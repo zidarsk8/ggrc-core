@@ -542,6 +542,7 @@
           } else {
             Loader = GGRC.ListLoaders.TypeFilteredListLoader;
             mappings = GGRC.Mappings.get_canonical_mapping_name(relevant.model_name, model_name);
+            mappings = mappings.replace("_as_source", "")
           }
           return new Loader(mappings, [model_name]).attach(relevant.filter);
         }));

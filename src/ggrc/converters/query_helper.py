@@ -7,7 +7,6 @@ import datetime
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
-import datetime
 
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.reflection import AttributeInfo
@@ -124,6 +123,16 @@ class QueryHelper(object):
     self.clean_filters(expression.get("left"))
     self.clean_filters(expression.get("right"))
 
+  def expression_keys(self, exp):
+    op = exp["op"]["name"]
+    if op in ["AND", "OR"]:
+      return expression_keys(exp["left"]) | expression_keys(exp["right"])
+    left = exp.get("left", None)
+    if left is None:
+      return set()
+    else:
+      return set([left])
+
   def macro_expand_object_query(self, object_query):
     def expand_task_dates(exp):
       if type(exp) is not dict or "op" not in exp:
@@ -166,9 +175,10 @@ class QueryHelper(object):
     if object_query["object_name"] == "TaskGroupTask":
       filters = object_query.get("filters")
       if filters is not None:
-        keys = filters.get("keys", [])
+        exp = filters["expression"]
+        keys = self.expression_keys(exp)
         if "start" in keys or "end" in keys:
-          expand_task_dates(filters.get("expression"))
+          expand_task_dates(exp)
 
   def get_ids(self):
     """ get list of objects and their ids according to the query
@@ -194,7 +204,10 @@ class QueryHelper(object):
         return value
       key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
       # handle dates
-      if key in ["start_date", "end_date"]:
+      if ("date" in key and "relative" not in key) or \
+         key in ["due_on", "requested_on"]:
+        if isinstance(value, datetime.date):
+          return value
         try:
           month, day, year = map(int, value.split("/"))
           return datetime.date(year, month, day)

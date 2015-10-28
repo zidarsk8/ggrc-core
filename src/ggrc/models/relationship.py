@@ -97,7 +97,8 @@ class Relationship(Mapping, db.Model):
   ]
 
   def _display_name(self):
-    return self.source.display_name + '<->' + self.destination.display_name
+    return "{}:{} <-> {}:{}".format(self.source_type, self.source_id,
+                                    self.destination_type, self.destination_id)
 
 
 class RelationshipType(Described, Base, db.Model):

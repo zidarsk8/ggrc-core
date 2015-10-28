@@ -290,7 +290,6 @@ class TestExportSingleObject(TestCase):
     }]
     response = self.export_csv(data)
 
-    sections = set([1, 5, 8])
     titles = [",mapped section {},".format(i) for i in range(1, 11)]
     titles.extend([",mapped reg {},".format(i) for i in range(1, 11)])
     titles.extend([",mapped policy {},".format(i) for i in range(1, 11)])
@@ -341,17 +340,24 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_query_all_aliases(self):
-    return # TODO re-enable
-    data = lambda obj_type, field: [{
-      "object_name": obj_type,
-      "fields": "all",
-      "filters": {
-        "expression": {
-          "left": field,
-          "op": { "name": "=" },
-          "right": "test"
-        },
-      }
+    def rhs(model, attr):
+      attr = getattr(model, attr, None)
+      if attr is not None and hasattr(attr, "_query_clause_element"):
+        class_name = attr._query_clause_element().type.__class__.__name__
+        if class_name == "Boolean":
+          return "1"
+      return "1/1/2015"
+
+    data = lambda model, attr, field: [{
+        "object_name": model.__name__,
+        "fields": "all",
+        "filters": {
+            "expression": {
+                "left": field.lower(),
+                "op": {"name": "="},
+                "right": rhs(model, attr)
+            },
+        }
     }]
 
     failed = set()
@@ -361,10 +367,10 @@ class TestExportSingleObject(TestCase):
           continue
         try:
          field = field["display_name"] if type(field) is dict else field
-         res = self.export_csv(data(model.__name__, field))
+         res = self.export_csv(data(model, attr, field))
          self.assertEqual(res.status_code, 200)
         except Exception as e:
-          failed.add((model, attr, field))
+          failed.add((model, attr, field, e))
     self.assertEqual(sorted(failed), [])
 
 

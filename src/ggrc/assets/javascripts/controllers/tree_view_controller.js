@@ -892,6 +892,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     for (i in already_visible) {
       control = $(already_visible[i]).control();
+      if (!control) {
+        continue;
+      }
       if (Math.abs(this.el_position(control.element)) <= page_count) {
         visible.push(control);
       } else {
