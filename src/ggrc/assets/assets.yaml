@@ -105,7 +105,7 @@ dashboard-js-files:
   - apps/quick_search.js
   - apps/business_objects.js
   - apps/custom_attributes.js
-  # - jquery.iframe-transport.js
+  - jquery.iframe-transport.js
   - jquery.remotipart-patched.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
