@@ -415,6 +415,10 @@ mockup-js-template-files:
   - base_templates/info_panel/requests_list.mustache
   - base_templates/info_panel/issues_list.mustache
   - base_templates/info_panel/assessment_custom.mustache
+  - base_templates/info_panel/code.mustache
+  - base_templates/info_panel/test.mustache
+  - base_templates/info_panel/notes.mustache
+  - base_templates/info_panel/request_type.mustache
 
   # Other base templates files
   - base_templates/request_panel.mustache

@@ -10,6 +10,8 @@
       title: "My new request",
       info_title: "My new request",
       description: Generator.paragraph(7),
+      notes: Generator.paragraph(9),
+      test: Generator.paragraph(11),
       state: {
         title: "In Progress",
         class_name: "inprogress"
@@ -19,6 +21,7 @@
       status: "In Progress",
       id: "2",
       comments: Generator.get("comment", 10, {sort: "date"}),
+      code: "REQ-007",
       people: {
         "assignee": Generator.get("user", 5),
         "requester": Generator.get("user"),
