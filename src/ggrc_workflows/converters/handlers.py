@@ -238,6 +238,8 @@ class TaskTypeColumnHandler(ColumnHandler):
   def parse_item(self):
     """ parse task type column value """
     if self.raw_value == "":
+      self.add_warning(errors.MISSING_VALUE_ERROR,
+                       column_name=self.display_name)
       return None
     value = self.type_map.get(self.raw_value.lower())
     if value is None:
