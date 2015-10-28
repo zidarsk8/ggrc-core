@@ -89,6 +89,8 @@ dashboard-js-files:
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
+  - modules/widget_descriptor.js
+  - modules/widget_list.js
   - models/section.js
   - models/system.js
   - models/join_models.js
