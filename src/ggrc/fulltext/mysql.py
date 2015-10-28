@@ -201,17 +201,20 @@ class MysqlIndexer(SqlIndexer):
     type_union_queries.append(all_people)
 
     # Objects to which the user is "mapped"
-    object_people_query = db.session.query(
-        ObjectPerson.personable_id.label('id'),
-        ObjectPerson.personable_type.label('type'),
-        literal(None).label('context_id')
-      ).filter(
-          and_(
-            ObjectPerson.person_id == contact_id,
-            ObjectPerson.personable_type.in_(model_names)
-          )
-      )
-    type_union_queries.append(object_people_query)
+    # We don't return mapped objects for the Creator because being mapped
+    # does not give the Creator necessary permissions to view the object.
+    if current_user.system_wide_role != "Creator":
+      object_people_query = db.session.query(
+          ObjectPerson.personable_id.label('id'),
+          ObjectPerson.personable_type.label('type'),
+          literal(None).label('context_id')
+        ).filter(
+            and_(
+              ObjectPerson.person_id == contact_id,
+              ObjectPerson.personable_type.in_(model_names)
+            )
+        )
+      type_union_queries.append(object_people_query)
 
     # Objects for which the user is an "owner"
     object_owners_query = db.session.query(

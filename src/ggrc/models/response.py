@@ -20,7 +20,7 @@ from ggrc.models.relationship import Relatable
 from ggrc.models.request import Request
 
 
-class Response(Noted, Described, Documentable, Hyperlinked, WithContact,
+class Response(Noted, Described, Hyperlinked, WithContact,
                Titled, Slugged, db.Model):
   __tablename__ = 'responses'
   __mapper_args__ = {
@@ -147,7 +147,7 @@ class Response(Noted, Described, Documentable, Hyperlinked, WithContact,
         orm.joinedload('request'))
 
 
-class DocumentationResponse(Relatable, Personable, Response):
+class DocumentationResponse(Relatable, Personable, Documentable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'documentation'
@@ -158,7 +158,7 @@ class DocumentationResponse(Relatable, Personable, Response):
   _sanitize_html = []
 
 
-class InterviewResponse(Relatable, Personable, Response):
+class InterviewResponse(Relatable, Personable, Documentable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'interview'
@@ -184,7 +184,7 @@ class InterviewResponse(Relatable, Personable, Response):
         orm.subqueryload('meetings'))
 
 
-class PopulationSampleResponse(Relatable, Personable, Response):
+class PopulationSampleResponse(Relatable, Personable, Documentable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'population sample'
