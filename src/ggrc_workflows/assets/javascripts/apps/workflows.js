@@ -406,9 +406,7 @@
 
         // Initialize controller -- probably this should go in a separate
         // initialization area
-        $(function() {
       $(document.body).ggrc_controllers_workflow_page();
-    });
 
         GGRC.register_hook(
             "ObjectNav.Actions",
@@ -573,19 +571,16 @@
       };
 
   WorkflowExtension.init_global = function() {
-    $(function() {
+    if (!GGRC.current_user || !GGRC.current_user.id) {
+      return;
+    }
 
-      if (!GGRC.current_user || !GGRC.current_user.id) {
-        return;
-      }
-
-      CMS.Models.Person.findOne({
-        id: GGRC.current_user.id
-      }).then(function(person) {
-        $('.task-count').ggrc_controllers_mapping_count({
-          mapping: 'assigned_tasks',
-          instance: person
-        });
+    CMS.Models.Person.findOne({
+      id: GGRC.current_user.id
+    }).then(function(person) {
+      $('.task-count').ggrc_controllers_mapping_count({
+        mapping: 'assigned_tasks',
+        instance: person
       });
     });
   };
@@ -602,7 +597,6 @@
   WorkflowExtension.init_mappings();
 
   var draft_on_update_mixin = can.Model.Mixin({
-
   }, {
     before_update: function() {
       if (this.status && this.os_state === "Approved") {
