@@ -8,10 +8,10 @@
 (function($, CMS, GGRC) {
   var WorkflowExtension = {},
       _workflow_object_types = Array.prototype.concat.call([],
-        'Program Regulation Policy Standard Contract Clause Section'.split(' '),
-        'Control Objective OrgGroup Vendor AccessGroup'.split(' '),
-        'System Process DataAsset Product Project Facility Market Issue ControlAssessment'.split(' '),
-        'Risk ThreatActor'.split(' ')
+        "Program Regulation Policy Standard Contract Clause Section".split(" "),
+        "Control Objective OrgGroup Vendor AccessGroup".split(" "),
+        "System Process DataAsset Product Project Facility Market Issue ControlAssessment".split(" "),
+        "Risk ThreatActor".split(" ")
       ),
       _task_sort_function = function(a, b) {
         var date_a = +new Date(a.end_date),
@@ -305,6 +305,9 @@
         tree_widgets = GGRC.tree_view.base_widgets_by_type;
 
     _.each(_workflow_object_types, function (type) {
+      if (!type || !tree_widgets[type]) {
+        return;
+      }
       tree_widgets[type] = tree_widgets[type].concat(["TaskGroup", "Workflow", "CycleTaskEntry", "CycleTaskGroupObjectTask", "CycleTaskGroupObject", "CycleTaskGroup"]);
     });
 

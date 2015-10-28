@@ -50,6 +50,7 @@ dashboard-js-files:
   - plugins/tooltip.js
   - plugins/popover.js
   - plugins/popover_template.js
+  - apps/base_widgets.js
   - application.js
   - client_record_replay.js
   - mustache_helper.js
@@ -90,7 +91,6 @@ dashboard-js-files:
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
-  - apps/base_widgets.js
   - modules/widget_descriptor.js
   - modules/widget_list.js
   - models/section.js
