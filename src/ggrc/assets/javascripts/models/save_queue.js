@@ -101,10 +101,11 @@
           this._buckets[type] = bucket;
         }
         bucket.objs.push(obj);
-        if (!bucket.in_flight) {
-          elem = this._enqueue_bucket(bucket);
-          bucket.in_flight = true;
+        if (bucket.in_flight) {
+          return;
         }
+        elem = this._enqueue_bucket(bucket);
+        bucket.in_flight = true;
       }
       this._step(elem);
      },
