@@ -322,7 +322,7 @@ class ObjectsColumnHandler(ColumnHandler):
         task_group_id=self.row_converter.obj.id).all()
     lines = ["{}: {}".format(t.object._inflector.title_singular.title(),
                              t.object.slug)
-             for t in task_group_objects]
+             for t in task_group_objects if t.object is not None]
     return "\n".join(lines)
 
   def insert_object(self):
