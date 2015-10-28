@@ -35,7 +35,9 @@ from ggrc.models.person import Person
 from ggrc.models.product import Product
 from ggrc.models.program import Program
 from ggrc.models.project import Project
-from ggrc.models.relationship import Relationship, RelationshipType
+from ggrc.models.relationship import Relationship
+from ggrc.models.relationship import RelationshipAttr
+from ggrc.models.relationship import RelationshipType
 from ggrc.models.request import Request
 from ggrc.models.response import (
     Response, DocumentationResponse, InterviewResponse,
@@ -92,6 +94,7 @@ all_models = [
     Project,
     Relationship,
     RelationshipType,
+    RelationshipAttr,
     Request,
     Response,
     DocumentationResponse,
