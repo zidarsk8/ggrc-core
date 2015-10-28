@@ -32,8 +32,7 @@
     _enqueue_bucket: function (bucket) {
       var that = this;
       return function () {
-        var objs = bucket.objs;
-        bucket.objs = [];
+        var objs = bucket.objs.splice(0, 100);
         var body = _.map(objs, function (obj) {
           var o = {};
           o[bucket.type] = obj.serialize();
