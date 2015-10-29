@@ -364,9 +364,15 @@ dashboard-js-spec-helpers:
   - spec_helpers.js
 
 mockup-js-files:
-  # 3rd party
-  # 3rd party end
   - mockup_generator.js
+
+  # Request
+  - request/pages/info.js
+  - request/pages/requests.js
+  - request/pages/objectives.js
+  - request/pages/regulations.js
+  - request/pages/controls.js
+  - request/pages/assessments.js
   - javascript/add_comment.js
   - javascript/attachment_list.js
   - javascript/info_panel.js
