@@ -365,6 +365,10 @@ dashboard-js-spec-helpers:
 
 mockup-js-files:
   - mockup_generator.js
+  - javascript/generators/assessment.js
+
+  # Assessor
+  - assessor/pages/assessments.js
 
   # Request
   - request/pages/info.js
@@ -373,16 +377,26 @@ mockup-js-files:
   - request/pages/regulations.js
   - request/pages/controls.js
   - request/pages/assessments.js
+
+  # Bootstrap files shouold be above
   - javascript/add_comment.js
   - javascript/attachment_list.js
   - javascript/info_panel.js
+  - javascript/tree_view.js
   - mockuphelper_controller.js
+  - assessor/main.js
   - request/main.js
 
 mockup-js-template-files:
+  # Request
   - title.mustache
   - request/info.mustache
-  - request/audit.mustache
+  - request/widget.mustache
+  - request/assessment_modal.mustache
+  - assessor/assessments.mustache
+
+  # Base templates
+  - base_templates/modal_base.mustache
 
   # Info panel partials
   - base_templates/info_panel/base.mustache
@@ -405,6 +419,7 @@ mockup-js-template-files:
   - base_templates/info_panel/test.mustache
   - base_templates/info_panel/notes.mustache
   - base_templates/info_panel/request_type.mustache
+  - base_templates/assessment_panel.mustache
   - base_templates/tree.mustache
   - base_templates/tree_item.mustache
   - base_templates/info_panel.mustache
