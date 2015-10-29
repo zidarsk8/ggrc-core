@@ -368,6 +368,7 @@ mockup-js-files:
   # 3rd party end
   - mockup_generator.js
   - javascript/add_comment.js
+  - javascript/attachment_list.js
   - mockuphelper_controller.js
   - request/main.js
 
@@ -380,4 +381,5 @@ mockup-js-template-files:
   - base_templates/info_panel.mustache
   - base_templates/filter.mustache
   - base_templates/nav_item.mustache
+  - base_templates/attachment_list.mustache
   - base_templates/add_comment.mustache
