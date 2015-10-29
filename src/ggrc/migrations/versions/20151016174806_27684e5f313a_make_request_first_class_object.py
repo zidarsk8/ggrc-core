@@ -70,16 +70,16 @@ def upgrade():
 
     # 3. Change status values
     sql += """
-    ALTER TABLE requests CHANGE status status ENUM('Draft','Requested','Responded','Amended Request','Updated Response','Accepted','Unstarted','In Progress','Completed','Verified');
+    ALTER TABLE requests CHANGE status status ENUM('Draft','Requested','Responded','Amended Request','Updated Response','Accepted','Unstarted','In Progress','Finished','Verified') NOT NULL;
 
     UPDATE requests SET status='Unstarted' WHERE status='Draft';
     UPDATE requests SET status='In Progress' WHERE status='Requested';
-    UPDATE requests SET status='Completed' WHERE status='Responded';
+    UPDATE requests SET status='Finished' WHERE status='Responded';
     UPDATE requests SET status='In Progress' WHERE status='Amended Request';
-    UPDATE requests SET status='Completed' WHERE status='Updated Response';
+    UPDATE requests SET status='Finished' WHERE status='Updated Response';
     UPDATE requests SET status='Verified' WHERE status='Accepted';
 
-    ALTER TABLE requests CHANGE status status ENUM('Unstarted','In Progress','Completed','Verified');
+    ALTER TABLE requests CHANGE status status ENUM('Unstarted','In Progress','Finished','Verified') NOT NULL;
     """
 
     sql += "COMMIT;"

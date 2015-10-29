@@ -42,7 +42,7 @@ class Request(Assignable, Commentable, CustomAttributable, Relatable, Titled,
   _title_uniqueness = False
 
   VALID_TYPES = (u'documentation', u'interview')
-  VALID_STATES = (u'Unstarted', u'In Progress', u'Completed', u'Verified')
+  VALID_STATES = (u'Unstarted', u'In Progress', u'Finished', u'Verified')
   # TODO Remove requestor and requestor_id on database cleanup
   requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))
   requestor = db.relationship('Person', foreign_keys=[requestor_id])
