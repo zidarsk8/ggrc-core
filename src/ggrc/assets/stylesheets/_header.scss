@@ -18,6 +18,9 @@
   height: 27px;
   line-height: 27px;
   margin: 10px 20px 0 46px;
+  &.single {
+    margin: 10px 20px 0 10px;
+  }
   a {
     display: block;
   }
