@@ -6,7 +6,7 @@
 */
 
 
-(function (can, $) {
+(function (can, $, Generator) {
   can.route(":tab", {tab: "Info"});
   can.route(":tab/:item");
 
@@ -28,11 +28,19 @@
             views: views
           };
       new CMS.Controllers.MockupNav(this.element.find(".internav"), options);
-      new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), options);
+      new CMS.Controllers.MockupInfoPanel(this.element.find(".info-pin"), _.extend(options, {
+        default_height: opts.infopin || "min"
+      }));
+      new CMS.Controllers.MockupModalView(this.element);
+
       this.element.find(".title-content").html(can.view(this.options.title_view, opts.object));
       this.options.views = views;
     },
     "{can.route} tab": function (router, ev, tab) {
+      var exists = _.findWhere(this.options.views, {title: tab});
+      if (!exists) {
+        return can.route.attr("tab", _.first(this.options.views).title);
+      }
       this.options.views.each(function (view) {
         var isActive = view.title === tab;
         view.attr("active", isActive);
@@ -65,157 +73,45 @@
 
   can.Control("CMS.Controllers.MockupView", {
     defaults: {
-      title_view: GGRC.mustache_path + "/title.mustache"
+      title_view: GGRC.mustache_path + "/title.mustache",
+      slide_speed: 240
     }
   }, {
-    init: function (el, options) {
-      this.element.html(can.view(GGRC.mustache_path + options.view.template, _.extend(this.options, {
-        instance: options.view
-      })));
-      if (options.view.children) {
-        new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
-      }
-    },
-    ".js-trigger-reuse click": function (el, ev) {
-      var view = this.options.view,
-          checked = _.reduce(view.past_requests, function (val, memo) {
-            return val.concat(_.filter(memo.past_requests_files, function (file) {
-              var status = file.checked;
-              file.attr("checked", false);
-              return status;
-            }));
-          }, []);
-      this.element.find(".past-items-list .js-trigger-pastfile").prop("checked", false);
-      view.files.push.apply(view.files, checked);
-    },
-    ".js-trigger-pastfile change": function (el, ev) {
-      var data = el.data("item"),
-          isChecked = el.prop("checked");
-
-      data.attr("checked", isChecked);
-    }
-  });
-
-  can.Control("CMS.Controllers.MockupTreeView", {
-  }, {
-    init: function (el, opts) {
-      _.each(this.options.children, function (child) {
-        var $item = $("<li/>", {class: "tree-item"});
-        new CMS.Controllers.MockupTreeItem($item, {
-          item: child
-        });
-        this.element.append($item);
-      }, this);
-    },
-    "{can.route} item": function (router, ev, item) {
-      if (!item || !item.length) {
-        return;
-      }
-      item = item.split("-");
-      var view = _.findWhere(this.options.children, {
-            type: item[0],
-            id: item[1]
-          });
-      view.attr("active", true);
-    },
-    "{children} change": function (list, ev, which, type, status) {
-      which = which.split(".");
-      var index = +which[0],
-          prop = which[1];
-
-      if (!status) {
-        return;
-      }
-      _.each(this.options.children, function (child, i) {
-        var isActive = index === i;
-        child.attr("active", isActive);
-        if (isActive) {
-          can.route.attr("item", child.type + "-" + child.id);
+      init: function (el, options) {
+        this.element.html(can.view(GGRC.mustache_path + options.view.template, _.extend(this.options, {
+          instance: options.view
+        })));
+        if (options.view.children) {
+          new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
         }
-      });
-    }
-  });
-
-  can.Control("CMS.Controllers.MockupTreeItem", {
-    defaults: {
-      view: "/static/mockups/base_templates/tree_item.mustache"
-    }
-  }, {
-    init: function (el, options) {
-      this.element.html(can.view(this.options.view, options.item));
-      _.each(options.item.children, function (child) {
-        var $item = $("<li/>", {class: "tree-item"});
-        new CMS.Controllers.MockupTreeItem($item, {
-          item: child
-        });
-        this.element.find(".tree-structure").append($item);
-      }, this);
-    },
-    ".select click": function (el, ev) {
-      var status = !this.options.item.active;
-      this.options.item.attr("active", status);
-    },
-    "{item} change": function (list, ev, which, type, status) {
-      if (which === "active") {
-        this.element.toggleClass("active", status);
-      }
-    }
-  });
-
-
-  can.Control("CMS.Controllers.MockupInfoPanel", {
-    defaults: {
-      view: "/static/mockups/base_templates/info_panel.mustache",
-      slide: 240
-    }
-  }, {
-    ".pin-action a click": function (el, ev) {
-      var size = el.data("size"),
-          height = Math.round($(window).height() / 3),
-          heights = {
-            deselect: 0,
-            min: height,
-            normal: height*2,
-            max: height*3
-          };
-
-      el.find("i").css("opacity", 1).closest("li").siblings().find("i").css("opacity", 0.25);
-      this.element
-        .show().height(0)
-        .animate({
-          height: heights[size]
-        }, {
-          duration: this.options.slide,
-          complete: function () {
-            if (size === "deselect") {
-              this.element.hide();
-              this.active.attr("active", false);
-              can.route.removeAttr("item");
-            }
-          }.bind(this)
-        });
-    },
-    "{can.route} tab": function (router, ev, tab) {
-      this.element.hide();
-    },
-    "{can.route} item": function (router, ev, item) {
-      // TODO: Simplify this
-      if (!item || !item.length) {
-        return;
-      }
-      function recursiveFind(needle) {
-        if (needle.type === item[0] && needle.id === item[1]) {
-          return needle;
+        if (options.view.title === "Info") {
+          this.cached = new CMS.Controllers.MockupInfoView(this.element);
         }
-        if (needle.children && needle.children.length) {
-          return _.map(needle.children, recursiveFind);
+      },
+      destroy: function () {
+        if (this.cached) {
+          this.cached.destroy();
         }
+        can.Control.prototype.destroy.call(this);
+      },
+      ".filter-trigger click": function (el, ev) {
+        this.element.find(".filter-holder").slideToggle(this.options.slide_speed);
       }
-      item = item.split("-");
-      var view = _.compact(_.flattenDeep(_.map(this.options.views, recursiveFind)))[0];
-      this.active = view;
-      this.element.html(can.view(this.options.view, view));
-      this.element.show();
+  });
+
+  can.Control("CMS.Controllers.MockupModalView", {
+  }, {
+    ".modal .js-toggle-field change": function (el, ev) {
+      var target = this.element.find(el.data("target")),
+          val = el.data("value");
+
+      target.prop("disabled", el.val() !== val);
+    },
+    ".modal #underAssessment change": function (el, ev) {
+      var isEnabled = el.val() === "Control";
+      this.element.find(".js-toggle-controlplans").prop("disabled", !isEnabled)
+          .closest("label").toggleClass("disabled", !isEnabled);
     }
   });
-})(this.can, this.can.$);
+
+})(this.can, this.can.$, GGRC.Mockup.Generator);

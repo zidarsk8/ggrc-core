@@ -658,6 +658,9 @@
   padding-top: 15px;
   padding-left: 28px;
   border-bottom: 1px solid $itemBorder;
+  &.active {
+    display: block !important;
+  }
 }
 
 .info {
@@ -1757,22 +1760,31 @@ ul.attr-list, ul.model-list {
 
 .info-expand {
   border-bottom: 1px solid $itemBorder;
+  .mapped & {
+    a {
+      font-weight: normal;
+    }
+  }
   a {
     display: block;
     padding: 9px 0 10px 4px;
     font-size: 13px;
     font-weight: bold;
     line-height: 20px;
-    i {
-      @include opacity(0.25);
-      margin-top: 2px !important;
+    span {
+      i {
+        @include opacity(0.25);
+        margin-top: 2px !important;
+      }
     }
     &:hover {
       text-decoration:none;
     }
     &.active {
-      i {
-        @include opacity(1);
+      span {
+        i {
+           @include opacity(1);
+        }
       }
     }
   }
@@ -1790,6 +1802,10 @@ ul.attr-list, ul.model-list {
 }
 
 .info-expand-custom {
+  @extend .info-expand;
+}
+
+.info-expand-mapped {
   @extend .info-expand;
 }
 

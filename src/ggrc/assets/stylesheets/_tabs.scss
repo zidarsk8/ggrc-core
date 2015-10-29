@@ -63,18 +63,46 @@
 			content: "A";
 		}
 	}
+	&.assessor,
+	&.assessors {
+		background: $purple;
+		&:after {
+			content: "S";
+		}
+	}
 	&.requester {
 		background: $purple;
 		&:after {
 			content: "R";
 		}
 	}
+	&.creator,
+	&.creators {
+		background: $orange;
+		&:after {
+			content: "C";
+		}
+	}
+	&.verifier,
 	&.verifier {
 		background: $orange;
 		&:after {
 			content: "V";
 		}
 	}
+	&.lead {
+		background: $orange;
+		&:after {
+			content: "L";
+		}
+	}
+	&.auditor {
+		background: $olive;
+		&:after {
+			content: "A";
+		}
+	}
+
 }
 
 .third-col {
@@ -130,8 +158,24 @@
 }
 
 .add-comment {
-	margin: 10px 0 20px;
+	margin: 0 0 20px;
 	.controls {
-		display: none;
+		margin-top: 15px;
+		&.top {
+			margin: 0 0 15px;
+		}
+	}
+	textarea {
+		margin-bottom: 0;
+	}
+}
+
+.attachments-preview {
+	ul {
+		@extend %reset-list;
+	}
+	li {
+		display: inline-block;
+		margin: 4px 0 0;
 	}
 }

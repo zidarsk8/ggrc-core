@@ -150,6 +150,9 @@ a.remove_filter i[class^="grcicon-"] {
   .active & {
     background-position:-30px -80px;
   }
+  .file-controls & {
+    background-position:-30px -56px;
+  }
   .tree-structure .active & {
     background-position:-30px -56px;
   }
@@ -288,10 +291,10 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-external { background-position: -366px -272px; }
 
 .grcicon-file-pdf { background-position: -366px -128px; }
-.grcicon-file-text { background-position: -366px -176px; }
+.grcicon-file-txt { background-position: -366px -176px; }
 .grcicon-file-xls { background-position: -366px -200px; }
 .grcicon-file-doc { background-position: -366px -224px; }
-.grcicon-file-image { background-position: -366px -296px; }
+.grcicon-file-img { background-position: -366px -296px; }
 .grcicon-file-zip { background-position: -366px -344px; }
 .grcicon-file-url { background-position: -342px -368px; }
 .grcicon-file { background-position: -366px -248px; }
@@ -338,6 +341,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grciconlarge-threat_actor { background-position: -264px -200px; }
 .grciconlarge-access_group, .grciconlarge-access-group, .grciconlarge-accessgroup { background-position: -296px -200px; }
 .grciconlarge-market { background-position: -328px -200px; }
+.grciconlarge-assessment { background-position: -8px -296px; }
 
 .showhide {
   background-position:-198px -56px;
@@ -562,6 +566,7 @@ a.remove_filter i[class^="grcicon-"] {
 .grcicon-deleted { background-position:-102px -344px; }
 .grcicon-updated { background-position:-126px -344px; }
 .grcicon-created { background-position:-222px -8px; }
+.grcicon-unmapped { background-position: -198px -344px; }
 
 // review/approval icons
 .grcicon-review-color { background-position: -318px -176px; }
