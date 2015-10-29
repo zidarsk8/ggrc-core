@@ -4,110 +4,105 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 }}
-
-    <header class="header sticky sticky-header tree-header " style="position: absolute; left: 0px; right: 0px; top: 69px; bottom: auto; width: auto; margin-left: 0px; margin-right: 0px; margin-top: 0px;">
+{{#instance}}
+    <header class="header sticky sticky-header tree-header">
       <div class="row-fluid">
         <div class="span4">
           <div class="title-heading oneline">
             <span class="widget-col-title" data-field="title">
-              Audit Title
+              {{title}} Title
               <i class="grcicon-carrot"></i>
             </span>
           </div>
         </div>
+        <div class="span4">
+          <div class="row-fluid">
+              <div class="span12">
+                <div class="oneline">
+                  <span class="widget-col-title" data-field="status">
+                    Status
+                    <i class="grcicon-carrot"></i>
+                  </span>
+                </div>
+              </div>
+          </div>
+        </div>
 
     <div class="span4">
-      <div class="row-fluid">
-          <div class="span12">
-            <div class="oneline">
-              <span class="widget-col-title" data-field="status">
+      <ul class="tree-action-list">
+        <li class="filter-trigger">
+          <a href="javascript://" class="active">
+             <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
+          </a>
+        </li>
+      <tree-header-selector>
+      <li>
+        <a href="#" class="dropdown-toggle tview-dropdown-toggle" data-toggle="dropdown">
+          <i class="grcicon-setup-color"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-form">
+          <a class="pull-right close-dropdown"><i class="grcicon-x-grey"></i></a>
+          <h5>Set visible fields for Audit</h5>
+          <ul class="attr-list">
+            <li class="disabled">
+              <label class="checkbox-inline" title="Title">
+                <input type="checkbox" checked="checked" disabled="" value="title" class="notify-wrap attr-checkbox mandatory">
+                Title
+              </label>
+            </li>
+            <li class="">
+              <label class="checkbox-inline" title="Audit Lead">
+                <input type="checkbox" value="audit_lead" class="notify-wrap attr-checkbox ">
+                Audit Lead
+              </label>
+            </li>
+            <li class="">
+              <label class="checkbox-inline" title="Code">
+                <input type="checkbox" value="slug" class="notify-wrap attr-checkbox ">
+                Code
+              </label>
+            </li>
+            <li class="">
+              <label class="checkbox-inline" title="Status">
+                <input type="checkbox" checked="checked" value="status" class="notify-wrap attr-checkbox ">
                 Status
-                <i class="grcicon-carrot"></i>
-              </span>
-            </div>
-          </div>
-      </div>
-    </div>
-
-        <div class="span4">
-          <ul class="tree-action-list">
-
-    <li class="filter-trigger">
-      <a href="javascript://" class="active">
-         <i class="grcicon-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
-      </a>
-    </li>
-
-    <tree-header-selector>
-    <li>
-      <a href="#" class="dropdown-toggle tview-dropdown-toggle" data-toggle="dropdown">
-        <i class="grcicon-setup-color"></i>
-      </a>
-      <div class="dropdown-menu dropdown-menu-form">
-        <a class="pull-right close-dropdown"><i class="grcicon-x-grey"></i></a>
-        <h5>Set visible fields for Audit</h5>
-        <ul class="attr-list">
-          <li class="disabled">
-            <label class="checkbox-inline" title="Title">
-              <input type="checkbox" checked="checked" disabled="" value="title" class="notify-wrap attr-checkbox mandatory">
-              Title
-            </label>
-          </li>
-          <li class="">
-            <label class="checkbox-inline" title="Audit Lead">
-              <input type="checkbox" value="audit_lead" class="notify-wrap attr-checkbox ">
-              Audit Lead
-            </label>
-          </li>
-          <li class="">
-            <label class="checkbox-inline" title="Code">
-              <input type="checkbox" value="slug" class="notify-wrap attr-checkbox ">
-              Code
-            </label>
-          </li>
-          <li class="">
-            <label class="checkbox-inline" title="Status">
-              <input type="checkbox" checked="checked" value="status" class="notify-wrap attr-checkbox ">
-              Status
-            </label>
-          </li>
-          <li class="">
-            <label class="checkbox-inline" title="Last Updated">
-              <input type="checkbox" value="updated_at" class="notify-wrap attr-checkbox ">
-              Last Updated
-            </label>
-          </li>
-          <li class="">
-            <label class="checkbox-inline" title="Start Date">
-              <input type="checkbox" value="start_date" class="notify-wrap attr-checkbox ">
-              Start Date
-            </label>
-          </li>
-          <li class="">
-            <label class="checkbox-inline" title="End Date">
-              <input type="checkbox" value="end_date" class="notify-wrap attr-checkbox ">
-              End Date
-            </label>
-          </li>
-          <li class="">
-            <label class="checkbox-inline" title="Report Period">
-              <input type="checkbox" value="report_period" class="notify-wrap attr-checkbox ">
-              Report Period
-            </label>
-          </li>
-          <li class="">
-            <label class="checkbox-inline" title="Audit Firm">
-              <input type="checkbox" value="audit_firm" class="notify-wrap attr-checkbox ">
-              Audit Firm
-            </label>
-          </li>
-        </ul>
-        <a class="btn btn-small btn-info set-tree-attrs" href="javascript://">Set fields</a>
-      </div>
-    </li>
+              </label>
+            </li>
+            <li class="">
+              <label class="checkbox-inline" title="Last Updated">
+                <input type="checkbox" value="updated_at" class="notify-wrap attr-checkbox ">
+                Last Updated
+              </label>
+            </li>
+            <li class="">
+              <label class="checkbox-inline" title="Start Date">
+                <input type="checkbox" value="start_date" class="notify-wrap attr-checkbox ">
+                Start Date
+              </label>
+            </li>
+            <li class="">
+              <label class="checkbox-inline" title="End Date">
+                <input type="checkbox" value="end_date" class="notify-wrap attr-checkbox ">
+                End Date
+              </label>
+            </li>
+            <li class="">
+              <label class="checkbox-inline" title="Report Period">
+                <input type="checkbox" value="report_period" class="notify-wrap attr-checkbox ">
+                Report Period
+              </label>
+            </li>
+            <li class="">
+              <label class="checkbox-inline" title="Audit Firm">
+                <input type="checkbox" value="audit_firm" class="notify-wrap attr-checkbox ">
+                Audit Firm
+              </label>
+            </li>
+          </ul>
+          <a class="btn btn-small btn-info set-tree-attrs" href="javascript://">Set fields</a>
+        </div>
+      </li>
     </tree-header-selector>
-
-
     <tree-type-selector>
       <li>
         <a href="#" class="dropdown-toggle tview-type-toggle" data-toggle="dropdown">
@@ -224,8 +219,7 @@
           </ul>
         </div>
       </div>
-    </header><div style="height: 20px; width: 1356px; margin: -6px 0px 4px; border-spacing: 0px; border: 0px; padding: 0px; font-size: 1em; position: static; float: none;"></div>
+    </header>
     <div class="clearfix"></div>
     <ul class="tree-structure new-tree base-tree-view"></ul>
-  </section>
-</section>
+{{/instance}}
