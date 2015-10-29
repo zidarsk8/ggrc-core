@@ -14,10 +14,8 @@
 
   // Insert risk mappings to all gov/business object types
   var _risk_object_types = [
-      "Program",
-      "Regulation", "Standard", "Policy", "Contract",
-      "Objective", "Control", "Section", "Clause",
-      "System", "Process",
+      "Program", "Regulation", "Standard", "Policy", "Contract",
+      "Objective", "Control", "Section", "Clause", "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
       "MultitypeSearch", "Issue", "ControlAssessment", "AccessGroup",
       "Person", "OrgGroup", "Vendor"
@@ -52,7 +50,6 @@
 
     // Add mappings for risk objects
     var mappings = {
-
       related: {
         related_objects_as_source: Proxy(
           null, "destination", "Relationship", "source", "related_destinations"),
@@ -114,12 +111,12 @@
     };
 
     can.each(_risk_object_types, function (type) {
-        mappings[type] = {
+        mappings[type] = _.extend(mappings[type] || {}, {
           _canonical: {
-            "related_objects_as_source": ['Risk', 'ThreatActor']
+            "related_objects_as_source": ["Risk", "ThreatActor"]
           },
-          _mixins: ['related', 'related_risk', 'related_threat_actor'],
-        };
+          _mixins: ["related", "related_risk", "related_threat_actor"],
+        });
     });
     new GGRC.Mappings("ggrc_risks", mappings);
   };
