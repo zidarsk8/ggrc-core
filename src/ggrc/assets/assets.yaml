@@ -366,6 +366,7 @@ dashboard-js-spec-helpers:
 mockup-js-files:
   # 3rd party
   # 3rd party end
+  - mockup_generator.js
   - mockuphelper_controller.js
   - request/main.js
 
