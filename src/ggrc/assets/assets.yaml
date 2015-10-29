@@ -369,6 +369,7 @@ mockup-js-files:
   - mockup_generator.js
   - javascript/add_comment.js
   - javascript/attachment_list.js
+  - javascript/info_panel.js
   - mockuphelper_controller.js
   - request/main.js
 
@@ -376,6 +377,28 @@ mockup-js-template-files:
   - title.mustache
   - request/info.mustache
   - request/audit.mustache
+
+  # Info panel partials
+  - base_templates/info_panel/base.mustache
+  - base_templates/info_panel/pin_actions.mustache
+  - base_templates/info_panel/header.mustache
+  - base_templates/info_panel/description.mustache
+  - base_templates/info_panel/mapped_objects.mustache
+  - base_templates/info_panel/people_list.mustache
+  - base_templates/info_panel/dates_list.mustache
+  - base_templates/info_panel/comment_list.mustache
+  - base_templates/info_panel/log_list.mustache
+  - base_templates/info_panel/past_items_list.mustache
+  - base_templates/info_panel/procedures.mustache
+  - base_templates/info_panel/assessment_results.mustache
+  - base_templates/info_panel/bug_number.mustache
+  - base_templates/info_panel/requests_list.mustache
+  - base_templates/info_panel/issues_list.mustache
+  - base_templates/info_panel/assessment_custom.mustache
+  - base_templates/info_panel/code.mustache
+  - base_templates/info_panel/test.mustache
+  - base_templates/info_panel/notes.mustache
+  - base_templates/info_panel/request_type.mustache
   - base_templates/tree.mustache
   - base_templates/tree_item.mustache
   - base_templates/info_panel.mustache
