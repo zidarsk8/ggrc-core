@@ -9,7 +9,6 @@ from sqlalchemy import and_, or_
 
 from ggrc.models.audit import Audit
 from ggrc.models.audit_object import AuditObject
-from ggrc.models.comment import Commentable
 from ggrc.models.mixins import Assignable
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
@@ -36,7 +35,7 @@ from ggrc.models.relationship import Relatable
 
 
 
-class Request(Assignable, Commentable, CustomAttributable, Relatable, Titled,
+class Request(Assignable, CustomAttributable, Relatable, Titled,
               Slugged, Described, Base,db.Model):
   __tablename__ = 'requests'
   _title_uniqueness = False
