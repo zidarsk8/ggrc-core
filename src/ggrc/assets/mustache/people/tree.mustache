@@ -1,8 +1,8 @@
 {{!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: brad@reciprocitylabs.com
-    Maintained By: brad@reciprocitylabs.com
+    Maintained By: vladan@reciprocitylabs.com
 }}
 
   <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
@@ -15,7 +15,7 @@
               <div class="span4">
                 <div class="title tree-title-area">
                   {{#if_draw_icon instance}}
-                    <i class="grcicon-person-color"></i>
+                    <i class="fa fa-person"></i>
                   {{/if_draw_icon}}
                   {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
                 </div>

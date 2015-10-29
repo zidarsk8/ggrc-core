@@ -1,8 +1,8 @@
 {{!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: silas@reciprocitylabs.com
-    Maintained By: silas@reciprocitylabs.com
+    Maintained By: vladan@reciprocitylabs.com
 }}
 
 
@@ -95,7 +95,7 @@
               <ul class="tree-action-list">
                 {{#infer_roles instance}}
                   <li>
-                    <i class="grcicon-person-black" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
+                    <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
                   </li>
                 {{/infer_roles}}
                 {{#with_page_object_as 'page_object'}}
@@ -104,7 +104,7 @@
                     {{^instance.contact}}
                       <li>
                         <div class="counter">
-                          <i class="grcicon-people-warning"></i>
+                          <i class="fa fa-person red"></i>
                         </div>
                       </li>
                     {{/instance.contact}}
@@ -128,7 +128,7 @@
                     {{^instance.contact}}
                       <li>
                         <div class="counter">
-                          <i class="grcicon-people-warning"></i>
+                          <i class="fa fa-person red"></i>
                         </div>
                       </li>
                     {{/instance.contact}}
