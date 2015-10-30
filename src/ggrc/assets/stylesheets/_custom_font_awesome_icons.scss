@@ -16,7 +16,9 @@
 }
 
 .#{$fa-css-prefix}-person:before { content: $fa-var-user; }
+.grcicon-role-color:before { content: $fa-var-key; }
 .#{$fa-css-prefix}-person-color:before { content: $fa-var-user; color: #a8491a; }
+
 
 // Turn icons to black
 %black-icons {
