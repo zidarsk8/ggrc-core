@@ -43,12 +43,12 @@
           {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make Relevant">
               {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
-              <i class="grcicon-checked"></i>
+              <i class="fa fa-check-square-o"></i>
             </a>
           {{/is_allowed_all}}
         {{else}}
           <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}} rel="tooltip" data-placement="left" data-original-title="Make Relevant">
-            <i class="grcicon-check"></i>
+            <i class="fa fa-square-o"></i>
           </a>
         {{/if}}
         {{/is_allowed_to_map}}
