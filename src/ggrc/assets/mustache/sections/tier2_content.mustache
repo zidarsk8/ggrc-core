@@ -31,7 +31,7 @@
       {{#is_allowed 'update' instance}}
         <li>
           <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-object-singular-override="{{#if_equals instance.directive.type 'Contract'}}Clause{{/if_equals}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{instance.class.model_singular}}" data-object-id="{{instance.id}}">
-            <i class="grcicon-edit"></i>
+            <i class="fa fa-pencil-square-o"></i>
             Edit {{instance.class.model_singular}}
           </a>
         </li>

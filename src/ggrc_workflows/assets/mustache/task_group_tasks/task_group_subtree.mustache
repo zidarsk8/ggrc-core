@@ -119,7 +119,7 @@
           {{#using workflow=parent_instance.workflow}}
             {{^if_equals workflow.status 'Inactive'}}
             <a class="utility-link pull-right info-action" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}" data-object-params='{ "modal_title": "Edit Task" }'>
-              <i class="grcicon-edit"></i>
+              <i class="fa fa-pencil-square-o"></i>
             </a>
             {{/if_equals}}
             {{/using}}

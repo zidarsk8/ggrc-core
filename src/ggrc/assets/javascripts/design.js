@@ -72,7 +72,7 @@ jQuery(function ($) {
     $('#confirmModal').modal('show');
   });
 
-/* no worky 
+/* no worky
   $(document).on("click", ".sluggroup", function(event){
     //alert("here");
     var $this = $(this);
@@ -104,7 +104,7 @@ jQuery(function ($) {
 //if includes a xpander we need to toggle it.
 $('body').on('click', '.grcicon-more', function(e) {
   //bootstrap data toggle opens this one up, but ...
-  
+
   e.preventDefault();
 
   //var title = $("em").attr("data-target");
@@ -128,10 +128,10 @@ $('body').on('click', '.grcicon-more', function(e) {
   $("[id$=-more]").each(function(i){
       var el = $(this);
       if (el.hasClass("in")) {
-        //its open close it!  
+        //its open close it!
         el.collapse('hide');
-      } else { 
-        //its already closed, relax. 
+      } else {
+        //its already closed, relax.
         // We have an isue with items on their way to closing and you clicked another, so checking for animating...
         el.filter(":animated").toggleClass("in");
       }
@@ -185,7 +185,7 @@ $('body').on('click', '.grcicon-more', function(e) {
     }
 
   });
-  
+
   // nicer hover
 
   $('body').on('mouseenter', '.people-list li', function(e) {
@@ -215,14 +215,14 @@ $('body').on('click', '.grcicon-more', function(e) {
   // add item in target list
 
   $('body').on('click', '.add-me', function(e) {
-    
+
     e.preventDefault();
-    
+
     var $this = $(this),
         $icon = $this.find("i"),
         $itemToAdd = $this.closest("li"),
         $name = $itemToAdd.find(".name").html(),
-        $company = $itemToAdd.find(".company").html(),        
+        $company = $itemToAdd.find(".company").html(),
         $target = $this.closest(".modal-body").find(".target"),
         $unassignedItems = $("#unassignedElements"),
         $unassignedValue = parseInt($unassignedItems.html());
@@ -253,8 +253,8 @@ $('body').on('click', '.grcicon-more', function(e) {
       .removeClass("grcicon-chevron-right")
       .addClass("grcicon-check-green")
     $target
-      .prepend('<li class="new-item"> <div class="row-fluid"> <div class="span6"> <span class="company">' + $company + '</span> <span class="name">'+ $name +'</span> </div> <div class="span6 actions">  <a class="widgetbtn pull-right" id="removeMe" href="#"> <i class="grcicon-remove"></i> </a> <a class="widgetbtn pull-right" href="#"> <i class="grcicon-edit"></i> </a> ' + $item2add + '</div> </div>' + $additionalinfo +' </div> </li>')
-      .find("li.new-item").hide().fadeIn('slow').removeClass("new-item");  
+      .prepend('<li class="new-item"> <div class="row-fluid"> <div class="span6"> <span class="company">' + $company + '</span> <span class="name">'+ $name +'</span> </div> <div class="span6 actions">  <a class="widgetbtn pull-right" id="removeMe" href="#"> <i class="grcicon-remove"></i> </a> <a class="widgetbtn pull-right" href="#"> <i class="fa fa-pencil-square-o"></i> </a> ' + $item2add + '</div> </div>' + $additionalinfo +' </div> </li>')
+      .find("li.new-item").hide().fadeIn('slow').removeClass("new-item");
     $unassignedItems
       .html($unassignedValue + 1).fadeIn();
 
@@ -272,7 +272,7 @@ $('body').on('click', '.grcicon-more', function(e) {
 
     $(this).closest(".btn-group").find(".dropdown-toggle").addClass('halfopacity');
     $(this).closest(".btn-group").find(".dropdown-toggle").removeClass('btn-info');
-    
+
   });
 
   $('body').on('click', '#makeResponsible', function(e) {
@@ -291,22 +291,22 @@ $('body').on('click', '.grcicon-more', function(e) {
     event.preventDefault();
     $(this).closest('li').slideUp("slow", function() { jQuery(this).remove(); });
   });
-  
+
   $('body').on('click', '#showFilters', function(e) {
     e.preventDefault();
     var $this = $(this),
         $filters = $this.closest(".modal-body").find(".filter-group"),
         $searchableLists = $this.closest(".modal-body").find(".filter-block .people-list");
-        
+
     if( $this.hasClass("active") ) {
       $filters.hide();
-      $this.removeClass("active");        
+      $this.removeClass("active");
       $searchableLists.removeClass("short");
     } else {
       $filters.show();
       $this.addClass("active");
       $searchableLists.addClass("short");
-    }      
+    }
   });
 
   $('body').on('click', '#showCategories', function(e) {
@@ -314,16 +314,16 @@ $('body').on('click', '.grcicon-more', function(e) {
     var $this = $(this),
         $filters = $this.closest(".modal-body").find(".category-group"),
         $searchableLists = $this.closest(".modal-body").find(".filter-block .people-list");
-        
+
     if( $this.hasClass("active") ) {
       $filters.hide();
-      $this.removeClass("active");        
+      $this.removeClass("active");
       $searchableLists.removeClass("short");
     } else {
       $filters.show();
       $this.addClass("active");
       $searchableLists.addClass("short");
-    }      
+    }
   });
 
 
@@ -333,14 +333,14 @@ $('body').on('click', '.grcicon-more', function(e) {
         $categoryfilters = $this.closest(".modal-body").find(".category-group"),
         $companyfilters = $this.closest(".modal-body").find(".filter-group"),
         $searchableLists = $this.closest(".modal-body").find(".filter-block .people-list");
-        
+
       $categoryfilters.show();
       $companyfilters.hide();
       $this.addClass("active");
-      $("#filterButton").html("GRC Directory <span class='caret'></span>"); 
+      $("#filterButton").html("GRC Directory <span class='caret'></span>");
       $searchableLists.removeClass("shortest");
       $searchableLists.addClass("short");
-    //}      
+    //}
   });
 
 $('body').on('click', '#showCompanyDirectory', function(e) {
@@ -349,19 +349,19 @@ $('body').on('click', '#showCompanyDirectory', function(e) {
         $categoryfilters = $this.closest(".modal-body").find(".category-group"),
         $companyfilters = $this.closest(".modal-body").find(".filter-group"),
         $searchableLists = $this.closest(".modal-body").find(".filter-block .people-list");
-        
+
     //if( $this.hasClass("active") ) {
       //$filters.hide();
-      //$this.removeClass("active");        
+      //$this.removeClass("active");
       //$searchableLists.removeClass("short");
     //} else {
       $categoryfilters.hide();
       $companyfilters.show();
       $this.addClass("active");
-      $("#filterButton").html("Company Directory <span class='caret'></span>"); 
+      $("#filterButton").html("Company Directory <span class='caret'></span>");
       $searchableLists.addClass("shortest");
       $searchableLists.removeClass("short");
-    //}      
+    //}
   });
 
 

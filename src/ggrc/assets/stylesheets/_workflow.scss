@@ -201,7 +201,7 @@ ul.new-tree {
     }
     .info-action {
       @include opacity(1);
-      i.grcicon-edit {
+      i.fa-pencil-square-o {
         margin-top: 7px;
       }
     }
