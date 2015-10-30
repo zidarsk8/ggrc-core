@@ -8,8 +8,8 @@
 <form action="javascript://">
   <div class="row-fluid">
     <div class="span12">
-      <label>Object for review <i class="grcicon-help-black" rel="tooltip" title="Title and description of the object"></i></div>
-      <h3>{{#using object=instance.original_object}}{{object.title}}{{/using}}</h3>    
+      <label>Object for review <i class="fa fa-question-circle" rel="tooltip" title="Title and description of the object"></i></div>
+      <h3>{{#using object=instance.original_object}}{{object.title}}{{/using}}</h3>
       {{#using object=instance.original_object}}
         {{{object.description}}}
       {{/using}}
@@ -21,7 +21,7 @@
       <label for="program_description">
         Assign reviewer
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Reviewer to assign"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Reviewer to assign"></i>
       </label>
       <div class="people-autocomplete">
         <input tabindex="2" type="text" name="contact.email" null-if-empty="true" class="span11 search-icon required" value="{{firstnonempty instance.contact.email}}" placeholder="Find reviewer" data-lookup="Person">
@@ -31,7 +31,7 @@
       <label for="task_group_assignee">
         <span>Due date</span>
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Set review due date"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Set review due date"></i>
       </label>
       <input tabindex="4" class="date input-small" name="end_date" data-toggle="datepicker_today_or_later" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
     </div>

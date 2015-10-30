@@ -9,7 +9,7 @@
   {{#instance}}
     <div class="row-fluid">
       <div class="span12">
-        <label>Meeting Title <i class="grcicon-help-black" rel="tooltip" title="Title"></i></label>
+        <label>Meeting Title <i class="fa fa-question-circle" rel="tooltip" title="Title"></i></label>
         <input tabindex="1" type="text" name="title" class="input-block-level" placeholder="Enter Title" value="{{instance.title}}" autofocus>
       </div>
     </div>
@@ -23,38 +23,38 @@
         <select class="input-block-level" name="start_at.time" tabindex="3">
           {{{local_time_range instance.start_at '09:00' '17:01'}}}
         </select>
-        
+
         <label>Ends at</label>
         <select class="input-block-level" name="end_at.time" tabindex="4">
           {{{local_time_range instance.end_at '09:00' '17:01'}}}
         </select>
       </div>
       <div class="span4">
-        Participants 
+        Participants
         <div>
         {{#using attendees=instance.people response=instance.response}}
           {{#using reified_people=response.people}}
             {{#reified_people}}
             <label>
-            <input tabindex="5" 
-                   name="people" 
+            <input tabindex="5"
+                   name="people"
                    data-binding="people"
                    model="Person"
-                   type="checkbox" 
-                   value="{{id}}" 
+                   type="checkbox"
+                   value="{{id}}"
                    {{#if new_object_form}}
                    checked
                    {{else}}
                    {{#in_array this attendees}}checked{{/in_array}}
-                   {{/if}} /> 
+                   {{/if}} />
               {{firstnonempty name email ''}}</label>
             {{/reified_people}}
           {{/using}}
           </div>
         {{/using}}
-        
+
       </div>
     </div>
   {{/instance}}
   {{!/div}}
-  
+

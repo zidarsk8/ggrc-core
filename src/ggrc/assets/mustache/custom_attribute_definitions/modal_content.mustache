@@ -13,7 +13,7 @@
     <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
       <label>Attribute title
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name."></i>
       </label>
       <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
     </div>
@@ -21,7 +21,7 @@
       <label>
         Attribute type
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Choose the type of attribute to create."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Choose the type of attribute to create."></i>
       </label>
       <select name="attribute_type" tabindex="2">
         {{#iterate 'Text', 'Rich Text', 'Date', 'Checkbox' 'Dropdown'}} {{! 'File upload' }}
@@ -42,7 +42,7 @@
       <div class="span6">
         <label>
           Inline help
-          <i class="grcicon-help-black" rel="tooltip"
+          <i class="fa fa-question-circle" rel="tooltip"
             title="Provide text to help users understand what this attribute is for."></i>
         </label>
         <input tabindex="4" class="input-block-level" placeholder="Enter Help Text" name="helptext" type="text" value="{{helptext}}">
@@ -50,7 +50,7 @@
       <div class="span6">
         <label>
           Placeholder
-          <i class="grcicon-help-black" rel="tooltip"
+          <i class="fa fa-question-circle" rel="tooltip"
             title="Provide text to show in the text field when the value is empty or not set. This should help users to understand what type of value to provide."></i>
         </label>
         <input tabindex="5" class="input-block-level" placeholder="Enter Placeholder" name="placeholder" type="text" value="{{placeholder}}">
@@ -62,7 +62,7 @@
       <div class="span6">
         <label>
           Inline help
-          <i class="grcicon-help-black" rel="tooltip"
+          <i class="fa fa-question-circle" rel="tooltip"
             title="Provide text to help users understand what this attribute is for."></i>
         </label>
         <input tabindex="4" class="input-block-level" placeholder="Enter Help Text" name="helptext" type="text" value="{{helptext}}">
@@ -70,7 +70,7 @@
       <div class="span6">
         <label>
           Placeholder
-          <i class="grcicon-help-black" rel="tooltip"
+          <i class="fa fa-question-circle" rel="tooltip"
             title="Provide text to show in the text field when the value is empty or not set. This should help users to understand what type of value to provide."></i>
         </label>
         <input tabindex="5" class="input-block-level" placeholder="Enter Placeholder" name="placeholder" type="text" value="{{placeholder}}">
@@ -82,7 +82,7 @@
       <div class="span12">
         <label>
           Possible values (separated by comma ",")
-          <i class="grcicon-help-black" rel="tooltip"
+          <i class="fa fa-question-circle" rel="tooltip"
             title="Provide a list of values from which users will be able to choose."></i>
         </label>
         <input tabindex="4" class="input-block-level" placeholder="Enter possible values" name="multi_choice_options" type="text" value="{{multi_choice_options}}">
@@ -92,7 +92,7 @@
       <div class="span6">
         <label>
           Inline help
-          <i class="grcicon-help-black" rel="tooltip"
+          <i class="fa fa-question-circle" rel="tooltip"
             title="Provide text to help users understand what this attribute is for."></i>
         </label>
         <input tabindex="5" class="input-block-level" placeholder="Enter Help Text" name="helptext" type="text" value="{{helptext}}">
@@ -104,7 +104,7 @@
     <div class="span6">
       <label>
         Inline help
-        <i class="grcicon-help-black" rel="tooltip"
+        <i class="fa fa-question-circle" rel="tooltip"
         title="Provide text to help users understand what this attribute is for."></i>
       </label>
       <input tabindex="4" class="input-block-level" placeholder="Enter Help Text" name="helptext" type="text" value="{{helptext}}">
@@ -116,7 +116,7 @@
     <div class="span6">
       <label>
         Inline help
-        <i class="grcicon-help-black" rel="tooltip"
+        <i class="fa fa-question-circle" rel="tooltip"
         title="Provide text to help users understand what this attribute is for."></i>
       </label>
       <input tabindex="5" class="input-block-level" placeholder="Enter Help Text" name="helptext" type="text" value="{{helptext}}">

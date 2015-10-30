@@ -10,6 +10,9 @@
   &.red {
     color: #ce3e3e;
   }
+  &.white {
+    color: $white;
+  }
 }
 
 .#{$fa-css-prefix}-person:before { content: $fa-var-user; }
