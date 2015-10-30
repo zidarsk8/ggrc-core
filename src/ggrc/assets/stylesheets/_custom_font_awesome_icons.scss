@@ -13,6 +13,9 @@
   &.white {
     color: $white;
   }
+  &.black {
+    color: $black;
+  }
 }
 
 .#{$fa-css-prefix}-person:before { content: $fa-var-user; }

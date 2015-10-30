@@ -794,7 +794,9 @@ h4.search-title {
       &.primary {
         float:right;
         i {
+          float: left;
           margin-top: 5px;
+          margin-right: 4px;
         }
       }
     }

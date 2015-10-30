@@ -65,7 +65,7 @@
             {{else}}
               {{#is_allowed_to_map page_instance instance join=true}}
               <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
-                <i class="grcicon-reg-map"></i>
+                <i class="fa fa-random black"></i>
                 Map to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
               </a>
               {{/is_allowed_to_map}}
