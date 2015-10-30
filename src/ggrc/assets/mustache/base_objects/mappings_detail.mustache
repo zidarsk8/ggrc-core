@@ -23,7 +23,7 @@
     {{/if}}
     {{else}}
     {{#if_instance_of binding.instance 'Response'}}
-    a <b>{{binding.instance.class.title_singular}}</b> in <i class="grcicon-audit-color"></i><b>{{#using request=binding.instance.request}}{{#using audit=request.audit}}{{audit.title}}{{/using}}{{/using}}</b>{{#if isLast}}.{{else}},{{/if}}
+    a <b>{{binding.instance.class.title_singular}}</b> in <i class="fa fa-audit-color"></i><b>{{#using request=binding.instance.request}}{{#using audit=request.audit}}{{audit.title}}{{/using}}{{/using}}</b>{{#if isLast}}.{{else}},{{/if}}
     {{else}}
     <i class="grcicon-{{binding.instance.class.table_singular}}-color"></i><b href="{{link_to_tree binding.instance}}">{{binding.instance.title}}</b>{{#if isLast}}.{{else}},{{/if}}
     {{/if_instance_of}}
