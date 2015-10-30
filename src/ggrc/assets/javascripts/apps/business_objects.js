@@ -767,6 +767,14 @@
         },
         Request: {
           _mixins: ["governance_objects", "business_objects", "issues"],
+          Audit: {
+            mapping: "audits",
+            draw_children: true,
+            allow_creating: false,
+            allow_mapping: false,
+            show_view: GGRC.mustache_path + "/audits/tree.mustache",
+            add_item_view: GGRC.mustache_path + "/audits/tree_add_item.mustache"
+          },
         },
         ControlAssessment: {
           _mixins: ["governance_objects", "business_objects", "issues"],
