@@ -5,7 +5,7 @@
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy import and_, or_
+from sqlalchemy import or_
 
 from ggrc.models.audit import Audit
 from ggrc.models.audit_object import AuditObject
@@ -16,7 +16,6 @@ from ggrc.models.mixins import deferred
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
-from ggrc.models.person import Person
 from ggrc.models.relationship import Relatable
 
 # audit_id        -> NULL || many (relationship)
@@ -33,21 +32,19 @@ from ggrc.models.relationship import Relatable
 # Documentable -> needing refactor too?
 
 
-
-
 class Request(Assignable, CustomAttributable, Relatable, Titled,
-              Slugged, Described, Base,db.Model):
+              Slugged, Described, Base, db.Model):
   __tablename__ = 'requests'
   _title_uniqueness = False
 
   VALID_TYPES = (u'documentation', u'interview')
   VALID_STATES = (u'Unstarted', u'In Progress', u'Finished', u'Verified')
+  ASSIGNEE_TYPES = (u'Assignee', u'Requester', u'Verifier')
+
   # TODO Remove requestor and requestor_id on database cleanup
   requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))
   requestor = db.relationship('Person', foreign_keys=[requestor_id])
-  assignee_id = db.Column(db.Integer, db.ForeignKey('people.id'),
-    nullable=False)
-  assignee = db.relationship('Person', foreign_keys=[assignee_id])
+
   # TODO Remove request_type on database cleanup
   request_type = deferred(db.Column(db.Enum(*VALID_TYPES), nullable=False),
     'Request')
@@ -74,7 +71,6 @@ class Request(Assignable, CustomAttributable, Relatable, Titled,
     return deferred(db.Column(db.String, nullable=True), cls.__name__)
 
   _publish_attrs = [
-    'assignee',
     'requestor',
     'request_type',
     'gdrive_upload_path',
@@ -95,11 +91,6 @@ class Request(Assignable, CustomAttributable, Relatable, Titled,
   ]
 
   _aliases = {
-    "assignee": {
-      "display_name": "Assignee",
-      "mandatory": True,
-      "filter_by": "_filter_by_assignee",
-    },
     "audit_object": {
       "display_name": "Request Object",
       "filter_by": "_filter_by_audit_object",
@@ -143,13 +134,6 @@ class Request(Assignable, CustomAttributable, Relatable, Titled,
       orm.subqueryload('responses'))
 
   @classmethod
-  def _filter_by_assignee(cls, predicate):
-    return cls.query.filter(
-      (Person.id == cls.assignee_id) &
-      (predicate(Person.name) | predicate(Person.email))
-    ).exists()
-
-  @classmethod
   def _filter_by_request_audit(cls, predicate):
     return cls.query.filter(
       (Audit.id == cls.audit_id) &
@@ -177,4 +161,3 @@ class Request(Assignable, CustomAttributable, Relatable, Titled,
         (AuditObject.id == cls.audit_object_id) &
         or_(*queries)
     ).exists()
-

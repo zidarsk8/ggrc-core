@@ -82,6 +82,40 @@ def upgrade():
     ALTER TABLE requests CHANGE status status ENUM('Unstarted','In Progress','Finished','Verified') NOT NULL;
     """
 
+    # Move assignees into relationships
+    sql += """
+    INSERT INTO relationships (
+      modified_by_id,
+      created_at,
+      updated_at,
+      source_type,
+      source_id,
+      destination_type,
+      destination_id
+    ) SELECT
+      modified_by_id,
+      created_at,
+      updated_at,
+      "Request",
+      id,
+      "Person",
+      assignee_id
+    FROM requests;
+
+    INSERT INTO relationship_attrs (
+      relationship_id,
+      attr_name,
+      attr_value
+    ) SELECT
+      relationships.id, "AssigneeType", "Assignee"
+      FROM requests
+      JOIN relationships ON (relationships.source_id = requests.id)
+      WHERE relationships.source_type = "Request";
+
+    ALTER TABLE requests DROP FOREIGN KEY requests_ibfk_1;
+    ALTER TABLE requests DROP COLUMN assignee_id;
+    """
+
     sql += "COMMIT;"
     op.execute(sql)
 
