@@ -19,6 +19,7 @@
 .grcicon-role-color:before { content: $fa-var-key; }
 .#{$fa-css-prefix}-person-color:before { content: $fa-var-user; color: #a8491a; }
 .#{$fa-css-prefix}-audit-color:before, .grcicon-audit-color:before { content: $fa-var-eye; color: $purple; }
+.#{$fa-css-prefix}-audit:before { content: $fa-var-eye; }
 .#{$fa-css-prefix}-task_group:before {
   content: $fa-var-cog;
   &.color { color: $purple; }
