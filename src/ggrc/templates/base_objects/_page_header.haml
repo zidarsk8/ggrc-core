@@ -12,7 +12,7 @@
 
   %span.title-content
     -if request.path.startswith('/admin')
-      %i.grciconlarge-dashboard
+      %i.fa.fa-tachometer
       Admin Dashboard
 
 %ul.menu
@@ -48,7 +48,7 @@
       -if permissions.is_allowed_read('/admin', None, 1)
         %li
           %a{'href': "/admin#people_list_widget"}
-            %i.grcicon-dashboard-black
+            %i.fa.fa-tachometer
             Admin Dashboard
       %li.notify-wrap
         %span
