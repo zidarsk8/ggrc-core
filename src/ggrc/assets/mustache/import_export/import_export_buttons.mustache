@@ -7,16 +7,16 @@
 
 {{^if_instance_of parent_instance 'ControlAssessment'}}
 <li>
-  <a href="/import" 
-    class="section-import" rel="tooltip" data-placement="left" 
+  <a href="/import"
+    class="section-import" rel="tooltip" data-placement="left"
     title="" data-original-title="Import {{model.model_plural}}">
-    <i class="grcicon-imp-exp"></i>
+    <i class="fa fa-arrow-circle-o-down"></i>
   </a>
 </li>
 {{#if list.length}}
   <li>
-    <a href="/export?model_type={{model.model_singular}}&relevant_type={{parent_instance.type}}&relevant_id={{parent_instance.id}}" 
-      class="section-import" rel="tooltip" data-placement="left" 
+    <a href="/export?model_type={{model.model_singular}}&relevant_type={{parent_instance.type}}&relevant_id={{parent_instance.id}}"
+      class="section-import" rel="tooltip" data-placement="left"
       title="" data-original-title="Export {{model.model_plural}}">
       <i class="grcicon-export"></i>
     </a>
