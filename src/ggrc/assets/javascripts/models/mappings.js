@@ -702,15 +702,8 @@
     Request: {
       _mixins: ["related_object", "personable", "ownable", "business_object", "documentable"],
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
-      related_business_objects: Multi([
-        "related_audits", "related_data_assets", "related_facilities", "related_markets",
-        "related_org_groups", "related_vendors", "related_processes", "related_products",
-        "related_projects", "related_systems"
-      ]),
-      related_and_able_objects: Multi([
-        "audits", "objectives", "related_business_objects",
-        "people", "programs", "clauses"
-      ]),
+      audits: Indirect("Audit", "audit"),
+      audits: Direct("Audit", "requests", "audit"),
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",
