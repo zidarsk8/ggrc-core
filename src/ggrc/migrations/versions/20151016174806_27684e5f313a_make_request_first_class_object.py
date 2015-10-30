@@ -113,7 +113,6 @@ def upgrade():
       WHERE relationships.source_type = "Request";
 
     ALTER TABLE requests DROP FOREIGN KEY requests_ibfk_1;
-    ALTER TABLE requests DROP COLUMN assignee_id;
     """
 
     sql += "COMMIT;"
