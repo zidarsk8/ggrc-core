@@ -14,12 +14,11 @@
 
   // Insert risk mappings to all gov/business object types
   var _risk_object_types = [
-      "Program",
-      "Regulation", "Standard", "Policy", "Contract",
-      "Objective", "Control", "Section", "Clause",
-      "System", "Process",
+      "Program", "Regulation", "Standard", "Policy", "Contract",
+      "Objective", "Control", "Section", "Clause", "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
-      "MultitypeSearch", "Issue", "ControlAssessment", "AccessGroup", "Request"
+      "MultitypeSearch", "Issue", "ControlAssessment", "AccessGroup", "Request",
+      "Person", "OrgGroup", "Vendor"
     ],
     related_object_descriptors = {},
     threat_actor_descriptor, risk_descriptor;
@@ -51,7 +50,6 @@
 
     // Add mappings for risk objects
     var mappings = {
-
       related: {
         related_objects_as_source: Proxy(
           null, "destination", "Relationship", "source", "related_destinations"),
@@ -82,7 +80,11 @@
         related_objectives: TypeFilter("related_objects", "Objective"),
         related_issues: TypeFilter("related_objects", "Issue"),
         related_control_assessments: TypeFilter("related_objects", "ControlAssessment"),
-        related_requests: TypeFilter("related_objects", "Request")
+        related_requests: TypeFilter("related_objects", "Request"),
+        related_people: TypeFilter("related_objects", "Person"),
+        related_org_groups: TypeFilter("related_objects", "OrgGroup"),
+        related_vendors: TypeFilter("related_objects", "Vendor")
+
       },
       related_risk: {
         _canonical: {
@@ -111,12 +113,12 @@
     };
 
     can.each(_risk_object_types, function (type) {
-        mappings[type] = {
+        mappings[type] = _.extend(mappings[type] || {}, {
           _canonical: {
-            "related_objects_as_source": ['Risk', 'ThreatActor']
+            "related_objects_as_source": ["Risk", "ThreatActor"]
           },
-          _mixins: ['related', 'related_risk', 'related_threat_actor'],
-        };
+          _mixins: ["related", "related_risk", "related_threat_actor"],
+        });
     });
     new GGRC.Mappings("ggrc_risks", mappings);
   };
