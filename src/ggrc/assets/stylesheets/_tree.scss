@@ -1302,14 +1302,6 @@ ul.new-tree {
   }
 }
 
-.info-pane-utility {
-  @include clearfix();
-  float: right;
-  .btn-complete {
-    margin-top: 18px;
-  }
-}
-
 .cms_controllers_mockup_helper {
   .details-wrap {
     &.pin {

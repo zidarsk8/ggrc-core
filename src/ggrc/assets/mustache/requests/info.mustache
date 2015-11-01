@@ -7,35 +7,19 @@
 
 {{#instance}}
   <section class="info">
-
     {{#is_info_pin}}
-    <div class="clearfix">
-      <div class="tier-content pin">
-        <div class="info-pane-utility">
-          {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-          <div class="details-wrap">
-            {{#if_can_edit_request instance}}
-            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-              <li>
-                <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
-                  <i class="grcicon-edit"></i>
-                  Edit {{model.title_singular}}
-                </a>
-              </li>
-              <li>
-                <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-              </li>
-              {{#is_allowed 'delete' instance}}
-                <li>
-                  <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                    <i class="grcicon-deleted"></i>
-                    Delete
-                  </a>
-                </li>
-              {{/is_allowed}}
-            </ul>
-            {{/if_can_edit_request}}
+      {{> /static/mustache/base_objects/info-pin.mustache}}
+    {{/is_info_pin}}
+    {{> /static/mockups/base_objects/info_header.mustache}}
+
+    <div class="row-fluid">
+      <div class="span8">
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Description</h6>
+            <div class="rtf-block">
+              {{description}}
+            </div>
           </div>
         </div>
         {{#instance}}
