@@ -1,0 +1,37 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+{{#instance}}
+<li>
+  <div class="custom-attr-wrap mapped">
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="info-expand-mapped">
+          <a class="show-hidden-fields info-show-hide" href="javascript://">
+            <span class="out">
+              <i class="grcicon-arrow-right"></i>
+            </span>
+            <span class="in">
+              <i class="grcicon-arrow-bottom"></i>
+            </span>
+            <i class="grcicon-{{class.table_singular}}-color"></i>
+            {{title}}
+          </a>
+        </div>
+      </div>
+    </div><!-- row-fluid end -->
+    <div class="hidden-fields-area" style="display:none;">
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>Description</h6>
+          {{description}}
+        </div>
+      </div><!-- row-fluid end -->
+    </div><!-- hidden-fields-area end -->
+  </div>
+</li>
+{{/instance}}

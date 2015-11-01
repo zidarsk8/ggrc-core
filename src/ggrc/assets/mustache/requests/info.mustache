@@ -22,77 +22,102 @@
             </div>
           </div>
         </div>
-        {{#instance}}
-          <div class="row-fluid wrap-row">
-            <div class="span6">
-              <h6>Request</h6>
-              <div class="rtf-block">
-                {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
-              </div>
-            </div>
-            <div class="span3">
-              <h6>State</h6>
-              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+        <div class="row-fluid wrap-row">
+          <div class="span6">
+            <div class="left-spacing">
+              <h6>Evidence</h6>
             </div>
           </div>
-        {{/instance}}
-      </div>
-    </div>
-    {{/is_info_pin}}
+          <div class="span6">
+            <h6>Url</h6>
+          </div>
+        </div>
 
-    <div class="tier-content">
-      <div class="row-fluid wrap-row">
-        <div class="span6">
-          <h6>Requested on</h6>
-          {{#if instance.requested_on}}
-            {{#using requested_on=instance.requested_on}}
-              {{localize_date requested_on}}
-            {{/using}}
-          {{/if}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Test</h6>
+            {{{test}}}
+          </div>
         </div>
-        <div class="span6" data-force-refresh="true" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
-          <h6>Assignee</h6>
-          {{#using assignee=instance.assignee}}
-            {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
-          {{/using}}
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Notes</h6>
+            {{{notes}}}
+          </div>
         </div>
+        {{#options}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            {{log child_options}}
+            {{#child_options.0}}
+            <h6>Mapped objects</h6>
+              <ul class="tree-structure new-tree" {{data 'options'}}
+                {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+              </ul>
+              {{#is_allowed_to_map instance model.shortName}}
+                <a
+                  class="btn btn-draft btn-small"
+                  href="javascript://"
+                  rel="tooltip"
+                  data-placement="left"
+                  data-toggle="unified-mapper"
+                  data-join-mapping="related_objects"
+                  data-join-option-type="{{model.shortName}}"
+                  data-join-object-id="{{instance.id}}"
+                  data-join-object-type="{{instance.class.shortName}}"
+                  data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}">
+                  Map Objects
+                </a>
+              {{/if}}
+            {{/child_options.0}}
+          </div>
+        </div>
+        {{/options}}
       </div>
-      {{#using audit=instance.audit}}
-        {{#with_mapping "audit_object_object" instance}}
-          {{#if audit_object_object.0.instance}}
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                <h6>{{audit_object_object.0.instance.class.table_singular}}</h6>
-                <p class="oneline">
-                  <i class="grcicon-{{audit_object_object.0.instance.class.table_singular}}-color nomargin"></i>
-                  {{#is_allowed "view_object_page" audit_object_object.0.instance}}
-                    <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
-                  {{else}}
-                    <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
-                  {{/is_allowed}}
-                </p>
-              </div>
+
+      <div class="span4">
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>People</h6>
+          </div>
+        </div>
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Dates</h6>
+            <div class="side-content">
+              <ul class="label-list dates">
+                <li class="gray">
+                  <label>
+                    Created on
+                  </label>
+                  {{date created_at}}
+                </li>
+                <li>
+                  <span class="file-controls">
+                    <a href="javascript://"><i class="grcicon-edit"></i></a>
+                  </span>
+                  <label>
+                    Due on
+                  </label>
+                  {{date due_on}}
+                </li>
+              </ul>
             </div>
-          {{/if}}
-        {{/using}}
-      {{/using}}
-
-      {{{render_hooks 'Request.tree_view_info'}}}
-
-      <div class="row-fluid wrap-row">
-        <div class="span12">
-          <h6>Notes</h6>
-          {{{instance.notes}}}
+          </div>
         </div>
-      </div>
-      <div class="row-fluid wrap-row">
-        <div class="span12">
-          <h6>Test</h6>
-          {{{instance.test}}}
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Code</h6>
+            <div class="side-content">
+              {{slug}}
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
   </section>
 
 {{/instance}}

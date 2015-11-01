@@ -325,6 +325,12 @@ can.Model.Cacheable("CMS.Models.Request", {
     , display_attr_names : ['description','assignee', 'due_on', 'status']
     , mandatory_attr_names : ['title', 'description']
     , draw_children : true
+    , child_options: [{
+          model: can.Model.Cacheable,
+          mapping: "related_objects",
+          show_view: GGRC.mustache_path + "/requests/subtree.mustache",
+        }
+    ]
   }
   , init : function() {
     this._super.apply(this, arguments);
