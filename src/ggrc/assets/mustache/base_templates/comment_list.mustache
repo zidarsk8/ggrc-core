@@ -6,6 +6,8 @@
 }}
 
 <ul class="entry-list">
+  {{log comments}}
+
   {{#comments}}
     <li>
       <span class="person-label {{author.type}}"></span>
@@ -16,7 +18,7 @@
           {{/author}}
           added a response - {{timestamp}}
         </span>
-        {{comment}}
+        {{description}}
         <ul class="attachment-list">
           {{#attachments}}
             <li>

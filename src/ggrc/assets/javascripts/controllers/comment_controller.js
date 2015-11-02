@@ -24,34 +24,65 @@ can.Component.extend({
 
     },
     events: {
-        //init: function() {
-        //    this.scope.attr("source_mapping", instance);
-        //},
+        init: function() {
+            this.scope.attr("source_mapping", GGRC.page_instance());
+        },
         "cleanPanel": function () {
             this.scope.attachments.replace([]);
             this.element.find("textarea").val("");
         },
         ".js-trigger-attachdata click": function (el, ev) {
-            alert("ATTACH DATA TODO");
-            this.scope.attachments.push();
+            //this.scope.attachments.push();
+            console.log("WIP")
         },
         ".btn-success click": function (el, ev) {
             var $textarea = this.element.find(".add-comment textarea"),
-                text = $.trim($textarea.val()),
-                attachments = this.scope.attachments;
+                description = $.trim($textarea.val()),
+                attachments = this.scope.attachments,
+                source = this.scope.source_mapping,
+                comment = CMS.Models["Comment"];
 
-            if (!text.length && !attachments.length) {
+            if (!description.length && !attachments.length) {
                 return;
             }
-            this.scope.data = {
-                author: "urban",
-                timestamp: "zdaj",
-                comment: text,
-                attachments: _.map(attachments, function (attachment) {
-                    return attachment;
-                })
+            var data = {
+                description: description,
+                context: source.context
             };
+            new comment(data).save();
             this.cleanPanel();
         }
     }
 });
+
+(function(can, $) {
+
+can.Control("GGRC.Controllers.Comments", {
+
+}, {
+    _create_relationship: function(source, destination) {
+
+        if (!destination) {
+            return $.Deferred().resolve();
+        }
+
+        return new CMS.Models.Relationship({
+            source: source.stub(),
+            destination: destination,
+            context: source.context,
+        }).save();
+    },
+    "{CMS.Models.Comment} created": function(model, ev, instance) {
+        if (!(instance instanceof  CMS.Models.Comment)) {
+            return;
+        }
+        var parent_dfd = this._create_relationship(GGRC.page_instance(), instance);
+        instance.delay_resolving_save_until($.when(parent_dfd));
+    }
+});
+
+    $(function() {
+        $(document.body).ggrc_controllers_comments();
+    });
+
+})(this.can, this.can.$);

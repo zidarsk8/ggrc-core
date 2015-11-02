@@ -431,8 +431,37 @@ can.Model.Cacheable("CMS.Models.Request", {
         this.attr('context', this.audit.reify().context);
       }
       return this._super.apply(this, arguments);
-  }
+  },
+  _refresh: function (bindings) {
+    var refresh_queue = new RefreshQueue();
+    can.each(bindings, function(binding) {
+      refresh_queue.enqueue(binding.instance);
+    });
+    return refresh_queue.trigger();
+  },
+  get_comments: function() {
+    var relations = this.related_sources.concat(
+        this.related_destinations),
+        refresh_queue = new RefreshQueue();
 
+    _.each(relations, function(r){
+      refresh_queue.enqueue(r.reify());
+    });
+    refresh_queue.trigger();
+
+    var comments = [];
+    $.when(refresh_queue).then(function(rels){
+      _.each(rels.objects, function(r){
+        if (r.source && r.source.type && r.source.type == "Comment") {
+          comments.push(r.source.reify());
+        }
+        if (r.destination && r.destination.type && r.destination.type == "Comment") {
+          comments.push(r.destination.reify());
+        }
+      });
+    });
+    return comments;
+  }
 });
 
 
@@ -440,6 +469,7 @@ can.Model.Cacheable("CMS.Models.Comment", {
     root_object : "comment",
     root_collection : "comments",
     findOne : "GET /api/comments/{id}",
+    findAll : "GET /api/comments",
     update : "PUT /api/comments/{id}",
     destroy : "DELETE /api/comments/{id}",
     create : "POST /api/comments",

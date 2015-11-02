@@ -103,6 +103,7 @@
           <add-comment data="comments"></add-comment>
         </div>
         {{> /static/mustache/base_templates/comment_list.mustache}}
+        {{{render "/static/mustache/base_templates/comment_list.mustache" comments=instance.get_comments}}}
       </div>
 
     </div>
