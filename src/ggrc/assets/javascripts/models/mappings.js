@@ -704,6 +704,7 @@
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
       audits: Indirect("Audit", "audit"),
       audits: Direct("Audit", "requests", "audit"),
+      comments: Direct("Comment", "requests", "comments"),
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",
@@ -728,6 +729,9 @@
             });
       }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,ControlAssessment,Request"),
             //, responses : Multi(["documentation_responses", "interview_responses", "population_sample_responses"])
+    },
+    Comment: {
+      _mixins: ["documentable"]
     },
     response: {
       _mixins: ["business_object", "documentable"],

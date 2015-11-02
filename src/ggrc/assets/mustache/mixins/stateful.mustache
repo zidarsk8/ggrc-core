@@ -1,0 +1,19 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: urban@reciprocitylabs.com
+    Maintained By: urban@reciprocitylabs.com
+}}
+
+{{#instance}}
+{{#if_equals instance.status "Unstarted"}}
+<a href="javascript://" class="btn btn-small btn-primary pull-right">Start</a>
+{{/if_equals}}
+{{#if_equals instance.status "In Progress"}}
+<a href="javascript://" class="btn btn-small btn-primary pull-right">Finish</a>
+{{/if_equals}}
+{{#if_equals instance.status "Finished"}}
+<a href="javascript://" class="btn btn-small btn-primary pull-right">Verify</a>
+<a href="javascript://" class="btn btn-small btn-primary pull-right">Decline</a>
+{{/if_equals}}
+{{/instance}}

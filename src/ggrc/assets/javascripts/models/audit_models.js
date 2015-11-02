@@ -436,6 +436,29 @@ can.Model.Cacheable("CMS.Models.Request", {
 });
 
 
+can.Model.Cacheable("CMS.Models.Comment", {
+    root_object : "comment",
+    root_collection : "comments",
+    findOne : "GET /api/comments/{id}",
+    update : "PUT /api/comments/{id}",
+    destroy : "DELETE /api/comments/{id}",
+    create : "POST /api/comments",
+    mixins : [],
+    attributes : {
+      context : "CMS.Models.Context.stub",
+      modified_by : "CMS.Models.Person.stub",
+    },
+    init : function() {
+      this._super && this._super.apply(this, arguments);
+      this.validatePresenceOf("description");
+    }
+  }, {
+    form_preload : function(new_object_form) {
+      var page_instance = GGRC.page_instance();
+      this.attr("comment", page_instance);
+    }
+});
+
 can.Model.Cacheable("CMS.Models.Response", {
 
   root_object : "response"

@@ -15,6 +15,7 @@ from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import deferred
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Slugged
+from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Titled
 from ggrc.models.relationship import Relatable
 
@@ -48,6 +49,7 @@ class Request(Assignable, CustomAttributable, Relatable, Titled,
   # TODO Remove request_type on database cleanup
   request_type = deferred(db.Column(db.Enum(*VALID_TYPES), nullable=False),
     'Request')
+  # TODO Make status via Stateful Mixin
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
     'Request')
   requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')

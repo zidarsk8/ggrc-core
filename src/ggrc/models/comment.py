@@ -4,9 +4,11 @@
 # Maintained By: andraz@reciprocitylabs.com
 
 from ggrc import db
-from ggrc.models.mixins import Base, Described
+from ggrc.models.mixins import Base
+from ggrc.models.mixins import Described
 from ggrc.models.object_document import Documentable
+from ggrc.models.relationship import Relatable
 
 
-class Comment(Described, Documentable, Base, db.Model):
+class Comment(Relatable, Described, Documentable, Base, db.Model):
   __tablename__ = "comments"
