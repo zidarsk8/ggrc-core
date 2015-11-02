@@ -6,7 +6,7 @@
 }}
 
 {{!div class="modal-body"}}
-<div class="hideable-holder"> 
+<div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
   {{> /static/mustache/base_objects/form_restore.mustache}}
@@ -80,7 +80,7 @@
       <div class="row-fluid inner-hide">
         <div class="span12 hidable">
           <label>
-            Threat Actor URL
+            Threat URL
             <i class="grcicon-help-black" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
@@ -108,7 +108,7 @@
         <i class="grcicon-help-black" rel="tooltip" title="The ZenGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="7" class="input-block-level" name="slug" placeholder="THREATACTOR-XXX" type="text" value="{{slug}}">
+      <input tabindex="7" class="input-block-level" name="slug" placeholder="Threat-XXX" type="text" value="{{slug}}">
     </div>
     <div class="span4 hidable">
       <label>
