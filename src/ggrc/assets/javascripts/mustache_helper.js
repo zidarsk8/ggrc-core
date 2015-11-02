@@ -136,6 +136,7 @@ function buildClassString(arr, context) {
 
 Mustache.registerHelper("addclass", function (prefix, compute, options) {
   prefix = resolve_computed(prefix);
+  var separator = 'separator' in (options.hash || {}) ? options.hash.separator : '-';
   return function (el) {
     var curClass = null
       , wasAttached = false
@@ -154,11 +155,9 @@ Mustache.registerHelper("addclass", function (prefix, compute, options) {
       } else if (nowAttached && !wasAttached) {
         wasAttached = true;
       }
-
       if (newVal && newVal.toLowerCase) {
-        newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, '-');
+        newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, separator);
       }
-
       if (curClass) {
         $(el).removeClass(curClass);
         curClass = null;
