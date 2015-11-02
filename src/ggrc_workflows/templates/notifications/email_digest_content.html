@@ -32,9 +32,10 @@ Maintained By: miha@reciprocitylabs.com
                 {% endif %}
 
                 {% if digest['task_declined'] %}
-                  <h2 {{ style.sub_title() }} > Following
-                    {{ "tasks" if digest['task_declined']|length > 1 else "task" }}
-                    you did, got declined </h2>
+                  <h2 {{ style.sub_title() }} > Your finished
+                    {{ "tasks were" if digest['task_declined']|length > 1 else "task was" }}
+                    declined - please review
+                    {{ "them" if digest['task_declined']|length > 1 else "it" }}:</h2>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['task_declined'].values() %}
                     <li {{ style.list_item() }} >
@@ -46,13 +47,13 @@ Maintained By: miha@reciprocitylabs.com
                 {% endif %}
 
                 {% if digest['due_soon'] %}
-                  <h2 {{ style.sub_title() }} >
+                  <h2 {{ style.sub_title() }} >You have
                   {% if digest['due_soon']|length == 1 %}
-                    1 task is
+                    a task that needs
                   {% else %}
-                    {{ digest['due_soon']|length }} tasks are
+                    {{ digest['due_soon']|length }} tasks that need
                   {% endif %}
-                  due very soon
+                  to be completed soon:
                   </h2>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['due_soon'].values() %}
@@ -60,20 +61,6 @@ Maintained By: miha@reciprocitylabs.com
                       <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
                       {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
                     due {{ task['fuzzy_due_in'] }}
-                    </li>
-                  {% endfor %}
-                  </ul>
-                {% endif %}
-
-                {% if digest['cycle_started'] %}
-                  <h2 {{ style.sub_title() }} >New workflow
-                    {{ "cycles" if digest['cycle_started']|length > 1 else "cycle" }}
-                    started</h2>
-                  <ul {{ style.list_wrap() }} >
-                  {% for cycle_id, cycle in digest['cycle_started'].items() %}
-                    <li {{ style.list_item() }} >
-                      New cycle of
-                      <a href="{{ cycle['cycle_url'] }}" {{ style.link_text() }} >{{ cycle['cycle_title'] }}</a>.
                     </li>
                   {% endfor %}
                   </ul>
@@ -125,8 +112,7 @@ Maintained By: miha@reciprocitylabs.com
                 {% endif %}
 
                 <p {{ style.text_paragraph() }} >
-                  Thanks,<br>
-                  gGRC team
+                  If you have any questions, please contact your gGRC administrator
                 </p>
               </td>
             </tr>
