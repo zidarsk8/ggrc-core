@@ -10,15 +10,15 @@
 
 
 (function (can) {
-  can.Model.Cacheable("CMS.Models.ThreatActor", {
-    root_object: "threat_actor",
-    root_collection: "threat_actors",
+  can.Model.Cacheable("CMS.Models.Threat", {
+    root_object: "threat",
+    root_collection: "threats",
     category: "risk",
-    findAll: "GET /api/threat_actors",
-    findOne: "GET /api/threat_actors/{id}",
-    create: "POST /api/threat_actors",
-    update: "PUT /api/threat_actors/{id}",
-    destroy: "DELETE /api/threat_actors/{id}",
+    findAll: "GET /api/threats",
+    findOne: "GET /api/threats/{id}",
+    create: "POST /api/threats",
+    update: "PUT /api/threats/{id}",
+    destroy: "DELETE /api/threats/{id}",
     mixins: ["ownable", "contactable", "unique_title"],
     is_custom_attributable: true,
     attributes: {
