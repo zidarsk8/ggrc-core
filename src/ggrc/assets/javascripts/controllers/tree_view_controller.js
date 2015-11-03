@@ -637,7 +637,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       this.init_display_options(opts);
     }.bind(this));
-
+    // Used when displaying a tree view inside the info controller
+    if ($(el).data('info-controller')) {
+      this.options.attr('parent_instance', GGRC.page_instance());
+      this.display();
+    }
   }
 
   , " inserted": function() {
