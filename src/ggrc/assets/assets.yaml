@@ -160,8 +160,11 @@ dashboard-js-template-files:
   - base_objects/open_close.mustache
   - base_objects/sub_tree_type_selector.mustache
   - base_templates/add_comment.mustache
+  - base_templates/attachment_list.mustache
+  - base_templates/documents.mustache
   - base_templates/base.mustache
   - base_templates/comment_list.mustache
+  - base_templates/comment_subtree.mustache
   - base_templates/dates_list.mustache
   - base_templates/description.mustache
   - base_templates/header.mustache
