@@ -7,66 +7,67 @@
 
 {{#instance}}
   {{#using object=instance.object}}
-    <section class="info">
+    <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
 
       {{#is_info_pin}}
-      <div class="clearfix">
-        <div class="tier-content pin">
-          <div class="info-pane-utility">
-            {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-            <div class="details-wrap">
-              {{#if object.title}}
-                <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-                <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                  {{#is_allowed 'update' object context='for'}}
-                    <li>
-                      <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{object.class.model_singular}}" data-object-plural="{{object.class.table_plural}}" data-object-id="{{object.id}}">
-                        <i class="grcicon-edit"></i>
-                        Edit Object
-                      </a>
-                    </li>
-                  {{/is_allowed}}
-                  <li>
-                    <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-                  </li>
-                  {{#if object.viewLink}}
-                    {{#is_allowed "view_object_page" object}}
-                      <li>
-                        <a href="{{object.viewLink}}">
-                          <i class="grcicon-goto"></i>
-                          View {{object.class.title_singular}}
-                        </a>
-                      </li>
-                    {{/is_allowed}}
-                  {{/if}}
+        {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      {{/is_info_pin}}
 
-                  {{#is_allowed 'delete' instance}}
-                    <li>
-                      <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                        <i class="grcicon-deleted"></i>
-                        Delete
-                      </a>
-                    </li>
-                  {{/is_allowed}}
-                </ul>
-              {{/if}}
-            </div>
-          </div>
+      <div class="info-pane-utility">
+        <div class="details-wrap">
           {{#if object.title}}
-            {{{render '/static/mustache/base_objects/general_info.mustache' instance=object}}}
-          {{else}}
-            <div class="row-fluid wrap-row">
-              <div class="span6">
-                <h6>Title</h6>
-                <h3>{{title}} <span class="gray">Sorry, you do not have access</span> </h3>
-              </div>
-            </div>
+            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+              {{#is_allowed 'update' object context='for'}}
+                <li>
+                  <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{object.class.model_singular}}" data-object-plural="{{object.class.table_plural}}" data-object-id="{{object.id}}">
+                    <i class="grcicon-edit"></i>
+                    Edit Object
+                  </a>
+                </li>
+              {{/is_allowed}}
+              <li>
+                <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+              </li>
+              {{#if object.viewLink}}
+                {{#is_allowed "view_object_page" object}}
+                  <li>
+                    <a href="{{object.viewLink}}">
+                      <i class="grcicon-goto"></i>
+                      View {{object.class.title_singular}}
+                    </a>
+                  </li>
+                {{/is_allowed}}
+              {{/if}}
+
+              {{#is_allowed 'delete' instance}}
+                <li>
+                  <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                    <i class="grcicon-deleted"></i>
+                    Delete
+                  </a>
+                </li>
+              {{/is_allowed}}
+            </ul>
           {{/if}}
         </div>
       </div>
-      {{/is_info_pin}}
 
       <div class="tier-content">
+        {{#if object.title}}
+          {{{render '/static/mustache/base_objects/general_info.mustache' instance=object}}}
+        {{else}}
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <h6>Title</h6>
+              <h3>{{title}} <span class="gray">Sorry, you do not have access</span> </h3>
+            </div>
+          </div>
+        {{/if}}
         {{{render '/static/mustache/base_objects/description.mustache' instance=object}}}
         {{{render '/static/mustache/base_objects/notes.mustache' instance=object}}}
         {{#if_equals object.class.title_singular 'Program'}}

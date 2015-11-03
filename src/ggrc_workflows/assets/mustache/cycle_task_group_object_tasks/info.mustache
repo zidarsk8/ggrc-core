@@ -7,45 +7,47 @@
 
 
 {{#instance}}
-  <section class="info">
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
 
     {{#is_info_pin}}
-    <div class="clearfix">
-      <div class="tier-content pin">
-        <div class="info-pane-utility">
-          {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-          {{#is_allowed 'update' instance context='for'}}
-            <div class="details-wrap">
-              <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-              <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                <li>
-                  <a href="javascript://" data-object-singular-override="Task for current Workflow Cycle" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
-                    <i class="grcicon-edit"></i>
-                    Edit Task
-                  </a>
-                </li>
-                <li>
-                  <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-                </li>
-
-                {{#is_allowed 'delete' instance}}
-                  <li>
-                    <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                      <i class="grcicon-deleted"></i>
-                      Delete
-                    </a>
-                  </li>
-                {{/is_allowed}}
-              </ul>
-            </div>
-            {{/is_allowed}}
-        </div>
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      </div>
-    </div>
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
     {{/is_info_pin}}
 
+    <div class="info-pane-utility">
+      {{#is_allowed 'update' instance context='for'}}
+        <div class="details-wrap">
+          <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+            <span class="bubble"></span>
+            <span class="bubble"></span>
+            <span class="bubble"></span>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+            <li>
+              <a href="javascript://" data-object-singular-override="Task for current Workflow Cycle" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+                <i class="grcicon-edit"></i>
+                Edit Task
+              </a>
+            </li>
+            <li>
+              <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+            </li>
+
+            {{#is_allowed 'delete' instance}}
+              <li>
+                <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                  <i class="grcicon-deleted"></i>
+                  Delete
+                </a>
+              </li>
+            {{/is_allowed}}
+          </ul>
+        </div>
+      {{/is_allowed}}
+    </div>
+
     <div class="tier-content">
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+
       <div class="row-fluid wrap-row">
         <div class="span6">
           <h6>Assignee</h6>
@@ -64,55 +66,55 @@
           {{/if_cycle_assignee_privileges}}
         </div>
         <div class="span3">
-            <h6>Start date</h6>
-            <p>
-              {{localize_date instance.start_date}}
-            </p>
+          <h6>Start date</h6>
+          <p>
+            {{localize_date instance.start_date}}
+          </p>
         </div>
 
         <div class="span3">
-            <h6>End date</h6>
-            <p>
-              {{localize_date instance.end_date }}
-            </p>
+          <h6>End date</h6>
+          <p>
+            {{localize_date instance.end_date }}
+          </p>
         </div>
       </div>
 
       <div class="row-fluid wrap-row">
         <div class="span12">
-        {{#if_helpers '\
-          #if_equals' instance.task_type 'text' '\
-          or #if_equals' instance.task_type "" '\
-          or #if_null' instance.task_type}}
-          <h6>Task details</h6>
-          <div class="rtf-block">
-            {{{firstnonempty instance.description 'No additional details'}}}
-          </div>
-        {{/if_helpers}}
-        {{#if_equals instance.task_type 'menu'}}
-          <h6>Response Options</h6>
-          {{! here we need to start a quick form or other componenet}}
-          <ggrc-quick-update instance="instance">
-            <select name="selected_response_options.0" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}}>
-              {{#each instance.response_options}}
-                <option value="{{.}}" {{#if_equals instance.selected_response_options.0 this}}selected="selected"{{/if_equals}}>{{.}}</option>
-              {{/each}}
-            </select>
-          </ggrc-quick-update>
-        {{/if_equals}}
-        {{#if_equals instance.task_type 'checkbox'}}
-          <h6>Response Options</h6>
-          <ggrc-quick-update instance="instance">
-            {{#each instance.response_options}}
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                <input type="checkbox" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}} multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
-              </div>
+          {{#if_helpers '\
+            #if_equals' instance.task_type 'text' '\
+            or #if_equals' instance.task_type "" '\
+            or #if_null' instance.task_type}}
+            <h6>Task details</h6>
+            <div class="rtf-block">
+              {{{firstnonempty instance.description 'No additional details'}}}
             </div>
-            {{/each}}
-          </ggrc-quick-update>
-        {{/if_equals}}
-        <br>
+          {{/if_helpers}}
+          {{#if_equals instance.task_type 'menu'}}
+            <h6>Response Options</h6>
+            {{! here we need to start a quick form or other componenet}}
+            <ggrc-quick-update instance="instance">
+              <select name="selected_response_options.0" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}}>
+                {{#each instance.response_options}}
+                  <option value="{{.}}" {{#if_equals instance.selected_response_options.0 this}}selected="selected"{{/if_equals}}>{{.}}</option>
+                {{/each}}
+              </select>
+            </ggrc-quick-update>
+          {{/if_equals}}
+          {{#if_equals instance.task_type 'checkbox'}}
+            <h6>Response Options</h6>
+            <ggrc-quick-update instance="instance">
+              {{#each instance.response_options}}
+              <div class="row-fluid wrap-row">
+                <div class="span12">
+                  <input type="checkbox" {{^if_can_edit_response instance instance.status}}disabled="disabled"{{/if}} multiple="multiple" name="selected_response_options" value="{{.}}" {{#in_array this instance.selected_response_options}}checked="checked"{{/in_array}}> {{.}}
+                </div>
+              </div>
+              {{/each}}
+            </ggrc-quick-update>
+          {{/if_equals}}
+          <br>
         </div>
       </div>
 
@@ -174,5 +176,6 @@
         </div>
         {{/options.child_options.0}}
     {{!/prune_context}}
+    </div>
   </section>
 {{/instance}}
