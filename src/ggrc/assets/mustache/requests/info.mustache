@@ -51,6 +51,20 @@
       </div>
       {{/if}}
 
+
+      <div class="row-fluid wrap-row">
+        <div class="span6">
+          <div class="left-spacing">
+            <h6>Evidence</h6>
+            {{> /static/mustache/base_templates/attachment_list.mustache}}
+          </div>
+        </div>
+        <div class="span6">
+          <h6>URL</h6>
+        </div>
+      </div>
+
+
       <div class="row-fluid wrap-row">
         <div class="span12">
           {{> /static/mustache/base_templates/mapped_objects.mustache}}
@@ -93,7 +107,7 @@
   <div class="tabs-wrap">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#tab1" data-toggle="tab">
-        Comments and Responses ({{comments.length}})
+        Comments and Responses
       </a></li>
     </ul>
 
@@ -103,7 +117,6 @@
           <add-comment data="comments"></add-comment>
         </div>
         {{> /static/mustache/base_templates/comment_list.mustache}}
-        {{{render "/static/mustache/base_templates/comment_list.mustache" comments=instance.get_comments}}}
       </div>
 
     </div>
