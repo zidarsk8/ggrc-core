@@ -31,6 +31,11 @@
     },
     tree_view_options: {
       add_item_view: _mustache_path + "/tree_add_item.mustache",
+      child_options: [{
+        model: "Document",
+        mapping: "documents",
+        show_view: _mustache_path + "/documents.mustache",
+      }],
     },
     init: function () {
       this._super && this._super.apply(this, arguments);
