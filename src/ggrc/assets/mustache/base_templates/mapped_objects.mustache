@@ -5,65 +5,30 @@
     Maintained By: urban@reciprocitylabs.com
 }}
 
-<h6>Mapped objects</h6>
-<ggrc-modal-connector
-  parent_instance="instance"
-  instance="instance"
-  source_mapping="business_objects"
-  deferred="true">
-  {{#if list.length}}
-  <ul class="mapped-list">
-  {{#each list}}
-    <li>
-      <div class="mapped">
-        <div class="row-fluid">
-          <div class="span12">
-            <div class="info-expand-mapped">
-              <a class="show-hidden-fields info-show-hide openclose" href="javascript://">
-                <span class="out">
-                  <i class="grcicon-arrow-right"></i>
-                </span>
-                <span class="in">
-                  <i class="grcicon-arrow-bottom"></i>
-                </span>
-                <i class="grcicon-{{to_class type ''}}-color"></i>
-                {{title}}
-              </a>
-            </div>
-          </div>
-        </div><!-- row-fluid end -->
-        <div class="hidden-fields-area" style="display:none;">
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Description</h6>
-              {{description}}
-            </div>
-          </div><!-- row-fluid end -->
-        </div><!-- hidden-fields-area end -->
-      </div>
-    </li>
-  {{/each}}
-  </ul>
-  {{/if}}
-  {{^list.length}}
-    <span class="gray"><em>No mapped objects</em></span>
-  {{/list.length}}
-  <div class="objective-selector">
-    <div style="clear:both">
-      <br>
-      <a class="section-add section-sticky btn btn-small btn-draft"
-         href="javascript://" rel="tooltip"
-        {{data "deferred_to"}}
-         data-placement="left"
-         data-toggle="unified-mapper"
-         data-deferred="true"
-         data-object-source="true"
-         data-join-mapping="business_objects"
-         data-join-object-id="{{instance.id}}"
-         data-join-object-type="{{instance.class.model_singular}}"
-         data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6">
-        Map Objects
-      </a>
-    </div>
+{{#instance.class.tree_view_options}}
+<div class="row-fluid wrap-row">
+  <div class="span12">
+    {{#child_options.0}}
+    <h6>Mapped objects</h6>
+      <ul class="tree-structure new-tree" {{data 'options'}} data-info-controller="true"
+        {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+      </ul>
+      {{#is_allowed_to_map instance model.shortName}}
+        <a
+          class="btn btn-draft btn-small"
+          href="javascript://"
+          rel="tooltip"
+          data-placement="left"
+          data-toggle="unified-mapper"
+          data-join-mapping="related_objects"
+          data-join-option-type="{{model.shortName}}"
+          data-join-object-id="{{instance.id}}"
+          data-join-object-type="{{instance.class.shortName}}"
+          data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}">
+          Map Objects
+        </a>
+      {{/if}}
+    {{/child_options.0}}
   </div>
-</ggrc-modal-connector>
+</div>
+{{/options}}
