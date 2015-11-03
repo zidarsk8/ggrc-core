@@ -23,8 +23,6 @@ def upgrade():
   op.create_table(
       'comments',
       sa.Column('id', sa.Integer(), primary_key=True, nullable=False),
-      sa.Column('commentable_id', sa.Integer(), nullable=False),
-      sa.Column('commentable_type', sa.String(length=250), nullable=False),
       sa.Column('description', sa.Text()),
       sa.Column('created_at', sa.DateTime()),
       sa.Column('modified_by_id', sa.Integer()),
