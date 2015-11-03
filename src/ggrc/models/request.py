@@ -17,6 +17,7 @@ from ggrc.models.mixins import Described
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Titled
+from ggrc.models.object_document import Documentable
 from ggrc.models.relationship import Relatable
 
 # audit_id        -> NULL || many (relationship)
@@ -33,7 +34,7 @@ from ggrc.models.relationship import Relatable
 # Documentable -> needing refactor too?
 
 
-class Request(Assignable, CustomAttributable, Relatable, Titled,
+class Request(Assignable, Documentable, CustomAttributable, Relatable, Titled,
               Slugged, Described, Base, db.Model):
   __tablename__ = 'requests'
   _title_uniqueness = False
