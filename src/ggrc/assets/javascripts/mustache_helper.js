@@ -1418,7 +1418,7 @@ can.each({
 
 Mustache.registerHelper("capitalize", function (value, options) {
   value = resolve_computed(value) || "";
-  return value.charAt(0).toUpperCase() + value.slice(1);
+  return can.capitalize(value);
 });
 
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {
