@@ -340,6 +340,25 @@ can.Model.Cacheable("CMS.Models.Request", {
     , requested_on : new Date()
     , due_on : null
   }
+  , info_pane_options: {
+    mapped_objects: {
+      model: can.Model.Cacheable,
+      mapping: "info_related_objects",
+      show_view: GGRC.mustache_path + "/requests/subtree.mustache",
+    },
+    evidence: {
+      model: CMS.Models.Document,
+      mapping: "documents",
+      show_view: GGRC.mustache_path + "/base_templates/documents.mustache",
+      sort_function: _comment_sort,
+    },
+    comments: {
+      model: can.Model.Cacheable,
+      mapping: "comments",
+      show_view: GGRC.mustache_path + "/base_templates/comment_subtree.mustache",
+      sort_function: _comment_sort,
+    }
+  }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
     , header_view : GGRC.mustache_path + "/requests/tree_header.mustache"
@@ -361,21 +380,10 @@ can.Model.Cacheable("CMS.Models.Request", {
     , mandatory_attr_names : ['title', 'description']
     , draw_children : true
     , child_options: [{
-          model: can.Model.Cacheable,
-          mapping: "info_related_objects",
-          show_view: GGRC.mustache_path + "/requests/subtree.mustache",
-        }, {
-          model: can.Model.Cacheable,
-          mapping: "comments",
-          show_view: GGRC.mustache_path + "/base_templates/comment_subtree.mustache",
-          sort_function: _comment_sort,
-        }, {
-          model: CMS.Models.Document,
-          mapping: "documents",
-          show_view: GGRC.mustache_path + "/base_templates/documents.mustache",
-          sort_function: _comment_sort,
-        }
-    ]
+      model : can.Model.Cacheable,
+      mapping: "related_objects",
+      allow_creating : true,
+    }]
   }
   , init : function() {
     this._super.apply(this, arguments);
