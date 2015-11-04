@@ -5,13 +5,13 @@
     Maintained By: urban@reciprocitylabs.com
 }}
 
-{{#instance.class.tree_view_options}}
+{{#instance.class.info_pane_options.mapped_objects}}
+{{#add_to_current_scope parent_instance=instance}}
 <div class="row-fluid wrap-row">
   <div class="span12">
-    {{#child_options.0}}
     <h6>Mapped objects</h6>
-      <ul class="tree-structure new-tree" {{data 'options'}} data-info-controller="true"
-        {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+      <ul class="tree-structure new-tree" {{data 'options'}}
+        {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
       </ul>
       {{#is_allowed_to_map instance model.shortName}}
         <a
@@ -28,7 +28,7 @@
           Map Objects
         </a>
       {{/if}}
-    {{/child_options.0}}
   </div>
 </div>
-{{/options}}
+{{/add_to_current_scope}}
+{{/instance}}

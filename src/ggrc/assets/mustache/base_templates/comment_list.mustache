@@ -5,11 +5,10 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-
-{{#instance.class.tree_view_options}}
-{{#child_options.1}}
+{{#instance.class.info_pane_options.comments}}
+{{#add_to_current_scope parent_instance=instance}}
   <ul class="entry-list" {{data 'options'}} data-info-controller="true"
-    {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+    {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
   </ul>
-{{/child_options.1}}
+{{/add_to_current_scope}}
 {{/instance}}
