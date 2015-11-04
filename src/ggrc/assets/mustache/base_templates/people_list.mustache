@@ -5,27 +5,6 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-<h6>People</h6>
-<div class="side-content">
-  <ul class="label-list">
-    {{#each people}}
-    <li>
-      <label>
-        <span class="person-label {{@key}}"></span>
-        {{@key}}
-      </label>
-      <ul>
-        {{#each .}}
-          <li>
-            <span class="file-controls">
-              <a href="javascript://"><i class="grcicon-deleted"></i></a>
-              <a href="javascript://"><i class="grcicon-edit"></i></a>
-            </span>
-            <a href="javascript://">{{name}}</a>
-          </li>
-        {{/each}}
-      </ul>
-    </li>
-    {{/each}}
-  </ul>
-</div>
+{{#each groups}}
+  <people-group type="{{@key}}" people="." groups="groups"></people-group>
+{{/each}}
