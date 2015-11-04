@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: andraz@reciprocitylabs.com
-# Maintained By: andraz@reciprocitylabs.com
+# Maintained By: urban@reciprocitylabs.com
 
 """Add Comments
 
@@ -19,6 +19,13 @@ from alembic import op
 import sqlalchemy as sa
 
 
+from ggrc import db
+from ggrc.models import Comment
+from ggrc.models import DocumentationResponse
+from ggrc.models import InterviewResponse
+from ggrc.models import Relationship
+
+
 def upgrade():
   op.create_table(
       'comments',
@@ -29,6 +36,70 @@ def upgrade():
       sa.Column('updated_at', sa.DateTime()),
       sa.Column('context_id', sa.Integer(), sa.ForeignKey('contexts.id'))
   )
+
+  documentation_responses = db.session.query(DocumentationResponse)
+  for dr in documentation_responses:
+    related = dr.related_sources + dr.related_destinations
+    comment = Comment(
+      description = dr.description,
+      created_at = dr.created_at,
+      modified_by = dr.modified_by,
+      updated_at = dr.updated_at,
+      context = dr.context)
+
+    request_comment_rel = Relationship(
+      source=dr.request,
+      destination=comment)
+
+    for rel in related:
+      if rel.source.type == "DocumentationResponse":
+        rel.source = dr.request
+        db.session.add(rel)
+      elif rel.destination.type == "DocumentationResponse":
+        rel.destination = dr.request
+        db.session.add(rel)
+    db.session.add(comment)
+    db.session.add(request_comment_rel)
+  db.session.commit()
+
+  interview_responses = db.session.query(InterviewResponse)
+  for ir  in interview_responses:
+    related = ir.related_sources + ir.related_destinations
+
+    desc = ir.description
+    if desc:
+      desc += " "
+
+    if ir.meetings:
+      for m in ir.meetings:
+        desc +=  ("Meeting requested on {}.").format(
+          m.created_at.strftime("%m/%d/%Y at %H:%M"))
+        if m.people:
+          people = ", ".join(["{} ({})".format(
+            p.name, p.email) for p in m.people])
+          desc = desc[:-1] + " with following attendees: {}. ".format(people)
+
+    comment = Comment(
+      description = desc,
+      created_at = ir.created_at,
+      modified_by = ir.modified_by,
+      updated_at = ir.updated_at,
+      context = ir.context)
+
+    request_comment_rel = Relationship(
+      source=ir.request,
+      destination=comment)
+
+    for rel in related:
+      if rel.source.type == "InterviewResponse":
+        rel.source = ir.request
+        db.session.add(rel)
+      elif rel.destination.type == "InterviewResponse":
+        rel.destination = ir.request
+        db.session.add(rel)
+    db.session.add(comment)
+    db.session.add(request_comment_rel)
+  db.session.commit()
 
 
 def downgrade():
