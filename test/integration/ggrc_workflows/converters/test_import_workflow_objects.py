@@ -9,7 +9,7 @@ from os.path import abspath
 from os.path import dirname
 from os.path import join
 
-from tests.ggrc.converters import TestCase
+from integration.ggrc.converters import TestCase
 
 from ggrc import db
 from ggrc_workflows.models.task_group import TaskGroup

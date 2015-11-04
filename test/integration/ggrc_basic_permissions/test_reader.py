@@ -7,12 +7,12 @@
 Test Reader role
 """
 
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 from ggrc.models import get_model
 from ggrc.models import all_models
-from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import Generator
-from tests.ggrc.generator import ObjectGenerator
+from integration.ggrc.api_helper import Api
+from integration.ggrc.generator import Generator
+from integration.ggrc.generator import ObjectGenerator
 
 
 class TestReader(TestCase):

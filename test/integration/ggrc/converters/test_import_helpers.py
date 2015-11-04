@@ -15,8 +15,8 @@ from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import split_array
 from ggrc.utils import title_from_camelcase
 from ggrc.utils import get_mapping_rules
-from tests.ggrc import TestCase
-from tests.ggrc.generator import ObjectGenerator
+from integration.ggrc import TestCase
+from integration.ggrc.generator import ObjectGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')

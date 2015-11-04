@@ -8,8 +8,8 @@ from flask.json import dumps
 
 from ggrc.app import app
 from ggrc_workflows.models import Workflow
-from tests.ggrc import TestCase
-from tests.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc import TestCase
+from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')

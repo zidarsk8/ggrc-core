@@ -7,7 +7,7 @@ from ggrc import db
 from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relationship
 from ggrc.models.relationship import RelationshipAttr
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 import ggrc
 import ggrc.builder
 import ggrc.services

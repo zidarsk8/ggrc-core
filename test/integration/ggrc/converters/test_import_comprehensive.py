@@ -9,8 +9,8 @@ from ggrc.models import Program
 from ggrc.converters import errors
 from ggrc_basic_permissions import Role
 from ggrc_basic_permissions import UserRole
-from tests.ggrc.converters import TestCase
-from tests.ggrc.generator import ObjectGenerator
+from integration.ggrc.converters import TestCase
+from integration.ggrc.generator import ObjectGenerator
 
 
 class TestComprehensiveSheets(TestCase):

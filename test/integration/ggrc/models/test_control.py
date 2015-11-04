@@ -6,7 +6,7 @@
 
 from ggrc import db
 from ggrc.models import Control
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 from .factories import ControlCategoryFactory, ControlFactory
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_in, eq_

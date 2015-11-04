@@ -3,7 +3,7 @@
 # Created By: ivan@reciprocitylabs.com
 # Maintained By: ivan@reciprocitylabs.com
 
-from tests.ggrc.api_helper import Api
+from integration.ggrc.api_helper import Api
 from ggrc.models.person import Person
 from ggrc_basic_permissions.models import Role, UserRole
 

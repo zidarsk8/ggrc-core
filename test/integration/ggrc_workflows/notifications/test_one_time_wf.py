@@ -14,10 +14,10 @@ from ggrc.models import Notification
 from ggrc.models import Person
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.views import send_todays_digest_notifications
-from tests.ggrc import TestCase
-from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import ObjectGenerator
-from tests.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc import TestCase
+from integration.ggrc.api_helper import Api
+from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 
 class TestOneTimeWorkflowNotification(TestCase):

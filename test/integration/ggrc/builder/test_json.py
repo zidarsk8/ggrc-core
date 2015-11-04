@@ -8,7 +8,7 @@ import ggrc.models
 from ggrc.builder.json import publish
 from ggrc.services.common import Resource
 from mock import MagicMock
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 from nose.plugins.skip import SkipTest
 
 

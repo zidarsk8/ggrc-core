@@ -4,7 +4,7 @@
 # Maintained By: urban@reciprocitylabs.com
 
 import random
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 from freezegun import freeze_time
 from datetime import date, datetime
 
@@ -12,7 +12,7 @@ import os
 from ggrc import db
 from ggrc_workflows.models import Workflow, Cycle, CycleTaskGroupObjectTask
 
-from tests.ggrc_workflows.workflow_cycle_calculator.base_workflow_test_case import BaseWorkflowTestCase
+from integration.ggrc_workflows.workflow_cycle_calculator.base_workflow_test_case import BaseWorkflowTestCase
 
 
 if os.environ.get('TRAVIS', False):

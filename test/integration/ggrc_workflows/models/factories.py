@@ -9,8 +9,8 @@ from datetime import date
 
 
 from ggrc_workflows import models
-from tests.ggrc.models.factories import ModelFactory
-from tests.ggrc.models.factories import TitledFactory
+from integration.ggrc.models.factories import ModelFactory
+from integration.ggrc.models.factories import TitledFactory
 
 
 class WorkflowFactory(ModelFactory, TitledFactory):

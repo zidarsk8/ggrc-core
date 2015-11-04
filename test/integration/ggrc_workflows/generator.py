@@ -8,7 +8,7 @@ from ggrc import db
 from ggrc import builder
 from ggrc_workflows.models import (Workflow, TaskGroup, TaskGroupTask,
                                    TaskGroupObject, Cycle)
-from tests.ggrc.generator import Generator
+from integration.ggrc.generator import Generator
 import random
 import copy
 

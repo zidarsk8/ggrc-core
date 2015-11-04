@@ -6,7 +6,7 @@
 from ggrc.utils import merge_dicts
 from ggrc.utils import merge_dict
 from ggrc.utils import get_mapping_rules
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 
 
 class TestUtilsDictFunctions(TestCase):

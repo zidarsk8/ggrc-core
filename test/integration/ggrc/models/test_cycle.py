@@ -5,7 +5,7 @@
 
 from flask import Flask
 from datetime import date, timedelta
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 #from ggrc_workflows import calc_start_date, calc_end_date
 #def calc_end_date(frequency, _date, start_date):
 from nose.plugins.skip import SkipTest

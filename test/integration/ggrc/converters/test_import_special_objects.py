@@ -7,7 +7,7 @@ from ggrc.models import Audit
 from ggrc.models import Program
 from ggrc.models import Person
 from ggrc_basic_permissions.models import UserRole
-from tests.ggrc.converters import TestCase
+from integration.ggrc.converters import TestCase
 
 
 class TestSpecialObjects(TestCase):

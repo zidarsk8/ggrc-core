@@ -5,14 +5,14 @@
 
 import random
 import copy
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 
 import os
 from ggrc import db
 from ggrc_workflows.models import Workflow, TaskGroup, CycleTaskGroupObjectTask, Cycle
-from tests.ggrc_workflows.generator import WorkflowsGenerator
-from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import ObjectGenerator
+from integration.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc.api_helper import Api
+from integration.ggrc.generator import ObjectGenerator
 from nose.plugins.skip import SkipTest
 
 

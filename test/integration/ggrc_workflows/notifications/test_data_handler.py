@@ -4,10 +4,10 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 
-from tests.ggrc_workflows.models.factories import CycleTaskFactory
-from tests.ggrc_workflows.models.factories import CycleTaskObjectFactory
+from integration.ggrc_workflows.models.factories import CycleTaskFactory
+from integration.ggrc_workflows.models.factories import CycleTaskObjectFactory
 from ggrc_workflows.notification.data_handler import get_cycle_task_dict
 
 

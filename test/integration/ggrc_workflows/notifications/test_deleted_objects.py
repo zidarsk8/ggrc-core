@@ -4,7 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import random
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 from freezegun import freeze_time
 from datetime import datetime
 from mock import patch
@@ -13,9 +13,9 @@ import os
 from ggrc import notification
 from ggrc.models import Notification, Person
 from ggrc_workflows.models import Workflow
-from tests.ggrc_workflows.generator import WorkflowsGenerator
-from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import ObjectGenerator
+from integration.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc.api_helper import Api
+from integration.ggrc.generator import ObjectGenerator
 
 
 if os.environ.get('TRAVIS', False):

@@ -8,8 +8,8 @@ import ggrc.models as models
 import itertools
 import os
 import random
-import tests.ggrc
-import tests.ggrc.generator
+import integration.ggrc
+import integration.ggrc.generator
 
 
 if os.environ.get('TRAVIS', False):
@@ -37,15 +37,15 @@ class automapping_count_limit:
     ggrc.automapper.rules.count_limit = self.original_limit
 
 
-class TestAutomappings(tests.ggrc.TestCase):
+class TestAutomappings(integration.ggrc.TestCase):
 
   def setUp(self):
-    tests.ggrc.TestCase.setUp(self)
-    self.gen = tests.ggrc.generator.ObjectGenerator()
+    integration.ggrc.TestCase.setUp(self)
+    self.gen = integration.ggrc.generator.ObjectGenerator()
     self.api = self.gen.api
 
   def tearDown(self):
-    tests.ggrc.TestCase.tearDown(self)
+    integration.ggrc.TestCase.tearDown(self)
 
   def create_object(self, cls, data):
     name = cls.__name__.lower()

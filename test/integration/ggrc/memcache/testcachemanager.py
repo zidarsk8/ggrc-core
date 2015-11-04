@@ -6,8 +6,8 @@
 import json
 import logging
 import sys, os
-from tests.ggrc import TestCase
-from tests.ggrc.services.test_common import TestResource
+from integration.ggrc import TestCase
+from integration.ggrc.services.test_common import TestResource
 from ggrc import settings
 from ggrc.cache import CacheManager, MemCache
 

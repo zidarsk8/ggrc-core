@@ -13,7 +13,7 @@ from datetime import datetime
 from ggrc import db
 from ggrc.models.mixins import Base
 from ggrc.services.common import Resource
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 from urlparse import urlparse
 from wsgiref.handlers import format_date_time
 from nose.plugins.skip import SkipTest

@@ -5,8 +5,8 @@
 
 from ggrc import db
 from ggrc.models import ControlAssessment
-from tests.ggrc import TestCase
-from tests.ggrc.models.factories import ControlAssessmentFactory
+from integration.ggrc import TestCase
+from integration.ggrc.models.factories import ControlAssessmentFactory
 
 
 class TestControlAssessment(TestCase):

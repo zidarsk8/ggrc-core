@@ -4,11 +4,11 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import random
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 
 import os
 from ggrc_workflows.models import Workflow, TaskGroup
-from tests.ggrc.api_helper import Api
+from integration.ggrc.api_helper import Api
 from nose.plugins.skip import SkipTest
 
 

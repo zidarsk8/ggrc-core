@@ -8,8 +8,8 @@ from ggrc.models import Audit
 from ggrc.models import ControlAssessment
 from ggrc.models import Policy
 from ggrc.models import Relationship
-from tests.ggrc.converters import TestCase
-from tests.ggrc.generator import ObjectGenerator
+from integration.ggrc.converters import TestCase
+from integration.ggrc.generator import ObjectGenerator
 
 
 class TestBasicCsvImport(TestCase):

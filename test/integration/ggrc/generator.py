@@ -16,7 +16,7 @@ from ggrc.models import (
 )
 from ggrc.services.common import Resource
 from ggrc_basic_permissions.models import UserRole, Role
-from tests.ggrc.api_helper import Api
+from integration.ggrc.api_helper import Api
 
 
 class Generator():

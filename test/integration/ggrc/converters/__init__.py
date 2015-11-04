@@ -8,7 +8,7 @@ from os.path import abspath
 from os.path import dirname
 from os.path import join
 
-from tests import ggrc
+from integration import ggrc
 
 
 THIS_ABS_PATH = abspath(dirname(__file__))

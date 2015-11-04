@@ -11,8 +11,8 @@ from ggrc.models import OrgGroup
 from ggrc.models import Product
 from ggrc.models import Relationship
 from ggrc.converters import errors
-from tests.ggrc.converters import TestCase
-from tests.ggrc.generator import ObjectGenerator
+from integration.ggrc.converters import TestCase
+from integration.ggrc.generator import ObjectGenerator
 
 
 class TestCsvImport(TestCase):

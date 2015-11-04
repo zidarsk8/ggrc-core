@@ -4,7 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import random
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 from freezegun import freeze_time
 
 import os
@@ -12,9 +12,9 @@ from mock import patch
 
 from ggrc import notification
 from ggrc.models import Person
-from tests.ggrc_workflows.generator import WorkflowsGenerator
-from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import ObjectGenerator
+from integration.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc.api_helper import Api
+from integration.ggrc.generator import ObjectGenerator
 from ggrc_workflows import views
 
 

@@ -10,4 +10,4 @@ if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
   from ggrc.cache import LocalCache
   from ggrc.cache import MemCache
   from ggrc.cache import CacheManager
-  from tests.ggrc.memcache.testcachemanager import TestCacheManager
+  from integration.ggrc.memcache.testcachemanager import TestCacheManager

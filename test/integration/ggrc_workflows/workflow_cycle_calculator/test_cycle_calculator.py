@@ -4,7 +4,7 @@
 # Maintained By: urban@reciprocitylabs.com
 
 import random
-from tests.ggrc import TestCase
+from integration.ggrc import TestCase
 from freezegun import freeze_time
 from datetime import date, datetime
 
@@ -13,11 +13,11 @@ from ggrc import db
 from ggrc_workflows.models import Workflow, Cycle
 from ggrc_workflows import start_recurring_cycles
 
-from tests.ggrc_workflows.generator import WorkflowsGenerator
-from tests.ggrc.api_helper import Api
-from tests.ggrc.generator import ObjectGenerator
+from integration.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc.api_helper import Api
+from integration.ggrc.generator import ObjectGenerator
 
-from tests.ggrc_workflows.workflow_cycle_calculator.base_workflow_test_case import BaseWorkflowTestCase
+from integration.ggrc_workflows.workflow_cycle_calculator.base_workflow_test_case import BaseWorkflowTestCase
 
 from ggrc_workflows.services.workflow_cycle_calculator.cycle_calculator import CycleCalculator
 from ggrc_workflows.services.workflow_cycle_calculator.weekly_cycle_calculator import WeeklyCycleCalculator
