@@ -1,7 +1,7 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: vraj@reciprocitylabs.com
+# Maintained By: urban@reciprocitylabs.com
 
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
@@ -19,19 +19,6 @@ from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Titled
 from ggrc.models.object_document import Documentable
 from ggrc.models.relationship import Relatable
-
-# audit_id        -> NULL || many (relationship)
-# audit_object_id -> relationship table
-# request_type    -> enum? somehting else?
-# status          -> enum to varchar?
-#
-# on migration - request audit_id + audit_object (audit id + object type + object id) => relationship
-#
-# HasObjectState - os_state - also relevant for Request?
-#   Draft/Approved/Declined/Modified /// keep existing states
-# CustomAttributable
-# Auditable -> refactor to move to relationship table (should use just relatable)
-# Documentable -> needing refactor too?
 
 
 class Request(Assignable, Documentable, CustomAttributable, Relatable, Titled,
