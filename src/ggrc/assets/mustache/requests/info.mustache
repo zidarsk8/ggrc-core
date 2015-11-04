@@ -18,17 +18,6 @@
     <div class="span8">
       {{> /static/mustache/base_objects/description.mustache}}
 
-      <div class="row-fluid wrap-row">
-        <div class="span6">
-          <div class="left-spacing">
-            <attachment-list title="Evidence" data="comments" types="!url"></attachment-list>
-          </div>
-        </div>
-        <div class="span6">
-          <attachment-list title="URL" data="comments" types="url"></attachment-list>
-        </div>
-      </div>
-
       {{#if test}}
       <div class="row-fluid wrap-row">
         <div class="span12">
