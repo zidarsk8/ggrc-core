@@ -3135,4 +3135,18 @@ Mustache.registerHelper("pretty_role_name", function (name) {
   return name;
 });
 
+
+/*
+Add new variables to current scope. This is useful for passing variables
+to intialize a tree view.
+
+Example:
+  {{#add_to_current_scope example1="a" example2="b"}}
+    {{log .}} // {example1: "a", example2: "b"}
+  {{/add_to_current_scope}}
+*/
+Mustache.registerHelper("add_to_current_scope", function(options) {
+  return options.fn(options.contexts.add(_.extend({}, options.context, options.hash)));
+});
+
 })(this, jQuery, can);

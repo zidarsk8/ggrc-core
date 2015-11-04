@@ -249,20 +249,6 @@ class MysqlIndexer(SqlIndexer):
       type_union_queries.append(context_query)
 
     for model, type_column in models:
-      # Audits where the user is assigned a Request or a Response
-      if model is all_models.Audit:
-        model_type_query = db.session.query(
-            Request.audit_id.label('id'),
-            type_column.label('type'),
-            literal(None).label('context_id')
-          ).join(Response).filter(
-              or_(
-                Request.assignee_id == contact_id,
-                Response.contact_id == contact_id
-              )
-          ).distinct()
-        type_union_queries.append(model_type_query)
-
       # Objects for which the user is the "contact" or "secondary contact"
       if hasattr(model, 'contact_id'):
         model_type_query = db.session.query(
