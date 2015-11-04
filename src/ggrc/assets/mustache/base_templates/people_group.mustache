@@ -8,28 +8,32 @@
 <div class="side-content">
   <ul class="label-list">
     <li>
-      {{^if editable}}
-        <label>
-          <span class="person-label {{type}}"></span>
-          {{type}}
-        </label>
-      {{/if}}
+      <label>
+        <span class="person-label {{type}}"></span>
+        {{capitalize type}}
+        {{#if editable}}
+          <span class="required">*</span>
+        {{/if}}
+      </label>
       <ul>
         {{#each people}}
+          {{^if_equals person_state "deleted"}}
           <li>
             {{#if editable}}
             <span class="file-controls">
-              <a class="js-trigger--person-delete" {{data "person"}} href="javascript://"><i class="grcicon-deleted"></i></a>
+              <a class="js-trigger--person-delete" data-index="{{@index}}" {{data "person"}} href="javascript://"><i class="grcicon-deleted"></i></a>
               {{! <a href="javascript://"><i class="grcicon-edit"></i></a> }}
             </span>
             {{/if}}
             <a href="javascript://">{{name}}</a>
           </li>
+          {{/if_equals}}
         {{/each}}
       </ul>
     </li>
   </ul>
 </div>
-{{#if editable}}
+
+{{#show_add}}
   {{> /static/mockups/base_templates/add_people.mustache }}
-{{/if}}
+{{/show_add}}

@@ -13,9 +13,13 @@
       define: {
         editable: {
           type: "boolean"
+        },
+        deferred: {
+          type: "boolean"
         }
       },
       editable: "@",
+      deferred: "@",
       groups: {
         "verifier": [],
         "assignee": [],
@@ -25,20 +29,17 @@
     events: {
       inserted: function () {
         this.scope.instance.get_assignees().then(function (assignees) {
-          console.log("Assignees", arguments);
+          assignees = _.mapKeys(assignees, function (val, key) {
+            return key.toLowerCase();
+          });
+          this.viewModel.attr("groups", assignees);
+          this.viewModel.attr("_groups", assignees);
         }.bind(this));
       },
       ".trigger-save-yo click": function () {
         var instance = this.viewModel.attr("instance"),
             destination, relationships = [];
 
-        // model = new CMS.Models.Relationship({
-        //   attrs: {
-        //     "AssigneeType": type
-        //   },
-        //   source: source,
-        //   destination: destination
-        // });
         destination = {
           context_id: instance.context_id,
           href: instance.href,
@@ -47,27 +48,33 @@
         };
         this.viewModel.attr("groups").each(function (group, type) {
           group.each(function (person) {
-            var model = new CMS.Models.Relationship({
+            var state = person.person_state,
+                states = {
+                  "added": "save",
+                  "deleted": "destroy"
+                },
+                model;
+            if (!_.contains(_.keys(states), state)) {
+              return;
+            }
+            model = new CMS.Models.Relationship({
               attrs: {
                 "AssigneeType": can.capitalize(type)
               },
               source: {
-                context_id: null,
                 href: person.href,
                 type: person.type,
                 id: person.id
               },
+              context: null,
               destination: destination
             });
-            relationships.push(model.save());
+            relationships.push(model[states[state]]());
           });
         });
 
         $.when.apply($, relationships)
-            .fail(function (response, message) {
-
-            }.bind(this))
-            .always(function () {
+            .done(function () {
               console.log("SUCCESS", arguments);
             });
       }
@@ -78,14 +85,46 @@
     tag: "people-group",
     template: can.view(GGRC.mustache_path + "/base_templates/people_group.mustache"),
     viewModel: {
+      define: {
+        required: {
+          type: "boolean"
+        },
+        limit: {
+          type: "number"
+        }
+      },
+      limit: "@",
+      required: "@",
       type: "@"
     },
     events: {
+      ".js-trigger--person-delete click": function (el, ev) {
+        var person = el.data("person");
+        if (person.attr("person_state")) {
+          return this.viewModel.attr("people").splice(el.data("index"), 1);
+        }
+        person.attr("person_state", "deleted");
+      },
       ".person-selector input autocomplete:select": function (el, ev, ui) {
         if (_.findWhere(this.viewModel.attr("people"), {id: ui.item.id})) {
           return;
         }
-        this.viewModel.attr("people").push(ui.item);
+        this.viewModel.attr("people").push(_.extend(ui.item, {
+          "person_state": "added"
+        }));
+      }
+    },
+    helpers: {
+      show_add: function (options) {
+        if (this.attr("editable")) {
+          if (_.isNull(this.attr("limit")) ||
+              this.attr("limit") > this.attr("people").filter(function (person) {
+                return !(person.attr("person_state") === "deleted");
+              }).length) {
+            return options.fn();
+          }
+        }
+        return options.inverse();
       }
     }
   });
