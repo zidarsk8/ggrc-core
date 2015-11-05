@@ -470,12 +470,12 @@ ul.new-tree {
         margin: 0 10px;
         border-bottom: 1px solid $itemBorder;
         > .openclose {
-          .grcicon-arrow-right {
+          .fa-caret-right {
             @include opacity(0.25);
             margin: 5px 0 0 4px;
           }
           &.active {
-            .grcicon-arrow-right {
+            .fa-caret-right {
               @include opacity(1);
               background-position: -102px -80px;
             }
@@ -969,11 +969,11 @@ ul.new-tree {
             padding: 0;
           }
           .openclose {
-            .grcicon-arrow-right {
+            .fa-caret-right {
               background-position: -78px -80px;
             }
             &.active {
-              .grcicon-arrow-right {
+              .fa-caret-right {
                 @include opacity(1);
                 background-position: -126px -80px;
               }

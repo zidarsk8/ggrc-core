@@ -186,7 +186,7 @@ h4.search-title {
         text-transform: uppercase;
         font-weight: bold;
         display: block;
-        .grcicon-arrow-right {
+        .fa-caret-right {
           @include opacity(0.25);
           margin: 4px 0 0 7px;
         }
@@ -194,9 +194,9 @@ h4.search-title {
           text-decoration:none;
         }
         &.active {
-          .grcicon-arrow-right {
+          .fa-caret-right:before {
             @include opacity(1);
-            background-position: -102px -80px;
+            content: $fa-var-caret-down;
           }
         }
       }
@@ -409,15 +409,15 @@ h4.search-title {
     li {
       a {
         padding-left: 18px;
-        .grcicon-arrow-right {
+        .fa-caret-right {
           @include opacity(0.25);
           margin: 4px 0 0 7px;
           background-position: -78px -80px;
         }
         &.active {
-          .grcicon-arrow-right {
+          .fa-caret-right:before {
             @include opacity(1);
-            background-position: -126px -80px;
+            content: $fa-var-caret-down;
           }
         }
         &:hover {
@@ -428,7 +428,7 @@ h4.search-title {
           [class^="fa fa-"] {
             display: none;
           }
-          .grcicon-arrow-right {
+          .fa-caret-right {
             display: inline-block;
           }
         }
