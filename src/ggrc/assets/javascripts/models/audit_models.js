@@ -349,7 +349,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     evidence: {
       model: CMS.Models.Document,
       mapping: "documents",
-      show_view: GGRC.mustache_path + "/base_templates/documents.mustache",
+      show_view: GGRC.mustache_path + "/base_templates/attachment.mustache",
       sort_function: _comment_sort,
     },
     comments: {

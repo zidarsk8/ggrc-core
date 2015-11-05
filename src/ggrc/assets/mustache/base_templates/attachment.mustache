@@ -14,8 +14,8 @@
     </a>
   </span>
   {{/is_allowed}}
-  <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-  <span class="date">{{date instance.created_at}}</span>
+  <i class="grcicon-file"></i>
+  <span class="date">{{date instance.created_at "no_time"}}</span>
   <a href="{{schemed_url instance.link}}" href="{{schemed_url instance.link}}" target="_blank">
     <span>{{firstnonempty instance.title instance.link}}</span>
   </a>
