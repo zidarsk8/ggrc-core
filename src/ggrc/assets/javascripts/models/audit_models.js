@@ -301,6 +301,14 @@ can.Model.Cacheable("CMS.Models.Comment", {
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("description");
     }
+    , info_pane_options: {
+      documents: {
+        model: CMS.Models.Document,
+        mapping: "documents",
+        show_view: GGRC.mustache_path + "/base_templates/attachment.mustache",
+        sort_function: _comment_sort,
+      }
+    }
   }, {
     form_preload : function(new_object_form) {
       var page_instance = GGRC.page_instance();
@@ -348,7 +356,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     },
     evidence: {
       model: CMS.Models.Document,
-      mapping: "documents",
+      mapping: "all_documents",
       show_view: GGRC.mustache_path + "/base_templates/attachment.mustache",
       sort_function: _comment_sort,
     },

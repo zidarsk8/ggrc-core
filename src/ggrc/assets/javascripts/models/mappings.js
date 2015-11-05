@@ -713,7 +713,9 @@
         "related_requests", "regulations", "contracts", "policies", "standards",
         "programs", "controls", "sections", "clauses", "objectives",
       ]),
-    comments: TypeFilter("related_objects", "Comment"),
+      comments: TypeFilter("related_objects", "Comment"),
+      documents_from_comments: Cross("comments", "documents"),
+      all_documents: Multi(["documents", "documents_from_comments"]),
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",

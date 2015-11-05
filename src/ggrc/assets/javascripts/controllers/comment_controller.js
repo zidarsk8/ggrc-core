@@ -21,26 +21,22 @@ can.Component.extend({
     list: [],
     // the following are just for the case when we have no object to start with,
     changes: []
-
   },
   events: {
     init: function() {
       this.scope.attr("source_mapping", GGRC.page_instance());
+      this.scope.attr("instance", CMS.Models.Comment());
     },
     "cleanPanel": function () {
       this.scope.attachments.replace([]);
       this.element.find("textarea").val("");
-    },
-    ".js-trigger-attachdata click": function (el, ev) {
-      //this.scope.attachments.push();
-      console.log("WIP")
     },
     ".btn-success click": function (el, ev) {
       var $textarea = this.element.find(".add-comment textarea"),
         description = $.trim($textarea.val()),
         attachments = this.scope.attachments,
         source = this.scope.source_mapping,
-        comment = CMS.Models.Comment;
+        instance = this.scope.instance;
 
       if (!description.length && !attachments.length) {
         return;
@@ -49,8 +45,13 @@ can.Component.extend({
         description: description,
         context: source.context
       };
-      new comment(data).save();
-      this.cleanPanel();
+      instance.attr(data).save().then(function() {
+        return instance.constructor.resolve_deferred_bindings(instance);
+      }).then(function() {
+        this.scope.attr('instance', new CMS.Models.Comment());
+        this.cleanPanel();
+      }.bind(this));
+
     }
   }
 });

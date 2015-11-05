@@ -14,16 +14,13 @@
       added a response - {{date created_at}}
     </span>
     {{description}}
-    <!-- <ul class="attachment-list">
-      {{#attachments}}
-        <li>
-          <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
-          <a href="{{url}}" target="_blank">
-
-          </a>
-        </li>
-      {{/attachments}}
-    </ul> -->
+    {{#instance.class.info_pane_options.documents}}
+    {{#add_to_current_scope parent_instance=instance}}
+      <ul class="attachment-list" {{data 'options'}} data-disable-lazy-loading="true"
+        {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
+      </ul>
+    {{/add_to_current_scope}}
+    {{/instance}}
   </div>
 </li>
 {{/instance}}
