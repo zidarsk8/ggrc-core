@@ -619,7 +619,7 @@
       objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects"),
       objectives: TypeFilter("objects", "Objective"),
       objectives_via_program: Cross("_program", "objectives"),
-      responses_via_requests: Cross("requests", "responses"),
+      responses_via_requests: Cross("requests", "related_objects"),
       related_objects_via_requests: Multi(['requests', 'responses_via_requests']),
       context: Direct("Context", "related_object", "context"),
       authorizations: Cross("context", "user_roles"),
