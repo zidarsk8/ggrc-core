@@ -81,7 +81,6 @@
         var instance = this.viewModel.attr("instance"),
             destination, relationships = [];
 
-        console.log("UPDATE", arguments);
         destination = {
           context_id: instance.context_id,
           href: instance.href,
@@ -96,8 +95,8 @@
                     return model.save();
                   },
                   "deleted": function (model) {
-                    return model.refresh().then(function (model) {
-                      return model.destroy();
+                    return model.refresh().then(function (response) {
+                      return response.destroy();
                     });
                   },
                 },
@@ -140,7 +139,11 @@
         person.attr("person_state", "deleted");
       },
       ".person-selector input autocomplete:select": function (el, ev, ui) {
-        if (_.findWhere(this.viewModel.attr("people"), {id: ui.item.id})) {
+        var person = _.findWhere(this.viewModel.attr("people"), {id: ui.item.id});
+        if (person) {
+          if (person.attr("person_state") === "deleted") {
+            person.attr("person_state", null);
+          }
           return;
         }
         this.viewModel.attr("people").push(_.extend(ui.item, {
