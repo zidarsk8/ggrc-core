@@ -53,11 +53,14 @@ def upgrade():
 
     for rel in related:
       if rel.source.type == "DocumentationResponse":
-        rel.source = dr.request
-        db.session.add(rel)
+        destination = rel.destination
       elif rel.destination.type == "DocumentationResponse":
-        rel.destination = dr.request
-        db.session.add(rel)
+        destination = rel.source
+      related_objects_to_request = Relationship(
+        source=dr.request,
+        destination=destination
+      )
+      db.session.add(related_objects_to_request)
     db.session.add(comment)
     db.session.add(request_comment_rel)
   db.session.commit()
@@ -92,11 +95,14 @@ def upgrade():
 
     for rel in related:
       if rel.source.type == "InterviewResponse":
-        rel.source = ir.request
-        db.session.add(rel)
+        destination = rel.destination
       elif rel.destination.type == "InterviewResponse":
-        rel.destination = ir.request
-        db.session.add(rel)
+        destination = rel.source
+      related_objects_to_request = Relationship(
+        source=ir.request,
+        destination=destination
+      )
+      db.session.add(related_objects_to_request)
     db.session.add(comment)
     db.session.add(request_comment_rel)
   db.session.commit()
