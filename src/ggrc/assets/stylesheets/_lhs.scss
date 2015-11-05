@@ -194,9 +194,11 @@ h4.search-title {
           text-decoration:none;
         }
         &.active {
-          .fa-caret-right:before {
+          .fa-caret-right {
             @include opacity(1);
-            content: $fa-var-caret-down;
+            &:before {
+              content: $fa-var-caret-down;
+            }
           }
         }
       }
@@ -414,9 +416,11 @@ h4.search-title {
           margin: 4px 0 0 7px;
         }
         &.active {
-          .fa-caret-right:before {
+          .fa-caret-right {
             @include opacity(1);
-            content: $fa-var-caret-down;
+            &:before {
+              content: $fa-var-caret-down;
+            }
           }
         }
         &:hover {
