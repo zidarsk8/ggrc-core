@@ -173,6 +173,7 @@ dashboard-js-template-files:
   - base_templates/people_list.mustache
   - base_templates/request_type.mustache
   - base_templates/test.mustache
+  - base_templates/urls.mustache
   - mixins/assignable.mustache
   - mixins/stateful.mustache
   - clauses/modal_content.mustache

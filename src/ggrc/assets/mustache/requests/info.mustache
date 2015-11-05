@@ -50,6 +50,11 @@
         </div>
         <div class="span6">
           <h6>URL</h6>
+          {{#instance.class.info_pane_options.urls}}
+            {{#add_to_current_scope parent_instance=instance}}
+              <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
+            {{/add_to_current_scope}}
+          {{/instance.class.info_pane_options.urls}}
         </div>
       </div>
 

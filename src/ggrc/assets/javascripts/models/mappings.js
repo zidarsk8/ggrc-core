@@ -704,6 +704,7 @@
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
       audits: Indirect("Audit", "audit"),
       audits: Direct("Audit", "requests", "audit"),
+      urls: TypeFilter("related_objects", "Document"),
       info_related_objects: Multi([
         "related_access_groups", "related_data_assets",
         "related_facilities", "related_markets", "related_org_groups",
