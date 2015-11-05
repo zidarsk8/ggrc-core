@@ -32,9 +32,31 @@
           assignees = _.mapKeys(assignees, function (val, key) {
             return key.toLowerCase();
           });
-          this.viewModel.attr("groups", assignees);
+          this.viewModel.attr("groups", _.mapValues(assignees, function (users) {
+            return _.map(users, function (user) {
+              user.person.relationship_id = user.relationship.id;
+              return user.person;
+            });
+          }));
           this.viewModel.attr("_groups", assignees);
         }.bind(this));
+      },
+      "getRelationship": function (person, destination, type, action) {
+        if (action === "deleted") {
+          return CMS.Models.Relationship.findInCacheById(person.relationship_id);
+        }
+        return new CMS.Models.Relationship({
+          attrs: {
+            "AssigneeType": can.capitalize(type)
+          },
+          source: {
+            href: person.href,
+            type: person.type,
+            id: person.id
+          },
+          context: null,
+          destination: destination
+        });
       },
       ".trigger-save-yo click": function () {
         var instance = this.viewModel.attr("instance"),
@@ -47,32 +69,21 @@
           id: instance.id
         };
         this.viewModel.attr("groups").each(function (group, type) {
-          group.each(function (entry) {
-            var person = entry.person;
-            var state = person.person_state,
+          group.each(function (person) {
+            var action = person.person_state,
                 states = {
                   "added": "save",
                   "deleted": "destroy"
                 },
                 model;
-            if (!_.contains(_.keys(states), state)) {
+            if (!_.contains(_.keys(states), action)) {
               return;
             }
-            model = new CMS.Models.Relationship({
-              attrs: {
-                "AssigneeType": can.capitalize(type)
-              },
-              source: {
-                href: person.href,
-                type: person.type,
-                id: person.id
-              },
-              context: null,
-              destination: destination
-            });
-            relationships.push(model[states[state]]());
-          });
-        });
+            model = this.getRelationship(person, destination, type, action);
+            console.log("MODEL", model);
+            relationships.push(model[states[action]]());
+          }, this);
+        }, this);
 
         $.when.apply($, relationships)
             .done(function () {
