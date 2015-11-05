@@ -11,5 +11,6 @@ mysql -u root -e "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevte
 
 export GGRC_SETTINGS_MODULE="testing travis ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_risk_assessments.settings.development ggrc_risks.settings.development ggrc_workflows.settings.development"
 
+nosetests unit --logging-clear-handlers ${@:1}
 nosetests integration --logging-clear-handlers ${@:1}
 
