@@ -316,7 +316,6 @@ can.Model.Cacheable("CMS.Models.Request", {
     , attr_list : [
       {attr_title: 'Title', attr_name: 'title'},
       {attr_title: 'Description', attr_name: 'description'},
-      {attr_title: 'Assignee', attr_name: 'assignee'},
       {attr_title: 'Status', attr_name: 'status'},
       {attr_title: 'Last Updated', attr_name: 'updated_at'},
       {attr_title: 'Request Date', attr_name: 'requested_on', attr_sort_field: 'report_start_date'},
@@ -341,9 +340,9 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validateNonBlank("description");
     this.validateNonBlank("due_on");
     this.validateNonBlank("requested_on");
-    this.validatePresenceOf("assignee");
     this.validateNonBlank("people");
     this.validatePresenceOf("audit");
+
     if(this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {
         if(instance.constructor === CMS.Models.Request) {

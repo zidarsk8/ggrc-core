@@ -27,8 +27,8 @@
       }
     },
     events: {
-      "{parent_instance} updated": "update",
-      "{parent_instance} created": "update",
+      "{instance} updated": "update",
+      "{instance} created": "update",
       "{groups} change": function () {
         var instance = this.viewModel.attr("instance"),
             isAllowed = [];
@@ -81,6 +81,7 @@
         var instance = this.viewModel.attr("instance"),
             destination, relationships = [];
 
+        console.log("UPDATE", arguments);
         destination = {
           context_id: instance.context_id,
           href: instance.href,
