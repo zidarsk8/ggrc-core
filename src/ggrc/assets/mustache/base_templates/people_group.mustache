@@ -25,7 +25,9 @@
               {{! <a href="javascript://"><i class="grcicon-edit"></i></a> }}
             </span>
             {{/if}}
-            <a href="javascript://">{{name}}</a>
+            {{#using person=.}}
+              {{> /static/mustache/people/popover.mustache}}
+            {{/using}}
           </li>
           {{/if_equals}}
         {{/each}}
