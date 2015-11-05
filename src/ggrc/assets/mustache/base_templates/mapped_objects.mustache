@@ -10,7 +10,7 @@
 <div class="row-fluid wrap-row">
   <div class="span12">
     <h6>Mapped objects</h6>
-      <ul class="tree-structure new-tree" {{data 'options'}}
+      <ul class="tree-structure new-tree" {{data 'options'}}  data-disable-lazy-loading="true"
         {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
       </ul>
       {{#is_allowed_to_map instance model.shortName}}
