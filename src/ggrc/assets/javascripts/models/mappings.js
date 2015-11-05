@@ -704,7 +704,16 @@
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
       audits: Indirect("Audit", "audit"),
       audits: Direct("Audit", "requests", "audit"),
-      comments: Direct("Comment", "requests", "comments"),
+      info_related_objects: Multi([
+        "related_access_groups", "related_data_assets",
+        "related_facilities", "related_markets", "related_org_groups",
+        "related_vendors", "related_processes", "related_products",
+        "related_projects", "related_systems", "related_issues",
+        "related_audits", "related_controls", "related_control_assessments",
+        "related_requests", "regulations", "contracts", "policies", "standards",
+        "programs", "controls", "sections", "clauses", "objectives",
+      ]),
+    comments: TypeFilter("related_objects", "Comment"),
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",

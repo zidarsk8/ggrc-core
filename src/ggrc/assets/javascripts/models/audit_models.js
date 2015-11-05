@@ -52,6 +52,16 @@ function update_program_authorizations(programs, person) {
   }).then(Permission.refresh());
 }
 
+function _comment_sort(a, b) {
+  if (a.created_at < b.created_at) {
+    return 1;
+  } else if (a.created_at > b.created_at) {
+    return -1;
+  } else {
+    return 0;
+  }
+}
+
 can.Model.Cacheable("CMS.Models.Audit", {
   root_object : "audit"
   , root_collection : "audits"
@@ -275,6 +285,30 @@ can.Model.Mixin("requestorable", {
   }
 });
 
+can.Model.Cacheable("CMS.Models.Comment", {
+    root_object : "comment",
+    root_collection : "comments",
+    findOne : "GET /api/comments/{id}",
+    findAll : "GET /api/comments",
+    update : "PUT /api/comments/{id}",
+    destroy : "DELETE /api/comments/{id}",
+    create : "POST /api/comments",
+    mixins : [],
+    attributes : {
+      context : "CMS.Models.Context.stub",
+      modified_by : "CMS.Models.Person.stub",
+    },
+    init : function() {
+      this._super && this._super.apply(this, arguments);
+      this.validatePresenceOf("description");
+    }
+  }, {
+    form_preload : function(new_object_form) {
+      var page_instance = GGRC.page_instance();
+      this.attr("comment", page_instance);
+    }
+});
+
 can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request",
   filter_keys : ["assignee", "audit", "code", "company", "control",
@@ -301,12 +335,32 @@ can.Model.Cacheable("CMS.Models.Request", {
     , assignee : "CMS.Models.Person.stub"
     , requested_on : "date"
     , due_on : "date"
+    , documents : "CMS.Models.Document.stubs"
     , audit : "CMS.Models.Audit.stub"
   }
   , defaults : {
     status : "Unstarted"
     , requested_on : new Date()
     , due_on : null
+  }
+  , info_pane_options: {
+    mapped_objects: {
+      model: can.Model.Cacheable,
+      mapping: "info_related_objects",
+      show_view: GGRC.mustache_path + "/requests/subtree.mustache",
+    },
+    evidence: {
+      model: CMS.Models.Document,
+      mapping: "documents",
+      show_view: GGRC.mustache_path + "/base_templates/documents.mustache",
+      sort_function: _comment_sort,
+    },
+    comments: {
+      model: can.Model.Cacheable,
+      mapping: "comments",
+      show_view: GGRC.mustache_path + "/base_templates/comment_subtree.mustache",
+      sort_function: _comment_sort,
+    }
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
@@ -328,11 +382,10 @@ can.Model.Cacheable("CMS.Models.Request", {
     , mandatory_attr_names : ['title', 'description']
     , draw_children : true
     , child_options: [{
-          model: can.Model.Cacheable,
-          mapping: "related_objects",
-          show_view: GGRC.mustache_path + "/requests/subtree.mustache",
-        }
-    ]
+      model : can.Model.Cacheable,
+      mapping: "related_objects",
+      allow_creating : true,
+    }]
   }
   , init : function() {
     this._super.apply(this, arguments);
@@ -442,29 +495,6 @@ can.Model.Cacheable("CMS.Models.Request", {
     });
     return refresh_queue.trigger();
   },
-  get_comments: function() {
-    var relations = this.related_sources.concat(
-        this.related_destinations),
-        refresh_queue = new RefreshQueue();
-
-    _.each(relations, function(r){
-      refresh_queue.enqueue(r.reify());
-    });
-    refresh_queue.trigger();
-
-    var comments = [];
-    $.when(refresh_queue).then(function(rels){
-      _.each(rels.objects, function(r){
-        if (r.source && r.source.type && r.source.type == "Comment") {
-          comments.push(r.source.reify());
-        }
-        if (r.destination && r.destination.type && r.destination.type == "Comment") {
-          comments.push(r.destination.reify());
-        }
-      });
-    });
-    return comments;
-  },
   get_assignees: function() {
     var assignees = {};
     var rq_rel = new RefreshQueue();
@@ -503,31 +533,6 @@ can.Model.Cacheable("CMS.Models.Request", {
       });
     });
   }
-});
-
-
-can.Model.Cacheable("CMS.Models.Comment", {
-    root_object : "comment",
-    root_collection : "comments",
-    findOne : "GET /api/comments/{id}",
-    findAll : "GET /api/comments",
-    update : "PUT /api/comments/{id}",
-    destroy : "DELETE /api/comments/{id}",
-    create : "POST /api/comments",
-    mixins : [],
-    attributes : {
-      context : "CMS.Models.Context.stub",
-      modified_by : "CMS.Models.Person.stub",
-    },
-    init : function() {
-      this._super && this._super.apply(this, arguments);
-      this.validatePresenceOf("description");
-    }
-  }, {
-    form_preload : function(new_object_form) {
-      var page_instance = GGRC.page_instance();
-      this.attr("comment", page_instance);
-    }
 });
 
 can.Model.Cacheable("CMS.Models.Response", {

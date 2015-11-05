@@ -637,7 +637,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       this.init_display_options(opts);
     }.bind(this));
-
+    // Make sure the parent_instance is not a computable
+    if (typeof this.options.parent_instance === 'function') {
+      this.options.attr('parent_instance', this.options.parent_instance());
+    }
   }
 
   , " inserted": function() {

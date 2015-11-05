@@ -1,0 +1,29 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+{{#instance}}
+<li>
+  <span class="person-label assignee"></span>
+  <div class="w-status">
+    <span class="entry-author">
+      {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}}
+      added a response - {{date created_at}}
+    </span>
+    {{description}}
+    <!-- <ul class="attachment-list">
+      {{#attachments}}
+        <li>
+          <i class="grcicon-file{{#icon}}-{{icon}}{{/icon}}"></i>
+          <a href="{{url}}" target="_blank">
+
+          </a>
+        </li>
+      {{/attachments}}
+    </ul> -->
+  </div>
+</li>
+{{/instance}}
