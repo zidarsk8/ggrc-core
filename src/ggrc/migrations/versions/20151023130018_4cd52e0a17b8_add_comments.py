@@ -53,11 +53,14 @@ def upgrade():
 
     for rel in related:
       if rel.source.type == "DocumentationResponse":
-        rel.source = dr.request
-        db.session.add(rel)
+        destination = rel.destination
       elif rel.destination.type == "DocumentationResponse":
-        rel.destination = dr.request
-        db.session.add(rel)
+        destination = rel.source
+      related_objects_to_request = Relationship(
+        source=dr.request,
+        destination=destination
+      )
+      db.session.add(related_objects_to_request)
     db.session.add(comment)
     db.session.add(request_comment_rel)
   db.session.commit()
@@ -67,17 +70,20 @@ def upgrade():
     related = ir.related_sources + ir.related_destinations
 
     desc = ir.description
-    if desc:
-      desc += " "
-
     if ir.meetings:
+      desc += "<br /><br /><b>Meetings</b><hr />"
+
       for m in ir.meetings:
-        desc +=  ("Meeting requested on {}.").format(
-          m.created_at.strftime("%m/%d/%Y at %H:%M"))
-        if m.people:
-          people = ", ".join(["{} ({})".format(
-            p.name, p.email) for p in m.people])
-          desc = desc[:-1] + " with following attendees: {}. ".format(people)
+        desc += "<a href=\"{url}\">Meeting</a> requested on {date}<br />".\
+          format(**{
+              "url": m.title,
+              "date": m.created_at.strftime("%m/%d/%Y at %H:%M"),
+            })
+
+    if ir.people:
+      desc += "<br /><br /><b>Attendees</b><hr />"
+      for p in ir.people:
+        desc += "- {} ({})<br />".format(p.name, p.email)
 
     comment = Comment(
       description = desc,
@@ -92,11 +98,14 @@ def upgrade():
 
     for rel in related:
       if rel.source.type == "InterviewResponse":
-        rel.source = ir.request
-        db.session.add(rel)
+        destination = rel.destination
       elif rel.destination.type == "InterviewResponse":
-        rel.destination = ir.request
-        db.session.add(rel)
+        destination = rel.source
+      related_objects_to_request = Relationship(
+        source=ir.request,
+        destination=destination
+      )
+      db.session.add(related_objects_to_request)
     db.session.add(comment)
     db.session.add(request_comment_rel)
   db.session.commit()

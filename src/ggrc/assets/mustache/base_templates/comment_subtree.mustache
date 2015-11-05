@@ -13,7 +13,9 @@
       {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}}
       added a response - {{date created_at}}
     </span>
-    {{description}}
+    <div class="rtf-block">
+      {{{firstnonempty description '<em>No comment was entered</em>'}}}
+    </div>
     {{#instance.class.info_pane_options.documents}}
     {{#add_to_current_scope parent_instance=instance}}
       <ul class="attachment-list" {{data 'options'}} data-disable-lazy-loading="true"
