@@ -322,7 +322,7 @@ can.Model("can.Model.Cacheable", {
             if(xhr.status === 409) {
               obj = that.findInCacheById(id);
               attrs = obj.attr();
-              base_attrs = obj._backupStore;
+              base_attrs = obj._backupStore();
               return obj.refresh().then(function(obj) {
                 var conflict = false,
                     remote_attrs = obj.attr();

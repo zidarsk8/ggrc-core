@@ -6,7 +6,7 @@
 import logging
 from collections import namedtuple
 
-from sqlalchemy import or_, and_
+from sqlalchemy import and_
 
 from datetime import datetime
 from ggrc import models
@@ -51,10 +51,10 @@ class AutomapperGenerator(object):
         and_(Relationship.source_type == obj.type,
              Relationship.source_id == obj.id),
     ).union_all(
-      Relationship.query.filter(
-        and_(Relationship.destination_type == obj.type,
-             Relationship.destination_id == obj.id),
-    )).all()
+        Relationship.query.filter(
+            and_(Relationship.destination_type == obj.type,
+                 Relationship.destination_id == obj.id))
+    ).all()
     res = set((Stub.from_destination(r)
                if r.source_type == obj.type and r.source_id == obj.id
                else Stub.from_source(r))

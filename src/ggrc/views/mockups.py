@@ -18,9 +18,9 @@ def init_mockup_views():
   @app.route("/mockups/request")
   @login_required
   def mockup_request():
-    return render_template("mockups/base.haml")
+    return render_template("mockups/request.haml")
 
   @app.route("/mockups/assessor")
   @login_required
   def mockup_assessor():
-    return render_template("mockups/base-assessor.haml")
+    return render_template("mockups/assessor.haml")

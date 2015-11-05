@@ -501,7 +501,7 @@
             __permission_model: join_model
           };
         }
-        if (join_model !== "ObjectPerson") {
+        if (!_.includes(["ObjectPerson", "WorkflowPerson"], join_model)) {
           data.options.__permission_type = data.options.__permission_type || "update";
         }
         data.model_name = _.isString(data.model_name) ? [data.model_name] : data.model_name;

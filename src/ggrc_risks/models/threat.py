@@ -15,10 +15,10 @@ from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState, track_state_for_class
 
 
-class ThreatActor(
+class Threat(
     HasObjectState, CustomAttributable, Documentable, Personable,
     Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
-  __tablename__ = 'threat_actors'
+  __tablename__ = 'threats'
 
   _aliases = {
       "contact": {
@@ -26,5 +26,5 @@ class ThreatActor(
           "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
-      "url": "Threat Actor URL",
+      "url": "Threat URL",
   }

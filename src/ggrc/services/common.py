@@ -681,7 +681,8 @@ class Resource(ModelView):
       return current_app.make_response((
           'application/json', 406, [('Content-Type', 'text/plain')]))
     with benchmark("Query read permissions"):
-      if not permissions.is_allowed_read(self.model.__name__, obj.id, obj.context_id):
+      if not permissions.is_allowed_read(self.model.__name__, obj.id, obj.context_id)\
+         and not has_conditions('read', self.model.__name__):
         raise Forbidden()
       if not permissions.is_allowed_read_for(obj):
         raise Forbidden()
@@ -728,13 +729,15 @@ class Resource(ModelView):
       return self.not_found_response()
     src = UnicodeSafeJsonWrapper(self.request.json)
     with benchmark("Query update permissions"):
-      if not permissions.is_allowed_update(self.model.__name__, obj.id, obj.context_id):
+      if not permissions.is_allowed_update(self.model.__name__, obj.id, obj.context_id)\
+         and not has_conditions('update', self.model.__name__):
         raise Forbidden()
       if not permissions.is_allowed_update_for(obj):
         raise Forbidden()
       new_context = self.get_context_id_from_json(src)
       if new_context != obj.context_id \
-          and not permissions.is_allowed_update(self.model.__name__, obj.id, new_context):
+         and not permissions.is_allowed_update(self.model.__name__, obj.id, new_context)\
+         and not has_conditions('update', self.model.__name__):
         raise Forbidden()
     if self.request.mimetype != 'application/json':
       return current_app.make_response(
@@ -790,7 +793,8 @@ class Resource(ModelView):
       if obj is None:
         return self.not_found_response()
       with benchmark("Query delete permissions"):
-        if not permissions.is_allowed_delete(self.model.__name__, obj.id, obj.context_id):
+        if not permissions.is_allowed_delete(self.model.__name__, obj.id, obj.context_id)\
+           and not has_conditions("delete", self.model.__name__):
           raise Forbidden()
         if not permissions.is_allowed_delete_for(obj):
           raise Forbidden()
@@ -996,27 +1000,22 @@ class Resource(ModelView):
     """Do NOTHING by default"""
     pass
 
-  def collection_post(self):
+  def collection_post_step(self, src):
     try:
-      if self.request.mimetype != 'application/json':
-        return current_app.make_response((
-            'Content-Type must be application/json', 415, []))
       obj = self.model()
-      src = UnicodeSafeJsonWrapper(self.request.json)
       root_attribute = self.model._inflector.table_singular
       try:
         src = src[root_attribute]
       except KeyError, e:
-        return current_app.make_response((
-            'Required attribute "{0}" not found'.format(
-                root_attribute), 400, []))
+        raise BadRequest('Required attribute "{0}" not found'.format(
+                root_attribute))
       with benchmark("Query create permissions"):
         if not permissions.is_allowed_create(self.model.__name__, None,
-                                             self.get_context_id_from_json(src)):
+                                             self.get_context_id_from_json(src))\
+           and not has_conditions('create', self.model.__name__):
           raise Forbidden()
-
       if src.get('private') == True and src.get('context') is not None \
-          and src['context'].get('id') is not None:
+         and src['context'].get('id') is not None:
         raise BadRequest(
             'context MUST be "null" when creating a private resource.')
       elif 'context' not in src:
@@ -1051,9 +1050,8 @@ class Resource(ModelView):
       with benchmark("Serialize object"):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
-        return self.json_success_response(
-            object_for_json, self.modified_at(obj), id=obj.id, status=201)
-    except IntegrityError as e:
+        return (201, object_for_json)
+    except (IntegrityError, ValidationError) as e:
       msg = e.orig.args[1]
       if obj.type == "Relationship" and \
           msg.startswith("Duplicate entry") and \
@@ -1071,10 +1069,50 @@ class Resource(ModelView):
             (R.destination_id==obj.source_id))
         ).first()
         object_for_json = self.object_for_json(obj)
-        return self.json_success_response(object_for_json,
-                                          self.modified_at(obj),
-                                          id=obj.id, status=200)
-      raise e
+        return (200, object_for_json)
+      message = translate_message(e)
+      current_app.logger.warn(message)
+      return (403, message)
+
+  def collection_post(self):
+    if self.request.mimetype != 'application/json':
+      return current_app.make_response((
+          'Content-Type must be application/json', 415, []))
+    body = self.request.json
+    wrap = type(body) == dict
+    if wrap:
+      body = [body]
+    res = []
+    for src in body:
+      try:
+        src_res = None
+        src_res = self.collection_post_step(UnicodeSafeJsonWrapper(src))
+        db.session.commit()
+      except Exception as e:
+        if not src_res or 200 <= src_res[0] < 300:
+          src_res = (getattr(e, "code", 500), e.message)
+        current_app.logger.warn("Collection POST commit failed: " + str(e))
+        db.session.rollback()
+      res.append(src_res)
+    headers = {"Content-Type": "application/json"}
+    errors = []
+    if wrap:
+      status, res = res[0]
+      if type(res) == dict and len(res) == 1:
+        value = res.values()[0]
+        if "id" in value:
+          headers['Location'] = self.url_for(id=value["id"])
+    else:
+      for res_status, body in res:
+        if not (200 <= res_status < 300):
+          errors.append((res_status, body))
+      if len(errors) > 0:
+        status = errors[0][0]
+        headers["X-Flash-Error"] = '<hr>'.join((error for _, error in errors))
+      else:
+        status = 200
+    return current_app.make_response(
+        (self.as_json(res), status, headers))
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
@@ -1222,6 +1260,17 @@ class ReadOnlyResource(Resource):
       return super(ReadOnlyResource, self).dispatch_request(*args, **kwargs)
     else:
       raise NotImplementedError()
+
+
+def has_conditions(action, resource):
+  """
+  Checks if the resource has a condition that needs to be checked with
+  is_allowed_for
+  """
+  _permissions = permissions.permissions_for(get_current_user())._permissions()
+  return bool(_permissions.get(action, {})
+              .get(resource, {})
+              .get('conditions', {}))
 
 
 def filter_resource(resource, depth=0, user_permissions=None):

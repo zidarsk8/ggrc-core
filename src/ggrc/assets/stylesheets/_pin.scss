@@ -71,6 +71,7 @@
           @include opacity(1);
         }
       }
+      &.active,
       &:hover {
         i {
           @include opacity(1);

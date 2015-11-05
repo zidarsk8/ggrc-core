@@ -4,9 +4,18 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, Base, Described, Mapping
-from sqlalchemy.ext.declarative import declared_attr
+from ggrc.models.mixins import Base
+from ggrc.models.mixins import Described
+from ggrc.models.mixins import Identifiable
+from ggrc.models.mixins import Mapping
+from ggrc.models.mixins import deferred
 from sqlalchemy import or_, and_
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import validates
+from sqlalchemy.orm.collections import attribute_mapped_collection
+from werkzeug.exceptions import BadRequest
+import functools
 
 
 class Relationship(Mapping, db.Model):
@@ -33,6 +42,16 @@ class Relationship(Mapping, db.Model):
   automapping = db.relationship(
       lambda: Relationship,
       remote_side=lambda: Relationship.id
+  )
+  relationship_attrs = db.relationship(
+      lambda: RelationshipAttr,
+      collection_class=attribute_mapped_collection("attr_name"),
+      lazy='joined',  # eager loading
+      cascade='all, delete-orphan'
+  )
+  attrs = association_proxy(
+      "relationship_attrs", "attr_value",
+      creator=lambda k, v: RelationshipAttr(attr_name=k, attr_value=v)
   )
 
   @property
@@ -64,6 +83,15 @@ class Relationship(Mapping, db.Model):
         else None
     return setattr(self, self.destination_attr, value)
 
+  @validates('relationship_attrs')
+  def _validate_attr(self, key, attr):
+    """
+      Only white-listed attributes can be stored, so users don't use this
+      for storing arbitrary data.
+    """
+    RelationshipAttr.validate_attr(self.source, self.destination, attr)
+    return attr
+
   @classmethod
   def find_related(cls, object1, object2):
     def predicate(src, dst):
@@ -94,7 +122,9 @@ class Relationship(Mapping, db.Model):
       'source',
       'destination',
       'relationship_type_id',
+      'attrs',
   ]
+  attrs.publish_raw = True
 
   def _display_name(self):
     return "{}:{} <-> {}:{}".format(self.source_type, self.source_id,
@@ -157,3 +187,58 @@ class Relatable(object):
     return cls.eager_inclusions(query, Relatable._include_links).options(
         orm.subqueryload('related_sources'),
         orm.subqueryload('related_destinations'))
+
+
+class RelationshipAttr(Identifiable, db.Model):
+  """
+    Extended attributes for relationships. Used to store relations meta-data
+    so the Relationship table can be used in place of join-tables that carry
+    extra information
+  """
+
+  __tablename__ = 'relationship_attrs'
+  relationship_id = db.Column(
+      db.Integer,
+      db.ForeignKey('relationships.id'),
+      primary_key=True
+  )
+  attr_name = db.Column(db.String, nullable=False)
+  attr_value = db.Column(db.String, nullable=False)
+
+  _validators = {}
+
+  @classmethod
+  def validate_attr(cls, source, destination, attr):
+    """
+      Checks both source and destination type (with mixins) for
+      defined validators _validate_relationship_attr
+    """
+    attr_name = attr.attr_name
+    attr_value = attr.attr_value
+    validators = cls._get_validators(source) + cls._get_validators(destination)
+    for validator in validators:
+      if validator(source, destination, attr_name, attr_value):
+        return
+    raise BadRequest("Invalid attribute {}: {}".format(attr_name, attr_value))
+
+  @classmethod
+  def _get_validators(cls, obj):
+    target_class = type(obj)
+    if target_class not in cls._validators:
+      cls._validators[target_class] = cls._gather_validators(target_class)
+    return cls._validators[target_class]
+
+  @staticmethod
+  def _gather_validators(target_class):
+    queue = set([target_class])
+    done = set()
+    validators = set()
+    while queue:
+      cls = queue.pop()
+      for b in cls.__bases__:
+        if b not in done:
+          queue.add(b)
+      validator = getattr(cls, "_validate_relationship_attr", None)
+      if validator is not None:
+        validators.add(validator)
+    return [functools.partial(v, target_class) for v in validators]

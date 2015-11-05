@@ -587,7 +587,10 @@ can.Control("GGRC.Controllers.Modals", {
     return false
   }
 
-  , save_ui_status : function(){
+  , save_ui_status : function() {
+    if (!this.options.model) {
+      return;
+    }
     var model_name = this.options.model.model_singular,
         reset_visible = this.options.reset_visible ? this.options.reset_visible : false,
         ui_array = this.options.ui_array ? this.options.ui_array : [],
@@ -598,10 +601,12 @@ can.Control("GGRC.Controllers.Modals", {
 
     this.display_prefs.setModalState(model_name, display_state);
     this.display_prefs.save();
-
   }
 
   , restore_ui_status_from_storage : function() {
+    if (!this.options.model) {
+      return;
+    }
     var model_name = this.options.model.model_singular,
         display_state = this.display_prefs.getModalState(model_name);
 

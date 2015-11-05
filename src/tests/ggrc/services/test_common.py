@@ -22,10 +22,11 @@ from nose.plugins.skip import SkipTest
 class ServicesTestMockModel(Base, ggrc.db.Model):
   __tablename__ = 'test_model'
   foo = db.Column(db.String)
+  code = db.Column(db.String, unique=True)
 
   # REST properties
-  _publish_attrs = ['modified_by_id', 'foo']
-  _update_attrs = ['foo']
+  _publish_attrs = ['modified_by_id', 'foo', 'code']
+  _update_attrs = ['foo', 'code']
 
 URL_MOCK_COLLECTION = '/api/mock_resources'
 URL_MOCK_RESOURCE = '/api/mock_resources/{0}'
@@ -35,6 +36,7 @@ Resource.add_to(
 COLLECTION_ALLOWED = ['HEAD', 'GET', 'POST', 'OPTIONS']
 RESOURCE_ALLOWED = ['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS']
 
+
 class TestResource(TestCase):
   def setUp(self):
     super(TestResource, self).setUp()
@@ -43,8 +45,8 @@ class TestResource(TestCase):
       ServicesTestMockModel.__table__.create(db.engine)
     with self.client.session_transaction() as session:
       session['permissions'] = {
-          "__GGRC_ADMIN__": {"__GGRC_ALL__": {"contexts": [0]} }
-          }
+          "__GGRC_ADMIN__": {"__GGRC_ALL__": {"contexts": [0]}}
+      }
 
   def tearDown(self):
     super(TestResource, self).tearDown()
@@ -68,23 +70,23 @@ class TestResource(TestCase):
         u'selfLink': unicode(URL_MOCK_RESOURCE.format(model.id)),
         u'type': unicode(model.__class__.__name__),
         u'modified_by': {
-          u'href': u'/api/people/1',
-          u'id': model.modified_by_id,
-          u'type': 'Person',
-          u'context_id': None
-          } if model.modified_by_id is not None else None,
+            u'href': u'/api/people/1',
+            u'id': model.modified_by_id,
+            u'type': 'Person',
+            u'context_id': None
+        } if model.modified_by_id is not None else None,
         u'modified_by_id': int(model.modified_by_id),
         u'updated_at': updated_at,
         u'created_at': created_at,
-        u'context': \
-            { u'id': model.context_id, } \
-                if model.context_id is not None else None,
+        u'context':
+            {u'id': model.context_id}
+            if model.context_id is not None else None,
         u'foo': (unicode(model.foo) if model.foo else None),
-        }
+    }
 
   def mock_model(self, id=None, modified_by_id=1, **kwarg):
     if 'id' not in kwarg:
-      kwarg['id'] = random.randint(0,999999999)
+      kwarg['id'] = random.randint(0, 999999999)
     if 'modified_by_id' not in kwarg:
       kwarg['modified_by_id'] = 1
     mock = ServicesTestMockModel(**kwarg)
@@ -99,12 +101,12 @@ class TestResource(TestCase):
     """Ignore the `http://localhost` prefix of the Location"""
     return response.headers['Location'][16:]
 
-  def assertRequiredHeaders(
-      self, response, headers={'Content-Type': 'application/json',}):
+  def assertRequiredHeaders(self, response,
+                            headers={'Content-Type': 'application/json'}):
     self.assertIn('Etag', response.headers)
     self.assertIn('Last-Modified', response.headers)
     self.assertIn('Content-Type', response.headers)
-    for k,v in headers.items():
+    for k, v in headers.items():
       self.assertEquals(v, response.headers.get(k))
 
   def assertAllow(self, response, allowed=None):
@@ -120,15 +122,15 @@ class TestResource(TestCase):
   def headers(self, *args, **kwargs):
     ret = list(args)
     ret.append(('X-Requested-By', 'Unit Tests'))
-    ret.extend([(k,v) for k,v in kwargs.items()])
+    ret.extend(kwargs.items())
     return ret
 
   def test_X_Requested_By_required(self):
     response = self.client.post(self.mock_url())
     self.assert400(response)
-    response = self.client.put(self.mock_url()+'/1', data='blah')
+    response = self.client.put(self.mock_url() + '/1', data='blah')
     self.assert400(response)
-    response = self.client.delete(self.mock_url()+'/1')
+    response = self.client.delete(self.mock_url() + '/1')
     self.assert400(response)
 
   def test_empty_collection_get(self):
@@ -151,8 +153,9 @@ class TestResource(TestCase):
     self.assert200(response)
     self.assertRequiredHeaders(
         response,
-        { 'Last-Modified': self.http_timestamp(date2),
-          'Content-Type': 'application/json',
+        {
+            'Last-Modified': self.http_timestamp(date2),
+            'Content-Type': 'application/json',
         })
     self.assertIn('test_model_collection', response.json)
     self.assertEqual(2, len(response.json['test_model_collection']))
@@ -171,12 +174,14 @@ class TestResource(TestCase):
     response = self.client.get(self.mock_url(mock1.id), headers=self.headers())
     self.assert200(response)
     self.assertRequiredHeaders(
-      response,
-      { 'Last-Modified': self.http_timestamp(date1),
-        'Content-Type': 'application/json',
-      })
+        response,
+        {
+            'Last-Modified': self.http_timestamp(date1),
+            'Content-Type': 'application/json',
+        })
     self.assertIn('services_test_mock_model', response.json)
-    self.assertDictEqual(self.mock_json(mock1), response.json['services_test_mock_model'])
+    self.assertDictEqual(self.mock_json(mock1),
+                         response.json['services_test_mock_model'])
 
   def test_collection_put(self):
     self.assertAllow(
@@ -190,13 +195,13 @@ class TestResource(TestCase):
 
   def test_collection_post_successful(self):
     data = json.dumps(
-        { 'services_test_mock_model': { 'foo': 'bar', 'context': None} })
+        {'services_test_mock_model': {'foo': 'bar', 'context': None}})
     response = self.client.post(
         URL_MOCK_COLLECTION,
         content_type='application/json',
         data=data,
         headers=self.headers(),
-        )
+    )
     self.assertStatus(response, 201)
     self.assertIn('Location', response.headers)
     response = self.client.get(
@@ -215,13 +220,85 @@ class TestResource(TestCase):
     self.assertEqual(
         'bar', response.json['test_model_collection']['test_model'][0]['foo'])
 
+  def test_collection_post_successful_single_array(self):
+    data = json.dumps(
+        [{'services_test_mock_model': {'foo': 'bar', 'context': None}}])
+    response = self.client.post(
+        URL_MOCK_COLLECTION,
+        content_type='application/json',
+        data=data,
+        headers=self.headers(),
+    )
+    self.assert200(response)
+    self.assertEqual(type(response.json), list)
+    self.assertEqual(len(response.json), 1)
+
+    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    self.assert200(response)
+    self.assertEqual(
+        1, len(response.json['test_model_collection']['test_model']))
+    self.assertEqual(
+        'bar', response.json['test_model_collection']['test_model'][0]['foo'])
+
+  def test_collection_post_successful_multiple(self):
+    data = json.dumps([
+      {'services_test_mock_model': {'foo': 'bar1', 'context': None}},
+      {'services_test_mock_model': {'foo': 'bar2', 'context': None}},
+    ])
+    response = self.client.post(
+        URL_MOCK_COLLECTION,
+        content_type='application/json',
+        data=data,
+        headers=self.headers(),
+    )
+    self.assert200(response)
+    self.assertEqual(type(response.json), list)
+    self.assertEqual(len(response.json), 2)
+    self.assertEqual(
+        'bar1', response.json[0][1]['services_test_mock_model']['foo'])
+    self.assertEqual(
+        'bar2', response.json[1][1]['services_test_mock_model']['foo'])
+    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    self.assert200(response)
+    self.assertEqual(
+        2, len(response.json['test_model_collection']['test_model']))
+
+  def test_collection_post_successful_multiple_with_errors(self):
+    data = json.dumps([
+      {'services_test_mock_model':
+        {'foo': 'bar1', 'code': 'f1', 'context': None}},
+      {'services_test_mock_model':
+        {'foo': 'bar1', 'code': 'f1', 'context': None}},
+      {'services_test_mock_model':
+        {'foo': 'bar2', 'code': 'f2', 'context': None}},
+      {'services_test_mock_model':
+        {'foo': 'bar2', 'code': 'f2', 'context': None}},
+    ])
+    response = self.client.post(
+        URL_MOCK_COLLECTION,
+        content_type='application/json',
+        data=data,
+        headers=self.headers(),
+    )
+
+    self.assertEqual(403, response.status_code)
+    self.assertEqual([201, 403, 201, 403], [i[0] for i in response.json])
+    self.assertEqual(
+        'bar1', response.json[0][1]['services_test_mock_model']['foo'])
+    self.assertEqual(
+        'bar2', response.json[2][1]['services_test_mock_model']['foo'])
+    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    self.assert200(response)
+    self.assertEqual(
+        2, len(response.json['test_model_collection']['test_model']))
+
   def test_collection_post_bad_request(self):
     response = self.client.post(
         URL_MOCK_COLLECTION,
         content_type='application/json',
         data='This is most definitely not valid content.',
         headers=self.headers(),
-        )
+    )
     self.assert400(response)
 
   def test_collection_post_bad_content_type(self):
@@ -230,7 +307,7 @@ class TestResource(TestCase):
         content_type='text/plain',
         data="Doesn't matter, now does it?",
         headers=self.headers(),
-        )
+    )
     self.assertStatus(response, 415)
 
   def test_put_successful(self):
@@ -251,11 +328,11 @@ class TestResource(TestCase):
         url,
         data=json.dumps(obj),
         headers=self.headers(
-          ('If-Unmodified-Since', original_headers['Last-Modified']),
-          ('If-Match', original_headers['Etag']),
-          ),
+            ('If-Unmodified-Since', original_headers['Last-Modified']),
+            ('If-Match', original_headers['Etag']),
+        ),
         content_type='application/json',
-        )
+    )
     self.assert200(response)
     response = self.client.get(url, headers=self.headers())
     self.assert200(response)
@@ -276,10 +353,9 @@ class TestResource(TestCase):
         content_type='application/json',
         data='This is most definitely not valid content.',
         headers=self.headers(
-          ('If-Unmodified-Since', response.headers['Last-Modified']),
-          ('If-Match', response.headers['Etag']),
-          ),
-        )
+            ('If-Unmodified-Since', response.headers['Last-Modified']),
+            ('If-Match', response.headers['Etag']))
+    )
     self.assert400(response)
 
   @SkipTest
@@ -290,8 +366,8 @@ class TestResource(TestCase):
     self.assertRequiredHeaders(response)
     obj = response.json
     obj['services_test_mock_model']['foo'] = 'rocks'
-    mock = ggrc.db.session.query(
-        ServicesTestMockModel).filter(ServicesTestMockModel.id==mock.id).one()
+    mock = ggrc.db.session.query(ServicesTestMockModel).filter(
+        ServicesTestMockModel.id == mock.id).one()
     mock.foo = 'dirt'
     ggrc.db.session.add(mock)
     ggrc.db.session.commit()
@@ -301,20 +377,20 @@ class TestResource(TestCase):
         url,
         data=json.dumps(obj),
         headers=self.headers(
-          ('If-Unmodified-Since', original_headers['Last-Modified']),
-          ('If-Match', original_headers['Etag']),
-          ),
+            ('If-Unmodified-Since', original_headers['Last-Modified']),
+            ('If-Match', original_headers['Etag'])
+        ),
         content_type='application/json',
-        )
+    )
     self.assertStatus(response, 409)
     response = self.client.delete(
         url,
         headers=self.headers(
-          ('If-Unmodified-Since', original_headers['Last-Modified']),
-          ('If-Match', original_headers['Etag']),
-          ),
+            ('If-Unmodified-Since', original_headers['Last-Modified']),
+            ('If-Match', original_headers['Etag'])
+        ),
         content_type='application/json',
-        )
+    )
     self.assertStatus(response, 409)
 
   @SkipTest
@@ -330,7 +406,7 @@ class TestResource(TestCase):
         data=json.dumps(obj),
         content_type='application/json',
         headers=self.headers(),
-        )
+    )
     self.assertStatus(response, 428)
     response = self.client.delete(url, headers=self.headers())
     self.assertStatus(response, 428)
@@ -344,13 +420,13 @@ class TestResource(TestCase):
     response = self.client.delete(
         url,
         headers=self.headers(
-          ('If-Unmodified-Since', response.headers['Last-Modified']),
-          ('If-Match', response.headers['Etag']),
-          ),
-        )
+            ('If-Unmodified-Since', response.headers['Last-Modified']),
+            ('If-Match', response.headers['Etag']),
+        ),
+    )
     self.assert200(response)
     response = self.client.get(url, headers=self.headers())
-    #410 would be nice! But, requires a tombstone.
+    # 410 would be nice! But, requires a tombstone.
     self.assert404(response)
 
   def test_options(self):
@@ -368,8 +444,7 @@ class TestResource(TestCase):
     mock1 = self.mock_model(foo='baz')
     response = self.client.get(
         self.mock_url(mock1.id),
-        headers=self.headers(('Accept', 'text/plain')),
-        )
+        headers=self.headers(('Accept', 'text/plain')))
     self.assertStatus(response, 406)
     self.assertEqual('text/plain', response.headers.get('Content-Type'))
     self.assertEqual('application/json', response.data)
@@ -377,8 +452,7 @@ class TestResource(TestCase):
   def test_collection_get_bad_accept(self):
     response = self.client.get(
         URL_MOCK_COLLECTION,
-        headers=self.headers(('Accept', 'text/plain')),
-        )
+        headers=self.headers(('Accept', 'text/plain')))
     self.assertStatus(response, 406)
     self.assertEqual('text/plain', response.headers.get('Content-Type'))
     self.assertEqual('application/json', response.data)
@@ -387,17 +461,16 @@ class TestResource(TestCase):
     mock1 = self.mock_model(foo='baz')
     response = self.client.get(
         self.mock_url(mock1.id),
-        headers=self.headers(('Accept', 'application/json')),
-        )
+        headers=self.headers(('Accept', 'application/json')))
     self.assert200(response)
     previous_headers = dict(response.headers)
     response = self.client.get(
         self.mock_url(mock1.id),
         headers=self.headers(
-          ('Accept', 'application/json'),
-          ('If-None-Match', previous_headers['Etag']),
-          ),
-        )
+            ('Accept', 'application/json'),
+            ('If-None-Match', previous_headers['Etag']),
+        ),
+    )
     self.assertStatus(response, 304)
     self.assertIn('Etag', response.headers)
 
@@ -406,16 +479,15 @@ class TestResource(TestCase):
     self.mock_model(foo='baz')
     response = self.client.get(
         URL_MOCK_COLLECTION,
-        headers=self.headers(('Accept', 'application/json')),
-        )
+        headers=self.headers(('Accept', 'application/json')))
     self.assert200(response)
     previous_headers = dict(response.headers)
     response = self.client.get(
         URL_MOCK_COLLECTION,
         headers=self.headers(
-          ('Accept', 'application/json'),
-          ('If-None-Match', previous_headers['Etag']),
-          ),
-        )
+            ('Accept', 'application/json'),
+            ('If-None-Match', previous_headers['Etag']),
+        ),
+    )
     self.assertStatus(response, 304)
     self.assertIn('Etag', response.headers)

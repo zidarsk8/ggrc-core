@@ -19,7 +19,7 @@
   %header.header.main
   .area{ 'class': '={ model_display_class }' }
     .header-content
-      %h2.logo-wrap
+      %h2.logo-wrap{ 'class': '={ logo_wrap_class }' }
         %a{ 'class': 'to-my-work', 'href': '/dashboard' }
           -set logo_url = config.get("COMPANY_LOGO")
           -if logo_url
