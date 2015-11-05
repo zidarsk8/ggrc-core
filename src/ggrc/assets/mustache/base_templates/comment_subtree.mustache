@@ -13,7 +13,9 @@
       {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}}
       added a response - {{date created_at}}
     </span>
-    {{description}}
+    <div class="rtf-block">
+      {{{firstnonempty description '<em>No comment was entered</em>'}}}
+    </div>
     <!-- <ul class="attachment-list">
       {{#attachments}}
         <li>
