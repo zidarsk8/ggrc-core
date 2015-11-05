@@ -342,6 +342,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validateNonBlank("due_on");
     this.validateNonBlank("requested_on");
     this.validatePresenceOf("assignee");
+    this.validateNonBlank("people");
     this.validatePresenceOf("audit");
     if(this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {

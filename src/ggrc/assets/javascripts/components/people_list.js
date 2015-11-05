@@ -27,6 +27,20 @@
       }
     },
     events: {
+      "{parent_instance} updated": "update",
+      "{parent_instance} created": "update",
+      "{groups} change": function () {
+        var instance = this.viewModel.attr("instance"),
+            isAllowed = [];
+
+        this.viewModel.attr("groups").each(function (group, type) {
+          group = group.filter(function (person) {
+            return person.attr("person_state") !== "deleted";
+          });
+          isAllowed.push(group.length);
+        });
+        instance.attr("people", _.every(isAllowed));
+      },
       inserted: function () {
         this.scope.instance.get_assignees().then(function (assignees) {
           assignees = _.mapKeys(assignees, function (val, key) {
@@ -63,7 +77,7 @@
           destination: destination
         });
       },
-      ".trigger-save-yo click": function () {
+      "update": function () {
         var instance = this.viewModel.attr("instance"),
             destination, relationships = [];
 
@@ -77,12 +91,12 @@
           group.each(function (person) {
             var action = person.person_state,
                 states = {
-                  "added": function(r) {
-                    return r.save()
+                  "added": function (model) {
+                    return model.save();
                   },
-                  "deleted": function(r) {
-                    return r.refresh().then(function(r) {
-                      return r.destroy();
+                  "deleted": function (model) {
+                    return model.refresh().then(function (model) {
+                      return model.destroy();
                     });
                   },
                 },
@@ -91,15 +105,11 @@
               return;
             }
             model = this.getRelationship(person, destination, type, action);
-            console.log("MODEL", model);
             relationships.push(states[action](model));
           }, this);
         }, this);
 
-        $.when.apply($, relationships)
-            .done(function () {
-              console.log("SUCCESS", arguments);
-            });
+        this.viewModel.attr("instance").delay_resolving_save_until($.when.apply($, relationships));
       }
     }
   });
@@ -142,7 +152,7 @@
         if (this.attr("editable")) {
           if (_.isNull(this.attr("limit")) ||
               this.attr("limit") > this.attr("people").filter(function (person) {
-                return !(person.attr("person_state") === "deleted");
+                return person.attr("person_state") !== "deleted";
               }).length) {
             return options.fn();
           }
