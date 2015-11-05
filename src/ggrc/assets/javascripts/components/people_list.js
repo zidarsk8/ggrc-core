@@ -30,6 +30,9 @@
       "{instance} updated": "update",
       "{instance} created": "update",
       "{groups} change": function () {
+        if (!this.viewModel.attr("editable")) {
+          return;
+        }
         var instance = this.viewModel.attr("instance"),
             isAllowed = [];
 
@@ -51,13 +54,13 @@
               assignees[type] = [];
             }
           });
-          this.viewModel.attr("groups", _.mapValues(assignees, function (users) {
+          assignees = _.mapValues(assignees, function (users) {
             return _.map(users, function (user) {
               user.person.relationship_id = user.relationship.id;
               return user.person;
             });
-          }));
-          this.viewModel.attr("_groups", assignees);
+          });
+          this.viewModel.attr("groups", assignees);
         }.bind(this));
       },
       "getRelationship": function (person, destination, type, action) {
@@ -95,15 +98,18 @@
                     return model.save();
                   },
                   "deleted": function (model) {
+
                     return model.refresh().then(function (response) {
                       return response.destroy();
                     });
                   },
                 },
                 model;
+
             if (!_.contains(_.keys(states), action)) {
               return;
             }
+            person.attr("person_state", null);
             model = this.getRelationship(person, destination, type, action);
             relationships.push(states[action](model));
           }, this);
@@ -134,6 +140,7 @@
       ".js-trigger--person-delete click": function (el, ev) {
         var person = el.data("person");
         if (person.attr("person_state")) {
+          person.attr("person_state", null);
           return this.viewModel.attr("people").splice(el.data("index"), 1);
         }
         person.attr("person_state", "deleted");
