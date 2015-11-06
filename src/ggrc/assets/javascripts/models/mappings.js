@@ -708,15 +708,9 @@
       _mixins: ["related_object", "personable", "ownable", "business_object", "documentable"],
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
       audits: Direct("Audit", "requests", "audit"),
-      related_assignees: AttrFilter("relationships", "AssigneeType", "Assignee"),
-      related_requesters: AttrFilter("relationships", "AssigneeType", "Requester"),
-      related_verifiers: AttrFilter("relationships", "AssigneeType", "Verifier"),
-
-      assignees: Direct("Person", "related_assignees", "source"),
-      // Direct("Relationship", "source", "related_destinations")
-      // related_objects_as_destination: Proxy(null, "source", "Relationship", "destination", "related_sources"),
-      // requesters: Proxy(null, "destination", "related_requesters", "source", "People"),
-      // verifiers: Proxy(null, "destination", "related_verifiers", "source", "People"),
+      related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee"),
+      related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester"),
+      related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier"),
       info_related_objects: Multi([
         "related_access_groups", "related_data_assets",
         "related_facilities", "related_markets", "related_org_groups",
