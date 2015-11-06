@@ -972,6 +972,7 @@ p {
     i {
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
+      color: $black;
       ul.new-tree & {
         margin-top: 0;
       }

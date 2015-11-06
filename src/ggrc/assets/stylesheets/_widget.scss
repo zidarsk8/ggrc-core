@@ -97,7 +97,8 @@
         top: 0px;
       }
       .tree-action-list {
-        [class^="grcicon-"] {
+        .fa {
+          color: $black;
           margin-top: 1px;
           @include opacity(0.5);
           @include transition(opacity 0.2s ease);
@@ -1255,7 +1256,7 @@
     @include clearfix();
     a {
       float: right;
-      margin-top: 12px !important;
+      margin-top: 2px !important;
       margin-left: 10px;
     }
     input[type="submit"] {
@@ -1270,6 +1271,7 @@
     i {
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
+      color: $black;
       &:hover {
         @include opacity(1);
       }
