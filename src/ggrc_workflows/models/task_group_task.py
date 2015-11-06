@@ -3,8 +3,8 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from datetime import date
 from sqlalchemy import orm
-from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.login import get_current_user
@@ -14,8 +14,8 @@ from ggrc_workflows.models.mixins import RelativeTimeboxed
 from ggrc_workflows.models.task_group import TaskGroup
 
 
-class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed, Base,
-                    db.Model):
+class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
+                    Base, db.Model):
   __tablename__ = 'task_group_tasks'
   _title_uniqueness = False
 
@@ -40,14 +40,28 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed, 
 
   VALID_TASK_TYPES = ['text', 'menu', 'checkbox']
 
-  @validates('task_type')
+  @orm.validates('task_type')
   def validate_task_type(self, key, value):
     if value is None:
       value = self.default_task_type()
     if value not in self.VALID_TASK_TYPES:
-      message = u"Invalid type '{}'".format(value)
-      raise ValueError(message)
+      raise ValueError(u"Invalid type '{}'".format(value))
     return value
+
+  def validate_date(self, value):
+    if value is not None and value.year <= 1900:
+      current_century = date.today().year / 100 * 100
+      year = current_century + value.year % 100
+      return date(year, value.month, value.day)
+    return value
+
+  @orm.validates('start_date')
+  def validate_start_date(self, key, value):
+    return self.validate_date(value)
+
+  @orm.validates('end_date')
+  def validate_end_date(self, key, value):
+    return self.validate_date(value)
 
   _publish_attrs = [
       'task_group',
