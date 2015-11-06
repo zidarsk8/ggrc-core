@@ -168,6 +168,7 @@ can.Component.extend({
   scope: {
     parent_instance: null,
     source_mapping: null,
+    deferred: "@",
     join_model: '@',
     model: null,
     delay: '@',
@@ -175,14 +176,11 @@ can.Component.extend({
     attributes: {},
     create_url: function() {
       var value = this.element.find("input[type='text']").val();
-      var dfd =  CMS.Models.Document.newInstance({
+      var dfd =  new CMS.Models.Document({
         link: value,
         title: value,
         context: this.scope.parent_instance.context || new CMS.Models.Context({id : null}),
-      }).save();
-      dfd.then(function(data) {
-        this.scope.attr("instance", data);
-      }.bind(this));
+      });
       return dfd;
     },
   },
@@ -209,6 +207,11 @@ can.Component.extend({
       }
       if (!created_dfd) {
         created_dfd = new $.Deferred().resolve();
+      }
+
+      if (this.scope.deferred) {
+        this.scope.parent_instance.mark_for_addition("related_objects_as_source", created_dfd);
+        return;
       }
 
       created_dfd.then(function() {

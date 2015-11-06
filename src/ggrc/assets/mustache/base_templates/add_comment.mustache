@@ -10,10 +10,25 @@
       <div class="controls top">
         <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach evidence" deferred="true" click_event="trigger_upload">
         </ggrc-gdrive-picker-launcher>
-        <!--
-        <a href="javascript://" class="js-trigger-attachdata btn btn-draft btn-small" data-type="url">
-          <i class="grcicon-link"></i> Attach URL
-        </a> -->
+
+        {{#is_allowed 'update' instance}}
+          {{#toggle show_new_object_form}}
+            <ggrc-quick-add parent_instance="instance" join_model="Relationship" deferred="true" quick_create="create_url">
+              {{#prune_context}}
+                <div class="objective-selector field-wrap">
+                  <input tabindex="3" type="text" name="instance" placeholder="Add URL">
+                  <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+                  <a href="javascript://" class="btn btn-small no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
+                </div>
+                <input type="hidden" name="role_name" value="Auditor" />
+              {{/prune_context}}
+            </ggrc-quick-add>
+          {{else}}
+            <a href="javascript://" class="btn btn-draft btn-small {{toggle_button}}" data-type="url">
+              <i class="grcicon-link"></i> Attach URL
+            </a>
+        {{/toggle}}
+        {{/is_allowed}}
       </div>
       <div class="wysiwyg-area">
         <textarea rows="4" class="span12 triple wysihtml5" name="comment-description" id="comment-description" placeholder="Enter comment (optional)"></textarea>

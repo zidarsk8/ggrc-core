@@ -9,10 +9,6 @@
 <div class="file-list-wrap">
   <ul class="attachment-list" data-disable-lazy-loading="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
   </ul>
-  {{#is_allowed 'update'}}
-    <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach evidence" click_event="trigger_upload">
-    </ggrc-gdrive-picker-launcher>
-  {{/is_allowed}}
 </div>
 {{/instance}}
 {{/add_to_current_scope}}

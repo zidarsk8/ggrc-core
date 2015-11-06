@@ -55,23 +55,6 @@
               <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
             {{/add_to_current_scope}}
           {{/instance.class.info_pane_options.urls}}
-          {{#is_allowed 'update' instance}}
-          {{#toggle show_new_object_form}}
-            <ggrc-quick-add parent_instance="instance" join_model="Relationship" quick_create="create_url">
-              {{#prune_context}}
-              <div class="objective-selector field-wrap">
-                <input tabindex="3" type="text" name="instance" placeholder="Add URL">
-                <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
-                <a href="javascript://" class="btn btn-small btn-success no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
-              </div>
-              <input type="hidden" name="role_name" value="Auditor" />
-              {{/prune_context}}
-            </ggrc-quick-add>
-          {{else}}
-            <br>
-              <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+ Add URL</a>
-          {{/toggle}}
-          {{/is_allowed}}
         </div>
       </div>
 
