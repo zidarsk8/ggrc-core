@@ -33,23 +33,19 @@ class TestWorkflowObjectsImport(TestCase):
 
   def test_full_good_import_no_warnings(self):
     filename = "simple_workflow_test_no_warnings.csv"
+    response_dry = self.import_file(filename, dry_run=True)
     response = self.import_file(filename)
+
+    self.assertEqual(response_dry, response)
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
-    broken_imports = set([
-        "Control Assessment",
-        "Task Group Task",
-    ])
-
     for block in response:
-      if block["name"] in broken_imports:
-        continue
       for message in messages:
         self.assertEqual(set(), set(block[message]))
 
     self.assertEqual(1, Workflow.query.count())
     self.assertEqual(1, TaskGroup.query.count())
-    self.assertEqual(1, TaskGroupTask.query.count())
+    self.assertEqual(2, TaskGroupTask.query.count())
     self.assertEqual(2, TaskGroupObject.query.count())
 
 
