@@ -13,6 +13,7 @@
     Search = GGRC.MapperHelpers.Search,
     Multi = GGRC.MapperHelpers.Multi,
     TypeFilter = GGRC.MapperHelpers.TypeFilter,
+    AttrFilter = GGRC.MapperHelpers.AttrFilter,
     CustomFilter = GGRC.MapperHelpers.CustomFilter,
     Cross = GGRC.MapperHelpers.Cross;
   /*
@@ -42,6 +43,7 @@
     Search: Search,
     Multi: Multi,
     TypeFilter: TypeFilter,
+    AttrFilter: AttrFilter,
     CustomFilter: CustomFilter,
     Cross: Cross,
     modules: {},
@@ -321,6 +323,9 @@
       related_objects_as_destination: Proxy(
         null, "source", "Relationship", "destination", "related_sources"),
       related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+      destinations: Direct("Relationship", "source", "related_destinations"),
+      sources: Direct("Relationship", "destination", "related_sources"),
+      relationships: Multi(["sources", "destinations"]),
       related_access_groups: TypeFilter("related_objects", "AccessGroup"),
       related_data_assets: TypeFilter("related_objects", "DataAsset"),
       related_facilities: TypeFilter("related_objects", "Facility"),
@@ -702,8 +707,16 @@
     Request: {
       _mixins: ["related_object", "personable", "ownable", "business_object", "documentable"],
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
-      audits: Indirect("Audit", "audit"),
       audits: Direct("Audit", "requests", "audit"),
+      related_assignees: AttrFilter("relationships", "AssigneeType", "Assignee"),
+      related_requesters: AttrFilter("relationships", "AssigneeType", "Requester"),
+      related_verifiers: AttrFilter("relationships", "AssigneeType", "Verifier"),
+
+      assignees: Direct("Person", "related_assignees", "source"),
+      // Direct("Relationship", "source", "related_destinations")
+      // related_objects_as_destination: Proxy(null, "source", "Relationship", "destination", "related_sources"),
+      // requesters: Proxy(null, "destination", "related_requesters", "source", "People"),
+      // verifiers: Proxy(null, "destination", "related_verifiers", "source", "People"),
       info_related_objects: Multi([
         "related_access_groups", "related_data_assets",
         "related_facilities", "related_markets", "related_org_groups",

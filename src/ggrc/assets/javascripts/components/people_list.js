@@ -45,23 +45,23 @@
         instance.attr("people", _.every(isAllowed));
       },
       inserted: function () {
-        this.scope.instance.get_assignees().then(function (assignees) {
-          assignees = _.mapKeys(assignees, function (val, key) {
-            return key.toLowerCase();
-          });
-          _.each(["verifier", "assignee", "requester"], function(type) {
-            if (!assignees[type]) {
-              assignees[type] = [];
-            }
-          });
-          assignees = _.mapValues(assignees, function (users) {
-            return _.map(users, function (user) {
-              user.person.relationship_id = user.relationship.id;
-              return user.person;
-            });
-          });
-          this.viewModel.attr("groups", assignees);
-        }.bind(this));
+        // this.scope.instance.get_assignees().then(function (assignees) {
+        //   assignees = _.mapKeys(assignees, function (val, key) {
+        //     return key.toLowerCase();
+        //   });
+        //   _.each(["verifier", "assignee", "requester"], function(type) {
+        //     if (!assignees[type]) {
+        //       assignees[type] = [];
+        //     }
+        //   });
+        //   assignees = _.mapValues(assignees, function (users) {
+        //     return _.map(users, function (user) {
+        //       user.person.relationship_id = user.relationship.id;
+        //       return user.person;
+        //     });
+        //   });
+        //   this.viewModel.attr("groups", assignees);
+        // }.bind(this));
       },
       "getRelationship": function (person, destination, type, action) {
         if (action === "deleted") {

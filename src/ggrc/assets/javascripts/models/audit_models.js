@@ -496,44 +496,6 @@ can.Model.Cacheable("CMS.Models.Request", {
       refresh_queue.enqueue(binding.instance);
     });
     return refresh_queue.trigger();
-  },
-  get_assignees: function() {
-    var assignees = {};
-    var rq_rel = new RefreshQueue();
-    var rq_person = new RefreshQueue();
-    this.related_destinations.each(rq_rel.enqueue.bind(rq_rel));
-    this.related_sources.each(rq_rel.enqueue.bind(rq_rel));
-    return rq_rel.trigger().then(function(relationships) {
-      _.each(relationships, function(r) {
-        if (r.attrs && r.attrs.AssigneeType) {
-          var type = r.attrs.AssigneeType;
-          var person = undefined;
-          if (r.source.type === "Person") {
-            person = r.source;
-          } else if (r.destination.type === "Person") {
-            person = r.destination;
-          }
-          if (person !== undefined) {
-            if (!assignees[type]) {
-              assignees[type] = [];
-            }
-            assignees[type].push({
-              "relationship": r,
-              "person": person
-            });
-            rq_person.enqueue(person);
-          }
-        }
-      });
-      return rq_person.trigger().then(function() {
-        _.each(assignees, function(entries, type) {
-          _.each(entries, function(entry) {
-            entry.person = entry.person.reify();
-          });
-        });
-        return assignees;
-      });
-    });
   }
 });
 
