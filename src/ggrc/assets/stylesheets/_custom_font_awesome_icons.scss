@@ -28,6 +28,11 @@
   &.color { color: $purple; }
 }
 .grcicon-task_group-color:before { content: $fa-var-cog; color: $purple; }
+.grcicon-objective-color:before { content: $fa-var-dot-circle-o; color: $objectives; }
+.#{$fa-css-prefix}-objective:before {
+  content: $fa-var-dot-circle-o;
+  &.color { color: $objectives; }
+}
 
 // Turn icons to black
 %black-icons {
@@ -35,6 +40,10 @@
   .#{$fa-css-prefix}-audit-color:before, .grcicon-audit-color:before { color: $black; }
   .grcicon-task_group-color:before { color: $black; }
   .#{$fa-css-prefix}-task_group:before {
+    &.color { color: $black; }
+  }
+  .grcicon-objective-color:before { color: $black; }
+  .#{$fa-css-prefix}-objective:before {
     &.color { color: $black; }
   }
 
@@ -93,6 +102,10 @@
   .#{$fa-css-prefix}-audit-color:before, .grcicon-audit-color:before { color: $white; }
   .grcicon-task_group-color:before { color: $white; }
   .#{$fa-css-prefix}-task_group:before {
+    &.color { color: $white; }
+  }
+  .grcicon-objective-color:before { color: $white; }
+  .#{$fa-css-prefix}-objective:before {
     &.color { color: $white; }
   }
 
