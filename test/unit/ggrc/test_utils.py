@@ -3,9 +3,7 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from ggrc.utils import merge_dicts
-from ggrc.utils import merge_dict
-from ggrc.utils import get_mapping_rules
+from ggrc import utils
 from unittest import TestCase
 
 
@@ -13,7 +11,7 @@ class TestUtilsFunctions(TestCase):
 
   def test_mapping_rules(self):
     """ Test that all mappings go both ways """
-    mappings = get_mapping_rules()
+    mappings = utils.get_mapping_rules()
     verificationErrors = []
 
     # Special cases in mappings as defined in utils.py:
@@ -87,7 +85,7 @@ class TestUtilsFunctions(TestCase):
         "h": 4,
     }
 
-    result = merge_dict(dict1, dict2)
+    result = utils.merge_dict(dict1, dict2)
 
     self.assertEquals(result, expected_result)
 
@@ -148,5 +146,5 @@ class TestUtilsFunctions(TestCase):
         },
         "h": 4,
     }
-    expected_result = merge_dicts(dict1, dict2, dict3)
+    expected_result = utils.merge_dicts(dict1, dict2, dict3)
     self.assertEqual(result, expected_result)
