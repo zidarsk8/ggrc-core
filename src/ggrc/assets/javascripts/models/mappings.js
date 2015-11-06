@@ -624,7 +624,7 @@
       objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects"),
       objectives: TypeFilter("objects", "Objective"),
       objectives_via_program: Cross("_program", "objectives"),
-      responses_via_requests: Cross("requests", "responses"),
+      responses_via_requests: Cross("requests", "related_objects"),
       related_objects_via_requests: Multi(['requests', 'responses_via_requests']),
       context: Direct("Context", "related_object", "context"),
       authorizations: Cross("context", "user_roles"),
@@ -707,7 +707,9 @@
     Request: {
       _mixins: ["related_object", "personable", "ownable", "business_object", "documentable"],
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
+      audits: Indirect("Audit", "audit"),
       audits: Direct("Audit", "requests", "audit"),
+      urls: TypeFilter("related_objects", "Document"),
       related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee"),
       related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier"),
@@ -720,7 +722,9 @@
         "related_requests", "regulations", "contracts", "policies", "standards",
         "programs", "controls", "sections", "clauses", "objectives",
       ]),
-    comments: TypeFilter("related_objects", "Comment"),
+      comments: TypeFilter("related_objects", "Comment"),
+      documents_from_comments: Cross("comments", "documents"),
+      all_documents: Multi(["documents", "documents_from_comments"]),
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",

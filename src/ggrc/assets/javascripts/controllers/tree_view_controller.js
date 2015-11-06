@@ -610,7 +610,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
 
       if (this.element.parent().length === 0 // element not attached
-        || this.element.hasClass("entry-list")) { // comment list
+        || this.element.data('disable-lazy-loading')) { // comment list
         this.options.disable_lazy_loading = true;
       }
       if(!this.options.scroll_element) {
@@ -1325,24 +1325,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           order_factor = order === "asc" ? 1 : -1;
 
       var comparator = function (a, b) {
-        if (typeof a === "string") {
-          a = a.toLowerCase();
-        };
-        if (typeof b === "string") {
-          b = b.toLowerCase();
-        };
-        if (a > b) {
-          return order_factor;
-        }
-        if (b > a) {
-          return -order_factor;
-        }
-        return 0;
+        return String.naturalCaseCompare(a, b) * order_factor;
       };
       this.options.sort_function = function (val1, val2) {
         var a = val1.get_deep_property(key_tree),
             b = val2.get_deep_property(key_tree);
-        return comparator(a,b);
+        return comparator(a, b);
       };
 
       this.options.sort_function.deep_property = key_tree;

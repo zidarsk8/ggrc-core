@@ -9,11 +9,35 @@ Create Date: 2015-10-16 17:48:06.875436
 
 # revision identifiers, used by Alembic.
 revision = '27684e5f313a'
-down_revision = '29b63100d61c'
+down_revision = '45693b1959f7'
 
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
+
+from HTMLParser import HTMLParser
+import bleach
+
+from ggrc import db
+from ggrc.models import Request
+
+
+def cleaner(value, bleach_tags=[], bleach_attrs={}):
+  if value is None:
+    return value
+
+  parser = HTMLParser()
+  lastvalue = value
+  value = parser.unescape(value)
+  while value != lastvalue:
+    lastvalue = value
+    value = parser.unescape(value)
+
+  ret = parser.unescape(
+    bleach.clean(value, bleach_tags, bleach_attrs, strip=True)
+  )
+  return ret
+
 
 def upgrade():
     sql = "BEGIN;"
@@ -118,6 +142,13 @@ def upgrade():
 
     sql += "COMMIT;"
     op.execute(sql)
+
+    requests = db.session.query(Request)
+    for request in requests:
+        cleaned_desc = cleaner(request.description)
+        request.title = cleaned_desc[:60]
+        db.session.add(request)
+    db.session.commit()
 
     # Remove unneeded attributes
     # sql = "BEGIN;"

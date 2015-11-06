@@ -171,7 +171,20 @@ can.Component.extend({
     join_model: '@',
     model: null,
     delay: '@',
-    attributes: {}
+    quick_create: '@',
+    attributes: {},
+    create_url: function() {
+      var value = this.element.find("input[type='text']").val();
+      var dfd =  CMS.Models.Document.newInstance({
+        link: value,
+        title: value,
+        context: this.scope.parent_instance.context || new CMS.Models.Context({id : null}),
+      }).save();
+      dfd.then(function(data) {
+        this.scope.attr("instance", data);
+      }.bind(this));
+      return dfd;
+    },
   },
   events: {
     init: function() {
@@ -181,45 +194,59 @@ can.Component.extend({
     //  At this time, live bound rendering should be resolved, which is not the
     //  case during init.
     inserted: function(el) {
-      var that = this;
       this.element.find("input:not([data-mapping], [data-lookup])").each(function(i, el) {
-        that.scope.attributes.attr($(el).attr("name"), $(el).val());
-      });
+        this.scope.attributes.attr($(el).attr("name"), $(el).val());
+      }.bind(this));
     },
     "a[data-toggle=submit]:not(.disabled) click": function(el){
-      var that = this,
-        join_model_class, join_object;
+      var join_model_class, join_object, quick_create, created_dfd;
 
-      if (this.scope.join_model && this.scope.join_model !== "@") {
-        join_model_class = CMS.Models[this.scope.join_model] || CMS.ModelHelpers[this.scope.join_model];
-        join_object = {};
-        join_object[this.scope.instance.constructor.table_singular] = this.scope.instance;
-        join_object = new join_model_class($.extend(
-          join_object,
-          {
-            context: this.scope.parent_instance.context
-                        || new CMS.Models.Context({id : null}),
-          },
-          this.scope.attributes.serialize()
-        ));
-      } else {
-
-        join_object = GGRC.Mappings.make_join_object(
-          this.scope.parent_instance,
-          this.scope.instance || this.scope.attributes.instance,
-          $.extend({
-            context : this.scope.parent_instance.context
-                      || new CMS.Models.Context({id : null})
-                    },
-                    this.scope.attributes.serialize())
-        );
+      if (this.scope.quick_create && this.scope.quick_create !== "@") {
+        quick_create = this.scope[this.scope.quick_create].bind(this);
+        if (quick_create) {
+          created_dfd = quick_create();
+        }
       }
-      this.bindXHRToButton(
-        join_object.save().done(function() {
-          el.trigger("modal:success", join_object);
-        }),
-        el
-        );
+      if (!created_dfd) {
+        created_dfd = new $.Deferred().resolve();
+      }
+
+      created_dfd.then(function() {
+        if (this.scope.join_model && this.scope.join_model !== "@") {
+          join_model_class = CMS.Models[this.scope.join_model] || CMS.ModelHelpers[this.scope.join_model];
+          join_object = {};
+          if (this.scope.join_model === "Relationship") {
+            join_object["source"] = this.scope.parent_instance;
+            join_object["destination"] = this.scope.instance;
+          } else {
+            join_object[this.scope.instance.constructor.table_singular] = this.scope.instance;
+          }
+          join_object = new join_model_class($.extend(
+            join_object,
+            {
+              context: this.scope.parent_instance.context
+                          || new CMS.Models.Context({id : null}),
+            },
+            this.scope.attributes.serialize()
+          ));
+        } else {
+          join_object = GGRC.Mappings.make_join_object(
+            this.scope.parent_instance,
+            this.scope.instance || this.scope.attributes.instance,
+            $.extend({
+              context : this.scope.parent_instance.context
+                        || new CMS.Models.Context({id : null})
+                      },
+                      this.scope.attributes.serialize())
+          );
+        }
+        this.bindXHRToButton(
+          join_object.save().done(function() {
+            el.trigger("modal:success", join_object);
+          }),
+          el
+          );
+      }.bind(this));
     },
     // this works like autocomplete_select on all modal forms and
     //  descendant class objects.

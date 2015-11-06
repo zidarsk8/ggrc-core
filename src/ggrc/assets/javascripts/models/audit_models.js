@@ -304,6 +304,14 @@ can.Model.Cacheable("CMS.Models.Comment", {
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("description");
     }
+    , info_pane_options: {
+      documents: {
+        model: CMS.Models.Document,
+        mapping: "documents",
+        show_view: GGRC.mustache_path + "/base_templates/attachment.mustache",
+        sort_function: _comment_sort,
+      }
+    }
   }, {
     form_preload : function(new_object_form) {
       var page_instance = GGRC.page_instance();
@@ -353,8 +361,8 @@ can.Model.Cacheable("CMS.Models.Request", {
     },
     evidence: {
       model: CMS.Models.Document,
-      mapping: "documents",
-      show_view: GGRC.mustache_path + "/base_templates/documents.mustache",
+      mapping: "all_documents",
+      show_view: GGRC.mustache_path + "/base_templates/attachment.mustache",
       sort_function: _comment_sort,
     },
     comments: {
@@ -362,7 +370,12 @@ can.Model.Cacheable("CMS.Models.Request", {
       mapping: "comments",
       show_view: GGRC.mustache_path + "/base_templates/comment_subtree.mustache",
       sort_function: _comment_sort,
-    }
+    },
+    urls: {
+      model: CMS.Models.Document,
+      mapping: "urls",
+      show_view: GGRC.mustache_path + "/base_templates/urls.mustache",
+    },
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"

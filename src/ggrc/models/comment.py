@@ -12,3 +12,7 @@ from ggrc.models.relationship import Relatable
 
 class Comment(Relatable, Described, Documentable, Base, db.Model):
   __tablename__ = "comments"
+
+  _sanitize_html = [
+    "description"
+  ]
