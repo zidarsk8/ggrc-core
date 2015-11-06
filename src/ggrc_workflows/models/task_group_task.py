@@ -57,11 +57,18 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
 
   @orm.validates('start_date')
   def validate_start_date(self, key, value):
-    return self.validate_date(value)
+    value = self.validate_date(value)
+    if self.end_date is not None and value > self.end_date:
+      raise ValueError("Start date can not be after end date.")
+    return value
 
   @orm.validates('end_date')
   def validate_end_date(self, key, value):
-    return self.validate_date(value)
+    value = self.validate_date(value)
+    if self.start_date is not None and self.start_date > value:
+      raise ValueError("Start date can not be after end date.")
+    return value
+
 
   _publish_attrs = [
       'task_group',
