@@ -161,7 +161,7 @@ dashboard-js-template-files:
   - base_objects/sub_tree_type_selector.mustache
   - base_templates/add_comment.mustache
   - base_templates/attachment_list.mustache
-  - base_templates/documents.mustache
+  - base_templates/attachment.mustache
   - base_templates/base.mustache
   - base_templates/comment_list.mustache
   - base_templates/comment_subtree.mustache

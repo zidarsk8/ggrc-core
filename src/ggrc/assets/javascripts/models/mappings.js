@@ -619,7 +619,7 @@
       objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects"),
       objectives: TypeFilter("objects", "Objective"),
       objectives_via_program: Cross("_program", "objectives"),
-      responses_via_requests: Cross("requests", "responses"),
+      responses_via_requests: Cross("requests", "related_objects"),
       related_objects_via_requests: Multi(['requests', 'responses_via_requests']),
       context: Direct("Context", "related_object", "context"),
       authorizations: Cross("context", "user_roles"),
@@ -713,7 +713,9 @@
         "related_requests", "regulations", "contracts", "policies", "standards",
         "programs", "controls", "sections", "clauses", "objectives",
       ]),
-    comments: TypeFilter("related_objects", "Comment"),
+      comments: TypeFilter("related_objects", "Comment"),
+      documents_from_comments: Cross("comments", "documents"),
+      all_documents: Multi(["documents", "documents_from_comments"]),
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",
