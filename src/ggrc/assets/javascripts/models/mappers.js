@@ -713,9 +713,17 @@
   GGRC.ListLoaders.StubFilteredListLoader("GGRC.ListLoaders.AttrFilteredListLoader", {
     }, {
       init: function (source, prop, value) {
-        var filter_fn = function (result) {
-          var instance = result.instance;
-          return _.exists(instance, "attrs") && instance.attrs[prop] === value;
+        var filter_fn = function (binding) {
+          if (!binding.mappings) return;
+          return _.any(binding.mappings, function(mapping) {
+            instance = mapping.instance;
+            if (instance instanceof CMS.Models.Relationship) {
+              if (_.exists(instance, "attrs") && instance.attrs[prop] === value) {
+                return true;
+              }
+            }
+            return filter_fn(mapping);
+          });
         };
         this._super(source, filter_fn);
       }
