@@ -365,7 +365,12 @@ can.Model.Cacheable("CMS.Models.Request", {
       mapping: "comments",
       show_view: GGRC.mustache_path + "/base_templates/comment_subtree.mustache",
       sort_function: _comment_sort,
-    }
+    },
+    urls: {
+      model: CMS.Models.Document,
+      mapping: "urls",
+      show_view: GGRC.mustache_path + "/base_templates/urls.mustache",
+    },
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
