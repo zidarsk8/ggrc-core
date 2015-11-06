@@ -69,7 +69,6 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
       raise ValueError("Start date can not be after end date.")
     return value
 
-
   _publish_attrs = [
       'task_group',
       'sort_index',
@@ -101,14 +100,28 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
       "relative_start_date": {
           "display_name": "Start",
           "mandatory": True,
+          "description": ("Enter the task stat date in the following format:\n"
+                          "'5/22/2015' for one time workflows\n"
+                          "'3' for weekly workflows\n"
+                          "'17' for monthly workflows\n"
+                          "'feb/may/aug/nov 17' for monthly workflows\n"
+                          "'1/17' for yearly workflows"),
       },
       "relative_end_date": {
           "display_name": "End",
           "mandatory": True,
+          "description": ("Enter the task stat date in the following format:\n"
+                          "'5/22/2015' for one time workflows\n"
+                          "'3' for weekly workflows\n"
+                          "'17' for monthly workflows\n"
+                          "'feb/may/aug/nov 17' for monthly workflows\n"
+                          "'1/17' for yearly workflows"),
       },
       "task_type": {
           "display_name": "Task Type",
           "mandatory": True,
+          "description": ("Accepted values are:"
+                          "\n'Rich Text'\n'Dropdown'\n'Checkbox'"),
       }
   }
 
