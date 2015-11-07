@@ -153,3 +153,10 @@ class TestBasicCsvImport(converters.TestCase):
     self.assertEquals(ca.design, "Needs improvement")
     self.assertEquals(ca.operationally, "Ineffective")
     self.assertIsNotNone(models.Relationship.find_related(ca, au))
+
+  def test_person_imports(self):
+    filename = "people_test.csv"
+    response_dry = self.import_file(filename, dry_run=True)
+    response = self.import_file(filename)
+    self.assertEqual(response, response_dry)
+    self.assertEqual(0, models.Person.query.filter_by(email=None).count())
