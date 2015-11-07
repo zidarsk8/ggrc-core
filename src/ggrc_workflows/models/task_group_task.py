@@ -4,6 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from datetime import date
+from datetime import datetime
 from sqlalchemy import orm
 
 from ggrc import db
@@ -49,6 +50,8 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
     return value
 
   def validate_date(self, value):
+    if isinstance(value, datetime):
+      value = value.date()
     if value is not None and value.year <= 1900:
       current_century = date.today().year / 100 * 100
       year = current_century + value.year % 100

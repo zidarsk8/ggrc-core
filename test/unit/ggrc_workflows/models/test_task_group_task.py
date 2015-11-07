@@ -5,9 +5,11 @@
 
 import unittest
 from datetime import date
+from datetime import datetime
 
 
 from ggrc_workflows.models import task_group_task
+
 
 class TestTaskGroupTask(unittest.TestCase):
 
@@ -18,7 +20,11 @@ class TestTaskGroupTask(unittest.TestCase):
 
   def test_validate_date(self):
     t = task_group_task.TaskGroupTask()
-    self.assertEqual(date(2002, 4, 16), t.validate_date(date(2,4,16)))
+    self.assertEqual(date(2002, 4, 16), t.validate_date(date(2, 4, 16)))
+    self.assertEqual(date(2014, 7, 23),
+                     t.validate_date(datetime(2014, 7, 23, 22, 5, 7)))
+    self.assertEqual(date(2014, 7, 23),
+                     t.validate_date(datetime(2014, 7, 23, 0, 0, 0)))
 
   def test_validate_end_date_decorator(self):
     t = task_group_task.TaskGroupTask()
