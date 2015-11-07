@@ -66,32 +66,37 @@ class TestWorkflowObjectsImport(TestCase):
 
     # Assert that CSV import got imported correctly
     getters = {
-      "one_time": lambda task: (task.start_date, task.end_date),
-      "weekly": lambda task: (task.relative_start_day, task.relative_end_day),
-      "monthly": lambda task: (task.relative_start_day, task.relative_end_day),
-      "quarterly": lambda task: ((task.relative_start_month,
-                                  task.relative_start_day),
-                                 (task.relative_end_month,
-                                  task.relative_end_day)),
-      "annually": lambda task: ((task.relative_start_month,
-                                 task.relative_start_day),
-                                (task.relative_end_month,
-                                 task.relative_end_day))
+        "one_time": lambda task: (task.start_date, task.end_date),
+        "weekly": lambda task: (task.relative_start_day,
+                                task.relative_end_day),
+        "monthly": lambda task: (task.relative_start_day,
+                                 task.relative_end_day),
+        "quarterly": lambda task: ((task.relative_start_month,
+                                    task.relative_start_day),
+                                   (task.relative_end_month,
+                                    task.relative_end_day)),
+        "annually": lambda task: ((task.relative_start_month,
+                                   task.relative_start_day),
+                                  (task.relative_end_month,
+                                   task.relative_end_day))
     }
 
     tasks = [
-      ["task-1", "one_time", (date(2015, 7, 1), date(2015, 7, 15))],
-      ["task-2", "weekly", (2, 5)],
-      ["task-3", "monthly", (1, 22)],
-      ["task-4", "quarterly", ((1, 5), (2, 15))],
-      ["task-5", "annually", ((5, 7), (7, 15))],
+        ["task-1", "one_time", (date(2015, 7, 1), date(2015, 7, 15))],
+        ["task-2", "weekly", (2, 5)],
+        ["task-3", "monthly", (1, 22)],
+        ["task-4", "quarterly", ((1, 5), (2, 15))],
+        ["task-10", "quarterly", ((3, 5), (1, 1))],
+        ["task-11", "quarterly", ((3, 5), (1, 1))],
+        ["task-5", "annually", ((5, 7), (7, 15))],
     ]
 
     for t in tasks:
       slug, freq, result = t
       task = db.session.query(TaskGroupTask).filter(
-        TaskGroupTask.slug == slug).one()
+          TaskGroupTask.slug == slug).one()
       getter = getters[freq]
       self.assertEqual(task.task_group.workflow.frequency, freq)
-      self.assertEqual(getter(task), result,
-        "Failed importing data for task with slug = '{}'".format(slug))
+      self.assertEqual(
+          getter(task), result,
+          "Failed importing data for task with slug = '{}'".format(slug))
