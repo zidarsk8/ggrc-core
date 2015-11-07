@@ -32,7 +32,7 @@ class TestWorkflowObjectsImport(TestCase):
     self.CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
 
   def test_full_good_import_no_warnings(self):
-    filename = "simple_workflow_test_no_warnings.csv"
+    filename = "workflow_small_sheet.csv"
     response_dry = self.import_file(filename, dry_run=True)
     response = self.import_file(filename)
 
@@ -54,7 +54,7 @@ class TestWorkflowObjectsImport(TestCase):
 
   def test_import_task_date_format(self):
     """Test import of tasks for workflows with various frequencies"""
-    filename = "data_for_workflow_export_testing.csv"
+    filename = "workflow_big_sheet.csv"
     response = self.import_file(filename)
     objects = {"Workflow", "Task Group", "Task Group Task"}
     messages = ["block_errors", "block_warnings", "row_errors", "row_warnings",

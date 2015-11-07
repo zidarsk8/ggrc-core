@@ -65,7 +65,7 @@ class TestExportMultipleObjects(TestCase):
     TestCase.clear_data()
     cls.tc = app.test_client()
     cls.tc.get("/login")
-    cls.import_file("data_for_workflow_export_testing.csv")
+    cls.import_file("workflow_big_sheet.csv")
 
   @classmethod
   def import_file(cls, filename, dry_run=False):
