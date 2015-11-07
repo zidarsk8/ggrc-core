@@ -51,8 +51,8 @@ class RowConverter(object):
     handle_fields = self.headers if field_list is None else field_list
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
       if attr_name not in handle_fields or \
-          attr_name in self.attrs or \
-          self.is_delete:
+              attr_name in self.attrs or \
+              self.is_delete:
         continue
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
@@ -60,7 +60,10 @@ class RowConverter(object):
         self.attrs[attr_name] = item
       else:
         self.objects[attr_name] = item
-      if attr_name in ("slug", "email"):
+
+      if attr_name == "email" and not self.get_value(attr_name):
+        self.add_error(errors.MISSING_VALUE_ERROR, column_name="Email")
+      elif attr_name in ("slug", "email"):
         self.id_key = attr_name
         self.obj = self.get_or_generate_object(attr_name)
         item.set_obj_attr()

@@ -159,4 +159,6 @@ class TestBasicCsvImport(converters.TestCase):
     response_dry = self.import_file(filename, dry_run=True)
     response = self.import_file(filename)
     self.assertEqual(response, response_dry)
+    self.assertIn("Line 8: Field Email is required. The line will be ignored.",
+                  response[0]["row_errors"])
     self.assertEqual(0, models.Person.query.filter_by(email=None).count())
