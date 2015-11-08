@@ -307,9 +307,14 @@ can.Model.Cacheable("CMS.Models.Comment", {
     , info_pane_options: {
       documents: {
         model: CMS.Models.Document,
-        mapping: "documents",
+        mapping: "documents_and_urls",
         show_view: GGRC.mustache_path + "/base_templates/attachment.mustache",
         sort_function: _comment_sort,
+      },
+      urls: {
+        model: CMS.Models.Document,
+        mapping: "urls",
+        show_view: GGRC.mustache_path + "/base_templates/urls.mustache",
       }
     }
   }, {
@@ -373,7 +378,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     },
     urls: {
       model: CMS.Models.Document,
-      mapping: "urls",
+      mapping: "all_urls",
       show_view: GGRC.mustache_path + "/base_templates/urls.mustache",
     },
   }

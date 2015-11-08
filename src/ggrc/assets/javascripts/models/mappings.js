@@ -315,7 +315,7 @@
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
           "Program", "Issue", "Control", "Section", "Clause", "Objective",
-          "Audit", "ControlAssessment", "AccessGroup", "Request"
+          "Audit", "ControlAssessment", "AccessGroup", "Request", "Document"
         ]
       },
       related_objects_as_source: Proxy(
@@ -707,7 +707,6 @@
     Request: {
       _mixins: ["related_object", "personable", "ownable", "business_object", "documentable"],
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
-      audits: Indirect("Audit", "audit"),
       audits: Direct("Audit", "requests", "audit"),
       urls: TypeFilter("related_objects", "Document"),
       related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee"),
@@ -724,7 +723,9 @@
       ]),
       comments: TypeFilter("related_objects", "Comment"),
       documents_from_comments: Cross("comments", "documents"),
+      urls_from_comments: Cross("comments", "urls"),
       all_documents: Multi(["documents", "documents_from_comments"]),
+      all_urls: Multi(["urls", "urls_from_comments"]),
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",
@@ -751,7 +752,9 @@
             //, responses : Multi(["documentation_responses", "interview_responses", "population_sample_responses"])
     },
     Comment: {
-      _mixins: ["documentable"]
+      _mixins: ["related_object", "documentable"],
+      urls: TypeFilter("related_objects", "Document"),
+      documents_and_urls: Multi(["documents", "urls"])
     },
     response: {
       _mixins: ["business_object", "documentable"],
