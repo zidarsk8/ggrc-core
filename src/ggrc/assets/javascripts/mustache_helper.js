@@ -244,6 +244,10 @@ Mustache.registerHelper("withattr", function () {
 Mustache.registerHelper("if_equals", function (val1, val2, options) {
   var that = this, _val1, _val2;
   function exec() {
+    if (_val1 && val2 && options.hash && options.hash.insensitive) {
+      _val1 = _val1.toLowerCase();
+      _val2 = _val2.toLowerCase();
+    }
     if (_val1 == _val2) return options.fn(options.contexts);
     else return options.inverse(options.contexts);
   }
