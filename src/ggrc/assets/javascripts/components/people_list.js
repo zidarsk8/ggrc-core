@@ -135,7 +135,8 @@
       limit: "@",
       mapping: "@",
       required: "@",
-      type: "@"
+      type: "@",
+      toggle_add: false,
     },
     events: {
       ".js-trigger--person-delete click": function (el, ev) {
