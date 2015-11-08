@@ -441,13 +441,23 @@ can.Model.Cacheable("CMS.Models.Request", {
       if (GGRC.page_model.type == "Audit") {
         this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
       }
+      this.mark_for_addition("related_objects_as_destination", CMS.Models.get_instance(GGRC.current_user), {
+        attrs: {
+          "AssigneeType": "Requester",
+        }
+      });
 
-      if(!this.assignee && this.audit) {
+      if(this.audit) {
         audit = this.audit.reify();
         (audit.selfLink ? $.when(audit) : audit.refresh())
         .then(function(audit) {
-          that.attr('assignee', audit.contact);
-        });
+          console.log("audit contact", audit.contact)
+          this.mark_for_addition("related_objects_as_destination", audit.contact, {
+            attrs: {
+              "AssigneeType": "Assignee",
+            }
+          });
+        }.bind(this));
       }
     }
   }
