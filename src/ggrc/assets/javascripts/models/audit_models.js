@@ -405,10 +405,8 @@ can.Model.Cacheable("CMS.Models.Request", {
   , init : function() {
     this._super.apply(this, arguments);
     this.validateNonBlank("title");
-    this.validateNonBlank("description");
     this.validateNonBlank("due_on");
     this.validateNonBlank("requested_on");
-    this.validateNonBlank("people");
     this.validatePresenceOf("audit");
 
     if(this === CMS.Models.Request) {
