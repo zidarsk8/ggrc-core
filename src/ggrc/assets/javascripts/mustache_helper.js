@@ -924,7 +924,7 @@ Mustache.registerHelper("with_mapping", function (binding, options) {
 
   if (!context) // can't find an object to map to.  Do nothing;
     return;
-
+  binding = Mustache.resolve(binding);
   loader = context.get_binding(binding);
   if (!loader)
     return;
@@ -933,7 +933,7 @@ Mustache.registerHelper("with_mapping", function (binding, options) {
   options = arguments[2] || options;
 
   function finish(list) {
-    return options.fn(options.contexts.add(frame));
+    return options.fn(options.contexts.add(_.extend({}, frame, {results: list})));
   }
   function fail(error) {
     return options.inverse(options.contexts.add({error : error}));
