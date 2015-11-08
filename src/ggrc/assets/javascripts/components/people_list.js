@@ -133,6 +133,7 @@
         }
       },
       limit: "@",
+      mapping: "@",
       required: "@",
       type: "@"
     },
@@ -146,17 +147,34 @@
         person.attr("person_state", "deleted");
       },
       ".person-selector input autocomplete:select": function (el, ev, ui) {
-        var person = _.findWhere(this.viewModel.attr("people"), {id: ui.item.id});
-        if (person) {
-          if (person.attr("person_state") === "deleted") {
-            person.attr("person_state", null);
-          }
-          return;
+        var person = ui.item,
+            destination = this.viewModel.instance,
+            deferred = this.viewModel.deferred;
+        if (deferred) {
+          destination.mark_for_addition("related_objects_as_destination", person, {
+            attrs: {
+              "AssigneeType": can.capitalize(this.viewModel.type),
+            }
+          });
+        } else {
+          new CMS.Models.Relationship({
+            attrs: {
+              "AssigneeType": can.capitalize(this.viewModel.type),
+            },
+            source: {
+              href: person.href,
+              type: person.type,
+              id: person.id
+            },
+            context: {},
+            destination: {
+              href: destination.href,
+              type: destination.type,
+              id: destination.id
+            }
+          }).save();
         }
-        this.viewModel.attr("people").push(_.extend(ui.item, {
-          "person_state": "added"
-        }));
-      }
+      },
     },
     helpers: {
       show_add: function (options) {

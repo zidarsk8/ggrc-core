@@ -15,27 +15,45 @@
           <span class="required">*</span>
         {{/if}}
       </label>
-      <ul>
-        {{#each people}}
-          {{^if_equals person_state "deleted"}}
-          <li>
-            {{#if editable}}
-            <span class="file-controls">
-              <a class="js-trigger--person-delete" data-index="{{@index}}" {{data "person"}} href="javascript://"><i class="grcicon-deleted"></i></a>
-              {{! <a href="javascript://"><i class="grcicon-edit"></i></a> }}
-            </span>
+      {{#with_mapping mapping instance}}
+          <ul class="inner-count-list">
+            {{^if results.length}}
+              {{^if instance._pending_joins}}
+              <li><i> No {{type}}s</i></li>
+              {{/if}}
             {{/if}}
-            {{#using person=.}}
-              {{> /static/mustache/people/popover.mustache}}
-            {{/using}}
-          </li>
-          {{/if_equals}}
-        {{/each}}
-      </ul>
+            {{#results}}
+              <li>
+                {{#is_allowed 'update'}}
+                <span class="file-controls">
+                  <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+                    <span class="result" {{data 'result'}}></span>
+                    <i class="grcicon-deleted"></i>
+                  </a>
+                </span>
+                {{/is_allowed}}
+                {{{render '/static/mustache/people/popover.mustache' person=instance}}}
+              </li>
+            {{/each}}
+          </ul>
+      {{/with_mapping}}
+      {{#instance._pending_joins}}
+        {{#if_equals extra.attrs.AssigneeType type insensitive='true'}}
+        <li>
+          {{{render '/static/mustache/people/popover.mustache' person=what}}}
+        </li>
+        {{/if_equals}}
+      {{/instance._pending_joins}}
     </li>
   </ul>
-</div>
 
 {{#show_add}}
-  {{> /static/mockups/base_templates/add_people.mustache }}
+  <div style="padding: 10px 0 10px 27%; marign-left:20px;">
+  {{#toggle show_new_object_form}}
+      {{> /static/mockups/base_templates/add_people.mustache }}
+  {{else}}
+    <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+</a>
+  {{/toggle}}
+  </div>
 {{/show_add}}
+</div>
