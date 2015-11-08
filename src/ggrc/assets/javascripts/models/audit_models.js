@@ -28,10 +28,8 @@ function update_program_authorizations(programs, person) {
             return ab.instance.person.reify();
           }
         });
-    if (!person) {
-      return;
-    }
-    if (Permission.is_allowed("create", "UserRole", program.context.id)
+
+    if(Permission.is_allowed("create", "UserRole", program.context.id)
       && !~can.inArray(
         person.reify(),
         editor_authorized_people
