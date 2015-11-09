@@ -23,6 +23,10 @@ from HTMLParser import HTMLParser
 import bleach
 
 from ggrc import db
+from ggrc.models import Comment
+from ggrc.models import DocumentationResponse
+from ggrc.models import InterviewResponse
+from ggrc.models import Relationship
 from ggrc.models import Request
 
 
@@ -176,6 +180,80 @@ def upgrade():
   # TODO: 5. Link all objects that are mapped to Audit to requests
 
   # TODO: Drop relationship audit_objects from Audits????
+
+  documentation_responses = db.session.query(DocumentationResponse)
+  for dr in documentation_responses:
+    related = dr.related_sources + dr.related_destinations
+    comment = Comment(
+      description=dr.description,
+      created_at=dr.created_at,
+      modified_by=dr.modified_by,
+      updated_at=dr.updated_at,
+      context=dr.context)
+
+    request_comment_rel = Relationship(
+      source=dr.request,
+      destination=comment)
+
+    for rel in related:
+      if rel.source.type == "DocumentationResponse":
+        destination = rel.destination
+      elif rel.destination.type == "DocumentationResponse":
+        destination = rel.source
+      else:
+        continue
+      related_objects_to_request = Relationship(
+        source=dr.request,
+        destination=destination
+      )
+      db.session.add(related_objects_to_request)
+    db.session.add(comment)
+    db.session.add(request_comment_rel)
+  db.session.commit()
+
+  interview_responses = db.session.query(InterviewResponse)
+  for ir in interview_responses:
+    related = ir.related_sources + ir.related_destinations
+
+    desc = ir.description
+    if ir.meetings:
+      desc += "<br /><br /><b>Meetings</b><hr />"
+
+      for m in ir.meetings:
+        desc += "<a href=\"{url}\">Meeting</a> requested on {date}<br />". \
+          format(url=m.title,
+                 date=m.created_at.strftime("%m/%d/%Y at %H:%M"))
+
+    if ir.people:
+      desc += "<br /><br /><b>Attendees</b><hr />"
+      for p in ir.people:
+        desc += "- {} ({})<br />".format(p.name, p.email)
+
+    comment = Comment(
+      description=desc,
+      created_at=ir.created_at,
+      modified_by=ir.modified_by,
+      updated_at=ir.updated_at,
+      context=ir.context)
+
+    request_comment_rel = Relationship(
+      source=ir.request,
+      destination=comment)
+
+    for rel in related:
+      if rel.source.type == "InterviewResponse":
+        destination = rel.destination
+      elif rel.destination.type == "InterviewResponse":
+        destination = rel.source
+      else:
+        continue
+      related_objects_to_request = Relationship(
+        source=ir.request,
+        destination=destination)
+      db.session.add(related_objects_to_request)
+    db.session.add(comment)
+    db.session.add(request_comment_rel)
+  db.session.commit()
 
 
 def downgrade():
