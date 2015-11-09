@@ -50,7 +50,7 @@
         return forbidden[type] ? forbidden[type] : [];
       },
       get_whitelist: function () {
-        var whitelisted = ["Request", "ControlAssessment",
+        var whitelisted = ["ControlAssessment",
             "TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask",
             "InterviewResponse", "DocumentationResponse"
           ];

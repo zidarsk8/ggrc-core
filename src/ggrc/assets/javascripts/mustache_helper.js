@@ -772,7 +772,6 @@ Mustache.registerHelper("get_view_link", function (instance, options) {
   }
   instance = resolve_computed(instance);
   var props = {
-      "Request": "audit",
       "TaskGroupTask": "task_group:workflow",
       "TaskGroup": "workflow",
       "CycleTaskGroupObjectTask": "cycle:workflow",
