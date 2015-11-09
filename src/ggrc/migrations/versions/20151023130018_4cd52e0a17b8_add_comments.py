@@ -56,6 +56,8 @@ def upgrade():
         destination = rel.destination
       elif rel.destination.type == "DocumentationResponse":
         destination = rel.source
+      else:
+        continue
       related_objects_to_request = Relationship(
         source=dr.request,
         destination=destination
@@ -99,6 +101,8 @@ def upgrade():
         destination = rel.destination
       elif rel.destination.type == "InterviewResponse":
         destination = rel.source
+      else:
+        continue
       related_objects_to_request = Relationship(
         source=ir.request,
         destination=destination
