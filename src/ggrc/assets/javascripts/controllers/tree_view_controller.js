@@ -610,7 +610,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
 
       if (this.element.parent().length === 0 // element not attached
-        || this.element.hasClass("entry-list")) { // comment list
+        || this.element.data('disable-lazy-loading')) { // comment list
         this.options.disable_lazy_loading = true;
       }
       if(!this.options.scroll_element) {
@@ -637,7 +637,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       this.init_display_options(opts);
     }.bind(this));
-
+    // Make sure the parent_instance is not a computable
+    if (typeof this.options.parent_instance === 'function') {
+      this.options.attr('parent_instance', this.options.parent_instance());
+    }
   }
 
   , " inserted": function() {

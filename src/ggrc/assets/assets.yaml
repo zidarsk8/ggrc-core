@@ -26,6 +26,7 @@ dashboard-js-files:
   - canjs/can.construct.proxy.js
   - canjs/can.map.attributes.js
   - canjs/can.map.backup.js
+  - canjs/can.map.define.js
   - wysihtml5/advanced.js
   - wysihtml5/wysihtml5-0.4.0pre.js
   - wysihtml5/bootstrap-wysihtml5-0.0.2.js
@@ -90,6 +91,7 @@ dashboard-js-files:
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
+  - controllers/comment_controller.js
   - models/section.js
   - models/system.js
   - models/join_models.js
@@ -109,6 +111,7 @@ dashboard-js-files:
   - components/csv/export.js
   - components/csv/import.js
   - components/mapper.js
+  - components/people_list.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -148,6 +151,7 @@ dashboard-js-template-files:
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pin.mustache
+  - base_objects/info_header.mustache
   - base_objects/filters/advanced_search_filter_actions.mustache
   - base_objects/filters/modal_filter_actions.mustache
   - base_objects/filters/filter_by_person.mustache
@@ -158,6 +162,25 @@ dashboard-js-template-files:
   - base_objects/modal_contact_fields.mustache
   - base_objects/open_close.mustache
   - base_objects/sub_tree_type_selector.mustache
+  - base_templates/add_comment.mustache
+  - base_templates/attachment_list.mustache
+  - base_templates/attachment.mustache
+  - base_templates/base.mustache
+  - base_templates/comment_list.mustache
+  - base_templates/comment_subtree.mustache
+  - base_templates/dates_list.mustache
+  - base_templates/description.mustache
+  - base_templates/header.mustache
+  - base_templates/mapped_objects.mustache
+  - base_templates/notes.mustache
+  - base_templates/people_list.mustache
+  - base_templates/add_people.mustache
+  - base_templates/people_group.mustache
+  - base_templates/request_type.mustache
+  - base_templates/test.mustache
+  - base_templates/urls.mustache
+  - mixins/assignable.mustache
+  - mixins/stateful.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
@@ -304,6 +327,7 @@ dashboard-js-template-files:
   - requests/modal_content.mustache
   - requests/tier2_content.mustache
   - requests/general_info.mustache
+  - requests/subtree.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache
   - responses/tree.mustache

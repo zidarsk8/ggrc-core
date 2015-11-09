@@ -17,7 +17,7 @@
       "Program", "Regulation", "Standard", "Policy", "Contract",
       "Objective", "Control", "Section", "Clause", "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
-      "MultitypeSearch", "Issue", "ControlAssessment", "AccessGroup",
+      "MultitypeSearch", "Issue", "ControlAssessment", "AccessGroup", "Request",
       "Person", "OrgGroup", "Vendor"
     ],
     related_object_descriptors = {},
@@ -81,9 +81,11 @@
         related_objectives: TypeFilter("related_objects", "Objective"),
         related_issues: TypeFilter("related_objects", "Issue"),
         related_control_assessments: TypeFilter("related_objects", "ControlAssessment"),
+        related_requests: TypeFilter("related_objects", "Request"),
         related_people: TypeFilter("related_objects", "Person"),
         related_org_groups: TypeFilter("related_objects", "OrgGroup"),
         related_vendors: TypeFilter("related_objects", "Vendor")
+
       },
       related_risk: {
         _canonical: {

@@ -891,9 +891,9 @@ class TestGetObjectColumnDefinitions(TestCase):
     mapping_names = get_mapping_names(models.Request.__name__)
     display_names = {val["display_name"] for val in definitions.values()}
     element_names = {
-        "Assignee",
         "Audit",
         "Code",
+        "Request Title",
         "Description",
         "Due On",
         "Notes",

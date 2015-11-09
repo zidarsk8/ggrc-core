@@ -439,7 +439,8 @@ can.Model("can.Model.Cacheable", {
             });
           }
         });
-        delete obj._pending_joins;
+
+        obj.attr('_pending_joins', []);
         return $.when.apply($, dfds).then(function() {
           return obj.refresh();
         });
@@ -981,7 +982,7 @@ can.Model("can.Model.Cacheable", {
   , mark_for_deletion : function(join_attr, obj) {
     obj = obj.reify ? obj.reify() : obj;
     if(!this._pending_joins) {
-      this._pending_joins = [];
+      this.attr('_pending_joins', []);
     }
     for(var i = this._pending_joins.length; i--;) {
       if(this._pending_joins[i].what === obj) {
@@ -996,7 +997,7 @@ can.Model("can.Model.Cacheable", {
   , mark_for_addition : function(join_attr, obj, extra_attrs) {
     obj = obj.reify ? obj.reify() : obj;
     if(!this._pending_joins) {
-      this._pending_joins = [];
+      this.attr('_pending_joins', []);
     }
     for(var i = this._pending_joins.length; i--;) {
       if(this._pending_joins[i].what === obj) {

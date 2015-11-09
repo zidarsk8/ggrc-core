@@ -1,0 +1,36 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+{{#instance}}
+<li>
+  <div class="custom-attr-wrap mapped item-main">
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="info-expand-mapped openclose">
+          <a class="show-hidden-fields info-show-hide" href="javascript://">
+            <span class="out">
+              <i class="grcicon-arrow-right"></i>
+            </span>
+            <i class="grcicon-{{class.table_singular}}-color"></i>
+            {{firstnonempty title description name email}}
+          </a>
+        </div>
+      </div>
+    </div><!-- row-fluid end -->
+  </div>
+  {{#if expanded}}
+  <div class="hidden-fields-area item-content">
+    <div class="row-fluid wrap-row">
+      <div class="span12">
+        <h6>Description</h6>
+        {{description}}
+      </div>
+    </div><!-- row-fluid end -->
+  </div><!-- hidden-fields-area end -->
+  {{/if}}
+</li>
+{{/instance}}

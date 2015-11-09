@@ -169,7 +169,7 @@
         <div class="row-fluid wrap-row">
           <div class="span12">
             <h6>Comments ({{list.length}})</h6>
-            <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+            <ul class="entry-list" data-disable-lazy-loading="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
           </div>
         </div>
         {{/options.child_options.0}}
