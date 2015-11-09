@@ -77,7 +77,8 @@
         'processes': GGRC.mustache_path + "/processes/info.mustache",
         'products': GGRC.mustache_path + "/products/info.mustache",
         'control_assessments': GGRC.mustache_path + "/control_assessments/info.mustache",
-        'issues': GGRC.mustache_path + "/issues/info.mustache",
+        'requests': GGRC.mustache_path + "/requests/info.mustache",
+        'issues': GGRC.mustache_path + "/issues/info.mustache"
       };
       widget_list.add_widget(object.constructor.shortName, "info", {
         widget_id: "info",
