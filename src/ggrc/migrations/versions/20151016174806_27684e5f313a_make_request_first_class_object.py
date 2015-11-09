@@ -48,13 +48,12 @@ def cleaner(value, bleach_tags=[], bleach_attrs={}):
 
 
 def upgrade():
-  sql = "BEGIN;"
   # 1. Move Audit Objects to Relationship table
   #   source_type = audit_objects.auditable_type
   #   source_id = audit_objects.auditable_id
   #   destination_type = "Request"
   #   destination_id = request.id
-  sql += """
+  op.execute("""
     INSERT INTO relationships (
       modified_by_id,
       created_at,
@@ -73,13 +72,13 @@ def upgrade():
         "Request",
         AO.context_id
       FROM requests AS R, audit_objects AS AO WHERE AO.id = R.audit_object_id;
-    """
+    """)
   # 2. Create relations to Audits in Relationship table
   #   source_type = Audit
   #   source_id   = audit.id
   #   destionation_type = Request
   #   destination_id = request.id
-  sql += """
+  op.execute("""
     INSERT INTO relationships (
       modified_by_id,
       created_at,
@@ -98,29 +97,21 @@ def upgrade():
       "Request",
       AO.context_id
       FROM requests AS R, audit_objects AS AO WHERE AO.id = R.audit_object_id;
-    """
+    """)
 
   # 3. Change status values
-  sql += """
-    ALTER TABLE requests CHANGE status status ENUM('Draft','Requested','Responded','Amended Request','Updated Response','Accepted','Unstarted','In Progress','Finished','Verified') NOT NULL;
+  op.execute("""ALTER TABLE requests CHANGE status status ENUM("Draft","Requested","Responded","Amended Request","Updated Response","Accepted","Unstarted","In Progress","Finished","Verified") NOT NULL;""")
+  op.execute("""UPDATE requests SET status="Unstarted" WHERE status="Draft";""")
+  op.execute("""UPDATE requests SET status="In Progress" WHERE status="Requested";""")
+  op.execute("""UPDATE requests SET status="Finished" WHERE status="Responded";""")
+  op.execute("""UPDATE requests SET status="In Progress" WHERE status="Amended Request";""")
+  op.execute("""UPDATE requests SET status="Finished" WHERE status="Updated Response";""")
+  op.execute("""UPDATE requests SET status="Verified" WHERE status="Accepted";""")
 
-    UPDATE requests SET status='Unstarted' WHERE status='Draft';
-    UPDATE requests SET status='In Progress' WHERE status='Requested';
-    UPDATE requests SET status='Finished' WHERE status='Responded';
-    UPDATE requests SET status='In Progress' WHERE status='Amended Request';
-    UPDATE requests SET status='Finished' WHERE status='Updated Response';
-    UPDATE requests SET status='Verified' WHERE status='Accepted';
+  op.execute("""ALTER TABLE requests CHANGE status status ENUM("Unstarted","In Progress","Finished","Verified") NOT NULL;""")
 
-    ALTER TABLE requests CHANGE status status ENUM('Unstarted','In Progress','Finished','Verified') NOT NULL;
-    """
-
-  sql += """
-    ALTER TABLE requests DROP FOREIGN KEY requests_ibfk_1;
-    ALTER TABLE requests MODIFY COLUMN assignee_id INT(11) NULL;
-  """
-
-  sql += "COMMIT;"
-  op.execute(sql)
+  op.execute("""ALTER TABLE requests DROP FOREIGN KEY requests_ibfk_1;""")
+  op.execute("""ALTER TABLE requests MODIFY COLUMN assignee_id INT(11) NULL;""")
 
   # Make pretty title
   requests = db.session.query(Request)
