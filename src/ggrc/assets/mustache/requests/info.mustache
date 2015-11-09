@@ -1,114 +1,137 @@
 {{!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: brad@reciprocitylabs.com
-    Maintained By: brad@reciprocitylabs.com
+    Created By: vladan@reciprocitylabs.com
+    Maintained By: urban@reciprocitylabs.com
 }}
 
 {{#instance}}
-  <section class="info">
-
-    {{#is_info_pin}}
+<section class="info">
+  {{#is_info_pin}}
     <div class="clearfix">
-      <div class="tier-content pin">
-        <div class="info-pane-utility">
-          {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-          <div class="details-wrap">
-            {{#if_can_edit_request instance}}
-            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-              <li>
-                <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-id="{{instance.id}}">
-                  <i class="grcicon-edit"></i>
-                  Edit {{model.title_singular}}
-                </a>
-              </li>
-              <li>
-                <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-              </li>
-              {{#is_allowed 'delete' instance}}
-                <li>
-                  <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                    <i class="grcicon-deleted"></i>
-                    Delete
-                  </a>
-                </li>
-              {{/is_allowed}}
-            </ul>
-            {{/if_can_edit_request}}
-          </div>
-        </div>
-        {{#instance}}
-          <div class="row-fluid wrap-row">
-            <div class="span6">
-              <h6>Request</h6>
-              <div class="rtf-block">
-                {{{firstnonempty instance.description '<i>State your request here...</i>'}}}
-              </div>
-            </div>
-            <div class="span3">
-              <h6>State</h6>
-              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
-            </div>
-          </div>
-        {{/instance}}
-      </div>
-    </div>
-    {{/is_info_pin}}
+      {{> /static/mustache/base_objects/info-pin.mustache}}
+    <div class="tier-content pin">
+  {{/is_info_pin}}
 
-    <div class="tier-content">
-      <div class="row-fluid wrap-row">
-        <div class="span6">
-          <h6>Requested on</h6>
-          {{#if instance.requested_on}}
-            {{#using requested_on=instance.requested_on}}
-              {{localize_date requested_on}}
-            {{/using}}
-          {{/if}}
-        </div>
-        <div class="span6" data-force-refresh="true" {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
-          <h6>Assignee</h6>
-          {{#using assignee=instance.assignee}}
-            {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
-          {{/using}}
-        </div>
-      </div>
-      {{#using audit=instance.audit}}
-        {{#with_mapping "audit_object_object" instance}}
-          {{#if audit_object_object.0.instance}}
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                <h6>{{audit_object_object.0.instance.class.table_singular}}</h6>
-                <p class="oneline">
-                  <i class="grcicon-{{audit_object_object.0.instance.class.table_singular}}-color nomargin"></i>
-                  {{#is_allowed "view_object_page" audit_object_object.0.instance}}
-                    <a class="object-title" href="{{audit_object_object.0.instance.viewLink}}" target="_blank">{{audit_object_object.0.instance.title}}</a>
-                  {{else}}
-                    <span class="object-title" target="_blank">{{audit_object_object.0.instance.title}}</span>
-                  {{/is_allowed}}
-                </p>
-              </div>
-            </div>
-          {{/if}}
-        {{/using}}
-      {{/using}}
+  {{> /static/mustache/base_templates/header.mustache}}
+  <div class="row-fluid">
+    <div class="span8">
+      {{> /static/mustache/base_objects/description.mustache}}
 
-      {{{render_hooks 'Request.tree_view_info'}}}
-
-      <div class="row-fluid wrap-row">
-        <div class="span12">
-          <h6>Notes</h6>
-          {{{instance.notes}}}
-        </div>
-      </div>
+      {{#if test}}
       <div class="row-fluid wrap-row">
         <div class="span12">
           <h6>Test</h6>
-          {{{instance.test}}}
+          <div class="rtf-block">
+            {{test}}
+          </div>
+
         </div>
       </div>
+      {{/if}}
+      {{#if notes}}
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>Notes</h6>
+          <div class="rtf-block">
+            {{notes}}
+          </div>
+        </div>
+      </div>
+      {{/if}}
+
+
+      <div class="row-fluid wrap-row">
+        <div class="span6">
+          <div class="left-spacing">
+            <h6>Evidence</h6>
+            {{> /static/mustache/base_templates/attachment_list.mustache}}
+          </div>
+        </div>
+        <div class="span6">
+          <h6>URL</h6>
+          {{#instance.class.info_pane_options.urls}}
+            {{#add_to_current_scope parent_instance=instance}}
+              <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
+            {{/add_to_current_scope}}
+          {{/instance.class.info_pane_options.urls}}
+          {{#is_allowed 'update' instance}}
+          {{#toggle show_new_object_form}}
+            <ggrc-quick-add parent_instance="instance" join_model="Relationship" quick_create="create_url">
+              {{#prune_context}}
+              <div class="objective-selector field-wrap">
+                <input tabindex="3" type="text" name="instance" placeholder="Add URL">
+                <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+                <a href="javascript://" class="btn btn-small btn-success no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
+              </div>
+              <input type="hidden" name="role_name" value="Auditor" />
+              {{/prune_context}}
+            </ggrc-quick-add>
+          {{else}}
+            <br>
+              <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+ Add URL</a>
+          {{/toggle}}
+          {{/is_allowed}}
+          </ul>
+        </div>
+      </div>
+
+
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          {{> /static/mustache/base_templates/mapped_objects.mustache}}
+        </div>
+      </div>
+
     </div>
+    <div class="span4">
 
-  </section>
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <people-list instance="instance" editable="true"></people-list>
+        </div>
+      </div>
 
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          {{> /static/mustache/base_templates/dates_list.mustache}}
+        </div>
+      </div>
+
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>Code</h6>
+          <div class="side-content">
+            {{slug}}
+          </div>
+        </div>
+      </div>
+
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          {{> /static/mustache/base_templates/request_type.mustache}}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="tabs-wrap">
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#tab1" data-toggle="tab">
+        Comments and Responses
+      </a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane fade in active" id="tab1">
+        <div class="tree-item-add">
+          <add-comment data="comments"></add-comment>
+        </div>
+        {{> /static/mustache/base_templates/comment_list.mustache}}
+      </div>
+
+    </div>
+  </div>
+</section>
 {{/instance}}

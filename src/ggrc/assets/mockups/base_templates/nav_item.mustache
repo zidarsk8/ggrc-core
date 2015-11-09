@@ -9,7 +9,7 @@
 <li {{#active}}class="active"{{/active}}>
     <a href="#{{title}}">
         <i class="{{icon}}"></i>
-        {{title}}
+        {{title}} {{#if children}}({{children.length}}){{/if}}
     </a>
 </li>
 {{/each}}

@@ -892,7 +892,8 @@ select.multiple-selector {
     font-weight:bold;
     font-size:12px;
   }
-  .info.info-expand {
+  .info.info-expand,
+  .info.info-expand-mapped {
     line-height:16px;
     padding:0;
     background:transparent;
@@ -1203,6 +1204,7 @@ p {
 }
 
 .custom-attr-table {
+  font-size: 11px;
   .table {
     td.centered,
     th.centered {
@@ -1278,6 +1280,24 @@ label.disabled {
   .popover-template:hover {
     i {
       background-position: -246px -416px;
+    }
+  }
+}
+
+.label-light {
+  background-color: lighten($blue, 55%);
+  span,
+  a {
+    color: $black;
+    text-shadow: none;
+    font-weight: normal;
+  }
+  a {
+    font-weight: bold;
+    text-decoration: none;
+    padding: 0 2px;
+    &:hover {
+      text-decoration: none;
     }
   }
 }

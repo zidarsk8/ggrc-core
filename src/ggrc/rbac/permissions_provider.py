@@ -145,10 +145,6 @@ class DefaultUserPermissions(UserPermissions):
   def _permission_match(self, permission, permissions):
     """Check if the user has the given permission"""
 
-    has_conditions = permissions\
-        .get(permission.action, {})\
-        .get(permission.resource_type, {})\
-        .get('conditions', False)
     if None in \
       permissions\
         .get(permission.action, {})\
@@ -160,9 +156,6 @@ class DefaultUserPermissions(UserPermissions):
             .get(permission.action, {})\
             .get(permission.resource_type, {})\
             .get('resources', [])\
-        or permission.context_id is None and permissions\
-            .get(permission.action, {})\
-            .get(permission.resource_type, False) and not has_conditions\
         or permission.context_id in \
           permissions\
             .get(permission.action, {})\
