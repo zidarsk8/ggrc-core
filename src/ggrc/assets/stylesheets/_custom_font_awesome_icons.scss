@@ -66,6 +66,8 @@
   }
 }
 
+.grcicon-cycle-color:before { content: $fa-var-play-circle; }
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -79,6 +81,7 @@
     &.color { color: $black; }
   }
   .grcicon-clause-color:before { color: $black; }
+  .grcicon-cycle-color:before { color: $black; }
 
   // .grcicon-info { background-position:-126px -176px; }
   // .grcicon-role-color { background-position:-102px -8px; }
@@ -142,6 +145,7 @@
     &.color { color: $white; }
   }
   .grcicon-clause-color:before { color: $white; }
+  .grcicon-cycle-color:before { color: $white; }
 
   // .grcicon-info { background-position:-198px -80px; }
   // .grcicon-role-color { background-position:-102px -32px; }
