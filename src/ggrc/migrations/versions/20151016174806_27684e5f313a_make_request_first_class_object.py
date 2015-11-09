@@ -114,6 +114,15 @@ def upgrade():
     ALTER TABLE requests CHANGE status status ENUM('Unstarted','In Progress','Finished','Verified') NOT NULL;
     """
 
+  sql += """
+    ALTER TABLE requests DROP FOREIGN KEY requests_ibfk_1;
+    ALTER TABLE requests MODIFY COLUMN assignee_id INT(11) NULL;
+  """
+
+  sql += "COMMIT;"
+  op.execute(sql)
+
+  # Make pretty title
   requests = db.session.query(Request)
   for request in requests:
     cleaned_desc = cleaner(request.description)
@@ -144,6 +153,7 @@ def upgrade():
 
   # TODO: Drop relationship audit_objects from Audits????
 
+  # Migrate responses to comments
   documentation_responses = db.session.query(DocumentationResponse)
   for dr in documentation_responses:
     related = dr.related_sources + dr.related_destinations
