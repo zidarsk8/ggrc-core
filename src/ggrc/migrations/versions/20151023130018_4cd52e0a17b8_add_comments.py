@@ -75,10 +75,8 @@ def upgrade():
 
       for m in ir.meetings:
         desc += "<a href=\"{url}\">Meeting</a> requested on {date}<br />".\
-          format(**{
-              "url": m.title,
-              "date": m.created_at.strftime("%m/%d/%Y at %H:%M"),
-            })
+          format(url=m.title,
+                 date=m.created_at.strftime("%m/%d/%Y at %H:%M"))
 
     if ir.people:
       desc += "<br /><br /><b>Attendees</b><hr />"
