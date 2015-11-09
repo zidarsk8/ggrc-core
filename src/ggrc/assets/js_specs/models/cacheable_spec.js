@@ -296,7 +296,7 @@ describe("can.Model.Cacheable", function() {
       var instance, binding, dummy;
       beforeEach(function() {
         dummy = new CMS.Models.DummyModel({id:1});
-        instance = jasmine.createSpyObj("instance", ["get_binding", "isNew", "refresh"]);
+        instance = jasmine.createSpyObj("instance", ["get_binding", "isNew", "refresh", "attr"]);
         binding = jasmine.createSpyObj("binding", ["refresh_stubs"]);
         instance._pending_joins = [{ what: dummy, how: "add", through: "foo" }];
         instance.isNew.and.returnValue(false);
@@ -333,7 +333,7 @@ describe("can.Model.Cacheable", function() {
       beforeEach(function() {
         dummy = new CMS.Models.DummyModel({id:1});
         dummy_join = new CMS.Models.DummyJoin({id:1});
-        instance = jasmine.createSpyObj("instance", ["get_binding", "isNew", "refresh"]);
+        instance = jasmine.createSpyObj("instance", ["get_binding", "isNew", "refresh", "attr"]);
         binding = jasmine.createSpyObj("binding", ["refresh_stubs"]);
         instance._pending_joins = [{ what: dummy, how: "remove", through: "foo" }];
         instance.isNew.and.returnValue(false);
