@@ -50,9 +50,7 @@
         return forbidden[type] ? forbidden[type] : [];
       },
       get_whitelist: function () {
-        var whitelisted = ["ControlAssessment",
-            "TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask"
-          ];
+        var whitelisted = ["TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask"];
         return this.attr("search_only") ? whitelisted : [];
       },
       types: can.compute(function () {
