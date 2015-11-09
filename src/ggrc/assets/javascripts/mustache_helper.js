@@ -774,9 +774,7 @@ Mustache.registerHelper("get_view_link", function (instance, options) {
   var props = {
       "TaskGroupTask": "task_group:workflow",
       "TaskGroup": "workflow",
-      "CycleTaskGroupObjectTask": "cycle:workflow",
-      "InterviewResponse": "request:audit",
-      "DocumentationResponse": "request:audit"
+      "CycleTaskGroupObjectTask": "cycle:workflow"
     },
     hasProp = _.has(props, instance.type);
 

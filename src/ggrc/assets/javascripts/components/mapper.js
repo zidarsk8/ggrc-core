@@ -51,8 +51,7 @@
       },
       get_whitelist: function () {
         var whitelisted = ["ControlAssessment",
-            "TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask",
-            "InterviewResponse", "DocumentationResponse"
+            "TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask"
           ];
         return this.attr("search_only") ? whitelisted : [];
       },
