@@ -244,6 +244,10 @@ Mustache.registerHelper("withattr", function () {
 Mustache.registerHelper("if_equals", function (val1, val2, options) {
   var that = this, _val1, _val2;
   function exec() {
+    if (_val1 && val2 && options.hash && options.hash.insensitive) {
+      _val1 = _val1.toLowerCase();
+      _val2 = _val2.toLowerCase();
+    }
     if (_val1 == _val2) return options.fn(options.contexts);
     else return options.inverse(options.contexts);
   }
@@ -920,7 +924,7 @@ Mustache.registerHelper("with_mapping", function (binding, options) {
 
   if (!context) // can't find an object to map to.  Do nothing;
     return;
-
+  binding = Mustache.resolve(binding);
   loader = context.get_binding(binding);
   if (!loader)
     return;
@@ -929,7 +933,7 @@ Mustache.registerHelper("with_mapping", function (binding, options) {
   options = arguments[2] || options;
 
   function finish(list) {
-    return options.fn(options.contexts.add(frame));
+    return options.fn(options.contexts.add(_.extend({}, frame, {results: list})));
   }
   function fail(error) {
     return options.inverse(options.contexts.add({error : error}));
@@ -1414,6 +1418,11 @@ can.each({
     }
     return date ? moment(date).format(tmpl) : "";
   });
+});
+
+Mustache.registerHelper("capitalize", function (value, options) {
+  value = resolve_computed(value) || "";
+  return can.capitalize(value);
 });
 
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {

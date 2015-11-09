@@ -388,7 +388,6 @@ can.Model.Cacheable("CMS.Models.Request", {
     , attr_list : [
       {attr_title: 'Title', attr_name: 'title'},
       {attr_title: 'Description', attr_name: 'description'},
-      {attr_title: 'Assignee', attr_name: 'assignee'},
       {attr_title: 'Status', attr_name: 'status'},
       {attr_title: 'Last Updated', attr_name: 'updated_at'},
       {attr_title: 'Request Date', attr_name: 'requested_on', attr_sort_field: 'report_start_date'},
@@ -409,11 +408,10 @@ can.Model.Cacheable("CMS.Models.Request", {
   , init : function() {
     this._super.apply(this, arguments);
     this.validateNonBlank("title");
-    this.validateNonBlank("description");
     this.validateNonBlank("due_on");
     this.validateNonBlank("requested_on");
-    this.validatePresenceOf("assignee");
     this.validatePresenceOf("audit");
+
     if(this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {
         if(instance.constructor === CMS.Models.Request) {
@@ -437,42 +435,28 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
       return 'Request "' + out_name + '"';
     }
-  , before_create : function() {
-    var audit, that = this;
-    if(!this.assignee) {
-      audit = this.audit.reify();
-      (audit.selfLink ? $.when(audit) : audit.refresh())
-      .then(function(audit) {
-        that.attr('assignee', audit.contact);
-      });
-    }
-  }
-  , after_save: function() {
-    var program_dfd,
-        dfd;
-
-    program_dfd = new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
-      return new RefreshQueue().enqueue(audits[0].program).trigger();
-    });
-    dfd = $.when(
-      program_dfd,
-      this.assignee
-    ).then(update_program_authorizations);
-    GGRC.delay_leaving_page_until(dfd);
-  }
   , form_preload : function(new_object_form) {
     var audit, that = this;
     if(new_object_form) {
       if (GGRC.page_model.type == "Audit") {
         this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
       }
+      this.mark_for_addition("related_objects_as_destination", CMS.Models.get_instance(GGRC.current_user), {
+        attrs: {
+          "AssigneeType": "Requester",
+        }
+      });
 
-      if(!this.assignee && this.audit) {
+      if(this.audit) {
         audit = this.audit.reify();
         (audit.selfLink ? $.when(audit) : audit.refresh())
         .then(function(audit) {
-          that.attr('assignee', audit.contact);
-        });
+          this.mark_for_addition("related_objects_as_destination", audit.contact, {
+            attrs: {
+              "AssigneeType": "Assignee",
+            }
+          });
+        }.bind(this));
       }
     }
   }
@@ -512,7 +496,7 @@ can.Model.Cacheable("CMS.Models.Request", {
       refresh_queue.enqueue(binding.instance);
     });
     return refresh_queue.trigger();
-  },
+  }
 });
 
 can.Model.Cacheable("CMS.Models.Response", {

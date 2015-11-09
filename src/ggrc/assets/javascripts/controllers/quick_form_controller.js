@@ -176,12 +176,11 @@ can.Component.extend({
     attributes: {},
     create_url: function() {
       var value = this.element.find("input[type='text']").val();
-      var dfd =  new CMS.Models.Document({
+      return new CMS.Models.Document({
         link: value,
         title: value,
         context: this.scope.parent_instance.context || new CMS.Models.Context({id : null}),
       });
-      return dfd;
     },
   },
   events: {
@@ -203,6 +202,11 @@ can.Component.extend({
         quick_create = this.scope[this.scope.quick_create].bind(this);
         if (quick_create) {
           created_dfd = quick_create();
+          if (!this.scope.deferred) {
+            created_dfd = created_dfd.save().then(function(data){
+              this.scope.attr('instance', data);
+            }.bind(this));
+          }
         }
       }
       if (!created_dfd) {
