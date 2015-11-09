@@ -14,7 +14,7 @@
             {{#using workflow=parent_instance.workflow}}
             {{^if_equals workflow.status 'Inactive'}}
             <a class="drag {{#parent_instance.lock_task_order}}disabled{{/parent_instance.lock_task_order}}" href="javascript://">
-              <i class="grcicon-drag"></i>
+              <i class="fa fa-arrows-v"></i>
             </a>
             {{/if_equals}}
             {{/using}}
