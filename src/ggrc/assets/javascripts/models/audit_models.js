@@ -451,7 +451,6 @@ can.Model.Cacheable("CMS.Models.Request", {
         audit = this.audit.reify();
         (audit.selfLink ? $.when(audit) : audit.refresh())
         .then(function(audit) {
-          console.log("audit contact", audit.contact)
           this.mark_for_addition("related_objects_as_destination", audit.contact, {
             attrs: {
               "AssigneeType": "Assignee",
