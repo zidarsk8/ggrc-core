@@ -63,7 +63,7 @@ var admin_list_descriptors = {
     show_view: GGRC.mustache_path + "/custom_attribute_definitions/tree.mustache",
     sortable: false,
     list_loader: function(instance) {
-      return instance.findAll();
+      return instance.class.findAll();
     },
     draw_children: true,
     child_options: [{
