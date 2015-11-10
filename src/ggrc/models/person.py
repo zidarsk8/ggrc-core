@@ -6,7 +6,8 @@
 import re
 from sqlalchemy.orm import validates
 
-from ggrc.app import app, db
+from ggrc import db
+from ggrc import settings
 from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
 from ggrc.models.exceptions import ValidationError
@@ -142,8 +143,7 @@ class Person(CustomAttributable, HasOwnContext, Relatable, Base, db.Model):
     # FIXME: This method should be in `ggrc_basic_permissions`, since it
     #   depends on `Role` and `UserRole` objects
 
-    if 'BOOTSTRAP_ADMIN_USERS' in app.config \
-            and self.email in app.config['BOOTSTRAP_ADMIN_USERS']:
+    if self.email in getattr(settings, "BOOTSTRAP_ADMIN_USERS", []):
       return u"Superuser"
 
     ROLE_HIERARCHY = {
