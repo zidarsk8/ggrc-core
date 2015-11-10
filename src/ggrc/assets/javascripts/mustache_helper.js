@@ -768,47 +768,13 @@ Mustache.registerHelper("get_permalink", function () {
 
 Mustache.registerHelper("get_view_link", function (instance, options) {
   function finish(link) {
-    var data = {},
-        url;
-    data.url = link.viewLink;
-    if (instance.type === "CycleTaskGroupObjectTask") {
-      _.extend(data, {
-        cycle_id: instance.cycle.id,
-        cycle_group_id: instance.cycle_task_group.id,
-        task_id: instance.id
-      });
-    } else if (instance.type === "TaskGroup") {
-      _.extend(data, {
-        task_group_id: instance.id
-      });
-    } else if (instance.type === "TaskGroupTask") {
-      _.extend(data, {
-        task_group_id: instance.task_group.id
-      });
-    }
-    url = urls[instance.type] ? can.mustache(urls[instance.type]).render(data) : data.url;
-    return "<a href=" + url + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
+    return "<a href=" + link + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
   }
   instance = resolve_computed(instance);
-  var props = {
-      "TaskGroupTask": "task_group:workflow",
-      "TaskGroup": "workflow",
-      "CycleTaskGroupObjectTask": "cycle:workflow"
-    },
-    urls = {
-      "CycleTaskGroupObjectTask": "{{url}}#current_widget/cycle/{{cycle_id}}/cycle_task_group/{{cycle_group_id}}/cycle_task_group_object_task/{{task_id}}",
-      "TaskGroup": "{{url}}#task_group_widget/task_group/{{task_group_id}}",
-      "TaskGroupTask": "{{url}}#task_group_widget/task_group/{{task_group_id}}",
-    },
-    hasProp = _.has(props, instance.type);
-
-  if (!instance.viewLink && !hasProp) {
+  if (!instance.viewLink && !instance.get_permalink) {
     return "";
   }
-  if (instance && !hasProp) {
-    return finish(instance);
-  }
-  return defer_render("a", finish, instance.refresh_all.apply(instance, props[instance.type].split(":")));
+  return defer_render("a", finish, instance.get_permalink());
 });
 
 Mustache.registerHelper("schemed_url", function (url) {
