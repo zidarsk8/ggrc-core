@@ -23,7 +23,7 @@ DELETE_UNKNOWN_OBJECT = (u"Line {line}: Object '{slug}' does not exist, so it"
 DUPLICATE_COLUMN = (u"Line {line}: Duplicate columns found {duplicates}."
                    " Object block will be ignored.")
 
-DUPLICATE_VALUE = (u"Line {line}: {column_name} '{title}' already exists."
+DUPLICATE_VALUE = (u"Line {line}: {column_name} '{value}' already exists."
                    "Record will be ignored.")
 
 DUPLICATE_VALUE_IN_CSV = (u"Lines {line_list} have same {column_name}"

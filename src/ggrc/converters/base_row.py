@@ -67,6 +67,7 @@ class RowConverter(object):
         self.id_key = attr_name
         self.obj = self.get_or_generate_object(attr_name)
         item.set_obj_attr()
+      item.check_unique_consistency()
 
   def handle_obj_row_data(self):
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):

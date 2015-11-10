@@ -295,7 +295,7 @@ class BlockConverter(object):
     return self.object_class, objects
 
   def generate_unique_counts(self):
-    unique = [key for key, header in self.headers.items() if header["unique"]]
+    unique = [key for key, header in self.object_headers.items() if header["unique"]]
     for key in unique:
       for index, row in enumerate(self.row_converters):
         value = row.get_value(key)
