@@ -23,6 +23,10 @@ from HTMLParser import HTMLParser
 import bleach
 
 from ggrc import db
+from ggrc.models import Comment
+from ggrc.models import DocumentationResponse
+from ggrc.models import InterviewResponse
+from ggrc.models import Relationship
 from ggrc.models import Request
 
 
@@ -44,13 +48,12 @@ def cleaner(value, bleach_tags=[], bleach_attrs={}):
 
 
 def upgrade():
-  sql = "BEGIN;"
   # 1. Move Audit Objects to Relationship table
   #   source_type = audit_objects.auditable_type
   #   source_id = audit_objects.auditable_id
   #   destination_type = "Request"
   #   destination_id = request.id
-  sql += """
+  op.execute("""
     INSERT INTO relationships (
       modified_by_id,
       created_at,
@@ -69,13 +72,13 @@ def upgrade():
         "Request",
         AO.context_id
       FROM requests AS R, audit_objects AS AO WHERE AO.id = R.audit_object_id;
-    """
+    """)
   # 2. Create relations to Audits in Relationship table
   #   source_type = Audit
   #   source_id   = audit.id
   #   destionation_type = Request
   #   destination_id = request.id
-  sql += """
+  op.execute("""
     INSERT INTO relationships (
       modified_by_id,
       created_at,
@@ -94,59 +97,23 @@ def upgrade():
       "Request",
       AO.context_id
       FROM requests AS R, audit_objects AS AO WHERE AO.id = R.audit_object_id;
-    """
+    """)
 
   # 3. Change status values
-  sql += """
-    ALTER TABLE requests CHANGE status status ENUM('Draft','Requested','Responded','Amended Request','Updated Response','Accepted','Unstarted','In Progress','Finished','Verified') NOT NULL;
+  op.execute("""ALTER TABLE requests CHANGE status status ENUM("Draft","Requested","Responded","Amended Request","Updated Response","Accepted","Unstarted","In Progress","Finished","Verified") NOT NULL;""")
+  op.execute("""UPDATE requests SET status="Unstarted" WHERE status="Draft";""")
+  op.execute("""UPDATE requests SET status="In Progress" WHERE status="Requested";""")
+  op.execute("""UPDATE requests SET status="Finished" WHERE status="Responded";""")
+  op.execute("""UPDATE requests SET status="In Progress" WHERE status="Amended Request";""")
+  op.execute("""UPDATE requests SET status="Finished" WHERE status="Updated Response";""")
+  op.execute("""UPDATE requests SET status="Verified" WHERE status="Accepted";""")
 
-    UPDATE requests SET status='Unstarted' WHERE status='Draft';
-    UPDATE requests SET status='In Progress' WHERE status='Requested';
-    UPDATE requests SET status='Finished' WHERE status='Responded';
-    UPDATE requests SET status='In Progress' WHERE status='Amended Request';
-    UPDATE requests SET status='Finished' WHERE status='Updated Response';
-    UPDATE requests SET status='Verified' WHERE status='Accepted';
+  op.execute("""ALTER TABLE requests CHANGE status status ENUM("Unstarted","In Progress","Finished","Verified") NOT NULL;""")
 
-    ALTER TABLE requests CHANGE status status ENUM('Unstarted','In Progress','Finished','Verified') NOT NULL;
-    """
+  op.execute("""ALTER TABLE requests DROP FOREIGN KEY requests_ibfk_1;""")
+  op.execute("""ALTER TABLE requests MODIFY COLUMN assignee_id INT(11) NULL;""")
 
-  # Move assignees into relationships
-  sql += """
-    INSERT INTO relationships (
-      modified_by_id,
-      created_at,
-      updated_at,
-      source_type,
-      source_id,
-      destination_type,
-      destination_id
-    ) SELECT
-      modified_by_id,
-      created_at,
-      updated_at,
-      "Request",
-      id,
-      "Person",
-      assignee_id
-    FROM requests;
-
-    INSERT INTO relationship_attrs (
-      relationship_id,
-      attr_name,
-      attr_value
-    ) SELECT
-      relationships.id, "AssigneeType", "Assignee"
-      FROM requests
-      JOIN relationships ON (relationships.source_id = requests.id)
-      WHERE relationships.source_type = "Request";
-
-    ALTER TABLE requests DROP FOREIGN KEY requests_ibfk_1;
-    ALTER TABLE requests MODIFY COLUMN assignee_id INT(11) NULL;
-    """
-
-  sql += "COMMIT;"
-  op.execute(sql)
-
+  # Make pretty title
   requests = db.session.query(Request)
   for request in requests:
     cleaned_desc = cleaner(request.description)
@@ -176,6 +143,85 @@ def upgrade():
   # TODO: 5. Link all objects that are mapped to Audit to requests
 
   # TODO: Drop relationship audit_objects from Audits????
+
+  # Migrate responses to comments
+  documentation_responses = db.session.query(DocumentationResponse)
+  for dr in documentation_responses:
+    related = dr.related_sources + dr.related_destinations
+    comment = Comment(
+      description=dr.description,
+      created_at=dr.created_at,
+      modified_by=dr.modified_by,
+      updated_at=dr.updated_at,
+      context=dr.context)
+
+    request_comment_rel = Relationship(
+      source=dr.request,
+      destination=comment)
+
+    for rel in related:
+      if not rel.source or not rel.destination:
+        continue
+      if rel.source.type == "DocumentationResponse":
+        destination = rel.destination
+      elif rel.destination.type == "DocumentationResponse":
+        destination = rel.source
+      else:
+        continue
+      related_objects_to_request = Relationship(
+        source=dr.request,
+        destination=destination
+      )
+      db.session.add(related_objects_to_request)
+    db.session.add(comment)
+    db.session.add(request_comment_rel)
+  db.session.commit()
+
+  interview_responses = db.session.query(InterviewResponse)
+  for ir in interview_responses:
+    related = ir.related_sources + ir.related_destinations
+
+    desc = ir.description
+    if ir.meetings:
+      desc += "<br /><br /><b>Meetings</b><hr />"
+
+      for m in ir.meetings:
+        desc += "<a href=\"{url}\">Meeting</a> requested on {date}<br />". \
+          format(url=m.title,
+                 date=m.created_at.strftime("%m/%d/%Y at %H:%M"))
+
+    if ir.people:
+      desc += "<br /><br /><b>Attendees</b><hr />"
+      for p in ir.people:
+        desc += "- {} ({})<br />".format(p.name, p.email)
+
+    comment = Comment(
+      description=desc,
+      created_at=ir.created_at,
+      modified_by=ir.modified_by,
+      updated_at=ir.updated_at,
+      context=ir.context)
+
+    request_comment_rel = Relationship(
+      source=ir.request,
+      destination=comment)
+
+    for rel in related:
+      if not rel.source or not rel.destination:
+        continue
+      if rel.source.type == "InterviewResponse":
+        destination = rel.destination
+      elif rel.destination.type == "InterviewResponse":
+        destination = rel.source
+      else:
+        continue
+      related_objects_to_request = Relationship(
+        source=ir.request,
+        destination=destination)
+      db.session.add(related_objects_to_request)
+    db.session.add(comment)
+    db.session.add(request_comment_rel)
+  db.session.commit()
 
 
 def downgrade():
