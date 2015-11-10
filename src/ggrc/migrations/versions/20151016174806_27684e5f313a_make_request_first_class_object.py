@@ -160,6 +160,8 @@ def upgrade():
       destination=comment)
 
     for rel in related:
+      if not rel.source or not rel.destination:
+        continue
       if rel.source.type == "DocumentationResponse":
         destination = rel.destination
       elif rel.destination.type == "DocumentationResponse":
@@ -205,6 +207,8 @@ def upgrade():
       destination=comment)
 
     for rel in related:
+      if not rel.source or not rel.destination:
+        continue
       if rel.source.type == "InterviewResponse":
         destination = rel.destination
       elif rel.destination.type == "InterviewResponse":
