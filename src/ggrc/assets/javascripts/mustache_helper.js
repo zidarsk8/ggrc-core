@@ -1860,8 +1860,9 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
 });
 
 Mustache.registerHelper("last_approved", function (instance, options) {
-  var loader = instance.get_binding("approval_tasks"),
-      frame = new can.Observe();
+  var loader, frame = new can.Observe();
+  instance = Mustache.resolve(instance);
+  loader = instance.get_binding("approval_tasks");
 
   frame.attr(instance, loader.list);
   function finish(list) {
