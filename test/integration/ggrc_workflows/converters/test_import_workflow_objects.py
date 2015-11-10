@@ -32,30 +32,29 @@ class TestWorkflowObjectsImport(TestCase):
     self.CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
 
   def test_full_good_import_no_warnings(self):
-    filename = "simple_workflow_test_no_warnings.csv"
+    filename = "workflow_small_sheet.csv"
+    response_dry = self.import_file(filename, dry_run=True)
     response = self.import_file(filename)
+
+    self.assertEqual(response_dry, response)
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
-    broken_imports = set([
-        "Control Assessment",
-        "Task Group Task",
-    ])
-
     for block in response:
-      if block["name"] in broken_imports:
-        continue
       for message in messages:
         self.assertEqual(set(), set(block[message]))
 
     self.assertEqual(1, Workflow.query.count())
     self.assertEqual(1, TaskGroup.query.count())
-    self.assertEqual(1, TaskGroupTask.query.count())
+    self.assertEqual(2, TaskGroupTask.query.count())
     self.assertEqual(2, TaskGroupObject.query.count())
 
+    task2 = TaskGroupTask.query.filter_by(slug="t-2").first()
+    self.assertEquals(task2.start_date, date(2015, 7, 10))
+    self.assertEquals(task2.end_date, date(2016, 12, 30))
 
   def test_import_task_date_format(self):
     """Test import of tasks for workflows with various frequencies"""
-    filename = "data_for_workflow_export_testing.csv"
+    filename = "workflow_big_sheet.csv"
     response = self.import_file(filename)
     objects = {"Workflow", "Task Group", "Task Group Task"}
     messages = ["block_errors", "block_warnings", "row_errors", "row_warnings",
@@ -67,32 +66,37 @@ class TestWorkflowObjectsImport(TestCase):
 
     # Assert that CSV import got imported correctly
     getters = {
-      "one_time": lambda task: (task.start_date, task.end_date),
-      "weekly": lambda task: (task.relative_start_day, task.relative_end_day),
-      "monthly": lambda task: (task.relative_start_day, task.relative_end_day),
-      "quarterly": lambda task: ((task.relative_start_month,
-                                  task.relative_start_day),
-                                 (task.relative_end_month,
-                                  task.relative_end_day)),
-      "annually": lambda task: ((task.relative_start_month,
-                                 task.relative_start_day),
-                                (task.relative_end_month,
-                                 task.relative_end_day))
+        "one_time": lambda task: (task.start_date, task.end_date),
+        "weekly": lambda task: (task.relative_start_day,
+                                task.relative_end_day),
+        "monthly": lambda task: (task.relative_start_day,
+                                 task.relative_end_day),
+        "quarterly": lambda task: ((task.relative_start_month,
+                                    task.relative_start_day),
+                                   (task.relative_end_month,
+                                    task.relative_end_day)),
+        "annually": lambda task: ((task.relative_start_month,
+                                   task.relative_start_day),
+                                  (task.relative_end_month,
+                                   task.relative_end_day))
     }
 
     tasks = [
-      ["task-1", "one_time", (date(2015, 7, 1), date(2015, 7, 15))],
-      ["task-2", "weekly", (2, 5)],
-      ["task-3", "monthly", (1, 22)],
-      ["task-4", "quarterly", ((1, 5), (2, 15))],
-      ["task-5", "annually", ((5, 7), (7, 15))],
+        ["task-1", "one_time", (date(2015, 7, 1), date(2015, 7, 15))],
+        ["task-2", "weekly", (2, 5)],
+        ["task-3", "monthly", (1, 22)],
+        ["task-4", "quarterly", ((1, 5), (2, 15))],
+        ["task-10", "quarterly", ((3, 5), (1, 1))],
+        ["task-11", "quarterly", ((3, 5), (1, 1))],
+        ["task-5", "annually", ((5, 7), (7, 15))],
     ]
 
     for t in tasks:
       slug, freq, result = t
       task = db.session.query(TaskGroupTask).filter(
-        TaskGroupTask.slug == slug).one()
+          TaskGroupTask.slug == slug).one()
       getter = getters[freq]
       self.assertEqual(task.task_group.workflow.frequency, freq)
-      self.assertEqual(getter(task), result,
-        "Failed importing data for task with slug = '{}'".format(slug))
+      self.assertEqual(
+          getter(task), result,
+          "Failed importing data for task with slug = '{}'".format(slug))
