@@ -125,9 +125,11 @@
 
     <div class="tab-content">
       <div class="tab-pane fade in active" id="tab1">
+        {{^if_equals status "Verified"}}
         <div class="tree-item-add">
           <add-comment data="comments"></add-comment>
         </div>
+        {{/if_equals}}
         {{> /static/mustache/base_templates/comment_list.mustache}}
       </div>
 
