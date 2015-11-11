@@ -58,7 +58,7 @@
     events: {
       "#importSelect change": function (el, ev) {
         var $items = el.find(":selected"),
-            selected = this.viewModel.attr("selected");
+            selected = this.scope.attr("selected");
 
         $items.each(function () {
           var $item = $(this);
@@ -73,7 +73,7 @@
       },
       ".import-button click": function (el, ev) {
         ev.preventDefault();
-        var data = _.map(this.viewModel.attr("selected"), function (el) {
+        var data = _.map(this.scope.attr("selected"), function (el) {
               return {
                 object_name: el.value,
                 fields: "all"
@@ -96,7 +96,7 @@
         ev.preventDefault();
 
         var index = el.data("index"),
-            item = this.viewModel.attr("selected").splice(index, 1)[0];
+            item = this.scope.attr("selected").splice(index, 1)[0];
 
         this.element.find("#importSelect option:selected").each(function () {
           var $item = $(this);
@@ -119,14 +119,14 @@
     events: {
       ".btn-title-change click": function (el, ev) {
         ev.preventDefault();
-        this.viewModel.attr("export.edit_filename", !this.viewModel.attr("export.edit_filename"));
+        this.scope.attr("export.edit_filename", !this.scope.attr("export.edit_filename"));
       },
       "#export-csv-button click": function (el, ev) {
         ev.preventDefault();
-        this.viewModel.attr("export.loading", true);
-        var panels = this.viewModel.attr("export.panels.items"),
-            data_grid = this.viewModel.attr("export.data_grid"),
-            only_relevant = this.viewModel.attr("export.only_relevant"),
+        this.scope.attr("export.loading", true);
+        var panels = this.scope.attr("export.panels.items"),
+            data_grid = this.scope.attr("export.data_grid"),
+            only_relevant = this.scope.attr("export.only_relevant"),
             query = _.map(panels, function (panel, index) {
               var relevant_filter = "",
                   predicates;
@@ -163,13 +163,13 @@
             "X-export-view": view
           }
         }).then(function (data) {
-          GGRC.Utils.download(this.viewModel.attr("export.get_filename"), data);
+          GGRC.Utils.download(this.scope.attr("export.get_filename"), data);
         }.bind(this))
         .fail(function (data) {
           $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
         }.bind(this))
         .always(function () {
-          this.viewModel.attr("export.loading", false);
+          this.scope.attr("export.loading", false);
         }.bind(this));
       }
     }
@@ -190,14 +190,14 @@
       },
       addPanel: function (data) {
         data = data || {};
-        var index = this.viewModel.attr("_index") + 1;
+        var index = this.scope.attr("_index") + 1;
         if (!data.type) {
           data.type = "Program";
         }
 
-        this.viewModel.attr("_index", index);
+        this.scope.attr("_index", index);
         data.index = index;
-        return this.viewModel.attr("panels.items").push(new panelModel(data));
+        return this.scope.attr("panels.items").push(new panelModel(data));
       },
       getIndex: function (el) {
         return +el.closest("export-panel").control().scope.attr("item.index");
@@ -205,8 +205,8 @@
       ".remove_filter_group click": function (el, ev) {
         ev.preventDefault();
         var elIndex = this.getIndex(el),
-            index = _.pluck(this.viewModel.attr("panels.items"), "index").indexOf(elIndex);
-        this.viewModel.attr("panels.items").splice(index, 1);
+            index = _.pluck(this.scope.attr("panels.items"), "index").indexOf(elIndex);
+        this.scope.attr("panels.items").splice(index, 1);
       },
       "#addAnotherObjectType click": function (el, ev) {
         ev.preventDefault();
@@ -235,15 +235,15 @@
     },
     events: {
       inserted: function () {
-        var panel_number = +this.viewModel.attr("panel_number");
+        var panel_number = +this.scope.attr("panel_number");
 
         if (!panel_number && url.relevant_id && url.relevant_type) {
-          this.viewModel.fetch_relevant_data(url.relevant_id, url.relevant_type);
+          this.scope.fetch_relevant_data(url.relevant_id, url.relevant_type);
         }
         this.setSelected();
       },
       "[data-action=attribute_select_toggle] click": function (el, ev) {
-        var items = GGRC.model_attr_defs[this.viewModel.attr("item.type")],
+        var items = GGRC.model_attr_defs[this.scope.attr("item.type")],
             split_items = {
               mappings: _.filter(items, function (el) {
                 return el.type === "mapping";
@@ -253,20 +253,20 @@
               })
             };
         _.map(split_items[el.data("type")], function (attr) {
-          this.viewModel.attr("item.selected." + attr.key, el.data("value"));
+          this.scope.attr("item.selected." + attr.key, el.data("value"));
         }.bind(this));
       },
       "setSelected": function () {
-        this.viewModel.attr("item.selected", _.reduce(this.viewModel.attr("item").columns(), function (memo, data) {
+        this.scope.attr("item.selected", _.reduce(this.scope.attr("item").columns(), function (memo, data) {
           memo[data.key] = true;
           return memo;
         }, {}));
       },
       "{scope.item} type": function () {
-        this.viewModel.attr("item.selected", {});
-        this.viewModel.attr("item.relevant", []);
-        this.viewModel.attr("item.filter", "");
-        this.viewModel.attr("item.has_parent", false);
+        this.scope.attr("item.selected", {});
+        this.scope.attr("item.relevant", []);
+        this.scope.attr("item.filter", "");
+        this.scope.attr("item.has_parent", false);
 
         this.setSelected();
       }
