@@ -26,14 +26,6 @@
     tag: "people-group",
     template: can.view(GGRC.mustache_path + "/base_templates/people_group.mustache"),
     scope: {
-      define: {
-        required: {
-          type: "boolean"
-        },
-        limit: {
-          type: "number"
-        }
-      },
       limit: "@",
       mapping: "@",
       required: "@",
@@ -45,6 +37,7 @@
         var person = ui.item,
             destination = this.scope.instance,
             deferred = this.scope.deferred;
+
         if (deferred === "true") {
           destination.mark_for_addition("related_objects_as_destination", person, {
             attrs: {
