@@ -500,7 +500,6 @@ can.Model.Cacheable("CMS.Models.Request", {
 });
 
 can.Model.Cacheable("CMS.Models.Response", {
-
   root_object : "response"
   , root_collection : "responses"
   , subclasses : []
@@ -573,7 +572,6 @@ can.Model.Cacheable("CMS.Models.Response", {
     , people : "CMS.Models.Person.stubs"
     , meetings : "CMS.Models.Meeting.stubs"
     , request : "CMS.Models.Request.stub"
-    , assignee : "CMS.Models.Person.stub"
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
     , controls : "CMS.Models.Control.stubs"

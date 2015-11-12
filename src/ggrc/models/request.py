@@ -19,9 +19,9 @@ from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Titled
 from ggrc.models.object_document import Documentable
 from ggrc.models.relationship import Relatable
+from ggrc.models.object_person import Personable
 
-
-class Request(Assignable, Documentable, CustomAttributable, Relatable, Titled,
+class Request(Assignable, Documentable, Personable, CustomAttributable, Relatable, Titled,
               Slugged, Described, Base, db.Model):
   __tablename__ = 'requests'
   _title_uniqueness = False

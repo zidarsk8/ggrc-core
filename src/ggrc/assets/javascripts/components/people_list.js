@@ -35,8 +35,8 @@
     events: {
       ".person-selector input autocomplete:select": function (el, ev, ui) {
         var person = ui.item,
-            destination = this.scope.instance,
-            deferred = this.scope.deferred;
+            destination = this.scope.attr("instance"),
+            deferred = this.scope.attr("deferred");
 
         if (deferred === "true") {
           destination.mark_for_addition("related_objects_as_destination", person, {

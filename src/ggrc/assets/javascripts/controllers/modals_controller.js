@@ -1044,7 +1044,7 @@ can.Component.extend({
 
     // this works like autocomplete_select on all modal forms and
     // descendant class objects.
-    autocomplete_select : function(el, event, ui) {
+    "autocomplete_select" : function(el, event, ui) {
       var mapping, extra_attrs;
       extra_attrs = can.reduce(this.element.find("input:not([data-mapping], [data-lookup])").get(), function(attrs, el) {
         attrs[$(el).attr("name")] = $(el).val();
