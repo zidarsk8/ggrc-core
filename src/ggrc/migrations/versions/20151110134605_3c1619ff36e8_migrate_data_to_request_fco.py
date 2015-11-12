@@ -67,7 +67,7 @@ def insert_relationship_attributes(connection,
             rel["destination_type"],
         ))).fetchall()
     if rel:
-      relid, _, _, _, _ = rel[0]
+      relid = rel[0][0]
       relationship_attrs += [{
           "relationship_id": relid,
           "attr_name": attr_type,
