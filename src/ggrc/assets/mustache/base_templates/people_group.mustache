@@ -44,16 +44,14 @@
         </li>
         {{/if_equals}}
       {{/instance._pending_joins}}
+    <li class="person-add">
+      {{#show_add}}
+        {{#toggle toggle_add}}
+          {{> /static/mockups/base_templates/add_people.mustache }}
+        {{else}}
+          <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+</a>
+        {{/toggle}}
+      {{/show_add}}
     </li>
   </ul>
 
-{{#show_add}}
-  <div style="padding: 10px 0 10px 27%; marign-left:20px;">
-  {{#toggle toggle_add}}
-      {{> /static/mockups/base_templates/add_people.mustache }}
-  {{else}}
-    <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+</a>
-  {{/toggle}}
-  </div>
-{{/show_add}}
-</div>

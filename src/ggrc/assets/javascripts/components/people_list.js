@@ -66,15 +66,11 @@
     },
     helpers: {
       show_add: function (options) {
-        if (this.attr("editable") === "true") {
-          if (_.isNull(this.attr("limit")) ||
-              this.attr("limit") > this.attr("people").filter(function (person) {
-                return person.attr("person_state") !== "deleted";
-              }).length) {
-            return options.fn();
-          }
+        if (this.attr("editable") === "true" && _.isNull(this.attr("limit")) ||
+            +this.attr("limit") < this.attr("people").length) {
+          return options.fn(options.context);
         }
-        return options.inverse();
+        return options.inverse(options.context);
       }
     }
   });
