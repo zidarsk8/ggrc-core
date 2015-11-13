@@ -143,7 +143,7 @@ can.Control("CMS.Controllers.TreeLoader", {
     this._prepare_deferred.resolve();
 
     this._attached_deferred.then(function() {
-      if (that.element) {
+      if (that.element && that.options.update_count) {
         that.element.trigger("updateCount", 0);
         that.init_count();
       }
@@ -613,6 +613,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         || this.element.data('disable-lazy-loading')) { // comment list
         this.options.disable_lazy_loading = true;
       }
+
+      this.options.update_count = _.isBoolean(this.element.data("update-count")) ? this.element.data("update-count") : true;
+
       if(!this.options.scroll_element) {
         this.options.attr("scroll_element", $(".object-area"));
       }
@@ -726,9 +729,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       if (this.get_count_deferred) {
         this.get_count_deferred.then(this._ifNotRemoved(function(count) {
-          self.element && self.element.trigger("updateCount", count());
+          self.options.update_count
+            && self.element
+            && self.element.trigger("updateCount", count());
+
           count.bind("change", self._ifNotRemoved(function() {
-            self.element.trigger("updateCount", count());
+            self.options.update_count
+              && self.element.trigger("updateCount", count());
           }));
         }));
       } else {
@@ -1168,8 +1175,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   , " updateCount": function(el, ev) {
       // Suppress events from sub-trees
-      if (!($(ev.target).closest('.' + this.constructor._fullName).is(this.element)))
+      if (!($(ev.target).closest('.' + this.constructor._fullName).is(this.element))) {
         ev.stopPropagation();
+      }
     }
 
 /*  , "{list} add": function() {
