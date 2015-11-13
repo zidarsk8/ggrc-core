@@ -98,17 +98,6 @@ can.Model.Mixin("ownable", {
       this.attr("owners", []);
     }
   }
-}, {
-  before_create : function() {
-    if (!this.owners) {
-      this.attr("owners", [{ id: GGRC.current_user.id, type : "Person" }]);
-    }
-  },
-  form_preload : function(new_object_form) {
-    if (new_object_form && !this.owners) {
-      this.attr("owners", [{ id: GGRC.current_user.id, type : "Person" }]);
-    }
-  }
 });
 
 can.Model.Mixin("contactable", {
