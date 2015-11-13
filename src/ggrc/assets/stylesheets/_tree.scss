@@ -1311,8 +1311,9 @@ ul.new-tree {
     z-index: 9999;
     margin-top: 20px;
   }
-  .btn-complete {
-    margin-top: 18px;
+  .request & {
+    position: static;
+    margin-top: 0;
   }
 }
 

@@ -339,6 +339,9 @@ small {
 }
 
 // buttons
+.btn-info-pin-header {
+  margin-top: 18px;
+}
 .btn {
   @include btn-size();
   font-weight: bold;
