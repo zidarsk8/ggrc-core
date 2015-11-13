@@ -768,26 +768,13 @@ Mustache.registerHelper("get_permalink", function () {
 
 Mustache.registerHelper("get_view_link", function (instance, options) {
   function finish(link) {
-    return "<a href=" + link.viewLink + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
+    return "<a href=" + link + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
   }
   instance = resolve_computed(instance);
-  var props = {
-      "Request": "audit",
-      "TaskGroupTask": "task_group:workflow",
-      "TaskGroup": "workflow",
-      "CycleTaskGroupObjectTask": "cycle:workflow",
-      "InterviewResponse": "request:audit",
-      "DocumentationResponse": "request:audit"
-    },
-    hasProp = _.has(props, instance.type);
-
-  if (!instance.viewLink && !hasProp) {
+  if (!instance.viewLink && !instance.get_permalink) {
     return "";
   }
-  if (instance && !hasProp) {
-    return finish(instance);
-  }
-  return defer_render("a", finish, instance.refresh_all.apply(instance, props[instance.type].split(":")));
+  return defer_render("a", finish, instance.get_permalink());
 });
 
 Mustache.registerHelper("schemed_url", function (url) {
