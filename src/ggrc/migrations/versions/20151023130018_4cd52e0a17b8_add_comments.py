@@ -1,7 +1,7 @@
 # Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: andraz@reciprocitylabs.com
-# Maintained By: andraz@reciprocitylabs.com
+# Maintained By: urban@reciprocitylabs.com
 
 """Add Comments
 
@@ -21,15 +21,15 @@ import sqlalchemy as sa
 
 def upgrade():
   op.create_table(
-      'comments',
-      sa.Column('id', sa.Integer(), primary_key=True, nullable=False),
-      sa.Column('commentable_id', sa.Integer(), nullable=False),
-      sa.Column('commentable_type', sa.String(length=250), nullable=False),
-      sa.Column('description', sa.Text()),
-      sa.Column('created_at', sa.DateTime()),
-      sa.Column('modified_by_id', sa.Integer()),
-      sa.Column('updated_at', sa.DateTime()),
-      sa.Column('context_id', sa.Integer(), sa.ForeignKey('contexts.id'))
+    'comments',
+    sa.Column('id', sa.Integer(), primary_key=True, nullable=False),
+    sa.Column('commentable_id', sa.Integer(), nullable=False),
+    sa.Column('commentable_type', sa.String(length=250), nullable=False),
+    sa.Column('description', sa.Text()),
+    sa.Column('created_at', sa.DateTime()),
+    sa.Column('modified_by_id', sa.Integer()),
+    sa.Column('updated_at', sa.DateTime()),
+    sa.Column('context_id', sa.Integer(), sa.ForeignKey('contexts.id'))
   )
 
 

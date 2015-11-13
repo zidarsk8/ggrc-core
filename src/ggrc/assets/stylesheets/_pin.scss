@@ -311,6 +311,9 @@
         width: 85%;
       }
     }
+    .custom-attr-wrap {
+      border-top: none;
+    }
     &:last-child {
       .custom-attr-wrap {
         &.mapped {

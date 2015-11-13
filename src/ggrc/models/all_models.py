@@ -7,7 +7,7 @@
 
 # TODO: Implement with Authentication
 # from .account import Account
-from access_group import AccessGroup
+from ggrc.models.access_group import AccessGroup
 from ggrc.models.audit import Audit
 from ggrc.models.audit_object import AuditObject
 from ggrc.models.comment import Comment

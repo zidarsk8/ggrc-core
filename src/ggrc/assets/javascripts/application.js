@@ -8,10 +8,10 @@
 
 (function(root, GGRC, $, can) {
   var doc = root.document,
-    body = doc.body,
-    $win = $(root),
-    $doc = $(doc),
-    $body = $(body);
+      body = doc.body,
+      $win = $(root),
+      $doc = $(doc),
+      $body = $(body);
 
 
   $win.on('hashchange', function() {
@@ -59,20 +59,6 @@
     });
     return zindex + 10;
   };
-
-  $doc.ajaxError(function(event, jqxhr, settings, exception) {
-    if (!jqxhr.hasFailCallback || settings.flashOnFail || (settings.flashOnFail == null && jqxhr.flashOnFail)) {
-      // TODO: Import produced 'canceled' ajax flash message that needed handling. Will refactor once better method works.
-      if (settings.url.indexOf("import") == -1 || exception !== 'canceled') {
-        $body.trigger(
-          "ajax:flash"
-          , {
-            "error": jqxhr.getResponseHeader("X-Flash-Error") || statusmsgs[jqxhr.status] || exception.message || exception
-          }
-        );
-      }
-    }
-  });
 
   $doc.ready(function() {
     // monitor target, where flash messages are added
@@ -154,7 +140,7 @@
         $('.header-content').next('.content').removeClass('affixed');
       }
     });
-    $body.on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose', function(evnt) {
+    $body.on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose, .mapped-list .openclose', function(evnt) {
       evnt.stopPropagation();
       $(this).openclose();
     });

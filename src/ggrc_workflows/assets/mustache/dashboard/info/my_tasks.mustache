@@ -184,7 +184,7 @@
                 {{#with_mapping_count instance "cycle_task_entries"}}
                 <h6>Comments ({{count}})</h6>
                 {{/with_mapping_count}}
-                <ul class="entry-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
+                <ul class="entry-list" data-disable-lazy-loading="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
                 </ul>
               </div>
             {{/inject_parent_instance}}

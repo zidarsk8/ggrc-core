@@ -1016,9 +1016,13 @@ can.Component.extend({
     },
     deferred_update: function () {
       var that = this,
-          changes = this.scope.changes;
+          changes = this.scope.changes,
+          instance = this.scope.instance;
 
       if (!changes.length) {
+        if (instance && instance._pending_joins && instance._pending_joins.length) {
+          return instance.constructor.resolve_deferred_bindings(instance);
+        }
         return;
       }
       this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
