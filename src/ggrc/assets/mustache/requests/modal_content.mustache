@@ -87,9 +87,11 @@
             <i class="grcicon-deleted"></i>
           </a>
           {{#update_link .}}
+            {{#prune_context}}
             <a class="url" href="{{schemed_url link}}" target="_blank">
               {{firstexist title name email link}}
             </a>
+            {{/prune_context}}
           {{/update_link}}
         </div>
         {{/each}}
