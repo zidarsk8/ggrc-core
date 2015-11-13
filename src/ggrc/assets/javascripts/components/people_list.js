@@ -9,15 +9,7 @@
   can.Component.extend({
     tag: "people-list",
     template: can.view(GGRC.mustache_path + "/base_templates/people_list.mustache"),
-    viewModel: {
-      define: {
-        editable: {
-          type: "boolean"
-        },
-        deferred: {
-          type: "boolean"
-        }
-      },
+    scope: {
       editable: "@",
       deferred: "@",
       groups: {
@@ -33,15 +25,7 @@
   can.Component.extend({
     tag: "people-group",
     template: can.view(GGRC.mustache_path + "/base_templates/people_group.mustache"),
-    viewModel: {
-      define: {
-        required: {
-          type: "boolean"
-        },
-        limit: {
-          type: "number"
-        }
-      },
+    scope: {
       limit: "@",
       mapping: "@",
       required: "@",
@@ -51,18 +35,19 @@
     events: {
       ".person-selector input autocomplete:select": function (el, ev, ui) {
         var person = ui.item,
-            destination = this.viewModel.instance,
-            deferred = this.viewModel.deferred;
-        if (deferred) {
+            destination = this.scope.instance,
+            deferred = this.scope.deferred;
+
+        if (deferred === "true") {
           destination.mark_for_addition("related_objects_as_destination", person, {
             attrs: {
-              "AssigneeType": can.capitalize(this.viewModel.type),
+              "AssigneeType": can.capitalize(this.scope.type),
             }
           });
         } else {
           new CMS.Models.Relationship({
             attrs: {
-              "AssigneeType": can.capitalize(this.viewModel.type),
+              "AssigneeType": can.capitalize(this.scope.type),
             },
             source: {
               href: person.href,
@@ -81,15 +66,11 @@
     },
     helpers: {
       show_add: function (options) {
-        if (this.attr("editable")) {
-          if (_.isNull(this.attr("limit")) ||
-              this.attr("limit") > this.attr("people").filter(function (person) {
-                return person.attr("person_state") !== "deleted";
-              }).length) {
-            return options.fn();
-          }
+        if (this.attr("editable") === "true" && _.isNull(this.attr("limit")) ||
+            +this.attr("limit") < this.attr("people").length) {
+          return options.fn(options.context);
         }
-        return options.inverse();
+        return options.inverse(options.context);
       }
     }
   });

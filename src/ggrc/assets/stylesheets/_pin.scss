@@ -121,6 +121,10 @@
   margin-left: 20px;
 }
 
+.people-group {
+  padding-bottom: 16px;
+}
+
 .label-list {
   @extend %reset-list;
   > li {
@@ -156,10 +160,15 @@
   label {
     float: left;
     width: 27%;
-    text-transform: uppercase;
     font-size: 10px;
     line-height: 16px;
     margin-top: 1px;
+    text-transform: uppercase;
+
+    .modal-body & {
+      text-transform: none;
+      width: 32%;
+    }
     .person-label {
       width: 16px;
       height: 16px;
@@ -176,6 +185,10 @@
     @extend %reset-list;
     float: left;
     width: 60%;
+
+    .modal-body & {
+      width: 55%;
+    }
     li {
       margin-bottom: 3px;
       position: relative;

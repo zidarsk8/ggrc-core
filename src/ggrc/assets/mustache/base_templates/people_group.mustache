@@ -5,55 +5,49 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-<div class="side-content">
-  <ul class="label-list">
-    <li>
-      <label>
-        <span class="person-label {{type}}"></span>
-        {{capitalize type}}
-        {{#if editable}}
-          <span class="required">*</span>
-        {{/if}}
-      </label>
-      {{#with_mapping mapping instance}}
-          <ul class="inner-count-list">
-            {{^if results.length}}
-              {{^if instance._pending_joins}}
-              <li><i> No {{type}}s</i></li>
-              {{/if}}
-            {{/if}}
-            {{#results}}
-              <li>
-                {{#is_allowed 'update'}}
-                <span class="file-controls">
-                  <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-                    <span class="result" {{data 'result'}}></span>
-                    <i class="grcicon-deleted"></i>
-                  </a>
-                </span>
-                {{/is_allowed}}
-                {{{render '/static/mustache/people/popover.mustache' person=instance}}}
-              </li>
-            {{/each}}
-          </ul>
-      {{/with_mapping}}
-      {{#instance._pending_joins}}
-        {{#if_equals extra.attrs.AssigneeType type insensitive='true'}}
-        <li>
-          {{{render '/static/mustache/people/popover.mustache' person=what}}}
-        </li>
-        {{/if_equals}}
-      {{/instance._pending_joins}}
+
+<label>
+  <span class="person-label {{type}}"></span>
+  {{capitalize type}}
+  {{#if editable}}
+    <span class="required">*</span>
+  {{/if}}
+</label>
+{{#with_mapping mapping instance}}
+  <ul class="inner-count-list">
+    {{^if results.length}}
+      {{^if instance._pending_joins}}
+      <li><i> No {{type}}s</i></li>
+      {{/if}}
+    {{/if}}
+    {{#results}}
+      <li>
+        {{#is_allowed 'update'}}
+        <span class="file-controls">
+          <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+            <span class="result" {{data 'result'}}></span>
+            <i class="grcicon-deleted"></i>
+          </a>
+        </span>
+        {{/is_allowed}}
+        {{{render '/static/mustache/people/popover.mustache' person=instance}}}
+      </li>
+    {{/each}}
+    {{#instance._pending_joins}}
+    {{#if_equals extra.attrs.AssigneeType type insensitive='true'}}
+      <li>
+        {{{render '/static/mustache/people/popover.mustache' person=what}}}
+      </li>
+      {{/if_equals}}
+    {{/instance._pending_joins}}
+    <li class="person-add">
+      {{#show_add}}
+        {{#toggle toggle_add}}
+          {{> /static/mockups/base_templates/add_people.mustache }}
+        {{else}}
+          <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+</a>
+        {{/toggle}}
+      {{/show_add}}
     </li>
   </ul>
-
-{{#show_add}}
-  <div style="padding: 10px 0 10px 27%; marign-left:20px;">
-  {{#toggle toggle_add}}
-      {{> /static/mockups/base_templates/add_people.mustache }}
-  {{else}}
-    <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+</a>
-  {{/toggle}}
-  </div>
-{{/show_add}}
-</div>
+{{/with_mapping}}
