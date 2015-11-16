@@ -5,62 +5,37 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-{{#is_allowed 'update' instance}}
-<div class="details-wrap no-top">
-  <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-  <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-    {{#using workflow=instance.workflow}}
-      {{^if_equals workflow.status 'Inactive'}}
-        {{> /static/mustache/base_objects/edit_object_link.mustache}}
-      {{/if_equals}}
-    {{/using}}
-    <li>
-      <task-group-clone task-group="instance">
-        <a href="javascript://">
-          <i class="grcicon-clone"></i>
-          Clone Task Group
-        </a>
-      </task-group-clone>
-    </li>
-  </ul>
-</div>
-{{/is_allowed}}
-
-<div class="tier-content">
-
-  {{#using workflow=instance.workflow}}
-    {{#if_equals workflow.status 'Active'}}
-      <div class="row-fluid wrap-row">
-        <div class="span12">
-            <div class="alert">
-              <button type="button" class="close" data-dismiss="alert">
-                <span aria-hidden="true">&times;</span>
-              </button>
-              <strong>Note:</strong> This workflow is active. Changes you make here will not affect active cycles. They will only affect future recurrences.
-            </div>
-        </div>
-      </div>
-    {{/if_equals}}
-  {{/using}}
-
-  {{#instance.description}}
-    <div class="row-fluid">
+{{#using workflow=instance.workflow}}
+  {{#if_equals workflow.status 'Active'}}
+    <div class="row-fluid wrap-row">
       <div class="span12">
-        <h6>Description</h6>
-        <div class="tree-description">
-          {{{instance.description}}}
+          <div class="alert">
+            <button type="button" class="close" data-dismiss="alert">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Note:</strong> This workflow is active. Changes you make here will not affect active cycles. They will only affect future recurrences.
           </div>
-        </div>
       </div>
     </div>
-    <br>
-  {{/instance.description}}
+  {{/if_equals}}
+{{/using}}
+
+{{#instance.description}}
   <div class="row-fluid">
     <div class="span12">
-      <h6>Code</h6>
+      <h6>Description</h6>
       <div class="tree-description">
-        {{{instance.slug}}}
+        {{{instance.description}}}
       </div>
     </div>
   </div>
-  <br>
+{{/instance.description}}
+
+<div class="row-fluid">
+  <div class="span12">
+    <h6>Code</h6>
+    <div class="tree-description">
+      {{{instance.slug}}}
+    </div>
+  </div>
+</div>

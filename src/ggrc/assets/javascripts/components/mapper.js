@@ -50,10 +50,7 @@
         return forbidden[type] ? forbidden[type] : [];
       },
       get_whitelist: function () {
-        var whitelisted = ["Request", "ControlAssessment",
-            "TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask",
-            "InterviewResponse", "DocumentationResponse"
-          ];
+        var whitelisted = ["TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask"];
         return this.attr("search_only") ? whitelisted : [];
       },
       types: can.compute(function () {

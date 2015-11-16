@@ -339,6 +339,9 @@ small {
 }
 
 // buttons
+.btn-info-pin-header {
+  margin-top: 18px;
+}
 .btn {
   @include btn-size();
   font-weight: bold;
@@ -757,6 +760,10 @@ select.multiple-selector {
   word-wrap: break-word;
   margin-bottom:10px;
   line-height:18px;
+  &.shorter-rtf {
+    width: 75%;
+    float: left
+  }
 }
 
 .drag {
@@ -1177,6 +1184,11 @@ p {
   .pane-header & {
     display: inline-block;
     margin-top: 4px;
+  }
+  &.state-float {
+    float: left;
+    margin-top: 0;
+    margin-left: 10px;
   }
 }
 
