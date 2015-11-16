@@ -718,7 +718,9 @@
           return _.any(binding.mappings, function(mapping) {
             instance = mapping.instance;
             if (instance instanceof CMS.Models.Relationship) {
-              if (_.exists(instance, "attrs") && instance.attrs[prop] === value) {
+              if (_.exists(instance, "attrs") &&
+                  instance.attrs[prop] &&
+                  _.contains(instance.attrs[prop].split(","), value)) {
                 return true;
               }
             }

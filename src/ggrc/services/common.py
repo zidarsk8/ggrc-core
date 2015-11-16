@@ -1054,20 +1054,12 @@ class Resource(ModelView):
     except (IntegrityError, ValidationError) as e:
       msg = e.orig.args[1]
       if obj.type == "Relationship" and \
-          msg.startswith("Duplicate entry") and \
-          msg.endswith("'uq_relationships'"):
-        R = obj.__class__
+         msg.startswith("Duplicate entry") and \
+         msg.endswith("'uq_relationships'"):
         db.session.rollback()
-        obj = R.query.filter(
-           ((R.source_type==obj.source_type) &
-            (R.source_id==obj.source_id) &
-            (R.destination_type==obj.destination_type) &
-            (R.destination_id==obj.destination_id)) |
-           ((R.source_type==obj.destination_type) &
-            (R.source_id==obj.destination_id) &
-            (R.destination_type==obj.source_type) &
-            (R.destination_id==obj.source_id))
-        ).first()
+        obj = obj.__class__.update_attributes(obj.source, obj.destination,
+                                              obj.attrs)
+        db.session.flush()
         object_for_json = self.object_for_json(obj)
         return (200, object_for_json)
       message = translate_message(e)

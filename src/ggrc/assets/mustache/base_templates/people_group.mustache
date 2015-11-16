@@ -24,7 +24,7 @@
       <li>
         {{#is_allowed 'update'}}
         <span class="file-controls">
-          <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+          <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{instance.id}}>
             <span class="result" {{data 'result'}}></span>
             <i class="grcicon-deleted"></i>
           </a>
