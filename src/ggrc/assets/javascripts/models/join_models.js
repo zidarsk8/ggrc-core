@@ -119,6 +119,7 @@ can.Model.Join("CMS.Models.Relationship", {
   }
   , findAll: "GET /api/relationships"
   , create: "POST /api/relationships"
+  , update: "PUT /api/relationships/{id}"
   , destroy: "DELETE /api/relationships/{id}"
 }, {
   reinit: function() {
