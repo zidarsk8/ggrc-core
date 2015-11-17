@@ -119,6 +119,9 @@
 
 .side-content {
   margin-left: 20px;
+  .modal & {
+    margin-left: 0;
+  }
 }
 
 .people-group {
