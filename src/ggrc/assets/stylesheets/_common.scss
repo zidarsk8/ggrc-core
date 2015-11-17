@@ -1192,7 +1192,7 @@ p {
   }
 }
 
-@each $state_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+@each $state_label in draft, inactive, declined, inprogress, in_progress, unstarted, overdue, active, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
   .state-#{$state_label} {
     @extend %state-#{$state_label};
   }
