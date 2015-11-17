@@ -179,6 +179,10 @@ small {
   position: relative;
 }
 
+.top-spacing {
+  margin-top: 15px;
+}
+
 .not-assigned {
   color: $tabTitle;
 }
@@ -810,6 +814,9 @@ select.multiple-selector {
     &.pull-right {
       width: auto;
       float: right;
+    }
+    &.btn {
+      width: auto;
     }
   }
   &.task-wrap {

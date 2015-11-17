@@ -15,10 +15,10 @@
           {{#toggle show_new_object_form}}
             <ggrc-quick-add parent_instance="instance" join_model="Relationship" deferred="true" quick_create="create_url">
               {{#prune_context}}
-                <div class="objective-selector field-wrap">
+                <div class="objective-selector field-wrap top-spacing">
                   <input tabindex="3" type="text" name="instance" placeholder="Add URL">
                   <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
-                  <a href="javascript://" class="btn btn-small no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
+                  <a href="javascript://" class="btn btn-small btn-success no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add URL</a>
                 </div>
                 <input type="hidden" name="role_name" value="Auditor" />
               {{/prune_context}}
