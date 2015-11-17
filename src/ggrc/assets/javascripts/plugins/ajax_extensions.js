@@ -4,11 +4,17 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 */
-(function($, can) {
+(function(root, $, can) {
 
   // Set up all PUT requests to the server to respect ETags, to ensure that
   // we are not overwriting more recent data than was viewed by the user.
-  var etags = {};
+  var etags = {},
+      doc = root.document,
+      body = doc.body,
+      $win = $(root),
+      $doc = $(doc),
+      $body = $(body);
+
   $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
     var data = originalOptions.data;
 
@@ -36,8 +42,9 @@
     if (/^\/api\/\w+/.test(options.url)) {
       jqXHR.setRequestHeader("X-Requested-By", "gGRC");
       jqXHR.done(function(data, status, xhr) {
-        if (!/^\/api\/\w+\/\d+/.test(options.url) && options.type.toUpperCase() === "GET")
+        if (!/^\/api\/\w+\/\d+/.test(options.url) && options.type.toUpperCase() === "GET") {
           return;
+        }
         switch (options.type.toUpperCase()) {
           case "GET":
           case "PUT":
@@ -59,13 +66,12 @@
   });
 
   //Set up default failure callbacks if nonesuch exist.
-  var _old_ajax = $.ajax;
-
-  var statusmsgs = {
-    401: "The server says you are not authorized.  Are you logged in?",
-    409: "There was a conflict in the object you were trying to update.  The version on the server is newer.",
-    412: "One of the form fields isn't right.  Check the form for any highlighted fields."
-  };
+  var _old_ajax = $.ajax,
+      statusmsgs = {
+        401: "The server says you are not authorized.  Are you logged in?",
+        409: "There was a conflict in the object you were trying to update.  The version on the server is newer.",
+        412: "One of the form fields isn't right.  Check the form for any highlighted fields."
+      };
 
 
   // Here we break the deferred pattern a bit by piping back to original AJAX deferreds when we
@@ -73,7 +79,7 @@
   //  we have a default failure handler that should only be called if no other one is registered,
   //  unless it's also explicitly asked for.  If it's registered in a transformed one, though (after
   //  then() or pipe()), then the original one won't normally be notified of failure.
-  can.ajax = $.ajax = function(options) {
+  can.ajax = $.ajax = function (options) {
     var _ajax = _old_ajax.apply($, arguments);
 
     function setup(_new_ajax, _old_ajax) {
@@ -85,16 +91,18 @@
         var _new_ajax = _old_then.apply(this, arguments);
         if (arguments.length > 1) {
           this.hasFailCallback = true;
-          if (_old_ajax)
+          if (_old_ajax) {
             _old_ajax.fail(function() {});
+          }
         }
         setup(_new_ajax, this);
         return _new_ajax;
       };
       _new_ajax.fail = function() {
         this.hasFailCallback = true;
-        if (_old_ajax)
+        if (_old_ajax) {
           _old_ajax.fail(function() {});
+        }
         return _old_fail.apply(this, arguments);
       };
       _new_ajax.pipe = function() {
@@ -107,4 +115,16 @@
     setup(_ajax);
     return _ajax;
   };
-})(jQuery, can);
+
+
+  $doc.ajaxError(function (event, jqxhr, settings, exception) {
+    if (!jqxhr.hasFailCallback || settings.flashOnFail || (settings.flashOnFail == null && jqxhr.flashOnFail)) {
+      // TODO: Import produced 'canceled' ajax flash message that needed handling. Will refactor once better method works.
+      if (settings.url.indexOf("import") === -1 || exception !== "canceled") {
+        $body.trigger("ajax:flash", {
+          "error": jqxhr.getResponseHeader("X-Flash-Error") || statusmsgs[jqxhr.status] || exception.message || exception
+        });
+      }
+    }
+  });
+})(this, jQuery, can);

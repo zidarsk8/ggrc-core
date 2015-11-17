@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Reciprocity, Inc - All Rights Reserved
- * Unauthorized use, copying, distribution, displaying, or public performance
- * of this file, via any medium, is strictly prohibited. All information
- * contained herein is proprietary and confidential and may not be shared
- * with any third party without the express written consent of Reciprocity, Inc.
+ * Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  * Created By: silas@reciprocitylabs.com
  * Maintained By: silas@reciprocitylabs.com
  */
@@ -17,7 +14,7 @@
       "Program", "Regulation", "Standard", "Policy", "Contract",
       "Objective", "Control", "Section", "Clause", "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
-      "MultitypeSearch", "Issue", "ControlAssessment", "AccessGroup",
+      "MultitypeSearch", "Issue", "ControlAssessment", "AccessGroup", "Request",
       "Person", "OrgGroup", "Vendor"
     ],
     related_object_descriptors = {},
@@ -81,9 +78,11 @@
         related_objectives: TypeFilter("related_objects", "Objective"),
         related_issues: TypeFilter("related_objects", "Issue"),
         related_control_assessments: TypeFilter("related_objects", "ControlAssessment"),
+        related_requests: TypeFilter("related_objects", "Request"),
         related_people: TypeFilter("related_objects", "Person"),
         related_org_groups: TypeFilter("related_objects", "OrgGroup"),
         related_vendors: TypeFilter("related_objects", "Vendor")
+
       },
       related_risk: {
         _canonical: {

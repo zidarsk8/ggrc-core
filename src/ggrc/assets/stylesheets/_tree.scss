@@ -1305,12 +1305,19 @@ ul.new-tree {
 .info-pane-utility {
   @include clearfix();
   float: right;
-  .btn-complete {
-    margin-top: 18px;
+  .sticky-info-panel & {
+    position: fixed;
+    right: 47px;
+    z-index: 9999;
+    margin-top: 20px;
+  }
+  .request & {
+    position: static;
+    margin-top: 0;
   }
 }
 
-.cms_controllers_mockup_helper {
+.sticky-info-panel {
   .details-wrap {
     &.pin {
       position: fixed;
@@ -1329,12 +1336,11 @@ ul.new-tree {
   margin-left: 20px;
   width: 60px;
   position: relative;
-  .info-pane-utility & {
-    .dropdown-toggle {
-      @include clearfix();
-      height: 12px;
-      padding-bottom: 9px;
-    }
+  .dropdown-toggle {
+    @include clearfix();
+    height: 8px;
+    padding-top: 9px;
+    padding-bottom: 9px;
   }
   .pin-content & {
     margin-top: 4px;

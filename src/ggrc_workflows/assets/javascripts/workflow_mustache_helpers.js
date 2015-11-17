@@ -151,8 +151,12 @@ Mustache.registerHelper("if_task_group_assignee_privileges", function(instance, 
   if(admin) {
     return options.fn(options.contexts);
   }
-
-  workflow_dfd = instance.workflow.reify().refresh().then(function(workflow){
+  if (instance.workflow.id in CMS.Models.Workflow.cache) {
+    workflow_dfd = new $.Deferred().resolve(instance.workflow.reify());
+  } else {
+    workflow_dfd = instance.workflow.reify().refresh();
+  }
+  workflow_dfd = workflow_dfd.then(function(workflow){
     return $.when(
       workflow.get_binding("authorizations").refresh_instances(),
       workflow.get_binding("owner_authorizations").refresh_instances()

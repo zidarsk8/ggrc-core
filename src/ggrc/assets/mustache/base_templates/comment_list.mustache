@@ -1,0 +1,14 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+{{#instance.class.info_pane_options.comments}}
+{{#add_to_current_scope parent_instance=instance}}
+  <ul class="entry-list" {{data 'options'}} data-disable-lazy-loading="true"
+    {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
+  </ul>
+{{/add_to_current_scope}}
+{{/instance}}
