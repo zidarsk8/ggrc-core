@@ -34,12 +34,3 @@ class TestTaskGroupTask(unittest.TestCase):
     t.start_date = date(2015, 4, 17)
     self.assertRaises(ValueError,
                       t.validate_end_date, "end_date", date(2014, 2, 5))
-
-  def test_validate_start_date_decorator(self):
-    t = task_group_task.TaskGroupTask()
-    t.start_date = date(16, 4, 21)
-    self.assertEqual(date(2016, 4, 21), t.start_date)
-
-    t.end_date = date(2016, 4, 21)
-    self.assertRaises(ValueError,
-                      t.validate_start_date, "start_date", date(2020, 2, 5))
