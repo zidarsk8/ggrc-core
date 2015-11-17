@@ -124,26 +124,6 @@ class TestExportSingleObject(TestCase):
       else:
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
-  def test_boolean_query_parameters(self):
-    data = [{
-        "object_name": "Program",
-        "filters": {
-            "expression": {
-                "left": "private",
-                "op": {"name": "="},
-                "right": "1",
-            },
-        },
-        "fields": "all",
-    }]
-    response = self.export_csv(data)
-    expected = set([10, 17, 18, 19, 20, 21, 22])
-    for i in range(1, 24):
-      if i in expected:
-        self.assertIn(",Cat ipsum {},".format(i), response.data)
-      else:
-        self.assertNotIn(",Cat ipsum {},".format(i), response.data)
-
   def test_and_export_query(self):
     data = [{
         "object_name": "Program",
