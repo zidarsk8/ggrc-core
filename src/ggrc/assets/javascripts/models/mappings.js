@@ -712,15 +712,9 @@
       related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee"),
       related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier"),
-      info_related_objects: Multi([
-        "related_access_groups", "related_data_assets",
-        "related_facilities", "related_markets", "related_org_groups",
-        "related_vendors", "related_processes", "related_products",
-        "related_projects", "related_systems", "related_issues",
-        "related_audits", "related_controls", "related_control_assessments",
-        "related_requests", "regulations", "contracts", "policies", "standards",
-        "programs", "controls", "sections", "clauses", "objectives",
-      ]),
+      info_related_objects: CustomFilter("related_objects", function (related_objects) {
+        return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
+      }),
       comments: TypeFilter("related_objects", "Comment"),
       documents_from_comments: Cross("comments", "documents"),
       urls_from_comments: Cross("comments", "urls"),
