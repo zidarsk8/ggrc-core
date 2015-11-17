@@ -340,7 +340,9 @@ small {
 
 // buttons
 .btn-info-pin-header {
-  margin-top: 18px;
+  .sticky-info-panel & {
+    margin-top: 18px;
+  }
 }
 .btn {
   @include btn-size();
