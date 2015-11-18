@@ -3,7 +3,7 @@
 # Created By: urban@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
-"""Make section titles unique
+"""Make section and clause titles unique
 
 Revision ID: 18cbdd3a7fd9
 Revises: 27684e5f313a
@@ -17,14 +17,19 @@ down_revision = '27684e5f313a'
 
 from alembic import op
 
+from ggrc.models.clause import Clause
 from ggrc.models.section import Section
 from ggrc.migrations.utils import resolve_duplicates
 
 
 def upgrade():
   resolve_duplicates(Section, 'title', " ")
+  resolve_duplicates(Clause, 'title', " ")
+
   op.create_unique_constraint('uq_t_sections', 'sections', ['title'])
+  op.create_unique_constraint('uq_t_clauses', 'clauses', ['title'])
 
 
 def downgrade():
   op.drop_constraint('uq_t_sections', 'sections', 'unique')
+  op.drop_constraint('uq_t_clauses', 'clauses', 'unique')

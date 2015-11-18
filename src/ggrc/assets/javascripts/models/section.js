@@ -97,8 +97,7 @@ can.Model.Cacheable("CMS.Models.Clause", {
   , update: "PUT /api/clauses/{id}"
   , destroy: "DELETE /api/clauses/{id}"
   , is_custom_attributable: true
-  , mixins : ["ownable", "contactable"]
-
+  , mixins : ["ownable", "contactable", "unique_title"]
   , attributes : {
       context : "CMS.Models.Context.stub"
     , owners: "CMS.Models.Person.stubs"
