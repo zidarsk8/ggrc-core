@@ -23,4 +23,5 @@ def resolve_duplicates(model, attr, separator=u"-"):
       nattr = "{}{}{}".format(getattr(v, attr, model.type), separator, i)
     setattr(v, attr, nattr)
     db.session.add(v)
+    db.session.flush()
   db.session.commit()
