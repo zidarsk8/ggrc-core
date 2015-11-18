@@ -140,7 +140,7 @@
         $('.header-content').next('.content').removeClass('affixed');
       }
     });
-    $body.on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose, .mapped-list .openclose', function(evnt) {
+    $body.on('click', 'ul.tree-structure .item-main .grcobject, ul.tree-structure .item-main .openclose', function(evnt) {
       evnt.stopPropagation();
       $(this).openclose();
     });
