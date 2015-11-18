@@ -197,7 +197,7 @@ class UserColumnHandler(ColumnHandler):
       if email != "":
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
       elif self.mandatory:
-        self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.key)
+        self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return person
 
   def get_value(self):
