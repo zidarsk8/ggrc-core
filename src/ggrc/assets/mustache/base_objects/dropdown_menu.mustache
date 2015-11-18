@@ -13,7 +13,9 @@
    or #is_allowed' 'update' instance '\
    ' context='for'}}
 <div class="details-wrap">
-  <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+  <a data-test-id="button_settings_0839163b" class="btn btn-small btn-draft
+  dropdown-toggle"
+  href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
   <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
     {{#is_allowed 'update' instance context='for'}}
       {{> /static/mustache/base_objects/edit_object_link.mustache}}
@@ -43,7 +45,12 @@
 
     {{#is_allowed 'delete' instance}}
       <li>
-        <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+        <a data-test-id="dropdown_delete_0839163b"
+           data-toggle="modal-ajax-deleteform"
+           data-object-plural="{{model.table_plural}}"
+           data-object-singular="{{model.model_singular}}"
+           data-modal-reset="reset" data-modal-class="modal"
+           data-object-id="{{instance.id}}" href="javascript://">
           <i class="grcicon-deleted"></i>
           Delete
         </a>

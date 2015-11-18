@@ -8,7 +8,7 @@
 {{! transcluded via renderLive in, for example, assets/mustache/sections/tier2_content.mustache }}
 {{#instance}}
   <div class="row-fluid wrap-row">
-    <div class="span6">
+    <div data-test-id="title_0ad9fbaf" class="span6">
       <h6>Title</h6>
       <h3>{{title}}</h3>
       {{#if type}}
@@ -17,14 +17,15 @@
       </p>
       {{/if}}
     </div>
-    <div class="span6">
+    <div data-test-id="title_state_0ad9fbaf" class="span6">
       {{#if status}}
         <h6>State</h6>
-        <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+        <span data-test-id="title_state_value_0ad9fbaf" class="state-value
+              state-{{to_class status '_'}}">{{status}}</span>
       {{/if}}
     </div>
   </div>
-  <div class="row-fluid wrap-row">
+  <div data-test-id="title_review_0ad9fbaf" class="row-fluid wrap-row">
     <div class="span12">
       <h6>Object Review</h6>
       {{#if class}}
