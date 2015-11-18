@@ -8,13 +8,20 @@ from sqlalchemy import and_
 from sqlalchemy.orm import aliased
 
 
-def resolve_duplicates(model, attr):
+def resolve_duplicates(model, attr, separator=u"-"):
   v0, v1 = aliased(model, name="v0"), aliased(model, name="v1")
   query = db.session.query(v0).join(v1, and_(
       getattr(v0, attr) == getattr(v1, attr),
       v0.id > v1.id
   ))
   for v in query:
-    setattr(v, attr, getattr(v, attr, model.type) + u"-" + unicode(v.id))
+    i = 0
+    nattr = "{}{}{}".format(getattr(v, attr, model.type), separator, i)
+    while db.session.query(model).\
+            filter(getattr(model, attr) == nattr).count():
+      i += 1
+      nattr = "{}{}{}".format(getattr(v, attr, model.type), separator, i)
+    setattr(v, attr, nattr)
     db.session.add(v)
+    db.session.flush()
   db.session.commit()
