@@ -709,9 +709,9 @@
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
       audits: Direct("Audit", "requests", "audit"),
       urls: TypeFilter("related_objects", "Document"),
-      related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee"),
-      related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester"),
-      related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier"),
+      related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee", "Person"),
+      related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester", "Person"),
+      related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
       info_related_objects: Multi([
         "related_access_groups", "related_data_assets",
         "related_facilities", "related_markets", "related_org_groups",
