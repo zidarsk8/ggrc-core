@@ -1021,8 +1021,9 @@ can.Component.extend({
 
       if (!changes.length) {
         if (instance && instance._pending_joins && instance._pending_joins.length) {
-          return instance.constructor.resolve_deferred_bindings(instance);
+          instance.delay_resolving_save_until(instance.constructor.resolve_deferred_bindings(instance));
         }
+
         return;
       }
       this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
@@ -1037,7 +1038,7 @@ can.Component.extend({
           }
         }
       );
-      return that.scope.instance.constructor.resolve_deferred_bindings(that.scope.instance);
+      instance.delay_resolving_save_until(that.scope.instance.constructor.resolve_deferred_bindings(that.scope.instance));
     },
     "{parent_instance} updated": "deferred_update",
     "{parent_instance} created": "deferred_update",
