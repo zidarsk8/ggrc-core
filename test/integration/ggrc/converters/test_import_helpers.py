@@ -305,6 +305,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Program"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Internal Audit Lead"]["mandatory"])
 
