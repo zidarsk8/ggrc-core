@@ -124,21 +124,14 @@ class RowConverter(object):
   def get_object_by_key(self, key="slug"):
     """ Get object if the slug is in the system or return a new object """
     value = self.get_value(key)
-    if value is None:
-      column_name = "Code" if key == slug else "Email"
-      self.add_error(errors.MISSING_COLUMN, s="", column_names=column_name)
-      return
-    obj = None
     self.is_new = False
-    if value:
-      obj = self.find_by_key(key, value)
+    obj = self.find_by_key(key, value)
     if not obj:
       obj = self.object_class()
       self.is_new = True
     elif not permissions.is_allowed_update_for(obj):
       self.ignore = True
       self.add_error(errors.PERMISSION_ERROR)
-
     return obj
 
   def setup_secondary_objects(self, slugs_dict):
