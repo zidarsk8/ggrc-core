@@ -36,24 +36,13 @@
     </div>
 
     <div class="span6 hide-wrap hidable">
-
-      <div class="row-fluid inner-hide">
-        <div data-id="owner_hidden" class="span12 hidable bottom-spacing">
+      <div class="span6 hide-wrap">
+        <div class="row-fluid inner-hide">
+          <div data-id="owner_hidden" class="span12 hidable bottom-spacing">
             {{> /static/mustache/people/owners_modal_connector.mustache}}
+          </div>
         </div>
-      </div>
-
-      <div class="row-fluid inner-hide">
-        <div class="span12 hidable">
-          {{#using contact=instance.contact}}
-          <label>
-            Contact
-            <i class="grcicon-help-black" rel="tooltip" title="Point of contact for this object"></i>
-            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-          </label>
-          <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
-          {{/using}}
-        </div>
+        {{> /static/mustache/base_objects/modal_contact_fields.mustache}}
       </div>
     </div>
   </div>
