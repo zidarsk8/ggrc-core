@@ -140,14 +140,13 @@
 
     // Init widget descriptors:
     can.each(sorted_widget_types, function (model_name) {
+      var widgets_by_type = GGRC.tree_view.base_widgets_by_type,
+          model;
 
-      if (model_name === 'MultitypeSearch') {
+      if (model_name === "MultitypeSearch" || !widgets_by_type[model_name]) {
         return;
       }
-
-      var model = CMS.Models[model_name],
-          widgets_by_type = GGRC.tree_view.base_widgets_by_type;
-
+      model = CMS.Models[model_name];
       widgets_by_type[model_name] = widgets_by_type[model_name].concat(["Risk", "Threat"]);
 
       related_object_descriptors[model_name] = {

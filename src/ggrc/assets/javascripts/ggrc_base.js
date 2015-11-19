@@ -8,6 +8,14 @@
   GGRC.mustache_path = '/static/mustache';
 
   GGRC.hooks = GGRC.hooks || {};
+  GGRC.extensions = GGRC.extensions || [];
+  if (!GGRC.widget_descriptors) {
+    GGRC.widget_descriptors = {};
+  }
+  if (!GGRC.default_widgets) {
+    GGRC.default_widgets = [];
+  }
+
   GGRC.register_hook = function(path, hook) {
     var h, parent_path, last;
     parent_path = path.split(".");
@@ -25,64 +33,7 @@
       fragment = window.location.hash;
     return window.encodeURIComponent(path + fragment);
   });
-  GGRC.extensions = GGRC.extensions || [];
-  GGRC.extensions.push({
-    name: "core",
 
-    object_type_decision_tree: function() {
-      return {
-        "program": CMS.Models.Program,
-        "audit": CMS.Models.Audit, /*, "directive" : {
-  _discriminator: function(data) {
-    var model_i, model;
-    models =  [CMS.Models.Regulation, CMS.Models.Policy, CMS.Models.Contract];
-    for (model_i in models) {
-      model = models[model_i];
-      if (model.meta_kinds.indexOf(data.kind) >= 0) {
-        return model;
-      }
-    }
-    throw new ModelError("Invalid Directive#kind value '" + data.kind + "'", data);
-  }
-}*/
-
-        "contract": CMS.Models.Contract,
-        "policy": CMS.Models.Policy,
-        "standard": CMS.Models.Standard,
-        "regulation": CMS.Models.Regulation,
-        "org_group": CMS.Models.OrgGroup,
-        "vendor": CMS.Models.Vendor,
-        "project": CMS.Models.Project,
-        "facility": CMS.Models.Facility,
-        "product": CMS.Models.Product,
-        "data_asset": CMS.Models.DataAsset,
-        "access_group": CMS.Models.AccessGroup,
-        "market": CMS.Models.Market,
-        "system_or_process": {
-          _discriminator: function(data) {
-            if (data.is_biz_process)
-              return CMS.Models.Process;
-            else
-              return CMS.Models.System;
-          }
-        },
-        "system": CMS.Models.System,
-        "process": CMS.Models.Process,
-        "control": CMS.Models.Control,
-        "control_assessment": CMS.Models.ControlAssessment,
-        "request": CMS.Models.Request,
-        "issue" : CMS.Models.Issue,
-        "objective": CMS.Models.Objective,
-        "section": CMS.Models.Section,
-        "clause": CMS.Models.Clause,
-        "person": CMS.Models.Person,
-        "role": CMS.Models.Role,
-        "threat": CMS.Models.Threat,
-        "vulnerability": CMS.Models.Vulnerability,
-        "template": CMS.Models.Template
-      };
-    }
-  });
   var onbeforeunload = function (evnt) {
       evnt = evnt || window.event;
       var message = 'There are operations in progress. Are you sure you want to leave the page?';
@@ -145,7 +96,7 @@
       if (!data) {
         return null;
       } else {
-        return can.reduce(Object.keys(data), function(a, b) {
+        return can.reduce(Object.keys(data), function (a, b) {
           return a || resolve(decision_tree[b], data[b]);
         }, null);
       }
