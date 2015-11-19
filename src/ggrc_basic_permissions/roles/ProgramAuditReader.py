@@ -27,22 +27,10 @@ permissions = {
         "UserRole",
         "Context",
     ],
-    "create": [
-        "DocumentationResponse",
-        "InterviewResponse",
-        "Response",
-        "ObjectDocument",
-        "ObjectPerson",
-        "Relationship",
-        "Document"
-    ],
+    "create": [],
     "view_object_page": [
         "__GGRC_ALL__"
     ],
     "update": [],
-    "delete": [
-        "ObjectDocument",
-        "ObjectPerson",
-        "Relationship"
-    ]
+    "delete": []
 }
