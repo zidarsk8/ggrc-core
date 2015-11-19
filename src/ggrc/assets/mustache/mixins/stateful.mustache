@@ -14,12 +14,12 @@
       <button href="javascript://" class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
     {{/if_equals}}
     {{#if_equals instance.status "Finished"}}
-      <button href="javascript://" class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Verified">Verify</button>
-      <button href="javascript://" class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="In Progress">Decline</button>
+      <button href="javascript://" class="btn btn-small btn-success pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Verified">Verify</button>
+      <button href="javascript://" class="btn btn-small btn-danger pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="In Progress">Decline</button>
     {{/if_equals}}
 
     {{#instance._undo.0}}
-        <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo {{instance._disabled}}">Undo</a>
+        <a href="javascript://" data-name="status" data-value="{{instance._undo.0}}" data-undo="true" class="undo btn-info-pin-header pull-right {{instance._disabled}}">Undo</a>
     {{/instance._undo.0}}
   </div>
 {{/is_allowed }}

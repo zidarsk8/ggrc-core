@@ -341,6 +341,11 @@ small {
 // buttons
 .btn-info-pin-header {
   margin-top: 18px;
+  margin-right: 10px;
+  &.undo {
+    margin-right: 10px;
+    margin-top: 22px;
+  }
 }
 .btn {
   @include btn-size();
