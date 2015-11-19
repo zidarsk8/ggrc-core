@@ -57,7 +57,8 @@
       ".person-selector input autocomplete:select": function (el, ev, ui) {
         var person = ui.item,
             destination = this.scope.instance,
-            deferred = this.scope.deferred;
+            deferred = this.scope.deferred,
+            model;
 
         if (deferred === "true") {
           destination.mark_for_addition("related_objects_as_destination", person, {
@@ -66,22 +67,30 @@
             }
           });
         } else {
-          new CMS.Models.Relationship({
-            attrs: {
-              "AssigneeType": can.capitalize(this.scope.type),
-            },
-            source: {
-              href: person.href,
-              type: person.type,
-              id: person.id
-            },
-            context: {},
-            destination: {
-              href: destination.href,
-              type: destination.type,
-              id: destination.id
-            }
-          }).save();
+          model = CMS.Models.Relationship.get_relationship(person, destination);
+          if (!model) {
+            model = new CMS.Models.Relationship({
+              attrs: {
+                "AssigneeType": can.capitalize(this.scope.type),
+              },
+              source: {
+                href: person.href,
+                type: person.type,
+                id: person.id
+              },
+              context: {},
+              destination: {
+                href: destination.href,
+                type: destination.type,
+                id: destination.id
+              }
+            });
+          }
+          model.refresh().then(function () {
+            var type = model.attr("attrs.AssigneeType");
+            model.attr("attrs.AssigneeType", can.capitalize(this.scope.type) + (type ? "," + type : ""));
+            model.save();
+          }.bind(this));
         }
       },
     },

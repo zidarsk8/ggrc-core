@@ -507,6 +507,7 @@
         binding.source_binding.list.bind("add", function (ev, results) {
           if (binding._refresh_stubs_deferred && binding._refresh_stubs_deferred.state() !== "pending") {
             var matching_results = can.map(can.makeArray(results), function(result) {
+              // console.log("MATCHING RESULTS", arguments);
               if (self.filter_fn(result)) {
                 return self.make_result(result.instance, [result], binding);
               }
@@ -743,12 +744,13 @@
             return item.instance.id === id;
           }));
         }
+
         CMS.Models.Relationship.bind("updated", function (ev, model) {
           if (!(model instanceof CMS.Models.Relationship)) {
             return;
           }
           var value = can.getObject("attrs." + this.prop_name, model),
-              needle, active, activeInList;
+              needle, active, activeInList, contains;
 
           if (model.source.type === this.object_type) {
             needle = model.source;
@@ -764,9 +766,12 @@
           if (!active) {
             return;
           }
-          if (!_.contains(value.split(","), this.keyword) &&
-              activeInList) {
+          contains = _.contains(value.split(","), this.keyword);
+          if (!contains && activeInList) {
             this.remove_instance(binding, active.instance, active);
+          }
+          if (contains && !activeInList) {
+            this.insert_results(binding, [active]);
           }
         }.bind(this));
       }

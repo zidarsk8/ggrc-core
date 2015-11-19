@@ -121,6 +121,18 @@ can.Model.Join("CMS.Models.Relationship", {
   , create: "POST /api/relationships"
   , update: "PUT /api/relationships/{id}"
   , destroy: "DELETE /api/relationships/{id}"
+  , get_relationship: function (source, destination) {
+    return _.first(_.filter(CMS.Models.Relationship.cache, function (model) {
+        return model.source.type === source.type &&
+                model.source.id === source.id &&
+                model.destination.type === destination.type &&
+                model.destination.id === destination.id ||
+                model.source.type === destination.type &&
+                model.source.id === destination.id &&
+                model.destination.type === source.type &&
+                model.destination.id === source.id;
+      }));
+  }
 }, {
   reinit: function() {
     var that = this;
