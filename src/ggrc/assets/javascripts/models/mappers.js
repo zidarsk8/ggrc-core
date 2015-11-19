@@ -507,7 +507,6 @@
         binding.source_binding.list.bind("add", function (ev, results) {
           if (binding._refresh_stubs_deferred && binding._refresh_stubs_deferred.state() !== "pending") {
             var matching_results = can.map(can.makeArray(results), function(result) {
-              // console.log("MATCHING RESULTS", arguments);
               if (self.filter_fn(result)) {
                 return self.make_result(result.instance, [result], binding);
               }
@@ -768,7 +767,7 @@
           }
           contains = _.contains(value.split(","), this.keyword);
           if (!contains && activeInList) {
-            this.remove_instance(binding, active.instance, active);
+            binding.list.splice(binding.list.indexOf(active), 1);
           }
           if (contains && !activeInList) {
             this.insert_results(binding, [active]);
