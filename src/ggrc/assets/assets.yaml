@@ -199,6 +199,7 @@ dashboard-js-template-files:
   - issues/remediation_plan.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
+  - custom_attributes/expanded_attrs.mustache
   - custom_attribute_definitions/modal_content.mustache
   - custom_attribute_definitions/tree.mustache
   - custom_attribute_definitions/subtree.mustache
