@@ -574,12 +574,7 @@
       extended_related_issues_via_search: TypeFilter("related_objects_via_search", "Issue"),
       extended_related_control_assessment_via_search: TypeFilter("related_objects_via_search", "ControlAssessment"),
       extended_related_request_via_search: TypeFilter("related_objects_via_search", "Request"),
-      audit_requests: Search(function (binding) {
-        return CMS.Models.Request.findAll({
-          'assignee_id': binding.instance.id
-        });
-      }, 'Request'),
-      open_audit_requests: CustomFilter('audit_requests', function (result) {
+      open_audit_requests: CustomFilter('extended_related_request_via_search', function (result) {
         return result.instance.status !== 'Accepted';
       }),
       all_audit_requests: Search(function (binding) {
