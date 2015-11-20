@@ -85,8 +85,11 @@
                 id: destination.id
               }
             });
+            model = new $.Deferred().resolve(model);
+          } else {
+            model = model.refresh();
           }
-          model.refresh().then(function () {
+          model.then(function (model) {
             var type = model.attr("attrs.AssigneeType");
             model.attr("attrs.AssigneeType", can.capitalize(this.scope.type) + (type ? "," + type : ""));
             model.save();
