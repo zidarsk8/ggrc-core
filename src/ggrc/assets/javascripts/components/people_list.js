@@ -11,14 +11,7 @@
     template: can.view(GGRC.mustache_path + "/base_templates/people_list.mustache"),
     scope: {
       editable: "@",
-      deferred: "@",
-      groups: {
-        "verifier": [],
-        "assignee": [],
-        "requester": []
-      }
-    },
-    events: {
+      deferred: "@"
     }
   });
 
@@ -65,9 +58,14 @@
       },
     },
     helpers: {
+      can_unmap: function (options) {
+        if (this.attr("instance").get_mapping(this.attr("mapping")).length > 1) {
+          return options.fn(options.context);
+        }
+        return options.inverse(options.context);
+      },
       show_add: function (options) {
-        if (this.attr("editable") === "true" && _.isNull(this.attr("limit")) ||
-            +this.attr("limit") < this.attr("people").length) {
+        if (this.attr("editable") === "true") {
           return options.fn(options.context);
         }
         return options.inverse(options.context);
