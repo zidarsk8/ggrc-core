@@ -9,6 +9,21 @@
   background-color: $white;
 }
 
+.field-hide {
+  display: none;
+  .modal & {
+    display: block;
+    float: right;
+    color: $warmGray;
+    font-size: 12px;
+    text-decoration: underline;
+    margin-top: 3px;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
 .modal {
   @include border-radius(2px);
   width:700px;
@@ -341,17 +356,6 @@
       i {
         margin-top:2px;
       }
-    }
-  }
-  .field-hide {
-    display: inline-block;
-    float: right;
-    color: $warmGray;
-    font-size: 12px;
-    text-decoration: underline;
-    margin-top: 3px;
-    &:hover {
-      text-decoration: none;
     }
   }
   .reset-form {

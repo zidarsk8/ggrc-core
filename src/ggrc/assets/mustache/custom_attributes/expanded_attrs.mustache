@@ -1,0 +1,42 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: urban@reciprocitylabs.com
+    Maintained By: urban@reciprocitylabs.com
+}}
+
+<custom-attributes instance="instance" load="true">
+{{#if instance.custom_attribute_definitions.length}}
+  {{#iterate_by_two instance.custom_attribute_definitions}}
+    <div class="row-fluid wrap-row">
+      <div class="span12">
+        <h6>Custom Attributes</h6>
+        {{#list}}
+        <div class="span6">
+          <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
+            {{#with_value_for_id id}}
+              {{#switch attribute_type}}
+                {{#case 'Checkbox'}}
+                  <h6>
+                    <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+                    {{title}}
+                  </h6>
+                {{/case}}
+                {{#case 'Rich Text'}}
+                  <h6>{{title}}</h6>
+                  {{{value}}}
+                {{/case}}
+                {{#default}}
+                  <h6>{{title}}</h6>
+                  {{value}}
+                {{/default}}
+              {{/switch}}
+            {{/with_value_for_id}}
+          </div>
+        </div>
+      {{/list}}
+      </div>
+    </div>
+  {{/instance.custom_attribute_definitions}}
+{{/if}}
+</custom-attributes>

@@ -23,12 +23,14 @@
     {{#results}}
       <li>
         {{#is_allowed 'update'}}
+        {{#can_unmap}}
         <span class="file-controls">
           <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{instance.id}}>
             <span class="result" {{data 'result'}}></span>
             <i class="grcicon-deleted"></i>
           </a>
         </span>
+        {{/can_unmap}}
         {{/is_allowed}}
         {{{render '/static/mustache/people/popover.mustache' person=instance}}}
       </li>

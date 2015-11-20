@@ -128,6 +128,11 @@ environment.register("dashboard-js", webassets.Bundle(
   #filters='jsmin',
   output='dashboard' + version_suffix + '.js'))
 
+environment.register("app-init-js", webassets.Bundle(
+  *asset_paths['app-init-files'],
+  #filters='jsmin',
+  output='app-init' + version_suffix + '.js'))
+
 environment.register("dashboard-js-templates", webassets.Bundle(
   *asset_paths['dashboard-js-template-files'],
   filters=MustacheFilter,

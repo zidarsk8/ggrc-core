@@ -10,6 +10,7 @@ from .user_permissions import UserPermissions
 from ggrc.rbac.permissions import permissions_for as find_permissions
 from ggrc.rbac.permissions import is_allowed_create
 from ggrc.models import get_model
+from ggrc.models import Person
 
 Permission = namedtuple('Permission', 'action resource_type resource_id context_id')
 
@@ -106,6 +107,9 @@ def relationship_condition(instance, action, property_name):
        getattr(obj.context, 'id') == context_id and \
        is_allowed_create('Relationship', None, context_id):
       return True
+    # Mapping a person does not require a permission check on the Person object
+    if isinstance(obj, Person):
+      continue
     if not find_permissions()._is_allowed_for(obj, action):
       return False
   return True

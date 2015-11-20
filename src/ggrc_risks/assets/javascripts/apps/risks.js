@@ -96,12 +96,16 @@
         },
         related_threats: TypeFilter("related_objects", "Threat"),
       },
+      ownable: {
+        owners: Proxy(
+          "Person", "person", "ObjectOwner", "ownable", "object_owners")
+      },
       Risk: {
-        _mixins: ['related', 'related_objects', 'related_threat'],
+        _mixins: ['related', 'related_objects', 'related_threat', 'ownable'],
         orphaned_objects: Multi([]),
       },
       Threat: {
-        _mixins: ['related', 'related_objects', 'related_risk'],
+        _mixins: ['related', 'related_objects', 'related_risk', 'ownable'],
         orphaned_objects: Multi([])
       },
       Person: {
@@ -136,14 +140,13 @@
 
     // Init widget descriptors:
     can.each(sorted_widget_types, function (model_name) {
+      var widgets_by_type = GGRC.tree_view.base_widgets_by_type,
+          model;
 
-      if (model_name === 'MultitypeSearch') {
+      if (model_name === "MultitypeSearch" || !widgets_by_type[model_name]) {
         return;
       }
-
-      var model = CMS.Models[model_name],
-          widgets_by_type = GGRC.tree_view.base_widgets_by_type;
-
+      model = CMS.Models[model_name];
       widgets_by_type[model_name] = widgets_by_type[model_name].concat(["Risk", "Threat"]);
 
       related_object_descriptors[model_name] = {

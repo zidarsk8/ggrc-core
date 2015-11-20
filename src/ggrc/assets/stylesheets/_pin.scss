@@ -233,10 +233,6 @@
   }
 }
 
-.file-list-wrap {
-  margin: 5px 0 0 12px;
-}
-
 .attachment-list {
   @extend %reset-list;
   .date {
@@ -305,7 +301,7 @@
 }
 
 .left-spacing {
-  margin-left: 30px;
+  margin-left: 35px;
 }
 
 .mapped-list {
