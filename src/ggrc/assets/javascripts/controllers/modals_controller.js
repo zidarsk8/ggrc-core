@@ -1015,28 +1015,26 @@ can.Component.extend({
       }
     },
     deferred_update: function () {
-      var that = this,
-          changes = this.scope.changes,
+      var changes = this.scope.changes,
           instance = this.scope.instance;
 
       if (!changes.length) {
         if (instance && instance._pending_joins && instance._pending_joins.length) {
           instance.delay_resolving_save_until(instance.constructor.resolve_deferred_bindings(instance));
         }
-
         return;
       }
       this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
       can.each(
         changes,
         function(item) {
-          var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
+          var mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, item.what.constructor.shortName);
           if (item.how === "add") {
-            that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
+            this.scope.instance.mark_for_addition(mapping, item.what, item.extra);
           } else {
-            that.scope.instance.mark_for_deletion(mapping, item.what);
+            this.scope.instance.mark_for_deletion(mapping, item.what);
           }
-        }
+        }.bind(this)
       );
       this.scope.instance.delay_resolving_save_until(this.scope.instance.constructor.resolve_deferred_bindings(this.scope.instance));
     },
