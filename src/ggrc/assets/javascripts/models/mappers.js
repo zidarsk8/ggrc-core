@@ -504,18 +504,19 @@
         } else {
           binding.source_binding = this.source;
         }
-        binding.source_binding.list.bind("add", function(ev, results) {
+        binding.source_binding.list.bind("add", function (ev, results) {
           if (binding._refresh_stubs_deferred && binding._refresh_stubs_deferred.state() !== "pending") {
             var matching_results = can.map(can.makeArray(results), function(result) {
-              if (self.filter_fn(result))
+              if (self.filter_fn(result)) {
                 return self.make_result(result.instance, [result], binding);
+              }
             });
             self.insert_results(binding, matching_results);
           }
         });
 
-        binding.source_binding.list.bind("remove", function(ev, results) {
-          can.each(results, function(result) {
+        binding.source_binding.list.bind("remove", function (ev, results) {
+          can.each(results, function (result) {
             self.remove_instance(binding, result.instance, result);
           });
         });
@@ -712,10 +713,13 @@
 
   GGRC.ListLoaders.StubFilteredListLoader("GGRC.ListLoaders.AttrFilteredListLoader", {
     }, {
-      init: function (source, prop, value) {
+      init: function (source, prop, value, type) {
         var filter_fn = function (binding) {
-          if (!binding.mappings) return;
-          return _.any(binding.mappings, function(mapping) {
+          // TODO: We should filter by type as well
+          if (!binding.mappings) {
+            return;
+          }
+          return _.any(binding.mappings, function (mapping) {
             instance = mapping.instance;
             if (instance instanceof CMS.Models.Relationship) {
               if (_.exists(instance, "attrs") &&
@@ -727,7 +731,48 @@
             return filter_fn(mapping);
           });
         };
+        this.prop_name = prop;
+        this.keyword = value;
+        this.object_type = type;
         this._super(source, filter_fn);
+      },
+      init_listeners: function (binding) {
+        this._super(binding);
+        function itemFromList (list, id) {
+          return _.first(can.makeArray(list).filter(function (item) {
+            return item.instance.id === id;
+          }));
+        }
+
+        CMS.Models.Relationship.bind("updated", function (ev, model) {
+          if (!(model instanceof CMS.Models.Relationship)) {
+            return;
+          }
+          var value = can.getObject("attrs." + this.prop_name, model),
+              needle, active, activeInList, contains;
+
+          if (model.source.type === this.object_type) {
+            needle = model.source;
+          } else if (model.destination.type === this.object_type) {
+            needle = model.destination;
+          }
+          if (!needle || !value) {
+            return;
+          }
+          active = itemFromList(binding.source_binding.list, needle.id);
+          activeInList = itemFromList(binding.list, needle.id);
+
+          if (!active) {
+            return;
+          }
+          contains = _.contains(value.split(","), this.keyword);
+          if (!contains && activeInList) {
+            binding.list.splice(binding.list.indexOf(active), 1);
+          }
+          if (contains && !activeInList) {
+            this.insert_results(binding, [active]);
+          }
+        }.bind(this));
       }
   });
 
@@ -1677,8 +1722,8 @@
     return new GGRC.ListLoaders.TypeFilteredListLoader(source, [model_name]);
   }
 
-  GGRC.MapperHelpers.AttrFilter = function AttrFilter(source, filter_name, keyword) {
-    return new GGRC.ListLoaders.AttrFilteredListLoader(source, filter_name, keyword);
+  GGRC.MapperHelpers.AttrFilter = function AttrFilter(source, filter_name, keyword, type) {
+    return new GGRC.ListLoaders.AttrFilteredListLoader(source, filter_name, keyword, type);
   }
 
   GGRC.MapperHelpers.CustomFilter = function CustomFilter(source, filter_fn) {

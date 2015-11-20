@@ -12,13 +12,6 @@
     scope: {
       editable: "@",
       deferred: "@",
-      groups: {
-        "verifier": [],
-        "assignee": [],
-        "requester": []
-      },
-    },
-    events: {
     }
   });
 
@@ -31,15 +24,16 @@
       required: "@",
       type: "@",
       toggle_add: false,
-      remove_role: function(parent_scope, target) {
-        var person = CMS.Models.Person.findInCacheById(target.data("person"));
-        var rel = function (obj) {
-          return _.map(obj.related_sources.concat(obj.related_destinations), function(r) {
-            return r.id;
-          });
-        };
-        var ids = _.intersection(rel(person), rel(this.instance));
-        var type = this.type;
+      remove_role: function (parent_scope, target) {
+        var person = CMS.Models.Person.findInCacheById(target.data("person")),
+            rel = function (obj) {
+              return _.map(obj.related_sources.concat(obj.related_destinations), function (r) {
+                return r.id;
+              });
+            },
+            ids = _.intersection(rel(person), rel(this.instance)),
+            type = this.attr("type");
+
         _.each(ids, function (id) {
           var rel = CMS.Models.Relationship.findInCacheById(id);
           if (rel.attrs && rel.attrs.AssigneeType) {
@@ -48,18 +42,23 @@
               roles = _.filter(roles, function (role) {
                 return role && (role.toLowerCase() !== type);
               });
-              rel.attrs.attr("AssigneeType", roles.join(","));
-              rel.save();
-            });
+              if (roles.length) {
+                rel.attrs.attr("AssigneeType", roles.join(","));
+                rel.save();
+              } else {
+                rel.destroy();
+              }
+            }.bind(this));
           }
-        });
+        }, this);
       },
     },
     events: {
       ".person-selector input autocomplete:select": function (el, ev, ui) {
         var person = ui.item,
             destination = this.scope.instance,
-            deferred = this.scope.deferred;
+            deferred = this.scope.deferred,
+            model;
 
         if (deferred === "true") {
           destination.mark_for_addition("related_objects_as_destination", person, {
@@ -68,29 +67,37 @@
             }
           });
         } else {
-          new CMS.Models.Relationship({
-            attrs: {
-              "AssigneeType": can.capitalize(this.scope.type),
-            },
-            source: {
-              href: person.href,
-              type: person.type,
-              id: person.id
-            },
-            context: {},
-            destination: {
-              href: destination.href,
-              type: destination.type,
-              id: destination.id
-            }
-          }).save();
+          model = CMS.Models.Relationship.get_relationship(person, destination);
+          if (!model) {
+            model = new CMS.Models.Relationship({
+              attrs: {
+                "AssigneeType": can.capitalize(this.scope.type),
+              },
+              source: {
+                href: person.href,
+                type: person.type,
+                id: person.id
+              },
+              context: {},
+              destination: {
+                href: destination.href,
+                type: destination.type,
+                id: destination.id
+              }
+            });
+          }
+          model.refresh().then(function () {
+            var type = model.attr("attrs.AssigneeType");
+            model.attr("attrs.AssigneeType", can.capitalize(this.scope.type) + (type ? "," + type : ""));
+            model.save();
+          }.bind(this));
         }
       },
     },
     helpers: {
       show_add: function (options) {
         if (this.attr("editable") === "true" && _.isNull(this.attr("limit")) ||
-            +this.attr("limit") < this.attr("people").length) {
+            +this.attr("limit") < this.attr("instance").get_mapping(this.attr("mapping")).length) {
           return options.fn(options.context);
         }
         return options.inverse(options.context);
