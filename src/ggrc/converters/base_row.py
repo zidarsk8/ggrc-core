@@ -86,10 +86,10 @@ class RowConverter(object):
   def chect_mandatory_fields(self):
     if not self.is_new or self.is_delete:
       return
-    mandatory = [key for key, header in
-                 self.block_converter.object_headers.items()
-                 if header["mandatory"]]
-    missing = set(mandatory).difference(set(self.headers.keys()))
+    headers = self.block_converter.object_headers
+    mandatory = [key for key, header in headers.items() if header["mandatory"]]
+    missing_keys = set(mandatory).difference(set(self.headers.keys()))
+    missing = [headers[key]["display_name"] for key in missing_keys]
     if missing:
       self.add_error(errors.MISSING_COLUMN,
                      s="s" if len(missing) > 1 else "",
@@ -124,20 +124,14 @@ class RowConverter(object):
   def get_object_by_key(self, key="slug"):
     """ Get object if the slug is in the system or return a new object """
     value = self.get_value(key)
-    if value is None:
-      self.add_error(errors.MISSING_COLUMN, s="", column_names=key)
-      return
-    obj = None
     self.is_new = False
-    if value:
-      obj = self.find_by_key(key, value)
+    obj = self.find_by_key(key, value)
     if not obj:
       obj = self.object_class()
       self.is_new = True
     elif not permissions.is_allowed_update_for(obj):
       self.ignore = True
       self.add_error(errors.PERMISSION_ERROR)
-
     return obj
 
   def setup_secondary_objects(self, slugs_dict):

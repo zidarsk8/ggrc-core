@@ -67,8 +67,7 @@
                   {{/prune_context}}
                 </ggrc-quick-add>
               {{else}}
-                <br>
-                  <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+ Add URL</a>
+                <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+ Add URL</a>
               {{/toggle}}
               {{/is_allowed}}
               </ul>
@@ -78,6 +77,12 @@
           <div class="row-fluid wrap-row">
             <div class="span12">
               {{{render "/static/mustache/base_templates/mapped_objects.mustache" instance=. update_count="false"}}}
+            </div>
+          </div>
+          <hr />
+          <div class="row-fluid wrap-row">
+            <div class="span12">
+              {{> /static/mustache/custom_attributes/expanded_attrs.mustache }}
             </div>
           </div>
 
@@ -122,14 +127,15 @@
 
         <div class="tab-content">
           <div class="tab-pane fade in active" id="tab1">
-            {{^if_equals status "Verified"}}
+            {{#if_helpers '\
+              ^if_equals' status 'Verified' '\
+              and ^if_equals' status 'Finished' }}
             <div class="tree-item-add">
-              <add-comment data="comments"></add-comment>
+              <add-comment data="comments" source_mapping="instance"></add-comment>
             </div>
             {{/if_equals}}
             {{{render "/static/mustache/base_templates/comment_list.mustache" instance=. update_count="false"}}}
           </div>
-
         </div>
       </div>
     </div>

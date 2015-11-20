@@ -51,8 +51,15 @@
   // Initialize widgets for risk assessment page
   RiskAssessmentsExtension.init_widgets = function init_widgets() {
     var descriptor = {},
-        page_instance = GGRC.page_instance();
+        page_instance = GGRC.page_instance(),
+        tree_widgets = GGRC.tree_view.base_widgets_by_type;
 
+    _.each(_risk_assessments_object_types, function (type) {
+      if (!type || !tree_widgets[type]) {
+        return;
+      }
+      tree_widgets[type] = tree_widgets[type].concat(["RiskAssessment"]);
+    });
     if (page_instance && ~can.inArray(page_instance.constructor.shortName, _risk_assessments_object_types)) {
       descriptor[page_instance.constructor.shortName] = {
         risk_assessments: {
@@ -70,7 +77,7 @@
       };
     }
     new GGRC.WidgetList("ggrc_risk_assessments", descriptor);
-  }
+  };
 
   RiskAssessmentsExtension.init_mappings();
 

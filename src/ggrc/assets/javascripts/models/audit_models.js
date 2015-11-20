@@ -343,6 +343,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
   , mixins : ["unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , assignee : "CMS.Models.Person.stub"
@@ -350,6 +351,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     , due_on : "date"
     , documents : "CMS.Models.Document.stubs"
     , audit : "CMS.Models.Audit.stub"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
     status : "Unstarted"

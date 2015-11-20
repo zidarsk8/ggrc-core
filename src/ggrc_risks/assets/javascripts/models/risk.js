@@ -33,7 +33,7 @@
 
     init: function() {
       this._super && this._super.apply(this, arguments);
-      var req_fields = ["title", "description", "contact", "owners"];
+      var req_fields = ["title", "description", "contact"];
       for (var i = 0; i < req_fields.length; i++) {
         this.validatePresenceOf(req_fields[i]);
       }

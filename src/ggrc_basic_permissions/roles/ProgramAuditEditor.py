@@ -50,25 +50,6 @@ permissions = {
     ],
     "update": [
         {
-            "terms": {
-                "property_name": "status",
-                "value": [
-                    "Requested",
-                    "Amended Request"
-                ]
-            },
-            "type": "Request",
-            "condition": "in"
-        },
-        {
-            "terms": {
-                "property_name": "assignee",
-                "value": "$current_user"
-            },
-            "type": "Request",
-            "condition": "is"
-        },
-        {
             "type": "ControlAssessment",
             "terms": {
                 "list_property": "owners",
@@ -84,6 +65,7 @@ permissions = {
             },
             "condition": "contains"
         },
+        "Request",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
