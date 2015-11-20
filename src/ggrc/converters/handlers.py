@@ -67,9 +67,9 @@ class ColumnHandler(object):
     if not self.value:
       return
     nr_duplicates = self.row_converter.object_class.query.filter(and_(
-          getattr(self.row_converter.object_class, self.key) == self.value,
-          self.row_converter.object_class.id != self.row_converter.obj.id
-      )).count()
+        getattr(self.row_converter.object_class, self.key) == self.value,
+        self.row_converter.object_class.id != self.row_converter.obj.id
+    )).count()
     if nr_duplicates > 0:
       self.add_error(errors.DUPLICATE_VALUE,
                      column_name=self.key,

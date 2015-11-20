@@ -134,7 +134,6 @@ class TestBasicCsvImport(converters.TestCase):
         "Line 3: title 'will this work' already exists.Record will be ignored."
     ])
 
-
   def test_control_assessments_import_update(self):
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
