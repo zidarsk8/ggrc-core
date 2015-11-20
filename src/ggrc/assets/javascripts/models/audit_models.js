@@ -414,7 +414,19 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validateNonBlank("requested_on");
     this.validatePresenceOf("audit");
 
-    if(this === CMS.Models.Request) {
+    this.validate(["requested_on", "due_on"], function (newVal, prop) {
+      var dates_are_valid;
+
+      if (this.requested_on && this.due_on) {
+        dates_are_valid = this.due_on >= this.requested_on;
+      }
+
+      if (!dates_are_valid) {
+        return "Requested and/or Due date is invalid";
+      }
+    });
+
+    if (this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {
         if(instance.constructor === CMS.Models.Request) {
           instance.audit.reify().refresh();
