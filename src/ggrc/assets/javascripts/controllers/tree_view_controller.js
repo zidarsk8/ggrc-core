@@ -729,13 +729,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       if (this.get_count_deferred) {
         this.get_count_deferred.then(this._ifNotRemoved(function(count) {
-          self.options.update_count
-            && self.element
-            && self.element.trigger("updateCount", count());
-
+          if (self.options.update_count && self.element) {
+            self.element.trigger("updateCount", count());
+          }
           count.bind("change", self._ifNotRemoved(function() {
-            self.options.update_count
-              && self.element.trigger("updateCount", count());
+            if (self.options.update_count) {
+              self.element.trigger("updateCount", count());
+            }
           }));
         }));
       } else {
