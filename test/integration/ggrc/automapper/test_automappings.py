@@ -300,6 +300,10 @@ class TestAutomappings(integration.ggrc.TestCase):
         'program': {'id': program.id},
         'status': 'Planned',
     })
+    control = self.create_object(models.Control, {
+        'title': next('Test control')
+    })
+    self.create_mapping(audit, control)
     request = self.create_object(models.Request, {
         'audit': {'id': audit.id},
         'title': next('Request'),
@@ -311,3 +315,4 @@ class TestAutomappings(integration.ggrc.TestCase):
     })
     self.assert_mapping(request, program)
     self.assert_mapping(request, audit, missing=True)
+    self.assert_mapping(request, control, missing=True)
