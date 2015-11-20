@@ -1038,7 +1038,7 @@ can.Component.extend({
           }
         }
       );
-      instance.delay_resolving_save_until(that.scope.instance.constructor.resolve_deferred_bindings(that.scope.instance));
+      this.scope.instance.delay_resolving_save_until(this.scope.instance.constructor.resolve_deferred_bindings(this.scope.instance));
     },
     "{parent_instance} updated": "deferred_update",
     "{parent_instance} created": "deferred_update",
