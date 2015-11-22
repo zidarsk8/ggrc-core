@@ -57,7 +57,24 @@ class ColumnHandler(object):
     self.display_name = options.get("display_name", "")
     self.dry_run = row_converter.block_converter.converter.dry_run
     self.new_objects = self.row_converter.block_converter.converter.new_objects
+    self.unique = options.get("unique", False)
     self.set_value()
+
+  def check_unique_consistency(self):
+    """Returns true if no object exists with the same unique field."""
+    if not self.unique:
+      return
+    if not self.value:
+      return
+    nr_duplicates = self.row_converter.object_class.query.filter(and_(
+        getattr(self.row_converter.object_class, self.key) == self.value,
+        self.row_converter.object_class.id != self.row_converter.obj.id
+    )).count()
+    if nr_duplicates > 0:
+      self.add_error(errors.DUPLICATE_VALUE,
+                     column_name=self.key,
+                     value=self.value)
+      self.row_converter.set_ignore()
 
   def set_value(self):
     self.value = self.parse_item()
@@ -336,7 +353,7 @@ class MappingColumnHandler(ColumnHandler):
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     class_ = self.mapping_object
-    lines = self.raw_value.splitlines()
+    lines = set(self.raw_value.splitlines())
     slugs = filter(unicode.strip, lines)  # noqa
     objects = []
     for slug in slugs:
