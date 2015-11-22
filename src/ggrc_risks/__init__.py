@@ -1,8 +1,5 @@
-# Copyright (C) 2015 Reciprocity, Inc - All Rights Reserved
-# Unauthorized use, copying, distribution, displaying, or public performance
-# of this file, via any medium, is strictly prohibited. All information
-# contained herein is proprietary and confidential and may not be shared
-# with any third party without the express written consent of Reciprocity, Inc.
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: silas@reciprocitylabs.com
 # Maintained By: silas@reciprocitylabs.com
 
@@ -61,7 +58,7 @@ def contributed_services():
   return [
       service('risks', models.Risk),
       service('risk_objects', models.RiskObject),
-      service('threat_actors', models.ThreatActor),
+      service('threats', models.Threat),
   ]
 
 
@@ -70,7 +67,7 @@ def contributed_object_views():
   from ggrc.views.registry import object_view
   return [
       object_view(models.Risk),
-      object_view(models.ThreatActor),
+      object_view(models.Threat),
   ]
 
 
@@ -83,15 +80,15 @@ class RiskRoleContributions(RoleContributions):
   contributions = {
       'Creator': {
           'read': [],
-          'create': ['ThreatActor', 'Risk'],
+          'create': ['Threat', 'Risk'],
       },
       'Editor': {
-          'read': ['ThreatActor', 'Risk'],
-          'create': ['ThreatActor', 'Risk'],
+          'read': ['Threat', 'Risk'],
+          'create': ['Threat', 'Risk'],
       },
       'Reader': {
-          'read': ['ThreatActor', 'Risk'],
-          'create': ['ThreatActor', 'Risk'],
+          'read': ['Threat', 'Risk'],
+          'create': ['Threat', 'Risk'],
       },
   }
 

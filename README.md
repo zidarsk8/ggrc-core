@@ -27,6 +27,8 @@ have the prerequisite software installed. Here are the steps:
 
 * clone the repo
 * cd to the project directory
+* make sure your ansible installation is up-to-date i.e. version 1.9.3 or higher (if it's not in the repositories, you can
+install it via pip)
 * run the following:
 
     ```sh
@@ -89,14 +91,20 @@ run_karma
 
 Then open Chrome at URL: <http://localhost:9876>
 
-For Python unit tests:
+For Python tests:
 
 ```sh
 run_pytests
 ```
 
-Both will run tests that run in the background and refresh every time
-you save a file. Keep them passing.
+The script will run unit tests and integration tests. 
+
+For better usage of unit tests you can use sniffer inside the test/unit folder.
+This will run the tests on each file update.
+
+```sh
+cd test/unit; sniffer
+```
 
 Quickstart Breakdown
 --------------------

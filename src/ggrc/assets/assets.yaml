@@ -31,6 +31,7 @@ dashboard-js-files:
   - wysihtml5/bootstrap-wysihtml5-0.0.2.js
   - moment/min/moment.min.js
   - spinjs/spin.js
+  - string-natural-compare/natural-compare.min.js
   # end 3rd party
   - bootstrap/wysihtml5.js
   - bootstrap/sticky-popover.js
@@ -41,6 +42,7 @@ dashboard-js-files:
   - plugins/persistent_notifier.js
   - ggrc_base.js
   - plugins/ggrc_utils.js
+  - plugins/can_control.js
   - plugins/wysiwyg.js
   - plugins/autocomplete.js
   - plugins/ajax_extensions.js
@@ -49,6 +51,7 @@ dashboard-js-files:
   - plugins/tooltip.js
   - plugins/popover.js
   - plugins/popover_template.js
+  - apps/base_widgets.js
   - application.js
   - client_record_replay.js
   - mustache_helper.js
@@ -89,6 +92,9 @@ dashboard-js-files:
   - models/control.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
+  - modules/widget_descriptor.js
+  - modules/widget_list.js
+  - controllers/comment_controller.js
   - models/section.js
   - models/system.js
   - models/join_models.js
@@ -100,16 +106,19 @@ dashboard-js-files:
   - models/custom_attributes.js
   - apps/quick_search.js
   - apps/business_objects.js
-  - apps/dashboard.js
   - apps/custom_attributes.js
-  - dashboard.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
   - components/csv/export.js
   - components/csv/import.js
   - components/mapper.js
+  - components/people_list.js
   #- d3.v2.js
   #- related_graph.js
+
+app-init-files:
+  - apps/dashboard.js
+  - dashboard.js
 
 dashboard-js-template-files:
   - add_widget_menu.mustache
@@ -147,6 +156,7 @@ dashboard-js-template-files:
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pin.mustache
+  - base_objects/info_header.mustache
   - base_objects/filters/advanced_search_filter_actions.mustache
   - base_objects/filters/modal_filter_actions.mustache
   - base_objects/filters/filter_by_person.mustache
@@ -157,6 +167,25 @@ dashboard-js-template-files:
   - base_objects/modal_contact_fields.mustache
   - base_objects/open_close.mustache
   - base_objects/sub_tree_type_selector.mustache
+  - base_templates/add_comment.mustache
+  - base_templates/attachment_list.mustache
+  - base_templates/attachment.mustache
+  - base_templates/base.mustache
+  - base_templates/comment_list.mustache
+  - base_templates/comment_subtree.mustache
+  - base_templates/dates_list.mustache
+  - base_templates/description.mustache
+  - base_templates/header.mustache
+  - base_templates/mapped_objects.mustache
+  - base_templates/notes.mustache
+  - base_templates/people_list.mustache
+  - base_templates/add_people.mustache
+  - base_templates/people_group.mustache
+  - base_templates/request_type.mustache
+  - base_templates/test.mustache
+  - base_templates/urls.mustache
+  - mixins/assignable.mustache
+  - mixins/stateful.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
@@ -176,6 +205,7 @@ dashboard-js-template-files:
   - issues/remediation_plan.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
+  - custom_attributes/expanded_attrs.mustache
   - custom_attribute_definitions/modal_content.mustache
   - custom_attribute_definitions/tree.mustache
   - custom_attribute_definitions/subtree.mustache
@@ -184,6 +214,7 @@ dashboard-js-template-files:
   - dashboard/info/info.mustache
   - dashboard/info/get_started.mustache
   - dashboard/info/wf_owner.mustache
+  - access_groups/modal_content.mustache
   - data_assets/modal_content.mustache
   - documents/active_column.mustache
   - dashboard/lhn.mustache
@@ -256,7 +287,6 @@ dashboard-js-template-files:
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
   - roles/object_list.mustache
-  - sections/info.mustache
   - sections/modal_content.mustache
   - sections/tree.mustache
   - sections/dropdown_menu.mustache
@@ -303,6 +333,7 @@ dashboard-js-template-files:
   - requests/modal_content.mustache
   - requests/tier2_content.mustache
   - requests/general_info.mustache
+  - requests/subtree.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache
   - responses/tree.mustache
@@ -364,15 +395,70 @@ dashboard-js-spec-helpers:
   - spec_helpers.js
 
 mockup-js-files:
-  # 3rd party
-  - jquery/dist/jquery.js
-  - jquery-ui/jquery-ui.min.js
-  - bootstrap/js/bootstrap-modal.js
-  - bootstrap/js/bootstrap-collapse.js
-  - bootstrap/js/bootstrap-dropdown.js
-  - bootstrap/js/bootstrap-tooltip.js
-  - bootstrap/js/bootstrap-popover.js
-  - bootstrap/js/bootstrap-transition.js
-  - canjs/can.jquery.js
-  - canjs/can.object.js
-  # 3rd party end
+  - mockup_generator.js
+  - javascript/generators/assessment.js
+
+  # Assessor
+  - assessor/pages/assessments.js
+
+  # Request
+  - request/pages/info.js
+  - request/pages/requests.js
+  - request/pages/objectives.js
+  - request/pages/regulations.js
+  - request/pages/controls.js
+  - request/pages/assessments.js
+
+  # Bootstrap files shouold be above
+  - javascript/add_comment.js
+  - javascript/attachment_list.js
+  - javascript/info_panel.js
+  - javascript/tree_view.js
+  - mockuphelper_controller.js
+  - assessor/main.js
+  - request/main.js
+
+mockup-js-template-files:
+  # Request
+  - title.mustache
+  - request/info.mustache
+  - request/widget.mustache
+  - request/assessment_modal.mustache
+  - assessor/assessments.mustache
+
+  # Base templates
+  - base_templates/modal_base.mustache
+
+  # Info panel partials
+  - base_templates/info_panel/base.mustache
+  - base_templates/info_panel/pin_actions.mustache
+  - base_templates/info_panel/header.mustache
+  - base_templates/info_panel/description.mustache
+  - base_templates/info_panel/mapped_objects.mustache
+  - base_templates/info_panel/people_list.mustache
+  - base_templates/info_panel/dates_list.mustache
+  - base_templates/info_panel/comment_list.mustache
+  - base_templates/info_panel/log_list.mustache
+  - base_templates/info_panel/past_items_list.mustache
+  - base_templates/info_panel/procedures.mustache
+  - base_templates/info_panel/assessment_results.mustache
+  - base_templates/info_panel/bug_number.mustache
+  - base_templates/info_panel/requests_list.mustache
+  - base_templates/info_panel/issues_list.mustache
+  - base_templates/info_panel/assessment_custom.mustache
+  - base_templates/info_panel/code.mustache
+  - base_templates/info_panel/test.mustache
+  - base_templates/info_panel/notes.mustache
+  - base_templates/info_panel/request_type.mustache
+
+  # Other base templates files
+  - base_templates/request_panel.mustache
+  - base_templates/assessment_panel.mustache
+  - base_templates/tree.mustache
+  - base_templates/tree-assessor.mustache
+  - base_templates/tree_item.mustache
+  - base_templates/info_panel.mustache
+  - base_templates/filter.mustache
+  - base_templates/nav_item.mustache
+  - base_templates/attachment_list.mustache
+  - base_templates/add_comment.mustache

@@ -79,6 +79,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
+    , "AccessGroup" : {}
     , "Product" : {}
     , "Market" : {}
   }
@@ -92,6 +93,11 @@ can.Model.Cacheable("CMS.Models.Program", {
 
 can.Model.Cacheable("CMS.Models.Option", {
   root_object : "option"
+  , findAll : "GET /api/options"
+  , findOne : "GET /api/options/{id}"
+  , create : "POST /api/options"
+  , update : "PUT /api/options/{id}"
+  , destroy : "DELETE /api/options/{id}"
   , root_collection : "options"
   , cache_by_role: {}
   , for_role: function(role) {
@@ -325,7 +331,11 @@ CMS.Models.get_stub = function (object) {
 };
 
 CMS.Models.get_stubs = function (objects) {
-  return new can.Stub.List(can.map(CMS.Models.get_instances(objects), function(o) {
+  return new can.Stub.List(can.map(CMS.Models.get_instances(objects), function (o) {
+    if (!o || !o.stub) {
+      console.warn("`Models.get_stubs` instance has no stubs ", arguments);
+      return;
+    }
     return o.stub();
   }));
 };

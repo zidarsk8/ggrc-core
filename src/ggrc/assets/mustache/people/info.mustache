@@ -10,58 +10,32 @@
   {{#is_dashboard_or_all}}
     {{> /static/mustache/dashboard/info/info.mustache}}
   {{else}}
-  <section class="info">
-    {{#is_info_pin}}
-    <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content">
-        {{#name}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Name</h6>
-            <h3>{{name}}
-              {{#if_equals system_wide_role 'No Access'}}
-                <span class="user-disabled">
-                  (No Access)
-                </span>
-              {{/if}}
-            </h3>
-          </div>
-        </div>
-        {{/name}}
 
-        {{#email}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Email</h6>
-            <p>
-            {{email}}
-            </p>
-          </div>
-        </div>
-        {{/email}}
-      </div>
-    </div>
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+    {{#is_info_pin}}
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
     {{/is_info_pin}}
 
     <div class="tier-content">
-      {{^is_info_pin}}
+      <div class="pane-header">
         {{#name}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Name</h6>
-            <h3>{{name}}
-              {{#if_equals system_wide_role 'No Access'}}
-                <span class="user-disabled">
-                  (No Access)
-                </span>
-              {{/if}}
-            </h3>
+          <div class="row-fluid wrap-row">
+            <div class="span12">
+              <h6>Name</h6>
+              <h3>{{name}}
+                {{#if_equals system_wide_role 'No Access'}}
+                  <span class="user-disabled">
+                    (No Access)
+                  </span>
+                {{/if}}
+              </h3>
+            </div>
           </div>
-        </div>
         {{/name}}
+      </div>
 
-        {{#email}}
+      {{#email}}
         <div class="row-fluid wrap-row">
           <div class="span12">
             <h6>Email</h6>
@@ -70,17 +44,17 @@
             </p>
           </div>
         </div>
-        {{/email}}
-      {{/is_info_pin}}
+      {{/email}}
+
       {{#company}}
-      <div class="row-fluid wrap-row">
-        <div class="span12">
-          <h6>Company</h6>
-            <p>
-              {{company}}
-            </p>
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Company</h6>
+              <p>
+                {{company}}
+              </p>
+          </div>
         </div>
-      </div>
       {{/company}}
     </div><!-- tier-content end -->
 

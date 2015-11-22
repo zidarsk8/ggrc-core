@@ -37,7 +37,15 @@
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
+    -block extra_templates
+
     -assets "dashboard-js"
+      %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
+    -endassets
+
+    -block extra_assets
+
+    -assets "app-init-js"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 

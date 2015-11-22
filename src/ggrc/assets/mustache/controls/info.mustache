@@ -6,22 +6,18 @@
 }}
 
 {{#instance}}
-  <section class="info">
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
     {{#is_info_pin}}
-    <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content pin">
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      </div>
-    </div>
     {{/is_info_pin}}
 
-    {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+    <div class="info-pane-utility">
+      {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+    </div>
 
     <div class="tier-content">
-      {{^is_info_pin}}
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      {{/is_info_pin}}
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/test_plan.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}

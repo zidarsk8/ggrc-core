@@ -18,9 +18,9 @@ from sqlalchemy.orm.session import Session
 from ggrc import db
 from ggrc.models.inflector import ModelInflectorDescriptor
 from ggrc.models.reflection import AttributeInfo
-from ggrc.models.reflection import PublishOnly
 from ggrc.models.computed_property import computed_property
 
+from ggrc.utils import underscore_from_camelcase
 
 """Mixins to add common attributes and relationships. Note, all model classes
 must also inherit from ``db.Model``. For example:
@@ -414,8 +414,9 @@ class Slugged(Base):
   _aliases = {
       "slug": {
           "display_name": "Code",
-          "description": ("Must be unique. Can be left empty for autogeneration."
-                          " If updating or deleting, code is required"),
+          "description": ("Must be unique. Can be left empty for"
+                          "autogeneration. If updating or deleting,"
+                          "code is required"),
       }
   }
 
@@ -508,12 +509,12 @@ class WithContact(object):
   _publish_attrs = ['contact', 'secondary_contact']
   _aliases = {
       "contact": {
-        "display_name": "Primary Contact",
-        "filter_by": "_filter_by_contact",
+          "display_name": "Primary Contact",
+          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": {
-        "display_name": "Secondary Contact",
-        "filter_by": "_filter_by_secondary_contact",
+          "display_name": "Secondary Contact",
+          "filter_by": "_filter_by_secondary_contact",
       },
   }
 
@@ -625,10 +626,11 @@ class CustomAttributable(object):
   @declared_attr
   def custom_attribute_definitions(cls):
     # FIXME definitions should be class scoped, not instance scoped.
-    from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+    from ggrc.models.custom_attribute_definition import \
+        CustomAttributeDefinition
     definition_type = foreign(CustomAttributeDefinition.definition_type)
     join_function = lambda: or_(
-        definition_type == cls.__name__,
+        definition_type == underscore_from_camelcase(cls.__name__),
         # The bottom statement always evaluates to False, and is here just to
         # satisfy sqlalchemys need for use of foreing keys while defining a
         # relationship.
@@ -641,9 +643,11 @@ class CustomAttributable(object):
 
   @classmethod
   def get_custom_attribute_definitions(cls):
-    from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+    from ggrc.models.custom_attribute_definition import \
+        CustomAttributeDefinition
     return CustomAttributeDefinition.query.filter(
-        CustomAttributeDefinition.definition_type == cls.__name__).all()
+        CustomAttributeDefinition.definition_type ==
+        underscore_from_camelcase(cls.__name__)).all()
 
 
 class TestPlanned(object):
@@ -657,3 +661,25 @@ class TestPlanned(object):
   _fulltext_attrs = ['test_plan']
   _sanitize_html = ['test_plan']
   _aliases = {"test_plan": "Test Plan"}
+
+
+class Assignable(object):
+
+  ASSIGNEE_TYPES = set(["Assignee"])
+
+  @property
+  def assignees(self):
+    assignees = [(r.source, r.attrs["AssigneeType"])
+                 for r in self.related_sources
+                 if "AssigneeType" in r.attrs]
+    assignees += [(r.destination, r.attrs["AssigneeType"])
+                  for r in self.related_destinations
+                  if "AssigneeType" in r.attrs]
+    return set(assignees)
+
+  @staticmethod
+  def _validate_relationship_attr(cls, source, dest, attr_name, attr_value):
+    types_ok = set([source.type, dest.type]) == set([cls.__name__, "Person"])
+    attr_name_ok = attr_name == "AssigneeType"
+    attr_value_ok = attr_value in cls.ASSIGNEE_TYPES
+    return types_ok and attr_name_ok and attr_value_ok

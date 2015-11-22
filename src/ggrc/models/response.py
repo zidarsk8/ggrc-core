@@ -4,11 +4,18 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from ggrc.models.mixins import (
-    deferred, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
-)
+from ggrc.models.document import Document
+from ggrc.models.mixins import Described
+from ggrc.models.mixins import Hyperlinked
+from ggrc.models.mixins import Noted
+from ggrc.models.mixins import Slugged
+from ggrc.models.mixins import Titled
+from ggrc.models.mixins import WithContact
+from ggrc.models.mixins import deferred
 from ggrc.models.object_document import Documentable
+from ggrc.models.object_document import ObjectDocument
 from ggrc.models.object_person import Personable
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
 from ggrc.models.request import Request
 
@@ -79,24 +86,50 @@ class Response(Noted, Described, Hyperlinked, WithContact,
   _aliases = {
       "description": "Response",
       "request": {
-        "display_name": "Request",
-        "mandatory": True,
-        "filter_by": "_filter_by_request",
+          "display_name": "Request",
+          "mandatory": True,
+          "filter_by": "_filter_by_request",
       },
       "response_type": {
-        "display_name": "Response Type",
-        "mandatory": True,
+          "display_name": "Response Type",
+          "mandatory": True,
       },
       "status": "Status",
       "title": None,
       "secondary_contact": None,
       "notes": None,
+      "documents": {
+          "display_name": "Documents",
+          "type": AttributeInfo.Type.SPECIAL_MAPPING,
+          "filter_by": "_filter_by_documents"
+      },
+      "mapped_objects": {
+          "display_name": "Mapped Objects",
+          "type": AttributeInfo.Type.SPECIAL_MAPPING,
+          "filter_by": "_filter_by_mapped_objects",
+      }
 
   }
 
   def _display_name(self):
     return u'Response with id={0} for Audit "{1}"'.format(
         self.id, self.request.audit.display_name)
+
+  @classmethod
+  def _filter_by_documents(cls, predicate):
+    types = ["Response", "DocumentationResponse", "InterviewResponse",
+             "PopulationSampleResponse"]
+    return ObjectDocument.query.filter(
+        (ObjectDocument.documentable_type.in_(types)) &
+        (ObjectDocument.documentable_id == cls.id)
+    ).join(Document).filter(
+        predicate(Document.title)
+    ).exists()
+
+  @classmethod
+  def _filter_by_mapped_objects(cls, predicate):
+    # ignore this since response is going away soon
+    return True
 
   @classmethod
   def _filter_by_request(cls, predicate):
@@ -114,7 +147,7 @@ class Response(Noted, Described, Hyperlinked, WithContact,
         orm.joinedload('request'))
 
 
-class DocumentationResponse(Relatable, Documentable, Personable, Response):
+class DocumentationResponse(Relatable, Personable, Documentable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'documentation'
@@ -125,7 +158,7 @@ class DocumentationResponse(Relatable, Documentable, Personable, Response):
   _sanitize_html = []
 
 
-class InterviewResponse(Relatable, Documentable, Personable, Response):
+class InterviewResponse(Relatable, Personable, Documentable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'interview'
@@ -151,7 +184,7 @@ class InterviewResponse(Relatable, Documentable, Personable, Response):
         orm.subqueryload('meetings'))
 
 
-class PopulationSampleResponse(Relatable, Documentable, Personable, Response):
+class PopulationSampleResponse(Relatable, Personable, Documentable, Response):
 
   __mapper_args__ = {
       'polymorphic_identity': 'population sample'

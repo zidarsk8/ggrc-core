@@ -17,6 +17,7 @@ def contributed_services():
 
   return [
       service('background_tasks', models.BackgroundTask),
+      service('access_groups', models.AccessGroup),
       service('audits', models.Audit),
       service('audit_objects', models.AuditObject),
       service('categorizations', models.Categorization),
@@ -26,6 +27,7 @@ def contributed_services():
       service('contexts', models.Context),
       service('controls', models.Control),
       service('control_assessments', models.ControlAssessment),
+      service('comments', models.Comment),
       service('custom_attribute_definitions',
               models.CustomAttributeDefinition),
       service('custom_attribute_values', models.CustomAttributeValue),
@@ -59,7 +61,6 @@ def contributed_services():
       service('interview_responses', models.InterviewResponse),
       service('population_sample_responses', models.PopulationSampleResponse),
       service('revisions', models.Revision, ReadOnlyResource),
-      service('section_bases', models.SectionBase, ReadOnlyResource),
       service('sections', models.Section),
       service('clauses', models.Clause),
       service(

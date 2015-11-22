@@ -15,7 +15,8 @@
 {{#if list.length}}
   <label>
     {{#if_equals list.length 1}}Owner{{else}}Owners{{/if_equals}}
-    <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+    <i class="grcicon-help-black" rel="tooltip"
+       title="This is the person in charge of this {{firstnonempty model_singular model.model_singular 'object'}}."></i>
     <a data-id="hide_owner_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
   </label>
   {{#each list}}
@@ -30,7 +31,8 @@
 {{else}}
   <label>
     Owners
-    <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+    <i class="grcicon-help-black" rel="tooltip"
+       title="This is the person in charge of this {{firstnonempty model_singular model.model_singular 'object'}}."></i>
     <a data-id="hide_owner_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
   </label>
   <p>No owners assigned</p>

@@ -10,7 +10,7 @@
 <custom-attributes instance="instance">
   <div class="hideable-holder bare">
     <div class="row-fluid">
-      {{#instance.custom_attribute_definitions}}
+      {{#each instance.custom_attribute_definitions}}
       {{#with_value_for_id id}}
 
       <div class="{{^mandatory}}hidable{{/mandatory}} span6">
@@ -22,7 +22,7 @@
             {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <input tabindex="20" class="input-block-level" value="{{value}}" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text">
+          <input tabindex="{{add_index 20 @index}}" data-ram="{{@index}}" class="input-block-level" value="{{value}}" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text">
         {{/case}}
         {{#case 'Rich Text'}}
           <label>
@@ -32,7 +32,7 @@
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <div class="wysiwyg-area">
-            <textarea tabindex="20" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{{value}}}</textarea>
+            <textarea tabindex="{{add_index 20 @index}}" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{{value}}}</textarea>
           </div>
         {{/case}}
         {{#case 'Dropdown'}}
@@ -53,7 +53,7 @@
           <label>&nbsp;</label>
           <div class="checkbox-area">
             <label>
-              <input tabindex="20" name="custom_attributes.{{id}}" type="checkbox"  {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+              <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" type="checkbox"  {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
               {{title}}
               {{#mandatory}}<span class="required">*</span>{{/mandatory}}
               {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
@@ -69,7 +69,7 @@
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div class="date-area">
-          <input tabindex="20" name="custom_attributes.{{id}}" value="{{value}}" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+          <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" value="{{value}}" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
         </div>
         {{/case}}
         {{/switch}}

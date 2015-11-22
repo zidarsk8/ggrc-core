@@ -28,9 +28,10 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
   meta_kind = db.Column(db.String)
   kind = deferred(db.Column(db.String), 'Directive')
 
-  sections = db.relationship(
-      'SectionBase', backref='directive',
-      order_by='SectionBase.slug', cascade='all, delete-orphan')
+  # TODO: FIX jost!
+  # sections = db.relationship(
+  #     'Section', backref='directive',
+  #     order_by='Section.slug', cascade='all, delete-orphan')
   controls = db.relationship(
       'Control', backref='directive', order_by='Control.slug')
   audit_frequency = db.relationship(
@@ -58,7 +59,6 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'kind',
       'organization',
       'scope',
-      'sections',
       'version',
   ]
 
@@ -94,8 +94,7 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
     return cls.eager_inclusions(query, Directive._include_links).options(
         orm.joinedload('audit_frequency'),
         orm.joinedload('audit_duration'),
-        orm.subqueryload('controls'),
-        orm.subqueryload('sections'))
+        orm.subqueryload('controls'))
 
   @staticmethod
   def _extra_table_args(cls):

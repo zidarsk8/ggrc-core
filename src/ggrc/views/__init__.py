@@ -52,13 +52,23 @@ def reindex(_):
   Web hook to update the full text search index
   """
 
+  do_reindex()
+
+  return app.make_response((
+      'success', 200, [('Content-Type', 'text/html')]))
+
+def do_reindex():
+  """
+  update the full text search index
+  """
+
   indexer = get_indexer()
   indexer.delete_all_records(False)
 
   # Find all models then remove base classes
   #   (If we don't remove base classes, we get duplicates in the index.)
   inheritance_base_models = [
-      all_models.Directive, all_models.SectionBase, all_models.SystemOrProcess,
+      all_models.Directive, all_models.SystemOrProcess,
       all_models.Response
   ]
   models = set(all_models.all_models) - set(inheritance_base_models)
@@ -73,9 +83,6 @@ def reindex(_):
       for instance in query_chunk:
         indexer.create_record(fts_record_for(instance), False)
       db.session.commit()
-
-  return app.make_response((
-      'success', 200, [('Content-Type', 'text/html')]))
 
 
 def get_permissions_json():
@@ -256,6 +263,7 @@ def contributed_object_views():
       object_view(models.Market),
       object_view(models.Project),
       object_view(models.DataAsset),
+      object_view(models.AccessGroup),
       object_view(models.Person),
       object_view(models.Vendor),
       object_view(models.Issue),

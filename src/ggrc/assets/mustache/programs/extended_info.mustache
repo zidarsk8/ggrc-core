@@ -3,18 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: brad@reciprocitylabs.com
     Maintained By: predrag@reciprocitylabs.com
-    
+
     Template: extended info applicable to program object
-    
+
 }}
 
 {{#instance}}
   <div class="row-fluid">
     <div class="span12">
       <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
-        {{#is_private}}
-          <i class="grcicon-private" rel="tooltip" title="Private"></i>
-        {{/is_private}}
         {{title}}
       </a>
     </div>
@@ -22,7 +19,7 @@
   <div class="row-fluid">
     <div class="span12">
       <h6>Description</h6>
-      <div class="rtf">      
+      <div class="rtf">
         {{{firstnonempty description '<em>No description</em>'}}}
       </div>
     </div>
@@ -85,14 +82,10 @@
                   </span>
                 {{else}}
                   {{#is_allowed_to_map page_instance instance join=true}}
-                  {{#if_helpers '\
-                    ^if_instance_of' page_instance 'Directive' '\
-                    or ^if_instance_of' instance 'Section'}}
                   <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
                     <i class="grcicon-reg-map"></i>
                     Map to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
                   </a>
-                  {{/if_helpers}}
                   {{/is_allowed_to_map}}
                 {{/if}}
               {{/with_direct_mappings_as}}

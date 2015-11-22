@@ -504,7 +504,6 @@
         } else {
           binding.source_binding = this.source;
         }
-
         binding.source_binding.list.bind("add", function(ev, results) {
           if (binding._refresh_stubs_deferred && binding._refresh_stubs_deferred.state() !== "pending") {
             var matching_results = can.map(can.makeArray(results), function(result) {
@@ -522,18 +521,16 @@
         });
       }
 
-    , _refresh_stubs: function(binding) {
-        var self = this
-          ;
-
+    , _refresh_stubs: function (binding) {
         return binding.source_binding.refresh_stubs()
-          .then(function(results) {
-            var matching_results = can.map(can.makeArray(results), function(result) {
-              if (self.filter_fn(result))
-                return self.make_result(result.instance, [result], binding);
-            });
-            self.insert_results(binding, matching_results);
-          });
+          .then(function (results) {
+            var matching_results = can.map(can.makeArray(results), function (result) {
+                  if (this.filter_fn(result)) {
+                    return this.make_result(result.instance, [result], binding);
+                  }
+                }.bind(this));
+            this.insert_results(binding, matching_results);
+          }.bind(this));
       }
   });
 
@@ -713,6 +710,25 @@
       }
   });
 
+  GGRC.ListLoaders.StubFilteredListLoader("GGRC.ListLoaders.AttrFilteredListLoader", {
+    }, {
+      init: function (source, prop, value) {
+        var filter_fn = function (binding) {
+          if (!binding.mappings) return;
+          return _.any(binding.mappings, function(mapping) {
+            instance = mapping.instance;
+            if (instance instanceof CMS.Models.Relationship) {
+              if (_.exists(instance, "attrs") && instance.attrs[prop] === value) {
+                return true;
+              }
+            }
+            return filter_fn(mapping);
+          });
+        };
+        this._super(source, filter_fn);
+      }
+  });
+
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.FirstElementLoader", {
   }, {
 
@@ -804,7 +820,8 @@
                 var new_result = self.make_result(result.instance, [result], binding);
                 new_result.compute = can.compute(function() {
                   return self.filter_fn(result);
-                }).bind("change", $.proxy(self, "process_result", binding, result, new_result));
+                });
+                new_result.compute.bind("change", $.proxy(self, "process_result", binding, result, new_result));
                 self.process_result(binding, result, new_result, new_result.compute());
               });
             });
@@ -831,7 +848,8 @@
                 var new_result = self.make_result(result.instance, [result], binding);
                 new_result.compute = can.compute(function() {
                   return self.filter_fn(result);
-                }).bind("change", $.proxy(self, "process_result", binding, result, new_result));
+                })
+                new_result.compute.bind("change", $.proxy(self, "process_result", binding, result, new_result));
                 self.process_result(binding, result, new_result, new_result.compute());
               });
             });
@@ -1655,6 +1673,10 @@
 
   GGRC.MapperHelpers.TypeFilter = function TypeFilter(source, model_name) {
     return new GGRC.ListLoaders.TypeFilteredListLoader(source, [model_name]);
+  }
+
+  GGRC.MapperHelpers.AttrFilter = function AttrFilter(source, filter_name, keyword) {
+    return new GGRC.ListLoaders.AttrFilteredListLoader(source, filter_name, keyword);
   }
 
   GGRC.MapperHelpers.CustomFilter = function CustomFilter(source, filter_fn) {

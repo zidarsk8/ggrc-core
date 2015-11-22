@@ -7,12 +7,14 @@
 from datetime import date
 from collections import OrderedDict
 from sqlalchemy import orm
+from sqlalchemy import not_
 
 from ggrc import db
 from ggrc.login import get_current_user
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
+from ggrc.models.person import Person
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins import (
     deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful,
@@ -21,6 +23,8 @@ from ggrc.models.mixins import (
 from ggrc.models.reflection import PublishOnly
 from ggrc_gdrive_integration.models.object_folder import Folderable
 from ggrc_workflows.models.cycle import Cycle
+from ggrc_workflows.models.workflow_person import WorkflowPerson
+from ggrc_basic_permissions.models import UserRole
 
 
 class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
@@ -125,6 +129,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       "workflow_mapped": {
           "display_name": "No Access",
           "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_no_access",
       },
       "status": None,
       "start_date": None,
@@ -138,6 +143,18 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
   @classmethod
   def _filter_by_workflow_member(cls, predicate):
     return cls._filter_by_role("WorkflowMember", predicate)
+
+  @classmethod
+  def _filter_by_no_access(cls, predicate):
+    is_no_access = not_(UserRole.query.filter(
+        (UserRole.person_id == Person.id) &
+        (UserRole.context_id == cls.context_id)
+    ).exists())
+    return WorkflowPerson.query.filter(
+        (cls.id == WorkflowPerson.workflow_id) & is_no_access
+    ).join(Person).filter(
+        (predicate(Person.name) | predicate(Person.email))
+    ).exists()
 
   def copy(self, _other=None, **kwargs):
     columns = [

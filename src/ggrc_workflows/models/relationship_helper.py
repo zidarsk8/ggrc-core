@@ -11,6 +11,7 @@ from ggrc_workflows.models import CycleTaskGroup
 from ggrc_workflows.models import CycleTaskGroupObjectTask as CycleTask
 from ggrc_workflows.models import CycleTaskGroupObject
 from ggrc_workflows.models import TaskGroup
+from ggrc_workflows.models import TaskGroupObject
 from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
 
@@ -24,6 +25,34 @@ def tg_task(object_type, related_type, related_ids):
   else:
     return db.session.query(TaskGroupTask.id).filter(
         TaskGroupTask.task_group_id.in_(related_ids))
+
+
+def task_tgo(object_type, related_type, related_ids):
+  """ relationships between Tasks and Task Group Objects """
+
+  if related_type == "TaskGroupTask":
+    return db.session.query(TaskGroupObject.object_id) \
+        .filter(TaskGroupObject.object_type == object_type) \
+        .join(TaskGroup, TaskGroupTask) \
+        .filter(TaskGroupTask.id.in_(related_ids))
+  else:
+    return db.session.query(TaskGroupTask.id) \
+        .join(TaskGroup, TaskGroupObject) \
+        .filter((TaskGroupObject.object_type == related_type) &
+                (TaskGroupObject.object_id.in_(related_ids)))
+
+
+def tg_tgo(object_type, related_type, related_ids):
+  """ relationships between TaskGroups and objects via Task Group Object """
+
+  if object_type == "TaskGroup":
+    return db.session.query(TaskGroupObject.task_group_id).filter(
+        (TaskGroupObject.object_type == related_type) &
+        (TaskGroupObject.object_id.in_(related_ids)))
+  else:
+    return db.session.query(TaskGroupObject.object_id).filter(
+        (TaskGroupObject.object_type == object_type) &
+        (TaskGroupObject.task_group_id.in_(related_ids)))
 
 
 def cycle_workflow(object_type, related_type, related_ids):
@@ -143,9 +172,11 @@ _function_map = {
 
 # add mappings for cycle tasks and cycle task objects
 for wot in WORKFLOW_OBJECT_TYPES:
-  obj = "CycleTaskGroupObjectTask"
-  key = tuple(sorted([obj, wot]))
-  _function_map[key] = ctgot_wot
+  for f, obj in [(ctgot_wot, "CycleTaskGroupObjectTask"),
+                 (tg_tgo, "TaskGroup"),
+                 (task_tgo, "TaskGroupTask")]:
+    key = tuple(sorted([obj, wot]))
+    _function_map[key] = f
 
 
 def get_ids_related_to(object_type, related_type, related_ids):

@@ -7,52 +7,58 @@
 
 # TODO: Implement with Authentication
 # from .account import Account
-from .audit import Audit
-from .audit_object import AuditObject
-from .categorization import Categorization
-from .category import CategoryBase
-from .context import Context
-from .control import Control, ControlCategory, ControlAssertion
-from .control_assessment import ControlAssessment
-from .custom_attribute_definition import CustomAttributeDefinition
-from .custom_attribute_value import CustomAttributeValue
-from .data_asset import DataAsset
-from .directive import Directive, Regulation, Policy, Contract, Standard
-from .document import Document
-from .facility import Facility
-from .help import Help
-from .market import Market
-from .object_document import ObjectDocument
-from .object_owner import ObjectOwner
-from .object_person import ObjectPerson
-from .object_type import ObjectType
-from .objective import Objective
-from .option import Option
-from .org_group import OrgGroup
-from .vendor import Vendor
-from .person import Person
-from .product import Product
-from .program import Program
-from .project import Project
-from .relationship import Relationship, RelationshipType
-from .request import Request
-from .response import (
+from ggrc.models.access_group import AccessGroup
+from ggrc.models.audit import Audit
+from ggrc.models.audit_object import AuditObject
+from ggrc.models.comment import Comment
+from ggrc.models.categorization import Categorization
+from ggrc.models.category import CategoryBase
+from ggrc.models.context import Context
+from ggrc.models.control import Control, ControlCategory, ControlAssertion
+from ggrc.models.control_assessment import ControlAssessment
+from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+from ggrc.models.custom_attribute_value import CustomAttributeValue
+from ggrc.models.data_asset import DataAsset
+from ggrc.models.directive import Directive, Regulation, Policy, Contract, Standard
+from ggrc.models.document import Document
+from ggrc.models.facility import Facility
+from ggrc.models.help import Help
+from ggrc.models.market import Market
+from ggrc.models.object_document import ObjectDocument
+from ggrc.models.object_owner import ObjectOwner
+from ggrc.models.object_person import ObjectPerson
+from ggrc.models.object_type import ObjectType
+from ggrc.models.objective import Objective
+from ggrc.models.option import Option
+from ggrc.models.org_group import OrgGroup
+from ggrc.models.vendor import Vendor
+from ggrc.models.person import Person
+from ggrc.models.product import Product
+from ggrc.models.program import Program
+from ggrc.models.project import Project
+from ggrc.models.relationship import Relationship
+from ggrc.models.relationship import RelationshipAttr
+from ggrc.models.relationship import RelationshipType
+from ggrc.models.request import Request
+from ggrc.models.response import (
     Response, DocumentationResponse, InterviewResponse,
     PopulationSampleResponse
 )
-from .meeting import Meeting
-from .background_task import BackgroundTask
-from .notification import NotificationConfig, NotificationType, Notification
-from .issue import Issue
+from ggrc.models.meeting import Meeting
+from ggrc.models.background_task import BackgroundTask
+from ggrc.models.notification import NotificationConfig, NotificationType, Notification
+from ggrc.models.issue import Issue
 
 # TODO: This isn't currently used
 # from .relationship_type import RelationshipType
-from .section import SectionBase, Section, Clause
+from .section import Section
+from .clause import Clause
 from .system import SystemOrProcess, System, Process
 
 from .revision import Revision
 from .event import Event
 all_models = [
+    AccessGroup,
     Audit,
     AuditObject,
     Categorization,
@@ -62,6 +68,7 @@ all_models = [
     Context,
     Control,
     ControlAssessment,
+    Comment,
     CustomAttributeDefinition,
     CustomAttributeValue,
     DataAsset,
@@ -89,12 +96,12 @@ all_models = [
     Project,
     Relationship,
     RelationshipType,
+    RelationshipAttr,
     Request,
     Response,
     DocumentationResponse,
     InterviewResponse,
     PopulationSampleResponse,
-    SectionBase,
     Section,
     Clause,
     SystemOrProcess,

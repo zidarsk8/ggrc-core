@@ -7,22 +7,20 @@
 
 {{! transcluded via renderLive in, for example, assets/mustache/sections/tier2_content.mustache }}
 {{#instance}}
-  <div class="row-fluid wrap-row">
-    <div data-test-id="title_0ad9fbaf" class="span6">
-      <h6>Title</h6>
-      <h3>{{title}}</h3>
-      {{#if type}}
-      <p>
-        {{type.title}}
-      </p>
-      {{/if}}
-    </div>
-    <div data-test-id="title_state_0ad9fbaf" class="span6">
-      {{#if status}}
-        <h6>State</h6>
-        <span data-test-id="title_state_value_0ad9fbaf" class="state-value
-              state-{{to_class status '_'}}">{{status}}</span>
-      {{/if}}
+  <div class="pane-header">
+    <div class="row-fluid wrap-row">
+      <div data-test-id="title_0ad9fbaf" class="span9">
+        <h6>Title</h6>
+        <h3>{{title}}</h3>
+        {{#if status}}
+          <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+        {{/if}}
+        {{#if type}}
+        <p>
+          {{type.title}}
+        </p>
+        {{/if}}
+      </div>
     </div>
   </div>
   <div data-test-id="title_review_0ad9fbaf" class="row-fluid wrap-row">

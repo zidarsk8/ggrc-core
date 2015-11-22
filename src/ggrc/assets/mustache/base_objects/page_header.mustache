@@ -44,13 +44,6 @@
     <span class="title-content">
       <i class="grciconlarge-{{model.table_singular}}"></i>
       {{instance.title}}
-      {{#if_equals model.table_singular 'program'}}
-        {{#if instance.private}}
-          <span class="private">
-            <i class="grcicon-private" rel="tooltip" title="Private"></i>
-          </span>
-        {{/if}}
-      {{/if_equals}}
     </span>
   {{/if_equals}}
 </h1>
@@ -146,12 +139,6 @@
         </a>
       </li>
     </ul>
-  </li>
-  <li>
-    <a class="nav-trigger active" href="javascript://">
-      <i class="grcicon-nav-trigger"></i>
-      <span>Menu</span>
-    </a>
   </li>
   <li>
     <a href="javascript://" id="#page-help" data-toggle="modal-ajax-helpform" data-help-slug="{{self.page_help()|trim}}">

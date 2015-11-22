@@ -1,8 +1,5 @@
-# Copyright (C) 2015 Reciprocity, Inc - All Rights Reserved
-# Unauthorized use, copying, distribution, displaying, or public performance
-# of this file, via any medium, is strictly prohibited. All information
-# contained herein is proprietary and confidential and may not be shared
-# with any third party without the express written consent of Reciprocity, Inc.
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
@@ -21,7 +18,7 @@ from ggrc.models.track_object_state import HasObjectState
 class Risk(HasObjectState, mixins.CustomAttributable, mixins.Stateful,
            Relatable, Documentable, mixins.Described, Ownable,
            mixins.WithContact, mixins.Titled, mixins.Timeboxed,
-           mixins.Slugged, mixins.Base, db.Model):
+           mixins.Slugged, mixins.Noted, mixins.Base, db.Model):
   __tablename__ = 'risks'
 
   VALID_STATES = [
@@ -51,6 +48,9 @@ class Risk(HasObjectState, mixins.CustomAttributable, mixins.Stateful,
   ]
 
   _aliases = {
-      "contact": "Contact",
+      "contact": {
+          "display_name": "Contact",
+          "filter_by": "_filter_by_contact",
+      },
       "secondary_contact": None,
   }

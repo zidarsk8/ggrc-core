@@ -10,6 +10,7 @@ from ggrc.models.object_person import ObjectPerson
 from ggrc.models.object_owner import ObjectOwner
 from ggrc.models.request import Request
 from ggrc.models.response import Response
+from ggrc.models.relationship import Relationship
 from ggrc_basic_permissions.models import UserRole
 from ggrc_basic_permissions import objects_via_relationships_query
 from ggrc.rbac import permissions, context_query_filter
@@ -164,7 +165,7 @@ class MysqlIndexer(SqlIndexer):
       Objects in private contexts via UserRole (e.g. for Private Programs)
       Objects for which the user is the "contact"
       Objects for which the user is the "primary_assessor" or "secondary_assessor"
-      Audits for which the user is assigned a Request or Response
+      Assignable objects for which the user is an assignee
 
     This method only *limits* the result set -- Contexts and Roles will still
     filter out forbidden objects.
@@ -201,17 +202,20 @@ class MysqlIndexer(SqlIndexer):
     type_union_queries.append(all_people)
 
     # Objects to which the user is "mapped"
-    object_people_query = db.session.query(
-        ObjectPerson.personable_id.label('id'),
-        ObjectPerson.personable_type.label('type'),
-        literal(None).label('context_id')
-      ).filter(
-          and_(
-            ObjectPerson.person_id == contact_id,
-            ObjectPerson.personable_type.in_(model_names)
-          )
-      )
-    type_union_queries.append(object_people_query)
+    # We don't return mapped objects for the Creator because being mapped
+    # does not give the Creator necessary permissions to view the object.
+    if current_user.system_wide_role != "Creator":
+      object_people_query = db.session.query(
+          ObjectPerson.personable_id.label('id'),
+          ObjectPerson.personable_type.label('type'),
+          literal(None).label('context_id')
+        ).filter(
+            and_(
+              ObjectPerson.person_id == contact_id,
+              ObjectPerson.personable_type.in_(model_names)
+            )
+        )
+      type_union_queries.append(object_people_query)
 
     # Objects for which the user is an "owner"
     object_owners_query = db.session.query(
@@ -225,6 +229,31 @@ class MysqlIndexer(SqlIndexer):
           )
       )
     type_union_queries.append(object_owners_query)
+
+    # Objects for which the user is assigned
+    model_assignee_query = db.session.query(
+        Relationship.destination_id.label('id'),
+        Relationship.destination_type.label('type'),
+        literal(None).label('context_id'),
+    ).filter(
+        and_(
+            Relationship.source_type == "Person",
+            Relationship.source_id == contact_id,
+        ),
+    )
+    type_union_queries.append(model_assignee_query)
+
+    model_assignee_query = db.session.query(
+        Relationship.source_id.label('id'),
+        Relationship.source_type.label('type'),
+        literal(None).label('context_id'),
+    ).filter(
+        and_(
+            Relationship.destination_type == "Person",
+            Relationship.destination_id == contact_id,
+        ),
+    )
+    type_union_queries.append(model_assignee_query)
 
     if not my_objects:
       type_union_queries.append(
@@ -246,20 +275,6 @@ class MysqlIndexer(SqlIndexer):
       type_union_queries.append(context_query)
 
     for model, type_column in models:
-      # Audits where the user is assigned a Request or a Response
-      if model is all_models.Audit:
-        model_type_query = db.session.query(
-            Request.audit_id.label('id'),
-            type_column.label('type'),
-            literal(None).label('context_id')
-          ).join(Response).filter(
-              or_(
-                Request.assignee_id == contact_id,
-                Response.contact_id == contact_id
-              )
-          ).distinct()
-        type_union_queries.append(model_type_query)
-
       # Objects for which the user is the "contact" or "secondary contact"
       if hasattr(model, 'contact_id'):
         model_type_query = db.session.query(

@@ -37,6 +37,7 @@
 @import "flash";
 @import "workflow";
 @import "pin";
+@import "tabs";
 @import "risk_assessment";
 @import "styleguide";
 
@@ -65,7 +66,7 @@
 
   // bootstrap rewrites
   @import "rewrite";
-  
+
   // global definitions
   @import "global";
 
@@ -84,7 +85,7 @@
 
   // SVG graphing
   @import "graph";
-  
+
   // icons
   @import "icons";
 

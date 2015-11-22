@@ -20,12 +20,12 @@
         relevant: can.compute(function () {
           return new can.List();
         }),
-        columns: can.compute(function () {
-          return _.filter(GGRC.model_attr_defs[this.attr("type")], function(el) {
+        columns: function () {
+          return _.filter(GGRC.model_attr_defs[this.attr("type")], function (el) {
             return (!el.import_only) &&
                    (el.display_name.indexOf("unmap:") === -1);
           });
-        })
+        }
       }),
       panelsModel = can.Map({
         items: new can.List()
@@ -246,10 +246,10 @@
         var items = GGRC.model_attr_defs[this.scope.attr("item.type")],
             split_items = {
               mappings: _.filter(items, function (el) {
-                return el.type == "mapping";
+                return el.type === "mapping";
               }),
               attributes: _.filter(items, function (el) {
-                return el.type != "mapping";
+                return el.type !== "mapping";
               })
             };
         _.map(split_items[el.data("type")], function (attr) {
@@ -257,7 +257,7 @@
         }.bind(this));
       },
       "setSelected": function () {
-        this.scope.attr("item.selected", _.reduce(this.scope.attr("item.columns"), function (memo, data) {
+        this.scope.attr("item.selected", _.reduce(this.scope.attr("item").columns(), function (memo, data) {
           memo[data.key] = true;
           return memo;
         }, {}));

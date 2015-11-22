@@ -10,14 +10,35 @@
 <form action="javascript://">
   {{> /static/mustache/base_objects/form_restore.mustache}}
 
+  <!-- Title Row -->
   <div class="row-fluid">
     <div class="span6">
       <label>
-        Request
+        Title
+        <span class="required">*</span>
+        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
+      </label>
+      <input data-id="title_txtbx" tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
+    </div>
+    <div class="span6">
+      <label>
+        Audit
         <span class="required">*</span>
       </label>
+        <div class="objective-selector">
+          {{#using audit=instance.audit }}
+            <input tabindex="11" type="text" name="audit.title" class="span12 search-icon" data-lookup="Audit" data-permission-type="update" placeholder="Enter text to search for Audit" null-if-empty="false" value="{{firstnonempty audit.title ''}}">
+          {{/using}}
+        </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span6">
+      <label>
+        Description
+      </label>
       <div class="wysiwyg-area">
-        <textarea tabindex="1" id="request_description" class="span12 double wysihtml5" name="description" placeholder="State your request here..." autofocus>{{{description}}}</textarea>
+        <textarea tabindex="2" id="request_description" class="span12 double wysihtml5" name="description" placeholder="State your request here...">{{{description}}}</textarea>
       </div>
     </div>
     <div class="span3">
@@ -25,37 +46,18 @@
         Request Type
         <span class="required">*</span>
       </label>
-      {{#with_mapping 'responses' instance}}
-      <select name="request_type" class="input-block-level" tabindex="2" {{#if responses.length}}disabled="true" readonly="true"{{/if}}>
+      <select name="request_type" class="input-block-level" tabindex="3" {{#if responses.length}}disabled="true" readonly="true"{{/if}}>
         {{#iterate 'Documentation' 'Interview'}}
         <option value="{{iterator.toLowerCase}}" {{#if_equals iterator.toLowerCase instance.request_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
         {{/iterate}}
       </select>
-      {{/with_mapping}}
       <label>
         Requested On
         <span class="required">*</span>
       </label>
-      <input tabindex="3" class="input-block-level date" name="requested_on" data-toggle="datepicker" data-before="due_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date requested_on}}">
+      <input tabindex="4" class="input-block-level date" name="requested_on" data-toggle="datepicker" data-before="due_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date requested_on}}">
     </div>
     <div class="span3">
-      <div class="span12 hidable">
-        <label>
-          Status
-          <a href="javascript://" class="field-hide">hide</a>
-        </label>
-        <div tabindex="4">
-          <select class="input-block-level" name="status"
-          {{#if_helpers '\
-            #if_auditor' instance '\
-            or #if' new_object_form '\
-            ' _0_include_admin=false }}disabled="true"{{/if_helpers}}>
-            {{#iterate 'Draft' 'Requested' 'Responded' 'Amended Request' 'Updated Response' 'Accepted'}}
-            <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-            {{/iterate}}
-          </select>
-        </div>
-      </div>
       <div class="span12">
         <label>
           Due On
@@ -67,44 +69,59 @@
   </div>
 
   <div class="row-fluid">
-    {{#using audit=instance.audit}}
-    {{#using audit_object=instance.audit_object}}
-    {{#using audit_object_object=audit_object.auditable}}
     <div class="span6 hidable">
-    {{#if_auditor instance include_admin=false}}
-      &nbsp;
-    {{else}}
-      <label>
-        Request Object
-        <a href="javascript://" class="field-hide">hide</a>
-      </label>
-      <div class="objective-selector">
-        <input tabindex="6" type="text" name="audit_object_object.title" data-lookup="Program,Issue,Regulation,Policy,Standard,Contract,Clause,Section,Control,Objective,Person,OrgGroup,Vendor,System,Process,DataAsset,Product,Project,Facility,Market" data-template="/directives/autocomplete_result.mustache" class="span10 search-icon" value="{{firstnonempty audit_object_object.title control_assessment.title ''}}" placeholder="Enter text to search for object">
-      </div>
-    {{/if_auditor}}
-    </div>
-    {{/using}}
-    {{/using}}
-    {{/using}}
-
-    <div class="span6">
-      <label>
-        Assignee
-        <span class="required">*</span>
-      </label>
-      <i class="grcicon-person-green pull-left icon-field"></i>
-      {{#using assignee=instance.assignee}}
-      {{#if_can_reassign_request instance}}
+      <ggrc-modal-connector
+          parent_instance="instance"
+          instance="instance"
+          source_mapping="info_related_objects"
+          deferred="true"
+          >
+        <label class="border-l">
+          Mapped Objects
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        </label>
+        {{#prune_context}}
+          {{#each list}}
+          <div class="oneline">
+            <a href="javascript://" class="unmap" data-toggle="unmap">
+              <span class="result" {{data 'result'}}></span>
+              <i class="grcicon-deleted"></i>
+            </a>
+            {{#update_link .}}
+              <a class="url" href="{{schemed_url link}}" target="_blank">
+                {{firstexist title name email link}}
+              </a>
+            {{/update_link}}
+          </div>
+          {{/each}}
+        {{/prune_context}}
+        {{^list.length}}
+          <span class="gray"><em>No mapped objects</em></span>
+        {{/list.length}}
         <div class="objective-selector">
-          <input tabindex="7" type="text" name="assignee.email" class="span10 search-icon" data-lookup="Person" placeholder="Enter text to search for Assignee" null-if-empty="true" value="{{firstnonempty assignee.email ''}}">
+          <div style="clear:both">
+            <br>
+            <a class="section-add section-sticky btn btn-small btn-draft"
+              href="javascript://" rel="tooltip"
+              {{data "deferred_to"}}
+              data-placement="left"
+              data-toggle="unified-mapper"
+              data-deferred="true"
+              data-object-source="true"
+              data-join-mapping="business_objects"
+              data-join-object-id="{{instance.id}}"
+              data-join-object-type="{{instance.class.model_singular}}"
+              data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6">
+              Map Objects
+            </a>
+          </div>
         </div>
-      {{else}}
-        {{firstnonempty assignee.email ''}}
-      {{/if_can_reassign_request}}
-      {{/using}}
+      </ggrc-modal-connector>
+    </div>
+    <div class="span6">
+      <people-list instance="instance" editable="true" deferred="true"></people-list>
     </div>
   </div>
-
   <div class="row-fluid">
     <div class="span6 hidable">
       <label>
@@ -135,10 +152,6 @@
       <input tabindex="10" class="input-block-level" name="slug" placeholder="REQUEST-XXX" type="text" value="{{slug}}">
     </div>
   </div>
-
-  {{#using audit=instance.audit}}
-  <input type="hidden" name="audit.id" value="{{audit.id}}">
-  {{/using}}
 </form>
 {{/instance}}
 </div>

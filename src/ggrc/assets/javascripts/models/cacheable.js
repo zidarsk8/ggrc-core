@@ -222,7 +222,6 @@ can.Model("can.Model.Cacheable", {
         return deferred.done(tracker_stop);
       };
     }
-
   , setup : function(construct, name, statics, prototypes) {
     var overrideFindAll = false;
 
@@ -379,7 +378,6 @@ can.Model("can.Model.Cacheable", {
       GGRC.custom_attributable_types.push($.extend({}, this));
     }
   }
-
   , resolve_deferred_bindings : function(obj) {
     var _pjs, refresh_dfds = [], dfds = [];
     if(obj._pending_joins) {
@@ -439,7 +437,8 @@ can.Model("can.Model.Cacheable", {
             });
           }
         });
-        delete obj._pending_joins;
+
+        obj.attr('_pending_joins', []);
         return $.when.apply($, dfds).then(function() {
           return obj.refresh();
         });
@@ -1009,6 +1008,17 @@ can.Model("can.Model.Cacheable", {
   }
   , autocomplete_label : function() {
     return this.title;
+  },
+  get_permalink: function () {
+    var dfd = $.Deferred(),
+        constructor = this.constructor;
+    if (!constructor.permalink_options) {
+      return dfd.resolve(this.viewLink);
+    }
+    $.when(this.refresh_all.apply(this, constructor.permalink_options.base.split(":"))).then(function (base) {
+      return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
+    }.bind(this));
+    return dfd.promise();
   }
 
   /**
@@ -1017,7 +1027,7 @@ can.Model("can.Model.Cacheable", {
   , mark_for_deletion : function(join_attr, obj) {
     obj = obj.reify ? obj.reify() : obj;
     if(!this._pending_joins) {
-      this._pending_joins = [];
+      this.attr('_pending_joins', []);
     }
     for(var i = this._pending_joins.length; i--;) {
       if(this._pending_joins[i].what === obj) {
@@ -1032,7 +1042,7 @@ can.Model("can.Model.Cacheable", {
   , mark_for_addition : function(join_attr, obj, extra_attrs) {
     obj = obj.reify ? obj.reify() : obj;
     if(!this._pending_joins) {
-      this._pending_joins = [];
+      this.attr('_pending_joins', []);
     }
     for(var i = this._pending_joins.length; i--;) {
       if(this._pending_joins[i].what === obj) {
@@ -1128,7 +1138,7 @@ can.Model("can.Model.Cacheable", {
     if (!this.custom_attributes) {
       this.setup_custom_attributes();
     }
-    this.custom_attribute_values.each(function (custom_attr) {
+    can.each(this.custom_attribute_values, function (custom_attr) {
       custom_attr = custom_attr.reify();
       custom_attrs[custom_attr_ids[custom_attr.custom_attribute_id]] =
         custom_attr.attribute_value;

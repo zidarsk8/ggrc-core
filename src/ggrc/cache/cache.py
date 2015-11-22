@@ -20,6 +20,7 @@ def mapping(class_name, attr, polymorph=False):
 
 def all_cache_entries():
   ret = [
+      resource('access_groups', 'Access Groups'),
       resource('audits', 'Audit'),
       resource('categorizations', 'Categorization'),
       resource('category_bases', 'CategoryBase'),
@@ -129,7 +130,7 @@ def all_mapping_entries():
       mapping('ObjectOwner', 'ownable', True),
       mapping('ObjectPerson', 'person'),
       mapping('ObjectPerson', 'personable', True),
-      mapping('Section', 'directive'),
+      mapping('Section', 'directive'), # this goes out?
       mapping('Relationship', 'source', True),
       mapping('Relationship', 'destination', True),
       mapping('UserRole', 'context'),

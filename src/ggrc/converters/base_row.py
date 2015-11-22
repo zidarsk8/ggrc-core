@@ -51,8 +51,8 @@ class RowConverter(object):
     handle_fields = self.headers if field_list is None else field_list
     for i, (attr_name, header_dict) in enumerate(self.headers.items()):
       if attr_name not in handle_fields or \
-          attr_name in self.attrs or \
-          self.is_delete:
+              attr_name in self.attrs or \
+              self.is_delete:
         continue
       Handler = header_dict["handler"]
       item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
@@ -60,7 +60,10 @@ class RowConverter(object):
         self.attrs[attr_name] = item
       else:
         self.objects[attr_name] = item
-      if attr_name in ("slug", "email"):
+
+      if attr_name == "email" and not self.get_value(attr_name):
+        self.add_error(errors.MISSING_VALUE_ERROR, column_name="Email")
+      elif attr_name in ("slug", "email"):
         self.id_key = attr_name
         self.obj = self.get_or_generate_object(attr_name)
         item.set_obj_attr()
@@ -83,10 +86,10 @@ class RowConverter(object):
   def chect_mandatory_fields(self):
     if not self.is_new or self.is_delete:
       return
-    mandatory = [key for key, header in
-                 self.block_converter.object_headers.items()
-                 if header["mandatory"]]
-    missing = set(mandatory).difference(set(self.headers.keys()))
+    headers = self.block_converter.object_headers
+    mandatory = [key for key, header in headers.items() if header["mandatory"]]
+    missing_keys = set(mandatory).difference(set(self.headers.keys()))
+    missing = [headers[key]["display_name"] for key in missing_keys]
     if missing:
       self.add_error(errors.MISSING_COLUMN,
                      s="s" if len(missing) > 1 else "",
@@ -121,20 +124,14 @@ class RowConverter(object):
   def get_object_by_key(self, key="slug"):
     """ Get object if the slug is in the system or return a new object """
     value = self.get_value(key)
-    if value is None:
-      self.add_error(errors.MISSING_COLUMN, s="", column_names=key)
-      return
-    obj = None
     self.is_new = False
-    if value:
-      obj = self.find_by_key(key, value)
+    obj = self.find_by_key(key, value)
     if not obj:
       obj = self.object_class()
       self.is_new = True
     elif not permissions.is_allowed_update_for(obj):
       self.ignore = True
       self.add_error(errors.PERMISSION_ERROR)
-
     return obj
 
   def setup_secondary_objects(self, slugs_dict):

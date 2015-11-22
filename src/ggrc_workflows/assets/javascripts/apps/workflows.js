@@ -8,11 +8,10 @@
 (function($, CMS, GGRC) {
   var WorkflowExtension = {},
       _workflow_object_types = Array.prototype.concat.call([],
-        'Program Regulation Policy Standard Contract Clause Section'.split(' '),
-        'Control Objective'.split(' '),
-        'OrgGroup Vendor'.split(' '),
-        'System Process DataAsset Product Project Facility Market Issue ControlAssessment'.split(' '),
-        'Risk ThreatActor'.split(' ')
+        "Program Regulation Policy Standard Contract Clause Section Request".split(" "),
+        "Control Objective OrgGroup Vendor AccessGroup".split(" "),
+        "System Process DataAsset Product Project Facility Market Issue ControlAssessment".split(" "),
+        "Risk Threat".split(" ")
       ),
       _task_sort_function = function(a, b) {
         var date_a = +new Date(a.end_date),
@@ -302,7 +301,15 @@
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for workflow page
   WorkflowExtension.init_widgets = function init_widgets() {
-    var page_instance = GGRC.page_instance();
+    var page_instance = GGRC.page_instance(),
+        tree_widgets = GGRC.tree_view.base_widgets_by_type;
+
+    _.each(_workflow_object_types, function (type) {
+      if (!type || !tree_widgets[type]) {
+        return;
+      }
+      tree_widgets[type] = tree_widgets[type].concat(["TaskGroup", "Workflow", "CycleTaskEntry", "CycleTaskGroupObjectTask", "CycleTaskGroupObject", "CycleTaskGroup"]);
+    });
 
     if (page_instance instanceof CMS.Models.Workflow) {
       WorkflowExtension.init_widgets_for_workflow_page();
@@ -405,9 +412,7 @@
 
         // Initialize controller -- probably this should go in a separate
         // initialization area
-        $(function() {
       $(document.body).ggrc_controllers_workflow_page();
-    });
 
         GGRC.register_hook(
             "ObjectNav.Actions",
@@ -572,19 +577,16 @@
       };
 
   WorkflowExtension.init_global = function() {
-    $(function() {
+    if (!GGRC.current_user || !GGRC.current_user.id) {
+      return;
+    }
 
-      if (!GGRC.current_user || !GGRC.current_user.id) {
-        return;
-      }
-
-      CMS.Models.Person.findOne({
-        id: GGRC.current_user.id
-      }).then(function(person) {
-        $('.task-count').ggrc_controllers_mapping_count({
-          mapping: 'assigned_tasks',
-          instance: person
-        });
+    CMS.Models.Person.findOne({
+      id: GGRC.current_user.id
+    }).then(function(person) {
+      $('.task-count').ggrc_controllers_mapping_count({
+        mapping: 'assigned_tasks',
+        instance: person
       });
     });
   };
@@ -601,7 +603,6 @@
   WorkflowExtension.init_mappings();
 
   var draft_on_update_mixin = can.Model.Mixin({
-
   }, {
     before_update: function() {
       if (this.status && this.os_state === "Approved") {

@@ -26,7 +26,6 @@ sass_options = {
 output_style = (environment == :production) ? :compressed : :expanded
 additional_import_paths = [
   "assets/stylesheets",
-  "assets/vendor/stylesheets",
   "assets/vendor/bootstrap-sass/vendor/assets/stylesheets",
   ]
 

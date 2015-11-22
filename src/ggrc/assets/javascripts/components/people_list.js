@@ -1,0 +1,75 @@
+/*!
+  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: andraz@reciprocitylabs.com
+  Maintained By: andraz@reciprocitylabs.com
+*/
+
+(function (can) {
+  can.Component.extend({
+    tag: "people-list",
+    template: can.view(GGRC.mustache_path + "/base_templates/people_list.mustache"),
+    scope: {
+      editable: "@",
+      deferred: "@"
+    }
+  });
+
+  can.Component.extend({
+    tag: "people-group",
+    template: can.view(GGRC.mustache_path + "/base_templates/people_group.mustache"),
+    scope: {
+      limit: "@",
+      mapping: "@",
+      required: "@",
+      type: "@",
+      toggle_add: false,
+    },
+    events: {
+      ".person-selector input autocomplete:select": function (el, ev, ui) {
+        var person = ui.item,
+            destination = this.scope.instance,
+            deferred = this.scope.deferred;
+
+        if (deferred === "true") {
+          destination.mark_for_addition("related_objects_as_destination", person, {
+            attrs: {
+              "AssigneeType": can.capitalize(this.scope.type),
+            }
+          });
+        } else {
+          new CMS.Models.Relationship({
+            attrs: {
+              "AssigneeType": can.capitalize(this.scope.type),
+            },
+            source: {
+              href: person.href,
+              type: person.type,
+              id: person.id
+            },
+            context: {},
+            destination: {
+              href: destination.href,
+              type: destination.type,
+              id: destination.id
+            }
+          }).save();
+        }
+      },
+    },
+    helpers: {
+      can_unmap: function (options) {
+        if (this.attr("instance").get_mapping(this.attr("mapping")).length > 1) {
+          return options.fn(options.context);
+        }
+        return options.inverse(options.context);
+      },
+      show_add: function (options) {
+        if (this.attr("editable") === "true") {
+          return options.fn(options.context);
+        }
+        return options.inverse(options.context);
+      }
+    }
+  });
+})(window.can);

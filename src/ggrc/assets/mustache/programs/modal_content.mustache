@@ -29,18 +29,6 @@
       {{/if_null}}
       {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
     </div>
-    <div class="span6 hidable">
-      <label data-test-id="label_privacy_2c925d94">
-      Privacy
-        <i class="grcicon-help-black" rel="tooltip" title="Should only certain people know about this Program?  If so, make it Private."></i>
-        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      </label>
-      <div class="checkbox-area">
-        <input data-test-id="new_page_checkbox_ed1fdde7"
-               tabindex="2" name="private"
-               value="private" type="checkbox" {{#if private}}checked="checked"{{/if}}> Private Program
-      </div>
-    </div>
   </div>
 
   <!-- Description & owner/contact block  -->
@@ -51,12 +39,8 @@
         <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <div class="wysiwyg-area"
-           data-test-id="new_program_field_description_77c4a06d">
-        <textarea tabindex="3"
-                  id="program_description"
-                  class="span12 triple wysihtml5" name="description"
-                  placeholder="Enter Description">{{{description}}}</textarea>
+      <div class="wysiwyg-area">
+        <textarea tabindex="3" id="program_description" class="span12 triple wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
       </div>
     </div>
 
