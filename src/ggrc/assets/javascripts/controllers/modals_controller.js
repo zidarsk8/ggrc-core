@@ -459,13 +459,26 @@ can.Control("GGRC.Controllers.Modals", {
       }
     }
     this.setup_wysihtml5(); // in case the changes in values caused a new wysi box to appear.
-  }
+  },
+  "[data-before], [data-after] change": function (el, ev) {
+    function setDateLimit(prop, when, date) {
+      var elem = prop ? this.element.find("[name=" + prop + "]") : el;
+      if (!elem.data("datepicker")) {
+        elem.datepicker({changeMonth: true, changeYear: true})
+      }
+      elem.datepicker("option", when, date);
+    }
+    var date = el.datepicker("getDate") || new Date(),
+        data = el.data(),
+        options = {
+          "before": "minDate",
+          "after": "maxDate"
+        };
 
-  , "[data-before], [data-after] change" : function(el, ev) {
-    var start_date = el.datepicker('getDate');
-    this.element.find("[name=" + el.data("before") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "minDate", start_date);
-    this.element.find("[name=" + el.data("after") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "maxDate", start_date);
-  }
+    _.each(options, function (val, key) {
+      setDateLimit.call(this, data[key], val, date);
+    }, this);
+  },
 
   "{$footer} a.btn[data-toggle='modal-submit-addmore'] click" : function(el, ev){
     if (el.hasClass('disabled')) {

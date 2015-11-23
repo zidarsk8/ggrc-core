@@ -354,9 +354,9 @@ can.Model.Cacheable("CMS.Models.Request", {
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
-    status : "Unstarted"
-    , requested_on : new Date()
-    , due_on : null
+    status: "Unstarted",
+    requested_on: new Date(),
+    due_on: new Date()
   }
   , info_pane_options: {
     mapped_objects: {
