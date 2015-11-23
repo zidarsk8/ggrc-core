@@ -6,7 +6,7 @@
 }}
 
 {{#instance.workflow_state}}
-  <li class="person-holder">
+  <div class="person-holder">
     <a href="{{instance.viewLink}}#task_widget" class="info-action person-tooltip-trigger" data-placement="left">
       {{#switch instance.workflow_state}}
         {{#case 'Verified'}}
@@ -74,5 +74,5 @@
         </div>
       </div>
     {{/with_mapping}}
-  </li>
+  </div>
 {{/instance.workflow_state}}

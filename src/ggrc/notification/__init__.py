@@ -63,6 +63,9 @@ def get_notification_data(notifications):
     filtered_data = get_filter_data(notification)
     aggregate_data = merge_dict(aggregate_data, filtered_data)
 
+  # Remove notifications for objects without a contact (such as task groups)
+  aggregate_data.pop("", None)
+
   return aggregate_data
 
 

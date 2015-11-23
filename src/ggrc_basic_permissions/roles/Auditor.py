@@ -30,6 +30,7 @@ permissions = {
         "Request",
         "ControlAssessment",
         "Issue",
+        "Relationship",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",

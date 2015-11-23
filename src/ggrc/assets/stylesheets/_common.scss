@@ -339,6 +339,9 @@ small {
 }
 
 // buttons
+.btn-info-pin-header {
+  margin-top: 18px;
+}
 .btn {
   @include btn-size();
   font-weight: bold;
@@ -757,6 +760,10 @@ select.multiple-selector {
   word-wrap: break-word;
   margin-bottom:10px;
   line-height:18px;
+  &.shorter-rtf {
+    width: 75%;
+    float: left
+  }
 }
 
 .drag {
@@ -892,7 +899,8 @@ select.multiple-selector {
     font-weight:bold;
     font-size:12px;
   }
-  .info.info-expand {
+  .info.info-expand,
+  .info.info-expand-mapped {
     line-height:16px;
     padding:0;
     background:transparent;
@@ -1178,6 +1186,11 @@ p {
     display: inline-block;
     margin-top: 4px;
   }
+  &.state-float {
+    float: left;
+    margin-top: 0;
+    margin-left: 10px;
+  }
 }
 
 @each $state_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
@@ -1204,6 +1217,7 @@ p {
 }
 
 .custom-attr-table {
+  font-size: 11px;
   .table {
     td.centered,
     th.centered {
@@ -1279,6 +1293,24 @@ label.disabled {
   .popover-template:hover {
     i {
       background-position: -246px -416px;
+    }
+  }
+}
+
+.label-light {
+  background-color: lighten($blue, 55%);
+  span,
+  a {
+    color: $black;
+    text-shadow: none;
+    font-weight: normal;
+  }
+  a {
+    font-weight: bold;
+    text-decoration: none;
+    padding: 0 2px;
+    &:hover {
+      text-decoration: none;
     }
   }
 }

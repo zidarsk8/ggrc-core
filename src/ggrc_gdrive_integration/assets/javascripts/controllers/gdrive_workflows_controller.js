@@ -1107,6 +1107,7 @@ can.Component.extend({
   scope: {
     instance: null,
     deferred: "@",
+    icon: "@",
     link_text: "@",
     link_class: "@",
     click_event: "@",

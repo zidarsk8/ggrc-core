@@ -20,7 +20,7 @@
       </label>
       <input data-id="title_txtbx" tabindex="1" id="section-title" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
     </div>
-    <div data-id="pol_reg_std" class="span6">
+    <div data-id="pol_reg_std" class="span6 hidable">
       {{#if_helpers '\
         ^if' instance.id '\
         and ^if' object_params.directive}}
@@ -28,6 +28,7 @@
         <label>
           Policy / Regulation / Standard / Contract
           <i class="fa fa-question-circle" rel="tooltip" title="Policy / Regulation / Standard / Contract containing this Section"></i>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <input tabindex="2" class="input-block-level" name="directive.title" data-lookup="Policy,Regulation,Standard,Contract" data-permission-type="update" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Policy / Regulation / Standard / Contract" type="text" value="{{firstexist directive.title ''}}" />
         {{/using}}

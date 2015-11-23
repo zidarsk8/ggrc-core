@@ -1,0 +1,16 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+{{#instance.class.info_pane_options.evidence}}
+{{#add_to_current_scope parent_instance=instance}}
+  <ul class="attachment-list" data-disable-lazy-loading="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
+  </ul>
+  {{#is_allowed 'update'}}
+    <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach evidence" click_event="trigger_upload">
+    </ggrc-gdrive-picker-launcher>
+  {{/is_allowed}}
+{{/instance}}
+{{/add_to_current_scope}}

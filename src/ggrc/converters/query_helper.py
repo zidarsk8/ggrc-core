@@ -4,6 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import datetime
+import collections
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
@@ -126,12 +127,13 @@ class QueryHelper(object):
   def expression_keys(self, exp):
     op = exp.get("op", {}).get("name", None)
     if op in ["AND", "OR"]:
-      return expression_keys(exp["left"]) | expression_keys(exp["right"])
+      return self.expression_keys(exp["left"]).union(
+          self.expression_keys(exp["right"]))
     left = exp.get("left", None)
-    if left is None:
-      return set()
-    else:
+    if left is not None and isinstance(left, collections.Hashable):
       return set([left])
+    else:
+      return set()
 
   def macro_expand_object_query(self, object_query):
     def expand_task_dates(exp):

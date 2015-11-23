@@ -1,35 +1,23 @@
 {{!
-    Copyright (C) 2015 Reciprocity, Inc - All Rights Reserved
-    Unauthorized use, copying, distribution, displaying, or public performance
-    of this file, via any medium, is strictly prohibited. All information
-    contained herein is proprietary and confidential and may not be shared
-    with any third party without the express written consent of Reciprocity, Inc.
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: urban@reciprocitylabs.com
     Maintained By: urban@reciprocitylabs.com
 }}
 
 {{#instance}}
-  <section class="info">
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
 
     {{#is_info_pin}}
-    <div class="clearfix">
-      <div class="tier-content pin">
-        <div class="info-pane-utility">
-          {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-          {{> /static/mustache/base_objects/dropdown_menu.mustache}}
-        </div>
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      </div>
-    </div>
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
     {{/is_info_pin}}
 
+    <div class="info-pane-utility">
+      {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+    </div>
+
     <div class="tier-content">
-      {{^is_info_pin}}
-        <div class="info-pane-utility">
-          {{> /static/mustache/base_objects/dropdown_menu.mustache}}
-        </div>
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      {{/is_info_pin}}
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
 

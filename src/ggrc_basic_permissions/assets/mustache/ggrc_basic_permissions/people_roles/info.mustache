@@ -5,55 +5,63 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-<section class="info">
+<section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
   {{#is_info_pin}}
-  <div class="clearfix">
-    <div class="tier-content pin">
-      <div class="info-pane-utility">
-        {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-        <div class="details-wrap">
-          <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-          <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-            <li>
-              <a href="/people/{{instance.id}}">
-                <i class="fa fa-long-arrow-right"></i>
-                View Profile Page
+    {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+  {{/is_info_pin}}
+
+  <div class="info-pane-utility">
+    <div class="details-wrap">
+      <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+        <span class="bubble"></span>
+        <span class="bubble"></span>
+        <span class="bubble"></span>
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+        <li>
+          <a href="/people/{{instance.id}}">
+            <i class="grcicon-goto"></i>
+            View Profile Page
+          </a>
+        </li>
+        <li>
+          <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+        </li>
+        {{#with_program_roles_as "roles" result}}
+          {{#if_helpers '\
+            #if_equals' roles.length 1 '\
+            and #if_equals' roles.0.role.permission_summary "Mapped" '\
+            and #if' result.mappings '\
+            and #is_allowed_all' 'delete' result.mappings}}
+            <li class="border">
+              <a href="javascript://" class="unmap" data-toggle="unmap">
+                {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+                <i class="grcicon-remove"></i>
+                Unmap
               </a>
             </li>
-            <li>
-              <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-            </li>
-            {{#with_program_roles_as "roles" result}}
-              {{#if_helpers '\
-                #if_equals' roles.length 1 '\
-                and #if_equals' roles.0.role.permission_summary "Mapped" '\
-                and #if' result.mappings '\
-                and #is_allowed_all' 'delete' result.mappings}}
-                <li class="border">
-                  <a href="javascript://" class="unmap" data-toggle="unmap">
-                    {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-                    <i class="grcicon-remove"></i>
-                    Unmap
-                  </a>
-                </li>
-              {{/if_helpers}}
-            {{/with_program_roles_as}}
+          {{/if_helpers}}
+        {{/with_program_roles_as}}
 
-            {{#is_allowed 'create' 'delete' 'UserRole' context=options.parent_instance.context.id}}
-            {{#is_info_pin}}
-            {{#if_equals options.mapping "mapped_and_or_authorized_people"}}
-              <li>
-                <a href="javascript://" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{instance.id}}">
-                  <i class="fa fa-key"></i>
-                  Edit Authorizations
-                </a>
-              </li>
-            {{/options.mapped_and_or_authorized_people}}
-            {{/is_info_pin}}
-            {{/is_allowed}}
-          </ul>
-        </div>
-      </div>
+        {{#is_allowed 'create' 'delete' 'UserRole' context=options.parent_instance.context.id}}
+        {{#is_info_pin}}
+        {{#if_equals options.mapping "mapped_and_or_authorized_people"}}
+          <li>
+            <a href="javascript://" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{instance.id}}">
+              <i class="grcicon-role-color"></i>
+              Edit Authorizations
+            </a>
+          </li>
+        {{/options.mapped_and_or_authorized_people}}
+        {{/is_info_pin}}
+        {{/is_allowed}}
+      </ul>
+    </div>
+  </div>
+
+  <div class="tier-content">
+    <div class="pane-header">
       <div class="row-fluid wrap-row">
         {{#if_match instance.name '\\\\S'}}
           {{#instance.name}}
@@ -78,80 +86,6 @@
         {{/if}}
       </div>
     </div>
-  </div>
-  {{/is_info_pin}}
-
-  <div class="tier-content">
-    {{^is_info_pin}}
-      <div class="info-pane-utility">
-        <div class="details-wrap">
-          <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-          <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-            <li>
-              <a href="/people/{{instance.id}}">
-                <i class="fa fa-long-arrow-right"></i>
-                View Profile Page
-              </a>
-            </li>
-            <li>
-              <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-            </li>
-            {{#with_program_roles_as "roles" result}}
-              {{#if_helpers '\
-                #if_equals' roles.length 1 '\
-                and #if_equals' roles.0.role.permission_summary "Mapped" '\
-                and #if' result.mappings '\
-                and #is_allowed_all' 'delete' result.mappings}}
-                <li class="border">
-                  <a href="javascript://" class="unmap" data-toggle="unmap">
-                    {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-                    <i class="grcicon-remove"></i>
-                    Unmap
-                  </a>
-                </li>
-              {{/if_helpers}}
-            {{/with_program_roles_as}}
-
-            {{#is_allowed 'create' 'delete' 'UserRole' context=options.parent_instance.context.id}}
-            {{#is_info_pin}}
-            {{#if_equals options.mapping "mapped_and_or_authorized_people"}}
-              <li>
-                <a href="javascript://" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{instance.id}}">
-                  <i class="fa fa-key"></i>
-                  Edit Authorizations
-                </a>
-              </li>
-            {{/options.mapped_and_or_authorized_people}}
-            {{/is_info_pin}}
-            {{/is_allowed}}
-          </ul>
-        </div>
-      </div>
-      <div class="row-fluid wrap-row">
-        {{#if_match instance.name '\\\\S'}}
-          {{#instance.name}}
-            <div class="span6">
-              <h6>Name</h6>
-              <h3>{{instance.name}}</h3>
-            </div>
-          </div>
-          {{/instance.name}}
-        {{/if_match}}
-
-        {{#if_match instance.email '\\\\S'}}
-          {{#instance.email}}
-            <div class="span3">
-              <h6>Email</h6>
-              <p>
-                <a href='mailto:{{instance.email}}' target="_blank">
-                  {{instance.email}}
-                </a>
-              </p>
-            </div>
-          {{/instance.email}}
-        {{/if}}
-      </div>
-    {{/is_info_pin}}
 
     <div class="row-fluid wrap-row">
       <div class="span6">

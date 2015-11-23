@@ -13,6 +13,7 @@
     Search = GGRC.MapperHelpers.Search,
     Multi = GGRC.MapperHelpers.Multi,
     TypeFilter = GGRC.MapperHelpers.TypeFilter,
+    AttrFilter = GGRC.MapperHelpers.AttrFilter,
     CustomFilter = GGRC.MapperHelpers.CustomFilter,
     Cross = GGRC.MapperHelpers.Cross;
   /*
@@ -42,6 +43,7 @@
     Search: Search,
     Multi: Multi,
     TypeFilter: TypeFilter,
+    AttrFilter: AttrFilter,
     CustomFilter: CustomFilter,
     Cross: Cross,
     modules: {},
@@ -269,15 +271,6 @@
       ]),
       audits: Proxy(
         "Audit", "audit", "AuditObject", "auditable", "audit_objects"),
-      potential_requests: Cross("audits", "active_requests"),
-      open_requests: CustomFilter("potential_requests", function(binding) {
-        var audit_object = binding.instance.audit_object && binding.instance.audit_object.reify(),
-            control = binding.binding.instance;
-        if (!audit_object) {
-          return;
-        }
-        return audit_object.auditable && audit_object.auditable.type === 'Control' && audit_object.auditable.id === control.id;
-      }),
       orphaned_objects: Multi([
         "related_objects", "clauses", "controls", "programs", "objectives", "people"
       ])
@@ -322,7 +315,7 @@
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
           "Program", "Issue", "Control", "Section", "Clause", "Objective",
-          "Audit", "ControlAssessment", "AccessGroup"
+          "Audit", "ControlAssessment", "AccessGroup", "Request", "Document"
         ]
       },
       related_objects_as_source: Proxy(
@@ -330,6 +323,9 @@
       related_objects_as_destination: Proxy(
         null, "source", "Relationship", "destination", "related_sources"),
       related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+      destinations: Direct("Relationship", "source", "related_destinations"),
+      sources: Direct("Relationship", "destination", "related_sources"),
+      relationships: Multi(["sources", "destinations"]),
       related_access_groups: TypeFilter("related_objects", "AccessGroup"),
       related_data_assets: TypeFilter("related_objects", "DataAsset"),
       related_facilities: TypeFilter("related_objects", "Facility"),
@@ -344,6 +340,7 @@
       related_audits: TypeFilter("related_objects", "Audit"),
       related_controls: TypeFilter("related_objects", "Control"),
       related_control_assessments: TypeFilter("related_objects", "ControlAssessment"),
+      related_requests: TypeFilter("related_objects", "Request"),
       regulations: TypeFilter("related_objects", "Regulation"),
       contracts: TypeFilter("related_objects", "Contract"),
       policies: TypeFilter("related_objects", "Policy"),
@@ -463,9 +460,11 @@
     Person: {
       _canonical: {
         "related_objects": [
-          "Program", "Regulation", "Contract", "Policy", "Standard", "AccessGroup",
-          "Objective", "Control", "Section", "Clause", "DataAsset", "Facility", "Market",
-          "OrgGroup", "Vendor", "Process", "Product", "Project", "System", "Issue", "ControlAssessment"
+          "Program", "Regulation", "Contract", "Policy", "Standard",
+          "AccessGroup", "Objective", "Control", "Section", "Clause",
+          "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process",
+          "Product", "Project", "System", "Issue", "ControlAssessment",
+          "Request"
         ],
         "authorizations": "UserRole"
       },
@@ -534,7 +533,8 @@
           "Program", "Regulation", "Contract", "Policy", "Standard",
           "Section", "Clause", "Objective", "Control", "AccessGroup",
           "System", "Process", "DataAsset", "Product", "Project", "Facility",
-          "Market", "OrgGroup", "Vendor", "Audit", "Issue", "ControlAssessment" //, "Request", "Response"
+          "Market", "OrgGroup", "Vendor", "Audit", "Issue", "ControlAssessment",
+          "Request" //, "Response"
         ];
 
         //checkfor window.location
@@ -550,7 +550,7 @@
           }).pipe(function (mappings) {
             return mappings.entries;
           });
-      }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,ControlAssessment"),
+      }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,ControlAssessment,Request"),
       extended_related_programs_via_search: TypeFilter("related_objects_via_search", "Program"),
       extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation"),
       extended_related_contracts_via_search: TypeFilter("related_objects_via_search", "Contract"),
@@ -573,12 +573,8 @@
       extended_related_audits_via_search: TypeFilter("related_objects_via_search", "Audit"),
       extended_related_issues_via_search: TypeFilter("related_objects_via_search", "Issue"),
       extended_related_control_assessment_via_search: TypeFilter("related_objects_via_search", "ControlAssessment"),
-      audit_requests: Search(function (binding) {
-        return CMS.Models.Request.findAll({
-          'assignee_id': binding.instance.id
-        });
-      }, 'Request'),
-      open_audit_requests: CustomFilter('audit_requests', function (result) {
+      extended_related_request_via_search: TypeFilter("related_objects_via_search", "Request"),
+      open_audit_requests: CustomFilter('extended_related_request_via_search', function (result) {
         return result.instance.status !== 'Accepted';
       }),
       all_audit_requests: Search(function (binding) {
@@ -623,7 +619,7 @@
       objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects"),
       objectives: TypeFilter("objects", "Objective"),
       objectives_via_program: Cross("_program", "objectives"),
-      responses_via_requests: Cross("requests", "responses"),
+      responses_via_requests: Cross("requests", "related_objects"),
       related_objects_via_requests: Multi(['requests', 'responses_via_requests']),
       context: Direct("Context", "related_object", "context"),
       authorizations: Cross("context", "user_roles"),
@@ -673,7 +669,8 @@
         else
           return false;
       }),
-      related_mapped_requests: TypeFilter("related_mapped_objects", "Request"),
+      //related_mapped_requests: TypeFilter("related_mapped_objects", "Request"),
+      related_requests: TypeFilter("related_objects_via_relationship", "Request"),
       related_mapped_documentation_responses: TypeFilter("related_mapped_objects", "DocumentationResponse"),
       related_mapped_interview_responses: TypeFilter("related_mapped_objects", "InterviewResponse"),
       related_mapped_population_sample_responses: TypeFilter("related_mapped_objects", "PopulationSampleResponse"),
@@ -703,24 +700,50 @@
       ],
     },
     Request: {
-      _canonical: {
-        "responses": ["DocumentationResponse", "InterviewResponse", "PopulationSampleResponse"],
-        "_audit": "Audit"
-      },
-      responses: Direct("Response", "request", "responses"),
-      _audit: Direct("Audit", "requests", "audit"),
-      _audit_object: Direct("AuditObject", "auditable", "audit_object"),
-      audit_object_object: Cross("_audit_object", "_auditable"),
-      audit_objects_via_audit: Cross("_audit", "objects"),
-      objectives_via_audit: Cross("_audit", "objectives"),
-      _objective: TypeFilter("audit_object_object", "Objective"),
-      documentation_responses: TypeFilter("responses", "DocumentationResponse"),
-      interview_responses: TypeFilter("responses", "InterviewResponse"),
-      population_sample_responses: TypeFilter("responses", "PopulationSampleResponse"),
-      related_objects_via_responses: Cross("responses", "business_objects"),
-      extended_related_objects: Multi(["related_objects_via_responses"]),
-      orphaned_objects: Multi(["responses"])
-        //, responses : Multi(["documentation_responses", "interview_responses", "population_sample_responses"])
+      _mixins: ["related_object", "personable", "ownable", "business_object", "documentable"],
+      business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
+      audits: Direct("Audit", "requests", "audit"),
+      urls: TypeFilter("related_objects", "Document"),
+      related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee"),
+      related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester"),
+      related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier"),
+      info_related_objects: CustomFilter("related_objects", function (related_objects) {
+        return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
+      }),
+      comments: TypeFilter("related_objects", "Comment"),
+      documents_from_comments: Cross("comments", "documents"),
+      urls_from_comments: Cross("comments", "urls"),
+      all_documents: Multi(["documents", "documents_from_comments"]),
+      all_urls: Multi(["urls", "urls_from_comments"]),
+      related_objects_via_search: Search(function (binding) {
+        var types = [
+          "Program", "Regulation", "Contract", "Policy", "Standard",
+          "Section", "Clause", "Objective", "Control", "AccessGroup",
+          "System", "Process", "DataAsset", "Product", "Project", "Facility",
+          "Market", "OrgGroup", "Vendor", "Audit", "Issue", "ControlAssessment",
+          "Request" //, "Response"
+        ];
+
+        //checkfor window.location
+        if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
+          return GGRC.Models.Search.search_for_types("", types, {})
+              .pipe(function (mappings) {
+                return mappings.entries;
+              });
+        }
+        return GGRC.Models.Search.search_for_types(
+            "", types, {
+              contact_id: binding.instance.id
+            }).pipe(function (mappings) {
+              return mappings.entries;
+            });
+      }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,ControlAssessment,Request"),
+            //, responses : Multi(["documentation_responses", "interview_responses", "population_sample_responses"])
+    },
+    Comment: {
+      _mixins: ["related_object", "documentable"],
+      urls: TypeFilter("related_objects", "Document"),
+      documents_and_urls: Multi(["documents", "urls"])
     },
     response: {
       _mixins: ["business_object", "documentable"],

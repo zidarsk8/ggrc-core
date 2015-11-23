@@ -3,9 +3,9 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from .all_models import *
+from ggrc.models.all_models import *
 from ggrc import settings
-from ggrc.app import db
+from ggrc import db
 
 """All gGRC model objects and associated utilities."""
 

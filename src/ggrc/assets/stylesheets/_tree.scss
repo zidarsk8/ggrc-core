@@ -1272,9 +1272,6 @@ ul.new-tree {
 }
 
 .tier-content {
-  .sticky-info-panel & {
-    margin-top: 77px;
-  }
   &.pin {
     .info-pane-utility {
       .details-wrap {
@@ -1289,9 +1286,44 @@ ul.new-tree {
   }
 }
 
+.sticky-info-panel {
+  .pane-header {
+    .details-wrap {
+      margin-top: 18px !important;
+    }
+  }
+  .tier-content {
+    margin-top: 77px;
+  }
+}
+
 .info-pane-utility {
   @include clearfix();
   float: right;
+  .sticky-info-panel & {
+    position: fixed;
+    right: 47px;
+    z-index: 9999;
+    margin-top: 20px;
+  }
+  .request & {
+    position: static;
+    margin-top: 0;
+  }
+}
+
+.sticky-info-panel {
+  .details-wrap {
+    &.pin {
+      position: fixed;
+      right: 47px;
+      z-index: 9999;
+      width: 100px;
+      background: $white;
+      margin-top: -15px !important;
+      padding-top: 5px;
+    }
+  }
 }
 
 .details-wrap {
@@ -1299,12 +1331,11 @@ ul.new-tree {
   margin-left: 20px;
   width: 60px;
   position: relative;
-  .info-pane-utility & {
-    .dropdown-toggle {
-      @include clearfix();
-      height: 12px;
-      padding-bottom: 9px;
-    }
+  .dropdown-toggle {
+    @include clearfix();
+    height: 8px;
+    padding-top: 9px;
+    padding-bottom: 9px;
   }
   .pin-content & {
     margin-top: 4px;

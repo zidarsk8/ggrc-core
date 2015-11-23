@@ -136,6 +136,7 @@ function buildClassString(arr, context) {
 
 Mustache.registerHelper("addclass", function (prefix, compute, options) {
   prefix = resolve_computed(prefix);
+  var separator = 'separator' in (options.hash || {}) ? options.hash.separator : '-';
   return function (el) {
     var curClass = null
       , wasAttached = false
@@ -154,11 +155,9 @@ Mustache.registerHelper("addclass", function (prefix, compute, options) {
       } else if (nowAttached && !wasAttached) {
         wasAttached = true;
       }
-
       if (newVal && newVal.toLowerCase) {
-        newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, '-');
+        newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, separator);
       }
-
       if (curClass) {
         $(el).removeClass(curClass);
         curClass = null;
@@ -245,6 +244,10 @@ Mustache.registerHelper("withattr", function () {
 Mustache.registerHelper("if_equals", function (val1, val2, options) {
   var that = this, _val1, _val2;
   function exec() {
+    if (_val1 && val2 && options.hash && options.hash.insensitive) {
+      _val1 = _val1.toLowerCase();
+      _val2 = _val2.toLowerCase();
+    }
     if (_val1 == _val2) return options.fn(options.contexts);
     else return options.inverse(options.contexts);
   }
@@ -765,26 +768,13 @@ Mustache.registerHelper("get_permalink", function () {
 
 Mustache.registerHelper("get_view_link", function (instance, options) {
   function finish(link) {
-    return "<a href=" + link.viewLink + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
+    return "<a href=" + link + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
   }
   instance = resolve_computed(instance);
-  var props = {
-      "Request": "audit",
-      "TaskGroupTask": "task_group:workflow",
-      "TaskGroup": "workflow",
-      "CycleTaskGroupObjectTask": "cycle:workflow",
-      "InterviewResponse": "request:audit",
-      "DocumentationResponse": "request:audit"
-    },
-    hasProp = _.has(props, instance.type);
-
-  if (!instance.viewLink && !hasProp) {
+  if (!instance.viewLink && !instance.get_permalink) {
     return "";
   }
-  if (instance && !hasProp) {
-    return finish(instance);
-  }
-  return defer_render("a", finish, instance.refresh_all.apply(instance, props[instance.type].split(":")));
+  return defer_render("a", finish, instance.get_permalink());
 });
 
 Mustache.registerHelper("schemed_url", function (url) {
@@ -921,7 +911,7 @@ Mustache.registerHelper("with_mapping", function (binding, options) {
 
   if (!context) // can't find an object to map to.  Do nothing;
     return;
-
+  binding = Mustache.resolve(binding);
   loader = context.get_binding(binding);
   if (!loader)
     return;
@@ -930,7 +920,7 @@ Mustache.registerHelper("with_mapping", function (binding, options) {
   options = arguments[2] || options;
 
   function finish(list) {
-    return options.fn(options.contexts.add(frame));
+    return options.fn(options.contexts.add(_.extend({}, frame, {results: list})));
   }
   function fail(error) {
     return options.inverse(options.contexts.add({error : error}));
@@ -1185,7 +1175,7 @@ Mustache.registerHelper("date", function (date) {
   if (no_time) {
     return m.format("MM/DD/YYYY");
   }
-  return m.zone(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
+  return m.utcOffset(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
 });
 
 /**
@@ -1415,6 +1405,11 @@ can.each({
     }
     return date ? moment(date).format(tmpl) : "";
   });
+});
+
+Mustache.registerHelper("capitalize", function (value, options) {
+  value = resolve_computed(value) || "";
+  return can.capitalize(value);
 });
 
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {
@@ -1852,8 +1847,9 @@ Mustache.registerHelper("current_user_is_contact", function (instance, options) 
 });
 
 Mustache.registerHelper("last_approved", function (instance, options) {
-  var loader = instance.get_binding("approval_tasks"),
-      frame = new can.Observe();
+  var loader, frame = new can.Observe();
+  instance = Mustache.resolve(instance);
+  loader = instance.get_binding("approval_tasks");
 
   frame.attr(instance, loader.list);
   function finish(list) {
@@ -3134,6 +3130,41 @@ Mustache.registerHelper("pretty_role_name", function (name) {
     return ROLE_LIST[name];
   }
   return name;
+});
+
+
+/*
+Add new variables to current scope. This is useful for passing variables
+to intialize a tree view.
+
+Example:
+  {{#add_to_current_scope example1="a" example2="b"}}
+    {{log .}} // {example1: "a", example2: "b"}
+  {{/add_to_current_scope}}
+*/
+Mustache.registerHelper("add_to_current_scope", function(options) {
+  return options.fn(options.contexts.add(_.extend({}, options.context, options.hash)));
+});
+
+/*
+Add spaces to a CamelCase string.
+
+Example:
+{{un_camel_case "InProgress"}} becomes "In Progress"
+*/
+Mustache.registerHelper("un_camel_case", function (str, options) {
+  var val = Mustache.resolve(str);
+  if (!val || val == "") {
+    return val;
+  }
+  var newval = val[0];
+  for (var i=1; i<val.length; i++) {
+    if (val[i] == val[i].toUpperCase()) {
+      newval += " ";
+    }
+    newval += val[i];
+  }
+  return newval;
 });
 
 })(this, jQuery, can);

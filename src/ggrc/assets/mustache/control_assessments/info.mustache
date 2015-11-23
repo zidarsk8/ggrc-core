@@ -6,153 +6,85 @@
 }}
 
 {{#instance}}
-  <section class="info">
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
 
     {{#is_info_pin}}
-    <div class="clearfix">
-      <div class="tier-content pin">
-        <div class="info-pane-utility">
-          {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-          {{#is_allowed 'update' instance context='for'}}
-            <div class="details-wrap">
-              <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-              <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                {{#is_allowed 'update' instance context='for'}}
-                  <li>
-                    <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
-                      <i class="fa fa-pencil-square-o"></i>
-                      Edit {{instance.class.title_singular}}
-                    </a>
-                  </li>
-                {{/is_allowed}}
-                <li>
-                  <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-                </li>
-                {{#is_allowed 'update' instance context='for'}}
-                {{#with_mapping 'related_audits' instance}}
-                {{#using control=control}}
-                {{#with_create_issue_json instance}}
-                  <li class="border">
-                      <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Issue" data-object-plural="issues" data-object-params='{{create_issue_json}}'>
-                        <i class="fa fa-plus-circle"></i>
-                        Create Issue
-                      </a>
-                  </li>
-                  <li class="border">
-                      <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{{create_issue_json}}'>
-                        <i class="fa fa-plus-circle"></i>
-                        Create Request
-                      </a>
-                  </li>
-                {{/with_create_issue_json}}
-                {{/using}}
-                {{/with_mapping}}
-                {{/is_allowed}}
-                {{#with_page_object_as 'page_instance'}}
-                  {{#is_allowed_to_map page_instance instance}}
-                    {{^options.is_in_selector}}
-                      {{> /static/mustache/base_objects/unmap.mustache}}
-                    {{/options}}
-                  {{/is_allowed_to_map}}
-                {{/with}}
-                {{#if instance.viewLink}}
-                  {{#is_allowed "view_object_page" instance}}
-                    <li>
-                      <a href="{{instance.viewLink}}">
-                        <i class="fa fa-long-arrow-right"></i>
-                        View {{instance.class.title_singular}}
-                      </a>
-                    </li>
-                  {{/is_allowed}}
-                {{/if}}
-
-                {{#is_allowed 'delete' instance}}
-                  <li>
-                    <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                      <i class="grcicon-deleted"></i>
-                      Delete
-                    </a>
-                  </li>
-                {{/is_allowed}}
-              </ul>
-            </div>
-          {{/is_allowed}}
-        </div>
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      </div>
-    </div>
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
     {{/is_info_pin}}
 
-    <div class="tier-content">
-      {{^is_info_pin}}
-        <div class="info-pane-utility">
-          {{#is_allowed 'update' instance context='for'}}
-            <div class="details-wrap">
-              <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-              <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                {{#is_allowed 'update' instance context='for'}}
-                  <li>
-                    <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
-                      <i class="fa fa-pencil-square-o"></i>
-                      Edit {{instance.class.title_singular}}
-                    </a>
-                  </li>
-                {{/is_allowed}}
+    <div class="info-pane-utility">
+      {{#is_allowed 'update' instance context='for'}}
+        <div class="details-wrap">
+          <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+            <span class="bubble"></span>
+            <span class="bubble"></span>
+            <span class="bubble"></span>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+            {{#is_allowed 'update' instance context='for'}}
+              <li>
+                <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+                  <i class="fa fa-pencil-square-o"></i>
+                  Edit {{instance.class.title_singular}}
+                </a>
+              </li>
+            {{/is_allowed}}
+            <li>
+              <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+            </li>
+            {{#is_allowed 'update' instance context='for'}}
+            {{#with_mapping 'related_audits' instance}}
+            {{#using control=control}}
+            {{#with_create_issue_json instance}}
+              <li class="border">
+                  <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Issue" data-object-plural="issues" data-object-params='{{create_issue_json}}'>
+                    <i class="fa fa-plus-circle"></i>
+                    Create Issue
+                  </a>
+              </li>
+              <li class="border">
+                  <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{{create_issue_json}}'>
+                    <i class="fa fa-plus-circle"></i>
+                    Create Request
+                  </a>
+              </li>
+            {{/with_create_issue_json}}
+            {{/using}}
+            {{/with_mapping}}
+            {{/is_allowed}}
+            {{#with_page_object_as 'page_instance'}}
+              {{#is_allowed_to_map page_instance instance}}
+                {{^options.is_in_selector}}
+                  {{> /static/mustache/base_objects/unmap.mustache}}
+                {{/options}}
+              {{/is_allowed_to_map}}
+            {{/with}}
+            {{#if instance.viewLink}}
+              {{#is_allowed "view_object_page" instance}}
                 <li>
-                  <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+                  <a href="{{instance.viewLink}}">
+                    <i class="grcicon-goto"></i>
+                    View {{instance.class.title_singular}}
+                  </a>
                 </li>
-                {{#is_allowed 'update' instance context='for'}}
-                {{#with_mapping 'related_audits' instance}}
-                {{#using control=control}}
-                {{#with_create_issue_json instance}}
-                  <li class="border">
-                      <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Issue" data-object-plural="issues" data-object-params='{{create_issue_json}}'>
-                        <i class="fa fa-plus-circle"></i>
-                        Create Issue
-                      </a>
-                  </li>
-                  <li class="border">
-                      <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{{create_issue_json}}'>
-                        <i class="fa fa-plus-circle"></i>
-                        Create Request
-                      </a>
-                  </li>
-                {{/with_create_issue_json}}
-                {{/using}}
-                {{/with_mapping}}
-                {{/is_allowed}}
-                {{#with_page_object_as 'page_instance'}}
-                  {{#is_allowed_to_map page_instance instance}}
-                    {{^options.is_in_selector}}
-                      {{> /static/mustache/base_objects/unmap.mustache}}
-                    {{/options}}
-                  {{/is_allowed_to_map}}
-                {{/with}}
-                {{#if instance.viewLink}}
-                  {{#is_allowed "view_object_page" instance}}
-                    <li>
-                      <a href="{{instance.viewLink}}">
-                        <i class="fa fa-long-arrow-right"></i>
-                        View {{instance.class.title_singular}}
-                      </a>
-                    </li>
-                  {{/is_allowed}}
-                {{/if}}
+              {{/is_allowed}}
+            {{/if}}
 
-                {{#is_allowed 'delete' instance}}
-                  <li>
-                    <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                      <i class="grcicon-deleted"></i>
-                      Delete
-                    </a>
-                  </li>
-                {{/is_allowed}}
-              </ul>
-            </div>
-          {{/is_allowed}}
+            {{#is_allowed 'delete' instance}}
+              <li>
+                <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                  <i class="grcicon-deleted"></i>
+                  Delete
+                </a>
+              </li>
+            {{/is_allowed}}
+          </ul>
         </div>
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      {{/is_info_pin}}
+      {{/is_allowed}}
+    </div>
+
+    <div class="tier-content">
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
 
       <div class="row-fluid wrap-row" {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true" data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
