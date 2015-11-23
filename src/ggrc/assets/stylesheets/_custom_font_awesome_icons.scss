@@ -68,6 +68,13 @@
 
 .grcicon-cycle-color:before { content: $fa-var-play-circle; }
 .grcicon-info:before { content: $fa-var-info-circle; }
+.grcicon-access-group:before,
+.grcicon-accessgroup:before,
+.grcicon-access_group:before,
+.grcicon-access_group-black:before,
+.grcicon-accessgroup-black:before,
+.grcicon-accessgroup-color:before,
+.grcicon-access_group-color:before { content: $fa-var-map-signs; }
 
 // Turn icons to black
 %black-icons {
@@ -84,6 +91,13 @@
   .grcicon-clause-color:before { color: $black; }
   .grcicon-cycle-color:before { color: $black; }
   .grcicon-info:before { color: $black; }
+  .grcicon-access-group:before,
+  .grcicon-accessgroup:before,
+  .grcicon-access_group:before,
+  .grcicon-access_group-black:before,
+  .grcicon-accessgroup-black:before,
+  .grcicon-accessgroup-color:before,
+  .grcicon-access_group-color:before { color: $black; }
 
   // .grcicon-info { background-position:-126px -176px; }
   // .grcicon-role-color { background-position:-102px -8px; }
@@ -148,7 +162,14 @@
   }
   .grcicon-clause-color:before { color: $white; }
   .grcicon-cycle-color:before { color: $white; }
-  .grcicon-info:before { color: $black; }
+  .grcicon-info:before { color: $white; }
+  .grcicon-access-group:before,
+  .grcicon-accessgroup:before,
+  .grcicon-access_group:before,
+  .grcicon-access_group-black:before,
+  .grcicon-accessgroup-black:before,
+  .grcicon-accessgroup-color:before,
+  .grcicon-access_group-color:before { color: $white; }
 
   // .grcicon-info { background-position:-198px -80px; }
   // .grcicon-role-color { background-position:-102px -32px; }
