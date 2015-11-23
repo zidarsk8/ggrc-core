@@ -451,7 +451,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     }
   , form_preload : function(new_object_form) {
     var audit, that = this;
-    if(new_object_form) {
+    if (new_object_form) {
       if (GGRC.page_model.type == "Audit") {
         this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
       }
@@ -461,7 +461,7 @@ can.Model.Cacheable("CMS.Models.Request", {
         }
       });
 
-      if(this.audit) {
+      if (this.audit) {
         audit = this.audit.reify();
         (audit.selfLink ? $.when(audit) : audit.refresh())
         .then(function(audit) {

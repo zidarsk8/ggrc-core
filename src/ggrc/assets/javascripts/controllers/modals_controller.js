@@ -86,7 +86,7 @@ can.Control("GGRC.Controllers.Modals", {
         .then(this.proxy("serialize_form"))
         .then(function() {
           // If the modal is closed early, the element no longer exists
-          that.element && that.element.trigger('preload');
+          that.element && that.element.trigger("preload");
         })
         .then(this.proxy("autocomplete"));
       this.restore_ui_status_from_storage();
@@ -325,38 +325,33 @@ can.Control("GGRC.Controllers.Modals", {
        (typeof el.attr('value') !== 'undefined' && !el.attr('value').length)) {
       this.set_value_from_element(el);
     }
-  }
-  , serialize_form : function() {
-      var $form = this.options.$content.find("form")
-        , $elements = $form.find(":input:not(isolate-form *)")
-        ;
+  },
+  serialize_form: function () {
+    var $form = this.options.$content.find("form"),
+        $elements = $form.find(":input:not(isolate-form *)");
 
-      can.each($elements.toArray(), this.proxy("set_value_from_element"));
+    can.each($elements.toArray(), this.proxy("set_value_from_element"));
+  },
+  set_value_from_element: function (el) {
+    el = el instanceof jQuery ? el : $(el);
+    var name = el.attr("name"),
+        value = el.val();
+
+    // If no model is specified, short circuit setting values
+    // Used to support ad-hoc form elements in confirmation dialogs
+    if (!this.options.model) {
+      return;
     }
-
-  , set_value_from_element : function (el) {
-      var $el = el instanceof jQuery ? el : $(el)
-        , name = $el.attr('name')
-        , value = $el.val()
-        ;
-      // If no model is specified, short circuit setting values
-      // Used to support ad-hoc form elements in confirmation dialogs
-      if (!this.options.model) {
-        return;
-      }
-
-      if (name) {
-        this.set_value({ name: name, value: value });
-      }
-
-      if ($el.is("[data-also-set]")) {
-        can.each($el.data("also-set").split(","), function(oname) {
-          this.set_value({ name : oname, value : value});
-        }, this);
-      }
+    if (name) {
+      this.set_value({name: name, value: value});
     }
-
-  , set_value: function (item) {
+    if (el.is("[data-also-set]")) {
+      can.each(el.data("also-set").split(","), function(oname) {
+        this.set_value({name: oname, value: value});
+      }, this);
+    }
+  },
+  set_value: function (item) {
     // Don't set `_wysihtml5_mode` on the instances
     if (item.name === '_wysihtml5_mode') {
       return;
@@ -472,7 +467,7 @@ can.Control("GGRC.Controllers.Modals", {
     this.element.find("[name=" + el.data("after") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "maxDate", start_date);
   }
 
-  , "{$footer} a.btn[data-toggle='modal-submit-addmore'] click" : function(el, ev){
+  "{$footer} a.btn[data-toggle='modal-submit-addmore'] click" : function(el, ev){
     if (el.hasClass('disabled')) {
       return;
     }
