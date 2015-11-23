@@ -518,7 +518,14 @@
     }
     .checkbox-wrap {
       input[type="checkbox"] {
-        margin-bottom: 0;
+        display: block;
+        margin: 0 auto 12px;
+        &:first-child {
+          margin-top: 6px;
+        }
+        &:last-child {
+          margin-bottom: 0;
+        }
       }
     }
     .objective-selector {
