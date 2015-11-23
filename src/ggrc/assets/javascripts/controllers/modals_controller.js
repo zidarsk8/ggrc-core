@@ -1015,30 +1015,28 @@ can.Component.extend({
       }
     },
     deferred_update: function () {
-      var that = this,
-          changes = this.scope.changes,
+      var changes = this.scope.changes,
           instance = this.scope.instance;
 
       if (!changes.length) {
         if (instance && instance._pending_joins && instance._pending_joins.length) {
           instance.delay_resolving_save_until(instance.constructor.resolve_deferred_bindings(instance));
         }
-
         return;
       }
       this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
       can.each(
         changes,
         function(item) {
-          var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
+          var mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, item.what.constructor.shortName);
           if (item.how === "add") {
-            that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
+            this.scope.instance.mark_for_addition(mapping, item.what, item.extra);
           } else {
-            that.scope.instance.mark_for_deletion(mapping, item.what);
+            this.scope.instance.mark_for_deletion(mapping, item.what);
           }
-        }
+        }.bind(this)
       );
-      instance.delay_resolving_save_until(that.scope.instance.constructor.resolve_deferred_bindings(that.scope.instance));
+      this.scope.instance.delay_resolving_save_until(this.scope.instance.constructor.resolve_deferred_bindings(this.scope.instance));
     },
     "{parent_instance} updated": "deferred_update",
     "{parent_instance} created": "deferred_update",
@@ -1046,6 +1044,10 @@ can.Component.extend({
     // this works like autocomplete_select on all modal forms and
     // descendant class objects.
     "autocomplete_select" : function(el, event, ui) {
+      if (!this.element) {
+        return;
+      }
+
       var mapping, extra_attrs;
       extra_attrs = can.reduce(this.element.find("input:not([data-mapping], [data-lookup])").get(), function(attrs, el) {
         attrs[$(el).attr("name")] = $(el).val();
