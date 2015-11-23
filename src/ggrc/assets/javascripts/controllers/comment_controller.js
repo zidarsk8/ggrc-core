@@ -13,7 +13,7 @@ can.Component.extend({
     parent_instance: null,
     instance: null,
     instance_attr: "@",
-    source_mapping: "@",
+    source_mapping: null,
     source_mapping_source: "@",
     mapping: "@",
     deferred: "@",
@@ -24,8 +24,15 @@ can.Component.extend({
   },
   events: {
     init: function() {
-      this.scope.attr("source_mapping", GGRC.page_instance());
-      this.scope.attr("instance", CMS.Models.Comment());
+      if (!this.scope.attr("source_mapping")) {
+        this.scope.attr("source_mapping", GGRC.page_instance());
+      }
+      this.newInstance();
+    },
+    newInstance: function () {
+      var instance = CMS.Models.Comment();
+      instance._source_mapping = this.scope.attr("source_mapping");
+      this.scope.attr("instance", instance);
     },
     "cleanPanel": function () {
       this.scope.attachments.replace([]);
@@ -48,7 +55,7 @@ can.Component.extend({
       instance.attr(data).save().then(function() {
         return instance.constructor.resolve_deferred_bindings(instance);
       }).then(function() {
-        this.scope.attr('instance', new CMS.Models.Comment());
+        this.newInstance();
         this.cleanPanel();
       }.bind(this));
 
@@ -77,7 +84,8 @@ can.Control("GGRC.Controllers.Comments", {
     if (!(instance instanceof  CMS.Models.Comment)) {
       return;
     }
-    var parent_dfd = this._create_relationship(GGRC.page_instance(), instance);
+    var source = instance._source_mapping || GGRC.page_instance();
+    var parent_dfd = this._create_relationship(source, instance);
     instance.delay_resolving_save_until($.when(parent_dfd));
   }
 });

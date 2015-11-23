@@ -87,10 +87,10 @@ class TestCsvImport(TestCase):
             line_list="21, 26, 27", column_name="Code", value="pro 1",
             s="s", ignore_lines="26, 27"),
         errors.OWNER_MISSING.format(line=26),
-        errors.MISSING_COLUMN.format(line=13, column_names="owners", s=""),
-        errors.MISSING_COLUMN.format(line=14, column_names="owners", s=""),
-        errors.MISSING_COLUMN.format(line=15, column_names="owners", s=""),
-        errors.MISSING_COLUMN.format(line=16, column_names="owners", s=""),
+        errors.MISSING_COLUMN.format(line=13, column_names="Owner", s=""),
+        errors.MISSING_COLUMN.format(line=14, column_names="Owner", s=""),
+        errors.MISSING_COLUMN.format(line=15, column_names="Owner", s=""),
+        errors.MISSING_COLUMN.format(line=16, column_names="Owner", s=""),
     ])
 
     self.assertEqual(expected_warnings, set(row_messages))

@@ -211,7 +211,6 @@ class BlockConverter(object):
       self.remove_duplicate_keys(key, counts)
 
   def get_info(self):
-    stats = [(r.is_new, r.ignore) for r in self.row_converters]
     created, updated, ignored, deleted = 0, 0, 0, 0
     for row in self.row_converters:
       if row.ignore:
@@ -295,7 +294,8 @@ class BlockConverter(object):
     return self.object_class, objects
 
   def generate_unique_counts(self):
-    unique = [key for key, header in self.headers.items() if header["unique"]]
+    unique = [key for key, header in self.object_headers.items()
+              if header["unique"]]
     for key in unique:
       for index, row in enumerate(self.row_converters):
         value = row.get_value(key)

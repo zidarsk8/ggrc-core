@@ -300,7 +300,6 @@ permissions = {
             "condition": "is"
         },
         "Program",
-        "Request",
         "Context",
         {
             "type": "BackgroundTask",

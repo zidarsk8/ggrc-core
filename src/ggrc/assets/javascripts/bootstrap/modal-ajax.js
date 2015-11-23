@@ -387,7 +387,7 @@
 
       $el.on(["click", "mouseup", "keypress", "keydown", "keyup", "show", "shown", "hide", "hidden"].join(".clone ") + ".clone", function(e) {
         that.$cloneEl
-        ? that.$cloneEl.find("[data-original-id=" + e.target.id + "]").trigger(new $.Event(e))
+        ? that.$cloneEl.find("[data-original-id='" + e.target.id + "']").trigger(new $.Event(e))
         : $el.off(".clone");
       });
     }

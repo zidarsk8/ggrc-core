@@ -27,7 +27,7 @@
       </label>
         <div class="objective-selector">
           {{#using audit=instance.audit }}
-            <input tabindex="11" type="text" name="audit.title" class="span12 search-icon" data-lookup="Audit" placeholder="Enter text to search for Audit" null-if-empty="false" value="{{firstnonempty audit.title ''}}">
+            <input tabindex="11" type="text" name="audit.title" class="span12 search-icon" data-lookup="Audit" data-permission-type="update" placeholder="Enter text to search for Audit" null-if-empty="false" value="{{firstnonempty audit.title ''}}">
           {{/using}}
         </div>
     </div>
@@ -73,26 +73,28 @@
       <ggrc-modal-connector
           parent_instance="instance"
           instance="instance"
-          source_mapping="business_objects"
+          source_mapping="info_related_objects"
           deferred="true"
           >
         <label class="border-l">
           Mapped Objects
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        {{#each list}}
-        <div class="oneline">
-          <a href="javascript://" class="unmap" data-toggle="unmap">
-            <span class="result" {{data 'result'}}></span>
-            <i class="grcicon-deleted"></i>
-          </a>
-          {{#update_link .}}
-            <a class="url" href="{{schemed_url link}}" target="_blank">
-              {{firstexist title name email link}}
+        {{#prune_context}}
+          {{#each list}}
+          <div class="oneline">
+            <a href="javascript://" class="unmap" data-toggle="unmap">
+              <span class="result" {{data 'result'}}></span>
+              <i class="grcicon-deleted"></i>
             </a>
-          {{/update_link}}
-        </div>
-        {{/each}}
+            {{#update_link .}}
+              <a class="url" href="{{schemed_url link}}" target="_blank">
+                {{firstexist title name email link}}
+              </a>
+            {{/update_link}}
+          </div>
+          {{/each}}
+        {{/prune_context}}
         {{^list.length}}
           <span class="gray"><em>No mapped objects</em></span>
         {{/list.length}}

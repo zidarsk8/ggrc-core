@@ -8,373 +8,152 @@
 //= require can.jquery-all
 
 (function (can, $) {
+  var CoreExtension = {};
 
-  if (!GGRC.widget_descriptors)
-    GGRC.widget_descriptors = {};
-  if (!GGRC.default_widgets)
-    GGRC.default_widgets = [];
-
-
-  //A widget descriptor has the minimum five properties:
-  // widget_id:  the unique ID string for the widget
-  // widget_name: the display title for the widget in the UI
-  // widget_icon: the CSS class for the widget in the UI
-  // content_controller: The controller class for the widget's content section
-  // content_controller_options: options passed directly to the content controller; the
-  //   precise options depend on the controller itself.  They usually require instance
-  //   and/or model and some view.
-  can.Construct("GGRC.WidgetDescriptor", {
-    /*
-      make an info widget descriptor for a GGRC object
-      You must provide:
-      instance - an instance that is a subclass of can.Model.Cacheable
-      widget_view [optional] - a template for rendering the info.
-    */
-    make_info_widget: function (instance, widget_view) {
-      var default_info_widget_view = GGRC.mustache_path + "/base_objects/info.mustache";
-      return new this(
-        instance.constructor.shortName + ":info", {
-          widget_id: "info",
-          widget_name: function () {
-            if (instance.constructor.title_singular === 'Person')
-              return 'Info';
-            else
-              return instance.constructor.title_singular + " Info";
-          },
-          widget_icon: "grcicon-info",
-          content_controller: GGRC.Controllers.InfoWidget,
-          content_controller_options: {
-            instance: instance,
-            model: instance.constructor,
-            widget_view: widget_view || default_info_widget_view
-          }
-        });
-    },
-    /*
-      make a tree view widget descriptor with mostly default-for-GGRC settings.
-      You must provide:
-      instance - an instance that is a subclass of can.Model.Cacheable
-      far_model - a can.Model.Cacheable class
-      mapping - a mapping object taken from the instance
-      extenders [optional] - an array of objects that will extend the default widget config.
-    */
-    make_tree_view: function (instance, far_model, mapping, extenders) {
-      var descriptor = {
-        content_controller: CMS.Controllers.TreeView,
-        content_controller_selector: "ul",
-        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
-        widget_id: far_model.table_singular,
-        widget_guard: function () {
-          if (far_model.title_plural === "Audits" && instance instanceof CMS.Models.Program) {
-            return "context" in instance && !!(instance.context.id);
-          }
-          return true;
-        },
-        widget_name: function () {
-          var $objectArea = $(".object-area");
-          if ($objectArea.hasClass("dashboard-area") || instance.constructor.title_singular === "Person") {
-            if (/dashboard/.test(window.location)) {
-              return "My " + far_model.title_plural;
-            } else {
-              return far_model.title_plural;
+  CoreExtension.name = "core";
+  GGRC.extensions.push(CoreExtension);
+  _.extend(CoreExtension, {
+    object_type_decision_tree: function () {
+      return {
+        "program": CMS.Models.Program,
+        "audit": CMS.Models.Audit,
+        "contract": CMS.Models.Contract,
+        "policy": CMS.Models.Policy,
+        "standard": CMS.Models.Standard,
+        "regulation": CMS.Models.Regulation,
+        "org_group": CMS.Models.OrgGroup,
+        "vendor": CMS.Models.Vendor,
+        "project": CMS.Models.Project,
+        "facility": CMS.Models.Facility,
+        "product": CMS.Models.Product,
+        "data_asset": CMS.Models.DataAsset,
+        "access_group": CMS.Models.AccessGroup,
+        "market": CMS.Models.Market,
+        "system_or_process": {
+          _discriminator: function (data) {
+            if (data.is_biz_process) {
+              return CMS.Models.Process;
             }
-          } else if (far_model.title_plural === "Audits") {
-            return "Mapped Audits";
-          } else {
-            return (far_model.title_plural === "References" ? "Linked " : "Mapped ") + far_model.title_plural;
+            return CMS.Models.System;
           }
         },
-        widget_icon: far_model.table_singular,
-        object_category: far_model.category || 'default',
-        model: far_model,
-        content_controller_options: {
-          child_options: [],
-          draw_children: false,
-          parent_instance: instance,
-          model: far_model,
-          list_loader: function () {
-            return mapping.refresh_list();
-          }
-        }
+        "system": CMS.Models.System,
+        "process": CMS.Models.Process,
+        "control": CMS.Models.Control,
+        "control_assessment": CMS.Models.ControlAssessment,
+        "request": CMS.Models.Request,
+        "issue" : CMS.Models.Issue,
+        "objective": CMS.Models.Objective,
+        "section": CMS.Models.Section,
+        "clause": CMS.Models.Clause,
+        "person": CMS.Models.Person,
+        "role": CMS.Models.Role,
+        "threat": CMS.Models.Threat,
+        "vulnerability": CMS.Models.Vulnerability,
+        "template": CMS.Models.Template
       };
-
-      $.extend.apply($, [true, descriptor].concat(extenders || []));
-
-      return new this(instance.constructor.shortName + ":" + far_model.table_singular, descriptor);
     },
-    newInstance: function (id, opts) {
-      var ret;
-      if (!opts && typeof id === "object") {
-        opts = id;
-        id = opts.widget_id;
+    init_widgets: function () {
+      var base_widgets_by_type = GGRC.tree_view.base_widgets_by_type,
+          widget_list = new GGRC.WidgetList("ggrc_core"),
+          object_class = GGRC.infer_object_type(GGRC.page_object),
+          object_table = object_class && object_class.table_plural,
+          object = GGRC.page_instance();
+
+      // TODO: Really ugly way to avoid executing IIFE - needs cleanup
+      if (!GGRC.page_object) {
+        return;
       }
+      // Info widgets display the object information instead of listing connected
+      //  objects.
+      var info_widget_views = {
+        'programs': GGRC.mustache_path + "/programs/info.mustache",
+        'audits': GGRC.mustache_path + "/audits/info.mustache",
+        'people': GGRC.mustache_path + "/people/info.mustache",
+        'policies': GGRC.mustache_path + "/policies/info.mustache",
+        'objectives': GGRC.mustache_path + "/objectives/info.mustache",
+        'controls': GGRC.mustache_path + "/controls/info.mustache",
+        'systems': GGRC.mustache_path + "/systems/info.mustache",
+        'processes': GGRC.mustache_path + "/processes/info.mustache",
+        'products': GGRC.mustache_path + "/products/info.mustache",
+        'control_assessments': GGRC.mustache_path + "/control_assessments/info.mustache",
+        'requests': GGRC.mustache_path + "/requests/info.mustache",
+        'issues': GGRC.mustache_path + "/issues/info.mustache"
+      };
+      widget_list.add_widget(object.constructor.shortName, "info", {
+        widget_id: "info",
+        content_controller: GGRC.Controllers.InfoWidget,
+        instance: object,
+        widget_view: info_widget_views[object_table]
+      });
 
-      if (GGRC.widget_descriptors[id]) {
-        if (GGRC.widget_descriptors[id] instanceof this) {
-          $.extend(GGRC.widget_descriptors[id], opts);
-        } else {
-          ret = this._super.apply(this);
-          $.extend(ret, GGRC.widget_descriptors[id], opts);
-          GGRC.widget_descriptors[id] = ret;
-        }
-        return GGRC.widget_descriptors[id];
-      } else {
-        ret = this._super.apply(this, arguments);
-        $.extend(ret, opts);
-        GGRC.widget_descriptors[id] = ret;
-        return ret;
-      }
-    }
-  }, {});
-
-  /*
-    WidgetList - an extensions-ready repository for widget descriptor configs.
-    Create a new widget list with new GGRC.WidgetList(list_name, widget_descriptions)
-      where widget_descriptions is an object with the structure:
-      { <page_name> :
-        { <widget_id> :
-          { <widget descriptor-ready properties> },
-        ...},
-      ...}
-
-    See the comments for GGRC.WidgetDescriptor for details in what is necessary to define
-    a widget descriptor.
-  */
-  can.Construct("GGRC.WidgetList", {
-    modules: {},
-    /*
-      get_widget_list_for: return a keyed object of widget descriptors for the specified page type.
-
-      page_type - one of a GGRC object model's shortName, or "admin"
-
-      The widget descriptors are built on the first call of this function; subsequently they are retrieved from the
-       widget descriptor cache.
-    */
-    get_widget_list_for: function (page_type) {
-      var widgets = {};
-      can.each(this.modules, function (module) {
-        can.each(module[page_type], function (descriptor, id) {
-          if (!widgets[id]) {
-            widgets[id] = descriptor;
-          } else {
-            can.extend(true, widgets[id], descriptor);
+      var model_names = Object.keys(base_widgets_by_type);
+      model_names.sort();
+      var possible_model_type = model_names.slice();
+      possible_model_type.push("Request"); //Missing model-type by selection
+      can.each(model_names, function (name) {
+        GGRC.tree_view.basic_model_list.push({model_name: name, display_name: CMS.Models[name].title_singular});
+        //Initialize child_model_list, and child_display_list each model_type
+        var w_list  = base_widgets_by_type[name], child_model_list = [];
+        w_list.sort();
+        can.each(w_list, function (item) {
+          if (possible_model_type.indexOf(item) !== -1) {
+            child_model_list.push({model_name: item, display_name: CMS.Models[item].title_singular});
           }
         });
-      });
-      var descriptors = {};
-      can.each(widgets, function (widget, widget_id) {
-        switch (widget.content_controller) {
-        case GGRC.Controllers.InfoWidget:
-          descriptors[widget_id] = GGRC.WidgetDescriptor.make_info_widget(
-            widget.content_controller_options && widget.content_controller_options.instance || widget.instance,
-            widget.content_controller_options && widget.content_controller_options.widget_view || widget.widget_view
-          );
-          break;
-        case GGRC.Controllers.TreeView:
-          descriptors[widget_id] = GGRC.WidgetDescriptor.make_tree_view(
-            widget.content_controller_options && (widget.content_controller_options.instance || widget.content_controller_options.parent_instance) || widget.instance,
-            widget.content_controller_options && widget.content_controller_options.model || widget.far_model || widget.model,
-            widget.content_controller_options && widget.content_controller_options.mapping || widget.mapping,
-            widget
-          );
-          break;
-        default:
-          descriptors[widget_id] = new GGRC.WidgetDescriptor(page_type + ":" + widget_id, widget);
-        }
-      });
-      can.each(descriptors, function (descriptor, id) {
-        if (descriptor.suppressed) {
-          delete descriptors[id];
-        }
-      });
-      return descriptors;
-    },
-    /*
-      returns a keyed object of widget descriptors that represents the current page.
-    */
-    get_current_page_widgets: function () {
-      return this.get_widget_list_for(GGRC.page_instance().constructor.shortName);
-    },
-    get_default_widget_sort: function () {
-      return this.sort;
-    },
-  }, {
-    init: function (name, opts, sort) {
-      this.constructor.modules[name] = this;
-      can.extend(this, opts);
-      if (sort && sort.length) {
-        this.constructor.sort = sort;
-      }
-    },
-    /*
-      Here instead of using the object format described in the class comments, you may instead
-      add widgets to the WidgetList by using add_widget.
-
-      page_type - the shortName of a GGRC object class, or "admin"
-      id - the desired widget's id.
-      descriptor - a widget descriptor appropriate for the widget type. FIXME - the descriptor's
-        widget_id value must match the value passed as "id"
-    */
-    add_widget: function (page_type, id, descriptor) {
-      this[page_type] = this[page_type] || {};
-      if (this[page_type][id]) {
-        can.extend(true, this[page_type][id], descriptor);
-      } else {
-        this[page_type][id] = descriptor;
-      }
-    },
-    suppress_widget: function (page_type, id) {
-      this[page_type] = this[page_type] || {};
-      if (this[page_type][id]) {
-        can.extend(true, this[page_type][id], {
-          suppressed: true
-        });
-      } else {
-        this[page_type][id] = {
-          suppressed: true
+        GGRC.tree_view.sub_tree_for[name] = {
+          model_list: child_model_list,
+          display_list : CMS.Models[name].tree_view_options.child_tree_display_list || w_list
         };
-      }
-    }
-  });
-
-  var widget_list = new GGRC.WidgetList("ggrc_core");
-
-  $(function () {
-
-    var object_class = GGRC.infer_object_type(GGRC.page_object),
-      object_table = object_class && object_class.table_plural,
-      object = GGRC.page_instance();
-
-    var base_widgets_by_type = {
-      "Program": "Issue ControlAssessment Regulation Contract Policy Standard Objective Control System Process DataAsset AccessGroup Product Project Facility Market OrgGroup Vendor Person Audit Clause Section Request",
-      "Audit": "Issue ControlAssessment Request history Person Program Control",
-      "Issue": "ControlAssessment Control Audit Program Regulation Contract Policy Standard Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Issue AccessGroup Clause Section Request",
-      "ControlAssessment": "Issue Objective Program Clause Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit Request AccessGroup Section Request",
-      "Request": "Issue Objective Program Clause Regulation Contract Policy Standard Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit Request AccessGroup Section",
-      "Regulation": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Request",
-      "Policy": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Request",
-      "Standard": "Program Issue ControlAssessment Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Request",
-      "Contract": "Program Issue ControlAssessment Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Section Request",
-      "Clause": "Contract Objective ControlAssessment Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Section Policy Regulation Standard Program Audit Request",
-      "Section": "Objective Control ControlAssessment System Process DataAsset Product Project Facility Market OrgGroup Vendor AccessGroup Person Policy Regulation Standard Contract Clause Program Audit Request",
-      "Objective": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person AccessGroup Request",
-      "Control": "Issue ControlAssessment Request Program Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
-      "Person": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Audit Request AccessGroup Request",
-      "OrgGroup": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
-      "Vendor": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
-      "System": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
-      "Process": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
-      "DataAsset": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
-      "AccessGroup": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit Request",
-      "Product": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
-      "Project": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
-      "Facility": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request",
-      "Market": "Program Issue ControlAssessment Regulation Contract Policy Standard Section Clause Objective Control System Process DataAsset Product Project Facility Market OrgGroup Vendor Person Audit AccessGroup Request"
-    };
-    base_widgets_by_type = _.mapValues(base_widgets_by_type,
-      function (conf) {
-        return conf.trim().split(" ");
       });
-    //Update GGRC.base_widgets_by_type for tree_view of each widget type
-    if (!GGRC.tree_view) {
-      GGRC.tree_view = {};
-    }
-    GGRC.tree_view.base_widgets_by_type = base_widgets_by_type;
 
-    // TODO: Really ugly way to avoid executing IIFE - needs cleanup
-    if (!GGRC.page_object) {
-      return;
-    }
-    // Info widgets display the object information instead of listing connected
-    //  objects.
-    var info_widget_views = {
-      'programs': GGRC.mustache_path + "/programs/info.mustache",
-      'audits': GGRC.mustache_path + "/audits/info.mustache",
-      'people': GGRC.mustache_path + "/people/info.mustache",
-      'policies': GGRC.mustache_path + "/policies/info.mustache",
-      'objectives': GGRC.mustache_path + "/objectives/info.mustache",
-      'controls': GGRC.mustache_path + "/controls/info.mustache",
-      'systems': GGRC.mustache_path + "/systems/info.mustache",
-      'processes': GGRC.mustache_path + "/processes/info.mustache",
-      'products': GGRC.mustache_path + "/products/info.mustache",
-      'control_assessments': GGRC.mustache_path + "/control_assessments/info.mustache",
-      'requests': GGRC.mustache_path + "/requests/info.mustache",
-      'issues': GGRC.mustache_path + "/issues/info.mustache",
-    };
-    widget_list.add_widget(object.constructor.shortName, "info", {
-      widget_id: "info",
-      content_controller: GGRC.Controllers.InfoWidget,
-      instance: object,
-      widget_view: info_widget_views[object_table]
-    });
-
-    var model_names = Object.keys(base_widgets_by_type);
-    model_names.sort();
-    var possible_model_type = model_names.slice();
-    possible_model_type.push("Request"); //Missing model-type by selection
-    can.each(model_names, function (name) {
-      GGRC.tree_view.basic_model_list.push({model_name: name, display_name: CMS.Models[name].title_singular});
-      //Initialize child_model_list, and child_display_list each model_type
-      var w_list  = base_widgets_by_type[name], child_model_list = [];
-      w_list.sort();
-      can.each(w_list, function (item) {
-        if (possible_model_type.indexOf(item) !== -1) {
-          child_model_list.push({model_name: item, display_name: CMS.Models[item].title_singular});
-        }
-      });
-      GGRC.tree_view.sub_tree_for[name] = {
-        model_list: child_model_list,
-        display_list : CMS.Models[name].tree_view_options.child_tree_display_list || w_list
-      };
-    });
-
-    function sort_sections(sections) {
-      return can.makeArray(sections).sort(window.natural_comparator);
-    }
-
-    function apply_mixins(definitions) {
-      var mappings = {};
-
-      // Recursively handle mixins
-      function reify_mixins(definition) {
-        var final_definition = {};
-        if (definition._mixins) {
-          can.each(definition._mixins, function (mixin) {
-            if (typeof (mixin) === "string") {
-              // If string, recursive lookup
-              if (!definitions[mixin])
-                console.debug("Undefined mixin: " + mixin, definitions);
-              else
-                can.extend(final_definition, reify_mixins(definitions[mixin]));
-            } else if (can.isFunction(mixin)) {
-              // If function, call with current definition state
-              mixin(final_definition);
-            } else {
-              // Otherwise, assume object and extend
-              can.extend(final_definition, mixin);
-            }
-          });
-        }
-        can.extend(final_definition, definition);
-        delete final_definition._mixins;
-        return final_definition;
+      function sort_sections(sections) {
+        return can.makeArray(sections).sort(window.natural_comparator);
       }
 
-      can.each(definitions, function (definition, name) {
-        // Only output the mappings if it's a model, e.g., uppercase first letter
-        if (name[0] === name[0].toUpperCase())
-          mappings[name] = reify_mixins(definition);
-      });
+      function apply_mixins(definitions) {
+        var mappings = {};
 
-      return mappings;
-    }
+        // Recursively handle mixins
+        function reify_mixins(definition) {
+          var final_definition = {};
+          if (definition._mixins) {
+            can.each(definition._mixins, function (mixin) {
+              if (typeof (mixin) === "string") {
+                // If string, recursive lookup
+                if (!definitions[mixin])
+                  console.debug("Undefined mixin: " + mixin, definitions);
+                else
+                  can.extend(final_definition, reify_mixins(definitions[mixin]));
+              } else if (can.isFunction(mixin)) {
+                // If function, call with current definition state
+                mixin(final_definition);
+              } else {
+                // Otherwise, assume object and extend
+                can.extend(final_definition, mixin);
+              }
+            });
+          }
+          can.extend(final_definition, definition);
+          delete final_definition._mixins;
+          return final_definition;
+        }
 
-    var far_models = base_widgets_by_type[object.constructor.shortName],
-      model_widget_descriptors = {},
-      model_default_widgets = [],
+        can.each(definitions, function (definition, name) {
+          // Only output the mappings if it's a model, e.g., uppercase first letter
+          if (name[0] === name[0].toUpperCase())
+            mappings[name] = reify_mixins(definition);
+        });
 
-      // here we are going to define extra descriptor options, meaning that
-      //  these will be used as extra options to create widgets on top of
+        return mappings;
+      }
+
+      var far_models = base_widgets_by_type[object.constructor.shortName],
+        model_widget_descriptors = {},
+        model_default_widgets = [],
+
+        // here we are going to define extra descriptor options, meaning that
+        //  these will be used as extra options to create widgets on top of
 
       extra_descriptor_options = {
         all: {
@@ -1004,62 +783,61 @@
         }
       });
 
-    // Disable editing on profile pages, as long as it isn't audits on the dashboard
-    if (GGRC.page_instance() instanceof CMS.Models.Person) {
-      var person_options = extra_content_controller_options.Person;
-      can.each(person_options, function (options, model_name) {
-        if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {
-          can.extend(options, {
-            allow_creating: false,
-            allow_mapping: false
+      // Disable editing on profile pages, as long as it isn't audits on the dashboard
+      if (GGRC.page_instance() instanceof CMS.Models.Person) {
+        var person_options = extra_content_controller_options.Person;
+        can.each(person_options, function (options, model_name) {
+          if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {
+            can.extend(options, {
+              allow_creating: false,
+              allow_mapping: false
+            });
+          }
+        });
+      }
+
+      can.each(far_models, function (model_name) {
+        if ((overridden_models.all && overridden_models.all.hasOwnProperty(model_name) && !overridden_models[model_name]) || (overridden_models[object.constructor.shortName] && overridden_models[object.constructor.shortName].hasOwnProperty(model_name) && !overridden_models[object.constructor.shortName][model_name]))
+          return;
+        var sources = [],
+          far_model, descriptor = {},
+          widget_id;
+
+        far_model = CMS.Models[model_name];
+        if (far_model) {
+          widget_id = far_model.table_singular;
+          descriptor = {
+            instance: object,
+            far_model: far_model,
+            mapping: GGRC.Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName)
+          };
+        } else {
+          widget_id = model_name;
+        }
+
+        // Custom overrides
+        if (extra_descriptor_options.all && extra_descriptor_options.all[model_name]) {
+          $.extend(descriptor, extra_descriptor_options.all[model_name]);
+        }
+
+        if (extra_descriptor_options[object.constructor.shortName] && extra_descriptor_options[object.constructor.shortName][model_name]) {
+          $.extend(descriptor, extra_descriptor_options[object.constructor.shortName][model_name]);
+        }
+
+        if (extra_content_controller_options.all && extra_content_controller_options.all[model_name]) {
+          $.extend(true, descriptor, {
+            content_controller_options: extra_content_controller_options.all[model_name]
           });
         }
+
+        if (extra_content_controller_options[object.constructor.shortName] && extra_content_controller_options[object.constructor.shortName][model_name]) {
+          $.extend(true, descriptor, {
+            content_controller_options: extra_content_controller_options[object.constructor.shortName][model_name]
+          });
+        }
+
+        widget_list.add_widget(object.constructor.shortName, widget_id, descriptor);
       });
     }
-
-    can.each(far_models, function (model_name) {
-      if ((overridden_models.all && overridden_models.all.hasOwnProperty(model_name) && !overridden_models[model_name]) || (overridden_models[object.constructor.shortName] && overridden_models[object.constructor.shortName].hasOwnProperty(model_name) && !overridden_models[object.constructor.shortName][model_name]))
-        return;
-      var sources = [],
-        far_model, descriptor = {},
-        widget_id;
-
-      far_model = CMS.Models[model_name];
-      if (far_model) {
-        widget_id = far_model.table_singular;
-        descriptor = {
-          instance: object,
-          far_model: far_model,
-          mapping: GGRC.Mappings.get_canonical_mapping(object.constructor.shortName, far_model.shortName)
-        };
-      } else {
-        widget_id = model_name;
-      }
-
-      // Custom overrides
-      if (extra_descriptor_options.all && extra_descriptor_options.all[model_name]) {
-        $.extend(descriptor, extra_descriptor_options.all[model_name]);
-      }
-
-      if (extra_descriptor_options[object.constructor.shortName] && extra_descriptor_options[object.constructor.shortName][model_name]) {
-        $.extend(descriptor, extra_descriptor_options[object.constructor.shortName][model_name]);
-      }
-
-      if (extra_content_controller_options.all && extra_content_controller_options.all[model_name]) {
-        $.extend(true, descriptor, {
-          content_controller_options: extra_content_controller_options.all[model_name]
-        });
-      }
-
-      if (extra_content_controller_options[object.constructor.shortName] && extra_content_controller_options[object.constructor.shortName][model_name]) {
-        $.extend(true, descriptor, {
-          content_controller_options: extra_content_controller_options[object.constructor.shortName][model_name]
-        });
-      }
-
-      widget_list.add_widget(object.constructor.shortName, widget_id, descriptor);
-    });
-
   });
-
 })(window.can, window.can.$);

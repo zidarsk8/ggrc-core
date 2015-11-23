@@ -574,12 +574,7 @@
       extended_related_issues_via_search: TypeFilter("related_objects_via_search", "Issue"),
       extended_related_control_assessment_via_search: TypeFilter("related_objects_via_search", "ControlAssessment"),
       extended_related_request_via_search: TypeFilter("related_objects_via_search", "Request"),
-      audit_requests: Search(function (binding) {
-        return CMS.Models.Request.findAll({
-          'assignee_id': binding.instance.id
-        });
-      }, 'Request'),
-      open_audit_requests: CustomFilter('audit_requests', function (result) {
+      open_audit_requests: CustomFilter('extended_related_request_via_search', function (result) {
         return result.instance.status !== 'Accepted';
       }),
       all_audit_requests: Search(function (binding) {
@@ -712,15 +707,9 @@
       related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee"),
       related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier"),
-      info_related_objects: Multi([
-        "related_access_groups", "related_data_assets",
-        "related_facilities", "related_markets", "related_org_groups",
-        "related_vendors", "related_processes", "related_products",
-        "related_projects", "related_systems", "related_issues",
-        "related_audits", "related_controls", "related_control_assessments",
-        "related_requests", "regulations", "contracts", "policies", "standards",
-        "programs", "controls", "sections", "clauses", "objectives",
-      ]),
+      info_related_objects: CustomFilter("related_objects", function (related_objects) {
+        return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
+      }),
       comments: TypeFilter("related_objects", "Comment"),
       documents_from_comments: Cross("comments", "documents"),
       urls_from_comments: Cross("comments", "urls"),

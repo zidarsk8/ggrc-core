@@ -10,6 +10,7 @@ from ggrc.models.object_person import ObjectPerson
 from ggrc.models.object_owner import ObjectOwner
 from ggrc.models.request import Request
 from ggrc.models.response import Response
+from ggrc.models.relationship import Relationship
 from ggrc_basic_permissions.models import UserRole
 from ggrc_basic_permissions import objects_via_relationships_query
 from ggrc.rbac import permissions, context_query_filter
@@ -164,7 +165,7 @@ class MysqlIndexer(SqlIndexer):
       Objects in private contexts via UserRole (e.g. for Private Programs)
       Objects for which the user is the "contact"
       Objects for which the user is the "primary_assessor" or "secondary_assessor"
-      Audits for which the user is assigned a Request or Response
+      Assignable objects for which the user is an assignee
 
     This method only *limits* the result set -- Contexts and Roles will still
     filter out forbidden objects.
@@ -228,6 +229,31 @@ class MysqlIndexer(SqlIndexer):
           )
       )
     type_union_queries.append(object_owners_query)
+
+    # Objects for which the user is assigned
+    model_assignee_query = db.session.query(
+        Relationship.destination_id.label('id'),
+        Relationship.destination_type.label('type'),
+        literal(None).label('context_id'),
+    ).filter(
+        and_(
+            Relationship.source_type == "Person",
+            Relationship.source_id == contact_id,
+        ),
+    )
+    type_union_queries.append(model_assignee_query)
+
+    model_assignee_query = db.session.query(
+        Relationship.source_id.label('id'),
+        Relationship.source_type.label('type'),
+        literal(None).label('context_id'),
+    ).filter(
+        and_(
+            Relationship.destination_type == "Person",
+            Relationship.destination_id == contact_id,
+        ),
+    )
+    type_union_queries.append(model_assignee_query)
 
     if not my_objects:
       type_union_queries.append(
