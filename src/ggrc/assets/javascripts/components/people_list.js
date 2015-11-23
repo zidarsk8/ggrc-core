@@ -58,20 +58,35 @@
         var person = ui.item,
             destination = this.scope.instance,
             deferred = this.scope.deferred,
-            model;
+            role = can.capitalize(this.scope.type),
+            pending, model;
 
         if (deferred === "true") {
-          destination.mark_for_addition("related_objects_as_destination", person, {
-            attrs: {
-              "AssigneeType": can.capitalize(this.scope.type),
-            }
-          });
+          pending = true;
+          if (destination._pending_joins) {
+            _.each(destination._pending_joins, function (join) {
+              if (join.what === person) {
+                var existing= join.extra.attr("attrs.AssigneeType") || "";
+                existing = _.filter(existing.split(","));
+                var roles = _.union(existing, [role]).join(",");
+                join.extra.attr("attrs.AssigneeType", roles);
+                pending = false;
+              }
+            });
+          }
+          if (pending) {
+            destination.mark_for_addition("related_objects_as_destination", person, {
+              attrs: {
+                "AssigneeType": role,
+              }
+            });
+          }
         } else {
           model = CMS.Models.Relationship.get_relationship(person, destination);
           if (!model) {
             model = new CMS.Models.Relationship({
               attrs: {
-                "AssigneeType": can.capitalize(this.scope.type),
+                "AssigneeType": role,
               },
               source: {
                 href: person.href,
@@ -91,7 +106,7 @@
           }
           model.then(function (model) {
             var type = model.attr("attrs.AssigneeType");
-            model.attr("attrs.AssigneeType", can.capitalize(this.scope.type) + (type ? "," + type : ""));
+            model.attr("attrs.AssigneeType", role + (type ? "," + type : ""));
             model.save();
           }.bind(this));
         }
@@ -110,7 +125,12 @@
           return options.fn(options.context);
         }
         return options.inverse(options.context);
-      }
+      },
+      if_has_role: function (roles, role, options) {
+        roles = _.filter(Mustache.resolve(roles).toLowerCase().split(","));
+        role = Mustache.resolve(role).toLowerCase();
+        return options[_.includes(roles, role) ? "fn" : "inverse"](options.contexts);
+      },
     }
   });
 })(window.can);
