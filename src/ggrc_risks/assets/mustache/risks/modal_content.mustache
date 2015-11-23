@@ -34,25 +34,14 @@
         <textarea tabindex="2" id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{instance.description}}}</textarea>
       </div>
     </div>
-    <div class="span6 hide-wrap">
 
+    <div class="span6 hide-wrap">
       <div class="row-fluid inner-hide">
         <div data-id="owner_hidden" class="span12 hidable bottom-spacing">
             {{> /static/mustache/people/owners_modal_connector.mustache}}
         </div>
       </div>
-
-      <div class="row-fluid {{#instance.computed_errors.contact}}field-failure{{/instance.computed_errors.contact}}">
-        {{#using contact=instance.contact}}
-        <label>
-          Contact
-          <span class="required">*</span>
-          <i class="grcicon-help-black" rel="tooltip" title="Point of contact for this object"></i>
-        </label>
-        <input tabindex="4" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstnonempty contact.email}}" />
-        {{#instance.computed_errors.contact}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.contact}}
-        {{/using}}
-      </div>
+      {{> /static/mustache/base_objects/modal_contact_fields.mustache}}
     </div>
   </div>
 

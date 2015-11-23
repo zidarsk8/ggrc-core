@@ -3146,4 +3146,25 @@ Mustache.registerHelper("add_to_current_scope", function(options) {
   return options.fn(options.contexts.add(_.extend({}, options.context, options.hash)));
 });
 
+/*
+Add spaces to a CamelCase string.
+
+Example:
+{{un_camel_case "InProgress"}} becomes "In Progress"
+*/
+Mustache.registerHelper("un_camel_case", function (str, options) {
+  var val = Mustache.resolve(str);
+  if (!val || val == "") {
+    return val;
+  }
+  var newval = val[0];
+  for (var i=1; i<val.length; i++) {
+    if (val[i] == val[i].toUpperCase()) {
+      newval += " ";
+    }
+    newval += val[i];
+  }
+  return newval;
+});
+
 })(this, jQuery, can);
