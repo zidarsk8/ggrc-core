@@ -1403,9 +1403,9 @@ ul.new-tree {
         }
         &.active {
           color: $black;
-          .icon-share {
+          .fa-link {
             @include opacity(1);
-            background-position: -270px -416px;
+            color: $green;
           }
         }
       }
