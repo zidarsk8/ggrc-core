@@ -66,13 +66,9 @@
     color: #135c89;
   }
 }
-.#{$fa-css-prefix}-clause:before {
-  content: $fa-var-sticky-note;
-}
 .#{$fa-css-prefix}-clause {
-  &.color {
-    color: #135c89;
-  }
+  &:before { content: $fa-var-sticky-note; }
+  &.color { color: #135c89; }
 }
 
 .grcicon-access_group {
@@ -96,21 +92,36 @@
 .#{$fa-css-prefix}-access_group:before { content: $fa-var-map-signs; }
 
 .grcicon-contract-color:before { content: $fa-var-file-text; color: #005580; }
-.#{$fa-css-prefix}-contract:before { content: $fa-var-file-text; }
+.#{$fa-css-prefix}-contract {
+  &:before { content: $fa-var-file-text; }
+  &.color { color: #005580; }
+}
+
+.grcicon-regulation-color:before { content: $fa-var-file; color: #005580; }
+.#{$fa-css-prefix}-regulation {
+  &:before { content: $fa-var-file; }
+  &.color { color: #005580; }
+}
 
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
+  .#{$fa-css-prefix}-person {
+    &.color { color: $black; }
+  }
   .#{$fa-css-prefix}-audit-color:before, .grcicon-audit-color:before { color: $black; }
   .grcicon-task_group-color:before { color: $black; }
   .#{$fa-css-prefix}-task_group:before {
     &.color { color: $black; }
   }
   .grcicon-objective-color:before { color: $black; }
-  .#{$fa-css-prefix}-objective:before {
+  .#{$fa-css-prefix}-objective {
     &.color { color: $black; }
   }
   .grcicon-clause-color:before { color: $black; }
+  .#{$fa-css-prefix}-clause {
+    &.color { color: $black; }
+  }
   .grcicon-cycle-color:before { color: $black; }
   .grcicon-info:before { color: $black; }
   .grcicon-access-group:before,
@@ -126,6 +137,13 @@
   .grcicon-program-color:before,
   .#{$fa-css-prefix}-program:before { color: $black; }
   .grcicon-contract-color:before { color: $black; }
+  .#{$fa-css-prefix}-contract {
+    &.color { color: $black; }
+  }
+  .grcicon-regulation-color:before { color: $black; }
+  .#{$fa-css-prefix}-regulation {
+    &.color { color: $black; }
+  }
 
   // .grcicon-info { background-position:-126px -176px; }
   // .grcicon-role-color { background-position:-102px -8px; }
@@ -185,10 +203,13 @@
     &.color { color: $white; }
   }
   .grcicon-objective-color:before { color: $white; }
-  .#{$fa-css-prefix}-objective:before {
+  .#{$fa-css-prefix}-objective {
     &.color { color: $white; }
   }
   .grcicon-clause-color:before { color: $white; }
+  .#{$fa-css-prefix}-clause {
+    &.color { color: $white; }
+  }
   .grcicon-cycle-color:before { color: $white; }
   .grcicon-info:before { color: $white; }
   .grcicon-access-group:before,
@@ -203,7 +224,14 @@
   .#{$fa-css-prefix}-program-color:before,
   .grcicon-program-color:before,
   .#{$fa-css-prefix}-program:before { color: $white; }
-  .grcicon-contract-color:before { color: $black; }
+  .grcicon-contract-color:before { color: $white; }
+  .#{$fa-css-prefix}-contract {
+    &.color { color: $white; }
+  }
+  .grcicon-regulation-color:before { color: $white; }
+  .#{$fa-css-prefix}-regulation {
+    &.color { color: $white; }
+  }
 
   // .grcicon-info { background-position:-198px -80px; }
   // .grcicon-role-color { background-position:-102px -32px; }
