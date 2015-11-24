@@ -95,9 +95,8 @@
 .grcicon-access_group-color:before,
 .#{$fa-css-prefix}-access_group:before { content: $fa-var-map-signs; }
 
-//.grcicon-program { content: $fa-var-folder-open-o; }
-//.grcicon-program-black { background-position:-102px -104px; }
-//.grcicon-program-color { background-position:-6px -296px; }
+.grcicon-contract-color:before { content: $fa-var-file-text; color: #005580; }
+.#{$fa-css-prefix}-contract:before { content: $fa-var-file-text; }
 
 // Turn icons to black
 %black-icons {
@@ -126,6 +125,7 @@
   .#{$fa-css-prefix}-program-color:before,
   .grcicon-program-color:before,
   .#{$fa-css-prefix}-program:before { color: $black; }
+  .grcicon-contract-color:before { color: $black; }
 
   // .grcicon-info { background-position:-126px -176px; }
   // .grcicon-role-color { background-position:-102px -8px; }
@@ -203,6 +203,7 @@
   .#{$fa-css-prefix}-program-color:before,
   .grcicon-program-color:before,
   .#{$fa-css-prefix}-program:before { color: $white; }
+  .grcicon-contract-color:before { color: $black; }
 
   // .grcicon-info { background-position:-198px -80px; }
   // .grcicon-role-color { background-position:-102px -32px; }
