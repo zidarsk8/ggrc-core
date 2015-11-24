@@ -164,7 +164,7 @@ def _date_has_changes(attr):
     This function normalises this and performs the correct check.
   """
   added, deleted = attr.history.added[0], attr.history.deleted[0]
-  if type(added) == datetime.datetime:
+  if isinstance(added, datetime.datetime):
     added = added.date()
   return not added == deleted
 
