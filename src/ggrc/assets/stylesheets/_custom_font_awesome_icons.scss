@@ -127,6 +127,12 @@
   &.color { color: $green; }
 }
 
+.grcicon-product-color:before { content: $fa-var-archive; }
+.#{$fa-css-prefix}-product {
+  &:before { content: $fa-var-archive; }
+  &.color { color: $green; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -182,6 +188,10 @@
   }
   .grcicon-market-color:before { color: $black; }
   .#{$fa-css-prefix}-market {
+    &.color { color: $black; }
+  }
+  .grcicon-product-color:before { color: $black; }
+  .#{$fa-css-prefix}-product {
     &.color { color: $black; }
   }
 
@@ -289,6 +299,10 @@
   }
   .grcicon-market-color:before { color: $white; }
   .#{$fa-css-prefix}-market {
+    &.color { color: $white; }
+  }
+  .grcicon-product-color:before { color: $white; }
+  .#{$fa-css-prefix}-product {
     &.color { color: $white; }
   }
 
