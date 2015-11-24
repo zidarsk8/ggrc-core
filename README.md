@@ -21,9 +21,10 @@ environment:
 
 Or alternatively (see Quickstart with docker)
 
-|               Prerequisite      |         Description        |
-|---------------------------------|----------------------------|
-|[Docker](https://www.docker.com/)| Container management toool |
+|               Prerequisite                       |                 Description              |
+|--------------------------------------------------|------------------------------------------|
+|[Docker](https://www.docker.com/)                 | Container management tool                |
+|[Docker compose](https://docs.docker.com/compose/)| A tool for defining multi-container apps |
 
 Quick Start
 -----------
