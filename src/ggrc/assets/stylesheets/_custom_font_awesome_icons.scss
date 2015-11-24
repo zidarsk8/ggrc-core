@@ -109,6 +109,12 @@
   &.color { color: #005580; }
 }
 
+.grcicon-section-color:before { content: $fa-var-paragraph; }
+.#{$fa-css-prefix}-section {
+  &:before { content: $fa-var-paragraph; }
+  &.color { color: #005580; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -152,6 +158,10 @@
   }
   .grcicon-policy-color:before { color: $black; }
   .#{$fa-css-prefix}-policy {
+    &.color { color: $black; }
+  }
+  .grcicon-section-color:before { color: $black; }
+  .#{$fa-css-prefix}-section {
     &.color { color: $black; }
   }
 
@@ -247,6 +257,10 @@
   }
   .grcicon-policy-color:before { color: $white; }
   .#{$fa-css-prefix}-policy {
+    &.color { color: $white; }
+  }
+  .grcicon-section-color:before { color: $white; }
+  .#{$fa-css-prefix}-section {
     &.color { color: $white; }
   }
 
