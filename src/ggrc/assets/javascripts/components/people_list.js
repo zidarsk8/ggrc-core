@@ -56,9 +56,9 @@
     events: {
       ".person-selector input autocomplete:select": function (el, ev, ui) {
         var person = ui.item,
-            destination = this.scope.instance,
-            deferred = this.scope.deferred,
             role = can.capitalize(this.scope.type),
+            destination = this.scope.attr("instance"),
+            deferred = this.scope.attr("deferred"),
             pending, model;
 
         if (deferred === "true") {
@@ -120,8 +120,7 @@
         return options.inverse(options.context);
       },
       show_add: function (options) {
-        if (this.attr("editable") === "true" && _.isNull(this.attr("limit")) ||
-            +this.attr("limit") < this.attr("instance").get_mapping(this.attr("mapping")).length) {
+        if (this.attr("editable") === "true") {
           return options.fn(options.context);
         }
         return options.inverse(options.context);

@@ -610,10 +610,34 @@ class Resource(ModelView):
         :src: The original POSTed JSON dictionary.
         :service: The instance of Resource handling the POST request.
       """,)
+  model_posted_after_commit = signals.signal(
+      'Model POSTed - after',
+      """
+      Indicates that a model object was received via POST and has been
+      committed to the database. The sender in the signal will be the model
+      aclass of the POSTed resource. The following arguments will be sent along
+      with the signal:
+
+        :obj: The model instance created from the POSTed JSON.
+        :src: The original POSTed JSON dictionary.
+        :service: The instance of Resource handling the POST request.
+      """,)
   model_put = signals.signal(
       'Model PUT',
       """
       Indicates that a model object update was received via PUT and will be
+      updated in the database. The sender in the signal will be the model class
+      of the PUT resource. The following arguments will be sent along with the
+      signal:
+
+        :obj: The model instance updated from the PUT JSON.
+        :src: The original PUT JSON dictionary.
+        :service: The instance of Resource handling the PUT request.
+      """,)
+  model_put_after_commit = signals.signal(
+      'Model PUT - after',
+      """
+      Indicates that a model object update was received via PUT and has been
       updated in the database. The sender in the signal will be the model class
       of the PUT resource. The following arguments will be sent along with the
       signal:
@@ -627,6 +651,16 @@ class Resource(ModelView):
       """
       Indicates that a model object was DELETEd and will be removed from the
       databse. The sender in the signal will be the model class of the DELETEd
+      resource. The followin garguments will be sent along with the signal:
+
+        :obj: The model instance removed.
+        :service: The instance of Resource handling the DELETE request.
+      """,)
+  model_deleted_after_commit = signals.signal(
+      'Model DELETEd - after',
+      """
+      Indicates that a model object was DELETEd and has been removed from the
+      database. The sender in the signal will be the model class of the DELETEd
       resource. The followin garguments will be sent along with the signal:
 
         :obj: The model instance removed.
@@ -771,6 +805,9 @@ class Resource(ModelView):
       update_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for resource collection PUT"):
       update_memcache_after_commit(self.request)
+    with benchmark("Send PUT - after commit event"):
+      self.model_put_after_commit.send(obj.__class__, obj=obj,
+                                       src=src, service=self)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     with benchmark("Make response"):
@@ -816,6 +853,9 @@ class Resource(ModelView):
         update_index(db.session, modified_objects)
       with benchmark("Update memcache after commit for resource collection DELETE"):
         update_memcache_after_commit(self.request)
+      with benchmark("Send DELETEd - after commit event"):
+        self.model_deleted_after_commit.send(obj.__class__, obj=obj,
+                                             service=self)
       with benchmark("Query for object"):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
@@ -1047,6 +1087,9 @@ class Resource(ModelView):
         update_index(db.session, modified_objects)
       with benchmark("Update memcache after commit for resource collection POST"):
         update_memcache_after_commit(self.request)
+      with benchmark("Send model POSTed - after commit event"):
+        self.model_posted_after_commit.send(obj.__class__, obj=obj,
+                                            src=src, service=self)
       with benchmark("Serialize object"):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
@@ -1304,6 +1347,9 @@ def filter_resource(resource, depth=0, user_permissions=None):
       can_read = True
       for t in ('source', 'destination'):
         inst = resource[t]
+        if not inst:
+          # If object was deleted but relationship still exists
+          continue
         contexts = permissions.read_contexts_for(inst['type']) or []
         resources = permissions.read_resources_for(inst['type']) or []
         if None in contexts or inst['context_id'] in contexts or inst['id'] in resources:

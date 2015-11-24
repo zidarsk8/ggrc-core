@@ -7,7 +7,6 @@
 
 {{#instance}}
   <section class="info{{#is_info_pin}} sticky-info-panel request{{/is_info_pin}}">
-
     {{#is_info_pin}}
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
     {{/is_info_pin}}
@@ -45,14 +44,14 @@
             <div class="span6">
               <div class="left-spacing">
                 <h6>Evidence</h6>
-                {{> /static/mustache/base_templates/attachment_list.mustache}}
+                {{{render "/static/mustache/base_templates/attachment_list.mustache" instance=. update_count="false"}}}
               </div>
             </div>
             <div class="span6">
               <h6>URL</h6>
               {{#instance.class.info_pane_options.urls}}
                 {{#add_to_current_scope parent_instance=instance}}
-                  <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
+                  <ul class="attachment-list" data-update-count="false" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
                 {{/add_to_current_scope}}
               {{/instance.class.info_pane_options.urls}}
               {{#is_allowed 'update' instance}}
@@ -77,7 +76,7 @@
 
           <div class="row-fluid wrap-row">
             <div class="span12">
-              {{> /static/mustache/base_templates/mapped_objects.mustache}}
+              {{{render "/static/mustache/base_templates/mapped_objects.mustache" instance=. update_count="false"}}}
             </div>
           </div>
           <hr />
@@ -134,10 +133,9 @@
             <div class="tree-item-add">
               <add-comment data="comments" source_mapping="instance"></add-comment>
             </div>
-            {{/if_helpers}}
-            {{> /static/mustache/base_templates/comment_list.mustache}}
+            {{/if_equals}}
+            {{{render "/static/mustache/base_templates/comment_list.mustache" instance=. update_count="false"}}}
           </div>
-
         </div>
       </div>
     </div>
