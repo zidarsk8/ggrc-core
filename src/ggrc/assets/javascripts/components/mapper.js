@@ -46,7 +46,7 @@
           "Program": ["Audit"],
           "Audit": ["Request"],
           "ControlAssessment": ["Control"],
-          "Request": ["Workflow"]
+          "Request": ["Workflow", "TaskGroup"]
         };
         return forbidden[type] ? forbidden[type] : [];
       },
