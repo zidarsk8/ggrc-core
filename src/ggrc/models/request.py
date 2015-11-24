@@ -182,7 +182,7 @@ def handle_request_put(sender, obj=None, src=None, service=None):
     has_changes = True
 
   if any(_date_has_changes(getattr(inspect(obj).attrs, attr))
-          for attr in tracked_date_attrs):
+         for attr in tracked_date_attrs):
     has_changes = True
 
   if has_changes:
