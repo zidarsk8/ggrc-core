@@ -103,6 +103,12 @@
   &.color { color: #005580; }
 }
 
+.grcicon-policy-color:before { content: $fa-var-clipboard; }
+.#{$fa-css-prefix}-policy {
+  &:before { content: $fa-var-clipboard; }
+  &.color { color: #005580; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -142,6 +148,10 @@
   }
   .grcicon-regulation-color:before { color: $black; }
   .#{$fa-css-prefix}-regulation {
+    &.color { color: $black; }
+  }
+  .grcicon-policy-color:before { color: $black; }
+  .#{$fa-css-prefix}-policy {
     &.color { color: $black; }
   }
 
@@ -197,6 +207,9 @@
 // Turn icons to white
  %white-icons {
  	.#{$fa-css-prefix}-person-color:before { color: $white; }
+  .#{$fa-css-prefix}-person {
+    &.color { color: $white; }
+  }
   .#{$fa-css-prefix}-audit-color:before, .grcicon-audit-color:before { color: $white; }
   .grcicon-task_group-color:before { color: $white; }
   .#{$fa-css-prefix}-task_group:before {
@@ -230,6 +243,10 @@
   }
   .grcicon-regulation-color:before { color: $white; }
   .#{$fa-css-prefix}-regulation {
+    &.color { color: $white; }
+  }
+  .grcicon-policy-color:before { color: $white; }
+  .#{$fa-css-prefix}-policy {
     &.color { color: $white; }
   }
 
