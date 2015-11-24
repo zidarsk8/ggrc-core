@@ -389,7 +389,6 @@ can.Model.Cacheable("CMS.Models.Request", {
     , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
     , attr_list : [
       {attr_title: 'Title', attr_name: 'title'},
-      {attr_title: 'Description', attr_name: 'description'},
       {attr_title: 'Status', attr_name: 'status'},
       {attr_title: 'Last Updated', attr_name: 'updated_at'},
       {attr_title: 'Request Date', attr_name: 'requested_on', attr_sort_field: 'report_start_date'},
@@ -398,8 +397,8 @@ can.Model.Cacheable("CMS.Models.Request", {
       {attr_title: 'Code', attr_name: 'slug'},
       {attr_title: 'Audit', attr_name: 'audit'},
     ]
-    , display_attr_names : ['description','assignee', 'due_on', 'status']
-    , mandatory_attr_names : ['title', 'description']
+    , display_attr_names : ['title', 'assignee', 'due_on', 'status']
+    , mandatory_attr_names : ['title']
     , draw_children : true
     , child_options: [{
       model : can.Model.Cacheable,
