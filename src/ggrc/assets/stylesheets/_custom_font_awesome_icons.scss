@@ -121,6 +121,12 @@
   &.color { color: $green; }
 }
 
+.grcicon-market-color:before { content: $fa-var-shopping-cart; }
+.#{$fa-css-prefix}-market {
+  &:before { content: $fa-var-shopping-cart; }
+  &.color { color: $green; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -172,6 +178,10 @@
   }
   .grcicon-facility-color:before { color: $black; }
   .#{$fa-css-prefix}-facility {
+    &.color { color: $black; }
+  }
+  .grcicon-market-color:before { color: $black; }
+  .#{$fa-css-prefix}-market {
     &.color { color: $black; }
   }
 
@@ -275,6 +285,10 @@
   }
   .grcicon-facility-color:before { color: $white; }
   .#{$fa-css-prefix}-facility {
+    &.color { color: $white; }
+  }
+  .grcicon-market-color:before { color: $white; }
+  .#{$fa-css-prefix}-market {
     &.color { color: $white; }
   }
 
