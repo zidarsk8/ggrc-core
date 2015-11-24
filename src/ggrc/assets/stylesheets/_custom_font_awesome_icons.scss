@@ -115,6 +115,12 @@
   &.color { color: #005580; }
 }
 
+.grcicon-facility-color:before { content: $fa-var-industry; }
+.#{$fa-css-prefix}-facility {
+  &:before { content: $fa-var-industry; }
+  &.color { color: $green; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -162,6 +168,10 @@
   }
   .grcicon-section-color:before { color: $black; }
   .#{$fa-css-prefix}-section {
+    &.color { color: $black; }
+  }
+  .grcicon-facility-color:before { color: $black; }
+  .#{$fa-css-prefix}-facility {
     &.color { color: $black; }
   }
 
@@ -261,6 +271,10 @@
   }
   .grcicon-section-color:before { color: $white; }
   .#{$fa-css-prefix}-section {
+    &.color { color: $white; }
+  }
+  .grcicon-facility-color:before { color: $white; }
+  .#{$fa-css-prefix}-facility {
     &.color { color: $white; }
   }
 
