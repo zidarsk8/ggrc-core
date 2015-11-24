@@ -22,7 +22,7 @@
     {{/if}}
     {{#results}}
       <li>
-        {{#is_allowed 'update'}}
+        {{#is_allowed 'update' instance context='for'}}
         {{#can_unmap}}
         <span class="file-controls">
           <a href="javascript://" class="info-action unmap" data-toggle="unmap">
@@ -44,11 +44,13 @@
     {{/instance._pending_joins}}
     <li class="person-add">
       {{#show_add}}
+        {{#is_allowed 'update' instance context='for'}}
         {{#toggle toggle_add}}
           {{> /static/mockups/base_templates/add_people.mustache }}
         {{else}}
           <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+</a>
         {{/toggle}}
+        {{/is_allowed}}
       {{/show_add}}
     </li>
   </ul>
