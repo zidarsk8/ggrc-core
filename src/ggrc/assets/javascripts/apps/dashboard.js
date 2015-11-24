@@ -66,8 +66,8 @@
       header_view: GGRC.mustache_path + "/custom_attribute_definitions/tree_header.mustache",
       show_view: GGRC.mustache_path + "/custom_attribute_definitions/tree.mustache",
       sortable: false,
-      list_loader: function(instance) {
-        return instance.findAll();
+      list_loader: function () {
+        return CMS.Models.CustomAttributable.findAll();
       },
       draw_children: true,
       child_options: [{
