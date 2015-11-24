@@ -130,7 +130,7 @@
   RisksExtension.init_widgets = function init_widgets() {
     var page_instance = GGRC.page_instance(),
         is_my_work = function is_my_work() {
-          return page_instance.type === "Person";
+          return page_instance && page_instance.type === "Person";
         },
         related_or_owned = is_my_work() ? 'owned_' : 'related_',
         sorted_widget_types = _.sortBy(_risk_object_types, function(type) {

@@ -9,7 +9,7 @@
   var base_widgets_by_type = {
       "AccessGroup": "Audit Clause Contract Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",
       "Audit": "Control ControlAssessment Issue Person Program Request history",
-      "Clause": "AccessGroup Audit Contract Control ControlAssessment DataAsset Facility Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",
+      "Clause": "AccessGroup Audit Contract Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",
       "Contract": "AccessGroup Clause Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Process Product Program Project Request Section System Vendor",
       "Control": "AccessGroup Audit Clause Contract Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Request Section Standard System Vendor",
       "ControlAssessment": "AccessGroup Audit Clause Contract Control DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Request Section Standard System Vendor",
@@ -26,7 +26,7 @@
       "Program": "AccessGroup Audit Clause Contract Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Project Regulation Request Section Standard System Vendor",
       "Project": "AccessGroup Audit Clause Contract Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",
       "Regulation": "AccessGroup Clause Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Process Product Program Project Request Section System Vendor",
-      "Request": "AccessGroup Audit Clause Contract Control DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",
+      "Request": "AccessGroup Audit Clause Contract Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",
       "Section": "AccessGroup Audit Clause Contract Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",
       "Standard": "AccessGroup Clause Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Process Product Program Project Request Section System Vendor",
       "System": "AccessGroup Audit Clause Contract Control ControlAssessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",

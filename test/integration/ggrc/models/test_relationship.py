@@ -24,16 +24,16 @@ class RelationshipTestMockModel(Base, ggrc.db.Model):
   _update_attrs = ['foo']
 
   @staticmethod
-  def _validate_relationship_attr(cls, source, destination, name, value):
+  def _validate_relationship_attr(cls, source, destination, old, name, value):
     if cls.__name__ not in {source.type, destination.type}:
-      return False
+      return None
     if name != "validated_attr":
-      return False
+      return None
     try:
       int(value)
     except ValueError:
-      return False
-    return True
+      return None
+    return value
 
 
 class TestRelationship(TestCase):

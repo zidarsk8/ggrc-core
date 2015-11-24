@@ -96,29 +96,43 @@ class TestBasicCsvImport(converters.TestCase):
     for policy in policies:
       test_owners(policy)
 
-  def test_facilities_intermappings_dry_run(self):
+  def test_intermappings(self):
     self.generate_people(["miha", "predrag", "vladan", "ivan"])
 
-    filename = "facilities_intermappings.csv"
-    response_json = self.import_file(filename, dry_run=True)
-
-    self.assertEqual(4, response_json[0]["created"])
-
-    response_warnings = response_json[0]["row_warnings"]
-    self.assertEqual(set(), set(response_warnings))
-    self.assertEqual(0, models.Relationship.query.count())
-
-  def test_facilities_intermappings(self):
-    self.generate_people(["miha", "predrag", "vladan", "ivan"])
-
-    filename = "facilities_intermappings.csv"
+    filename = "intermappings.csv"
+    response_json_dry = self.import_file(filename, dry_run=True)
     response_json = self.import_file(filename)
 
-    self.assertEqual(4, response_json[0]["created"])
+    self.assertEqual(response_json_dry, response_json)
+
+    self.assertEqual(4, response_json[0]["created"])  # Facility
+    self.assertEqual(4, response_json[1]["created"])  # Objective
 
     response_warnings = response_json[0]["row_warnings"]
     self.assertEqual(set(), set(response_warnings))
-    self.assertEqual(4, models.Relationship.query.count())
+    self.assertEqual(13, models.Relationship.query.count())
+
+    obj2 = models.Objective.query.filter_by(slug="O2").first()
+    obj3 = models.Objective.query.filter_by(slug="O3").first()
+    self.assertNotEqual(None, models.Relationship.find_related(obj2, obj2))
+    self.assertEqual(None, models.Relationship.find_related(obj3, obj3))
+
+  def test_policy_unique_title(self):
+    filename = "policy_sample1.csv"
+    response_json_dry = self.import_file(filename, dry_run=True)
+    response_json = self.import_file(filename)
+
+    self.assertEqual(response_json_dry, response_json)
+    self.assertEqual(response_json[0]["row_errors"], [])
+
+    filename = "policy_sample2.csv"
+    response_json_dry = self.import_file(filename, dry_run=True)
+    response_json = self.import_file(filename)
+
+    self.assertEqual(response_json_dry, response_json)
+    self.assertEqual(response_json[0]["row_errors"], [
+        "Line 3: title 'will this work' already exists.Record will be ignored."
+    ])
 
   def test_control_assessments_import_update(self):
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")

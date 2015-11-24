@@ -11,10 +11,10 @@
   <div class="span12">
     <div class="left-spacing">
       <h6>Mapped objects</h6>
-      <ul class="mapped-list" {{data 'options'}}  data-disable-lazy-loading="true"
+      <ul class="mapped-list" data-update-count="{{update_count}}" {{data 'options'}}  data-disable-lazy-loading="true"
         {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
       </ul>
-      {{#is_allowed_to_map instance model.shortName}}
+      {{#is_allowed 'update' instance context='for'}}
         <a
           class="btn btn-draft btn-small"
           href="javascript://"
@@ -28,7 +28,7 @@
           data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}">
           Map Objects
         </a>
-      {{/if}}
+      {{/is_allowed}}
     </div>
   </div>
 </div>

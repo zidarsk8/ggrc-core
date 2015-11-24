@@ -30,6 +30,7 @@ permissions = {
     ],
     "create": [
         "Request",
+        "Comment",
         "ControlAssessment",
         "Issue",
         "DocumentationResponse",
@@ -66,6 +67,7 @@ permissions = {
             "condition": "contains"
         },
         "Request",
+        "Comment",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
