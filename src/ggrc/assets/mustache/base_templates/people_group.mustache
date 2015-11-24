@@ -25,7 +25,7 @@
         {{#is_allowed 'update' instance context='for'}}
         {{#can_unmap}}
         <span class="file-controls">
-          <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+          <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{instance.id}}>
             <span class="result" {{data 'result'}}></span>
             <i class="grcicon-deleted"></i>
           </a>
@@ -36,11 +36,11 @@
       </li>
     {{/each}}
     {{#instance._pending_joins}}
-    {{#if_equals extra.attrs.AssigneeType type insensitive='true'}}
+    {{#if_has_role extra.attrs.AssigneeType type}}
       <li>
         {{{render '/static/mustache/people/popover.mustache' person=what}}}
       </li>
-      {{/if_equals}}
+    {{/if_has_role}}
     {{/instance._pending_joins}}
     <li class="person-add">
       {{#show_add}}
