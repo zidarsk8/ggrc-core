@@ -23,6 +23,7 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
       schema.CheckConstraint('start_date <= end_date'),
   )
   _title_uniqueness = False
+  _start_changed = False
 
   @classmethod
   def default_task_type(cls):
@@ -65,7 +66,10 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
   @orm.validates("start_date", "end_date")
   def validate_end_date(self, key, value):
     value = self.validate_date(value)
-    if key == "end_date" and self.start_date and self.start_date > value:
+    if key == "start_date":
+      self._start_changed = True
+    if key == "end_date" and self._start_changed and self.start_date > value:
+      self._start_changed = False
       raise ValueError("Start date can not be after end date.")
     return value
 
