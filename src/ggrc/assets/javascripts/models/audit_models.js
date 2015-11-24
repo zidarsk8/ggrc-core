@@ -355,8 +355,8 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
   , defaults : {
     status: "Unstarted",
-    requested_on: new Date(),
-    due_on: new Date()
+    requested_on: moment().toDate(),
+    due_on: GGRC.Utils.firstWorkingDay(moment().add(1, "weeks"))
   }
   , info_pane_options: {
     mapped_objects: {
