@@ -210,7 +210,6 @@ class TestCustomAttributesDefinitions(TestCase):
         "Title",
         "Description",
         "Notes",
-        "Privacy",
         "Manager",
         "Reader",
         "Editor",
@@ -236,7 +235,6 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Mandatory Attribute"]["mandatory"])
     self.assertTrue(vals["Choose"]["mandatory"])
-    self.assertTrue(vals["Privacy"]["mandatory"])
 
 
 class TestGetObjectColumnDefinitions(TestCase):
@@ -258,7 +256,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Notes",
-        "Privacy",
         "Manager",
         "Reader",
         "Editor",
@@ -305,6 +302,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
+    self.assertTrue(vals["Program"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Internal Audit Lead"]["mandatory"])
 

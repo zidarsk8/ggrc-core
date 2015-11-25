@@ -71,6 +71,7 @@ class Audit(
       "program": {
           "display_name": "Program",
           "filter_by": "_filter_by_program",
+          "mandatory": True,
       },
       "user_role:Auditor": {
           "display_name": "Auditors",

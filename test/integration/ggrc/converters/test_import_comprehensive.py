@@ -184,7 +184,6 @@ class TestComprehensiveSheets(TestCase):
           len(current["row_warnings"]), data["row_warnings"], name)
 
     prog = Program.query.filter_by(slug="prog-8").first()
-    self.assertTrue(prog.private)
     self.assertEqual(prog.title, "program 8")
     self.assertEqual(prog.status, "Draft")
     self.assertEqual(prog.description, "test")

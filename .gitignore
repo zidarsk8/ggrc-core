@@ -24,6 +24,7 @@ src/ggrc/static/.webassets-cache
 src/ggrc/static/webassets-external
 src/ggrc/static/assets.manifest
 src/ggrc/static/dashboard*
+src/ggrc/static/app-init*
 src/ggrc/static/mockup*
 src/ggrc/assets/stylesheets/dashboard.css
 src/ggrc/assets/stylesheets/design.css

@@ -22,31 +22,35 @@
     {{/if}}
     {{#results}}
       <li>
-        {{#is_allowed 'update'}}
+        {{#is_allowed 'update' instance context='for'}}
+        {{#can_unmap}}
         <span class="file-controls">
-          <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+          <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{instance.id}}>
             <span class="result" {{data 'result'}}></span>
             <i class="grcicon-deleted"></i>
           </a>
         </span>
+        {{/can_unmap}}
         {{/is_allowed}}
         {{{render '/static/mustache/people/popover.mustache' person=instance}}}
       </li>
     {{/each}}
     {{#instance._pending_joins}}
-    {{#if_equals extra.attrs.AssigneeType type insensitive='true'}}
+    {{#if_has_role extra.attrs.AssigneeType type}}
       <li>
         {{{render '/static/mustache/people/popover.mustache' person=what}}}
       </li>
-      {{/if_equals}}
+    {{/if_has_role}}
     {{/instance._pending_joins}}
     <li class="person-add">
       {{#show_add}}
+        {{#is_allowed 'update' instance context='for'}}
         {{#toggle toggle_add}}
           {{> /static/mockups/base_templates/add_people.mustache }}
         {{else}}
           <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+ Add Person</a>
         {{/toggle}}
+        {{/is_allowed}}
       {{/show_add}}
     </li>
   </ul>

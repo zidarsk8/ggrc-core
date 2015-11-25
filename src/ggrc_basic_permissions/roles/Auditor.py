@@ -24,15 +24,18 @@ permissions = {
         "Document",
         "Meeting",
         "UserRole",
+        "Comment",
         "Context",
     ],
     "create": [
         "Request",
         "ControlAssessment",
         "Issue",
+        "Relationship",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
+        "Comment",
     ],
     "view_object_page": [
         "__GGRC_ALL__"

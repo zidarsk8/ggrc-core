@@ -89,7 +89,8 @@ class Relationship(Mapping, db.Model):
       Only white-listed attributes can be stored, so users don't use this
       for storing arbitrary data.
     """
-    RelationshipAttr.validate_attr(self.source, self.destination, attr)
+    RelationshipAttr.validate_attr(self.source, self.destination,
+                                   self.attrs, attr)
     return attr
 
   @classmethod
@@ -104,6 +105,16 @@ class Relationship(Mapping, db.Model):
     return Relationship.query.filter(
         or_(predicate(object1, object2), predicate(object2, object1))
     ).first()
+
+  @classmethod
+  def update_attributes(cls, object1, object2, new_attrs):
+    r = cls.find_related(object1, object2)
+    for attr_name, attr_value in new_attrs.iteritems():
+      attr = RelationshipAttr(attr_name=attr_name, attr_value=attr_value)
+      attr = RelationshipAttr.validate_attr(r.source, r.destination,
+                                            r.attrs, attr)
+      r.attrs[attr.attr_name] = attr.attr_value
+    return r
 
   @staticmethod
   def _extra_table_args(cls):
@@ -208,7 +219,7 @@ class RelationshipAttr(Identifiable, db.Model):
   _validators = {}
 
   @classmethod
-  def validate_attr(cls, source, destination, attr):
+  def validate_attr(cls, source, destination, attrs, attr):
     """
       Checks both source and destination type (with mixins) for
       defined validators _validate_relationship_attr
@@ -217,8 +228,11 @@ class RelationshipAttr(Identifiable, db.Model):
     attr_value = attr.attr_value
     validators = cls._get_validators(source) + cls._get_validators(destination)
     for validator in validators:
-      if validator(source, destination, attr_name, attr_value):
-        return
+      validated_value = validator(source, destination, attrs,
+                                  attr_name, attr_value)
+      if validated_value is not None:
+        attr.attr_value = validated_value
+        return attr
     raise BadRequest("Invalid attribute {}: {}".format(attr_name, attr_value))
 
   @classmethod

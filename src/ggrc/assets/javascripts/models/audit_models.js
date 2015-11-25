@@ -343,6 +343,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
   , mixins : ["unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
     , assignee : "CMS.Models.Person.stub"
@@ -350,11 +351,12 @@ can.Model.Cacheable("CMS.Models.Request", {
     , due_on : "date"
     , documents : "CMS.Models.Document.stubs"
     , audit : "CMS.Models.Audit.stub"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
-    status : "Unstarted"
-    , requested_on : new Date()
-    , due_on : null
+    status: "Unstarted",
+    requested_on: moment().toDate(),
+    due_on: GGRC.Utils.firstWorkingDay(moment().add(1, "weeks"))
   }
   , info_pane_options: {
     mapped_objects: {
@@ -387,7 +389,6 @@ can.Model.Cacheable("CMS.Models.Request", {
     , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
     , attr_list : [
       {attr_title: 'Title', attr_name: 'title'},
-      {attr_title: 'Description', attr_name: 'description'},
       {attr_title: 'Status', attr_name: 'status'},
       {attr_title: 'Last Updated', attr_name: 'updated_at'},
       {attr_title: 'Request Date', attr_name: 'requested_on', attr_sort_field: 'report_start_date'},
@@ -396,8 +397,8 @@ can.Model.Cacheable("CMS.Models.Request", {
       {attr_title: 'Code', attr_name: 'slug'},
       {attr_title: 'Audit', attr_name: 'audit'},
     ]
-    , display_attr_names : ['description','assignee', 'due_on', 'status']
-    , mandatory_attr_names : ['title', 'description']
+    , display_attr_names : ['title', 'assignee', 'due_on', 'status']
+    , mandatory_attr_names : ['title']
     , draw_children : true
     , child_options: [{
       model : can.Model.Cacheable,
@@ -412,7 +413,19 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validateNonBlank("requested_on");
     this.validatePresenceOf("audit");
 
-    if(this === CMS.Models.Request) {
+    this.validate(["requested_on", "due_on"], function (newVal, prop) {
+      var dates_are_valid;
+
+      if (this.requested_on && this.due_on) {
+        dates_are_valid = this.due_on >= this.requested_on;
+      }
+
+      if (!dates_are_valid) {
+        return "Requested and/or Due date is invalid";
+      }
+    });
+
+    if (this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {
         if(instance.constructor === CMS.Models.Request) {
           instance.audit.reify().refresh();
@@ -437,7 +450,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     }
   , form_preload : function(new_object_form) {
     var audit, that = this;
-    if(new_object_form) {
+    if (new_object_form) {
       if (GGRC.page_model.type == "Audit") {
         this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
       }
@@ -447,7 +460,7 @@ can.Model.Cacheable("CMS.Models.Request", {
         }
       });
 
-      if(this.audit) {
+      if (this.audit) {
         audit = this.audit.reify();
         (audit.selfLink ? $.when(audit) : audit.refresh())
         .then(function(audit) {
@@ -500,7 +513,6 @@ can.Model.Cacheable("CMS.Models.Request", {
 });
 
 can.Model.Cacheable("CMS.Models.Response", {
-
   root_object : "response"
   , root_collection : "responses"
   , subclasses : []
@@ -573,7 +585,6 @@ can.Model.Cacheable("CMS.Models.Response", {
     , people : "CMS.Models.Person.stubs"
     , meetings : "CMS.Models.Meeting.stubs"
     , request : "CMS.Models.Request.stub"
-    , assignee : "CMS.Models.Person.stub"
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
     , controls : "CMS.Models.Control.stubs"

@@ -44,7 +44,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     }
 
     this.options.widget_count = new can.Observe();
-    
+
     this.element
           .addClass("widget")
           .addClass(this.options.object_category)
