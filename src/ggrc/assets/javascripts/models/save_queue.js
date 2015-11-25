@@ -56,10 +56,12 @@
             };
           };
           for (var i = 0; i < objs.length; i++) {
-            var single = data[i];
+            var single = data[i],
+                obj = objs[i];
             if (single[0] >= 200 && single[0] < 300) {
-              var obj = objs[i];
               obj._save(cb(single));
+            } else {
+              obj._dfd.rejectWith(obj, [single]);
             }
           }
         }).always(function() {
