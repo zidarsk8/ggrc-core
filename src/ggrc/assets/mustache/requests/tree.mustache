@@ -58,7 +58,7 @@
                             {{/using}}
                           {{/case}}
                           {{#case 'mapped_responses'}}
-                            <i rel="tooltip" data-placement="right" {{#if_equals instance.request_type "documentation"}}data-original-title="# of attached documents" class="grcicon-directive-black"{{else}}data-original-title="# of attached meetings" class="grcicon-interview"{{/if_equals}}></i>
+                            <i rel="tooltip" data-placement="right" {{#if_equals instance.request_type "documentation"}}data-original-title="# of attached documents" class="fa fa-files-o"{{else}}data-original-title="# of attached meetings" class="grcicon-interview"{{/if_equals}}></i>
                             <span class="counter">
                               {{#child_options}}
                                 {{#with_mapping_count instance mapping}}
