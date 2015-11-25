@@ -14,24 +14,14 @@ class TestUtilsFunctions(TestCase):
     mappings = utils.get_mapping_rules()
     verificationErrors = []
 
-    # Special cases in mappings as defined in utils.py:
-    audit_mappings = ["Control", "DataAsset", "Facility", "Market", "OrgGroup",
-                      "Process", "Product", "Program", "Project", "System",
-                      "Vendor", "AccessGroup", "Request"]
-
     for object_name, object_mappings in mappings.items():
       for mapping in object_mappings:
         try:
-          if mapping == "Request":
-            # objects mapped to requests show up as mapped to Audit so
-            # Requests are no listed anywhere in the allowed mappings.
-            self.assertNotIn(mapping, mappings)
-          elif mapping == "Audit" and object_name in audit_mappings:
-            self.assertNotIn(
-                object_name, mappings[mapping],
-                "{} found in {} mappings".format(object_name, mapping)
-            )
-          else:
+          # Audits do not have dirrect mappings and do not have all objects
+          # listed, that is why we don't check bothways.
+          if mapping != "Audit":
+            # If obj A is in obj B mappings, make sure that obj B is also in
+            #obj A mappings
             self.assertIn(
                 mapping, mappings,
                 "- {} is not in the mappings dict".format(mapping)

@@ -6,11 +6,11 @@
 }}
 {{#instance.class.info_pane_options.evidence}}
 {{#add_to_current_scope parent_instance=instance}}
-  <ul class="attachment-list" data-disable-lazy-loading="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
+  <ul class="attachment-list" data-update-count="{{update_count}}" data-disable-lazy-loading="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
   </ul>
-  {{#is_allowed 'update'}}
+  {{#is_allowed 'update' instance context='for'}}
     <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach evidence" click_event="trigger_upload">
     </ggrc-gdrive-picker-launcher>
   {{/is_allowed}}
-{{/instance}}
 {{/add_to_current_scope}}
+{{/instance}}

@@ -86,7 +86,7 @@ can.Control("GGRC.Controllers.Modals", {
         .then(this.proxy("serialize_form"))
         .then(function() {
           // If the modal is closed early, the element no longer exists
-          that.element && that.element.trigger('preload');
+          that.element && that.element.trigger("preload");
         })
         .then(this.proxy("autocomplete"));
       this.restore_ui_status_from_storage();
@@ -325,38 +325,33 @@ can.Control("GGRC.Controllers.Modals", {
        (typeof el.attr('value') !== 'undefined' && !el.attr('value').length)) {
       this.set_value_from_element(el);
     }
-  }
-  , serialize_form : function() {
-      var $form = this.options.$content.find("form")
-        , $elements = $form.find(":input:not(isolate-form *)")
-        ;
+  },
+  serialize_form: function () {
+    var $form = this.options.$content.find("form"),
+        $elements = $form.find(":input:not(isolate-form *)");
 
-      can.each($elements.toArray(), this.proxy("set_value_from_element"));
+    can.each($elements.toArray(), this.proxy("set_value_from_element"));
+  },
+  set_value_from_element: function (el) {
+    el = el instanceof jQuery ? el : $(el);
+    var name = el.attr("name"),
+        value = el.val();
+
+    // If no model is specified, short circuit setting values
+    // Used to support ad-hoc form elements in confirmation dialogs
+    if (!this.options.model) {
+      return;
     }
-
-  , set_value_from_element : function (el) {
-      var $el = el instanceof jQuery ? el : $(el)
-        , name = $el.attr('name')
-        , value = $el.val()
-        ;
-      // If no model is specified, short circuit setting values
-      // Used to support ad-hoc form elements in confirmation dialogs
-      if (!this.options.model) {
-        return;
-      }
-
-      if (name) {
-        this.set_value({ name: name, value: value });
-      }
-
-      if ($el.is("[data-also-set]")) {
-        can.each($el.data("also-set").split(","), function(oname) {
-          this.set_value({ name : oname, value : value});
-        }, this);
-      }
+    if (name) {
+      this.set_value({name: name, value: value});
     }
-
-  , set_value: function (item) {
+    if (el.is("[data-also-set]")) {
+      can.each(el.data("also-set").split(","), function(oname) {
+        this.set_value({name: oname, value: value});
+      }, this);
+    }
+  },
+  set_value: function (item) {
     // Don't set `_wysihtml5_mode` on the instances
     if (item.name === '_wysihtml5_mode') {
       return;
@@ -464,15 +459,28 @@ can.Control("GGRC.Controllers.Modals", {
       }
     }
     this.setup_wysihtml5(); // in case the changes in values caused a new wysi box to appear.
-  }
+  },
+  "[data-before], [data-after] change": function (el, ev) {
+    function setDateLimit(prop, when, date) {
+      var elem = prop ? this.element.find("[name=" + prop + "]") : el;
+      if (!elem.data("datepicker")) {
+        elem.datepicker({changeMonth: true, changeYear: true})
+      }
+      elem.datepicker("option", when, date);
+    }
+    var date = el.datepicker("getDate") || new Date(),
+        data = el.data(),
+        options = {
+          "before": "minDate",
+          "after": "maxDate"
+        };
 
-  , "[data-before], [data-after] change" : function(el, ev) {
-    var start_date = el.datepicker('getDate');
-    this.element.find("[name=" + el.data("before") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "minDate", start_date);
-    this.element.find("[name=" + el.data("after") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "maxDate", start_date);
-  }
+    _.each(options, function (val, key) {
+      setDateLimit.call(this, data[key], val, date);
+    }, this);
+  },
 
-  , "{$footer} a.btn[data-toggle='modal-submit-addmore'] click" : function(el, ev){
+  "{$footer} a.btn[data-toggle='modal-submit-addmore'] click" : function(el, ev){
     if (el.hasClass('disabled')) {
       return;
     }
@@ -1015,37 +1023,39 @@ can.Component.extend({
       }
     },
     deferred_update: function () {
-      var that = this,
-          changes = this.scope.changes,
+      var changes = this.scope.changes,
           instance = this.scope.instance;
 
       if (!changes.length) {
         if (instance && instance._pending_joins && instance._pending_joins.length) {
           instance.delay_resolving_save_until(instance.constructor.resolve_deferred_bindings(instance));
         }
-
         return;
       }
       this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
       can.each(
         changes,
         function(item) {
-          var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
+          var mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, item.what.constructor.shortName);
           if (item.how === "add") {
-            that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
+            this.scope.instance.mark_for_addition(mapping, item.what, item.extra);
           } else {
-            that.scope.instance.mark_for_deletion(mapping, item.what);
+            this.scope.instance.mark_for_deletion(mapping, item.what);
           }
-        }
+        }.bind(this)
       );
-      instance.delay_resolving_save_until(that.scope.instance.constructor.resolve_deferred_bindings(that.scope.instance));
+      this.scope.instance.delay_resolving_save_until(this.scope.instance.constructor.resolve_deferred_bindings(this.scope.instance));
     },
     "{parent_instance} updated": "deferred_update",
     "{parent_instance} created": "deferred_update",
 
     // this works like autocomplete_select on all modal forms and
     // descendant class objects.
-    autocomplete_select : function(el, event, ui) {
+    "autocomplete_select" : function(el, event, ui) {
+      if (!this.element) {
+        return;
+      }
+
       var mapping, extra_attrs;
       extra_attrs = can.reduce(this.element.find("input:not([data-mapping], [data-lookup])").get(), function(attrs, el) {
         attrs[$(el).attr("name")] = $(el).val();

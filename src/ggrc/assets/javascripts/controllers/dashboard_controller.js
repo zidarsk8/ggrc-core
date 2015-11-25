@@ -323,7 +323,6 @@ can.Control("CMS.Controllers.InnerNav", {
     init: function(options) {
       CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
         this.display_prefs = prefs;
-
         if (!this.options.widget_list) {
           this.options.widget_list = new can.Observe.List([]);
         }
@@ -337,7 +336,6 @@ can.Control("CMS.Controllers.InnerNav", {
         can.bind.call(window, 'hashchange', function() {
           this.route(window.location.hash);
         }.bind(this));
-
         can.view(this.options.internav_view, this.options, function(frag) {
           var fn = function () {
             this.element.append(frag);
@@ -476,7 +474,6 @@ can.Control("CMS.Controllers.InnerNav", {
         , count = match[2] || undefined
         , existing_index
         ;
-
       index = this.saved_widget_index($widget, index);
 
       if(this.delayed_display) {

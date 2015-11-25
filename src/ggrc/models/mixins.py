@@ -669,17 +669,22 @@ class Assignable(object):
 
   @property
   def assignees(self):
-    assignees = [(r.source, r.attrs["AssigneeType"])
+    assignees = [(r.source, r.attrs["AssigneeType"].split(","))
                  for r in self.related_sources
                  if "AssigneeType" in r.attrs]
-    assignees += [(r.destination, r.attrs["AssigneeType"])
+    assignees += [(r.destination, r.attrs["AssigneeType"].split(","))
                   for r in self.related_destinations
                   if "AssigneeType" in r.attrs]
     return set(assignees)
 
   @staticmethod
-  def _validate_relationship_attr(cls, source, dest, attr_name, attr_value):
+  def _validate_relationship_attr(cls, source, dest, existing, name, value):
     types_ok = set([source.type, dest.type]) == set([cls.__name__, "Person"])
-    attr_name_ok = attr_name == "AssigneeType"
-    attr_value_ok = attr_value in cls.ASSIGNEE_TYPES
-    return types_ok and attr_name_ok and attr_value_ok
+    attr_name_ok = name == "AssigneeType"
+    new_roles = value.split(",")
+    attr_value_ok = all(role in cls.ASSIGNEE_TYPES for role in new_roles)
+    if types_ok and attr_name_ok and attr_value_ok:
+      roles = set(existing.get(name, "").split(",")) | set(new_roles)
+      return ",".join(role for role in roles if role)
+    else:
+      return None

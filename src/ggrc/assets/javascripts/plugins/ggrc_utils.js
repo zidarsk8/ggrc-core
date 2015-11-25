@@ -4,8 +4,16 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 */
-(function($, GGRC) {
+(function($, GGRC, moment) {
   GGRC.Utils = {
+    firstWorkingDay: function (date) {
+      date = moment(date);
+      // 6 is Saturday 0 is Sunday
+      while (_.contains([0, 6], date.day())) {
+        date.add(1, "day");
+      }
+      return date.toDate();
+    },
     getPickerElement: function (picker) {
       return _.find(_.values(picker), function (val) {
         if (val instanceof Node) {
@@ -69,4 +77,4 @@
       return can_map;
     }
   };
-})(jQuery, window.GGRC = window.GGRC || {});
+})(jQuery, window.GGRC = window.GGRC || {}, window.moment);
