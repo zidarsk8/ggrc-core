@@ -138,6 +138,8 @@
   &.color { color: $purple; }
 }
 
+.grcicon-event-color:before { content: $fa-var-history; }
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }

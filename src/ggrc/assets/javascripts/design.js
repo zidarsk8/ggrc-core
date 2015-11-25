@@ -44,7 +44,7 @@ jQuery(function ($) {
   /*Checkbutton in modals widget function*/
   $(document).on("click", ".checkbutton", function(event) {
     $(this).children("i").toggleClass("grcicon-blank");
-    $(this).children("i").toggleClass("grcicon-x-grey");
+    $(this).children("i").toggleClass("fa-times");
   });
 
   /*Toggle widget function*/
