@@ -666,9 +666,6 @@ i.short {
 }
 
 .quick-list {
-  .icon-wrap {
-    @extend %white-icons;
-  }
   .dropdown-menu {
     // turns icons to black
     @extend %black-icons;
