@@ -663,50 +663,44 @@ can.Control("GGRC.Controllers.Modals", {
       return false;
     }
 
-  }
+  },
+
   //make buttons non-clickable when saving, make it disable afterwards
-  ,  bindXHRToButton_disable : function(xhr, el, newtext, disable) {
-      // binding of an ajax to a click is something we do manually
-      var $el = $(el),
-          oldtext = $el.text();
+  bindXHRToButton_disable: function (xhr, el, newtext, disable) {
+    // binding of an ajax to a click is something we do manually
+    var $el = $(el),
+        oldtext = $el.text();
 
-      if (newtext) {
-        $el[0].innerHTML = newtext;
-      }
-      $el.addClass("disabled pending-ajax");
-      if (disable !== false) {
-        $el.attr("disabled", true);
-      }
-      xhr.always(function() {
-        // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-        if ($el.length) {
-          $el.removeAttr("disabled").removeClass("pending-ajax")[0].innerHTML = oldtext;
-        }
-      });
+    if (newtext) {
+      $el[0].innerHTML = newtext;
     }
-
+    $el.addClass("disabled pending-ajax");
+    if (disable !== false) {
+      $el.attr("disabled", true);
+    }
+    xhr.always(function () {
+      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
+      if ($el.length) {
+        $el.removeAttr("disabled").removeClass("pending-ajax")[0].innerHTML = oldtext;
+      }
+    });
+  },
   //make buttons non-clickable when saving
-  , bindXHRToBackdrop : function(xhr, el, newtext, disable) {
-      // binding of an ajax to a click is something we do manually
+  bindXHRToBackdrop: function (xhr, el, newtext, disable) {
+    // binding of an ajax to a click is something we do manually
+    var $el = $(el),
+        oldtext = $el.text(),
+        alt;
 
-      var $el = $(el)
-      , oldtext = $el.text();
-      var alt;
-
-      var myel = "<div ";
-      //if(newtext) {
-      //  $el[0].innerHTML = newtext;
-      //}
-      $el.addClass("disabled pending-ajax");
-      if (disable !== false) {
-        $el.attr("disabled", true);
-      }
-      xhr.always(function() {
-        // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-        $el.removeAttr("disabled").removeClass("disabled pending-ajax");//[0].innerHTML = oldtext;
-      });
-
+    $el.addClass("disabled pending-ajax");
+    if (disable !== false) {
+      $el.attr("disabled", true);
     }
+    xhr.always(function() {
+      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
+      $el.removeAttr("disabled").removeClass("disabled pending-ajax");//[0].innerHTML = oldtext;
+    });
+  }
 
   , triggerSave : function(el, ev) {
     var ajd,
@@ -717,17 +711,15 @@ can.Control("GGRC.Controllers.Modals", {
     // Normal saving process
     if (el.is(':not(.disabled)')) {
       ajd = this.save_instance(el, ev);
-
-      if(this.options.add_more) {
-        if(ajd) {
+      if (this.options.add_more) {
+        if (ajd) {
           this.bindXHRToButton_disable(ajd, save_close_btn);
           this.bindXHRToButton_disable(ajd, save_addmore_btn);
 
           this.bindXHRToBackdrop(ajd, modal_backdrop, "Saving, please wait...");
         }
-      }
-      else {
-        if(ajd) {
+      } else {
+        if (ajd) {
           this.bindXHRToButton(ajd, save_close_btn, "Saving, please wait...");
           this.bindXHRToButton(ajd, save_addmore_btn);
         }
@@ -809,60 +801,55 @@ can.Control("GGRC.Controllers.Modals", {
       }
 
       this.disable_hide = true;
-      ajd = instance.save()
-      .fail(this.save_error.bind(this))
-      .done(function(obj) {
-        function finish() {
-          delete that.disable_hide;
-          if (that.options.add_more) {
-            if (that.options.$trigger) {
-              that.options.$trigger.trigger("modal:added", [obj]);
-            }
-            that.new_instance();
-          } else {
-            that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
-            that.update_hash_fragment();
-          }
-        }
-
-        // If this was an Objective created directly from a Section, create a join
-        var params = that.options.object_params;
-        if (obj instanceof CMS.Models.Objective && params && params.section) {
-          new CMS.Models.Relationship({
-            source: obj,
-            destination: CMS.Models.Section.findInCacheById(params.section.id),
-            context: { id: null }
-          }).save()
-          .fail(that.save_error.bind(that))
-          .done(function(){
-            $(document.body).trigger("ajax:flash",
-                { success : "Objective mapped successfully." });
-            finish();
-          });
-        } else {
-          var type = obj.type ? can.spaceCamelCase(obj.type) : '',
-              name = obj.title ? obj.title : '',
-              msg;
-          if(instance_id === undefined) { //new element
-            if(obj.is_declining_review && obj.is_declining_review == '1') {
-              msg = "Review declined";
-            } else if (name) {
-              msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+      ajd = instance.save();
+      ajd.fail(this.save_error.bind(this))
+        .done(function (obj) {
+          function finish() {
+            delete that.disable_hide;
+            if (that.options.add_more) {
+              if (that.options.$trigger) {
+                that.options.$trigger.trigger("modal:added", [obj]);
+              }
+              that.new_instance();
             } else {
-              msg = "New " + type + " added successfully.";
+              that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
+              that.update_hash_fragment();
             }
-          } else {
-            msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";
           }
-          $(document.body).trigger("ajax:flash", { success : msg });
-          finish();
-        }
-      }).fail(function(xhr, status) {
-        if(!instance.errors()) {
-          $(document.body).trigger("ajax:flash", { error : xhr.responseText });
-        }
-        delete that.disable_hide;
-      });
+
+          // If this was an Objective created directly from a Section, create a join
+          var params = that.options.object_params;
+          if (obj instanceof CMS.Models.Objective && params && params.section) {
+            new CMS.Models.Relationship({
+              source: obj,
+              destination: CMS.Models.Section.findInCacheById(params.section.id),
+              context: { id: null }
+            }).save()
+            .fail(that.save_error.bind(that))
+            .done(function(){
+              $(document.body).trigger("ajax:flash",
+                  { success : "Objective mapped successfully." });
+              finish();
+            });
+          } else {
+            var type = obj.type ? can.spaceCamelCase(obj.type) : '',
+                name = obj.title ? obj.title : '',
+                msg;
+            if(instance_id === undefined) { //new element
+              if(obj.is_declining_review && obj.is_declining_review == '1') {
+                msg = "Review declined";
+              } else if (name) {
+                msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+              } else {
+                msg = "New " + type + " added successfully.";
+              }
+            } else {
+              msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";
+            }
+            $(document.body).trigger("ajax:flash", { success : msg });
+            finish();
+          }
+        });
       this.save_ui_status();
       return ajd;
   }

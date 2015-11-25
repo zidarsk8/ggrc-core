@@ -32,17 +32,18 @@
     _enqueue_bucket: function (bucket) {
       var that = this;
       return function () {
-        var objs = bucket.objs.splice(0, 100);
-        var body = _.map(objs, function (obj) {
-          var o = {};
-          o[bucket.type] = obj.serialize();
-          return o;
-        });
-        return $.ajax({
-          type: "POST",
-          url: "/api/" + bucket.plural,
-          data: body
-        }).always(function(data, type) {
+        var objs = bucket.objs.splice(0, 100),
+            body = _.map(objs, function (obj) {
+              var o = {};
+              o[bucket.type] = obj.serialize();
+              return o;
+            }),
+            dfd = $.ajax({
+              type: "POST",
+              url: "/api/" + bucket.plural,
+              data: body
+            }).promise();
+        dfd.always(function (data, type) {
           if (type === "error") {
             data = data.responseJSON;
             if (data === undefined) {
@@ -64,13 +65,15 @@
               obj._dfd.rejectWith(obj, [single]);
             }
           }
-        }).always(function() {
-          if (bucket.objs.length > 0) {
+        }).always(function () {
+          if (bucket.objs.length) {
             that._step(that._enqueue_bucket(bucket));
           } else {
             bucket.in_flight = false;
           }
         });
+
+        return dfd;
       };
     },
 
