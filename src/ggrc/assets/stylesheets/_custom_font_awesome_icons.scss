@@ -70,12 +70,8 @@
 }
 
 .grcicon-access_group {
-  &:before {
-    content: $fa-var-map-signs;
-  }
-  &.color {
-    color: #a8491a;
-  }
+  &:before { content: $fa-var-map-signs; }
+  &.color { color: #a8491a; }
 }
 
 .grcicon-cycle-color:before { content: $fa-var-play-circle; }
@@ -86,8 +82,11 @@
 .grcicon-access_group-black:before,
 .grcicon-accessgroup-black:before,
 .grcicon-accessgroup-color:before,
-.grcicon-access_group-color:before,
-.#{$fa-css-prefix}-access_group:before { content: $fa-var-map-signs; }
+.grcicon-access_group-color:before { content: $fa-var-map-signs; color: #a8491a; }
+.#{$fa-css-prefix}-access_group {
+  &:before { content: $fa-var-map-signs; }
+  &.color { color: #a8491a; }
+}
 
 .grcicon-contract-color:before { content: $fa-var-file-text; color: #005580; }
 .#{$fa-css-prefix}-contract {
@@ -173,8 +172,10 @@
   .grcicon-access_group-black:before,
   .grcicon-accessgroup-black:before,
   .grcicon-accessgroup-color:before,
-  .grcicon-access_group-color:before,
-  .#{$fa-css-prefix}-access_group:before { color: $black; }
+  .grcicon-access_group-color:before { color: $black; }
+  .#{$fa-css-prefix}-access_group {
+    &.color { color: $black; }
+  }
 
   .grcicon-contract-color:before { color: $black; }
   .#{$fa-css-prefix}-contract {
@@ -295,8 +296,10 @@
   .grcicon-access_group-black:before,
   .grcicon-accessgroup-black:before,
   .grcicon-accessgroup-color:before,
-  .grcicon-access_group-color:before,
-  .#{$fa-css-prefix}-access_group:before { color: $white; }
+  .grcicon-access_group-color:before { color: $white; }
+  .#{$fa-css-prefix}-access_group {
+    &.color { color: $white; }
+  }
 
   .grcicon-contract-color:before { color: $white; }
   .#{$fa-css-prefix}-contract {

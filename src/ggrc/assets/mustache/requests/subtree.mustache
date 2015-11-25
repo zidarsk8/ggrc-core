@@ -11,11 +11,11 @@
   <span class="file-controls">
     <a href="javascript://" class="info-action unmap" data-toggle="unmap">
       {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-      <i class="grcicon-remove"></i>
+      <i class="fa fa-ban"></i>
     </a>
   </span>
   {{/is_allowed}}
-  <i class="grcicon-{{class.table_singular}}-color"></i>
+  <i class="fa fa-{{class.table_singular}} color"></i>
   {{firstnonempty title description name email}}
 </li>
 {{/instance}}
