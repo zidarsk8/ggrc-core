@@ -114,10 +114,17 @@
     },
     helpers: {
       can_unmap: function (options) {
-        if (this.attr("instance").get_mapping(this.attr("mapping")).length > 1) {
+        var num_mappings = this.attr("instance").get_mapping(this.attr("mapping")).length,
+            required = this.attr("required");
+
+        if (required) {
+          if (num_mappings > 1) {
+            return options.fn(options.context);
+          }
+          return options.inverse(options.context);
+        } else {
           return options.fn(options.context);
         }
-        return options.inverse(options.context);
       },
       show_add: function (options) {
         if (this.attr("editable") === "true") {
