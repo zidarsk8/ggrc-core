@@ -344,8 +344,16 @@ small {
 
 // buttons
 .btn-info-pin-header {
+  margin-right: 10px;
+  &.undo {
+    margin-right: 10px;
+    margin-top: 6px;
+  }
   .sticky-info-panel & {
     margin-top: 18px;
+    &.undo {
+      margin-top: 22px;
+    }
   }
 }
 .btn {

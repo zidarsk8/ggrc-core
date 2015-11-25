@@ -120,19 +120,17 @@ can.Control("GGRC.Controllers.Modals", {
     }, "_transient");
 
     instance.attr(["_transient"].concat(name).join("."), value);
-  }
-
-  , autocomplete : function(el) {
+  },
+  autocomplete : function(el) {
     $.cms_autocomplete.call(this, el);
-  }
+  },
+  autocomplete_select: function (el, event, ui) {
+    $("#extended-info").trigger("mouseleave"); // Make sure the extra info tooltip closes
 
-  , autocomplete_select: function (el, event, ui) {
-    $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
-
-    var path = el.attr("name").split(".")
-      , instance = this.options.instance
-      , index = 0
-      , prop = path.pop();
+    var path = el.attr("name").split("."),
+        instance = this.options.instance,
+        index = 0,
+        prop = path.pop();
 
     if (/^\d+$/.test(path[path.length - 1])) {
       index = parseInt(path.pop(), 10);
@@ -143,15 +141,15 @@ can.Control("GGRC.Controllers.Modals", {
       this.options.instance.attr(path).splice(index, 1, ui.item.stub());
     } else {
       path = path.join(".");
-      setTimeout(function(){
+      setTimeout(function () {
         el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
       }, 0);
 
       this.options.instance.attr(path, ui.item);
+      this.options.instance.attr("_transient." + path, ui.item);
     }
-  }
-
-  , immediate_find_or_create : function(el, ev, data) {
+  },
+  immediate_find_or_create : function(el, ev, data) {
     var that = this
     , prop = el.data("drop")
     , model = CMS.Models[el.data("lookup")]
