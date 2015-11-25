@@ -18,30 +18,28 @@
   }
 }
 
-.#{$fa-css-prefix}-person:before { content: $fa-var-user; }
 .grcicon-role-color:before { content: $fa-var-key; }
+
+.#{$fa-css-prefix}-person:before { content: $fa-var-user; }
 .#{$fa-css-prefix}-person-color:before { content: $fa-var-user; color: #a8491a; }
-.#{$fa-css-prefix}-audit-color:before, .grcicon-audit-color:before { content: $fa-var-eye; color: $purple; }
-.#{$fa-css-prefix}-audit:before { content: $fa-var-eye; }
-.#{$fa-css-prefix}-audit {
-  &.color {
-    color: $purple;
-  }
-}
-.#{$fa-css-prefix}-program-color:before, .grcicon-program-color:before { content: $fa-var-folder-open-o; color: $purple; }
-.#{$fa-css-prefix}-program {
-  &:before {
-    content: $fa-var-folder-open-o;
-  }
-  &.color {
-    color: $purple;
-  }
-}
 .#{$fa-css-prefix}-person {
   &.color {
     color: #a8491a;
   }
 }
+
+.grcicon-audit-color:before { content: $fa-var-eye; color: $purple; }
+.#{$fa-css-prefix}-audit {
+  &:before { content: $fa-var-eye; }
+  &.color { color: $purple; }
+}
+
+.grcicon-program-color:before { content: $fa-var-folder-open-o; color: $purple; }
+.#{$fa-css-prefix}-program {
+  &:before { content: $fa-var-folder-open-o; }
+  &.color { color: $purple; }
+}
+
 .#{$fa-css-prefix}-task_group:before {
   content: $fa-var-cog;
   &.color { color: $purple; }
@@ -135,13 +133,26 @@
 
 .grcicon-history-color:before { content: $fa-var-clock-o; }
 
+.grcicon-request-color:before { content: $fa-var-file-o; }
+.#{$fa-css-prefix}-request {
+  &:before { content: $fa-var-file-o; }
+  &.color { color: $purple; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
   .#{$fa-css-prefix}-person {
     &.color { color: $black; }
   }
-  .#{$fa-css-prefix}-audit-color:before, .grcicon-audit-color:before { color: $black; }
+  .grcicon-audit-color:before { color: $black; }
+  .#{$fa-css-prefix}-audit {
+    &.color { color: $black; }
+  }
+  .grcicon-program-color:before { color: $black; }
+  .#{$fa-css-prefix}-program {
+    &.color { color: $black; }
+  }
   .grcicon-task_group-color:before { color: $black; }
   .#{$fa-css-prefix}-task_group:before {
     &.color { color: $black; }
@@ -165,9 +176,6 @@
   .grcicon-access_group-color:before,
   .#{$fa-css-prefix}-access_group:before { color: $black; }
 
-  .#{$fa-css-prefix}-program-color:before,
-  .grcicon-program-color:before,
-  .#{$fa-css-prefix}-program:before { color: $black; }
   .grcicon-contract-color:before { color: $black; }
   .#{$fa-css-prefix}-contract {
     &.color { color: $black; }
@@ -198,6 +206,10 @@
   }
   .grcicon-history-color:before { color: $black; }
   .#{$fa-css-prefix}-clock-o {
+    &.color { color: $black; }
+  }
+  .grcicon-request-color:before { color: $black; }
+  .#{$fa-css-prefix}-request {
     &.color { color: $black; }
   }
 
@@ -256,7 +268,13 @@
   .#{$fa-css-prefix}-person {
     &.color { color: $white; }
   }
-  .#{$fa-css-prefix}-audit-color:before, .grcicon-audit-color:before { color: $white; }
+  .#{$fa-css-prefix}-audit {
+    &.color { color: $black; }
+  }
+  .grcicon-program-color:before { color: $black; }
+  .#{$fa-css-prefix}-program {
+    &.color { color: $black; }
+  }
   .grcicon-task_group-color:before { color: $white; }
   .#{$fa-css-prefix}-task_group:before {
     &.color { color: $white; }
@@ -280,9 +298,6 @@
   .grcicon-access_group-color:before,
   .#{$fa-css-prefix}-access_group:before { color: $white; }
 
-  .#{$fa-css-prefix}-program-color:before,
-  .grcicon-program-color:before,
-  .#{$fa-css-prefix}-program:before { color: $white; }
   .grcicon-contract-color:before { color: $white; }
   .#{$fa-css-prefix}-contract {
     &.color { color: $white; }
@@ -313,6 +328,10 @@
   }
   .grcicon-history-color:before { color: $white; }
   .#{$fa-css-prefix}-clock-o {
+    &.color { color: $white; }
+  }
+  .grcicon-request-color:before { color: $white; }
+  .#{$fa-css-prefix}-request {
     &.color { color: $white; }
   }
 
