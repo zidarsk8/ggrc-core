@@ -678,12 +678,16 @@ can.Control("GGRC.Controllers.Modals", {
     if (disable !== false) {
       $el.attr("disabled", true);
     }
-    xhr.always(function () {
-      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-      if ($el.length) {
-        $el.removeAttr("disabled").removeClass("pending-ajax")[0].innerHTML = oldtext;
-      }
-    });
+    xhr.fail(function () {
+        if ($el.length) {
+          $el.removeClass("disabled");
+        }
+      }).always(function () {
+        // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
+        if ($el.length) {
+          $el.removeAttr("disabled").removeClass("pending-ajax")[0].innerHTML = oldtext;
+        }
+      }.bind(this));
   },
   //make buttons non-clickable when saving
   bindXHRToBackdrop: function (xhr, el, newtext, disable) {
@@ -835,8 +839,8 @@ can.Control("GGRC.Controllers.Modals", {
             var type = obj.type ? can.spaceCamelCase(obj.type) : '',
                 name = obj.title ? obj.title : '',
                 msg;
-            if(instance_id === undefined) { //new element
-              if(obj.is_declining_review && obj.is_declining_review == '1') {
+            if (instance_id === undefined) { //new element
+              if (obj.is_declining_review && obj.is_declining_review == '1') {
                 msg = "Review declined";
               } else if (name) {
                 msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
@@ -852,11 +856,17 @@ can.Control("GGRC.Controllers.Modals", {
         });
       this.save_ui_status();
       return ajd;
-  }
-
-  , save_error: function (_, error) {
-    $(document.body).trigger("ajax:flash", {error: error});
-    delete this.disable_hide;
+  },
+  save_error: function (_, error) {
+    $("html, body").animate({
+      scrollTop: "0px"
+    }, {
+      duration: 200,
+      complete: function () {
+        $(document.body).trigger("ajax:flash", { error: error });
+        delete this.disable_hide;
+      }.bind(this)
+    });
   }
 
   , "{instance} destroyed" : " hide"
