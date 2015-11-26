@@ -66,6 +66,8 @@ class ColumnHandler(object):
       return
     if not self.value:
       return
+    if not self.row_converter.obj:
+      return
     nr_duplicates = self.row_converter.object_class.query.filter(and_(
         getattr(self.row_converter.object_class, self.key) == self.value,
         self.row_converter.object_class.id != self.row_converter.obj.id
