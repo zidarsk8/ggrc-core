@@ -69,7 +69,7 @@ PERMISSION_ERROR = (u"Line {line}: You don't have permission to update/delete"
                     " this record.")
 
 MAPPING_PERMISSION_ERROR = (u"Line {line}: You don't have permission to update"
-                            " mappings for {object_type}: {title} ({slug}).")
+                            " mappings for {object_type}: {slug}.")
 
 DELETE_NEW_OBJECT_ERROR = (u"Line {line}: Tried to create and delete the same"
                            " object {object_type}: {slug} in one import.")

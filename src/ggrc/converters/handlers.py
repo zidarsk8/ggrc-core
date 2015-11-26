@@ -375,7 +375,6 @@ class MappingColumnHandler(ColumnHandler):
           self.add_warning(
               errors.MAPPING_PERMISSION_ERROR,
               object_type=class_._inflector.human_singular.title(),
-              title=title,
               slug=slug,
           )
       elif not (slug in self.new_slugs and self.dry_run):
@@ -612,7 +611,7 @@ class ParentColumnHandler(ColumnHandler):
       return None
     if not permissions.is_allowed_update_for(obj):
       self.add_error(errors.MAPPING_PERMISSION_ERROR,
-                     object_type=obj.type, title=obj.title, slug=slug)
+                     object_type=obj.type, slug=slug)
       return None
     return obj
 
