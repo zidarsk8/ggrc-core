@@ -594,6 +594,11 @@ class ParentColumnHandler(ColumnHandler):
       self.add_error(errors.UNKNOWN_OBJECT,
                      object_type=self.parent._inflector.human_singular.title(),
                      slug=slug)
+      return None
+    if not permissions.is_allowed_update_for(obj):
+      self.add_error(errors.MAPPING_PERMISSION_ERROR,
+                     object_type=obj.type, title=obj.title, slug=slug)
+      return None
     return obj
 
   def set_obj_attr(self):
