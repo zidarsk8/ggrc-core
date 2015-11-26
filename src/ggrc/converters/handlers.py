@@ -220,7 +220,8 @@ class UserColumnHandler(ColumnHandler):
       if email != "":
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
       elif self.mandatory:
-        self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+        self.add_error(errors.MISSING_VALUE_ERROR,
+                       column_name=self.display_name)
     return person
 
   def get_value(self):
@@ -368,7 +369,15 @@ class MappingColumnHandler(ColumnHandler):
         if permissions.is_allowed_update_for(obj):
           objects.append(obj)
         else:
-          self.add_warning(errors.MAPPING_PERMISSION_ERROR, value=slug)
+          title = getattr(obj, "title", None)
+          if title is None:
+            title = getattr(obj, "email", "")
+          self.add_warning(
+              errors.MAPPING_PERMISSION_ERROR,
+              object_type=class_._inflector.human_singular.title(),
+              title=title,
+              slug=slug,
+          )
       elif not (slug in self.new_slugs and self.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
