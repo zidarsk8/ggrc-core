@@ -4,16 +4,21 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from ggrc import db
-from ggrc.models.mixins import (
-    deferred, Base, Titled, Described, Timeboxed, Noted, Slugged
-)
+from ggrc.models.mixins import Base
+from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import Described
+from ggrc.models.mixins import Noted
+from ggrc.models.mixins import Slugged
+from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import Titled
+from ggrc.models.mixins import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.person import Person
 from ggrc.models.program import Program
 
 
 class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
-                     Titled, Base, db.Model):
+                     CustomAttributable, Titled, Base, db.Model):
   __tablename__ = 'risk_assessments'
   _title_uniqueness = False
 
