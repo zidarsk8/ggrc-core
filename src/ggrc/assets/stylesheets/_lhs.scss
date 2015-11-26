@@ -566,20 +566,6 @@ h4.search-title {
       font-size: 13px;
       color: $gray;
       position: relative;
-      .closed {
-        @include background-size(368px 416px);
-        background-image: image-url("grcicons/icons.png");
-        background-position: -347px -179px;
-        background-repeat: no-repeat;
-        display: none;
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        width: 10px;
-        height: 10px;
-        line-height: 10px;
-        cursor: pointer;
-      }
       &:hover {
         color: $black;
         background: none;
@@ -589,24 +575,24 @@ h4.search-title {
         }
         .closed {
           display: block;
-          position: absolute;
-          top: 2px;
-          right: 2px;
         }
       }
       .closed {
-        @include background-size(392px 440px);
-        background-image: image-url("grcicons/icons.png");
-        background-position: -347px -179px;
-        background-repeat: no-repeat;
         display: none;
         position: absolute;
-        top: 2px;
-        right: 2px;
+        top: 0;
+        right: 0;
         width: 10px;
         height: 10px;
         line-height: 10px;
         cursor: pointer;
+        i {
+          margin-top: 0;
+        }
+        .fa {
+          font-size: 10px;
+          color: $white;
+        }
         &.red {
           top: -4px;
           right: -4px;
