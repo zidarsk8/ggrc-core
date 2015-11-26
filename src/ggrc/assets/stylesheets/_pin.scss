@@ -18,7 +18,7 @@
   overflow: auto;
   .info {
     @include box-shadow(none);
-    padding: 15px 20px 20px 20px;
+    padding: 15px 25px 20px;
     .small-info {
       i {
         @include opacity(.25);
@@ -144,7 +144,7 @@
       &:hover {
         .file-controls {
           @include opacity(1);
-          left: -28px;
+          left: -25px;
         }
       }
     }
@@ -167,7 +167,13 @@
     line-height: 16px;
     margin-top: 1px;
     text-transform: uppercase;
-
+    position: relative;
+    &:hover {
+      .file-controls {
+        @include opacity(1);
+        left: -25px;
+      }
+    }
     .modal-body & {
       text-transform: none;
       width: 32%;
@@ -201,7 +207,7 @@
       &:hover {
         .file-controls {
           @include opacity(1);
-          left: -27px;
+          left: -25px;
         }
       }
     }
@@ -221,7 +227,7 @@
   padding-left: 5px;
   height: 20px;
   padding-top: 2px;
-  min-width: 23px;
+  min-width: 20px;
   i {
     @include opacity(.6);
     @include transition(opacity .2s ease);
@@ -253,7 +259,7 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        left: -27px;
+        left: -25px;
       }
     }
     a {
@@ -331,7 +337,7 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        left: -27px;
+        left: -25px;
       }
     }
   }
@@ -351,8 +357,8 @@
 .sticky-info-panel {
   .pane-header {
     position: fixed;
-    left: 47px;
-    right: 47px;
+    left: 52px;
+    right: 52px;
     height: 52px;
     background: $white;
     border-bottom: 1px solid $lightGray;
