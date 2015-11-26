@@ -8,7 +8,7 @@
 <div data-object-id="{{instance.id}}"
     data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}>
   {{#if_equals instance.status 'Final'}}
-    <i class="grcicon-review-color"></i>
+    <i class="fa fa-check-square-o green"></i>
     <span class="object-approved">
       {{#last_approved instance}}
         Reviewed on {{instance.updated_at}} <br />
