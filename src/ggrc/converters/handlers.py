@@ -116,14 +116,20 @@ class ColumnHandler(object):
 class DeleteColumnHandler(ColumnHandler):
 
   # this is a white list of objects that can be deleted in a cascade
-  # e.g. deleting a Market can delete the associated ObjectOwner objectect too
-  delete_whitelist = {"Relationship", "ObjectOwner", "ObjectPerson"}
+  # e.g. deleting a Market can delete the associated ObjectOwner object too
+  DELETE_WHITELIST = {"Relationship", "ObjectOwner", "ObjectPerson"}
+  ALLOWED_VALUES = {"", "no", "false", "true", "yes", "force"}
+  TRUE_VALUES = {"true", "yes", "force"}
 
   def get_value(self):
     return ""
 
   def parse_item(self):
-    is_delete = self.raw_value.lower() in ["true", "yes"]
+    if self.raw_value.lower() not in self.ALLOWED_VALUES:
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+      return False
+    is_delete = self.raw_value.lower() in self.TRUE_VALUES
+    self._allow_cascade = self.raw_value.lower() == "force"
     self.row_converter.is_delete = is_delete
     return is_delete
 
@@ -142,8 +148,8 @@ class DeleteColumnHandler(ColumnHandler):
     try:
       tr.session.delete(obj)
       deleted = len([o for o in tr.session.deleted
-                     if o.type not in self.delete_whitelist])
-      if deleted != 1:
+                     if o.type not in self.DELETE_WHITELIST])
+      if deleted > 1 and not self._allow_cascade:
         self.add_error(errors.DELETE_CASCADE_ERROR,
                        object_type=obj.type, slug=obj.slug)
     finally:
@@ -654,16 +660,12 @@ class SectionDirectiveColumnHandler(MappingColumnHandler):
 
 class ControlColumnHandler(MappingColumnHandler):
 
-  def __init__(self, row_converter, key, **options):
-    key = "{}control".format(MAPPING_PREFIX)
-    super(ControlColumnHandler, self).__init__(row_converter, key, **options)
-
-  def set_obj_attr(self):
-    self.value = self.parse_item()
+  def insert_object(self):
     if len(self.value) != 1:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name="Control")
       return
     self.row_converter.obj.control = self.value[0]
+    MappingColumnHandler.insert_object(self)
 
 
 class AuditColumnHandler(MappingColumnHandler):
