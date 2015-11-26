@@ -289,6 +289,10 @@ class AttributeInfo(object):
       filtered_aliases.append(("delete", {
         "display_name": "Delete",
         "import_only": True,
+        "description": "Mark the current object for deletion.\n"
+        "Leave the cell empty or use 'no' to leave this object\n"
+        "Use 'Yes' for a safe delete (will not delete any other objects).\n"
+        "Use 'Force' to force unsafe deletion of the object\n",
       }))
 
     unique_columns = cls.get_unique_constraints(object_class)
