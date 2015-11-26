@@ -428,6 +428,22 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
     });
 
+    this.validate(["Assignee", "Requester"], function (newVal, prop) {
+      // Validate assignees and requestors via _pending joins on newly
+      // created object so that we don't allow request creation if no
+      // Assignee/Requester were assigned.
+      if (this.id === undefined && this._pending_joins) {
+        added = _.filter(this._pending_joins, function(elem){
+          return elem.how == "add" && elem.extra.attrs.AssigneeType == prop;
+        });
+
+        if (added.length < 1) {
+          return "At least one required!";
+        }
+      }
+      return;
+    });
+
     if (this === CMS.Models.Request) {
       this.bind("created", function(ev, instance) {
         if(instance.constructor === CMS.Models.Request) {

@@ -110,6 +110,12 @@
             model.save();
           }.bind(this));
         }
+        if (destination.id === undefined && destination._pending_joins) {
+          // Force re-validation of all fields on person select
+          var modal = $(".ggrc_controllers_modals");
+          var control = $(modal).control();
+          control.options.instance._triggerChange("title");
+        }
       },
     },
     helpers: {
