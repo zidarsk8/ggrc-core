@@ -229,4 +229,3 @@ def get_ids_related_to(object_type, related_type, related_ids):
   if len(non_empty) == 0:
     return None
   return non_empty.pop().union(*non_empty)
-
