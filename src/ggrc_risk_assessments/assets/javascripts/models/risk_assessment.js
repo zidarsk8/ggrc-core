@@ -20,6 +20,7 @@
     create: "POST /api/risk_assessments",
     update: "PUT /api/risk_assessments/{id}",
     destroy: "DELETE /api/risk_assessments/{id}",
+    is_custom_attributable: true,
     attributes: {
       ra_manager: "CMS.Models.Person.stub",
       ra_counsel: "CMS.Models.Person.stub",
@@ -27,7 +28,8 @@
       documents: "CMS.Models.Document.stubs",
       program: "CMS.Models.Program.stub",
       modified_by: "CMS.Models.Person.stub",
-      object_documents: "CMS.Models.ObjectDocument.stubs"
+      object_documents: "CMS.Models.ObjectDocument.stubs",
+      custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
     },
     tree_view_options: {
       add_item_view: _mustache_path + "/tree_add_item.mustache",

@@ -400,7 +400,7 @@ can.Model.Cacheable("CMS.Models.Request", {
       {attr_title: 'Code', attr_name: 'slug'},
       {attr_title: 'Audit', attr_name: 'audit'},
     ]
-    , display_attr_names : ['title', 'assignee', 'due_on', 'status']
+    , display_attr_names : ['title', 'assignee', 'due_on', 'status', 'request_type']
     , mandatory_attr_names : ['title']
     , draw_children : true
     , child_options: [{
