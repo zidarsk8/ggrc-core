@@ -2933,11 +2933,13 @@ Mustache.registerHelper("if_draw_icon", function(instance, options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("debugger", function (options) {
+Mustache.registerHelper("debugger", function () {
   // This just gives you a helper that you can wrap around some code in a
-  // template to see what's in the context. Set a breakpoint in dev tools
-  // on the return statement on the line below to debug.
+  // template to see what's in the context. Dev tools need to be open for this
+  // to work (in Chrome at least).
   debugger;
+
+  var options = arguments[arguments.length - 1];
   return options.fn(options.contexts);
 });
 
