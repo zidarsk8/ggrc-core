@@ -61,7 +61,8 @@
     },
     allowed_to_map: function (source, target, options) {
       var can_map = false,
-          target_type, source_type;
+          target_type, source_type, target_context,
+          source_context, create_contexts;
 
       target_type = target instanceof can.Model ? target.constructor.shortName
                                                 : (target.type || target);
