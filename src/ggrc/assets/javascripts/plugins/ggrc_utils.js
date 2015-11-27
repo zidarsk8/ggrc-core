@@ -4,7 +4,7 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 */
-(function($, GGRC, moment) {
+(function($, GGRC, moment, Permission) {
   GGRC.Utils = {
     firstWorkingDay: function (date) {
       date = moment(date);
@@ -61,20 +61,25 @@
     },
     allowed_to_map: function (source, target, options) {
       var can_map = false,
-          target_type, source_type;
+          target_type, source_type, target_context, source_context, create_contexts, contains;
 
       target_type = target instanceof can.Model ? target.constructor.shortName
                                                 : (target.type || target);
       source_type = source.constructor.shortName || source;
-      target_context = target.context && target.context.id;
-      source_context = source.context && source.context.id;
-      create_contexts = GGRC.permissions.create && GGRC.permissions.create.Relationship && GGRC.permissions.create.Relationship.contexts;
 
-      can_map = Permission.is_allowed_for("update", source) || source_type === "Person" || _.contains(create_contexts, source_context);
+      if (can.getObject("hash.join", options) && !GGRC.Mappings.get_canonical_mapping(source_type, target_type)) {
+        return false;
+      }
+      target_context = can.getObject("target.context.id");
+      source_context = can.getObject("source.context.id");
+      create_contexts = can.getObject("GGRC.permissions.create.Relationship.contexts");
+      contains = _.contains(create_contexts, source_context);
+
+      can_map = Permission.is_allowed_for("update", source) || source_type === "Person" || contains;
       if (target instanceof can.Model) {
-        can_map = can_map && (Permission.is_allowed_for("update", target) || target_type === "Person" || _.contains(create_contexts, target_context));
+        can_map = can_map && (Permission.is_allowed_for("update", target) || target_type === "Person" || contains);
       }
       return can_map;
     }
   };
-})(jQuery, window.GGRC = window.GGRC || {}, window.moment);
+})(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);
