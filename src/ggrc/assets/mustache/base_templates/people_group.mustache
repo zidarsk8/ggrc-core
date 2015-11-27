@@ -8,6 +8,16 @@
 
 <label>
   <span class="person-label {{type}}"></span>
+  {{#is_allowed 'update' instance context='for'}}
+    {{#toggle toggle_add}}
+      {{else}}
+      <span class="file-controls">
+        <a href="javascript://" {{toggle_button}}>
+          <i class="grcicon-add-black"></i>
+        </a>
+      </span>
+    {{/toggle}}
+  {{/is_allowed}}
   {{capitalize type}}
   {{#if editable}}
     <span class="required">*</span>
@@ -47,8 +57,6 @@
         {{#is_allowed 'update' instance context='for'}}
         {{#toggle toggle_add}}
           {{> /static/mockups/base_templates/add_people.mustache }}
-        {{else}}
-          <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+ Add Person</a>
         {{/toggle}}
         {{/is_allowed}}
       {{/show_add}}
