@@ -11,7 +11,6 @@ from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc.models.audit import Audit
-from ggrc.models.audit_object import AuditObject
 from ggrc.models.mixins import Assignable
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
@@ -86,10 +85,6 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
   ]
 
   _aliases = {
-      "audit_object": {
-          "display_name": "Request Object",
-          "filter_by": "_filter_by_audit_object",
-      },
       "request_audit": {
           "display_name": "Audit",
           "filter_by": "_filter_by_request_audit",
@@ -125,7 +120,6 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
     query = super(Request, cls).eager_query()
     return query.options(
         orm.joinedload('audit'),
-        orm.joinedload('audit_object'),
         orm.subqueryload('responses'))
 
   @classmethod
