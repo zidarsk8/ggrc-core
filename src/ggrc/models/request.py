@@ -58,11 +58,6 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
   responses = db.relationship('Response', backref='request',
                               cascade='all, delete-orphan')
 
-  # workaround for title being attached to slug
-  @declared_attr
-  def title(cls):
-    return deferred(db.Column(db.String, nullable=True), cls.__name__)
-
   _publish_attrs = [
       'requestor',
       'request_type',
@@ -88,6 +83,7 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       "request_audit": {
           "display_name": "Audit",
           "filter_by": "_filter_by_request_audit",
+          "mandatory": True,
       },
       "due_on": "Due On",
       "notes": "Notes",
@@ -95,7 +91,17 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       "requested_on": "Requested On",
       "status": "Status",
       "test": "Test",
-      "title": "Request Title",
+      "related_assignees": {
+          "display_name": "Assignee",
+          "mandatory": True,
+      },
+      "related_requesters": {
+          "display_name": "Requester",
+          "mandatory": True,
+      },
+      "related_verifiers": {
+          "display_name": "Verifier",
+      },
   }
 
   def _display_name(self):
