@@ -7,10 +7,13 @@ import datetime
 
 from ggrc import db
 from sqlalchemy import or_
+from sqlalchemy import and_
 from sqlalchemy import inspect
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy import orm
 
-from ggrc.models.audit import Audit
+
+from ggrc.models import person
+from ggrc.models import audit
 from ggrc.models.mixins import Assignable
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
@@ -21,6 +24,7 @@ from ggrc.models.mixins import Titled
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
+from ggrc.models import relationship
 from ggrc.services.common import Resource
 
 
@@ -94,13 +98,16 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       "related_assignees": {
           "display_name": "Assignee",
           "mandatory": True,
+          "filter_by": "_filter_by_related_assignees",
       },
       "related_requesters": {
           "display_name": "Requester",
           "mandatory": True,
+          "filter_by": "_filter_by_related_requesters",
       },
       "related_verifiers": {
           "display_name": "Verifier",
+          "filter_by": "_filter_by_related_verifiers",
       },
   }
 
@@ -121,40 +128,48 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Request, cls).eager_query()
     return query.options(
         orm.joinedload('audit'),
         orm.subqueryload('responses'))
 
   @classmethod
-  def _filter_by_request_audit(cls, predicate):
-    return cls.query.filter(
-        (Audit.id == cls.audit_id) &
-        (predicate(Audit.slug) | predicate(Audit.title))
-    ).exists()
+  def _get_relate_filter(cls, predicate, related_type):
+    Rel = relationship.Relationship
+    RelAttr = relationship.RelationshipAttr
+    Person = person.Person
+    return db.session.query(Rel).join(RelAttr).join(
+        Person,
+        or_(and_(
+            Rel.source_id == Person.id,
+            Rel.source_type == Person.__name__
+        ), and_(
+            Rel.destination_id == Person.id,
+            Rel.destination_type == Person.__name__
+        ))
+    ).filter(and_(
+        RelAttr.attr_value.contains(related_type),
+        RelAttr.attr_name == "AssigneeType",
+        or_(predicate(Person.name), predicate(Person.email))
+    )).exists()
 
   @classmethod
-  def _filter_by_audit_object(cls, predicate):
-    from ggrc.models import all_models
-    queries = []
-    for model_name in all_models.__all__:
-      model = getattr(all_models, model_name)
-      if not hasattr(model, "query"):
-        continue
-      fields = []
-      for field_name in ["slug", "title", "name", "email"]:
-        if hasattr(model, field_name):
-          fields.append(getattr(model, field_name))
-      if len(fields) > 0:
-        queries.append(model.query.filter(
-            (AuditObject.auditable_type == model.__name__) &
-            or_(*map(predicate, fields))
-        ).exists())
-    return AuditObject.query.filter(
-        (AuditObject.id == cls.audit_object_id) &
-        or_(*queries)
+  def _filter_by_related_assignees(cls, predicate):
+    return cls._get_relate_filter(predicate, "Assignee")
+
+  @classmethod
+  def _filter_by_related_requesters(cls, predicate):
+    return cls._get_relate_filter(predicate, "Requester")
+
+  @classmethod
+  def _filter_by_related_verifiers(cls, predicate):
+    return cls._get_relate_filter(predicate, "Verifier")
+
+  @classmethod
+  def _filter_by_request_audit(cls, predicate):
+    return cls.query.filter(
+        (audit.Audit.id == cls.audit_id) &
+        (predicate(audit.Audit.slug) | predicate(audit.Audit.title))
     ).exists()
 
 
