@@ -61,13 +61,14 @@
     },
     allowed_to_map: function (source, target, options) {
       var can_map = false,
-          target_type, source_type, target_context, source_context, create_contexts;
+          target_type, source_type, target_context, source_context, create_contexts, canonical;
 
       target_type = target instanceof can.Model ? target.constructor.shortName
                                                 : (target.type || target);
       source_type = source.constructor.shortName || source;
+      canonical = GGRC.Mappings.get_canonical_mapping(source_type, target_type);
 
-      if (_.exists(options, "hash.join") && !GGRC.Mappings.get_canonical_mapping(source_type, target_type)) {
+      if (_.exists(options, "hash.join") && !_.exists(canonical, "model_name")) {
         return false;
       }
       target_context = _.exists(target, "context.id");
