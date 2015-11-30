@@ -29,6 +29,12 @@ class TestCase(ggrc.TestCase):
     self.assert200(response)
     return json.loads(response.data)
 
+  def import_with_test(self, filename):
+    response_dry = self.import_file(filename, dry_run=True)
+    response = self.import_file(filename)
+    self.assertEqual(response_dry, response)
+    return response
+
   def export_csv(self, data):
     headers = {
         'Content-Type': 'application/json',
