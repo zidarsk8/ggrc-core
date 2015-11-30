@@ -15,7 +15,6 @@ _column_handlers = {
     "categories": handlers.ControlCategoryColumnHandler,
     "company": handlers.TextColumnHandler,
     "contact": handlers.UserColumnHandler,
-    "control": handlers.ControlColumnHandler,
     "delete": handlers.DeleteColumnHandler,
     "description": handlers.TextareaColumnHandler,
     "design": handlers.ConclusionColumnHandler,
@@ -56,6 +55,12 @@ _column_handlers = {
     "title": handlers.RequiredTextColumnHandler,
     "url": handlers.TextColumnHandler,
     "verify_frequency": handlers.OptionColumnHandler,
+
+    # Mapping column handlers
+    "__mapping__:person": handlers.PersonMappingColumnHandler,
+    "__unmapping__:person": handlers.PersonUnmappingColumnHandler,
+    "control": handlers.ControlColumnHandler,
+    "directive": handlers.SectionDirectiveColumnHandler,
 }
 
 
