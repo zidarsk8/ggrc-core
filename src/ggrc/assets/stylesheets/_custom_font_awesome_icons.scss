@@ -21,6 +21,23 @@
   }
 }
 
+// WYSIWYG Icons
+[class^="icon-"] {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome; // shortening font declaration
+  font-size: inherit; // can't have font-size inherit on line above, so need to override
+  text-rendering: auto; // optimizelegibility throws things off #1094
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-share:before { content: $fa-var-link; }
+.icon-th-list:before { content: $fa-var-list-ol; }
+.icon-list:before { content: $fa-var-list-ul; }
+.icon-indent-right:before { content: $fa-var-long-arrow-left; }
+.icon-indent-left:before { content: $fa-var-long-arrow-right; }
+.icon-pencil:before { content: $fa-var-code; }
+
 .grcicon-role-color:before { content: $fa-var-key; }
 
 .#{$fa-css-prefix}-person:before { content: $fa-var-user; }
