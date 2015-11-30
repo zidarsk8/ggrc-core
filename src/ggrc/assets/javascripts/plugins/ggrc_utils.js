@@ -70,9 +70,9 @@
       if (can.getObject("hash.join", options) && !GGRC.Mappings.get_canonical_mapping(source_type, target_type)) {
         return false;
       }
-      target_context = can.getObject("target.context.id");
-      source_context = can.getObject("source.context.id");
-      create_contexts = can.getObject("GGRC.permissions.create.Relationship.contexts");
+      target_context = can.getObject("context.id", target);
+      source_context = can.getObject("context.id", source);
+      create_contexts = can.getObject("permissions.create.Relationship.contexts", GGRC);
       contains = _.contains(create_contexts, source_context);
 
       can_map = Permission.is_allowed_for("update", source) || source_type === "Person" || contains;
