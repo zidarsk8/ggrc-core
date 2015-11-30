@@ -19,6 +19,9 @@
   &.green {
     color: $green;
   }
+  a & {
+    color: $black;
+  }
 }
 
 // WYSIWYG Icons

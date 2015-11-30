@@ -60,7 +60,11 @@
   float: right;
   li {
     float: left;
-    margin-left: 5px;
+    margin-left: 8px;
+    margin-top: 2px;
+    &:last-child {
+      margin-top: 0;
+    }
     &:first-child {
       margin-left: 0;
     }
