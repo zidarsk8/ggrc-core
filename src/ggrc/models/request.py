@@ -14,6 +14,7 @@ from sqlalchemy import orm
 
 from ggrc.models import person
 from ggrc.models import audit
+from ggrc.models import reflection
 from ggrc.models.mixins import Assignable
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
@@ -99,15 +100,18 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
           "display_name": "Assignee",
           "mandatory": True,
           "filter_by": "_filter_by_related_assignees",
+          "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "related_requesters": {
           "display_name": "Requester",
           "mandatory": True,
           "filter_by": "_filter_by_related_requesters",
+          "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "related_verifiers": {
           "display_name": "Verifier",
           "filter_by": "_filter_by_related_verifiers",
+          "type": reflection.AttributeInfo.Type.MAPPING,
       },
   }
 
