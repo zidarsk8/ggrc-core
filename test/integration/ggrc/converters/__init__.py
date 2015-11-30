@@ -18,7 +18,7 @@ class TestCase(ggrc.TestCase):
 
   CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
 
-  def import_file(self, filename, dry_run=False):
+  def _import_file(self, filename, dry_run=False):
     data = {"file": (open(join(self.CSV_DIR, filename)), filename)}
     headers = {
         "X-test-only": "true" if dry_run else "false",
@@ -29,11 +29,14 @@ class TestCase(ggrc.TestCase):
     self.assert200(response)
     return json.loads(response.data)
 
-  def import_with_test(self, filename):
-    response_dry = self.import_file(filename, dry_run=True)
-    response = self.import_file(filename)
-    self.assertEqual(response_dry, response)
-    return response
+  def import_file(self, filename, dry_run=False):
+    if dry_run:
+      return self._import_file(filename, dry_run=True)
+    else:
+      response_dry = self._import_file(filename, dry_run=True)
+      response = self._import_file(filename)
+      self.assertEqual(response_dry, response)
+      return response
 
   def export_csv(self, data):
     headers = {

@@ -33,10 +33,8 @@ class TestWorkflowObjectsImport(TestCase):
 
   def test_full_good_import_no_warnings(self):
     filename = "workflow_small_sheet.csv"
-    response_dry = self.import_file(filename, dry_run=True)
     response = self.import_file(filename)
 
-    self.assertEqual(response_dry, response)
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
     for block in response:

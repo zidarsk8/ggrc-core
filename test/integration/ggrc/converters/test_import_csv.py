@@ -100,10 +100,7 @@ class TestBasicCsvImport(converters.TestCase):
     self.generate_people(["miha", "predrag", "vladan", "ivan"])
 
     filename = "intermappings.csv"
-    response_json_dry = self.import_file(filename, dry_run=True)
     response_json = self.import_file(filename)
-
-    self.assertEqual(response_json_dry, response_json)
 
     self.assertEqual(4, response_json[0]["created"])  # Facility
     self.assertEqual(4, response_json[1]["created"])  # Objective
@@ -119,17 +116,13 @@ class TestBasicCsvImport(converters.TestCase):
 
   def test_policy_unique_title(self):
     filename = "policy_sample1.csv"
-    response_json_dry = self.import_file(filename, dry_run=True)
     response_json = self.import_file(filename)
 
-    self.assertEqual(response_json_dry, response_json)
     self.assertEqual(response_json[0]["row_errors"], [])
 
     filename = "policy_sample2.csv"
-    response_json_dry = self.import_file(filename, dry_run=True)
     response_json = self.import_file(filename)
 
-    self.assertEqual(response_json_dry, response_json)
     self.assertEqual(response_json[0]["row_errors"], [
         "Line 3: title 'will this work' already exists.Record will be ignored."
     ])
@@ -170,9 +163,7 @@ class TestBasicCsvImport(converters.TestCase):
 
   def test_person_imports(self):
     filename = "people_test.csv"
-    response_dry = self.import_file(filename, dry_run=True)
     response = self.import_file(filename)
-    self.assertEqual(response, response_dry)
     self.assertIn("Line 8: Field Email is required. The line will be ignored.",
                   response[0]["row_errors"])
     self.assertEqual(0, models.Person.query.filter_by(email=None).count())
