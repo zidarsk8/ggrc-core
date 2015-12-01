@@ -44,7 +44,7 @@
       get_forbidden: function (type) {
         var forbidden = {
           "Program": ["Audit"],
-          "Audit": ["Request"],
+          "Audit": ["ControlAssessment", "Program", "Request"],
           "ControlAssessment": ["Control"],
           "Request": ["Workflow", "TaskGroup"]
         };
