@@ -181,6 +181,12 @@
   &.color { color: $green; }
 }
 
+.grcicon-system-color:before { content: $fa-var-cogs; }
+.#{$fa-css-prefix}-system {
+  &:before { content: $fa-var-cogs; }
+  &.color { color: $green; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -266,6 +272,11 @@
   }
   .grcicon-process-color:before { color: $black; }
   .#{$fa-css-prefix}-process {
+    &.color { color: $black; }
+  }
+
+  .grcicon-system-color:before { color: $black; }
+  .#{$fa-css-prefix}-system {
     &.color { color: $black; }
   }
 
@@ -402,6 +413,10 @@
   }
   .grcicon-process-color:before { color: $white; }
   .#{$fa-css-prefix}-process {
+    &.color { color: $white; }
+  }
+  .grcicon-system-color:before { color: $white; }
+  .#{$fa-css-prefix}-system {
     &.color { color: $white; }
   }
 
