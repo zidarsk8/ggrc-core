@@ -1074,7 +1074,23 @@ class RelatedPersonColumnHandler(UserColumnHandler):
             relation.relationship_attrs["AssigneeType"], person)
 
   def get_value(self):
-    return ""
+    """ Get a list of people with specific role on a Request """
+    RA = relationship.RelationshipAttr
+    relations = relationship.Relationship.get_related_query(
+        self.row_converter.obj, Person()
+    ).join(RA).filter(and_(
+        RA.attr_name == "AssigneeType",
+        RA.attr_value.contains(self._assigne_type),
+    )).all()
+    people_ids = [r.source_id for r in relations if r.source_type == "Person"]
+    people_ids.extend(
+        [r.destination_id for r in relations if r.destination_type == "Person"]
+    )
+    emails = []
+    if people_ids:
+      people = Person.query.filter(Person.id.in_(people_ids)).all()
+      emails = [p.email for p in people]
+    return "\n".join(emails)
 
 
 class RelatedAssigneesColumnHandler(RelatedPersonColumnHandler):
