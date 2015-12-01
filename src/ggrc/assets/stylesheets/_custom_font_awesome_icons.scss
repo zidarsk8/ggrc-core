@@ -187,6 +187,12 @@
   &.color { color: $green; }
 }
 
+.grcicon-control-color:before { content: $fa-var-video-camera; }
+.#{$fa-css-prefix}-control {
+  &:before { content: $fa-var-video-camera; }
+  &.color { color: $controls; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -274,9 +280,12 @@
   .#{$fa-css-prefix}-process {
     &.color { color: $black; }
   }
-
   .grcicon-system-color:before { color: $black; }
   .#{$fa-css-prefix}-system {
+    &.color { color: $black; }
+  }
+  .grcicon-control-color:before { color: $black; }
+  .#{$fa-css-prefix}-control {
     &.color { color: $black; }
   }
 
@@ -417,6 +426,10 @@
   }
   .grcicon-system-color:before { color: $white; }
   .#{$fa-css-prefix}-system {
+    &.color { color: $white; }
+  }
+  .grcicon-control-color:before { color: $white; }
+  .#{$fa-css-prefix}-control {
     &.color { color: $white; }
   }
 
