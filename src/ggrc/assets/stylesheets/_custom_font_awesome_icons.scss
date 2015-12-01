@@ -199,6 +199,12 @@
   &.color { color: $green; }
 }
 
+.grcicon-risk-color:before { content: $fa-var-bolt; }
+.#{$fa-css-prefix}-risk {
+  &:before { content: $fa-var-bolt; }
+  &.color { color: #8e0000; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -296,6 +302,10 @@
   }
   .grcicon-data_asset-color:before { content: $black; }
   .#{$fa-css-prefix}-data_asset {
+    &.color { color: $black; }
+  }
+  .grcicon-risk-color:before { color: $black; }
+  .#{$fa-css-prefix}-risk {
     &.color { color: $black; }
   }
 
@@ -444,6 +454,10 @@
   }
   .grcicon-data_asset-color:before { content: $white; }
   .#{$fa-css-prefix}-data_asset {
+    &.color { color: $white; }
+  }
+  .grcicon-risk-color:before { color: $white; }
+  .#{$fa-css-prefix}-risk {
     &.color { color: $white; }
   }
 
