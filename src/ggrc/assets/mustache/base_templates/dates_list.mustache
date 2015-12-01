@@ -15,13 +15,23 @@
       {{date created_at notime}}
     </li>
     <li>
-      <span class="file-controls">
-        <a href="javascript://"><i class="grcicon-edit"></i></a>
-      </span>
+    {{#toggle change_due_date}}
+      <div {{#instance}}{{data "model"}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data("model")}); }}>
+        <label>Due on</label>
+        <input tabindex="5" class="span8 input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+      </div>
+    </div>
+    {{else}}
+      {{#is_allowed 'update' instance}}
+        <span class="file-controls">
+          <a href="javascript://" {{toggle_button}}><i class="grcicon-edit"></i></a>
+        </span>
+      {{/is_allowed}}
       <label>
         Due on
       </label>
       {{date due_on notime}}
     </li>
+    {{/toggle}}
   </ul>
 </div>

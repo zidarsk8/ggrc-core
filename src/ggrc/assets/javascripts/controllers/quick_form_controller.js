@@ -26,6 +26,20 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
   , "input, textarea, select change" : function(el, ev) {
     var that = this;
     if(!el.is("[data-lookup]")) {
+    if (el.data("toggle") === "datepicker") {
+      var val = el.datepicker("getDate"),
+          prop = el.attr("name"),
+          old_value = this.options.instance.attr(prop);
+
+          if (moment(val).isSame(old_value)) {
+            return;
+          }
+          $.when(this.options.instance.refresh()).then(function () {
+            this.options.instance.attr(prop, val);
+            this.options.instance.save();
+          }.bind(this));
+      return;
+    }
       this.set_value_from_element(el);
       setTimeout(function() {
         that.options.instance.save();
