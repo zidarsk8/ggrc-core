@@ -34,6 +34,7 @@ from ggrc.models import Response
 from ggrc.models import Standard
 from ggrc.models import all_models
 from ggrc.models import response
+from ggrc.models import relationship
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.rbac import permissions
@@ -403,8 +404,8 @@ class MappingColumnHandler(ColumnHandler):
       elif self.unmap and mapping:
         db.session.delete(mapping)
     db.session.flush()
-    for relationship in relationships:
-      AutomapperGenerator(relationship, False).generate_automappings()
+    for relation in relationships:
+      AutomapperGenerator(relation, False).generate_automappings()
     self.dry_run = True
 
   def get_value(self):
@@ -1001,3 +1002,97 @@ class DocumentsColumnHandler(ColumnHandler):
       return
     self.row_converter.obj.documents = self.value
     self.dry_run = True
+
+
+class RelatedPersonColumnHandler(UserColumnHandler):
+
+  _assigne_type = None
+
+  def parse_item(self):
+    users = self.get_users_list()
+    if self.mandatory and not users:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+    return users
+
+  def set_obj_attr(self):
+    self.value = self.parse_item()
+
+  def _create_relationship_attr(self, relation):
+    rel_attr = relationship.RelationshipAttr(
+        attr_name="AssigneeType",
+        attr_value=self._assigne_type,
+        relationship_id=relation.id
+    )
+    db.session.add(rel_attr)
+    db.session.flush()
+
+  def _remove_relationship_attr(self):
+    """ Remove all instances of a relationship attr and value
+
+    This function is used for example to clean up all Assignees from requests.
+    """
+    relations = relationship.Relationship.get_related_query(
+        self.row_converter.obj, Person()
+    ).join(relationship.RelationshipAttr).filter(
+        relationship.RelationshipAttr.attr_name == "AssigneeType"
+    ).all()
+    for relation in relations:
+      rel_attr = relation.relationship_attrs["AssigneeType"]
+      values = rel_attr.attr_value.split(",")
+      filtered_values = [v for v in values if v != self._assigne_type]
+      rel_attr.attr_value = ",".join(filtered_values)
+    db.session.flush()
+
+  def _create_relationship(self, person):
+    relation = relationship.Relationship(
+        source_type=person.type,
+        source_id=person.id,
+        destination_type=self.row_converter.obj.type,
+        destination_id=self.row_converter.obj.id
+    )
+    db.session.add(relation)
+    db.session.flush()
+    self._create_relationship_attr(relation)
+
+  def _update_relationship_attr(self, rel_attr, person):
+    values = set(rel_attr.attr_value.split(","))
+    values.add(self._assigne_type)
+    rel_attr.attr_value = ",".join(values)
+    db.session.flush()
+
+  def insert_object(self):
+    self._remove_relationship_attr()
+    for person in self.value:
+      relation = Relationship.find_related(self.row_converter.obj, person)
+      if relation is None:
+        self._create_relationship(person)
+      elif relation.relationship_attrs is None or \
+              "AssigneeType" not in relation.relationship_attrs:
+        self._create_relationship_attr(relation)
+      else:
+        self._update_relationship_attr(
+            relation.relationship_attrs["AssigneeType"], person)
+
+  def get_value(self):
+    return ""
+
+
+class RelatedAssigneesColumnHandler(RelatedPersonColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self._assigne_type = "Assignee"
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class RelatedRequestersColumnHandler(RelatedPersonColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self._assigne_type = "Requester"
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class RelatedVerifiersColumnHandler(RelatedPersonColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self._assigne_type = "Verifier"
+    super(self.__class__, self).__init__(row_converter, key, **options)
