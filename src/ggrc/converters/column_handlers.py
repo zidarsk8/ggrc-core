@@ -5,6 +5,7 @@
 
 
 from ggrc.converters.handlers import handlers
+from ggrc.converters.handlers import related_person
 from ggrc.extensions import get_extension_modules
 
 _column_handlers = {
@@ -39,9 +40,9 @@ _column_handlers = {
     "program": handlers.ProgramColumnHandler,
     "program_mapped": handlers.ObjectPersonColumnHandler,
     "reference_url": handlers.TextColumnHandler,
-    "related_assignees": handlers.RelatedAssigneesColumnHandler,
-    "related_requesters": handlers.RelatedRequestersColumnHandler,
-    "related_verifiers": handlers.RelatedVerifiersColumnHandler,
+    "related_assignees": related_person.RelatedAssigneesColumnHandler,
+    "related_requesters": related_person.RelatedRequestersColumnHandler,
+    "related_verifiers": related_person.RelatedVerifiersColumnHandler,
     "report_end_date": handlers.DateColumnHandler,
     "report_start_date": handlers.DateColumnHandler,
     "request": handlers.RequestColumnHandler,
