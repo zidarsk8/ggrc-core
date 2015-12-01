@@ -1699,7 +1699,7 @@ ul.attr-list, ul.model-list {
       margin-bottom: 0;
     }
   }
-  [class^="grcicon-"] {
+  .fa {
     margin: 6px 0 0 0;
   }
   a {
@@ -1724,6 +1724,7 @@ ul.attr-list, ul.model-list {
     text-align: center;
     background: $blue;
     margin-right: 5px;
+    vertical-align: top;
     i {
       margin-top: 9px;
     }
