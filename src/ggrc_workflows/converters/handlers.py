@@ -10,10 +10,7 @@ import datetime
 from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters import get_importables
-from ggrc.converters.handlers import CheckboxColumnHandler
-from ggrc.converters.handlers import ColumnHandler
-from ggrc.converters.handlers import ParentColumnHandler
-from ggrc.converters.handlers import UserColumnHandler
+from ggrc.converters.handlers import handlers
 from ggrc.models import Person
 from ggrc_workflows.models import CycleTaskGroup
 from ggrc_workflows.models import TaskGroup
@@ -22,7 +19,7 @@ from ggrc_workflows.models import Workflow
 from ggrc_workflows.models import WorkflowPerson
 
 
-class FrequencyColumnHandler(ColumnHandler):
+class FrequencyColumnHandler(handlers.ColumnHandler):
 
   """ Handler for workflow frequency column """
 
@@ -51,7 +48,7 @@ class FrequencyColumnHandler(ColumnHandler):
     return reverse_map.get(value, value)
 
 
-class WorkflowColumnHandler(ParentColumnHandler):
+class WorkflowColumnHandler(handlers.ParentColumnHandler):
 
   """ handler for workflow column in task groups """
 
@@ -61,7 +58,7 @@ class WorkflowColumnHandler(ParentColumnHandler):
     super(WorkflowColumnHandler, self).__init__(row_converter, key, **options)
 
 
-class TaskGroupColumnHandler(ParentColumnHandler):
+class TaskGroupColumnHandler(handlers.ParentColumnHandler):
 
   """ handler for task group column in task group tasks """
 
@@ -71,7 +68,7 @@ class TaskGroupColumnHandler(ParentColumnHandler):
     super(TaskGroupColumnHandler, self).__init__(row_converter, key, **options)
 
 
-class CycleTaskGroupColumnHandler(ParentColumnHandler):
+class CycleTaskGroupColumnHandler(handlers.ParentColumnHandler):
 
   """ handler for task group column in task group tasks """
 
@@ -82,7 +79,7 @@ class CycleTaskGroupColumnHandler(ParentColumnHandler):
         .__init__(row_converter, key, **options)
 
 
-class TaskDateColumnHandler(ColumnHandler):
+class TaskDateColumnHandler(handlers.ColumnHandler):
 
   """ handler for start and end columns in task group tasks """
 
@@ -225,7 +222,7 @@ class TaskEndColumnHandler(TaskDateColumnHandler):
       return
 
 
-class TaskTypeColumnHandler(ColumnHandler):
+class TaskTypeColumnHandler(handlers.ColumnHandler):
 
   """ handler for task type column in task group tasks """
 
@@ -253,7 +250,7 @@ class TaskTypeColumnHandler(ColumnHandler):
     return value
 
 
-class WorkflowPersonColumnHandler(UserColumnHandler):
+class WorkflowPersonColumnHandler(handlers.UserColumnHandler):
 
   def parse_item(self):
     return self.get_users_list()
@@ -286,7 +283,7 @@ class WorkflowPersonColumnHandler(UserColumnHandler):
     self.dry_run = True
 
 
-class ObjectsColumnHandler(ColumnHandler):
+class ObjectsColumnHandler(handlers.ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.mappable = get_importables()
@@ -346,7 +343,7 @@ class ObjectsColumnHandler(ColumnHandler):
     pass
 
 
-class ExportOnlyColumnHandler(ColumnHandler):
+class ExportOnlyColumnHandler(handlers.ColumnHandler):
 
   def parse_item(self):
     pass
@@ -390,7 +387,7 @@ COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
     "cycle_task_group": CycleTaskGroupColumnHandler,
     "cycle_object": CycleObjectColumnHandler,
-    "notify_on_change": CheckboxColumnHandler,
+    "notify_on_change": handlers.CheckboxColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
     "relative_start_date": TaskStartColumnHandler,
     "task_group": TaskGroupColumnHandler,

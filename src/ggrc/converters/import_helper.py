@@ -8,7 +8,7 @@ import chardet
 from StringIO import StringIO
 from ggrc.models.reflection import AttributeInfo
 from ggrc.converters.column_handlers import COLUMN_HANDLERS
-from ggrc.converters import handlers
+from ggrc.converters.handlers import handlers
 
 
 def get_object_column_definitions(object_class):

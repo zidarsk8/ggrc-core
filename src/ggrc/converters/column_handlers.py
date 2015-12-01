@@ -4,7 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 
-from ggrc.converters import handlers
+from ggrc.converters.handlers import handlers
 from ggrc.extensions import get_extension_modules
 
 _column_handlers = {
