@@ -169,6 +169,12 @@
   &.color { color: $green; }
 }
 
+.grcicon-org_group-color:before { content: $fa-var-users; }
+.#{$fa-css-prefix}-org_group {
+  &:before { content: $fa-var-users; }
+  &.color { color: #a8491a; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -246,6 +252,10 @@
   }
   .grcicon-project-color:before { color: $black; }
   .#{$fa-css-prefix}-project {
+    &.color { color: $black; }
+  }
+  .grcicon-org_group-color:before { color: $black; }
+  .#{$fa-css-prefix}-org_group {
     &.color { color: $black; }
   }
 
@@ -374,6 +384,10 @@
   }
   .grcicon-project-color:before { color: $white; }
   .#{$fa-css-prefix}-project {
+    &.color { color: $white; }
+  }
+  .grcicon-org_group-color:before { color: $white; }
+  .#{$fa-css-prefix}-org_group {
     &.color { color: $white; }
   }
 
