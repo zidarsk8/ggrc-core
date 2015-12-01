@@ -136,6 +136,7 @@ dashboard-js-template-files:
   - base_objects/notes.mustache
   - base_objects/info.mustache
   - base_objects/dropdown_menu.mustache
+  - base_objects/dropdown_menu_tier2.mustache
   - base_objects/view_link.mustache
   - base_objects/unmap.mustache
   - base_objects/map_related_modal_content.mustache
