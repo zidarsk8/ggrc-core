@@ -163,6 +163,12 @@
 
 .grcicon-event-color:before { content: $fa-var-history; }
 
+.grcicon-project-color:before { content: $fa-var-cube; }
+.#{$fa-css-prefix}-project {
+  &:before { content: $fa-var-cube; }
+  &.color { color: $green; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -236,6 +242,10 @@
   }
   .grcicon-request-color:before { color: $black; }
   .#{$fa-css-prefix}-request {
+    &.color { color: $black; }
+  }
+  .grcicon-project-color:before { color: $black; }
+  .#{$fa-css-prefix}-project {
     &.color { color: $black; }
   }
 
@@ -360,6 +370,10 @@
   }
   .grcicon-request-color:before { color: $white; }
   .#{$fa-css-prefix}-request {
+    &.color { color: $white; }
+  }
+  .grcicon-project-color:before { color: $white; }
+  .#{$fa-css-prefix}-project {
     &.color { color: $white; }
   }
 
