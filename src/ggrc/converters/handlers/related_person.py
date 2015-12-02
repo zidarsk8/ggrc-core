@@ -26,13 +26,7 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
     self.value = self.parse_item()
 
   def _create_relationship_attr(self, relation):
-    rel_attr = models.RelationshipAttr(
-        attr_name="AssigneeType",
-        attr_value=self._assigne_type,
-        relationship_id=relation.id
-    )
-    db.session.add(rel_attr)
-    db.session.flush()
+    relation.attrs["AssigneeType"] = self._assigne_type
 
   def _remove_relationship_attr(self):
     """ Remove all instances of a relationship attr and value
@@ -45,11 +39,9 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
         models.RelationshipAttr.attr_name == "AssigneeType"
     ).all()
     for relation in relations:
-      rel_attr = relation.relationship_attrs["AssigneeType"]
-      values = rel_attr.attr_value.split(",")
+      values = relation.attrs["AssigneeType"].split(",")
       filtered_values = [v for v in values if v != self._assigne_type]
-      rel_attr.attr_value = ",".join(filtered_values)
-    db.session.flush()
+      relation.attrs["AssigneeType"] = ",".join(filtered_values)
 
   def _create_relationship(self, person):
     relation = models.Relationship(
@@ -62,10 +54,10 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
     db.session.flush()
     self._create_relationship_attr(relation)
 
-  def _update_relationship_attr(self, rel_attr, person):
-    values = set(rel_attr.attr_value.split(","))
+  def _update_relationship_attr(self, relation, person):
+    values = set(relation.attrs["AssigneeType"].split(","))
     values.add(self._assigne_type)
-    rel_attr.attr_value = ",".join(values)
+    relation.attrs["AssigneeType"] = ",".join(values)
     db.session.flush()
 
   def insert_object(self):
@@ -75,12 +67,10 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
           self.row_converter.obj, person)
       if relation is None:
         self._create_relationship(person)
-      elif relation.relationship_attrs is None or \
-              "AssigneeType" not in relation.relationship_attrs:
+      elif "AssigneeType" not in relation.attrs:
         self._create_relationship_attr(relation)
       else:
-        self._update_relationship_attr(
-            relation.relationship_attrs["AssigneeType"], person)
+        self._update_relationship_attr(relation, person)
 
   def get_value(self):
     """ Get a list of people with specific role on a Request """
