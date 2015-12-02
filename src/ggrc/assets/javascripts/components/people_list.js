@@ -78,6 +78,7 @@
             destination.mark_for_addition("related_objects_as_destination", person, {
               attrs: {
                 "AssigneeType": role,
+                "context": destination.context,
               }
             });
           }
@@ -93,7 +94,7 @@
                 type: person.type,
                 id: person.id
               },
-              context: {},
+              context: destination.context,
               destination: {
                 href: destination.href,
                 type: destination.type,
