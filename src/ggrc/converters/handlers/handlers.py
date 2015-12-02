@@ -368,9 +368,6 @@ class MappingColumnHandler(ColumnHandler):
         if permissions.is_allowed_update_for(obj):
           objects.append(obj)
         else:
-          title = getattr(obj, "title", None)
-          if title is None:
-            title = getattr(obj, "email", "")
           self.add_warning(
               errors.MAPPING_PERMISSION_ERROR,
               object_type=class_._inflector.human_singular.title(),
