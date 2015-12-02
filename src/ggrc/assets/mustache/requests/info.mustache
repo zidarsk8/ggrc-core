@@ -77,12 +77,8 @@
               {{{render "/static/mustache/base_templates/mapped_objects.mustache" instance=. update_count="false"}}}
             </div>
           </div>
-          <hr />
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              {{> /static/mustache/custom_attributes/expanded_attrs.mustache }}
-            </div>
-          </div>
+
+          {{> /static/mustache/custom_attributes/expanded_attrs.mustache }}
 
         </div>
         <div class="span4">
@@ -107,11 +103,13 @@
             </div>
           </div>
 
+          <!--
           <div class="row-fluid wrap-row">
             <div class="span12">
               {{> /static/mustache/base_templates/request_type.mustache}}
             </div>
           </div>
+          -->
 
         </div>
       </div>
