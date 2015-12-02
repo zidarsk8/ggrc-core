@@ -103,6 +103,9 @@
           });
           groups["all_objects"]["models"].push(cms_model.shortName);
         }, this);
+        if (groups["all_objects"]["models"].length < 2) {
+          delete groups["all_objects"];
+        }
         return groups;
       })
     });
