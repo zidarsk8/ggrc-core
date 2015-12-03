@@ -12,8 +12,9 @@
       <h3>{{title}}</h3>
       <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
       <span class="gray">
-        {{#if_equals request_type "documentation"}}(Documentation){{/if_equals}}
-        {{#if_equals request_type "interview"}}(Interview){{/if_equals}}
+        {{#if request_type}}
+          ({{capitalize request_type}})
+        {{/if}}
       </span>
     </div>
     <div class="span3">

@@ -93,17 +93,18 @@
                 type: person.type,
                 id: person.id
               },
-              context: {},
+              context: null,
               destination: {
                 href: destination.href,
                 type: destination.type,
                 id: destination.id
               }
             });
-            model = new $.Deferred().resolve(model);
+            model = $.Deferred().resolve(model);
           } else {
             model = model.refresh();
           }
+
           model.then(function (model) {
             var type = model.attr("attrs.AssigneeType");
             model.attr("attrs.AssigneeType", role + (type ? "," + type : ""));
