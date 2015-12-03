@@ -479,6 +479,22 @@ can.Model.Cacheable("CMS.Models.Request", {
             assignees[contact.email] = "Assignee";
           }
         }.bind(this));
+
+        // Audit auditors should be default verifiers
+        $.when(audit.findAuditors()).then(function(auditors) {
+          auditors.each(function(elem){
+            elem.each(function(p){
+              if (p.type == "Person") {
+                if (p.email in assignees) {
+                  assignees[p.email] += ",Verifier"
+                } else {
+                  assignees[p.email] = "Verifier"
+                }
+              }
+
+            });
+          });
+        });
       }
 
       // Assign assignee roles
