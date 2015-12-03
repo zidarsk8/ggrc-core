@@ -9,8 +9,7 @@
 <label>
   <span class="person-label {{type}}"></span>
   {{#is_allowed 'update' instance context='for'}}
-    {{#toggle toggle_add}}
-      {{else}}
+    {{^toggle toggle_add}}
       <span class="file-controls">
         <a href="javascript://" {{toggle_button}}>
           <i class="grcicon-add-black"></i>
