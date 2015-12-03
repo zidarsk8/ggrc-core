@@ -9,11 +9,11 @@
 
 can.Control("GGRC.Controllers.InfoWidget", {
   defaults : {
-    model : null
-    , instance : null
-    , widget_view : GGRC.mustache_path + "/base_objects/info.mustache"
-  }
-  , init : function() {
+    model : null,
+    instance : null,
+    widget_view : GGRC.mustache_path + "/base_objects/info.mustache"
+  },
+  init : function() {
     var that = this;
     $(function() {
       if (GGRC.page_object) {
@@ -45,18 +45,18 @@ can.Control("GGRC.Controllers.InfoWidget", {
     can.view(this.get_widget_view(this.element), this.options.context, function(frag) {
       that.element.html(frag);
     });
-  }
+  },
 
-  , get_widget_view: function(el) {
-      var widget_view = $(el)
-            .closest('[data-widget-view]').attr('data-widget-view');
-      if (widget_view && widget_view.length > 0)
-        return GGRC.mustache_path + widget_view;
-      else
-        return this.options.widget_view;
-    }
+  get_widget_view: function(el) {
+    var widget_view = $(el)
+          .closest('[data-widget-view]').attr('data-widget-view');
+    if (widget_view && widget_view.length > 0)
+      return GGRC.mustache_path + widget_view;
+    else
+      return this.options.widget_view;
+  },
 
-  , init_menu: function() {
+  init_menu: function() {
     var start_menu,
         object_menu;
 
