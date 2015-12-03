@@ -840,6 +840,7 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
     if(new_object_form && page_instance && page_instance.type === 'Audit') {
       if (!this.audit) {
         this.attr('audit', page_instance);
+        this.mark_for_addition("related_objects_as_destination", page_instance.program);
       }
     }
   }
