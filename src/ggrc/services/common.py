@@ -1350,9 +1350,14 @@ def filter_resource(resource, depth=0, user_permissions=None):
         if not inst:
           # If object was deleted but relationship still exists
           continue
-        contexts = permissions.read_contexts_for(inst['type']) or []
+        contexts = permissions.read_contexts_for(inst['type'])
+        if contexts is None:
+          # read_contexts_for returns None if the user has access to all the
+          # objects of this type. If the user doesn't have access to any object
+          # an empty list ([]) will be returned
+          continue
         resources = permissions.read_resources_for(inst['type']) or []
-        if None in contexts or inst['context_id'] in contexts or inst['id'] in resources:
+        if inst['context_id'] in contexts or inst['id'] in resources:
           continue
         can_read = False
       if not can_read:
