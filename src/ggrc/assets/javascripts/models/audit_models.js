@@ -452,29 +452,45 @@ can.Model.Cacheable("CMS.Models.Request", {
       return 'Request "' + out_name + '"';
     }
   , form_preload : function(new_object_form) {
-    var audit, that = this;
+    var audit,
+        that = this,
+        assignees = {},
+        current_user = CMS.Models.get_instance(GGRC.current_user);
+
     if (new_object_form) {
+      // Current user should be Requester
+      assignees[current_user.email] = "Requester";
+
       if (GGRC.page_model.type == "Audit") {
         this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
       }
-      this.mark_for_addition("related_objects_as_destination", CMS.Models.get_instance(GGRC.current_user), {
-        attrs: {
-          "AssigneeType": "Requester",
-        }
-      });
 
       if (this.audit) {
         audit = this.audit.reify();
+
+        // Audit leads should be default assignees
         (audit.selfLink ? $.when(audit) : audit.refresh())
         .then(function(audit) {
-          this.mark_for_addition("related_objects_as_destination", audit.contact, {
-            attrs: {
-              "AssigneeType": "Assignee",
-            }
-          });
+          contact = audit.contact.reify();
+
+          if (contact.email in assignees) {
+            assignees[contact.email] += ",Assignee"
+          } else {
+            assignees[contact.email] = "Assignee";
+          }
         }.bind(this));
       }
-    }
+
+      // Assign assignee roles
+      for (var email in assignees) {
+        var p = CMS.Models.Person.findInCacheByEmail(email);
+        this.mark_for_addition("related_objects_as_destination", p, {
+          attrs: {
+            "AssigneeType": assignees[email],
+          }
+        });
+      }
+    } // /new_object_form
   }
   , get_filter_vals: function () {
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
