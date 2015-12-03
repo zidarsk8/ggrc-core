@@ -61,14 +61,19 @@
     },
     allowed_to_map: function (source, target, options) {
       var can_map = false,
-          target_type, source_type, target_context, source_context, create_contexts, canonical;
+          target_type, source_type, target_context, source_context, create_contexts, canonical, has_widget;
 
       target_type = target instanceof can.Model ? target.constructor.shortName
                                                 : (target.type || target);
       source_type = source.constructor.shortName || source;
-      canonical = GGRC.Mappings.get_canonical_mapping(source_type, target_type);
+      canonical = GGRC.Mappings.get_canonical_mapping_name(source_type, target_type);
+      if (canonical && canonical.startsWith("_")) {
+        canonical = null;
+      }
 
-      if (_.exists(options, "hash.join") && !_.exists(canonical, "model_name")) {
+      has_widget = _.contains(GGRC.tree_view.base_widgets_by_type[source_type] || [], target_type);
+
+      if (_.exists(options, "hash.join") && (!canonical || !has_widget)) {
         return false;
       }
       target_context = _.exists(target, "context.id");
