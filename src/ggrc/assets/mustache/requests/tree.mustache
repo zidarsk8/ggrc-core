@@ -5,7 +5,7 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-<li class="tree-item programs" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "rq-" instance.status}}>
+<li class="tree-item requests" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "rq-" instance.status}}>
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}} data-model="true">
     <div class="item-wrap">
       {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
