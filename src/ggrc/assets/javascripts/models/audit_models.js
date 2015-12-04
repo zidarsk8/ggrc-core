@@ -484,29 +484,28 @@ can.Model.Cacheable("CMS.Models.Request", {
         // Audit auditors should be default verifiers
         $.when(audit.findAuditors()).then(function(auditors) {
           auditors.each(function(elem){
-            elem.each(function(p){
-              if (p.type == "Person") {
-                if (p.email in assignees) {
-                  assignees[p.email] += ",Verifier"
+            elem.each(function(obj){
+              if (obj.type == "Person") {
+                if (assignees[obj.email]) {
+                  assignees[obj.email] += ",Verifier"
                 } else {
-                  assignees[p.email] = "Verifier"
+                  assignees[obj.email] = "Verifier"
                 }
               }
-
             });
           });
         });
       }
 
       // Assign assignee roles
-      for (var email in assignees) {
-        var p = CMS.Models.Person.findInCacheByEmail(email);
-        this.mark_for_addition("related_objects_as_destination", p, {
+      can.each(assignees, function(value, key) {
+        var person = CMS.Models.Person.findInCacheByEmail(key);
+        that.mark_for_addition("related_objects_as_destination", person, {
           attrs: {
-            "AssigneeType": assignees[email],
+            "AssigneeType": value,
           }
         });
-      }
+      });
     } // /new_object_form
   }
   , get_filter_vals: function () {
