@@ -19,7 +19,7 @@
             {{#if deletable_mappings.length}}
               <a href="javascript://" class="info-action unmap pull-right relevant-action all-relevant" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make All Relevant">
                 {{#deletable_mappings}}<span class="result" {{data 'result'}}></span>{{/deletable_mappings}}
-                <i class="grcicon-checked-all"></i>
+                <i class="fa fa-check-square-o"></i>
               </a>
             {{/if}}
           {{/with_allowed_as}}
@@ -27,7 +27,7 @@
           {{#if unmapped_instances.length}}
             {{! we permission checked for create up in with_mappable_instances_as}}
             <a class="info-action pull-right map-to-page-object relevant-action all-relevant" href="javascript://" {{#with processed_list}}{{data 'instance'}}{{/with}} {{#with mappings}}{{data 'existing_mappings'}}{{/with}} rel="tooltip" data-placement="left" data-original-title="Make All Relevant">
-              <i class="grcicon-check-all"></i>
+              <i class="fa fa-square-o"></i>
             </a>
           {{/if}}
         {{/if_equals}}
