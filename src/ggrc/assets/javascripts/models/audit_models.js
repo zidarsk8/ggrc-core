@@ -455,7 +455,8 @@ can.Model.Cacheable("CMS.Models.Request", {
     var audit,
         that = this,
         assignees = {},
-        current_user = CMS.Models.get_instance(GGRC.current_user);
+        current_user = CMS.Models.get_instance(GGRC.current_user),
+        contact;
 
     if (new_object_form) {
       // Current user should be Requester
