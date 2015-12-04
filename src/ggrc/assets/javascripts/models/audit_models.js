@@ -474,7 +474,7 @@ can.Model.Cacheable("CMS.Models.Request", {
         .then(function(audit) {
           contact = audit.contact.reify();
 
-          if (contact.email in assignees) {
+          if (assignees[contact.email]) {
             assignees[contact.email] += ",Assignee"
           } else {
             assignees[contact.email] = "Assignee";
