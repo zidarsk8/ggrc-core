@@ -766,6 +766,14 @@ Mustache.registerHelper("get_permalink", function () {
   return window.location.href;
 });
 
+Mustache.registerHelper("get_permalink_for_object", function (instance, options) {
+  instance = resolve_computed(instance);
+  if (!instance.viewLink) {
+    return "";
+  }
+  return window.location.origin + instance.viewLink;
+});
+
 Mustache.registerHelper("get_view_link", function (instance, options) {
   function finish(link) {
     return "<a href=" + link + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";

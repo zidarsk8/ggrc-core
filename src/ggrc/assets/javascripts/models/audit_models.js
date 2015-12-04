@@ -405,7 +405,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     , draw_children : true
     , child_options: [{
       model : can.Model.Cacheable,
-      mapping: "related_objects",
+      mapping: "info_related_objects",
       allow_creating : true,
     }]
   }
@@ -839,18 +839,19 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
         {attr_title: 'Conclusion: Operation', attr_name: 'operationally'}
     ])
   },
-  init : function() {
+  init: function () {
     this._super && this._super.apply(this, arguments);
     this.validatePresenceOf("control");
     this.validatePresenceOf("audit");
     this.validateNonBlank("title");
   }
 }, {
-  form_preload : function(new_object_form) {
+  form_preload: function (new_object_form) {
     var page_instance = GGRC.page_instance();
-    if(new_object_form && page_instance && page_instance.type === 'Audit') {
+    if (new_object_form && page_instance && page_instance.type === "Audit") {
       if (!this.audit) {
-        this.attr('audit', page_instance);
+        this.attr("audit", page_instance);
+        this.mark_for_addition("related_objects_as_destination", page_instance.program);
       }
     }
   }

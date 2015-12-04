@@ -82,14 +82,30 @@
             role = can.capitalize(this.scope.type),
             destination = this.scope.attr("instance"),
             deferred = this.scope.attr("deferred"),
-            model;
+            pending, model;
 
         if (deferred === "true") {
-          destination.mark_for_addition("related_objects_as_destination", person, {
-            attrs: {
-              "AssigneeType": role,
-            }
-          });
+          pending = true;
+          if (destination._pending_joins) {
+            _.each(destination._pending_joins, function (join) {
+              if (join.what === person) {
+                var existing= join.extra.attr("attrs.AssigneeType") || "";
+                existing = _.filter(existing.split(","));
+                var roles = _.union(existing, [role]).join(",");
+                join.extra.attr("attrs.AssigneeType", roles);
+                pending = false;
+              }
+            });
+
+          }
+          if (pending) {
+            destination.mark_for_addition("related_objects_as_destination", person, {
+              attrs: {
+                "AssigneeType": role,
+                "context": destination.context,
+              }
+            });
+          }
         } else {
           model = CMS.Models.Relationship.get_relationship(person, destination);
           if (!model) {
@@ -102,7 +118,7 @@
                 type: person.type,
                 id: person.id
               },
-              context: {},
+              context: destination.context,
               destination: {
                 href: destination.href,
                 type: destination.type,

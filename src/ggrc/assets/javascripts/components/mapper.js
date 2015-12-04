@@ -499,7 +499,8 @@
             __permission_model: join_model
           };
         }
-        if (!_.includes(["ObjectPerson", "WorkflowPerson"], join_model)) {
+        if (!_.includes(["ObjectPerson", "WorkflowPerson"], join_model) &&
+            !this.options.scope.attr("mapper.search_only")) {
           data.options.__permission_type = data.options.__permission_type || "update";
         }
         data.model_name = _.isString(data.model_name) ? [data.model_name] : data.model_name;
