@@ -19,6 +19,12 @@
   &.green {
     color: $green;
   }
+  &.orange {
+    color: #ff6600;
+  }
+  &.gray {
+    color: #b2b2b2;
+  }
   a & {
     color: $black;
   }
