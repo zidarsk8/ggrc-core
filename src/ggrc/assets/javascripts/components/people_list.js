@@ -24,6 +24,7 @@
       required: "@",
       type: "@",
       toggle_add: false,
+      humans: [],
       remove_role: function (parent_scope, target) {
         var person = CMS.Models.Person.findInCacheById(target.data("person")),
             rel = function (obj) {
@@ -54,33 +55,41 @@
       },
     },
     events: {
+      "init": function () {
+        if (!this.scope.attr("required")) {
+          return;
+        }
+
+        var instance = this.scope.attr("instance"),
+            mapping = this.scope.attr("mapping");
+
+        this.scope.attr("humans", this.scope.attr("deferred") ? instance._pending_joins : instance.get_mapping(mapping));
+        this.validate();
+      },
+      "validate": function () {
+        var list = _.filter(this.scope.attr("humans"), function (human) {
+              if (this.scope.attr("deferred")) {
+                var roles = can.getObject("extra.attrs", human);
+                return human.what.type === "Person" && (roles && roles.AssigneeType === can.capitalize(this.scope.type));
+              }
+              return human;
+            }.bind(this));
+        this.scope.attr("instance").attr("validate_" + this.scope.attr("type"), !!list.length);
+      },
+      "{scope.humans} change": "validate",
       ".person-selector input autocomplete:select": function (el, ev, ui) {
         var person = ui.item,
             role = can.capitalize(this.scope.type),
             destination = this.scope.attr("instance"),
             deferred = this.scope.attr("deferred"),
-            pending, model;
+            model;
 
         if (deferred === "true") {
-          pending = true;
-          if (destination._pending_joins) {
-            _.each(destination._pending_joins, function (join) {
-              if (join.what === person) {
-                var existing= join.extra.attr("attrs.AssigneeType") || "";
-                existing = _.filter(existing.split(","));
-                var roles = _.union(existing, [role]).join(",");
-                join.extra.attr("attrs.AssigneeType", roles);
-                pending = false;
-              }
-            });
-          }
-          if (pending) {
-            destination.mark_for_addition("related_objects_as_destination", person, {
-              attrs: {
-                "AssigneeType": role,
-              }
-            });
-          }
+          destination.mark_for_addition("related_objects_as_destination", person, {
+            attrs: {
+              "AssigneeType": role,
+            }
+          });
         } else {
           model = CMS.Models.Relationship.get_relationship(person, destination);
           if (!model) {
@@ -109,10 +118,6 @@
             model.attr("attrs.AssigneeType", role + (type ? "," + type : ""));
             model.save();
           }.bind(this));
-        }
-        if (destination.id === undefined && destination._pending_joins) {
-          // Force re-validation of all fields on person select
-          this.scope.instance._triggerChange("title");
         }
       },
     },
