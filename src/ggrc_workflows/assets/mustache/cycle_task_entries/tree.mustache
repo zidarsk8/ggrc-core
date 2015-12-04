@@ -44,7 +44,7 @@
     <span class="entry-author">Modified by {{#using person=instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>
   </div>
   <div class="entry-actions pull-right">
-    <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+    <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
     <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
       <li>
         {{^if_equals parent_instance.status 'Verified'}}
