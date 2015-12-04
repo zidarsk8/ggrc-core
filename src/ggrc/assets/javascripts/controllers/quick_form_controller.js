@@ -36,7 +36,7 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
           }.bind(this));
       return;
     }
-    if (!el.is("[data-lookup]") || el.data("toggle") !== "datepicker") {
+    if (!el.is("[data-lookup]")) {
       this.set_value_from_element(el);
       setTimeout(function () {
         this.options.instance.save();
