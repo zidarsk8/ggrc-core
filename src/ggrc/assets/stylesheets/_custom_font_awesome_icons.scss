@@ -48,6 +48,8 @@
 .icon-pencil:before { content: $fa-var-code; }
 
 .grcicon-role-color:before { content: $fa-var-key; }
+.#{$fa-css-prefix}-interview { content: $fa-var-calendar; }
+.#{$fa-css-prefix}-documentation { content: $fa-var-files-o; }
 
 .#{$fa-css-prefix}-person:before { content: $fa-var-user; }
 .#{$fa-css-prefix}-person-color:before { content: $fa-var-user; color: #a8491a; }
