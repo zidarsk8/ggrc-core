@@ -1425,6 +1425,14 @@ Mustache.registerHelper("lowercase", function (value, options) {
   return value.toLowerCase();
 });
 
+Mustache.registerHelper("assignee_types", function (value, options) {
+  value = resolve_computed(value) || "";
+  value = _.map(value.split(","), function (type) {
+    return _.trim(type).toLowerCase();
+  }).join(" ");
+  return value.length ? _.first(value) : "";
+});
+
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {
   var tokens = [];
   var sod;
