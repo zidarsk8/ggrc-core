@@ -31,7 +31,7 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
   _title_uniqueness = False
 
   VALID_TYPES = (u'documentation', u'interview')
-  VALID_STATES = (u'Unstarted', u'In Progress', u'Finished', u'Verified')
+  VALID_STATES = (u'Open', u'In Progress', u'Finished', u'Verified', u'Final')
   ASSIGNEE_TYPES = (u'Assignee', u'Requester', u'Verifier')
 
   # TODO Remove requestor and requestor_id on database cleanup
