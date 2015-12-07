@@ -25,7 +25,11 @@
       changes: [],
       get_assignee_type: can.compute(function () {
         // TODO: We prioritize order V > A > R
-        var types = "verifier assignee requester".split(" "),
+        var types = {
+              related_verifiers: "verifier",
+              related_assignees: "assignee",
+              related_requesters: "requester"
+            },
             instance = this.attr("parent_instance"),
             user = GGRC.current_user,
             user_type;
@@ -33,8 +37,8 @@
         if (!instance || !user) {
           return;
         }
-        _.each(types, function (type) {
-          var mappings = instance.get_mapping("related_" + type + "s");
+        _.each(types, function (type, mapping) {
+          var mappings = instance.get_mapping(mapping);
           if (!mappings.length) {
             return;
           }
