@@ -452,29 +452,61 @@ can.Model.Cacheable("CMS.Models.Request", {
       return 'Request "' + out_name + '"';
     }
   , form_preload : function(new_object_form) {
-    var audit, that = this;
+    var audit,
+        that = this,
+        assignees = {},
+        current_user = CMS.Models.get_instance(GGRC.current_user),
+        contact;
+
     if (new_object_form) {
+      // Current user should be Requester
+      assignees[current_user.email] = "Requester";
+
       if (GGRC.page_model.type == "Audit") {
         this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
       }
-      this.mark_for_addition("related_objects_as_destination", CMS.Models.get_instance(GGRC.current_user), {
-        attrs: {
-          "AssigneeType": "Requester",
-        }
-      });
 
       if (this.audit) {
         audit = this.audit.reify();
+
+        // Audit leads should be default assignees
         (audit.selfLink ? $.when(audit) : audit.refresh())
         .then(function(audit) {
-          this.mark_for_addition("related_objects_as_destination", audit.contact, {
-            attrs: {
-              "AssigneeType": "Assignee",
-            }
-          });
+          contact = audit.contact.reify();
+
+          if (assignees[contact.email]) {
+            assignees[contact.email] += ",Assignee"
+          } else {
+            assignees[contact.email] = "Assignee";
+          }
         }.bind(this));
+
+        // Audit auditors should be default verifiers
+        $.when(audit.findAuditors()).then(function(auditors) {
+          auditors.each(function(elem){
+            elem.each(function(obj){
+              if (obj.type == "Person") {
+                if (assignees[obj.email]) {
+                  assignees[obj.email] += ",Verifier"
+                } else {
+                  assignees[obj.email] = "Verifier"
+                }
+              }
+            });
+          });
+        });
       }
-    }
+
+      // Assign assignee roles
+      can.each(assignees, function(value, key) {
+        var person = CMS.Models.Person.findInCacheByEmail(key);
+        that.mark_for_addition("related_objects_as_destination", person, {
+          attrs: {
+            "AssigneeType": value,
+          }
+        });
+      });
+    } // /new_object_form
   }
   , get_filter_vals: function () {
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
