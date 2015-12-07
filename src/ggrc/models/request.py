@@ -20,8 +20,10 @@ from ggrc.models.mixins import Described
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.object_document import Documentable
+from ggrc.models.object_document import ObjectDocument
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
+from ggrc.models.relationship import Relationship
 from ggrc.services.common import Resource
 
 
@@ -172,7 +174,7 @@ def _date_has_changes(attr):
 @Resource.model_put.connect_via(Request)
 def handle_request_put(sender, obj=None, src=None, service=None):
   all_attrs = set(Request._publish_attrs)
-  non_tracked_attrs = {'status', 'requestor'}
+  non_tracked_attrs = {'status'}
   tracked_date_attrs = {'requested_on', 'due_on'}
   tracked_attrs = all_attrs - non_tracked_attrs - tracked_date_attrs
   has_changes = False
@@ -185,5 +187,38 @@ def handle_request_put(sender, obj=None, src=None, service=None):
          for attr in tracked_date_attrs):
     has_changes = True
 
-  if has_changes:
+  if has_changes and obj.status in {"Open", "Final", "Verified"}:
     obj.status = "In Progress"
+
+
+@Resource.model_posted.connect_via(Relationship)
+def handle_relationship_post(sender, obj=None, src=None, service=None):
+  has_changes = False
+  if "Request" in (obj.source.type, obj.destination.type):
+    if obj.source.type == "Request":
+      req = obj.source
+    else:
+      req = obj.destination
+
+    if "Document" in (obj.source.type, obj.destination.type):
+      # This captures the "Add URL" event
+      has_changes = True
+
+    if "Person" in (obj.source.type, obj.destination.type):
+      # This captures assignable addition
+      if inspect(obj).attrs.relationship_attrs.history.has_changes():
+        has_changes = True
+
+    if has_changes and req.status in {"Open", "Final", "Verified"}:
+      req.status = "In Progress"
+      db.session.add(req)
+
+
+@Resource.model_posted.connect_via(ObjectDocument)
+def handle_objectdocument_post(sender, obj=None, src=None, service=None):
+  # This captures "Attach Evidence" event
+  if obj.documentable.type == "Request":
+    req = obj.documentable
+    if req.status in {"Open", "Final", "Verified"}:
+      req.status = "In Progress"
+      db.session.add(req)
