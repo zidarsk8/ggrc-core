@@ -611,10 +611,17 @@ class ParentColumnHandler(ColumnHandler):
                      object_type=self.parent._inflector.human_singular.title(),
                      slug=slug)
       return None
-    if not permissions.is_allowed_update_for(obj):
-      self.add_error(errors.MAPPING_PERMISSION_ERROR,
-                     object_type=obj.type, slug=slug)
-      return None
+    context_id = None
+    if hasattr(obj, "context_id") and \
+       hasattr(self.row_converter.obj, "context_id"):
+      context_id = obj.context_id
+      if context_id is not None:
+        name = self.row_converter.obj.__class__.__name__
+        if not permissions.is_allowed_create(name, None, context_id) \
+           and not permissions.has_conditions('create', name):
+          self.add_error(errors.MAPPING_PERMISSION_ERROR,
+                         object_type=obj.type, slug=slug)
+          return None
     return obj
 
   def set_obj_attr(self):
