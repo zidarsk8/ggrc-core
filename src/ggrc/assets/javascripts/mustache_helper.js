@@ -1427,10 +1427,10 @@ Mustache.registerHelper("lowercase", function (value, options) {
 
 Mustache.registerHelper("assignee_types", function (value, options) {
   value = resolve_computed(value) || "";
-  value = _.map(value.split(","), function (type) {
+  value = _.first(_.map(value.split(","), function (type) {
     return _.trim(type).toLowerCase();
-  });
-  return value.length ? _.first(value) : "";
+  }));
+  return _.isEmpty(value) ? "none" : value;
 });
 
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {
