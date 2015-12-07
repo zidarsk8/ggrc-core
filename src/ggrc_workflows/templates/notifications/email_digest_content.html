@@ -31,13 +31,27 @@ Maintained By: miha@reciprocitylabs.com
                   {% endfor %}
                 {% endif %}
 
-                {% if digest['task_declined'] %}
-                  <h2 {{ style.sub_title() }} >Your finished
-                    {{ "tasks were" if digest['task_declined']|length > 1 else "task was" }}
-                    declined - please review
-                    {{ "them" if digest['task_declined']|length > 1 else "it" }}:</h2>
+
+                {% if digest['cycle_started_tasks'] %}
+                  <h2 {{ style.sub_title() }} >You have been assigned
+                    {{ "these tasks" if digest['cycle_started_tasks']|length > 1 else "a task" }}:
+                  </h2>
                   <ul {{ style.list_wrap() }} >
-                  {% for task in digest['task_declined'].values() %}
+                  {% for task in digest['cycle_started_tasks'].values() %}
+                    <li {{ style.list_item() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
+                        {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
+                      due on {{ task['end_date'] }}
+                    </li>
+                  {% endfor %}
+                {% endif %}
+
+                {% if digest['task_overdue'] %}
+                  <h2 {{ style.sub_title() }} >You have
+                    {{ "overdue tasks" if digest['task_overdue']|length > 1 else "an overdue task" }}
+                    in ZenGRC:</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['task_overdue'].values() %}
                     <li {{ style.list_item() }} >
                       <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
                       {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }}
