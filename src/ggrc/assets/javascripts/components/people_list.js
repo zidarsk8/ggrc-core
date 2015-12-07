@@ -24,7 +24,7 @@
       required: "@",
       type: "@",
       toggle_add: false,
-      humans: [],
+      mapped_people: [],
       remove_role: function (parent_scope, target) {
         var person = CMS.Models.Person.findInCacheById(target.data("person")),
             rel = function (obj) {
@@ -63,20 +63,20 @@
         var instance = this.scope.attr("instance"),
             mapping = this.scope.attr("mapping");
 
-        this.scope.attr("humans", this.scope.attr("deferred") ? instance._pending_joins : instance.get_mapping(mapping));
+        this.scope.attr("mapped_people", this.scope.attr("deferred") ? instance._pending_joins : instance.get_mapping(mapping));
         this.validate();
       },
       "validate": function () {
-        var list = _.filter(this.scope.attr("humans"), function (human) {
+        var list = _.filter(this.scope.attr("mapped_people"), function (person) {
               if (this.scope.attr("deferred")) {
-                var roles = can.getObject("extra.attrs", human);
-                return human.what.type === "Person" && (roles && roles.AssigneeType === can.capitalize(this.scope.type));
+                var roles = can.getObject("extra.attrs", person);
+                return person.what.type === "Person" && (roles && roles.AssigneeType === can.capitalize(this.scope.type));
               }
-              return human;
+              return person;
             }.bind(this));
         this.scope.attr("instance").attr("validate_" + this.scope.attr("type"), !!list.length);
       },
-      "{scope.humans} change": "validate",
+      "{scope.mapped_people} change": "validate",
       ".person-selector input autocomplete:select": function (el, ev, ui) {
         var person = ui.item,
             role = can.capitalize(this.scope.type),
