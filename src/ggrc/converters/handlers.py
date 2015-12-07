@@ -211,9 +211,9 @@ class UserColumnHandler(ColumnHandler):
 
   def get_person(self, email):
     new_objects = self.row_converter.block_converter.converter.new_objects
-    if email in new_objects[Person]:
-      return new_objects[Person].get(email)
-    return Person.query.filter(Person.email == email).first()
+    if email not in new_objects[Person]:
+      new_objects[Person][email] = Person.query.filter_by(email=email).first()
+    return new_objects[Person].get(email)
 
   def parse_item(self):
     email = self.raw_value.lower()
