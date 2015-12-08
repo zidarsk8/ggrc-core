@@ -5,63 +5,61 @@
  * Maintained By: brad@reciprocitylabs.com
  */
 (function(can, $) {
-var create_folder = function(cls, title_generator, parent_attr, model, ev, instance) {
-  var that = this
-  , dfd
-  , folder
-  , has_parent = true
-  , owner = cls === CMS.Models.Request ? "assignee" : "contact";
+var create_folder = function (cls, title_generator, parent_attr, model, ev, instance) {
+  var that = this,
+      dfd,
+      folder,
+      has_parent = true,
+      owner = cls === CMS.Models.Request ? "assignee" : "contact";
 
-  if(instance instanceof cls) {
-    if(parent_attr) {
+  if (instance instanceof cls) {
+    if (parent_attr) {
       dfd = instance[parent_attr].reify().get_binding("folders").refresh_instances();
     } else {
       has_parent = false;
       dfd = $.when([{}]); //make parent_folder instance be undefined;
                           // GDriveFolder.create will translate that into 'root'
     }
-    return dfd.then(function(parent_folders) {
-      parent_folders = can.map(parent_folders, function(pf) {
+    return dfd.then(function (parent_folders) {
+      parent_folders = can.map(parent_folders, function (pf) {
         return pf.instance && pf.instance.userPermission &&
-          (pf.instance.userPermission.role === "writer" ||
-           pf.instance.userPermission.role === "owner") ? pf : undefined;
+              (pf.instance.userPermission.role === "writer" ||
+              pf.instance.userPermission.role === "owner") ?
+              pf : undefined;
       });
-      if(has_parent && parent_folders.length < 1){
+      if (has_parent && parent_folders.length < 1){
         return new $.Deferred().reject("no write permissions on parent");
       }
       var xhr = new CMS.Models.GDriveFolder({
-        title : title_generator(instance)
-        , parents : parent_folders.length > 0 ? parent_folders[0].instance : undefined
+        title: title_generator(instance),
+        parents: parent_folders.length ? parent_folders[0].instance : undefined
       }).save();
-
       report_progress("Creating Drive folder for " + title_generator(instance), xhr);
       return xhr;
     }).then(function(created_folder) {
       var refresh_queue;
-
       folder = created_folder;
 
       return report_progress(
-        'Linking folder "' + folder.title + '" to ' + instance.constructor.title_singular
-        , new CMS.Models.ObjectFolder({
-          folder : folder
-          , folderable : instance
-          , context : instance.context || { id : null }
+        "Linking folder \"" + folder.title + "\" to " + instance.constructor.title_singular,
+        new CMS.Models.ObjectFolder({
+          folder: folder,
+          folderable: instance,
+          context: instance.context || { id : null }
         }).save()
       );
     }).then($.proxy(instance, "refresh"))
-    .then(function() {
-      if(!(instance instanceof CMS.Models.Audit)) {
+    .then(function () {
+      if (!(instance instanceof CMS.Models.Audit)) {
         return that.update_permissions(model, ev, instance);  //done automatically on refresh for Audits
       }
-    }).then(function(){
+    }).then(function () {
       return folder;
-    }, function() {
+    }, function () {
       //rejected case from previous
       return $.when();
     });
-  }
-  else {
+  } else {
     dfd = new $.Deferred();
     return dfd.reject("Type mismatch");
   }

@@ -12,11 +12,9 @@
     <ggrc-gdrive-picker-launcher
       instance="instance"
       link_text="Attach evidence"
+      click_event="trigger_upload"
       {{#if_in instance.status "Open,Final,Verified"}}
-        click_event="trigger_upload"
         verify_event="true"
-      {{else}}
-        click_event="trigger_upload"
       {{/if_in}}>
     </ggrc-gdrive-picker-launcher>
   {{/is_allowed}}
