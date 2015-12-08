@@ -2342,6 +2342,26 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
   return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("if_verifiers_defined", function (instance, options) {
+  var verifiers;
+
+  instance = Mustache.resolve(instance);
+  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+
+  if (!instance) {
+    return '';
+  }
+
+  verifiers = instance.get_binding('related_verifiers');
+
+  return defer_render('span', function(list) {
+    if (list.length) {
+      return options.fn(options.contexts);
+    }
+    return options.inverse(options.contexts);
+  }, verifiers.refresh_instances());
+});
+
 Mustache.registerHelper("if_verifier", function (instance, options) {
   var user = GGRC.current_user,
       verifiers;
