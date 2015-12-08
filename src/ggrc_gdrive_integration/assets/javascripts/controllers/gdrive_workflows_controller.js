@@ -1111,76 +1111,90 @@ can.Component.extend({
     link_text: "@",
     link_class: "@",
     click_event: "@",
+    verify_event: "@",
 
     trigger_upload: function(scope, el, ev){
       // upload files without a parent folder (risk assesment)
       var that = this,
+          verify_dfd = new $.Deferred(),
           dfd = GGRC.Controllers.GAPI.authorize(["https://www.googleapis.com/auth/drive"]),
           folder_id = el.data("folder-id");
 
-      dfd.then(function(){
-        gapi.load('picker', {'callback': createPicker});
+      if (scope.verify_event) {
+        GGRC.Controllers.Modals.confirm({
+          modal_description: "You are about to move request back to \"In Progress\", all steps will have to be redone - are you sure about that?",
+          modal_confirm: "Confirm",
+          modal_title: "Confirm moving Request back to \"In Progress\"",
+          scope: scope,
+          el: el,
+          ev: ev
+        }, verify_dfd.resolve);
+      };
 
-        // Create and render a Picker object for searching images.
-        function createPicker() {
-          window.oauth_dfd.done(function(token, oauth_user) {
-            var dialog,
-                picker = new google.picker.PickerBuilder()
-                  .setOAuthToken(gapi.auth.getToken().access_token)
-                  .setDeveloperKey(GGRC.config.GAPI_KEY)
-                  .setCallback(pickerCallback);
+      $.when(verify_dfd).then(dfd.then(function() {
+        //dfd.then(function () {
+          gapi.load('picker', {'callback': createPicker});
 
-            if(el.data('type') === 'folders'){
-              var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-                .setIncludeFolders(true)
-                .setSelectFolderEnabled(true);
-              picker.addView(view);
-            }
-            else{
-              var docsUploadView = new google.picker.DocsUploadView()
-                    .setParent(folder_id),
-                  docsView = new google.picker.DocsView()
-                    .setParent(folder_id);
+          // Create and render a Picker object for searching images.
+          function createPicker() {
+            window.oauth_dfd.done(function (token, oauth_user) {
+              var dialog,
+                  picker = new google.picker.PickerBuilder()
+                      .setOAuthToken(gapi.auth.getToken().access_token)
+                      .setDeveloperKey(GGRC.config.GAPI_KEY)
+                      .setCallback(pickerCallback);
 
-              picker.addView(docsUploadView)
-                .addView(docsView)
-                .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
-            }
-            picker = picker.build();
-            picker.setVisible(true);
+              if (el.data('type') === 'folders') {
+                var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+                    .setIncludeFolders(true)
+                    .setSelectFolderEnabled(true);
+                picker.addView(view);
+              }
+              else {
+                var docsUploadView = new google.picker.DocsUploadView()
+                        .setParent(folder_id),
+                    docsView = new google.picker.DocsView()
+                        .setParent(folder_id);
 
-            dialog = GGRC.Utils.getPickerElement(picker);
-            if (dialog) {
-              dialog.style.zIndex = 2001; // our modals start with 1050
-            }
-          });
-        }
+                picker.addView(docsUploadView)
+                    .addView(docsView)
+                    .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
+              }
+              picker = picker.build();
+              picker.setVisible(true);
 
-        function pickerCallback(data) {
-
-          var files, models,
-              PICKED = google.picker.Action.PICKED,
-              ACTION = google.picker.Response.ACTION,
-              DOCUMENTS = google.picker.Response.DOCUMENTS,
-              CANCEL = google.picker.Action.CANCEL;
-
-          if (data[ACTION] == PICKED) {
-            files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
-            that.attr("pending", true);
-            return new RefreshQueue().enqueue(files).trigger().then(function(files){
-              doc_dfds = that.handle_file_upload(files);
-              $.when.apply($, doc_dfds).then(function() {
-                el.trigger("modal:success", { arr: can.makeArray(arguments) });
-                that.attr('pending', false);
-              });
+              dialog = GGRC.Utils.getPickerElement(picker);
+              if (dialog) {
+                dialog.style.zIndex = 2001; // our modals start with 1050
+              }
             });
           }
-          else if (data[ACTION] == CANCEL) {
-            //TODO: hadle canceled uplads
-            el.trigger('rejected');
+
+          function pickerCallback(data) {
+
+            var files, models,
+                PICKED = google.picker.Action.PICKED,
+                ACTION = google.picker.Response.ACTION,
+                DOCUMENTS = google.picker.Response.DOCUMENTS,
+                CANCEL = google.picker.Action.CANCEL;
+
+            if (data[ACTION] == PICKED) {
+              files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
+              that.attr("pending", true);
+              return new RefreshQueue().enqueue(files).trigger().then(function (files) {
+                doc_dfds = that.handle_file_upload(files);
+                $.when.apply($, doc_dfds).then(function () {
+                  el.trigger("modal:success", {arr: can.makeArray(arguments)});
+                  that.attr('pending', false);
+                });
+              });
+            }
+            else if (data[ACTION] == CANCEL) {
+              //TODO: hadle canceled uplads
+              el.trigger('rejected');
+            }
           }
-        }
-      });
+        }));
     },
 
     trigger_upload_parent: function(scope, el, ev) {

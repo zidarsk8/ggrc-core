@@ -9,7 +9,15 @@
   <ul class="attachment-list" data-update-count="{{update_count}}" data-disable-lazy-loading="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
   </ul>
   {{#is_allowed 'update' instance context='for'}}
-    <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach evidence" click_event="trigger_upload">
+    <ggrc-gdrive-picker-launcher
+      instance="instance"
+      link_text="Attach evidence"
+      {{#if_in instance.status "Open,Final,Verified"}}
+        click_event="trigger_upload"
+        verify_event="true"
+      {{else}}
+        click_event="trigger_upload"
+      {{/if_in}}>
     </ggrc-gdrive-picker-launcher>
   {{/is_allowed}}
 {{/add_to_current_scope}}
