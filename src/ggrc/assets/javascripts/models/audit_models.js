@@ -414,6 +414,8 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validateNonBlank("title");
     this.validateNonBlank("due_on");
     this.validateNonBlank("requested_on");
+    this.validatePresenceOf("validate_assignee");
+    this.validatePresenceOf("validate_requester");
     this.validatePresenceOf("audit");
 
     this.validate(["requested_on", "due_on"], function (newVal, prop) {
@@ -428,9 +430,18 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
     });
 
+    this.validate(["validate_assignee", "validate_requester"], function (newVal, prop) {
+      if (!this.validate_assignee) {
+        return "You need to specify at least one assignee";
+      }
+      if (!this.validate_requester) {
+        return "You need to specify at least one requester";
+      }
+    });
+
     if (this === CMS.Models.Request) {
-      this.bind("created", function(ev, instance) {
-        if(instance.constructor === CMS.Models.Request) {
+      this.bind("created", function (ev, instance) {
+        if (instance.constructor === CMS.Models.Request) {
           instance.audit.reify().refresh();
         }
       });

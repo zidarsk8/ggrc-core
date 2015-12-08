@@ -24,6 +24,7 @@
       required: "@",
       type: "@",
       toggle_add: false,
+      mapped_people: [],
       remove_role: function (parent_scope, target) {
         var person = CMS.Models.Person.findInCacheById(target.data("person")),
             rel = function (obj) {
@@ -54,6 +55,28 @@
       },
     },
     events: {
+      "init": function () {
+        if (!this.scope.attr("required")) {
+          return;
+        }
+
+        var instance = this.scope.attr("instance"),
+            mapping = this.scope.attr("mapping");
+
+        this.scope.attr("mapped_people", this.scope.attr("deferred") ? instance._pending_joins : instance.get_mapping(mapping));
+        this.validate();
+      },
+      "validate": function () {
+        var list = _.filter(this.scope.attr("mapped_people"), function (person) {
+              if (this.scope.attr("deferred")) {
+                var roles = can.getObject("extra.attrs", person);
+                return person.what.type === "Person" && (roles && roles.AssigneeType === can.capitalize(this.scope.type));
+              }
+              return person;
+            }.bind(this));
+        this.scope.attr("instance").attr("validate_" + this.scope.attr("type"), !!list.length);
+      },
+      "{scope.mapped_people} change": "validate",
       ".person-selector input autocomplete:select": function (el, ev, ui) {
         var person = ui.item,
             role = can.capitalize(this.scope.type),
@@ -73,6 +96,7 @@
                 pending = false;
               }
             });
+
           }
           if (pending) {
             destination.mark_for_addition("related_objects_as_destination", person, {
@@ -115,10 +139,17 @@
     },
     helpers: {
       can_unmap: function (options) {
-        if (this.attr("instance").get_mapping(this.attr("mapping")).length > 1) {
+        var num_mappings = this.attr("instance").get_mapping(this.attr("mapping")).length,
+            required = this.attr("required");
+
+        if (required) {
+          if (num_mappings > 1) {
+            return options.fn(options.context);
+          }
+          return options.inverse(options.context);
+        } else {
           return options.fn(options.context);
         }
-        return options.inverse(options.context);
       },
       show_add: function (options) {
         if (this.attr("editable") === "true") {
