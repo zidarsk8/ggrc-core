@@ -2355,7 +2355,7 @@ Mustache.registerHelper("if_verifier", function (instance, options) {
 
   verifiers = instance.get_binding('related_verifiers');
 
-  function finish(list) {
+  return defer_render('span', function(list) {
     var llist = _.filter(list, function(item) {
       if (item.instance.email == user.email) {
         return true;
@@ -2367,13 +2367,7 @@ Mustache.registerHelper("if_verifier", function (instance, options) {
       return options.fn(options.contexts);
     }
     return options.inverse(options.contexts);
-  }
-
-  function fail(error) {
-    return options.inverse(options.contexts);
-  }
-
-  return defer_render('span', { done : finish, fail : fail }, verifiers.refresh_instances())
+  }, verifiers.refresh_instances());
 });
 
 can.each({
