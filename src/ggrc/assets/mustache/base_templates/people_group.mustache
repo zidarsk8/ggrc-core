@@ -19,7 +19,9 @@
   {{/is_allowed}}
   {{capitalize type}}
   {{#if editable}}
-    <span class="required">*</span>
+    {{#if required}}
+      <span class="required">*</span>
+    {{/if}}
   {{/if}}
 </label>
 {{#with_mapping mapping instance}}
