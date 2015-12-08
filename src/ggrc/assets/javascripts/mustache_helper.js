@@ -2162,7 +2162,6 @@ Mustache.registerHelper("if_in", function (needle, haystack, options) {
   var found = haystack.some(function (h) {
     return h.trim() === needle;
   });
-
   return options[found ? "fn" : "inverse"](options.contexts);
 });
 
