@@ -15,7 +15,11 @@
       click_event="trigger_upload"
       {{#if_in instance.status "Open,Final,Verified"}}
         verify_event="true"
-      {{/if_in}}>
+        modal_description='You are about to move request back to "In Progress", all steps will have to be redone - are you sure about that?'
+        modal_title='Confirm moving Request back to "In Progress"'
+        modal_button='Confirm'
+      {{/if_in}}
+    >
     </ggrc-gdrive-picker-launcher>
   {{/is_allowed}}
 {{/add_to_current_scope}}
