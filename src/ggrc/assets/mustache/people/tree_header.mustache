@@ -1,0 +1,80 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: miha@reciprocitylabs.com
+    Maintained By: miha@reciprocitylabs.com
+}}
+
+{{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
+
+<header class="header sticky sticky-header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+  <div class="row-fluid">
+    <div class="span4">
+      <div class="title-heading oneline">
+        <span class="widget-col-title" data-field="title|description_inline|name|email">
+          {{model.title_singular}} Name
+          <i class="grcicon-carrot"></i>
+        </span>
+      </div>
+    </div>
+    <div class="span2">
+      <div class="oneline">
+        <span class="widget-col-title" data-field="email">
+          Email
+          <i class="grcicon-carrot"></i>
+        </span>
+      </div>
+    </div>
+    <div class="span2">
+      <div class="oneline">
+        Authorizations
+      </div>
+    </div>
+    <div class="span4">
+      <ul class="tree-action-list">
+        {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
+        <!-- Temporary hidden. Do not remove this.
+        <li>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+          <div class="dropdown-menu dropdown-menu-form">
+            <h5>Set visible fields</h5>
+            <ul class="attr-list">
+              <li class="disabled">
+                <label class="checkbox-inline">
+                  <input type="checkbox" checked="" disabled="">
+                  Name
+                </label>
+              </li>
+              <li class=" disabled">
+                <label class="checkbox-inline">
+                  <input type="checkbox" checked="" disabled="">
+                  Email
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-inline">
+                  <input type="checkbox" checked="">
+                  Authorizations
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-inline">
+                  <input type="checkbox">
+                  Company
+                </label>
+              </li>
+            </ul>
+            <button class="btn btn-small btn-info">Set fields</button>
+          </div>
+        </li>
+        -->
+        {{#if add_item_view}}
+          <li>
+            {{{renderLive add_item_view}}}
+          </li>
+        {{/if}}
+      </ul>
+    </div>
+  </div>
+</header>
+<div class="clearfix"></div>

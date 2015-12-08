@@ -1,0 +1,20 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{> /static/mustache/base_objects/dropdown_menu_tier2.mustache}}
+
+<div class="tier-content">
+  {{#if instance.email}}
+    <div class="row-fluid wrap-row">
+      <h6>Email</h6>
+      <p>
+        {{{render '/static/mustache/people/popover.mustache' person=instance show_email=true}}}
+      </p>
+    </div>
+  {{/if}}
+  {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
+</div>

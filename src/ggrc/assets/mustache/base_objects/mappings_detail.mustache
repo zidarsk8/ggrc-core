@@ -1,0 +1,34 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#if_result_has_extended_mappings result.bindings_compute parent_instance}}
+<div class="row-fluid wrap-row">
+  This {{instance.class.title_singular}} is mapped to
+  {{#each_with_extras_as "binding" result.bindings_compute}}
+    {{#unless isFirst}}{{#if isLast}}and{{/if}}{{/unless}}
+    {{#if_equals binding.instance parent_instance}}
+    this {{parent_instance.class.title_singular}}{{#if isLast}}.{{else}},{{/if}}
+    {{else}}
+    {{#if_instance_of binding.instance "Section"}}
+    <i class="grcicon-{{binding.instance.class.table_singular}}-color"></i><b href="{{link_to_tree binding.instance.directive binding.instance}}">{{binding.instance.title}}</b>
+    {{#if binding.instance.directive}}
+      of
+      {{#using directive=binding.instance.directive}}
+        <i class="grcicon-{{directive.class.table_singular}}-color"></i><b href="{{link_to_tree directive}}">{{directive.title}}</b>{{#if isLast}}.{{else}},{{/if}}
+      {{/using}}
+    {{/if}}
+    {{else}}
+    {{#if_instance_of binding.instance 'Response'}}
+    a <b>{{binding.instance.class.title_singular}}</b> in <i class="grcicon-audit-color"></i><b>{{#using request=binding.instance.request}}{{#using audit=request.audit}}{{audit.title}}{{/using}}{{/using}}</b>{{#if isLast}}.{{else}},{{/if}}
+    {{else}}
+    <i class="grcicon-{{binding.instance.class.table_singular}}-color"></i><b href="{{link_to_tree binding.instance}}">{{binding.instance.title}}</b>{{#if isLast}}.{{else}},{{/if}}
+    {{/if_instance_of}}
+    {{/if_instance_of}}
+    {{/if_equals}}
+  {{/each_with_extras_as}}
+</div>
+{{/if_result_has_extended_mappings}}

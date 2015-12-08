@@ -1,0 +1,190 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<ul class="tree-structure new-tree">
+  {{#list}}
+    {{#person}}
+    <li data-model="true" {{data 'person'}} class="tree-item person">
+      <div class="item-main">
+        <div class="openclose">
+          <div class="row-fluid">
+            <div class="span12">
+
+              <ul class="tree-action-list">
+                {{#if roles.length}}
+                  <li>
+                    <div class="item-data">
+                      <div class="tree-title-area">
+                        <span class="role" title="{{#roles}}{{role.permission_summary}} {{/roles}}">
+                          {{#if_helpers '\
+                            #if_equals' roles.0.role.permission_summary 'Mapped' '\
+                            and ^if_equals' roles.length 1}}
+                            {{roles.1.role.permission_summary}}
+                          {{else}}
+                            {{roles.0.role.permission_summary}}
+                          {{/if_helpers}}
+                          {{#roles.1}}
+                            {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
+                              {{^if_equals roles.length 2}}
+                                + {{sum roles.length '-2'}}
+                              {{/if_equals}}
+                            {{else}}
+                              + {{sum roles.length '-1'}}
+                            {{/if_in_map}}
+                          {{/roles.1}}
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                  {{else}}
+                  <li>
+                    <div class="item-data">
+                      <div class="tree-title-area">
+                        <span class="no-role">
+                          No Access
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                {{/if}}
+              </ul>
+
+              <div class="item-data">
+                <div class="tree-title-area">
+                  {{{render '/static/mustache/people/popover.mustache' person=this}}}
+                  {{#if_match name '\\\\S'}}
+                    {{#name}}
+                      <span class="email">{{email}}</span>
+                    {{/name}}
+                  {{/if_match}}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tier-2-info item-content">
+        <div class="tier-2-info-content">
+          <div class="row-fluid">
+            <div class="span6">
+              <div class="profile-info">
+                <ul>
+                  {{#if_match name '\\\\S'}}
+                    {{#name}}
+                      <li>
+                        <span class="name">
+                          <strong>{{name}}</strong>
+                        </span>
+                      </li>
+                    {{/name}}
+                  {{/if_match}}
+                  {{#if_match email '\\\\S'}}
+                    {{#email}}
+                      <li>
+                        <span class="email">
+                          <strong>Email:</strong> <a href='mailto:{{email}}' rel='tooltip' title='{{email}}' target="_blank">{{email}}</a>
+                        </span>
+                      </li>
+                    {{/email}}
+                  {{/if}}
+                  {{#if_match company '\\\\S'}}
+                    {{#company}}
+                      <li>
+                        <span class="company">
+                          <strong>Company:</strong> {{company}}
+                        </span>
+                      </li>
+                    {{/company}}
+                  {{/if_match}}
+                  <li>
+                    <ul>
+                    {{#roles}}
+                      {{#if_helpers '\
+                        ^if_equals' role.permission_summary 'Mapped' '\
+                        or #if_equals' roles.length 1}}
+                        <li class="role">
+                          {{role.permission_summary}}{{#if_equals role.permission_summary 'Auditor'}}: {{#with_mapping 'audit_via_context' user_role}}{{audit_via_context.0.instance.title}}{{/with_mapping}}{{/if_equal}}
+                        </li>
+                      {{/if_helpers}}
+                    {{/roles}}
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="span6 info person-info">
+              <div>
+                {{#is_allowed 'create' 'delete' 'UserRole' context=parent_instance.context.id}}
+                <div class="pull-right">
+                  <a class="info-edit" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}" href="javascript://" rel="tooltip" title="Edit Authorizations">
+                    <i class="grcicon-role-color"></i> <span>Edit Authorizations</span>
+                  </a>
+                </div>
+                {{/is_allowed}}
+              </div>
+              {{#roles}}
+              {{#if_helpers '\
+                #if_equals' role.permission_summary 'Mapped' '\
+                and #if' allow_mapping '\
+                and #if' user_role.result.mappings '\
+                and #is_allowed_all' 'delete' user_role.result.mappings}}
+                <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
+                  {{#user_role.result}}<span class="result" {{data 'result'}}></span>{{/user_role.result}}
+                  <i class="grcicon-remove"></i>
+                  Unmap
+                </a>
+              {{/if_helpers}}
+              {{/roles}}
+            </div>
+          </div>
+          {{#roles}}
+            {{#if_equals role.permission_summary 'Mapped'}}
+              {{{render '/static/mustache/base_objects/mappings_detail.mustache' result=user_role.result parent_instance=parent_instance}}}
+            {{/if_equals}}
+          {{/roles}}
+          <div class="row-fluid">
+            <div class="span6">
+              <div>
+                <a href="/people/{{id}}" class="info-action">
+                  <i class="grcicon-goto"></i>
+                  View Profile Page
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    {{/person}}
+  {{/list}}
+  {{#if allow_mapping}}
+  {{#is_allowed_to_map parent_instance model.shortName}}
+  <li class="tree-footer tree-item tree-item-add">
+    <div class="row-fluid">
+      <div class="span12">
+
+        <a
+          href="javascript://"
+          rel="tooltip"
+          data-placement="left"
+          data-toggle="unified-mapper"
+          data-join-mapping="{{mapping}}"
+          data-join-option-type="{{model.shortName}}"
+          data-join-object-id="{{parent_instance.id}}"
+          data-join-object-type="{{parent_instance.class.shortName}}"
+          data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
+          Map {{model.title_singular}}
+        </a>
+
+      </div>
+    </div>
+  </li>
+  {{/is_allowed_to_map}}
+  {{/if}}
+</ul>

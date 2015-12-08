@@ -1,0 +1,34 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{! transcluded via renderLive in, for example, assets/mustache/sections/tier2_content.mustache }}
+{{#instance}}
+  <div class="pane-header">
+    <div class="row-fluid wrap-row">
+      <div data-test-id="title_0ad9fbaf" class="span9">
+        <h6>Title</h6>
+        <h3>{{title}}</h3>
+        {{#if status}}
+          <span class="state-value state-{{to_class status '_'}}">{{un_camel_case status}}</span>
+        {{/if}}
+        {{#if type}}
+        <p>
+          {{type.title}}
+        </p>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+  <div data-test-id="title_review_0ad9fbaf" class="row-fluid wrap-row">
+    <div class="span12">
+      <h6>Object Review</h6>
+      {{#if class}}
+        {{{render_hooks instance.class.shortName 'info_widget_actions'}}}
+      {{/if}}
+    </div>
+  </div>
+{{/instance}}

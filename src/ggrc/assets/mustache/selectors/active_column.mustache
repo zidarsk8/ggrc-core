@@ -1,0 +1,33 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<div class="selector-info">
+  <h4>
+    <i class="grcicon-user-black"></i>
+    Related {{related_title_plural}} ({{joins.length}})
+  </h4>
+  <ul class="linked-people">
+    {{#actives}}
+    <li class="{{#if _removed}}removed{{/if}}">
+      {{!<select class="role pull-right">
+        <option>
+          Accountable
+        </option>
+        <option>
+          Responsible
+        </option>
+      </select>}}
+      <a class="jump-to-control" href="javascript://">
+        <span>
+          {{option.title}}
+          &nbsp;
+        </span>
+      </a>
+    </li>
+    {{/actives}}
+  </ul>
+</div>

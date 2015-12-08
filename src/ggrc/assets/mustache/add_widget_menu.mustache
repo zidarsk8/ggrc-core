@@ -1,0 +1,18 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#categories}}
+    <li class="title">{{title}} Widgets</li>
+    {{#objects}}
+    <li class="{{widget_id}}">
+      <a href="javascript://">
+        {{widget_name}}
+      </a>
+    </li>
+    {{/objects}}
+    <li class="divider"></li>
+{{/categories}}

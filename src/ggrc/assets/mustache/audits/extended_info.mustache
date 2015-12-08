@@ -1,0 +1,125 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#instance}}
+  <div class="row-fluid">
+    <div class="span12">
+      {{#using program=instance.program}}
+        <a class="main-title {{instance.class.category}} oneline" href="{{#is_allowed 'view_object_page' 'Program' context=program.context}}{{viewLink}}{{else}}/dashboard#audit_widget/audit/{{id}}{{/is_allowed}}">
+          {{instance.title}}
+        </a>
+      {{/using}}
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span9">
+      <h6>Description</h6>
+      <div class="rtf">
+        {{{firstnonempty description '<em>No description</em>'}}}
+      </div>
+    </div>
+    <div class="span3">
+      <h6>Status</h6>
+      <p>
+        {{status}}
+      </p>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      <h6>Audit Lead</h6>
+      <p>
+        {{#if instance.contact}}
+          {{#using contact=instance.contact}}
+          {{firstnonempty contact.name contact.email}}
+          {{/using}}
+        {{else}}
+          Not assigned
+        {{/if}}
+      </p>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span3">
+      <h6>Start date</h6>
+      <p>
+        {{#if instance.start_date}}
+          {{localize_date instance.start_date}}
+        {{else}}
+          Not set
+        {{/if}}
+      </p>
+    </div>
+    <div class="span3">
+      <h6>End date</h6>
+      <p>
+        {{#if instance.end_date}}
+          {{localize_date instance.end_date}}
+        {{else}}
+          Not set
+        {{/if}}
+      </p>
+    </div>
+    <div class="span6">
+      <h6>Report period</h6>
+      <p>
+        {{#if instance.report_start_date}}
+          {{#if instance.report_end_date}}
+            {{localize_date instance.report_start_date}}-{{localize_date instance.report_end_date}}
+          {{else}}
+            Starts {{localize_date instance.report_start_date}}
+          {{/if}}
+        {{else}}
+          {{#if instance.report_end_date}}
+            Ends {{localize_date instance.report_end_date}}
+          {{else}}
+            Not set
+          {{/if}}
+        {{/if}}
+      </p>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span6">
+      <h6>Auditor</h6>
+      <p>
+        {{! `with_auditors` requires `authorizations` mapping, so preload it }}
+        {{#with_mapping 'authorizations' instance}}
+          {{#with_auditors instance decoy=authorizations}}
+            {{#using auditor=auditors.0.person}}
+              {{{firstnonempty auditor.name auditor.email 'Not assigned'}}}
+            {{/using}}
+          {{else}}
+            Not assigned
+          {{/with_auditors}}
+        {{/with_mapping}}
+      </p>
+    </div>
+    <div class="span6">
+      <h6>Audit firm</h6>
+      <p>
+        {{#using firm=instance.audit_firm}}
+          {{{firstnonempty firm.title 'None'}}}
+        {{/using}}
+      </p>
+    </div>
+  </div>
+
+  <div class="links">
+    <div class="row-fluid">
+      <div class="span12">
+        {{#using program=instance.program}}
+          <a class="secondary oneline {{instance.class.category}}" href="{{#is_allowed 'view_object_page' 'Program' context=program.context}}{{program.viewLink}}{{else}}/dashboard{{/is_allowed}}#audit_widget/audit/{{id}}">
+            View {{instance.title}}
+          </a>
+        {{/using}}
+      </div>
+    </div>
+  </div>
+{{/instance}}

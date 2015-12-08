@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+
+if [[ -z "$1" ]]
+then
+  echo "Usage: `basename ${0}` <deployment_settings_file>"
+  exit
+fi
+
+cd "${SCRIPTPATH}/.."
+
+git show --oneline | head -1 > tmp/last_commit
+git pull -q
+git show --oneline | head -1 > tmp/next_commit
+
+mkdir -p tmp
+if diff tmp/last_commit tmp/next_commit; then
+  true
+else
+  date
+  bin/deploy_appengine "$1"
+fi

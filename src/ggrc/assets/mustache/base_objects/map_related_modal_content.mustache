@@ -1,0 +1,58 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{!<div class="modal-body">}}
+
+<div class="row-fluid">
+
+  {{#page_object}}
+  <div class="span4 detail_column {{class.model_singular.toLowerCase}}">
+    <input type="hidden" name="source.type" value="{{class.model_singular}}"/>
+    <input type="hidden" name="source.id" value="{{id}}"/>
+    <div class="selector-info centered">
+        <h4 class="{{class.category}}">
+          <i class="grcicon-{{class.model_singular.toLowerCase}}-color"></i>
+          {{class.title_singular}}
+        </h4>
+        <br>
+        {{ title }}
+        <br>
+        {{ link }}
+        <br>
+    </div>
+  </div>
+  {{/page_object}}
+
+  <div class="span4 option_column">
+    {{#relationships}}
+    <input type="radio" name="relationship_type_id" value="{{id}}">
+    <span>{{name}}</span>
+    <br>
+    {{/relationships}}
+  </div>
+
+  {{#related_object}}
+  <div class="span4 detail_column {{class.model_singular.toLowerCase}}">
+    <input type="hidden" name="destination.type" value="{{class.model_singular}}"/>
+    <input type="hidden" name="destination.id" value="{{id}}"/>
+    <div class="selector-info centered">
+        <h4 class="{{class.category}}">
+          <i class="grcicon-{{class.model_singular.toLowerCase}}-color"></i>
+          {{class.title_singular}}
+        </h4>
+        <br>
+        {{ title }}
+        <br>
+        {{ link }}
+        <br>
+    </div>
+  </div>
+  {{/related_object}}
+
+  <input type="hidden" name="context.id" value="{{determine_context page_object related_object}}" />
+</div>
+{{!</div>}}

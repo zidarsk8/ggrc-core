@@ -1,0 +1,90 @@
+# # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+#
+# See https://developers.google.com/appengine/docs/python/config/appconfig
+
+application: {APPENGINE_INSTANCE}
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+instance_class: {INSTANCE_CLASS}
+manual_scaling:
+  instances: {MAX_INSTANCES}
+
+handlers:
+  - url: /login
+    script: ggrc.app.app.wsgi_app
+    login: required
+    secure: always
+
+  - url: /_background_tasks/.*
+    script: ggrc.app.app.wsgi_app
+    login: admin
+    secure: always
+
+  - url: /notify_emaildigest
+    script: ggrc.app.app.wsgi_app
+    login: admin
+    secure: always
+
+#  - url: /notify_email_deferred
+#    script: ggrc.app.app.wsgi_app
+#    login: admin
+#    secure: always
+
+  - url: /.*
+    script: ggrc.app.app.wsgi_app
+    secure: always
+
+libraries:
+  - name: MySQLdb
+    version: "latest"
+  - name: jinja2
+    version: "2.6"
+
+builtins:
+- remote_api: on
+
+# Don't upload some files
+#  - note the first 9 items are defaults, see:
+#    https://developers.google.com/appengine/docs/python/config/appconfig#Skipping_Files
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+# Custom GGRC excludes here
+- requirements\.txt
+- requirements\.txt\.md5
+- dev-requirements\.txt
+- migrations/.*
+- tests/.*
+- service_specs/.*
+- assets/.*
+- reports/.*
+
+# Define certain environment variables
+env_variables:
+  GGRC_SETTINGS_MODULE: "{SETTINGS_MODULE}"
+  GGRC_DATABASE_URI: "{DATABASE_URI}"
+  GGRC_SECRET_KEY: "{SECRET_KEY}"
+  GGRC_GOOGLE_ANALYTICS_ID: "{GOOGLE_ANALYTICS_ID}"
+  GGRC_GOOGLE_ANALYTICS_DOMAIN: "{GOOGLE_ANALYTICS_DOMAIN}"
+  GGRC_GAPI_KEY: "{GAPI_KEY}"
+  GGRC_GAPI_CLIENT_ID: "{GAPI_CLIENT_ID}"
+  GGRC_GAPI_CLIENT_SECRET: "{GAPI_CLIENT_SECRET}"
+  GGRC_GAPI_ADMIN_GROUP: "{GAPI_ADMIN_GROUP}"
+  GGRC_BOOTSTRAP_ADMIN_USERS: "{BOOTSTRAP_ADMIN_USERS}"
+  GGRC_RISK_ASSESSMENT_URL: "{RISK_ASSESSMENT_URL}"
+  APPENGINE_EMAIL: "{APPENGINE_EMAIL}"
+  GGRC_CUSTOM_URL_ROOT: "{CUSTOM_URL_ROOT}"
+  MAX_INSTANCES: "{MAX_INSTANCES}"
+  AUTHORIZED_DOMAINS: "{AUTHORIZED_DOMAINS}"

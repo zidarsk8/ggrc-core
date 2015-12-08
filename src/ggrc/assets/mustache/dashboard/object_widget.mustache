@@ -1,0 +1,62 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{!section class="widget... }}
+  {{#if_equals widget_id "roles_list"}}
+    <header class="header tree-header no-left-space {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="title-heading oneline">
+            Role
+          </div>
+        </div>
+        <div class="span6">
+          <div class="title-heading oneline right">
+            Role Scope
+          </div>
+        </div>
+      </div>
+    </header>
+  {{/if_equals}}
+
+  {{#if_equals widget_id "custom_attribute"}}
+  {{^is_dashboard}}
+    <header class="header">
+      <h2>
+        <i class="grcicon-workflow-color"></i>
+        {{{widget_name}}}
+      </h2>
+    </header>
+  {{/is_dashboard}}
+  {{/if_equals}}
+
+  {{#if_equals widget_id "events_list"}}
+  {{^is_dashboard}}
+    <header class="header">
+      <h2>
+        <i class="grcicon-event-color"></i>
+        {{{widget_name}}}
+      </h2>
+    </header>
+  {{/is_dashboard}}
+  {{/if_equals}}
+
+  {{#if_equals widget_id "info"}}
+  {{^is_dashboard}}
+    <header class="header">
+      <h2>
+        <i class="{{widget_icon}}"></i>
+        {{{widget_name}}}
+      </h2>
+    </header>
+  {{/is_dashboard}}
+  {{/if_equals}}
+
+  <section class="content">
+    {{{widget_initial_content}}}
+  </section>
+{{!/section}}

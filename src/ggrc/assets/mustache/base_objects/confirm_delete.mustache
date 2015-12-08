@@ -1,0 +1,26 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<div class="centered">
+<p>
+{{#instance}}
+Are you sure you want to delete 
+  <span class="user-string">
+    {{#if display_name}}
+      {{display_name}}?
+    {{else}}
+      this {{type_to_readable instance.type}}?
+    {{/if}}
+  </span>
+  {{#if delete_counts.loading}}
+	<br/><span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block;' }}></span>
+  {{else}}
+	<br/>{{delete_counts.counts}}
+  {{/if}}
+{{/instance}}
+</p>
+</div>

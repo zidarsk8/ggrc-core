@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: dan@reciprocitylabs.com
+    Maintained By: dan@reciprocitylabs.com
+}}
+
+<form action="javascript://">
+  <div class="row-fluid">
+    <div class="span12">
+      <input id="task_id" name="cycle_task_group_object_task" type="hidden" model="CycleTaskGroupObjectTask" value="{{firstnonempty instance.cycle_task_group_object_task.id object_params.cycle_task_group_object_task}}">
+      <input id="cycle_id" name="cycle" type="hidden" model="Cycle" value="{{firstnonempty instance.cycle.id object_params.cycle}}">
+      <input id="context_id" name="context" type="hidden" model="Context" value="{{firstnonempty instance.context.id object_params.context}}">
+      <input id="is_declining_review" name="is_declining_review" type="hidden" value="{{firstnonempty instance.is_declining_review object_params.is_declining_review}}">
+      <label for="program_description">
+        Comment
+        <span class="required">*</span>
+        <i class="grcicon-help-black" rel="tooltip" title="Commentary goes here"></i>
+      </label>
+      <div class="wysiwyg-area">
+        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Comments" tabindex="2" autofocus>{{instance.description}}</textarea>
+      </div>
+    </div>
+  </div>
+</form>

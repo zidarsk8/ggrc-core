@@ -1,0 +1,28 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
+
+"""Add RiskAssessment.template_id
+
+Revision ID: 160cd75171ac
+Revises: 236bd544d592
+Create Date: 2014-01-16 23:03:02.385367
+
+"""
+
+# revision identifiers, used by Alembic.
+revision = '160cd75171ac'
+down_revision = '236bd544d592'
+
+from alembic import op
+import sqlalchemy as sa
+
+
+def upgrade():
+    op.add_column('risk_assessments', sa.Column('template_id', sa.Integer(), nullable=False))
+
+
+def downgrade():
+    op.drop_column('risk_assessments', 'template_id')

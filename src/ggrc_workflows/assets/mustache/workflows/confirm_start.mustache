@@ -1,0 +1,33 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: laran@reciprocitylabs.com
+    Maintained By: laran@reciprocitylabs.com
+}}
+
+<div class="centered">
+{{#instance}}
+<form>
+  {{#defer 'is_mid_frequency' instance.is_mid_frequency spinner=true}}
+  <p>
+    {{^if is_mid_frequency}}
+      By clicking "Proceed",
+    {{/if}}
+    {{instance.task_groups.length}} task group{{^if_equals instance.task_groups.length 1}}s{{/if_equals}} will be started,
+    tasks will be assigned and notifications will be sent.
+  </p>
+
+  {{#if is_mid_frequency}}
+  <p>
+    {{!
+      TODO: Fix for CORE-1678, our current/next start date isn't working as expected
+    }}
+    Are you sure you want to generate a cycle?
+  </p>
+  {{/if}}
+  {{else}}
+  <span {{attach_spinner '{ "radius": 5, "length": 5, "width": 3 }' 'display:inline-block; margin: 15px;' }}></span>
+  {{/defer}}
+</form>
+{{/instance}}
+</div>

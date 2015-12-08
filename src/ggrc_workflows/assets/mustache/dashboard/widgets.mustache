@@ -1,0 +1,34 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+<!-- Right side workflow and task trees area -->
+<dashboard-widgets class="span{{#system_role 'No Access'}}12{{/system_role}}{{^system_role 'No Access'}}9{{/system_role}} content-wrap">
+    <div class="inner-content">
+      <section class="widget dashboard small-margin">
+        <header class="header widget-nav">
+          <div class="row-fluid">
+            <div class="span12">
+              <ul>
+                <li class="active workflow-tab">
+                  <a href="javascript://">
+                    My Workflows ({{workflow_count}})
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </header>
+        <section class="content">
+          {{{ renderLive workflow_view }}}
+          {{#workflow_show_all}}
+            <a href="javascript://" class="workflow-trigger show-all">Show all my workflows</a>
+          {{/workflow_show_all}}
+        </section>
+      </section><!-- Widget end -->
+
+    </div><!-- inner-content end -->
+</dashboard-widgets>

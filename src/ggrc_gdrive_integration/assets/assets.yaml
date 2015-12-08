@@ -1,0 +1,28 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
+dashboard-js-files:
+  - models/gdrive_models.js
+  - models/gcal_models.js
+  - controllers/gapi_controllers.js
+  - apps/gdrive.js
+  - controllers/gdrive_workflows_controller.js
+  - mustache_helpers.js
+
+dashboard-js-spec-files:
+  - models/gdrive_models_spec.js
+  - controllers/gdrive_workflows_controller_spec.js
+
+dashboard-js-template-files:
+  - responses/gdrive_upload_evidence.mustache
+  - responses/gdrive_evidence_tree.mustache
+  - meetings/gcal_info.mustache
+  - people/gplus_actions.mustache
+  - people/gplus_photo.mustache
+  - gdrive/auth_button.mustache
+  - gdrive/gapi_errors.mustache
+  - gdrive/gdrive_folder.mustache
+  - gdrive/gdrive_file.mustache
+  - roles/gdrive_option_detail.mustache

@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+  <div class="row-fluid">
+    <div class="span8">
+      <div class="tree-info">
+        <strong>gCal Event Link: </strong>
+        {{#with_mapping 'events' instance}}
+          {{#if events.length}}
+          <a href="javascript://" class="show-meeting" {{#instance}}{{data 'model'}}{{/instance}} {{#events.0.instance}}{{data 'cev'}}{{/events.0.instance}}>
+            {{events.0.instance.summary}}
+          </a>
+          {{else}}
+            <a href="javascript://" class="create-meeting" {{#instance}}{{data 'model'}}{{/instance}}>
+              Create Google Calendar meeting
+            </a>
+          {{/if}}
+        {{/with_mapping}}
+      </div>
+    </div>
+  </div>

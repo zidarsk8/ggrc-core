@@ -1,0 +1,33 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: swizec@reciprocitylabs.com
+}}
+
+{{#each items}}
+<li class="ui-menu-item" {{data 'ui-autocomplete-item'}}>
+  <a href="javascript://" class='show-extended' {{data 'model'}}>
+    {{title}}
+  </a>
+</li>
+{{/each}}
+{{^items}}
+  <li class="ui-menu-item" data-ui-autocomplete-item="">
+    No results
+  </li>
+{{/items}}
+{{#if items_loading}}
+  <li class="spinner ui-menu-item" data-ui-autocomplete-item="">
+    <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+  </li>
+{{/if}}
+{{#if model}}
+{{#is_allowed "create" model.shortName context=null}}
+<li class="ui-menu-item add-new oneline" data-ui-autocomplete-item="">
+  <a data-object-plural="{{model.table_plural}}" data-modal-class="modal-wide" href="javascript://" data-object-singular="{{model.model_singular}}" data-toggle="modal-ajax-form" data-modal-reset="reset" data-mapping="{{mapping}}">
+    + Create New
+  </a>
+</li>
+{{/is_allowed}}
+{{/if}}

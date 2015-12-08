@@ -1,0 +1,4 @@
+#! /usr/bin/env bash
+bn=`git log --oneline | wc -l | tr -d ' '`
+echo "BUILD_NUMBER=\"${bn}\"" > src/ggrc/settings/build_number.py
+echo "Local build number set to ${bn}"

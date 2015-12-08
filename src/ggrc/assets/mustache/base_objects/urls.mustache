@@ -1,0 +1,33 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#instance}}
+  <div class="row-fluid wrap-row">
+    <div data-test-id="title_program_url_aa7d1a65" class="span6">
+      <h6>
+        {{firstnonempty constructor.title_singular}}
+        URL
+      </h6>
+      <p>
+        <a data-test-id="text_program_url_aa7d1a65" class="url"
+           href="{{schemed_url url}}" target="_blank">
+          {{url}}
+        </a>
+      </p>
+    </div>
+    <div data-test-id="title_reference_url_aa7d1a65" class="span6">
+      <h6>Reference URL</h6>
+      <p>
+        <a data-test-id="text_reference_url_aa7d1a65" class="url"
+           href="{{schemed_url reference_url}}" target="_blank">
+          {{reference_url}}
+        </a>
+      </p>
+    </div>
+  </div>
+  
+{{/instance}}

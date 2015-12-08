@@ -1,0 +1,75 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: Sasmita
+    Maintained By: Sasmita
+}}
+
+
+{{#each options}}
+<li class="tree-item control governance task-item"
+  data-object-type="{{instance.class.table_singular}}"
+  {{#instance}}{{ data 'option' }}{{/instance}}
+  data-id="{{ instance.id }}">
+    <div class="item-main">
+      <div class="item-wrap">
+        {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
+        <div class="select">
+          <div class="item-data">
+            <div class="row-fluid">
+              <div class="span8">
+                <div class="tree-title-area">
+                  <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                  {{#if instance.name}}{{instance.name}}{{/if}}
+                  <span class="url-link">
+                    {{#if instance.email}}{{instance.email}}{{/if}}
+                  </span>
+                  {{#if_equals system_wide_role 'No Access'}}
+                    <span class="user-disabled">
+                      (No Access)
+                    </span>
+                  {{/if}}
+                </div>
+              </div> <!-- span8 end -->
+              <div class="span4">
+                <div class="show-details">
+                  {{#if instance.viewLink}}
+                    {{#is_allowed "view_object_page" instance}}
+                      <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                    {{/is_allowed}}
+                  {{/if}}
+                </div>
+              </div>
+            </div> <!-- row-fluid end -->
+          </div> <!-- item-data end-->
+        </div> <!-- select end -->
+      </div> <!-- item-wrap end -->
+    </div> <!-- item-main end -->
+
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        {{#find_template 'tier2_content' instance}}
+          {{{renderLive template}}}
+        {{else}}
+          <div class="tier-content">
+            <div class="row-fluid wrap-row">
+            {{#instance}}
+              <h6>Email</h6>
+              <span class="person-holder">
+                <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">
+                  {{firstnonempty email}}
+                </span></a>
+                {{#if_equals system_wide_role 'No Access'}}
+                  <span class="user-disabled">
+                    (No Access)
+                  </span>
+                {{/if}}
+              </span>
+            {{/instance}}
+            </div>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+</li>
+{{/each}}

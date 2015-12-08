@@ -1,0 +1,38 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+
+-extends 'layouts/_widget_box.haml'
+
+-set all_role_assignments = authorized_users_for(instance.context)
+
+-block widget_title
+  %i.grcicon-role-color
+  Authorizations
+
+-block widget_help
+  program_role_assignments
+
+-block widget_id
+  program_role_assignments_widget
+
+-block widget_actions
+  .widget-action.pull-right
+    %a.pull-right{ 'href': 'javascript://', 'data-toggle': 'user-roles-modal-selector', 'data-modal-selector-options': 'user_roles', 'data-list-target': 'refresh', 'data-modal-class': 'modal-wide', 'rel': 'tooltip', 'data-placement': 'left', 'title': 'Authorize People' }
+      %i.grcicon-link
+
+-block main
+  %ul.tree-structure.new-tree
+    -for email,assignments in all_role_assignments.items()
+      %li{ 'data-id': '={ email }', 'class': 'tree-item program' }
+        .item-main
+          .simple-link
+            .row-fluid
+              .span12
+                .item-data
+                  .tree-title-area
+                    =email
+                    %span.role
+                      =assignments|join(', ', attribute='name')
+

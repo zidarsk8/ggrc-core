@@ -1,0 +1,22 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{!div class="modal-footer"}}
+  <div class="row-fluid">
+    <div class="span3">
+      &nbsp;
+    </div>
+    <div class="span6">
+      &nbsp;
+    </div>
+    <div class="span3">
+      <div class="confirm-buttons">
+        <a class="btn btn-small btn-success preventdoubleclick {{#instance.computed_unsuppressed_errors}}disabled{{/instance.computed_unsuppressed_errors}}" data-toggle="modal-submit" href="javascript://">{{firstnonempty custom_save_button_text 'Save'}}</a>
+      </div>
+    </div>
+  </div>
+{{!/div}}

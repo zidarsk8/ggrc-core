@@ -1,0 +1,109 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: miha@reciprocitylabs.com
+    Maintained By: miha@reciprocitylabs.com
+}}
+
+<div class="inline-filtering sticky-filter search-filters">
+  <form class="form-search" onsubmit="return false" autocomplete="off">
+    <div class="row-fluid">
+      <div class="span3">
+        <div class="filter-title">
+          <h6>
+            Filter People
+          </h6>
+        </div>
+      </div>
+      <div class="span9">
+        <ul class="quick-filters">
+          <li>
+            <label>
+              By Name
+            </label>
+            <input name="search" type="text" value="" class="input-medium" value="{{search_query}}" placeholder="By name, email or company">
+          </li>
+          <li>
+            <label>
+              By Roles
+            </label>
+            <select name="user_role">
+              <option value="" selected>All Roles</option>
+              {{#roles}}
+                <option value="{{id}}">{{name}}</option>
+              {{/roles}}
+            </select>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </form>
+</div>
+
+<header class="header tree-header">
+  <div class="row-fluid">
+    <div class="span4">
+      <div class="title-heading oneline">
+        {{far_model.title_singular}} Name
+      </div>
+    </div>
+    <div class="span4">
+      <div class="oneline">
+        Email
+      </div>
+    </div>
+    <div class="span2">
+      <div class="oneline">
+        Authorizations
+      </div>
+    </div>
+    <div class="span2">
+      <ul class="tree-action-list">
+        {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
+        <!-- Temporary hidden. Do not remove this.
+        <li>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+          <div class="dropdown-menu dropdown-menu-form">
+            <h5>Set visible fields</h5>
+            <ul class="attr-list">
+              <li class="disabled">
+                <label class="checkbox-inline">
+                  <input type="checkbox" checked="" disabled="">
+                  Name
+                </label>
+              </li>
+              <li class=" disabled">
+                <label class="checkbox-inline">
+                  <input type="checkbox" checked="" disabled="">
+                  Email
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-inline">
+                  <input type="checkbox" checked="">
+                  Authorizations
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-inline">
+                  <input type="checkbox">
+                  Company
+                </label>
+              </li>
+            </ul>
+            <button class="btn btn-small btn-info">Set fields</button>
+          </div>
+        </li>
+        -->
+
+        <li>
+          <a href="javascript://" rel="tooltip" data-placement="left" data-original-title="Add Person" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Person" data-object-plural="people">
+            <i class="grcicon-add-black"></i>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</header>
+<div class="clearfix"></div>

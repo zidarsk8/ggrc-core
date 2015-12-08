@@ -1,0 +1,70 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+<custom-attributes instance="instance" load="true">
+  {{#if loading}}
+  <div class="row-fluid">
+    <div class="span12">
+      Loading Custom Attributes...<span  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' 'display:inline-block; top: -6px; left: 20px;' }}></span>
+    </div>
+  </div>
+  {{else}}
+    {{#if instance.custom_attribute_definitions.length}}
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="info-expand-custom">
+          <a data-test-id="button_custom_attrs_cf47bc01" class="show-hidden-fields
+             info-show-hide-cusotm"
+             href="javascript://">
+            <span class="out">
+              <i class="grcicon-arrow-right"></i>
+              Show
+            </span>
+            <span class="in">
+              <i class="grcicon-arrow-bottom"></i>
+              Hide
+            </span>
+            Custom Attributes
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden-fields-area-custom" style="display:none;">
+        {{#iterate_by_two instance.custom_attribute_definitions}}
+          <div class="row-fluid wrap-row">
+          {{#list}}
+            <div class="span6">
+              <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
+                {{#with_value_for_id id}}
+                  {{#switch attribute_type}}
+                  {{#case 'Checkbox'}}
+                    <h6>
+                      <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+                      {{title}}
+                    </h6>
+                  {{/case}}
+                  {{#case 'Rich Text'}}
+                    <h6>{{title}}</h6>
+                    {{{value}}}
+                  {{/case}}
+                  {{#default}}
+                    <h6>{{title}}</h6>
+                    {{value}}
+                  {{/default}}
+                  {{/switch}}
+                {{/with_value_for_id}}
+              </div>
+            </div>
+          {{/list}}
+          </div>
+        {{/instance.custom_attribute_definitions}}
+      </div>
+    </div>
+    {{/if}}
+  {{/loading}}
+</custom-attributes>

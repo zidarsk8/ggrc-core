@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+
+{{#instance}}   
+<!--p class="oneline"-->
+  Owned by: 
+  {{#with_mapping 'authorizations' instance}}
+    {{#each authorizations}}
+    <span>
+      {{#using role=instance.role}}
+        {{#if_equals role.name 'WorkflowOwner'}}
+          {{#using contact=instance.person}}
+            {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+          {{/using}}
+        {{/if_equals}}
+      {{/using}}
+    </span>
+    {{/each}}
+  {{/with_mapping}}
+<!--/p-->  
+{{/instance}}

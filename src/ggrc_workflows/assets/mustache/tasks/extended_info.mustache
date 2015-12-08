@@ -1,0 +1,83 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+
+{{#instance}}
+{{!div class="extended"}}
+  <div class="row-fluid">
+    <div class="span12">
+      <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
+        {{title}}
+        {{#is_private}}
+          <i class="grcicon-private" rel="tooltip" title="Private"></i>
+        {{/is_private}}
+      </a>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="rtf">
+        <p>
+          {{{firstnonempty description '<i>No description</i>'}}}
+        </p>
+      </div>
+
+      {{^if_null url}}
+        <a class="url oneline" href="{{schemed_url url}}" target="_blank">
+          {{url}}
+        </a>
+      {{/if_null}}
+      {{#if_null url}}
+        <span class="no-url">No URL</span>
+      {{/if_null}}
+
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="code">
+        Code: {{slug}}
+      </div>
+    </div>
+  </div>
+
+  <div class="links">
+    <div class="row-fluid">
+      <div class="span6">
+        <a class="secondary" href="{{viewLink}}">
+          View {{class.title_singular}}
+        </a>
+      </div>
+      <div class="span6">
+      {{#with_page_object_as 'page_instance'}}
+        {{^if_equals instance page_instance}}
+          {{#with_direct_mappings_as 'mappings' page_instance instance}}
+            {{#if mappings.length}}
+              <span class="primary">
+                <i class="grcicon-checked"></i>
+                Relevant to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
+              </span>
+            {{else}}
+              {{#is_allowed_to_map page_instance instance join=true}}
+              <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
+                <i class="grcicon-reg-map"></i>
+                Map to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
+              </a>
+              {{/is_allowed_to_map}}
+            {{/if}}
+          {{/with_direct_mappings_as}}
+        {{/if_equals}}
+      {{/with_page_object_as}}
+      </div>
+    </div>
+  </div>
+
+
+
+{{!/div}}
+{{/instance}}

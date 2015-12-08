@@ -1,0 +1,26 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<h6>Object type</h6>
+{{#if option_type_menu}}
+  {{^if_equals option_type_count 1}}
+    <select class="input-block-level option-type-selector">
+      {{#option_type_menu}}
+        <optgroup label="{{category}}">
+          {{#items}}
+          <option
+            value="{{model_name}}"
+            label="{{model_display}}"
+            {{#if_equals model_name selected_option_type}}selected="selected"
+            {{/if_equals}}>
+          </option>
+          {{/items}}
+        </optgroup>
+      {{/option_type_menu}}
+    </select>
+  {{/if_equals}}
+{{/if}}

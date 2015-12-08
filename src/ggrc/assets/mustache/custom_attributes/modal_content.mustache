@@ -1,0 +1,82 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+
+{{#instance.class.is_custom_attributable}}
+<custom-attributes instance="instance">
+  <div class="hideable-holder bare">
+    <div class="row-fluid">
+      {{#each instance.custom_attribute_definitions}}
+      {{#with_value_for_id id}}
+
+      <div class="{{^mandatory}}hidable{{/mandatory}} span6">
+        {{#switch attribute_type}}
+        {{#case 'Text'}}
+          <label>
+            {{title}}
+            {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+            {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          </label>
+          <input tabindex="{{add_index 20 @index}}" data-ram="{{@index}}" class="input-block-level" value="{{value}}" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text">
+        {{/case}}
+        {{#case 'Rich Text'}}
+          <label>
+            {{title}}
+            {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+            {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          </label>
+          <div class="wysiwyg-area">
+            <textarea tabindex="{{add_index 20 @index}}" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{{value}}}</textarea>
+          </div>
+        {{/case}}
+        {{#case 'Dropdown'}}
+          <label>
+            {{title}}
+            {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+            {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          </label>
+          <select class="input-block-level" name="custom_attributes.{{id}}" null-if-empty="null-if-empty" tabindex="20">
+            <option value="" {{#if_equals "" value}}selected="true"{{/if_equals}}>---</option>
+            {{#iterate_string multi_choice_options ','}}
+              <option {{#if_equals iterator value}}selected="true"{{/if_equals}}>{{iterator}}</option>
+            {{/iterate}}
+          </select>
+        {{/case}}
+        {{#case 'Checkbox'}}
+          <label>&nbsp;</label>
+          <div class="checkbox-area">
+            <label>
+              <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" type="checkbox"  {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
+              {{title}}
+              {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+              {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+            </label>
+          </div>
+        {{/case}}
+        {{#case 'Date'}}
+        <label>
+          {{title}}
+          {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+          {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        </label>
+        <div class="date-area">
+          <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" value="{{value}}" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+        </div>
+        {{/case}}
+        {{/switch}}
+      </div>
+      {{/with_value_for_id}}
+      {{/instance.custom_attribute_definitions}}
+    </div>
+  </div>
+</custom-attributes>
+{{/instance.class.is_custom_attributable}}

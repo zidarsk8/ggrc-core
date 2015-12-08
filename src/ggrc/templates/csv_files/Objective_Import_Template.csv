@@ -1,0 +1,41 @@
+Type,{{object_kind}} Code,,,,,,,,,,
+Objectives,{{object_slug}},,,,,,,,,,
+*Rows 3 and 4 are ignored on import.  We use these rows to describe the legal values for cells above and below.,"*Type and <{{object_kind}} Code> are very important.  
+
+For Objective Import, Type should be ""Objectives"", in cell A2.
+
+Then copy the Code from your {{object_kind}} Info widget on your {{object_kind}} page in gGRC to cell B2 above",,,,,,,,,,
+"*Required
+
+If you have a standardized acronym or other specific reason for entering Codes manually, we recommend doing so.
+
+Enter the Codes for already existing objects if you want to use Import as a means to edit and update those objects.","*Required
+
+Objective Titles are required text fields.  You MUST fill in a title for all Objectives in order to import them.","*Optional
+
+Description is an optional text field.  If you have the description available, we recommend entering it now.  Otherwise, it can be filled in later after creating your control. ",*Optional.  Enter a valid URL,*Optional.  Enter a valid URL,"*Optional.  
+Use this text field to keep notes about this Objective","*Optional.
+
+Date fields should always follow standard formats such as year/month/date in the form of xxxx/xx/xx ","*Optional.
+
+Date fields should always follow standard formats such as year/month/date in the form of xxxx/xx/xx ","*Optional.  
+
+You can link Objectives to a Section/Clause on import by specifying the Section/Clause code.
+Examples:
+
+SECTION-1
+CLAUSE-2","*Optional.  
+
+You can link Controls to Objectives on import by specifying the Control code.  Use <option><return> to deliniate between Control Codes.
+Example:
+
+CONTROL-1
+CONTROL-2","*Optional.
+You can map a person to be the Owner/Person of Contact for the Control by enter an email address that already exists in your gGRC instance. Only 1 email address may be entered.
+
+Example:
+
+jeff@reciprocitylabs.com
+","*Optional.
+Can be ""Draft"", ""Final"", ""Effective"", ""Ineffective"", ""Launched"", ""Not Launched"", ""In Scope"", or ""Not in Scope"""
+Objective Code,Title,Description,URL,Reference URL,Notes,Created,Updated,Map:Section,Map:Control,Map:Person of Contact,State

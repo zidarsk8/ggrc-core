@@ -1,0 +1,35 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
+# These are installed with --no-deps, due to undesired dependencies, so
+# be explicit about desired dependencies.
+#
+# Avoided dependencies:
+# - from HamlPy: Jinja2, django, pygments, markdown
+# - from Flask-SQLAlchemy: distribute
+#
+itsdangerous==0.24
+Werkzeug==0.9.3
+SQLAlchemy==0.9.4
+Flask==0.10.1
+Flask-Login==0.2.2
+webassets==0.8
+Flask-Assets==0.8
+git+https://github.com/danring/HamlPy.git#egg=HamlPy
+iso8601==0.1.0
+blinker==1.3
+bleach==1.2.2
+html5lib==0.95
+six==1.3.0
+chardet==2.1.1
+google-api-python-client==1.2
+httplib2==0.8
+# Flask-SQLAlchemy must be last - it somehow mangles `distribute` / `setuptools`
+Flask-SQLAlchemy==1.0
+python-dateutil==2.2
+MonthDelta==0.9.1
+babel==1.3
+pytz==2015.2
+holidays==0.3.1

@@ -1,0 +1,47 @@
+# Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: goran@reciprocitylabs.com
+# Maintained By: goran@reciprocitylabs.com
+
+---
+ggrc_packages:
+  - name: unzip
+  - name: zip
+  - name: vim
+  - name: make
+  - name: python-virtualenv
+  - name: fabric
+  - name: python-mysqldb
+  - name: python-imaging
+  - name: sqlite3
+  - name: python-dev
+  - name: rubygems
+  - name: nodejs
+
+ggrc_development_directories:
+  - name: /vagrant-dev
+  - name: /vagrant-dev/opt
+  - name: /vagrant-dev/tmp
+  - name: /vagrant/tmp
+
+ggrc_global_npm_modules:
+  - name: nodeunit
+  - name: pegjs
+  - name: karma-cli
+  - name: jasmine-core
+  - name: mkdirp
+  - name: bower
+
+ggrc_local_npm_modules:
+  - name: karma
+  - name: karma-jasmine
+
+ggrc_gems:
+  - name: 'sass'
+    version: '3.2.13'
+  - name: 'compass'
+    version: '0.12.2'
+
+ggrc_databases:
+  - name: ggrcdev
+  - name: ggrctest

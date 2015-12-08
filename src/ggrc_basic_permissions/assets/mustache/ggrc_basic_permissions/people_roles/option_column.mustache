@@ -1,0 +1,38 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<div class="search-title">
+  <div class="row-fluid">
+    <div class="span6">
+      <h4>
+        Role
+      </h4>
+    </div>
+    <div class="span6">
+      <div class="guide">
+        &nbsp;
+      </div>
+    </div>
+  </div>
+</div>
+<div class="selector-list people-selector">
+  <ul>
+    {{#options}}
+    <li {{ data 'option' }} data-id="{{ id }}">
+      <label>
+        <input type="radio" name="map" rel="tooltip" title="map">
+        {{pretty_role_name name}}
+      </label>
+      <div class="role-description">
+        <p>{{{description}}}</p>
+        {{{render_hooks 'Role.option_detail'}}}
+        {{#scope}}<p><strong>Role Scope:</strong> {{scope}}</p>{{/scope}}
+      </div>
+    </li>
+    {{/options}}
+  </ul>
+</div>

@@ -1,0 +1,30 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: predrag@reciprocitylabs.com
+    Maintained By: predrag@reciprocitylabs.com
+}}
+
+{{#list}}
+<li class="{{class.category}}" data-model="true" {{data 'model'}}>
+  <a href="{{viewLink}}" class="show-extended">
+    <div>
+      <div class="lhs-main-title">
+        <span class="lhs-item">
+          {{firstnonempty title name email}}
+        </span>
+      </div>
+      <div class="lhs-people">
+        {{^contact}}
+        <i class="grcicon-people-warning"></i>
+        {{/contact}}
+      </div>
+    </div>
+  </a>
+</li>
+{{/list}}
+
+{{#list.is_loading}}
+  <li class="spinny"  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' }}>
+  </li>
+{{/list.is_loading}}

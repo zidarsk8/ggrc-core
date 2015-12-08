@@ -1,0 +1,26 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: sasmita
+    Maintained By: sasmita
+}}
+
+  {{{render_hooks 'Dashboard.Errors'}}}
+  <div class="row-fluid">
+    <!-- Left side Get started column -->
+    {{^system_role 'No Access'}}
+    <div class="span3 side-wrap">
+      <div class="inner-content">
+        <section class="widget bare">
+          <header class="header">
+            <h2>Get Started</h2>
+          </header>
+          <section class="content">
+            {{> /static/mustache/dashboard/info/get_started.mustache}}
+          </section><!-- Widget content end -->
+        </section><!-- Widget end -->
+      </div><!-- inner-content end -->
+    </div>
+    {{/system_role}}
+    {{{render_hooks 'Dashboard.Widgets'}}}
+  </div>

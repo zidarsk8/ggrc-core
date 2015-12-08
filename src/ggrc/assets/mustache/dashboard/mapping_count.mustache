@@ -1,0 +1,12 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+{{#with_mapping_count instance mapping}}
+<small class="count {{#if_equals count '0'}}count-zero{{/if_equals}}">
+  &nbsp;{{count}}&nbsp;
+</small>
+{{/with_mapping_count}}

@@ -1,0 +1,90 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<div data-object-id="{{instance.id}}"
+    data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}>
+  {{#if_equals instance.status 'Final'}}
+    <i class="grcicon-review-color"></i>
+    <span class="object-approved">
+      {{#last_approved instance}}
+        Reviewed on {{instance.updated_at}} <br />
+        and approved by
+        {{#using person=instance.modified_by}}
+          {{{> '/static/mustache/people/popover.mustache'}}}
+        {{/using}}
+      </span>
+      {{/last_approved}}
+  {{else}}
+    {{#with_mapping 'approval_tasks' instance}}
+      {{#with_review_task}}
+        {{#with_is_reviewer review_task}}
+          {{#if_helpers '\
+            #owned_by_current_user' instance '\
+            or #current_user_is_admin'}}
+            {{^if is_reviewer}}
+              {{#if_equals review_task.status 'Declined'}}
+                {{#with_most_recent_declining_task_entry review_task}}
+                  <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
+                {{/with_most_recent_declining_task_entry}}
+              {{/if_equals}}
+            {{/if}}
+          {{/if_helpers}}
+          {{#if is_reviewer}}
+            {{#if_equals review_task.status 'Declined'}}
+              {{#with_most_recent_declining_task_entry review_task}}
+                <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
+              {{/with_most_recent_declining_task_entry}}
+            {{/if_equals}}
+            <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
+              <button class="btn btn-mini btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Approve</button>
+              <a href="javascript://"
+                class="undoable btn btn-mini btn-danger change-task-status {{instance._disabled}}"
+                data-toggle="modal-ajax-form"
+                data-object-singular="CycleTaskEntry"
+                data-object-params='{\
+                  "cycle" : {{review_task.cycle.id}}, \
+                  "cycle_task_group_object_task" : {{review_task.id}}, \
+                  "is_declining_review" : 1, \
+                  "context": {{firstnonempty review_task.context.id "null"}} }'
+                data-object-plural="cycle_task_entries"
+                data-object-id=""
+                data-placement="right"
+                data-modal-reset="reset"
+                data-modal-class="modal-wide"
+                data-modal-title-override="Decline Review"
+                data-original-title="Decline Review"
+                data-name="status"
+                data-value="Declined"
+                data-also-undo="description">
+                Decline
+              </a>
+              <small><em>Approval applies only to this object and not to mapped objects.</em></small>
+            </div>
+          {{else}}
+            {{#is_allowed "read" "Workflow" context="any"}}
+              {{#with_mapping_count instance 'current_approval_cycles'}}
+                {{#if_equals count 0}}
+                  {{#is_allowed "update" instance}}
+                    <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
+                      <i class="grcicon-review"></i>
+                      Submit For Review
+                    </a>
+                  {{else}}
+                    <i>No review in progress</i>
+                  {{/is_allowed}}
+                {{else}}
+                  <i class="grcicon-review"></i>
+                  <span class="setup-link">Review in progress</span>
+                {{/if_equals}}
+              {{/with_mapping_count}}
+            {{/is_allowed}}
+          {{/if}}
+        {{/with_is_reviewer}}
+      {{/with_review_task}}
+    {{/with_mapping}}
+  {{/if_equals}}
+</div>

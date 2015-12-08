@@ -1,0 +1,44 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{! dashboard object listing}}
+<ul class="tree-structure new-tree">
+  {{#list}}
+    <li class="tree-item role" data-model="true" {{data 'model'}}>
+      <div class="item-main">
+        <div class="item-wrap">
+          <div class="select">
+            <div class="item-data">
+              <div class="row-fluid">
+                <div class="span8">
+                  <div class="title tree-title-area">
+                    {{name}}
+                  </div>
+                </div>
+                <div class="span4">
+                  <ul class="tree-action-list">
+                    {{#scope}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="scope">
+                              {{scope}}
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    {{/scope}}
+                  </ul>
+                </div>
+              </div>
+            </div><!-- item-data end -->
+          </div><!-- select end -->
+        </div><!-- item-wrap end -->
+      </div><!-- item-main end -->
+    </li>
+  {{/list}}
+</ul>

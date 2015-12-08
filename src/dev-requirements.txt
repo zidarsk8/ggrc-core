@@ -1,0 +1,26 @@
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
+Jinja2==2.6
+# Use `behave` library from github for --junit support of ScenarioOutline
+# This will be unnecessary when behave==1.2.2.16 is released to PyPI
+# see: https://github.com/behave/behave/issues/69
+git+https://github.com/behave/behave.git@1.2.3a19#egg=behave
+Flask-Testing==0.4.2
+git+https://github.com/rbarrois/factory_boy.git#egg=factory-boy
+mock==1.0.1
+nose==1.3.0
+sniffer==0.3.5
+requests==2.0.0
+PyYAML==3.11
+Flask-Jasmine==1.4
+Alembic==0.6.7
+ipdb==0.8.1
+ipython==3.2.0
+MonthDelta==0.9.1
+webob==1.4.1
+names==0.3.0
+flask-debugtoolbar==0.10.0
+freezegun==0.3.1

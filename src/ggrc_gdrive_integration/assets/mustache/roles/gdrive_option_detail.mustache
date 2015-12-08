@@ -1,0 +1,13 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#if_equals name "gGRC Admin"}}
+  <p>
+  <strong>Note</strong>: This role does not automatically confer Admin access to gDrive resources.
+    Please ensure that all gGRC Admin users are also members of <span style="white-space: nowrap">{{ggrc_config_value "GAPI_ADMIN_GROUP"}}</span>
+  </p>
+{{/if_equals}}

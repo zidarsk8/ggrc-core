@@ -1,0 +1,31 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{!div class="modal-header"}}
+  {{#allow_help_edit}}
+    <a class="btn btn-mini pull-right help-edit" data-toggle='collapse' href='#helpedit' title="Edit Help" rel="tooltip" data-placement="left">
+      <i class="grcicon-edit"></i>
+    </a>
+  {{/allow_help_edit}}
+  {{#instance.content}}
+    <span>{{instance.title}}</span>
+    {{^instance.title}}
+      <span>
+      {{slug}}
+      Help
+      </span>
+    {{/instance.title}}
+  {{/instance.content}}
+  {{^instance.content}}
+    {{#allow_help_edit}}
+      <a class="btn btn-mini pull-right help-edit" data-toggle='collapse' href='#helpedit' title="Edit Help" rel="tooltip" data-placement="left">
+        <i class="grcicon-edit"></i>
+      </a>
+    {{/allow_help_edit}}
+    GRC Help
+  {{/instance.content}}
+{{!/div}}

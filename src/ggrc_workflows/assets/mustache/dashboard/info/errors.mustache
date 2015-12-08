@@ -1,0 +1,19 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+<dashboard-errors >
+{{^if_equals error_msg ''}}
+<div class="alert warning">
+  <a href="#" class="close" data-dismiss="alert">x</a>
+  <span>
+    <i class="grcicon-warning"></i>
+    <!--This is global messaging letting you know that something is over due! -->
+    {{error_msg}}
+  </span>
+</div>
+{{/if_equals}}
+</dashboard-errors>

@@ -1,0 +1,4 @@
+#! /usr/bin/env bash
+bn=$(git rev-parse HEAD)
+echo "BUILD_NUMBER = \"${bn}\"" > src/ggrc/settings/build_number.py
+echo "Local build number set to ${bn}"

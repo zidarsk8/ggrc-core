@@ -1,0 +1,133 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: predrag@reciprocitylabs.com
+}}
+{{#instance}}
+
+  <div class="row-fluid">
+    <div class="span12">
+      {{#if_equals instance.class.table_singular 'person'}}
+        <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
+          {{firstnonempty name email}}
+        </a>
+      {{else}}
+        <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
+          {{title}}
+        </a>
+      {{/if_equals}}
+    </div>
+  </div>
+
+  {{^if_equals instance.class.table_singular 'person'}}
+    <div class="row-fluid">
+      <div class="span12">
+        <h6>Description</h6>
+        <div class="rtf">
+          {{{firstnonempty description '<em>No description</em>'}}}
+        </div>
+      </div>
+    </div>
+  {{/if_equals}}
+
+  {{#if_equals instance.class.table_singular 'person'}}
+    <div class="row-fluid">
+      <div class="span12">
+        <h6>Email</h6>
+        <p class="oneline">
+          {{#using person=this}}
+            {{>'/static/mustache/people/popover.mustache'}}
+          {{/using}}
+        </p>
+      </div>
+    </div>
+
+    {{#if company.length}}
+      <div class="row-fluid">
+        <div class="span12">
+          <h6>Company</h6>
+          <p class="oneline">
+            {{company}}
+          </p>
+        </div>
+      </div>
+    {{/if}}
+
+  {{/if_equals}}
+
+  {{^if_equals instance.class.table_singular 'person'}}
+    {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+  {{/if_equals}}
+
+  <div class="row-fluid">
+    <div class="span5">
+      {{#visibility_delay 500}}
+      <div class="info">
+        <i class="grcicon-control-color"></i>
+        {{#with_mapping_count instance 'controls' 'related_controls' 'controls'}}
+          {{count}}
+        {{else}}
+          <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
+        {{/with_mapping_count}}
+        &nbsp;&nbsp;
+        <i class="grcicon-process-color"></i>
+        {{#with_mapping_count instance 'related_processes' 'related_processes' 'processes'}}
+          {{count}}
+        {{else}}
+          <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
+        {{/with_mapping_count}}
+        &nbsp;&nbsp;
+        <i class="grcicon-system-color"></i>
+        {{#with_mapping_count instance 'related_systems' 'related_systems' 'systems'}}
+          {{count}}
+        {{else}}
+          <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
+        {{/with_mapping_count}}
+      </div>
+      {{/visibility_delay}}
+    </div>
+  </div>
+  {{^if_equals instance.class.table_singular 'person'}}
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="code">
+          Code: {{slug}}
+        </div>
+      </div>
+    </div>
+  {{/if_equals}}
+  <div class="links">
+    <div class="row-fluid">
+      <div class="span6">
+        <a class="secondary" href="{{viewLink}}">
+          View {{class.title_singular}}
+        </a>
+      </div>
+      <div class="span6">
+        <div class="oneline">
+          {{#with_page_object_as 'page_instance'}}
+            {{^if_equals instance page_instance}}
+              {{#with_direct_mappings_as 'mappings' page_instance instance}}
+                {{#if mappings.length}}
+                  <span class="primary">
+                    <i class="grcicon-checked"></i>
+                    Relevant to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
+                  </span>
+                {{else}}
+                  {{#is_allowed_to_map page_instance instance join=true}}
+                  <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
+                    <i class="grcicon-reg-map"></i>
+                    Map to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
+                  </a>
+                  {{/is_allowed_to_map}}
+                {{/if}}
+              {{/with_direct_mappings_as}}
+            {{/if_equals}}
+          {{/with_page_object_as}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+{{/instance}}

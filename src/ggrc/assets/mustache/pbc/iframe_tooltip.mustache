@@ -1,0 +1,14 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<div class="preview-container">
+{{#mixed_content_check url}}
+  <iframe class="preview" src="{{schemed_url url}}" sandbox="allow-same-origin allow-scripts allow-forms"></iframe>
+{{else}}
+  <div style="display:table-cell">The linked content is insecure and cannot be shown inside a secure application</div>
+{{/mixed_content_check}}
+</div>

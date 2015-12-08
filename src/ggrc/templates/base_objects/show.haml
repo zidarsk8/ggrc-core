@@ -1,0 +1,20 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+
+-extends "layouts/dashboard.haml"
+
+-set model = controller.model
+-set model_title = model._inflector.title_singular
+-set model_name = model._inflector.table_singular
+-set model_display_class = model|display_class
+
+-block title
+  =instance.title
+
+-block extra_javascript
+  =super()
+  GGRC.page_object = ={ instance_json()|safe };
+
+-block widget_area

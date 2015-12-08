@@ -1,0 +1,17 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{! This surrounding is_allowed check should be removed! FIXME}}
+{{^is_allowed 'read' model.shortName context="for"}}
+<li class="tree-item tree-item-add">
+  <div class="row-fluid">
+    <div class="span12">
+      You do not have access to read this information.
+    </div>
+  </div>
+</li>
+{{/is_allowed}}

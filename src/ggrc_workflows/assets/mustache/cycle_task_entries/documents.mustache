@@ -1,0 +1,21 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+  <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+    <a href="{{schemed_url instance.link}}" href="{{schemed_url instance.link}}" target="_blank">
+      <i class="grcicon-attach"></i>
+      <span>{{firstnonempty instance.title instance.link}}</span>
+    </a>
+    {{#using cycle_task_group_object_task=parent_instance.cycle_task_group_object_task}}
+      {{^if_equals cycle_task_group_object_task.status 'Verified'}}
+        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+          {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+          <i class="grcicon-deleted"></i>
+        </a>
+      {{/if_equals}}
+    {{/using}}
+  </li>

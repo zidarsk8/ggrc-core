@@ -1,0 +1,51 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#instance}}
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+    {{#is_info_pin}}
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+    {{/is_info_pin}}
+
+    <div class="info-pane-utility">
+      {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+    </div>
+
+    <div class="tier-content">
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/urls.mustache' instance=instance}}}
+
+      <div class="row-fluid wrap-row">
+        <div class="span6">
+          <h6>Code</h6>
+          <p>
+            {{slug}}
+          </p>
+        </div>
+      </div>
+    </div><!-- tier-content end -->
+
+  {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+
+  </section>
+
+  <div class="info-widget-footer">
+    <p>
+      <small>
+        <em>
+          Created at {{date created_at}}
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+        </em>
+      </small>
+    </p>
+  </div>
+{{/instance}}

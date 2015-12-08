@@ -1,0 +1,22 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#list}}
+<li class="{{model.category.toLowerCase}}" data-model="true" {{data 'model'}}>
+  <a href="{{viewLink}}" class="show-extended">
+    <div class="row-fluid">
+      <div class="span11">
+        <div class="oneline">
+          <i class="grcicon-{{model.table_singular}}-color"></i>
+          {{firstnonempty title name email}} 
+        </div>
+      </div>
+    </div>
+  </a>
+
+</li>
+{{/list}}

@@ -1,0 +1,18 @@
+-# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: anze@reciprocitylabs.com
+-# Maintained By: anze@reciprocitylabs.com
+
+-set default_message = "Could not import: verify the file is correctly formatted."
+
+.row-fluid
+  %hr.hr-widget
+
+.row-fluid
+  .span6
+    %h4
+      -if exception_message is defined
+        %b
+          =exception_message.__str__()
+      -else
+        =default_message

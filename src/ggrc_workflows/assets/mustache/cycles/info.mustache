@@ -1,0 +1,99 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: Sasmita
+    Maintained By: Sasmita
+}}
+
+<section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+  {{#is_info_pin}}
+    {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+  {{/is_info_pin}}
+
+  <div class="info-pane-utility">
+    {{#using instance=instance.workflow}}
+    <!-- This should have only view link, shouldn't edit cycle instance of workflow while active -->
+      <div class="details-wrap">
+        <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+          <span class="bubble"></span>
+          <span class="bubble"></span>
+          <span class="bubble"></span>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+          {{#if instance.viewLink}}
+            {{!#is_allowed "view_object_page" instance}}
+              <li>
+                <a href="{{instance.viewLink}}">
+                  <i class="grcicon-goto"></i>
+                  View {{instance.class.title_singular}}
+                </a>
+              </li>
+            {{!/is_allowed}}
+          {{/if}}
+          <li>
+            <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+          </li>
+
+          {{#is_allowed 'delete' instance}}
+            <li>
+              <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                <i class="grcicon-deleted"></i>
+                Delete
+              </a>
+            </li>
+          {{/is_allowed}}
+        </ul>
+      </div>
+    {{/using}}
+  </div>
+
+  <div class="tier-content">
+    {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+
+    <div class="row-fluid wrap-row">
+      <div class="span12">
+        <h6>Description</h6>
+        <div class="rtf-block">
+          <p>{{{firstnonempty instance.description '<em>No description</em>'}}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-fluid wrap-row">
+      {{#using instance=instance.workflow}}
+        <div class="span6">
+          <div class="rtf-block">
+            {{{render '/static/mustache/workflows/contacts.mustache' instance=instance stacked=true}}}
+          </div>
+        </div>
+        <div class="span6">
+          <h6>
+            Frequency
+          </h6>
+          <p>
+            {{#if_equals instance.frequency 'one_time'}}
+              One time
+            {{else}}
+              {{instance.frequency}}
+            {{/if_equals}}
+          </p>
+        </div>
+      {{/using}}
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span12">
+      {{#using instance=instance.workflow}}
+      <ggrc-gdrive-folder-picker {{^is_allowed 'update' instance}}readonly="true"{{/is_allowed}} instance="instance" placeholder="If selected, all workflow attachments go here." />
+      {{/using}}
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12">
+      {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+    </div>
+  </div>
+
+</section>

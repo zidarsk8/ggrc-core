@@ -1,0 +1,178 @@
+-# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: ivan@reciprocitylabs.com
+-# Maintained By: ivan@reciprocitylabs.com
+
+-extends 'layouts/dashboard.haml'
+
+-block extra_javascript
+  =super()
+  GGRC.page_object = ={ instance_json()|safe };
+
+-block header
+  %script{ 'type' : "text/javascript", 'src' : "https://apis.google.com/js/client.js?onload=doGAuth" }
+
+  %script#event_tmpl{ 'type' : 'text/mustache' }
+    -raw
+      <h3> Current calendar : {{calendar.title}} </h3>
+      <ul class="events-list">
+        {{#events}}
+        <li> 
+          <a class="list-folders" href='javascript://' {{data 'event'}}>
+          {{summary}} ({{localize_date start}} to {{localize_date end}})
+          </a>
+          |
+          <a href="{{htmlLink}}" target="_blank">[View event]</a>
+          |
+          <a href="javascript://" class="delete-event" {{data 'event'}}>[Delete]</a>
+        </li>
+        {{/events}} 
+      </ul>
+    -endraw
+
+  %script#file_tmpl{ 'type' : 'text/mustache' }
+    -raw
+      <ul class="files-list">
+        {{#this}}
+        <li> 
+          <a href="{{alternateLink}}" target="_blank">{{title}}</a>
+        </li>
+        {{/this}}
+        {{^this}}
+          <li>No files</li>
+        {{/this}}
+      </ul>
+    -endraw
+
+  %script#permissions_tmpl{ 'type' : 'text/mustache' }
+    -raw
+      <h3>permissions</h3>
+      {{#this}}
+      {{#if_equals status -1}}
+        Error: {{message}}
+      {{else}}
+      {{shareablepermissions}}
+      {{/if_equals}}
+      {{/this}}
+      <h3>users</h3>
+      {{#this}}
+      {{#if_equals status -1}}
+        Error: {{message}}
+      {{else}}
+      {{viewers}}
+      {{/if_equals}}
+      {{/this}}
+    -endraw
+
+-block main
+  .clearfix
+    .object-area
+      %h2 Events on GCal
+      %div#events{"style" : "border : 1px solid black; width: 400px"} &nbsp;
+
+      %br
+      %a#load_top.list-events{ 'href' : 'javascript://', 'style' : 'display:none'} List top level folders
+
+      %h2 Add a calendar event
+      %div#add_folder{'style' : 'border : 1px solid black; width : 400px'}
+        %form{ 'action' : 'javascript://'}
+          %label{ 'for' : '#eventname'} Event name
+          %input#eventname{ 'type' : 'text', 'name' : 'summary', 'value' : ''}
+          %br
+          %label{ 'for' : '#eventstart'} Event start
+          %input#eventstart{ 'type' : 'text', 'name' : 'start', 'value' : ''}
+          %br
+          %label{ 'for' : '#eventstart'} Event end
+          %input#eventend{ 'type' : 'text', 'name' : 'end', 'value' : ''}
+          
+          %input.add-event{ 'type' : 'button', 'value' : 'Add event'}
+  :javascript
+    $(function() {
+      $("#eventstart, #eventend").datepicker();
+
+      var lblist = null;
+      var eventspinner, filespinner;
+      $(document.body).on("click", ".list-events", function(ev) {
+        $("#events").html((eventspinner = new Spinner({ length : 5, width : 2, radius : 2, y: 14, x: 15}).spin()).el).append("&nbsp;");
+        can.view(
+          "#event_tmpl"
+          , CMS.Models.GCalEvent.findAll({})
+            .then(function(list) {
+              return { 
+                events : (lblist = list.slice(list.length - 10, list.length)), 
+                calendar : GGRC.config.DEFAULT_CALENDAR
+              };
+            }, function(xhr, status) {
+              eventspinner.stop();
+              $("#events").html("error: " + xhr.statusText);
+              return new $.Deferred().reject();
+            })
+        ).done(function(frag) {
+          $("#events").html(frag);
+        });
+
+        /*
+        $("#files").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
+        can.view(
+          "#file_tmpl"
+          , CMS.Models.GDriveFile.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
+            filespinner.stop();
+            $("#files").html("error: " + e.statusText || JSON.stringify(e));
+            return new $.Deferred().reject();
+          })
+        ).done(function(frag) {
+          $("#files").html(frag).data("folder-id", folder.id || folder);
+        });
+
+        $("#permissions").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
+        can.view(
+          "#permissions_tmpl"
+          , CMS.Models.GDriveFolderPermission.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
+            filespinner.stop();
+            $("#permissions").html("error: " + e.statusText || JSON.stringify(e));
+            return new $.Deferred().reject();
+          })
+        ).done(function(frag) {
+          $("#permissions").html(frag).data("folder-id", folder.id || folder);
+        });
+        */
+      }).on("click", ".add-event", function(ev) {
+        var that = this;
+        new CMS.Models.GCalEvent({ 
+          summary : $(this).closest("form").find("[name=summary]").val()
+          , calendar : GGRC.config.DEFAULT_CALENDAR
+          , start : $(this).closest("form").find("[name=start]").val()
+          , end : $(this).closest("form").find("[name=end]").val()
+        })
+        .save()
+        .fail(function(xhr, status){
+          $(document.body).trigger("ajax:flash", { error : [status]});
+        })
+        .done(function(noob) {
+          lblist.push(noob);
+          $(that).closest("form")[0].reset();
+        });
+      }).on("click", ".delete-event", function(ev) {
+        var that = this
+        , event = $(this).data("event");
+
+        event.destroy()
+        .fail(function(xhr, status){
+          $(document.body).trigger("ajax:flash", { error : [status]});
+        })
+        .done(function(noob) {
+          lblist.replace(can.map(lblist, function(l) {
+            return l === event ? undefined : l;
+          }));
+        });
+      });
+
+      var func;
+      setTimeout(func = function() {
+        if(GGRC.config.DEFAULT_CALENDAR) {
+          $("#load_top").click();
+        } else {
+          setTimeout(func, 100);
+        }
+      }, 100);
+    });

@@ -1,0 +1,21 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+
+-extends "layouts/dashboard.haml"
+
+-block title
+  Import/Export
+
+-block header
+  -include 'base_objects/_page_header.haml'
+
+-block main
+  .clearfix
+    .object-area.import-area
+      .column-set
+        .row-fluid
+          .span12.full-width
+            .widget-area.inner-content
+              -include 'systems/_import.haml'

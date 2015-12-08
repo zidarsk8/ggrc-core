@@ -1,0 +1,64 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+
+  {{#switch error.code}}
+    {{#case 404}}The {{type}} was not found in Drive, or you do not have access to read it.{{/case}}
+    {{#case 403}}You were not permitted to access Drive.{{/case}}
+    {{#case 401}}You are not logged in to Drive.{{/case}}
+    {{#case 500}}Google Drive encountered an internal error.{{/case}}
+    {{#case 400}}Google API didn't understand the request from GGRC{{/case}}
+    {{#default}}No error code was returned or the error was not recognized{{/default}}
+  {{/switch}}
+
+  <div class="info info-expand">
+    <a href="javascript://">
+      <span class="out">
+        More
+      </span>
+      <span class="in">
+        Hide
+      </span>
+       Error Info
+    </a>
+    <div class="error-container hidden-fields-area in">
+      {{error.message}} <strong>(Code {{error.code}})</strong>
+    </div>
+  </div>
+
+  {{#if_auditor instance}}
+    <div>
+      {{#switch error.code}}
+        {{#case 404}}
+          {{#if_instance_of instance 'Request'}}
+            Contact your Audit Lead ({{#using audit=instance.audit}}{{#using assignee=audit.contact}}<a href="mailto:{{assignee.email}}">{{assignee.email}}</a>{{/using}}{{/using}}) to request access.
+          {{else}}
+            Contact your Audit Lead ({{#using assignee=instance.contact}}<a href="mailto:{{assignee.email}}">{{assignee.email}}</a>{{/using}}) to request access.
+          {{/if_instance_of}}
+        {{/case}}
+        {{#case 403}}
+          {{#if_instance_of instance 'Request'}}
+            Contact your Audit Lead ({{#using audit=instance.audit}}{{#using assignee=audit.contact}}<a href="mailto:{{assignee.email}}">{{assignee.email}}</a>{{/using}}{{/using}}) to request access.
+          {{else}}
+            Contact your Audit Lead ({{#using assignee=instance.contact}}<a href="mailto:{{assignee.email}}">{{assignee.email}}</a>{{/using}}) to request access.
+          {{/if_instance_of}}      
+        {{/case}}
+        {{#case 401}}
+          Try reloading this page. If you see a popup for Google API, make sure to click the Authorize buttons
+        {{/case}}
+        {{#case 500}}
+          Try again later to see if the problem resolves.
+        {{/case}}
+        {{#case 400}}
+          Please contact your GGRC admins (<a href="mailto:{{ggrc_config_value 'GAPI_ADMIN_GROUP'}}">{{ggrc_config_value 'GAPI_ADMIN_GROUP'}}</a>) and report this problem.
+        {{/case}}
+        {{#default}}
+          Try again later to see if the problem resolves.
+        {{/default}}
+      {{/switch}}  
+    </div>
+  {{/if}}

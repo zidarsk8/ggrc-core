@@ -1,0 +1,21 @@
+{{!
+  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: sasmita@google.com
+  Maintained By: sasmita@google.com
+}}
+
+<div class="span{{display_options.selectable_width}}">
+  <div class="row-fluid">
+    {{#display_attr_list}}
+      <div class="span{{display_options.selectable_attr_width}}">
+        <div class="oneline">
+          <span class="widget-col-title" data-field="{{attr_sort_field}}">
+            {{attr_title}}
+            <i class="grcicon-carrot"></i>
+          </span>
+        </div>
+      </div>
+    {{/display_attr_list}}
+  </div>
+</div>

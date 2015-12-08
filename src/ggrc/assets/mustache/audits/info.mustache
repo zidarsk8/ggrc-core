@@ -1,0 +1,186 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#instance}}
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+    {{#is_info_pin}}
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+    {{/is_info_pin}}
+
+    <div class="info-pane-utility">
+      {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+    </div>
+
+    <div class="tier-content">
+      <div class="pane-header">
+        {{#instance}}
+          <div class="row-fluid wrap-row">
+            <div class="span9">
+              <h6>Title</h6>
+              <h3>{{title}}</h3>
+              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+              {{#if type}}
+              <p>
+                {{type.title}}
+              </p>
+              {{/if}}
+            </div>
+          </div>
+        {{/instance}}
+      </div>
+
+      {{#instance.description}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Description</h6>
+            <div class="rtf-block">
+              {{{instance.description}}}
+            </div>
+          </div>
+        </div>
+      {{/instance.description}}
+
+      <div class="row-fluid wrap-row">
+        <div class="span4">
+          <h6>Planned Start Date</h6>
+          {{#if instance.start_date}}
+            {{localize_date instance.start_date}}
+          {{else}}
+            Not set
+          {{/if}}
+        </div>
+        <div class="span4">
+          <h6>Planned End Date</h6>
+          {{#if instance.end_date}}
+            {{localize_date instance.end_date}}
+          {{else}}
+            Not set
+          {{/if}}
+        </div>
+        <div class="span4">
+          <h6>Planned Report Period</h6>
+          {{#if instance.report_start_date}}
+            {{#if instance.report_end_date}}
+              {{localize_date instance.report_start_date}} - {{localize_date instance.report_end_date}}
+            {{else}}
+              Starts {{localize_date instance.report_start_date}}
+            {{/if}}
+          {{else}}
+            {{#if instance.report_end_date}}
+              Ends {{localize_date instance.report_end_date}}
+            {{else}}
+              Not set
+            {{/if}}
+          {{/if}}
+        </div>
+      </div>
+
+      <div class="row-fluid wrap-row">
+        <div class="span4">
+          <h6>Audit Lead</h6>
+          {{#if instance.contact}}
+            {{#using person=instance.contact}}
+              {{>'/static/mustache/people/popover.mustache'}}
+            {{/using}}
+          {{else}}
+            Not defined
+          {{/if}}
+        </div>
+        <div class="span4">
+          <h6>Audit Firm</h6>
+          {{#using firm=instance.audit_firm}}
+            {{{firstnonempty firm.title 'None'}}}
+          {{/using}}
+        </div>
+        <div class="span4">
+          {{! `with_auditors` requires `authorizations` mapping, so preload it }}
+          {{#with_mapping 'auditor_authorizations' instance}}
+            {{#if auditor_authorizations.length}}
+              <h6>{{#if_equals auditor_authorizations.length 1}}Auditor{{else}}Auditors{{/if_equals}}</h6>
+              <ul class="inner-count-list">
+                {{#each auditor_authorizations}}
+                  <li>
+                    {{#using auditor=instance.person}}
+                      {{{renderLive '/static/mustache/people/popover.mustache' person=auditor}}}
+                    {{/using}}
+                    {{#is_allowed 'delete' this}}
+                      <a href="javascript://" class="unmap" data-toggle="unmap">
+                        <span class="result" {{data 'result'}}></span>
+                        <i class="grcicon-deleted"></i>
+                      </a>
+                    {{/is_allowed}}
+                  </li>
+                {{/each}}
+              </ul>
+            {{else}}
+              <h6>Auditors</h6>
+              No auditor assigned
+            {{/if}}
+          {{/with_mapping}}
+          {{#is_allowed 'create' 'UserRole' context=instance.context.id}}
+          {{#toggle show_new_object_form}}
+            {{#with_page_object_as 'page_instance'}}
+            <ggrc-quick-add parent_instance="instance" join_model="UserRole">
+              {{#prune_context}}
+              <div class="objective-selector field-wrap">
+                <input tabindex="3" type="text" name="instance" data-lookup="Person" null-if-empty="true" class="search-icon" placeholder="Add Auditor" {{autocomplete_select}} value="{{instance.email}}">
+                <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+
+                <a href="javascript://" class="btn btn-small btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
+              </div>
+              <input type="hidden" name="role_name" value="Auditor" />
+              {{/prune_context}}
+            </ggrc-quick-add>
+            {{/with_page_object_as}}
+          {{else}}
+            <br>
+              <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+ Add Auditor</a>
+          {{/toggle}}
+          {{/is_allowed}}
+        </div>
+      </div>
+
+      {{#instance.url}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>URL</h6>
+            <a class="url" href="{{schemed_url instance.url}}" target="_blank">
+              {{instance.url}}
+            </a>
+          </div>
+        </div>
+      {{/instance.url}}
+
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>Code</h6>
+          {{instance.slug}}
+        </div>
+      </div>
+
+    </div>
+    <div class="row-fluid wrap-row">
+      <div class="span12">
+        {{{render_hooks 'Audit.tree_view_info'}}}
+      </div>
+    </div>
+    {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+  </section>
+
+  <div class="info-widget-footer">
+    <p>
+      <small>
+        <em>
+          Created at {{date created_at}}
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+        </em>
+      </small>
+    </p>
+  </div>
+{{/instance}}

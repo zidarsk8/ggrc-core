@@ -1,0 +1,28 @@
+Object type,,,
+"Policy
+",code,title,owner
+,p-1,Bacon,user@example.com
+,p-2,ipsum,user@example.com
+,p-3,dolor,user@example.com
+,p-4,dolor,user@example.com
+,p-4,amet,user@example.com
+,,,
+,,,
+,,,
+Object type,,,
+Org group,code,title*
+,org-1,boudin
+,org-2,tail
+,org-3,filet
+,org-4,mignon
+,,,
+,,,
+Object type,,,
+product,code*,title,owner
+,pro 1,meatloaf,user@example.com
+,pro 2,pastrami,user@example.com
+,pro 3,landjaeger,user@example.com
+,pro 4,ham,user@example.com
+,pro 5,bacon,user@example.com
+,pro 1,meatloaf,
+,pro 1,lamb,user@example.com

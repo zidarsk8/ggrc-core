@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
+
+def main(infile, outfile, **options):
+  f = open(infile)
+  s = f.read()
+  f.close()
+
+  f = open(outfile, 'w')
+  f.write(s.format(**options))
+  f.close()
+
+if __name__ == '__main__':
+  import sys
+  infile, outfile = sys.argv[1], sys.argv[2]
+  options = sys.argv[3:]
+  options = dict(map(lambda o: tuple(o.split('=', 1)), options))
+  main(infile, outfile, **options)

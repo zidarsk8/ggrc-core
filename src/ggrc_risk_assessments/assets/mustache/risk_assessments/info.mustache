@@ -1,0 +1,65 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+  {{#is_info_pin}}
+    {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+  {{/is_info_pin}}
+
+  <div class="info-pane-utility">
+    {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+  </div>
+
+  <div class="tier-content">
+    {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+    {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
+    <div class="row-fluid wrap-row">
+      <div class="span12">
+        <h6>Notes</h6>
+        <div class="rtf-block">
+          {{{firstnonempty instance.notes '<span class="no-data">No additional notes</span>'}}}
+        </div>
+      </div>
+    </div>
+    <div class="row-fluid wrap-row">
+      <div class="span4">
+        <h6>Supporting files</h6>
+        {{#options.child_options.0}}
+          <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
+          </ul>
+        {{/child_options}}
+        {{#is_allowed 'update'}}
+          <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach supporting file" click_event="trigger_upload">
+          </ggrc-gdrive-picker-launcher>
+        {{/is_allowed}}
+      </div>
+      <div class="span4">
+        <h6>Risk Manager</h6>
+        {{#using person=instance.ra_manager}}
+          {{{render '/static/mustache/people/popover.mustache'}}}
+        {{/using}}
+      </div>
+      <div class="span4">
+        <h6>Risk Counsel</h6>
+        {{#using person=instance.ra_counsel}}
+          {{{render '/static/mustache/people/popover.mustache'}}}
+        {{/using}}
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span12">
+        <h6>Code</h6>
+        <div class="tree-description">
+          {{{instance.slug}}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+</div>

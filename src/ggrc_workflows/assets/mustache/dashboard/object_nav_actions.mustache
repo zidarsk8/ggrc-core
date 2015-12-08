@@ -1,0 +1,36 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+
+{{#is_allowed 'update' instance context='for'}}
+  <li class="inner-nav-button">
+    <workflow-activate workflow="instance" deferredData="can_activate">
+      {{#if_equals instance.status "Draft"}}
+        {{#if waiting}}
+          <span {{attach_spinner '{ "radius": 5, "length": 5, "width": 3 }' 'display:inline-block; margin: 15px;' }}></span>
+        {{else}}
+          {{^can_activate}}
+            <p class="tiny-help-text">You need to setup task group(s) before activating workflow</p>
+          {{/can_activate}}
+          <button type="submit" href="#workflowActivate" class="btn btn-info btn-small" {{^can_activate}}disabled="disabled"{{/can_activate}}>
+            Activate Workflow
+          </button>
+        {{/waiting}}
+      {{else}}
+        {{^if_equals instance.status 'Inactive'}}
+        {{#if waiting}}
+          <span {{attach_spinner '{ "radius": 5, "length": 5, "width": 3 }' 'display:inline-block; margin: 15px;' }}></span>
+        {{else}}
+          {{^can_activate}}
+            <p class="alert tiny-help-text" style="margin-bottom:0px;"><strong>Note:</strong> At least one of the task groups is missing either a task or an object.</p>
+          {{/can_activate}}
+        {{/if}}
+        {{/if_equals}}
+      {{/if_equals}}
+    </workflow-activate>
+  </li>
+{{/is_allowed}}

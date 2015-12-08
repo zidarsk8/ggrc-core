@@ -1,0 +1,78 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#instance.workflow_state}}
+  <div class="person-holder">
+    <a href="{{instance.viewLink}}#task_widget" class="info-action person-tooltip-trigger" data-placement="left">
+      {{#switch instance.workflow_state}}
+        {{#case 'Verified'}}
+          <span class="green"><em>Verified</em></span>
+        {{/case}}
+        {{#case 'Assigned'}}
+          <span class="gray"><em>Assigned</em></span>
+        {{/case}}
+        {{#case 'Finished'}}
+          <span class="gray"><em>Finished</em></span>
+        {{/case}}
+        {{#case 'InProgress'}}
+          <span class="yellow"><em>In progress</em></span>
+        {{/case}}
+        {{#case 'Overdue'}}
+            <span class="error"><em>Overdue</em></span>
+        {{/case}}
+      {{/switch}}
+      {{#with_mapping_count instance 'object_tasks'}}
+        <i class="grcicon-task-black"></i>
+        {{count}}
+      {{/with_mapping_count}}
+    </a>
+    {{#with_mapping 'object_tasks' instance}}
+      <div class="custom-popover-content">
+        <div class="preview-container person-preview">
+          <div class="profile-info">
+            <h3 class="task-list-title">Current Tasks</h3>
+            <ul class="popup-task-list">
+              {{#object_tasks}}
+                <li>
+                  <div class="clearfix">
+                    <div class="pull-left">
+                      <i class="grcicon-task-black"></i>
+                    </div>
+                    <div class="task-title pull-left">
+                      {{instance.title}}
+                    </div>
+                    <div class="task-status pull-left">
+                      {{#switch instance.status}}
+                        {{#case 'Verified'}}
+                          <span class="green"><em>Verified</em></span>
+                        {{/case}}
+                        {{#case 'Assigned'}}
+                          <span class="gray"><em>Assigned</em></span>
+                        {{/case}}
+                        {{#case 'Finished'}}
+                          <span class="blue"><em>Finished</em></span>
+                        {{/case}}
+                        {{#case 'InProgress'}}
+                          <span class="yellow"><em>In progress</em></span>
+                        {{/case}}
+                      {{/switch}}
+                      {{^if_equals instance.status 'Verified'}}{{#is_overdue instance.end_date}}
+                        <span class="error"><em>Overdue</em></span>
+                      {{/is_overdue}}
+                      {{/if_equals}}
+                    </div>
+                  </div>
+                </li>
+              {{/object_tasks}}
+            </ul>
+            <a class="info-action" href="{{instance.viewLink}}#task_widget"><i class="grcicon-goto"></i> View tasks</a>
+          </div>
+        </div>
+      </div>
+    {{/with_mapping}}
+  </div>
+{{/instance.workflow_state}}

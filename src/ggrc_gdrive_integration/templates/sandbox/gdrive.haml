@@ -1,0 +1,174 @@
+-# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: ivan@reciprocitylabs.com
+-# Maintained By: ivan@reciprocitylabs.com
+
+-extends 'layouts/dashboard.haml'
+
+-block extra_javascript
+  GGRC.page_object = ={ instance_json()|safe };
+  GGRC.permissions = ={ permissions_json()|safe };
+  GGRC.config = ={config_json()|safe};
+
+-block header
+  %script{ 'type' : "text/javascript", 'src' : "https://apis.google.com/js/client.js?onload=doGAuth" }
+
+  %script#folder_tmpl{ 'type' : 'text/mustache' }
+    -raw
+      <h3> Current folder : {{#if_equals parent ''}}Root folder{{else}}{{parent.title}}{{/if_equals}} </h3>
+      <a href="javascript://" class='list-folders go-up' style='{{#if_equals parent ''}}display: none{{/if_equals}}' data-folder-id="{{parent_id}}">Go up one level</a>
+      <ul class="folders-list">
+        {{#list}}
+        <li> 
+          <a class="list-folders" href='javascript://' {{data 'folder'}}>
+          {{title}}
+          </a>
+          |
+          <a href="{{alternateLink}}" target="_blank">[Go to folder]</a>
+          |
+          <a href="javascript://" class="delete-folder" {{data 'folder'}}>[Delete]</a>
+        </li>
+        {{/list}} 
+      </ul>
+    -endraw
+
+  %script#file_tmpl{ 'type' : 'text/mustache' }
+    -raw
+      <ul class="files-list">
+        {{#this}}
+        <li> 
+          <a href="{{alternateLink}}" target="_blank">{{title}}</a>
+        </li>
+        {{/this}}
+        {{^this}}
+          <li>No files</li>
+        {{/this}}
+      </ul>
+    -endraw
+
+  %script#permissions_tmpl{ 'type' : 'text/mustache' }
+    -raw
+      <ul>
+      {{#this}}
+        <li>
+          {{type}}: {{name}}
+          ({{firstnonempty emailAddress domain}})
+          <ul>
+            <li>{{role}}</li>
+          </ul>
+        </li>
+      {{/this}}
+      </ul>
+    -endraw
+
+-block main
+  .clearfix
+    .object-area
+      %h2 Folders on GDrive
+      %div#folders{"style" : "border : 1px solid black; width: 400px"} &nbsp;
+
+      %h2 Files in the current folder
+      %div#files{"style" : "border : 1px solid black; width: 400px"} &nbsp;
+
+      %h2 Permissions on the current folder
+      %div#permissions{"style" : "border : 1px solid black; width: 400px"} &nbsp;
+
+      %br
+      %a#load_top.list-folders{ 'href' : 'javascript://', 'style' : 'display:none'} List top level folders
+
+      %h2 Add a folder
+      %div#add_folder{'style' : 'border : 1px solid black; width : 400px'}
+        %form{ 'action' : 'javascript://'}
+          %label{ 'for' : '#foldername'} Folder name
+          %input#foldername{ 'type' : 'text', 'name' : 'name', 'value' : ''}
+          %input.add-folder{ 'type' : 'button', 'value' : 'Add folder'}
+  :javascript
+    $(function() {
+      var folderstack = ['root'];
+      var lblist = null;
+      var folderspinner, filespinner;
+      $(document.body).on("click", ".list-folders", function(ev) {
+        var folder = $(this).data('folder') || 'root';
+        if($(this).is(".go-up")) {
+          folderstack.shift();
+          folder = folderstack[0];
+        } else {
+          folderstack.unshift(folder);
+        }
+        console.log(folderstack);
+        $("#folders").html((folderspinner = new Spinner({ length : 5, width : 2, radius : 2, y: 14, x: 15}).spin()).el).append("&nbsp;");
+        can.view(
+          "#folder_tmpl"
+          , CMS.Models.GDriveFolder.findAll({parentfolderid : folder.id || folder})
+            .then(function(list) {
+              if(list.status && list.status() === 0) {
+              } else {
+                lblist = list;
+                return { 
+                  list : list, 
+                  parent : folder === 'root' ? null : folder
+                };
+              }
+            }, function(xhr, status) {
+              folderspinner.stop();
+              $("folders").html("error: " + xhr.statusText);
+              return new $.Deferred().reject();
+            })
+        ).done(function(frag) {
+          $("#folders").html(frag).data("folder-id", folder.id || folder);
+        });
+
+        $("#files").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
+        can.view(
+          "#file_tmpl"
+          , CMS.Models.GDriveFile.findAll({parentfolderid : folder.id || folder}).fail(function(e) {
+            filespinner.stop();
+            $("#files").html("error: " + e.statusText || JSON.stringify(e));
+            return new $.Deferred().reject();
+          })
+        ).done(function(frag) {
+          $("#files").html(frag).data("folder-id", folder.id || folder);
+        });
+
+        $("#permissions").html((filespinner = new Spinner({ length : 5, width : 2, radius: 2}).spin()).el).append("&nbsp;");
+        can.view(
+          "#permissions_tmpl"
+          , CMS.Models.GDriveFolderPermission.findAll({id : folder.id || folder}).fail(function(e) {
+            filespinner.stop();
+            $("#permissions").html("error: " + e.statusText || JSON.stringify(e));
+            return new $.Deferred().reject();
+          })
+        ).done(function(frag) {
+          $("#permissions").html(frag).data("folder-id", folder.id || folder);
+        });
+      }).on("click", ".add-folder", function(ev) {
+        var that = this;
+        new CMS.Models.GDriveFolder({ 
+          title : $(this).closest("form").find("[name=name]").val()
+          , parents : [typeof folderstack[0] === "string" ? { id : folderstack[0] } : folderstack[0]]
+         })
+        .save()
+        .fail(function(xhr, status, gerror){
+          $(document.body).trigger("ajax:flash", { error : [gerror.message]});
+        })
+        .done(function(noobs) {
+          lblist.push.apply(lblist, noobs);
+          $(that).closest("form")[0].reset();
+        });
+      }).on("click", ".delete-folder", function(ev) {
+        var that = this
+        , folder = $(this).data("folder");
+
+        CMS.Models.GDriveFolder.removeFromParent(folder, folderstack[0])
+        .fail(function(xhr, status, gerror){
+          $(document.body).trigger("ajax:flash", { error : [gerror.message]});
+        })
+        .done(function(noob) {
+          lblist.replace(can.map(lblist, function(l) {
+            return l === folder ? l : undefined;
+          }));
+        });
+      });
+
+      $("#load_top").click();
+    });

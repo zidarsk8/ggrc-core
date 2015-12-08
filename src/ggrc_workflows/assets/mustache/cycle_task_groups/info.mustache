@@ -1,0 +1,29 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+
+{{#instance}}
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+    {{#is_info_pin}}
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+    {{/is_info_pin}}
+
+    <div class="tier-content">
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>{{instance.class.title_singular}} description</h6>
+          <div class="rtf-block">
+            {{{firstnonempty instance.description 'No description'}}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+{{/instance}}

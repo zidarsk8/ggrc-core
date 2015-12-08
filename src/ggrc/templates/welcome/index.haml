@@ -1,0 +1,42 @@
+-#
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+-#
+-extends "layouts/base.haml"
+
+-block body
+  .container-fluid.welcome
+    %section.content
+      .flash
+        -with messages = get_flashed_messages(with_categories=True)
+          -if messages
+            -for category, message in messages
+              %div{ 'class': "{{category}}" }
+                %a.close{'href': "#", 'data-dismiss': "alert" }
+                  x
+                %p
+                  {{message|safe}}
+        -#FIXME: Flash messages
+        -#flash.each do |type, value|
+          -value = [value] unless value.is_a?(Array)
+          -value = value.map(:presence).compact
+          -if value.size > 0
+            %div{ 'class': type }
+              %a.close{'href': "#{}", :'data-dismiss': "alert"}
+                &times;
+              -value.each do |message|
+                %p=message
+
+    .row-fluid
+      .span12
+        %h1
+          gGRC
+        %h2
+          Governance, Risk and Compliance
+        %p.centered
+          %a.btn.btn-large.btn-info{:href => "/dashboard"} Login
+          %br
+          %br
+          %a.about-link{:href => "http://goto.google.com/ggrc", :target => "_blank"} About gGRC

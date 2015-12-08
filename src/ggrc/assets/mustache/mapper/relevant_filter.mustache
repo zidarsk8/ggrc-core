@@ -1,0 +1,47 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<h6>Filter by mapping relevance</h6>
+{{#each relevant}}
+  <div class="single-line-filter">
+    <button type="submit" data-index="{{@index}}" class="remove_filter">
+      <i class="grcicon-deleted"></i>
+    </button>
+    <label>
+      {{#if @index}}AND {{/if}}Relevant to:
+    </label>
+    <select class="input-small filter-type-selector select-filter{{@index}}" can-value="model_name">
+      {{#menu}}
+        {{#if model_singular}}<option value="{{model_singular}}" label="{{title_singular}}"></option>{{/if}}
+      {{/menu}}
+    </select>
+    {{#filter}}
+      {{#if_helpers '\
+        #if' model_name '\
+        and ^if_equals' model_name '__previous__'}}
+        {{#model_name}}
+        <div class="modal-search objective-selector">
+          <input
+            class="input-large search-icon search-filter-{{@index}}"
+            placeholder="Enter text to search for {{model_name}}"
+            type="text"
+            data-index="{{@index}}"
+            name="filter_list.{{@index}}.filter"
+            value="{{firstnonempty filter.name filter.email filter.title}}"
+            data-lookup="{{this}}"
+            data-template="/{{#if_equals model_name 'Person'}}people{{else}}base_objects{{/if_equals}}/autocomplete_result.mustache"
+            {{ autocomplete_select }}
+            >
+        </div>
+        {{/model_name}}
+      {{/if_helpers}}
+    {{/filter}}
+  </div>
+{{/each}}
+<div class="add-rule">
+  <a href="javascript://" class="add-filter-rule">+ Add New Rule</a>
+</div>

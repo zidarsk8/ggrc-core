@@ -1,0 +1,36 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<div class="selector-info" style="margin-right:-10%;">
+  {{!<div class="pull-right">
+    <a class="btn btn-mini" rel="tooltip" title="Edit">
+      <i class="grcicon-edit"></i>
+    </a>
+    <a class="btn btn-mini" rel="tooltip" title="Remove">
+      <i class="grcicon-remove"></i>
+    </a>
+  </div>
+  <p>
+    <img src="/static/images/sample/profile100.jpg" alt="">
+  </p>}}
+  <h4>
+    <i class="grcicon-{{table_singular}}-color"></i>
+    {{ title }}
+  </h4>
+  <div class="rtf">
+    {{{description}}}
+  </div>
+  <div class="owner">
+    {{{render '/static/mustache/base_objects/contacts.mustache' instance=this stacked=true}}}
+  </div>
+  <div class="object-url">
+    <strong>URL:</strong>
+    {{#if url}}
+    <a href="{{schemed_url url}}" target="_blank">{{url}}</a>
+    {{/if}}
+  </div>
+</div>

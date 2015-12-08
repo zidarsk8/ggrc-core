@@ -1,0 +1,29 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+{{#instance}}
+<div class="row-fluid">
+  <div class="span12">
+    <h6>Manager</h6>
+    <p class="oneline">
+    {{#with_mapping 'authorizations' instance}}
+      {{#each authorizations}}
+        <span>
+          {{#using role=instance.role}}
+            {{#if_equals role.name 'WorkflowOwner'}}
+              {{#using contact=instance.person}}
+                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+              {{/using}}
+            {{/if_equals}}
+          {{/using}}
+        </span>
+      {{/each}}
+    {{/with_mapping}}
+  </p>
+  </div>
+</div>
+{{/instance}}

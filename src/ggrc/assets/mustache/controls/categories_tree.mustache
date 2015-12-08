@@ -1,0 +1,60 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#list}}
+  <li class="tree-item governance" data-object-id="{{instance.id}}" data-object-type="category" data-object-meta-type="category" {{^instance.descendant_controls}}style="display:none"{{/instance.descendant_controls}}>
+    <div class="item-main" {{data 'model'}}>
+      <div class="openclose">
+        <a class="openclose-placeholder" href="javascript://"> </a>
+        <div class="row-fluid">
+          <div class="span10">
+            <div class="item-data">
+              <div class="tree-title-area">
+                {{instance.name}}
+              </div>
+            </div>
+          </div>
+          <div class="span1">
+            <div class="counter">
+              &nbsp;
+            </div>
+          </div>
+          <div class="span1">
+            <div class="counter">
+              &nbsp;
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tier-2-info item-content">
+      <div class="tier-2-info-content">
+        {{#if draw_children}}
+          {{#prune_context}} {{! this line is just chopping the context stack down to one element}}
+            <div class="inner-tree">
+              {{#child_options}}
+                <h6>{{model.title_plural}} ({{list.length}})</h6>
+                <ul class="tree-structure new-tree" data-object-type="{{ model.shortName }}" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+              {{/child_options}}
+            </div>
+          {{/prune_context}}
+        {{/if}}
+        
+      </div>
+    </div>
+  </li>
+{{/list}}
+<li class="tree-item tree-item-add">
+  <div class="row-fluid">
+    <div class="span12">
+      <a href="javascript://">
+        + Control Category
+      </a>
+    </div>
+  </div>
+</li>

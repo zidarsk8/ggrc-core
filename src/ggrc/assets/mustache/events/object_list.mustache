@@ -1,0 +1,64 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<ul class="tree-structure new-tree event-tree">
+  {{#each list}}
+    <li class="tree-item {{resource_type.toLowerCase}}" data-model="true" {{data 'model'}}>
+      <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+        <div class="item-wrap">
+          <div class="row-fluid">
+            <div class="span12">
+              <div class="item-data">
+                <div class="tree-title-area">
+                  <ul>
+                    {{#revisions}}
+                    {{^if_match resource_type 'Context|RoleImplication'}}
+                    <li>
+                      <strong>
+                        {{firstnonempty description display_name}}
+                      </strong>
+                    </li>
+                    {{/if_equals}}
+                    {{/revisions}}
+                    <li>
+                      <span class="event-owner">
+                        by
+                        {{#using modified_by=modified_by}}
+                          {{{render '/static/mustache/people/popover.mustache' person=modified_by}}}
+                        {{/using}}
+                      </span>
+                    </li>
+                    <li>
+                      <span class="event-time">
+                        on {{date created_at}}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+  {{/each}}
+  {{#if list.length}}
+  <li>
+    {{#if has_prev_page}}
+    <a href="javascript://" class="view-more-paging">
+      Previous Page
+    </a>
+    {{/if}}
+
+    {{#if has_next_page}}
+    <a href="javascript://" class="pull-right view-more-paging" data-next="true">
+      Next Page
+    </a>
+    {{/if}}
+  </li>
+  {{/if}}
+</ul>

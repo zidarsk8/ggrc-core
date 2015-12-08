@@ -1,0 +1,72 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+
+<li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <span class="status-label status-"></span>
+  <div class="w-status">
+    {{{instance.description}}}
+    {{#prune_context}}
+    {{#child_options.0}}
+      <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
+      </ul>
+    {{/child_options.0}}
+    {{/prune_context}}
+
+    {{^if_equals parent_instance.status 'Verified'}}
+    {{#with_mapping 'folders' instance}} {{! dummy to ensure the child content always updates}}
+    {{#defer 'workflowFolder' instance.workflowFolder allow_fail=true}}
+      {{#if workflowFolder.errors}}
+        <small class="error-inline">
+          <strong>Warning:</strong> You need permission to upload files to workflow folder. <a href="https://drive.google.com/folderview?id={{grdive_msg_to_id workflowFolder.message}}&usp=sharing#">Request access</a>.
+        </small>
+      {{else}}
+        <div class="oneline">
+          {{#if workflowFolder}}
+            <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach supporting file" link_class="entry-attachment tree-item-add" click_event="trigger_upload_parent">
+            </ggrc-gdrive-picker-launcher>
+          {{else}}
+            <small class="error-inline">
+              <strong>Warning:</strong> Workflow folder is not set. Please select a folder before uploading files.
+            </small>
+          {{/if}}
+        </div>
+      {{/need_permission}}
+    {{else}}
+      <div {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }' 'display:inline-block; top: -5px; margin-left: 5px;' }}></div>
+    {{/defer}}
+    {{/with_mapping}}
+    {{/if_equals}}
+    <span class="entry-author">Modified by {{#using person=instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>
+  </div>
+  <div class="entry-actions pull-right">
+    <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+    <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+      <li>
+        {{^if_equals parent_instance.status 'Verified'}}
+          <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
+            <i class="grcicon-edit"></i>
+            Edit Comment
+          </a>
+        {{/if_equals}}
+      </li>
+      <li>
+        {{^if_equals parent_instance.status 'Verified'}}
+          {{#if mappings}}
+          {{#is_allowed_all 'delete' mappings}}
+            <a href="javascript://" data-toggle="unmap">
+              {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+              <i class="grcicon-deleted"></i>
+              Delete Comment
+            </a>
+          {{/is_allowed_all}}
+          {{/if}}
+        {{/if_equals}}
+      </li>
+    </ul>
+  </div><!-- entry-actions end -->
+</li>

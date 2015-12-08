@@ -1,0 +1,27 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{> /static/mustache/base_objects/dropdown_menu_tier2.mustache}}
+
+<div class="tier-content">
+  {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
+  {{{renderLive '/static/mustache/base_objects/mappings_detail.mustache' result=result parent_instance=parent_instance}}}
+  {{{renderLive '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+  {{#instance.url}}
+    <div class="row-fluid wrap-row">
+      <div class="span6">
+        <div class="tree-info">
+          {{! FIXME: Add tree item - should be Contract OR Regulation OR Policy OR Standard NOT Directive }}
+          <strong>URL:</strong>
+          <a class="url" href="{{schemed_url instance.url}}" target="_blank">
+            {{instance.url}}
+          </a>
+        </div>
+      </div>
+    </div>
+  {{/instance.url}}
+</div>

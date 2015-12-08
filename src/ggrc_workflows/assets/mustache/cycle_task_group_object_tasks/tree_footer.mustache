@@ -1,0 +1,22 @@
+{{!
+    Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+
+{{#if_equals original_list.length 0}}
+<li>
+  <div class="zero-state">
+    <h2>
+    {{#is_profile}}
+      You have
+    {{else}}
+      {{#with_page_object_as 'page_object'}}
+        {{page_object.type}} has
+      {{/with_page_object_as}}
+    {{/is_profile}} no assigned tasks</h2>
+  </div>
+</li>
+{{/if _equals}}

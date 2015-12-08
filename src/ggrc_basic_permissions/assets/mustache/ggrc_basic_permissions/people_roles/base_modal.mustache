@@ -1,0 +1,49 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{!<div id='{ id }' class='modal modal-selector fade hide' tabindex='-1'>}}
+    <div class="modal-header">
+      <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+        <i class="grcicon-x-grey"></i>
+      </a>
+      <h2>
+        {{ modal_title }}
+      </h2>
+    </div>
+    <div class="modal-body">
+      <div class="row-fluid">
+        <div class="span12 object_detail_column">
+          {{#selected_object}}
+            {{{ renderLive object_detail_view }}}
+          {{/selected_object}}
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span12">
+          {{#if selected_object}}
+            <div class="option_column">
+              {{{ renderLive option_column_view }}}
+            </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="row-fluid">
+        <div class="span6">
+          &nbsp;
+        </div>
+        <div class="span6">
+          <div class="confirm-buttons">
+            <a class="btn btn-small btn-success preventdoubleclick" xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
+              Save
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+{{!</div>}}

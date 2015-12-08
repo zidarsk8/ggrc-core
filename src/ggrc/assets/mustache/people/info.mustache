@@ -1,0 +1,77 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{#instance}}
+
+  {{#is_dashboard_or_all}}
+    {{> /static/mustache/dashboard/info/info.mustache}}
+  {{else}}
+
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+    {{#is_info_pin}}
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+    {{/is_info_pin}}
+
+    <div class="tier-content">
+      <div class="pane-header">
+        {{#name}}
+          <div class="row-fluid wrap-row">
+            <div class="span12">
+              <h6>Name</h6>
+              <h3>{{name}}
+                {{#if_equals system_wide_role 'No Access'}}
+                  <span class="user-disabled">
+                    (No Access)
+                  </span>
+                {{/if}}
+              </h3>
+            </div>
+          </div>
+        {{/name}}
+      </div>
+
+      {{#email}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Email</h6>
+            <p>
+            {{email}}
+            </p>
+          </div>
+        </div>
+      {{/email}}
+
+      {{#company}}
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Company</h6>
+              <p>
+                {{company}}
+              </p>
+          </div>
+        </div>
+      {{/company}}
+    </div><!-- tier-content end -->
+
+  {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+
+  </section>
+
+    <div class="info-widget-footer">
+      <p>
+        <small>
+        <em>
+          Created at {{date created_at}}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+        </em>
+        </small>
+      </p>
+    </div>
+  {{/is_dashboard}}
+{{/instance}}

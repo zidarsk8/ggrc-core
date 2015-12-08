@@ -1,0 +1,87 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+    <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+      <div class="item-main" {{#instance}}{{data 'person'}}{{/instance}}>
+        <div class="item-wrap">
+          {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
+          <div class="select">
+            <div class="item-data">
+              <div class="row-fluid">
+                <div class="span4">
+                  <div class="title tree-title-area">
+                    {{{render '/static/mustache/people/popover.mustache' person=instance}}}
+                  </div>
+                </div>
+                <div class="span2">
+                  <div class="email tree-title-area">
+                    {{#if_match instance.name '\\\\S'}}
+                      {{#instance.name}}
+                        <span class="email">{{instance.email}}</span>
+                      {{/instance.name}}
+                    {{/if_match}}
+                  </div>
+                </div>
+                <div class="span2">
+                  <div class="role tree-title-area">
+                    {{#with_program_roles_as "roles" result}}
+                    {{#if roles.length}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="role" title="{{#roles}}{{role.permission_summary}} {{/roles}}">
+                              {{#if_helpers '\
+                                #if_equals' roles.0.role.permission_summary 'Mapped' '\
+                                and ^if_equals' roles.length 1}}
+                                {{pretty_role_name roles.1.role.permission_summary}}
+                              {{else}}
+                                {{pretty_role_name roles.0.role.permission_summary}}
+                              {{/if_helpers}}
+                              {{#roles.1}}
+                                {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
+                                  {{^if_equals roles.length 2}}
+                                    + {{sum roles.length '-2'}}
+                                  {{/if_equals}}
+                                {{else}}
+                                  + {{sum roles.length '-1'}}
+                                {{/if_in_map}}
+                              {{/roles.1}}
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                      {{else}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="no-role">
+                              No Access
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    {{/if}}
+                    {{/with_program_roles_as}}
+                  </div>
+                </div>
+
+                <div class="span4">
+                  <div class="show-details">
+                    {{#if instance.viewLink}}
+                      {{#is_allowed "view_object_page" instance}}
+                        <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                      {{/is_allowed}}
+                    {{/if}}
+                  </div>
+                </div>
+              </div>
+            </div><!-- item-data end -->
+          </div><!-- select end -->
+        </div><!-- item-wrap end -->
+      </div><!-- item-main end -->
+
+    </li>

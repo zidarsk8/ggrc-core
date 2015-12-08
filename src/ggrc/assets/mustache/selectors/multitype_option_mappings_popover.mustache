@@ -1,0 +1,32 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+<div class="row-fluid">
+  <p>
+  </p>
+
+  <ul>
+    {{#each_with_extras_as "binding" result.bindings_compute}}
+    <li>
+      {{#if_instance_of binding.instance "Section"}}
+      <i class="grcicon-{{binding.instance.class.table_singular}}-color"></i><b href="{{link_to_tree binding.instance.directive binding.instance}}">{{binding.instance.title}}</b>
+      {{#if binding.instance.directive}}
+        of
+        {{#using directive=binding.instance.directive}}
+          <i class="grcicon-{{directive.class.table_singular}}-color"></i><b href="{{link_to_tree directive}}">{{directive.title}}</b>
+        {{/using}}
+      {{/if}}
+      {{else}}
+      <i class="grcicon-{{binding.instance.class.table_singular}}-color"></i><b href="{{link_to_tree binding.instance}}">{{binding.instance.title}}</b>
+      {{/if_equals}}
+      {{#unless isLast}},{{/unless}}
+      {{#if isSecondToLast}} and{{/if}}
+    </li>
+    {{/each_with_extras_as}}
+  </ul>
+</div>
+</div>

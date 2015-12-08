@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: dan@reciprocitylabs.com
+# Maintained By: dan@reciprocitylabs.com
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+
+cd "${SCRIPTPATH}/../src"
+
+
+#python -c "import ggrc.migrate; ggrc.migrate.upgradeall()"
+
+# FIXME: This is a workaround due to deprecation of `oauth2client.tools.run`
+#   and `gflags`.  AppEngine SDK provides a working `oauth2client`, but it
+#   is masked by our (newer) version in `packages`.  Adding the `python-gflags`
+#   package to `src/requirements.txt` is a fix, but then we have to apply
+#   the same `noauth_local_webserver` workaround used in
+#   `extras/google_appengine__force_noauth_local_webserver.diff`
+
+python -c "\
+import ggrc.migrate
+import sys, os
+dev_prefix = os.environ['DEV_PREFIX']
+old_module_paths = [
+  dev_prefix + '/opt/google_appengine/lib/google-api-python-client',
+  dev_prefix + '/opt/google_appengine/lib/python-gflags',
+  dev_prefix + '/opt/google_appengine/lib/httplib2',
+  ]
+for old_path in old_module_paths:
+  sys.path.insert(0, old_path)
+ggrc.migrate.upgradeall()"
+

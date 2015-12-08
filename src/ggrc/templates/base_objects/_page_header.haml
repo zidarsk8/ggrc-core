@@ -1,0 +1,91 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: silas@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+
+%h1.entities
+  -if current_user.system_wide_role.lower() != 'no access'
+    %button{ 'class': 'lhn-trigger', 'href': 'javascript://'}
+      %span.icon-bar
+      %span.icon-bar
+      %span.icon-bar
+
+  %span.title-content
+    -if request.path.startswith('/admin')
+      %i.grciconlarge-dashboard
+      Admin Dashboard
+
+%ul.menu
+  %li
+    %a{ 'href': 'javascript://', 'data-toggle': 'unified-search', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
+      %i.grcicon-search
+      %span
+        Search
+  %li
+    %a#page-help{ 'href': "/dashboard#task_widget" }
+      %i.grcicon-task-black
+      %span
+        My Tasks
+        %span.task-count
+  %li
+    %a{ 'href': '/objectBrowser' }
+      %i.grcicon-search
+      %span
+        All Objects
+
+  %li.user.dropdown
+    %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
+      %i.grcicon-user-black
+      %span
+        =current_user.email
+      %i.grcicon-carot
+    %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
+      %li.full-opacity
+        %a{'href': "/dashboard"}
+          %i.grcicon-my-work
+          My Work ({{current_user.system_wide_role}})
+
+      -if permissions.is_allowed_read('/admin', None, 1)
+        %li
+          %a{'href': "/admin#people_list_widget"}
+            %i.grcicon-dashboard-black
+            Admin Dashboard
+      %li.notify-wrap
+        %span
+          %i.grcicon-alarm-black
+          Notifications
+        %div.inner-list
+          %label
+            %input{
+              'type': 'checkbox',
+              'name': 'notifications',
+              'value': 'Email_Digest'
+            }
+            Daily email digest
+          %label.inner
+            %input{
+              'type': 'checkbox',
+              'name': 'notifications',
+              'value': 'Email_Now'
+            }
+            Real-time email updates
+      %li
+        %a{'href': "/import"}
+          Data import
+      %li
+        %a{'href': "/export"}
+          Data export
+      %li
+        %a{'href': "/export?data_grid=true"}
+          Data grid
+      %li
+        %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
+          %i.grcicon-logout-black
+          Logout
+
+  -if self.page_help
+    %li
+      %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+        %i.grcicon-help-black
+          %span
+            Help

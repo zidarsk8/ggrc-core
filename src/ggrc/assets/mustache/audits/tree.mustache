@@ -1,0 +1,161 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: silas@reciprocitylabs.com
+    Maintained By: silas@reciprocitylabs.com
+}}
+
+
+{{!tree node mustache}}
+<li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
+    <div class="item-wrap">
+      {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
+      <div class="select">
+        <div class="item-data">
+          <div class="row-fluid">
+            <div class="span{{display_options.title_width}}">
+              <div class="title tree-title-area" rel="tooltip" data-placement="left" title="" data-original-title="{{instance.title}}">
+                {{#if_draw_icon instance}}
+                  <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                {{/if_draw_icon}}
+                {{instance.title}}
+              </div>
+            </div>
+
+            <div class="span{{display_options.selectable_width}}">
+              <div class="row-fluid">
+                {{#display_attr_list}}
+                  <div class="span{{display_options.selectable_attr_width}}">
+                    {{#if_equals attr_type 'custom'}}
+                      <div class="custom tree-title-area">
+                        {{get_custom_attr_value this instance}}
+                      </div>
+                    {{else}}
+                      <div class="owner tree-title-area">
+                        {{#switch attr_name}}
+                          {{#case 'audit_lead'}}
+                            {{#if instance.contact}}
+                              {{#using contact=instance.contact}}
+                                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                              {{/using}}
+                            {{/if}}
+                          {{/case}}
+                          {{#case 'report_period'}}
+                            {{#if instance.report_start_date}}
+                              {{#if instance.report_end_date}}
+                                {{localize_date instance.report_start_date}} - {{localize_date instance.report_end_date}}
+                              {{else}}
+                                Starts {{localize_date instance.report_start_date}}
+                              {{/if}}
+                            {{else}}
+                              {{#if instance.report_end_date}}
+                                Ends {{localize_date instance.report_end_date}}
+                              {{/if}}
+                            {{/if}}
+                          {{/case}}
+                          {{#case 'audit_firm'}}
+                            {{#using firm=instance.audit_firm}}
+                              {{{firstnonempty firm.title 'None'}}}
+                            {{/using}}
+                          {{/case}}
+
+                          {{#default}}
+                            {{#if_helpers '\
+                              #if_equals' attr_name 'url' '\
+                              or #if_equals' attr_name 'reference_url'}}
+                                <a class="url" href="{{get_url_value attr_name instance}}" target="_blank">
+                                  {{get_default_attr_value attr_name instance}}
+                                </a>
+                            {{else}}
+                              {{get_default_attr_value attr_name instance}}
+                            {{/in_helpers}}
+                          {{/default}}
+                        {{/switch}}
+                      </div>
+                    {{/if_equals}}
+                  </div>
+                {{/display_attr_list}}
+              </div>
+            </div>
+
+            <div class="span{{display_options.action_width}}">
+              <div class="show-details">
+                {{#child_options}}
+                  {{#if add_item_view}}
+                    {{{renderLive add_item_view}}}
+                  {{/if}}
+                {{/child_options}}
+                {{#if instance.viewLink}}
+                  {{#is_allowed "view_object_page" instance}}
+                    <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                  {{/is_allowed}}
+                {{/if}}
+              </div>
+              <ul class="tree-action-list">
+                {{#infer_roles instance}}
+                  <li>
+                    <i class="grcicon-person-black" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
+                  </li>
+                {{/infer_roles}}
+                {{#with_page_object_as 'page_object'}}
+                  {{#if_instance_of page_object 'Person'}}
+
+                    {{^instance.contact}}
+                      <li>
+                        <div class="counter">
+                          <i class="grcicon-people-warning"></i>
+                        </div>
+                      </li>
+                    {{/instance.contact}}
+
+                    {{#mapping_count instance 'related_owned_objects'}}
+                      <li>
+                        <div class="counter">
+                          <i class="grcicon-object-black"></i>
+                            {{.}}
+                        </div>
+                      </li>
+                      {{else}}
+                      <li>
+                        <div class="counter">
+                          <i class="grcicon-object-black"></i>
+                            ...
+                        </div>
+                      </li>
+                    {{/mapping_count}}
+                    {{else}}
+                    {{^instance.contact}}
+                      <li>
+                        <div class="counter">
+                          <i class="grcicon-people-warning"></i>
+                        </div>
+                      </li>
+                    {{/instance.contact}}
+                  {{/if_instance_of}}
+                {{/with_page_object_as}}
+              </ul>
+
+            </div>
+          </div>
+        </div><!-- item-data end -->
+      </div><!-- select end -->
+    </div><!-- item-wrap end -->
+  </div><!-- item-main end -->
+
+  {{#if expanded}}
+  <div class="tier-2-info item-content">
+    <div class="tier-2-info-content">
+      {{#if draw_children}}
+        {{#child_options.0}}
+          <div class="inner-tree">
+            <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
+            </ul>
+          </div>
+        {{/child_options.0}}
+      {{/if}}
+    </div>
+  </div>
+  {{/if}}
+
+</li>

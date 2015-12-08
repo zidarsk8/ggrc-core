@@ -1,0 +1,32 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+
+%table.ggrc-table{cellspacing:"0",cellpadding:"0"}
+  -for a in width_pcts
+    %col{style:"width:{{a}}%" }
+  -for a in custom_attribute_definitions
+    %col{style:"width:{{default_width_pct}}%" }
+  %thead
+    %tr
+      -for a in column_names
+        -if a in header_overrides
+          %th
+            {{header_overrides[a]}}
+        -else
+          %th
+            {{converter.get_header_for_object_column(a)}}
+      -for c in custom_attribute_definitions
+        %th
+          {{c}}
+  %tbody
+    -for result in results
+      -set parity = "even" if (loop.index % 2 == 0) else "odd"
+      %tr{class:"={parity}"}
+        -for col_name in column_names
+          -set cellvalue = result[col_name]
+          -include "directives/_import_cell.haml"
+        -for definition in custom_attribute_definitions
+          -set cellvalue = result.handlers[definition]
+          -include "directives/_import_cell.haml"

@@ -1,0 +1,33 @@
+{#
+Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+Created By: miha@reciprocitylabs.com
+Maintained By: miha@reciprocitylabs.com
+#}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+{% import 'notifications/style.html' as style %}
+
+<html xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0;">
+<head>
+
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<title>Google GRC Email</title>
+
+</head>
+
+<body {{ style.body_style() }} >
+
+  {% block body %}
+    {% include 'notifications/email_header.html' %}
+      {% block content %}
+      {% endblock %}
+  {% endblock %}
+
+</body>
+</html>
+
+

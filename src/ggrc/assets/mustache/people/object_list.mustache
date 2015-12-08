@@ -1,0 +1,184 @@
+{{!
+    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
+{{! dashboard object listing}}
+<ul class="tree-structure new-tree">
+  {{#each list}}
+    <li class="tree-item role" data-model="true" {{data 'model'}}>
+      <div class="item-main">
+        <div class="item-wrap">
+          {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
+          <div class="select">
+            <div class="item-data">
+              <div class="row-fluid">
+                <div class="span4">
+                  <div class="title tree-title-area">
+                    {{name}}
+                  </div>
+                </div>
+                <div class="span4">
+                  <div class="email tree-title-area">
+                    {{#if_match name '\\\\S'}}
+                      {{#name}}
+                        <span class="email">{{email}}</span>
+                      {{/name}}
+                    {{/if_match}}
+                  </div>
+                </div>
+                <div class="span2">
+                  {{#person_roles this "System|Admin"}}
+                    {{#if roles.length}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="role" title="{{#roles}}{{permission_summary}} {{/roles}}">
+                              {{roles.0.permission_summary}}
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    {{else}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="no-role">
+                              No Access
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    {{/if}}
+                  {{/person_roles}}
+                </div>
+                <div class="span2">
+                  <div class="show-details">
+                    <a href="/people/{{id}}">
+                      <i class="grcicon-to-right"></i>
+                    </a>
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- item-data end -->
+          </div><!-- select end -->
+        </div><!-- item-wrap end -->
+      </div><!-- item-main end -->
+
+      <div class="tier-2-info item-content info">
+        <div class="tier-2-info-content">
+
+          <div class="details-wrap">
+            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+              <li>
+                <a href="/people/{{id}}">
+                  <i class="grcicon-goto"></i>
+                  View Profile Page
+                </a>
+              </li>
+              {{#is_allowed 'create' 'delete' 'UserRole' context=parent_instance.context.id}}
+                <li class="border">
+                  <a href="javascript://" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}">
+                    <i class="grcicon-role-color"></i>
+                    <span>Edit Authorizations</span>
+                  </a>
+                </li>
+              {{/is_allowed}}
+              {{#is_allowed 'update' instance}}
+                <li>
+                  <a href="javascript://" data-object-plural="people" data-object-singular="Person" data-object-id="{{id}}" data-modal-class="modal-wide" data-placement="left" data-toggle="modal-ajax-form">
+                    <i class="grcicon-edit"></i>
+                    <span>Edit Person</span>
+                  </a>
+                </li>
+              {{/is_allowed}}
+            </ul>
+          </div>
+
+          <div class="tier-content">
+            {{#if_match name '\\\\S'}}
+              {{#name}}
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Name</h6>
+                    <h3>{{name}}</h3>
+                  </div>
+                </div>
+              {{/name}}
+            {{/if_match}}
+
+            {{#if_match email '\\\\S'}}
+              {{#email}}
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Email</h6>
+                    <p>
+                      <a href='mailto:{{email}}' target="_blank">
+                        {{email}}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              {{/email}}
+            {{/if}}
+            {{#if_match company '\\\\S'}}
+              {{#company}}
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Company</h6>
+                    {{company}}
+                  </div>
+                </div>
+              {{/company}}
+            {{/if_match}}
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                <h6>Authorizations</h6>
+                <p>
+                  {{#person_roles this "System|Admin"}}
+                    {{#if roles.length}}
+                      {{#roles}}
+                        <span class="role">
+                          {{permission_summary}}
+                        </span>
+                      {{/roles}}
+                    {{else}}
+                      <li>
+                        <div class="item-data">
+                          <div class="tree-title-area">
+                            <span class="no-role">
+                              No Access
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    {{/if}}
+                  {{/person_roles}}
+                </p>
+              </div>
+            </div>
+          </div>
+          {{{render '/static/mustache/custom_attributes/info.mustache' instance=this}}}
+        </div>
+      </div><!-- tier 2 end -->
+    </li>
+  {{/each}}
+
+  <li>
+    {{#if has_prev_page}}
+    <a href="javascript://" class="view-more-paging">
+      Previous Page
+    </a>
+    {{/if}}
+
+    {{#if has_next_page}}
+    <a href="javascript://" class="pull-right view-more-paging" data-next="true">
+      Next Page
+    </a>
+    {{/if}}
+  </li>
+</ul>
