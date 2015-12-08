@@ -357,7 +357,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
-    status: "Unstarted",
+    status: "Open",
     requested_on: moment().toDate(),
     due_on: GGRC.Utils.firstWorkingDay(moment().add(1, "weeks"))
   }
