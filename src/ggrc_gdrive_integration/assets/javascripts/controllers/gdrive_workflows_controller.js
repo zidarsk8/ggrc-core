@@ -1185,10 +1185,7 @@ can.Component.extend({
         GGRC.Controllers.Modals.confirm({
           modal_description: scope.attr("modal_description"),
           modal_confirm: scope.attr("modal_button"),
-          modal_title: scope.attr("modal_title"),
-          scope: scope,
-          el: el,
-          ev: ev
+          modal_title: scope.attr("modal_title")
         }, verify_dfd.resolve);
       } else {
         verify_dfd.resolve();
