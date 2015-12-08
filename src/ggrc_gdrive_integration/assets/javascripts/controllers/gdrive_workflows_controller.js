@@ -104,20 +104,20 @@ function report_progress(str, xhr) {
       }
     });
 
-    if(success_count) {
+    if (success_count) {
       flash.success = successes.concat(closer);
     } else {
-      flash.success = []
+      flash.success = [];
     }
-    if(failure_count) {
+    if (failure_count) {
       flash.error = failures.concat(closer);
-    } else{
-      flash.error = []
+    } else {
+      flash.error = [];
     }
-    if(pending_count) {
+    if (pending_count) {
       flash.warning = pendings.concat(closer);
     } else {
-      flash.warning = []
+      flash.warning = [];
     }
     $(document.body).trigger("ajax:flash", flash);
     // initialize items in hidden state
