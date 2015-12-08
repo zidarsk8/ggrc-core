@@ -206,7 +206,8 @@ def handle_relationship_post(sender, obj=None, src=None, service=None):
 
     if "Person" in (obj.source.type, obj.destination.type):
       # This captures assignable addition
-      if inspect(obj).attrs.relationship_attrs.history.has_changes():
+      history = inspect(obj).attrs.relationship_attrs.history
+      if history.has_changes() and req.status in {"Final", "Verified"}:
         has_changes = True
 
     if has_changes and req.status in {"Open", "Final", "Verified"}:
