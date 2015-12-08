@@ -60,7 +60,7 @@
                   quick_create="create_url"
                   {{#if_in instance.status "Open,Final,Verified"}}
                     verify_event="true"
-                    modal_description='You are about to move request back to "In Progress", all steps will have to be redone - are you sure about that?'
+                    modal_description='You are about to move request from "{{instance.status}}" to "In Progress" - are you sure about that?'
                     modal_title='Confirm moving Request back to "In Progress"'
                     modal_button='Confirm'
                   {{/if_in}}
