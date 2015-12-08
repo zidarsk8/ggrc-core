@@ -1168,6 +1168,8 @@ can.Component.extend({
           return new RefreshQueue().enqueue(files).trigger().then(function (files) {
             doc_dfds = that.handle_file_upload(files);
             $.when.apply($, doc_dfds).then(function () {
+              // Trigger modal:success event on scope
+              can.trigger(that, "modal:success", {arr: can.makeArray(arguments)});
               el.trigger("modal:success", {arr: can.makeArray(arguments)});
               that.attr('pending', false);
             });
@@ -1344,6 +1346,10 @@ can.Component.extend({
       if(!this.scope.link_class) {
         this.scope.attr("link_class", "btn");
       }
+    }
+    , "{scope} modal:success": function(_scope, _event) {
+      var instance = this.scope.instance.reify();
+      instance.refresh();
     }
   }
 });
