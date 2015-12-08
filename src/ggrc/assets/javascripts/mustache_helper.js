@@ -2342,6 +2342,40 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
   return options.inverse(options.contexts);
 });
 
+Mustache.registerHelper("if_verifier", function (instance, options) {
+  var user = GGRC.current_user,
+      verifiers;
+
+  instance = Mustache.resolve(instance);
+  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+
+  if (!instance) {
+    return '';
+  }
+
+  verifiers = instance.get_binding('related_verifiers');
+
+  function finish(list) {
+    var llist = _.filter(list, function(item) {
+      if (item.instance.email == user.email) {
+        return true;
+      }
+      return false;
+    });
+
+    if (llist.length) {
+      return options.fn(options.contexts);
+    }
+    return options.inverse(options.contexts);
+  }
+
+  function fail(error) {
+    return options.inverse(options.contexts);
+  }
+
+  return defer_render('span', { done : finish, fail : fail }, verifiers.refresh_instances())
+});
+
 can.each({
   "if_can_edit_request": {
     assignee_states: ["Requested", "Amended Request"],
