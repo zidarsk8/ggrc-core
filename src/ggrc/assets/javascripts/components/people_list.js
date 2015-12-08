@@ -94,7 +94,7 @@
                 type: person.type,
                 id: person.id
               },
-              context: null,
+              context: destination.context,
               destination: {
                 href: destination.href,
                 type: destination.type,
