@@ -9,18 +9,24 @@
   <ul class="attachment-list" data-update-count="{{update_count}}" data-disable-lazy-loading="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }} data-info-controller="true">
   </ul>
   {{#is_allowed 'update' instance context='for'}}
-    <ggrc-gdrive-picker-launcher
-      instance="instance"
-      link_text="Attach evidence"
-      click_event="trigger_upload"
-      {{#if_in instance.status "Open,Final,Verified"}}
+    {{#if_in instance.status "Open,Final,Verified"}}
+      <ggrc-gdrive-picker-launcher
+        instance="instance"
+        link_text="Attach evidence"
+        click_event="trigger_upload"
         verify_event="true"
         modal_description='You are about to move request from "{{instance.status}}" to "In Progress" - are you sure about that?'
         modal_title='Confirm moving Request back to "In Progress"'
         modal_button='Confirm'
-      {{/if_in}}
-    >
-    </ggrc-gdrive-picker-launcher>
+        >
+      </ggrc-gdrive-picker-launcher>
+    {{else}}
+      <ggrc-gdrive-picker-launcher
+        instance="instance"
+        link_text="Attach evidence"
+        click_event="trigger_upload">
+      </ggrc-gdrive-picker-launcher>
+    {{/if_in}}
   {{/is_allowed}}
 {{/add_to_current_scope}}
 {{/instance}}
