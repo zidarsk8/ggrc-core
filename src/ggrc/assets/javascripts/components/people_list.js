@@ -125,10 +125,11 @@
                 id: destination.id
               }
             });
-            model = new $.Deferred().resolve(model);
+            model = $.Deferred().resolve(model);
           } else {
             model = model.refresh();
           }
+
           model.then(function (model) {
             var type = model.attr("attrs.AssigneeType");
             model.attr("attrs.AssigneeType", role + (type ? "," + type : ""));

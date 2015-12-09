@@ -181,7 +181,6 @@ dashboard-js-template-files:
   - base_templates/mapped_objects.mustache
   - base_templates/notes.mustache
   - base_templates/people_list.mustache
-  - base_templates/add_people.mustache
   - base_templates/people_group.mustache
   - base_templates/request_type.mustache
   - base_templates/test.mustache
