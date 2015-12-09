@@ -132,22 +132,22 @@ can.Control("CMS.Controllers.TreeLoader", {
         $footer.before($spinner_li);
       }
     }
-  }
-  , prepare: function() {
-    var that = this;
-
-    if (this._prepare_deferred)
+  },
+  prepare: function () {
+    if (this._prepare_deferred) {
       return this._prepare_deferred;
+    }
 
-    this._prepare_deferred = new $.Deferred();
+    this._prepare_deferred = $.Deferred();
     this._prepare_deferred.resolve();
 
-    this._attached_deferred.then(function() {
-      if (that.element && that.options.update_count) {
-        that.element.trigger("updateCount", 0);
-        that.init_count();
+    this._attached_deferred.then(function () {
+      if (!this.element) {
+        return;
       }
-    });
+      can.trigger(this.element, "updateCount", [0, this.options.update_count]);
+      this.init_count();
+    }.bind(this));
 
     return this._prepare_deferred;
   }

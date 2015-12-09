@@ -144,12 +144,13 @@ can.Control("CMS.Controllers.Dashboard", {
       this.get_active_widget_containers().show();
     }
 
-  , " widgets_updated" : "update_inner_nav"
-
-  , " updateCount": function(el, ev, count) {
-      this.inner_nav_controller.update_widget_count($(ev.target), count);
+  , " widgets_updated" : "update_inner_nav",
+  " updateCount": function (el, ev, count, updateCount) {
+    if (_.isBoolean(updateCount) && !updateCount) {
+      return;
     }
-
+    this.inner_nav_controller.update_widget_count($(ev.target), count, updateCount);
+  }
   , update_inner_nav: function(el, ev, data) {
       if (this.inner_nav_controller) {
         if(data) {
