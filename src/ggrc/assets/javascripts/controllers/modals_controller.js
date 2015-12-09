@@ -500,7 +500,8 @@ can.Control("GGRC.Controllers.Modals", {
       $hidable = $el.closest('[class*="span"].hidable'),
       $innerHide = $el.closest('[class*="span"]').find('.hidable'),
       $showButton = $(this.element).find('#formRestore'),
-      $hideButton = $(this.element).find('#formHide');
+      $hideButton = $(this.element).find('#formHide'),
+      $totalInner = $el.closest('.hide-wrap.hidable').find('.inner-hide').length;
 
       $el.closest('.inner-hide').addClass('inner-hidable');
       //$hidable.hide();
@@ -518,8 +519,8 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }
 
-      for(i=0; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
-        if(i == 1) {
+      for(i=1; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
+        if(i == $totalInner - 1) {
           $el.closest('.inner-hide').parent('.hidable').addClass("hidden");
         }
       }
