@@ -482,7 +482,7 @@ can.Model.Cacheable("CMS.Models.Request", {
 
         // Audit leads should be default assignees
         (audit.selfLink ? $.when(audit) : audit.refresh())
-        .then(function(audit) {
+        .then(function (audit) {
           contact = audit.contact.reify();
 
           if (assignees[contact.email]) {
@@ -493,9 +493,9 @@ can.Model.Cacheable("CMS.Models.Request", {
         }.bind(this));
 
         // Audit auditors should be default verifiers
-        $.when(audit.findAuditors()).then(function(auditors) {
-          auditors.each(function(elem){
-            elem.each(function(obj){
+        $.when(audit.findAuditors()).then(function (auditors) {
+          auditors.each(function (elem) {
+            elem.each(function (obj) {
               if (obj.type == "Person") {
                 if (assignees[obj.email]) {
                   assignees[obj.email] += ",Verifier"
@@ -509,11 +509,11 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
 
       // Assign assignee roles
-      can.each(assignees, function(value, key) {
+      can.each(assignees, function (value, key) {
         var person = CMS.Models.Person.findInCacheByEmail(key);
         that.mark_for_addition("related_objects_as_destination", person, {
           attrs: {
-            "AssigneeType": value,
+            "AssigneeType": value
           }
         });
       });
