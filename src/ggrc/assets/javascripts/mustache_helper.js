@@ -762,8 +762,16 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
-Mustache.registerHelper("get_permalink", function () {
+Mustache.registerHelper("get_permalink_url", function () {
   return window.location.href;
+});
+
+Mustache.registerHelper("get_permalink_for_object", function (instance, options) {
+  instance = resolve_computed(instance);
+  if (!instance.viewLink) {
+    return "";
+  }
+  return window.location.origin + instance.viewLink;
 });
 
 Mustache.registerHelper("get_view_link", function (instance, options) {
@@ -1410,6 +1418,19 @@ can.each({
 Mustache.registerHelper("capitalize", function (value, options) {
   value = resolve_computed(value) || "";
   return can.capitalize(value);
+});
+
+Mustache.registerHelper("lowercase", function (value, options) {
+  value = resolve_computed(value) || "";
+  return value.toLowerCase();
+});
+
+Mustache.registerHelper("assignee_types", function (value, options) {
+  value = resolve_computed(value) || "";
+  value = _.first(_.map(value.split(","), function (type) {
+    return _.trim(type).toLowerCase();
+  }));
+  return _.isEmpty(value) ? "none" : value;
 });
 
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {
