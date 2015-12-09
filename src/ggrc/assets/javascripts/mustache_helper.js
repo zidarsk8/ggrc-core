@@ -3171,7 +3171,7 @@ Example:
     {{log .}} // {example1: "a", example2: "b"}
   {{/add_to_current_scope}}
 */
-Mustache.registerHelper("add_to_current_scope", function(options) {
+Mustache.registerHelper("add_to_current_scope", function (options) {
   return options.fn(options.contexts.add(_.extend({}, options.context, options.hash)));
 });
 

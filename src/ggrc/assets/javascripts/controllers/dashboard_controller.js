@@ -541,14 +541,14 @@ can.Control("CMS.Controllers.InnerNav", {
     return index;
   }
 
-  , update_widget_count : function($el, count) {
-      var widget_id = $el.closest('.widget').attr('id'),
+  , update_widget_count: function ($el, count) {
+      var widget_id = $el.closest(".widget").attr("id"),
           widget = this.widget_by_selector("#" + widget_id);
 
       if (widget) {
         widget.attr({
-            count: count
-          , has_count: true
+          count: count,
+          has_count: true
         });
       }
       this.update_add_more_link();
