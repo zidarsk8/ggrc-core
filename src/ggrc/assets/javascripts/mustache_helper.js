@@ -1420,6 +1420,19 @@ Mustache.registerHelper("capitalize", function (value, options) {
   return can.capitalize(value);
 });
 
+Mustache.registerHelper("lowercase", function (value, options) {
+  value = resolve_computed(value) || "";
+  return value.toLowerCase();
+});
+
+Mustache.registerHelper("assignee_types", function (value, options) {
+  value = resolve_computed(value) || "";
+  value = _.first(_.map(value.split(","), function (type) {
+    return _.trim(type).toLowerCase();
+  }));
+  return _.isEmpty(value) ? "none" : value;
+});
+
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {
   var tokens = [];
   var sod;

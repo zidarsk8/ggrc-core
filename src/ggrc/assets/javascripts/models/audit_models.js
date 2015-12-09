@@ -298,8 +298,8 @@ can.Model.Cacheable("CMS.Models.Comment", {
     create : "POST /api/comments",
     mixins : [],
     attributes : {
-      context : "CMS.Models.Context.stub",
-      modified_by : "CMS.Models.Person.stub",
+      context: "CMS.Models.Context.stub",
+      modified_by: "CMS.Models.Person.stub"
     },
     init : function() {
       this._super && this._super.apply(this, arguments);

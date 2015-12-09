@@ -64,6 +64,12 @@
       	line-height: 20px;
       	font-size: 12px;
 	}
+	&.none {
+		background: $lightGray;
+		&:after {
+			content: "N";
+		}
+	}
 	&.assignee {
 		background: $olive;
 		&:after {
