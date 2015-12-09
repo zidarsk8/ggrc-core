@@ -57,7 +57,26 @@ class ColumnHandler(object):
     self.display_name = options.get("display_name", "")
     self.dry_run = row_converter.block_converter.converter.dry_run
     self.new_objects = self.row_converter.block_converter.converter.new_objects
+    self.unique = options.get("unique", False)
     self.set_value()
+
+  def check_unique_consistency(self):
+    """Returns true if no object exists with the same unique field."""
+    if not self.unique:
+      return
+    if not self.value:
+      return
+    if not self.row_converter.obj:
+      return
+    nr_duplicates = self.row_converter.object_class.query.filter(and_(
+        getattr(self.row_converter.object_class, self.key) == self.value,
+        self.row_converter.object_class.id != self.row_converter.obj.id
+    )).count()
+    if nr_duplicates > 0:
+      self.add_error(errors.DUPLICATE_VALUE,
+                     column_name=self.key,
+                     value=self.value)
+      self.row_converter.set_ignore()
 
   def set_value(self):
     self.value = self.parse_item()
@@ -99,14 +118,20 @@ class ColumnHandler(object):
 class DeleteColumnHandler(ColumnHandler):
 
   # this is a white list of objects that can be deleted in a cascade
-  # e.g. deleting a Market can delete the associated ObjectOwner objectect too
-  delete_whitelist = {"Relationship", "ObjectOwner", "ObjectPerson"}
+  # e.g. deleting a Market can delete the associated ObjectOwner object too
+  DELETE_WHITELIST = {"Relationship", "ObjectOwner", "ObjectPerson"}
+  ALLOWED_VALUES = {"", "no", "false", "true", "yes", "force"}
+  TRUE_VALUES = {"true", "yes", "force"}
 
   def get_value(self):
     return ""
 
   def parse_item(self):
-    is_delete = self.raw_value.lower() in ["true", "yes"]
+    if self.raw_value.lower() not in self.ALLOWED_VALUES:
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+      return False
+    is_delete = self.raw_value.lower() in self.TRUE_VALUES
+    self._allow_cascade = self.raw_value.lower() == "force"
     self.row_converter.is_delete = is_delete
     return is_delete
 
@@ -125,8 +150,8 @@ class DeleteColumnHandler(ColumnHandler):
     try:
       tr.session.delete(obj)
       deleted = len([o for o in tr.session.deleted
-                     if o.type not in self.delete_whitelist])
-      if deleted != 1:
+                     if o.type not in self.DELETE_WHITELIST])
+      if deleted > 1 and not self._allow_cascade:
         self.add_error(errors.DELETE_CASCADE_ERROR,
                        object_type=obj.type, slug=obj.slug)
     finally:
@@ -186,9 +211,9 @@ class UserColumnHandler(ColumnHandler):
 
   def get_person(self, email):
     new_objects = self.row_converter.block_converter.converter.new_objects
-    if email in new_objects[Person]:
-      return new_objects[Person].get(email)
-    return Person.query.filter(Person.email == email).first()
+    if email not in new_objects[Person]:
+      new_objects[Person][email] = Person.query.filter_by(email=email).first()
+    return new_objects[Person].get(email)
 
   def parse_item(self):
     email = self.raw_value.lower()
@@ -197,7 +222,8 @@ class UserColumnHandler(ColumnHandler):
       if email != "":
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
       elif self.mandatory:
-        self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.key)
+        self.add_error(errors.MISSING_VALUE_ERROR,
+                       column_name=self.display_name)
     return person
 
   def get_value(self):
@@ -336,7 +362,7 @@ class MappingColumnHandler(ColumnHandler):
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     class_ = self.mapping_object
-    lines = self.raw_value.splitlines()
+    lines = set(self.raw_value.splitlines())
     slugs = filter(unicode.strip, lines)  # noqa
     objects = []
     for slug in slugs:
@@ -345,7 +371,14 @@ class MappingColumnHandler(ColumnHandler):
         if permissions.is_allowed_update_for(obj):
           objects.append(obj)
         else:
-          self.add_warning(errors.MAPPING_PERMISSION_ERROR, value=slug)
+          title = getattr(obj, "title", None)
+          if title is None:
+            title = getattr(obj, "email", "")
+          self.add_warning(
+              errors.MAPPING_PERMISSION_ERROR,
+              object_type=class_._inflector.human_singular.title(),
+              slug=slug,
+          )
       elif not (slug in self.new_slugs and self.dry_run):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
@@ -577,6 +610,18 @@ class ParentColumnHandler(ColumnHandler):
       self.add_error(errors.UNKNOWN_OBJECT,
                      object_type=self.parent._inflector.human_singular.title(),
                      slug=slug)
+      return None
+    context_id = None
+    if hasattr(obj, "context_id") and \
+       hasattr(self.row_converter.obj, "context_id"):
+      context_id = obj.context_id
+      if context_id is not None:
+        name = self.row_converter.obj.__class__.__name__
+        if not permissions.is_allowed_create(name, None, context_id) \
+           and not permissions.has_conditions('create', name):
+          self.add_error(errors.MAPPING_PERMISSION_ERROR,
+                         object_type=obj.type, slug=slug)
+          return None
     return obj
 
   def set_obj_attr(self):
@@ -632,16 +677,12 @@ class SectionDirectiveColumnHandler(MappingColumnHandler):
 
 class ControlColumnHandler(MappingColumnHandler):
 
-  def __init__(self, row_converter, key, **options):
-    key = "{}control".format(MAPPING_PREFIX)
-    super(ControlColumnHandler, self).__init__(row_converter, key, **options)
-
-  def set_obj_attr(self):
-    self.value = self.parse_item()
+  def insert_object(self):
     if len(self.value) != 1:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name="Control")
       return
     self.row_converter.obj.control = self.value[0]
+    MappingColumnHandler.insert_object(self)
 
 
 class AuditColumnHandler(MappingColumnHandler):

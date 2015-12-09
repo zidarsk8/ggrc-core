@@ -4,8 +4,16 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 */
-(function($, GGRC) {
+(function($, GGRC, moment, Permission) {
   GGRC.Utils = {
+    firstWorkingDay: function (date) {
+      date = moment(date);
+      // 6 is Saturday 0 is Sunday
+      while (_.contains([0, 6], date.day())) {
+        date.add(1, "day");
+      }
+      return date.toDate();
+    },
     getPickerElement: function (picker) {
       return _.find(_.values(picker), function (val) {
         if (val instanceof Node) {
@@ -53,14 +61,24 @@
     },
     allowed_to_map: function (source, target, options) {
       var can_map = false,
-          target_type, source_type;
+          target_type, source_type, target_context, source_context, create_contexts, canonical, has_widget;
 
       target_type = target instanceof can.Model ? target.constructor.shortName
                                                 : (target.type || target);
       source_type = source.constructor.shortName || source;
-      target_context = target.context && target.context.id;
-      source_context = source.context && source.context.id;
-      create_contexts = GGRC.permissions.create && GGRC.permissions.create.Relationship && GGRC.permissions.create.Relationship.contexts;
+      canonical = GGRC.Mappings.get_canonical_mapping_name(source_type, target_type);
+      if (canonical && canonical.startsWith("_")) {
+        canonical = null;
+      }
+
+      has_widget = _.contains(GGRC.tree_view.base_widgets_by_type[source_type] || [], target_type);
+
+      if (_.exists(options, "hash.join") && (!canonical || !has_widget)) {
+        return false;
+      }
+      target_context = _.exists(target, "context.id");
+      source_context = _.exists(source, "context.id");
+      create_contexts = _.exists(GGRC, "permissions.create.Relationship.contexts");
 
       can_map = Permission.is_allowed_for("update", source) || source_type === "Person" || _.contains(create_contexts, source_context);
       if (target instanceof can.Model) {
@@ -69,4 +87,4 @@
       return can_map;
     }
   };
-})(jQuery, window.GGRC = window.GGRC || {});
+})(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

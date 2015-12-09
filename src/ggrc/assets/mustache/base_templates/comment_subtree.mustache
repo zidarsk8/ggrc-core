@@ -1,0 +1,30 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+{{#instance}}
+<li>
+  <span class="person-label {{assignee_types assignee_type}}"></span>
+  <div class="w-status">
+    <span class="entry-author">
+      {{#using person=modified_by}}
+        {{{render '/static/mustache/people/popover.mustache' person=person}}}
+      {{/using}}
+      added a response - {{date created_at}}
+    </span>
+    <div class="rtf-block">
+      {{{firstnonempty description '<em>No comment was entered</em>'}}}
+    </div>
+    {{#instance.class.info_pane_options.documents}}
+    {{#add_to_current_scope parent_instance=instance}}
+      <ul class="attachment-list" {{data 'options'}} data-disable-lazy-loading="true"
+        {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
+      </ul>
+    {{/add_to_current_scope}}
+    {{/instance}}
+  </div>
+</li>
+{{/instance}}

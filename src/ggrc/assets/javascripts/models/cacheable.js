@@ -222,7 +222,6 @@ can.Model("can.Model.Cacheable", {
         return deferred.done(tracker_stop);
       };
     }
-
   , setup : function(construct, name, statics, prototypes) {
     var overrideFindAll = false;
 
@@ -379,7 +378,6 @@ can.Model("can.Model.Cacheable", {
       GGRC.custom_attributable_types.push($.extend({}, this));
     }
   }
-
   , resolve_deferred_bindings : function(obj) {
     var _pjs, refresh_dfds = [], dfds = [];
     if(obj._pending_joins) {
@@ -439,7 +437,8 @@ can.Model("can.Model.Cacheable", {
             });
           }
         });
-        delete obj._pending_joins;
+
+        obj.attr('_pending_joins', []);
         return $.when.apply($, dfds).then(function() {
           return obj.refresh();
         });
@@ -930,35 +929,36 @@ can.Model("can.Model.Cacheable", {
       }
     }
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
-  }
-  , refresh : function(params) {
+  },
+  refresh: function (params) {
     var dfd,
-      href = this.selfLink || this.href,
-      that = this;
+        href = this.selfLink || this.href,
+        that = this;
 
-    if (!href)
+    if (!href) {
       return (new can.Deferred()).reject();
-    if(!this._pending_refresh) {
+    }
+    if (!this._pending_refresh) {
       this._pending_refresh = {
-        dfd : new $.Deferred()
-        , fn : _.throttle(function() {
+        dfd: $.Deferred(),
+        fn: _.throttle(function () {
           var dfd = that._pending_refresh.dfd;
           can.ajax({
-            url : href
-            , params : params
-            , type : "get"
-            , dataType : "json"
+            url: href,
+            params: params,
+            type: "get",
+            dataType : "json"
           })
-          .then(function(resources) {
+          .then(function (resources) {
             delete that._pending_refresh;
             return resources;
           })
           .then($.proxy(that.constructor, "model"))
-          .done(function(d) {
-            d.backup();
-            dfd.resolve(d);
+          .done(function (response) {
+            response.backup();
+            dfd.resolve.apply(dfd, arguments);
           })
-          .fail(function() {
+          .fail(function () {
             dfd.reject.apply(dfd, arguments);
           });
         }, 1000, {trailing: false})
@@ -1009,6 +1009,17 @@ can.Model("can.Model.Cacheable", {
   }
   , autocomplete_label : function() {
     return this.title;
+  },
+  get_permalink: function () {
+    var dfd = $.Deferred(),
+        constructor = this.constructor;
+    if (!constructor.permalink_options) {
+      return dfd.resolve(this.viewLink);
+    }
+    $.when(this.refresh_all.apply(this, constructor.permalink_options.base.split(":"))).then(function (base) {
+      return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
+    }.bind(this));
+    return dfd.promise();
   }
 
   /**
@@ -1017,7 +1028,7 @@ can.Model("can.Model.Cacheable", {
   , mark_for_deletion : function(join_attr, obj) {
     obj = obj.reify ? obj.reify() : obj;
     if(!this._pending_joins) {
-      this._pending_joins = [];
+      this.attr('_pending_joins', []);
     }
     for(var i = this._pending_joins.length; i--;) {
       if(this._pending_joins[i].what === obj) {
@@ -1032,7 +1043,7 @@ can.Model("can.Model.Cacheable", {
   , mark_for_addition : function(join_attr, obj, extra_attrs) {
     obj = obj.reify ? obj.reify() : obj;
     if(!this._pending_joins) {
-      this._pending_joins = [];
+      this.attr('_pending_joins', []);
     }
     for(var i = this._pending_joins.length; i--;) {
       if(this._pending_joins[i].what === obj) {
@@ -1045,7 +1056,7 @@ can.Model("can.Model.Cacheable", {
   , delay_resolving_save_until : function(dfd) {
     return this.notifier.queue(dfd);
   }
-  , _save: function() {
+  , _save: function () {
     var that = this,
         _super = Array.prototype.pop.call(arguments),
         isNew = this.isNew(),
@@ -1065,7 +1076,7 @@ can.Model("can.Model.Cacheable", {
 
     pre_save_notifier.on_empty(function() {
       xhr = _super.apply(that, arguments)
-      .then(function(result) {
+      .then(function (result) {
         if (isNew) {
           that.after_create && that.after_create();
         } else {
@@ -1073,7 +1084,7 @@ can.Model("can.Model.Cacheable", {
         }
         that.after_save && that.after_save();
         return result;
-      }, function(xhr, status, message) {
+      }, function (xhr, status, message) {
         that.save_error && that.save_error(xhr.responseText);
         return new $.Deferred().reject(xhr, status, message);
       })
@@ -1090,7 +1101,6 @@ can.Model("can.Model.Cacheable", {
 
       GGRC.delay_leaving_page_until(xhr);
       GGRC.delay_leaving_page_until(dfd);
-
     });
     return dfd;
   }

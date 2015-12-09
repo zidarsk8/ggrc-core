@@ -30,7 +30,7 @@ function _display_tree_subpath(el, path, attempt_counter) {
   var rest = path.split("/")
     , type = rest.shift()
     , id = rest.shift()
-    , selector = "[data-object-type=" + type + "][data-object-id=" + id + "]"
+    , selector = "[data-object-type='" + type + "'][data-object-id=" + id + "]"
     , $node
     , $next_node
     , node_controller
@@ -143,7 +143,7 @@ can.Control("CMS.Controllers.TreeLoader", {
     this._prepare_deferred.resolve();
 
     this._attached_deferred.then(function() {
-      if (that.element) {
+      if (that.element && that.options.update_count) {
         that.element.trigger("updateCount", 0);
         that.init_count();
       }
@@ -610,9 +610,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
 
       if (this.element.parent().length === 0 // element not attached
-        || this.element.hasClass("entry-list")) { // comment list
+        || this.element.data('disable-lazy-loading')) { // comment list
         this.options.disable_lazy_loading = true;
       }
+
+      this.options.update_count = _.isBoolean(this.element.data("update-count")) ? this.element.data("update-count") : true;
+
       if(!this.options.scroll_element) {
         this.options.attr("scroll_element", $(".object-area"));
       }
@@ -637,7 +640,10 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       this.init_display_options(opts);
     }.bind(this));
-
+    // Make sure the parent_instance is not a computable
+    if (typeof this.options.parent_instance === 'function') {
+      this.options.attr('parent_instance', this.options.parent_instance());
+    }
   }
 
   , " inserted": function() {
@@ -723,9 +729,13 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       if (this.get_count_deferred) {
         this.get_count_deferred.then(this._ifNotRemoved(function(count) {
-          self.element && self.element.trigger("updateCount", count());
-          count.bind("change", self._ifNotRemoved(function() {
+          if (self.options.update_count && self.element) {
             self.element.trigger("updateCount", count());
+          }
+          count.bind("change", self._ifNotRemoved(function() {
+            if (self.options.update_count) {
+              self.element.trigger("updateCount", count());
+            }
           }));
         }));
       } else {
@@ -1165,8 +1175,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   , " updateCount": function(el, ev) {
       // Suppress events from sub-trees
-      if (!($(ev.target).closest('.' + this.constructor._fullName).is(this.element)))
+      if (!($(ev.target).closest('.' + this.constructor._fullName).is(this.element))) {
         ev.stopPropagation();
+      }
     }
 
 /*  , "{list} add": function() {
@@ -1322,24 +1333,12 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           order_factor = order === "asc" ? 1 : -1;
 
       var comparator = function (a, b) {
-        if (typeof a === "string") {
-          a = a.toLowerCase();
-        };
-        if (typeof b === "string") {
-          b = b.toLowerCase();
-        };
-        if (a > b) {
-          return order_factor;
-        }
-        if (b > a) {
-          return -order_factor;
-        }
-        return 0;
+        return String.naturalCaseCompare(a, b) * order_factor;
       };
       this.options.sort_function = function (val1, val2) {
         var a = val1.get_deep_property(key_tree),
             b = val2.get_deep_property(key_tree);
-        return comparator(a,b);
+        return comparator(a, b);
       };
 
       this.options.sort_function.deep_property = key_tree;

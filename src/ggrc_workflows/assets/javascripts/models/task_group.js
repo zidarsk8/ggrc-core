@@ -19,6 +19,10 @@
     destroy: "DELETE /api/task_groups/{id}",
 
     mixins: ["contactable"],
+    permalink_options: {
+      url: "<%= base.viewLink %>#task_group_widget/task_group/<%= instance.id %>",
+      base: "workflow"
+    },
     attributes: {
       workflow: "CMS.Models.Workflow.stub",
       task_group_tasks: "CMS.Models.TaskGroupTask.stubs",
@@ -81,6 +85,10 @@
     destroy: "DELETE /api/task_group_tasks/{id}",
 
     mixins : ["contactable"],
+    permalink_options: {
+      url: "<%= base.viewLink %>#task_group_widget/task_group/<%= instance.task_group.id %>",
+      base: "task_group:workflow"
+    },
     attributes: {
       context: "CMS.Models.Context.stub",
       modified_by: "CMS.Models.Person.stub",

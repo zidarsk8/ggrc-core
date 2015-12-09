@@ -610,10 +610,34 @@ class Resource(ModelView):
         :src: The original POSTed JSON dictionary.
         :service: The instance of Resource handling the POST request.
       """,)
+  model_posted_after_commit = signals.signal(
+      'Model POSTed - after',
+      """
+      Indicates that a model object was received via POST and has been
+      committed to the database. The sender in the signal will be the model
+      aclass of the POSTed resource. The following arguments will be sent along
+      with the signal:
+
+        :obj: The model instance created from the POSTed JSON.
+        :src: The original POSTed JSON dictionary.
+        :service: The instance of Resource handling the POST request.
+      """,)
   model_put = signals.signal(
       'Model PUT',
       """
       Indicates that a model object update was received via PUT and will be
+      updated in the database. The sender in the signal will be the model class
+      of the PUT resource. The following arguments will be sent along with the
+      signal:
+
+        :obj: The model instance updated from the PUT JSON.
+        :src: The original PUT JSON dictionary.
+        :service: The instance of Resource handling the PUT request.
+      """,)
+  model_put_after_commit = signals.signal(
+      'Model PUT - after',
+      """
+      Indicates that a model object update was received via PUT and has been
       updated in the database. The sender in the signal will be the model class
       of the PUT resource. The following arguments will be sent along with the
       signal:
@@ -627,6 +651,16 @@ class Resource(ModelView):
       """
       Indicates that a model object was DELETEd and will be removed from the
       databse. The sender in the signal will be the model class of the DELETEd
+      resource. The followin garguments will be sent along with the signal:
+
+        :obj: The model instance removed.
+        :service: The instance of Resource handling the DELETE request.
+      """,)
+  model_deleted_after_commit = signals.signal(
+      'Model DELETEd - after',
+      """
+      Indicates that a model object was DELETEd and has been removed from the
+      database. The sender in the signal will be the model class of the DELETEd
       resource. The followin garguments will be sent along with the signal:
 
         :obj: The model instance removed.
@@ -682,7 +716,7 @@ class Resource(ModelView):
           'application/json', 406, [('Content-Type', 'text/plain')]))
     with benchmark("Query read permissions"):
       if not permissions.is_allowed_read(self.model.__name__, obj.id, obj.context_id)\
-         and not has_conditions('read', self.model.__name__):
+         and not permissions.has_conditions('read', self.model.__name__):
         raise Forbidden()
       if not permissions.is_allowed_read_for(obj):
         raise Forbidden()
@@ -730,14 +764,14 @@ class Resource(ModelView):
     src = UnicodeSafeJsonWrapper(self.request.json)
     with benchmark("Query update permissions"):
       if not permissions.is_allowed_update(self.model.__name__, obj.id, obj.context_id)\
-         and not has_conditions('update', self.model.__name__):
+         and not permissions.has_conditions('update', self.model.__name__):
         raise Forbidden()
       if not permissions.is_allowed_update_for(obj):
         raise Forbidden()
       new_context = self.get_context_id_from_json(src)
       if new_context != obj.context_id \
          and not permissions.is_allowed_update(self.model.__name__, obj.id, new_context)\
-         and not has_conditions('update', self.model.__name__):
+         and not permissions.has_conditions('update', self.model.__name__):
         raise Forbidden()
     if self.request.mimetype != 'application/json':
       return current_app.make_response(
@@ -771,6 +805,9 @@ class Resource(ModelView):
       update_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for resource collection PUT"):
       update_memcache_after_commit(self.request)
+    with benchmark("Send PUT - after commit event"):
+      self.model_put_after_commit.send(obj.__class__, obj=obj,
+                                       src=src, service=self)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     with benchmark("Make response"):
@@ -794,7 +831,7 @@ class Resource(ModelView):
         return self.not_found_response()
       with benchmark("Query delete permissions"):
         if not permissions.is_allowed_delete(self.model.__name__, obj.id, obj.context_id)\
-           and not has_conditions("delete", self.model.__name__):
+           and not permissions.has_conditions("delete", self.model.__name__):
           raise Forbidden()
         if not permissions.is_allowed_delete_for(obj):
           raise Forbidden()
@@ -816,6 +853,9 @@ class Resource(ModelView):
         update_index(db.session, modified_objects)
       with benchmark("Update memcache after commit for resource collection DELETE"):
         update_memcache_after_commit(self.request)
+      with benchmark("Send DELETEd - after commit event"):
+        self.model_deleted_after_commit.send(obj.__class__, obj=obj,
+                                             service=self)
       with benchmark("Query for object"):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
@@ -1012,7 +1052,7 @@ class Resource(ModelView):
       with benchmark("Query create permissions"):
         if not permissions.is_allowed_create(self.model.__name__, None,
                                              self.get_context_id_from_json(src))\
-           and not has_conditions('create', self.model.__name__):
+           and not permissions.has_conditions('create', self.model.__name__):
           raise Forbidden()
       if src.get('private') == True and src.get('context') is not None \
          and src['context'].get('id') is not None:
@@ -1047,6 +1087,9 @@ class Resource(ModelView):
         update_index(db.session, modified_objects)
       with benchmark("Update memcache after commit for resource collection POST"):
         update_memcache_after_commit(self.request)
+      with benchmark("Send model POSTed - after commit event"):
+        self.model_posted_after_commit.send(obj.__class__, obj=obj,
+                                            src=src, service=self)
       with benchmark("Serialize object"):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
@@ -1054,20 +1097,12 @@ class Resource(ModelView):
     except (IntegrityError, ValidationError) as e:
       msg = e.orig.args[1]
       if obj.type == "Relationship" and \
-          msg.startswith("Duplicate entry") and \
-          msg.endswith("'uq_relationships'"):
-        R = obj.__class__
+         msg.startswith("Duplicate entry") and \
+         msg.endswith("'uq_relationships'"):
         db.session.rollback()
-        obj = R.query.filter(
-           ((R.source_type==obj.source_type) &
-            (R.source_id==obj.source_id) &
-            (R.destination_type==obj.destination_type) &
-            (R.destination_id==obj.destination_id)) |
-           ((R.source_type==obj.destination_type) &
-            (R.source_id==obj.destination_id) &
-            (R.destination_type==obj.source_type) &
-            (R.destination_id==obj.source_id))
-        ).first()
+        obj = obj.__class__.update_attributes(obj.source, obj.destination,
+                                              obj.attrs)
+        db.session.flush()
         object_for_json = self.object_for_json(obj)
         return (200, object_for_json)
       message = translate_message(e)
@@ -1262,17 +1297,6 @@ class ReadOnlyResource(Resource):
       raise NotImplementedError()
 
 
-def has_conditions(action, resource):
-  """
-  Checks if the resource has a condition that needs to be checked with
-  is_allowed_for
-  """
-  _permissions = permissions.permissions_for(get_current_user())._permissions()
-  return bool(_permissions.get(action, {})
-              .get(resource, {})
-              .get('conditions', {}))
-
-
 def filter_resource(resource, depth=0, user_permissions=None):
   """
   Returns:
@@ -1312,9 +1336,17 @@ def filter_resource(resource, depth=0, user_permissions=None):
       can_read = True
       for t in ('source', 'destination'):
         inst = resource[t]
-        contexts = permissions.read_contexts_for(inst['type']) or []
+        if not inst:
+          # If object was deleted but relationship still exists
+          continue
+        contexts = permissions.read_contexts_for(inst['type'])
+        if contexts is None:
+          # read_contexts_for returns None if the user has access to all the
+          # objects of this type. If the user doesn't have access to any object
+          # an empty list ([]) will be returned
+          continue
         resources = permissions.read_resources_for(inst['type']) or []
-        if None in contexts or inst['context_id'] in contexts or inst['id'] in resources:
+        if inst['context_id'] in contexts or inst['id'] in resources:
           continue
         can_read = False
       if not can_read:

@@ -33,7 +33,8 @@ before_script:
   - build_compass
   - build_assets
 script:
-  - bin/run_travis_tests
-  - ./node_modules/karma/bin/karma start karma.conf.js --single-run
+  - bin/run_travis_tests unit
+  - bin/run_travis_tests integration
+  - ./node_modules/karma/bin/karma start karma.conf.js --single-run --reporters dots
 notifications:
   email: false

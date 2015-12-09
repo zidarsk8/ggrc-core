@@ -13,13 +13,17 @@
    or #is_allowed' 'update' instance '\
    ' context='for'}}
 <div class="details-wrap">
-  <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+  <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+    <span class="bubble"></span>
+    <span class="bubble"></span>
+    <span class="bubble"></span>
+  </a>
   <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
     {{#is_allowed 'update' instance context='for'}}
       {{> /static/mustache/base_objects/edit_object_link.mustache}}
     {{/is_allowed}}
     <li>
-      <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
+      <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_for_object instance}}" />
     </li>
 
     {{#is_info_pin}}
@@ -43,7 +47,12 @@
 
     {{#is_allowed 'delete' instance}}
       <li>
-        <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+        <a data-test-id="dropdown_delete_0839163b"
+           data-toggle="modal-ajax-deleteform"
+           data-object-plural="{{model.table_plural}}"
+           data-object-singular="{{model.model_singular}}"
+           data-modal-reset="reset" data-modal-class="modal"
+           data-object-id="{{instance.id}}" href="javascript://">
           <i class="grcicon-deleted"></i>
           Delete
         </a>

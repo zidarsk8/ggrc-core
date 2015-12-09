@@ -52,10 +52,21 @@ function update_program_authorizations(programs, person) {
   }).then(Permission.refresh());
 }
 
+function _comment_sort(a, b) {
+  if (a.created_at < b.created_at) {
+    return 1;
+  } else if (a.created_at > b.created_at) {
+    return -1;
+  } else {
+    return 0;
+  }
+}
+
 can.Model.Cacheable("CMS.Models.Audit", {
   root_object : "audit"
   , root_collection : "audits"
   , category : "programs"
+  , findAll : "GET /api/audits"
   , findOne : "GET /api/audits/{id}"
   , update : "PUT /api/audits/{id}"
   , destroy : "DELETE /api/audits/{id}"
@@ -134,12 +145,15 @@ can.Model.Cacheable("CMS.Models.Audit", {
     this.validatePresenceOf("program");
     this.validatePresenceOf("contact");
     this.validateNonBlank("title");
-    this.validate(["_transient.audit_firm", "audit_firm"], function(newVal, prop) {
-      var audit_firm = this.attr("audit_firm");
-      var audit_firm_text = this.attr("_transient.audit_firm");
-      if(!audit_firm && audit_firm_text
-        || (audit_firm_text !== "" && audit_firm_text != null && audit_firm != null && audit_firm_text !== audit_firm.reify().title)) {
-        return "No valid org group selected for firm";
+    this.validate(["_transient.audit_firm", "audit_firm"], function (newVal, prop) {
+      var audit_firm = this.attr("audit_firm"),
+          transient_audit_firm = this.attr("_transient.audit_firm");
+
+      if (!audit_firm && transient_audit_firm) {
+        if (_.isObject(transient_audit_firm) && (audit_firm.reify().title !== transient_audit_firm.reify().title)
+          || (transient_audit_firm !== "" && transient_audit_firm != null && audit_firm != null && transient_audit_firm !== audit_firm.reify().title)) {
+            return "No valid org group selected for firm";
+        }
       }
     });
     // Preload auditor role:
@@ -274,38 +288,102 @@ can.Model.Mixin("requestorable", {
   }
 });
 
+can.Model.Cacheable("CMS.Models.Comment", {
+    root_object : "comment",
+    root_collection : "comments",
+    findOne : "GET /api/comments/{id}",
+    findAll : "GET /api/comments",
+    update : "PUT /api/comments/{id}",
+    destroy : "DELETE /api/comments/{id}",
+    create : "POST /api/comments",
+    mixins : [],
+    attributes : {
+      context: "CMS.Models.Context.stub",
+      modified_by: "CMS.Models.Person.stub"
+    },
+    init : function() {
+      this._super && this._super.apply(this, arguments);
+      this.validatePresenceOf("description");
+    }
+    , info_pane_options: {
+      documents: {
+        model: CMS.Models.Document,
+        mapping: "documents_and_urls",
+        show_view: GGRC.mustache_path + "/base_templates/attachment.mustache",
+        sort_function: _comment_sort,
+      },
+      urls: {
+        model: CMS.Models.Document,
+        mapping: "urls",
+        show_view: GGRC.mustache_path + "/base_templates/urls.mustache",
+      }
+    }
+  }, {
+    form_preload : function(new_object_form) {
+      var page_instance = GGRC.page_instance();
+      this.attr("comment", page_instance);
+    }
+});
+
 can.Model.Cacheable("CMS.Models.Request", {
   root_object : "request",
-  filter_keys : ["assignee", "code", "company", "control",
+  filter_keys : ["assignee", "audit", "code", "company", "control",
                  "due date", "due", "name", "notes", "request",
                  "requested on", "status", "test", "title", "request_type",
-                 "type", "request type", "due_on", "request_object", "request object", "request title"
+                 "type", "request type", "due_on", "request_object",
+                 "request object", "request title"
   ],
   filter_mappings: {
     "type": "request_type",
+    "request title": "title",
+    "request description": "description",
     "request type": "request_type",
-    "request title": "description",
-    "request object": "request_object"
   },
   root_collection : "requests"
+  , findAll: "GET /api/requests"
+  , findOne : "GET /api/requests/{id}"
   , create : "POST /api/requests"
   , update : "PUT /api/requests/{id}"
   , destroy : "DELETE /api/requests/{id}"
-  , mixins : ["unique_title", "requestorable"]
+  , mixins : ["unique_title"]
+  , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
-    , audit : "CMS.Models.Audit.stub"
-    , responses : "CMS.Models.Response.stubs"
     , assignee : "CMS.Models.Person.stub"
-    , requestor : "CMS.Models.Person.stub"
-    , audit_object : "CMS.Models.AuditObject.stub"
     , requested_on : "date"
     , due_on : "date"
+    , documents : "CMS.Models.Document.stubs"
+    , audit : "CMS.Models.Audit.stub"
+    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
-    status : "Draft"
-    , requested_on : new Date()
-    , due_on : null
+    status: "Unstarted",
+    requested_on: moment().toDate(),
+    due_on: GGRC.Utils.firstWorkingDay(moment().add(1, "weeks"))
+  }
+  , info_pane_options: {
+    mapped_objects: {
+      model: can.Model.Cacheable,
+      mapping: "info_related_objects",
+      show_view: GGRC.mustache_path + "/requests/subtree.mustache",
+    },
+    evidence: {
+      model: CMS.Models.Document,
+      mapping: "all_documents",
+      show_view: GGRC.mustache_path + "/base_templates/attachment.mustache",
+      sort_function: _comment_sort,
+    },
+    comments: {
+      model: can.Model.Cacheable,
+      mapping: "comments",
+      show_view: GGRC.mustache_path + "/base_templates/comment_subtree.mustache",
+      sort_function: _comment_sort,
+    },
+    urls: {
+      model: CMS.Models.Document,
+      mapping: "all_urls",
+      show_view: GGRC.mustache_path + "/base_templates/urls.mustache",
+    },
   }
   , tree_view_options : {
     show_view : GGRC.mustache_path + "/requests/tree.mustache"
@@ -313,34 +391,57 @@ can.Model.Cacheable("CMS.Models.Request", {
     , footer_view : GGRC.mustache_path + "/requests/tree_footer.mustache"
     , add_item_view : GGRC.mustache_path + "/requests/tree_add_item.mustache"
     , attr_list : [
-      {attr_title: 'Title', attr_name: 'description'},
-      {attr_title: 'Request Object', attr_name: 'audit_object'},
-      {attr_title: 'Assignee', attr_name: 'assignee'},
+      {attr_title: 'Title', attr_name: 'title'},
       {attr_title: 'Status', attr_name: 'status'},
       {attr_title: 'Last Updated', attr_name: 'updated_at'},
       {attr_title: 'Request Date', attr_name: 'requested_on', attr_sort_field: 'report_start_date'},
       {attr_title: 'Due Date', attr_name: 'due_on', attr_sort_field: 'due_on'},
       {attr_title: 'Request Type', attr_name: 'request_type'},
       {attr_title: 'Code', attr_name: 'slug'},
-      {attr_title: 'Responses', attr_name: 'mapped_responses'}
+      {attr_title: 'Audit', attr_name: 'audit'},
     ]
-    , display_attr_names : ['description', 'audit_object', 'assignee', 'due_on', 'status']
-    , mandatory_attr_names : ['description']
+    , display_attr_names : ['title', 'assignee', 'due_on', 'status', 'request_type']
+    , mandatory_attr_names : ['title']
     , draw_children : true
-    , child_options : [{
-      model : "Response"
-      , mapping : "responses"
-      , allow_creating : true
+    , child_options: [{
+      model : can.Model.Cacheable,
+      mapping: "related_info_objects",
+      allow_creating : true,
     }]
   }
   , init : function() {
     this._super.apply(this, arguments);
-    this.validateNonBlank("description");
+    this.validateNonBlank("title");
     this.validateNonBlank("due_on");
-    this.validatePresenceOf("assignee");
-    if(this === CMS.Models.Request) {
-      this.bind("created", function(ev, instance) {
-        if(instance.constructor === CMS.Models.Request) {
+    this.validateNonBlank("requested_on");
+    this.validatePresenceOf("validate_assignee");
+    this.validatePresenceOf("validate_requester");
+    this.validatePresenceOf("audit");
+
+    this.validate(["requested_on", "due_on"], function (newVal, prop) {
+      var dates_are_valid;
+
+      if (this.requested_on && this.due_on) {
+        dates_are_valid = this.due_on >= this.requested_on;
+      }
+
+      if (!dates_are_valid) {
+        return "Requested and/or Due date is invalid";
+      }
+    });
+
+    this.validate(["validate_assignee", "validate_requester"], function (newVal, prop) {
+      if (!this.validate_assignee) {
+        return "You need to specify at least one assignee";
+      }
+      if (!this.validate_requester) {
+        return "You need to specify at least one requester";
+      }
+    });
+
+    if (this === CMS.Models.Request) {
+      this.bind("created", function (ev, instance) {
+        if (instance.constructor === CMS.Models.Request) {
           instance.audit.reify().refresh();
         }
       });
@@ -349,24 +450,6 @@ can.Model.Cacheable("CMS.Models.Request", {
 }, {
   init : function() {
     this._super && this._super.apply(this, arguments);
-    function setFieldsFromAudit() {
-      if(!this.selfLink && this.audit) {
-        var audit = this.audit.reify();
-        if (!this.assignee) {
-          this.attr("assignee", audit.contact || {id : null});
-        }
-        if (!this.due_on) {
-          this.attr("due_on", audit.end_date || "");
-        }
-      }
-    }
-    setFieldsFromAudit.call(this);
-    this.bind("audit", setFieldsFromAudit);
-    this.attr("response_model_class", can.compute(function() {
-      return can.capitalize(this.attr("request_type")
-          .replace(/ [a-z]/g, function(a) { return a.slice(1).toUpperCase(); }))
-        + "Response";
-    }, this));
   }
 
   , display_name : function() {
@@ -379,79 +462,71 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
       return 'Request "' + out_name + '"';
     }
-  , before_create : function() {
-    var audit, that = this;
-    if(!this.assignee) {
-      audit = this.audit.reify();
-      (audit.selfLink ? $.when(audit) : audit.refresh())
-      .then(function(audit) {
-        that.attr('assignee', audit.contact);
-      });
-    }
-  }
-  , after_save: function() {
-    var program_dfd,
-        dfd;
-
-    program_dfd = new RefreshQueue().enqueue(this.audit.reify()).trigger().then(function(audits) {
-      return new RefreshQueue().enqueue(audits[0].program).trigger();
-    });
-    dfd = $.when(
-      program_dfd,
-      this.assignee
-    ).then(update_program_authorizations);
-    GGRC.delay_leaving_page_until(dfd);
-  }
-  , before_save: function(notifier) {
-    // this.control_assessment is the control assessment passed in by clicking
-    // "Open Request" on the control assessment page
-    var obj = this.audit_object_object || this.control_assessment,
-        audit = this.audit.reify(),
-        audit_object;
-
-    // We fetch all audit_objets, because we need to check if this audit_object
-    // is already mapped to a request
-    notifier.queue(audit.refresh_all("audit_objects").then(function(objects) {
-      audit_object = _.reduce(objects, function(previous, audit_object) {
-        var auditable = audit_object.auditable || {};
-        if (obj && auditable.id === obj.id && auditable.type === obj.type) {
-          return audit_object;
-        }
-        return previous;
-      }, null);
-
-      if (obj && !audit_object) {
-        return new CMS.Models.AuditObject({
-          audit: this.audit,
-          auditable: obj,
-          context: this.audit.reify().context
-        }).save();
-      }
-      return $.when(audit_object);
-    }.bind(this)).then(function(audit_object) {
-      this.attr("audit_object", audit_object);
-    }.bind(this)));
-  }
   , form_preload : function(new_object_form) {
-    var audit, that = this;
-    if(new_object_form) {
-      if(!this.assignee && this.audit) {
+    var audit,
+        that = this,
+        assignees = {},
+        current_user = CMS.Models.get_instance(GGRC.current_user),
+        contact;
+
+    if (new_object_form) {
+      // Current user should be Requester
+      assignees[current_user.email] = "Requester";
+
+      if (GGRC.page_model.type == "Audit") {
+        this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
+      }
+
+      if (this.audit) {
         audit = this.audit.reify();
+
+        // Audit leads should be default assignees
         (audit.selfLink ? $.when(audit) : audit.refresh())
         .then(function(audit) {
-          that.attr('assignee', audit.contact);
+          contact = audit.contact.reify();
+
+          if (assignees[contact.email]) {
+            assignees[contact.email] += ",Assignee"
+          } else {
+            assignees[contact.email] = "Assignee";
+          }
+        }.bind(this));
+
+        // Audit auditors should be default verifiers
+        $.when(audit.findAuditors()).then(function(auditors) {
+          auditors.each(function(elem){
+            elem.each(function(obj){
+              if (obj.type == "Person") {
+                if (assignees[obj.email]) {
+                  assignees[obj.email] += ",Verifier"
+                } else {
+                  assignees[obj.email] = "Verifier"
+                }
+              }
+            });
+          });
         });
       }
-    }
+
+      // Assign assignee roles
+      can.each(assignees, function(value, key) {
+        var person = CMS.Models.Person.findInCacheByEmail(key);
+        that.mark_for_addition("related_objects_as_destination", person, {
+          attrs: {
+            "AssigneeType": value,
+          }
+        });
+      });
+    } // /new_object_form
   }
   , get_filter_vals: function () {
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
         mappings = $.extend({}, this.class.filter_mappings, {
-          "title": "description",
+          "title": "title",
+          "description": "description",
           "state": "status",
           "due date": "due_on",
-          "due": "due_on",
-          "request object": "request_object"
+          "due": "due_on"
         }),
         keys, vals;
 
@@ -463,8 +538,6 @@ can.Model.Cacheable("CMS.Models.Request", {
       if (this.assignee) {
         vals["assignee"] = filter_vals.apply(this.assignee.reify(), []);
       }
-      vals["control"] = this.audit_object ? this.audit_object.reify().auditable.reify().title : "None";
-      vals["request_object"] = vals["request object"] = vals["control"];
     } catch (e) {}
 
     return vals;
@@ -475,13 +548,17 @@ can.Model.Cacheable("CMS.Models.Request", {
         this.attr('context', this.audit.reify().context);
       }
       return this._super.apply(this, arguments);
+  },
+  _refresh: function (bindings) {
+    var refresh_queue = new RefreshQueue();
+    can.each(bindings, function(binding) {
+      refresh_queue.enqueue(binding.instance);
+    });
+    return refresh_queue.trigger();
   }
-
 });
 
-
 can.Model.Cacheable("CMS.Models.Response", {
-
   root_object : "response"
   , root_collection : "responses"
   , subclasses : []
@@ -554,7 +631,6 @@ can.Model.Cacheable("CMS.Models.Response", {
     , people : "CMS.Models.Person.stubs"
     , meetings : "CMS.Models.Meeting.stubs"
     , request : "CMS.Models.Request.stub"
-    , assignee : "CMS.Models.Person.stub"
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
     , controls : "CMS.Models.Control.stubs"
@@ -769,6 +845,7 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
   root_object : "control_assessment",
   root_collection : "control_assessments",
   findOne : "GET /api/control_assessments/{id}",
+  findAll : "GET /api/control_assessments",
   update : "PUT /api/control_assessments/{id}",
   destroy : "DELETE /api/control_assessments/{id}",
   create : "POST /api/control_assessments",
@@ -794,18 +871,19 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
         {attr_title: 'Conclusion: Operation', attr_name: 'operationally'}
     ])
   },
-  init : function() {
+  init: function () {
     this._super && this._super.apply(this, arguments);
     this.validatePresenceOf("control");
     this.validatePresenceOf("audit");
     this.validateNonBlank("title");
   }
 }, {
-  form_preload : function(new_object_form) {
+  form_preload: function (new_object_form) {
     var page_instance = GGRC.page_instance();
-    if(new_object_form && page_instance && page_instance.type === 'Audit') {
+    if (new_object_form && page_instance && page_instance.type === "Audit") {
       if (!this.audit) {
-        this.attr('audit', page_instance);
+        this.attr("audit", page_instance);
+        this.mark_for_addition("related_objects_as_destination", page_instance.program);
       }
     }
   }

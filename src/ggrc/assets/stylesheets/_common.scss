@@ -179,6 +179,10 @@ small {
   position: relative;
 }
 
+.top-spacing {
+  margin-top: 15px;
+}
+
 .not-assigned {
   color: $tabTitle;
 }
@@ -339,6 +343,19 @@ small {
 }
 
 // buttons
+.btn-info-pin-header {
+  margin-right: 10px;
+  &.undo {
+    margin-right: 10px;
+    margin-top: 6px;
+  }
+  .sticky-info-panel & {
+    margin-top: 18px;
+    &.undo {
+      margin-top: 22px;
+    }
+  }
+}
 .btn {
   @include btn-size();
   font-weight: bold;
@@ -757,6 +774,10 @@ select.multiple-selector {
   word-wrap: break-word;
   margin-bottom:10px;
   line-height:18px;
+  &.shorter-rtf {
+    width: 75%;
+    float: left
+  }
 }
 
 .drag {
@@ -801,6 +822,9 @@ select.multiple-selector {
     &.pull-right {
       width: auto;
       float: right;
+    }
+    &.btn {
+      width: auto;
     }
   }
   &.task-wrap {
@@ -1178,9 +1202,14 @@ p {
     display: inline-block;
     margin-top: 4px;
   }
+  &.state-float {
+    float: left;
+    margin-top: 0;
+    margin-left: 10px;
+  }
 }
 
-@each $state_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+@each $state_label in draft, inactive, declined, inprogress, in_progress, unstarted, overdue, active, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
   .state-#{$state_label} {
     @extend %state-#{$state_label};
   }
@@ -1299,5 +1328,13 @@ label.disabled {
     &:hover {
       text-decoration: none;
     }
+  }
+}
+
+.person-selector {
+  input {
+    float: left;
+    margin-right: 5px;
+    width: 70%;
   }
 }

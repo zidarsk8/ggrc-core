@@ -504,36 +504,34 @@
         } else {
           binding.source_binding = this.source;
         }
-
-        binding.source_binding.list.bind("add", function(ev, results) {
+        binding.source_binding.list.bind("add", function (ev, results) {
           if (binding._refresh_stubs_deferred && binding._refresh_stubs_deferred.state() !== "pending") {
             var matching_results = can.map(can.makeArray(results), function(result) {
-              if (self.filter_fn(result))
+              if (self.filter_fn(result)) {
                 return self.make_result(result.instance, [result], binding);
+              }
             });
             self.insert_results(binding, matching_results);
           }
         });
 
-        binding.source_binding.list.bind("remove", function(ev, results) {
-          can.each(results, function(result) {
+        binding.source_binding.list.bind("remove", function (ev, results) {
+          can.each(results, function (result) {
             self.remove_instance(binding, result.instance, result);
           });
         });
       }
 
-    , _refresh_stubs: function(binding) {
-        var self = this
-          ;
-
+    , _refresh_stubs: function (binding) {
         return binding.source_binding.refresh_stubs()
-          .then(function(results) {
-            var matching_results = can.map(can.makeArray(results), function(result) {
-              if (self.filter_fn(result))
-                return self.make_result(result.instance, [result], binding);
-            });
-            self.insert_results(binding, matching_results);
-          });
+          .then(function (results) {
+            var matching_results = can.map(can.makeArray(results), function (result) {
+                  if (this.filter_fn(result)) {
+                    return this.make_result(result.instance, [result], binding);
+                  }
+                }.bind(this));
+            this.insert_results(binding, matching_results);
+          }.bind(this));
       }
   });
 
@@ -713,6 +711,76 @@
       }
   });
 
+  GGRC.ListLoaders.StubFilteredListLoader("GGRC.ListLoaders.AttrFilteredListLoader", {
+    }, {
+      init: function (source, prop, value, type) {
+        var filter_fn = function (binding) {
+          // TODO: We should filter by type as well
+          if (!binding.mappings) {
+            return;
+          }
+          return _.any(binding.mappings, function (mapping) {
+            instance = mapping.instance;
+            if (instance instanceof CMS.Models.Relationship) {
+              if (_.exists(instance, "attrs") &&
+                  instance.attrs[prop] &&
+                  _.contains(instance.attrs[prop].split(","), value)) {
+                return true;
+              }
+            }
+            return filter_fn(mapping);
+          });
+        };
+        this.prop_name = prop;
+        this.keyword = value;
+        this.object_type = type;
+        this._super(source, filter_fn);
+      },
+      init_listeners: function (binding) {
+        this._super(binding);
+        function itemFromList (list, id) {
+          return _.first(can.makeArray(list).filter(function (item) {
+            return item.instance.id === id;
+          }));
+        }
+
+        CMS.Models.Relationship.bind("updated", function (ev, model) {
+          if (!(model instanceof CMS.Models.Relationship)) {
+            return;
+          }
+          var value = can.getObject("attrs." + this.prop_name, model),
+              needle, active, activeInList, contains;
+
+          if (model.source.type === this.object_type) {
+            needle = model.source;
+          } else if (model.destination.type === this.object_type) {
+            needle = model.destination;
+          }
+          if (!needle || !value) {
+            return;
+          }
+          active = itemFromList(binding.source_binding.list, needle.id);
+          activeInList = itemFromList(binding.list, needle.id);
+
+          if (!active) {
+            return;
+          }
+          contains = _.contains(value.split(","), this.keyword);
+          if (!contains && activeInList) {
+            binding.list.splice(
+                _.map(binding.list, function (e) {
+                  return e.instance.id;
+                }).indexOf(active.instance.id),
+                1
+            );
+          }
+          if (contains && !activeInList) {
+            this.insert_results(binding, [active]);
+          }
+        }.bind(this));
+      }
+  });
+
   GGRC.ListLoaders.BaseListLoader("GGRC.ListLoaders.FirstElementLoader", {
   }, {
 
@@ -804,7 +872,8 @@
                 var new_result = self.make_result(result.instance, [result], binding);
                 new_result.compute = can.compute(function() {
                   return self.filter_fn(result);
-                }).bind("change", $.proxy(self, "process_result", binding, result, new_result));
+                });
+                new_result.compute.bind("change", $.proxy(self, "process_result", binding, result, new_result));
                 self.process_result(binding, result, new_result, new_result.compute());
               });
             });
@@ -831,7 +900,8 @@
                 var new_result = self.make_result(result.instance, [result], binding);
                 new_result.compute = can.compute(function() {
                   return self.filter_fn(result);
-                }).bind("change", $.proxy(self, "process_result", binding, result, new_result));
+                })
+                new_result.compute.bind("change", $.proxy(self, "process_result", binding, result, new_result));
                 self.process_result(binding, result, new_result, new_result.compute());
               });
             });
@@ -1655,6 +1725,10 @@
 
   GGRC.MapperHelpers.TypeFilter = function TypeFilter(source, model_name) {
     return new GGRC.ListLoaders.TypeFilteredListLoader(source, [model_name]);
+  }
+
+  GGRC.MapperHelpers.AttrFilter = function AttrFilter(source, filter_name, keyword, type) {
+    return new GGRC.ListLoaders.AttrFilteredListLoader(source, filter_name, keyword, type);
   }
 
   GGRC.MapperHelpers.CustomFilter = function CustomFilter(source, filter_fn) {

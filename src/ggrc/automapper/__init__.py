@@ -11,6 +11,7 @@ from sqlalchemy import and_
 from datetime import datetime
 from ggrc import models
 from ggrc.models.relationship import Relationship
+from ggrc.models.request import Request
 from ggrc.services.common import Resource
 from ggrc import db
 from ggrc.automapper.rules import rules
@@ -109,6 +110,8 @@ class AutomapperGenerator(object):
       # it means that the mapping was already created by another request
       # and we can safely ignore it.
       inserter = Relationship.__table__.insert().prefix_with("IGNORE")
+      original = self.relate(Stub.from_source(self.relationship),
+                             Stub.from_destination(self.relationship))
       db.session.execute(inserter.values([{
           "id": None,
           "modified_by_id": current_user.id,
@@ -122,7 +125,8 @@ class AutomapperGenerator(object):
           "context_id": None,
           "status": None,
           "automapping_id": self.relationship.id}
-          for src, dst in self.auto_mappings]))
+          for src, dst in self.auto_mappings
+          if (src, dst) != original])) # (src, dst) is sorted
 
   def _step(self, src, dst):
       explicit, implicit = rules[src.type, dst.type]
@@ -185,3 +189,18 @@ def register_automapping_listeners():
       logging.warning("Automapping listener: no obj, no mappings created")
       return
     AutomapperGenerator(obj).generate_automappings()
+
+  @Resource.model_posted_after_commit.connect_via(Request)
+  @Resource.model_put_after_commit.connect_via(Request)
+  def handle_request(sender, obj=None, src=None, service=None):
+    if obj is None:
+      logging.warning("Automapping request listener: no obj, no mappings created")
+      return
+    if obj.audit is None:
+      logging.warning("Automapping request listener: no audit, no mappings created")
+      return
+    rel = Relationship(source_type=obj.type,
+                       source_id=obj.id,
+                       destination_type=obj.audit.type,
+                       destination_id=obj.audit.id)
+    handle_relationship_post(sender, obj=rel)

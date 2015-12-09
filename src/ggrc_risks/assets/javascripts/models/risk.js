@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2015 Reciprocity, Inc - All Rights Reserved
- * Unauthorized use, copying, distribution, displaying, or public performance
- * of this file, via any medium, is strictly prohibited. All information
- * contained herein is proprietary and confidential and may not be shared
- * with any third party without the express written consent of Reciprocity, Inc.
+ * Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  * Created By: silas@reciprocitylabs.com
  * Maintained By: silas@reciprocitylabs.com
  */
@@ -36,7 +33,7 @@
 
     init: function() {
       this._super && this._super.apply(this, arguments);
-      var req_fields = ["title", "description", "contact", "owners"];
+      var req_fields = ["title", "description", "contact"];
       for (var i = 0; i < req_fields.length; i++) {
         this.validatePresenceOf(req_fields[i]);
       }

@@ -18,38 +18,31 @@ Maintained By: miha@reciprocitylabs.com
                 </h1>
 
                 {% if digest['cycle_started_tasks'] %}
-                  <h2 {{ style.sub_title() }} >You have been assigned
-                    {{ "these tasks" if digest['cycle_started_tasks']|length > 1 else "a task" }}:
+                  <h2 {{ style.sub_title() }} >
+                    {% if digest['cycle_started_tasks']|length > 1 %}
+                      You have been assigned these tasks:
+                    {% else %}
+                      You have been assigned a task:
+                    {% endif %}
                   </h2>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['cycle_started_tasks'].values() %}
                     <li {{ style.list_item() }} >
                       <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
                         {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
-                      due on {{ task['end_date'] }}
-                    </li>
-                  {% endfor %}
-                {% endif %}
-
-
-                {% if digest['cycle_started_tasks'] %}
-                  <h2 {{ style.sub_title() }} >You have been assigned
-                    {{ "these tasks" if digest['cycle_started_tasks']|length > 1 else "a task" }}:
-                  </h2>
-                  <ul {{ style.list_wrap() }} >
-                  {% for task in digest['cycle_started_tasks'].values() %}
-                    <li {{ style.list_item() }} >
-                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
-                        {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
-                      due on {{ task['end_date'] }}
+                        due on {{ task['end_date'] }}
                     </li>
                   {% endfor %}
                 {% endif %}
 
                 {% if digest['task_overdue'] %}
-                  <h2 {{ style.sub_title() }} >You have
-                    {{ "overdue tasks" if digest['task_overdue']|length > 1 else "an overdue task" }}
-                    in ZenGRC:</h2>
+                  <h2 {{ style.sub_title() }} >
+                    {%  if digest['task_overdue']|length > 1 %}
+                      You have overdue tasks task in gGRC:
+                    {% else %}
+                      You have an overdue task in gGRC:
+                    {% endif %}
+                  </h2>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['task_overdue'].values() %}
                     <li {{ style.list_item() }} >
@@ -60,14 +53,30 @@ Maintained By: miha@reciprocitylabs.com
                   </ul>
                 {% endif %}
 
+                {% if digest['task_declined'] %}
+                  <h2 {{ style.sub_title() }} >
+                    {% if digest['task_declined']|length > 1 %}
+                      Your finished tasks were declined - please review them:
+                    {% else %}
+                      Your finished task was declined - please review it:
+                    {% endif %}
+                  </h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['task_declined'].values() %}
+                    <li {{ style.list_item() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
+                      {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }}
+                    </li>
+                  {% endfor %}
+                {% endif %}
+
                 {% if digest['due_soon'] %}
-                  <h2 {{ style.sub_title() }} >You have
-                  {% if digest['due_soon']|length == 1 %}
-                    a task that needs
-                  {% else %}
-                    {{ digest['due_soon']|length }} tasks that need
-                  {% endif %}
-                  to be completed soon:
+                  <h2 {{ style.sub_title() }} >
+                    {% if digest['due_soon']|length == 1 %}
+                      You have a task that needs to be completed soon:
+                    {% else %}
+                      You have {{ digest['due_soon']|length }} tasks that need to be completed soon:
+                    {% endif %}
                   </h2>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['due_soon'].values() %}
@@ -82,8 +91,12 @@ Maintained By: miha@reciprocitylabs.com
 
                 {% if digest['cycle_started'] %}
                   <h2 {{ style.sub_title() }} >
-                    {{ "These workflows" if digest['cycle_started']|length > 1 else "This workflow" }}
-                    just started:</h2>
+                    {% if digest['cycle_started']|length > 1 %}
+                      These workflows just started:
+                    {% else %}
+                      This workflow just started:
+                    {% endif %}
+                  </h2>
                   <ul {{ style.list_wrap() }} >
                   {% for cycle_id, cycle in digest['cycle_started'].items() %}
                     <li {{ style.list_item() }} >
@@ -95,8 +108,12 @@ Maintained By: miha@reciprocitylabs.com
                 {% endif %}
 
                 {% if digest['all_tasks_completed'] %}
-                  <h2 {{ style.sub_title() }} >All tasks have been completed in
-                    {{ "these workflow cycles" if digest['all_tasks_completed']|length > 1 else "this workflow cycle" }}:
+                  <h2 {{ style.sub_title() }} >
+                    {% if digest['all_tasks_completed']|length > 1 %}
+                      All tasks have been completed in these workflow cycles
+                    {% else %}
+                      All tasks have been completed in this workflow cycle
+                    {% endif %}
                     </h2>
                   <ul {{ style.list_wrap() }} >
                   {% for cycle_id, cycle in digest['all_tasks_completed'].items() %}
@@ -110,8 +127,11 @@ Maintained By: miha@reciprocitylabs.com
 
                 {% if digest['cycle_starts_in'] %}
                   <h2 {{ style.sub_title() }} >
-                    {{ "These workflows are" if digest['cycle_starts_in']|length > 1 else "This workflow is" }}
-                    starting soon:
+                    {% if digest['cycle_starts_in']|length > 1 %}
+                      These workflows are starting soon:
+                    {% else %}
+                      This workflow is starting soon:
+                    {% endif %}
                   </h2>
                   <ul {{ style.list_wrap() }} >
                   {% for workflow_id, workflow in digest['cycle_starts_in'].items() %}

@@ -308,6 +308,10 @@
       context: "CMS.Models.Context.stub",
       cycle: "CMS.Models.Cycle.stub",
     },
+    permalink_options: {
+      url: "<%= base.viewLink %>#current_widget/cycle/<%= instance.cycle.id %>/cycle_task_group/<%= instance.cycle_task_group.id %>/cycle_task_group_object_task/<%= instance.id %>",
+      base: "cycle:workflow"
+    },
 
     tree_view_options: {
       sort_property: 'sort_index',

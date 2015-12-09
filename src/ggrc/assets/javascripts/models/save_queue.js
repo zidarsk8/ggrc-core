@@ -32,17 +32,18 @@
     _enqueue_bucket: function (bucket) {
       var that = this;
       return function () {
-        var objs = bucket.objs.splice(0, 100);
-        var body = _.map(objs, function (obj) {
-          var o = {};
-          o[bucket.type] = obj.serialize();
-          return o;
-        });
-        return $.ajax({
-          type: "POST",
-          url: "/api/" + bucket.plural,
-          data: body
-        }).always(function(data, type) {
+        var objs = bucket.objs.splice(0, 100),
+            body = _.map(objs, function (obj) {
+              var o = {};
+              o[bucket.type] = obj.serialize();
+              return o;
+            }),
+            dfd = $.ajax({
+              type: "POST",
+              url: "/api/" + bucket.plural,
+              data: body
+            }).promise();
+        dfd.always(function (data, type) {
           if (type === "error") {
             data = data.responseJSON;
             if (data === undefined) {
@@ -52,23 +53,27 @@
           var cb = function(single) {
             return function () {
               this.created(single[1][bucket.type]);
-              return new $.Deferred().resolve();
+              return $.when(can.Model.Cacheable.resolve_deferred_bindings(this));
             };
           };
           for (var i = 0; i < objs.length; i++) {
-            var single = data[i];
+            var single = data[i],
+                obj = objs[i];
             if (single[0] >= 200 && single[0] < 300) {
-              var obj = objs[i];
               obj._save(cb(single));
+            } else {
+              obj._dfd.rejectWith(obj, [single]);
             }
           }
-        }).always(function() {
-          if (bucket.objs.length > 0) {
+        }).always(function () {
+          if (bucket.objs.length) {
             that._step(that._enqueue_bucket(bucket));
           } else {
             bucket.in_flight = false;
           }
         });
+
+        return dfd;
       };
     },
 
