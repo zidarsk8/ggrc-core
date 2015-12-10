@@ -549,6 +549,20 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
       return this._super.apply(this, arguments);
   },
+  after_save: function() {
+    // Create a relationship between request & control_assessment & control
+    var dfds = can.map(['control', 'control_assessment'], function(obj){
+      if (!this.attr(obj) && !this.attr(obj).stub) {
+        return;
+      }
+      return new CMS.Models.Relationship({
+        source: this.attr(obj).stub(),
+        destination: this.stub(),
+        context: this.context.stub(),
+      }).save();
+    }.bind(this));
+    GGRC.delay_leaving_page_until($.when.apply($, dfds));
+  },
   _refresh: function (bindings) {
     var refresh_queue = new RefreshQueue();
     can.each(bindings, function(binding) {
