@@ -18,34 +18,10 @@
         <div class="span8">
           {{> /static/mustache/base_objects/description.mustache}}
 
-          {{#if test}}
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                <h6>Test</h6>
-                <div class="rtf-block">
-                  {{test}}
-                </div>
-
-              </div>
-            </div>
-          {{/if}}
-          {{#if notes}}
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                <h6>Notes</h6>
-                <div class="rtf-block">
-                  {{notes}}
-                </div>
-              </div>
-            </div>
-          {{/if}}
-
           <div class="row-fluid wrap-row">
             <div class="span6">
-              <div class="left-spacing">
-                <h6>Evidence</h6>
-                {{{render "/static/mustache/base_templates/attachment_list.mustache" instance=. update_count="false"}}}
-              </div>
+              <h6>Evidence</h6>
+              {{{render "/static/mustache/base_templates/attachment_list.mustache" instance=. update_count="false"}}}
             </div>
             <div class="span6">
               <h6>URL</h6>
@@ -79,12 +55,23 @@
               {{{render "/static/mustache/base_templates/mapped_objects.mustache" instance=. update_count="false"}}}
             </div>
           </div>
-          <hr />
+
           <div class="row-fluid wrap-row">
-            <div class="span12">
-              {{> /static/mustache/custom_attributes/expanded_attrs.mustache }}
+            <div class="span6">
+              <h6>Test</h6>
+              <div class="rtf-block">
+                {{{firstnonempty test '<em>No test</em>'}}}
+              </div>
+            </div>
+            <div class="span6">
+              <h6>Notes</h6>
+              <div class="rtf-block">
+                {{{firstnonempty notes '<em>No notes</em>'}}}
+              </div>
             </div>
           </div>
+
+          {{> /static/mustache/custom_attributes/expanded_attrs.mustache }}
 
         </div>
         <div class="span4">
@@ -106,12 +93,6 @@
               <div class="side-content">
                 {{slug}}
               </div>
-            </div>
-          </div>
-
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              {{> /static/mustache/base_templates/request_type.mustache}}
             </div>
           </div>
 

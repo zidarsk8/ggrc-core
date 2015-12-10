@@ -145,12 +145,15 @@ can.Model.Cacheable("CMS.Models.Audit", {
     this.validatePresenceOf("program");
     this.validatePresenceOf("contact");
     this.validateNonBlank("title");
-    this.validate(["_transient.audit_firm", "audit_firm"], function(newVal, prop) {
-      var audit_firm = this.attr("audit_firm");
-      var audit_firm_text = this.attr("_transient.audit_firm");
-      if(!audit_firm && audit_firm_text
-        || (audit_firm_text !== "" && audit_firm_text != null && audit_firm != null && audit_firm_text !== audit_firm.reify().title)) {
-        return "No valid org group selected for firm";
+    this.validate(["_transient.audit_firm", "audit_firm"], function (newVal, prop) {
+      var audit_firm = this.attr("audit_firm"),
+          transient_audit_firm = this.attr("_transient.audit_firm");
+
+      if (!audit_firm && transient_audit_firm) {
+        if (_.isObject(transient_audit_firm) && (audit_firm.reify().title !== transient_audit_firm.reify().title)
+          || (transient_audit_firm !== "" && transient_audit_firm != null && audit_firm != null && transient_audit_firm !== audit_firm.reify().title)) {
+            return "No valid org group selected for firm";
+        }
       }
     });
     // Preload auditor role:
@@ -295,8 +298,8 @@ can.Model.Cacheable("CMS.Models.Comment", {
     create : "POST /api/comments",
     mixins : [],
     attributes : {
-      context : "CMS.Models.Context.stub",
-      modified_by : "CMS.Models.Person.stub",
+      context: "CMS.Models.Context.stub",
+      modified_by: "CMS.Models.Person.stub"
     },
     init : function() {
       this._super && this._super.apply(this, arguments);
@@ -397,12 +400,12 @@ can.Model.Cacheable("CMS.Models.Request", {
       {attr_title: 'Code', attr_name: 'slug'},
       {attr_title: 'Audit', attr_name: 'audit'},
     ]
-    , display_attr_names : ['title', 'assignee', 'due_on', 'status']
+    , display_attr_names : ['title', 'assignee', 'due_on', 'status', 'request_type']
     , mandatory_attr_names : ['title']
     , draw_children : true
     , child_options: [{
       model : can.Model.Cacheable,
-      mapping: "related_objects",
+      mapping: "related_info_objects",
       allow_creating : true,
     }]
   }
@@ -411,6 +414,8 @@ can.Model.Cacheable("CMS.Models.Request", {
     this.validateNonBlank("title");
     this.validateNonBlank("due_on");
     this.validateNonBlank("requested_on");
+    this.validatePresenceOf("validate_assignee");
+    this.validatePresenceOf("validate_requester");
     this.validatePresenceOf("audit");
 
     this.validate(["requested_on", "due_on"], function (newVal, prop) {
@@ -425,9 +430,18 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
     });
 
+    this.validate(["validate_assignee", "validate_requester"], function (newVal, prop) {
+      if (!this.validate_assignee) {
+        return "You need to specify at least one assignee";
+      }
+      if (!this.validate_requester) {
+        return "You need to specify at least one requester";
+      }
+    });
+
     if (this === CMS.Models.Request) {
-      this.bind("created", function(ev, instance) {
-        if(instance.constructor === CMS.Models.Request) {
+      this.bind("created", function (ev, instance) {
+        if (instance.constructor === CMS.Models.Request) {
           instance.audit.reify().refresh();
         }
       });
@@ -439,7 +453,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
 
   , display_name : function() {
-      var desc = this.description
+      var desc = this.title
         , max_len = 20;
       out_name = desc;
       // Truncate if greater than max_len chars
@@ -449,29 +463,61 @@ can.Model.Cacheable("CMS.Models.Request", {
       return 'Request "' + out_name + '"';
     }
   , form_preload : function(new_object_form) {
-    var audit, that = this;
+    var audit,
+        that = this,
+        assignees = {},
+        current_user = CMS.Models.get_instance(GGRC.current_user),
+        contact;
+
     if (new_object_form) {
+      // Current user should be Requester
+      assignees[current_user.email] = "Requester";
+
       if (GGRC.page_model.type == "Audit") {
         this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
       }
-      this.mark_for_addition("related_objects_as_destination", CMS.Models.get_instance(GGRC.current_user), {
-        attrs: {
-          "AssigneeType": "Requester",
-        }
-      });
 
       if (this.audit) {
         audit = this.audit.reify();
+
+        // Audit leads should be default assignees
         (audit.selfLink ? $.when(audit) : audit.refresh())
         .then(function(audit) {
-          this.mark_for_addition("related_objects_as_destination", audit.contact, {
-            attrs: {
-              "AssigneeType": "Assignee",
-            }
-          });
+          contact = audit.contact.reify();
+
+          if (assignees[contact.email]) {
+            assignees[contact.email] += ",Assignee"
+          } else {
+            assignees[contact.email] = "Assignee";
+          }
         }.bind(this));
+
+        // Audit auditors should be default verifiers
+        $.when(audit.findAuditors()).then(function(auditors) {
+          auditors.each(function(elem){
+            elem.each(function(obj){
+              if (obj.type == "Person") {
+                if (assignees[obj.email]) {
+                  assignees[obj.email] += ",Verifier"
+                } else {
+                  assignees[obj.email] = "Verifier"
+                }
+              }
+            });
+          });
+        });
       }
-    }
+
+      // Assign assignee roles
+      can.each(assignees, function(value, key) {
+        var person = CMS.Models.Person.findInCacheByEmail(key);
+        that.mark_for_addition("related_objects_as_destination", person, {
+          attrs: {
+            "AssigneeType": value,
+          }
+        });
+      });
+    } // /new_object_form
   }
   , get_filter_vals: function () {
     var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
@@ -825,18 +871,19 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
         {attr_title: 'Conclusion: Operation', attr_name: 'operationally'}
     ])
   },
-  init : function() {
+  init: function () {
     this._super && this._super.apply(this, arguments);
     this.validatePresenceOf("control");
     this.validatePresenceOf("audit");
     this.validateNonBlank("title");
   }
 }, {
-  form_preload : function(new_object_form) {
+  form_preload: function (new_object_form) {
     var page_instance = GGRC.page_instance();
-    if(new_object_form && page_instance && page_instance.type === 'Audit') {
+    if (new_object_form && page_instance && page_instance.type === "Audit") {
       if (!this.audit) {
-        this.attr('audit', page_instance);
+        this.attr("audit", page_instance);
+        this.mark_for_addition("related_objects_as_destination", page_instance.program);
       }
     }
   }

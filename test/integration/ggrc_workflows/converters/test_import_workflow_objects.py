@@ -49,8 +49,8 @@ class TestWorkflowObjectsImport(TestCase):
     self.assertEqual(2, TaskGroupObject.query.count())
 
     task2 = TaskGroupTask.query.filter_by(slug="t-2").first()
-    self.assertEquals(task2.start_date, date(2015, 7, 10))
-    self.assertEquals(task2.end_date, date(2016, 12, 30))
+    self.assertEqual(task2.start_date, date(2015, 7, 10))
+    self.assertEqual(task2.end_date, date(2016, 12, 30))
 
   def test_import_task_date_format(self):
     """Test import of tasks for workflows with various frequencies"""

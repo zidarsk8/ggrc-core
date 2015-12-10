@@ -289,6 +289,7 @@ class AttributeInfo(object):
       filtered_aliases.append(("delete", {
         "display_name": "Delete",
         "import_only": True,
+        "description": "",
       }))
 
     unique_columns = cls.get_unique_constraints(object_class)

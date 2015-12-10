@@ -8,11 +8,13 @@
 {{#person}}
 <span class="person-holder">
   {{#if show_email}}
-    <a href='mailto:{{email}}' target="_blank"><span class="person-tooltip-trigger" data-placement="top">
+    <a data-test-id="text_manager_7a906d2e" href='mailto:{{email}}'
+       target="_blank"><span class="person-tooltip-trigger" data-placement="top">
       {{email}}
     </span></a>
   {{else}}
-    <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">
+    <a data-test-id="text_manager_7a906d2e" href="/people/{{id}}"><span
+            class="person-tooltip-trigger" data-placement="top">
       {{firstnonempty name email}}
     </span></a>
   {{/if}}

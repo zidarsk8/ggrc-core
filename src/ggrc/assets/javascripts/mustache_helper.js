@@ -762,8 +762,16 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
 
-Mustache.registerHelper("get_permalink", function () {
+Mustache.registerHelper("get_permalink_url", function () {
   return window.location.href;
+});
+
+Mustache.registerHelper("get_permalink_for_object", function (instance, options) {
+  instance = resolve_computed(instance);
+  if (!instance.viewLink) {
+    return "";
+  }
+  return window.location.origin + instance.viewLink;
 });
 
 Mustache.registerHelper("get_view_link", function (instance, options) {
@@ -1412,6 +1420,19 @@ Mustache.registerHelper("capitalize", function (value, options) {
   return can.capitalize(value);
 });
 
+Mustache.registerHelper("lowercase", function (value, options) {
+  value = resolve_computed(value) || "";
+  return value.toLowerCase();
+});
+
+Mustache.registerHelper("assignee_types", function (value, options) {
+  value = resolve_computed(value) || "";
+  value = _.first(_.map(value.split(","), function (type) {
+    return _.trim(type).toLowerCase();
+  }));
+  return _.isEmpty(value) ? "none" : value;
+});
+
 Mustache.registerHelper("local_time_range", function (value, start, end, options) {
   var tokens = [];
   var sod;
@@ -1876,7 +1897,9 @@ Mustache.registerHelper("last_approved", function (instance, options) {
 Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
   review_task = Mustache.resolve(review_task);
   var current_user_id = GGRC.current_user.id;
-  var is_reviewer = review_task && current_user_id == review_task.contact.id;
+  var is_reviewer = review_task &&
+      (current_user_id == review_task.contact.id ||
+      Permission.is_allowed("__GGRC_ADMIN__"));
   return options.fn(options.contexts.add({is_reviewer: is_reviewer}));
 });
 
@@ -2801,7 +2824,7 @@ Mustache.registerHelper("grdive_msg_to_id", function (message) {
   return msg[msg.length-1];
 });
 
-Mustache.registerHelper("disable_if_errors", function(instance){
+Mustache.registerHelper("disable_if_errors", function (instance) {
   var ins,
       res;
   ins = Mustache.resolve(instance);
@@ -2933,11 +2956,13 @@ Mustache.registerHelper("if_draw_icon", function(instance, options) {
     return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("debugger", function (options) {
+Mustache.registerHelper("debugger", function () {
   // This just gives you a helper that you can wrap around some code in a
-  // template to see what's in the context. Set a breakpoint in dev tools
-  // on the return statement on the line below to debug.
+  // template to see what's in the context. Dev tools need to be open for this
+  // to work (in Chrome at least).
   debugger;
+
+  var options = arguments[arguments.length - 1];
   return options.fn(options.contexts);
 });
 
@@ -3087,7 +3112,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   instance = Mustache.resolve(instance);
 
   var audits = instance.get_mapping("related_audits"),
-      audit, programs, program, control, json;
+      audit, programs, program, control, json, related_controls;
 
   if (!audits.length) {
     return "";
@@ -3097,7 +3122,11 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   programs = audit.get_mapping("_program");
   program = programs[0].instance.reify();
   control = instance.control ? instance.control.reify() : {};
+  related_controls = instance.get_mapping('related_controls');
 
+  if (!control.id && related_controls.length) {
+    control = related_controls[0].instance;
+  }
   json = {
     audit: {title: audit.title, id: audit.id, type: audit.type},
     program: {title: program.title, id: program.id, type: program.type},

@@ -17,5 +17,12 @@
   {{/is_allowed}}
   <i class="fa fa-{{class.table_singular}} color"></i>
   {{firstnonempty title description name email}}
+
+  {{#if instance.viewLink}}
+    {{#is_allowed "view_object_page" instance}}
+      <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-goto"></i></a>
+    {{/is_allowed}}
+  {{/if}}
+
 </li>
 {{/instance}}

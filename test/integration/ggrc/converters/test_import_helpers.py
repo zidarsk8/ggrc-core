@@ -7,19 +7,23 @@ from copy import copy
 from os.path import abspath, dirname, join
 from random import shuffle
 
+from ggrc import converters
 from ggrc import models
-from ggrc_workflows import models as wf_models
-from ggrc_risk_assessments import models as ra_models
-from ggrc.converters.import_helper import get_object_column_definitions
+from ggrc.converters import column_handlers
+from ggrc.converters import import_helper
 from ggrc.converters.import_helper import get_column_order
+from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.converters.import_helper import split_array
-from ggrc.utils import title_from_camelcase
 from ggrc.utils import get_mapping_rules
+from ggrc.utils import title_from_camelcase
+from ggrc_risk_assessments import models as ra_models
+from ggrc_workflows import models as wf_models
 from integration.ggrc import TestCase
 from integration.ggrc.generator import ObjectGenerator
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
+
 
 def get_mapping_names(class_name):
   mapping_rules = get_mapping_rules().get(class_name, set())
@@ -28,13 +32,14 @@ def get_mapping_names(class_name):
   unmapping_names = {"unmap:{}".format(name) for name in pretty_rules}
   return mapping_names.union(unmapping_names)
 
+
 class TestSplitArry(TestCase):
 
   def test_sigle_block(self):
     test_data = [
-      ["hello", "world"],
-      ["hello", "world"],
-      ["hello", "world"],
+        ["hello", "world"],
+        ["hello", "world"],
+        ["hello", "world"],
     ]
     offests, data_blocks = split_array(test_data)
     self.assertEqual(len(data_blocks), 1)
@@ -43,11 +48,11 @@ class TestSplitArry(TestCase):
 
   def test_sigle_block_with_padding(self):
     test_data = [
-      ["", ""],
-      ["hello", "world"],
-      ["hello", "world", "uet"],
-      ["hello", "world"],
-      ["hello", "world"],
+        ["", ""],
+        ["hello", "world"],
+        ["hello", "world", "uet"],
+        ["hello", "world"],
+        ["hello", "world"],
     ]
     offests, data_blocks = split_array(test_data)
     self.assertEqual(len(data_blocks), 1)
@@ -55,15 +60,15 @@ class TestSplitArry(TestCase):
     self.assertEqual(offests[0], 1)
 
     test_data = [
-      ["", ""],
-      ["", ""],
-      ["", ""],
-      ["hello", "world"],
-      ["hello", "world", "uet"],
-      ["hello", "world"],
-      ["hello", "world"],
-      ["", ""],
-      ["", ""],
+        ["", ""],
+        ["", ""],
+        ["", ""],
+        ["hello", "world"],
+        ["hello", "world", "uet"],
+        ["hello", "world"],
+        ["hello", "world"],
+        ["", ""],
+        ["", ""],
     ]
     offests, data_blocks = split_array(test_data)
     self.assertEqual(len(data_blocks), 1)
@@ -72,12 +77,12 @@ class TestSplitArry(TestCase):
 
   def test_multiple_blocks(self):
     test_data = [
-      ["", ""],
-      ["hello", "world"],
-      ["hello", "world", "uet"],
-      ["", ""],
-      ["hello", "world"],
-      ["hello", "world"],
+        ["", ""],
+        ["hello", "world"],
+        ["hello", "world", "uet"],
+        ["", ""],
+        ["hello", "world"],
+        ["hello", "world"],
     ]
     offests, data_blocks = split_array(test_data)
     self.assertEqual(len(data_blocks), 2)
@@ -87,18 +92,18 @@ class TestSplitArry(TestCase):
     self.assertEqual(offests[1], 4)
 
     test_data = [
-      ["", ""],
-      ["hello", "world"],
-      ["hello", "world", "uet"],
-      ["hello", "world"],
-      ["", ""],
-      ["", ""],
-      ["hello", "world"],
-      ["", ""],
-      ["", ""],
-      ["hello", "world"],
-      ["hello", "world"],
-      ["hello", "world"],
+        ["", ""],
+        ["hello", "world"],
+        ["hello", "world", "uet"],
+        ["hello", "world"],
+        ["", ""],
+        ["", ""],
+        ["hello", "world"],
+        ["", ""],
+        ["", ""],
+        ["hello", "world"],
+        ["hello", "world"],
+        ["hello", "world"],
     ]
     offests, data_blocks = split_array(test_data)
     self.assertEqual(len(data_blocks), 3)
@@ -110,6 +115,35 @@ class TestSplitArry(TestCase):
     self.assertEqual(offests[2], 9)
 
 
+class TestGetObjectColumnDefinitons(TestCase):
+
+  def test_object_column_handlers(self):
+
+    def test_single_object(obj):
+      handlers = column_handlers.COLUMN_HANDLERS
+      column_definitions = import_helper.get_object_column_definitions(obj)
+      for key, value in column_definitions.items():
+        if key in handlers:
+          self.assertEqual(
+              value["handler"],
+              handlers[key],
+              "Object '{}', column '{}': expected {}, found {}".format(
+                  obj.__name__,
+                  key,
+                  handlers[key].__name__,
+                  value["handler"].__name__,
+              )
+          )
+
+    verificationErrors = []
+    for obj in set(converters.get_exportables().values()):
+      try:
+        test_single_object(obj)
+      except AssertionError as e:
+        verificationErrors.append(str(e))
+
+    verificationErrors.sort()
+    self.assertEqual(verificationErrors, [])
 
 
 class TestCulumnOrder(TestCase):
@@ -244,8 +278,6 @@ class TestGetObjectColumnDefinitions(TestCase):
 
   order of these test functions is the same as the objects in LHN
   """
-
-
 
   def test_program_definitions(self):
     """ test default headers for Program """
@@ -978,7 +1010,8 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
 
   def test_cycle_task_definitions(self):
     """ test default headers for Cycle Task Group Object Task """
-    definitions = get_object_column_definitions(wf_models.CycleTaskGroupObjectTask)
+    definitions = get_object_column_definitions(
+        wf_models.CycleTaskGroupObjectTask)
     display_names = {val["display_name"] for val in definitions.values()}
     expected_names = {
         "Code",

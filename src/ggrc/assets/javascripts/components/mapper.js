@@ -44,8 +44,9 @@
       get_forbidden: function (type) {
         var forbidden = {
           "Program": ["Audit"],
-          "Audit": ["Request"],
-          "ControlAssessment": ["Control"]
+          "Audit": ["ControlAssessment", "Program", "Request"],
+          "ControlAssessment": ["Control"],
+          "Request": ["Workflow", "TaskGroup"]
         };
         return forbidden[type] ? forbidden[type] : [];
       },
@@ -102,6 +103,9 @@
           });
           groups["all_objects"]["models"].push(cms_model.shortName);
         }, this);
+        if (groups["all_objects"]["models"].length < 2) {
+          delete groups["all_objects"];
+        }
         return groups;
       })
     });
@@ -498,7 +502,8 @@
             __permission_model: join_model
           };
         }
-        if (!_.includes(["ObjectPerson", "WorkflowPerson"], join_model)) {
+        if (!_.includes(["ObjectPerson", "WorkflowPerson"], join_model) &&
+            !this.options.scope.attr("mapper.search_only")) {
           data.options.__permission_type = data.options.__permission_type || "update";
         }
         data.model_name = _.isString(data.model_name) ? [data.model_name] : data.model_name;
