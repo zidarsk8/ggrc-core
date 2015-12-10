@@ -576,7 +576,7 @@
             draw_children: true
           },
           Request: {
-            mapping: "requests",
+            mapping: "related_requests",
             draw_children: true,
             show_view: GGRC.mustache_path + "/requests/tree.mustache",
             footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
