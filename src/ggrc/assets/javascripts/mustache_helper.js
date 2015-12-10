@@ -1897,7 +1897,9 @@ Mustache.registerHelper("last_approved", function (instance, options) {
 Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
   review_task = Mustache.resolve(review_task);
   var current_user_id = GGRC.current_user.id;
-  var is_reviewer = review_task && current_user_id == review_task.contact.id;
+  var is_reviewer = review_task &&
+      (current_user_id == review_task.contact.id ||
+      Permission.is_allowed("__GGRC_ADMIN__"));
   return options.fn(options.contexts.add({is_reviewer: is_reviewer}));
 });
 
