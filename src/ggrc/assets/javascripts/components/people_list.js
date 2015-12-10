@@ -102,8 +102,8 @@
             destination.mark_for_addition("related_objects_as_destination", person, {
               attrs: {
                 "AssigneeType": role,
-                "context": destination.context,
-              }
+              },
+              context: destination.context,
             });
           }
         } else {
