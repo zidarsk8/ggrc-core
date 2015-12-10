@@ -391,6 +391,12 @@ class TaskDescriptionColumnHandler(handlers.TextareaColumnHandler):
       options = [v.strip() for v in self.value.split(",")]
       self.row_converter.obj.response_options = options
 
+  def get_value(self):
+    if self.row_converter.obj.task_type == "text":
+      return self.row_converter.obj.description
+    else:
+      return ", ".join(self.row_converter.obj.response_options)
+
 
 COLUMN_HANDLERS = {
     "cycle": CycleColumnHandler,
