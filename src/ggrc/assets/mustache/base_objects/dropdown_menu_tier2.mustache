@@ -10,7 +10,14 @@
    or #if" options.allow_mapping "\
    or #is_allowed" "update" instance}}
 <div class="details-wrap">
-  <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+  <a class="btn btn-small btn-draft dropdown-toggle"
+     href="#"
+     data-toggle="dropdown">
+       <span class="bubble"></span>
+       <span class="bubble"></span>
+       <span class="bubble"></span>
+  </a>
+
   <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 
     {{> /static/mustache/base_objects/edit_object_link.mustache}}
