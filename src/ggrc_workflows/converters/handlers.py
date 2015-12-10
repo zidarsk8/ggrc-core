@@ -13,6 +13,7 @@ from ggrc.converters import get_importables
 from ggrc.converters.handlers import CheckboxColumnHandler
 from ggrc.converters.handlers import ColumnHandler
 from ggrc.converters.handlers import ParentColumnHandler
+from ggrc.converters.handlers import TextareaColumnHandler
 from ggrc.converters.handlers import UserColumnHandler
 from ggrc.models import Person
 from ggrc_workflows.models import CycleTaskGroup
@@ -386,6 +387,18 @@ class CycleColumnHandler(ExportOnlyColumnHandler):
     return self.row_converter.obj.cycle.slug
 
 
+class TaskDescriptionColumnHandler(TextareaColumnHandler):
+
+  def set_obj_attr(self):
+    if not self.value:
+      return
+    if self.row_converter.obj.task_type == "text":
+      self.row_converter.obj.description = self.value
+    else:
+      options = [v.strip() for v in self.value.split(",")]
+      self.row_converter.obj.response_options = options
+
+
 COLUMN_HANDLERS = {
     "frequency": FrequencyColumnHandler,
     "cycle_task_group": CycleTaskGroupColumnHandler,
@@ -400,4 +413,5 @@ COLUMN_HANDLERS = {
     "cycle": CycleColumnHandler,
     "workflow_mapped": WorkflowPersonColumnHandler,
     "task_group_objects": ObjectsColumnHandler,
+    "task_description": TaskDescriptionColumnHandler,
 }
