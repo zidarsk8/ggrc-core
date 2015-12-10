@@ -17,24 +17,6 @@ Maintained By: miha@reciprocitylabs.com
                   Hi, {{ macro.user_name(digest['user']) }}.
                 </h1>
 
-                {% if digest['cycle_started_tasks'] %}
-                  <h2 {{ style.sub_title() }} >
-                    {% if digest['cycle_started_tasks']|length > 1 %}
-                      You have been assigned these tasks:
-                    {% else %}
-                      You have been assigned a task:
-                    {% endif %}
-                  </h2>
-                  <ul {{ style.list_wrap() }} >
-                  {% for task in digest['cycle_started_tasks'].values() %}
-                    <li {{ style.list_item() }} >
-                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
-                        {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
-                        due on {{ task['end_date'] }}
-                    </li>
-                  {% endfor %}
-                {% endif %}
-
                 {% if digest['task_overdue'] %}
                   <h2 {{ style.sub_title() }} >
                     {%  if digest['task_overdue']|length > 1 %}
@@ -87,6 +69,24 @@ Maintained By: miha@reciprocitylabs.com
                     </li>
                   {% endfor %}
                   </ul>
+                {% endif %}
+
+                {% if digest['cycle_started_tasks'] %}
+                  <h2 {{ style.sub_title() }} >
+                    {% if digest['cycle_started_tasks']|length > 1 %}
+                      You have been assigned these tasks:
+                    {% else %}
+                      You have been assigned a task:
+                    {% endif %}
+                  </h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['cycle_started_tasks'].values() %}
+                    <li {{ style.list_item() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
+                        {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
+                        due on {{ task['end_date'] }}
+                    </li>
+                  {% endfor %}
                 {% endif %}
 
                 {% if digest['cycle_started'] %}
