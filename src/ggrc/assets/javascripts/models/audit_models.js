@@ -453,7 +453,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   }
 
   , display_name : function() {
-      var desc = this.description
+      var desc = this.title
         , max_len = 20;
       out_name = desc;
       // Truncate if greater than max_len chars
