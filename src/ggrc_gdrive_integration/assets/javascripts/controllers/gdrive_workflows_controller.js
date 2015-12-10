@@ -1027,11 +1027,23 @@ can.Component.extend({
         }
       });
     },
-    ".entry-attachment picked": function(el, ev, data) {
+
+    /**
+     * Handle an event of the user picking a new GDrive upload folder.
+     *
+     * @param {Object} el - The jQuery-wrapped DOM element on which the event
+     *   has been triggered.
+     * @param {Object} ev - The event object.
+     * @param {Object} data - Additional event data.
+     *   @param {Array} data.files - The list of GDrive folders the user picked
+     *     in the GDrive folder picker modal.
+     */
+    ".entry-attachment picked": function (el, ev, data) {
       var dfd,
           that = this,
           files = data.files || [],
-          scope = this.scope;
+          scope = this.scope,
+          refreshDeferred;  // instance's deferred object_folder refresh action
 
       if(el.data("type") === "folders"
          && files.length
@@ -1043,9 +1055,11 @@ can.Component.extend({
         return;
       }
 
-
       this.scope.attr('_folder_change_pending', true);
-      if (el.data('replace')) {
+
+      if (!el.data('replace')) {
+        dfd = $.when();
+      } else {
         if(scope.deferred) {
           if(scope.current_folder) {
             scope.instance.mark_for_deletion("folders", scope.current_folder);
@@ -1063,16 +1077,36 @@ can.Component.extend({
           }
           dfd = $.when();
         } else {
-          dfd = $.when.apply(this, $.map(scope.instance.object_folders, function(object_folder) {
-            // Remove existing object folders before mapping a new one:
-            return object_folder.reify().refresh().then(function(instance) {
-              return instance.destroy();
+          // refresh the instance and its object_folders list
+          refreshDeferred = scope.instance.refresh()
+            .then(function () {
+              return scope.instance.refresh_all("object_folders");
+            })
+            .then(function (fresh_folder_list) {
+              scope.instance.object_folders = fresh_folder_list;
             });
-          }));
+
+          // when the object_folders list is up to date, delete all existing
+          // upload folders currently mapped to instance
+          dfd = refreshDeferred.then(function () {
+            // delete folders and collect their deferred delete objects
+            var deferredDeletes = $.map(
+              scope.instance.object_folders,
+              function (object_folder) {
+                var deferredDestroy = object_folder
+                  .reify()
+                  .refresh()
+                  .then(function (instance) {
+                    return instance.destroy();
+                  });
+                return deferredDestroy;
+              });
+
+            return $.when.apply(that, deferredDeletes);
+          });
         }
-      } else {
-        dfd = $.when();
       }
+
       return dfd.then(function() {
         if(scope.deferred) {
           return $.when.apply(
