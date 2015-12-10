@@ -549,6 +549,19 @@ can.Model.Cacheable("CMS.Models.Request", {
       }
       return this._super.apply(this, arguments);
   },
+  after_save: function() {
+    // Create a relationship between request & control_assessment
+    var dfd;
+    if (!this.control_assessment) {
+      return;
+    }
+    dfd = new CMS.Models.Relationship({
+      source: this.control_assessment.stub(),
+      destination: this.stub(),
+      context: this.context.stub(),
+    }).save();
+    GGRC.delay_leaving_page_until(dfd);
+  },
   _refresh: function (bindings) {
     var refresh_queue = new RefreshQueue();
     can.each(bindings, function(binding) {
