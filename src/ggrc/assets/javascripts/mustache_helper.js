@@ -3112,7 +3112,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   instance = Mustache.resolve(instance);
 
   var audits = instance.get_mapping("related_audits"),
-      audit, programs, program, control, json;
+      audit, programs, program, control, json, related_controls;
 
   if (!audits.length) {
     return "";
@@ -3122,7 +3122,11 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
   programs = audit.get_mapping("_program");
   program = programs[0].instance.reify();
   control = instance.control ? instance.control.reify() : {};
+  related_controls = instance.get_mapping('related_controls');
 
+  if (!control.id && related_controls.length) {
+    control = related_controls[0].instance;
+  }
   json = {
     audit: {title: audit.title, id: audit.id, type: audit.type},
     program: {title: program.title, id: program.id, type: program.type},
