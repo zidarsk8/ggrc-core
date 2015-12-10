@@ -86,8 +86,10 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
   _sanitize_html = []
   _aliases = {
       "title": "Summary",
-      "description": None,
-      "task_description": "Task Description",
+      "description": {
+          "display_name": "Task Description",
+          "handler_key": "task_description",
+      },
       "contact": {
           "display_name": "Assignee",
           "mandatory": True,
