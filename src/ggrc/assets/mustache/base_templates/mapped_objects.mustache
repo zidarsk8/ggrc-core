@@ -5,14 +5,16 @@
     Maintained By: urban@reciprocitylabs.com
 }}
 
-{{#instance.class.info_pane_options.mapped_objects}}
-{{#add_to_current_scope parent_instance=instance}}
 <div class="row-fluid wrap-row">
   <div class="span12">
     <h6>Mapped objects</h6>
-    <ul class="mapped-list" data-update-count="{{update_count}}" {{data 'options'}}  data-disable-lazy-loading="true"
-      {{ (el) -> el.cms_controllers_tree_view(el.data("options")).control("tree_view").display() }}>
-    </ul>
+
+    <mapping-tree-view
+      parent-instance="instance"
+      mapping="instance.class.info_pane_options.mapped_objects.mapping"
+      item-template="instance.class.info_pane_options.mapped_objects.show_view"
+    >
+    </mapping-tree-view>
     {{#is_allowed 'update' instance context='for'}}
       <a
         class="btn btn-draft btn-small"
@@ -30,5 +32,3 @@
     {{/is_allowed}}
   </div>
 </div>
-{{/add_to_current_scope}}
-{{/instance}}
