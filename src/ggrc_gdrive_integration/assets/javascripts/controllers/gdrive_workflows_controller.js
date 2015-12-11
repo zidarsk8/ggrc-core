@@ -1202,13 +1202,8 @@ can.Component.extend({
     trigger_upload_parent: function(scope, el, ev) {
       // upload files with a parent folder (audits and workflows)
       var that = this,
+          verify_dfd = $.Deferred(),
           parent_folder_dfd;
-
-      if(this.instance.attr("_transient.folder")) {
-        parent_folder_dfd = $.when([{ instance: this.instance.attr("_transient.folder") }]);
-      } else {
-        parent_folder_dfd = this.instance.get_binding("extended_folders").refresh_instances();
-      }
 
       function is_own_folder(mapping, instance) {
         if(mapping.binding.instance !== instance)
@@ -1221,53 +1216,72 @@ can.Component.extend({
           }, false);
         }
       }
-      can.Control.prototype.bindXHRToButton(parent_folder_dfd, el);
-      parent_folder_dfd.done(function(bindings) {
-        var parent_folder;
-        if(bindings.length < 1 || !bindings[0].instance.selfLink) {
-          //no ObjectFolder or cannot access folder from GAPI
-          el.trigger(
-            "ajax:flash"
-            , {
-              warning : 'Can\'t upload: No GDrive folder found'
-            });
-          return;
+
+      if (scope.attr("verify_event")) {
+        GGRC.Controllers.Modals.confirm({
+          modal_description: scope.attr("modal_description"),
+          modal_confirm: scope.attr("modal_button"),
+          modal_title: scope.attr("modal_title")
+        }, verify_dfd.resolve);
+      } else {
+        verify_dfd.resolve();
+      }
+
+      verify_dfd.done(function () {
+        if(that.instance.attr("_transient.folder")) {
+          parent_folder_dfd = $.when([{ instance: that.instance.attr("_transient.folder") }]);
+        } else {
+          parent_folder_dfd = that.instance.get_binding("extended_folders").refresh_instances();
         }
+        can.Control.prototype.bindXHRToButton(parent_folder_dfd, el);
 
-        parent_folder = can.map(bindings, function(binding) {
-          return can.reduce(binding.mappings, function(current, mp) {
-            return current || is_own_folder(mp, that.instance);
-          }, false) ? binding.instance : undefined;
-        });
-        parent_folder = parent_folder[0] || bindings[0].instance;
+        parent_folder_dfd.done(function(bindings) {
+          var parent_folder;
+          if(bindings.length < 1 || !bindings[0].instance.selfLink) {
+            //no ObjectFolder or cannot access folder from GAPI
+            el.trigger(
+                "ajax:flash"
+                , {
+                  warning : 'Can\'t upload: No GDrive folder found'
+                });
+            return;
+          }
 
-        //NB: resources returned from uploadFiles() do not match the properties expected from getting
-        // files from GAPI -- "name" <=> "title", "url" <=> "alternateLink".  Of greater annoyance is
-        // the "url" field from the picker differs from the "alternateLink" field value from GAPI: the
-        // URL has a query parameter difference, "usp=drive_web" vs "usp=drivesdk".  For consistency,
-        // when getting file references back from Picker, always put them in a RefreshQueue before
-        // using their properties. --BM 11/19/2013
-        parent_folder.uploadFiles().then(function(files) {
-          that.attr("pending", true);
-          return new RefreshQueue().enqueue(files).trigger().then(function(fs) {
-            return $.when.apply($, can.map(fs, function(f) {
-              if(!~can.inArray(parent_folder.id, can.map(f.parents, function(p) { return p.id; }))) {
-                return f.copyToParent(parent_folder);
-              } else {
-                return f;
-              }
-            }));
+          parent_folder = can.map(bindings, function(binding) {
+            return can.reduce(binding.mappings, function(current, mp) {
+              return current || is_own_folder(mp, that.instance);
+            }, false) ? binding.instance : undefined;
           });
-        }).done(function() {
-          var files = can.map(
-                        can.makeArray(arguments),
-                        function(file) {
-                          return CMS.Models.GDriveFile.model(file);
-                        }),
-          doc_dfds = that.handle_file_upload(files);
-          $.when.apply($, doc_dfds).then(function() {
-            el.trigger("modal:success", { arr: can.makeArray(arguments) });
-            that.attr('pending', false);
+          parent_folder = parent_folder[0] || bindings[0].instance;
+
+          //NB: resources returned from uploadFiles() do not match the properties expected from getting
+          // files from GAPI -- "name" <=> "title", "url" <=> "alternateLink".  Of greater annoyance is
+          // the "url" field from the picker differs from the "alternateLink" field value from GAPI: the
+          // URL has a query parameter difference, "usp=drive_web" vs "usp=drivesdk".  For consistency,
+          // when getting file references back from Picker, always put them in a RefreshQueue before
+          // using their properties. --BM 11/19/2013
+          parent_folder.uploadFiles().then(function(files) {
+            that.attr("pending", true);
+            return new RefreshQueue().enqueue(files).trigger().then(function(fs) {
+              return $.when.apply($, can.map(fs, function(f) {
+                if(!~can.inArray(parent_folder.id, can.map(f.parents, function(p) { return p.id; }))) {
+                  return f.copyToParent(parent_folder);
+                } else {
+                  return f;
+                }
+              }));
+            });
+          }).done(function() {
+            var files = can.map(
+                    can.makeArray(arguments),
+                    function(file) {
+                      return CMS.Models.GDriveFile.model(file);
+                    }),
+                doc_dfds = that.handle_file_upload(files);
+            $.when.apply($, doc_dfds).then(function() {
+              el.trigger("modal:success", { arr: can.makeArray(arguments) });
+              that.attr('pending', false);
+            });
           });
         });
       });
