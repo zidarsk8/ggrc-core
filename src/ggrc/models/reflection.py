@@ -303,6 +303,7 @@ class AttributeInfo(object):
           "unique": key in unique_columns,
           "description": "",
           "type": cls.Type.PROPERTY,
+          "handler_key": key,
       }
       if type(value) is dict:
         definition.update(value)
