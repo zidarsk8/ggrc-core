@@ -191,6 +191,11 @@ small {
   color: $subTitle;
 }
 
+.empty-message {
+  color: $gray;
+  font-style: italic;
+}
+
 .checkbox-inline {
   input[type="checkbox"] {
     margin: -1px 0 0 0;
