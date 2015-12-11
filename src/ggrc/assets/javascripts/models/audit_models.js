@@ -552,7 +552,7 @@ can.Model.Cacheable("CMS.Models.Request", {
   after_save: function() {
     // Create a relationship between request & control_assessment & control
     var dfds = can.map(['control', 'control_assessment'], function(obj){
-      if (!this.attr(obj) && !this.attr(obj).stub) {
+      if (!(this.attr(obj) && this.attr(obj).stub)) {
         return;
       }
       return new CMS.Models.Relationship({
