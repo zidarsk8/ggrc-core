@@ -162,7 +162,7 @@
   }
   label {
     float: left;
-    width: 27%;
+    width: 32%;
     font-size: 10px;
     line-height: 20px;
     margin-top: 1px;
@@ -196,10 +196,10 @@
   ul {
     @extend %reset-list;
     float: left;
-    width: 60%;
+    width: 55%;
 
     .modal-body & {
-      width: 55%;
+      width: 50%;
     }
     li {
       margin-bottom: 3px;
