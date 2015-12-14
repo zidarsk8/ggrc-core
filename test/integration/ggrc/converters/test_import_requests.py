@@ -70,7 +70,7 @@ class TestRequestImport(converters.TestCase):
         "user 5": {"Verifier"},
     }
     self._test_request_users(request_1, users)
-    self.assertEqual(request_1.status, "Unstarted")
+    self.assertEqual(request_1.status, "Open")
     self.assertEqual(request_1.request_type, "documentation")
 
     # Test second request line in the CSV file
