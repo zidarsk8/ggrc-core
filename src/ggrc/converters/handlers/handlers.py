@@ -16,12 +16,9 @@ from ggrc.converters import errors
 from ggrc.converters import get_importables
 from ggrc.login import get_current_user
 from ggrc.models import Audit
-from ggrc.models import AuditObject
 from ggrc.models import CategoryBase
 from ggrc.models import Contract
 from ggrc.models import ControlAssessment
-from ggrc.models import CustomAttributeDefinition
-from ggrc.models import CustomAttributeValue
 from ggrc.models import ObjectPerson
 from ggrc.models import Option
 from ggrc.models import Person
@@ -371,9 +368,6 @@ class MappingColumnHandler(ColumnHandler):
         if permissions.is_allowed_update_for(obj):
           objects.append(obj)
         else:
-          title = getattr(obj, "title", None)
-          if title is None:
-            title = getattr(obj, "email", "")
           self.add_warning(
               errors.MAPPING_PERMISSION_ERROR,
               object_type=class_._inflector.human_singular.title(),
@@ -403,8 +397,8 @@ class MappingColumnHandler(ColumnHandler):
       elif self.unmap and mapping:
         db.session.delete(mapping)
     db.session.flush()
-    for relationship in relationships:
-      AutomapperGenerator(relationship, False).generate_automappings()
+    for relation in relationships:
+      AutomapperGenerator(relation, False).generate_automappings()
     self.dry_run = True
 
   def get_value(self):
@@ -425,103 +419,6 @@ class MappingColumnHandler(ColumnHandler):
 
   def set_value(self):
     pass
-
-
-types = CustomAttributeDefinition.ValidTypes
-
-
-class CustomAttributeColumHandler(TextColumnHandler):
-
-  _type_handlers = {
-      types.TEXT: lambda self: self.get_text_value(),
-      types.DATE: lambda self: self.get_date_value(),
-      types.DROPDOWN: lambda self: self.get_dropdown_value(),
-      types.CHECKBOX: lambda self: self.get_checkbox_value(),
-      types.RICH_TEXT: lambda self: self.get_rich_text_value(),
-  }
-
-  def parse_item(self):
-    self.definition = self.get_ca_definition()
-    value = CustomAttributeValue(custom_attribute_id=self.definition.id)
-    value_handler = self._type_handlers[self.definition.attribute_type]
-    value.attribute_value = value_handler(self)
-    if value.attribute_value is None:
-      return None
-    return value
-
-  def get_value(self):
-    for value in self.row_converter.obj.custom_attribute_values:
-      if value.custom_attribute_id == self.definition.id:
-        return value.attribute_value
-    return None
-
-  def set_obj_attr(self):
-    if self.value:
-      self.row_converter.obj.custom_attribute_values.append(self.value)
-
-  def insert_object(self):
-    if self.dry_run or self.value is None:
-      return
-    self.value.attributable_type = self.row_converter.obj.__class__.__name__
-    self.value.attributable_id = self.row_converter.obj.id
-    db.session.add(self.value)
-    self.dry_run = True
-
-  def get_ca_definition(self):
-    for definition in self.row_converter.object_class\
-            .get_custom_attribute_definitions():
-      if definition.title == self.display_name:
-        return definition
-    return None
-
-  def get_date_value(self):
-    if not self.mandatory and self.raw_value == "":
-      return None  # ignore empty fields
-    value = None
-    try:
-      value = parse(self.raw_value)
-    except:
-      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-    if self.mandatory and value is None:
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-    return value
-
-  def get_checkbox_value(self):
-    if not self.mandatory and self.raw_value == "":
-      return None  # ignore empty fields
-    value = self.raw_value.lower() in ("yes", "true")
-    if self.raw_value.lower() not in ("yes", "true", "no", "false"):
-      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-      value = None
-    if self.mandatory and value is None:
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-    return value
-
-  def get_dropdown_value(self):
-    choices_list = self.definition.multi_choice_options.split(",")
-    valid_choices = map(unicode.strip, choices_list)  # noqa
-    choice_map = {choice.lower(): choice for choice in valid_choices}
-    value = choice_map.get(self.raw_value.lower())
-    if value is None and self.raw_value != "":
-      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-    if self.mandatory and value is None:
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-    return value
-
-  def get_text_value(self):
-    if not self.mandatory and self.raw_value == "":
-      return None  # ignore empty fields
-    value = self.clean_whitespaces(self.raw_value)
-    if self.mandatory and not value:
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-    return value
-
-  def get_rich_text_value(self):
-    if not self.mandatory and self.raw_value == "":
-      return None  # ignore empty fields
-    if self.mandatory and not self.raw_value:
-      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
-    return self.raw_value
 
 
 class ConclusionColumnHandler(ColumnHandler):
@@ -698,59 +595,6 @@ class RequestAuditColumnHandler(ParentColumnHandler):
     self.parent = Audit
     super(RequestAuditColumnHandler, self) \
         .__init__(row_converter, "audit", **options)
-
-
-class AuditObjectColumnHandler(ColumnHandler):
-
-  def get_value(self):
-    audit_object = self.row_converter.obj.audit_object
-    if audit_object is None:
-      return ""
-    obj_type = audit_object.auditable_type
-    obj_id = audit_object.auditable_id
-    model = getattr(all_models, obj_type, None)
-    if model is None or not hasattr(model, "slug"):
-      return ""
-    slug = db.session.query(model.slug).filter(model.id == obj_id).first()
-    if not slug:
-      return ""
-    return "{}: {}".format(obj_type, slug[0])
-
-  def parse_item(self):
-    raw = self.raw_value
-    if raw is None or raw == "":
-      return None
-    parts = [p.strip() for p in raw.split(":")]
-    if len(parts) != 2:
-      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-      return None
-    object_type, object_slug = parts
-    model = getattr(all_models, object_type, None)
-    if model is None:
-      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-      return None
-    new_objects = self.row_converter.block_converter.converter.new_objects
-    existing = new_objects[model].get(object_slug, None)
-    if existing is None:
-      existing = model.query.filter(model.slug == object_slug).first()
-      if existing is None:
-        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-    return existing
-
-  def set_obj_attr(self):
-    if not self.value:
-      return
-    # self.row_converter.obj.audit is not set yet, but it was already parsed
-    audit = self.row_converter.attrs["request_audit"].value
-    audit_object = AuditObject(
-        context=audit.context,
-        audit_id=audit.id,
-        auditable_id=self.value.id,
-        auditable_type=self.value.type
-    )
-    setattr(self.row_converter.obj, self.key, audit_object)
-    if not self.dry_run:
-      db.session.add(audit_object)
 
 
 class ObjectPersonColumnHandler(UserColumnHandler):

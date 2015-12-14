@@ -8,10 +8,10 @@
 import datetime
 
 from ggrc import db
+from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters import get_importables
-from ggrc.converters import handlers
-from ggrc import models
+from ggrc.converters.handlers import handlers
 from ggrc_workflows import models as wf_models
 
 
