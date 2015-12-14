@@ -70,7 +70,7 @@
         var list = _.filter(this.scope.attr("mapped_people"), function (person) {
               if (this.scope.attr("deferred")) {
                 var roles = can.getObject("extra.attrs", person);
-                return person.what.type === "Person" && (roles && roles.AssigneeType === can.capitalize(this.scope.type));
+                return person.what.type === "Person" && (roles && _.contains(roles.AssigneeType.split(","), can.capitalize(this.scope.type)));
               }
               return person;
             }.bind(this));

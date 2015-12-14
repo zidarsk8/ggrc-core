@@ -15,7 +15,8 @@ def get_object_column_definitions(object_class):
   """ Attach additional info to attribute definitions """
   attributes = AttributeInfo.get_object_attr_definitions(object_class)
   for key, attr in attributes.items():
-    handler = COLUMN_HANDLERS.get(key, handlers.ColumnHandler)
+    handler_key = attr.get("handler_key", key)
+    handler = COLUMN_HANDLERS.get(handler_key, handlers.ColumnHandler)
     validator = None
     default = None
     if attr["type"] == AttributeInfo.Type.PROPERTY:

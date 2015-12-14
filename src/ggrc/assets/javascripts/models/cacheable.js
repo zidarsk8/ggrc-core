@@ -771,12 +771,14 @@ can.Model("can.Model.Cacheable", {
     })
   , computed_unsuppressed_errors : can.compute(function() {
     return this.errors();
-  })
-  , get_list_counter: function(name) {
-      var binding = this.get_binding(name);
-      if(!binding) return new $.Deferred().reject();
-      return binding.refresh_count();
+  }),
+  get_list_counter: function (name) {
+    var binding = this.get_binding(name);
+    if (!binding) {
+      return $.Deferred().reject();
     }
+    return binding.refresh_count();
+  }
 
   , get_list_loader: function(name) {
       var binding = this.get_binding(name);
