@@ -14,7 +14,7 @@ from ggrc import models
 
 class RelatedPersonColumnHandler(handlers.UserColumnHandler):
 
-  _assigne_type = None
+  _assignee_type = None
 
   def parse_item(self):
     users = self.get_users_list()
@@ -26,7 +26,7 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
     self.value = self.parse_item()
 
   def _create_relationship_attr(self, relation):
-    relation.attrs["AssigneeType"] = self._assigne_type
+    relation.attrs["AssigneeType"] = self._assignee_type
 
   def _remove_relationship_attr(self):
     """ Remove all instances of a relationship attr and value
@@ -40,7 +40,7 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
     ).all()
     for relation in relations:
       values = relation.attrs["AssigneeType"].split(",")
-      filtered_values = [v for v in values if v != self._assigne_type]
+      filtered_values = [v for v in values if v != self._assignee_type]
       relation.attrs["AssigneeType"] = ",".join(filtered_values)
 
   def _create_relationship(self, person):
@@ -56,7 +56,7 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
 
   def _update_relationship_attr(self, relation, person):
     values = set(relation.attrs["AssigneeType"].split(","))
-    values.add(self._assigne_type)
+    values.add(self._assignee_type)
     relation.attrs["AssigneeType"] = ",".join(values)
     db.session.flush()
 
@@ -79,7 +79,7 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
         self.row_converter.obj, models.Person()
     ).join(RA).filter(and_(
         RA.attr_name == "AssigneeType",
-        RA.attr_value.contains(self._assigne_type),
+        RA.attr_value.contains(self._assignee_type),
     )).all()
     people_ids = [r.source_id for r in relations if r.source_type == "Person"]
     people_ids.extend(
@@ -96,19 +96,19 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
 class RelatedAssigneesColumnHandler(RelatedPersonColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self._assigne_type = "Assignee"
+    self._assignee_type = "Assignee"
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
 class RelatedRequestersColumnHandler(RelatedPersonColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self._assigne_type = "Requester"
+    self._assignee_type = "Requester"
     super(self.__class__, self).__init__(row_converter, key, **options)
 
 
 class RelatedVerifiersColumnHandler(RelatedPersonColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self._assigne_type = "Verifier"
+    self._assignee_type = "Verifier"
     super(self.__class__, self).__init__(row_converter, key, **options)

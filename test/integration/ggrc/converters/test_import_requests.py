@@ -7,7 +7,7 @@ from ggrc import models
 from integration.ggrc import converters
 
 
-class TestRequesImport(converters.TestCase):
+class TestRequestImport(converters.TestCase):
 
   def setUp(self):
     """ Set up for Request test cases """
