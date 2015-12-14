@@ -29,7 +29,8 @@ class TestRequestImport(converters.TestCase):
           )
           self.assertIn("AssigneeType", rel.relationship_attrs)
           self.assertEqual(
-              set(rel.relationship_attrs["AssigneeType"].attr_value.split(",")),
+              set(rel.relationship_attrs[
+                  "AssigneeType"].attr_value.split(",")),
               expected_types
           )
         else:
