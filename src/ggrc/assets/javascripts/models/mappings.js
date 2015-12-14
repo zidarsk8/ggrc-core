@@ -607,6 +607,9 @@
         "context": "Context",
         "related_objects_as_source": ["ControlAssessment", "Issue"]
       },
+      folders: Proxy(
+        "ObjectFolder", "folderable", "folder",
+        "object_folders", "GDriveFolder"),
       requests: Direct("Request", "audit", "requests"),
       active_requests: CustomFilter('requests', function (result) {
         return result.instance.status !== 'Accepted';
@@ -692,7 +695,6 @@
         "control": "Control",
       },
       control: Direct("Control", "controls", "control_assessment"),
-      requests: Cross("related_audits", "requests")
     },
     Issue: {
       _mixins: [
@@ -703,11 +705,16 @@
       _mixins: ["related_object", "personable", "ownable", "business_object", "documentable"],
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
       audits: Direct("Audit", "requests", "audit"),
+      extended_folders: Cross("audits", "folders"),
       urls: TypeFilter("related_objects", "Document"),
       related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee", "Person"),
       related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester", "Person"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
+      // TODO: This is duplication is done on purpose, check CORE-2905 for details
       info_related_objects: CustomFilter("related_objects", function (related_objects) {
+        return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
+      }),
+      related_info_objects: CustomFilter("related_objects", function (related_objects) {
         return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
       }),
       comments: TypeFilter("related_objects", "Comment"),

@@ -124,9 +124,10 @@ class TestGetObjectColumnDefinitons(TestCase):
       column_definitions = import_helper.get_object_column_definitions(obj)
       for key, value in column_definitions.items():
         if key in handlers:
+          handler_key = value.get("handler_key", key)
           self.assertEqual(
               value["handler"],
-              handlers[key],
+              handlers[handler_key],
               "Object '{}', column '{}': expected {}, found {}".format(
                   obj.__name__,
                   key,

@@ -8,15 +8,11 @@
 import datetime
 
 from ggrc import db
+from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters import get_importables
 from ggrc.converters.handlers import handlers
-from ggrc.models import Person
-from ggrc_workflows.models import CycleTaskGroup
-from ggrc_workflows.models import TaskGroup
-from ggrc_workflows.models import TaskGroupObject
-from ggrc_workflows.models import Workflow
-from ggrc_workflows.models import WorkflowPerson
+from ggrc_workflows import models as wf_models
 
 
 class FrequencyColumnHandler(handlers.ColumnHandler):
@@ -54,7 +50,7 @@ class WorkflowColumnHandler(handlers.ParentColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     """ init workflow handler """
-    self.parent = Workflow
+    self.parent = wf_models.Workflow
     super(WorkflowColumnHandler, self).__init__(row_converter, key, **options)
 
 
@@ -64,7 +60,7 @@ class TaskGroupColumnHandler(handlers.ParentColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     """ init task group handler """
-    self.parent = TaskGroup
+    self.parent = wf_models.TaskGroup
     super(TaskGroupColumnHandler, self).__init__(row_converter, key, **options)
 
 
@@ -74,7 +70,7 @@ class CycleTaskGroupColumnHandler(handlers.ParentColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     """ init task group handler """
-    self.parent = CycleTaskGroup
+    self.parent = wf_models.CycleTaskGroup
     super(CycleTaskGroupColumnHandler, self) \
         .__init__(row_converter, key, **options)
 
@@ -259,14 +255,14 @@ class WorkflowPersonColumnHandler(handlers.UserColumnHandler):
     pass
 
   def get_value(self):
-    workflow_person = db.session.query(WorkflowPerson.person_id).filter_by(
-        workflow_id=self.row_converter.obj.id,)
-    users = Person.query.filter(Person.id.in_(workflow_person))
+    workflow_person = db.session.query(wf_models.WorkflowPerson.person_id)\
+        .filter_by(workflow_id=self.row_converter.obj.id,)
+    users = models.Person.query.filter(models.Person.id.in_(workflow_person))
     emails = [user.email for user in users]
     return "\n".join(emails)
 
   def remove_current_people(self):
-    WorkflowPerson.query.filter_by(
+    wf_models.WorkflowPerson.query.filter_by(
         workflow_id=self.row_converter.obj.id).delete()
 
   def insert_object(self):
@@ -274,7 +270,7 @@ class WorkflowPersonColumnHandler(handlers.UserColumnHandler):
       return
     self.remove_current_people()
     for owner in self.value:
-      workflow_person = WorkflowPerson(
+      workflow_person = wf_models.WorkflowPerson(
           workflow=self.row_converter.obj,
           person=owner,
           context=self.row_converter.obj.context
@@ -317,7 +313,7 @@ class ObjectsColumnHandler(handlers.ColumnHandler):
     self.value = self.parse_item()
 
   def get_value(self):
-    task_group_objects = TaskGroupObject.query.filter_by(
+    task_group_objects = wf_models.TaskGroupObject.query.filter_by(
         task_group_id=self.row_converter.obj.id).all()
     lines = ["{}: {}".format(t.object._inflector.title_singular.title(),
                              t.object.slug)
@@ -331,7 +327,7 @@ class ObjectsColumnHandler(handlers.ColumnHandler):
     for object_ in self.value:
       if (object_.type, object_.id) in existing:
         continue
-      tgo = TaskGroupObject(
+      tgo = wf_models.TaskGroupObject(
           task_group=obj,
           object=object_,
           context=obj.context,
@@ -383,18 +379,38 @@ class CycleColumnHandler(ExportOnlyColumnHandler):
     return self.row_converter.obj.cycle.slug
 
 
+class TaskDescriptionColumnHandler(handlers.TextareaColumnHandler):
+
+  def set_obj_attr(self):
+    """ Set task attribute based on task type """
+    if not self.value:
+      return
+    if self.row_converter.obj.task_type == "text":
+      self.row_converter.obj.description = self.value
+    else:
+      options = [v.strip() for v in self.value.split(",")]
+      self.row_converter.obj.response_options = options
+
+  def get_value(self):
+    if self.row_converter.obj.task_type == "text":
+      return self.row_converter.obj.description
+    else:
+      return ", ".join(self.row_converter.obj.response_options)
+
+
 COLUMN_HANDLERS = {
-    "frequency": FrequencyColumnHandler,
-    "cycle_task_group": CycleTaskGroupColumnHandler,
+    "cycle": CycleColumnHandler,
     "cycle_object": CycleObjectColumnHandler,
+    "cycle_task_group": CycleTaskGroupColumnHandler,
+    "cycle_workflow": CycleWorkflowColumnHandler,
+    "frequency": FrequencyColumnHandler,
     "notify_on_change": handlers.CheckboxColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
     "relative_start_date": TaskStartColumnHandler,
+    "task_description": TaskDescriptionColumnHandler,
     "task_group": TaskGroupColumnHandler,
+    "task_group_objects": ObjectsColumnHandler,
     "task_type": TaskTypeColumnHandler,
     "workflow": WorkflowColumnHandler,
-    "cycle_workflow": CycleWorkflowColumnHandler,
-    "cycle": CycleColumnHandler,
     "workflow_mapped": WorkflowPersonColumnHandler,
-    "task_group_objects": ObjectsColumnHandler,
 }

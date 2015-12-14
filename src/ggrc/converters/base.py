@@ -40,6 +40,7 @@ class Converter(object):
       "email",
       "slug",
       "delete",
+      "task_type",
   ]
 
   def __init__(self, **kwargs):

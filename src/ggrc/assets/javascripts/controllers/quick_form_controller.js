@@ -8,60 +8,70 @@
 
 GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
   defaults : {
-    model : null
-    , instance : null
+    model: null,
+    instance: null
   }
 }, {
-
-  init : function() {
+  init: function () {
     if(this.options.instance && !this.options.model) {
       this.options.model = this.options.instance.constructor;
     }
     this.options.$content = this.element;
-    if (this.element.data('force-refresh')) {
+    if (this.element.data("force-refresh")) {
       this.options.instance.refresh();
     }
-  }
+  },
+  "input, textarea, select change": function (el, ev) {
+    if (el.data("toggle") === "datepicker") {
+      var val = el.datepicker("getDate"),
+          prop = el.attr("name"),
+          old_value = this.options.instance.attr(prop);
 
-  , "input, textarea, select change" : function(el, ev) {
-    var that = this;
-    if(!el.is("[data-lookup]")) {
-      this.set_value_from_element(el);
-      setTimeout(function() {
-        that.options.instance.save();
-      }, 100);
+          if (moment(val).isSame(old_value)) {
+            return;
+          }
+          $.when(this.options.instance.refresh()).then(function () {
+            this.options.instance.attr(prop, val);
+            this.options.instance.save();
+          }.bind(this));
+      return;
     }
-  }
-
-  , autocomplete_select : function(el, event, ui) {
-    var that = this;
+    if (!el.is("[data-lookup]")) {
+      this.set_value_from_element(el);
+      setTimeout(function () {
+        this.options.instance.save();
+      }.bind(this), 100);
+    }
+  },
+  autocomplete_select: function (el, event, ui) {
     var prop = el.attr("name").split(".").slice(0, -1).join(".");
-    if(this._super.apply(this, arguments) !== false) {
-      setTimeout(function() {
-        that.options.instance.save().then(function() {
-          var obj = that.options.instance.attr(prop);
-          if(obj.attr) {
+    if (this._super.apply(this, arguments) !== false) {
+      setTimeout(function () {
+        this.options.instance.save().then(function () {
+          var obj = this.options.instance.attr(prop);
+          if (obj.attr) {
             obj.attr("saved", true);
           }
-        });
-      }, 100);
+        }.bind(this));
+      }.bind(this), 100);
     } else {
       return false;
     }
-  }
-
-  , "input, select, textarea click" : function(el, ev) {
+  },
+  "input, select, textarea click": function (el, ev) {
+    if (el.data("toggle") === "datepicker") {
+      return;
+    }
     this._super && this._super.apply(this, arguments);
     ev.stopPropagation();
-  }
-
-  , ".dropdown-menu > li click" : function(el, ev){
+  },
+  ".dropdown-menu > li click": function (el, ev) {
     ev.stopPropagation();
     var that = this;
     this.set_value({ name: el.data('name'), value: el.data('value') });
     setTimeout(function() {
       that.options.instance.save();
-      $(el).closest('.open').removeClass('open');
+      $(el).closest(".open").removeClass("open");
     }, 100);
   }
 
@@ -215,6 +225,7 @@ can.Component.extend({
 
       if (this.scope.deferred) {
         this.scope.parent_instance.mark_for_addition("related_objects_as_source", created_dfd);
+        el.trigger("modal:success", created_dfd);
         return;
       }
 

@@ -135,15 +135,15 @@ class TestBasicCsvImport(converters.TestCase):
 
     for response_block in response:
       for message in messages:
-        self.assertEquals(set(), set(response_block[message]))
+        self.assertEqual(set(), set(response_block[message]))
 
     ca = models.ControlAssessment.query.filter_by(slug="CA.PCI 1.1").first()
     au = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
-    self.assertEquals(len(ca.owners), 1)
-    self.assertEquals(ca.owners[0].email, "danny@reciprocitylabs.com")
-    self.assertEquals(ca.contact.email, "danny@reciprocitylabs.com")
-    self.assertEquals(ca.design, "Effective")
-    self.assertEquals(ca.operationally, "Effective")
+    self.assertEqual(len(ca.owners), 1)
+    self.assertEqual(ca.owners[0].email, "danny@reciprocitylabs.com")
+    self.assertEqual(ca.contact.email, "danny@reciprocitylabs.com")
+    self.assertEqual(ca.design, "Effective")
+    self.assertEqual(ca.operationally, "Effective")
     self.assertIsNone(models.Relationship.find_related(ca, au))
 
     filename = "pci_program_update.csv"
@@ -151,14 +151,14 @@ class TestBasicCsvImport(converters.TestCase):
 
     for response_block in response:
       for message in messages:
-        self.assertEquals(set(), set(response_block[message]))
+        self.assertEqual(set(), set(response_block[message]))
 
     ca = models.ControlAssessment.query.filter_by(slug="CA.PCI 1.1").first()
     au = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
-    self.assertEquals(ca.owners[0].email, "miha@reciprocitylabs.com")
-    self.assertEquals(ca.contact.email, "albert@reciprocitylabs.com")
-    self.assertEquals(ca.design, "Needs improvement")
-    self.assertEquals(ca.operationally, "Ineffective")
+    self.assertEqual(ca.owners[0].email, "miha@reciprocitylabs.com")
+    self.assertEqual(ca.contact.email, "albert@reciprocitylabs.com")
+    self.assertEqual(ca.design, "Needs improvement")
+    self.assertEqual(ca.operationally, "Ineffective")
     self.assertIsNotNone(models.Relationship.find_related(ca, au))
 
   def test_person_imports(self):
