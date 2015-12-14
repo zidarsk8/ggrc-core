@@ -5,8 +5,10 @@
 
 import sqlalchemy.types as types
 import json
-from ggrc.utils import as_json
-from .exceptions import ValidationError
+import pickle
+from ggrc import utils
+from ggrc.models import exceptions
+
 
 class JsonType(types.TypeDecorator):
   '''
@@ -25,12 +27,13 @@ class JsonType(types.TypeDecorator):
     if value is None or isinstance(value, basestring):
       pass
     else:
-      value = as_json(value)
+      value = utils.as_json(value)
       # Detect if the byte-length of the encoded JSON is larger than the
       # database "TEXT" column type can handle
       if len(value.encode('utf-8')) > 65534:
-        raise ValidationError("Log record content too long")
+        raise exceptions.ValidationError("Log record content too long")
     return value
+
 
 class CompressedType(types.TypeDecorator):
   '''
@@ -40,16 +43,14 @@ class CompressedType(types.TypeDecorator):
   impl = types.LargeBinary(length=16777215)
 
   def process_result_value(self, value, dialect):
-    import pickle, zlib
     if value is not None:
       value = pickle.loads(value)
     return value
 
   def process_bind_param(self, value, dialect):
-    import pickle, zlib
     value = pickle.dumps(value)
     # Detect if the byte-length of the compressed pickle is larger than the
     # database "LargeBinary" column type can handle
     if len(value) > 16777215:
-      raise ValidationError("Log record content too long")
+      raise exceptions.ValidationError("Log record content too long")
     return value
