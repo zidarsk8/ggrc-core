@@ -826,7 +826,43 @@ can.Component.extend({
     deferred: "@",
     tabindex: "@",
     placeholder: "@",
-    readonly: "@"
+    readonly: "@",
+
+    /**
+     * Helper method for unlinking all object folders currently linked to the
+     * given instance.
+     *
+     * @param {Object} instance - an instance of a model object (e.g Audit) for
+     *   which to unlink the object folders from
+     * @return {Object} - a deferred object that is resolved when the instance's
+     *   object folders have been successfully unlinked from it
+     */
+    _unlinkObjFolders: function (instance) {
+      var deleteDeferred;
+
+      // make sure the object_folders list is up to date, and then delete all
+      // existing upload folders currently mapped to the instance
+      deleteDeferred = instance.refresh().then(function () {
+        var deferredDeletes,
+            obj_folders = instance.object_folders;
+
+        // delete folders and collect their deferred delete objects
+        deferredDeletes = $.map(obj_folders, function (folder) {
+          var deferredDestroy = folder
+            .reify()
+            .refresh()
+            .then(function (folder_refreshed) {
+              return folder_refreshed.destroy();
+            });
+
+          return deferredDestroy;
+        });
+
+        return $.when.apply($, deferredDeletes);
+      });
+
+      return deleteDeferred;
+    }
   },
   events: {
     init: function() {
@@ -920,8 +956,8 @@ can.Component.extend({
      * @param {Object} ev - The event object.
      */
     "a[data-toggle=gdrive-remover] click" : function(el, ev) {
-      var that = this,
-          scope = this.scope;
+      var scope = this.scope,
+          dfd;
 
       if(scope.deferred) {
         if(scope.current_folder) {
@@ -940,34 +976,7 @@ can.Component.extend({
         }
         dfd = $.when();
       } else {
-        // refresh the instance and its object_folders list
-        refreshDeferred = scope.instance.refresh()
-          .then(function () {
-            return scope.instance.refresh_all("object_folders");
-          })
-          .then(function (fresh_folder_list) {
-            scope.instance.object_folders = fresh_folder_list;
-          });
-
-        // when the object_folders list is up to date, delete all existing
-        // upload folders currently mapped to instance
-        dfd = refreshDeferred.then(function () {
-          var deferredDeletes,
-              obj_folders = scope.instance.object_folders;
-
-          // delete folders and collect their deferred delete objects
-          deferredDeletes = $.map(obj_folders, function (folder) {
-            var deferredDestroy = folder
-              .reify()
-              .refresh()
-              .then(function (obj_folder) {
-                return obj_folder.destroy();
-              });
-            return deferredDestroy;
-          });
-
-          return $.when.apply(that, deferredDeletes);
-        });
+        dfd = scope._unlinkObjFolders(scope.instance);
       }
 
       dfd.then(function () {
@@ -990,7 +999,7 @@ can.Component.extend({
           scope.attr("current_folder", null);
         }
 
-        this.scope.attr('folder_error', null);
+        scope.attr('folder_error', null);
       });
     },
 
@@ -1079,7 +1088,6 @@ can.Component.extend({
      */
     ".entry-attachment picked": function (el, ev, data) {
       var dfd,
-          that = this,
           files = data.files || [],
           scope = this.scope,
           refreshDeferred;  // instance's deferred object_folder refresh action
@@ -1108,41 +1116,15 @@ can.Component.extend({
             // in this case.
             scope.attr('folder_error', null);
           } else {
-            can.each(this.scope.instance.object_folders.reify(), function(object_folder){
+            can.each(scope.instance.object_folders.reify(), function(object_folder){
               object_folder.refresh().then(function(of){
-                that.scope.instance.mark_for_deletion("object_folders", of);
+                scope.instance.mark_for_deletion("object_folders", of);
               });
             });
           }
           dfd = $.when();
         } else {
-          // refresh the instance and its object_folders list
-          refreshDeferred = scope.instance.refresh()
-            .then(function () {
-              return scope.instance.refresh_all("object_folders");
-            })
-            .then(function (fresh_folder_list) {
-              scope.instance.object_folders = fresh_folder_list;
-            });
-
-          // when the object_folders list is up to date, delete all existing
-          // upload folders currently mapped to instance
-          dfd = refreshDeferred.then(function () {
-            // delete folders and collect their deferred delete objects
-            var deferredDeletes = $.map(
-              scope.instance.object_folders,
-              function (object_folder) {
-                var deferredDestroy = object_folder
-                  .reify()
-                  .refresh()
-                  .then(function (instance) {
-                    return instance.destroy();
-                  });
-                return deferredDestroy;
-              });
-
-            return $.when.apply(that, deferredDeletes);
-          });
+          dfd = scope._unlinkObjFolders(scope.instance);
         }
       }
 
