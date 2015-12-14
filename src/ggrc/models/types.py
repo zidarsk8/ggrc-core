@@ -42,12 +42,12 @@ class CompressedType(types.TypeDecorator):
   def process_result_value(self, value, dialect):
     import pickle, zlib
     if value is not None:
-      value = pickle.loads(zlib.decompress(value))
+      value = pickle.loads(value)
     return value
 
   def process_bind_param(self, value, dialect):
     import pickle, zlib
-    value = zlib.compress(pickle.dumps(value))
+    value = pickle.dumps(value)
     # Detect if the byte-length of the compressed pickle is larger than the
     # database "LargeBinary" column type can handle
     if len(value) > 16777215:
