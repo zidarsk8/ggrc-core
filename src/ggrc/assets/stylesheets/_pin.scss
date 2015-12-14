@@ -269,6 +269,10 @@
       @extend %oneline;
       width: 68%;
       display: inline-block;
+      &.more {
+        display: inline;
+        width: auto;
+      }
     }
   }
   .past-items-list & {
