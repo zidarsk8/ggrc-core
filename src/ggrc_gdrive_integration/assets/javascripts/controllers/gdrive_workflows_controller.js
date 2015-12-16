@@ -1279,6 +1279,7 @@ can.Component.extend({
                     }),
                 doc_dfds = that.handle_file_upload(files);
             $.when.apply($, doc_dfds).then(function() {
+              can.trigger(that, "modal:success", {arr: can.makeArray(arguments)});
               el.trigger("modal:success", { arr: can.makeArray(arguments) });
               that.attr('pending', false);
             });
