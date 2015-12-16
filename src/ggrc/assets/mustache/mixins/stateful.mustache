@@ -8,13 +8,13 @@
 {{#is_allowed 'update' instance context='for'}}
   <div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
 
-  {{#if_equals instance.status "In Progress"}}
+  {{#if_in instance.status "Open,In Progress"}}
     {{#if_verifiers_defined instance}}
         <button href="javascript://" class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
     {{else}}
         <button href="javascript://" class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Final">Finish</button>
     {{/if_verifiers_defined}}
-  {{/if_equals}}
+  {{/if_in}}
 
   {{#if_equals instance.status "Finished"}}
     {{#if_verifier instance}}
