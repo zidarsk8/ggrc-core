@@ -1185,7 +1185,8 @@ can.Component.extend({
         GGRC.Controllers.Modals.confirm({
           modal_description: scope.attr("modal_description"),
           modal_confirm: scope.attr("modal_button"),
-          modal_title: scope.attr("modal_title")
+          modal_title: scope.attr("modal_title"),
+          button_view : GGRC.mustache_path + "/gdrive/confirm_buttons.mustache"
         }, verify_dfd.resolve);
       } else {
         verify_dfd.resolve();
@@ -1221,7 +1222,8 @@ can.Component.extend({
         GGRC.Controllers.Modals.confirm({
           modal_description: scope.attr("modal_description"),
           modal_confirm: scope.attr("modal_button"),
-          modal_title: scope.attr("modal_title")
+          modal_title: scope.attr("modal_title"),
+          button_view : GGRC.mustache_path + "/gdrive/confirm_buttons.mustache"
         }, verify_dfd.resolve);
       } else {
         verify_dfd.resolve();
