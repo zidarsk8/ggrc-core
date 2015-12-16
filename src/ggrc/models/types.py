@@ -3,19 +3,27 @@
 # Created By: vraj@reciprocitylabs.com
 # Maintained By: vraj@reciprocitylabs.com
 
-import sqlalchemy.types as types
+"""Declaration of custom ORM data types.
+
+Add Json and Compressed type declaration for use in ORM models.
+"""
+
 import json
 import pickle
+import sqlalchemy.types as types
 from ggrc import utils
 from ggrc.models import exceptions
 
 
 class JsonType(types.TypeDecorator):
-  '''
-  Marshals Python structures to and from JSON stored
-  as Text in the db
-  '''
-  # FIXME: Change this to a larger column type and fix validation below
+  # pylint: disable=W0223
+
+  """ Custom Json data type
+
+  Custom type for storing Json objects in our database as serialized text.
+  The Limit for the serialized Json is the same as the database text column
+  limit (65534).
+  """
   impl = types.Text
 
   def process_result_value(self, value, dialect):
@@ -36,10 +44,12 @@ class JsonType(types.TypeDecorator):
 
 
 class CompressedType(types.TypeDecorator):
-  '''
-  Marshals Python structures to and from a compressed pickle format
-  as LargeBinary in the db
-  '''
+  # pylint: disable=W0223
+
+  """ Custom Compresed data type
+
+  Custom type for storing any python object in our database as serialized text.
+  """
   impl = types.LargeBinary(length=16777215)
 
   def process_result_value(self, value, dialect):
