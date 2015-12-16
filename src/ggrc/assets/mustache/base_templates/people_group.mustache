@@ -45,7 +45,7 @@
         {{/is_allowed}}
         {{{render '/static/mustache/people/popover.mustache' person=instance}}}
       </li>
-    {{/each}}
+    {{/results}}
     {{#instance._pending_joins}}
     {{#if_has_role extra.attrs.AssigneeType type}}
       <li>

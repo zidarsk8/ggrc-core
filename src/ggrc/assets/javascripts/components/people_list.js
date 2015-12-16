@@ -25,13 +25,14 @@
       type: "@",
       toggle_add: false,
       mapped_people: [],
-      remove_role: function (parent_scope, target) {
-        var person = CMS.Models.Person.findInCacheById(target.data("person")),
+      remove_role: function (parent_scope, el, ev) {
+        var person = CMS.Models.Person.findInCacheById(el.data("person")),
             rel = function (obj) {
               return _.map(obj.related_sources.concat(obj.related_destinations), function (r) {
                 return r.id;
               });
             },
+            instance = this.instance,
             ids = _.intersection(rel(person), rel(this.instance)),
             type = this.attr("type");
 
@@ -43,11 +44,24 @@
               roles = _.filter(roles, function (role) {
                 return role && (role.toLowerCase() !== type);
               });
-              if (roles.length) {
-                rel.attrs.attr("AssigneeType", roles.join(","));
-                rel.save();
+              if (this.attr("deferred") === "true") {
+                el.closest("li").remove();
+                if (roles.length) {
+                  instance.mark_for_deletion("related_objects_as_destination", person);
+                } else {
+                  instance.mark_for_change("related_objects_as_destination", person, {
+                    attrs: {
+                      "AssigneeType": roles.join(",")
+                    }
+                  });
+                }
               } else {
-                rel.destroy();
+                if (roles.length) {
+                  rel.attrs.attr("AssigneeType", roles.join(","));
+                  rel.save();
+                } else {
+                  rel.destroy();
+                }
               }
             }.bind(this));
           }
@@ -148,9 +162,8 @@
             return options.fn(options.context);
           }
           return options.inverse(options.context);
-        } else {
-          return options.fn(options.context);
         }
+        return options.fn(options.context);
       },
       show_add: function (options) {
         if (this.attr("editable") === "true") {
@@ -159,8 +172,10 @@
         return options.inverse(options.context);
       },
       if_has_role: function (roles, role, options) {
-        roles = _.filter(Mustache.resolve(roles).toLowerCase().split(","));
-        role = Mustache.resolve(role).toLowerCase();
+        roles = Mustache.resolve(roles) || "";
+        role = Mustache.resolve(role) || "";
+        roles = _.filter(roles.toLowerCase().split(","));
+        role = role.toLowerCase();
         return options[_.includes(roles, role) ? "fn" : "inverse"](options.contexts);
       },
     }

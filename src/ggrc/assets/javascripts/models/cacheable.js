@@ -1022,37 +1022,53 @@ can.Model("can.Model.Cacheable", {
       return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
     }.bind(this));
     return dfd.promise();
-  }
+  },
+
+  mark_for_change: function (join_attr, obj, extra_attrs) {
+    extra_attrs = extra_attrs || {};
+    var args = can.makeArray(arguments).concat({change: true});
+    this.mark_for_deletion.apply(this, args);
+    this.mark_for_addition.apply(this, args);
+  },
+
 
   /**
    Set up a deferred join object deletion when this object is updated.
   */
-  , mark_for_deletion : function(join_attr, obj) {
+  mark_for_deletion: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
-    if(!this._pending_joins) {
+    var len;
+
+    if (!this._pending_joins) {
       this.attr('_pending_joins', []);
     }
-    for(var i = this._pending_joins.length; i--;) {
-      if(this._pending_joins[i].what === obj) {
-        this._pending_joins.splice(i, 1);
+    for (len = this._pending_joins.length; len--;) {
+      if (this._pending_joins[len].what === obj &&
+          !(this._pending_joins[len].opts && this._pending_joins[len].opts.change)) {
+        this._pending_joins.splice(len, 1);
       }
     }
-    this._pending_joins.push({how : "remove", what : obj, through : join_attr });
-  }
+    this._pending_joins.push({how: "remove", what: obj, through: join_attr, opts: options});
+  },
+
   /**
    Set up a deferred join object creation when this object is updated.
   */
-  , mark_for_addition : function(join_attr, obj, extra_attrs) {
+  mark_for_addition: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
-    if(!this._pending_joins) {
+    extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
+    var len;
+
+    if (!this._pending_joins) {
       this.attr('_pending_joins', []);
     }
-    for(var i = this._pending_joins.length; i--;) {
-      if(this._pending_joins[i].what === obj) {
-        this._pending_joins.splice(i, 1);
+    for (len = this._pending_joins.length; len--;) {
+      if (this._pending_joins[len].what === obj &&
+          !(this._pending_joins[len].opts && this._pending_joins[len].opts.change)) {
+        this._pending_joins.splice(len, 1);
       }
     }
-    this._pending_joins.push({how : "add", what : obj, through : join_attr, extra: extra_attrs });
+    this._pending_joins.push({how: "add", what: obj, through: join_attr, extra: extra_attrs, opts: options});
   }
 
   , delay_resolving_save_until : function(dfd) {
