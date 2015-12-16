@@ -2750,8 +2750,11 @@ Mustache.registerHelper("with_allowed_as", function (name, action, mappings, opt
   return options.fn(options.contexts.add(ctx));
 });
 
-Mustache.registerHelper("log", function (obj) {
-  console.log('Mustache log', resolve_computed(obj));
+Mustache.registerHelper("log", function () {
+  var args = can.makeArray(arguments).slice(0, arguments.length - 1);
+  console.log.apply(console, ["Mustache log"].concat(_.map(args, function (arg) {
+    return resolve_computed(arg);
+  })));
 });
 
 Mustache.registerHelper("autocomplete_select", function (options) {
@@ -3171,7 +3174,7 @@ Example:
     {{log .}} // {example1: "a", example2: "b"}
   {{/add_to_current_scope}}
 */
-Mustache.registerHelper("add_to_current_scope", function(options) {
+Mustache.registerHelper("add_to_current_scope", function (options) {
   return options.fn(options.contexts.add(_.extend({}, options.context, options.hash)));
 });
 

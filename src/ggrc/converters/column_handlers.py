@@ -4,14 +4,14 @@
 # Maintained By: miha@reciprocitylabs.com
 
 
-from ggrc.converters import handlers
+from ggrc.converters.handlers import handlers
+from ggrc.converters.handlers import related_person
 from ggrc.extensions import get_extension_modules
 
 _column_handlers = {
     "assertions": handlers.ControlAssertionColumnHandler,
     "assignee": handlers.UserColumnHandler,
     "audit": handlers.AuditColumnHandler,
-    "audit_object": handlers.AuditObjectColumnHandler,
     "categories": handlers.ControlCategoryColumnHandler,
     "company": handlers.TextColumnHandler,
     "contact": handlers.UserColumnHandler,
@@ -40,6 +40,9 @@ _column_handlers = {
     "program": handlers.ProgramColumnHandler,
     "program_mapped": handlers.ObjectPersonColumnHandler,
     "reference_url": handlers.TextColumnHandler,
+    "related_assignees": related_person.RelatedAssigneesColumnHandler,
+    "related_requesters": related_person.RelatedRequestersColumnHandler,
+    "related_verifiers": related_person.RelatedVerifiersColumnHandler,
     "report_end_date": handlers.DateColumnHandler,
     "report_start_date": handlers.DateColumnHandler,
     "request": handlers.RequestColumnHandler,
