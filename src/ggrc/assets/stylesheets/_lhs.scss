@@ -112,7 +112,7 @@ h4.search-title {
   @include transition(opacity 0.2s ease);
   position: absolute;
   top: 5px;
-  right: 0;
+  right: 5px;
   z-index: 9999;
   &:hover {
     @include opacity(1);
