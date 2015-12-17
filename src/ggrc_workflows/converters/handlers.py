@@ -225,8 +225,10 @@ class TaskTypeColumnHandler(handlers.ColumnHandler):
 
   type_map = {
       "rich text": "text",
+      "dropdown": "menu",
       "drop down": "menu",
       "checkboxes": "checkbox",
+      "checkbox": "checkbox",
   }
 
   def parse_item(self):
