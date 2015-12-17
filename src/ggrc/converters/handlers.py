@@ -76,6 +76,18 @@ class ColumnHandler(object):
       return
     try:
       setattr(self.row_converter.obj, self.key, self.value)
+      # TODO: The next peace of code should be deleted when Plum patch gets
+      # merged back into develop branch. This fix is here because we don't want
+      # to risk introducing new bugs to solve this one. The propper fix is
+      # already in the Zucchini release.
+      # This is a hack to make task group tasks work with other task types
+      if self.key == "description" and \
+          isinstance(self.value, basestring) and \
+          self.row_converter.obj.__class__.__name__ == "TaskGroupTask" and \
+          hasattr(self.row_converter.obj, "response_options"):
+        json_value = [i.strip() for i in self.value.split(",")]
+        setattr(self.row_converter.obj, "response_options", json_value)
+
     except:
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
       trace = traceback.format_exc()
