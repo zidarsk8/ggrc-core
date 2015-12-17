@@ -96,9 +96,6 @@ def get_cycle_task_due(notification):
 
   notif_name = notification.notification_type.name
   due = "due_today" if notif_name == "cycle_task_due_today" else "due_in"
-  if cycle_task.end_date < date.today():
-    due = "task_overdue"
-
   force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
   return {
       cycle_task.contact.email: {

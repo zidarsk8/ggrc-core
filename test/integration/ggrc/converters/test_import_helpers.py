@@ -280,6 +280,73 @@ class TestGetObjectColumnDefinitions(TestCase):
   order of these test functions is the same as the objects in LHN
   """
 
+  def _test_definiton_names(self, obj_class, names, has_mappings=True):
+    """ Test name definitions for one class
+
+    This function checks if names returned by get_object_column_definitions
+    match provided list of names with the approprate mapping names fro that
+    class if has_mappings attribute is set.
+    """
+    definitions = get_object_column_definitions(obj_class)
+    display_names = {val["display_name"] for val in definitions.values()}
+    mapping_names = get_mapping_names(obj_class.__name__)
+    expected_names = names.union(mapping_names)
+    self.assertEqual(expected_names, display_names)
+    if has_mappings:
+      self.assertNotEqual(set(), mapping_names)
+    else:
+      self.assertEqual(set(), mapping_names)
+
+  def _test_mandatory_fields(self, obj_class, mandatory):
+    """ Test mandatory column definitions
+
+    Check that all the correct and only the correct fields are marked as
+    mandotory
+    """
+    definitions = get_object_column_definitions(obj_class)
+    mandatory_names = {val["display_name"] for val in definitions.values()
+                       if val["mandatory"]}
+    self.assertEqual(mandatory_names, mandatory)
+
+  def _test_unique_fields(self, obj_class, unique):
+    """ Test unique column definitions
+
+    Check that all the correct and only the correct fields are marked as
+    unique
+    """
+    definitions = get_object_column_definitions(obj_class)
+    mandatory_names = {val["display_name"] for val in definitions.values()
+                       if val["unique"]}
+    self.assertEqual(mandatory_names, unique)
+
+  def _test_single_object(self, obj_class, names, mandatory, unique,
+                          has_mappings=True):
+    """ Test object definitions
+
+    This is a helper function to aggregate tests for column name definitions,
+    mandatory fields and unique fields.
+    """
+    errors = ""
+    try:
+      self._test_definiton_names(obj_class, names, has_mappings)
+    except AssertionError as e:
+      errors += "\n\n{} definition names missmatch.\n{}".format(
+          obj_class.__name__, str(e))
+
+    try:
+      self._test_mandatory_fields(obj_class, mandatory)
+    except AssertionError as e:
+      errors += "\n\n{} mandatory fields missmatch.\n{}".format(
+          obj_class.__name__, str(e))
+
+    try:
+      self._test_unique_fields(obj_class, unique)
+    except AssertionError as e:
+      errors += "\n\n{} unique fields missmatch.\n{}".format(
+          obj_class.__name__, str(e))
+
+    self.assertEqual(errors, "", errors)
+
   def test_program_definitions(self):
     """ test default headers for Program """
     definitions = get_object_column_definitions(models.Program)
@@ -918,25 +985,38 @@ class TestGetObjectColumnDefinitions(TestCase):
 
   def test_request_definitions(self):
     """ test default headers for Request """
-    definitions = get_object_column_definitions(models.Request)
-    mapping_names = get_mapping_names(models.Request.__name__)
-    display_names = {val["display_name"] for val in definitions.values()}
-    element_names = {
+
+    names = {
+        "Assignee",
         "Audit",
         "Code",
-        "Request Title",
+        "Delete",
         "Description",
         "Due On",
         "Notes",
-        "Request Object",
         "Request Type",
         "Requested On",
+        "Requester",
         "Status",
         "Test",
-        "Delete",
+        "Title",
+        "Verifier",
     }
-    expected_names = element_names.union(mapping_names)
-    self.assertEqual(expected_names, display_names)
+    mandatory = {
+        "Assignee",
+        "Audit",
+        "Code",
+        "Due On",
+        "Request Type",
+        "Requested On",
+        "Requester",
+        "Status",
+        "Title",
+    }
+    unique = {
+        "Code",
+    }
+    self._test_single_object(models.Request, names, mandatory, unique)
 
 
 class TestGetWorkflowObjectColumnDefinitions(TestCase):

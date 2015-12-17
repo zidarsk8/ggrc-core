@@ -335,7 +335,11 @@
           },
           Request: {
             mapping: "related_requests",
-            child_options: [related_objects_child_options],
+            child_options: [
+              _.extend({}, related_objects_child_options, {
+                mapping: "info_related_objects"
+              })
+            ],
             draw_children: true
           },
           Document: {

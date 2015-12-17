@@ -239,7 +239,10 @@
               // we refresh the whole tree view. Other solutions could be to batch add the objects.
               $(".cms_controllers_tree_view:visible").each(function () {
                 // TODO: This is terrible solution, but it's only way to refresh all tree views on page
-                $(this).control().reload_list();
+                var control = $(this).control();
+                if (control) {
+                  control.reload_list();
+                }
               });
             }.bind(this));
         }.bind(this));
