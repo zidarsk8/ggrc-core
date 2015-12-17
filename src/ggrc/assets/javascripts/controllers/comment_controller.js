@@ -62,6 +62,7 @@
       newInstance: function () {
         var instance = CMS.Models.Comment();
         instance._source_mapping = this.scope.attr("source_mapping");
+        instance.attr("context", this.scope.attr('parent_instance.context'));
         this.scope.attr("instance", instance);
       },
       "cleanPanel": function () {
