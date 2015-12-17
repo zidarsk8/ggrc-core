@@ -16,9 +16,11 @@ revision = '27684e5f313a'
 down_revision = '1bad7fe16295'
 
 from alembic import op
-
-from HTMLParser import HTMLParser
 import bleach
+from HTMLParser import HTMLParser
+import sqlalchemy.exc as sqlaexceptions
+import sqlalchemy.types as types
+
 
 from ggrc import db
 from ggrc.models import Comment
@@ -83,8 +85,25 @@ def upgrade():
 
   op.execute("""ALTER TABLE requests CHANGE status status ENUM("Unstarted","In Progress","Finished","Verified") NOT NULL;""")
 
-  op.execute("""ALTER TABLE requests DROP FOREIGN KEY requests_ibfk_1;""")
-  op.execute("""ALTER TABLE requests MODIFY COLUMN assignee_id INT(11) NULL;""")
+  # Drop foreign key relationship on assignee_id
+  try:
+    op.drop_constraint("requests_ibfk_1", "requests", type_="foreignkey")
+  except sqlaexceptions.OperationalError as oe:
+    # Ignores error in case constraint no longer exists
+    if "1025" not in oe.message:
+      raise oe
+
+  # Drop index on assignee_id
+  try:
+    op.drop_index("assignee_id", "requests")
+  except sqlaexceptions.OperationalError as oe:
+    # Ignores error in case index no longer exists
+    if "1091" not in oe.message:
+      raise oe
+
+  # Make assignee_id nullable
+  op.alter_column("requests", "assignee_id",
+                  existing_nullable=False, nullable=True, type_=types.Integer)
 
   # 4. Make pretty title
   requests = db.session.query(Request)
