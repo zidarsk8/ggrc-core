@@ -21,9 +21,11 @@
           <input tabindex="5" class="span8 input-block-level date" name="due_on" data-toggle="datepicker" data-after="created_at" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
         {{else}}
           {{#is_allowed 'update' instance}}
-            <span class="file-controls">
-              <a href="javascript://" {{toggle_button}}><i class="grcicon-edit"></i></a>
-            </span>
+            {{#if_in instance.status "In Progress"}}
+              <span class="file-controls">
+                <a href="javascript://" {{toggle_button}}><i class="grcicon-edit"></i></a>
+              </span>
+            {{/if_in}}
           {{/is_allowed}}
           <label>
             Due on
