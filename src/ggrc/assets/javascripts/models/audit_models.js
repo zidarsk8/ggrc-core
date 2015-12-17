@@ -405,7 +405,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     , draw_children : true
     , child_options: [{
       model : can.Model.Cacheable,
-      mapping: "related_info_objects",
+      mapping: "info_related_objects",
       allow_creating : true,
     }]
   }
