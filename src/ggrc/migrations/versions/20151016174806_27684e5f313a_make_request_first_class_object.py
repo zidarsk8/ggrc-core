@@ -90,7 +90,8 @@ def upgrade():
     op.drop_constraint("requests_ibfk_1", "requests", type_="foreignkey")
   except sqlaexceptions.OperationalError as oe:
     # Ignores error in case constraint no longer exists
-    if "1025" not in oe.message:
+    error_code, _ = oe.orig.args  # error_code, message
+    if error_code != 1025:
       raise oe
 
   # Drop index on assignee_id
@@ -98,7 +99,8 @@ def upgrade():
     op.drop_index("assignee_id", "requests")
   except sqlaexceptions.OperationalError as oe:
     # Ignores error in case index no longer exists
-    if "1091" not in oe.message:
+    error_code, _ = oe.orig.args  # error_code, message
+    if error_code != 1091:
       raise oe
 
   # Make assignee_id nullable
