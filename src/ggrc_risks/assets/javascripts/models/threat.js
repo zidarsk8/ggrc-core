@@ -37,8 +37,8 @@
       sections: "CMS.Models.get_stubs"
     },
     tree_view_options: {
-      add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
-      , attr_list : can.Model.Cacheable.attr_list.concat([
+      add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
+      attr_list : can.Model.Cacheable.attr_list.concat([
         {attr_title: 'URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
       ])
