@@ -270,3 +270,19 @@ class TestExportMultipleObjects(TestCase):
     self.assertEqual(2, response.count("CYCLETASK-"))
     self.assertEqual(2, response.count("Policy: p1"))
     self.assertIn(",p1,", response)
+
+  def test_workflow_no_access_users(self):
+    """ test export of No Access users """
+    data = [
+        {
+            "object_name": "Workflow",
+            "fields": ["workflow_mapped"],
+            "filters": {
+                "expression": {}
+            }
+        }
+    ]
+    response = self.export_csv(data).data
+    users = response.splitlines()[2:-2]
+    expected = [",user20@ggrc.com"] * 10
+    self.assertEqual(expected, users)
