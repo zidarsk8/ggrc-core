@@ -826,7 +826,43 @@ can.Component.extend({
     deferred: "@",
     tabindex: "@",
     placeholder: "@",
-    readonly: "@"
+    readonly: "@",
+
+    /**
+     * Helper method for unlinking all object folders currently linked to the
+     * given instance.
+     *
+     * @param {Object} instance - an instance of a model object (e.g Audit) for
+     *   which to unlink the object folders from
+     * @return {Object} - a deferred object that is resolved when the instance's
+     *   object folders have been successfully unlinked from it
+     */
+    _unlinkObjFolders: function (instance) {
+      var deleteDeferred;
+
+      // make sure the object_folders list is up to date, and then delete all
+      // existing upload folders currently mapped to the instance
+      deleteDeferred = instance.refresh().then(function () {
+        var deferredDeletes,
+            obj_folders = instance.object_folders;
+
+        // delete folders and collect their deferred delete objects
+        deferredDeletes = $.map(obj_folders, function (folder) {
+          var deferredDestroy = folder
+            .reify()
+            .refresh()
+            .then(function (folder_refreshed) {
+              return folder_refreshed.destroy();
+            });
+
+          return deferredDestroy;
+        });
+
+        return $.when.apply($, deferredDeletes);
+      });
+
+      return deleteDeferred;
+    }
   },
   events: {
     init: function() {
@@ -910,51 +946,63 @@ can.Component.extend({
         });
       }
     },
+
+    /**
+     * Handle a click on the button for detaching an upload folder from
+     * a model instance (e.g. an Audit).
+     *
+     * @param {Object} el - The jQuery-wrapped DOM element on which the event
+     *   has been triggered.
+     * @param {Object} ev - The event object.
+     */
     "a[data-toggle=gdrive-remover] click" : function(el, ev) {
-      var that = this;
-      if(this.scope.deferred) {
-        if(this.scope.current_folder) {
-          this.scope.instance.mark_for_deletion("folders", this.scope.current_folder);
-        } else if (this.scope.folder_error && !this.scope.instance.object_folders) {
+      var scope = this.scope,
+          dfd;
+
+      if(scope.deferred) {
+        if(scope.current_folder) {
+          scope.instance.mark_for_deletion("folders", scope.current_folder);
+        } else if (scope.folder_error && !scope.instance.object_folders) {
           // If object_folders are not defined for this instance the error
           // is from extended_folders, we just need to clear folder_error
           // in this case.
-          this.scope.attr('folder_error', null);
+          scope.attr('folder_error', null);
         } else {
-          can.each(this.scope.instance.object_folders.reify(), function(object_folder){
+          can.each(scope.instance.object_folders.reify(), function(object_folder){
             object_folder.refresh().then(function(of){
-              that.scope.instance.mark_for_deletion("object_folders", of);
+              scope.instance.mark_for_deletion("object_folders", of);
             });
           });
         }
+        dfd = $.when();
       } else {
-        can.each(this.scope.instance.object_folders.reify(), function(object_folder){
-          object_folder.refresh().then(function(of){
-            of.destroy();
-          });
-        });
+        dfd = scope._unlinkObjFolders(scope.instance);
       }
 
-      if(this.scope.instance.get_binding("extended_folders")) {
-        $.when(
-          this.scope.instance.get_binding("folders").refresh_instances(),
-          this.scope.instance.get_binding("extended_folders").refresh_instances()
-        ).then(function(local_bindings, extended_bindings) {
-          var self_folders, remote_folders;
-          self_folders = can.map(local_bindings, function(folder_binding) {
-            return folder_binding.instance;
-          });
-          remote_folders = can.map(extended_bindings, function(folder_binding) {
-            return ~can.inArray(folder_binding.instance, self_folders) ? undefined : folder_binding.instance;
-          });
+      dfd.then(function () {
+        if (scope.instance.get_binding("extended_folders")) {
+          $.when(
+            scope.instance.get_binding("folders").refresh_instances(),
+            scope.instance.get_binding("extended_folders").refresh_instances()
+          ).then(function (local_bindings, extended_bindings) {
+            var self_folders, remote_folders;
+            self_folders = can.map(local_bindings, function(folder_binding) {
+              return folder_binding.instance;
+            });
+            remote_folders = can.map(extended_bindings, function(folder_binding) {
+              return ~can.inArray(folder_binding.instance, self_folders) ? undefined : folder_binding.instance;
+            });
 
-          that.scope.attr("current_folder", remote_folders[0] || null);
-        });
-      } else {
-        this.scope.attr("current_folder", null);
-      }
-      this.scope.attr('folder_error', null);
+            scope.attr("current_folder", remote_folders[0] || null);
+          });
+        } else {
+          scope.attr("current_folder", null);
+        }
+
+        scope.attr('folder_error', null);
+      });
     },
+
     "a[data-toggle=gdrive-picker] click" : function(el, ev) {
 
       var dfd = GGRC.Controllers.GAPI.authorize(["https://www.googleapis.com/auth/drive"]),
@@ -1027,11 +1075,22 @@ can.Component.extend({
         }
       });
     },
-    ".entry-attachment picked": function(el, ev, data) {
+
+    /**
+     * Handle an event of the user picking a new GDrive upload folder.
+     *
+     * @param {Object} el - The jQuery-wrapped DOM element on which the event
+     *   has been triggered.
+     * @param {Object} ev - The event object.
+     * @param {Object} data - Additional event data.
+     *   @param {Array} data.files - The list of GDrive folders the user picked
+     *     in the GDrive folder picker modal.
+     */
+    ".entry-attachment picked": function (el, ev, data) {
       var dfd,
-          that = this,
           files = data.files || [],
-          scope = this.scope;
+          scope = this.scope,
+          refreshDeferred;  // instance's deferred object_folder refresh action
 
       if(el.data("type") === "folders"
          && files.length
@@ -1043,9 +1102,11 @@ can.Component.extend({
         return;
       }
 
-
       this.scope.attr('_folder_change_pending', true);
-      if (el.data('replace')) {
+
+      if (!el.data('replace')) {
+        dfd = $.when();
+      } else {
         if(scope.deferred) {
           if(scope.current_folder) {
             scope.instance.mark_for_deletion("folders", scope.current_folder);
@@ -1055,24 +1116,18 @@ can.Component.extend({
             // in this case.
             scope.attr('folder_error', null);
           } else {
-            can.each(this.scope.instance.object_folders.reify(), function(object_folder){
+            can.each(scope.instance.object_folders.reify(), function(object_folder){
               object_folder.refresh().then(function(of){
-                that.scope.instance.mark_for_deletion("object_folders", of);
+                scope.instance.mark_for_deletion("object_folders", of);
               });
             });
           }
           dfd = $.when();
         } else {
-          dfd = $.when.apply(this, $.map(scope.instance.object_folders, function(object_folder) {
-            // Remove existing object folders before mapping a new one:
-            return object_folder.reify().refresh().then(function(instance) {
-              return instance.destroy();
-            });
-          }));
+          dfd = scope._unlinkObjFolders(scope.instance);
         }
-      } else {
-        dfd = $.when();
       }
+
       return dfd.then(function() {
         if(scope.deferred) {
           return $.when.apply(
