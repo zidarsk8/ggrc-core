@@ -153,12 +153,12 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
         return
       month, day, year = self.value
       try:
-        self.row_converter.obj.end_date = datetime.date(year, month, day)
+        self.row_converter.obj.start_date = datetime.date(year, month, day)
       except ValueError:
         self.add_error(errors.WRONG_VALUE_ERROR,
                        column_name=self.display_name)
         return
-      self.row_converter.obj.end_date = datetime.date(year, month, day)
+      self.row_converter.obj.start_date = datetime.date(year, month, day)
     elif freq in ["weekly", "monthly"]:
       if len(self.value) != 1 or \
          (freq == "weekly" and not (1 <= self.value[0] <= 5)) or \
@@ -232,7 +232,7 @@ class TaskTypeColumnHandler(ColumnHandler):
 
   type_map = {
       "rich text": "text",
-      "drop down": "menu",
+      "dropdown": "menu",
       "checkboxes": "checkbox",
   }
 
