@@ -2959,6 +2959,66 @@ Mustache.registerHelper("if_draw_icon", function(instance, options) {
     return options.inverse(options.contexts);
 });
 
+/**
+ * Helper method for determining the file type of a Document object from its
+ * file name extension.
+ *
+ * @param {Object} instance - an instance of a model object of type "Document"
+ * @return {String} - determined file type or "default" for unknown/missing
+ *   file name extensions.
+ *
+ * @throws {String} If the type of the `instance` is not "Document" or if its
+ *   "title" attribute is empty.
+ */
+Mustache.registerHelper("file_type", function (instance) {
+  var extension,
+      filename,
+      parts,
+      DEFAULT_VALUE = "default",
+      FILE_EXTENSIONS;
+
+  FILE_EXTENSIONS = Object.freeze({
+    plainText: Object.freeze({txt: 1}),
+    image: Object.freeze(
+      {jpg: 1, jpeg: 1, png: 1, gif: 1, tiff: 1, bmp: 1}),
+    pdfDoc: Object.freeze({pdf: 1}),
+    officeDoc: Object.freeze({doc: 1, docx: 1, odt: 1}),
+    officeSpreadsheet: Object.freeze({xls: 1, xlsx: 1, ods: 1}),
+    archiveFile: Object.freeze({zip: 1, rar: 1, "7z": 1, gz: 1, tar: 1})
+  });
+
+  if (instance.type !== "Document") {
+    throw "Cannot determine file type for a non-document object";
+  }
+
+  filename = instance.title || "";
+  if (!filename) {
+    throw "Cannot determine the object's file name";
+  }
+
+  parts = filename.split(".");
+  extension = (parts.length === 1) ? "" : parts[parts.length - 1];
+  extension = extension.toLowerCase();
+
+  if (!extension) {
+    return DEFAULT_VALUE;
+  } else if (extension in FILE_EXTENSIONS.plainText) {
+    return "txt";
+  } else if (extension in FILE_EXTENSIONS.image) {
+    return "img";
+  } else if (extension in FILE_EXTENSIONS.pdfDoc) {
+    return "pdf";
+  } else if (extension in FILE_EXTENSIONS.officeDoc) {
+    return "doc";
+  } else if (extension in FILE_EXTENSIONS.officeSpreadsheet) {
+    return "xls";
+  } else if (extension in FILE_EXTENSIONS.archiveFile) {
+    return "zip";
+  } else {
+    return DEFAULT_VALUE;
+  }
+});
+
 Mustache.registerHelper("debugger", function () {
   // This just gives you a helper that you can wrap around some code in a
   // template to see what's in the context. Dev tools need to be open for this
