@@ -251,6 +251,11 @@ class TaskTypeColumnHandler(ColumnHandler):
       value = self.row_converter.obj.default_task_type()
     return value
 
+  def get_value(self):
+    reverse_map = {v: k for k, v in self.type_map.items()}
+    return reverse_map.get(self.row_converter.obj.task_type,
+                           "rich text").title()
+
 
 class WorkflowPersonColumnHandler(UserColumnHandler):
 
