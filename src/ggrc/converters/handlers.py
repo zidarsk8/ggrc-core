@@ -60,6 +60,13 @@ class ColumnHandler(object):
     self.value = self.parse_item()
 
   def get_value(self):
+    if (self.key == "description" and
+        self.row_converter.obj.__class__.__name__ == "TaskGroupTask" and
+        hasattr(self.row_converter.obj, "response_options") and
+        self.row_converter.obj.response_options and
+        hasattr(self.row_converter.obj, "task_type") and
+        self.row_converter.obj.task_type in {"menu", "checkbox"}):
+      return ", ".join(self.row_converter.obj.response_options)
     return getattr(self.row_converter.obj, self.key, self.value)
 
   def add_error(self, template, **kwargs):
@@ -314,16 +321,6 @@ class RequiredTextColumnHandler(TextColumnHandler):
     if not clean_value:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return clean_value
-
-  def get_value(self):
-    if (self.key == "description" and
-        self.row_converter.obj.__class__.__name__ == "TaskGroupTask" and
-        hasattr(self.row_converter.obj, "response_options") and
-        self.row_converter.obj.response_options and
-        hasattr(self.row_converter.obj, "task_type") and
-        self.row_converter.obj.task_type in {"menu", "checkbox"}):
-      return ", ".join(self.row_converter.obj.response_options)
-    return getattr(self.row_converter.obj, self.key, self.value)
 
 
 class TextareaColumnHandler(ColumnHandler):
