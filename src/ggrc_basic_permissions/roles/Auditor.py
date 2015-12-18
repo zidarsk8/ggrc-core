@@ -46,7 +46,8 @@ permissions = {
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
-        "PopulationSampleResponse"
+        "PopulationSampleResponse",
+        "Comment"
     ],
     "delete": [
         "Request",
