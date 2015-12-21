@@ -16,6 +16,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from werkzeug.exceptions import BadRequest
 import functools
+import inspect
 
 
 class Relationship(Mapping, db.Model):
@@ -248,15 +249,7 @@ class RelationshipAttr(Identifiable, db.Model):
 
   @staticmethod
   def _gather_validators(target_class):
-    queue = set([target_class])
-    done = set()
-    validators = set()
-    while queue:
-      cls = queue.pop()
-      for b in cls.__bases__:
-        if b not in done:
-          queue.add(b)
-      validator = getattr(cls, "_validate_relationship_attr", None)
-      if validator is not None:
-        validators.add(validator)
+    validators = set(getattr(cls, "_validate_relationship_attr", None)
+                     for cls in inspect.getmro(target_class))
+    validators.discard(None)
     return [functools.partial(v, target_class) for v in validators]
