@@ -219,6 +219,12 @@
   &.color { color: $purple; }
 }
 
+.grcicon-issue-color:before { content: $fa-var-exclamation-circle; }
+.#{$fa-css-prefix}-issue {
+  &:before { content: $fa-var-exclamation-circle; }
+  &.color { color: $purple; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -324,6 +330,10 @@
   }
   .grcicon-workflow-color:before { color: $black; }
   .#{$fa-css-prefix}-workflow {
+    &.color { color: $black; }
+  }
+  .grcicon-issue-color:before { color: $black; }
+  .#{$fa-css-prefix}-issue {
     &.color { color: $black; }
   }
 
@@ -480,6 +490,10 @@
   }
   .grcicon-workflow-color:before { color: $white; }
   .#{$fa-css-prefix}-workflow {
+    &.color { color: $white; }
+  }
+  .grcicon-issue-color:before { color: $white; }
+  .#{$fa-css-prefix}-issue {
     &.color { color: $white; }
   }
 
