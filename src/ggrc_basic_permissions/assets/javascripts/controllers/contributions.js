@@ -149,6 +149,8 @@
       join_query: {},
       join_object: null,
 
+      selected_id: null,
+
       modal_title: null,
       option_list_title: null,
       active_list_title: null,
@@ -335,22 +337,21 @@
     },
 
     update_option_radios: function() {
-      var self = this
-        , role_found = false
-        , $option_list = $(this.element).find('.option_column ul')
-        ;
-
-      this.join_list.forEach(function(join, index, list) {
-        var $option = $option_list
-          .find('li[data-id=' + join[self.options.option_attr].id + '] input[type=radio]');
-        if($option.length == 1){
-          $option.prop('checked', true);
-          role_found = true;
-        }
+      var allowed_ids = can.map(this.context.options, function(join) {
+        return join.id;
       });
-      if(!role_found){
-        $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
+      if (!allowed_ids.length) {
+        return;
       }
+      if (!this.join_list.length) {
+        this.context.attr('selected_id', 0);
+      }
+      this.join_list.forEach(function(join) {
+        var id = join[this.options.option_attr].id;
+        if (allowed_ids.indexOf(id) >= 0) {
+          this.context.attr('selected_id', id);
+        }
+      }.bind(this));
     },
 
     /*" hide": function(el, ev) {
