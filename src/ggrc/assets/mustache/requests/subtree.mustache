@@ -7,10 +7,10 @@
 
 {{#instance}}
 <li>
-  {{#is_allowed 'update'}}
+  {{#is_allowed "update" instance}}
   <span class="file-controls">
     <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-      {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+      <span class="result" {{data "result"}}></span>
       <i class="grcicon-remove"></i>
     </a>
   </span>
@@ -20,7 +20,7 @@
 
   {{#if instance.viewLink}}
     {{#is_allowed "view_object_page" instance}}
-      <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-goto"></i></a>
+      <a class="more" href="{{instance.viewLink}}" target="_blank"><i class="grcicon-goto"></i></a>
     {{/is_allowed}}
   {{/if}}
 
