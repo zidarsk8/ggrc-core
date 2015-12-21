@@ -338,9 +338,9 @@
 
     update_option_radios: function() {
       var allowed_ids = can.map(this.context.options, function(join) {
-        return join.id
+        return join.id;
       });
-      if(!allowed_ids.length) {
+      if (!allowed_ids.length) {
         return;
       }
       if (!this.join_list.length) {
