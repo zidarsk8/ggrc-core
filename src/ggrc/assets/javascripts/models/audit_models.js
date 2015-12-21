@@ -357,7 +357,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
   , defaults : {
-    status: "Unstarted",
+    status: "Open",
     requested_on: moment().toDate(),
     due_on: GGRC.Utils.firstWorkingDay(moment().add(1, "weeks"))
   }
@@ -882,7 +882,9 @@ can.Model.Cacheable("CMS.Models.ControlAssessment", {
     add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
     attr_list : can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Conclusion: Design', attr_name: 'design'},
-        {attr_title: 'Conclusion: Operation', attr_name: 'operationally'}
+        {attr_title: 'Conclusion: Operation', attr_name: 'operationally'},
+        {attr_title: 'URL', attr_name: 'url'},
+        {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
   },
   init: function () {

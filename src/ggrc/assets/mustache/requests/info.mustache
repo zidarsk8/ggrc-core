@@ -39,7 +39,17 @@
               </ul>
               {{#is_allowed 'update' instance context='for'}}
               {{#toggle show_new_object_form}}
-                <ggrc-quick-add parent_instance="instance" join_model="Relationship" quick_create="create_url">
+                <ggrc-quick-add
+                  parent_instance="instance"
+                  join_model="Relationship"
+                  quick_create="create_url"
+                  {{#if_in instance.status "Open,Final,Verified"}}
+                    verify_event="true"
+                    modal_description='You are about to move request from "{{instance.status}}" to "In Progress" - are you sure about that?'
+                    modal_title='Confirm moving Request to "In Progress"'
+                    modal_button='Confirm'
+                  {{/if_in}}
+                >
                   {{#prune_context}}
                   <div class="objective-selector field-wrap">
                     <input tabindex="3" type="text" name="instance" placeholder="Add URL">
@@ -67,13 +77,13 @@
             <div class="span6">
               <h6>Test</h6>
               <div class="rtf-block">
-                {{{firstnonempty test '<em>No test</em>'}}}
+                {{{firstnonempty test '<span class="empty-message">None</span>'}}}
               </div>
             </div>
             <div class="span6">
               <h6>Notes</h6>
               <div class="rtf-block">
-                {{{firstnonempty notes '<em>No notes</em>'}}}
+                {{{firstnonempty notes '<span class="empty-message">None</span>'}}}
               </div>
             </div>
           </div>

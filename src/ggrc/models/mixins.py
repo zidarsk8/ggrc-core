@@ -669,10 +669,10 @@ class Assignable(object):
 
   @property
   def assignees(self):
-    assignees = [(r.source, r.attrs["AssigneeType"].split(","))
+    assignees = [(r.source, tuple(r.attrs["AssigneeType"].split(",")))
                  for r in self.related_sources
                  if "AssigneeType" in r.attrs]
-    assignees += [(r.destination, r.attrs["AssigneeType"].split(","))
+    assignees += [(r.destination, tuple(r.attrs["AssigneeType"].split(",")))
                   for r in self.related_destinations
                   if "AssigneeType" in r.attrs]
     return set(assignees)
