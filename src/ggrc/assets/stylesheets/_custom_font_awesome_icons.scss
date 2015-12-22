@@ -232,6 +232,12 @@
   &.color { color: $purple; }
 }
 
+.grcicon-standard-color:before { content: $fa-var-book; }
+.#{$fa-css-prefix}-standard {
+  &:before { content: $fa-var-book; }
+  &.color { color: #005580; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -345,6 +351,10 @@
   }
   .grcicon-cycle_task_group_object_task-color:before { color: $black; }
   .#{$fa-css-prefix}-cycle_task_group_object_task {
+    &.color { color: $black; }
+  }
+  .grcicon-standard-color:before { color: $black; }
+  .#{$fa-css-prefix}-standard {
     &.color { color: $black; }
   }
 
@@ -510,6 +520,10 @@
   }
   .grcicon-cycle_task_group_object_task-color:before { color: $white; }
   .#{$fa-css-prefix}-cycle_task_group_object_task {
+    &.color { color: $white; }
+  }
+  .grcicon-standard-color:before { color: $white; }
+  .#{$fa-css-prefix}-standard {
     &.color { color: $white; }
   }
 
