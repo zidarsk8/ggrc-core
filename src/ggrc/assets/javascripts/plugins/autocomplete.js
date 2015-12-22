@@ -133,7 +133,8 @@
           } else {
             original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
-              ctl.autocomplete_select($this, original_event, {
+              var autocomplete_select = ctl.autocomplete_select || ctl.scope.autocomplete_select;
+              autocomplete_select($this, original_event, {
                 item: new_obj
               });
               $this.trigger("modal:success", new_obj);

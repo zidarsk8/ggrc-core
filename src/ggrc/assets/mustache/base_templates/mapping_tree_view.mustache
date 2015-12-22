@@ -8,7 +8,7 @@
 <ul class="attachment-list">
   {{#with_mapping mapping parentInstance}}
     {{#results}}
-      {{{render itemTemplate}}}
+      {{{render itemTemplate parentInstance=parentInstance}}}
     {{/results}}
   {{/with_mapping}}
 </ul>
