@@ -51,6 +51,7 @@
 .#{$fa-css-prefix}-interview { content: $fa-var-calendar; }
 .#{$fa-css-prefix}-documentation { content: $fa-var-files-o; }
 
+.grcicon-person-color:before { content: $fa-var-user; }
 .#{$fa-css-prefix}-person:before { content: $fa-var-user; }
 .#{$fa-css-prefix}-person-color:before { content: $fa-var-user; color: #a8491a; }
 .#{$fa-css-prefix}-person {
@@ -398,6 +399,7 @@
 }
 // Turn icons to white
  %white-icons {
+  .grcicon-person-color:before { color: $white; }
  	.#{$fa-css-prefix}-person-color:before { color: $white; }
   .#{$fa-css-prefix}-person {
     &.color { color: $white; }
