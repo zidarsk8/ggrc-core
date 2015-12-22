@@ -24,49 +24,40 @@
     {{/if}}
   {{/if}}
 </label>
-{{#with_mapping mapping instance}}
-  <ul class="inner-count-list">
-    {{^if results.length}}
-      {{^if instance._pending_joins}}
-      <li><i> No {{type}}s</i></li>
-      {{/if}}
+<ul class="inner-count-list">
+  {{^if results.length}}
+    {{^if instance._pending_joins}}
+    <li><i> No {{type}}s</i></li>
     {{/if}}
-    {{#results}}
-      <li>
-        {{#is_allowed 'update' instance context='for'}}
-        {{#can_unmap}}
-        <span class="file-controls">
-          <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{instance.id}}>
-            <span class="result" {{data 'result'}}></span>
-            <i class="grcicon-deleted"></i>
-          </a>
-        </span>
-        {{/can_unmap}}
-        {{/is_allowed}}
-        {{{render '/static/mustache/people/popover.mustache' person=instance}}}
-      </li>
-    {{/results}}
-    {{#instance._pending_joins}}
-    {{#if_has_role extra.attrs.AssigneeType type}}
-      <li>
-        {{{render '/static/mustache/people/popover.mustache' person=what}}}
-      </li>
-    {{/if_has_role}}
-    {{/instance._pending_joins}}
-    <li class="person-add">
-      {{#show_add}}
-        {{#is_allowed 'update' instance context='for'}}
-        {{#toggle toggle_add}}
-          <i class="grcicon-person-green pull-left icon-field"></i>
-          <div class="person-selector">
-            <input tabindex="7" type="text" name="" class="search-icon" data-lookup="Person" placeholder="Search for {{type}}" null-if-empty="false" value="" {{autocomplete_select}} />
-            <a href="javascript://" {{toggle_button}}>
-              <i class="grcicon-x-grey"></i>
-            </a>
-          </div>
-        {{/toggle}}
-        {{/is_allowed}}
-      {{/show_add}}
+  {{/if}}
+  {{#results}}
+    <li>
+      {{#is_allowed 'update' instance context='for'}}
+      {{#can_unmap}}
+      <span class="file-controls">
+        <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{id}}>
+          <span class="result" {{data 'result'}}></span>
+          <i class="grcicon-deleted"></i>
+        </a>
+      </span>
+      {{/can_unmap}}
+      {{/is_allowed}}
+      {{{render '/static/mustache/people/popover.mustache' person=.}}}
     </li>
-  </ul>
-{{/with_mapping}}
+  {{/results}}
+  <li class="person-add">
+    {{#show_add}}
+      {{#is_allowed 'update' instance context='for'}}
+      {{#toggle toggle_add}}
+        <i class="grcicon-person-green pull-left icon-field"></i>
+        <div class="person-selector">
+          <input tabindex="7" type="text" name="" class="search-icon" data-lookup="Person" placeholder="Search for {{type}}" null-if-empty="false" value="" {{autocomplete_select}} />
+          <a href="javascript://" {{toggle_button}}>
+            <i class="grcicon-x-grey"></i>
+          </a>
+        </div>
+      {{/toggle}}
+      {{/is_allowed}}
+    {{/show_add}}
+  </li>
+</ul>
