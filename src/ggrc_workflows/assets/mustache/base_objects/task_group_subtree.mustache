@@ -27,7 +27,7 @@
             {{#if mappings}}
               {{#is_allowed_all 'delete' mappings}}
                 <a href="javascript://" data-toggle="unmap" data-id="{{instance.id}}" data-type="{{instance.class.shortName}}" class="deleteTrigger">
-                  <i class="grcicon-deleted"></i>
+                  <i class="fa fa-trash"></i>
                   {{#result}}
                     <span class="result" {{data 'result'}}></span>
                   {{/result}}

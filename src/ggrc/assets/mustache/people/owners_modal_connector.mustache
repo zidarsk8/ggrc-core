@@ -24,7 +24,7 @@
     {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
     <a href="javascript://" class="unmap" data-toggle="unmap">
       <span class="result" {{data 'result'}}></span>
-      {{^if_equals list.length 1}}<i class="grcicon-deleted" tabindex="11"></i>{{/if_equals}}
+      {{^if_equals list.length 1}}<i class="fa fa-trash" tabindex="11"></i>{{/if_equals}}
     </a>
   </div>
   {{/each}}
@@ -41,7 +41,7 @@
   {{#prune_context}}
     <div class="span12 objective-selector field-wrap">
       <input tabindex="11" data-id="owner_txtbx" type="text" data-lookup="Person" null-if-empty="true" class="search-icon" placeholder="Enter text to search for Owner" {{autocomplete_select}} value="{{instance.email}}">
-      <a class="remove-field" href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+      <a class="remove-field" href="javascript://" {{toggle_button}}><i class="fa fa-trash"></i></a>
 
     </div>
     <!--input type="hidden" name="role_name" value="Owner" /-->
