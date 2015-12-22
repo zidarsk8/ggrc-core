@@ -18,7 +18,7 @@
       {{#if current_folder}}
         <div class="oneline">
           <a href="{{current_folder.alternateLink}}" target="_blank">
-            <i class="grcicon-attach-color"></i> {{current_folder.title}}
+            <i class="fa fa-paperclip attach-blue"></i> {{current_folder.title}}
           </a>
           {{^if readonly}}
           <a class="icon-link entry-attachment" href="javascript://" rel="tooltip" data-original-title="{{firstnonempty placeholder 'Choose a new folder'}}" data-toggle="gdrive-picker" data-model="{{instance.class.model_singular}}" data-id="{{instance.id}}" data-type="folders" data-replace="true">
@@ -55,7 +55,7 @@
             {{^if readonly}}
             <a href="javascript://" tabindex="{{firsnonempty tabindex '0'}}" class="entry-attachment tree-item-add" data-toggle="gdrive-picker"
               data-model="{{instance.class.model_singular}}" data-type="folders" data-id="{{instance.id}}">
-              <i class="grcicon-attach-color"></i> Assign folder
+              <i class="fa fa-paperclip attach-blue"></i> Assign folder
             </a>
             {{/if}}
           {{/if}}
