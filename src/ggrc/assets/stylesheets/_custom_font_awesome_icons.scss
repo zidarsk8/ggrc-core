@@ -238,6 +238,12 @@
   &.color { color: #005580; }
 }
 
+.grcicon-threat-color:before { content: $fa-var-user-secret; }
+.#{$fa-css-prefix}-threat {
+  &:before { content: $fa-var-user-secret; }
+  &.color { color: #8e0000; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -355,6 +361,10 @@
   }
   .grcicon-standard-color:before { color: $black; }
   .#{$fa-css-prefix}-standard {
+    &.color { color: $black; }
+  }
+  .grcicon-threat-color:before { color: $black; }
+  .#{$fa-css-prefix}-threat {
     &.color { color: $black; }
   }
 
@@ -524,6 +534,10 @@
   }
   .grcicon-standard-color:before { color: $white; }
   .#{$fa-css-prefix}-standard {
+    &.color { color: $white; }
+  }
+  .grcicon-threat-color:before { color: $white; }
+  .#{$fa-css-prefix}-threat {
     &.color { color: $white; }
   }
 
