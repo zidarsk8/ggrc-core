@@ -69,7 +69,10 @@
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div class="date-area">
-          <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" value="{{value}}" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" value="{{value}}" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+          </div>
         </div>
         {{/case}}
         {{/switch}}

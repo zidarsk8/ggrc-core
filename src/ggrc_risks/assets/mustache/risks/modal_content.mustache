@@ -73,7 +73,10 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Enter the date this object becomes effective."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="6" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+      <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input tabindex="6" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+      </div>
     </div>
 
     <div class="span4 hidable">
@@ -82,7 +85,10 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Enter the date the object stops being effective."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="7" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+      <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input tabindex="7" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+      </div>
     </div>
   </div>
 

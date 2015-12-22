@@ -16,7 +16,10 @@
     <div class="row-fluid">
       <div class="span4">
         <label>Choose Date</label>
-        <input tabindex="2" class="input-block-level date" name="start_at.date" data-also-set="end_at.date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_at}}">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+          <input tabindex="2" class="input-block-level date" name="start_at.date" data-also-set="end_at.date" data-toggle="datepicker" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_at}}">
+        </div>
       </div>
       <div class="span4">
         <label>Starts at</label>

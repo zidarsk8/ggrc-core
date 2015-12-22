@@ -18,7 +18,10 @@
       <li>
         {{#toggle change_due_date}}
           <label>Due on</label>
-          <input tabindex="5" class="span8 input-block-level date" name="due_on" data-toggle="datepicker" data-after="created_at" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input tabindex="5" class="span8 input-block-level date" name="due_on" data-toggle="datepicker" data-after="created_at" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+          </div>
         {{else}}
           {{#is_allowed 'update' instance}}
             {{#if_in instance.status "In Progress"}}

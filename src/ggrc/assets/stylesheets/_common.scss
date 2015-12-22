@@ -475,10 +475,6 @@ small {
 
 // Date input field - To see date icon just add class .date to input field
 input.date {
-  @include background-size(392px 440px);
-  background-image: image-url("grcicons/icons.png");
-  background-repeat: no-repeat;
-  background-position: -364px -364px;
   padding-left: 26px;
   &.short-field {
     height: 16px !important;
@@ -492,6 +488,15 @@ input.date {
 input.input-block-level,
 select.input-block-level {
   @extend %input-block-level;
+}
+
+.input-group {
+  position: relative;
+  .input-group-addon {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+  }
 }
 
 // resizible widget functionality

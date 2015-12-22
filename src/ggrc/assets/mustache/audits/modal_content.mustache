@@ -81,14 +81,20 @@
           Planned Start Date
           <a data-id="hide_planned_start_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <input data-id="planned_start_date_txtbx" tabindex="6" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+          <input data-id="planned_start_date_txtbx" tabindex="6" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+        </div>
       </div>
       <div data-id="planned_end_date_hidden" class="span3 hidable">
         <label>
           Planned End Date
           <a data-id="hide_planned_end_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <input data-id="planned_end_date_txtbx" tabindex="7" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+          <input data-id="planned_end_date_txtbx" tabindex="7" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+        </div>
       </div>
       <div data-id="planned_report_period_from_hidden" class="span6 hidable">
         <label>
@@ -97,10 +103,16 @@
         </label>
         <div class="row-fluid">
           <div class="span6">
-            <input data-id="planned_report_period_from_txtbx" tabindex="8" class="input-block-level date" name="report_start_date" data-toggle="datepicker" data-before="report_end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date report_start_date}}">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+              <input data-id="planned_report_period_from_txtbx" tabindex="8" class="input-block-level date" name="report_start_date" data-toggle="datepicker" data-before="report_end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date report_start_date}}">
+            </div>
           </div>
           <div class="span6">
-            <input data-id="planned_report_period_to_txtbx" tabindex="9" class="input-block-level date" name="report_end_date" data-toggle="datepicker" data-after="report_start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date report_end_date}}">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+              <input data-id="planned_report_period_to_txtbx" tabindex="9" class="input-block-level date" name="report_end_date" data-toggle="datepicker" data-after="report_start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date report_end_date}}">
+            </div>
           </div>
         </div>
       </div>

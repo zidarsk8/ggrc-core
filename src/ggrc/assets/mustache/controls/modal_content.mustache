@@ -162,7 +162,10 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Enter the date this object becomes effective."></i>
           <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <input  tabindex="13" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+          <input  tabindex="13" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+        </div>
       </div>
       <div data-id="stop_date_hidden" class="span6 hidable">
         <label>
@@ -170,7 +173,10 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Enter the date the object stops being effective."></i>
           <a data-id="hide_stop_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <input data-id="stop_date_txtbx" tabindex="14" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+          <input data-id="stop_date_txtbx" tabindex="14" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+        </div>
       </div>
     </div>
 
