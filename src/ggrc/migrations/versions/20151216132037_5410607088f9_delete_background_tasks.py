@@ -6,7 +6,7 @@
 """Delete background tasks
 
 Revision ID: 5410607088f9
-Revises: 504f541411a5
+Revises: 1ef8f4f504ae
 Create Date: 2015-12-16 13:20:37.341342
 
 """
@@ -17,7 +17,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '5410607088f9'
-down_revision = '504f541411a5'
+down_revision = '1ef8f4f504ae'
 
 
 def upgrade():
