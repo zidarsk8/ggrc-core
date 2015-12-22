@@ -23,6 +23,7 @@ from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
 from ggrc.services.common import Resource
 from . import basic_roles
+from ggrc.utils import benchmark
 from .contributed_roles import lookup_role_implications
 from .models import Role, UserRole, ContextImplication
 from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
@@ -115,7 +116,8 @@ class BasicUserPermissions(DefaultUserPermissions):
   """User permissions that aren't kept in session."""
   def __init__(self, user):
     self.user = user
-    self.permissions = load_permissions_for(user)
+    with benchmark('BasicUserPermissions > load permissions for user'):
+      self.permissions = load_permissions_for(user)
 
   def _permissions(self):
     return self.permissions
@@ -148,7 +150,8 @@ class UserPermissions(DefaultUserPermissions):
     if user is None or user.is_anonymous():
       self._request_permissions = {}
     else:
-      self._request_permissions = load_permissions_for(user)
+      with benchmark('load_permissions > load permissions for user'):
+        self._request_permissions = load_permissions_for(user)
 
 def collect_permissions(src_permissions, context_id, permissions):
   for action, resource_permissions in src_permissions.items():
