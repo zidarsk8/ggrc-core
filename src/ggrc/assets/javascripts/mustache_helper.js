@@ -2185,7 +2185,6 @@ Mustache.registerHelper("if_in", function (needle, haystack, options) {
   var found = haystack.some(function (h) {
     return h.trim() === needle;
   });
-
   return options[found ? "fn" : "inverse"](options.contexts);
 });
 
@@ -2363,6 +2362,54 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
+});
+
+Mustache.registerHelper("if_verifiers_defined", function (instance, options) {
+  var verifiers;
+
+  instance = Mustache.resolve(instance);
+  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+
+  if (!instance) {
+    return '';
+  }
+
+  verifiers = instance.get_binding('related_verifiers');
+
+  return defer_render('span', function(list) {
+    if (list.length) {
+      return options.fn(options.contexts);
+    }
+    return options.inverse(options.contexts);
+  }, verifiers.refresh_instances());
+});
+
+Mustache.registerHelper("if_verifier", function (instance, options) {
+  var user = GGRC.current_user,
+      verifiers;
+
+  instance = Mustache.resolve(instance);
+  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+
+  if (!instance) {
+    return '';
+  }
+
+  verifiers = instance.get_binding('related_verifiers');
+
+  return defer_render('span', function(list) {
+    var llist = _.filter(list, function(item) {
+      if (item.instance.email == user.email) {
+        return true;
+      }
+      return false;
+    });
+
+    if (llist.length) {
+      return options.fn(options.contexts);
+    }
+    return options.inverse(options.contexts);
+  }, verifiers.refresh_instances());
 });
 
 can.each({
@@ -2957,6 +3004,66 @@ Mustache.registerHelper("if_draw_icon", function(instance, options) {
     return options.fn(options.contexts);
   else
     return options.inverse(options.contexts);
+});
+
+/**
+ * Helper method for determining the file type of a Document object from its
+ * file name extension.
+ *
+ * @param {Object} instance - an instance of a model object of type "Document"
+ * @return {String} - determined file type or "default" for unknown/missing
+ *   file name extensions.
+ *
+ * @throws {String} If the type of the `instance` is not "Document" or if its
+ *   "title" attribute is empty.
+ */
+Mustache.registerHelper("file_type", function (instance) {
+  var extension,
+      filename,
+      parts,
+      DEFAULT_VALUE = "default",
+      FILE_EXTENSIONS;
+
+  FILE_EXTENSIONS = Object.freeze({
+    plainText: Object.freeze({txt: 1}),
+    image: Object.freeze(
+      {jpg: 1, jpeg: 1, png: 1, gif: 1, tiff: 1, bmp: 1}),
+    pdfDoc: Object.freeze({pdf: 1}),
+    officeDoc: Object.freeze({doc: 1, docx: 1, odt: 1}),
+    officeSpreadsheet: Object.freeze({xls: 1, xlsx: 1, ods: 1}),
+    archiveFile: Object.freeze({zip: 1, rar: 1, "7z": 1, gz: 1, tar: 1})
+  });
+
+  if (instance.type !== "Document") {
+    throw "Cannot determine file type for a non-document object";
+  }
+
+  filename = instance.title || "";
+  if (!filename) {
+    throw "Cannot determine the object's file name";
+  }
+
+  parts = filename.split(".");
+  extension = (parts.length === 1) ? "" : parts[parts.length - 1];
+  extension = extension.toLowerCase();
+
+  if (!extension) {
+    return DEFAULT_VALUE;
+  } else if (extension in FILE_EXTENSIONS.plainText) {
+    return "txt";
+  } else if (extension in FILE_EXTENSIONS.image) {
+    return "img";
+  } else if (extension in FILE_EXTENSIONS.pdfDoc) {
+    return "pdf";
+  } else if (extension in FILE_EXTENSIONS.officeDoc) {
+    return "doc";
+  } else if (extension in FILE_EXTENSIONS.officeSpreadsheet) {
+    return "xls";
+  } else if (extension in FILE_EXTENSIONS.archiveFile) {
+    return "zip";
+  } else {
+    return DEFAULT_VALUE;
+  }
 });
 
 Mustache.registerHelper("debugger", function () {

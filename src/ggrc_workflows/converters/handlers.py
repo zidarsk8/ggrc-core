@@ -12,6 +12,7 @@ from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters import get_importables
 from ggrc.converters.handlers import handlers
+from ggrc_basic_permissions import models as bp_models
 from ggrc_workflows import models as wf_models
 
 
@@ -224,8 +225,10 @@ class TaskTypeColumnHandler(handlers.ColumnHandler):
 
   type_map = {
       "rich text": "text",
+      "dropdown": "menu",
       "drop down": "menu",
       "checkboxes": "checkbox",
+      "checkbox": "checkbox",
   }
 
   def parse_item(self):
@@ -257,7 +260,12 @@ class WorkflowPersonColumnHandler(handlers.UserColumnHandler):
   def get_value(self):
     workflow_person = db.session.query(wf_models.WorkflowPerson.person_id)\
         .filter_by(workflow_id=self.row_converter.obj.id,)
-    users = models.Person.query.filter(models.Person.id.in_(workflow_person))
+    workflow_roles = db.session.query(bp_models.UserRole.person_id)\
+        .filter_by(context_id=self.row_converter.obj.context_id)
+    users = models.Person.query.filter(
+        models.Person.id.in_(workflow_person) &
+        models.Person.id.notin_(workflow_roles)
+    )
     emails = [user.email for user in users]
     return "\n".join(emails)
 

@@ -377,6 +377,7 @@ dashboard-js-template-files:
   - import_export/export/attribute_selector.mustache
   - import_export/export/filter_query.mustache
   - mapper/relevant_filter.mustache
+  - quick_form/confirm_buttons.mustache
 
 dashboard-css-files:
   # dashboard.css is generated automatically from `compass watch -c compass.config.rb`

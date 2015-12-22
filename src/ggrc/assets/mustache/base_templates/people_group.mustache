@@ -24,6 +24,7 @@
     {{/if}}
   {{/if}}
 </label>
+{{#using parentInstance=instance}}
 <ul class="inner-count-list">
   {{^if results.length}}
     {{^if instance._pending_joins}}
@@ -32,7 +33,7 @@
   {{/if}}
   {{#results}}
     <li>
-      {{#is_allowed 'update' instance context='for'}}
+      {{#is_allowed 'update' parentInstance context='for'}}
       {{#can_unmap}}
       <span class="file-controls">
         <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{id}}>
@@ -61,3 +62,4 @@
     {{/show_add}}
   </li>
 </ul>
+{{/using}}
