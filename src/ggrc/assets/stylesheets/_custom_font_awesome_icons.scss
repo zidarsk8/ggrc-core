@@ -259,10 +259,16 @@
   &.color { color: $purple; }
 }
 
-.grcicon-assessment-plan:before { content: $fa-var-wrench; }
+.grcicon-assessment-plan-color:before { content: $fa-var-wrench; }
 .#{$fa-css-prefix}-assessment-plan {
   &:before { content: $fa-var-wrench; }
   &.color { color: $purple; }
+}
+
+.grcicon-risk_assessment-color:before { content: $fa-var-bomb; }
+.#{$fa-css-prefix}-risk_assessment {
+  &:before { content: $fa-var-bomb; }
+  &.color { color: #8e0000; }
 }
 
 // Turn icons to black
@@ -396,8 +402,12 @@
   .#{$fa-css-prefix}-control_assessment {
     &.color { color: $black; }
   }
-  .grcicon-assessment-plan:before { color: $black; }
+  .grcicon-assessment-plan-color:before { color: $black; }
   .#{$fa-css-prefix}-assessment-plan {
+    &.color { color: $black; }
+  }
+  .grcicon-risk_assessment-color:before { color: $black; }
+  .#{$fa-css-prefix}-risk_assessment {
     &.color { color: $black; }
   }
 
@@ -581,8 +591,12 @@
   .#{$fa-css-prefix}-control_assessment {
     &.color { color: $white; }
   }
-  .grcicon-assessment-plan:before { color: $white; }
+  .grcicon-assessment-plan-color:before { color: $white; }
   .#{$fa-css-prefix}-assessment-plan {
+    &.color { color: $white; }
+  }
+  .grcicon-risk_assessment-color:before { color: $white; }
+  .#{$fa-css-prefix}-risk_assessment {
     &.color { color: $white; }
   }
 
