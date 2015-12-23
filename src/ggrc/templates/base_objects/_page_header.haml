@@ -42,7 +42,7 @@
     %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
       %li.full-opacity
         %a{'href': "/dashboard"}
-          %i.grcicon-my-work
+          %i.fa.fa-home.orange
           My Work ({{current_user.system_wide_role}})
 
       -if permissions.is_allowed_read('/admin', None, 1)
