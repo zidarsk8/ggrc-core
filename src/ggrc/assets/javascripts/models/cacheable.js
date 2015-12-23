@@ -1037,17 +1037,8 @@ can.Model("can.Model.Cacheable", {
   */
   mark_for_deletion: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
-    var len;
 
-    if (!this._pending_joins) {
-      this.attr('_pending_joins', []);
-    }
-    for (len = this._pending_joins.length; len--;) {
-      if (this._pending_joins[len].what === obj &&
-          !(this._pending_joins[len].opts && this._pending_joins[len].opts.change)) {
-        this._pending_joins.splice(len, 1);
-      }
-    }
+    this.is_pending_join(obj);
     this._pending_joins.push({how: "remove", what: obj, through: join_attr, opts: options});
   },
 
@@ -1057,24 +1048,26 @@ can.Model("can.Model.Cacheable", {
   mark_for_addition: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
     extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
-    var len;
 
+    this.is_pending_join(obj);
+    this._pending_joins.push({how: "add", what: obj, through: join_attr, extra: extra_attrs, opts: options});
+  },
+
+  is_pending_join: function (needle) {
     if (!this._pending_joins) {
       this.attr('_pending_joins', []);
     }
-    for (len = this._pending_joins.length; len--;) {
-      if (this._pending_joins[len].what === obj &&
-          !(this._pending_joins[len].opts && this._pending_joins[len].opts.change)) {
-        this._pending_joins.splice(len, 1);
+    _.each(this._pending_joins, function (val, index) {
+      if (val.what === needle && !(val.opts && val.opts.change)) {
+        this._pending_joins.splice(index, 1);
       }
-    }
-    this._pending_joins.push({how: "add", what: obj, through: join_attr, extra: extra_attrs, opts: options});
-  }
+    }, this);
+  },
 
-  , delay_resolving_save_until : function(dfd) {
+  delay_resolving_save_until: function (dfd) {
     return this.notifier.queue(dfd);
-  }
-  , _save: function () {
+  },
+   _save: function () {
     var that = this,
         _super = Array.prototype.pop.call(arguments),
         isNew = this.isNew(),
