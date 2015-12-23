@@ -191,6 +191,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     build_cycle(obj, current_user=current_user, base_date=base_date)
 
     adjust_next_cycle_start_date(obj.calculator, workflow, move_forward=True)
+    update_workflow_state(workflow)
     db.session.add(workflow)
 
 
@@ -614,6 +615,13 @@ def update_workflow_state(workflow):
 
   if workflow.status == 'Draft':
     return
+
+  if workflow.status == "Inactive":
+    if workflow.cycles:
+      workflow.status = "Active"
+      db.session.add(workflow)
+      db.session.flush()
+      return
 
   # Active workflow with no recurrences and no active cycles, workflow is
   # now Inactive
