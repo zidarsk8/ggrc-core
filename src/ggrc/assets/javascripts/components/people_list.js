@@ -50,16 +50,16 @@
             },
             instance = this.instance,
             ids = _.intersection(rel(person), rel(this.instance)),
-            type = this.attr("type");
+            type = this.attr("type"),
+            list, index;
 
         if (!ids.length && this.attr("deferred")) {
-          var list = this.attr("list_pending")
-              index = _.findIndex(list, function (item) {
-                return item.what.type === "Person" &&
-                       item.how === "add" &&
-                       item.what.id === person.id;
-              });
-
+          list = this.attr("list_pending");
+          index = _.findIndex(list, function (item) {
+            return item.what.type === "Person" &&
+                   item.how === "add" &&
+                   item.what.id === person.id;
+          });
           return list.splice(index, 1);
         }
         _.each(ids, function (id) {
@@ -126,21 +126,24 @@
             pending = _.filter(this.scope.get_pending(), function (item) {
               return item.what.type === "Person";
             }),
-            added = _.map(_.filter(pending, function (item) {
-                var roles = can.getObject("extra.attrs", item);
-                return item.how === "add" &&
-                  (roles && _.contains(roles.AssigneeType.split(","), can.capitalize(type)));
-              }), function (item) {
-                return item.what;
-              }),
-            removed = _.map(_.filter(pending, function (item) {
-                return item.how === "remove" && _.find(mapped, function (map) {
-                    return map.id === item.what.id;
-                  });
-              }),function (item) {
-                return item.what;
+            added = _.filter(pending, function (item) {
+              var roles = can.getObject("extra.attrs", item);
+              return item.how === "add" &&
+                (roles && _.contains(roles.AssigneeType.split(","), can.capitalize(type)));
+            }),
+            removed = _.filter(pending, function (item) {
+              return item.how === "remove" && _.find(mapped, function (map) {
+                  return map.id === item.what.id;
               });
+            });
 
+        function getInstances(arr) {
+          return _.map(arr, function (item) {
+            return item.what;
+          });
+        }
+        added = getInstances(added);
+        removed = getInstances(removed);
         this.scope.attr("results").replace(_.union(_.filter(mapped, function (item) {
           return !_.findWhere(removed, {id: item.id});
         }), added));
