@@ -27,9 +27,7 @@
 {{#using parentInstance=instance}}
 <ul class="inner-count-list">
   {{^if results.length}}
-    {{^if instance._pending_joins}}
     <li><i> No {{type}}s</i></li>
-    {{/if}}
   {{/if}}
   {{#results}}
     <li>
