@@ -154,7 +154,8 @@
 
   , hide: function(e) {
       var that = this,
-          options = this.$element.control().options;
+          control = this.$element.control(),
+          options = control && control.options;
 
       // If the hide was initiated by the backdrop, check for dirty form data before continuing
       if (e && $(e.target).is('.modal-backdrop')) {
@@ -184,7 +185,9 @@
       }
 
       // Hide the modal like normal
-      can.trigger(options.instance, "modal:dismiss");
+      if (options) {
+        can.trigger(options.instance, "modal:dismiss");
+      }
       $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
       this.$element.off('modal_form');
     }
