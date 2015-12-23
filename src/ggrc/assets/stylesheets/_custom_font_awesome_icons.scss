@@ -43,6 +43,29 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.#{$fa-css-prefix}-file-txt-o:before { content: $fa-var-file-text-o; }
+
+.#{$fa-css-prefix}-file-jpg-o:before,
+.#{$fa-css-prefix}-file-jpeg-o:before,
+.#{$fa-css-prefix}-file-png-o:before,
+.#{$fa-css-prefix}-file-gif-o:before,
+.#{$fa-css-prefix}-file-tiff-o:before,
+.#{$fa-css-prefix}-file-bmp-o:before { content: $fa-var-file-image-o; }
+
+.#{$fa-css-prefix}-file-doc-o:before,
+.#{$fa-css-prefix}-file-docx-o:before,
+.#{$fa-css-prefix}-file-odt-o:before { content: $fa-var-file-word-o; }
+
+.#{$fa-css-prefix}-file-xls-o:before,
+.#{$fa-css-prefix}-file-xlsx-o:before,
+.#{$fa-css-prefix}-file-ods-o:before { content: $fa-var-file-excel-o; }
+
+.#{$fa-css-prefix}-file-zip-o:before,
+.#{$fa-css-prefix}-file-rar-o:before,
+.#{$fa-css-prefix}-file-7z-o:before,
+.#{$fa-css-prefix}-file-gz-o:before,
+.#{$fa-css-prefix}-file-tar-o:before { content: $fa-var-file-archive-o; }
+
 .icon-share:before { content: $fa-var-link; }
 .icon-th-list:before { content: $fa-var-list-ol; }
 .icon-list:before { content: $fa-var-list-ul; }

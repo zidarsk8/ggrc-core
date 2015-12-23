@@ -273,6 +273,9 @@
         left: -25px;
       }
     }
+    [class*="fa-file-"] {
+      vertical-align: top;
+    }
     a {
       @extend %oneline;
       width: 68%;
