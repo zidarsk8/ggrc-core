@@ -43,6 +43,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-share:before { content: $fa-var-link; }
+.icon-th-list:before { content: $fa-var-list-ol; }
+.icon-list:before { content: $fa-var-list-ul; }
+.icon-indent-right:before { content: $fa-var-long-arrow-left; }
+.icon-indent-left:before { content: $fa-var-long-arrow-right; }
+.icon-pencil:before { content: $fa-var-code; }
+
+// File types
 .#{$fa-css-prefix}-file-txt-o:before { content: $fa-var-file-text-o; }
 
 .#{$fa-css-prefix}-file-jpg-o:before,
@@ -65,13 +73,6 @@
 .#{$fa-css-prefix}-file-7z-o:before,
 .#{$fa-css-prefix}-file-gz-o:before,
 .#{$fa-css-prefix}-file-tar-o:before { content: $fa-var-file-archive-o; }
-
-.icon-share:before { content: $fa-var-link; }
-.icon-th-list:before { content: $fa-var-list-ol; }
-.icon-list:before { content: $fa-var-list-ul; }
-.icon-indent-right:before { content: $fa-var-long-arrow-left; }
-.icon-indent-left:before { content: $fa-var-long-arrow-right; }
-.icon-pencil:before { content: $fa-var-code; }
 
 .grcicon-role-color:before { content: $fa-var-key; }
 .#{$fa-css-prefix}-interview { content: $fa-var-calendar; }
@@ -433,56 +434,8 @@
   .#{$fa-css-prefix}-risk_assessment {
     &.color { color: $black; }
   }
-
-  // .grcicon-info { background-position:-126px -176px; }
-  // .grcicon-role-color { background-position:-102px -8px; }
-  // .grcicon-authorization-color { background-position:-102px -8px; }
-  // .grcicon-directive-color { background-position:-78px -176px; }
-  // .grcicon-control-color { background-position:-150px -224px; }
-  // .grcicon-link { background-position:-30px -104px; }
-  // .grcicon-user { background-position:-6px -8px; }
-  // .grcicon-user-black { background-position:-6px -8px; }
-  // .grcicon-data_asset-color { background-position:-174px -224px; }
-  // .grcicon-facility-color { background-position:-222px -104px; }
-  // .grcicon-market-color { background-position:-246px -104px; }
-  // .grcicon-org_group-color { background-position:-78px -224px; }
-  // .grcicon-vendor-color { background-position:-78px -224px; }
-  // .grcicon-process-color { background-position:-102px -224px; }
-  // .grcicon-product-color { background-position:-270px -104px; }
-  // .grcicon-project-color { background-position:-54px -224px; }
-  // .grcicon-system-color { background-position:-126px -224px; }
-  // .grcicon-contract-color { background-position:-126px -104px; }
-  // .grcicon-policy-color { background-position:-150px -104px; }
-  // .grcicon-regulation-color { background-position:-174px -104px; }
-  // .grcicon-standard-color { background-position:-198px -368px; }
-  // .grcicon-objective-color { background-position:-150px -56px; }
-  // .grcicon-risk-color { background-position:-198px -224px; }
-  // .grcicon-risk_assessment-color { background-position:-198px -224px; }
-  // .grcicon-risky_attribute-color { background-position:-222px -224px; }
-  // .grcicon-audit { background-position:-366px -320px; }
-  // .grcicon-audit-color { background-position:-366px -320px; }
-  // .grcicon-section-color { background-position:-198px -104px; }
-  // .grcicon-clause-color { background-position:-294px -104px; }
-  // .grcicon-event-color { background-position:-102px -176px; }
-  // .grcicon-program-color { background-position:-102px -104px; }
-  // .grcicon-objectperson-color { background-position:-6px -8px; }
-  // .grcicon-assessment-color { background-position:-150px -392px; }
-  // .grcicon-object-color { background-position:-6px -344px; }
-  // .grcicon-workflow-color { background-position:-6px -344px; }
-  // .grcicon-cycle_task_group_object_task-color,.grcicon-task-color { background-position:-294px -392px; }
-  // .grcicon-task_group-color { background-position:-318px -56px; }
-  // .grcicon-history-color { background-position: -318px -104px; }
-  // .grcicon-cycle-color { background-position: -342px -32px; }
-  // .grcicon-vendor-color { background-position: -30px -392px; }
-  // .grcicon-assessment-plan-color { background-position: -78px -368px; }
-  // .grcicon-access-list-color { background-position: -54px -344px; }
-  // .grcicon-issue-color { background-position: -342px -296px; }
-  // .grcicon-add-color { background-position:-222px -8px; }
-  // .grcicon-control_assessment-color { background-position: -126px -416px; }
-  // .grcicon-auto_control_assessment-color { background-position: -366px -392px; }
-  // .grcicon-access-group-color { background-position: -366px -80px; }
-  // .grcicon-threat_actor-color { background-position:-318px -368px; }
 }
+
 // Turn icons to white
  %white-icons {
   .grcicon-person-color:before { color: $white; }
@@ -622,53 +575,4 @@
   .#{$fa-css-prefix}-risk_assessment {
     &.color { color: $white; }
   }
-
-  // .grcicon-info { background-position:-198px -80px; }
-  // .grcicon-role-color { background-position:-102px -32px; }
-  // .grcicon-authorization-color { background-position:-102px -32px; }
-  // .grcicon-directive-color { background-position:-78px -200px; }
-  // .grcicon-control-color { background-position:-150px -248px }
-  // .grcicon-link { background-position:-30px -128px; }
-  // .grcicon-user { background-position:-6px -32px; }
-  // .grcicon-user-black { background-position:-6px -32px; }
-  // .grcicon-data_asset-color { background-position:-174px -248px; }
-  // .grcicon-facility-color { background-position:-222px -128px; }
-  // .grcicon-market-color { background-position:-246px -128px; }
-  // .grcicon-org_group-color { background-position:-78px -248px; }
-  // .grcicon-vendor-color { background-position:-78px -248px; }
-  // .grcicon-process-color { background-position:-102px -248px }
-  // .grcicon-product-color { background-position:-270px -128px; }
-  // .grcicon-project-color { background-position:-54px -248px; }
-  // .grcicon-system-color { background-position:-126px -248px; }
-  // .grcicon-contract-color { background-position:-126px -128px; }
-  // .grcicon-policy-color { background-position:-150px -128px; }
-  // .grcicon-regulation-color { background-position:-174px -128px; }
-  // .grcicon-standard-color { background-position:-222px -368px; }
-  // .grcicon-objective-color { background-position:-150px -80px; }
-  // .grcicon-risk-color { background-position:-198px -248px; }
-  // .grcicon-risk_assessment-color { background-position:-198px -248px; }
-  // .grcicon-risky_attribute-color { background-position:-222px -248px; }
-  // .grcicon-audit { background-position:-270px -32px; }
-  // .grcicon-audit-color { background-position:-270px -32px; }
-  // .grcicon-section-color { background-position:-198px -128px; }
-  // .grcicon-clause-color { background-position:-294px -80px; }
-  // .grcicon-event-color { background-position:-198px -56px; }
-  // .grcicon-program-color { background-position:-102px -128px; }
-  // .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
-  // .grcicon-assessment-color { background-position:-174px -392px; }
-  // .grcicon-object-color { background-position:-6px -368px; }
-  // .grcicon-workflow-color { background-position:-6px -368px; }
-  // .grcicon-cycle_task_group_object_task-color,.grcicon-task-color { background-position:-294px -344px; }
-  // .grcicon-task_group-color { background-position:-318px -32px; }
-  // .grcicon-history-color { background-position: -318px -128px; }
-  // .grcicon-cycle-color { background-position: -342px -56px; }
-  // .grcicon-vendor-color { background-position: -54px -392px; }
-  // .grcicon-assessment-plan-color { background-position: -102px -392px; }
-  // .grcicon-access-list-color { background-position: -78px -344px; }
-  // .grcicon-issue-color { background-position: -342px -344px; }
-  // .grcicon-add-color { background-position:-222px -32px; }
-  // .grcicon-control_assessment-color { background-position: -174px -416px; }
-  // .grcicon-auto_control_assessment-color { background-position: -342px -200px; }
-  // .grcicon-access-group-color { background-position: -366px -104px; }
-  // .grcicon-threat_actor-color { background-position:-270px -368px; }
  }
