@@ -737,15 +737,17 @@ select.multiple-selector {
   .ui-datepicker-next {
     top: 4px !important;
     .ui-icon {
-      @include background-size(392px 440px);
-      background-image: image-url("grcicons/icons.png");
-      background-position: -2000px -2000px;
-      background-repeat: no-repeat;
+      background: none;
       width: 20px;
-      height: 16px;
-      line-height: 16px;
+      height: 20px;
       vertical-align: top;
-      margin-top: -7px;
+      text-align: center;
+      display: inline-block;
+      font: normal normal normal 20px/1 FontAwesome; // shortening font declaration
+      text-rendering: auto; // optimizelegibility throws things off #1094
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-indent: 0;
     }
   }
   .ui-datepicker-prev-hover,
@@ -757,7 +759,9 @@ select.multiple-selector {
   .ui-datepicker-prev {
     left: 4px !important;
     .ui-icon-circle-triangle-w {
-      background-position:-294px -176px;
+      &:before {
+        content: $fa-var-caret-left;
+      }
       margin-left: -9px;
     }
     &.ui-datepicker-prev-hover {
@@ -769,7 +773,9 @@ select.multiple-selector {
   .ui-datepicker-next {
     right: 4px !important;
     .ui-icon-circle-triangle-e {
-      background-position:-198px -176px;
+      &:before {
+        content: $fa-var-caret-right;
+      }
       margin-left: -11px;
     }
     &.ui-datepicker-next-hover {
