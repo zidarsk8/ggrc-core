@@ -17,17 +17,43 @@ down_revision = '1bad7fe16295'
 
 from alembic import op
 import bleach
+import datetime
 from HTMLParser import HTMLParser
 import sqlalchemy.exc as sqlaexceptions
 import sqlalchemy.types as types
+from sqlalchemy.sql import column
+from sqlalchemy.sql import table
 
 
 from ggrc import db
-from ggrc.models import Comment
 from ggrc.models import DocumentationResponse
 from ggrc.models import InterviewResponse
-from ggrc.models import Relationship
 from ggrc.models import Request
+
+
+relationships_table = table(
+    'relationships',
+    column('id'),
+    column('source_id'),
+    column('source_type'),
+    column('destination_id'),
+    column('destination_type'),
+    column('context_id'),
+    column('modified_by_id'),
+    column('updated_at'),
+    column('created_at'),
+)
+
+
+comments_table = table(
+    'comments',
+    column('id'),
+    column('description'),
+    column('created_at'),
+    column('modified_by_id'),
+    column('updated_at'),
+    column('context_id')
+)
 
 
 def cleaner(value, bleach_tags=[], bleach_attrs={}):
@@ -47,7 +73,172 @@ def cleaner(value, bleach_tags=[], bleach_attrs={}):
   return ret
 
 
+def _build_comment(iid,
+                   description,
+                   created_at,
+                   modified_by,
+                   updated_at,
+                   context,
+                   request_id):
+  context_id = context.id if context else None
+  return {
+      "id": iid,
+      "description": description,
+      "created_at": created_at,
+      "modified_by_id": modified_by.id,
+      "updated_at": updated_at,
+      "context_id": context_id,
+      "request_id": request_id,
+  }
+
+
+def _build_request_comment_relationship(req_id,
+                                        comm_id,
+                                        context_id,
+                                        modified_by_id):
+  return {
+      "source_type": "Request",
+      "source_id": req_id,
+      "destination_type": "Comment",
+      "destination_id": comm_id,
+      "context_id": context_id,
+      "modified_by_id": modified_by_id,
+      "updated_at": datetime.datetime.now(),
+      "created_at": datetime.datetime.now()
+  }
+
+
+def _build_request_object_relationship(req, dest):
+  return {
+      "source_type": "Request",
+      "source_id": req.id,
+      "destination_type": dest.type,
+      "destination_id": dest.id,
+      "context_id": req.context.id if req.context else None,
+      "updated_at": datetime.datetime.now(),
+      "created_at": datetime.datetime.now()
+  }
+
+
+def migrate_documentation_responses(conn):
+  documentation_responses = db.session.query(DocumentationResponse)
+  comments = []
+  comm_relationships = []
+  request_object_relationships = []
+
+  _max_comment_id = conn.execute("SELECT max(id) FROM comments").fetchone()\
+      .values()[0]
+  if not _max_comment_id:
+    _max_comment_id = 0
+
+  comment_id = _max_comment_id + 1
+  for i, dr in enumerate(documentation_responses):
+    related = dr.related_sources + dr.related_destinations
+    comments += [_build_comment(
+        comment_id + i,
+        dr.description,
+        dr.created_at,
+        dr.modified_by,
+        dr.updated_at,
+        dr.context,
+        dr.request.id)]
+
+    for rel in related:
+      if not rel.source or not rel.destination:
+        continue
+      if rel.source.type == "DocumentationResponse":
+        destination = rel.destination
+      elif rel.destination.type == "DocumentationResponse":
+        destination = rel.source
+      else:
+        continue
+
+      request_object_relationships += [
+          _build_request_object_relationship(
+              dr.request,
+              destination
+          )]
+
+  for comm in comments:
+    comm_relationships += [
+        _build_request_comment_relationship(comm["request_id"],
+                                            comm["id"],
+                                            comm["context_id"],
+                                            comm["modified_by_id"])]
+
+  op.bulk_insert(comments_table, comments)
+  op.bulk_insert(relationships_table, comm_relationships)
+  op.bulk_insert(relationships_table, request_object_relationships)
+
+
+def migrate_interview_responses(conn):
+  interview_responses = db.session.query(InterviewResponse)
+  comments = []
+  comm_relationships = []
+  request_object_relationships = []
+
+  _max_comment_id = conn.execute("SELECT max(id) FROM comments").fetchone()\
+      .values()[0]
+  if not _max_comment_id:
+    _max_comment_id = 0
+
+  comment_id = _max_comment_id + 1
+  for i, ir in enumerate(interview_responses):
+    related = ir.related_sources + ir.related_destinations
+    desc = ir.description
+    if ir.meetings:
+      desc += "<br /><br /><b>Meetings</b><hr />"
+
+      for m in ir.meetings:
+        desc += "<a href=\"{url}\">Meeting</a> requested on {date}<br />". \
+            format(url=m.title,
+                   date=m.created_at.strftime("%m/%d/%Y at %H:%M"))
+
+    if ir.people:
+      desc += "<br /><br /><b>Attendees</b><hr />"
+      for p in ir.people:
+        desc += "- {} ({})<br />".format(p.name, p.email)
+
+    comments += [_build_comment(
+        comment_id + i,
+        desc,
+        ir.created_at,
+        ir.modified_by,
+        ir.updated_at,
+        ir.context,
+        ir.request.id)]
+
+    for rel in related:
+      if not rel.source or not rel.destination:
+        continue
+      if rel.source.type == "InterviewResponse":
+        destination = rel.destination
+      elif rel.destination.type == "InterviewResponse":
+        destination = rel.source
+      else:
+        continue
+
+      request_object_relationships += [
+          _build_request_object_relationship(
+              ir.request,
+              destination
+          )]
+
+  for comm in comments:
+    comm_relationships += [
+        _build_request_comment_relationship(comm["request_id"],
+                                            comm["id"],
+                                            comm["context_id"],
+                                            comm["modified_by_id"])]
+
+  op.bulk_insert(comments_table, comments)
+  op.bulk_insert(relationships_table, comm_relationships)
+  op.bulk_insert(relationships_table, request_object_relationships)
+
+
 def upgrade():
+  connection = op.get_bind()
+
   # 1. Move Audit Objects to Relationship table
   #   source_type = audit_objects.auditable_type
   #   source_id = audit_objects.auditable_id
@@ -137,84 +328,11 @@ def upgrade():
 
   # TODO: Drop relationship audit_objects from Audits????
 
-  # 5. Migrate responses to comments
-  documentation_responses = db.session.query(DocumentationResponse)
-  for dr in documentation_responses:
-    related = dr.related_sources + dr.related_destinations
-    comment = Comment(
-        description=dr.description,
-        created_at=dr.created_at,
-        modified_by=dr.modified_by,
-        updated_at=dr.updated_at,
-        context=dr.context)
+  # 5. Migrate documentation responses to comments
+  migrate_documentation_responses(connection)
 
-    request_comment_rel = Relationship(
-        source=dr.request,
-        destination=comment)
-
-    for rel in related:
-      if not rel.source or not rel.destination:
-        continue
-      if rel.source.type == "DocumentationResponse":
-        destination = rel.destination
-      elif rel.destination.type == "DocumentationResponse":
-        destination = rel.source
-      else:
-        continue
-      related_objects_to_request = Relationship(
-          source=dr.request,
-          destination=destination
-      )
-      db.session.add(related_objects_to_request)
-    db.session.add(comment)
-    db.session.add(request_comment_rel)
-  db.session.commit()
-
-  interview_responses = db.session.query(InterviewResponse)
-  for ir in interview_responses:
-    related = ir.related_sources + ir.related_destinations
-
-    desc = ir.description
-    if ir.meetings:
-      desc += "<br /><br /><b>Meetings</b><hr />"
-
-      for m in ir.meetings:
-        desc += "<a href=\"{url}\">Meeting</a> requested on {date}<br />". \
-            format(url=m.title,
-                   date=m.created_at.strftime("%m/%d/%Y at %H:%M"))
-
-    if ir.people:
-      desc += "<br /><br /><b>Attendees</b><hr />"
-      for p in ir.people:
-        desc += "- {} ({})<br />".format(p.name, p.email)
-
-    comment = Comment(
-        description=desc,
-        created_at=ir.created_at,
-        modified_by=ir.modified_by,
-        updated_at=ir.updated_at,
-        context=ir.context)
-
-    request_comment_rel = Relationship(
-        source=ir.request,
-        destination=comment)
-
-    for rel in related:
-      if not rel.source or not rel.destination:
-        continue
-      if rel.source.type == "InterviewResponse":
-        destination = rel.destination
-      elif rel.destination.type == "InterviewResponse":
-        destination = rel.source
-      else:
-        continue
-      related_objects_to_request = Relationship(
-          source=ir.request,
-          destination=destination)
-      db.session.add(related_objects_to_request)
-    db.session.add(comment)
-    db.session.add(request_comment_rel)
-  db.session.commit()
+  # 6. Migrate interview responses to comments
+  migrate_interview_responses(connection)
 
 
 def downgrade():
