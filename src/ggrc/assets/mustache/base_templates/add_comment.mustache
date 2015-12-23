@@ -9,7 +9,7 @@
     <div class="span8">
       <div class="controls top">
         {{#is_allowed 'update' parent_instance context='for'}}
-        <ggrc-gdrive-picker-launcher icon="attach" instance="instance" link_text="Attach evidence" deferred="true" click_event="trigger_upload">
+        <ggrc-gdrive-picker-launcher icon="paperclip" instance="instance" link_text="Attach evidence" deferred="true" click_event="trigger_upload">
         </ggrc-gdrive-picker-launcher>
           {{#toggle show_new_object_form}}
             <ggrc-quick-add parent_instance="instance" join_model="Relationship" deferred="true" quick_create="create_url">

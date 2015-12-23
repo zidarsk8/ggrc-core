@@ -26,7 +26,7 @@
           {{#is_allowed 'update' instance context='for'}}
             {{#if_in instance.status "In Progress"}}
               <span class="file-controls">
-                <a href="javascript://" {{toggle_button}}><i class="grcicon-edit"></i></a>
+                <a href="javascript://" {{toggle_button}}><i class="fa fa-pencil-square-o"></i></a>
               </span>
             {{/if_in}}
           {{/is_allowed}}

@@ -193,6 +193,10 @@
       font-size: 10px;
     }
   }
+  .input-group {
+    float: left;
+    width: 68%;
+  }
   .disabled {
     cursor: default;
     @include opacity(.3);
