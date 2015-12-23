@@ -41,26 +41,45 @@
       get_mapped: function () {
         return this.attr("instance").get_mapping(this.attr("mapping"));
       },
+      remove_pending: function (person) {
+        function findInList(item) {
+          return item.what.type === "Person" &&
+                   item.how === "add" &&
+                   item.what.id === person.id;
+        }
+
+        var results = this.attr("results"),
+            list = this.attr("list_pending"),
+            listPerson = _.find(list, findInList),
+            personRoles = can.getObject("extra.attrs.AssigneeType", listPerson).split(","),
+            type = this.type,
+            index;
+
+        if (personRoles.length > 1) {
+          listPerson.extra.attrs.AssigneeType = _.without(personRoles, can.capitalize(type)).join(",");
+          index = _.findIndex(results, function (result) {
+            return result.id === person.id;
+          });
+          results.splice(index, 1);
+          return list;
+        }
+        index = _.findIndex(list, findInList);
+        return list.splice(index, 1);
+      },
       remove_role: function (parent_scope, el, ev) {
         var person = CMS.Models.Person.findInCacheById(el.data("person")),
             rel = function (obj) {
-              return _.map(_.union(obj.related_sources, obj.related_destinations), function (r) {
-                return r.id;
+              return _.map(_.union(obj.related_sources, obj.related_destinations), function (relationship) {
+                return relationship.id;
               });
             },
             instance = this.instance,
             ids = _.intersection(rel(person), rel(this.instance)),
             type = this.attr("type"),
-            list, index;
+            list, index, listPerson, personRoles;
 
         if (!ids.length && this.attr("deferred")) {
-          list = this.attr("list_pending");
-          index = _.findIndex(list, function (item) {
-            return item.what.type === "Person" &&
-                   item.how === "add" &&
-                   item.what.id === person.id;
-          });
-          return list.splice(index, 1);
+          return this.remove_pending(person);
         }
         _.each(ids, function (id) {
           var rel = CMS.Models.Relationship.findInCacheById(id);
