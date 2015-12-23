@@ -97,6 +97,12 @@
         top: 0px;
       }
       .tree-action-list {
+        .open {
+          .fa-share-alt {
+            @include opacity(1);
+            color: #2196f3;
+          }
+        }
         .fa {
           color: $black;
           margin-top: 1px;
