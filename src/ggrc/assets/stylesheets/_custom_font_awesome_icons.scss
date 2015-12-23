@@ -259,6 +259,12 @@
   &.color { color: $purple; }
 }
 
+.grcicon-assessment-plan:before { content: $fa-var-wrench; }
+.#{$fa-css-prefix}-assessment-plan {
+  &:before { content: $fa-var-wrench; }
+  &.color { color: $purple; }
+}
+
 // Turn icons to black
 %black-icons {
 	.#{$fa-css-prefix}-person-color:before { color: $black; }
@@ -388,6 +394,10 @@
   }
   .grcicon-control_assessment-color:before { color: $black; }
   .#{$fa-css-prefix}-control_assessment {
+    &.color { color: $black; }
+  }
+  .grcicon-assessment-plan:before { color: $black; }
+  .#{$fa-css-prefix}-assessment-plan {
     &.color { color: $black; }
   }
 
@@ -569,6 +579,10 @@
   }
   .grcicon-control_assessment-color:before { color: $white; }
   .#{$fa-css-prefix}-control_assessment {
+    &.color { color: $white; }
+  }
+  .grcicon-assessment-plan:before { color: $white; }
+  .#{$fa-css-prefix}-assessment-plan {
     &.color { color: $white; }
   }
 
