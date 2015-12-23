@@ -39,9 +39,11 @@
         </div>
         <div class="span6">
           <div class="confirm-buttons">
-            <a class="btn btn-small btn-success preventdoubleclick" xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
-              Save
-            </a>
+            {{#options.0}}
+              <a class="btn btn-small btn-success preventdoubleclick" xdata-toggle="modal-submit" data-dismiss="modal" href="javascript://">
+                Save
+              </a>
+            {{/options}}
           </div>
         </div>
       </div>

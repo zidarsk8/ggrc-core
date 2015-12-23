@@ -6,13 +6,15 @@
 }}
 
 <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-  {{#is_allowed 'update' instace}}
-  <span class="file-controls">
-    <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-      <span class="result" {{data 'result'}}></span>
-      <i class="fa fa-trash"></i>
-    </a>
-  </span>
+  {{#is_allowed 'update' parentInstance context='for'}}
+  {{#instance}}
+    <span class="file-controls">
+      <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+        <span class="result" {{data 'result'}}></span>
+        <i class="fa fa-trash"></i>
+      </a>
+    </span>
+  {{/instance}}
   {{/is_allowed}}
   <a href="{{schemed_url instance.link}}" target="_blank">
     <span>{{firstnonempty instance.title instance.link}}</span>

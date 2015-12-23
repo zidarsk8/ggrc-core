@@ -231,6 +231,12 @@ class TaskTypeColumnHandler(handlers.ColumnHandler):
       "checkbox": "checkbox",
   }
 
+  reverse_map = {
+      "text": "rich text",
+      "menu": "dropdown",
+      "checkbox": "checkbox"
+  }
+
   def parse_item(self):
     """ parse task type column value """
     if self.raw_value == "":
@@ -247,6 +253,10 @@ class TaskTypeColumnHandler(handlers.ColumnHandler):
                        column_name=self.display_name)
       value = self.row_converter.obj.default_task_type()
     return value
+
+  def get_value(self):
+    return self.reverse_map.get(self.row_converter.obj.task_type,
+                                "rich text").title()
 
 
 class WorkflowPersonColumnHandler(handlers.UserColumnHandler):

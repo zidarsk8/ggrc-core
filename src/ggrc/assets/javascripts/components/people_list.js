@@ -53,6 +53,11 @@
           }
         }, this);
       },
+      autocomplete_select: function (el, ev, ui) {
+        if (ui && ui.item) {
+          el.trigger("autocomplete:select", [ui]);
+        }
+      },
     },
     events: {
       "init": function () {
@@ -136,6 +141,10 @@
             model.save();
           }.bind(this));
         }
+      },
+      "modal:success": function () {
+        // prevent navigating to a new object page when a new user is created
+        return false;
       },
     },
     helpers: {
