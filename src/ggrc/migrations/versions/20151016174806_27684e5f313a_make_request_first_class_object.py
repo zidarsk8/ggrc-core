@@ -245,7 +245,7 @@ def upgrade():
   #   destination_type = "Request"
   #   destination_id = request.id
   op.execute("""
-    INSERT INTO relationships (
+    INSERT IGNORE INTO relationships (
       modified_by_id,
       created_at,
       updated_at,
