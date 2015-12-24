@@ -305,7 +305,7 @@ CMS.Models.GDriveFile("CMS.Models.GDriveFolder", {
           picker.setVisible(true);
           dialog = GGRC.Utils.getPickerElement(picker);
           if (dialog) {
-            dialog.style.zIndex = 2001; // our modals start with 1050
+            dialog.style.zIndex = 4001; // our modals start with 2050
           }
         });
       }
