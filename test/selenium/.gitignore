@@ -1,0 +1,11 @@
+*.pyc
+*.iml
+*.log
+*.pyo
+*.swp
+.idea
+*.yaml
+*.cfg
+logs
+virtual_env
+chromedriver
