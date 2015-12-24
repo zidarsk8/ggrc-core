@@ -48,7 +48,7 @@ class TestAutomappings(integration.ggrc.TestCase):
     integration.ggrc.TestCase.tearDown(self)
 
   def create_object(self, cls, data):
-    name = cls.__name__.lower()
+    name = cls._inflector.table_singular
     data['context'] = None
     res, obj = self.gen.generate(cls, name, {name: data})
     self.assertIsNotNone(obj, '%s, %s: %s' % (name, str(data), str(res)))
@@ -316,3 +316,26 @@ class TestAutomappings(integration.ggrc.TestCase):
     self.assert_mapping(request, program)
     self.assert_mapping(request, audit, missing=True)
     self.assert_mapping(request, control, missing=True)
+
+  def test_automapping_control_assesment(self):
+    program = self.create_object(models.Program, {'title': next('Program')})
+    regulation = self.create_object(models.Regulation, {
+        'title': next('Test Regulation')
+    })
+    audit = self.create_object(models.Audit, {
+        'title': next('Audit'),
+        'program': {'id': program.id},
+        'status': 'Planned',
+    })
+    control = self.create_object(models.Control, {
+        'title': next('Test control')
+    })
+    control_assessment = self.create_object(models.ControlAssessment, {
+        'title': next('Test CA'),
+        'audit': {'id': audit.id},
+        'control': {'id': control.id},
+    })
+    self.assert_mapping_implication(
+        to_create=[(program, regulation), (regulation, control_assessment)],
+        implied=[(program, control_assessment)]
+    )
