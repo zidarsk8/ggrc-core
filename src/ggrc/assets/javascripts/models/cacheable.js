@@ -380,7 +380,7 @@ can.Model("can.Model.Cacheable", {
   }
   , resolve_deferred_bindings : function(obj) {
     var _pjs, refresh_dfds = [], dfds = [];
-    if(obj._pending_joins) {
+    if (obj._pending_joins && obj._pending_joins.length) {
       _pjs = obj._pending_joins.slice(0); //refresh of bindings later will muck up the pending joins on the object
       can.each(can.unique(can.map(_pjs, function(pj) { return pj.through; })), function(binding) {
         refresh_dfds.push(obj.get_binding(binding).refresh_stubs());
