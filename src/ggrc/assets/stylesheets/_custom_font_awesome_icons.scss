@@ -258,8 +258,10 @@
   &.color { color: $purple; }
 }
 
-.grcicon-cycle_task_group_object_task-color:before { content: $fa-var-calendar-check-o; }
-.#{$fa-css-prefix}-cycle_task_group_object_task {
+.grcicon-cycle_task_group_object_task-color:before,
+.grcicon-task_group_task-color:before { content: $fa-var-calendar-check-o; }
+.#{$fa-css-prefix}-cycle_task_group_object_task,
+.#{$fa-css-prefix}-task_group_task {
   &:before { content: $fa-var-calendar-check-o; }
   &.color { color: $purple; }
 }
@@ -411,8 +413,10 @@
   .#{$fa-css-prefix}-issue {
     &.color { color: $black; }
   }
-  .grcicon-cycle_task_group_object_task-color:before { color: $black; }
-  .#{$fa-css-prefix}-cycle_task_group_object_task {
+  .grcicon-cycle_task_group_object_task-color:before,
+  .grcicon-task_group_task-color:before { color: $black; }
+  .#{$fa-css-prefix}-cycle_task_group_object_task,
+  .#{$fa-css-prefix}-task_group_task {
     &.color { color: $black; }
   }
   .grcicon-standard-color:before { color: $black; }
@@ -552,8 +556,10 @@
   .#{$fa-css-prefix}-issue {
     &.color { color: $white; }
   }
-  .grcicon-cycle_task_group_object_task-color:before { color: $white; }
-  .#{$fa-css-prefix}-cycle_task_group_object_task {
+  .grcicon-cycle_task_group_object_task-color:before,
+  .grcicon-task_group_task-color:before { color: $white; }
+  .#{$fa-css-prefix}-cycle_task_group_object_task,
+  .#{$fa-css-prefix}-task_group_task {
     &.color { color: $white; }
   }
   .grcicon-standard-color:before { color: $white; }

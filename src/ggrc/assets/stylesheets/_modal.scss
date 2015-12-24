@@ -1198,6 +1198,14 @@ p.modal-value {
       &:nth-child(even) {
         background: #fafafa;
       }
+      .openclose {
+        .status-label {
+          margin-top: 8px;
+        }
+        i {
+          margin-top: 4px !important;
+        }
+      }
     }
     &.tree-open {
       li.tree-item {
