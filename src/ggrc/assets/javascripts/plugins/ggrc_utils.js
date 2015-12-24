@@ -82,7 +82,8 @@
           source_context,
           create_contexts,
           canonical,
-          has_widget;
+          has_widget,
+          canonical_mapping;
 
       target_type = target instanceof can.Model ? target.constructor.shortName
                                                 : (target.type || target);
@@ -97,6 +98,7 @@
 
       canonical = GGRC.Mappings.get_canonical_mapping_name(
         source_type, target_type);
+      canonical_mapping = GGRC.Mappings.get_canonical_mapping(source_type, target_type);
       if (canonical && canonical.startsWith("_")) {
         canonical = null;
       }
@@ -105,7 +107,8 @@
         GGRC.tree_view.base_widgets_by_type[source_type] || [],
         target_type);
 
-      if (_.exists(options, "hash.join") && (!canonical || !has_widget)) {
+      if (_.exists(options, "hash.join") && (!canonical || !has_widget) ||
+          (canonical && !canonical_mapping.model_name)) {
         return false;
       }
       target_context = _.exists(target, "context.id");
