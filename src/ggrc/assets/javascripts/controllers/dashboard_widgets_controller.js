@@ -36,7 +36,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
       this.options.widget_icon = this.options.model.table_singular;
     }
     if(this.options.widget_icon && !/^fa/.test(this.options.widget_icon)) {
-      this.options.widget_icon = "fa-" + this.options.widget_icon + " color";
+      this.options.widget_icon = this.options.widget_icon;
     }
 
     if(!this.options.object_category && this.options.model) {

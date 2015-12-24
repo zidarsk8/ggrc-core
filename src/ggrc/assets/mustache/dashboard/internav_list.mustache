@@ -16,7 +16,7 @@
 
     <a href="{{ selector }}" rel="tooltip" data-placement="bottom" title="{{ internav_display }}">
       <div class="oneline">
-        <i class="fa {{ internav_icon }}"></i>
+        <i class="fa fa-{{ internav_icon }} color"></i>
         {{#if show_title}}
           {{internav_display}}
           {{#has_count}}({{count}}{{#spinner}}...{{/spinner}}){{/has_count}}
@@ -48,7 +48,7 @@
           or #if' instance.constructor.obj_nav_options.show_all_tabs}}
         <a href="{{ selector }}">
           <div class="oneline">
-            <i class="fa {{ internav_icon }}"></i>
+            <i class="fa fa-{{ internav_icon }} color"></i>
             {{internav_display}}
           </div>
         </a>
