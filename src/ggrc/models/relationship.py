@@ -25,7 +25,6 @@ class Relationship(Mapping, db.Model):
   source_type = db.Column(db.String, nullable=False)
   destination_id = db.Column(db.Integer, nullable=False)
   destination_type = db.Column(db.String, nullable=False)
-  relationship_type_id = db.Column(db.String)
   automapping_id = db.Column(
       db.Integer,
       db.ForeignKey('relationships.id', ondelete='SET NULL'),
@@ -128,7 +127,6 @@ class Relationship(Mapping, db.Model):
   _publish_attrs = [
       'source',
       'destination',
-      'relationship_type_id',
       'attrs',
   ]
   attrs.publish_raw = True
