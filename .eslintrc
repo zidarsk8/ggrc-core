@@ -1,0 +1,11 @@
+{
+  'extends': 'eslint-config-google',
+
+  'rules': {
+    'require-jsdoc': false,
+    'space-before-function-paren': {
+      'anonymous': 'always',
+      'named': 'never'
+    }
+  }
+}
