@@ -8,7 +8,7 @@
 
 <label>
   <span class="person-label {{type}}"></span>
-  {{#is_allowed 'update' instance context='for'}}
+  {{#has_permissions}}
     {{^toggle toggle_add}}
       <span class="file-controls">
         <a href="javascript://" {{toggle_button}}>
@@ -16,7 +16,7 @@
         </a>
       </span>
     {{/toggle}}
-  {{/is_allowed}}
+  {{/has_permissions}}
   {{type}}(s)
   {{#if editable}}
     {{#if required}}
@@ -24,40 +24,38 @@
     {{/if}}
   {{/if}}
 </label>
-{{#using parentInstance=instance}}
 <ul class="inner-count-list">
   {{^if results.length}}
     <li><i> No {{type}}s</i></li>
   {{/if}}
   {{#results}}
     <li>
-      {{#is_allowed 'update' parentInstance context='for'}}
-      {{#can_unmap}}
-      <span class="file-controls">
-        <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{id}}>
-          <span class="result" {{data 'result'}}></span>
-          <i class="grcicon-deleted"></i>
-        </a>
-      </span>
-      {{/can_unmap}}
-      {{/is_allowed}}
+      {{#has_permissions}}
+        {{#can_unmap}}
+        <span class="file-controls">
+          <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{id}}>
+            <span class="result" {{data 'result'}}></span>
+            <i class="grcicon-deleted"></i>
+          </a>
+        </span>
+        {{/can_unmap}}
+      {{/has_permissions}}
       {{{render '/static/mustache/people/popover.mustache' person=.}}}
     </li>
   {{/results}}
   <li class="person-add">
     {{#show_add}}
-      {{#is_allowed 'update' instance context='for'}}
-      {{#toggle toggle_add}}
-        <i class="grcicon-person-green pull-left icon-field"></i>
-        <div class="person-selector">
-          <input tabindex="7" type="text" name="" class="search-icon" data-lookup="Person" placeholder="Search for {{type}}" null-if-empty="false" value="" {{autocomplete_select}} />
-          <a href="javascript://" {{toggle_button}}>
-            <i class="grcicon-x-grey"></i>
-          </a>
-        </div>
-      {{/toggle}}
-      {{/is_allowed}}
+      {{#has_permissions}}
+        {{#toggle toggle_add}}
+          <i class="grcicon-person-green pull-left icon-field"></i>
+          <div class="person-selector">
+            <input tabindex="7" type="text" name="" class="search-icon" data-lookup="Person" placeholder="Search for {{type}}" null-if-empty="false" value="" {{autocomplete_select}} />
+            <a href="javascript://" {{toggle_button}}>
+              <i class="grcicon-x-grey"></i>
+            </a>
+          </div>
+        {{/toggle}}
+      {{/has_permissions}}
     {{/show_add}}
   </li>
 </ul>
-{{/using}}

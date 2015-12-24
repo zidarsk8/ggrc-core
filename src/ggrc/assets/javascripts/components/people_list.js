@@ -239,6 +239,14 @@
       },
     },
     helpers: {
+      has_permissions: function (options) {
+        var isAllowed;
+        if (this.attr("deferred")) {
+          return options.fn(options.context);
+        }
+        isAllowed = Permission.is_allowed_for("update",  this.attr("instance"));
+        return options[isAllowed ? "fn" : "inverse"](options.context);
+      },
       can_unmap: function (options) {
         var results = this.attr("results"),
             required = this.attr("required");
