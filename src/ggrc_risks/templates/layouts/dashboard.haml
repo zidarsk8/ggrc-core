@@ -45,7 +45,7 @@
                       %span.task-count
                 %li.user.dropdown.dropdown-black.black-link
                   %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
-                    %i.grcicon-user
+                    %i.fa.fa-person
                     %span
                       %strong
                         =current_user.email
@@ -53,12 +53,12 @@
                   %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
                     %li
                       %a{'href': "/dashboard"}
-                        %i.fa.fa-tachometer
+                        %i.fa.fa-home.orange
                         My Work ({{current_user.system_wide_role}})
                     -if permissions.is_allowed_read('/admin', 1)
                       %li
                         %a{'href': "/admin#people_list_widget"}
-                          %i.grcicon-admin
+                          %i.fa.fa-tachometer
                           Admin Dashboard
                     %li.notify-wrap
                       %span

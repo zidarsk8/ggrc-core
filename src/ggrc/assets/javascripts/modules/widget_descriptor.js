@@ -32,7 +32,7 @@
             else
               return instance.constructor.title_singular + " Info";
           },
-          widget_icon: "grcicon-info",
+          widget_icon: "info-circle",
           content_controller: GGRC.Controllers.InfoWidget,
           content_controller_options: {
             instance: instance,

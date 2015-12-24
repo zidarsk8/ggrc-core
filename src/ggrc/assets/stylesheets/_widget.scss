@@ -1265,7 +1265,7 @@
     @include clearfix();
     a {
       float: right;
-      margin-top: 2px !important;
+      margin-top: 1px;
       margin-left: 10px;
     }
     input[type="submit"] {
@@ -1863,10 +1863,18 @@ ul.attr-list, ul.model-list {
     }
   }
   &.asc {
-    i { background-position: -198px -416px; }
+    i {
+      &:before {
+        content: $fa-var-caret-up;
+      }
+    }
   }
   &.desc {
-    i { background-position: -78px -56px; }
+    i {
+      &:before {
+        content: $fa-var-caret-down;
+      }
+    }
   }
 }
 .workflow-wrap-main {

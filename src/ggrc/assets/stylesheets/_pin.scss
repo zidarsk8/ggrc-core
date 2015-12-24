@@ -98,11 +98,7 @@
   i {
     @include opacity(.25);
   }
-  .grcicon-done { background-position: -78px -416px; }
-  .grcicon-not-done { background-position: -102px -416px; }
   .active {
-    .grcicon-done { background-position: -30px -416px; }
-    .grcicon-not-done { background-position: -54px -416px; }
     i {
       @include opacity(1);
     }
@@ -319,9 +315,6 @@
             text-decoration: underline;
           }
         }
-      }
-      [class^="grcicon-"] {
-        margin-top: 1px;
       }
     }
   }

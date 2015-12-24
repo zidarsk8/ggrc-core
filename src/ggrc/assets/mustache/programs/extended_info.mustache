@@ -32,21 +32,21 @@
     <div class="span5">
       {{#visibility_delay 500}}
       <div class="info">
-        <i class="grcicon-control-color"></i>
+        <i class="fa fa-control color"></i>
         {{#with_mapping_count instance 'controls'}}
           {{count}}
         {{else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
         {{/with_mapping_count}}
         &nbsp;&nbsp;
-        <i class="grcicon-process-color"></i>
+        <i class="fa fa-process color"></i>
         {{#with_mapping_count instance 'related_processes'}}
           {{count}}
         {{else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
         {{/with_mapping_count}}
         &nbsp;&nbsp;
-        <i class="grcicon-system-color"></i>
+        <i class="fa fa-system color"></i>
         {{#with_mapping_count instance 'related_systems'}}
           {{count}}
         {{else}}

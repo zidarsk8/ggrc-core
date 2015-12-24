@@ -13,15 +13,15 @@
     {{#each_with_extras_as "binding" result.bindings_compute}}
     <li>
       {{#if_instance_of binding.instance "Section"}}
-      <i class="grcicon-{{binding.instance.class.table_singular}}-color"></i><b href="{{link_to_tree binding.instance.directive binding.instance}}">{{binding.instance.title}}</b>
+      <i class="fa fa-{{binding.instance.class.table_singular}} color"></i><b href="{{link_to_tree binding.instance.directive binding.instance}}">{{binding.instance.title}}</b>
       {{#if binding.instance.directive}}
         of
         {{#using directive=binding.instance.directive}}
-          <i class="grcicon-{{directive.class.table_singular}}-color"></i><b href="{{link_to_tree directive}}">{{directive.title}}</b>
+          <i class="fa fa-{{directive.class.table_singular}} color"></i><b href="{{link_to_tree directive}}">{{directive.title}}</b>
         {{/using}}
       {{/if}}
       {{else}}
-      <i class="grcicon-{{binding.instance.class.table_singular}}-color"></i><b href="{{link_to_tree binding.instance}}">{{binding.instance.title}}</b>
+      <i class="fa fa-{{binding.instance.class.table_singular}} color"></i><b href="{{link_to_tree binding.instance}}">{{binding.instance.title}}</b>
       {{/if_equals}}
       {{#unless isLast}},{{/unless}}
       {{#if isSecondToLast}} and{{/if}}

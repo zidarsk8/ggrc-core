@@ -119,7 +119,7 @@ can.Component.extend({
       var $i = this.element.find("a > i"),
           icon = $i.attr("class");
 
-      $i.attr("class", "grcicon-loading");
+      $i.attr("class", "fa fa-spinner fa-pulse");
       $(document.body).trigger("ajax:flash",
                                {warning: "Generating Control Assessments"});
 

@@ -134,7 +134,7 @@
                 {{#if object.viewLink}}
                 <h6>Task to be performed on object</h6>
                 <p>
-                  <i class="grcicon-{{instance.object.reify.class.table_singular}}-color smallmargin"></i>
+                  <i class="fa fa-{{instance.object.reify.class.table_singular}} color smallmargin"></i>
                   <span class="cap">{{instance.object.reify.class.table_singular}}:</span>
                   {{#is_allowed "view_object_page" object}}
                     <a href="{{object.viewLink}}" rel="tooltip" data-original-title="View {{instance.object.reify.class.table_singular}}">

@@ -282,14 +282,6 @@
                   background-image: none !important;
                   background-color: #ffffb3 !important;
                 }
-                .grcicon-carot {
-                  background-position:-78px -56px;
-                  margin-left: -6px;
-                }
-              }
-              .grcicon-carot {
-                background-position: -222px -56px;
-                margin-left: -6px;
               }
             }
             .owner,
@@ -325,12 +317,6 @@
         }
         .tree-title-data {
           @extend %oneline;
-          .grcicon-left {
-            margin-left: -2px;
-          }
-          .grcicon-left-fill {
-            margin-left: -2px;
-          }
         }
         .spinner {
           top: 13px !important;
@@ -663,13 +649,21 @@
       &:hover {
         .ui-resizable-handle {
           @include opacity(0.8);
-          @include background-size(392px 440px);
           background-color: lighten($lightGray,5%);
-          background-repeat:no-repeat;
-          background-image: image-url("grcicons/icons.png");
-          background-position:50% -157px;
           height:12px;
           border-top:1px solid darken($lightGray,5%);
+          display: inline-block;
+          font: normal normal normal 14px/1 FontAwesome; // shortening font declaration
+          font-size: inherit; // can't have font-size inherit on line above, so need to override
+          text-rendering: auto; // optimizelegibility throws things off #1094
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          text-align: center;
+          &:before {
+            content: $fa-var-caret-down;
+            line-height: 7px;
+            vertical-align: top;
+          }
         }
       }
       // smaller buttons in wysiwyg editor
@@ -1179,7 +1173,7 @@ p.modal-value {
       line-height: 24px;
       margin: 0 10px;
 
-      [class^="grcicon-"] {
+      [class*="fa-"] {
         margin-top: 4px;
       }
       .show-details i {

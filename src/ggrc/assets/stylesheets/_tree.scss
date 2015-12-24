@@ -17,20 +17,6 @@ ul.new-tree {
       float: none;
       clear: both;
     }
-    &.active {
-      .tier-trigger {
-        @include background-size(17px 12px);
-        background: image-url('grcicons/open.png') no-repeat 20px center;
-      }
-    }
-    .tier-trigger {
-      float: left;
-      @include background-size(17px 12px);
-      background: image-url('grcicons/not-open.png') no-repeat 20px center;
-      width: 17px;
-      height: 30px;
-      padding-left: 20px;
-    }
   }
   .select {
     overflow: hidden;

@@ -6,13 +6,6 @@
  */
 
 .mockup-tree {
-  .tree-item {
-    .tree-title-area {
-      [class^="grcicon-"] {
-        display: inline-block;
-      }
-    }
-  }
   .tree-item-add {
     .add-single-object {
       padding-top: 4px;
@@ -200,14 +193,14 @@ ul.new-tree {
       .entry-attachment {
         display: inline-block;
         margin-bottom: 10px;
-        [class^="grcicon-"] {
+        [class*="fa-"] {
           margin-top: 1px;
         }
       }
     }
     .entry-actions {
       position: relative;
-      [class^="grcicon-"] {
+      [class*="fa-"] {
         margin-top: 0px;
       }
       .dropdown-menu {

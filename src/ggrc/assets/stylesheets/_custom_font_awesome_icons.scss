@@ -74,7 +74,6 @@
 .#{$fa-css-prefix}-file-gz-o:before,
 .#{$fa-css-prefix}-file-tar-o:before { content: $fa-var-file-archive-o; }
 
-.grcicon-role-color:before { content: $fa-var-key; }
 .#{$fa-css-prefix}-interview { content: $fa-var-calendar; }
 .#{$fa-css-prefix}-documentation { content: $fa-var-files-o; }
 
@@ -85,6 +84,12 @@
   &.color {
     color: #a8491a;
   }
+}
+
+.grcicon-role-color:before { content: $fa-var-key; }
+.#{$fa-css-prefix}-role {
+  &:before { content: $fa-var-key; }
+  &.color { color: $black; }
 }
 
 .grcicon-audit-color:before { content: $fa-var-eye; color: $purple; }
