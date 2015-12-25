@@ -8,6 +8,8 @@ dev:
   volumes:
    - ".:/vagrant"
   privileged: true
+  environment:
+   - PYTHONDONTWRITEBYTECODE=true
 
 selenium:
   build: .
@@ -19,3 +21,5 @@ selenium:
    - "/dev/shm:/dev/shm"
   links:
    - dev 
+  environment:
+   - PYTHONDONTWRITEBYTECODE=true
