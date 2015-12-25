@@ -527,10 +527,8 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }
 
-      for(i=1; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
-        if(i === totalInner - 1) {
-          $el.closest('.inner-hide').parent('.hidable').addClass("hidden");
-        }
+      if (totalInner == $el.closest('.hide-wrap.hidable').find('.inner-hidable').length) {
+        $el.closest('.inner-hide').parent('.hidable').addClass("hidden");
       }
 
       $hideButton.hide();
