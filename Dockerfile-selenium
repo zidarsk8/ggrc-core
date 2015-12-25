@@ -1,0 +1,10 @@
+FROM selenium/standalone-chrome-debug
+COPY ./test/selenium /selenium
+
+WORKDIR /selenium
+
+RUN apt-get update \
+  && apt-get install -y python python-pip xserver-xephyr
+
+RUN pip install -r /selenium/resources/requirements.txt
+

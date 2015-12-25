@@ -6,5 +6,16 @@ dev:
    - "8080:8080"
    - "9876:9876"
   volumes:
-    - ".:/vagrant"
+   - ".:/vagrant"
   privileged: true
+
+selenium:
+  build: .
+  dockerfile: Dockerfile-selenium
+  ports:
+   - "4444:4444"
+  volumes:
+   - "./test/selenium:/selenium"
+   - "/dev/shm:/dev/shm"
+  links:
+   - dev 
