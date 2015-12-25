@@ -24,7 +24,11 @@
     {{#options}}
     <li {{ data 'option' }} data-id="{{ id }}">
       <label>
-        <input type="radio" name="map" rel="tooltip" title="map">
+        {{#if_equals selected_id id}}
+          <input type="radio" checked="checked" name="map" rel="tooltip" title="map">
+        {{else}}
+          <input type="radio" name="map" rel="tooltip" title="map">
+        {{/if_equals}}
         {{pretty_role_name name}}
       </label>
       <div class="role-description">

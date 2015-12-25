@@ -3022,16 +3022,49 @@ Mustache.registerHelper("file_type", function (instance) {
       filename,
       parts,
       DEFAULT_VALUE = "default",
-      FILE_EXTENSIONS;
+      FILE_EXTENSION_TYPES,
+      FILE_TYPES;
 
-  FILE_EXTENSIONS = Object.freeze({
-    plainText: Object.freeze({txt: 1}),
-    image: Object.freeze(
-      {jpg: 1, jpeg: 1, png: 1, gif: 1, tiff: 1, bmp: 1}),
-    pdfDoc: Object.freeze({pdf: 1}),
-    officeDoc: Object.freeze({doc: 1, docx: 1, odt: 1}),
-    officeSpreadsheet: Object.freeze({xls: 1, xlsx: 1, ods: 1}),
-    archiveFile: Object.freeze({zip: 1, rar: 1, "7z": 1, gz: 1, tar: 1})
+  FILE_TYPES = Object.freeze({
+    PLAIN_TXT: "txt",
+    IMAGE: "img",
+    PDF: "pdf",
+    OFFICE_DOC: "doc",
+    OFFICE_SHEET: "xls",
+    ARCHIVE: "zip"
+  });
+
+  FILE_EXTENSION_TYPES = Object.freeze({
+    // plain text files
+    txt: FILE_TYPES.PLAIN_TXT,
+
+    // image files
+    jpg: FILE_TYPES.IMAGE,
+    jpeg: FILE_TYPES.IMAGE,
+    png: FILE_TYPES.IMAGE,
+    gif: FILE_TYPES.IMAGE,
+    bmp: FILE_TYPES.IMAGE,
+    tiff: FILE_TYPES.IMAGE,
+
+    // PDF documents
+    pdf: FILE_TYPES.PDF,
+
+    // Office-like text documents
+    doc: FILE_TYPES.OFFICE_DOC,
+    docx: FILE_TYPES.OFFICE_DOC,
+    odt: FILE_TYPES.OFFICE_DOC,
+
+    // Office-like spreadsheet documents
+    xls: FILE_TYPES.OFFICE_SHEET,
+    xlsx: FILE_TYPES.OFFICE_SHEET,
+    ods: FILE_TYPES.OFFICE_SHEET,
+
+    // archive files
+    zip: FILE_TYPES.ARCHIVE,
+    rar: FILE_TYPES.ARCHIVE,
+    "7z": FILE_TYPES.ARCHIVE,
+    gz: FILE_TYPES.ARCHIVE,
+    tar: FILE_TYPES.ARCHIVE
   });
 
   if (instance.type !== "Document") {
@@ -3047,23 +3080,7 @@ Mustache.registerHelper("file_type", function (instance) {
   extension = (parts.length === 1) ? "" : parts[parts.length - 1];
   extension = extension.toLowerCase();
 
-  if (!extension) {
-    return DEFAULT_VALUE;
-  } else if (extension in FILE_EXTENSIONS.plainText) {
-    return "txt";
-  } else if (extension in FILE_EXTENSIONS.image) {
-    return "img";
-  } else if (extension in FILE_EXTENSIONS.pdfDoc) {
-    return "pdf";
-  } else if (extension in FILE_EXTENSIONS.officeDoc) {
-    return "doc";
-  } else if (extension in FILE_EXTENSIONS.officeSpreadsheet) {
-    return "xls";
-  } else if (extension in FILE_EXTENSIONS.archiveFile) {
-    return "zip";
-  } else {
-    return DEFAULT_VALUE;
-  }
+  return FILE_EXTENSION_TYPES[extension] || DEFAULT_VALUE;
 });
 
 Mustache.registerHelper("debugger", function () {
