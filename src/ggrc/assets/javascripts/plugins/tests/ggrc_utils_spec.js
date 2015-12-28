@@ -33,6 +33,7 @@ describe("GGRC utils allowed_to_map() method", function () {
 
       spyOn(Permission, "is_allowed_for").and.returnValue(true);
     });
+
     it("returns false for Audit as source and Program as target", function () {
       var result = allowed_to_map(fakeAudit, fakeProgram, fakeOptions);
       expect(result).toBe(false);
@@ -50,20 +51,22 @@ describe("GGRC utils allowed_to_map() method", function () {
       fakePersonCreator = new CMS.Models.Person({type: "Person"});
 
       spyOn(Permission, "is_allowed_for").and.returnValue(true);
+      spyOn(GGRC.Mappings, "get_canonical_mapping_name");
     });
+
     it("returns true for Control Assessment as source and Person as target", function () {
+      GGRC.Mappings.get_canonical_mapping_name.and.returnValue("people");
+
       var result = allowed_to_map(fakeCA, fakePersonCreator, fakeOptions);
 
-      spyOn(GGRC.Mappings, "get_canonical_mapping_name")
-        .and.returnValue("people");
       expect(result).toBe(true);
     });
 
     it("returns false for Person as source and as Control Assessment target", function () {
+      GGRC.Mappings.get_canonical_mapping_name.and.returnValue("related_objects");
+
       var result = allowed_to_map(fakePersonCreator, fakeCA, fakeOptions);
 
-      spyOn(GGRC.Mappings, "get_canonical_mapping_name")
-        .and.returnValue("related_objects");
       expect(result).toBe(false);
     });
   });
