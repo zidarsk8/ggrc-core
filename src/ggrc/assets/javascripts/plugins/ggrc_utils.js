@@ -99,7 +99,8 @@
       canonical = GGRC.Mappings.get_canonical_mapping_name(
         source_type, target_type);
       canonical_mapping = GGRC.Mappings.get_canonical_mapping(source_type, target_type);
-      if (canonical && canonical.startsWith("_")) {
+
+      if (canonical && canonical.indexOf("_") === 0) {
         canonical = null;
       }
 
