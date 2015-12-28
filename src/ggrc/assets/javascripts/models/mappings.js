@@ -154,7 +154,7 @@
           type: option.constructor.shortName
         };
 
-      if (join_mapping) {
+      if (join_mapping && join_mapping.model_name) {
         join_model = CMS.Models[join_mapping.model_name];
         join_attrs = $.extend({}, join_attrs || {});
         join_attrs[join_mapping.option_attr] = option_attrs;
