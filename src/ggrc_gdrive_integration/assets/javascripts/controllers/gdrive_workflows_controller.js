@@ -1159,6 +1159,7 @@ can.Component.extend({
   template: can.view(GGRC.mustache_path + "/gdrive/gdrive_file.mustache"),
   scope: {
     instance: null,
+    folder_instance: null,
     deferred: "@",
     icon: "@",
     link_text: "@",
@@ -1259,8 +1260,10 @@ can.Component.extend({
       // upload files with a parent folder (audits and workflows)
       var that = this,
           verify_dfd = $.Deferred(),
-          parent_folder_dfd;
+          parent_folder_dfd,
+          folder_instance;
 
+      folder_instance = this.folder_instance || this.instance;
       function is_own_folder(mapping, instance) {
         if(mapping.binding.instance !== instance)
           return false;
@@ -1286,9 +1289,9 @@ can.Component.extend({
 
       verify_dfd.done(function () {
         if(that.instance.attr("_transient.folder")) {
-          parent_folder_dfd = $.when([{ instance: that.instance.attr("_transient.folder") }]);
+          parent_folder_dfd = $.when([{ instance: folder_instance.attr("_transient.folder") }]);
         } else {
-          parent_folder_dfd = that.instance.get_binding("extended_folders").refresh_instances();
+          parent_folder_dfd = folder_instance.get_binding("extended_folders").refresh_instances();
         }
         can.Control.prototype.bindXHRToButton(parent_folder_dfd, el);
 
