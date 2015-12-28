@@ -23,6 +23,14 @@ fi
 
 find $ROOT_PATH -iname "*.pyc" -delete
 
+if [[ -f "$DUMP_FILE" ]] && grep "^USE " $DUMP_FILE; then
+  echo "Error: 'USE' statement found in the database dump."
+  echo ""
+  echo "Importing into $DB_NAME will fail if there is USE block in the"
+  echo "database dump file. Please fix the dump file and run this script again"
+  exit 1
+fi
+
 mysql -uroot -proot -e "drop database if exists $DB_NAME"
 mysql -uroot -proot -e "create database $DB_NAME character set utf8"
 
