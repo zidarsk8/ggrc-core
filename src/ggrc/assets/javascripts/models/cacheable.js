@@ -292,6 +292,7 @@ can.Model("can.Model.Cacheable", {
   }
   , init : function() {
     var id_key = this.id;
+
     this.bind("created", function(ev, new_obj) {
       var cache = can.getObject("cache", new_obj.constructor, true);
       if(new_obj[id_key] || new_obj[id_key] === 0) {
@@ -700,6 +701,10 @@ can.Model("can.Model.Cacheable", {
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
     this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
+
+    if (!this._pending_joins) {
+      this.attr("_pending_joins", []);
+    }
 
     // Listen for `stub_destroyed` change events and nullify or remove the
     // corresponding property or list item.

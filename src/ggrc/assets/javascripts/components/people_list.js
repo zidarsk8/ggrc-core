@@ -33,9 +33,6 @@
         if (!this.attr("deferred")) {
           return [];
         }
-        if (!this.attr("instance._pending_joins")) {
-          this.attr("instance._pending_joins", []);
-        }
         return this.attr("instance._pending_joins");
       },
       get_mapped: function () {
