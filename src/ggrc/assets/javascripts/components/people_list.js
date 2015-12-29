@@ -183,9 +183,8 @@
           if (list_pending) {
             _.each(list_pending, function (join) {
               if (join.what === person && join.how === "add") {
-                var existing= join.extra.attr("attrs.AssigneeType") || "";
-                existing = _.filter(existing.split(","));
-                var roles = _.union(existing, [role]).join(",");
+                var existing = can.getObject("extra.attrs.AssigneeType", join) || "";
+                var roles = _.union(existing.split(","), [role]).join(",");
                 join.extra.attr("attrs.AssigneeType", roles);
                 pending = false;
               }

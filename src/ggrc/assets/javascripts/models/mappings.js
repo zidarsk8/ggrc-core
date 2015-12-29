@@ -710,6 +710,7 @@
       related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee", "Person"),
       related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester", "Person"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
+      people: AttrFilter("related_objects", "AssigneeType", null, "Person"),
       info_related_objects: CustomFilter("related_objects", function (related_objects) {
         return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
       }),
