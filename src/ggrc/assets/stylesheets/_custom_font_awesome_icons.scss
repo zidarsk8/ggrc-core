@@ -456,3 +456,30 @@
     &.color { color: $white; }
   }
  }
+
+.internav {
+  // turns icons to black
+  @extend %black-icons;
+}
+
+// icons for disabled tree object in object selector
+.tree-item {
+  &.disabled {
+    // turns icons to black
+    @extend %black-icons;
+  }
+}
+
+.quick-list {
+  .dropdown-menu {
+    // turns icons to black
+    @extend %black-icons;
+  }
+}
+
+// inner tree icons to black
+.inner-tree {
+  .select {
+    @extend %black-icons;
+  }
+}
