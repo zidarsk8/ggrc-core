@@ -176,20 +176,27 @@
             , model : options.model
             , skip_refresh : true
           }, function() {
-            can.trigger(options.instance, "modal:dismiss");
-            that.$element.find("[data-dismiss='modal'], [data-dismiss='modal-reset']").trigger("click");
-            that.hide();
+            $.when(function () {
+              can.trigger(options.instance, "modal:dismiss");
+            }).then(function () {
+              that.$element.find("[data-dismiss='modal'], [data-dismiss='modal-reset']").trigger("click");
+              that.hide();
+            });
           });
           return;
         }
       }
 
       // Hide the modal like normal
-      if (options) {
-        can.trigger(options.instance, "modal:dismiss");
-      }
-      $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
-      this.$element.off('modal_form');
+      $.when(function () {
+        if (options) {
+          return can.trigger(options.instance, "modal:dismiss");
+        }
+        return;
+      }).then(function () {
+        $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
+        this.$element.off('modal_form');
+      }.bind(this));
     }
 
   , focus_first_input: function(ev) {
