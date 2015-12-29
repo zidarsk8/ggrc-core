@@ -512,6 +512,7 @@ can.Control("GGRC.Controllers.Modals", {
       totalInner = $el.closest('.hide-wrap.hidable').find('.inner-hide').length;
 
       $el.closest('.inner-hide').addClass('inner-hidable');
+      var totalHidden = $el.closest('.hide-wrap.hidable').find('.inner-hidable').length;
       //$hidable.hide();
       $hidable.addClass("hidden");
       this.options.reset_visible = true;
@@ -527,7 +528,7 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }
 
-      if (totalInner == $el.closest('.hide-wrap.hidable').find('.inner-hidable').length) {
+      if (totalInner == totalHidden) {
         $el.closest('.inner-hide').parent('.hidable').addClass("hidden");
       }
 
