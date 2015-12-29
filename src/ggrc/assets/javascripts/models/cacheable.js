@@ -1059,17 +1059,20 @@ can.Model("can.Model.Cacheable", {
   },
 
   is_pending_join: function (needle) {
+    var joins;
+    var len;
     if (!this._pending_joins) {
       this.attr('_pending_joins', []);
     }
-    can.each(this._pending_joins, function (val, index) {
-      if (!val) {
-        return;
-      }
-      if (val.what === needle && !(val.opts && val.opts.change)) {
-        this._pending_joins.splice(index, 1);
-      }
-    }, this);
+    len = this._pending_joins.length;
+    joins = _.filter(this._pending_joins, function (val) {
+      var isNeedle = val.what === needle;
+      var isChanged = val.opts && val.opts.change;
+      return !(isNeedle && !isChanged);
+    }.bind(this));
+    if (len !== joins.length) {
+      this.attr('_pending_joins').replace(joins);
+    }
   },
 
   delay_resolving_save_until: function (dfd) {
