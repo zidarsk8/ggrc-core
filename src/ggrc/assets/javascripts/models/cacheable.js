@@ -1062,7 +1062,7 @@ can.Model("can.Model.Cacheable", {
     if (!this._pending_joins) {
       this.attr('_pending_joins', []);
     }
-    _.each(this._pending_joins, function (val, index) {
+    can.each(this._pending_joins, function (val, index) {
       if (val.what === needle && !(val.opts && val.opts.change)) {
         this._pending_joins.splice(index, 1);
       }
