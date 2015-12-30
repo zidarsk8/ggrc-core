@@ -49,3 +49,6 @@ src/ggrc/static/flash
 # Some editors automagically compile sass
 src/**/.sass-cache
 src/**/_*.css
+
+# Copied font awesome icons into static
+src/ggrc/static/fonts/
