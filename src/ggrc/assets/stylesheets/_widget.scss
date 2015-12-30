@@ -423,10 +423,6 @@
       margin-bottom: 0;
     }
     input {
-      @include background-size(368px 416px);
-      background-image: image-url("grcicons/icons.png");
-      background-repeat: no-repeat;
-      background-position:-259px -195px;
       margin-bottom: 0;
       border: 1px solid $popOverBorder;
       padding-left: 40px;
