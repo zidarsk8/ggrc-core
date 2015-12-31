@@ -292,6 +292,7 @@ can.Model("can.Model.Cacheable", {
   }
   , init : function() {
     var id_key = this.id;
+
     this.bind("created", function(ev, new_obj) {
       var cache = can.getObject("cache", new_obj.constructor, true);
       if(new_obj[id_key] || new_obj[id_key] === 0) {
@@ -701,6 +702,10 @@ can.Model("can.Model.Cacheable", {
     this.attr("class", this.constructor);
     this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
 
+    if (!this._pending_joins) {
+      this.attr("_pending_joins", []);
+    }
+
     // Listen for `stub_destroyed` change events and nullify or remove the
     // corresponding property or list item.
     this.bind("change", function(ev, path, how, newVal, oldVal) {
@@ -1022,43 +1027,58 @@ can.Model("can.Model.Cacheable", {
       return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
     }.bind(this));
     return dfd.promise();
-  }
+  },
+
+  mark_for_change: function (join_attr, obj, extra_attrs) {
+    extra_attrs = extra_attrs || {};
+    var args = can.makeArray(arguments).concat({change: true});
+    this.mark_for_deletion.apply(this, args);
+    this.mark_for_addition.apply(this, args);
+  },
+
 
   /**
    Set up a deferred join object deletion when this object is updated.
   */
-  , mark_for_deletion : function(join_attr, obj) {
+  mark_for_deletion: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
-    if(!this._pending_joins) {
-      this.attr('_pending_joins', []);
-    }
-    for(var i = this._pending_joins.length; i--;) {
-      if(this._pending_joins[i].what === obj) {
-        this._pending_joins.splice(i, 1);
-      }
-    }
-    this._pending_joins.push({how : "remove", what : obj, through : join_attr });
-  }
+
+    this.is_pending_join(obj);
+    this._pending_joins.push({how: "remove", what: obj, through: join_attr, opts: options});
+  },
+
   /**
    Set up a deferred join object creation when this object is updated.
   */
-  , mark_for_addition : function(join_attr, obj, extra_attrs) {
+  mark_for_addition: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
-    if(!this._pending_joins) {
+    extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
+
+    this.is_pending_join(obj);
+    this._pending_joins.push({how: "add", what: obj, through: join_attr, extra: extra_attrs, opts: options});
+  },
+
+  is_pending_join: function (needle) {
+    var joins;
+    var len;
+    if (!this._pending_joins) {
       this.attr('_pending_joins', []);
     }
-    for(var i = this._pending_joins.length; i--;) {
-      if(this._pending_joins[i].what === obj) {
-        this._pending_joins.splice(i, 1);
-      }
+    len = this._pending_joins.length;
+    joins = _.filter(this._pending_joins, function (val) {
+      var isNeedle = val.what === needle;
+      var isChanged = val.opts && val.opts.change;
+      return !(isNeedle && !isChanged);
+    }.bind(this));
+    if (len !== joins.length) {
+      this.attr('_pending_joins').replace(joins);
     }
-    this._pending_joins.push({how : "add", what : obj, through : join_attr, extra: extra_attrs });
-  }
+  },
 
-  , delay_resolving_save_until : function(dfd) {
+  delay_resolving_save_until: function (dfd) {
     return this.notifier.queue(dfd);
-  }
-  , _save: function () {
+  },
+   _save: function () {
     var that = this,
         _super = Array.prototype.pop.call(arguments),
         isNew = this.isNew(),

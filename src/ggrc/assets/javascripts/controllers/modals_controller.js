@@ -885,7 +885,7 @@ can.Control("GGRC.Controllers.Modals", {
         return false;
       }
       if (this.options.instance) {
-        delete this.options.instance._pending_joins;
+        this.options.instance.attr("_pending_joins", []);
       }
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
