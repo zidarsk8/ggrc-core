@@ -2965,47 +2965,6 @@ Mustache.registerHelper("iterate_by_two", function (list, options) {
   return output.join("");
 });
 
-/*
-  This helper should be called from widget/tree_view where parent_instance is expected.
-  Purpose: don't show the object icon in the first level tree, as the tab has the icon already.
-
-  Get the current type of object.
-  If the object-type == widget shown, draw = false (First level tree)
-*/
-Mustache.registerHelper("if_draw_icon", function(instance, options) {
-  var draw = true,
-    ins,
-    type,
-    uri,
-    regex;
-
-  ins = Mustache.resolve(instance);
-  type = ins.type;
-
-  switch (type) {
-    case "OrgGroup":
-      type = "org_group";
-      break;
-    case "DataAsset":
-      type = "data_asset";
-      break;
-    default:
-      break;
-  }
-
-  if (type){
-    uri = type.slice(1) + "_widget";
-    regex = new RegExp(uri);
-      if (regex.test(window.location))
-        draw = false;
-  }
-
-  if (draw)
-    return options.fn(options.contexts);
-  else
-    return options.inverse(options.contexts);
-});
-
 /**
  * Helper method for determining the file type of a Document object from its
  * file name extension.

@@ -153,7 +153,9 @@
     }
 
   , hide: function(e) {
-      var that = this;
+      var that = this,
+          control = this.$element.control(),
+          options = control && control.options;
 
       // If the hide was initiated by the backdrop, check for dirty form data before continuing
       if (e && $(e.target).is('.modal-backdrop')) {
@@ -164,11 +166,7 @@
           e.stopPropagation();
           return;
         }
-        if(this.is_form_dirty()) {
-          // Copy some base options from the original modal,
-          // otherwise the form won't be properly reset on discard
-          var options = that.$element.control().options;
-
+        if (this.is_form_dirty()) {
           // Confirm that the user wants to lose the data prior to hiding
           GGRC.Controllers.Modals.confirm({
             modal_title : "Discard Changes"
@@ -178,16 +176,27 @@
             , model : options.model
             , skip_refresh : true
           }, function() {
-            that.$element.find("[data-dismiss='modal'], [data-dismiss='modal-reset']").trigger("click");
-            that.hide();
+            $.when(function () {
+              can.trigger(options.instance, "modal:dismiss");
+            }).then(function () {
+              that.$element.find("[data-dismiss='modal'], [data-dismiss='modal-reset']").trigger("click");
+              that.hide();
+            });
           });
           return;
         }
       }
 
       // Hide the modal like normal
-      $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
-      this.$element.off('modal_form');
+      $.when(function () {
+        if (options) {
+          return can.trigger(options.instance, "modal:dismiss");
+        }
+        return;
+      }).then(function () {
+        $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
+        this.$element.off('modal_form');
+      }.bind(this));
     }
 
   , focus_first_input: function(ev) {
@@ -310,8 +319,8 @@
         , flash_class
         , flash_class_mappings = { notice: "success" }
         , html
-        , got_message = _.some(_.values(flash), 
-                               function (msg) { return !!msg; }); 
+        , got_message = _.some(_.values(flash),
+                               function (msg) { return !!msg; });
 
       if (!got_message) {
         // sometimes ajax:flash is triggered with bad data
