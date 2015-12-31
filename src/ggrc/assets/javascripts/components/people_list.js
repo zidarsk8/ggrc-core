@@ -108,12 +108,7 @@
             }.bind(this));
           }
         }, this);
-      },
-      autocomplete_select: function (el, ev, ui) {
-        if (ui && ui.item) {
-          el.trigger("autocomplete:select", [ui]);
-        }
-      },
+      }
     },
     events: {
       "inserted": function () {
@@ -222,11 +217,11 @@
             model = model.refresh();
           }
 
-          model.then(function (model) {
+          model.done(function (model) {
             var type = model.attr("attrs.AssigneeType");
             model.attr("attrs.AssigneeType", role + (type ? "," + type : ""));
             model.save();
-          }.bind(this));
+          });
         }
       },
       "modal:success": function () {
