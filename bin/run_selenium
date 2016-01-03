@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+
+cd "${SCRIPTPATH}/.."
+
+docker-compose up --force-recreate -d
+
+# This provisioning is needed until the provision script stops changing the
+# /vagrant folder and so the containe can then be propperly provisioned with
+# docker-compose build.
+
+echo "Provisioning ggrccore_dev_1"
+docker exec -it ggrccore_dev_1 su vagrant -c \
+"ansible-playbook -i provision/docker/inventory provision/site.yml > /dev/null"
+
+echo "Running Test server"
+docker exec -itd ggrccore_dev_1 /vagrant/bin/launch_ggrc_test
+
+# Wait up to 30 seconds for the test server to start or exit with error 1
+((count = 30))
+while [[ $count -gt 0 ]] ; do
+	curl -s localhost:8080 > /dev/null
+	rc=$?
+	if [[ $rc -eq 0 ]] ; then
+	  ((count = 1))
+	fi
+	((count = count - 1))
+  sleep 1
+done
+
+if [[ $rc -ne 0 ]] ; then
+  echo "Error starting test server"
+  exit 1
+fi
+
+echo "Running Selenium tests"
+docker exec -it ggrccore_selenium_1 python /selenium/src/run_selenium.py
+
+docker-compose stop
