@@ -112,7 +112,7 @@ will be avaiable via this URL: <http://localhost:8000/>
 
 Tests are your friend! Keep them running, keep them updated.
 
-For JavaScript tests:
+##### For JavaScript tests:
 
 ```sh
 run_karma
@@ -120,7 +120,7 @@ run_karma
 
 Then open Chrome at URL: <http://localhost:9876>
 
-For Python tests:
+##### For Python tests:
 
 ```sh
 run_pytests
@@ -135,16 +135,13 @@ This will run the tests on each file update.
 cd test/unit; sniffer
 ```
 
-For Selenium tests:
+##### For Selenium tests:
 
-First you have to manually launch the server inside you dev container.
-Then you can run the selenium tests with:
+On the host machine in the root of the repository run:
 
 ```sh
-docker exec -it ggrccore_selenium_1 python /selenium/src/run_selenium.py
+./bin/run_selenium
 ```
-
-Note: The tests should pass if you launch the server with a clean database.
 
 Quickstart Breakdown
 --------------------
