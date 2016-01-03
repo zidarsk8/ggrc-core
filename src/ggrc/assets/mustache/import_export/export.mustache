@@ -18,11 +18,7 @@
             </div>
           {{else}}
             <h2 class="title">
-              {{#if export.data_grid}}
-                Data Grid
-              {{else}}
-                Export Objects
-              {{/if}}
+              Export Objects
             </h2>
           {{/if}}
         </div>
@@ -33,7 +29,7 @@
       <div class="relevant-filter-group">
         {{#each panels.items}}
           <div class="new-relevant-block">
-            <export-panel type="{{type}}" data_grid="export.data_grid" item="." panel_number="{{@index}}">
+            <export-panel type="{{type}}" item="." panel_number="{{@index}}">
               <div class="row-fluid">
                 <div class="span4">
                   <h6>Export object type</h6>
@@ -55,13 +51,7 @@
               {{> /static/mustache/import_export/export/attribute_selector.mustache}}
               {{> /static/mustache/import_export/export/filter_query.mustache}}
 
-              {{#if export.data_grid}}
-                {{#if_equals panel_number 0}}
-                  <relevant-filter show_all="true" type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
-                {{/if}}
-              {{else}}
-                <relevant-filter show_all="true" has_parent="item.has_parent" relevant_menu_item="parent" type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
-              {{/if}}
+              <relevant-filter show_all="true" has_parent="item.has_parent" relevant_menu_item="parent" type="export.type" panel_number="panel_number" relevant="item.relevant"></relevant-filter>
             </export-panel>
           </div>
         {{/each}}
@@ -72,23 +62,11 @@
     </export-group>
   </div>
   <div class="save-template-wrap">
-    {{#export.data_grid}}
-      <div class="left-content">
-        <label class="checkbox-inline">
-          <input type="checkbox" can-value="export.only_relevant" name="only_relevant" checked="checked">
-          Show only objects relevant to selected anchor objects
-        </label>
-      </div>
-    {{/data_grid}}
     <div class="btn-group pull-right">
       {{^export.loading}}
         <button type="submit" id="export-csv-button" class="btn btn-success btn-small">
           <i class="grcicon-export-white"></i>
-          {{#if export.data_grid}}
-            Export Data Grid
-          {{else}}
-            Export Objects
-          {{/if}}
+          Export Objects
         </button>
       {{/loading }}
       {{#export.loading}}
