@@ -4,6 +4,9 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+set -o nounset
+set -o errexit
+
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/.."
@@ -22,14 +25,13 @@ echo "Running Test server"
 docker exec -itd ggrccore_dev_1 /vagrant/bin/launch_ggrc_test
 
 # Wait up to 30 seconds for the test server to start or exit with error 1
-((count = 30))
+count=30
 while [[ $count -gt 0 ]] ; do
-	curl -s localhost:8080 > /dev/null
-	rc=$?
+	curl -s localhost:8080 > /dev/null && rc=$? || rc=$?
 	if [[ $rc -eq 0 ]] ; then
-	  ((count = 1))
+	  count=1
 	fi
-	((count = count - 1))
+	count=$((count - 1))
   sleep 1
 done
 
@@ -39,6 +41,9 @@ if [[ $rc -ne 0 ]] ; then
 fi
 
 echo "Running Selenium tests"
-docker exec -it ggrccore_selenium_1 python /selenium/src/run_selenium.py
+docker exec -it ggrccore_selenium_1 python /selenium/src/run_selenium.py && \
+  rc=$? || rc=$?
 
 docker-compose stop
+
+exit $rc
