@@ -1103,6 +1103,8 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Task Details",
         "Start Date",
         "End Date",
+        "Actual Verified Date",
+        "Actual Finish Date",
         "Task Group",
         "Cycle Object",
         "State",
