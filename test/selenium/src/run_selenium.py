@@ -33,4 +33,4 @@ if __name__ == "__main__":
 
     logger.setLevel(environment.LOGGING_LEVEL)
 
-    pytest.main()
+    sys.exit(pytest.main())
