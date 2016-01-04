@@ -421,4 +421,6 @@ COLUMN_HANDLERS = {
     "task_type": TaskTypeColumnHandler,
     "workflow": WorkflowColumnHandler,
     "workflow_mapped": WorkflowPersonColumnHandler,
+    "finished_date": handlers.DateColumnHandler,
+    "verified_date": handlers.DateColumnHandler,
 }
