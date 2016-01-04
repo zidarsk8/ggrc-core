@@ -100,9 +100,10 @@ class TestBasicWorkflowActions(TestCase):
       transitions = [
           ("InProgress", None, None),
           ("Finished", today, None),
-          ("Declined", today, None),
+          ("Declined", None, None),
           ("Finished", today, None),
           ("Verified", today, today),
+          ("Finished", today, None),
       ]
       # Iterate over possible transitions and check if dates got set correctly
       for (status, expected_finished, expected_verified) in transitions:
