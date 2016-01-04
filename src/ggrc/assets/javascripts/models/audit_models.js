@@ -473,7 +473,7 @@ can.Model.Cacheable("CMS.Models.Request", {
       // Current user should be Requester
       assignees[current_user.email] = "Requester";
 
-      if (GGRC.page_model.type == "Audit") {
+      if (_.exists(GGRC, 'page_model.type') === 'Audit') {
         this.attr("audit", { id: GGRC.page_model.id, type: "Audit" });
       }
 
