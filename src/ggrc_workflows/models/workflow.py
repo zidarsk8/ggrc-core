@@ -148,7 +148,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
   def _filter_by_no_access(cls, predicate):
     is_no_access = not_(UserRole.query.filter(
         (UserRole.person_id == Person.id) &
-        (UserRole.context_id == cls.context_id)
+        (UserRole.context_id == WorkflowPerson.context_id)
     ).exists())
     return WorkflowPerson.query.filter(
         (cls.id == WorkflowPerson.workflow_id) & is_no_access

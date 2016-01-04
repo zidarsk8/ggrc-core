@@ -443,8 +443,14 @@ $fontTitle: "Helvetica Neue", Helvetica, Arial, sans-serif;
 %state-draft {
   color: $status-draft;
 }
+%state-unstarted {
+  color: $status-draft;
+}
 %state-inactive {
   color: $status-draft;
+}
+%state-in_progress {
+  color: $orange;
 }
 %state-declined {
   color: $yellow;

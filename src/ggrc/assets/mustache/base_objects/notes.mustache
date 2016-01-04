@@ -8,10 +8,12 @@
 {{#instance}}
 
   <div class="row-fluid wrap-row">
-    <div class="span12">
+    <div data-test-id="title_notes_ef5bc3a71e88" class="span12">
       <h6>Notes</h6>
-      {{{firstnonempty notes '<em>No notes available</em>'}}}
+      <div data-test-id="title_notes_content_ef5bc3a71e88" class="rtf-block">
+        {{{firstnonempty notes '<span class="empty-message">None</span>'}}}
+      </div>
     </div>
   </div>
-  
+
 {{/instance}}

@@ -7,7 +7,7 @@
 
 {{#instance}}
 <div class="row-fluid wrap-row">
-  <div class="span6">
+  <div data-test-id="title_manager_7a906d2e" class="span6">
     {{#if is_program}}
     <h6>Manager</h6>
     <p class="oneline">
@@ -25,9 +25,7 @@
             </span>
           {{/each}}
         {{else}}
-          <span class="error">
-            Not Assigned
-          </span>
+          <span class="empty-message">None</span>
         {{/if}}
       {{/with_mapping}}
     {{else}}
@@ -46,37 +44,32 @@
         </ul>
         {{/using}}
       {{else}}
-        <span class="error">
-          Not Assigned
-        </span>
+        <span class="empty-message">None</span>
       {{/if}}
     {{/if}}
     </p>
   </div>
-    <div class="span6">
+    <div data-test-id="title_contacts_696de7244b84" class="span6">
       {{#using person=contact}}
-      <div class="bottom-space">
+      <div data-test-id="title_primary_contact_696de7244b84"
+           class="bottom-space">
         <h6>Primary Contact</h6>
-        <p class="oneline">
+        <p data-test-id="text_primary_contact_696de7244b84" class="oneline">
           {{#if person}}
             {{>'/static/mustache/people/popover.mustache'}}
           {{else}}
-            <span class="error">
-              Not Assigned
-            </span>
+            <span data-test-id="text_primary_contact_696de7244b84" class="empty-message">None</span>
           {{/if}}
         </p>
       </div>
       {{/using}}
       {{#using person=secondary_contact}}
       <h6>Secondary Contact</h6>
-      <p class="oneline">
+      <p data-test-id="text_secondary_contact_696de7244b84" class="oneline">
         {{#if person}}
           {{>'/static/mustache/people/popover.mustache'}}
         {{else}}
-          <span class="error">
-            Not Assigned
-          </span>
+          <span data-test-id="text_secondary_contact_696de7244b84" class="empty-message">None</span>
         {{/if}}
       </p>
       {{/using}}

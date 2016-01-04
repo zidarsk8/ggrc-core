@@ -132,22 +132,22 @@ can.Control("CMS.Controllers.TreeLoader", {
         $footer.before($spinner_li);
       }
     }
-  }
-  , prepare: function() {
-    var that = this;
-
-    if (this._prepare_deferred)
+  },
+  prepare: function () {
+    if (this._prepare_deferred) {
       return this._prepare_deferred;
+    }
 
-    this._prepare_deferred = new $.Deferred();
+    this._prepare_deferred = $.Deferred();
     this._prepare_deferred.resolve();
 
-    this._attached_deferred.then(function() {
-      if (that.element) {
-        that.element.trigger("updateCount", 0);
-        that.init_count();
+    this._attached_deferred.then(function () {
+      if (!this.element) {
+        return;
       }
-    });
+      can.trigger(this.element, "updateCount", [0, this.options.update_count]);
+      this.init_count();
+    }.bind(this));
 
     return this._prepare_deferred;
   }
@@ -201,12 +201,16 @@ can.Control("CMS.Controllers.TreeLoader", {
   , draw_list : function(list, is_reload, force_prepare_chilren) {
     is_reload = is_reload === true;
     // TODO figure out why this happens and fix the root of the problem
-    if (!list && !this.options.list) return;
-    if (this._draw_list_deferred)
-      return this._draw_list_deferred;
-    this._draw_list_deferred = new $.Deferred();
-    if (this.element && !this.element.closest('body').length)
+    if (!list && !this.options.list) {
       return;
+    }
+    if (this._draw_list_deferred) {
+      return this._draw_list_deferred;
+    }
+    this._draw_list_deferred = new $.Deferred();
+    if (this.element && !this.element.closest('body').length) {
+      return;
+    }
 
     var that = this
       , refresh_queue = new RefreshQueue()
@@ -214,7 +218,7 @@ can.Control("CMS.Controllers.TreeLoader", {
       , original_function
       , sort_prop;
 
-    if(list) {
+    if (list) {
       list = list.length == null ? new can.Observe.List([list]) : list;
     } else {
       list = this.options.list;
@@ -409,6 +413,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     // { property : "controls", model : CMS.Models.Control, }
     // { parent_find_param : "system_id" ... }
     , scroll_page_count: 0.5 // pages above and below viewport
+    , is_subtree: false
   },
   do_not_propagate : [
     'header_view', 'footer_view', 'add_item_view', 'list', 'original_list', 'single_object', 'find_function',
@@ -451,7 +456,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     hash.pop();
     window.location.hash = hash.join('/');
   },
-
   // Total display with is set to be span12.
   // Default: title : span4
   //          middle selectable : span4, by default 2 attributes are selected
@@ -613,6 +617,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         || this.element.data('disable-lazy-loading')) { // comment list
         this.options.disable_lazy_loading = true;
       }
+
+      this.options.update_count = _.isBoolean(this.element.data("update-count")) ? this.element.data("update-count") : true;
+
       if(!this.options.scroll_element) {
         this.options.attr("scroll_element", $(".object-area"));
       }
@@ -703,38 +710,41 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           ));
       }
       return $.when.apply($.when, dfds);
-    }
+    },
 
-  , init_count : function() {
-      var self = this
-        ;
+    init_count: function () {
+      var self = this;
 
-      if (this.get_count_deferred)
+      if (this.get_count_deferred) {
         return this.get_count_deferred;
-
+      }
       if (this.options.parent_instance && this.options.mapping) {
         this.get_count_deferred =
           this.options.parent_instance.get_list_counter(this.options.mapping);
       } else if (this.options.list_loader) {
         this.get_count_deferred =
           this.options.list_loader(this.options.parent_instance)
-            .then(function(list) {
-              return can.compute(function() {
+            .then(function (list) {
+              return can.compute(function () {
                 return list.attr("length");
               });
             });
       }
       if (this.get_count_deferred) {
-        this.get_count_deferred.then(this._ifNotRemoved(function(count) {
-          self.element && self.element.trigger("updateCount", count());
-          count.bind("change", self._ifNotRemoved(function() {
-            self.element.trigger("updateCount", count());
+        this.get_count_deferred.then(this._ifNotRemoved(function (count) {
+          if (self.element) {
+            can.trigger(self.element, "updateCount", [count(), self.options.update_count]);
+          }
+          count.bind("change", self._ifNotRemoved(function () {
+            can.trigger(self.element, "updateCount", [count(), self.options.update_count]);
           }));
         }));
       } else {
         // FIXME: Does this ever happen?
-        this.get_count_deferred = new $.Deferred();
-        this.get_count_deferred.resolve(function() { return 0; });
+        this.get_count_deferred = $.Deferred();
+        this.get_count_deferred.resolve(function () {
+          return 0;
+        });
       }
       return this.get_count_deferred;
     }
@@ -1168,8 +1178,9 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
   , " updateCount": function(el, ev) {
       // Suppress events from sub-trees
-      if (!($(ev.target).closest('.' + this.constructor._fullName).is(this.element)))
+      if (!($(ev.target).closest('.' + this.constructor._fullName).is(this.element))) {
         ev.stopPropagation();
+      }
     }
 
 /*  , "{list} add": function() {
@@ -1453,6 +1464,7 @@ can.Control("CMS.Controllers.TreeViewNode", {
         this._draw_node_deferred.resolve();
       }.bind(this)));
       this._draw_node_in_progress = false;
+      this.options.attr('is_subtree', this.element && this.element.closest('.inner-tree').length > 0);
     }.bind(this), 2); // We give the browser a 2ms pause for scrolling
   }
   , draw_placeholder: function() {

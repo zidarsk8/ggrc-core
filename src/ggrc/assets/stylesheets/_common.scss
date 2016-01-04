@@ -179,12 +179,21 @@ small {
   position: relative;
 }
 
+.top-spacing {
+  margin-top: 15px;
+}
+
 .not-assigned {
   color: $tabTitle;
 }
 
 .assignee-dark {
   color: $subTitle;
+}
+
+.empty-message {
+  color: $gray;
+  font-style: italic;
 }
 
 .checkbox-inline {
@@ -340,7 +349,17 @@ small {
 
 // buttons
 .btn-info-pin-header {
-  margin-top: 18px;
+  margin-right: 10px;
+  &.undo {
+    margin-right: 10px;
+    margin-top: 6px;
+  }
+  .sticky-info-panel & {
+    margin-top: 18px;
+    &.undo {
+      margin-top: 22px;
+    }
+  }
 }
 .btn {
   @include btn-size();
@@ -809,6 +828,9 @@ select.multiple-selector {
       width: auto;
       float: right;
     }
+    &.btn {
+      width: auto;
+    }
   }
   &.task-wrap {
     span.empty {
@@ -1192,7 +1214,7 @@ p {
   }
 }
 
-@each $state_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+@each $state_label in draft, inactive, declined, inprogress, in_progress, unstarted, overdue, active, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
   .state-#{$state_label} {
     @extend %state-#{$state_label};
   }
@@ -1315,4 +1337,16 @@ label.disabled {
       text-decoration: none;
     }
   }
+}
+
+.person-selector {
+  input {
+    float: left;
+    margin-right: 5px;
+    width: 70%;
+  }
+}
+
+.capitalize {
+  text-transform: capitalize;
 }

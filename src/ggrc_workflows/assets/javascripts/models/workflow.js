@@ -93,7 +93,7 @@
         var tg = new CMS.Models.TaskGroup({
           title: task_group_title,
           workflow: instance,
-          assignee: instance.contact,
+          contact: instance.people && instance.people[0] || instance.modified_by,
           context: instance.context,
         });
         return tg.save().then(function(tg) {

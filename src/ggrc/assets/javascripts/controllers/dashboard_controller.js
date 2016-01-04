@@ -144,12 +144,13 @@ can.Control("CMS.Controllers.Dashboard", {
       this.get_active_widget_containers().show();
     }
 
-  , " widgets_updated" : "update_inner_nav"
-
-  , " updateCount": function(el, ev, count) {
-      this.inner_nav_controller.update_widget_count($(ev.target), count);
+  , " widgets_updated" : "update_inner_nav",
+  " updateCount": function (el, ev, count, updateCount) {
+    if (_.isBoolean(updateCount) && !updateCount) {
+      return;
     }
-
+    this.inner_nav_controller.update_widget_count($(ev.target), count, updateCount);
+  }
   , update_inner_nav: function(el, ev, data) {
       if (this.inner_nav_controller) {
         if(data) {
@@ -323,7 +324,6 @@ can.Control("CMS.Controllers.InnerNav", {
     init: function(options) {
       CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
         this.display_prefs = prefs;
-
         if (!this.options.widget_list) {
           this.options.widget_list = new can.Observe.List([]);
         }
@@ -337,7 +337,6 @@ can.Control("CMS.Controllers.InnerNav", {
         can.bind.call(window, 'hashchange', function() {
           this.route(window.location.hash);
         }.bind(this));
-
         can.view(this.options.internav_view, this.options, function(frag) {
           var fn = function () {
             this.element.append(frag);
@@ -476,7 +475,6 @@ can.Control("CMS.Controllers.InnerNav", {
         , count = match[2] || undefined
         , existing_index
         ;
-
       index = this.saved_widget_index($widget, index);
 
       if(this.delayed_display) {
@@ -544,14 +542,14 @@ can.Control("CMS.Controllers.InnerNav", {
     return index;
   }
 
-  , update_widget_count : function($el, count) {
-      var widget_id = $el.closest('.widget').attr('id'),
+  , update_widget_count: function ($el, count) {
+      var widget_id = $el.closest(".widget").attr("id"),
           widget = this.widget_by_selector("#" + widget_id);
 
       if (widget) {
         widget.attr({
-            count: count
-          , has_count: true
+          count: count,
+          has_count: true
         });
       }
       this.update_add_more_link();

@@ -16,6 +16,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from werkzeug.exceptions import BadRequest
 import functools
+import inspect
 
 
 class Relationship(Mapping, db.Model):
@@ -24,16 +25,6 @@ class Relationship(Mapping, db.Model):
   source_type = db.Column(db.String, nullable=False)
   destination_id = db.Column(db.Integer, nullable=False)
   destination_type = db.Column(db.String, nullable=False)
-  relationship_type_id = db.Column(db.String)
-  # FIXME: Should this be a strict constraint?  If so, a migration is needed.
-  # relationship_type_id = db.Column(
-  #    db.Integer, db.ForeignKey('relationship_types.id'))
-  relationship_type = db.relationship(
-      'RelationshipType',
-      primaryjoin='foreign(RelationshipType.relationship_type) =='
-      ' Relationship.relationship_type_id',
-      uselist=False
-  )
   automapping_id = db.Column(
       db.Integer,
       db.ForeignKey('relationships.id', ondelete='SET NULL'),
@@ -89,21 +80,36 @@ class Relationship(Mapping, db.Model):
       Only white-listed attributes can be stored, so users don't use this
       for storing arbitrary data.
     """
-    RelationshipAttr.validate_attr(self.source, self.destination, attr)
+    RelationshipAttr.validate_attr(self.source, self.destination,
+                                   self.attrs, attr)
     return attr
 
   @classmethod
   def find_related(cls, object1, object2):
+    return cls.get_related_query(object1, object2).first()
+
+  @classmethod
+  def get_related_query(cls, object1, object2):
     def predicate(src, dst):
       return and_(
           Relationship.source_type == src.type,
-          Relationship.source_id == src.id,
+          or_(Relationship.source_id == src.id, src.id == None),  # noqa
           Relationship.destination_type == dst.type,
-          Relationship.destination_id == dst.id
+          or_(Relationship.destination_id == dst.id, dst.id == None),  # noqa
       )
     return Relationship.query.filter(
         or_(predicate(object1, object2), predicate(object2, object1))
-    ).first()
+    )
+
+  @classmethod
+  def update_attributes(cls, object1, object2, new_attrs):
+    r = cls.find_related(object1, object2)
+    for attr_name, attr_value in new_attrs.iteritems():
+      attr = RelationshipAttr(attr_name=attr_name, attr_value=attr_value)
+      attr = RelationshipAttr.validate_attr(r.source, r.destination,
+                                            r.attrs, attr)
+      r.attrs[attr.attr_name] = attr.attr_value
+    return r
 
   @staticmethod
   def _extra_table_args(cls):
@@ -121,7 +127,6 @@ class Relationship(Mapping, db.Model):
   _publish_attrs = [
       'source',
       'destination',
-      'relationship_type_id',
       'attrs',
   ]
   attrs.publish_raw = True
@@ -129,21 +134,6 @@ class Relationship(Mapping, db.Model):
   def _display_name(self):
     return "{}:{} <-> {}:{}".format(self.source_type, self.source_id,
                                     self.destination_type, self.destination_id)
-
-
-class RelationshipType(Described, Base, db.Model):
-  __tablename__ = 'relationship_types'
-  relationship_type = deferred(db.Column(db.String), 'RelationshipType')
-  forward_phrase = deferred(db.Column(db.String), 'RelationshipType')
-  backward_phrase = deferred(db.Column(db.String), 'RelationshipType')
-  symmetric = deferred(
-      db.Column(db.Boolean, nullable=False), 'RelationshipType')
-
-  _publish_attrs = [
-      'forward_phrase',
-      'backward_phrase',
-      'symmetric',
-  ]
 
 
 class Relatable(object):
@@ -208,7 +198,7 @@ class RelationshipAttr(Identifiable, db.Model):
   _validators = {}
 
   @classmethod
-  def validate_attr(cls, source, destination, attr):
+  def validate_attr(cls, source, destination, attrs, attr):
     """
       Checks both source and destination type (with mixins) for
       defined validators _validate_relationship_attr
@@ -217,8 +207,11 @@ class RelationshipAttr(Identifiable, db.Model):
     attr_value = attr.attr_value
     validators = cls._get_validators(source) + cls._get_validators(destination)
     for validator in validators:
-      if validator(source, destination, attr_name, attr_value):
-        return
+      validated_value = validator(source, destination, attrs,
+                                  attr_name, attr_value)
+      if validated_value is not None:
+        attr.attr_value = validated_value
+        return attr
     raise BadRequest("Invalid attribute {}: {}".format(attr_name, attr_value))
 
   @classmethod
@@ -230,15 +223,7 @@ class RelationshipAttr(Identifiable, db.Model):
 
   @staticmethod
   def _gather_validators(target_class):
-    queue = set([target_class])
-    done = set()
-    validators = set()
-    while queue:
-      cls = queue.pop()
-      for b in cls.__bases__:
-        if b not in done:
-          queue.add(b)
-      validator = getattr(cls, "_validate_relationship_attr", None)
-      if validator is not None:
-        validators.add(validator)
+    validators = set(getattr(cls, "_validate_relationship_attr", None)
+                     for cls in inspect.getmro(target_class))
+    validators.discard(None)
     return [functools.partial(v, target_class) for v in validators]

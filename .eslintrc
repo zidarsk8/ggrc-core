@@ -1,0 +1,29 @@
+{
+  "extends": "eslint-config-google",
+
+  "env": {
+    "browser": true,
+    "jasmine": true,
+    "jquery": true
+  },
+
+  "globals": {
+    "_": false,
+    "can": false,
+    "CMS": false,
+    "GGRC": false,
+    "Mustache": false,
+    "MutationObserver": false,
+    "permission": false,
+    "RefreshQueue": false,
+    "RefreshQueueManager": false,
+    "ZeroClipboard": false,
+  },
+
+  "rules": {
+    "require-jsdoc": 0,
+    "space-before-function-paren": [
+      2, {"anonymous": "always", "named": "never"}
+    ]
+  }
+}

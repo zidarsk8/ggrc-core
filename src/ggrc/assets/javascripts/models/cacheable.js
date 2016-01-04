@@ -292,6 +292,7 @@ can.Model("can.Model.Cacheable", {
   }
   , init : function() {
     var id_key = this.id;
+
     this.bind("created", function(ev, new_obj) {
       var cache = can.getObject("cache", new_obj.constructor, true);
       if(new_obj[id_key] || new_obj[id_key] === 0) {
@@ -380,7 +381,7 @@ can.Model("can.Model.Cacheable", {
   }
   , resolve_deferred_bindings : function(obj) {
     var _pjs, refresh_dfds = [], dfds = [];
-    if(obj._pending_joins) {
+    if (obj._pending_joins && obj._pending_joins.length) {
       _pjs = obj._pending_joins.slice(0); //refresh of bindings later will muck up the pending joins on the object
       can.each(can.unique(can.map(_pjs, function(pj) { return pj.through; })), function(binding) {
         refresh_dfds.push(obj.get_binding(binding).refresh_stubs());
@@ -701,6 +702,10 @@ can.Model("can.Model.Cacheable", {
     this.attr("class", this.constructor);
     this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
 
+    if (!this._pending_joins) {
+      this.attr("_pending_joins", []);
+    }
+
     // Listen for `stub_destroyed` change events and nullify or remove the
     // corresponding property or list item.
     this.bind("change", function(ev, path, how, newVal, oldVal) {
@@ -771,12 +776,14 @@ can.Model("can.Model.Cacheable", {
     })
   , computed_unsuppressed_errors : can.compute(function() {
     return this.errors();
-  })
-  , get_list_counter: function(name) {
-      var binding = this.get_binding(name);
-      if(!binding) return new $.Deferred().reject();
-      return binding.refresh_count();
+  }),
+  get_list_counter: function (name) {
+    var binding = this.get_binding(name);
+    if (!binding) {
+      return $.Deferred().reject();
     }
+    return binding.refresh_count();
+  }
 
   , get_list_loader: function(name) {
       var binding = this.get_binding(name);
@@ -929,35 +936,36 @@ can.Model("can.Model.Cacheable", {
       }
     }
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
-  }
-  , refresh : function(params) {
+  },
+  refresh: function (params) {
     var dfd,
-      href = this.selfLink || this.href,
-      that = this;
+        href = this.selfLink || this.href,
+        that = this;
 
-    if (!href)
+    if (!href) {
       return (new can.Deferred()).reject();
-    if(!this._pending_refresh) {
+    }
+    if (!this._pending_refresh) {
       this._pending_refresh = {
-        dfd : new $.Deferred()
-        , fn : _.throttle(function() {
+        dfd: $.Deferred(),
+        fn: _.throttle(function () {
           var dfd = that._pending_refresh.dfd;
           can.ajax({
-            url : href
-            , params : params
-            , type : "get"
-            , dataType : "json"
+            url: href,
+            params: params,
+            type: "get",
+            dataType : "json"
           })
-          .then(function(resources) {
+          .then(function (resources) {
             delete that._pending_refresh;
             return resources;
           })
           .then($.proxy(that.constructor, "model"))
-          .done(function(d) {
-            d.backup();
-            dfd.resolve(d);
+          .done(function (response) {
+            response.backup();
+            dfd.resolve.apply(dfd, arguments);
           })
-          .fail(function() {
+          .fail(function () {
             dfd.reject.apply(dfd, arguments);
           });
         }, 1000, {trailing: false})
@@ -1019,43 +1027,58 @@ can.Model("can.Model.Cacheable", {
       return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
     }.bind(this));
     return dfd.promise();
-  }
+  },
+
+  mark_for_change: function (join_attr, obj, extra_attrs) {
+    extra_attrs = extra_attrs || {};
+    var args = can.makeArray(arguments).concat({change: true});
+    this.mark_for_deletion.apply(this, args);
+    this.mark_for_addition.apply(this, args);
+  },
+
 
   /**
    Set up a deferred join object deletion when this object is updated.
   */
-  , mark_for_deletion : function(join_attr, obj) {
+  mark_for_deletion: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
-    if(!this._pending_joins) {
-      this.attr('_pending_joins', []);
-    }
-    for(var i = this._pending_joins.length; i--;) {
-      if(this._pending_joins[i].what === obj) {
-        this._pending_joins.splice(i, 1);
-      }
-    }
-    this._pending_joins.push({how : "remove", what : obj, through : join_attr });
-  }
+
+    this.is_pending_join(obj);
+    this._pending_joins.push({how: "remove", what: obj, through: join_attr, opts: options});
+  },
+
   /**
    Set up a deferred join object creation when this object is updated.
   */
-  , mark_for_addition : function(join_attr, obj, extra_attrs) {
+  mark_for_addition: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
-    if(!this._pending_joins) {
+    extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
+
+    this.is_pending_join(obj);
+    this._pending_joins.push({how: "add", what: obj, through: join_attr, extra: extra_attrs, opts: options});
+  },
+
+  is_pending_join: function (needle) {
+    var joins;
+    var len;
+    if (!this._pending_joins) {
       this.attr('_pending_joins', []);
     }
-    for(var i = this._pending_joins.length; i--;) {
-      if(this._pending_joins[i].what === obj) {
-        this._pending_joins.splice(i, 1);
-      }
+    len = this._pending_joins.length;
+    joins = _.filter(this._pending_joins, function (val) {
+      var isNeedle = val.what === needle;
+      var isChanged = val.opts && val.opts.change;
+      return !(isNeedle && !isChanged);
+    }.bind(this));
+    if (len !== joins.length) {
+      this.attr('_pending_joins').replace(joins);
     }
-    this._pending_joins.push({how : "add", what : obj, through : join_attr, extra: extra_attrs });
-  }
+  },
 
-  , delay_resolving_save_until : function(dfd) {
+  delay_resolving_save_until: function (dfd) {
     return this.notifier.queue(dfd);
-  }
-  , _save: function() {
+  },
+   _save: function () {
     var that = this,
         _super = Array.prototype.pop.call(arguments),
         isNew = this.isNew(),
@@ -1075,7 +1098,7 @@ can.Model("can.Model.Cacheable", {
 
     pre_save_notifier.on_empty(function() {
       xhr = _super.apply(that, arguments)
-      .then(function(result) {
+      .then(function (result) {
         if (isNew) {
           that.after_create && that.after_create();
         } else {
@@ -1083,7 +1106,7 @@ can.Model("can.Model.Cacheable", {
         }
         that.after_save && that.after_save();
         return result;
-      }, function(xhr, status, message) {
+      }, function (xhr, status, message) {
         that.save_error && that.save_error(xhr.responseText);
         return new $.Deferred().reject(xhr, status, message);
       })
@@ -1100,7 +1123,6 @@ can.Model("can.Model.Cacheable", {
 
       GGRC.delay_leaving_page_until(xhr);
       GGRC.delay_leaving_page_until(dfd);
-
     });
     return dfd;
   }

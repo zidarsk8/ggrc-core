@@ -130,7 +130,7 @@
   RisksExtension.init_widgets = function init_widgets() {
     var page_instance = GGRC.page_instance(),
         is_my_work = function is_my_work() {
-          return page_instance.type === "Person";
+          return page_instance && page_instance.type === "Person";
         },
         related_or_owned = is_my_work() ? 'owned_' : 'related_',
         sorted_widget_types = _.sortBy(_risk_object_types, function(type) {
@@ -157,6 +157,7 @@
         widget_name: model.model_plural,
         widget_icon: model.table_singular,
         content_controller_options: {
+          add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
           child_options: [],
           draw_children: false,
           parent_instance: page_instance,

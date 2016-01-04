@@ -18,7 +18,7 @@
   overflow: auto;
   .info {
     @include box-shadow(none);
-    padding: 15px 20px 20px 20px;
+    padding: 15px 25px 20px;
     .small-info {
       i {
         @include opacity(.25);
@@ -122,6 +122,9 @@
 
 .side-content {
   margin-left: 20px;
+  .modal & {
+    margin-left: 0;
+  }
 }
 
 .people-group {
@@ -144,7 +147,7 @@
       &:hover {
         .file-controls {
           @include opacity(1);
-          left: -51px;
+          left: -25px;
         }
       }
     }
@@ -162,21 +165,30 @@
   }
   label {
     float: left;
-    width: 27%;
+    width: 32%;
     font-size: 10px;
-    line-height: 16px;
+    line-height: 20px;
     margin-top: 1px;
     text-transform: uppercase;
-
+    position: relative;
+    .file-controls {
+      top: 0;
+    }
+    &:hover {
+      .file-controls {
+        @include opacity(1);
+        left: -25px;
+      }
+    }
     .modal-body & {
       text-transform: none;
       width: 32%;
     }
     .person-label {
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
       margin-right: 4px;
-      line-height: 16px;
+      line-height: 20px;
       font-size: 10px;
     }
   }
@@ -187,10 +199,10 @@
   ul {
     @extend %reset-list;
     float: left;
-    width: 60%;
+    width: 55%;
 
     .modal-body & {
-      width: 55%;
+      width: 50%;
     }
     li {
       margin-bottom: 3px;
@@ -201,7 +213,7 @@
       &:hover {
         .file-controls {
           @include opacity(1);
-          left: -51px;
+          left: -25px;
         }
       }
     }
@@ -216,12 +228,12 @@
   position: absolute;
   top: -2px;
   left: 0;
-  z-index: 9999;
+  z-index: 1000;
   background: $white;
   padding-left: 5px;
   height: 20px;
   padding-top: 2px;
-  min-width: 45px;
+  min-width: 20px;
   i {
     @include opacity(.6);
     @include transition(opacity .2s ease);
@@ -253,13 +265,17 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        left: -50px;
+        left: -25px;
       }
     }
     a {
       @extend %oneline;
       width: 68%;
       display: inline-block;
+      &.more {
+        display: inline;
+        width: auto;
+      }
     }
   }
   .past-items-list & {
@@ -303,15 +319,8 @@
   }
 }
 
-.left-spacing {
-  margin-left: 35px;
-}
-
 .mapped-list {
   @extend %reset-list;
-  &.left-spacing {
-    margin-left: 20px;
-  }
   li {
     margin-bottom: 5px;
     position: relative;
@@ -338,7 +347,7 @@
     &:hover {
       .file-controls {
         @include opacity(1);
-        left: -50px;
+        left: -25px;
       }
     }
   }
@@ -358,8 +367,8 @@
 .sticky-info-panel {
   .pane-header {
     position: fixed;
-    left: 47px;
-    right: 47px;
+    left: 52px;
+    right: 52px;
     height: 52px;
     background: $white;
     border-bottom: 1px solid $lightGray;
