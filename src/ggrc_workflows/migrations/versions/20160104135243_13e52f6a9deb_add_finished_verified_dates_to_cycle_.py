@@ -29,7 +29,7 @@ def upgrade():
   """)
   op.execute("""
       UPDATE cycle_task_group_object_tasks
-      SET verified_date = updated_at
+      SET verified_date = updated_at, finished_date = updated_at
       WHERE status = "Verified"
   """)
 
