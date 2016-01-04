@@ -6,6 +6,8 @@
 import random
 import copy
 from integration.ggrc import TestCase
+from datetime import datetime
+from freezegun import freeze_time
 
 import os
 from ggrc import db
@@ -85,6 +87,29 @@ class TestBasicWorkflowActions(TestCase):
 
     self.assertEqual(sum(tasks), len(cycle_tasks))
     self.assertEqual(active_wf.status, "Active")
+
+  def test_one_time_wf_state_transition_dates(self):
+    _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
+    self.generator.generate_cycle(wf)
+    self.generator.activate_workflow(wf)
+
+    cycle_tasks = db.session.query(CycleTaskGroupObjectTask).join(
+      Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
+    with freeze_time("2015-6-9 13:00:00"):
+      today = datetime.now()
+      transitions = [
+          ("InProgress", None, None),
+          ("Finished", today, None),
+          ("Declined", today, None),
+          ("Finished", today, None),
+          ("Verified", today, today),
+      ]
+      # Iterate over possible transitions and check if dates got set correctly
+      for (status, expected_finished, expected_verified) in transitions:
+        cycle_task = cycle_tasks[0]
+        _, task = self.generator.modify_object(cycle_task, {"status": status})
+        self.assertEqual(task.finished_date, expected_finished)
+        self.assertEqual(task.verified_date, expected_verified)
 
   def test_delete_calls(self):
     _, workflow = self.generator.generate_workflow()
