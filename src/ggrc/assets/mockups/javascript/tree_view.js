@@ -48,7 +48,7 @@
 
   can.Control("CMS.Controllers.MockupTreeItem", {
     defaults: {
-      view: "/static/mockups/base_templates/tree_item.mustache"
+      view: "/static/mustache/mockup_base_templates/tree_item.mustache"
     }
   }, {
     init: function (el, options) {
