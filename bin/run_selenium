@@ -19,7 +19,7 @@ docker-compose up --force-recreate -d
 
 echo "Provisioning ggrccore_dev_1"
 docker exec -it ggrccore_dev_1 su vagrant -c \
-"ansible-playbook -i provision/docker/inventory provision/site.yml > /dev/null"
+  "ansible-playbook -i provision/docker/inventory provision/site.yml"
 
 echo "Running Test server"
 docker exec -itd ggrccore_dev_1 /vagrant/bin/launch_ggrc_test
