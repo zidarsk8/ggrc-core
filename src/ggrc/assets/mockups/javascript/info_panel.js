@@ -8,7 +8,7 @@
 (function (can, $, Generator) {
   can.Control("CMS.Controllers.MockupInfoPanel", {
     defaults: {
-      view: "/static/mockups/base_templates/info_panel.mustache",
+      view: "/static/mustache/mockup_base_templates/info_panel.mustache",
       slide: 240,
       default_height: "min",
       active_pin: null,
@@ -88,8 +88,8 @@
     defaults: {
       comment_attachments: new can.List(),
       templates: {
-        "assessment": "/static/mockups/base_templates/assessment_panel.mustache",
-        "default": "/static/mockups/base_templates/request_panel.mustache"
+        "assessment": "/static/mustache/mockup_base_templates/assessment_panel.mustache",
+        "default": "/static/mustache/mockup_base_templates/request_panel.mustache"
       }
     }
   }, {

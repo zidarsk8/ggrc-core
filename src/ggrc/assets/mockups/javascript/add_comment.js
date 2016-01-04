@@ -8,7 +8,7 @@
 (function (can, $, Generator) {
   can.Component.extend({
     tag: "add-comment",
-    template: can.view("/static/mockups/base_templates/add_comment.mustache"),
+    template: can.view("/static/mustache/mockup_base_templates/add_comment.mustache"),
     scope: {
       attachments: new can.List()
     },

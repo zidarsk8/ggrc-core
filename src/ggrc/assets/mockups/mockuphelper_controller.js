@@ -58,7 +58,7 @@
 
   can.Control("CMS.Controllers.MockupNav", {
     defaults: {
-      view: "/static/mockups/base_templates/nav_item.mustache"
+      view: "/static/mustache/mockup_base_templates/nav_item.mustache"
     }
   }, {
     "{views} change": function (list, ev, which, type, status) {

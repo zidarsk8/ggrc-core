@@ -8,7 +8,7 @@
 (function (can, $, Generator) {
   can.Component.extend({
     tag: "attachment-list",
-    template: can.view("/static/mockups/base_templates/attachment_list.mustache"),
+    template: can.view("/static/mustache/mockup_base_templates/attachment_list.mustache"),
     scope: {
       title: "@",
       types: "@",

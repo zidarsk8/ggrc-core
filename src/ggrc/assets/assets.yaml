@@ -431,38 +431,38 @@ mockup-js-template-files:
   - assessor/assessments.mustache
 
   # Base templates
-  - base_templates/modal_base.mustache
+  - mockup_base_templates/modal_base.mustache
 
   # Info panel partials
-  - base_templates/info_panel/base.mustache
-  - base_templates/info_panel/pin_actions.mustache
-  - base_templates/info_panel/header.mustache
-  - base_templates/info_panel/description.mustache
-  - base_templates/info_panel/mapped_objects.mustache
-  - base_templates/info_panel/people_list.mustache
-  - base_templates/info_panel/dates_list.mustache
-  - base_templates/info_panel/comment_list.mustache
-  - base_templates/info_panel/log_list.mustache
-  - base_templates/info_panel/past_items_list.mustache
-  - base_templates/info_panel/procedures.mustache
-  - base_templates/info_panel/assessment_results.mustache
-  - base_templates/info_panel/bug_number.mustache
-  - base_templates/info_panel/requests_list.mustache
-  - base_templates/info_panel/issues_list.mustache
-  - base_templates/info_panel/assessment_custom.mustache
-  - base_templates/info_panel/code.mustache
-  - base_templates/info_panel/test.mustache
-  - base_templates/info_panel/notes.mustache
-  - base_templates/info_panel/request_type.mustache
+  - mockup_base_templates/info_panel/base.mustache
+  - mockup_base_templates/info_panel/pin_actions.mustache
+  - mockup_base_templates/info_panel/header.mustache
+  - mockup_base_templates/info_panel/description.mustache
+  - mockup_base_templates/info_panel/mapped_objects.mustache
+  - mockup_base_templates/info_panel/people_list.mustache
+  - mockup_base_templates/info_panel/dates_list.mustache
+  - mockup_base_templates/info_panel/comment_list.mustache
+  - mockup_base_templates/info_panel/log_list.mustache
+  - mockup_base_templates/info_panel/past_items_list.mustache
+  - mockup_base_templates/info_panel/procedures.mustache
+  - mockup_base_templates/info_panel/assessment_results.mustache
+  - mockup_base_templates/info_panel/bug_number.mustache
+  - mockup_base_templates/info_panel/requests_list.mustache
+  - mockup_base_templates/info_panel/issues_list.mustache
+  - mockup_base_templates/info_panel/assessment_custom.mustache
+  - mockup_base_templates/info_panel/code.mustache
+  - mockup_base_templates/info_panel/test.mustache
+  - mockup_base_templates/info_panel/notes.mustache
+  - mockup_base_templates/info_panel/request_type.mustache
 
   # Other base templates files
-  - base_templates/request_panel.mustache
-  - base_templates/assessment_panel.mustache
-  - base_templates/tree.mustache
-  - base_templates/tree-assessor.mustache
-  - base_templates/tree_item.mustache
-  - base_templates/info_panel.mustache
-  - base_templates/filter.mustache
-  - base_templates/nav_item.mustache
-  - base_templates/attachment_list.mustache
-  - base_templates/add_comment.mustache
+  - mockup_base_templates/request_panel.mustache
+  - mockup_base_templates/assessment_panel.mustache
+  - mockup_base_templates/tree.mustache
+  - mockup_base_templates/tree-assessor.mustache
+  - mockup_base_templates/tree_item.mustache
+  - mockup_base_templates/info_panel.mustache
+  - mockup_base_templates/filter.mustache
+  - mockup_base_templates/nav_item.mustache
+  - mockup_base_templates/attachment_list.mustache
+  - mockup_base_templates/add_comment.mustache
