@@ -49,3 +49,6 @@ src/ggrc/static/flash
 # Some editors automagically compile sass
 src/**/.sass-cache
 src/**/_*.css
+
+# pythest cache folder used by selenium tests
+test/selenium/.cache/
