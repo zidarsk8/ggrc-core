@@ -40,9 +40,6 @@
         filename: "Export Objects",
         get_filename: can.compute(function () {
           return this.attr("filename").replace(/\s+/, "_").toLowerCase() + ".csv";
-        }),
-        data_grid: can.compute(function () {
-          return _.has(url, "data_grid");
         })
       });
 
@@ -125,25 +122,17 @@
         ev.preventDefault();
         this.scope.attr("export.loading", true);
         var panels = this.scope.attr("export.panels.items"),
-            data_grid = this.scope.attr("export.data_grid"),
             only_relevant = this.scope.attr("export.only_relevant"),
             query = _.map(panels, function (panel, index) {
               var relevant_filter = "",
                   predicates;
-              if (data_grid && index > 0) {
-                relevant_filter = "#__previous__," + (index - 1) + "#";
-                if (only_relevant && index > 1) {
-                  relevant_filter += " AND #__previous__,0#";
-                }
-              } else {
-                predicates = _.map(panel.attr("relevant"), function (el) {
-                  var id = el.model_name === "__previous__" ? index - 1 : el.filter.id;
-                  return "#" + el.model_name + "," + id + "#";
-                });
-                relevant_filter = _.reduce(predicates, function (p1, p2) {
-                  return p1 + " AND " + p2;
-                });
-              }
+              predicates = _.map(panel.attr("relevant"), function (el) {
+                var id = el.model_name === "__previous__" ? index - 1 : el.filter.id;
+                return "#" + el.model_name + "," + id + "#";
+              });
+              relevant_filter = _.reduce(predicates, function (p1, p2) {
+                return p1 + " AND " + p2;
+              });
               return {
                 object_name: panel.type,
                 fields: _.compact(_.map(Object.keys(panel.selected), function (key) {
@@ -154,14 +143,10 @@
                   GGRC.query_parser.parse(panel.filter || "")
                 )
               };
-            }),
-            view = data_grid ? "grid" : "blocks";
+            });
 
         GGRC.Utils.export_request({
-          data: query,
-          headers: {
-            "X-export-view": view
-          }
+          data: query
         }).then(function (data) {
           GGRC.Utils.download(this.scope.attr("export.get_filename"), data);
         }.bind(this))
