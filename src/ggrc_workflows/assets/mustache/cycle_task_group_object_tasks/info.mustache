@@ -87,6 +87,30 @@
           {{/if}}
         </div>
       </div>
+      <div class="row-fluid wrap-row">
+        <div class="span6">
+        </div>
+        <div class="span3">
+          <h6>Actual Finish Date</h6>
+          {{#if instance.finished_date}}
+            <p>
+              {{localize_date instance.finished_date}}
+            </p>
+          {{else}}
+            <span class="empty-message">None</span>
+          {{/if}}
+        </div>
+
+        <div class="span3">
+          <h6>Actual Verified Date</h6>
+          {{#if instance.verified_date}}
+            <p>
+              {{localize_date instance.verified_date }}
+            </p>
+          {{else}}
+            <span class="empty-message">None</span>
+          {{/if}}
+        </div>
 
       <div class="row-fluid wrap-row">
         <div class="span12">
