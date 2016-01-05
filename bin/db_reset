@@ -9,6 +9,7 @@ set -o errexit
 
 
 DB_NAME="ggrcdev"
+TEST_DB_NAME="ggrcdevtest"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 ROOT_PATH="${SCRIPTPATH}/../"
 DUMP_FILE=${1:-}
@@ -33,6 +34,8 @@ fi
 
 mysql -uroot -proot -e "drop database if exists $DB_NAME"
 mysql -uroot -proot -e "create database $DB_NAME character set utf8"
+mysql -uroot -proot -e "drop database if exists $TEST_DB_NAME"
+mysql -uroot -proot -e "create database $TEST_DB_NAME character set utf8"
 
 if [[ -f "$DUMP_FILE" ]]; then
   echo "Importing: $DUMP_FILE"

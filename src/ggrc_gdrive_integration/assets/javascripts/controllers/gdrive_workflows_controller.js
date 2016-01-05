@@ -1038,12 +1038,12 @@ can.Component.extend({
             picker.setVisible(true);
             // use undocumented fu to make the Picker be "modal" - https://b2.corp.google.com/issues/18628239
             // this is the "mask" displayed behind the dialog box div
-            $('div.picker-dialog-bg').css('zIndex', 2000);  // there are multiple divs of that sort
+            $('div.picker-dialog-bg').css('zIndex', 4000);  // there are multiple divs of that sort
             // and this is the dialog box modal div, which we must display on top of our modal, if any
 
             dialog = GGRC.Utils.getPickerElement(picker);
             if (dialog) {
-              dialog.style.zIndex = 2001; // our modals start with 1050
+              dialog.style.zIndex = 4001; // our modals start with 2050
             }
           });
         }
@@ -1159,6 +1159,7 @@ can.Component.extend({
   template: can.view(GGRC.mustache_path + "/gdrive/gdrive_file.mustache"),
   scope: {
     instance: null,
+    folder_instance: null,
     deferred: "@",
     icon: "@",
     link_text: "@",
@@ -1205,7 +1206,7 @@ can.Component.extend({
 
           dialog = GGRC.Utils.getPickerElement(picker);
           if (dialog) {
-            dialog.style.zIndex = 2001; // our modals start with 1050
+            dialog.style.zIndex = 4001; // our modals start with 2050
           }
         });
       }
@@ -1259,8 +1260,10 @@ can.Component.extend({
       // upload files with a parent folder (audits and workflows)
       var that = this,
           verify_dfd = $.Deferred(),
-          parent_folder_dfd;
+          parent_folder_dfd,
+          folder_instance;
 
+      folder_instance = this.folder_instance || this.instance;
       function is_own_folder(mapping, instance) {
         if(mapping.binding.instance !== instance)
           return false;
@@ -1286,9 +1289,9 @@ can.Component.extend({
 
       verify_dfd.done(function () {
         if(that.instance.attr("_transient.folder")) {
-          parent_folder_dfd = $.when([{ instance: that.instance.attr("_transient.folder") }]);
+          parent_folder_dfd = $.when([{ instance: folder_instance.attr("_transient.folder") }]);
         } else {
-          parent_folder_dfd = that.instance.get_binding("extended_folders").refresh_instances();
+          parent_folder_dfd = folder_instance.get_binding("extended_folders").refresh_instances();
         }
         can.Control.prototype.bindXHRToButton(parent_folder_dfd, el);
 

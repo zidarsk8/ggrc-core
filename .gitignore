@@ -52,3 +52,6 @@ src/**/_*.css
 
 # Copied font awesome icons into static
 src/ggrc/static/fonts/
+
+# pythest cache folder used by selenium tests
+test/selenium/.cache/

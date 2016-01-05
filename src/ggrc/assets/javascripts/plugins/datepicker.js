@@ -30,13 +30,12 @@
 
   // On-demand creation of datepicker() objects, initial date today or later
   $body.on("focus", "[data-toggle=\"datepicker_today_or_later\"]", function (ev) {
-    var $this = $(this),
-        start_date = moment().format("MM/DD/YY");
+    var $this = $(this);
 
     if ($this.data("datepicker")) {
       return;
     }
     $this.datepicker(format)
-         .datepicker("option", "minDate", start_date);
+         .datepicker("option", "minDate", new Date());
   });
 })(jQuery, moment);
