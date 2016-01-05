@@ -6,35 +6,17 @@
 }}
 
 <h6>Mapped objects</h6>
-<ul class="mapped-list">
+<ul class="attachment-list">
   {{#each mapped.objects}}
     <li>
-      <div class="custom-attr-wrap mapped">
-        <div class="row-fluid">
-          <div class="span12">
-            <div class="info-expand-mapped">
-              <a class="show-hidden-fields info-show-hide" href="javascript://">
-                <span class="out">
-                  <i class="grcicon-arrow-right"></i>
-                </span>
-                <span class="in">
-                  <i class="grcicon-arrow-bottom"></i>
-                </span>
-                <i class="grcicon-{{icon}}-color"></i>
-                {{title}}
-              </a>
-            </div>
-          </div>
-        </div><!-- row-fluid end -->
-        <div class="hidden-fields-area" style="display:none;">
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Description</h6>
-              {{description}}
-            </div>
-          </div><!-- row-fluid end -->
-        </div><!-- hidden-fields-area end -->
-      </div>
+      <span class="file-controls">
+        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+          <i class="grcicon-remove"></i>
+        </a>
+      </span>
+      <i class="grcicon-{{icon}}-color"></i>
+      {{title}}
+      <a class="more" href="javascript://" target="_blank"><i class="grcicon-goto"></i></a>
     </li>
   {{/each}}
 </ul>

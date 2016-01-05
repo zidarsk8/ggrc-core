@@ -11,6 +11,8 @@
     template: can.view("/static/mustache/mockup_base_templates/attachment_list.mustache"),
     scope: {
       title: "@",
+      icon: "@",
+      button: "@",
       types: "@",
       files: new can.List()
     },
