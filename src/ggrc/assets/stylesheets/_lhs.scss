@@ -33,30 +33,6 @@ h4.search-title {
   padding-left: 10px;
   padding-right: 4px;
   z-index: 2000;
-  .lhs-bg {
-    @include opacity(0.6);
-    margin-top:5px;
-    display:none;
-    float:right;
-    width:40px;
-    height:70px;
-    background:transparent image-url('bgnds/lhs-closed.png') no-repeat 0 0;
-  }
-  &.lhs-closed {
-    margin-left:-200px;
-    cursor:pointer;
-    overflow:hidden;
-    .lhs-bg {
-      display:block;
-    }
-    .lhs-search,
-    .lhs-nav {
-      display:none;
-    }
-    .top-level {
-      visibility:hidden;
-    }
-  }
   .lhs-search {
     @include clearfix();
     padding:10px 20px 10px 10px;
