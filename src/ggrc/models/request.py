@@ -177,6 +177,10 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
         (predicate(audit.Audit.slug) | predicate(audit.Audit.title))
     ).exists()
 
+  @classmethod
+  def default_request_type(cls):
+    return cls.VALID_TYPES[0]
+
 
 def _date_has_changes(attr):
   """Date fields are always interpreted as changed because incoming data is
