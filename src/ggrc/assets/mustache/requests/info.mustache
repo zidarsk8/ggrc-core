@@ -127,11 +127,11 @@
           <div class="tab-pane fade in active" id="tab1">
             {{#if_helpers '\
               ^if_equals' status 'Verified' '\
-              and ^if_equals' status 'Finished' }}
+              and ^if_equals' status 'Final' }}
             {{#is_allowed 'update' instance context='for'}}
-            <div class="tree-item-add">
-              <add-comment data="comments" source_mapping="instance" parent_instance="instance"></add-comment>
-            </div>
+              <div class="tree-item-add">
+                <add-comment data="comments" source_mapping="instance" parent_instance="instance"></add-comment>
+              </div>
             {{/is_allowed}}
             {{/if_equals}}
             {{{render "/static/mustache/base_templates/comment_list.mustache" instance=. update_count="false"}}}
