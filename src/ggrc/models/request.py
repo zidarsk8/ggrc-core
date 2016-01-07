@@ -187,6 +187,8 @@ def _date_has_changes(attr):
     of type datetime.datetime, while database field has type datetime.date.
     This function normalises this and performs the correct check.
   """
+  if not attr.history.added or not attr.history.deleted:
+    return False
   added, deleted = attr.history.added[0], attr.history.deleted[0]
   if isinstance(added, datetime.datetime):
     added = added.date()
