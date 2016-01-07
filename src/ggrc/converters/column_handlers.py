@@ -48,6 +48,7 @@ _column_handlers = {
     "request": handlers.RequestColumnHandler,
     "request_audit": handlers.RequestAuditColumnHandler,
     "requested_on": handlers.DateColumnHandler,
+    "request_type": handlers.RequestTypeColumnHandler,
     "response_type": handlers.ResponseTypeColumnHandler,
     "secondary_assessor": handlers.UserColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,
