@@ -26,7 +26,11 @@
 @import "compass/css3";
 //@import "bootstrap-wysihtml5-0.0.2";
 
+$fa-font-path: "/static/fonts";
+@import "font-awesome";
+
 @import "setup";
+@import "custom_font_awesome_icons";
 @import "common";
 @import "lhs";
 @import "layout";
@@ -43,15 +47,12 @@
 
 // page specific scss
 @import "reg-mapper";
-@import "pbc";
 
 @import "quick-search";
 @import "modal";
 
 @import "popover";
 @import "login";
-
-@import "icons";
 
 @import "responsive";
 @import "js-helpers";

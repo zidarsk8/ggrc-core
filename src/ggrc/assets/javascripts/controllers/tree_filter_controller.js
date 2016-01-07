@@ -28,9 +28,9 @@ can.Control("GGRC.Controllers.TreeFilter", {
 
       this.element.find('.filter-input').toggleClass("expression", is_expression);
       this.element.find('.filter-input span i')
-        .toggleClass("grcicon-expression-green", is_expression);
+        .toggleClass("fa-check-circle green", is_expression);
       this.element.find('.filter-input span i')
-        .toggleClass("grcicon-expression-black", !is_expression);
+        .toggleClass("fa-check-circle-o", !is_expression);
   }
   , apply_filter : function(filter_string){
       var current_filter = GGRC.query_parser.parse(filter_string),

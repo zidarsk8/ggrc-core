@@ -16,7 +16,7 @@
               <div class="span{{display_options.title_width}}">
                 <div class="title tree-title-area" rel="tooltip" data-placement="left" title="" data-original-title="{{instance.title}}">
                   {{#is_subtree}}
-                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                    <i class="fa fa-{{instance.class.table_singular}} color"></i>
                   {{/is_subtree}}
                   {{instance.title}}
                 </div>
@@ -145,14 +145,14 @@
                   {{/child_options}}
                   {{#if instance.viewLink}}
                     {{#is_allowed "view_object_page" instance}}
-                      <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                      <a href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
                     {{/is_allowed}}
                   {{/if}}
                 </div>
                 <ul class="tree-action-list">
                   {{#infer_roles instance}}
                     <li>
-                      <i class="grcicon-person-black" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
+                      <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
                     </li>
                   {{/infer_roles}}
                   <li>
@@ -164,7 +164,7 @@
                   {{^instance.contact}}
                     <li>
                       <div class="counter">
-                        <i class="grcicon-people-warning"></i>
+                        <i class="fa fa-person red"></i>
                       </div>
                     </li>
                   {{/instance.contact}}

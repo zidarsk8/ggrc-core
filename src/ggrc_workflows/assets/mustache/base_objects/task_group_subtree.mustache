@@ -11,7 +11,7 @@
         <div class="span11">
           <div class="row-fluid">
             <div class="span1">
-              <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+              <i class="fa fa-{{instance.class.table_singular}} color"></i>
             </div>
             <div class="span11">
               <span class="inline-data-content oneline" rel="tooltip" title="{{instance.title}}">
@@ -27,7 +27,7 @@
             {{#if mappings}}
               {{#is_allowed_all 'delete' mappings}}
                 <a href="javascript://" data-toggle="unmap" data-id="{{instance.id}}" data-type="{{instance.class.shortName}}" class="deleteTrigger">
-                  <i class="grcicon-deleted"></i>
+                  <i class="fa fa-trash"></i>
                   {{#result}}
                     <span class="result" {{data 'result'}}></span>
                   {{/result}}

@@ -16,7 +16,7 @@
       <label>
         Title
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label>
       <input data-id="title_txtbx" tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
       {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
@@ -27,7 +27,7 @@
     <div data-id="description_hidden" class="span6 hidable">
       <label>
         Description
-        <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
         <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
@@ -49,7 +49,7 @@
     <div data-id="test_plan_hidden" class="span6 hidable">
       <label>
         Test Plan
-        <i class="grcicon-help-black" rel="tooltip" title="Provide a test plan for this {{model.model_singular}}."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Provide a test plan for this {{model.model_singular}}."></i>
         <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
@@ -67,7 +67,7 @@
     <div data-id="note_hidden" class="span6 hidable">
       <label>
         Notes
-        <i class="grcicon-help-black" rel="tooltip" title="Append simple text or html notes here."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
         <a data-id="hide_note_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
@@ -79,7 +79,7 @@
         <div data-id="url_hidden" class="span12 hidable">
           <label>
             Control URL
-            <i class="grcicon-help-black" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
+            <i class="fa fa-question-circle" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
             <a data-id="hide_url_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <input data-id="url_txtbx" tabindex="6" class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
@@ -89,7 +89,7 @@
         <div data-id="reference_url_hidden" class="span12 hidable">
           <label>
             Reference URL
-            <i class="grcicon-help-black" rel="tooltip" title="Web links to other references."></i>
+            <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
             <a data-id="hide_reference_url_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <input data-id="reference_url_txtbx" tabindex="7" id="reference_url" class="input-block-level" placeholder="https://www.example.com/" name="reference_url" type="text" value="{{reference_url}}">
@@ -103,7 +103,7 @@
       <div data-id="code_hidden" class="span6 hidable">
         <label>
           Code
-          <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
           <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="CONTROL-XXX" type="text" value="{{slug}}">
@@ -113,7 +113,7 @@
       <div data-id="kind_nature_hidden" class="span3 hidable">
         <label>
           Kind/Nature
-          <i class="grcicon-help-black" rel="tooltip" title="Choose from the options in the drop down list, or leave this set to None."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Choose from the options in the drop down list, or leave this set to None."></i>
           <a data-id="hide_kind_nature_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="kind_nature_dd" tabindex="9">
@@ -123,7 +123,7 @@
       <div data-id="fraud_related_hidden" class="span3 hidable">
         <label>
           Fraud Related
-          <i class="grcicon-help-black" rel="tooltip" title="Is control fraud related?"></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Is control fraud related?"></i>
           <a data-id="hide_fraud_related_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <select data-id="fraud_related_dd" class="input-block-level" name="fraud_related" null-if-empty="null-if-empty" tabindex="10">
@@ -135,7 +135,7 @@
       <div data-id="significance_hidden" class="span3 hidable">
         <label>
           Significance
-          <i class="grcicon-help-black" rel="tooltip" title="Is this Control a Key Control?"></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Is this Control a Key Control?"></i>
           <a data-id="hide_significance_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <select data-id="significance_dd" class="input-block-level" name="key_control" null-if-empty="null-if-empty" tabindex="11">
@@ -147,7 +147,7 @@
       <div data-id="type_means_hidden" class="span3 hidable">
         <label>
           Type/Means
-          <i class="grcicon-help-black" rel="tooltip" title="Choose from the options in the drop down list, or leave this set to None."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Choose from the options in the drop down list, or leave this set to None."></i>
           <a data-id="hide_type_means_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="type_means_dd" tabindex="12">
@@ -159,18 +159,24 @@
       <div data-id="effective_date_hidden" class="span6 hidable">
         <label>
           Effective Date
-          <i class="grcicon-help-black" rel="tooltip" title="Enter the date this object becomes effective."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Enter the date this object becomes effective."></i>
           <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <input  tabindex="13" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+          <input  tabindex="13" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+        </div>
       </div>
       <div data-id="stop_date_hidden" class="span6 hidable">
         <label>
           Stop Date
-          <i class="grcicon-help-black" rel="tooltip" title="Enter the date the object stops being effective."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Enter the date the object stops being effective."></i>
           <a data-id="hide_stop_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <input data-id="stop_date_txtbx" tabindex="14" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+          <input data-id="stop_date_txtbx" tabindex="14" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+        </div>
       </div>
     </div>
 
@@ -178,7 +184,7 @@
       <div data-id="frequency_hidden" class="span4 hidable">
         <label>
           Frequency
-          <i class="grcicon-help-black" rel="tooltip" title="How often should this Control be re-evaluated?"></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="How often should this Control be re-evaluated?"></i>
           <a data-id="hide_frequency_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="frequency_dd" tabindex=15>
@@ -188,7 +194,7 @@
       <div data-id="assertions_hidden" class="span4 hidable">
         <label>
           Assertions
-          <i class="grcicon-help-black" rel="tooltip" title="Select control assertions."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Select control assertions."></i>
           <a data-id="hide_assertions_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
           <div data-id="assertions_dd" tabindex=16>
@@ -198,7 +204,7 @@
       <div data-id="categories_hidden" class="span4 hidable">
         <label>
           Categories
-          <i class="grcicon-help-black" rel="tooltip" title="Select control categories."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Select control categories."></i>
           <a data-id="hide_categories_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
           <div data-id="categories_dd" tabindex=17>
@@ -210,10 +216,10 @@
       <div data-id="principal_assessor_hidden" class="span4 hidable">
         <label>
           Principal Assessor
-          <i class="grcicon-help-black" rel="tooltip" title="Select primary person who is responsible for assessing this control."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Select primary person who is responsible for assessing this control."></i>
           <a data-id="hide_principal_assessor_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <i class="grcicon-person-green pull-left icon-field"></i>
+        <i class="fa fa-person green pull-left icon-field"></i>
         <div class="objective-selector">
           {{#using assessor=instance.principal_assessor}}
           <input data-id="principal_assessor_txtbx"  tabindex="18" type="text" name="principal_assessor.email" data-lookup="Person" class="span11 audit-selector search-icon" placeholder="Enter text to search for Principal Assessor" value="{{firstnonempty assessor.email ''}}">
@@ -223,10 +229,10 @@
       <div data-id="secondary_assessor_hidden" class="span4 hidable">
         <label>
           Secondary Assessor
-          <i class="grcicon-help-black" rel="tooltip" title="Select secondary person who is responsible for assessing this control."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Select secondary person who is responsible for assessing this control."></i>
           <a data-id="hide_secondary_assessor_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <i class="grcicon-person-green pull-left icon-field"></i>
+        <i class="fa fa-person green pull-left icon-field"></i>
         <div class="objective-selector">
           {{#using assessor=instance.secondary_assessor}}
           <input data-id="secondary_assessor_txtbx" tabindex="19" type="text" name="secondary_assessor.email" data-lookup="Person" class="span11 audit-selector search-icon" placeholder="Enter text to search for Secondary Assessor" value="{{firstnonempty assessor.email ''}}">
@@ -236,7 +242,7 @@
       <div data-id="state_hidden" class="span4 hidable">
         <label>
           State
-          <i class="grcicon-help-black" rel="tooltip" title="Indicates the status of this object."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
           <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <select data-id="state_dd" class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="20">

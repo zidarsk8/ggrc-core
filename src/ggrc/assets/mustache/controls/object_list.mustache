@@ -1,8 +1,8 @@
 {{!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: brad@reciprocitylabs.com
-    Maintained By: brad@reciprocitylabs.com
+    Maintained By: vladan@reciprocitylabs.com
 }}
 
 {{! dashboard object listing}}
@@ -23,7 +23,7 @@
           <div class="span1">
             <div class="counter">
               {{^contact}}
-                <i class="grcicon-people-warning"></i>
+                <i class="fa fa-person red"></i>
               {{/contact}}
             </div>
           </div>
@@ -37,7 +37,7 @@
         <div class="row-fluid">
           <div class="span6">
             <a href="{{viewLink}}" class="info-action">
-              <i class="grcicon-goto"></i>
+              <i class="fa fa-long-arrow-right"></i>
               View {{class.title_singular}}
             </a>
           </div>
@@ -45,7 +45,7 @@
           {{! UNMAP
           <div class="span6">
             <a href="javascript://" class="info-action unmap pull-right">
-              <i class="grcicon-remove"></i>
+              <i class="fa fa-ban"></i>
               Unmap
             </a>
           </div>
@@ -108,7 +108,7 @@
             </a>
             <span class="section-expander">
               <a href="javascript://" class="section-create" data-toggle="modal-ajax-form" data-modal-reset="reset" data-dirty="#category_controls, #combo" data-route="category_controls" data-modal-class="modal-wide" data-object-singular="Control" data-object-plural="controls">
-                <i class="grcicon-add-black"></i>
+                <i class="fa fa-plus-circle"></i>
                 Create Control
               </a>
             </span>

@@ -29,6 +29,7 @@ APPENGINE_ENV_DIR=$(DEV_PREFIX)/opt/gae_virtualenv
 APPENGINE_REQUIREMENTS_TXT=$(PREFIX)/src/requirements.txt
 
 FLASH_PATH=$(PREFIX)/src/ggrc/static/flash
+STATIC_PATH=$(PREFIX)/src/ggrc/static
 BOWER_PATH=$(PREFIX)/bower_components
 
 $(APPENGINE_SDK_PATH) : $(APPENGINE_ZIP_PATH)
@@ -153,9 +154,10 @@ bower_components : bower.json
 	mkdir -p $(FLASH_PATH)
 	bower install
 	cp $(BOWER_PATH)/zeroclipboard/dist/ZeroClipboard.swf $(FLASH_PATH)/ZeroClipboard.swf
+	cp -r $(BOWER_PATH)/fontawesome/fonts $(STATIC_PATH)
 
 clean_bower_components :
-	rm -rf $(BOWER_PATH) $(FLASH_PATH)
+	rm -rf $(BOWER_PATH) $(FLASH_PATH) $(STATIC_PATH)/fonts
 
 deploy : appengine_packages_zip bower_components src/ggrc/static/assets.manifest src/app.yaml
 

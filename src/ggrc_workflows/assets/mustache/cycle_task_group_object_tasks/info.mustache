@@ -24,7 +24,7 @@
           <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
             <li>
               <a href="javascript://" data-object-singular-override="Task for current Workflow Cycle" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{instance.class.model_singular}}" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
-                <i class="grcicon-edit"></i>
+                <i class="fa fa-pencil-square-o"></i>
                 Edit Task
               </a>
             </li>
@@ -35,7 +35,7 @@
             {{#is_allowed 'delete' instance}}
               <li>
                 <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                  <i class="grcicon-deleted"></i>
+                  <i class="fa fa-trash"></i>
                   Delete
                 </a>
               </li>
@@ -158,12 +158,12 @@
                 {{#if object.viewLink}}
                 <h6>Task to be performed on object</h6>
                 <p>
-                  <i class="grcicon-{{instance.object.reify.class.table_singular}}-color smallmargin"></i>
+                  <i class="fa fa-{{instance.object.reify.class.table_singular}} color smallmargin"></i>
                   <span class="cap">{{instance.object.reify.class.table_singular}}:</span>
                   {{#is_allowed "view_object_page" object}}
                     <a href="{{object.viewLink}}" rel="tooltip" data-original-title="View {{instance.object.reify.class.table_singular}}">
                       {{firstnonempty object.title instance.title}}
-                      <i class="grcicon-goto smallmargin"></i>
+                      <i class="fa fa-long-arrow-right smallmargin"></i>
                     </a>
                   {{else}}
                     {{firstnonempty object.title instance.title}}
@@ -190,7 +190,7 @@
               <p>
                 <a href="{{workflow.viewLink}}">
                   {{workflow.title}}
-                  <i class="grcicon-goto smallmargin"></i>
+                  <i class="fa fa-long-arrow-right smallmargin"></i>
                 </a>
               </p>
             </div>

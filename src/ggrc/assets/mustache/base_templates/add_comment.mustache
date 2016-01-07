@@ -12,7 +12,7 @@
           {{#with_mapping 'extended_folders' parent_instance}}
             {{#if extended_folders.length}}
               <ggrc-gdrive-picker-launcher
-                icon="attach"
+                icon="paperclip"
                 instance="instance"
                 folder_instance="parent_instance"
                 link_text="Attach evidence"
@@ -21,7 +21,7 @@
               </ggrc-gdrive-picker-launcher>
             {{else}}
               <ggrc-gdrive-picker-launcher
-                icon="attach"
+                icon="paperclip"
                 instance="instance"
                 link_text="Attach evidence"
                 deferred="true"
@@ -46,7 +46,7 @@
               {{#prune_context}}
                 <div class="objective-selector field-wrap top-spacing">
                   <input tabindex="3" type="text" name="instance" placeholder="Add URL">
-                  <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+                  <a href="javascript://" {{toggle_button}}><i class="fa fa-trash"></i></a>
                   <a href="javascript://" class="btn btn-small btn-success no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add URL</a>
                 </div>
                 <input type="hidden" name="role_name" value="Auditor" />
@@ -54,7 +54,7 @@
             </ggrc-quick-add>
           {{else}}
             <a href="javascript://" class="btn btn-draft btn-small {{toggle_button}}" data-type="url">
-              <i class="grcicon-link"></i> Attach URL
+              <i class="fa fa-link"></i> Attach URL
             </a>
         {{/toggle}}
         {{/is_allowed}}

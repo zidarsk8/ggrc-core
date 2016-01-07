@@ -19,7 +19,7 @@
           <label>
             {{title}}
             {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-            {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <input tabindex="{{add_index 20 @index}}" data-ram="{{@index}}" class="input-block-level" value="{{value}}" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text">
@@ -28,7 +28,7 @@
           <label>
             {{title}}
             {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-            {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <div class="wysiwyg-area">
@@ -39,7 +39,7 @@
           <label>
             {{title}}
             {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-            {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <select class="input-block-level" name="custom_attributes.{{id}}" null-if-empty="null-if-empty" tabindex="20">
@@ -56,7 +56,7 @@
               <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" type="checkbox"  {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
               {{title}}
               {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-              {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+              {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
               <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
             </label>
           </div>
@@ -65,11 +65,14 @@
         <label>
           {{title}}
           {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-          {{#helptext}}<i class="grcicon-help-black" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+          {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div class="date-area">
-          <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" value="{{value}}" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" value="{{value}}" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+          </div>
         </div>
         {{/case}}
         {{/switch}}

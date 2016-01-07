@@ -13,7 +13,7 @@
   {{^if new_object_form}}
     {{#if_in instance.status "Open,Final,Verified"}}
       <div class="alert warning">
-        <i class="grcicon-warning"></i>
+        <i class="fa fa-exclamation-triangle red"></i>
         You are about to move request from "{{instance.status}}" to "In Progress".
       </div>
     {{/if_in}}
@@ -25,7 +25,7 @@
       <label>
         Title
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label>
       <input data-id="title_txtbx" tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
     </div>
@@ -73,14 +73,20 @@
             Requested On
             <span class="required">*</span>
           </label>
-          <input tabindex="4" class="input-block-level date" name="requested_on" data-toggle="datepicker" data-before="due_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date requested_on}}">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input tabindex="4" class="input-block-level date" name="requested_on" data-toggle="datepicker" data-before="due_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date requested_on}}">
+          </div>
         </div>
         <div class="span6">
           <label>
             Due On
             <span class="required">*</span>
           </label>
-          <input tabindex="5" class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input tabindex="5" class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+          </div>
         </div>
       </div>
     </div>
@@ -103,7 +109,7 @@
           <div class="oneline">
             <a href="javascript://" class="unmap" data-toggle="unmap">
               <span class="result" {{data 'result'}}></span>
-              <i class="grcicon-deleted"></i>
+              <i class="fa fa-trash"></i>
             </a>
             {{#update_link .}}
               <a class="url" href="{{schemed_url link}}" target="_blank">
@@ -164,7 +170,7 @@
     <div class="span6 hidable">
       <label>
         Code
-        <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         <a href="javascript://" class="field-hide">hide</a>
       </label>
       <input tabindex="10" class="input-block-level" name="slug" placeholder="REQUEST-XXX" type="text" value="{{slug}}">
