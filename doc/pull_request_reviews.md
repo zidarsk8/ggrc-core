@@ -94,8 +94,10 @@ TODO: if PR is marked as "migration"
     _NOTE: You have to close all current incognito browsers to get a clean
     session._
 
-    After you have verified that everything works correctly, you can remove
-    the temporary branch used for the testing:
+    Test the pull request as decribed in
+    [Part 2](#how-to-properly-review-a-pull-request) of this guide. After you
+    have verified that everything works correctly, you can remove the temporary
+    branch that was used for the testing:
 
     ```console
     git checkout develop
@@ -140,5 +142,87 @@ git pr 5678
 
 This command will automatically fetch and checkout the branch containing the
 changes in the pull request 5678.
+
+\[[Back to top](#top)\]
+
+
+## How to properly review a pull request
+
+First of all, make sure that you have properly set up the local environment as
+described in
+[Part 1](#setting-up-and-tearing-down-the-environment-for-pr-testing). Then
+follow the guidelines described in the following sections.
+
+#### Reviewing a bugfix PR
+
+If reviewing a pull request that contains a bug fix, you **must** first
+reproduce the bug on the vanilla `develop` branch, i.e. the one without the PR
+branch merged. Only after the bug has been reproduced, you can actually verify
+that the PR indeed fixes something.
+
+It is highly recommended that you also test a few other application features
+that might have been affected by the same code changes.
+
+#### Reviewing a PR containing a database migration script
+
+TODO: Ivan?
+
+TODO: should we also add a section on DB upgrade/downgrade to Part 1 (seetting
+up) the dev environment?
+
+#### Acceptance criteria
+
+A pull request **must be rejected** if **any** of the following is true:
+
+* It does not do/fix what it claims to and/or it does that only partially,
+* The review reveals that the PR has introduced new issues,
+* At least one of the automatic checks on the continuous integration server
+  fails, i.e. the build is broken,
+* The new code contains severe readability, logical and/or architectural
+  issues,
+* The new code is not sufficiently covered with automated tests (subject to
+  exceptions, e.g. when a test would be disproportionally difficult and
+  time-consuiming to write, or for little UI changes like changing an icon or a
+  font color).
+
+The reviewer must mark the pull request with the `needs work` label, signalling
+to the author that the PR cannot yet been merged as-is, and additional changes
+are required. Along with the tagging, the reviewer should clearly explain why
+the PR has temporarily been rejected, and what needs to be done before it can
+be merged.
+
+On the other hand, if the PR looks good to merge, the reviewer expresses this
+by giving a thumb-up icon in a comment (:+1:). For this reason, the thumb-up
+icon _should not_ be used in other comments, as it might give a false
+impression that the pull request has been verified and confirmed.
+
+#### Using GitHub labels
+
+There are several labels defined on the GitHub project repository page that can
+(and should!) be used for tagging pull requests. Labeling enables easier PR
+categorization and searching, thus make sure to use them.
+
+The meaning of the lables and their intended usage is as follows (sorted
+alphabetically):
+
+* `documentation` - a PR contains the updates of project documentation,
+* `migration` - a PR contains a migration script that changes the database
+  schema. Such pull requests require additional setup and verification steps,
+* `needs work` - a reviewer has concluded that the PR requires additional work
+  before it can be accepted and merged,
+* `next release` - the PR will be merged after the next release and should not
+  be merged in the current release cycle,
+* `please review` - the author asked that the PR should be reviewed with a
+  higher pripority. This label is usually used when the PR has not received
+  enough attention for a considerable time period, or because it is important
+  and attempts to resolve an important/blocking issue,
+* `question` - a reviewer requires additional explanation from the PR author
+  before a decision can be made on whether the PR meets all the requirements.
+  Occasionally, this label is also used when a reviewer makes a non-essential
+  suggestion for a PR change, but that change is not required to deem the PR
+  ready to merge,
+* `wrong branch` - the author sent the PR to the wrong branch. The author
+  should re-issue the same PR against the correct branch.
+
 
 \[[Back to top](#top)\]
