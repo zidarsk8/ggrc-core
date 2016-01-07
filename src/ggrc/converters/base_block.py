@@ -39,6 +39,7 @@ class BlockConverter(object):
     rows (list of list of str): 2D array containg csv data
     row_converters (list of RowConverter): list of row convertor objects with
       data from the coresponding row in rows attribute
+    object_headers (dict): A dictionary containing object headers
     headers (dict): A dictionary containing csv headers with additional
       information. Keys are object attributes such as "title", "slug"...
       Example:
