@@ -36,7 +36,7 @@ class Converter(object):
       "Task Group Task",
   ]
 
-  priortiy_columns = [
+  priority_columns = [
       "email",
       "slug",
       "delete",
@@ -102,7 +102,7 @@ class Converter(object):
     self.drop_cache()
 
   def handle_priority_columns(self):
-    for attr_name in self.priortiy_columns:
+    for attr_name in self.priority_columns:
       for block_converter in self.block_converters:
         block_converter.handle_row_data(attr_name)
 
