@@ -22,6 +22,9 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return users
 
+  def set_value(self):
+    pass
+
   def set_obj_attr(self):
     self.value = self.parse_item()
 
