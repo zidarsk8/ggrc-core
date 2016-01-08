@@ -8,7 +8,6 @@
     CacheManager provides encapsulation to the caching mechanism used in GGRC for resource collection
 
 """
-from collections import OrderedDict
 from cache import all_cache_entries, all_mapping_entries
 
 class CacheManager:
