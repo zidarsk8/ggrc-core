@@ -43,9 +43,6 @@ WHITESPACE_WARNING = (u"Line {line}: Field {column_name} contains multiple"
 UNKNOWN_USER_WARNING = (u"Line {line}: Specified user '{email}' does not exist."
                         " That user will be ignored.")
 
-UNKNOWN_USER_ERROR = (u"Specified user '{email}' does not exist. That user will"
-                      " be ignored.")
-
 OWNER_MISSING = (u"Line {line}: Owner field does not contain a valid owner."
                  " You will be assigned as object owner.")
 
