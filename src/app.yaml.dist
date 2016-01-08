@@ -15,9 +15,8 @@ manual_scaling:
   instances: {MAX_INSTANCES}
 
 handlers:
-  - url: /(static/(fonts|images|flash).*)
-    static_files: ggrc/\1
-    upload: ggrc/static/(fonts|images|flash).*
+  - url: /static
+    static_dir: ggrc/static
     http_headers:
       Access-Control-Allow-Origin: '*'
 
