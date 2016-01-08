@@ -31,6 +31,8 @@ ggrc_global_npm_modules:
   - name: jasmine-core
   - name: mkdirp
   - name: bower
+  - name: eslint
+  - name: eslint-config-google
 
 ggrc_local_npm_modules:
   - name: karma
