@@ -8,6 +8,7 @@
 """Test request import and updates."""
 
 from ggrc import models
+from ggrc.converters import errors
 from integration.ggrc import converters
 
 
@@ -95,3 +96,64 @@ class TestRequestImport(converters.TestCase):
     self._test_request_users(request_2, users)
     self.assertEqual(request_2.status, "In Progress")
     self.assertEqual(request_2.request_type, "interview")
+
+  def test_request_warnings_errors(self):
+    """ Test full request import with warnings and errors
+
+    CSV sheet:
+      https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=889865936
+    """
+    self.import_file("request_full_no_warnings.csv")
+    response = self.import_file("request_with_warnings_and_errors.csv")
+    message_types = (
+        "block_errors",
+        "block_warnings",
+        "row_errors",
+        "row_warnings"
+    )
+
+    messages = {
+        "block_errors": set([]),
+        "block_warnings": set([
+            errors.UNKNOWN_COLUMN.format(
+                line=2,
+                column_name="error description - non existing column will be "
+                "ignored"
+            ),
+            errors.UNKNOWN_COLUMN.format(
+                line=2,
+                column_name="actual error ""message"
+            ),
+        ]),
+        "row_errors": set([
+            errors.UNKNOWN_OBJECT.format(
+                line=18,
+                object_type="Audit",
+                slug="not existing"
+            ),
+            errors.DUPLICATE_VALUE_IN_CSV.format(
+                line_list="19, 21",
+                column_name="Code",
+                value="Request 22",
+                s="",
+                ignore_lines="21",
+            ),
+        ]),
+        "row_warnings": set([
+            errors.UNKNOWN_USER_WARNING.format(
+                line=14,
+                email="non_existing@a.com",
+
+            ),
+            errors.UNKNOWN_OBJECT.format(
+                line=14,
+                object_type="Project",
+                slug="proj-55"
+            ),
+        ]),
+    }
+
+    for message_type in message_types:
+      self.assertEqual(len(set(response[0][message_type])),
+                       len(response[0][message_type]))
+      self.assertEqual(set(response[0][message_type]), messages[message_type])
