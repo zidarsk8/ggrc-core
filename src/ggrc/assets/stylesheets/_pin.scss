@@ -60,7 +60,11 @@
   float: right;
   li {
     float: left;
-    margin-left: 5px;
+    margin-left: 8px;
+    margin-top: 2px;
+    &:last-child {
+      margin-top: 0;
+    }
     &:first-child {
       margin-left: 0;
     }
@@ -94,11 +98,7 @@
   i {
     @include opacity(.25);
   }
-  .grcicon-done { background-position: -78px -416px; }
-  .grcicon-not-done { background-position: -102px -416px; }
   .active {
-    .grcicon-done { background-position: -30px -416px; }
-    .grcicon-not-done { background-position: -54px -416px; }
     i {
       @include opacity(1);
     }
@@ -189,6 +189,10 @@
       font-size: 10px;
     }
   }
+  .input-group {
+    float: left;
+    width: 68%;
+  }
   .disabled {
     cursor: default;
     @include opacity(.3);
@@ -265,6 +269,9 @@
         left: -25px;
       }
     }
+    [class*="fa-file-"] {
+      vertical-align: top;
+    }
     a {
       @extend %oneline;
       width: 68%;
@@ -308,9 +315,6 @@
             text-decoration: underline;
           }
         }
-      }
-      [class^="grcicon-"] {
-        margin-top: 1px;
       }
     }
   }

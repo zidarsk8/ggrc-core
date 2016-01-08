@@ -34,35 +34,35 @@
               %ul.menu
                 %li.black-link
                   %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax', 'data-modal-type': 'helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-                    %i.grcicon-help
+                    %i.fa.fa-question-circle.white
                     %span
                       Help
                 %li.black-link
                   %a#page-help{ 'href': "/dashboard#task_widget" }
-                    %i.grcicon-task
+                    %i.fa.fa-calendar-check-o
                     %span
                       My Tasks
                       %span.task-count
                 %li.user.dropdown.dropdown-black.black-link
                   %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
-                    %i.grcicon-user
+                    %i.fa.fa-person
                     %span
                       %strong
                         =current_user.email
-                    %i.grcicon-carot-white
+                    %i.fa.fa-caret-down.white
                   %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
                     %li
                       %a{'href': "/dashboard"}
-                        %i.grcicon-dashboard
+                        %i.fa.fa-home.orange
                         My Work ({{current_user.system_wide_role}})
                     -if permissions.is_allowed_read('/admin', 1)
                       %li
                         %a{'href': "/admin#people_list_widget"}
-                          %i.grcicon-admin
+                          %i.fa.fa-tachometer
                           Admin Dashboard
                     %li.notify-wrap
                       %span
-                        %i.grcicon-alarm
+                        %i.fa.fa-clock-o
                         Notifications
                       %div.inner-list
                         %label
@@ -88,14 +88,14 @@
                           Calendar notifications
                     %li.layout-wrap
                       %a.set-display-settings-default{'href': "javascript://", 'tabindex': "-1"}
-                        %i.grcicon-desktop
+                        %i.fa.fa-television
                         Save Layout
                       %a.clear-display-settings{'href': "javascript://", 'tabindex': "-1"}
-                        %i.grcicon-reset
+                        %i.fa.fa-ban.white
                         Reset Layout
                     %li.logout-wrap
                       %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
-                        %i.grcicon-logout
+                        %i.fa.fa-power-off
                         Logout
 
     .area{ 'class': '={ model_display_class }' }

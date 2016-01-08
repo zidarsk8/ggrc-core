@@ -12,47 +12,47 @@
 
   %span.title-content
     -if request.path.startswith('/admin')
-      %i.grciconlarge-dashboard
+      %i.fa.fa-tachometer
       Admin Dashboard
 
 %ul.menu
   %li
     %a{ 'href': 'javascript://', 'data-toggle': 'unified-search', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
-      %i.grcicon-search
+      %i.fa.fa-search
       %span
         Search
   %li
     %a#page-help{ 'href': "/dashboard#task_widget" }
-      %i.grcicon-task-black
+      %i.fa.fa-calendar-check-o
       %span
         My Tasks
         %span.task-count
   %li
     %a{ 'href': '/objectBrowser' }
-      %i.grcicon-search
+      %i.fa.fa-search
       %span
         All Objects
 
   %li.user.dropdown
     %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
-      %i.grcicon-user-black
+      %i.fa.fa-user
       %span
         =current_user.email
-      %i.grcicon-carot
+      %i.fa.fa-caret-down
     %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
       %li.full-opacity
         %a{'href': "/dashboard"}
-          %i.grcicon-my-work
+          %i.fa.fa-home.orange
           My Work ({{current_user.system_wide_role}})
 
       -if permissions.is_allowed_read('/admin', None, 1)
         %li
           %a{'href': "/admin#people_list_widget"}
-            %i.grcicon-dashboard-black
+            %i.fa.fa-tachometer
             Admin Dashboard
       %li.notify-wrap
         %span
-          %i.grcicon-alarm-black
+          %i.fa.fa-clock-o
           Notifications
         %div.inner-list
           %label
@@ -62,13 +62,6 @@
               'value': 'Email_Digest'
             }
             Daily email digest
-          %label.inner
-            %input{
-              'type': 'checkbox',
-              'name': 'notifications',
-              'value': 'Email_Now'
-            }
-            Real-time email updates
       %li
         %a{'href': "/import"}
           Data import
@@ -77,12 +70,12 @@
           Data export
       %li
         %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
-          %i.grcicon-logout-black
+          %i.fa.fa-power-off
           Logout
 
   -if self.page_help
     %li
       %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-        %i.grcicon-help-black
+        %i.fa.fa-question-circle
           %span
             Help

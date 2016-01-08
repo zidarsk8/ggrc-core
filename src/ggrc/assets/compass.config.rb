@@ -27,6 +27,7 @@ output_style = (environment == :production) ? :compressed : :expanded
 additional_import_paths = [
   "assets/stylesheets",
   "assets/vendor/bootstrap-sass/vendor/assets/stylesheets",
+  "../../bower_components/fontawesome/scss",
   ]
 
 sass_dir = "assets/stylesheets"

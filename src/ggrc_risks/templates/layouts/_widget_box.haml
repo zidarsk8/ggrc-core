@@ -31,15 +31,15 @@
             %a.active{ 'href': "javascript://" }
           -if widget_help is not none
             .widget-action.pull-right.widget-action-help
-              %a{ 'href': "javascript://", 
-                  'data-toggle': 'modal-ajax', 
-                  'rel': "tooltip", 
-                  'title': "Help", 
+              %a{ 'href': "javascript://",
+                  'data-toggle': 'modal-ajax',
+                  'rel': "tooltip",
+                  'title': "Help",
                   'data-placement': "top",
                   'data-modal-type' : "helpform",
                   'data-help-slug' : "={widget_id}"
                 }
-                %i.grcicon-help-black
+                %i.fa.fa-question-circle
           -block widget_actions
 
     -block widget_buttons

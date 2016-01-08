@@ -8,7 +8,7 @@
 {{!<div id='{ id }' class='modal modal-selector fade hide' tabindex='-1'>}}
     <div class="modal-header">
       <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
-        <i class="grcicon-x-grey"></i>
+        <i class="fa fa-times black"></i>
       </a>
       <h2>
         {{ modal_title }}
@@ -22,7 +22,7 @@
             Choose Auditor
             <span class="required">*</span>
           </label>
-          <i class="grcicon-person-green pull-left icon-field"></i>
+          <i class="fa fa-person green pull-left icon-field"></i>
           {{! `with_auditors` requires `authorizations` mapping, so preload it }}
           {{#with_mapping 'authorizations' instance}}
           {{#with_auditors instance}}

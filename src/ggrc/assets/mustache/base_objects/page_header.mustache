@@ -29,7 +29,7 @@
         </button>
       {{/system_role}}
       <span class="title-content">
-        <i class="grciconlarge-{{model.table_singular}}"></i>
+        <i class="fa fa-{{model.table_singular}}"></i>
         {{firstnonempty instance.name instance.email}}
       </span>
     {{/is_dashboard_or_all}}
@@ -42,7 +42,7 @@
       <span class="icon-bar"></span>
     </button>
     <span class="title-content">
-      <i class="grciconlarge-{{model.table_singular}}"></i>
+      <i class="fa fa-{{model.table_singular}}"></i>
       {{instance.title}}
     </span>
   {{/if_equals}}
@@ -50,13 +50,13 @@
 <ul class="menu">
   <li>
     <a href="javascript://" data-toggle="unified-search" data-join-object-type="MultitypeSearch" data-original-title="search items">
-      <i class="grcicon-search"></i>
+      <i class="fa fa-search"></i>
       <span>Search</span>
     </a>
   </li>
   <li>
     <a href="/dashboard#task_widget" id="page-help">
-      <i class="grcicon-task-black"></i>
+      <i class="fa fa-calendar-check-o"></i>
       <span>
         My Tasks
         <span class="task-count"></span>
@@ -66,14 +66,14 @@
   <li>
     {{#is_allobjectview}}
       <a id="myWorkView" href="/dashboard">
-        <i class="grcicon-my-work-black"></i>
+        <i class="fa fa-home"></i>
         <span>
           My Work
         </span>
       </a>
     {{else}}
       <a id="allObjectView" href="/objectBrowser">
-        <i class="grcicon-all-object"></i>
+        <i class="fa fa-files-o"></i>
         <span>
           All Objects
         </span>
@@ -82,38 +82,34 @@
   </li>
   <li class="user user-dropdown dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
-      <i class="grcicon-user-black"></i>
+      <i class="fa fa-person"></i>
       <span>{{current_user.email}}</span>
-      <i class="grcicon-carot"></i>
+      <i class="fa fa-caret-down"></i>
     </a>
     <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
       <li class="full-opacity">
         <a href="/dashboard">
-          <i class="grcicon-my-work"></i>
+          <i class="fa fa-home orange"></i>
           My Work ({{current_user.system_wide_role}})
         </a>
       </li>
       {{#current_user_is_admin}}
       <li>
         <a href="/admin#people_list_widget">
-          <i class="grcicon-dashboard-black"></i>
+          <i class="fa fa-tachometer"></i>
           Admin Dashboard
         </a>
       </li>
       {{/current_user_is_admin}}
       <li class="notify-wrap">
         <span>
-          <i class="grcicon-alarm-black"></i>
+          <i class="fa fa-clock-o"></i>
           Notifications
         </span>
         <div class="inner-list">
           <label>
             <input type="checkbox" name="notifications" value="Email_Digest">
             Daily email digest
-          </label>
-          <label class="inner disabled">
-            <input type="checkbox" name="notifications" value="Email_Now" disabled>
-            Real-time email updates
           </label>
         </div>
       </li>
@@ -129,7 +125,7 @@
       </li>
       <li>
         <a class="nav-logout" href="/logout" tabindex="-1">
-          <i class="grcicon-logout-black"></i>
+          <i class="fa fa-power-off"></i>
           Logout
         </a>
       </li>
@@ -137,7 +133,7 @@
   </li>
   <li>
     <a href="javascript://" id="#page-help" data-toggle="modal-ajax-helpform" data-help-slug="{{self.page_help()|trim}}">
-      <i class="grcicon-help-black"></i>
+      <i class="fa fa-question-circle"></i>
       <span>Help</span>
     </a>
   </li>

@@ -852,3 +852,26 @@ class DocumentsColumnHandler(ColumnHandler):
       return
     self.row_converter.obj.documents = self.value
     self.dry_run = True
+
+
+class RequestTypeColumnHandler(ColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self.key = key
+    valid_types = row_converter.object_class.VALID_TYPES
+    self.type_mappings = {str(s).lower(): s for s in valid_types}
+    super(RequestTypeColumnHandler, self).__init__(row_converter, key, **options)
+
+  def parse_item(self):
+    value = self.raw_value.lower()
+    req_type = self.type_mappings.get(value)
+
+    if req_type is None:
+      req_type = self.get_default()
+      if not self.row_converter.is_new:
+        req_type = self.get_value()
+      if value:
+        self.add_warning(errors.WRONG_VALUE,
+                         value=value[:20],
+                         column_name=self.display_name)
+    return req_type

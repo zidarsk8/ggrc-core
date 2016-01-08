@@ -17,20 +17,6 @@ ul.new-tree {
       float: none;
       clear: both;
     }
-    &.active {
-      .tier-trigger {
-        @include background-size(17px 12px);
-        background: image-url('grcicons/open.png') no-repeat 20px center;
-      }
-    }
-    .tier-trigger {
-      float: left;
-      @include background-size(17px 12px);
-      background: image-url('grcicons/not-open.png') no-repeat 20px center;
-      width: 17px;
-      height: 30px;
-      padding-left: 20px;
-    }
   }
   .select {
     overflow: hidden;
@@ -470,14 +456,16 @@ ul.new-tree {
         margin: 0 10px;
         border-bottom: 1px solid $itemBorder;
         > .openclose {
-          .grcicon-arrow-right {
+          .fa-caret-right {
             @include opacity(0.25);
             margin: 5px 0 0 4px;
           }
           &.active {
-            .grcicon-arrow-right {
+            .fa-caret-right {
               @include opacity(1);
-              background-position: -102px -80px;
+              &:before {
+                content: $fa-var-caret-down;
+              }
             }
           }
         }
@@ -969,13 +957,9 @@ ul.new-tree {
             padding: 0;
           }
           .openclose {
-            .grcicon-arrow-right {
-              background-position: -78px -80px;
-            }
             &.active {
-              .grcicon-arrow-right {
+              .fa-caret-right {
                 @include opacity(1);
-                background-position: -126px -80px;
               }
             }
           }
@@ -1218,7 +1202,7 @@ ul.new-tree {
   text-transform:uppercase;
   font-weight:bold;
   color:#111;
-  i.grcicon-edit {
+  i.fa-pencil-square-o {
     margin-top:5px;
   }
   &:hover {
@@ -1408,9 +1392,9 @@ ul.new-tree {
         }
         &.active {
           color: $black;
-          .icon-share {
+          .fa-link {
             @include opacity(1);
-            background-position: -270px -416px;
+            color: $green;
           }
         }
       }

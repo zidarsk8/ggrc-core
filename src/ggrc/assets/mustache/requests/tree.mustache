@@ -15,7 +15,7 @@
             <div class="span{{display_options.title_width}}">
               <div class="title tree-title-area">
                 {{#is_subtree}}
-                  <i class="grcicon-{{instance.request_type}}"></i>
+                  <i class="fa fa-{{instance.request_type}}"></i>
                 {{/is_subtree}}
                 <span>{{instance.title}}</span>
               </div>
@@ -58,7 +58,7 @@
                             {{/using}}
                           {{/case}}
                           {{#case 'mapped_responses'}}
-                            <i rel="tooltip" data-placement="right" {{#if_equals instance.request_type "documentation"}}data-original-title="# of attached documents" class="grcicon-directive-black"{{else}}data-original-title="# of attached meetings" class="grcicon-interview"{{/if_equals}}></i>
+                            <i rel="tooltip" data-placement="right" {{#if_equals instance.request_type "documentation"}}data-original-title="# of attached documents" class="fa fa-files-o"{{else}}data-original-title="# of attached meetings" class="fa fa-calendar"{{/if_equals}}></i>
                             <span class="counter">
                               {{#child_options}}
                                 {{#with_mapping_count instance mapping}}
@@ -84,7 +84,7 @@
               <div class="show-details">
                 {{#if instance.viewLink}}
                   {{#is_allowed "view_object_page" instance}}
-                    <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                    <a href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
                   {{/is_allowed}}
                 {{/if}}
               </div>
