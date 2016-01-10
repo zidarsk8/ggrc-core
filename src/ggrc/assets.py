@@ -27,10 +27,13 @@ from . import settings
 
 # Initialize webassets to handle the asset pipeline
 import webassets
+import os
+import yaml
+import imp
 
 environment = webassets.Environment()
-
-environment.manifest = 'file:assets.manifest'
+manifest = os.path.join(settings.BASE_DIR, 'ggrc', 'assets', 'assets.manifest')
+environment.manifest = 'file:' + manifest
 environment.versions = 'hash:32'
 
 # `asset-debug` mode doesn't merge bundles into a single file
@@ -44,7 +47,7 @@ import webassets.updater
 environment.updater = webassets.updater.TimestampUpdater()
 
 # Read asset listing from YAML file
-import os, yaml, imp
+
 assets_yamls = [os.path.join(settings.MODULE_DIR, 'assets', 'assets.yaml'),]
 
 module_load_paths = [settings.MODULE_DIR, ]
