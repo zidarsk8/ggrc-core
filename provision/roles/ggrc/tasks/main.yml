@@ -4,11 +4,6 @@
 # Maintained By: goran@reciprocitylabs.com
 
 ---
-- name: install requirements
-  sudo: yes
-  pip:
-    requirements: "/vagrant/src/requirements.txt"
-
 - name: install packages
   sudo: yes
   with_items: ggrc_packages
