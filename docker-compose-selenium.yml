@@ -1,0 +1,23 @@
+dev:
+  build: .
+  command: /sbin/my_init
+  volumes:
+   - ".:/vagrant"
+   - "./provision/docker/mysql:/etc/mysql/conf.d"
+  privileged: true
+  environment:
+   - PYTHONDONTWRITEBYTECODE=true
+
+selenium:
+  build: .
+  dockerfile: Dockerfile-selenium
+  ports:
+   - "4444:4444"
+  volumes:
+   - "./test/selenium:/selenium"
+   - "/dev/shm:/dev/shm"
+  links:
+   - dev 
+  environment:
+   - PYTHONDONTWRITEBYTECODE=true
+   - PYTHONPATH=/selenium/src

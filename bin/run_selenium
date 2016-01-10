@@ -11,7 +11,7 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/.."
 
-docker-compose up --force-recreate -d
+docker-compose -f docker-compose-selenium.yml up --force-recreate -d
 
 # This provisioning is needed until the provision script stops changing the
 # /vagrant folder and so the containe can then be propperly provisioned with
