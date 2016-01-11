@@ -13,7 +13,11 @@ PASS_PREFIX="$(tput bold)$(tput setaf 2)PASS$(tput sgr0)"
 
 # runs ESLint on the sources and extract the number of code style issues found
 function eslint_issues() {
-  eslint --format compact src/ | tail -1 | cut -d' ' -f1
+  ISSUES_FOUND=$(eslint --format compact src/ | tail -1 | cut -d' ' -f1)
+  if [[ -z "$ISSUES_FOUND" ]]; then
+    ISSUES_FOUND=0
+  fi
+  echo $ISSUES_FOUND
 }
 
 function print_usage() {
@@ -26,26 +30,31 @@ TARGET_BRANCH="develop"
 
 
 # parse the command line options
-while [[ "$#" -gt 1 ]]
+while [[ "$#" -gt 0 ]]
 do
-    OPT_NAME="$1"
+  OPT_NAME="$1"
 
-    case $OPT_NAME in
-        -t|--merge-target)
-        TARGET_BRANCH="$2"
-        shift  # extra shift for the current options's value
-        ;;
+  case $OPT_NAME in
+    -t|--merge-target)
+    if [[ "$#" -lt 2 ]]; then  # option value not specified
+      print_usage
+      exit 1
+    fi
+    TARGET_BRANCH="$2"
+    shift  # extra shift for the current options's value
+    ;;
 
-        -h|--help)
-        print_usage
-        exit
-        ;;
+    -h|--help)
+    print_usage
+    exit
+    ;;
 
-        *)  # an unknown option found
-        print_usage
-        exit 1
-        ;;
-    esac
+    *)  # an unknown option found
+    echo "Unknown option: $1"
+    print_usage
+    exit 1
+    ;;
+  esac
 
     shift  # drop the just-processed option/argument
 done
