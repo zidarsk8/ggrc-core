@@ -1,0 +1,30 @@
+Object type,"This needs to be imported after 
+request_fill_no_warnings
+",,,These are the expected warnings,,,,,,,,,,,,
+Request,Code*,Audit*,Title*,Error description - non existing column will be ignored,Actual Error message,Notes,Status*,Assignee*,Requester*,Verifier,Request Type*,Requested On*,Due On*,Test,map:project,map: Market
+,Request 2,Audit,Request title 2,"you are not verifier, you can not verify this request",,notes 2,Verified,user1@a.com,user2@a.com,user3@a.com,interviEW,7/2/2015,5/12/2016,Test text 2,,
+,Request 3,Audit,Request title 3,"this request has changed and can not be verified in the first step, verification will 
+be done only upon re-importing this csv", ,changed notes,verified,user1@a.com,user2@a.com,user@example.com,Documentation,7/3/2015,5/13/2016,Test text 3,,
+,Request 4,Audit,Request title 4,This should work and the state will be changed to verified,,notes 4,Verified,user1@a.com,user2@a.com,user@example.com,Interview,7/4/2015,5/14/2016,Test text 4,,
+,Request 5,Audit,Request title 1,State can not be verified if there is no verifier.,Could not change request state to verified.  There is no designated verifier for the request.,,Verified,user1@a.com,user2@a.com,,Interview,7/5/2015,5/15/2016,,,
+,Request 6,Audit,Request title 2,State can not be set to final if there is a verifier.,"Could not change request state to final.  When there are designated verifiers, the valid end state can only be 'verified'. ",,Final,user1@a.com,user2@a.com,user@example.com,Interview,7/6/2015,5/16/2016,,,
+,Request 7,Audit,Request title 3,No verifier and state going from open to final is fine,,,Final,user1@a.com,user2@a.com,,Interview,7/7/2015,5/17/2016,,,
+,Request 8,Audit,Request title 4,This works normally.,,,Finished,user1@a.com,user2@a.com,user@example.com,Interview,7/8/2015,5/18/2016,,,
+,Request 9,Audit,Request title 5,Invalid state finished if there is no verifier - shows only on change,,,finisHED,user1@a.com,user2@a.com,,Interview,7/9/2015,5/19/2016,,,
+,Request 10,Audit,Request title 6,"This works because the change is removing verifier, and state does not change",,,Finished,user1@a.com,user2@a.com,,Interview,7/10/2015,5/20/2016,,,
+,Request 11,Audit,Request title 7,State can not transition back to open,,,open,user1@a.com,user2@a.com,user@example.com,Interview,7/11/2015,5/21/2016,,,
+,Request 12,Audit,Request title 8,"State will be changed to in-progress, because of the updates to request.",,changes,Open,user1@a.com,user2@a.com,user@example.com,Interview,7/12/2015,5/22/2016,,,
+,Request 17,Audit,Request title 1,"proj-55 does not exist
+non_existing@a.com does not exist ", --- already exists ---,notes 1,OPEN,"user1@a.com
+user2@a.com","user2@a.com
+user3@a.com","user3@a.com
+non_existing@a.com",docuMEntation,7/1/2015,5/11/2016,Test text 1,proj-55,mkt-1
+,Request 18,Audit,Request title 2,Missing requested on date - will default to today,,notes 2,In Progress,user1@a.com,user2@a.com,user3@a.com,interviEW,,5/12/2016,Test text 2,proj-1,mkt-2
+,Request 19,Audit,Request title 3,"Missing requested on and due on dates, default today",,notes 3,In Progress,user1@a.com,user2@a.com,user3@a.com,interviEW,,,Test text 3,,
+,Request 20,Audit,Request title 4,Missing request type - will take default , --- already exists ---,notes 4,oPEN,user1@a.com,user2@a.com,user3@a.com,,7/4/2015,5/14/2016,Test text 4,,
+,Request 21,not existing,Request title 5,Not existing audit does not exist, --- already exists ---,notes 5,In Progress,user1@a.com,user2@a.com,user3@a.com,interviEW,7/5/2015,5/15/2016,Test text 5,,
+,Request 22,Audit,same title no warning,"Can not set a state of a new request to verified or finished, because adding a new 
+one is treated the same as updating an old one, except all values are new",,notes 3,Final,user1@a.com,user2@a.com,user@example.com,Documentation,7/3/2015,5/13/2016,Test text 3,proj-2,mkt-3
+,Request 23,Audit,same title no warning,"Can not set a state of a new request to verified or finished, because adding a new 
+one is treated the same as updating an old one, except all values are new",,notes 4,Verified,user1@a.com,user2@a.com,user3@a.com,Interview,7/4/2015,5/14/2016,Test text 4,proj-3,
+,Request 22,Audit,Request title 1,Duplicate code line will be ignored, --- already exists ---,,Verified,user1@a.com,user2@a.com,,Interview,7/5/2015,5/15/2016,,,

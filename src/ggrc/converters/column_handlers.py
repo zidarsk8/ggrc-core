@@ -5,6 +5,7 @@
 
 
 from ggrc.converters.handlers import handlers
+from ggrc.converters.handlers import request
 from ggrc.converters.handlers import related_person
 from ggrc.extensions import get_extension_modules
 
@@ -55,6 +56,7 @@ _column_handlers = {
     "slug": handlers.SlugColumnHandler,
     "start_date": handlers.DateColumnHandler,
     "status": handlers.StatusColumnHandler,
+    "request_status": request.RequestStatusColumnHandler,
     "test_plan": handlers.TextareaColumnHandler,
     "title": handlers.RequiredTextColumnHandler,
     "url": handlers.TextColumnHandler,
