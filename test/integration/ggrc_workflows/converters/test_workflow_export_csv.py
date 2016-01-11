@@ -286,3 +286,55 @@ class TestExportMultipleObjects(TestCase):
     users = response.splitlines()[2:-2]
     expected = [",user20@ggrc.com"] * 10
     self.assertEqual(expected, users)
+
+  def test_wf_indirect_relevant_filters(self):
+    """ test related filter for indirect relationships on wf objects """
+    block = lambda obj: {
+        "object_name": obj,
+        "fields": ["slug"],
+        "filters": {
+            "expression": {
+                "object_name": "Policy",
+                "op": {"name": "relevant"},
+                "slugs": ["p1"],
+            },
+        },
+    }
+
+    data = [
+        block("Workflow"),
+        block("Cycle"),
+        block("CycleTaskGroupObjectTask"),
+    ]
+    response = self.export_csv(data).data
+
+    self.assertEqual(1, response.count("wf-"))
+    self.assertIn(",wf-1", response)
+
+    self.assertEqual(1, response.count("CYCLE-"))
+    self.assertIn("CYCLE-1", response)
+
+    self.assertEqual(2, response.count("CYCLETASK-"))
+    self.assertIn("CYCLETASK-1", response)
+    self.assertIn("CYCLETASK-2", response)
+
+    destinations = [
+        ("Workflow", "wf-1", 3),
+        ("Cycle", "CYCLE-1", 3),
+        ("CycleTaskGroupObjectTask", "CYCLETASK-1", 1),
+    ]
+    for object_name, slug, count in destinations:
+      data = [{
+          "object_name": "Policy",
+          "fields": ["slug"],
+          "filters": {
+              "expression": {
+                  "object_name": object_name,
+                  "op": {"name": "relevant"},
+                  "slugs": [slug],
+              },
+          },
+      }]
+      response = self.export_csv(data).data
+      self.assertEqual(count, response.count(",p"), "Count for " + object_name)
+      self.assertIn(",p1", response)
