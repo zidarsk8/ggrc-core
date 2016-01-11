@@ -7,6 +7,8 @@
 
 """Test request import and updates."""
 
+from nose.plugins import skip
+
 from ggrc import models
 from ggrc.converters import errors
 from integration.ggrc import converters
@@ -97,6 +99,51 @@ class TestRequestImport(converters.TestCase):
     self.assertEqual(request_2.status, "In Progress")
     self.assertEqual(request_2.request_type, "interview")
 
+  def test_request_import_states(self):
+    """ Test Request state imports
+
+    These tests are an intermediate part for zucchini release and will be
+    updated in the next release.
+
+    CSV sheet:
+      https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=299569476
+    """
+    self.import_file("request_full_no_warnings.csv")
+    response = self.import_file("request_update_intermediate.csv")
+    message_types = (
+        "block_errors",
+        "block_warnings",
+        "row_errors",
+        "row_warnings"
+    )
+
+    messages = {
+        "block_errors": set(),
+        "block_warnings": set(),
+        "row_errors": set(),
+        "row_warnings": set([
+            errors.REQUEST_INVALID_STATE.format(line=5),
+            errors.REQUEST_INVALID_STATE.format(line=6),
+            errors.REQUEST_INVALID_STATE.format(line=11),
+            errors.REQUEST_INVALID_STATE.format(line=12),
+        ]),
+    }
+
+    for message_type in message_types:
+      self.assertEqual(len(set(response[0][message_type])),
+                       len(response[0][message_type]))
+      self.assertEqual(set(response[0][message_type]), messages[message_type])
+
+    requests = {r.slug: r for r in models.Request.query.all()}
+    self.assertEqual(requests["Request 60"].status, "Open")
+    self.assertEqual(requests["Request 61"].status, "In Progress")
+    self.assertEqual(requests["Request 62"].status, "Finished")
+    self.assertEqual(requests["Request 63"].status, "In Progress")
+    self.assertEqual(requests["Request 64"].status, "In Progress")
+    self.assertEqual(requests["Request 3"].status, "In Progress")
+    self.assertEqual(requests["Request 4"].status, "In Progress")
+
+  @skip.SkipTest
   def test_request_warnings_errors(self):
     """ Test full request import with warnings and errors
 
