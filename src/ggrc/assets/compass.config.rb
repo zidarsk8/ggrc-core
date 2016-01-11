@@ -21,7 +21,7 @@ cache_path = "/tmp/.sass-cache"
 
 sass_options = {
   :debug_info => true,
-  }
+}
 
 output_style = (environment == :production) ? :compressed : :expanded
 additional_import_paths = [

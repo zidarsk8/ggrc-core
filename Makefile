@@ -121,7 +121,7 @@ setup_dev : dev_virtualenv_packages linked_packages
 ## Deployment!
 
 src/ggrc/assets/stylesheets/dashboard.css : src/ggrc/assets/stylesheets/*.scss
-	bin/build_compass
+	bin/build_compass -e production --force
 
 src/ggrc/assets/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/ggrc/assets
 	source "bin/init_env"; \
