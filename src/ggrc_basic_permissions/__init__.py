@@ -213,10 +213,12 @@ def load_permissions_for(user):
       # remove all permissions related keys from memcache
       cached_keys_set.add(key)
       cache.set('permissions:list', cached_keys_set, PERMISSION_CACHE_TIMEOUT)
-    elif cache.get(key):
-      # If the key is both in permissions:list and in memcache itself
-      # it is safe to return the cached permissions
-      return cache.get(key)
+    else:
+      permissions_cache = cache.get(key)
+      if permissions_cache:
+        # If the key is both in permissions:list and in memcache itself
+        # it is safe to return the cached permissions
+        return permissions_cache
 
   # Add default `Help` and `NotificationConfig` permissions for everyone
   # FIXME: This should be made into a global base role so it can be extended
