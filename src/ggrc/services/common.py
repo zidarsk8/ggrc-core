@@ -240,6 +240,7 @@ def update_memcache_after_commit(context):
     if delete_result is not True:
       current_app.logger.error("CACHE: Failed to remove status entries from cache")
 
+  clear_permission_cache()
   cache_manager.clear_cache()
 
 def build_cache_status(data, key, expiry_timeout, status):
@@ -327,6 +328,16 @@ def log_event(session, obj=None, current_user_id=None):
         context_id=context_id)
     event.revisions = revisions
     session.add(event)
+
+def clear_permission_cache():
+  if not getattr(settings, 'MEMCACHE_MECHANISM', False):
+    return
+  cache = _get_cache_manager().cache_object.memcache_client
+  cached_keys_set = cache.get('permissions:list') or set()
+  cached_keys_set.add('permissions:list')
+  # We delete all the cached user permissions as well as
+  # the permissions:list value itself
+  cache.delete_multi(cached_keys_set)
 
 class ModelView(View):
   DEFAULT_PAGE_SIZE = 20
