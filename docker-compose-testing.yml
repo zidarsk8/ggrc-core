@@ -11,8 +11,6 @@ dev:
 selenium:
   build: .
   dockerfile: Dockerfile-selenium
-  ports:
-   - "4444:4444"
   volumes:
    - "./test/selenium:/selenium"
    - "/dev/shm:/dev/shm"
