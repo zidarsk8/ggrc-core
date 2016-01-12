@@ -3,24 +3,22 @@
 # Created By: andraz@reciprocitylabs.com
 # Maintained By: andraz@reciprocitylabs.com
 
-import logging
-from collections import namedtuple
-
-from sqlalchemy import and_
-
 from datetime import datetime
+from ggrc import db
 from ggrc import models
+from ggrc.automapper.rules import rules
+from ggrc.login import get_current_user
 from ggrc.models.relationship import Relationship
 from ggrc.models.request import Request
-from ggrc.services.common import Resource
-from ggrc import db
-from ggrc.automapper.rules import rules
-from ggrc.utils import benchmark, with_nop
 from ggrc.rbac.permissions import is_allowed_update
-from ggrc.login import get_current_user
+from ggrc.services.common import Resource
+from ggrc.utils import benchmark, with_nop
+from sqlalchemy.sql.expression import tuple_
+import collections
+import logging
 
 
-class Stub(namedtuple("Stub", ["type", "id"])):
+class Stub(collections.namedtuple("Stub", ["type", "id"])):
 
   @classmethod
   def from_source(cls, relationship):
@@ -36,7 +34,7 @@ class AutomapperGenerator(object):
     self.relationship = relationship
     self.processed = set()
     self.queue = set()
-    self.cache = dict()
+    self.cache = collections.defaultdict(set)
     self.auto_mappings = set()
     if use_benchmark:
       self.benchmark = benchmark
@@ -46,22 +44,35 @@ class AutomapperGenerator(object):
   def related(self, obj):
     if obj in self.cache:
       return self.cache[obj]
+    # Pre-fetch neighbourhood for enqueued object since we're gonna need that
+    # results in a few steps. This drastically reduces number of queries.
+    stubs = {s for rel in self.queue for s in rel}
+    stubs.add(obj)
     # Union is here to convince mysql to use two separate indices and
     # merge te results. Just using `or` results in a full-table scan
     relationships = Relationship.query.filter(
-        and_(Relationship.source_type == obj.type,
-             Relationship.source_id == obj.id),
+        tuple_(Relationship.source_type, Relationship.source_id).in_(
+            [(s.type, s.id) for s in stubs]
+        )
     ).union_all(
         Relationship.query.filter(
-            and_(Relationship.destination_type == obj.type,
-                 Relationship.destination_id == obj.id))
+            tuple_(Relationship.destination_type,
+                   Relationship.destination_id).in_(
+                [(s.type, s.id) for s in stubs]
+            )
+        )
     ).all()
-    res = set((Stub.from_destination(r)
-               if r.source_type == obj.type and r.source_id == obj.id
-               else Stub.from_source(r))
-              for r in relationships)
-    self.cache[obj] = res
-    return res
+    for r in relationships:
+      src = Stub.from_source(r)
+      dst = Stub.from_destination(r)
+      # only store a neighbour if we queried for it since this way we know
+      # we'll be storing complete neighbourhood by the end of the loop
+      if src in stubs:
+        self.cache[src].add(dst)
+      if dst in stubs:
+        self.cache[dst].add(src)
+
+    return self.cache[obj]
 
   def relate(self, src, dst):
     if src < dst:
@@ -125,7 +136,7 @@ class AutomapperGenerator(object):
           "status": None,
           "automapping_id": self.relationship.id}
           for src, dst in self.auto_mappings
-          if (src, dst) != original])) # (src, dst) is sorted
+          if (src, dst) != original]))  # (src, dst) is sorted
 
   def _step(self, src, dst):
       explicit, implicit = rules[src.type, dst.type]
@@ -193,10 +204,12 @@ def register_automapping_listeners():
   @Resource.model_put_after_commit.connect_via(Request)
   def handle_request(sender, obj=None, src=None, service=None):
     if obj is None:
-      logging.warning("Automapping request listener: no obj, no mappings created")
+      logging.warning("Automapping request listener: "
+                      "no obj, no mappings created")
       return
     if obj.audit is None:
-      logging.warning("Automapping request listener: no audit, no mappings created")
+      logging.warning("Automapping request listener: "
+                      "no audit, no mappings created")
       return
     rel = Relationship(source_type=obj.type,
                        source_id=obj.id,
