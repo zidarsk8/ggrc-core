@@ -5,7 +5,7 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
-// container size
+// Container styling
 .container-fluid {
   margin: 0 auto;
   &.resizable {
@@ -13,30 +13,13 @@
   }
 }
 
-.lhs-holder {
-  position: fixed;
-  top: 128px;
-  left: -240px;
-  width: 240px;
-  height: 548px;
-  overflow-y: auto;
-  background: $white;
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
-  }
+// Header styling
+.header.main {
+  height: 48px;
 }
 
-.lhn-type {
-  position: fixed;
-  top: 94px;
-  left: -246px;
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
-  }
-}
-
-.area {
-  margin-left: 0px;
+#page-header {
+  position: relative;
 }
 
 .header-content {
@@ -48,14 +31,7 @@
   border-bottom: 1px solid $headerBorder;
 }
 
-.top-inner-nav {
-  @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
-  width: 100%;
-  z-index: 1;
-  top: 48px;
-  background: $tabBgnd;
-}
-
+// Content styling
 .object-area {
   overflow-y: auto;
   overflow-x: hidden;
@@ -97,7 +73,38 @@
   }
 }
 
+// Footer styling
 .footer {
   margin-top: 500px;
   overflow: hidden;
+}
+
+.lhs-holder {
+  position: fixed;
+  top: 128px;
+  left: -240px;
+  width: 240px;
+  height: 548px;
+  overflow-y: auto;
+  background: $white;
+  &.active {
+    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
+  }
+}
+
+.lhn-type {
+  position: fixed;
+  top: 94px;
+  left: -246px;
+  &.active {
+    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
+  }
+}
+
+.top-inner-nav {
+  @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
+  width: 100%;
+  z-index: 1;
+  top: 48px;
+  background: $tabBgnd;
 }
