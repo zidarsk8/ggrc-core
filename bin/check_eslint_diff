@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: peter@reciprocitylabs.com
+# Maintained By: peter@reciprocitylabs.com
+
+set -o nounset
+set -o errexit
+
+FAIL_PREFIX="$(tput bold)$(tput setaf 1)FAIL$(tput sgr0)"
+PASS_PREFIX="$(tput bold)$(tput setaf 2)PASS$(tput sgr0)"
+
+# runs ESLint on the sources and extract the number of code style issues found
+function eslint_issues() {
+  ISSUES_FOUND=$(eslint --format compact src/ | tail -1 | cut -d' ' -f1)
+  if [[ -z "$ISSUES_FOUND" ]]; then
+    ISSUES_FOUND=0
+  fi
+  echo $ISSUES_FOUND
+}
+
+function print_usage() {
+  echo $"Usage: $0 [-t BRANCH_NAME] [--merge-target BRANCH_NAME]"
+}
+
+
+# the name of the branch the current branch will be merged into
+TARGET_BRANCH="develop"
+
+
+# parse the command line options
+while [[ "$#" -gt 0 ]]
+do
+  OPT_NAME="$1"
+
+  case $OPT_NAME in
+    -t|--merge-target)
+    if [[ "$#" -lt 2 ]]; then  # option value not specified
+      print_usage
+      exit 1
+    fi
+    TARGET_BRANCH="$2"
+    shift  # extra shift for the current options's value
+    ;;
+
+    -h|--help)
+    print_usage
+    exit
+    ;;
+
+    *)  # an unknown option found
+    echo "Unknown option: $1"
+    print_usage
+    exit 1
+    ;;
+  esac
+
+    shift  # drop the just-processed option/argument
+done
+
+
+echo "*** Javascript code style check ***"
+
+
+# move to the project root directory
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+cd "${SCRIPTPATH}/../"
+
+
+# Determine the number of JS code issues at the point the PR branch was
+# forked off from the $TARGET_BRANCH branch (i.e. the merge base)
+MERGE_BASE_HASH=$(git merge-base "$TARGET_BRANCH" HEAD)
+
+echo -n "Checking out the merge base of $TARGET_BRANCH and the current branch"
+echo -n " (${MERGE_BASE_HASH:0:7})..."
+git checkout --quiet "$MERGE_BASE_HASH"
+echo " DONE"
+
+echo -n "Running ESLint on the merge base commit (${MERGE_BASE_HASH:0:7})... "
+N_ISSUES_BASE=$(eslint_issues)
+echo "found $N_ISSUES_BASE issue(s)"
+
+
+# Go back to the previous branch, which is the PR branch itself, and determine
+# the number of JS code issues on it
+echo -n "Checking out back the current branch..."
+git checkout --quiet -
+echo " DONE"
+
+echo -n "Running ESLint on the current (PR) branch... "
+N_ISSUES_PR=$(eslint_issues)
+echo "found $N_ISSUES_PR issue(s)"
+
+
+# Calculate the issue count difference and print the outcome
+N_ISS_DIFF=$((N_ISSUES_PR - N_ISSUES_BASE))
+
+if [[ "$N_ISS_DIFF" -gt 0 ]]; then
+  N_ISS_DIFF_TEXT="$(tput setaf 1)$N_ISS_DIFF$(tput sgr0)"
+  MSG="$FAIL_PREFIX: The PR would increase the ESLInt issue count."
+  EXIT_CODE=1
+else
+  N_ISS_DIFF_TEXT="$(tput setaf 2)$N_ISS_DIFF$(tput sgr0)"
+  MSG="$PASS_PREFIX: The PR branch will not increase the ESLint issue count."
+  EXIT_CODE=0
+fi
+
+echo "Issue count difference: $N_ISS_DIFF_TEXT"
+echo $MSG
+exit $EXIT_CODE

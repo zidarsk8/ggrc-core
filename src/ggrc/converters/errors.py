@@ -21,7 +21,7 @@ DELETE_UNKNOWN_OBJECT = (u"Line {line}: Object '{slug}' does not exist, so it"
                          " can't be deleted.")
 
 DUPLICATE_COLUMN = (u"Line {line}: Duplicate columns found {duplicates}."
-                   " Object block will be ignored.")
+                    " Object block will be ignored.")
 
 DUPLICATE_VALUE = (u"Line {line}: {column_name} '{value}' already exists."
                    "Record will be ignored.")
@@ -42,9 +42,6 @@ WHITESPACE_WARNING = (u"Line {line}: Field {column_name} contains multiple"
 
 UNKNOWN_USER_WARNING = (u"Line {line}: Specified user '{email}' does not exist."
                         " That user will be ignored.")
-
-UNKNOWN_USER_ERROR = (u"Specified user '{email}' does not exist. That user will"
-                      " be ignored.")
 
 OWNER_MISSING = (u"Line {line}: Owner field does not contain a valid owner."
                  " You will be assigned as object owner.")
@@ -78,3 +75,6 @@ DELETE_CASCADE_ERROR = (u"Line {line}: Cannot delete object {object_type}:"
                         " {slug} without deleting other objects")
 
 UNKNOWN_ERROR = "Line {line}: Import failed due to unknown error."
+
+REQUEST_INVALID_STATE = ("LINE {line}: Can not set Request state to Final or "
+                         "Verified via imports.")

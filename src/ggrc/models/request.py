@@ -95,7 +95,10 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       "notes": "Notes",
       "request_type": "Request Type",
       "requested_on": "Requested On",
-      "status": "Status",
+      "status": {
+        "display_name": "Status",
+        "handler_key": "request_status",
+      },
       "test": "Test",
       "related_assignees": {
           "display_name": "Assignee",

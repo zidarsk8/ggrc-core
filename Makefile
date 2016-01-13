@@ -103,9 +103,7 @@ dev_virtualenv : $(DEV_PREFIX)/opt/dev_virtualenv
 
 dev_virtualenv_packages : dev_virtualenv src/dev-requirements.txt src/requirements.txt
 	source "$(PREFIX)/bin/init_env"; \
-		pip --version | grep -E "1.5" \
-			&& pip install -U pip==1.4.1 --no-use-wheel \
-			|| pip install -U pip==1.4.1; \
+		pip install -U pip==7.1.2; \
 		pip install --no-deps -r src/requirements.txt; \
 		pip install -r src/dev-requirements.txt
 
@@ -125,7 +123,7 @@ setup_dev : dev_virtualenv_packages linked_packages
 src/ggrc/assets/stylesheets/dashboard.css : src/ggrc/assets/stylesheets/*.scss
 	bin/build_compass
 
-src/ggrc/static/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/ggrc/assets
+src/ggrc/assets/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/ggrc/assets
 	source "bin/init_env"; \
 		GGRC_SETTINGS_MODULE="$(SETTINGS_MODULE)" bin/build_assets
 
@@ -159,11 +157,11 @@ bower_components : bower.json
 clean_bower_components :
 	rm -rf $(BOWER_PATH) $(FLASH_PATH) $(STATIC_PATH)/fonts
 
-deploy : appengine_packages_zip bower_components src/ggrc/static/assets.manifest src/app.yaml
+deploy : appengine_packages_zip bower_components src/ggrc/assets/assets.manifest src/app.yaml
 
 clean_deploy :
 	rm -f src/ggrc/assets/stylesheets/dashboard.css
-	rm -f src/ggrc/static/dashboard-*.* src/ggrc/static/assets.manifest
+	rm -f src/ggrc/static/dashboard-*.* src/ggrc/assets/assets.manifest
 	rm -f src/app.yaml
 
 clean : clean_deploy clean_bower_components
