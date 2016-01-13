@@ -100,11 +100,3 @@
     @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
   }
 }
-
-.top-inner-nav {
-  @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
-  width: 100%;
-  z-index: 1;
-  top: 48px;
-  background: $tabBgnd;
-}

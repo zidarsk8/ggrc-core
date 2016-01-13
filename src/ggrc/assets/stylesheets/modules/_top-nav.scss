@@ -1,0 +1,105 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: brad@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.top-inner-nav {
+  @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
+  width: 100%;
+  z-index: 1;
+  top: 48px;
+  background: $tabBgnd;
+}
+
+ul.internav {
+  @extend %reset-list;
+  @include clearfix();
+  margin-left: 28px;
+  li {
+    position: relative;
+    float: left;
+    &.inner-nav-button {
+      text-align: center;
+      padding: 1px 40px 0 10px;
+      float: right;
+      .message {
+        color: $green;
+      }
+      .tiny-help-text {
+        padding-top: 4px;
+        font-size: 10px;
+        line-height: 13px;
+        display: inline-block;
+        margin: 0;
+      }
+    }
+    &.hidden-widgets-list {
+	    a.dropdown-toggle {
+	      &:hover {
+	        background: none;
+	      }
+	    }
+	  }
+	  &.active {
+	    a {
+	      color: $black;
+	      font-weight: bold;
+	      background: $contentBgnd;
+	      i {
+	        @include opacity(1);
+	      }
+	      &:hover {
+	        color: $black;
+	      }
+	    }
+	  }
+  }
+  a {
+    @include transition(color 0.2s ease);
+    padding: 0 14px 0 10px;
+    display: block;
+    line-height: 29px;
+    font-size: 13px;
+    color: $gray;
+    position: relative;
+    &:hover {
+      color: $black;
+      background: none;
+      text-decoration: none;
+      i {
+        @include opacity(1);
+      }
+      .closed {
+        display: block;
+      }
+    }
+    .closed {
+      display: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      line-height: 10px;
+      cursor: pointer;
+      i {
+        margin-top: 0;
+      }
+      .fa {
+        font-size: 10px;
+        color: $white;
+      }
+      &.red {
+        top: -4px;
+        right: -4px;
+        background-position: -347px -275px;
+      }
+    }
+  }
+  i {
+    @include opacity(0.4);
+    margin-top: 6px;
+  }
+}
