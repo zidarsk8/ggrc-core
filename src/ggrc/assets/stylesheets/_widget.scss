@@ -8,9 +8,6 @@
 
 // widgets styles
 .widget {
-  &.small-margin {
-    margin-bottom: 40px !important;
-  }
   .tree-action-list {
     @extend %reset-list;
     @include clearfix();

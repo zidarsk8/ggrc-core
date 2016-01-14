@@ -82,27 +82,6 @@ select {
   }
 }
 
-// progress bar
-.progress {
-  @include box-shadow(none);
-  @include border-radius($default-border-radius);
-  background: $lightGray;
-  height: 20px;
-  margin: 4px 0 0 0;
-  .bar {
-    @include box-shadow(none);
-    height: 20px;
-    float: left;
-    margin-right: 0px;
-  }
-
-  @each $bar_color in verify, progress, pending, warning {
-    .bar-#{$bar_color} {
-      @extend %bar-#{$bar_color};
-    }
-  }
-}
-
 // buttons
 .btn-info-pin-header {
   margin-right: 10px;
@@ -675,33 +654,6 @@ p {
   color:$red !important;
   font-weight:bold;
   font-size: 10px;
-}
-
-.item-util {
-  @extend %reset-list;
-  @include clearfix();
-  font-size: 11px;
-  line-height: 16px;
-  color: $black;
-  li {
-    margin-right: 30px;
-    float: left;
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-  .tree-progress & {
-    li {
-      @extend %item-util-wide;
-      text-align: center;
-    }
-  }
-  .right & {
-    li {
-      @extend %item-util-wide;
-      text-align: right;
-    }
-  }
 }
 
 .show-details {

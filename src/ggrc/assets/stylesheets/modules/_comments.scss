@@ -1,0 +1,114 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.add-comment {
+	margin: 0 0 20px;
+	.controls {
+		margin-top: 15px;
+		&.top {
+			margin: 0 0 15px;
+		}
+	}
+	textarea {
+		margin-bottom: 0;
+	}
+}
+
+.attachments-preview {
+	ul {
+		@extend %reset-list;
+	}
+	li {
+		display: inline-block;
+		margin: 4px 0 0;
+	}
+}
+
+.entry-list {
+  @extend %reset-list;
+  margin-top: 4px;
+  li {
+    @include clearfix();
+    margin-bottom: 14px;
+    .entry-author {
+      color: $gray;
+      font-size: 11px;
+      font-style: italic;
+      display: block;
+    }
+    .info-action {
+      @include opacity(1);
+      i.fa-pencil-square-o {
+        margin-top: 7px;
+      }
+    }
+    .entry-attachment {
+      &.tree-item-add {
+        display: inline-block;
+        margin: 0px 0 0px -6px;
+        i {
+          margin-top: 1px;
+        }
+      }
+    }
+    &:last-child {
+      margin-bottom: 6px;
+    }
+    &.add-entry {
+      border-bottom: none;
+      margin-top: 12px;
+      textarea {
+        margin-bottom: 4px;
+      }
+      .entry-attachment {
+        display: inline-block;
+        margin-bottom: 10px;
+        [class*="fa-"] {
+          margin-top: 1px;
+        }
+      }
+    }
+    .entry-actions {
+      position: relative;
+      [class*="fa-"] {
+        margin-top: 0px;
+      }
+      .dropdown-menu {
+        @include border-radius(0);
+        min-width: 210px;
+        top: 100%;
+        right: 0;
+        left: auto;
+        li {
+          margin-bottom: 0;
+          a {
+            @include transition(background 0.2s ease, color 0.2s ease);
+            line-height: 30px;
+            padding: 0 10px;
+            background: none;
+            color: $gray;
+            i {
+              @include opacity(0.4);
+              @include transition(opacity 0.2s ease);
+              margin: 7px 4px 0 0;
+            }
+            &:hover {
+              background: $headerBgnd;
+              color: $black;
+              i {
+                @include opacity(1);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .sticky-filter {
+    display: none;
+  }
+}
