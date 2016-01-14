@@ -78,25 +78,3 @@
   margin-top: 500px;
   overflow: hidden;
 }
-
-.lhs-holder {
-  position: fixed;
-  top: 128px;
-  left: -240px;
-  width: 240px;
-  height: 548px;
-  overflow-y: auto;
-  background: $white;
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
-  }
-}
-
-.lhn-type {
-  position: fixed;
-  top: 94px;
-  left: -246px;
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
-  }
-}

@@ -68,12 +68,6 @@ select {
   .entry-list & {
     margin: 5px 10px 0 4px !important;
   }
-  .lhn-items-list & {
-    @include border-radius(2px);
-    width: 4px;
-    height: 4px;
-    margin: 10px 8px 0 1px;
-  }
   .inner-tree & {
     margin: 10px 5px 0 10px;
   }
