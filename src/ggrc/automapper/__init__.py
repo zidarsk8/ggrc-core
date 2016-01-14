@@ -30,8 +30,7 @@ class Stub(collections.namedtuple("Stub", ["type", "id"])):
 
 
 class AutomapperGenerator(object):
-  def __init__(self, relationship, use_benchmark=True):
-    self.relationship = relationship
+  def __init__(self, use_benchmark=True):
     self.processed = set()
     self.queue = set()
     self.cache = collections.defaultdict(set)
@@ -50,21 +49,26 @@ class AutomapperGenerator(object):
     stubs.add(obj)
     # Union is here to convince mysql to use two separate indices and
     # merge te results. Just using `or` results in a full-table scan
-    relationships = Relationship.query.filter(
+    # Manual column list avoids loading the full object which would also try to
+    # load related objects
+    cols = db.session.query(
+        Relationship.source_type, Relationship.source_id,
+        Relationship.destination_type, Relationship.destination_id)
+    relationships = cols.filter(
         tuple_(Relationship.source_type, Relationship.source_id).in_(
             [(s.type, s.id) for s in stubs]
         )
     ).union_all(
-        Relationship.query.filter(
+        cols.filter(
             tuple_(Relationship.destination_type,
                    Relationship.destination_id).in_(
                 [(s.type, s.id) for s in stubs]
             )
         )
     ).all()
-    for r in relationships:
-      src = Stub.from_source(r)
-      dst = Stub.from_destination(r)
+    for (src_type, src_id, dst_type, dst_id) in relationships:
+      src = Stub(src_type, src_id)
+      dst = Stub(dst_type, dst_id)
       # only store a neighbour if we queried for it since this way we know
       # we'll be storing complete neighbourhood by the end of the loop
       if src in stubs:
@@ -80,10 +84,11 @@ class AutomapperGenerator(object):
     else:
       return (dst, src)
 
-  def generate_automappings(self):
+  def generate_automappings(self, relationship):
+    self.auto_mappings = set()
     with self.benchmark("Automapping generate_automappings"):
-      self.queue.add(self.relate(Stub.from_source(self.relationship),
-                     Stub.from_destination(self.relationship)))
+      self.queue.add(self.relate(Stub.from_source(relationship),
+                     Stub.from_destination(relationship)))
       count = 0
       while len(self.queue) > 0:
         if len(self.auto_mappings) > rules.count_limit:
@@ -91,7 +96,8 @@ class AutomapperGenerator(object):
         count += 1
         src, dst = entry = self.queue.pop()
 
-        if not (self._can_map_to(src) and self._can_map_to(dst)):
+        if not (self._can_map_to(src, relationship) and
+                self._can_map_to(dst, relationship)):
           continue
 
         self._ensure_relationship(src, dst)
@@ -100,16 +106,16 @@ class AutomapperGenerator(object):
         self._step(dst, src)
 
       if len(self.auto_mappings) <= rules.count_limit:
-        self._flush()
+        self._flush(relationship)
       else:
-        self.relationship._json_extras = {
+        relationship._json_extras = {
             'automapping_limit_exceeded': True
         }
 
-  def _can_map_to(self, obj):
-    return is_allowed_update(obj.type, obj.id, self.relationship.context)
+  def _can_map_to(self, obj, parent_relationship):
+    return is_allowed_update(obj.type, obj.id, parent_relationship.context)
 
-  def _flush(self):
+  def _flush(self, parent_relationship):
     if len(self.auto_mappings) == 0:
       return
     with self.benchmark("Automapping flush"):
@@ -121,8 +127,8 @@ class AutomapperGenerator(object):
       # it means that the mapping was already created by another request
       # and we can safely ignore it.
       inserter = Relationship.__table__.insert().prefix_with("IGNORE")
-      original = self.relate(Stub.from_source(self.relationship),
-                             Stub.from_destination(self.relationship))
+      original = self.relate(Stub.from_source(parent_relationship),
+                             Stub.from_destination(parent_relationship))
       db.session.execute(inserter.values([{
           "id": None,
           "modified_by_id": current_user.id,
@@ -134,7 +140,7 @@ class AutomapperGenerator(object):
           "destination_type": dst.type,
           "context_id": None,
           "status": None,
-          "automapping_id": self.relationship.id}
+          "automapping_id": parent_relationship.id}
           for src, dst in self.auto_mappings
           if (src, dst) != original]))  # (src, dst) is sorted
 
@@ -198,7 +204,7 @@ def register_automapping_listeners():
     if obj is None:
       logging.warning("Automapping listener: no obj, no mappings created")
       return
-    AutomapperGenerator(obj).generate_automappings()
+    AutomapperGenerator().generate_automappings(obj)
 
   @Resource.model_posted_after_commit.connect_via(Request)
   @Resource.model_put_after_commit.connect_via(Request)
