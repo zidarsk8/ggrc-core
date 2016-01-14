@@ -87,8 +87,13 @@ class AutomapperGenerator(object):
   def generate_automappings(self, relationship):
     self.auto_mappings = set()
     with self.benchmark("Automapping generate_automappings"):
-      self.queue.add(self.relate(Stub.from_source(relationship),
-                     Stub.from_destination(relationship)))
+      # initial relationship is special since it is already created and
+      # processing it would abort the loop so we manually enqueue the
+      # neighbourhood
+      src = Stub.from_source(relationship)
+      dst = Stub.from_destination(relationship)
+      self._step(src, dst)
+      self._step(dst, src)
       count = 0
       while len(self.queue) > 0:
         if len(self.auto_mappings) > rules.count_limit:
@@ -100,8 +105,12 @@ class AutomapperGenerator(object):
                 self._can_map_to(dst, relationship)):
           continue
 
-        self._ensure_relationship(src, dst)
+        created = self._ensure_relationship(src, dst)
         self.processed.add(entry)
+        if not created:
+          # If the edge already exists it means that auto mappings for it have
+          # already been processed and it is safe to cut here.
+          continue
         self._step(src, dst)
         self._step(dst, src)
 
@@ -185,17 +194,21 @@ class AutomapperGenerator(object):
 
   def _ensure_relationship(self, src, dst):
     if dst in self.cache.get(src, []):
-      return
+      return False
     if src in self.cache.get(dst, []):
-      return
+      return False
 
+    created = False
     if Relationship.find_related(src, dst) is None:
       self.auto_mappings.add((src, dst))
+      created = True
 
     if src in self.cache:
       self.cache[src].add(dst)
     if dst in self.cache:
       self.cache[dst].add(src)
+
+    return created
 
 
 def register_automapping_listeners():
