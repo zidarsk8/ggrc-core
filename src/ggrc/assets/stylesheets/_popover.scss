@@ -5,6 +5,11 @@
  * Maintained By: brad@reciprocitylabs.com
  */
 
+.popover-data-title,
+.popover-data-content {
+  display: none;
+}
+
 .popover {
   padding: 0;
   .arrow {
