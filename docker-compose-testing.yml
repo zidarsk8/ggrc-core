@@ -3,6 +3,7 @@ dev:
   command: /sbin/my_init
   volumes:
    - ".:/vagrant"
+   - ".:/vagrant_bind"
    - "./provision/docker/mysql:/etc/mysql/conf.d"
   privileged: true
   environment:

@@ -3,7 +3,7 @@ ADD . /vagrant
 
 WORKDIR /vagrant
 
-RUN apt-get update && apt-get install -y ansible python-apt python-pycurl wget
+RUN apt-get update && apt-get install -y ansible python-apt python-pycurl wget bindfs
 
 RUN useradd -G sudo -m vagrant \
  && echo "vagrant ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
