@@ -124,34 +124,6 @@
   }
 }
 
-.file-controls {
-  @include border-radius(11px 0 0 11px);
-  @include box-shadow(-1px 0 1px rgba(0,0,0, .2));
-  @include opacity(0);
-  @include transition(opacity .2s ease, left .2s ease);
-  position: absolute;
-  top: -2px;
-  left: 0;
-  z-index: 1000;
-  background: $white;
-  padding-left: 5px;
-  height: 20px;
-  padding-top: 2px;
-  min-width: 20px;
-  i {
-    @include opacity(.6);
-    @include transition(opacity .2s ease);
-  }
-  a {
-    width: auto !important;
-    &:hover {
-      i {
-        @include opacity(1);
-      }
-    }
-  }
-}
-
 .mapped-list {
   @extend %reset-list;
   li {
