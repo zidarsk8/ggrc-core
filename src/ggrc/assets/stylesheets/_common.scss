@@ -656,30 +656,6 @@ p {
   font-size: 10px;
 }
 
-.show-details {
-  float: right;
-  padding-right: 4px;
-  margin-left: 10px;
-  a {
-    display: inline-block;
-    line-height: 16px;
-    i {
-      @include opacity(0.25);
-      @include transition(opacity 0.2s ease);
-      color: $black;
-      ul.new-tree & {
-        margin-top: 0;
-      }
-    }
-    &:hover {
-      text-decoration: none;
-      i {
-        @include opacity(1);
-      }
-    }
-  }
-}
-
 .pos-wrap {
   position: relative;
   .dropdown-menu {
