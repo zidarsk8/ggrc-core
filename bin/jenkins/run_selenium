@@ -7,10 +7,10 @@
 set -o nounset
 set -o errexit
 
-PROJECT=testing
+PROJECT="selenium"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
-cd "${SCRIPTPATH}/.."
+cd "${SCRIPTPATH}/../.."
 
 docker-compose -f docker-compose-testing.yml -p ${PROJECT} up --force-recreate -d
 
@@ -19,10 +19,6 @@ if [[ $UID != 1000 ]]; then
   bindfs /vagrant_bind /vagrant --map=$UID/1000 -o nonempty
   "
 fi
-
-# This provisioning is needed until the provision script stops changing the
-# /vagrant folder and so the containe can then be propperly provisioned with
-# docker-compose build.
 
 echo "Provisioning ${PROJECT}_dev_1"
 docker exec -i ${PROJECT}_dev_1 su vagrant -c \
