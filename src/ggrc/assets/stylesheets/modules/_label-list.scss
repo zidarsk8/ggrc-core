@@ -1,0 +1,103 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.people-group {
+  padding-bottom: 16px;
+}
+
+.label-list {
+  @extend %reset-list;
+  > li {
+    margin-bottom: 10px;
+    @include clearfix();
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  &.dates {
+    > li {
+      margin-bottom: 0;
+      position: relative;
+      &:hover {
+        .file-controls {
+          @include opacity(1);
+          left: -25px;
+        }
+      }
+    }
+  }
+  i {
+    @include opacity(.6);
+    @include transition(opacity .2s ease);
+  }
+  a {
+    &:hover {
+      i {
+        @include opacity(1);
+      }
+    }
+  }
+  label {
+    float: left;
+    width: 32%;
+    font-size: 10px;
+    line-height: 20px;
+    margin-top: 1px;
+    text-transform: uppercase;
+    position: relative;
+    .file-controls {
+      top: 0;
+    }
+    &:hover {
+      .file-controls {
+        @include opacity(1);
+        left: -25px;
+      }
+    }
+    .modal-body & {
+      text-transform: none;
+      width: 32%;
+    }
+    .person-label {
+      width: 20px;
+      height: 20px;
+      margin-right: 4px;
+      line-height: 20px;
+      font-size: 10px;
+    }
+  }
+  .input-group {
+    float: left;
+    width: 68%;
+  }
+  .disabled {
+    cursor: default;
+    @include opacity(.3);
+  }
+  ul {
+    @extend %reset-list;
+    float: left;
+    width: 55%;
+
+    .modal-body & {
+      width: 50%;
+    }
+    li {
+      margin-bottom: 3px;
+      position: relative;
+      &:last-child {
+        margin-bottom: 0;
+      }
+      &:hover {
+        .file-controls {
+          @include opacity(1);
+          left: -25px;
+        }
+      }
+    }
+  }
+}
