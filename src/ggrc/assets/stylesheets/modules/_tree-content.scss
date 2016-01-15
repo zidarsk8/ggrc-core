@@ -901,3 +901,171 @@ ul.new-tree {
     }
   }
 }
+
+.tier-2-info {
+  display: none;
+}
+
+.tier-2-info-content {
+  @include clearfix();
+  padding: 0 10px 0 32px;
+  position: relative;
+  font-size: 13px;
+  line-height: 20px;
+  .wrap-row {
+    margin-bottom: 14px;
+    p {
+      padding-top: 6px;
+      margin-bottom: 3px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  .tier-2-code {
+    color: #777;
+    font-style: italic;
+    font-size: 13px;
+  }
+  .top-space {
+    margin-top: 6px;
+  }
+  .tree-info {
+    line-height: 18px;
+  }
+
+  .edit-auditor a {
+    @include opacity(0.4);
+    @include transition(opacity 0.2s);
+    font-size:11px;
+    font-weight:bold;
+    color:#111;
+    text-transform:uppercase;
+    &:hover {
+      @include opacity(1);
+      text-decoration:none;
+    }
+    [class^="grcicon-"] {
+      margin-top: 2px;
+    }
+  }
+
+  .info-audit {
+    @extend %reset-list;
+    @include clearfix();
+    margin: 10px 0 0;
+    li {
+      float: left;
+      margin-right: 20px;
+      margin-bottom: 10px;
+      a {
+        @include opacity(0.4);
+        @include transition(opacity 0.2s);
+        font-size:11px;
+        font-weight:bold;
+        color:#111;
+        text-transform:uppercase;
+        &:hover {
+          @include opacity(1);
+          text-decoration:none;
+        }
+      }
+    }
+    [class^="grcicon-"] {
+      margin-top: 2px;
+    }
+  }
+}
+
+.item-data {
+  overflow: hidden;
+  zoom: 1;
+  &.no-space {
+    padding-left: 0;
+  }
+  .tree-title-area {
+    @extend %oneline;
+    font-size: 12px;
+    &.w-status {
+      float: left;
+      width: 94%;
+    }
+    &.title {
+      font-size: 16px;
+      width: 100%;
+    }
+    &.owner, &.code, &.state-value {
+      line-height: 28px;
+    }
+    &.owner {
+      .person-holder {
+        margin-right: 8px;
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+      .objective-selector {
+        input {
+          margin-bottom: 0;
+        }
+      }
+    }
+    &.code {
+      text-transform: uppercase;
+    }
+    .event-action {
+      font-size:13px;
+      color:#777;
+    }
+    .email,
+    .url-link {
+      color:#777;
+      font-size:11px;
+    }
+    .option,
+    .scope {
+      font-size:11px;
+      font-weight:bold;
+      text-transform:uppercase;
+      color:$green;
+    }
+    .no-role,
+    .role {
+      font-size:11px;
+      line-height: 28px;
+      display: block;
+      font-weight:bold;
+      color:$green;
+    }
+    .no-role {
+      color:$gray;
+    }
+    .event-action {
+      font-size:13px;
+      color:#777;
+    }
+    .event-owner {
+      font-size:13px;
+      color:#777;
+    }
+    .not-mapped {
+      font-size:13px;
+      font-weight:bold;
+      color:$error;
+    }
+    .event-time {
+      font-size:13px;
+      color:#777;
+    }
+  }
+  .event-more {
+    float:right;
+    color:$blue;
+    margin-right:0;
+    font-size:13px;
+  }
+  .tree-code {
+    font-weight:bold;
+    color:$governance;
+  }
+}
