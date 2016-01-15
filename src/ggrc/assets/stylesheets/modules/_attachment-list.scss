@@ -16,6 +16,18 @@
     line-height: 18px;
     vertical-align: top;
   }
+  a {
+    @extend %oneline;
+    width: 68%;
+    display: inline-block;
+    &.more {
+      display: inline;
+      width: auto;
+    }
+  }
+  [class*="fa-file-"] {
+    vertical-align: top;
+  }
   li {
     margin-bottom: 5px;
     position: relative;
@@ -25,24 +37,12 @@
         left: -25px;
       }
     }
-    [class*="fa-file-"] {
-      vertical-align: top;
-    }
-    a {
-      @extend %oneline;
-      width: 68%;
-      display: inline-block;
-      &.more {
-        display: inline;
-        width: auto;
-      }
-    }
   }
   .past-items-list & {
+    width: 92%;
     li {
       margin-bottom: 0;
     }
-    width: 92%;
     label {
       display: inline-block;
       @extend %oneline;
@@ -54,24 +54,24 @@
   }
   .entry-list & {
     padding: 4px 0 0 0;
+    .info-action {
+      @include opacity(1);
+      i {
+        margin-top: 0;
+      }
+    }
+    a {
+      width: auto;
+      display: inline;
+      &:hover {
+        text-decoration: underline;
+        span {
+          text-decoration: underline;
+        }
+      }
+    }
     li {
       margin-left: -4px;
-      .info-action {
-        @include opacity(1);
-        i {
-          margin-top: 0;
-        }
-      }
-      a {
-        width: auto;
-        display: inline;
-        &:hover {
-          text-decoration: underline;
-          span {
-            text-decoration: underline;
-          }
-        }
-      }
     }
   }
 }
