@@ -5,39 +5,6 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
-// Pin content
-.pin-content,
-.info-pin {
-  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
-  position: fixed;
-  bottom: 40px;
-  left: 27px;
-  right: 27px;
-  background: $white;
-  z-index: 1000;
-  overflow: auto;
-  .info {
-    @include box-shadow(none);
-    padding: 15px 25px 20px;
-    .small-info {
-      i {
-        @include opacity(.25);
-        @include transition(opacity 0.2s ease);
-        cursor: pointer;
-        &:hover {
-          @include opacity(1);
-        }
-      }
-    }
-  }
-  .info-widget-footer {
-    display: none;
-  }
-  select {
-    margin-bottom: 0;
-  }
-}
-
 .inline-date-wrap {
   input {
     margin-bottom: 0;
@@ -114,13 +81,6 @@
     &:last-child {
       margin-right: 0;
     }
-  }
-}
-
-.side-content {
-  margin-left: 20px;
-  .modal & {
-    margin-left: 0;
   }
 }
 
