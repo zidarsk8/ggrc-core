@@ -22,14 +22,6 @@ ul.new-tree {
     overflow: hidden;
     zoom: 1;
   }
-  .tree-action-list {
-    li {
-      line-height: 28px;
-    }
-    .counter {
-      @include opacity(1);
-    }
-  }
   .task-item {
     .item-data {
       padding-left: 0;
@@ -523,23 +515,6 @@ ul.new-tree {
       > .item-main {
         > .item-wrap {
           background: $headerBgnd;
-          > .select {
-            > .item-data {
-              > .row-fluid {
-                > .span4 {
-                  > .tree-action-list {
-                    > .show-details {
-                      > a {
-                        > i {
-                          @include opacity(1);
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
         }
       }
     }
