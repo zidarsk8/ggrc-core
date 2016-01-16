@@ -34,6 +34,6 @@ docker exec -i ${PROJECT}_selenium_1 python /selenium/src/run_selenium.py && \
 docker exec -i ${PROJECT}_dev_1 sh -c "chown $UID -R /vagrant"
 docker exec -i ${PROJECT}_selenium_1 sh -c "chown $UID -R /selenium"
 
-docker-compose stop
+docker-compose -p ${PROJECT} stop
 
 exit $rc

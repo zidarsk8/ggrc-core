@@ -7,7 +7,7 @@
 set -o nounset
 set -o errexit
 
-PROJECT="pylint"
+PROJECT="integration"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../.."
@@ -24,7 +24,7 @@ echo "Provisioning ${PROJECT}_dev_1"
 docker exec -i ${PROJECT}_dev_1 su vagrant -c \
   "ansible-playbook -i provision/docker/inventory provision/site.yml"
 
-echo "Running pylint"
+echo "Running ${PROJECT}"
 docker exec -i ${PROJECT}_dev_1 su vagrant -c "
   source /vagrant/bin/init_vagrant_env
   /vagrant/run_integration
@@ -33,6 +33,6 @@ docker exec -i ${PROJECT}_dev_1 su vagrant -c "
 docker exec -i ${PROJECT}_dev_1 sh -c "chown $UID -R /vagrant"
 docker exec -i ${PROJECT}_selenium_1 sh -c "chown $UID -R /selenium"
 
-docker-compose stop
+docker-compose -p ${PROJECT} stop
 
 exit $rc
