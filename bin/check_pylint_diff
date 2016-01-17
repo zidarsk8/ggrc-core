@@ -8,6 +8,9 @@
 set -o nounset
 set -o errexit
 
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+cd "${SCRIPTPATH}/.."
+
 if [[ "${1:-}" != "" ]]; then
   TEST_COMMIT=$1
 else
@@ -21,13 +24,10 @@ echo "Comparing commits $TEST_COMMIT and $PARENT_1."
 
 git checkout --quiet $PARENT_1
 pylint src/* > /dev/null 2>&1 | true
-
 git checkout --quiet $TEST_COMMIT
 PYLINT_RESULT=$(pylint src/* 2> /dev/null | tail -n 2) 
-
 git checkout --quiet $CURRENT_COMMIT
 
-echo $PYLINT_RESULT
-echo $PYLINT_RESULT | grep "+" && rc=$? || rc=$?
+echo "$PYLINT_RESULT" | grep "+" && rc=$? || rc=$?
 
 exit $rc
