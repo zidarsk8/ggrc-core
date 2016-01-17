@@ -7,7 +7,7 @@
 set -o nounset
 set -o errexit
 
-PROJECT="integration"
+PROJECT="flake"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../.."
@@ -27,7 +27,7 @@ docker exec -i ${PROJECT}_dev_1 su vagrant -c \
 echo "Running ${PROJECT}"
 docker exec -i ${PROJECT}_dev_1 su vagrant -c "
   source /vagrant/bin/init_vagrant_env
-  /vagrant/bin/run_integration
+  /vagrant/bin/check_flake8_diff
 " && rc=$? || rc=$?
 
 docker exec -i ${PROJECT}_dev_1 sh -c "chown $UID -R /vagrant"
