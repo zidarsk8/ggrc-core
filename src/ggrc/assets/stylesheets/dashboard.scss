@@ -1,21 +1,9 @@
 /*
  * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: brad@reciprocitylabs.com
+ * Created By: vladan@reciprocitylabs.com
  * Maintained By: vladan@reciprocitylabs.com
  */
-
-/* FIXME: Fix for https://github.com/rails/rails/issues/3686
- * - Bump this counter if asset dependencies aren't re-compiled on change
- * counter: 0
- */
-
-// NOTE! Don't use Sprockets 'require' statements inside SASS files
-
-// Required external stylesheets
-
-//@import "jquery-ui";
-
 
 // Whole file is commented. Leaving it for now. WIll be removed later.
 // @import "bootstrap-setup";
@@ -24,7 +12,6 @@
 @import "bootstrap-responsive";
 
 @import "compass/css3";
-//@import "bootstrap-wysihtml5-0.0.2";
 
 $fa-font-path: "/static/fonts";
 @import "font-awesome";
@@ -35,6 +22,9 @@ $fa-font-path: "/static/fonts";
 @import "typography";
 @import "helpers";
 @import "custom_font_awesome_icons";
+
+@import "layout";
+@import "modules";
 
 @import "common";
 @import "layout";
@@ -52,5 +42,3 @@ $fa-font-path: "/static/fonts";
 @import "responsive";
 
 @import "import-export";
-
-@import "modules";
