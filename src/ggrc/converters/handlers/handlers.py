@@ -397,8 +397,12 @@ class MappingColumnHandler(ColumnHandler):
       elif self.unmap and mapping:
         db.session.delete(mapping)
     db.session.flush()
+    # it is safe to reuse this automapper since no other objects will be
+    # created while creating automappings and cache reuse yields significant
+    # performance boost
+    automapper = AutomapperGenerator(use_benchmark=False)
     for relation in relationships:
-      AutomapperGenerator(relation, False).generate_automappings()
+      automapper.generate_automappings(relation)
     self.dry_run = True
 
   def get_value(self):
@@ -817,8 +821,12 @@ class ResponseMappedObjectsColumnHandler(ColumnHandler):
       new_relationships.append(rel)
       db.session.add(rel)
     db.session.flush()
+    # it is safe to reuse this automapper since no other objects will be
+    # created while creating automappings and cache reuse yields significant
+    # performance boost
+    automapper = AutomapperGenerator(use_benchmark=False)
     for rel in new_relationships:
-      AutomapperGenerator(rel, False).generate_automappings()
+      automapper.generate_automappings(rel)
     self.dry_run = True
 
   def set_obj_attr(self):
