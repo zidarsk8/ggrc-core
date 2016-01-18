@@ -53,12 +53,10 @@ class ControlFactory(ModelFactory, TitledFactory):
   notes = None
 
 
-class ControlAssessmentFactory(ModelFactory, TitledFactory):
+class AssessmentFactory(ModelFactory, TitledFactory):
 
   class Meta:
-    model = models.ControlAssessment
-
-  control = factory.SubFactory(ControlFactory)
+    model = models.Assessment
 
 
 class ControlCategoryFactory(ModelFactory):

@@ -406,17 +406,16 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Internal Audit Lead"]["mandatory"])
 
-  def test_control_assessment_definitions(self):
-    """ test default headers for Control Assessment """
-    definitions = get_object_column_definitions(models.ControlAssessment)
-    mapping_names = get_mapping_names(models.ControlAssessment.__name__)
+  def test_assessment_definitions(self):
+    """ test default headers for Assessment """
+    definitions = get_object_column_definitions(models.Assessment)
+    mapping_names = get_mapping_names(models.Assessment.__name__)
     display_names = {val["display_name"] for val in definitions.values()}
     element_names = {
         "Title",
         "Description",
         "Notes",
         "Test Plan",
-        "Control",
         "Audit",
         "Owner",
         "Primary Contact",
@@ -437,7 +436,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
-    self.assertTrue(vals["Control"]["mandatory"])
     self.assertTrue(vals["Audit"]["mandatory"])
 
   def test_issue_definitions(self):

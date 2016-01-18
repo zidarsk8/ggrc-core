@@ -17,8 +17,8 @@ class TestUtilsFunctions(TestCase):
     for object_name, object_mappings in mappings.items():
       for mapping in object_mappings:
         try:
-          # Audits do not have dirrect mappings and do not have all objects
-          # listed, that is why we don't check bothways.
+          # Audits do not have direct mappings and do not have all objects
+          # listed, that is why we don't check both ways.
           if mapping != "Audit":
             # If obj A is in obj B mappings, make sure that obj B is also in
             #obj A mappings

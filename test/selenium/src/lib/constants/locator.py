@@ -29,8 +29,8 @@ class LhnMenu(object):
     PROGRAMS = (By.CSS_SELECTOR, '[data-model-name="Program"]')
     WORKFLOWS = (By.CSS_SELECTOR, '[data-model-name="Workflow"]')
     AUDITS = (By.CSS_SELECTOR, '[data-model-name="Audit"]')
-    CONTROL_ASSESSMENTS = (By.CSS_SELECTOR,
-                           '[data-model-name="ControlAssessment"]')
+    ASSESSMENTS = (By.CSS_SELECTOR,
+                           '[data-model-name="Assessment"]')
     REQUESTS = (By.CSS_SELECTOR, '[data-model-name="Request"]')
     ISSUES = (By.CSS_SELECTOR, '[data-model-name="Issue"]')
     DIRECTIVES = (By.CSS_SELECTOR, '[data-test-id="directives_66116337"]')
@@ -77,9 +77,9 @@ class LhnMenu(object):
         By.CSS_SELECTOR,
         '[data-model-name="Audit"] ['
         'data-test-id="button_lhn_create_new_program_522c563f"]')
-    BUTTON_CREATE_NEW_CONTROL_ASSESSMENT = (
+    BUTTON_CREATE_NEW_ASSESSMENT = (
         By.CSS_SELECTOR,
-        '[data-model-name="ControlAssessment"] ['
+        '[data-model-name="Assessment"] ['
         'data-test-id="button_lhn_create_new_program_522c563f"]')
     BUTTON_CREATE_NEW_REQUEST = (
         By.CSS_SELECTOR,
@@ -96,8 +96,8 @@ class LhnMenu(object):
     WORKFLOWS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Workflow"] '
                                         '.item-count')
     AUDITS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Audit"] .item-count')
-    CONTROL_ASSESSMENTS_COUNT = (By.CSS_SELECTOR,
-                                 '[data-model-name="ControlAssessment"] '
+    ASSESSMENTS_COUNT = (By.CSS_SELECTOR,
+                                 '[data-model-name="Assessment"] '
                                  '.item-count')
     ISSUES_COUNT = (By.CSS_SELECTOR, '[data-model-name="Issue"] .item-count')
     REQUESTS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Request"] '
@@ -216,9 +216,9 @@ class WidgetBarButtonAddDropdown(object):
                                   '[href="#workflow_widget"]')
     CONTRACTS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
                                   '[href="#contract_widget"]')
-    CONTROL_ASSESSMENTS = (By.CSS_SELECTOR,
+    ASSESSMENTS = (By.CSS_SELECTOR,
                            '[data-test-id="button_widget_add_2c925d94"] '
-                           '[href="#control_assessment_widget"]')
+                           '[href="#assessment_widget"]')
     FACILITIES = (By.CSS_SELECTOR,
                   '[data-test-id="button_widget_add_2c925d94"] '
                   '[href="#facility_widget"]')
