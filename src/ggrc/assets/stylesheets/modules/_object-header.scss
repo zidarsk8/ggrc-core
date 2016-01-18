@@ -1,0 +1,142 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.tier-content {
+  &.pin {
+    .info-pane-utility {
+      .details-wrap {
+        margin-top: 10px;
+      }
+    }
+  }
+  .info-pane-utility {
+    .details-wrap {
+      margin-top: 0;
+    }
+  }
+}
+
+.info-pane-utility {
+  @include clearfix();
+  float: right;
+  .sticky-info-panel & {
+    position: fixed;
+    right: 47px;
+    z-index: 9999;
+    margin-top: 20px;
+  }
+  .request & {
+    position: static;
+    margin-top: 0;
+  }
+}
+
+.details-wrap {
+  float: right;
+  margin-left: 10px;
+  width: 60px;
+  position: relative;
+  .dropdown-toggle {
+    @include clearfix();
+    height: 8px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+  .pin-content & {
+    margin-top: 4px;
+  }
+  a {
+    display: block;
+  }
+  &.pin {
+    @include clearfix();
+    width: auto;
+    margin-left: 5px;
+    margin-top: -10px !important;
+    float: none;
+    clear: both;
+    .sticky-info-panel & {
+      margin-top: -3px;
+    }
+  }
+  .bubble {
+    float: left;
+    margin-right: 4px;
+    background: $darkGray;
+    @include border-radius(50%);
+    width: 8px;
+    height: 8px;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  .dropdown-menu {
+    @extend %reset-list;
+    @include border-radius(0);
+    min-width: 210px;
+    float: none;
+    padding: 5px 0;
+    margin-top: 6px;
+    text-transform: none;
+    top: 100%;
+    right: 0;
+    left: auto;
+    li {
+      float:none;
+      clear: both;
+      text-transform: none;
+      a {
+        @include transition(background 0.2s ease, color 0.2s ease);
+        display: block;
+        line-height: 30px;
+        padding: 0 10px;
+        background: none;
+        text-shadow: none;
+        color: $gray;
+        i {
+          @include opacity(0.4);
+          @include transition(opacity 0.2s ease);
+          margin: 7px 4px 0 0;
+        }
+        &:hover,
+        &.zeroclipboard-is-hover {
+          background: $headerBgnd;
+          color: $black;
+          i {
+            @include opacity(1);
+          }
+        }
+        &.active {
+          color: $black;
+          .fa-link {
+            @include opacity(1);
+            color: $green;
+          }
+        }
+      }
+      &.border {
+        border-top: 1px solid $headerBgnd;
+        padding-top: 5px;
+        margin-top: 5px;
+      }
+    }
+  }
+  &.status-wrap {
+    float: none;
+    clear: both;
+    margin-left: 0;
+    width: auto;
+    margin-top: 0;
+    .dropdown-toggle {
+      display: inline-block;
+    }
+    .dropdown-menu {
+      right: auto;
+      left: 0;
+    }
+  }
+}

@@ -43,3 +43,25 @@
     margin-left: 0;
   }
 }
+
+.sticky-info-panel {
+  .pane-header {
+    .details-wrap {
+      margin-top: 18px !important;
+    }
+  }
+  .tier-content {
+    margin-top: 77px;
+  }
+  .details-wrap {
+    &.pin {
+      position: fixed;
+      right: 47px;
+      z-index: 9999;
+      width: 100px;
+      background: $white;
+      margin-top: -15px !important;
+      padding-top: 5px;
+    }
+  }
+}
