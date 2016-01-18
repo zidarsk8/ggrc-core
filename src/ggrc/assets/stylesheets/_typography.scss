@@ -1,0 +1,119 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+ body {
+  font-size:$f-regular;
+  background: $contentBgnd;
+}
+
+h1 {
+  @extend %oneline;
+  color: $headerTitle;
+  font-size: 24px;
+  line-height: 47px;
+  height: 47px;
+  font-family: $fontTitle;
+  font-weight: normal;
+  width: 38%;
+  float: left;
+  .lhn-trigger {
+    position: absolute;
+    left: -2px;
+    top: 0;
+  }
+  .title-content {
+    @extend %oneline;
+    width: 85%;
+    float: left;
+  }
+  .right-side {
+    position: absolute;
+    right: 104px;
+    top: 0;
+    text-align: right;
+  }
+  .child-title-content {
+    float: right;
+    text-align: right;
+  }
+}
+
+h2 {
+  font-size: $f-subTitle;
+  line-height: 26px;
+  font-weight: bold;
+  color: $subTitle;
+  margin-right: 8px;
+}
+
+h3 {
+  font-size: $f-subTitle;
+  line-height: 24px;
+  font-weight: bold;
+  color: $subTitle;
+}
+
+h4 {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: normal;
+  color: $subTitle;
+  span {
+    color: $disabled;
+  }
+}
+
+h6 {
+  font-weight:normal;
+  font-size: 11px;
+  color: $darkText;
+  line-height: 17px;
+  font-weight: bold;
+}
+
+span.error {
+  color:$error;
+  font-weight:bold;
+}
+
+blockquote {
+  border:none;
+}
+
+u {
+  text-decoration: underline;
+}
+
+.about-link {
+  font-size: 12px;
+  text-decoration: underline;
+  color: $gray;
+  &:hover {
+    text-decoration: none;
+    color: $gray;
+  }
+}
+
+p {
+  small {
+    color: $textGray;
+  }
+}
+
+a {
+  color: $blue;
+  text-decoration: none;
+  &:hover {
+    color: $blue;
+    text-decoration: underline;
+  }
+  &.icon-link {
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}

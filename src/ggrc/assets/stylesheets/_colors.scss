@@ -1,0 +1,146 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+// widget
+$widgetBorder: #ccc;
+$widgetHeader: #ddd;
+$widgetTitle: #111;
+$filterBgnd: #bebebe;
+
+// widget info
+$infoWidgetHeader: #111;
+
+// texts
+$darkText:#333;
+$text:#666;
+$error:#e00;
+$disabled: #777;
+$warning:#f60;
+
+// default colors
+$white: #fff;
+$black: #000;
+$gray: #999;
+$darkGray: #7c7c7c;
+$lightGray: #eee;
+$red: #e53935;
+$lightRed: #ff9d9d;
+$purpleRed: #9c27b0;
+$purple: #361c74;
+$green: #1d8d15;
+$lightGreen: #8bc34a;
+$defaultGreen: #4caf50;
+$blue: #0277bd;
+$darkBlue: #369;
+$warmGray: #ccc;
+$midGray: #aaa;
+$textGray: #757575;
+$defaultBlue: #2196f3;
+$olive: #b5d7ad;
+
+// quick search
+$topBarSearchText: #bbbdc1;
+$topBarSearchBorder: #282a2c;
+$topBarSearchBgnd: #6a6b6d;
+$quickSearchOpen: #cbcbcb;
+
+// modal
+$modalHeader: #0071cc;
+$modalHeaderBorder: #074fb2;
+$modalHeaderShadow: #9ac5ff;
+$modalDarkBlue: #0055cc;
+$modalLightBlue: #0088cc;
+
+//popover
+$popOverHeaderBgnd: #f7f7f7;
+$popOverHeaderBorder: #ebebeb;
+$popOverBorder: #b0b0b0;
+
+// PBC
+$btnGreen: #51a351;
+$btnOrange: #f9a732;
+$responsBgnd: #e8fdd6;
+$responsBorder: #cdecb4;
+$pbcListGray: #f0f0f0;
+$responsTitle: #333;
+
+$headerBgnd: #f1f1f1;
+$headerBorder: #d9d9d9;
+$menuLink: #d7dce8;
+$screenBgnd: #323438;
+$link: #049cdb;
+$headerTitle: #444;
+$demoHide: #f99c18;
+$demoShow: #55ab55;
+$widgetHeaderBgnd: #efefef;
+$dropPlaceholder: #ddd;
+$subTitle: #111;
+$widgetFooteBgnd: #e1e1e1;
+$riskActive: #a46203;
+$gov: #44aac8;
+$govActive: #026b8a;
+$addBtn: #5ab45a;
+$addBtnBorder: #399a39;
+$sidenavBorder: #e5e5e5;
+$sidenavHover: #f5f5f5;
+$treeListBgnd: #fafafa;
+$btnActive: #e6e6e6;
+$tabTitle: #777;
+$btnAddShadow: #296029;
+$ajaxBtnDisabled: #e0e0e0;
+$ajaxGray: #7b7b7b;
+$footerBorder: #ddd;
+$infoMessageBorder: #ddd;
+$infoMessageText: #bbb;
+$tabBgnd: #fafafa;
+$tabBorder: #ddd;
+$tabHoverBgnd: #444;
+$darkBlue: #0055cc;
+$warningBorder: #fbeed5;
+$warningBgnd: #fcf8e3;
+$contentBgnd: #e0e0e0;
+$itemBorder: #e0e0e0;
+$searchBlue: #448aff;
+$draftGray: #757575;
+$itemBgnd: #f5f5f5;
+
+// compliance
+$defaultWidget: #444;
+$governance: $defaultBlue;
+$business: $defaultGreen;
+$risk: #731a46;
+$entities: #795548;
+$programs: #512da8;
+$objectives: #2b8ccc;
+$controls: #243ea4;
+
+// pbc requests color states
+$rqDraft: #f7f7f7;
+$rqAccepted: #d1fcb5;
+$rqStarted: #ffffbe;
+$rqWarning: #ffcebe;
+$rqRequest: #ffffbe;
+$rqAmmend: #ffffbe;
+$rqRespond: #cbeaff;
+$rqUpdate: #cbeaff;
+
+$rqAssigned: #ffffbe;
+$rqSubmitted: #cbeaff;
+
+$lightBlue: #40c4ff;
+$orange: #ffab40;
+$deepOrange: #ff7043;
+$btnGreen: #43a047;
+
+// status label colors
+$status-draft: #bdbdbd;
+
+// progress bar colors
+$bar-base: #fff;
+$bar-success: #d1fcb5;
+$bar-danger: #ffffbe;
+$bar-warning: #ffcebe;

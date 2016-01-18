@@ -364,6 +364,7 @@ function resize_areas(event, target_info_pin_height) {
   $window = $(window);
   $lhs = $(".lhs");
   $lhsHolder = $(".lhs-holder");
+  $lhnType = $(".lhn-type");
   $footer = $(".footer");
   $header = $(".header-content");
   $innerNav = $(".inner-nav");
@@ -384,6 +385,7 @@ function resize_areas(event, target_info_pin_height) {
   headerWidth = winWidth - 40;// - lhsWidth;  new ui resize
   internavHeight = object_area_height();
 
+  $lhnType.css('width', lhsWidth);
   $lhsHolder.css("height",lhsHeight);
   $bar.css("height",lhsHeight);
   $footer.css("margin-top",footerMargin);

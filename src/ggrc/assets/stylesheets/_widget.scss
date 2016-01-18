@@ -1007,6 +1007,23 @@
 }
 
 .preview-container {
+  height: 560px;
+  width: 756px;
+  margin: 10px 10px;
+  overflow: hidden;
+  .preview {
+    transform: scale3d(0.75, 0.75, 1);
+    -webkit-transform: scale3d(0.75, 0.75, 1);
+    -ms-transform: scale3d(0.75, 0.75, 1);
+    -o-transform: scale3d(0.75, 0.75, 1);
+    transform-origin: 0px 0px;
+    -webkit-transform-origin: 0 0;
+    -ms-transform-origin: 0 0;
+    -o-transform-origin: 0 0;
+    height: 560px;
+    width: 756px;
+    position: absolute;
+  }
   &.person-preview {
     overflow: visible;
     height: auto;
