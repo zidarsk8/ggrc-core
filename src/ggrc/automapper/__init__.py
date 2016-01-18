@@ -62,9 +62,7 @@ class AutomapperGenerator(object):
         cols.filter(
             tuple_(Relationship.destination_type,
                    Relationship.destination_id).in_(
-                [(s.type, s.id) for s in stubs]
-            )
-        )
+                       [(s.type, s.id) for s in stubs]))
     ).all()
     for (src_type, src_id, dst_type, dst_id) in relationships:
       src = Stub(src_type, src_id)
@@ -154,9 +152,9 @@ class AutomapperGenerator(object):
           if (src, dst) != original]))  # (src, dst) is sorted
 
   def _step(self, src, dst):
-      explicit, implicit = rules[src.type, dst.type]
-      self._step_explicit(src, dst, explicit)
-      self._step_implicit(src, dst, implicit)
+    explicit, implicit = rules[src.type, dst.type]
+    self._step_explicit(src, dst, explicit)
+    self._step_implicit(src, dst, implicit)
 
   def _step_explicit(self, src, dst, explicit):
     if len(explicit) != 0:
