@@ -118,32 +118,6 @@
   }
 }
 
-.pane-header {
-  h3 {
-    overflow: hidden !important;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 80%;
-    float: left;
-    margin-right: 10px;
-  }
-}
-
-.sticky-info-panel {
-  .pane-header {
-    position: fixed;
-    left: 52px;
-    right: 52px;
-    height: 52px;
-    background: $white;
-    border-bottom: 1px solid $lightGray;
-    padding-top: 15px;
-    margin-bottom: 10px;
-    z-index: 9000;
-    margin-top: -92px;
-    padding-top: 20px;
-  }
-}
 .inline-radio-list {
   @extend %reset-list;
   @include clearfix();

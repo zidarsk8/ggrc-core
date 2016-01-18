@@ -1,0 +1,89 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.info {
+  @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
+  background: $white;
+  padding: 25px 30px 20px 30px;
+  font-size: 13px;
+  .wrap-row {
+    p {
+      padding-top: 0;
+      margin-bottom: 9px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  h6 {
+    padding-bottom: 6px;
+  }
+  h3 {
+    font-size: 18px;
+    line-height: 23px;
+    font-weight: normal;
+    i {
+      @include opacity(0.2);
+      cursor: pointer;
+      margin-top: 5px;
+      &:hover {
+        @include opacity(0.7);
+      }
+    }
+  }
+  .person-tooltip-trigger {
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    &.active {
+      text-decoration: underline;
+    }
+  }
+  .url {
+    @extend %oneline;
+    display: inline-block;
+  }
+  .error {
+    font-weight:normal;
+  }
+  i.fa-long-arrow-right {
+    @include opacity(0.4);
+    &:hover {
+      @include opacity(0.8);
+    }
+  }
+  &.no-space {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  &.tier-info {
+    padding:16px 0 0 0;
+    h3 {
+      .btn-mini {
+        font-weight:normal;
+        margin-left:10px;
+        padding-left:10px;
+        padding-right:10px;
+      }
+    }
+  }
+  &.person-info {
+    padding: 5px 0 0 0;
+    > div {
+      overflow: hidden;
+    }
+  }
+  .multi-type-label {
+    padding-bottom: 2px;
+    font-size: 11px;
+    color: $darkText;
+    line-height: 17px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+}
