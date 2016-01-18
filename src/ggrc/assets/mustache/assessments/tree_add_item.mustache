@@ -15,7 +15,7 @@
     {{/is_allowed}}
     {{/if}}
   {{else}}
-    {{^if_instance_of parent_instance 'ControlAssessment'}}
+    {{^if_instance_of parent_instance 'Assessment'}}
       {{#if allow_mapping}}
       {{#is_allowed_to_map parent_instance model.shortName}}
         <a

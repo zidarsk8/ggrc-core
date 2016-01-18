@@ -12,7 +12,7 @@ permissions = {
     "read": [
         "Audit",
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -29,7 +29,7 @@ permissions = {
     ],
     "create": [
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
         "Relationship",
         "DocumentationResponse",
@@ -42,7 +42,7 @@ permissions = {
     ],
     "update": [
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -51,7 +51,7 @@ permissions = {
     ],
     "delete": [
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",

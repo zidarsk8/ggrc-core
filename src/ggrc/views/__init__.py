@@ -252,7 +252,7 @@ def contributed_object_views():
       object_view(models.Clause),
       object_view(models.Section),
       object_view(models.Control),
-      object_view(models.ControlAssessment),
+      object_view(models.Assessment),
       object_view(models.Objective),
       object_view(models.System),
       object_view(models.Process),

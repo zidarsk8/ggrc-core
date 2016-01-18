@@ -30,7 +30,7 @@ class Converter(object):
       "Standard",
       "Section",
       "Control",
-      "Control Assessment",
+      "Assessment",
       "Workflow",
       "Task Group",
       "Task Group Task",

@@ -18,7 +18,7 @@ from ggrc.login import get_current_user
 from ggrc.models import Audit
 from ggrc.models import CategoryBase
 from ggrc.models import Contract
-from ggrc.models import ControlAssessment
+from ggrc.models import Assessment
 from ggrc.models import ObjectPerson
 from ggrc.models import Option
 from ggrc.models import Person
@@ -431,7 +431,7 @@ class ConclusionColumnHandler(ColumnHandler):
 
   def parse_item(self):
     conclusion_map = {i.lower(): i for i in
-                      ControlAssessment.VALID_CONCLUSIONS}
+                      Assessment.VALID_CONCLUSIONS}
     return conclusion_map.get(self.raw_value.lower(), "")
 
 
