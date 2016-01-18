@@ -1347,6 +1347,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.options.sort_function.deep_property = key_tree;
       this.options.sort_function.comparator = comparator;
 
+
       this.options.sort_direction = order;
       this.options.sort_by = key;
 

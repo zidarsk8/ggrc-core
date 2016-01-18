@@ -1206,12 +1206,29 @@ can.Model("can.Model.Cacheable", {
     return [type,
             this.id].join('/');
   },
+  get_custom_value: function (prop) {
+    var attr = _.find(GGRC.custom_attr_defs, function (item) {
+      return item.definition_type === this.type.toLowerCase() &&
+        item.title === prop;
+    }.bind(this));
+    var result;
+
+    if (!attr) {
+      return undefined;
+    }
+    result = _.find(this.custom_attribute_values, function (item) {
+      return item.custom_attribute_id === attr.id;
+    });
+    return result ? result.reify().attribute_value : undefined;
+  },
 
   // Returns a deep property as specified in the descriptor built
   // by Cacheable.parse_deep_property_descriptor
   get_deep_property: function(property_descriptor) {
     var i, j, part, field, found, tmp,
         val = this;
+    var rCustom = /^custom\:/i;
+
     for (i = 0; i < property_descriptor.length; i++) {
       part = property_descriptor[i];
       if (val.instance) {
@@ -1222,6 +1239,9 @@ can.Model("can.Model.Cacheable", {
         return _.map(val, function(element) {
           return element.get_deep_property(property_descriptor.slice(i+1));
         });
+      } else if (part.length === 1 && rCustom.test(part[0])) {
+        part = part[0].split(':')[1];
+        return this.get_custom_value(part);
       } else {
         for (j = 0; j < part.length; j++) {
           field = part[j];
