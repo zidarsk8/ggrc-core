@@ -16,13 +16,12 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
     if(!(instance instanceof CMS.Models.ControlAssessment)) {
       return;
     }
-
     var audit_dfd, control_dfd;
-
-    audit_dfd = this._create_relationship(instance, instance.audit, instance.audit.context);
-    control_dfd = this._create_relationship(instance, instance.control, instance.audit.context);
-    instance.delay_resolving_save_until($.when(audit_dfd, control_dfd));
-
+    this._after_pending_joins(instance, function() {
+      audit_dfd = this._create_relationship(instance, instance.audit, instance.audit.context);
+      control_dfd = this._create_relationship(instance, instance.control, instance.audit.context);
+      instance.delay_resolving_save_until($.when(audit_dfd, control_dfd));
+    }.bind(this));
   },
   "{CMS.Models.Issue} created": function(model, ev, instance) {
 
@@ -31,13 +30,14 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
     }
 
     var audit_dfd, control_dfd, program_dfd, control_assessment_dfd;
-
-    audit_dfd = this._create_relationship(instance, instance.audit);
-    control_dfd = this._create_relationship(instance, instance.control);
-    program_dfd = this._create_relationship(instance, instance.program);
-    control_assessment_dfd = this._create_relationship(instance, instance.control_assessment);
-    instance.delay_resolving_save_until($.when(audit_dfd, control_dfd));
-
+    this._after_pending_joins(instance, function() {
+      audit_dfd = this._create_relationship(instance, instance.audit);
+      control_dfd = this._create_relationship(instance, instance.control);
+      program_dfd = this._create_relationship(instance, instance.program);
+      control_assessment_dfd = this._create_relationship(instance, instance.control_assessment);
+      instance.delay_resolving_save_until($.when(audit_dfd, control_dfd,
+          program_dfd, control_assessment_dfd));
+    }.bind(this));
   },
   "{CMS.Models.Section} created": function(model, ev, instance) {
 
@@ -46,9 +46,10 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
     }
 
     var directive_dfd;
-
-    directive_dfd = this._create_relationship(instance, instance.directive);
-    instance.delay_resolving_save_until($.when(directive_dfd));
+    this._after_pending_joins(instance, function() {
+      directive_dfd = this._create_relationship(instance, instance.directive);
+      instance.delay_resolving_save_until($.when(directive_dfd));
+    }.bind(this));
 
   },
   "{CMS.Models.UserRole} created": function(model, ev, instance) {
@@ -78,6 +79,13 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
       }).save();
     });
     instance.delay_resolving_save_until(dfd);
+  },
+  _after_pending_joins: function(instance, callback) {
+    var dfd = instance.attr('_pending_joins_dfd');
+    if (!dfd) {
+      dfd = new $.Deferred().resolve();
+    }
+    dfd.then(callback)
   },
   _create_relationship: function(source, destination, context) {
 
