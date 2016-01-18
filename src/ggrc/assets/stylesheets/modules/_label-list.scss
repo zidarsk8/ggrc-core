@@ -5,6 +5,79 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
+.person-label {
+  @include border-radius(50%);
+  width: 35px;
+  height: 35px;
+  float: left;
+  margin-right: 10px;
+  color: $white;
+  text-align: center;
+  line-height: 36px;
+  font-size: 14px;
+  .required {
+    display: inline-block;
+  }
+  .modal-body & {
+    width: 20px;
+    height: 20px;
+    margin-right: 7px;
+    line-height: 20px;
+    font-size: 12px;
+  }
+  &.none {
+    background: $lightGray;
+    &:after {
+      content: "N";
+    }
+  }
+  &.assignee {
+    background: $olive;
+    &:after {
+      content: "A";
+    }
+  }
+  &.assessor,
+  &.assessors {
+    background: $purple;
+    &:after {
+      content: "S";
+    }
+  }
+  &.requester {
+    background: $purple;
+    &:after {
+      content: "R";
+    }
+  }
+  &.creator,
+  &.creators {
+    background: $orange;
+    &:after {
+      content: "C";
+    }
+  }
+  &.verifier,
+  &.verifier {
+    background: $orange;
+    &:after {
+      content: "V";
+    }
+  }
+  &.lead {
+    background: $orange;
+    &:after {
+      content: "L";
+    }
+  }
+  &.auditor {
+    background: $olive;
+    &:after {
+      content: "A";
+    }
+  }
+}
+
 .people-group {
   padding-bottom: 16px;
 }
