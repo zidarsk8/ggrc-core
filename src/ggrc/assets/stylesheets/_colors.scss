@@ -15,11 +15,11 @@ $filterBgnd: #bebebe;
 $infoWidgetHeader: #111;
 
 // texts
-$darkText:#333; // WCAG AAA
-$text:#666; // WCAG AAA
-$error:#e00; // WCAG AA
-$disabled: #777; // WCAG AA
-$warning:#f60; // WCAG AAA
+$darkText:#333;
+$text:#666;
+$error:#e00;
+$disabled: #777;
+$warning:#f60;
 
 // default colors
 $white: #fff;
@@ -113,12 +113,12 @@ $messageYellow: #ffffcc;
 $messagePurple: #ddddff;
 
 // compliance
-$defaultWidget: #444; // WCAG AAA
-$governance: $defaultBlue;  // WCAG AAA
-$business: $defaultGreen;  // WCAG AAA
-$risk: #731a46;  // WCAG AAA
-$entities: #795548; // WCAG AAA
-$programs: #512da8; // WCAG AAA
+$defaultWidget: #444;
+$governance: $defaultBlue;
+$business: $defaultGreen;
+$risk: #731a46;
+$entities: #795548;
+$programs: #512da8;
 $objectives: #2b8ccc;
 $controls: #243ea4;
 
