@@ -29,6 +29,34 @@
   }
 }
 
+.pin-action {
+  @include clearfix();
+  @extend %reset-list;
+  float: right;
+  li {
+    float: left;
+    margin-left: 8px;
+    margin-top: 2px;
+    &:last-child {
+      margin-top: 0;
+    }
+    &:first-child {
+      margin-left: 0;
+    }
+    a {
+      i {
+        @include opacity(.25);
+      }
+      &.active,
+      &:hover {
+        i {
+          @include opacity(1);
+        }
+      }
+    }
+  }
+}
+
 .tier-content {
   &.pin {
     .info-pane-utility {

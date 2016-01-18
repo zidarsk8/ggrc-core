@@ -1,0 +1,40 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.mapped-list {
+  @extend %reset-list;
+  li {
+    margin-bottom: 5px;
+    position: relative;
+    .person-holder {
+      @extend %oneline;
+      width: 77%;
+      display: inline-block;
+      .past-items-list & {
+        width: 85%;
+      }
+    }
+    .custom-attr-wrap {
+      border-top: none;
+    }
+    &:last-child {
+      .custom-attr-wrap {
+        &.mapped {
+          .info-expand-mapped {
+            border-bottom: none;
+          }
+        }
+      }
+    }
+    &:hover {
+      .file-controls {
+        @include opacity(1);
+        left: -25px;
+      }
+    }
+  }
+}

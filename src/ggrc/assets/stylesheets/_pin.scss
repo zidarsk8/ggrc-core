@@ -21,34 +21,6 @@
   }
 }
 
-.pin-action {
-  @include clearfix();
-  @extend %reset-list;
-  float: right;
-  li {
-    float: left;
-    margin-left: 8px;
-    margin-top: 2px;
-    &:last-child {
-      margin-top: 0;
-    }
-    &:first-child {
-      margin-left: 0;
-    }
-    a {
-      i {
-        @include opacity(.25);
-      }
-      &.active,
-      &:hover {
-        i {
-          @include opacity(1);
-        }
-      }
-    }
-  }
-}
-
 .visual-radio {
   @extend %reset-list;
   @include clearfix();
@@ -79,61 +51,6 @@
     float: left;
     margin-right: 10px;
     &:last-child {
-      margin-right: 0;
-    }
-  }
-}
-
-.mapped-list {
-  @extend %reset-list;
-  li {
-    margin-bottom: 5px;
-    position: relative;
-    .person-holder {
-      @extend %oneline;
-      width: 77%;
-      display: inline-block;
-      .past-items-list & {
-        width: 85%;
-      }
-    }
-    .custom-attr-wrap {
-      border-top: none;
-    }
-    &:last-child {
-      .custom-attr-wrap {
-        &.mapped {
-          .info-expand-mapped {
-            border-bottom: none;
-          }
-        }
-      }
-    }
-    &:hover {
-      .file-controls {
-        @include opacity(1);
-        left: -25px;
-      }
-    }
-  }
-}
-
-.inline-radio-list {
-  @extend %reset-list;
-  @include clearfix();
-  li {
-    float: left;
-    margin-right: 20px;
-    &:last-child {
-      margin-right: 0;
-    }
-    input {
-      margin: -3px 0 0 0;
-    }
-  }
-  &.full-width {
-    li {
-      width: 20%;
       margin-right: 0;
     }
   }
