@@ -855,54 +855,60 @@ can.Model.Cacheable("CMS.Models.Meeting", {
 
 });
 
-can.Model.Cacheable("CMS.Models.ControlAssessment", {
-  root_object : "control_assessment",
-  root_collection : "control_assessments",
-  findOne : "GET /api/control_assessments/{id}",
-  findAll : "GET /api/control_assessments",
-  update : "PUT /api/control_assessments/{id}",
-  destroy : "DELETE /api/control_assessments/{id}",
-  create : "POST /api/control_assessments",
-  mixins : ["ownable", "contactable", "unique_title"],
-  is_custom_attributable: true,
-  attributes : {
-    control : "CMS.Models.Control.stub",
-    context : "CMS.Models.Context.stub",
-    modified_by : "CMS.Models.Person.stub",
-    custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
-    start_date: "date",
-    end_date: "date"
-  },
-  filter_keys : ["operationally", "operational", "design"
-  ],
-  filter_mappings: {
-    "operational": "operationally"
-  },
-  tree_view_options : {
-    add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
-    attr_list : can.Model.Cacheable.attr_list.concat([
+  can.Model.Cacheable('CMS.Models.ControlAssessment', {
+    root_object: 'control_assessment',
+    root_collection: 'control_assessments',
+    findOne: 'GET /api/control_assessments/{id}',
+    findAll: 'GET /api/control_assessments',
+    update: 'PUT /api/control_assessments/{id}',
+    destroy: 'DELETE /api/control_assessments/{id}',
+    create: 'POST /api/control_assessments',
+    mixins: ['ownable', 'contactable', 'unique_title'],
+    is_custom_attributable: true,
+    attributes: {
+      control: 'CMS.Models.Control.stub',
+      context: 'CMS.Models.Context.stub',
+      modified_by: 'CMS.Models.Person.stub',
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
+      start_date: 'date',
+      end_date: 'date'
+    },
+    filter_keys: ['operationally', 'operational', 'design'
+    ],
+    filter_mappings: {
+      operational: 'operationally'
+    },
+    tree_view_options: {
+      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
+      attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Conclusion: Design', attr_name: 'design'},
         {attr_title: 'Conclusion: Operation', attr_name: 'operationally'},
         {attr_title: 'URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
-    ])
-  },
-  init: function () {
-    this._super && this._super.apply(this, arguments);
-    this.validatePresenceOf("control");
-    this.validatePresenceOf("audit");
-    this.validateNonBlank("title");
-  }
-}, {
-  form_preload: function (new_object_form) {
-    var page_instance = GGRC.page_instance();
-    if (new_object_form && page_instance && page_instance.type === "Audit") {
-      if (!this.audit) {
-        this.attr("audit", page_instance);
-        this.mark_for_addition("related_objects_as_destination", page_instance.program);
+      ])
+    },
+    init: function () {
+      if (this._super) {
+        this._super.apply(this, arguments);
       }
+      this.validatePresenceOf('control');
+      this.validatePresenceOf('audit');
+      this.validateNonBlank('title');
     }
-  }
-});
-
+  }, {
+    form_preload: function (new_object_form) {
+      var page_instance = GGRC.page_instance();
+      if (new_object_form && page_instance && page_instance.type === 'Audit') {
+        if (!this.audit) {
+          this.attr('audit', page_instance);
+        }
+      }
+    },
+    before_save: function (newForm) {
+      if (!newForm) {
+        return;
+      }
+      this.mark_for_addition('related_objects_as_destination', this.audit.program);
+    }
+  });
 })(this.can);
