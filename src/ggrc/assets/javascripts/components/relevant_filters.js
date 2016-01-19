@@ -16,12 +16,17 @@
         var type = this.attr("type"),
             showAll = /true/i.test(this.attr("show_all")),
             isAll = type === "AllObject",
-            mappings;
+            mappings, models;
 
         if (showAll) {
-          return _.sortBy(_.compact(_.map(GGRC.tree_view.base_widgets_by_type[type], function (mapping) {
+          // find all widget types and manually add Cycle since it's missing
+          // convert names to CMS models and prune invalid (undefined)
+          models = ["Cycle"];
+          models = Array.prototype.concat.apply(models, _.values(GGRC.tree_view.base_widgets_by_type));
+          models = _.map(_.unique(models), function (mapping) {
             return CMS.Models[mapping];
-          })), "model_singular");
+          });
+          return _.sortBy(_.compact(models), "model_singular");
         }
         if (this.attr("search_only") && isAll) {
           mappings = GGRC.tree_view.base_widgets_by_type;
