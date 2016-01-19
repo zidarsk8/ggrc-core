@@ -40,6 +40,17 @@
       font-size: 24px;
     }
   }
+  @media (max-width: 1200px) {
+    .menu {
+      li {
+        a {
+          span {
+            display: none;
+          }
+        }
+      }
+    }
+  }
 }
 
 .lhn-trigger {
