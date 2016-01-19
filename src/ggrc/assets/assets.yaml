@@ -197,12 +197,12 @@ dashboard-js-template-files:
   - controls/modal_content.mustache
   - controls/object_list.mustache
   - controls/tree.mustache
-  - control_assessments/modal_content.mustache
-  - control_assessments/tree.mustache
-  - control_assessments/tree_header.mustache
-  - control_assessments/tree_footer.mustache
-  - control_assessments/tree_add_item.mustache
-  - control_assessments/info.mustache
+  - assessments/modal_content.mustache
+  - assessments/tree.mustache
+  - assessments/tree_header.mustache
+  - assessments/tree_footer.mustache
+  - assessments/tree_add_item.mustache
+  - assessments/info.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache

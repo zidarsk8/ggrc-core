@@ -13,7 +13,7 @@ Attr = namedtuple('Attr', ['name'])
 
 type_ordering = [['Program'], ['Regulation', 'Policy', 'Standard', 'Contract'],
                  ['Section', 'Clause'], ['Objective'], ['Control'],
-                 ['ControlAssessment']]
+                 ['Assessment']]
 
 
 def get_type_indices():
@@ -129,7 +129,7 @@ class RuleSet(object):
 
 class Types(object):
   all = {'Program', 'Regulation', 'Policy', 'Standard', 'Contract',
-         'Section', 'Clause', 'Objective', 'Control', 'ControlAssessment'}
+         'Section', 'Clause', 'Objective', 'Control', 'Assessment'}
   directives = {'Regulation', 'Policy', 'Standard', 'Contract'}
   assets_business = {'System', 'Process', 'DataAsset', 'Product', 'Project',
                      'Facility', 'Market'}

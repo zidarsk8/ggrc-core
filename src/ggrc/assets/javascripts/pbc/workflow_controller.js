@@ -11,9 +11,9 @@
 can.Control("GGRC.Controllers.PbcWorkflows", {
 
 }, {
-  "{CMS.Models.ControlAssessment} created": function(model, ev, instance) {
+  "{CMS.Models.Assessment} created": function(model, ev, instance) {
 
-    if(!(instance instanceof CMS.Models.ControlAssessment)) {
+    if(!(instance instanceof CMS.Models.Assessment)) {
       return;
     }
 
@@ -30,12 +30,12 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
       return;
     }
 
-    var audit_dfd, control_dfd, program_dfd, control_assessment_dfd;
+    var audit_dfd, control_dfd, program_dfd, assessment_dfd;
 
     audit_dfd = this._create_relationship(instance, instance.audit);
     control_dfd = this._create_relationship(instance, instance.control);
     program_dfd = this._create_relationship(instance, instance.program);
-    control_assessment_dfd = this._create_relationship(instance, instance.control_assessment);
+    assessment_dfd = this._create_relationship(instance, instance.assessment);
     instance.delay_resolving_save_until($.when(audit_dfd, control_dfd));
 
   },

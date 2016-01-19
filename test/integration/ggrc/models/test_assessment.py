@@ -4,16 +4,15 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from ggrc import db
-from ggrc.models import ControlAssessment
+from ggrc.models import Assessment
 from integration.ggrc import TestCase
-from integration.ggrc.models.factories import ControlAssessmentFactory
+from integration.ggrc.models.factories import AssessmentFactory
 
 
-class TestControlAssessment(TestCase):
+class TestAssessment(TestCase):
 
   def test_auto_slug_generation(self):
-    ControlAssessmentFactory(title="Some title")
+    AssessmentFactory(title="Some title")
     db.session.commit()
-    ca = ControlAssessment.query.first()
-    self.assertIn("CONTROL-", ca.slug)
-    self.assertIn(ca.control.slug, ca.slug)
+    ca = Assessment.query.first()
+    self.assertEqual("ASSESSMENT-{}".format(ca.id), ca.slug)

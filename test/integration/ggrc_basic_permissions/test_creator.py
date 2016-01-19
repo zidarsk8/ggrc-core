@@ -45,7 +45,7 @@ class TestCreator(TestCase):
     self.api.set_user(self.users["creator"])
     all_errors = []
     base_models = set([
-        "Control", "ControlAssessment", "DataAsset", "Contract",
+        "Control", "Assessment", "DataAsset", "Contract",
         "Policy", "Regulation", "Standard", "Document", "Facility",
         "Market", "Objective", "OrgGroup", "Vendor", "Product",
         "Clause", "System", "Process", "Issue", "Project", "AccessGroup"

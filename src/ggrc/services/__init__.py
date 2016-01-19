@@ -26,7 +26,7 @@ def contributed_services():
       service('control_assertions', models.ControlAssertion),
       service('contexts', models.Context),
       service('controls', models.Control),
-      service('control_assessments', models.ControlAssessment),
+      service('assessments', models.Assessment),
       service('comments', models.Comment),
       service('custom_attribute_definitions',
               models.CustomAttributeDefinition),

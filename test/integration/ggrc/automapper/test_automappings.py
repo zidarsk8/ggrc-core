@@ -330,12 +330,12 @@ class TestAutomappings(integration.ggrc.TestCase):
     control = self.create_object(models.Control, {
         'title': next('Test control')
     })
-    control_assessment = self.create_object(models.ControlAssessment, {
+    assessment = self.create_object(models.Assessment, {
         'title': next('Test CA'),
         'audit': {'id': audit.id},
         'control': {'id': control.id},
     })
     self.assert_mapping_implication(
-        to_create=[(program, regulation), (regulation, control_assessment)],
-        implied=[(program, control_assessment)]
+        to_create=[(program, regulation), (regulation, assessment)],
+        implied=[(program, assessment)]
     )
