@@ -163,7 +163,7 @@ To run the full-fledged end-to-end system tests, go to the project root
 directory **on the host machine** and run the following from its console:
 
 ```console
-./bin/run_selenium
+./bin/jenkins/run_selenium
 ```
 
 Please keep in mind that, for various technical reasons, Selenium tests
