@@ -1,4 +1,4 @@
-C,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",Mandatory field,,"if owner is not provided, current user will be reated as owner of the object","Default value 'draft' is selected
+Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",Mandatory field,,"if owner is not provided, current user will be reated as owner of the object","Default value 'draft' is selected
 Other values are:
 Final
 Effective
