@@ -59,7 +59,7 @@
                           {{/case}}
                           {{#case 'audit'}}
                             {{#using audit=instance.audit}}
-                              {{audit.title}}
+                              {{audit.status}} &mdash; {{audit.title}}
                             {{/using}}
                           {{/case}}
                           {{#case 'mapped_responses'}}
