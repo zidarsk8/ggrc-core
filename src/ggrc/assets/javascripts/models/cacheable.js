@@ -1249,11 +1249,6 @@ can.Model("can.Model.Cacheable", {
       if (part === 'GET_ALL') {
         mapProp = mapDeepProp(i);
         return _.map(val, mapProp);
-      } else if (_.isString(part) && rCustom.test(part) ||
-        _.isArray(part) && part.length === 1 && rCustom.test(part[0])
-        ) {
-        part = (_.isArray(part) ? part[0] : part).split(':')[1];
-        return this.get_custom_value(part);
       }
       for (j = 0; j < part.length; j++) {
         field = part[j];
@@ -1263,6 +1258,11 @@ can.Model("can.Model.Cacheable", {
           if (typeof val.reify === 'function') {
             val = val.reify();
           }
+          found = true;
+          break;
+        } else if (rCustom.test(field)) {
+          field = field.split(':')[1];
+          val = this.get_custom_value(field);
           found = true;
           break;
         }
