@@ -905,7 +905,7 @@ can.Model.Cacheable("CMS.Models.Meeting", {
       }
     },
     before_save: function (newForm) {
-      if (!newForm) {
+      if (!this.isNew()) {
         return;
       }
       this.mark_for_addition('related_objects_as_destination', this.audit.program);
