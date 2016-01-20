@@ -22,9 +22,13 @@ from ggrc.models.mixins import (
 )
 from ggrc.models.reflection import PublishOnly
 from ggrc_gdrive_integration.models.object_folder import Folderable
-from ggrc_workflows.models.cycle import Cycle
+from ggrc_workflows.models import cycle
 from ggrc_workflows.models.workflow_person import WorkflowPerson
 from ggrc_basic_permissions.models import UserRole
+
+
+from ggrc_workflows.models import cycle_task_group_object_task as ctgot
+from sqlalchemy import and_
 
 
 class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
@@ -87,7 +91,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
 
   @computed_property
   def workflow_state(self):
-    return WorkflowState.get_state(self.cycles)
+    return WorkflowState.get_workflow_state(self.cycles)
 
   _sanitize_html = [
       'notify_custom_message',
@@ -192,29 +196,18 @@ class WorkflowState(object):
   _stub_attrs = []
 
   @classmethod
-  def get_state(cls, objs):
+  def _get_state(cls, current_objects):
     priority_states = OrderedDict([
         # The first True state will be returned
-        ("Overdue", False),
         ("InProgress", False),
         ("Finished", False),
         ("Assigned", False),
         ("Verified", False)
     ])
 
-    for obj in objs:
-      today = date.today()
-      cycle = obj if isinstance(obj, Cycle) else obj.cycle
-      if not cycle.is_current:
-        continue
-      for task in obj.cycle_task_group_object_tasks:
-        if task.end_date and \
-           task.end_date <= today and \
-           task.status != "Verified":
-          priority_states["Overdue"] = True
-      if not obj.status:
-        priority_states["Assigned"] = True
-      priority_states[obj.status] = True
+    for obj in current_objects:
+      status = obj.status or "Assigned"
+      priority_states[status] = True
 
     for state in priority_states.keys():
       if priority_states[state]:
@@ -222,9 +215,57 @@ class WorkflowState(object):
 
     return None
 
+  @classmethod
+  def get_object_state(cls, objs):
+    current_objects = [o for o in objs if o.cycle.is_current]
+
+    if not current_objects:
+      return None
+
+    object_ids = [o.id for o in current_objects]
+    overdue_tasks = db.session.query(
+        ctgot.CycleTaskGroupObjectTask.id).join(
+        cycle.Cycle).filter(
+        and_(
+            cycle.Cycle.is_current,
+            ctgot.CycleTaskGroupObjectTask.status != "Verified",
+            ctgot.CycleTaskGroupObjectTask.end_date <= date.today(),
+            ctgot.CycleTaskGroupObjectTask.cycle_task_group_object_id.in_(
+                object_ids),
+        )
+    ).count()
+    if overdue_tasks:
+      return "Overdue"
+
+    return cls._get_state(current_objects)
+
+
+  @classmethod
+  def get_workflow_state(cls, cycles):
+    current_cycles = [c for c in cycles if c.is_current]
+
+    if not current_cycles:
+      return None
+
+    cycle_ids = [c.id for c in current_cycles]
+    overdue_tasks = db.session.query(
+        ctgot.CycleTaskGroupObjectTask.id).join(
+        cycle.Cycle).filter(
+        and_(
+            cycle.Cycle.id.in_(cycle_ids),
+            ctgot.CycleTaskGroupObjectTask.status != "Verified",
+            ctgot.CycleTaskGroupObjectTask.end_date <= date.today()
+        )
+    ).count()
+    if overdue_tasks:
+      return "Overdue"
+
+    return cls._get_state(current_cycles)
+
+
   @computed_property
   def workflow_state(self):
-    return WorkflowState.get_state(self.cycle_task_group_objects)
+    return WorkflowState.get_object_state(self.cycle_task_group_objects)
 
   @classmethod
   def eager_query(cls):
