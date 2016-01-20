@@ -63,6 +63,15 @@
       },
       events : new GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent")
     },
+    Workflow: {
+      _mixins :  ["folderable"],
+      folders : new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder"),
+      orphaned_objects : new GGRC.ListLoaders.MultiListLoader(["cycles", "task_groups", "tasks", "current_task_groups", "current_tasks", "folders"])
+    },
+    CycleTaskEntry : {
+      folders : new GGRC.ListLoaders.CrossListLoader("workflow", "folders"),
+      extended_folders : new GGRC.ListLoaders.MultiListLoader(["folders"])
+    },
     GDriveFolder : {
       _mixins : ["revisionable"],
       _canonical : {
@@ -90,7 +99,7 @@
     GGRC.Controllers.GAPI.gapidfd.resolve(gapi);
     delete window["resolvegapi" + r];
   };
-  $('head').append("<scr" + "ipt type='text/javascript' src='https://apis.google.com/js/client.js?onload=resolvegapi" + r + "'></script>");
+  $('head').append("<script type='text/javascript' src='https://apis.google.com/js/client.js?onload=resolvegapi" + r + "'></script>");
 
 
   $.extend(true, CMS.Models.Audit.attributes, {
@@ -100,6 +109,7 @@
 
   can.view.mustache("picker-tag-default", "<ggrc-gdrive-folder-picker {{^is_allowed 'update' instance context='for'}}readonly=true{{/is_allowed}} instance='instance'/>");
   GGRC.register_hook("Audit.tree_view_info", "picker-tag-default");
+  GGRC.register_hook("Audit.storage_folder_picker", GGRC.mustache_path + "/audits/gdrive_folder_picker.mustache");
 
 
   $.extend(true, CMS.Models.Document.attributes, {
@@ -131,5 +141,7 @@
   // Enable these hooks when the deployment allows G+ APIs
   // GGRC.register_hook("Person.popover_actions", GGRC.mustache_path + "/people/gplus_actions.mustache");
   // GGRC.register_hook("Person.popover_info", GGRC.mustache_path + "/people/gplus_photo.mustache");
+
+  GGRC.register_hook("Workflow.storage_folder_picker", GGRC.mustache_path + "/workflows/gdrive_folder_picker.mustache");
 
 })(this.can, this.can.$, this.CMS, this.GGRC);

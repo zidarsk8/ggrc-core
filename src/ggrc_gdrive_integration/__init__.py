@@ -4,8 +4,23 @@
 # Maintained By: anze@reciprocitylabs.com
 
 from flask import Blueprint
+from ggrc import db
 from ggrc import settings
 from ggrc.app import app
+from ggrc.models import Audit
+from ggrc.models import Document
+from ggrc.models import DocumentationResponse
+from ggrc.models import InterviewResponse
+from ggrc.models import Meeting
+from ggrc.models import Program
+from ggrc.models import PopulationSampleResponse
+from ggrc.models import Request
+from ggrc.models import Response
+from ggrc_workflows.models import Workflow
+import ggrc_gdrive_integration.models
+from ggrc_gdrive_integration.models.object_folder import Folderable
+from ggrc_gdrive_integration.models.object_file import Fileable
+from ggrc_gdrive_integration.models.object_event import Eventable
 
 blueprint = Blueprint(
   'gdrive',
@@ -15,15 +30,7 @@ blueprint = Blueprint(
   static_url_path='/static/ggrc_gdrive_integration',
 )
 
-import ggrc_gdrive_integration.models
 
-from ggrc import db
-from ggrc.models import Program, Audit, Request, Response, \
-  DocumentationResponse, InterviewResponse, PopulationSampleResponse, Document, \
-  Meeting
-from .models.object_folder import Folderable
-from .models.object_file import Fileable
-from .models.object_event import Eventable
 Program.__bases__ = (Folderable,) + Program.__bases__
 Program.late_init_folderable()
 Audit.__bases__ = (Folderable,) + Audit.__bases__
@@ -48,6 +55,11 @@ Document.late_init_fileable()
 Meeting.__bases__ = (Eventable,) + \
   Meeting.__bases__
 Meeting.late_init_eventable()
+# TODO: now the Gdrive module is dependant on the Workflows module. it used to
+# be the other way around but none of them are actually okay
+Workflow.__bases__ = (Folderable,) + Workflow.__bases__
+Workflow.late_init_folderable()
+
 '''
 Some other spitballs from Dan here:
 
