@@ -3,36 +3,45 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""Workflow object and WorkflowState mixins.
 
-from datetime import date
+This contains the basic Workflow object and a mixin for determining the state
+of the Objects that are mapped to any cycle tasks.
+"""
+
 from collections import OrderedDict
-from sqlalchemy import orm
+from datetime import date
+from sqlalchemy import and_
 from sqlalchemy import not_
+from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.login import get_current_user
+from ggrc.models import reflection
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
+from ggrc.models.mixins import Base
+from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import Described
+from ggrc.models.mixins import Slugged
+from ggrc.models.mixins import Stateful
+from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import Titled
+from ggrc.models.mixins import deferred
 from ggrc.models.person import Person
-from ggrc.models.reflection import AttributeInfo
-from ggrc.models.mixins import (
-    deferred, Base, Titled, Slugged, Described, Timeboxed, Stateful,
-    CustomAttributable
-)
-from ggrc.models.reflection import PublishOnly
-from ggrc_gdrive_integration.models.object_folder import Folderable
-from ggrc_workflows.models import cycle
-from ggrc_workflows.models.workflow_person import WorkflowPerson
 from ggrc_basic_permissions.models import UserRole
-
-
+from ggrc_gdrive_integration.models import object_folder
+from ggrc_workflows.models import cycle
 from ggrc_workflows.models import cycle_task_group_object_task as ctgot
-from sqlalchemy import and_
+from ggrc_workflows.models import workflow_person
 
 
 class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
                Slugged, Stateful, Base, db.Model):
+
+  """Basic Workflow first class object.
+  """
   __tablename__ = 'workflows'
   _title_uniqueness = False
 
@@ -51,7 +60,9 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
     return 'one_time'
 
   @orm.validates('frequency')
-  def validate_frequency(self, key, value):
+  def validate_frequency(self, _, value):
+    """Make sure that value is listed in valid frequencies.
+    """
     if value is None:
       value = self.default_frequency()
     if value not in self.VALID_FREQUENCIES:
@@ -99,7 +110,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
 
   _publish_attrs = [
       'workflow_people',
-      PublishOnly('people'),
+      reflection.PublishOnly('people'),
       'task_groups',
       'frequency',
       'notify_on_change',
@@ -107,9 +118,9 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       'cycles',
       'object_approval',
       'recurrences',
-      PublishOnly('next_cycle_start_date'),
-      PublishOnly('non_adjusted_next_cycle_start_date'),
-      PublishOnly('workflow_state'),
+      reflection.PublishOnly('next_cycle_start_date'),
+      reflection.PublishOnly('non_adjusted_next_cycle_start_date'),
+      reflection.PublishOnly('workflow_state'),
   ]
 
   _aliases = {
@@ -121,18 +132,18 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       "notify_on_change": "Force real-time email updates",
       "workflow_owner": {
           "display_name": "Manager",
-          "type": AttributeInfo.Type.USER_ROLE,
+          "type": reflection.AttributeInfo.Type.USER_ROLE,
           "mandatory": True,
           "filter_by": "_filter_by_workflow_owner",
       },
       "workflow_member": {
           "display_name": "Member",
-          "type": AttributeInfo.Type.USER_ROLE,
+          "type": reflection.AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_workflow_member",
       },
       "workflow_mapped": {
           "display_name": "No Access",
-          "type": AttributeInfo.Type.USER_ROLE,
+          "type": reflection.AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_no_access",
       },
       "status": None,
@@ -150,17 +161,21 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
 
   @classmethod
   def _filter_by_no_access(cls, predicate):
+    """Get query that filters workflows with mapped users.
+    """
     is_no_access = not_(UserRole.query.filter(
         (UserRole.person_id == Person.id) &
-        (UserRole.context_id == WorkflowPerson.context_id)
+        (UserRole.context_id == workflow_person.WorkflowPerson.context_id)
     ).exists())
-    return WorkflowPerson.query.filter(
-        (cls.id == WorkflowPerson.workflow_id) & is_no_access
+    return workflow_person.WorkflowPerson.query.filter(
+        (cls.id == workflow_person.WorkflowPerson.workflow_id) & is_no_access
     ).join(Person).filter(
         (predicate(Person.name) | predicate(Person.email))
     ).exists()
 
   def copy(self, _other=None, **kwargs):
+    """Create a partial copy of the current workflow.
+    """
     columns = [
         'title', 'description', 'notify_on_change', 'notify_custom_message',
         'frequency', 'end_date', 'start_date'
@@ -169,6 +184,8 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
     return target
 
   def copy_task_groups(self, target, **kwargs):
+    """Copy all task groups and tasks mapped to this workflow.
+    """
     for task_group in self.task_groups:
       obj = task_group.copy(
           workflow=target,
@@ -179,7 +196,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       )
       target.task_groups.append(obj)
 
-      if(kwargs.get("clone_tasks", False)):
+      if kwargs.get("clone_tasks", False):
         task_group.copy_tasks(
             obj,
             clone_people=kwargs.get("clone_people", False),
@@ -191,32 +208,43 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
 
 class WorkflowState(object):
 
-  _publish_attrs = [PublishOnly('workflow_state')]
+  """Object state mixin.
+
+  This is a mixin for adding workflow_state to all objects that can be mapped
+  to workflow tasks.
+  """
+
+  _publish_attrs = [reflection.PublishOnly('workflow_state')]
   _update_attrs = []
   _stub_attrs = []
 
   @classmethod
   def _get_state(cls, current_objects):
+    """Get lowest state of the objects.
+
+    Return the least done state off all objects. Function will work correctly
+    only for non Overdue states. If the result is overdue, it should be
+    handled outsid of this function.
+    """
     priority_states = OrderedDict([
         # The first True state will be returned
         ("InProgress", False),
         ("Finished", False),
         ("Assigned", False),
-        ("Verified", False)
+        ("Verified", False),
+        (None, True),
     ])
 
     for obj in current_objects:
       status = obj.status or "Assigned"
       priority_states[status] = True
 
-    for state in priority_states.keys():
-      if priority_states[state]:
-        return state
-
-    return None
+    first_state = [k for k, v in priority_states.items() if v]
+    return first_state[0]
 
   @classmethod
   def get_object_state(cls, objs):
+    """Get lowest state of an object"""
     current_objects = [o for o in objs if o.cycle.is_current]
 
     if not current_objects:
@@ -239,9 +267,9 @@ class WorkflowState(object):
 
     return cls._get_state(current_objects)
 
-
   @classmethod
   def get_workflow_state(cls, cycles):
+    """Get lowest state of a workflow"""
     current_cycles = [c for c in cycles if c.is_current]
 
     if not current_cycles:
@@ -262,7 +290,6 @@ class WorkflowState(object):
 
     return cls._get_state(current_cycles)
 
-
   @computed_property
   def workflow_state(self):
     return WorkflowState.get_object_state(self.cycle_task_group_objects)
@@ -279,5 +306,5 @@ class WorkflowState(object):
 
 
 # TODO: This makes the Workflow module dependant on Gdrive. It is not pretty.
-Workflow.__bases__ = (Folderable,) + Workflow.__bases__
+Workflow.__bases__ = (object_folder.Folderable,) + Workflow.__bases__
 Workflow.late_init_folderable()
