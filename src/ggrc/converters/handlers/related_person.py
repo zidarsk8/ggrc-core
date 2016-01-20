@@ -51,7 +51,8 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
         source_type=person.type,
         source_id=person.id,
         destination_type=self.row_converter.obj.type,
-        destination_id=self.row_converter.obj.id
+        destination_id=self.row_converter.obj.id,
+        context_id=self.row_converter.obj.context_id,
     )
     db.session.add(relation)
     db.session.flush()
