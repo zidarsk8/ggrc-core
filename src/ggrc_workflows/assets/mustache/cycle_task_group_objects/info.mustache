@@ -44,6 +44,7 @@
                 {{/is_allowed}}
               {{/if}}
 
+              {{#if_equals instance.cycle.reify.is_current true}}
               {{#is_allowed 'delete' instance}}
                 <li>
                   <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
@@ -52,6 +53,7 @@
                   </a>
                 </li>
               {{/is_allowed}}
+              {{/if_equals}}
             </ul>
           {{/if}}
         </div>
