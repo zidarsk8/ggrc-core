@@ -16,7 +16,6 @@ from ggrc_workflows import models
 
 
 class PreviousWorkflowState(object):
-
   """Copy of the original WorkflowState mixin
 
   This class is used as a base for comparing the refactored workflow_state
@@ -26,6 +25,10 @@ class PreviousWorkflowState(object):
   @classmethod
   def get_state(cls, objs):
     """Original get_state function.
+
+    This function is copy-pasted from the original WorkflowState mixin an
+    should not be modified. It is used only for comparison of the results with
+    the new refactored get_object_state and get_workflow_state functions.
     """
     priority_states = collections.OrderedDict([
         # The first True state will be returned
@@ -62,6 +65,13 @@ class PreviousWorkflowState(object):
     Previous workflow state was called with different arguments depending on
     the source class. This is a helper to make sure we always call the
     get_state function with the correct parameters.
+
+    Args:
+      obj: Object for which we want to get the state
+
+    Returns:
+      String containing the state of the object or None if the object has no
+        relevant tasks.
     """
     if isinstance(obj, models.Workflow):
       return cls.get_state(obj.cycles)
@@ -70,7 +80,6 @@ class PreviousWorkflowState(object):
 
 
 class TestWorkflowState(ggrc.TestCase):
-
   """Test class for workflow state refactor.
   """
 

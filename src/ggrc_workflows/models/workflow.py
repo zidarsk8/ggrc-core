@@ -39,7 +39,6 @@ from ggrc_workflows.models import workflow_person
 
 class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
                Slugged, Stateful, Base, db.Model):
-
   """Basic Workflow first class object.
   """
   __tablename__ = 'workflows'
@@ -62,6 +61,16 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
   @orm.validates('frequency')
   def validate_frequency(self, _, value):
     """Make sure that value is listed in valid frequencies.
+
+    Args:
+      value: A string value for requested frequency
+
+    Returns:
+      default_frequency which is 'one_time' if the value is None, or the value
+      itself.
+
+    Raises:
+      Value error, if the value is not None or in the VALID_FREQUENCIES array.
     """
     if value is None:
       value = self.default_frequency()
@@ -162,6 +171,14 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
   @classmethod
   def _filter_by_no_access(cls, predicate):
     """Get query that filters workflows with mapped users.
+
+    Args:
+      predicate: lambda function that excepts a single parameter and returns
+        true of false.
+
+    Returns:
+      An sqlalchemy query that evaluates to true or false and can be used in
+      filtering workflows by no_access users.
     """
     is_no_access = not_(UserRole.query.filter(
         (UserRole.person_id == Person.id) &
@@ -196,7 +213,7 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
       )
       target.task_groups.append(obj)
 
-      if kwargs.get("clone_tasks", False):
+      if kwargs.get("clone_tasks"):
         task_group.copy_tasks(
             obj,
             clone_people=kwargs.get("clone_people", False),
@@ -207,7 +224,6 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
 
 
 class WorkflowState(object):
-
   """Object state mixin.
 
   This is a mixin for adding workflow_state to all objects that can be mapped
@@ -225,6 +241,15 @@ class WorkflowState(object):
     Return the least done state off all objects. Function will work correctly
     only for non Overdue states. If the result is overdue, it should be
     handled outsid of this function.
+
+    Args:
+      current_objects: list of objects that are currently a part of an active
+        cycle or cycles that are active in an workflow.
+
+    Returns:
+      Lowest state of the list of objects, ordered from least done to complete.
+      This function does not check the Overdue states. if any object is Overdue
+      the result of thi function will not be correct.
     """
     priority_states = OrderedDict([
         # The first True state will be returned
@@ -239,12 +264,23 @@ class WorkflowState(object):
       status = obj.status or "Assigned"
       priority_states[status] = True
 
-    first_state = [k for k, v in priority_states.items() if v]
-    return first_state[0]
+    return next(k for k, v in priority_states.items() if v)
 
   @classmethod
   def get_object_state(cls, objs):
-    """Get lowest state of an object"""
+    """Get lowest state of an object
+
+    Get the lowest possible state of the tasks relevant to one object. States
+    are scanned in order: Overdue, InProgress, Finished, Assigned, Verified.
+
+    Args:
+      objs: A list of cycle task group objects, which should all be mapped to
+        the same object.
+
+    Returns:
+      Name of the lowest state of all active cycle tasks that relate to the
+      given objects.
+    """
     current_objects = [o for o in objs if o.cycle.is_current]
 
     if not current_objects:
@@ -269,7 +305,19 @@ class WorkflowState(object):
 
   @classmethod
   def get_workflow_state(cls, cycles):
-    """Get lowest state of a workflow"""
+    """Get lowest state of a workflow
+
+    Get the lowest possible state of the tasks relevant to a given workflow.
+    States are scanned in order: Overdue, InProgress, Finished, Assigned,
+    Verified.
+
+    Args:
+      cycles: list of cycles belonging to a single workflow.
+
+    Returns:
+      Name of the lowest workflow state, if there are any active cycles.
+      Otherwise it returns None.
+    """
     current_cycles = [c for c in cycles if c.is_current]
 
     if not current_cycles:
@@ -296,7 +344,6 @@ class WorkflowState(object):
 
   @classmethod
   def eager_query(cls):
-
     query = super(WorkflowState, cls).eager_query()
     return query.options(
         orm.subqueryload('cycle_task_group_objects')
