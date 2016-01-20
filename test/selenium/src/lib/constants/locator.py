@@ -26,11 +26,11 @@ class PageHeader(object):
 
   # dropdown toggle
   BUTTON_ADMIN_DASHBOARD = (
-      By.CSS_SELECTOR, '.dropdown-menu [href="/admin#people_list_widget"]')
-  BUTTON_MY_WORK = (By.CSS_SELECTOR, '.dropdown-menu [href="/dashboard"]')
-  BUTTON_DATA_IMPORT = (By.CSS_SELECTOR, '.dropdown-menu [href="/import"]')
-  BUTTON_DATA_EXPORT = (By.CSS_SELECTOR, '.dropdown-menu [href="/export"]')
-  BUTTON_LOGOUT = (By.CSS_SELECTOR, '.dropdown-menu [href="/logout"]')
+      By.CSS_SELECTOR, '.user-dropdown [href="/admin#people_list_widget"]')
+  BUTTON_MY_WORK = (By.CSS_SELECTOR, '.user-dropdown [href="/dashboard"]')
+  BUTTON_DATA_IMPORT = (By.CSS_SELECTOR, '.user-dropdown [href="/import"]')
+  BUTTON_DATA_EXPORT = (By.CSS_SELECTOR, '.user-dropdown [href="/export"]')
+  BUTTON_LOGOUT = (By.CSS_SELECTOR, '.user-dropdown [href="/logout"]')
 
 
 class Dashboard(object):
@@ -505,7 +505,7 @@ class WidgetBarButtonAddDropdown(object):
 class Widget(object):
   DROPDOWN_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
   DROPDOWN_SETTINGS_MEMBERS = (By.CSS_SELECTOR, '.info-pane-utility'
-                                                ' .dropdown-menu li')
+                                                ' .user-dropdown li')
   ALERT_LINK_COPIED = (By.CSS_SELECTOR, '.alert.alert-success')
   DROPDOWN_DELETE = (By.CSS_SELECTOR,
                      '[data-test-id="dropdown_delete_0839163b"]')
