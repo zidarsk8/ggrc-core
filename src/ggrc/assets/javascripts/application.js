@@ -112,7 +112,7 @@
       }
 
     });
-    $body.on("change", ".rotate_control_assessment", function(ev) {
+    $body.on("change", ".rotate_assessment", function(ev) {
       ev.currentTarget.click(function() {
         ev.currentTarget.toggle();
       });

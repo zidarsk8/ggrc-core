@@ -40,7 +40,7 @@
         "system": CMS.Models.System,
         "process": CMS.Models.Process,
         "control": CMS.Models.Control,
-        "control_assessment": CMS.Models.ControlAssessment,
+        "assessment": CMS.Models.Assessment,
         "request": CMS.Models.Request,
         "issue" : CMS.Models.Issue,
         "objective": CMS.Models.Objective,
@@ -76,7 +76,7 @@
         'systems': GGRC.mustache_path + "/systems/info.mustache",
         'processes': GGRC.mustache_path + "/processes/info.mustache",
         'products': GGRC.mustache_path + "/products/info.mustache",
-        'control_assessments': GGRC.mustache_path + "/control_assessments/info.mustache",
+        'assessments': GGRC.mustache_path + "/assessments/info.mustache",
         'requests': GGRC.mustache_path + "/requests/info.mustache",
         'issues': GGRC.mustache_path + "/issues/info.mustache"
       };
@@ -328,8 +328,8 @@
             child_options: [related_objects_child_options],
             draw_children: true
           },
-          ControlAssessment: {
-            mapping: "related_control_assessments",
+          Assessment: {
+            mapping: "related_assessments",
             child_options: [related_objects_child_options],
             draw_children: true
           },
@@ -486,17 +486,17 @@
             child_options: [related_objects_child_options],
             draw_children: true
           },
-          ControlAssessment: {
-            mapping: "related_control_assessments",
+          Assessment: {
+            mapping: "related_assessments",
             parent_instance: GGRC.page_instance(),
             allow_mapping: true,
             child_options: [related_objects_child_options],
             draw_children: true,
-            model: CMS.Models.ControlAssessment,
+            model: CMS.Models.Assessment,
             show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
             header_view: GGRC.mustache_path + "/base_objects/tree_header.mustache",
-            footer_view: GGRC.mustache_path + "/control_assessments/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/control_assessments/tree_add_item.mustache"
+            footer_view: GGRC.mustache_path + "/assessments/tree_footer.mustache",
+            add_item_view: GGRC.mustache_path + "/assessments/tree_add_item.mustache"
           }
         },
         directive: {
@@ -559,7 +559,7 @@
             add_item_view: GGRC.mustache_path + "/audits/tree_add_item.mustache"
           },
         },
-        ControlAssessment: {
+        Assessment: {
           _mixins: ["governance_objects", "business_objects", "issues"],
           Audit: {
             mapping: "related_audits",
@@ -779,8 +779,8 @@
           Document: {
             mapping: "extended_related_documents_via_search"
           },
-          ControlAssessment: {
-            mapping: "extended_related_control_assessment_via_search",
+          Assessment: {
+            mapping: "extended_related_assessment_via_search",
             child_options: [related_objects_child_options],
             draw_children: true
           }

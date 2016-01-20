@@ -315,7 +315,7 @@
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
           "Project", "System", "Regulation", "Policy", "Contract", "Standard",
           "Program", "Issue", "Control", "Section", "Clause", "Objective",
-          "Audit", "ControlAssessment", "AccessGroup", "Request", "Document"
+          "Audit", "Assessment", "AccessGroup", "Request", "Document"
         ]
       },
       related_objects_as_source: Proxy(
@@ -339,7 +339,7 @@
       related_issues: TypeFilter("related_objects", "Issue"),
       related_audits: TypeFilter("related_objects", "Audit"),
       related_controls: TypeFilter("related_objects", "Control"),
-      related_control_assessments: TypeFilter("related_objects", "ControlAssessment"),
+      related_assessments: TypeFilter("related_objects", "Assessment"),
       related_requests: TypeFilter("related_objects", "Request"),
       regulations: TypeFilter("related_objects", "Regulation"),
       contracts: TypeFilter("related_objects", "Contract"),
@@ -463,7 +463,7 @@
           "Program", "Regulation", "Contract", "Policy", "Standard",
           "AccessGroup", "Objective", "Control", "Section", "Clause",
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process",
-          "Product", "Project", "System", "Issue", "ControlAssessment",
+          "Product", "Project", "System", "Issue", "Assessment",
           "Request"
         ],
         "authorizations": "UserRole"
@@ -533,7 +533,7 @@
           "Program", "Regulation", "Contract", "Policy", "Standard",
           "Section", "Clause", "Objective", "Control", "AccessGroup",
           "System", "Process", "DataAsset", "Product", "Project", "Facility",
-          "Market", "OrgGroup", "Vendor", "Audit", "Issue", "ControlAssessment",
+          "Market", "OrgGroup", "Vendor", "Audit", "Issue", "Assessment",
           "Request" //, "Response"
         ];
 
@@ -550,7 +550,7 @@
           }).pipe(function (mappings) {
             return mappings.entries;
           });
-      }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,ControlAssessment,Request"),
+      }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,Assessment,Request"),
       extended_related_programs_via_search: TypeFilter("related_objects_via_search", "Program"),
       extended_related_regulations_via_search: TypeFilter("related_objects_via_search", "Regulation"),
       extended_related_contracts_via_search: TypeFilter("related_objects_via_search", "Contract"),
@@ -572,7 +572,7 @@
       extended_related_systems_via_search: TypeFilter("related_objects_via_search", "System"),
       extended_related_audits_via_search: TypeFilter("related_objects_via_search", "Audit"),
       extended_related_issues_via_search: TypeFilter("related_objects_via_search", "Issue"),
-      extended_related_control_assessment_via_search: TypeFilter("related_objects_via_search", "ControlAssessment"),
+      extended_related_assessment_via_search: TypeFilter("related_objects_via_search", "Assessment"),
       extended_related_request_via_search: TypeFilter("related_objects_via_search", "Request"),
       open_audit_requests: CustomFilter('extended_related_request_via_search', function (result) {
         return result.instance.status !== 'Accepted';
@@ -605,7 +605,7 @@
         "requests": "Request",
         "_program": "Program",
         "context": "Context",
-        "related_objects_as_source": ["ControlAssessment", "Issue"]
+        "related_objects_as_source": ["Assessment", "Issue"]
       },
       folders: Proxy(
         "ObjectFolder", "folderable", "folder",
@@ -684,17 +684,17 @@
       related_objects_as_destination: Proxy(
         null, "source", "Relationship", "destination", "related_sources"),
       related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
-      related_control_assessments: TypeFilter("related_objects", "ControlAssessment"),
+      related_assessments: TypeFilter("related_objects", "Assessment"),
       related_issues: TypeFilter("related_objects", "Issue")
     },
-    ControlAssessment: {
+    Assessment: {
       _mixins: [
         "related_object", "personable", "ownable"
       ],
       _canonical: {
         "control": "Control",
       },
-      control: Direct("Control", "controls", "control_assessment"),
+      control: Direct("Control", "controls", "assessment"),
     },
     Issue: {
       _mixins: [
@@ -724,7 +724,7 @@
           "Program", "Regulation", "Contract", "Policy", "Standard",
           "Section", "Clause", "Objective", "Control", "AccessGroup",
           "System", "Process", "DataAsset", "Product", "Project", "Facility",
-          "Market", "OrgGroup", "Vendor", "Audit", "Issue", "ControlAssessment",
+          "Market", "OrgGroup", "Vendor", "Audit", "Issue", "Assessment",
           "Request" //, "Response"
         ];
 
@@ -741,7 +741,7 @@
             }).pipe(function (mappings) {
               return mappings.entries;
             });
-      }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,ControlAssessment,Request"),
+      }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,Assessment,Request"),
             //, responses : Multi(["documentation_responses", "interview_responses", "population_sample_responses"])
     },
     Comment: {

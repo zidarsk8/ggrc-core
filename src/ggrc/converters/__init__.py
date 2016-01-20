@@ -9,7 +9,7 @@ from ggrc.extensions import get_extension_modules
 from ggrc.models import AccessGroup
 from ggrc.models import Audit
 from ggrc.models import Control
-from ggrc.models import ControlAssessment
+from ggrc.models import Assessment
 from ggrc.models import DataAsset
 from ggrc.models import Contract
 from ggrc.models import Policy
@@ -58,9 +58,9 @@ GGRC_IMPORTABLE = {
     "accessgroup": AccessGroup,
     "audit": Audit,
     "control": Control,
-    "control assessment": ControlAssessment,
-    "control_assessment": ControlAssessment,
-    "controlassessment": ControlAssessment,
+    "control assessment": Assessment,
+    "assessment": Assessment,
+    "assessment": Assessment,
     "data asset": DataAsset,
     "data_asset": DataAsset,
     "dataasset": DataAsset,

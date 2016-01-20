@@ -8,8 +8,8 @@
 set -o nounset
 set -o errexit
 
-FAIL_PREFIX="$(tput bold)$(tput setaf 1)FAIL$(tput sgr0)"
-PASS_PREFIX="$(tput bold)$(tput setaf 2)PASS$(tput sgr0)"
+FAIL_PREFIX="FAIL"
+PASS_PREFIX="PASS"
 
 # runs ESLint on the sources and extract the number of code style issues found
 function eslint_issues() {
@@ -21,12 +21,12 @@ function eslint_issues() {
 }
 
 function print_usage() {
-  echo $"Usage: $0 [-t BRANCH_NAME] [--merge-target BRANCH_NAME]"
+  echo $"Usage: $0 [-t BRANCH_NAME]"
 }
 
 
 # the name of the branch the current branch will be merged into
-TARGET_BRANCH="develop"
+TARGET_BRANCH=""
 
 
 # parse the command line options
@@ -35,7 +35,7 @@ do
   OPT_NAME="$1"
 
   case $OPT_NAME in
-    -t|--merge-target)
+    -t)
     if [[ "$#" -lt 2 ]]; then  # option value not specified
       print_usage
       exit 1
@@ -67,10 +67,14 @@ echo "*** Javascript code style check ***"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 cd "${SCRIPTPATH}/../"
 
-
-# Determine the number of JS code issues at the point the PR branch was
-# forked off from the $TARGET_BRANCH branch (i.e. the merge base)
-MERGE_BASE_HASH=$(git merge-base "$TARGET_BRANCH" HEAD)
+if [[ "$TARGET_BRANCH" != "" ]]; then
+  # Determine the number of JS code issues at the point the PR branch was
+  # forked off from the $TARGET_BRANCH branch (i.e. the merge base)
+  MERGE_BASE_HASH=$(git merge-base "$TARGET_BRANCH" HEAD)
+else
+  # Previous commit on current branch
+  MERGE_BASE_HASH=$(git show --pretty=raw HEAD | grep parent | head -1 | grep -oE "[^ ]*$")
+fi
 
 echo -n "Checking out the merge base of $TARGET_BRANCH and the current branch"
 echo -n " (${MERGE_BASE_HASH:0:7})..."
@@ -97,11 +101,11 @@ echo "found $N_ISSUES_PR issue(s)"
 N_ISS_DIFF=$((N_ISSUES_PR - N_ISSUES_BASE))
 
 if [[ "$N_ISS_DIFF" -gt 0 ]]; then
-  N_ISS_DIFF_TEXT="$(tput setaf 1)$N_ISS_DIFF$(tput sgr0)"
+  N_ISS_DIFF_TEXT="$N_ISS_DIFF"
   MSG="$FAIL_PREFIX: The PR would increase the ESLInt issue count."
   EXIT_CODE=1
 else
-  N_ISS_DIFF_TEXT="$(tput setaf 2)$N_ISS_DIFF$(tput sgr0)"
+  N_ISS_DIFF_TEXT="$N_ISS_DIFF"
   MSG="$PASS_PREFIX: The PR branch will not increase the ESLint issue count."
   EXIT_CODE=0
 fi

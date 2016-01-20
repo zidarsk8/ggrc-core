@@ -126,8 +126,6 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
       db.Column(db.Integer, db.ForeignKey('people.id')), 'Control')
   secondary_assessor_id = deferred(
       db.Column(db.Integer, db.ForeignKey('people.id')), 'Control')
-  control_assessments = db.relationship(
-      'ControlAssessment', backref='program', cascade='all, delete-orphan')
 
   principal_assessor = db.relationship(
       'Person', uselist=False, foreign_keys='Control.principal_assessor_id')

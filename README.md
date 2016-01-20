@@ -140,7 +140,7 @@ cd test/unit; sniffer
 On the host machine in the root of the repository run:
 
 ```sh
-./bin/run_selenium
+./bin/jenkins/run_selenium
 ```
 
 Quickstart Breakdown

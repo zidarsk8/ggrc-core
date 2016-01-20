@@ -15,7 +15,7 @@ from ggrc.models.categorization import Categorization
 from ggrc.models.category import CategoryBase
 from ggrc.models.context import Context
 from ggrc.models.control import Control, ControlCategory, ControlAssertion
-from ggrc.models.control_assessment import ControlAssessment
+from ggrc.models.assessment import Assessment
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.data_asset import DataAsset
@@ -64,7 +64,7 @@ all_models = [
     ControlAssertion,
     Context,
     Control,
-    ControlAssessment,
+    Assessment,
     Comment,
     CustomAttributeDefinition,
     CustomAttributeValue,

@@ -1199,50 +1199,80 @@ can.Model("can.Model.Cacheable", {
   },
 
   hash_fragment: function () {
-    var type = can.spaceCamelCase(this.type || "")
+    var type = can.spaceCamelCase(this.type || '')
             .toLowerCase()
             .replace(/ /g, '_');
 
-    return [type,
-            this.id].join('/');
+    return [type, this.id].join('/');
+  },
+  get_custom_value: function (prop) {
+    var attr = _.find(GGRC.custom_attr_defs, function (item) {
+      return item.definition_type === this.type.toLowerCase() &&
+        item.title === prop;
+    }.bind(this));
+    var result;
+
+    if (!attr) {
+      return undefined;
+    }
+    result = _.find(this.custom_attribute_values, function (item) {
+      return item.reify().custom_attribute_id === attr.id;
+    });
+    return result ? result.reify().attribute_value : undefined;
   },
 
   // Returns a deep property as specified in the descriptor built
   // by Cacheable.parse_deep_property_descriptor
-  get_deep_property: function(property_descriptor) {
-    var i, j, part, field, found, tmp,
-        val = this;
+  get_deep_property: function (property_descriptor) {
+    var i;
+    var j;
+    var part;
+    var field;
+    var found;
+    var tmp;
+    var val = this;
+    var rCustom = /^custom\:/i;
+    var mapProp;
+
+    function mapDeepProp(count) {
+      count += 1;
+      return function (element) {
+        return element.get_deep_property(property_descriptor.slice(count));
+      };
+    }
     for (i = 0; i < property_descriptor.length; i++) {
       part = property_descriptor[i];
       if (val.instance) {
         val = val.instance;
       }
       found = false;
-      if (part === "GET_ALL") {
-        return _.map(val, function(element) {
-          return element.get_deep_property(property_descriptor.slice(i+1));
-        });
-      } else {
-        for (j = 0; j < part.length; j++) {
-          field = part[j];
-          tmp = val[field];
-          if (tmp !== undefined && tmp !== null) {
-            val = tmp;
-            if (typeof val.reify === "function") {
-              val = val.reify();
-            }
-            found = true;
-            break;
+      if (part === 'GET_ALL') {
+        mapProp = mapDeepProp(i);
+        return _.map(val, mapProp);
+      }
+      for (j = 0; j < part.length; j++) {
+        field = part[j];
+        tmp = val[field];
+        if (tmp !== undefined && tmp !== null) {
+          val = tmp;
+          if (typeof val.reify === 'function') {
+            val = val.reify();
           }
+          found = true;
+          break;
+        } else if (rCustom.test(field)) {
+          field = field.split(':')[1];
+          val = this.get_custom_value(field);
+          found = true;
+          break;
         }
-        if (!found) {
-          return null;
-        }
+      }
+      if (!found) {
+        return null;
       }
     }
     return val;
-  },
-
+  }
 });
 
 _old_attr = can.Observe.prototype.attr;

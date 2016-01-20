@@ -37,8 +37,8 @@ GGRC.Bootstrap = {
     "title_plural": "Controls",
     "model_singular": "Control"
   }, {
-    "title_plural": "Control Assessments",
-    "model_singular": "ControlAssessment"
+    "title_plural": "Assessments",
+    "model_singular": "Assessment"
   }, {
     "title_plural": "Cycles",
     "model_singular": "Cycle"
@@ -131,8 +131,8 @@ GGRC.Bootstrap = {
     "title_plural": "Controls",
     "model_singular": "Control"
   }, {
-    "title_plural": "Control Assessments",
-    "model_singular": "ControlAssessment"
+    "title_plural": "Assessments",
+    "model_singular": "Assessment"
   }, {
     "title_plural": "Data Assets",
     "model_singular": "DataAsset"

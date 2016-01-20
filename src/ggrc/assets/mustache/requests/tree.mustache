@@ -57,6 +57,11 @@
                               {{{renderLive '/static/mustache/people/popover.mustache' person=assignee}}}
                             {{/using}}
                           {{/case}}
+                          {{#case 'audit'}}
+                            {{#using audit=instance.audit}}
+                              {{audit.status}} &mdash; {{audit.title}}
+                            {{/using}}
+                          {{/case}}
                           {{#case 'mapped_responses'}}
                             <i rel="tooltip" data-placement="right" {{#if_equals instance.request_type "documentation"}}data-original-title="# of attached documents" class="fa fa-files-o"{{else}}data-original-title="# of attached meetings" class="fa fa-calendar"{{/if_equals}}></i>
                             <span class="counter">
