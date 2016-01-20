@@ -147,6 +147,7 @@ class TestOneTimeWorkflow(BaseWorkflowTestCase):
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
 
+      cycle = cycle.__class__.query.get(cycle.id)
       self.assertEqual(active_wf.status, "Active")
       self.assertEqual(cycle.start_date, date(2014, 10, 1))
       self.assertEqual(cycle.end_date, date(2015, 5, 27))
@@ -178,6 +179,7 @@ class TestOneTimeWorkflow(BaseWorkflowTestCase):
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
 
+      cycle = cycle.__class__.query.get(cycle.id)
       self.assertEqual(active_wf.status, "Active")
       self.assertEqual(cycle.start_date, date(2014, 3, 1))
       self.assertEqual(cycle.end_date, date(2015, 5, 27))
