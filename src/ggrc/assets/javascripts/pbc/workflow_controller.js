@@ -20,8 +20,8 @@ can.Control("GGRC.Controllers.PbcWorkflows", {
     var audit_dfd, control_dfd;
 
     audit_dfd = this._create_relationship(instance, instance.audit, instance.audit.context);
-    control_dfd = this._create_relationship(instance, instance.control, instance.audit.context);
-    instance.delay_resolving_save_until($.when(audit_dfd, control_dfd));
+    object_dfd = this._create_relationship(instance, instance.object, instance.audit.context);
+    instance.delay_resolving_save_until($.when(audit_dfd, object_dfd));
 
   },
   "{CMS.Models.Issue} created": function(model, ev, instance) {
