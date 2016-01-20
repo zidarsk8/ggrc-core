@@ -16,6 +16,27 @@ select {
   padding: 0;
 }
 
+.bottom-space {
+  padding-bottom: 25px;
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.counter {
+  @include opacity(0.5);
+  color:#000;
+  .overdue & {
+    color: $red;
+  }
+}
+
+.unmap {
+  &:hover {
+    color:$error;
+  }
+}
+
 .wrap-row {
   margin-bottom: 20px;
   p {

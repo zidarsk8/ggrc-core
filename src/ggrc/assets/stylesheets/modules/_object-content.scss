@@ -87,3 +87,37 @@
     text-transform: uppercase;
   }
 }
+
+.w-status {
+  float: left;
+  width: 90%;
+}
+
+.selector-list {
+  ul.new-tree {
+    li.tree-item {
+      .item-content {
+        line-height:18px;
+        padding:9px 0;
+      }
+      .simple-link {
+        &:hover {
+          background:lighten(#ff9,5%);
+          cursor:pointer;
+        }
+      }
+    }
+  }
+}
+
+.show-description {
+  position:relative;
+  padding-top:16px;
+  &.bottom-space {
+    padding-bottom: 12px;
+  }
+  h5 {
+    font-size: 15px;
+    padding-bottom: 10px;
+  }
+}
