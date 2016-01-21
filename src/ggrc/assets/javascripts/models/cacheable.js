@@ -1125,31 +1125,31 @@ can.Model("can.Model.Cacheable", {
       GGRC.delay_leaving_page_until(dfd);
     });
     return dfd;
-  }
-  , save: function() {
+  },
+  save: function () {
     Array.prototype.push.call(arguments, this._super);
-    this._dfd = new $.Deferred();
+    this._dfd = $.Deferred();
     GGRC.SaveQueue.enqueue(this, arguments);
     return this._dfd;
   },
-  refresh_all: function() {
+  refresh_all: function () {
     var props = Array.prototype.slice.call(arguments, 0);
 
     return RefreshQueue.refresh_all(this, props);
   },
-  refresh_all_force: function() {
+  refresh_all_force: function () {
     var props = Array.prototype.slice.call(arguments, 0);
 
     return RefreshQueue.refresh_all(this, props, true);
   },
   get_filter_vals: function (keys, mappings) {
+    var values = {};
+    var custom_attrs = {};
+    var custom_attr_ids = {};
+    var long_title = this.type.toLowerCase() + ' title';
+
     keys = keys || this.class.filter_keys;
     mappings = mappings || this.class.filter_mappings;
-
-    var values = {},
-        custom_attrs = {},
-        custom_attr_ids = {},
-        long_title = this.type.toLowerCase() + " title";
 
     if (!this.custom_attribute_definitions) {
       this.load_custom_attribute_definitions();
@@ -1166,26 +1166,28 @@ can.Model("can.Model.Cacheable", {
         custom_attr.attribute_value;
     });
 
-    if (!mappings[long_title]){
-      mappings[long_title] = "title";
+    if (!mappings[long_title]) {
+      mappings[long_title] = 'title';
     }
     keys = _.union(keys, long_title, _.keys(mappings), _.keys(custom_attrs));
-    $.each(keys, function(index, key) {
-      var attr_key = mappings[key] || key,
-          val = this[attr_key] || custom_attrs[attr_key];
+    $.each(keys, function (index, key) {
+      var attr_key = mappings[key] || key;
+      var val = this[attr_key] || custom_attrs[attr_key];
+      var owner;
+      var audit;
 
       if (val !== undefined && val !== null) {
         if (key === 'owner' || key === 'owners') {
           values[key] = [];
           val.forEach(function (owner_stub) {
-            var owner = owner_stub.reify();
+            owner = owner_stub.reify();
             values[key].push({
               name: owner.name,
               email: owner.email
             });
           });
-        } else if (key === "audit") {
-          var audit = this.audit.reify();
+        } else if (key === 'audit') {
+          audit = this.audit.reify();
           values[key] = {
             status: audit.status,
             title: audit.title
@@ -1194,7 +1196,7 @@ can.Model("can.Model.Cacheable", {
           if ($.type(val) === 'date') {
             val = val.toISOString().substring(0, 10);
           }
-          if ($.type(val) === 'string'){
+          if ($.type(val) === 'string') {
             values[key] = val;
           }
         }
