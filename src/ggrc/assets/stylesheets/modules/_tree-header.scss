@@ -6,7 +6,7 @@
  */
 
 .widget {
-	.tree-action-list {
+  .tree-action-list {
     @extend %reset-list;
     @include clearfix();
     text-align: right;
@@ -60,7 +60,7 @@
       }
     }
   }
-	.header {
+  .header {
     &.tree-header {
       padding: 0 12px 0 70px;
       font-size: 11px;
@@ -91,8 +91,8 @@
           overflow: visible;
           line-height: 28px;
           .counter {
-			      @include opacity(1);
-			    }
+            @include opacity(1);
+          }
           .dropdown-menu {
             @include border-radius(0);
             right: -12px;
@@ -219,8 +219,8 @@
 }
 
 ul.new-tree {
-	li.tree-item {
-		&.active {
+  li.tree-item {
+    &.active {
       > .item-main {
         > .item-wrap {
           > .select {
@@ -243,7 +243,7 @@ ul.new-tree {
         }
       }
     }
-	}
+  }
 }
 
 .widget-col-title {
