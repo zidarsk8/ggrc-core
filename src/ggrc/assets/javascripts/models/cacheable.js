@@ -1211,14 +1211,19 @@ can.Model("can.Model.Cacheable", {
         item.title === prop;
     }.bind(this));
     var result;
-
     if (!attr) {
       return undefined;
     }
     result = _.find(this.custom_attribute_values, function (item) {
       return item.reify().custom_attribute_id === attr.id;
     });
-    return result ? result.reify().attribute_value : undefined;
+    if (result) {
+      result = result.reify().attribute_value;
+      if (attr.attribute_type.toLowerCase() === 'date') {
+        result = moment(result, 'MM/DD/YYYY').format('YYYY-MM-DD');
+      }
+    }
+    return result;
   },
 
   // Returns a deep property as specified in the descriptor built
