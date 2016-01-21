@@ -1,4 +1,0 @@
-#!/bin/bash
-build_compass
-build_assets
-db_migrate

@@ -6,5 +6,5 @@
 
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
-cd "${SCRIPTPATH}/../src/ggrc"
-compass compile -c assets/compass.config.rb $@
+cd "${SCRIPTPATH}/.."
++webpack $@
