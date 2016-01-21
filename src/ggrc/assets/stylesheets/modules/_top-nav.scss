@@ -36,25 +36,25 @@ ul.internav {
       }
     }
     &.hidden-widgets-list {
-	    a.dropdown-toggle {
-	      &:hover {
-	        background: none;
-	      }
-	    }
-	  }
-	  &.active {
-	    a {
-	      color: $black;
-	      font-weight: bold;
-	      background: $contentBgnd;
-	      i {
-	        @include opacity(1);
-	      }
-	      &:hover {
-	        color: $black;
-	      }
-	    }
-	  }
+      a.dropdown-toggle {
+        &:hover {
+          background: none;
+        }
+      }
+    }
+    &.active {
+      a {
+        color: $black;
+        font-weight: bold;
+        background: $contentBgnd;
+        i {
+          @include opacity(1);
+        }
+        &:hover {
+          color: $black;
+        }
+      }
+    }
   }
   a {
     @include transition(color 0.2s ease);
