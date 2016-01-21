@@ -47,11 +47,6 @@ ggrc_local_npm_modules:
   - name: url-loader
   - name: webpack
 
-ggrc_gems:
-  - name: 'sass'
-    version: '3.2.13'
-  - name: 'compass'
-    version: '0.12.2'
 
 ggrc_databases:
   - name: ggrcdev

@@ -15,12 +15,12 @@ assets by starting the `webassets` command-line utility:
   cd src/ggrc
   webassets -m ggrc.assets watch
 
-Currently, Compass/Sass is used to build CSS assets, and it has its own
+Currently, SASS is used to build CSS assets, and it has its own
 monitor utility, which can be invoked thusly:
 
 ..
-  cd src/ggrc
-  compass watch -c assets/compass.config.rb
+  cd /
+  webpack --watch --watch-poll
 """
 
 from . import settings
