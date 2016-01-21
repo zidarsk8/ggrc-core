@@ -6,7 +6,7 @@
  */
 
 .lhs-holder {
-	@include transition-property(left);
+  @include transition-property(left);
   @include transition-duration(.8s);
   position: fixed;
   top: 128px;
@@ -23,7 +23,7 @@
 }
 
 .lhn-type {
-	@include clearfix();
+  @include clearfix();
   @include transition-property(left);
   @include transition-duration(.8s);
   min-width: 240px;
