@@ -520,7 +520,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     } // /new_object_form
   },
   get_filter_vals: function () {
-    var filter_vals = can.Model.Cacheable.prototype.get_filter_vals;
+    var filterVals = can.Model.Cacheable.prototype.get_filter_vals;
     var mappings = $.extend({}, this.class.filter_mappings, {
       title: 'title',
       description: 'description',
@@ -530,16 +530,14 @@ can.Model.Cacheable("CMS.Models.Request", {
       code: 'slug',
       audit: 'audit'
     });
-    var keys;
-    var vals;
+    var keys = _.union(this.class.filter_keys, ['state'], _.keys(mappings));
+    var vals = filterVals.call(this, keys, mappings);
 
-    keys = _.union(this.class.filter_keys, ['state'], _.keys(mappings));
-    vals = filter_vals.call(this, keys, mappings);
     try {
       vals.due_on = moment(this.due_on).format('YYYY-MM-DD');
       vals.due = vals['due date'] = vals.due_on;
       if (this.assignee) {
-        vals.assignee = filter_vals.apply(this.assignee.reify(), []);
+        vals.assignee = filterVals.apply(this.assignee.reify(), []);
       }
     } catch (e) {}
 

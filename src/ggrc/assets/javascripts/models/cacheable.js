@@ -1144,9 +1144,9 @@ can.Model("can.Model.Cacheable", {
   },
   get_filter_vals: function (keys, mappings) {
     var values = {};
-    var custom_attrs = {};
-    var custom_attr_ids = {};
-    var long_title = this.type.toLowerCase() + ' title';
+    var customAttrs = {};
+    var customAttrIds = {};
+    var longTitle = this.type.toLowerCase() + ' title';
 
     keys = keys || this.class.filter_keys;
     mappings = mappings || this.class.filter_mappings;
@@ -1155,24 +1155,24 @@ can.Model("can.Model.Cacheable", {
       this.load_custom_attribute_definitions();
     }
     this.custom_attribute_definitions.each(function (definition) {
-      custom_attr_ids[definition.id] = definition.title.toLowerCase();
+      customAttrIds[definition.id] = definition.title.toLowerCase();
     });
     if (!this.custom_attributes) {
       this.setup_custom_attributes();
     }
-    can.each(this.custom_attribute_values, function (custom_attr) {
-      custom_attr = custom_attr.reify();
-      custom_attrs[custom_attr_ids[custom_attr.custom_attribute_id]] =
-        custom_attr.attribute_value;
+    can.each(this.custom_attribute_values, function (customAttr) {
+      customAttr = customAttr.reify();
+      customAttrs[customAttrIds[customAttr.custom_attribute_id]] =
+        customAttr.attribute_value;
     });
 
-    if (!mappings[long_title]) {
-      mappings[long_title] = 'title';
+    if (!mappings[longTitle]) {
+      mappings[longTitle] = 'title';
     }
-    keys = _.union(keys, long_title, _.keys(mappings), _.keys(custom_attrs));
+    keys = _.union(keys, longTitle, _.keys(mappings), _.keys(customAttrs));
     $.each(keys, function (index, key) {
-      var attr_key = mappings[key] || key;
-      var val = this[attr_key] || custom_attrs[attr_key];
+      var attrKey = mappings[key] || key;
+      var val = this[attrKey] || customAttrs[attrKey];
       var owner;
       var audit;
 
