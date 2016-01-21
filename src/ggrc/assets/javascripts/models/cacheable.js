@@ -1174,16 +1174,22 @@ can.Model("can.Model.Cacheable", {
       var attr_key = mappings[key] || key,
           val = this[attr_key] || custom_attrs[attr_key];
 
-      if (val !== undefined && val !== null){
-        if (key == 'owner' || key == 'owners'){
+      if (val !== undefined && val !== null) {
+        if (key === 'owner' || key === 'owners') {
           values[key] = [];
-          val.forEach(function(owner_stub){
+          val.forEach(function (owner_stub) {
             var owner = owner_stub.reify();
             values[key].push({
               name: owner.name,
               email: owner.email
             });
           });
+        } else if (key === "audit") {
+          var audit = this.audit.reify();
+          values[key] = {
+            status: audit.status,
+            title: audit.title
+          };
         } else {
           if ($.type(val) === 'date') {
             val = val.toISOString().substring(0, 10);

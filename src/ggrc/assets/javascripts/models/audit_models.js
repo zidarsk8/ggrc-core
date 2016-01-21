@@ -526,7 +526,9 @@ can.Model.Cacheable("CMS.Models.Request", {
           "description": "description",
           "state": "status",
           "due date": "due_on",
-          "due": "due_on"
+          "due": "due_on",
+          "code": "slug",
+          "audit": "audit"
         }),
         keys, vals;
 
