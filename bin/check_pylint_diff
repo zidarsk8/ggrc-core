@@ -28,6 +28,7 @@ git checkout --quiet $TEST_COMMIT
 PYLINT_RESULT=$(pylint src/* 2> /dev/null | tail -n 2) 
 git checkout --quiet $CURRENT_COMMIT
 
+echo "$PYLINT_RESULT"
 echo "$PYLINT_RESULT" | grep "+" && rc=$? || rc=$?
 
 exit $rc
