@@ -81,7 +81,7 @@
       instance.delay_resolving_save_until(dfd);
     },
     _create_relationship: function (source, destination, context) {
-      if (!destination) {
+      if (!destination || !destination.id) {
         return $.Deferred().resolve();
       }
       if (!context) {
