@@ -3144,21 +3144,33 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
   return '';
 });
 
-/*
-  Used to get the string value for default attributes
-  This doesn't work for nested object reference
-*/
+/**
+ * Retrieve the string value of an attribute of the given instance.
+ *
+ * The method only supports instance attributes categorized as "default", and
+ * does not support (read: work for) nested object references.
+ *
+ * If the attribute does not exist, has a falsy value, or is not considered to
+ * be a "default" attribute, an empty string is returned.
+ *
+ * If the attribue represents a date information, it is returned in the
+ * MM/DD/YYYY format.
+ *
+ * @param {String} attr_name - the name of the attribute to retrieve
+ * @param {Object} instance - an instance of a model object
+ * @return {String} - the retrieved attribute's value
+ */
 Mustache.registerHelper('get_default_attr_value', function (attr_name, instance) {
   instance = Mustache.resolve(instance);
   attr_name = Mustache.resolve(attr_name);
 
   if (instance[attr_name]) {
     if (['slug', 'status', 'url', 'reference_url', 'kind', 'request_type'].indexOf(attr_name) !== -1) {
-      return instance[attr_name];
+      return instance.attr(attr_name);
     }
     if (['start_date', 'end_date', 'updated_at', 'requested_on', 'due_on'].indexOf(attr_name) !== -1) {
       //convert to localize date
-      return moment(instance[attr_name]).format('MM/DD/YYYY');
+      return moment(instance.attr(attr_name)).format('MM/DD/YYYY');
     }
   }
 
