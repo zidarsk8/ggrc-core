@@ -397,7 +397,7 @@ build_assets
 
 # Copyright Notice
 
-Copyright (C) 2013-2015 Google Inc., authors, and contributors (see the AUTHORS
+Copyright (C) 2013-2016 Google Inc., authors, and contributors (see the AUTHORS
 file).
 Licensed under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 license (see the LICENSE file).
