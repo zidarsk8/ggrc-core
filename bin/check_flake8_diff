@@ -32,4 +32,4 @@ echo "Checking files:"
 echo "$CHANGED_FILES"
 echo ""
 
-echo $CHANGED_FILES | xargs flake8
+echo $CHANGED_FILES | xargs flake8 --config setup.cfg

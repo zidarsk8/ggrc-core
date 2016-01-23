@@ -6,8 +6,8 @@
 """Chrome launcher for karma tests.
 """
 
-from selenium import webdriver
 import time
+from selenium import webdriver
 
 WAIT_PERIOD = 600
 DEV_KARMA_URL = "http://dev:9876"
