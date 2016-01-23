@@ -7,7 +7,7 @@
 set -o nounset
 set -o errexit
 
-PROJECT="integration"
+PROJECT="unittests"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../.."
@@ -19,11 +19,28 @@ echo "
 ###############################################################################
 "
 
-echo "Running ${PROJECT}"
+echo "Running python unit tests"
 docker exec -i ${PROJECT}_dev_1 su vagrant -c "
   source /vagrant/bin/init_vagrant_env
-  /vagrant/bin/run_integration
-" && rc=$? || rc=$?
+  /vagrant/bin/run_unit
+" && unit_rc=$? || unit_rc=$?
+
+[[ unit_rc -eq 0 ]] && echo "PASS" || echo "FAIL"
+
+echo "
+###############################################################################
+"
+
+echo "Running karma tests"
+
+docker exec -id ${PROJECT}_selenium_1 python /selenium/bin/chrome_karma.py
+
+docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+  source /vagrant/bin/init_vagrant_env
+  /vagrant/node_modules/karma/bin/karma start /vagrant/karma.conf.js --single-run --reporters dots
+" && karma_rc=$? || karma_rc=$?
+
+[[ karma_rc -eq 0 ]] && echo "PASS" || echo "FAIL"
 
 echo "
 ###############################################################################
@@ -31,4 +48,4 @@ echo "
 
 teardown $PROJECT
 
-exit $rc
+exit $((unit_rc * unit_rc + karma_rc * karma_rc))
