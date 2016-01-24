@@ -28,6 +28,7 @@ ggrc_global_npm_modules:
   - name: nodeunit
   - name: pegjs
   - name: karma-cli
+  - name: karma-junit-reporter
   - name: jasmine-core
   - name: mkdirp
   - name: bower
@@ -37,7 +38,6 @@ ggrc_global_npm_modules:
 ggrc_local_npm_modules:
   - name: karma
   - name: karma-jasmine
-  - name: karma-junit-reporter
 
 ggrc_gems:
   - name: 'sass'
