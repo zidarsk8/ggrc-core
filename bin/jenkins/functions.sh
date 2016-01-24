@@ -6,6 +6,38 @@
 set -o nounset
 set -o errexit
 
+project_name () {
+  # Get propper project name
+  # args: 
+  #  -p: if set the project name will be the name of the repo parent folder.
+  #  -d: default project name, if parent folder is not set or valid.
+  # returns: project name containing only alphanumeric characters
+
+  # parse the command line options
+  while [[ "$#" -gt 0 ]]
+  do
+    OPT_NAME="$1"
+
+    case $OPT_NAME in
+      -p|--parent)
+        RESULT=$( cd "$(dirname "$0")/../.." ; echo ${PWD##*/}  )
+      ;;
+      -d|--default)
+        DEFAULT="$2"
+        shift  # extra shift for the current options's value
+      ;;
+      *)  # an unknown option found
+      ;;
+    esac
+    shift  # drop the just-processed option/argument
+  done
+  if [[ -n "${RESULT:-}" ]]; then
+    echo "${RESULT:-}" | sed 's/[^A-Za-z0-9]//g'
+  else
+    echo "${DEFAULT:-}" | sed 's/[^A-Za-z0-9]//g'
+  fi
+}
+
 setup () {
   if [ -z "${1:-}" ]; then
     echo "Missing mandatory project parameter"
