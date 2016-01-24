@@ -12,4 +12,4 @@ export GGRC_SETTINGS_MODULE="testing ggrc_basic_permissions.settings.development
 db_migrate
 
 echo -e "\nRunning integration tests"
-nosetests integration --logging-clear-handlers ${@:1}
+nosetests integration --with-xunit --logging-clear-handlers ${@:1}
