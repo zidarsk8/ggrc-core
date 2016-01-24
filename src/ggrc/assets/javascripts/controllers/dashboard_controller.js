@@ -237,50 +237,6 @@ can.Control("CMS.Controllers.Dashboard", {
         return this.add_dashboard_widget_from_descriptor(descriptor);
     }
 
-  , make_tree_view_descriptor_from_model_descriptor: function(descriptor) {
-      // possibly never used
-      return {
-        content_controller: CMS.Controllers.TreeView,
-        content_controller_options: descriptor,
-        content_controller_selector: "ul",
-        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
-        widget_id: descriptor.model.table_singular,
-        widget_name: descriptor.widget_name || function() {
-          var $objectArea = $(".object-area");
-          if ( $objectArea.hasClass("dashboard-area") ) {
-            return descriptor.model.title_plural;
-          } else if (/people/.test(window.location)) {
-            return "My " + descriptor.model.title_plural;
-          } else {
-            return "Mapped " + descriptor.model.title_plural;
-          }
-        },
-        widget_info : descriptor.widget_info,
-        widget_icon: descriptor.model.table_singular,
-        object_category: descriptor.model.category || descriptor.object_category
-      }
-    }
-
-  , make_list_view_descriptor_from_model_descriptor: function(descriptor) {
-      return {
-        content_controller: GGRC.Controllers.ListView,
-        content_controller_options: descriptor,
-        widget_id: descriptor.model.table_singular,
-        widget_name: descriptor.widget_name || function() {
-          var $objectArea = $(".object-area");
-          if ( $objectArea.hasClass("dashboard-area") ) {
-            return descriptor.model.title_plural;
-          } else if (/people/.test(window.location)) {
-            return "My " + descriptor.model.title_plural;
-          } else {
-            return "Mapped " + descriptor.model.title_plural;
-          }
-        },
-        widget_info : descriptor.widget_info,
-        widget_icon: descriptor.model.table_singular,
-        object_category: descriptor.model.category || descriptor.object_category
-      }
-    }
 });
 
 
