@@ -248,6 +248,13 @@ class TestGetObjectColumnDefinitions(TestCase):
   order of these test functions is the same as the objects in LHN
   """
 
+  @classmethod
+  def setUpClass(cls):
+    TestCase.clear_data()
+
+  def setUp(self):
+    pass
+
   def _test_definiton_names(self, obj_class, names, has_mappings=True):
     """ Test name definitions for one class
 
@@ -1033,10 +1040,15 @@ class TestGetObjectColumnDefinitions(TestCase):
 
 
 class TestGetWorkflowObjectColumnDefinitions(TestCase):
+  """Test default column difinitions for workflow objcts.
+  """
 
-  """
-  Test default column difinitions for workflow objcts
-  """
+  @classmethod
+  def setUpClass(cls):
+    TestCase.clear_data()
+
+  def setUp(self):
+    pass
 
   def test_workflow_definitions(self):
     """ test default headers for Workflow """
@@ -1130,10 +1142,15 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
 
 
 class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
+  """Test default column difinitions for risk assessment objcts.
+  """
 
-  """
-  Test default column difinitions for risk assessment objcts
-  """
+  @classmethod
+  def setUpClass(cls):
+    TestCase.clear_data()
+
+  def setUp(self):
+    pass
 
   def test_risk_assessemnt_definitions(self):
     """ test default headers for Workflow """
