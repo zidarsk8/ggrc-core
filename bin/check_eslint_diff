@@ -59,13 +59,14 @@ do
     shift  # drop the just-processed option/argument
 done
 
-
 echo "*** Javascript code style check ***"
 
-
-# move to the project root directory
+# move to a temporary directory for these checks
+TMP_REPO="/tmp/ggrc-core"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
-cd "${SCRIPTPATH}/../"
+rm -rf $TMP_REPO
+cp -a /vagrant $TMP_REPO
+cd $TMP_REPO
 
 if [[ "$TARGET_BRANCH" != "" ]]; then
   # Determine the number of JS code issues at the point the PR branch was
