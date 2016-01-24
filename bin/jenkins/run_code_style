@@ -9,9 +9,10 @@ set -o errexit
 
 PROJECT="codestyle"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
-
 cd "${SCRIPTPATH}/../.."
 source bin/jenkins/functions.sh
+
+PROJECT=$( project_name "$@" -d "$PROJECT" )
 
 setup $PROJECT
 
