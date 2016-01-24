@@ -46,6 +46,8 @@ setup () {
     PROJECT="${1}"
   fi
 
+  git submodule update --init
+
   docker-compose --file docker-compose-testing.yml \
     --project-name ${PROJECT} \
     up --force-recreate -d
