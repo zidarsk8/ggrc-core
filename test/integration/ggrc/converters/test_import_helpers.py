@@ -3,17 +3,13 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from copy import copy
 from os.path import abspath, dirname, join
-from random import shuffle
 
 from ggrc import converters
 from ggrc import models
 from ggrc.converters import column_handlers
 from ggrc.converters import import_helper
-from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
-from ggrc.converters.import_helper import split_array
 from ggrc.utils import get_mapping_rules
 from ggrc.utils import title_from_camelcase
 from ggrc_risk_assessments import models as ra_models
@@ -31,123 +27,6 @@ def get_mapping_names(class_name):
   mapping_names = {"map:{}".format(name) for name in pretty_rules}
   unmapping_names = {"unmap:{}".format(name) for name in pretty_rules}
   return mapping_names.union(unmapping_names)
-
-
-class TestSplitArry(TestCase):
-
-  def test_sigle_block(self):
-    test_data = [
-        ["hello", "world"],
-        ["hello", "world"],
-        ["hello", "world"],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 1)
-    self.assertEqual(data_blocks[0], test_data)
-    self.assertEqual(offests[0], 0)
-
-  def test_sigle_block_with_padding(self):
-    test_data = [
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world", "uet"],
-        ["hello", "world"],
-        ["hello", "world"],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 1)
-    self.assertEqual(data_blocks[0], test_data[1:])
-    self.assertEqual(offests[0], 1)
-
-    test_data = [
-        ["", ""],
-        ["", ""],
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world", "uet"],
-        ["hello", "world"],
-        ["hello", "world"],
-        ["", ""],
-        ["", ""],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 1)
-    self.assertEqual(data_blocks[0], test_data[3:7])
-    self.assertEqual(offests[0], 3)
-
-  def test_multiple_blocks(self):
-    test_data = [
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world", "uet"],
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world"],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 2)
-    self.assertEqual(data_blocks[0], test_data[1:3])
-    self.assertEqual(data_blocks[1], test_data[4:6])
-    self.assertEqual(offests[0], 1)
-    self.assertEqual(offests[1], 4)
-
-    test_data = [
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world", "uet"],
-        ["hello", "world"],
-        ["", ""],
-        ["", ""],
-        ["hello", "world"],
-        ["", ""],
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world"],
-        ["hello", "world"],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 3)
-    self.assertEqual(data_blocks[0], test_data[1:4])
-    self.assertEqual(data_blocks[1], test_data[6:7])
-    self.assertEqual(data_blocks[2], test_data[9:])
-    self.assertEqual(offests[0], 1)
-    self.assertEqual(offests[1], 6)
-    self.assertEqual(offests[2], 9)
-
-
-class TestCulumnOrder(TestCase):
-
-  def test_column_order(self):
-    attr_list = [
-        "slug",
-        "title",
-        "description",
-        "notes",
-        "test_plan",
-        "owners",
-        "start_date",
-        "status",
-        "kind",
-        "url",
-        "reference_url",
-        "name",
-        "email",
-        "is_enabled",
-        "company",
-        "A Capital custom attribute",
-        "a simple custom attribute",
-        "some custom attribute",
-        "map:A thing",
-        "map:B thing",
-        "map:c thing",
-        "map:Program",
-        "map:some other mapping",
-    ]
-    original_list = copy(attr_list)
-    for _ in range(1):
-      shuffle(attr_list)
-      column_order = get_column_order(attr_list)
-      self.assertEqual(original_list, column_order)
 
 
 class TestCustomAttributesDefinitions(TestCase):
