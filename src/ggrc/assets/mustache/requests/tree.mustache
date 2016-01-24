@@ -12,6 +12,7 @@
       <div class="select">
         <div class="item-data">
           <div class="row-fluid">
+
             <div class="span{{display_options.title_width}}">
               <div class="title tree-title-area">
                 {{#is_subtree}}
@@ -20,6 +21,7 @@
                 <span>{{instance.title}}</span>
               </div>
             </div>
+
             <div class="span{{display_options.selectable_width}}">
               <div class="row-fluid">
                 {{#display_attr_list}}
@@ -79,7 +81,7 @@
                           {{/default}}
                         {{/switch}}
                       </div>
-                    {{/if_equals}}
+                    {{/if_equals attr_type 'custom'}}
                   </div>
                 {{/display_attr_list}}
               </div>
