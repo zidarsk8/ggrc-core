@@ -37,7 +37,7 @@ docker exec -id ${PROJECT}_selenium_1 python /selenium/bin/chrome_karma.py
 
 docker exec -i ${PROJECT}_dev_1 su vagrant -c "
   source /vagrant/bin/init_vagrant_env
-  /vagrant/node_modules/karma/bin/karma start /vagrant/karma.conf.js --single-run --reporters dots
+  /vagrant/node_modules/karma/bin/karma start /vagrant/karma.conf.js --single-run --reporters dots,junit
 " && karma_rc=$? || karma_rc=$?
 
 [[ karma_rc -eq 0 ]] && echo "PASS" || echo "FAIL"
