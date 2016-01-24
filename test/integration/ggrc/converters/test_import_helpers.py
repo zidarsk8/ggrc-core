@@ -115,38 +115,6 @@ class TestSplitArry(TestCase):
     self.assertEqual(offests[2], 9)
 
 
-class TestGetObjectColumnDefinitons(TestCase):
-
-  def test_object_column_handlers(self):
-
-    def test_single_object(obj):
-      handlers = column_handlers.COLUMN_HANDLERS
-      column_definitions = import_helper.get_object_column_definitions(obj)
-      for key, value in column_definitions.items():
-        if key in handlers:
-          handler_key = value.get("handler_key", key)
-          self.assertEqual(
-              value["handler"],
-              handlers[handler_key],
-              "Object '{}', column '{}': expected {}, found {}".format(
-                  obj.__name__,
-                  key,
-                  handlers[key].__name__,
-                  value["handler"].__name__,
-              )
-          )
-
-    verificationErrors = []
-    for obj in set(converters.get_exportables().values()):
-      try:
-        test_single_object(obj)
-      except AssertionError as e:
-        verificationErrors.append(str(e))
-
-    verificationErrors.sort()
-    self.assertEqual(verificationErrors, [])
-
-
 class TestCulumnOrder(TestCase):
 
   def test_column_order(self):
@@ -346,6 +314,53 @@ class TestGetObjectColumnDefinitions(TestCase):
           obj_class.__name__, str(e))
 
     self.assertEqual(errors, "", errors)
+
+  def test_object_column_handlers(self):
+    """Test column handlers on all exportable objects.
+
+    This function makes sure that we don't use get wrong hadlers when fetching
+    object column definitions. If a column has a specified handler_key then
+    the appropriate handler must override the default handler for the column
+    with the same name.
+
+    Raises:
+      AssertionError if any unexpected colum handlers are found.
+    """
+
+    def test_single_object(obj):
+      """Test colum handlers for a single object.
+
+      Args:
+        obj: sqlachemy model.
+
+      Raises:
+        AssertionError if object definiton contains the wrong handler.
+      """
+      handlers = column_handlers.COLUMN_HANDLERS
+      column_definitions = import_helper.get_object_column_definitions(obj)
+      for key, value in column_definitions.items():
+        if key in handlers:
+          handler_key = value.get("handler_key", key)
+          self.assertEqual(
+              value["handler"],
+              handlers[handler_key],
+              "Object '{}', column '{}': expected {}, found {}".format(
+                  obj.__name__,
+                  key,
+                  handlers[key].__name__,
+                  value["handler"].__name__,
+              )
+          )
+
+    verificationErrors = []
+    for obj in set(converters.get_exportables().values()):
+      try:
+        test_single_object(obj)
+      except AssertionError as e:
+        verificationErrors.append(str(e))
+
+    verificationErrors.sort()
+    self.assertEqual(verificationErrors, [])
 
   def test_program_definitions(self):
     """ test default headers for Program """
