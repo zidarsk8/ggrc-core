@@ -9,10 +9,10 @@
   {{#each mapped.issues}}
     <li>
       <span class="file-controls">
-        <a href="javascript://"><i class="grcicon-unmapped"></i></a>
-        <a href="javascript://"><i class="grcicon-edit"></i></a>
+        <a href="javascript://"><i class="fa fa-ban"></i></a>
+        <a href="javascript://"><i class="fa fa-pencil-square-o"></i></a>
       </span>
-      <i class="grcicon-{{icon}}-color"></i>
+      <i class="fa fa-{{icon}}-color"></i>
       <span class="person-holder">
         <a href='{{url}}' target="_blank">
           <span class="person-tooltip-trigger" data-placement="top">
@@ -28,7 +28,7 @@
                   <div class="row-fluid wrap-row">
                     <div class="span8">
                       <h6>Title</h6>
-                      <h5 class="oneline"><i class="grcicon-{{icon}}-color"></i> {{title}}</h5>
+                      <h5 class="oneline"><i class="fa fa-{{icon}}-color"></i> {{title}}</h5>
                     </div>
                     <div class="span4">
                       <h6>Status</h6>
