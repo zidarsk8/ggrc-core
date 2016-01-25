@@ -50,7 +50,6 @@ can.Model.Cacheable("CMS.Models.Section", {
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
-    , child_tree_display_list : ['Objective']
     , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
     , child_options : [{
         model : can.Model.Cacheable
@@ -121,7 +120,6 @@ can.Model.Cacheable("CMS.Models.Clause", {
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
-    , child_tree_display_list : ['Objective']
     , add_item_view : GGRC.mustache_path + "/sections/tree_add_item.mustache"
     , child_options: [{
         model: can.Model.Cacheable

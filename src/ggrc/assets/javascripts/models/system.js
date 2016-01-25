@@ -57,7 +57,6 @@ can.Model.Cacheable("CMS.Models.SystemOrProcess", {
         {attr_title: 'URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
       ])
-      , child_tree_display_list : ['Control']
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , link_buttons : true
       , child_options : []
