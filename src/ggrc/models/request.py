@@ -95,7 +95,10 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       "notes": "Notes",
       "request_type": "Request Type",
       "requested_on": "Requested On",
-      "status": "Status",
+      "status": {
+        "display_name": "Status",
+        "handler_key": "request_status",
+      },
       "test": "Test",
       "related_assignees": {
           "display_name": "Assignee",
@@ -177,12 +180,18 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
         (predicate(audit.Audit.slug) | predicate(audit.Audit.title))
     ).exists()
 
+  @classmethod
+  def default_request_type(cls):
+    return cls.VALID_TYPES[0]
+
 
 def _date_has_changes(attr):
   """Date fields are always interpreted as changed because incoming data is
     of type datetime.datetime, while database field has type datetime.date.
     This function normalises this and performs the correct check.
   """
+  if not attr.history.added or not attr.history.deleted:
+    return False
   added, deleted = attr.history.added[0], attr.history.deleted[0]
   if isinstance(added, datetime.datetime):
     added = added.date()

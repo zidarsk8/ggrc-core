@@ -23,16 +23,13 @@ from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.track_object_state import track_state_for_class
 
 
-class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
+class Assessment(HasObjectState, TestPlanned, CustomAttributable,
                         Documentable, Personable, Timeboxed, Ownable,
                         Relatable, BusinessObject, db.Model):
-  __tablename__ = 'control_assessments'
+  __tablename__ = 'assessments'
 
-  design = deferred(db.Column(db.String), 'ControlAssessment')
-  operationally = deferred(db.Column(db.String), 'ControlAssessment')
-
-  control_id = db.Column(db.Integer, db.ForeignKey('controls.id'))
-  control = db.relationship('Control', foreign_keys=[control_id])
+  design = deferred(db.Column(db.String), 'Assessment')
+  operationally = deferred(db.Column(db.String), 'Assessment')
 
   audit = {}  # we add this for the sake of client side error checking
 
@@ -47,17 +44,10 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
   _publish_attrs = [
       'design',
       'operationally',
-      'control',
       PublishOnly('audit')
   ]
 
   _aliases = {
-      "control": {
-          "display_name": "Control",
-          "type": "mapping",
-          "mandatory": True,
-          "filter_by": "_filter_by_control",
-      },
       "audit": {
           "display_name": "Audit",
           "mandatory": True,
@@ -78,23 +68,4 @@ class ControlAssessment(HasObjectState, TestPlanned, CustomAttributable,
   def validate_design(self, key, value):
     return self.validate_conclusion(value)
 
-  @classmethod
-  def _filter_by_control(cls, predicate):
-    return Control.query.filter(
-      (Control.id == cls.control_id) &
-      (predicate(Control.slug) | predicate(Control.title))
-    ).exists()
-
-  @classmethod
-  def eager_query(cls):
-
-    query = super(ControlAssessment, cls).eager_query()
-    return query.options(orm.subqueryload('control'))
-
-  @classmethod
-  def generate_slug_for(cls, obj):
-    id = getattr(obj, 'id', uuid1())
-    control = getattr(getattr(obj, "control", None), "slug", "")
-    obj.slug = "{}.CA-{}".format(control, id)
-
-track_state_for_class(ControlAssessment)
+track_state_for_class(Assessment)

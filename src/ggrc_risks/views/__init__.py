@@ -9,13 +9,5 @@ from ggrc_risks.views import converters
 
 from flask import render_template
 
-
-def risk_admin():
-  """Special admin page to show risks
-  TODO: Dry this up, override existing admin url.
-  """
-  return render_template("admin/risk_index.haml")
-
-
 def init_extra_views(app):
   pass

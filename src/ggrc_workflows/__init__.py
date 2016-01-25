@@ -671,7 +671,19 @@ def handle_cycle_status_change(sender, obj=None, new_status=None,
       db.session.add(obj)
       update_workflow_state(obj.workflow)
 
-# FIXME: Duplicates `ggrc_basic_permissions._get_or_create_personal_context`
+
+@Signals.status_change.connect_via(models.CycleTaskGroupObjectTask)
+def handle_cycle_task_status_change(sender, obj=None, new_status=None,
+                                    old_status=None):
+  if inspect(obj).attrs.status.history.has_changes():
+    if new_status == 'Verified':
+      obj.verified_date = datetime.now()
+    elif new_status == 'Finished':
+      obj.finished_date = datetime.now()
+      obj.verified_date = None
+    else:
+      obj.finished_date = None
+      obj.verified_date = None
 
 
 def _get_or_create_personal_context(user):

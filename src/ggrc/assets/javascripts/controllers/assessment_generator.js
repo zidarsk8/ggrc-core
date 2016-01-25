@@ -16,11 +16,11 @@ can.Component.extend({
       if (this.scope.loading) {
         return;
       }
-      this._generate_control_assessments();
+      this._generate_assessments();
     },
 
-    _generate_control_assessments: function(controls) {
-      var assessments_list = this.scope.audit.get_binding("related_control_assessments").list,
+    _generate_assessments: function(controls) {
+      var assessments_list = this.scope.audit.get_binding("related_assessments").list,
           controls_list = this.scope.audit.get_binding("program_controls").list,
           assessments_dfd = this._refresh(assessments_list),
           controls_dfd = this._refresh(controls_list),
@@ -76,11 +76,11 @@ can.Component.extend({
             test_plan: control.test_plan
           };
       return dfd.then(function() {
-        return GGRC.Models.Search.counts_for_types(title, ['ControlAssessment']);
+        return GGRC.Models.Search.counts_for_types(title, ['Assessment']);
       }).then(function (result) {
-        index = result.getCountFor('ControlAssessment') + 1;
+        index = result.getCountFor('Assessment') + 1;
         data.title = title + ' ' + index;
-        return new CMS.Models.ControlAssessment(data).save();
+        return new CMS.Models.Assessment(data).save();
       }.bind(this));
     },
 
@@ -99,16 +99,16 @@ can.Component.extend({
       if (errors < 1) {
         if (count === 0) {
           msg = {
-            success: "Every Control already has a Control Assessment!"
+            success: "Every Control already has an Assessment!"
           };
         } else {
           msg = {
-            success: "<span class='user-string'>" + count + "</span> Control Assessments successfully created."
+            success: "<span class='user-string'>" + count + "</span> Assessments successfully created."
           };
         }
       } else {
         msg = {
-          error: "An error occured when creating Control Assessments."
+          error: "An error occured when creating Assessments."
         };
       }
 
@@ -119,9 +119,9 @@ can.Component.extend({
       var $i = this.element.find("a > i"),
           icon = $i.attr("class");
 
-      $i.attr("class", "grcicon-loading");
+      $i.attr("class", "fa fa-spinner fa-pulse");
       $(document.body).trigger("ajax:flash",
-                               {warning: "Generating Control Assessments"});
+                               {warning: "Generating Assessments"});
 
       this.scope.icon = icon;
       this.scope.loading = true;

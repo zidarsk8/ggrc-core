@@ -14,7 +14,7 @@
       <label>
         Title
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Title goes here"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Title goes here"></i>
       </label>
       <input data-id="title_txtbx" class="input-block-level required" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
       <br>
@@ -25,7 +25,7 @@
       {{#with_current_user_as 'current_user'}}
         <label>
           Manager
-          <i class="grcicon-help-black" rel="tooltip" title="Workflow Managers are managed in the People widget."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Workflow Managers are managed in the People widget."></i>
           <a data-id="hide_owner_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <input data-id="owner_txtbx"  type="hidden" name="owners.0.email" data-lookup="Person" value="" />
@@ -40,7 +40,7 @@
     <div data-id="description_hidden" class="span8 hidable">
       <label>
         Description
-        <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Description goes here"></i>
         <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
@@ -53,7 +53,7 @@
         <div data-id="frequency_hidden" class="span12 hidable">
           <label>
             Frequency
-            <i class="grcicon-help-black" rel="tooltip" title="Choose frequency"></i>
+            <i class="fa fa-question-circle" rel="tooltip" title="Choose frequency"></i>
             <a data-id="hide_frequency_hidden_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <select data-id="frequency_dd" tabindex="4" class="input-block-level" id="frequency" name="frequency" {{^if new_object_form}}disabled="disabled"{{/if new_object_form}}>
@@ -67,7 +67,7 @@
         <div data-id="email_preferences_hidden" class="span12 hidable">
           <label class="second-in-column">
             Email preferences
-            <i class="grcicon-help-black" rel="tooltip" title="This setting will override user email preferences"></i>
+            <i class="fa fa-question-circle" rel="tooltip" title="This setting will override user email preferences"></i>
             <a data-id="hide_email_preferences_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <input data-id="email_preferences_chkbx" type="checkbox" name="notify_on_change" {{#if instance.notify_on_change}}checked="checked"{{/if}} tabindex="5">
@@ -89,7 +89,7 @@
     <div data-id="first_task_group_title_hidden" class="span8 hidable">
       <label>
         First task group's title
-        <i class="grcicon-help-black" rel="tooltip" title="The name of the first task group"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="The name of the first task group"></i>
         <a data-id="hide_first_task_group_title_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <input data-id="first_task_group_title_chkbx" class="input-block-level" placeholder="Enter Title" name="task_group_title" type="text" tabindex="7" value="Task Group 1" autofocus>
@@ -102,7 +102,7 @@
     <div data-id="custom_start_workflow_email_message_hidden" class="span8 hidable">
       <label>
         Custom "Start Workflow" email message
-        <i class="grcicon-help-black" rel="tooltip" title="This email will be sent to all workflow members once workflow starts"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="This email will be sent to all workflow members once workflow starts"></i>
         <a data-id="hide_custom_start_workflow_email_message_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
@@ -114,7 +114,7 @@
     <div data-id="code_hidden" class="span4 hidable">
       <label>
         Code
-        <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="WORKFLOW-XXX" type="text" value="{{instance.slug}}">

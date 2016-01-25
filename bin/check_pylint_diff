@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
+
+set -o nounset
+set -o errexit
+
+TMP_REPO="/tmp/ggrc-core"
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+rm -rf $TMP_REPO
+cp -a /vagrant $TMP_REPO
+cd $TMP_REPO
+
+if [[ "${1:-}" != "" ]]; then
+  TEST_COMMIT=$1
+else
+  TEST_COMMIT=$(git rev-parse HEAD)
+fi
+
+CURRENT_COMMIT=$(git rev-parse HEAD)
+PARENT_1=$(git show --pretty=raw $TEST_COMMIT | grep parent | head -1 | grep -oE "[^ ]*$")
+
+echo "Comparing commits $TEST_COMMIT and $PARENT_1."
+
+git checkout --quiet $PARENT_1
+pylint src/* > /dev/null 2>&1 | true
+git checkout --quiet $TEST_COMMIT
+PYLINT_RESULT=$(pylint src/* 2> /dev/null | tail -n 2) 
+git checkout --quiet $CURRENT_COMMIT
+
+echo "$PYLINT_RESULT"
+echo "$PYLINT_RESULT" | grep "+" && rc=$? || rc=$?
+
+exit $rc

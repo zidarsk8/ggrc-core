@@ -16,7 +16,7 @@
 
     <a href="{{ selector }}" rel="tooltip" data-placement="bottom" title="{{ internav_display }}">
       <div class="oneline">
-        <i class="{{ internav_icon }}"></i>
+        <i class="fa fa-{{ internav_icon }} color"></i>
         {{#if show_title}}
           {{internav_display}}
           {{#has_count}}({{count}}{{#spinner}}...{{/spinner}}){{/has_count}}
@@ -25,7 +25,7 @@
         {{/if}}
         {{^count}}{{#has_count}}
           {{^instance.constructor.obj_nav_options.show_all_tabs}}
-            <span class="closed"></span>
+            <span class="closed"><i class="fa fa-times"></i></span>
           {{/instance.constructor.obj_nav_options.show_all_tabs}}
         {{/has_count}}{{/count}}
       </div>
@@ -36,7 +36,7 @@
 {{#is_allowed 'update' instance}}
 {{#if widget_list.length}}
 <li data-test-id="button_widget_add_2c925d94" class="hidden-widgets-list">
-  <a href="#dropdown-widgets" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="Add widget"><i class="grcicon-created"></i> Add...</a>
+  <a href="#dropdown-widgets" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="Add widget"><i class="fa fa-plus-circle"></i> Add...</a>
   <div class="dropdown-menu" role="menu">
     {{#each widget_list}}
       <div class="inner-nav-item">
@@ -48,7 +48,7 @@
           or #if' instance.constructor.obj_nav_options.show_all_tabs}}
         <a href="{{ selector }}">
           <div class="oneline">
-            <i class="{{ internav_icon }}"></i>
+            <i class="fa fa-{{ internav_icon }} color"></i>
             {{internav_display}}
           </div>
         </a>

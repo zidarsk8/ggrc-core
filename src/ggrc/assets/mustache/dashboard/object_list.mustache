@@ -1,8 +1,8 @@
 {{!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: brad@reciprocitylabs.com
-    Maintained By: brad@reciprocitylabs.com
+    Maintained By: vladan@reciprocitylabs.com
 }}
 
 {{! dashboard object listing}}
@@ -23,14 +23,14 @@
           <div class="span1">
             <div class="counter">
               {{#is_private}}
-                <i class="grcicon-private"></i>
+                <i class="fa fa-lock"></i>
               {{/is_private}}
             </div>
           </div>
           <div class="span1">
             <div class="counter">
               {{^contact}}
-                <i class="grcicon-people-warning"></i>
+                <i class="fa fa-person red"></i>
               {{/contact}}
             </div>
           </div>
@@ -44,7 +44,7 @@
         <div class="row-fluid">
           <div class="span6">
             <a href="{{viewLink}}" class="info-action">
-              <i class="grcicon-goto"></i>
+              <i class="fa fa-long-arrow-right"></i>
               View {{class.title_singular}}
             </a>
           </div>

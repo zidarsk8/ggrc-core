@@ -27,7 +27,7 @@
       <label>
         Summary
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
       </label>
       <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
       <br>
@@ -37,7 +37,7 @@
       <label>
         Assignee
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="This is the default assignee for this task."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="This is the default assignee for this task."></i>
       </label>
       {{#if_cycle_assignee_privileges instance}}
       <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
@@ -66,7 +66,7 @@
       or #if_null' instance.task_type}}
       <label>
         Task Details
-        <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
       </label>
       <div class="wysiwyg-area">
         <textarea id="tgt_response_options" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="2">{{instance.description}}</textarea>
@@ -74,7 +74,7 @@
       {{else}}
       <label>
         Selection Response Options (Comma Separated)
-        <i class="grcicon-help-black" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
       </label>
         <textarea id="tgt_response_options" class="span12 double" name="response_options_csv" placeholder="Enter Description" tabindex="2">{{instance.response_options_csv}}</textarea>
       {{/if_equals}}
@@ -87,11 +87,17 @@
         </label>
         <label class="smaller">
           <span class="start-text">Start Date</span>
-          <input tabindex="4" class="date input-small" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.start_date}}">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input tabindex="4" class="date input-small" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.start_date}}">
+          </div>
         </label>
         <label class="smaller">
           <span class="start-text">End Date</span>
-          <input tabindex="4" class="date input-small" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input tabindex="4" class="date input-small" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
+          </div>
         </label>
       </div>
     </div>

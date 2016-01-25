@@ -10,6 +10,8 @@
       format = {
         changeMonth: true,
         changeYear: true,
+        prevText: "",
+        nextText: "",
         dateFormat: "mm/dd/yy"
       };
 

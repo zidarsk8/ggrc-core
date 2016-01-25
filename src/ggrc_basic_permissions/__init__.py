@@ -22,6 +22,7 @@ from ggrc.rbac import permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.registry import service
 from ggrc.services.common import Resource
+from ggrc.services.common import _get_cache_manager
 from . import basic_roles
 from ggrc.utils import benchmark
 from .contributed_roles import lookup_role_implications
@@ -199,7 +200,25 @@ def load_permissions_for(user):
   'condition' is the string name of a conditional operator, such as 'contains'.
   'terms' are the arguments to the 'condition'.
   """
+  PERMISSION_CACHE_TIMEOUT = 1800 # 30 minutes
   permissions = {}
+  key = 'permissions:{}'.format(user.id)
+  cache = None
+
+  if getattr(settings, 'MEMCACHE_MECHANISM', False):
+    cache = _get_cache_manager().cache_object.memcache_client
+    cached_keys_set = cache.get('permissions:list') or set()
+    if key not in cached_keys_set:
+      # We set the permissions:list variable so that we are able to batch
+      # remove all permissions related keys from memcache
+      cached_keys_set.add(key)
+      cache.set('permissions:list', cached_keys_set, PERMISSION_CACHE_TIMEOUT)
+    else:
+      permissions_cache = cache.get(key)
+      if permissions_cache:
+        # If the key is both in permissions:list and in memcache itself
+        # it is safe to return the cached permissions
+        return permissions_cache
 
   # Add default `Help` and `NotificationConfig` permissions for everyone
   # FIXME: This should be made into a global base role so it can be extended
@@ -353,6 +372,15 @@ def load_permissions_for(user):
       .setdefault('__GGRC_ALL__', dict())\
       .setdefault('contexts', list())\
       .append(personal_context.id)
+
+  if cache is not None:
+    cached_keys_set = cache.get('permissions:list') or set()
+    if key in cached_keys_set:
+      # We only add the permissions to the cache if the
+      # key still exists in the permissions:list after
+      # the query has executed.
+      cache.set(key, permissions, PERMISSION_CACHE_TIMEOUT)
+
   return permissions
 
 

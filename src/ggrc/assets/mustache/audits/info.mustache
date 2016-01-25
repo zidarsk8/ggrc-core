@@ -109,7 +109,7 @@
                     {{#is_allowed 'delete' this}}
                       <a href="javascript://" class="unmap" data-toggle="unmap">
                         <span class="result" {{data 'result'}}></span>
-                        <i class="grcicon-deleted"></i>
+                        <i class="fa fa-trash"></i>
                       </a>
                     {{/is_allowed}}
                   </li>
@@ -127,7 +127,7 @@
               {{#prune_context}}
               <div class="objective-selector field-wrap">
                 <input tabindex="3" type="text" name="instance" data-lookup="Person" null-if-empty="true" class="search-icon" placeholder="Add Auditor" {{autocomplete_select}} value="{{instance.email}}">
-                <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+                <a href="javascript://" {{toggle_button}}><i class="fa fa-trash"></i></a>
 
                 <a href="javascript://" class="btn btn-small btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
               </div>

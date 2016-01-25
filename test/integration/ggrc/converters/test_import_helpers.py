@@ -3,17 +3,13 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from copy import copy
 from os.path import abspath, dirname, join
-from random import shuffle
 
 from ggrc import converters
 from ggrc import models
 from ggrc.converters import column_handlers
 from ggrc.converters import import_helper
-from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
-from ggrc.converters.import_helper import split_array
 from ggrc.utils import get_mapping_rules
 from ggrc.utils import title_from_camelcase
 from ggrc_risk_assessments import models as ra_models
@@ -31,155 +27,6 @@ def get_mapping_names(class_name):
   mapping_names = {"map:{}".format(name) for name in pretty_rules}
   unmapping_names = {"unmap:{}".format(name) for name in pretty_rules}
   return mapping_names.union(unmapping_names)
-
-
-class TestSplitArry(TestCase):
-
-  def test_sigle_block(self):
-    test_data = [
-        ["hello", "world"],
-        ["hello", "world"],
-        ["hello", "world"],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 1)
-    self.assertEqual(data_blocks[0], test_data)
-    self.assertEqual(offests[0], 0)
-
-  def test_sigle_block_with_padding(self):
-    test_data = [
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world", "uet"],
-        ["hello", "world"],
-        ["hello", "world"],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 1)
-    self.assertEqual(data_blocks[0], test_data[1:])
-    self.assertEqual(offests[0], 1)
-
-    test_data = [
-        ["", ""],
-        ["", ""],
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world", "uet"],
-        ["hello", "world"],
-        ["hello", "world"],
-        ["", ""],
-        ["", ""],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 1)
-    self.assertEqual(data_blocks[0], test_data[3:7])
-    self.assertEqual(offests[0], 3)
-
-  def test_multiple_blocks(self):
-    test_data = [
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world", "uet"],
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world"],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 2)
-    self.assertEqual(data_blocks[0], test_data[1:3])
-    self.assertEqual(data_blocks[1], test_data[4:6])
-    self.assertEqual(offests[0], 1)
-    self.assertEqual(offests[1], 4)
-
-    test_data = [
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world", "uet"],
-        ["hello", "world"],
-        ["", ""],
-        ["", ""],
-        ["hello", "world"],
-        ["", ""],
-        ["", ""],
-        ["hello", "world"],
-        ["hello", "world"],
-        ["hello", "world"],
-    ]
-    offests, data_blocks = split_array(test_data)
-    self.assertEqual(len(data_blocks), 3)
-    self.assertEqual(data_blocks[0], test_data[1:4])
-    self.assertEqual(data_blocks[1], test_data[6:7])
-    self.assertEqual(data_blocks[2], test_data[9:])
-    self.assertEqual(offests[0], 1)
-    self.assertEqual(offests[1], 6)
-    self.assertEqual(offests[2], 9)
-
-
-class TestGetObjectColumnDefinitons(TestCase):
-
-  def test_object_column_handlers(self):
-
-    def test_single_object(obj):
-      handlers = column_handlers.COLUMN_HANDLERS
-      column_definitions = import_helper.get_object_column_definitions(obj)
-      for key, value in column_definitions.items():
-        if key in handlers:
-          handler_key = value.get("handler_key", key)
-          self.assertEqual(
-              value["handler"],
-              handlers[handler_key],
-              "Object '{}', column '{}': expected {}, found {}".format(
-                  obj.__name__,
-                  key,
-                  handlers[key].__name__,
-                  value["handler"].__name__,
-              )
-          )
-
-    verificationErrors = []
-    for obj in set(converters.get_exportables().values()):
-      try:
-        test_single_object(obj)
-      except AssertionError as e:
-        verificationErrors.append(str(e))
-
-    verificationErrors.sort()
-    self.assertEqual(verificationErrors, [])
-
-
-class TestCulumnOrder(TestCase):
-
-  def test_column_order(self):
-    attr_list = [
-        "slug",
-        "title",
-        "description",
-        "notes",
-        "test_plan",
-        "owners",
-        "start_date",
-        "status",
-        "kind",
-        "url",
-        "reference_url",
-        "name",
-        "email",
-        "is_enabled",
-        "company",
-        "A Capital custom attribute",
-        "a simple custom attribute",
-        "some custom attribute",
-        "map:A thing",
-        "map:B thing",
-        "map:c thing",
-        "map:Program",
-        "map:some other mapping",
-    ]
-    original_list = copy(attr_list)
-    for _ in range(1):
-      shuffle(attr_list)
-      column_order = get_column_order(attr_list)
-      self.assertEqual(original_list, column_order)
 
 
 class TestCustomAttributesDefinitions(TestCase):
@@ -280,6 +127,13 @@ class TestGetObjectColumnDefinitions(TestCase):
   order of these test functions is the same as the objects in LHN
   """
 
+  @classmethod
+  def setUpClass(cls):
+    TestCase.clear_data()
+
+  def setUp(self):
+    pass
+
   def _test_definiton_names(self, obj_class, names, has_mappings=True):
     """ Test name definitions for one class
 
@@ -347,6 +201,53 @@ class TestGetObjectColumnDefinitions(TestCase):
 
     self.assertEqual(errors, "", errors)
 
+  def test_object_column_handlers(self):
+    """Test column handlers on all exportable objects.
+
+    This function makes sure that we don't use get wrong hadlers when fetching
+    object column definitions. If a column has a specified handler_key then
+    the appropriate handler must override the default handler for the column
+    with the same name.
+
+    Raises:
+      AssertionError if any unexpected colum handlers are found.
+    """
+
+    def test_single_object(obj):
+      """Test colum handlers for a single object.
+
+      Args:
+        obj: sqlachemy model.
+
+      Raises:
+        AssertionError if object definiton contains the wrong handler.
+      """
+      handlers = column_handlers.COLUMN_HANDLERS
+      column_definitions = import_helper.get_object_column_definitions(obj)
+      for key, value in column_definitions.items():
+        if key in handlers:
+          handler_key = value.get("handler_key", key)
+          self.assertEqual(
+              value["handler"],
+              handlers[handler_key],
+              "Object '{}', column '{}': expected {}, found {}".format(
+                  obj.__name__,
+                  key,
+                  handlers[key].__name__,
+                  value["handler"].__name__,
+              )
+          )
+
+    verificationErrors = []
+    for obj in set(converters.get_exportables().values()):
+      try:
+        test_single_object(obj)
+      except AssertionError as e:
+        verificationErrors.append(str(e))
+
+    verificationErrors.sort()
+    self.assertEqual(verificationErrors, [])
+
   def test_program_definitions(self):
     """ test default headers for Program """
     definitions = get_object_column_definitions(models.Program)
@@ -406,17 +307,16 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Internal Audit Lead"]["mandatory"])
 
-  def test_control_assessment_definitions(self):
-    """ test default headers for Control Assessment """
-    definitions = get_object_column_definitions(models.ControlAssessment)
-    mapping_names = get_mapping_names(models.ControlAssessment.__name__)
+  def test_assessment_definitions(self):
+    """ test default headers for Assessment """
+    definitions = get_object_column_definitions(models.Assessment)
+    mapping_names = get_mapping_names(models.Assessment.__name__)
     display_names = {val["display_name"] for val in definitions.values()}
     element_names = {
         "Title",
         "Description",
         "Notes",
         "Test Plan",
-        "Control",
         "Audit",
         "Owner",
         "Primary Contact",
@@ -437,7 +337,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
-    self.assertTrue(vals["Control"]["mandatory"])
     self.assertTrue(vals["Audit"]["mandatory"])
 
   def test_issue_definitions(self):
@@ -1020,10 +919,15 @@ class TestGetObjectColumnDefinitions(TestCase):
 
 
 class TestGetWorkflowObjectColumnDefinitions(TestCase):
+  """Test default column difinitions for workflow objcts.
+  """
 
-  """
-  Test default column difinitions for workflow objcts
-  """
+  @classmethod
+  def setUpClass(cls):
+    TestCase.clear_data()
+
+  def setUp(self):
+    pass
 
   def test_workflow_definitions(self):
     """ test default headers for Workflow """
@@ -1103,6 +1007,8 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Task Details",
         "Start Date",
         "End Date",
+        "Actual Verified Date",
+        "Actual Finish Date",
         "Task Group",
         "Cycle Object",
         "State",
@@ -1115,10 +1021,15 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
 
 
 class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
+  """Test default column difinitions for risk assessment objcts.
+  """
 
-  """
-  Test default column difinitions for risk assessment objcts
-  """
+  @classmethod
+  def setUpClass(cls):
+    TestCase.clear_data()
+
+  def setUp(self):
+    pass
 
   def test_risk_assessemnt_definitions(self):
     """ test default headers for Workflow """

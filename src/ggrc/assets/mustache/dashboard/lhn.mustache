@@ -14,28 +14,30 @@
   <div class="affix-holder">
     <div id="lhs" class="lhs accordion">
       <button class="bar-v"></button>
-      <a href="javascript://" class="lhn-pin"><i class="grcicon-pin"></i></a>
+      <a href="javascript://" class="lhn-pin"><i class="fa fa-thumb-tack"></i></a>
       <form class="form-search">
         <div class="lhs-search active">
           <input class="widgetsearch" placeholder="Filter my objects..." type="text" can-value="search_text">
-          <input type="submit" class="widgetsearch-submit" value="">
+          <button type="submit" class="widgetsearch-submit" value="">
+            <i class="fa fa-search"></i>
+          </button>
 
           <div class="filter-off">
-            <a href="#" rel="tooltip" data-title="Clear filters" data-original-title="" title=""><i class="grcicon-close-red"></i></a>
+            <a href="#" rel="tooltip" data-title="Clear filters" data-original-title="" title="">
+              <i class="fa fa-times red"></i>
+            </a>
           </div>
         </div>
       </form>
 
       <h4 class="search-title">Showing filtered results</h4>
 
-      <div class="lhs-bg"></div>
-
       <div class="lhs-nav emphesized">
         <ul class="top-level">
           {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Program" li_class="programs" tooltip_view='/programs/extended_info.mustache'  template_view='/static/mustache/programs/search_result.mustache'}}}
           {{{render_hooks 'LHN.Sections_workflow'}}}
           {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Audit" li_class="programs" tooltip_view='/audits/extended_info.mustache' template_view='/static/mustache/audits/search_result.mustache'}}}
-          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="ControlAssessment" li_class="programs"}}}
+          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Assessment" li_class="programs"}}}
           {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Request" li_class="programs"}}}
           {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Issue" li_class="programs"}}}
         </ul>
@@ -49,9 +51,8 @@
         <ul class="top-level">
           <li class="governance
           accordion-group">
-            <a data-test-id="directives_66116337" class="governance
-            list-toggle top" href="#">
-              <i class="grcicon-arrow-right"></i>
+            <a data-test-id="directives_66116337" class="governance list-toggle top" href="#">
+              <i class="fa fa-caret-right"></i>
               Directives
             </a>
             <div class="content">
@@ -67,9 +68,8 @@
           </li>
 
           <li class="governance accordion-group">
-            <a data-test-id="controls/objectives_66116337" class="governance
-            list-toggle top" href="#">
-              <i class="grcicon-arrow-right"></i>
+            <a data-test-id="controls/objectives_66116337" class="governance list-toggle top" href="#">
+              <i class="fa fa-caret-right"></i>
               Controls/Objectives
             </a>
             <div class="content">
@@ -81,9 +81,8 @@
           </li>
 
           <li class="entities accordion-group">
-            <a data-test-id="people/groups_66116337" class="entities list-toggle
-             top" href="#">
-              <i class="grcicon-arrow-right"></i>
+            <a data-test-id="people/groups_66116337" class="entities list-toggle top" href="#">
+              <i class="fa fa-caret-right"></i>
               People/Groups
             </a>
             <div class="content">
@@ -97,9 +96,8 @@
           </li>
 
           <li class="business accordion-group">
-            <a data-test-id="assets/business_66116337" class="business
-            list-toggle top" href="#">
-              <i class="grcicon-arrow-right"></i>
+            <a data-test-id="assets/business_66116337" class="business list-toggle top" href="#">
+              <i class="fa fa-caret-right"></i>
               Assets/Business
             </a>
             <div class="content">

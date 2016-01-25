@@ -13,7 +13,7 @@
       <label>
         Summary
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title=""></i>
+        <i class="fa fa-question-circle" rel="tooltip" title=""></i>
       </label>
       <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
       <input id="context_id" name="context" type="hidden" model="Context" value="{{firstnonempty instance.context.id object_params.context}}">
@@ -37,7 +37,7 @@
     <div class="span8 hidable">
       <label for="program_description">
         Details
-        <i class="grcicon-help-black" rel="tooltip" title="Description goes here"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Description goes here"></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
@@ -52,7 +52,7 @@
         <label>
           Workflow
           <span class="required">*</span>
-          <i class="grcicon-help-black" rel="tooltip" title="Workflow containing this Task Group"></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Workflow containing this Task Group"></i>
         </label>
         <input tabindex="4" class="input-block-level" name="workflow.title" data-lookup="Workflow" data-template="/workflows/autocomplete_result.mustache" placeholder="Choose Workflow" type="text" value="{{firstexist workflow.title ''}}" />
         {{/using}}
@@ -69,7 +69,7 @@
     <div data-id="code_hidden" class="span4 hidable">
       <label>
         Code
-        <i class="grcicon-help-black" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
         <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="TASKGROUP-XXX" type="text" value="{{instance.slug}}">

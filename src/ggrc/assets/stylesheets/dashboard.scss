@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  * Created By: brad@reciprocitylabs.com
- * Maintained By: predrag@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
  */
 
 /* FIXME: Fix for https://github.com/rails/rails/issues/3686
@@ -26,13 +26,21 @@
 @import "compass/css3";
 //@import "bootstrap-wysihtml5-0.0.2";
 
+$fa-font-path: "/static/fonts";
+@import "font-awesome";
+
+@import "colors";
+@import "mixins";
 @import "setup";
+@import "typography";
+@import "helpers";
+@import "custom_font_awesome_icons";
+
 @import "common";
 @import "lhs";
 @import "layout";
 @import "widget";
 @import "tree";
-@import "header";
 @import "footer";
 @import "flash";
 @import "workflow";
@@ -43,61 +51,15 @@
 
 // page specific scss
 @import "reg-mapper";
-@import "pbc";
 
-@import "quick-search";
 @import "modal";
 
 @import "popover";
 @import "login";
 
-@import "icons";
-
 @import "responsive";
 @import "js-helpers";
 
 @import "import-export";
-/*
 
-// editable styles start here
-
-  // variables, overrides, mixins
-  @import "setup";
-
-  // bootstrap rewrites
-  @import "rewrite";
-
-  // global definitions
-  @import "global";
-
-  // everything
-  @import "gcms";
-
-  // modals aka dialogs
-  @import "progressbars";
-
-
-  // modals aka dialogs
-  @import "modals";
-
-  // modals aka dialogs
-  @import "widgets";
-
-  // SVG graphing
-  @import "graph";
-
-  // icons
-  @import "icons";
-
-  // tables
-  @import "tables";
-
-
-  // new page structure and elements
-  @import "page-structure";
-
-  // fluid-layout styles
-  @import "fluid";
-
-
-*/
+@import "modules";

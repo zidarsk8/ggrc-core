@@ -10,6 +10,7 @@ from ggrc.models.mixins import (
     Base, Titled, Described, Timeboxed, Slugged, Stateful, WithContact
     )
 from ggrc.models import all_models
+from ggrc.models.reflection import PublishOnly
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
 from ggrc_workflows.models.cycle_task_group_object import CycleTaskGroupObject
@@ -18,7 +19,8 @@ from sqlalchemy import or_
 
 
 class CycleTaskGroupObjectTask(
-    WithContact, Stateful, Slugged, Timeboxed, Described, Titled, Base, db.Model):
+    WithContact, Stateful, Slugged, Timeboxed,
+    Described, Titled, Base, db.Model):
   __tablename__ = 'cycle_task_group_object_tasks'
   _title_uniqueness = False
 
@@ -50,6 +52,9 @@ class CycleTaskGroupObjectTask(
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
 
+  finished_date = db.Column(db.DateTime)
+  verified_date = db.Column(db.DateTime)
+
   _publish_attrs = [
       'cycle',
       'cycle_task_group_object',
@@ -59,7 +64,9 @@ class CycleTaskGroupObjectTask(
       'sort_index',
       'task_type',
       'response_options',
-      'selected_response_options'
+      'selected_response_options',
+      PublishOnly('finished_date'),
+      PublishOnly('verified_date')
       ]
 
   default_description = "<ol>"\
@@ -81,6 +88,8 @@ class CycleTaskGroupObjectTask(
       "secondary_contact": None,
       "start_date": "Start Date",
       "end_date": "End Date",
+      "finished_date": "Actual Finish Date",
+      "verified_date": "Actual Verified Date",
       "cycle": {
         "display_name": "Cycle",
         "filter_by": "_filter_by_cycle",

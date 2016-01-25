@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+cd "${SCRIPTPATH}/../test"
+find ./../ -iname "*.pyc" -delete
+
+echo -e "\nRunning unit tests"
+nosetests unit --with-xunit --xunit-file="nosetests-unit.xml" --logging-clear-handlers ${@:1}

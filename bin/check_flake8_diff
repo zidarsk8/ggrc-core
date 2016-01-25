@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
+
+set -o nounset
+set -o errexit
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+cd "${SCRIPTPATH}/../"
+
+CURRENT_COMMIT=$(git rev-parse HEAD)
+PARENT_1=$(git show --pretty=raw $CURRENT_COMMIT | grep parent | head -1 | grep -oE "[^ ]*$")
+PARENT_2=$(git show --pretty=raw $CURRENT_COMMIT | head -6 | grep parent | tail -1 | grep -oE "[^ ]*$")
+BASE_COMMIT=$(git merge-base $PARENT_1 $PARENT_2)
+
+# List files changed in a commit, or if it's a merge commit, list files chaged
+# from the begin of the branch to the last commit on the merged branch.
+if [[ "$PARENT_2" == "$BASE_COMMIT" ]]; then
+  CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r $BASE_COMMIT | grep "\.py$" || true )
+else
+  CHANGED_FILES=$(git diff --name-only $BASE_COMMIT $PARENT_2 | grep "\.py$" || true )
+fi
+
+if [[ "$CHANGED_FILES" == "" ]]; then
+  echo "No python files changed. Skipping flake checks"
+  exit 0
+fi
+
+echo "Checking files:"
+echo "$CHANGED_FILES"
+echo ""
+
+echo $CHANGED_FILES | xargs flake8 --config setup.cfg

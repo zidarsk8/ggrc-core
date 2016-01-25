@@ -22,11 +22,5 @@ class TestBasicCsvImport(converters.TestCase):
     response_data = self.import_file(filename)
     self.assertEqual(response_data_dry, response_data)
 
-    expected_errors = set([
-        errors.DELETE_CASCADE_ERROR.format(
-            line=3, object_type="Control", slug="c1")
-    ])
-
-    self.assertEqual(set(response_data[0]["row_errors"]), expected_errors)
-    self.assertEqual(response_data[0]["deleted"], 1)
-    self.assertEqual(response_data[0]["ignored"], 1)
+    self.assertEqual(response_data[0]["deleted"], 2)
+    self.assertEqual(response_data[0]["ignored"], 0)

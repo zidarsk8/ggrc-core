@@ -1125,70 +1125,78 @@ can.Model("can.Model.Cacheable", {
       GGRC.delay_leaving_page_until(dfd);
     });
     return dfd;
-  }
-  , save: function() {
+  },
+  save: function () {
     Array.prototype.push.call(arguments, this._super);
-    this._dfd = new $.Deferred();
+    this._dfd = $.Deferred();
     GGRC.SaveQueue.enqueue(this, arguments);
     return this._dfd;
   },
-  refresh_all: function() {
+  refresh_all: function () {
     var props = Array.prototype.slice.call(arguments, 0);
 
     return RefreshQueue.refresh_all(this, props);
   },
-  refresh_all_force: function() {
+  refresh_all_force: function () {
     var props = Array.prototype.slice.call(arguments, 0);
 
     return RefreshQueue.refresh_all(this, props, true);
   },
   get_filter_vals: function (keys, mappings) {
+    var values = {};
+    var customAttrs = {};
+    var customAttrIds = {};
+    var longTitle = this.type.toLowerCase() + ' title';
+
     keys = keys || this.class.filter_keys;
     mappings = mappings || this.class.filter_mappings;
-
-    var values = {},
-        custom_attrs = {},
-        custom_attr_ids = {},
-        long_title = this.type.toLowerCase() + " title";
 
     if (!this.custom_attribute_definitions) {
       this.load_custom_attribute_definitions();
     }
     this.custom_attribute_definitions.each(function (definition) {
-      custom_attr_ids[definition.id] = definition.title.toLowerCase();
+      customAttrIds[definition.id] = definition.title.toLowerCase();
     });
     if (!this.custom_attributes) {
       this.setup_custom_attributes();
     }
-    can.each(this.custom_attribute_values, function (custom_attr) {
-      custom_attr = custom_attr.reify();
-      custom_attrs[custom_attr_ids[custom_attr.custom_attribute_id]] =
-        custom_attr.attribute_value;
+    can.each(this.custom_attribute_values, function (customAttr) {
+      customAttr = customAttr.reify();
+      customAttrs[customAttrIds[customAttr.custom_attribute_id]] =
+        customAttr.attribute_value;
     });
 
-    if (!mappings[long_title]){
-      mappings[long_title] = "title";
+    if (!mappings[longTitle]) {
+      mappings[longTitle] = 'title';
     }
-    keys = _.union(keys, long_title, _.keys(mappings), _.keys(custom_attrs));
-    $.each(keys, function(index, key) {
-      var attr_key = mappings[key] || key,
-          val = this[attr_key] || custom_attrs[attr_key];
+    keys = _.union(keys, longTitle, _.keys(mappings), _.keys(customAttrs));
+    $.each(keys, function (index, key) {
+      var attrKey = mappings[key] || key;
+      var val = this[attrKey] || customAttrs[attrKey];
+      var owner;
+      var audit;
 
-      if (val !== undefined && val !== null){
-        if (key == 'owner' || key == 'owners'){
+      if (val !== undefined && val !== null) {
+        if (key === 'owner' || key === 'owners') {
           values[key] = [];
-          val.forEach(function(owner_stub){
-            var owner = owner_stub.reify();
+          val.forEach(function (owner_stub) {
+            owner = owner_stub.reify();
             values[key].push({
               name: owner.name,
               email: owner.email
             });
           });
+        } else if (key === 'audit') {
+          audit = this.audit.reify();
+          values[key] = {
+            status: audit.status,
+            title: audit.title
+          };
         } else {
           if ($.type(val) === 'date') {
             val = val.toISOString().substring(0, 10);
           }
-          if ($.type(val) === 'string'){
+          if ($.type(val) === 'string') {
             values[key] = val;
           }
         }
@@ -1199,50 +1207,85 @@ can.Model("can.Model.Cacheable", {
   },
 
   hash_fragment: function () {
-    var type = can.spaceCamelCase(this.type || "")
+    var type = can.spaceCamelCase(this.type || '')
             .toLowerCase()
             .replace(/ /g, '_');
 
-    return [type,
-            this.id].join('/');
+    return [type, this.id].join('/');
+  },
+  get_custom_value: function (prop) {
+    var attr = _.find(GGRC.custom_attr_defs, function (item) {
+      return item.definition_type === this.type.toLowerCase() &&
+        item.title === prop;
+    }.bind(this));
+    var result;
+    if (!attr) {
+      return undefined;
+    }
+    result = _.find(this.custom_attribute_values, function (item) {
+      return item.reify().custom_attribute_id === attr.id;
+    });
+    if (result) {
+      result = result.reify().attribute_value;
+      if (attr.attribute_type.toLowerCase() === 'date') {
+        result = moment(result, 'MM/DD/YYYY').format('YYYY-MM-DD');
+      }
+    }
+    return result;
   },
 
   // Returns a deep property as specified in the descriptor built
   // by Cacheable.parse_deep_property_descriptor
-  get_deep_property: function(property_descriptor) {
-    var i, j, part, field, found, tmp,
-        val = this;
+  get_deep_property: function (property_descriptor) {
+    var i;
+    var j;
+    var part;
+    var field;
+    var found;
+    var tmp;
+    var val = this;
+    var rCustom = /^custom\:/i;
+    var mapProp;
+
+    function mapDeepProp(count) {
+      count += 1;
+      return function (element) {
+        return element.get_deep_property(property_descriptor.slice(count));
+      };
+    }
     for (i = 0; i < property_descriptor.length; i++) {
       part = property_descriptor[i];
       if (val.instance) {
         val = val.instance;
       }
       found = false;
-      if (part === "GET_ALL") {
-        return _.map(val, function(element) {
-          return element.get_deep_property(property_descriptor.slice(i+1));
-        });
-      } else {
-        for (j = 0; j < part.length; j++) {
-          field = part[j];
-          tmp = val[field];
-          if (tmp !== undefined && tmp !== null) {
-            val = tmp;
-            if (typeof val.reify === "function") {
-              val = val.reify();
-            }
-            found = true;
-            break;
+      if (part === 'GET_ALL') {
+        mapProp = mapDeepProp(i);
+        return _.map(val, mapProp);
+      }
+      for (j = 0; j < part.length; j++) {
+        field = part[j];
+        tmp = val[field];
+        if (tmp !== undefined && tmp !== null) {
+          val = tmp;
+          if (typeof val.reify === 'function') {
+            val = val.reify();
           }
+          found = true;
+          break;
+        } else if (rCustom.test(field)) {
+          field = field.split(':')[1];
+          val = this.get_custom_value(field);
+          found = true;
+          break;
         }
-        if (!found) {
-          return null;
-        }
+      }
+      if (!found) {
+        return null;
       }
     }
     return val;
-  },
-
+  }
 });
 
 _old_attr = can.Observe.prototype.attr;

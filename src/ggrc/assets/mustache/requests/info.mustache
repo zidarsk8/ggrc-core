@@ -53,7 +53,7 @@
                   {{#prune_context}}
                   <div class="objective-selector field-wrap">
                     <input tabindex="3" type="text" name="instance" placeholder="Add URL">
-                    <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+                    <a href="javascript://" {{toggle_button}}><i class="fa fa-trash"></i></a>
                     <a href="javascript://" class="btn btn-small btn-success no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
                   </div>
                   <input type="hidden" name="role_name" value="Auditor" />
@@ -127,11 +127,11 @@
           <div class="tab-pane fade in active" id="tab1">
             {{#if_helpers '\
               ^if_equals' status 'Verified' '\
-              and ^if_equals' status 'Finished' }}
+              and ^if_equals' status 'Final' }}
             {{#is_allowed 'update' instance context='for'}}
-            <div class="tree-item-add">
-              <add-comment data="comments" source_mapping="instance" parent_instance="instance"></add-comment>
-            </div>
+              <div class="tree-item-add">
+                <add-comment data="comments" source_mapping="instance" parent_instance="instance"></add-comment>
+              </div>
             {{/is_allowed}}
             {{/if_equals}}
             {{{render "/static/mustache/base_templates/comment_list.mustache" instance=. update_count="false"}}}

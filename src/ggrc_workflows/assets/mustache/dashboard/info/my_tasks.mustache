@@ -19,14 +19,14 @@
                   <li> <!-- number of comment count -->
                     {{#with_mapping_count instance 'cycle_task_entries'}}
                     <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of comments">
-                      <i class="grcicon-comment"></i>
+                      <i class="fa fa-comment-o"></i>
                       <strong class="error">{{count}}</strong>
                     </span>
                     {{/with_mapping_count}}
                   </li>
                   <li> <!-- due date -->
                     <span rel="tooltip" data-placement="top" {{#is_overdue instance.end_date instance.status}}class="error"{{/is_overdue}} data-original-title="Due On">
-                      <i class="grcicon-history-{{#is_overdue instance.end_date instance.status}}red{{else}}color{{/if overdue_warning}}"></i>
+                      <i class="fa fa-clock-o {{#is_overdue instance.end_date instance.status}}red{{else}}color{{/if overdue_warning}}"></i>
                       {{localize_date instance.end_date}}
                     </span>
                   </li>
@@ -96,7 +96,7 @@
       <div class="tier-2-info item-content">
         <div class="tier-2-info-content">
           <div class="details-wrap">
-            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
             <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
               {{#is_allowed 'update' instance context='for'}}
               <li>
@@ -108,7 +108,7 @@
                     data-object-singular="{{instance.class.model_singular}}"
                     data-object-plural="{{instance.class.table_plural}}"
                     data-object-id="{{instance.id}}">
-                  <i class="grcicon-edit"></i>
+                  <i class="fa fa-pencil-square-o"></i>
                   Edit Task
                 </a>
               </li>

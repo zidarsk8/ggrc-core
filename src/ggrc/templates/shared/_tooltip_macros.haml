@@ -13,14 +13,14 @@
   .row-fluid
     .span10
       %h3
-        %i{ 'class' : 'grcicon-={name|lower}-color' }
+        %i{ 'class' : 'fa fa-={name|lower} color' }
         %span.title
           =instance.title
         %span.code.governance
           =instance.slug
     .span2
       %a.btn.btn-mini.btn-primary.pull-right{ 'href': '={instance|viewlink}', 'rel': 'tooltip', 'title': 'View ={name}' }
-        %i.grcicon-goto-white
+        %i.fa.fa-long-arrow-right.white
 -endmacro
 
 
@@ -74,7 +74,7 @@
           %h4
             Audit Status
           %p.audit-status
-            %i.grcicon-eye-completed
+            %i.fa.fa-eye.green
             %span.status.completed Completed
             %br
             started on:
@@ -109,16 +109,16 @@
           {{ controls_progressbar(controls) }}
           %h4
             Directives ({{instance.directives|length}})
-          %i.grcicon-regulation-color
+          %i.fa.fa-regulation.color
           =reg_directives|length
           &nbsp;
-          %i.grcicon-contract-color
+          %i.fa.fa-contract.color
           =ct_directives|length
           &nbsp;
-          %i.grcicon-policy-color
+          %i.fa.fa-policy.color
           =pol_directives|length
           &nbsp;
-          %i.grcicon-standard-color
+          %i.fa.fa-book
           =std_directives|length
     -elif object == 'contract'
       .row-fluid
@@ -127,12 +127,12 @@
         .span3
           %h4
             Clauses
-          %i.grcicon-clause-color
+          %i.fa.fa-sticky-note.color
           =instance.sections|length
         .span3
           %h4
             Programs
-          %i.grcicon-program-color
+          %i.fa.fa-program.color
           =instance.programs|length
     -elif object == 'company policy'
       .row-fluid
@@ -141,12 +141,12 @@
         .span3
           %h4
             Sections
-          %i.grcicon-section-color
+          %i.fa.fa-section.color
           =instance.sections|length
         .span3
           %h4
             Programs
-          %i.grcicon-program-color
+          %i.fa.fa-program.color
           =instance.programs|length
     -elif object == 'regulation'
       .row-fluid
@@ -155,12 +155,12 @@
         .span3
           %h4
             Sections
-          %i.grcicon-section-color
+          %i.fa.fa-section.color
           =instance.sections|length
         .span3
           %h4
             Programs
-          %i.grcicon-program-color
+          %i.fa.fa-program.color
           =instance.programs|length
     -elif object == 'standard'
       .row-fluid
@@ -169,12 +169,12 @@
         .span3
           %h4
             Sections
-          %i.grcicon-section-color
+          %i.fa.fa-section.color
           =instance.sections|length
         .span3
           %h4
             Programs
-          %i.grcicon-program-color
+          %i.fa.fa-program.color
           =instance.programs|length
     -elif object == 'company controls'
       .row-fluid
@@ -191,7 +191,7 @@
         .span6
           %h4
             Directive Programs
-          %i.grcicon-program-color
+          %i.fa.fa-program.color
           =directive_programs|length
     -elif object == 'dataasset' or object == 'market' or object == 'facility' or object == 'product' or object == 'project' or object == 'orggroup'
       .row-fluid
@@ -199,22 +199,22 @@
         -#.span6
           %h4
             People
-          %i.grcicon-user-black
+          %i.fa.fa-person
           =instance.people|length
         -#.span6
           %h4
             References
-          %i.grcicon-document
+          %i.fa.fa-file-o
           =instance.documents|length
         .span6
           %h4
             Controls
-          %i.grcicon-control-color
+          %i.fa.fa-control.color
           =instance.controls|length
         .span6
           %h4
             Programs
-          %i.grcicon-program-color
+          %i.fa.fa-program.color
           =instance.programs|length
 
 
@@ -232,10 +232,10 @@
         .span6
           %h4
             Dependent Process/Systems
-          %i.grcicon-process-color
+          %i.fa.fa-process.color
           =sub_processes|length
           &nbsp;
-          %i.grcicon-system-color
+          %i.fa.fa-system.color
           =sub_systems|length
 
     .row-fluid

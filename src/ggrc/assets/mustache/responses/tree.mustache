@@ -16,7 +16,7 @@
               <div class="span4">
                 <div class="title tree-title-area">
                   {{#is_subtree}}
-                    <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                    <i class="fa fa-{{instance.class.table_singular}} color"></i>
                   {{/is_subtree}}
                   {{{truncate instance.description}}}
                 </div>
@@ -25,7 +25,7 @@
                 <div class="span1">
                   <div class="counter">
                     {{#child_options.0}}
-                    <i class="grcicon-object-black" rel="tooltip" data-placement="top" data-original-title="Mapped Objects"></i>
+                    <i class="fa fa-list-alt" rel="tooltip" data-placement="top" data-original-title="Mapped Objects"></i>
                     {{child_options.0.list.length}}
                     {{/child_options.0}}
                   </div>

@@ -1,0 +1,288 @@
+/*
+ * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.fa {
+  font-size: 16px;
+  &.red {
+    color: #ce3e3e;
+  }
+  &.white {
+    color: $white;
+  }
+  &.black {
+    color: $black;
+  }
+  &.green {
+    color: $green;
+  }
+  &.orange {
+    color: #ff6600;
+  }
+  &.gray {
+    color: #b2b2b2;
+  }
+  a & {
+    color: $black;
+  }
+  &.attach-blue {
+    color: #005580;
+  }
+}
+
+// WYSIWYG Icons
+[class^="icon-"] {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome; // shortening font declaration
+  font-size: inherit; // can't have font-size inherit on line above, so need to override
+  text-rendering: auto; // optimizelegibility throws things off #1094
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-share:before { content: $fa-var-link; }
+.icon-th-list:before { content: $fa-var-list-ol; }
+.icon-list:before { content: $fa-var-list-ul; }
+.icon-indent-right:before { content: $fa-var-long-arrow-left; }
+.icon-indent-left:before { content: $fa-var-long-arrow-right; }
+.icon-pencil:before { content: $fa-var-code; }
+
+// File types
+.#{$fa-css-prefix}-file-txt-o:before { content: $fa-var-file-text-o; }
+
+.#{$fa-css-prefix}-file-jpg-o:before,
+.#{$fa-css-prefix}-file-jpeg-o:before,
+.#{$fa-css-prefix}-file-png-o:before,
+.#{$fa-css-prefix}-file-gif-o:before,
+.#{$fa-css-prefix}-file-tiff-o:before,
+.#{$fa-css-prefix}-file-bmp-o:before { content: $fa-var-file-image-o; }
+
+.#{$fa-css-prefix}-file-doc-o:before,
+.#{$fa-css-prefix}-file-docx-o:before,
+.#{$fa-css-prefix}-file-odt-o:before { content: $fa-var-file-word-o; }
+
+.#{$fa-css-prefix}-file-xls-o:before,
+.#{$fa-css-prefix}-file-xlsx-o:before,
+.#{$fa-css-prefix}-file-ods-o:before { content: $fa-var-file-excel-o; }
+
+.#{$fa-css-prefix}-file-zip-o:before,
+.#{$fa-css-prefix}-file-rar-o:before,
+.#{$fa-css-prefix}-file-7z-o:before,
+.#{$fa-css-prefix}-file-gz-o:before,
+.#{$fa-css-prefix}-file-tar-o:before { content: $fa-var-file-archive-o; }
+
+.#{$fa-css-prefix}-interview:before { content: $fa-var-calendar; }
+.#{$fa-css-prefix}-documentation:before { content: $fa-var-files-o; }
+
+.#{$fa-css-prefix}-person:before { content: $fa-var-user; }
+.#{$fa-css-prefix}-person-color:before { content: $fa-var-user; color: #a8491a; }
+.#{$fa-css-prefix}-person {
+  &.color {
+    color: #a8491a;
+  }
+}
+
+.#{$fa-css-prefix}-role {
+  &:before { content: $fa-var-key; }
+  &.color { color: $black; }
+}
+
+.#{$fa-css-prefix}-audit {
+  &:before { content: $fa-var-eye; }
+  &.color { color: $purple; }
+}
+
+.#{$fa-css-prefix}-program {
+  &:before { content: $fa-var-folder-open-o; }
+  &.color { color: $purple; }
+}
+
+.#{$fa-css-prefix}-task_group {
+  &:before { content: $fa-var-cog; }
+  &.color { color: $purple; }
+}
+
+.#{$fa-css-prefix}-objective {
+  &:before { content: $fa-var-dot-circle-o; }
+  &.color { color: $objectives; }
+}
+
+.fa-sticky-note {
+  &.color {
+    color: #135c89;
+  }
+}
+
+.#{$fa-css-prefix}-clause {
+  &:before { content: $fa-var-sticky-note; }
+  &.color { color: #135c89; }
+}
+
+.#{$fa-css-prefix}-cycle:before { content: $fa-var-play-circle; }
+
+.#{$fa-css-prefix}-access_group {
+  &:before { content: $fa-var-map-signs; }
+  &.color { color: #a8491a; }
+}
+
+.#{$fa-css-prefix}-contract {
+  &:before { content: $fa-var-file-text; }
+  &.color { color: #005580; }
+}
+
+.#{$fa-css-prefix}-regulation {
+  &:before { content: $fa-var-file; }
+  &.color { color: #005580; }
+}
+
+.#{$fa-css-prefix}-policy {
+  &:before { content: $fa-var-clipboard; }
+  &.color { color: #005580; }
+}
+
+.#{$fa-css-prefix}-section {
+  &:before { content: $fa-var-paragraph; }
+  &.color { color: #005580; }
+}
+
+.#{$fa-css-prefix}-facility {
+  &:before { content: $fa-var-industry; }
+  &.color { color: $green; }
+}
+
+.#{$fa-css-prefix}-market {
+  &:before { content: $fa-var-shopping-cart; }
+  &.color { color: $green; }
+}
+
+.#{$fa-css-prefix}-product {
+  &:before { content: $fa-var-archive; }
+  &.color { color: $green; }
+}
+
+.#{$fa-css-prefix}-history:before { content: $fa-var-clock-o; }
+
+.#{$fa-css-prefix}-request {
+  &:before { content: $fa-var-file-o; }
+  &.color { color: $purple; }
+}
+
+.#{$fa-css-prefix}-event:before { content: $fa-var-history; }
+
+.#{$fa-css-prefix}-project {
+  &:before { content: $fa-var-cube; }
+  &.color { color: $green; }
+}
+
+.#{$fa-css-prefix}-org_group {
+  &:before { content: $fa-var-users; }
+  &.color { color: #a8491a; }
+}
+
+.#{$fa-css-prefix}-process {
+  &:before { content: $fa-var-sitemap; }
+  &.color { color: $green; }
+}
+
+.#{$fa-css-prefix}-system {
+  &:before { content: $fa-var-cogs; }
+  &.color { color: $green; }
+}
+
+.#{$fa-css-prefix}-control {
+  &:before { content: $fa-var-video-camera; }
+  &.color { color: $controls; }
+}
+
+.#{$fa-css-prefix}-data_asset {
+  &:before { content: $fa-var-floppy-o; }
+  &.color { color: $green; }
+}
+
+.#{$fa-css-prefix}-risk {
+  &:before { content: $fa-var-bolt; }
+  &.color { color: #8e0000; }
+}
+
+.#{$fa-css-prefix}-workflow {
+  &:before { content: $fa-var-list-alt; }
+  &.color { color: $purple; }
+}
+
+.#{$fa-css-prefix}-issue {
+  &:before { content: $fa-var-exclamation-circle; }
+  &.color { color: $purple; }
+}
+
+.#{$fa-css-prefix}-cycle_task_group_object_task,
+.#{$fa-css-prefix}-task_group_task {
+  &:before { content: $fa-var-calendar-check-o; }
+  &.color { color: $purple; }
+}
+
+.#{$fa-css-prefix}-standard {
+  &:before { content: $fa-var-book; }
+  &.color { color: #005580; }
+}
+
+.#{$fa-css-prefix}-threat {
+  &:before { content: $fa-var-user-secret; }
+  &.color { color: #8e0000; }
+}
+
+.#{$fa-css-prefix}-vendor {
+  &:before { content: $fa-var-briefcase; }
+  &.color { color: #a8491a; }
+}
+
+.#{$fa-css-prefix}-assessment {
+  &:before { content: $fa-var-gavel; }
+  &.color { color: $purple; }
+}
+
+.#{$fa-css-prefix}-assessment-plan {
+  &:before { content: $fa-var-wrench; }
+  &.color { color: $purple; }
+}
+
+.#{$fa-css-prefix}-risk_assessment {
+  &:before { content: $fa-var-bomb; }
+  &.color { color: #8e0000; }
+}
+
+// Turn icons to black
+%black-icons {
+  [class^="fa #{$fa-css-prefix}-"] {
+    &.color { color: $black; }
+  }
+}
+
+.internav {
+  // turns icons to black
+  @extend %black-icons;
+}
+
+// icons for disabled tree object in object selector
+.tree-item {
+  &.disabled {
+    // turns icons to black
+    @extend %black-icons;
+  }
+}
+
+.quick-list {
+  .dropdown-menu {
+    // turns icons to black
+    @extend %black-icons;
+  }
+}
+
+// inner tree icons to black
+.inner-tree {
+  .select {
+    @extend %black-icons;
+  }
+}

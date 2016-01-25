@@ -1,18 +1,16 @@
 /*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: brad@reciprocitylabs.com
- * Maintained By: brad@reciprocitylabs.com
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
  */
 
-// defaults
+// Defaults configuration
 $default-border-radius: 4px;
 $topBorderRadius: 4px 4px 0 0;
 $bottomBorderRadius: 0 0 4px 4px;
 
-// colors
-
-// font-sizes
+// Typography configuration
 $f-regular:90%; // equals 16px ?????
 $f-medium:85%;
 $f-small:75%;
@@ -20,175 +18,7 @@ $f-subTitle:120%;
 $f-widgetTitle: 130%;
 $f-headline:170%;
 
-// widget
-$widgetBorder: #ccc;
-$widgetHeader: #ddd;
-$widgetTitle: #111;
-$filterBgnd: #bebebe;
-
-// widget info
-$infoWidgetHeader: #111;
-
-// texts
-$darkText:#333; // WCAG AAA
-$text:#666; // WCAG AAA
-$error:#e00; // WCAG AA
-$disabled: #777; // WCAG AA
-$warning:#f60; // WCAG AAA
-
-// default colors
-$white: #fff;
-$black: #000;
-$gray: #999;
-$darkGray: #7c7c7c;
-$lightGray: #eee;
-$red: #e53935;
-$lightRed: #ff9d9d;
-$purpleRed: #9c27b0;
-$green: #1d8d15;
-$lightGreen: #8bc34a;
-$defaultGreen: #4caf50;
-$blue: #0277bd;
-$darkBlue: #369;
-$warmGray: #ccc;
-$midGray: #aaa;
-$textGray: #757575;
-$defaultBlue: #2196f3;
-$olive: #b5d7ad;
-
-// quick search
-$topBarSearchText: #bbbdc1;
-$topBarSearchBorder: #282a2c;
-$topBarSearchBgnd: #6a6b6d;
-$quickSearchOpen: #cbcbcb;
-
-// modal
-$modalHeader: #0071cc;
-$modalHeaderBorder: #074fb2;
-$modalHeaderShadow: #9ac5ff;
-$modalDarkBlue: #0055cc;
-$modalLightBlue: #0088cc;
-
-//popover
-$popOverHeaderBgnd: #f7f7f7;
-$popOverHeaderBorder: #ebebeb;
-$popOverBorder: #b0b0b0;
-
-// PBC
-$btnGreen: #51a351;
-$btnOrange: #f9a732;
-$responsBgnd: #e8fdd6;
-$responsBorder: #cdecb4;
-$pbcListGray: #f0f0f0;
-$responsTitle: #333;
-
-$headerBgnd: #f1f1f1;
-$headerBorder: #d9d9d9;
-$menuLink: #d7dce8;
-$screenBgnd: #323438;
-$link: #049cdb;
-$headerTitle: #444;
-$demoHide: #f99c18;
-$demoShow: #55ab55;
-$widgetHeaderBgnd: #efefef;
-$dropPlaceholder: #ddd;
-$subTitle: #111;
-$widgetFooteBgnd: #e1e1e1;
-$riskActive: #a46203;
-$gov: #44aac8;
-$govActive: #026b8a;
-$addBtn: #5ab45a;
-$addBtnBorder: #399a39;
-$sidenavBorder: #e5e5e5;
-$sidenavHover: #f5f5f5;
-$treeListBgnd: #fafafa;
-$btnActive: #e6e6e6;
-$tabTitle: #777;
-$btnAddShadow: #296029;
-$ajaxBtnDisabled: #e0e0e0;
-$ajaxGray: #7b7b7b;
-$footerBorder: #ddd;
-$infoMessageBorder: #ddd;
-$infoMessageText: #bbb;
-$tabBgnd: #fafafa;
-$tabBorder: #ddd;
-$tabHoverBgnd: #444;
-$darkBlue: #0055cc;
-$warningBorder: #fbeed5;
-$warningBgnd: #fcf8e3;
-$contentBgnd: #e0e0e0;
-$itemBorder: #e0e0e0;
-$searchBlue: #448aff;
-$draftGray: #757575;
-$itemBgnd: #f5f5f5;
-
-// compliance
-$defaultWidget: #444; // WCAG AAA
-$governance: $defaultBlue;  // WCAG AAA
-$business: $defaultGreen;  // WCAG AAA
-$risk: #731a46;  // WCAG AAA
-$entities: #795548; // WCAG AAA
-$programs: #512da8; // WCAG AAA
-$objectives: #2b8ccc;
-$controls: #243ea4;
-
-// pbc requests color states
-$rqDraft: #f7f7f7;
-$rqAccepted: #d1fcb5;
-$rqStarted: #ffffbe;
-$rqWarning: #ffcebe;
-$rqRequest: #ffffbe;
-$rqAmmend: #ffffbe;
-$rqRespond: #cbeaff;
-$rqUpdate: #cbeaff;
-
-$rqAssigned: #ffffbe;
-$rqSubmitted: #cbeaff;
-
-$lightBlue: #40c4ff;
-$orange: #ffab40;
-$deepOrange: #ff7043;
-$btnGreen: #43a047;
-
-// status label colors
-$status-draft: #bdbdbd;
-
-// progress bar colors
-$bar-base: #fff;
-$bar-success: #d1fcb5;
-$bar-danger: #ffffbe;
-$bar-warning: #ffcebe;
-
-// Web fonts
-$font_path: "/static/fonts/";
-$font_name: "raleway-regular-webfont";
-
 $fontTitle: "Helvetica Neue", Helvetica, Arial, sans-serif;
-
-// mixins
-@mixin btnBgnd($color) {
-  background: $color;
-  &:hover {
-    background: darken($color, 8%);
-    [class^="grcicon-"] {
-      @include opacity(1);
-    }
-  }
-}
-
-@mixin input-placeholder {
-  &.placeholder { @content; }
-  &:-moz-placeholder { @content; }
-  &::-moz-placeholder { @content; }
-  &:-ms-input-placeholder { @content; }
-  &::-webkit-input-placeholder { @content; }
-}
-
-@mixin btn-size($font: 16px, $l-height: 24px, $padding: 4px 14px) {
-  font-size: $font;
-  line-height: $l-height;
-  padding: $padding;
-}
 
 // Placeholders
 %outline-fix {
@@ -267,109 +97,6 @@ $fontTitle: "Helvetica Neue", Helvetica, Arial, sans-serif;
       @include opacity(1);
     }
   }
-}
-
-// Turn icons to black
-%black-icons {
-  .grcicon-info { background-position:-126px -176px; }
-  .grcicon-role-color { background-position:-102px -8px; }
-  .grcicon-authorization-color { background-position:-102px -8px; }
-  .grcicon-directive-color { background-position:-78px -176px; }
-  .grcicon-control-color { background-position:-150px -224px; }
-  .grcicon-link { background-position:-30px -104px; }
-  .grcicon-user { background-position:-6px -8px; }
-  .grcicon-user-black { background-position:-6px -8px; }
-  .grcicon-data_asset-color { background-position:-174px -224px; }
-  .grcicon-facility-color { background-position:-222px -104px; }
-  .grcicon-market-color { background-position:-246px -104px; }
-  .grcicon-org_group-color { background-position:-78px -224px; }
-  .grcicon-vendor-color { background-position:-78px -224px; }
-  .grcicon-process-color { background-position:-102px -224px; }
-  .grcicon-product-color { background-position:-270px -104px; }
-  .grcicon-project-color { background-position:-54px -224px; }
-  .grcicon-system-color { background-position:-126px -224px; }
-  .grcicon-contract-color { background-position:-126px -104px; }
-  .grcicon-policy-color { background-position:-150px -104px; }
-  .grcicon-regulation-color { background-position:-174px -104px; }
-  .grcicon-standard-color { background-position:-198px -368px; }
-  .grcicon-objective-color { background-position:-150px -56px; }
-  .grcicon-risk-color { background-position:-198px -224px; }
-  .grcicon-risk_assessment-color { background-position:-198px -224px; }
-  .grcicon-risky_attribute-color { background-position:-222px -224px; }
-  .grcicon-audit { background-position:-366px -320px; }
-  .grcicon-audit-color { background-position:-366px -320px; }
-  .grcicon-section-color { background-position:-198px -104px; }
-  .grcicon-clause-color { background-position:-294px -104px; }
-  .grcicon-event-color { background-position:-102px -176px; }
-  .grcicon-program-color { background-position:-102px -104px; }
-  .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -8px; }
-  .grcicon-assessment-color { background-position:-150px -392px; }
-  .grcicon-object-color { background-position:-6px -344px; }
-  .grcicon-workflow-color { background-position:-6px -344px; }
-  .grcicon-cycle_task_group_object_task-color,.grcicon-task-color { background-position:-294px -392px; }
-  .grcicon-task_group-color { background-position:-318px -56px; }
-  .grcicon-history-color { background-position: -318px -104px; }
-  .grcicon-cycle-color { background-position: -342px -32px; }
-  .grcicon-vendor-color { background-position: -30px -392px; }
-  .grcicon-assessment-plan-color { background-position: -78px -368px; }
-  .grcicon-access-list-color { background-position: -54px -344px; }
-  .grcicon-issue-color { background-position: -342px -296px; }
-  .grcicon-add-color { background-position:-222px -8px; }
-  .grcicon-control_assessment-color { background-position: -126px -416px; }
-  .grcicon-auto_control_assessment-color { background-position: -366px -392px; }
-  .grcicon-access-group-color { background-position: -366px -80px; }
-  .grcicon-threat-color { background-position:-318px -368px; }
-}
-// Turn icons to white
-%white-icons {
-  .grcicon-info { background-position:-198px -80px; }
-  .grcicon-role-color { background-position:-102px -32px; }
-  .grcicon-authorization-color { background-position:-102px -32px; }
-  .grcicon-directive-color { background-position:-78px -200px; }
-  .grcicon-control-color { background-position:-150px -248px }
-  .grcicon-link { background-position:-30px -128px; }
-  .grcicon-user { background-position:-6px -32px; }
-  .grcicon-user-black { background-position:-6px -32px; }
-  .grcicon-data_asset-color { background-position:-174px -248px; }
-  .grcicon-facility-color { background-position:-222px -128px; }
-  .grcicon-market-color { background-position:-246px -128px; }
-  .grcicon-org_group-color { background-position:-78px -248px; }
-  .grcicon-vendor-color { background-position:-78px -248px; }
-  .grcicon-process-color { background-position:-102px -248px }
-  .grcicon-product-color { background-position:-270px -128px; }
-  .grcicon-project-color { background-position:-54px -248px; }
-  .grcicon-system-color { background-position:-126px -248px; }
-  .grcicon-contract-color { background-position:-126px -128px; }
-  .grcicon-policy-color { background-position:-150px -128px; }
-  .grcicon-regulation-color { background-position:-174px -128px; }
-  .grcicon-standard-color { background-position:-222px -368px; }
-  .grcicon-objective-color { background-position:-150px -80px; }
-  .grcicon-risk-color { background-position:-198px -248px; }
-  .grcicon-risk_assessment-color { background-position:-198px -248px; }
-  .grcicon-risky_attribute-color { background-position:-222px -248px; }
-  .grcicon-audit { background-position:-270px -32px; }
-  .grcicon-audit-color { background-position:-270px -32px; }
-  .grcicon-section-color { background-position:-198px -128px; }
-  .grcicon-clause-color { background-position:-294px -80px; }
-  .grcicon-event-color { background-position:-198px -56px; }
-  .grcicon-program-color { background-position:-102px -128px; }
-  .grcicon-objectperson-color, .grcicon-person-color { background-position:-6px -32px; }
-  .grcicon-assessment-color { background-position:-174px -392px; }
-  .grcicon-object-color { background-position:-6px -368px; }
-  .grcicon-workflow-color { background-position:-6px -368px; }
-  .grcicon-cycle_task_group_object_task-color,.grcicon-task-color { background-position:-294px -344px; }
-  .grcicon-task_group-color { background-position:-318px -32px; }
-  .grcicon-history-color { background-position: -318px -128px; }
-  .grcicon-cycle-color { background-position: -342px -56px; }
-  .grcicon-vendor-color { background-position: -54px -392px; }
-  .grcicon-assessment-plan-color { background-position: -102px -392px; }
-  .grcicon-access-list-color { background-position: -78px -344px; }
-  .grcicon-issue-color { background-position: -342px -344px; }
-  .grcicon-add-color { background-position:-222px -32px; }
-  .grcicon-control_assessment-color { background-position: -174px -416px; }
-  .grcicon-auto_control_assessment-color { background-position: -342px -200px; }
-  .grcicon-access-group-color { background-position: -366px -104px; }
-  .grcicon-threat-color { background-position:-270px -368px; }
 }
 
 // progress bar placeholder colors

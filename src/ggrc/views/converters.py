@@ -37,16 +37,15 @@ def parse_export_request():
       "X-export-view": ["blocks", "grid"],
   }
   check_required_headers(required_headers)
-  data_grid = request.headers["X-export-view"] == "grid"
-  return data_grid, request.json
+  return request.json
 
 
 def handle_export_request():
   try:
-    data_grid, data = parse_export_request()
+    data = parse_export_request()
     query_helper = QueryHelper(data)
     converter = Converter(ids_by_type=query_helper.get_ids())
-    csv_data = converter.to_array(data_grid)
+    csv_data = converter.to_array()
     csv_string = generate_csv_string(csv_data)
 
     object_names = "_".join(converter.get_object_names())
@@ -119,5 +118,4 @@ def init_converter_views():
   @app.route("/export")
   @login_required
   def export_view():
-    data_grid = request.args.get("data_grid", "").lower() == "true"
-    return render_template("import_export/export.haml", data_grid=data_grid)
+    return render_template("import_export/export.haml")

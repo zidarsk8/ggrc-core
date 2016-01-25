@@ -112,7 +112,7 @@
       }
 
     });
-    $body.on("change", ".rotate_control_assessment", function(ev) {
+    $body.on("change", ".rotate_assessment", function(ev) {
       ev.currentTarget.click(function() {
         ev.currentTarget.toggle();
       });
@@ -274,7 +274,7 @@
 
       $showWatermark.fadeIn('fast');
       $this.addClass("active");
-      $this.html('<span class="utility-link"><i class="grcicon-watermark"></i> Watermarked</span>');
+      $this.html('<span class="utility-link"><i class="fa fa-check-square-o"></i> Watermarked</span>');
 
       return false;
     });

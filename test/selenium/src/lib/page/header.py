@@ -19,8 +19,8 @@ class LhnMenu(base.Page):
         self.programs = lhn.Programs(self._driver, self.locators.PROGRAMS)
         self.workflows = lhn.Workflows(self._driver, self.locators.WORKFLOWS)
         self.audits = lhn.Audits(self._driver, self.locators.AUDITS)
-        self.control_assessments = lhn.ControlAssesments(
-            self._driver, self.locators.CONTROL_ASSESSMENTS)
+        self.assessments = lhn.ControlAssesments(
+            self._driver, self.locators.ASSESSMENTS)
         self.requests = lhn.Requests(self._driver, self.locators.REQUESTS)
         self.issues = lhn.Issues(self._driver, self.locators.ISSUES)
 
@@ -73,8 +73,8 @@ class LhnMenu(base.Page):
                                           self.locators.WORKFLOWS_COUNT)
         self.audits_count = base.Label(self._driver,
                                        self.locators.AUDITS_COUNT)
-        self.control_assessments_count = base.Label(
-            self._driver, self.locators.CONTROL_ASSESSMENTS_COUNT)
+        self.assessments_count = base.Label(
+            self._driver, self.locators.ASSESSMENTS_COUNT)
         self.requests_count = base.Label(self._driver,
                                          self.locators.REQUESTS_COUNT)
         self.regulations_count = base.Label(self._driver,

@@ -18,7 +18,7 @@
     var template =
       [ '<div class="modal-header">'
       , '  <a class="pull-right modal-dismiss" href="#" data-dismiss="modal">'
-      , '    <i class="grcicon-x-grey"></i>'
+      , '    <i class="fa fa-times black"></i>'
       , '  </a>'
       , '  <h2>Loading...</h2>'
       , '</div>'

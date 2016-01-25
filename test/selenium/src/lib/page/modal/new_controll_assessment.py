@@ -6,5 +6,5 @@
 from lib import base
 
 
-class ControlAssessmentModal(base.Modal):
+class AssessmentModal(base.Modal):
     pass

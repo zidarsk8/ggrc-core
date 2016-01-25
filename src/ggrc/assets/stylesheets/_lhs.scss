@@ -33,30 +33,6 @@ h4.search-title {
   padding-left: 10px;
   padding-right: 4px;
   z-index: 2000;
-  .lhs-bg {
-    @include opacity(0.6);
-    margin-top:5px;
-    display:none;
-    float:right;
-    width:40px;
-    height:70px;
-    background:transparent image-url('bgnds/lhs-closed.png') no-repeat 0 0;
-  }
-  &.lhs-closed {
-    margin-left:-200px;
-    cursor:pointer;
-    overflow:hidden;
-    .lhs-bg {
-      display:block;
-    }
-    .lhs-search,
-    .lhs-nav {
-      display:none;
-    }
-    .top-level {
-      visibility:hidden;
-    }
-  }
   .lhs-search {
     @include clearfix();
     padding:10px 20px 10px 10px;
@@ -79,18 +55,16 @@ h4.search-title {
     }
     .widgetsearch-submit {
       @include border-radius(0 4px 4px 0);
-      @include background-size(392px 440px);
       background-color: $lightGray;
-      background-image: image-url("grcicons/icons.png");
-      background-repeat: no-repeat;
-      background-position: -334px -314px;
+      color: #b2b2b2;
       float: left;
       line-height: 28px;
+      height: 28px;
       width: 36px;
       border: none;
       padding: 0;
       &.active {
-        background-position: -238px -74px;
+        color: $white;
         background-color: $searchBlue;
       }
     }
@@ -98,7 +72,7 @@ h4.search-title {
       display: none;
       float: left;
       margin-top: 6px;
-      margin-left: 0;
+      margin-left: 4px;
       margin-right: -10px;
       &.active {
         display: block;
@@ -112,7 +86,7 @@ h4.search-title {
   @include transition(opacity 0.2s ease);
   position: absolute;
   top: 5px;
-  right: 0;
+  right: 5px;
   z-index: 9999;
   &:hover {
     @include opacity(1);
@@ -186,7 +160,7 @@ h4.search-title {
         text-transform: uppercase;
         font-weight: bold;
         display: block;
-        .grcicon-arrow-right {
+        .fa-caret-right {
           @include opacity(0.25);
           margin: 4px 0 0 7px;
         }
@@ -194,9 +168,11 @@ h4.search-title {
           text-decoration:none;
         }
         &.active {
-          .grcicon-arrow-right {
+          .fa-caret-right {
             @include opacity(1);
-            background-position: -102px -80px;
+            &:before {
+              content: $fa-var-caret-down;
+            }
           }
         }
       }
@@ -409,15 +385,16 @@ h4.search-title {
     li {
       a {
         padding-left: 18px;
-        .grcicon-arrow-right {
+        .fa-caret-right {
           @include opacity(0.25);
           margin: 4px 0 0 7px;
-          background-position: -78px -80px;
         }
         &.active {
-          .grcicon-arrow-right {
+          .fa-caret-right {
             @include opacity(1);
-            background-position: -126px -80px;
+            &:before {
+              content: $fa-var-caret-down;
+            }
           }
         }
         &:hover {
@@ -425,10 +402,10 @@ h4.search-title {
           text-decoration: underline;
         }
         &.list-toggle {
-          [class^="grcicon-"] {
+          [class^="fa fa-"] {
             display: none;
           }
-          .grcicon-arrow-right {
+          .fa-caret-right {
             display: inline-block;
           }
         }
@@ -511,199 +488,6 @@ h4.search-title {
   &.disabled {
     @include opacity(0.5);
     cursor: default;
-  }
-}
-
-// TOP INNER NAV
-.top-inner-nav {
-  ul.internav {
-    @extend %reset-list;
-    @include clearfix();
-    margin-left: 28px;
-    li {
-      @include background-size(368px 416px);
-      position: relative;
-      float: left;
-      &.inner-nav-button {
-        text-align: center;
-        padding: 1px 40px 0 10px;
-        float: right;
-        .message {
-          color: $green;
-        }
-        .tiny-help-text {
-          padding-top: 4px;
-          font-size: 10px;
-          line-height: 13px;
-          display: inline-block;
-          margin: 0;
-        }
-      }
-      &.finished {
-        background: $rqAccepted;
-      }
-      &.started {
-        background: $rqStarted;
-      }
-      &.overdue {
-        background: $red;
-        a {
-          color: $white;
-          i {
-            @include opacity(1);
-          }
-        }
-      }
-    }
-    a {
-      @include transition(color 0.2s ease);
-      padding: 0 14px 0 10px;
-      display: block;
-      line-height: 29px;
-      font-size: 13px;
-      color: $gray;
-      position: relative;
-      .closed {
-        @include background-size(368px 416px);
-        background-image: image-url("grcicons/icons.png");
-        background-position: -347px -179px;
-        background-repeat: no-repeat;
-        display: none;
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        width: 10px;
-        height: 10px;
-        line-height: 10px;
-        cursor: pointer;
-      }
-      &:hover {
-        color: $black;
-        background: none;
-        text-decoration: none;
-        i {
-          @include opacity(1);
-        }
-        .closed {
-          display: block;
-          position: absolute;
-          top: 2px;
-          right: 2px;
-        }
-      }
-      .closed {
-        @include background-size(392px 440px);
-        background-image: image-url("grcicons/icons.png");
-        background-position: -347px -179px;
-        background-repeat: no-repeat;
-        display: none;
-        position: absolute;
-        top: 2px;
-        right: 2px;
-        width: 10px;
-        height: 10px;
-        line-height: 10px;
-        cursor: pointer;
-        &.red {
-          top: -4px;
-          right: -4px;
-          background-position: -347px -275px;
-        }
-      }
-    }
-    i {
-      @include opacity(0.4);
-      margin-top: 6px;
-    }
-    li.hidden-widgets-list {
-      a.dropdown-toggle {
-        &:hover {
-          background: none;
-        }
-      }
-    }
-    li.active {
-      a {
-        color: $black;
-        font-weight: bold;
-        background: $contentBgnd;
-        i {
-          @include opacity(1);
-        }
-        &:hover {
-          color: $black;
-        }
-      }
-    }
-    li:hover {
-      &.overdue {
-        a {
-          background-color: $red;
-          color: $white;
-        }
-      }
-    }
-    &.business {
-      li {
-        > a:hover {
-          color: $white;
-          background-color:$business;
-        }
-      }
-    }
-    &.governance {
-      li {
-        > a:hover {
-          background-color:$governance;
-        }
-      }
-    }
-    &.risk {
-      li {
-        > a:hover {
-          background-color:$risk;
-        }
-      }
-    }
-    &.program {
-      li {
-        > a:hover {
-          color: $white;
-          background-color:$programs;
-        }
-      }
-    }
-    &.objectives {
-      li {
-        > a:hover {
-          background-color:$objectives;
-        }
-      }
-    }
-    &.controls {
-      li {
-        > a:hover {
-          color: $white;
-          background-color:$controls;
-        }
-      }
-    }
-    &.entities {
-      li {
-        > a:hover {
-          color: $white;
-          background-color:$entities;
-        }
-      }
-    }
-    &.workflow {
-      li {
-        > a:hover {
-          color: $white;
-          background-color:$programs;
-        }
-      }
-    }
   }
 }
 
@@ -794,7 +578,9 @@ h4.search-title {
       &.primary {
         float:right;
         i {
+          float: left;
           margin-top: 5px;
+          margin-right: 4px;
         }
       }
     }
@@ -845,24 +631,6 @@ h4.search-title {
 // fix for redundant lhn scroll
 .accordion {
   margin-bottom:0;
-}
-
-.accordion-group-inner {
-  .sub-level {
-    display: none;
-  }
-}
-
-// advanced search
-.advanced-search {
-  a {
-    margin-top:-8px;
-    text-align:center;
-    font-size:12px;
-    text-decoration:underline;
-    display:block;
-    line-height:16px;
-  }
 }
 
 label {

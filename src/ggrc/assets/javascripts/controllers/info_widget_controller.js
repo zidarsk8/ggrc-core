@@ -85,7 +85,7 @@ can.Control("GGRC.Controllers.InfoWidget", {
         'Clause',
         'Contract',
         'Control',
-        'ControlAssessment',
+        'Assessment',
         'DataAsset',
         'Facility',
         'Issue',

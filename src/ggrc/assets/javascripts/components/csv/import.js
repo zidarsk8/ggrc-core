@@ -24,7 +24,7 @@
               analysing: {class: "btn-draft", text: "Analysing", isDisabled: true},
               import: {class: "btn-primary", text: "Import data"},
               importing: {class: "btn-draft", text: "Importing", isDisabled: true},
-              success: {class: "btn-success", text: "<i class=\"grcicon-check-white\"></i> Import successful"}
+              success: {class: "btn-success", text: "<i class=\"fa fa-check-square-o white\"></i> Import successful"}
             };
 
         return _.extend(states[state], {state: state});

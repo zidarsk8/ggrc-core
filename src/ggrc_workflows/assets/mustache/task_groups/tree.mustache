@@ -9,7 +9,7 @@
       <div class="item-wrap">
         <div class="openclose">
           <span class="status-label"></span>
-          <i class="grcicon-arrow-right"></i>
+          <i class="fa fa-caret-right"></i>
         </div>
         <div class="select {{^if_equals parent_instance.task_groups.length 1}}ordered-item-data{{/if}}">
           <div class="item-data">
@@ -18,7 +18,7 @@
                 <div class="title tree-title-area">
                   <!-- This drag icon is just temporary here until we move 2nd tier info to bottom info pin -->
                   {{^if_equals parent_instance.task_groups.length 1}}
-                    <span class="drag"><i class="grcicon-drag"></i></span>
+                    <span class="drag"><i class="fa fa-arrows-v"></i></span>
                   {{/if}}
                   {{instance.title}}
                 </div>
@@ -42,7 +42,7 @@
                   <li>
                     {{#with_mapping 'objects' instance}}
                     <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
-                      <i class="grcicon-object-black"></i>
+                      <i class="fa fa-list-alt"></i>
                       <strong class="error">{{objects.length}}</strong>
                     </span>
                     {{/with_mapping}}
@@ -50,7 +50,7 @@
                   <li>
                     {{#with_mapping 'task_group_tasks' instance}}
                     <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
-                      <i class="grcicon-task-black"></i>
+                      <i class="fa fa-calendar-check-o"></i>
                       <strong class="error">{{task_group_tasks.length}}</strong>
                     </span>
                     {{/with_mapping}}

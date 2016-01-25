@@ -8,12 +8,13 @@ from sqlalchemy import and_
 from ggrc import db
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroup
-from ggrc_workflows.models import CycleTaskGroupObjectTask as CycleTask
 from ggrc_workflows.models import CycleTaskGroupObject
+from ggrc_workflows.models import CycleTaskGroupObjectTask as CycleTask
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupObject
 from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
+from ggrc_workflows.models import Workflow
 
 
 def tg_task(object_type, related_type, related_ids):
@@ -146,7 +147,7 @@ def ctg_ctgot(object_type, related_type, related_ids):
         CycleTask.cycle_task_group_id.in_(related_ids))
 
 
-def ctgot_wot(object_type, related_type, related_ids):
+def ctgot_ctgo(object_type, related_type, related_ids):
   """ relationships between Cycle Task and Cycle Task Objects """
   if object_type == "CycleTaskGroupObjectTask":
     return db.session.query(CycleTask.id).join(CycleTaskGroupObject).filter(
@@ -156,7 +157,44 @@ def ctgot_wot(object_type, related_type, related_ids):
         ))
   else:
     return db.session.query(CycleTaskGroupObject.object_id).join(CycleTask)\
-        .filter(CycleTask.id.in_(related_ids))
+        .filter(
+            and_(
+                CycleTask.id.in_(related_ids),
+                CycleTaskGroupObject.object_type == object_type
+            ))
+
+
+def cycle_ctgo(object_type, related_type, related_ids):
+  """ indirect relationships between Cycles and Cycle Task Objects """
+  if object_type == "Cycle":
+    return db.session.query(CycleTaskGroupObject.cycle_id).filter(
+        and_(
+            CycleTaskGroupObject.object_type == related_type,
+            CycleTaskGroupObject.object_id.in_(related_ids)
+        ))
+  else:
+    return db.session.query(CycleTaskGroupObject.object_id).filter(
+        and_(
+            CycleTaskGroupObject.cycle_id.in_(related_ids),
+            CycleTaskGroupObject.object_type == object_type
+        ))
+
+
+def wf_ctgo(object_type, related_type, related_ids):
+  """ indirect relationships between Workflows and Cycle Task Objects """
+  if object_type == "Workflow":
+    return db.session.query(Workflow.id).join(Cycle, CycleTaskGroupObject)\
+        .filter(and_(
+            CycleTaskGroupObject.object_type == related_type,
+            CycleTaskGroupObject.object_id.in_(related_ids)
+        ))
+  else:
+    return db.session.query(CycleTaskGroupObject.object_id)\
+        .join(Cycle, Workflow).filter(and_(
+            Workflow.id.in_(related_ids),
+            CycleTaskGroupObject.object_type == object_type
+        ))
+
 
 _function_map = {
     ("Cycle", "CycleTaskGroup"): cycle_ctg,
@@ -172,7 +210,9 @@ _function_map = {
 
 # add mappings for cycle tasks and cycle task objects
 for wot in WORKFLOW_OBJECT_TYPES:
-  for f, obj in [(ctgot_wot, "CycleTaskGroupObjectTask"),
+  for f, obj in [(ctgot_ctgo, "CycleTaskGroupObjectTask"),
+                 (cycle_ctgo, "Cycle"),
+                 (wf_ctgo, "Workflow"),
                  (tg_tgo, "TaskGroup"),
                  (task_tgo, "TaskGroupTask")]:
     key = tuple(sorted([obj, wot]))

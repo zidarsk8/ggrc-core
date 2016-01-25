@@ -19,7 +19,7 @@
       notifyText: "Link has been copied to your clipboard."
     },
     template: ["<a data-clipboard-text=\"{{text}}\" {{#isActive}}class=\"active\"{{/isActive}} href=\"#\">",
-               "<i class=\"icon-share\"></i> {{title}}",
+               "<i class=\"fa fa-link\"></i> {{title}}",
                "</a>"].join(""),
     events: {
       "a click": function (el, evnt) {

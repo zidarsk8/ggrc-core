@@ -30,13 +30,13 @@ class Converter(object):
       "Standard",
       "Section",
       "Control",
-      "Control Assessment",
+      "Assessment",
       "Workflow",
       "Task Group",
       "Task Group Task",
   ]
 
-  priortiy_colums = [
+  priority_columns = [
       "email",
       "slug",
       "delete",
@@ -54,11 +54,9 @@ class Converter(object):
     self.exportable = get_exportables()
     self.indexer = get_indexer()
 
-  def to_array(self, data_grid=False):
+  def to_array(self):
     self.block_converters_from_ids()
     self.handle_row_data()
-    if data_grid:
-      return self.to_data_grid()
     return self.to_block_array()
 
   def to_block_array(self):
@@ -78,21 +76,6 @@ class Converter(object):
       csv_data.extend(block_data)
     return csv_data
 
-  def to_data_grid(self):
-    """ multi join datagrid with all objects in one block
-
-    Generate 2d array where each cell represents a cell in a csv file
-    """
-    grid_blocks = []
-    grid_header = []
-    for block_converter in self.block_converters:
-      csv_header, csv_body = block_converter.to_array()
-      grid_header.extend(csv_header[1])
-      if csv_body:
-        grid_blocks.append(csv_body)
-    grid_data = [list(chain(*i)) for i in product(*grid_blocks)]
-    return [grid_header] + grid_data
-
   def import_csv(self):
     self.block_converters_from_csv()
     self.row_converters_from_csv()
@@ -102,7 +85,7 @@ class Converter(object):
     self.drop_cache()
 
   def handle_priority_columns(self):
-    for attr_name in self.priortiy_colums:
+    for attr_name in self.priority_columns:
       for block_converter in self.block_converters:
         block_converter.handle_row_data(attr_name)
 
@@ -132,6 +115,9 @@ class Converter(object):
       self.block_converters.append(block_converter)
 
   def block_converters_from_csv(self):
+    """Prepare BlockConverters and order them like specified in
+    self.class_order.
+    """
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
       if len(data) < 2:

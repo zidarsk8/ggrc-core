@@ -97,7 +97,14 @@
         top: 0px;
       }
       .tree-action-list {
-        [class^="grcicon-"] {
+        .open {
+          .fa-share-alt {
+            @include opacity(1);
+            color: #2196f3;
+          }
+        }
+        .fa {
+          color: $black;
           margin-top: 1px;
           @include opacity(0.5);
           @include transition(opacity 0.2s ease);
@@ -416,10 +423,6 @@
       margin-bottom: 0;
     }
     input {
-      @include background-size(368px 416px);
-      background-image: image-url("grcicons/icons.png");
-      background-repeat: no-repeat;
-      background-position:-259px -195px;
       margin-bottom: 0;
       border: 1px solid $popOverBorder;
       padding-left: 40px;
@@ -709,7 +712,7 @@
   .error {
     font-weight:normal;
   }
-  i.grcicon-goto {
+  i.fa-long-arrow-right {
     @include opacity(0.4);
     &:hover {
       @include opacity(0.8);
@@ -1004,6 +1007,23 @@
 }
 
 .preview-container {
+  height: 560px;
+  width: 756px;
+  margin: 10px 10px;
+  overflow: hidden;
+  .preview {
+    transform: scale3d(0.75, 0.75, 1);
+    -webkit-transform: scale3d(0.75, 0.75, 1);
+    -ms-transform: scale3d(0.75, 0.75, 1);
+    -o-transform: scale3d(0.75, 0.75, 1);
+    transform-origin: 0px 0px;
+    -webkit-transform-origin: 0 0;
+    -ms-transform-origin: 0 0;
+    -o-transform-origin: 0 0;
+    height: 560px;
+    width: 756px;
+    position: absolute;
+  }
   &.person-preview {
     overflow: visible;
     height: auto;
@@ -1202,7 +1222,7 @@
     margin-bottom: 0;
     .filter-input {
       .is-expression {
-        top: 6px;
+        top: 3px;
       }
     }
   }
@@ -1243,7 +1263,7 @@
       @include opacity(0.25);
       position: absolute;
       right: 6px;
-      top: 12px;
+      top: 1px;
     }
     &.expression {
       .is-expression {
@@ -1258,7 +1278,7 @@
     @include clearfix();
     a {
       float: right;
-      margin-top: 12px !important;
+      margin-top: 1px;
       margin-left: 10px;
     }
     input[type="submit"] {
@@ -1273,6 +1293,7 @@
     i {
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
+      color: $black;
       &:hover {
         @include opacity(1);
       }
@@ -1697,7 +1718,7 @@ ul.attr-list, ul.model-list {
       margin-bottom: 0;
     }
   }
-  [class^="grcicon-"] {
+  .fa {
     margin: 6px 0 0 0;
   }
   a {
@@ -1722,6 +1743,7 @@ ul.attr-list, ul.model-list {
     text-align: center;
     background: $blue;
     margin-right: 5px;
+    vertical-align: top;
     i {
       margin-top: 9px;
     }
@@ -1854,10 +1876,18 @@ ul.attr-list, ul.model-list {
     }
   }
   &.asc {
-    i { background-position: -198px -416px; }
+    i {
+      &:before {
+        content: $fa-var-caret-up;
+      }
+    }
   }
   &.desc {
-    i { background-position: -78px -56px; }
+    i {
+      &:before {
+        content: $fa-var-caret-down;
+      }
+    }
   }
 }
 .workflow-wrap-main {

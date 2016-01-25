@@ -776,7 +776,7 @@ Mustache.registerHelper("get_permalink_for_object", function (instance, options)
 
 Mustache.registerHelper("get_view_link", function (instance, options) {
   function finish(link) {
-    return "<a href=" + link + " target=\"_blank\"><i class=\"grcicon-to-right\"></i></a>";
+    return "<a href=" + link + " target=\"_blank\"><i class=\"fa fa-long-arrow-right\"></i></a>";
   }
   instance = resolve_computed(instance);
   if (!instance.viewLink && !instance.get_permalink) {
@@ -3144,26 +3144,60 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
   return '';
 });
 
-/*
-  Used to get the string value for default attributes
-  This doesn't work for nested object reference
-*/
-Mustache.registerHelper('get_default_attr_value', function (attr_name, instance) {
-  instance = Mustache.resolve(instance);
-  attr_name = Mustache.resolve(attr_name);
+  /**
+   * Retrieve the string value of an attribute of the given instance.
+   *
+   * The method only supports instance attributes categorized as "default",
+   * and does not support (read: not work for) nested object references.
+   *
+   * If the attribute does not exist, has a falsy value, or is not considered
+   * to be a "default" attribute, an empty string is returned.
+   *
+   * If the attribue represents a date information, it is returned in the
+   * MM/DD/YYYY format.
+   *
+   * @param {String} attrName - the name of the attribute to retrieve
+   * @param {Object} instance - an instance of a model object
+   * @return {String} - the retrieved attribute's value
+   */
+  Mustache.registerHelper('get_default_attr_value',
+    function (attrName, instance) {
+      // attribute names considered "default" and representing a date
+      var DATE_ATTRS = Object.freeze({
+        start_date: 1,
+        end_date: 1,
+        updated_at: 1,
+        requested_on: 1,
+        due_on: 1
+      });
 
-  if (instance[attr_name]) {
-    if (['slug', 'status', 'url', 'reference_url', 'kind', 'request_type'].indexOf(attr_name) !== -1) {
-      return instance[attr_name];
-    }
-    if (['start_date', 'end_date', 'updated_at', 'requested_on', 'due_on'].indexOf(attr_name) !== -1) {
-      //convert to localize date
-      return moment(instance[attr_name]).format('MM/DD/YYYY');
-    }
-  }
+      // attribute names considered "default" and not representing a date
+      var NON_DATE_ATTRS = Object.freeze({
+        slug: 1,
+        status: 1,
+        url: 1,
+        reference_url: 1,
+        kind: 1,
+        request_type: 1
+      });
 
-  return '';
-});
+      instance = Mustache.resolve(instance);
+      attrName = Mustache.resolve(attrName);
+
+      if (instance.attr(attrName)) {
+        if (attrName in NON_DATE_ATTRS) {
+          return instance.attr(attrName);
+        }
+        if (attrName in DATE_ATTRS) {
+          // convert to a localized date
+          return moment(instance.attr(attrName)).format('MM/DD/YYYY');
+        }
+      }
+
+      return '';
+    }
+  );
+
 /*
   Used to get the string value for custom attributes
 */
@@ -3218,7 +3252,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
     program: {title: program.title, id: program.id, type: program.type},
     control: {title: control.title, id: control.id, type: control.type},
     context: {type: audit.context.type, id: audit.context.id},
-    control_assessment: {
+    assessment: {
       title: instance.title,
       id: instance.id,
       type: instance.type,

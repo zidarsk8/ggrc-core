@@ -22,7 +22,7 @@ src/ggrc/settings/build_number.py
 # Asset-pipeline/cache related files
 src/ggrc/static/.webassets-cache
 src/ggrc/static/webassets-external
-src/ggrc/static/assets.manifest
+src/ggrc/assets/assets.manifest
 src/ggrc/static/dashboard*
 src/ggrc/static/app-init*
 src/ggrc/static/mockup*
@@ -50,5 +50,11 @@ src/ggrc/static/flash
 src/**/.sass-cache
 src/**/_*.css
 
+# Copied font awesome icons into static
+src/ggrc/static/fonts/
+
 # pythest cache folder used by selenium tests
 test/selenium/.cache/
+
+# test reports:
+test/*.xml
