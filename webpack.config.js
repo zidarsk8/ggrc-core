@@ -32,7 +32,7 @@ module.exports = {
   },
   output: {
     filename: '[name]_.js',
-    path: path.join(__dirname, './src/ggrc/static/'),
+    path: path.join(__dirname, './src/ggrc/assets/stylesheets/'),
     publicPath: '/src/ggrc/static/'
   },
   module: {

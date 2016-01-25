@@ -382,7 +382,6 @@ dashboard-js-template-files:
   - quick_form/confirm_buttons.mustache
 
 dashboard-css-files:
-  # dashboard.css is generated automatically from `compass watch -c compass.config.rb`
   - dashboard.css
   - wysihtml5/bootstrap-wysihtml5-0.0.2.css
   - jquery/jquery-ui.css
