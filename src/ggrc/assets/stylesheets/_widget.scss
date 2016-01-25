@@ -54,9 +54,6 @@
         margin-right: 30px;
       }
     }
-    [class^="grcicon-"] {
-      margin-top: 6px;
-    }
     &.tasks-action {
       float: right;
       li {
@@ -213,20 +210,6 @@
               i {
                 @include opacity(1);
               }
-            }
-          }
-          &.open {
-            a {
-              [class^="grcicon-"] {
-                @include opacity(1);
-              }
-            }
-          }
-        }
-        a {
-          &:hover {
-            [class^="grcicon-"] {
-              @include opacity(1);
             }
           }
         }
@@ -819,12 +802,6 @@
           outline: 0;
         }
       }
-      i {
-        &.grcicon-carot {
-          margin-top: 1px;
-          display: inline-block;
-        }
-      }
     }
   }
   &:hover {
@@ -1092,9 +1069,6 @@
       display:inline-block;
       line-height:24px;
       margin:0 20px 0 0;
-      [class^="grcicon-"] {
-        margin: 4px 0 0 0;
-      }
       a {
         @extend %action-link;
         font-size: 11px;
@@ -1181,9 +1155,6 @@
   .tree-action-list {
     li {
       line-height: 28px;
-    }
-    [class^="grcicon-"] {
-      margin-top: 6px;
     }
     .counter {
       @include opacity(1);
@@ -1377,9 +1348,6 @@
   padding-top: 20px;
   .tree-item-add {
     .btn {
-      [class^="grcicon-"] {
-        margin-top: 1px;
-      }
     }
   }
   .tree-action-list {
