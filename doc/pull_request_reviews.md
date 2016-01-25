@@ -231,10 +231,31 @@ are required. Along with the tagging, the reviewer should clearly explain why
 the PR has temporarily been rejected, and what needs to be done before it can
 be merged.
 
-On the other hand, if the PR looks good to merge, the reviewer expresses this
-by giving a thumb-up icon in a comment (:+1:). For this reason, the thumb-up
-icon _should not_ be used in other comments, as it might give a false
-impression that the pull request has been verified and confirmed.
+On the other hand, if the PR looks good, it can be merged immediately (subject
+to the conditions described in the [next section](#merging-pull-requests)).
+
+Sometimes, however, a PR looks good, but the reviewer is nevertheless not yet
+100% confident with merging it, usually due to its complexity and/or size, or
+his own lesser familiarity with the project codebase. In such cases, the
+reviewer can still express the approval of the PR, but defer the final verdict
+on merging to other reviewers.
+
+An approval is given by posting a comment containing a thumb-up icon (:+1:).
+For this reason, this icon icon _should not_ be used in regular comments, as it
+might mislead somebody to a false conclusion.
+
+
+#### Merging pull requests
+
+A pull request can be merged if all of the following is true:
+
+* _You_ have gone through all the verification steps and concluded that
+  everything works as expected (other people's approvals by themselves
+  _are not enough_!),
+* All automatic continuous integration checks have passed,
+* The pull request does not contain **any of your commits**. You are not
+  allowed to merge your own work, including the pull requests that you have at
+  least partially contributed to.
 
 #### Using GitHub labels
 
