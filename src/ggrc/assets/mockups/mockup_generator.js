@@ -166,7 +166,7 @@
   };
   g.file = function (options) {
     options = options || {};
-    var types = "pdf txt xls doc img zip ".split(" "),
+    var types = "pdf txt xls doc jpg zip ".split(" "),
         name = g.get_words(_.random(3, 7), "_"),
         extension = g.get_random(types);
 
