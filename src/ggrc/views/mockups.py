@@ -24,3 +24,8 @@ def init_mockup_views():
   @login_required
   def mockup_assessor():
     return render_template("mockups/assessor.haml")
+
+  @app.route("/mockups/workflow")
+  @login_required
+  def mockup_workflow():
+    return render_template("mockups/workflow.haml")

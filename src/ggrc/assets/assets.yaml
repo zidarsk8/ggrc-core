@@ -413,6 +413,10 @@ mockup-js-files:
   - request/pages/controls.js
   - request/pages/assessments.js
 
+  #Workflow
+  - workflow/pages/workflow.js
+  - workflow/pages/info.js
+
   # Bootstrap files shouold be above
   - javascript/add_comment.js
   - javascript/attachment_list.js
@@ -429,6 +433,10 @@ mockup-js-template-files:
   - request/widget.mustache
   - request/assessment_modal.mustache
   - assessor/assessments.mustache
+
+  # Workflow
+  - workflow/workflow.mustache
+  - workflow/info.mustache
 
   # Base templates
   - mockup_base_templates/modal_base.mustache
