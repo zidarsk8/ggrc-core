@@ -74,18 +74,37 @@ already have it running.
     # TODO: write Docker commands
     ```
 
-1. (optional) Run database migration
+1. (optional) Run the database migration
 
-TODO: if PR is marked as "migration"
+    If the pull request is marked with the `migration` label, it modifies the
+    database schema, and you thus need to update the schema locally as well.
 
-1. Rebuild all asset files and lauch the application:
+    First, backup the current development database by running the following in
+    the development container's console (you will be prompted for the database
+    root password):
+
+    ```console
+    mysqldump ggrcdev -u root -p > db_backup.sql
+    ```
+
+    With the backup successfully created, run the actual database migration:
+
+    ```console
+    db_migrate
+    ```
+
+    _NOTE: Database migration must be run from the latest database state on
+    the main `develop` branch. If your topic branch introduced any DB changes,
+    they must first be reverted before running the migration._
+
+1. Rebuild all asset files and launch the application:
 
     ```console
     deploy_appengine extras/deploy_settings_local.sh
     launch_ggrc
     ```
 
-1. Test in the application in incognito mode.
+1. Test the application in incognito mode.
 
     _HINT: For incognito mode in Chrome press
     <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>n</kbd>
@@ -95,20 +114,28 @@ TODO: if PR is marked as "migration"
     session._
 
     Test the pull request as decribed in
-    [Part 2](#how-to-properly-review-a-pull-request) of this guide. After you
-    have verified that everything works correctly, you can remove the temporary
-    branch that was used for the testing:
+    [Part 2](#how-to-properly-review-a-pull-request) of this guide.
+
+1. Go back to your branch and continue with your work:
+
+    After you have finished verifying the pull request, you can remove the
+    temporary branch that was used for testing it:
 
     ```console
     git checkout develop
     git branch -D temp_branch
     ```
 
-1. Go back to your branch and continue with your work:
-
     ```console
     git checkout my/previous-branch
     git stash pop  # only needed if you had any changes stashed in Step 1
+    ```
+
+    If you tested a `migration` pull request, you should also revert the
+    database to its previous state by running the following from the
+    development container's console:
+    ```console
+    mysql -u root -p ggrcdev < db_backup.sql
     ```
 
 #### Tip: Automatically checking out a pull request by its ID
@@ -153,6 +180,13 @@ described in
 [Part 1](#setting-up-and-tearing-down-the-environment-for-pr-testing). Then
 follow the guidelines described in the following sections.
 
+#### Reviewing a new feature PR
+
+The philosophy is simple - verify that the PR implements everything that is
+required by the corresponding project task / specification. While reviewing, it
+is highly recommended that you also test a few other application features
+that might have been affected by the submitted code changes.
+
 #### Reviewing a bugfix PR
 
 If reviewing a pull request that contains a bug fix, you **must** first
@@ -160,15 +194,21 @@ reproduce the bug on the vanilla `develop` branch, i.e. the one without the PR
 branch merged. Only after the bug has been reproduced, you can actually verify
 that the PR indeed fixes something.
 
-It is highly recommended that you also test a few other application features
-that might have been affected by the same code changes.
+Again, try to also check that the bugfix has not accidentally introduced any
+other issues.
 
-#### Reviewing a PR containing a database migration script
+#### Reviewing a PR containing database migration scripts
 
-TODO: Ivan?
+Pull requests that modify the database (marked with the `migration` label)
+require additional checks to be performed on top of all the others regular
+checks, namely the following:
 
-TODO: should we also add a section on DB upgrade/downgrade to Part 1 (seetting
-up) the dev environment?
+* The migration works from a clean database,
+* Downgrading and upgrading work on a clean database,
+* Migrations work from the current database state on the main `develop` branch,
+* Migrations work on a populated database (using the data from the `grc-dev`
+  instance).
+
 
 #### Acceptance criteria
 
