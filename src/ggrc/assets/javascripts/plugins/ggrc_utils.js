@@ -74,60 +74,64 @@
    * @return {Boolean} - true if mapping is allowed, false otherwise
    */
     allowed_to_map: function (source, target, options) {
-      var can_map = false,
-          types,
-          target_type,
-          source_type,
-          target_context,
-          source_context,
-          create_contexts,
-          canonical,
-          has_widget,
-          canonical_mapping;
+      var canMap = false;
+      var types;
+      var targetType;
+      var sourceType;
+      var targetContext;
+      var sourceContext;
+      var createContexts;
+      var canonical;
+      var hasWidget;
+      var canonicalMapping;
 
-      target_type = target instanceof can.Model ? target.constructor.shortName
-                                                : (target.type || target);
-      source_type = source.constructor.shortName || source;
+      if (target instanceof can.Model) {
+        targetType = target.constructor.shortName;
+      } else {
+        targetType = target.type || target;
+      }
+      sourceType = source.constructor.shortName || source;
 
       // special case check: mapping an Audit to a Program (and vice versa) is
       // not allowed
-      types = [source_type.toLowerCase(), target_type.toLowerCase()].sort();
+      types = [sourceType.toLowerCase(), targetType.toLowerCase()].sort();
       if (_.isEqual(types, ['audit', 'program'])) {
         return false;
       }
 
       canonical = GGRC.Mappings.get_canonical_mapping_name(
-        source_type, target_type);
-      canonical_mapping = GGRC.Mappings.get_canonical_mapping(source_type, target_type);
+        sourceType, targetType);
+      canonicalMapping = GGRC.Mappings.get_canonical_mapping(
+        sourceType, targetType);
 
-      if (canonical && canonical.indexOf("_") === 0) {
+      if (canonical && canonical.indexOf('_') === 0) {
         canonical = null;
       }
 
-      has_widget = _.contains(
-        GGRC.tree_view.base_widgets_by_type[source_type] || [],
-        target_type);
+      hasWidget = _.contains(
+        GGRC.tree_view.base_widgets_by_type[sourceType] || [],
+        targetType);
 
-      if (_.exists(options, "hash.join") && (!canonical || !has_widget) ||
-          (canonical && !canonical_mapping.model_name)) {
+      if (_.exists(options, 'hash.join') && (!canonical || !hasWidget) ||
+          (canonical && !canonicalMapping.model_name)) {
         return false;
       }
-      target_context = _.exists(target, "context.id");
-      source_context = _.exists(source, "context.id");
-      create_contexts = _.exists(
-        GGRC, "permissions.create.Relationship.contexts");
+      targetContext = _.exists(target, 'context.id');
+      sourceContext = _.exists(source, 'context.id');
+      createContexts = _.exists(
+        GGRC, 'permissions.create.Relationship.contexts');
 
-      can_map = Permission.is_allowed_for("update", source) ||
-        source_type === "Person" ||
-        _.contains(create_contexts, source_context);
+      canMap = Permission.is_allowed_for('update', source) ||
+        sourceType === 'Person' ||
+        _.contains(createContexts, sourceContext);
 
       if (target instanceof can.Model) {
-        can_map = can_map &&
-          (Permission.is_allowed_for("update", target) ||
-           target_type === "Person" ||
-           _.contains(create_contexts, target_context));
+        canMap = canMap &&
+          (Permission.is_allowed_for('update', target) ||
+           targetType === 'Person' ||
+           _.contains(createContexts, targetContext));
       }
-      return can_map;
+      return canMap;
     }
   };
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);
