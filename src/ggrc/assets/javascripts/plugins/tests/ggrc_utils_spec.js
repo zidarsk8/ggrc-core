@@ -11,6 +11,7 @@ describe('GGRC utils allowed_to_map() method', function () {
   var allowedToMap;
   var fakeOptions;
   var fakeProgram;
+  var fakeRequest;
   var fakeAudit;
   var fakeCA;
   var fakePersonCreator;
@@ -41,6 +42,28 @@ describe('GGRC utils allowed_to_map() method', function () {
 
     it('returns false for Program as source and Audit as target', function () {
       var result = allowedToMap(fakeProgram, fakeAudit, fakeOptions);
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('given an Audit and Request pair', function () {
+    beforeEach(function () {
+      fakeRequest = new CMS.Models.Request({type: 'Request'});
+      fakeAudit = new CMS.Models.Audit({type: 'Audit'});
+
+      spyOn(GGRC.Mappings, 'get_canonical_mapping_name')
+        .and.returnValue('audits');
+
+      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+    });
+
+    it('returns false for Audit as source and Request as target', function () {
+      var result = allowedToMap(fakeAudit, fakeRequest, fakeOptions);
+      expect(result).toBe(false);
+    });
+
+    it('returns false for Request as source and Audit as target', function () {
+      var result = allowedToMap(fakeRequest, fakeAudit, fakeOptions);
       expect(result).toBe(false);
     });
   });
