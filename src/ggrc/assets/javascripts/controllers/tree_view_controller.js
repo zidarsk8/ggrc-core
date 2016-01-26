@@ -1119,6 +1119,11 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
     res = $.when.apply($, drawItemsDfds);
     res.then(function () {
+      var shown = drawItemsDfds.length;
+      var count = optionsList.length;
+
+      this.options.attr('filter_shown', shown === count ? 0 : shown);
+      this.options.attr('filter_count', count);
       setTimeout(this.draw_visible.bind(this), 0);
     }.bind(this));
     return res;

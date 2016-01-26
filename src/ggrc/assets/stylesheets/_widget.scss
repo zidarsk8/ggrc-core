@@ -1229,6 +1229,14 @@
   .fluid-wrap {
     position: relative;
   }
+  .filter-stats {
+    position: absolute;
+    font-size: 11px;
+    color: $gray;
+    line-height: 38px;
+    top: 0;
+    right: 26px;
+  }
   .filter-title-wrap,
   .filter-button-wrap {
     position: absolute;
