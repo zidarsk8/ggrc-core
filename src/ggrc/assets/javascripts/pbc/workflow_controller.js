@@ -15,7 +15,7 @@
         return;
       }
 
-      this._after_pending_joins(instance, function() {
+      this._after_pending_joins(instance, function () {
         auditDfd = this._create_relationship(instance,
             instance.audit, instance.audit.context);
         objectDfd = this._create_relationship(instance,
@@ -33,11 +33,12 @@
         return;
       }
 
-      this._after_pending_joins(instance, function() {
+      this._after_pending_joins(instance, function () {
         auditDfd = this._create_relationship(instance, instance.audit);
         controlDfd = this._create_relationship(instance, instance.control);
         programDfd = this._create_relationship(instance, instance.program);
-        assessmentDfd = this._create_relationship(instance, instance.assessment);
+        assessmentDfd = this._create_relationship(
+          instance, instance.assessment);
         instance.delay_resolving_save_until($.when(auditDfd, controlDfd,
             programDfd, assessmentDfd));
       }.bind(this));
@@ -49,7 +50,7 @@
         return;
       }
 
-      this._after_pending_joins(instance, function() {
+      this._after_pending_joins(instance, function () {
         directiveDfd = this._create_relationship(instance, instance.directive);
         instance.delay_resolving_save_until($.when(directiveDfd));
       }.bind(this));
@@ -86,12 +87,12 @@
       });
       instance.delay_resolving_save_until(dfd);
     },
-    _after_pending_joins: function(instance, callback) {
+    _after_pending_joins: function (instance, callback) {
       var dfd = instance.attr('_pending_joins_dfd');
       if (!dfd) {
         dfd = new $.Deferred().resolve();
       }
-      dfd.then(callback)
+      dfd.then(callback);
     },
     _create_relationship: function (source, destination, context) {
       if (!destination || !destination.id) {
