@@ -28,7 +28,10 @@
             <span class="required">*</span>
             <i class="fa fa-question-circle" rel="tooltip" title="Object for this Assessment"></i>
           </label>
-          <input tabindex="2" class="input-block-level" name="object.title" data-permission-type="update" data-lookup="Control" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Object" type="text" value="{{firstexist object.title ''}}" />
+          <input tabindex="2" class="input-block-level" name="object.title" data-permission-type="update"
+                 data-lookup="Program,AccessGroup,Clause,Control,Facility,Issue,Market,Objective,OrgGroup,Person,Process,Product,Project,Request,Section,System,Vendor,Policy,Regulation,Standard,Contract"
+                 data-template="/directives/autocomplete_result.mustache" placeholder="Choose Object"
+                 type="text" value="{{firstexist object.title ''}}" />
       </div>
       <div class="span3">
           <label>
