@@ -85,14 +85,9 @@
       var hasWidget;
       var canonicalMapping;
       var forbidden = {
-        ap: ['audit', 'program'],
-        ar: ['audit', 'request']
+        'audit program': true,
+        'audit request': true
       };
-      function hasMatch(obj, arr) {
-        return _.some(_.map(obj, function (pair) {
-          return _.isEqual(arr, pair);
-        }));
-      }
 
       if (target instanceof can.Model) {
         targetType = target.constructor.shortName;
@@ -106,7 +101,7 @@
       // - mapping an Audit to a Request is not allowed
       // (and vice versa)
       types = [sourceType.toLowerCase(), targetType.toLowerCase()].sort();
-      if (hasMatch(forbidden, types)) {
+      if (forbidden[types.join(' ')]) {
         return false;
       }
 
