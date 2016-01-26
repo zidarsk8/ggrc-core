@@ -440,7 +440,9 @@ can.Model("can.Model.Cacheable", {
         });
 
         obj.attr('_pending_joins', []);
+        obj.attr('_pending_joins_dfd', $.when.apply($, dfds));
         return $.when.apply($, dfds).then(function() {
+          can.trigger(this, "resolved");
           return obj.refresh();
         });
       });
