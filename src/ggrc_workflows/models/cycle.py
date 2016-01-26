@@ -4,6 +4,8 @@
 # Maintained By: dan@reciprocitylabs.com
 
 
+from sqlalchemy import orm
+
 from ggrc import db
 from ggrc.models.mixins import (
     Slugged, Titled, Described, Timeboxed, Stateful, WithContact
@@ -59,3 +61,10 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
       (Workflow.id == cls.workflow_id) &
       (predicate(Workflow.slug) | predicate(Workflow.title))
     ).exists()
+
+  @classmethod
+  def eager_query(cls):
+    query = super(Cycle, cls).eager_query()
+    return query.options(
+        orm.joinedload('cycle_task_groups'),
+    )
