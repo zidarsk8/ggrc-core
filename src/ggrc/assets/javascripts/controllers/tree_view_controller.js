@@ -1056,70 +1056,73 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       this.element.parent().find(".sticky").Stickyfill();
     }.bind(this)));
     return final_dfd;
-  }
+  },
+  draw_items: function (optionsList) {
+    var $footer = this.element.children('.tree-item-add').first();
+    var $items = $();
+    var $existing = this.element.children('.cms_controllers_tree_view_node');
+    var drawItemsDfds = [];
+    var sortProp = this.options.sort_property;
+    var sortFunction = this.options.sort_function;
+    var filter = this.options.filter;
+    var res;
 
-  , draw_items : function(options_list) {
-      var that = this
-        , $footer = this.element.children('.tree-item-add').first()
-        , $items = $()
-        , $existing = this.element.children('.cms_controllers_tree_view_node')
-        , draw_items_dfds = []
-        , sort_prop = this.options.sort_property
-        , sort_function = this.options.sort_function
-        , filter = this.options.filter
-        ;
-      options_list = can.makeArray(options_list);
-      can.map(options_list, function(options) {
-        if (!filter || filter.evaluate(options.instance.get_filter_vals())) {
-          if (that.options.disable_lazy_loading) {
-            options.disable_lazy_loading = true;
-          }
-          var $li = $("<li />").cms_controllers_tree_view_node(options);
-          draw_items_dfds.push($li.control()._draw_node_deferred);
-          $items.push($li[0]);
+    optionsList = can.makeArray(optionsList);
+    can.map(optionsList, function (options) {
+      var $li = $('<li />');
+      if (!filter || filter.evaluate(options.instance.get_filter_vals())) {
+        if (this.options.disable_lazy_loading) {
+          options.disable_lazy_loading = true;
         }
-      });
-
-      if (sort_prop || sort_function) {
-        if (!sort_function) {
-          sort_function = this._sort_property_comparator(sort_prop);
-        }
-
-        $items.each(function(i, item) {
-            var j, $item = $(item), compare,
-                new_item = $item.control().options.instance;
-            for(j = $existing.length - 1; j >= 0; j--) {
-              var old_item = $existing.eq(j).control().options.instance,
-                  compare = sort_function(old_item, new_item);
-              if (compare <= 0) {
-                $item.insertAfter($existing.eq(j));
-                $existing.splice(j + 1, 0, item);
-                return;
-              }
-            }
-            if($existing.length) {
-              $item.insertBefore($existing.eq(0));
-            } else if($footer.length) {
-              $item.insertBefore($footer);
-            } else {
-              $item.appendTo(this.element);
-            }
-            $existing.splice(0, 0, item);
-        }.bind(this));
-        if (this.options.sortable) {
-          $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
-        }
-      } else {
-        if($footer.length) {
-          $items.insertBefore($footer);
-        } else {
-          $items.appendTo(this.element);
-        }
+        $li.cms_controllers_tree_view_node(options);
+        drawItemsDfds.push($li.control()._draw_node_deferred);
+        $items.push($li[0]);
       }
-      var res = $.when.apply($, draw_items_dfds);
-      res.then(function(){setTimeout(that.draw_visible.bind(that), 0)});
-      return res;
+    }.bind(this));
+
+    if (sortProp || sortFunction) {
+      if (!sortFunction) {
+        sortFunction = this._sort_property_comparator(sortProp);
+      }
+      $items.each(function (i, item) {
+        var j;
+        var $item = $(item);
+        var compare;
+        var newItem = $item.control().options.instance;
+        var oldItem;
+
+        for (j = $existing.length - 1; j >= 0; j--) {
+          oldItem = $existing.eq(j).control().options.instance;
+          compare = sortFunction(oldItem, newItem);
+          if (compare <= 0) {
+            $item.insertAfter($existing.eq(j));
+            $existing.splice(j + 1, 0, item);
+            return;
+          }
+        }
+        if ($existing.length) {
+          $item.insertBefore($existing.eq(0));
+        } else if ($footer.length) {
+          $item.insertBefore($footer);
+        } else {
+          $item.appendTo(this.element);
+        }
+        $existing.splice(0, 0, item);
+      }.bind(this));
+      if (this.options.sortable) {
+        $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
+      }
+    } else if ($footer.length) {
+      $items.insertBefore($footer);
+    } else {
+      $items.appendTo(this.element);
     }
+    res = $.when.apply($, drawItemsDfds);
+    res.then(function () {
+      setTimeout(this.draw_visible.bind(this), 0);
+    }.bind(this));
+    return res;
+  }
 
   , " sortupdate" : function(el, ev, ui) {
     var that = this,
