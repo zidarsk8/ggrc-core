@@ -414,6 +414,7 @@ mockup-js-files:
   - request/pages/assessments.js
 
   #Workflow
+  - workflow/main.js
   - workflow/pages/workflow.js
   - workflow/pages/info.js
 
