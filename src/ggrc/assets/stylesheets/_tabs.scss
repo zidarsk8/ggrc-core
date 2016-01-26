@@ -83,6 +83,12 @@
 			content: "S";
 		}
 	}
+  &.manager {
+    background: $purple;
+    &:after {
+      content: "M";
+    }
+  }
 	&.requester {
 		background: $purple;
 		&:after {

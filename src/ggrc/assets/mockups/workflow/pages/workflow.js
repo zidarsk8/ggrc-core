@@ -3,11 +3,11 @@
   GGRC.Bootstrap.Mockups.Workflow = GGRC.Bootstrap.Mockups.Workflow || {};
 
   GGRC.Bootstrap.Mockups.Workflow.Workflows = {
-    title: "Workflows",
+    title: "Other Info",
     icon: "workflow",
     template: "/workflow/workflow.mustache",
     hide_filter: true,
-    children: Generator.get("assessment", 3)
+    children: Generator.get("assessment")
     // Not sure should I use this extended child info, or generator above? If I use generator above and use workflow word instead of assessment then requests are not working also.
     // children: [{
     //   title: "My new request",

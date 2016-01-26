@@ -18,9 +18,8 @@
     // Object:
     object: {
       icon: "workflow",
-      title: "My Workflows",
+      title: "Workflow",
     },
-    infopin: "normal",
     // Views:
     views: _.values(GGRC.Bootstrap.Mockups.Workflow)
   });

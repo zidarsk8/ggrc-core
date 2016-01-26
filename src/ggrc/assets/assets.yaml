@@ -414,7 +414,6 @@ mockup-js-files:
   - request/pages/assessments.js
 
   #Workflow
-  - workflow/main.js
   - workflow/pages/workflow.js
   - workflow/pages/info.js
 
@@ -426,6 +425,7 @@ mockup-js-files:
   - mockuphelper_controller.js
   - assessor/main.js
   - request/main.js
+  - workflow/main.js
 
 mockup-js-template-files:
   # Request
@@ -436,8 +436,8 @@ mockup-js-template-files:
   - assessor/assessments.mustache
 
   # Workflow
-  - workflow/workflow.mustache
   - workflow/info.mustache
+  - workflow/workflow.mustache
 
   # Base templates
   - mockup_base_templates/modal_base.mustache

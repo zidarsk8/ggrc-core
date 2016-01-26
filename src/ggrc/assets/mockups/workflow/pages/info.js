@@ -3,101 +3,51 @@
   GGRC.Bootstrap.Mockups.Workflow = GGRC.Bootstrap.Mockups.Workflow || {};
 
   GGRC.Bootstrap.Mockups.Workflow.Info = {
-    title: "Info",
+    title: "Setup",
     icon: "info-circle",
     template: "/workflow/info.mustache",
-    info_title: "My new workflow",
+    //info_title: "My new workflow",
     description: Generator.paragraph(7),
     state: {
       title: "In Progress",
       class_name: "inprogress"
     },
     people: {
-      "audit lead": Generator.get("user", 5),
-      "auditor": Generator.get("user", 3)
+      "manager": Generator.get("user", 3)
+    },
+    task_people: {
+      "assignee": Generator.get("user", 3),
+      "verifier": Generator.get("user", 3)
     },
     comments: can.Map(Generator.get("comment", 10, {sort: "date"})),
-    logs: Generator.create({
-      author: "%user",
-      timestamp: "%date",
-      data: [{
-        status: "made changes",
-        field: "Comment",
-        original: {
-          text: "%text"
-        },
-        changed: {
-          text: "%text"
-        }
+    mapped: {
+      "objects": Generator.create({
+        icon: ["objective", "control", "regulation"],
+        title: "%title",
+        description: "%text",
+        state: ["In Progress", "Draft"]
       }, {
-        status: "made changes",
-        field: "Evidence",
-        original: {
-          files: []
-        },
-        changed: {
-          files: "%files"
-        }
+        count: 5,
+        randomize: ["state", "icon"]
+      }),
+      "requests": Generator.create({
+        icon: "requests",
+        title: "%title",
+        description: "%text",
+        state: ["In Progress", "Draft"]
       }, {
-        status: "made changes",
-        field: "People - Requester",
-        original: {
-          author: "%user"
-        },
-        changed: {
-          author: "%user"
-        }
+        count: 5,
+        randomize: "state"
+      }),
+      "issues": Generator.create({
+        icon: "issue",
+        title: "%title",
+        description: "%text",
+        state: ["In Progress", "Draft"]
       }, {
-        status: "created request",
-        field: ""
-      }, {
-        status: "made changes",
-        field: "Dates - Due on",
-        original: {
-          text: "%date"
-        },
-        changed: {
-          text: "%date"
-        }
-      }, {
-        status: "made changes",
-        field: "Dates - Created on",
-        original: {
-          text: "%date"
-        },
-        changed: {
-          text: "%date"
-        }
-      }, {
-        status: "made changes",
-        field: "Description",
-        original: {
-          text: "%text"
-        },
-        changed: {
-          text: "%text"
-        }
-      }]
-    }, {
-      count: 5,
-      randomize: "data"
-    }),
-    mapped_objects: [{
-      icon: "objective",
-      title: "090.7068 objective 1",
-      state: "Draft",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-    }, {
-      icon: "control",
-      title: "Access to the Private Network with expired Key v0906984",
-      state: "In Progress",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-    }, {
-      icon: "regulation",
-      title: "a regulation object",
-      state: "In Progress",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer bibendum sem id lectus porta, eu rutrum nunc commodo."
-    }],
-    past_requests: Generator.get("request", 5)
+        count: 5,
+        randomize: "state"
+      })
+    },
   };
 })(GGRC || {}, GGRC.Mockup.Generator);
