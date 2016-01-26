@@ -3,16 +3,26 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+"""Module for cycle task group model.
+"""
+
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.models.mixins import (
-    Base, Titled, Described, Timeboxed, Slugged, Stateful, WithContact
-)
+from ggrc.models.mixins import Base
+from ggrc.models.mixins import Described
+from ggrc.models.mixins import Slugged
+from ggrc.models.mixins import Stateful
+from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import Titled
+from ggrc.models.mixins import WithContact
 from ggrc_workflows.models.cycle import Cycle
+
 
 class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
                      Titled, Base, db.Model):
+  """Cycle Task Group model.
+  """
   __tablename__ = 'cycle_task_groups'
   _title_uniqueness = False
 
@@ -52,16 +62,26 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
 
   _aliases = {
       "cycle": {
-        "display_name": "Cycle",
-        "filter_by": "_filter_by_cycle",
+          "display_name": "Cycle",
+          "filter_by": "_filter_by_cycle",
       },
   }
 
   @classmethod
   def _filter_by_cycle(cls, predicate):
+    """Get query that filters cycle task groups.
+
+    Args:
+      predicate: lambda function that excepts a single parameter and returns
+      true of false.
+
+    Returns:
+      An sqlalchemy query that evaluates to true or false and can be used in
+      filtering cycle task groups by related cycle.
+    """
     return Cycle.query.filter(
-      (Cycle.id == cls.cycle_id) &
-      (predicate(Cycle.slug) | predicate(Cycle.title))
+        (Cycle.id == cls.cycle_id) &
+        (predicate(Cycle.slug) | predicate(Cycle.title))
     ).exists()
 
   @classmethod
