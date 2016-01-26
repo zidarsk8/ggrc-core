@@ -4,6 +4,8 @@
 # Maintained By: dan@reciprocitylabs.com
 
 
+from sqlalchemy import orm
+
 from ggrc import db
 from ggrc.models.types import JsonType
 from ggrc.models.mixins import (
@@ -141,3 +143,20 @@ class CycleTaskGroupObjectTask(
         (CycleTaskGroupObject.id == cls.cycle_task_group_object_id) &
         or_(*parts)
     ).exists()
+
+  @classmethod
+  def eager_query(cls):
+    """Add cycle task entries to cycle task eager query
+
+    This function add cycle_task_entries as a join option when fetching cycles
+    tasks, and makes sure that with one query we fetch all cycle task related
+    data needed for generating cycle taks json for a response.
+
+    Returns:
+      a query object with cycle_task_entries added to joined load options.
+    """
+    query = super(CycleTaskGroupObjectTask, cls).eager_query()
+    return query.options(
+        orm.joinedload('cycle_task_entries'),
+    )
+
