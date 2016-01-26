@@ -251,7 +251,7 @@ class Widget(object):
     DROPDOWN_DELETE = (By.CSS_SELECTOR,
                        '[data-test-id="dropdown_delete_0839163b"]')
     MODAL_DELETE = (By.ID, '[id="ajax-modal-javascript:--"]')
-    MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, '.modal .grcicon-x-grey')
+    MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, '.modal .fa.fa-times.black')
 
     TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
     TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
