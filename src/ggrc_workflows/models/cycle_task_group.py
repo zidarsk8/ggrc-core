@@ -3,6 +3,7 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models.mixins import (
@@ -62,3 +63,19 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
       (Cycle.id == cls.cycle_id) &
       (predicate(Cycle.slug) | predicate(Cycle.title))
     ).exists()
+
+  @classmethod
+  def eager_query(cls):
+    """Add cycle tasks and objects to cycle task group eager query.
+
+    Make sure we load all cycle task group relevant data in a single query.
+
+    Returns:
+      a query object with cycle_task_group_tasks and cycle_task_group_objects
+      added to joined load options.
+    """
+    query = super(CycleTaskGroup, cls).eager_query()
+    return query.options(
+        orm.joinedload('cycle_task_group_tasks'),
+        orm.joinedload('cycle_task_group_objects'),
+    )
