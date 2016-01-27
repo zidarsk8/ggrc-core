@@ -38,7 +38,7 @@
             modal_button='Confirm'
             >
           </ggrc-gdrive-picker-launcher>
-          <i class="grcicon-warning" style="margin-top:4px" rel="tooltip" data-placement="bottom" data-original-title="Audit folder not set. Files will be uploaded to your GDrive root folder."></i>
+          <i class="fa fa-exclamation-triangle red" style="margin-top:4px" rel="tooltip" data-placement="bottom" data-original-title="Audit folder not set. Files will be uploaded to your GDrive root folder."></i>
         {{/if_in}}
       {{else}}
         {{#if extended_folders.length}}
@@ -55,7 +55,7 @@
             link_text="Attach evidence"
             click_event="trigger_upload">
           </ggrc-gdrive-picker-launcher>
-          <i class="grcicon-warning" style="margin-top:4px" rel="tooltip" data-placement="bottom" data-original-title="Audit folder not set. Files will be uploaded to your GDrive root folder."></i>
+          <i class="fa fa-exclamation-triangle red" style="margin-top:4px" rel="tooltip" data-placement="bottom" data-original-title="Audit folder not set. Files will be uploaded to your GDrive root folder."></i>
         {{/if_in}}
       {{/if}}
     </div>

@@ -135,9 +135,6 @@ ul.new-tree {
       overflow: visible;
       .type {
         float: left;
-        .grcicon-carot {
-          margin-left: -6px;
-        }
       }
       .tree-title-area {
         width: auto;
@@ -199,9 +196,6 @@ ul.new-tree {
   }
 
   &.event-tree {
-    [class^="grcicon-"] {
-      margin-top: 1px;
-    }
     a.openclose {
       &.active {
         font-weight: normal;
@@ -273,9 +267,6 @@ ul.new-tree {
       }
     }
     .events-content {
-      [class^="grcicon-"] {
-        margin-top: 7px;
-      }
       .info-action {
         @include opacity(1);
         text-transform: none;
@@ -472,17 +463,6 @@ ul.new-tree {
         .openclose,
         .select {
           padding: 6px 0;
-        }
-        .drag {
-          [class^="grcicon-"] {
-            @include opacity(.2);
-            margin-top: 6px;
-          }
-          &:hover {
-            [class^="grcicon-"] {
-              @include opacity(1);
-            }
-          }
         }
       }
     }
@@ -733,14 +713,6 @@ ul.new-tree {
         margin: 5px 0;
       }
     }
-    .btn {
-      [class^="grcicon-"] {
-        margin-top: 1px;
-      }
-    }
-  }
-  [class^="grcicon-"] {
-    margin-top:7px;
   }
   .parent {
     @include opacity(0.6);
@@ -764,9 +736,6 @@ ul.new-tree {
     font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
-    [class^="grcicon-"] {
-      margin-top: 7px;
-    }
   }
   a.show-long {
     color:$disabled;
@@ -1062,9 +1031,6 @@ ul.new-tree {
       @include opacity(1);
       text-decoration:none;
     }
-    [class^="grcicon-"] {
-      margin-top: 2px;
-    }
   }
 
   .info-audit {
@@ -1087,9 +1053,6 @@ ul.new-tree {
           text-decoration:none;
         }
       }
-    }
-    [class^="grcicon-"] {
-      margin-top: 2px;
     }
   }
 }

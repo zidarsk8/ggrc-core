@@ -43,13 +43,12 @@ jQuery(function ($) {
 
   /*Checkbutton in modals widget function*/
   $(document).on("click", ".checkbutton", function(event) {
-    $(this).children("i").toggleClass("grcicon-blank");
     $(this).children("i").toggleClass("fa-times");
   });
 
   /*Toggle widget function*/
   $(document).on("click", ".accordion-toggle", function(event) {
-    $(this).children("i").toggleClass("grcicon-blue-expand");
+    $(this).children("i").toggleClass("fa fa-caret-right");
   });
 
   /*Toggle slot function*/
@@ -60,7 +59,7 @@ jQuery(function ($) {
 
   $(document).on("click", ".expandAll", function(event) {
     // $("h3.trigger").toggleClass("active").next().slideToggle("fast");
-    $(this).children("i").toggleClass("grcicon-blue-expand");
+    $(this).children("i").toggleClass("fa fa-caret-right");
   });
 
   //Handle remove buttons
@@ -102,7 +101,7 @@ jQuery(function ($) {
   });
 
 //if includes a xpander we need to toggle it.
-$('body').on('click', '.grcicon-more', function(e) {
+$('body').on('click', '.fa fa-caret-right', function(e) {
   //bootstrap data toggle opens this one up, but ...
 
   e.preventDefault();
@@ -250,8 +249,8 @@ $('body').on('click', '.grcicon-more', function(e) {
       .removeClass("widgetbtn addme")
       .addClass("widgetbtnoff"); //remove icon square around checkmark (not a button anymore)
     $icon
-      .removeClass("grcicon-chevron-right")
-      .addClass("grcicon-check-green")
+      .removeClass("fa fa-caret-right")
+      .addClass("fa fa-check-square-o green")
     $target
       .prepend('<li class="new-item"> <div class="row-fluid"> <div class="span6"> <span class="company">' + $company + '</span> <span class="name">'+ $name +'</span> </div> <div class="span6 actions">  <a class="widgetbtn pull-right" id="removeMe" href="#"> <i class="fa fa-ban"></i> </a> <a class="widgetbtn pull-right" href="#"> <i class="fa fa-pencil-square-o"></i> </a> ' + $item2add + '</div> </div>' + $additionalinfo +' </div> </li>')
       .find("li.new-item").hide().fadeIn('slow').removeClass("new-item");
