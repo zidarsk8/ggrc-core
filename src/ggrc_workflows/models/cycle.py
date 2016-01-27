@@ -73,7 +73,7 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
   def eager_query(cls):
     """Add cycle task groups to cycle eager query
 
-    This function add cycle_task_groups as a join option when fetching cycles,
+    This function adds cycle_task_groups as a join option when fetching cycles,
     and makes sure we fetch all cycle related data needed for generating cycle
     json, in one query.
 

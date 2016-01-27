@@ -186,7 +186,7 @@ class CycleTaskGroupObjectTask(
   def eager_query(cls):
     """Add cycle task entries to cycle task eager query
 
-    This function add cycle_task_entries as a join option when fetching cycles
+    This function adds cycle_task_entries as a join option when fetching cycles
     tasks, and makes sure that with one query we fetch all cycle task related
     data needed for generating cycle taks json for a response.
 
