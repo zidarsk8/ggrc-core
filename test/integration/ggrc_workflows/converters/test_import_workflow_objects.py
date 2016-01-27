@@ -12,6 +12,7 @@ from os.path import join
 from integration.ggrc.converters import TestCase
 
 from ggrc import db
+from ggrc.converters import errors
 from ggrc_workflows.models.task_group import TaskGroup
 from ggrc_workflows.models.task_group_object import TaskGroupObject
 from ggrc_workflows.models.task_group_task import TaskGroupTask
@@ -58,13 +59,38 @@ class TestWorkflowObjectsImport(TestCase):
     """Test import of tasks for workflows with various frequencies"""
     filename = "workflow_big_sheet.csv"
     response = self.import_file(filename)
-    objects = {"Workflow", "Task Group", "Task Group Task"}
-    messages = ["block_errors", "block_warnings", "row_errors", "row_warnings",
-                "ignored"]
+    expected_messages = {
+        "Workflow": {},
+        "Task Group": {},
+        "Task Group Task": {
+            "row_warnings": set([
+                errors.WRONG_REQUIRED_VALUE.format(
+                    line=38, value="aaaa", column_name="Task Type"
+                ),
+                errors.WRONG_REQUIRED_VALUE.format(
+                    line=39, value="", column_name="Task Type"
+                ),
+                errors.WRONG_REQUIRED_VALUE.format(
+                    line=40, value="", column_name="Task Type"
+                ),
+            ])
+        },
+    }
+    messages = (
+        "block_errors",
+        "block_warnings",
+        "row_errors",
+        "row_warnings",
+    )
     # Assert that there were no import errors
     for obj in response:
-      if obj['name'] in objects:
-        self.assertEqual([[], [], [], [], 0], [obj[msg] for msg in messages])
+      if obj['name'] in expected_messages:
+        for message in messages:
+          self.assertEqual(
+            set(obj[message]),
+            expected_messages[obj["name"]].get(message, set())
+          )
+          self.assertEqual(obj["ignored"], 0)
 
     # Assert that CSV import got imported correctly
     getters = {
