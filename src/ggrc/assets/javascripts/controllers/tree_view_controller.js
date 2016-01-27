@@ -877,6 +877,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
           // list of items
           return e.tagName == "LI";
         }),
+        to_render = [],
         i, control, index, page_count, mid, el, pos;
 
     while (steps < MAX_STEPS && lo < hi) {
@@ -927,8 +928,25 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       if (!_.contains(visible, control)) {
         visible.push(control);
-        control.draw_node();
+        to_render.push(control);
       }
+    }
+    function render_step(to_render) {
+      if (to_render.length === 0) {
+        return;
+      }
+      to_render[0].draw_node();
+      setTimeout(function() {
+        render_step(to_render.slice(1));
+      }, 0);
+    }
+    if (this._has_completed_render_loop) {
+      render_step(to_render);
+    } else {
+      _.each(to_render, function(control) {
+        control.draw_node();
+      });
+      this._has_completed_render_loop = true;
     }
   }, 100, {leading: true})
   , _last_scroll_top : 0
@@ -1458,14 +1476,12 @@ can.Control("CMS.Controllers.TreeViewNode", {
     }
     this._draw_node_in_progress = true;
     this.add_child_lists_to_child();
-    setTimeout(function() {
-      can.view(this.options.show_view, this.options, this._ifNotRemoved(function(frag) {
-        this.replace_element(frag);
-        this._draw_node_deferred.resolve();
-      }.bind(this)));
-      this._draw_node_in_progress = false;
-      this.options.attr('is_subtree', this.element && this.element.closest('.inner-tree').length > 0);
-    }.bind(this), 2); // We give the browser a 2ms pause for scrolling
+    can.view(this.options.show_view, this.options, this._ifNotRemoved(function(frag) {
+      this.replace_element(frag);
+      this._draw_node_deferred.resolve();
+    }.bind(this)));
+    this._draw_node_in_progress = false;
+    this.options.attr('is_subtree', this.element && this.element.closest('.inner-tree').length > 0);
   }
   , draw_placeholder: function() {
       var that = this;
