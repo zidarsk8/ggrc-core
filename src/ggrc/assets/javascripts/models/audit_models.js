@@ -408,8 +408,13 @@ can.Model.Cacheable("CMS.Models.Request", {
       mapping: "info_related_objects",
       allow_creating : true,
     }]
-  }
-  , init : function() {
+  },
+  assignable_list: [
+    {type: 'requester', mapping: 'related_requesters', required: true},
+    {type: 'assignee', mapping: 'related_assignees', required: true},
+    {type: 'verifier', mapping: 'related_verifiers', required: false},
+  ],
+  init : function() {
     this._super.apply(this, arguments);
     this.validateNonBlank("title");
     this.validateNonBlank("due_on");

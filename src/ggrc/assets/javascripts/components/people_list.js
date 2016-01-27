@@ -21,9 +21,9 @@
     template: can.view(GGRC.mustache_path + "/base_templates/people_group.mustache"),
     scope: {
       limit: "@",
-      mapping: "@",
+      mapping: null,
       required: "@",
-      type: "@",
+      type: null,
       toggle_add: false,
       mapped_people: [],
       results: [],
