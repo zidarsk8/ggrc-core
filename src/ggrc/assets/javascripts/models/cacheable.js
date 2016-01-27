@@ -83,10 +83,10 @@
 
   function makeDateSerializer(type, key) {
     var conversion = type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD\\THH:mm:ss\\Z';
-    return function(date) {
+    return function (date) {
       var retstr;
       var retval;
-      if (date === null) {
+      if (date == null) {
         return '';
       }
       if (typeof date !== 'number') {
