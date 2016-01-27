@@ -1012,50 +1012,49 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if(parent && !parent.children_drawn) {
       parent.attr("children_drawn", true);
     }
-  }
-
+  },
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
-  , add_child_lists : function(list) {
-    var that = this
-      , current_list = can.makeArray(list)
-      , list_window = []
-      , final_dfd
-      , queue = []
-      , op_id = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1
-      ;
+  add_child_lists: function (list) {
+    var that = this;
+    var currentList = can.makeArray(list);
+    var listWindow = [];
+    var finalDfd;
+    var queue = [];
+    var opId = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1;
 
-    can.each(current_list, function(item) {
-      list_window.push(item);
-      if (list_window.length >= 50) {
-        queue.push(list_window);
-        list_window = [];
+    can.each(currentList, function (item) {
+      listWindow.push(item);
+      if (listWindow.length >= 50) {
+        queue.push(listWindow);
+        listWindow = [];
       }
     });
-    if (list_window.length > 0) {
-      queue.push(list_window);
+    if (listWindow.length > 0) {
+      queue.push(listWindow);
     }
 
-    final_dfd = _.foldl(queue, function(dfd, list_window) {
-      return dfd.then(function (all_draw_items) {
-        if (that._add_child_lists_id !== op_id) {
+    finalDfd = _.foldl(queue, function (dfd, listWindow) {
+      return dfd.then(function () {
+        var res = $.Deferred();
+        if (that._add_child_lists_id !== opId) {
           return dfd;
         }
-        var res = $.Deferred();
-        setTimeout(function(){
-          if (that._add_child_lists_id !== op_id) {
+        setTimeout(function () {
+          var draw;
+          if (that._add_child_lists_id !== opId) {
             return;
           }
-          var draw = that._ifNotRemoved(that.draw_items.bind(that));
-          res.resolve(draw(list_window));
+          draw = that._ifNotRemoved(that.draw_items.bind(that));
+          res.resolve(draw(listWindow));
         }, 0);
         return res;
       });
-    }, new $.Deferred().resolve());
+    }, $.Deferred().resolve());
 
-    final_dfd.done(this._ifNotRemoved(function() {
-      this.element.parent().find(".sticky").Stickyfill();
+    finalDfd.done(this._ifNotRemoved(function () {
+      this.element.parent().find('.sticky').Stickyfill();
     }.bind(this)));
-    return final_dfd;
+    return finalDfd;
   },
   draw_items: function (optionsList) {
     var $footer = this.element.children('.tree-item-add').first();
