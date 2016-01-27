@@ -99,7 +99,8 @@
       },
       ".add-object-trigger click": function (el, ev) {
         ev.preventDefault();
-        this.element.find('.new-relevant-block').last().clone().appendTo(".relevant-block-wrap");
+        this.element.find('.new-relevant-block').last().clone()
+        .appendTo('.relevant-block-wrap');
       }
   });
 
