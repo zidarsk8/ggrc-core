@@ -86,7 +86,7 @@
     return function (date) {
       var retstr;
       var retval;
-      if (date == null) {
+      if (date === null || date === undefined) {
         return '';
       }
       if (typeof date !== 'number') {
