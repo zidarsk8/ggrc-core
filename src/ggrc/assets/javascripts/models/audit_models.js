@@ -365,7 +365,7 @@ can.Model.Cacheable("CMS.Models.Request", {
     mapped_objects: {
       model: can.Model.Cacheable,
       mapping: "info_related_objects",
-      show_view: GGRC.mustache_path + "/requests/subtree.mustache",
+      show_view: GGRC.mustache_path + "/base_templates/subtree.mustache",
     },
     evidence: {
       model: CMS.Models.Document,
@@ -893,6 +893,34 @@ can.Model.Cacheable('CMS.Models.Assessment', {
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
   },
+  info_pane_options: {
+    mapped_objects: {
+      model: can.Model.Cacheable,
+      mapping: "info_related_objects",
+      show_view: GGRC.mustache_path + "/base_templates/subtree.mustache",
+    },
+    evidence: {
+      model: CMS.Models.Document,
+      mapping: "all_documents",
+      show_view: GGRC.mustache_path + "/base_templates/attachment.mustache",
+      sort_function: _comment_sort,
+    },
+    comments: {
+      model: can.Model.Cacheable,
+      mapping: "comments",
+      show_view: GGRC.mustache_path + "/base_templates/comment_subtree.mustache",
+      sort_function: _comment_sort,
+    },
+    urls: {
+      model: CMS.Models.Document,
+      mapping: "all_urls",
+      show_view: GGRC.mustache_path + "/base_templates/urls.mustache",
+    }
+  },
+  assignable_list: [
+    {type: 'assessor', mapping: 'related_assessors', required: false},
+    {type: 'verifier', mapping: 'related_verifiers', required: false}
+  ],
   init: function () {
       if (this._super) {
         this._super.apply(this, arguments);
