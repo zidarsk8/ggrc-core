@@ -65,114 +65,97 @@
   </div>
 
   <div class="relevant-filter-group">
-    <div class="new-relevant-block">
-      <div class="row-fluid">
-        <div class="span8">
-          <div class="row-fluid">
-            <div class="span8">
-              <div class="row-fluid wrap-row">
-                <div class="span12">
-                  <h6>Task title</h6>
-                  <input type="text" class="span9">
+    <div class="relevant-block-wrap">
+      <div class="new-relevant-block">
+        <div class="row-fluid">
+          <div class="span8">
+            <div class="row-fluid">
+              <div class="span8">
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Task title</h6>
+                    <input type="text" class="span9">
+                  </div>
                 </div>
-              </div>
-              <div class="row-fluid wrap-row">
-                <div class="span12">
-                  <h6>Task description</h6>
-                  <div class="wysiwyg-area">
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Task description</h6>
+                    <div class="wysiwyg-area">
+                      <textarea rows="4" class="span9 triple wysihtml5" placeholder="Enter description"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Task group</h6>
+                    <input type="text" class="span9">
+                  </div>
+                </div>
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Task type</h6>
+                    <select>
+                      <option value="text">Rich text</option>
+                      <option value="menu">Dropdown</option>
+                      <option value="checkbox">Checkboxes</option>
+                    </select>
+
+                    <h6>Task Notes</h6>
                     <textarea rows="4" class="span9 triple wysihtml5" placeholder="Enter description"></textarea>
+
+                    <h6>Selection Response Options (Comma Separated)</h6>
+                    <textarea id="tgt_response_options" class="span12 double" name="response_options_csv" placeholder="Enter Description" tabindex="2"></textarea>
+
+                  </div>
+                </div>
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    {{> /static/mustache/mockup_base_templates/info_panel/mapped_objects.mustache}}
                   </div>
                 </div>
               </div>
-              <div class="row-fluid wrap-row">
-                <div class="span12">
-                  <h6>Task group</h6>
-                  <input type="text" class="span9">
+              <div class="span4">
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Start Date</h6>
+                    <input type="text" class="span9">
+                  </div>
                 </div>
-              </div>
-              <div class="row-fluid wrap-row">
-                <div class="span12">
-                  {{> /static/mustache/mockup_base_templates/info_panel/mapped_objects.mustache}}
-                </div>
-              </div>
-            </div>
-            <div class="span4">
-              <div class="row-fluid wrap-row">
-                <div class="span12">
-                  <h6>Start Date</h6>
-                  <input type="text" class="span9">
-                </div>
-              </div>
-              <div class="row-fluid wrap-row">
-                <div class="span12">
-                  <h6>End Date</h6>
-                  <input type="text" class="span9">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="span4">
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              {{> /static/mustache/mockup_base_templates/info_panel/people_list.mustache}}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="new-relevant-block">
-      <div class="row-fluid">
-        <div class="span8">
-          <div class="row-fluid">
-            <div class="span6">
-              <div class="row-fluid wrap-row">
-                <div class="span12">
-                  <h6>Task title</h6>
-                  <input type="text" class="span10">
-                </div>
-              </div>
-            </div>
-            <div class="span6">
-              <div class="row-fluid wrap-row">
-                <div class="span12">
-                  <div class="pull-right">
-                    <h6>State</h6>
-                    <input type="text" class="span4">
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>End Date</h6>
+                    <input type="text" class="span9">
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="span4"></div>
-      </div>
-      <div class="row-fluid">
-        <div class="span4">
-          <h6>Task title</h6>
-          <div class="single-line-filter">
-            <select can-value="type" class="input-block-level option-type-selector">
-              <option>Da</option>
-            </select>
+          <div class="span4">
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                {{> /static/mustache/mockup_base_templates/info_panel/task_people_list.mustache}}
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="add-rule add-object">
-      <a href="#" class="addFilterRule btn btn-small btn-info">Add another object type</a>
+      <a href="#" class="add-object-trigger btn btn-small btn-info">Add another task</a>
     </div>
 
   </div>
 
   <div class="info">
     <div class="save-template-wrap">
-      <div class="btn-group pull-right">
-        <button type="submit" id="export-csv-button" class="btn btn-success btn-small">
-          <i class="fa fa-arrow-circle-o-up white"></i>
-          Export Objects
+      <div class="pull-right">
+        <button type="submit" class="btn btn-draft btn-small">
+          Save draft
+        </button>
+        <button type="submit" class="btn btn-success btn-small">
+          Activate
         </button>
       </div>
     </div>

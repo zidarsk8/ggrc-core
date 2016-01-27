@@ -6,12 +6,6 @@
     title: "Setup",
     icon: "info-circle",
     template: "/workflow/info.mustache",
-    //info_title: "My new workflow",
-    description: Generator.paragraph(7),
-    state: {
-      title: "In Progress",
-      class_name: "inprogress"
-    },
     people: {
       "manager": Generator.get("user", 3)
     },
@@ -19,7 +13,6 @@
       "assignee": Generator.get("user", 3),
       "verifier": Generator.get("user", 3)
     },
-    comments: can.Map(Generator.get("comment", 10, {sort: "date"})),
     mapped: {
       "objects": Generator.create({
         icon: ["objective", "control", "regulation"],

@@ -449,6 +449,7 @@ mockup-js-template-files:
   - mockup_base_templates/info_panel/description.mustache
   - mockup_base_templates/info_panel/mapped_objects.mustache
   - mockup_base_templates/info_panel/people_list.mustache
+  - mockup_base_templates/info_panel/task_people_list.mustache
   - mockup_base_templates/info_panel/dates_list.mustache
   - mockup_base_templates/info_panel/comment_list.mustache
   - mockup_base_templates/info_panel/log_list.mustache
