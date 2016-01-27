@@ -1032,7 +1032,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if (listWindow.length > 0) {
       queue.push(listWindow);
     }
-
+    this.options.attr('filter_shown', 0);
     finalDfd = _.foldl(queue, function (dfd, listWindow) {
       return dfd.then(function () {
         var res = $.Deferred();
@@ -1052,6 +1052,16 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }, $.Deferred().resolve());
 
     finalDfd.done(this._ifNotRemoved(function () {
+      var shown = this.element[0].children.length;
+      var count = this.options.list.length;
+      // We need to hide `of` in case the numbers are same
+      if (shown === count && shown > 0) {
+        shown = false;
+      } else {
+        shown = shown.toString();
+      }
+      this.options.attr('filter_shown', shown);
+      this.options.attr('filter_count', count.toString());
       this.element.parent().find('.sticky').Stickyfill();
     }.bind(this)));
     return finalDfd;
@@ -1118,11 +1128,6 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     }
     res = $.when.apply($, drawItemsDfds);
     res.then(function () {
-      var shown = drawItemsDfds.length;
-      var count = optionsList.length;
-
-      this.options.attr('filter_shown', shown === count ? 0 : shown);
-      this.options.attr('filter_count', count);
       setTimeout(this.draw_visible.bind(this), 0);
     }.bind(this));
     return res;
