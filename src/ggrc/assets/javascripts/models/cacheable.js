@@ -5,101 +5,107 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-//= require can.jquery-all
+// = require can.jquery-all
 
-(function(can) {
-
-var makeFindRelated = function(thistype, othertype) {
-  return function(params) {
-    if(!params[thistype + "_type"]) {
-      params[thistype + "_type"] = this.shortName;
-    }
-    return CMS.Models.Relationship.findAll(params).then(function(relationships) {
-      var dfds = [], things = new can.Model.List();
-      can.each(relationships, function(rel,idx) {
-        var dfd;
-        if(rel[othertype].selfLink) {
-          things.push(rel[othertype]);
-        } else {
-          dfd = rel[othertype].refresh().then(function(dest) {
-            things.splice(idx, 1, dest);
+(function (can) {
+  var makeFindRelated = function (thistype, othertype) {
+    return function (params) {
+      if (!params[thistype + '_type']) {
+        params[thistype + '_type'] = this.shortName;
+      }
+      return CMS.Models.Relationship.findAll(params).then(
+        function (relationships) {
+          var dfds = [];
+          var things = new can.Model.List();
+          can.each(relationships, function (rel, idx) {
+            var dfd;
+            if (rel[othertype].selfLink) {
+              things.push(rel[othertype]);
+            } else {
+              dfd = rel[othertype].refresh().then(function (dest) {
+                things.splice(idx, 1, dest);
+              });
+              dfds.push(dfd);
+              things.push(dfd);
+            }
           });
-          dfds.push(dfd);
-          things.push(dfd);
-        }
-      });
-      return $.when.apply($, dfds).then(function(){ return things; });
-    });
+          return $.when.apply($, dfds).then(function () {
+            return things;
+          });
+        });
+    };
   };
-};
 
-function dateConverter(d, oldValue, fn, key) {
-  var conversion = "YYYY-MM-DD\\THH:mm:ss\\Z";
-  var ret;
-  if(typeof d === "object" && d) {
-    d = d.getTime();
-  }
-  if(typeof d === "number") {
-    d /= 1000;
-    conversion = "X";
-  }
-  if(typeof d === "string" && ~d.indexOf("/")) {
-    conversion = "MM/DD/YYYY";
-  }
-  d = d ? d.toString() : null;
-  ret = moment(d, conversion);
-  if(!ret.unix()) {
-    // invalid date computed. Result of unix() is NaN.
-    return undefined;
-  }
-
-  if (typeof d === "string" && ret
-      //  Don't correct timezone for dates
-      && !/^\d+-\d+-\d+$/.test(d) && !/^\d+\/\d+\/\d+$/.test(d)
-      //  Don't correct timezone if `moment.js` has already done it
-      && !/[-+]\d\d:?\d\d/.test(d)) {
-    ret.subtract(new Date().getTimezoneOffset(), "minute");
-  }
-
-  if(oldValue && oldValue.getTime && ret && ret.toDate().getTime() === oldValue.getTime()) {
-    return oldValue;  // avoid changing to new Date object if the value is the same.
-  }
-  return ret ? ret.toDate() : undefined;
-}
-
-function makeDateUnpacker(keys) {
-  return function(d, oldValue, fn, attr) {
-    return can.reduce(keys, function(curr, key) {
-      return curr || (d[key] && dateConverter(d[key], oldValue, fn, attr));
-    }, null) || d;
-  };
-}
-
-function makeDateSerializer(type, key) {
-  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\THH:mm:ss\\Z";
-  return function(d) {
-    if(d == null) {
-      return "";
+  function dateConverter(date, oldValue, fn, key) {
+    var conversion = 'YYYY-MM-DD\\THH:mm:ss\\Z';
+    var ret;
+    if (typeof date === 'object' && date) {
+      date = date.getTime();
     }
-    if(typeof d !== "number") {
-      d = d.getTime();
+    if (typeof date === 'number') {
+      date /= 1000;
+      conversion = 'X';
     }
-    var retstr = moment((d / 1000).toString(), "X");
-    if(type !== "date") {
-      retstr = retstr.utc();
+    if (typeof date === 'string' && ~date.indexOf('/')) {
+      conversion = 'MM/DD/YYYY';
     }
-    retstr = retstr.format(conversion);
-    var retval;
-    if(key) {
-      retval = {};
-      retval[key] = retstr;
-    } else {
-      retval = retstr;
+    date = date ? date.toString() : null;
+    ret = moment(date, conversion);
+    if (!ret.unix()) {
+      // invalid date computed. Result of unix() is NaN.
+      return undefined;
     }
-    return retval;
-  };
-}
 
+    if (typeof date === 'string' && ret
+        //  Don't correct timezone for dates
+        && !/^\d+-\d+-\d+$/.test(date) && !/^\d+\/\d+\/\d+$/.test(date)
+        //  Don't correct timezone if `moment.js` has already done it
+        && !/[-+]\d\d:?\d\d/.test(date)) {
+      ret.subtract(new Date().getTimezoneOffset(), 'minute');
+    }
+
+    if (oldValue && oldValue.getTime
+        && ret && ret.toDate().getTime() === oldValue.getTime()) {
+      // avoid changing to new Date object if the value is the same.
+      return oldValue;
+    }
+    return ret ? ret.toDate() : undefined;
+  }
+
+  function makeDateUnpacker(keys) {
+    return function (date, oldValue, fn, attr) {
+      return can.reduce(keys, function (curr, key) {
+        return curr || (date[key] && dateConverter(
+            date[key], oldValue, fn, attr));
+      }, null) || date;
+    };
+  }
+
+  function makeDateSerializer(type, key) {
+    var conversion = type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD\\THH:mm:ss\\Z';
+    return function(date) {
+      var retstr;
+      var retval;
+      if (date === null) {
+        return '';
+      }
+      if (typeof date !== 'number') {
+        date = date.getTime();
+      }
+      retstr = moment((date / 1000).toString(), 'X');
+      if (type !== 'date') {
+        retstr = retstr.utc();
+      }
+      retstr = retstr.format(conversion);
+      if (key) {
+        retval = {};
+        retval[key] = retstr;
+      } else {
+        retval = retstr;
+      }
+      return retval;
+    };
+  }
 
 can.Model("can.Model.Cacheable", {
 
