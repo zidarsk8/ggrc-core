@@ -15,11 +15,13 @@
         return;
       }
 
-      auditDfd = this._create_relationship(instance,
-          instance.audit, instance.audit.context);
-      objectDfd = this._create_relationship(instance,
-          instance.object, instance.audit.context);
-      instance.delay_resolving_save_until($.when(auditDfd, objectDfd));
+      this._after_pending_joins(instance, function () {
+        auditDfd = this._create_relationship(instance,
+            instance.audit, instance.audit.context);
+        objectDfd = this._create_relationship(instance,
+            instance.object, instance.audit.context);
+        instance.delay_resolving_save_until($.when(auditDfd, objectDfd));
+      }.bind(this));
     },
     '{CMS.Models.Issue} created': function (model, ev, instance) {
       var auditDfd;
@@ -31,12 +33,15 @@
         return;
       }
 
-      auditDfd = this._create_relationship(instance, instance.audit);
-      controlDfd = this._create_relationship(instance, instance.control);
-      programDfd = this._create_relationship(instance, instance.program);
-      assessmentDfd = this._create_relationship(instance, instance.assessment);
-      instance.delay_resolving_save_until($.when(auditDfd, controlDfd,
-          programDfd, assessmentDfd));
+      this._after_pending_joins(instance, function () {
+        auditDfd = this._create_relationship(instance, instance.audit);
+        controlDfd = this._create_relationship(instance, instance.control);
+        programDfd = this._create_relationship(instance, instance.program);
+        assessmentDfd = this._create_relationship(
+          instance, instance.assessment);
+        instance.delay_resolving_save_until($.when(auditDfd, controlDfd,
+            programDfd, assessmentDfd));
+      }.bind(this));
     },
     '{CMS.Models.Section} created': function (model, ev, instance) {
       var directiveDfd;
@@ -45,8 +50,10 @@
         return;
       }
 
-      directiveDfd = this._create_relationship(instance, instance.directive);
-      instance.delay_resolving_save_until($.when(directiveDfd));
+      this._after_pending_joins(instance, function () {
+        directiveDfd = this._create_relationship(instance, instance.directive);
+        instance.delay_resolving_save_until($.when(directiveDfd));
+      }.bind(this));
     },
     '{CMS.Models.UserRole} created': function (model, ev, instance) {
       var dfd;
@@ -79,6 +86,13 @@
         }).save();
       });
       instance.delay_resolving_save_until(dfd);
+    },
+    _after_pending_joins: function (instance, callback) {
+      var dfd = instance.attr('_pending_joins_dfd');
+      if (!dfd) {
+        dfd = new $.Deferred().resolve();
+      }
+      dfd.then(callback);
     },
     _create_relationship: function (source, destination, context) {
       if (!destination || !destination.id) {
