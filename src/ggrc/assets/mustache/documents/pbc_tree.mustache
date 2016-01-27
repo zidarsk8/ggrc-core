@@ -5,18 +5,16 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-  <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-    <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
-      <div class="row-fluid">
-        <div class="span8">
-
-          <div class="item-data">
-            <div class="tree-title-area">
-                <a href='{{schemed_url instance.link}}'>{{firstnonempty instance.title instance.link}}</a>
-            </div>
+<li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+    <div class="row-fluid">
+      <div class="span8">
+        <div class="item-data">
+          <div class="tree-title-area">
+            <a href='{{schemed_url instance.link}}'>{{firstnonempty instance.title instance.link}}</a>
           </div>
         </div>
       </div>
-
     </div>
-  </li>
+  </div>
+</li>
