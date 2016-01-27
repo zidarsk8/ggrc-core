@@ -209,6 +209,6 @@ form.import {
   padding: 30px;
 }
 
-.new-relevant-block:nth-child(even) {
+.new-relevant-block:nth-child(odd) {
   background: $lightGray;
 }
