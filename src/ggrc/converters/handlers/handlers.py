@@ -3,6 +3,9 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""Generic handlers for imports and exports.
+"""
+
 from dateutil.parser import parse
 from flask import current_app
 from sqlalchemy import and_
@@ -55,7 +58,8 @@ class ColumnHandler(object):
     self.dry_run = row_converter.block_converter.converter.dry_run
     self.new_objects = self.row_converter.block_converter.converter.new_objects
     self.unique = options.get("unique", False)
-    self.set_value()
+    if options.get("parse"):
+      self.set_value()
 
   def check_unique_consistency(self):
     """Returns true if no object exists with the same unique field."""
@@ -868,7 +872,8 @@ class RequestTypeColumnHandler(ColumnHandler):
     self.key = key
     valid_types = row_converter.object_class.VALID_TYPES
     self.type_mappings = {str(s).lower(): s for s in valid_types}
-    super(RequestTypeColumnHandler, self).__init__(row_converter, key, **options)
+    super(RequestTypeColumnHandler, self).__init__(
+        row_converter, key, **options)
 
   def parse_item(self):
     value = self.raw_value.lower()

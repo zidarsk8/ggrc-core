@@ -3,7 +3,8 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-""" This module is used for handling a single line from a csv file """
+"""This module is used for handling a single line from a csv file.
+"""
 
 from ggrc import db
 from ggrc.converters import errors
@@ -55,7 +56,8 @@ class RowConverter(object):
               self.is_delete:
         continue
       Handler = header_dict["handler"]
-      item = Handler(self, attr_name, raw_value=self.row[i], **header_dict)
+      item = Handler(self, attr_name, parse=True,
+                     raw_value=self.row[i], **header_dict)
       if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
         self.attrs[attr_name] = item
       else:

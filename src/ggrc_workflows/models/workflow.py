@@ -31,7 +31,6 @@ from ggrc.models.mixins import Titled
 from ggrc.models.mixins import deferred
 from ggrc.models.person import Person
 from ggrc_basic_permissions.models import UserRole
-from ggrc_gdrive_integration.models import object_folder
 from ggrc_workflows.models import cycle
 from ggrc_workflows.models import cycle_task_group_object_task as ctgot
 from ggrc_workflows.models import workflow_person
@@ -350,8 +349,3 @@ class WorkflowState(object):
         .undefer_group('CycleTaskGroupObject_complete'),
         orm.subqueryload_all('cycle_task_group_objects.cycle'),
     )
-
-
-# TODO: This makes the Workflow module dependant on Gdrive. It is not pretty.
-Workflow.__bases__ = (object_folder.Folderable,) + Workflow.__bases__
-Workflow.late_init_folderable()
