@@ -13,26 +13,29 @@
       // Make sure custom_attribute_definitions & custom_attribute_values
       // get loaded
       load: '@',
-      loading: false
+      loading: false,
+      refreshAttributes: function () {
+        this.attr('loading', true);
+        $.when(
+          this.instance.load_custom_attribute_definitions(),
+          this.instance.refresh_all('custom_attribute_values')
+        ).always(function () {
+          this.attr('loading', false);
+        }.bind(this));
+      }
     },
     content: '<content/>',
     events: {
+      '{scope.instance} updated': function () {
+        this.scope.refreshAttributes();
+      }
     },
     init: function () {
-      var instance = this.scope.instance;
-      var scope = this.scope;
-
-      if (!instance.class.is_custom_attributable) {
+      if (!this.scope.instance.class.is_custom_attributable) {
         return;
       }
       if (this.scope.load) {
-        scope.attr('loading', true);
-        $.when(
-          instance.load_custom_attribute_definitions(),
-          instance.refresh_all('custom_attribute_values')
-        ).always(function () {
-          scope.attr('loading', false);
-        });
+        this.scope.refreshAttributes();
       }
     },
     helpers: {
