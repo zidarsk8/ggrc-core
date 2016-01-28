@@ -416,3 +416,29 @@ ul.new-tree {
   color:$error;
   font-weight:normal;
 }
+
+.repeated-block {
+  padding: 20px 30px;
+  h6 {
+    padding-bottom: 6px;
+  }
+  &:nth-child(odd) {
+    background: $lightGray;
+  }
+}
+
+.options-wrap {
+  display: none;
+}
+
+.hideable-holder {
+  .field-hide {
+    display: block;
+    float: right;
+    color: $warmGray;
+    font-size: 12px;
+    text-decoration: underline;
+    text-transform: none;
+    font-weight: normal;
+  }
+}

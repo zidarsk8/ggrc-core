@@ -99,8 +99,20 @@
       },
       ".add-object-trigger click": function (el, ev) {
         ev.preventDefault();
-        this.element.find('.new-relevant-block').last().clone()
+        this.element.find('.repeated-block').last().clone()
         .appendTo('.relevant-block-wrap');
+      },
+      ".type-select change": function (el, ev) {
+        var isOptions = el.val() === 'menu' || el.val() === 'checkbox',
+            isText = el.val() === 'text';
+
+        if (isOptions) {
+          this.element.find('.text-wrap').hide();
+          this.element.find('.options-wrap').show();
+        } else if (isText) {
+          this.element.find('.text-wrap').show();
+          this.element.find('.options-wrap').hide();
+        }
       }
   });
 

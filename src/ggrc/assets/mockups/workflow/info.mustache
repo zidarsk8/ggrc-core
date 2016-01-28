@@ -7,145 +7,130 @@
 
 {{#instance}}
 <section class="content">
-  <div class="basic-info">
-    <div class="info">
-      <div class="choose-object-wrap bottom-space">
-        <div class="row-fluid">
-          <div class="span12">
-            <div class="report-title">
-              <h2 class="title">
-                Workflow Setup
-              </h2>
+  <div class="hideable-holder">
+    <div class="basic-info">
+      <div class="info">
+        <div class="choose-object-wrap">
+          <div class="row-fluid wrap-row">
+            <div class="span8 hidable">
+              <h6>
+                Workflow title
+                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              </h6>
+              <input type="text" class="span12">
             </div>
-          </div>
-        </div>
-
-        <div class="row-fluid">
-          <div class="span8">
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                <h6>Workflow title</h6>
-                <input type="text" class="span10">
-              </div>
-            </div>
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                <h6>Description</h6>
-                <div class="wysiwyg-area">
-                  <textarea rows="4" class="span10 triple wysihtml5" placeholder="Enter description"></textarea>
+            <div class="span4">
+              <div class="row-fluid">
+                <div class="span12">
+                  <h6>People</h6>
+                  {{> /static/mustache/mockup_base_templates/info_panel/people_list.mustache}}
                 </div>
               </div>
             </div>
           </div>
-
-          <div class="span4">
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                {{> /static/mustache/mockup_base_templates/info_panel/people_list.mustache}}
+          <div class="row-fluid wrap-row">
+            <div class="span8 hidable">
+              <h6>
+                Description
+                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              </h6>
+              <div class="wysiwyg-area">
+                <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
               </div>
             </div>
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                <h6>Frequency</h6>
-                <div class="side-content">
-                  <select>
-                    <option>One time</option>
-                    <option>Weekly</option>
-                    <option>Monthly</option>
-                    <option>Quarterly</option>
-                    <option>Annually</option>
-                  </select>
-                </div>
+            <div class="span4">
+              <h6>Frequency</h6>
+              <div class="side-content">
+                <select>
+                  <option>One time</option>
+                  <option>Weekly</option>
+                  <option>Monthly</option>
+                  <option>Quarterly</option>
+                  <option>Annually</option>
+                </select>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="relevant-filter-group">
-    <div class="relevant-block-wrap">
-      <div class="new-relevant-block">
-        <div class="row-fluid">
-          <div class="span8">
-            <div class="row-fluid">
-              <div class="span8">
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    <h6>Task title</h6>
-                    <input type="text" class="span9">
+    <div class="relevant-filter-group">
+      <div class="relevant-block-wrap">
+        <div class="repeated-block">
+          <div class="row-fluid">
+            <div class="span8">
+              <div class="row-fluid wrap-row">
+                <div class="span9">
+                  <h6>Task title</h6>
+                  <input type="text" class="span12">
+                </div>
+                <div class="span3">
+                  <h6>Start Date</h6>
+                  <input type="text" class="span12">
+                </div>
+              </div>
+
+              <div class="row-fluid wrap-row">
+                <div class="span9">
+                  <h6>Task description</h6>
+                  <div class="wysiwyg-area">
+                    <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
                   </div>
                 </div>
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    <h6>Task description</h6>
-                    <div class="wysiwyg-area">
-                      <textarea rows="4" class="span9 triple wysihtml5" placeholder="Enter description"></textarea>
-                    </div>
-                  </div>
+                <div class="span3">
+                  <h6>End Date</h6>
+                  <input type="text" class="span12">
                 </div>
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    <h6>Task group</h6>
-                    <input type="text" class="span9">
-                  </div>
-                </div>
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
+              </div>
+
+              <div class="row-fluid wrap-row">
+                <div class="span9">
+                  <div class="wrap-row">
                     <h6>Task type</h6>
-                    <select>
+                    <select class="type-select">
                       <option value="text">Rich text</option>
                       <option value="menu">Dropdown</option>
                       <option value="checkbox">Checkboxes</option>
                     </select>
+                  </div>
 
+                  <div class="wrap-row text-wrap">
                     <h6>Task Notes</h6>
-                    <textarea rows="4" class="span9 triple wysihtml5" placeholder="Enter description"></textarea>
+                    <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
+                  </div>
 
+                  <div class="wrap-row options-wrap">
                     <h6>Selection Response Options (Comma Separated)</h6>
                     <textarea id="tgt_response_options" class="span12 double" name="response_options_csv" placeholder="Enter Description" tabindex="2"></textarea>
+                  </div>
+                </div>
+                <div class="span3">
+                  <h6>Task group</h6>
+                  <input type="text" class="span12">
+                </div>
+              </div>
 
-                  </div>
-                </div>
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    {{> /static/mustache/mockup_base_templates/info_panel/mapped_objects.mustache}}
-                  </div>
+              <div class="row-fluid">
+                <div class="span12">
+                  {{> /static/mustache/mockup_base_templates/info_panel/mapped_objects.mustache}}
                 </div>
               </div>
-              <div class="span4">
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    <h6>Start Date</h6>
-                    <input type="text" class="span9">
-                  </div>
-                </div>
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    <h6>End Date</h6>
-                    <input type="text" class="span9">
-                  </div>
-                </div>
-              </div>
+
             </div>
-          </div>
-
-          <div class="span4">
-            <div class="row-fluid wrap-row">
-              <div class="span12">
-                {{> /static/mustache/mockup_base_templates/info_panel/task_people_list.mustache}}
-              </div>
+            <div class="span4">
+              <h6>People</h6>
+              {{> /static/mustache/mockup_base_templates/info_panel/task_people_list.mustache}}
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="add-rule add-object">
-      <a href="#" class="add-object-trigger btn btn-small btn-info">Add another task</a>
-    </div>
+      <div class="add-rule add-object">
+        <a href="#" class="add-object-trigger btn btn-small btn-info">Add another task</a>
+      </div>
 
+    </div>
   </div>
 
   <div class="info">
