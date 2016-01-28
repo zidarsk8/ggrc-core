@@ -4,8 +4,7 @@
 # Maintained By: urban@reciprocitylabs.com
 
 
-"""Tests for workflow specific imports.
-"""
+"""Tests for workflow specific imports."""
 
 from datetime import date
 from os.path import abspath
@@ -25,8 +24,7 @@ THIS_ABS_PATH = abspath(dirname(__file__))
 
 
 class TestWorkflowObjectsImport(TestCase):
-  """Test imports for basic workflow objects.
-  """
+  """Test imports for basic workflow objects."""
 
   CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
 
@@ -35,8 +33,7 @@ class TestWorkflowObjectsImport(TestCase):
     self.client.get("/login")
 
   def test_full_good_import(self):
-    """Test full good import without any warnings.
-    """
+    """Test full good import without any warnings."""
     filename = "workflow_small_sheet.csv"
     response = self.import_file(filename)
 
@@ -100,8 +97,7 @@ class TestWorkflowObjectsImport(TestCase):
         ["task-5", "annually", ((5, 7), (7, 15))],
     ]
 
-    for task in tasks:
-      slug, freq, result = task
+    for slug, freq, result in tasks:
       task = db.session.query(TaskGroupTask).filter(
           TaskGroupTask.slug == slug).one()
       getter = getters[freq]
@@ -181,13 +177,13 @@ class TestWorkflowObjectsImport(TestCase):
       self._test_task_types(task_type, slugs)
 
   def _test_task_types(self, expected_type, task_slugs):
-    """Test that all listed task have rich text type.
+    """Test that all listed tasks have rich text type.
 
     This is a part of the test_import_task_date_format
 
     Args:
-      task_slugs: list of slugs for the tasks that will be tested.
       expected_type: Expected task type for all tasks specified by task_slugs.
+      task_slugs: list of slugs for the tasks that will be tested.
 
     Raises:
       AssertionError: if any of the tasks does not exists or if their type is
@@ -199,7 +195,7 @@ class TestWorkflowObjectsImport(TestCase):
       self.assertEqual(
           task.task_type,
           expected_type,
-          "task '{}' has tye '{}', expected '{}'".format(
+          "task '{}' has type '{}', expected '{}'".format(
               task.slug,
               task.task_type,
               expected_type,

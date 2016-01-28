@@ -58,7 +58,7 @@ class ColumnHandler(object):
     self.dry_run = row_converter.block_converter.converter.dry_run
     self.new_objects = self.row_converter.block_converter.converter.new_objects
     self.unique = options.get("unique", False)
-    if options.get("parse", False):
+    if options.get("parse"):
       self.set_value()
 
   def check_unique_consistency(self):
