@@ -414,8 +414,8 @@ class Slugged(Base):
   _aliases = {
       "slug": {
           "display_name": "Code",
-          "description": ("Must be unique. Can be left empty for"
-                          "autogeneration. If updating or deleting,"
+          "description": ("Must be unique. Can be left empty for "
+                          "autogeneration. If updating or deleting, "
                           "code is required"),
       }
   }
