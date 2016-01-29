@@ -863,22 +863,28 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if (this.options.disable_lazy_loading || this.element === null) {
       return;
     }
-    var MAX_STEPS = 100,
-        el_position = this.el_position.bind(this),
-        children = this.element.children(),
-        lo = 0,
-        hi = children.length - 1,
-        max = hi,
-        steps = 0,
-        visible = [],
-        already_visible = _.filter(this.element[0].children, function(e) {
-          // doing this manualy is 10x faster than a jQuery selector and performance
-          // here matters since it runs on every scroll event on a potentialy long
-          // list of items
-          return e.tagName == "LI";
-        }),
-        to_render = [],
-        i, control, index, page_count, mid, el, pos;
+    var MAX_STEPS = 100;
+    var el_position = this.el_position.bind(this);
+    var children = this.element.children();
+    var lo = 0;
+    var hi = children.length - 1;
+    var max = hi;
+    var steps = 0;
+    var visible = [];
+    var already_visible = _.filter(this.element[0].children, function (e) {
+      // doing this manualy is 10x faster than a jQuery selector and performance
+      // here matters since it runs on every scroll event on a potentialy long
+      // list of items
+      return e.tagName == "LI";
+    });
+    var to_render = [];
+    var i;
+    var control;
+    var index;
+    var page_count;
+    var mid;
+    var el;
+    var pos;
 
     while (steps < MAX_STEPS && lo < hi) {
       steps += 1;
@@ -936,14 +942,14 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
         return;
       }
       to_render[0].draw_node();
-      setTimeout(function() {
+      setTimeout(function () {
         render_step(to_render.slice(1));
       }, 0);
     }
     if (this._has_completed_render_loop) {
       render_step(to_render);
     } else {
-      _.each(to_render, function(control) {
+      _.each(to_render, function (control) {
         control.draw_node();
       });
       this._has_completed_render_loop = true;
@@ -1476,12 +1482,13 @@ can.Control("CMS.Controllers.TreeViewNode", {
     }
     this._draw_node_in_progress = true;
     this.add_child_lists_to_child();
-    can.view(this.options.show_view, this.options, this._ifNotRemoved(function(frag) {
+    can.view(this.options.show_view, this.options, this._ifNotRemoved(function (frag) {
       this.replace_element(frag);
       this._draw_node_deferred.resolve();
     }.bind(this)));
     this._draw_node_in_progress = false;
-    this.options.attr('is_subtree', this.element && this.element.closest('.inner-tree').length > 0);
+    this.options.attr('is_subtree',
+        this.element && this.element.closest('.inner-tree').length > 0);
   }
   , draw_placeholder: function() {
       var that = this;
