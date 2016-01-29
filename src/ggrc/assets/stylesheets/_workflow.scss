@@ -423,7 +423,7 @@ ul.new-tree {
     padding-bottom: 6px;
   }
   &:nth-child(odd) {
-    background: $lightGray;
+    background: lighten($lightGray, 3%);
   }
 }
 
@@ -440,5 +440,20 @@ ul.new-tree {
     text-decoration: underline;
     text-transform: none;
     font-weight: normal;
+  }
+  .row-fluid {
+    [class*="span"] {
+      margin-right: 2.127659574468085%;
+      *margin-right: 2.074468085106383%;
+      margin-left: 0;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+  [class*="span"] {
+    &.hidden {
+      display: none;
+    }
   }
 }

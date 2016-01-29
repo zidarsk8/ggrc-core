@@ -113,6 +113,68 @@
           this.element.find('.text-wrap').show();
           this.element.find('.options-wrap').hide();
         }
+      },
+      "a.field-hide click" : function(el, ev) { //field hide
+        var $el = $(el),
+          $hidable = $el.closest('[class*="span"].hidable'),
+          $showButton = $(this.element).find('#formRestore'),
+          $hideButton = $(this.element).find('#formHide');
+
+        $hidable.addClass("hidden");
+        this.options.reset_visible = true;
+        var ui_unit = $hidable.find('[tabindex]');
+        var i, tab_value;
+        for (i = 0; i < ui_unit.length; i++) {
+          tab_value = $(ui_unit[i]).attr('tabindex');
+          if(tab_value > 0) {
+            this.options.ui_array[tab_value-1] = 1;
+            $(ui_unit[i]).attr('tabindex', '-1');
+            $(ui_unit[i]).attr('uiindex', tab_value);
+          }
+        }
+
+        $hideButton.hide();
+        $showButton.show();
+        return false;
+      },
+      "#formHide click" : function(el, ev) {
+        var i,
+            $showButton = this.element.find("#formRestore"),
+            $hidables = this.element.find(".hidable"),
+            hidden_elements = $hidables.find("[tabindex]");
+
+        this.options.reset_visible = true;
+
+        $hidables.addClass("hidden");
+
+        el.hide();
+        $showButton.show();
+        return false;
+      },
+
+      "#formRestore click" : function(el, ev) {
+        //Update UI status array to initial state
+        var i,
+            $form = this.element.find("form"),
+            $body = $form.closest(".modal-body"),
+            uiElements = $body.find("[uiindex]")
+            $hideButton = this.element.find("#formHide");
+
+        //Set up the correct tab index for tabbing
+        //Get all the ui elements with 'uiindex' set to original tabindex
+        //Restore the original tab index
+
+        for (i = 0; i < uiElements.length; i++) {
+          var $el = $(uiElements[i]);
+          var tab_val = $el.attr("uiindex");
+          $el.attr("tabindex", tab_val);
+        }
+
+        this.options.reset_visible = false;
+        this.element.find(".hidden").removeClass("hidden");
+        el.hide();
+        $hideButton.show();
+        return false;
       }
   });
 
