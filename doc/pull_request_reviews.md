@@ -22,10 +22,9 @@ you are not sure, just run them all._
 
     ```console
     cd to/your/ggrc/clone
-    git stash
-    git checkout develop
+    git stash  # make sure you don't have any local changes
     git fetch <remote_main>
-    git rebase <remote_main>/develop
+    git checkout <remote_main>/develop
     ```
 
     Here `<remote_main>` stands for the name of the _remote_ representing the
@@ -34,8 +33,8 @@ you are not sure, just run them all._
 
 1. Test should be done on the merged branch:
 
-    _NOTE: The merge must be a fast-forward, since all pull requests are merged
-    with the `--no-ff` flag._
+    _NOTE: The merge must **not** be a fast-forward, since all pull requests
+    are merged with the `--no-ff` flag._
 
     ```console
     git checkout -b temp_branch
@@ -156,7 +155,7 @@ file (e.g. the one located in your home directory):
   }; f"
 ```
 
-_NOTE: The alias assumes that the _remote_ representing the main development
+_NOTE: The alias assumes that the remote representing the main development
 repository is referred to as `upstream`. This is a common convention, but if
 your local configuration uses a different name, you must replace the two
 appearances of the word `upstream` in the alias with that name._
@@ -247,7 +246,7 @@ might mislead somebody to a false conclusion.
 
 #### Merging pull requests
 
-A pull request can be merged if all of the following is true:
+A pull request can be merged only if **all** of the following is true:
 
 * _You_ have gone through all the verification steps and concluded that
   everything works as expected (other people's approvals by themselves
@@ -256,6 +255,8 @@ A pull request can be merged if all of the following is true:
 * The pull request does not contain **any of your commits**. You are not
   allowed to merge your own work, including the pull requests that you have at
   least partially contributed to.
+* The pull request is **not** labeled with the `needs work` or the `question`
+  label, meaning that all open questions and issues have been resolved.
 
 #### Using GitHub labels
 
@@ -271,17 +272,19 @@ alphabetically):
   schema. Such pull requests require additional setup and verification steps,
 * `needs work` - a reviewer has concluded that the PR requires additional work
   before it can be accepted and merged,
-* `next release` - the PR will be merged after the next release and should not
-  be merged in the current release cycle,
+* `next release` - the PR will be merged after the current release has branched
+  off of the main development branch, and should not be merged just yet,
 * `please review` - the author asked that the PR should be reviewed with a
   higher pripority. This label is usually used when the PR has not received
   enough attention for a considerable time period, or because it is important
   and attempts to resolve an important/blocking issue,
-* `question` - a reviewer requires additional explanation from the PR author
-  before a decision can be made on whether the PR meets all the requirements.
-  Occasionally, this label is also used when a reviewer makes a non-essential
-  suggestion for a PR change, but that change is not required to deem the PR
-  ready to merge,
+* `question` - the PR author seeks advice/feedback on some code feature and/or
+  design decision. It can also be used by a reviewer to ask the PR author for
+  additional explanation before a decision can be made on whether the PR meets
+  all the requirements.
+  On top of that, this label is occasionally used when a reviewer makes a
+  non-essential suggestion for a PR change, but that change is not required to
+  deem the PR ready to merge,
 * `wrong branch` - the author sent the PR to the wrong branch. The author
   should re-issue the same PR against the correct branch.
 
