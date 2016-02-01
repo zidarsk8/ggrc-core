@@ -6,416 +6,203 @@
 }}
 
 {{#instance}}
-<section class="content">
-  <div class="hideable-holder">
-    <div class="basic-info">
-      <div class="info">
+  <section class="content">
+    <div class="hideable-holder">
+      <div class="basic-info">
+        <div class="info">
 
-        <div class="row-fluid">
-          <div class="span12">
-            <div class="pull-right reset-form">
-              <p>
-                <small><em>Fields are only temporarily hidden</em></small>
-                <a id="formHide" tabindex="36" class="btn btn-small btn-draft" href="javascript://">Hide all optional fields</a>
-                <a id="formRestore" tabindex="36" class="btn btn-small btn-draft" href="javascript://" style="display:none;">Show all optional fields</a>
-
-                <!--
-                <a href="#" class="btn btn-small btn-draft dropdown-toggle tview-dropdown-toggle"
-                tabindex="36" data-toggle="dropdown">Selectively show/hide fields</a>
-                <div class="dropdown-menu dropdown-menu-form">
-                  <a class="pull-right close-dropdown"><i class="fa fa-times black"></i></a>
-                  <h5>Selectively show or hide all optional fields</h5>
-                  <ul class="attr-list">
-                    <li class="disabled">
-                      <label class="checkbox-inline">
-                        <input type="checkbox"
-                          {{#if display_status}}checked="checked"{{/if}}
-                          {{#if mandatory}}disabled{{/if_equals}}
-                          value="{{attr_name}}"
-                          class="notify-wrap attr-checkbox {{#if mandatory}}mandatory{{/if_equals}}">
-                        Workflow Title
-                      </label>
-                    </li>
-                    <li>
-                      <label class="checkbox-inline">
-                        <input type="checkbox"
-                          {{#if display_status}}checked="checked"{{/if}}
-                          {{#if mandatory}}disabled{{/if_equals}}
-                          value="{{attr_name}}"
-                          class="notify-wrap attr-checkbox {{#if mandatory}}mandatory{{/if_equals}}">
-                        Workflow Description
-                      </label>
-                    </li>
-                  </ul>
-                  <a class="btn btn-small btn-info set-tree-attrs" href="javascript://">Set fields</a>
-                </div>
-                -->
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="choose-object-wrap">
-          <div class="row-fluid wrap-row">
-            <div class="span8 hidable">
-              <h6>
-                Workflow title
-                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-              </h6>
-              <input type="text" class="span12">
-            </div>
-            <div class="span4">
-              <div class="row-fluid">
-                <div class="span12">
-                  <h6>People</h6>
-                  {{> /static/mustache/mockup_base_templates/info_panel/people_list.mustache}}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row-fluid wrap-row">
-            <div class="span8 hidable">
-              <h6>
-                Description
-                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-              </h6>
-              <div class="wysiwyg-area">
-                <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
-              </div>
-            </div>
-            <div class="span4">
-              <h6>Frequency</h6>
-              <div class="side-content">
-                <select>
-                  <option>One time</option>
-                  <option>Weekly</option>
-                  <option>Monthly</option>
-                  <option>Quarterly</option>
-                  <option>Annually</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="relevant-filter-group">
-      <div class="relevant-block-wrap">
-        <div class="repeated-block">
           <div class="row-fluid">
-            <div class="span8">
-              <div class="row-fluid wrap-row">
-                <div class="span9">
-                  <h6>Task title</h6>
-                  <input type="text" class="span12">
-                </div>
-                <div class="span3 hidable">
-                  <h6>
-                    Start Date
-                    <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-                  </h6>
-                  <input type="text" class="span12">
-                </div>
-              </div>
+            <div class="span12">
+              <div class="pull-right reset-form">
+                <p>
+                  <small><em>Fields are only temporarily hidden</em></small>
+                  <a id="formHide" tabindex="36" class="btn btn-small btn-draft" href="javascript://" style="display:none;">Hide all optional fields</a>
+                  <a id="formRestore" tabindex="36" class="btn btn-small btn-draft" href="javascript://">Show all optional fields</a>
 
-              <div class="row-fluid wrap-row">
-                <div class="span9 hidable">
-                  <h6>
-                    Task description
-                    <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-                  </h6>
-                  <div class="wysiwyg-area">
-                    <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
-                  </div>
-                </div>
-                <div class="span3 hidable">
-                  <h6>
-                    End Date
-                    <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-                  </h6>
-                  <input type="text" class="span12">
-                </div>
-              </div>
-
-              <div class="row-fluid wrap-row">
-                <div class="span9">
-                  <div class="wrap-row">
-                    <h6>Task type</h6>
-                    <select class="type-select">
-                      <option value="text">Rich text</option>
-                      <option value="menu">Dropdown</option>
-                      <option value="checkbox">Checkboxes</option>
-                    </select>
-                  </div>
-
-                  <div class="wrap-row text-wrap">
-                    <h6>Task Notes</h6>
-                    <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
-                  </div>
-
-                  <div class="wrap-row options-wrap">
-                    <h6>Selection Response Options (Comma Separated)</h6>
-                    <textarea id="tgt_response_options" class="span12 double" name="response_options_csv" placeholder="Enter Description" tabindex="2"></textarea>
-                  </div>
-                </div>
-                <div class="span3 hidable">
-                  <h6>
-                    Task group
-                    <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-                  </h6>
-                  <input type="text" class="span12">
-                </div>
-              </div>
-
-              <div class="row-fluid">
-                <div class="span12">
-                  {{> /static/mustache/mockup_base_templates/info_panel/mapped_objects.mustache}}
-                </div>
-              </div>
-
-            </div>
-            <div class="span4">
-              <h6>People</h6>
-              {{> /static/mustache/mockup_base_templates/info_panel/task_people_list.mustache}}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="add-rule add-object">
-        <a href="#" class="add-object-trigger btn btn-small btn-info">Add another task</a>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="info">
-    <div class="save-template-wrap">
-      <div class="pull-right">
-        <button type="submit" class="btn btn-draft btn-small">
-          Save draft
-        </button>
-        <button type="submit" class="btn btn-success btn-small">
-          Activate
-        </button>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-  <!--<section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
-    {{#is_info_pin}}
-      <div class="details-wrap pin">
-        <ul class="pin-action">
-          <li>
-            <a href="javascript://" data-size="deselect" class="close-pane"><i class="fa fa-times black" rel="tooltip" data-placement="left" title="Close info pane"></i></a>
-          </li>
-          <li>
-            <a href="javascript://" data-size="max" class="max"><i class="grcicon-maximize" rel="tooltip" data-placement="left" title="Maximize height"></i></a>
-          </li>
-          <li>
-            <a href="javascript://" data-size="normal" class="normal"><i class="grcicon-default" style="opacity:1.0" rel="tooltip" data-placement="left" title="Default height"></i></a>
-          </li>
-          <li>
-            <a href="javascript://" data-size="min" class="min"><i class="grcicon-minimize" rel="tooltip" data-placement="left" title="Minimize height"></i></a>
-          </li>
-        </ul>
-      </div>
-    {{/is_info_pin}}
-
-    <div class="pane-header">
-      <div class="row-fluid wrap-row">
-        <div class="span9">
-          <h6>Title</h6>
-          <h3>{{info_title}}</h3>
-          {{#state}}
-            <span class="state-value state-{{class_name}}">{{title}}</span>
-          {{/state}}
-        </div>
-        <div class="span3">
-          <div class="info-pane-utility">
-
-            <div class="details-wrap">
-              <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
-                <span class="bubble"></span>
-                <span class="bubble"></span>
-                <span class="bubble"></span>
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-                <li>
-                  <a href="#AssessmentDefineTemplate" data-toggle="modal">
-                    <i class="grcicon-add-black"></i>
-                    Define Assessment template
-                  </a>
-                </li>
-                {{#is_allowed 'update' instance context='for'}}
-                  {{> /static/mustache/base_objects/edit_object_link.mustache}}
-                {{/is_allowed}}
-                <li>
-                  <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_url}}" />
-                </li>
-
-                {{#is_info_pin}}
-                  {{#is_allowed_to_map page_instance instance}}
-                    {{^options.is_in_selector}}
-                      {{> /static/mustache/base_objects/unmap.mustache}}
-
-                    {{/options}}
-                  {{/is_allowed_to_map}}
-                  {{#if instance.viewLink}}
-                    {{#is_allowed "view_object_page" instance}}
-                      <li>
-                        <a href="{{instance.viewLink}}">
-                          <i class="grcicon-goto"></i>
-                          View {{instance.class.title_singular}}
-                        </a>
+                  <!--
+                  <a href="#" class="btn btn-small btn-draft dropdown-toggle tview-dropdown-toggle"
+                  tabindex="36" data-toggle="dropdown">Selectively show/hide fields</a>
+                  <div class="dropdown-menu dropdown-menu-form">
+                    <a class="pull-right close-dropdown"><i class="fa fa-times black"></i></a>
+                    <h5>Selectively show or hide all optional fields</h5>
+                    <ul class="attr-list">
+                      <li class="disabled">
+                        <label class="checkbox-inline">
+                          <input type="checkbox"
+                            {{#if display_status}}checked="checked"{{/if}}
+                            {{#if mandatory}}disabled{{/if_equals}}
+                            value="{{attr_name}}"
+                            class="notify-wrap attr-checkbox {{#if mandatory}}mandatory{{/if_equals}}">
+                          Workflow Title
+                        </label>
                       </li>
-                    {{/is_allowed}}
-                  {{/if}}
-                {{/is_info_pin}}
-
-                {{#is_allowed 'delete' instance}}
-                  <li>
-                    <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                      <i class="grcicon-deleted"></i>
-                      Delete
-                    </a>
-                  </li>
-                {{/is_allowed}}
-
-              </ul>
-            </div>
-
-            <a href="javascript://" class="btn btn-small btn-primary pull-right">Complete</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="tier-content">
-      <div class="row-fluid">
-        <div class="span8">
-
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Description</h6>
-              <div class="rtf-block">
-                {{description}}
-              </div>
-            </div>
-          </div>
-
-          <div class="row-fluid wrap-row">
-            <div class="span6">
-              <h6>Audit Firm</h6>
-              None
-            </div>
-            <div class="span6">
-              <h6>URL</h6>
-              <a href="javascript://">http://google.com/</a>
-            </div>
-          </div>
-
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Code</h6>
-              AUDIT-1176
-            </div>
-          </div>
-
-          <div class="row-fluid wrap-row">
-            <div class="span12 small-info ">
-              <label class="multi-type-label">
-                Audit Folder <label style="display: inline"><i class="grcicon-help-black" rel="tooltip" data-original-title="If selected, all Audit attachments go here."></i></label>
-              </label>
-
-              <span class="error">
-                No folder for this Audit.
-              </span>
-              <a href="javascript://" tabindex="" class="entry-attachment tree-item-add" data-toggle="gdrive-picker" data-model="Audit" data-type="folders" data-id="1176">
-                <i class="grcicon-attach-color"></i> Assign folder
-              </a>
-
-            </div>
-          </div>
-
-        </div>
-
-        <div class="span4">
-
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>People</h6>
-              <div class="side-content">
-                <ul class="label-list">
-                  {{#each people}}
-                  <li>
-                    <label>
-                      <span class="person-label {{@key}}"></span>
-                      {{@key}}
-                    </label>
-                    <ul>
-                      {{#each .}}
-                        <li>
-                          <span class="file-controls">
-                            <a href="javascript://"><i class="grcicon-deleted"></i></a>
-                            <a href="javascript://"><i class="grcicon-edit"></i></a>
-                          </span>
-                          <a href="javascript://">{{name}}</a>
-                        </li>
-                      {{/each}}
+                      <li>
+                        <label class="checkbox-inline">
+                          <input type="checkbox"
+                            {{#if display_status}}checked="checked"{{/if}}
+                            {{#if mandatory}}disabled{{/if_equals}}
+                            value="{{attr_name}}"
+                            class="notify-wrap attr-checkbox {{#if mandatory}}mandatory{{/if_equals}}">
+                          Workflow Description
+                        </label>
+                      </li>
                     </ul>
-                  </li>
-                  {{/each}}
-                </ul>
+                    <a class="btn btn-small btn-info set-tree-attrs" href="javascript://">Set fields</a>
+                  </div>
+                  -->
+                </p>
               </div>
             </div>
           </div>
 
-          <div class="row-fluid wrap-row">
-            <div class="span12">
-              <h6>Planned Dates</h6>
-              <div class="side-content">
-                <ul class="label-list dates">
-                  <li class="gray">
-                    <label>
-                      start
-                    </label>
-                    10/09/2015
-                  </li>
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-edit"></i></a>
-                    </span>
-                    <label>
-                      end
-                    </label>
-                    11/30/2016
-                  </li>
-                  <li>
-                    <span class="file-controls">
-                      <a href="javascript://"><i class="grcicon-edit"></i></a>
-                    </span>
-                    <label>
-                      report period
-                    </label>
-                    01/01/2016 - 04/30/2016
-                  </li>
-                </ul>
+          <div class="choose-object-wrap">
+            <div class="row-fluid wrap-row">
+              <div class="span8 hidable">
+                <h6>
+                  Workflow title
+                  <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                </h6>
+                <input type="text" class="span12">
+              </div>
+              <div class="span4">
+                <div class="row-fluid">
+                  <div class="span12">
+                    <h6>People</h6>
+                    {{> /static/mustache/mockup_base_templates/info_panel/people_list.mustache}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row-fluid wrap-row">
+              <div class="span8 hidable hidden">
+                <h6>
+                  Description
+                  <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                </h6>
+                <div class="wysiwyg-area">
+                  <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
+                </div>
+              </div>
+              <div class="span4">
+                <h6>Frequency</h6>
+                <div class="side-content">
+                  <select>
+                    <option>One time</option>
+                    <option>Weekly</option>
+                    <option>Monthly</option>
+                    <option>Quarterly</option>
+                    <option>Annually</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
+      <div class="relevant-filter-group">
+        <div class="relevant-block-wrap">
+          <div class="repeated-block">
+            <div class="row-fluid">
+              <div class="span8">
+                <div class="row-fluid wrap-row">
+                  <div class="span9">
+                    <h6>Task title</h6>
+                    <input type="text" class="span12">
+                  </div>
+                  <div class="span3 hidable">
+                    <h6>
+                      Start Date
+                      <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                    </h6>
+                    <input type="text" class="span12">
+                  </div>
+                </div>
+
+                <div class="row-fluid wrap-row">
+                  <div class="span9 hidable hidden">
+                    <h6>
+                      Task description
+                      <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                    </h6>
+                    <div class="wysiwyg-area">
+                      <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
+                    </div>
+                  </div>
+                  <div class="span3 hidable">
+                    <h6>
+                      End Date
+                      <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                    </h6>
+                    <input type="text" class="span12">
+                  </div>
+                </div>
+
+                <div class="row-fluid wrap-row">
+                  <div class="span9">
+                    <div class="wrap-row">
+                      <h6>Task type</h6>
+                      <select class="type-select">
+                        <option value="text">Rich text</option>
+                        <option value="menu">Dropdown</option>
+                        <option value="checkbox">Checkboxes</option>
+                      </select>
+                    </div>
+
+                    <div class="wrap-row text-wrap">
+                      <h6>Task Notes</h6>
+                      <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
+                    </div>
+
+                    <div class="wrap-row options-wrap">
+                      <h6>Selection Response Options (Comma Separated)</h6>
+                      <textarea id="tgt_response_options" class="span12 double" name="response_options_csv" placeholder="Enter Description" tabindex="2"></textarea>
+                    </div>
+                  </div>
+                  <div class="span3 hidable hidden">
+                    <h6>
+                      Task group
+                      <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                    </h6>
+                    <input type="text" class="span12">
+                  </div>
+                </div>
+
+                <div class="row-fluid">
+                  <div class="span12">
+                    {{> /static/mustache/mockup_base_templates/info_panel/mapped_objects.mustache}}
+                  </div>
+                </div>
+
+              </div>
+              <div class="span4">
+                <h6>People</h6>
+                {{> /static/mustache/mockup_base_templates/info_panel/task_people_list.mustache}}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="add-rule add-object">
+          <a href="#" class="add-object-trigger btn btn-small btn-info">Add another task</a>
+        </div>
+
+      </div>
     </div>
 
-  {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
-
-  </section>-->
+    <div class="info">
+      <div class="save-template-wrap">
+        <div class="pull-right">
+          <button type="submit" class="btn btn-draft btn-small">
+            Save draft
+          </button>
+          <button type="submit" class="btn btn-success btn-small">
+            Activate
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <div class="info-widget-footer">
     <p>
