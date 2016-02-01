@@ -30,6 +30,7 @@ dashboard-js-files:
   - wysihtml5/wysihtml5-0.4.0pre.js
   - wysihtml5/bootstrap-wysihtml5-0.0.2.js
   - moment/min/moment.min.js
+  - moment-timezone/builds/moment-timezone-with-data.min.js
   - spinjs/spin.js
   - string-natural-compare/natural-compare.min.js
   # end 3rd party
