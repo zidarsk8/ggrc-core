@@ -59,25 +59,36 @@
       sidebar: false,
       size: 5
     }),
-    select: {
-      "type": Generator.create({
-        option_text: "%title",
+    frequency_select: Generator.create({
+      data: [{
+        option_text: "One time",
+        value: "one_time"
       }, {
-        count: 3
-      }),
-      "frequency": Generator.create({
-        option_text: "%title",
+        option_text: "Weekly",
+        value: "weekly"
       }, {
-        count: 5
-      })
-    },
-    // t_type_data: [{
-    //     option_text: "Rich text"
-    //   }, {
-    //     option_text: "Dropdown"
-    //   }, {
-    //     option_text: "Checkboxes"
-    // }],
+        option_text: "Monthly",
+        value: "monthly"
+      }, {
+        option_text: "Quarterly",
+        value: "quarterly"
+      }, {
+        option_text: "Annually",
+        value: "annually"
+      }]
+    }),
+    type_select: Generator.create({
+      data: [{
+        option_text: "Rich text",
+        value: "text"
+      }, {
+        option_text: "Dropdown",
+        value: "menu"
+      }, {
+        option_text: "Checkboxes",
+        value: "checkbox"
+      }]
+    }),
     t_group: Generator.create({
       hidable: true
     }),
@@ -91,17 +102,6 @@
       hidable: false,
       sidebar: true,
       size: 6
-    }),
-    // frequency_data: [{
-    //     option_text: "One time"
-    //   }, {
-    //     option_text: "Weekly"
-    //   }, {
-    //     option_text: "Monthly"
-    //   }, {
-    //     option_text: "Quarterly"
-    //   }, {
-    //     option_text: "Annually"
-    // }]
+    })
   };
 })(GGRC || {}, GGRC.Mockup.Generator);

@@ -9,11 +9,11 @@
   <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
 {{/if}}
 <div {{#if sidebar}}class="side-content"{{/if}}>
-  <select class="span{{size}}">
-    {{#frequency_select}}
+  <select class="type-select span{{size}}">
+    {{#type_select}}
       {{#each data}}
         <option value="{{value}}">{{option_text}}</option>
       {{/each}}
-    {{/frequency_select}}
+    {{/type_select}}
   </select>
 </div>

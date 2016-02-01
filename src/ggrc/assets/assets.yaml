@@ -468,6 +468,7 @@ mockup-js-template-files:
   # Workflow setup
   - mockup_base_templates/object_setup/object_input.mustache
   - mockup_base_templates/object_setup/object_select.mustache
+  - mockup_base_templates/object_setup/object_select_type.mustache
   - mockup_base_templates/object_setup/object_textarea.mustache
 
   # Other base templates files
