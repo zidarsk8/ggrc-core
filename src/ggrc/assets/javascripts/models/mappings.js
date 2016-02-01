@@ -688,9 +688,6 @@
       _mixins: [
         "related_object", "personable", "ownable", "documentable"
       ],
-      _canonical: {
-        "control": "Control",
-      },
       related_assessors: AttrFilter("related_objects", "AssigneeType", "Assessor", "Person"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
       comments: TypeFilter("related_objects", "Comment"),
@@ -698,7 +695,6 @@
         return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
       }),
       people: AttrFilter("related_objects", "AssigneeType", null, "Person"),
-      control: Direct("Control", "controls", "assessment"),
     },
     Issue: {
       _mixins: [
