@@ -432,6 +432,9 @@ ul.new-tree {
 }
 
 .hideable-holder {
+  h6 {
+    display: inline-block;
+  }
   .field-hide {
     display: block;
     float: right;

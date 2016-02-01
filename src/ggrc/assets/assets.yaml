@@ -465,6 +465,11 @@ mockup-js-template-files:
   - mockup_base_templates/info_panel/notes.mustache
   - mockup_base_templates/info_panel/request_type.mustache
 
+  # Workflow setup
+  - mockup_base_templates/object_setup/object_input.mustache
+  - mockup_base_templates/object_setup/object_select.mustache
+  - mockup_base_templates/object_setup/object_textarea.mustache
+
   # Other base templates files
   - mockup_base_templates/request_panel.mustache
   - mockup_base_templates/assessment_panel.mustache
