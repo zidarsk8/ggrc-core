@@ -68,12 +68,12 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
   });
 
-  describe('given an Person and Assessment pair', function () {
+  describe('given a Person and Assessment pair', function () {
     beforeEach(function () {
       fakeCA = new CMS.Models.Assessment({type: 'Assessment'});
       fakePersonCreator = new CMS.Models.Person({type: 'Person'});
 
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+      spyOn(Permission, 'is_allowed_for').and.returnValue(false);
       spyOn(GGRC.Mappings, 'get_canonical_mapping_name');
     });
 
@@ -82,7 +82,7 @@ describe('GGRC utils allowed_to_map() method', function () {
       GGRC.Mappings.get_canonical_mapping_name.and.returnValue('people');
       result = allowedToMap(fakeCA, fakePersonCreator, fakeOptions);
 
-      expect(result).toBe(true);
+      expect(result).toBe(false);
     });
 
     it('returns false for Person as source and as Assessment target', function () {

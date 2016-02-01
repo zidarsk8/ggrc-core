@@ -463,7 +463,7 @@
           "Program", "Regulation", "Contract", "Policy", "Standard",
           "AccessGroup", "Objective", "Control", "Section", "Clause",
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process",
-          "Product", "Project", "System", "Issue", "Assessment",
+          "Product", "Project", "System", "Issue",
           "Request"
         ],
         "authorizations": "UserRole"
