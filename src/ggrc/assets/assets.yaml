@@ -469,6 +469,11 @@ mockup-js-template-files:
   - mockup_base_templates/object_setup/object_select.mustache
   - mockup_base_templates/object_setup/object_select_type.mustache
   - mockup_base_templates/object_setup/object_textarea.mustache
+  - mockup_base_templates/object_setup/fields_visibility_control.mustache
+  - mockup_base_templates/object_setup/type_fields.mustache
+  - mockup_base_templates/object_setup/repeating_block.mustache
+  - mockup_base_templates/object_setup/repeating_block_control.mustache
+  - mockup_base_templates/object_setup/template_master_controls.mustache
 
   # Other base templates files
   - mockup_base_templates/request_panel.mustache

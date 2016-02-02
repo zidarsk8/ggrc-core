@@ -54,6 +54,9 @@
     t_description: Generator.create({
       hidable: true
     }),
+    task: Generator.create({
+      object_type: "task"
+    }),
     t_type: Generator.create({
       hidable: false,
       sidebar: false,
@@ -102,6 +105,8 @@
       hidable: false,
       sidebar: true,
       size: 6
-    })
+    }),
+    button_draft: "Save draft",
+    button_active: "Activate"
   };
 })(GGRC || {}, GGRC.Mockup.Generator);
