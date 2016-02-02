@@ -460,3 +460,30 @@ ul.new-tree {
     }
   }
 }
+
+.dropdown-wrap {
+  position: relative;
+  .reset-form & {
+    .dropdown-menu {
+      min-width: 350px;
+      left: auto;
+      right: 0;
+      padding: 10px 15px;
+      margin-top: 3px;
+      .close-dropdown {
+        margin-right: 0;
+      }
+      ul.attr-list {
+        li {
+          width: 50%;
+          &:first-child {
+            width: 100%;
+          }
+        }
+        label {
+          padding-right: 10px;
+        }
+      }
+    }
+  }
+}

@@ -16,7 +16,7 @@
               {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
             {{/t_title}}
           </div>
-          <div class="span3 hidable">
+          <div class="span3 hidable" data-value="start_date">
             <h6>Start Date</h6>
             {{#start_date}}
               {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
@@ -25,13 +25,13 @@
         </div>
 
         <div class="row-fluid wrap-row">
-          <div class="span9 hidable hidden">
+          <div class="span9 hidable hidden" data-value="task_description">
             <h6>Description</h6>
             {{#t_description}}
               {{> /static/mustache/mockup_base_templates/object_setup/object_textarea.mustache}}
             {{/t_description}}
           </div>
-          <div class="span3 hidable">
+          <div class="span3 hidable" data-value="end_date">
             <h6>End Date</h6>
             {{#end_date}}
               {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
@@ -53,7 +53,7 @@
             {{/t_type}}
 
           </div>
-          <div class="span3 hidable hidden">
+          <div class="span3 hidable hidden" data-value="task_group">
             <h6>{{object_type}} Group</h6>
             {{#t_group}}
               {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
