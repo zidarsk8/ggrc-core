@@ -110,6 +110,7 @@
     template: "<content></content>",
     scope: function () {
       return {
+        isFilterActive: false,
         export: new exportModel()
       };
     },
@@ -117,6 +118,21 @@
       ".btn-title-change click": function (el, ev) {
         ev.preventDefault();
         this.scope.attr("export.edit_filename", !this.scope.attr("export.edit_filename"));
+      },
+
+      toggleIndicator: function (currentFilter) {
+        var isExpression =
+            !!currentFilter &&
+            !!currentFilter.expression.op &&
+            currentFilter.expression.op.name !== 'text_search' &&
+            currentFilter.expression.op.name !== 'exclude_text_search';
+        this.scope.attr('isFilterActive', isExpression);
+      },
+      '.filter-input input keyup': function (el, ev) {
+        this.toggleIndicator(GGRC.query_parser.parse(el.val()));
+      },
+      '.option-type-selector change': function (el, ev) {
+        this.scope.attr('isFilterActive', false);
       },
       "#export-csv-button click": function (el, ev) {
         ev.preventDefault();
