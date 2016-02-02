@@ -863,21 +863,28 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if (this.options.disable_lazy_loading || this.element === null) {
       return;
     }
-    var MAX_STEPS = 100,
-        el_position = this.el_position.bind(this),
-        children = this.element.children(),
-        lo = 0,
-        hi = children.length - 1,
-        max = hi,
-        steps = 0,
-        visible = [],
-        already_visible = _.filter(this.element[0].children, function(e) {
-          // doing this manualy is 10x faster than a jQuery selector and performance
-          // here matters since it runs on every scroll event on a potentialy long
-          // list of items
-          return e.tagName == "LI";
-        }),
-        i, control, index, page_count, mid, el, pos;
+    var MAX_STEPS = 100;
+    var el_position = this.el_position.bind(this);
+    var children = this.element.children();
+    var lo = 0;
+    var hi = children.length - 1;
+    var max = hi;
+    var steps = 0;
+    var visible = [];
+    var already_visible = _.filter(this.element[0].children, function (e) {
+      // doing this manualy is 10x faster than a jQuery selector and performance
+      // here matters since it runs on every scroll event on a potentialy long
+      // list of items
+      return e.tagName == "LI";
+    });
+    var to_render = [];
+    var i;
+    var control;
+    var index;
+    var page_count;
+    var mid;
+    var el;
+    var pos;
 
     while (steps < MAX_STEPS && lo < hi) {
       steps += 1;
@@ -927,8 +934,25 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
       }
       if (!_.contains(visible, control)) {
         visible.push(control);
-        control.draw_node();
+        to_render.push(control);
       }
+    }
+    function render_step(to_render) {
+      if (to_render.length === 0) {
+        return;
+      }
+      to_render[0].draw_node();
+      setTimeout(function () {
+        render_step(to_render.slice(1));
+      }, 0);
+    }
+    if (this._has_completed_render_loop) {
+      render_step(to_render);
+    } else {
+      _.each(to_render, function (control) {
+        control.draw_node();
+      });
+      this._has_completed_render_loop = true;
     }
   }, 100, {leading: true})
   , _last_scroll_top : 0
@@ -1012,114 +1036,126 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     if(parent && !parent.children_drawn) {
       parent.attr("children_drawn", true);
     }
-  }
-
+  },
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
-  , add_child_lists : function(list) {
-    var that = this
-      , current_list = can.makeArray(list)
-      , list_window = []
-      , final_dfd
-      , queue = []
-      , op_id = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1
-      ;
+  add_child_lists: function (list) {
+    var that = this;
+    var currentList = can.makeArray(list);
+    var listWindow = [];
+    var finalDfd;
+    var queue = [];
+    var opId = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1;
 
-    can.each(current_list, function(item) {
-      list_window.push(item);
-      if (list_window.length >= 50) {
-        queue.push(list_window);
-        list_window = [];
+    can.each(currentList, function (item) {
+      listWindow.push(item);
+      if (listWindow.length >= 50) {
+        queue.push(listWindow);
+        listWindow = [];
       }
     });
-    if (list_window.length > 0) {
-      queue.push(list_window);
+    if (listWindow.length > 0) {
+      queue.push(listWindow);
     }
-
-    final_dfd = _.foldl(queue, function(dfd, list_window) {
-      return dfd.then(function (all_draw_items) {
-        if (that._add_child_lists_id !== op_id) {
+    this.options.attr('filter_shown', 0);
+    finalDfd = _.foldl(queue, function (dfd, listWindow) {
+      return dfd.then(function () {
+        var res = $.Deferred();
+        if (that._add_child_lists_id !== opId) {
           return dfd;
         }
-        var res = $.Deferred();
-        setTimeout(function(){
-          if (that._add_child_lists_id !== op_id) {
+        setTimeout(function () {
+          var draw;
+          if (that._add_child_lists_id !== opId) {
             return;
           }
-          var draw = that._ifNotRemoved(that.draw_items.bind(that));
-          res.resolve(draw(list_window));
+          draw = that._ifNotRemoved(that.draw_items.bind(that));
+          res.resolve(draw(listWindow));
         }, 0);
         return res;
       });
-    }, new $.Deferred().resolve());
+    }, $.Deferred().resolve());
 
-    final_dfd.done(this._ifNotRemoved(function() {
-      this.element.parent().find(".sticky").Stickyfill();
-    }.bind(this)));
-    return final_dfd;
-  }
-
-  , draw_items : function(options_list) {
-      var that = this
-        , $footer = this.element.children('.tree-item-add').first()
-        , $items = $()
-        , $existing = this.element.children('.cms_controllers_tree_view_node')
-        , draw_items_dfds = []
-        , sort_prop = this.options.sort_property
-        , sort_function = this.options.sort_function
-        , filter = this.options.filter
-        ;
-      options_list = can.makeArray(options_list);
-      can.map(options_list, function(options) {
-        if (!filter || filter.evaluate(options.instance.get_filter_vals())) {
-          if (that.options.disable_lazy_loading) {
-            options.disable_lazy_loading = true;
-          }
-          var $li = $("<li />").cms_controllers_tree_view_node(options);
-          draw_items_dfds.push($li.control()._draw_node_deferred);
-          $items.push($li[0]);
-        }
-      });
-
-      if (sort_prop || sort_function) {
-        if (!sort_function) {
-          sort_function = this._sort_property_comparator(sort_prop);
-        }
-
-        $items.each(function(i, item) {
-            var j, $item = $(item), compare,
-                new_item = $item.control().options.instance;
-            for(j = $existing.length - 1; j >= 0; j--) {
-              var old_item = $existing.eq(j).control().options.instance,
-                  compare = sort_function(old_item, new_item);
-              if (compare <= 0) {
-                $item.insertAfter($existing.eq(j));
-                $existing.splice(j + 1, 0, item);
-                return;
-              }
-            }
-            if($existing.length) {
-              $item.insertBefore($existing.eq(0));
-            } else if($footer.length) {
-              $item.insertBefore($footer);
-            } else {
-              $item.appendTo(this.element);
-            }
-            $existing.splice(0, 0, item);
-        }.bind(this));
-        if (this.options.sortable) {
-          $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
-        }
+    finalDfd.done(this._ifNotRemoved(function () {
+      var shown = this.element[0].children.length;
+      var count = this.options.list.length;
+      // We need to hide `of` in case the numbers are same
+      if (shown === count && shown > 0) {
+        shown = false;
       } else {
-        if($footer.length) {
-          $items.insertBefore($footer);
-        } else {
-          $items.appendTo(this.element);
-        }
+        shown = shown.toString();
       }
-      var res = $.when.apply($, draw_items_dfds);
-      res.then(function(){setTimeout(that.draw_visible.bind(that), 0)});
-      return res;
+      this.options.attr('filter_shown', shown);
+      this.options.attr('filter_count', count.toString());
+      this.element.parent().find('.sticky').Stickyfill();
+    }.bind(this)));
+    return finalDfd;
+  },
+  draw_items: function (optionsList) {
+    var $footer = this.element.children('.tree-item-add').first();
+    var $items = $();
+    var $existing = this.element.children('.cms_controllers_tree_view_node');
+    var drawItemsDfds = [];
+    var sortProp = this.options.sort_property;
+    var sortFunction = this.options.sort_function;
+    var filter = this.options.filter;
+    var res;
+
+    optionsList = can.makeArray(optionsList);
+    can.map(optionsList, function (options) {
+      var $li = $('<li />');
+      if (!filter || filter.evaluate(options.instance.get_filter_vals())) {
+        if (this.options.disable_lazy_loading) {
+          options.disable_lazy_loading = true;
+        }
+        $li.cms_controllers_tree_view_node(options);
+        drawItemsDfds.push($li.control()._draw_node_deferred);
+        $items.push($li[0]);
+      }
+    }.bind(this));
+
+    if (sortProp || sortFunction) {
+      if (!sortFunction) {
+        sortFunction = this._sort_property_comparator(sortProp);
+      }
+      $items.each(function (i, item) {
+        var j;
+        var $item = $(item);
+        var compare;
+        var newItem = $item.control().options.instance;
+        var oldItem;
+
+        for (j = $existing.length - 1; j >= 0; j--) {
+          oldItem = $existing.eq(j).control().options.instance;
+          compare = sortFunction(oldItem, newItem);
+          if (compare <= 0) {
+            $item.insertAfter($existing.eq(j));
+            $existing.splice(j + 1, 0, item);
+            return;
+          }
+        }
+        if ($existing.length) {
+          $item.insertBefore($existing.eq(0));
+        } else if ($footer.length) {
+          $item.insertBefore($footer);
+        } else {
+          $item.appendTo(this.element);
+        }
+        $existing.splice(0, 0, item);
+      }.bind(this));
+      if (this.options.sortable) {
+        $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
+      }
+    } else if ($footer.length) {
+      $items.insertBefore($footer);
+    } else {
+      $items.appendTo(this.element);
     }
+    res = $.when.apply($, drawItemsDfds);
+    res.then(function () {
+      setTimeout(this.draw_visible.bind(this), 0);
+    }.bind(this));
+    return res;
+  }
 
   , " sortupdate" : function(el, ev, ui) {
     var that = this,
@@ -1458,14 +1494,13 @@ can.Control("CMS.Controllers.TreeViewNode", {
     }
     this._draw_node_in_progress = true;
     this.add_child_lists_to_child();
-    setTimeout(function() {
-      can.view(this.options.show_view, this.options, this._ifNotRemoved(function(frag) {
-        this.replace_element(frag);
-        this._draw_node_deferred.resolve();
-      }.bind(this)));
-      this._draw_node_in_progress = false;
-      this.options.attr('is_subtree', this.element && this.element.closest('.inner-tree').length > 0);
-    }.bind(this), 2); // We give the browser a 2ms pause for scrolling
+    can.view(this.options.show_view, this.options, this._ifNotRemoved(function (frag) {
+      this.replace_element(frag);
+      this._draw_node_deferred.resolve();
+    }.bind(this)));
+    this._draw_node_in_progress = false;
+    this.options.attr('is_subtree',
+        this.element && this.element.closest('.inner-tree').length > 0);
   }
   , draw_placeholder: function() {
       var that = this;

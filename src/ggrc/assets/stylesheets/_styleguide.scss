@@ -161,8 +161,6 @@
   }
 }
 
-.grcicon-carot-white { background-position:-78px -80px; }
-
 .widget {
   .header {
     &.tree-header {
@@ -170,11 +168,6 @@
         .add-trigger {
           .disable {
             cursor: not-allowed;
-            &:hover {
-              [class^="grcicon-"] {
-                @include opacity(.25);
-              }
-            }
           }
         }
       }

@@ -67,7 +67,6 @@ can.Model.Cacheable("CMS.Models.Program", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
-    , child_tree_display_list : ['Standard', 'Regulation', 'Policy', 'Contract']
     , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     }
   , links_to : {
@@ -152,7 +151,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
-    , child_tree_display_list : ['Control']
     , add_item_view : GGRC.mustache_path + "/objectives/tree_add_item.mustache"
     , create_link : true
     //, draw_children : true

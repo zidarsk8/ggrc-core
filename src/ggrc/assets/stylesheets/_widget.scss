@@ -54,9 +54,6 @@
         margin-right: 30px;
       }
     }
-    [class^="grcicon-"] {
-      margin-top: 6px;
-    }
     &.tasks-action {
       float: right;
       li {
@@ -213,20 +210,6 @@
               i {
                 @include opacity(1);
               }
-            }
-          }
-          &.open {
-            a {
-              [class^="grcicon-"] {
-                @include opacity(1);
-              }
-            }
-          }
-        }
-        a {
-          &:hover {
-            [class^="grcicon-"] {
-              @include opacity(1);
             }
           }
         }
@@ -819,12 +802,6 @@
           outline: 0;
         }
       }
-      i {
-        &.grcicon-carot {
-          margin-top: 1px;
-          display: inline-block;
-        }
-      }
     }
   }
   &:hover {
@@ -1092,9 +1069,6 @@
       display:inline-block;
       line-height:24px;
       margin:0 20px 0 0;
-      [class^="grcicon-"] {
-        margin: 4px 0 0 0;
-      }
       a {
         @extend %action-link;
         font-size: 11px;
@@ -1182,9 +1156,6 @@
     li {
       line-height: 28px;
     }
-    [class^="grcicon-"] {
-      margin-top: 6px;
-    }
     .counter {
       @include opacity(1);
     }
@@ -1229,6 +1200,14 @@
   .fluid-wrap {
     position: relative;
   }
+  .filter-stats {
+    position: absolute;
+    font-size: 11px;
+    color: $gray;
+    line-height: 38px;
+    top: 0;
+    right: 26px;
+  }
   .filter-title-wrap,
   .filter-button-wrap {
     position: absolute;
@@ -1259,6 +1238,9 @@
   }
   .filter-input {
     position: relative;
+    .input-wide {
+      padding-right: 200px;
+    }
     .is-expression {
       @include opacity(0.25);
       position: absolute;
@@ -1377,9 +1359,6 @@
   padding-top: 20px;
   .tree-item-add {
     .btn {
-      [class^="grcicon-"] {
-        margin-top: 1px;
-      }
     }
   }
   .tree-action-list {

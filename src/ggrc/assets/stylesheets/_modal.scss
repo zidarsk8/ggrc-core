@@ -1096,16 +1096,6 @@ p.modal-value {
     .accordion-toggle  {
       padding: 4px 0;
       font-weight: bold;
-      .grcicon-toggle-arrow {
-        background-position:-126px -56px;
-        margin-left: -7px;
-      }
-      &.active {
-        .grcicon-toggle-arrow {
-          background-position:-102px -56px;
-          margin-left: -5px;
-        }
-      }
     }
   }
   .accordion-inner {
