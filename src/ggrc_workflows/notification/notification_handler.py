@@ -7,7 +7,7 @@
 from sqlalchemy import and_, or_, inspect
 from datetime import timedelta, datetime, date
 
-from ggrc.models import Notification, NotificationType, ObjectType
+from ggrc.models import Notification, NotificationType
 from ggrc import db
 
 
@@ -80,10 +80,9 @@ def add_cycle_task_reassigned_notification(obj):
 
   # check if the current assignee allready got the first notification
   result = db.session.query(Notification)\
-      .join(ObjectType)\
       .join(NotificationType)\
       .filter(and_(Notification.object_id == obj.id,  # noqa
-                   ObjectType.name == obj.__class__.__name__,
+                   Notification.object_type == obj.type,
                    Notification.sent_at != None,
                    or_(NotificationType.name == "cycle_task_reassigned",
                        NotificationType.name == "cycle_created",
@@ -99,10 +98,9 @@ def add_cycle_task_reassigned_notification(obj):
 
 def modify_cycle_task_notification(obj, notification_name):
   notif = db.session.query(Notification)\
-      .join(ObjectType)\
       .join(NotificationType)\
       .filter(and_(Notification.object_id == obj.id,
-                   ObjectType.name == obj.__class__.__name__,
+                   Notification.object_type == obj.type,
                    Notification.sent_at == None,  # noqa
                    NotificationType.name == notification_name,
                    ))
@@ -191,16 +189,11 @@ def handle_cycle_created(sender, obj=None, src=None, service=None,
 
 def get_notification(obj):
   # maybe we shouldn't return different thigs here.
-  result = db.session.query(Notification).join(ObjectType).filter(
+  result = Notification.query.filter(
       and_(Notification.object_id == obj.id,
-           ObjectType.name == obj.__class__.__name__,
+           Notification.object_type == obj.type,
            Notification.sent_at == None))  # noqa
   return result.all()
-
-
-def get_object_type(obj):
-  return db.session.query(ObjectType).filter(
-      ObjectType.name == obj.__class__.__name__).one()
 
 
 def get_notification_type(name):
@@ -213,7 +206,7 @@ def add_notif(obj, notif_type, send_on=None):
     send_on = date.today()
   notif = Notification(
       object_id=obj.id,
-      object_type=get_object_type(obj),
+      object_type=obj.type,
       notification_type=notif_type,
       send_on=send_on,
   )
