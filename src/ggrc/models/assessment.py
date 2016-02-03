@@ -25,14 +25,14 @@ class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
                  Relatable, BusinessObject, db.Model):
   __tablename__ = 'assessments'
 
-  VALID_STATES = (u'Open', u'In Progress', u'Finished', u'Verified', u'Final')
-  ASSIGNEE_TYPES = (u'Creator', u'Assessor', u'Verifier')
+  VALID_STATES = (u"Open", u"In Progress", u"Finished", u"Verified", u"Final")
+  ASSIGNEE_TYPES = (u"Creator", u"Assessor", u"Verifier")
 
-  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
-                    'Assessment')
+  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
+                    default=VALID_STATES[0]), "Assessment")
 
-  design = deferred(db.Column(db.String), 'Assessment')
-  operationally = deferred(db.Column(db.String), 'Assessment')
+  design = deferred(db.Column(db.String), "Assessment")
+  operationally = deferred(db.Column(db.String), "Assessment")
 
   object = {}  # we add this for the sake of client side error checking
   audit = {}
