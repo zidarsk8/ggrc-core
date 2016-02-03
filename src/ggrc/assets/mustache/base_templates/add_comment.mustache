@@ -1,0 +1,50 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+<div class="add-comment">
+  <div class="row-fluid">
+    <div class="span8">
+      <div class="controls top">
+        {{#is_allowed 'update' parent_instance context='for'}}
+          {{{render_hooks "Request.gdrive_comment_attachment"}}}
+
+          {{#toggle show_new_object_form}}
+            <ggrc-quick-add parent_instance="instance" join_model="Relationship" deferred="true" quick_create="create_url">
+              {{#prune_context}}
+                <div class="objective-selector field-wrap top-spacing">
+                  <input tabindex="3" type="text" name="instance" placeholder="Add URL">
+                  <a href="javascript://" {{toggle_button}}><i class="fa fa-trash"></i></a>
+                  <a href="javascript://" class="btn btn-small btn-success no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add URL</a>
+                </div>
+                <input type="hidden" name="role_name" value="Auditor" />
+              {{/prune_context}}
+            </ggrc-quick-add>
+          {{else}}
+            <a href="javascript://" class="btn btn-draft btn-small {{toggle_button}}" data-type="url">
+              <i class="fa fa-link"></i> Attach URL
+            </a>
+        {{/toggle}}
+        {{/is_allowed}}
+      </div>
+      <div class="wysiwyg-area">
+        <textarea rows="4" class="span12 triple wysihtml5" name="comment-description" id="comment-description" placeholder="Enter comment (optional)"></textarea>
+      </div>
+      <div class="attachments-preview">
+        <ul>
+        {{#instance._pending_joins}}
+          <li class="label label-light">
+            <span>{{what.title}}</span>
+            <a href="#" class="js-trigger-removeattachment">&times;</a>
+          </li>
+        {{/instance._pending_joins}}
+        </ul>
+      </div>
+      <div class="controls">
+        <a href="javascript://" class="btn btn-success btn-small">Add</a>
+      </div>
+    </div>
+  </div>
+</div>

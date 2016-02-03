@@ -3,16 +3,24 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+"""Module contains a workflow Cycle model
+"""
+
+from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.models.mixins import (
-    Slugged, Titled, Described, Timeboxed, Stateful, WithContact
-    )
-from sqlalchemy import event
+from ggrc.models.mixins import Described
+from ggrc.models.mixins import Slugged
+from ggrc.models.mixins import Stateful
+from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import Titled
+from ggrc.models.mixins import WithContact
 
 
-class Cycle(
-    WithContact, Stateful, Timeboxed, Described, Titled, Slugged, db.Model):
+class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
+            db.Model):
+  """Workflow Cycle model
+  """
   __tablename__ = 'cycles'
   _title_uniqueness = False
 
@@ -25,7 +33,8 @@ class Cycle(
   cycle_task_group_objects = db.relationship(
       'CycleTaskGroupObject', backref='cycle', cascade='all, delete-orphan')
   cycle_task_group_object_tasks = db.relationship(
-      'CycleTaskGroupObjectTask', backref='cycle', cascade='all, delete-orphan')
+      'CycleTaskGroupObjectTask', backref='cycle',
+      cascade='all, delete-orphan')
   cycle_task_entries = db.relationship(
       'CycleTaskEntry', backref='cycle', cascade='all, delete-orphan')
   is_current = db.Column(db.Boolean, default=True, nullable=False)
@@ -43,4 +52,35 @@ class Cycle(
       'cycle_task_groups',
       'is_current',
       'next_due_date',
-      ]
+  ]
+
+  _aliases = {
+      "cycle_workflow": {
+          "display_name": "Workflow",
+          "filter_by": "_filter_by_cycle_workflow",
+      },
+  }
+
+  @classmethod
+  def _filter_by_cycle_workflow(cls, predicate):
+    from ggrc_workflows.models.workflow import Workflow
+    return Workflow.query.filter(
+        (Workflow.id == cls.workflow_id) &
+        (predicate(Workflow.slug) | predicate(Workflow.title))
+    ).exists()
+
+  @classmethod
+  def eager_query(cls):
+    """Add cycle task groups to cycle eager query
+
+    This function adds cycle_task_groups as a join option when fetching cycles,
+    and makes sure we fetch all cycle related data needed for generating cycle
+    json, in one query.
+
+    Returns:
+      a query object with cycle_task_groups added to joined load options.
+    """
+    query = super(Cycle, cls).eager_query()
+    return query.options(
+        orm.joinedload('cycle_task_groups'),
+    )

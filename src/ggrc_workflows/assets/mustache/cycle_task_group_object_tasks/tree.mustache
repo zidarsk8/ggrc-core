@@ -17,12 +17,12 @@
           <div class="row-fluid">
             <div class="span{{display_options.title_width}}">
               <div class="title tree-title-area" rel="tooltip" data-placement="left" title="" data-original-title="{{instance.title}}">
-                <i class="grcicon-task-black"></i>
+                <i class="fa fa-calendar-check-o"></i>
                 {{instance.title}}
               </div>
             </div>
 
-            {{#is_dashboard}}
+            {{!#is_dashboard}}
               <div class="span{{display_options.selectable_width}}">
                 <div class="row-fluid">
                   {{#display_attr_list}}
@@ -34,7 +34,7 @@
                               {{#using instance=instance.cycle_task_group_object}}
                                 {{#using object=instance.object}}
                                     <div class="tree-title-area">
-                                      <i class="grcicon-{{instance.object.reify.class.table_singular}}-black"></i>
+                                      <i class="fa fa-{{instance.object.reify.class.table_singular}} black"></i>
                                       <span class="tiny-data">
                                         {{firstnonempty object.title ''}}
                                       </span>
@@ -76,21 +76,21 @@
                   {{/display_attr_list}}
                 </div>
               </div>
-            {{/is_dashboard}}
+            {{!/is_dashboard}}
 
             <div class="span{{display_options.action_width}}">
               <ul class="tree-action-list tasks-action">
                 <li>
                   <div class="date">
                     <span rel="tooltip" data-placement="top" {{#is_overdue instance.end_date instance.status}}class="error"{{/is_overdue}} data-original-title="Due On">
-                      <i class="grcicon-history-{{#is_overdue instance.end_date instance.status}}red{{else}}color{{/is_overdue}}"></i> {{localize_date instance.end_date}}
+                      <i class="fa fa-clock-o {{#is_overdue instance.end_date instance.status}}red{{else}}color{{/is_overdue}}"></i> {{localize_date instance.end_date}}
                     </span>
                   </div>
                 </li>
                 <li> <!-- number of comment count -->
                   {{#with_mapping_count instance 'cycle_task_entries'}}
                   <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of comments">
-                    <i class="grcicon-comment"></i>
+                    <i class="fa fa-comment-o"></i>
                     <strong class="error">{{count}}</strong>
                   </span>
                   {{/with_mapping_count}}
@@ -98,7 +98,7 @@
                 <li>
                   {{#with_mapping_count instance 'cycle_task_group_object'}}
                   <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of objects">
-                    <i class="grcicon-object-black"></i>
+                    <i class="fa fa-list-alt"></i>
                     <strong class="error">{{count}}</strong>
                   </span>
                   {{/with_mapping_count}}
@@ -106,6 +106,7 @@
                 {{#with_review_task}}
                   {{#using cycle=instance.cycle}}
                     {{#if_equals cycle.is_current true}}
+                    {{#is_allowed 'update' instance}}
                       <li>
                         <div class="request-control" {{ (el) -> $(el).bind('inserted', function() { el.ggrc_controllers_quick_form({ instance : el.closest('.item-list').data('model')}); }); }}>
                           {{#if_equals instance.status 'Assigned'}}
@@ -135,6 +136,7 @@
                           {{/instance._undo.0}}
                         </div>
                       </li>
+                    {{/is_allowed}}
                     {{/if_equals}}
                   {{/using}}
                 {{/with_review_task}}

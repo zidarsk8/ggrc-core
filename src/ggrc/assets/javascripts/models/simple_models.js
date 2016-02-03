@@ -58,7 +58,7 @@ can.Model.Cacheable("CMS.Models.Program", {
       show_view : GGRC.mustache_path + "/programs/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : [
-      {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: 'authorizations.0.person.name|email'}
+      {attr_title: 'Manager', attr_name: 'owner', attr_sort_field: 'authorizations.0.person.name|email'}
     ].concat(can.Model.Cacheable.attr_list.filter(function (d) {
       return d.attr_name != 'owner';
     })).concat([
@@ -78,6 +78,7 @@ can.Model.Cacheable("CMS.Models.Program", {
     , "Vendor" : {}
     , "Project" : {}
     , "DataAsset" : {}
+    , "AccessGroup" : {}
     , "Product" : {}
     , "Market" : {}
   }
@@ -91,6 +92,11 @@ can.Model.Cacheable("CMS.Models.Program", {
 
 can.Model.Cacheable("CMS.Models.Option", {
   root_object : "option"
+  , findAll : "GET /api/options"
+  , findOne : "GET /api/options/{id}"
+  , create : "POST /api/options"
+  , update : "PUT /api/options/{id}"
+  , destroy : "DELETE /api/options/{id}"
   , root_collection : "options"
   , cache_by_role: {}
   , for_role: function(role) {
@@ -118,9 +124,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
   , mixins : ["ownable", "contactable", "unique_title"]
-  , links_to : {
-      "Section" : "SectionObjective"
-  }
   , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -154,7 +157,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , start_expanded : false
     , child_options : [{
         model : can.Model.Cacheable
-      , mapping : "related_and_able_objects"
+      , mapping : "related_objects" //"related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , title_plural : "Business Objects"
@@ -317,18 +320,26 @@ CMS.Models.get_instance = function(object_type, object_id, params_or_object) {
   return instance;
 };
 
-CMS.Models.get_stub = function(object) {
-  return CMS.Models.get_instance(object).stub();
-}
+CMS.Models.get_stub = function (object) {
+  var instance = CMS.Models.get_instance(object);
+  if (!instance) {
+    return;
+  }
+  return instance.stub();
+};
 
-CMS.Models.get_stubs = function(objects) {
-  return new can.Stub.List(can.map(CMS.Models.get_instances(objects), function(o) {
+CMS.Models.get_stubs = function (objects) {
+  return new can.Stub.List(can.map(CMS.Models.get_instances(objects), function (o) {
+    if (!o || !o.stub) {
+      console.warn("`Models.get_stubs` instance has no stubs ", arguments);
+      return;
+    }
     return o.stub();
   }));
 };
 
-CMS.Models.get_instances = function(objects) {
-  var i, instances = []
+CMS.Models.get_instances = function (objects) {
+  var i, instances = [];
   if (!objects)
     return [];
   for (i=0; i<objects.length; i++) {

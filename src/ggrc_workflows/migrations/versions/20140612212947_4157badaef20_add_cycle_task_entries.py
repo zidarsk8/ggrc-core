@@ -1,3 +1,8 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 
 """Add cycle_task_entries
 
@@ -13,6 +18,7 @@ down_revision = '580d2ac5bc2d'
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import mysql
 
 
 def upgrade():

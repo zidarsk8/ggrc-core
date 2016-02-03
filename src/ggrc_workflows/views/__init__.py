@@ -1,8 +1,9 @@
 # Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: miha@reciprocitylabs.com
+# Maintained By: urban@reciprocitylabs.com
 
+import traceback
 from datetime import date, datetime
 from flask import render_template, redirect, url_for, current_app
 from ggrc.rbac import permissions
@@ -10,6 +11,7 @@ from jinja2 import Environment, PackageLoader
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
+from ggrc.app import app
 from ggrc import notification
 from ggrc.login import login_required
 from ggrc.notification import email
@@ -32,8 +34,9 @@ def send_error_notification(message):
 def run_job(job):
   try:
     job()
-  except Exception as e:
-    message = "job '{}' failed with: \n{}".format(job.__name__, e.message)
+  except:
+    message = "job '{}' failed with: \n{}".format(job.__name__,
+                                                  traceback.format_exc())
     current_app.logger.error(message)
     send_error_notification(message)
 
@@ -130,7 +133,26 @@ def unstarted_cycles():
 def start_unstarted_cycles():
   workflows = _get_unstarted_workflows()
   for workflow in workflows:
+    tasks_start_days = [task.relative_start_day
+                        for tg in workflow.task_groups
+                        for task in tg.task_group_tasks]
+
+    tasks_end_days = [task.relative_end_day
+                    for tg in workflow.task_groups
+                    for task in tg.task_group_tasks]
+
+    # We must skip tasks that don't have start days and end days defined
+    if ((not all(tasks_start_days) and not all(tasks_end_days)) or
+          (not tasks_start_days and not tasks_end_days)):
+      app.logger.info(
+        "Skipping workflow {0} (ID: {1}) because it doesn't "
+        "have relative start and end days specified".format(
+          workflow.title,
+          workflow.id))
+      continue
+
     workflow.next_cycle_start_date = date.today()
+    workflow.non_adjusted_next_cycle_start_date = date.today()
     db.session.add(workflow)
   db.session.commit()
   run_job(start_recurring_cycles)

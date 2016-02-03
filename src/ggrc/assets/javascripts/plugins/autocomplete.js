@@ -119,24 +119,30 @@
 
         select: function(ev, ui) {
           var original_event,
-            that = this,
-            ctl = $(this).data($(this).data("autocomplete-widget-name")).options.controller
-          ;
+              $this = $(this),
+              ctl = $this.data($this.data("autocomplete-widget-name")).options.controller;
 
           if (ui.item) {
+            $this.trigger("autocomplete:select", [ui]);
             if (ctl.scope && ctl.scope.autocomplete_select) {
-              return ctl.scope.autocomplete_select($(this), ev, ui);
+              return ctl.scope.autocomplete_select($this, ev, ui);
             } else if (ctl.autocomplete_select) {
-              return ctl.autocomplete_select($(this), ev, ui);
+              return ctl.autocomplete_select($this, ev, ui);
             }
 
           } else {
             original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
-              ctl.autocomplete_select($(that), original_event, {
+              var autocomplete_select = ctl.autocomplete_select || ctl.scope.autocomplete_select;
+              if (autocomplete_select) {
+                autocomplete_select($this, original_event, {
+                  item: new_obj
+                });
+              }
+              $this.trigger("autocomplete:select", [{
                 item: new_obj
-              });
-              $(that).trigger("modal:success", new_obj);
+              }]);
+              $this.trigger("modal:success", new_obj);
             }).one("hidden", function() {
               setTimeout(function() {
                 $(this).off(".autocomplete");
@@ -166,12 +172,16 @@
           base_search = $that.data("lookup"),
           from_list = $that.data("from-list"),
           search_params = $that.data("params"),
+          permission = $that.data("permission-type"),
           searchtypes;
 
         this._super.apply(this, arguments);
         this.options.search_params = {
           extra_params: search_params
         };
+        if (permission) {
+          this.options.search_params.__permission_type = permission;
+        }
 
         $that.data("autocomplete-widget-name", this.widgetFullName);
 

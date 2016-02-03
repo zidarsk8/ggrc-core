@@ -1,3 +1,10 @@
+/*!
+ Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ Created By: brad@reciprocitylabs.com
+ Maintained By: miha@reciprocitylabs.com
+ */
+
 can.Control("GGRC.Controllers.TreeFilter", {
 
 }, {
@@ -13,15 +20,17 @@ can.Control("GGRC.Controllers.TreeFilter", {
   }
 
   , toggle_indicator: function(current_filter){
-      var is_expression = !!current_filter &&
+      var is_expression =
+            !!current_filter &&
             !!current_filter.expression.op &&
-            current_filter.expression.op != "text_search";
+            current_filter.expression.op.name != "text_search" &&
+            current_filter.expression.op.name != "exclude_text_search";
 
       this.element.find('.filter-input').toggleClass("expression", is_expression);
       this.element.find('.filter-input span i')
-        .toggleClass("grcicon-expression-green", is_expression);
+        .toggleClass("fa-check-circle green", is_expression);
       this.element.find('.filter-input span i')
-        .toggleClass("grcicon-expression-black", !is_expression);
+        .toggleClass("fa-check-circle-o", !is_expression);
   }
   , apply_filter : function(filter_string){
       var current_filter = GGRC.query_parser.parse(filter_string),

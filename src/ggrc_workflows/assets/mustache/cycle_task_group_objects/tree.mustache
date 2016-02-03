@@ -16,20 +16,13 @@
             <div class="span4">
               <div class="title tree-title-area">
                 {{#using object=instance.object}}
-                  {{#if object}}
+                  {{#if object.title}}
                     <div class="span11">
-                      <i class="grcicon-{{object.class.table_singular}}-black"></i>
-                      {{#if_helpers '\
-                        #if_equals' object.type "Program" '\
-                        and #if' object.private}}
-                        <span class="private">
-                          <i class="grcicon-private"></i>
-                        </span>
-                      {{/if_helpers}}
+                      <i class="fa fa-{{object.class.table_singular}}"></i>
                       {{object.title}}
                     </div>
                   {{else}}
-                    <span class="gray">[deleted]</span> {{instance.title}}
+                    {{instance.title}} <span class="gray">Sorry, you do not have access</span>
                   {{/if}}
                 {{/using}}
               </div>

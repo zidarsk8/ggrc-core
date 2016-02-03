@@ -13,6 +13,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     root_object : "control"
   , root_collection : "controls"
   , category : "governance"
+  , findAll : "GET /api/controls"
   , findOne : "GET /api/controls/{id}"
   , create : "POST /api/controls"
   , update : "PUT /api/controls/{id}"
@@ -72,7 +73,7 @@ can.Model.Cacheable("CMS.Models.Control", {
     , draw_children : true
     , child_options : [{
         model : can.Model.Cacheable
-      , mapping : "related_and_able_objects"
+      , mapping : "related_objects" //"related_and_able_objects"
       , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
       , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
       , title_plural : "Business Objects"

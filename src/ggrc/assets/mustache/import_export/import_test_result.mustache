@@ -1,0 +1,49 @@
+{{!
+  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: ivan@reciprocitylabs.com
+  Maintained By: ivan@reciprocitylabs.com
+}}
+
+<div class="import-main-wrap import-main-wrap-analyze">
+  <div class="row-fluid wrap-row">
+    <div class="span12">
+      <div class="import-wrap import-analyze">
+        <h4>
+          {{filename}}
+          {{#if isLoading}}
+            <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+          {{/if}}
+        </h4>
+        <hr />
+
+        {{#each import}}
+        <ul>
+          <li><strong>Object type</strong>: {{name}}</li>
+          <li><strong>Number of rows</strong>: {{rows}}</li>
+          {{#if created}} <li><strong>To be created</strong>: {{created}}</li> {{/if}}
+          {{#if updated}} <li><strong>To be updated</strong>: {{updated}}</li> {{/if}}
+          {{#if deleted}} <li><strong>To be deleted</strong>: {{deleted}}</li> {{/if}}
+          {{#if ignored}} <li><strong>Ignored</strong>: {{ignored}}</li> {{/if}}
+          {{#data}}
+            <li>
+              <strong>{{status}}</strong>
+              {{#if_equals status "errors"}}
+                <i class="fa fa-exclamation-triangle red"></i>
+              {{/if}}
+              {{#if messages.length}}
+                <ul>
+                  {{#messages}}
+                    <li>{{.}}</li>
+                  {{/messages}}
+                </ul>
+              {{/if}}
+            </li>
+          {{/data}}
+        </ul>
+        <hr />
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>

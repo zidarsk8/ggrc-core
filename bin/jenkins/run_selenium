@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
+
+set -o nounset
+set -o errexit
+
+PROJECT="selenium"
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+source bin/jenkins/functions.sh
+
+PROJECT=$( project_name "$@" -d "$PROJECT" )
+
+setup $PROJECT
+
+echo "
+###############################################################################
+"
+
+echo "Running Test server"
+docker exec -id ${PROJECT}_dev_1 /vagrant/bin/launch_ggrc_test
+
+echo "Running Selenium tests"
+docker exec -i ${PROJECT}_selenium_1 sh -c "
+  python /selenium/src/run_selenium.py --junitxml=/selenium/logs/selenium.xml
+" && rc=$? || rc=$?
+
+mv ./test/selenium/logs/selenium.xml ./test/selenium.xml || true
+
+echo "
+###############################################################################
+"
+
+teardown $PROJECT
+
+exit $rc

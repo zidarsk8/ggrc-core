@@ -12,7 +12,7 @@
       <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
         {{title}}
         {{#is_private}}
-          <i class="grcicon-private" rel="tooltip" title="Private"></i>
+          <i class="fa fa-lock" rel="tooltip" title="Private"></i>
         {{/is_private}}
       </a>
     </div>
@@ -22,10 +22,10 @@
     <div class="span12">
       <div class="rtf">
         <p>
-          {{{firstnonempty description '<i>No description</i>'}}}
+          {{{firstnonempty description '<span class="empty-message">None</span>'}}}
         </p>
       </div>
-      
+
       {{^if_null url}}
         <a class="url oneline" href="{{schemed_url url}}" target="_blank">
           {{url}}
@@ -34,7 +34,7 @@
       {{#if_null url}}
         <span class="no-url">No URL</span>
       {{/if_null}}
-  	  
+
     </div>
   </div>
 
@@ -59,19 +59,15 @@
           {{#with_direct_mappings_as 'mappings' page_instance instance}}
             {{#if mappings.length}}
               <span class="primary">
-                <i class="grcicon-checked"></i>
+                <i class="fa fa-check-square-o"></i>
                 Relevant to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
               </span>
             {{else}}
               {{#is_allowed_to_map page_instance instance join=true}}
-              {{#if_helpers '\
-                ^if_instance_of' page_instance 'Directive' '\
-                or ^if_instance_of' instance 'Section'}}
               <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
-                <i class="grcicon-reg-map"></i>
+                <i class="fa fa-random black"></i>
                 Map to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
               </a>
-              {{/if_helpers}}
               {{/is_allowed_to_map}}
             {{/if}}
           {{/with_direct_mappings_as}}

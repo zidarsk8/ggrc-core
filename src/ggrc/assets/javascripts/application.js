@@ -8,10 +8,10 @@
 
 (function(root, GGRC, $, can) {
   var doc = root.document,
-    body = doc.body,
-    $win = $(root),
-    $doc = $(doc),
-    $body = $(body);
+      body = doc.body,
+      $win = $(root),
+      $doc = $(doc),
+      $body = $(body);
 
 
   $win.on('hashchange', function() {
@@ -59,20 +59,6 @@
     });
     return zindex + 10;
   };
-
-  $doc.ajaxError(function(event, jqxhr, settings, exception) {
-    if (!jqxhr.hasFailCallback || settings.flashOnFail || (settings.flashOnFail == null && jqxhr.flashOnFail)) {
-      // TODO: Import produced 'canceled' ajax flash message that needed handling. Will refactor once better method works.
-      if (settings.url.indexOf("import") == -1 || exception !== 'canceled') {
-        $body.trigger(
-          "ajax:flash"
-          , {
-            "error": jqxhr.getResponseHeader("X-Flash-Error") || statusmsgs[jqxhr.status] || exception.message || exception
-          }
-        );
-      }
-    }
-  });
 
   $doc.ready(function() {
     // monitor target, where flash messages are added
@@ -126,7 +112,7 @@
       }
 
     });
-    $body.on("change", ".rotate_control_assessment", function(ev) {
+    $body.on("change", ".rotate_assessment", function(ev) {
       ev.currentTarget.click(function() {
         ev.currentTarget.toggle();
       });
@@ -288,7 +274,7 @@
 
       $showWatermark.fadeIn('fast');
       $this.addClass("active");
-      $this.html('<span class="utility-link"><i class="grcicon-watermark"></i> Watermarked</span>');
+      $this.html('<span class="utility-link"><i class="fa fa-check-square-o"></i> Watermarked</span>');
 
       return false;
     });
@@ -320,4 +306,6 @@
       || $(document.body).data("page-type")
       || window.location.pathname.substring(1, (window.location.pathname + "/").indexOf("/", 1));
   };
+  // Make sure GGRC.config is defined (needed to run Karma tests)
+  GGRC.config = GGRC.config || {};
 })(window, GGRC, jQuery, can);

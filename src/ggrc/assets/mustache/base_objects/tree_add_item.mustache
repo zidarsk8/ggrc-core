@@ -13,19 +13,19 @@
     href="javascript://"
     rel="tooltip"
     data-placement="left"
-    data-toggle="multitype-multiselect-modal-selector"
+    data-toggle="unified-mapper"
     data-join-mapping="{{mapping}}"
     data-join-option-type="{{model.shortName}}"
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="{{parent_instance.class.shortName}}"
     data-exclude-option-types="{{exclude_option_types}}"
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-    <i class="grcicon-add-black"></i>
+    <i class="fa fa-plus-circle"></i>
   </a>
   {{#if null}}
   <span class="section-expander">
     <a href="javascript://" rel="tooltip" data-placement="left" data-original-title="Create Object" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="{{parent_instance.class.model_singular}}" data-object-plural="{{parent_instance.class.table_plural}}" >
-      <i class="grcicon-add-black"></i>
+      <i class="fa fa-plus-circle"></i>
     </a>
   </span>
   {{/if}}
@@ -36,7 +36,7 @@
     href="javascript://"
     rel="tooltip"
     data-placement="left"
-    data-toggle="multitype-object-modal-selector"
+    data-toggle="unified-mapper"
     data-join-mapping="{{mapping}}"
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="{{parent_instance.class.shortName}}"
@@ -44,7 +44,7 @@
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
     data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }'
     >
-    <i class="grcicon-add-black"></i>
+    <i class="fa fa-plus-circle"></i>
   </a>
   {{else}}
   <a
@@ -52,14 +52,14 @@
     href="javascript://"
     rel="tooltip"
     data-placement="left"
-    data-toggle="multitype-object-modal-selector"
+    data-toggle="unified-mapper"
     data-join-mapping="{{mapping}}"
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="{{parent_instance.class.shortName}}"
     data-exclude-option-types="{{exclude_option_types}}"
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
     >
-    <i class="grcicon-add-black"></i>
+    <i class="fa fa-plus-circle"></i>
   </a>
   {{/if_instance_of}}
   {{/if}}

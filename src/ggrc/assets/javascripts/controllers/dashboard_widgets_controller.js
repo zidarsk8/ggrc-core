@@ -35,8 +35,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     if(!this.options.widget_icon && this.options.model) {
       this.options.widget_icon = this.options.model.table_singular;
     }
-    if(this.options.widget_icon && !/^grcicon/.test(this.options.widget_icon)) {
-      this.options.widget_icon = "grcicon-" + this.options.widget_icon + "-color";
+    if(this.options.widget_icon && !/^fa/.test(this.options.widget_icon)) {
+      this.options.widget_icon = this.options.widget_icon;
     }
 
     if(!this.options.object_category && this.options.model) {
@@ -44,7 +44,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     }
 
     this.options.widget_count = new can.Observe();
-    
+
     this.element
           .addClass("widget")
           .addClass(this.options.object_category)
@@ -135,7 +135,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
       }).done(tracker_stop);
 
       return this._display_deferred;
-    }
+    },
 
   /*, ".remove-widget click" : function() {
     var parent = this.element.parent();
@@ -151,8 +151,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     ev.stopPropagation();
     ev.originalEvent && ev.originalEvent.stopPropagation();
   }*/
-  , " updateCount" : function(el, ev, count) {
-    this.options.widget_count.attr('count', ''+count);
+  "updateCount": function (el, ev, count, updateCount) {
+    this.options.widget_count.attr("count", "" + count);
   }
 
   , display_path: function(path) {

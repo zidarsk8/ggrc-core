@@ -9,6 +9,8 @@
   GGRC.permissions = ={ permissions_json()|safe };
   GGRC.current_user = ={ current_user_json()|safe };
   GGRC.config = ={ config_json()|safe };
+  GGRC.custom_attr_defs =  ={ attributes_json()|safe }
+  GGRC.model_attr_defs =  ={ all_attributes_json()|safe }
 
 -block page_help scoped
   dashboard
@@ -17,13 +19,18 @@
   %header.header.main
   .area{ 'class': '={ model_display_class }' }
     .header-content
-      .row-fluid
-        #page-header.span12
-          -block header
+      %h2.logo-wrap{ 'class': '={ logo_wrap_class }' }
+        %a{ 'class': 'to-my-work', 'href': '/dashboard' }
+          -set logo_url = config.get("COMPANY_LOGO")
+          -if logo_url
+            %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
+      #page-header
+        -block header
 
-    .top-inner-nav
-      .object-nav
-        %ul.nav{ 'class': "internav" }
+    -block nav
+      .top-inner-nav
+        .object-nav
+          %ul.nav{ 'class': "internav" }
 
     %section.content
       .flash

@@ -28,6 +28,10 @@ APPENGINE_PACKAGES_DIR=$(DEV_PREFIX)/opt/gae_packages
 APPENGINE_ENV_DIR=$(DEV_PREFIX)/opt/gae_virtualenv
 APPENGINE_REQUIREMENTS_TXT=$(PREFIX)/src/requirements.txt
 
+FLASH_PATH=$(PREFIX)/src/ggrc/static/flash
+STATIC_PATH=$(PREFIX)/src/ggrc/static
+BOWER_PATH=$(PREFIX)/bower_components
+
 $(APPENGINE_SDK_PATH) : $(APPENGINE_ZIP_PATH)
 	@echo $( dirname $(APPENGINE_ZIP_PATH) )
 	cd `dirname $(APPENGINE_SDK_PATH)`; \
@@ -99,9 +103,7 @@ dev_virtualenv : $(DEV_PREFIX)/opt/dev_virtualenv
 
 dev_virtualenv_packages : dev_virtualenv src/dev-requirements.txt src/requirements.txt
 	source "$(PREFIX)/bin/init_env"; \
-		pip --version | grep -E "1.5" \
-			&& pip install -U pip==1.4.1 --no-use-wheel \
-			|| pip install -U pip==1.4.1; \
+		pip install -U pip==7.1.2; \
 		pip install --no-deps -r src/requirements.txt; \
 		pip install -r src/dev-requirements.txt
 
@@ -119,9 +121,9 @@ setup_dev : dev_virtualenv_packages linked_packages
 ## Deployment!
 
 src/ggrc/assets/stylesheets/dashboard.css : src/ggrc/assets/stylesheets/*.scss
-	bin/build_compass
+	bin/build_compass -e production --force
 
-src/ggrc/static/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/ggrc/assets
+src/ggrc/assets/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/ggrc/assets
 	source "bin/init_env"; \
 		GGRC_SETTINGS_MODULE="$(SETTINGS_MODULE)" bin/build_assets
 
@@ -142,13 +144,24 @@ src/app.yaml : src/app.yaml.dist
 		APPENGINE_EMAIL="$(APPENGINE_EMAIL)" \
 		CUSTOM_URL_ROOT="$(CUSTOM_URL_ROOT)" \
 		INSTANCE_CLASS="$(INSTANCE_CLASS)" \
-		MAX_INSTANCES="$(MAX_INSTANCES)"
+		MAX_INSTANCES="$(MAX_INSTANCES)" \
+		AUTHORIZED_DOMAINS="$(AUTHORIZED_DOMAINS)"
 
-deploy : appengine_packages_zip src/ggrc/static/assets.manifest src/app.yaml
+bower_components : bower.json
+	mkdir -p $(BOWER_PATH)
+	mkdir -p $(FLASH_PATH)
+	bower install
+	cp $(BOWER_PATH)/zeroclipboard/dist/ZeroClipboard.swf $(FLASH_PATH)/ZeroClipboard.swf
+	cp -r $(BOWER_PATH)/fontawesome/fonts $(STATIC_PATH)
+
+clean_bower_components :
+	rm -rf $(BOWER_PATH) $(FLASH_PATH) $(STATIC_PATH)/fonts
+
+deploy : appengine_packages_zip bower_components src/ggrc/assets/assets.manifest src/app.yaml
 
 clean_deploy :
 	rm -f src/ggrc/assets/stylesheets/dashboard.css
-	rm -f src/ggrc/static/dashboard-*.* src/ggrc/static/assets.manifest
+	rm -f src/ggrc/static/dashboard-*.* src/ggrc/assets/assets.manifest
 	rm -f src/app.yaml
 
-clean : clean_deploy
+clean : clean_deploy clean_bower_components

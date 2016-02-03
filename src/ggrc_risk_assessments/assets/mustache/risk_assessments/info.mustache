@@ -1,41 +1,28 @@
-<section class="info">
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
   {{#is_info_pin}}
-  <div class="clearfix">
     {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-    <div class="tier-content pin">
-      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-    </div>
-  </div>
   {{/is_info_pin}}
 
-  <div class="details-wrap">
-    <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-    <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-      {{#is_allowed 'update'}}
-        <li>
-          <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
-            <i class="grcicon-edit"></i>
-            <span>Edit risk assessment</span>
-          </a>
-        </li>
-      {{/is_allowed}}
-      <li>
-        <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-      </li>
-    </ul>
+  <div class="info-pane-utility">
+    {{> /static/mustache/base_objects/dropdown_menu.mustache}}
   </div>
 
   <div class="tier-content">
-    {{^is_info_pin}}
-      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-    {{/is_info_pin}}
-
+    {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
     {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
     <div class="row-fluid wrap-row">
       <div class="span12">
         <h6>Notes</h6>
         <div class="rtf-block">
-          {{{firstnonempty instance.notes '<span class="no-data">No additional notes</span>'}}}
+          {{{firstnonempty instance.notes '<span class="empty-message">None</span>'}}}
         </div>
       </div>
     </div>
@@ -64,6 +51,15 @@
         {{/using}}
       </div>
     </div>
-
+    <div class="row-fluid">
+      <div class="span12">
+        <h6>Code</h6>
+        <div class="tree-description">
+          {{{instance.slug}}}
+        </div>
+      </div>
+    </div>
   </div>
+
+  {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
 </div>

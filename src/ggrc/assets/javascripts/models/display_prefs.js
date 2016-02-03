@@ -22,6 +22,9 @@ var COLLAPSE = "collapse"
 , TOP_NAV = "top_nav"
 , FILTER_WIDGET = "filter_widget"
 , TREE_VIEW_HEADERS = "tree_view_headers"
+, TREE_VIEW = "tree_view"
+, CHILD_TREE_DISPLAY_LIST = "child_tree_display_list"
+, MODAL_STATE = "modal_state"
 , path = window.location.pathname.replace(/\./g, "/");
 
 can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
@@ -203,6 +206,53 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
     if (!value || !value[model_name]) {
       return [];
+    }
+
+    return value[model_name].display_list;
+  }
+
+  , setModalState : function (model_name, display_state) {
+    var path = null, modal_state = this.getObject(path, MODAL_STATE), obj = {};
+
+    if (!modal_state) {
+      modal_state = this.makeObject(path, MODAL_STATE);
+    }
+
+    obj.display_state = display_state;
+    modal_state.attr(model_name, obj);
+
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getModalState : function (model_name) {
+    var modal_state = this.getObject(null, MODAL_STATE);
+
+    if (!modal_state || !modal_state[model_name]) {
+      return null;
+    }
+
+    return modal_state[model_name].display_state;
+  }
+
+  , setChildTreeDisplayList : function (model_name, display_list) {
+    var hdr = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST), obj = {};
+    if (!hdr) {
+      hdr = this.makeObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
+    }
+
+    obj.display_list = display_list;
+    hdr.attr(model_name, obj);
+
+    this.autoupdate && this.save();
+    return this;
+  }
+
+  , getChildTreeDisplayList : function (model_name) {
+    var value = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
+
+    if (!value || !value[model_name]) {
+      return null; //in this case user should use default list an empty list, [], is different  than null
     }
 
     return value[model_name].display_list;

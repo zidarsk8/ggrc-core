@@ -1,17 +1,11 @@
-{{#if_helpers "\
-   #if" instance.viewLink "\
-   or #if" options.allow_mapping "\
-   or #is_allowed" "update" instance "\
-   " _2_context='for'}}
-<div class="details-wrap">
-  <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-  <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-    {{> /static/mustache/base_objects/view_link.mustache }}
-    {{> /static/mustache/base_objects/unmap.mustache}}
-    {{> /static/mustache/base_objects/edit_object_link.mustache}}
-  </ul>
-</div>
-{{/if_helpers}}
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+{{> /static/mustache/base_objects/dropdown_menu_tier2.mustache}}
 
 <div class="tier-content">
   {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance }}}
@@ -42,7 +36,7 @@
   </div>
   <div class="row-fluid wrap-row">
     <div class="span12">
-      <ggrc-gdrive-folder-picker instance="instance"/>
+      <ggrc-gdrive-folder-picker {{^is_allowed 'update' instance}}readonly="true"{{/is_allowed}} instance="instance"/>
     </div>
   </div>
 </div>

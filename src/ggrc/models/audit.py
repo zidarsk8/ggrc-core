@@ -8,10 +8,13 @@ from .mixins import (
     deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact,
     Titled, Slugged, CustomAttributable
 )
-from .relationship import Relatable
-from .object_person import Personable
-from .context import HasOwnContext
-from .reflection import PublishOnly
+from ggrc.models.relationship import Relatable
+from ggrc.models.object_person import Personable
+from ggrc.models.context import HasOwnContext
+from ggrc.models.reflection import AttributeInfo
+from ggrc.models.reflection import PublishOnly
+from ggrc.models.program import Program
+from ggrc.models.person import Person
 
 
 class Audit(
@@ -65,8 +68,16 @@ class Audit(
   _include_links = []
 
   _aliases = {
-      "program_id": "Program",
-      "user_role:Auditor": "Auditors",
+      "program": {
+          "display_name": "Program",
+          "filter_by": "_filter_by_program",
+          "mandatory": True,
+      },
+      "user_role:Auditor": {
+          "display_name": "Auditors",
+          "type": AttributeInfo.Type.USER_ROLE,
+          "filter_by": "_filter_by_auditor",
+      },
       "status": "Status",
       "start_date": "Planned Start Date",
       "end_date": "Planned End Date",
@@ -74,14 +85,30 @@ class Audit(
       "report_end_date": "Planned Report Period to",
       "contact": {
           "display_name": "Internal Audit Lead",
-          "mandatory": True
+          "mandatory": True,
+          "filter_by": "_filter_by_contact",
       },
-      "slug": None,
       "secondary_contact": None,
       "notes": None,
       "url": None,
       "reference_url": None,
   }
+
+  @classmethod
+  def _filter_by_program(cls, predicate):
+    return Program.query.filter(
+        (Program.id == Audit.program_id) &
+        (predicate(Program.slug) | predicate(Program.title))
+    ).exists()
+
+  @classmethod
+  def _filter_by_auditor(cls, predicate):
+    from ggrc_basic_permissions.models import Role, UserRole
+    return UserRole.query.join(Role, Person).filter(
+        (Role.name == "Auditor") &
+        (UserRole.context_id == cls.context_id) &
+        (predicate(Person.name) | predicate(Person.email))
+    ).exists()
 
   @classmethod
   def eager_query(cls):

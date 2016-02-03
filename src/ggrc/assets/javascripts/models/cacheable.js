@@ -5,101 +5,107 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-//= require can.jquery-all
+// = require can.jquery-all
 
-(function(can) {
-
-var makeFindRelated = function(thistype, othertype) {
-  return function(params) {
-    if(!params[thistype + "_type"]) {
-      params[thistype + "_type"] = this.shortName;
-    }
-    return CMS.Models.Relationship.findAll(params).then(function(relationships) {
-      var dfds = [], things = new can.Model.List();
-      can.each(relationships, function(rel,idx) {
-        var dfd;
-        if(rel[othertype].selfLink) {
-          things.push(rel[othertype]);
-        } else {
-          dfd = rel[othertype].refresh().then(function(dest) {
-            things.splice(idx, 1, dest);
+(function (can) {
+  var makeFindRelated = function (thistype, othertype) {
+    return function (params) {
+      if (!params[thistype + '_type']) {
+        params[thistype + '_type'] = this.shortName;
+      }
+      return CMS.Models.Relationship.findAll(params).then(
+        function (relationships) {
+          var dfds = [];
+          var things = new can.Model.List();
+          can.each(relationships, function (rel, idx) {
+            var dfd;
+            if (rel[othertype].selfLink) {
+              things.push(rel[othertype]);
+            } else {
+              dfd = rel[othertype].refresh().then(function (dest) {
+                things.splice(idx, 1, dest);
+              });
+              dfds.push(dfd);
+              things.push(dfd);
+            }
           });
-          dfds.push(dfd);
-          things.push(dfd);
-        }
-      });
-      return $.when.apply($, dfds).then(function(){ return things; });
-    });
+          return $.when.apply($, dfds).then(function () {
+            return things;
+          });
+        });
+    };
   };
-};
 
-function dateConverter(d, oldValue, fn, key) {
-  var conversion = "YYYY-MM-DD\\THH:mm:ss\\Z";
-  var ret;
-  if(typeof d === "object" && d) {
-    d = d.getTime();
-  }
-  if(typeof d === "number") {
-    d /= 1000;
-    conversion = "X";
-  }
-  if(typeof d === "string" && ~d.indexOf("/")) {
-    conversion = "MM/DD/YYYY";
-  }
-  d = d ? d.toString() : null;
-  ret = moment(d, conversion);
-  if(!ret.unix()) {
-    // invalid date computed. Result of unix() is NaN.
-    return undefined;
-  }
-
-  if (typeof d === "string" && ret
-      //  Don't correct timezone for dates
-      && !/^\d+-\d+-\d+$/.test(d) && !/^\d+\/\d+\/\d+$/.test(d)
-      //  Don't correct timezone if `moment.js` has already done it
-      && !/[-+]\d\d:?\d\d/.test(d)) {
-    ret.subtract(new Date().getTimezoneOffset(), "minute");
-  }
-
-  if(oldValue && oldValue.getTime && ret && ret.toDate().getTime() === oldValue.getTime()) {
-    return oldValue;  // avoid changing to new Date object if the value is the same.
-  }
-  return ret ? ret.toDate() : undefined;
-}
-
-function makeDateUnpacker(keys) {
-  return function(d, oldValue, fn, attr) {
-    return can.reduce(keys, function(curr, key) {
-      return curr || (d[key] && dateConverter(d[key], oldValue, fn, attr));
-    }, null) || d;
-  };
-}
-
-function makeDateSerializer(type, key) {
-  var conversion = type === "date" ? "YYYY-MM-DD" : "YYYY-MM-DD\\THH:mm:ss\\Z";
-  return function(d) {
-    if(d == null) {
-      return "";
+  function dateConverter(date, oldValue, fn, key) {
+    var conversion = 'YYYY-MM-DD\\THH:mm:ss\\Z';
+    var ret;
+    if (typeof date === 'object' && date) {
+      date = date.getTime();
     }
-    if(typeof d !== "number") {
-      d = d.getTime();
+    if (typeof date === 'number') {
+      date /= 1000;
+      conversion = 'X';
     }
-    var retstr = moment((d / 1000).toString(), "X");
-    if(type !== "date") {
-      retstr = retstr.utc();
+    if (typeof date === 'string' && ~date.indexOf('/')) {
+      conversion = 'MM/DD/YYYY';
     }
-    retstr = retstr.format(conversion);
-    var retval;
-    if(key) {
-      retval = {};
-      retval[key] = retstr;
-    } else {
-      retval = retstr;
+    date = date ? date.toString() : null;
+    ret = moment(date, conversion);
+    if (!ret.unix()) {
+      // invalid date computed. Result of unix() is NaN.
+      return undefined;
     }
-    return retval;
-  };
-}
 
+    if (typeof date === 'string' && ret
+        //  Don't correct timezone for dates
+        && !/^\d+-\d+-\d+$/.test(date) && !/^\d+\/\d+\/\d+$/.test(date)
+        //  Don't correct timezone if `moment.js` has already done it
+        && !/[-+]\d\d:?\d\d/.test(date)) {
+      ret.subtract(new Date().getTimezoneOffset(), 'minute');
+    }
+
+    if (oldValue && oldValue.getTime
+        && ret && ret.toDate().getTime() === oldValue.getTime()) {
+      // avoid changing to new Date object if the value is the same.
+      return oldValue;
+    }
+    return ret ? ret.toDate() : undefined;
+  }
+
+  function makeDateUnpacker(keys) {
+    return function (date, oldValue, fn, attr) {
+      return can.reduce(keys, function (curr, key) {
+        return curr || (date[key] && dateConverter(
+            date[key], oldValue, fn, attr));
+      }, null) || date;
+    };
+  }
+
+  function makeDateSerializer(type, key) {
+    var conversion = type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD\\THH:mm:ss\\Z';
+    return function (date) {
+      var retstr;
+      var retval;
+      if (date === null || date === undefined) {
+        return '';
+      }
+      if (typeof date !== 'number') {
+        date = date.getTime();
+      }
+      retstr = moment((date / 1000).toString(), 'X');
+      if (type !== 'date') {
+        retstr = retstr.utc();
+      }
+      retstr = retstr.format(conversion);
+      if (key) {
+        retval = {};
+        retval[key] = retstr;
+      } else {
+        retval = retstr;
+      }
+      return retval;
+    };
+  }
 
 can.Model("can.Model.Cacheable", {
 
@@ -121,6 +127,7 @@ can.Model("can.Model.Cacheable", {
     "start date": "start_date",
     "created date": "created_at",
     "updated date": "updated_at",
+    "modified date": "updated_at",
     "code": "slug",
     "state": "status"
   }
@@ -221,7 +228,6 @@ can.Model("can.Model.Cacheable", {
         return deferred.done(tracker_stop);
       };
     }
-
   , setup : function(construct, name, statics, prototypes) {
     var overrideFindAll = false;
 
@@ -292,6 +298,7 @@ can.Model("can.Model.Cacheable", {
   }
   , init : function() {
     var id_key = this.id;
+
     this.bind("created", function(ev, new_obj) {
       var cache = can.getObject("cache", new_obj.constructor, true);
       if(new_obj[id_key] || new_obj[id_key] === 0) {
@@ -378,10 +385,9 @@ can.Model("can.Model.Cacheable", {
       GGRC.custom_attributable_types.push($.extend({}, this));
     }
   }
-
   , resolve_deferred_bindings : function(obj) {
     var _pjs, refresh_dfds = [], dfds = [];
-    if(obj._pending_joins) {
+    if (obj._pending_joins && obj._pending_joins.length) {
       _pjs = obj._pending_joins.slice(0); //refresh of bindings later will muck up the pending joins on the object
       can.each(can.unique(can.map(_pjs, function(pj) { return pj.through; })), function(binding) {
         refresh_dfds.push(obj.get_binding(binding).refresh_stubs());
@@ -438,8 +444,11 @@ can.Model("can.Model.Cacheable", {
             });
           }
         });
-        delete obj._pending_joins;
+
+        obj.attr('_pending_joins', []);
+        obj.attr('_pending_joins_dfd', $.when.apply($, dfds));
         return $.when.apply($, dfds).then(function() {
+          can.trigger(this, "resolved");
           return obj.refresh();
         });
       });
@@ -672,6 +681,23 @@ can.Model("can.Model.Cacheable", {
         return mapper;
       }
     }
+
+  // This this is the parsing part of the easy accessor for deep properties.
+  // Use the result of this with instance.get_deep_property
+  // owners.0.name -> this.owners[0].reify().name
+  // owners.0.name|email ->
+  // firstnonempty this.owners[0].reify().name this.owners[0].reify().email
+  //
+  // owners.GET_ALL.name ->
+  // [this.owners[0].reify().name, this.owners[1].reify().name...]
+  , parse_deep_property_descriptor: function(deep_property_string) {
+      return Object.freeze(_.map(deep_property_string.split("."), function (part) {
+        if (part === "GET_ALL") {
+          return part;
+        }
+        return Object.freeze(part.split("|"));
+      }));
+  }
 }, {
   init : function() {
     var cache = can.getObject("cache", this.constructor, true)
@@ -683,6 +709,10 @@ can.Model("can.Model.Cacheable", {
       cache[this[id_key]] = this;
     this.attr("class", this.constructor);
     this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
+
+    if (!this._pending_joins) {
+      this.attr("_pending_joins", []);
+    }
 
     // Listen for `stub_destroyed` change events and nullify or remove the
     // corresponding property or list item.
@@ -703,17 +733,16 @@ can.Model("can.Model.Cacheable", {
     });
   }
   , load_custom_attribute_definitions: function custom_attribute_definitions() {
-    var self = this;
-    if (self.attr('custom_attribute_definitions')) {
-      return new $.Deferred().resolve(self.attr('custom_attribute_definitions'));
+    var definitions;
+    if (this.attr('custom_attribute_definitions')) {
+      return;
     }
-    return CMS.Models.CustomAttributeDefinition.findAll({
-      definition_type: self.class.root_object
-    }).then(function(definitions) {
-      if(!self.attr('custom_attribute_definitions')) {
-        self.attr('custom_attribute_definitions', definitions);
+    definitions = can.map(GGRC.custom_attr_defs, function(def) {
+      if (def.definition_type && def.definition_type === this.constructor.table_singular) {
+        return def;
       }
-    });
+    }.bind(this));
+    this.attr('custom_attribute_definitions', definitions);
   }
   , setup_custom_attributes: function setup_custom_attributes() {
     var self = this, key;
@@ -728,6 +757,7 @@ can.Model("can.Model.Cacheable", {
     can.each(this.custom_attribute_definitions, function(definition) {
       if (definition.mandatory) {
         if (definition.attribute_type === 'Checkbox') {
+
           self.class.validate('custom_attributes.' + definition.id, function(val){
             return !val;
           });
@@ -754,12 +784,14 @@ can.Model("can.Model.Cacheable", {
     })
   , computed_unsuppressed_errors : can.compute(function() {
     return this.errors();
-  })
-  , get_list_counter: function(name) {
-      var binding = this.get_binding(name);
-      if(!binding) return new $.Deferred().reject();
-      return binding.refresh_count();
+  }),
+  get_list_counter: function (name) {
+    var binding = this.get_binding(name);
+    if (!binding) {
+      return $.Deferred().reject();
     }
+    return binding.refresh_count();
+  }
 
   , get_list_loader: function(name) {
       var binding = this.get_binding(name);
@@ -768,8 +800,11 @@ can.Model("can.Model.Cacheable", {
 
   , get_mapping: function(name) {
       var binding = this.get_binding(name);
-      binding.refresh_list();
-      return binding.list;
+      if (binding) {
+        binding.refresh_list();
+        return binding.list;
+      }
+      return [];
     }
 
   // This retrieves the potential orphan stats for a given instance
@@ -909,38 +944,39 @@ can.Model("can.Model.Cacheable", {
       }
     }
     this._triggerChange(attrName, "set", this[attrName], this[attrName].slice(0, this[attrName].length - 1));
-  }
-  , refresh : function(params) {
+  },
+  refresh: function (params) {
     var dfd,
-      href = this.selfLink || this.href,
-      that = this;
+        href = this.selfLink || this.href,
+        that = this;
 
-    if (!href)
+    if (!href) {
       return (new can.Deferred()).reject();
-    if(!this._pending_refresh) {
+    }
+    if (!this._pending_refresh) {
       this._pending_refresh = {
-        dfd : new $.Deferred()
-        , fn : $.throttle(1000, true, function() {
+        dfd: $.Deferred(),
+        fn: _.throttle(function () {
           var dfd = that._pending_refresh.dfd;
           can.ajax({
-            url : href
-            , params : params
-            , type : "get"
-            , dataType : "json"
+            url: href,
+            params: params,
+            type: "get",
+            dataType : "json"
           })
-          .then(function(resources) {
+          .then(function (resources) {
             delete that._pending_refresh;
             return resources;
           })
           .then($.proxy(that.constructor, "model"))
-          .done(function(d) {
-            d.backup();
-            dfd.resolve(d);
+          .done(function (response) {
+            response.backup();
+            dfd.resolve.apply(dfd, arguments);
           })
-          .fail(function() {
+          .fail(function () {
             dfd.reject.apply(dfd, arguments);
           });
-        })
+        }, 1000, {trailing: false})
       };
     }
     dfd = this._pending_refresh.dfd
@@ -988,43 +1024,69 @@ can.Model("can.Model.Cacheable", {
   }
   , autocomplete_label : function() {
     return this.title;
-  }
+  },
+  get_permalink: function () {
+    var dfd = $.Deferred(),
+        constructor = this.constructor;
+    if (!constructor.permalink_options) {
+      return dfd.resolve(this.viewLink);
+    }
+    $.when(this.refresh_all.apply(this, constructor.permalink_options.base.split(":"))).then(function (base) {
+      return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
+    }.bind(this));
+    return dfd.promise();
+  },
+
+  mark_for_change: function (join_attr, obj, extra_attrs) {
+    extra_attrs = extra_attrs || {};
+    var args = can.makeArray(arguments).concat({change: true});
+    this.mark_for_deletion.apply(this, args);
+    this.mark_for_addition.apply(this, args);
+  },
+
 
   /**
    Set up a deferred join object deletion when this object is updated.
   */
-  , mark_for_deletion : function(join_attr, obj) {
+  mark_for_deletion: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
-    if(!this._pending_joins) {
-      this._pending_joins = [];
-    }
-    for(var i = this._pending_joins.length; i--;) {
-      if(this._pending_joins[i].what === obj) {
-        this._pending_joins.splice(i, 1);
-      }
-    }
-    this._pending_joins.push({how : "remove", what : obj, through : join_attr });
-  }
+
+    this.is_pending_join(obj);
+    this._pending_joins.push({how: "remove", what: obj, through: join_attr, opts: options});
+  },
+
   /**
    Set up a deferred join object creation when this object is updated.
   */
-  , mark_for_addition : function(join_attr, obj, extra_attrs) {
+  mark_for_addition: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
-    if(!this._pending_joins) {
-      this._pending_joins = [];
-    }
-    for(var i = this._pending_joins.length; i--;) {
-      if(this._pending_joins[i].what === obj) {
-        this._pending_joins.splice(i, 1);
-      }
-    }
-    this._pending_joins.push({how : "add", what : obj, through : join_attr, extra: extra_attrs });
-  }
+    extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
 
-  , delay_resolving_save_until : function(dfd) {
+    this.is_pending_join(obj);
+    this._pending_joins.push({how: "add", what: obj, through: join_attr, extra: extra_attrs, opts: options});
+  },
+
+  is_pending_join: function (needle) {
+    var joins;
+    var len;
+    if (!this._pending_joins) {
+      this.attr('_pending_joins', []);
+    }
+    len = this._pending_joins.length;
+    joins = _.filter(this._pending_joins, function (val) {
+      var isNeedle = val.what === needle;
+      var isChanged = val.opts && val.opts.change;
+      return !(isNeedle && !isChanged);
+    }.bind(this));
+    if (len !== joins.length) {
+      this.attr('_pending_joins').replace(joins);
+    }
+  },
+
+  delay_resolving_save_until: function (dfd) {
     return this.notifier.queue(dfd);
-  }
-  , _save: function() {
+  },
+   _save: function () {
     var that = this,
         _super = Array.prototype.pop.call(arguments),
         isNew = this.isNew(),
@@ -1044,7 +1106,7 @@ can.Model("can.Model.Cacheable", {
 
     pre_save_notifier.on_empty(function() {
       xhr = _super.apply(that, arguments)
-      .then(function(result) {
+      .then(function (result) {
         if (isNew) {
           that.after_create && that.after_create();
         } else {
@@ -1052,7 +1114,7 @@ can.Model("can.Model.Cacheable", {
         }
         that.after_save && that.after_save();
         return result;
-      }, function(xhr, status, message) {
+      }, function (xhr, status, message) {
         that.save_error && that.save_error(xhr.responseText);
         return new $.Deferred().reject(xhr, status, message);
       })
@@ -1069,54 +1131,82 @@ can.Model("can.Model.Cacheable", {
 
       GGRC.delay_leaving_page_until(xhr);
       GGRC.delay_leaving_page_until(dfd);
-
     });
     return dfd;
-  }
-  , save: function() {
+  },
+  save: function () {
     Array.prototype.push.call(arguments, this._super);
-    this._dfd = new $.Deferred();
+    this._dfd = $.Deferred();
     GGRC.SaveQueue.enqueue(this, arguments);
     return this._dfd;
   },
-  refresh_all: function() {
+  refresh_all: function () {
     var props = Array.prototype.slice.call(arguments, 0);
 
     return RefreshQueue.refresh_all(this, props);
   },
-  refresh_all_force: function() {
+  refresh_all_force: function () {
     var props = Array.prototype.slice.call(arguments, 0);
 
     return RefreshQueue.refresh_all(this, props, true);
   },
   get_filter_vals: function (keys, mappings) {
+    var values = {};
+    var customAttrs = {};
+    var customAttrIds = {};
+    var longTitle = this.type.toLowerCase() + ' title';
+
     keys = keys || this.class.filter_keys;
     mappings = mappings || this.class.filter_mappings;
 
-    var values = {},
-        long_title = this.type.toLowerCase() + " title";
-
-    if (!mappings[long_title]){
-      mappings[long_title] = "title";
+    if (!this.custom_attribute_definitions) {
+      this.load_custom_attribute_definitions();
     }
-    keys = _.union(keys, long_title, _.keys(mappings));
-    $.each(keys, function(index, key) {
-      var val = mappings[key] ?
-        this[mappings[key]] :
-        this[key];
+    this.custom_attribute_definitions.each(function (definition) {
+      customAttrIds[definition.id] = definition.title.toLowerCase();
+    });
+    if (!this.custom_attributes) {
+      this.setup_custom_attributes();
+    }
+    can.each(this.custom_attribute_values, function (customAttr) {
+      customAttr = customAttr.reify();
+      customAttrs[customAttrIds[customAttr.custom_attribute_id]] =
+        customAttr.attribute_value;
+    });
 
-      if (val !== undefined && val !== null){
-        if (key == 'owner' || key == 'owners'){
+    if (!mappings[longTitle]) {
+      mappings[longTitle] = 'title';
+    }
+    keys = _.union(keys, longTitle, _.keys(mappings), _.keys(customAttrs));
+    $.each(keys, function (index, key) {
+      var attrKey = mappings[key] || key;
+      var val = this[attrKey] || customAttrs[attrKey];
+      var owner;
+      var audit;
+
+      if (val !== undefined && val !== null) {
+        if (key === 'owner' || key === 'owners') {
           values[key] = [];
-          val.forEach(function(owner_stub){
-            var owner = owner_stub.reify();
+          val.forEach(function (owner_stub) {
+            owner = owner_stub.reify();
             values[key].push({
               name: owner.name,
               email: owner.email
             });
           });
-        } else if ($.type(val) === 'string'){
-          values[key] = val;
+        } else if (key === 'audit') {
+          audit = this.audit.reify();
+          values[key] = {
+            status: audit.status,
+            title: audit.title
+          };
+        } else {
+          if ($.type(val) === 'date') {
+            val = val.toISOString().substring(0, 10);
+          }
+          if ($.type(val) === 'string') {
+            values[key] = val;
+          }
         }
       }
     }.bind(this));
@@ -1125,87 +1215,84 @@ can.Model("can.Model.Cacheable", {
   },
 
   hash_fragment: function () {
-    var type = can.spaceCamelCase(this.type || "")
+    var type = can.spaceCamelCase(this.type || '')
             .toLowerCase()
             .replace(/ /g, '_');
 
-    return [type,
-            this.id].join('/');
+    return [type, this.id].join('/');
+  },
+  get_custom_value: function (prop) {
+    var attr = _.find(GGRC.custom_attr_defs, function (item) {
+      return item.definition_type === this.type.toLowerCase() &&
+        item.title === prop;
+    }.bind(this));
+    var result;
+    if (!attr) {
+      return undefined;
+    }
+    result = _.find(this.custom_attribute_values, function (item) {
+      return item.reify().custom_attribute_id === attr.id;
+    });
+    if (result) {
+      result = result.reify().attribute_value;
+      if (attr.attribute_type.toLowerCase() === 'date') {
+        result = moment(result, 'MM/DD/YYYY').format('YYYY-MM-DD');
+      }
+    }
+    return result;
   },
 
-  // easier accessor for deep properties
-  // owners.0.name -> this.owners[0].reify().name
-  // owners.0.name|email -> 
-  //  firstnonempty this.owners[0].reify().name this.owners[0].reify().email
-  get_deep_property: function get_deep_property (descriptor, val) {
-    val = typeof val === "undefined" ? this : val;
-    
-    if (!descriptor || !descriptor.length) {
-      return undefined;
-    } else if (val[descriptor]) {
-      return val[descriptor];
-    } else if (descriptor.match(/^custom:/)) {
-      return this.get_deep_property(
-          this._find_custom_attr(descriptor),
-          val);
-    } else {
-      var d = descriptor.split('.'),
-          keys = d.shift().split('|'),
-          rest = d.join('.');
+  // Returns a deep property as specified in the descriptor built
+  // by Cacheable.parse_deep_property_descriptor
+  get_deep_property: function (property_descriptor) {
+    var i;
+    var j;
+    var part;
+    var field;
+    var found;
+    var tmp;
+    var val = this;
+    var rCustom = /^custom\:/i;
+    var mapProp;
 
+    function mapDeepProp(count) {
+      count += 1;
+      return function (element) {
+        return element.get_deep_property(property_descriptor.slice(count));
+      };
+    }
+    for (i = 0; i < property_descriptor.length; i++) {
+      part = property_descriptor[i];
       if (val.instance) {
         val = val.instance;
       }
-
-      return _.reduce(keys, function (res, key) {
-        if (res && res.length) return res;
-
-        var binding = val.get_binding && val.has_binding(key)
-                ? val.get_binding(key)
-                : null;
-
-        if (binding && binding.list && binding.list.length) {
-          val = binding.list;
-
-          return rest.length
-                ? get_deep_property(rest, val)
-                : val;
-        } else if (typeof val[key] === "undefined") {
-          return undefined;
-        } else if (val[key] === null) {
-          return null;
-        } else {
-          if (typeof val[key].reify === "function") {
-            val[key] = val[key].reify();
+      found = false;
+      if (part === 'GET_ALL') {
+        mapProp = mapDeepProp(i);
+        return _.map(val, mapProp);
+      }
+      for (j = 0; j < part.length; j++) {
+        field = part[j];
+        tmp = val[field];
+        if (tmp !== undefined && tmp !== null) {
+          val = tmp;
+          if (typeof val.reify === 'function') {
+            val = val.reify();
           }
-          
-          return rest.length
-                ? get_deep_property(rest, val[key])
-                : val[key];
+          found = true;
+          break;
+        } else if (rCustom.test(field)) {
+          field = field.split(':')[1];
+          val = this.get_custom_value(field);
+          found = true;
+          break;
         }
-      }, "");
+      }
+      if (!found) {
+        return null;
+      }
     }
-  },
-
-  // finds path descriptors for custom fields
-  // something like custom:Custom field
-  // becomes custom_attribute_values.1.attribute_value
-  // the index is what we're looking for
-  _find_custom_attr: function (descriptor, val) {
-    descriptor = descriptor.replace(/^custom:/, '');
-    val = typeof val === "undefined" ? this : val;
-
-    var needle = _.find(GGRC.custom_attr_defs, function (attr) {
-      return attr.definition_type === val.class.table_singular && 
-            attr.title === descriptor;
-    });
-
-    var index = _.findIndex(val.custom_attribute_values, function (attr) {
-      attr = attr.reify();
-      return attr.custom_attribute_id === needle.id;
-    });
-
-    return 'custom_attribute_values.'+index+'.attribute_value';
+    return val;
   }
 });
 
@@ -1296,17 +1383,19 @@ can.Observe.List.prototype.stubs = function() {
 can.Observe.prototype.reify = function() {
   var type, model;
 
-  if (this instanceof can.Model)
+  if (this instanceof can.Model) {
     return this;
-  if (!(this instanceof can.Stub))
+  }
+  if (!(this instanceof can.Stub)) {
     console.debug("`reify()` called on non-stub, non-instance object", this);
+  }
 
   type = this.type;
   model = CMS.Models[type] || GGRC.Models[type];
 
-  if (!model)
+  if (!model) {
     console.debug("`reify()` called with unrecognized type", this);
-
+  }
   return model.model(this);
 };
 

@@ -2,6 +2,7 @@ gGRC-Core
 =========
 
 [![Travis status](https://travis-ci.org/google/ggrc-core.svg?branch=develop)](https://travis-ci.org/google/ggrc-core)
+[![Code Climate](https://codeclimate.com/github/google/ggrc-core/badges/gpa.svg)](https://codeclimate.com/github/google/ggrc-core)
 
 Google Governance, Risk and Compliance. Migrated from [Google](https://code.google.com/p/compliance-management/)
 [Code](https://code.google.com/p/ggrc-core).
@@ -18,6 +19,13 @@ environment:
 |[Vagrant](http://www.vagrantup.com/)      | Handy scriptable VM management           |
 |[Ansible](http://www.ansible.com/home)    | Provisioning and deployment tool         |
 
+Or alternatively (see Quickstart with docker)
+
+|               Prerequisite                       |                 Description              |
+|--------------------------------------------------|------------------------------------------|
+|[Docker](https://www.docker.com/)                 | Container management tool                |
+|[Docker compose](https://docs.docker.com/compose/)| A tool for defining multi-container apps |
+
 Quick Start
 -----------
 
@@ -26,6 +34,8 @@ have the prerequisite software installed. Here are the steps:
 
 * clone the repo
 * cd to the project directory
+* make sure your ansible installation is up-to-date i.e. version 1.9.3 or higher (if it's not in the repositories, you can
+install it via pip)
 * run the following:
 
     ```sh
@@ -43,10 +53,32 @@ VM](#provision-a-running-vagrant-vm) below for more).
 
 Now you're in the VM and ready to rock. Get to work!
 
+### Quickstart with docker
+
+Alternative setup is using just docker. Run a vagrant-like fat docker container
+named *ggrccore_dev_1* with this command (from the repo root)
+
+    docker-compose up
+
+Add `-d` to automatically daemonize.
+To enter a running container run
+
+    docker exec -it ggrccore_dev_1 su vagrant
+
+And then continue just like with vagrant
+
+    build_compass
+    build_assets
+    db_migrate
+
+`docker-compose` will manage the containers for you. If you want to reuse old container use
+
+    docker-compose --no-recreate
+
 ### Launching gGRC as Stand-alone Flask
 
-Most development is done in a stand-alone flask. We strive to make getting up 
-and running as simple as possible; to that end, launching the application is 
+Most development is done in a stand-alone flask. We strive to make getting up
+and running as simple as possible; to that end, launching the application is
 simple:
 
 ```sh
@@ -55,25 +87,32 @@ launch_ggrc
 
 ### Launching gGRC in Google App Engine SDK
 
-We strive to make getting up and running as simple as possible; to that end, 
+We strive to make getting up and running as simple as possible; to that end,
 launching the application in the Google App Engine SDK environment is simple:
 
 ```sh
 launch_gae_ggrc
 ```
 
+This requires `src/app.yaml` with settings. You can generate one for
+development with:
+
+```sh
+deploy_appengine extras/deploy_settings_local.sh
+```
+
 ### Accessing the Application
 
 The application will be accessible via this URL: <http://localhost:8080/>
 
-If you're running the Google App Engine SDK, the App Engine management console 
+If you're running the Google App Engine SDK, the App Engine management console
 will be avaiable via this URL: <http://localhost:8000/>
 
 ### Running Tests
 
 Tests are your friend! Keep them running, keep them updated.
 
-For JavaScript tests:
+##### For JavaScript tests:
 
 ```sh
 run_karma
@@ -81,14 +120,28 @@ run_karma
 
 Then open Chrome at URL: <http://localhost:9876>
 
-For Python unit tests:
+##### For Python tests:
 
 ```sh
 run_pytests
 ```
 
-Both will run tests that run in the background and refresh every time
-you save a file. Keep them passing.
+The script will run unit tests and integration tests.
+
+For better usage of unit tests you can use sniffer inside the test/unit folder.
+This will run the tests on each file update.
+
+```sh
+cd test/unit; sniffer
+```
+
+##### For Selenium tests:
+
+On the host machine in the root of the repository run:
+
+```sh
+./bin/jenkins/run_selenium
+```
 
 Quickstart Breakdown
 --------------------
@@ -344,7 +397,7 @@ build_assets
 
 # Copyright Notice
 
-Copyright (C) 2013-2015 Google Inc., authors, and contributors (see the AUTHORS
-file).  
+Copyright (C) 2013-2016 Google Inc., authors, and contributors (see the AUTHORS
+file).
 Licensed under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 license (see the LICENSE file).

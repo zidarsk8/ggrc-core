@@ -161,8 +161,6 @@
   }
 }
 
-.grcicon-carot-white { background-position:-78px -80px; }
-
 .widget {
   .header {
     &.tree-header {
@@ -170,11 +168,6 @@
         .add-trigger {
           .disable {
             cursor: not-allowed;
-            &:hover {
-              [class^="grcicon-"] {
-                @include opacity(.25);
-              }
-            }
           }
         }
       }
@@ -197,9 +190,18 @@
 .import-final,
 .import-progress,
 .import-progress-final {
-  display: none;
+  // display: none;
 }
 
-.export-control {
+.download-template select[multiple] {
+  min-height: 320px;
+}
+
+// Risk Assessment
+.object-wrap-people,
+.object-wrap-risks,
+.object-wrap-heat,
+#RAList,
+#RASheet {
   display: none;
 }

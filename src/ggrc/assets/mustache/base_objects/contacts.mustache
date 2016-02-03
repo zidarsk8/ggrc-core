@@ -1,9 +1,16 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: dan@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
 {{#instance}}
 <div class="row-fluid wrap-row">
-  <div class="span6">
-    <h6>Owner</h6>
-    <p class="oneline">
+  <div data-test-id="title_manager_7a906d2e" class="span6">
     {{#if is_program}}
+    <h6>Manager</h6>
+    <p class="oneline">
       {{#with_mapping 'authorizations' instance}}
         {{#if authorizations.length}}
           {{#each authorizations}}
@@ -18,71 +25,53 @@
             </span>
           {{/each}}
         {{else}}
-          <span class="error">
-            Not Assigned
-          </span>
+          <span class="empty-message">None</span>
         {{/if}}
       {{/with_mapping}}
     {{else}}
+    <h6>Owner</h6>
+    <p class="oneline">
       {{#if owners.length}}
         {{#using contacts=owners}}
         <ul class="inner-count-list">
           {{#each contacts}}
             <li>
-              {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-              {{^if is_enabled}}
-                <span class="user-disabled">
-                  (Disabled)
-                </span>
-              {{/if}}
+              {{#using person=this}}
+                {{>'/static/mustache/people/popover.mustache'}}
+              {{/using}}
             </li>
           {{/each}}
         </ul>
         {{/using}}
       {{else}}
-        <span class="error">
-          Not Assigned
-        </span>
+        <span class="empty-message">None</span>
       {{/if}}
     {{/if}}
     </p>
   </div>
-    <div class="span6">
+    <div data-test-id="title_contacts_696de7244b84" class="span6">
       {{#using person=contact}}
-      <h6>Primary Contact</h6>
-      <p class="oneline">
-        {{#if person}}
-          {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
-          {{^if person.is_enabled}}
-            <span class="user-disabled">
-              (Disabled)
-            </span>
+      <div data-test-id="title_primary_contact_696de7244b84"
+           class="bottom-space">
+        <h6>Primary Contact</h6>
+        <p data-test-id="text_primary_contact_696de7244b84" class="oneline">
+          {{#if person}}
+            {{>'/static/mustache/people/popover.mustache'}}
+          {{else}}
+            <span data-test-id="text_primary_contact_696de7244b84" class="empty-message">None</span>
           {{/if}}
-        {{else}}
-          <span class="error">
-            Not Assigned
-          </span>      
-        {{/if}}
-      </p>
+        </p>
+      </div>
       {{/using}}
       {{#using person=secondary_contact}}
-      {{#if person}}
       <h6>Secondary Contact</h6>
-      <p class="oneline">
+      <p data-test-id="text_secondary_contact_696de7244b84" class="oneline">
         {{#if person}}
-          {{{renderLive '/static/mustache/people/popover.mustache' person=person}}}
-          {{^if person.is_enabled}}
-            <span class="user-disabled">
-              (Disabled)
-            </span>
-          {{/if}}
+          {{>'/static/mustache/people/popover.mustache'}}
         {{else}}
-          <span class="error">
-            Not Assigned
-          </span>      
+          <span data-test-id="text_secondary_contact_696de7244b84" class="empty-message">None</span>
         {{/if}}
       </p>
-      {{/if}}
       {{/using}}
     </div>
 </div>

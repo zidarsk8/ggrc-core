@@ -15,6 +15,9 @@
             <div class="row-fluid">
               <div class="span{{display_options.title_width}}">
                 <div class="title tree-title-area" rel="tooltip" data-placement="left" title="" data-original-title="{{instance.title}}">
+                  {{#is_subtree}}
+                    <i class="fa fa-{{instance.class.table_singular}} color"></i>
+                  {{/is_subtree}}
                   {{instance.title}}
                 </div>
               </div>
@@ -83,33 +86,29 @@
                   {{/child_options}}
                   {{#if instance.viewLink}}
                     {{#is_allowed "view_object_page" instance}}
-                      <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                      <a href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
                     {{/is_allowed}}
                   {{/if}}
                 </div>
                 <ul class="tree-action-list">
                   {{#infer_roles instance}}
                     <li>
-                      <i class="grcicon-person-black" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
+                      <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
                     </li>
                   {{/infer_roles}}
                   {{#with_page_object_as 'page_instance'}}
-                  {{#if_helpers '\
-                    ^if_instance_of' page_instance 'Directive' '\
-                    or ^if_instance_of' instance 'Section'}}
                     <li>
                       {{#child_options}}
                         {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance multiple_mapping_case=true}}}
                       {{/child_options}}
                       {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
                     </li>
-                  {{/if_helpers}}
                   {{/with_page_object_as}}
 
                   {{#with_mapping_count instance 'related_objects'}}
                     {{#prune_context}}
                       <li rel="tooltip" data-placement="left" data-original-title="# of mapped objects">
-                        <i class="grcicon-object-black"></i>
+                        <i class="fa fa-list-alt"></i>
                         {{#if count}}
                           <span class="counter">{{count}}</span>
                         {{else}}
@@ -121,7 +120,7 @@
 
                   {{#with_mapping_count instance 'objectives'}}
                     <li rel="tooltip" data-placement="left" data-original-title="# of mapped objectives">
-                      <i class="grcicon-objective-black"></i>
+                      <i class="fa fa-dot-circle-o"></i>
                       {{#if count}}
                         <span class="counter">{{count}}</span>
                       {{else}}
@@ -132,7 +131,7 @@
 
                   {{#with_mapping_count instance 'controls'}}
                     <li rel="tooltip" data-placement="left" data-original-title="# of mapped controls">
-                      <i class="grcicon-control-black"></i>
+                      <i class="fa fa-video-camera"></i>
                       {{#if count}}
                         <span class="counter">{{count}}</span>
                       {{else}}

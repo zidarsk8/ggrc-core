@@ -1,0 +1,70 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: anze@reciprocitylabs.com
+}}
+
+{{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
+
+<header class="header sticky sticky-header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+  <div class="row-fluid">
+    <div class="span4">
+        <div class="title-heading oneline">
+          <span class="widget-col-title" data-field="title|description_inline|name|email">
+            {{model.title_singular}} Title
+            <i class="fa fa-caret-up"></i>
+          </span>
+      </div>
+    </div>
+    <div class="span1">
+      <div class="oneline">
+        <span class="widget-col-title" data-field="owners.0.name|email">
+          Owner
+          <i class="fa fa-caret-up"></i>
+        </span>
+      </div>
+    </div>
+    <div class="span2">
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="oneline centered">
+            <span class="widget-col-title" data-field="design">
+              Design
+              <i class="fa fa-caret-up"></i>
+            </span>
+          </div>
+        </div>
+        <div class="span6">
+          <div class="oneline centered">
+            <span class="widget-col-title" data-field="operationally">
+              Operational
+              <i class="fa fa-caret-up"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="span1">
+      <div class="oneline">
+        <span class="widget-col-title" data-field="status">
+          State
+          <i class="fa fa-caret-up"></i>
+        </span>
+      </div>
+    </div>
+    <div class="span4">
+        <ul class="tree-action-list">
+        {{{> "/static/mustache/import_export/import_export_buttons.mustache}}}
+        <assessment-generator-button audit="parent_instance"></assessment-generator-button>
+        {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
+        {{#if add_item_view}}
+          <li>
+            {{{renderLive add_item_view}}}
+          </li>
+        {{/if}}
+      </ul>
+    </div>
+  </div>
+</header>
+<div class="clearfix"></div>

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
+
+set -o nounset
+set -o errexit
+
+TMP_REPO="/tmp/ggrc-core"
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+rm -rf $TMP_REPO
+cp -a /vagrant $TMP_REPO
+cd $TMP_REPO
+
+if [[ "${1:-}" != "" ]]; then
+  TEST_COMMIT=$1
+else
+  TEST_COMMIT=$(git rev-parse HEAD)
+fi
+
+CURRENT_COMMIT=$(git rev-parse HEAD)
+PARENT_1=$(git show --pretty=raw $TEST_COMMIT | grep parent | head -1 | grep -oE "[^ ]*$")
+
+echo "Comparing commits $TEST_COMMIT and $PARENT_1."
+
+CHANGED_FILES=$(git diff --name-only $TEST_COMMIT $PARENT_1 | grep "\.py$" || true )
+if [[ "$CHANGED_FILES" == "" ]]; then
+  echo "No python files changed. Skipping flake checks"
+  exit 0
+fi
+
+echo "Checking files:"
+echo "$CHANGED_FILES"
+echo ""
+
+# Run pylint on the old and new code, to compare the quality.
+# If pylint is run multiple times it will store the previous results and show
+# the change in quality with a non-negative number if code was improved or not 
+# changed, and a negative number if more code issues have been introduced.
+git checkout --quiet $PARENT_1
+echo "$CHANGED_FILES" | xargs pylint > /dev/null 2>&1 | true
+git checkout --quiet $TEST_COMMIT
+PYLINT_RESULT=$(echo "$CHANGED_FILES" | xargs pylint 2> /dev/null | tail -n 2) 
+
+echo "$PYLINT_RESULT"
+echo "$PYLINT_RESULT" | grep -q "+" && rc=$? || rc=$?
+
+exit $rc

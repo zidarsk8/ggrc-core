@@ -1,0 +1,17 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<mapping-tree-view
+  parent-instance="instance"
+  mapping="instance.class.info_pane_options.evidence.mapping"
+  item-template="instance.class.info_pane_options.evidence.show_view"
+>
+</mapping-tree-view>
+
+{{#is_allowed 'update' instance context='for'}}
+  {{{render_hooks "Request.gdrive_evidence_storage"}}}
+{{/is_allowed}}

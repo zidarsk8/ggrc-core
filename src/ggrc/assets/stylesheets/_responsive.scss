@@ -209,16 +209,6 @@
         }
       }
     }
-    .ui-resizable-handle {
-      height:12px;
-      border-top:1px solid darken($lightGray,5%);
-      background-color: lighten($lightGray,5%);
-      background-repeat:no-repeat;
-      background-image: image-url("grcicons/icons.png");
-      @include background-size(368px 416px);
-      background-position:50% -157px;
-      @include opacity(0.8);
-    }
   }
 
   .widget-filters {
@@ -269,10 +259,6 @@
     text-align:left;
   }
 
-  .content {
-    background: $white;
-  }
-
   .lhs-nav {
     ul.sub-level {
       li {
@@ -284,11 +270,7 @@
           }
           .lhs-main-title {
             float: left;
-            width: 141px;
-          }
-          .lhs-private {
-            float: left;
-            width: 20px;
+            width: 161px;
             margin-right: 14px;
           }
           .lhs-people {
@@ -317,5 +299,34 @@
     [class*="span"] {
       margin-left: 0;
     }
+  }
+}
+
+@media (max-width: 1200px) {
+  h1 {
+    width: 60%;
+  }
+  .header-content {
+    .menu {
+      li {
+        a {
+          span {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  h1 {
+    width: 40%;
+  }
+}
+
+@media (max-width: 740px) {
+  h1 {
+    width: 25%;
   }
 }

@@ -12,7 +12,7 @@
       <label>
         Title
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
       </label>
       <input class="input-block-level required" id="risk-assessment-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
       <br>
@@ -39,10 +39,10 @@
       {{#using manager=instance.ra_manager model_singular=model.model_singular}}
       <label>
         Risk Manager
-        <i class="grcicon-help-black" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="This is the person in charge of this {{model_singular}}."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="4" class="input-block-level" name="ra_manager.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist manager.email ''}}" />
+      <input tabindex="4" class="input-block-level" name="ra_manager.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist manager.email ''}}" />
       {{/using}}
       <br>
     </div>
@@ -50,10 +50,10 @@
       {{#using counsel=instance.ra_counsel model_singular=model.model_singular}}
       <label>
         Risk Counsel
-        <i class="grcicon-help-black" rel="tooltip" title="This is the counsel in charge of this {{model_singular}}."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="This is the counsel in charge of this {{model_singular}}."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="5" class="input-block-level" name="ra_counsel.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist counsel.email ''}}" />
+      <input tabindex="5" class="input-block-level" name="ra_counsel.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist counsel.email ''}}" />
       {{/using}}
       <br>
     </div>
@@ -63,7 +63,7 @@
     <div class="span6 hidable">
       <label>
         Description
-        <i class="grcicon-help-black" rel="tooltip" title="Describe the Risk Assessment."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Describe the Risk Assessment."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
@@ -74,12 +74,22 @@
     <div class="span6 hidable">
       <label>
         Notes
-        <i class="grcicon-help-black" rel="tooltip" title="Notes"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Notes"></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
         <textarea id="risk_assessment_notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes" tabindex="7">{{{instance.notes}}}</textarea>
       </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div data-id="code_hidden" class="span4 hidable">
+      <label>
+        Code
+        <i class="fa fa-question-circle" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+        <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      </label>
+      <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="RISKASSESSMENT-XXX" type="text" value="{{instance.slug}}">
     </div>
   </div>
 </form>

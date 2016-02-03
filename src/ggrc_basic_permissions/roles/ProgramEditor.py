@@ -1,3 +1,8 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 scope = "Private Program"
 description = """
   A user with authorization to edit mapping objects related to an access
@@ -16,6 +21,7 @@ permissions = {
         "Context",
     ],
     "create": [
+        "Audit",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
@@ -32,6 +38,7 @@ permissions = {
         "Relationship"
     ],
     "delete": [
+        "Program",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",

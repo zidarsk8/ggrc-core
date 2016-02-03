@@ -20,6 +20,7 @@ def mapping(class_name, attr, polymorph=False):
 
 def all_cache_entries():
   ret = [
+      resource('access_groups', 'AccessGroup'),
       resource('audits', 'Audit'),
       resource('categorizations', 'Categorization'),
       resource('category_bases', 'CategoryBase'),
@@ -27,7 +28,7 @@ def all_cache_entries():
       resource('control_assertions', 'ControlAssertion'),
       resource('contexts', 'Context'),
       resource('controls', 'Control'),
-      resource('control_assessments', 'ControlAssessments'),
+      resource('assessments', 'Assessments'),
       resource('data_assets', 'DataAsset'),
       resource('directives', 'Directive'),
       resource('contracts', 'Contract'),
@@ -52,7 +53,6 @@ def all_cache_entries():
       resource('projects', 'Project'),
       resource('programs', 'Program'),
       resource('relationships', 'Relationship'),
-      resource('relationship_types', 'RelationshipType'),
       resource('requests', 'Request'),
       resource('responses', 'Response'),
       resource('documentation_responses', 'DocumentationResponse'),
@@ -129,7 +129,7 @@ def all_mapping_entries():
       mapping('ObjectOwner', 'ownable', True),
       mapping('ObjectPerson', 'person'),
       mapping('ObjectPerson', 'personable', True),
-      mapping('Section', 'directive'),
+      mapping('Section', 'directive'), # this goes out?
       mapping('Relationship', 'source', True),
       mapping('Relationship', 'destination', True),
       mapping('UserRole', 'context'),

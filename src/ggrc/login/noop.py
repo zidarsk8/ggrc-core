@@ -41,13 +41,13 @@ def before_request(*args, **kwargs):
 def login():
   from ggrc.login.common import get_next_url
   user = get_user()
-  if user.is_enabled:
+  if user.system_wide_role != 'No Access':
     flask_login.login_user(user)
     return redirect(get_next_url(request, default_url=url_for('dashboard')))
   else:
-    flash(u'That user account is disabled.', 'alert alert-error')
+    flash(u'You do not have access. Please contact your administrator.', 'alert alert-info')
     return redirect('/')
-  
+
 def logout():
   from ggrc.login.common import get_next_url
   if 'permissions' in session:

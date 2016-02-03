@@ -21,25 +21,22 @@
 </div>
 <div class="selector-list people-selector">
   <ul>
-    {{#if selected_object.is_enabled}}
-      {{#options}}
-      <li {{ data 'option' }} data-id="{{ id }}">
-        <label>
+    {{#options}}
+    <li {{ data 'option' }} data-id="{{ id }}">
+      <label>
+        {{#if_equals selected_id id}}
+          <input type="radio" checked="checked" name="map" rel="tooltip" title="map">
+        {{else}}
           <input type="radio" name="map" rel="tooltip" title="map">
-          {{name}}
-        </label>
-        <div class="role-description">
-          <p>{{{description}}}</p>
-          {{{render_hooks 'Role.option_detail'}}}
-          {{#scope}}<p><strong>Role Scope:</strong> {{scope}}</p>{{/scope}}
-        </div>
-      </li>
-      {{/options}}
-    {{else}}
-      <li>
-        <p>This user is disabled and cannot be granted authorizations.
-          They currently have "No Access".</p>
-      </li>
-    {{/if}}
+        {{/if_equals}}
+        {{pretty_role_name name}}
+      </label>
+      <div class="role-description">
+        <p>{{{description}}}</p>
+        {{{render_hooks 'Role.option_detail'}}}
+        {{#scope}}<p><strong>Role Scope:</strong> {{scope}}</p>{{/scope}}
+      </div>
+    </li>
+    {{/options}}
   </ul>
 </div>

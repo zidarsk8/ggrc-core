@@ -10,6 +10,7 @@
     root_object : "issue",
     root_collection : "issues",
     findOne : "GET /api/issues/{id}",
+    findAll : "GET /api/issues",
     update : "PUT /api/issues/{id}",
     destroy : "DELETE /api/issues/{id}",
     create : "POST /api/issues",
@@ -21,6 +22,12 @@
       custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
       start_date: "date",
       end_date: "date"
+    },
+    tree_view_options : {
+      attr_list : can.Model.Cacheable.attr_list.concat([
+        {attr_title: 'URL', attr_name: 'url'},
+        {attr_title: 'Reference URL', attr_name: 'reference_url'}
+      ])
     },
     init : function() {
       this._super && this._super.apply(this, arguments);

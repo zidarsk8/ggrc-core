@@ -46,7 +46,7 @@
       show_view: GGRC.mustache_path + "/workflows/tree.mustache",
       attr_list : [
         {attr_title: 'Title', attr_name: 'title'},
-        {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: ''},
+        {attr_title: 'Manager', attr_name: 'owner', attr_sort_field: ''},
         {attr_title: 'Code', attr_name: 'slug'},
         {attr_title: 'State', attr_name: 'status'},
         {attr_title: 'Frequency', attr_name: 'frequency'},
@@ -93,7 +93,7 @@
         var tg = new CMS.Models.TaskGroup({
           title: task_group_title,
           workflow: instance,
-          assignee: instance.contact,
+          contact: instance.people && instance.people[0] || instance.modified_by,
           context: instance.context,
         });
         return tg.save().then(function(tg) {

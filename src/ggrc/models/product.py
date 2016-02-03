@@ -9,6 +9,7 @@ from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
+from .option import Option
 from .relationship import Relatable
 from .utils import validate_option
 from .track_object_state import HasObjectState, track_state_for_class
@@ -35,13 +36,22 @@ class Product(HasObjectState, CustomAttributable, Documentable, Personable,
   _sanitize_html = ['version',]
   _aliases = {
     "url": "Product URL",
-    "kind": "Kind/Type",
+    "kind": {
+      "display_name": "Kind/Type",
+      "filter_by": "_filter_by_kind",
+    },
   }
 
   @validates('kind')
   def validate_product_options(self, key, option):
     return validate_option(
         self.__class__.__name__, key, option, 'product_type')
+
+  @classmethod
+  def _filter_by_kind(cls, predicate):
+    return Option.query.filter(
+        (Option.id == cls.kind_id) & predicate(Option.title)
+    ).exists()
 
   @classmethod
   def eager_query(cls):

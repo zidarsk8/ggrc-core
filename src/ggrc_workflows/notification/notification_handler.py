@@ -16,6 +16,7 @@ exposed functions
     handle_workflow_modify,
     handle_cycle_task_group_object_task_put,
     handle_cycle_created,
+    handle_cycle_modify,
     handle_cycle_task_status_change,
 """
 
@@ -92,7 +93,7 @@ def add_cycle_task_reassigned_notification(obj):
   if result.count() == 0:
     return
 
-  notif_type = get_notification_type("cycle_task_reassigned"),
+  notif_type = get_notification_type("cycle_task_reassigned")
   add_notif(obj, notif_type)
 
 
@@ -161,6 +162,15 @@ def handle_cycle_task_group_object_task_put(obj):
   if inspect(obj).attrs.end_date.history.has_changes():
     modify_cycle_task_end_date(obj)
 
+
+def remove_all_cycle_task_notifications(obj):
+  for cycle_task in obj.cycle_task_group_object_tasks:
+    for notif in get_notification(cycle_task):
+      db.session.delete(notif)
+
+def handle_cycle_modify(sender, obj=None, src=None, service=None):
+  if not obj.is_current:
+    remove_all_cycle_task_notifications(obj)
 
 def handle_cycle_created(sender, obj=None, src=None, service=None,
                          manually=False):

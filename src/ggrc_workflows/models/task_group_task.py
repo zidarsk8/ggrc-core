@@ -3,25 +3,35 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from datetime import date
+from datetime import datetime
+from sqlalchemy import orm
+from sqlalchemy import schema
+
 from ggrc import db
-from sqlalchemy.orm import validates
-from ggrc.models.mixins import (
-  Base, Titled, Described, WithContact
-    )
 from ggrc.login import get_current_user
+from ggrc.models.mixins import Base, Slugged, Titled, Described, WithContact
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.mixins import RelativeTimeboxed
+from ggrc_workflows.models.task_group import TaskGroup
 
 
-class TaskGroupTask(
-    WithContact, Titled, Described, RelativeTimeboxed, Base,
-    db.Model):
+class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
+                    Base, db.Model):
   __tablename__ = 'task_group_tasks'
+  __table_args__ = (
+      schema.CheckConstraint('start_date <= end_date'),
+  )
   _title_uniqueness = False
+  _start_changed = False
 
   @classmethod
   def default_task_type(cls):
     return "text"
+
+  @classmethod
+  def generate_slug_prefix_for(cls, obj):
+    return "TASK"
 
   task_group_id = db.Column(
       db.Integer, db.ForeignKey('task_groups.id'), nullable=False)
@@ -36,22 +46,32 @@ class TaskGroupTask(
 
   VALID_TASK_TYPES = ['text', 'menu', 'checkbox']
 
-  @validates('task_type')
+  @orm.validates('task_type')
   def validate_task_type(self, key, value):
     if value is None:
       value = self.default_task_type()
     if value not in self.VALID_TASK_TYPES:
-      message = u"Invalid type '{}'".format(value)
-      raise ValueError(message)
+      raise ValueError(u"Invalid type '{}'".format(value))
     return value
 
-  @staticmethod
-  def _extra_table_args(cls):
-    return (
-        #db.UniqueConstraint('task_group_id', 'task_id'),
-        #db.Index('ix_task_group_id', 'task_group_id'),
-        #db.Index('ix_task_id', 'task_id'),
-        )
+  def validate_date(self, value):
+    if isinstance(value, datetime):
+      value = value.date()
+    if value is not None and value.year <= 1900:
+      current_century = date.today().year / 100 * 100
+      year = current_century + value.year % 100
+      return date(year, value.month, value.day)
+    return value
+
+  @orm.validates("start_date", "end_date")
+  def validate_end_date(self, key, value):
+    value = self.validate_date(value)
+    if key == "start_date":
+      self._start_changed = True
+    if key == "end_date" and self._start_changed and self.start_date > value:
+      self._start_changed = False
+      raise ValueError("Start date can not be after end date.")
+    return value
 
   _publish_attrs = [
       'task_group',
@@ -63,17 +83,68 @@ class TaskGroupTask(
       'object_approval',
       'task_type',
       'response_options'
-      ]
+  ]
   _sanitize_html = []
+  _aliases = {
+      "title": "Summary",
+      "description": {
+          "display_name": "Task Description",
+          "handler_key": "task_description",
+      },
+      "contact": {
+          "display_name": "Assignee",
+          "mandatory": True,
+          "filter_by": "_filter_by_contact",
+      },
+      "secondary_contact": None,
+      "start_date": None,
+      "end_date": None,
+      "task_group": {
+          "display_name": "Task Group",
+          "mandatory": True,
+          "filter_by": "_filter_by_task_group",
+      },
+      "relative_start_date": {
+          "display_name": "Start",
+          "mandatory": True,
+          "description": ("Enter the task stat date in the following format:\n"
+                          "'5/22/2015' for one time workflows\n"
+                          "'3' for weekly workflows\n"
+                          "'17' for monthly workflows\n"
+                          "'feb/may/aug/nov 17' for monthly workflows\n"
+                          "'1/17' for yearly workflows"),
+      },
+      "relative_end_date": {
+          "display_name": "End",
+          "mandatory": True,
+          "description": ("Enter the task stat date in the following format:\n"
+                          "'5/22/2015' for one time workflows\n"
+                          "'3' for weekly workflows\n"
+                          "'17' for monthly workflows\n"
+                          "'feb/may/aug/nov 17' for monthly workflows\n"
+                          "'1/17' for yearly workflows"),
+      },
+      "task_type": {
+          "display_name": "Task Type",
+          "mandatory": True,
+          "description": ("Accepted values are:"
+                          "\n'Rich Text'\n'Dropdown'\n'Checkbox'"),
+      }
+  }
+
+  @classmethod
+  def _filter_by_task_group(cls, predicate):
+    return TaskGroup.query.filter(
+        (TaskGroup.id == cls.task_group_id) &
+        (predicate(TaskGroup.slug) | predicate(TaskGroup.title))
+    ).exists()
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(TaskGroupTask, cls).eager_query()
     return query.options(
         orm.subqueryload('task_group'),
-        )
+    )
 
   def _display_name(self):
     return self.title + '<->' + self.task_group.display_name
@@ -87,7 +158,7 @@ class TaskGroupTask(
         'start_date', 'end_date',
         'contact', 'modified_by',
         'task_type', 'response_options',
-        ]
+    ]
 
     contact = None
     if(kwargs.get('clone_people', False)):

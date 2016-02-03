@@ -1,7 +1,14 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
 {{#each items}}
  <li class="ui-menu-item" {{data 'ui-autocomplete-item'}}>
    <a href="javascript://" class='show-extended' {{data 'model'}}>
-     <i class="grcicon-{{class.table_singular}}-color"></i>
+     <i class="fa fa-{{class.table_singular}} color"></i>
      {{title}}
    </a>
  </li>
@@ -26,7 +33,7 @@
      href="javascript://"
      data-object-singular="{{model.model_singular}}"
 
-     data-toggle="multitype-object-modal-selector"
+     data-toggle="unified-mapper"
      data-modal-reset="reset"
      data-mapping="false"
      rel="tooltip"

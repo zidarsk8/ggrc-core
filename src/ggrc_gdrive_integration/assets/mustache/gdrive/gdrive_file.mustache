@@ -9,7 +9,9 @@
     class="{{link_class}} btn-small btn-draft"
     data-object-source="true"
     data-toggle="evidence-gdrive-picker"
-    can-click="{{click_event}}">{{firstexist link_text "Upload Files to GDrive"}}
+    can-click="{{click_event}}">
+    <i class="fa fa-{{firstexist icon 'paperclip'}}"></i>
+    {{firstexist link_text "Upload Files to GDrive"}}
 </a>
 {{#pending}}
   <span {{attach_spinner '{ "radius": 3, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 12px;' }}>

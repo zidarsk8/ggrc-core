@@ -13,22 +13,24 @@ Default settings should go in `settings.default`.
 Environment/deployment-specific settings should go in `settings.<environment_name>`.
 """
 
-import sys, os
+import os
 
 BASE_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
 MODULE_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 SETTINGS_DIR = os.path.join(BASE_DIR, 'ggrc', 'settings')
+THIRD_PARTY_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'third_party'))
+BOWER_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'bower_components'))
 
 from default import *
 
-settings_modules = os.environ.get("GGRC_SETTINGS_MODULE", '')
-custom_url_root = os.environ.get("GGRC_CUSTOM_URL_ROOT", None)
+SETTINGS_MODULE = os.environ.get("GGRC_SETTINGS_MODULE", '')
+CUSTOM_URL_ROOT = os.environ.get("GGRC_CUSTOM_URL_ROOT", None)
 
-if len(settings_modules.strip()) == 0:
+if len(SETTINGS_MODULE.strip()) == 0:
   raise RuntimeError(
     "Specify your settings using the `GGRC_SETTINGS_MODULE` environment variable")
 
-for module_name in settings_modules.split(" "):
+for module_name in SETTINGS_MODULE.split(" "):
   if len(module_name.strip()) == 0:
     continue
 

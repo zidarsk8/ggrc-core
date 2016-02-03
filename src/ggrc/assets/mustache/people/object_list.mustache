@@ -17,10 +17,10 @@
               <div class="row-fluid">
                 <div class="span4">
                   <div class="title tree-title-area">
-                    {{{render '/static/mustache/people/popover.mustache' person=this}}}
+                    {{name}}
                   </div>
                 </div>
-                <div class="span2">
+                <div class="span4">
                   <div class="email tree-title-area">
                     {{#if_match name '\\\\S'}}
                       {{#name}}
@@ -55,18 +55,9 @@
                   {{/person_roles}}
                 </div>
                 <div class="span2">
-                  <div class="email tree-title-area">
-                    {{^if is_enabled}}
-                      <span class="user-disabled">
-                        (Disabled)
-                      </span>
-                    {{/if}}
-                  </div>
-                </div>
-                <div class="span2">
                   <div class="show-details">
                     <a href="/people/{{id}}">
-                      <i class="grcicon-to-right"></i>
+                      <i class="fa fa-long-arrow-right"></i>
                     </a>
                   </div>
                 </div>
@@ -81,18 +72,22 @@
         <div class="tier-2-info-content">
 
           <div class="details-wrap">
-            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+            <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+            </a>
             <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
               <li>
                 <a href="/people/{{id}}">
-                  <i class="grcicon-goto"></i>
+                  <i class="fa fa-long-arrow-right"></i>
                   View Profile Page
                 </a>
               </li>
               {{#is_allowed 'create' 'delete' 'UserRole' context=parent_instance.context.id}}
                 <li class="border">
                   <a href="javascript://" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}">
-                    <i class="grcicon-role-color"></i>
+                    <i class="fa fa-key"></i>
                     <span>Edit Authorizations</span>
                   </a>
                 </li>
@@ -100,7 +95,7 @@
               {{#is_allowed 'update' instance}}
                 <li>
                   <a href="javascript://" data-object-plural="people" data-object-singular="Person" data-object-id="{{id}}" data-modal-class="modal-wide" data-placement="left" data-toggle="modal-ajax-form">
-                    <i class="grcicon-edit"></i>
+                    <i class="fa fa-pencil-square-o"></i>
                     <span>Edit Person</span>
                   </a>
                 </li>
@@ -109,41 +104,49 @@
           </div>
 
           <div class="tier-content">
-            {{#if_match name '\\\\S'}}
-              {{#name}}
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    <h6>Name</h6>
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                <h6>Name</h6>
+                {{#if_match name '\\\\S'}}
+                  {{#name}}
                     <h3>{{name}}</h3>
-                  </div>
-                </div>
-              {{/name}}
-            {{/if_match}}
+                  {{/name}}
+                {{else}}
+                  <span class="empty-message">None</span>
+                {{/if_match}}
+              </div>
+            </div>
 
-            {{#if_match email '\\\\S'}}
-              {{#email}}
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    <h6>Email</h6>
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                <h6>Email</h6>
+                {{#if_match email '\\\\S'}}
+                  {{#email}}
                     <p>
                       <a href='mailto:{{email}}' target="_blank">
                         {{email}}
                       </a>
                     </p>
-                  </div>
-                </div>
-              {{/email}}
-            {{/if}}
-            {{#if_match company '\\\\S'}}
-              {{#company}}
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    <h6>Company</h6>
+                  {{/email}}
+                {{else}}
+                  <span class="empty-message">None</span>
+                {{/if_match}}
+              </div>
+            </div>
+
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                <h6>Company</h6>
+                {{#if_match company '\\\\S'}}
+                  {{#company}}
                     {{company}}
-                  </div>
-                </div>
-              {{/company}}
-            {{/if_match}}
+                  {{/company}}
+                {{else}}
+                  <span class="empty-message">None</span>
+                {{/if_match}}
+              </div>
+            </div>
+
             <div class="row-fluid wrap-row">
               <div class="span12">
                 <h6>Authorizations</h6>
@@ -176,12 +179,6 @@
       </div><!-- tier 2 end -->
     </li>
   {{/each}}
-
-  <li class="tree-item tree-item-add">
-    <a class="btn btn-small btn-draft" data-object-plural="people" data-modal-class="modal-wide" href="javascript://" data-object-singular="Person" data-toggle="modal-ajax-form" data-modal-reset="reset" rel="tooltip" data-placement="right" data-original-title="Add Person">
-      <i class="grcicon-add-black"></i>
-    </a>
-  </li>
 
   <li>
     {{#if has_prev_page}}

@@ -14,7 +14,7 @@
           <div class='span12'>
             <div class='item-data'>
               <div class='tree-title-area'>
-                <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                <i class="fa fa-{{instance.class.table_singular}} color"></i>
                 {{firstnonempty instance.title instance.link}}
                 <span class="option">
                 </span>
@@ -39,7 +39,7 @@
             {{#using request=parent_instance.request}}{{#with_mapping "folders" request}}
             <a href="javascript://" class="info-action unmap pull-right" data-toggle="modal-ajax-unmapform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-title="Warning" data-modal-class="modal" data-object-id="{{instance.id}}" data-content-view="/static/mustache/responses/confirm_delete_evidence.mustache" data-object-params='{ "folder": { "title": "{{folders.0.instance.title}}", "link": "{{folders.0.instance.alternateLink}}" } }' href="javascript://">
               {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-              <i class="grcicon-remove"></i>
+              <i class="fa fa-ban"></i>
               Unmap
             </a>
             {{else}}{{/with_mapping}}{{/using}}
@@ -55,9 +55,9 @@
             <div class="tree-description">
               {{{instance.description}}}
             </div>
-            
+
             {{else}}
-              <i>No description</i>
+              <span class="empty-message">None</span>
             {{/if}}
           </div>
         </div>
@@ -119,7 +119,7 @@
         <div class="row-fluid">
           <div class="span12">
             <a class="utility-link" href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Document" data-object-plural="documents" data-object-id="{{instance.id}}" data-object-params='{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" }, "modal_title" : "Edit Evidence" }'>
-            <i class="grcicon-edit"></i>
+            <i class="fa fa-pencil-square-o"></i>
             Edit Evidence
           </a>
 

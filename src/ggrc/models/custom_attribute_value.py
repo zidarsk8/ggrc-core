@@ -4,17 +4,16 @@
 # Maintained By: laran@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import (
-    deferred, Base
-    )
+from ggrc.models.mixins import Base
+from ggrc.models.mixins import deferred
+
 
 class CustomAttributeValue(Base, db.Model):
   __tablename__ = 'custom_attribute_values'
 
   custom_attribute_id = deferred(
-    db.Column(
-      db.Integer,
-      db.ForeignKey('custom_attribute_definitions.id')), 'CustomAttributeValue')
+      db.Column(db.Integer, db.ForeignKey('custom_attribute_definitions.id')),
+      'CustomAttributeValue')
   attributable_id = deferred(db.Column(db.Integer), 'CustomAttributeValue')
   attributable_type = deferred(db.Column(db.String), 'CustomAttributeValue')
   attribute_value = deferred(db.Column(db.String), 'CustomAttributeValue')
@@ -39,4 +38,15 @@ class CustomAttributeValue(Base, db.Model):
       'attributable_id',
       'attributable_type',
       'attribute_value'
-      ]
+  ]
+
+  @classmethod
+  def mk_filter_by_custom(cls, obj_class, custom_attribute_id):
+    def filter_by(predicate):
+      return cls.query.filter(
+          (cls.custom_attribute_id == custom_attribute_id) &
+          (cls.attributable_type == obj_class.__name__) &
+          (cls.attributable_id == obj_class.id) &
+          predicate(cls.attribute_value)
+      ).exists()
+    return filter_by

@@ -17,20 +17,6 @@ ul.new-tree {
       float: none;
       clear: both;
     }
-    &.active {
-      .tier-trigger {
-        @include background-size(17px 12px);
-        background: image-url('grcicons/open.png') no-repeat 20px center;
-      }
-    }
-    .tier-trigger {
-      float: left;
-      @include background-size(17px 12px);
-      background: image-url('grcicons/not-open.png') no-repeat 20px center;
-      width: 17px;
-      height: 30px;
-      padding-left: 20px;
-    }
   }
   .select {
     overflow: hidden;
@@ -149,9 +135,6 @@ ul.new-tree {
       overflow: visible;
       .type {
         float: left;
-        .grcicon-carot {
-          margin-left: -6px;
-        }
       }
       .tree-title-area {
         width: auto;
@@ -213,9 +196,6 @@ ul.new-tree {
   }
 
   &.event-tree {
-    [class^="grcicon-"] {
-      margin-top: 1px;
-    }
     a.openclose {
       &.active {
         font-weight: normal;
@@ -265,6 +245,7 @@ ul.new-tree {
             &.facility,
             &.product,
             &.dataasset,
+            &.accessgroup,
             &.market {
               color:$business;
             }
@@ -286,9 +267,6 @@ ul.new-tree {
       }
     }
     .events-content {
-      [class^="grcicon-"] {
-        margin-top: 7px;
-      }
       .info-action {
         @include opacity(1);
         text-transform: none;
@@ -356,6 +334,7 @@ ul.new-tree {
               &.facility,
               &.product,
               &.dataasset,
+              &.accessgroup,
               &.market {
                 color:$business;
               }
@@ -429,6 +408,17 @@ ul.new-tree {
     }
   }
 
+  .tree-item-placeholder {
+    background: white;
+    font-size: 16px;
+    height: 29px;
+    padding: 11px 60% 0 70px;
+    border-bottom: 1px solid #e0e0e0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
   li.tree-item {
     @include transition(all 0.18s cubic-bezier(.55,0,.1,1));
     min-height: 30px;
@@ -457,31 +447,22 @@ ul.new-tree {
         margin: 0 10px;
         border-bottom: 1px solid $itemBorder;
         > .openclose {
-          .grcicon-arrow-right {
+          .fa-caret-right {
             @include opacity(0.25);
             margin: 5px 0 0 4px;
           }
           &.active {
-            .grcicon-arrow-right {
+            .fa-caret-right {
               @include opacity(1);
-              background-position: -102px -80px;
+              &:before {
+                content: $fa-var-caret-down;
+              }
             }
           }
         }
         .openclose,
         .select {
           padding: 6px 0;
-        }
-        .drag {
-          [class^="grcicon-"] {
-            @include opacity(.2);
-            margin-top: 6px;
-          }
-          &:hover {
-            [class^="grcicon-"] {
-              @include opacity(1);
-            }
-          }
         }
       }
     }
@@ -661,6 +642,7 @@ ul.new-tree {
     &.facility,
     &.product,
     &.dataasset,
+    &.accessgroup,
     &.market
     {
       .item-data {
@@ -731,14 +713,6 @@ ul.new-tree {
         margin: 5px 0;
       }
     }
-    .btn {
-      [class^="grcicon-"] {
-        margin-top: 1px;
-      }
-    }
-  }
-  [class^="grcicon-"] {
-    margin-top:7px;
   }
   .parent {
     @include opacity(0.6);
@@ -762,9 +736,6 @@ ul.new-tree {
     font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
-    [class^="grcicon-"] {
-      margin-top: 7px;
-    }
   }
   a.show-long {
     color:$disabled;
@@ -927,6 +898,11 @@ ul.new-tree {
 .inner-tree {
   ul.new-tree {
     margin-bottom: 0;
+    .tree-item-placeholder {
+      font-size: 13px;
+      height: 25px;
+      padding: 4px 60% 0 84px;
+    }
     li.tree-item {
       line-height: 28px;
       .generated-link {
@@ -950,13 +926,9 @@ ul.new-tree {
             padding: 0;
           }
           .openclose {
-            .grcicon-arrow-right {
-              background-position: -78px -80px;
-            }
             &.active {
-              .grcicon-arrow-right {
+              .fa-caret-right {
                 @include opacity(1);
-                background-position: -126px -80px;
               }
             }
           }
@@ -996,6 +968,13 @@ ul.new-tree {
 .selector-list ul.new-tree li.tree-item .item-content {
   line-height:18px;
   padding:9px 0;
+}
+
+.bottom-space {
+  padding-bottom: 25px;
+  p {
+    margin-bottom: 0;
+  }
 }
 
 .show-description {
@@ -1052,9 +1031,6 @@ ul.new-tree {
       @include opacity(1);
       text-decoration:none;
     }
-    [class^="grcicon-"] {
-      margin-top: 2px;
-    }
   }
 
   .info-audit {
@@ -1077,9 +1053,6 @@ ul.new-tree {
           text-decoration:none;
         }
       }
-    }
-    [class^="grcicon-"] {
-      margin-top: 2px;
     }
   }
 }
@@ -1144,6 +1117,8 @@ ul.new-tree {
     .no-role,
     .role {
       font-size:11px;
+      line-height: 28px;
+      display: block;
       font-weight:bold;
       color:$green;
     }
@@ -1190,7 +1165,7 @@ ul.new-tree {
   text-transform:uppercase;
   font-weight:bold;
   color:#111;
-  i.grcicon-edit {
+  i.fa-pencil-square-o {
     margin-top:5px;
   }
   &:hover {
@@ -1249,35 +1224,98 @@ ul.new-tree {
 }
 
 .tier-content {
-  overflow: hidden;
-  zoom: 1;
-  .pin-content & {
-    margin-right: 105px;
-  }
   &.pin {
-    margin-right: 0;
+    .info-pane-utility {
+      .details-wrap {
+        margin-top: 10px;
+      }
+    }
+  }
+  .info-pane-utility {
+    .details-wrap {
+      margin-top: 0;
+    }
+  }
+}
+
+.sticky-info-panel {
+  .pane-header {
+    .details-wrap {
+      margin-top: 18px !important;
+    }
+  }
+  .tier-content {
+    margin-top: 77px;
+  }
+}
+
+.info-pane-utility {
+  @include clearfix();
+  float: right;
+  .sticky-info-panel & {
+    position: fixed;
+    right: 47px;
+    z-index: 9999;
+    margin-top: 20px;
+  }
+  .request & {
+    position: static;
+    margin-top: 0;
+  }
+}
+
+.sticky-info-panel {
+  .details-wrap {
+    &.pin {
+      position: fixed;
+      right: 47px;
+      z-index: 9999;
+      width: 100px;
+      background: $white;
+      margin-top: -15px !important;
+      padding-top: 5px;
+    }
   }
 }
 
 .details-wrap {
   float: right;
-  margin-left: 20px;
+  margin-left: 10px;
   width: 60px;
-  margin-top: -4px;
-  .pin-content & {
-    margin-top: -54px;
-  }
   position: relative;
+  .dropdown-toggle {
+    @include clearfix();
+    height: 8px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+  .pin-content & {
+    margin-top: 4px;
+  }
   a {
     display: block;
   }
-  &.no-top {
-    margin-top: -4px;
-  }
   &.pin {
-    margin-left: 10px;
-    width: 95px;
-    margin-top: 5px;
+    @include clearfix();
+    width: auto;
+    margin-left: 5px;
+    margin-top: -10px !important;
+    float: none;
+    clear: both;
+    .sticky-info-panel & {
+      margin-top: -3px;
+    }
+  }
+  .bubble {
+    float: left;
+    margin-right: 4px;
+    background: $darkGray;
+    @include border-radius(50%);
+    width: 8px;
+    height: 8px;
+    &:last-child {
+      margin-right: 0;
+    }
   }
   .dropdown-menu {
     @extend %reset-list;
@@ -1317,9 +1355,9 @@ ul.new-tree {
         }
         &.active {
           color: $black;
-          .icon-share {
+          .fa-link {
             @include opacity(1);
-            background-position: -270px -416px;
+            color: $green;
           }
         }
       }

@@ -1,15 +1,15 @@
 {{!
     Copyright (C) 2014 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: Sasmita 
+    Created By: Sasmita
     Maintained By: Sasmita
 }}
 
 
 {{#each options}}
-<li class="tree-item control governance task-item" 
+<li class="tree-item control governance task-item"
   data-object-type="{{instance.class.table_singular}}"
-  {{#instance}}{{ data 'option' }}{{/instance}} 
+  {{#instance}}{{ data 'option' }}{{/instance}}
   data-id="{{ instance.id }}">
     <div class="item-main">
       <div class="item-wrap">
@@ -19,14 +19,14 @@
             <div class="row-fluid">
               <div class="span8">
                 <div class="tree-title-area">
-                  <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+                  <i class="fa fa-{{instance.class.table_singular}} color"></i>
                   {{#if instance.name}}{{instance.name}}{{/if}}
                   <span class="url-link">
                     {{#if instance.email}}{{instance.email}}{{/if}}
                   </span>
-                  {{^if instance.is_enabled}}
+                  {{#if_equals system_wide_role 'No Access'}}
                     <span class="user-disabled">
-                      (Disabled)
+                      (No Access)
                     </span>
                   {{/if}}
                 </div>
@@ -35,7 +35,7 @@
                 <div class="show-details">
                   {{#if instance.viewLink}}
                     {{#is_allowed "view_object_page" instance}}
-                      <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                      <a href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
                     {{/is_allowed}}
                   {{/if}}
                 </div>
@@ -59,9 +59,9 @@
                 <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">
                   {{firstnonempty email}}
                 </span></a>
-                {{^if is_enabled}}
+                {{#if_equals system_wide_role 'No Access'}}
                   <span class="user-disabled">
-                    (Disabled)
+                    (No Access)
                   </span>
                 {{/if}}
               </span>

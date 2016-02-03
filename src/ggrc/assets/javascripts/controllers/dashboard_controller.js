@@ -7,16 +7,6 @@
 
 (function(can, $) {
 
-function getCustomAttributes () {
-  var custom_attr_deferred = new $.Deferred();
-  CMS.Models.CustomAttributeDefinition.findAll({})
-    .then(function (defs) {
-      GGRC.custom_attr_defs = defs;
-      custom_attr_deferred.resolve();
-  });
-  return custom_attr_deferred;
-}
-
 can.Control("CMS.Controllers.Dashboard", {
     defaults: {
       widget_descriptors: null
@@ -30,6 +20,7 @@ can.Control("CMS.Controllers.Dashboard", {
       CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
         this.display_prefs = prefs;
 
+        this.init_tree_view_settings();
         this.init_page_title();
         this.init_page_help();
         this.init_page_header();
@@ -47,6 +38,21 @@ can.Control("CMS.Controllers.Dashboard", {
         this.init_info_pin();
       }.bind(this));
     }
+
+  , init_tree_view_settings: function () {
+    if (!GGRC.page_object) //Admin dashboard
+      return;
+
+    var valid_models = Object.keys(GGRC.tree_view.base_widgets_by_type),
+        saved_child_tree_display_list;
+    //only change the display list
+    can.each(valid_models, function (m_name) {
+      saved_child_tree_display_list = this.display_prefs.getChildTreeDisplayList(m_name);
+      if (saved_child_tree_display_list !== null) {
+        GGRC.tree_view.sub_tree_for[m_name].display_list = saved_child_tree_display_list;
+      }
+    }.bind(this));
+  }
 
   , init_page_title: function() {
       var page_title = null;
@@ -97,24 +103,11 @@ can.Control("CMS.Controllers.Dashboard", {
               dashboard_controller: this
           });
       }
-
-      if (this.display_prefs.getTopNavHidden()) {
-        // page needs time to render
-        setTimeout(this.close_nav.bind(this), 500);
-      }
     }
 
   , init_info_pin: function() {
     this.info_pin = new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
   }
-
-  , ".nav-trigger click": function(el, ev) {
-      if(el.hasClass("active")) {
-        this.close_nav(el);
-      } else {
-        this.open_nav(el);
-      }
-    }
 
   , '.user-dropdown click': function (el, ev) {
     var email_now = el.find('input[value="Email_Now"]'),
@@ -127,47 +120,9 @@ can.Control("CMS.Controllers.Dashboard", {
     }
   }
 
-  , open_nav: function (el) {
-    el || (el = $(".nav-trigger"));
-    var options = {
-        duration: 800,
-        easing: 'easeOutExpo'
-    },
-        $nav = el.closest("body").find(".top-inner-nav"),
-        $lhn_nav = el.closest("body").find(".lhs-holder"),
-        $lhn_type = el.closest("body").find(".lhn-type"),
-        $content = el.closest("body").find(".object-area");
-
-    el.addClass("active");
-    $nav.animate({top: "48"}, options);
-    $lhn_type.animate({top: "94"}, options);
-    $lhn_nav.animate({top: "128"}, options);
-    $content.animate({top: "78"}, options);
-
-    this.display_prefs.setTopNavHidden("", false);
-    $(window).trigger("resize");
-  }
-
-  , close_nav: function (el) {
-    el || (el = $(".nav-trigger"));
-    var options = {
-        duration: 800,
-        easing: 'easeOutExpo'
-    },
-        $nav = el.closest("body").find(".top-inner-nav"),
-        $lhn_nav = el.closest("body").find(".lhs-holder"),
-        $lhn_type = el.closest("body").find(".lhn-type"),
-        $content = el.closest("body").find(".object-area");
-
-    el.removeClass("active");
-    $nav.animate({top: "18"}, options);
-    $lhn_type.animate({top: "65"}, options);
-    $lhn_nav.animate({top: "99"}, options);
-    $content.animate({top: "49"}, options);
-
-    this.display_prefs.setTopNavHidden("", true);
-    $(window).trigger("resize");
-  }
+    , ".nav-logout click": function (el, ev) {
+      can.Model.LocalStorage.clearAll();
+    }
 
   , init_widget_descriptors: function() {
       var that = this;
@@ -176,10 +131,8 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , init_default_widgets: function() {
-      $.when(getCustomAttributes()).always(function(){
         can.each(this.options.default_widgets, function (name) {
           this.add_dashboard_widget_from_descriptor(this.options.widget_descriptors[name]);
-        }.bind(this));
       }.bind(this));
     }
 
@@ -191,12 +144,13 @@ can.Control("CMS.Controllers.Dashboard", {
       this.get_active_widget_containers().show();
     }
 
-  , " widgets_updated" : "update_inner_nav"
-
-  , " updateCount": function(el, ev, count) {
-      this.inner_nav_controller.update_widget_count($(ev.target), count);
+  , " widgets_updated" : "update_inner_nav",
+  " updateCount": function (el, ev, count, updateCount) {
+    if (_.isBoolean(updateCount) && !updateCount) {
+      return;
     }
-
+    this.inner_nav_controller.update_widget_count($(ev.target), count, updateCount);
+  }
   , update_inner_nav: function(el, ev, data) {
       if (this.inner_nav_controller) {
         if(data) {
@@ -213,7 +167,7 @@ can.Control("CMS.Controllers.Dashboard", {
     }
 
   , get_active_widget_elements: function() {
-      return this.element.find("section.widget[id]:not([id=])").toArray();
+      return this.element.find("section.widget[id]:not([id=''])").toArray();
     }
 
   , add_widget_from_descriptor: function() {
@@ -283,50 +237,6 @@ can.Control("CMS.Controllers.Dashboard", {
         return this.add_dashboard_widget_from_descriptor(descriptor);
     }
 
-  , make_tree_view_descriptor_from_model_descriptor: function(descriptor) {
-      // possibly never used
-      return {
-        content_controller: CMS.Controllers.TreeView,
-        content_controller_options: descriptor,
-        content_controller_selector: "ul",
-        widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
-        widget_id: descriptor.model.table_singular,
-        widget_name: descriptor.widget_name || function() {
-          var $objectArea = $(".object-area");
-          if ( $objectArea.hasClass("dashboard-area") ) {
-            return descriptor.model.title_plural;
-          } else if (/people/.test(window.location)) {
-            return "My " + descriptor.model.title_plural;
-          } else {
-            return "Mapped " + descriptor.model.title_plural;
-          }
-        },
-        widget_info : descriptor.widget_info,
-        widget_icon: descriptor.model.table_singular,
-        object_category: descriptor.model.category || descriptor.object_category
-      }
-    }
-
-  , make_list_view_descriptor_from_model_descriptor: function(descriptor) {
-      return {
-        content_controller: GGRC.Controllers.ListView,
-        content_controller_options: descriptor,
-        widget_id: descriptor.model.table_singular,
-        widget_name: descriptor.widget_name || function() {
-          var $objectArea = $(".object-area");
-          if ( $objectArea.hasClass("dashboard-area") ) {
-            return descriptor.model.title_plural;
-          } else if (/people/.test(window.location)) {
-            return "My " + descriptor.model.title_plural;
-          } else {
-            return "Mapped " + descriptor.model.title_plural;
-          }
-        },
-        widget_info : descriptor.widget_info,
-        widget_icon: descriptor.model.table_singular,
-        object_category: descriptor.model.category || descriptor.object_category
-      }
-    }
 });
 
 
@@ -370,7 +280,6 @@ can.Control("CMS.Controllers.InnerNav", {
     init: function(options) {
       CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
         this.display_prefs = prefs;
-
         if (!this.options.widget_list) {
           this.options.widget_list = new can.Observe.List([]);
         }
@@ -384,7 +293,6 @@ can.Control("CMS.Controllers.InnerNav", {
         can.bind.call(window, 'hashchange', function() {
           this.route(window.location.hash);
         }.bind(this));
-
         can.view(this.options.internav_view, this.options, function(frag) {
           var fn = function () {
             this.element.append(frag);
@@ -465,10 +373,11 @@ can.Control("CMS.Controllers.InnerNav", {
     if (info_pin_controller) {
       info_pin_controller.hideInstance();
     }
-      
+
     if (widget.length) {
       dashboard_controller.show_widget_area();
-      widget.siblings(':visible').hide().end().show();
+      widget.siblings(':visible').hide().trigger('widget_hidden');
+      widget.show().trigger('widget_shown');
       $("[href=" + panel_selector + "]")
         .closest("li").addClass("active")
         .siblings().removeClass("active");
@@ -522,7 +431,6 @@ can.Control("CMS.Controllers.InnerNav", {
         , count = match[2] || undefined
         , existing_index
         ;
-
       index = this.saved_widget_index($widget, index);
 
       if(this.delayed_display) {
@@ -590,14 +498,14 @@ can.Control("CMS.Controllers.InnerNav", {
     return index;
   }
 
-  , update_widget_count : function($el, count) {
-      var widget_id = $el.closest('.widget').attr('id'),
+  , update_widget_count: function ($el, count) {
+      var widget_id = $el.closest(".widget").attr("id"),
           widget = this.widget_by_selector("#" + widget_id);
 
       if (widget) {
         widget.attr({
-            count: count
-          , has_count: true
+          count: count,
+          has_count: true
         });
       }
       this.update_add_more_link();

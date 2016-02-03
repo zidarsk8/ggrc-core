@@ -194,24 +194,15 @@ can.Control("CMS.Controllers.LHN", {
 
       this.obs = new can.Observe();
 
-      if (this.should_show_lhn()) {
-        this.init_lhn();
-      }
-      else {
-        this.hide_lhn();
-      }
+      this.init_lhn();
 
       // Set up a scroll handler to capture the current scroll-Y position on the
       // whole LHN search panel.  scroll events do not bubble, so this cannot be
       // set as a delegate on the controller element.
-      self.lhs_holder_onscroll = $.debounce(250, function() {
+      self.lhs_holder_onscroll = _.debounce(function() {
         self.options.display_prefs.setLHNState({ "panel_scroll" : this.scrollTop });
-      });
+      }, 250);
       this.element.find(".lhs-holder").on("scroll", self.lhs_holder_onscroll);
-    }
-
-  , should_show_lhn: function() {
-      return Permission.is_allowed("view_object_page", "__GGRC_ALL__", null);
     }
 
   , is_lhn_open: function () {
@@ -231,6 +222,7 @@ can.Control("CMS.Controllers.LHN", {
 
         value = $(ev.target).val();
         this.do_search(value);
+        this.toggle_filter_active();
       }
     }
 
@@ -239,28 +231,29 @@ can.Control("CMS.Controllers.LHN", {
 
       var value = $(ev.target).find("input.widgetsearch").val();
       this.do_search(value);
-  }
-
-  , ".widgetsearch keyup": function(el, ev) {
       this.toggle_filter_active();
-    }
+  }
 
   , toggle_filter_active: function () {
       // Set active state to search field if the input is not empty:
       var $filter = this.element.find('.widgetsearch'),
+          $button = this.element.find('.widgetsearch-submit'),
           $off = this.element.find('.filter-off'),
+          $search_title = this.element.find(".search-title"),
           got_filter = !!$filter.val().trim().length;
 
       $filter.toggleClass("active", got_filter);
+      $button.toggleClass("active", got_filter);
       $off.toggleClass("active", got_filter);
+      $search_title.toggleClass("active", got_filter);
   }
 
   , ".filter-off a click": function (el, ev) {
     ev.preventDefault();
 
     this.element.find('.widgetsearch').val('');
-    this.toggle_filter_active();
     this.do_search('');
+    this.toggle_filter_active();
   }
 
   , "a[data-name='work_type'] click": function(el, ev) {
@@ -347,18 +340,16 @@ can.Control("CMS.Controllers.LHN", {
 
   , init_lhn: function() {
       CMS.Models.DisplayPrefs.getSingleton().done(function(prefs) {
-        var checked
-          , $lhs = $("#lhs")
-          , lhn_search_dfd
-          ;
+        var $lhs = $("#lhs"),
+            lhn_search_dfd,
+            my_work_tab = false;
 
         this.options.display_prefs = prefs;
 
-        checked = true;
         if (typeof prefs.getLHNState().my_work !== "undefined") {
-          checked = !!prefs.getLHNState().my_work;
+          my_work_tab = !!prefs.getLHNState().my_work;
         }
-        this.obs.attr("my_work", checked);
+        this.obs.attr("my_work", my_work_tab);
 
         lhn_search_dfd = $lhs
           .cms_controllers_lhn_search({
@@ -449,10 +440,12 @@ can.Control("CMS.Controllers.LHN", {
     }
 
   , do_search: function (value) {
+    var $search_title = this.element.find(".search-title");
     value = $.trim(value);
     if (this._value === value) {
       return;
     }
+    $search_title.addClass("active");
     this.obs.attr("value", value);
     this.options.display_prefs.setLHNState("search_text", value);
     this._value = value;
@@ -673,9 +666,9 @@ can.Control("CMS.Controllers.LHN_Search", {
         self.post_init();
         self.element.find(".sub-level")
           .cms_controllers_infinite_scroll()
-          .on("scroll", $.debounce(250, function() {
+          .on("scroll", _.debounce(function() {
             self.options.display_prefs.setLHNState("category_scroll", this.scrollTop);
-          }));
+          }, 250));
 
         initial_term = self.options.display_prefs.getLHNState().search_text || "";
         if (self.options.observer.my_work) {
@@ -1036,14 +1029,9 @@ can.Control("CMS.Controllers.LHN_Search", {
           // Remove filter suffix (ie Workflow_All) from model_name before
           //  checking permissions
           model_name = model_name.split('_')[0];
-          if (Permission.is_allowed('read', model_name, null) && !isNaN(parseInt(count))) {
-            $list
-              .find(self.options.count_selector)
-              .text(count);
-          }
-          else {
-            $list.find(self.options.count_selector).closest('small').remove();
-          }
+          $list
+            .find(self.options.count_selector)
+            .text(count);
         }
       });
     }

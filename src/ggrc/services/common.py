@@ -19,11 +19,10 @@ from urllib import urlencode
 from blinker import Namespace
 from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 import sqlalchemy.orm.exc
 from werkzeug.exceptions import BadRequest, Forbidden
-from sqlalchemy.orm.properties import RelationshipProperty
 
 import ggrc.builder.json
 from flask.ext.sqlalchemy import Pagination
@@ -35,7 +34,6 @@ from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
-from ggrc.models.relationship import Relationship
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.rbac import permissions, context_query_filter
 from .attribute_query import AttributeQueryBuilder
@@ -43,14 +41,13 @@ from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc import settings
 
 
-CACHE_EXPIRY_COLLECTION=60
+CACHE_EXPIRY_COLLECTION = 60
+
 
 def get_oauth_credentials():
   from flask import session
-  if session.has_key('oauth_credentials'):
-    return session['oauth_credentials']
-  else:
-    return None
+  return session.get('oauth_credentials')
+
 
 def _get_cache_manager():
   from ggrc.cache import CacheManager, MemCache
@@ -120,7 +117,8 @@ def set_ids_for_new_custom_attribute_values(objects, obj):
   custom attribute values at this point and set the correct attributable_id
 
   Args:
-    objects: newly created objects (we update only the ones that are CustomAttributeValue
+    objects: newly created objects (we update only the ones that
+             are CustomAttributeValue
     obj: parent object to be set as attributable
 
   Returns:
@@ -140,10 +138,31 @@ def set_ids_for_new_custom_attribute_values(objects, obj):
   db.session.flush()
 
 
+def memcache_mark_for_deletion(context, objects_to_mark):
+  """
+  Mark objects for deletion from memcache
+
+  Args:
+    context: application context
+    objects_to_mark: A list of objects to be deleted from memcache
+
+  Returns:
+    None
+  """
+  for o, _ in objects_to_mark:
+    cls = get_cache_class(o)
+    if cls in context.cache_manager.supported_classes:
+      key = get_cache_key(o)
+      context.cache_manager.marked_for_delete.append(key)
+      context.cache_manager.marked_for_delete.extend(
+          get_related_keys_for_expiration(context, o))
+
+
 def update_memcache_before_commit(context, modified_objects, expiry_time):
   """
   Preparing the memccache entries to be updated before DB commit
-  Also update the memcache to indicate the status cache operation 'InProgress' waiting for DB commit
+  Also update the memcache to indicate the status cache operation
+  'InProgress' waiting for DB commit
   Raises Exception on failures, cannot proceed with DB commit
 
   Args:
@@ -160,47 +179,27 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
   context.cache_manager = _get_cache_manager()
 
   if len(modified_objects.new) > 0:
-    items_to_add = modified_objects.new.items()
-    for o, json_obj in items_to_add:
-      cls = get_cache_class(o)
-      if context.cache_manager.supported_classes.has_key(cls):
-        key = get_cache_key(o)
-        context.cache_manager.marked_for_delete.append(key)
-        context.cache_manager.marked_for_delete.extend(
-            get_related_keys_for_expiration(context, o))
+    memcache_mark_for_deletion(context, modified_objects.new.items())
 
   if len(modified_objects.dirty) > 0:
-    items_to_update = modified_objects.dirty.items()
-    for o, json_obj in items_to_update:
-      cls = get_cache_class(o)
-      if context.cache_manager.supported_classes.has_key(cls):
-        key = get_cache_key(o)
-        context.cache_manager.marked_for_delete.append(key)
-        context.cache_manager.marked_for_delete.extend(
-            get_related_keys_for_expiration(context, o))
+    memcache_mark_for_deletion(context, modified_objects.dirty.items())
 
   if len(modified_objects.deleted) > 0:
-    items_to_delete=modified_objects.deleted.items()
-    for o, json_obj in items_to_delete:
-      cls = get_cache_class(o)
-      if context.cache_manager.supported_classes.has_key(cls):
-        # FIXME: is explicit `id=...` *required* here to avoid querying the
-        #   database for a possibly-deleted object?
-        key = get_cache_key(o)#, id=json_obj['id'])
-        context.cache_manager.marked_for_delete.append(key)
-        context.cache_manager.marked_for_delete.extend(
-            get_related_keys_for_expiration(context, o))
+    memcache_mark_for_deletion(context, modified_objects.deleted.items())
 
-  status_entries ={}
+  status_entries = {}
   for key in context.cache_manager.marked_for_delete:
-    build_cache_status(status_entries, 'DeleteOp:' + key, expiry_time, 'InProgress')
+    build_cache_status(status_entries, 'DeleteOp:' + key,
+                       expiry_time, 'InProgress')
   if len(status_entries) > 0:
     current_app.logger.info("CACHE: status entries: " + str(status_entries))
     ret = context.cache_manager.bulk_add(status_entries, expiry_time)
     if ret is not None and len(ret) == 0:
       pass
     else:
-      current_app.logger.error('CACHE: Unable to add status for newly created entries in memcache ' + str(ret))
+      current_app.logger.error(
+          'CACHE: Unable to add status for newly created entries ' +
+          str(ret))
 
 
 def update_memcache_after_commit(context):
@@ -226,22 +225,27 @@ def update_memcache_after_commit(context):
 
   # TODO(dan): check for duplicates in marked_for_delete
   if len(cache_manager.marked_for_delete) > 0:
-    #current_app.logger.info("CACHE: Bulk Delete: " + str(cache_manager.marked_for_delete))
-    delete_result = cache_manager.bulk_delete(cache_manager.marked_for_delete, 0)
-    # TODO(dan): handling failure including network errors, currently we log errors
+    delete_result = cache_manager.bulk_delete(
+        cache_manager.marked_for_delete, 0)
+    # TODO(dan): handling failure including network errors,
+    #            currently we log errors
     if delete_result is not True:
-      current_app.logger.error("CACHE: Failed to remoe collection from cache")
+      current_app.logger.error("CACHE: Failed to remove collection from cache")
 
-  status_entries =[]
+  status_entries = []
   for key in cache_manager.marked_for_delete:
     status_entries.append('DeleteOp:' + str(key))
   if len(status_entries) > 0:
     delete_result = cache_manager.bulk_delete(status_entries, 0)
-    # TODO(dan): handling failure including network errors, currently we log errors
+    # TODO(dan): handling failure including network errors,
+    #            currently we log errors
     if delete_result is not True:
-      current_app.logger.error("CACHE: Failed to remove status entries from cache")
+      current_app.logger.error(
+          "CACHE: Failed to remove status entries from cache")
 
+  clear_permission_cache()
   cache_manager.clear_cache()
+
 
 def build_cache_status(data, key, expiry_timeout, status):
   """
@@ -257,8 +261,11 @@ def build_cache_status(data, key, expiry_timeout, status):
   """
   data[key] = {'expiry': expiry_timeout, 'status': status}
 
+
 def inclusion_filter(obj):
-  return permissions.is_allowed_read(obj.__class__.__name__, obj.context_id)
+  return permissions.is_allowed_read(obj.__class__.__name__,
+                                     obj.id, obj.context_id)
+
 
 def get_cache(create=False):
   """
@@ -275,6 +282,7 @@ def get_cache(create=False):
     logging.warning("No request context - no cache created")
     return None
 
+
 def get_modified_objects(session):
   session.flush()
   cache = get_cache()
@@ -282,6 +290,7 @@ def get_modified_objects(session):
     return cache.copy()
   else:
     return None
+
 
 def update_index(session, cache):
   if cache:
@@ -293,6 +302,7 @@ def update_index(session, cache):
     for obj in cache.deleted:
       indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
     session.commit()
+
 
 def log_event(session, obj=None, current_user_id=None):
   revisions = []
@@ -321,13 +331,25 @@ def log_event(session, obj=None, current_user_id=None):
     context_id = obj.context_id
   if revisions:
     event = Event(
-      modified_by_id=current_user_id,
-      action=action,
-      resource_id=resource_id,
-      resource_type=resource_type,
-      context_id=context_id)
+        modified_by_id=current_user_id,
+        action=action,
+        resource_id=resource_id,
+        resource_type=resource_type,
+        context_id=context_id)
     event.revisions = revisions
     session.add(event)
+
+
+def clear_permission_cache():
+  if not getattr(settings, 'MEMCACHE_MECHANISM', False):
+    return
+  cache = _get_cache_manager().cache_object.memcache_client
+  cached_keys_set = cache.get('permissions:list') or set()
+  cached_keys_set.add('permissions:list')
+  # We delete all the cached user permissions as well as
+  # the permissions:list value itself
+  cache.delete_multi(cached_keys_set)
+
 
 class ModelView(View):
   DEFAULT_PAGE_SIZE = 20
@@ -363,16 +385,16 @@ class ModelView(View):
   def _get_type_select_column(self, model):
     mapper = model._sa_class_manager.mapper
     if mapper.polymorphic_on is None:
-    #if len(mapper.self_and_descendants) == 1:
+      # if len(mapper.self_and_descendants) == 1:
       type_column = sqlalchemy.literal(mapper.class_.__name__)
     else:
       # Handle polymorphic types with CASE
       type_column = sqlalchemy.case(
           value=mapper.polymorphic_on,
           whens={
-            val: m.class_.__name__
+              val: m.class_.__name__
               for val, m in mapper.polymorphic_map.items()
-            })
+          })
     return type_column
 
   def _get_type_where_clause(self, model):
@@ -387,13 +409,6 @@ class ModelView(View):
           if m in mappers)
       return mapper.polymorphic_on.in_(polymorphic_on_values)
 
-  #def _get_polymorphic_column(self, model):
-  #  mapper = model._sa_class_manager.mapper
-  #  if len(mapper.self_and_descendants) > 1:
-  #    return mapper.polymorphic_on
-  #  else:
-  #    return sqlalchemy.literal(mapper.class_.__name__)
-
   def _get_matching_types(self, model):
     mapper = model._sa_class_manager.mapper
     if len(list(mapper.self_and_descendants)) == 1:
@@ -406,13 +421,13 @@ class ModelView(View):
     mapper = model._sa_class_manager.mapper
     columns = []
     columns.append(mapper.primary_key[0].label('id'))
-    #columns.append(model.id.label('id'))
+    # columns.append(model.id.label('id'))
     columns.append(self._get_type_select_column(model).label('type'))
     if hasattr(mapper.c, 'context_id'):
       columns.append(mapper.c.context_id.label('context_id'))
     if hasattr(mapper.c, 'updated_at'):
       columns.append(mapper.c.updated_at.label('updated_at'))
-    #columns.append(self._get_polymorphic_column(model))
+    # columns.append(self._get_polymorphic_column(model))
     return columns
 
   def get_collection_matches(self, model, filter_by_contexts=True):
@@ -420,27 +435,27 @@ class ModelView(View):
     query = db.session.query(*columns).filter(
         self._get_type_where_clause(model))
     return self.filter_query_by_request(
-      query, filter_by_contexts=filter_by_contexts)
+        query, filter_by_contexts=filter_by_contexts)
 
   def get_resource_match_query(self, model, id):
     columns = self.get_match_columns(model)
     query = db.session.query(*columns).filter(
         and_(
-          self._get_type_where_clause(model),
-          columns[0] == id))
+            self._get_type_where_clause(model),
+            columns[0] == id))
     return query
 
   # Default model/DB helpers
   def get_collection(self, filter_by_contexts=True):
     if '__stubs_only' not in request.args and \
-        hasattr(self.model, 'eager_query'):
+       hasattr(self.model, 'eager_query'):
       query = self.model.eager_query()
     else:
       query = db.session.query(self.model)
     return self.filter_query_by_request(
         query, filter_by_contexts=filter_by_contexts)
 
-  def filter_query_by_request(self, query, filter_by_contexts=True):
+  def filter_query_by_request(self, query, filter_by_contexts=True):  # noqa
     joinlist = []
     if request.args:
       querybuilder = AttributeQueryBuilder(self.model)
@@ -451,14 +466,22 @@ class ModelView(View):
         query = query.filter(filter)
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
+      resources = permissions.read_resources_for(self.model.__name__)
       filter_expr = context_query_filter(self.model.context_id, contexts)
+      if resources:
+        filter_expr = or_(filter_expr, self.model.id.in_(resources))
       query = query.filter(filter_expr)
       for j in joinlist:
         j_class = j.property.mapper.class_
         j_contexts = permissions.read_contexts_for(j_class.__name__)
+        j_resources = permissions.read_resources_for(j_class.__name__)
         if j_contexts is not None:
-          query = query.filter(
-              context_query_filter(j_class.context_id, j_contexts))
+          j_filter_expr = context_query_filter(j_class.context_id, j_contexts)
+          if resources:
+            j_filter_expr = or_(j_filter_expr, self.model.id.in_(j_resources))
+          query = query.filter(j_filter_expr)
+        elif resources:
+          query = query.filter(self.model.id.in_(resources))
     if '__search' in request.args:
       terms = request.args['__search']
       types = self._get_matching_types(self.model)
@@ -466,7 +489,8 @@ class ModelView(View):
       models = indexer._get_grouped_types(types)
       search_query = indexer._get_type_query(models, 'read', None)
       search_query = and_(search_query, indexer._get_filter_query(terms))
-      search_query = db.session.query(indexer.record_type.key).filter(search_query)
+      search_query = db.session.query(indexer.record_type.key).filter(
+          search_query)
       if '__mywork' in request.args:
         search_query = indexer._add_owner_query(
             search_query, models, get_current_user_id())
@@ -487,7 +511,8 @@ class ModelView(View):
             order_property = order_property.desc()
           order_properties.append(order_property)
         else:
-          # Possibly throw an exception instead, if sorting by invalid attribute?
+          # Possibly throw an exception instead,
+          # if sorting by invalid attribute?
           pass
     order_properties.append(self.modified_attr.desc())
     order_properties.append(self.model.id.desc())
@@ -518,21 +543,6 @@ class ModelView(View):
   def not_found_response(self):
     return current_app.make_response((self.not_found_message(), 404, []))
 
-  def etag(self, last_modified):
-    """Generate the etag given a datetime for the last time the resource was
-    modified. This isn't as good as an etag generated off of a hash of the
-    representation, but, it doesn't require the representation in order to be
-    calculated. An alternative would be to keep an etag on the stored
-    representation, but this will do for now.
-
-    .. note::
-
-       Using the datetime implies the need for some care - the resolution of
-       the time object needs to be sufficient such that you don't end up with
-       the same etag due to two updates performed in rapid succession.
-    """
-    return '"{0}"'.format(hashlib.sha1(str(last_modified)).hexdigest())
-
   def collection_last_modified(self):
     """Calculate the last time a member of the collection was modified. This
     method relies on the fact that the collection table has an `updated_at` or
@@ -555,7 +565,7 @@ class ModelView(View):
     url = cls.url_for(*args, **kwargs)
     # preserve original query string
     idx = request.url.find('?')
-    querystring = '' if idx < 0 else '?' + request.url[idx+1:]
+    querystring = '' if idx < 0 else '?' + request.url[idx + 1:]
     return url + querystring
 
   @classmethod
@@ -606,19 +616,32 @@ class Resource(ModelView):
   """
 
   signals = Namespace()
-  model_posted = signals.signal('Model POSTed',
-    """
-    Indicates that a model object was received via POST and will be committed
-    to the database. The sender in the signal will be the model class of the
-    POSTed resource. The following arguments will be sent along with the
-    signal:
+  model_posted = signals.signal(
+      'Model POSTed',
+      """
+      Indicates that a model object was received via POST and will be committed
+      to the database. The sender in the signal will be the model class of the
+      POSTed resource. The following arguments will be sent along with the
+      signal:
 
-      :obj: The model instance created from the POSTed JSON.
-      :src: The original POSTed JSON dictionary.
-      :service: The instance of Resource handling the POST request.
-    """,
-    )
-  model_put = signals.signal('Model PUT',
+        :obj: The model instance created from the POSTed JSON.
+        :src: The original POSTed JSON dictionary.
+        :service: The instance of Resource handling the POST request.
+      """,)
+  model_posted_after_commit = signals.signal(
+      'Model POSTed - after',
+      """
+      Indicates that a model object was received via POST and has been
+      committed to the database. The sender in the signal will be the model
+      aclass of the POSTed resource. The following arguments will be sent along
+      with the signal:
+
+        :obj: The model instance created from the POSTed JSON.
+        :src: The original POSTed JSON dictionary.
+        :service: The instance of Resource handling the POST request.
+      """,)
+  model_put = signals.signal(
+      'Model PUT',
       """
       Indicates that a model object update was received via PUT and will be
       updated in the database. The sender in the signal will be the model class
@@ -628,9 +651,21 @@ class Resource(ModelView):
         :obj: The model instance updated from the PUT JSON.
         :src: The original PUT JSON dictionary.
         :service: The instance of Resource handling the PUT request.
-      """,
-      )
-  model_deleted = signals.signal('Model DELETEd',
+      """,)
+  model_put_after_commit = signals.signal(
+      'Model PUT - after',
+      """
+      Indicates that a model object update was received via PUT and has been
+      updated in the database. The sender in the signal will be the model class
+      of the PUT resource. The following arguments will be sent along with the
+      signal:
+
+        :obj: The model instance updated from the PUT JSON.
+        :src: The original PUT JSON dictionary.
+        :service: The instance of Resource handling the PUT request.
+      """,)
+  model_deleted = signals.signal(
+      'Model DELETEd',
       """
       Indicates that a model object was DELETEd and will be removed from the
       databse. The sender in the signal will be the model class of the DELETEd
@@ -638,15 +673,24 @@ class Resource(ModelView):
 
         :obj: The model instance removed.
         :service: The instance of Resource handling the DELETE request.
-      """,
-      )
+      """,)
+  model_deleted_after_commit = signals.signal(
+      'Model DELETEd - after',
+      """
+      Indicates that a model object was DELETEd and has been removed from the
+      database. The sender in the signal will be the model class of the DELETEd
+      resource. The followin garguments will be sent along with the signal:
 
-  def dispatch_request(self, *args, **kwargs):
+        :obj: The model instance removed.
+        :service: The instance of Resource handling the DELETE request.
+      """,)
+
+  def dispatch_request(self, *args, **kwargs):  # noqa
     with benchmark("Dispatch request"):
       with benchmark("dispatch_request > Check Headers"):
         method = request.method
         if method in ('POST', 'PUT', 'DELETE')\
-            and 'X-Requested-By' not in request.headers:
+           and 'X-Requested-By' not in request.headers:
           raise BadRequest('X-Requested-By header is REQUIRED.')
 
       with benchmark("dispatch_request > Try"):
@@ -670,7 +714,7 @@ class Resource(ModelView):
         except (IntegrityError, ValidationError) as v:
           message = translate_message(v)
           current_app.logger.warn(message)
-          return ((message, 403, []))
+          return (message, 403, [])
         except Exception as e:
           current_app.logger.exception(e)
           raise
@@ -678,18 +722,20 @@ class Resource(ModelView):
   def post(*args, **kwargs):
     raise NotImplementedError()
 
-  # Default JSON request handlers
   def get(self, id):
+    """Default JSON request handlers"""
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
     if 'Accept' in self.request.headers and \
-        'application/json' not in self.request.headers['Accept']:
+       'application/json' not in self.request.headers['Accept']:
       return current_app.make_response((
           'application/json', 406, [('Content-Type', 'text/plain')]))
     with benchmark("Query read permissions"):
-      if not permissions.is_allowed_read(self.model.__name__, obj.context_id):
+      if not permissions.is_allowed_read(
+          self.model.__name__, obj.id, obj.context_id)\
+         and not permissions.has_conditions('read', self.model.__name__):
         raise Forbidden()
       if not permissions.is_allowed_read_for(obj):
         raise Forbidden()
@@ -697,33 +743,34 @@ class Resource(ModelView):
       object_for_json = self.object_for_json(obj)
 
     if 'If-None-Match' in self.request.headers and \
-        self.request.headers['If-None-Match'] == self.etag(object_for_json):
+       self.request.headers['If-None-Match'] == etag(object_for_json):
       with benchmark("Make response"):
-        return current_app.make_response((
-          '', 304, [('Etag', self.etag(object_for_json))]))
+        return current_app.make_response(
+            ('', 304, [('Etag', etag(object_for_json))]))
     with benchmark("Make response"):
       return self.json_success_response(
-        object_for_json, self.modified_at(obj))
+          object_for_json, self.modified_at(obj))
 
   def validate_headers_for_put_or_delete(self, obj):
-    # rfc 6585 defines a new status code for missing required headers
+    """rfc 6585 defines a new status code for missing required headers"""
     required_headers = set(['If-Match', 'If-Unmodified-Since'])
-    missing_headers = required_headers.difference(set(self.request.headers.keys()))
+    missing_headers = required_headers.difference(
+        set(self.request.headers.keys()))
     if missing_headers:
-      return current_app.make_response((
-        'required headers: ' + ', '.join(missing_headers),
-        428, [('Content-Type', 'text/plain')]))
+      return current_app.make_response(
+          ('required headers: ' + ', '.join(missing_headers),
+           428, [('Content-Type', 'text/plain')]))
 
-    if request.headers['If-Match'] != self.etag(self.object_for_json(obj)) or \
+    if request.headers['If-Match'] != etag(self.object_for_json(obj)) or \
         request.headers['If-Unmodified-Since'] != \
-          self.http_timestamp(self.modified_at(obj)):
+            self.http_timestamp(self.modified_at(obj)):
       return current_app.make_response((
           'The resource could not be updated due to a conflict with the '
           'current state on the server. Please resolve the conflict by '
           'refreshing the resource.',
           409,
           [('Content-Type', 'text/plain')]
-          ))
+      ))
     return None
 
   def json_update(self, obj, src):
@@ -734,28 +781,33 @@ class Resource(ModelView):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
-    if self.request.mimetype != 'application/json':
-      return current_app.make_response((
-        'Content-Type must be application/json', 415,[]))
-    header_error = self.validate_headers_for_put_or_delete(obj)
-    if header_error:
-      return header_error
     src = UnicodeSafeJsonWrapper(self.request.json)
-    root_attribute = self.model._inflector.table_singular
-    try:
-      src = src[root_attribute]
-    except KeyError, e:
-      return current_app.make_response((
-        'Required attribute "{0}" not found'.format(root_attribute), 400, []))
     with benchmark("Query update permissions"):
-      if not permissions.is_allowed_update(self.model.__name__, obj.context_id):
+      if not permissions.is_allowed_update(
+          self.model.__name__, obj.id, obj.context_id)\
+         and not permissions.has_conditions('update', self.model.__name__):
         raise Forbidden()
       if not permissions.is_allowed_update_for(obj):
         raise Forbidden()
       new_context = self.get_context_id_from_json(src)
       if new_context != obj.context_id \
-          and not permissions.is_allowed_update(self.model.__name__, new_context):
+         and not permissions.is_allowed_update(
+              self.model.__name__, obj.id, new_context)\
+         and not permissions.has_conditions('update', self.model.__name__):
         raise Forbidden()
+    if self.request.mimetype != 'application/json':
+      return current_app.make_response(
+          ('Content-Type must be application/json', 415, []))
+    header_error = self.validate_headers_for_put_or_delete(obj)
+    if header_error:
+      return header_error
+    root_attribute = self.model._inflector.table_singular
+    try:
+      src = src[root_attribute]
+    except KeyError:
+      return current_app.make_response((
+          'Required attribute "{0}" not found'.format(
+              root_attribute), 400, []))
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
@@ -766,16 +818,20 @@ class Resource(ModelView):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Log event"):
       log_event(db.session, obj)
-    with benchmark("Update memcache before commit for resource collection PUT"):
-      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
+    with benchmark("Update memcache before commit for collection PUT"):
+      update_memcache_before_commit(
+          self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
     with benchmark("Commit"):
       db.session.commit()
     with benchmark("Query for object"):
       obj = self.get_object(id)
     with benchmark("Update index"):
       update_index(db.session, modified_objects)
-    with benchmark("Update memcache after commit for resource collection PUT"):
+    with benchmark("Update memcache after commit for collection PUT"):
       update_memcache_after_commit(self.request)
+    with benchmark("Send PUT - after commit event"):
+      self.model_put_after_commit.send(obj.__class__, obj=obj,
+                                       src=src, service=self)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     with benchmark("Make response"):
@@ -797,14 +853,16 @@ class Resource(ModelView):
         obj = self.get_object(id)
       if obj is None:
         return self.not_found_response()
-      header_error = self.validate_headers_for_put_or_delete(obj)
-      if header_error:
-        return header_error
       with benchmark("Query delete permissions"):
-        if not permissions.is_allowed_delete(self.model.__name__, obj.context_id):
+        if not permissions.is_allowed_delete(
+            self.model.__name__, obj.id, obj.context_id)\
+           and not permissions.has_conditions("delete", self.model.__name__):
           raise Forbidden()
         if not permissions.is_allowed_delete_for(obj):
           raise Forbidden()
+      header_error = self.validate_headers_for_put_or_delete(obj)
+      if header_error:
+        return header_error
       db.session.delete(obj)
       with benchmark("Send DELETEd event"):
         self.model_deleted.send(obj.__class__, obj=obj, service=self)
@@ -812,14 +870,18 @@ class Resource(ModelView):
         modified_objects = get_modified_objects(db.session)
       with benchmark("Log event"):
         log_event(db.session, obj)
-      with benchmark("Update memcache before commit for resource collection DELETE"):
-        update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
+      with benchmark("Update memcache before commit for collection DELETE"):
+        update_memcache_before_commit(
+            self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
       with benchmark("Commit"):
         db.session.commit()
       with benchmark("Update index"):
         update_index(db.session, modified_objects)
-      with benchmark("Update memcache after commit for resource collection DELETE"):
+      with benchmark("Update memcache after commit for collection DELETE"):
         update_memcache_after_commit(self.request)
+      with benchmark("Send DELETEd - after commit event"):
+        self.model_deleted_after_commit.send(obj.__class__, obj=obj,
+                                             service=self)
       with benchmark("Query for object"):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
@@ -847,7 +909,7 @@ class Resource(ModelView):
       page_number = int(request.args.get('__page', 1))
       matches = matches_query\
           .limit(page_size)\
-          .offset((page_number-1)*page_size)\
+          .offset((page_number - 1) * page_size)\
           .all()
       if page_number == 1 and len(matches) < page_size:
         total = len(matches)
@@ -857,7 +919,7 @@ class Resource(ModelView):
         matches_query, page_number, page_size, total, matches)
     collection_extras = {
         'paging': self.build_page_object_for_json(page)
-        }
+    }
     return matches, collection_extras
 
   def get_matched_resources(self, matches):
@@ -882,11 +944,18 @@ class Resource(ModelView):
   def collection_get(self):
     with benchmark("dispatch_request > collection_get > Check headers"):
       if 'Accept' in self.request.headers and \
-          'application/json' not in self.request.headers['Accept']:
+         'application/json' not in self.request.headers['Accept']:
         return current_app.make_response((
-          'application/json', 406, [('Content-Type', 'text/plain')]))
-    with benchmark("dispatch_request > collection_get > Get collection matches"):
-      matches_query = self.get_collection_matches(self.model)
+            'application/json', 406, [('Content-Type', 'text/plain')]))
+    with benchmark("dispatch_request > collection_get > Collection matches"):
+      # We skip querying by contexts for Creator role and relationship objects,
+      # because it will filter out objects that the Creator can access.
+      # We are doing a special permissions check for these objects
+      # below in the filter_resource method.
+      filter_by_contexts = not (self.model.__name__ == "Relationship" and
+                                _is_creator())
+      matches_query = self.get_collection_matches(
+          self.model, filter_by_contexts)
     with benchmark("dispatch_request > collection_get > Query Data"):
       if '__page' in request.args or '__page_only' in request.args:
         with benchmark("Query matches with paging"):
@@ -895,7 +964,7 @@ class Resource(ModelView):
         with benchmark("Query matches"):
           matches = matches_query.all()
           extras = {}
-    with benchmark("dispatch_request > collection_get > Get matched resources"):
+    with benchmark("dispatch_request > collection_get > Matched resources"):
       cache_op = None
       if '__stubs_only' in request.args:
         objs = [{
@@ -903,24 +972,23 @@ class Resource(ModelView):
             'type': m[1],
             'href': utils.url_for(m[1], id=m[0]),
             'context_id': m[2]
-            } for m in matches]
+        } for m in matches]
 
       else:
         cache_objs, database_objs = self.get_matched_resources(matches)
-
         objs = {}
         objs.update(cache_objs)
         objs.update(database_objs)
 
         objs = [objs[m] for m in matches if m in objs]
-
         with benchmark("Filter resources based on permissions"):
           objs = filter_resource(objs)
 
         cache_op = 'Hit' if len(cache_objs) > 0 else 'Miss'
     with benchmark("dispatch_request > collection_get > Create Response"):
       # Return custom fields specified via `__fields=id,title,description` etc.
-      # TODO this can be optimized by filter_resource() not retrieving the other fields to being with
+      # TODO this can be optimized by filter_resource() not retrieving
+      # the other fields to being with
       if '__fields' in request.args:
           custom_fields = request.args['__fields'].split(',')
           objs = [
@@ -932,13 +1000,13 @@ class Resource(ModelView):
             objs, extras=extras)
 
       if 'If-None-Match' in self.request.headers and \
-          self.request.headers['If-None-Match'] == self.etag(collection):
+         self.request.headers['If-None-Match'] == etag(collection):
         return current_app.make_response((
-          '', 304, [('Etag', self.etag(collection))]))
+            '', 304, [('Etag', etag(collection))]))
 
       with benchmark("Make response"):
         return self.json_success_response(
-          collection, self.collection_last_modified(), cache_op=cache_op)
+            collection, self.collection_last_modified(), cache_op=cache_op)
 
   def get_resources_from_cache(self, matches):
     """Get resources from cache for specified matches"""
@@ -976,11 +1044,12 @@ class Resource(ModelView):
     while len(keys) > 0:
       slice_keys = keys[:32]
       keys = keys[32:]
-      blocker_keys = [key_blockers[key] for key in slice_keys]
+      blocker_keys = [key_blockers[slice_key] for slice_key in slice_keys]
       result = memcache_client.get_multi(blocker_keys)
       # Reduce `slice_keys` to only unblocked keys
       slice_keys = [
-          key for key in slice_keys if key_blockers[key] not in result]
+          slice_key for slice_key in slice_keys
+          if key_blockers[slice_key] not in result]
       memcache_client.add_multi(
           {key: key_objs[key] for key in slice_keys})
 
@@ -1001,65 +1070,123 @@ class Resource(ModelView):
     """Do NOTHING by default"""
     pass
 
-  def collection_post(self):
+  def collection_post_step(self, src):
+    try:
+      obj = self.model()
+      root_attribute = self.model._inflector.table_singular
+      try:
+        src = src[root_attribute]
+      except KeyError, e:
+        raise BadRequest('Required attribute "{0}" not found'.format(
+            root_attribute))
+      with benchmark("Query create permissions"):
+        if not permissions.is_allowed_create(
+            self.model.__name__, None,
+            self.get_context_id_from_json(src))\
+           and not permissions.has_conditions('create', self.model.__name__):
+          raise Forbidden()
+      if src.get('private') is True and src.get('context') is not None \
+         and src['context'].get('id') is not None:
+        raise BadRequest(
+            'context MUST be "null" when creating a private resource.')
+      elif 'context' not in src:
+        raise BadRequest('context MUST be specified.')
+
+      with benchmark("Deserialize object"):
+        self.json_create(obj, src)
+      with benchmark("Query create permissions"):
+        if not permissions.is_allowed_create_for(obj):
+          # json_create sometimes adds objects to session, so we need to
+          # make sure the session is cleared
+          db.session.expunge_all()
+          raise Forbidden()
+      with benchmark("Send model POSTed event"):
+        self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+      obj.modified_by_id = get_current_user_id()
+      db.session.add(obj)
+      with benchmark("Get modified objects"):
+        modified_objects = get_modified_objects(db.session)
+      with benchmark("Update custom attribute values"):
+        set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
+      with benchmark("Log event"):
+        log_event(db.session, obj)
+      with benchmark("Update memcache before commit for collection POST"):
+        update_memcache_before_commit(
+            self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
+      with benchmark("Commit"):
+        db.session.commit()
+      with benchmark("Update index"):
+        update_index(db.session, modified_objects)
+      with benchmark("Update memcache after commit for collection POST"):
+        update_memcache_after_commit(self.request)
+      with benchmark("Send model POSTed - after commit event"):
+        self.model_posted_after_commit.send(obj.__class__, obj=obj,
+                                            src=src, service=self)
+      with benchmark("Serialize object"):
+        object_for_json = self.object_for_json(obj)
+      with benchmark("Make response"):
+        return (201, object_for_json)
+    except (IntegrityError, ValidationError) as e:
+      msg = e.orig.args[1]
+      if obj.type == "Relationship" and \
+         msg.startswith("Duplicate entry") and \
+         msg.endswith("'uq_relationships'"):
+        db.session.rollback()
+        obj = obj.__class__.update_attributes(obj.source, obj.destination,
+                                              obj.attrs)
+        db.session.flush()
+        object_for_json = self.object_for_json(obj)
+        return (200, object_for_json)
+      message = translate_message(e)
+      current_app.logger.warn(message)
+      return (403, message)
+
+  def collection_post(self):  # noqa
     if self.request.mimetype != 'application/json':
       return current_app.make_response((
-        'Content-Type must be application/json', 415,[]))
-    obj = self.model()
-    src = UnicodeSafeJsonWrapper(self.request.json)
-    root_attribute = self.model._inflector.table_singular
-    try:
-      src = src[root_attribute]
-    except KeyError, e:
-      return current_app.make_response((
-          'Required attribute "{0}" not found'.format(
-              root_attribute), 400, []))
-    with benchmark("Query create permissions"):
-      if not permissions.is_allowed_create(self.model.__name__,
-                                           self.get_context_id_from_json(src)):
-        raise Forbidden()
-    if src.get('private') == True and src.get('context') is not None \
-        and src['context'].get('id') is not None:
-      raise BadRequest(
-        'context MUST be "null" when creating a private resource.')
-    elif 'context' not in src:
-      raise BadRequest('context MUST be specified.')
+          'Content-Type must be application/json', 415, []))
+    body = self.request.json
+    wrap = type(body) == dict
+    if wrap:
+      body = [body]
+    res = []
+    for src in body:
+      try:
+        src_res = None
+        src_res = self.collection_post_step(UnicodeSafeJsonWrapper(src))
+        db.session.commit()
+      except Exception as e:
+        if not src_res or 200 <= src_res[0] < 300:
+          src_res = (getattr(e, "code", 500), e.message)
+        current_app.logger.warn("Collection POST commit failed: " + str(e))
+        db.session.rollback()
+      res.append(src_res)
+    headers = {"Content-Type": "application/json"}
+    errors = []
+    if wrap:
+      status, res = res[0]
+      if type(res) == dict and len(res) == 1:
+        value = res.values()[0]
+        if "id" in value:
+          headers['Location'] = self.url_for(id=value["id"])
     else:
-      if not permissions.is_allowed_create(
-          self.model.__name__, self.get_context_id_from_json(src)):
-        raise Forbidden()
-    with benchmark("Deserialize object"):
-      self.json_create(obj, src)
-    with benchmark("Send model POSTed event"):
-      self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
-    obj.modified_by_id = get_current_user_id()
-    db.session.add(obj)
-    with benchmark("Get modified objects"):
-      modified_objects = get_modified_objects(db.session)
-    with benchmark("Update custom attribute values"):
-      set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
-    with benchmark("Log event"):
-      log_event(db.session, obj)
-    with benchmark("Update memcache before commit for resource collection POST"):
-      update_memcache_before_commit(self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
-    with benchmark("Commit"):
-      db.session.commit()
-    with benchmark("Update index"):
-      update_index(db.session, modified_objects)
-    with benchmark("Update memcache after commit for resource collection POST"):
-      update_memcache_after_commit(self.request)
-    with benchmark("Serialize object"):
-      object_for_json = self.object_for_json(obj)
-    with benchmark("Make response"):
-      return self.json_success_response(
-        object_for_json, self.modified_at(obj), id=obj.id, status=201)
+      for res_status, body in res:
+        if not (200 <= res_status < 300):
+          errors.append((res_status, body))
+      if len(errors) > 0:
+        status = errors[0][0]
+        headers["X-Flash-Error"] = '<hr>'.join((error for _, error in errors))
+      else:
+        status = 200
+    return current_app.make_response(
+        (self.as_json(res), status, headers))
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
     if model_class:
       service_class = type(model_class.__name__, (cls,), {
-        '_model': model_class,
-        })
+          '_model': model_class,
+      })
       import ggrc.services
       setattr(ggrc.services, model_class.__name__, service_class)
     else:
@@ -1070,7 +1197,7 @@ class Resource(ModelView):
         url,
         defaults={cls.pk: None},
         view_func=view_func,
-        methods=['GET','POST'])
+        methods=['GET', 'POST'])
     app.add_url_rule(
         '{url}/<{type}:{pk}>'.format(url=url, type=cls.pk_type, pk=cls.pk),
         view_func=view_func,
@@ -1082,8 +1209,8 @@ class Resource(ModelView):
     return as_json(obj, **kwargs)
 
   def get_properties_to_include(self, inclusions):
-    #FIXME This needs to be improved to deal with branching paths... if that's
-    #desirable or needed.
+    # FIXME This needs to be improved to deal with branching paths... if that's
+    # desirable or needed.
     if inclusions is not None:
       if len(inclusions) == 0:
         raise BadRequest(
@@ -1102,17 +1229,18 @@ class Resource(ModelView):
     return inclusions
 
   def build_page_object_for_json(self, paging):
+    def page_url(params):
+      return base_url + '?' + urlencode(utils.encoded_dict(params))
+
     def page_args(next_num, per_page):
       # coerce the values to be plain strings, rather than unicode
-      ret = dict([(k,unicode(v)) for k,v in request.args.items()])
+      ret = dict([(k, unicode(v)) for k, v in request.args.items()])
       ret['__page'] = next_num
       if '__page_size' in ret:
         ret['__page_size'] = per_page
       return ret
     paging_obj = {}
     base_url = self.url_for()
-    page_url = lambda params:\
-      base_url + '?' + urlencode(utils.encoded_dict(params))
     if paging.has_next:
       paging_obj['next'] = page_url(
           page_args(paging.next_num, paging.per_page))
@@ -1128,7 +1256,7 @@ class Resource(ModelView):
   def get_resources_from_database(self, matches):
     # FIXME: This is cheating -- `matches` should be allowed to be any model
     model = self.model
-    ids = { m[0]: m for m in matches }
+    ids = {m[0]: m for m in matches}
     query = model.eager_query()
     objs = query.filter(model.id.in_(ids.keys()))
     resources = {}
@@ -1143,10 +1271,10 @@ class Resource(ModelView):
     collection_name = '{0}_collection'.format(table_plural)
     resource = {
         collection_name: {
-          'selfLink': self.url_for_preserving_querystring(),
-          table_plural: objs,
-          }
+            'selfLink': self.url_for_preserving_querystring(),
+            table_plural: objs,
         }
+    }
     if extras:
       resource[collection_name].update(extras)
     return resource
@@ -1156,13 +1284,15 @@ class Resource(ModelView):
     json_obj = ggrc.builder.json.publish(
         obj, properties_to_include or [], inclusion_filter)
     ggrc.builder.json.publish_representation(json_obj)
-    return { model_name: json_obj }
+    if hasattr(obj, "_json_extras"):
+      json_obj["extras"] = obj._json_extras
+    return {model_name: json_obj}
 
   def build_resource_representation(self, obj, extras=None):
     table_singular = self.model._inflector.table_singular
     resource = {
         table_singular: obj,
-        }
+    }
     if extras:
       resource.update(extras)
     return resource
@@ -1170,19 +1300,19 @@ class Resource(ModelView):
   def http_timestamp(self, timestamp):
     return format_date_time(time.mktime(timestamp.utctimetuple()))
 
-  def json_success_response(
-      self, response_object, last_modified, status=200, id=None, cache_op=None):
+  def json_success_response(self, response_object, last_modified,
+                            status=200, id=None, cache_op=None):
     headers = [
         ('Last-Modified', self.http_timestamp(last_modified)),
-        ('Etag', self.etag(response_object)),
+        ('Etag', etag(response_object)),
         ('Content-Type', 'application/json'),
-        ]
+    ]
     if id is not None:
       headers.append(('Location', self.url_for(id=id)))
     if cache_op:
       headers.append(('X-GGRC-Cache', cache_op))
     return current_app.make_response(
-      (self.as_json(response_object), status, headers))
+        (self.as_json(response_object), status, headers))
 
   def getval(self, src, attr, *args):
     if args:
@@ -1200,7 +1330,7 @@ class ReadOnlyResource(Resource):
       raise NotImplementedError()
 
 
-def filter_resource(resource, depth=0, user_permissions=None):
+def filter_resource(resource, depth=0, user_permissions=None):  # noqa
   """
   Returns:
      The subset of resources which are readable based on user_permissions
@@ -1213,7 +1343,7 @@ def filter_resource(resource, depth=0, user_permissions=None):
     filtered = []
     for sub_resource in resource:
       filtered_sub_resource = filter_resource(
-          sub_resource, depth=depth+1, user_permissions=user_permissions)
+          sub_resource, depth=depth + 1, user_permissions=user_permissions)
       if filtered_sub_resource is not None:
         filtered.append(filtered_sub_resource)
     return filtered
@@ -1229,7 +1359,33 @@ def filter_resource(resource, depth=0, user_permissions=None):
       context_id = resource['context_id']
     assert context_id is not False, "No context found for object"
 
-    if not user_permissions.is_allowed_read(resource['type'], context_id):
+    # In order to avoid loading full instances and using is_allowed_read_for,
+    # we are making a special test for the Creator here. Creator can only
+    # see relationship objects where he has read access on both source and
+    # destination. This is defined in Creator.py:220 file, but is_allowed_read
+    # can not check conditions without the full instance
+    if resource['type'] == "Relationship" and _is_creator():
+      # Make a check for relationship objects that are a special case
+      can_read = True
+      for t in ('source', 'destination'):
+        inst = resource[t]
+        if not inst:
+          # If object was deleted but relationship still exists
+          continue
+        contexts = permissions.read_contexts_for(inst['type'])
+        if contexts is None:
+          # read_contexts_for returns None if the user has access to all the
+          # objects of this type. If the user doesn't have access to any object
+          # an empty list ([]) will be returned
+          continue
+        resources = permissions.read_resources_for(inst['type']) or []
+        if inst['context_id'] in contexts or inst['id'] in resources:
+          continue
+        can_read = False
+      if not can_read:
+        return None
+    if not user_permissions.is_allowed_read(resource['type'],
+                                            resource['id'], context_id):
       return None
     else:
       # Then, filter any typed keys
@@ -1241,8 +1397,30 @@ def filter_resource(resource, depth=0, user_permissions=None):
           # Apply filtering to sub-resources
           if type(value) is dict and 'type' in value:
             resource[key] = filter_resource(
-              value, depth=depth+1, user_permissions=user_permissions)
+                value, depth=depth + 1, user_permissions=user_permissions)
 
       return resource
   else:
     assert False, "Non-object passed to filter_resource"
+
+
+def _is_creator():
+  current_user = get_current_user()
+  return hasattr(current_user, 'system_wide_role') \
+      and current_user.system_wide_role == "Creator"
+
+
+def etag(last_modified):
+  """Generate the etag given a datetime for the last time the resource was
+  modified. This isn't as good as an etag generated off of a hash of the
+  representation, but, it doesn't require the representation in order to be
+  calculated. An alternative would be to keep an etag on the stored
+  representation, but this will do for now.
+
+  .. note::
+
+      Using the datetime implies the need for some care - the resolution of
+      the time object needs to be sufficient such that you don't end up with
+      the same etag due to two updates performed in rapid succession.
+  """
+  return '"{0}"'.format(hashlib.sha1(str(last_modified)).hexdigest())

@@ -7,81 +7,67 @@
 
 {{#instance}}
 
-  {{#is_dashboard}}
+  {{#is_dashboard_or_all}}
     {{> /static/mustache/dashboard/info/info.mustache}}
   {{else}}
-  <section class="info">
-    {{#is_info_pin}}
-    <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content">
-        {{#name}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Name</h6>
-            <h3>{{name}}
-                {{^if is_enabled}}
-                    <span class="user-disabled">
-                      (Disabled)
-                    </span>
-                {{/if}}
-            </h3>
-          </div>
-        </div>
-        {{/name}}
 
-        {{#email}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Email</h6>
-            <p>
-            {{email}}
-            </p>
-          </div>
-        </div>
-        {{/email}}
-      </div>
-    </div>
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+    {{#is_info_pin}}
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
     {{/is_info_pin}}
 
     <div class="tier-content">
-      {{^is_info_pin}}
-        {{#name}}
+      <div class="pane-header">
         <div class="row-fluid wrap-row">
           <div class="span12">
             <h6>Name</h6>
-            <h3>{{name}}
-                {{^if is_enabled}}
+            {{#if name}}
+              {{#name}}
+                <h3>{{name}}
+                  {{#if_equals system_wide_role 'No Access'}}
                     <span class="user-disabled">
-                      (Disabled)
+                      (No Access)
                     </span>
-                {{/if}}
-            </h3>
+                  {{/if}}
+                </h3>
+              {{/name}}
+            {{else}}
+              <span class="empty-message">None</span>
+            {{/if}}
           </div>
         </div>
-        {{/name}}
+      </div>
 
-        {{#email}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Email</h6>
-            <p>
-            {{email}}
-            </p>
-          </div>
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>Email</h6>
+          {{#if email}}
+            {{#email}}
+              <p>
+                {{email}}
+              </p>
+            {{/email}}
+          {{else}}
+            <span class="empty-message">None</span>
+          {{/if}}
         </div>
-        {{/email}}
-      {{/is_info_pin}}
-      {{#company}}
+      </div>
+
       <div class="row-fluid wrap-row">
         <div class="span12">
           <h6>Company</h6>
-            <p>
-              {{company}}
-            </p>
+          {{#if company}}
+            {{#company}}
+              <p>
+                {{company}}
+              </p>
+            {{/company}}
+          {{else}}
+            <span class="empty-message">None</span>
+          {{/if}}
         </div>
       </div>
-      {{/company}}
     </div><!-- tier-content end -->
 
   {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}

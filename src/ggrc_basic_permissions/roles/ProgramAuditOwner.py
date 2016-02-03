@@ -1,3 +1,8 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 scope = "Audit Implied"
 description = """
   A user with the ProgramOwner role for a private program will also have this
@@ -6,7 +11,7 @@ description = """
 permissions = {
     "read": [
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -25,7 +30,7 @@ permissions = {
     ],
     "create": [
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -47,7 +52,7 @@ permissions = {
     ],
     "update": [
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -65,7 +70,8 @@ permissions = {
     ],
     "delete": [
         "UserRole",
-        "ControlAssessment",
+        "Request",
+        "Assessment",
         "Issue",
         "ObjectControl",
         "ObjectDocument",

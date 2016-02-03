@@ -4,15 +4,19 @@
 # Maintained By: david@reciprocitylabs.com
 
 from ggrc import db
+from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.object_person import ObjectPerson
 from ggrc.models.object_owner import ObjectOwner
 from ggrc.models.request import Request
 from ggrc.models.response import Response
+from ggrc.models.relationship import Relationship
 from ggrc_basic_permissions.models import UserRole
+from ggrc_basic_permissions import objects_via_relationships_query
 from ggrc.rbac import permissions, context_query_filter
 from sqlalchemy import \
-    event, and_, or_, text, literal, union, alias, case, func, distinct
+    event, and_, or_, literal, union, alias, case, func, distinct
+from sqlalchemy.sql import false
 from sqlalchemy.schema import DDL
 from sqlalchemy.ext.declarative import declared_attr
 from .sql import SqlIndexer
@@ -65,14 +69,22 @@ class MysqlIndexer(SqlIndexer):
       if permission_type == 'read':
         contexts = permissions.read_contexts_for(
             permission_model or model_name)
+        resources = permissions.read_resources_for(
+            permission_model or model_name)
       elif permission_type == 'create':
         contexts = permissions.create_contexts_for(
+            permission_model or model_name)
+        resources = permissions.create_resources_for(
             permission_model or model_name)
       elif permission_type == 'update':
         contexts = permissions.update_contexts_for(
             permission_model or model_name)
+        resources = permissions.update_resources_for(
+            permission_model or model_name)
       elif permission_type == 'delete':
         contexts = permissions.delete_contexts_for(
+            permission_model or model_name)
+        resources = permissions.delete_resources_for(
             permission_model or model_name)
 
       if permission_model and contexts:
@@ -80,10 +92,26 @@ class MysqlIndexer(SqlIndexer):
             permissions.read_contexts_for(model_name))
 
       if contexts is not None:
-        type_query = and_(
-            MysqlRecordProperty.type == model_name,
-            context_query_filter(MysqlRecordProperty.context_id, contexts))
+        # Don't filter out None contexts here
+        if None not in contexts and permission_type == "read":
+          contexts.append(None)
+
+        if resources:
+          resource_sql = and_(
+                MysqlRecordProperty.type == model_name,
+                MysqlRecordProperty.key.in_(resources))
+        else:
+          resource_sql = false()
+
+        type_query = or_(
+            and_(
+                MysqlRecordProperty.type == model_name,
+                context_query_filter(MysqlRecordProperty.context_id, contexts)
+            ),
+            resource_sql)
         type_queries.append(type_query)
+      else:
+        type_queries.append(MysqlRecordProperty.type == model_name)
 
     return and_(
         MysqlRecordProperty.type.in_(model_names),
@@ -137,11 +165,18 @@ class MysqlIndexer(SqlIndexer):
       Objects in private contexts via UserRole (e.g. for Private Programs)
       Objects for which the user is the "contact"
       Objects for which the user is the "primary_assessor" or "secondary_assessor"
-      Audits for which the user is assigned a Request or Response
+      Assignable objects for which the user is an assignee
 
     This method only *limits* the result set -- Contexts and Roles will still
     filter out forbidden objects.
     '''
+
+    # Check if the user has Creator role
+    current_user = get_current_user()
+    my_objects = contact_id is not None
+    if current_user.system_wide_role == "Creator":
+      contact_id = current_user.id
+
     if not contact_id:
       return query
 
@@ -159,18 +194,28 @@ class MysqlIndexer(SqlIndexer):
 
     type_union_queries = []
 
-    # Objects to which the user is "mapped"
-    object_people_query = db.session.query(
-        ObjectPerson.personable_id.label('id'),
-        ObjectPerson.personable_type.label('type'),
+    all_people = db.session.query(
+        all_models.Person.id.label('id'),
+        literal(all_models.Person.__name__).label('type'),
         literal(None).label('context_id')
-      ).filter(
-          and_(
-            ObjectPerson.person_id == contact_id,
-            ObjectPerson.personable_type.in_(model_names)
-          )
-      )
-    type_union_queries.append(object_people_query)
+    )
+    type_union_queries.append(all_people)
+
+    # Objects to which the user is "mapped"
+    # We don't return mapped objects for the Creator because being mapped
+    # does not give the Creator necessary permissions to view the object.
+    if current_user.system_wide_role != "Creator":
+      object_people_query = db.session.query(
+          ObjectPerson.personable_id.label('id'),
+          ObjectPerson.personable_type.label('type'),
+          literal(None).label('context_id')
+        ).filter(
+            and_(
+              ObjectPerson.person_id == contact_id,
+              ObjectPerson.personable_type.in_(model_names)
+            )
+        )
+      type_union_queries.append(object_people_query)
 
     # Objects for which the user is an "owner"
     object_owners_query = db.session.query(
@@ -184,6 +229,35 @@ class MysqlIndexer(SqlIndexer):
           )
       )
     type_union_queries.append(object_owners_query)
+
+    # Objects for which the user is assigned
+    model_assignee_query = db.session.query(
+        Relationship.destination_id.label('id'),
+        Relationship.destination_type.label('type'),
+        literal(None).label('context_id'),
+    ).filter(
+        and_(
+            Relationship.source_type == "Person",
+            Relationship.source_id == contact_id,
+        ),
+    )
+    type_union_queries.append(model_assignee_query)
+
+    model_assignee_query = db.session.query(
+        Relationship.source_id.label('id'),
+        Relationship.source_type.label('type'),
+        literal(None).label('context_id'),
+    ).filter(
+        and_(
+            Relationship.destination_type == "Person",
+            Relationship.destination_id == contact_id,
+        ),
+    )
+    type_union_queries.append(model_assignee_query)
+
+    if not my_objects:
+      type_union_queries.append(
+          objects_via_relationships_query(contact_id, True))
 
     # FIXME The following line crashes if the Workflow extension is not enabled
     for model in [all_models.Program, all_models.Audit, all_models.Workflow]:
@@ -201,20 +275,6 @@ class MysqlIndexer(SqlIndexer):
       type_union_queries.append(context_query)
 
     for model, type_column in models:
-      # Audits where the user is assigned a Request or a Response
-      if model is all_models.Audit:
-        model_type_query = db.session.query(
-            Request.audit_id.label('id'),
-            type_column.label('type'),
-            literal(None).label('context_id')
-          ).join(Response).filter(
-              or_(
-                Request.assignee_id == contact_id,
-                Response.contact_id == contact_id
-              )
-          ).distinct()
-        type_union_queries.append(model_type_query)
-
       # Objects for which the user is the "contact" or "secondary contact"
       if hasattr(model, 'contact_id'):
         model_type_query = db.session.query(

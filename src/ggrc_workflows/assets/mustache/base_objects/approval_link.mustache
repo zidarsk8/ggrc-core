@@ -1,7 +1,14 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
 <div data-object-id="{{instance.id}}"
     data-object-type="{{instance.class.table_singular}}" {{#instance}}{{data 'model'}}{{/instance}}>
   {{#if_equals instance.status 'Final'}}
-    <i class="grcicon-review-color"></i>
+    <i class="fa fa-check-square-o green"></i>
     <span class="object-approved">
       {{#last_approved instance}}
         Reviewed on {{instance.updated_at}} <br />
@@ -21,7 +28,7 @@
             {{^if is_reviewer}}
               {{#if_equals review_task.status 'Declined'}}
                 {{#with_most_recent_declining_task_entry review_task}}
-                  <div>Review was declined on {{#date most_recent_declining_task_entry.instance.created_at}}{{/date}}.</div>
+                  <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
                 {{/with_most_recent_declining_task_entry}}
               {{/if_equals}}
             {{/if}}
@@ -29,7 +36,7 @@
           {{#if is_reviewer}}
             {{#if_equals review_task.status 'Declined'}}
               {{#with_most_recent_declining_task_entry review_task}}
-                <div>Review was declined on {{#date most_recent_declining_task_entry.instance.created_at}}{{/date}}.</div>
+                <div>Review was declined on {{#date instance.created_at}}{{/date}}.</div>
               {{/with_most_recent_declining_task_entry}}
             {{/if_equals}}
             <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
@@ -42,7 +49,7 @@
                   "cycle" : {{review_task.cycle.id}}, \
                   "cycle_task_group_object_task" : {{review_task.id}}, \
                   "is_declining_review" : 1, \
-                  "context": {{firstexist review_task.context.id "null"}} }'
+                  "context": {{firstnonempty review_task.context.id "null"}} }'
                 data-object-plural="cycle_task_entries"
                 data-object-id=""
                 data-placement="right"
@@ -61,14 +68,16 @@
             {{#is_allowed "read" "Workflow" context="any"}}
               {{#with_mapping_count instance 'current_approval_cycles'}}
                 {{#if_equals count 0}}
-                  {{#is_allowed "create" "Workflow" context="any"}}
+                  {{#is_allowed "update" instance}}
                     <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
-                      <i class="grcicon-review"></i>
+                      <i class="fa fa-check-square-o gray"></i>
                       Submit For Review
                     </a>
+                  {{else}}
+                    <i>No review in progress</i>
                   {{/is_allowed}}
                 {{else}}
-                  <i class="grcicon-review"></i>
+                  <i class="fa fa-check-square-o gray"></i>
                   <span class="setup-link">Review in progress</span>
                 {{/if_equals}}
               {{/with_mapping_count}}

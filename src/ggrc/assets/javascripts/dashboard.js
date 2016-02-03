@@ -29,30 +29,6 @@ jQuery(function($) {
     return 0;
   };
 
-  // On-demand creation of datepicker() objects
-  $('body').on('focus', '[data-toggle="datepicker"]', function(e) {
-    var $this = $(this);
-
-    if (!$this.data('datepicker'))
-      $(this).datepicker({changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy'});
-  });
-
-  // On-demand creation of datepicker() objects, initial date today or later
-  $('body').on('focus', '[data-toggle="datepicker_today_or_later"]', function(e) {
-    var $this = $(this),
-        today = new Date(),
-        start_date = (today.getMonth()+1) + '/' + today.getDate() + '/' + today.getFullYear();
-
-    if (!$this.data('datepicker')) {
-      $(this)
-        .datepicker({changeMonth: true,
-                    changeYear: true,
-                    dateFormat: 'mm/dd/yy'
-        })
-        .datepicker('option', 'minDate', start_date);
-    }
-  });
-
   // Turn the arrow when tree node content is shown
   $('body').on('click', '[data-toggle="collapse"]', function(e) {
     var $this = $(this)
@@ -205,20 +181,6 @@ jQuery(function($) {
     }
   });
 
-  $('body').on('click', 'a.export-link', function(e, el){
-    e.preventDefault();
-    var url = e.currentTarget.href;
-    can.ajax({
-      url: url,
-      success: function(data, status, xhr) {
-        var jsonResult = $.parseJSON($(data).html());
-        setTimeout(function(){
-          checkStatus(jsonResult, "Export");
-        }, 500);
-      }
-    });
-  });
-
   // change button to disabled when no file selected, and vice versa
   $(file_select_elem).change(function(ev) {
     if (this.value === "") {
@@ -279,44 +241,6 @@ jQuery(function($) {
 });
 
 jQuery(function($) {
-  can.extend(can.Control.prototype, {
-    // Returns a function which will be halted unless `this.element` exists
-    //   - useful for callbacks which depend on the controller's presence in
-    //     the DOM
-    _ifNotRemoved: function(fn) {
-      var that = this;
-      return function() {
-        if (!that.element)
-          return;
-        return fn.apply(this, arguments);
-      };
-    },
-
-    //make buttons non-clickable when saving
-    bindXHRToButton : function(xhr, el, newtext, disable) {
-      // binding of an ajax to a click is something we do manually
-      var $el = $(el)
-      , oldtext = $el.text();
-
-      if(newtext) {
-        $el[0].innerHTML = newtext;
-      }
-      $el.addClass("disabled pending-ajax");
-      if (disable !== false) {
-        $el.attr("disabled", true);
-      }
-      xhr.always(function() {
-        // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-        if ($el.length) {
-          $el.removeAttr("disabled").removeClass("disabled pending-ajax")[0].innerHTML = oldtext;
-        }
-      });
-    }
-  });
-});
-
-jQuery(function($) {
-
   function checkActive(notification_configs) {
     var inputs = $('.notify-wrap').find('input'),
         active_notifications;
@@ -440,6 +364,7 @@ function resize_areas(event, target_info_pin_height) {
   $window = $(window);
   $lhs = $(".lhs");
   $lhsHolder = $(".lhs-holder");
+  $lhnType = $(".lhn-type");
   $footer = $(".footer");
   $header = $(".header-content");
   $innerNav = $(".inner-nav");
@@ -460,12 +385,11 @@ function resize_areas(event, target_info_pin_height) {
   headerWidth = winWidth - 40;// - lhsWidth;  new ui resize
   internavHeight = object_area_height();
 
+  $lhnType.css('width', lhsWidth);
   $lhsHolder.css("height",lhsHeight);
   $bar.css("height",lhsHeight);
   $footer.css("margin-top",footerMargin);
   $innerNav.css("height",internavHeight);
-  $header.css("width",headerWidth);
-  $topNav.css("width",objectWidth);
   $objectArea
     .css("margin-left",internavWidth)
     .css("height",internavHeight)

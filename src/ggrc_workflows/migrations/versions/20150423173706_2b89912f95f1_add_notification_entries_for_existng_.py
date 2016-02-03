@@ -1,3 +1,8 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 
 """add notification entries for existng workflows
 
@@ -52,10 +57,18 @@ def _handle_workflow_modify(sender, obj=None, src=None, service=None):
 
 
 def upgrade():
+  # New instances don't need this migration so we can skip this.
+  # All product instances already had this migration applied and therefore
+  # don't need this.
+  # In case this migration IS needed - FIRST upgrade to grapes release, THEN
+  # upgrade to plum and beyond...
+  return
+
   existing_tasks = CycleTaskGroupObjectTask.query.filter(and_(
       CycleTaskGroupObjectTask.end_date >= date.today(),
       CycleTaskGroupObjectTask.status != "Verified"
   )).all()
+
   for cycle_task in existing_tasks:
     if cycle_task.end_date >= date.today():
       add_cycle_task_due_notifications(cycle_task)

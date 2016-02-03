@@ -1,3 +1,8 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 scope = "System Implied"
 description = """
   A user with Auditor role for a program audit will also have this role in the
@@ -11,10 +16,11 @@ permissions = {
         "ControlCategory",
         "ControlAssertion",
         "Control",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
         "ControlControl",
         "DataAsset",
+        "AccessGroup",
         "Directive",
         "Contract",
         "Policy",
@@ -34,8 +40,6 @@ permissions = {
         "Product",
         "Project",
         "Relationship",
-        "RelationshipType",
-        "SectionBase",
         "Section",
         "Clause",
         "SystemOrProcess",

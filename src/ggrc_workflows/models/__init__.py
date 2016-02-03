@@ -5,8 +5,8 @@
 
 
 from ggrc.models.all_models import register_model
+from ggrc.models import all_models
 
-from .mixins import RelativeTimeboxed
 from .task_group_task import TaskGroupTask
 from .task_group import TaskGroup
 from .task_group_object import TaskGroupObject
@@ -30,3 +30,16 @@ register_model(CycleTaskEntry)
 register_model(CycleTaskGroup)
 register_model(CycleTaskGroupObject)
 register_model(CycleTaskGroupObjectTask)
+
+WORKFLOW_OBJECT_TYPES = {
+    "Program", "Vendor", "OrgGroup",
+    "Assessment", "Request",
+    "Regulation", "Standard", "Policy", "Contract",
+    "Objective", "Control", "Section", "Clause",
+    "System", "Process",
+    "DataAsset", "Facility", "Market", "Product", "Project", "Issue",
+    "AccessGroup", "Risk", "RiskObject", "Threat"
+}
+
+WORKFLOW_OBJECT_TYPES = set(t for t in WORKFLOW_OBJECT_TYPES if
+                            hasattr(all_models, t))

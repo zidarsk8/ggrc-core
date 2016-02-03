@@ -1,0 +1,89 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: brad@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.logo-wrap {
+  float: left;
+  height: 27px;
+  line-height: 27px;
+  margin: 10px 20px 0 46px;
+  &.single {
+    margin: 10px 20px 0 10px;
+  }
+  a {
+    display: block;
+  }
+  img {
+    @extend a;
+  }
+}
+
+.header-content {
+  background: $white;
+  z-index:3;
+  padding-left: 30px;
+  h1 {
+    span.status {
+      font-size: 13px;
+      color: $gray;
+      font-style: italic;
+      display: inline-block;
+      line-height: 36px;
+      vertical-align: middle;
+    }
+    i {
+      margin-top: 10px;
+      margin-right: 8px;
+      font-size: 24px;
+    }
+  }
+}
+
+.lhn-trigger {
+  @include transition-duration(0.3s);
+  display: block;
+  height: 15px;
+  width: 16px;
+  margin: 16px 30px 0 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  .icon-bar {
+    display: block;
+    margin-bottom: 3px;
+    height: 3px;
+    background: #757575;
+    width: 100%;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  &:hover {
+    @include border-radius(18px);
+    margin: 6px 20px 0 0px;
+    padding: 10px;
+    height: 35px;
+    width: 36px;
+    background: $contentBgnd;
+    .icon-bar {
+      background: #f60;
+    }
+  }
+  &.active {
+    @include rotate(90deg);
+    @extend :hover;
+    .icon-bar {
+      background: #f60;
+    }
+  }
+  &:focus {
+    @extend %outline-fix;
+  }
+  &.disabled {
+    @include opacity(0.5);
+    cursor: default;
+  }
+}

@@ -1,5 +1,11 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
 
-  <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="item-wrap">
         <div class="select">
@@ -7,7 +13,7 @@
             <div class="row-fluid">
               <div class="span12">
                 <div class="title tree-title-area">
-                  <i class="grcicon-calendar"></i>
+                  <i class="fa fa-calendar"></i>
                   <a class="url" href="{{schemed_url instance.title}}" target="_blank">
                     {{instance.title}}
                   </a>

@@ -64,7 +64,7 @@ repo:
 
 make an alias (assuming upstream is pointing to google/ggrc-core.git)
 
-    git config alias.pr '!f() { git fetch upstream pull/$1/head:pr-$1 && git checkout pr-$1; }; f'
+    git config alias.pr '!f() { git checkout develop; git branch -D pr-$1; git fetch upstream develop:pr-$1; git checkout pr-$1; git fetch upstream pull/$1/head; git merge FETCH_HEAD -m \"Automatic merge\"; }; f'
 
 fetch a given pull requst
 

@@ -9,14 +9,14 @@
 <li class="tree-item" data-model="true">
   <div class="item-main" {{data 'model'}}>
     <div class="item-wrap">
-      {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
+      {{> '/static/mustache/base_objects/open_close.mustache' }}
       <div class="select disabled">
         <div class="item-data">
           <div class="row-fluid">
             <div class="span12">
               <div class="item-data">
                 <div>
-                  <i class="grcicon-{{instance.root_object}}-color"></i>
+                  <i class="fa fa-{{instance.root_object}} color"></i>
                   {{instance.title_plural}}
                 </div>
               </div>
@@ -67,7 +67,7 @@
                       data-object-plural="custom_attribute_definitions"
                       data-object-params='{ "definition_type": "{{instance.table_singular}}", "modal_title": "Add Attribute to type {{instance.title_singular}}" }'
                       data-original-title="Add Attribute">
-                      <i class="grcicon-add-black"></i>
+                      <i class="fa fa-plus-circle"></i>
                     </a>
                   </div>
                 </div>

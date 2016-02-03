@@ -37,7 +37,7 @@ class MemCache(Cache):
 
     Returns:
       All or None policy is applied by default
-      None on any errors 
+      None on any errors
       otherwise returns JSON string representation
     """
 
@@ -73,7 +73,7 @@ class MemCache(Cache):
     return data
 
   def add(self, category, resource, data, expiration_time=0):
-    """ add data to mem cache 
+    """ add data to mem cache
 
     Args:
       category: collection or stub
@@ -121,7 +121,7 @@ class MemCache(Cache):
       filter: dictionary containing ids and attrs
 
     Returns:
-      None on any errors 
+      None on any errors
       Mapping of DTO formatted string, e.g. JSON string representation
     """
     if not self.is_caching_supported(category, resource):
@@ -151,7 +151,7 @@ class MemCache(Cache):
       data: List of keys
 
     Returns:
-      None on any errors 
+      None on any errors
       mapping of DTO formatted string, e.g. JSON string representation
     """
     if not self.is_caching_supported(category, resource):
@@ -204,7 +204,7 @@ class MemCache(Cache):
     Args:
       category: collection or stub
       resource: regulation, controls, etc.
-      data: dictionary containing ids 
+      data: dictionary containing ids
 
     Returns:
       memcache client API get_multi
@@ -221,7 +221,7 @@ class MemCache(Cache):
       data: dictionary containing ids and dictionary of attrs
 
     Returns:
-      memcache client API cas_multi (compare and set) 
+      memcache client API cas_multi (compare and set)
     """
     return self.memcache_client.cas_multi(data, expiration_time)
 
@@ -239,4 +239,6 @@ class MemCache(Cache):
     return self.memcache_client.delete_multi(data, lockadd_seconds)
 
   def clean(self):
-    pass
+    """ flush everything from memcache """
+    return self.memcache_client.flush_all()
+

@@ -12,7 +12,7 @@
       <div class="item-wrap">
         <div class="openclose">
           <span class="status-label status-{{to_class instance.status '_'}}"></span>
-          <i class="grcicon-arrow-right"></i>
+          <i class="fa fa-caret-right"></i>
         </div>
         <div class="select">
           <div class="item-data">
@@ -23,9 +23,9 @@
                   <span class="url-link">
                     {{#if instance.email}}{{instance.email}}{{/if}}
                   </span>
-                  {{^if instance.is_enabled}}
+                  {{#if_equals system_wide_role 'No Access'}}
                     <span class="user-disabled">
-                      (Disabled)
+                      (No Access)
                     </span>
                   {{/if}}
                 </div>
@@ -40,7 +40,7 @@
                       <input type="checkbox" value="{{instance.title}}" checked="checked" disabled="true" class="object-check-single">
                     {{/result_direct_mappings}}
                   {{else}}
-                    <input type="checkbox" value="{{instance.title}}" {{^if instance.is_enabled}}disabled="true"{{/if}} class="object-check-single">
+                    <input type="checkbox" value="{{instance.title}}" {{#if_equals system_wide_role 'No Access'}}disabled="true"{{/if}} class="object-check-single">
                   {{/if}}
                 </div>
               </div>
@@ -66,9 +66,9 @@
                 <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">
                   {{firstnonempty email}}
                 </span></a>
-                {{^if is_enabled}}
+                {{#if_equals system_wide_role 'No Access'}}
                   <span class="user-disabled">
-                    (Disabled)
+                    (No Access)
                   </span>
                 {{/if}}
               </span>

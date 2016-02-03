@@ -22,7 +22,9 @@ GGRC.Controllers.Modals("GGRC.Controllers.Delete", {
         cancel_button = this.element.find("a.btn[data-dismiss=modal]"),
         modal_backdrop = this.element.data("modal_form").$backdrop;
 
-    this.bindXHRToButton(this.options.instance.destroy().then(function(instance) {
+    this.bindXHRToButton(this.options.instance.refresh().then(function(instance) {
+      return instance.destroy();
+    }).then(function(instance) {
       // If this modal is spawned from an edit modal, make sure that one does
       // not refresh the instance post-delete.
       var parent_controller = $(that.options.$trigger).closest('.modal').control();

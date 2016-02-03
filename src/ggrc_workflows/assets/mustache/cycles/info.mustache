@@ -5,45 +5,59 @@
     Maintained By: Sasmita
 }}
 
-<section class="info">
+<section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
   {{#is_info_pin}}
-    <div class="clearfix">
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content pin">
-        {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
-      </div>
-    </div>
+    {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
   {{/is_info_pin}}
 
-  {{#using instance=instance.workflow}}
-  <!-- This should have only view link, shouldn't edit cycle instance of workflow while active -->
-    <div class="details-wrap">
-      <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-      <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-        {{#if instance.viewLink}}
-          {{!#is_allowed "view_object_page" instance}}
-            <li>
-              <a href="{{instance.viewLink}}">
-                View {{instance.class.title_singular}}
-                <i class="grcicon-goto"></i>
-              </a>
-            </li>
-          {{!/is_allowed}}
-        {{/if}}
-        <li>
-          <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-        </li>
-      </ul>
-    </div>
-  {{/using}}
+  <div class="info-pane-utility">
+    {{#using workflow=instance.workflow}}
+    <!-- This should have only view link, shouldn't edit cycle instance of workflow while active -->
+      <div class="details-wrap">
+        <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+          <span class="bubble"></span>
+          <span class="bubble"></span>
+          <span class="bubble"></span>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+          {{#if workflow.viewLink}}
+            {{!#is_allowed "view_object_page" instance}}
+              <li>
+                <a href="{{workflow.viewLink}}">
+                  <i class="fa fa-long-arrow-right"></i>
+                  View {{workflow.class.title_singular}}
+                </a>
+              </li>
+            {{!/is_allowed}}
+          {{/if}}
+          <li>
+            <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_url}}" />
+          </li>
 
+          {{#if_equals instance.is_current true}}
+          {{#is_allowed 'delete' workflow}}
+              <li>
+                <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{workflow.id}}" href="javascript://">
+                  <i class="fa fa-trash"></i>
+                  Delete
+                </a>
+              </li>
+          {{/is_allowed}}
+          {{/if_equals}}
+        </ul>
+      </div>
+    {{/using}}
+  </div>
 
   <div class="tier-content">
+    {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+
     <div class="row-fluid wrap-row">
       <div class="span12">
         <h6>Description</h6>
         <div class="rtf-block">
-          <p>{{{firstnonempty instance.description '<em>No description</em>'}}}</p>
+          <p>{{{firstnonempty instance.description '<span class="empty-message">None</span>'}}}</p>
         </div>
       </div>
     </div>
@@ -74,7 +88,7 @@
   <div class="row-fluid">
     <div class="span12">
       {{#using instance=instance.workflow}}
-      <ggrc-gdrive-folder-picker instance="instance" placeholder="If selected, all workflow attachments go here." />
+      <ggrc-gdrive-folder-picker {{^is_allowed 'update' instance}}readonly="true"{{/is_allowed}} instance="instance" placeholder="If selected, all workflow attachments go here." />
       {{/using}}
     </div>
   </div>

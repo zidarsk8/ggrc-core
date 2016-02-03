@@ -1,0 +1,33 @@
+{{!
+  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: ivan@reciprocitylabs.com
+  Maintained By: ivan@reciprocitylabs.com
+}}
+
+<div class="row-fluid wrap-row">
+  <div class="span12">
+    <h6>
+      Select attributes to show in grid
+    </h6>
+    Attributes:
+    <a data-action="attribute_select_toggle" data-value="true" data-type="attributes" href="javascript://">Select All</a> /
+    <a data-action="attribute_select_toggle" data-value="false" data-type="attributes" href="javascript://">None</a>
+    <br>
+    Mappings:
+    <a data-action="attribute_select_toggle" data-value="true" data-type="mappings" href="javascript://">Select All</a> /
+    <a data-action="attribute_select_toggle" data-value="false" data-type="mappings" href="javascript://">None</a>
+    <div class="attribute-wrap">
+      <ul class="attr-list">
+        {{#columns}}
+        <li>
+          <label>
+            <input can-value="selected.{{key}}" type="checkbox" name="{{key}}" checked>
+            {{display_name}}
+          </label>
+        </li>
+        {{/columns}}
+      </ul>
+    </div>
+  </div>
+</div>

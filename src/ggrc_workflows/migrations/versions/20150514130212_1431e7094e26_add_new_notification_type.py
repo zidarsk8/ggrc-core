@@ -1,3 +1,8 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 
 """add new notification type
 
@@ -53,10 +58,18 @@ def upgrade():
 
   op.bulk_insert(notification_types_table, notification_types)
 
+  # New instances don't need this migration so we can skip this.
+  # All product instances already had this migration applied and therefore
+  # don't need this.
+  # In case this migration IS needed - FIRST upgrade to grapes release, THEN
+  # upgrade to plum and beyond...
+  return
+
   existing_wfs = Workflow.query.filter(and_(
       Workflow.frequency.in_(["weekly", "monthly", "quarterly", "annually"]),
       Workflow.next_cycle_start_date >= date.today()
   ))
+
   for wf in existing_wfs:
     notif_type = get_notification_type("cycle_start_failed")
     add_notif(wf, notif_type, wf.next_cycle_start_date + timedelta(1))

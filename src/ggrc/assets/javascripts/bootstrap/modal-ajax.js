@@ -18,7 +18,7 @@
     var template =
       [ '<div class="modal-header">'
       , '  <a class="pull-right modal-dismiss" href="#" data-dismiss="modal">'
-      , '    <i class="grcicon-x-grey"></i>'
+      , '    <i class="fa fa-times black"></i>'
       , '  </a>'
       , '  <h2>Loading...</h2>'
       , '</div>'
@@ -222,6 +222,7 @@
       , model = CMS.Models[$trigger.attr("data-object-singular")] || CMS.ModelHelpers[$trigger.attr("data-object-singular")]
       , mapping = $trigger.data('mapping')
       , instance;
+
       if($trigger.attr('data-object-id') === "page") {
         instance = GGRC.page_instance();
       } else {
@@ -386,7 +387,7 @@
 
       $el.on(["click", "mouseup", "keypress", "keydown", "keyup", "show", "shown", "hide", "hidden"].join(".clone ") + ".clone", function(e) {
         that.$cloneEl
-        ? that.$cloneEl.find("[data-original-id=" + e.target.id + "]").trigger(new $.Event(e))
+        ? that.$cloneEl.find("[data-original-id='" + e.target.id + "']").trigger(new $.Event(e))
         : $el.off(".clone");
       });
     }
@@ -492,8 +493,13 @@
           , toggle_type = $(this).data('toggle')
           , modal_id, target, $target, option, href, new_target, modal_type;
 
-        if(e.type === "keydown" && e.which !== 13)
+
+        if ($this.hasClass("disabled")) {
+          return;
+        }
+        if (e.type === "keydown" && e.which !== 13) {
           return;  //activate for keydown on Enter/Return only.
+        }
 
         href = $this.attr('data-href') || $this.attr('href');
         modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');

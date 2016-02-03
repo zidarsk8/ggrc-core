@@ -13,7 +13,7 @@
         <div class="openclose">
           <div class="row-fluid">
             <div class="span12">
-              
+
               <ul class="tree-action-list">
                 {{#if roles.length}}
                   <li>
@@ -52,7 +52,7 @@
                   </li>
                 {{/if}}
               </ul>
-              
+
               <div class="item-data">
                 <div class="tree-title-area">
                   {{{render '/static/mustache/people/popover.mustache' person=this}}}
@@ -63,7 +63,7 @@
                   {{/if_match}}
                 </div>
               </div>
-              
+
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@
                 {{#is_allowed 'create' 'delete' 'UserRole' context=parent_instance.context.id}}
                 <div class="pull-right">
                   <a class="info-edit" data-modal-class="modal-wide" data-placement="left" data-toggle="user-roles-modal-selector" data-modal-selector-options="user_roles" data-person_id="{{ id }}" href="javascript://" rel="tooltip" title="Edit Authorizations">
-                    <i class="grcicon-role-color"></i> <span>Edit Authorizations</span>
+                    <i class="fa fa-key"></i> <span>Edit Authorizations</span>
                   </a>
                 </div>
                 {{/is_allowed}}
@@ -136,7 +136,7 @@
                 and #is_allowed_all' 'delete' user_role.result.mappings}}
                 <a href="javascript://" class="info-action unmap pull-right" data-toggle="unmap">
                   {{#user_role.result}}<span class="result" {{data 'result'}}></span>{{/user_role.result}}
-                  <i class="grcicon-remove"></i>
+                  <i class="fa fa-ban"></i>
                   Unmap
                 </a>
               {{/if_helpers}}
@@ -152,8 +152,8 @@
             <div class="span6">
               <div>
                 <a href="/people/{{id}}" class="info-action">
+                  <i class="fa fa-long-arrow-right"></i>
                   View Profile Page
-                  <i class="grcicon-goto"></i>
                 </a>
               </div>
             </div>
@@ -173,7 +173,7 @@
           href="javascript://"
           rel="tooltip"
           data-placement="left"
-          data-toggle="multitype-multiselect-modal-selector"
+          data-toggle="unified-mapper"
           data-join-mapping="{{mapping}}"
           data-join-option-type="{{model.shortName}}"
           data-join-object-id="{{parent_instance.id}}"

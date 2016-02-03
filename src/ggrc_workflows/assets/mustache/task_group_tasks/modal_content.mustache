@@ -13,7 +13,7 @@
       <label>
         Summary
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
       </label>
       <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
       <br>
@@ -23,10 +23,10 @@
       <label>
         Assignee
         <span class="required">*</span>
-        <i class="grcicon-help-black" rel="tooltip" title="This is the default assignee for this task."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="This is the default assignee for this task."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="2" class="input-block-level" name="contact.email" data-lookup="Person" data-params="Person:is_enabled=1" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
+      <input tabindex="2" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
       {{/using}}
       <br>
     </div>
@@ -50,7 +50,7 @@
       or #if_null' instance.task_type}}
       <label>
         Task Description
-        <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
       </label>
       <div class="wysiwyg-area">
         <textarea id="tgt_response_options" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{instance.description}}</textarea>
@@ -59,14 +59,14 @@
       {{#if_equals instance.task_type 'menu'}}
       <label>
         Dropdown Options (Comma Separated)
-        <i class="grcicon-help-black" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
       </label>
         <textarea id="tgt_response_options" class="span12 double" name="response_options_csv" placeholder="Enter Values" tabindex="2">{{instance.response_options_csv}}</textarea>
       {{/if_equals}}
       {{#if_equals instance.task_type 'checkbox'}}
       <label>
         Checkbox Options (Comma Separated)
-        <i class="grcicon-help-black" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Choose which response should be applied to this {{model.model_singular}}."></i>
       </label>
         <textarea id="" class="span12 double" name="response_options_csv" placeholder="Enter Values" tabindex="2">{{instance.response_options_csv}}</textarea>
       {{/if_equals}}
@@ -80,21 +80,27 @@
       <div id="one-time" class="frequency-wrap" style="display:block">
         <label>
           Frequency: One time
-          <i class="grcicon-help-black" rel="tooltip" title="Choose start and end dates"></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
         </label>
         <label class="smaller">
           <span class="start-text">
             Start Date
             <span class="required">*</span>
           </span>
-          <input tabindex="4" class="date input-block-level" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.start_date}}">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input tabindex="4" class="date input-block-level" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.start_date}}">
+          </div>
         </label>
         <label class="smaller">
           <span class="start-text">
             End Date
             <span class="required">*</span>
           </span>
-          <input tabindex="5" class="date input-block-level" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            <input tabindex="5" class="date input-block-level" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
+          </div>
         </label>
       </div>
       {{/case}}
@@ -102,7 +108,7 @@
       <div id="weekly" class="frequency-wrap" style="display:block">
         <label>
           Frequency: Weekly
-          <i class="grcicon-help-black" rel="tooltip" title="Choose start/end days of the week"></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="Choose start/end days of the week"></i>
         </label>
         <label class="smaller">
           <span class="start-text">
@@ -132,7 +138,7 @@
       <div id="monthly" class="frequency-wrap" style="display:block">
         <label>
           Frequency: Each month
-          <i class="grcicon-help-black" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
         </label>
         <label class="smaller">
           <span class="start-text">
@@ -162,7 +168,7 @@
       <div id="quarterly" class="frequency-wrap" style="display:block">
         <label>
           Frequency: Every quarter
-          <i class="grcicon-help-black" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
         </label>
         <label class="smaller">
           <span class="start-text extrasmall">
@@ -202,7 +208,7 @@
       <div id="annually" class="frequency-wrap" style="display:block">
         <label>
           Frequency: Each year
-          <i class="grcicon-help-black" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
         </label>
         <label class="smaller">
           <span class="start-text">
@@ -245,6 +251,16 @@
     <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
     <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" />
     <input type="hidden" name="sort_index" value="{{firstnonempty object_params.sort_index instance.sort_index}}" />
+  </div>
+  <div class="row-fluid">
+    <div data-id="code_hidden" class="span4 hidable">
+      <label>
+        Code
+        <i class="fa fa-question-circle" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+        <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      </label>
+      <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="TASK-XXX" type="text" value="{{instance.slug}}">
+    </div>
   </div>
   {{{render_hooks 'TaskGroupTask.modal_tier1'}}}
 </form>

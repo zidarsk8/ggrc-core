@@ -32,17 +32,16 @@ Create or update the deployment settings file (e.g. `deploy_settings_ggrc_prod.s
 
     #!/usr/bin/env bash
 
-    APPENGINE_INSTANCE=google.com:ggrc-prod
+    APPENGINE_INSTANCE=******
     SETTINGS_MODULE='app_engine_ggrc_prod ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development'
-    DATABASE_URI='mysql+gaerdbms:///ggrc_prod_db?instance=google.com:ggrc-prod:ggrc-prod-db'
+    DATABASE_URI='********'
     GAPI_KEY='XXX'
     GAPI_CLIENT_ID='YYY'
     GAPI_CLIENT_SECRET='ZZZ'
-    GAPI_ADMIN_GROUP='ggrc-admin@prod.google.com'
-    BOOTSTRAP_ADMIN_USERS='hsainion@google.com [tommyward@google.com](mailto:tommyward@google.com)'
-    RISK_ASSESSMENT_URL='https://ggrc-risk-dev.googleplex.com'
+    GAPI_ADMIN_GROUP='***@***.com'
+    BOOTSTRAP_ADMIN_USERS='***@***.com RISK_ASSESSMENT_URL='https://****************'
     SECRET_KEY='--CHANGE-TO-SOMETHING-SECRET--'
-    APPENGINE_EMAIL='prasannav@google.com'
+    APPENGINE_EMAIL='*****@****.com'
     INSTANCE_CLASS='B4'
     MAX_INSTANCES='4'
 
@@ -103,7 +102,7 @@ Note: This step only needs to be done once, but required APIs might change, so d
 3. Select “Credentials” in the left-hand column, and click “CREATE NEW CLIENT ID”.
 
   * Select “Web Application”
-  * Add “<https://ggrc-prod.googleplex.com>” to the box labeled “Authorized JavaScript origins”
+  * Add “<https://*****.****.com>” to the box labeled “Authorized JavaScript origins”
   * Delete the content from the box labeled “Authorized redirect URI”
 
    Your screen should look like the following:
@@ -153,8 +152,7 @@ In the left-hand column of the Google Developers Console (<https://cloud.google.
 
 In the top line, click the “Export...” button, select a Cloud Storage path, and click “OK”.  The Cloud Storage Path should look something like:
 
-* test: `gs://ggrc-db-backups/ggrc-test-yyyymmdd.sql`
-* prod: `gs://ggrc-prod-backup/ggrc-prod.yyyymmdd.sql`
+* `gs://****-backups/****-yyyymmdd.sql`
 
 ### 5. Complete the deployment
 
@@ -163,8 +161,8 @@ Go back to the virtual machine, and do the following (note the `GGRC_DATABASE_UR
     # Update the local repository
     git fetch
 
-    # Checkout the release tag we want to deploy, e.g. 0.9a28.5
-    git checkout 0.9a28.5
+    # Checkout the release tag we want to deploy, e.g. 0.9.2-Grapes
+    git checkout 0.9.2-Grapes
 
     # If Python packages may have changed, you need to remove previous packages
     make clean_appengine_packages
@@ -179,14 +177,12 @@ Go back to the virtual machine, and do the following (note the `GGRC_DATABASE_UR
 
     export GGRC_SETTINGS_MODULE='app_engine_ggrc_test ggrc_basic_permissions.settings.development ggrc_gdrive_integration.settings.development ggrc_workflow.settings.development'
 
-    export GGRC_DATABASE_URI='mysql+gaerdbms:///ggrc_test_20130822?instance=google.com:ggrc-dev-db:ggrc-dev-db'
+    export GGRC_DATABASE_URI='*****'
 
     # This line prepares the static assets (Javascripts and Stylesheets) and creates
     # the required `app.yaml` file. Choose one, or edit to match your .sh file.
 
-    bin/deploy_appengine deploy_settings_ggrc_test.sh
-    bin/deploy_appengine deploy_settings_ggrc_uat.sh
-    bin/deploy_appengine deploy_settings_ggrc_prod.sh
+    bin/deploy_appengine deploy_settings_ggrc_<something>.sh
 
     # Update the database for new changes. This command may take a while to complete.
     db_migrate

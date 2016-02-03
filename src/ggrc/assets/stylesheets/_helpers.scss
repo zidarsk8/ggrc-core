@@ -1,0 +1,159 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.centered {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+.bottom-spacing {
+  margin-bottom: 16px;
+}
+
+small {
+  font-size: 11px;
+  &.accepted {
+    color: $green;
+  }
+}
+
+.inline {
+  display:inline;
+}
+
+.spacing {
+  margin: 15px 0 24px 0;
+}
+
+.spacing-bottom {
+  margin-bottom: 20px;
+}
+
+.no-float {
+  clear: both;
+}
+
+.normal-font {
+  font-weight: normal;
+}
+
+.top-button {
+  vertical-align: top;
+}
+
+.block-element {
+  display: block;
+}
+
+.no-control {
+  display: inline;
+}
+
+.parent-position {
+  position: relative;
+}
+
+.top-spacing {
+  margin-top: 15px;
+}
+
+.not-assigned {
+  color: $tabTitle;
+}
+
+.assignee-dark {
+  color: $subTitle;
+}
+
+.empty-message {
+  color: $gray;
+  font-style: italic;
+}
+
+.checkbox-inline {
+  input[type="checkbox"] {
+    margin: -1px 0 0 0;
+  }
+}
+.radio-inline {
+  input[type="radio"] {
+    margin: -1px 0 0 0;
+  }
+}
+
+.gray {
+  color: $gray;
+}
+
+.green {
+  color: $green;
+}
+
+.blue {
+  color: $blue;
+}
+
+.yellow {
+  color: $yellow;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: $footerBorder;
+  margin: 14px 0;
+}
+
+.undo {
+  font-size: 12px;
+  padding-left: 7px;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+strong.capitalize {
+	@extend .capitalize;
+}
+
+.cap {
+  @extend .capitalize;
+}
+
+label.disabled {
+  color: $gray !important;
+}
+
+.border-l {
+  padding-bottom: 5px;
+  border-bottom: 1px solid $infoMessageBorder;
+}
+
+.overdue {
+  color: $red;
+  font-weight: bold;
+}
+
+.required {
+  color: $red;
+}
+
+.nomargin {
+  margin:0 !important;
+}
+
+.smallmargin {
+  margin-top:2px !important;
+}
+
+.tiny-data {
+  font-size:12px;
+}

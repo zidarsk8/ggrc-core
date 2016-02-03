@@ -1,0 +1,98 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: urban@reciprocitylabs.com
+    Maintained By: urban@reciprocitylabs.com
+}}
+
+{{#instance}}
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+    {{#is_info_pin}}
+      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+    {{/is_info_pin}}
+
+    <div class="info-pane-utility">
+      {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+    </div>
+
+    <div class="tier-content">
+      {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+
+      <div class="custom-attr-wrap">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="info-expand">
+              <a class="show-hidden-fields info-show-hide" href="javascript://">
+                <span class="out">
+                  <i class="fa fa-caret-right"></i>
+                  Show
+                </span>
+                <span class="in">
+                  <i class="fa fa-caret-down"></i>
+                  Hide
+                </span>
+                Advanced
+              </a>
+            </div>
+          </div>
+        </div><!-- row-fluid end -->
+        <div class="hidden-fields-area" style="display:none;">
+          <div class="row-fluid wrap-row">
+            <div class="span4">
+              <h6>Code</h6>
+              <p>
+                {{slug}}
+              </p>
+            </div>
+            <div class="span4">
+              <h6>Effective Date</h6>
+              {{#if start_date}}
+                <p>
+                  {{localize_date start_date}}
+                </p>
+              {{else}}
+                <span class="empty-message">None</span>
+              {{/if}}
+            </div>
+            <div class="span4">
+              <h6>Stop Date</h6>
+              {{#if end_date}}
+                <p>
+                  {{localize_date end_date}}
+                </p>
+              {{else}}
+                <span class="empty-message">None</span>
+              {{/if}}
+            </div>
+          </div><!-- row-fluid end -->
+          <div class="row-fluid wrap-row">
+            <div class="span4">
+              <h6>State</h6>
+              <p>
+                {{status}}
+              </p>
+            </div>
+          </div><!-- row-fluid end -->
+        </div><!-- hidden-fields-area end -->
+      </div><!-- custom-attr-wrap end -->
+    </div><!-- tier-content end -->
+
+  {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+
+  </section>
+
+  <div class="info-widget-footer">
+    <p>
+      <small>
+        <em>
+          Created at {{date created_at}}
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+        </em>
+      </small>
+    </p>
+  </div>
+{{/instance}}

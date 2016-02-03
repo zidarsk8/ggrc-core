@@ -6,106 +6,42 @@
 }}
 
 {{#instance}}
-  <section class="info">
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
     {{#is_info_pin}}
-    <div class="clearfix">
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
-      <div class="tier-content pin">
-        {{#instance}}
-          <div class="row-fluid wrap-row">
-            <div class="span6">
-              <h6>Title</h6>
-              <h3>{{title}}</h3>
-              {{#if type}}
-              <p>
-                {{type.title}}
-              </p>
-              {{/if}}
-            </div>
-            <div class="span6">
-              <h6>State</h6>
-              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
-            </div>
-          </div>
-        {{/instance}}
-      </div>
-    </div>
     {{/is_info_pin}}
 
-    {{#is_allowed 'read' instance context='for'}}
-      <div class="details-wrap">
-        <a class="btn btn-small btn-draft dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
-        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-          {{#is_info_pin}}
-          <li>
-            <a href="{{viewLink}}">
-              <i class="grcicon-goto"></i>
-              View {{instance.class.title_singular}}
-            </a>
-          </li>
-          {{/is_info_pin}}
-          <li>
-            <clipboard-link title="Get permalink" notify="true" text="{{get_permalink}}" />
-          </li>
-          {{#is_allowed 'create' 'update' 'Request' context=instance.context.id}}
-            <li>
-            {{! FIXME: Better way to get the Audit link }}
-              <a href="/audits/{{instance.id}}/import_pbcs?return_to={{param_current_location}}">
-                <i class="grcicon-imp-exp"></i>
-                Import Requests
-              </a>
-            </li>
-          {{/is_allowed}}
-          {{#is_allowed 'read' 'Request' context=instance.context.id}}
-            <li>
-              <a href="/audits/{{instance.id}}/export_pbcs?id={{instance_ids child_options.0.list}}">
-                <i class="grcicon-export"></i>
-                Export Requests
-              </a>
-            </li>
-          {{/is_allowed}}
-          {{#is_allowed 'update' instance context='for'}}
-            <li>
-              <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Audit" data-object-plural="audits" data-object-id="{{instance.id}}" data-object-params='{{#options}}{ "{{parent_instance.class.table_singular}}": { "id" : {{parent_instance.id}}, "title" : "{{parent_instance.title}}" } }{{/options}}'>
-                <i class="grcicon-edit"></i>
-                Edit {{model.title_singular}}
-              </a>
-            </li>
-          {{/is_allowed}}
-        </ul>
-      </div>
-    {{/is_allowed}}
+    <div class="info-pane-utility">
+      {{> /static/mustache/base_objects/dropdown_menu.mustache}}
+    </div>
 
     <div class="tier-content">
-      {{^is_info_pin}}
+      <div class="pane-header">
         {{#instance}}
           <div class="row-fluid wrap-row">
-            <div class="span6">
+            <div class="span9">
               <h6>Title</h6>
               <h3>{{title}}</h3>
+              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
               {{#if type}}
               <p>
                 {{type.title}}
               </p>
               {{/if}}
             </div>
-            <div class="span6">
-              <h6>State</h6>
-              <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
-            </div>
           </div>
         {{/instance}}
-      {{/is_info_pin}}
-      {{#instance.description}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Description</h6>
-            <div class="rtf-block">
-              {{{instance.description}}}
-            </div>
+      </div>
+
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>Description</h6>
+          <div class="rtf-block">
+            {{{firstnonempty instance.description '<span class="empty-message">None</span>'}}}
           </div>
         </div>
-      {{/instance.description}}
+      </div>
 
       <div class="row-fluid wrap-row">
         <div class="span4">
@@ -113,7 +49,7 @@
           {{#if instance.start_date}}
             {{localize_date instance.start_date}}
           {{else}}
-            Not set
+            <span class="empty-message">None</span>
           {{/if}}
         </div>
         <div class="span4">
@@ -121,7 +57,7 @@
           {{#if instance.end_date}}
             {{localize_date instance.end_date}}
           {{else}}
-            Not set
+            <span class="empty-message">None</span>
           {{/if}}
         </div>
         <div class="span4">
@@ -136,7 +72,7 @@
             {{#if instance.report_end_date}}
               Ends {{localize_date instance.report_end_date}}
             {{else}}
-              Not set
+              <span class="empty-message">None</span>
             {{/if}}
           {{/if}}
         </div>
@@ -146,22 +82,17 @@
         <div class="span4">
           <h6>Audit Lead</h6>
           {{#if instance.contact}}
-            {{#using contact=instance.contact}}
-              {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-              {{^if contact.is_enabled}}
-                <span class="user-disabled">
-                  (Disabled)
-                </span>
-              {{/if}}
+            {{#using person=instance.contact}}
+              {{>'/static/mustache/people/popover.mustache'}}
             {{/using}}
           {{else}}
-            Not defined
+            <span class="empty-message">None</span>
           {{/if}}
         </div>
         <div class="span4">
           <h6>Audit Firm</h6>
           {{#using firm=instance.audit_firm}}
-            {{{firstnonempty firm.title 'None'}}}
+            {{{firstnonempty firm.title '<span class="empty-message">None</span>'}}}
           {{/using}}
         </div>
         <div class="span4">
@@ -178,7 +109,7 @@
                     {{#is_allowed 'delete' this}}
                       <a href="javascript://" class="unmap" data-toggle="unmap">
                         <span class="result" {{data 'result'}}></span>
-                        <i class="grcicon-deleted"></i>
+                        <i class="fa fa-trash"></i>
                       </a>
                     {{/is_allowed}}
                   </li>
@@ -186,7 +117,7 @@
               </ul>
             {{else}}
               <h6>Auditors</h6>
-              No auditor assigned
+              <span class="empty-message">None</span>
             {{/if}}
           {{/with_mapping}}
           {{#is_allowed 'create' 'UserRole' context=instance.context.id}}
@@ -195,8 +126,8 @@
             <ggrc-quick-add parent_instance="instance" join_model="UserRole">
               {{#prune_context}}
               <div class="objective-selector field-wrap">
-                <input tabindex="3" type="text" name="instance" data-lookup="Person" data-params="Person:is_enabled=1" null-if-empty="true" class="search-icon" placeholder="Add Auditor" {{autocomplete_select}} value="{{instance.email}}">
-                <a href="javascript://" {{toggle_button}}><i class="grcicon-deleted"></i></a>
+                <input tabindex="3" type="text" name="instance" data-lookup="Person" null-if-empty="true" class="search-icon" placeholder="Add Auditor" {{autocomplete_select}} value="{{instance.email}}">
+                <a href="javascript://" {{toggle_button}}><i class="fa fa-trash"></i></a>
 
                 <a href="javascript://" class="btn btn-small btn-success {{^instance}}disabled{{/instance}} no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
               </div>
@@ -212,16 +143,12 @@
         </div>
       </div>
 
-      {{#instance.url}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>URL</h6>
-            <a class="url" href="{{schemed_url instance.url}}" target="_blank">
-              {{instance.url}}
-            </a>
-          </div>
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          <h6>Code</h6>
+          {{instance.slug}}
         </div>
-      {{/instance.url}}
+      </div>
 
     </div>
     <div class="row-fluid wrap-row">

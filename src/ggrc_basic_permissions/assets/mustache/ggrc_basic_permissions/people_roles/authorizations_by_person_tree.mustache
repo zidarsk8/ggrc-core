@@ -22,11 +22,6 @@
                     {{#if_match instance.name '\\\\S'}}
                       {{#instance.name}}
                         <span class="email">{{instance.email}}</span>
-                        {{^if instance.is_enabled}}
-                          <span class="user-disabled">
-                            (Disabled)
-                          </span>
-                        {{/if}}
                       {{/instance.name}}
                     {{/if_match}}
                   </div>
@@ -42,9 +37,9 @@
                               {{#if_helpers '\
                                 #if_equals' roles.0.role.permission_summary 'Mapped' '\
                                 and ^if_equals' roles.length 1}}
-                                {{roles.1.role.permission_summary}}
+                                {{pretty_role_name roles.1.role.permission_summary}}
                               {{else}}
-                                {{roles.0.role.permission_summary}}
+                                {{pretty_role_name roles.0.role.permission_summary}}
                               {{/if_helpers}}
                               {{#roles.1}}
                                 {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
@@ -78,7 +73,7 @@
                   <div class="show-details">
                     {{#if instance.viewLink}}
                       {{#is_allowed "view_object_page" instance}}
-                        <a href="{{instance.viewLink}}" target="_blank"><i class="grcicon-to-right"></i></a>
+                        <a href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
                       {{/is_allowed}}
                     {{/if}}
                   </div>

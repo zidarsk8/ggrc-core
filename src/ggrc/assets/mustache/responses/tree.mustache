@@ -15,31 +15,12 @@
             <div class="row-fluid">
               <div class="span4">
                 <div class="title tree-title-area">
+                  {{#is_subtree}}
+                    <i class="fa fa-{{instance.class.table_singular}} color"></i>
+                  {{/is_subtree}}
                   {{{truncate instance.description}}}
                 </div>
               </div>
-              <!--
-                <div class="span1">
-                  <div class="counter">
-                    {{#child_options.0}}
-                    <i class="grcicon-object-black" rel="tooltip" data-placement="top" data-original-title="Mapped Objects"></i>
-                    {{child_options.0.list.length}}
-                    {{/child_options.0}}
-                  </div>
-                </div>
-
-                <div class="span1">
-                  <div class="counter">
-                    {{#child_options.1}}
-                    {{#if_equals instance.response_type 'documentation'}}
-                    <i class="grcicon-document-color" rel="tooltip" data-placement="top" data-original-title="Evidence"></i>
-                    {{child_options.1.list.length}}
-                    {{/if_equals}}
-                    {{/child_options.1}}
-                  </div>
-                </div>
-              need to check what will happened with this-->
-
             </div>
           </div><!-- item-data end -->
         </div><!-- select end -->

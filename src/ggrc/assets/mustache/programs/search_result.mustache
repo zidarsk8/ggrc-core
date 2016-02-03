@@ -14,26 +14,15 @@
           {{firstnonempty title name email}}
         </span>
       </div>
-      <div class="lhs-private">
-        {{#is_private}}
-        <i class="grcicon-private" rel="tooltip" title="Private"></i>
-        {{/is_private}}
-      </div>
       <div class="lhs-people">
         {{^contact}}
-        <i class="grcicon-people-warning"></i>
+        <i class="fa fa-person red"></i>
         {{/contact}}
       </div>
     </div>
   </a>
 </li>
 {{/list}}
-
-{{^is_allowed 'read' model.shortName context='any'}}
-<li class="no-access">
-  You do not have access to read this information.
-</li>
-{{/is_allowed}}
 
 {{#list.is_loading}}
   <li class="spinny"  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' }}>

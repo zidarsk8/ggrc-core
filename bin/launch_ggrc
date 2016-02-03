@@ -4,6 +4,4 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
-
-cd "${SCRIPTPATH}/../src/ggrc";python -m ggrc
+python -m ggrc

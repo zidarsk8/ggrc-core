@@ -1,208 +1,12 @@
 /*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  * Created By: brad@reciprocitylabs.com
- * Maintained By: brad@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
  */
-
-body {
-  font-size:$f-regular;
-  background: $contentBgnd;
-}
-
-// typography
-h1 {
-  @extend %oneline;
-  color: $headerTitle;
-  font-size: 24px;
-  line-height: 47px;
-  height: 47px;
-  font-family: $fontTitle;
-  font-weight: normal;
-  width: 40%;
-  float: left;
-  position: relative;
-  .lhn-trigger {
-    float: left;
-  }
-  .title-content {
-    @extend %oneline;
-    width: 85%;
-    float: left;
-  }
-  .right-side {
-    position: absolute;
-    right: 104px;
-    top: 0;
-    text-align: right;
-  }
-  .child-title-content {
-    float: right;
-    text-align: right;
-  }
-}
-
-h2 {
-  font-size: $f-subTitle;
-  line-height: 26px;
-  font-weight: bold;
-  color: $subTitle;
-  margin-right: 8px;
-}
-
-h3 {
-  font-size: $f-subTitle;
-  line-height: 24px;
-  font-weight: bold;
-  color: $subTitle;
-}
-
-h4 {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: normal;
-  color: $subTitle;
-  span {
-    color: $disabled;
-  }
-}
-
-h6 {
-  font-weight:normal;
-  font-size: 11px;
-  color: $darkText;
-  line-height: 17px;
-  font-weight: bold;
-}
-
-span.error {
-  color:$error;
-  font-weight:bold;
-}
-
-blockquote {
-  border:none;
-}
-
-u {
-  text-decoration: underline;
-}
 
 select {
   padding: 0;
-}
-
-.about-link {
-  font-size: 12px;
-  text-decoration: underline;
-  color: $gray;
-  &:hover {
-    text-decoration: none;
-    color: $gray;
-  }
-}
-
-p {
-  small {
-    color: $textGray;
-  }
-}
-
-a {
-  color: $blue;
-  text-decoration: none;
-  &:hover {
-    color: $blue;
-    text-decoration: underline;
-  }
-  &.icon-link {
-    &:hover {
-      text-decoration: none;
-    }
-  }
-}
-
-// helpers
-.centered {
-  text-align: center;
-}
-
-.right {
-  text-align: right;
-}
-
-.bottom-spacing {
-  margin-bottom: 16px;
-}
-
-small {
-  font-size: 11px;
-  &.accepted {
-    color: $green;
-  }
-}
-
-.inline {
-  display:inline;
-}
-
-.spacing {
-  margin: 15px 0 24px 0;
-}
-
-.spacing-bottom {
-  margin-bottom: 20px;
-}
-
-.no-float {
-  clear: both;
-}
-
-.normal-font {
-  font-weight: normal;
-}
-
-.top-button {
-  vertical-align: top;
-}
-
-.block-element {
-  display: block;
-}
-
-.no-control {
-  display: inline;
-}
-
-.parent-position {
-  position: relative;
-}
-
-.not-assigned {
-  color: $tabTitle;
-}
-
-.assignee-dark {
-  color: $subTitle;
-}
-
-.checkbox-inline {
-  input[type="checkbox"] {
-    margin: -1px 0 0 0;
-  }
-}
-.radio-inline {
-  input[type="radio"] {
-    margin: -1px 0 0 0;
-  }
-}
-
-.btn {
-  &.dropdown-toggle {
-    [class^="grcicon-"] {
-      margin-top: 1px !important;
-    }
-  }
 }
 
 .wrap-row {
@@ -220,34 +24,6 @@ small {
       margin-bottom: 0;
     }
   }
-}
-
-.gray {
-  color: $gray;
-}
-
-.green {
-  color: $green;
-}
-
-.blue {
-  color: $blue;
-}
-
-.yellow {
-  color: $yellow;
-}
-
-.divider {
-  width: 100%;
-  height: 1px;
-  background: $footerBorder;
-  margin: 14px 0;
-}
-
-.undo {
-  font-size: 12px;
-  padding-left: 7px;
 }
 
 .read-only {
@@ -278,7 +54,7 @@ small {
 
 .tooltip {
   // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
-  z-index: 2000 !important;
+  z-index: 3000 !important;
 }
 
 // status
@@ -312,10 +88,6 @@ small {
   }
 }
 
-.status-overdue {
-  background: $red !important;
-}
-
 // progress bar
 .progress {
   @include box-shadow(none);
@@ -338,6 +110,19 @@ small {
 }
 
 // buttons
+.btn-info-pin-header {
+  margin-right: 10px;
+  &.undo {
+    margin-right: 10px;
+    margin-top: 6px;
+  }
+  .sticky-info-panel & {
+    margin-top: 18px;
+    &.undo {
+      margin-top: 22px;
+    }
+  }
+}
 .btn {
   @include btn-size();
   font-weight: bold;
@@ -350,8 +135,13 @@ small {
   &.btn-mini {
     @include btn-size(11px, 16px, 2px 12px);
   }
-  [class^="grcicon-"] {
+  [class*="fa-"] {
     @include opacity(0.7);
+  }
+  &.btn-full {
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
   }
   &.btn-fixed {
     width: 250px;
@@ -359,7 +149,7 @@ small {
   }
   &:active {
     @include box-shadow(inset 0 0 4px rgba(0,0,0,0.4));
-    [class^="grcicon-"] {
+    [class*="fa-"] {
       @include opacity(1);
     }
   }
@@ -447,10 +237,6 @@ small {
 
 // Date input field - To see date icon just add class .date to input field
 input.date {
-  @include background-size(368px 440px);
-  background-image: image-url("grcicons/icons.png");
-  background-repeat: no-repeat;
-  background-position: -340px -364px;
   padding-left: 26px;
   &.short-field {
     height: 16px !important;
@@ -464,6 +250,15 @@ input.date {
 input.input-block-level,
 select.input-block-level {
   @extend %input-block-level;
+}
+
+.input-group {
+  position: relative;
+  .input-group-addon {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+  }
 }
 
 // resizible widget functionality
@@ -643,10 +438,6 @@ input.disabled.pending-ajax{
   }
 }
 
-strong.capitalize {
-  text-transform:capitalize;
-}
-
 span.no-data {
   color:lighten($disabled,10%);
   font-weight:normal;
@@ -689,7 +480,6 @@ select.multiple-selector {
 // Sticky headers
 .sticky-header {
   @extend %sticky;
-  @include box-shadow(inset 0 0 3px 0 #bbb);
   border-top: none !important;
 }
 
@@ -705,15 +495,17 @@ select.multiple-selector {
   .ui-datepicker-next {
     top: 4px !important;
     .ui-icon {
-      @include background-size(368px 440px);
-      background-image: image-url("grcicons/icons.png");
-      background-position: -2000px -2000px;
-      background-repeat: no-repeat;
+      background: none;
       width: 20px;
-      height: 16px;
-      line-height: 16px;
+      height: 20px;
       vertical-align: top;
-      margin-top: -7px;
+      text-align: center;
+      display: inline-block;
+      font: normal normal normal 20px/1 FontAwesome; // shortening font declaration
+      text-rendering: auto; // optimizelegibility throws things off #1094
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-indent: 0;
     }
   }
   .ui-datepicker-prev-hover,
@@ -725,7 +517,9 @@ select.multiple-selector {
   .ui-datepicker-prev {
     left: 4px !important;
     .ui-icon-circle-triangle-w {
-      background-position:-294px -176px;
+      &:before {
+        content: $fa-var-caret-left;
+      }
       margin-left: -9px;
     }
     &.ui-datepicker-prev-hover {
@@ -737,7 +531,9 @@ select.multiple-selector {
   .ui-datepicker-next {
     right: 4px !important;
     .ui-icon-circle-triangle-e {
-      background-position:-198px -176px;
+      &:before {
+        content: $fa-var-caret-right;
+      }
       margin-left: -11px;
     }
     &.ui-datepicker-next-hover {
@@ -752,6 +548,10 @@ select.multiple-selector {
   word-wrap: break-word;
   margin-bottom:10px;
   line-height:18px;
+  &.shorter-rtf {
+    width: 75%;
+    float: left
+  }
 }
 
 .drag {
@@ -797,6 +597,9 @@ select.multiple-selector {
       width: auto;
       float: right;
     }
+    &.btn {
+      width: auto;
+    }
   }
   &.task-wrap {
     span.empty {
@@ -819,7 +622,7 @@ select.multiple-selector {
   .pull-left {
     margin-right: 10px;
     line-height: 14px;
-    [class^="grcicon-"] {
+    [class*="fa-"] {
       margin-top: 1px;
     }
   }
@@ -832,46 +635,6 @@ select.multiple-selector {
       }
     }
   }
-}
-
-// Welcome page
-.welcome {
-  background: $white;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  bottom: auto;
-  right: auto;
-  h1 {
-    text-align: center;
-    margin-top: 3em;  // allow space for flash messages
-    padding-top: 1em;
-    padding-bottom: 0.5em;
-    font-size: 44px;
-    font-weight: normal;
-    line-height: 1.5em;
-    width: 100%;
-  }
-  h2 {
-    text-align:center;
-    padding-bottom:1.0em;
-    font-size:22px;
-    font-weight:normal;
-    line-height:1.0em;
-  }
-  .btn-large {
-    padding-left:60px;
-    padding-right:60px;
-    margin-bottom:10px;
-  }
-}
-
-.cap {
-  text-transform:capitalize;
-}
-
-.tiny-data {
-  font-size:12px;
 }
 
 .inline-warning {
@@ -887,7 +650,8 @@ select.multiple-selector {
     font-weight:bold;
     font-size:12px;
   }
-  .info.info-expand {
+  .info.info-expand,
+  .info.info-expand-mapped {
     line-height:16px;
     padding:0;
     background:transparent;
@@ -896,14 +660,6 @@ select.multiple-selector {
     color:$red;
     text-decoration:underline;
   }
-}
-
-.nomargin {
-  margin:0 !important;
-}
-
-.smallmargin {
-  margin-top:2px !important;
 }
 
 p {
@@ -921,13 +677,10 @@ p {
   }
 }
 
-.required {
-  color: $red;
-}
 .user-disabled {
-  color:#f00 !important;
+  color:$red !important;
   font-weight:bold;
-  font-size: $f-small;
+  font-size: 10px;
 }
 
 .item-util {
@@ -967,6 +720,7 @@ p {
     i {
       @include opacity(0.25);
       @include transition(opacity 0.2s ease);
+      color: $black;
       ul.new-tree & {
         margin-top: 0;
       }
@@ -1028,11 +782,6 @@ p {
   }
 }
 
-.overdue {
-  color: $red;
-  font-weight: bold;
-}
-
 .filter-wrap {
   background: $white;
   .filter-border {
@@ -1079,13 +828,9 @@ p {
   }
 }
 
-.border-l {
-  padding-bottom: 5px;
-  border-bottom: 1px solid $infoMessageBorder;
-}
-
 .hidden-widgets-list {
-  .dropdown-menu {
+  .dropdown-menu,
+  .dropdown-list {
     @include clearfix();
     width: 320px;
     .inner-nav-item {
@@ -1108,6 +853,9 @@ p {
         clear: both;
       }
     }
+  }
+  &.child-node-wrap {
+    text-align: left;
   }
 }
 
@@ -1164,9 +912,18 @@ p {
   .tree-title-area & {
     font-weight: normal;
   }
+  .pane-header & {
+    display: inline-block;
+    margin-top: 4px;
+  }
+  &.state-float {
+    float: left;
+    margin-top: 0;
+    margin-left: 10px;
+  }
 }
 
-@each $state_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
+@each $state_label in draft, inactive, declined, inprogress, in_progress, unstarted, overdue, active, verified, planned, accepted, pending, finished, requested, responded, amended_request, updated_response, assigned {
   .state-#{$state_label} {
     @extend %state-#{$state_label};
   }
@@ -1176,7 +933,7 @@ p {
   @extend %reset-list;
   li {
     margin-bottom: 6px;
-    [class^="grcicon-"] {
+    [class*="fa-"] {
       margin-top: 0 !important;
     }
   }
@@ -1190,6 +947,7 @@ p {
 }
 
 .custom-attr-table {
+  font-size: 11px;
   .table {
     td.centered,
     th.centered {
@@ -1209,10 +967,6 @@ p {
   }
 }
 
-label.disabled {
-  color: $gray !important;
-}
-
 .add-trigger {
   .disable {
     cursor: not-allowed;
@@ -1228,5 +982,69 @@ label.disabled {
   margin-top: 30px;
   h3 {
     margin-bottom: 10px;
+  }
+}
+
+.popover-child-node {
+  @include box-shadow(0 5px 10px rgba(0, 0, 0, .2));
+  border: 1px solid rgba(0,0,0, .2);
+  .arrow {
+    display: none !important;
+  }
+}
+
+.child-node-wrap {
+  a {
+    @include transition(color .2s ease);
+    padding: 0 14px 0 10px;
+    display: block;
+    line-height: 29px;
+    font-size: 13px;
+    color: $gray;
+    text-transform: none;
+    i {
+      @include opacity(.4);
+    }
+    &:hover {
+      color: $black;
+      text-decoration: none;
+      i {
+        @include opacity(1);
+      }
+    }
+  }
+}
+
+.child-node {
+  .popover-template:hover {
+    i {
+      background-position: -246px -416px;
+    }
+  }
+}
+
+.label-light {
+  background-color: lighten($blue, 55%);
+  span,
+  a {
+    color: $black;
+    text-shadow: none;
+    font-weight: normal;
+  }
+  a {
+    font-weight: bold;
+    text-decoration: none;
+    padding: 0 2px;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.person-selector {
+  input {
+    float: left;
+    margin-right: 5px;
+    width: 70%;
   }
 }

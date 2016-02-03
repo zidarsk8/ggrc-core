@@ -1,3 +1,10 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: brad@reciprocitylabs.com
+    Maintained By: brad@reciprocitylabs.com
+}}
+
 <div class="relevance-filters">
   <div class="row-fluid">
     <div class="span12">
@@ -5,7 +12,7 @@
       {{#each filter_list}}
       <div class="single-line-filter">
         <button type="submit" data-index="{{@index}}" class="remove_filter">
-          <i class="grcicon-deleted"></i>
+          <i class="fa fa-trash"></i>
         </button>
         <label>
           {{#if @index}}AND {{/if}}Relevant to:
@@ -40,4 +47,4 @@
       </div>
     </div>
   </div>
-</div>  
+</div>

@@ -26,12 +26,13 @@
         </small>
       {{else}}
         <div class="oneline">
-          <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach supporting file" link_class="entry-attachment tree-item-add" click_event="trigger_upload_parent">
-          </ggrc-gdrive-picker-launcher>
-          {{^if workflowFolder}}
-          <small class="error-inline">
-            <strong>Warning:</strong> Workflow folder is not set. Files will be placed in your Gdrive root folder.
-          </small>
+          {{#if workflowFolder}}
+            <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach supporting file" link_class="entry-attachment tree-item-add" click_event="trigger_upload_parent">
+            </ggrc-gdrive-picker-launcher>
+          {{else}}
+            <small class="error-inline">
+              <strong>Warning:</strong> Workflow folder is not set. Please select a folder before uploading files.
+            </small>
           {{/if}}
         </div>
       {{/need_permission}}
@@ -43,12 +44,12 @@
     <span class="entry-author">Modified by {{#using person=instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>
   </div>
   <div class="entry-actions pull-right">
-    <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="grcicon-setup-color"></i></a>
+    <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
     <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
       <li>
         {{^if_equals parent_instance.status 'Verified'}}
           <a href="javascript://" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="CycleTaskEntry" data-object-plural="{{instance.class.table_plural}}" data-object-id="{{instance.id}}">
-            <i class="grcicon-edit"></i>
+            <i class="fa fa-pencil-square-o"></i>
             Edit Comment
           </a>
         {{/if_equals}}
@@ -59,7 +60,7 @@
           {{#is_allowed_all 'delete' mappings}}
             <a href="javascript://" data-toggle="unmap">
               {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-              <i class="grcicon-deleted"></i>
+              <i class="fa fa-trash"></i>
               Delete Comment
             </a>
           {{/is_allowed_all}}

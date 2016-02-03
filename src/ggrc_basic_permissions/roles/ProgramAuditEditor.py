@@ -1,3 +1,8 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 scope = "Audit Implied"
 description = """
   A user with the ProgramEditor role for a private program will also have this
@@ -6,7 +11,8 @@ description = """
 permissions = {
     "read": [
         "Request",
-        "ControlAssessment",
+        "Comment",
+        "Assessment",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -25,7 +31,8 @@ permissions = {
     ],
     "create": [
         "Request",
-        "ControlAssessment",
+        "Comment",
+        "Assessment",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -45,26 +52,7 @@ permissions = {
     ],
     "update": [
         {
-            "terms": {
-                "property_name": "status",
-                "value": [
-                    "Requested",
-                    "Amended Request"
-                ]
-            },
-            "type": "Request",
-            "condition": "in"
-        },
-        {
-            "terms": {
-                "property_name": "assignee",
-                "value": "$current_user"
-            },
-            "type": "Request",
-            "condition": "is"
-        },
-        {
-            "type": "ControlAssessment",
+            "type": "Assessment",
             "terms": {
                 "list_property": "owners",
                 "value": "$current_user"
@@ -79,6 +67,8 @@ permissions = {
             },
             "condition": "contains"
         },
+        "Request",
+        "Comment",
         "DocumentationResponse",
         "InterviewResponse",
         "PopulationSampleResponse",
@@ -99,6 +89,7 @@ permissions = {
         "Relationship",
         "Document",
         "Meeting",
+        "Audit",
         "AuditObject"
     ]
 }

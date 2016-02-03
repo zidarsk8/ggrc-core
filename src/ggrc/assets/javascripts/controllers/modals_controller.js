@@ -74,18 +74,23 @@ can.Control("GGRC.Controllers.Modals", {
     if (content) {
       this.element.html(content);
     }
-    this.options.attr("$header", this.element.find(".modal-header"));
-    this.options.attr("$content", this.element.find(".modal-body"));
-    this.options.attr("$footer", this.element.find(".modal-footer"));
-    this.on();
-    this.fetch_all()
-      .then(this.proxy("apply_object_params"))
-      .then(this.proxy("serialize_form"))
-      .then(function() {
-        // If the modal is closed early, the element no longer exists
-        that.element && that.element.trigger('preload');
-      })
-      .then(this.proxy("autocomplete"));
+    CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
+      this.display_prefs = display_prefs;
+
+      this.options.attr("$header", this.element.find(".modal-header"));
+      this.options.attr("$content", this.element.find(".modal-body"));
+      this.options.attr("$footer", this.element.find(".modal-footer"));
+      this.on();
+      this.fetch_all()
+        .then(this.proxy("apply_object_params"))
+        .then(this.proxy("serialize_form"))
+        .then(function() {
+          // If the modal is closed early, the element no longer exists
+          that.element && that.element.trigger("preload");
+        })
+        .then(this.proxy("autocomplete"));
+      this.restore_ui_status_from_storage();
+    }.bind(this));
   }
 
   , apply_object_params: function () {
@@ -115,19 +120,17 @@ can.Control("GGRC.Controllers.Modals", {
     }, "_transient");
 
     instance.attr(["_transient"].concat(name).join("."), value);
-  }
-
-  , autocomplete : function(el) {
+  },
+  autocomplete : function(el) {
     $.cms_autocomplete.call(this, el);
-  }
+  },
+  autocomplete_select: function (el, event, ui) {
+    $("#extended-info").trigger("mouseleave"); // Make sure the extra info tooltip closes
 
-  , autocomplete_select: function (el, event, ui) {
-    $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
-
-    var path = el.attr("name").split(".")
-      , instance = this.options.instance
-      , index = 0
-      , prop = path.pop();
+    var path = el.attr("name").split("."),
+        instance = this.options.instance,
+        index = 0,
+        prop = path.pop();
 
     if (/^\d+$/.test(path[path.length - 1])) {
       index = parseInt(path.pop(), 10);
@@ -138,15 +141,15 @@ can.Control("GGRC.Controllers.Modals", {
       this.options.instance.attr(path).splice(index, 1, ui.item.stub());
     } else {
       path = path.join(".");
-      setTimeout(function(){
+      setTimeout(function () {
         el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
       }, 0);
 
       this.options.instance.attr(path, ui.item);
+      this.options.instance.attr("_transient." + path, ui.item);
     }
-  }
-
-  , immediate_find_or_create : function(el, ev, data) {
+  },
+  immediate_find_or_create : function(el, ev, data) {
     var that = this
     , prop = el.data("drop")
     , model = CMS.Models[el.data("lookup")]
@@ -286,7 +289,7 @@ can.Control("GGRC.Controllers.Modals", {
         hidable_tabs++;
     }
     //ui_array index is used as the tab_order, Add extra space for skipped numbers
-    var storable_ui = hidable_tabs + 10;
+    var storable_ui = hidable_tabs + 20;
     for (var i = 0; i < storable_ui; i++) {
       //When we start, all the ui elements are visible
       this.options.ui_array.push(0);
@@ -320,38 +323,33 @@ can.Control("GGRC.Controllers.Modals", {
        (typeof el.attr('value') !== 'undefined' && !el.attr('value').length)) {
       this.set_value_from_element(el);
     }
-  }
-  , serialize_form : function() {
-      var $form = this.options.$content.find("form")
-        , $elements = $form.find(":input:not(isolate-form *)")
-        ;
+  },
+  serialize_form: function () {
+    var $form = this.options.$content.find("form"),
+        $elements = $form.find(":input:not(isolate-form *)");
 
-      can.each($elements.toArray(), this.proxy("set_value_from_element"));
+    can.each($elements.toArray(), this.proxy("set_value_from_element"));
+  },
+  set_value_from_element: function (el) {
+    el = el instanceof jQuery ? el : $(el);
+    var name = el.attr("name"),
+        value = el.val();
+
+    // If no model is specified, short circuit setting values
+    // Used to support ad-hoc form elements in confirmation dialogs
+    if (!this.options.model) {
+      return;
     }
-
-  , set_value_from_element : function (el) {
-      var $el = el instanceof jQuery ? el : $(el)
-        , name = $el.attr('name')
-        , value = $el.val()
-        ;
-      // If no model is specified, short circuit setting values
-      // Used to support ad-hoc form elements in confirmation dialogs
-      if (!this.options.model) {
-        return;
-      }
-
-      if (name) {
-        this.set_value({ name: name, value: value });
-      }
-
-      if ($el.is("[data-also-set]")) {
-        can.each($el.data("also-set").split(","), function(oname) {
-          this.set_value({ name : oname, value : value});
-        }, this);
-      }
+    if (name) {
+      this.set_value({name: name, value: value});
     }
-
-  , set_value: function (item) {
+    if (el.is("[data-also-set]")) {
+      can.each(el.data("also-set").split(","), function(oname) {
+        this.set_value({name: oname, value: value});
+      }, this);
+    }
+  },
+  set_value: function (item) {
     // Don't set `_wysihtml5_mode` on the instances
     if (item.name === '_wysihtml5_mode') {
       return;
@@ -459,15 +457,36 @@ can.Control("GGRC.Controllers.Modals", {
       }
     }
     this.setup_wysihtml5(); // in case the changes in values caused a new wysi box to appear.
-  }
+  },
+  "[data-before], [data-after] change": function (el, ev) {
+    if (!el.data("datepicker")) {
+      el.datepicker({changeMonth: true, changeYear: true});
+    }
+    var date = el.datepicker("getDate"),
+        data = el.data(),
+        options = {
+          "before": "maxDate",
+          "after": "minDate"
+        };
 
-  , "[data-before], [data-after] change" : function(el, ev) {
-    var start_date = el.datepicker('getDate');
-    this.element.find("[name=" + el.data("before") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "minDate", start_date);
-    this.element.find("[name=" + el.data("after") + "]").datepicker({changeMonth: true, changeYear: true}).datepicker("option", "maxDate", start_date);
-  }
+    _.each(options, function (val, key) {
+      if (!data[key]) {
+        return;
+      }
+      var targetEl = this.element.find("[name=" + data[key] + "]"),
+          isInput = targetEl.is("input"),
+          targetDate = isInput ? targetEl.val() : targetEl.text(),
+          otherKey;
 
-  , "{$footer} a.btn[data-toggle='modal-submit-addmore'] click" : function(el, ev){
+      el.datepicker("option", val, targetDate);
+      if (targetEl) {
+        otherKey = key === "before" ? "after" : "before";
+        targetEl.datepicker("option", options[otherKey], date);
+      }
+    }, this);
+  },
+
+  "{$footer} a.btn[data-toggle='modal-submit-addmore'] click" : function(el, ev){
     if (el.hasClass('disabled')) {
       return;
     }
@@ -489,9 +508,12 @@ can.Control("GGRC.Controllers.Modals", {
       $hidable = $el.closest('[class*="span"].hidable'),
       $innerHide = $el.closest('[class*="span"]').find('.hidable'),
       $showButton = $(this.element).find('#formRestore'),
-      $hideButton = $(this.element).find('#formHide');
+      $hideButton = $(this.element).find('#formHide'),
+      totalInner = $el.closest('.hide-wrap.hidable').find('.inner-hide').length,
+      totalHidden;
 
       $el.closest('.inner-hide').addClass('inner-hidable');
+      totalHidden = $el.closest('.hide-wrap.hidable').find('.inner-hidable').length;
       //$hidable.hide();
       $hidable.addClass("hidden");
       this.options.reset_visible = true;
@@ -507,10 +529,8 @@ can.Control("GGRC.Controllers.Modals", {
         }
       }
 
-      for(i=0; i < $el.closest('.hide-wrap.hidable').find('.inner-hidable').length; i++) {
-        if(i == 1) {
-          $el.closest('.inner-hide').parent('.hidable').addClass("hidden");
-        }
+      if (totalInner == totalHidden) {
+        $el.closest('.inner-hide').parent('.hidable').addClass("hidden");
       }
 
       $hideButton.hide();
@@ -519,26 +539,31 @@ can.Control("GGRC.Controllers.Modals", {
   }
 
   , "{$content} #formHide click" : function(el, ev) {
-    var ui_arr_length = this.options.ui_array.length;
-    for(var i = 0; i < ui_arr_length; i++) {
+    var i, ui_arr_length = this.options.ui_array.length,
+        $showButton = this.element.find("#formRestore"),
+        $hidables = this.element.find(".hidable"),
+        hidden_elements = $hidables.find("[tabindex]");
+
+    for (i = 0; i < ui_arr_length; i++) {
       this.options.ui_array[i] = 0;
     }
-    var $showButton = $(this.element).find('#formRestore');
+
     this.options.reset_visible = true;
 
-    var $hidables = $(this.element).find(".hidable");
     $hidables.addClass("hidden");
-    $(this.element).find('.inner-hide').addClass('inner-hidable');
+    this.element.find(".inner-hide").addClass("inner-hidable");
 
     //Set up the hidden elements index to 1
-    var hidden_elements = $hidables.find('[tabindex]');
-    for(var i = 0; i < hidden_elements.length; i++) {
-      var tab_value = $(hidden_elements[i]).attr('tabindex');
+    for (i = 0; i < hidden_elements.length; i++) {
+      var $hidden_element = $(hidden_elements[i]),
+          tab_value = $hidden_element.attr("tabindex");
       //The UI array index start from 0, and tab-index/io-index is from 1
       if(tab_value > 0){
         this.options.ui_array[tab_value-1] = 1;
-        $(hidden_elements[i]).attr('tabindex', '-1');
-        $(hidden_elements[i]).attr('uiindex', tab_value);
+        $hidden_element.attr({
+          tabindex: "-1",
+          uiindex: tab_value
+        });
       }
     }
 
@@ -549,107 +574,144 @@ can.Control("GGRC.Controllers.Modals", {
 
   , "{$content} #formRestore click" : function(el, ev) {
     //Update UI status array to initial state
-    var ui_arr_length = this.options.ui_array.length;
-    for(var i = 0; i < ui_arr_length; i++) {
+    var i, ui_arr_length = this.options.ui_array.length,
+        $form = this.element.find("form"),
+        $body = $form.closest(".modal-body"),
+        uiElements = $body.find("[uiindex]")
+        $hideButton = this.element.find("#formHide");
+
+    for (i = 0; i < ui_arr_length; i++) {
       this.options.ui_array[i] = 0;
     }
 
     //Set up the correct tab index for tabbing
     //Get all the ui elements with 'uiindex' set to original tabindex
     //Restore the original tab index
-    var $form = $(this.element).find('form');
-    var uiElements = $form.find('[uiindex]');
-    for (var i = 0; i < uiElements.length; i++) {
+
+    for (i = 0; i < uiElements.length; i++) {
       var $el = $(uiElements[i]);
-      var tab_val = $el.attr('uiindex');
-      $el.attr('tabindex', tab_val);
+      var tab_val = $el.attr("uiindex");
+      $el.attr("tabindex", tab_val);
     }
 
-    var $hideButton = $(this.element).find('#formHide');
     this.options.reset_visible = false;
-    $(this.element).find(".hidden").removeClass("hidden");
-    $(this.element).find('.inner-hide').removeClass('inner-hidable');
+    this.element.find(".hidden").removeClass("hidden");
+    this.element.find(".inner-hide").removeClass("inner-hidable");
     el.hide();
     $hideButton.show();
     return false
   }
 
-  , save_ui_status : function(){}
+  , save_ui_status : function() {
+    if (!this.options.model) {
+      return;
+    }
+    var model_name = this.options.model.model_singular,
+        reset_visible = this.options.reset_visible ? this.options.reset_visible : false,
+        ui_array = this.options.ui_array ? this.options.ui_array : [],
+        display_state = {
+          reset_visible : reset_visible,
+          ui_array : ui_array
+        };
 
-  , restore_ui_status : function(){
+    this.display_prefs.setModalState(model_name, display_state);
+    this.display_prefs.save();
+  }
+
+  , restore_ui_status_from_storage : function() {
+    if (!this.options.model) {
+      return;
+    }
+    var model_name = this.options.model.model_singular,
+        display_state = this.display_prefs.getModalState(model_name);
+
+    //set up reset_visible and ui_array
+    if (display_state !== null) {
+      if (display_state.reset_visible) {
+        this.options.reset_visible = display_state.reset_visible;
+      }
+      if (display_state.ui_array) {
+        this.options.ui_array = display_state.ui_array;
+      }
+    }
+    this.restore_ui_status();
+  }
+
+  , restore_ui_status : function() {
     //walk through the ui_array, for the one values,
     //select the element with tab index and hide it
 
-    if(this.options.reset_visible){//some elements are hidden
-      var $selected,
-          str,
-          tabindex,
-          $form = $(this.element).find('form');
-      for (var i = 0; i < this.options.ui_array.length; i++){
-        if(this.options.ui_array[i] == 1){
-          tabindex = i+1;
-          str = '[tabindex=' + tabindex + ']';
-          $selected = $form.find(str);
-          $selected.closest('.hidable').addClass('hidden');
-          $selected.attr('uiindex', tabindex);
-          $selected.attr('tabindex', '-1');
+    if (this.options.reset_visible) {//some elements are hidden
+      var $selected, str, tabindex, i,
+          $form = this.element.find("form"),
+          $body = $form.closest(".modal-body"),
+          $hideButton = $form.find("#formHide"),
+          $showButton = $form.find("#formRestore");
+
+      for (i = 0; i < this.options.ui_array.length; i++) {
+        if (this.options.ui_array[i] == 1) {
+          tabindex = i + 1;
+          str = "[tabindex=" + tabindex + "]";
+          $selected = $body.find(str);
+
+          if ($selected) {
+            $selected.closest(".hidable").addClass("hidden");
+            $selected.attr({
+              uiindex: tabindex,
+              tabindex: "-1"
+            });
+          }
         }
       }
 
-      if($selected){
-        var $hideButton = $selected.closest('.modal-body').find('#formHide'),
-          $showButton = $selected.closest('.modal-body').find('#formRestore');
+      $hideButton.hide();
+      $showButton.show();
 
-        $hideButton.hide();
-        $showButton.show();
-      }
       return false;
     }
 
-  }
-  //make buttons non-clickable when saving, make it disable afterwards
-  ,  bindXHRToButton_disable : function(xhr, el, newtext, disable) {
-      // binding of an ajax to a click is something we do manually
-      var $el = $(el),
-          oldtext = $el.text();
+  },
 
-      if (newtext) {
-        $el[0].innerHTML = newtext;
-      }
-      $el.addClass("disabled pending-ajax");
-      if (disable !== false) {
-        $el.attr("disabled", true);
-      }
-      xhr.always(function() {
+  //make buttons non-clickable when saving, make it disable afterwards
+  bindXHRToButton_disable: function (xhr, el, newtext, disable) {
+    // binding of an ajax to a click is something we do manually
+    var $el = $(el),
+        oldtext = $el.text();
+
+    if (newtext) {
+      $el[0].innerHTML = newtext;
+    }
+    $el.addClass("disabled pending-ajax");
+    if (disable !== false) {
+      $el.attr("disabled", true);
+    }
+    xhr.fail(function () {
+        if ($el.length) {
+          $el.removeClass("disabled");
+        }
+      }).always(function () {
         // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
         if ($el.length) {
           $el.removeAttr("disabled").removeClass("pending-ajax")[0].innerHTML = oldtext;
         }
-      });
-    }
-
+      }.bind(this));
+  },
   //make buttons non-clickable when saving
-  , bindXHRToBackdrop : function(xhr, el, newtext, disable) {
-      // binding of an ajax to a click is something we do manually
+  bindXHRToBackdrop: function (xhr, el, newtext, disable) {
+    // binding of an ajax to a click is something we do manually
+    var $el = $(el),
+        oldtext = $el.text(),
+        alt;
 
-      var $el = $(el)
-      , oldtext = $el.text();
-      var alt;
-
-      var myel = "<div ";
-      //if(newtext) {
-      //  $el[0].innerHTML = newtext;
-      //}
-      $el.addClass("disabled pending-ajax");
-      if (disable !== false) {
-        $el.attr("disabled", true);
-      }
-      xhr.always(function() {
-        // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-        $el.removeAttr("disabled").removeClass("disabled pending-ajax");//[0].innerHTML = oldtext;
-      });
-
+    $el.addClass("disabled pending-ajax");
+    if (disable !== false) {
+      $el.attr("disabled", true);
     }
+    xhr.always(function() {
+      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
+      $el.removeAttr("disabled").removeClass("disabled pending-ajax");//[0].innerHTML = oldtext;
+    });
+  }
 
   , triggerSave : function(el, ev) {
     var ajd,
@@ -660,17 +722,15 @@ can.Control("GGRC.Controllers.Modals", {
     // Normal saving process
     if (el.is(':not(.disabled)')) {
       ajd = this.save_instance(el, ev);
-
-      if(this.options.add_more) {
-        if(ajd) {
+      if (this.options.add_more) {
+        if (ajd) {
           this.bindXHRToButton_disable(ajd, save_close_btn);
           this.bindXHRToButton_disable(ajd, save_addmore_btn);
 
           this.bindXHRToBackdrop(ajd, modal_backdrop, "Saving, please wait...");
         }
-      }
-      else {
-        if(ajd) {
+      } else {
+        if (ajd) {
           this.bindXHRToButton(ajd, save_close_btn, "Saving, please wait...");
           this.bindXHRToButton(ajd, save_addmore_btn);
         }
@@ -752,63 +812,68 @@ can.Control("GGRC.Controllers.Modals", {
       }
 
       this.disable_hide = true;
-      ajd = instance.save()
-      .fail(this.save_error.bind(this))
-      .done(function(obj) {
-        function finish() {
-          delete that.disable_hide;
-          if (that.options.add_more) {
-            that.new_instance();
-          } else {
-            that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
-            that.update_hash_fragment();
-          }
-        }
-
-        // If this was an Objective created directly from a Section, create a join
-        var params = that.options.object_params;
-        if (obj instanceof CMS.Models.Objective && params && params.section) {
-          new CMS.Models.SectionObjective({
-            objective: obj
-            , section: CMS.Models.Section.findInCacheById(params.section.id)
-            , context: { id: null }
-          }).save()
-          .fail(that.save_error.bind(that))
-          .done(function(){
-            $(document.body).trigger("ajax:flash",
-                { success : "Objective mapped successfully." });
-            finish();
-          });
-        } else {
-          var type = obj.type ? can.spaceCamelCase(obj.type) : '',
-              name = obj.title ? obj.title : '',
-              msg;
-          if(instance_id === undefined) { //new element
-            if(obj.is_declining_review && obj.is_declining_review == '1') {
-              msg = "Review declined";
-            } else if (name) {
-              msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+      ajd = instance.save();
+      ajd.fail(this.save_error.bind(this))
+        .done(function (obj) {
+          function finish() {
+            delete that.disable_hide;
+            if (that.options.add_more) {
+              if (that.options.$trigger) {
+                that.options.$trigger.trigger("modal:added", [obj]);
+              }
+              that.new_instance();
             } else {
-              msg = "New " + type + " added successfully.";
+              that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
+              that.update_hash_fragment();
             }
-          } else {
-            msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";
           }
-          $(document.body).trigger("ajax:flash", { success : msg });
-          finish();
-        }
-      }).fail(function(xhr, status) {
-        if(!instance.errors()) {
-          $(document.body).trigger("ajax:flash", { error : xhr.responseText });
-        }
-        delete that.disable_hide;
-      });
-      return ajd;
-  }
 
-  , save_error: function (_, error) {
-    $(document.body).trigger("ajax:flash", {error: error});
-    delete this.disable_hide;
+          // If this was an Objective created directly from a Section, create a join
+          var params = that.options.object_params;
+          if (obj instanceof CMS.Models.Objective && params && params.section) {
+            new CMS.Models.Relationship({
+              source: obj,
+              destination: CMS.Models.Section.findInCacheById(params.section.id),
+              context: { id: null }
+            }).save()
+            .fail(that.save_error.bind(that))
+            .done(function(){
+              $(document.body).trigger("ajax:flash",
+                  { success : "Objective mapped successfully." });
+              finish();
+            });
+          } else {
+            var type = obj.type ? can.spaceCamelCase(obj.type) : '',
+                name = obj.title ? obj.title : '',
+                msg;
+            if (instance_id === undefined) { //new element
+              if (obj.is_declining_review && obj.is_declining_review == '1') {
+                msg = "Review declined";
+              } else if (name) {
+                msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+              } else {
+                msg = "New " + type + " added successfully.";
+              }
+            } else {
+              msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";
+            }
+            $(document.body).trigger("ajax:flash", { success : msg });
+            finish();
+          }
+        });
+      this.save_ui_status();
+      return ajd;
+  },
+  save_error: function (_, error) {
+    $("html, body").animate({
+      scrollTop: "0px"
+    }, {
+      duration: 200,
+      complete: function () {
+        $(document.body).trigger("ajax:flash", { error: error });
+        delete this.disable_hide;
+      }.bind(this)
+    });
   }
 
   , "{instance} destroyed" : " hide"
@@ -821,7 +886,7 @@ can.Control("GGRC.Controllers.Modals", {
         return false;
       }
       if (this.options.instance) {
-        delete this.options.instance._pending_joins;
+        this.options.instance.attr("_pending_joins", []);
       }
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
@@ -898,11 +963,13 @@ can.Component.extend({
   scope: {
     parent_instance: null,
     instance: null,
-    instance_attr: '@',
-    source_mapping: '@',
-    source_mapping_source: '@',
-    mapping: '@',
+    instance_attr: "@",
+    source_mapping: "@",
+    source_mapping_source: "@",
+    mapping: "@",
+    deferred: "@",
     attributes: {},
+    list: [],
     // the following are just for the case when we have no object to start with,
     changes: []
   },
@@ -912,7 +979,6 @@ can.Component.extend({
           key;
 
       this.scope.attr("controller", this);
-
       if (!this.scope.instance) {
         this.scope.attr("deferred", true);
       } else if (this.scope.instance.reify) {
@@ -930,10 +996,10 @@ can.Component.extend({
         .get_binding(this.scope.source_mapping)
         .refresh_instances()
         .then(function (list) {
-          that.scope.attr("list", can.map(list, function (binding) {
-                return binding.instance;
-              }));
-        });
+          this.scope.attr("list", can.map(list, function (binding) {
+            return binding.instance;
+          }));
+        }.bind(this));
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
         key = this.scope.instance_attr + "_" + (this.scope.mapping || this.scope.source_mapping);
@@ -950,10 +1016,9 @@ can.Component.extend({
 
       this.options.parent_instance = this.scope.parent_instance;
       this.options.instance = this.scope.instance;
-      setTimeout(this.set_user_as_owner.bind(this), 0);
       this.on();
     },
-    set_user_as_owner: function () {
+    "{scope} list": function () {
       // Workaround so we render pre-defined users.
       if (~['owners'].indexOf(this.scope.mapping) && this.scope.list && !this.scope.list.length) {
         var person = CMS.Models.Person.findInCacheById(GGRC.current_user.id);
@@ -962,39 +1027,45 @@ can.Component.extend({
       }
     },
     deferred_update: function () {
-      var that = this,
-          changes = this.scope.changes;
+      var changes = this.scope.changes,
+          instance = this.scope.instance;
 
       if (!changes.length) {
+        if (instance && instance._pending_joins && instance._pending_joins.length) {
+          instance.delay_resolving_save_until(instance.constructor.resolve_deferred_bindings(instance));
+        }
         return;
       }
       this.scope.attr("instance", this.scope.attr("parent_instance").attr(this.scope.instance_attr).reify());
       can.each(
         changes,
         function(item) {
-          var mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, item.what.constructor.shortName);
-
+          var mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, item.what.constructor.shortName);
           if (item.how === "add") {
-            that.scope.instance.mark_for_addition(mapping, item.what, item.extra);
+            this.scope.instance.mark_for_addition(mapping, item.what, item.extra);
           } else {
-            that.scope.instance.mark_for_deletion(mapping, item.what);
+            this.scope.instance.mark_for_deletion(mapping, item.what);
           }
-        }
+        }.bind(this)
       );
-      return that.scope.instance.constructor.resolve_deferred_bindings(that.scope.instance);
+      this.scope.instance.delay_resolving_save_until(this.scope.instance.constructor.resolve_deferred_bindings(this.scope.instance));
     },
     "{parent_instance} updated": "deferred_update",
     "{parent_instance} created": "deferred_update",
+
     // this works like autocomplete_select on all modal forms and
     // descendant class objects.
-    autocomplete_select : function(el, event, ui) {
-      var mapping, extra_attrs;
+    "autocomplete_select" : function(el, event, ui) {
+      if (!this.element) {
+        return;
+      }
 
+      var mapping, extra_attrs;
       extra_attrs = can.reduce(this.element.find("input:not([data-mapping], [data-lookup])").get(), function(attrs, el) {
         attrs[$(el).attr("name")] = $(el).val();
         return attrs;
       }, {});
-      if (this.scope.deferred) {
+      if (this.scope.attr("deferred")) {
         this.scope.changes.push({ what: ui.item, how: "add", extra: extra_attrs });
       } else {
         mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, ui.item.constructor.shortName);
@@ -1022,7 +1093,7 @@ can.Component.extend({
             len = this.scope.list.length,
             mapping;
 
-        if (this.scope.deferred) {
+        if (this.scope.attr("deferred")) {
           this.scope.changes.push({ what: obj, how: "remove" });
         } else {
           mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, obj.constructor.shortName);
@@ -1079,7 +1150,7 @@ can.Component.extend({
         obj = new CMS.Models[binding.loader.option_model_name](extra_attrs);
       }
 
-      if (that.scope.deferred) {
+      if (that.scope.attr("deferred")) {
         that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
       } else {
         mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
@@ -1088,21 +1159,21 @@ can.Component.extend({
       that.scope.list.push(obj);
       that.scope.attr("attributes", {});
     },
-    "a[data-object-source] modal:success": function(el, ev, data) {
-      var mapping,
-          that = this;
+    "a[data-object-source] modal:success": "addMapings",
+    "defer:add": "addMapings",
+    "addMapings": function(el, ev, data) {
       ev.stopPropagation();
+      var mapping;
 
       can.each(data.arr || [data], function(obj) {
-
-        if (that.scope.deferred) {
-          that.scope.changes.push({ what: obj, how: "add" });
+        if (this.scope.attr("deferred")) {
+          this.scope.changes.push({ what: obj, how: "add" });
         } else {
-          mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);
-          that.scope.instance.mark_for_addition(mapping, obj);
+          mapping = this.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(this.scope.instance.constructor.shortName, obj.constructor.shortName);
+          this.scope.instance.mark_for_addition(mapping, obj);
         }
-        that.scope.list.push(obj);
-      });
+        this.scope.list.push(obj);
+      }, this);
     },
     ".ui-autocomplete-input modal:success" : function(el, ev, data, options) {
       var that = this,
@@ -1121,7 +1192,7 @@ can.Component.extend({
 
       can.each(data.arr || [data], function(obj) {
         var mapping;
-        if (that.scope.deferred) {
+        if (that.scope.attr("deferred")) {
           that.scope.changes.push({ what: obj, how: "add", extra: extra_attrs });
         } else {
           mapping = that.scope.mapping || GGRC.Mappings.get_canonical_mapping_name(that.scope.instance.constructor.shortName, obj.constructor.shortName);

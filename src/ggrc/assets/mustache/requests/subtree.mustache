@@ -1,0 +1,28 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: anze@reciprocitylabs.com
+    Maintained By: vladan@reciprocitylabs.com
+}}
+
+{{#instance}}
+<li>
+  {{#is_allowed "update" instance}}
+  <span class="file-controls">
+    <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+      <span class="result" {{data "result"}}></span>
+      <i class="fa fa-ban"></i>
+    </a>
+  </span>
+  {{/is_allowed}}
+  <i class="fa fa-{{class.table_singular}} color"></i>
+  {{firstnonempty title description name email}}
+
+  {{#if instance.viewLink}}
+    {{#is_allowed "view_object_page" instance}}
+      <a class="more" href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
+    {{/is_allowed}}
+  {{/if}}
+
+</li>
+{{/instance}}

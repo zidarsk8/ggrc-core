@@ -8,19 +8,28 @@
 (function($, CMS, GGRC) {
   var WorkflowExtension = {},
       _workflow_object_types = Array.prototype.concat.call([],
-        'Program Regulation Policy Standard Contract Clause Section'.split(' '),
-        'Control Objective'.split(' '),
-        'OrgGroup Vendor'.split(' '),
-        'System Process DataAsset Product Project Facility Market'.split(' ')
+        "Program Regulation Policy Standard Contract Clause Section Request".split(" "),
+        "Control Objective OrgGroup Vendor AccessGroup".split(" "),
+        "System Process DataAsset Product Project Facility Market Issue Assessment".split(" "),
+        "Risk Threat".split(" ")
       ),
       _task_sort_function = function(a, b) {
         var date_a = +new Date(a.end_date),
             date_b = +new Date(b.end_date);
         if (date_a === date_b) {
-          return a.id < b.id;
+          if (a.id < b.id) {
+            return -1;
+          } else if (a.id > b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
         }
-
-        return date_a < date_b;
+        if (date_a < date_b) {
+          return -1;
+        } else {
+          return 1;
+        }
       };
 
   // Register `workflows` extension with GGRC
@@ -36,7 +45,6 @@
       'cycle_task_group': CMS.Models.CycleTaskGroup,
       'cycle_task_group_object': CMS.Models.CycleTaskGroupObject,
       'cycle_task_group_object_task': CMS.Models.CycleTaskGroupObjectTask,
-
       'task_group': CMS.Models.TaskGroup,
       'workflow': CMS.Models.Workflow
     };
@@ -75,7 +83,6 @@
           _canonical: {
             task_groups: "TaskGroup",
             people: "Person",
-            folders: "GDriveFolder",
             context: "Context"
           },
 
@@ -85,8 +92,6 @@
             "task_groups", "task_group_tasks"),
           cycles: Direct(
             "Cycle", "workflow", "cycles"),
-          folders:
-            new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder"),
           previous_cycles: CustomFilter("cycles", function(result) {
               return !result.instance.attr("is_current");
             }),
@@ -123,7 +128,7 @@
                    && binding.instance.role.reify().attr("name") === "WorkflowOwner";
           }),
           owners: Cross("owner_authorizations", "person"),
-          orphaned_objects: Multi(["cycles", "task_groups", "tasks", "current_task_groups", "current_tasks", "folders"])
+          orphaned_objects: Multi(["cycles", "task_groups", "tasks", "current_task_groups", "current_tasks"])
         },
 
         Cycle: {
@@ -207,9 +212,7 @@
             "CycleTaskGroupObjectTask",
             "cycle_task_entries",
             "cycle_task_group_object_task"),
-          workflow: Cross("cycle", "workflow"),
-          folders: Cross("workflow", "folders"),
-          extended_folders: Multi(["folders"])
+          workflow: Cross("cycle", "workflow")
         },
 
         People: {
@@ -239,7 +242,11 @@
 
     // Insert `workflows` mappings to all business object types
     can.each(_workflow_object_types, function (type) {
-      CMS.Models[type].attributes.cycle_objects = 'CMS.Models.CycleTaskGroupObject.stubs';
+      var model = CMS.Models[type];
+      if (model === undefined || model === null) {
+        return;
+      }
+      model.attributes.cycle_objects = 'CMS.Models.CycleTaskGroupObject.stubs';
       mappings[type] = {
         task_groups: new GGRC.ListLoaders.ProxyListLoader('TaskGroupObject', 'object', 'task_group', 'task_group_objects', null),
         cycle_objects: Direct('CycleTaskGroupObject', 'object', 'cycle_task_group_objects'),
@@ -289,7 +296,15 @@
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for workflow page
   WorkflowExtension.init_widgets = function init_widgets() {
-    var page_instance = GGRC.page_instance();
+    var page_instance = GGRC.page_instance(),
+        tree_widgets = GGRC.tree_view.base_widgets_by_type;
+
+    _.each(_workflow_object_types, function (type) {
+      if (!type || !tree_widgets[type]) {
+        return;
+      }
+      tree_widgets[type] = tree_widgets[type].concat(["TaskGroup", "Workflow", "CycleTaskEntry", "CycleTaskGroupObjectTask", "CycleTaskGroupObject", "CycleTaskGroup"]);
+    });
 
     if (page_instance instanceof CMS.Models.Workflow) {
       WorkflowExtension.init_widgets_for_workflow_page();
@@ -392,9 +407,7 @@
 
         // Initialize controller -- probably this should go in a separate
         // initialization area
-        $(function() {
       $(document.body).ggrc_controllers_workflow_page();
-    });
 
         GGRC.register_hook(
             "ObjectNav.Actions",
@@ -501,14 +514,13 @@
         new_widget_descriptors.current = current_widget_descriptor;
 
         new GGRC.WidgetList("ggrc_workflows", {Workflow: new_widget_descriptors});
-
         // Setup extra refresh required due to automatic creation of permissions
         // on creation of WorkflowPerson
         CMS.Models.WorkflowPerson.bind("created", function(ev, instance) {
-      if (instance instanceof CMS.Models.WorkflowPerson) {
-        instance.context.reify().refresh();
-      }
-    });
+          if (instance instanceof CMS.Models.WorkflowPerson) {
+            instance.context && instance.context.reify().refresh();
+          }
+        });
       };
 
   WorkflowExtension.init_widgets_for_person_page =
@@ -560,19 +572,16 @@
       };
 
   WorkflowExtension.init_global = function() {
-    $(function() {
+    if (!GGRC.current_user || !GGRC.current_user.id) {
+      return;
+    }
 
-      if (!GGRC.current_user || !GGRC.current_user.id) {
-        return;
-      }
-
-      CMS.Models.Person.findOne({
-        id: GGRC.current_user.id
-      }).then(function(person) {
-        $('.task-count').ggrc_controllers_mapping_count({
-          mapping: 'assigned_tasks',
-          instance: person
-        });
+    CMS.Models.Person.findOne({
+      id: GGRC.current_user.id
+    }).then(function(person) {
+      $('.task-count').ggrc_controllers_mapping_count({
+        mapping: 'assigned_tasks',
+        instance: person
       });
     });
   };
@@ -589,7 +598,6 @@
   WorkflowExtension.init_mappings();
 
   var draft_on_update_mixin = can.Model.Mixin({
-
   }, {
     before_update: function() {
       if (this.status && this.os_state === "Approved") {
@@ -598,7 +606,11 @@
     }
   });
   can.each(_workflow_object_types, function(model_name) {
-    draft_on_update_mixin.add_to(CMS.Models[model_name]);
+    var model = CMS.Models[model_name];
+    if (model === undefined || model === null) {
+      return;
+    }
+    draft_on_update_mixin.add_to(model);
   });
 
 })(this.can.$, this.CMS, this.GGRC);

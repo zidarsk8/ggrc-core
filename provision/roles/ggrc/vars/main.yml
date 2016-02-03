@@ -15,7 +15,7 @@ ggrc_packages:
   - name: python-imaging
   - name: sqlite3
   - name: python-dev
-  - name: rubygems
+  - name: ruby
   - name: nodejs
 
 ggrc_development_directories:
@@ -28,8 +28,12 @@ ggrc_global_npm_modules:
   - name: nodeunit
   - name: pegjs
   - name: karma-cli
+  - name: karma-junit-reporter
   - name: jasmine-core
   - name: mkdirp
+  - name: bower
+  - name: eslint
+  - name: eslint-config-google
 
 ggrc_local_npm_modules:
   - name: karma

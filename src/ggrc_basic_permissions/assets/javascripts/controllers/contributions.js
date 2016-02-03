@@ -149,6 +149,8 @@
       join_query: {},
       join_object: null,
 
+      selected_id: null,
+
       modal_title: null,
       option_list_title: null,
       active_list_title: null,
@@ -290,7 +292,7 @@
         $.extend(params, this.option_query),
         function(options) {
           var scope = params.scope || "System";
-          options = can.makeArray(options).sort(function(a,b){return a.id-b.id;});
+          options = can.makeArray(_.sortBy(options, "role_order"))
           if (params.scope == "Private Program") {
             description = "A person with the No Access role will not be able to see this Private Program.";
           }
@@ -335,22 +337,21 @@
     },
 
     update_option_radios: function() {
-      var self = this
-        , role_found = false
-        , $option_list = $(this.element).find('.option_column ul')
-        ;
-
-      this.join_list.forEach(function(join, index, list) {
-        var $option = $option_list
-          .find('li[data-id=' + join[self.options.option_attr].id + '] input[type=radio]');
-        if($option.length == 1){
-          $option.prop('checked', true);
-          role_found = true;
-        }
+      var allowed_ids = can.map(this.context.options, function(join) {
+        return join.id;
       });
-      if(!role_found){
-        $option_list.find('li[data-id=0] input[type=radio]').prop('checked', true);
+      if (!allowed_ids.length) {
+        return;
       }
+      if (!this.join_list.length) {
+        this.context.attr('selected_id', 0);
+      }
+      this.join_list.forEach(function(join) {
+        var id = join[this.options.option_attr].id;
+        if (allowed_ids.indexOf(id) >= 0) {
+          this.context.attr('selected_id', id);
+        }
+      }.bind(this));
     },
 
     /*" hide": function(el, ev) {
@@ -378,20 +379,27 @@
       var self = this
         , el = $(".people-selector").find("input[type=radio]:checked")
         , li = el.closest('li')
-        , clicked_option = li.data('option')
+        , clicked_option = li.data('option') || {}
         , join
+        , delete_dfds
+        , already_exists = false
         ;
 
       // Look for and remove the existing join.
-      $.map(li.parent().children(), function(el){
+      delete_dfds = $.map(li.parent().children(), function(el){
         var el = $(el)
         , option = el.closest('li').data('option')
         , join = self.find_join(option.id)
         ;
 
+        if (join && join.role.id === clicked_option.id) {
+          // Don't delete the role we marked to add.
+          already_exists = true;
+          return;
+        }
         if(join) {
-          join.refresh().done(function() {
-            join.destroy().then(function() {
+          return join.refresh().done(function() {
+            return join.destroy().then(function() {
               self.element.trigger("relationshipdestroyed", join);
             });
           });
@@ -399,13 +407,16 @@
       });
 
       // Create the new join (skipping "No Access" role, with id == 0)
-      if (clicked_option.id > 0) {
-        join = self.get_new_join(
-            clicked_option.id, clicked_option.scope, clicked_option.constructor.shortName);
-        join.save().then(function() {
-            self.join_list.push(join);
-            self.refresh_option_list();
-            self.element.trigger("relationshipcreated", join);
+      if (clicked_option.id > 0 && !already_exists) {
+
+        $.when.apply($, delete_dfds).then(function() {
+          join = self.get_new_join(
+              clicked_option.id, clicked_option.scope, clicked_option.constructor.shortName);
+          join.save().then(function() {
+              self.join_list.push(join);
+              self.refresh_option_list();
+              self.element.trigger("relationshipcreated", join);
+          });
         });
       }
     },

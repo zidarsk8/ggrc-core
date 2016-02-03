@@ -25,7 +25,7 @@
       <div class="span12">
         <h6>Description</h6>
         <div class="rtf">
-          {{{firstnonempty description '<em>No description</em>'}}}
+          {{{firstnonempty description '<span class="empty-message">None</span>'}}}
         </div>
       </div>
     </div>
@@ -36,18 +36,13 @@
       <div class="span12">
         <h6>Email</h6>
         <p class="oneline">
-          <a class="url" href="mailto:{{email}}" target="_blank">
-            {{email}}
-          </a>
-          {{^if is_enabled}}
-            <span class="user-disabled">
-              (Disabled)
-            </span>
-          {{/if}}
+          {{#using person=this}}
+            {{>'/static/mustache/people/popover.mustache'}}
+          {{/using}}
         </p>
       </div>
     </div>
-    
+
     {{#if company.length}}
       <div class="row-fluid">
         <div class="span12">
@@ -57,9 +52,9 @@
           </p>
         </div>
       </div>
-    {{/if}}   
-    
-  {{/if_equals}}  
+    {{/if}}
+
+  {{/if_equals}}
 
   {{^if_equals instance.class.table_singular 'person'}}
     {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
@@ -69,21 +64,21 @@
     <div class="span5">
       {{#visibility_delay 500}}
       <div class="info">
-        <i class="grcicon-control-color"></i>
+        <i class="fa fa-control color"></i>
         {{#with_mapping_count instance 'controls' 'related_controls' 'controls'}}
           {{count}}
         {{else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
         {{/with_mapping_count}}
         &nbsp;&nbsp;
-        <i class="grcicon-process-color"></i>
+        <i class="fa fa-process color"></i>
         {{#with_mapping_count instance 'related_processes' 'related_processes' 'processes'}}
           {{count}}
         {{else}}
           <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
         {{/with_mapping_count}}
         &nbsp;&nbsp;
-        <i class="grcicon-system-color"></i>
+        <i class="fa fa-system color"></i>
         {{#with_mapping_count instance 'related_systems' 'related_systems' 'systems'}}
           {{count}}
         {{else}}
@@ -116,19 +111,15 @@
               {{#with_direct_mappings_as 'mappings' page_instance instance}}
                 {{#if mappings.length}}
                   <span class="primary">
-                    <i class="grcicon-checked"></i>
+                    <i class="fa fa-check-square-o"></i>
                     Relevant to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
                   </span>
                 {{else}}
                   {{#is_allowed_to_map page_instance instance join=true}}
-                  {{#if_helpers '\
-                    ^if_instance_of' page_instance 'Directive' '\
-                    or ^if_instance_of' instance 'Section'}}
                   <a class="primary map-to-page-object" href="javascript://" data-follow="true" {{#instance}}{{data 'instance'}}{{/instance}}>
-                    <i class="grcicon-reg-map"></i>
+                    <i class="fa fa-random black"></i>
                     Map to this {{#page_instance.class.title_singular}}{{toLowerCase}}{{/page_instance.class.title_singular}}
                   </a>
-                  {{/if_helpers}}
                   {{/is_allowed_to_map}}
                 {{/if}}
               {{/with_direct_mappings_as}}

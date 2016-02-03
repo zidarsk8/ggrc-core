@@ -14,11 +14,11 @@
     root_object: "notification_config",
     root_collection: "notification_configs",
     category: "person",
-    findAll: "GET /api/notification_config",
-    findOne: "GET /api/notification_config/{id}",
-    create: "POST /api/notification_config",
-    update: "PUT /api/notification_config/{id}",
-    destroy: "DELETE /api/notification_config/{id}",
+    findAll: "GET /api/notification_configs",
+    findOne: "GET /api/notification_configs/{id}",
+    create: "POST /api/notification_configs",
+    update: "PUT /api/notification_configs/{id}",
+    destroy: "DELETE /api/notification_configs/{id}",
     active: "POST /api/set_active_notifications",
 
     findActive: function(){

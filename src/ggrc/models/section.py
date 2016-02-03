@@ -3,24 +3,32 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: vraj@reciprocitylabs.com
 
-from sqlalchemy.orm import validates
-
 from ggrc import db
-from ggrc.models.exceptions import ValidationError
-from ggrc.models.mixins import (
-    deferred, Hierarchical, Noted, Described, Hyperlinked, WithContact,
-    Titled, Slugged, CustomAttributable, Stateful, Timeboxed
-)
+from ggrc.models.directive import Directive
+from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import Described
+from ggrc.models.mixins import Hierarchical
+from ggrc.models.mixins import Hyperlinked
+from ggrc.models.mixins import Noted
+from ggrc.models.mixins import Slugged
+from ggrc.models.mixins import Stateful
+from ggrc.models.mixins import Titled
+from ggrc.models.mixins import WithContact
+from ggrc.models.mixins import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
-from ggrc.models.track_object_state import track_state_for_class
+from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
+from ggrc.models.track_object_state import track_state_for_class
 
 
-class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
-                  WithContact, Titled, Slugged, Stateful, db.Model):
+class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
+              WithContact, Titled, Slugged, Stateful, db.Model,
+              CustomAttributable, Documentable, Personable,
+              Ownable, Relatable):
   VALID_STATES = [
       'Draft',
       'Final',
@@ -32,84 +40,50 @@ class SectionBase(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
       'Not in Scope',
       'Deprecated',
   ]
-  _table_plural = 'section_bases'
   __tablename__ = 'sections'
-  _title_uniqueness = False
-
-  type = db.Column(db.String)
-  directive_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('directives.id'), nullable=True),
-      'SectionBase')
-  na = deferred(db.Column(db.Boolean, default=False, nullable=False),
-                'SectionBase')
-  notes = deferred(db.Column(db.Text), 'SectionBase')
-
-  __mapper_args__ = {
-      'polymorphic_on': type
+  _table_plural = 'sections'
+  _title_uniqueness = True
+  _aliases = {
+      "url": "Section URL",
+      "description": "Text of Section",
+      "directive": {
+          "display_name": "Policy / Regulation / Standard / Contract",
+          "type": AttributeInfo.Type.MAPPING,
+          "filter_by": "_filter_by_directive",
+      }
   }
 
+  na = deferred(db.Column(db.Boolean, default=False, nullable=False),
+                'Section')
+  notes = deferred(db.Column(db.Text), 'Section')
+
   _publish_attrs = [
-      'directive',
       'na',
       'notes',
   ]
   _sanitize_html = ['notes']
   _include_links = []
-  _aliases = {"directive_id": "Policy / Regulation / Standard"}
-
-  @validates('type')
-  def validates_type(self, key, value):
-    return self.__class__.__name__
 
   @classmethod
-  def generate_slug_prefix_for(cls, obj):
-    from directive import Contract
-    if obj.directive and isinstance(obj.directive, Contract):
-      return "CLAUSE"
-    return super(SectionBase, cls).generate_slug_prefix_for(obj)
-
-  @classmethod
-  def eager_query(cls):
-    from sqlalchemy import orm
-
-    query = super(SectionBase, cls).eager_query()
-    return cls.eager_inclusions(query, SectionBase._include_links).options(
-        orm.joinedload('directive'))
-
-track_state_for_class(SectionBase)
-
-
-class Section(CustomAttributable, Documentable, Personable,
-              Ownable, Relatable, SectionBase):
-  __mapper_args__ = {
-      'polymorphic_identity': 'Section'
-  }
-  _table_plural = 'sections'
-  _aliases = {
-      "url": "Section URL",
-      "description": "Text of Section",
-  }
-
-  @validates('directive_id')
-  def validates_directive_id(self, key, value):
-    if self.directive_id:
-      return self.directive_id
-    raise ValidationError("Directive is required for sections")
-
-  def log_json(self):
-    out_json = super(Section, self).log_json()
-    # so that event log can refer to deleted directive
-    out_json["mapped_directive"] = self.directive.display_name
-    return out_json
+  def _filter_by_directive(cls, predicate):
+    types = ["Policy", "Regulation", "Standard", "Contract"]
+    dst = Relationship.query \
+        .filter(
+            (Relationship.source_id == cls.id) &
+            (Relationship.source_type == cls.__name__) &
+            (Relationship.destination_type.in_(types))) \
+        .join(Directive, Directive.id == Relationship.destination_id) \
+        .filter(predicate(Directive.slug) | predicate(Directive.title)) \
+        .exists()
+    src = Relationship.query \
+        .filter(
+            (Relationship.destination_id == cls.id) &
+            (Relationship.destination_type == cls.__name__) &
+            (Relationship.source_type.in_(types))) \
+        .join(Directive, Directive.id == Relationship.source_id) \
+        .filter(predicate(Directive.slug) | predicate(Directive.title)) \
+        .exists()
+    return dst | src
 
 
-class Clause(CustomAttributable, Documentable, Personable, Ownable,
-             Timeboxed, Relatable, SectionBase):
-  __mapper_args__ = {
-      'polymorphic_identity': 'Clause'
-  }
-  _table_plural = 'clauses'
-  _aliases = {
-      "url": "Clause URL",
-      "directive_id": None,
-  }
+track_state_for_class(Section)

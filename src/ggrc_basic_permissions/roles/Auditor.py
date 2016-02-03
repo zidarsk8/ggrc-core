@@ -1,3 +1,8 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: anze@reciprocitylabs.com
+# Maintained By: anze@reciprocitylabs.com
+
 scope = "Audit"
 description = """
   The permissions required by an auditor to access relevant resources for the
@@ -7,44 +12,11 @@ permissions = {
     "read": [
         "Audit",
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
-        {
-            "terms": {
-                "property_name": "status",
-                "value": [
-                    "Submitted",
-                    "Accepted",
-                    "Rejected"
-                ]
-            },
-            "type": "DocumentationResponse",
-            "condition": "in"
-        },
-        {
-            "terms": {
-                "property_name": "status",
-                "value": [
-                    "Submitted",
-                    "Accepted",
-                    "Rejected"
-                ]
-            },
-            "type": "InterviewResponse",
-            "condition": "in"
-        },
-        {
-            "terms": {
-                "property_name": "status",
-                "value": [
-                    "Submitted",
-                    "Accepted",
-                    "Rejected"
-                ]
-            },
-            "type": "PopulationSampleResponse",
-            "condition": "in"
-        },
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
         "Meeting",
         "ObjectDocument",
         "ObjectPerson",
@@ -52,25 +24,37 @@ permissions = {
         "Document",
         "Meeting",
         "UserRole",
+        "Comment",
         "Context",
     ],
     "create": [
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
+        "Relationship",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
+        "Comment",
     ],
     "view_object_page": [
         "__GGRC_ALL__"
     ],
     "update": [
         "Request",
-        "ControlAssessment",
+        "Assessment",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
-        "PopulationSampleResponse"
+        "PopulationSampleResponse",
+        "Comment"
     ],
     "delete": [
         "Request",
+        "Assessment",
+        "Issue",
+        "DocumentationResponse",
+        "InterviewResponse",
+        "PopulationSampleResponse",
     ],
 }

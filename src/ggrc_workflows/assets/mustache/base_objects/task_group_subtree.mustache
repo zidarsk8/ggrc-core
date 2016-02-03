@@ -1,20 +1,20 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     <div class="item-main objective-selector field-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
       <div class="row-fluid">
         <div class="span11">
           <div class="row-fluid">
             <div class="span1">
-              <i class="grcicon-{{instance.class.table_singular}}-color"></i>
+              <i class="fa fa-{{instance.class.table_singular}} color"></i>
             </div>
             <div class="span11">
               <span class="inline-data-content oneline" rel="tooltip" title="{{instance.title}}">
-                {{#if_helpers '\
-                  #if_equals' instance.type "Program" '\
-                  and #if' instance.private}}
-                  <span class="private">
-                    <i class="grcicon-private"></i>
-                  </span>
-                {{/if_helpers}}
                 {{instance.title}}
               </span>
             </div>
@@ -27,7 +27,7 @@
             {{#if mappings}}
               {{#is_allowed_all 'delete' mappings}}
                 <a href="javascript://" data-toggle="unmap" data-id="{{instance.id}}" data-type="{{instance.class.shortName}}" class="deleteTrigger">
-                  <i class="grcicon-deleted"></i>
+                  <i class="fa fa-trash"></i>
                   {{#result}}
                     <span class="result" {{data 'result'}}></span>
                   {{/result}}

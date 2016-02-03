@@ -1,0 +1,61 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+
+<label>
+  <span class="person-label {{type}}"></span>
+  {{#has_permissions}}
+    {{^toggle toggle_add}}
+      <span class="file-controls">
+        <a href="javascript://" {{toggle_button}}>
+          <i class="fa fa-plus-circle"></i>
+        </a>
+      </span>
+    {{/toggle}}
+  {{/has_permissions}}
+  {{type}}(s)
+  {{#if editable}}
+    {{#if required}}
+      <span class="required">*</span>
+    {{/if}}
+  {{/if}}
+</label>
+<ul class="inner-count-list">
+  {{^if results.length}}
+    <li><i> No {{type}}s</i></li>
+  {{/if}}
+  {{#results}}
+    <li>
+      {{#has_permissions}}
+        {{#can_unmap}}
+        <span class="file-controls">
+          <a href="javascript://" class="info-action unmap" can-click="remove_role" data-person={{id}}>
+            <span class="result" {{data 'result'}}></span>
+            <i class="fa fa-trash"></i>
+          </a>
+        </span>
+        {{/can_unmap}}
+      {{/has_permissions}}
+      {{{render '/static/mustache/people/popover.mustache' person=.}}}
+    </li>
+  {{/results}}
+  <li class="person-add">
+    {{#show_add}}
+      {{#has_permissions}}
+        {{#toggle toggle_add}}
+          <i class="fa fa-user green pull-left icon-field"></i>
+          <div class="person-selector">
+            <input tabindex="7" type="text" name="" class="search-icon" data-lookup="Person" placeholder="Search for {{type}}" null-if-empty="false" value="" {{autocomplete_select}} />
+            <a href="javascript://" {{toggle_button}}>
+              <i class="fa fa-times"></i>
+            </a>
+          </div>
+        {{/toggle}}
+      {{/has_permissions}}
+    {{/show_add}}
+  </li>
+</ul>

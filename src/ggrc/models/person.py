@@ -3,20 +3,21 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-from ggrc.app import app, db
-from ggrc.models.computed_property import computed_property
-
-from sqlalchemy.orm import validates
-from .mixins import deferred, Base, CustomAttributable
-from .reflection import PublishOnly
-from .utils import validate_option
-from .exceptions import ValidationError
-from .context import HasOwnContext
-
 import re
+from sqlalchemy.orm import validates
+
+from ggrc import db
+from ggrc import settings
+from ggrc.models.computed_property import computed_property
+from ggrc.models.context import HasOwnContext
+from ggrc.models.exceptions import ValidationError
+from ggrc.models.mixins import deferred, Base, CustomAttributable
+from ggrc.models.reflection import PublishOnly
+from ggrc.models.relationship import Relatable
+from ggrc.models.utils import validate_option
 
 
-class Person(CustomAttributable, HasOwnContext, Base, db.Model):
+class Person(CustomAttributable, HasOwnContext, Relatable, Base, db.Model):
 
   __tablename__ = 'people'
 
@@ -24,7 +25,6 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
   name = deferred(db.Column(db.String), 'Person')
   language_id = deferred(db.Column(db.Integer), 'Person')
   company = deferred(db.Column(db.String), 'Person')
-  is_enabled = deferred(db.Column(db.Boolean), 'Person')
 
   object_people = db.relationship(
       'ObjectPerson', backref='person', cascade='all, delete-orphan')
@@ -36,12 +36,6 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
       'Option.role == "person_language")',
       uselist=False,
   )
-
-  def __init__(self, **kwargs):
-    # Default is_enabled to True
-    if 'is_enabled' not in kwargs:
-      kwargs['is_enabled'] = True
-    super(Person, self).__init__(**kwargs)
 
   @staticmethod
   def _extra_table_args(cls):
@@ -60,7 +54,6 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
       'email',
       'language',
       'name',
-      'is_enabled',
       PublishOnly('object_people'),
       PublishOnly('system_wide_role'),
   ]
@@ -71,10 +64,26 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
   _include_links = []
   _aliases = {
       "name": "Name",
-      "email": "Email",
-      "is_enabled": "enabled user",
+      "email": {
+          "display_name": "Email",
+          "unique": True,
+      },
       "company": "Company",
+      "user_role": {
+          "display_name": "Role",
+          "type": "user_role",
+          "filter_by": "_filter_by_user_role",
+      },
   }
+
+  @classmethod
+  def _filter_by_user_role(cls, predicate):
+    from ggrc_basic_permissions.models import Role, UserRole
+    return UserRole.query.join(Role).filter(
+        (UserRole.person_id == cls.id) &
+        (UserRole.context_id == None) &
+        predicate(Role.name)
+    ).exists()
 
   # Methods required by Flask-Login
   def is_authenticated(self):
@@ -87,7 +96,7 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
     return False
 
   def get_id(self):
-    return unicode(self.id)
+    return unicode(self.id)  # noqa
 
   @validates('language')
   def validate_person_options(self, key, option):
@@ -134,19 +143,20 @@ class Person(CustomAttributable, HasOwnContext, Base, db.Model):
     # FIXME: This method should be in `ggrc_basic_permissions`, since it
     #   depends on `Role` and `UserRole` objects
 
-    if 'BOOTSTRAP_ADMIN_USERS' in app.config \
-            and self.email in app.config['BOOTSTRAP_ADMIN_USERS']:
+    if self.email in getattr(settings, "BOOTSTRAP_ADMIN_USERS", []):
       return u"Superuser"
 
     ROLE_HIERARCHY = {
         u'gGRC Admin': 0,
-        u'ProgramCreator': 1,
-        u'ObjectEditor': 2,
-        u'Reader': 3
+        u'Editor': 1,
+        u'Reader': 2,
+        u'Creator': 3,
     }
+    system_wide_roles = ROLE_HIERARCHY.keys()
     unique_roles = set([
         user_role.role.name
-        for user_role in self.user_roles if not user_role.context_id
+        for user_role in self.user_roles
+        if user_role.role.name in system_wide_roles
     ])
     if len(unique_roles) == 0:
       return u"No Access"

@@ -5,41 +5,44 @@
     Maintained By: anze@reciprocitylabs.com
 */
 
-(function(can, $) {
-
+(function (can, $) {
   can.Component.extend({
-    tag: "custom-attributes",
+    tag: 'custom-attributes',
     scope: {
       instance: null,
       // Make sure custom_attribute_definitions & custom_attribute_values
       // get loaded
-      load: "@",
-      loading: false
+      load: '@',
+      loading: false,
+      refreshAttributes: function () {
+        this.attr('loading', true);
+        $.when(
+          this.instance.load_custom_attribute_definitions(),
+          this.instance.refresh_all('custom_attribute_values')
+        ).always(function () {
+          this.attr('loading', false);
+        }.bind(this));
+      }
     },
-    content: "<content/>",
+    content: '<content/>',
     events: {
+      '{scope.instance} updated': function () {
+        this.scope.refreshAttributes();
+      }
     },
-    init: function() {
-      var instance = this.scope.instance,
-          scope = this.scope;
-      if (!instance.class.is_custom_attributable) {
+    init: function () {
+      if (!this.scope.instance.class.is_custom_attributable) {
         return;
       }
       if (this.scope.load) {
-        scope.attr('loading', true);
-        $.when(
-          instance.load_custom_attribute_definitions(),
-          instance.refresh_all('custom_attribute_values')
-        ).always(function() {
-          scope.attr('loading', false);
-        });
+        this.scope.refreshAttributes();
       }
     },
     helpers: {
-      with_value_for_id: function(id, options) {
+      with_value_for_id: function (id, options) {
         var ret;
         id = Mustache.resolve(id);
-        can.each(this.instance.custom_attribute_values, function(value) {
+        can.each(this.instance.custom_attribute_values, function (value) {
           value = value.reify();
           if (value.custom_attribute_id === id) {
             ret = value.attribute_value;
@@ -51,5 +54,4 @@
       }
     }
   });
-
 })(window.can, window.can.$);

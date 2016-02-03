@@ -3,10 +3,12 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+from sqlalchemy import and_, or_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
+from ggrc.models.person import Person
 from ggrc.models.mixins import Mapping
 from ggrc.models.reflection import PublishOnly
 
@@ -83,7 +85,13 @@ class Ownable(object):
       PublishOnly('object_owners'),
   ]
   _include_links = []
-  _aliases = {"owners": "Owner"}
+  _aliases = {
+      "owners": {
+          "display_name": "Owner",
+          "mandatory": True,
+          "filter_by": "_filter_by_owners",
+      }
+  }
 
   @classmethod
   def eager_query(cls):
@@ -92,3 +100,12 @@ class Ownable(object):
     query = super(Ownable, cls).eager_query()
     return cls.eager_inclusions(query, Ownable._include_links).options(
         orm.subqueryload('object_owners'))
+
+  @classmethod
+  def _filter_by_owners(cls, predicate):
+    return ObjectOwner.query.join(Person).filter(and_(
+      (ObjectOwner.ownable_id == cls.id),
+      (ObjectOwner.ownable_type == cls.__name__),
+      or_(predicate(Person.name), predicate(Person.email))
+    )).exists()
+

@@ -18,9 +18,9 @@ from sqlalchemy.orm.session import Session
 from ggrc import db
 from ggrc.models.inflector import ModelInflectorDescriptor
 from ggrc.models.reflection import AttributeInfo
-from ggrc.models.reflection import PublishOnly
 from ggrc.models.computed_property import computed_property
 
+from ggrc.utils import underscore_from_camelcase
 
 """Mixins to add common attributes and relationships. Note, all model classes
 must also inherit from ``db.Model``. For example:
@@ -411,12 +411,30 @@ class Slugged(Base):
   _publish_attrs = ['slug']
   _fulltext_attrs = ['slug']
   _sanitize_html = ['slug']
-  _aliases = {"slug": "Code"}
+  _aliases = {
+      "slug": {
+          "display_name": "Code",
+          "description": ("Must be unique. Can be left empty for "
+                          "autogeneration. If updating or deleting, "
+                          "code is required"),
+      }
+  }
 
   @classmethod
   def generate_slug_for(cls, obj):
-    id = obj.id if hasattr(obj, 'id') else uuid1()
-    obj.slug = "{0}-{1}".format(cls.generate_slug_prefix_for(obj), id)
+    _id = getattr(obj, 'id', uuid1())
+    obj.slug = "{0}-{1}".format(cls.generate_slug_prefix_for(obj), _id)
+    # We need to make sure the generated slug is not already present in the
+    # database. If it is, we increment the id until we find a slug that is
+    # unique.
+    # A better approach would be to query the database for slug uniqueness
+    # only if the there was a conflict, but because we can't easily catch a
+    # session rollback at this point we are sticking with a
+    # suboptimal solution for now.
+    INCREMENT = 1000
+    while cls.query.filter(cls.slug == obj.slug).count():
+      _id += INCREMENT
+      obj.slug = "{0}-{1}".format(cls.generate_slug_prefix_for(obj), _id)
 
   @classmethod
   def generate_slug_prefix_for(cls, obj):
@@ -490,9 +508,33 @@ class WithContact(object):
 
   _publish_attrs = ['contact', 'secondary_contact']
   _aliases = {
-      "contact": "Primary Contact",
-      "secondary_contact": "Secondary Contact",
+      "contact": {
+          "display_name": "Primary Contact",
+          "filter_by": "_filter_by_contact",
+      },
+      "secondary_contact": {
+          "display_name": "Secondary Contact",
+          "filter_by": "_filter_by_secondary_contact",
+      },
   }
+
+  @classmethod
+  def _filter_by_contact(cls, predicate):
+    # dependency cycle mixins.py <~> person.py
+    from ggrc.models.person import Person
+    return Person.query.filter(
+        (Person.id == cls.contact_id) &
+        (predicate(Person.name) | predicate(Person.email))
+    ).exists()
+
+  @classmethod
+  def _filter_by_secondary_contact(cls, predicate):
+    # dependency cycle mixins.py <~> person.py
+    from ggrc.models.person import Person
+    return Person.query.filter(
+        (Person.id == cls.secondary_contact_id) &
+        (predicate(Person.name) | predicate(Person.email))
+    ).exists()
 
 
 class BusinessObject(
@@ -518,9 +560,11 @@ class CustomAttributable(object):
   @declared_attr
   def custom_attribute_values(cls):
     from ggrc.models.custom_attribute_value import CustomAttributeValue
-    join_function = lambda: and_(
-        foreign(CustomAttributeValue.attributable_id) == cls.id,
-        foreign(CustomAttributeValue.attributable_type) == cls.__name__)
+
+    def join_function():
+      return and_(
+          foreign(CustomAttributeValue.attributable_id) == cls.id,
+          foreign(CustomAttributeValue.attributable_type) == cls.__name__)
     return relationship(
         "CustomAttributeValue",
         primaryjoin=join_function,
@@ -577,23 +621,25 @@ class CustomAttributable(object):
       # av.context_id = cls.context_id
       db.session.add(av)
 
-  _publish_attrs = ['custom_attribute_values', ]
+  _publish_attrs = ['custom_attribute_values']
   _update_attrs = ['custom_attributes']
   _include_links = []
-  _aliases = {"custom_attributes": "Custom Attributes"}
 
   @declared_attr
   def custom_attribute_definitions(cls):
     # FIXME definitions should be class scoped, not instance scoped.
-    from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+    from ggrc.models.custom_attribute_definition import \
+        CustomAttributeDefinition
     definition_type = foreign(CustomAttributeDefinition.definition_type)
-    join_function = lambda: or_(
-        definition_type == cls.__name__,
-        # The bottom statement always evaluates to False, and is here just to
-        # satisfy sqlalchemys need for use of foreing keys while defining a
-        # relationship.
-        definition_type == cls.id,
-    )
+
+    def join_function():
+      return or_(
+          definition_type == underscore_from_camelcase(cls.__name__),
+          # The bottom statement always evaluates to False, and is here just to
+          # satisfy sqlalchemys need for use of foreing keys while defining a
+          # relationship.
+          definition_type == cls.id,
+      )
     return db.relationship(
         "CustomAttributeDefinition",
         primaryjoin=join_function
@@ -601,9 +647,11 @@ class CustomAttributable(object):
 
   @classmethod
   def get_custom_attribute_definitions(cls):
-    from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+    from ggrc.models.custom_attribute_definition import \
+        CustomAttributeDefinition
     return CustomAttributeDefinition.query.filter(
-        CustomAttributeDefinition.definition_type == cls.__name__).all()
+        CustomAttributeDefinition.definition_type ==
+        underscore_from_camelcase(cls.__name__)).all()
 
 
 class TestPlanned(object):
@@ -617,3 +665,48 @@ class TestPlanned(object):
   _fulltext_attrs = ['test_plan']
   _sanitize_html = ['test_plan']
   _aliases = {"test_plan": "Test Plan"}
+
+
+class Assignable(object):
+
+  ASSIGNEE_TYPES = set(["Assignee"])
+
+  @property
+  def assignees(self):
+    assignees = [(r.source, tuple(r.attrs["AssigneeType"].split(",")))
+                 for r in self.related_sources
+                 if "AssigneeType" in r.attrs]
+    assignees += [(r.destination, tuple(r.attrs["AssigneeType"].split(",")))
+                  for r in self.related_destinations
+                  if "AssigneeType" in r.attrs]
+    return set(assignees)
+
+  @staticmethod
+  def _validate_relationship_attr(cls, source, dest, existing, name, value):
+    """Validator that allows Assignable relationship attributes
+
+    Allow relationship attribute of name "AssigneeType" with value that is a
+    comma separated list of valid roles (as defined in target class).
+
+    Args:
+        cls (class): target class of this mixin. Think of this like a class
+                     method.
+        source (model instance): relevant relationship source
+        dest (model instance): relevant relationship destinations
+        existing (dict): current attributes on the relationship
+        name (string): attribute name
+        value (any): attribute value. Should be string for the right attribute
+
+    Returns:
+        New attribute value (merge with existing roles) or None if the
+        attribute is not valid.
+    """
+    if not set([source.type, dest.type]) == set([cls.__name__, "Person"]):
+      return None
+    if not name == "AssigneeType":
+      return None
+    new_roles = value.split(",")
+    if not all(role in cls.ASSIGNEE_TYPES for role in new_roles):
+      return None
+    roles = set(existing.get(name, "").split(",")) | set(new_roles)
+    return ",".join(role for role in roles if role)
