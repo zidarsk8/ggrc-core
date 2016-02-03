@@ -11,9 +11,8 @@ Create Date: 2015-04-03 10:12:50.583661
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.sql import table, column
+# Disable Invalid constant name pylint warning for mandatory Alembic variables.
+# pylint: disable=C0103
 
 # revision identifiers, used by Alembic.
 revision = '4f9f00e4faca'
@@ -21,30 +20,10 @@ down_revision = '8e530ce276a'
 
 
 def upgrade():
-  object_types_table = table(
-      'object_types',
-      column('id', sa.Integer),
-      column('name', sa.String),
-      column('description', sa.Text),
-      column('created_at', sa.DateTime),
-      column('modified_by_id', sa.Integer),
-      column('updated_at', sa.DateTime),
-      column('context_id', sa.Integer),
-  )
-
-  op.bulk_insert(
-      object_types_table,
-      [
-          {"name": "Workflow", "description": ""},
-          {"name": "TaskGroup", "description": ""},
-          {"name": "TaskGroupTask", "description": ""},
-          {"name": "TaskGroupObject", "description": ""},
-          {"name": "Cycle", "description": ""},
-          {"name": "CycleTaskGroup", "description": ""},
-          {"name": "CycleTaskGroupObject", "description": ""},
-          {"name": "CycleTaskGroupObjectTask", "description": ""},
-      ]
-  )
+  # This migration has been removed due to remove_object_type_table migration.
+  # The object_types table has been removed and there should not be any more
+  # refferences to that table.
+  pass
 
 
 def downgrade():
