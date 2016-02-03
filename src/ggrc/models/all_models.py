@@ -27,7 +27,6 @@ from ggrc.models.market import Market
 from ggrc.models.object_document import ObjectDocument
 from ggrc.models.object_owner import ObjectOwner
 from ggrc.models.object_person import ObjectPerson
-from ggrc.models.object_type import ObjectType
 from ggrc.models.objective import Objective
 from ggrc.models.option import Option
 from ggrc.models.org_group import OrgGroup
@@ -83,7 +82,6 @@ all_models = [
     ObjectDocument,
     ObjectOwner,
     ObjectPerson,
-    ObjectType,
     Option,
     OrgGroup,
     Vendor,
