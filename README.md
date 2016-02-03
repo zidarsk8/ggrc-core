@@ -1,16 +1,29 @@
-gGRC-Core
+Google Governance, Risk and Compliance (GGRC)
 =========
 
 [![Travis status](https://travis-ci.org/google/ggrc-core.svg?branch=develop)](https://travis-ci.org/google/ggrc-core)
 [![Code Climate](https://codeclimate.com/github/google/ggrc-core/badges/gpa.svg)](https://codeclimate.com/github/google/ggrc-core)
 
-Google Governance, Risk and Compliance. Migrated from [Google](https://code.google.com/p/compliance-management/)
+Governance, Risk Management, and Compliance are activities necessary for any organization with regulatory or contractual obligations. 
+
+Governance refers to management structure, policies, procedures, shareholder relations, etc. 
+
+Risk Management is a process to identify business and technical risks as well as means to mitigate those. 
+
+Compliance refers to processes necessary to meet applicable regulations and communicate to stakeholders about it.  
+
+Many organizations operate in multiple jurisdictions worldwide, each of which has its own and often overlapping laws and regulations.   Organizational functions and information relating to risk management and compliance often tend to be managed in silos reflecting the multiple jurisdictions, scope, stakeholder diversity and historical basis.   This leads to inefficiency.  
+
+The GGRC project intends to provide an open source solution for managing some of these common problems.  The application provides a common system of record for information in this domain.   It provides the ability to capture the relationships and to understand how the pieces fit together.  It also provides workflow capability to manage processes in this domain.
+
+
+Migrated from [Google](https://code.google.com/p/compliance-management/)
 [Code](https://code.google.com/p/ggrc-core).
 
 Requirements
 ------------
 
-The following software is required to stand up a gGRC-Core development
+The following software is required to stand up a GGRC-Core development
 environment:
 
 |               Prerequisite               |               Description                |
@@ -29,7 +42,7 @@ Or alternatively (see Quickstart with docker)
 Quick Start
 -----------
 
-Getting started with gGRC-Core development should be fast and easy once you
+Getting started with GGRC-Core development should be fast and easy once you
 have the prerequisite software installed. Here are the steps:
 
 * clone the repo
@@ -75,7 +88,7 @@ And then continue just like with vagrant
 
     docker-compose --no-recreate
 
-### Launching gGRC as Stand-alone Flask
+### Launching GGRC as Stand-alone Flask
 
 Most development is done in a stand-alone flask. We strive to make getting up
 and running as simple as possible; to that end, launching the application is
@@ -146,14 +159,14 @@ On the host machine in the root of the repository run:
 Quickstart Breakdown
 --------------------
 
-The quickstart above gives a glimpse into the gGRC development environment.
-It's worth noting where there is automation in gGRC, and where there isn't.
+The quickstart above gives a glimpse into the GGRC development environment.
+It's worth noting where there is automation in GGRC, and where there isn't.
 Often the lack of automation support for a step is intentional. Let's explore
 each step in detail.
 
-### Git Submodules in gGRC
+### Git Submodules in GGRC
 
-gGRC makes use of some external tools for [Sass](http://sass-lang.com/)
+GGRC makes use of some external tools for [Sass](http://sass-lang.com/)
 templates and JavaScript form handling. In order to have the relevant
 repositories checked out as Git submodules the following command must be
 issued in the project directory:
@@ -164,7 +177,7 @@ git submodule init
 
 The lack of automation for this step is intentional. First, it must be done in
 the host operating system, not the Vagrant virtual machine. Second, performing
-this step informs the new gGRC developer that there are Git submodules to be
+this step informs the new GGRC developer that there are Git submodules to be
 concerned about, leading to the second step:
 
 ```sh
@@ -176,7 +189,7 @@ update to a new revision for one or more of the submodules.
 
 ### Ansible
 
-gGRC-Core provides both a `Vagrantfile` and an Ansible playbook to make
+GGRC-Core provides both a `Vagrantfile` and an Ansible playbook to make
 standing up a development environment simple and repeatable thanks to the magic
 of Vagrant and Ansible. Vagrant enables developers to use a consistent and
 shared VM configuration to perform application testing while allowing
@@ -195,13 +208,13 @@ vagrant up
 ```
 
 This results in the creation of the virtual machine and the provisioning of
-required software to support the development and execution of gGRC.
+required software to support the development and execution of GGRC.
 
 #### Reprovisioning a Vagrant VM
 
 There are several ways to update the provisioning of a Vagrant VM when changes
 have been made to the cookbooks or other dependency management mechanisms in
-gGRC.
+GGRC.
 
 ##### Provision a running Vagrant VM
 
@@ -238,7 +251,7 @@ vagrant up
 
 ### Compiling Sass Templates
 
-Since gGRC uses Sass for CSS templating, the templates need to be compiled.
+Since GGRC uses Sass for CSS templating, the templates need to be compiled.
 This has been automated via a script available in $PATH in the virtual
 machine:
 
@@ -279,11 +292,11 @@ mysql -u root -p ggrcdev < backup-file.sql
 Gotchas
 -------
 
-After sync'ing your local clone of gGRC-Core you may experience a failure when
+After sync'ing your local clone of GGRC-Core you may experience a failure when
 trying to run the application due to a change (usually an addition) to the
 prerequisites.
 
-There are three primary classes of requirements for gGRC-Core: submodules,
+There are three primary classes of requirements for GGRC-Core: submodules,
 cookbooks and Python packages. Cookbooks are managed via specification in the
 `Cheffile` while Python packages are managed via specification in
 [pip](https://en.wikipedia.org/wiki/Pip_(package_manager)) requirements files.
@@ -369,7 +382,7 @@ vagrant provision
 
 ### Changes to `site-cookbooks`
 
-Changes to the recipes defined by gGRC itself can also lead to errors. The
+Changes to the recipes defined by GGRC itself can also lead to errors. The
 solution is to reprovision the Vagrant VM:
 
 ```sh
@@ -387,7 +400,7 @@ git submodule update
 ```
 
 Given that Sass and Javascript related projects are included in the submodule
-requirements of gGRC, it may also be necessary to rebuild the Sass and other
+requirements of GGRC, it may also be necessary to rebuild the Sass and other
 web assets:
 
 ```sh
