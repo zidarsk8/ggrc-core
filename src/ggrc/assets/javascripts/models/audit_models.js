@@ -992,9 +992,13 @@
       }
     },
     assignable_list: [{
+      type: 'creator',
+      mapping: 'related_creators',
+      required: true
+    }, {
       type: 'assessor',
       mapping: 'related_assessors',
-      required: false
+      required: true
     }, {
       type: 'verifier',
       mapping: 'related_verifiers',
@@ -1005,8 +1009,20 @@
         this._super.apply(this, arguments);
       }
       this.validatePresenceOf('object');
-      this.validatePresenceOf('audit');
+      this.validatePresenceOf('validate_creator');
+      this.validatePresenceOf('validate_assessor');
       this.validateNonBlank('title');
+
+      this.validate(['validate_creator', 'validate_assessor'],
+        function (newVal, prop) {
+          if (!this.validate_creator) {
+            return 'You need to specify at least one creator';
+          }
+          if (!this.validate_assessor) {
+            return 'You need to specify at least one assessor';
+          }
+        }
+      );
     }
   }, {
     form_preload: function (newObjectForm) {

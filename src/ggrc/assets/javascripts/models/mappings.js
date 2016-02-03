@@ -688,6 +688,7 @@
       _mixins: [
         "related_object", "personable", "ownable", "documentable"
       ],
+      related_creators: AttrFilter("related_objects", "AssigneeType", "Creator", "Person"),
       related_assessors: AttrFilter("related_objects", "AssigneeType", "Assessor", "Person"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
       comments: TypeFilter("related_objects", "Comment"),

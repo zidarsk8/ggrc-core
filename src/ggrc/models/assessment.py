@@ -26,7 +26,7 @@ class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
   __tablename__ = 'assessments'
 
   VALID_STATES = (u'Open', u'In Progress', u'Finished', u'Verified', u'Final')
-  ASSIGNEE_TYPES = (u'Assessor', u'Verifier')
+  ASSIGNEE_TYPES = (u'Creator', u'Assessor', u'Verifier')
 
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
                     'Assessment')
@@ -34,7 +34,8 @@ class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
   design = deferred(db.Column(db.String), 'Assessment')
   operationally = deferred(db.Column(db.String), 'Assessment')
 
-  audit = {}  # we add this for the sake of client side error checking
+  object = {}  # we add this for the sake of client side error checking
+  audit = {}
 
   VALID_CONCLUSIONS = frozenset([
       "Effective",
@@ -47,7 +48,8 @@ class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
   _publish_attrs = [
       'design',
       'operationally',
-      PublishOnly('audit')
+      PublishOnly('audit'),
+      PublishOnly('object')
   ]
 
   _aliases = {
