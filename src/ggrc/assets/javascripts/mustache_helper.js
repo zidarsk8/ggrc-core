@@ -1181,6 +1181,8 @@ Mustache.registerHelper("link_to_tree", function () {
 Mustache.registerHelper('date', function (date, hide_time) {
   var current_timezone = moment.tz.guess();
   var m;
+
+  if (date === undefined || date === null) {
     return '';
   }
 
