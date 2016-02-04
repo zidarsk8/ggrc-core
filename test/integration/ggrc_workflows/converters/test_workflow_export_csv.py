@@ -312,6 +312,7 @@ class TestExportMultipleObjects(TestCase):
     data = [
         block("Workflow"),
         block("Cycle"),
+        block("CycleTaskGroup"),
         block("CycleTaskGroupObjectTask"),
     ]
     response = self.export_csv(data).data
@@ -324,6 +325,9 @@ class TestExportMultipleObjects(TestCase):
         if cycle_task.cycle_task_group_object.object.slug == "p1"
     ]
 
+    cycle_task_groups = list({cycle_task.cycle_task_group
+                             for cycle_task in cycle_tasks})
+
     self.assertEqual(1, response.count("wf-"))
 
     self.assertRegexpMatches(response, ",{}[,\r\n]".format(wf.slug))
@@ -331,10 +335,16 @@ class TestExportMultipleObjects(TestCase):
     self.assertEqual(1, response.count("CYCLE-"))
     self.assertRegexpMatches(response, ",{}[,\r\n]".format(cycle.slug))
 
+    self.assertEqual(1, response.count("CYCLEGROUP-"))
+    self.assertEqual(1, len(cycle_task_groups))
+    self.assertRegexpMatches(response, ",{}[,\r\n]".format(
+        cycle_task_groups[0].slug))
+
     self.assertEqual(2, response.count("CYCLETASK-"))
     self.assertEqual(2, len(cycle_tasks))
     for cycle_task in cycle_tasks:
-      self.assertRegexpMatches(response, ",{}[,\r\n]".format(cycle_task.slug))
+      self.assertRegexpMatches(response, ",{}[,\r\n]".format(
+          cycle_task.slug))
 
     destinations = [
         ("Workflow", wf.slug, 3),
