@@ -55,7 +55,7 @@ class WidgetBar(object):
 class WidgetProgramInfo(object):
     SUBMIT_FOR_REVIEW = "Submit For Review"
 
-    # state in modal create new page
+    # state in lhn_modal create new page
     DRAFT = "Draft"
     FINAL = "Final"
     EFFECTIVE = "Effective"
