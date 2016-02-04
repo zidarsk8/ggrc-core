@@ -46,10 +46,10 @@
       hidable: false
     }),
     start_date: Generator.create({
-      hidable: true
+      hidable: false
     }),
     end_date: Generator.create({
-      hidable: true
+      hidable: false
     }),
     t_description: Generator.create({
       hidable: true
@@ -58,7 +58,7 @@
       object_type: "task"
     }),
     t_type: Generator.create({
-      hidable: false,
+      hidable: true,
       sidebar: false,
       size: 5
     }),
@@ -96,7 +96,7 @@
       hidable: true
     }),
     w_title: Generator.create({
-      hidable: true
+      hidable: false
     }),
     w_desc: Generator.create({
       hidable: true
