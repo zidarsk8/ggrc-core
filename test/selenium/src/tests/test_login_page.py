@@ -13,7 +13,6 @@ class TestLoginPage(base.Test):
     @pytest.mark.smoke_tests
     def test_login_as_admin(self, selenium):
         """Logs in and verifies that we're logged in as admin."""
-        login_page = login.LoginPage(selenium.driver)
-        login_page.login()
+        login.LoginPage(selenium.driver).login()
         selenium.driver.find_element(
-            *locator.PageHeader.PEOPLE_LIST_WIDGET)
+            *locator.PageHeader.BUTTON_ADMIN_DASHBOARD)
