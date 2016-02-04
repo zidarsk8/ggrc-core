@@ -1178,18 +1178,16 @@ Mustache.registerHelper("link_to_tree", function () {
  *    * date: MM/DD/YYYY),
  *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
  */
-Mustache.registerHelper('date', function (date) {
-  if (typeof date == 'undefined') {
+Mustache.registerHelper('date', function (date, hide_time) {
+  var current_timezone = moment.tz.guess();
+  var m;
     return '';
   }
-  var current_timezone = moment.tz.guess();
-  var m = moment(new Date(date.isComputed ? date() : date));
-  var no_time = arguments.length > 2;
 
-  if (no_time) {
+  m = moment(new Date(date.isComputed ? date() : date));
+  if (hide_time === true) {
     return m.format('MM/DD/YYYY');
   }
-
   return m.tz(current_timezone).format('MM/DD/YYYY hh:mm:ss A z');
 });
 
