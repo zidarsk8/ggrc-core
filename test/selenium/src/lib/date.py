@@ -18,19 +18,6 @@ def get_days_in_current_month():
     return days_in_month
 
 
-def get_from_string(date, format):
-    """Creates a date object from given string
-
-    Args:
-        date (str): date string
-        format (str): date format specs
-
-    Returns:
-        datetime
-    """
-    return datetime.strptime(date, format)
-
-
 def get_month_start(date):
     """Gets a date object with the date of the first of the month.
 
@@ -53,12 +40,3 @@ def get_month_end(date):
         datetime
     """
     return date.replace(day=calendar.monthrange(date.year, date.month)[1])
-
-
-def get_current():
-    """Gets a date object with current date
-
-    Returns:
-        datetime
-    """
-    return datetime.now()
