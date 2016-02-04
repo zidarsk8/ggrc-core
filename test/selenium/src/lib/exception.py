@@ -10,3 +10,7 @@ class ElementNotFound(Exception):
 
 class DocstringsMissing(Exception):
     pass
+
+
+class NoClassFound(Exception):
+    pass
