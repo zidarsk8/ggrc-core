@@ -1173,7 +1173,7 @@ Mustache.registerHelper("link_to_tree", function () {
 /**
  *  Helper for rendering date or datetime values in current local time
  *
- *  @param {boolean} time flag - if set to true, render date only
+ *  @param {boolean} hide_time - if set to true, render date only
  *  @return {String} - date or datetime string in the following format:
  *    * date: MM/DD/YYYY),
  *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
