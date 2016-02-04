@@ -413,7 +413,7 @@ mockup-js-files:
   - request/pages/assessments.js
 
   #Workflow
-  - workflow/pages/workflow.js
+  - workflow/pages/cycle.js
   - workflow/pages/info.js
 
   # Bootstrap files shouold be above
@@ -436,7 +436,7 @@ mockup-js-template-files:
 
   # Workflow
   - workflow/info.mustache
-  - workflow/workflow.mustache
+  - workflow/cycle.mustache
 
   # Base templates
   - mockup_base_templates/modal_base.mustache
@@ -480,6 +480,7 @@ mockup-js-template-files:
   - mockup_base_templates/assessment_panel.mustache
   - mockup_base_templates/tree.mustache
   - mockup_base_templates/tree-assessor.mustache
+  - mockup_base_templates/tree-cycle.mustache
   - mockup_base_templates/tree_item.mustache
   - mockup_base_templates/info_panel.mustache
   - mockup_base_templates/filter.mustache

@@ -6,88 +6,95 @@
 }}
 
 <div class="item-main" data-model="true">
-    <div class="item-wrap">
-        <div class="openclose">
-            <span class="status-label status-{{state_color}}"></span>
-            <i class="grcicon-arrow-right"></i>
-        </div>
-        <div class="select">
-            <div class="item-data">
-                <div class="row-fluid">
-                <div class="
-                {{#if_equals type "assessment"}}
-                    span6
-                {{else}}
-                    span4
-                {{/if_equals}}
-                ">
-                       <div class="title tree-title-area" rel="tooltip" data-placement="left" title="" data-original-title="{{title}}">
-                        {{title}}
-                    </div>
+  <div class="item-wrap">
+    <div class="openclose">
+      <span class="status-label status-{{state_color}}"></span>
+      <i class="fa fa-caret-right"></i>
+    </div>
+    <div class="select">
+      <div class="item-data">
+        <div class="row-fluid">
+          <div class="{{#if_helpers '\ #if_equals' type 'assessment' '\ or #if_equals' type 'workflow'}}
+            span6
+          {{else}}
+            span4
+          {{/if_helpers}}">
+            <div class="title tree-title-area" rel="tooltip" data-placement="left" title=""
+            data-original-title="{{title}}">
+              {{title}}
+            </div>
+          </div>
+          {{#if_helpers '\
+            #if_equals' type 'assessment' '\
+            or #if_equals' type 'workflow'}}
+            <div class="span2">
+              <div class="row-fluid">
+                <div class="span12">
+                  <div class="owner tree-title-area">
+                    {{due_on}}
+                  </div>
                 </div>
-                {{#if_equals type "assessment"}}
-                    <div class="span2">
-                        <div class="row-fluid">
-                            <div class="span12">
-                                <div class="owner tree-title-area">
-                                    {{due_on}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {{/if}}
-                <div class="
-                {{#if_equals type "assessment"}}
-                    span2
-                {{else}}
-                    span4
-                {{/if}}
-                ">
-                    <div class="row-fluid">
-                        <div class="span12">
-                            <div class="owner tree-title-area">
-                                {{status}}
-                            </div>
-                        </div>
-                    </div>
+              </div>
+            </div>
+          {{/if_helpers}}
+          {{^if_equals type "workflow"}}
+            <div class="{{#if_equals type "assessment"}}span2{{else}}span4{{/if}}">
+              <div class="row-fluid">
+                <div class="span12">
+                  <div class="owner tree-title-area">
+                    {{status}}
+                  </div>
                 </div>
+              </div>
+            </div>
+          {{/if_equals}}
 
-                <div class="
-                {{#if_equals type "assessment"}}
-                    span2
-                {{else}}
-                    span4
-                {{/if}}
-                ">
-                        <div class="show-details">
-                            <a href="/audits/3" target="_blank"><i class="grcicon-to-right"></i></a>
-                        </div>
-                    {{^if_equals type "assessment"}}
-                        <ul class="tree-action-list">
-                            <li>
-                                <i class="grcicon-person-black" rel="tooltip" data-placement="left" data-original-title="Audit Lead, Request Assignee "></i>
-                            </li>
-                            <li>
-                                <div class="counter">
-                                    <i class="fa fa-list-alt"></i>
-                                    3
-                                </div>
-                            </li>
-                        </ul>
-                    {{/if}}
+          {{^if_equals type "workflow"}}
+            <div class="{{#if_equals type "assessment"}}span2{{else}}span4{{/if_equals}}">
+              <div class="show-details">
+                <a href="/audits/3" target="_blank"><i class="grcicon-to-right"></i></a>
+              </div>
+              {{^if_equals type "assessment"}}
+                <ul class="tree-action-list">
+                  <li>
+                    <i class="grcicon-person-black" rel="tooltip" data-placement="left"
+                    data-original-title="Audit Lead, Request Assignee "></i>
+                  </li>
+                  <li>
+                    <div class="counter">
+                      <i class="fa fa-list-alt"></i>
+                      3
                     </div>
-                </div>
-            </div><!-- item-data end -->
-        </div><!-- select end -->
-    </div><!-- item-wrap end -->
+                  </li>
+                </ul>
+              {{/if_equals}}
+            </div>
+          {{/if_equals}}
+          {{#if_equals type "workflow"}}
+            <div class="span4">
+              <ul class="tree-action-list">
+                <li>
+                  <div class="request-control">
+                    <cycle-end-cycle cycle="instance">
+                      <button class="btn btn-draft btn-small end-cycle">End Cycle</button>
+                    </cycle-end-cycle>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          {{/if_equals}}
+        </div>
+      </div><!-- item-data end -->
+    </div><!-- select end -->
+  </div><!-- item-wrap end -->
 </div><!-- item-main end -->
 
 {{#if children.length}}
-<div class="tier-2-info item-content">
+  <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-        <div class="inner-tree">
-            <ul class="tree-structure new-tree"></ul>
-        </div>
+      <div class="inner-tree">
+        <ul class="tree-structure new-tree"></ul>
+      </div>
     </div>
-</div>
+  </div>
 {{/if}}
