@@ -164,6 +164,33 @@ def ctgot_ctgo(object_type, related_type, related_ids):
             ))
 
 
+def ctg_ctgo(object_type, related_type, related_ids):
+  """ Indirect relationship helper between Cycle Task Groups and Objects
+
+  Build a query to find indirectly related objects.
+
+  Args:
+      object_type: Type name (string) of the sought objects
+      related_type: Type name (string) of the known objects
+      related_ids: List of ids of the known objects
+  Returns:
+      A query object which finds the ids of objects (of type object_type) that
+      are indirectly related to one of the related objects.
+  """
+  if object_type == "CycleTaskGroup":
+    return db.session.query(CycleTaskGroupObject.cycle_task_group_id).filter(
+        and_(
+            CycleTaskGroupObject.object_type == related_type,
+            CycleTaskGroupObject.object_id.in_(related_ids)
+        ))
+  else:
+    return db.session.query(CycleTaskGroupObject.object_id).filter(
+        and_(
+            CycleTaskGroupObject.cycle_task_group_id.in_(related_ids),
+            CycleTaskGroupObject.object_type == object_type
+        ))
+
+
 def cycle_ctgo(object_type, related_type, related_ids):
   """ indirect relationships between Cycles and Cycle Task Objects """
   if object_type == "Cycle":
@@ -211,6 +238,7 @@ _function_map = {
 # add mappings for cycle tasks and cycle task objects
 for wot in WORKFLOW_OBJECT_TYPES:
   for f, obj in [(ctgot_ctgo, "CycleTaskGroupObjectTask"),
+                 (ctg_ctgo, "CycleTaskGroup"),
                  (cycle_ctgo, "Cycle"),
                  (wf_ctgo, "Workflow"),
                  (tg_tgo, "TaskGroup"),
