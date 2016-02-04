@@ -1170,8 +1170,14 @@ Mustache.registerHelper("link_to_tree", function () {
   return link.join("/");
 });
 
-// Returns date formated like 01/28/2015 02:59:02am PST
-// To omit time pass in a second parameter {{date updated_at true}}
+/**
+ *  Helper for rendering date or datetime values in current local time
+ *
+ *  @param {boolean} time flag - if set to true, render date only
+ *  @return {String} - date or datetime string in the following format:
+ *    * date: MM/DD/YYYY),
+ *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
+ */
 Mustache.registerHelper('date', function (date) {
   if (typeof date == 'undefined') {
     return '';
