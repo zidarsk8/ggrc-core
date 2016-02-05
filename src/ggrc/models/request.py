@@ -5,13 +5,12 @@
 
 import datetime
 
-from ggrc import db
 from sqlalchemy import or_
 from sqlalchemy import and_
 from sqlalchemy import inspect
 from sqlalchemy import orm
 
-
+from ggrc import db
 from ggrc.models import person
 from ggrc.models import audit
 from ggrc.models import reflection
@@ -197,7 +196,7 @@ def _date_has_changes(attr):
   added, deleted = attr.history.added[0], attr.history.deleted[0]
   if isinstance(added, datetime.datetime):
     added = added.date()
-  return not added == deleted
+  return added != deleted
 
 
 @Resource.model_put.connect_via(Request)
