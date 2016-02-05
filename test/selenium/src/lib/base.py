@@ -146,15 +146,16 @@ class Element(InstanceRepresentation):
         click"""
         self.get_when_visible(locator).click()
 
-    def _find_field_and_enter_data(self, locator, data):
-        """
-        Args:
-            locator (tuple)
-            data (str): the string we want to enter
-        """
-        element = self.get_when_visible(locator)
-        element.clear()
-        self.get_when_visible(locator).send_keys(data)
+    def click_when_animation_over(self):
+        """Waits until the element stops moving"""
+
+        prev_location = None
+
+        while prev_location != self._element.location:
+            prev_location = self._element.location
+            time.sleep(0.1)
+
+        self._element.click()
 
 
 class Label(Element):
