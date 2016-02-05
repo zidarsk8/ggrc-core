@@ -45,6 +45,6 @@ git checkout --quiet $TEST_COMMIT
 PYLINT_RESULT=$(echo "$CHANGED_FILES" | xargs pylint 2> /dev/null | tail -n 2) 
 
 echo "$PYLINT_RESULT"
-echo "$PYLINT_RESULT" | grep -qv "+" && rc=$? || rc=$?
+echo "$PYLINT_RESULT" | grep -E -q -e "-|\\+0.00" && rc=$? || rc=$?
 
 exit $rc
