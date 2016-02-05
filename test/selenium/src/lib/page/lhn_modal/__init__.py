@@ -4,7 +4,7 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from lib.page.lhn_modal import (
-    new_access_group,
+    new_access_group,     # flake8: noqa
     new_audit,
     new_clause,
     new_contract,
