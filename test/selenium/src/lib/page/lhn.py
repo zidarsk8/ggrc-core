@@ -29,11 +29,11 @@ class _Workflows(lhn.AccordionGroup):
     def __init__(self, driver):
         super(_Workflows, self).__init__(driver)
         self.button_active = base.Button(
-                self._driver, locator.LhnMenu.WORKFLOWS_ACTIVE)
+            self._driver, locator.LhnMenu.WORKFLOWS_ACTIVE)
         self.button_inactive = base.Button(
-                self._driver, locator.LhnMenu.WORKFLOWS_INACTIVE)
+            self._driver, locator.LhnMenu.WORKFLOWS_INACTIVE)
         self.button_draft = base.Button(
-                self._driver, locator.LhnMenu.WORKFLOWS_DRAFT)
+            self._driver, locator.LhnMenu.WORKFLOWS_DRAFT)
 
     def create_new(self):
         """
@@ -69,7 +69,7 @@ class _Assessments(lhn.AccordionGroup):
         """
         self.button_create_new.click()
         return lhn_modal.new_controll_assessment.ControlAssessmentModal(
-                self._driver)
+            self._driver)
 
 
 class _Requests(lhn.AccordionGroup):
@@ -331,19 +331,19 @@ class _PeopleOrGroups(lhn.DropdownStatic):
             locator.LhnMenu.PEOPLE_COUNT
         )
         self.button_org_groups = lhn.Button(
-                self._driver,
-                locator.LhnMenu.PEOPLE,
-                locator.LhnMenu.PEOPLE_COUNT
+            self._driver,
+            locator.LhnMenu.PEOPLE,
+            locator.LhnMenu.PEOPLE_COUNT
         )
         self.button_vendors = lhn.Button(
-                self._driver,
-                locator.LhnMenu.PEOPLE,
-                locator.LhnMenu.PEOPLE_COUNT
+            self._driver,
+            locator.LhnMenu.PEOPLE,
+            locator.LhnMenu.PEOPLE_COUNT
         )
         self.button_access_groups = lhn.Button(
-                self._driver,
-                locator.LhnMenu.PEOPLE,
-                locator.LhnMenu.PEOPLE_COUNT
+            self._driver,
+            locator.LhnMenu.PEOPLE,
+            locator.LhnMenu.PEOPLE_COUNT
         )
 
     def select_people(self):
@@ -442,34 +442,34 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
             locator.LhnMenu.SYSTEMS_COUNT
         )
         self.button_processes = lhn.Button(
-                self._driver,
-                locator.LhnMenu.PROCESSES,
-                locator.LhnMenu.PROCESSES_COUNT
+            self._driver,
+            locator.LhnMenu.PROCESSES,
+            locator.LhnMenu.PROCESSES_COUNT
         )
         self.button_data_assets = lhn.Button(
-                self._driver,
-                locator.LhnMenu.DATA_ASSETS,
-                locator.LhnMenu.DATA_ASSETS_COUNT
+            self._driver,
+            locator.LhnMenu.DATA_ASSETS,
+            locator.LhnMenu.DATA_ASSETS_COUNT
         )
         self.button_products = lhn.Button(
-                self._driver,
-                locator.LhnMenu.PRODUCTS,
-                locator.LhnMenu.PRODUCTS_COUNT
+            self._driver,
+            locator.LhnMenu.PRODUCTS,
+            locator.LhnMenu.PRODUCTS_COUNT
         )
         self.button_projects = lhn.Button(
-                self._driver,
-                locator.LhnMenu.PROJECTS,
-                locator.LhnMenu.PROJECTS_COUNT
+            self._driver,
+            locator.LhnMenu.PROJECTS,
+            locator.LhnMenu.PROJECTS_COUNT
         )
         self.button_facilities = lhn.Button(
-                self._driver,
-                locator.LhnMenu.FACILITIES,
-                locator.LhnMenu.FACILITIES_COUNT
+            self._driver,
+            locator.LhnMenu.FACILITIES,
+            locator.LhnMenu.FACILITIES_COUNT
         )
         self.button_markets = lhn.Button(
-                self._driver,
-                locator.LhnMenu.MARKETS,
-                locator.LhnMenu.MARKETS_COUNT
+            self._driver,
+            locator.LhnMenu.MARKETS,
+            locator.LhnMenu.MARKETS_COUNT
         )
 
     def select_systems(self):

@@ -10,5 +10,5 @@ from lib.page.widget.base import Widget
 
 class AdminRoles(Widget):
     URL = environment.APP_URL \
-          + url.ADMIN_DASHBOARD \
-          + url.Widget.ROLES
+        + url.ADMIN_DASHBOARD \
+        + url.Widget.ROLES

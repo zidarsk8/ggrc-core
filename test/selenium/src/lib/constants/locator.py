@@ -20,7 +20,8 @@ class PageHeader(object):
                                         'href="/dashboard#task_widget"]')
     BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR, '.header-content ['
                                            'href="/objectBrowser"]')
-    BUTTON_USER_DROPDOWN = (By.CSS_SELECTOR, '.header-content .dropdown-toggle')
+    BUTTON_USER_DROPDOWN = (
+      By.CSS_SELECTOR, '.header-content .dropdown-toggle')
     BUTTON_HELP = (By.CSS_SELECTOR, '.header-content [id="#page-help"]')
 
     # dropdown toggle
@@ -51,7 +52,8 @@ class LhnMenu(object):
 
     FILTER = (By.CSS_SELECTOR, '.lhs-search')
     FILTER_TEXT_BOX = (By.CSS_SELECTOR, '.lhs-search>.widgetsearch')
-    FILTER_SUBMIT_BUTTON = (By.CSS_SELECTOR, '.lhs-search>.widgetsearch-submit')
+    FILTER_SUBMIT_BUTTON = (
+      By.CSS_SELECTOR, '.lhs-search>.widgetsearch-submit')
     FILTER_CLEAR_BUTTON = (
         By.CSS_SELECTOR, '.lhs-search [data-title="Clear filters"]')
 
@@ -232,7 +234,8 @@ class LhnMenu(object):
                      '[data-model-name="Regulation"] .item-count')
     SECTIONS_COUNT = (By.CSS_SELECTOR,
                       '[data-model-name="Section"] .item-count')
-    CONTROL_COUNT = (By.CSS_SELECTOR, '[data-model-name="Control"] .item-count')
+    CONTROL_COUNT = (
+      By.CSS_SELECTOR, '[data-model-name="Control"] .item-count')
     OBJECTIVES_COUNT = (By.CSS_SELECTOR, '[data-model-name="Objective"] '
                                          '.item-count')
     PEOPLE_COUNT = (By.CSS_SELECTOR, '[data-model-name="Person"] .item-count')
@@ -266,7 +269,8 @@ class LhnMenu(object):
 
     # spinny
     SPINNY_PROGRAMS = (By.CSS_SELECTOR, '[data-model-name="Program"] .spinny')
-    SPINNY_WORKFLOWS = (By.CSS_SELECTOR, '[data-model-name="Workflow"] .spinny')
+    SPINNY_WORKFLOWS = (
+      By.CSS_SELECTOR, '[data-model-name="Workflow"] .spinny')
     SPINNY_AUDITS = (By.CSS_SELECTOR, '[data-model-name="Audit"] .spinny')
     SPINNY_CONTROL_ASSESSMENTS = (
         By.CSS_SELECTOR, '[data-model-name="ControlAssessment"] .spinny')
@@ -275,8 +279,10 @@ class LhnMenu(object):
     SPINNY_REGULATIONS = (
         By.CSS_SELECTOR, '[data-model-name="Regulation"] .spinny')
     SPINNY_POLICIES = (By.CSS_SELECTOR, '[data-model-name="Policy"] .spinny')
-    SPINNY_STANDARDS = (By.CSS_SELECTOR, '[data-model-name="Standard"] .spinny')
-    SPINNY_CONTRACTS = (By.CSS_SELECTOR, '[data-model-name="Contract"] .spinny')
+    SPINNY_STANDARDS = (
+      By.CSS_SELECTOR, '[data-model-name="Standard"] .spinny')
+    SPINNY_CONTRACTS = (
+      By.CSS_SELECTOR, '[data-model-name="Contract"] .spinny')
     SPINNY_CLAUSES = (By.CSS_SELECTOR, '[data-model-name="Clause"] .spinny')
     SPINNY_SECTIONS = (By.CSS_SELECTOR, '[data-model-name="Section"] .spinny')
     SPINNY_CONTROLS = (By.CSS_SELECTOR, '[data-model-name="Control"] .spinny')
@@ -434,10 +440,12 @@ class WidgetBarButtonAddDropdown(object):
                                 '[href="#system_widget"]')
     RISKS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
                               '[href="#risk_widget"]')
-    WORKFLOWS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                                  '[href="#workflow_widget"]')
-    CONTRACTS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                                  '[href="#contract_widget"]')
+    WORKFLOWS = (
+      By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
+                       '[href="#workflow_widget"]')
+    CONTRACTS = (
+      By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
+                       '[href="#contract_widget"]')
     ASSESSMENTS = (By.CSS_SELECTOR,
                    '[data-test-id="button_widget_add_2c925d94"] '
                    '[href="#assessment_widget"]')
@@ -449,12 +457,15 @@ class WidgetBarButtonAddDropdown(object):
     ORG_GROUPS = (By.CSS_SELECTOR,
                   '[data-test-id="button_widget_add_2c925d94"] '
                   '[href="#org_groups_widget"]')
-    PROCESSES = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                                  '[href="#process_widget"]')
-    PROJECTS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                                 '[href="#project_widget"]')
-    STANDARDS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                                  '[href="#standard_widget"]')
+    PROCESSES = (By.CSS_SELECTOR,
+                 '[data-test-id="button_widget_add_2c925d94"] '
+                 '[href="#process_widget"]')
+    PROJECTS = (By.CSS_SELECTOR,
+                '[data-test-id="button_widget_add_2c925d94"] '
+                '[href="#project_widget"]')
+    STANDARDS = (By.CSS_SELECTOR,
+                 '[data-test-id="button_widget_add_2c925d94"] '
+                 '[href="#standard_widget"]')
     VENDORS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
                                 '[href="#vendor_widget"]')
     THREAD_ACTORS = (By.CSS_SELECTOR,
@@ -578,24 +589,24 @@ class AdminCustomAttributes(object):
                                         '.openclose')
     BUTTON_AUDITS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(6) div '
                                       '.openclose')
-    BUTTON_OBJECTIVES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(7) div '
-                                          '.openclose')
-    BUTTON_SECTIONS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(8) div '
-                                        '.openclose')
+    BUTTON_OBJECTIVES = (By.CSS_SELECTOR,
+                         '.tree-structure li:nth-child(7) div .openclose')
+    BUTTON_SECTIONS = (By.CSS_SELECTOR,
+                       '.tree-structure li:nth-child(8) div .openclose')
     BUTTON_CONTROLS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(9) div '
                                         '.openclose')
     BUTTON_ISSUES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(10) div '
                                       '.openclose')
     BUTTON_ASSESSMENTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(11) '
                                            'div .openclose')
-    BUTTON_STANDARDS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(12) div '
-                                         '.openclose')
+    BUTTON_STANDARDS = (By.CSS_SELECTOR,
+                        '.tree-structure li:nth-child(12) div .openclose')
     BUTTON_REGULATIONS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(13) '
                                            'div .openclose')
     BUTTON_POLICIES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(14) div '
                                         '.openclose')
-    BUTTON_CONTRACTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(15) div '
-                                         '.openclose')
+    BUTTON_CONTRACTS = (By.CSS_SELECTOR,
+                        '.tree-structure li:nth-child(15) div .openclose')
     BUTTON_CLAUSES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(16) div '
                                        '.openclose')
     BUTTON_REQUESTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(17) div '
@@ -604,16 +615,16 @@ class AdminCustomAttributes(object):
                                        '.openclose')
     BUTTON_PEOPLE = (By.CSS_SELECTOR, '.tree-structure li:nth-child(19) div '
                                       '.openclose')
-    BUTTON_ACCESS_GROUPS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(20) '
-                                             'div .openclose')
+    BUTTON_ACCESS_GROUPS = (By.CSS_SELECTOR,
+                            '.tree-structure li:nth-child(20) div .openclose')
     BUTTON_ORG_GROUPS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(21) '
                                           'div .openclose')
     BUTTON_PRODUCTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(22) div '
                                         '.openclose')
     BUTTON_MARKETS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(23) div '
                                        '.openclose')
-    BUTTON_PROCESSES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(24) div '
-                                         '.openclose')
+    BUTTON_PROCESSES = (By.CSS_SELECTOR,
+                        '.tree-structure li:nth-child(24) div .openclose')
     BUTTON_FACILITIES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(25) '
                                           'div .openclose')
     BUTTON_PROJECTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(26) div '

@@ -18,8 +18,8 @@ from lib import mixin
 class InstanceRepresentation(object):
     def __repr__(self):
         return str(
-                {key: value for key, value in self.__dict__.items()
-                 if "__" not in key}
+            {key: value for key, value in self.__dict__.items()
+             if "__" not in key}
         )
 
 
@@ -63,16 +63,16 @@ class Selenium(object):
         options.add_argument("--verbose")
 
         self.display = pyvirtualdisplay.Display(
-                visible=environment.DISPLAY_WINDOWS,
-                size=environment.WINDOW_RESOLUTION
+          visible=environment.DISPLAY_WINDOWS,
+          size=environment.WINDOW_RESOLUTION
         )
         self.display.start()
         self.driver = CustomDriver(
-                executable_path=environment.CHROME_DRIVER_PATH,
-                chrome_options=options,
-                service_log_path=environment.PROJECT_ROOT_PATH +
-                constants.path.LOGS_DIR +
-                constants.path.CHROME_DRIVER
+          executable_path=environment.CHROME_DRIVER_PATH,
+          chrome_options=options,
+          service_log_path=environment.PROJECT_ROOT_PATH +
+          constants.path.LOGS_DIR +
+          constants.path.CHROME_DRIVER
         )
         width, height = environment.WINDOW_RESOLUTION
         self.driver.set_window_size(width, height)
@@ -100,6 +100,7 @@ class Element(InstanceRepresentation):
         Args:
             driver (CustomDriver):
         """
+        super(Element, self).__init__()
         self._driver = driver
         self._locator = locator
         self._element = driver.find_element(*locator)
@@ -121,9 +122,9 @@ class Element(InstanceRepresentation):
         locator_to_use = locator if locator else self._locator
 
         element = WebDriverWait(
-            self._driver,
-            constants.ux.MAX_USER_WAIT_SECONDS) \
-            .until(EC.invisibility_of_element_located(locator_to_use))
+          self._driver,
+          constants.ux.MAX_USER_WAIT_SECONDS) \
+          .until(EC.invisibility_of_element_located(locator_to_use))
         return element
 
     def get_when_visible(self, locator=None):
@@ -133,9 +134,11 @@ class Element(InstanceRepresentation):
         """
         locator_to_use = locator if locator else self._locator
 
-        element = WebDriverWait(self._driver,
-                                constants.ux.MAX_USER_WAIT_SECONDS) \
+        element = WebDriverWait(
+          self._driver,
+          constants.ux.MAX_USER_WAIT_SECONDS)\
             .until(EC.element_to_be_clickable(locator_to_use))
+
         return element
 
     def click_when_visible(self, locator=None):
@@ -210,7 +213,7 @@ class Iframe(Element):
 
         self._driver.switch_to.frame(iframe)
         self._driver.find_element_by_tag_name(constants.tag.BODY) \
-            .send_keys(text)
+          .send_keys(text)
         self._driver.switch_to.default_content()
         self.text = text
 
@@ -307,7 +310,7 @@ class DropdownStatic(Element):
         super(DropdownStatic, self).__init__(driver, dropdown_locator)
         self._locator_dropdown_elements = elements_locator
         self.elements_dropdown = self._driver.find_elements(
-                *self._locator_dropdown_elements)
+          *self._locator_dropdown_elements)
 
     def click(self):
         self._element.click()
@@ -367,7 +370,7 @@ class AnimatedComponent(Component):
     def _wait_until_invisible(self):
         for locator in self._locators:
             WebDriverWait(self._driver, constants.ux.MAX_USER_WAIT_SECONDS) \
-                .until(EC.invisibility_of_element_located(locator))
+              .until(EC.invisibility_of_element_located(locator))
 
 
 class Modal(Component):

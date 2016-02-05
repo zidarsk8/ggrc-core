@@ -4,7 +4,9 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from functools import wraps
-from lib import environment, constants, file_ops
+from lib import environment
+from lib import constants
+from lib import file_ops
 
 
 def take_screenshot_on_error(fun):

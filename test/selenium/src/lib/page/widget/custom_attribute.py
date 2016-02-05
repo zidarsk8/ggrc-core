@@ -29,24 +29,24 @@ class NewCustomAttributeModal(base.Modal):
     def __init__(self, driver):
         super(NewCustomAttributeModal, self).__init__(driver)
         self.attribute_title = base.Label(
-                self._driver, self._locator.ATTRIBUTE_TITLE)
+            self._driver, self._locator.ATTRIBUTE_TITLE)
         self.inline_help = base.Label(self._driver, self._locator.INLINE_HELP)
         self.attribute_type = base.Label(
-                self._driver, self._locator.ATTRIBUTE_TYPE)
+            self._driver, self._locator.ATTRIBUTE_TYPE)
         self.placeholder = base.Label(self._driver, self._locator.PLACEHOLDER)
         self.mandatory = base.Label(self._driver, self._locator.MANDATORY)
         self.ui_attribute_title = base.TextInputField(
-                self._driver, self._locator.UI_ATTRIBUTE_TITLE)
+            self._driver, self._locator.UI_ATTRIBUTE_TITLE)
         self.ui_inline_help = base.TextInputField(
-                self._driver, self._locator.UI_INLINE_HELP)
+            self._driver, self._locator.UI_INLINE_HELP)
         self.ui_placeholder = base.TextInputField(
-                self._driver, self._locator.UI_PLACEHOLDER)
+            self._driver, self._locator.UI_PLACEHOLDER)
         self.checkbox_mandatory = base.Checkbox(
-                self._driver, self._locator.CHECKBOX_MANDATORY)
+            self._driver, self._locator.CHECKBOX_MANDATORY)
         self.button_submit = base.Button(
-                self._driver, self._locator.BUTTON_SAVE)
+            self._driver, self._locator.BUTTON_SAVE)
         self.button_add_more = base.Button(
-                self._driver, self._locator.BUTTON_ADD_ANOTHER)
+            self._driver, self._locator.BUTTON_ADD_ANOTHER)
 
     def enter_title(self, title):
         self.ui_attribute_title.enter_text(title)
@@ -86,21 +86,21 @@ class AdminCustomAttributes(base.Widget):
     def __init__(self, driver):
         super(AdminCustomAttributes, self).__init__(driver)
         self.filter = base.Filter(
-                self._driver,
-                self._locator.FILTER_INPUT_FIELD,
-                self._locator.FILTER_BUTTON_SUBMIT,
-                self._locator.FILTER_BUTTON_RESET
+            self._driver,
+            self._locator.FILTER_INPUT_FIELD,
+            self._locator.FILTER_BUTTON_SUBMIT,
+            self._locator.FILTER_BUTTON_RESET
         )
         self.button_workflows = base.Button(
-                self._driver, self._locator.BUTTON_WORKFLOWS)
+            self._driver, self._locator.BUTTON_WORKFLOWS)
         self.button_risk_assessments = base.Button(
-                self._driver, self._locator.BUTTON_RISK_ASSESSMENTS)
+            self._driver, self._locator.BUTTON_RISK_ASSESSMENTS)
         self.button_threats = base.Button(
-                self._driver, self._locator.BUTTON_THREATS)
+            self._driver, self._locator.BUTTON_THREATS)
         self.button_risks = base.Button(
-                self._driver, self._locator.BUTTON_RISKS)
+            self._driver, self._locator.BUTTON_RISKS)
         self.button_programs = base.Button(
-                self._driver, self._locator.BUTTON_PROGRAMS)
+            self._driver, self._locator.BUTTON_PROGRAMS)
 
     def select_programs(self):
         """

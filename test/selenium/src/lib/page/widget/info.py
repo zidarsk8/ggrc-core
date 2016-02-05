@@ -24,7 +24,7 @@ class InfoWidget(base.Widget):
     def delete_object(self):
         self.navigate_to()
         self.button_settings.select(
-                element.WidgetProgramInfo.BUTTON_SETTINGS_DROPDOWN_ITEMS)
+            element.WidgetProgramInfo.BUTTON_SETTINGS_DROPDOWN_ITEMS)
 
 
 class DashboardInfo(base.Widget):
@@ -35,15 +35,15 @@ class DashboardInfo(base.Widget):
         super(DashboardInfo, self).__init__(driver)
 
         self.button_start_new_program = base.Button(
-                self._driver, self._locator.BUTTON_START_NEW_PROGRAM)
+            self._driver, self._locator.BUTTON_START_NEW_PROGRAM)
         self.button_start_new_audit = base.Button(
-                self._driver, self._locator.BUTTON_START_NEW_AUDIT)
+            self._driver, self._locator.BUTTON_START_NEW_AUDIT)
         self.button_start_new_workflow = base.Button(
-                self._driver, self._locator.BUTTON_START_NEW_WORKFLOW)
+            self._driver, self._locator.BUTTON_START_NEW_WORKFLOW)
         self.button_create_new_object = base.Button(
-                self._driver, self._locator.BUTTON_CREATE_NEW_OBJECT)
+            self._driver, self._locator.BUTTON_CREATE_NEW_OBJECT)
         self.button_all_objects = base.Button(
-                self._driver, self._locator.BUTTON_ALL_OBJECTS)
+            self._driver, self._locator.BUTTON_ALL_OBJECTS)
 
     def start_new_program(self):
         raise NotImplementedError
@@ -71,57 +71,57 @@ class ProgramInfo(InfoWidget):
             driver (base.CustomDriver)
         """
         super(ProgramInfo, self).__init__(
-                driver,
-                self._locators.DROPDOWN_SETTINGS,
-                self._locators.DROPDOWN_SETTINGS_MEMBERS
+            driver,
+            self._locators.DROPDOWN_SETTINGS,
+            self._locators.DROPDOWN_SETTINGS_MEMBERS
         )
         self.show_advanced = base.Toggle(
-                self._driver, self._locators.BUTTON_SHOW_ADVANCED)
+            self._driver, self._locators.BUTTON_SHOW_ADVANCED)
 
         # activate all fields
         self.show_advanced.click()
 
         self.title = base.Label(self._driver, self._locators.TITLE)
         self.title_entered = base.Label(
-                self._driver, self._locators.TITLE_ENTERED)
+            self._driver, self._locators.TITLE_ENTERED)
         self.object_review = base.Label(
-                self._driver, self._locators.OBJECT_REVIEW)
+            self._driver, self._locators.OBJECT_REVIEW)
         self.submit_for_review = base.Label(
-                self._driver, self._locators.SUBMIT_FOR_REVIEW)
+            self._driver, self._locators.SUBMIT_FOR_REVIEW)
         self.description = base.Label(self._driver, self._locators.DESCRIPTION)
         self.description_entered = base.Label(
-                self._driver, self._locators.DESCRIPTION_ENTERED)
+            self._driver, self._locators.DESCRIPTION_ENTERED)
         self.notes = base.Label(self._driver, self._locators.NOTES)
         self.notes_entered = base.Label(
-                self._driver, self._locators.NOTES_ENTERED)
+            self._driver, self._locators.NOTES_ENTERED)
         self.manager = base.Label(self._driver, self._locators.MANAGER)
         self.manager_entered = base.Label(
-                self._driver, self._locators.MANAGER_ENTERED)
+            self._driver, self._locators.MANAGER_ENTERED)
         self.program_url = base.Label(self._driver, self._locators.PROGRAM_URL)
         self.program_url_entered = base.Label(
-                self._driver, self._locators.PROGRAM_URL_ENTERED)
+            self._driver, self._locators.PROGRAM_URL_ENTERED)
         self.code = base.Label(self._driver, self._locators.CODE)
         self.code_entered = base.Label(
-                self._driver, self._locators.CODE_ENTERED)
+            self._driver, self._locators.CODE_ENTERED)
         self.effective_date = base.Label(
-                self._driver, self._locators.EFFECTIVE_DATE)
+            self._driver, self._locators.EFFECTIVE_DATE)
         self.effective_date_entered = base.Label(
-                self._driver, self._locators.EFFECTIVE_DATE_ENTERED)
+            self._driver, self._locators.EFFECTIVE_DATE_ENTERED)
         self.stop_date = base.Label(self._driver, self._locators.STOP_DATE)
         self.stop_date_entered = base.Label(
-                self._driver, self._locators.STOP_DATE_ENTERED)
+            self._driver, self._locators.STOP_DATE_ENTERED)
         self.primary_contact = base.Label(
-                self._driver, self._locators.PRIMARY_CONTACT)
+            self._driver, self._locators.PRIMARY_CONTACT)
         self.primary_contact_entered = base.Label(
-                self._driver, self._locators.PRIMARY_CONTACT_ENTERED)
+            self._driver, self._locators.PRIMARY_CONTACT_ENTERED)
         self.secondary_contact = base.Label(
-                self._driver, self._locators.SECONDARY_CONTACT)
+            self._driver, self._locators.SECONDARY_CONTACT)
         self.secondary_contact_entered = base.Label(
-                self._driver, self._locators.SECONDARY_CONTACT_ENTERED)
+            self._driver, self._locators.SECONDARY_CONTACT_ENTERED)
         self.reference_url = base.Label(
-                self._driver, self._locators.REFERENCE_URL)
+            self._driver, self._locators.REFERENCE_URL)
         self.reference_url_entered = base.Label(
-                self._driver, self._locators.REFERENCE_URL_ENTERED)
+            self._driver, self._locators.REFERENCE_URL_ENTERED)
 
 
 class WorkflowInfo(InfoWidget):

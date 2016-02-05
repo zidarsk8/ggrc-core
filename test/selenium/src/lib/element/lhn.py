@@ -29,7 +29,8 @@ class AllObjectsTab(_Tab):
 class Button(base.Button):
     def __init__(self, driver, locator_element, locator_count):
         super(Button, self).__init__(driver, locator_element)
-        self.members_count = int(self._driver.find_element(*locator_count).text)
+        self.members_count = int(
+            self._driver.find_element(*locator_count).text)
 
 
 class DropdownStatic(base.Dropdown):
@@ -57,7 +58,7 @@ class AccordionGroup(base.DropdownDynamic):
         )
 
         self.button_create_new = base.Button(
-                self._driver, self._locator_button_create_new)
+            self._driver, self._locator_button_create_new)
 
         # todo
         # self._update_loaded_members()
