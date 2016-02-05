@@ -21,6 +21,9 @@
           {{/if_helpers}}">
             <div class="title tree-title-area" rel="tooltip" data-placement="left" title=""
             data-original-title="{{title}}">
+              {{^if_equals type "workflow"}}
+                <i class="fa fa-{{icon}}"></i>
+              {{/if_equals}}
               {{title}}
             </div>
           </div>
@@ -50,6 +53,8 @@
           {{/if_equals}}
 
           {{^if_equals type "workflow"}}
+          {{^if_equals type "task_group"}}
+          {{^if_equals type "task"}}
             <div class="{{#if_equals type "assessment"}}span2{{else}}span4{{/if_equals}}">
               <div class="show-details">
                 <a href="/audits/3" target="_blank"><i class="grcicon-to-right"></i></a>
@@ -70,6 +75,8 @@
               {{/if_equals}}
             </div>
           {{/if_equals}}
+          {{/if_equals}}
+          {{/if_equals}}
           {{#if_equals type "workflow"}}
             <div class="span4">
               <ul class="tree-action-list">
@@ -78,6 +85,46 @@
                     <cycle-end-cycle cycle="instance">
                       <button class="btn btn-draft btn-small end-cycle">End Cycle</button>
                     </cycle-end-cycle>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          {{/if_equals}}
+          {{#if_equals type "task_group"}}
+            <div class="span6">
+              <ul class="tree-action-list">
+                <li>
+                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of mapped tasks">
+                    <i class="fa fa-calendar-check-o"></i>
+                    <strong>1</strong>
+                  </span>
+                </li>
+                <li>
+                  <div class="request-control">
+                    <button class="btn btn-mini btn-info change-task-status " data-openclose="open" data-name="status" data-value="InProgress">Start</button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          {{/if_equals}}
+          {{#if_equals type "task"}}
+            <div class="span6">
+              <ul class="tree-action-list tasks-action">
+                <li>
+                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of comments">
+                    <i class="fa fa-comment-o"></i>
+                    <strong class="error">0</strong>
+                  </span>
+                </li>
+                <li>
+                  <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of objects">
+                    <i class="fa fa-list-alt"></i>
+                    <strong class="error">1</strong>
+                  </span>
+                </li>
+                <li>
+                  <div class="request-control">
+                    <button class="btn btn-mini btn-info change-task-status " data-openclose="open" data-name="status" data-value="InProgress">Start</button>
                   </div>
                 </li>
               </ul>

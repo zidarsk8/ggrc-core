@@ -126,17 +126,16 @@
         randomize: "data"
       }),
       children: [{
-        title: "Other title",
-        type: "process",
-        id: "23"
-      }, {
-        title: "YOLO",
-        type: "issue",
-        id: "24"
-      }, {
-        title: "R U Talking to me",
-        type: "system",
-        id: "12"
+        title: "Task Group",
+        type: "task_group",
+        icon: "task_group",
+        id: "23",
+        children: [{
+          title: "Simple task",
+          type: "task",
+          icon: "calendar-check-o",
+          id: "33"
+        }]
       }]
     }]
   };
