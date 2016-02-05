@@ -103,6 +103,7 @@ dashboard-js-files:
   - pbc/workflow_controller.js
   - models/category.js
   - models/refresh_queue.js
+  - models/revision.js
   - models/save_queue.js
   - models/custom_attributes.js
   - apps/quick_search.js

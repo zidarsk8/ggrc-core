@@ -85,7 +85,12 @@ reports=yes
 # respectively contain the number of errors / warnings messages and the total
 # number of statements analyzed. This is used by the global evaluation report
 # (RP0004).
-evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
+
+# This expression does not return a value between 0 and 10 because it is used
+# for reducing the amount of issues in the code. Having anything normalized to
+# LOC would mean that we could add more errors to the code as long as the
+# number of new lines of code was high enough.
+evaluation=2 * error + warning + refactor + convention
 
 # Add a comment according to your evaluation note. This is used by the global
 # evaluation report (RP0004).

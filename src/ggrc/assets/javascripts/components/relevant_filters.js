@@ -25,7 +25,9 @@
           models = ['Cycle'];
           models = Array.prototype.concat.apply(models,
               _.values(GGRC.tree_view.base_widgets_by_type));
-          models = _.map(_.unique(models), function (mapping) {
+          models = _.difference(_.unique(models),
+                               ['CycleTaskEntry', 'CycleTaskGroupObject']);
+          models = _.map(models, function (mapping) {
             return CMS.Models[mapping];
           });
           return _.sortBy(_.compact(models), 'model_singular');
