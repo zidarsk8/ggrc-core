@@ -146,14 +146,18 @@ class Element(InstanceRepresentation):
         click"""
         self.get_when_visible(locator).click()
 
-    def click_when_animation_over(self):
+    def click_when_moving_over(self):
         """Waits until the element stops moving"""
 
         prev_location = None
+        timer_begin = time.time()
 
         while prev_location != self._element.location:
             prev_location = self._element.location
             time.sleep(0.1)
+
+            if time.time() - timer_begin > constants.ux.ELEMENT_MOVING_TIMEOUT:
+                raise exception.ElementMovingTimeout(self._locator)
 
         self._element.click()
 

@@ -19,7 +19,7 @@ class _Dropdown(base.Component):
         Returns:
             new_custom_attribute.NewCustomAttributeModal
         """
-        self.button_add.click_when_animation_over()
+        self.button_add.click_when_moving_over()
         return NewCustomAttributeModal(self._driver)
 
 

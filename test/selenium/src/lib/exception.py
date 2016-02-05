@@ -14,3 +14,7 @@ class DocstringsMissing(Exception):
 
 class NoClassFound(Exception):
     pass
+
+
+class ElementMovingTimeout(Exception):
+    pass
