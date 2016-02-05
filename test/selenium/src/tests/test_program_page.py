@@ -22,7 +22,8 @@ class TestProgramPage(base.Test):
             .open_lhn_menu()\
             .select_my_objects()
 
-        assert lhn_menu.button_programs.members_count >= int(program_object.object_id)
+        assert lhn_menu.button_programs.members_count \
+            >= int(program_object.object_id)
 
     @pytest.mark.smoke_tests
     def test_app_redirects_to_new_program_page(self, selenium, new_program):
@@ -52,4 +53,3 @@ class TestProgramPage(base.Test):
 
         assert horizontal_bar.get_active_widget_name() == \
             element.LandingPage.PROGRAM_INFO_TAB
-

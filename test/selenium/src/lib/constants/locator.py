@@ -21,7 +21,7 @@ class PageHeader(object):
     BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR, '.header-content ['
                                            'href="/objectBrowser"]')
     BUTTON_USER_DROPDOWN = (
-      By.CSS_SELECTOR, '.header-content .dropdown-toggle')
+        By.CSS_SELECTOR, '.header-content .dropdown-toggle')
     BUTTON_HELP = (By.CSS_SELECTOR, '.header-content [id="#page-help"]')
 
     # dropdown toggle
@@ -53,7 +53,7 @@ class LhnMenu(object):
     FILTER = (By.CSS_SELECTOR, '.lhs-search')
     FILTER_TEXT_BOX = (By.CSS_SELECTOR, '.lhs-search>.widgetsearch')
     FILTER_SUBMIT_BUTTON = (
-      By.CSS_SELECTOR, '.lhs-search>.widgetsearch-submit')
+        By.CSS_SELECTOR, '.lhs-search>.widgetsearch-submit')
     FILTER_CLEAR_BUTTON = (
         By.CSS_SELECTOR, '.lhs-search [data-title="Clear filters"]')
 
@@ -235,7 +235,7 @@ class LhnMenu(object):
     SECTIONS_COUNT = (By.CSS_SELECTOR,
                       '[data-model-name="Section"] .item-count')
     CONTROL_COUNT = (
-      By.CSS_SELECTOR, '[data-model-name="Control"] .item-count')
+        By.CSS_SELECTOR, '[data-model-name="Control"] .item-count')
     OBJECTIVES_COUNT = (By.CSS_SELECTOR, '[data-model-name="Objective"] '
                                          '.item-count')
     PEOPLE_COUNT = (By.CSS_SELECTOR, '[data-model-name="Person"] .item-count')
@@ -270,7 +270,7 @@ class LhnMenu(object):
     # spinny
     SPINNY_PROGRAMS = (By.CSS_SELECTOR, '[data-model-name="Program"] .spinny')
     SPINNY_WORKFLOWS = (
-      By.CSS_SELECTOR, '[data-model-name="Workflow"] .spinny')
+        By.CSS_SELECTOR, '[data-model-name="Workflow"] .spinny')
     SPINNY_AUDITS = (By.CSS_SELECTOR, '[data-model-name="Audit"] .spinny')
     SPINNY_CONTROL_ASSESSMENTS = (
         By.CSS_SELECTOR, '[data-model-name="ControlAssessment"] .spinny')
@@ -280,9 +280,9 @@ class LhnMenu(object):
         By.CSS_SELECTOR, '[data-model-name="Regulation"] .spinny')
     SPINNY_POLICIES = (By.CSS_SELECTOR, '[data-model-name="Policy"] .spinny')
     SPINNY_STANDARDS = (
-      By.CSS_SELECTOR, '[data-model-name="Standard"] .spinny')
+        By.CSS_SELECTOR, '[data-model-name="Standard"] .spinny')
     SPINNY_CONTRACTS = (
-      By.CSS_SELECTOR, '[data-model-name="Contract"] .spinny')
+        By.CSS_SELECTOR, '[data-model-name="Contract"] .spinny')
     SPINNY_CLAUSES = (By.CSS_SELECTOR, '[data-model-name="Clause"] .spinny')
     SPINNY_SECTIONS = (By.CSS_SELECTOR, '[data-model-name="Section"] .spinny')
     SPINNY_CONTROLS = (By.CSS_SELECTOR, '[data-model-name="Control"] .spinny')
@@ -441,11 +441,11 @@ class WidgetBarButtonAddDropdown(object):
     RISKS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
                               '[href="#risk_widget"]')
     WORKFLOWS = (
-      By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                       '[href="#workflow_widget"]')
+        By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
+                         '[href="#workflow_widget"]')
     CONTRACTS = (
-      By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                       '[href="#contract_widget"]')
+        By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
+                         '[href="#contract_widget"]')
     ASSESSMENTS = (By.CSS_SELECTOR,
                    '[data-test-id="button_widget_add_2c925d94"] '
                    '[href="#assessment_widget"]')

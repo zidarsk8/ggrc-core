@@ -16,7 +16,7 @@ def take_screenshot_on_error(fun):
     def wrapper(self, *args, **kwargs):
         try:
             return fun(self, *args, **kwargs)
-        except Exception as e:
+        except Exception:
             file_path = environment.PROJECT_ROOT_PATH \
                 + constants.path.LOGS_DIR \
                 + self.__class__.__name__ \

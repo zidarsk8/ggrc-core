@@ -10,7 +10,7 @@ from lib.constants import locator
 
 class NewProgramModal(base.Modal):
     _locators = locator.ModalCreateNewProgram
-    
+
     def __init__(self, driver):
         super(NewProgramModal, self).__init__(driver)
         # user input elements
@@ -20,7 +20,8 @@ class NewProgramModal(base.Modal):
             self._driver, self._locators.UI_DESCRIPTION)
         self.ui_notes = base.Iframe(self._driver,
                                     self._locators.NOTES_UI)
-        self.ui_code = base.TextInputField(self._driver, self._locators.UI_CODE)
+        self.ui_code = base.TextInputField(self._driver,
+                                           self._locators.UI_CODE)
         self.ui_state = base.Dropdown(self._driver, self._locators.UI_STATE)
         self.ui_show_optional_fields = base.Toggle(
             self._driver,

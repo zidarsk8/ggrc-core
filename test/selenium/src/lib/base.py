@@ -63,16 +63,16 @@ class Selenium(object):
         options.add_argument("--verbose")
 
         self.display = pyvirtualdisplay.Display(
-          visible=environment.DISPLAY_WINDOWS,
-          size=environment.WINDOW_RESOLUTION
+            visible=environment.DISPLAY_WINDOWS,
+            size=environment.WINDOW_RESOLUTION
         )
         self.display.start()
         self.driver = CustomDriver(
-          executable_path=environment.CHROME_DRIVER_PATH,
-          chrome_options=options,
-          service_log_path=environment.PROJECT_ROOT_PATH +
-          constants.path.LOGS_DIR +
-          constants.path.CHROME_DRIVER
+            executable_path=environment.CHROME_DRIVER_PATH,
+            chrome_options=options,
+            service_log_path=environment.PROJECT_ROOT_PATH +
+            constants.path.LOGS_DIR +
+            constants.path.CHROME_DRIVER
         )
         width, height = environment.WINDOW_RESOLUTION
         self.driver.set_window_size(width, height)
@@ -113,8 +113,8 @@ class Element(InstanceRepresentation):
     def get_when_invisible(self, locator=None):
         """
         Some elements, upon activation, are overlaying others. Here we wait
-        for the animation to end so that we can interact with the elements below
-        the overlay.
+        for the animation to end so that we can interact with the elements
+        below the overlay.
 
         Returns:
             selenium.webdriver.remote.webelement.WebElement
@@ -122,9 +122,9 @@ class Element(InstanceRepresentation):
         locator_to_use = locator if locator else self._locator
 
         element = WebDriverWait(
-          self._driver,
-          constants.ux.MAX_USER_WAIT_SECONDS) \
-          .until(EC.invisibility_of_element_located(locator_to_use))
+            self._driver,
+            constants.ux.MAX_USER_WAIT_SECONDS) \
+            .until(EC.invisibility_of_element_located(locator_to_use))
         return element
 
     def get_when_visible(self, locator=None):
@@ -135,8 +135,8 @@ class Element(InstanceRepresentation):
         locator_to_use = locator if locator else self._locator
 
         element = WebDriverWait(
-          self._driver,
-          constants.ux.MAX_USER_WAIT_SECONDS)\
+            self._driver,
+            constants.ux.MAX_USER_WAIT_SECONDS)\
             .until(EC.element_to_be_clickable(locator_to_use))
 
         return element
@@ -192,7 +192,7 @@ class TextFilterDropdown(Element):
         # wait that it appears
         self.get_when_visible(self._locator_dropdown)
         dropdown_elements = self._driver.find_elements(
-                *self._locator_dropdown)
+            *self._locator_dropdown)
 
         self.text = dropdown_elements[0].text
         dropdown_elements[0].click()
@@ -213,7 +213,7 @@ class Iframe(Element):
 
         self._driver.switch_to.frame(iframe)
         self._driver.find_element_by_tag_name(constants.tag.BODY) \
-          .send_keys(text)
+            .send_keys(text)
         self._driver.switch_to.default_content()
         self.text = text
 
@@ -310,7 +310,7 @@ class DropdownStatic(Element):
         super(DropdownStatic, self).__init__(driver, dropdown_locator)
         self._locator_dropdown_elements = elements_locator
         self.elements_dropdown = self._driver.find_elements(
-          *self._locator_dropdown_elements)
+            *self._locator_dropdown_elements)
 
     def click(self):
         self._element.click()
@@ -370,7 +370,7 @@ class AnimatedComponent(Component):
     def _wait_until_invisible(self):
         for locator in self._locators:
             WebDriverWait(self._driver, constants.ux.MAX_USER_WAIT_SECONDS) \
-              .until(EC.invisibility_of_element_located(locator))
+                .until(EC.invisibility_of_element_located(locator))
 
 
 class Modal(Component):
@@ -378,7 +378,8 @@ class Modal(Component):
 
 
 class Filter(Component):
-    def __init__(self, driver, locator_text_box, locator_submit, locator_clear):
+    def __init__(self, driver, locator_text_box, locator_submit,
+                 locator_clear):
         super(Filter, self).__init__(driver)
         self.text_box = TextInputField(driver, locator_text_box)
         self.button_submit = Button(driver, locator_submit)

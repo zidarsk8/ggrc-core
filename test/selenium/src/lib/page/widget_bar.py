@@ -19,8 +19,8 @@ class _WidgetBar(base.Component):
         super(_WidgetBar, self).__init__(driver)
 
     def get_active_widget_name(self):
-        """In general multiple tabs are open. Here we get the name of the active
-        one.
+        """In general multiple tabs are open. Here we get the name of the
+        active one.
 
         Returns:
              str
@@ -39,7 +39,7 @@ class AdminDashboardWidgetBarPage(_WidgetBar):
         self.tab_events = widget_bar.Tab(self._driver,
                                          locator.WidgetBar.ADMIN_EVENTS)
         self.tab_custom_attributes = widget_bar.Tab(
-                self._driver, locator.WidgetBar.ADMIN_CUSTOM_ATTRIBUTE)
+            self._driver, locator.WidgetBar.ADMIN_CUSTOM_ATTRIBUTE)
 
     def select_people(self):
         """
