@@ -401,6 +401,7 @@ dashboard-js-spec-helpers:
 mockup-js-files:
   - mockup_generator.js
   - javascript/generators/assessment.js
+  - javascript/generators/task.js
 
   # Assessor
   - assessor/pages/assessments.js
@@ -479,6 +480,7 @@ mockup-js-template-files:
   # Other base templates files
   - mockup_base_templates/request_panel.mustache
   - mockup_base_templates/assessment_panel.mustache
+  - mockup_base_templates/task_panel.mustache
   - mockup_base_templates/tree.mustache
   - mockup_base_templates/tree-assessor.mustache
   - mockup_base_templates/tree-cycle.mustache
