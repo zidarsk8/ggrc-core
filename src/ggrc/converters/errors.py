@@ -3,6 +3,9 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""List of all error and warning messages for imports."""
+
+
 WRONG_FILE_TYPE = (u"Line {line}: Wrong file type. Only .csv files are"
                    " supported. Please upload a .csv file.")
 
@@ -40,8 +43,8 @@ UNKNOWN_OBJECT = (u"Line {line}: {object_type} '{slug}' doesn't exist, so it"
 WHITESPACE_WARNING = (u"Line {line}: Field {column_name} contains multiple"
                       "spaces together, that will be merged into one.")
 
-UNKNOWN_USER_WARNING = (u"Line {line}: Specified user '{email}' does not exist."
-                        " That user will be ignored.")
+UNKNOWN_USER_WARNING = (u"Line {line}: Specified user '{email}' does not "
+                        "exist. That user will be ignored.")
 
 OWNER_MISSING = (u"Line {line}: Owner field does not contain a valid owner."
                  " You will be assigned as object owner.")
@@ -59,8 +62,11 @@ WRONG_REQUIRED_VALUE = (u"Line {line}: Required field {column_name} contains"
                         " invalid data '{value}'. The default value will be"
                         " used.")
 
-MISSING_VALUE_ERROR = (u"Line {line}: Field {column_name} is required. The line"
-                       " will be ignored.")
+MISSING_VALUE_WARNING = (u"Line {line}: Field {column_name} is required. The "
+                         "default value '{default_value}' will be used.")
+
+MISSING_VALUE_ERROR = (u"Line {line}: Field {column_name} is required. The "
+                       "line will be ignored.")
 
 PERMISSION_ERROR = (u"Line {line}: You don't have permission to update/delete"
                     " this record.")
