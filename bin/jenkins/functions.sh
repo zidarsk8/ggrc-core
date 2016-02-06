@@ -52,13 +52,9 @@ setup () {
     --project-name ${PROJECT} \
     up --force-recreate -d
   
-  if [[ $UID -eq 0 ]]; then
-    # This fixes permissions with bindfs only on jenkins.
-    chown 1000:1000 -R .
-  elif [[ $UID -eq 1000 ]]; then
-    docker exec -i ${PROJECT}_dev_1 sh -c "
-    bindfs /vagrant_bind /vagrant --map=$UID/1000 -o nonempty
-    "
+  if [[ $UID -ne 1000 ]]; then
+    echo "These tests must be run with UID 1000"
+    exit 1
   fi
   
   echo "Provisioning ${PROJECT}_dev_1"
