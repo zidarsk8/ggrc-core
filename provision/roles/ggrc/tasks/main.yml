@@ -4,13 +4,6 @@
 # Maintained By: goran@reciprocitylabs.com
 
 ---
-- name: install packages
-  sudo: yes
-  with_items: ggrc_packages
-  apt:
-    pkg: "{{ item.name }}"
-    state: latest
-
 - name: create development directories
   sudo: yes
   with_items: ggrc_development_directories
@@ -24,10 +17,6 @@
   command: make setup_dev DEV_PREFIX=/vagrant-dev
   args:
     chdir: /vagrant
-
-- name: remove gems
-  sudo: yes
-  shell: gem list | cut -d " " -f1 | xargs gem uninstall -aIx 2> /dev/null || true
 
 - name: install gems
   sudo: yes
@@ -63,23 +52,6 @@
   command: make bower_components
   args:
     chdir: /vagrant
-
-- name: change root password
-  mysql_user:
-    name: root
-    password: root
-    login_user: root
-    login_password: root
-    check_implicit_admin: yes
-    priv: "*.*:ALL"
-
-- name: create databases
-  with_items: ggrc_databases
-  mysql_db:
-    name: "{{ item.name }}"
-    state: present
-    login_user: root
-    login_password: root
 
 - name: configure bash
   sudo: yes
