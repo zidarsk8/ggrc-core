@@ -6,7 +6,7 @@
 }}
 
 <div class="wrap-row text-wrap">
-  <h6>{{object_type}} Notes</h6>
+  <h6>{{#if_equals type "task"}}{{type}}{{else}}{{object_type}}{{/if_equals}} Notes</h6>
   <textarea rows="4" class="span12 triple wysihtml5" placeholder="Enter description"></textarea>
 </div>
 

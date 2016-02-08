@@ -21,7 +21,7 @@
       status: "Draft",
       id: "33",
       icon: "calendar-check-o",
-      comments: Generator.get("comment", 10, {sort: "date", types: ["assignee", "verifier"]}),
+      comments: Generator.get("comment", 5, {sort: "date", types: ["assignee", "verifier"]}),
       people: {
         "assignee": Generator.get("user", 2),
         "verifiers": Generator.get("user", 2)
@@ -121,8 +121,7 @@
       }, {
         count: 5,
         randomize: "data"
-      }),
-      past_requests: Generator.get("request", 5)
+      })
     };
   };
 })(this.GGRC, this._, GGRC.Mockup.Generator);
