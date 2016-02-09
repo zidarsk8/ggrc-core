@@ -7,10 +7,12 @@
 
 <div class="item-main" data-model="true">
   <div class="item-wrap">
+    {{#if children}}
     <div class="openclose">
       <span class="status-label status-{{state_color}}"></span>
       <i class="fa fa-caret-right"></i>
     </div>
+    {{/if}}
     <div class="select">
       <div class="item-data">
         <div class="row-fluid">
@@ -138,7 +140,7 @@
   </div><!-- item-wrap end -->
 </div><!-- item-main end -->
 
-{{#if children.length}}
+{{#if children}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
       <div class="inner-tree">
