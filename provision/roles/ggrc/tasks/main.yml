@@ -4,20 +4,6 @@
 # Maintained By: goran@reciprocitylabs.com
 
 ---
-- name: create development directories
-  sudo: yes
-  with_items: ggrc_development_directories
-  file:
-    path: "{{ item.name }}"
-    owner: vagrant
-    group: vagrant
-    state: directory
-
-- name: prepare development virtualenv
-  command: make setup_dev DEV_PREFIX=/vagrant-dev
-  args:
-    chdir: /vagrant
-
 - name: install gems
   sudo: yes
   with_items: ggrc_gems
@@ -44,11 +30,3 @@
   command: make bower_components
   args:
     chdir: /vagrant
-
-- name: configure bash
-  sudo: yes
-  template:
-    src: .bashrc.j2
-    dest: /home/vagrant/.bashrc
-    owner: vagrant
-    group: vagrant
