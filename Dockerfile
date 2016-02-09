@@ -43,12 +43,11 @@ RUN /etc/init.d/mysql start \
 COPY ./src/requirements.txt ./src/dev-requirements.txt /vagrant/src/
 COPY ./Makefile /vagrant/
 COPY ./bin /vagrant/bin
+COPY ./extras /vagrant/extras
 
 WORKDIR /vagrant
 
 RUN make setup_dev DEV_PREFIX=/vagrant-dev \
-  && chown -R vagrant:vagrant /vagrant /vagrant-dev
+  && make appengine DEV_PREFIX=/vagrant-dev
 
-COPY . /vagrant
-
-RUN su vagrant -c "ansible-playbook -i provision/docker/inventory provision/site.yml"
+RUN chown -R vagrant:vagrant /vagrant /vagrant-dev

@@ -21,11 +21,6 @@
     global: yes
     state: present
 
-- name: run make appengine
-  command: make appengine DEV_PREFIX=/vagrant-dev
-  args:
-    chdir: /vagrant
-
 - name: run make bower_components
   command: make bower_components
   args:
