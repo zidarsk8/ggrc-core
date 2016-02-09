@@ -23,7 +23,7 @@ down_revision = '262bbe790f4c'
 
 def upgrade():
   op.execute("""
-      INSERT INTO relationships (
+      INSERT IGNORE INTO relationships (
         modified_by_id, created_at, updated_at,
         source_id, source_type, destination_id, destination_type,
         context_id
@@ -42,7 +42,9 @@ def upgrade():
       )
       SELECT r.id, 'AssigneeType', 'Creator,Assessor'
       FROM relationships AS r
-      WHERE r.source_type = 'Assessment';
+      JOIN object_owners AS oo
+      ON r.destination_id = oo.person_id AND r.destination_type = 'Person'
+      AND r.source_id = oo.ownable_id AND r.source_type = 'Assessment';
   """)
 
   op.execute("""UPDATE assessments SET status = 'Open'""")
