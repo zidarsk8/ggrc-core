@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewOrgGroupModal(base.Modal):
-    pass
+  pass

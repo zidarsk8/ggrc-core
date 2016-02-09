@@ -6,9 +6,9 @@
 
 
 class Program(object):
-    TITLE = u"""Test title with unicode characters: Un texte en français and
+  TITLE = u"""Test title with unicode characters: Un texte en français and
              additionally đšžćč!#./?€ħ&^~'"""
-    DESCRIPTION_LONG = u"""Governance, Risk Management, and Compliance (GRC)
+  DESCRIPTION_LONG = u"""Governance, Risk Management, and Compliance (GRC)
     are three pillars that work together for the purpose of
     assuring that an organization meets its objectives. ...
     Governance is the combination of processes established '
@@ -51,8 +51,8 @@ class Program(object):
     GRC-related requirements due to changes in technology,
     increasing data storage, market globalization and
     increased regulation. Un texte en français"""
-    DESCRIPTION_SHORT = u"Test description"
-    NOTES_LONG = u"""Governance describes the overall management approach
+  DESCRIPTION_SHORT = u"Test description"
+  NOTES_LONG = u"""Governance describes the overall management approach
     through which senior executives direct and control the entire "
     organization, using a combination of management information "
     and hierarchical management control structures. Governance "
@@ -87,12 +87,12 @@ class Program(object):
     non-compliance against the projected expenses to achieve "
     compliance, and hence prioritize, fund and initiate any "
     corrective actions deemed necessary. Un texte en français"""
-    NOTES_SHORT = "Test notes"
-    CODE = u"Test code with special chars: Un texte en français"
-    PRIMARY_CONTACT = "selenium@test.com"
-    SECONDARY_CONTACT = "selenium@test.com"
-    PROGRAM_URL = "www.program_url.com"
-    REFERENCE_URL = "www.reference_url.com"
-    EFFECTIVE_DATE = "12/01/2014"
-    STOP_DATE = "12/30/2014"
-    DEFAULT_MANAGER = "user@example.com"
+  NOTES_SHORT = "Test notes"
+  CODE = u"Test code with special chars: Un texte en français"
+  PRIMARY_CONTACT = "selenium@test.com"
+  SECONDARY_CONTACT = "selenium@test.com"
+  PROGRAM_URL = "www.program_url.com"
+  REFERENCE_URL = "www.reference_url.com"
+  EFFECTIVE_DATE = "12/01/2014"
+  STOP_DATE = "12/30/2014"
+  DEFAULT_MANAGER = "user@example.com"

@@ -9,23 +9,23 @@ from lib import environment, base
 
 
 class LoginPage(base.Page):
-    URL = environment.APP_URL
+  URL = environment.APP_URL
 
-    def __init__(self, driver):
-        super(LoginPage, self).__init__(driver)
-        self.button_login = base.Button(driver, locator.Login.BUTTON_LOGIN)
+  def __init__(self, driver):
+    super(LoginPage, self).__init__(driver)
+    self.button_login = base.Button(driver, locator.Login.BUTTON_LOGIN)
 
-    def login(self):
-        """Clicks on the login button on the login page
+  def login(self):
+    """Clicks on the login button on the login page
 
-        Returns:
-             dashboard.DashboardPage
-        """
-        self.button_login.click()
-        return dashboard.DashboardPage(self._driver)
+    Returns:
+         dashboard.DashboardPage
+    """
+    self.button_login.click()
+    return dashboard.DashboardPage(self._driver)
 
-    def login_as(self, user_name, user_email):
-        """Clicks on the login button on the login page and logs in as a
-        certain user.
-        """
-        raise NotImplementedError
+  def login_as(self, user_name, user_email):
+    """Clicks on the login button on the login page and logs in as a
+    certain user.
+    """
+    raise NotImplementedError

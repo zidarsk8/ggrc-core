@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewVendorModal(base.Modal):
-    pass
+  pass

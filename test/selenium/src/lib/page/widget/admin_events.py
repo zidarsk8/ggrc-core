@@ -9,6 +9,6 @@ from lib.page.widget.base import Widget
 
 
 class AdminEvents(Widget):
-    URL = environment.APP_URL \
-        + url.ADMIN_DASHBOARD \
-        + url.Widget.EVENTS
+  URL = environment.APP_URL \
+      + url.ADMIN_DASHBOARD \
+      + url.Widget.EVENTS

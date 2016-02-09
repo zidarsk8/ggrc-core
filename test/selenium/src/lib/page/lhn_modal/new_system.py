@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewSystemModal(base.Modal):
-    pass
+  pass

@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewThreatModal(base.Modal):
-    pass
+  pass

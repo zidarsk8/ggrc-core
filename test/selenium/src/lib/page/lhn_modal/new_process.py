@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewProcessModal(base.Modal):
-    pass
+  pass

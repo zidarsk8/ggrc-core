@@ -9,6 +9,6 @@ from lib.page.widget.base import Widget
 
 
 class AdminPeople(Widget):
-    URL = environment.APP_URL \
-        + url.ADMIN_DASHBOARD \
-        + url.Widget.PEOPLE
+  URL = environment.APP_URL \
+      + url.ADMIN_DASHBOARD \
+      + url.Widget.PEOPLE

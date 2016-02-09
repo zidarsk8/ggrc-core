@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewSectionModal(base.Modal):
-    pass
+  pass

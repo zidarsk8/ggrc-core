@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewWorkflowPage(base.Modal):
-    pass
+  pass

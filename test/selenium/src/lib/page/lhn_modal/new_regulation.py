@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewRegulationModal(base.Modal):
-    pass
+  pass

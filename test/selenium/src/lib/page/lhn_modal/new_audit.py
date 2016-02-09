@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewAuditModal(base.Modal):
-    pass
+  pass

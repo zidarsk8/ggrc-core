@@ -6,9 +6,9 @@
 
 
 class Program(object):
-    TITLE = u"""Test title with unicode characters: Un texte en français and
+  TITLE = u"""Test title with unicode characters: Un texte en français and
      additionally đšžćč!#./?€ħ&^~'"""
-    INLINE_HELP = u"""Test title with unicode characters: Un texte en français
+  INLINE_HELP = u"""Test title with unicode characters: Un texte en français
      and additionally đšžćč!#./?€ħ&^~'"""
-    PLACEHOLDER = u"""Test title with unicode characters: Un texte en
+  PLACEHOLDER = u"""Test title with unicode characters: Un texte en
      français and additionally đšžćč!#./?€ħ&^~'"""

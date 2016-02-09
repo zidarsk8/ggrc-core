@@ -10,9 +10,9 @@ from lib.constants import locator
 
 
 class TestLoginPage(base.Test):
-    @pytest.mark.smoke_tests
-    def test_login_as_admin(self, selenium):
-        """Logs in and verifies that we're logged in as admin."""
-        login.LoginPage(selenium.driver).login()
-        selenium.driver.find_element(
-            *locator.PageHeader.BUTTON_ADMIN_DASHBOARD)
+  @pytest.mark.smoke_tests
+  def test_login_as_admin(self, selenium):
+    """Logs in and verifies that we're logged in as admin."""
+    login.LoginPage(selenium.driver).login()
+    selenium.driver.find_element(
+        *locator.PageHeader.BUTTON_ADMIN_DASHBOARD)

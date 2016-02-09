@@ -35,8 +35,8 @@ THREATS = "threats"
 
 
 class Widget(object):
-    INFO = "#info_widget"
-    CUSTOM_ATTRIBUTES = "#custom_attribute_widget"
-    EVENTS = "#events_list_widget"
-    ROLES = "#roles_list_widget"
-    PEOPLE = "#people_list_widget"
+  INFO = "#info_widget"
+  CUSTOM_ATTRIBUTES = "#custom_attribute_widget"
+  EVENTS = "#events_list_widget"
+  ROLES = "#roles_list_widget"
+  PEOPLE = "#people_list_widget"

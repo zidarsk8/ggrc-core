@@ -7,6 +7,6 @@ from lib import base
 
 
 class Widget(base.Widget):
-    def __init__(self, driver):
-        super(Widget, self).__init__(driver)
-        self.object_id = self.url.split("/")[-1][:-1]
+  def __init__(self, driver):
+    super(Widget, self).__init__(driver)
+    self.object_id = self.url.split("/")[-1][:-1]

@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewContractModal(base.Modal):
-    pass
+  pass

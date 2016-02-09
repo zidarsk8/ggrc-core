@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewPolicyModal(base.Modal):
-    pass
+  pass

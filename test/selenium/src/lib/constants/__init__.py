@@ -4,13 +4,13 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from lib.constants import (
-    element,
-    log,
-    path,
-    kwargs,
-    yaml,
-    url,
-    ux,
-    tag,
-    test_runner
+  element,  # flake8: noqa
+  log,
+  path,
+  kwargs,
+  yaml,
+  url,
+  ux,
+  tag,
+  test_runner
 )

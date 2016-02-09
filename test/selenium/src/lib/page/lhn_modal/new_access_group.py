@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewAccessGroupModal(base.Modal):
-    pass
+  pass

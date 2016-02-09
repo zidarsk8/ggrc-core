@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewAssetModal(base.Modal):
-    pass
+  pass

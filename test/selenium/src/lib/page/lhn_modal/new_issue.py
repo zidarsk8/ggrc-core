@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewIssueModal(base.Modal):
-    pass
+  pass

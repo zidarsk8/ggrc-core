@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewPersonModal(base.Modal):
-    pass
+  pass

@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewControlModal(base.Modal):
-    pass
+  pass

@@ -8,7 +8,6 @@ import logging
 from ast import literal_eval
 from lib import constants, file_ops
 
-
 PROJECT_ROOT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/../../../"
 VIRTENV_PATH = PROJECT_ROOT_PATH + constants.path.VIRTUALENV_DIR
 
@@ -25,8 +24,8 @@ APP_URL = _yaml_app_url \
     else _yaml_app_url.join("/")
 SERVER_WAIT_TIME = _yaml[constants.yaml.APP][constants.yaml.WAIT_TIME]
 DISPLAY_WINDOWS = _yaml[constants.yaml.BROWSER][constants.yaml.DISPLAY]
-WINDOW_RESOLUTION = literal_eval(_yaml[constants.yaml.BROWSER][
-    constants.yaml.RESOLUTION])
+WINDOW_RESOLUTION = literal_eval(
+    _yaml[constants.yaml.BROWSER][constants.yaml.RESOLUTION])
 
 LOG_PATH = PROJECT_ROOT_PATH + constants.path.LOGS_DIR
 # register loggers

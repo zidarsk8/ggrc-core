@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewClauseModal(base.Modal):
-    pass
+  pass

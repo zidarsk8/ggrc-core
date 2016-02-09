@@ -7,4 +7,4 @@ from lib import base
 
 
 class NewRequestModal(base.Modal):
-    pass
+  pass
