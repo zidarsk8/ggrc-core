@@ -98,9 +98,26 @@
         this.element.find(".filter-holder").slideToggle(this.options.slide_speed);
       },
       ".add-object-trigger click": function (el, ev) {
+        var repeatBlock = $('.repeated-block').length;
         ev.preventDefault();
         this.element.find('.repeated-block').last().clone()
         .appendTo('.relevant-block-wrap');
+
+        console.log(repeatBlock);
+        if (repeatBlock >= 1) {
+          $(".close-block").removeClass("hidden");
+        }
+      },
+      ".close-trigger click": function (el, ev) {
+        var repeatBlock;
+
+        el.closest('.repeated-block').remove();
+
+        repeatBlock = $('.repeated-block').length;
+
+        if (repeatBlock === 1) {
+          $(".close-block").addClass("hidden");
+        }
       },
       '.dropdown-menu-form ul click' : function (el, ev) {
         ev.stopPropagation();
@@ -121,14 +138,14 @@
             $allCheckboxes = $('.attr-checkbox'),
             $hidable = $('.hidable');
 
-        if ($allTrigger.hasClass('triggered')) {
-          $allTrigger.removeClass('triggered');
-          $hidable.removeClass('hidden');
-          $allCheckboxes.prop('checked', false);
-        } else {
+        if (!$allTrigger.hasClass('triggered')) {
           $allTrigger.addClass('triggered');
-          $hidable.addClass('hidden');
+          $hidable.removeClass('hidden');
           $allCheckboxes.prop('checked', true);
+        } else {
+          $allTrigger.removeClass('triggered');
+          $hidable.addClass('hidden');
+          $allCheckboxes.prop('checked', false);
         }
       },
       ".type-select change": function (el, ev) {
@@ -145,9 +162,7 @@
       },
       "a.field-hide click" : function(el, ev) { //field hide
         var $el = $(el),
-          $hidable = $el.closest('[class*="span"].hidable'),
-          $showButton = $(this.element).find('#formRestore'),
-          $hideButton = $(this.element).find('#formHide');
+          $hidable = $el.closest('[class*="span"].hidable');
 
         $hidable.addClass("hidden");
         this.options.reset_visible = true;
@@ -161,9 +176,6 @@
             $(ui_unit[i]).attr('uiindex', tab_value);
           }
         }
-
-        $hideButton.hide();
-        $showButton.show();
         return false;
       }
   });

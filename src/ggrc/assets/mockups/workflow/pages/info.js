@@ -43,13 +43,13 @@
       })
     },
     t_title: Generator.create({
-      hidable: false
+      hidable: false,
     }),
     start_date: Generator.create({
-      hidable: false
+      hidable: false,
     }),
     end_date: Generator.create({
-      hidable: false
+      hidable: false,
     }),
     t_description: Generator.create({
       hidable: true
@@ -59,7 +59,6 @@
     }),
     t_type: Generator.create({
       hidable: true,
-      sidebar: false,
       size: 5
     }),
     frequency_select: Generator.create({
@@ -93,20 +92,26 @@
       }]
     }),
     t_group: Generator.create({
-      hidable: true
+      hidable: true,
     }),
     w_title: Generator.create({
-      hidable: false
+      hidable: false,
     }),
     w_desc: Generator.create({
       hidable: true
     }),
+    w_custom: Generator.create({
+      hidable: true
+    }),
+    w_code: Generator.create({
+      hidable: false,
+    }),
     frequency: Generator.create({
       hidable: false,
-      sidebar: true,
       size: 6
     }),
     button_draft: "Save draft",
+    button_reset: "Don’t save",
     button_active: "Activate"
   };
 })(GGRC || {}, GGRC.Mockup.Generator);

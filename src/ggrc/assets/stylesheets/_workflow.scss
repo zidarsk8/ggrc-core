@@ -419,11 +419,24 @@ ul.new-tree {
 
 .repeated-block {
   padding: 20px 30px;
+  position: relative;
   h6 {
     padding-bottom: 6px;
   }
   &:nth-child(odd) {
     background: lighten($lightGray, 3%);
+  }
+  .close-block {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    a {
+      @include opacity(0.35);
+      @include transition(opacity 0.2s ease-in-out);
+      &:hover {
+        @include opacity(1);
+      }
+    }
   }
 }
 
@@ -454,6 +467,7 @@ ul.new-tree {
 .dropdown-wrap {
   position: relative;
   .reset-form & {
+    float: left;
     .dropdown-menu {
       min-width: 350px;
       left: auto;
@@ -475,5 +489,12 @@ ul.new-tree {
         }
       }
     }
+  }
+}
+
+.state-value {
+  .reset-form & {
+    float: left;
+    margin: 5px 10px 0 0;
   }
 }
