@@ -12,7 +12,7 @@ TMP_REPO="/tmp/ggrc-core"
 SCRIPT=$(basename "$0")
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
-if [ "$ARG1" == "-h" || "$ARG1" == "--help" ]; then
+if [[ "$ARG1" == "-h" || "$ARG1" == "--help" ]]; then
   echo "
 Usage: $SCRIPT [test_commit] [-h]
 

@@ -4,158 +4,77 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from lib import base
-from lib.page import modal
 from lib.constants import locator
 
 
-class _LhnToggle(base.Toggle):
-    locators = locator.LhnMenu
-    
-    
-class _LhnDropdown(base.DropdownDynamic):
-    locators = locator.LhnMenu
+class _Tab(base.Tab):
+  locator_element = None
 
-    def __init__(self, driver, element_locator):
-        """
-        Args:
-            driver (base._CustomDriver)
-            element_locator (tuple)
-        """
-        super(_LhnDropdown, self).__init__(driver, element_locator)
-
-    def create_new(self):
-        raise NotImplementedError
+  def __init__(self, driver):
+    """
+    Args:
+        driver (base.CustomDriver
+    """
+    super(_Tab, self).__init__(driver, self.locator_element)
 
 
-class Programs(_LhnToggle):
-    def create_new(self):
-        """
-        Returns:
-            modal.new_program.NewProgramModal
-        """
-        self.click_when_visible(self.locators.BUTTON_CREATE_NEW_PROGRAM)
-        return modal.new_program.NewProgramModal(self._driver)
+class MyObjectsTab(_Tab):
+  locator_element = locator.LhnMenu.MY_OBJECTS
 
 
-class Workflows(_LhnDropdown):
+class AllObjectsTab(_Tab):
+  locator_element = locator.LhnMenu.ALL_OBJECTS
+
+
+class Button(base.Button):
+  def __init__(self, driver, locator_element, locator_count):
+    super(Button, self).__init__(driver, locator_element)
+    self.members_count = int(
+        self._driver.find_element(*locator_count).text)
+
+
+class DropdownStatic(base.Dropdown):
+  _locator_element = None
+
+  def __init__(self, driver):
+    super(DropdownStatic, self).__init__(driver, self._locator_element)
+
+
+class AccordionGroup(base.DropdownDynamic):
+  """Class which models LHN top level buttons/elements."""
+
+  _locator_spinny = None
+  _locator_button_create_new = None
+
+  def __init__(self, driver):
+    """
+    Args:
+        driver (base.CustomDriver)
+    """
+    super(AccordionGroup, self).__init__(
+        driver,
+        [self._locator_spinny],
+        wait_until_visible=False
+    )
+
+    self.button_create_new = base.Button(
+        self._driver, self._locator_button_create_new)
+
+    # todo
+    # self._update_loaded_members()
+    # self._set_visible_members()
+
+  def _update_loaded_members(self):
     pass
 
-
-class Audits(_LhnDropdown):
+  def _set_visible_members(self):
     pass
 
-
-class ControlAssesments(_LhnDropdown):
+  def scroll_down(self):
     pass
 
-
-class Requests(_LhnDropdown):
+  def scroll_up(self):
     pass
 
-
-class Issues(_LhnDropdown):
-    pass
-
-
-class Directives(_LhnToggle):
-    pass
-
-
-class Regulations(_LhnDropdown):
-    pass
-
-
-class Policies(_LhnDropdown):
-    pass
-
-
-class Standards(_LhnDropdown):
-    pass
-
-
-class Contracts(_LhnDropdown):
-    pass
-
-
-class Clauses(_LhnDropdown):
-    pass
-
-
-class Sections(_LhnDropdown):
-    pass
-
-
-class ControlsOrObjectives(_LhnToggle):
-    pass
-
-
-class Controls(_LhnDropdown):
-    pass
-
-
-class Objectives(_LhnDropdown):
-    pass
-
-
-class PeopleOrGroups(_LhnToggle):
-    pass
-
-
-class People(_LhnDropdown):
-    pass
-
-
-class OrgGroups(_LhnDropdown):
-    pass
-
-
-class Vendors(_LhnDropdown):
-    pass
-
-
-class AccessGroups(_LhnDropdown):
-    pass
-
-
-class AssetsOrBusiness(_LhnToggle):
-    pass
-
-
-class Systems(_LhnDropdown):
-    pass
-
-
-class Processes(_LhnDropdown):
-    pass
-
-
-class DataAssets(_LhnDropdown):
-    pass
-
-
-class Products(_LhnDropdown):
-    pass
-
-
-class Projects(_LhnDropdown):
-    pass
-
-
-class Facilities(_LhnDropdown):
-    pass
-
-
-class Markets(_LhnDropdown):
-    pass
-
-
-class RisksOrThreats(_LhnToggle):
-    pass
-
-
-class Risks(_LhnDropdown):
-    pass
-
-
-class Threats(_LhnDropdown):
+  def create_new(self):
     pass

@@ -7,4 +7,4 @@ from lib import meta
 
 
 class MetaDocsDecorator(meta.RequireDocs, meta.DecoratePublicMethods):
-    pass
+  pass
