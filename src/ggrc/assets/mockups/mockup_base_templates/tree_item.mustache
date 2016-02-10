@@ -14,7 +14,10 @@
     <div class="select">
       <div class="item-data">
         <div class="row-fluid">
-          <div class="{{#if_helpers '\ #if_equals' type 'assessment' '\ or #if_equals' type 'task'}}
+          <div class="
+          {{#if_helpers '\
+            #if_equals' type 'assessment' '\
+            or #if_equals' type 'task'}}
             span6
           {{else}}
             span4
@@ -30,6 +33,7 @@
           {{#if_helpers '\
             #if_equals' type 'assessment' '\
             or ^if_equals' type 'task'}}
+            {{^if_equals type "control"}}
             <div class="span2">
               <div class="row-fluid">
                 <div class="span12">
@@ -39,6 +43,7 @@
                 </div>
               </div>
             </div>
+            {{/if_equals}}
           {{/if_helpers}}
           {{^if_equals type "task"}}
             <div class="{{#if_equals type "assessment"}}span2{{else}}span4{{/if}}">
@@ -55,22 +60,24 @@
           {{^if_equals type "task"}}
           {{^if_equals type "task_group"}}
           {{^if_equals type "task"}}
-            <div class="{{#if_equals type "assessment"}}span2{{else}}span4{{/if_equals}}">
+            <div class="{{#if_equals type 'assessment'}}span2{{else}}span4{{/if_equals}}">
               <div class="show-details">
-                <a href="/audits/3" target="_blank"><i class="grcicon-to-right"></i></a>
+                <a href="/audits/3" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
               </div>
               {{^if_equals type "assessment"}}
                 <ul class="tree-action-list">
                   <li>
-                    <i class="grcicon-person-black" rel="tooltip" data-placement="left"
+                    <i class="fa fa-person" rel="tooltip" data-placement="left"
                     data-original-title="Audit Lead, Request Assignee "></i>
                   </li>
-                  <li>
-                    <div class="counter">
-                      <i class="fa fa-list-alt"></i>
-                      3
-                    </div>
-                  </li>
+                  {{^if_equals type "control"}}
+                    <li>
+                      <div class="counter">
+                        <i class="fa fa-list-alt"></i>
+                        3
+                      </div>
+                    </li>
+                  {{/if_equals}}
                 </ul>
               {{/if_equals}}
             </div>

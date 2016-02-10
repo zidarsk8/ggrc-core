@@ -30,6 +30,11 @@
 
       <div class="span4">
         <ul class="tree-action-list">
+          <li>
+            <a href="#QuickWorkflowCreate" data-toggle="modal">
+              <i class="fa fa-list-alt"></i>
+            </a>
+          </li>
           <li class="filter-trigger">
             <a href="javascript://" class="active">
               <i class="fa fa-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
@@ -217,3 +222,5 @@
   <div class="clearfix"></div>
   <ul class="tree-structure new-tree base-tree-view"></ul>
 {{/instance}}
+
+{{> /static/mustache/quick-workflow/workflow_modal.mustache }}

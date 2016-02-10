@@ -29,3 +29,8 @@ def init_mockup_views():
   @login_required
   def mockup_workflow():
     return render_template("mockups/workflow.haml")
+
+  @app.route("/mockups/quick-workflow")
+  @login_required
+  def mockup_quick_workflow():
+    return render_template("mockups/quick-workflow.haml")
