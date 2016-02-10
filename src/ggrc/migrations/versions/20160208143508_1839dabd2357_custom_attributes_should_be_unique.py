@@ -15,7 +15,6 @@ Create Date: 2015-12-07 15:33:08.728216
 """
 
 from alembic import op
-
 from sqlalchemy.sql import text
 
 from ggrc import db
@@ -48,7 +47,8 @@ def upgrade():
   index = 0
   conn = op.get_bind()
   for a in attributes:
-    sql = "update custom_attribute_definitions set title = :title where id = :id"
+    sql = "update custom_attribute_definitions \
+      set title = :title where id = :id"
     if previous_value != a["title"]:
       previous_value = a["title"]
       index = 0
