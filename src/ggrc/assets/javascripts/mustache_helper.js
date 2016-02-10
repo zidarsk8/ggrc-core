@@ -1173,13 +1173,13 @@ Mustache.registerHelper("link_to_tree", function () {
 /**
  *  Helper for rendering date or datetime values in current local time
  *
- *  @param {boolean} hide_time - if set to true, render date only
+ *  @param {boolean} hideTime - if set to true, render date only
  *  @return {String} - date or datetime string in the following format:
  *    * date: MM/DD/YYYY),
  *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
  */
-Mustache.registerHelper('date', function (date, hide_time) {
-  var current_timezone = moment.tz.guess();
+Mustache.registerHelper('date', function (date, hideTime) {
+  var currentTimezone = moment.tz.guess();
   var m;
 
   if (date === undefined || date === null) {
@@ -1187,10 +1187,10 @@ Mustache.registerHelper('date', function (date, hide_time) {
   }
 
   m = moment(new Date(date.isComputed ? date() : date));
-  if (hide_time === true) {
+  if (hideTime === true) {
     return m.format('MM/DD/YYYY');
   }
-  return m.tz(current_timezone).format('MM/DD/YYYY hh:mm:ss A z');
+  return m.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A z');
 });
 
 /**
