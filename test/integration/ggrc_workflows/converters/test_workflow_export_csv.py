@@ -3,6 +3,8 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""Tests for workflow object exports."""
+
 from os.path import abspath, dirname, join
 from flask.json import dumps
 
@@ -17,6 +19,8 @@ CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
 
 class TestExportEmptyTemplate(TestCase):
 
+  """Test empty export for all workflow object types."""
+
   def setUp(self):
     self.client.get("/login")
     self.headers = {
@@ -25,7 +29,8 @@ class TestExportEmptyTemplate(TestCase):
         "X-export-view": "blocks",
     }
 
-  def test_basic_policy_template(self):
+  def test_single_object_export(self):
+    """Test empty exports for workflow only."""
     data = [{"object_name": "Workflow", "fields": "all"}]
 
     response = self.client.post("/_service/export_csv",
@@ -33,7 +38,8 @@ class TestExportEmptyTemplate(TestCase):
     self.assertEqual(response.status_code, 200)
     self.assertIn("Title*", response.data)
 
-  def test_multiple_empty_objects(self):
+  def test_multiple_objects(self):
+    """Test empty exports for all workflow object in one query."""
     data = [
         {"object_name": "Workflow", "fields": "all"},
         {"object_name": "TaskGroup", "fields": "all"},
@@ -46,12 +52,13 @@ class TestExportEmptyTemplate(TestCase):
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
     self.assertEqual(response.status_code, 200)
-    self.assertIn("Workflow", response.data)
-    self.assertIn("Task Group", response.data)
-    self.assertIn("Task", response.data)
-    self.assertIn("Cycle", response.data)
-    self.assertIn("Cycle Task", response.data)
-    self.assertIn("Cycle Object", response.data)
+    self.assertIn("Workflow,", response.data)
+    self.assertIn("Task Group,", response.data)
+    self.assertIn("Task,", response.data)
+    self.assertIn("Cycle,", response.data)
+    self.assertIn("Cycle Task Group,", response.data)
+    self.assertIn("Cycle Task Group Object Task,", response.data)
+    self.assertIn("Cycle Object,", response.data)
 
 
 class TestExportMultipleObjects(TestCase):
@@ -61,7 +68,7 @@ class TestExportMultipleObjects(TestCase):
   """
 
   @classmethod
-  def setUpClass(cls):
+  def setUpClass(cls):  # pylint: disable=C0103
     TestCase.clear_data()
     cls.tc = app.test_client()
     cls.tc.get("/login")
@@ -289,39 +296,61 @@ class TestExportMultipleObjects(TestCase):
 
   def test_wf_indirect_relevant_filters(self):
     """ test related filter for indirect relationships on wf objects """
-    block = lambda obj: {
-        "object_name": obj,
-        "fields": ["slug"],
-        "filters": {
-            "expression": {
-                "object_name": "Policy",
-                "op": {"name": "relevant"},
-                "slugs": ["p1"],
-            },
-        },
-    }
+    def block(obj):
+      return {
+          "object_name": obj,
+          "fields": ["slug"],
+          "filters": {
+              "expression": {
+                  "object_name": "Policy",
+                  "op": {"name": "relevant"},
+                  "slugs": ["p1"],
+              },
+          },
+      }
 
     data = [
         block("Workflow"),
         block("Cycle"),
+        block("CycleTaskGroup"),
         block("CycleTaskGroupObjectTask"),
     ]
     response = self.export_csv(data).data
 
+    wf = Workflow.query.filter_by(slug="wf-1").first()
+    cycle = wf.cycles[0]
+    cycle_tasks = [
+        cycle_task
+        for cycle_task in cycle.cycle_task_group_object_tasks
+        if cycle_task.cycle_task_group_object.object.slug == "p1"
+    ]
+
+    cycle_task_groups = list({cycle_task.cycle_task_group
+                             for cycle_task in cycle_tasks})
+
     self.assertEqual(1, response.count("wf-"))
-    self.assertIn(",wf-1", response)
+
+    self.assertRegexpMatches(response, ",{}[,\r\n]".format(wf.slug))
 
     self.assertEqual(1, response.count("CYCLE-"))
-    self.assertIn("CYCLE-1", response)
+    self.assertRegexpMatches(response, ",{}[,\r\n]".format(cycle.slug))
+
+    self.assertEqual(1, response.count("CYCLEGROUP-"))
+    self.assertEqual(1, len(cycle_task_groups))
+    self.assertRegexpMatches(response, ",{}[,\r\n]".format(
+        cycle_task_groups[0].slug))
 
     self.assertEqual(2, response.count("CYCLETASK-"))
-    self.assertIn("CYCLETASK-1", response)
-    self.assertIn("CYCLETASK-2", response)
+    self.assertEqual(2, len(cycle_tasks))
+    for cycle_task in cycle_tasks:
+      self.assertRegexpMatches(response, ",{}[,\r\n]".format(
+          cycle_task.slug))
 
     destinations = [
-        ("Workflow", "wf-1", 3),
-        ("Cycle", "CYCLE-1", 3),
-        ("CycleTaskGroupObjectTask", "CYCLETASK-1", 1),
+        ("Workflow", wf.slug, 3),
+        ("Cycle", cycle.slug, 3),
+        ("CycleTaskGroupObjectTask", cycle_tasks[0].slug, 1),
+        ("CycleTaskGroupObjectTask", cycle_tasks[1].slug, 1),
     ]
     for object_name, slug, count in destinations:
       data = [{

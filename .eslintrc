@@ -21,6 +21,7 @@
     "RefreshQueue": false,
     "RefreshQueueManager": false,
     "Spinner": false,
+    "Stickyfill": false,
     "ZeroClipboard": false,
 
     // TODO: Check why these vars are global
@@ -69,8 +70,14 @@
     "quote-props": [2, "as-needed", { "numbers": true, "keywords": true }],
     "vars-on-top": 2,
 
-    // CanJS uses a lot of these exceptions
-    "camelcase": 0,
+
+    // CanJS uses a lot of the following, thus the exceptions...
+    //
+    // NOTE: camelCase check is disabled for object properties, because 3rd
+    // party libraries' APIs might expect object arguments with properties
+    // following a different naming conventions, and trying to work around
+    // that just to make the linter happy is simply not worth it.
+    "camelcase":  [1, {properties: "never"}],
     "new-cap": 0,
     "no-new": 0,
   }

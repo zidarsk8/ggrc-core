@@ -158,10 +158,10 @@
       extra_descriptor_options = {
         all: {
           Person: {
-            widget_icon: 'grcicon-user-black'
+            widget_icon: 'fa fa-person'
           },
           Document: {
-            widget_icon: 'grcicon-link'
+            widget_icon: 'fa fa-link'
           }
         },
         Contract: {

@@ -25,7 +25,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'}
     ])
-    , child_tree_display_list : ['Section', 'Clause']
     , add_item_view : GGRC.mustache_path + "/directives/tree_add_item.mustache"
     }
 

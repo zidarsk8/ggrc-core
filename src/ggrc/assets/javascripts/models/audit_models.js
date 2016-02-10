@@ -518,36 +518,37 @@ can.Model.Cacheable("CMS.Models.Request", {
         });
       });
     } // /new_object_form
-  }
-  , get_filter_vals: function () {
-    var filter_vals = can.Model.Cacheable.prototype.get_filter_vals,
-        mappings = $.extend({}, this.class.filter_mappings, {
-          "title": "title",
-          "description": "description",
-          "state": "status",
-          "due date": "due_on",
-          "due": "due_on"
-        }),
-        keys, vals;
+  },
+  get_filter_vals: function () {
+    var filterVals = can.Model.Cacheable.prototype.get_filter_vals;
+    var mappings = $.extend({}, this.class.filter_mappings, {
+      title: 'title',
+      description: 'description',
+      state: 'status',
+      'due date': 'due_on',
+      due: 'due_on',
+      code: 'slug',
+      audit: 'audit'
+    });
+    var keys = _.union(this.class.filter_keys, ['state'], _.keys(mappings));
+    var vals = filterVals.call(this, keys, mappings);
 
-    keys = _.union(this.class.filter_keys, ["state"], _.keys(mappings));
-    vals = filter_vals.call(this, keys, mappings);
     try {
-      vals["due_on"] = moment(this["due_on"]).format("YYYY-MM-DD");
-      vals["due"] = vals["due date"] = vals["due_on"];
+      vals.due_on = moment(this.due_on).format('YYYY-MM-DD');
+      vals.due = vals['due date'] = vals.due_on;
       if (this.assignee) {
-        vals["assignee"] = filter_vals.apply(this.assignee.reify(), []);
+        vals.assignee = filterVals.apply(this.assignee.reify(), []);
       }
     } catch (e) {}
 
     return vals;
   },
-  save: function() {
-      // Make sure the context is always set to the parent audit
-      if (!this.context || !this.context.id) {
-        this.attr('context', this.audit.reify().context);
-      }
-      return this._super.apply(this, arguments);
+  save: function () {
+    // Make sure the context is always set to the parent audit
+    if (!this.context || !this.context.id) {
+      this.attr('context', this.audit.reify().context);
+    }
+    return this._super.apply(this, arguments);
   },
   after_save: function() {
     // Create a relationship between request & assessment & control
@@ -891,7 +892,7 @@ can.Model.Cacheable('CMS.Models.Assessment', {
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      this.validatePresenceOf('control');
+      this.validatePresenceOf('object');
       this.validatePresenceOf('audit');
       this.validateNonBlank('title');
   }

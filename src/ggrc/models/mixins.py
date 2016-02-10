@@ -414,8 +414,8 @@ class Slugged(Base):
   _aliases = {
       "slug": {
           "display_name": "Code",
-          "description": ("Must be unique. Can be left empty for"
-                          "autogeneration. If updating or deleting,"
+          "description": ("Must be unique. Can be left empty for "
+                          "autogeneration. If updating or deleting, "
                           "code is required"),
       }
   }
@@ -560,9 +560,11 @@ class CustomAttributable(object):
   @declared_attr
   def custom_attribute_values(cls):
     from ggrc.models.custom_attribute_value import CustomAttributeValue
-    join_function = lambda: and_(
-        foreign(CustomAttributeValue.attributable_id) == cls.id,
-        foreign(CustomAttributeValue.attributable_type) == cls.__name__)
+
+    def join_function():
+      return and_(
+          foreign(CustomAttributeValue.attributable_id) == cls.id,
+          foreign(CustomAttributeValue.attributable_type) == cls.__name__)
     return relationship(
         "CustomAttributeValue",
         primaryjoin=join_function,
@@ -629,13 +631,15 @@ class CustomAttributable(object):
     from ggrc.models.custom_attribute_definition import \
         CustomAttributeDefinition
     definition_type = foreign(CustomAttributeDefinition.definition_type)
-    join_function = lambda: or_(
-        definition_type == underscore_from_camelcase(cls.__name__),
-        # The bottom statement always evaluates to False, and is here just to
-        # satisfy sqlalchemys need for use of foreing keys while defining a
-        # relationship.
-        definition_type == cls.id,
-    )
+
+    def join_function():
+      return or_(
+          definition_type == underscore_from_camelcase(cls.__name__),
+          # The bottom statement always evaluates to False, and is here just to
+          # satisfy sqlalchemys need for use of foreing keys while defining a
+          # relationship.
+          definition_type == cls.id,
+      )
     return db.relationship(
         "CustomAttributeDefinition",
         primaryjoin=join_function

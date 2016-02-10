@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
+
+set -o nounset
+set -o errexit
+
+PROJECT="unittests"
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+cd "${SCRIPTPATH}/../.."
+source bin/jenkins/functions.sh
+
+PROJECT=$( project_name "$@" -d "$PROJECT" )
+
+setup $PROJECT
+
+echo "
+###############################################################################
+"
+
+echo "Running python unit tests"
+docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+  source /vagrant/bin/init_vagrant_env
+  /vagrant/bin/run_unit
+" && unit_rc=$? || unit_rc=$?
+
+[[ unit_rc -eq 0 ]] && echo "PASS" || echo "FAIL"
+
+echo "
+###############################################################################
+"
+
+echo "Running karma tests"
+
+docker exec -id ${PROJECT}_selenium_1 python /selenium/bin/chrome_karma.py
+
+docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+  source /vagrant/bin/init_vagrant_env
+  /vagrant/node_modules/karma/bin/karma start /vagrant/karma.conf.js --single-run --reporters dots,junit
+" && karma_rc=$? || karma_rc=$?
+
+[[ karma_rc -eq 0 ]] && echo "PASS" || echo "FAIL"
+
+echo "
+###############################################################################
+"
+
+teardown $PROJECT
+
+exit $((unit_rc * unit_rc + karma_rc * karma_rc))

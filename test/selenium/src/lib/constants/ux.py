@@ -4,3 +4,4 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 MAX_USER_WAIT_SECONDS = 60
+ELEMENT_MOVING_TIMEOUT = 5

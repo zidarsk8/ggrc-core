@@ -83,7 +83,6 @@
           _canonical: {
             task_groups: "TaskGroup",
             people: "Person",
-            folders: "GDriveFolder",
             context: "Context"
           },
 
@@ -93,8 +92,6 @@
             "task_groups", "task_group_tasks"),
           cycles: Direct(
             "Cycle", "workflow", "cycles"),
-          folders:
-            new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder"),
           previous_cycles: CustomFilter("cycles", function(result) {
               return !result.instance.attr("is_current");
             }),
@@ -131,7 +128,7 @@
                    && binding.instance.role.reify().attr("name") === "WorkflowOwner";
           }),
           owners: Cross("owner_authorizations", "person"),
-          orphaned_objects: Multi(["cycles", "task_groups", "tasks", "current_task_groups", "current_tasks", "folders"])
+          orphaned_objects: Multi(["cycles", "task_groups", "tasks", "current_task_groups", "current_tasks"])
         },
 
         Cycle: {
@@ -215,9 +212,7 @@
             "CycleTaskGroupObjectTask",
             "cycle_task_entries",
             "cycle_task_group_object_task"),
-          workflow: Cross("cycle", "workflow"),
-          folders: Cross("workflow", "folders"),
-          extended_folders: Multi(["folders"])
+          workflow: Cross("cycle", "workflow")
         },
 
         People: {

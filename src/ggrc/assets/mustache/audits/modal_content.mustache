@@ -197,11 +197,8 @@
     </div>
     <input data-id="audit_firm_2_txtbx" type="hidden" name="slug" value="{{slug}}">
 
-    <div class="row-fluid">
-      <div data-id="folder_hidden" class="span6 hidable">
-        <ggrc-gdrive-folder-picker instance="instance" deferred="true" tabindex="13"></ggrc-gdrive-folder-picker>
-      </div>
-    </div>
+    {{{render_hooks "Audit.storage_folder_picker"}}}
+
     <div class="row-fluid">
       <div data-id="code_hidden" class="span4 hidable">
         <label>
