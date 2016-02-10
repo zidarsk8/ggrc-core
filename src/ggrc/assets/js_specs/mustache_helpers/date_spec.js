@@ -25,7 +25,8 @@ describe('can.mustache.helper.date', function () {
       '2015-05-03T12:34:45Z').tz(moment.tz.guess()).format('z');
     testDate = new Date(2015, 4, 3, 7, 34, 56);
 
-    expect(helper(testDate, 'true')).toEqual('05/03/2015 07:34:56 AM '+ timezone);
+    expect(
+      helper(testDate, 'true')).toEqual('05/03/2015 07:34:56 AM ' + timezone);
   });
 
   it('returns datetime when stringy falsey value is passed in', function () {
@@ -34,7 +35,7 @@ describe('can.mustache.helper.date', function () {
     testDate = new Date(2015, 4, 3, 7, 34, 56);
 
     expect(
-      helper(testDate, 'false')).toEqual('05/03/2015 07:34:56 AM '+ timezone);
+      helper(testDate, 'false')).toEqual('05/03/2015 07:34:56 AM ' + timezone);
   });
 
   it('returns datetime when false value is passed in', function () {
@@ -43,9 +44,8 @@ describe('can.mustache.helper.date', function () {
     testDate = new Date(2015, 4, 3, 7, 34, 56);
 
     expect(
-      helper(testDate, false)).toEqual('05/03/2015 07:34:56 AM '+ timezone);
+      helper(testDate, false)).toEqual('05/03/2015 07:34:56 AM ' + timezone);
   });
-
 
   it('returns datetime when random values are passed in', function () {
     var timezone = moment(
@@ -53,13 +53,12 @@ describe('can.mustache.helper.date', function () {
     testDate = new Date(2015, 4, 3, 7, 34, 56);
 
     expect(
-      helper(testDate, 'asdasd')).toEqual('05/03/2015 07:34:56 AM '+ timezone);
+      helper(testDate, 'asdasd')).toEqual('05/03/2015 07:34:56 AM ' + timezone);
     expect(
-      helper(testDate, {a: 1})).toEqual('05/03/2015 07:34:56 AM '+ timezone);
+      helper(testDate, {a: 1})).toEqual('05/03/2015 07:34:56 AM ' + timezone);
     expect(
-      helper(testDate, '{a: 1}')).toEqual('05/03/2015 07:34:56 AM '+ timezone);
+      helper(testDate, '{a: 1}')).toEqual('05/03/2015 07:34:56 AM ' + timezone);
     expect(
-      helper(testDate, 123)).toEqual('05/03/2015 07:34:56 AM '+ timezone);
+      helper(testDate, 123)).toEqual('05/03/2015 07:34:56 AM ' + timezone);
   });
-
 });
