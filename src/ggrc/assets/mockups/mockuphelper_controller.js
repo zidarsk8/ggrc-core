@@ -103,20 +103,19 @@
         this.element.find('.repeated-block').last().clone()
         .appendTo('.relevant-block-wrap');
 
-        console.log(repeatBlock);
         if (repeatBlock >= 1) {
-          $(".close-block").removeClass("hidden");
+          $('.close-block').removeClass("hidden");
         }
       },
       ".close-trigger click": function (el, ev) {
-        var repeatBlock;
+        var repeatBlock,
+            close = $(".close-block");
 
         el.closest('.repeated-block').remove();
-
         repeatBlock = $('.repeated-block').length;
 
         if (repeatBlock === 1) {
-          $(".close-block").addClass("hidden");
+          close.addClass("hidden");
         }
       },
       '.dropdown-menu-form ul click' : function (el, ev) {
