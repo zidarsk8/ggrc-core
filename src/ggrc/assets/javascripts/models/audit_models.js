@@ -1027,11 +1027,20 @@
   }, {
     form_preload: function (newObjectForm) {
       var pageInstance = GGRC.page_instance();
-      if (newObjectForm && pageInstance && pageInstance.type === 'Audit') {
-        if (!this.audit) {
-          this.attr('audit', pageInstance);
-        }
+      var currentUser = CMS.Models.get_instance(GGRC.current_user);
+
+      if (!newObjectForm) {
+        return;
       }
+
+      if (pageInstance && pageInstance.type === 'Audit' && !this.audit) {
+        this.attr('audit', pageInstance);
+      }
+      this.mark_for_addition('related_objects_as_destination', currentUser, {
+        attrs: {
+          AssigneeType: 'Creator'
+        }
+      });
     },
     before_save: function (newForm) {
       if (!this.isNew()) {
