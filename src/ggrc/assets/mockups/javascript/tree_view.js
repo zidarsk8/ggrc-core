@@ -9,7 +9,7 @@
    can.Control("CMS.Controllers.MockupTreeView", {
     }, {
     init: function (el, opts) {
-      _.each(this.options.children, function (child) {
+      can.each(this.options.instance.children, function (child) {
         var $item = $("<li/>", {class: "tree-item"});
         new CMS.Controllers.MockupTreeItem($item, {
           item: child
@@ -36,7 +36,7 @@
       if (!status) {
         return;
       }
-      _.each(this.options.children, function (child, i) {
+      can.each(this.options.instance.children, function (child, i) {
         var isActive = index === i;
         child.attr("active", isActive);
         if (isActive) {
@@ -53,7 +53,7 @@
   }, {
     init: function (el, options) {
       this.element.html(can.view(this.options.view, options.item));
-      _.each(options.item.children, function (child) {
+      can.each(options.item.children, function (child) {
         var $item = $("<li/>", {class: "tree-item"});
         new CMS.Controllers.MockupTreeItem($item, {
           item: child
