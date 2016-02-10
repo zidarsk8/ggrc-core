@@ -3,17 +3,14 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
-from sqlalchemy import orm
 from sqlalchemy.orm import validates
-from uuid import uuid1
-
 from ggrc import db
+from ggrc.models.mixins import Assignable
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import deferred
-from ggrc.models.control import Control
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
@@ -23,15 +20,22 @@ from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.track_object_state import track_state_for_class
 
 
-class Assessment(HasObjectState, TestPlanned, CustomAttributable,
-                        Documentable, Personable, Timeboxed, Ownable,
-                        Relatable, BusinessObject, db.Model):
+class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
+                 Documentable, Personable, Timeboxed, Ownable,
+                 Relatable, BusinessObject, db.Model):
   __tablename__ = 'assessments'
 
-  design = deferred(db.Column(db.String), 'Assessment')
-  operationally = deferred(db.Column(db.String), 'Assessment')
+  VALID_STATES = (u"Open", u"In Progress", u"Finished", u"Verified", u"Final")
+  ASSIGNEE_TYPES = (u"Creator", u"Assessor", u"Verifier")
 
-  audit = {}  # we add this for the sake of client side error checking
+  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
+                    default=VALID_STATES[0]), "Assessment")
+
+  design = deferred(db.Column(db.String), "Assessment")
+  operationally = deferred(db.Column(db.String), "Assessment")
+
+  object = {}  # we add this for the sake of client side error checking
+  audit = {}
 
   VALID_CONCLUSIONS = frozenset([
       "Effective",
@@ -44,7 +48,8 @@ class Assessment(HasObjectState, TestPlanned, CustomAttributable,
   _publish_attrs = [
       'design',
       'operationally',
-      PublishOnly('audit')
+      PublishOnly('audit'),
+      PublishOnly('object')
   ]
 
   _aliases = {
