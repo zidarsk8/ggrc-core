@@ -30,9 +30,11 @@ def upgrade():
   Make sure the object_type in notifications is the same string field as in all
   other polymorphic tables and remove the now obsolete object_types tabele.
   """
-  op.add_column(
-      "notifications",
-      sa.Column("object_type", sa.String(length=250), nullable=True)
+
+  op.execute(
+      "ALTER TABLE notifications "
+      "ADD COLUMN object_type VARCHAR(250) NOT NULL "
+      "AFTER object_id;"
   )
 
   op.execute(
