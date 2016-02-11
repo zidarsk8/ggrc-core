@@ -7,24 +7,23 @@ from lib import base
 from lib import environment
 from lib.constants import url
 from lib.constants import locator
-from lib.constants import element
+from lib.element import widget_info
 
 
 class InfoWidget(base.Widget):
-  def __init__(self, driver, locator_button_settings, locator_members):
+  def __init__(self, driver):
     super(InfoWidget, self).__init__(driver)
 
-    self.button_settings = base.DropdownStatic(
-        driver,
-        locator_button_settings,
-        locator_members
-    )
+    self.button_settings = base.Button(driver, locator.Widget.BUTTON_SETTINGS)
     self.object_id = self.url.split("/")[-1]
 
-  def delete_object(self):
-    self.navigate_to()
-    self.button_settings.select(
-        element.WidgetProgramInfo.BUTTON_SETTINGS_DROPDOWN_ITEMS)
+  def press_object_settings(self):
+    """
+    Returns:
+        widget_info.DropdownSettingsPrograms
+    """
+    self.button_settings.click()
+    return widget_info.DropdownSettingsPrograms(self._driver)
 
 
 class DashboardInfo(base.Widget):
@@ -70,11 +69,7 @@ class ProgramInfo(InfoWidget):
     Args:
         driver (base.CustomDriver)
     """
-    super(ProgramInfo, self).__init__(
-        driver,
-        self._locators.DROPDOWN_SETTINGS,
-        self._locators.DROPDOWN_SETTINGS_MEMBERS
-    )
+    super(ProgramInfo, self).__init__(driver)
     self.show_advanced = base.Toggle(
         self._driver, self._locators.BUTTON_SHOW_ADVANCED)
 

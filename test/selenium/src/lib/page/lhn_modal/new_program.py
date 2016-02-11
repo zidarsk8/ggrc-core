@@ -4,8 +4,8 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from lib import base
-from lib.page.widget import info
 from lib.constants import locator
+import lib.page.widget.info
 
 
 class NewProgramModal(base.Modal):
@@ -139,7 +139,10 @@ class NewProgramModal(base.Modal):
     """Saves this object.
 
     Note that at least the title must be entered and it must be unique.
+
+    Returns:
+        lib.page.widget.info.ProgramInfo
     """
     self.button_save_and_close.click()
     self.wait_for_redirect()
-    return info.ProgramInfo(self._driver)
+    return lib.page.widget.info.ProgramInfo(self._driver)

@@ -679,9 +679,9 @@ class _Threats(lhn.AccordionGroup):
     return lhn_modal.new_threat.NewThreatModal(self._driver)
 
 
-class _LhnContents(base.Component):
+class LhnContents(base.Component):
   def __init__(self, driver):
-    super(_LhnContents, self).__init__(driver)
+    super(LhnContents, self).__init__(driver)
     self.filter = None
     self.button_programs = None
     self.button_workflows = None
@@ -868,18 +868,18 @@ class Menu(base.AnimatedComponent):
     """In LHN selects the tab "My Objects"
 
     Returns:
-        _LhnContents
+        LhnContents
     """
     self.my_objects.click()
     self.all_objects.is_activated = False
-    return _LhnContents(self._driver)
+    return LhnContents(self._driver)
 
   def select_all_objects(self):
     """ In LHN selects the tab "All Objects"
 
     Returns:
-        _LhnContents
+        LhnContents
     """
     self.all_objects.click()
     self.my_objects.is_activated = False
-    return _LhnContents(self._driver)
+    return LhnContents(self._driver)
