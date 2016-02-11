@@ -7,6 +7,7 @@ import time
 import pyvirtualdisplay
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common import keys
 from selenium import webdriver
 from lib import environment
 from lib import constants
@@ -172,6 +173,10 @@ class RichTextInputField(Element):
     self._element.clear()
     self._element.send_keys(text)
     self.text = text
+
+  def paste_from_clipboard(self):
+    self._element.clear()
+    self._element.send_keys(keys.Keys.CONTROL, 'v')
 
 
 class TextInputField(RichTextInputField):
