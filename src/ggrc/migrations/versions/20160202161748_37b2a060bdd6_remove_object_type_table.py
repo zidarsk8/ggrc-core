@@ -4,7 +4,7 @@
 # Maintained By: miha@reciprocitylabs.com
 
 
-"""remove object type table
+"""Remove object type table
 
 Revision ID: 37b2a060bdd6
 Revises: 262bbe790f4c
@@ -21,7 +21,7 @@ from sqlalchemy.sql import table, column
 
 # revision identifiers, used by Alembic.
 revision = '37b2a060bdd6'
-down_revision = '262bbe790f4c'
+down_revision = '6bed0575a0b'
 
 
 def upgrade():
