@@ -4,7 +4,8 @@ COPY ./provision/docker/selenium.bashrc.j2 /root/.bashrc
 RUN apt-get update && apt-get install -y python python-pip xserver-xephyr
 
 COPY ./test/selenium/resources/requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN pip install pip \
+  && pip install -r /tmp/requirements.txt
 
 WORKDIR /selenium
 USER seluser
