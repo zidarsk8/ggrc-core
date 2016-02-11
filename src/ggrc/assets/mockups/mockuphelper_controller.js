@@ -191,6 +191,18 @@
       var isEnabled = el.val() === "Control";
       this.element.find(".js-toggle-controlplans").prop("disabled", !isEnabled)
           .closest("label").toggleClass("disabled", !isEnabled);
+    },
+    ".task-people-trigger change": function (el, ev) {
+      var isEach = el.val() === 'each',
+          isAll = el.val() === 'all';
+
+      if (isEach) {
+        this.element.find('.people-option').show();
+        this.element.find('.people-regular').hide();
+      } else if (isAll) {
+        this.element.find('.people-option').hide();
+        this.element.find('.people-regular').show();
+      }
     }
   });
 

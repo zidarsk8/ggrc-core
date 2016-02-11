@@ -8,25 +8,61 @@
   <div class="modal-body">
     <div class="row-fluid">
       <div class="span7">
-        <div class="row-fluid">
-          <div class="span12">
-            <label>
-              Workflow title
-            </label>
-            {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
-          </div>
+        <label>
+          Workflow title
+        </label>
+        {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
+      </div>
+      <div class="span5">
+        <label>People</label>
+        <div class="side-content">
+          <ul class="label-list">
+            <li>
+              <label>
+                <span class="file-controls">
+                  <a href="javascript://">
+                    <i class="fa fa-plus-circle"></i>
+                  </a>
+                </span>
+                <span class="person-label manager"></span>
+                Manager
+              </label>
+              <ul class="inner-count-list">
+                <li>
+                  <span class="file-controls">
+                    <a href="javascript://"><i class="fa fa-trash"></i></a>
+                  </span>
+                  <a href="javascript://">Anthony Lopez</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
         </div>
-        <div class="row-fluid">
-          <div class="span12">
-            <label>
-              One or many
-            </label>
-            <select>
-              <option>One task for each</option>
-              <option>One task for all</option>
-            </select>
-          </div>
-        </div>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span7">
+        <label>
+          One or many
+        </label>
+        <select class="task-people-trigger">
+          <option value="each">One task for each</option>
+          <option value="all">One task for all</option>
+        </select>
+      </div>
+      <div class="span5">
+        <label>Frequency</label>
+        <select class="span6">
+          <option value="one_time">One time</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="annually">Annually</option>
+        </select>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span7">
         <div class="row-fluid">
           <div class="span12">
             <label>
@@ -51,44 +87,88 @@
         </div>
       </div>
       <div class="span5">
-        <div class="row-fluid">
-          <div class="span12">
-            <label>People</label>
-            <div class="side-content">
-              <ul class="label-list">
-                <li>
-                  <label>
-                    <span class="file-controls">
-                      <a href="javascript://">
-                        <i class="fa fa-plus-circle"></i>
-                      </a>
-                    </span>
-                    <span class="person-label manager"></span>
-                    Manager
-                  </label>
-                  <ul class="inner-count-list">
-                    <li>
-                      <span class="file-controls">
-                        <a href="javascript://"><i class="fa fa-trash"></i></a>
-                      </span>
-                      <a href="javascript://">Anthony Lopez</a>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
+        <div class="people-option">
+          <div class="row-fluid">
+            <div class="span12">
+              <label>Assignee</label>
+              <select class="span6">
+                <option value="others">Others</option>
+                <option value="primary_contact">Primary contact</option>
+                <option value="secondary_contact">Secondary contact</option>
+                <option value="custom_attribute">Custom attribute</option>
+              </select>
+            </div>
+          </div>
+          <div class="row-fluid">
+            <div class="span12">
+              <label>Verifier</label>
+              <select class="span6">
+                <option value="others">Others</option>
+                <option value="primary_contact">Primary contact</option>
+                <option value="secondary_contact">Secondary contact</option>
+                <option value="custom_attribute">Custom attribute</option>
+              </select>
             </div>
           </div>
         </div>
-        <div class="row-fluid">
-          <div class="span12">
-            <label>Frequency</label>
-            <select class="span6">
-              <option value="one_time">One time</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="quarterly">Quarterly</option>
-              <option value="annually">Annually</option>
-            </select>
+        <div class="people-regular">
+          <div class="row-fluid">
+            <div class="span12">
+              <div class="side-content">
+                <ul class="label-list">
+                  <li>
+                    <label>
+                      <span class="file-controls">
+                        <a href="javascript://">
+                          <i class="fa fa-plus-circle"></i>
+                        </a>
+                      </span>
+                      <span class="person-label assignee"></span>
+                      Assignee
+                    </label>
+                    <ul>
+                      <li>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="fa fa-trash"></i></a>
+                        </span>
+                        <a href="javascript://">Sandra White</a>
+                      </li>
+                      <li>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="fa fa-trash"></i></a>
+                        </span>
+                        <a href="javascript://">Laura Taylor</a>
+                      </li>
+                      <li>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="fa fa-trash"></i></a>
+                        </span>
+                        <a href="javascript://">Steven Perez</a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <label>
+                      <span class="file-controls">
+                        <a href="javascript://">
+                          <i class="fa fa-plus-circle"></i>
+                        </a>
+                      </span>
+                      <span class="person-label verifier"></span>
+                      Verifier
+                    </label>
+                    <ul>
+                      <li>
+                        <span class="file-controls">
+                          <a href="javascript://"><i class="fa fa-trash"></i></a>
+                        </span>
+                        <a href="javascript://">Maria Davis</a>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
