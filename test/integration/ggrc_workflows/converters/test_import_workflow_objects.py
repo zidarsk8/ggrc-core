@@ -128,11 +128,11 @@ class TestWorkflowObjectsImport(TestCase):
                 errors.WRONG_REQUIRED_VALUE.format(
                     line=38, value="aaaa", column_name="Task Type"
                 ),
-                errors.WRONG_REQUIRED_VALUE.format(
-                    line=39, value="", column_name="Task Type"
+                errors.MISSING_VALUE_WARNING.format(
+                    line=39, default_value="Rich Text", column_name="Task Type"
                 ),
-                errors.WRONG_REQUIRED_VALUE.format(
-                    line=40, value="", column_name="Task Type"
+                errors.MISSING_VALUE_WARNING.format(
+                    line=40, default_value="Rich Text", column_name="Task Type"
                 ),
             ])
         },
