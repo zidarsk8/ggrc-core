@@ -81,8 +81,5 @@ teardown () {
     PROJECT="${1}"
   fi
 
-  docker exec -i ${PROJECT}_dev_1 sh -c "chown $UID -R /vagrant"
-  docker exec -i ${PROJECT}_selenium_1 sh -c "chown $UID -R /selenium"
-
   docker-compose -p ${PROJECT} stop
 }
