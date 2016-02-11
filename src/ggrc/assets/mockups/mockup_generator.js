@@ -124,6 +124,7 @@
   g.user = function (options) {
     options = options || {};
     var types = "assignee requester verifier assessor".split(" ");
+    console.log('User', options.types);
     return {
       name: g.get_random(FIRST_NAMES) + " " + g.get_random(LAST_NAMES),
       type: options.type || g.get_random(options.types || types)
@@ -198,7 +199,7 @@
   g.comment = function (options) {
     options = options || {};
     return {
-      author: g.user(options.type || options.types),
+      author: g.user({types: options.type || options.types}),
       timestamp: g.get_date({year: 2015}),
       comment: g.paragraph(_.random(0, 10)),
       attachments: g.get("file|url", _.random(0, 3))
