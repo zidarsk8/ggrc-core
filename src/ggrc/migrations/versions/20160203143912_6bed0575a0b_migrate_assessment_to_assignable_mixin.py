@@ -37,7 +37,7 @@ def upgrade():
   """)
 
   op.execute("""
-      INSERT INTO relationship_attrs (
+      INSERT IGNORE INTO relationship_attrs (
         relationship_id, attr_name, attr_value
       )
       SELECT r.id, 'AssigneeType', 'Creator,Assessor'
