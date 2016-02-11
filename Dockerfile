@@ -1,6 +1,7 @@
 FROM phusion/baseimage
 
-RUN apt-get update \
+RUN rm /usr/sbin/policy-rc.d \
+  && apt-get update \
   && apt-get install -y \
     ansible \
     curl \
@@ -23,8 +24,7 @@ RUN apt-get update \
     vim \
     wget \
     zip \
-  && ln -s /usr/bin/nodejs /usr/bin/node \
-  && rm /usr/sbin/policy-rc.d
+  && ln -s /usr/bin/nodejs /usr/bin/node
 
 COPY ./provision/docker/01_start_mysql.sh /etc/my_init.d/
 
@@ -48,6 +48,8 @@ COPY ./package.json /vagrant/
 RUN npm install -g \
   && ln -s /usr/local/lib/node_modules/ggrc-core/node_modules/karma/bin/karma /usr/bin/karma
 
+RUN gem install sass -v 3.2.13 \
+  && gem install compass -v 0.12.2
 
 COPY ./src/requirements.txt ./src/dev-requirements.txt /vagrant/src/
 COPY ./Makefile /vagrant/
