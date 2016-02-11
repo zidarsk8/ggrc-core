@@ -11,13 +11,13 @@ Create Date: 2016-01-13 15:05:36.008456
 
 """
 
-# revision identifiers, used by Alembic.
-revision = '4003827b3d48'
-down_revision = '5410607088f9'
-
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
+
+# revision identifiers, used by Alembic.
+revision = '4003827b3d48'
+down_revision = '5410607088f9'
 
 
 def upgrade():
