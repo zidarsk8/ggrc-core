@@ -35,14 +35,6 @@
     global: yes
     state: present
 
-- name: install local npm modules
-  sudo: no
-  with_items: ggrc_local_npm_modules
-  npm:
-    name: "{{ item.name }}"
-    state: present
-    path: "/vagrant/node_modules"
-
 - name: run make appengine
   command: make appengine DEV_PREFIX=/vagrant-dev
   args:
