@@ -67,7 +67,7 @@ setup () {
   echo "Provisioning ${PROJECT}_dev_1"
   docker exec -i ${PROJECT}_dev_1 su vagrant -c "
     source /vagrant/bin/init_vagrant_env
-    ansible-playbook -i provision/docker/inventory provision/site.yml
+    make bower_components > /dev/null
     build_compass
     build_assets
   "

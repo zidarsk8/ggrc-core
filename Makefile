@@ -31,6 +31,8 @@ APPENGINE_REQUIREMENTS_TXT=$(PREFIX)/src/requirements.txt
 FLASH_PATH=$(PREFIX)/src/ggrc/static/flash
 STATIC_PATH=$(PREFIX)/src/ggrc/static
 BOWER_PATH=$(PREFIX)/bower_components
+DEV_BOWER_PATH=$(DEV_PREFIX)/bower_components
+BOWER_BIN_PATH=/usr/local/lib/node_modules/ggrc-core/node_modules/bower/bin/bower
 
 $(APPENGINE_SDK_PATH) : $(APPENGINE_ZIP_PATH)
 	@echo $( dirname $(APPENGINE_ZIP_PATH) )
@@ -148,9 +150,10 @@ src/app.yaml : src/app.yaml.dist
 		AUTHORIZED_DOMAINS="$(AUTHORIZED_DOMAINS)"
 
 bower_components : bower.json
-	mkdir -p $(BOWER_PATH)
 	mkdir -p $(FLASH_PATH)
-	bower install
+	mkdir -p $(DEV_BOWER_PATH)
+	ln -s $(DEV_BOWER_PATH) $(BOWER_PATH)
+	$(BOWER_BIN_PATH) install --allow-root
 	cp $(BOWER_PATH)/zeroclipboard/dist/ZeroClipboard.swf $(FLASH_PATH)/ZeroClipboard.swf
 	cp -r $(BOWER_PATH)/fontawesome/fonts $(STATIC_PATH)
 
