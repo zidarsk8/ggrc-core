@@ -18,6 +18,16 @@ from lib.constants.test import modal_create_new
 from lib.constants.test import modal_custom_attribute
 
 
+class HtmlParser(base.Test):
+  @staticmethod
+  def parse_text(text):
+    """Simulates text parsed by html
+    Args:
+      text (str)
+    """
+    return text.replace("  ", "").replace("\n", "")
+
+
 class ModalNewProgramPage(base.Test):
   """Methods for simulating common user actions"""
 
