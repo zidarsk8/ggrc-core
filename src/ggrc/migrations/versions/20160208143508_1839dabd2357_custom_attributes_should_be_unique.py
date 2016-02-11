@@ -75,7 +75,8 @@ def upgrade():
 
 
 def downgrade():
-  op.drop_constraint("uq_custom_attribute", "custom_attribute_definitions")
+  op.drop_constraint("uq_custom_attribute", "custom_attribute_definitions",
+                     type_="unique")
 
   sql1 = """
       alter table  custom_attribute_values
