@@ -17,6 +17,13 @@ def db_drop():
   pass
 
 
+@pytest.yield_fixture(scope="session")
+def db_migrate():
+  """Make sure the DB is up to date"""
+  # todo
+  pass
+
+
 @pytest.yield_fixture(scope="class")
 def selenium():
   """Setup test resources for running test in headless mode.
@@ -45,7 +52,19 @@ def custom_program_attribute(selenium):
 
 
 @pytest.yield_fixture(scope="class")
-def new_program(selenium, custom_program_attribute):
+def initial_lhn(selenium):
+  """
+  Returns:
+      lib.page.lhn.LhnContents
+  """
+  lhn_contents = dashboard.DashboardPage(selenium.driver) \
+      .open_lhn_menu() \
+      .select_my_objects()
+  yield lhn_contents
+
+
+@pytest.yield_fixture(scope="class")
+def new_program(selenium):
   """Creates a new program object.
 
   Returns:
@@ -62,6 +81,8 @@ def new_program(selenium, custom_program_attribute):
 
   yield modal, program_info_page
 
+  selenium.driver.get(program_info_page.url)
   widget.ProgramInfo(selenium.driver) \
-      .navigate_to(program_info_page.url) \
-      .delete_object()
+      .press_object_settings() \
+      .select_delete() \
+      .confirm_delete()
