@@ -7,13 +7,15 @@
 
 <div class="side-content">
   <ul class="label-list">
-    <li>
-        <people-group validate="validate" deferred="deferred" editable="editable" instance="instance" mapping="related_requesters" required="true" type="requester"></people-group>
-    </li>
-    <li>
-        <people-group validate="validate" deferred="deferred" editable="editable" instance="instance" mapping="related_assignees" required="true" type="assignee"></people-group>
-    </li>
-    <li class="hidable">
-        <people-group deferred="deferred" editable="editable" instance="instance" mapping="related_verifiers" type="verifier"></people-group>
-    </li>
+    {{#instance.class.assignable_list}}
+      {{#if required}}
+        <li>
+          <people-group validate="validate" deferred="deferred" editable="editable" instance="instance" mapping="mapping" required="true" type="type"></people-group>
+        </li>
+      {{else}}
+        <li class="hidable">
+          <people-group deferred="deferred" editable="editable" instance="instance" mapping="mapping" type="type"></people-group>
+        </li>
+      {{/if}}
+    {{/instance}}
 </ul>

@@ -65,3 +65,18 @@
     }
   }
 }
+
+.info-pane-utility {
+  @include clearfix();
+  float: right;
+  .sticky-info-panel & {
+    position: fixed;
+    right: 47px;
+    z-index: 9999;
+    margin-top: 20px;
+  }
+  .assignable & {
+    position: static;
+    margin-top: 0;
+  }
+}
