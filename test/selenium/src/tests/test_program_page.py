@@ -5,7 +5,10 @@
 
 import pytest
 from lib import base
-from lib.constants import element, url
+from lib import test_helpers
+from lib.constants import element
+from lib.constants import url
+from lib.constants import locator
 from lib.page import dashboard
 from lib.page import widget_bar
 
@@ -17,13 +20,13 @@ class TestProgramPage(base.Test):
   def test_object_count_updates(self, selenium, new_program):
     """Checks if the count updates in LHN after creating a new program
     object."""
-    _, program_object = new_program
+    _, program_info_page = new_program
     lhn_menu = dashboard.DashboardPage(selenium.driver) \
-        .open_lhn_menu() \
-        .select_my_objects()
+      .open_lhn_menu() \
+      .select_my_objects()
 
     assert lhn_menu.button_programs.members_count \
-        >= int(program_object.object_id)
+        >= int(program_info_page.object_id)
 
   @pytest.mark.smoke_tests
   def test_app_redirects_to_new_program_page(self, selenium, new_program):
@@ -53,3 +56,47 @@ class TestProgramPage(base.Test):
 
     assert horizontal_bar.get_active_widget_name() == \
         element.LandingPage.PROGRAM_INFO_TAB
+
+  @pytest.mark.smoke_tests
+  def test_info_tab_contains_entered_data(self, selenium, new_program):
+    """Verify that the created object contains the data we've entered
+    into the modal."""
+    modal, program_info_page = new_program
+
+    assert test_helpers.HtmlParser.parse_text(modal.ui_title.text) == \
+        program_info_page.title_entered.text
+    assert modal.ui_description.text == \
+        program_info_page.description_entered.text
+    assert modal.ui_notes.text == program_info_page.notes_entered.text
+
+    assert modal.ui_code.text == program_info_page.code_entered.text
+    assert program_info_page.primary_contact_entered.text in \
+        modal.ui_primary_contact.text
+    assert program_info_page.secondary_contact_entered.text in \
+        modal.ui_secondary_contact.text
+    assert modal.ui_program_url.text == \
+        program_info_page.program_url_entered.text
+    assert modal.ui_reference_url.text == \
+        program_info_page.reference_url_entered.text
+    assert modal.ui_effective_date.text == \
+        program_info_page.effective_date_entered.text
+    assert modal.ui_stop_date.text == program_info_page.stop_date_entered.text
+
+  @pytest.mark.smoke_tests
+  def test_permalink(self, selenium, new_program):
+    """Verify the url is copied to clipboard"""
+    _, program_info_page = new_program
+    selenium.driver.get(program_info_page.url)
+    
+    program_info_page \
+      .press_object_settings() \
+      .select_get_permalink()
+
+    # test notification alert
+    base.AnimatedComponent(
+      selenium.driver,
+      [locator.Widget.ALERT_LINK_COPIED],
+      wait_until_visible=True
+    )
+
+
