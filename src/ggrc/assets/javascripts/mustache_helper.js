@@ -1170,20 +1170,27 @@ Mustache.registerHelper("link_to_tree", function () {
   return link.join("/");
 });
 
-// Returns date formated like 01/28/2015 02:59:02am PST
-// To omit time pass in a second parameter {{date updated_at true}}
-Mustache.registerHelper("date", function (date) {
-    if (typeof date == 'undefined')
-      return '';
-  var m = moment(new Date(date.isComputed ? date() : date))
-    , dst = m.isDST()
-    , no_time = arguments.length > 2
-    ;
+/**
+ *  Helper for rendering date or datetime values in current local time
+ *
+ *  @param {boolean} hideTime - if set to true, render date only
+ *  @return {String} - date or datetime string in the following format:
+ *    * date: MM/DD/YYYY),
+ *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
+ */
+Mustache.registerHelper('date', function (date, hideTime) {
+  var currentTimezone = moment.tz.guess();
+  var m;
 
-  if (no_time) {
-    return m.format("MM/DD/YYYY");
+  if (date === undefined || date === null) {
+    return '';
   }
-  return m.utcOffset(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
+
+  m = moment(new Date(date.isComputed ? date() : date));
+  if (hideTime === true) {
+    return m.format('MM/DD/YYYY');
+  }
+  return m.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A z');
 });
 
 /**
