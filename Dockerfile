@@ -22,7 +22,8 @@ RUN apt-get update \
     unzip \
     vim \
     wget \
-    zip
+    zip \
+  && ln -s /usr/bin/nodejs /usr/bin/node
 
 COPY ./provision/docker/01_start_mysql.sh /etc/my_init.d/
 
@@ -41,12 +42,8 @@ WORKDIR /vagrant
 
 RUN useradd -G sudo -m vagrant \
  && echo "vagrant ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
- && chown -R vagrant.vagrant . \
+ && mkdir /vagrant-dev \
+ && chown -R vagrant:vagrant /vagrant /vagrant-dev \
  && rm /usr/sbin/policy-rc.d
 
 RUN su vagrant -c "ansible-playbook -i provision/docker/inventory provision/site.yml"
-
-
-RUN rm -rf /vagrant \
- && mkdir /vagrant \
- && chown vagrant.vagrant /vagrant
