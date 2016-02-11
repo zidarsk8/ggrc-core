@@ -7,5 +7,7 @@ COPY ./test/selenium/resources/requirements.txt /tmp/requirements.txt
 RUN pip install pip \
   && pip install -r /tmp/requirements.txt
 
+RUN usermod -u 1000 seluser
+
 WORKDIR /selenium
 USER seluser

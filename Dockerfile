@@ -36,18 +36,22 @@ RUN /etc/init.d/mysql start \
   && mv mysql mysql-hd \
   && ln -s mysql-hd mysql \
   && chmod +x /etc/my_init.d/01_start_mysql.sh \
-  && useradd -G sudo -m vagrant \
+  && useradd -G sudo -u 1000 -m vagrant \
   && echo "vagrant ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
-  && mkdir -p /vagrant-dev /vagrant/src
+  && mkdir -p /vagrant-dev /vagrant/src /vagrant/bin
+
+COPY ./provision/docker/vagrant.bashrc /home/vagrant/.bashrc
 
 WORKDIR /vagrant
 
 COPY ./package.json /vagrant/
-RUN npm install -g
+RUN npm install -g \
+  && ln -s /usr/local/lib/node_modules/ggrc-core/node_modules/karma/bin/karma /usr/bin/karma
+
 
 COPY ./src/requirements.txt ./src/dev-requirements.txt /vagrant/src/
 COPY ./Makefile /vagrant/
-COPY ./bin /vagrant/bin
+COPY ./bin/init_env ./bin/setup_linked_packages.py /vagrant/bin/
 COPY ./extras /vagrant/extras
 RUN make setup_dev DEV_PREFIX=/vagrant-dev \
   && make appengine DEV_PREFIX=/vagrant-dev
