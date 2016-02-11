@@ -50,13 +50,20 @@ setup () {
 
   docker-compose --file docker-compose-testing.yml \
     --project-name ${PROJECT} \
+    build
+
+  docker-compose --file docker-compose-testing.yml \
+    --project-name ${PROJECT} \
     up --force-recreate -d
-  
-  if [[ $UID -ne 1000 ]]; then
-    echo "These tests must be run with UID 1000"
+
+  if [[ $UID -eq 0 ]]; then
+    # Allow users inside the containers to access files.
+    chown 1000 -R .
+  elif [[ $UID -ne 1000 ]]; then
+    echo "These tests must be run with UID 1000 or 0. Your UID is $UID"
     exit 1
   fi
-  
+
   echo "Provisioning ${PROJECT}_dev_1"
   docker exec -i ${PROJECT}_dev_1 su vagrant -c "
     source /vagrant/bin/init_vagrant_env
