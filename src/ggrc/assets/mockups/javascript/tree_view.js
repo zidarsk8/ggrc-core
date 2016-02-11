@@ -34,6 +34,7 @@
       }
       function findNeedle(list, slug) {
         var prop;
+        var result;
         for (prop in list) {
           if (!list.hasOwnProperty(prop) || prop.indexOf('_') === 0) {
             continue;
@@ -43,7 +44,10 @@
             return list[prop];
           }
           if (list[prop].children) {
-            return findNeedle(list[prop].children, slug);
+            result = findNeedle(list[prop].children, slug);
+            if (result) {
+              return result;
+            }
           }
         }
       }
@@ -57,7 +61,6 @@
           type: slug[0]
         });
         if (item) {
-          console.log('Found needle', item);
           item.attr('active', false);
         }
       }, this);
