@@ -22,27 +22,81 @@
         return;
       }
       item = item.split("-");
-      var view = _.findWhere(this.options.children, {
+      var view = _.findWhere(this.options.instance.children, {
             type: item[0],
             id: item[1]
           });
-      view.attr("active", true);
+      // view && view.attr("active", true);
     },
-    "{children} change": function (list, ev, which, type, status) {
-      which = which.split(".");
-      var index = +which[0],
-          prop = which[1];
-
+    '{can.route} item': function (router, ev, current, previous) {
+      if (!previous) {
+        return;
+      }
+      function findNeedle(list, slug) {
+        var prop;
+        for (prop in list) {
+          if (!list.hasOwnProperty(prop) || prop.indexOf('_') === 0) {
+            continue;
+          }
+          if (list[prop].type === slug.type &&
+              Number(list[prop].id) === Number(slug.id)) {
+            return list[prop];
+          }
+          if (list[prop].children) {
+            return findNeedle(list[prop].children, slug);
+          }
+        }
+      }
+      current = current.split('__');
+      previous = previous.split('__');
+      _.each(_.difference(previous, current), function (slug) {
+        var item;
+        slug = slug.split('-');
+        item = findNeedle(this.options.instance.children, {
+          id: slug[1],
+          type: slug[0]
+        });
+        if (item) {
+          console.log('Found needle', item);
+          item.attr('active', false);
+        }
+      }, this);
+    },
+    '{instance.children} change': function (list, ev, which, type, status) {
+      var groups = groupChanged(which.split('.'));
+      var instance = this.options.instance;
+      var url = [];
+      function groupChanged(arr) {
+        var groups = [];
+        var check = arr;
+        while (check.length) {
+          check = arr.splice(0, 2);
+          if (check.length) {
+            groups.push(check);
+          }
+        }
+        return groups;
+      }
       if (!status) {
         return;
       }
-      can.each(this.options.instance.children, function (child, i) {
-        var isActive = index === i;
-        child.attr("active", isActive);
-        if (isActive) {
-          can.route.attr("item", child.type + "-" + child.id);
+
+      can.each(groups, function (group) {
+        var index = Number(group[0]);
+        var prop = group[1];
+
+        if (prop === 'active') {
+          instance = instance.children[index];
+
+          url.push(instance.type + '-' + instance.id);
+          instance.attr('active', true);
+          can.route.attr('item', url.join('__'));
+        } else {
+          instance = instance[prop][index];
+          url.push(instance.type + '-' + instance.id);
+          instance.attr('active', true);
         }
-      });
+      }, this);
     }
   });
 
@@ -61,13 +115,14 @@
         this.element.find(".tree-structure").append($item);
       }, this);
     },
-    ".select click": function (el, ev) {
-      var status = !this.options.item.active;
-      this.options.item.attr("active", status);
-    },
-    "{item} change": function (list, ev, which, type, status) {
-      if (which === "active") {
-        this.element.toggleClass("active", status);
+    '.select click': function (el, ev) {
+      var item = el.closest('.tree-item');
+      var status = this.options.item.attr('active');
+      if (this.element.is(item)) {
+        if (status) {
+          this.options.item.attr('active', false);
+        }
+        this.options.item.attr('active', true);
       }
     }
   });

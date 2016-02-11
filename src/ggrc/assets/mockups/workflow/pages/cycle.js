@@ -18,7 +18,7 @@
         id: "%id",
         children: Generator.get("task")
       }, {
-        count: 1
+        count: 2
       })
     }, {
       count: 2
