@@ -20,8 +20,21 @@ import sqlalchemy as sa
 
 
 def upgrade():
-  op.drop_column('relationships', 'relationship_type_id')
-  op.drop_table('relationship_types')
+  try:
+    op.drop_column('relationships', 'relationship_type_id')
+  except sa.exc.OperationalError as operr:
+    # Ignores error in case relationship_type_id no longer exists
+    error_code, _ = operr.orig.args  # error_code, message
+    if error_code != 1091:
+      raise operr
+
+  try:
+    op.drop_table('relationship_types')
+  except sa.exc.OperationalError as operr:
+    # Ignores error in case relationship_types table no longer exists
+    error_code, _ = operr.orig.args  # error_code, message
+    if error_code != 1051:
+      raise operr
 
 
 def downgrade():
