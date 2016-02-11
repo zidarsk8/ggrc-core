@@ -23,6 +23,11 @@ class Revision(Base, db.Model):
                      nullable=False)
   content = db.Column(JsonType, nullable=False)
 
+  source_type = db.Column(db.String, nullable=True)
+  source_id = db.Column(db.Integer, nullable=True)
+  destination_type = db.Column(db.String, nullable=True)
+  destination_id = db.Column(db.Integer, nullable=True)
+
   @staticmethod
   def _extra_table_args(_):
     return (db.Index('revisions_modified_by', 'modified_by_id'),)
@@ -30,6 +35,10 @@ class Revision(Base, db.Model):
   _publish_attrs = [
       'resource_id',
       'resource_type',
+      'source_type',
+      'source_id',
+      'destination_type',
+      'destination_id',
       'action',
       'content',
       'description',
@@ -50,6 +59,12 @@ class Revision(Base, db.Model):
     self.resource_type = str(obj.__class__.__name__)
     self.action = action
     self.content = content
+
+    for attr in ["source_type",
+                 "source_id",
+                 "destination_type",
+                 "destination_id"]:
+      setattr(self, attr, getattr(obj, attr, None))
 
   def _description_mapping(self, link_objects):
     """Compute description for revisions with <-> in display name."""
