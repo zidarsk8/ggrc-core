@@ -537,8 +537,28 @@ class WithContact(object):
     ).exists()
 
 
-class BusinessObject(
-        Stateful, Noted, Described, Hyperlinked, WithContact, Titled, Slugged):
+class Revisionable(object):
+  """ Mixin for models to expose revision history of the given model """
+  # pylint: disable=too-few-public-methods
+  # since this is a small-by-design mixin
+
+  _publish_attrs = ['revisions']
+
+  @declared_attr
+  def revisions(self):
+    """ Relationship to revisions of the given object """
+    def join_function():
+      from ggrc.models import Revision
+      return and_(Revision.resource_type == self.__name__,
+                  Revision.resource_id == self.id)
+    return db.relationship(
+        "Revision",
+        primaryjoin=join_function,
+        foreign_keys="Revision.resource_type, Revision.resource_id")
+
+
+class BusinessObject(Stateful, Noted, Described, Hyperlinked, WithContact,
+                     Titled, Slugged, Revisionable):
   VALID_STATES = (
       'Draft',
       'Final',
