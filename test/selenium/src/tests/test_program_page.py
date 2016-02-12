@@ -11,6 +11,7 @@ from lib.constants import url
 from lib.constants import locator
 from lib.page import dashboard
 from lib.page import widget_bar
+from lib.page import widget
 
 
 class TestProgramPage(base.Test):
@@ -22,8 +23,8 @@ class TestProgramPage(base.Test):
     object."""
     _, program_info_page = new_program
     lhn_menu = dashboard.DashboardPage(selenium.driver) \
-      .open_lhn_menu() \
-      .select_my_objects()
+        .open_lhn_menu() \
+        .select_my_objects()
 
     assert lhn_menu.button_programs.members_count \
         >= int(program_info_page.object_id)
@@ -68,7 +69,6 @@ class TestProgramPage(base.Test):
     assert modal.ui_description.text == \
         program_info_page.description_entered.text
     assert modal.ui_notes.text == program_info_page.notes_entered.text
-
     assert modal.ui_code.text == program_info_page.code_entered.text
     assert program_info_page.primary_contact_entered.text in \
         modal.ui_primary_contact.text
@@ -85,18 +85,59 @@ class TestProgramPage(base.Test):
   @pytest.mark.smoke_tests
   def test_permalink(self, selenium, new_program):
     """Verify the url is copied to clipboard"""
-    _, program_info_page = new_program
-    selenium.driver.get(program_info_page.url)
-    
+    _, program_info = new_program
+    selenium.driver.get(program_info.url)
+
+    program_info_page = widget.ProgramInfo(selenium.driver)
     program_info_page \
-      .press_object_settings() \
-      .select_get_permalink()
+        .press_object_settings() \
+        .select_get_permalink()
 
     # test notification alert
     base.AnimatedComponent(
-      selenium.driver,
-      [locator.Widget.ALERT_LINK_COPIED],
-      wait_until_visible=True
+        selenium.driver,
+        [locator.Widget.ALERT_LINK_COPIED],
+        wait_until_visible=True
     )
 
+    # test generated link
+    modal = program_info_page \
+        .press_object_settings() \
+        .select_edit()
+    modal.ui_title.paste_from_clipboard(modal.ui_description)
 
+    assert modal.ui_title.text == program_info_page.url
+
+  @pytest.mark.smoke_tests
+  def test_edit_modal(self, selenium, new_program):
+    """Tests if data is saved after editing the program info page edit modal"""
+    _, program_info = new_program
+    selenium.driver.get(program_info.url)
+
+    program_info_page = widget.ProgramInfo(selenium.driver)
+    modal = program_info_page \
+        .press_object_settings() \
+        .select_edit()
+    test_helpers.ModalNewProgramPage.enter_test_data(modal)
+    test_helpers.ModalNewProgramPage.set_start_end_dates(modal, 1, -2)
+    modal.save_and_close()
+
+    updated_program_info_page = widget.ProgramInfo(selenium.driver)
+    assert test_helpers.HtmlParser.parse_text(modal.ui_title.text) == \
+        updated_program_info_page.title_entered.text
+    assert modal.ui_description.text == \
+        updated_program_info_page.description_entered.text
+    assert modal.ui_notes.text == updated_program_info_page.notes_entered.text
+    assert modal.ui_code.text == updated_program_info_page.code_entered.text
+    assert updated_program_info_page.primary_contact_entered.text in \
+        modal.ui_primary_contact.text
+    assert updated_program_info_page.secondary_contact_entered.text in \
+        modal.ui_secondary_contact.text
+    assert modal.ui_program_url.text == \
+        updated_program_info_page.program_url_entered.text
+    assert modal.ui_reference_url.text == \
+        updated_program_info_page.reference_url_entered.text
+    assert modal.ui_effective_date.text == \
+        updated_program_info_page.effective_date_entered.text
+    assert modal.ui_stop_date.text == \
+        updated_program_info_page.stop_date_entered.text
