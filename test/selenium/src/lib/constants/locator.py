@@ -506,11 +506,11 @@ class Widget(object):
   PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
   BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
   DROPDOWN_SETTINGS_EDIT = (
-    By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(1)')
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(1)')
   DROPDOWN_SETTINGS_PERMALINK = (
-    By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(2)')
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(2)')
   DROPDOWN_SETTINGS_DELETE = (
-    By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(3)')
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(3)')
 
   MODAL_OBJECT_DELETE_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
   MODAL_OBJECT_DELETE_CONFIRMATION_TEXT = (By.CSS_SELECTOR,
@@ -518,7 +518,7 @@ class Widget(object):
   MODAL_OBJECT_DELETE_OBJECT_TITLE = (By.CSS_SELECTOR,
                                       '.modal-body>div>p>span')
   MODAL_OBJECT_DELETE_BUTTON_DELETE = (
-    By.CSS_SELECTOR, '.modal-footer .confirm-buttons>[data-toggle="delete"]')
+      By.CSS_SELECTOR, '.modal-footer .confirm-buttons>[data-toggle="delete"]')
 
   ALERT_LINK_COPIED = (By.CSS_SELECTOR, '.alert.alert-success')
   DROPDOWN_DELETE = (By.CSS_SELECTOR,
