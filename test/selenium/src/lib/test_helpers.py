@@ -19,6 +19,8 @@ from lib.constants.test import modal_custom_attribute
 
 
 class HtmlParser(base.Test):
+  """The HtmlParser class simulates what happens with (non-rich)text in HTML.
+  """
   @staticmethod
   def parse_text(text):
     """Simulates text parsed by html
