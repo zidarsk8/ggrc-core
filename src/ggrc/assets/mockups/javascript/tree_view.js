@@ -105,11 +105,17 @@
 
   can.Control("CMS.Controllers.MockupTreeItem", {
     defaults: {
-      view: "/static/mustache/mockup_base_templates/tree_item.mustache"
+      templates: {
+        task: '/static/mustache/mockup_base_templates/tree_item.mustache',
+        'default': '/static/mustache/mockup_base_templates/tree_item.mustache'
+      }
     }
   }, {
     init: function (el, options) {
-      this.element.html(can.view(this.options.view, options.item));
+      var template = this.options.templates[options.item.type] ||
+        this.options.templates['default'];
+
+      this.element.html(can.view(template, options.item));
       can.each(options.item.children, function (child) {
         var $item = $("<li/>", {class: "tree-item"});
         new CMS.Controllers.MockupTreeItem($item, {

@@ -124,7 +124,6 @@
   g.user = function (options) {
     options = options || {};
     var types = "assignee requester verifier assessor".split(" ");
-    console.log('User', options.types);
     return {
       name: g.get_random(FIRST_NAMES) + " " + g.get_random(LAST_NAMES),
       type: options.type || g.get_random(options.types || types)
