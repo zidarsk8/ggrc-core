@@ -41,7 +41,7 @@ Given the commit tree:
 fi
 
 CURRENT_COMMIT=$(git rev-parse HEAD)
-if [[ "$ARG1" == "" ]]; then
+if [[ "$ARG1" != "" ]]; then
   BASE_COMMIT="$ARG1"
   PARENT_2=$CURRENT_COMMIT
 else

@@ -36,7 +36,7 @@ fi
 rm -rf $TMP_REPO
 cp -a /vagrant $TMP_REPO
 cd $TMP_REPO
-git clean -xdf
+git clean -xdfq
 
 if [[ "$ARG1" != "" ]]; then
   TEST_COMMIT=$ARG1
