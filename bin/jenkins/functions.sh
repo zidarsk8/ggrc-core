@@ -68,6 +68,7 @@ setup () {
   docker exec -i ${PROJECT}_dev_1 su vagrant -c "
     source /vagrant/bin/init_vagrant_env
     make bower_components > /dev/null
+    ln -s /vagrant-dev/node_modules /vagrant/node_modules
     build_compass
     build_assets
   "

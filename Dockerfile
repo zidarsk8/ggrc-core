@@ -44,9 +44,9 @@ COPY ./provision/docker/vagrant.bashrc /home/vagrant/.bashrc
 
 WORKDIR /vagrant
 
-COPY ./package.json /vagrant/
-RUN npm install -g \
-  && ln -s /usr/local/lib/node_modules/ggrc-core/node_modules/karma/bin/karma /usr/bin/karma
+COPY ./package.json /vagrant-dev/
+RUN cd /vagrant-dev \
+  && npm install
 
 RUN gem install sass -v 3.2.13 \
   && gem install compass -v 0.12.2
