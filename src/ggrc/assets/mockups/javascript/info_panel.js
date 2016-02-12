@@ -58,26 +58,46 @@
       this.activePanel = _.findWhere(this.options.views, {title: tab});
       this.element.height(0).hide();
     },
-    "{can.route} item": function (router, ev, item) {
-      // TODO: Simplify this
+    '{can.route} item': function (router, ev, item) {
+      var view;
+      var tab;
+      function findNeedle(list, slug) {
+        var prop;
+        var result;
+        for (prop in list) {
+          if (!list.hasOwnProperty(prop) || prop.indexOf('_') === 0) {
+            continue;
+          }
+          if (list[prop].type === slug.type &&
+              Number(list[prop].id) === Number(slug.id)) {
+            return list[prop];
+          }
+          if (list[prop].children) {
+            result = findNeedle(list[prop].children, slug);
+            if (result) {
+              return result;
+            }
+          }
+        }
+      }
       if (!item || !item.length) {
         return;
       }
-      function recursiveFind(needle) {
-        if (needle.type === item[0] && needle.id === item[1]) {
-          return needle;
-        }
-        if (needle.children && needle.children.length) {
-          return _.map(needle.children, recursiveFind);
-        }
-      }
-      item = item.split("-");
-      var view = _.compact(_.flattenDeep(_.map(this.options.views, recursiveFind)))[0];
-      this.active = view;
+      item = item.split('__');
+      item = _.last(item).split('-');
+      tab = _.filter(this.options.views, function (view) {
+        return view.title === can.route.attr('tab');
+      })[0];
+
+      view = findNeedle(tab.children, {
+        id: item[1],
+        type: item[0]
+      });
+
       if (this.cached) {
         this.cached.destroy();
       }
-      this.cached = new CMS.Controllers.MockupInfoView(this.element.find(".tier-content"), {
+      this.cached = new CMS.Controllers.MockupInfoView(this.element.find('.tier-content'), {
         view: view
       });
       this.setSize();
@@ -88,17 +108,18 @@
     defaults: {
       comment_attachments: new can.List(),
       templates: {
-        "assessment": "/static/mustache/mockup_base_templates/assessment_panel.mustache",
-        "task": "/static/mustache/mockup_base_templates/task_panel.mustache",
-        "default": "/static/mustache/mockup_base_templates/request_panel.mustache"
+        assessment: '/static/mustache/mockup_base_templates/assessment_panel.mustache',
+        task: '/static/mustache/mockup_base_templates/task_panel.mustache',
+        'default': '/static/mustache/mockup_base_templates/request_panel.mustache'
       }
     }
   }, {
-    "init": function () {
+    init: function () {
+      var template;
       if (!this.options.view || !this.options.view.type) {
         return;
       }
-      var template = this.options.templates[this.options.view.type] || this.options.templates["default"];
+      template = this.options.templates[this.options.view.type] || this.options.templates['default'];
       this.element.html(can.view(template, this.options.view));
     },
     ".js-trigger-reuse click": function (el, ev) {

@@ -190,10 +190,15 @@
     // TODO: Moment knows how to handle invalid dates, so I don't care
     return moment(data.month + "-" + data.day + "-" + data.year).format(data.format || "MM/DD/YYYY");
   };
+  g.get_id = function (data) {
+    data = data || {};
+
+    return Number(_.uniqueId());
+  };
   g.comment = function (options) {
     options = options || {};
     return {
-      author: g.user(options.type || options.types),
+      author: g.user({types: options.type || options.types}),
       timestamp: g.get_date({year: 2015}),
       comment: g.paragraph(_.random(0, 10)),
       attachments: g.get("file|url", _.random(0, 3))
@@ -236,6 +241,7 @@
   g._create_single = function (data, options) {
     var alias = {
           "date": "get_date",
+          "id": "get_id",
           "title": "title",
           "timestamp": "get_date",
           "text": "paragraph",
@@ -245,7 +251,7 @@
         rGenerator = /^\%\S+$/i,
         result = {};
 
-     _.each(data, function (val, prop) {
+    _.each(data, function (val, prop) {
       if (_.isArray(options.randomize) ? _.indexOf(options.randomize, prop) !== -1
                                        : options.randomize === prop) {
         if (_.every(val, _.isString)) {
@@ -262,8 +268,8 @@
       } else if (!_.isNumber(prop)) {
         result[prop] = val;
       }
-     });
-     return result;
+    });
+    return result;
   };
   g.create = function (data, options) {
     options = options || {};

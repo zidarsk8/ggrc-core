@@ -5,7 +5,6 @@
     Maintained By: anze@reciprocitylabs.com
 */
 
-
 (function (can, $, Generator) {
   can.route(":tab", {tab: "Info"});
   can.route(":tab/:item");
@@ -82,7 +81,9 @@
           instance: options.view
         })));
         if (options.view.children) {
-          new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), options.view);
+          new CMS.Controllers.MockupTreeView(this.element.find(".base-tree-view"), {
+            instance: options.view
+          });
         }
         if (options.view.title === "Info") {
           this.cached = new CMS.Controllers.MockupInfoView(this.element);

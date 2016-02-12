@@ -7,18 +7,21 @@
     icon: "cycle",
     template: "/workflow/cycle.mustache",
     hide_filter: false,
-    children: Generator.get("task")
-    // children: [{
-    //   title: "My workflow",
-    //   type: "workflow",
-    //   id: "2",
-    //   children: [{
-    //     title: "Task Group",
-    //     type: "task_group",
-    //     icon: "task_group",
-    //     id: "23",
-    //     children: Generator.get("task")
-    //   }]
-    // }]
+    children: Generator.create({
+      title: "%title",
+      type: "workflow",
+      id: "%id",
+      children: Generator.create({
+        title: "Task Group",
+        type: "task_group",
+        icon: "task_group",
+        id: "%id",
+        children: Generator.get("task")
+      }, {
+        count: 2
+      })
+    }, {
+      count: 2
+    })
   };
 })(GGRC || {}, GGRC.Mockup.Generator);
