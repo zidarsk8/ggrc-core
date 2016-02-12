@@ -3,6 +3,7 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+# flake8: noqa
 from lib.page.widget.add import AddWidget
 from lib.page.widget.admin_people import AdminPeople
 from lib.page.widget.admin_events import AdminEvents
