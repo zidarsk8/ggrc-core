@@ -168,15 +168,39 @@ class Label(Element):
 
 
 class RichTextInputField(Element):
+  def __init__(self, driver, locator):
+    """
+    Args:
+        driver (CustomDriver):
+    """
+    self._driver = driver
+    self._locator = locator
+    self._element = self.get_when_visible(locator)
+    self.text = self._element.text
+
   def enter_text(self, text):
     self.click_when_visible()
     self._element.clear()
     self._element.send_keys(text)
     self.text = text
 
-  def paste_from_clipboard(self):
+  def paste_from_clipboard(self, element):
+    """
+    Pastes a value from clipboard into text input element.
+
+    Details:
+    We want to update the value of this element after pasting. In order to
+    do that, we click on another element.
+
+    Args:
+      element (Element)
+    """
     self._element.clear()
     self._element.send_keys(keys.Keys.CONTROL, 'v')
+    element.click()
+    el = self._driver.find_element(
+        *self._locator)
+    self.text = el.get_attribute("value")
 
 
 class TextInputField(RichTextInputField):
@@ -220,10 +244,12 @@ class Iframe(Element):
         text (str): the string we want to enter
     """
     iframe = self.get_when_visible()
-
     self._driver.switch_to.frame(iframe)
-    self._driver.find_element_by_tag_name(constants.tag.BODY) \
-        .send_keys(text)
+
+    element = self._driver.find_element_by_tag_name(constants.tag.BODY)
+    element.clear()
+    element.send_keys(text)
+
     self._driver.switch_to.default_content()
     self.text = text
 
@@ -249,6 +275,21 @@ class DatePicker(Element):
     self._element.click()
     elements = self._driver.find_elements(*self._locator_datepcker)
     return elements
+
+  def select_day_in_current_month(self, day):
+    """Selects a day - a sequential element from datepicker. Days go from 0 to
+    28,29 or 30, depending on current month. Since we're selecting an element
+    from a list, we can pass e.g. -1 to select the last day in month.
+
+    Args:
+      day (int)
+    """
+    elements = self._get_datepicker_elements_for_current_month()
+    elements[day].click()
+
+    # wait for fadeout in case we're above some other element
+    self.get_when_invisible(self._locator_datepcker)
+    self.text = self._element.get_attribute("value")
 
   def select_month_end(self):
     """Selects the last day of current month"""
