@@ -32,7 +32,7 @@ FLASH_PATH=$(PREFIX)/src/ggrc/static/flash
 STATIC_PATH=$(PREFIX)/src/ggrc/static
 BOWER_PATH=$(PREFIX)/bower_components
 DEV_BOWER_PATH=$(DEV_PREFIX)/bower_components
-BOWER_BIN_PATH=/usr/local/lib/node_modules/ggrc-core/node_modules/bower/bin/bower
+BOWER_BIN_PATH=/vagrant-dev/node_modules/bower/bin/bower
 
 $(APPENGINE_SDK_PATH) : $(APPENGINE_ZIP_PATH)
 	@echo $( dirname $(APPENGINE_ZIP_PATH) )
