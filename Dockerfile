@@ -3,7 +3,6 @@ FROM phusion/baseimage
 RUN rm /usr/sbin/policy-rc.d \
   && apt-get update \
   && apt-get install -y \
-    ansible \
     curl \
     fabric \
     git-core \
@@ -11,8 +10,6 @@ RUN rm /usr/sbin/policy-rc.d \
     mysql-server \
     nodejs \
     npm \
-    python-apt \
-    python-dev \
     python-imaging \
     python-mysqldb \
     python-pip \
@@ -55,7 +52,6 @@ COPY ./Makefile ./bower.json ./.bowerrc /vagrant/
 RUN make bower_components DEV_PREFIX=/vagrant-dev
 
 COPY ./src/requirements.txt ./src/dev-requirements.txt /vagrant/src/
-COPY ./Makefile /vagrant/
 COPY ./bin/init_env ./bin/setup_linked_packages.py /vagrant/bin/
 COPY ./extras /vagrant/extras
 RUN make setup_dev DEV_PREFIX=/vagrant-dev \
