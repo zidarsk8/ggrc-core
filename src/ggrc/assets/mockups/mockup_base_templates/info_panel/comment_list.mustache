@@ -6,7 +6,7 @@
 }}
 
 <ul class="entry-list">
-  {{#comments}}
+  {{#each comments}}
     <li>
       <span class="person-label {{author.type}}"></span>
       <div class="w-status">
@@ -29,5 +29,5 @@
         </ul>
       </div>
     </li>
-  {{/comments}}
+  {{/each}}
 </ul>
