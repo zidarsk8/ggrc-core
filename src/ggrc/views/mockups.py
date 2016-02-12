@@ -15,6 +15,11 @@ def init_mockup_views():
   if settings.PRODUCTION:
     return
 
+  @app.route("/mockups")
+  @login_required
+  def mockup_home():
+    return render_template("mockups/home.haml")
+
   @app.route("/mockups/request")
   @login_required
   def mockup_request():
