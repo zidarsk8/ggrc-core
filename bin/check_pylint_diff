@@ -61,14 +61,29 @@ echo ""
 
 # Run pylint on the old and new code, to compare the quality.
 # If pylint is run multiple times it will store the previous results and show
-# the change in quality with a non-negative number if code was improved or not 
+# the change in quality with a non-negative number if code was improved or not
 # changed, and a negative number if more code issues have been introduced.
-git checkout --quiet $PARENT_1
-echo "$CHANGED_FILES" | xargs pylint > /dev/null 2>&1 | true
-git checkout --quiet $TEST_COMMIT
-PYLINT_RESULT=$(echo "$CHANGED_FILES" | xargs pylint 2> /dev/null | tail -n 2) 
 
-echo "$PYLINT_RESULT"
-echo "$PYLINT_RESULT" | grep -E -q -e "-|\\+0.00" && rc=$? || rc=$?
+function run_pylint() {
+  echo "$CHANGED_FILES" | xargs pylint 2> /dev/null |  \
+    grep -E " [^ ]+/10" -o | head -n1 | grep -E -e "[^\.]+" -o | head -n1 \
+    || true
+}
 
-exit $rc
+git checkout $PARENT_1
+echo "running pylint on parent commit"
+RESULT_1=$( run_pylint )
+echo "$RESULT_1"
+
+git checkout $TEST_COMMIT
+echo "running pylint on test commit"
+RESULT_2=$( run_pylint )
+echo "$RESULT_2"
+
+if [ "$RESULT_2" -le "$RESULT_1" ]; then
+  echo "ok"
+  exit 0
+else
+  echo "FAIL: pylint score got worse"
+  exit 1
+fi
