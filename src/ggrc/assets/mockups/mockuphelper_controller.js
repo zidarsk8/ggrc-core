@@ -204,6 +204,17 @@
         this.element.find('.people-option').hide();
         this.element.find('.people-regular').show();
       }
+    },
+    ".modal .close-trigger click": function (el, ev) {
+      var repeatBlock,
+          close = $(".close-block");
+
+      el.closest('.repeated-block').remove();
+      repeatBlock = $('.repeated-block').length;
+
+      if (repeatBlock === 1) {
+        close.addClass("hidden");
+      }
     }
   });
 

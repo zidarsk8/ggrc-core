@@ -11,7 +11,16 @@
       <div class="basic-info">
         <div class="info">
 
-          {{> /static/mustache/mockup_base_templates/object_setup/fields_visibility_control.mustache}}
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <a href="#WorkflowSetup" class="btn btn-draft btn-small" data-toggle="modal">
+                Edit
+              </a>
+            </div>
+            <div class="span6">
+              {{> /static/mustache/mockup_base_templates/object_setup/fields_visibility_control.mustache}}
+            </div>
+          </div>
 
           <div class="choose-object-wrap">
             <div class="row-fluid">
@@ -98,3 +107,5 @@
     </p>
   </div>
 {{/instance}}
+
+{{> /static/mustache/workflow/workflow_setup_modal.mustache }}
