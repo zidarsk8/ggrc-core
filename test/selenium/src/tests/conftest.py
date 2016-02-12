@@ -77,6 +77,7 @@ def new_program(selenium):
       .create_new()
 
   test_helpers.ModalNewProgramPage.enter_test_data(modal)
+  test_helpers.ModalNewProgramPage.set_start_end_dates(modal, 0, -1)
   program_info_page = modal.save_and_close()
 
   yield modal, program_info_page
