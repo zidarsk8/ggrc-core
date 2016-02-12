@@ -3,6 +3,7 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+# flake8: noqa
 from lib.page.lhn_modal.new_access_group import NewAccessGroupModal
 from lib.page.lhn_modal.new_audit import NewAuditModal
 from lib.page.lhn_modal.new_clause import NewClauseModal
