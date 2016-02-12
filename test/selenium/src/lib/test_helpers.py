@@ -13,6 +13,7 @@ this module.
 """
 
 import uuid
+import re
 from lib import base
 from lib.constants.test import modal_create_new
 from lib.constants.test import modal_custom_attribute
@@ -27,7 +28,7 @@ class HtmlParser(base.Test):
     Args:
       text (str)
     """
-    return text.replace("  ", "").replace("\n", "")
+    return re.sub(r'\s+', " ", text)
 
 
 class ModalNewProgramPage(base.Test):
