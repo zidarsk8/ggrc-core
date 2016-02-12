@@ -10,6 +10,7 @@
     children: Generator.create({
       title: "%title",
       type: "workflow",
+      due_on: '12/31/2017',
       id: "%id",
       children: Generator.create({
         title: "Task Group",
@@ -17,11 +18,7 @@
         icon: "task_group",
         id: "%id",
         children: Generator.get("task")
-      }, {
-        count: 2
       })
-    }, {
-      count: 2
     })
   };
 })(GGRC || {}, GGRC.Mockup.Generator);

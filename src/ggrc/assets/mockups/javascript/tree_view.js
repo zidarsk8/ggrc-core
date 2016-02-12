@@ -106,7 +106,9 @@
   can.Control("CMS.Controllers.MockupTreeItem", {
     defaults: {
       templates: {
-        task: '/static/mustache/mockup_base_templates/tree_item.mustache',
+        task: '/static/mustache/mockup_base_templates/tree_item_task.mustache',
+        task_group: '/static/mustache/mockup_base_templates/tree_item_task.mustache',
+        workflow: '/static/mustache/mockup_base_templates/tree_item_task.mustache',
         'default': '/static/mustache/mockup_base_templates/tree_item.mustache'
       }
     }

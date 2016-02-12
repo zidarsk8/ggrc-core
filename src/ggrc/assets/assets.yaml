@@ -494,6 +494,7 @@ mockup-js-template-files:
   - mockup_base_templates/tree-assessor.mustache
   - mockup_base_templates/tree-cycle.mustache
   - mockup_base_templates/tree_item.mustache
+  - mockup_base_templates/tree_item_task.mustache
   - mockup_base_templates/info_panel.mustache
   - mockup_base_templates/filter.mustache
   - mockup_base_templates/nav_item.mustache
