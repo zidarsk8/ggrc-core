@@ -48,7 +48,7 @@ RUN cd /vagrant-dev \
 RUN gem install sass -v 3.2.13 \
   && gem install compass -v 0.12.2
 
-COPY ./Makefile ./bower.json ./.bowerrc /vagrant/
+COPY ./Makefile ./bower.json /vagrant/
 RUN make bower_components DEV_PREFIX=/vagrant-dev
 
 COPY ./src/requirements.txt ./src/dev-requirements.txt /vagrant/src/
