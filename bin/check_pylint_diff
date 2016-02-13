@@ -70,18 +70,27 @@ function run_pylint() {
     || true
 }
 
-git checkout $PARENT_1
+git checkout -q $PARENT_1
 echo "running pylint on parent commit"
 RESULT_1=$( run_pylint )
-echo "$RESULT_1"
 
-git checkout $TEST_COMMIT
+git checkout -q $TEST_COMMIT
 echo "running pylint on test commit"
 RESULT_2=$( run_pylint )
-echo "$RESULT_2"
+
+echo "
+###############################################################################
+"
+echo "$CHANGED_FILES" | xargs pylint || true
+echo "
+###############################################################################
+"
+
+echo "Number of issues on parent commit: $RESULT_1"
+echo "Number of issues on the pull request: $RESULT_2"
 
 if [ "$RESULT_2" -le "$RESULT_1" ]; then
-  echo "ok"
+  echo "Ok"
   exit 0
 else
   echo "FAIL: pylint score got worse"
