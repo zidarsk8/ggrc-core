@@ -39,6 +39,7 @@ project_name () {
 }
 
 setup () {
+  rm ./test/*.xml | true
   if [ -z "${1:-}" ]; then
     echo "Missing mandatory project parameter"
     exit 1
