@@ -12,6 +12,7 @@ dev:
   privileged: true
   environment:
    - PYTHONDONTWRITEBYTECODE=true
+   - NODE_PATH=/vagrant-dev/node_modules/
 
 selenium:
   build: .
