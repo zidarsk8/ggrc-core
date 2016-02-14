@@ -51,6 +51,9 @@ RUN gem install sass -v 3.2.13 \
 COPY ./Makefile ./bower.json /vagrant/
 RUN make bower_components DEV_PREFIX=/vagrant-dev
 
+COPY ./test/selenium/resources/requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
+
 COPY ./src/requirements.txt ./src/dev-requirements.txt /vagrant/src/
 COPY ./bin/init_env ./bin/setup_linked_packages.py /vagrant/bin/
 COPY ./extras /vagrant/extras
