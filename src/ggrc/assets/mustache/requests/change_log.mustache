@@ -1,0 +1,43 @@
+{{!
+  Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: peter@reciprocitylabs.com
+  Maintained By: peter@reciprocitylabs.com
+}}
+
+{{#revisions_diff instance}}
+  <ul class="entry-list">
+    {{#objectChanges}}
+      <li>
+        <span class="person-label assignee"></span>
+
+        <div class="w-status">
+          <span class="entry-author">
+            <a href="javascript://">{{madeBy}}</a>
+            made changes &mdash; {{date updatedAt}}
+          </span>
+
+          {{#each changes}}
+          <div class="clearfix">
+            <div class="third-col">
+              <p class="instruction">Field</p>
+              {{fieldName}}
+            </div>
+            <div class="third-col">
+              <p class="instruction">Original value</p>
+              {{origVal}}
+            </div>
+            <div class="third-col">
+              <p class="instruction">New value</p>
+              {{newVal}}
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </li>
+    {{/objectChanges}}
+    {{^objectChanges}}
+      <li>The history of changes is currently empty.</li>
+    {{/objectChanges}}
+  </ul>
+{{/revision_diff}}
