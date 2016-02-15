@@ -76,6 +76,12 @@
       content: "A";
     }
   }
+  &.manager {
+    background: $purple;
+    &:after {
+      content: "M";
+    }
+  }
 }
 
 .people-group {
@@ -122,6 +128,9 @@
     margin-top: 1px;
     text-transform: uppercase;
     position: relative;
+    .choose-object-wrap & {
+      line-height: 20px;
+    }
     .file-controls {
       top: 0;
     }

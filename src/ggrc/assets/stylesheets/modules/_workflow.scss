@@ -342,6 +342,9 @@ ul.new-tree {
   &:nth-child(odd) {
     background: lighten($lightGray, 3%);
   }
+  &.info {
+    @include box-shadow(none);
+  }
   .close-block {
     position: absolute;
     top: 8px;

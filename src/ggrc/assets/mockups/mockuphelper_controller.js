@@ -200,9 +200,16 @@
       if (isEach) {
         this.element.find('.people-option').show();
         this.element.find('.people-regular').hide();
+        this.element.find('.active-trigger').addClass('disabled');
+        this.element.find('.active-trigger').attr('rel', 'tooltip');
+        this.element.find('.active-trigger')
+        .attr('data-original-title', 'Save draft and go to Setup workflow to activate it');
       } else if (isAll) {
         this.element.find('.people-option').hide();
         this.element.find('.people-regular').show();
+        this.element.find('.active-trigger').removeClass('disabled');
+        this.element.find('.active-trigger').removeAttr('rel');
+        this.element.find('.active-trigger').removeAttr('data-original-title');
       }
     },
     ".modal .close-trigger click": function (el, ev) {

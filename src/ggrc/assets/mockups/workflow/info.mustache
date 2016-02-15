@@ -28,25 +28,19 @@
                 <div class="row-fluid wrap-row">
                   <div class="span12">
                     <h6>Workflow title</h6>
-                    {{#w_title}}
-                      {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
-                    {{/w_title}}
+                    <p>Tribe Also Relationship</p>
                   </div>
                 </div>
                 <div class="row-fluid wrap-row">
                   <div class="span12 hidable" data-value="workflow_description">
                     <h6>Description</h6>
-                    {{#w_desc}}
-                      {{> /static/mustache/mockup_base_templates/object_setup/object_textarea.mustache}}
-                    {{/w_desc}}
+                    <p>Actions internet shareholders customers has given right was reinforcing people interaction investigating decisions deals include. Both legal. Best like environment. By make concept. Etc corporate authority called. Mission governance given. Itself problems mission held.</p>
                   </div>
                 </div>
                 <div class="row-fluid">
                   <div class="span12 hidable hidden" data-value="workflow_custom">
                     <h6>Custom "Start Workflow" email message</h6>
-                    {{#w_custom}}
-                      {{> /static/mustache/mockup_base_templates/object_setup/object_textarea.mustache}}
-                    {{/w_custom}}
+                    <p>Way independent norms articulated whom mediated often organizations. Risks non-governmental. One incorporated research. Governance governing interaction. Inter- was respect information. With governance distinguish. Unlike older articulated players.</p>
                   </div>
                 </div>
               </div>
@@ -54,23 +48,53 @@
                 <div class="row-fluid wrap-row">
                   <div class="span12">
                     <h6>People</h6>
-                    {{> /static/mustache/mockup_base_templates/info_panel/people_list.mustache}}
+                    <div class="side-content">
+                      <ul class="label-list">
+                        <li>
+                          <label>
+                            <span class="file-controls">
+                              <a href="javascript://">
+                                <i class="fa fa-plus-circle"></i>
+                              </a>
+                            </span>
+                            <span class="person-label manager"></span>
+                            Manager
+                          </label>
+                          <ul>
+                            <li>
+                              <span class="file-controls">
+                                <a href="javascript://"><i class="fa fa-trash"></i></a>
+                              </span>
+                              <a href="javascript://">William Thompson</a>
+                            </li>
+                            <li>
+                              <span class="file-controls">
+                                <a href="javascript://"><i class="fa fa-trash"></i></a>
+                              </span>
+                              <a href="javascript://">Sandra Turner</a>
+                            </li>
+                            <li>
+                              <span class="file-controls">
+                                <a href="javascript://"><i class="fa fa-trash"></i></a>
+                              </span>
+                              <a href="javascript://">Helen Hernandez</a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
                 <div class="row-fluid wrap-row">
                   <div class="span12">
                     <h6>Frequency</h6>
-                    {{#frequency}}
-                      {{> /static/mustache/mockup_base_templates/object_setup/object_select.mustache}}
-                    {{/frequency}}
+                    <p>One time</p>
                   </div>
                 </div>
                 <div class="row-fluid">
                   <div class="span6">
                     <h6>Code</h6>
-                    {{#w_code}}
-                      {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
-                    {{/w_code}}
+                    <p>WORKFLOW-2</p>
                   </div>
                 </div>
               </div>
@@ -81,7 +105,137 @@
 
       {{#task}}
         <div class="relevant-filter-group">
-          {{> /static/mustache/mockup_base_templates/object_setup/repeating_block.mustache}}
+          <div class="relevant-block-wrap">
+            <div class="repeated-block info">
+              <div class="row-fluid">
+                <div class="span6">
+                  <div class="row-fluid wrap-row">
+                    <div class="span12">
+                      <h6>{{object_type}} title</h6>
+                      <p>Simple task</p>
+                    </div>
+                  </div>
+                  <div class="row-fluid wrap-row">
+                    <div class="span12 hidable hidden" data-value="task_description">
+                      <h6>Description</h6>
+                      <p>Governanceit way sustained for organization. Interests all. Perspective tribe goals. Where policies successful. With regulated coherent. Governance governanceinformation authority body perspective. Respect processes governance regulation eells proposes.</p>
+                    </div>
+                  </div>
+                  <div class="row-fluid wrap-row">
+                    <div class="span12 hidable hidden" data-value="task_type">
+                      <div class="wrap-row">
+                        <h6>{{object_type}} type</h6>
+                        <p>Rich text</p>
+                      </div>
+
+                      <div class="wrap-row text-wrap">
+                        <h6>{{object_type}} Notes</h6>
+                        <p>Articulated are being already banks deals at differences internet control articulated. As where. Respect on governance. Decision-making term issues. Established found governance. Goal regulators include. Way becht authority interaction postulated in.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row-fluid">
+                    <div class="span12">
+                      {{> /static/mustache/mockup_base_templates/info_panel/mapped_objects.mustache}}
+                    </div>
+                  </div>
+                </div>
+                <div class="span2">
+                  <div class="row-fluid wrap-row">
+                    <div class="span12">
+                      <h6>Start Date</h6>
+                      <p>22/03/16</p>
+                    </div>
+                  </div>
+                  <div class="row-fluid wrap-row">
+                    <div class="span12">
+                      <h6>End Date</h6>
+                      <p><p>22/03/18</p></p>
+                    </div>
+                  </div>
+                  <div class="row-fluid">
+                    <div class="span12 hidable hidden" data-value="task_group">
+                      <h6>{{object_type}} Group</h6>
+                      <p>Group 007</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="span4">
+                  <div class="row-fluid">
+                    <div class="span12">
+                      <h6>People</h6>
+                      <div class="side-content">
+                        <ul class="label-list">
+                          <li>
+                            <label>
+                              <span class="file-controls">
+                                <a href="javascript://">
+                                  <i class="fa fa-plus-circle"></i>
+                                </a>
+                              </span>
+                              <span class="person-label assignee"></span>
+                              Assignee
+                            </label>
+                            <ul>
+                              <li>
+                                <span class="file-controls">
+                                  <a href="javascript://"><i class="fa fa-trash"></i></a>
+                                </span>
+                                <a href="javascript://">Dorothy Johnson</a>
+                              </li>
+                              <li>
+                                <span class="file-controls">
+                                  <a href="javascript://"><i class="fa fa-trash"></i></a>
+                                </span>
+                                <a href="javascript://">Sharon Thomas</a>
+                              </li>
+                              <li>
+                                <span class="file-controls">
+                                  <a href="javascript://"><i class="fa fa-trash"></i></a>
+                                </span>
+                                <a href="javascript://">Jeff Wilson</a>
+                              </li>
+                            </ul>
+                          </li>
+                          <li>
+                            <label>
+                              <span class="file-controls">
+                                <a href="javascript://">
+                                  <i class="fa fa-plus-circle"></i>
+                                </a>
+                              </span>
+                              <span class="person-label verifier"></span>
+                              Verifier
+                            </label>
+                            <ul>
+                              <li>
+                                <span class="file-controls">
+                                  <a href="javascript://"><i class="fa fa-trash"></i></a>
+                                </span>
+                                <a href="javascript://">Kimberly Robinson</a>
+                              </li>
+                              <li>
+                                <span class="file-controls">
+                                  <a href="javascript://"><i class="fa fa-trash"></i></a>
+                                </span>
+                                <a href="javascript://">David Jones</a>
+                              </li>
+                              <li>
+                                <span class="file-controls">
+                                  <a href="javascript://"><i class="fa fa-trash"></i></a>
+                                </span>
+                                <a href="javascript://">Anthony Edwards</a>
+                              </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       {{/task}}
     </div>
