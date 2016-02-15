@@ -18,4 +18,4 @@ class TestLoginPage(base.Test):
     # pylint: disable=no-self-use
     login.LoginPage(selenium.driver).login()
     selenium.driver.find_element(
-      *locator.PageHeader.BUTTON_ADMIN_DASHBOARD)
+        *locator.PageHeader.BUTTON_ADMIN_DASHBOARD)

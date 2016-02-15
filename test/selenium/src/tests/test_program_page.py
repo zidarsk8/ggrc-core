@@ -30,7 +30,7 @@ class TestProgramPage(base.Test):
       .select_my_objects()
 
     assert lhn_menu.button_programs.members_count \
-           >= int(program_info_page.object_id)
+        >= int(program_info_page.object_id)
 
   @pytest.mark.smoke_tests
   def test_app_redirects_to_new_program_page(self, new_program):
@@ -45,7 +45,7 @@ class TestProgramPage(base.Test):
     # pylint: disable=invalid-name
     _, program_info_page = new_program
     assert url.PROGRAMS + "/" + program_info_page.object_id in \
-           program_info_page.url
+        program_info_page.url
 
   @pytest.mark.smoke_tests
   def test_info_tab_is_active_by_default(self, selenium, new_program):
@@ -63,7 +63,7 @@ class TestProgramPage(base.Test):
     horizontal_bar = widget_bar.DashboardWidgetBarPage(selenium.driver)
 
     assert horizontal_bar.get_active_widget_name() == \
-           element.LandingPage.PROGRAM_INFO_TAB
+        element.LandingPage.PROGRAM_INFO_TAB
 
   @pytest.mark.smoke_tests
   def test_info_tab_contains_entered_data(self, new_program):
@@ -74,21 +74,21 @@ class TestProgramPage(base.Test):
     modal, program_info_page = new_program
 
     assert test_helpers.HtmlParser.parse_text(modal.ui_title.text) == \
-           program_info_page.title_entered.text
+        program_info_page.title_entered.text
     assert modal.ui_description.text == \
-           program_info_page.description_entered.text
+        program_info_page.description_entered.text
     assert modal.ui_notes.text == program_info_page.notes_entered.text
     assert modal.ui_code.text == program_info_page.code_entered.text
     assert program_info_page.primary_contact_entered.text in \
-           modal.ui_primary_contact.text
+        modal.ui_primary_contact.text
     assert program_info_page.secondary_contact_entered.text in \
-           modal.ui_secondary_contact.text
+        modal.ui_secondary_contact.text
     assert modal.ui_program_url.text == \
-           program_info_page.program_url_entered.text
+        program_info_page.program_url_entered.text
     assert modal.ui_reference_url.text == \
-           program_info_page.reference_url_entered.text
+        program_info_page.reference_url_entered.text
     assert modal.ui_effective_date.text == \
-           program_info_page.effective_date_entered.text
+        program_info_page.effective_date_entered.text
     assert modal.ui_stop_date.text == program_info_page.stop_date_entered.text
 
   @pytest.mark.smoke_tests
@@ -101,20 +101,20 @@ class TestProgramPage(base.Test):
 
     program_info_page = widget.ProgramInfo(selenium.driver)
     program_info_page \
-      .press_object_settings() \
-      .select_get_permalink()
+        .press_object_settings() \
+        .select_get_permalink()
 
     # test notification alert
     base.AnimatedComponent(
-      selenium.driver,
-      [locator.Widget.ALERT_LINK_COPIED],
-      wait_until_visible=True
+        selenium.driver,
+        [locator.Widget.ALERT_LINK_COPIED],
+        wait_until_visible=True
     )
 
     # test generated link
     modal = program_info_page \
-      .press_object_settings() \
-      .select_edit()
+        .press_object_settings() \
+        .select_edit()
     modal.ui_title.paste_from_clipboard(modal.ui_description)
 
     assert modal.ui_title.text == program_info_page.url
@@ -129,28 +129,28 @@ class TestProgramPage(base.Test):
 
     program_info_page = widget.ProgramInfo(selenium.driver)
     modal = program_info_page \
-      .press_object_settings() \
-      .select_edit()
+        .press_object_settings() \
+        .select_edit()
     test_helpers.ModalNewProgramPage.enter_test_data(modal)
     test_helpers.ModalNewProgramPage.set_start_end_dates(modal, 1, -2)
     modal.save_and_close()
 
     updated_program_info_page = widget.ProgramInfo(selenium.driver)
     assert test_helpers.HtmlParser.parse_text(modal.ui_title.text) == \
-           updated_program_info_page.title_entered.text
+        updated_program_info_page.title_entered.text
     assert modal.ui_description.text == \
-           updated_program_info_page.description_entered.text
+        updated_program_info_page.description_entered.text
     assert modal.ui_notes.text == updated_program_info_page.notes_entered.text
     assert modal.ui_code.text == updated_program_info_page.code_entered.text
     assert updated_program_info_page.primary_contact_entered.text in \
-           modal.ui_primary_contact.text
+        modal.ui_primary_contact.text
     assert updated_program_info_page.secondary_contact_entered.text in \
-           modal.ui_secondary_contact.text
+        modal.ui_secondary_contact.text
     assert modal.ui_program_url.text == \
-           updated_program_info_page.program_url_entered.text
+        updated_program_info_page.program_url_entered.text
     assert modal.ui_reference_url.text == \
-           updated_program_info_page.reference_url_entered.text
+        updated_program_info_page.reference_url_entered.text
     assert modal.ui_effective_date.text == \
-           updated_program_info_page.effective_date_entered.text
+        updated_program_info_page.effective_date_entered.text
     assert modal.ui_stop_date.text == \
-           updated_program_info_page.stop_date_entered.text
+        updated_program_info_page.stop_date_entered.text

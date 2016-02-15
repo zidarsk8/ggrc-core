@@ -13,7 +13,7 @@ PROJECT_ROOT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/../../../"
 VIRTENV_PATH = PROJECT_ROOT_PATH + constants.path.VIRTUALENV_DIR
 
 _CONFIG_FILE_PATH = PROJECT_ROOT_PATH + constants.path.RESOURCES \
-                    + constants.path.YAML
+    + constants.path.YAML
 _YAML = file_ops.load_yaml_contents(_CONFIG_FILE_PATH)
 LOGGING_FORMAT = _YAML[constants.yaml.LOGGING][constants.yaml.FORMAT]
 LOGGING_LEVEL = _YAML[constants.yaml.LOGGING][constants.yaml.LEVEL]

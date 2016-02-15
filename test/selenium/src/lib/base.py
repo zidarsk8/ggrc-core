@@ -6,8 +6,12 @@
 
 import time
 import pyvirtualdisplay   # pylint: disable=import-error
-from selenium.webdriver.support import expected_conditions as EC    # pylint: disable=import-error
-from selenium.webdriver.support.ui import WebDriverWait   # pylint: disable=import-error
+
+# pylint: disable=import-error
+from selenium.webdriver.support import expected_conditions as EC
+
+# pylint: disable=import-error
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common import keys    # pylint: disable=import-error
 from selenium import webdriver    # pylint: disable=import-error
 from lib import environment
@@ -42,6 +46,7 @@ class CustomDriver(webdriver.Chrome):
     Raises:
         exception.ElementNotFound
     """
+    # pylint: disable=invalid-name
     elements = self.find_elements(*locator)
 
     for element in elements:
@@ -422,8 +427,8 @@ class AnimatedComponent(Component):
 
   def _wait_until_invisible(self):
     for locator in self._locators:
-      WebDriverWait(self._driver, constants.ux.MAX_USER_WAIT_SECONDS) \
-          .until(EC.invisibility_of_element_located(locator))
+        WebDriverWait(self._driver, constants.ux.MAX_USER_WAIT_SECONDS) \
+            .until(EC.invisibility_of_element_located(locator))
 
 
 class Modal(Component):
