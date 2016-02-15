@@ -1,0 +1,27 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.inline-radio-list {
+  @extend %reset-list;
+  @include clearfix();
+  li {
+    float: left;
+    margin-right: 20px;
+    &:last-child {
+      margin-right: 0;
+    }
+    input {
+      margin: -3px 0 0 0;
+    }
+  }
+  &.full-width {
+    li {
+      width: 20%;
+      margin-right: 0;
+    }
+  }
+}

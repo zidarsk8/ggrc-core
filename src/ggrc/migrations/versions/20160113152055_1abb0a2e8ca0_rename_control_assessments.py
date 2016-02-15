@@ -11,14 +11,27 @@ Create Date: 2016-01-13 15:20:55.866368
 
 """
 
+from alembic import op
+import sqlalchemy as sa
+
 # revision identifiers, used by Alembic.
 revision = '1abb0a2e8ca0'
 down_revision = '4003827b3d48'
 
-from alembic import op
 
 def upgrade():
-  op.execute("RENAME TABLE control_assessments TO assessments")
+  try:
+    op.execute("RENAME TABLE control_assessments TO assessments")
+  except sa.exc.OperationalError as operr:
+    # Ignores error in case table assessment already exists
+    error_code, _ = operr.orig.args  # error_code, message
+    if error_code != 1050:
+      raise operr
+    # We don't perform migration if table assessment already exists;
+    # that can only happen if the migration already happened and there
+    # is no longer need to perform it second time
+    return
+
   # Migrate all possible mappings where object_type = 'ControlAssessment'
   objects = {
       "relationships": ("source_type", "destination_type"),
@@ -41,6 +54,7 @@ def upgrade():
            WHERE {value} = 'control_assessment'"""
   op.execute(sql.format(key='custom_attribute_definitions',
                         value='definition_type'))
+
 
 def downgrade():
   op.execute("RENAME TABLE assessments TO control_assessments")

@@ -84,6 +84,11 @@
     width:960px;
     margin-left:-480px;
     left: 50% !important;
+    @media (max-width: 963px) {
+      width: 94%;
+      margin-left: 0;
+      left: 3% !important;
+    }
   }
   &.modal-xwide {
     width: 1260px;

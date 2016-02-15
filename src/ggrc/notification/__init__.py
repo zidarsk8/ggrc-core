@@ -44,7 +44,7 @@ services = NotificationServices()
 
 def get_filter_data(notification):
   result = {}
-  data = services.call_service(notification.object_type.name, notification)
+  data = services.call_service(notification.object_type, notification)
 
   for user, user_data in data.iteritems():
     if should_receive(notification,

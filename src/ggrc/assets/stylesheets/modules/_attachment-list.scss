@@ -1,0 +1,77 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.attachment-list {
+  @extend %reset-list;
+  .date {
+    color: $gray;
+    font-size: 11px;
+    font-style: italic;
+    display: inline-block;
+    margin-right: 4px;
+    line-height: 18px;
+    vertical-align: top;
+  }
+  li {
+    margin-bottom: 5px;
+    position: relative;
+    &:hover {
+      .file-controls {
+        @include opacity(1);
+        left: -25px;
+      }
+    }
+    [class*="fa-file-"] {
+      vertical-align: top;
+    }
+    a {
+      @extend %oneline;
+      width: 68%;
+      display: inline-block;
+      &.more {
+        display: inline;
+        width: auto;
+      }
+    }
+  }
+  .past-items-list & {
+    width: 92%;
+    li {
+      margin-bottom: 0;
+    }
+    label {
+      display: inline-block;
+      @extend %oneline;
+      width: 95%;
+    }
+    input[type="checkbox"] {
+      float: right;
+    }
+  }
+  .entry-list & {
+    padding: 4px 0 0 0;
+    li {
+      margin-left: -4px;
+      .info-action {
+        @include opacity(1);
+        i {
+          margin-top: 0;
+        }
+      }
+      a {
+        width: auto;
+        display: inline;
+        &:hover {
+          text-decoration: underline;
+          span {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}

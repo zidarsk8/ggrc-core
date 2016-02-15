@@ -24,20 +24,18 @@ ggrc_development_directories:
   - name: /vagrant-dev/tmp
   - name: /vagrant/tmp
 
-ggrc_global_npm_modules:
-  - name: nodeunit
-  - name: pegjs
-  - name: karma-cli
-  - name: karma-junit-reporter
-  - name: jasmine-core
-  - name: mkdirp
+ggrc_local_npm_modules:
   - name: bower
   - name: eslint
   - name: eslint-config-google
-
-ggrc_local_npm_modules:
+  - name: jasmine-core
   - name: karma
+  - name: karma-cli
   - name: karma-jasmine
+  - name: karma-junit-reporter
+  - name: mkdirp
+  - name: nodeunit
+  - name: pegjs
 
 ggrc_gems:
   - name: 'sass'

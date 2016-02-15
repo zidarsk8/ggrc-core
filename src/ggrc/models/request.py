@@ -5,13 +5,12 @@
 
 import datetime
 
-from ggrc import db
 from sqlalchemy import or_
 from sqlalchemy import and_
 from sqlalchemy import inspect
 from sqlalchemy import orm
 
-
+from ggrc import db
 from ggrc.models import person
 from ggrc.models import audit
 from ggrc.models import reflection
@@ -20,6 +19,7 @@ from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import deferred
 from ggrc.models.mixins import Described
+from ggrc.models.mixins import Revisionable
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.object_document import Documentable
@@ -31,7 +31,8 @@ from ggrc.services.common import Resource
 
 
 class Request(Assignable, Documentable, Personable, CustomAttributable,
-              Relatable, Titled, Slugged, Described, Base, db.Model):
+              Relatable, Titled, Slugged, Described, Revisionable,
+              Base, db.Model):
   __tablename__ = 'requests'
   _title_uniqueness = False
 
@@ -96,8 +97,8 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       "request_type": "Request Type",
       "requested_on": "Requested On",
       "status": {
-        "display_name": "Status",
-        "handler_key": "request_status",
+          "display_name": "Status",
+          "handler_key": "request_status",
       },
       "test": "Test",
       "related_assignees": {
@@ -195,7 +196,7 @@ def _date_has_changes(attr):
   added, deleted = attr.history.added[0], attr.history.deleted[0]
   if isinstance(added, datetime.datetime):
     added = added.date()
-  return not added == deleted
+  return added != deleted
 
 
 @Resource.model_put.connect_via(Request)

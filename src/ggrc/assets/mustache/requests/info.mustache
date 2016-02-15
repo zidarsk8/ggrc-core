@@ -6,7 +6,7 @@
 }}
 
 {{#instance}}
-  <section class="info{{#is_info_pin}} sticky-info-panel request{{/is_info_pin}}">
+  <section class="info{{#is_info_pin}} sticky-info-panel assignable{{/is_info_pin}}">
     {{#is_info_pin}}
       {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
     {{/is_info_pin}}
@@ -121,6 +121,9 @@
           <li class="active"><a href="#tab1" data-toggle="tab">
             Comments and Responses
           </a></li>
+          <li><a href="#tab2" data-toggle="tab">
+            Request log
+          </a></li>
         </ul>
 
         <div class="tab-content">
@@ -136,7 +139,12 @@
             {{/if_equals}}
             {{{render "/static/mustache/base_templates/comment_list.mustache" instance=. update_count="false"}}}
           </div>
+
+          <div class="tab-pane fade in" id="tab2">
+            {{{render "/static/mustache/requests/change_log.mustache" instance=.}}}
+          </div>
         </div>
+
       </div>
     </div>
   </section>

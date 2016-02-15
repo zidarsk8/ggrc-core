@@ -5,7 +5,7 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
- body {
+body {
   font-size:$f-regular;
   background: $contentBgnd;
 }
@@ -39,6 +39,15 @@ h1 {
   .child-title-content {
     float: right;
     text-align: right;
+  }
+  @media (max-width: 740px) {
+    width: 25%;
+  }
+  @media (max-width: 1000px) {
+    width: 40%;
+  }
+  @media (max-width: 1200px) {
+    width: 60%;
   }
 }
 

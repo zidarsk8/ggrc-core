@@ -39,6 +39,7 @@ project_name () {
 }
 
 setup () {
+  rm ./test/*.xml | true
   if [ -z "${1:-}" ]; then
     echo "Missing mandatory project parameter"
     exit 1
@@ -50,21 +51,25 @@ setup () {
 
   docker-compose --file docker-compose-testing.yml \
     --project-name ${PROJECT} \
+    build
+
+  docker-compose --file docker-compose-testing.yml \
+    --project-name ${PROJECT} \
     up --force-recreate -d
-  
+
   if [[ $UID -eq 0 ]]; then
-    # This fixes permissions with bindfs only on jenkins.
-    chown 1000:1000 -R .
-  elif [[ $UID -eq 1000 ]]; then
-    docker exec -i ${PROJECT}_dev_1 sh -c "
-    bindfs /vagrant_bind /vagrant --map=$UID/1000 -o nonempty
-    "
+    # Allow users inside the containers to access files.
+    chown 1000 -R .
+  elif [[ $UID -ne 1000 ]]; then
+    echo "These tests must be run with UID 1000 or 0. Your UID is $UID"
+    exit 1
   fi
-  
+
   echo "Provisioning ${PROJECT}_dev_1"
   docker exec -i ${PROJECT}_dev_1 su vagrant -c "
     source /vagrant/bin/init_vagrant_env
-    ansible-playbook -i provision/docker/inventory provision/site.yml
+    make bower_components > /dev/null
+    ln -s /vagrant-dev/node_modules /vagrant/node_modules
     build_compass
     build_assets
   "
@@ -77,9 +82,6 @@ teardown () {
   else
     PROJECT="${1}"
   fi
-
-  docker exec -i ${PROJECT}_dev_1 sh -c "chown $UID -R /vagrant"
-  docker exec -i ${PROJECT}_selenium_1 sh -c "chown $UID -R /selenium"
 
   docker-compose -p ${PROJECT} stop
 }

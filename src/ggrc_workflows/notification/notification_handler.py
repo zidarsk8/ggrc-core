@@ -3,15 +3,12 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""Handlers for workflow notifications.
 
-from sqlalchemy import and_, or_, inspect
-from datetime import timedelta, datetime, date
+This module contains all function needed for handling notification objects
+needed by workflow notifications. The exposed functions are the entry points
+for callback listeners.
 
-from ggrc.models import Notification, NotificationType, ObjectType
-from ggrc import db
-
-
-"""
 exposed functions
     handle_workflow_modify,
     handle_cycle_task_group_object_task_put,
@@ -20,8 +17,25 @@ exposed functions
     handle_cycle_task_status_change,
 """
 
+from sqlalchemy import and_
+from sqlalchemy import or_
+from sqlalchemy import inspect
+from datetime import timedelta
+from datetime import datetime
+from datetime import date
+
+from ggrc import db
+from ggrc.models.notification import Notification
+from ggrc.models.notification import NotificationType
+
 
 def handle_task_group_task(obj, notif_type=None):
+  """Add notification entry for task group tasks.
+
+  Args:
+    obj: Instance of a model for which the notification should be scheduled.
+    notif_type: The notification type for the scheduled notification.
+  """
   if not notif_type:
     return
 
@@ -33,6 +47,7 @@ def handle_task_group_task(obj, notif_type=None):
 
 
 def handle_workflow_modify(sender, obj=None, src=None, service=None):
+  """Update or add notifications on a workflow update."""
   if obj.status != "Active" or obj.frequency == "one_time":
     return
 
@@ -56,6 +71,14 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
 
 
 def add_cycle_task_due_notifications(obj):
+  """Add notifications entries for cycle task due dates.
+
+  Create two notification entries, one for X days before the due date and one
+  on the due date.
+
+  Args:
+    obj: Cycle object for notification generation.
+  """
   if obj.status == "Verified":
     return
   if not obj.cycle_task_group.cycle.is_current:
@@ -71,19 +94,19 @@ def add_cycle_task_due_notifications(obj):
   add_notif(obj, notif_type, send_on)
 
 
-def add_new_cycle_task_notifications(obj, start_notif_type=None):
+def add_cycle_task_notifications(obj, start_notif_type=None):
+  """Add start and due  notification entries for cycle tasks."""
   add_notif(obj, start_notif_type, date.today())
   add_cycle_task_due_notifications(obj)
 
 
 def add_cycle_task_reassigned_notification(obj):
-
+  """Add or update notifications for reassigned cycle tasks."""
   # check if the current assignee allready got the first notification
   result = db.session.query(Notification)\
-      .join(ObjectType)\
       .join(NotificationType)\
       .filter(and_(Notification.object_id == obj.id,  # noqa
-                   ObjectType.name == obj.__class__.__name__,
+                   Notification.object_type == obj.type,
                    Notification.sent_at != None,
                    or_(NotificationType.name == "cycle_task_reassigned",
                        NotificationType.name == "cycle_created",
@@ -99,10 +122,9 @@ def add_cycle_task_reassigned_notification(obj):
 
 def modify_cycle_task_notification(obj, notification_name):
   notif = db.session.query(Notification)\
-      .join(ObjectType)\
       .join(NotificationType)\
       .filter(and_(Notification.object_id == obj.id,
-                   ObjectType.name == obj.__class__.__name__,
+                   Notification.object_type == obj.type,
                    Notification.sent_at == None,  # noqa
                    NotificationType.name == notification_name,
                    ))
@@ -168,9 +190,11 @@ def remove_all_cycle_task_notifications(obj):
     for notif in get_notification(cycle_task):
       db.session.delete(notif)
 
+
 def handle_cycle_modify(sender, obj=None, src=None, service=None):
   if not obj.is_current:
     remove_all_cycle_task_notifications(obj)
+
 
 def handle_cycle_created(sender, obj=None, src=None, service=None,
                          manually=False):
@@ -186,21 +210,16 @@ def handle_cycle_created(sender, obj=None, src=None, service=None,
 
   for cycle_task_group in obj.cycle_task_groups:
     for task in cycle_task_group.cycle_task_group_tasks:
-      add_new_cycle_task_notifications(task, notification_type)
+      add_cycle_task_notifications(task, notification_type)
 
 
 def get_notification(obj):
   # maybe we shouldn't return different thigs here.
-  result = db.session.query(Notification).join(ObjectType).filter(
+  result = Notification.query.filter(
       and_(Notification.object_id == obj.id,
-           ObjectType.name == obj.__class__.__name__,
+           Notification.object_type == obj.type,
            Notification.sent_at == None))  # noqa
   return result.all()
-
-
-def get_object_type(obj):
-  return db.session.query(ObjectType).filter(
-      ObjectType.name == obj.__class__.__name__).one()
 
 
 def get_notification_type(name):
@@ -213,7 +232,7 @@ def add_notif(obj, notif_type, send_on=None):
     send_on = date.today()
   notif = Notification(
       object_id=obj.id,
-      object_type=get_object_type(obj),
+      object_type=obj.type,
       notification_type=notif_type,
       send_on=send_on,
   )

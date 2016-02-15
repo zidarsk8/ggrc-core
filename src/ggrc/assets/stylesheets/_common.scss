@@ -5,8 +5,36 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
+body {
+  @media (max-width: 767px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 select {
   padding: 0;
+}
+
+.bottom-space {
+  padding-bottom: 25px;
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.counter {
+  @include opacity(0.5);
+  color:#000;
+  .overdue & {
+    color: $red;
+  }
+}
+
+.unmap {
+  &:hover {
+    color:$error;
+  }
 }
 
 .wrap-row {
@@ -68,12 +96,6 @@ select {
   .entry-list & {
     margin: 5px 10px 0 4px !important;
   }
-  .lhn-items-list & {
-    @include border-radius(2px);
-    width: 4px;
-    height: 4px;
-    margin: 10px 8px 0 1px;
-  }
   .inner-tree & {
     margin: 10px 5px 0 10px;
   }
@@ -85,27 +107,6 @@ select {
 @each $status_label in draft, inactive, declined, inprogress, overdue, active, inprogress, verified, planned, accepted, pending, finished, requested, responded, amended-request, updated-response, assigned {
   .status-#{$status_label} {
     @extend %status-#{$status_label};
-  }
-}
-
-// progress bar
-.progress {
-  @include box-shadow(none);
-  @include border-radius($default-border-radius);
-  background: $lightGray;
-  height: 20px;
-  margin: 4px 0 0 0;
-  .bar {
-    @include box-shadow(none);
-    height: 20px;
-    float: left;
-    margin-right: 0px;
-  }
-
-  @each $bar_color in verify, progress, pending, warning {
-    .bar-#{$bar_color} {
-      @extend %bar-#{$bar_color};
-    }
   }
 }
 
@@ -681,57 +682,6 @@ p {
   color:$red !important;
   font-weight:bold;
   font-size: 10px;
-}
-
-.item-util {
-  @extend %reset-list;
-  @include clearfix();
-  font-size: 11px;
-  line-height: 16px;
-  color: $black;
-  li {
-    margin-right: 30px;
-    float: left;
-    &:last-child {
-      margin-right: 0;
-    }
-  }
-  .tree-progress & {
-    li {
-      @extend %item-util-wide;
-      text-align: center;
-    }
-  }
-  .right & {
-    li {
-      @extend %item-util-wide;
-      text-align: right;
-    }
-  }
-}
-
-.show-details {
-  float: right;
-  padding-right: 4px;
-  margin-left: 10px;
-  a {
-    display: inline-block;
-    line-height: 16px;
-    i {
-      @include opacity(0.25);
-      @include transition(opacity 0.2s ease);
-      color: $black;
-      ul.new-tree & {
-        margin-top: 0;
-      }
-    }
-    &:hover {
-      text-decoration: none;
-      i {
-        @include opacity(1);
-      }
-    }
-  }
 }
 
 .pos-wrap {

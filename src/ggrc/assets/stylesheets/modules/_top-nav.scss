@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: brad@reciprocitylabs.com
+ * Created By: vladan@reciprocitylabs.com
  * Maintained By: vladan@reciprocitylabs.com
  */
 
@@ -36,25 +36,25 @@ ul.internav {
       }
     }
     &.hidden-widgets-list {
-	    a.dropdown-toggle {
-	      &:hover {
-	        background: none;
-	      }
-	    }
-	  }
-	  &.active {
-	    a {
-	      color: $black;
-	      font-weight: bold;
-	      background: $contentBgnd;
-	      i {
-	        @include opacity(1);
-	      }
-	      &:hover {
-	        color: $black;
-	      }
-	    }
-	  }
+      a.dropdown-toggle {
+        &:hover {
+          background: none;
+        }
+      }
+    }
+    &.active {
+      a {
+        color: $black;
+        font-weight: bold;
+        background: $contentBgnd;
+        i {
+          @include opacity(1);
+        }
+        &:hover {
+          color: $black;
+        }
+      }
+    }
   }
   a {
     @include transition(color 0.2s ease);

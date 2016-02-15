@@ -11,17 +11,30 @@ Create Date: 2015-10-15 12:43:37.846021
 
 """
 
-# revision identifiers, used by Alembic.
-revision = '1ef8f4f504ae'
-down_revision = '297131e22e28'
-
 from alembic import op
 import sqlalchemy as sa
 
+# revision identifiers, used by Alembic.
+revision = '1ef8f4f504ae'
+down_revision = '262bbe790f4c'
+
 
 def upgrade():
-  op.drop_column('relationships', 'relationship_type_id')
-  op.drop_table('relationship_types')
+  try:
+    op.drop_column('relationships', 'relationship_type_id')
+  except sa.exc.OperationalError as operr:
+    # Ignores error in case relationship_type_id no longer exists
+    error_code, _ = operr.orig.args  # error_code, message
+    if error_code != 1091:
+      raise operr
+
+  try:
+    op.drop_table('relationship_types')
+  except sa.exc.OperationalError as operr:
+    # Ignores error in case relationship_types table no longer exists
+    error_code, _ = operr.orig.args  # error_code, message
+    if error_code != 1051:
+      raise operr
 
 
 def downgrade():

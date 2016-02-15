@@ -11,27 +11,38 @@ Create Date: 2016-01-13 15:05:36.008456
 
 """
 
-# revision identifiers, used by Alembic.
-revision = '4003827b3d48'
-down_revision = '5410607088f9'
-
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
+# revision identifiers, used by Alembic.
+revision = '4003827b3d48'
+down_revision = '5410607088f9'
+
+
 def upgrade():
-  op.drop_table('object_sections')
-  op.drop_table('control_sections')
-  op.drop_table('objective_controls')
-  op.drop_table('program_controls')
-  op.drop_table('directive_controls')
-  op.drop_table('control_controls')
-  op.drop_table('calendar_entries')
-  op.drop_table('object_objectives')
-  op.drop_table('object_controls')
-  op.drop_table('section_objectives')
-  op.drop_table('program_directives')
-  op.drop_table('directive_sections')
+  tables = [
+      "object_sections",
+      "control_sections",
+      "objective_controls",
+      "program_controls",
+      "directive_controls",
+      "control_controls",
+      "calendar_entries",
+      "object_objectives",
+      "object_controls",
+      "section_objectives",
+      "program_directives",
+      "directive_sections"
+  ]
+  for table in tables:
+    try:
+      op.drop_table(table)
+    except sa.exc.OperationalError as operr:
+      # Ignores error in case relationship_types table no longer exists
+      error_code, _ = operr.orig.args  # error_code, message
+      if error_code != 1051:
+        raise operr
 
 
 def downgrade():

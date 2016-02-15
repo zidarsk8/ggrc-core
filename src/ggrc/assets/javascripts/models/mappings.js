@@ -463,7 +463,7 @@
           "Program", "Regulation", "Contract", "Policy", "Standard",
           "AccessGroup", "Objective", "Control", "Section", "Clause",
           "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process",
-          "Product", "Project", "System", "Issue", "Assessment",
+          "Product", "Project", "System", "Issue",
           "Request"
         ],
         "authorizations": "UserRole"
@@ -686,12 +686,16 @@
     },
     Assessment: {
       _mixins: [
-        "related_object", "personable", "ownable"
+        "related_object", "personable", "ownable", "documentable"
       ],
-      _canonical: {
-        "control": "Control",
-      },
-      control: Direct("Control", "controls", "assessment"),
+      related_creators: AttrFilter("related_objects", "AssigneeType", "Creator", "Person"),
+      related_assessors: AttrFilter("related_objects", "AssigneeType", "Assessor", "Person"),
+      related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
+      comments: TypeFilter("related_objects", "Comment"),
+      info_related_objects: CustomFilter("related_objects", function (related_objects) {
+        return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
+      }),
+      people: AttrFilter("related_objects", "AssigneeType", null, "Person"),
     },
     Issue: {
       _mixins: [
@@ -715,6 +719,7 @@
       urls_from_comments: Cross("comments", "urls"),
       all_documents: Multi(["documents", "documents_from_comments"]),
       all_urls: Multi(["urls", "urls_from_comments"]),
+      revision_history: Direct('Revision', 'resource', 'revisions'),
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",

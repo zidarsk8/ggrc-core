@@ -1,0 +1,95 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.inner-tree {
+  .tree-action-list {
+    li {
+      line-height: 28px;
+    }
+    [class^="grcicon-"] {
+      margin-top: 6px;
+    }
+    .counter {
+      @include opacity(1);
+    }
+  }
+  ul.new-tree {
+    margin-bottom: 0;
+    .tree-item-placeholder {
+      font-size: 13px;
+      height: 25px;
+      padding: 4px 60% 0 84px;
+    }
+    li.tree-item {
+      line-height: 28px;
+      .generated-link {
+        @extend %oneline;
+      }
+      .row-fluid {
+        [class*="span"] {
+          display: none;
+          &:first-child {
+            display: block;
+          }
+          &:last-child {
+            display: block;
+          }
+        }
+      }
+      > .item-main {
+        > .item-wrap {
+          .openclose,
+          .select {
+            padding: 0;
+          }
+          .openclose {
+            &.active {
+              .fa-caret-right {
+                @include opacity(1);
+              }
+            }
+          }
+        }
+      }
+      .dashboard & {
+        > .item-main {
+          > .openclose {
+            > .item-wrap {
+              padding: 0;
+            }
+          }
+        }
+      }
+      .item-data {
+        .tree-title-area {
+          &.title {
+            font-size: 13px;
+            line-height: 29px;
+          }
+        }
+      }
+    }
+  }
+  .custom-state {
+    ul.new-tree {
+      li.tree-item {
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+  }
+  .tier-2-info-content {
+    padding: 0;
+    .custom-state {
+      h6 {
+        &.border {
+          border-bottom: 1px solid $infoMessageBorder;
+        }
+      }
+    }
+  }
+}

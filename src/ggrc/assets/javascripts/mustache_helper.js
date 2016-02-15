@@ -1170,20 +1170,27 @@ Mustache.registerHelper("link_to_tree", function () {
   return link.join("/");
 });
 
-// Returns date formated like 01/28/2015 02:59:02am PST
-// To omit time pass in a second parameter {{date updated_at true}}
-Mustache.registerHelper("date", function (date) {
-    if (typeof date == 'undefined')
-      return '';
-  var m = moment(new Date(date.isComputed ? date() : date))
-    , dst = m.isDST()
-    , no_time = arguments.length > 2
-    ;
+/**
+ *  Helper for rendering date or datetime values in current local time
+ *
+ *  @param {boolean} hideTime - if set to true, render date only
+ *  @return {String} - date or datetime string in the following format:
+ *    * date: MM/DD/YYYY),
+ *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
+ */
+Mustache.registerHelper('date', function (date, hideTime) {
+  var currentTimezone = moment.tz.guess();
+  var m;
 
-  if (no_time) {
-    return m.format("MM/DD/YYYY");
+  if (date === undefined || date === null) {
+    return '';
   }
-  return m.utcOffset(dst ? "-0700" : "-0800").format("MM/DD/YYYY hh:mm:ssa") + " " + (dst ? 'PDT' : 'PST');
+
+  m = moment(new Date(date.isComputed ? date() : date));
+  if (hideTime === true) {
+    return m.format('MM/DD/YYYY');
+  }
+  return m.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A z');
 });
 
 /**
@@ -3316,4 +3323,99 @@ Mustache.registerHelper("un_camel_case", function (str, options) {
   return newval;
 });
 
+  /**
+   * A helper function for computing the difference between the two Revisions
+   * of an object.
+   *
+   * The function assumes that the given revisions are two distinct Revisions
+   * of the same object (application entity).
+   *
+   * @param {CMS.Models.Revision} rev1 - the older of the two revisions
+   * @param {CMS.Models.Revision} rev2 - the newer of the two revisions
+   *
+   * @return {Array} - A "diff" object describing the changes between the
+   *   revisions. The object has the following attributes:
+   *   - madeBy: the user who made the changes
+   *   - updatedAt: the time when the changes have been made
+   *   - changes:
+   *       A list of objects describing the modified attributes of the
+   *       instance`, with each object having the following attributes:
+   *         - fieldName: the name of the changed`instance` attribute
+   *         - origVal: the attribute's original value
+   *         - newVal: the attribute's new (modified) value
+   */
+  function revisionDiff(rev1, rev2) {
+    var diff = {
+      madeBy: null,
+      updatedAt: null,
+      changes: []
+    };
+
+    diff.madeBy = 'User ' + rev2.modified_by.id;
+    diff.updatedAt = rev2.updated_at;
+
+    can.each(rev2.content, function (value, fieldName) {
+      var origVal = rev1.content[fieldName];
+
+      if (value !== origVal) {
+        diff.changes.push({
+          fieldName: fieldName,
+          origVal: origVal,
+          newVal: value
+        });
+      }
+    });
+
+    return diff;
+  }
+
+  /**
+   * Compute the the history of changes for the given object.
+   *
+   * The computed list of changes is sorted from oldest to newest (the helper
+   * assumes that the `instance`'s revision history is also sorted
+   * chronologically with the oldest Revision first).
+   *
+   * The helper creates a new Mustache context containing the `objectChanges`
+   * attribute. That attribute is list of "diff" objects representing the
+   * differences between the pairs of two successive Revisions of the
+   * `instance`. The diff objects follow the format returned by the
+   * `caclulateDiff` helper function.
+   *
+   * Example usage of the helper in a mustache template:
+   *
+   *   {{#revisions_diff instance}}
+   *     {{#objectChanges}}
+   *       ...
+   *     {{/objectChanges}}
+   *   {{/revision_diff}}
+   *
+   * @param {can.Model.Cacheable} instance - an application entity instance
+   * @param {Object} options - a CanJS options argument passed to every helper
+   *
+   */
+  Mustache.registerHelper('revisions_diff', function (instance, options) {
+    var diff;
+    var diffList = [];
+    var i;
+    var newContext;
+
+    var revisions = instance.get_mapping('revision_history');
+    revisions = _.map(revisions, 'instance');
+
+    // Only operate on the list if the Revision history has been fully
+    // fetched from the server (and not just the Revision objects stubs).
+    if ((revisions.length > 0) && revisions[0].content) {
+      for (i = 1; i < revisions.length; i++) {
+        diff = revisionDiff(revisions[i - 1], revisions[i]);
+        diffList.push(diff);
+      }
+    }
+
+    newContext = options.contexts.add({
+      objectChanges: diffList
+    });
+
+    return options.fn(newContext);
+  });
 })(this, jQuery, can);

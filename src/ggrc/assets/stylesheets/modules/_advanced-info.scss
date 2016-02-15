@@ -1,0 +1,98 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.custom-attr-wrap {
+  border-top: 1px solid $itemBorder;
+}
+
+.info-expand {
+  border-bottom: 1px solid $itemBorder;
+  .mapped & {
+    a {
+      font-weight: normal;
+    }
+  }
+  a {
+    display: block;
+    padding: 9px 0 10px 4px;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 20px;
+    span {
+      i {
+        @include opacity(0.25);
+        margin-top: 2px !important;
+      }
+    }
+    &:hover {
+      text-decoration:none;
+    }
+    &.active {
+      span {
+        i {
+           @include opacity(1);
+        }
+      }
+    }
+  }
+  .in, .out.active, .active .out {
+    display: none;
+  };
+  .in.active, .active .in, .out {
+    display: inline;
+  }
+  .show-hidden-fields {
+    &.active {
+      border-top: none;
+    }
+  }
+}
+
+.info-expand-custom {
+  @extend .info-expand;
+}
+
+.info-expand-mapped {
+  @extend .info-expand;
+}
+
+.expand-link {
+  a.show-hidden-fields {
+    display:block;
+    padding-top:10px;
+    font-size:16px;
+    span.hidden-fields {
+      margin-left:10px;
+      font-style:italic;
+      font-size:14px;
+      color:$gray;
+    }
+    i {
+      @include opacity(0.25);
+      margin-top: 2px;
+    }
+    &:hover {
+      text-decoration:none;
+    }
+    &.active {
+      border-top: 1px solid $itemBorder;
+      i {
+        @include opacity(1);
+      }
+    }
+  }
+}
+
+.hidden-fields-area,
+.hidden-fields-area-custom {
+  padding-top: 15px;
+  padding-left: 28px;
+  border-bottom: 1px solid $itemBorder;
+  &.active {
+    display: block !important;
+  }
+}
