@@ -1,0 +1,82 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.pin-content,
+.info-pin {
+  @include box-shadow(0 0 5px rgba(0,0,0, 0.3));
+  position: fixed;
+  bottom: 40px;
+  left: 27px;
+  right: 27px;
+  background: $white;
+  z-index: 1000;
+  overflow: auto;
+  .info {
+    @include box-shadow(none);
+    padding: 15px 25px 20px;
+    .small-info {
+      i {
+        @include opacity(.25);
+        @include transition(opacity 0.2s ease);
+        cursor: pointer;
+        &:hover {
+          @include opacity(1);
+        }
+      }
+    }
+  }
+  .info-widget-footer {
+    display: none;
+  }
+  select {
+    margin-bottom: 0;
+  }
+}
+
+.side-content {
+  margin-left: 20px;
+  .modal & {
+    margin-left: 0;
+  }
+}
+
+.sticky-info-panel {
+  .pane-header {
+    .details-wrap {
+      margin-top: 18px !important;
+    }
+  }
+  .tier-content {
+    margin-top: 77px;
+  }
+  .details-wrap {
+    &.pin {
+      position: fixed;
+      right: 47px;
+      z-index: 9999;
+      width: 100px;
+      background: $white;
+      margin-top: -15px !important;
+      padding-top: 5px;
+    }
+  }
+}
+
+.info-pane-utility {
+  @include clearfix();
+  float: right;
+  .sticky-info-panel & {
+    position: fixed;
+    right: 47px;
+    z-index: 9999;
+    margin-top: 20px;
+  }
+  .assignable & {
+    position: static;
+    margin-top: 0;
+  }
+}

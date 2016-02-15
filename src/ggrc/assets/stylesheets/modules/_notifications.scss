@@ -1,0 +1,72 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.flash {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  width: 50%;
+  margin-left: 25%;
+  z-index: 9000;
+  font-size: 11px;
+  .notice {
+    background-color: $messageGreen;
+    p {
+      color: $green;
+      font-weight: bold;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      line-height: 30px;
+      i {
+        margin-top: 6px;
+      }
+    }
+  }
+  .message {
+    text-align: center;
+    margin: 0 auto 15px;
+    p {
+      margin: 8px;
+      font-weight: bold;
+    }
+  }
+  .error {
+    background-color: $messageRed;
+  }
+  .warning {
+    background-color: $messageYellow;
+  }
+  .alert {
+    .close {
+      margin: 0;
+    }
+  }
+  .modal-header & {
+    z-index: 9999;
+  }
+}
+
+.alert-progress {
+  color: $darkText;
+  background: image-url('ajax-loader.gif') no-repeat 10px 9px;
+  background-color: $messagePurple;
+  padding-left: 35px;
+}
+
+.alert {
+  @include border-radius(0);
+  border: none;
+  margin-bottom: 20px;
+  p {
+    margin-bottom: 0;
+  }
+  &.warning {
+    background-color: $warningBgnd;
+    color: $red;
+  }
+}

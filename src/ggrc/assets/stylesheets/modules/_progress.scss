@@ -1,0 +1,89 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.progress {
+  @include box-shadow(none);
+  @include border-radius($default-border-radius);
+  background: $lightGray;
+  height: 20px;
+  margin: 4px 0 0 0;
+  .bar {
+    @include box-shadow(none);
+    height: 20px;
+    float: left;
+    margin-right: 0px;
+  }
+
+  @each $bar_color in verify, progress, pending, warning {
+    .bar-#{$bar_color} {
+      @extend %bar-#{$bar_color};
+    }
+  }
+}
+
+.dashboard-tree {
+  .item-data {
+    .tree-title-area {
+      font-size: 16px;
+    }
+  }
+}
+
+.widget {
+  &.small-margin {
+    margin-bottom: 40px !important;
+  }
+}
+
+ul.new-tree {
+  &.tree-open {
+    &.dashboard-tree {
+      li.tree-item {
+        &:first-child {
+          &.item-open {
+            margin-top: 10px;
+          }
+        }
+      }
+    }
+  }
+  &.tree-one {
+    li.tree-item {
+      background: $white;
+    }
+  }
+  &.dashboard-tree {
+    margin-bottom: 0;
+  }
+}
+
+.item-util {
+  @extend %reset-list;
+  @include clearfix();
+  font-size: 11px;
+  line-height: 16px;
+  color: $black;
+  li {
+    margin-right: 30px;
+    float: left;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  .tree-progress & {
+    li {
+      @extend %item-util-wide;
+      text-align: center;
+    }
+  }
+  .right & {
+    li {
+      @extend %item-util-wide;
+      text-align: right;
+    }
+  }
+}

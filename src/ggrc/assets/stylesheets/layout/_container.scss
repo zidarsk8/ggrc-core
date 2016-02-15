@@ -5,7 +5,9 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
-@import "layout/container";
-@import "layout/header";
-@import "layout/content";
-@import "layout/footer";
+.container-fluid {
+  margin: 0 auto;
+  &.resizable {
+    @include transition(width 0.2s);
+  }
+}

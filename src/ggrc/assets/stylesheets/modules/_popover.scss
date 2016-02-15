@@ -1,9 +1,14 @@
 /*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: brad@reciprocitylabs.com
- * Maintained By: brad@reciprocitylabs.com
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
  */
+
+.popover-data-title,
+.popover-data-content {
+  display: none;
+}
 
 .popover {
   padding: 0;

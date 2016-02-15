@@ -5,7 +5,19 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
-@import "layout/container";
-@import "layout/header";
-@import "layout/content";
-@import "layout/footer";
+.header.main {
+  height: 48px;
+}
+
+#page-header {
+  position: relative;
+}
+
+.header-content {
+  height: 47px;
+  line-height: 47px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  border-bottom: 1px solid $headerBorder;
+}

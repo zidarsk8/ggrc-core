@@ -1,0 +1,183 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.inner-tree {
+  .sticky-filter {
+    display: none;
+  }
+}
+
+.filter-holder {
+  margin-bottom: 25px;
+  overflow: hidden;
+}
+
+.inline-filtering {
+  line-height: 39px;
+  height: 39px;
+  background: $white;
+  border-bottom: 3px solid $warmGray;
+  padding: 0 16px 0 10px;
+  margin-bottom: 8px;
+  &.inline-filtering-transparent {
+    line-height: 26px;
+    height: 26px;
+    background: none;
+    border-bottom: none;
+    padding: 0;
+    margin-bottom: 0;
+    .filter-input {
+      .is-expression {
+        top: 3px;
+      }
+    }
+  }
+  .fluid-wrap {
+    position: relative;
+  }
+  .filter-title-wrap,
+  .filter-button-wrap {
+    position: absolute;
+    top: 0;
+  }
+  .filter-title-wrap {
+    width: 45px;
+    left: 0;
+  }
+  .filter-input-wrap {
+    width: auto;
+    margin-right: 164px;
+    margin-left: 45px;
+  }
+  .filter-button-wrap {
+    width: 164px;
+    right: 0;
+  }
+  .filter-title {
+    h6 {
+      @extend %oneline;
+      font-weight: normal;
+      text-transform: none;
+      font-size: 16px;
+      line-height: 20px;
+      padding-top: 10px;
+    }
+  }
+  .filter-input {
+    position: relative;
+    .is-expression {
+      @include opacity(0.25);
+      position: absolute;
+      right: 6px;
+      top: 1px;
+    }
+    &.expression {
+      .is-expression {
+        @include opacity(1);
+        i {
+          background-position: -246px -176px;
+        }
+      }
+    }
+  }
+  .filter-button {
+    @include clearfix();
+    a {
+      float: right;
+      margin-top: 1px;
+      margin-left: 10px;
+    }
+    input[type="submit"] {
+      margin-top: 7px;
+      float: right;
+    }
+    input[type="reset"] {
+      @extend input[type="submit"];
+      margin-left: 10px;
+      font-weight: normal;
+    }
+    i {
+      @include opacity(0.25);
+      @include transition(opacity 0.2s ease);
+      color: $black;
+      &:hover {
+        @include opacity(1);
+      }
+    }
+  }
+  input[type="text"] {
+    @include box-shadow(none);
+    @include border-radius(0);
+    line-height: 26px;
+    height: 26px;
+    padding: 2px 4px;
+    font-size: 12px;
+    margin: -2px 0 0 0;
+    box-sizing: border-box;
+    &.input-wide {
+      width: 100%;
+    }
+    &.input-medium {
+      width: 170px;
+    }
+    &.input-date {
+      width: 80px;
+      padding: 2px 4px 2px 26px;
+      &.date {
+        background-position: -342px -365px;
+      }
+    }
+  }
+  label {
+    font-size:11px;
+    text-transform:uppercase;
+    display: inline-block;
+  }
+  select {
+    line-height:20px;
+    font-size:12px;
+    height:20px;
+    width:120px;
+    display: inline-block;
+    margin-bottom: 0;
+    &.input-small {
+      width: 90px;
+    }
+  }
+  h6 {
+    display:inline-block;
+    line-height:30px;
+    color:#000;
+    font-weight:bold;
+  }
+  form {
+    margin: 0;
+  }
+  ul.quick-filters {
+    @extend %reset-list;
+    float:right;
+    li {
+      display:inline-block;
+      margin-left: 20px;
+    }
+  }
+  &.task-filtering {
+    input {
+      &[class*="span"],
+      &.input-block-level {
+        padding: 4px;
+        min-height: 20px;
+      }
+      &.input-block-level {
+        margin-top: 5px;
+      }
+      &[type="checkbox"] {
+        margin-top: -2px;
+      }
+    }
+  }
+}

@@ -5,7 +5,13 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
-@import "layout/container";
-@import "layout/header";
-@import "layout/content";
-@import "layout/footer";
+.third-col {
+  float: left;
+  width: 30%;
+  margin-right: 3.33%
+}
+
+.instruction {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
