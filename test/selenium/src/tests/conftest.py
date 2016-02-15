@@ -2,8 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""PyTest fixtures"""
 
-import pytest
+import pytest   # pylint: disable=import-error
 from lib import base
 from lib import test_helpers
 from lib.page import dashboard
@@ -31,14 +32,16 @@ def selenium():
   Returns:
       base.CustomDriver
   """
-  selenium = base.Selenium()
-  yield selenium
+  selenium_base = base.Selenium()
+  yield selenium_base
 
-  selenium.close_resources()
+  selenium_base.close_resources()
 
 
 @pytest.yield_fixture(scope="class")
 def custom_program_attribute(selenium):
+  """Creates a custom attribute for a program object"""
+  # pylint: disable=redefined-outer-name
   modal = dashboard.AdminDashboardPage(selenium.driver) \
       .select_custom_attributes() \
       .select_programs() \
@@ -57,6 +60,7 @@ def initial_lhn(selenium):
   Returns:
       lib.page.lhn.LhnContents
   """
+  # pylint: disable=redefined-outer-name
   lhn_contents = dashboard.DashboardPage(selenium.driver) \
       .open_lhn_menu() \
       .select_my_objects()
@@ -70,6 +74,7 @@ def new_program(selenium):
   Returns:
       lib.page.modal.new_program.NewProgramModal
   """
+  # pylint: disable=redefined-outer-name
   modal = dashboard.DashboardPage(selenium.driver) \
       .open_lhn_menu() \
       .select_my_objects() \

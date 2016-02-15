@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""Elements for info widget"""
 
 from lib import base
 from lib.constants import locator
@@ -10,6 +11,8 @@ from lib.page import lhn_modal
 
 
 class _DropdownSettings(base.Component):
+  """A class for the button/dropdown settings in the info widget"""
+
   _locator = locator.Widget
 
   def __init__(self, driver):

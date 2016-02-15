@@ -18,10 +18,10 @@ LOGGING_FORMAT = _yaml[constants.yaml.LOGGING][constants.yaml.FORMAT]
 LOGGING_LEVEL = _yaml[constants.yaml.LOGGING][constants.yaml.LEVEL]
 CHROME_DRIVER_PATH = _yaml[constants.yaml.WEBDRIVER][constants.yaml.PATH]
 
-_yaml_app_url = _yaml[constants.yaml.APP][constants.yaml.URL]
-APP_URL = _yaml_app_url \
-    if _yaml_app_url.endswith("/") \
-    else _yaml_app_url.join("/")
+_YAML_APP_URL = _yaml[constants.yaml.APP][constants.yaml.URL]
+APP_URL = _YAML_APP_URL \
+    if _YAML_APP_URL.endswith("/") \
+    else _YAML_APP_URL.join("/")
 SERVER_WAIT_TIME = _yaml[constants.yaml.APP][constants.yaml.WAIT_TIME]
 DISPLAY_WINDOWS = _yaml[constants.yaml.BROWSER][constants.yaml.DISPLAY]
 WINDOW_RESOLUTION = literal_eval(
