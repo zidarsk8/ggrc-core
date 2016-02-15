@@ -30,8 +30,7 @@ class InstanceRepresentation(object):
 
 
 class CustomDriver(webdriver.Chrome):
-  def __init__(self, **kwargs):
-    super(CustomDriver, self).__init__(**kwargs)
+  """An extension to the web driver"""
 
   def find_elements_by_visible_locator(self, locator):
     """
@@ -427,8 +426,8 @@ class AnimatedComponent(Component):
 
   def _wait_until_invisible(self):
     for locator in self._locators:
-        WebDriverWait(self._driver, constants.ux.MAX_USER_WAIT_SECONDS) \
-            .until(EC.invisibility_of_element_located(locator))
+      WebDriverWait(self._driver, constants.ux.MAX_USER_WAIT_SECONDS) \
+          .until(EC.invisibility_of_element_located(locator))
 
 
 class Modal(Component):

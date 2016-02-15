@@ -26,8 +26,8 @@ class TestProgramPage(base.Test):
     # pylint: disable=invalid-name
     _, program_info_page = new_program
     lhn_menu = dashboard.HeaderPage(selenium.driver) \
-      .open_lhn_menu() \
-      .select_my_objects()
+        .open_lhn_menu() \
+        .select_my_objects()
 
     assert lhn_menu.button_programs.members_count \
         >= int(program_info_page.object_id)
