@@ -12,13 +12,12 @@ from sqlalchemy import and_
 
 import os
 from ggrc import db, notification
-from ggrc.models import ObjectType, NotificationType, Notification, Person
+from ggrc.models import NotificationType, Notification, Person
 from ggrc_workflows.views import send_todays_digest_notifications
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
-from nose.plugins.skip import SkipTest
 
 
 if os.environ.get('TRAVIS', False):
@@ -39,7 +38,8 @@ class TestCycleTaskStatusChange(TestCase):
     Notification.query.delete()
 
     self.random_objects = self.object_generator.generate_random_objects(2)
-    _, self.user = self.object_generator.generate_person(user_role="gGRC Admin")
+    _, self.user = self.object_generator.generate_person(
+        user_role="gGRC Admin")
     self.create_test_cases()
 
     def init_decorator(init):
@@ -66,8 +66,8 @@ class TestCycleTaskStatusChange(TestCase):
 
       notif = db.session.query(Notification).filter(and_(
           Notification.object_id == task1.id,
-          Notification.object_type == self.get_object_type(task1),
-          Notification.sent_at == None,
+          Notification.object_type == task1.type,
+          Notification.sent_at == None,  # noqa
           Notification.notification_type == self.get_notification_type(
               "cycle_task_declined"
           )
@@ -83,14 +83,15 @@ class TestCycleTaskStatusChange(TestCase):
       self.wf_generator.activate_workflow(wf)
 
       cycle = Cycle.query.get(cycle.id)
-      task1 = CycleTaskGroupObjectTask.query.get(cycle.cycle_task_group_object_tasks[0].id)
+      task1 = CycleTaskGroupObjectTask.query.get(
+          cycle.cycle_task_group_object_tasks[0].id)
 
       self.task_change_status(task1)
 
       notif = db.session.query(Notification).filter(and_(
           Notification.object_id == cycle.id,
-          Notification.object_type == self.get_object_type(cycle),
-          Notification.sent_at == None,
+          Notification.object_type == cycle.type,
+          Notification.sent_at == None,  # noqa
           Notification.notification_type == self.get_notification_type(
               "all_cycle_tasks_completed"
           )
@@ -100,15 +101,14 @@ class TestCycleTaskStatusChange(TestCase):
 
       notif = db.session.query(Notification).filter(and_(
           Notification.object_id == task1.id,
-          Notification.object_type == self.get_object_type(task1),
-          Notification.sent_at == None,
+          Notification.object_type == task1.type,
+          Notification.sent_at == None,  # noqa
           Notification.notification_type != self.get_notification_type(
               "all_cycle_tasks_completed"
           )
       )).all()
 
       self.assertEqual(notif, [])
-
 
   def test_multi_all_tasks_finished_notification_created(self):
 
@@ -126,8 +126,8 @@ class TestCycleTaskStatusChange(TestCase):
 
       notif = db.session.query(Notification).filter(and_(
           Notification.object_id == cycle.id,
-          Notification.object_type == self.get_object_type(cycle),
-          Notification.sent_at == None,
+          Notification.object_type == cycle.type,
+          Notification.sent_at == None,  # noqa
           Notification.notification_type == self.get_notification_type(
               "all_cycle_tasks_completed"
           )
@@ -139,8 +139,8 @@ class TestCycleTaskStatusChange(TestCase):
 
       notif = db.session.query(Notification).filter(and_(
           Notification.object_id == task1.id,
-          Notification.object_type == self.get_object_type(task1),
-          Notification.sent_at == None,
+          Notification.object_type == task1.type,
+          Notification.sent_at == None,  # noqa
           Notification.notification_type != self.get_notification_type(
               "all_cycle_tasks_completed"
           )
@@ -157,8 +157,8 @@ class TestCycleTaskStatusChange(TestCase):
 
       notif = db.session.query(Notification).filter(and_(
           Notification.object_id == cycle.id,
-          Notification.object_type == self.get_object_type(cycle),
-          Notification.sent_at == None,
+          Notification.object_type == cycle.type,
+          Notification.sent_at == None,  # noqa
           Notification.notification_type == self.get_notification_type(
               "all_cycle_tasks_completed"
           )
@@ -259,13 +259,12 @@ class TestCycleTaskStatusChange(TestCase):
       cycle = Cycle.query.get(cycle.id)
       user = Person.query.get(self.user.id)
       self.assertIn(user.email, notif_data)
-      self.wf_generator.modify_object(cycle, data={"is_current":False})
+      self.wf_generator.modify_object(cycle, data={"is_current": False})
       cycle = Cycle.query.get(cycle.id)
       self.assertFalse(cycle.is_current)
 
       _, notif_data = notification.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
-
 
   def create_test_cases(self):
     def person_dict(person_id):
@@ -315,10 +314,6 @@ class TestCycleTaskStatusChange(TestCase):
   def get_notification_type(self, name):
     return db.session.query(NotificationType).filter(
         NotificationType.name == name).one()
-
-  def get_object_type(self, obj):
-    return db.session.query(ObjectType).filter(
-        ObjectType.name == obj.__class__.__name__).one()
 
   def task_change_status(self, task, status="Verified"):
     self.wf_generator.modify_object(

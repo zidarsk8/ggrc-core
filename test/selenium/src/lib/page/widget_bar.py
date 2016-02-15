@@ -3,98 +3,96 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-from lib.constants import locator
-from lib.constants import element
 from lib import base
+from lib.page import widget
+from lib.element import widget_bar
+from lib.constants import locator
 
 
-class ProgramInfoWidget(base.Widget):
-    locators = locator.Widget
-
-    def __init__(self, driver):
-        """
-        Args:
-            driver (base._CustomDriver)
-        """
-        super(ProgramInfoWidget, self).__init__(driver)
-        self.button_settings = base.DropdownStatic(
-            driver,
-            self.locators.DROPDOWN_SETTINGS,
-            self.locators.DROPDOWN_SETTINGS_MEMBERS)
-
-        self.show_advanced = base.Toggle(
-            self._driver, self.locators.BUTTON_SHOW_ADVANCED)
-
-        # activate all fields
-        self.show_advanced.click()
-
-        self.title = base.Label(self._driver, self.locators.TITLE)
-        self.title_entered = base.Label(self._driver,
-                                        self.locators.TITLE_ENTERED)
-        self.object_review = base.Label(self._driver,
-                                        self.locators.OBJECT_REVIEW)
-        self.submit_for_review = base.Label(self._driver,
-                                            self.locators.SUBMIT_FOR_REVIEW)
-        self.description = base.Label(self._driver, self.locators.DESCRIPTION)
-        self.description_entered = base.Label(self._driver,
-                                              self.locators.DESCRIPTION_ENTERED)
-        self.notes = base.Label(self._driver, self.locators.NOTES)
-        self.notes_entered = base.Label(self._driver,
-                                        self.locators.NOTES_ENTERED)
-        self.manager = base.Label(self._driver, self.locators.MANAGER)
-        self.manager_entered = base.Label(self._driver,
-                                          self.locators.MANAGER_ENTERED)
-        self.program_url = base.Label(self._driver, self.locators.PROGRAM_URL)
-        self.program_url_entered = base.Label(self._driver,
-                                              self.locators.PROGRAM_URL_ENTERED)
-        self.code = base.Label(self._driver, self.locators.CODE)
-        self.code_entered = base.Label(self._driver, self.locators.CODE_ENTERED)
-        self.effective_date = base.Label(self._driver,
-                                         self.locators.EFFECTIVE_DATE)
-        self.effective_date_entered = base.Label(
-            self._driver, self.locators.EFFECTIVE_DATE_ENTERED)
-        self.stop_date = base.Label(self._driver, self.locators.STOP_DATE)
-        self.stop_date_entered = base.Label(self._driver,
-                                            self.locators.STOP_DATE_ENTERED)
-        self.primary_contact = base.Label(self._driver,
-                                          self.locators.PRIMARY_CONTACT)
-        self.primary_contact_entered = base.Label(
-            self._driver, self.locators.PRIMARY_CONTACT_ENTERED)
-        self.secondary_contact = base.Label(self._driver,
-                                            self.locators.SECONDARY_CONTACT)
-        self.secondary_contact_entered = base.Label(
-            self._driver, self.locators.SECONDARY_CONTACT_ENTERED)
-        self.reference_url = base.Label(self._driver,
-                                        self.locators.REFERENCE_URL)
-        self.reference_url_entered = base.Label(
-            self._driver, self.locators.REFERENCE_URL_ENTERED)
-
-    def delete_object(self):
-        self.navigate_to()
-        self.button_settings.select(
-            element.WidgetProgramInfo.BUTTON_SETTINGS_DROPDOWN_ITEMS)
+class _AdminWidget(base.Widget):
+  def __init__(self, driver):
+    super(_AdminWidget, self).__init__(driver)
 
 
-class WidgetBarPage(base.Page):
-    def __init__(self, driver):
-        super(WidgetBarPage, self).__init__(driver)
-        self.button_add_widget = base.Dropdown(driver,
-                                               locator.WidgetBar.BUTTON_ADD)
+class _WidgetBar(base.Component):
+  def __init__(self, driver):
+    super(_WidgetBar, self).__init__(driver)
 
-    def add_widget(self, option_locator):
-        """Adds a new widget to the bar.
+  def get_active_widget_name(self):
+    """In general multiple tabs are open. Here we get the name of the
+    active one.
 
-        Args:
-            option_locator (tuple)
-        """
-        self.button_add_widget.select(option_locator)
+    Returns:
+         str
+    """
+    active_widget = base.Button(self._driver, locator.WidgetBar.TAB_WIDGET)
+    return active_widget.text
 
-    def get_active_tab_name(self):
-        """In general multiple tabs are open. Here we get the name of the active
-        one.
 
-        Returns:
-             str
-        """
-        active_widget = base.Button(self._driver, locator.WidgetBar.TAB_ACTIVE)
-        return active_widget.text
+class AdminDashboardWidgetBarPage(_WidgetBar):
+  def __init__(self, driver):
+    super(AdminDashboardWidgetBarPage, self).__init__(driver)
+    self.tab_people = widget_bar.Tab(self._driver,
+                                     locator.WidgetBar.ADMIN_PEOPLE)
+    self.tab_roles = widget_bar.Tab(self._driver,
+                                    locator.WidgetBar.ADMIN_ROLES)
+    self.tab_events = widget_bar.Tab(self._driver,
+                                     locator.WidgetBar.ADMIN_EVENTS)
+    self.tab_custom_attributes = widget_bar.Tab(
+        self._driver, locator.WidgetBar.ADMIN_CUSTOM_ATTRIBUTE)
+
+  def select_people(self):
+    """
+    Returns:
+        widget.AdminPeople
+    """
+    self.tab_people.click()
+    return widget.AdminPeople(self._driver)
+
+  def select_roles(self):
+    """
+    Returns:
+        widget.AdminRoles
+    """
+    self.tab_roles.click()
+    return widget.AdminRoles(self._driver)
+
+  def select_events(self):
+    """
+    Returns:
+        widget.AdminPeople
+    """
+    self.tab_events.click()
+    return widget.AdminEvents(self._driver)
+
+  def select_custom_attributes(self):
+    """
+    Returns:
+        widget.AdminCustomAttributes
+    """
+    self.tab_custom_attributes.click()
+    return widget.AdminCustomAttributes(self._driver)
+
+
+class DashboardWidgetBarPage(_WidgetBar):
+  def __init__(self, driver):
+    super(DashboardWidgetBarPage, self).__init__(driver)
+    self.button_add_widget = base.Dropdown(driver,
+                                           locator.WidgetBar.BUTTON_ADD)
+    self.tab_info = base.Tab(self._driver, locator.WidgetBar.INFO)
+
+  def add_widget(self):
+    """
+    Returns:
+        widget.AddWidget
+    """
+    self.button_add_widget.click()
+    return widget.AddWidget(self._driver)
+
+  def select_info(self):
+    """
+    Returns:
+        widget.InfoWidget
+    """
+    self.tab_info.click()
+    return widget.DashboardInfo(self._driver)

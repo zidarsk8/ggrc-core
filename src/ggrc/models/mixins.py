@@ -414,8 +414,8 @@ class Slugged(Base):
   _aliases = {
       "slug": {
           "display_name": "Code",
-          "description": ("Must be unique. Can be left empty for"
-                          "autogeneration. If updating or deleting,"
+          "description": ("Must be unique. Can be left empty for "
+                          "autogeneration. If updating or deleting, "
                           "code is required"),
       }
   }
@@ -537,8 +537,28 @@ class WithContact(object):
     ).exists()
 
 
-class BusinessObject(
-        Stateful, Noted, Described, Hyperlinked, WithContact, Titled, Slugged):
+class Revisionable(object):
+  """ Mixin for models to expose revision history of the given model """
+  # pylint: disable=too-few-public-methods
+  # since this is a small-by-design mixin
+
+  _publish_attrs = ['revisions']
+
+  @declared_attr
+  def revisions(self):
+    """ Relationship to revisions of the given object """
+    def join_function():
+      from ggrc.models import Revision
+      return and_(Revision.resource_type == self.__name__,
+                  Revision.resource_id == self.id)
+    return db.relationship(
+        "Revision",
+        primaryjoin=join_function,
+        foreign_keys="Revision.resource_type, Revision.resource_id")
+
+
+class BusinessObject(Stateful, Noted, Described, Hyperlinked, WithContact,
+                     Titled, Slugged, Revisionable):
   VALID_STATES = (
       'Draft',
       'Final',
@@ -560,9 +580,11 @@ class CustomAttributable(object):
   @declared_attr
   def custom_attribute_values(cls):
     from ggrc.models.custom_attribute_value import CustomAttributeValue
-    join_function = lambda: and_(
-        foreign(CustomAttributeValue.attributable_id) == cls.id,
-        foreign(CustomAttributeValue.attributable_type) == cls.__name__)
+
+    def join_function():
+      return and_(
+          foreign(CustomAttributeValue.attributable_id) == cls.id,
+          foreign(CustomAttributeValue.attributable_type) == cls.__name__)
     return relationship(
         "CustomAttributeValue",
         primaryjoin=join_function,
@@ -629,13 +651,15 @@ class CustomAttributable(object):
     from ggrc.models.custom_attribute_definition import \
         CustomAttributeDefinition
     definition_type = foreign(CustomAttributeDefinition.definition_type)
-    join_function = lambda: or_(
-        definition_type == underscore_from_camelcase(cls.__name__),
-        # The bottom statement always evaluates to False, and is here just to
-        # satisfy sqlalchemys need for use of foreing keys while defining a
-        # relationship.
-        definition_type == cls.id,
-    )
+
+    def join_function():
+      return or_(
+          definition_type == underscore_from_camelcase(cls.__name__),
+          # The bottom statement always evaluates to False, and is here just to
+          # satisfy sqlalchemys need for use of foreing keys while defining a
+          # relationship.
+          definition_type == cls.id,
+      )
     return db.relationship(
         "CustomAttributeDefinition",
         primaryjoin=join_function

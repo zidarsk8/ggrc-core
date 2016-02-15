@@ -3,8 +3,10 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
-from datetime import date
 
+"""Tests for workflow specific imports."""
+
+from datetime import date
 from os.path import abspath
 from os.path import dirname
 from os.path import join
@@ -12,6 +14,7 @@ from os.path import join
 from integration.ggrc.converters import TestCase
 
 from ggrc import db
+from ggrc.converters import errors
 from ggrc_workflows.models.task_group import TaskGroup
 from ggrc_workflows.models.task_group_object import TaskGroupObject
 from ggrc_workflows.models.task_group_task import TaskGroupTask
@@ -21,17 +24,16 @@ THIS_ABS_PATH = abspath(dirname(__file__))
 
 
 class TestWorkflowObjectsImport(TestCase):
+  """Test imports for basic workflow objects."""
 
-  """
-    Test imports for basic workflow objects
-  """
+  CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
 
   def setUp(self):
     TestCase.setUp(self)
     self.client.get("/login")
-    self.CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
 
-  def test_full_good_import_no_warnings(self):
+  def test_full_good_import(self):
+    """Test full good import without any warnings."""
     filename = "workflow_small_sheet.csv"
     response = self.import_file(filename)
 
@@ -55,16 +57,18 @@ class TestWorkflowObjectsImport(TestCase):
     self.assertIn("option 1", task4.response_options)
 
   def test_import_task_date_format(self):
-    """Test import of tasks for workflows with various frequencies"""
+    """Test import of tasks for workflows
+
+    This is a test for various imports of task dates for all types of
+    workflows. This test ignores all warnings returned by the file import,
+    since those are verified in a different test.
+
+    Raises:
+      AssertionError: if the start and end values on tasks don't match the
+        values in the imported csv files.
+    """
     filename = "workflow_big_sheet.csv"
-    response = self.import_file(filename)
-    objects = {"Workflow", "Task Group", "Task Group Task"}
-    messages = ["block_errors", "block_warnings", "row_errors", "row_warnings",
-                "ignored"]
-    # Assert that there were no import errors
-    for obj in response:
-      if obj['name'] in objects:
-        self.assertEqual([[], [], [], [], 0], [obj[msg] for msg in messages])
+    self.import_file(filename)
 
     # Assert that CSV import got imported correctly
     getters = {
@@ -93,8 +97,7 @@ class TestWorkflowObjectsImport(TestCase):
         ["task-5", "annually", ((5, 7), (7, 15))],
     ]
 
-    for t in tasks:
-      slug, freq, result = t
+    for slug, freq, result in tasks:
       task = db.session.query(TaskGroupTask).filter(
           TaskGroupTask.slug == slug).one()
       getter = getters[freq]
@@ -102,3 +105,100 @@ class TestWorkflowObjectsImport(TestCase):
       self.assertEqual(
           getter(task), result,
           "Failed importing data for task with slug = '{}'".format(slug))
+
+  def test_import_task_types(self):
+    """Test task import with warnings
+
+    Check that the warnings for bay task type field work and that the task type
+    gets set to default when an invalid values is found in the csv.
+
+    Raises:
+      AssertionError: When file import does not return correct errors for the
+        example csv, or if any of the tasks does not have the expected task
+        type.
+
+    """
+    filename = "workflow_big_sheet.csv"
+    response = self.import_file(filename)
+    expected_messages = {
+        "Workflow": {},
+        "Task Group": {},
+        "Task Group Task": {
+            "row_warnings": set([
+                errors.WRONG_REQUIRED_VALUE.format(
+                    line=38, value="aaaa", column_name="Task Type"
+                ),
+                errors.MISSING_VALUE_WARNING.format(
+                    line=39, default_value="Rich Text", column_name="Task Type"
+                ),
+                errors.MISSING_VALUE_WARNING.format(
+                    line=40, default_value="Rich Text", column_name="Task Type"
+                ),
+            ])
+        },
+    }
+    messages = (
+        "block_errors",
+        "block_warnings",
+        "row_errors",
+        "row_warnings",
+    )
+    # Assert that there were no import errors
+    for obj in response:
+      if obj['name'] in expected_messages:
+        for message in messages:
+          self.assertEqual(
+              set(obj[message]),
+              expected_messages[obj["name"]].get(message, set())
+          )
+          self.assertEqual(obj["ignored"], 0)
+
+    task_types = {
+        "text": [
+            "task-1",
+            "task-2",
+            "task-4",
+            "task-7",
+            "task-9",
+            "task-10",
+            "task-11",
+        ],
+        "menu": [
+            "task-5",
+            "task-8",
+        ],
+        "checkbox": [
+            "task-3",
+            "task-6",
+        ],
+    }
+
+    for task_type, slugs in task_types.items():
+      self._test_task_types(task_type, slugs)
+
+  def _test_task_types(self, expected_type, task_slugs):
+    """Test that all listed tasks have rich text type.
+
+    This is a part of the test_import_task_date_format
+
+    Args:
+      expected_type: Expected task type for all tasks specified by task_slugs.
+      task_slugs: list of slugs for the tasks that will be tested.
+
+    Raises:
+      AssertionError: if any of the tasks does not exists or if their type is
+        not text.
+    """
+    tasks = db.session.query(TaskGroupTask).filter(
+        TaskGroupTask.slug.in_(task_slugs)).all()
+    for task in tasks:
+      self.assertEqual(
+          task.task_type,
+          expected_type,
+          "task '{}' has type '{}', expected '{}'".format(
+              task.slug,
+              task.task_type,
+              expected_type,
+          )
+      )
+    self.assertEqual(len(tasks), len(task_slugs))

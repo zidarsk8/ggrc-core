@@ -112,7 +112,7 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
 fi
 source /vagrant/bin/init_vagrant_env
 
-export NODE_PATH=/usr/local/lib/node_modules/
+export NODE_PATH=/vagrant-dev/node_modules/
 export TERM=xterm-color
 export EDITOR=vim
 PS1='\[\033[01;35m\]\u@\h\[\033[01;34m\] \w \n\$\[\033[00m\] '

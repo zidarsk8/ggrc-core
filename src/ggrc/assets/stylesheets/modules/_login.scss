@@ -1,0 +1,37 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.welcome {
+  background: $white;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  bottom: auto;
+  right: auto;
+  h1 {
+    text-align: center;
+    margin-top: 3em;  // allow space for flash messages
+    padding-top: 1em;
+    padding-bottom: 0.5em;
+    font-size: 44px;
+    font-weight: normal;
+    line-height: 1.5em;
+    width: 100%;
+  }
+  h2 {
+    text-align:center;
+    padding-bottom:1.0em;
+    font-size:22px;
+    font-weight:normal;
+    line-height:1.0em;
+  }
+  .btn-large {
+    padding-left:60px;
+    padding-right:60px;
+    margin-bottom:10px;
+  }
+}

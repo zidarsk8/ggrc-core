@@ -21,6 +21,7 @@
     "RefreshQueue": false,
     "RefreshQueueManager": false,
     "Spinner": false,
+    "Stickyfill": false,
     "ZeroClipboard": false,
 
     // TODO: Check why these vars are global

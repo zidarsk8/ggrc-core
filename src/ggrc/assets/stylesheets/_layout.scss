@@ -1,102 +1,11 @@
 /*
  * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: brad@reciprocitylabs.com
+ * Created By: vladan@reciprocitylabs.com
  * Maintained By: vladan@reciprocitylabs.com
  */
 
-// Container styling
-.container-fluid {
-  margin: 0 auto;
-  &.resizable {
-    @include transition(width 0.2s);
-  }
-}
-
-// Header styling
-.header.main {
-  height: 48px;
-}
-
-#page-header {
-  position: relative;
-}
-
-.header-content {
-  height: 47px;
-  line-height: 47px;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  border-bottom: 1px solid $headerBorder;
-}
-
-// Content styling
-.object-area {
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-top: 20px;
-  background: $contentBgnd;
-  &.import-area {
-    margin-left: 0;
-    .widget {
-      .content {
-        display: block !important;
-      }
-    }
-  }
-  &.dashboard-area {
-    margin-left: 0;
-  }
-}
-
-.inner-content {
-  .side-wrap & {
-    margin-left: 40px;
-  }
-  .content-wrap & {
-    margin-right: 40px;
-  }
-  .full-width & {
-    margin-left: 40px;
-    margin-right: 40px;
-    .side-wrap {
-      .inner-content {
-        margin: 0;
-      }
-    }
-    .content-wrap {
-      .inner-content {
-        margin: 0;
-      }
-    }
-  }
-}
-
-// Footer styling
-.footer {
-  margin-top: 500px;
-  overflow: hidden;
-}
-
-.lhs-holder {
-  position: fixed;
-  top: 128px;
-  left: -240px;
-  width: 240px;
-  height: 548px;
-  overflow-y: auto;
-  background: $white;
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
-  }
-}
-
-.lhn-type {
-  position: fixed;
-  top: 94px;
-  left: -246px;
-  &.active {
-    @include box-shadow(2px 2px 4px rgba(0,0,0, 0.05), 2px -2px 4px rgba(0,0,0, 0.05));
-  }
-}
+@import "layout/container";
+@import "layout/header";
+@import "layout/content";
+@import "layout/footer";

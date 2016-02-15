@@ -3,6 +3,7 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+
 """ Module for all special column handlers for workflow objects """
 
 import datetime
@@ -139,6 +140,8 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
 
   def set_obj_attr(self):
     """ set all possible start date attributes """
+    # disable false parentheses warning for 'not (a < b < c)'
+    # pylint: disable=C0325
     freq = self.row_converter.obj.task_group.workflow.frequency
     if freq == "one_time":
       if len(self.value) != 3:
@@ -177,11 +180,12 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
 
 
 class TaskEndColumnHandler(TaskDateColumnHandler):
-
   """ handler for end column in task group tasks """
 
   def set_obj_attr(self):
     """ set all possible end date attributes """
+    # disable false parentheses warning for 'not (a < b < c)'
+    # pylint: disable=C0325
     freq = self.row_converter.obj.task_group.workflow.frequency
     if freq == "one_time":
       if len(self.value) != 3:
@@ -221,7 +225,7 @@ class TaskEndColumnHandler(TaskDateColumnHandler):
 
 class TaskTypeColumnHandler(handlers.ColumnHandler):
 
-  """ handler for task type column in task group tasks """
+  """Handler for task type column in task group tasks."""
 
   type_map = {
       "rich text": "text",
@@ -238,23 +242,26 @@ class TaskTypeColumnHandler(handlers.ColumnHandler):
   }
 
   def parse_item(self):
-    """ parse task type column value """
-    if self.raw_value == "":
-      self.add_warning(errors.MISSING_VALUE_ERROR,
-                       column_name=self.display_name)
-      return None
+    """Parse task type column value."""
     value = self.type_map.get(self.raw_value.lower())
     if value is None:
       if self.raw_value.lower() in self.type_map.values():
         value = self.raw_value.lower()
     if value is None:
-      self.add_warning(errors.WRONG_REQUIRED_VALUE,
-                       value=self.raw_value,
-                       column_name=self.display_name)
       value = self.row_converter.obj.default_task_type()
+      default_value = self.reverse_map.get(value).title()
+      if self.raw_value:
+        self.add_warning(errors.WRONG_REQUIRED_VALUE,
+                         value=self.raw_value,
+                         column_name=self.display_name)
+      else:
+        self.add_warning(errors.MISSING_VALUE_WARNING,
+                         default_value=default_value,
+                         column_name=self.display_name)
     return value
 
   def get_value(self):
+    """Get titled user readable value for taks type."""
     return self.reverse_map.get(self.row_converter.obj.task_type,
                                 "rich text").title()
 

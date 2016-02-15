@@ -4,38 +4,64 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 import pytest
-from lib import base, test_helpers
+from lib import base
+from lib import test_helpers
 from lib.page import dashboard
+from lib.page import widget
+
+
+@pytest.yield_fixture(scope="session")
+def db_drop():
+  """Reset the DB"""
+  # todo
+  pass
 
 
 @pytest.yield_fixture(scope="class")
 def selenium():
-    """Setup test resources for running test in headless mode.
+  """Setup test resources for running test in headless mode.
 
-    Returns:
-        base.Test
-    """
-    selenium = base.Selenium()
-    yield selenium
+  Returns:
+      base.CustomDriver
+  """
+  selenium = base.Selenium()
+  yield selenium
 
-    selenium.close_resources()
+  selenium.close_resources()
 
 
 @pytest.yield_fixture(scope="class")
-def new_program(selenium):
-    """Creates a new program object.
+def custom_program_attribute(selenium):
+  modal = dashboard.AdminDashboardPage(selenium.driver) \
+      .select_custom_attributes() \
+      .select_programs() \
+      .add_new_custom_attribute()
+  test_helpers.ModalNewProgramCustomAttribute.enter_test_data(modal)
+  cust_attr_widget = modal.save_and_close()
 
-    Returns:
-        lib.page.modal.new_program.NewProgramModal
-    """
-    selenium.driver.get(dashboard.DashboardPage.URL)
-    dashboard_page = dashboard.DashboardPage(selenium.driver)
-    lhn_menu = dashboard_page.open_lhn_menu()
-    lhn_menu.programs.click()
-    modal = lhn_menu.programs.create_new()
-    test_helpers.ModalNewProgramPage.enter_test_data(modal)
-    program_info = modal.save_and_close()
+  yield cust_attr_widget
 
-    yield modal, program_info
+  # todo: delete this custom attribute
 
-    program_info.delete_object()
+
+@pytest.yield_fixture(scope="class")
+def new_program(selenium, custom_program_attribute):
+  """Creates a new program object.
+
+  Returns:
+      lib.page.modal.new_program.NewProgramModal
+  """
+  modal = dashboard.DashboardPage(selenium.driver) \
+      .open_lhn_menu() \
+      .select_my_objects() \
+      .select_programs() \
+      .create_new()
+
+  test_helpers.ModalNewProgramPage.enter_test_data(modal)
+  program_info_page = modal.save_and_close()
+
+  yield modal, program_info_page
+
+  widget.ProgramInfo(selenium.driver) \
+      .navigate_to(program_info_page.url) \
+      .delete_object()

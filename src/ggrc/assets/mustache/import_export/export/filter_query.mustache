@@ -6,13 +6,13 @@
 }}
 
 <div class="row-fluid wrap-row">
-  <div class="span4">
+  <div class="span10">
     <h6>Filter Query</h6>
     <div class="inline-filtering inline-filtering-transparent">
-      <div class="filter-input">
+      <div class="filter-input{{#isFilterActive}} expression{{/isFilterActive}}">
         <input can-value="item.filter" name="filter_query" type="text" class="input-wide">
         <span class="is-expression">
-          <i class="fa fa-check-circle-o"></i>
+          <i class="fa {{#if isFilterActive}}fa-check-circle green{{else}}fa-check-circle-o{{/if}}"></i>
         </span>
       </div>
     </div>

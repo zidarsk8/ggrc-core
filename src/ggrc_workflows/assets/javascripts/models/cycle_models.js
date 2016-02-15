@@ -152,14 +152,17 @@
     }
   }, {
     workflowFolder: function() {
-      return this.refresh_all('cycle', 'workflow', 'folders').then(function(folders){
-        if (folders.length === 0) {
-          // Workflow folder has not been assigned
-          return null;
+      return this.refresh_all('cycle', 'workflow').then(function(workflow){
+        if (workflow.has_binding('folders')) {
+          return workflow.refresh_all('folders').then(function(folders){
+            if (folders.length === 0) {
+              return null;  // workflow folder has not been assigned
+            }
+            return folders[0].instance;
+          }, function(result) {
+            return result;
+          });
         }
-        return folders[0].instance;
-      }, function(result) {
-        return result;
       });
     }
   });

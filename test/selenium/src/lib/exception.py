@@ -5,8 +5,16 @@
 
 
 class ElementNotFound(Exception):
-    pass
+  pass
 
 
 class DocstringsMissing(Exception):
-    pass
+  pass
+
+
+class NoClassFound(Exception):
+  pass
+
+
+class ElementMovingTimeout(Exception):
+  pass
