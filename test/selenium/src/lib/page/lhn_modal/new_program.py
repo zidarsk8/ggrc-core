@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""New program modal"""
 
 from lib import base
 from lib.constants import locator
@@ -9,6 +10,9 @@ import lib.page.widget.info
 
 
 class EditProgramModal(base.Modal):
+  """Class representing a modal visible after clicking the settings button
+  in the info widget and selecting edit"""
+
   _locators = locator.ModalCreateNewProgram
 
   def __init__(self, driver):
@@ -97,10 +101,12 @@ class EditProgramModal(base.Modal):
 
   def filter_and_select_primary_contact(self, text):
     """Enters the text into the primary contact element"""
+    # pylint: disable=invalid-name
     self.ui_primary_contact.filter_and_select_first(text)
 
   def filter_and_select_secondary_contact(self, text):
     """Enters the text into the secondary contact element"""
+    # pylint: disable=invalid-name
     self.ui_secondary_contact.filter_and_select_first(text)
 
   def enter_program_url(self, url):
@@ -124,6 +130,7 @@ class EditProgramModal(base.Modal):
     Args:
       day (int): for more info see base.DatePicker.select_day_in_current_month
     """
+    # pylint: disable=invalid-name
     self.ui_effective_date.select_day_in_current_month(day)
 
   def enter_stop_date_end_month(self, day):
@@ -147,6 +154,9 @@ class EditProgramModal(base.Modal):
 
 
 class NewProgramModal(EditProgramModal):
+  """Class representing a new program modal visible after creating a new
+  program from LHN"""
+
   _locators = locator.ModalCreateNewProgram
 
   def __init__(self, driver):

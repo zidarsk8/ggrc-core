@@ -4,4 +4,4 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 # flake8: noqa
-from delete_object import DeleteObjectModal
+from lib.page.widget_modal.delete_object import DeleteObjectModal

@@ -19,11 +19,11 @@ class _UserList(base.Component):
     self.button_my_work = base.Button(self._driver,
                                       self._locator.BUTTON_MY_WORK)
     self.button_admin_dashboard = base.Button(
-        self._driver, self._locator.BUTTON_ADMIN_DASHBOARD)
+      self._driver, self._locator.BUTTON_ADMIN_DASHBOARD)
     self.button_data_import = base.Button(
-        self._driver, self._locator.BUTTON_DATA_IMPORT)
+      self._driver, self._locator.BUTTON_DATA_IMPORT)
     self.button_data_export = base.Button(
-        self._driver, self._locator.BUTTON_DATA_EXPORT)
+      self._driver, self._locator.BUTTON_DATA_EXPORT)
     self.button_logout = base.Button(self._driver,
                                      self._locator.BUTTON_LOGOUT)
 
@@ -52,11 +52,13 @@ class _UserList(base.Component):
     raise NotImplementedError
 
 
-class _HeaderPage(base.Page):
+class HeaderPage(base.Page):
+  """Header of the page"""
+
   _locator = locator.PageHeader
 
   def __init__(self, driver):
-    super(_HeaderPage, self).__init__(driver)
+    super(HeaderPage, self).__init__(driver)
     self.button_lhn_menu = base.Button(self._driver,
                                        self._locator.BUTTON_LHN)
     self.button_dashboard = base.Button(self._driver,
@@ -66,9 +68,9 @@ class _HeaderPage(base.Page):
     self.button_my_tasks = base.Button(self._driver,
                                        self._locator.BUTTON_MY_TASKS)
     self.button_all_objects = base.Button(
-        self._driver, self._locator.BUTTON_ALL_OBJECTS)
+      self._driver, self._locator.BUTTON_ALL_OBJECTS)
     self.button_user_dropdown = base.Button(
-        self._driver, self._locator.BUTTON_USER_DROPDOWN)
+      self._driver, self._locator.BUTTON_USER_DROPDOWN)
 
   def open_lhn_menu(self):
     """Opens LHN on the Dashboard
@@ -95,7 +97,9 @@ class _HeaderPage(base.Page):
     return _UserList(self._driver)
 
 
-class DashboardPage(widget_bar.DashboardWidgetBarPage, _HeaderPage):
+class DashboardPage(widget_bar.DashboardWidgetBarPage, HeaderPage):
+  """The main dashboard page"""
+
   URL = environment.APP_URL + url.DASHBOARD
 
   def __init__(self, driver):
@@ -104,7 +108,9 @@ class DashboardPage(widget_bar.DashboardWidgetBarPage, _HeaderPage):
 
 
 class AdminDashboardPage(widget_bar.AdminDashboardWidgetBarPage,
-                         _HeaderPage):
+                         HeaderPage):
+  """Admin dashboard page model"""
+
   URL = environment.APP_URL + url.ADMIN_DASHBOARD
 
   def __init__(self, driver):

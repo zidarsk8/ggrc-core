@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""Modals for deleting objects"""
 
 from lib import base
 from lib.constants import locator
@@ -9,6 +10,8 @@ import lib.page.dashboard
 
 
 class DeleteObjectModal(base.Modal):
+  """A generic modal for deleting an object"""
+
   _locator = locator.Widget
 
   def __init__(self, driver):

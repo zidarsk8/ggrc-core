@@ -2,13 +2,14 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""Module for base classes"""
 
 import time
-import pyvirtualdisplay
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common import keys
-from selenium import webdriver
+import pyvirtualdisplay   # pylint: disable=import-error
+from selenium.webdriver.support import expected_conditions as EC    # pylint: disable=import-error
+from selenium.webdriver.support.ui import WebDriverWait   # pylint: disable=import-error
+from selenium.webdriver.common import keys    # pylint: disable=import-error
+from selenium import webdriver    # pylint: disable=import-error
 from lib import environment
 from lib import constants
 from lib import exception

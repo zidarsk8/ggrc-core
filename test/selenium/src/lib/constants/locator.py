@@ -3,7 +3,7 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-from selenium.webdriver.common.by import By
+from selenium.webdriver.common.by import By   # pylint: disable=import-error
 
 
 class Login(object):

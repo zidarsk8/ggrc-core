@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""A page model for LHN"""
 
 from lib import base
 from lib.constants import locator
@@ -10,6 +11,8 @@ from lib.page import lhn_modal
 
 
 class _Programs(lhn.AccordionGroup):
+  """Programs dropdown in LHN"""
+
   _locator_spinny = locator.LhnMenu.SPINNY_PROGRAMS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROGRAM
 
@@ -23,6 +26,8 @@ class _Programs(lhn.AccordionGroup):
 
 
 class _Workflows(lhn.AccordionGroup):
+  """Workflows dropdown in LHN"""
+
   _locator_spinny = locator.LhnMenu.SPINNY_WORKFLOWS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_WORKFLOW
 
@@ -45,6 +50,8 @@ class _Workflows(lhn.AccordionGroup):
 
 
 class _Audits(lhn.AccordionGroup):
+  """Audits dropdown in LHN"""
+
   _locator_spinny = locator.LhnMenu.SPINNY_AUDITS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_AUDIT
 
@@ -58,6 +65,8 @@ class _Audits(lhn.AccordionGroup):
 
 
 class _Assessments(lhn.AccordionGroup):
+  """Assessments dropdown in LHN"""
+
   _locator_spinny = locator.LhnMenu.SPINNY_CONTROL_ASSESSMENTS
   _locator_button_create_new = locator.LhnMenu \
       .BUTTON_CREATE_NEW_CONTROL_ASSESSMENT
@@ -73,6 +82,8 @@ class _Assessments(lhn.AccordionGroup):
 
 
 class _Requests(lhn.AccordionGroup):
+  """Requests dropdown in LHN"""
+
   _locator_spinny = locator.LhnMenu.SPINNY_REQUESTS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_REQUEST
 
