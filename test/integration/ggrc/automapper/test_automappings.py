@@ -3,11 +3,12 @@
 # Created By: andraz@reciprocitylabs.com
 # Maintained By: andraz@reciprocitylabs.com
 
-import ggrc
-import ggrc.models as models
 import itertools
 import os
 import random
+
+import ggrc
+import ggrc.models as models
 import integration.ggrc
 import integration.ggrc.generator
 
@@ -338,4 +339,25 @@ class TestAutomappings(integration.ggrc.TestCase):
     self.assert_mapping_implication(
         to_create=[(program, regulation), (regulation, assessment)],
         implied=[(program, assessment)]
+    )
+
+  def test_automapping_audit_program_object(self):
+    """Test rule 'mapping program objects to audit'."""
+    program = self.create_object(models.Program, {'title': next('Program')})
+    audit = self.create_object(models.Audit, {
+        'title': next('Audit'),
+        'program': {'id': program.id},
+        'status': 'Planned',
+    })
+    regulation = self.create_object(models.Regulation, {
+        'title': next('Test PD Regulation')
+    })
+    section = self.create_object(models.Section, {
+        'title': next('Test section'),
+        'directive': {'id': regulation.id},
+    })
+
+    self.assert_mapping_implication(
+        to_create=[(program, regulation), (program, section)],
+        implied=[(regulation, audit), (section, audit)]
     )
