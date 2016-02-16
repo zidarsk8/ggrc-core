@@ -1384,22 +1384,22 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
         can_read = False
       if not can_read:
         return None
-    if not user_permissions.is_allowed_read(resource['type'],
-                                            resource['id'], context_id):
-      return None
     else:
-      # Then, filter any typed keys
-      for key, value in resource.items():
-        if key == 'context':
-          # Explicitly allow `context` objects to pass through
-          pass
-        else:
-          # Apply filtering to sub-resources
-          if type(value) is dict and 'type' in value:
-            resource[key] = filter_resource(
-                value, depth=depth + 1, user_permissions=user_permissions)
+      if not user_permissions.is_allowed_read(resource['type'],
+                                              resource['id'], context_id):
+        return None
+    # Then, filter any typed keys
+    for key, value in resource.items():
+      if key == 'context':
+        # Explicitly allow `context` objects to pass through
+        pass
+      else:
+        # Apply filtering to sub-resources
+        if isinstance(value, dict) and 'type' in value:
+          resource[key] = filter_resource(
+              value, depth=depth + 1, user_permissions=user_permissions)
 
-      return resource
+    return resource
   else:
     assert False, "Non-object passed to filter_resource"
 
