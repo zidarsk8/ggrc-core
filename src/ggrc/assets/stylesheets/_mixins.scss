@@ -6,6 +6,12 @@
  */
 
 // Import all mixins
-@import "mixins/btn-bgnd";
 @import "mixins/input-placeholder";
+@import "mixins/background-size";
+@import "mixins/btn-bgnd";
 @import "mixins/btn-size";
+@import "mixins/border-radius";
+@import "mixins/box-shadow";
+
+@import "mixins/opacity";
+@import "mixins/transition";

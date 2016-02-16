@@ -6,8 +6,7 @@
  */
 
 .lhs-holder {
-  @include transition-property(left);
-  @include transition-duration(.8s);
+  @include transition(left, 0.8s);
   position: fixed;
   top: 128px;
   left: -240px;
@@ -135,6 +134,31 @@ h4.search-title {
   }
   &.active {
     @include opacity(1);
+  }
+}
+
+.lhn-type {
+  @include clearfix();
+  @include transition(left, 0.8s);
+  min-width: 240px;
+  left: -246px;
+  &.active {
+    left: 0px;
+  }
+  a {
+    float: left;
+    height: 34px;
+    line-height: 34px;
+    font-family: $fontTitle;
+    font-size: 16px;
+    color: darken($status-draft,10%);
+    text-align: center;
+    width: 50%;
+    background: $lightGray;
+    &.active {
+      color: $deepOrange;
+      background: $white;
+    }
   }
 }
 
@@ -421,8 +445,7 @@ h4.search-title {
 }
 
 .bar-v {
-  @include transition-property(left);
-  @include transition-duration(.8s);
+  @include transition(left, 0.8s);
   @include background-size(2px 30px);
   background-color: $white;
   background-image: image-url("bgnds/drag-v.png");
