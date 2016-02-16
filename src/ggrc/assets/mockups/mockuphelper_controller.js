@@ -98,27 +98,6 @@
       ".filter-trigger click": function (el, ev) {
         this.element.find(".filter-holder").slideToggle(this.options.slide_speed);
       },
-      ".add-object-trigger click": function (el, ev) {
-        var repeatBlock = $('.repeated-block').length;
-        ev.preventDefault();
-        this.element.find('.repeated-block').last().clone()
-        .appendTo('.relevant-block-wrap');
-
-        if (repeatBlock >= 1) {
-          $('.close-block').removeClass("hidden");
-        }
-      },
-      ".close-trigger click": function (el, ev) {
-        var repeatBlock,
-            close = $(".close-block");
-
-        el.closest('.repeated-block').remove();
-        repeatBlock = $('.repeated-block').length;
-
-        if (repeatBlock === 1) {
-          close.addClass("hidden");
-        }
-      },
       '.dropdown-menu-form ul click' : function (el, ev) {
         ev.stopPropagation();
       },
@@ -193,7 +172,7 @@
       this.element.find(".js-toggle-controlplans").prop("disabled", !isEnabled)
           .closest("label").toggleClass("disabled", !isEnabled);
     },
-    ".task-people-trigger change": function (el, ev) {
+    ".modal .task-people-trigger change": function (el, ev) {
       var isEach = el.val() === 'each',
           isAll = el.val() === 'all';
 
@@ -210,6 +189,29 @@
         this.element.find('.active-trigger').removeClass('disabled');
         this.element.find('.active-trigger').removeAttr('rel');
         this.element.find('.active-trigger').removeAttr('data-original-title');
+      }
+    },
+    ".modal .add-object-trigger click": function (el, ev) {
+      var repeatBlock = $('.modal .repeated-block').length;
+      ev.preventDefault();
+      this.element.find('.modal .repeated-block').last().clone()
+      .appendTo('.modal .relevant-block-wrap');
+
+      console.log(repeatBlock);
+
+      if (repeatBlock >= 1) {
+        $('.close-block').removeClass("hidden");
+      }
+    },
+    ".modal .close-trigger click": function (el, ev) {
+      var repeatBlock,
+          close = $(".modal .close-block");
+
+      el.closest('.repeated-block').remove();
+      repeatBlock = $('.modal .repeated-block').length;
+
+      if (repeatBlock === 1) {
+        close.addClass("hidden");
       }
     }
   });
