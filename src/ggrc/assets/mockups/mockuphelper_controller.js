@@ -211,17 +211,6 @@
         this.element.find('.active-trigger').removeAttr('rel');
         this.element.find('.active-trigger').removeAttr('data-original-title');
       }
-    },
-    ".modal .close-trigger click": function (el, ev) {
-      var repeatBlock,
-          close = $(".close-block");
-
-      el.closest('.repeated-block').remove();
-      repeatBlock = $('.repeated-block').length;
-
-      if (repeatBlock === 1) {
-        close.addClass("hidden");
-      }
     }
   });
 

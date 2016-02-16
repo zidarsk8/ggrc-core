@@ -49,17 +49,21 @@
                     <div class="row-fluid wrap-row">
                       <div class="span12">
                         <h6>Frequency</h6>
-                        {{#frequency}}
-                          {{> /static/mustache/mockup_base_templates/object_setup/object_select.mustache}}
-                        {{/frequency}}
+                        <div class="side-content">
+                          {{#frequency}}
+                            {{> /static/mustache/mockup_base_templates/object_setup/object_select.mustache}}
+                          {{/frequency}}
+                        </div>
                       </div>
                     </div>
                     <div class="row-fluid">
                       <div class="span6">
                         <h6>Code</h6>
-                        {{#w_code}}
-                          {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
-                        {{/w_code}}
+                        <div class="side-content">
+                          {{#w_code}}
+                            {{> /static/mustache/mockup_base_templates/object_setup/object_input.mustache}}
+                          {{/w_code}}
+                        </div>
                       </div>
                     </div>
                   </div>

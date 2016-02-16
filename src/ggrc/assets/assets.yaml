@@ -418,6 +418,8 @@ mockup-js-files:
 
   #Workflow
   - workflow/pages/cycle.js
+  - workflow/pages/history.js
+  - workflow/pages/people.js
   - workflow/pages/info.js
 
   # Quick Workflow
