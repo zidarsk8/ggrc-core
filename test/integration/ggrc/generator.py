@@ -12,7 +12,7 @@ from ggrc import db
 from ggrc import models
 from ggrc.app import app
 from ggrc.services import common
-from ggrc_basic_permissions.models import UserRole, Role
+from ggrc_basic_permissions import models as permissions_models
 from integration.ggrc import api_helper
 
 
@@ -158,7 +158,7 @@ class ObjectGenerator(Generator):
             "role": self.create_stub(role),
         }
     }
-    return self.generate(UserRole, "user_role", data)
+    return self.generate(permissions_models.UserRole, "user_role", data)
 
   def generate_person(self, data={}, user_role=None):
     obj_name = 'person'
@@ -174,7 +174,8 @@ class ObjectGenerator(Generator):
     response, person = self.generate(models.Person, obj_name, default)
 
     if person and user_role:
-      role = db.session.query(Role).filter(Role.name == user_role).first()
+      role = db.session.query(permissions_models.Role).filter(
+          permissions_models.Role.name == user_role).first()
       self.generate_user_role(person, role)
 
     return response, person
