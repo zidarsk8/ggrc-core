@@ -20,7 +20,7 @@ import sys
 import time
 import urllib
 
-import pytest
+import pytest   # pylint: disable=import-error
 
 from lib import constants
 from lib import file_ops

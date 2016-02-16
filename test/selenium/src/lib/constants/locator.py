@@ -3,14 +3,17 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-from selenium.webdriver.common.by import By
+from selenium.webdriver.common.by import By   # pylint: disable=import-error
 
 
 class Login(object):
+  """All locators for the login page"""
   BUTTON_LOGIN = (By.CSS_SELECTOR, "a.btn.btn-large.btn-info")
 
 
 class PageHeader(object):
+  """All locators for the dashboard header (has the same name as the elemnt"""
+
   BUTTON_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
   BUTTON_DASHBOARD = (By.CSS_SELECTOR, '.header-content .to-my-work['
                                        'href="/dashboard"]')
@@ -34,6 +37,8 @@ class PageHeader(object):
 
 
 class Dashboard(object):
+  """Locators for the dashbord page"""
+
   BUTTON_START_NEW_PROGRAM = (
       By.CSS_SELECTOR, '.quick-list [data-object-singular="Program"]')
   BUTTON_START_NEW_AUDIT = (
@@ -47,6 +52,8 @@ class Dashboard(object):
 
 
 class LhnMenu(object):
+  """Locators for the menu in header"""
+
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
 
@@ -308,6 +315,9 @@ class LhnMenu(object):
 
 
 class ModalCreateNewProgram(object):
+  """Locators for the program modal visible when creating a new modal from
+  LHN"""
+
   UI_TITLE = (By.CSS_SELECTOR,
               '[data-test-id="new_program_field_title_a63ed79d"]')
   UI_DESCRIPTION = (By.CSS_SELECTOR,
@@ -356,6 +366,8 @@ class ModalCreateNewProgram(object):
 
 
 class ModalCustomAttribute(object):
+  """Locators for a generic custom attributes modal in admin dashboard"""
+
   MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header h2')
   ATTRIBUTE_TITLE = (By.CSS_SELECTOR, '.modal-body div:nth-child(1)>label')
   INLINE_HELP = (By.CSS_SELECTOR, '.modal-body div:nth-child(2)>label')
@@ -378,6 +390,8 @@ class ModalCustomAttribute(object):
 
 
 class WidgetBar(object):
+  """Locators for the bar containing the widgets/tabs"""
+
   BUTTON_ADD = (By.CSS_SELECTOR,
                 '[data-test-id="button_widget_add_2c925d94"]')
   TAB_WIDGET = (By.CSS_SELECTOR, ".object-nav .active")
@@ -422,6 +436,8 @@ class WidgetBar(object):
 
 
 class WidgetBarButtonAddDropdown(object):
+  """Locators for the button/dropdown "add widget" in widget bar"""
+
   AUDITS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
                              '[href="#audit_widget"]')
   CONTROLS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
@@ -503,9 +519,25 @@ class WidgetBarButtonAddDropdown(object):
 
 
 class Widget(object):
-  DROPDOWN_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
-  DROPDOWN_SETTINGS_MEMBERS = (By.CSS_SELECTOR, '.info-pane-utility'
-                                                ' .dropdown-menu li')
+  """Locators for a generic widget"""
+
+  PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
+  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
+  DROPDOWN_SETTINGS_EDIT = (
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(1)')
+  DROPDOWN_SETTINGS_PERMALINK = (
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(2)')
+  DROPDOWN_SETTINGS_DELETE = (
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(3)')
+
+  MODAL_OBJECT_DELETE_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
+  MODAL_OBJECT_DELETE_CONFIRMATION_TEXT = (By.CSS_SELECTOR,
+                                           '.modal-body>div>p')
+  MODAL_OBJECT_DELETE_OBJECT_TITLE = (By.CSS_SELECTOR,
+                                      '.modal-body>div>p>span')
+  MODAL_OBJECT_DELETE_BUTTON_DELETE = (
+      By.CSS_SELECTOR, '.modal-footer .confirm-buttons>[data-toggle="delete"]')
+
   ALERT_LINK_COPIED = (By.CSS_SELECTOR, '.alert.alert-success')
   DROPDOWN_DELETE = (By.CSS_SELECTOR,
                      '[data-test-id="dropdown_delete_0839163b"]')
@@ -527,7 +559,7 @@ class Widget(object):
   NOTES = (By.CSS_SELECTOR, '[data-test-id="title_notes_ef5bc3a71e88"] '
                             'h6')
   NOTES_ENTERED = (By.CSS_SELECTOR,
-                   '[data-test-id="title_notes_ef5bc3a71e88"]')
+                   '[data-test-id="title_notes_ef5bc3a71e88"]>div')
   MANAGER = (By.CSS_SELECTOR, '[data-test-id="title_manager_7a906d2e"] '
                               'h6')
   MANAGER_ENTERED = (By.CSS_SELECTOR,
@@ -579,6 +611,8 @@ class Widget(object):
 
 
 class AdminCustomAttributes(object):
+  """Locators for the widget custom attributes in admin dashboard"""
+
   FILTER_INPUT_FIELD = (By.CLASS_NAME, 'filter-input')
   FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR, '.filter-button>[type="submit"]')
   FILTER_BUTTON_RESET = (By.CSS_SELECTOR, '.filter-button>[type="reset"]')

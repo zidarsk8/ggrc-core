@@ -2,17 +2,21 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""New program modal"""
 
 from lib import base
-from lib.page.widget import info
 from lib.constants import locator
+import lib.page.widget.info
 
 
-class NewProgramModal(base.Modal):
+class EditProgramModal(base.Modal):
+  """Class representing a modal visible after clicking the settings button
+  in the info widget and selecting edit"""
+
   _locators = locator.ModalCreateNewProgram
 
   def __init__(self, driver):
-    super(NewProgramModal, self).__init__(driver)
+    super(EditProgramModal, self).__init__(driver)
     # user input elements
     self.ui_title = base.TextInputField(self._driver,
                                         self._locators.UI_TITLE)
@@ -51,9 +55,6 @@ class NewProgramModal(base.Modal):
     self.title = base.Label(self._driver, self._locators.TITLE)
     self.description = base.Label(self._driver, self._locators.DESCRIPTION)
     self.program_url = base.Label(self._driver, self._locators.PROGRAM_URL)
-    self.button_save_and_add_another = base.Button(
-        self._driver,
-        self._locators.BUTTON_SAVE_AND_ADD_ANOTHER)
     self.button_save_and_close = base.Button(
         self._driver,
         self._locators.BUTTON_SAVE_AND_CLOSE)
@@ -70,7 +71,7 @@ class NewProgramModal(base.Modal):
     """Enters the text into the description element
 
     Args:
-        description (str)
+        description (str or unicode)
     """
     self.ui_description.find_iframe_and_enter_data(description)
 
@@ -100,10 +101,12 @@ class NewProgramModal(base.Modal):
 
   def filter_and_select_primary_contact(self, text):
     """Enters the text into the primary contact element"""
+    # pylint: disable=invalid-name
     self.ui_primary_contact.filter_and_select_first(text)
 
   def filter_and_select_secondary_contact(self, text):
     """Enters the text into the secondary contact element"""
+    # pylint: disable=invalid-name
     self.ui_secondary_contact.filter_and_select_first(text)
 
   def enter_program_url(self, url):
@@ -122,24 +125,47 @@ class NewProgramModal(base.Modal):
     """
     self.ui_reference_url.enter_text(url)
 
-  def enter_effective_date_start_month(self):
-    """Selects from datepicker the start date"""
-    self.ui_effective_date.select_month_start()
+  def enter_effective_date_start_month(self, day):
+    """Selects from datepicker the start date
+    Args:
+      day (int): for more info see base.DatePicker.select_day_in_current_month
+    """
+    # pylint: disable=invalid-name
+    self.ui_effective_date.select_day_in_current_month(day)
 
-  def enter_stop_date_end_month(self):
-    """Selects from datepicker the end date"""
-    self.ui_stop_date.select_month_end()
-
-  def save_and_add_other(self):
-    """Saves this objects and opens a new form"""
-    self.button_save_and_add_another.click()
-    return NewProgramModal(self._driver)
+  def enter_stop_date_end_month(self, day):
+    """Selects from datepicker the end date
+    Args:
+      day (int): for more info see base.DatePicker.select_day_in_current_month
+    """
+    self.ui_stop_date.select_day_in_current_month(day)
 
   def save_and_close(self):
     """Saves this object.
 
     Note that at least the title must be entered and it must be unique.
+
+    Returns:
+        lib.page.widget.info.ProgramInfo
     """
     self.button_save_and_close.click()
     self.wait_for_redirect()
-    return info.ProgramInfo(self._driver)
+    return lib.page.widget.info.ProgramInfo(self._driver)
+
+
+class NewProgramModal(EditProgramModal):
+  """Class representing a new program modal visible after creating a new
+  program from LHN"""
+
+  _locators = locator.ModalCreateNewProgram
+
+  def __init__(self, driver):
+    super(NewProgramModal, self).__init__(driver)
+    self.button_save_and_add_another = base.Button(
+        self._driver,
+        self._locators.BUTTON_SAVE_AND_ADD_ANOTHER)
+
+  def save_and_add_other(self):
+    """Saves this objects and opens a new form"""
+    self.button_save_and_add_another.click()
+    return NewProgramModal(self._driver)

@@ -65,7 +65,7 @@ echo ""
 # changed, and a negative number if more code issues have been introduced.
 
 function run_pylint() {
-  echo "$CHANGED_FILES" | xargs pylint 2> /dev/null |  \
+  echo "$CHANGED_FILES" | xargs pylint 2> /dev/null | tail -n2 | \
     grep -E " [^ ]+/10" -o | head -n1 | grep -E -e "[^\.]+" -o | head -n1 \
     || true
 }
@@ -79,13 +79,14 @@ echo "running pylint on test commit"
 RESULT_2=$( run_pylint )
 
 echo "
-###############################################################################
+-------------------------------------------------------------------------------
 "
 echo "$CHANGED_FILES" | xargs pylint || true
 echo "
-###############################################################################
+-------------------------------------------------------------------------------
 "
 
+echo "Pylint results."
 echo "Number of issues on parent commit: $RESULT_1"
 echo "Number of issues on the pull request: $RESULT_2"
 

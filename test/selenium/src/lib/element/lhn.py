@@ -2,12 +2,15 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""A modul for elements contained in LHN"""
 
 from lib import base
 from lib.constants import locator
 
 
 class _Tab(base.Tab):
+  """The tab elemnt"""
+
   locator_element = None
 
   def __init__(self, driver):
@@ -19,14 +22,20 @@ class _Tab(base.Tab):
 
 
 class MyObjectsTab(_Tab):
+  """In the LHN my objects tab"""
+
   locator_element = locator.LhnMenu.MY_OBJECTS
 
 
 class AllObjectsTab(_Tab):
+  """In the LHN all objects tab"""
+
   locator_element = locator.LhnMenu.ALL_OBJECTS
 
 
 class Button(base.Button):
+  """A button in LHN"""
+
   def __init__(self, driver, locator_element, locator_count):
     super(Button, self).__init__(driver, locator_element)
     self.members_count = int(
@@ -34,6 +43,8 @@ class Button(base.Button):
 
 
 class DropdownStatic(base.Dropdown):
+  """Dropdown in LHN"""
+
   _locator_element = None
 
   def __init__(self, driver):

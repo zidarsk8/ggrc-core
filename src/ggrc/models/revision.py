@@ -3,30 +3,42 @@
 # Created By: vraj@reciprocitylabs.com
 # Maintained By: vraj@reciprocitylabs.com
 
+"""Defines a Revision model for storing snapshots."""
+
 from ggrc import db
-from .all_models import Directive
-from .mixins import Base
-from .types import JsonType
-from .computed_property import computed_property
+from ggrc.models.computed_property import computed_property
+from ggrc.models.mixins import Base
+from ggrc.models.types import JsonType
+
 
 class Revision(Base, db.Model):
+  """Revision object holds a JSON snapshot of the object at a time."""
+
   __tablename__ = 'revisions'
 
-  resource_id = db.Column(db.Integer, nullable = False)
-  resource_type = db.Column(db.String, nullable = False)
-  event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable = False)
-  action = db.Column(db.Enum(u'created', u'modified', u'deleted'), nullable = False)
+  resource_id = db.Column(db.Integer, nullable=False)
+  resource_type = db.Column(db.String, nullable=False)
+  event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
+  action = db.Column(db.Enum(u'created', u'modified', u'deleted'),
+                     nullable=False)
   content = db.Column(JsonType, nullable=False)
 
+  source_type = db.Column(db.String, nullable=True)
+  source_id = db.Column(db.Integer, nullable=True)
+  destination_type = db.Column(db.String, nullable=True)
+  destination_id = db.Column(db.Integer, nullable=True)
+
   @staticmethod
-  def _extra_table_args(cls):
-    return (
-        db.Index('revisions_modified_by', 'modified_by_id'),
-        )
+  def _extra_table_args(_):
+    return (db.Index('revisions_modified_by', 'modified_by_id'),)
 
   _publish_attrs = [
       'resource_id',
       'resource_type',
+      'source_type',
+      'source_id',
+      'destination_type',
+      'destination_id',
       'action',
       'content',
       'description',
@@ -39,7 +51,7 @@ class Revision(Base, db.Model):
     query = super(Revision, cls).eager_query()
     return query.options(
         orm.subqueryload('modified_by'),
-        )
+    )
 
   def __init__(self, obj, modified_by_id, action, content):
     self.resource_id = obj.id
@@ -48,32 +60,36 @@ class Revision(Base, db.Model):
     self.action = action
     self.content = content
 
+    for attr in ["source_type",
+                 "source_id",
+                 "destination_type",
+                 "destination_id"]:
+      setattr(self, attr, getattr(obj, attr, None))
+
+  def _description_mapping(self, link_objects):
+    """Compute description for revisions with <-> in display name."""
+    display_name = self.content['display_name']
+    source, destination = display_name.split('<->')[:2]
+    mapping_verb = "linked" if self.resource_type in link_objects else "mapped"
+    if self.action == 'created':
+      result = u"{1} {2} to {0}".format(source, destination, mapping_verb)
+    elif self.action == 'deleted':
+      result = u"{1} un{2} from {0}".format(source, destination, mapping_verb)
+    else:
+      result = u"{0} {1}".format(display_name, self.action)
+    return result
+
   @computed_property
   def description(self):
+    """Compute a human readable description from action and content."""
     link_objects = ['ObjectDocument']
-    # TODO: Remove check below if migration can guarantee display_name in content
     if 'display_name' not in self.content:
       return ''
     display_name = self.content['display_name']
     if not display_name:
       result = u"{0} {1}".format(self.resource_type, self.action)
     elif u'<->' in display_name:
-      #TODO: Fix too many values to unpack below
-      source, destination = display_name.split('<->')[:2]
-      if self.resource_type in link_objects:
-        if self.action == 'created':
-          result = u"{1} linked to {0}".format(source, destination)
-        elif self.action == 'deleted':
-          result = u"{1} unlinked from {0}".format(source, destination)
-        else:
-          result = u"{0} {1}".format(display_name, self.action)
-      else:
-        if self.action == 'created':
-          result = u"{1} mapped to {0}".format(source, destination)
-        elif self.action == 'deleted':
-          result = u"{1} unmapped from {0}".format(source, destination)
-        else:
-          result = u"{0} {1}".format(display_name, self.action)
+      result = self._description_mapping(link_objects)
     else:
       if 'mapped_directive' in self.content:
         # then this is a special case of combined map/creation

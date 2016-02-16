@@ -554,6 +554,7 @@ class Revisionable(object):
     return db.relationship(
         "Revision",
         primaryjoin=join_function,
+        viewonly=True,
         foreign_keys="Revision.resource_type, Revision.resource_id")
 
 

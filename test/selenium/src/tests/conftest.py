@@ -2,8 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""PyTest fixtures"""
 
-import pytest
+import pytest   # pylint: disable=import-error
 from lib import base
 from lib import test_helpers
 from lib.page import dashboard
@@ -17,6 +18,13 @@ def db_drop():
   pass
 
 
+@pytest.yield_fixture(scope="session")
+def db_migrate():
+  """Make sure the DB is up to date"""
+  # todo
+  pass
+
+
 @pytest.yield_fixture(scope="class")
 def selenium():
   """Setup test resources for running test in headless mode.
@@ -24,14 +32,16 @@ def selenium():
   Returns:
       base.CustomDriver
   """
-  selenium = base.Selenium()
-  yield selenium
+  selenium_base = base.Selenium()
+  yield selenium_base
 
-  selenium.close_resources()
+  selenium_base.close_resources()
 
 
 @pytest.yield_fixture(scope="class")
 def custom_program_attribute(selenium):
+  """Creates a custom attribute for a program object"""
+  # pylint: disable=redefined-outer-name
   modal = dashboard.AdminDashboardPage(selenium.driver) \
       .select_custom_attributes() \
       .select_programs() \
@@ -45,12 +55,26 @@ def custom_program_attribute(selenium):
 
 
 @pytest.yield_fixture(scope="class")
-def new_program(selenium, custom_program_attribute):
+def initial_lhn(selenium):
+  """
+  Returns:
+      lib.page.lhn.LhnContents
+  """
+  # pylint: disable=redefined-outer-name
+  lhn_contents = dashboard.DashboardPage(selenium.driver) \
+      .open_lhn_menu() \
+      .select_my_objects()
+  yield lhn_contents
+
+
+@pytest.yield_fixture(scope="class")
+def new_program(selenium):
   """Creates a new program object.
 
   Returns:
       lib.page.modal.new_program.NewProgramModal
   """
+  # pylint: disable=redefined-outer-name
   modal = dashboard.DashboardPage(selenium.driver) \
       .open_lhn_menu() \
       .select_my_objects() \
@@ -58,10 +82,13 @@ def new_program(selenium, custom_program_attribute):
       .create_new()
 
   test_helpers.ModalNewProgramPage.enter_test_data(modal)
+  test_helpers.ModalNewProgramPage.set_start_end_dates(modal, 0, -1)
   program_info_page = modal.save_and_close()
 
   yield modal, program_info_page
 
+  selenium.driver.get(program_info_page.url)
   widget.ProgramInfo(selenium.driver) \
-      .navigate_to(program_info_page.url) \
-      .delete_object()
+      .press_object_settings() \
+      .select_delete() \
+      .confirm_delete()
