@@ -1,6 +1,7 @@
 FROM phusion/baseimage
 
 RUN rm /usr/sbin/policy-rc.d \
+  && curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash \
   && apt-get update \
   && apt-get install -y \
     curl \
@@ -9,7 +10,6 @@ RUN rm /usr/sbin/policy-rc.d \
     make \
     mysql-server \
     nodejs \
-    npm \
     python-imaging \
     python-mysqldb \
     python-pip \
@@ -20,8 +20,7 @@ RUN rm /usr/sbin/policy-rc.d \
     unzip \
     vim \
     wget \
-    zip \
-  && ln -s /usr/bin/nodejs /usr/bin/node
+    zip
 
 COPY ./provision/docker/01_start_mysql.sh /etc/my_init.d/
 
