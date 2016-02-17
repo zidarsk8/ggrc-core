@@ -3,13 +3,10 @@
 # Created By: urban@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
+import abc
 import datetime
 
-from abc import ABCMeta, abstractmethod
-
-from ggrc_workflows.services.workflow_cycle_calculator.google_holidays import (
-    GoogleHolidays
-)
+from ggrc_workflows.services.workflow_cycle_calculator import google_holidays
 
 
 @property
@@ -44,14 +41,14 @@ class CycleCalculator(object):
     HOLIDAYS: Official holidays with the addition of several days that Google
               observes. See file google_holidays.py for details.
   """
-  __metaclass__ = ABCMeta
+  __metaclass__ = abc.ABCMeta
 
   date_domain = NotImplementedProperty
   time_delta = NotImplementedProperty
 
-  HOLIDAYS = GoogleHolidays()
+  HOLIDAYS = google_holidays.GoogleHolidays()
 
-  @abstractmethod
+  @abc.abstractmethod
   def relative_day_to_date(self, relative_day, relative_month=None,
                            base_date=None):
     raise NotImplementedError("Converting from relative to real date"
@@ -146,8 +143,7 @@ class CycleCalculator(object):
   def get_first_task_relative(self):
     tasks_start_dates = [
         (v['start_date'], v['relative_start'])
-        for v in self.reified_tasks.values()
-    ]
+        for v in self.reified_tasks.values()]
     tasks_start_dates.sort(key=lambda x: x[0])
     _, first_relative_pair = tasks_start_dates[0]
     return first_relative_pair
@@ -155,8 +151,7 @@ class CycleCalculator(object):
   def get_last_task_relative(self):
     tasks_end_dates = [
         (v['end_date'], v['relative_end'])
-        for v in self.reified_tasks.values()
-    ]
+        for v in self.reified_tasks.values()]
     tasks_end_dates.sort(key=lambda x: x[0], reverse=True)
     _, last_relative_pair = tasks_end_dates[0]
     return last_relative_pair
@@ -186,9 +181,8 @@ class CycleCalculator(object):
     start_date, end_date = self.non_adjusted_task_date_range(task, base_date)
     return self.adjust_date(start_date), self.adjust_date(end_date)
 
-  def non_adjusted_task_date_range(
-      self, task, base_date=None, initialisation=False
-  ):
+  def non_adjusted_task_date_range(self,
+                                   task, base_date=None, initialisation=False):
     """Calculates individual task's start and end date based on base_date.
 
     Taking base_date into account calculates individual task's start and
