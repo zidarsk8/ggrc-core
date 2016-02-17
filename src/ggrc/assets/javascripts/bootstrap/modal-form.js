@@ -347,15 +347,14 @@
 
           flash_class = flash_class_mappings[type] || type;
 
-          html =
-            [ '<div class="alert alert-' + flash_class + '">'
-            ,   '<a href="#" class="close" data-dismiss="alert">x</a>'
-            ];
+          html = $('<div></div>');
+          html.addClass('alert').addClass('alert-' + flash_class);
+          html.append('<a href="#" class="close" data-dismiss="alert">x</a>');
+
           for (message_i in flash[type]) {
-            html.push('<span>' + flash[type][message_i] + '</span>');
+            html.append($('<span></span>').text(flash[type][message_i]));
           }
-          html.push('</div>');
-          $flash_holder.append(html.join(''));
+          $flash_holder.append(html);
         }
       }
     });
