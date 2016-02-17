@@ -213,6 +213,11 @@
       if (repeatBlock === 1) {
         close.addClass("hidden");
       }
+    },
+    ".object-check-all click": function (el, ev) {
+      ev.preventDefault();
+
+      this.element.find('.object-check-single').prop('checked', true);
     }
   });
 

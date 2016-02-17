@@ -49,6 +49,12 @@
                   {{> /static/mustache/base_objects/edit_object_link.mustache}}
                 {{/is_allowed}}
                 <li>
+                  <a href="#QuickWorkflowCreate" data-toggle="modal">
+                    <i class="fa fa-list-alt"></i>
+                    Create Workflow
+                  </a>
+                </li>
+                <li>
                   <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_url}}" />
                 </li>
                 {{#is_allowed 'delete' instance}}
@@ -140,3 +146,5 @@
     </p>
   </div>
 {{/instance}}
+
+{{> /static/mustache/quick-workflow/workflow_modal.mustache }}
