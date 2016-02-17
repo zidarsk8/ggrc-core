@@ -45,9 +45,6 @@ COPY ./package.json /vagrant-dev/
 RUN cd /vagrant-dev \
   && npm install
 
-RUN gem install sass -v 3.2.13 \
-  && gem install compass -v 0.12.2
-
 COPY ./Makefile ./bower.json /vagrant/
 RUN make bower_components DEV_PREFIX=/vagrant-dev
 
