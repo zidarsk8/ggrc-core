@@ -33,7 +33,7 @@ STATIC_PATH=$(PREFIX)/src/ggrc/static
 BOWER_PATH=$(PREFIX)/bower_components
 DEV_BOWER_PATH=$(DEV_PREFIX)/bower_components
 BOWER_BIN_PATH=/vagrant-dev/node_modules/bower/bin/bower
-NODE_MODULES_PATH=$(PREFIX)/node_modules
+NODE_MODULES_PATH=$(DEV_PREFIX)/node_modules
 
 $(APPENGINE_SDK_PATH) : $(APPENGINE_ZIP_PATH)
 	@echo $( dirname $(APPENGINE_ZIP_PATH) )
