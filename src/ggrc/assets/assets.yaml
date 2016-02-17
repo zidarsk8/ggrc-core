@@ -461,6 +461,7 @@ mockup-js-template-files:
   - mockup_base_templates/info_panel/base.mustache
   - mockup_base_templates/info_panel/pin_actions.mustache
   - mockup_base_templates/info_panel/header.mustache
+  - mockup_base_templates/info_panel/info_panel_utility.mustache
   - mockup_base_templates/info_panel/description.mustache
   - mockup_base_templates/info_panel/mapped_objects.mustache
   - mockup_base_templates/info_panel/people_list.mustache

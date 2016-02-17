@@ -12,13 +12,11 @@
         <div class="info">
 
           <div class="row-fluid wrap-row">
-            <div class="span6">
-              <a href="#WorkflowSetup" class="btn btn-draft btn-small" data-toggle="modal">
-                Edit
-              </a>
-            </div>
-            <div class="span6">
-              {{> /static/mustache/mockup_base_templates/object_setup/fields_visibility_control.mustache}}
+            <div class="span12">
+              <div class="pull-right reset-form">
+                {{> /static/mustache/mockup_base_templates/object_setup/fields_visibility_control.mustache}}
+                {{> /static/mustache/mockup_base_templates/info_panel/info_panel_utility.mustache}}
+              </div>
             </div>
           </div>
 
@@ -242,14 +240,6 @@
           </div>
         </div>
       {{/task}}
-    </div>
-
-    <div class="info">
-      <div class="save-template-wrap">
-        <div class="pull-right">
-          {{> /static/mustache/mockup_base_templates/object_setup/template_master_controls.mustache}}
-        </div>
-      </div>
     </div>
   </section>
 

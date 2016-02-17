@@ -92,10 +92,11 @@
       }]
     }),
     t_group: Generator.create({
-      hidable: true,
+      hidable: true
     }),
     w_title: Generator.create({
       hidable: false,
+      placeholder: "Tribe Also Relationship"
     }),
     w_desc: Generator.create({
       hidable: true
