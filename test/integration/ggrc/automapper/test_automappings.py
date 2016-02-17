@@ -361,3 +361,12 @@ class TestAutomappings(integration.ggrc.TestCase):
         to_create=[(program, regulation), (program, section)],
         implied=[(regulation, audit), (section, audit)]
     )
+
+    audit_new = self.create_object(models.Audit, {
+        'title': next('Audit'),
+        'program': {'id': program.id},
+        'status': 'Planned',
+    })
+    self.assert_mapping(audit_new, regulation)
+    self.assert_mapping(audit_new, section)
+    self.assert_mapping(audit_new, program, missing=True)

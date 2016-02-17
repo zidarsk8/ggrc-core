@@ -4,18 +4,20 @@
 # Maintained By: andraz@reciprocitylabs.com
 
 from datetime import datetime
+import collections
+import logging
+
 from ggrc import db
 from ggrc import models
 from ggrc.automapper.rules import rules
 from ggrc.login import get_current_user
+from ggrc.models.audit import Audit
 from ggrc.models.relationship import Relationship
 from ggrc.models.request import Request
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource
 from ggrc.utils import benchmark, with_nop
 from sqlalchemy.sql.expression import tuple_
-import collections
-import logging
 
 
 class Stub(collections.namedtuple("Stub", ["type", "id"])):
@@ -220,6 +222,7 @@ def register_automapping_listeners():
       return
     AutomapperGenerator().generate_automappings(obj)
 
+  # pylint: disable=unused-variable
   @Resource.model_posted_after_commit.connect_via(Request)
   @Resource.model_put_after_commit.connect_via(Request)
   def handle_request(sender, obj=None, src=None, service=None):
@@ -235,4 +238,22 @@ def register_automapping_listeners():
                        source_id=obj.id,
                        destination_type=obj.audit.type,
                        destination_id=obj.audit.id)
+    handle_relationship_post(sender, obj=rel)
+
+  # pylint: disable=unused-variable
+  @Resource.model_posted_after_commit.connect_via(Audit)
+  @Resource.model_put_after_commit.connect_via(Audit)
+  def handle_audit(sender, obj=None, src=None, service=None):
+    if obj is None:
+      logging.warning("Automapping audit listener: "
+                      "no obj, no mappings created")
+      return
+    if obj.program is None:
+      logging.warning("Automapping audit listener: "
+                      "no program, no mappings created")
+      return
+    rel = Relationship(source_type=obj.type,
+                       source_id=obj.id,
+                       destination_type=obj.program.type,
+                       destination_id=obj.program.id)
     handle_relationship_post(sender, obj=rel)

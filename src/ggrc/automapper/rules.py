@@ -175,7 +175,7 @@ rules = RuleSet(count_limit=10000, rule_list=[
 
     Rule(
         'mapping program objects to audit',
-        {Attr('audits')},
+        {Attr('audits'), 'Audit'},
         {'Program'},
         {'Regulation', 'Policy', 'Standard', 'Contract',
          'Section', 'Clause', 'Objective', 'Control'}
