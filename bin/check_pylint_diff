@@ -37,6 +37,7 @@ rm -rf $TMP_REPO
 cp -a /vagrant $TMP_REPO
 cd $TMP_REPO
 git clean -xdfq
+git reset --hard HEAD
 
 if [[ "$ARG1" != "" ]]; then
   TEST_COMMIT=$ARG1
@@ -71,10 +72,14 @@ function run_pylint() {
 }
 
 git checkout -q $PARENT_1
+git clean -xdfq
+git reset --hard HEAD
 echo "running pylint on parent commit"
 RESULT_1=$( run_pylint )
 
 git checkout -q $TEST_COMMIT
+git clean -xdfq
+git reset --hard HEAD
 echo "running pylint on test commit"
 RESULT_2=$( run_pylint )
 

@@ -5,8 +5,7 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
-@mixin btn-size($font: 16px, $l-height: 24px, $padding: 4px 14px) {
-  font-size: $font;
-  line-height: $l-height;
-  padding: $padding;
+@mixin opacity($opacity) {
+  opacity: $opacity / 1;
+  filter: alpha(opacity=$opacity);
 }

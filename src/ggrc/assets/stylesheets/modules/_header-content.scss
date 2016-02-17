@@ -54,7 +54,7 @@
 }
 
 .lhn-trigger {
-  @include transition-duration(0.3s);
+  @include transition(all 0.3s ease);
   display: block;
   height: 15px;
   width: 16px;

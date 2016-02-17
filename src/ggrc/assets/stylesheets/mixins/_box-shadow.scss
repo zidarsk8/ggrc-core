@@ -5,8 +5,8 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
-@mixin btn-size($font: 16px, $l-height: 24px, $padding: 4px 14px) {
-  font-size: $font;
-  line-height: $l-height;
-  padding: $padding;
+@mixin box-shadow($shadow...) {
+  -moz-box-shadow: $shadow;
+  -webkit-box-shadow: $shadow;
+  box-shadow: $shadow;
 }
