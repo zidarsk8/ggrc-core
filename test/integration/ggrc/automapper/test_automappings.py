@@ -26,6 +26,13 @@ def next(msg):
   return msg + str(counter)
 
 
+def relate(src, dst):
+  if src < dst:
+    return (src, dst)
+  else:
+    return (dst, src)
+
+
 class automapping_count_limit:
   def __init__(self, new_limit):
     self.new_limit = new_limit
@@ -76,7 +83,6 @@ class TestAutomappings(integration.ggrc.TestCase):
     for obj in relevant:
       objects.add(obj)
     mappings = set()
-    relate = lambda src, dst: (src, dst) if src < dst else (dst, src)
     if type(to_create) is not list:
       to_create = [to_create]
     for src, dst in to_create:
