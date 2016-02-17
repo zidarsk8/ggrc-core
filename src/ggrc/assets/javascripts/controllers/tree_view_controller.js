@@ -1512,7 +1512,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
     }.bind(this), 0);
   },
   '{instance} change': function (inst, ev, prop) {
-    if (_.contains(['custom_attribute_values'], prop)) {
+    if (prop === 'custom_attribute_values') {
       this.draw_node();
     }
   },
