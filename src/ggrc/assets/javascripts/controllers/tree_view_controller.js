@@ -1511,7 +1511,11 @@ can.Control('CMS.Controllers.TreeViewNode', {
       }
     }.bind(this), 0);
   },
-
+  '{instance} change': function (inst, ev, prop) {
+    if (prop === 'custom_attribute_values') {
+      this.draw_node();
+    }
+  },
   draw_node: function () {
     if (this._draw_node_in_progress) {
       return;
