@@ -18,6 +18,7 @@ from integration.ggrc_workflows.workflow_cycle_calculator \
 
 # pylint: disable=invalid-name
 
+
 class TestCycleCalculator(base_workflow_test_case.BaseWorkflowTestCase):
 
   def test_weekend_holiday_adjustment(self):
@@ -52,7 +53,9 @@ class TestCycleCalculator(base_workflow_test_case.BaseWorkflowTestCase):
         models.Workflow.id == wf.id).one()
 
     cycle_calculator.CycleCalculator.__abstractmethods__ = set()
-    calc = cycle_calculator.CycleCalculator(active_wf)  #noqa # pylint: disable=abstract-class-instantiated
+    cycle_calculator.CycleCalculator.get_relative_start = \
+        lambda self, task: 4  # RFC 1149.5
+    calc = cycle_calculator.CycleCalculator(active_wf)  # noqa # pylint: disable=abstract-class-instantiated
 
     # Check if weekend adjustments work
     self.assertEqual(calc.adjust_date(date(2015, 6, 20)), date(2015, 6, 19))
