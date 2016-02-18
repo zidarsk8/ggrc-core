@@ -60,6 +60,7 @@
         CustomFilter = GGRC.MapperHelpers.CustomFilter,
         Reify = GGRC.MapperHelpers.Reify,
         Search = GGRC.MapperHelpers.Search;
+        TypeFilter = GGRC.MapperHelpers.TypeFilter;
 
     // Add mappings for basic workflow objects
     var mappings = {
@@ -175,6 +176,47 @@
         },
 
         CycleTaskGroupObjectTask: {
+          _canonical: {
+            "related_objects_as_source": [
+              "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
+              "Project", "System", "Regulation", "Policy", "Contract", "Standard",
+              "Program", "Issue", "Control", "Section", "Clause", "Objective",
+              "Audit", "Assessment", "AccessGroup", "Request", "Document"
+            ]
+          },
+          related_objects_as_source: Proxy(
+            null, "destination", "Relationship", "source", "related_destinations"),
+          related_objects_as_destination: Proxy(
+            null, "source", "Relationship", "destination", "related_sources"),
+          related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
+          destinations: Direct("Relationship", "source", "related_destinations"),
+          sources: Direct("Relationship", "destination", "related_sources"),
+          relationships: Multi(["sources", "destinations"]),
+          related_access_groups: TypeFilter("related_objects", "AccessGroup"),
+          related_data_assets: TypeFilter("related_objects", "DataAsset"),
+          related_facilities: TypeFilter("related_objects", "Facility"),
+          related_markets: TypeFilter("related_objects", "Market"),
+          related_org_groups: TypeFilter("related_objects", "OrgGroup"),
+          related_vendors: TypeFilter("related_objects", "Vendor"),
+          related_processes: TypeFilter("related_objects", "Process"),
+          related_products: TypeFilter("related_objects", "Product"),
+          related_projects: TypeFilter("related_objects", "Project"),
+          related_systems: TypeFilter("related_objects", "System"),
+          related_issues: TypeFilter("related_objects", "Issue"),
+          related_audits: TypeFilter("related_objects", "Audit"),
+          related_controls: TypeFilter("related_objects", "Control"),
+          related_documents: TypeFilter("related_objects", "Document"),
+          related_assessments: TypeFilter("related_objects", "Assessment"),
+          related_requests: TypeFilter("related_objects", "Request"),
+          regulations: TypeFilter("related_objects", "Regulation"),
+          contracts: TypeFilter("related_objects", "Contract"),
+          policies: TypeFilter("related_objects", "Policy"),
+          standards: TypeFilter("related_objects", "Standard"),
+          programs: TypeFilter("related_objects", "Program"),
+          controls: TypeFilter("related_objects", "Control"),
+          sections: TypeFilter("related_objects", "Section"),
+          clauses: TypeFilter("related_objects", "Clause"),
+          objectives: TypeFilter("related_objects", "Objective"),
           cycle: Direct(
             "Cycle", "cycle_task_group_object_tasks", "cycle"),
           cycle_task_group_object: Direct(
@@ -192,6 +234,9 @@
           _object: Cross(
             "cycle_task_group_object", '_object'
           ),
+          info_related_objects: CustomFilter("related_objects", function (related_objects) {
+            return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
+          }),
 
           // This code needs to be reworked to figure out how to return the single
           // most recent task entry with is_declining_review = true.

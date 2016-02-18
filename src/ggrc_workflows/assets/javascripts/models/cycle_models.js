@@ -315,7 +315,13 @@
       url: "<%= base.viewLink %>#current_widget/cycle/<%= instance.cycle.id %>/cycle_task_group/<%= instance.cycle_task_group.id %>/cycle_task_group_object_task/<%= instance.id %>",
       base: "cycle:workflow"
     },
-
+    info_pane_options: {
+      mapped_objects: {
+        model: can.Model.Cacheable,
+        mapping: 'info_related_objects',
+        show_view: GGRC.mustache_path + '/base_templates/subtree.mustache'
+      }
+    },
     tree_view_options: {
       sort_property: 'sort_index',
       show_view: _mustache_path + "/tree.mustache",

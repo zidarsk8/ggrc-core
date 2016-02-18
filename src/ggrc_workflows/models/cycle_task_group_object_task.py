@@ -19,6 +19,7 @@ from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import WithContact
 from ggrc.models.reflection import PublishOnly
+from ggrc.models.relationship import Relatable
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
@@ -26,7 +27,7 @@ from ggrc_workflows.models.cycle_task_group_object import CycleTaskGroupObject
 
 
 class CycleTaskGroupObjectTask(
-        WithContact, Stateful, Slugged, Timeboxed,
+        WithContact, Stateful, Slugged, Timeboxed, Relatable,
         Described, Titled, Base, db.Model):
   """Cycle task model
   """
