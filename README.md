@@ -1,14 +1,13 @@
 Google Governance, Risk and Compliance (GGRC)
 =========
 
-[![Travis status](https://travis-ci.org/google/ggrc-core.svg?branch=develop)](https://travis-ci.org/google/ggrc-core)
-[![Code Climate](https://codeclimate.com/github/google/ggrc-core/badges/gpa.svg)](https://codeclimate.com/github/google/ggrc-core)
+[![Build Status](https://jenkins.reciprocitylabs.com/job/ggrc_develop_build/badge/icon)](https://jenkins.reciprocitylabs.com/job/ggrc_develop_build/)
 
-Governance, Risk Management, and Compliance are activities necessary for any organization with regulatory or contractual obligations. 
+Governance, Risk Management, and Compliance are activities necessary for any organization with regulatory or contractual obligations.
 
-Governance refers to management structure, policies, procedures, shareholder relations, etc. 
+Governance refers to management structure, policies, procedures, shareholder relations, etc.
 
-Risk Management is a process to identify business and technical risks as well as means to mitigate those. 
+Risk Management is a process to identify business and technical risks as well as means to mitigate those.
 
 Compliance refers to processes necessary to meet applicable regulations and communicate to stakeholders about it.  
 
@@ -73,7 +72,7 @@ named *ggrccore_dev_1*.
 
 
 * clone the repo
-* cd to the project 
+* cd to the project
 directory
 * run the following:
 
@@ -445,4 +444,3 @@ Copyright (C) 2013-2016 Google Inc., authors, and contributors (see the AUTHORS
 file).
 Licensed under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 license (see the LICENSE file).
-
