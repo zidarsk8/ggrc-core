@@ -12,7 +12,6 @@ from mock import patch
 import os
 from ggrc import notifications
 from ggrc.models import Notification
-from ggrc_workflows.views import send_todays_digest_notifications
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
@@ -77,7 +76,7 @@ class TestCycleStartFailed(TestCase):
       self.assertIn(wf_owner, notif_data)
       self.assertIn("cycle_start_failed", notif_data[wf_owner])
 
-      send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
 
       _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(wf_owner, notif_data)
@@ -120,7 +119,7 @@ class TestCycleStartFailed(TestCase):
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertNotIn("cycle_start_failed", notif_data[wf_owner])
 
-  #     send_todays_digest_notifications()
+  #     notifications.send_todays_digest_notifications()
 
   #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertNotIn(wf_owner, notif_data)
@@ -153,7 +152,7 @@ class TestCycleStartFailed(TestCase):
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertNotIn("cycle_start_failed", notif_data[wf_owner])
 
-  #     send_todays_digest_notifications()
+  #     notifications.send_todays_digest_notifications()
 
   #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertNotIn(wf_owner, notif_data)

@@ -28,7 +28,7 @@ def run_job(job):
 
 
 def nightly_cron_endpoint():
-  from ggrc_workflows.views import send_todays_digest_notifications
+  from ggrc.notifications import send_todays_digest_notifications
   from ggrc_workflows import start_recurring_cycles
   cron_jobs = [
       start_recurring_cycles,

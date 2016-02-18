@@ -13,7 +13,6 @@ from sqlalchemy import and_
 import os
 from ggrc import db, notifications
 from ggrc.models import NotificationType, Notification, Person
-from ggrc_workflows.views import send_todays_digest_notifications
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
@@ -180,7 +179,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.wf_generator.activate_workflow(wf)
 
     with freeze_time("2015-05-02"):
-      send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -192,7 +191,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.assertEqual(notif_data, {})
 
     with freeze_time("2015-05-02"):
-      send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -220,7 +219,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.wf_generator.activate_workflow(wf)
 
     with freeze_time("2015-05-02"):
-      send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(

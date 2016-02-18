@@ -15,7 +15,6 @@ from ggrc.models import Person
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
-from ggrc_workflows import views
 
 
 if os.environ.get('TRAVIS', False):
@@ -78,7 +77,7 @@ class TestRecurringCycleNotifications(TestCase):
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-01-29"):
-      views.send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
       _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 

@@ -3,14 +3,18 @@
 # Created By: mouli@meics.org
 # Maintained By: miha@reciprocitylabs.com
 
-
 from collections import defaultdict
+from sqlalchemy import and_
 from datetime import date, datetime
+from jinja2 import Environment, PackageLoader
+
 from ggrc.extensions import get_extension_modules
 from ggrc.models import Notification, NotificationConfig
 from ggrc.utils import merge_dict
 from ggrc import db
-from sqlalchemy import and_
+from ggrc.notifications import common
+
+env = Environment(loader=PackageLoader('ggrc', 'templates'))
 
 
 class NotificationServices():
@@ -123,3 +127,23 @@ def should_receive(notif, force_notif, person_id, nightly_cron=True):
   has_digest = force_notif or is_enabled("Email_Digest")
 
   return has_digest
+
+
+def send_todays_digest_notifications():
+  digest_template = env.get_template("notifications/email_digest.html")
+  notif_list, notif_data = get_todays_notifications()
+  sent_emails = []
+  subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
+  for user_email, data in notif_data.iteritems():
+    data = common.modify_data(data)
+    email_body = digest_template.render(digest=data)
+    common.send_email(user_email, subject, email_body)
+    sent_emails.append(user_email)
+  set_notification_sent_time(notif_list)
+  return "emails sent to: <br> {}".format("<br>".join(sent_emails))
+
+
+def set_notification_sent_time(notif_list):
+  for notif in notif_list:
+    notif.sent_at = datetime.now()
+  db.session.commit()
