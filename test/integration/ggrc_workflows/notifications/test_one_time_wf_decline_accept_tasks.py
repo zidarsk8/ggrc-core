@@ -166,7 +166,7 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.assertEqual(len(notif), 1, "notifications: {}".format(str(notif)))
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_single_task_declined(self, mock_mail):
     """
     test moving the end date to the future, befor due_in and due_today
@@ -206,7 +206,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.assertIn(user.email, notif_data)
       self.assertIn("task_declined", notif_data[user.email])
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_single_task_accepted(self, mock_mail):
     """
     test moving the end date to the future, befor due_in and due_today
@@ -243,7 +243,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.assertNotIn(user.email, notif_data)
       self.assertIn("all_tasks_completed", notif_data["user@example.com"])
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_end_cycle(self, mock_mail):
     """
     manaually ending a cycle should stop all notifications for that cycle

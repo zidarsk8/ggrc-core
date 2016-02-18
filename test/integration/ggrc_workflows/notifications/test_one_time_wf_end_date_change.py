@@ -49,7 +49,7 @@ class TestOneTimeWfEndDateChange(TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_no_date_change(self, mock_mail):
     def get_person(person_id):
       return db.session.query(Person).filter(Person.id == person_id).one()
@@ -101,7 +101,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.assertEqual(len(notif_data[user.email]["due_today"]),
                        len(self.random_objects))
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_future(self, mock_mail):
     """
     test moving the end date to the future, befor due_in and due_today
@@ -175,7 +175,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.assertEqual(len(notif_data[user.email]["due_today"]),
                        len(self.random_objects))
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_past(self, mock_mail):
     def get_person(person_id):
       return db.session.query(Person).filter(Person.id == person_id).one()
@@ -218,7 +218,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = notifications.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_today(self, mock_mail):
     def get_person(person_id):
       return db.session.query(Person).filter(Person.id == person_id).one()

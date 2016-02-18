@@ -61,7 +61,7 @@ class TestRecurringCycleNotifications(TestCase):
       self.assertIn(assignee.email, notif_data)
 
   # TODO: this should mock google email api.
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_marking_sent_notifications(self, mail_mock):
     mail_mock.return_value = True
 

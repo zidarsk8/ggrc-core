@@ -6,13 +6,13 @@
 import traceback
 from flask import current_app
 
-from ggrc.notifications import email
+from ggrc.notifications import common
 
 
 def send_error_notification(message):
   try:
-    user_email = email.getAppEngineEmail()
-    email.send_email(user_email, "Error in nightly cron job", message)
+    user_email = common.getAppEngineEmail()
+    common.send_email(user_email, "Error in nightly cron job", message)
   except Exception as e:
     current_app.logger.error(e)
 

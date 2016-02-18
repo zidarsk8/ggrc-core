@@ -48,7 +48,7 @@ class TestCycleStartFailed(TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_start_failed(self, mock_mail):
 
     wf_owner = "user@example.com"
@@ -84,7 +84,7 @@ class TestCycleStartFailed(TestCase):
   # TODO: investigate why next_cycle_start date remains the same after
   # start_recurring_cycles
 
-  # @patch("ggrc.notifications.email.send_email")
+  # @patch("ggrc.notifications.common.send_email")
   # def test_start_failed_send_notifications(self, mock_mail):
 
   #   wf_owner = "user@example.com"
@@ -124,7 +124,7 @@ class TestCycleStartFailed(TestCase):
   #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertNotIn(wf_owner, notif_data)
 
-  # @patch("ggrc.notifications.email.send_email")
+  # @patch("ggrc.notifications.common.send_email")
   # def test_start_failed_send_notifications_monthly(self, mock_mail):
 
   #   wf_owner = "user@example.com"

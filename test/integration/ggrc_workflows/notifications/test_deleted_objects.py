@@ -48,7 +48,7 @@ class TestNotificationsForDeletedObjects(TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_delete_activated_workflow(self, mock_mail):
 
     with freeze_time("2015-02-01 13:39:20"):

@@ -13,7 +13,7 @@ from ggrc import db
 from ggrc import notifications
 from ggrc.app import app
 from ggrc.login import login_required
-from ggrc.notifications import email
+from ggrc.notifications import common
 from ggrc.views.cron import run_job
 from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.models import Workflow
@@ -82,7 +82,7 @@ def send_todays_digest_notifications():
   for user_email, data in notif_data.iteritems():
     data = modify_data(data)
     email_body = digest_template.render(digest=data)
-    email.send_email(user_email, subject, email_body)
+    common.send_email(user_email, subject, email_body)
     sent_emails.append(user_email)
   set_notification_sent_time(notif_list)
   return "emails sent to: <br> {}".format("<br>".join(sent_emails))

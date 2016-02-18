@@ -51,7 +51,7 @@ class TestMonthlyWorkflowNotification(TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_auto_generate_cycle(self, mock_mail):
 
     with freeze_time("2015-04-01"):
@@ -90,7 +90,7 @@ class TestMonthlyWorkflowNotification(TestCase):
       person_1 = Person.query.get(self.person_1.id)
       self.assertIn(person_1.email, notif_data)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_manual_generate_cycle(self, mock_mail):
 
     with freeze_time("2015-04-01"):

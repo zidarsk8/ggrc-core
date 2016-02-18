@@ -80,7 +80,7 @@ class TestOneTimeWorkflowNotification(TestCase):
       _, notif_data = notifications.get_todays_notifications()
       self.assertEqual(len(notif_data[person_1.email]["due_today"]), 2)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_one_time_wf_activate_single_person(self, mock_mail):
 
     with freeze_time("2015-04-10"):

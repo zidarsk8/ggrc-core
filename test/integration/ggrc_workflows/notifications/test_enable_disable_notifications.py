@@ -47,7 +47,7 @@ class TestEnableAndDisableNotifications(TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_default_notificaitons_settings(self, mock_mail):
 
     with freeze_time("2015-02-01 13:39:20"):
@@ -66,7 +66,7 @@ class TestEnableAndDisableNotifications(TestCase):
       _, notif_data = notifications.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_disabled_notifications(self, mock_mail):
 
     with freeze_time("2015-02-01 13:39:20"):
@@ -88,7 +88,7 @@ class TestEnableAndDisableNotifications(TestCase):
       _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_enabled_notifications(self, mock_mail):
 
     with freeze_time("2015-02-01 13:39:20"):
@@ -109,7 +109,7 @@ class TestEnableAndDisableNotifications(TestCase):
       _, notif_data = notifications.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_forced_notifications(self, mock_mail):
 
     with freeze_time("2015-02-01 13:39:20"):
@@ -131,7 +131,7 @@ class TestEnableAndDisableNotifications(TestCase):
       _, notif_data = notifications.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
-  @patch("ggrc.notifications.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_force_one_wf_notifications(self, mock_mail):
 
     with freeze_time("2015-02-01 13:39:20"):
