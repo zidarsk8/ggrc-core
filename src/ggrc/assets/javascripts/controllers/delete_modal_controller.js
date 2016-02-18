@@ -28,6 +28,7 @@ GGRC.Controllers.Modals("GGRC.Controllers.Delete", {
       // If this modal is spawned from an edit modal, make sure that one does
       // not refresh the instance post-delete.
       var parent_controller = $(that.options.$trigger).closest('.modal').control();
+      var msg;
       if (parent_controller) {
         parent_controller.options.skip_refresh = true;
       }
