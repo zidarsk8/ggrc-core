@@ -141,7 +141,6 @@ class TestProgramPage(base.Test):
     assert modal.ui_description.text == \
         updated_program_info_page.description_entered.text
     assert modal.ui_notes.text == updated_program_info_page.notes_entered.text
-    assert modal.ui_code.text == updated_program_info_page.code_entered.text
     assert updated_program_info_page.primary_contact_entered.text in \
         modal.ui_primary_contact.text
     assert updated_program_info_page.secondary_contact_entered.text in \
@@ -150,10 +149,6 @@ class TestProgramPage(base.Test):
         updated_program_info_page.program_url_entered.text
     assert modal.ui_reference_url.text == \
         updated_program_info_page.reference_url_entered.text
-    assert modal.ui_effective_date.text == \
-        updated_program_info_page.effective_date_entered.text
-    assert modal.ui_stop_date.text == \
-        updated_program_info_page.stop_date_entered.text
 
   @pytest.mark.smoke_tests
   def test_mapping_controls_via_lhn(self, selenium, new_control, new_program):

@@ -479,12 +479,16 @@ class Widget(AbstractPage):
         widget_locator (tuple)
     """
     super(Widget, self).__init__(driver)
-    object_id_info = self.url.split("/")[-1]
 
     if "#" in self.url:
-        self.object_id, self.widget_name = object_id_info.split("#")
+        object_id_info = self.url.split("/")
+
+        if len(object_id_info) == 5:
+            self.object_id, self.widget_name = object_id_info[-1].split("#")
+        else:
+            self.object_id, self.widget_name = object_id_info[-3].split("#")
     else:
-        self.object_id = object_id_info
+        self.object_id = self.url.split("/")[-1]
         self.widget_name = constants.element.WidgetBar.INFO
 
 

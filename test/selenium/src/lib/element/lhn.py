@@ -143,10 +143,12 @@ class AccordionGroup(base.DropdownDynamic):
     Returns:
 
     """
-    el = self._get_visible_member_by_title(member_title)
-    action_chains.ActionChains(self._driver).move_to_element(el).perform()
-    selenium_utils.get_when_visible(self._driver,
-                                    locator.LhnMenu.EXTENDED_INFO)
-    return self._extended_info_cls(self._driver)
-
+    try:
+        el = self._get_visible_member_by_title(member_title)
+        action_chains.ActionChains(self._driver).move_to_element(el).perform()
+        selenium_utils.get_when_visible(self._driver,
+                                        locator.LhnMenu.EXTENDED_INFO)
+        return self._extended_info_cls(self._driver)
+    except selenium_exception.StaleElementReferenceException:
+        return self.hover_over_visible_member(member_title)
 
