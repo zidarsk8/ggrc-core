@@ -5,13 +5,8 @@
 """Module for base classes"""
 
 import time
+import re
 import pyvirtualdisplay   # pylint: disable=import-error
-
-# pylint: disable=import-error
-from selenium.webdriver.support import expected_conditions as EC
-
-# pylint: disable=import-error
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common import keys    # pylint: disable=import-error
 from selenium import webdriver    # pylint: disable=import-error
 from lib import environment
@@ -19,6 +14,7 @@ from lib import constants
 from lib import exception
 from lib import meta
 from lib import mixin
+from lib import selenium_utils
 
 
 class InstanceRepresentation(object):
@@ -116,56 +112,10 @@ class Element(InstanceRepresentation):
     """Clicks on the element"""
     self._element.click()
 
-  def get_when_invisible(self, locator=None):
-    """
-    Some elements, upon activation, are overlaying others. Here we wait
-    for the animation to end so that we can interact with the elements
-    below the overlay.
-
-    Returns:
-        selenium.webdriver.remote.webelement.WebElement
-    """
-    locator_to_use = locator if locator else self._locator
-
-    element = WebDriverWait(
-        self._driver,
-        constants.ux.MAX_USER_WAIT_SECONDS) \
-        .until(EC.invisibility_of_element_located(locator_to_use))
-    return element
-
-  def get_when_visible(self, locator=None):
-    """
-    Returns:
-        selenium.webdriver.remote.webelement.WebElement
-    """
-    locator_to_use = locator if locator else self._locator
-
-    element = WebDriverWait(
-        self._driver,
-        constants.ux.MAX_USER_WAIT_SECONDS) \
-        .until(EC.element_to_be_clickable(locator_to_use))
-
-    return element
-
   def click_when_visible(self, locator=None):
     """Waits for the element to be visible and only then performs a
     click"""
-    self.get_when_visible(locator).click()
-
-  def click_when_moving_over(self):
-    """Waits until the element stops moving"""
-
-    prev_location = None
-    timer_begin = time.time()
-
-    while prev_location != self._element.location:
-      prev_location = self._element.location
-      time.sleep(0.1)
-
-      if time.time() - timer_begin > constants.ux.ELEMENT_MOVING_TIMEOUT:
-        raise exception.ElementMovingTimeout(self._locator)
-
-    self._element.click()
+    selenium_utils.get_when_visible(self._driver, self._locator).click()
 
 
 class Label(Element):
@@ -180,7 +130,7 @@ class RichTextInputField(Element):
     """
     self._driver = driver
     self._locator = locator
-    self._element = self.get_when_visible(locator)
+    self._element = selenium_utils.get_when_visible(driver, locator)
     self.text = self._element.text
 
   def enter_text(self, text):
@@ -209,8 +159,7 @@ class RichTextInputField(Element):
 
 
 class TextInputField(RichTextInputField):
-  def enter_text(self, text):
-    super(TextInputField, self).enter_text(text)
+  pass
 
 
 class TextFilterDropdown(Element):
@@ -229,13 +178,13 @@ class TextFilterDropdown(Element):
 
   def _select_first_result(self):
     # wait that it appears
-    self.get_when_visible(self._locator_dropdown)
+    selenium_utils.get_when_visible(self._driver, self._locator_dropdown)
     dropdown_elements = self._driver.find_elements(
         *self._locator_dropdown)
 
     self.text = dropdown_elements[0].text
     dropdown_elements[0].click()
-    self.get_when_invisible(self._locator_dropdown)
+    selenium_utils.get_when_invisible(self._driver, self._locator_dropdown)
 
   def filter_and_select_first(self, text):
     self._filter_results(text)
@@ -248,7 +197,7 @@ class Iframe(Element):
     Args:
         text (str): the string we want to enter
     """
-    iframe = self.get_when_visible()
+    iframe = selenium_utils.get_when_visible(self._driver, self._locator)
     self._driver.switch_to.frame(iframe)
 
     element = self._driver.find_element_by_tag_name(constants.tag.BODY)
@@ -293,7 +242,7 @@ class DatePicker(Element):
     elements[day].click()
 
     # wait for fadeout in case we're above some other element
-    self.get_when_invisible(self._locator_datepcker)
+    selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
     self.text = self._element.get_attribute("value")
 
   def select_month_end(self):
@@ -302,7 +251,7 @@ class DatePicker(Element):
     elements[-1].click()
 
     # wait for fadeout in case we're above some other element
-    self.get_when_invisible(self._locator_datepcker)
+    selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
     self.text = self._element.get_attribute("value")
 
   def select_month_start(self):
@@ -311,7 +260,7 @@ class DatePicker(Element):
     elements[0].click()
 
     # wait for fadeout in case we're above some other element
-    self.get_when_invisible(self._locator_datepcker)
+    selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
     self.text = self._element.get_attribute("value")
 
 
@@ -409,7 +358,8 @@ class AnimatedComponent(Component):
     """
     Args:
         driver (CustomDriver)
-        locators_to_check (list of tuples): list of locators
+        locators_to_check (list of tuples): locators to wait for to become
+          (in)visible
         wait_until_visible (bool): for all elements to be visible do we
             have to wait for certain elements to be invisible or visible?
     """
@@ -421,13 +371,11 @@ class AnimatedComponent(Component):
 
   def _wait_until_visible(self):
     for locator in self._locators:
-      WebDriverWait(self._driver, constants.ux.MAX_USER_WAIT_SECONDS) \
-          .until(EC.element_to_be_clickable(locator))
+        selenium_utils.get_when_visible(self._driver, locator)
 
   def _wait_until_invisible(self):
     for locator in self._locators:
-      WebDriverWait(self._driver, constants.ux.MAX_USER_WAIT_SECONDS) \
-          .until(EC.invisibility_of_element_located(locator))
+        selenium_utils.get_when_invisible(self._driver, locator)
 
 
 class Modal(Component):
@@ -453,6 +401,9 @@ class Filter(Component):
 
 
 class AbstractPage(Component):
+  """Represents a page that can be navigate to, but we don't necessarily know
+  it's url in advance"""
+
   def __init__(self, driver):
     super(AbstractPage, self).__init__(driver)
     self.url = driver.current_url
@@ -467,7 +418,7 @@ class AbstractPage(Component):
 
 class Page(AbstractPage):
   """The Page class represents components with special properties i.e. they
-  have URL-s, can be navigated to etc."""
+  have *static* URL-s, can be navigated to etc."""
   URL = None
 
   def __init__(self, driver):
@@ -486,7 +437,8 @@ class DropdownDynamic(AnimatedComponent):
     """
     Args:
         driver (CustomDriver)
-        locators_to_check (list of tuples): list of locators
+        locators_to_check (list of tuples): locators to wait for to become
+          (in)visible
         wait_until_visible (bool): for all elements to be visible do we
             have to wait for certain elements to be invisible or visible?
     """
@@ -512,6 +464,11 @@ class DropdownDynamic(AnimatedComponent):
     raise NotImplementedError
 
 
+class Selectable(Element):
+  """Representing list of elements that are selectable"""
+  pass
+
+
 class Widget(AbstractPage):
   """A page like class for which we don't know the initial url"""
 
@@ -519,5 +476,41 @@ class Widget(AbstractPage):
     """
     Args:
         driver (CustomDriver)
+        widget_locator (tuple)
     """
     super(Widget, self).__init__(driver)
+    object_id_info = self.url.split("/")[-1]
+
+    if "#" in self.url:
+        self.object_id, self.widget_name = object_id_info.split("#")
+    else:
+        self.object_id = object_id_info
+        self.widget_name = constants.element.WidgetBar.INFO
+
+
+class ObjectWidget(Widget):
+  """Class representing all widgets except the info widget"""
+
+  def __init__(self, driver, locator_widget, locator_filter_title,
+               locator_button_questionmark,
+               locator_filter_textbox, locator_filter_submit,
+               locator_filter_clear):
+    super(ObjectWidget, self).__init__(driver)
+
+    # parse number from widget title
+    widget_title = self._driver.find_element(*locator_widget).text
+    self.member_count = int(widget_title) \
+        if "(" not in widget_title \
+        else int(re.match(constants.regex.NUMBER_FROM_WIDGET_TITLE,
+                          widget_title).group(2)
+                 )
+
+    self.label_filter = Label(driver, locator_filter_title)
+    self.button_filter_question = Button(driver,
+                                         locator_button_questionmark)
+    self.filter = Filter(
+        driver,
+        locator_filter_textbox,
+        locator_filter_submit,
+        locator_filter_clear
+    )
