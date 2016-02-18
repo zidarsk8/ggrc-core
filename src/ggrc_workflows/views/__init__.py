@@ -18,7 +18,7 @@ from ggrc.views.cron import run_job
 from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.models import Workflow
 
-env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
+env = Environment(loader=PackageLoader('ggrc', 'templates'))
 
 # TODO: move these views to ggrc_views and all the functions to notifications
 # module.
