@@ -6,7 +6,7 @@
 import traceback
 from flask import current_app
 
-from ggrc.notification import email
+from ggrc.notifications import email
 
 
 def send_error_notification(message):

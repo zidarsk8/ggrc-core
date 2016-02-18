@@ -13,7 +13,7 @@ from datetime import date, datetime
 import os
 from ggrc import db
 from ggrc.models import *
-from ggrc import notification
+from ggrc import notifications
 from ggrc_workflows.models import Workflow, TaskGroup, CycleTaskGroupObjectTask, Cycle
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
@@ -109,7 +109,7 @@ class TestOneTimeWorkflowNotification(TestCase):
       db.session.add(self.tgassignee1)
       db.session.add(self.member1)
 
-      notifications = notification.get_todays_notifications()
+      notifications.get_todays_notifications()
 
 
 

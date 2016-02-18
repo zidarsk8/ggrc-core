@@ -10,10 +10,10 @@ from jinja2 import Environment, PackageLoader
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
-from ggrc import notification
+from ggrc import notifications
 from ggrc.app import app
 from ggrc.login import login_required
-from ggrc.notification import email
+from ggrc.notifications import email
 from ggrc.views.cron import run_job
 from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.models import Workflow
@@ -49,7 +49,7 @@ def modify_data(data):
 def show_pending_notifications():
   if not permissions.is_admin():
     raise Forbidden()
-  _, notif_data = notification.get_pending_notifications()
+  _, notif_data = notifications.get_pending_notifications()
 
   for day, day_notif in notif_data.iteritems():
     for user_email, data in day_notif.iteritems():
@@ -61,22 +61,22 @@ def show_pending_notifications():
 def show_todays_digest_notifications():
   if not permissions.is_admin():
     raise Forbidden()
-  _, notif_data = notification.get_todays_notifications()
+  _, notif_data = notifications.get_todays_notifications()
   for user_email, data in notif_data.iteritems():
     data = modify_data(data)
   todays = env.get_template("notifications/view_todays_digest.html")
   return todays.render(data=notif_data)
 
 
-def set_notification_sent_time(notifications):
-  for notif in notifications:
+def set_notification_sent_time(notif_list):
+  for notif in notif_list:
     notif.sent_at = datetime.now()
   db.session.commit()
 
 
 def send_todays_digest_notifications():
   digest_template = env.get_template("notifications/email_digest.html")
-  notifications, notif_data = notification.get_todays_notifications()
+  notif_list, notif_data = notifications.get_todays_notifications()
   sent_emails = []
   subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
   for user_email, data in notif_data.iteritems():
@@ -84,7 +84,7 @@ def send_todays_digest_notifications():
     email_body = digest_template.render(digest=data)
     email.send_email(user_email, subject, email_body)
     sent_emails.append(user_email)
-  set_notification_sent_time(notifications)
+  set_notification_sent_time(notif_list)
   return "emails sent to: <br> {}".format("<br>".join(sent_emails))
 
 
