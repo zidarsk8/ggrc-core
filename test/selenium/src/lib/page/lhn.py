@@ -246,7 +246,7 @@ class _Objectives(lhn.AccordionGroup):
 
 
 class _PeopleOrGroups(lhn.DropdownStatic):
-  """Peopl or groups dropdown in LHN"""
+  """People or groups dropdown in LHN"""
 
   _locator_element = locator.LhnMenu.PEOPLE_OR_GROUPS
 
