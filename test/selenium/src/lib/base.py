@@ -379,7 +379,7 @@ class AnimatedComponent(Component):
     self._locators = locators_to_check
 
     self._wait_until_visible() if wait_until_visible \
-      else self._wait_until_invisible()
+        else self._wait_until_invisible()
 
   def _wait_until_visible(self):
     for locator in self._locators:
