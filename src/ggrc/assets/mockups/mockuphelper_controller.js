@@ -192,16 +192,17 @@
       }
     },
     ".modal .add-object-trigger click": function (el, ev) {
-      var repeatBlock = $('.modal .repeated-block').length;
-      ev.preventDefault();
-      this.element.find('.modal .repeated-block').last().clone()
-      .appendTo('.modal .relevant-block-wrap');
+      var clone = _.clone(GGRC.Bootstrap.Mockups.Workflow.Info.tasks);
+      var task = clone[0];
+      var tasks = [];
+      clone.push(tasks);
 
-      console.log(repeatBlock);
+      console.log('Klon ' + clone);
+      console.log('Task Array ' + task);
 
-      if (repeatBlock >= 1) {
-        $('.close-block').removeClass("hidden");
-      }
+      // if (tasks >= 1) {
+      //   $('.close-block').removeClass("hidden");
+      // }
     },
     ".modal .close-trigger click": function (el, ev) {
       var repeatBlock,
