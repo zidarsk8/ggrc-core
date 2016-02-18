@@ -1143,7 +1143,7 @@ class Resource(ModelView):
           errors.append((res_status, body))
       if len(errors) > 0:
         status = errors[0][0]
-        headers["X-Flash-Error"] = '<hr>'.join((error for _, error in errors))
+        headers["X-Flash-Error"] = ' || '.join((error for _, error in errors))
       else:
         status = 200
     return current_app.make_response(
