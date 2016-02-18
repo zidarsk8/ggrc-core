@@ -52,6 +52,8 @@ class CustomDriver(webdriver.Chrome):
 
 
 class Selenium(object):
+  """Selenium resource handler"""
+
   __metaclass__ = mixin.MetaDocsDecorator
 
   def __init__(self):
@@ -153,9 +155,9 @@ class RichTextInputField(Element):
     self._element.clear()
     self._element.send_keys(keys.Keys.CONTROL, 'v')
     element.click()
-    el = self._driver.find_element(
+    element = self._driver.find_element(
         *self._locator)
-    self.text = el.get_attribute("value")
+    self.text = element.get_attribute("value")
 
 
 class TextInputField(RichTextInputField):
@@ -192,6 +194,8 @@ class TextFilterDropdown(Element):
 
 
 class Iframe(Element):
+  """Iframe element methods"""
+
   def find_iframe_and_enter_data(self, text):
     """
     Args:
@@ -209,6 +213,8 @@ class Iframe(Element):
 
 
 class DatePicker(Element):
+  """Date picker element methods"""
+
   def __init__(self, driver, date_picker_locator, field_locator):
     """
     Args:
@@ -265,10 +271,13 @@ class DatePicker(Element):
 
 
 class Button(Element):
+  """A generic button element"""
   pass
 
 
 class Checkbox(Element):
+  """A generic checkboux element"""
+
   def __init__(self, driver, locator, is_checked=False):
     super(Checkbox, self).__init__(driver, locator)
     self.is_checked = is_checked
@@ -299,6 +308,8 @@ class Tab(Element):
 
 
 class Dropdown(Element):
+  """A generic dropdown"""
+
   def select(self, option_locator):
     """Select an option from a dropdown menu
 
@@ -333,6 +344,7 @@ class DropdownStatic(Element):
 
 class Component(object):
   """The Component class is a container for elements"""
+
   __metaclass__ = meta.RequireDocs
 
   def __init__(self, driver):
@@ -367,22 +379,25 @@ class AnimatedComponent(Component):
     self._locators = locators_to_check
 
     self._wait_until_visible() if wait_until_visible \
-        else self._wait_until_invisible()
+      else self._wait_until_invisible()
 
   def _wait_until_visible(self):
     for locator in self._locators:
-        selenium_utils.get_when_visible(self._driver, locator)
+      selenium_utils.get_when_visible(self._driver, locator)
 
   def _wait_until_invisible(self):
     for locator in self._locators:
-        selenium_utils.get_when_invisible(self._driver, locator)
+      selenium_utils.get_when_invisible(self._driver, locator)
 
 
 class Modal(Component):
+  """A generic modal element"""
   pass
 
 
 class Filter(Component):
+  """A gneric filter element"""
+
   def __init__(self, driver, locator_text_box, locator_submit,
                locator_clear):
     super(Filter, self).__init__(driver)
@@ -466,6 +481,7 @@ class DropdownDynamic(AnimatedComponent):
 
 class Selectable(Element):
   """Representing list of elements that are selectable"""
+
   pass
 
 
@@ -481,15 +497,15 @@ class Widget(AbstractPage):
     super(Widget, self).__init__(driver)
 
     if "#" in self.url:
-        object_id_info = self.url.split("/")
+      object_id_info = self.url.split("/")
 
-        if len(object_id_info) == 5:
-            self.object_id, self.widget_name = object_id_info[-1].split("#")
-        else:
-            self.object_id, self.widget_name = object_id_info[-3].split("#")
+      if len(object_id_info) == 5:
+        self.object_id, self.widget_name = object_id_info[-1].split("#")
+      else:
+        self.object_id, self.widget_name = object_id_info[-3].split("#")
     else:
-        self.object_id = self.url.split("/")[-1]
-        self.widget_name = constants.element.WidgetBar.INFO
+      self.object_id = self.url.split("/")[-1]
+      self.widget_name = constants.element.WidgetBar.INFO
 
 
 class ObjectWidget(Widget):
