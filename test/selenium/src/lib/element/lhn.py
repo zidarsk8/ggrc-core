@@ -89,11 +89,11 @@ class AccordionGroup(base.DropdownDynamic):
 
   def _set_visible_members(self):
     try:
-      [selenium_utils.wait_until_stops_moving(el)
-       for el in self.members_loaded]
+      for element in self.members_loaded:
+        selenium_utils.wait_until_stops_moving(element)
 
-      self.members_visible = [el for el in self.members_loaded
-                              if el.is_displayed()]
+      self.members_visible = [element for element in self.members_loaded
+                              if element.is_displayed()]
     except selenium_exception.StaleElementReferenceException:
       self._update_loaded_members()
       self._set_visible_members()
@@ -107,13 +107,13 @@ class AccordionGroup(base.DropdownDynamic):
         selenium.webdriver.remote.webelement.WebElement
     """
     try:
-      for el in self.members_visible:
-        if el.text == member_title:
+      for element in self.members_visible:
+        if element.text == member_title:
           break
-        else:
-          raise exception.ElementNotFound
+      else:
+        raise exception.ElementNotFound
 
-      return el
+      return element
     except selenium_exception.StaleElementReferenceException:
       # the elements can go stale, here we refresh them
       self._update_loaded_members()

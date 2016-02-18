@@ -39,7 +39,7 @@ class DropdownSettings(base.Component):
   def select_delete(self):
     """
     Returns:
-        moda.delete_object.DeleteObjectModal
+        modal.delete_object.DeleteObjectModal
     """
     self.delete.click()
     return self._delete_modal_cls(self._driver)

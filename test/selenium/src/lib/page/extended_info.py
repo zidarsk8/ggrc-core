@@ -2,7 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
-"""A modul for extended info page models (visible in LHN on hover over
+
+"""A module for extended info page models (visible in LHN on hover over
 object members)"""
 
 from lib import base
