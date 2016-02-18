@@ -849,12 +849,12 @@ can.Control("GGRC.Controllers.Modals", {
               if (obj.is_declining_review && obj.is_declining_review == '1') {
                 msg = "Review declined";
               } else if (name) {
-                msg = "New " + type + " <span class='user-string'>" + name + "</span>" + " added successfully.";
+                msg = "New " + type + " " + name + " added successfully.";
               } else {
                 msg = "New " + type + " added successfully.";
               }
             } else {
-              msg = "<span class='user-string'>" + name + "</span>" + " modified successfully.";
+              msg = name + " modified successfully.";
             }
             $(document.body).trigger("ajax:flash", { success : msg });
             finish();
