@@ -151,4 +151,3 @@ class AccordionGroup(base.DropdownDynamic):
         return self._extended_info_cls(self._driver)
     except selenium_exception.StaleElementReferenceException:
         return self.hover_over_visible_member(member_title)
-

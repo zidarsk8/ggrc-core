@@ -316,9 +316,9 @@ class LhnMenu(object):
 
   # accordeon members
   ACCORDEON_PROGRAMS_MEMBERS = (
-    By.CSS_SELECTOR, '[data-model-name="Program"]>.content>.sub-level>li')
+      By.CSS_SELECTOR, '[data-model-name="Program"]>.content>.sub-level>li')
   ACCORDEON_CONTROLS_MEMBERS = (
-    By.CSS_SELECTOR, '[data-model-name="Control"]>.content>.sub-level>li')
+      By.CSS_SELECTOR, '[data-model-name="Control"]>.content>.sub-level>li')
 
 
 class ExtendedInfo(object):
@@ -383,136 +383,136 @@ class ModalCreateNewControl(object):
   MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
   TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
   DESCRIPTION = (
-    By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) .span6>label')
+      By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) .span6>label')
   TEST_PLAN = (By.CSS_SELECTOR, '[data-id="test_plan_hidden"] label')
   NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] label')
   CODE = (By.CSS_SELECTOR, '[data-id="code_hidden"] label')
   KIND_OR_NATURE = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(1) label')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(1) label')
   FRAUD_RELATED = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(2) label')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(2) label')
   EFFECTIVE_DATE = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(3)>div:nth-child(1) label')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(3)>div:nth-child(1) label')
   FREQUENCY = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(4) div:nth-child(1) select')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4) div:nth-child(1) select')
   ASSERTIONS = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(4)>div:nth-child(2) label')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(2) label')
   PRINCIPAL_ASSESSOR = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(5)>div:nth-child(1) label')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(1) label')
   SECONDARY_ASSESSOR = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(5)>div:nth-child(2) label')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(2) label')
   OWNER = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(1)>form>div:nth-child(3) div:nth-child(2) '
-    'label')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(3) div:nth-child(2) '
+      'label')
   PRIMARY_CONTACT = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
-    'div:nth-child(1)>div>label')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
+      'div:nth-child(1)>div>label')
   SECONDARY_CONTACT = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
-    'div:nth-child(2)>div>label')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
+      'div:nth-child(2)>div>label')
   CONTROL_URL = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(5) div:nth-child(2)>div:nth-child(1)>div>'
-    'label')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(5) div:nth-child(2)>div:nth-child(1)>div'
+      '>label')
   REFERENCE_URL = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(1)>form>div:nth-child(5) div:nth-child(2)>'
-    'div:nth-child(2)>div>label')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(5) div:nth-child(2)>'
+      'div:nth-child(2)>div>label')
   SIGNIFICANCE = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(3) label')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(3) label')
   TYPE_OR_MEANS = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(4) label')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(4) label')
   STOP_DATE = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(6) div:nth-child(3) div:nth-child(2) label')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(3) div:nth-child(2) label')
   CATEGORIES = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(4)>div:nth-child(3) label')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(3) label')
   STATE = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(5)>div:nth-child(3) label')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(3) label')
 
   # user input elements
   UI_TITLE = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(2) .span6>input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
   UI_DESCRIPTION = (
-    By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
+      By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
   UI_TEST_PLAN = (By.CSS_SELECTOR, '[data-id="test_plan_hidden"] iframe')
   UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] iframe')
   UI_CODE = (By.CSS_SELECTOR, '[data-id="code_hidden"] input')
   UI_PRIMARY_CONTACT = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
-    'div:nth-child(1)>div>input')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
+      'div:nth-child(1)>div>input')
   UI_SECONDARY_CONTACT = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
-    'div:nth-child(2)>div>input')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
+      'div:nth-child(2)>div>input')
   UI_CONTROL_URL = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(5) div:nth-child(2)>div:nth-child(1)>div>'
-    'input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(5) div:nth-child(2)>div:nth-child(1)>div'
+      '>input')
   UI_REFERENCE_URL = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(1)>form>div:nth-child(5) div:nth-child(2)>'
-    'div:nth-child(2)>div>input')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(5) div:nth-child(2)>'
+      'div:nth-child(2)>div>input')
 
   DATEPICKER_EFFECTIVE_DATE = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(3)>div:nth-child(1) input')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(3)>div:nth-child(1) input')
   DATEPICKER_STOP_DATE = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(3)>div:nth-child(2) input')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(3)>div:nth-child(2) input')
 
   # dorpdowns
   DROPDOWN_KIND_OR_NATURE = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(1) select')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(1) select')
   DROPDOWN_FRAUD_RELATED = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(6)>div:nth-child(2)>div:nth-child(2)>select')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6)>div:nth-child(2)>div:nth-child(2)>select')
   DROPDOWN_SIGNIFICANCE = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(6)>div:nth-child(2)>div:nth-child(3)>select')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6)>div:nth-child(2)>div:nth-child(3)>select')
   DROPDOWN_TYPE_OR_MEANS = (
-    By.CSS_SELECTOR,
-    '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(4) select')
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(4) select')
   DROPDOWN_FREQUENCY = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(4) div:nth-child(1) select')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4) div:nth-child(1) select')
   DROPDOWN_STATE = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(5)>div:nth-child(3) select')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(3) select')
 
   SELECTABLE_ASSERTIONS = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(4)>div:nth-child(2) select')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(2) select')
   SELECTABLE_CATEGORIES = (
-    By.CSS_SELECTOR,
-    '.modal-body div>form>div>div:nth-child(4)>div:nth-child(3) select')
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(3) select')
 
   # buttons
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
   BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
   BUTTON_SAVE_AND_CLOSE = (
-    By.CSS_SELECTOR,
-    '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
+      By.CSS_SELECTOR,
+      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
   BUTTON_SAVE_AND_ADD_ANOTHER = (
-    By.CSS_SELECTOR,
-    '.confirm-buttons [data-toggle="modal-submit-addmore"]')
+      By.CSS_SELECTOR,
+      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
 
 
 class ModalCustomAttribute(object):
@@ -785,9 +785,9 @@ class WidgetFilter(object):
   TEXTFIELD_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
                                         '.filter-input')
   BUTTON_SUBMIT_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
-                                     '.filter-button  [type="submit"]')
+                                            '.filter-button  [type="submit"]')
   BUTTON_RESET_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
-                                    '.filter-button  [type="reset"]')
+                                           '.filter-button  [type="reset"]')
   BUTTON_HELP = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
                                   '.filter-button  #page-help')
 

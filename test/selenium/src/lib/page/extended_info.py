@@ -26,7 +26,7 @@ class ExtendedInfoMappable(_ExtendedInfo):
   def map_to_object(self):
     self.button_map.click()
     selenium_utils.get_when_visible(
-      self._driver, self._locator_redirected_to_widget)
+        self._driver, self._locator_redirected_to_widget)
 
 
 class Controls(ExtendedInfoMappable):

@@ -30,7 +30,7 @@ class DropdownSettings(base.Component):
     """
     self.edit.click()
     selenium_utils.get_when_visible(
-      self._driver, self._edit_modal_cls.locator_button_save)
+        self._driver, self._edit_modal_cls.locator_button_save)
     return self._edit_modal_cls(self._driver)
 
   def select_get_permalink(self):

@@ -159,7 +159,7 @@ class TestProgramPage(base.Test):
 
     # check that the widget isn't opened yet since it doesn't have any members
     assert selenium.driver.find_element(
-      *locator.WidgetBar.CONTROLS).is_displayed() == False
+        *locator.WidgetBar.CONTROLS).is_displayed() is False
 
     # map to obj
     dashboard.HeaderPage(selenium.driver)\

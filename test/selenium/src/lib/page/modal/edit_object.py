@@ -195,51 +195,51 @@ class EditControlModal(_EditModal):
     self.ui_notes = base.Iframe(driver, self._locators.UI_NOTES)
     self.ui_code = base.TextInputField(driver, self._locators.UI_CODE)
     self.ui_primary_contact = base.TextInputField(
-      driver, self._locators.UI_PRIMARY_CONTACT)
+        driver, self._locators.UI_PRIMARY_CONTACT)
     self.ui_secondary_contact = base.TextInputField(
-      driver, self._locators.UI_SECONDARY_CONTACT)
+        driver, self._locators.UI_SECONDARY_CONTACT)
     self.ui_control_url = base.TextInputField(
-      driver, self._locators.UI_CONTROL_URL)
+        driver, self._locators.UI_CONTROL_URL)
     self.ui_reference_url = base.TextInputField(
-      driver, self._locators.UI_REFERENCE_URL)
+        driver, self._locators.UI_REFERENCE_URL)
 
     # datepickers
     self.ui_effective_date = base.DatePicker(
-      driver,
-      self._locators.EFFECTIVE_DATE,
-      self._locators.DATEPICKER_EFFECTIVE_DATE)
+        driver,
+        self._locators.EFFECTIVE_DATE,
+        self._locators.DATEPICKER_EFFECTIVE_DATE)
     self.ui_stop_date = base.DatePicker(
-      driver,
-      self._locators.STOP_DATE,
-      self._locators.DATEPICKER_STOP_DATE)
+        driver,
+        self._locators.STOP_DATE,
+        self._locators.DATEPICKER_STOP_DATE)
 
     # dropdowns
     self.ui_kind_or_nature = base.Dropdown(
-      driver,
-      self._locators.DROPDOWN_KIND_OR_NATURE)
+        driver,
+        self._locators.DROPDOWN_KIND_OR_NATURE)
     self.ui_fraud_related = base.Dropdown(
-      driver,
-      self._locators.DROPDOWN_FRAUD_RELATED)
+        driver,
+        self._locators.DROPDOWN_FRAUD_RELATED)
     self.ui_type_or_means = base.Dropdown(
-      driver,
-      self._locators.DROPDOWN_TYPE_OR_MEANS)
+        driver,
+        self._locators.DROPDOWN_TYPE_OR_MEANS)
     self.ui_frequency = base.Dropdown(
-      driver,
-      self._locators.DROPDOWN_FREQUENCY)
+        driver,
+        self._locators.DROPDOWN_FREQUENCY)
 
     # selectable lists
     self.selectable_assertions = base.Selectable(
-      driver,
-      self._locators.SELECTABLE_ASSERTIONS)
+        driver,
+        self._locators.SELECTABLE_ASSERTIONS)
     self.selectable_categories = base.Selectable(
-      driver,
-      self._locators.SELECTABLE_CATEGORIES)
+        driver,
+        self._locators.SELECTABLE_CATEGORIES)
 
     # buttons
     self.button_add_owner = base.Button(
-      driver, self._locators.BUTTON_ADD_OWNER)
+        driver, self._locators.BUTTON_ADD_OWNER)
     self.button_hide_all_optional_fields = base.Button(
-      driver, self._locators.BUTTON_HIDE_ALL_OPTIONAL_FIELDS)
+        driver, self._locators.BUTTON_HIDE_ALL_OPTIONAL_FIELDS)
 
   def enter_title(self, text):
     """

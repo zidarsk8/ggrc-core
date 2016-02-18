@@ -61,13 +61,14 @@ class _Requests(lhn.AccordionGroup):
 
 class _Issues(lhn.AccordionGroup):
   """Issues dropdown in LHN"""
-  
+
   _locator_spinny = locator.LhnMenu.SPINNY_ISSUES
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ISSUE
 
 
 class _Directives(lhn.DropdownStatic):
   """Directives dropdown in LHN"""
+
   _locator_element = locator.LhnMenu.DIRECTIVES
 
   def __init__(self, driver):
@@ -154,49 +155,49 @@ class _Directives(lhn.DropdownStatic):
 
 class _Regulations(lhn.AccordionGroup):
   """Regulations dropdown in LHN"""
-  
+
   _locator_spinny = locator.LhnMenu.SPINNY_REGULATIONS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_REGULATION
 
 
 class _Policies(lhn.AccordionGroup):
   """Policies dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_POLICY
   _locator_spinny = locator.LhnMenu.SPINNY_POLICIES
 
 
 class _Standards(lhn.AccordionGroup):
   """Standards dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_STANDARD
   _locator_spinny = locator.LhnMenu.SPINNY_STANDARDS
 
 
 class _Contracts(lhn.AccordionGroup):
   """Contracts dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CONTRACT
   _locator_spinny = locator.LhnMenu.SPINNY_REGULATIONS
 
 
 class _Clauses(lhn.AccordionGroup):
   """Clauses dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CLAUSE
   _locator_spinny = locator.LhnMenu.SPINNY_CLAUSES
 
 
 class _Sections(lhn.AccordionGroup):
   """Sections dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_SECTION
   _locator_spinny = locator.LhnMenu.SPINNY_SECTIONS
 
 
 class _ControlsOrObjectives(lhn.DropdownStatic):
   """Controls or objects dropdown in LHN"""
-  
+
   _locator_element = locator.LhnMenu.CONTROLS_OR_OBJECTIVES
 
   def __init__(self, driver):
@@ -231,7 +232,7 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
 
 class _Controls(lhn.AccordionGroup):
   """Controls dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CONTROL
   _locator_spinny = locator.LhnMenu.SPINNY_CONTROLS
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_CONTROLS_MEMBERS
@@ -239,17 +240,16 @@ class _Controls(lhn.AccordionGroup):
   _extended_info_cls = extended_info.Controls
 
 
-
 class _Objectives(lhn.AccordionGroup):
   """Objectives dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_OBJECTIVE
   _locator_spinny = locator.LhnMenu.SPINNY_OBJECTIVES
 
 
 class _PeopleOrGroups(lhn.DropdownStatic):
   """Peopl or groups dropdown in LHN"""
-  
+
   _locator_element = locator.LhnMenu.PEOPLE_OR_GROUPS
 
   def __init__(self, driver):
@@ -310,35 +310,35 @@ class _PeopleOrGroups(lhn.DropdownStatic):
 
 class _People(lhn.AccordionGroup):
   """People dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PERSON
   _locator_spinny = locator.LhnMenu.SPINNY_PEOPLE
 
 
 class _OrgGroups(lhn.AccordionGroup):
   """Org groups dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ORG_GROUP
   _locator_spinny = locator.LhnMenu.SPINNY_ORG_GROUPS
 
 
 class _Vendors(lhn.AccordionGroup):
   """Vendors dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_VENDOR
   _locator_spinny = locator.LhnMenu.SPINNY_VENDORS
 
 
 class _AccessGroups(lhn.AccordionGroup):
   """Access groups dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ACCESS_GROUP
   _locator_spinny = locator.LhnMenu.SPINNY_ACCESS_GROUPS
 
 
 class _AssetsOrBusiness(lhn.DropdownStatic):
   """Assets or business dropdown in LHN"""
-  
+
   _locator_element = locator.LhnMenu.ASSETS_OR_BUSINESS
 
   def __init__(self, driver):
@@ -438,56 +438,56 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
 
 class _Systems(lhn.AccordionGroup):
   """Systems dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_SYSTEM
   _locator_spinny = locator.LhnMenu.SPINNY_SYSTEMS
 
 
 class _Processes(lhn.AccordionGroup):
   """Processes dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PROCESS
   _locator_spinny = locator.LhnMenu.SPINNY_PROCESSES
 
 
 class _DataAssets(lhn.AccordionGroup):
   """Data assets dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_DATA_ASSET
   _locator_spinny = locator.LhnMenu.SPINNY_DATA_ASSETS
 
 
 class _Products(lhn.AccordionGroup):
   """Products dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PRODUCT
   _locator_spinny = locator.LhnMenu.SPINNY_PRODUCTS
 
 
 class _Projects(lhn.AccordionGroup):
   """Projects dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PROJECT
   _locator_spinny = locator.LhnMenu.SPINNY_PROJECTS
 
 
 class _Facilities(lhn.AccordionGroup):
   """Facilities dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_FACILITY
   _locator_spinny = locator.LhnMenu.SPINNY_FACILITIES
 
 
 class _Markets(lhn.AccordionGroup):
   """Markets dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_MARKET
   _locator_spinny = locator.LhnMenu.SPINNY_MARKETS
 
 
 class _RisksOrThreats(lhn.DropdownStatic):
   """Risks or threats dropdown in LHN"""
-  
+
   _locator_element = locator.LhnMenu.RISK_OR_THREATS
 
   def __init__(self, driver):
@@ -522,21 +522,21 @@ class _RisksOrThreats(lhn.DropdownStatic):
 
 class _Risks(lhn.AccordionGroup):
   """Risks dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_RISK
   _locator_spinny = locator.LhnMenu.SPINNY_RISKS
 
 
 class _Threats(lhn.AccordionGroup):
   """Threats dropdown in LHN"""
-  
+
   _locator_button_create_new = locator.LhnMenu.THREATS
   _locator_spinny = locator.LhnMenu.SPINNY_THREATS
 
 
 class LhnContents(base.Component):
   """Model for the highest level contents in LHN"""
-  
+
   def __init__(self, driver):
     super(LhnContents, self).__init__(driver)
     self.filter = None
@@ -700,7 +700,7 @@ class LhnContents(base.Component):
 
 class Menu(base.AnimatedComponent):
   """Model of the LHN menu"""
-  
+
   def __init__(self, driver):
     super(Menu, self).__init__(
         driver,

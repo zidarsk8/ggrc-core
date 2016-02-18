@@ -4,7 +4,7 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from lib.page.modal import (
-    create_new_object,
-    edit_object,
-    delete_object
+    create_new_object,    # flake8: noqa
+    edit_object,    # flake8: noqa
+    delete_object   # flake8: noqa
 )

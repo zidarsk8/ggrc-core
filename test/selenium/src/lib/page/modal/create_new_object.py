@@ -16,7 +16,7 @@ class _CreateNewObjectModal(base.Modal):
   def __init__(self, driver):
     super(_CreateNewObjectModal, self).__init__(driver)
     self.button_save_and_add_another = base.Button(
-      driver, self._locator_button_add_another)
+        driver, self._locator_button_add_another)
 
   def save_and_add_other(self):
     """Saves this objects and opens a new modal"""
