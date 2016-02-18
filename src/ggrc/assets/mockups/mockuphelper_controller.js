@@ -176,12 +176,48 @@
       if (template) {
         this.options.originalInstance = instance.instance;
         this.options.instance = _.clone(instance.instance);
-        this.template = can.view(template, this.options.instance);
+        this.template = can.view(template, _.extend(this.options.instance, {
+          editable: true
+        }));
         this.el = el;
         this.el.find('.modal-inner-content')
           .empty()
           .append(this.template);
       }
+    },
+    '.modal .add-task-trigger click': function (el, ev) {
+      this.options.instance.tasks.push({
+        type: 'task',
+        title: {
+          value: '',
+          hidable: false
+        },
+        description: {
+          value: '',
+          hidable: true
+        },
+        task_type: {
+          option: 'Rich text',
+          value: '',
+          hidable: true,
+          size: 5
+        },
+        group: {
+          value: '',
+          hidable: true
+        },
+        start_date: {
+          value: moment().format('MM/DD/YY'),
+          hidable: false
+        },
+        end_date: {
+          value: moment().format('MM/DD/YY'),
+          hidable: false
+        },
+        mapped: {
+          objects: {}
+        }
+      });
     },
     ".modal .js-toggle-field change": function (el, ev) {
       var target = this.element.find(el.data("target")),
