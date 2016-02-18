@@ -55,93 +55,12 @@ class _ObjectWidgetBar(_WidgetBar):
     self.tab_info.click()
     return self._info_cls(self._driver)
 
-  def select_audits(self):
-    raise NotImplementedError
-
-  def select_people(self):
-    raise NotImplementedError
-
-  def select_policies(self):
-    raise NotImplementedError
-
-  def select_risks(self):
-    raise NotImplementedError
-
-  def select_workflow_tasks(self):
-    raise NotImplementedError
-
-  def select_access_groups(self):
-    raise NotImplementedError
-
-  def select_clauses(self):
-    raise NotImplementedError
-
   def select_controls(self):
     """
     Returns:
         widget.Controls
     """
     return widget.Controls(self._driver)
-
-  def select_faclities(self):
-    raise NotImplementedError
-
-  def select_markets(self):
-    raise NotImplementedError
-
-  def select_org_groups(self):
-    raise NotImplementedError
-
-  def select_products(self):
-    raise NotImplementedError
-
-  def select_regulations(self):
-    raise NotImplementedError
-
-  def select_sections(self):
-    raise NotImplementedError
-
-  def select_systems(self):
-    raise NotImplementedError
-
-  def select_reisk_assessments(self):
-    raise NotImplementedError
-
-  def select_workflows(self):
-    raise NotImplementedError
-
-  def select_assessments(self):
-    raise NotImplementedError
-
-  def select_contracts(self):
-    raise NotImplementedError
-
-  def select_data_assets(self):
-    raise NotImplementedError
-
-  def select_issues(self):
-    raise NotImplementedError
-
-  def select_objectives(self):
-    raise NotImplementedError
-
-  def select_processes(self):
-    raise NotImplementedError
-
-  def select_projects(self):
-    raise NotImplementedError
-
-  def select_requests(self):
-    raise NotImplementedError
-
-  def select_standards(self):
-    raise NotImplementedError
-
-  def select_vendors(self):
-    raise NotImplementedError
-
-  def select_threats(self):
-    raise NotImplementedError
 
 
 class AdminDashboardWidgetBarPage(_WidgetBar):

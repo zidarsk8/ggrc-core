@@ -5,13 +5,11 @@
 
 """Utility function for selenium"""
 
+import time
 # pylint: disable=import-error
 from selenium.webdriver.support import expected_conditions as EC
-
 # pylint: disable=import-error
 from selenium.webdriver.support.ui import WebDriverWait
-
-import time
 from lib import exception
 from lib import constants
 

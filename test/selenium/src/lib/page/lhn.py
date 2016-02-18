@@ -205,13 +205,11 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
     self.button_controls = lhn.Button(
         self._driver,
         locator.LhnMenu.CONTROLS,
-        locator.LhnMenu.CONTROL_COUNT
-    )
+        locator.LhnMenu.CONTROL_COUNT)
     self.button_objectives = lhn.Button(
         self._driver,
         locator.LhnMenu.OBJECTIVES,
-        locator.LhnMenu.OBJECTIVES_COUNT
-    )
+        locator.LhnMenu.OBJECTIVES_COUNT)
 
   def select_controls(self):
     """
