@@ -42,24 +42,34 @@
         randomize: "state"
       })
     },
-    t_title: Generator.create({
-      hidable: false,
-    }),
-    start_date: Generator.create({
-      hidable: false,
-    }),
-    end_date: Generator.create({
-      hidable: false,
-    }),
-    t_description: Generator.create({
-      hidable: true
-    }),
-    task: Generator.create({
-      object_type: "task"
-    }),
-    t_type: Generator.create({
-      hidable: true,
-      size: 5
+    tasks: Generator.create({
+      type: "task",
+      title: {
+        value: "Simple task",
+        hidable: false
+      },
+      description: {
+        value: "Governanceit way sustained for organization. Interests all. Perspective tribe goals. Where policies successful. With regulated coherent. Governance governanceinformation authority body perspective. Respect processes governance regulation eells proposes.",
+        hidable: true
+      },
+      task_type: {
+        option: "Rich text",
+        value: "Articulated are being already banks deals at differences internet control articulated. As where. Respect on governance. Decision-making term issues. Established found governance. Goal regulators include. Way becht authority interaction postulated in.",
+        hidable: true,
+        size: 5
+      },
+      group: {
+        value: "Group 007",
+        hidable: true
+      },
+      start_date: {
+        value: "22/03/16",
+        hidable: false
+      },
+      end_date: {
+        value: "22/03/18",
+        hidable: false
+      }
     }),
     frequency_select: Generator.create({
       data: [{
@@ -90,22 +100,6 @@
         option_text: "Checkboxes",
         value: "checkbox"
       }]
-    }),
-    t_group: Generator.create({
-      hidable: true
-    }),
-    w_title: Generator.create({
-      hidable: false,
-      placeholder: "Tribe Also Relationship"
-    }),
-    w_desc: Generator.create({
-      hidable: true
-    }),
-    w_custom: Generator.create({
-      hidable: true
-    }),
-    w_code: Generator.create({
-      hidable: false,
     }),
     frequency: Generator.create({
       hidable: false,

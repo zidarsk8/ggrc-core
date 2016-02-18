@@ -24,7 +24,7 @@
                     <div class="row-fluid wrap-row">
                       <div class="span12">
                         <h6>Workflow title</h6>
-                        <input type="text" class="span12" placeholder="Tribe Also Relationship">
+                        <input type="text" class="span12" value="Tribe Also Relationship">
                       </div>
                     </div>
                     <div class="row-fluid wrap-row">
@@ -32,7 +32,7 @@
                         <h6>Description</h6>
                         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
                         <div class="wysiwyg-area">
-                          <textarea rows="4" class="span12 triple wysihtml5" placeholder="Actions internet shareholders customers has given right was reinforcing people interaction investigating decisions deals include. Both legal. Best like environment. By make concept. Etc corporate authority called. Mission governance given. Itself problems mission held."></textarea>
+                          <textarea rows="4" class="span12 triple wysihtml5">Actions internet shareholders customers has given right was reinforcing people interaction investigating decisions deals include. Both legal. Best like environment. By make concept. Etc corporate authority called. Mission governance given. Itself problems mission held.</textarea>
                         </div>
                       </div>
                     </div>
@@ -41,7 +41,7 @@
                         <h6>Custom "Start Workflow" email message</h6>
                         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
                         <div class="wysiwyg-area">
-                          <textarea rows="4" class="span12 triple wysihtml5" placeholder="Way independent norms articulated whom mediated often organizations. Risks non-governmental. One incorporated research. Governance governing interaction. Inter- was respect information. With governance distinguish. Unlike older articulated players."></textarea>
+                          <textarea rows="4" class="span12 triple wysihtml5">Way independent norms articulated whom mediated often organizations. Risks non-governmental. One incorporated research. Governance governing interaction. Inter- was respect information. With governance distinguish. Unlike older articulated players.</textarea>
                         </div>
                       </div>
                     </div>
@@ -67,7 +67,7 @@
                       <div class="span6">
                         <h6>Code</h6>
                         <div class="side-content">
-                          <input type="text" class="span12" placeholder="WORKFLOW-007">
+                          <input type="text" class="span12" value="WORKFLOW-007">
                         </div>
                       </div>
                     </div>
@@ -77,11 +77,12 @@
             </div>
           </div>
 
-          {{#task}}
+          {{#tasks}}
             <div class="relevant-filter-group">
               {{> /static/mustache/mockup_base_templates/object_setup/repeating_block.mustache}}
+              {{> /static/mustache/mockup_base_templates/object_setup/repeating_block_control.mustache}}
             </div>
-          {{/task}}
+          {{/tasks}}
         </div>
 
         <div class="info">
