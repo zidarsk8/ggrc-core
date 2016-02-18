@@ -30,6 +30,8 @@ class InfoWidget(base.Widget):
 
 
 class DashboardInfo(base.Widget):
+  """Model for the dashboard info widget"""
+
   _locator = locator.Dashboard
   URL = environment.APP_URL + url.DASHBOARD
 
@@ -64,6 +66,8 @@ class DashboardInfo(base.Widget):
 
 
 class ProgramInfo(InfoWidget):
+  """Model for program object info widget"""
+
   _locators = locator.ProgramInfoWidget
 
   def __init__(self, driver):
@@ -122,61 +126,85 @@ class ProgramInfo(InfoWidget):
 
 
 class WorkflowInfo(InfoWidget):
+  """Model for workflow object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.WORKFLOWS
 
 
 class AuditInfo(InfoWidget):
+  """Model for audit object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.AUDITS
 
 
 class AssessmentsInfo(InfoWidget):
+  """Model for assessment object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.ASSESSMENTS
 
 
 class RequestsInfo(InfoWidget):
+  """Model for request object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.REQUESTS
 
 
 class IssuesInfo(InfoWidget):
+  """Model for issue object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.ISSUES
 
 
 class RegulationsInfo(InfoWidget):
+  """Model for regulation object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.REGULATIONS
 
 
 class PoliciesInfo(InfoWidget):
+  """Model for policies object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.POLICIES
 
 
 class StandardsInfo(InfoWidget):
+  """Model for standard object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.STANDARDS
 
 
 class ContractsInfo(InfoWidget):
+  """Model for contract object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.CONTRACTS
 
 
 class ClausesInfo(InfoWidget):
+  """Model for clause object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.CLAUSES
 
 
 class SectionsInfo(InfoWidget):
+  """Model for selection object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.SECTIONS
 
 
 class ControlInfo(InfoWidget):
+  """Model for control object info widget"""
+
   _locators = locator.ControlInfoWidget
 
   def __init__(self, driver):
@@ -189,70 +217,98 @@ class ControlInfo(InfoWidget):
 
 
 class ObjectivesInfo(InfoWidget):
+  """Model for objectives object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.OBJECTIVES
 
 
 class PeopleInfo(base.Widget):
+  """Model for people object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.PEOPLE
 
 
 class OrgGroupsInfo(InfoWidget):
+  """Model for org groups object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.ORG_GROUPS
 
 
 class VendorsInfo(InfoWidget):
+  """Model for vendors object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.VENDORS
 
 
 class AccessGroupInfo(InfoWidget):
+  """Model for access group object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.ACCESS_GROUPS
 
 
 class SystemInfo(InfoWidget):
+  """Model for system object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.SYSTEMS
 
 
 class ProcessInfo(InfoWidget):
+  """Model for process object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.PROCESSES
 
 
 class DataAssetInfo(InfoWidget):
+  """Model for data asset object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.DATA_ASSETS
 
 
 class ProductInfo(InfoWidget):
+  """Model for product object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.PRODUCTS
 
 
 class ProjectInfo(InfoWidget):
+  """Model for project object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.PROJECTS
 
 
 class FacilityInfo(InfoWidget):
+  """Model for facility object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.FACILITIES
 
 
 class MarketInfo(InfoWidget):
+  """Model for market object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.MARKETS
 
 
 class RiskInfo(InfoWidget):
+  """Model for risk object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.RISKS
 
 
 class ThreatInfo(InfoWidget):
+  """Model for threat object info widget"""
+
   _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.THREATS

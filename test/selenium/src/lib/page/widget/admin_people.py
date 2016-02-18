@@ -9,6 +9,8 @@ from lib.constants import url
 
 
 class AdminPeople(base.Widget):
+  """Model for people widget on admin dashboard"""
+
   URL = environment.APP_URL \
       + url.ADMIN_DASHBOARD \
       + url.Widget.PEOPLE
