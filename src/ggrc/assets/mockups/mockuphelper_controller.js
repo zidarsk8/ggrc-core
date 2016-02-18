@@ -160,7 +160,29 @@
   });
 
   can.Control("CMS.Controllers.MockupModalView", {
+    defaults: {
+      instance: null
+    }
   }, {
+    '.modal hide': function (el, ev) {
+      this.el = null;
+      this.template = null;
+      this.options.instance = null;
+    },
+    '.modal show': function (el, ev) {
+      var template = el.data('template');
+      var instance = el.data('instance');
+
+      if (template) {
+        this.options.originalInstance = instance.instance;
+        this.options.instance = _.clone(instance.instance);
+        this.template = can.view(template, this.options.instance);
+        this.el = el;
+        this.el.find('.modal-inner-content')
+          .empty()
+          .append(this.template);
+      }
+    },
     ".modal .js-toggle-field change": function (el, ev) {
       var target = this.element.find(el.data("target")),
           val = el.data("value");
@@ -190,19 +212,6 @@
         this.element.find('.active-trigger').removeAttr('rel');
         this.element.find('.active-trigger').removeAttr('data-original-title');
       }
-    },
-    ".modal .add-object-trigger click": function (el, ev) {
-      var clone = _.clone(GGRC.Bootstrap.Mockups.Workflow.Info.tasks);
-      var task = clone[0];
-      var tasks = [];
-      clone.push(tasks);
-
-      console.log('Klon ' + clone);
-      console.log('Task Array ' + task);
-
-      // if (tasks >= 1) {
-      //   $('.close-block').removeClass("hidden");
-      // }
     },
     ".modal .close-trigger click": function (el, ev) {
       var repeatBlock,
