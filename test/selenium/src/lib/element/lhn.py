@@ -42,7 +42,7 @@ class Button(base.Button):
 
   def __init__(self, driver, locator_element, locator_count):
     super(Button, self).__init__(driver, locator_element)
-    count_element = self._driver.find_element(*locator_count)
+    count_element = selenium_utils.get_when_visible(driver, locator_count)
     self.members_count = int(count_element.text)
 
 
@@ -89,14 +89,14 @@ class AccordionGroup(base.DropdownDynamic):
 
   def _set_visible_members(self):
     try:
-        [selenium_utils.wait_until_stops_moving(el)
-         for el in self.members_loaded]
+      [selenium_utils.wait_until_stops_moving(el)
+       for el in self.members_loaded]
 
-        self.members_visible = [el for el in self.members_loaded
-                                if el.is_displayed()]
+      self.members_visible = [el for el in self.members_loaded
+                              if el.is_displayed()]
     except selenium_exception.StaleElementReferenceException:
-        self._update_loaded_members()
-        self._set_visible_members()
+      self._update_loaded_members()
+      self._set_visible_members()
 
   def _get_visible_member_by_title(self, member_title):
     """Hovers over a visible member with the (unique) title "member_title"
@@ -107,18 +107,18 @@ class AccordionGroup(base.DropdownDynamic):
         selenium.webdriver.remote.webelement.WebElement
     """
     try:
-        for el in self.members_visible:
-            if el.text == member_title:
-                break
+      for el in self.members_visible:
+        if el.text == member_title:
+          break
         else:
-            raise exception.ElementNotFound
+          raise exception.ElementNotFound
 
-        return el
+      return el
     except selenium_exception.StaleElementReferenceException:
-        # the elements can go stale, here we refresh them
-        self._update_loaded_members()
-        self._set_visible_members()
-        return self._get_visible_member_by_title(member_title)
+      # the elements can go stale, here we refresh them
+      self._update_loaded_members()
+      self._set_visible_members()
+      return self._get_visible_member_by_title(member_title)
 
   def scroll_down(self):
     pass
@@ -144,10 +144,10 @@ class AccordionGroup(base.DropdownDynamic):
 
     """
     try:
-        el = self._get_visible_member_by_title(member_title)
-        action_chains.ActionChains(self._driver).move_to_element(el).perform()
-        selenium_utils.get_when_visible(self._driver,
-                                        locator.LhnMenu.EXTENDED_INFO)
-        return self._extended_info_cls(self._driver)
+      el = self._get_visible_member_by_title(member_title)
+      action_chains.ActionChains(self._driver).move_to_element(el).perform()
+      selenium_utils.get_when_visible(self._driver,
+                                      locator.LhnMenu.EXTENDED_INFO)
+      return self._extended_info_cls(self._driver)
     except selenium_exception.StaleElementReferenceException:
-        return self.hover_over_visible_member(member_title)
+      return self.hover_over_visible_member(member_title)
