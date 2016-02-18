@@ -34,6 +34,7 @@ from ggrc.services.common import inclusion_filter
 from ggrc.views import filters
 from ggrc.views import mockups
 from ggrc.views import converters
+from ggrc.views import cron
 from ggrc.views.common import RedirectedPolymorphView
 from ggrc.views.registry import object_view
 
@@ -284,7 +285,7 @@ def all_object_views():
   return views
 
 
-def init_extra_views(_):
+def init_extra_views(app):
   """Init any extra views needed by the app
 
   This should be used for any views that might use extension modules.
@@ -292,6 +293,7 @@ def init_extra_views(_):
   mockups.init_mockup_views()
   filters.init_filter_views()
   converters.init_converter_views()
+  cron.init_cron_views(app)
 
 
 def init_all_views(app):

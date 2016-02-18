@@ -3,18 +3,18 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
-import traceback
 from datetime import date, datetime
-from flask import render_template, redirect, url_for, current_app
+from flask import render_template, redirect, url_for
 from ggrc.rbac import permissions
 from jinja2 import Environment, PackageLoader
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
-from ggrc.app import app
 from ggrc import notification
+from ggrc.app import app
 from ggrc.login import login_required
 from ggrc.notification import email
+from ggrc.views.cron import run_job
 from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.models import Workflow
 
@@ -22,35 +22,6 @@ env = Environment(loader=PackageLoader('ggrc_workflows', 'templates'))
 
 # TODO: move these views to ggrc_views and all the functions to notifications
 # module.
-
-def send_error_notification(message):
-  try:
-    user_email = email.getAppEngineEmail()
-    email.send_email(user_email, "Error in nightly cron job", message)
-  except Exception as e:
-    current_app.logger.error(e)
-
-
-def run_job(job):
-  try:
-    job()
-  except:
-    message = "job '{}' failed with: \n{}".format(job.__name__,
-                                                  traceback.format_exc())
-    current_app.logger.error(message)
-    send_error_notification(message)
-
-
-def nightly_cron_endpoint():
-  cron_jobs = [
-    start_recurring_cycles,
-    send_todays_digest_notifications
-  ]
-
-  for job in cron_jobs:
-    run_job(job)
-
-  return 'Ok'
 
 
 def modify_data(data):
@@ -138,17 +109,17 @@ def start_unstarted_cycles():
                         for task in tg.task_group_tasks]
 
     tasks_end_days = [task.relative_end_day
-                    for tg in workflow.task_groups
-                    for task in tg.task_group_tasks]
+                      for tg in workflow.task_groups
+                      for task in tg.task_group_tasks]
 
     # We must skip tasks that don't have start days and end days defined
     if ((not all(tasks_start_days) and not all(tasks_end_days)) or
-          (not tasks_start_days and not tasks_end_days)):
+            (not tasks_start_days and not tasks_end_days)):
       app.logger.info(
-        "Skipping workflow {0} (ID: {1}) because it doesn't "
-        "have relative start and end days specified".format(
-          workflow.title,
-          workflow.id))
+          "Skipping workflow {0} (ID: {1}) because it doesn't "
+          "have relative start and end days specified".format(
+              workflow.title,
+              workflow.id))
       continue
 
     workflow.next_cycle_start_date = date.today()
@@ -160,10 +131,6 @@ def start_unstarted_cycles():
 
 
 def init_extra_views(app):
-  app.add_url_rule(
-      "/nightly_cron_endpoint", "nightly_cron_endpoint",
-      view_func=nightly_cron_endpoint)
-
   app.add_url_rule(
       "/_notifications/show_pending", "show_pending_notifications",
       view_func=login_required(show_pending_notifications))
