@@ -11,16 +11,19 @@ from lib.element import widget_info
 
 
 class InfoWidget(base.Widget):
+  """Model for a generic info widget"""
+
   def __init__(self, driver):
     super(InfoWidget, self).__init__(driver)
 
-    self.button_settings = base.Button(driver, locator.Widget.BUTTON_SETTINGS)
+    self.button_settings = base.Button(driver,
+                                       locator.InfoWidget.BUTTON_SETTINGS)
     self.object_id = self.url.split("/")[-1]
 
   def press_object_settings(self):
     """
     Returns:
-        widget_info.DropdownSettingsPrograms
+        widget_info.DropdownSettings
     """
     self.button_settings.click()
     return widget_info.DropdownSettingsPrograms(self._driver)
@@ -61,8 +64,7 @@ class DashboardInfo(base.Widget):
 
 
 class ProgramInfo(InfoWidget):
-  _locators = locator.Widget
-  URL = environment.APP_URL + url.PROGRAMS
+  _locators = locator.ProgramInfoWidget
 
   def __init__(self, driver):
     """
@@ -120,130 +122,137 @@ class ProgramInfo(InfoWidget):
 
 
 class WorkflowInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.WORKFLOWS
 
 
 class AuditInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.AUDITS
 
 
 class AssessmentsInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.ASSESSMENTS
 
 
 class RequestsInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.REQUESTS
 
 
 class IssuesInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.ISSUES
 
 
 class RegulationsInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.REGULATIONS
 
 
 class PoliciesInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.POLICIES
 
 
 class StandardsInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.STANDARDS
 
 
 class ContractsInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.CONTRACTS
 
 
 class ClausesInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.CLAUSES
 
 
 class SectionsInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.SECTIONS
 
 
-class ControlsInfo(InfoWidget):
-  _locators = locator.Widget
-  URL = environment.APP_URL + url.CONTROLS
+class ControlInfo(InfoWidget):
+  _locators = locator.ControlInfoWidget
+
+  def __init__(self, driver):
+    """
+    Args:
+        driver (base.CustomDriver)
+    """
+    super(ControlInfo, self).__init__(driver)
+    self.title_entered = base.Label(driver, self._locators.TITLE_ENTERED)
 
 
 class ObjectivesInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.OBJECTIVES
 
 
 class PeopleInfo(base.Widget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.PEOPLE
 
 
 class OrgGroupsInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.ORG_GROUPS
 
 
 class VendorsInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.VENDORS
 
 
 class AccessGroupInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.ACCESS_GROUPS
 
 
 class SystemInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.SYSTEMS
 
 
 class ProcessInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.PROCESSES
 
 
 class DataAssetInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.DATA_ASSETS
 
 
 class ProductInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.PRODUCTS
 
 
 class ProjectInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.PROJECTS
 
 
 class FacilityInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.FACILITIES
 
 
 class MarketInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.MARKETS
 
 
 class RiskInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.RISKS
 
 
 class ThreatInfo(InfoWidget):
-  _locators = locator.Widget
+  _locators = locator.ProgramInfoWidget
   URL = environment.APP_URL + url.THREATS

@@ -5,6 +5,7 @@
 
 from lib import base
 from lib import environment
+from lib import selenium_utils
 from lib.constants import url
 from lib.constants import locator
 
@@ -19,7 +20,8 @@ class _Dropdown(base.Component):
     Returns:
         new_custom_attribute.NewCustomAttributeModal
     """
-    self.button_add.click_when_moving_over()
+    selenium_utils.wait_until_stops_moving(self.button_add)
+    self.button_add.click()
     return NewCustomAttributeModal(self._driver)
 
 
