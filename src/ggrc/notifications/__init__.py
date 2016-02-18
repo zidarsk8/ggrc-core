@@ -8,6 +8,8 @@ from sqlalchemy import and_
 from datetime import date, datetime
 from jinja2 import Environment, PackageLoader
 
+from ggrc.rbac import permissions
+from werkzeug.exceptions import Forbidden
 from ggrc.extensions import get_extension_modules
 from ggrc.models import Notification, NotificationConfig
 from ggrc.utils import merge_dict
@@ -147,3 +149,25 @@ def set_notification_sent_time(notif_list):
   for notif in notif_list:
     notif.sent_at = datetime.now()
   db.session.commit()
+
+
+def show_pending_notifications():
+  if not permissions.is_admin():
+    raise Forbidden()
+  _, notif_data = get_pending_notifications()
+
+  for day, day_notif in notif_data.iteritems():
+    for user_email, data in day_notif.iteritems():
+      data = common.modify_data(data)
+  pending = env.get_template("notifications/view_pending_digest.html")
+  return pending.render(data=sorted(notif_data.iteritems()))
+
+
+def show_todays_digest_notifications():
+  if not permissions.is_admin():
+    raise Forbidden()
+  _, notif_data = get_todays_notifications()
+  for user_email, data in notif_data.iteritems():
+    data = common.modify_data(data)
+  todays = env.get_template("notifications/view_todays_digest.html")
+  return todays.render(data=notif_data)

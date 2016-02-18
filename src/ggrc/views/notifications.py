@@ -4,9 +4,19 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from ggrc import notifications
+from ggrc.login import login_required
 
 
 def init_notification_views(app):
   app.add_url_rule(
       "/_notifications/send_todays_digest", "send_todays_digest_notifications",
       view_func=notifications.send_todays_digest_notifications)
+
+  app.add_url_rule(
+      "/_notifications/show_pending", "show_pending_notifications",
+      view_func=login_required(notifications.show_pending_notifications))
+
+  app.add_url_rule(
+      "/_notifications/show_todays_digest", "show_todays_digest_notifications",
+      view_func=login_required(notifications.show_todays_digest_notifications))
+
