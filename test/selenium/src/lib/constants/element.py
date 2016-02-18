@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
-
+"""Module containing element labels or properties e.g. date formatting"""
 
 class LandingPage(object):
   BUTTON_LOGIN = "Login"
@@ -33,6 +33,11 @@ class LhnMenu(object):
 
 
 class WidgetBar(object):
+  """Labels specific for a generic widget bar"""
+
+  # identifier for the object's info page
+  INFO = "Info"
+
   # dropdown
   CLAUSES = "Clauses"
   CONTRACTS = "Contracts"
@@ -53,6 +58,8 @@ class WidgetBar(object):
 
 
 class WidgetProgramInfo(object):
+  """Labels specific to program info widget"""
+
   SUBMIT_FOR_REVIEW = "Submit For Review"
 
   # state in lhn_modal create new page
