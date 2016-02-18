@@ -177,13 +177,16 @@ class AutomapperGenerator(object):
       return
     for attr in implicit:
       if hasattr(instance, attr.name):
-        value = getattr(instance, attr.name)
-        if value is not None:
-          entry = self.relate(Stub(value.type, value.id), dst)
-          if entry not in self.processed:
-            self.queue.add(entry)
-        else:
-          logging.warning('Automapping by attr: %s is None' % attr.name)
+        values = getattr(instance, attr.name)
+        if not isinstance(values, collections.Iterable):
+          values = [values]
+        for value in values:
+          if value is not None:
+            entry = self.relate(Stub(value.type, value.id), dst)
+            if entry not in self.processed:
+              self.queue.add(entry)
+          else:
+            logging.warning('Automapping by attr: %s is None' % attr.name)
       else:
         logging.warning(
             'Automapping by attr: object %s has no attribute %s' %
