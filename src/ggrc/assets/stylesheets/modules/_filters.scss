@@ -85,7 +85,7 @@
     }
   }
   .filter-button {
-    @include clearfix();
+    @extend %clearfix;
     a {
       float: right;
       margin-top: 1px;

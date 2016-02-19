@@ -9,9 +9,9 @@ Governance refers to management structure, policies, procedures, shareholder rel
 
 Risk Management is a process to identify business and technical risks as well as means to mitigate those.
 
-Compliance refers to processes necessary to meet applicable regulations and communicate to stakeholders about it.  
+Compliance refers to processes necessary to meet applicable regulations and communicate to stakeholders about it.
 
-Many organizations operate in multiple jurisdictions worldwide, each of which has its own and often overlapping laws and regulations.   Organizational functions and information relating to risk management and compliance often tend to be managed in silos reflecting the multiple jurisdictions, scope, stakeholder diversity and historical basis.   This leads to inefficiency.  
+Many organizations operate in multiple jurisdictions worldwide, each of which has its own and often overlapping laws and regulations.   Organizational functions and information relating to risk management and compliance often tend to be managed in silos reflecting the multiple jurisdictions, scope, stakeholder diversity and historical basis.   This leads to inefficiency.
 
 The GGRC project intends to provide an open source solution for managing some of these common problems.  The application provides a common system of record for information in this domain.   It provides the ability to capture the relationships and to understand how the pieces fit together.  It also provides workflow capability to manage processes in this domain.
 
@@ -54,7 +54,7 @@ install it via pip)
     git submodule update --init
     vagrant up
     vagrant ssh
-    build_compass
+    build_css
     build_assets
     db_reset
     ```
@@ -81,7 +81,7 @@ directory
     docker-compose up -d
     docker exec -it ggrccore_dev_1 su vagrant
     make bower_components
-    build_compass
+    build_css
     build_assets
     db_reset
     ```
@@ -180,7 +180,7 @@ To run the selenium tests, you must login into your dev container, and run the s
 ```
 docker exec -it ggrccore_dev_1 su vagrant
 make bower_components
-build_compass
+build_css
 build_assets
 db_reset
 launch_ggrc
@@ -303,14 +303,14 @@ This has been automated via a script available in $PATH in the virtual
 machine:
 
 ```sh
-build_compass
+build_css
 ```
 
 To have a process watch the Sass resources and compile them as they are changed
 you could use this command:
 
 ```sh
-watch_compass
+watch_css
 ```
 
 ### Compiling Assets
@@ -321,7 +321,7 @@ For other asset bundling required, there is the following command:
 build_assets
 ```
 
-As for Compass, there is an asset builder that can watch for changes and update
+As for CSS, there is an asset builder that can watch for changes and update
 files as they change:
 
 ```sh
@@ -434,7 +434,7 @@ requirements of GGRC, it may also be necessary to rebuild the Sass and other
 web assets:
 
 ```sh
-build_compass
+build_css
 build_assets
 ```
 

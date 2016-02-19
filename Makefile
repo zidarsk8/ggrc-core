@@ -33,6 +33,7 @@ STATIC_PATH=$(PREFIX)/src/ggrc/static
 BOWER_PATH=$(PREFIX)/bower_components
 DEV_BOWER_PATH=$(DEV_PREFIX)/bower_components
 BOWER_BIN_PATH=/vagrant-dev/node_modules/bower/bin/bower
+NODE_MODULES_PATH=$(DEV_PREFIX)/node_modules
 
 $(APPENGINE_SDK_PATH) : $(APPENGINE_ZIP_PATH)
 	@echo $( dirname $(APPENGINE_ZIP_PATH) )
@@ -123,7 +124,7 @@ setup_dev : dev_virtualenv_packages linked_packages
 ## Deployment!
 
 src/ggrc/assets/stylesheets/dashboard.css : src/ggrc/assets/stylesheets/*.scss
-	bin/build_compass -e production --force
+	bin/build_css -p
 
 src/ggrc/assets/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/ggrc/assets
 	source "bin/init_env"; \
@@ -155,7 +156,7 @@ bower_components : bower.json
 	ln -s $(DEV_BOWER_PATH) $(BOWER_PATH)
 	$(BOWER_BIN_PATH) install --allow-root
 	cp $(BOWER_PATH)/zeroclipboard/dist/ZeroClipboard.swf $(FLASH_PATH)/ZeroClipboard.swf
-	cp -r $(BOWER_PATH)/fontawesome/fonts $(STATIC_PATH)
+	cp -r $(NODE_MODULES_PATH)/font-awesome/fonts $(STATIC_PATH)
 
 clean_bower_components :
 	rm -rf $(BOWER_PATH) $(FLASH_PATH) $(STATIC_PATH)/fonts

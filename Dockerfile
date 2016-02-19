@@ -1,6 +1,7 @@
 FROM phusion/baseimage
 
 RUN rm /usr/sbin/policy-rc.d \
+  && curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash \
   && apt-get update \
   && apt-get install -y \
     curl \
@@ -9,19 +10,16 @@ RUN rm /usr/sbin/policy-rc.d \
     make \
     mysql-server \
     nodejs \
-    npm \
     python-imaging \
     python-mysqldb \
     python-pip \
     python-pycurl \
     python-virtualenv \
-    ruby \
     sqlite3 \
     unzip \
     vim \
     wget \
-    zip \
-  && ln -s /usr/bin/nodejs /usr/bin/node
+    zip
 
 COPY ./provision/docker/01_start_mysql.sh /etc/my_init.d/
 
@@ -44,9 +42,6 @@ WORKDIR /vagrant
 COPY ./package.json /vagrant-dev/
 RUN cd /vagrant-dev \
   && npm install
-
-RUN gem install sass -v 3.2.13 \
-  && gem install compass -v 0.12.2
 
 COPY ./Makefile ./bower.json /vagrant/
 RUN make bower_components DEV_PREFIX=/vagrant-dev

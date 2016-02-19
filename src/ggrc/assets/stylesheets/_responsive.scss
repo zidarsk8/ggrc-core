@@ -248,8 +248,8 @@
     ul.sub-level {
       li {
         a {
-          min-height: 24px !important;
           @include clearfix();
+          min-height: 24px !important;
           &:hover {
             text-decoration: none;
           }

@@ -127,7 +127,7 @@ ul.new-tree {
   }
   &.request-list {
     .item-data {
-      @include clearfix();
+      @extend %clearfix;
       padding-left: 5px;
       overflow: visible;
       .type {
@@ -163,7 +163,7 @@ ul.new-tree {
       }
     }
     .control-wrap {
-      @include clearfix();
+      @extend %clearfix;
       padding-right: 5px;
     }
     .date {
@@ -912,7 +912,7 @@ ul.new-tree {
 }
 
 .tier-2-info-content {
-  @include clearfix();
+  @extend %clearfix;
   padding: 0 10px 0 32px;
   position: relative;
   font-size: 13px;
@@ -957,7 +957,7 @@ ul.new-tree {
 
   .info-audit {
     @extend %reset-list;
-    @include clearfix();
+    @extend %clearfix;
     margin: 10px 0 0;
     li {
       float: left;

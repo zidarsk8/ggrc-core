@@ -30,7 +30,7 @@
 }
 
 .pin-action {
-  @include clearfix();
+  @extend %clearfix;
   @extend %reset-list;
   float: right;
   li {
@@ -73,7 +73,7 @@
 }
 
 .info-pane-utility {
-  @include clearfix();
+  @extend %clearfix;
   float: right;
   .sticky-info-panel & {
     position: fixed;
@@ -93,7 +93,7 @@
   width: 60px;
   position: relative;
   .dropdown-toggle {
-    @include clearfix();
+    @extend %clearfix;
     height: 8px;
     padding-top: 9px;
     padding-bottom: 9px;
@@ -105,7 +105,7 @@
     display: block;
   }
   &.pin {
-    @include clearfix();
+    @extend %clearfix;
     width: auto;
     margin-left: 5px;
     margin-top: -10px !important;

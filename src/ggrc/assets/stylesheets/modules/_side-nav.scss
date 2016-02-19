@@ -22,7 +22,7 @@
 }
 
 .lhn-type {
-  @include clearfix();
+  @extend %clearfix;
   @include transition-property(left);
   @include transition-duration(.8s);
   min-width: 240px;
@@ -76,7 +76,7 @@ h4.search-title {
 }
 
 .lhs-search {
-  @include clearfix();
+  @extend %clearfix;
   padding:10px 20px 10px 10px;
   .widgetsearch {
     @include border-radius(0);
@@ -138,7 +138,7 @@ h4.search-title {
 }
 
 .lhn-type {
-  @include clearfix();
+  @extend %clearfix;
   @include transition(left, 0.8s);
   min-width: 240px;
   left: -246px;

@@ -8,7 +8,7 @@
 .widget {
   .tree-action-list {
     @extend %reset-list;
-    @include clearfix();
+    @extend %clearfix;
     text-align: right;
     height: 28px;
     li {

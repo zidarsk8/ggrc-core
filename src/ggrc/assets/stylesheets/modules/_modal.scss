@@ -169,7 +169,7 @@
     }
     &.multi-selector {
       .multi-select-search {
-        @include clearfix();
+        @extend %clearfix;
       }
       .multi-select-submit {
         @include border-radius(14px 0 0 14px);
@@ -856,7 +856,7 @@
     .selector-list {
       ul {
         @extend %reset-list;
-        @include clearfix();
+        @extend %clearfix;
       }
       li {
         float: left;

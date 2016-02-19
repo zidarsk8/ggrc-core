@@ -67,7 +67,7 @@
 }
 
 .info-pane-utility {
-  @include clearfix();
+  @extend %clearfix;
   float: right;
   .sticky-info-panel & {
     position: fixed;

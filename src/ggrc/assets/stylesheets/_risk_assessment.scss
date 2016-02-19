@@ -28,7 +28,7 @@
 }
 
 .heat-map-wrap {
-  @include clearfix();
+  @extend %clearfix;
   background: $gray;
   margin-bottom: 20px;
 }
@@ -67,7 +67,7 @@
 }
 
 .map-grid {
-  @include clearfix();
+  @extend %clearfix;
   float: left;
   width: 70%;
   border-top: 1px solid $black;
@@ -81,7 +81,7 @@
   width: 80%;
   margin: 0 auto;
   ul {
-    @include clearfix();
+    @extend %clearfix;
     @extend %reset-list;
   }
   li {
@@ -132,7 +132,7 @@
 .risks-list {
   @extend %reset-list;
   li {
-    @include clearfix();
+    @extend %clearfix;
     display: block;
     margin: 2px 2px 0;
     border: 1px solid $black;

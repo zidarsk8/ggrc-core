@@ -7,7 +7,7 @@
 
 .menu {
   @extend %reset-list;
-  @include clearfix();
+  @extend %clearfix;
   position: absolute;
   right: 0px;
   margin-right: 40px;
