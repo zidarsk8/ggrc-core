@@ -413,7 +413,7 @@ class ModalCreateNewRisk(object):
       By.CSS_SELECTOR,
       '.modal-body form>div:nth-child(2) .span6>input')
   UI_DESCRIPTION = (
-    By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
+      By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
 
   BUTTON_SAVE_AND_CLOSE = (
       By.CSS_SELECTOR,

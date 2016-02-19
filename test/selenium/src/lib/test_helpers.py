@@ -51,8 +51,10 @@ class ModalNewControlPage(base.Test):
         modal (lib.page.lhn_modal.new_control.NewControlModal)
     """
     modal.enter_title(add_random_string_after(modal_create_new.SHORT_TITLE))
-    modal.enter_description(add_random_string_after(modal_create_new.SHORT_TITLE))
-    modal.enter_test_plan(add_random_string_after(modal_create_new.SHORT_TITLE))
+    modal.enter_description(add_random_string_after(
+        modal_create_new.SHORT_TITLE))
+    modal.enter_test_plan(add_random_string_after(
+        modal_create_new.SHORT_TITLE))
     modal.enter_notes(add_random_string_after(modal_create_new.SHORT_TITLE))
     modal.enter_code(add_random_string_after(modal_create_new.SHORT_TITLE))
 
@@ -120,7 +122,7 @@ class ModalNewOrgGroupPage(base.Test):
         modal (lib.page.modal.edit_object.EditOrgGroupModal)
     """
     modal.enter_title(add_random_string_after(
-      modal_custom_attribute.Program.TITLE))
+        modal_custom_attribute.Program.TITLE))
 
 
 class ModalRiskPage(base.Test):
@@ -132,7 +134,6 @@ class ModalRiskPage(base.Test):
         modal (lib.page.modal.edit_object.EditRiskModal)
     """
     modal.enter_title(add_random_string_after(
-      modal_custom_attribute.Program.TITLE))
+        modal_custom_attribute.Program.TITLE))
     modal.enter_description(add_random_string_after(
-      modal_custom_attribute.Program.TITLE))
-
+        modal_custom_attribute.Program.TITLE))
