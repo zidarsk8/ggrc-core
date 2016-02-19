@@ -105,11 +105,14 @@
         </div>
       </div>
 
-      {{#tasks}}
-        <div class="relevant-filter-group">
-          {{> /static/mustache/mockup_base_templates/object_setup/repeating_block.mustache}}
+      <div class="relevant-filter-group">
+        <div class="relevant-block-wrap">
+          {{#tasks}}
+            {{> /static/mustache/mockup_base_templates/object_setup/repeating_block.mustache}}
+          {{/tasks}}
         </div>
-      {{/tasks}}
+      </div>
+
     </div>
   </section>
 

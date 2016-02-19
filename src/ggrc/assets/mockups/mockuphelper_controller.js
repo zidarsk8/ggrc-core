@@ -97,65 +97,6 @@
       },
       ".filter-trigger click": function (el, ev) {
         this.element.find(".filter-holder").slideToggle(this.options.slide_speed);
-      },
-      '.dropdown-menu-form ul click' : function (el, ev) {
-        ev.stopPropagation();
-      },
-      '.dropdown-menu-form input change' : function (el, ev) {
-        var checkedValue = el.val(),
-            targetValue = this.element
-            .find("[data-value='" + checkedValue + "']");
-
-        if (targetValue.hasClass('hidden')) {
-          targetValue.removeClass('hidden');
-        } else {
-          targetValue.addClass('hidden');
-        }
-      },
-      '.all change' : function (el, ev) {
-        var $allTrigger = $('.all'),
-            $allCheckboxes = $('.attr-checkbox'),
-            $hidable = $('.hidable');
-
-        if (!$allTrigger.hasClass('triggered')) {
-          $allTrigger.addClass('triggered');
-          $hidable.removeClass('hidden');
-          $allCheckboxes.prop('checked', true);
-        } else {
-          $allTrigger.removeClass('triggered');
-          $hidable.addClass('hidden');
-          $allCheckboxes.prop('checked', false);
-        }
-      },
-      ".type-select change": function (el, ev) {
-        var isOptions = el.val() === 'menu' || el.val() === 'checkbox',
-            isText = el.val() === 'text';
-
-        if (isOptions) {
-          this.element.find('.text-wrap').hide();
-          this.element.find('.options-wrap').show();
-        } else if (isText) {
-          this.element.find('.text-wrap').show();
-          this.element.find('.options-wrap').hide();
-        }
-      },
-      "a.field-hide click" : function(el, ev) { //field hide
-        var $el = $(el),
-          $hidable = $el.closest('[class*="span"].hidable');
-
-        $hidable.addClass("hidden");
-        this.options.reset_visible = true;
-        var ui_unit = $hidable.find('[tabindex]');
-        var i, tab_value;
-        for (i = 0; i < ui_unit.length; i++) {
-          tab_value = $(ui_unit[i]).attr('tabindex');
-          if(tab_value > 0) {
-            this.options.ui_array[tab_value-1] = 1;
-            $(ui_unit[i]).attr('tabindex', '-1');
-            $(ui_unit[i]).attr('uiindex', tab_value);
-          }
-        }
-        return false;
       }
   });
 
@@ -218,6 +159,20 @@
           objects: {}
         }
       });
+      if (this.options.instance.tasks.length > 1) {
+        $(".modal .close-block").removeClass("hidden");
+      }
+    },
+    ".modal .close-trigger click": function (el, ev) {
+      var repeatBlock,
+          close = $(".modal .close-block");
+
+      el.closest('.repeated-block').remove();
+      repeatBlock = $('.modal .repeated-block').length;
+
+      if (repeatBlock === 1) {
+        close.addClass("hidden");
+      }
     },
     ".modal .js-toggle-field change": function (el, ev) {
       var target = this.element.find(el.data("target")),
@@ -249,15 +204,63 @@
         this.element.find('.active-trigger').removeAttr('data-original-title');
       }
     },
-    ".modal .close-trigger click": function (el, ev) {
-      var repeatBlock,
-          close = $(".modal .close-block");
+    '.all change' : function (el, ev) {
+      var $allTrigger = $('.all'),
+          $allCheckboxes = $('.attr-checkbox'),
+          $hidable = $('.hidable');
 
-      el.closest('.repeated-block').remove();
-      repeatBlock = $('.modal .repeated-block').length;
+      if (!$allTrigger.hasClass('triggered')) {
+        $allTrigger.addClass('triggered');
+        $hidable.removeClass('hidden');
+        $allCheckboxes.prop('checked', true);
+      } else {
+        $allTrigger.removeClass('triggered');
+        $hidable.addClass('hidden');
+        $allCheckboxes.prop('checked', false);
+      }
+    },
+    ".type-select change": function (el, ev) {
+      var isOptions = el.val() === 'menu' || el.val() === 'checkbox',
+          isText = el.val() === 'text';
 
-      if (repeatBlock === 1) {
-        close.addClass("hidden");
+      if (isOptions) {
+        this.element.find('.text-wrap').hide();
+        this.element.find('.options-wrap').show();
+      } else if (isText) {
+        this.element.find('.text-wrap').show();
+        this.element.find('.options-wrap').hide();
+      }
+    },
+    "a.field-hide click" : function(el, ev) { //field hide
+      var $el = $(el),
+        $hidable = $el.closest('[class*="span"].hidable');
+
+      $hidable.addClass("hidden");
+      this.options.reset_visible = true;
+      var ui_unit = $hidable.find('[tabindex]');
+      var i, tab_value;
+      for (i = 0; i < ui_unit.length; i++) {
+        tab_value = $(ui_unit[i]).attr('tabindex');
+        if(tab_value > 0) {
+          this.options.ui_array[tab_value-1] = 1;
+          $(ui_unit[i]).attr('tabindex', '-1');
+          $(ui_unit[i]).attr('uiindex', tab_value);
+        }
+      }
+      return false;
+    },
+    '.dropdown-menu-form ul click' : function (el, ev) {
+      ev.stopPropagation();
+    },
+    '.dropdown-menu-form input change' : function (el, ev) {
+      var checkedValue = el.val(),
+          targetValue = this.element
+          .find("[data-value='" + checkedValue + "']");
+
+      if (targetValue.hasClass('hidden')) {
+        targetValue.removeClass('hidden');
+      } else {
+        targetValue.addClass('hidden');
       }
     },
     ".object-check-all click": function (el, ev) {

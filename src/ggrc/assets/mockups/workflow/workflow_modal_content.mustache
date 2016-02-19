@@ -81,14 +81,16 @@
       </div>
     </div>
 
-    {{#tasks}}
-      <div class="relevant-filter-group">
-        {{> /static/mustache/mockup_base_templates/object_setup/repeating_block.mustache}}
+    <div class="relevant-filter-group">
+      <div class="relevant-block-wrap">
+        {{#tasks}}
+          {{> /static/mustache/mockup_base_templates/object_setup/repeating_block.mustache}}
+        {{/tasks}}
       </div>
-    {{/tasks}}
+    </div>
     {{#if tasks}}
-      <div class="add-rule add-object">
-        <a href="#" class="add-task-trigger btn btn-small btn-info">Add another task</a>
+      <div class="add-rule-wrap">
+        {{> /static/mustache/mockup_base_templates/object_setup/repeating_block_control.mustache}}
       </div>
     {{/if}}
   </div>
