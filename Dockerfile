@@ -15,7 +15,6 @@ RUN rm /usr/sbin/policy-rc.d \
     python-pip \
     python-pycurl \
     python-virtualenv \
-    ruby \
     sqlite3 \
     unzip \
     vim \
