@@ -10,11 +10,21 @@ from lib.constants import locator
 
 
 class _EditModal(base.Modal):
+  _locator_ui_title = None
   locator_button_save = None
 
   def __init__(self, driver):
     super(_EditModal, self).__init__(driver)
     self.button_save_and_close = base.Button(driver, self.locator_button_save)
+    self.ui_title = base.TextInputField(self._driver,
+                                        self._locator_ui_title)
+
+  def enter_title(self, text):
+    """
+    Args:
+        text (str or unicode)
+    """
+    self.ui_title.enter_text(text)
 
   def save_and_close(self):
     """Saves this object"""
@@ -22,19 +32,18 @@ class _EditModal(base.Modal):
     self.wait_for_redirect()
 
 
-class EditProgramModalBase(_EditModal):
+class EditProgramModal(_EditModal):
   """Class representing a modal visible after clicking the settings button
   in the info widget and selecting edit"""
 
   _locators = locator.ModalCreateNewProgram
+  _locator_ui_title = locator.ModalCreateNewProgram.UI_TITLE
   locator_button_save = locator.ModalCreateNewProgram.BUTTON_SAVE_AND_CLOSE
 
   def __init__(self, driver):
-    super(EditProgramModalBase, self).__init__(driver)
+    super(EditProgramModal, self).__init__(driver)
 
     # user input elements
-    self.ui_title = base.TextInputField(self._driver,
-                                        self._locators.UI_TITLE)
     self.ui_description = base.Iframe(
         self._driver, self._locators.UI_DESCRIPTION)
     self.ui_notes = base.Iframe(self._driver,
@@ -70,14 +79,6 @@ class EditProgramModalBase(_EditModal):
     self.title = base.Label(self._driver, self._locators.TITLE)
     self.description = base.Label(self._driver, self._locators.DESCRIPTION)
     self.program_url = base.Label(self._driver, self._locators.PROGRAM_URL)
-
-  def enter_title(self, text):
-    """Enters the text into the title base.
-
-    Args:
-        text (str or unicode)
-    """
-    self.ui_title.enter_text(text)
 
   def enter_description(self, description):
     """Enters the text into the description element
@@ -158,6 +159,7 @@ class EditControlModal(_EditModal):
   control from LHN"""
 
   _locators = locator.ModalCreateNewControl
+  _locator_ui_title = locator.ModalCreateNewControl.UI_TITLE
   locator_button_save = locator.ModalCreateNewControl.BUTTON_SAVE_AND_CLOSE
 
   def __init__(self, driver):
@@ -189,7 +191,6 @@ class EditControlModal(_EditModal):
     self.categories = base.Label(driver, self._locators.CATEGORIES)
     self.state = base.Label(driver, self._locators.STATE)
 
-    self.ui_title = base.TextInputField(driver, self._locators.UI_TITLE)
     self.ui_description = base.Iframe(driver, self._locators.UI_DESCRIPTION)
     self.ui_test_plan = base.Iframe(driver, self._locators.UI_TEST_PLAN)
     self.ui_notes = base.Iframe(driver, self._locators.UI_NOTES)
@@ -241,13 +242,6 @@ class EditControlModal(_EditModal):
     self.button_hide_all_optional_fields = base.Button(
         driver, self._locators.BUTTON_HIDE_ALL_OPTIONAL_FIELDS)
 
-  def enter_title(self, text):
-    """
-    Args:
-        text (str or unicode)
-    """
-    self.ui_title.enter_text(text)
-
   def enter_description(self, text):
     """
     Args:
@@ -275,3 +269,11 @@ class EditControlModal(_EditModal):
         text (str or unicode)
     """
     self.ui_code.enter_text(text)
+
+
+class EditOrgGroupModal(_EditModal):
+  """Class representing a new program modal visible after creating a new
+  control from LHN"""
+
+  _locator_ui_title = locator.ModalCreateNewOrgGroup.UI_TITLE
+  locator_button_save = locator.ModalCreateNewOrgGroup.BUTTON_SAVE_AND_CLOSE
