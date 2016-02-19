@@ -2,8 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+
 """A page model for LHN"""
-import lib.page.modal.create_new_object
+
 from lib import base
 from lib.constants import locator
 from lib.element import lhn
@@ -18,7 +19,6 @@ class _Programs(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROGRAM
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_PROGRAMS_MEMBERS
   _create_new_modal_cls = modal.create_new_object.NewProgramModal
-  _modal_cls = lib.page.modal.create_new_object.NewProgramModal
 
 
 class _Workflows(lhn.AccordionGroup):
@@ -259,18 +259,18 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     )
     self.button_org_groups = lhn.Button(
         self._driver,
-        locator.LhnMenu.PEOPLE,
-        locator.LhnMenu.PEOPLE_COUNT
+        locator.LhnMenu.ORG_GROUPS,
+        locator.LhnMenu.ORG_GROUPS_COUNT
     )
     self.button_vendors = lhn.Button(
         self._driver,
-        locator.LhnMenu.PEOPLE,
-        locator.LhnMenu.PEOPLE_COUNT
+        locator.LhnMenu.VENDORS,
+        locator.LhnMenu.VENDORS_COUNT
     )
     self.button_access_groups = lhn.Button(
         self._driver,
-        locator.LhnMenu.PEOPLE,
-        locator.LhnMenu.PEOPLE_COUNT
+        locator.LhnMenu.ACCESS_GROUPS,
+        locator.LhnMenu.ACCESS_GROUPS_COUNT
     )
 
   def select_people(self):
@@ -318,6 +318,8 @@ class _OrgGroups(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ORG_GROUP
   _locator_spinny = locator.LhnMenu.SPINNY_ORG_GROUPS
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_ORG_GROUP_MEMBERS
+  _create_new_modal_cls = modal.create_new_object.NewOrgGroupModal
 
 
 class _Vendors(lhn.AccordionGroup):
