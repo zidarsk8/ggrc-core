@@ -31,6 +31,8 @@ class DropdownSettings(base.Component):
     self.edit.click()
     selenium_utils.get_when_visible(
         self._driver, self._edit_modal_cls.locator_button_save)
+
+    # pylint: disable=not-callable
     return self._edit_modal_cls(self._driver)
 
   def select_get_permalink(self):
@@ -42,16 +44,20 @@ class DropdownSettings(base.Component):
         modal.delete_object.DeleteObjectModal
     """
     self.delete.click()
+
+    # pylint: disable=not-callable
     return self._delete_modal_cls(self._driver)
 
 
 class DropdownSettingsPrograms(DropdownSettings):
+  """A model for the settings dropdown on the program object"""
+
   _locator = locator.ProgramInfoWidget
   _delete_modal_cls = modal.delete_object.DeleteProgramModal
   _edit_modal_cls = modal.edit_object.EditProgramModal
 
   def __init__(self, driver):
-    super(DropdownSettings, self).__init__(driver)
+    super(DropdownSettingsPrograms, self).__init__(driver)
     self.edit = base.Button(driver, self._locator.DROPDOWN_SETTINGS_EDIT)
     self.permalink = base.Button(driver,
                                  self._locator.DROPDOWN_SETTINGS_PERMALINK)

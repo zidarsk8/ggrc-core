@@ -10,6 +10,8 @@ from lib.constants import locator
 
 
 class _EditModal(base.Modal):
+  """Base class for the edit modal"""
+
   _locator_ui_title = None
   locator_button_save = None
 

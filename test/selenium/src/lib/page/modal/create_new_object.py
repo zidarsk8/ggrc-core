@@ -11,6 +11,8 @@ from lib.page.modal import edit_object
 
 
 class _CreateNewObjectModal(base.Modal):
+  """Base create modal model"""
+
   _locator_button_add_another = None
 
   def __init__(self, driver):
