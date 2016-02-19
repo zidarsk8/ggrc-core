@@ -48,7 +48,7 @@ class DropdownSettings(base.Component):
 class DropdownSettingsPrograms(DropdownSettings):
   _locator = locator.ProgramInfoWidget
   _delete_modal_cls = modal.delete_object.DeleteProgramModal
-  _edit_modal_cls = modal.edit_object.EditProgramModalBase
+  _edit_modal_cls = modal.edit_object.EditProgramModal
 
   def __init__(self, driver):
     super(DropdownSettings, self).__init__(driver)
