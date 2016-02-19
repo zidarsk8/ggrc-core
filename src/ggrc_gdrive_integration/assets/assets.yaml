@@ -13,7 +13,6 @@ dashboard-js-files:
 
 dashboard-js-spec-files:
   - models/gdrive_models_spec.js
-  - controllers/gdrive_workflows_controller_spec.js
 
 dashboard-js-template-files:
   - responses/gdrive_upload_evidence.mustache
