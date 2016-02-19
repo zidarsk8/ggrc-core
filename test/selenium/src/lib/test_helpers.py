@@ -19,6 +19,14 @@ from lib.constants.test import modal_create_new
 from lib.constants.test import modal_custom_attribute
 
 
+def add_random_string_after(text):
+  return text + str(uuid.uuid4())
+
+
+def add_random_string_before(text):
+  return str(uuid.uuid4()) + text
+
+
 class HtmlParser(base.Test):
   """The HtmlParser class simulates what happens with (non-rich)text in HTML.
   """
@@ -42,11 +50,11 @@ class ModalNewControlPage(base.Test):
     Args:
         modal (lib.page.lhn_modal.new_control.NewControlModal)
     """
-    modal.enter_title(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
-    modal.enter_description(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
-    modal.enter_test_plan(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
-    modal.enter_notes(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
-    modal.enter_code(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
+    modal.enter_title(add_random_string_after(modal_create_new.SHORT_TITLE))
+    modal.enter_description(add_random_string_after(modal_create_new.SHORT_TITLE))
+    modal.enter_test_plan(add_random_string_after(modal_create_new.SHORT_TITLE))
+    modal.enter_notes(add_random_string_after(modal_create_new.SHORT_TITLE))
+    modal.enter_code(add_random_string_after(modal_create_new.SHORT_TITLE))
 
 
 class ModalNewProgramPage(base.Test):
@@ -59,18 +67,17 @@ class ModalNewProgramPage(base.Test):
     Args:
         modal (lib.page.modal.edit_object.EditProgramModal)
     """
-    modal.enter_title(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
-    modal.enter_description(
-        modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
-    modal.enter_notes(
-        modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
-    modal.enter_code(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
+    modal.enter_title(add_random_string_after(modal_create_new.SHORT_TITLE))
+    modal.enter_description(add_random_string_after(
+        modal_create_new.SHORT_TITLE))
+    modal.enter_notes(add_random_string_after(modal_create_new.SHORT_TITLE))
+    modal.enter_code(add_random_string_after(modal_create_new.SHORT_TITLE))
     modal.filter_and_select_primary_contact("example")
     modal.filter_and_select_secondary_contact("example")
-    modal.enter_program_url(
-        str(uuid.uuid4()) + modal_create_new.Program.PROGRAM_URL)
-    modal.enter_reference_url(
-        str(uuid.uuid4()) + modal_create_new.Program.REFERENCE_URL)
+    modal.enter_program_url(add_random_string_before(
+        modal_create_new.Program.PROGRAM_URL))
+    modal.enter_reference_url(add_random_string_before(
+        modal_create_new.Program.REFERENCE_URL))
 
   @staticmethod
   def set_start_end_dates(modal, day_start, day_end):
@@ -94,11 +101,14 @@ class ModalNewProgramCustomAttributePage(base.Test):
     """Fills out all fields in the lhn_modal
 
     Args:
-        modal (lib.page.widget.custom_attribute.NewCustomAttributeModal)
+        modal (lib.page.modal.custom_attribute.NewCustomAttributeModal)
     """
-    modal.enter_title(modal_custom_attribute.Program.TITLE)
-    modal.enter_inline_help(modal_custom_attribute.Program.INLINE_HELP)
-    modal.enter_placeholder(modal_custom_attribute.Program.PLACEHOLDER)
+    modal.enter_title(add_random_string_after(
+        modal_custom_attribute.Program.TITLE))
+    modal.enter_inline_help(add_random_string_after(
+        modal_custom_attribute.Program.INLINE_HELP))
+    modal.enter_placeholder(add_random_string_after(
+        modal_custom_attribute.Program.PLACEHOLDER))
 
 
 class ModalNewOrgGroupPage(base.Test):
@@ -107,6 +117,22 @@ class ModalNewOrgGroupPage(base.Test):
     """Fills out all fields in the lhn_modal
 
     Args:
-        modal (lib.page.widget.custom_attribute.NewCustomAttributeModal)
+        modal (lib.page.modal.edit_object.EditOrgGroupModal)
     """
-    modal.enter_title(modal_custom_attribute.Program.TITLE)
+    modal.enter_title(add_random_string_after(
+      modal_custom_attribute.Program.TITLE))
+
+
+class ModalRiskPage(base.Test):
+  @staticmethod
+  def enter_test_data(modal):
+    """Fills out all fields in the lhn_modal
+
+    Args:
+        modal (lib.page.modal.edit_object.EditRiskModal)
+    """
+    modal.enter_title(add_random_string_after(
+      modal_custom_attribute.Program.TITLE))
+    modal.enter_description(add_random_string_after(
+      modal_custom_attribute.Program.TITLE))
+
