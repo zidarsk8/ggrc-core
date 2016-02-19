@@ -449,6 +449,7 @@ mockup-js-template-files:
   - workflow/info.mustache
   - workflow/cycle.mustache
   - workflow/workflow_setup_modal.mustache
+  - workflow/workflow_modal_content.mustache
 
   # Quick Workflow
   - quick-workflow/info.mustache

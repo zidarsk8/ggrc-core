@@ -69,6 +69,17 @@
       end_date: {
         value: "22/03/18",
         hidable: false
+      },
+      mappedd: {
+        objects: Generator.create({
+          icon: ['objective', 'control', 'regulation'],
+          title: '%title',
+          description: '%text',
+          state: ['In Progress', 'Draft']
+        }, {
+          count: 5,
+          randomize: ['state', 'icon']
+        })
       }
     }),
     frequency_select: Generator.create({
