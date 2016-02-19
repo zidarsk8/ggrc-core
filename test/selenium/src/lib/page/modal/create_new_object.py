@@ -44,7 +44,15 @@ class NewControlModal(_CreateNewObjectModal, edit_object.EditControlModal):
 
 class NewOrgGroupModal(_CreateNewObjectModal, edit_object.EditOrgGroupModal):
   """Class representing an org group modal visible after creating a new
-  program from LHN"""
+  org group from LHN"""
 
   _locator_button_add_another = locator.ModalCreateNewOrgGroup \
+      .BUTTON_SAVE_AND_ADD_ANOTHER
+
+
+class NewRiskModal(_CreateNewObjectModal, edit_object.EditRiskModal):
+  """Class representing a risk modal visible after creating a new
+  risk from LHN"""
+
+  _locator_button_add_another = locator.ModalCreateNewRisk \
       .BUTTON_SAVE_AND_ADD_ANOTHER
