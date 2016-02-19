@@ -2,7 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
-"""All smoke tests relevant to program page"""
+
+"""All smoke tests relevant to people/groups page"""
 
 import pytest    # pylint: disable=import-error
 from lib import base
@@ -10,7 +11,7 @@ from lib.constants import url
 
 
 class TestOrgGroupPage(base.Test):
-  """Tests the org group page a part of smoke tests, section 7."""
+  """Tests the org group page, a part of smoke tests, section 7."""
 
   @pytest.mark.smoke_tests
   def test_app_redirects_to_new_org_group_page(self, new_org_group):
