@@ -2,4 +2,5 @@ bower_components/*
 third_party/*
 
 src/ggrc/static/**/*.js
+src/ggrc/assets/stylesheets/*.js
 src/parser/parser_template.js
