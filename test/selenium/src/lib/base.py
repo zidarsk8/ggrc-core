@@ -496,10 +496,9 @@ class Widget(AbstractPage):
     super(Widget, self).__init__(driver)
 
     if "#" in self.url:
-      for part in self.url.split("/"):
-        if "#" in part:
-          self.object_id, self.widget_name = part.split("#")
-          break
+      self.object_id = self.url.split("#")[0].split("/")[-1]
+      self.widget_name = self.url.split("#")[1].split("/")[0] or \
+          constants.element.WidgetBar.INFO
     else:
       self.object_id = self.url.split("/")[-1]
       self.widget_name = constants.element.WidgetBar.INFO
