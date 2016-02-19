@@ -1,9 +1,14 @@
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>  
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>  
+# Created By: miha@reciprocitylabs.com                                           
+# Maintained By: miha@reciprocitylabs.com                                        
+
 FROM selenium/standalone-chrome-debug
 
 COPY ./provision/docker/selenium.bashrc.j2 /root/.bashrc
 RUN apt-get update && apt-get install -y python python-pip xserver-xephyr
 
-COPY ./test/selenium/resources/requirements.txt /tmp/requirements.txt
+COPY ./src/dev-requirements.txt /tmp/requirements.txt
 RUN pip install pip \
   && pip install -r /tmp/requirements.txt
 
