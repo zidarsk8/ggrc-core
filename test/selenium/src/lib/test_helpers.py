@@ -57,7 +57,7 @@ class ModalNewProgramPage(base.Test):
     """Fills out all fields in the lhn_modal
 
     Args:
-        modal (lib.page.modal.edit_object.EditProgramModalBase)
+        modal (lib.page.modal.edit_object.EditProgramModal)
     """
     modal.enter_title(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
     modal.enter_description(
@@ -78,7 +78,7 @@ class ModalNewProgramPage(base.Test):
     Sets the dates from the datepicker in the new program/edit modal.
 
     Args:
-      modal (lib.page.modal.edit_object.EditProgramModalBase)
+      modal (lib.page.modal.edit_object.EditProgramModal)
       day_start (int): for more info see
         base.DatePicker.select_day_in_current_month
       day_end (int): for more info see
@@ -88,7 +88,7 @@ class ModalNewProgramPage(base.Test):
     modal.enter_stop_date_end_month(day_end)
 
 
-class ModalNewProgramCustomAttribute(base.Test):
+class ModalNewProgramCustomAttributePage(base.Test):
   @staticmethod
   def enter_test_data(modal):
     """Fills out all fields in the lhn_modal
@@ -99,3 +99,14 @@ class ModalNewProgramCustomAttribute(base.Test):
     modal.enter_title(modal_custom_attribute.Program.TITLE)
     modal.enter_inline_help(modal_custom_attribute.Program.INLINE_HELP)
     modal.enter_placeholder(modal_custom_attribute.Program.PLACEHOLDER)
+
+
+class ModalNewOrgGroupPage(base.Test):
+  @staticmethod
+  def enter_test_data(modal):
+    """Fills out all fields in the lhn_modal
+
+    Args:
+        modal (lib.page.widget.custom_attribute.NewCustomAttributeModal)
+    """
+    modal.enter_title(modal_custom_attribute.Program.TITLE)

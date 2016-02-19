@@ -11,6 +11,8 @@ from lib.page.modal import edit_object
 
 
 class _CreateNewObjectModal(base.Modal):
+  """Base create modal model"""
+
   _locator_button_add_another = None
 
   def __init__(self, driver):
@@ -24,11 +26,10 @@ class _CreateNewObjectModal(base.Modal):
     return self.__class__(self._driver)
 
 
-class NewProgramModal(_CreateNewObjectModal, edit_object.EditProgramModalBase):
+class NewProgramModal(_CreateNewObjectModal, edit_object.EditProgramModal):
   """Class representing a program modal visible after creating a new
   program from LHN"""
 
-  locator_button_save = locator.ModalCreateNewProgram.BUTTON_SAVE_AND_CLOSE
   _locator_button_add_another = locator.ModalCreateNewProgram\
       .BUTTON_SAVE_AND_ADD_ANOTHER
 
@@ -37,7 +38,13 @@ class NewControlModal(_CreateNewObjectModal, edit_object.EditControlModal):
   """Class representing a control modal visible after creating a new
   control from LHN"""
 
-  _locators = locator.ModalCreateNewControl
-  locator_button_save = locator.ModalCreateNewControl.BUTTON_SAVE_AND_CLOSE
   _locator_button_add_another = locator.ModalCreateNewControl\
+      .BUTTON_SAVE_AND_ADD_ANOTHER
+
+
+class NewOrgGroupModal(_CreateNewObjectModal, edit_object.EditOrgGroupModal):
+  """Class representing an org group modal visible after creating a new
+  program from LHN"""
+
+  _locator_button_add_another = locator.ModalCreateNewOrgGroup \
       .BUTTON_SAVE_AND_ADD_ANOTHER
