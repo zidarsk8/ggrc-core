@@ -89,26 +89,20 @@ $(function() {
             error : [
               "Failed to map"
               , inst.constructor.title_singular
-              , "<strong>"
               , inst.title
-              , "</strong> to"
+              , "to"
               , page_model.title_singular
-              , "<strong>"
               , page_instance.title
-              , "</strong>"
               ].join(" ")
             }
           : {
             success : [
               "Mapped"
               , inst.constructor.title_singular
-              , "<strong>"
               , inst.title
-              , "</strong> to"
+              , "to"
               , page_model.title_singular
-              , "<strong>"
               , page_instance.title
-              , "</strong>"
               ].join(" ")
             }
         );
