@@ -8,7 +8,7 @@ set -o errexit
 
 project_name () {
   # Get propper project name
-  # args: 
+  # args:
   #  -p: if set the project name will be the name of the repo parent folder.
   #  -d: default project name, if parent folder is not set or valid.
   # returns: project name containing only alphanumeric characters
@@ -39,7 +39,7 @@ project_name () {
 }
 
 setup () {
-  rm ./test/*.xml | true
+  rm ./test/*.xml ./test/*.out | true
   if [ -z "${1:-}" ]; then
     echo "Missing mandatory project parameter"
     exit 1
