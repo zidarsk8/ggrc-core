@@ -39,7 +39,7 @@
       background: none;
       ul {
         @extend %reset-list;
-        @include clearfix();
+        @extend %clearfix;
         li {
           float: left;
           font-size: 18px;
@@ -583,7 +583,7 @@
     margin-top: 5px;
     margin-bottom: 10px;
     ul {
-      @include clearfix();
+      @extend %clearfix;
       li {
         padding-bottom: 0;
         float: left;
@@ -763,7 +763,7 @@
 
 // new action bar
 .action-bar {
-  @include clearfix();
+  @extend %clearfix;
   padding-top:5px;
   margin-bottom:10px;
   ul {
@@ -915,7 +915,7 @@
 
 // Report
 .save-template-wrap {
-  @include clearfix();
+  @extend %clearfix;
   padding-left: 30px;
   padding-right: 30px;
   .left-content {
@@ -947,12 +947,12 @@
 
 ul.select-clear-all {
   @extend %reset-list;
-  @include clearfix();
+  @extend %clearfix;
 }
 
 ul.attr-list, ul.model-list {
   @extend %reset-list;
-  @include clearfix();
+  @extend %clearfix;
   margin-top: 20px;
   margin-bottom: 10px;
   .attribute-wrap & {

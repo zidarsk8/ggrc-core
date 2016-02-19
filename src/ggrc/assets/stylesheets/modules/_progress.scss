@@ -63,7 +63,7 @@ ul.new-tree {
 
 .item-util {
   @extend %reset-list;
-  @include clearfix();
+  @extend %clearfix;
   font-size: 11px;
   line-height: 16px;
   color: $black;

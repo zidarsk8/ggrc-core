@@ -23,7 +23,7 @@
 
 .visual-radio {
   @extend %reset-list;
-  @include clearfix();
+  @extend %clearfix;
   li {
     float: left;
     margin-right: 5px;
@@ -46,7 +46,7 @@
 
 .repeated-utility {
   @extend %reset-list;
-  @include clearfix();
+  @extend %clearfix;
   li {
     float: left;
     margin-right: 10px;
