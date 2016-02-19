@@ -319,6 +319,8 @@ class LhnMenu(object):
       By.CSS_SELECTOR, '[data-model-name="Program"]>.content>.sub-level>li')
   ACCORDEON_CONTROLS_MEMBERS = (
       By.CSS_SELECTOR, '[data-model-name="Control"]>.content>.sub-level>li')
+  ACCORDEON_ORG_GROUP_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="OrgGroup"]>.content>.sub-level>li')
 
 
 class ExtendedInfo(object):
@@ -374,6 +376,26 @@ class ModalCreateNewProgram(object):
   PRIVACY = (By.CSS_SELECTOR, '[data-test-id="label_privacy_2c925d94"]')
   PROGRAM_URL = (By.CSS_SELECTOR,
                  '[data-test-id="label_program_url_2c925d94"]')
+
+
+class ModalCreateNewOrgGroup(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
+
+  BUTTON_SAVE_AND_CLOSE = (
+      By.CSS_SELECTOR,
+      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
+  BUTTON_SAVE_AND_ADD_ANOTHER = (
+      By.CSS_SELECTOR,
+      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
 
 
 class ModalCreateNewControl(object):
