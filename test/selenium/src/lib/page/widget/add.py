@@ -20,7 +20,6 @@ class AddWidget(base.Component):
     Returns:
         People
     """
-    self._driver.find_element(*self._locator.PERSON).click()
     raise NotImplementedError
 
   def select_audits(self):
@@ -28,7 +27,6 @@ class AddWidget(base.Component):
     Returns:
         Audits
     """
-    self._driver.find_element(*self._locator.AUDITS).click()
     raise NotImplementedError
 
   def select_programs(self):
@@ -36,7 +34,6 @@ class AddWidget(base.Component):
     Returns:
         Programs
     """
-    self._driver.find_element(*self._locator.PROGRAM).click()
     raise NotImplementedError
 
   def select_access_groups(self):
@@ -44,7 +41,6 @@ class AddWidget(base.Component):
     Returns:
         AccessGroups
     """
-    self._driver.find_element(*self._locator.ACCESS_GROUP).click()
     raise NotImplementedError
 
   def select_clauses(self):
@@ -52,7 +48,6 @@ class AddWidget(base.Component):
     Returns:
         Clauses
     """
-    self._driver.find_element(*self._locator.CLAUSE).click()
     raise NotImplementedError
 
   def select_controls(self):
@@ -68,7 +63,6 @@ class AddWidget(base.Component):
     Returns:
         Facilities
     """
-    self._driver.find_element(*self._locator.FACILITIES).click()
     raise NotImplementedError
 
   def select_markets(self):
@@ -76,7 +70,6 @@ class AddWidget(base.Component):
     Returns:
         Markets
     """
-    self._driver.find_element(*self._locator.MARKETS).click()
     raise NotImplementedError
 
   def select_org_groups(self):
@@ -84,7 +77,6 @@ class AddWidget(base.Component):
     Returns:
         OrgGroups
     """
-    self._driver.find_element(*self._locator.ORG_GROUPS).click()
     raise NotImplementedError
 
   def select_processes(self):
@@ -92,7 +84,6 @@ class AddWidget(base.Component):
     Returns:
         Processes
     """
-    self._driver.find_element(*self._locator.PROCESSES).click()
     raise NotImplementedError
 
   def select_projects(self):
@@ -100,7 +91,6 @@ class AddWidget(base.Component):
     Returns:
         Projects
     """
-    self._driver.find_element(*self._locator.PROJECTS).click()
     raise NotImplementedError
 
   def select_requests(self):
@@ -108,7 +98,6 @@ class AddWidget(base.Component):
     Returns:
         Requests
     """
-    self._driver.find_element(*self._locator.REQUEST).click()
     raise NotImplementedError
 
   def select_standards(self):
@@ -116,7 +105,6 @@ class AddWidget(base.Component):
     Returns:
         Standards
     """
-    self._driver.find_element(*self._locator.STANDARDS).click()
     raise NotImplementedError
 
   def select_vendors(self):
@@ -124,7 +112,6 @@ class AddWidget(base.Component):
     Returns:
         Vendor
     """
-    self._driver.find_element(*self._locator.VENDORS).click()
     raise NotImplementedError
 
   def select_risks(self):
@@ -132,7 +119,6 @@ class AddWidget(base.Component):
     Returns:
         Risks
     """
-    self._driver.find_element(*self._locator.RISKS).click()
     raise NotImplementedError
 
   def select_assessments(self):
@@ -140,7 +126,6 @@ class AddWidget(base.Component):
     Returns:
         Assessments
     """
-    self._driver.find_element(*self._locator.ASSESSMENTS).click()
     raise NotImplementedError
 
   def select_contracts(self):
@@ -148,7 +133,6 @@ class AddWidget(base.Component):
     Returns:
         Contracts
     """
-    self._driver.find_element(*self._locator.CONTRACTS).click()
     raise NotImplementedError
 
   def select_data_assets(self):
@@ -156,7 +140,6 @@ class AddWidget(base.Component):
     Returns:
         DataAssets
     """
-    self._driver.find_element(*self._locator.DATA_ASSETS).click()
     raise NotImplementedError
 
   def select_issues(self):
@@ -164,7 +147,6 @@ class AddWidget(base.Component):
     Returns:
         Issues
     """
-    self._driver.find_element(*self._locator.ISSUES).click()
     raise NotImplementedError
 
   def select_objectives(self):
@@ -172,7 +154,6 @@ class AddWidget(base.Component):
     Returns:
         Objectives
     """
-    self._driver.find_element(*self._locator.OBJECTIVES).click()
     raise NotImplementedError
 
   def select_policies(self):
@@ -180,7 +161,6 @@ class AddWidget(base.Component):
     Returns:
         Policies
     """
-    self._driver.find_element(*self._locator.POLICIES).click()
     raise NotImplementedError
 
   def select_products(self):
@@ -188,7 +168,6 @@ class AddWidget(base.Component):
     Returns:
         Products
     """
-    self._driver.find_element(*self._locator.PRODUCTS).click()
     raise NotImplementedError
 
   def select_regulations(self):
@@ -196,7 +175,6 @@ class AddWidget(base.Component):
     Returns:
         Regulations
     """
-    self._driver.find_element(*self._locator.REGULATIONS).click()
     raise NotImplementedError
 
   def select_sections(self):
@@ -204,7 +182,6 @@ class AddWidget(base.Component):
     Returns:
         Sections
     """
-    self._driver.find_element(*self._locator.SECTION).click()
     raise NotImplementedError
 
   def select_systems(self):
@@ -212,7 +189,6 @@ class AddWidget(base.Component):
     Returns:
         Systems
     """
-    self._driver.find_element(*self._locator.SYSTEMS).click()
     raise NotImplementedError
 
   def select_threats(self):
@@ -220,5 +196,4 @@ class AddWidget(base.Component):
     Returns:
         Threats
     """
-    self._driver.find_element(*self._locator.THREAT).click()
     raise NotImplementedError
