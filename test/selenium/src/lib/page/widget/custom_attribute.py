@@ -5,11 +5,14 @@
 
 from lib import base
 from lib import environment
+from lib import selenium_utils
 from lib.constants import url
 from lib.constants import locator
 
 
 class _Dropdown(base.Component):
+  """A generic model for a dropdown in custom attributes"""
+
   def __init__(self, driver, locator_button_add):
     super(_Dropdown, self).__init__(driver)
     self.button_add = base.Button(driver, locator_button_add)
@@ -19,11 +22,14 @@ class _Dropdown(base.Component):
     Returns:
         new_custom_attribute.NewCustomAttributeModal
     """
-    self.button_add.click_when_moving_over()
+    selenium_utils.wait_until_stops_moving(self.button_add)
+    self.button_add.click()
     return NewCustomAttributeModal(self._driver)
 
 
 class NewCustomAttributeModal(base.Modal):
+  """Model for the custom attribute modal"""
+
   _locator = locator.ModalCustomAttribute
 
   def __init__(self, driver):
@@ -78,6 +84,8 @@ class NewCustomAttributeModal(base.Modal):
 
 
 class AdminCustomAttributes(base.Widget):
+  """Model for custom attributes on the admin dashboard page"""
+
   _locator = locator.AdminCustomAttributes
   URL = environment.APP_URL \
       + url.ADMIN_DASHBOARD \

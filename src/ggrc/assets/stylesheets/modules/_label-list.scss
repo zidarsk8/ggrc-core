@@ -92,7 +92,7 @@
   @extend %reset-list;
   > li {
     margin-bottom: 10px;
-    @include clearfix();
+    @extend %clearfix;
     &:last-child {
       margin-bottom: 0;
     }

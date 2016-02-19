@@ -767,7 +767,7 @@ p {
   ul {
     @extend %reset-list;
     @extend %oneline;
-    @include clearfix();
+    @extend %clearfix;
     li {
       display: inline-block;
       margin-left: 20px;
@@ -781,7 +781,7 @@ p {
 .hidden-widgets-list {
   .dropdown-menu,
   .dropdown-list {
-    @include clearfix();
+    @extend %clearfix;
     width: 320px;
     .inner-nav-item {
       float: left;

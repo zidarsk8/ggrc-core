@@ -7,7 +7,7 @@
 
 .inline-radio-list {
   @extend %reset-list;
-  @include clearfix();
+  @extend %clearfix;
   li {
     float: left;
     margin-right: 20px;

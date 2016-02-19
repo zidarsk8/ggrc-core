@@ -20,9 +20,20 @@
     "pegjs": "^0.9.0"
   },
   "devDependencies": {
+    "compass-mixins": "~0.12.7",
+    "css-loader": "~0.23.1",
+    "eslint": "^2.1.0",
     "eslint-config-google": "^0.4.0",
     "eslint-config-xo": "^0.10.1",
-    "eslint": "^2.1.0"
+    "extract-text-webpack-plugin": "~1.0.1",
+    "file-loader": "~0.8.5",
+    "font-awesome": "~4.5.0",
+    "lodash": "~4.0.0",
+    "node-sass": "~3.4.2",
+    "sass-loader": "~3.1.2",
+    "style-loader": "~0.13.0",
+    "url-loader": "~0.5.7",
+    "webpack": "~1.12.11"
   },
   "scripts": {
     "test": "run_unittests"

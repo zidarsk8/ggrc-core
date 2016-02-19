@@ -25,10 +25,28 @@ class HtmlParser(base.Test):
   @staticmethod
   def parse_text(text):
     """Simulates text parsed by html
+
     Args:
-      text (str)
+      text (str or unicode)
     """
     return re.sub(r'\s+', " ", text)
+
+
+class ModalNewControlPage(base.Test):
+  """Methods for simulating common user actions"""
+
+  @staticmethod
+  def enter_test_data(modal):
+    """Fills out all fields in the lhn_modal
+
+    Args:
+        modal (lib.page.lhn_modal.new_control.NewControlModal)
+    """
+    modal.enter_title(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
+    modal.enter_description(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
+    modal.enter_test_plan(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
+    modal.enter_notes(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
+    modal.enter_code(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
 
 
 class ModalNewProgramPage(base.Test):
@@ -39,22 +57,20 @@ class ModalNewProgramPage(base.Test):
     """Fills out all fields in the lhn_modal
 
     Args:
-        modal (lib.page.lhn_modal.new_program.EditProgramModal)
+        modal (lib.page.modal.edit_object.EditProgramModal)
     """
-    unique_id = str(uuid.uuid4())
-
-    modal.enter_title(modal_create_new.Program.TITLE + unique_id)
+    modal.enter_title(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
     modal.enter_description(
-        modal_create_new.Program.DESCRIPTION_SHORT + unique_id)
+        modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
     modal.enter_notes(
-        modal_create_new.Program.NOTES_SHORT + unique_id)
-    modal.enter_code(modal_create_new.Program.CODE + unique_id)
+        modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
+    modal.enter_code(modal_create_new.SHORT_TITLE + str(uuid.uuid4()))
     modal.filter_and_select_primary_contact("example")
     modal.filter_and_select_secondary_contact("example")
     modal.enter_program_url(
-        unique_id + modal_create_new.Program.PROGRAM_URL)
+        str(uuid.uuid4()) + modal_create_new.Program.PROGRAM_URL)
     modal.enter_reference_url(
-        unique_id + modal_create_new.Program.REFERENCE_URL)
+        str(uuid.uuid4()) + modal_create_new.Program.REFERENCE_URL)
 
   @staticmethod
   def set_start_end_dates(modal, day_start, day_end):
@@ -62,7 +78,7 @@ class ModalNewProgramPage(base.Test):
     Sets the dates from the datepicker in the new program/edit modal.
 
     Args:
-      modal (lib.page.lhn_modal.new_program.EditProgramModal)
+      modal (lib.page.modal.edit_object.EditProgramModal)
       day_start (int): for more info see
         base.DatePicker.select_day_in_current_month
       day_end (int): for more info see
@@ -72,7 +88,7 @@ class ModalNewProgramPage(base.Test):
     modal.enter_stop_date_end_month(day_end)
 
 
-class ModalNewProgramCustomAttribute(base.Test):
+class ModalNewProgramCustomAttributePage(base.Test):
   @staticmethod
   def enter_test_data(modal):
     """Fills out all fields in the lhn_modal
@@ -83,3 +99,14 @@ class ModalNewProgramCustomAttribute(base.Test):
     modal.enter_title(modal_custom_attribute.Program.TITLE)
     modal.enter_inline_help(modal_custom_attribute.Program.INLINE_HELP)
     modal.enter_placeholder(modal_custom_attribute.Program.PLACEHOLDER)
+
+
+class ModalNewOrgGroupPage(base.Test):
+  @staticmethod
+  def enter_test_data(modal):
+    """Fills out all fields in the lhn_modal
+
+    Args:
+        modal (lib.page.widget.custom_attribute.NewCustomAttributeModal)
+    """
+    modal.enter_title(modal_custom_attribute.Program.TITLE)

@@ -5,10 +5,8 @@
 
 ---
 
-- name: add the node.js PPA
-  apt_repository: repo="ppa:chris-lea/node.js"
-  tags: nodejs
-  sudo: yes
+- name: Add NodeJS repository
+  command: bash -c "curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash -"
 
 - name: update apt
   sudo: yes

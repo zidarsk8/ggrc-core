@@ -29,11 +29,11 @@ class PageHeader(object):
 
   # dropdown toggle
   BUTTON_ADMIN_DASHBOARD = (
-      By.CSS_SELECTOR, '.user-dropdown [href="/admin#people_list_widget"]')
-  BUTTON_MY_WORK = (By.CSS_SELECTOR, '.user-dropdown [href="/dashboard"]')
-  BUTTON_DATA_IMPORT = (By.CSS_SELECTOR, '.user-dropdown [href="/import"]')
-  BUTTON_DATA_EXPORT = (By.CSS_SELECTOR, '.user-dropdown [href="/export"]')
-  BUTTON_LOGOUT = (By.CSS_SELECTOR, '.user-dropdown [href="/logout"]')
+      By.CSS_SELECTOR, '.dropdown-menu [href="/admin#people_list_widget"]')
+  BUTTON_MY_WORK = (By.CSS_SELECTOR, '.dropdown-menu [href="/dashboard"]')
+  BUTTON_DATA_IMPORT = (By.CSS_SELECTOR, '.dropdown-menu [href="/import"]')
+  BUTTON_DATA_EXPORT = (By.CSS_SELECTOR, '.dropdown-menu [href="/export"]')
+  BUTTON_LOGOUT = (By.CSS_SELECTOR, '.dropdown-menu [href="/logout"]')
 
 
 class Dashboard(object):
@@ -56,6 +56,7 @@ class LhnMenu(object):
 
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
+  EXTENDED_INFO = (By.CSS_SELECTOR, '.extended-info.in')
 
   FILTER = (By.CSS_SELECTOR, '.lhs-search')
   FILTER_TEXT_BOX = (By.CSS_SELECTOR, '.lhs-search>.widgetsearch')
@@ -313,6 +314,18 @@ class LhnMenu(object):
   SPINNY_RISKS = (By.CSS_SELECTOR, '[data-model-name="Risk"] .spinny')
   SPINNY_THREATS = (By.CSS_SELECTOR, '[data-model-name="Threat"] .spinny')
 
+  # accordeon members
+  ACCORDEON_PROGRAMS_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="Program"]>.content>.sub-level>li')
+  ACCORDEON_CONTROLS_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="Control"]>.content>.sub-level>li')
+  ACCORDEON_ORG_GROUP_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="OrgGroup"]>.content>.sub-level>li')
+
+
+class ExtendedInfo(object):
+  BUTTON_MAP_TO = (By.CSS_SELECTOR, '.extended-info.in .map-to-page-object')
+
 
 class ModalCreateNewProgram(object):
   """Locators for the program modal visible when creating a new modal from
@@ -323,7 +336,7 @@ class ModalCreateNewProgram(object):
   UI_DESCRIPTION = (By.CSS_SELECTOR,
                     '[data-test-id="new_program_field_description_1fb8bc06"]'
                     '>iframe.wysihtml5-sandbox')
-  NOTES_UI = (By.CSS_SELECTOR,
+  UI_NOTES = (By.CSS_SELECTOR,
               '[data-test-id="new_program_field_notes_75b8bc05"]'
               '>iframe.wysihtml5-sandbox')
   UI_CODE = (By.CSS_SELECTOR,
@@ -363,6 +376,165 @@ class ModalCreateNewProgram(object):
   PRIVACY = (By.CSS_SELECTOR, '[data-test-id="label_privacy_2c925d94"]')
   PROGRAM_URL = (By.CSS_SELECTOR,
                  '[data-test-id="label_program_url_2c925d94"]')
+
+
+class ModalCreateNewOrgGroup(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
+
+  BUTTON_SAVE_AND_CLOSE = (
+      By.CSS_SELECTOR,
+      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
+  BUTTON_SAVE_AND_ADD_ANOTHER = (
+      By.CSS_SELECTOR,
+      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
+
+
+class ModalCreateNewControl(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+  DESCRIPTION = (
+      By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) .span6>label')
+  TEST_PLAN = (By.CSS_SELECTOR, '[data-id="test_plan_hidden"] label')
+  NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] label')
+  CODE = (By.CSS_SELECTOR, '[data-id="code_hidden"] label')
+  KIND_OR_NATURE = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(1) label')
+  FRAUD_RELATED = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(2) label')
+  EFFECTIVE_DATE = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(3)>div:nth-child(1) label')
+  FREQUENCY = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4) div:nth-child(1) select')
+  ASSERTIONS = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(2) label')
+  PRINCIPAL_ASSESSOR = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(1) label')
+  SECONDARY_ASSESSOR = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(2) label')
+  OWNER = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(3) div:nth-child(2) '
+      'label')
+  PRIMARY_CONTACT = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
+      'div:nth-child(1)>div>label')
+  SECONDARY_CONTACT = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
+      'div:nth-child(2)>div>label')
+  CONTROL_URL = (
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(5) div:nth-child(2)>div:nth-child(1)>div'
+      '>label')
+  REFERENCE_URL = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(5) div:nth-child(2)>'
+      'div:nth-child(2)>div>label')
+  SIGNIFICANCE = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(3) label')
+  TYPE_OR_MEANS = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(4) label')
+  STOP_DATE = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(3) div:nth-child(2) label')
+  CATEGORIES = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(3) label')
+  STATE = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(3) label')
+
+  # user input elements
+  UI_TITLE = (
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
+  UI_DESCRIPTION = (
+      By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
+  UI_TEST_PLAN = (By.CSS_SELECTOR, '[data-id="test_plan_hidden"] iframe')
+  UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] iframe')
+  UI_CODE = (By.CSS_SELECTOR, '[data-id="code_hidden"] input')
+  UI_PRIMARY_CONTACT = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
+      'div:nth-child(1)>div>input')
+  UI_SECONDARY_CONTACT = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(4) div:nth-child(2)>'
+      'div:nth-child(2)>div>input')
+  UI_CONTROL_URL = (
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(5) div:nth-child(2)>div:nth-child(1)>div'
+      '>input')
+  UI_REFERENCE_URL = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(1)>form>div:nth-child(5) div:nth-child(2)>'
+      'div:nth-child(2)>div>input')
+
+  DATEPICKER_EFFECTIVE_DATE = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(3)>div:nth-child(1) input')
+  DATEPICKER_STOP_DATE = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(3)>div:nth-child(2) input')
+
+  # dorpdowns
+  DROPDOWN_KIND_OR_NATURE = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(1) select')
+  DROPDOWN_FRAUD_RELATED = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6)>div:nth-child(2)>div:nth-child(2)>select')
+  DROPDOWN_SIGNIFICANCE = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6)>div:nth-child(2)>div:nth-child(3)>select')
+  DROPDOWN_TYPE_OR_MEANS = (
+      By.CSS_SELECTOR,
+      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(4) select')
+  DROPDOWN_FREQUENCY = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4) div:nth-child(1) select')
+  DROPDOWN_STATE = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(3) select')
+
+  SELECTABLE_ASSERTIONS = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(2) select')
+  SELECTABLE_CATEGORIES = (
+      By.CSS_SELECTOR,
+      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(3) select')
+
+  # buttons
+  BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
+  BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
+  BUTTON_SAVE_AND_CLOSE = (
+      By.CSS_SELECTOR,
+      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
+  BUTTON_SAVE_AND_ADD_ANOTHER = (
+      By.CSS_SELECTOR,
+      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
 
 
 class ModalCustomAttribute(object):
@@ -518,11 +690,24 @@ class WidgetBarButtonAddDropdown(object):
             '[href="#threat_widget"]')
 
 
-class Widget(object):
+class ObjectWidget(object):
   """Locators for a generic widget"""
+  CONTROL_COLUMN_TITLE = (By.CSS_SELECTOR, '#control_widget .header .span4 '
+                                           '.title-heading .widget-col-title')
+  CONTROL_OWNER = (By.CSS_SELECTOR, '#control_widget .header .span4 '
+                                    '[data-field="contact.name|email"]')
+  COTNROL_STATE = (By.CSS_SELECTOR, '#control_widget .header .span4 '
+                                    '[data-field="status"]')
+
+
+class InfoWidget(object):
+  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
+
+
+class ProgramInfoWidget(object):
+  """Locators for the info widget"""
 
   PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
-  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
   DROPDOWN_SETTINGS_EDIT = (
       By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(1)')
   DROPDOWN_SETTINGS_PERMALINK = (
@@ -608,6 +793,25 @@ class Widget(object):
   PRIVATE_PROGRAM = (By.CSS_SELECTOR,
                      '[data-test-id="title_private_ec758af9"] h6')
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
+
+
+class ControlInfoWidget(object):
+  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"]>h3')
+
+
+class WidgetFilter(object):
+  """Locators for filters in widgets"""
+
+  TITLE_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
+                                    '.filter-title h6')
+  TEXTFIELD_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
+                                        '.filter-input')
+  BUTTON_SUBMIT_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
+                                            '.filter-button  [type="submit"]')
+  BUTTON_RESET_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
+                                           '.filter-button  [type="reset"]')
+  BUTTON_HELP = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
+                                  '.filter-button  #page-help')
 
 
 class AdminCustomAttributes(object):

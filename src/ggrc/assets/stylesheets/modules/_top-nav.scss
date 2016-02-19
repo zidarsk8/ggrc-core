@@ -15,7 +15,7 @@
 
 ul.internav {
   @extend %reset-list;
-  @include clearfix();
+  @extend %clearfix;
   margin-left: 28px;
   li {
     position: relative;

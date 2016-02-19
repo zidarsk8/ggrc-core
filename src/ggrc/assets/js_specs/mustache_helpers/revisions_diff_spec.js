@@ -24,6 +24,8 @@ describe('can.mustache.helper.revisions_diff', function () {
         })
       }
     };
+
+    GGRC.model_attr_defs = {};
   });
 
   beforeEach(function () {

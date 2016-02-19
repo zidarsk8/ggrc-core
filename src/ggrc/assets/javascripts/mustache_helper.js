@@ -3350,16 +3350,25 @@ Mustache.registerHelper("un_camel_case", function (str, options) {
       updatedAt: null,
       changes: []
     };
+    var attrDefs = GGRC.model_attr_defs[rev2.resource_type];
 
     diff.madeBy = 'User ' + rev2.modified_by.id;
     diff.updatedAt = rev2.updated_at;
 
     can.each(rev2.content, function (value, fieldName) {
       var origVal = rev1.content[fieldName];
+      var displayName;
+      if (attrDefs) {
+        displayName = (_.find(attrDefs, function (attr) {
+          return attr.attr_name === fieldName;
+        }) || {}).display_name;
+      } else {
+        displayName = fieldName;
+      }
 
-      if (value !== origVal) {
+      if (displayName && value !== origVal) {
         diff.changes.push({
-          fieldName: fieldName,
+          fieldName: displayName,
           origVal: origVal,
           newVal: value
         });

@@ -32,7 +32,7 @@
   @extend %reset-list;
   margin-top: 4px;
   li {
-    @include clearfix();
+    @extend %clearfix;
     margin-bottom: 14px;
     .entry-author {
       color: $gray;
