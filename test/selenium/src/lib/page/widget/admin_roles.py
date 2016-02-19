@@ -3,12 +3,14 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+from lib import base
 from lib import environment
 from lib.constants import url
-from lib.page.widget.base import Widget
 
 
-class AdminRoles(Widget):
+class AdminRoles(base.Widget):
+  """Model for the widget admin rols on admin dashboard"""
+
   URL = environment.APP_URL \
       + url.ADMIN_DASHBOARD \
       + url.Widget.ROLES

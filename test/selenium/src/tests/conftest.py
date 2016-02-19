@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+
 """PyTest fixtures"""
 
 import pytest   # pylint: disable=import-error
@@ -68,7 +69,33 @@ def initial_lhn(selenium):
 
 
 @pytest.yield_fixture(scope="class")
-def new_program(selenium):
+def new_control(selenium):
+  """Creates a new control object.
+
+  Returns:
+      lib.page.modal.new_program.NewControlModal
+  """
+  modal = dashboard.DashboardPage(selenium.driver) \
+      .open_lhn_menu() \
+      .select_my_objects() \
+      .select_controls_or_objectives() \
+      .select_controls() \
+      .create_new()
+  test_helpers.ModalNewControlPage.enter_test_data(modal)
+  modal.save_and_close()
+  control_info_page = widget.ControlInfo(selenium.driver)
+
+  yield control_info_page
+
+  selenium.driver.get(control_info_page.url)
+  widget.ControlInfo(selenium.driver) \
+      .press_object_settings() \
+      .select_delete() \
+      .confirm_delete()
+
+
+@pytest.yield_fixture(scope="class")
+def new_program(selenium, new_control):
   """Creates a new program object.
 
   Returns:
@@ -83,7 +110,8 @@ def new_program(selenium):
 
   test_helpers.ModalNewProgramPage.enter_test_data(modal)
   test_helpers.ModalNewProgramPage.set_start_end_dates(modal, 0, -1)
-  program_info_page = modal.save_and_close()
+  modal.save_and_close()
+  program_info_page = widget.ProgramInfo(selenium.driver)
 
   yield modal, program_info_page
 

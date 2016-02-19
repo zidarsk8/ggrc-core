@@ -2,28 +2,36 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+
 """Elements for info widget"""
 
 from lib import base
+from lib import selenium_utils
+from lib.page import modal
 from lib.constants import locator
-from lib.page import widget_modal
-from lib.page import lhn_modal
 
 
-class _DropdownSettings(base.Component):
+class DropdownSettings(base.Component):
   """A class for the button/dropdown settings in the info widget"""
 
-  _locator = locator.Widget
+  _delete_modal_cls = None
+  _edit_modal_cls = None
 
   def __init__(self, driver):
-    super(_DropdownSettings, self).__init__(driver)
-    self.edit = base.Button(driver, self._locator.DROPDOWN_SETTINGS_EDIT)
-    self.permalink = base.Button(driver,
-                                 self._locator.DROPDOWN_SETTINGS_PERMALINK)
-    self.delete = base.Button(driver, self._locator.DROPDOWN_DELETE)
+    super(DropdownSettings, self).__init__(driver)
+    self.edit = None
+    self.permalink = None
+    self.delete = None
 
   def select_edit(self):
-    raise NotImplementedError
+    """
+    Returns:
+        base.Modal
+    """
+    self.edit.click()
+    selenium_utils.get_when_visible(
+        self._driver, self._edit_modal_cls.locator_button_save)
+    return self._edit_modal_cls(self._driver)
 
   def select_get_permalink(self):
     self.permalink.click()
@@ -31,17 +39,20 @@ class _DropdownSettings(base.Component):
   def select_delete(self):
     """
     Returns:
-        DeleteObjectModal
+        modal.delete_object.DeleteObjectModal
     """
     self.delete.click()
-    return widget_modal.DeleteObjectModal(self._driver)
+    return self._delete_modal_cls(self._driver)
 
 
-class DropdownSettingsPrograms(_DropdownSettings):
-  def select_edit(self):
-    """
-    Returns:
-        lhn_modal.new_program.NewProgramModal
-    """
-    self.edit.click()
-    return lhn_modal.new_program.EditProgramModal(self._driver)
+class DropdownSettingsPrograms(DropdownSettings):
+  _locator = locator.ProgramInfoWidget
+  _delete_modal_cls = modal.delete_object.DeleteProgramModal
+  _edit_modal_cls = modal.edit_object.EditProgramModalBase
+
+  def __init__(self, driver):
+    super(DropdownSettings, self).__init__(driver)
+    self.edit = base.Button(driver, self._locator.DROPDOWN_SETTINGS_EDIT)
+    self.permalink = base.Button(driver,
+                                 self._locator.DROPDOWN_SETTINGS_PERMALINK)
+    self.delete = base.Button(driver, self._locator.DROPDOWN_DELETE)

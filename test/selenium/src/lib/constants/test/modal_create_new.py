@@ -3,12 +3,11 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+"""Constants used when filling out a new modal"""
 
+SHORT_TITLE = u"""Un texte en français and additionally đšžćč!#./?€ħ&^~'"""
 
-class Program(object):
-  TITLE = u"""Test title with unicode characters: Un texte en français and
-             additionally đšžćč!#./?€ħ&^~'"""
-  DESCRIPTION_LONG = u"""Governance, Risk Management, and Compliance (GRC)
+LONG_DESCRIPTION = u"""Governance, Risk Management, and Compliance (GRC)
     are three pillars that work together for the purpose of
     assuring that an organization meets its objectives. ...
     Governance is the combination of processes established '
@@ -51,44 +50,11 @@ class Program(object):
     GRC-related requirements due to changes in technology,
     increasing data storage, market globalization and
     increased regulation. Un texte en français"""
-  DESCRIPTION_SHORT = u"Test description"
-  NOTES_LONG = u"""Governance describes the overall management approach
-    through which senior executives direct and control the entire "
-    organization, using a combination of management information "
-    and hierarchical management control structures. Governance "
-    activities ensure that critical management information "
-    reaching the executive team is sufficiently complete, accurate "
-    and timely to enable appropriate management decision making, "
-    and provide the control mechanisms to ensure that strategies, "
-    directions and instructions from management are carried out "
-    systematically and effectively.[5] Governance of risk "
-    management is the attention given to preventing excessive risk "
-    management by keeping in mind the organisation's appetite for "
-    risk. Sufficient countermeasures are required rather than "
-    excessive, unnecessary and pointless measures. The risk of "
-    risk management is that the good intentions become wasteful "
-    expenditure or impediments to growth, innovation and "
-    opportunity. Risk management is the set of processes through "
-    which management identifies, analyzes, and, where necessary, "
-    responds appropriately to risks that might adversely affect "
-    realization of the organization's business objectives. The "
-    response to risks typically depends on their perceived "
-    gravity, and involves controlling, avoiding, accepting or "
-    transferring them to a third party. Whereas organizations "
-    routinely manage a wide range of risks (e.g. technological "
-    risks, commercial/financial risks, information security risks "
-    etc.), external legal and regulatory compliance risks are "
-    arguably the key issue in GRC. Compliance means conforming "
-    with stated requirements. At an organizational level, "
-    it is achieved through management processes which identify the "
-    applicable requirements (defined for example in laws, "
-    regulations, contracts, strategies and policies), assess the "
-    state of compliance, assess the risks and potential costs of "
-    non-compliance against the projected expenses to achieve "
-    compliance, and hence prioritize, fund and initiate any "
-    corrective actions deemed necessary. Un texte en français"""
-  NOTES_SHORT = "Test notes"
-  CODE = u"Test code with special chars: Un texte en français"
+
+
+class Program(object):
+  """Constants used when filling out a new program modal"""
+
   PRIMARY_CONTACT = "selenium@test.com"
   SECONDARY_CONTACT = "selenium@test.com"
   PROGRAM_URL = "www.program_url.com"

@@ -107,7 +107,7 @@ class TestProgramPage(base.Test):
     # test notification alert
     base.AnimatedComponent(
         selenium.driver,
-        [locator.Widget.ALERT_LINK_COPIED],
+        [locator.ProgramInfoWidget.ALERT_LINK_COPIED],
         wait_until_visible=True
     )
 
@@ -141,7 +141,6 @@ class TestProgramPage(base.Test):
     assert modal.ui_description.text == \
         updated_program_info_page.description_entered.text
     assert modal.ui_notes.text == updated_program_info_page.notes_entered.text
-    assert modal.ui_code.text == updated_program_info_page.code_entered.text
     assert updated_program_info_page.primary_contact_entered.text in \
         modal.ui_primary_contact.text
     assert updated_program_info_page.secondary_contact_entered.text in \
@@ -150,7 +149,29 @@ class TestProgramPage(base.Test):
         updated_program_info_page.program_url_entered.text
     assert modal.ui_reference_url.text == \
         updated_program_info_page.reference_url_entered.text
-    assert modal.ui_effective_date.text == \
-        updated_program_info_page.effective_date_entered.text
-    assert modal.ui_stop_date.text == \
-        updated_program_info_page.stop_date_entered.text
+
+  @pytest.mark.smoke_tests
+  def test_mapping_controls_via_lhn(self, selenium, new_control, new_program):
+    """Tests if widget number increases when mapping via LHN"""
+    # pylint: disable=no-self-use
+    # pylint: disable=invalid-name
+    _, program_info_page = new_program
+
+    # check that the widget isn't opened yet since it doesn't have any members
+    assert selenium.driver.find_element(
+        *locator.WidgetBar.CONTROLS).is_displayed() is False
+
+    # map to obj
+    dashboard.HeaderPage(selenium.driver)\
+        .open_lhn_menu()\
+        .select_my_objects()\
+        .select_controls_or_objectives()\
+        .select_controls()\
+        .hover_over_visible_member(new_control.title_entered.text)\
+        .map_to_object()
+
+    control_widget_count = widget_bar.ProgramWidgetBarPage(selenium.driver)\
+        .select_controls()\
+        .member_count
+
+    assert control_widget_count == 1

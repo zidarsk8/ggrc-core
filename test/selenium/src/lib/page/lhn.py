@@ -3,11 +3,12 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 """A page model for LHN"""
-
+import lib.page.modal.create_new_object
 from lib import base
 from lib.constants import locator
 from lib.element import lhn
-from lib.page import lhn_modal
+from lib.page import modal
+from lib.page import extended_info
 
 
 class _Programs(lhn.AccordionGroup):
@@ -15,14 +16,9 @@ class _Programs(lhn.AccordionGroup):
 
   _locator_spinny = locator.LhnMenu.SPINNY_PROGRAMS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROGRAM
-
-  def create_new(self):
-    """
-    Returns:
-        modal.new_program.NewProgramModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_program.NewProgramModal(self._driver)
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_PROGRAMS_MEMBERS
+  _create_new_modal_cls = modal.create_new_object.NewProgramModal
+  _modal_cls = lib.page.modal.create_new_object.NewProgramModal
 
 
 class _Workflows(lhn.AccordionGroup):
@@ -40,28 +36,12 @@ class _Workflows(lhn.AccordionGroup):
     self.button_draft = base.Button(
         self._driver, locator.LhnMenu.WORKFLOWS_DRAFT)
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_workflow.NewWorkflowPage
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_workflow.NewWorkflowPage(self._driver)
-
 
 class _Audits(lhn.AccordionGroup):
   """Audits dropdown in LHN"""
 
   _locator_spinny = locator.LhnMenu.SPINNY_AUDITS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_AUDIT
-
-  def create_new(self):
-    """
-    Returns:
-        modal.new_audit.NewAuditModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_audit.NewAuditModal(self._driver)
 
 
 class _Assessments(lhn.AccordionGroup):
@@ -71,15 +51,6 @@ class _Assessments(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu \
       .BUTTON_CREATE_NEW_CONTROL_ASSESSMENT
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_controll_assessment.ControlAssessmentModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_controll_assessment.ControlAssessmentModal(
-        self._driver)
-
 
 class _Requests(lhn.AccordionGroup):
   """Requests dropdown in LHN"""
@@ -87,29 +58,17 @@ class _Requests(lhn.AccordionGroup):
   _locator_spinny = locator.LhnMenu.SPINNY_REQUESTS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_REQUEST
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_request.NewRequestModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_request.NewRequestModal(self._driver)
-
 
 class _Issues(lhn.AccordionGroup):
+  """Issues dropdown in LHN"""
+
   _locator_spinny = locator.LhnMenu.SPINNY_ISSUES
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ISSUE
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_issue.NewIssueModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_issue.NewIssueModal(self._driver)
-
 
 class _Directives(lhn.DropdownStatic):
+  """Directives dropdown in LHN"""
+
   _locator_element = locator.LhnMenu.DIRECTIVES
 
   def __init__(self, driver):
@@ -195,84 +154,50 @@ class _Directives(lhn.DropdownStatic):
 
 
 class _Regulations(lhn.AccordionGroup):
+  """Regulations dropdown in LHN"""
+
   _locator_spinny = locator.LhnMenu.SPINNY_REGULATIONS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_REGULATION
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_regulation.NewRegulationModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_regulation.NewRegulationModal(self._driver)
-
 
 class _Policies(lhn.AccordionGroup):
+  """Policies dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_POLICY
   _locator_spinny = locator.LhnMenu.SPINNY_POLICIES
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_policy.NewPolicyModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_policy.NewPolicyModal(self._driver)
-
 
 class _Standards(lhn.AccordionGroup):
+  """Standards dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_STANDARD
   _locator_spinny = locator.LhnMenu.SPINNY_STANDARDS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_standard.NewStandardModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_standard.NewStandardModal(self._driver)
-
 
 class _Contracts(lhn.AccordionGroup):
+  """Contracts dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CONTRACT
   _locator_spinny = locator.LhnMenu.SPINNY_REGULATIONS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_contract.NewContractModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_contract.NewContractModal(self._driver)
-
 
 class _Clauses(lhn.AccordionGroup):
+  """Clauses dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CLAUSE
   _locator_spinny = locator.LhnMenu.SPINNY_CLAUSES
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_clause.NewClauseModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_clause.NewClauseModal(self._driver)
-
 
 class _Sections(lhn.AccordionGroup):
+  """Sections dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_SECTION
   _locator_spinny = locator.LhnMenu.SPINNY_SECTIONS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_section.NewSectionModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_section.NewSectionModal(self._driver)
-
 
 class _ControlsOrObjectives(lhn.DropdownStatic):
+  """Controls or objects dropdown in LHN"""
+
   _locator_element = locator.LhnMenu.CONTROLS_OR_OBJECTIVES
 
   def __init__(self, driver):
@@ -280,13 +205,11 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
     self.button_controls = lhn.Button(
         self._driver,
         locator.LhnMenu.CONTROLS,
-        locator.LhnMenu.CONTRACTS_COUNT
-    )
+        locator.LhnMenu.CONTROL_COUNT)
     self.button_objectives = lhn.Button(
         self._driver,
         locator.LhnMenu.OBJECTIVES,
-        locator.LhnMenu.OBJECTIVES_COUNT
-    )
+        locator.LhnMenu.OBJECTIVES_COUNT)
 
   def select_controls(self):
     """
@@ -306,32 +229,25 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
 
 
 class _Controls(lhn.AccordionGroup):
+  """Controls dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CONTROL
   _locator_spinny = locator.LhnMenu.SPINNY_CONTROLS
-
-  def create_new(self):
-    """
-    Returns:
-        modal.new_control.NewControlModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_control.NewControlModal(self._driver)
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_CONTROLS_MEMBERS
+  _create_new_modal_cls = modal.create_new_object.NewControlModal
+  _extended_info_cls = extended_info.Controls
 
 
 class _Objectives(lhn.AccordionGroup):
+  """Objectives dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_OBJECTIVE
   _locator_spinny = locator.LhnMenu.SPINNY_OBJECTIVES
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_objective.NewObjectiveModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_objective.NewObjectiveModal(self._driver)
-
 
 class _PeopleOrGroups(lhn.DropdownStatic):
+  """People or groups dropdown in LHN"""
+
   _locator_element = locator.LhnMenu.PEOPLE_OR_GROUPS
 
   def __init__(self, driver):
@@ -391,58 +307,36 @@ class _PeopleOrGroups(lhn.DropdownStatic):
 
 
 class _People(lhn.AccordionGroup):
+  """People dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PERSON
   _locator_spinny = locator.LhnMenu.SPINNY_PEOPLE
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_person.NewPersonModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_person.NewPersonModal(self._driver)
-
 
 class _OrgGroups(lhn.AccordionGroup):
+  """Org groups dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ORG_GROUP
   _locator_spinny = locator.LhnMenu.SPINNY_ORG_GROUPS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_org_group.NewOrgGroupModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_org_group.NewOrgGroupModal(self._driver)
-
 
 class _Vendors(lhn.AccordionGroup):
+  """Vendors dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_VENDOR
   _locator_spinny = locator.LhnMenu.SPINNY_VENDORS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_vendor.NewVendorModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_vendor.NewVendorModal(self._driver)
-
 
 class _AccessGroups(lhn.AccordionGroup):
+  """Access groups dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ACCESS_GROUP
   _locator_spinny = locator.LhnMenu.SPINNY_ACCESS_GROUPS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_access_group.NewAccessGroupModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_access_group.NewAccessGroupModal(self._driver)
-
 
 class _AssetsOrBusiness(lhn.DropdownStatic):
+  """Assets or business dropdown in LHN"""
+
   _locator_element = locator.LhnMenu.ASSETS_OR_BUSINESS
 
   def __init__(self, driver):
@@ -541,97 +435,57 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
 
 
 class _Systems(lhn.AccordionGroup):
+  """Systems dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_SYSTEM
   _locator_spinny = locator.LhnMenu.SPINNY_SYSTEMS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_system.NewSystemModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_system.NewSystemModal(self._driver)
-
 
 class _Processes(lhn.AccordionGroup):
+  """Processes dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PROCESS
   _locator_spinny = locator.LhnMenu.SPINNY_PROCESSES
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_process.NewProcessModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_process.NewProcessModal(self._driver)
-
 
 class _DataAssets(lhn.AccordionGroup):
+  """Data assets dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_DATA_ASSET
   _locator_spinny = locator.LhnMenu.SPINNY_DATA_ASSETS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_data_asset.NewAssetModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_data_asset.NewAssetModal(self._driver)
-
 
 class _Products(lhn.AccordionGroup):
+  """Products dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PRODUCT
   _locator_spinny = locator.LhnMenu.SPINNY_PRODUCTS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_product.NewProductModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_product.NewProductModal(self._driver)
-
 
 class _Projects(lhn.AccordionGroup):
+  """Projects dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PROJECT
   _locator_spinny = locator.LhnMenu.SPINNY_PROJECTS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_project.NewProjectModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_project.NewProjectModal(self._driver)
-
 
 class _Facilities(lhn.AccordionGroup):
+  """Facilities dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_FACILITY
   _locator_spinny = locator.LhnMenu.SPINNY_FACILITIES
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_facility.NewFacilityModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_facility.NewFacilityModal(self._driver)
-
 
 class _Markets(lhn.AccordionGroup):
+  """Markets dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_MARKET
   _locator_spinny = locator.LhnMenu.SPINNY_MARKETS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_market.NewMarketModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_market.NewMarketModal(self._driver)
-
 
 class _RisksOrThreats(lhn.DropdownStatic):
+  """Risks or threats dropdown in LHN"""
+
   _locator_element = locator.LhnMenu.RISK_OR_THREATS
 
   def __init__(self, driver):
@@ -665,32 +519,22 @@ class _RisksOrThreats(lhn.DropdownStatic):
 
 
 class _Risks(lhn.AccordionGroup):
+  """Risks dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_RISK
   _locator_spinny = locator.LhnMenu.SPINNY_RISKS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_risk.NewRiskModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_risk.NewRiskModal(self._driver)
-
 
 class _Threats(lhn.AccordionGroup):
+  """Threats dropdown in LHN"""
+
   _locator_button_create_new = locator.LhnMenu.THREATS
   _locator_spinny = locator.LhnMenu.SPINNY_THREATS
 
-  def create_new(self):
-    """
-    Returns:
-        modal.new_threat.NewThreatModal
-    """
-    self.button_create_new.click()
-    return lhn_modal.new_threat.NewThreatModal(self._driver)
-
 
 class LhnContents(base.Component):
+  """Model for the highest level contents in LHN"""
+
   def __init__(self, driver):
     super(LhnContents, self).__init__(driver)
     self.filter = None
@@ -715,58 +559,46 @@ class LhnContents(base.Component):
         self._driver,
         locator.LhnMenu.FILTER_TEXT_BOX,
         locator.LhnMenu.FILTER_SUBMIT_BUTTON,
-        locator.LhnMenu.FILTER_CLEAR_BUTTON
-    )
+        locator.LhnMenu.FILTER_CLEAR_BUTTON)
     self.button_programs = lhn.Button(
         self._driver,
         locator.LhnMenu.PROGRAMS,
-        locator.LhnMenu.PROGRAMS_COUNT
-    )
+        locator.LhnMenu.PROGRAMS_COUNT)
     self.button_workflows = lhn.Button(
         self._driver,
         locator.LhnMenu.WORKFLOWS,
-        locator.LhnMenu.WORKFLOWS_COUNT
-    )
+        locator.LhnMenu.WORKFLOWS_COUNT)
     self.button_audits = lhn.Button(
         self._driver,
         locator.LhnMenu.AUDITS,
-        locator.LhnMenu.AUDITS_COUNT
-    )
+        locator.LhnMenu.AUDITS_COUNT)
     self.button_assessments = lhn.Button(
         self._driver,
         locator.LhnMenu.ASSESSMENTS,
-        locator.LhnMenu.ASSESSMENTS_COUNT
-    )
+        locator.LhnMenu.ASSESSMENTS_COUNT)
     self.button_requests = lhn.Button(
         self._driver,
         locator.LhnMenu.REQUESTS,
-        locator.LhnMenu.REQUESTS_COUNT
-    )
+        locator.LhnMenu.REQUESTS_COUNT)
     self.button_issues = lhn.Button(
         self._driver,
         locator.LhnMenu.ISSUES,
-        locator.LhnMenu.ISSUES_COUNT
-    )
+        locator.LhnMenu.ISSUES_COUNT)
     self.button_directives = base.Button(
         self._driver,
-        locator.LhnMenu.PROGRAMS
-    )
+        locator.LhnMenu.DIRECTIVES)
     self.button_controls_or_objectives = base.Button(
         self._driver,
-        locator.LhnMenu.PROGRAMS
-    )
+        locator.LhnMenu.CONTROLS_OR_OBJECTIVES)
     self.button_people_or_groups = base.Button(
         self._driver,
-        locator.LhnMenu.PROGRAMS
-    )
+        locator.LhnMenu.PEOPLE_OR_GROUPS)
     self.button_assets_or_business = base.Button(
         self._driver,
-        locator.LhnMenu.PROGRAMS
-    )
+        locator.LhnMenu.ASSETS_OR_BUSINESS)
     self.button_risks_or_threats = base.Button(
         self._driver,
-        locator.LhnMenu.PROGRAMS
-    )
+        locator.LhnMenu.RISK_OR_THREATS)
 
   def filter_query(self, query):
     self.filter.filter_query(query)
@@ -865,6 +697,8 @@ class LhnContents(base.Component):
 
 
 class Menu(base.AnimatedComponent):
+  """Model of the LHN menu"""
+
   def __init__(self, driver):
     super(Menu, self).__init__(
         driver,

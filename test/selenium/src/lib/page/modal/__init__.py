@@ -3,14 +3,8 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-from lib.constants import (
-  element,  # flake8: noqa
-  log,
-  path,
-  yaml,
-  regex,
-  url,
-  ux,
-  tag,
-  test_runner
+from lib.page.modal import (
+    create_new_object,    # flake8: noqa
+    edit_object,    # flake8: noqa
+    delete_object   # flake8: noqa
 )
