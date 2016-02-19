@@ -47,7 +47,7 @@ def custom_program_attribute(selenium):
       .select_custom_attributes() \
       .select_programs() \
       .add_new_custom_attribute()
-  test_helpers.ModalNewProgramCustomAttribute.enter_test_data(modal)
+  test_helpers.ModalNewProgramCustomAttributePage.enter_test_data(modal)
   cust_attr_widget = modal.save_and_close()
 
   yield cust_attr_widget
@@ -117,6 +117,32 @@ def new_program(selenium, new_control):
 
   selenium.driver.get(program_info_page.url)
   widget.ProgramInfo(selenium.driver) \
+      .press_object_settings() \
+      .select_delete() \
+      .confirm_delete()
+
+
+@pytest.yield_fixture(scope="class")
+def new_org_group(selenium):
+  """Creates a new org group object.
+
+  Returns:
+      lib.page.modal.new_program.NewOrgGroupModal
+  """
+  modal = dashboard.DashboardPage(selenium.driver) \
+      .open_lhn_menu() \
+      .select_my_objects() \
+      .select_people_or_groups() \
+      .select_org_groups() \
+      .create_new()
+  test_helpers.ModalNewOrgGroupPage.enter_test_data(modal)
+  modal.save_and_close()
+  org_group_page = widget.OrgGroupsInfo(selenium.driver)
+
+  yield org_group_page
+
+  selenium.driver.get(org_group_page.url)
+  widget.OrgGroupsInfo(selenium.driver) \
       .press_object_settings() \
       .select_delete() \
       .confirm_delete()
