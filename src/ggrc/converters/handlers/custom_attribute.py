@@ -33,6 +33,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     return value
 
   def get_value(self):
+    self.definition = self.get_ca_definition()
     for value in self.row_converter.obj.custom_attribute_values:
       if value.custom_attribute_id == self.definition.id:
         return value.attribute_value

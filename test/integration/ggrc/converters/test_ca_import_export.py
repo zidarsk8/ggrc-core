@@ -3,9 +3,10 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+from flask.json import dumps
+
 from integration.ggrc.converters import TestCase
 from integration.ggrc.generator import ObjectGenerator
-
 from ggrc.models import AccessGroup
 from ggrc.models import Product
 
@@ -18,6 +19,11 @@ class TestImportWithCustomAttributes(TestCase):
     self.create_custom_attributes()
     self.create_people()
     self.client.get("/login")
+    self.headers = {
+        'Content-Type': 'application/json',
+        "X-Requested-By": "gGRC",
+        "X-export-view": "blocks",
+    }
 
   def tearDown(self):
     pass
@@ -97,6 +103,23 @@ class TestImportWithCustomAttributes(TestCase):
     self.assertEqual(18, response["created"])
     self.assertEqual(8, response["ignored"])
     self.assertEqual(18, Product.query.count())
+
+  def tests_ca_export(self):
+    filename = "product_with_all_custom_attributes.csv"
+    self.import_file(filename)
+
+    data = [{
+        "object_name": "Product",
+        "filters": {
+            "expression": {},
+        },
+        "fields": "all",
+    }]
+    response = self.client.post("/_service/export_csv", data=dumps(data),
+                            headers=self.headers)
+
+    self.assert200(response)
+
 
   def test_multi_word_object_with_custom_attributes(self):
     """Test multi-word (e.g. Access Group, Data Asset) object import"""
