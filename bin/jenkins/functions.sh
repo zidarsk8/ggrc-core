@@ -104,3 +104,22 @@ integration_tests () {
   print_line
   return $rc
 }
+
+
+selenium_tests () {
+  PROJECT=$1
+  print_line
+
+  echo "Running Test server"
+  docker exec -id ${PROJECT}_dev_1 /vagrant/bin/launch_ggrc_test
+
+  echo "Running Selenium tests"
+  docker exec -i ${PROJECT}_selenium_1 sh -c "
+    python /selenium/src/run_selenium.py --junitxml=/selenium/logs/selenium.xml
+  " && rc=$? || rc=$?
+
+  mv ./test/selenium/logs/selenium.xml ./test/selenium.xml || true
+
+  print_line
+  return $rc
+}
