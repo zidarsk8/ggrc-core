@@ -844,6 +844,51 @@ class ProgramInfoWidget(object):
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
 
 
+class AdminRolesWidget(object):
+  """Locators for the roles widget on the admin dashboard"""
+  ROLE_EDITOR = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(2) .span8>div')
+  ROLE_GRC_ADMIN = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(3) .span8>div')
+  ROLE_PROGRAM_EDITOR = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(4) .span8>div')
+  ROLE_PROGRAM_OWNER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(5) .span8>div')
+  ROLE_PROGRAM_READER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(6) .span8>div')
+  ROLE_READER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(7) .span8>div')
+  ROLE_WORKFLOW_MEMBER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(8) .span8>div')
+  ROLE_WORKFLOW_OWNER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(9) .span8>div')
+
+  SCOPE_EDITOR = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(2) .span4 .scope')
+  SCOPE_GRC_ADMIN = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(3) .span4 .scope')
+  SCOPE_PROGRAM_EDITOR = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(4) .span4 .scope')
+  SCOPE_PROGRAM_OWNER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(5) .span4 .scope')
+  SCOPE_PROGRAM_READER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(6) .span4 .scope')
+  SCOPE_READER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(7) .span4 .scope')
+  SCOPE_WORKFLOW_MEMBER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(8) .span4 .scope')
+  SCOPE_WORKFLOW_OWNER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(9) .span4 .scope')
+
+
 class ControlInfoWidget(object):
   """Locators for the control info widget"""
   # pylint: disable=too-few-public-methods
