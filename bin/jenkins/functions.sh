@@ -123,3 +123,34 @@ selenium_tests () {
   print_line
   return $rc
 }
+
+
+unittests_tests () {
+  PROJECT=$1
+  print_line
+  
+  echo "Running python unit tests"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/bin/run_unit
+  " && unit_rc=$? || unit_rc=$?
+  
+  [[ unit_rc -eq 0 ]] && echo "PASS" || echo "FAIL"
+  
+  print_line
+
+  echo "Running karma tests"
+  
+  docker exec -id ${PROJECT}_selenium_1 python /selenium/bin/chrome_karma.py
+  
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/node_modules/karma/bin/karma start \\
+      /vagrant/karma.conf.js --single-run --reporters dots,junit
+  " && karma_rc=$? || karma_rc=$?
+  
+  [[ karma_rc -eq 0 ]] && echo "PASS" || echo "FAIL"
+  
+  print_line
+  return $((unit_rc * unit_rc + karma_rc * karma_rc))
+}
