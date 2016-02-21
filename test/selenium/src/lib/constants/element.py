@@ -82,3 +82,19 @@ class WidgetProgramInfo(object):
   BUTTON_SETTINGS_DROPDOWN_ITEMS = [EDIT_PROGRAM, GET_PERMALINK, DELETE]
 
   ALERT_LINK_COPIED = "Link has been copied to your clipboard."
+
+
+class AdminRolesWidget(object):
+  EDITOR = "Editor"
+  GRC_ADMIN = "gGRC Admin"
+  PROGRAM_EDITOR = "ProgramEditor"
+  PROGRAM_OWNER = "ProgramOwner"
+  PROGRAM_READER = "ProgramReader"
+  READER = "Reader"
+  WORKFLOW_MEMEMBER = "WorkflowMember"
+  WORKFLOW_OWNER = "WorkflowOwner"
+
+  SCOPE_SYSTEM = "SYSTEM"
+  SCOPE_ADMIN = "ADMIN"
+  SCOPE_PRIVATE_PROGRAM = "PRIVATE PROGRAM"
+  SCOPE_WORKFLOW = "WORKFLOW"
