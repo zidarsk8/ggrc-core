@@ -19,11 +19,11 @@ from lib.constants.test import modal_create_new
 from lib.constants.test import modal_custom_attribute
 
 
-def append_random_string_after(text):
+def append_random_string(text):
   return text + str(uuid.uuid4())
 
 
-def prepend_random_string_before(text):
+def prepend_random_string(text):
   return str(uuid.uuid4()) + text
 
 
@@ -50,13 +50,13 @@ class ModalNewControlPage(base.Test):
     Args:
         modal (lib.page.lhn_modal.new_control.NewControlModal)
     """
-    modal.enter_title(append_random_string_after(modal_create_new.SHORT_TITLE))
-    modal.enter_description(append_random_string_after(
+    modal.enter_title(append_random_string(modal_create_new.SHORT_TITLE))
+    modal.enter_description(append_random_string(
         modal_create_new.SHORT_TITLE))
-    modal.enter_test_plan(append_random_string_after(
+    modal.enter_test_plan(append_random_string(
         modal_create_new.SHORT_TITLE))
-    modal.enter_notes(append_random_string_after(modal_create_new.SHORT_TITLE))
-    modal.enter_code(append_random_string_after(modal_create_new.SHORT_TITLE))
+    modal.enter_notes(append_random_string(modal_create_new.SHORT_TITLE))
+    modal.enter_code(append_random_string(modal_create_new.SHORT_TITLE))
 
 
 class ModalNewProgramPage(base.Test):
@@ -69,16 +69,16 @@ class ModalNewProgramPage(base.Test):
     Args:
         modal (lib.page.modal.edit_object.EditProgramModal)
     """
-    modal.enter_title(append_random_string_after(modal_create_new.SHORT_TITLE))
-    modal.enter_description(append_random_string_after(
+    modal.enter_title(append_random_string(modal_create_new.SHORT_TITLE))
+    modal.enter_description(append_random_string(
         modal_create_new.SHORT_TITLE))
-    modal.enter_notes(append_random_string_after(modal_create_new.SHORT_TITLE))
-    modal.enter_code(append_random_string_after(modal_create_new.SHORT_TITLE))
+    modal.enter_notes(append_random_string(modal_create_new.SHORT_TITLE))
+    modal.enter_code(append_random_string(modal_create_new.SHORT_TITLE))
     modal.filter_and_select_primary_contact("example")
     modal.filter_and_select_secondary_contact("example")
-    modal.enter_program_url(prepend_random_string_before(
+    modal.enter_program_url(prepend_random_string(
         modal_create_new.Program.PROGRAM_URL))
-    modal.enter_reference_url(prepend_random_string_before(
+    modal.enter_reference_url(prepend_random_string(
         modal_create_new.Program.REFERENCE_URL))
 
   @staticmethod
@@ -105,11 +105,11 @@ class ModalNewProgramCustomAttributePage(base.Test):
     Args:
         modal (lib.page.modal.custom_attribute.NewCustomAttributeModal)
     """
-    modal.enter_title(append_random_string_after(
+    modal.enter_title(append_random_string(
         modal_custom_attribute.Program.TITLE))
-    modal.enter_inline_help(append_random_string_after(
+    modal.enter_inline_help(append_random_string(
         modal_custom_attribute.Program.INLINE_HELP))
-    modal.enter_placeholder(append_random_string_after(
+    modal.enter_placeholder(append_random_string(
         modal_custom_attribute.Program.PLACEHOLDER))
 
 
@@ -121,7 +121,7 @@ class ModalNewOrgGroupPage(base.Test):
     Args:
         modal (lib.page.modal.edit_object.EditOrgGroupModal)
     """
-    modal.enter_title(append_random_string_after(
+    modal.enter_title(append_random_string(
         modal_custom_attribute.Program.TITLE))
 
 
@@ -133,7 +133,7 @@ class ModalRiskPage(base.Test):
     Args:
         modal (lib.page.modal.edit_object.EditRiskModal)
     """
-    modal.enter_title(append_random_string_after(
+    modal.enter_title(append_random_string(
         modal_custom_attribute.Program.TITLE))
-    modal.enter_description(append_random_string_after(
+    modal.enter_description(append_random_string(
         modal_custom_attribute.Program.TITLE))
