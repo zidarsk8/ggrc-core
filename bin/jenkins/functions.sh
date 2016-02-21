@@ -220,3 +220,34 @@ code_style_tests () {
   print_line
   return $((pylint_rc * pylint_rc + flake_rc * flake_rc + eslint_rc * eslint_rc))
 }
+
+
+checkstyle_tests () {
+  PROJECT=$1
+  print_line
+  
+  echo "Running pylint"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    pylint -f parseable src/ggrc\
+                        src/ggrc_basic_permissions\
+                        src/ggrc_gdrive_integration\
+                        src/ggrc_risk_assessments\
+                        src/ggrc_risks\
+                        src/ggrc_workflows\
+                        test/integration\
+                        test/selenium/src\
+                        test/unit\
+                        > test/pylint.out
+  " || true
+  
+  print_line
+  
+  echo "Running eslint"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    eslint -f checkstyle src -o test/eslint.xml
+  " || true
+  
+  print_line
+}
