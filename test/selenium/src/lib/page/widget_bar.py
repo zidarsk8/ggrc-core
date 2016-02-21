@@ -7,6 +7,7 @@
 object can have it's own rules what is mappable to it"""
 
 from lib import base
+from lib import selenium_utils
 from lib.page import widget
 from lib.element import widget_bar
 from lib.constants import locator
@@ -91,6 +92,10 @@ class AdminDashboardWidgetBarPage(_WidgetBar):
         widget.AdminRoles
     """
     self.tab_roles.click()
+
+    # wait until elements are loaded
+    selenium_utils.get_when_visible(
+        self._driver, locator.AdminRolesWidget.ROLE_EDITOR)
     return widget.AdminRoles(self._driver)
 
   def select_events(self):
