@@ -525,6 +525,8 @@ class _Risks(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_RISK
   _locator_spinny = locator.LhnMenu.SPINNY_RISKS
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_RISK_MEMBERS
+  _create_new_modal_cls = modal.create_new_object.NewRiskModal
 
 
 class _Threats(lhn.AccordionGroup):

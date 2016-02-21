@@ -3,18 +3,18 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-"""All smoke tests relevant to people/groups page"""
+"""All smoke tests relevant to risks/threats page"""
 
 import pytest    # pylint: disable=import-error
 from lib import base
 from lib.constants import url
 
 
-class TestOrgGroupPage(base.Test):
-  """Tests the org group page, a part of smoke tests, section 7."""
+class TestRiskThreatPage(base.Test):
+  """Tests the threat/risk page, a part of smoke tests, section 8."""
 
   @pytest.mark.smoke_tests
-  def test_app_redirects_to_new_org_group_page(self, new_org_group):
+  def test_app_redirects_to_new_risk_page(self, new_risk):
     """Tests if after saving and closing the lhn_modal the app redirects to
     the object page.
 
@@ -24,5 +24,5 @@ class TestOrgGroupPage(base.Test):
     """
     # pylint: disable=no-self-use
     # pylint: disable=invalid-name
-    assert url.ORG_GROUPS + "/" + new_org_group.object_id in \
-        new_org_group.url
+    assert url.RISKS + "/" + new_risk.object_id in \
+        new_risk.url

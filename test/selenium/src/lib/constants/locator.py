@@ -8,11 +8,14 @@ from selenium.webdriver.common.by import By   # pylint: disable=import-error
 
 class Login(object):
   """All locators for the login page"""
+  # pylint: disable=too-few-public-methods
+
   BUTTON_LOGIN = (By.CSS_SELECTOR, "a.btn.btn-large.btn-info")
 
 
 class PageHeader(object):
   """All locators for the dashboard header (has the same name as the elemnt"""
+  # pylint: disable=too-few-public-methods
 
   BUTTON_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
   BUTTON_DASHBOARD = (By.CSS_SELECTOR, '.header-content .to-my-work['
@@ -38,6 +41,7 @@ class PageHeader(object):
 
 class Dashboard(object):
   """Locators for the dashbord page"""
+  # pylint: disable=too-few-public-methods
 
   BUTTON_START_NEW_PROGRAM = (
       By.CSS_SELECTOR, '.quick-list [data-object-singular="Program"]')
@@ -53,6 +57,7 @@ class Dashboard(object):
 
 class LhnMenu(object):
   """Locators for the menu in header"""
+  # pylint: disable=too-few-public-methods
 
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
@@ -321,15 +326,22 @@ class LhnMenu(object):
       By.CSS_SELECTOR, '[data-model-name="Control"]>.content>.sub-level>li')
   ACCORDEON_ORG_GROUP_MEMBERS = (
       By.CSS_SELECTOR, '[data-model-name="OrgGroup"]>.content>.sub-level>li')
+  ACCORDEON_RISK_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="Risk"]>.content>.sub-level>li')
 
 
 class ExtendedInfo(object):
+  """Locators for the extended info tooltip in LHN after hovering over a
+  member object"""
+  # pylint: disable=too-few-public-methods
+
   BUTTON_MAP_TO = (By.CSS_SELECTOR, '.extended-info.in .map-to-page-object')
 
 
 class ModalCreateNewProgram(object):
   """Locators for the program modal visible when creating a new modal from
   LHN"""
+  # pylint: disable=too-few-public-methods
 
   UI_TITLE = (By.CSS_SELECTOR,
               '[data-test-id="new_program_field_title_a63ed79d"]')
@@ -381,6 +393,8 @@ class ModalCreateNewProgram(object):
 class ModalCreateNewOrgGroup(object):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
+  # pylint: disable=too-few-public-methods
+
   # labels
   MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
   TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
@@ -398,9 +412,35 @@ class ModalCreateNewOrgGroup(object):
       '.confirm-buttons [data-toggle="modal-submit-addmore"]')
 
 
+class ModalCreateNewRisk(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+  # pylint: disable=too-few-public-methods
+
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
+  UI_DESCRIPTION = (
+      By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
+
+  BUTTON_SAVE_AND_CLOSE = (
+      By.CSS_SELECTOR,
+      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
+  BUTTON_SAVE_AND_ADD_ANOTHER = (
+      By.CSS_SELECTOR,
+      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
+
+
 class ModalCreateNewControl(object):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
+  # pylint: disable=too-few-public-methods
+
   # labels
   MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
   TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
@@ -539,6 +579,7 @@ class ModalCreateNewControl(object):
 
 class ModalCustomAttribute(object):
   """Locators for a generic custom attributes modal in admin dashboard"""
+  # pylint: disable=too-few-public-methods
 
   MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header h2')
   ATTRIBUTE_TITLE = (By.CSS_SELECTOR, '.modal-body div:nth-child(1)>label')
@@ -563,6 +604,7 @@ class ModalCustomAttribute(object):
 
 class WidgetBar(object):
   """Locators for the bar containing the widgets/tabs"""
+  # pylint: disable=too-few-public-methods
 
   BUTTON_ADD = (By.CSS_SELECTOR,
                 '[data-test-id="button_widget_add_2c925d94"]')
@@ -609,6 +651,7 @@ class WidgetBar(object):
 
 class WidgetBarButtonAddDropdown(object):
   """Locators for the button/dropdown "add widget" in widget bar"""
+  # pylint: disable=too-few-public-methods
 
   AUDITS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
                              '[href="#audit_widget"]')
@@ -692,6 +735,8 @@ class WidgetBarButtonAddDropdown(object):
 
 class ObjectWidget(object):
   """Locators for a generic widget"""
+  # pylint: disable=too-few-public-methods
+
   CONTROL_COLUMN_TITLE = (By.CSS_SELECTOR, '#control_widget .header .span4 '
                                            '.title-heading .widget-col-title')
   CONTROL_OWNER = (By.CSS_SELECTOR, '#control_widget .header .span4 '
@@ -701,11 +746,15 @@ class ObjectWidget(object):
 
 
 class InfoWidget(object):
+  """Locators for the info widget"""
+  # pylint: disable=too-few-public-methods
+
   BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
 
 
 class ProgramInfoWidget(object):
   """Locators for the info widget"""
+  # pylint: disable=too-few-public-methods
 
   PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
   DROPDOWN_SETTINGS_EDIT = (
@@ -796,11 +845,15 @@ class ProgramInfoWidget(object):
 
 
 class ControlInfoWidget(object):
+  """Locators for the control info widget"""
+  # pylint: disable=too-few-public-methods
+
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"]>h3')
 
 
 class WidgetFilter(object):
   """Locators for filters in widgets"""
+  # pylint: disable=too-few-public-methods
 
   TITLE_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
                                     '.filter-title h6')
@@ -816,6 +869,7 @@ class WidgetFilter(object):
 
 class AdminCustomAttributes(object):
   """Locators for the widget custom attributes in admin dashboard"""
+  # pylint: disable=too-few-public-methods
 
   FILTER_INPUT_FIELD = (By.CLASS_NAME, 'filter-input')
   FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR, '.filter-button>[type="submit"]')

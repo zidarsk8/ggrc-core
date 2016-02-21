@@ -146,3 +146,29 @@ def new_org_group(selenium):
       .press_object_settings() \
       .select_delete() \
       .confirm_delete()
+
+
+@pytest.yield_fixture(scope="class")
+def new_risk(selenium):
+  """Creates a new risk group object.
+
+  Returns:
+      lib.page.modal.new_program.NewOrgGroupModal
+  """
+  modal = dashboard.DashboardPage(selenium.driver) \
+      .open_lhn_menu() \
+      .select_my_objects() \
+      .select_risks_or_threats() \
+      .select_risks() \
+      .create_new()
+  test_helpers.ModalRiskPage.enter_test_data(modal)
+  modal.save_and_close()
+  risk_page = widget.RiskInfo(selenium.driver)
+
+  yield risk_page
+
+  selenium.driver.get(risk_page.url)
+  widget.RiskInfo(selenium.driver) \
+      .press_object_settings() \
+      .select_delete() \
+      .confirm_delete()

@@ -279,3 +279,19 @@ class EditOrgGroupModal(_EditModal):
 
   _locator_ui_title = locator.ModalCreateNewOrgGroup.UI_TITLE
   locator_button_save = locator.ModalCreateNewOrgGroup.BUTTON_SAVE_AND_CLOSE
+
+
+class EditRiskModal(_EditModal):
+  """Class representing a new risk modal visible after creating a new
+  control from LHN"""
+
+  _locators = locator.ModalCreateNewRisk
+  _locator_ui_title = locator.ModalCreateNewRisk.UI_TITLE
+  locator_button_save = locator.ModalCreateNewRisk.BUTTON_SAVE_AND_CLOSE
+
+  def __init__(self, driver):
+    super(EditRiskModal, self).__init__(driver)
+    self.ui_description = base.Iframe(driver, self._locators.UI_DESCRIPTION)
+
+  def enter_description(self, text):
+    self.ui_description.find_iframe_and_enter_data(text)
