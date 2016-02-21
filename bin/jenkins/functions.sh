@@ -84,3 +84,23 @@ teardown () {
 
   docker-compose -p ${PROJECT} stop
 }
+
+print_line () {
+echo "
+###############################################################################
+"
+}
+
+integration_tests () {
+  PROJECT=$1
+  print_line
+
+  echo "Running ${PROJECT}"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/bin/run_integration
+  " && rc=$? || rc=$?
+
+  print_line
+  return $rc
+}
