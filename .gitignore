@@ -59,3 +59,4 @@ test/selenium/.cache/
 
 # test reports:
 test/*.xml
+test/*.out

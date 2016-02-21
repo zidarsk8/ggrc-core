@@ -23,7 +23,16 @@ echo "
 echo "Running pylint"
 docker exec -i ${PROJECT}_dev_1 su vagrant -c "
   source /vagrant/bin/init_vagrant_env
-  pylint -f parseable src/* test/* > test/pylint.out
+  pylint -f parseable src/ggrc\
+                      src/ggrc_basic_permissions\
+                      src/ggrc_gdrive_integration\
+                      src/ggrc_risk_assessments\
+                      src/ggrc_risks\
+                      src/ggrc_workflows\
+                      test/integration\
+                      test/selenium/src\
+                      test/unit\
+                      > test/pylint.out
 " || true
 
 echo "
