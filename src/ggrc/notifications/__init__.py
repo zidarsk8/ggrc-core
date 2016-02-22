@@ -16,15 +16,15 @@ from ggrc.utils import merge_dict
 from ggrc import db
 from ggrc.notifications import common
 
-env = Environment(loader=PackageLoader('ggrc', 'templates'))
+ENV = Environment(loader=PackageLoader('ggrc', 'templates'))
 
 
-class NotificationServices():
+class Services():
 
-  def __init__(self):
-    self.services = self.all_notifications()
+  services = []
 
-  def all_notifications(self):
+  @classmethod
+  def all_notifications(cls):
     services = {}
     for extension_module in get_extension_modules():
       contributions = getattr(
@@ -35,22 +35,23 @@ class NotificationServices():
         services.update(contributions)
     return services
 
-  def get_service_function(self, name):
-    if name not in self.services:
+  @classmethod
+  def get_service_function(cls, name):
+    if not cls.services:
+      cls.services = cls.all_notifications()
+    if name not in cls.services:
       raise ValueError("unknown service name: %s" % name)
-    return self.services[name]
+    return cls.services[name]
 
-  def call_service(self, name, notification):
-    service = self.get_service_function(name)
+  @classmethod
+  def call_service(cls, name, notification):
+    service = cls.get_service_function(name)
     return service(notification)
-
-
-services = NotificationServices()
 
 
 def get_filter_data(notification):
   result = {}
-  data = services.call_service(notification.object_type, notification)
+  data = Services.call_service(notification.object_type, notification)
 
   for user, user_data in data.iteritems():
     if should_receive(notification,
@@ -132,7 +133,7 @@ def should_receive(notif, force_notif, person_id, nightly_cron=True):
 
 
 def send_todays_digest_notifications():
-  digest_template = env.get_template("notifications/email_digest.html")
+  digest_template = ENV.get_template("notifications/email_digest.html")
   notif_list, notif_data = get_todays_notifications()
   sent_emails = []
   subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
@@ -159,7 +160,7 @@ def show_pending_notifications():
   for day, day_notif in notif_data.iteritems():
     for user_email, data in day_notif.iteritems():
       data = common.modify_data(data)
-  pending = env.get_template("notifications/view_pending_digest.html")
+  pending = ENV.get_template("notifications/view_pending_digest.html")
   return pending.render(data=sorted(notif_data.iteritems()))
 
 
@@ -169,5 +170,5 @@ def show_todays_digest_notifications():
   _, notif_data = get_todays_notifications()
   for user_email, data in notif_data.iteritems():
     data = common.modify_data(data)
-  todays = env.get_template("notifications/view_todays_digest.html")
+  todays = ENV.get_template("notifications/view_todays_digest.html")
   return todays.render(data=notif_data)
