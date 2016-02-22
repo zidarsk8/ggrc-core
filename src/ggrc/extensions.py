@@ -79,6 +79,8 @@ def _get_contribution(module, name):
   if callable(contributions):
     contributions = contributions()
 
+  if isinstance(contributions, dict):
+    contributions = contributions.items()
   if not isinstance(contributions, list):
     raise TypeError("Contributed item must be a list or a callable that "
                     "returns a list")
@@ -107,4 +109,6 @@ def get_module_contributions(name):
     contributions_module = getattr(module, "contributions", None)
     if contributions_module:
       all_contributions.extend(_get_contribution(contributions_module, name))
+  if all(isinstance(val, tuple) for val in all_contributions):
+    all_contributions = dict(all_contributions)
   return all_contributions
