@@ -15,23 +15,7 @@ PROJECT=$( project_name "$@" -d "$PROJECT" )
 
 setup $PROJECT
 
-echo "
-###############################################################################
-"
-
-echo "Running Test server"
-docker exec -id ${PROJECT}_dev_1 /vagrant/bin/launch_ggrc_test
-
-echo "Running Selenium tests"
-docker exec -i ${PROJECT}_selenium_1 sh -c "
-  python /selenium/src/run_selenium.py --junitxml=/selenium/logs/selenium.xml
-" && rc=$? || rc=$?
-
-mv ./test/selenium/logs/selenium.xml ./test/selenium.xml || true
-
-echo "
-###############################################################################
-"
+selenium_tests $PROJECT && rc=$? || rc=$?
 
 teardown $PROJECT
 

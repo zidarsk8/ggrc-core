@@ -16,37 +16,8 @@ PROJECT=$( project_name "$@" -d "$PROJECT" )
 
 setup $PROJECT
 
-echo "
-###############################################################################
-"
-
-echo "Running pylint"
-docker exec -i ${PROJECT}_dev_1 su vagrant -c "
-  source /vagrant/bin/init_vagrant_env
-  pylint -f parseable src/ggrc\
-                      src/ggrc_basic_permissions\
-                      src/ggrc_gdrive_integration\
-                      src/ggrc_risk_assessments\
-                      src/ggrc_risks\
-                      src/ggrc_workflows\
-                      test/integration\
-                      test/selenium/src\
-                      test/unit\
-                      > test/pylint.out
-" || true
-
-echo "
-###############################################################################
-"
-
-echo "Running eslint"
-docker exec -i ${PROJECT}_dev_1 su vagrant -c "
-  source /vagrant/bin/init_vagrant_env
-  eslint -f checkstyle src -o test/eslint.xml
-" || true
-
-echo "
-###############################################################################
-"
+checkstyle_tests $PROJECT && rc=$? || rc=$?
 
 teardown $PROJECT
+
+exit 0
