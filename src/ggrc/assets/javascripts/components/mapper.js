@@ -143,6 +143,7 @@
       }
       return {
         mapper: new MapperModel(data)
+        template: parentScope.attr('template')
       };
     },
     events: {

@@ -12,14 +12,40 @@ can.Component.extend({
     audit: null
   },
   events: {
-    'a click': function() {
+    'a click': function (el, ev) {
+      var instance = GGRC.page_instance();
       if (this.scope.loading) {
         return;
       }
-      this._generate_assessments();
+      GGRC.Controllers.MapperModal.launch(el, {
+        object: 'Audit',
+        type: 'Control',
+        'join-object-id': this.scope.audit.id,
+        'search-only': 'false',
+        'join-mapping': 'program_controls',
+        relevantTo: [{
+          type: instance.program.type,
+          id: instance.program.id
+        }],
+        getList: this.getList.bind(this),
+        template: {
+          title: 'Select controls to generate assessments',
+          submitButton: 'Generate Assessments',
+          count: 'assessment(s) will be generated'
+        },
+        callback: this._generate_assessments.bind(this)
+      });
     },
-
-    _generate_assessments: function(controls) {
+    getList: function (type) {
+      var bindings = {
+        control: 'program_controls',
+        issue: 'related_issues'
+      };
+      var audit = GGRC.page_instance();
+      var result = audit.get_binding(bindings[type.toLowerCase()]);
+      return result.list;
+    },
+    _generate_assessments: function (controls) {
       var assessments_list = this.scope.audit.get_binding("related_assessments").list,
           controls_list = this.scope.audit.get_binding("program_controls").list,
           assessments_dfd = this._refresh(assessments_list),
