@@ -9,6 +9,7 @@ import re
 import pyvirtualdisplay   # pylint: disable=import-error
 from selenium.webdriver.common import keys    # pylint: disable=import-error
 from selenium import webdriver    # pylint: disable=import-error
+from selenium.common import exceptions
 from lib import environment
 from lib import constants
 from lib import exception
@@ -356,9 +357,13 @@ class Component(object):
   def wait_for_redirect(self):
     """Wait until the current url changes"""
     from_url = self._driver.current_url
+    timer_start = time.time()
 
     while from_url == self._driver.current_url:
       time.sleep(0.1)
+
+      if time.time() - timer_start > constants.ux.MAX_USER_WAIT_SECONDS:
+         raise exception.RedirectTimeout
 
 
 class AnimatedComponent(Component):
@@ -505,7 +510,9 @@ class Widget(AbstractPage):
 
 
 class ObjectWidget(Widget):
-  """Class representing all widgets except the info widget"""
+  """Class representing all widgets with filters that list objects"""
+
+  _info_pane_cls = None
 
   def __init__(self, driver, locator_widget, locator_filter_title,
                locator_button_questionmark,
@@ -531,3 +538,30 @@ class ObjectWidget(Widget):
         locator_filter_textbox,
         locator_filter_submit,
         locator_filter_clear)
+
+    try:
+      self.members_listed = self._driver \
+          .find_elements(*constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
+    except exceptions.NoSuchElementException:
+      self.members_listed = None
+
+  def select_nth_member(self, member):
+    """Selects member from the list. Members start from (including) 0.
+
+    Args:
+        member (int)
+
+    Returns:
+        lib.page.widget.info.InfoWidget
+    """
+    try:
+      self.members_listed[member].click()
+
+      # wait until the info pane loads
+      selenium_utils.get_when_visible(
+          self._driver, constants.locator.ObjectWidget.INFO_PANE)
+      return self._info_pane_cls(self._driver)
+    except exceptions.StaleElementReferenceException:
+      self.members_listed = self._driver \
+          .find_elements(*constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
+      return self.select_nth_member(member)
