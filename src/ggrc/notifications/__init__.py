@@ -3,42 +3,39 @@
 # Created By: mouli@meics.org
 # Maintained By: miha@reciprocitylabs.com
 
+import jinja2
 from collections import defaultdict
+from datetime import date
+from datetime import datetime
 from sqlalchemy import and_
-from datetime import date, datetime
-from jinja2 import Environment, PackageLoader
-
-from ggrc.rbac import permissions
 from werkzeug.exceptions import Forbidden
-from ggrc.extensions import get_extension_modules
-from ggrc.models import Notification, NotificationConfig
-from ggrc.utils import merge_dict
-from ggrc import db
-from ggrc.notifications import common
 
-ENV = Environment(loader=PackageLoader('ggrc', 'templates'))
+from ggrc import db
+from ggrc import extensions
+from ggrc.models import Notification
+from ggrc.models import NotificationConfig
+from ggrc.notifications import common
+from ggrc.rbac import permissions
+from ggrc.utils import merge_dict
+
+ENV = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
 
 
 class Services():
+  """Helper class for notification services.
+
+  This class is is a helper class for calling a notification service for a
+  given object. The first call get_service_function must be done after all
+  modules have been initialized.
+  """
 
   services = []
 
   @classmethod
-  def all_notifications(cls):
-    services = {}
-    for extension_module in get_extension_modules():
-      contributions = getattr(
-          extension_module, 'contributed_notifications', None)
-      if contributions:
-        if callable(contributions):
-          contributions = contributions()
-        services.update(contributions)
-    return services
-
-  @classmethod
   def get_service_function(cls, name):
     if not cls.services:
-      cls.services = cls.all_notifications()
+      cls.services = extensions.get_module_contributions(
+          "contributed_notifications")
     if name not in cls.services:
       raise ValueError("unknown service name: %s" % name)
     return cls.services[name]
@@ -100,14 +97,6 @@ def get_todays_notifications():
            Notification.sent_at == None  # noqa
            )).all()
   return notifications, get_notification_data(notifications)
-
-
-def generate_notification_email(data):
-  pass
-
-
-def dispatch_notifications():
-  pass
 
 
 def should_receive(notif, force_notif, person_id, nightly_cron=True):
