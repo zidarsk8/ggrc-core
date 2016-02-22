@@ -602,10 +602,10 @@
     },
     Audit: {
       _canonical: {
-        "requests": "Request",
-        "_program": "Program",
-        "context": "Context",
-        "related_objects_as_source": ["Assessment", "Issue"]
+        requests: 'Request',
+        _program: 'Program',
+        context: 'Context',
+        related_objects_as_source: ['Control', 'Assessment', 'Issue']
       },
       requests: Direct("Request", "audit", "requests"),
       active_requests: CustomFilter('requests', function (result) {
