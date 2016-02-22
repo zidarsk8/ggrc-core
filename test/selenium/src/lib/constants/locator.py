@@ -3,19 +3,20 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+"""Locators for all the elements"""
+# pylint: disable=too-few-public-methods
+
 from selenium.webdriver.common.by import By   # pylint: disable=import-error
 
 
 class Login(object):
   """All locators for the login page"""
-  # pylint: disable=too-few-public-methods
 
   BUTTON_LOGIN = (By.CSS_SELECTOR, "a.btn.btn-large.btn-info")
 
 
 class PageHeader(object):
   """All locators for the dashboard header (has the same name as the elemnt"""
-  # pylint: disable=too-few-public-methods
 
   BUTTON_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
   BUTTON_DASHBOARD = (By.CSS_SELECTOR, '.header-content .to-my-work['
@@ -41,7 +42,6 @@ class PageHeader(object):
 
 class Dashboard(object):
   """Locators for the dashbord page"""
-  # pylint: disable=too-few-public-methods
 
   BUTTON_START_NEW_PROGRAM = (
       By.CSS_SELECTOR, '.quick-list [data-object-singular="Program"]')
@@ -57,7 +57,6 @@ class Dashboard(object):
 
 class LhnMenu(object):
   """Locators for the menu in header"""
-  # pylint: disable=too-few-public-methods
 
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
@@ -333,7 +332,6 @@ class LhnMenu(object):
 class ExtendedInfo(object):
   """Locators for the extended info tooltip in LHN after hovering over a
   member object"""
-  # pylint: disable=too-few-public-methods
 
   BUTTON_MAP_TO = (By.CSS_SELECTOR, '.extended-info.in .map-to-page-object')
 
@@ -341,10 +339,7 @@ class ExtendedInfo(object):
 class ModalCreateNewProgram(object):
   """Locators for the program modal visible when creating a new modal from
   LHN"""
-  # pylint: disable=too-few-public-methods
 
-  UI_TITLE = (By.CSS_SELECTOR,
-              '[data-test-id="new_program_field_title_a63ed79d"]')
   UI_DESCRIPTION = (By.CSS_SELECTOR,
                     '[data-test-id="new_program_field_description_1fb8bc06"]'
                     '>iframe.wysihtml5-sandbox')
@@ -365,9 +360,7 @@ class ModalCreateNewProgram(object):
                                            '"new_program_field_secondary_'
                                            'contact_'
                                            '86160053"]')
-  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR, '[data-toggle="modal-submit"]')
-  BUTTON_SAVE_AND_ADD_ANOTHER = (By.CSS_SELECTOR,
-                                 '[data-toggle="modal-submit-addmore"]')
+
   UI_PROGRAM_URL = (By.CSS_SELECTOR, '[data-test-id='
                                      '"new_program_field_program_url_'
                                      '86160053"]')
@@ -393,7 +386,6 @@ class ModalCreateNewProgram(object):
 class ModalCreateNewOrgGroup(object):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
-  # pylint: disable=too-few-public-methods
 
   # labels
   MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
@@ -404,18 +396,10 @@ class ModalCreateNewOrgGroup(object):
       By.CSS_SELECTOR,
       '.modal-body form>div:nth-child(2) .span6>input')
 
-  BUTTON_SAVE_AND_CLOSE = (
-      By.CSS_SELECTOR,
-      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
-  BUTTON_SAVE_AND_ADD_ANOTHER = (
-      By.CSS_SELECTOR,
-      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
-
 
 class ModalCreateNewRisk(object):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
-  # pylint: disable=too-few-public-methods
 
   # labels
   MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
@@ -428,18 +412,10 @@ class ModalCreateNewRisk(object):
   UI_DESCRIPTION = (
       By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
 
-  BUTTON_SAVE_AND_CLOSE = (
-      By.CSS_SELECTOR,
-      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
-  BUTTON_SAVE_AND_ADD_ANOTHER = (
-      By.CSS_SELECTOR,
-      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
-
 
 class ModalCreateNewControl(object):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
-  # pylint: disable=too-few-public-methods
 
   # labels
   MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
@@ -569,6 +545,16 @@ class ModalCreateNewControl(object):
   # buttons
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
   BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
+
+
+class ModalEditObject(object):
+  BUTTON_DELETE = (
+      By.CSS_SELECTOR, '.deny-buttons [data-toggle="modal-ajax-deleteform"]')
+
+
+class ModalCreateNewObject(object):
+  UI_TITLE = (By.CSS_SELECTOR, '[data-id="title_txtbx"]')
+
   BUTTON_SAVE_AND_CLOSE = (
       By.CSS_SELECTOR,
       '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
@@ -579,7 +565,6 @@ class ModalCreateNewControl(object):
 
 class ModalCustomAttribute(object):
   """Locators for a generic custom attributes modal in admin dashboard"""
-  # pylint: disable=too-few-public-methods
 
   MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header h2')
   ATTRIBUTE_TITLE = (By.CSS_SELECTOR, '.modal-body div:nth-child(1)>label')
@@ -594,17 +579,16 @@ class ModalCustomAttribute(object):
       '.modal-body div:nth-child(1)>input[tabindex="4"]')
   UI_PLACEHOLDER = (By.CSS_SELECTOR, '.modal-body div:nth-child(2)>input')
   CHECKBOX_MANDATORY = (By.CSS_SELECTOR, '.modal-body [type="checkbox"]')
-  BUTTON_SAVE = (By.CSS_SELECTOR, '.modal-footer .confirm-buttons '
-                                  '[data-toggle="modal-submit"]')
   BUTTON_ADD_ANOTHER = (
       By.CSS_SELECTOR,
-      '.modal-footer .confirm-buttons [data-toggle="modal-submit-addmore"]'
-  )
+      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
+  BUTTON_SAVE_AND_CLOSE = (
+      By.CSS_SELECTOR,
+      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
 
 
 class WidgetBar(object):
   """Locators for the bar containing the widgets/tabs"""
-  # pylint: disable=too-few-public-methods
 
   BUTTON_ADD = (By.CSS_SELECTOR,
                 '[data-test-id="button_widget_add_2c925d94"]')
@@ -651,7 +635,6 @@ class WidgetBar(object):
 
 class WidgetBarButtonAddDropdown(object):
   """Locators for the button/dropdown "add widget" in widget bar"""
-  # pylint: disable=too-few-public-methods
 
   AUDITS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
                              '[href="#audit_widget"]')
@@ -735,7 +718,6 @@ class WidgetBarButtonAddDropdown(object):
 
 class ObjectWidget(object):
   """Locators for a generic widget"""
-  # pylint: disable=too-few-public-methods
 
   CONTROL_COLUMN_TITLE = (By.CSS_SELECTOR, '#control_widget .header .span4 '
                                            '.title-heading .widget-col-title')
@@ -743,38 +725,33 @@ class ObjectWidget(object):
                                     '[data-field="contact.name|email"]')
   COTNROL_STATE = (By.CSS_SELECTOR, '#control_widget .header .span4 '
                                     '[data-field="status"]')
+  MEMBERS_TITLE_LIST = (
+      By.CSS_SELECTOR,
+      '.object-area [id="control_widget"] .tree-structure .select '
+      '.span4:nth-child(1)')
+  INFO_PANE = (By.CSS_SELECTOR, '.tier-content')
 
 
 class InfoWidget(object):
   """Locators for the info widget"""
-  # pylint: disable=too-few-public-methods
 
   BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
 
 
-class ProgramInfoWidget(object):
-  """Locators for the info widget"""
-  # pylint: disable=too-few-public-methods
-
-  PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
-  DROPDOWN_SETTINGS_EDIT = (
-      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(1)')
-  DROPDOWN_SETTINGS_PERMALINK = (
-      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(2)')
-  DROPDOWN_SETTINGS_DELETE = (
-      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(3)')
-
-  MODAL_OBJECT_DELETE_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
-  MODAL_OBJECT_DELETE_CONFIRMATION_TEXT = (By.CSS_SELECTOR,
-                                           '.modal-body>div>p')
-  MODAL_OBJECT_DELETE_OBJECT_TITLE = (By.CSS_SELECTOR,
-                                      '.modal-body>div>p>span')
-  MODAL_OBJECT_DELETE_BUTTON_DELETE = (
+class ModalDeleteObject(object):
+  MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
+  CONFIRMATION_TEXT = (By.CSS_SELECTOR, '.modal-body>div>p')
+  OBJECT_TITLE = (By.CSS_SELECTOR, '.modal-body>div>p>span')
+  BUTTON_DELETE = (
       By.CSS_SELECTOR, '.modal-footer .confirm-buttons>[data-toggle="delete"]')
 
+
+class ProgramInfoWidget(object):
+  """Locators for the info widget"""
+
+  PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
+
   ALERT_LINK_COPIED = (By.CSS_SELECTOR, '.alert.alert-success')
-  DROPDOWN_DELETE = (By.CSS_SELECTOR,
-                     '[data-test-id="dropdown_delete_0839163b"]')
   MODAL_DELETE = (By.ID, '[id="ajax-lhn_modal-javascript:--"]')
   MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, '.lhn_modal .grcicon-x-grey')
 
@@ -846,6 +823,7 @@ class ProgramInfoWidget(object):
 
 class AdminRolesWidget(object):
   """Locators for the roles widget on the admin dashboard"""
+
   ROLE_EDITOR = (
       By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(2) .span8>div')
   ROLE_GRC_ADMIN = (
@@ -889,16 +867,21 @@ class AdminRolesWidget(object):
       '[id="roles_list_widget"] li:nth-child(9) .span4 .scope')
 
 
-class ControlInfoWidget(object):
+class WidgetInfoSettingsButton(object):
   """Locators for the control info widget"""
-  # pylint: disable=too-few-public-methods
 
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"]>h3')
+
+  DROPDOWN_SETTINGS_EDIT = (
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(1)')
+  DROPDOWN_SETTINGS_PERMALINK = (
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(2)')
+  DROPDOWN_SETTINGS_DELETE = (
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(3)')
 
 
 class WidgetFilter(object):
   """Locators for filters in widgets"""
-  # pylint: disable=too-few-public-methods
 
   TITLE_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
                                     '.filter-title h6')
@@ -914,7 +897,6 @@ class WidgetFilter(object):
 
 class AdminCustomAttributes(object):
   """Locators for the widget custom attributes in admin dashboard"""
-  # pylint: disable=too-few-public-methods
 
   FILTER_INPUT_FIELD = (By.CLASS_NAME, 'filter-input')
   FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR, '.filter-button>[type="submit"]')
