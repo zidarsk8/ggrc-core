@@ -23,6 +23,7 @@ can.Component.extend({
         'join-object-id': this.scope.audit.id,
         'search-only': 'false',
         'join-mapping': 'program_controls',
+        getList: true,
         relevantTo: [{
           type: instance.program.type,
           id: instance.program.id

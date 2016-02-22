@@ -64,10 +64,11 @@
       })
     },
     events: {
-      inserted: function () {
+      init: function () {
         this.setRelevant();
       },
       setRelevant: function () {
+        this.scope.attr('relevant').replace([]);
         can.each(this.scope.attr('relevantTo') || [], function (item) {
           var model = CMS.Models[item.type].cache[item.id];
           this.scope.attr('relevant').push({

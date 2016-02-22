@@ -147,9 +147,9 @@
       }
       return {
         mapper: new MapperModel(_.extend(data, {
-          getList: parentScope.attr('getList'),
           relevantTo: parentScope.attr('relevantTo'),
-          callback: parentScope.attr('callback')
+          callback: parentScope.attr('callback'),
+          getList: parentScope.attr('getList')
         })),
         template: parentScope.attr('template')
       };
@@ -195,10 +195,15 @@
         entries.unshift(item);
       },
       ".modal-footer .btn-map click": function (el, ev) {
+        var callback = this.scope.attr('mapper.callback');
         ev.preventDefault();
         if (el.hasClass("disabled")) {
           return;
         }
+        if (this.scope.attr('mapper.getList')) {
+          return callback(this.scope.attr('mapper.selected'));
+        }
+
         // TODO: Figure out nicer / proper way to handle deferred save
         if (this.scope.attr("deferred")) {
           return this.deferredSave();
