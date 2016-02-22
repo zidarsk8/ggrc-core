@@ -6,6 +6,7 @@
 import traceback
 from flask import current_app
 
+from ggrc import extensions
 from ggrc.notifications import common
 
 
@@ -21,23 +22,16 @@ def run_job(job):
   try:
     job()
   except:
-    message = "job '{}' failed with: \n{}".format(job.__name__,
-                                                  traceback.format_exc())
+    message = "job '{}' failed with: \n{}".format(
+        job.__name__, traceback.format_exc())
     current_app.logger.error(message)
     send_error_notification(message)
 
 
 def nightly_cron_endpoint():
-  from ggrc.notifications import send_todays_digest_notifications
-  from ggrc_workflows import start_recurring_cycles
-  cron_jobs = [
-      start_recurring_cycles,
-      send_todays_digest_notifications
-  ]
-
+  cron_jobs = extensions.get_module_contributions("CONTRIBUTED_CRON_JOBS")
   for job in cron_jobs:
     run_job(job)
-
   return 'Ok'
 
 
