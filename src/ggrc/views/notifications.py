@@ -3,11 +3,18 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""Views for email notifications."""
+
 from ggrc import notifications
 from ggrc.login import login_required
 
 
 def init_notification_views(app):
+  """Add url rules for all notification views.
+
+  Args:
+    app: current flask app.
+  """
   app.add_url_rule(
       "/_notifications/send_todays_digest", "send_todays_digest_notifications",
       view_func=notifications.send_todays_digest_notifications)
@@ -19,4 +26,3 @@ def init_notification_views(app):
   app.add_url_rule(
       "/_notifications/show_todays_digest", "show_todays_digest_notifications",
       view_func=login_required(notifications.show_todays_digest_notifications))
-

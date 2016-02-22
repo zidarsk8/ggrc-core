@@ -19,7 +19,7 @@ from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
 from ggrc_workflows.converters import IMPORTABLE, EXPORTABLE
 from ggrc_workflows.converters.handlers import COLUMN_HANDLERS
 from ggrc_workflows.services.common import Signals
-from ggrc_workflows.services.workflow_cycle_calculator import get_cycle_calculator
+from ggrc_workflows.services import workflow_cycle_calculator
 from ggrc_workflows.roles import (
     WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader
 )
@@ -182,7 +182,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):
     # When called via a REST POST, use current user.
     current_user = get_current_user()
     workflow = obj.workflow
-    obj.calculator = get_cycle_calculator(workflow)
+    obj.calculator = workflow_cycle_calculator.get_cycle_calculator(workflow)
 
     if workflow.non_adjusted_next_cycle_start_date:
       base_date = workflow.non_adjusted_next_cycle_start_date
@@ -208,7 +208,7 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group,
       task_group_task.object_approval else task_group_task.description
 
   date_range = cycle.calculator.task_date_range(
-    task_group_task, base_date=base_date)
+      task_group_task, base_date=base_date)
   start_date, end_date = date_range
 
   cycle_task_group_object_task = models.CycleTaskGroupObjectTask(
@@ -346,7 +346,7 @@ def update_cycle_object_child_state(obj):
           update_cycle_object_child_state(child)
 
 
-def update_cycle_object_parent_state(obj):
+def update_cycle_object_parent_state(obj):  # noqa
   parent_attrs = _cycle_object_parent_attr.get(type(obj), [])
   for parent_attr in parent_attrs:
     if not parent_attr:
@@ -448,9 +448,9 @@ def handle_task_group_task_put(sender, obj=None, src=None, service=None):
     ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
 
   # If relative days were change we must update workflow next cycle start date
-  workflow_modifying_attrs =[
-    "relative_start_day", "relative_start_month",
-    "relative_end_day", "relative_end_month"]
+  workflow_modifying_attrs = [
+      "relative_start_day", "relative_start_month",
+      "relative_end_day", "relative_end_month"]
 
   if any(getattr(inspect(obj).attrs, attr).history.has_changes()
          for attr in workflow_modifying_attrs):
@@ -514,11 +514,13 @@ def set_internal_object_state(task_group_object, object_state, status):
 
   db.session.add(task_group_object)
 
+
 @Resource.model_deleted.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_delete(sender, obj=None,
                                                src=None, service=None):
   db.session.flush()
   update_cycle_dates(obj.cycle)
+
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
@@ -580,22 +582,22 @@ def handle_cycle_task_group_put(
 
 def update_workflow_state(workflow):
   today = date.today()
-  calculator = get_cycle_calculator(workflow)
+  calculator = workflow_cycle_calculator.get_cycle_calculator(workflow)
 
   # Start the first cycle if min_start_date < today < max_end_date
   if workflow.status == "Active" and workflow.recurrences and calculator.tasks:
     start_date, end_date = calculator.workflow_date_range()
     # Only create the cycle if we're mid-cycle
     if (start_date <= today <= end_date) \
-        and not workflow.cycles:
+            and not workflow.cycles:
       cycle = models.Cycle()
       cycle.workflow = workflow
       cycle.calculator = calculator
       # Other cycle attributes will be set in build_cycle.
       build_cycle(
-        cycle,
-        None,
-        base_date=workflow.non_adjusted_next_cycle_start_date)
+          cycle,
+          None,
+          base_date=workflow.non_adjusted_next_cycle_start_date)
       notification.handle_cycle_created(None, obj=cycle)
 
     adjust_next_cycle_start_date(calculator, workflow)
@@ -844,7 +846,7 @@ def start_recurring_cycles():
   for workflow in workflows:
     cycle = models.Cycle()
     cycle.workflow = workflow
-    cycle.calculator = get_cycle_calculator(workflow)
+    cycle.calculator = workflow_cycle_calculator.get_cycle_calculator(workflow)
     cycle.context = workflow.context
     # We can do this because we selected only workflows with
     # next_cycle_start_date = today
@@ -873,17 +875,19 @@ def start_recurring_cycles():
   db.session.commit()
   db.session.flush()
 
+
 def get_cycles(workflow):
   def is_valid_cycle(cycle):
     return ([ct for ct in cycle.cycle_task_group_object_tasks] and
             isinstance(cycle.start_date, (date, datetime)))
   return [c for c in workflow.cycles if is_valid_cycle(c)]
 
+
 def adjust_next_cycle_start_date(
-    calculator,
-    workflow,
-    base_date=None,
-    move_forward=False):
+        calculator,
+        workflow,
+        base_date=None,
+        move_forward=False):
   """Sets new cycle start date - it either recalculates a start date or moves
   it forward one interval if manual cycle start was requested or cycle
   was generated with start_recurring_cycles on next cycle start date.
@@ -912,9 +916,9 @@ def adjust_next_cycle_start_date(
       last_cycle_start_date = max([c.start_date for c in cycles])
       first_task = calculator.tasks[0]
       first_task_reified = calculator.relative_day_to_date(
-        relative_day=first_task.relative_start_day,
-        relative_month=first_task.relative_start_month,
-        base_date=last_cycle_start_date
+          relative_day=first_task.relative_start_day,
+          relative_month=first_task.relative_start_month,
+          base_date=last_cycle_start_date
       )
 
       # In an edge case where reified first task happens before last cycle
@@ -923,11 +927,11 @@ def adjust_next_cycle_start_date(
         last_cycle_start_date = last_cycle_start_date + calculator.time_delta
 
       workflow.non_adjusted_next_cycle_start_date = \
-        calculator.relative_day_to_date(
-          relative_day=first_task.relative_start_day,
-          relative_month=first_task.relative_start_month,
-          base_date=last_cycle_start_date
-      )
+          calculator.relative_day_to_date(
+              relative_day=first_task.relative_start_day,
+              relative_month=first_task.relative_start_month,
+              base_date=last_cycle_start_date
+          )
 
   # Unless we are moving forward one interval we just want to recalculate
   # the next_cycle_start_date to reflect the latest changes to the
@@ -935,10 +939,10 @@ def adjust_next_cycle_start_date(
   # new next cycle start date.
   if not move_forward and workflow.non_adjusted_next_cycle_start_date:
     workflow.non_adjusted_next_cycle_start_date = (
-      workflow.non_adjusted_next_cycle_start_date - calculator.time_delta)
+        workflow.non_adjusted_next_cycle_start_date - calculator.time_delta)
 
   non_adjusted_ncsd = calculator.non_adjusted_next_cycle_start_date(
-    base_date=workflow.non_adjusted_next_cycle_start_date)
+      base_date=workflow.non_adjusted_next_cycle_start_date)
 
   # In an edge case where we unwinded into the past for editing and
   # the next cycle start date returned back is less than or equal today,
@@ -946,12 +950,13 @@ def adjust_next_cycle_start_date(
   # original value.
   if non_adjusted_ncsd <= date.today():
     workflow.non_adjusted_next_cycle_start_date = (
-      workflow.non_adjusted_next_cycle_start_date + calculator.time_delta)
+        workflow.non_adjusted_next_cycle_start_date + calculator.time_delta)
     non_adjusted_ncsd = calculator.non_adjusted_next_cycle_start_date(
-      base_date=workflow.non_adjusted_next_cycle_start_date)
+        base_date=workflow.non_adjusted_next_cycle_start_date)
 
   workflow.non_adjusted_next_cycle_start_date = non_adjusted_ncsd
   workflow.next_cycle_start_date = calculator.adjust_date(non_adjusted_ncsd)
+
 
 class WorkflowRoleContributions(RoleContributions):
   contributions = {
@@ -1019,6 +1024,4 @@ contributed_importables = IMPORTABLE
 contributed_exportables = EXPORTABLE
 contributed_column_handlers = COLUMN_HANDLERS
 contributed_get_ids_related_to = relationship_helper.get_ids_related_to
-CONTRIBUTED_CRON_JOBS = [
-    start_recurring_cycles,
-]
+CONTRIBUTED_CRON_JOBS = [start_recurring_cycles]

@@ -60,7 +60,7 @@ def get_extension_instance(extension_setting, default, extensions={}):
   return extensions[extension_setting]
 
 
-def _get_contribution(module, name):
+def _get_contributions(module, name):
   """Fetch contributions from a single module.
 
   Args:
@@ -105,10 +105,10 @@ def get_module_contributions(name):
   all_contributions = []
   all_modules = [ggrc] + get_extension_modules()
   for module in all_modules:
-    all_contributions.extend(_get_contribution(module, name))
+    all_contributions.extend(_get_contributions(module, name))
     contributions_module = getattr(module, "contributions", None)
     if contributions_module:
-      all_contributions.extend(_get_contribution(contributions_module, name))
+      all_contributions.extend(_get_contributions(contributions_module, name))
   if all(isinstance(val, tuple) for val in all_contributions):
     all_contributions = dict(all_contributions)
   return all_contributions
