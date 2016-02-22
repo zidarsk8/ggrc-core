@@ -15,6 +15,7 @@ from tabulate import tabulate
 from ggrc import contributions  # noqa: imported so it can be used with getattr
 from ggrc import db
 from ggrc import extensions
+from ggrc import notifications
 from ggrc import settings
 
 
@@ -156,3 +157,5 @@ def _display_sql_queries():
 _enable_debug_toolbar()
 _enable_jasmine()
 _display_sql_queries()
+
+notifications.register_notification_listeners()
