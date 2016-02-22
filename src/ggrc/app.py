@@ -112,3 +112,5 @@ if hasattr(settings, 'SQLALCHEMY_RECORD_QUERIES')\
         with_prefix(query.statement, "       ")))
     app.logger.info("Total queries: {}".format(len(queries)))
     return response
+
+from ggrc import contributions
