@@ -6,7 +6,13 @@
 """Lists of ggrc contributions."""
 
 from ggrc.notifications import common
+from ggrc.notifications import notification_handlers
+
 
 CONTRIBUTED_CRON_JOBS = [
     common.send_todays_digest_notifications
+]
+
+NOTIFICATION_LISTENERS = [
+    notification_handlers.register_handlers
 ]
