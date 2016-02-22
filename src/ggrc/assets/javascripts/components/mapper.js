@@ -5,8 +5,12 @@
     Maintained By: ivan@reciprocitylabs.com
 */
 
-(function(can, $) {
+(function (can, $) {
   "use strict";
+
+  var selectors = _.map(['unified-mapper', 'unified-search'], function (val) {
+    return '[data-toggle="' + val + '"]';
+  });
   var MapperModel = can.Map({
       type: "AllObject", // We set default as All Object
       contact: {},
@@ -589,15 +593,11 @@
     }
   });
 
-
-  $("body").on("click",
-  '[data-toggle="unified-mapper"], \
-   [data-toggle="unified-search"]',
-  function (ev) {
+  $('body').on('click', selectors.join(', '), function (ev) {
+    var btn = $(ev.currentTarget);
+    var data = {};
+    var isSearch;
     ev.preventDefault();
-    var btn = $(ev.currentTarget),
-        data = {},
-        isSearch;
 
     _.each(btn.data(), function (val, key) {
       data[can.camelCaseToUnderscore(key)] = val;
@@ -607,11 +607,14 @@
       data.tooltip.hide();
     }
     isSearch = /unified-search/ig.test(data.toggle);
-    GGRC.Controllers.MapperModal.launch($(this), _.extend({
-      "object": btn.data("join-object-type"),
-      "type": btn.data("join-option-type"),
-      "join-object-id": btn.data("join-object-id"),
-      "search-only": isSearch
+    GGRC.Controllers.MapperModal.launch(btn, _.extend({
+      object: btn.data('join-object-type'),
+      type: btn.data('join-option-type'),
+      'join-object-id': btn.data('join-object-id'),
+      'search-only': isSearch,
+      template: {
+        title: isSearch ? 'Search' : ''
+      }
     }, data));
   });
 })(window.can, window.can.$);
