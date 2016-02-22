@@ -596,17 +596,7 @@
               this.options.attr("mapping", el.attr("mapping"));
               this.reload_list();
             }
-          },
-          child_options: [
-            {
-              model: CMS.Models.CycleTaskEntry,
-              mapping: "cycle_task_entries",
-              show_view: GGRC.mustache_path + "/cycle_task_entries/tree.mustache",
-              footer_view: GGRC.mustache_path + "/cycle_task_entries/tree_footer.mustache",
-              add_item_view: GGRC.mustache_path + "/cycle_task_entries/tree_add_item.mustache",
-              allow_creating: true
-            }
-          ]
+          }
         }
       }
     };

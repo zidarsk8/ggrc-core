@@ -345,8 +345,8 @@
           allow_creating: true
         },
         {
-          model: "CycleTaskGroupObject",
-          mapping: "cycle_task_group_object",
+          model: can.Model.Cacheable,
+          mapping: 'info_related_objects',
           allow_creating: true
         }
       ]
