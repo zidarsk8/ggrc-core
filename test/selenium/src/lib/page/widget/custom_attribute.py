@@ -50,7 +50,7 @@ class NewCustomAttributeModal(base.Modal):
     self.checkbox_mandatory = base.Checkbox(
         self._driver, self._locator.CHECKBOX_MANDATORY)
     self.button_submit = base.Button(
-        self._driver, self._locator.BUTTON_SAVE)
+        self._driver, self._locator.BUTTON_SAVE_AND_CLOSE)
     self.button_add_more = base.Button(
         self._driver, self._locator.BUTTON_ADD_ANOTHER)
 

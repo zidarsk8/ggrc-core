@@ -13,6 +13,8 @@ from lib.element import widget_info
 class InfoWidget(base.Widget):
   """Model for a generic info widget"""
 
+  _dropdown_settings_cls = None
+
   def __init__(self, driver):
     super(InfoWidget, self).__init__(driver)
 
@@ -26,7 +28,7 @@ class InfoWidget(base.Widget):
         widget_info.DropdownSettings
     """
     self.button_settings.click()
-    return widget_info.DropdownSettingsPrograms(self._driver)
+    return self._dropdown_settings_cls(self._driver)
 
 
 class DashboardInfo(base.Widget):
@@ -69,6 +71,7 @@ class ProgramInfo(InfoWidget):
   """Model for program object info widget"""
 
   _locators = locator.ProgramInfoWidget
+  _dropdown_settings_cls = widget_info.DropdownSettingsPrograms
 
   def __init__(self, driver):
     """
@@ -205,7 +208,8 @@ class SectionsInfo(InfoWidget):
 class ControlInfo(InfoWidget):
   """Model for control object info widget"""
 
-  _locators = locator.ControlInfoWidget
+  _locators = locator.WidgetInfoSettingsButton
+  _dropdown_settings_cls = widget_info.DropdownSettingsControls
 
   def __init__(self, driver):
     """
