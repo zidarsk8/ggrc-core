@@ -115,39 +115,41 @@
     });
 
   can.Component.extend({
-    tag: "modal-mapper",
-    template: can.view(GGRC.mustache_path + "/modals/mapper/base.mustache"),
+    tag: 'modal-mapper',
+    template: can.view(GGRC.mustache_path + '/modals/mapper/base.mustache'),
     scope: function (attrs, parentScope, el) {
-      var $el = $(el),
-          data = {},
-          id = +$el.attr("join-object-id"),
-          object = $el.attr("object"),
-          type = $el.attr("type"),
-          tree_view = GGRC.tree_view.sub_tree_for[object];
+      var $el = $(el);
+      var data = {};
+      var id = Number($el.attr('join-object-id'));
+      var object = $el.attr('object');
+      var type = $el.attr('type');
+      var treeView = GGRC.tree_view.sub_tree_for[object];
 
-      if ($el.attr("search-only")) {
-        data["search_only"] =  /true/i.test($el.attr("search-only"));
+      if ($el.attr('search-only')) {
+        data.search_only = /true/i.test($el.attr('search-only'));
       }
       if (object) {
-        data["object"] = object;
+        data.object = object;
       }
 
       type = CMS.Models[type] && type;
-      if (!data["search_only"]) {
+      if (!data.search_only) {
         if (type) {
-          data["type"] = type;
-        } else if (id === GGRC.page_instance().id || !tree_view) {
-          data["type"] = "AllObject";
+          data.type = type;
+        } else if (id === GGRC.page_instance().id || !treeView) {
+          data.type = 'AllObject';
         } else {
-          data["type"] = tree_view.display_list[0];
+          data.type = treeView.display_list[0];
         }
       }
       if (id || GGRC.page_instance()) {
-        data["join_object_id"] = id || GGRC.page_instance().id;
+        data.join_object_id = id || GGRC.page_instance().id;
       }
       return {
         mapper: new MapperModel(_.extend(data, {
+          getList: parentScope.attr('getList'),
           relevantTo: parentScope.attr('relevantTo'),
+          callback: parentScope.attr('callback')
         })),
         template: parentScope.attr('template')
       };
@@ -273,7 +275,7 @@
           }, this);
         }.bind(this));
       },
-      "setModel": function () {
+      setModel: function () {
         var type = this.scope.attr("mapper.type"),
             types = this.scope.attr("mapper.types");
 
@@ -283,9 +285,9 @@
         this.scope.attr("mapper.model", this.scope.mapper.model_from_type(type));
       },
       "{mapper} type": function () {
-        this.scope.attr("mapper.term", "");
-        this.scope.attr("mapper.contact", {});
-        this.scope.attr("mapper.relevant", []);
+        this.scope.attr('mapper.term', "");
+        this.scope.attr('mapper.contact', {});
+        this.scope.attr('mapper.relevant').replace([]);
 
         this.setModel();
         this.setBinding();
@@ -523,29 +525,32 @@
 
         return GGRC.Models.Search.search_for_types(data.term || "", data.model_name, data.options);
       },
-      "getResults": function () {
-        if (this.scope.attr("mapper.page_loading") || this.scope.attr("mapper.is_saving")) {
+      getResults: function () {
+        var model_name = this.scope.attr('type');
+        var contact = this.scope.attr('contact');
+        var permission_parms = {};
+        var search = [];
+        var getList = this.scope.attr('mapper.getList');
+        var relevant = this.scope.attr('mapper.relevant');
+        var filters;
+        var list;
+
+        if (this.scope.attr('mapper.page_loading') || this.scope.attr('mapper.is_saving')) {
           return;
         }
-        var model_name = this.scope.attr("type"),
-            contact = this.scope.attr("contact"),
-            permission_parms = {},
-            search = [],
-            filters,
-            list;
+        this.scope.attr('page', 0);
+        this.scope.attr('entries', []);
+        this.scope.attr('selected', []);
+        this.scope.attr('options', []);
+        this.scope.attr('select_state', false);
+        this.scope.attr('mapper.all_selected', false);
 
-        this.scope.attr("page", 0);
-        this.scope.attr("entries", []);
-        this.scope.attr("selected", []);
-        this.scope.attr("options", []);
-        this.scope.attr("select_state", false);
-        this.scope.attr("mapper.all_selected", false);
-
-        filters = _.compact(_.map(this.scope.attr("mapper.relevant"), function (relevant) {
+        filters = _.compact(_.map(relevant, function (relevant) {
           if (!relevant.value) {
             return;
           }
-          var mappings, Loader;
+          var mappings;
+          var Loader;
           if (model_name === "AllObject") {
             Loader = GGRC.ListLoaders.MultiListLoader;
             mappings = _.compact(_.map(GGRC.Mappings.get_mappings_for(relevant.filter.constructor.shortName), function (mapping) {

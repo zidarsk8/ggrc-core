@@ -89,7 +89,6 @@ dashboard-js-files:
   - controllers/unmap_modal_controller.js
   - controllers/mapping_count_controller.js
   - controllers/info_pin_controller.js
-  - controllers/assessment_generator.js
   - controllers/automapper_controller.js
   - models/control.js
   - controllers/dashboard_controller.js
@@ -117,6 +116,7 @@ dashboard-js-files:
   - components/mapper.js
   - components/people_list.js
   - components/mapped_tree_view.js
+  - components/assessment_generator.js
   #- d3.v2.js
   #- related_graph.js
 

@@ -27,7 +27,6 @@ can.Component.extend({
           type: instance.program.type,
           id: instance.program.id
         }],
-        getList: this.getList.bind(this),
         template: {
           title: 'Select controls to generate assessments',
           submitButton: 'Generate Assessments',
@@ -35,15 +34,6 @@ can.Component.extend({
         },
         callback: this._generate_assessments.bind(this)
       });
-    },
-    getList: function (type) {
-      var bindings = {
-        control: 'program_controls',
-        issue: 'related_issues'
-      };
-      var audit = GGRC.page_instance();
-      var result = audit.get_binding(bindings[type.toLowerCase()]);
-      return result.list;
     },
     _generate_assessments: function (controls) {
       var assessments_list = this.scope.audit.get_binding("related_assessments").list,

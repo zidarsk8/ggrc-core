@@ -65,6 +65,9 @@
     },
     events: {
       inserted: function () {
+        this.setRelevant();
+      },
+      setRelevant: function () {
         can.each(this.scope.attr('relevantTo') || [], function (item) {
           var model = CMS.Models[item.type].cache[item.id];
           this.scope.attr('relevant').push({
