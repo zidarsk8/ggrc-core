@@ -6,20 +6,13 @@
 }}
 
 {{#if_instance_of parent_instance 'Audit'}}
-
-  {{#if_equals model.shortName 'Control'}}
+  {{#if_helpers '\
+    #if_equals' model.shortName 'Control' '\
+    or #if_equals' model.shortName 'Assessment'}}
     <li class="generate-control-assessments">
       <a href="javascript://">
         <i class="fa fa-magic" rel="tooltip" data-placement="left" title="" data-original-title="Generate Assessments"></i>
       </a>
     </li>
-  {{/if_equals}}
-
-  {{#if_equals model.shortName 'Assessment'}}
-    <li class="generate-control-assessments">
-      <a href="javascript://">
-        <i class="fa fa-magic" rel="tooltip" data-placement="left"" title="" data-original-title="Generate Assessments"></i>
-      </a>
-    </li>
-  {{/if_equals}}
+  {{/if_helpers}}
 {{/if_instance_of}}
