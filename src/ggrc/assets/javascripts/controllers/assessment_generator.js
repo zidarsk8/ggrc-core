@@ -103,12 +103,12 @@ can.Component.extend({
           };
         } else {
           msg = {
-            success: "<span class='user-string'>" + count + "</span> Assessments successfully created."
+            success: count + " Assessments successfully created."
           };
         }
       } else {
         msg = {
-          error: "An error occured when creating Assessments."
+          error: "An error occurred when creating Assessments."
         };
       }
 
