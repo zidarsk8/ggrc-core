@@ -3,5 +3,7 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-MAX_USER_WAIT_SECONDS = 10
-ELEMENT_MOVING_TIMEOUT = 5
+"""Constants related to batch tests (tests that require multiple objects"""
+
+# number of objects in a battery
+BATTERY = 3
