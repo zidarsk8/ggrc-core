@@ -12,6 +12,25 @@
     scope: {
       relevant_menu_item: '@',
       show_all: '@',
+      addFilter: function () {
+        var menu = this.attr('menu');
+
+        if (this.attr('relevant_menu_item') === 'parent' &&
+             Number(this.attr('panel_number')) !== 0 &&
+             !this.attr('has_parent')) {
+          menu.unshift({
+            title_singular: 'Previous objects',
+            model_singular: '__previous__'
+          });
+        }
+
+        this.attr('relevant').push({
+          value: false,
+          filter: new can.Map(),
+          menu: menu,
+          model_name: menu[0].model_singular
+        });
+      },
       menu: can.compute(function () {
         var type = this.attr('type');
         var showAll = /true/i.test(this.attr('show_all'));
@@ -45,27 +64,16 @@
       })
     },
     events: {
-      '.add-filter-rule click': function (el, ev) {
-        var menu;
-        ev.preventDefault();
-
-        menu = this.scope.attr('menu');
-
-        if (this.scope.attr('relevant_menu_item') === 'parent' &&
-             Number(this.scope.attr('panel_number')) !== 0 &&
-             !this.scope.attr('has_parent')) {
-          menu.unshift({
-            title_singular: 'Previous objects',
-            model_singular: '__previous__'
+      inserted: function () {
+        can.each(this.scope.attr('relevantTo') || [], function (item) {
+          var model = CMS.Models[item.type].cache[item.id];
+          this.scope.attr('relevant').push({
+            value: true,
+            filter: model,
+            menu: this.scope.attr('menu'),
+            model_name: model.constructor.shortName
           });
-        }
-
-        this.scope.attr('relevant').push({
-          value: false,
-          filter: new can.Map(),
-          menu: menu,
-          model_name: menu[0].model_singular
-        });
+        }, this);
       },
       '.ui-autocomplete-input autocomplete:select': function (el, ev, data) {
         var index = el.data('index');

@@ -142,7 +142,9 @@
         data["join_object_id"] = id || GGRC.page_instance().id;
       }
       return {
-        mapper: new MapperModel(data)
+        mapper: new MapperModel(_.extend(data, {
+          relevantTo: parentScope.attr('relevantTo'),
+        })),
         template: parentScope.attr('template')
       };
     },
