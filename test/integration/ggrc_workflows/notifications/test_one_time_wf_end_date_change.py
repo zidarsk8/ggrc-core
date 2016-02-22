@@ -10,7 +10,8 @@ from datetime import datetime
 from freezegun import freeze_time
 from mock import patch
 
-from ggrc import db, notifications
+from ggrc import db
+from ggrc.notifications import common
 from ggrc.models import Notification, Person
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
 from integration.ggrc.api_helper import Api
@@ -59,42 +60,44 @@ class TestOneTimeWfEndDateChange(TestCase):
 
     with freeze_time("2015-04-11 03:21:34"):
       user = get_person(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn("cycle_started", notif_data[user.email])
 
     with freeze_time("2015-05-02 03:21:34"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
       self.assertIn("cycle_started", notif_data[user.email])
       self.assertNotIn("due_in", notif_data[user.email])
       self.assertNotIn("due_today", notif_data[user.email])
 
     with freeze_time("2015-05-02 03:21:34"):
-      notifications.send_todays_digest_notifications()
-      _, notif_data = notifications.get_todays_notifications()
+      common.send_todays_digest_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
       # one email to owner and one to assigne
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-04 03:21:34"):  # one day before due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       user = get_person(self.user.id)
       self.assertIn("due_in", notif_data[user.email])
-      self.assertEqual(len(notif_data[user.email]["due_in"]), 2)
+      self.assertEqual(len(notif_data[user.email]["due_in"]),
+                       len(self.random_objects))
 
     with freeze_time("2015-05-04 03:21:34"):  # one day before due date
-      notifications.send_todays_digest_notifications()
-      _, notif_data = notifications.get_todays_notifications()
+      common.send_todays_digest_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
       # one email to owner and one to assigne
       self.assertEqual(mock_mail.call_count, 3)
 
     with freeze_time("2015-05-05 03:21:34"):  # due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn("due_today", notif_data[user.email])
-      self.assertEqual(len(notif_data[user.email]["due_today"]), 2)
+      self.assertEqual(len(notif_data[user.email]["due_today"]),
+                       len(self.random_objects))
 
   @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_future(self, mock_mail):
@@ -114,19 +117,19 @@ class TestOneTimeWfEndDateChange(TestCase):
 
     with freeze_time("2015-04-11 03:21:34"):
       user = get_person(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn("cycle_started", notif_data[user.email])
 
     with freeze_time("2015-05-02 03:21:34"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
       self.assertIn("cycle_started", notif_data[user.email])
       self.assertNotIn("due_in", notif_data[user.email])
       self.assertNotIn("due_today", notif_data[user.email])
 
     with freeze_time("2015-05-02 03:21:34"):
-      notifications.send_todays_digest_notifications()
-      _, notif_data = notifications.get_todays_notifications()
+      common.send_todays_digest_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
       # one email to owner and one to assigne
@@ -145,23 +148,23 @@ class TestOneTimeWfEndDateChange(TestCase):
           task2, data={"end_date": date(2015, 5, 15)})
 
     with freeze_time("2015-05-04 03:21:34"):  # one day befor due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       user = get_person(self.user.id)
       self.assertEqual(notif_data, {})
 
     with freeze_time("2015-05-05 03:21:34"):  # due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
     with freeze_time("2015-05-14 03:21:34"):  # due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
       self.assertIn("due_in", notif_data[user.email])
       self.assertEqual(len(notif_data[user.email]["due_in"]),
                        len(self.random_objects))
 
     with freeze_time("2015-05-15 03:21:34"):  # due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
       # yesterdays mail has not been sent
@@ -184,8 +187,8 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02 03:21:34"):
-      notifications.send_todays_digest_notifications()
-      _, notif_data = notifications.get_todays_notifications()
+      common.send_todays_digest_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
       # one email to owner and one to assigne
@@ -204,15 +207,15 @@ class TestOneTimeWfEndDateChange(TestCase):
           task2, data={"end_date": date(2015, 5, 1)})
 
     with freeze_time("2015-05-03 03:21:34"):  # one day befor due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
     with freeze_time("2015-05-04 03:21:34"):  # due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
     with freeze_time("2015-05-05 03:21:34"):  # due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
   @patch("ggrc.notifications.common.send_email")
@@ -228,8 +231,8 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02 03:21:34"):
-      notifications.send_todays_digest_notifications()
-      _, notif_data = notifications.get_todays_notifications()
+      common.send_todays_digest_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
       # one email to owner and one to assigne
@@ -249,7 +252,7 @@ class TestOneTimeWfEndDateChange(TestCase):
 
     with freeze_time("2015-05-03 03:21:34"):  # one day befor due date
       user = get_person(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
 
       self.assertNotEquals(notif_data, {})
       self.assertIn(user.email, notif_data)
@@ -257,18 +260,18 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.assertIn("due_in", notif_data[user.email])
       self.assertEqual(len(notif_data[user.email]["due_today"]), 1)
 
-      notifications.send_todays_digest_notifications()
+      common.send_todays_digest_notifications()
 
     with freeze_time("2015-05-04 03:21:34"):  # due date
       user = get_person(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
       self.assertIn("due_today", notif_data[user.email])
       self.assertNotIn("due_in", notif_data[user.email])
-      notifications.send_todays_digest_notifications()
+      common.send_todays_digest_notifications()
 
     with freeze_time("2015-05-05 03:21:34"):  # due date
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
   def create_test_cases(self):
@@ -290,12 +293,6 @@ class TestOneTimeWfEndDateChange(TestCase):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
-                "contact": person_dict(self.user.id),
-                "start_date": date(2015, 5, 1),  # friday
-                "end_date": date(2015, 5, 5),
-            }, {
-                "title": "task 2",
-                "description": "some task 2",
                 "contact": person_dict(self.user.id),
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),

@@ -8,7 +8,7 @@ from freezegun import freeze_time
 
 from mock import patch
 
-from ggrc import notifications
+from ggrc.notifications import common
 from ggrc.models import Person
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
@@ -42,15 +42,15 @@ class TestRecurringCycleNotifications(TestCase):
       assignee = Person.query.get(self.assignee.id)
 
     with freeze_time("2015-01-01"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-01-29"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(assignee.email, notif_data)
 
     with freeze_time("2015-02-01"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(assignee.email, notif_data)
 
   # TODO: this should mock google email api.
@@ -67,16 +67,16 @@ class TestRecurringCycleNotifications(TestCase):
       assignee = Person.query.get(self.assignee.id)
 
     with freeze_time("2015-01-01"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-01-29"):
-      notifications.send_todays_digest_notifications()
-      _, notif_data = notifications.get_todays_notifications()
+      common.send_todays_digest_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-02-01"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
   def create_test_cases(self):

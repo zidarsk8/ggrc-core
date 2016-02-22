@@ -7,12 +7,12 @@ import unittest
 from mock import patch
 
 from ggrc import app  # noqa
-from ggrc import notifications
+from ggrc.notifications import common
 
 
 class TestNotificationsInit(unittest.TestCase):
 
-  @patch("ggrc.notifications.get_filter_data")
+  @patch("ggrc.notifications.common.get_filter_data")
   def test_get_notification_data(self, get_filter_data):
     """ Test that data does not contain empty emails """
 
@@ -20,6 +20,6 @@ class TestNotificationsInit(unittest.TestCase):
         "email@example.com": {},
         "": {},
     }
-    notification_data = notifications.get_notification_data([1, 2])
+    notification_data = common.get_notification_data([1, 2])
     self.assertIn("email@example.com", notification_data)
     self.assertNotIn("", notification_data)

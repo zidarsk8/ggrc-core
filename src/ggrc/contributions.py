@@ -5,8 +5,8 @@
 
 """Lists of ggrc contributions."""
 
-from ggrc.notifications import send_todays_digest_notifications
+from ggrc.notifications import common
 
 CONTRIBUTED_CRON_JOBS = [
-    send_todays_digest_notifications
+    common.send_todays_digest_notifications
 ]
