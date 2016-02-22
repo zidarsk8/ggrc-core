@@ -10,6 +10,7 @@ from sqlalchemy import inspect, and_, orm
 from ggrc import db
 from ggrc.login import get_current_user
 from ggrc.models import all_models
+from ggrc.models.relationship import Relationship
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource
 from ggrc.services.registry import service
@@ -265,35 +266,16 @@ def build_cycle(cycle, current_user=None, base_date=None):
         sort_index=task_group.sort_index,
     )
 
-    if len(task_group.task_group_objects) == 0:
-      for task_group_task in task_group.task_group_tasks:
-        cycle_task_group_object_task = _create_cycle_task(
-            task_group_task, cycle, cycle_task_group, current_user, base_date)
+    for task_group_task in task_group.task_group_tasks:
+      cycle_task_group_object_task = _create_cycle_task(
+          task_group_task, cycle, cycle_task_group, current_user, base_date)
+      cycle_task_group.cycle_task_group_tasks.append(
+          cycle_task_group_object_task)
 
-        cycle_task_group.cycle_task_group_tasks.append(
-            cycle_task_group_object_task)
-
-    for task_group_object in task_group.task_group_objects:
-      object = task_group_object.object
-
-      cycle_task_group_object = models.CycleTaskGroupObject(
-          context=cycle.context,
-          cycle=cycle,
-          cycle_task_group=cycle_task_group,
-          task_group_object=task_group_object,
-          title=object.title,
-          modified_by=current_user,
-          end_date=cycle.end_date,
-          object=object,
-      )
-      cycle_task_group.cycle_task_group_objects.append(
-          cycle_task_group_object)
-
-      for task_group_task in task_group.task_group_tasks:
-        cycle_task_group_object_task = _create_cycle_task(
-            task_group_task, cycle, cycle_task_group, current_user, base_date)
-        cycle_task_group_object.cycle_task_group_object_tasks.append(
-            cycle_task_group_object_task)
+      for task_group_object in task_group.task_group_objects:
+        object_ = task_group_object.object
+        db.session.add(Relationship(source=cycle_task_group_object_task,
+                                    destination=object_))
 
   update_cycle_dates(cycle)
 
