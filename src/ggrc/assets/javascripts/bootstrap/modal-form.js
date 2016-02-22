@@ -313,49 +313,53 @@
       }
     });
 
-    $('body').on('ajax:flash', function(e, flash) {
-      var $target, $flash_holder
-        , type, message_i
-        , flash_class
-        , flash_class_mappings = { notice: "success" }
-        , html
-        , got_message = _.some(_.values(flash),
-                               function (msg) { return !!msg; });
+    $('body').on('ajax:flash', function (e, flash) {
+      var $target;
+      var $flashHolder;
+      var type;
+      var messageI;
+      var flashClass;
+      var flashClassMappings = {notice: 'success'};
+      var $html;
+      var gotMessage = _.some(_.values(flash), function (msg) {
+        return !!msg;
+      });
 
-      if (!got_message) {
+      if (!gotMessage) {
         // sometimes ajax:flash is triggered with bad data
         return;
       }
 
       // Find or create the flash-message holder
       $target = $(e.target);
-      if($target.has(".modal-body").length < 1)
+      if ($target.has('.modal-body').length < 1) {
         $target = $('body');
-      $flash_holder = $target.find('.flash');
+      }
+      $flashHolder = $target.find('.flash');
 
-      if ($flash_holder.length == 0) {
-        $flash_holder = $('<div class="flash"></div>');
-        $target.find('.modal-body').prepend($flash_holder);
+      if ($flashHolder.length === 0) {
+        $flashHolder = $('<div class="flash"></div>');
+        $target.find('.modal-body').prepend($flashHolder);
       } else {
-        $flash_holder.empty();
+        $flashHolder.empty();
       }
 
       for (type in flash) {
         if (flash[type]) {
-          if (typeof(flash[type]) == "string")
+          if (typeof (flash[type]) === 'string') {
             flash[type] = [flash[type]];
-
-          flash_class = flash_class_mappings[type] || type;
-
-          html =
-            [ '<div class="alert alert-' + flash_class + '">'
-            ,   '<a href="#" class="close" data-dismiss="alert">x</a>'
-            ];
-          for (message_i in flash[type]) {
-            html.push('<span>' + flash[type][message_i] + '</span>');
           }
-          html.push('</div>');
-          $flash_holder.append(html.join(''));
+
+          flashClass = flashClassMappings[type] || type;
+
+          $html = $('<div></div>');
+          $html.addClass('alert').addClass('alert-' + flashClass);
+          $html.append('<a href="#" class="close" data-dismiss="alert">x</a>');
+
+          for (messageI in flash[type]) {
+            $html.append($('<span></span>').text(flash[type][messageI]));
+          }
+          $flashHolder.append($html);
         }
       }
     });
