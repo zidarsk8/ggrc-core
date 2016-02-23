@@ -13,13 +13,13 @@ from lib.element import widget_info
 class InfoWidget(base.Widget):
   """Model for a generic info widget"""
 
-  _dropdown_settings_cls = None
+  _dropdown_settings_cls = widget_info.DropdownSettingsControls
 
   def __init__(self, driver):
     super(InfoWidget, self).__init__(driver)
 
-    self.button_settings = base.Button(driver,
-                                       locator.InfoWidget.BUTTON_SETTINGS)
+    self.button_settings = base.Button(
+        driver, locator.InfoWidget.BUTTON_SETTINGS)
     self.object_id = self.url.split("/")[-1]
 
   def press_object_settings(self):
@@ -209,7 +209,6 @@ class ControlInfo(InfoWidget):
   """Model for control object info widget"""
 
   _locators = locator.WidgetInfoSettingsButton
-  _dropdown_settings_cls = widget_info.DropdownSettingsControls
 
   def __init__(self, driver):
     """
