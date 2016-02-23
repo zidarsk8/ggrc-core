@@ -84,3 +84,170 @@ teardown () {
 
   docker-compose -p ${PROJECT} stop
 }
+
+print_line () {
+echo "
+###############################################################################
+"
+}
+
+integration_tests () {
+  PROJECT=$1
+  print_line
+
+  echo "Running ${PROJECT}"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/bin/run_integration
+  " && rc=$? || rc=$?
+
+  print_line
+  return $rc
+}
+
+
+selenium_tests () {
+  PROJECT=$1
+  print_line
+
+  echo "Running Test server"
+  docker exec -id ${PROJECT}_dev_1 /vagrant/bin/launch_ggrc_test
+
+  echo "Running Selenium tests"
+  docker exec -i ${PROJECT}_selenium_1 sh -c "
+    python /selenium/src/run_selenium.py --junitxml=/selenium/logs/selenium.xml
+  " && rc=$? || rc=$?
+
+  mv ./test/selenium/logs/selenium.xml ./test/selenium.xml || true
+
+  print_line
+  return $rc
+}
+
+
+unittests_tests () {
+  PROJECT=$1
+  print_line
+  
+  echo "Running python unit tests"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/bin/run_unit
+  " && unit_rc=$? || unit_rc=$?
+  
+  [[ unit_rc -eq 0 ]] && echo "PASS" || echo "FAIL"
+  
+  print_line
+
+  echo "Running karma tests"
+  
+  docker exec -id ${PROJECT}_selenium_1 python /selenium/bin/chrome_karma.py
+  
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/node_modules/karma/bin/karma start \\
+      /vagrant/karma.conf.js --single-run --reporters dots,junit
+  " && karma_rc=$? || karma_rc=$?
+  
+  [[ karma_rc -eq 0 ]] && echo "PASS" || echo "FAIL"
+  
+  print_line
+  return $((unit_rc * unit_rc + karma_rc * karma_rc))
+}
+
+
+code_style_tests () {
+  PROJECT=$1
+  print_line
+
+  echo "Running pylint"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/bin/check_pylint_diff
+  " && pylint_rc=$? || pylint_rc=$?
+  
+  if [[ pylint_rc -eq 0 ]]; then
+    echo "PASS"
+    pylint_error=''
+  else
+    echo "FAIL"
+    pylint_error='<error type="pylint" message="Pylint error"></error>'
+  fi
+  
+  print_line
+
+  echo "Running flake8"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    /vagrant/bin/check_flake8_diff
+  " && flake_rc=$? || flake_rc=$?
+  
+  if [[ flake_rc -eq 0 ]]; then
+    echo "PASS"
+    flake8_error=''
+  else
+    echo "FAIL"
+    flake8_error='<error type="flake8" message="Flake8 error"></error>'
+  fi
+  
+  print_line
+  
+  echo "Running eslint"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    export PATH=\$PATH:/vagrant-dev/node_modules/.bin
+    /vagrant/bin/check_eslint_diff
+  " && eslint_rc=$? || eslint_rc=$?
+  
+  if [[ eslint_rc -eq 0 ]]; then
+    echo "PASS"
+    eslint_error=''
+  else
+    echo "FAIL"
+    eslint_error='<error type="eslint" message="ESLint error"></error>'
+  fi
+  
+  print_line
+  
+  teardown $PROJECT
+  
+  echo '<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="code-style" tests="3" errors="'$((pylint_rc + flake_rc))'" failures="0" skip="0">
+  <testcase classname="pylint.pylint" name="pylint" time="0">'$pylint_error'</testcase>
+  <testcase classname="flake8.flake8" name="flake8" time="0">'$flake8_error'</testcase>
+  <testcase classname="eslint.eslint" name="eslint" time="0">'$eslint_error'</testcase>
+</testsuite>' > test/lint.xml
+  
+  print_line
+  return $((pylint_rc * pylint_rc + flake_rc * flake_rc + eslint_rc * eslint_rc))
+}
+
+
+checkstyle_tests () {
+  PROJECT=$1
+  print_line
+  
+  echo "Running pylint"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    pylint -f parseable src/ggrc\
+                        src/ggrc_basic_permissions\
+                        src/ggrc_gdrive_integration\
+                        src/ggrc_risk_assessments\
+                        src/ggrc_risks\
+                        src/ggrc_workflows\
+                        test/integration\
+                        test/selenium/src\
+                        test/unit\
+                        > test/pylint.out
+  " || true
+  
+  print_line
+  
+  echo "Running eslint"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    eslint -f checkstyle src -o test/eslint.xml
+  " || true
+  
+  print_line
+}

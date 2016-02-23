@@ -12,6 +12,7 @@ describe('can.mustache.helper.revisions_diff', function () {
   var fakeRevHistory;
   var helper;
   var instance;  // an object the helper retrieves an attribute value from
+  var origModelAttrDefs;  // original user-friendly attribute name definitions
 
   beforeAll(function () {
     helper = can.Mustache._helpers.revisions_diff.fn;
@@ -24,8 +25,6 @@ describe('can.mustache.helper.revisions_diff', function () {
         })
       }
     };
-
-    GGRC.model_attr_defs = {};
   });
 
   beforeEach(function () {
@@ -41,9 +40,14 @@ describe('can.mustache.helper.revisions_diff', function () {
     );
 
     fakeRevHistory = [];
+
+    origModelAttrDefs = GGRC.model_attr_defs;
+    GGRC.model_attr_defs = {};
   });
 
   afterEach(function () {
+    GGRC.model_attr_defs = origModelAttrDefs;
+
     fakeOptions.fn.calls.reset();
     fakeOptions.contexts.add.calls.reset();
   });
@@ -228,5 +232,113 @@ describe('can.mustache.helper.revisions_diff', function () {
       }
     ];
     expect(expected).toEqual(expected);
+  });
+
+  describe('with model attributes definitions defined', function () {
+    beforeEach(function () {
+      GGRC.model_attr_defs = {
+        Audit: [
+          {
+            attr_name: 'title',
+            display_name: 'Object Name'
+          }
+        ]
+      };
+    });
+
+    it('uses the fields\' display names in the diff objects', function () {
+      var actual;
+      var expected;
+      var callArgs;
+      var diffList;
+
+      fakeRevHistory = [
+        {
+          instance: {
+            updated_at: '2016-01-25T16:36:29',
+            modified_by: {id: 5},
+            resource_type: 'Audit',
+            content: {
+              title: 'Audit 1.0'
+            }
+          }
+        },
+        {
+          instance: {
+            updated_at: '2016-01-30T13:22:59',
+            modified_by: {id: 5},
+            resource_type: 'Audit',
+            content: {
+              title: 'My Audit 1.0'
+            }
+          }
+        }
+      ];
+
+      helper(instance, fakeOptions);
+
+      expect(fakeOptions.fn.calls.count()).toEqual(1);
+      callArgs = fakeOptions.fn.calls.mostRecent().args;
+      expect(callArgs.length).toEqual(1);
+
+      diffList = callArgs[0].objectChanges;
+      expect(diffList.length).toEqual(1);
+
+      actual = diffList[0].changes;
+      expected = [
+        {
+          fieldName: 'Object Name',
+          origVal: 'Audit 1.0',
+          newVal: 'My Audit 1.0'
+        }
+      ];
+      expect(actual).toEqual(expected);
+    });
+
+    it('omits object fields that are considered internal', function () {
+      var match;
+      var callArgs;
+      var diffList;
+
+      fakeRevHistory = [
+        {
+          instance: {
+            updated_at: '2016-01-25T16:36:29',
+            modified_by: {id: 5},
+            resource_type: 'Audit',
+            content: {
+              title: 'Audit 1.0',
+              internalField: 'AUDIT-e34a'
+            }
+          }
+        },
+        {
+          instance: {
+            updated_at: '2016-01-30T13:22:59',
+            modified_by: {id: 5},
+            resource_type: 'Audit',
+            content: {
+              title: 'Audit 1.0',
+              internalField: 'AUDIT-e34a-v2'
+            }
+          }
+        }
+      ];
+
+      helper(instance, fakeOptions);
+
+      expect(fakeOptions.fn.calls.count()).toEqual(1);
+      callArgs = fakeOptions.fn.calls.mostRecent().args;
+      expect(callArgs.length).toEqual(1);
+
+      diffList = callArgs[0].objectChanges;
+      expect(diffList.length).toEqual(1);
+
+      // the Audit's internalField does not have a display name defined in
+      // GGRC.model_attr_defs, and is thus considered internal, meaning that it
+      // should be omitted from the resulting diff object
+      match = _.find(diffList[0].changes, {fieldName: 'internalField'});
+      expect(match).toBeUndefined();
+    });
   });
 });

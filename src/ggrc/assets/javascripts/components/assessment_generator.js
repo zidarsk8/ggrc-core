@@ -94,7 +94,7 @@ can.Component.extend({
           };
         } else {
           msg = {
-            success: "<span class='user-string'>" + success + "</span> Assessments successfully created."
+            success: success + " Assessments successfully created."
           };
         }
       } else {

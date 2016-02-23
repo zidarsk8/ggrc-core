@@ -79,7 +79,7 @@ else
   MERGE_BASE_HASH=$(git show --pretty=raw HEAD | grep parent | head -1 | grep -oE "[^ ]*$")
 fi
 
-echo -n "Checking out the merge base of $TARGET_BRANCH and the current branch"
+echo -n "Checking out the merge base of ${TARGET_BRANCH:-the target} and the current branch"
 echo -n " (${MERGE_BASE_HASH:0:7})..."
 git checkout --quiet "$MERGE_BASE_HASH"
 git clean -xdfq
