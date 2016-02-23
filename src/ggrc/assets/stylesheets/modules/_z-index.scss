@@ -6,48 +6,19 @@
  */
 
 $zindex: (
-  tooltip: 3100,
-  max: 9999,
-  footer: 1500,
-  extended-info: 3100, // z-index(3100) + 100
-  file-controls: 1500,
-  header-content: 100,
-  info-pin: 1500,
-  details-wrap.pin: 9999,
-  info-pane-utility: 9999,
-  modal-backdrop: 2050,
-  modal: 3100,
-  ui-autocomplete: 3100, // z-index(3100) + 100
-  ui-autocomplete.active: 1500,
-  ui-autocomplete.active--extended-content: 1500,
-  flash: 9999,
-  modal-header--flash: 9999,
-  pane-header: 3100,
-  info-pane-utility: 9999,
-  lhs: 2050,
-  lhn-pin: 9999,
-  bar-v: 100,
-  tree-spinner: 100,
-  event-more: 2050
+  min: 100,
+  small: 1500,
+  medium: 2050,
+  large: 3100,
+  max: 9999
 );
 
-// @function zindex($name) {
-//   @if map-has-key($zindex, $name) {
-//     @return map-get($zindex, $name);
-//   }
-//   @warn "Key #{$name} is not in the map ’$zindex’";
-//   @return null;
-// }
-// .m-lightbox {
-//   z-index: zindex(max);
-// }
-
-9000
-9999
-
-
-100
-1500
-2050
-3100
-9999
+@function z($name) {
+  @if map-has-key($zindex, $name) {
+    @return map-get($zindex, $name);
+  }
+  @warn "Key #{$name} is not in the map ’$zindex’";
+  @return null;
+}
+// extended-info: 3100, // z-index(3100) + 100
+// ui-autocomplete: 3100, // z-index(3100) + 100
