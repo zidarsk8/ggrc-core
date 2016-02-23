@@ -33,6 +33,7 @@ class _WidgetBar(base.Component):
 class _ObjectWidgetBar(_WidgetBar):
   """Model for a generic object widget bar (e.g. each info widget is object
   specific"""
+  # pylint: disable=not-callable
 
   _info_cls = None
 

@@ -6,6 +6,7 @@
 """All smoke tests relevant to my work page"""
 # pylint: disable=no-self-use
 # pylint: disable=invalid-name
+# pylint: disable=too-few-public-methods
 
 import pytest    # pylint: disable=import-error
 from lib import base

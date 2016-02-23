@@ -137,6 +137,8 @@ class RichTextInputField(Element):
     self.text = self._element.text
 
   def enter_text(self, text):
+    """Clears the fields and enteres text"""
+
     self.click_when_visible()
     self._element.clear()
     self._element.send_keys(text)
@@ -161,10 +163,14 @@ class RichTextInputField(Element):
 
 
 class TextInputField(RichTextInputField):
+  """A generic model for the text input field"""
   pass
 
 
 class TextFilterDropdown(Element):
+  """Model for elements which are using autocomplete in a text field with a
+  dropdown list of found results"""
+
   def __init__(self, driver, textbox_locator, dropdown_locator):
     super(TextFilterDropdown, self).__init__(driver, textbox_locator)
     self._locator_dropdown = dropdown_locator
@@ -382,8 +388,10 @@ class AnimatedComponent(Component):
     super(AnimatedComponent, self).__init__(driver)
     self._locators = locators_to_check
 
-    self._wait_until_visible() if wait_until_visible \
-        else self._wait_until_invisible()
+    if wait_until_visible:
+      self._wait_until_visible()
+    else:
+      self._wait_until_invisible()
 
   def _wait_until_visible(self):
     for locator in self._locators:

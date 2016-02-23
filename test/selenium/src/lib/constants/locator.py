@@ -550,11 +550,15 @@ class ModalCreateNewControl(object):
 
 
 class ModalEditObject(object):
+  """Locators for a generic edit object modal"""
+
   BUTTON_DELETE = (
       By.CSS_SELECTOR, '.deny-buttons [data-toggle="modal-ajax-deleteform"]')
 
 
 class ModalCreateNewObject(object):
+  """Locators for a generic new object modal"""
+
   UI_TITLE = (By.CSS_SELECTOR, '[data-id="title_txtbx"]')
 
   BUTTON_SAVE_AND_CLOSE = (

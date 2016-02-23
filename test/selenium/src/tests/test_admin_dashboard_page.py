@@ -6,6 +6,7 @@
 """Admin dashboard page smoke tests"""
 # pylint: disable=no-self-use
 # pylint: disable=invalid-name
+# pylint: disable=too-few-public-methods
 
 import pytest    # pylint: disable=import-error
 from lib import base

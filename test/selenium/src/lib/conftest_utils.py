@@ -15,7 +15,7 @@ from lib.page import lhn
 
 def _navigate_to_page_that_contains_lhn(selenium):
   if selenium.driver.current_url in [login.LoginPage.URL, "data:,"]:
-      selenium.driver.get(dashboard.DashboardPage.URL)
+    selenium.driver.get(dashboard.DashboardPage.URL)
 
 
 def create_control(selenium):

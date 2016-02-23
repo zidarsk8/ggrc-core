@@ -3,6 +3,8 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+"""Models for the custom attribute widget"""
+
 from lib import base
 from lib import environment
 from lib import selenium_utils

@@ -3,6 +3,8 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+"""Page object models for the info widget of the object"""
+
 from lib import base
 from lib import environment
 from lib.constants import url
