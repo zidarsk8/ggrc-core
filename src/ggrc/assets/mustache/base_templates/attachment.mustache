@@ -5,20 +5,26 @@
     Maintained By: anze@reciprocitylabs.com
 }}
 
-<li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-  {{#is_allowed 'update' parentInstance context='for'}}
-  {{#instance}}
-    <span class="file-controls">
-      <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-        <span class="result" {{data 'result'}}></span>
-        <i class="fa fa-trash"></i>
-      </a>
-    </span>
-  {{/instance}}
-  {{/is_allowed}}
-  <i class="fa fa-file-{{file_type instance}}-o"></i>
-  <span class="date">{{date instance.created_at true}}</span>
-  <a href="{{schemed_url instance.link}}" href="{{schemed_url instance.link}}" target="_blank">
-    <span>{{firstnonempty instance.title instance.link}}</span>
-  </a>
-</li>
+<reusable-object>
+  <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+    {{#is_allowed 'update' parentInstance context='for'}}
+    {{#instance}}
+      <span class="file-controls">
+        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+          <span class="result" {{data 'result'}}></span>
+          <i class="fa fa-trash"></i>
+        </a>
+      </span>
+    {{/instance}}
+    {{/is_allowed}}
+    <i class="fa fa-file-{{file_type instance}}-o"></i>
+    <span class="date">{{date instance.created_at true}}</span>
+    <a href="{{schemed_url instance.link}}" href="{{schemed_url instance.link}}" target="_blank">
+      <span>{{firstnonempty instance.title instance.link}}</span>
+    </a>
+
+    {{#if_reusable}}
+      <input type="checkbox" />
+    {{/if_reusable}}
+  </li>
+</reusable-object>

@@ -124,6 +124,9 @@
           <li><a href="#tab2" data-toggle="tab">
             Request log
           </a></li>
+          <li><a href="#tab3" data-toggle="tab">
+            Related Requests
+          </a></li>
         </ul>
 
         <div class="tab-content">
@@ -142,6 +145,10 @@
 
           <div class="tab-pane fade in" id="tab2">
             {{{render "/static/mustache/requests/change_log.mustache" instance=.}}}
+          </div>
+
+          <div class="tab-pane fade in" id="tab3">
+            {{> /static/mustache/requests/relatable_objects.mustache }}
           </div>
         </div>
 
