@@ -42,6 +42,6 @@ class NewOrgGroupModal(modal_base.OrgGroupModal, CreateNewObjectModal):
   org group from LHN"""
 
 
-class NewRiskModal(modal_base.OrgGroupModal, CreateNewObjectModal):
+class NewRiskModal(modal_base.RiskModal, CreateNewObjectModal):
   """Class representing a risk modal visible after creating a new
   risk from LHN"""
