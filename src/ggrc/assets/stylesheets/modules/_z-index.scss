@@ -20,9 +20,9 @@ $zindex: (
   ui-autocomplete: 3100, // z-index(3100) + 100
   ui-autocomplete.active: 1500,
   ui-autocomplete.active--extended-content: 1500,
-  flash: 9000,
+  flash: 9999,
   modal-header--flash: 9999,
-  pane-header: 9000,
+  pane-header: 3100,
   info-pane-utility: 9999,
   lhs: 2050,
   lhn-pin: 9999,
