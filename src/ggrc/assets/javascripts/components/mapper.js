@@ -173,13 +173,16 @@
                     }
                   }.bind(this)))
             };
-        this.scope.attr("deferred_to").controller.element.trigger("defer:add", [data, {map_and_save: true}]);
+        this.scope.attr('deferred_to').controller.element.trigger('defer:add', [data, {map_and_save: true}]);
+        this.closeModal();
+      },
+      '.add-button .btn modal:added': 'addNew',
+      '.add-button .btn modal:success': 'addNew',
+      closeModal: function () {
         // TODO: Find proper way to dismiss the modal
         this.element.find(".modal-dismiss").trigger("click");
       },
-      ".add-button .btn modal:added": "addNew",
-      ".add-button .btn modal:success": "addNew",
-      "addNew": function (el, ev, model) {
+      addNew: function (el, ev, model) {
         var entries = this.scope.attr("mapper.entries"),
             len = entries.length,
             get_binding_name = this.scope.attr("mapper").get_binding_name,
@@ -196,25 +199,34 @@
       },
       ".modal-footer .btn-map click": function (el, ev) {
         var callback = this.scope.attr('mapper.callback');
+        var type = this.scope.attr('mapper.type');
+        var object = this.scope.attr('mapper.object');
+        var isAllObject = type === 'AllObject';
+        var instance = CMS.Models[object].findInCacheById(
+          this.scope.attr('mapper.join_object_id'));
+        var mapping;
+        var Model;
+        var data = {};
+        var defer = [];
+        var que = new RefreshQueue();
+
         ev.preventDefault();
-        if (el.hasClass("disabled")) {
+        if (el.hasClass('disabled')) {
           return;
         }
         if (this.scope.attr('mapper.getList')) {
-          return callback(this.scope.attr('mapper.selected'));
+          return callback(this.scope.attr('mapper.selected'), {
+            type: type,
+            target: object,
+            instance: instance,
+            context: this
+          });
         }
 
         // TODO: Figure out nicer / proper way to handle deferred save
         if (this.scope.attr("deferred")) {
           return this.deferredSave();
         }
-
-        var type = this.scope.attr("mapper.type"),
-            object = this.scope.attr("mapper.object"),
-            isAllObject = type === "AllObject",
-            instance = CMS.Models[object].findInCacheById(this.scope.attr("mapper.join_object_id")),
-            mapping, Model, data = {}, defer = [],
-            que = new RefreshQueue();
 
         this.scope.attr("mapper.is_saving", true);
         que.enqueue(instance).trigger().done(function (inst) {
@@ -244,14 +256,13 @@
               $("body").trigger("ajax:flash", {"error": message});
             }.bind(this))
             .always(function () {
-              this.scope.attr("mapper.is_saving", false);
-              // TODO: Find proper way to dismiss the modal
-              this.element.find(".modal-dismiss").trigger("click");
+              this.scope.attr('mapper.is_saving', false);
+              this.closeModal();
 
               // there is some kind of a race condition when filling the treview with new elements
               // so many don't get rendered. To solve it, at the end of the loading
               // we refresh the whole tree view. Other solutions could be to batch add the objects.
-              $(".cms_controllers_tree_view:visible").each(function () {
+              $('.cms_controllers_tree_view:visible').each(function () {
                 // TODO: This is terrible solution, but it's only way to refresh all tree views on page
                 var control = $(this).control();
                 if (control) {
@@ -415,7 +426,7 @@
       })
     },
     events: {
-      "inserted":  function () {
+      "inserted": function () {
         this.element.find(".results-wrap").cms_controllers_infinite_scroll();
         this.getResults();
       },

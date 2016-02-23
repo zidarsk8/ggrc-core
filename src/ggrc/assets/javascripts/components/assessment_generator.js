@@ -6,8 +6,8 @@
 */
 
 can.Component.extend({
-  tag: "assessment-generator-button",
-  template: "{{{> /static/mustache/base_objects/generate_assessments_button.mustache}}}",
+  tag: 'assessment-generator-button',
+  template: '{{{> /static/mustache/base_objects/generate_assessments_button.mustache}}}',
   scope: {
     audit: null
   },
@@ -17,11 +17,11 @@ can.Component.extend({
       if (this.scope.loading) {
         return;
       }
+      this._results = null;
       GGRC.Controllers.MapperModal.launch(el, {
         object: 'Audit',
         type: 'Control',
         'join-object-id': this.scope.audit.id,
-        'search-only': 'false',
         'join-mapping': 'program_controls',
         getList: true,
         relevantTo: [{
@@ -36,91 +36,65 @@ can.Component.extend({
         callback: this._generate_assessments.bind(this)
       });
     },
-    _generate_assessments: function (controls) {
-      var assessments_list = this.scope.audit.get_binding("related_assessments").list,
-          controls_list = this.scope.audit.get_binding("program_controls").list,
-          assessments_dfd = this._refresh(assessments_list),
-          controls_dfd = this._refresh(controls_list),
-          ignore_controls, dfd, inner_dfd = new $.Deferred().resolve();
-
-      dfd = $.when(assessments_dfd, controls_dfd).then(function (assessments, controls){
-        // Preload related controls mapping on assessment objects
-        var related_controls_dfd = $.when.apply($, can.map(assessments, function(assessment) {
-          return assessment.refresh_all("related_controls");
-        }));
-        return $.when(assessments, controls, related_controls_dfd);
-      }).then(function (assessments, controls) {
-        ignore_controls = _.map(assessments, function(ca) {
-          var control_id = ca.control && ca.control.id,
-              related_controls = ca.get_mapping('related_controls');
-          if (!control_id && related_controls.length) {
-            control_id = _.exists(related_controls[0], 'instance.id');
-          }
-          return control_id;
-        });
-
-        return $.when.apply($, can.map(controls, function(control) {
-          if (_.includes(ignore_controls, control.id)) {
-            return;
-          }
-          // We are rewriting inner_dfd to make sure _generate calls are
-          // daisy chained
-          inner_dfd = this._generate(control, inner_dfd);
-          return  inner_dfd;
-        }.bind(this)));
+    _generate_assessments: function (list, options) {
+      this._refresh(list).then(function (items) {
+        var results = _.map(items, function (item) {
+          return this._generate(item);
+        }.bind(this));
+        this._results = results;
+        $.when.apply($, results)
+          .then(function () {
+            options.context.closeModal();
+          })
+          .done(this._notify.bind(this))
+          .fail(this._notify.bind(this));
       }.bind(this));
-      this._enter_loading_state(dfd);
-      dfd.always(this._notify.bind(this));
     },
 
     _refresh: function (bindings) {
-      var refresh_queue = new RefreshQueue();
-      can.each(bindings, function(binding) {
-          refresh_queue.enqueue(binding.instance);
-      });
-      return refresh_queue.trigger();
+      var que = new RefreshQueue();
+      return que.enqueue(bindings).trigger();
     },
 
-    _generate: function (control, dfd) {
-      var assessment,
-          index,
-          title = control.title + ' assessment for ' + this.scope.audit.title,
-          data = {
-            audit: this.scope.audit,
-            control: control.stub(),
-            context: this.scope.audit.context,
-            owners: [CMS.Models.Person.findInCacheById(GGRC.current_user.id)],
-            test_plan: control.test_plan
-          };
-      return dfd.then(function() {
-        return GGRC.Models.Search.counts_for_types(title, ['Assessment']);
-      }).then(function (result) {
-        index = result.getCountFor('Assessment') + 1;
-        data.title = title + ' ' + index;
-        return new CMS.Models.Assessment(data).save();
-      }.bind(this));
+    _generate: function (object) {
+      var title = object.title + ' assessment for ' + this.scope.audit.title;
+      var data = {
+        audit: this.scope.audit,
+        object: object.stub(),
+        context: this.scope.audit.context,
+        title: title,
+        owners: [CMS.Models.Person.findInCacheById(GGRC.current_user.id)]
+      };
+      if (object.test_plan) {
+        data.test_plan = object.test_plan;
+      }
+      return new CMS.Models.Assessment(data).save();
     },
 
-    _notify: function() {
-      this._exit_loading_state();
+    _notify: function () {
+      var success;
+      var errors;
+      var msg;
 
-      var assessments = arguments,
-        count = _.filter(assessments, function(assessment) {
-          return  !_.isNull(assessment) && !(assessment.state && assessment.state() === "rejected");
-        }).length,
-        errors = _.filter(assessments, function(assessment) {
-          return assessment.state && assessment.state() === "rejected";
-        }).length,
-        msg;
+      if (!this._results) {
+        return;
+      }
+      success = _.filter(this._results, function (assessment) {
+        return !_.isNull(assessment) &&
+          !(assessment.state && assessment.state() === 'rejected');
+      }).length;
+      errors = _.filter(this._results, function (assessment) {
+        return assessment.state && assessment.state() === 'rejected';
+      }).length;
 
       if (errors < 1) {
-        if (count === 0) {
+        if (success === 0) {
           msg = {
             success: "Every Control already has an Assessment!"
           };
         } else {
           msg = {
-            success: "<span class='user-string'>" + count + "</span> Assessments successfully created."
+            success: "<span class='user-string'>" + success + "</span> Assessments successfully created."
           };
         }
       } else {
@@ -129,27 +103,7 @@ can.Component.extend({
         };
       }
 
-      $(document.body).trigger("ajax:flash", msg);
-    },
-
-    _enter_loading_state: function (deferred) {
-      var $i = this.element.find("a > i"),
-          icon = $i.attr("class");
-
-      $i.attr("class", "fa fa-spinner fa-pulse");
-      $(document.body).trigger("ajax:flash",
-                               {warning: "Generating Assessments"});
-
-      this.scope.icon = icon;
-      this.scope.loading = true;
-      GGRC.delay_leaving_page_until(deferred);
-    },
-
-    _exit_loading_state: function () {
-      this.element.find("a > i")
-            .attr("class", this.scope.icon);
-
-      this.scope.loading = false;
+      $(document.body).trigger('ajax:flash', msg);
     }
   }
 });
