@@ -565,3 +565,6 @@ class ObjectWidget(Widget):
       self.members_listed = self._driver \
           .find_elements(*constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
       return self.select_nth_member(member)
+    except exceptions.TimeoutException:
+      # sometimes the click to the listed member results in hover
+      return self.select_nth_member(member)
