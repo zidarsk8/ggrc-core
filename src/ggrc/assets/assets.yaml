@@ -117,6 +117,7 @@ dashboard-js-files:
   - components/mapper.js
   - components/people_list.js
   - components/mapped_tree_view.js
+  - components/relatable.js
   #- d3.v2.js
   #- related_graph.js
 

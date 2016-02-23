@@ -178,4 +178,56 @@ can.Model.Mixin("unique_title", {
   }
 });
 
+  can.Model.Mixin('relatable', {
+  }, {
+    related: function () {
+      var that = this;
+      var bindingName = 'related_' + that.constructor.root_collection;
+      var relatable = $.Deferred();
+      var connectionsCount = {};
+      var blacklistedObjects = ['Comment', 'Person'];
+
+      $.when(this.get_binding('related_objects').refresh_instances()).then(
+        function (relatedObjects) {
+          var roCount = 0;
+          var roCountDone = 0;
+
+          _.each(relatedObjects, function (ro) {
+            var binding;
+            if (_.contains(blacklistedObjects, ro.instance.type)) {
+              return;
+            }
+            binding = ro.instance.get_binding(bindingName);
+            if (binding) {
+              roCount += 1;
+              $.when(binding.refresh_instances()).then(
+                function (relatableObjects) {
+                  roCountDone += 1;
+                  _.each(relatableObjects, function (relObj) {
+                    if (relObj.instance.id !== that.id) {
+                      if (connectionsCount[relObj.instance.id] === undefined) {
+                        connectionsCount[relObj.instance.id] = {
+                          count: 1,
+                          object: relObj
+                        };
+                      } else {
+                        connectionsCount[relObj.instance.id].count += 1;
+                      }
+                    }
+                  });
+
+                  if (roCount === roCountDone) {
+                    relatable.resolve(
+                      _.map(_.sortBy(connectionsCount, 'count').reverse(),
+                        function (item) {
+                          return item.object;
+                        }));
+                  }
+                });
+            }
+          });
+        });
+      return relatable;
+    }
+  });
 })(this.can);
