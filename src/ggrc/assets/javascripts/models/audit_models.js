@@ -368,7 +368,7 @@
     create: 'POST /api/requests',
     update: 'PUT /api/requests/{id}',
     destroy: 'DELETE /api/requests/{id}',
-    mixins: ['unique_title'],
+    mixins: ['unique_title', 'relatable'],
     is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
