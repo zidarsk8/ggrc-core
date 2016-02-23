@@ -340,6 +340,8 @@ class ModalCreateNewProgram(object):
   """Locators for the program modal visible when creating a new modal from
   LHN"""
 
+  UI_TITLE = (By.CSS_SELECTOR,
+              '[data-test-id="new_program_field_title_a63ed79d"]')
   UI_DESCRIPTION = (By.CSS_SELECTOR,
                     '[data-test-id="new_program_field_description_1fb8bc06"]'
                     '>iframe.wysihtml5-sandbox')
