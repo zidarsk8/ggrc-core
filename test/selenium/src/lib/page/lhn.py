@@ -214,10 +214,10 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
   def select_controls(self):
     """
     Returns:
-        _Controls
+        Controls
     """
     self.button_controls.click()
-    return _Controls(self._driver)
+    return Controls(self._driver)
 
   def select_objectives(self):
     """
@@ -228,7 +228,7 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
     return _Objectives(self._driver)
 
 
-class _Controls(lhn.AccordionGroup):
+class Controls(lhn.AccordionGroup):
   """Controls dropdown in LHN"""
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CONTROL

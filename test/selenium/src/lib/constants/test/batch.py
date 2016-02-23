@@ -3,22 +3,7 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+"""Constants related to batch tests (tests that require multiple objects"""
 
-class ElementNotFound(Exception):
-  pass
-
-
-class DocstringsMissing(Exception):
-  pass
-
-
-class NoClassFound(Exception):
-  pass
-
-
-class ElementMovingTimeout(Exception):
-  pass
-
-
-class RedirectTimeout(Exception):
-  pass
+# number of objects in a battery
+BATTERY = 3

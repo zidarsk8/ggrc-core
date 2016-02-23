@@ -4,6 +4,9 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 """Admin dashboard page smoke tests"""
+# pylint: disable=no-self-use
+# pylint: disable=invalid-name
+# pylint: disable=too-few-public-methods
 
 import pytest    # pylint: disable=import-error
 from lib import base
@@ -12,6 +15,7 @@ from lib.page import dashboard
 
 
 class TestAdminDashboardPage(base.Test):
+  """Tests for the admin dashboard, a part of smoke tests, section 1"""
   _element = constants.element.AdminRolesWidget
 
   @pytest.mark.smoke_tests

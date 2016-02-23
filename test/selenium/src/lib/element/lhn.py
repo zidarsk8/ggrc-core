@@ -130,7 +130,7 @@ class AccordionGroup(base.DropdownDynamic):
     """Creates a new modal for the object in the LHN
 
     Returns:
-        lib.base.Modal
+        lib.page.modal.create_new_object.CreateNewObjectModal
     """
     self.button_create_new.click()
     return self._create_new_modal_cls(self._driver)
