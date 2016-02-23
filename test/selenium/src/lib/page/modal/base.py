@@ -36,6 +36,7 @@ class ProgramModal(_Modal):
   """Class representing a modal base for the program object"""
 
   _locators = locator.ModalCreateNewProgram
+  _locator_ui_title = locator.ModalCreateNewProgram.UI_TITLE
 
   def __init__(self, driver):
     super(ProgramModal, self).__init__(driver)
@@ -270,6 +271,7 @@ class RiskModal(_Modal):
   control from LHN"""
 
   _locators = locator.ModalCreateNewRisk
+  _locator_ui_title = locator.ModalCreateNewRisk.UI_TITLE
 
   def __init__(self, driver):
     super(RiskModal, self).__init__(driver)
