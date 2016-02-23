@@ -179,8 +179,9 @@
       '.add-button .btn modal:added': 'addNew',
       '.add-button .btn modal:success': 'addNew',
       closeModal: function () {
+        this.scope.attr('mapper.is_saving', false);
         // TODO: Find proper way to dismiss the modal
-        this.element.find(".modal-dismiss").trigger("click");
+        this.element.find('.modal-dismiss').trigger('click');
       },
       addNew: function (el, ev, model) {
         var entries = this.scope.attr("mapper.entries"),
@@ -215,6 +216,7 @@
           return;
         }
         if (this.scope.attr('mapper.getList')) {
+          this.scope.attr('mapper.is_saving', true);
           return callback(this.scope.attr('mapper.selected'), {
             type: type,
             target: object,
