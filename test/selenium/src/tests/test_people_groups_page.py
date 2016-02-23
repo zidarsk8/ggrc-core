@@ -4,8 +4,6 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 """All smoke tests relevant to people/groups page"""
-# pylint: disable=no-self-use
-# pylint: disable=invalid-name
 
 import pytest    # pylint: disable=import-error
 from lib import base
@@ -24,5 +22,7 @@ class TestOrgGroupPage(base.Test):
     and closing the lhn_modal we're redirected to an url that contains an
     object id.
     """
+    # pylint: disable=no-self-use
+    # pylint: disable=invalid-name
     assert url.ORG_GROUPS + "/" + new_org_group.object_id in \
         new_org_group.url
