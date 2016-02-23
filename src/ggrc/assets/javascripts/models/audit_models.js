@@ -935,7 +935,7 @@
     update: 'PUT /api/assessments/{id}',
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
-    mixins: ['ownable', 'contactable', 'unique_title'],
+    mixins: ['ownable', 'contactable', 'unique_title', 'relatable'],
     is_custom_attributable: true,
     attributes: {
       control: 'CMS.Models.Control.stub',
