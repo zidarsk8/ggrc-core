@@ -7,17 +7,16 @@
 
 from lib import base
 from lib.constants import locator
-from lib.page.modal import base as modal_base
+from lib.page.modal import edit_object
 
 
-class CreateNewObjectModal(base.Modal):
+class _CreateNewObjectModal(base.Modal):
   """Base create modal model"""
 
-  _locator_button_add_another = locator.ModalCreateNewObject\
-      .BUTTON_SAVE_AND_ADD_ANOTHER
+  _locator_button_add_another = None
 
   def __init__(self, driver):
-    super(CreateNewObjectModal, self).__init__(driver)
+    super(_CreateNewObjectModal, self).__init__(driver)
     self.button_save_and_add_another = base.Button(
         driver, self._locator_button_add_another)
 
@@ -27,21 +26,33 @@ class CreateNewObjectModal(base.Modal):
     return self.__class__(self._driver)
 
 
-class NewProgramModal(modal_base.ProgramModal, CreateNewObjectModal):
+class NewProgramModal(_CreateNewObjectModal, edit_object.EditProgramModal):
   """Class representing a program modal visible after creating a new
   program from LHN"""
 
+  _locator_button_add_another = locator.ModalCreateNewProgram\
+      .BUTTON_SAVE_AND_ADD_ANOTHER
 
-class NewControlModal(modal_base.ControlModal, CreateNewObjectModal):
+
+class NewControlModal(_CreateNewObjectModal, edit_object.EditControlModal):
   """Class representing a control modal visible after creating a new
   control from LHN"""
 
+  _locator_button_add_another = locator.ModalCreateNewControl\
+      .BUTTON_SAVE_AND_ADD_ANOTHER
 
-class NewOrgGroupModal(modal_base.OrgGroupModal, CreateNewObjectModal):
+
+class NewOrgGroupModal(_CreateNewObjectModal, edit_object.EditOrgGroupModal):
   """Class representing an org group modal visible after creating a new
   org group from LHN"""
 
+  _locator_button_add_another = locator.ModalCreateNewOrgGroup \
+      .BUTTON_SAVE_AND_ADD_ANOTHER
 
-class NewRiskModal(modal_base.RiskModal, CreateNewObjectModal):
+
+class NewRiskModal(_CreateNewObjectModal, edit_object.EditRiskModal):
   """Class representing a risk modal visible after creating a new
   risk from LHN"""
+
+  _locator_button_add_another = locator.ModalCreateNewRisk \
+      .BUTTON_SAVE_AND_ADD_ANOTHER

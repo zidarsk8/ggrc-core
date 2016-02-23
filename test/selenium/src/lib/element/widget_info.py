@@ -14,20 +14,19 @@ from lib.constants import locator
 class DropdownSettings(base.Component):
   """A class for the button/dropdown settings in the info widget"""
 
-  _locator = locator.WidgetInfoSettingsButton
+  _delete_modal_cls = None
   _edit_modal_cls = None
 
   def __init__(self, driver):
     super(DropdownSettings, self).__init__(driver)
-    self.edit = base.Button(driver, self._locator.DROPDOWN_SETTINGS_EDIT)
-    self.permalink = base.Button(driver,
-                                 self._locator.DROPDOWN_SETTINGS_PERMALINK)
-    self.delete = base.Button(driver, self._locator.DROPDOWN_SETTINGS_DELETE)
+    self.edit = None
+    self.permalink = None
+    self.delete = None
 
   def select_edit(self):
     """
     Returns:
-        lib.page.modal.edit_object.EditModal
+        base.Modal
     """
     self.edit.click()
     selenium_utils.get_when_visible(
@@ -45,16 +44,21 @@ class DropdownSettings(base.Component):
         modal.delete_object.DeleteObjectModal
     """
     self.delete.click()
-    return modal.delete_object.DeleteObjectModal(self._driver)
+
+    # pylint: disable=not-callable
+    return self._delete_modal_cls(self._driver)
 
 
 class DropdownSettingsPrograms(DropdownSettings):
   """A model for the settings dropdown on the program object"""
 
+  _locator = locator.ProgramInfoWidget
+  _delete_modal_cls = modal.delete_object.DeleteProgramModal
   _edit_modal_cls = modal.edit_object.EditProgramModal
 
-
-class DropdownSettingsControls(DropdownSettings):
-  """A model for the settings dropdown on the program object"""
-
-  _edit_modal_cls = modal.edit_object.EditControlModal
+  def __init__(self, driver):
+    super(DropdownSettingsPrograms, self).__init__(driver)
+    self.edit = base.Button(driver, self._locator.DROPDOWN_SETTINGS_EDIT)
+    self.permalink = base.Button(driver,
+                                 self._locator.DROPDOWN_SETTINGS_PERMALINK)
+    self.delete = base.Button(driver, self._locator.DROPDOWN_DELETE)
