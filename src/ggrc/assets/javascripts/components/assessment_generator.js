@@ -13,10 +13,7 @@ can.Component.extend({
   },
   events: {
     'a click': function (el, ev) {
-      var instance = GGRC.page_instance();
-      if (this.scope.loading) {
-        return;
-      }
+      var instance = this.scope.attr('audit') || GGRC.page_instance();
       this._results = null;
       GGRC.Controllers.MapperModal.launch(el, {
         object: 'Audit',
@@ -33,30 +30,26 @@ can.Component.extend({
           submitButton: 'Generate Assessments',
           count: 'assessment(s) will be generated'
         },
-        callback: this._generate_assessments.bind(this)
+        callback: this.generateAssessments.bind(this)
       });
     },
-    _generate_assessments: function (list, options) {
-      this._refresh(list).then(function (items) {
+    generateAssessments: function (list, options) {
+      var que = new RefreshQueue();
+
+      que.enqueue(list).trigger().then(function (items) {
         var results = _.map(items, function (item) {
-          return this._generate(item);
+          return this.generateModel(item);
         }.bind(this));
         this._results = results;
         $.when.apply($, results)
           .then(function () {
             options.context.closeModal();
           })
-          .done(this._notify.bind(this))
-          .fail(this._notify.bind(this));
+          .done(this.notify.bind(this))
+          .fail(this.notify.bind(this));
       }.bind(this));
     },
-
-    _refresh: function (bindings) {
-      var que = new RefreshQueue();
-      return que.enqueue(bindings).trigger();
-    },
-
-    _generate: function (object) {
+    generateModel: function (object) {
       var title = object.title + ' assessment for ' + this.scope.audit.title;
       var data = {
         audit: this.scope.audit,
@@ -70,8 +63,7 @@ can.Component.extend({
       }
       return new CMS.Models.Assessment(data).save();
     },
-
-    _notify: function () {
+    notify: function () {
       var success;
       var errors;
       var msg;
@@ -90,16 +82,16 @@ can.Component.extend({
       if (errors < 1) {
         if (success === 0) {
           msg = {
-            success: "Every Control already has an Assessment!"
+            success: 'Every Control already has an Assessment!'
           };
         } else {
           msg = {
-            success: success + " Assessments successfully created."
+            success: success + ' Assessments successfully created.'
           };
         }
       } else {
         msg = {
-          error: "An error occured when creating Assessments."
+          error: 'An error occured when creating Assessments.'
         };
       }
 
