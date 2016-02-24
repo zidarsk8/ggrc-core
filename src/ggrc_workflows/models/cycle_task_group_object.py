@@ -62,32 +62,3 @@ class CycleTaskGroupObject(WithContact, Stateful,
   def _display_name(self):
     return \
         self.object.display_name + '<->' + self.cycle_task_group.display_name
-
-
-class CycleTaskGroupable(object):
-  @classmethod
-  def late_init_cycle_task_groupable(cls):
-    def make_cycle_task_group_objects(cls):
-      joinstr = 'and_(foreign(CycleTaskGroupObject.object_id) == {type}.id, '\
-                'foreign(CycleTaskGroupObject.object_type) == "{type}")'
-      joinstr = joinstr.format(type=cls.__name__)
-      return db.relationship(
-          'CycleTaskGroupObject',
-          primaryjoin=joinstr,
-          backref='{0}_object'.format(cls.__name__),
-      )
-
-    cls.cycle_task_group_objects = make_cycle_task_group_objects(cls)
-
-  _publish_attrs = [
-      'cycle_task_group_objects',
-  ]
-
-  @classmethod
-  def eager_query(cls):
-    from sqlalchemy import orm
-
-    query = super(CycleTaskGroupable, cls).eager_query()
-    return query.options(
-        orm.subqueryload('cycle_task_group_objects'),
-    )

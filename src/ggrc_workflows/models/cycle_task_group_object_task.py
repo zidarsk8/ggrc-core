@@ -11,6 +11,7 @@ from sqlalchemy import or_
 
 from ggrc import db
 from ggrc.models import all_models
+from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Slugged
@@ -45,8 +46,6 @@ class CycleTaskGroupObjectTask(
       db.Integer, db.ForeignKey('cycles.id'), nullable=False)
   cycle_task_group_id = db.Column(
       db.Integer, db.ForeignKey('cycle_task_groups.id'), nullable=False)
-  cycle_task_group_object_id = db.Column(
-      db.Integer, db.ForeignKey('cycle_task_group_objects.id'), nullable=True)
   task_group_task_id = db.Column(
       db.Integer, db.ForeignKey('task_group_tasks.id'), nullable=False)
   task_group_task = db.relationship(
@@ -66,9 +65,14 @@ class CycleTaskGroupObjectTask(
   finished_date = db.Column(db.DateTime)
   verified_date = db.Column(db.DateTime)
 
+  @property
+  def cycle_task_objects_for_cache(self):
+    """Changing task state must invalidate `workflow_state` on objects
+    """
+    return [(o.__class__.__name__, o.id) for o in self.related_objects]
+
   _publish_attrs = [
       'cycle',
-      'cycle_task_group_object',
       'cycle_task_group',
       'task_group_task',
       'cycle_task_entries',
@@ -198,3 +202,16 @@ class CycleTaskGroupObjectTask(
     return query.options(
         orm.joinedload('cycle_task_entries'),
     )
+
+
+class CycleTaskable(object):
+  """ Requires the Relatable mixin, otherwise cycle_task_group_object_tasks
+  fails to fetch related objects
+  """
+  @computed_property
+  def cycle_task_group_object_tasks(self):
+    sources = [r.source for r in self.related_sources
+               if r.source_type == "CycleTaskGroupObjectTask"]
+    destinations = [r.destination for r in self.related_destinations
+                    if r.destination_type == "CycleTaskGroupObjectTask"]
+    return sources + destinations

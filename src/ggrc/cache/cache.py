@@ -161,7 +161,7 @@ def all_mapping_entries():
       mapping('CycleTaskGroupObjectTask', 'cycle'),
       mapping('CycleTaskGroupObjectTask', 'cycle_task_entries'),
       mapping('CycleTaskGroupObjectTask', 'task_group_task'),
-      mapping('CycleTaskGroupObjectTask', 'cycle_task_group_object'),
+      mapping('CycleTaskGroupObjectTask', 'cycle_task_objects_for_cache'),
       mapping('CycleTaskEntry', 'cycle'),
       mapping('CycleTaskEntry', 'cycle_task_group_object_task'),
       # mapping('RiskAssessmentMapping'),

@@ -43,14 +43,11 @@ blueprint = Blueprint(
 for type_ in WORKFLOW_OBJECT_TYPES:
   model = getattr(all_models, type_)
   model.__bases__ = (
-      # models.workflow_object.Workflowable,
       models.task_group_object.TaskGroupable,
-      models.cycle_task_group_object.CycleTaskGroupable,
+      models.cycle_task_group_object_task.CycleTaskable,
       models.workflow.WorkflowState,
   ) + model.__bases__
-  # model.late_init_workflowable()
   model.late_init_task_groupable()
-  model.late_init_cycle_task_groupable()
 
 
 def get_public_config(current_user):
@@ -139,13 +136,21 @@ def _get_date_range(timeboxed_objects):
 
 
 def update_cycle_dates(cycle):
+  """ This gets all cycle task groups and tasks associated with a cycle and
+  calculates the start and end date for the cycle by aggregating cycle task
+  dates to cycle task groups and then cycle task group dates to cycle.
+
+  Args:
+    cycle: Cycle for which we want to calculate the start and end dates.
+
+  """
   if cycle.id:
     # If `cycle` is already in the database, then eager load required objects
     cycle = models.Cycle.query.filter_by(id=cycle.id).\
-        options(orm.joinedload_all(
-            'cycle_task_groups.'
-            'cycle_task_group_objects.'
-            'cycle_task_group_object_tasks')).one()
+        options(orm
+                .joinedload('cycle_task_groups')
+                .joinedload('cycle_task_group_tasks')
+                ).one()
 
   if not cycle.cycle_task_group_object_tasks:
     cycle.start_date, cycle.end_date = None, None
@@ -155,24 +160,11 @@ def update_cycle_dates(cycle):
     return
 
   for ctg in cycle.cycle_task_groups:
-    # This is where we calculate the start and end dates
-    for ctgo in ctg.cycle_task_group_objects:
-      ctgo.start_date, ctgo.end_date = _get_date_range(
-          ctgo.cycle_task_group_object_tasks)
-      ctgo.next_due_date = _get_min_end_date(
-          ctgo.cycle_task_group_object_tasks)
+    ctg.start_date, ctg.end_date = _get_date_range(
+        ctg.cycle_task_group_tasks)
+    ctg.next_due_date = _get_min_end_date(
+        ctg.cycle_task_group_tasks)
 
-    if len(ctg.cycle_task_group_objects) == 0:
-      # Handle case where cycle task group has no mapped objects
-      ctg.start_date, ctg.end_date = _get_date_range(
-          ctg.cycle_task_group_tasks)
-      ctg.next_due_date = _get_min_end_date(
-          ctg.cycle_task_group_tasks)
-    else:
-      ctg.start_date, ctg.end_date = _get_date_range(
-          ctg.cycle_task_group_objects)
-      ctg.next_due_date = _get_min_next_due_date(
-          ctg.cycle_task_group_objects)
   cycle.start_date, cycle.end_date = _get_date_range(cycle.cycle_task_groups)
   cycle.next_due_date = _get_min_next_due_date(cycle.cycle_task_groups)
 
