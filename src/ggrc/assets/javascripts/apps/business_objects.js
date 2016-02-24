@@ -200,11 +200,6 @@
             widget_id: "Request",
             widget_name: "Open Requests"
           },
-          history: {
-            widget_id: "history",
-            widget_name: "Complete",
-            widget_icon: "history"
-          },
           Control: {
             widget_id: "control",
             widget_name: "In Scope Controls",
@@ -214,7 +209,7 @@
             widget_id: "program",
             widget_name: "Program",
             widget_icon: "program"
-          },
+          }
         },
         Control: {
           Request: {
@@ -444,17 +439,6 @@
             show_view: GGRC.mustache_path + "/requests/tree.mustache",
             footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache"
-          },
-          history: {
-            mapping: "history",
-            parent_instance: GGRC.page_instance(),
-            draw_children: true,
-            model: "Request",
-            show_view: GGRC.mustache_path + "/requests/tree.mustache",
-            footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache",
-            allow_mapping: false,
-            allow_creating: false
           },
           Control: {
             mapping: "program_controls",
