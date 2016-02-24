@@ -3,11 +3,12 @@
 # Created By: andraz@reciprocitylabs.com
 # Maintained By: andraz@reciprocitylabs.com
 
-import ggrc
-import ggrc.models as models
 import itertools
 import os
 import random
+
+import ggrc
+import ggrc.models as models
 import integration.ggrc
 import integration.ggrc.generator
 
@@ -19,10 +20,17 @@ if os.environ.get('TRAVIS', False):
 counter = 0
 
 
-def next(msg):
+def make_name(msg):
   global counter
   counter += 1
   return msg + str(counter)
+
+
+def relate(src, dst):
+  if src < dst:
+    return (src, dst)
+  else:
+    return (dst, src)
 
 
 class automapping_count_limit:
@@ -75,7 +83,6 @@ class TestAutomappings(integration.ggrc.TestCase):
     for obj in relevant:
       objects.add(obj)
     mappings = set()
-    relate = lambda src, dst: (src, dst) if src < dst else (dst, src)
     if type(to_create) is not list:
       to_create = [to_create]
     for src, dst in to_create:
@@ -110,20 +117,24 @@ class TestAutomappings(integration.ggrc.TestCase):
 
   def test_mapping_directive_to_a_program(self):
     self.with_permutations(
-        lambda: self.create_object(models.Program, {'title': next('Program')}),
+        lambda: self.create_object(models.Program, {
+            'title': make_name('Program')
+        }),
         lambda: self.create_object(models.Regulation, {
-            'title': next('Test PD Regulation')
+            'title': make_name('Test PD Regulation')
         }),
         lambda: self.create_object(models.Objective, {
-            'title': next('Objective')
+            'title': make_name('Objective')
         }),
     )
-    program = self.create_object(models.Program, {'title': next('Program')})
+    program = self.create_object(models.Program, {
+        'title': make_name('Program')
+    })
     objective1 = self.create_object(models.Objective, {
-        'title': next('Objective')
+        'title': make_name('Objective')
     })
     objective2 = self.create_object(models.Objective, {
-        'title': next('Objective')
+        'title': make_name('Objective')
     })
     self.assert_mapping_implication(
         to_create=[(program, objective1), (objective1, objective2)],
@@ -132,20 +143,22 @@ class TestAutomappings(integration.ggrc.TestCase):
 
   def test_mapping_to_sections(self):
     regulation = self.create_object(models.Regulation, {
-        'title': next('Test Regulation')
+        'title': make_name('Test Regulation')
     })
     section = self.create_object(models.Section, {
-        'title': next('Test section'),
+        'title': make_name('Test section'),
     })
     objective = self.create_object(models.Objective, {
-        'title': next('Objective')
+        'title': make_name('Objective')
     })
     self.assert_mapping_implication(
         to_create=[(regulation, section), (objective, section)],
         implied=(objective, regulation),
 
     )
-    program = self.create_object(models.Program, {'title': next('Program')})
+    program = self.create_object(models.Program, {
+        'title': make_name('Program')
+    })
     self.assert_mapping_implication(
         to_create=[(objective, program)],
         implied=[(regulation, section),
@@ -156,12 +169,14 @@ class TestAutomappings(integration.ggrc.TestCase):
 
   def test_automapping_limit(self):
     with automapping_count_limit(-1):
-      program = self.create_object(models.Program, {'title': next('Program')})
+      program = self.create_object(models.Program, {
+          'title': make_name('Program')
+      })
       regulation = self.create_object(models.Regulation, {
-          'title': next('Test PD Regulation')
+          'title': make_name('Test PD Regulation')
       })
       objective = self.create_object(models.Objective, {
-          'title': next('Objective')
+          'title': make_name('Objective')
       })
       self.assert_mapping_implication(
           to_create=[(regulation, objective), (objective, program)],
@@ -170,17 +185,17 @@ class TestAutomappings(integration.ggrc.TestCase):
 
   def test_mapping_to_objective(self):
     regulation = self.create_object(models.Regulation, {
-        'title': next('Test PD Regulation')
+        'title': make_name('Test PD Regulation')
     })
     section = self.create_object(models.Section, {
-        'title': next('Test section'),
+        'title': make_name('Test section'),
         'directive': {'id': regulation.id},
     })
     control = self.create_object(models.Control, {
-        'title': next('Test control')
+        'title': make_name('Test control')
     })
     objective = self.create_object(models.Objective, {
-        'title': next('Test control')
+        'title': make_name('Test control')
     })
     self.assert_mapping_implication(
         to_create=[(regulation, section),
@@ -193,7 +208,9 @@ class TestAutomappings(integration.ggrc.TestCase):
         ]
     )
 
-    program = self.create_object(models.Program, {'title': next('Program')})
+    program = self.create_object(models.Program, {
+        'title': make_name('Program')
+    })
     self.assert_mapping_implication(
         to_create=[(control, program)],
         implied=[
@@ -209,17 +226,17 @@ class TestAutomappings(integration.ggrc.TestCase):
 
   def test_mapping_between_objectives(self):
     regulation = self.create_object(models.Regulation, {
-        'title': next('Test PD Regulation')
+        'title': make_name('Test PD Regulation')
     })
     section = self.create_object(models.Section, {
-        'title': next('Test section'),
+        'title': make_name('Test section'),
         'directive': {'id': regulation.id},
     })
     objective1 = self.create_object(models.Objective, {
-        'title': next('Test Objective')
+        'title': make_name('Test Objective')
     })
     objective2 = self.create_object(models.Objective, {
-        'title': next('Test Objective')
+        'title': make_name('Test Objective')
     })
     self.assert_mapping_implication(
         to_create=[(regulation, section),
@@ -234,16 +251,16 @@ class TestAutomappings(integration.ggrc.TestCase):
 
   def test_mapping_nested_controls(self):
     objective = self.create_object(models.Objective, {
-        'title': next('Test Objective')
+        'title': make_name('Test Objective')
     })
     controlP = self.create_object(models.Control, {
-        'title': next('Test control')
+        'title': make_name('Test control')
     })
     control1 = self.create_object(models.Control, {
-        'title': next('Test control')
+        'title': make_name('Test control')
     })
     control2 = self.create_object(models.Control, {
-        'title': next('Test control')
+        'title': make_name('Test control')
     })
     self.assert_mapping_implication(
         to_create=[(objective, controlP),
@@ -256,23 +273,25 @@ class TestAutomappings(integration.ggrc.TestCase):
     _, creator = self.gen.generate_person(user_role="Creator")
     _, admin = self.gen.generate_person(user_role="gGRC Admin")
 
-    program = self.create_object(models.Program, {'title': next('Program')})
+    program = self.create_object(models.Program, {
+        'title': make_name('Program')
+    })
     regulation = self.create_object(models.Regulation, {
-        'title': next('Regulation'),
+        'title': make_name('Regulation'),
         'owners': [{"id": admin.id}],
     })
     owners = [{"id": creator.id}]
     self.api.set_user(creator)
     section = self.create_object(models.Section, {
-        'title': next('Section'),
+        'title': make_name('Section'),
         'owners': owners,
     })
     objective = self.create_object(models.Objective, {
-        'title': next('Objective'),
+        'title': make_name('Objective'),
         'owners': owners,
     })
     control = self.create_object(models.Control, {
-        'title': next('Control'),
+        'title': make_name('Control'),
         'owners': owners,
     })
 
@@ -294,19 +313,21 @@ class TestAutomappings(integration.ggrc.TestCase):
 
   def test_automapping_request_audit(self):
     _, creator = self.gen.generate_person(user_role="Creator")
-    program = self.create_object(models.Program, {'title': next('Program')})
+    program = self.create_object(models.Program, {
+        'title': make_name('Program')
+    })
     audit = self.create_object(models.Audit, {
-        'title': next('Audit'),
+        'title': make_name('Audit'),
         'program': {'id': program.id},
         'status': 'Planned',
     })
     control = self.create_object(models.Control, {
-        'title': next('Test control')
+        'title': make_name('Test control')
     })
     self.create_mapping(audit, control)
     request = self.create_object(models.Request, {
         'audit': {'id': audit.id},
-        'title': next('Request'),
+        'title': make_name('Request'),
         'assignee': {'id': creator.id},
         'request_type': 'documentation',
         'status': 'Open',
@@ -318,20 +339,22 @@ class TestAutomappings(integration.ggrc.TestCase):
     self.assert_mapping(request, control, missing=True)
 
   def test_automapping_control_assesment(self):
-    program = self.create_object(models.Program, {'title': next('Program')})
+    program = self.create_object(models.Program, {
+        'title': make_name('Program')
+    })
     regulation = self.create_object(models.Regulation, {
-        'title': next('Test Regulation')
+        'title': make_name('Test Regulation')
     })
     audit = self.create_object(models.Audit, {
-        'title': next('Audit'),
+        'title': make_name('Audit'),
         'program': {'id': program.id},
         'status': 'Planned',
     })
     control = self.create_object(models.Control, {
-        'title': next('Test control')
+        'title': make_name('Test control')
     })
     assessment = self.create_object(models.Assessment, {
-        'title': next('Test CA'),
+        'title': make_name('Test CA'),
         'audit': {'id': audit.id},
         'control': {'id': control.id},
     })
@@ -339,3 +362,35 @@ class TestAutomappings(integration.ggrc.TestCase):
         to_create=[(program, regulation), (regulation, assessment)],
         implied=[(program, assessment)]
     )
+
+  def test_automapping_audit_program_object(self):
+    """Test rule 'mapping program objects to audit'."""
+    program = self.create_object(models.Program, {
+        'title': make_name('Program')
+    })
+    audit = self.create_object(models.Audit, {
+        'title': make_name('Audit'),
+        'program': {'id': program.id},
+        'status': 'Planned',
+    })
+    regulation = self.create_object(models.Regulation, {
+        'title': make_name('Test PD Regulation')
+    })
+    section = self.create_object(models.Section, {
+        'title': make_name('Test section'),
+        'directive': {'id': regulation.id},
+    })
+
+    self.assert_mapping_implication(
+        to_create=[(program, regulation), (program, section)],
+        implied=[(regulation, audit), (section, audit)]
+    )
+
+    audit_new = self.create_object(models.Audit, {
+        'title': make_name('Audit'),
+        'program': {'id': program.id},
+        'status': 'Planned',
+    })
+    self.assert_mapping(audit_new, regulation)
+    self.assert_mapping(audit_new, section)
+    self.assert_mapping(audit_new, program, missing=True)

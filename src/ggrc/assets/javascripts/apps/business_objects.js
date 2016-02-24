@@ -437,7 +437,7 @@
           }
         },
         Audit: {
-          _mixins: ["issues"],
+          _mixins: ['issues', 'governance_objects'],
           Request: {
             mapping: "active_requests",
             draw_children: true,
@@ -512,6 +512,9 @@
             mapping: "clauses",
             child_options: [related_objects_child_options],
             draw_children: true
+          },
+          Audit: {
+            mapping: 'related_audits'
           }
          },
         Regulation: {
@@ -537,16 +540,28 @@
           },
         },
         Clause: {
-          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'extended_audits', 'issues'],
+          Audit: {
+            mapping: 'related_audits'
+          }
         },
         Section: {
-          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'extended_audits', 'issues'],
+          Audit: {
+            mapping: 'related_audits'
+          }
         },
         Objective: {
-          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'extended_audits', 'issues'],
+          Audit: {
+            mapping: 'related_audits'
+          }
         },
         Control: {
-          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"],
+          _mixins: ['governance_objects', 'business_objects', 'extended_audits', 'issues'],
+          Audit: {
+            mapping: 'related_audits'
+          }
         },
         Request: {
           _mixins: ["governance_objects", "business_objects", "issues"],

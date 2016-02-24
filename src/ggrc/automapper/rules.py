@@ -11,7 +11,8 @@ from ggrc import models
 Attr = namedtuple('Attr', ['name'])
 
 
-type_ordering = [['Program'], ['Regulation', 'Policy', 'Standard', 'Contract'],
+type_ordering = [['Audit'], ['Program'],
+                 ['Regulation', 'Policy', 'Standard', 'Contract'],
                  ['Section', 'Clause'], ['Objective'], ['Control'],
                  ['Assessment']]
 
@@ -170,5 +171,13 @@ rules = RuleSet(count_limit=10000, rule_list=[
         {Attr('program')},
         {'Audit'},
         {'Request'},
+    ),
+
+    Rule(
+        'mapping program objects to audit',
+        {Attr('audits'), 'Audit'},
+        {'Program'},
+        {'Regulation', 'Policy', 'Standard', 'Contract',
+         'Section', 'Clause', 'Objective', 'Control'}
     ),
 ])
