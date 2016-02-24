@@ -6,9 +6,11 @@
 }}
 
 <ul class="attachment-list">
+  {{#expose reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod}}
   {{#with_mapping mapping parentInstance}}
     {{#results}}
-      {{{render itemTemplate parentInstance=parentInstance}}}
+      {{{render itemTemplate parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod}}}
     {{/results}}
   {{/with_mapping}}
+  {{/expose}}
 </ul>

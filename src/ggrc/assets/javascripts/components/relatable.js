@@ -11,7 +11,22 @@
     scope: {
       parentInstance: null,
       reusedObjects: new can.List(),
-      create_relationship: function (destination) {
+      disableReuse: true,
+      reuseIt: function (scope, el, ev) {
+        var reused;
+        var relatedDfds;
+
+        if (el.hasClass('disabled')) {
+          return;
+        }
+        reused = this.attr('reusedObjects');
+        relatedDfds = can.map(reused, function (object) {
+          var executer = this[object.method].bind(this);
+          return executer(object.item);
+        }.bind(this));
+        GGRC.delay_leaving_page_until($.when.apply($, relatedDfds));
+      },
+      createRelationship: function (destination) {
         var source;
         var dest;
 
@@ -31,7 +46,7 @@
           context: source.context
         }).save();
       },
-      create_evidence_relationship: function (destination) {
+      createEvidenceRelationship: function (destination) {
         var source;
         var dest;
 
@@ -53,28 +68,8 @@
       }
     },
     events: {
-      '[reusable=true] input[type=checkbox] change': function (el, ev) {
-        var reused = this.scope.attr('reusedObjects');
-        var object = el.parent();
-        var key = {
-          type: object.attr('data-object-type'),
-          id: object.attr('data-object-id'),
-          method: object.parents('[reusable=true]').attr('reuse-method')
-        };
-        var index = _.findIndex(reused, key);
-        if (index >= 0) {
-          reused.splice(index, 1);
-          return;
-        }
-        reused.push(key);
-      },
-      '.js-trigger-reuse click': function (el, ev) {
-        var reused = this.scope.attr('reusedObjects');
-        var relatedDfds = can.map(reused, function (object) {
-          var executer = this.scope[object.method].bind(this);
-          return executer(object);
-        }.bind(this));
-        GGRC.delay_leaving_page_until($.when.apply($, relatedDfds));
+      '{scope.reusedObjects} change': function (list) {
+        this.scope.attr('disableReuse', !list.length);
       }
     }
   });
@@ -83,21 +78,26 @@
     tag: 'reusable-object',
     template: '<content></content>',
     scope: {
-      is_reusable: null
-    },
-    events: {
-      'inserted': function (el, ev) {
-        if (el.parents('[reusable=true]').length === 1) {
-          this.scope.attr('is_reusable', true);
+      selectObject: function (instance, el, ev) {
+        var status = el.prop('checked');
+        var list = this.attr('list');
+        var index;
+
+        if (status) {
+          list.push({
+            item: instance,
+            method: this.attr('method')
+          });
+        } else {
+          index = _.findIndex(list, function (item) {
+            if (!item.instance || item.instance.id) {
+              return false;
+            }
+            return item.instance.id === instance.id &&
+              item.instance.type === instance.type;
+          });
+          list.splice(index, 1);
         }
-      }
-    },
-    helpers: {
-      if_reusable: function (options) {
-        if (this.attr('is_reusable') === true) {
-          return options.fn();
-        }
-        return options.inverse();
       }
     }
   });
