@@ -34,7 +34,7 @@
     path: "/vagrant-dev/node_modules"
 
 - name: link node_modules
-  command: ln -s /vagrant-dev/node_modules /vagrant/node_modules
+  file: src=/vagrant-dev/node_modules dest=/vagrant/node_modules state=link
 
 - name: run make appengine
   command: make appengine DEV_PREFIX=/vagrant-dev
