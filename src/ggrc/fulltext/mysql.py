@@ -12,6 +12,7 @@ from ggrc.models.request import Request
 from ggrc.models.response import Response
 from ggrc.models.relationship import Relationship
 from ggrc_basic_permissions.models import UserRole
+from ggrc_basic_permissions import objects_via_assignable_query
 from ggrc_basic_permissions import objects_via_relationships_query
 from ggrc.rbac import permissions, context_query_filter
 from sqlalchemy import \
@@ -258,6 +259,9 @@ class MysqlIndexer(SqlIndexer):
     if not my_objects:
       type_union_queries.append(
           objects_via_relationships_query(contact_id, True))
+      type_union_queries.append(
+          objects_via_assignable_query(contact_id)
+      )
 
     # FIXME The following line crashes if the Workflow extension is not enabled
     for model in [all_models.Program, all_models.Audit, all_models.Workflow]:

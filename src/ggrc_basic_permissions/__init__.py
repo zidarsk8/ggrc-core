@@ -453,6 +453,14 @@ def load_permissions_for(user):
           .setdefault(type_, {})\
           .setdefault('resources', list())\
           .append(id_)
+  for res in objects_via_assignable_query(user.id).all():
+    id_, type_, context_id = res
+    actions = ["read", "view_object_page"]
+    for action in actions:
+      permissions.setdefault(action, {})\
+          .setdefault(type_, {})\
+          .setdefault('resources', list())\
+          .append(id_)
 
   personal_context = _get_or_create_personal_context(user)
 
