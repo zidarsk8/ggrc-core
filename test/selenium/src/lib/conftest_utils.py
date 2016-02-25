@@ -5,17 +5,21 @@
 
 """PyTest fixture utils"""
 
+from selenium.common import exceptions
+
 from lib import test_helpers
 from lib.constants.test import batch
 from lib.page import dashboard
 from lib.page import widget
-from lib.page import login
 from lib.page import lhn
 
 
 def _navigate_to_page_that_contains_lhn(selenium):
+  """Navigates to dashboard since dashboard always contains the LHN button"""
   # pylint: disable=invalid-name
-  if selenium.driver.current_url in [login.LoginPage.URL, "data:,"]:
+  try:
+    selenium.driver.find_element(*dashboard.HeaderPage.locator.BUTTON_LHN)
+  except exceptions.NoSuchElementException:
     selenium.driver.get(dashboard.DashboardPage.URL)
 
 
@@ -29,7 +33,6 @@ def create_control(selenium):
   _navigate_to_page_that_contains_lhn(selenium)
   modal = dashboard.HeaderPage(selenium.driver) \
       .open_lhn_menu() \
-      .select_my_objects() \
       .select_controls_or_objectives() \
       .select_controls() \
       .create_new()
@@ -41,6 +44,7 @@ def create_control(selenium):
 def create_controls(selenium):
   """Creates a new control object.
 
+  We create first a control. But because LHN remembers it's state
   Returns:
       list(widget.ControlInfo)
   """
@@ -51,8 +55,7 @@ def create_controls(selenium):
 
   for _ in xrange(batch.BATTERY - 1):
     dashboard.HeaderPage(selenium.driver) \
-        .open_lhn_menu() \
-        .select_my_objects()
+        .open_lhn_menu()
     modal = lhn.Controls(selenium.driver).create_new()
     test_helpers.ModalNewControlPage.enter_test_data(modal)
     modal.save_and_close()
@@ -62,6 +65,7 @@ def create_controls(selenium):
 
 
 def delete_control(selenium):
+  """Deletes a control object when on control info widget"""
   widget.ControlInfo(selenium.driver) \
       .press_object_settings() \
       .select_delete() \
@@ -69,7 +73,7 @@ def delete_control(selenium):
 
 
 def create_custom_program_attribute(selenium):
-  """Creates a custom attribute for a program object"""
+  """Creates a custom text attribute for a program object"""
   # pylint: disable=redefined-outer-name
 
   modal = dashboard.AdminDashboardPage(selenium.driver) \
@@ -90,7 +94,6 @@ def create_org_group(selenium):
   _navigate_to_page_that_contains_lhn(selenium)
   modal = dashboard.HeaderPage(selenium.driver) \
       .open_lhn_menu() \
-      .select_my_objects() \
       .select_people_or_groups() \
       .select_org_groups() \
       .create_new()
@@ -100,6 +103,7 @@ def create_org_group(selenium):
 
 
 def delete_org_group(selenium):
+  """Deletes an org group object when on org group info widget"""
   widget.OrgGroupsInfo(selenium.driver) \
       .press_object_settings() \
       .select_delete() \
@@ -116,7 +120,6 @@ def create_risk(selenium):
   _navigate_to_page_that_contains_lhn(selenium)
   modal = dashboard.HeaderPage(selenium.driver) \
       .open_lhn_menu() \
-      .select_my_objects() \
       .select_risks_or_threats() \
       .select_risks() \
       .create_new()
@@ -126,6 +129,7 @@ def create_risk(selenium):
 
 
 def delete_risk(selenium):
+  """Deletes a risk object when on risk info widget"""
   widget.RiskInfo(selenium.driver) \
       .press_object_settings() \
       .select_delete() \
@@ -139,7 +143,6 @@ def create_program(selenium):
   _navigate_to_page_that_contains_lhn(selenium)
   modal = dashboard.HeaderPage(selenium.driver) \
       .open_lhn_menu() \
-      .select_my_objects() \
       .select_programs() \
       .create_new()
 
@@ -150,6 +153,7 @@ def create_program(selenium):
 
 
 def delete_program(selenium):
+  """Deletes a program object when on program info widget"""
   widget.ProgramInfo(selenium.driver) \
       .press_object_settings() \
       .select_delete() \
