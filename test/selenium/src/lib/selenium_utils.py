@@ -47,6 +47,21 @@ def get_when_visible(driver, locator):
       .until(EC.visibility_of_element_located(locator))
 
 
+def get_when_clickable(driver, locator):
+  """
+  Args:
+    driver (base.CustomDriver)
+    locator (tuple)
+
+  Returns:
+      selenium.webdriver.remote.webelement.WebElement
+  """
+  return WebDriverWait(
+      driver,
+      constants.ux.MAX_USER_WAIT_SECONDS) \
+      .until(EC.element_to_be_clickable(locator))
+
+
 def get_when_invisible(driver, locator):
   """
   Args:
@@ -82,4 +97,4 @@ def check_if_element_active(element):
       bool
   """
   attributes = element.get_attribute("class")
-  return True if "active" in attributes.split(" ") else False
+  return True if "active" in attributes.split() else False
