@@ -27,6 +27,7 @@ def contributed_services():
       service('contexts', models.Context),
       service('controls', models.Control),
       service('assessments', models.Assessment),
+      service('assessment_templates', models.AssessmentTemplate),
       service('comments', models.Comment),
       service('custom_attribute_definitions',
               models.CustomAttributeDefinition),
