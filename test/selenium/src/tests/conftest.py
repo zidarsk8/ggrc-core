@@ -52,7 +52,6 @@ def new_control(selenium):
   Returns:
       lib.page.modal.new_program.NewControlModal
   """
-
   control_info_page = conftest_utils.create_control(selenium)
   yield control_info_page
   selenium.driver.get(control_info_page.url)
