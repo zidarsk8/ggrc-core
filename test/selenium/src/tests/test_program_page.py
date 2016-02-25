@@ -7,8 +7,10 @@
 # pylint: disable=no-self-use
 # pylint: disable=invalid-name
 # pylint: disable=too-few-public-methods
+# pylint: disable=unused-argument
 
 import pytest    # pylint: disable=import-error
+
 from lib import base
 from lib import test_helpers
 from lib.constants import element
@@ -145,7 +147,6 @@ class TestProgramPage(base.Test):
   @pytest.mark.smoke_tests
   def test_mapping_controls_via_lhn(self, selenium, new_control, new_program):
     """Tests if widget number increases when mapping via LHN"""
-    _, program_info_page = new_program
 
     # check that the widget isn't opened yet since it doesn't have any members
     assert selenium.driver.find_element(

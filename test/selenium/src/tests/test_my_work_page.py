@@ -7,8 +7,10 @@
 # pylint: disable=no-self-use
 # pylint: disable=invalid-name
 # pylint: disable=too-few-public-methods
+# pylint: disable=unused-argument
 
 import pytest    # pylint: disable=import-error
+
 from lib import base
 from lib import exception
 from lib.page import dashboard
@@ -22,7 +24,6 @@ class TestMyWorkPage(base.Test):
   @pytest.mark.smoke_tests
   def test_horizontal_nav_bar_tabs(self, selenium, battery_of_controls):
     """Tests that several objects in a widget can be deleted sequentially"""
-
     controls_widget = dashboard\
         .DashboardPage(selenium.driver)\
         .select_controls()

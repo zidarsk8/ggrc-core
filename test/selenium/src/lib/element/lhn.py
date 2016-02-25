@@ -2,10 +2,14 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+
 """A modul for elements contained in LHN"""
+# pylint: disable=not-callable
+# pylint: disable=not-an-iterable
 
 from selenium.common import exceptions as selenium_exception
 from selenium.webdriver.common import action_chains
+
 from lib import base
 from lib import exception
 from lib import selenium_utils

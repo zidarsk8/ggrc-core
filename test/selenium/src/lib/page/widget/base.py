@@ -4,6 +4,8 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 """Base classes for widget models"""
+# pylint: disable=not-callable
+# pylint: disable=not-an-iterable
 
 from lib import base
 from lib import environment
