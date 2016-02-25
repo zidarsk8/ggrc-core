@@ -89,7 +89,7 @@ def objects_via_relationships_query(user_id, context_not_role=False):
       case([
           (_relationship.destination_type == "Program",
            _relationship.source_type.label('type'))
-      ], else_=_relationship.destination_type.label('id')),
+      ], else_=_relationship.destination_type.label('type')),
       literal(None).label('context_id') if context_not_role else _role.name))
 
   # We also need to return relationships themselves:
