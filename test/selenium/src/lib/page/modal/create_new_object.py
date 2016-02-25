@@ -5,54 +5,24 @@
 
 """Modals for creating new objects"""
 
-from lib import base
-from lib.constants import locator
-from lib.page.modal import edit_object
+from lib.page.modal import base
 
 
-class _CreateNewObjectModal(base.Modal):
-  """Base create modal model"""
-
-  _locator_button_add_another = None
-
-  def __init__(self, driver):
-    super(_CreateNewObjectModal, self).__init__(driver)
-    self.button_save_and_add_another = base.Button(
-        driver, self._locator_button_add_another)
-
-  def save_and_add_other(self):
-    """Saves this objects and opens a new modal"""
-    self.button_save_and_add_another.click()
-    return self.__class__(self._driver)
-
-
-class NewProgramModal(_CreateNewObjectModal, edit_object.EditProgramModal):
+class NewProgramModal(base.ProgramModal, base.CreateNewObjectModal):
   """Class representing a program modal visible after creating a new
   program from LHN"""
 
-  _locator_button_add_another = locator.ModalCreateNewProgram\
-      .BUTTON_SAVE_AND_ADD_ANOTHER
 
-
-class NewControlModal(_CreateNewObjectModal, edit_object.EditControlModal):
+class NewControlModal(base.ControlModal, base.CreateNewObjectModal):
   """Class representing a control modal visible after creating a new
   control from LHN"""
 
-  _locator_button_add_another = locator.ModalCreateNewControl\
-      .BUTTON_SAVE_AND_ADD_ANOTHER
 
-
-class NewOrgGroupModal(_CreateNewObjectModal, edit_object.EditOrgGroupModal):
+class NewOrgGroupModal(base.OrgGroupModal, base.CreateNewObjectModal):
   """Class representing an org group modal visible after creating a new
   org group from LHN"""
 
-  _locator_button_add_another = locator.ModalCreateNewOrgGroup \
-      .BUTTON_SAVE_AND_ADD_ANOTHER
 
-
-class NewRiskModal(_CreateNewObjectModal, edit_object.EditRiskModal):
+class NewRiskModal(base.RiskModal, base.CreateNewObjectModal):
   """Class representing a risk modal visible after creating a new
   risk from LHN"""
-
-  _locator_button_add_another = locator.ModalCreateNewRisk \
-      .BUTTON_SAVE_AND_ADD_ANOTHER
