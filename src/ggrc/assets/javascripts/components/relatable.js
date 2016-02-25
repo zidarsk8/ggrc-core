@@ -13,18 +13,28 @@
       reusedObjects: new can.List(),
       disableReuse: true,
       reuseIt: function (scope, el, ev) {
+        var list = this.attr('reusedObjects');
         var reused;
         var relatedDfds;
+        var when;
 
         if (el.hasClass('disabled')) {
           return;
         }
         reused = this.attr('reusedObjects');
         relatedDfds = can.map(reused, function (object) {
-          var executer = this[object.method].bind(this);
-          return executer(object.item);
+          var executer = this[object.method];
+          return executer.call(this, object.item);
         }.bind(this));
-        GGRC.delay_leaving_page_until($.when.apply($, relatedDfds));
+        when = $.when.apply($, relatedDfds);
+
+        when.then(function () {
+          list.replace([]);
+          $(document.body).trigger('ajax:flash', {
+            success: 'Selected evidences are reused'
+          });
+        });
+        GGRC.delay_leaving_page_until(when);
       },
       createRelationship: function (destination) {
         var source;
@@ -68,7 +78,7 @@
       }
     },
     events: {
-      '{scope.reusedObjects} change': function (list) {
+      '{scope.reusedObjects} length': function (list) {
         this.scope.attr('disableReuse', !list.length);
       }
     }
@@ -78,6 +88,7 @@
     tag: 'reusable-object',
     template: '<content></content>',
     scope: {
+      list: null,
       selectObject: function (instance, el, ev) {
         var status = el.prop('checked');
         var list = this.attr('list');
@@ -96,7 +107,16 @@
             return item.instance.id === instance.id &&
               item.instance.type === instance.type;
           });
-          list.splice(index, 1);
+          if (index) {
+            list.splice(index, 1);
+          }
+        }
+      }
+    },
+    events: {
+      '{scope.list} length': function (list) {
+        if (!list.length) {
+          this.element.find('input[type="checkbox"]').prop('checked', false);
         }
       }
     }
