@@ -3340,6 +3340,10 @@ Mustache.registerHelper("un_camel_case", function (str, options) {
    * The function assumes that the given revisions are two distinct Revisions
    * of the same object (application entity).
    *
+   * NOTE: The object fields that do not have a user-friendly alias defined are
+   * considered "internal", and are thus not included in the resulting diff
+   * objects, because they are not meant to be shown to the end user.
+   *
    * @param {CMS.Models.Revision} rev1 - the older of the two revisions
    * @param {CMS.Models.Revision} rev2 - the newer of the two revisions
    *
