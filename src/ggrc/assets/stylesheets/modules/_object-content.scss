@@ -121,3 +121,24 @@
     padding-bottom: 10px;
   }
 }
+
+.custom-attr-table {
+  font-size: 11px;
+  .table {
+    td.centered,
+    th.centered {
+      text-align: center;
+    }
+    .checkbox-wrap {
+      input {
+        margin-top: 3px;
+        margin-bottom: 0;
+      }
+    }
+    tbody {
+      td {
+        vertical-align: top;
+      }
+    }
+  }
+}

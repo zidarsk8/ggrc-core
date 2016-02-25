@@ -208,3 +208,10 @@ form.import {
 .new-relevant-block:nth-child(even) {
   background: $lightGray;
 }
+
+.text-top-space {
+  margin-top: 30px;
+  h3 {
+    margin-bottom: 10px;
+  }
+}
