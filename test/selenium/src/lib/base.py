@@ -9,6 +9,7 @@ import re
 import pyvirtualdisplay   # pylint: disable=import-error
 from selenium.webdriver.common import keys    # pylint: disable=import-error
 from selenium import webdriver    # pylint: disable=import-error
+from selenium.common import exceptions
 from lib import environment
 from lib import constants
 from lib import exception
@@ -107,14 +108,14 @@ class Element(InstanceRepresentation):
     super(Element, self).__init__()
     self._driver = driver
     self._locator = locator
-    self._element = driver.find_element(*locator)
+    self._element = selenium_utils.get_when_visible(driver, locator)
     self.text = self._element.text
 
   def click(self):
     """Clicks on the element"""
     self._element.click()
 
-  def click_when_visible(self, locator=None):
+  def click_when_visible(self):
     """Waits for the element to be visible and only then performs a
     click"""
     selenium_utils.get_when_visible(self._driver, self._locator).click()
@@ -130,12 +131,14 @@ class RichTextInputField(Element):
     Args:
         driver (CustomDriver):
     """
+    super(RichTextInputField, self).__init__(driver, locator)
     self._driver = driver
     self._locator = locator
-    self._element = selenium_utils.get_when_visible(driver, locator)
     self.text = self._element.text
 
   def enter_text(self, text):
+    """Clears the fields and enteres text"""
+
     self.click_when_visible()
     self._element.clear()
     self._element.send_keys(text)
@@ -160,10 +163,14 @@ class RichTextInputField(Element):
 
 
 class TextInputField(RichTextInputField):
+  """A generic model for the text input field"""
   pass
 
 
 class TextFilterDropdown(Element):
+  """Model for elements which are using autocomplete in a text field with a
+  dropdown list of found results"""
+
   def __init__(self, driver, textbox_locator, dropdown_locator):
     super(TextFilterDropdown, self).__init__(driver, textbox_locator)
     self._locator_dropdown = dropdown_locator
@@ -287,13 +294,19 @@ class Checkbox(Element):
 
 
 class Toggle(Element):
-  def __init__(self, driver, locator, is_activated=False):
+  def __init__(self, driver, locator):
     super(Toggle, self).__init__(driver, locator)
-    self.is_activated = is_activated
+    self.is_activated = selenium_utils.check_if_element_active(self._element)
 
-  def click(self):
-    self._element.click()
-    self.is_activated = not self.is_activated
+  def switch_on(self):
+    if not self.is_activated:
+      self._element.click()
+      self.is_activated = True
+
+  def switch_off(self):
+    if self.is_activated:
+      self._element.click()
+      self.is_activated = False
 
 
 class Tab(Element):
@@ -356,9 +369,13 @@ class Component(object):
   def wait_for_redirect(self):
     """Wait until the current url changes"""
     from_url = self._driver.current_url
+    timer_start = time.time()
 
     while from_url == self._driver.current_url:
       time.sleep(0.1)
+
+      if time.time() - timer_start > constants.ux.MAX_USER_WAIT_SECONDS:
+         raise exception.RedirectTimeout
 
 
 class AnimatedComponent(Component):
@@ -377,8 +394,10 @@ class AnimatedComponent(Component):
     super(AnimatedComponent, self).__init__(driver)
     self._locators = locators_to_check
 
-    self._wait_until_visible() if wait_until_visible \
-        else self._wait_until_invisible()
+    if wait_until_visible:
+      self._wait_until_visible()
+    else:
+      self._wait_until_invisible()
 
   def _wait_until_visible(self):
     for locator in self._locators:
@@ -402,7 +421,9 @@ class Filter(Component):
     super(Filter, self).__init__(driver)
     self.text_box = TextInputField(driver, locator_text_box)
     self.button_submit = Button(driver, locator_submit)
-    self.button_clear = Button(driver, locator_clear)
+
+    # the clear button is only visible after a query is entered
+    self.button_clear = driver.find_element(*locator_clear)
 
   def enter_query(self, query):
     self.text_box.enter_text(query)
@@ -495,13 +516,19 @@ class Widget(AbstractPage):
     """
     super(Widget, self).__init__(driver)
 
-    id_, name = re.match(constants.regex.URL_WIDGET_INFO, self.url).groups()
-    self.object_id = id_
-    self.widget_name = name or constants.element.WidgetBar.INFO
+    if "#" in self.url:
+      self.object_id = self.url.split("#")[0].split("/")[-1]
+      self.widget_name = self.url.split("#")[1].split("/")[0] or \
+          constants.element.WidgetBar.INFO
+    else:
+      self.object_id = self.url.split("/")[-1]
+      self.widget_name = constants.element.WidgetBar.INFO
 
 
 class ObjectWidget(Widget):
-  """Class representing all widgets except the info widget"""
+  """Class representing all widgets with filters that list objects"""
+
+  _info_pane_cls = None
 
   def __init__(self, driver, locator_widget, locator_filter_title,
                locator_button_questionmark,
@@ -527,3 +554,29 @@ class ObjectWidget(Widget):
         locator_filter_textbox,
         locator_filter_submit,
         locator_filter_clear)
+
+    try:
+      self.members_listed = self._driver \
+          .find_elements(*constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
+    except exceptions.NoSuchElementException:
+      self.members_listed = None
+
+  def select_nth_member(self, member):
+    """Selects member from the list. Members start from (including) 0.
+
+    Args:
+        member (int)
+
+    Returns:
+        lib.page.widget.info.InfoWidget
+    """
+    try:
+      self.members_listed[member].click()
+      return self._info_pane_cls(self._driver)
+    except exceptions.StaleElementReferenceException:
+      self.members_listed = self._driver \
+          .find_elements(*constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
+      return self.select_nth_member(member)
+    except exceptions.TimeoutException:
+      # sometimes the click to the listed member results in hover
+      return self.select_nth_member(member)
