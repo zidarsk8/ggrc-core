@@ -122,11 +122,11 @@ class ProgramModal(_Modal):
 
   def select_state(self, state):
     """Selects a state from the dropdown"""
-    pass
+    raise NotImplementedError
 
   def toggle_optional_fields(self):
     """Shows or hides optional fields"""
-    pass
+    raise NotImplementedError
 
   def filter_and_select_primary_contact(self, text):
     """Enters the text into the primary contact element"""
