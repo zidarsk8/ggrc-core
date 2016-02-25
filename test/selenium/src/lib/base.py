@@ -22,8 +22,7 @@ class InstanceRepresentation(object):
   def __repr__(self):
     return str(
         {key: value for key, value in self.__dict__.items()
-         if "__" not in key}
-    )
+         if "__" not in key})
 
 
 class CustomDriver(webdriver.Chrome):
@@ -205,7 +204,7 @@ class Iframe(Element):
   def find_iframe_and_enter_data(self, text):
     """
     Args:
-        text (str): the string we want to enter
+        text (basestring): the string we want to enter
     """
     iframe = selenium_utils.get_when_visible(self._driver, self._locator)
     self._driver.switch_to.frame(iframe)
@@ -315,7 +314,7 @@ class Tab(Element):
     self.is_activated = is_activated
 
   def click(self):
-    self._element.click()
+    selenium_utils.get_when_clickable(self._driver, self._locator).click()
     self.is_activated = True
 
 
@@ -516,13 +515,9 @@ class Widget(AbstractPage):
     """
     super(Widget, self).__init__(driver)
 
-    if "#" in self.url:
-      self.object_id = self.url.split("#")[0].split("/")[-1]
-      self.widget_name = self.url.split("#")[1].split("/")[0] or \
-          constants.element.WidgetBar.INFO
-    else:
-      self.object_id = self.url.split("/")[-1]
-      self.widget_name = constants.element.WidgetBar.INFO
+    id_, name = re.match(constants.regex.URL_WIDGET_INFO, self.url).groups()
+    self.object_id = id_
+    self.widget_name = name or constants.element.WidgetBar.INFO
 
 
 class ObjectWidget(Widget):
@@ -571,7 +566,9 @@ class ObjectWidget(Widget):
         lib.page.widget.info.InfoWidget
     """
     try:
-      self.members_listed[member].click()
+      element = self.members_listed[member]
+      selenium_utils.wait_until_stops_moving(element)
+      element.click()
       return self._info_pane_cls(self._driver)
     except exceptions.StaleElementReferenceException:
       self.members_listed = self._driver \
