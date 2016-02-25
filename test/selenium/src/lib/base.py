@@ -122,7 +122,7 @@ class Element(InstanceRepresentation):
 
 
 class Label(Element):
-  pass
+  """A generic label"""
 
 
 class RichTextInputField(Element):
@@ -164,12 +164,12 @@ class RichTextInputField(Element):
 
 class TextInputField(RichTextInputField):
   """A generic model for the text input field"""
-  pass
 
 
 class TextFilterDropdown(Element):
   """Model for elements which are using autocomplete in a text field with a
-  dropdown list of found results"""
+  dropdown list of found results
+  """
 
   def __init__(self, driver, textbox_locator, dropdown_locator):
     super(TextFilterDropdown, self).__init__(driver, textbox_locator)
@@ -278,7 +278,6 @@ class DatePicker(Element):
 
 class Button(Element):
   """A generic button element"""
-  pass
 
 
 class Checkbox(Element):
@@ -320,12 +319,14 @@ class Toggle(Element):
 
 
 class Tab(Element):
-  """A generic tab element"""
+  """A generic element representing a tab"""
   def __init__(self, driver, locator, is_activated=True):
     super(Tab, self).__init__(driver, locator)
     self.is_activated = is_activated
 
   def click(self):
+    """When clicking on a tab we want to first make sure it's clickable i.e.
+    that this element will receive a click"""
     selenium_utils.get_when_clickable(self._driver, self._locator).click()
     self.is_activated = True
 
@@ -410,7 +411,6 @@ class AnimatedComponent(Component):
 
 class Modal(Component):
   """A generic modal element"""
-  pass
 
 
 class Filter(Component):
@@ -432,6 +432,7 @@ class Filter(Component):
     self.button_submit.click()
 
   def clear(self):
+    """Clears the query field"""
     self.button_clear.click()
 
 
@@ -501,8 +502,6 @@ class DropdownDynamic(AnimatedComponent):
 
 class Selectable(Element):
   """Representing list of elements that are selectable"""
-
-  pass
 
 
 class Widget(AbstractPage):
