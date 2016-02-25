@@ -40,11 +40,11 @@
         var source;
         var dest;
 
-        if (!this.scope || !destination) {
+        if (!destination) {
           return $.Deferred().resolve();
         }
 
-        source = this.scope.attr('parentInstance');
+        source = this.attr('parentInstance');
         dest = CMS.Models.get_instance({
           id: destination.id,
           type: can.spaceCamelCase(destination.type).replace(/ /g, '')
@@ -60,11 +60,11 @@
         var source;
         var dest;
 
-        if (!this.scope || !destination) {
+        if (!destination) {
           return $.Deferred().resolve();
         }
 
-        source = this.scope.attr('parentInstance');
+        source = this.attr('parentInstance');
         dest = CMS.Models.get_instance({
           id: destination.id,
           type: can.spaceCamelCase(destination.type).replace(/ /g, '')
