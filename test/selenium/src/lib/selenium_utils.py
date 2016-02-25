@@ -20,6 +20,7 @@ def wait_until_stops_moving(element):
   Args:
       selenium.webdriver.remote.webelement.WebElement
   """
+
   prev_location = None
   timer_begin = time.time()
 
@@ -43,7 +44,7 @@ def get_when_visible(driver, locator):
   return WebDriverWait(
       driver,
       constants.ux.MAX_USER_WAIT_SECONDS) \
-      .until(EC.element_to_be_clickable(locator))
+      .until(EC.visibility_of_element_located(locator))
 
 
 def get_when_invisible(driver, locator):
@@ -59,3 +60,26 @@ def get_when_invisible(driver, locator):
       driver,
       constants.ux.MAX_USER_WAIT_SECONDS) \
       .until(EC.invisibility_of_element_located(locator))
+
+
+def scroll_to_page_bottom(driver):
+  """Scrolls to te page bottom using JS
+
+  Args:
+      driver (base.CustomDriver)
+  """
+
+  driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+
+def check_if_element_active(element):
+  """Checks if the toggle is in activated state
+
+  Args:
+    element (selenium.webdriver.remote.webelement.WebElement)
+
+  Returns:
+      bool
+  """
+  attributes = element.get_attribute("class")
+  return True if "active" in attributes.split(" ") else False
