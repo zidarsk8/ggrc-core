@@ -78,9 +78,6 @@ class Dropdown(base.Component):
         driver, self._locator_label_attribute_type)
     self.mandatory = base.Label(driver, self._locator_label_mandatory)
     self.edit = base.Label(driver, self._locator_label_edit)
-    self.members = driver.find_elements(*self._locator_listed_members)
-    self.buttons_members_edit = driver.find_elements(
-        *self._locator_buttons_edit)
 
   def add_new_custom_attribute(self):
     """
@@ -98,7 +95,11 @@ class Dropdown(base.Component):
     Args:
         member (int)
     """
-    self.buttons_members_edit[member].click()
+    # check that the buttons are loaded
+    selenium_utils.get_when_clickable(
+        self._driver, self._locator_buttons_edit)
+
+    self._driver.find_elements(*self._locator_buttons_edit)[member].click()
     return CustomAttributeModal(self._driver)
 
 
