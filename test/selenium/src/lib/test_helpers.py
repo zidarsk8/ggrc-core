@@ -35,7 +35,7 @@ class HtmlParser(base.Test):
     """Simulates text parsed by html
 
     Args:
-      text (str or unicode)
+      text (basestring)
     """
     return re.sub(r'\s+', " ", text)
 
