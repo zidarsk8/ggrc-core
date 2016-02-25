@@ -3,6 +3,8 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+"""Page object models for the info widget of the object"""
+
 from lib import base
 from lib import environment
 from lib.constants import url
@@ -13,11 +15,13 @@ from lib.element import widget_info
 class InfoWidget(base.Widget):
   """Model for a generic info widget"""
 
+  _dropdown_settings_cls = widget_info.DropdownSettingsControls
+
   def __init__(self, driver):
     super(InfoWidget, self).__init__(driver)
 
-    self.button_settings = base.Button(driver,
-                                       locator.InfoWidget.BUTTON_SETTINGS)
+    self.button_settings = base.Button(
+        driver, locator.InfoWidget.BUTTON_SETTINGS)
     self.object_id = self.url.split("/")[-1]
 
   def press_object_settings(self):
@@ -26,7 +30,7 @@ class InfoWidget(base.Widget):
         widget_info.DropdownSettings
     """
     self.button_settings.click()
-    return widget_info.DropdownSettingsPrograms(self._driver)
+    return self._dropdown_settings_cls(self._driver)
 
 
 class DashboardInfo(base.Widget):
@@ -69,6 +73,7 @@ class ProgramInfo(InfoWidget):
   """Model for program object info widget"""
 
   _locators = locator.ProgramInfoWidget
+  _dropdown_settings_cls = widget_info.DropdownSettingsPrograms
 
   def __init__(self, driver):
     """
@@ -77,10 +82,10 @@ class ProgramInfo(InfoWidget):
     """
     super(ProgramInfo, self).__init__(driver)
     self.show_advanced = base.Toggle(
-        self._driver, self._locators.BUTTON_SHOW_ADVANCED)
+        self._driver, self._locators.TOGGLE_SHOW_ADVANCED)
 
     # activate all fields
-    self.show_advanced.click()
+    self.show_advanced.switch_on()
 
     self.title = base.Label(self._driver, self._locators.TITLE)
     self.title_entered = base.Label(
@@ -205,7 +210,7 @@ class SectionsInfo(InfoWidget):
 class ControlInfo(InfoWidget):
   """Model for control object info widget"""
 
-  _locators = locator.ControlInfoWidget
+  _locators = locator.WidgetInfoSettingsButton
 
   def __init__(self, driver):
     """
