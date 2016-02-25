@@ -106,7 +106,7 @@ class AccordionGroup(base.DropdownDynamic):
     """Hovers over a visible member with the (unique) title "member_title"
 
     Args:
-        member_title (str or unicode): a (unique) title of a member
+        member_title (basestring): a (unique) title of a member
     Returns:
         selenium.webdriver.remote.webelement.WebElement
     """
@@ -143,7 +143,7 @@ class AccordionGroup(base.DropdownDynamic):
     """Hovers over a visible member with the (unique) title "member_title"
 
     Args:
-        member_title (str or unicode): a (unique) title of a member
+        member_title (basestring): a (unique) title of a member
     Returns:
 
     """

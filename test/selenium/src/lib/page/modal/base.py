@@ -22,7 +22,7 @@ class _Modal(base.Modal):
   def enter_title(self, text):
     """
     Args:
-        text (str or unicode)
+        text (basestring)
     """
     self.ui_title.enter_text(text)
 
@@ -99,7 +99,7 @@ class ProgramModal(_Modal):
     """Enters the text into the description element
 
     Args:
-        description (str or unicode)
+        description (basestring)
     """
     self.ui_description.find_iframe_and_enter_data(description)
 
@@ -107,7 +107,7 @@ class ProgramModal(_Modal):
     """Enters the text into the notes element
 
     Args:
-        notes (str or unicode)
+        notes basestring)
     """
     self.ui_notes.find_iframe_and_enter_data(notes)
 
@@ -115,7 +115,7 @@ class ProgramModal(_Modal):
     """Enters the text into the code element
 
     Args:
-        code (str or unicode)
+        code (basestring)
     """
     self.ui_code.enter_text(code)
 
@@ -257,28 +257,28 @@ class ControlModal(_Modal):
   def enter_description(self, text):
     """
     Args:
-        text (str or unicode)
+        text (basestringe)
     """
     self.ui_description.find_iframe_and_enter_data(text)
 
   def enter_test_plan(self, text):
     """
     Args:
-        text (str or unicode)
+        text (basestring)
     """
     self.ui_test_plan.find_iframe_and_enter_data(text)
 
   def enter_notes(self, text):
     """
     Args:
-        text (str or unicode)
+        text (basestring)
     """
     self.ui_notes.find_iframe_and_enter_data(text)
 
   def enter_code(self, text):
     """
     Args:
-        text (str or unicode)
+        text (basestring)
     """
     self.ui_code.enter_text(text)
 
