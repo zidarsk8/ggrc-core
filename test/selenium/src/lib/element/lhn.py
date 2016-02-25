@@ -37,11 +37,11 @@ class AllObjectsTab(_Tab):
   locator_element = locator.LhnMenu.ALL_OBJECTS
 
 
-class Button(base.Button):
+class Toggle(base.Toggle):
   """A button in LHN"""
 
   def __init__(self, driver, locator_element, locator_count):
-    super(Button, self).__init__(driver, locator_element)
+    super(Toggle, self).__init__(driver, locator_element)
     count_element = selenium_utils.get_when_visible(driver, locator_count)
     self.members_count = int(count_element.text)
 
@@ -130,7 +130,7 @@ class AccordionGroup(base.DropdownDynamic):
     """Creates a new modal for the object in the LHN
 
     Returns:
-        lib.base.Modal
+        lib.page.modal.create_new_object.CreateNewObjectModal
     """
     self.button_create_new.click()
     return self._create_new_modal_cls(self._driver)
