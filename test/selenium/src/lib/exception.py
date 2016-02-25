@@ -18,3 +18,7 @@ class NoClassFound(Exception):
 
 class ElementMovingTimeout(Exception):
   pass
+
+
+class RedirectTimeout(Exception):
+  pass
