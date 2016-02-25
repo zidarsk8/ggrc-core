@@ -5,31 +5,29 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-//= require can.jquery-all
-
 (function (can, $) {
   var CoreExtension = {};
 
-  CoreExtension.name = "core";
+  CoreExtension.name = 'core"';
   GGRC.extensions.push(CoreExtension);
   _.extend(CoreExtension, {
     object_type_decision_tree: function () {
       return {
-        "program": CMS.Models.Program,
-        "audit": CMS.Models.Audit,
-        "contract": CMS.Models.Contract,
-        "policy": CMS.Models.Policy,
-        "standard": CMS.Models.Standard,
-        "regulation": CMS.Models.Regulation,
-        "org_group": CMS.Models.OrgGroup,
-        "vendor": CMS.Models.Vendor,
-        "project": CMS.Models.Project,
-        "facility": CMS.Models.Facility,
-        "product": CMS.Models.Product,
-        "data_asset": CMS.Models.DataAsset,
-        "access_group": CMS.Models.AccessGroup,
-        "market": CMS.Models.Market,
-        "system_or_process": {
+        program: CMS.Models.Program,
+        audit: CMS.Models.Audit,
+        contract: CMS.Models.Contract,
+        policy: CMS.Models.Policy,
+        standard: CMS.Models.Standard,
+        regulation: CMS.Models.Regulation,
+        org_group: CMS.Models.OrgGroup,
+        vendor: CMS.Models.Vendor,
+        project: CMS.Models.Project,
+        facility: CMS.Models.Facility,
+        product: CMS.Models.Product,
+        data_asset: CMS.Models.DataAsset,
+        access_group: CMS.Models.AccessGroup,
+        market: CMS.Models.Market,
+        system_or_process: {
           _discriminator: function (data) {
             if (data.is_biz_process) {
               return CMS.Models.Process;
@@ -37,28 +35,31 @@
             return CMS.Models.System;
           }
         },
-        "system": CMS.Models.System,
-        "process": CMS.Models.Process,
-        "control": CMS.Models.Control,
-        "assessment": CMS.Models.Assessment,
-        "request": CMS.Models.Request,
-        "issue" : CMS.Models.Issue,
-        "objective": CMS.Models.Objective,
-        "section": CMS.Models.Section,
-        "clause": CMS.Models.Clause,
-        "person": CMS.Models.Person,
-        "role": CMS.Models.Role,
-        "threat": CMS.Models.Threat,
-        "vulnerability": CMS.Models.Vulnerability,
-        "template": CMS.Models.Template
+        system: CMS.Models.System,
+        process: CMS.Models.Process,
+        control: CMS.Models.Control,
+        assessment: CMS.Models.Assessment,
+        request: CMS.Models.Request,
+        issue: CMS.Models.Issue,
+        objective: CMS.Models.Objective,
+        section: CMS.Models.Section,
+        clause: CMS.Models.Clause,
+        person: CMS.Models.Person,
+        role: CMS.Models.Role,
+        threat: CMS.Models.Threat,
+        vulnerability: CMS.Models.Vulnerability,
+        template: CMS.Models.Template
       };
     },
     init_widgets: function () {
-      var base_widgets_by_type = GGRC.tree_view.base_widgets_by_type,
-          widget_list = new GGRC.WidgetList("ggrc_core"),
-          object_class = GGRC.infer_object_type(GGRC.page_object),
-          object_table = object_class && object_class.table_plural,
-          object = GGRC.page_instance();
+      var base_widgets_by_type = GGRC.tree_view.base_widgets_by_type;
+      var widget_list = new GGRC.WidgetList('ggrc_core');
+      var object_class = GGRC.infer_object_type(GGRC.page_object);
+      var object_table = object_class && object_class.table_plural;
+      var object = GGRC.page_instance();
+      var info_widget_views;
+      var model_names;
+      var possible_model_type;
 
       // TODO: Really ugly way to avoid executing IIFE - needs cleanup
       if (!GGRC.page_object) {
@@ -66,44 +67,52 @@
       }
       // Info widgets display the object information instead of listing connected
       //  objects.
-      var info_widget_views = {
-        'programs': GGRC.mustache_path + "/programs/info.mustache",
-        'audits': GGRC.mustache_path + "/audits/info.mustache",
-        'people': GGRC.mustache_path + "/people/info.mustache",
-        'policies': GGRC.mustache_path + "/policies/info.mustache",
-        'objectives': GGRC.mustache_path + "/objectives/info.mustache",
-        'controls': GGRC.mustache_path + "/controls/info.mustache",
-        'systems': GGRC.mustache_path + "/systems/info.mustache",
-        'processes': GGRC.mustache_path + "/processes/info.mustache",
-        'products': GGRC.mustache_path + "/products/info.mustache",
-        'assessments': GGRC.mustache_path + "/assessments/info.mustache",
-        'requests': GGRC.mustache_path + "/requests/info.mustache",
-        'issues': GGRC.mustache_path + "/issues/info.mustache"
+      info_widget_views = {
+        programs: GGRC.mustache_path + '/programs/info.mustache',
+        audits: GGRC.mustache_path + '/audits/info.mustache',
+        people: GGRC.mustache_path + '/people/info.mustache',
+        policies: GGRC.mustache_path + '/policies/info.mustache',
+        objectives: GGRC.mustache_path + '/objectives/info.mustache',
+        controls: GGRC.mustache_path + '/controls/info.mustache',
+        systems: GGRC.mustache_path + '/systems/info.mustache',
+        processes: GGRC.mustache_path + '/processes/info.mustache',
+        products: GGRC.mustache_path + '/products/info.mustache',
+        assessments: GGRC.mustache_path + '/assessments/info.mustache',
+        requests: GGRC.mustache_path + '/requests/info.mustache',
+        issues: GGRC.mustache_path + '/issues/info.mustache'
       };
-      widget_list.add_widget(object.constructor.shortName, "info", {
-        widget_id: "info",
+      widget_list.add_widget(object.constructor.shortName, 'info', {
+        widget_id: 'info',
         content_controller: GGRC.Controllers.InfoWidget,
         instance: object,
         widget_view: info_widget_views[object_table]
       });
 
-      var model_names = Object.keys(base_widgets_by_type);
+      model_names = Object.keys(base_widgets_by_type);
       model_names.sort();
-      var possible_model_type = model_names.slice();
-      possible_model_type.push("Request"); //Missing model-type by selection
+      possible_model_type = model_names.slice();
+      possible_model_type.push('Request'); // Missing model-type by selection
       can.each(model_names, function (name) {
-        GGRC.tree_view.basic_model_list.push({model_name: name, display_name: CMS.Models[name].title_singular});
-        //Initialize child_model_list, and child_display_list each model_type
-        var w_list  = base_widgets_by_type[name], child_model_list = [];
+        var w_list;
+        var child_model_list = [];
+        GGRC.tree_view.basic_model_list.push({
+          model_name: name,
+          display_name: CMS.Models[name].title_singular
+        });
+        // Initialize child_model_list, and child_display_list each model_type
+        w_list = base_widgets_by_type[name];
         w_list.sort();
         can.each(w_list, function (item) {
           if (possible_model_type.indexOf(item) !== -1) {
-            child_model_list.push({model_name: item, display_name: CMS.Models[item].title_singular});
+            child_model_list.push({
+              model_name: item,
+              display_name: CMS.Models[item].title_singular
+            });
           }
         });
         GGRC.tree_view.sub_tree_for[name] = {
           model_list: child_model_list,
-          display_list : CMS.Models[name].tree_view_options.child_tree_display_list || w_list
+          display_list: CMS.Models[name].tree_view_options.child_tree_display_list || w_list
         };
       });
 
@@ -200,11 +209,6 @@
             widget_id: "Request",
             widget_name: "Open Requests"
           },
-          history: {
-            widget_id: "history",
-            widget_name: "Complete",
-            widget_icon: "history"
-          },
           Control: {
             widget_id: "control",
             widget_name: "In Scope Controls",
@@ -214,7 +218,7 @@
             widget_id: "program",
             widget_name: "Program",
             widget_icon: "program"
-          },
+          }
         },
         Control: {
           Request: {
@@ -444,17 +448,6 @@
             show_view: GGRC.mustache_path + "/requests/tree.mustache",
             footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache"
-          },
-          history: {
-            mapping: "history",
-            parent_instance: GGRC.page_instance(),
-            draw_children: true,
-            model: "Request",
-            show_view: GGRC.mustache_path + "/requests/tree.mustache",
-            footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache",
-            allow_mapping: false,
-            allow_creating: false
           },
           Control: {
             mapping: "program_controls",
@@ -716,86 +709,86 @@
           },
           Clause: {
             model: CMS.Models.Clause,
-            mapping: "extended_related_clauses_via_search",
-            show_view: GGRC.mustache_path + "/sections/tree.mustache",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
+            mapping: 'extended_related_clauses_via_search',
+            show_view: GGRC.mustache_path + '/sections/tree.mustache',
+            footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+            add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
             draw_children: true
           },
           Objective: {
-            mapping: "extended_related_objectives_via_search",
+            mapping: 'extended_related_objectives_via_search',
             draw_children: true,
-            show_view: GGRC.mustache_path + "/objectives/tree.mustache",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+            show_view: GGRC.mustache_path + '/objectives/tree.mustache',
+            footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+            add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
           },
           Control: {
-            mapping: "extended_related_controls_via_search",
+            mapping: 'extended_related_controls_via_search',
             draw_children: true,
-            show_view: GGRC.mustache_path + "/controls/tree.mustache",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+            show_view: GGRC.mustache_path + '/controls/tree.mustache',
+            footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+            add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
           },
           Issue: {
-            mapping: "extended_related_issues_via_search",
+            mapping: 'extended_related_issues_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           AccessGroup: {
-            mapping: "extended_related_access_groups_via_search",
+            mapping: 'extended_related_access_groups_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           DataAsset: {
-            mapping: "extended_related_data_assets_via_search",
+            mapping: 'extended_related_data_assets_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           Facility: {
-            mapping: "extended_related_facilities_via_search",
+            mapping: 'extended_related_facilities_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           Market: {
-            mapping: "extended_related_markets_via_search",
+            mapping: 'extended_related_markets_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           OrgGroup: {
-            mapping: "extended_related_org_groups_via_search",
+            mapping: 'extended_related_org_groups_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           Vendor: {
-            mapping: "extended_related_vendors_via_search",
+            mapping: 'extended_related_vendors_via_search',
             hild_options: [related_objects_child_options],
             draw_children: true
           },
           Process: {
-            mapping: "extended_related_processes_via_search",
+            mapping: 'extended_related_processes_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           Product: {
-            mapping: "extended_related_products_via_search",
+            mapping: 'extended_related_products_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           Project: {
-            mapping: "extended_related_projects_via_search",
+            mapping: 'extended_related_projects_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           System: {
-            mapping: "extended_related_systems_via_search",
+            mapping: 'extended_related_systems_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           },
           Document: {
-            mapping: "extended_related_documents_via_search"
+            mapping: 'extended_related_documents_via_search'
           },
           Assessment: {
-            mapping: "extended_related_assessment_via_search",
+            mapping: 'extended_related_assessment_via_search',
             child_options: [related_objects_child_options],
             draw_children: true
           }
