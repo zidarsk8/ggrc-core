@@ -280,16 +280,13 @@ def build_cycle(cycle, current_user=None, base_date=None):
 
 # 'InProgress' states propagate via these links
 _cycle_object_parent_attr = {
-    models.CycleTaskGroupObjectTask: ['cycle_task_group_object',
-                                      'cycle_task_group'],
+    models.CycleTaskGroupObjectTask: ['cycle_task_group'],
     models.CycleTaskGroup: ['cycle']
 }
 
 # 'Finished' and 'Verified' states are determined via these links
 _cycle_object_children_attr = {
-    models.CycleTaskGroupObject: ['cycle_task_group_object_tasks'],
-    models.CycleTaskGroup: ['cycle_task_group_objects',
-                            'cycle_task_group_tasks'],
+    models.CycleTaskGroup: ['cycle_task_group_tasks'],
     models.Cycle: ['cycle_task_groups']
 }
 
