@@ -517,11 +517,18 @@ class _Threats(lhn.AccordionGroup):
   _locator_spinny = locator.LhnMenu.SPINNY_THREATS
 
 
-class LhnContents(base.Component):
-  """Model for the highest level contents in LHN"""
+class Menu(base.AnimatedComponent):
+  """Model of the LHN menu"""
 
   def __init__(self, driver):
-    super(LhnContents, self).__init__(driver)
+    super(Menu, self).__init__(
+        driver,
+        [lhn.MyObjectsTab.locator_element,
+         lhn.AllObjectsTab.locator_element],
+        wait_until_visible=True,
+    )
+    self.my_objects = lhn.MyObjectsTab(driver)
+    self.all_objects = lhn.AllObjectsTab(driver)
     self.filter = None
     self.toggle_programs = None
     self.toggle_workflows = None
@@ -541,49 +548,49 @@ class LhnContents(base.Component):
     """Each dropdown in LHN has a count of members in brackets which we
     update."""
     self.filter = base.Filter(
-        self._driver,
-        locator.LhnMenu.FILTER_TEXT_BOX,
-        locator.LhnMenu.FILTER_SUBMIT_BUTTON,
-        locator.LhnMenu.FILTER_CLEAR_BUTTON)
+      self._driver,
+      locator.LhnMenu.FILTER_TEXT_BOX,
+      locator.LhnMenu.FILTER_SUBMIT_BUTTON,
+      locator.LhnMenu.FILTER_CLEAR_BUTTON)
     self.toggle_programs = lhn.Toggle(
-        self._driver,
-        locator.LhnMenu.PROGRAMS,
-        locator.LhnMenu.PROGRAMS_COUNT)
+      self._driver,
+      locator.LhnMenu.PROGRAMS,
+      locator.LhnMenu.PROGRAMS_COUNT)
     self.toggle_workflows = lhn.Toggle(
-        self._driver,
-        locator.LhnMenu.WORKFLOWS,
-        locator.LhnMenu.WORKFLOWS_COUNT)
+      self._driver,
+      locator.LhnMenu.WORKFLOWS,
+      locator.LhnMenu.WORKFLOWS_COUNT)
     self.toggle_audits = lhn.Toggle(
-        self._driver,
-        locator.LhnMenu.AUDITS,
-        locator.LhnMenu.AUDITS_COUNT)
+      self._driver,
+      locator.LhnMenu.AUDITS,
+      locator.LhnMenu.AUDITS_COUNT)
     self.toggle_assessments = lhn.Toggle(
-        self._driver,
-        locator.LhnMenu.ASSESSMENTS,
-        locator.LhnMenu.ASSESSMENTS_COUNT)
+      self._driver,
+      locator.LhnMenu.ASSESSMENTS,
+      locator.LhnMenu.ASSESSMENTS_COUNT)
     self.toggle_requests = lhn.Toggle(
-        self._driver,
-        locator.LhnMenu.REQUESTS,
-        locator.LhnMenu.REQUESTS_COUNT)
+      self._driver,
+      locator.LhnMenu.REQUESTS,
+      locator.LhnMenu.REQUESTS_COUNT)
     self.toggle_issues = lhn.Toggle(
-        self._driver,
-        locator.LhnMenu.ISSUES,
-        locator.LhnMenu.ISSUES_COUNT)
+      self._driver,
+      locator.LhnMenu.ISSUES,
+      locator.LhnMenu.ISSUES_COUNT)
     self.toggle_directives = base.Button(
-        self._driver,
-        locator.LhnMenu.DIRECTIVES)
+      self._driver,
+      locator.LhnMenu.DIRECTIVES)
     self.toggle_controls_or_objectives = base.Button(
-        self._driver,
-        locator.LhnMenu.CONTROLS_OR_OBJECTIVES)
+      self._driver,
+      locator.LhnMenu.CONTROLS_OR_OBJECTIVES)
     self.toggle_people_or_groups = base.Button(
-        self._driver,
-        locator.LhnMenu.PEOPLE_OR_GROUPS)
+      self._driver,
+      locator.LhnMenu.PEOPLE_OR_GROUPS)
     self.toggle_assets_or_business = base.Button(
-        self._driver,
-        locator.LhnMenu.ASSETS_OR_BUSINESS)
+      self._driver,
+      locator.LhnMenu.ASSETS_OR_BUSINESS)
     self.toggle_risks_or_threats = base.Button(
-        self._driver,
-        locator.LhnMenu.RISK_OR_THREATS)
+      self._driver,
+      locator.LhnMenu.RISK_OR_THREATS)
 
   def filter_query(self, query):
     self.filter.filter_query(query)
@@ -679,21 +686,6 @@ class LhnContents(base.Component):
     """
     self.toggle_risks_or_threats.click()
     return _RisksOrThreats(self._driver)
-
-
-class Menu(base.AnimatedComponent):
-  """Model of the LHN menu"""
-
-  def __init__(self, driver):
-    super(Menu, self).__init__(
-        driver,
-        [lhn.MyObjectsTab.locator_element,
-         lhn.AllObjectsTab.locator_element],
-        wait_until_visible=True,
-    )
-    self.my_objects = lhn.MyObjectsTab(driver)
-    self.all_objects = lhn.AllObjectsTab(driver)
-
   def select_my_objects(self):
     """In LHN selects the tab "My Objects"
 
@@ -702,7 +694,7 @@ class Menu(base.AnimatedComponent):
     """
     self.my_objects.click()
     self.all_objects.is_activated = False
-    return LhnContents(self._driver)
+    return self.__class__(self._driver)
 
   def select_all_objects(self):
     """ In LHN selects the tab "All Objects"
@@ -712,4 +704,4 @@ class Menu(base.AnimatedComponent):
     """
     self.all_objects.click()
     self.my_objects.is_activated = False
-    return LhnContents(self._driver)
+    return self.__class__(self._driver)
