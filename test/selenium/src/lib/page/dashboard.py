@@ -55,22 +55,22 @@ class _UserList(base.Component):
 class HeaderPage(base.Page):
   """Header of the page"""
 
-  _locator = locator.PageHeader
+  locator = locator.PageHeader
 
   def __init__(self, driver):
     super(HeaderPage, self).__init__(driver)
     self.button_lhn_menu = base.Button(self._driver,
-                                       self._locator.BUTTON_LHN)
+                                       self.locator.BUTTON_LHN)
     self.button_dashboard = base.Button(self._driver,
-                                        self._locator.BUTTON_DASHBOARD)
+                                        self.locator.BUTTON_DASHBOARD)
     self.button_search = base.Button(self._driver,
-                                     self._locator.BUTTON_SEARCH)
+                                     self.locator.BUTTON_SEARCH)
     self.button_my_tasks = base.Button(self._driver,
-                                       self._locator.BUTTON_MY_TASKS)
+                                       self.locator.BUTTON_MY_TASKS)
     self.button_all_objects = base.Button(
-        self._driver, self._locator.BUTTON_ALL_OBJECTS)
+        self._driver, self.locator.BUTTON_ALL_OBJECTS)
     self.button_user_dropdown = base.Button(
-        self._driver, self._locator.BUTTON_USER_DROPDOWN)
+        self._driver, self.locator.BUTTON_USER_DROPDOWN)
 
   def open_lhn_menu(self):
     """Opens LHN on the Dashboard
@@ -104,7 +104,7 @@ class DashboardPage(widget_bar.DashboardWidgetBarPage, HeaderPage):
 
   def __init__(self, driver):
     super(DashboardPage, self).__init__(driver)
-    self.button_help = base.Button(self._driver, self._locator.BUTTON_HELP)
+    self.button_help = base.Button(self._driver, self.locator.BUTTON_HELP)
 
 
 class AdminDashboardPage(widget_bar.AdminDashboardWidgetBarPage,
