@@ -4,7 +4,7 @@
 # Maintained By: goran@reciprocitylabs.com
 
 ---
-- name: install packages
+- name: install linux packages
   sudo: yes
   with_items: ggrc_packages
   apt:
@@ -25,13 +25,13 @@
   args:
     chdir: /vagrant
 
-- name: install local npm modules
-  sudo: no
-  with_items: ggrc_local_npm_modules
-  npm:
-    name: "{{ item.name }}"
-    state: present
-    path: "/vagrant-dev/node_modules"
+- name: copy npm package.json to dev directory
+  command: cp /vagrant/package.json /vagrant-dev/package.json
+
+- name: install npm modules
+  command: npm install
+  args:
+    chdir: /vagrant-dev
 
 - name: link node_modules
   file: src=/vagrant-dev/node_modules dest=/vagrant/node_modules state=link
