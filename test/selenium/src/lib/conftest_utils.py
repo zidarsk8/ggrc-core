@@ -8,10 +8,8 @@
 from selenium.common import exceptions
 
 from lib import test_helpers
-from lib.constants.test import batch
 from lib.page import dashboard
 from lib.page import widget
-from lib.page import lhn
 
 
 def _navigate_to_page_that_contains_lhn(selenium):

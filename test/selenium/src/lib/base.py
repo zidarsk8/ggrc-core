@@ -4,12 +4,13 @@
 # Maintained By: jernej@reciprocitylabs.com
 """Module for base classes"""
 
-import time
 import re
+
 import pyvirtualdisplay   # pylint: disable=import-error
 from selenium.webdriver.common import keys    # pylint: disable=import-error
 from selenium import webdriver    # pylint: disable=import-error
 from selenium.common import exceptions
+
 from lib import environment
 from lib import constants
 from lib import exception
