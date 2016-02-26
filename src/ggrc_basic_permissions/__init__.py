@@ -63,7 +63,7 @@ def objects_via_assignable_query(user_id):
      assigned via the assignable mixin.
 
     Args:
-        user_id: id of the user
+        user_id (int): id of the user
 
     Returns:
         db.session.query object that selects the following columns:
@@ -75,8 +75,8 @@ def objects_via_assignable_query(user_id):
   _attrs = aliased(all_models.RelationshipAttr, name="attrs")
 
   def assignable_join(query):
-    """ Joins relationship_attrs to the query. This filters out only the
-        relationship objects where the user is mapped as an Assignee.
+    """Joins relationship_attrs to the query. This filters out only the
+       relationship objects where the user is mapped with an AssigneeType.
     """
     return query.join(
         _attrs, and_(
@@ -88,7 +88,7 @@ def objects_via_assignable_query(user_id):
             ], else_=rel1.source_id) == user_id))
 
   def related_assignables():
-    """ Header for the mapped_objects join """
+    """Header for the mapped_objects join"""
     return db.session.query(
         case([
             (rel2.destination_type == rel1.destination_type,
@@ -464,8 +464,7 @@ def load_permissions_for(user):  # noqa
           .setdefault(type_, {})\
           .setdefault('resources', list())\
           .append(id_)
-  for res in objects_via_assignable_query(user.id).all():
-    id_, type_, context_id = res
+  for id_, type_, context_id in objects_via_assignable_query(user.id):
     actions = ["read", "view_object_page"]
     for action in actions:
       permissions.setdefault(action, {})\
