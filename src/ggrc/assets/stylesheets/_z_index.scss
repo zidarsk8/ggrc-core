@@ -13,9 +13,13 @@ $zindex: (
   max: 9999
 );
 
-@function z($name) {
+/* Calculated value of map value and offset cannot be larger
+ * then next bigger value in map. Use offset only in cases
+ * when this function value should be in between predefined values.
+ */
+@function z($name, $offset: 0) {
   @if map-has-key($zindex, $name) {
-    @return map-get($zindex, $name);
+    @return map-get($zindex, $name) + $offset;
   }
   @warn "Key #{$name} is not in the map ’$zindex’";
   @return null;
