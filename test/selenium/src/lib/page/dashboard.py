@@ -7,6 +7,7 @@ from lib import base
 from lib.constants import url
 from lib.constants import locator
 from lib import environment
+from lib import decorator
 from lib.page import widget_bar
 from lib.page import lhn
 
@@ -27,14 +28,15 @@ class _UserList(base.Component):
     self.button_logout = base.Button(self._driver,
                                      self._locator.BUTTON_LOGOUT)
 
-  def open_my_work(self):
+  def select_my_work(self):
     """
     Returns:
         widget.DataAssetInfo
     """
-    raise NotImplementedError
+    self.button_my_work.click()
+    return DashboardPage(self._driver)
 
-  def open_admin_dashboard(self):
+  def select_admin_dashboard(self):
     """
     Returns:
         admin_dashboard.AdminDashboardPage
@@ -42,13 +44,14 @@ class _UserList(base.Component):
     self.button_my_work.click()
     return AdminDashboardPage(self._driver)
 
-  def import_data(self):
+  def select_import_data(self):
     raise NotImplementedError
 
-  def export_data(self):
+  def select_export_data(self):
     raise NotImplementedError
 
-  def logout(self):
+  @decorator.wait_for_redirect
+  def select_logout(self):
     raise NotImplementedError
 
 
