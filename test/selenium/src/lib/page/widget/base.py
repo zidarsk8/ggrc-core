@@ -84,7 +84,7 @@ class Dropdown(base.Component):
     Returns:
         new_custom_attribute.NewCustomAttributeModal
     """
-    selenium_utils.wait_until_stops_moving(self.button_add._element)
+    selenium_utils.wait_until_stops_moving(self.button_add.element)
     self.button_add.click()
     return self._cls_new_attrb_modal(self._driver)
 
@@ -136,8 +136,8 @@ class DynamicTreeToggle(base.Toggle):
   """Class representing the tree item in admin custom attribute widget"""
 
   def __init__(self, driver, el_locator):
-    self._element = driver.find_element(*el_locator)
-    self.is_activated = selenium_utils.check_if_element_active(self._element)
+    self.element = driver.find_element(*el_locator)
+    self.is_activated = selenium_utils.check_if_element_active(self.element)
 
 
 class WidgetAdminCustomAttributes(base.Widget):

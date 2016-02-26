@@ -108,12 +108,12 @@ class Element(InstanceRepresentation):
     super(Element, self).__init__()
     self._driver = driver
     self._locator = locator
-    self._element = selenium_utils.get_when_visible(driver, locator)
-    self.text = self._element.text
+    self.element = selenium_utils.get_when_visible(driver, locator)
+    self.text = self.element.text
 
   def click(self):
     """Clicks on the element"""
-    self._element.click()
+    self.element.click()
 
   def click_when_visible(self):
     """Waits for the element to be visible and only then performs a
@@ -134,14 +134,14 @@ class RichTextInputField(Element):
     super(RichTextInputField, self).__init__(driver, locator)
     self._driver = driver
     self._locator = locator
-    self.text = self._element.text
+    self.text = self.element.text
 
   def enter_text(self, text):
     """Clears the fields and enteres text"""
 
     self.click_when_visible()
-    self._element.clear()
-    self._element.send_keys(text)
+    self.element.clear()
+    self.element.send_keys(text)
     self.text = text
 
   def paste_from_clipboard(self, element):
@@ -155,8 +155,8 @@ class RichTextInputField(Element):
     Args:
       element (Element)
     """
-    self._element.clear()
-    self._element.send_keys(keys.Keys.CONTROL, 'v')
+    self.element.clear()
+    self.element.send_keys(keys.Keys.CONTROL, 'v')
     element.click()
     element = self._driver.find_element(*self._locator)
     self.text = element.get_attribute("value")
@@ -180,8 +180,8 @@ class TextFilterDropdown(Element):
   def _filter_results(self, text):
     self.text_to_filter = text
 
-    self._element.click()
-    self._element.clear()
+    self.element.click()
+    self.element.clear()
     self._driver.find_element(*self._locator).send_keys(text)
 
   def _select_first_result(self):
@@ -238,7 +238,7 @@ class DatePicker(Element):
     Returns:
         list of selenium.webdriver.remote.webelement.WebElement
     """
-    self._element.click()
+    self.element.click()
     elements = self._driver.find_elements(*self._locator_datepcker)
     return elements
 
@@ -255,7 +255,7 @@ class DatePicker(Element):
 
     # wait for fadeout in case we're above some other element
     selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
-    self.text = self._element.get_attribute("value")
+    self.text = self.element.get_attribute("value")
 
   def select_month_end(self):
     """Selects the last day of current month"""
@@ -264,7 +264,7 @@ class DatePicker(Element):
 
     # wait for fadeout in case we're above some other element
     selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
-    self.text = self._element.get_attribute("value")
+    self.text = self.element.get_attribute("value")
 
   def select_month_start(self):
     """Selects the first day of current month"""
@@ -273,7 +273,7 @@ class DatePicker(Element):
 
     # wait for fadeout in case we're above some other element
     selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
-    self.text = self._element.get_attribute("value")
+    self.text = self.element.get_attribute("value")
 
 
 class Button(Element):
@@ -288,7 +288,7 @@ class Checkbox(Element):
     self.is_checked = is_checked
 
   def click(self):
-    self._element.click()
+    self.element.click()
     self.is_checked = not self.is_checked
 
 
@@ -302,7 +302,7 @@ class Toggle(Element):
   def __init__(self, driver, locator, is_active_attr_val="active"):
     super(Toggle, self).__init__(driver, locator)
     self.is_activated = selenium_utils.check_if_element_active(
-        self._element, is_active_attr_val)
+        self.element, is_active_attr_val)
 
   def toggle(self, on=True):
     """Clicks on an element based on the is_active status and the "on" arg
@@ -311,10 +311,10 @@ class Toggle(Element):
         on (bool)
     """
     if on and not self.is_activated:
-      self._element.click()
+      self.element.click()
       self.is_activated = True
     elif not on and self.is_activated:
-      self._element.click()
+      self.element.click()
       self.is_activated = False
 
 
@@ -340,7 +340,7 @@ class Dropdown(Element):
     Args:
         option_locator (tuple): locator of the dropdown element
     """
-    self._element.click()
+    self.element.click()
     self._driver.find_element(*option_locator).click()
 
 
@@ -354,7 +354,7 @@ class DropdownStatic(Element):
         *self._locator_dropdown_elements)
 
   def click(self):
-    self._element.click()
+    self.element.click()
 
   def select(self, member_name):
     """Selects the dropdown element based on dropdown element name"""
