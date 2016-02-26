@@ -47,7 +47,9 @@ def wait_for_redirect(fun):
       time.sleep(0.1)
 
       if time.time() - timer_start > constants.ux.MAX_USER_WAIT_SECONDS:
-        raise exception.RedirectTimeout
+        raise exception.RedirectTimeout(
+            "Failed to redirect from {} to {}".format(
+                from_url, self._driver.current_url))
 
     return result
   return wrapper
