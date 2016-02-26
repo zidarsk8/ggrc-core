@@ -42,7 +42,8 @@ def selenium():
 def custom_program_attribute(selenium):
   """Creates a custom attribute for a program object"""
   # pylint: disable=redefined-outer-name
-  cust_attr_widget = conftest_utils.create_custom_program_attribute(selenium)
+  cust_attr_widget = conftest_utils.create_custom_program_attribute(
+      selenium.driver)
   yield cust_attr_widget
   # todo: delete this custom attribute
 
@@ -54,10 +55,10 @@ def new_control(selenium):
   Returns:
       lib.page.modal.new_program.NewControlModal
   """
-  control_info_page = conftest_utils.lhn_create_control(selenium)
+  control_info_page = conftest_utils.lhn_create_control(selenium.driver)
   yield control_info_page
   selenium.driver.get(control_info_page.url)
-  conftest_utils.delete_control(selenium)
+  conftest_utils.delete_control(selenium.driver)
 
 
 @pytest.yield_fixture(scope="class")
@@ -68,10 +69,10 @@ def new_program(selenium, new_control):
       lib.page.modal.new_program.NewProgramModal
   """
   # pylint: disable=redefined-outer-name
-  modal, program_info_page = conftest_utils.lhn_create_program(selenium)
+  modal, program_info_page = conftest_utils.lhn_create_program(selenium.driver)
   yield modal, program_info_page
   selenium.driver.get(program_info_page.url)
-  conftest_utils.delete_program(selenium)
+  conftest_utils.delete_program(selenium.driver)
 
 
 @pytest.yield_fixture(scope="class")
@@ -81,10 +82,10 @@ def new_org_group(selenium):
   Returns:
       lib.page.modal.new_program.NewOrgGroupModal
   """
-  org_group_page = conftest_utils.lhn_create_org_group(selenium)
+  org_group_page = conftest_utils.lhn_create_org_group(selenium.driver)
   yield org_group_page
   selenium.driver.get(org_group_page.url)
-  conftest_utils.delete_org_group(selenium)
+  conftest_utils.delete_org_group(selenium.driver)
 
 
 @pytest.yield_fixture(scope="class")
@@ -94,10 +95,10 @@ def new_risk(selenium):
   Returns:
       lib.page.modal.new_program.NewOrgGroupModal
   """
-  risk_page = conftest_utils.lhn_create_risk(selenium)
+  risk_page = conftest_utils.lhn_create_risk(selenium.driver)
   yield risk_page
   selenium.driver.get(risk_page.url)
-  conftest_utils.delete_risk(selenium)
+  conftest_utils.delete_risk(selenium.driver)
 
 
 @pytest.yield_fixture(scope="class")
@@ -106,6 +107,6 @@ def battery_of_controls(selenium):
   controls = []
 
   for _ in xrange(batch.BATTERY):
-    controls.append(conftest_utils.lhn_create_control(selenium))
+    controls.append(conftest_utils.lhn_create_control(selenium.driver))
 
   yield controls
