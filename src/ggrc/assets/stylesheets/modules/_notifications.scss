@@ -11,7 +11,7 @@
   left: 0;
   width: 50%;
   margin-left: 25%;
-  z-index: z(max);
+  z-index: zIndex(max);
   font-size: 11px;
   .notice {
     background-color: $messageGreen;
@@ -47,7 +47,7 @@
     }
   }
   .modal-header & {
-    z-index: z(max);
+    z-index: zIndex(max);
   }
 }
 

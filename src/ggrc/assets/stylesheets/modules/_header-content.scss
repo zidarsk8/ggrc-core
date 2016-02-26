@@ -23,7 +23,7 @@
 
 .header-content {
   background: $white;
-  z-index: z(min);
+  z-index: zIndex(min);
   padding-left: 30px;
   h1 {
     span.status {

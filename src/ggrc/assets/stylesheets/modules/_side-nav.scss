@@ -67,7 +67,7 @@ h4.search-title {
   position:relative;
   padding-left: 10px;
   padding-right: 4px;
-  z-index: z(medium);
+  z-index: zIndex(medium);
 }
 
 // Fix for redundant lhn scroll
@@ -128,7 +128,7 @@ h4.search-title {
   position: absolute;
   top: 5px;
   right: 5px;
-  z-index: z(max);
+  z-index: zIndex(max);
   &:hover {
     @include opacity(1);
   }
@@ -452,7 +452,7 @@ h4.search-title {
   top: 0;
   right: 0;
   height:100%;
-  z-index: z(min);
+  z-index: zIndex(min);
   width: 6px;
   padding: 0;
   border: none;

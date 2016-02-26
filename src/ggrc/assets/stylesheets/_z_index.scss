@@ -17,7 +17,7 @@ $zindex: (
  * then next bigger value in map. Use offset only in cases
  * when this function value should be in between predefined values.
  */
-@function z($name, $offset: 0) {
+@function zIndex($name, $offset: 0) {
   @if map-has-key($zindex, $name) {
     @return map-get($zindex, $name) + $offset;
   }
