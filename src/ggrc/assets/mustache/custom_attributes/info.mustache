@@ -31,6 +31,12 @@
                   <h6>{{title}}</h6>
                   {{{value}}}
                 {{/case}}
+                {{#case 'Map:Person'}}
+                  <h6>{{title}}</h6>
+                  {{#with_object_for_id id}}
+                    {{object.email}}
+                  {{/with_object_for_id}}
+                {{/case}}
                 {{#default}}
                   <h6>{{title}}</h6>
                   {{value}}

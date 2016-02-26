@@ -18,7 +18,7 @@
         this.attr('loading', true);
         $.when(
           this.instance.load_custom_attribute_definitions(),
-          this.instance.refresh_all('custom_attribute_values')
+          this.instance.refresh_all('custom_attribute_values', 'attribute_object')
         ).always(function () {
           this.attr('loading', false);
         }.bind(this));
@@ -50,6 +50,19 @@
         });
         return options.fn(options.contexts.add({
           value: ret
+        }));
+      },
+      with_object_for_id: function (id, options) {
+        var ret;
+        id = Mustache.resolve(id);
+        can.each(this.instance.custom_attribute_values, function (value) {
+          value = value.reify();
+          if (value.custom_attribute_id === id) {
+            ret = value.attribute_object.reify();
+          }
+        });
+        return options.fn(options.contexts.add({
+          object: ret
         }));
       }
     }
