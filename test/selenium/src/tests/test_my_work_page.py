@@ -14,9 +14,11 @@ import pytest    # pylint: disable=import-error
 from lib import base
 from lib import exception
 from lib.page import dashboard
+from lib.page import lhn
 from lib.constants.test import batch
 from lib.page.widget import controls
 from lib import conftest_utils
+from lib import selenium_utils
 
 
 class TestMyWorkPage(base.Test):
@@ -55,3 +57,19 @@ class TestMyWorkPage(base.Test):
         .select_my_work()
 
     assert selenium.driver.current_url == dashboard.DashboardPage.URL
+
+  @pytest.mark.smoke_tests
+  def test_lhn_stays_expanded(self, selenium):
+    """Tests if, after opening the LHN, it slides out and stays expanded."""
+    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+
+    lhn_menu = dashboard.HeaderPage(selenium.driver).open_lhn_menu()
+    initial_position = lhn_menu.my_objects.element.location
+
+    selenium_utils.wait_until_stops_moving(lhn_menu.my_objects.element)
+    selenium_utils.hover_over_element(
+        selenium.driver,
+        dashboard.HeaderPage(selenium.driver).button_my_tasks.element)
+
+    assert initial_position == \
+        lhn.Menu(selenium.driver).my_objects.element.location
