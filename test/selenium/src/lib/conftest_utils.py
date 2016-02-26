@@ -16,7 +16,7 @@ def _navigate_to_page_that_contains_lhn(selenium):
   """Navigates to dashboard since dashboard always contains the LHN button"""
   # pylint: disable=invalid-name
   try:
-    selenium.driver.find_element(*dashboard.HeaderPage.locator.BUTTON_LHN)
+    selenium.driver.find_element(*dashboard.HeaderPage.locator.TOGGLE_LHN)
   except exceptions.NoSuchElementException:
     selenium.driver.get(dashboard.DashboardPage.URL)
 

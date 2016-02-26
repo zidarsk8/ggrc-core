@@ -300,9 +300,10 @@ class Toggle(Element):
   which may not work on an arbitrary element.
   """
 
-  def __init__(self, driver, locator):
+  def __init__(self, driver, locator, is_active_attr_val="active"):
     super(Toggle, self).__init__(driver, locator)
-    self.is_activated = selenium_utils.check_if_element_active(self._element)
+    self.is_activated = selenium_utils.check_if_element_active(
+        self._element, is_active_attr_val)
 
   def toggle(self, on=True):
     """Clicks on an element based on the is_active status and the "on" arg
@@ -567,8 +568,16 @@ class ObjectWidget(Widget):
     """
     try:
       element = self.members_listed[member]
+
+      # wait for the listed items animation to stop
       selenium_utils.wait_until_stops_moving(element)
       element.click()
+
+      # wait for the info pane animation to stop
+      info_pane = self._driver.find_element(
+          *constants.locator.ObjectWidget.INFO_PANE)
+      selenium_utils.wait_until_stops_moving(info_pane)
+
       return self._info_pane_cls(self._driver)
     except exceptions.StaleElementReferenceException:
       self.members_listed = self._driver.find_elements(
