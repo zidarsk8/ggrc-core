@@ -127,7 +127,7 @@ permissions = {
     ],
     "update": [
         "Audit",
-        "Workflow"
+        "Workflow",
         "Categorization",
         "Category",
         "ControlCategory",
