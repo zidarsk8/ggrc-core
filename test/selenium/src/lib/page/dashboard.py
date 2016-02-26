@@ -59,8 +59,9 @@ class HeaderPage(base.Page):
 
   def __init__(self, driver):
     super(HeaderPage, self).__init__(driver)
-    self.button_lhn_menu = base.Button(self._driver,
-                                       self.locator.BUTTON_LHN)
+    self.toggle_lhn_menu = base.Toggle(self._driver,
+                                       self.locator.TOGGLE_LHN,
+                                       is_active_attr_val="open")
     self.button_dashboard = base.Button(self._driver,
                                         self.locator.BUTTON_DASHBOARD)
     self.button_search = base.Button(self._driver,
@@ -69,8 +70,8 @@ class HeaderPage(base.Page):
                                        self.locator.BUTTON_MY_TASKS)
     self.button_all_objects = base.Button(
         self._driver, self.locator.BUTTON_ALL_OBJECTS)
-    self.button_user_dropdown = base.Button(
-        self._driver, self.locator.BUTTON_USER_DROPDOWN)
+    self.toggle_user_dropdown = base.Toggle(
+        self._driver, self.locator.TOGGLE_USER_DROPDOWN)
 
   def open_lhn_menu(self):
     """Opens LHN on the Dashboard
@@ -78,7 +79,7 @@ class HeaderPage(base.Page):
     Returns:
         LhnMenu
     """
-    self.button_lhn_menu.click()
+    self.toggle_lhn_menu.toggle()
     return lhn.Menu(self._driver)
 
   def click_on_logo(self):
@@ -93,7 +94,7 @@ class HeaderPage(base.Page):
     Returns:
         _UserList
     """
-    self.button_user_dropdown.click()
+    self.toggle_user_dropdown.click()
     return _UserList(self._driver)
 
 
