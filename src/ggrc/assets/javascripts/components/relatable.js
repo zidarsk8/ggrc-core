@@ -10,26 +10,40 @@
     tag: 'reuse-objects',
     scope: {
       parentInstance: null,
-      reusedObjects: new can.List(),
-      disableReuse: true,
+      reusedObjects: new can.Map(),
       reuseIt: function (scope, el, ev) {
-        var list = this.attr('reusedObjects');
-        var reused;
-        var relatedDfds;
+        var reused = this.attr('reusedObjects');
+        var relatedDfds = [];
         var when;
 
         if (el.hasClass('disabled')) {
           return;
         }
-        reused = this.attr('reusedObjects');
-        relatedDfds = can.map(reused, function (object) {
-          var executer = this[object.method];
-          return executer.call(this, object.item);
-        }.bind(this));
-        when = $.when.apply($, relatedDfds);
 
+        relatedDfds = can.map(can.Map.keys(reused), function (prop) {
+          var executer;
+          var id;
+          var type;
+
+          if (!reused.attr(prop)) {
+            return;
+          }
+          prop = prop.split('-');
+          executer = this[prop[0]];
+          id = Number(prop[2]);
+          type = can.spaceCamelCase(prop[1]).replace(/ /g, '');
+
+          relatedDfds.push(executer.call(this, {
+            id: id,
+            type: type
+          }));
+        }.bind(this));
+
+        when = $.when.apply($, relatedDfds);
         when.then(function () {
-          list.replace([]);
+          can.map(can.Map.keys(reused), function (prop) {
+            reused.attr(prop, false);
+          });
           $(document.body).trigger('ajax:flash', {
             success: 'Selected evidences are reused'
           });
@@ -47,7 +61,7 @@
         source = this.attr('parentInstance');
         dest = CMS.Models.get_instance({
           id: destination.id,
-          type: can.spaceCamelCase(destination.type).replace(/ /g, '')
+          type: destination.type
         });
 
         return new CMS.Models.Relationship({
@@ -67,7 +81,7 @@
         source = this.attr('parentInstance');
         dest = CMS.Models.get_instance({
           id: destination.id,
-          type: can.spaceCamelCase(destination.type).replace(/ /g, '')
+          type: destination.type
         });
 
         return new CMS.Models.ObjectDocument({
@@ -77,9 +91,20 @@
         }).save();
       }
     },
-    events: {
-      '{scope.reusedObjects} length': function (list) {
-        this.scope.attr('disableReuse', !list.length);
+    helpers: {
+      disableReuse: function (options) {
+        var list = [];
+        var reused = this.attr('reusedObjects');
+        can.each(can.Map.keys(reused), function (prop) {
+          if (reused.attr(prop)) {
+            list.push(prop);
+          }
+        });
+
+        if (!list.length) {
+          return options.fn();
+        }
+        return options.inverse();
       }
     }
   });
@@ -88,37 +113,7 @@
     tag: 'reusable-object',
     template: '<content></content>',
     scope: {
-      list: null,
-      selectObject: function (instance, el, ev) {
-        var status = el.prop('checked');
-        var list = this.attr('list');
-        var index;
-
-        if (status) {
-          list.push({
-            item: instance,
-            method: this.attr('method')
-          });
-        } else {
-          index = _.findIndex(list, function (item) {
-            if (!item.instance || item.instance.id) {
-              return false;
-            }
-            return item.instance.id === instance.id &&
-              item.instance.type === instance.type;
-          });
-          if (index) {
-            list.splice(index, 1);
-          }
-        }
-      }
-    },
-    events: {
-      '{scope.list} length': function (list) {
-        if (!list.length) {
-          this.element.find('input[type="checkbox"]').prop('checked', false);
-        }
-      }
+      list: null
     }
   });
 })(window.can, window.can.$);

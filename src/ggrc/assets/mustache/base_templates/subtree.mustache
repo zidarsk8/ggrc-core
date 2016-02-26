@@ -25,7 +25,7 @@
       {{/is_allowed}}
     {{/if}}
     {{#if reusable}}
-      <input type="checkbox" can-change="selectObject" />
+      <input type="checkbox" can-value="list.{{method}}-{{instance.type}}-{{instance.id}}" />
     {{/if}}
   </li>
   {{/instance}}
