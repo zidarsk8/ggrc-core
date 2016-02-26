@@ -21,8 +21,8 @@ def _navigate_to_page_that_contains_lhn(selenium):
     selenium.driver.get(dashboard.DashboardPage.URL)
 
 
-def create_control(selenium):
-  """Creates a new control object.
+def lhn_create_control(selenium):
+  """Creates a new control object via LHN
 
   Returns:
       lib.page.modal.new_program.NewControlModal
@@ -59,8 +59,8 @@ def create_custom_program_attribute(selenium):
   return modal.save_and_close()
 
 
-def create_org_group(selenium):
-  """Creates a new org group object.
+def lhn_create_org_group(selenium):
+  """Creates a new org group object
 
   Returns:
       lib.page.modal.new_program.NewOrgGroupModal
@@ -85,8 +85,8 @@ def delete_org_group(selenium):
       .confirm_delete()
 
 
-def create_risk(selenium):
-  """Creates a new risk group object.
+def lhn_create_risk(selenium):
+  """Creates a new risk group object via LHN
 
   Returns:
       lib.page.modal.new_program.NewOrgGroupModal
@@ -111,8 +111,8 @@ def delete_risk(selenium):
       .confirm_delete()
 
 
-def create_program(selenium):
-  """Creates a new program object"""
+def lhn_create_program(selenium):
+  """Creates a new program object via LHN"""
   # pylint: disable=redefined-outer-name
 
   _navigate_to_page_that_contains_lhn(selenium)

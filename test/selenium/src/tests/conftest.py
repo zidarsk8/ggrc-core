@@ -54,7 +54,7 @@ def new_control(selenium):
   Returns:
       lib.page.modal.new_program.NewControlModal
   """
-  control_info_page = conftest_utils.create_control(selenium)
+  control_info_page = conftest_utils.lhn_create_control(selenium)
   yield control_info_page
   selenium.driver.get(control_info_page.url)
   conftest_utils.delete_control(selenium)
@@ -68,7 +68,7 @@ def new_program(selenium, new_control):
       lib.page.modal.new_program.NewProgramModal
   """
   # pylint: disable=redefined-outer-name
-  modal, program_info_page = conftest_utils.create_program(selenium)
+  modal, program_info_page = conftest_utils.lhn_create_program(selenium)
   yield modal, program_info_page
   selenium.driver.get(program_info_page.url)
   conftest_utils.delete_program(selenium)
@@ -81,7 +81,7 @@ def new_org_group(selenium):
   Returns:
       lib.page.modal.new_program.NewOrgGroupModal
   """
-  org_group_page = conftest_utils.create_org_group(selenium)
+  org_group_page = conftest_utils.lhn_create_org_group(selenium)
   yield org_group_page
   selenium.driver.get(org_group_page.url)
   conftest_utils.delete_org_group(selenium)
@@ -94,7 +94,7 @@ def new_risk(selenium):
   Returns:
       lib.page.modal.new_program.NewOrgGroupModal
   """
-  risk_page = conftest_utils.create_risk(selenium)
+  risk_page = conftest_utils.lhn_create_risk(selenium)
   yield risk_page
   selenium.driver.get(risk_page.url)
   conftest_utils.delete_risk(selenium)
@@ -106,6 +106,6 @@ def battery_of_controls(selenium):
   controls = []
 
   for _ in xrange(batch.BATTERY):
-    controls.append(conftest_utils.create_control(selenium))
+    controls.append(conftest_utils.lhn_create_control(selenium))
 
   yield controls
