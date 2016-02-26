@@ -103,7 +103,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Regulations
     """
-    self.toggle_regulations.click()
+    self.toggle_regulations.switch_on()
     return _Regulations(self._driver)
 
   def select_policies(self):
@@ -111,7 +111,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Policies
     """
-    self.toggle_policies.click()
+    self.toggle_policies.switch_on()
     return _Policies(self._driver)
 
   def select_standards(self):
@@ -119,7 +119,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Standards
     """
-    self.toggle_standards.click()
+    self.toggle_standards.switch_on()
     return _Standards(self._driver)
 
   def select_contracts(self):
@@ -127,7 +127,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Contracts
     """
-    self.toggle_contracts.click()
+    self.toggle_contracts.switch_on()
     return _Contracts(self._driver)
 
   def select_clauses(self):
@@ -135,7 +135,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Clauses
     """
-    self.toggle_clauses.click()
+    self.toggle_clauses.switch_on()
     return _Clauses(self._driver)
 
   def select_sections(self):
@@ -143,7 +143,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Sections
     """
-    self.toggle_sections.click()
+    self.toggle_sections.switch_on()
     return _Sections(self._driver)
 
 
@@ -210,7 +210,7 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
     Returns:
         Controls
     """
-    self.toggle_controls.click()
+    self.toggle_controls.switch_on()
     return Controls(self._driver)
 
   def select_objectives(self):
@@ -218,7 +218,7 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
     Returns:
         _Objectives
     """
-    self.toggle_objectives.click()
+    self.toggle_objectives.switch_on()
     return _Objectives(self._driver)
 
 
@@ -268,7 +268,7 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     Returns:
         _People
     """
-    self.toggle_people.click()
+    self.toggle_people.switch_on()
     return _People(self._driver)
 
   def select_org_groups(self):
@@ -276,7 +276,7 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     Returns:
         _OrgGroups
     """
-    self.toggle_org_groups.click()
+    self.toggle_org_groups.switch_on()
     return _OrgGroups(self._driver)
 
   def select_vendors(self):
@@ -284,7 +284,7 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     Returns:
         _Vendors
     """
-    self.toggle_vendors.click()
+    self.toggle_vendors.switch_on()
     return _Vendors(self._driver)
 
   def select_access_groups(self):
@@ -292,7 +292,7 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     Returns:
         _AccessGroups
     """
-    self.toggle_access_groups.click()
+    self.toggle_access_groups.switch_on()
     return _AccessGroups(self._driver)
 
 
@@ -367,7 +367,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Systems
     """
-    self.toggle_systems.click()
+    self.toggle_systems.switch_on()
     return _Systems(self._driver)
 
   def select_processes(self):
@@ -375,7 +375,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Processes
     """
-    self.toggle_processes.click()
+    self.toggle_processes.switch_on()
     return _Processes(self._driver)
 
   def select_data_assets(self):
@@ -383,7 +383,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _DataAssets
     """
-    self.toggle_data_assets.click()
+    self.toggle_data_assets.switch_on()
     return _DataAssets(self._driver)
 
   def select_products(self):
@@ -391,7 +391,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Products
     """
-    self.toggle_products.click()
+    self.toggle_products.switch_on()
     return _Products(self._driver)
 
   def select_projects(self):
@@ -399,7 +399,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Projects
     """
-    self.toggle_projects.click()
+    self.toggle_projects.switch_on()
     return _Projects(self._driver)
 
   def select_facilities(self):
@@ -407,7 +407,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Facilities
     """
-    self.toggle_facilities.click()
+    self.toggle_facilities.switch_on()
     return _Facilities(self._driver)
 
   def select_markets(self):
@@ -415,7 +415,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Markets
     """
-    self.toggle_markets.click()
+    self.toggle_markets.switch_on()
     return _Markets(self._driver)
 
 
@@ -489,7 +489,7 @@ class _RisksOrThreats(lhn.DropdownStatic):
     Returns:
         _Risks
     """
-    self.toggle_risks.click()
+    self.toggle_risks.switch_on()
     return _Risks(self._driver)
 
   def select_threats(self):
@@ -497,7 +497,7 @@ class _RisksOrThreats(lhn.DropdownStatic):
     Returns:
         _Threats
     """
-    self.toggle_threats.click()
+    self.toggle_threats.switch_on()
     return _Threats(self._driver)
 
 
@@ -576,19 +576,19 @@ class Menu(base.AnimatedComponent):
         self._driver,
         locator.LhnMenu.ISSUES,
         locator.LhnMenu.ISSUES_COUNT)
-    self.toggle_directives = base.Button(
+    self.toggle_directives = base.Toggle(
         self._driver,
         locator.LhnMenu.DIRECTIVES)
-    self.toggle_controls_or_objectives = base.Button(
+    self.toggle_controls_or_objectives = base.Toggle(
         self._driver,
         locator.LhnMenu.CONTROLS_OR_OBJECTIVES)
-    self.toggle_people_or_groups = base.Button(
+    self.toggle_people_or_groups = base.Toggle(
         self._driver,
         locator.LhnMenu.PEOPLE_OR_GROUPS)
-    self.toggle_assets_or_business = base.Button(
+    self.toggle_assets_or_business = base.Toggle(
         self._driver,
         locator.LhnMenu.ASSETS_OR_BUSINESS)
-    self.toggle_risks_or_threats = base.Button(
+    self.toggle_risks_or_threats = base.Toggle(
         self._driver,
         locator.LhnMenu.RISK_OR_THREATS)
 
@@ -604,7 +604,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _Programs
     """
-    self.toggle_programs.click()
+    self.toggle_programs.switch_on()
     return _Programs(self._driver)
 
   def select_workflows(self):
@@ -612,7 +612,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _Workflows
     """
-    self.toggle_workflows.click()
+    self.toggle_workflows.switch_on()
     return _Workflows(self._driver)
 
   def select_audits(self):
@@ -620,7 +620,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _Audits
     """
-    self.toggle_audits.click()
+    self.toggle_audits.switch_on()
     return _Audits(self._driver)
 
   def select_assessments(self):
@@ -628,7 +628,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _Assessments
     """
-    self.toggle_assessments.click()
+    self.toggle_assessments.switch_on()
     return _Assessments(self._driver)
 
   def select_requests(self):
@@ -636,7 +636,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _Requests
     """
-    self.toggle_requests.click()
+    self.toggle_requests.switch_on()
     return _Requests(self._driver)
 
   def select_issues(self):
@@ -644,7 +644,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _Issues
     """
-    self.toggle_issues.click()
+    self.toggle_issues.switch_on()
     return _Issues(self._driver)
 
   def select_directives(self):
@@ -652,7 +652,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _Directives
     """
-    self.toggle_directives.click()
+    self.toggle_directives.switch_on()
     return _Directives(self._driver)
 
   def select_controls_or_objectives(self):
@@ -660,7 +660,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _ControlsOrObjectives
     """
-    self.toggle_controls_or_objectives.click()
+    self.toggle_controls_or_objectives.switch_on()
     return _ControlsOrObjectives(self._driver)
 
   def select_people_or_groups(self):
@@ -668,7 +668,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _PeopleOrGroups
     """
-    self.toggle_people_or_groups.click()
+    self.toggle_people_or_groups.switch_on()
     return _PeopleOrGroups(self._driver)
 
   def select_assests_or_business(self):
@@ -676,7 +676,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _AssetsOrBusiness
     """
-    self.toggle_assets_or_business.click()
+    self.toggle_assets_or_business.switch_on()
     return _AssetsOrBusiness(self._driver)
 
   def select_risks_or_threats(self):
@@ -684,7 +684,7 @@ class Menu(base.AnimatedComponent):
     Returns:
         _RisksOrThreats
     """
-    self.toggle_risks_or_threats.click()
+    self.toggle_risks_or_threats.switch_on()
     return _RisksOrThreats(self._driver)
 
   def select_my_objects(self):
