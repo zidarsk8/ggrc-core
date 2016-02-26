@@ -99,4 +99,4 @@ def check_if_element_active(element, is_active_attr_val):
       bool
   """
   attributes = element.get_attribute("class")
-  return True if is_active_attr_val in attributes.split() else False
+  return is_active_attr_val in attributes.split()
