@@ -12,109 +12,109 @@
     return '[data-toggle="' + val + '"]';
   });
   var MapperModel = can.Map({
-      type: "AllObject", // We set default as All Object
-      contact: {},
-      deferred: "@",
-      deferred_to: "@",
-      term: "",
-      object: "",
-      model: {},
-      bindings: {},
-      is_loading: false,
-      page_loading: false,
-      is_saving: false,
-      all_selected: false,
-      search_only: false,
-      join_object_id: "",
-      selected: new can.List(),
-      entries: new can.List(),
-      options: new can.List(),
-      relevant: new can.List(),
-      get_instance: can.compute(function () {
-        return CMS.Models.get_instance(this.attr("object"), this.attr("join_object_id"));
-      }),
-      get_binding_name: function (instance, plural) {
-        return (instance.has_binding(plural) ? "" : "related_") + plural;
-      },
-      model_from_type: function (type) {
-        var types = _.reduce(_.values(this.types()), function (memo, val) {
-          if (val.items) {
-            return memo.concat(val.items);
-          }
-          return memo;
-        }, []);
-        return _.findWhere(types, {value: type});
-      },
-      get_forbidden: function (type) {
-        var forbidden = {
-          Program: ["Audit"],
-          Audit: ["Assessment", "Program", "Request"],
-          Assessment: ["Control"],
-          Request: ["Workflow", "TaskGroup", "Person"]
-        };
-        return forbidden[type] ? forbidden[type] : [];
-      },
-      get_whitelist: function () {
-        var whitelisted = ["TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask"];
-        return this.attr("search_only") ? whitelisted : [];
-      },
-      types: can.compute(function () {
-        var selector_list;
-        var canonical = GGRC.Mappings.get_canonical_mappings_for(this.object);
-        var list = GGRC.tree_view.base_widgets_by_type[this.object];
-        var forbidden = this.get_forbidden(this.object);
-        var whitelist = this.get_whitelist();
-        var groups = {
-          all_objects: {
-            name: 'All Objects',
-            value: 'AllObject',
-            plural: 'allobjects',
-            table_plural: 'allobjects',
-            singular: 'AllObject',
-            models: []
-          },
-          entities: {
-            name: 'People/Groups',
-            items: []
-          },
-          business: {
-            name: 'Assets/Business',
-            items: []
-          },
-          governance: {
-            name: 'Governance',
-            items: []
-          }
-        };
-
-        selector_list = _.intersection.apply(_, _.compact([_.keys(canonical), list]));
-        selector_list = _.union(selector_list, whitelist);
-        can.each(selector_list, function (model_name) {
-          var cms_model;
-          var group;
-          if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name)) {
-            return;
-          }
-          cms_model = CMS.Models[model_name];
-          group = !groups[cms_model.category] ? 'governance' : cms_model.category;
-
-          groups[group].items.push({
-            name: cms_model.title_plural,
-            value: cms_model.shortName,
-            singular: cms_model.shortName,
-            plural: cms_model.title_plural.toLowerCase().replace(/\s+/, '_'),
-            table_plural: cms_model.table_plural,
-            title_singular: cms_model.title_singular,
-            isSelected: cms_model.shortName === this.type
-          });
-          groups.all_objects.models.push(cms_model.shortName);
-        }, this);
-        if (groups.all_objects.models.length < 2) {
-          delete groups.all_objects;
+    type: "AllObject", // We set default as All Object
+    contact: {},
+    deferred: "@",
+    deferred_to: "@",
+    term: "",
+    object: "",
+    model: {},
+    bindings: {},
+    is_loading: false,
+    page_loading: false,
+    is_saving: false,
+    all_selected: false,
+    search_only: false,
+    join_object_id: "",
+    selected: new can.List(),
+    entries: new can.List(),
+    options: new can.List(),
+    relevant: new can.List(),
+    get_instance: can.compute(function () {
+      return CMS.Models.get_instance(this.attr("object"), this.attr("join_object_id"));
+    }),
+    get_binding_name: function (instance, plural) {
+      return (instance.has_binding(plural) ? "" : "related_") + plural;
+    },
+    model_from_type: function (type) {
+      var types = _.reduce(_.values(this.types()), function (memo, val) {
+        if (val.items) {
+          return memo.concat(val.items);
         }
-        return groups;
-      })
-    });
+        return memo;
+      }, []);
+      return _.findWhere(types, {value: type});
+    },
+    get_forbidden: function (type) {
+      var forbidden = {
+        Program: ["Audit"],
+        Audit: ["Assessment", "Program", "Request"],
+        Assessment: ["Control"],
+        Request: ["Workflow", "TaskGroup", "Person"]
+      };
+      return forbidden[type] ? forbidden[type] : [];
+    },
+    get_whitelist: function () {
+      var whitelisted = ["TaskGroupTask", "TaskGroup", "CycleTaskGroupObjectTask"];
+      return this.attr("search_only") ? whitelisted : [];
+    },
+    types: can.compute(function () {
+      var selector_list;
+      var object = this.attr('getList') ? 'MultitypeSearch' : this.object;
+      var canonical = GGRC.Mappings.get_canonical_mappings_for(object);
+      var list = GGRC.tree_view.base_widgets_by_type[object];
+      var forbidden = this.get_forbidden(object);
+      var whitelist = this.get_whitelist();
+      var groups = {
+        all_objects: {
+          name: 'All Objects',
+          value: 'AllObject',
+          plural: 'allobjects',
+          table_plural: 'allobjects',
+          singular: 'AllObject',
+          models: []
+        },
+        entities: {
+          name: 'People/Groups',
+          items: []
+        },
+        business: {
+          name: 'Assets/Business',
+          items: []
+        },
+        governance: {
+          name: 'Governance',
+          items: []
+        }
+      };
+      selector_list = _.intersection.apply(_, _.compact([_.keys(canonical), list]));
+      selector_list = _.union(selector_list, whitelist);
+      can.each(selector_list, function (model_name) {
+        var cms_model;
+        var group;
+        if (!model_name || !CMS.Models[model_name] || ~forbidden.indexOf(model_name)) {
+          return;
+        }
+        cms_model = CMS.Models[model_name];
+        group = !groups[cms_model.category] ? 'governance' : cms_model.category;
+
+        groups[group].items.push({
+          name: cms_model.title_plural,
+          value: cms_model.shortName,
+          singular: cms_model.shortName,
+          plural: cms_model.title_plural.toLowerCase().replace(/\s+/, '_'),
+          table_plural: cms_model.table_plural,
+          title_singular: cms_model.title_singular,
+          isSelected: cms_model.shortName === this.type
+        });
+        groups.all_objects.models.push(cms_model.shortName);
+      }, this);
+      if (groups.all_objects.models.length < 2) {
+        delete groups.all_objects;
+      }
+      return groups;
+    })
+  });
 
   can.Component.extend({
     tag: 'modal-mapper',
@@ -307,7 +307,9 @@
       "{mapper} type": function () {
         this.scope.attr('mapper.term', "");
         this.scope.attr('mapper.contact', {});
-        this.scope.attr('mapper.relevant').replace([]);
+        if (!this.scope.attr('getList')) {
+          this.scope.attr('mapper.relevant').replace([]);
+        }
 
         this.setModel();
         this.setBinding();
@@ -645,7 +647,7 @@
       'join-object-id': btn.data('join-object-id'),
       'search-only': isSearch,
       template: {
-        title: isSearch ? 'Search' : ''
+        title: isSearch ? '/static/mustache/base_objects/modal/search_title.mustache' : ''
       }
     }, data));
   });
