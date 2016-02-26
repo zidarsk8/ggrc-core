@@ -16,6 +16,7 @@ from lib import exception
 from lib.page import dashboard
 from lib.constants.test import batch
 from lib.page.widget import controls
+from lib import conftest_utils
 
 
 class TestMyWorkPage(base.Test):
@@ -42,3 +43,15 @@ class TestMyWorkPage(base.Test):
       assert controls.Controls(selenium.driver).members_listed == []
     else:
       assert False
+
+  @pytest.mark.smoke_tests
+  def test_redirect(self, selenium):
+    """Tests if the user is redirected to the My Work page after clicking on
+    the my work button in user dropdown"""
+    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+
+    dashboard.HeaderPage(selenium.driver)\
+        .open_user_list()\
+        .select_my_work()
+
+    assert selenium.driver.current_url == dashboard.DashboardPage.URL
