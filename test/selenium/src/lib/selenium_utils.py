@@ -6,12 +6,20 @@
 """Utility function for selenium"""
 
 import time
+
 # pylint: disable=import-error
 from selenium.webdriver.support import expected_conditions as EC
 # pylint: disable=import-error
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common import action_chains
+
 from lib import exception
 from lib import constants
+
+
+def hover_over_element(driver, element):
+  """Moves the mouse pointer to the element and hovers"""
+  action_chains.ActionChains(driver).move_to_element(element).perform()
 
 
 def wait_until_stops_moving(element):

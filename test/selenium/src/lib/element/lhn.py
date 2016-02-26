@@ -8,7 +8,6 @@
 # pylint: disable=not-an-iterable
 
 from selenium.common import exceptions as selenium_exception
-from selenium.webdriver.common import action_chains
 
 from lib import base
 from lib import exception
@@ -149,7 +148,7 @@ class AccordionGroup(base.DropdownDynamic):
     """
     try:
       el = self._get_visible_member_by_title(member_title)
-      action_chains.ActionChains(self._driver).move_to_element(el).perform()
+      selenium_utils.hover_over_element(self._driver, el)
       selenium_utils.get_when_visible(self._driver,
                                       locator.LhnMenu.EXTENDED_INFO)
       return self._extended_info_cls(self._driver)
