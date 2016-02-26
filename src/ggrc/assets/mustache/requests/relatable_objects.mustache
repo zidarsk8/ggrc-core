@@ -21,7 +21,7 @@ Maintained By: urban@reciprocitylabs.com
         <h6>Evidence</h6>
       </div>
       <div class="mini-col">
-        <a href="javascript://" class="btn btn-small btn-full btn-draft js-trigger-reuse">Reuse</a>
+        <a href="javascript://" can-click="reuseIt" class="btn {{#disableReuse}}disabled{{/disableReuse}} btn-small btn-full btn-draft js-trigger-reuse">Reuse</a>
       </div>
     </li>
   </ul>
@@ -41,7 +41,8 @@ Maintained By: urban@reciprocitylabs.com
         <ul class="mapped-list">
           <mapping-tree-view
             reusable="true"
-            reuse-method="create_relationship"
+            reusable-objects="reusedObjects"
+            reuse-method="createRelationship"
             parent-instance="instance"
             mapping="instance.class.info_pane_options.mapped_objects.mapping"
             item-template="instance.class.info_pane_options.mapped_objects.show_view"
@@ -53,7 +54,8 @@ Maintained By: urban@reciprocitylabs.com
         <ul class="file-list">
           <mapping-tree-view
             reusable="true"
-            reuse-method="create_evidence_relationship"
+            reusable-objects="reusedObjects"
+            reuse-method="createEvidenceRelationship"
             parent-instance="instance"
             mapping="instance.class.info_pane_options.evidence.mapping"
             item-template="instance.class.info_pane_options.evidence.show_view"
@@ -64,7 +66,8 @@ Maintained By: urban@reciprocitylabs.com
         <ul class="file-list">
           <mapping-tree-view
             reusable="true"
-            reuse-method="create_relationship"
+            reusable-objects="reusedObjects"
+            reuse-method="createRelationship"
             parent-instance="instance"
             mapping="instance.class.info_pane_options.urls.mapping"
             item-template="instance.class.info_pane_options.urls.show_view"

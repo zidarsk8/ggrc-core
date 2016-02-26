@@ -5,7 +5,7 @@
     Maintained By: anze@reciprocitylabs.com
 }}
 
-<reusable-object>
+<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects">
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     {{#is_allowed 'update' parentInstance context='for'}}
     {{#instance}}
@@ -23,8 +23,8 @@
       <span>{{firstnonempty instance.title instance.link}}</span>
     </a>
 
-    {{#if_reusable}}
-      <input type="checkbox" />
-    {{/if_reusable}}
+    {{#reusable}}
+      <input type="checkbox" can-value="list.{{method}}-{{instance.type}}-{{instance.id}}" />
+    {{/reusable}}
   </li>
 </reusable-object>

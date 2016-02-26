@@ -10,19 +10,58 @@
     tag: 'reuse-objects',
     scope: {
       parentInstance: null,
-      reusedObjects: new can.List(),
-      create_relationship: function (destination) {
+      reusedObjects: new can.Map(),
+      reuseIt: function (scope, el, ev) {
+        var reused = this.attr('reusedObjects');
+        var relatedDfds = [];
+        var when;
+
+        if (el.hasClass('disabled')) {
+          return;
+        }
+
+        relatedDfds = can.map(can.Map.keys(reused), function (prop) {
+          var executer;
+          var id;
+          var type;
+
+          if (!reused.attr(prop)) {
+            return;
+          }
+          prop = prop.split('-');
+          executer = this[prop[0]];
+          id = Number(prop[2]);
+          type = can.spaceCamelCase(prop[1]).replace(/ /g, '');
+
+          relatedDfds.push(executer.call(this, {
+            id: id,
+            type: type
+          }));
+        }.bind(this));
+
+        when = $.when.apply($, relatedDfds);
+        when.then(function () {
+          can.map(can.Map.keys(reused), function (prop) {
+            reused.attr(prop, false);
+          });
+          $(document.body).trigger('ajax:flash', {
+            success: 'Selected evidences are reused'
+          });
+        });
+        GGRC.delay_leaving_page_until(when);
+      },
+      createRelationship: function (destination) {
         var source;
         var dest;
 
-        if (!this.scope || !destination) {
+        if (!destination) {
           return $.Deferred().resolve();
         }
 
-        source = this.scope.attr('parentInstance');
+        source = this.attr('parentInstance');
         dest = CMS.Models.get_instance({
           id: destination.id,
-          type: can.spaceCamelCase(destination.type).replace(/ /g, '')
+          type: destination.type
         });
 
         return new CMS.Models.Relationship({
@@ -31,18 +70,18 @@
           context: source.context
         }).save();
       },
-      create_evidence_relationship: function (destination) {
+      createEvidenceRelationship: function (destination) {
         var source;
         var dest;
 
-        if (!this.scope || !destination) {
+        if (!destination) {
           return $.Deferred().resolve();
         }
 
-        source = this.scope.attr('parentInstance');
+        source = this.attr('parentInstance');
         dest = CMS.Models.get_instance({
           id: destination.id,
-          type: can.spaceCamelCase(destination.type).replace(/ /g, '')
+          type: destination.type
         });
 
         return new CMS.Models.ObjectDocument({
@@ -52,29 +91,20 @@
         }).save();
       }
     },
-    events: {
-      '[reusable=true] input[type=checkbox] change': function (el, ev) {
-        var reused = this.scope.attr('reusedObjects');
-        var object = el.parent();
-        var key = {
-          type: object.attr('data-object-type'),
-          id: object.attr('data-object-id'),
-          method: object.parents('[reusable=true]').attr('reuse-method')
-        };
-        var index = _.findIndex(reused, key);
-        if (index >= 0) {
-          reused.splice(index, 1);
-          return;
+    helpers: {
+      disableReuse: function (options) {
+        var list = [];
+        var reused = this.attr('reusedObjects');
+        can.each(can.Map.keys(reused), function (prop) {
+          if (reused.attr(prop)) {
+            list.push(prop);
+          }
+        });
+
+        if (!list.length) {
+          return options.fn();
         }
-        reused.push(key);
-      },
-      '.js-trigger-reuse click': function (el, ev) {
-        var reused = this.scope.attr('reusedObjects');
-        var relatedDfds = can.map(reused, function (object) {
-          var executer = this.scope[object.method].bind(this);
-          return executer(object);
-        }.bind(this));
-        GGRC.delay_leaving_page_until($.when.apply($, relatedDfds));
+        return options.inverse();
       }
     }
   });
@@ -83,22 +113,7 @@
     tag: 'reusable-object',
     template: '<content></content>',
     scope: {
-      is_reusable: null
-    },
-    events: {
-      'inserted': function (el, ev) {
-        if (el.parents('[reusable=true]').length === 1) {
-          this.scope.attr('is_reusable', true);
-        }
-      }
-    },
-    helpers: {
-      if_reusable: function (options) {
-        if (this.attr('is_reusable') === true) {
-          return options.fn();
-        }
-        return options.inverse();
-      }
+      list: null
     }
   });
 })(window.can, window.can.$);
