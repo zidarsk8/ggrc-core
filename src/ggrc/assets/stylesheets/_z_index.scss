@@ -20,5 +20,3 @@ $zindex: (
   @warn "Key #{$name} is not in the map ’$zindex’";
   @return null;
 }
-// extended-info: 3100, // z-index(3100) + 100
-// ui-autocomplete: 3100, // z-index(3100) + 100

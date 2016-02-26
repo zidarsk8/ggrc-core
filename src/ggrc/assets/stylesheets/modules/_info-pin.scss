@@ -13,7 +13,7 @@
   left: 27px;
   right: 27px;
   background: $white;
-  z-index: 1500;
+  z-index: z(small);
   overflow: auto;
   .info {
     @include box-shadow(none);
@@ -57,7 +57,7 @@
     &.pin {
       position: fixed;
       right: 47px;
-      z-index: 9999;
+      z-index: z(max);
       width: 100px;
       background: $white;
       margin-top: -15px !important;
@@ -72,7 +72,7 @@
   .sticky-info-panel & {
     position: fixed;
     right: 47px;
-    z-index: 9999;
+    z-index: z(max);
     margin-top: 20px;
   }
   .assignable & {

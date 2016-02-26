@@ -82,7 +82,7 @@ select {
 
 .tooltip {
   // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
-  z-index: 3100 !important;
+  z-index: z(large) !important;
 }
 
 // status
@@ -481,12 +481,14 @@ select.multiple-selector {
 // Sticky headers
 .sticky-header {
   @extend %sticky;
+  z-index: z(min);
   border-top: none !important;
 }
 
 .sticky-footer {
   @extend %sticky;
   @include box-shadow(inset 0 0 3px 0 #bbb);
+  z-index: z(min);
   border-bottom: none !important;
 }
 
@@ -697,7 +699,7 @@ p {
     top: 100%;
     right: 0;
     left: auto;
-    z-index: 9999;
+    z-index: z(max);
     li {
       float:none;
       clear: both;
