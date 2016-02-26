@@ -41,29 +41,6 @@ def create_control(selenium):
   return widget.ControlInfo(selenium.driver)
 
 
-def create_controls(selenium):
-  """Creates a new control object.
-
-  We create first a control. But because LHN remembers it's state
-  Returns:
-      list(widget.ControlInfo)
-  """
-
-  _navigate_to_page_that_contains_lhn(selenium)
-  objects = []
-  objects.append(create_control(selenium))
-
-  for _ in xrange(batch.BATTERY - 1):
-    dashboard.HeaderPage(selenium.driver) \
-        .open_lhn_menu()
-    modal = lhn.Controls(selenium.driver).create_new()
-    test_helpers.ModalNewControlPage.enter_test_data(modal)
-    modal.save_and_close()
-    objects.append(widget.ControlInfo(selenium.driver))
-
-  return objects
-
-
 def delete_control(selenium):
   """Deletes a control object when on control info widget"""
   widget.ControlInfo(selenium.driver) \

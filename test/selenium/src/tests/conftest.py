@@ -6,8 +6,10 @@
 """PyTest fixtures"""
 
 import pytest   # pylint: disable=import-error
+
 from lib import base
 from lib import conftest_utils
+from lib.constants.test import batch
 
 
 @pytest.yield_fixture(scope="session")
@@ -101,5 +103,9 @@ def new_risk(selenium):
 @pytest.yield_fixture(scope="class")
 def battery_of_controls(selenium):
   """Creates 3 control objects"""
+  controls = []
 
-  yield conftest_utils.create_controls(selenium)
+  for _ in xrange(batch.BATTERY):
+    controls.append(conftest_utils.create_control(selenium))
+
+  yield controls
