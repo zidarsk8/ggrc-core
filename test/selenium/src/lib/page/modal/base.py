@@ -4,6 +4,7 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from lib import base
+from lib import decorator
 from lib.constants import locator
 
 
@@ -26,10 +27,10 @@ class _Modal(base.Modal):
     """
     self.ui_title.enter_text(text)
 
+  @decorator.wait_for_redirect
   def save_and_close(self):
     """Saves this object"""
     self.button_save_and_close.click()
-    self.wait_for_redirect()
 
 
 class CreateNewObjectModal(base.Modal):

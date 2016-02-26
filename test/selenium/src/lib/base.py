@@ -365,17 +365,6 @@ class Component(object):
     """
     self._driver = driver
 
-  def wait_for_redirect(self):
-    """Wait until the current url changes"""
-    from_url = self._driver.current_url
-    timer_start = time.time()
-
-    while from_url == self._driver.current_url:
-      time.sleep(0.1)
-
-      if time.time() - timer_start > constants.ux.MAX_USER_WAIT_SECONDS:
-         raise exception.RedirectTimeout
-
 
 class AnimatedComponent(Component):
   """Class for components where an animation must first complete before the
@@ -551,8 +540,8 @@ class ObjectWidget(Widget):
         locator_filter_clear)
 
     try:
-      self.members_listed = self._driver \
-          .find_elements(*constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
+      self.members_listed = self._driver.find_elements(
+          *constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
     except exceptions.NoSuchElementException:
       self.members_listed = None
 
@@ -571,8 +560,8 @@ class ObjectWidget(Widget):
       element.click()
       return self._info_pane_cls(self._driver)
     except exceptions.StaleElementReferenceException:
-      self.members_listed = self._driver \
-          .find_elements(*constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
+      self.members_listed = self._driver.find_elements(
+          *constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
       return self.select_nth_member(member)
     except exceptions.TimeoutException:
       # sometimes the click to the listed member results in hover
