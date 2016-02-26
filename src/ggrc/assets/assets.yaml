@@ -172,6 +172,7 @@ dashboard-js-template-files:
   - base_objects/modal_contact_fields.mustache
   - base_objects/open_close.mustache
   - base_objects/sub_tree_type_selector.mustache
+  - base_objects/modal/search_title.mustache
   - base_templates/add_comment.mustache
   - base_templates/attachment_list.mustache
   - base_templates/attachment.mustache
