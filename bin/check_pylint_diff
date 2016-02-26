@@ -66,9 +66,16 @@ echo ""
 # changed, and a negative number if more code issues have been introduced.
 
 function run_pylint() {
-  echo "$CHANGED_FILES" | xargs pylint 2> /dev/null | tail -n2 | \
+  
+  result=$(echo "$CHANGED_FILES" | xargs pylint 2> /dev/null | tail -n2 | \
     grep -E " [^ ]+/10" -o | head -n1 | grep -E -e "[^\.]+" -o | head -n1 \
-    || true
+    || true )
+
+  if [[ "$result" != "" ]]; then
+    echo $result
+  else
+    echo "0"
+  fi
 }
 
 git checkout -q $PARENT_1
