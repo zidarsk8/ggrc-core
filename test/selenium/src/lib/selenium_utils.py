@@ -87,7 +87,7 @@ def scroll_to_page_bottom(driver):
   driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
 
-def check_if_element_active(element, is_active_attr_val):
+def check_if_element_active(element, is_active_attr_val="active"):
   """Checks if the toggle is in activated state
 
   Args:
