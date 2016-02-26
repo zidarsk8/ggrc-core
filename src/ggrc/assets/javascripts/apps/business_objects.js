@@ -39,6 +39,7 @@
         process: CMS.Models.Process,
         control: CMS.Models.Control,
         assessment: CMS.Models.Assessment,
+        assessment_template: CMS.Models.AssessmentTemplate,
         request: CMS.Models.Request,
         issue: CMS.Models.Issue,
         objective: CMS.Models.Objective,
@@ -65,8 +66,8 @@
       if (!GGRC.page_object) {
         return;
       }
-      // Info widgets display the object information instead of listing connected
-      //  objects.
+      // Info widgets display the object information instead of listing
+      // connected objects.
       info_widget_views = {
         programs: GGRC.mustache_path + '/programs/info.mustache',
         audits: GGRC.mustache_path + '/audits/info.mustache',
@@ -78,6 +79,8 @@
         processes: GGRC.mustache_path + '/processes/info.mustache',
         products: GGRC.mustache_path + '/products/info.mustache',
         assessments: GGRC.mustache_path + '/assessments/info.mustache',
+        assessment_templates:
+          GGRC.mustache_path + '/assessment_templates/info.mustache',
         requests: GGRC.mustache_path + '/requests/info.mustache',
         issues: GGRC.mustache_path + '/issues/info.mustache'
       };

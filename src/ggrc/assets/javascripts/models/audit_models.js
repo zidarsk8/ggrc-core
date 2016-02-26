@@ -1050,4 +1050,45 @@
         'related_objects_as_destination', this.audit.program);
     }
   });
+
+  /**
+   * A model describing a template for the newly created Assessment objects.
+   *
+   * This is useful when creating multiple similar Assessment objects. Using an
+   * AssessmentTemplate helps avoiding repeatedly defining the same set of
+   * Assessment object properties for each new instance.
+   */
+  can.Model.Cacheable('CMS.Models.AssessmentTemplate', {
+    root_object: 'assessment_template',
+    root_collection: 'assessment_templates',
+    model_singular: 'AssessmentTemplate',
+    model_plural: 'AssessmentTemplates',
+    title_singular: 'AssessmentTemplate',
+    title_plural: 'AssessmentTemplates',
+    table_singular: 'assessment_template',
+    table_plural: 'assessment_templates',
+
+    findOne: 'GET /api/assessment_templates/{id}',
+    findAll: 'GET /api/assessment_templates',
+    update: 'PUT /api/assessment_templates/{id}',
+    destroy: 'DELETE /api/assessment_templates/{id}',
+    create: 'POST /api/assessment_templates',
+
+    mixins: ['unique_title'],
+    is_custom_attributable: false,
+
+    attributes: {
+      audit: 'CMS.Models.Audit.stub'
+    },
+
+    /**
+     * Initialize the newly created object instance. Essentially just validate
+     * that its title is non-blank.
+     */
+    init: function () {
+      this._super.apply(this, arguments);
+      this.validateNonBlank('title');
+    }
+  },
+  {});
 })(this.can);
