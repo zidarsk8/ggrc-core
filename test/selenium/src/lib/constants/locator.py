@@ -18,7 +18,7 @@ class Login(object):
 class PageHeader(object):
   """All locators for the dashboard header (has the same name as the elemnt"""
 
-  BUTTON_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
+  TOGGLE_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
   BUTTON_DASHBOARD = (By.CSS_SELECTOR, '.header-content .to-my-work['
                                        'href="/dashboard"]')
   BUTTON_SEARCH = (By.CSS_SELECTOR, '.header-content ['
@@ -27,7 +27,7 @@ class PageHeader(object):
                                       'href="/dashboard#task_widget"]')
   BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR, '.header-content ['
                                          'href="/objectBrowser"]')
-  BUTTON_USER_DROPDOWN = (
+  TOGGLE_USER_DROPDOWN = (
       By.CSS_SELECTOR, '.header-content .dropdown-toggle')
   BUTTON_HELP = (By.CSS_SELECTOR, '.header-content [id="#page-help"]')
 
@@ -735,7 +735,7 @@ class ObjectWidget(object):
       By.CSS_SELECTOR,
       '.object-area [id="control_widget"] .tree-structure .select '
       '.span4:nth-child(1)')
-  INFO_PANE = (By.CSS_SELECTOR, '.tier-content')
+  INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
 
 
 class InfoWidget(object):
