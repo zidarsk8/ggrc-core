@@ -205,6 +205,7 @@ dashboard-js-template-files:
   - assessments/tree_footer.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
+  - assessments/generator_title.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache

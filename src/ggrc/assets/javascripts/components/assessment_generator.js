@@ -26,7 +26,7 @@ can.Component.extend({
           id: instance.program.id
         }],
         template: {
-          title: 'Select controls to generate assessments',
+          title: '/static/mustache/assessments/generator_title.mustache',
           submitButton: 'Generate Assessments',
           count: 'assessment(s) will be generated'
         },
