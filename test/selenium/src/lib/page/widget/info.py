@@ -85,7 +85,7 @@ class ProgramInfo(InfoWidget):
         self._driver, self._locators.TOGGLE_SHOW_ADVANCED)
 
     # activate all fields
-    self.show_advanced.switch_on()
+    self.show_advanced.toggle()
 
     self.title = base.Label(self._driver, self._locators.TITLE)
     self.title_entered = base.Label(

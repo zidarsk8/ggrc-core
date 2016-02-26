@@ -294,22 +294,32 @@ class Checkbox(Element):
 
 
 class Toggle(Element):
+  """A generic toggle element.
+
+  Note that a special function is used for detecting if an element is active
+  which may not work on an arbitrary element.
+  """
+
   def __init__(self, driver, locator):
     super(Toggle, self).__init__(driver, locator)
     self.is_activated = selenium_utils.check_if_element_active(self._element)
 
-  def switch_on(self):
-    if not self.is_activated:
+  def toggle(self, on=True):
+    """Clicks on an element based on the is_active status and the "on" arg
+
+    Args:
+        on (bool)
+    """
+    if on and not self.is_activated:
       self._element.click()
       self.is_activated = True
-
-  def switch_off(self):
-    if self.is_activated:
+    elif not on and self.is_activated:
       self._element.click()
       self.is_activated = False
 
 
 class Tab(Element):
+  """A generic tab element"""
   def __init__(self, driver, locator, is_activated=True):
     super(Tab, self).__init__(driver, locator)
     self.is_activated = is_activated
