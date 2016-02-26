@@ -12,6 +12,7 @@ permissions = {
         "Audit",
         "Categorization",
         "Category",
+        "Comment",
         "ControlCategory",
         "ControlAssertion",
         "Control",
@@ -70,6 +71,7 @@ permissions = {
         "Workflow"
         "Categorization",
         "Category",
+        "Comment",
         "ControlCategory",
         "ControlAssertion",
         "Control",
@@ -130,6 +132,7 @@ permissions = {
         "Workflow",
         "Categorization",
         "Category",
+        "Comment",
         "ControlCategory",
         "ControlAssertion",
         "Control",
@@ -187,6 +190,7 @@ permissions = {
         "Workflow"
         "Categorization",
         "Category",
+        "Comment",
         "ControlCategory",
         "ControlAssertion",
         "Control",
