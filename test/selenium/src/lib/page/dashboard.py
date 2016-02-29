@@ -63,8 +63,7 @@ class HeaderPage(base.Page):
   def __init__(self, driver):
     super(HeaderPage, self).__init__(driver)
     self.toggle_lhn_menu = base.Toggle(self._driver,
-                                       self.locator.TOGGLE_LHN,
-                                       is_active_attr_val="open")
+                                       self.locator.TOGGLE_LHN)
     self.button_dashboard = base.Button(self._driver,
                                         self.locator.BUTTON_DASHBOARD)
     self.button_search = base.Button(self._driver,
@@ -84,6 +83,15 @@ class HeaderPage(base.Page):
     """
     self.toggle_lhn_menu.toggle()
     return lhn.Menu(self._driver)
+
+  def close_lhn_menu(self):
+    """Closes LHN on the Dashboard
+
+    Returns:
+        LhnMenu
+    """
+    self.toggle_lhn_menu.toggle(on=False)
+    return DashboardPage(self._driver)
 
   def click_on_logo(self):
     """
