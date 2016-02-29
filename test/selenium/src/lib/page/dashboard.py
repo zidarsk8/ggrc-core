@@ -25,9 +25,10 @@ class UserList(base.Component):
         self._driver, self.locator_cls.BUTTON_DATA_IMPORT)
     self.button_data_export = base.Button(
         self._driver, self.locator_cls.BUTTON_DATA_EXPORT)
-    self.button_logout = base.Button(self._driver,
-                                     self.locator_cls.BUTTON_LOGOUT)
-    self.notifications = base.Label(self._driver, self.locator_cls.NOTIFICATIONS)
+    self.button_logout = base.Button(
+        self._driver, self.locator_cls.BUTTON_LOGOUT)
+    self.notifications = base.Label(
+        self._driver, self.locator_cls.NOTIFICATIONS)
     self.checkbox_daily_digest = base.Checkbox(
         self._driver, self.locator_cls.CHECKBOX_DAILY_DIGEST)
 
