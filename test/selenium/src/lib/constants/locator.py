@@ -72,6 +72,7 @@ class LhnMenu(object):
   LHS_ITEM = (By.CSS_SELECTOR, '[test-data-id="lhs-item_3ad27b8b"]')
   ALL_OBJECTS = (By.CSS_SELECTOR, '[data-test-id="all_objects_e0345ec4"]')
   MY_OBJECTS = (By.CSS_SELECTOR, '[data-test-id="my_objects_6fa95ae1"]')
+  PIN = (By.CSS_SELECTOR, '.lhn-pin')
 
   # lhn items
   PROGRAMS = (By.CSS_SELECTOR, '[data-model-name="Program"]>a')
