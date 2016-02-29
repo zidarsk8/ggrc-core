@@ -218,6 +218,11 @@
   }
 }
 
+ul.select-clear-all {
+  @extend %reset-list;
+  @extend %clearfix;
+}
+
 ul.new-tree {
   li.tree-item {
     &.active {
@@ -271,6 +276,34 @@ ul.new-tree {
       &:before {
         content: $fa-var-caret-down;
       }
+    }
+  }
+}
+
+ul.attr-list,
+ul.model-list {
+  @extend %reset-list;
+  @extend %clearfix;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  .attribute-wrap & {
+    margin: 0;
+  }
+  li {
+    float: left;
+    width: 16.66%;
+    .attribute-wrap & {
+      width: auto;
+      margin-right: 15px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+    input {
+      margin-top: -3px;
+    }
+    &.disabled {
+      color: $lightGray;
     }
   }
 }

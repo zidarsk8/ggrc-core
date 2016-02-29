@@ -201,6 +201,16 @@ form.import {
   }
 }
 
+.save-template-wrap {
+  @extend %clearfix;
+  padding-left: 30px;
+  padding-right: 30px;
+  .left-content {
+    float: left;
+    padding-top: 5px;
+  }
+}
+
 .new-relevant-block {
   padding: 30px;
 }
@@ -213,5 +223,23 @@ form.import {
   margin-top: 30px;
   h3 {
     margin-bottom: 10px;
+  }
+}
+
+.report-title {
+  margin-bottom: 20px;
+  h2 {
+    font-size: 24px;
+    line-height: 30px;
+    font-family: $fontTitle;
+    font-weight: normal;
+  }
+}
+
+.report-title-change {
+  display: block;
+  height: 30px;
+  input {
+    margin-bottom: 0;
   }
 }
