@@ -137,7 +137,7 @@ class DynamicTreeToggle(base.Toggle):
 
   def __init__(self, driver, el_locator):
     self.element = driver.find_element(*el_locator)
-    self.is_activated = selenium_utils.check_if_element_active(self.element)
+    self.is_activated = selenium_utils.is_value_in_attr(self.element)
 
 
 class WidgetAdminCustomAttributes(base.Widget):

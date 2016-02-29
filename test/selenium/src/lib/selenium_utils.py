@@ -95,16 +95,17 @@ def scroll_to_page_bottom(driver):
   driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
 
-def check_if_element_active(element, is_active_attr_val="active"):
-  """Checks if the toggle is in activated state
+def is_value_in_attr(element, attr="class", value="active"):
+  """Checks if the attribute value is present for given attribute
 
   Args:
     element (selenium.webdriver.remote.webelement.WebElement)
-    is_active_attr_val (basestring): value in the class attribute that
+    attr (basestring): attribute name e.g. "class"
+    value (basestring): value in the class attribute that
       indicates the element is now active/opened
 
   Returns:
       bool
   """
-  attributes = element.get_attribute("class")
-  return is_active_attr_val in attributes.split()
+  attributes = element.get_attribute(attr)
+  return value in attributes.split()
