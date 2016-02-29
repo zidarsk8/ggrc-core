@@ -285,11 +285,15 @@ class Checkbox(Element):
 
   def __init__(self, driver, locator, is_checked=False):
     super(Checkbox, self).__init__(driver, locator)
-    self.is_checked = is_checked
+    self.is_checked = self.element.is_selected()
 
-  def click(self):
-    self.element.click()
-    self.is_checked = not self.is_checked
+  def check(self):
+    if not self.is_checked:
+      self.element.click()
+
+  def uncheck(self):
+    if self.is_checked:
+      self.element.click()
 
 
 class Toggle(Element):
@@ -301,8 +305,8 @@ class Toggle(Element):
 
   def __init__(self, driver, locator, is_active_attr_val="active"):
     super(Toggle, self).__init__(driver, locator)
-    self.is_activated = selenium_utils.check_if_element_active(
-        self.element, is_active_attr_val)
+    self.is_activated = selenium_utils.is_value_in_attr(
+        self.element, value=is_active_attr_val)
 
   def toggle(self, on=True):
     """Clicks on an element based on the is_active status and the "on" arg
