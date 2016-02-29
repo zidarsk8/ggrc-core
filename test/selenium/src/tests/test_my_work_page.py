@@ -97,4 +97,11 @@ class TestMyWorkPage(base.Test):
     header.open_user_list()
     new_lhn = header.open_lhn_menu()
     assert selenium_utils.check_if_element_active(
-      new_lhn.all_objects.element) is True
+        new_lhn.all_objects.element) is True
+
+  @pytest.mark.smoke_tests
+  def test_lhn_pin(self, selenium):
+    """Tests if the pin is present and if it's default state is off"""
+    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+    lhn_menu = dashboard.HeaderPage(selenium.driver).open_lhn_menu()
+    assert lhn_menu.pin.is_activated is False
