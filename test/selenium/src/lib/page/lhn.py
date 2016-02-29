@@ -529,6 +529,7 @@ class Menu(base.AnimatedComponent):
     )
     self.my_objects = lhn.MyObjectsTab(driver)
     self.all_objects = lhn.AllObjectsTab(driver)
+    self.pin = None
     self.filter = None
     self.toggle_programs = None
     self.toggle_workflows = None
@@ -552,6 +553,7 @@ class Menu(base.AnimatedComponent):
         locator.LhnMenu.FILTER_TEXT_BOX,
         locator.LhnMenu.FILTER_SUBMIT_BUTTON,
         locator.LhnMenu.FILTER_CLEAR_BUTTON)
+    self.pin = base.Toggle(self._driver, locator.LhnMenu.PIN)
     self.toggle_programs = lhn.Toggle(
         self._driver,
         locator.LhnMenu.PROGRAMS,
