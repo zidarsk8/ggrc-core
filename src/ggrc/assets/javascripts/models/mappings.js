@@ -616,6 +616,9 @@
       }),
       _program: Direct("Program", "audits", "program"),
       program_controls: Cross("_program", "controls"),
+      program_requests: Cross("_program", "related_requests"),
+      program_issues: Cross("_program", "related_issues"),
+      program_assessments: Cross("_program", "related_assessments"),
       objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects"),
       objectives: TypeFilter("objects", "Objective"),
       objectives_via_program: Cross("_program", "objectives"),
@@ -696,6 +699,9 @@
       _mixins: [
         "related_object", "personable", "ownable", "documentable"
       ],
+      audits: TypeFilter("related_objects", "Audit"),
+      related_controls: TypeFilter("related_objects", "Control"),
+      related_regulations: TypeFilter("related_objects", "Regulation"),
       related_creators: AttrFilter("related_objects", "AssigneeType", "Creator", "Person"),
       related_assessors: AttrFilter("related_objects", "AssigneeType", "Assessor", "Person"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
@@ -715,6 +721,8 @@
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
       audits: Direct("Audit", "requests", "audit"),
       urls: TypeFilter("related_objects", "Document"),
+      related_controls: TypeFilter("related_objects", "Control"),
+      related_regulations: TypeFilter("related_objects", "Regulation"),
       related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee", "Person"),
       related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester", "Person"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),

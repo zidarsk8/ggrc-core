@@ -369,6 +369,25 @@
     update: 'PUT /api/requests/{id}',
     destroy: 'DELETE /api/requests/{id}',
     mixins: ['unique_title', 'relatable'],
+    relatable_options: {
+      relevantTypes: {
+        Audit: {
+          objectBinding: 'audits',
+          relatableBinding: 'program_requests',
+          weight: 5
+        },
+        Regulation: {
+          objectBinding: 'related_regulations',
+          relatableBinding: 'related_requests',
+          weight: 3
+        },
+        Control: {
+          objectBinding: 'related_controls',
+          relatableBinding: 'related_requests',
+          weight: 10
+        }
+      }
+    },
     is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
@@ -936,6 +955,25 @@
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
     mixins: ['ownable', 'contactable', 'unique_title', 'relatable'],
+    relatable_options: {
+      relevantTypes: {
+        Audit: {
+          objectBinding: 'audits',
+          relatableBinding: 'program_assessments',
+          weight: 5
+        },
+        Regulation: {
+          objectBinding: 'related_regulations',
+          relatableBinding: 'related_assessments',
+          weight: 3
+        },
+        Control: {
+          objectBinding: 'related_controls',
+          relatableBinding: 'related_assessments',
+          weight: 10
+        }
+      }
+    },
     is_custom_attributable: true,
     attributes: {
       control: 'CMS.Models.Control.stub',

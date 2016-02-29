@@ -27,8 +27,8 @@ Maintained By: urban@reciprocitylabs.com
   </ul>
   <ul class="past-items-list relatables">
     {{#expose reusedObjects=reusedObjects}}
-    {{#defer 'related_requests' instance.related}}
-    {{#related_requests}}
+    {{#defer 'related_self' instance.related_self }}
+    {{#related_self}}
     <li class="clearfix">
       <div class="mini-col">
         {{localize_date instance.created_at}}
@@ -77,7 +77,7 @@ Maintained By: urban@reciprocitylabs.com
         </ul>
       </div>
     </li>
-    {{/related_requests}}
+    {{/related_self}}
     {{/defer}}
     {{/expose}}
   </ul>
