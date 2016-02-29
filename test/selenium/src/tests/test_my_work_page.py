@@ -87,7 +87,7 @@ class TestMyWorkPage(base.Test):
     header.close_lhn_menu()
     header.open_user_list()
     new_lhn = header.open_lhn_menu()
-    assert selenium_utils.check_if_element_active(
+    assert selenium_utils.is_value_in_attr(
         new_lhn.my_objects.element) is True
 
     # check if all objects tab saves state
@@ -96,7 +96,7 @@ class TestMyWorkPage(base.Test):
     header.close_lhn_menu()
     header.open_user_list()
     new_lhn = header.open_lhn_menu()
-    assert selenium_utils.check_if_element_active(
+    assert selenium_utils.is_value_in_attr(
         new_lhn.all_objects.element) is True
 
   @pytest.mark.smoke_tests
@@ -105,3 +105,17 @@ class TestMyWorkPage(base.Test):
     conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
     lhn_menu = dashboard.HeaderPage(selenium.driver).open_lhn_menu()
     assert lhn_menu.pin.is_activated is False
+
+  @pytest.mark.smoke_tests
+  def test_user_menu_checkbox(self, selenium):
+    """Tests the user menu checkbox. With that also the user menu itself is
+    tested since the model initializes all elements (and throws and
+    exception if they're not present."""
+    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+    user_list = dashboard.HeaderPage(selenium.driver).open_user_list()
+
+    user_list.checkbox_daily_digest.click()
+    user_list.checkbox_daily_digest.element.get_attribute("disabled")
+
+    # restore previous state
+    user_list.checkbox_daily_digest.click()
