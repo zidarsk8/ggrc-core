@@ -12,21 +12,24 @@ from lib.page import widget_bar
 from lib.page import lhn
 
 
-class _UserList(base.Component):
-  _locator = locator.PageHeader
+class UserList(base.Component):
+  locator_cls = locator.PageHeader
 
   def __init__(self, driver):
-    super(_UserList, self).__init__(driver)
+    super(UserList, self).__init__(driver)
     self.button_my_work = base.Button(self._driver,
-                                      self._locator.BUTTON_MY_WORK)
+                                      self.locator_cls.BUTTON_MY_WORK)
     self.button_admin_dashboard = base.Button(
-        self._driver, self._locator.BUTTON_ADMIN_DASHBOARD)
+        self._driver, self.locator_cls.BUTTON_ADMIN_DASHBOARD)
     self.button_data_import = base.Button(
-        self._driver, self._locator.BUTTON_DATA_IMPORT)
+        self._driver, self.locator_cls.BUTTON_DATA_IMPORT)
     self.button_data_export = base.Button(
-        self._driver, self._locator.BUTTON_DATA_EXPORT)
+        self._driver, self.locator_cls.BUTTON_DATA_EXPORT)
     self.button_logout = base.Button(self._driver,
-                                     self._locator.BUTTON_LOGOUT)
+                                     self.locator_cls.BUTTON_LOGOUT)
+    self.notifications = base.Label(self._driver, self.locator_cls.NOTIFICATIONS)
+    self.checkbox_daily_digest = base.Checkbox(
+        self._driver, self.locator_cls.CHECKBOX_DAILY_DIGEST)
 
   def select_my_work(self):
     """
@@ -53,6 +56,14 @@ class _UserList(base.Component):
   @decorator.wait_for_redirect
   def select_logout(self):
     raise NotImplementedError
+
+  def check_daily_email_digest(self):
+    """Checks the daily checkbox"""
+    self.checkbox_daily_digest.check()
+
+  def uncheck_daily_email_digest(self):
+    """Unchecks the daily checkbox"""
+    self.checkbox_daily_digest.uncheck()
 
 
 class HeaderPage(base.Page):
@@ -103,10 +114,10 @@ class HeaderPage(base.Page):
   def open_user_list(self):
     """
     Returns:
-        _UserList
+        UserList
     """
     self.toggle_user_dropdown.click()
-    return _UserList(self._driver)
+    return UserList(self._driver)
 
 
 class DashboardPage(widget_bar.DashboardWidgetBarPage, HeaderPage):
