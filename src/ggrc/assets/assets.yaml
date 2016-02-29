@@ -236,6 +236,8 @@ dashboard-js-template-files:
   - assessment_templates/attribute_add_field.mustache
   - assessment_templates/modal_content.mustache
   - assessment_templates/info.mustache
+  - assessments/related_issues.mustache
+  - assessments/related_requests.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache
