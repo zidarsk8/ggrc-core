@@ -73,3 +73,28 @@ class TestMyWorkPage(base.Test):
 
     assert initial_position == \
         lhn.Menu(selenium.driver).my_objects.element.location
+
+  @pytest.mark.smoke_tests
+  def test_lhn_remembers_tab_state(self, selenium):
+    """Tests if LHN remembers which tab is selected (my or all objects) after
+    closing it"""
+    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+    header = dashboard.HeaderPage(selenium.driver)
+
+    # check if my objects tab saves state
+    lhn_menu = header.open_lhn_menu()
+    lhn_menu.select_my_objects()
+    header.close_lhn_menu()
+    header.open_user_list()
+    new_lhn = header.open_lhn_menu()
+    assert selenium_utils.check_if_element_active(
+        new_lhn.my_objects.element) is True
+
+    # check if all objects tab saves state
+    lhn_menu = header.open_lhn_menu()
+    lhn_menu.select_all_objects()
+    header.close_lhn_menu()
+    header.open_user_list()
+    new_lhn = header.open_lhn_menu()
+    assert selenium_utils.check_if_element_active(
+      new_lhn.all_objects.element) is True
