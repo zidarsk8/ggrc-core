@@ -1,0 +1,19 @@
+{{!
+    Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<ul class="nav nav-tabs">
+  {{#each panels}}
+  <li {{#if panel.active}}class="active"{{/if}}>
+    <a {{data 'panel'}}
+      can-click='setActive'
+      href="#tab-{{@index}}">
+      {{title}}
+    </a>
+  </li>
+  {{/each}}
+</ul>
+<content></content>
