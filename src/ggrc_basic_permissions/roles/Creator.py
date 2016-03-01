@@ -94,14 +94,6 @@ owner_base = [
         "condition": "contains"
     },
     {
-        "type": "Document",
-        "terms": {
-            "list_property": "owners",
-            "value": "$current_user"
-        },
-        "condition": "contains"
-    },
-    {
         "type": "Facility",
         "terms": {
             "list_property": "owners",
