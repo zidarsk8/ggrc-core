@@ -182,6 +182,17 @@
       '.add-button .btn modal:success': 'addNew',
       closeModal: function () {
         this.scope.attr('mapper.is_saving', false);
+        // there is some kind of a race condition when filling the treview with new elements
+        // so many don't get rendered. To solve it, at the end of the loading
+        // we refresh the whole tree view. Other solutions could be to batch add the objects.
+        $('.cms_controllers_tree_view:visible').each(function () {
+          // TODO: This is terrible solution, but it's only way to refresh all tree views on page
+          var control = $(this).control();
+          if (control) {
+            control.reload_list();
+          }
+        });
+
         // TODO: Find proper way to dismiss the modal
         this.element.find('.modal-dismiss').trigger('click');
       },
@@ -262,17 +273,6 @@
             .always(function () {
               this.scope.attr('mapper.is_saving', false);
               this.closeModal();
-
-              // there is some kind of a race condition when filling the treview with new elements
-              // so many don't get rendered. To solve it, at the end of the loading
-              // we refresh the whole tree view. Other solutions could be to batch add the objects.
-              $('.cms_controllers_tree_view:visible').each(function () {
-                // TODO: This is terrible solution, but it's only way to refresh all tree views on page
-                var control = $(this).control();
-                if (control) {
-                  control.reload_list();
-                }
-              });
             }.bind(this));
         }.bind(this));
       },
@@ -307,7 +307,7 @@
       "{mapper} type": function () {
         this.scope.attr('mapper.term', "");
         this.scope.attr('mapper.contact', {});
-        if (!this.scope.attr('getList')) {
+        if (!this.scope.attr('mapper.getList')) {
           this.scope.attr('mapper.relevant').replace([]);
         }
 
