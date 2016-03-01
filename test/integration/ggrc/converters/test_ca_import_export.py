@@ -54,6 +54,9 @@ class TestCustomAttributeImportExport(TestCase):
         options="a,b,c,d")
     gen("product", attribute_type="Dropdown", title="man select",
         options="e,f,g", mandatory=True)
+    gen("product", attribute_type="Map:Person", title="normal person")
+    gen("product", attribute_type="Map:Person", title="man person",
+        mandatory=True)
 
     gen("access_group", attribute_type="Text",
         title="access group test custom", mandatory=True)
@@ -117,14 +120,15 @@ class TestCustomAttributeImportExport(TestCase):
         "Line 16: Field man Date is required. The line will be ignored.",
         "Line 18: Field man RT is required. The line will be ignored.",
         "Line 20: Field man text is required. The line will be ignored.",
+        "Line 21: Field man person is required. The line will be ignored.",
         "Line 28: Field Title is required. The line will be ignored."
     }
 
     self.assertEqual(expected_warnings, set(response["row_warnings"]))
     self.assertEqual(expected_errors, set(response["row_errors"]))
-    self.assertEqual(18, response["created"])
-    self.assertEqual(8, response["ignored"])
-    self.assertEqual(18, Product.query.count())
+    self.assertEqual(17, response["created"])
+    self.assertEqual(9, response["ignored"])
+    self.assertEqual(17, Product.query.count())
 
   def tests_ca_export(self):
     """Test exporting products with custom attributes
@@ -149,7 +153,7 @@ class TestCustomAttributeImportExport(TestCase):
                                 headers=self.headers)
 
     self.assert200(response)
-    self.assertEqual(len(response.data.splitlines()), 22)
+    self.assertEqual(len(response.data.splitlines()), 21)
 
   def test_multi_word_object_with_ca(self):
     """Test multi-word (e.g. Access Group, Data Asset) object import"""
