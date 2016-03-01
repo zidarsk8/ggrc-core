@@ -22,4 +22,6 @@ EXPORTABLE = {
     "cycle": models.Cycle,
     "cycle_task_group": models.CycleTaskGroup,
     "cycle_task_group_object_task": models.CycleTaskGroupObjectTask,
+    "cycle task group object task": models.CycleTaskGroupObjectTask,
+    "cycletaskgroupobjecttask": models.CycleTaskGroupObjectTask,
 }

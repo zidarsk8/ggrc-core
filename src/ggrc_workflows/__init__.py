@@ -279,24 +279,24 @@ def build_cycle(cycle, current_user=None, base_date=None):
   )
 
 # 'InProgress' states propagate via these links
-_cycle_object_parent_attr = {
+_cycle_task_parent_attr = {
     models.CycleTaskGroupObjectTask: ['cycle_task_group'],
     models.CycleTaskGroup: ['cycle']
 }
 
 # 'Finished' and 'Verified' states are determined via these links
-_cycle_object_children_attr = {
+_cycle_task_children_attr = {
     models.CycleTaskGroup: ['cycle_task_group_tasks'],
     models.Cycle: ['cycle_task_groups']
 }
 
 
-def update_cycle_object_child_state(obj):
+def update_cycle_task_child_state(obj):
 
   status_order = (None, 'Assigned', 'InProgress',
                   'Declined', 'Finished', 'Verified')
   status = obj.status
-  children_attrs = _cycle_object_children_attr.get(type(obj), [])
+  children_attrs = _cycle_task_children_attr.get(type(obj), [])
   for children_attr in children_attrs:
     if children_attr:
       children = getattr(obj, children_attr, None)
@@ -314,11 +314,11 @@ def update_cycle_object_child_state(obj):
                 new_status=child.status,
                 old_status=old_status
             )
-          update_cycle_object_child_state(child)
+          update_cycle_task_child_state(child)
 
 
-def update_cycle_object_parent_state(obj):  # noqa
-  parent_attrs = _cycle_object_parent_attr.get(type(obj), [])
+def update_cycle_task_parent_state(obj):  # noqa
+  parent_attrs = _cycle_task_parent_attr.get(type(obj), [])
   for parent_attr in parent_attrs:
     if not parent_attr:
       continue
@@ -341,10 +341,10 @@ def update_cycle_object_parent_state(obj):  # noqa
               new_status=parent.status,
               old_status=old_status
           )
-        update_cycle_object_parent_state(parent)
+        update_cycle_task_parent_state(parent)
     # If all children are `Finished` or `Verified`, then parent should be same
     elif obj.status == 'Finished' or obj.status == 'Verified':
-      children_attrs = _cycle_object_children_attr.get(type(parent), [])
+      children_attrs = _cycle_task_children_attr.get(type(parent), [])
       for children_attr in children_attrs:
         if children_attr:
           children = getattr(parent, children_attr, None)
@@ -366,7 +366,7 @@ def update_cycle_object_parent_state(obj):  # noqa
                   new_status=parent.status,
                   old_status=old_status
               )
-            update_cycle_object_parent_state(parent)
+            update_cycle_task_parent_state(parent)
           elif children_finished and len(children) > 0:
             if is_allowed_update(parent.__class__.__name__,
                                  parent.id, parent.context.id):
@@ -378,7 +378,7 @@ def update_cycle_object_parent_state(obj):  # noqa
                   new_status=parent.status,
                   old_status=old_status
               )
-            update_cycle_object_parent_state(parent)
+            update_cycle_task_parent_state(parent)
 
 
 def ensure_assignee_is_workflow_member(workflow, assignee):
@@ -514,7 +514,7 @@ def handle_cycle_task_group_object_task_put(
         new_status=obj.status,
         old_status=inspect(obj).attrs.status.history.deleted.pop(),
     )
-    update_cycle_object_parent_state(obj)
+    update_cycle_task_parent_state(obj)
 
   # Doing this regardless of status.history.has_changes() is important in order
   # to update objects that have been declined. It updates the os_last_updated
@@ -547,8 +547,8 @@ def handle_cycle_task_group_object_task_put(
 def handle_cycle_task_group_put(
         sender, obj=None, src=None, service=None):
   if inspect(obj).attrs.status.history.has_changes():
-    update_cycle_object_parent_state(obj)
-    update_cycle_object_child_state(obj)
+    update_cycle_task_parent_state(obj)
+    update_cycle_task_child_state(obj)
 
 
 def update_workflow_state(workflow):

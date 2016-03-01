@@ -30,8 +30,6 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
       db.Integer, db.ForeignKey('workflows.id'), nullable=False)
   cycle_task_groups = db.relationship(
       'CycleTaskGroup', backref='cycle', cascade='all, delete-orphan')
-  cycle_task_group_objects = db.relationship(
-      'CycleTaskGroupObject', backref='cycle', cascade='all, delete-orphan')
   cycle_task_group_object_tasks = db.relationship(
       'CycleTaskGroupObjectTask', backref='cycle',
       cascade='all, delete-orphan')

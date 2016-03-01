@@ -16,6 +16,7 @@ import traceback
 from ggrc import db
 from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import errors
+from ggrc.converters import get_exportables
 from ggrc.converters import get_importables
 from ggrc.login import get_current_user
 from ggrc.models import Audit
@@ -352,9 +353,9 @@ class MappingColumnHandler(ColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
-    importable = get_importables()
+    exportable = get_exportables()
     self.attr_name = options.get("attr_name", "")
-    self.mapping_object = importable.get(self.attr_name)
+    self.mapping_object = exportable.get(self.attr_name)
     self.new_slugs = row_converter.block_converter.converter.new_objects[
         self.mapping_object]
     self.unmap = self.key.startswith(AttributeInfo.UNMAPPING_PREFIX)

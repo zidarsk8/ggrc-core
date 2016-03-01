@@ -118,11 +118,13 @@ class CycleTaskGroupObjectTask(
           "display_name": "Task Type",
           "mandatory": True,
       },
-      "cycle_object": {
-          "display_name": "Cycle Object",
-          "filter_by": "_filter_by_cycle_object",
-      },
   }
+
+  @computed_property
+  def related_objects(self):
+    sources = [r.source for r in self.related_sources]
+    destinations = [r.destination for r in self.related_destinations]
+    return sources + destinations
 
   @classmethod
   def _filter_by_cycle(cls, predicate):
@@ -156,35 +158,6 @@ class CycleTaskGroupObjectTask(
     return CycleTaskGroup.query.filter(
         (CycleTaskGroup.id == cls.cycle_id) &
         (predicate(CycleTaskGroup.slug) | predicate(CycleTaskGroup.title))
-    ).exists()
-
-  @classmethod
-  def _filter_by_cycle_object(cls, predicate):
-    """Get query that filters cycle tasks by mapped objects.
-
-    Args:
-      predicate: lambda function that excepts a single parameter and returns
-      true of false.
-
-    Returns:
-      An sqlalchemy query that evaluates to true or false and can be used in
-      filtering cycle tasks by objects mapped to them.
-    """
-    parts = []
-    for model_name in all_models.__all__:
-      model = getattr(all_models, model_name)
-      query = getattr(model, "query", None)
-      field = getattr(model, "slug", getattr(model, "email", None))
-      if query is None or field is None or not hasattr(model, "id"):
-        continue
-      parts.append(query.filter(
-          (CycleTaskGroupObject.object_type == model_name) &
-          (model.id == CycleTaskGroupObject.object_id) &
-          predicate(field)
-      ).exists())
-    return CycleTaskGroupObject.query.filter(
-        (CycleTaskGroupObject.id == cls.cycle_task_group_object_id) &
-        or_(*parts)
     ).exists()
 
   @classmethod

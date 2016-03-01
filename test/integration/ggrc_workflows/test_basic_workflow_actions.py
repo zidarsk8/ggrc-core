@@ -73,11 +73,8 @@ class TestBasicWorkflowActions(TestCase):
     self.generator.generate_cycle(wf)
     self.generator.activate_workflow(wf)
 
-    tasks = [
-        len(tg.get("task_group_tasks", [])) *
-        max(1, len(tg.get("task_group_objects", [])))
-        for tg in self.one_time_workflow_1["task_groups"]
-    ]
+    tasks = [len(tg.get("task_group_tasks", []))
+             for tg in self.one_time_workflow_1["task_groups"]]
 
     cycle_tasks = db.session.query(CycleTaskGroupObjectTask).join(
         Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
@@ -221,31 +218,32 @@ class TestBasicWorkflowActions(TestCase):
     self.one_time_workflow_2 = {
         "title": "test_wf_title",
         "description": "some test workflow",
-        "task_groups": [{
-            "title": "tg_1",
-            "task_group_tasks": [{}, {}, {}]
-        },
-            {"title": "tg_2",
-             "task_group_tasks": [{
-                 "description": self.generator.random_str(100)
-             },
-                 {}
-             ],
-             "task_group_objects": self.random_objects[:2]
-             },
-            {"title": "tg_3",
-             "task_group_tasks": [{
-                 "title": "simple task 1",
-                 "description": self.generator.random_str(100)
-             }, {
-                 "title": self.generator.random_str(),
-                 "description": self.generator.random_str(100)
-             }, {
-                 "title": self.generator.random_str(),
-                 "description": self.generator.random_str(100)
-             }],
-             "task_group_objects": []
-             }
+        "task_groups": [
+            {
+                "title": "tg_1",
+                "task_group_tasks": [{}, {}, {}]
+            },
+            {
+                "title": "tg_2",
+                "task_group_tasks": [{
+                    "description": self.generator.random_str(100)
+                }, {}],
+                "task_group_objects": self.random_objects[:2]
+            },
+            {
+                "title": "tg_3",
+                "task_group_tasks": [{
+                    "title": "simple task 1",
+                    "description": self.generator.random_str(100)
+                }, {
+                    "title": self.generator.random_str(),
+                    "description": self.generator.random_str(100)
+                }, {
+                    "title": self.generator.random_str(),
+                    "description": self.generator.random_str(100)
+                }],
+                "task_group_objects": []
+            }
         ]
     }
 
@@ -254,29 +252,29 @@ class TestBasicWorkflowActions(TestCase):
         "description": "start this many a time",
         "frequency": "monthly",
         "task_groups": [
-            {"title": "tg_2",
-             "task_group_tasks": [{
-                 "description": self.generator.random_str(100),
-                 "relative_end_day": 1,
-                 "relative_end_month": None,
-                 "relative_start_day": 5,
-                 "relative_start_month": None,
-             },
-                 {"title": "monday task",
-                  "relative_end_day": 1,
-                  "relative_end_month": None,
-                  "relative_start_day": 1,
-                  "relative_start_month": None,
-                  },
-                 {"title": "weekend task",
-                  "relative_end_day": 4,
-                  "relative_end_month": None,
-                  "relative_start_day": 1,
-                  "relative_start_month": None,
-                  },
-             ],
+            {
+                "title": "tg_2",
+                "task_group_tasks": [{
+                     "description": self.generator.random_str(100),
+                     "relative_end_day": 1,
+                     "relative_end_month": None,
+                     "relative_start_day": 5,
+                     "relative_start_month": None,
+                }, {
+                    "title": "monday task",
+                    "relative_end_day": 1,
+                    "relative_end_month": None,
+                    "relative_start_day": 1,
+                    "relative_start_month": None,
+                }, {
+                    "title": "weekend task",
+                    "relative_end_day": 4,
+                    "relative_end_month": None,
+                    "relative_start_day": 1,
+                    "relative_start_month": None,
+                }],
                 "task_group_objects": self.random_objects
-             },
+            },
         ]
     }
     self.all_workflows = [
