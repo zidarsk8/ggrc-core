@@ -32,7 +32,7 @@
   height: auto !important;
   position: absolute;
   top: 12%;
-  z-index: zIndex(large) !important;
+  z-index: zIndex(large, base) !important;
   .small-info {
     h3 {
       font-weight:normal;
@@ -1028,7 +1028,7 @@ p.modal-value {
   overflow: visible;
   top: 28px;
   left: 24px;
-  z-index: zIndex(large, 100); /* Needs to be greater than modals */
+  z-index: zIndex(large, increased); /* Needs to be greater than modals */
   &.in {
     border: 1px solid $tabTitle;
     overflow: visible;

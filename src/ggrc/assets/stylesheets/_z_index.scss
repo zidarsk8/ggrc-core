@@ -6,21 +6,36 @@
  */
 
 $zindex: (
-  min: 100,
-  small: 1500,
-  medium: 2050,
-  large: 3100,
-  max: 9999
+  'min': 100,
+  'small': 1500,
+  'medium': 2050,
+  'large': (
+    'base': 3100,
+    'increased': 3200
+  ),
+  'max': 9999
 );
 
-/* Calculated value of map value and offset cannot be larger
- * then next bigger value in map. Use offset only in cases
- * when this function value should be in between predefined values.
- */
-@function zIndex($name, $offset: 0) {
-  @if map-has-key($zindex, $name) {
-    @return map-get($zindex, $name) + $offset;
+@function map-has-nested-keys($map, $keys...) {
+  @each $key in $keys {
+    @if not map-has-key($map, $key) {
+      @return false;
+    }
+    $map: map-get($map, $key);
   }
-  @warn "Key #{$name} is not in the map ’$zindex’";
-  @return null;
+  @return true;
+}
+
+@function map-deep-get($map, $keys...) {
+  @each $key in $keys {
+    $map: map-get($map, $key);
+  }
+  @return $map;
+}
+
+@function zIndex($layers...) {
+  @if not map-has-nested-key($zindex, $layers...) {
+    @warn "Key #{inspect($layers...)} is not in the map ’$zindex’";
+  }
+  @return map-deep-get($zindex, $layers...);
 }
