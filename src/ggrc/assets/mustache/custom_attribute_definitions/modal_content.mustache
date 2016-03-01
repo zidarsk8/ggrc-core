@@ -24,7 +24,7 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Choose the type of attribute to create."></i>
       </label>
       <select name="attribute_type" tabindex="2">
-        {{#iterate 'Text', 'Rich Text', 'Date', 'Checkbox' 'Dropdown'}} {{! 'File upload' }}
+        {{#iterate 'Text', 'Rich Text', 'Date', 'Checkbox' 'Dropdown' 'Map:Person'}} {{! 'File upload' }}
         <option {{#if_equals iterator attribute_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
         {{/iterate}}
       </select>
@@ -112,6 +112,18 @@
   </div>
   {{/case}}
   {{#case "Date"}}
+  <div class='row-fluid'>
+    <div class="span6">
+      <label>
+        Inline help
+        <i class="fa fa-question-circle" rel="tooltip"
+        title="Provide text to help users understand what this attribute is for."></i>
+      </label>
+      <input tabindex="5" class="input-block-level" placeholder="Enter Help Text" name="helptext" type="text" value="{{helptext}}">
+    </div>
+  </div>
+  {{/case}}
+  {{#case "Map:Person"}}
   <div class='row-fluid'>
     <div class="span6">
       <label>
