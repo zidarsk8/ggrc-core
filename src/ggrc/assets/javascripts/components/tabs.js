@@ -12,7 +12,26 @@
     scope: {
       panels: [],
       setActive: function (scope, el, ev) {
+        ev.preventDefault();
         scope.panel.attr('active', true);
+      }
+    },
+    events: {
+      '{scope.panels} length': function (list, ev, item, action, status) {
+        var panels = this.element.find('tab-panel');
+        var active;
+
+        if (list.length !== panels.length) {
+          return;
+        }
+        active = _.filter(list, function (item) {
+          if (item.panel) {
+            return item.panel.attr('active');
+          }
+        });
+        if (!active.length) {
+          list[0].panel.attr('active', true);
+        }
       }
     }
   });
