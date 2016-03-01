@@ -11,13 +11,28 @@
     template: can.view(GGRC.mustache_path + '/base_objects/tabs.mustache'),
     scope: {
       panels: [],
+      /**
+       * Activate currently clicked panel
+       *
+       * @param {Object} scope - current item value from `scope.panels`
+       * @param {jQuery.Object} el - clicked element
+       * @param {Object} ev - click event handler
+       */
       setActive: function (scope, el, ev) {
         ev.preventDefault();
         scope.panel.attr('active', true);
       }
     },
     events: {
-      '{scope.panels} length': function (list, ev, item, action, status) {
+      /**
+       * Set default active tab if none defined
+       *
+       * @param {can.List} list - list of items in `panels` object
+       * @param {Object} ev - event triggered on change length
+       * @param {String} item - item that got changed
+       * @param {String} action - in our case it can be `add` or `remove`
+       */
+      '{scope.panels} length': function (list, ev, item, action) {
         var panels = this.element.find('tab-panel');
         var active;
 
@@ -45,6 +60,13 @@
       panels: null
     },
     events: {
+      /**
+       * Add this `panel` to `panels` list in fomat
+       * {
+       *   title: `Title`
+       *   panel: `Current panel scope`
+       * }
+       */
       inserted: function () {
         var panels = this.scope.attr('panels');
         panels.push({
@@ -52,6 +74,16 @@
           panel: this.scope
         });
       },
+      /**
+       * Check if other tabs are active and deactivate them
+       *
+       * @param {can.List} list - list of items in `panels` object
+       * @param {Object} ev - event triggered on change
+       * @param {String} item - item that got changed
+       * @param {String} action - what got changed on the object
+       * @param {String} status - status of changed item, we are looking for `active`
+       *                          property change to either `true` or `false`
+       */
       '{scope.panels} change': function (list, ev, item, action, status) {
         var index;
         var panel;
