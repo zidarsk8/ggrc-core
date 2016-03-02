@@ -787,7 +787,27 @@ can.Model("can.Model.Cacheable", {
                                     attribute_value);
       }.bind(this));
     }
+  },
+
+  _custom_attribute_map: function (ca_id, object) {
+    var definition;
+    ca_id = Number(ca_id); // coming from mustache this will be a string
+    definition = _.find(this.custom_attribute_definitions, {id: ca_id});
+
+    if (!definition || !definition.attribute_type.startsWith("Map:")) {
+      return;
+    }
+    if (typeof(object) === "string" && object.length > 0) {
+      return;
+    }
+    object = object.stub ? object.stub() : undefined;
+    if (object) {
+      this.custom_attributes.attr(ca_id, object.type + ":" + object.id);
+    } else {
+      this.custom_attributes.removeAttr(String(ca_id));
+    }
   }
+
   , computed_errors : can.compute(function() {
       var errors = this.errors();
       if(this.attr("_suppress_errors")) {

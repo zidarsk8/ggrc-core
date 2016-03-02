@@ -125,12 +125,27 @@ can.Control("GGRC.Controllers.Modals", {
     $.cms_autocomplete.call(this, el);
   },
   autocomplete_select: function (el, event, ui) {
+    var path;
+    var instance;
+    var index;
+    var prop;
+    var cb;
     $("#extended-info").trigger("mouseleave"); // Make sure the extra info tooltip closes
 
-    var path = el.attr("name").split("."),
-        instance = this.options.instance,
-        index = 0,
-        prop = path.pop();
+    path = el.attr("name").split(".");
+    instance = this.options.instance;
+    index = 0;
+    prop = path.pop();
+    cb = el.data("lookup-cb");
+
+    if (cb) {
+      cb = cb.split(" ");
+      instance[cb[0]].apply(instance, cb.slice(1).concat([ui.item]));
+      setTimeout(function () {
+        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+      }, 0);
+      return;
+    }
 
     if (/^\d+$/.test(path[path.length - 1])) {
       index = parseInt(path.pop(), 10);
@@ -334,13 +349,18 @@ can.Control("GGRC.Controllers.Modals", {
     el = el instanceof jQuery ? el : $(el);
     var name = el.attr("name"),
         value = el.val();
+    var cb = el.data("lookup-cb");
+    var instance = this.options.instance;
 
     // If no model is specified, short circuit setting values
     // Used to support ad-hoc form elements in confirmation dialogs
     if (!this.options.model) {
       return;
     }
-    if (name) {
+    if (cb) {
+      cb = cb.split(" ");
+      instance[cb[0]].apply(instance, cb.slice(1).concat([value]));
+    } else if (name) {
       this.set_value({name: name, value: value});
     }
     if (el.is("[data-also-set]")) {

@@ -83,7 +83,13 @@
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         {{#with_object_for_id id}}
-          {{object.email}}
+          <input class="input-block-level"
+                 name="_custom_attribute_mappings.{{@index}}.email"
+                 data-lookup="Person" placeholder="Enter email address"
+                 data-lookup-cb="_custom_attribute_map {{id}}"
+                 null-if-empty="null-if-empty"
+                 type="text"
+                 value="{{object.email}}" />
         {{/with_object_for_id}}
         {{/case}}
         {{/switch}}
