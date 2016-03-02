@@ -235,6 +235,14 @@ owner_update = owner_base + [
         },
         "condition": "relationship",
     },
+    {
+        "type": "Comment",
+        "terms": {
+            "property_name": "modified_by",
+            "value": "$current_user"
+        },
+        "condition": "is"
+    },
 ]
 
 permissions = {
@@ -246,6 +254,7 @@ permissions = {
         "ControlCategory",
         "ControlAssertion",
         "Control",
+        "Comment",
         "Assessment",
         "Issue",
         "DataAsset",

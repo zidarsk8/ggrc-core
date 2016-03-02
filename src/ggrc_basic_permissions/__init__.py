@@ -58,7 +58,7 @@ def get_public_config(_):
   return public_config
 
 
-def objects_via_assignable_query(user_id):
+def objects_via_assignable_query(user_id, context_not_role=True):
   """Creates a query that returns objects a user can access because she is
      assigned via the assignable mixin.
 
@@ -98,7 +98,7 @@ def objects_via_assignable_query(user_id):
             (rel2.destination_type == rel1.destination_type,
              rel2.source_type)
         ], else_=rel2.destination_type).label('type'),
-        rel1.context_id.label('context_id')
+        rel1.context_id if context_not_role else literal('R')
     ).select_from(rel1)
 
   # First we fetch objects where a user is mapped as an assignee
@@ -111,7 +111,7 @@ def objects_via_assignable_query(user_id):
           (rel1.destination_type == "Person",
            rel1.source_type)
       ], else_=rel1.destination_type),
-      rel1.context_id))
+      rel1.context_id if context_not_role else literal('RUD')))
 
   # The user should also have access to objects mapped to the assigned_objects
   # We accomplish this by filtering out relationships where the user is
@@ -464,8 +464,10 @@ def load_permissions_for(user):  # noqa
           .setdefault(type_, {})\
           .setdefault('resources', list())\
           .append(id_)
-  for id_, type_, context_id in objects_via_assignable_query(user.id):
+  for id_, type_, role_name in objects_via_assignable_query(user.id, False):
     actions = ["read", "view_object_page"]
+    if role_name == "RUD":
+      actions += ["update", "delete"]
     for action in actions:
       permissions.setdefault(action, {})\
           .setdefault(type_, {})\
