@@ -5,6 +5,14 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
+%clearfix {
+  &::after {
+    clear: both;
+    content: "";
+    display: block;
+  }
+}
+
 %outline-fix {
   outline:0;
 }
