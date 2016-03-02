@@ -18,6 +18,9 @@ from alembic import op
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import text
 
+# mandatory alembic variables
+# pylint: disable=invalid-name
+
 # revision identifiers, used by Alembic.
 revision = '1839dabd2357'
 down_revision = '4e989ef86619'
