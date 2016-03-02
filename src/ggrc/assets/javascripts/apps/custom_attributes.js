@@ -67,7 +67,10 @@
         can.each(this.instance.custom_attribute_values, function (value) {
           value = value.reify();
           if (value.custom_attribute_id === id) {
-            ret = value.attribute_object.reify();
+            ret = value.attribute_object;
+            if (ret) {
+              ret = ret.reify();
+            }
           }
         });
         return options.fn(options.contexts.add({
