@@ -18,7 +18,16 @@
         this.attr('loading', true);
         $.when(
           this.instance.load_custom_attribute_definitions(),
-          this.instance.refresh_all('custom_attribute_values', 'attribute_object')
+          this.instance.refresh_all('custom_attribute_values')
+            .then(function (values) {
+              var rq = new RefreshQueue();
+              _.each(values, function (value) {
+                if (value.attribute_object) {
+                  rq.enqueue(value.attribute_object);
+                }
+              });
+              return rq.trigger();
+            })
         ).always(function () {
           this.attr('loading', false);
         }.bind(this));
