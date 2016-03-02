@@ -1,0 +1,100 @@
+/*!
+    Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+*/
+
+(function (can, $) {
+  can.Component.extend({
+    tag: 'tabs',
+    template: can.view(GGRC.mustache_path + '/base_objects/tabs.mustache'),
+    scope: {
+      panels: [],
+      /**
+       * Activate currently clicked panel
+       *
+       * @param {Object} scope - current item value from `scope.panels`
+       * @param {jQuery.Object} el - clicked element
+       * @param {Object} ev - click event handler
+       */
+      setActive: function (scope, el, ev) {
+        ev.preventDefault();
+        scope.panel.attr('active', true);
+      }
+    },
+    events: {
+      /**
+       * Set default active tab if none defined
+       *
+       * @param {can.List} list - list of items in `panels` object
+       * @param {Object} ev - event triggered on change length
+       * @param {String} item - item that got changed
+       * @param {String} action - in our case it can be `add` or `remove`
+       */
+      '{scope.panels} length': function (list, ev, item, action) {
+        var panels = this.element.find('tab-panel');
+        var active;
+
+        if (list.length !== panels.length) {
+          return;
+        }
+        active = _.filter(list, function (item) {
+          if (item.panel) {
+            return item.panel.attr('active');
+          }
+        });
+        if (!active.length) {
+          list[0].panel.attr('active', true);
+        }
+      }
+    }
+  });
+
+  can.Component.extend({
+    tag: 'tab-panel',
+    template: can.view(GGRC.mustache_path + '/base_objects/tab_panel.mustache'),
+    scope: {
+      active: false,
+      title: '@',
+      panels: null
+    },
+    events: {
+      /**
+       * Add this `panel` to `panels` list in fomat
+       * {
+       *   title: `Title`
+       *   panel: `Current panel scope`
+       * }
+       */
+      inserted: function () {
+        var panels = this.scope.attr('panels');
+        panels.push({
+          title: this.scope.attr('title'),
+          panel: this.scope
+        });
+      },
+      /**
+       * Check if other tabs are active and deactivate them
+       *
+       * @param {can.List} list - list of items in `panels` object
+       * @param {Object} ev - event triggered on change
+       * @param {String} item - item that got changed
+       * @param {String} action - what got changed on the object
+       * @param {String} status - status of changed item, we are looking for `active`
+       *                          property change to either `true` or `false`
+       */
+      '{scope.panels} change': function (list, ev, item, action, status) {
+        var index;
+        var panel;
+
+        item.split('.');
+        index = Number(item[0]);
+        panel = list[index].panel;
+        if (status && this.scope !== panel) {
+          this.scope.attr('active', false);
+        }
+      }
+    }
+  });
+})(window.can, window.can.$);
