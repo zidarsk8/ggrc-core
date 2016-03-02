@@ -7,7 +7,6 @@
 
 .modal-backdrop {
   background-color: $white;
-  z-index: zIndex(modal-backdrop) !important;
 }
 
 .field-hide {
@@ -32,7 +31,6 @@
   height: auto !important;
   position: absolute;
   top: 12%;
-  z-index: zIndex(modal) !important;
   .small-info {
     h3 {
       font-weight:normal;
