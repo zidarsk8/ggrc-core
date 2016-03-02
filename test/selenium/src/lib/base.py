@@ -577,8 +577,8 @@ class ObjectWidget(Widget):
       element.click()
 
       # wait for the info pane animation to stop
-      info_pane = self._driver.find_element(
-          *constants.locator.ObjectWidget.INFO_PANE)
+      info_pane = selenium_utils.get_when_clickable(
+          self._driver, constants.locator.ObjectWidget.INFO_PANE)
       selenium_utils.wait_until_stops_moving(info_pane)
 
       return self._info_pane_cls(self._driver)
