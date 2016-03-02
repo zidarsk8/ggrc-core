@@ -769,9 +769,23 @@ can.Model("can.Model.Cacheable", {
     if (!this.custom_attributes) {
       this.attr('custom_attributes', new can.Map());
       can.each(this.custom_attribute_values, function(value) {
-        value = value.reify();
-        self.custom_attributes.attr(value.custom_attribute_id, value.attribute_value);
-      });
+        var def;
+        var attribute_value;
+        var object;
+        var stub = value;
+        value = stub.reify();
+        def = _.find(this.custom_attribute_definitions, {
+          id: value.custom_attribute_id
+        });
+        if (def && def.attribute_type.startsWith("Map:")) {
+          object = value.attribute_object;
+          attribute_value = object.type + ":" + object.id;
+        } else {
+          attribute_value = value.attribute_value;
+        }
+        self.custom_attributes.attr(value.custom_attribute_id,
+                                    attribute_value);
+      }.bind(this));
     }
   }
   , computed_errors : can.compute(function() {
