@@ -82,7 +82,7 @@ select {
 
 .tooltip {
   // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
-  z-index: zIndex(large, base) !important;
+  z-index: zIndex(large) !important;
 }
 
 // status
