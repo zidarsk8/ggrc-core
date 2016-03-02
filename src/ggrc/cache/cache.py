@@ -128,7 +128,7 @@ def all_mapping_entries():
       mapping('ObjectOwner', 'ownable', True),
       mapping('ObjectPerson', 'person'),
       mapping('ObjectPerson', 'personable', True),
-      mapping('Section', 'directive'), # this goes out?
+      mapping('Section', 'directive'),  # this goes out?
       mapping('Relationship', 'source', True),
       mapping('Relationship', 'destination', True),
       mapping('UserRole', 'context'),

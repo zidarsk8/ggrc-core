@@ -37,7 +37,8 @@ class TestOneTimeWfEndDateChange(TestCase):
     Notification.query.delete()
 
     self.random_objects = self.object_generator.generate_random_objects(2)
-    _, self.user = self.object_generator.generate_person(user_role="gGRC Admin")
+    _, self.user = self.object_generator.generate_person(
+        user_role="gGRC Admin")
     self.create_test_cases()
 
     def init_decorator(init):
@@ -139,14 +140,14 @@ class TestOneTimeWfEndDateChange(TestCase):
     with freeze_time("2015-05-03 03:21:34"):
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
-        cycle.cycle_task_group_object_tasks[0].id)
+          cycle.cycle_task_group_object_tasks[0].id)
       task2 = CycleTaskGroupObjectTask.query.get(
-        cycle.cycle_task_group_object_tasks[1].id)
+          cycle.cycle_task_group_object_tasks[1].id)
 
       self.wf_generator.modify_object(
-        task1, data = {"end_date": date(2015, 5, 15)})
+          task1, data={"end_date": date(2015, 5, 15)})
       self.wf_generator.modify_object(
-        task2, data = {"end_date": date(2015, 5, 15)})
+          task2, data={"end_date": date(2015, 5, 15)})
 
     with freeze_time("2015-05-04 03:21:34"):  # one day befor due date
       _, notif_data = notifications.get_todays_notifications()
@@ -197,14 +198,14 @@ class TestOneTimeWfEndDateChange(TestCase):
     with freeze_time("2015-05-03 03:21:34"):
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
-        cycle.cycle_task_group_object_tasks[0].id)
+          cycle.cycle_task_group_object_tasks[0].id)
       task2 = CycleTaskGroupObjectTask.query.get(
-        cycle.cycle_task_group_object_tasks[1].id)
+          cycle.cycle_task_group_object_tasks[1].id)
 
       self.wf_generator.modify_object(
-        task1, data = {"end_date": date(2015, 5, 1)})
+          task1, data={"end_date": date(2015, 5, 1)})
       self.wf_generator.modify_object(
-        task2, data = {"end_date": date(2015, 5, 1)})
+          task2, data={"end_date": date(2015, 5, 1)})
 
     with freeze_time("2015-05-03 03:21:34"):  # one day befor due date
       _, notif_data = notifications.get_todays_notifications()
@@ -240,14 +241,14 @@ class TestOneTimeWfEndDateChange(TestCase):
     with freeze_time("2015-05-03 03:21:34"):
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
-        cycle.cycle_task_group_object_tasks[0].id)
+          cycle.cycle_task_group_object_tasks[0].id)
       task2 = CycleTaskGroupObjectTask.query.get(
-        cycle.cycle_task_group_object_tasks[1].id)
+          cycle.cycle_task_group_object_tasks[1].id)
 
       self.wf_generator.modify_object(
-        task1, data = {"end_date": date(2015, 5, 3)})
+          task1, data={"end_date": date(2015, 5, 3)})
       self.wf_generator.modify_object(
-        task2, data = {"end_date": date(2015, 5, 4)})
+          task2, data={"end_date": date(2015, 5, 4)})
 
     with freeze_time("2015-05-03 03:21:34"):  # one day befor due date
       user = get_person(self.user.id)

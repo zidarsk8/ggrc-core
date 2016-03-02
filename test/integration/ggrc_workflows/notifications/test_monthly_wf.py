@@ -13,7 +13,6 @@ import os
 from ggrc import notifications
 from ggrc.models import Notification, Person
 from ggrc_workflows import start_recurring_cycles
-from ggrc_workflows.views import send_todays_digest_notifications
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
@@ -78,7 +77,6 @@ class TestMonthlyWorkflowNotification(TestCase):
     # cycle starts on monday - 6th, and not on 5th
     with freeze_time("2015-04-03"):
       start_recurring_cycles()
-
 
     with freeze_time("2015-04-15"):  # one day befor due date
       _, notif_data = notifications.get_todays_notifications()
