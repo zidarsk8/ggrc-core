@@ -7,7 +7,7 @@
 
 .tree-spinner {
   position: relative;
-  z-index: zIndex(min) !important;
+  z-index: zIndex(tree-spinner) !important;
 }
 
 ul.new-tree {
@@ -265,7 +265,7 @@ ul.new-tree {
           position: absolute;
           top: 0;
           right: 0px;
-          z-index: zIndex(medium);
+          z-index: zIndex(event-more);
         }
       }
     }
@@ -362,7 +362,7 @@ ul.new-tree {
           position: absolute;
           top: 0;
           right: 20px;
-          z-index: zIndex(medium);
+          z-index: zIndex(event-more);
         }
       }
       .events-content {

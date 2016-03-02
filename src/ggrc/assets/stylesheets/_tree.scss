@@ -11,7 +11,7 @@
     @include border-radius($default-border-radius);
     left: -10px;
     top: 26px;
-    z-index: zIndex(max);
+    z-index: zIndex(dropdown-menu);
     margin: 0;
     padding: 0;
     font-weight: normal;
