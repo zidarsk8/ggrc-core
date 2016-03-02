@@ -1087,8 +1087,33 @@
      */
     init: function () {
       this._super.apply(this, arguments);
-      this.validateNonBlank('title');
+      // TODO: perform any validation here?
     }
   },
-  {});
+  {
+    // TODO: docstring, tests
+    // isNewObject: boolean (true if creating new object)
+    form_preload: function (isNewObject) {
+      console.log('formPreload in Ass. Template');
+      // TODO: needed? to init/pre-fetch some data or what?
+    },
+
+    // TODO: docstring, tests
+    // TODO: why this isn't called? To perform validation, data packing etc.
+    before_save: function () {
+      console.log('AssessmentTemplate before_save');
+      debugger;
+    },
+
+    before_create: function () {
+      console.log('AssessmentTemplate before_create');
+      debugger;
+    },
+
+    // save: function () {
+    //   console.log('AssessmentTemplate saved');
+    //   // return this._super.apply(this, arguments);
+    //   return 'DDDD';
+    // }
+  });
 })(this.can);
