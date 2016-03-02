@@ -6,8 +6,7 @@
  */
 
 $zindex: (
-  'sticky-header': 100,
-  'sticky-footer': 100,
+  'sticky': 100,
   'header-content': 100,
   'bar-v': 100,
   'tree-spinner': 100,
@@ -32,7 +31,7 @@ $zindex: (
 
 @function zIndex($name) {
   @if not map-has-key($zindex, $name) {
-    @warn "Key #{$name} is not in the map ’$zindex’";
+    @warn "No value found for '#{$name}' in '$zindex' map";
   }
   @return map-get($zindex, $name);
 }

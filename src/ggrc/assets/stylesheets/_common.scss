@@ -481,14 +481,14 @@ select.multiple-selector {
 // Sticky headers
 .sticky-header {
   @extend %sticky;
-  z-index: zIndex(sticky-header);
+  z-index: zIndex(sticky);
   border-top: none !important;
 }
 
 .sticky-footer {
   @extend %sticky;
   @include box-shadow(inset 0 0 3px 0 #bbb);
-  z-index: zIndex(sticky-footer);
+  z-index: zIndex(sticky);
   border-bottom: none !important;
 }
 
