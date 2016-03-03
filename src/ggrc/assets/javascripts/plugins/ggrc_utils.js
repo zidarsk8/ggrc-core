@@ -14,7 +14,7 @@
       date = moment(date);
       // 6 is Saturday 0 is Sunday
       while (_.contains([0, 6], date.day())) {
-        date.add(1, "day");
+        date.add(1, 'day');
       }
       return date.toDate();
     },
@@ -28,7 +28,8 @@
     },
     download: function (filename, text) {
       var element = document.createElement('a');
-      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute(
+        'href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
       element.setAttribute('download', filename);
       element.style.display = 'none';
       document.body.appendChild(element);
@@ -37,20 +38,21 @@
     },
     export_request: function (request) {
       return $.ajax({
-        type: "POST",
-        dataType: "text",
+        type: 'POST',
+        dataType: 'text',
         headers: $.extend({
-          "Content-Type": "application/json",
-          "X-export-view": "blocks",
-          "X-requested-by": "gGRC"
+          'Content-Type': 'application/json',
+          'X-export-view': 'blocks',
+          'X-requested-by': 'gGRC'
         }, request.headers || {}),
-        url: "/_service/export_csv",
+        url: '/_service/export_csv',
         data: JSON.stringify(request.data || {})
       });
     },
     is_mapped: function (target, destination) {
-      var table_plural = CMS.Models[destination.type].table_plural,
-          bindings = target.get_binding((target.has_binding(table_plural) ? "" : "related_") + table_plural);
+      var tablePlural = CMS.Models[destination.type].table_plural;
+      var bindings = target.get_binding(
+        (target.has_binding(tablePlural) ? '' : 'related_') + tablePlural);
 
       if (bindings && bindings.list && bindings.list.length) {
         return _.find(bindings.list, function (item) {
