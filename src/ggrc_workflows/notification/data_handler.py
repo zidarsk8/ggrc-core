@@ -6,14 +6,16 @@
 from copy import deepcopy
 from datetime import date
 from sqlalchemy import and_
+from sqlalchemy import or_
 from urlparse import urljoin
 
 from ggrc import db
+from ggrc.models.revision import Revision
 from ggrc.utils import merge_dicts, get_url_root
 from ggrc_basic_permissions.models import Role, UserRole
-from ggrc_workflows.models import (
-    Workflow, Cycle, CycleTaskGroupObjectTask, TaskGroupTask
-)
+from ggrc_workflows.models import Cycle
+from ggrc_workflows.models import CycleTaskGroupObjectTask
+from ggrc_workflows.models import Workflow
 
 
 """
@@ -315,19 +317,58 @@ def get_workflow_owners_dict(context_id):
           for user_role in owners}
 
 
+def _get_object_info_from_revision(revision, known_type):
+  """ returns type and id of the searched object, if we have one part of
+  the relationship known.
+  """
+  object_type = revision.destination_type \
+      if revision.source_type == known_type \
+      else revision.source_type
+  object_id = revision.destination_id if \
+      revision.source_type == known_type \
+      else revision.source_id
+  return object_type, object_id
+
+
 def get_cycle_task_dict(cycle_task):
 
-  object_title = ""
-  if cycle_task.cycle_task_group_object:
-    if cycle_task.cycle_task_group_object.object:
-      object_title = cycle_task.cycle_task_group_object.object.title
-    else:
-      object_title = u"{} [deleted]".format(
-          cycle_task.cycle_task_group_object.title)
+  object_titles = []
+  # every object should have a title or at least a name like person object
+  for related_object in cycle_task.related_objects:
+    object_titles.append(related_object.title or
+                         related_object.name or
+                         u"Untitled object")
+  # related objects might have been deleted or unmapped,
+  # check the revision history
+  deleted_relationships_sources = db.session.query(Revision).filter(
+      Revision.resource_type == "Relationship",
+      Revision.action == "deleted",
+      Revision.source_type == "CycleTaskGroupObjectTask",
+      Revision.source_id == cycle_task.id
+  )
+  deleted_relationships_destinations = db.session.query(Revision).filter(
+      Revision.resource_type == "Relationship",
+      Revision.action == "deleted",
+      Revision.destination_type == "CycleTaskGroupObjectTask",
+      Revision.destination_id == cycle_task.id
+  )
+  deleted_relationships = deleted_relationships_sources.union(
+      deleted_relationships_destinations).all()
+  for deleted_relationship in deleted_relationships:
+    removed_object_type, removed_object_id = _get_object_info_from_revision(
+        deleted_relationship, "CycleTaskGroupObjectTask")
+    object_data = db.session.query(Revision).filter(
+        Revision.resource_type == removed_object_type,
+        Revision.resource_id == removed_object_id,
+    ).one()
+
+    object_titles.append(
+        u"{} [removed from task]".format(object_data.content["display_name"])
+    )
 
   return {
       "title": cycle_task.title,
-      "object_title": object_title,
+      "related_objects": object_titles,
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
       "fuzzy_due_in": get_fuzzy_date(cycle_task.end_date),
       "cycle_task_url": get_cycle_task_url(cycle_task),

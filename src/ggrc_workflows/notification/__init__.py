@@ -153,7 +153,7 @@ Task and cycle_task have the following structure:
 
   task = {
       "title": title,
-      "object_title": object title or "",
+      "object_titles": list of object titles for all related objects
       "end_date": end date in MM/DD/YYYY format
       "fuzzy_due_in": "today" or "in 1 day"... "in 5 days", "in 1 week" etc.,
       "cycle_task_url" ""

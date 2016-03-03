@@ -299,6 +299,12 @@ class TestCycleTaskStatusChange(TestCase):
                 "contact": person_dict(self.user.id),
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
+            }, {
+                "title": "task 2",
+                "description": "two taks in wf with different objects",
+                "contact": person_dict(self.user.id),
+                "start_date": date(2015, 5, 1),  # friday
+                "end_date": date(2015, 5, 5),
             }],
             "task_group_objects": self.random_objects
         }]

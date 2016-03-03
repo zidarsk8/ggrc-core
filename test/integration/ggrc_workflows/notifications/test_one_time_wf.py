@@ -73,11 +73,11 @@ class TestOneTimeWorkflowNotification(TestCase):
 
     with freeze_time("2015-05-04"):  # one day befor due date
       _, notif_data = notifications.get_todays_notifications()
-      self.assertEqual(len(notif_data[person_1.email]["due_in"]), 2)
+      self.assertEqual(len(notif_data[person_1.email]["due_in"]), 1)
 
     with freeze_time("2015-05-05"):  # due date
       _, notif_data = notifications.get_todays_notifications()
-      self.assertEqual(len(notif_data[person_1.email]["due_today"]), 2)
+      self.assertEqual(len(notif_data[person_1.email]["due_today"]), 1)
 
   @patch("ggrc.notifications.common.send_email")
   def test_one_time_wf_activate_single_person(self, mock_mail):
@@ -109,19 +109,19 @@ class TestOneTimeWorkflowNotification(TestCase):
         self.assertIn("title", cycle_data["cycle_tasks"][task.id])
         self.assertIn("cycle_task_url", cycle_data["cycle_tasks"][task.id])
 
-    with freeze_time("2015-05-03"):  # two days befor due date
+    with freeze_time("2015-05-03"):  # two days before due date
       _, notif_data = notifications.get_todays_notifications()
       self.assertIn(user, notif_data)
       self.assertNotIn("due_in", notif_data[user])
       self.assertNotIn("due_today", notif_data[user])
 
-    with freeze_time("2015-05-04"):  # one day befor due date
+    with freeze_time("2015-05-04"):  # one day before due date
       _, notif_data = notifications.get_todays_notifications()
-      self.assertEqual(len(notif_data[user]["due_in"]), 3)
+      self.assertEqual(len(notif_data[user]["due_in"]), 2)
 
     with freeze_time("2015-05-05"):  # due date
       _, notif_data = notifications.get_todays_notifications()
-      self.assertEqual(len(notif_data[user]["due_today"]), 3)
+      self.assertEqual(len(notif_data[user]["due_today"]), 2)
 
       notifications.send_todays_digest_notifications()
       self.assertEqual(mock_mail.call_count, 1)

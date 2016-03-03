@@ -10,6 +10,7 @@ import collections
 from datetime import date
 from freezegun import freeze_time
 from integration import ggrc
+import unittest
 
 from ggrc.models import all_models
 from ggrc_workflows import models
@@ -79,6 +80,7 @@ class PreviousWorkflowState(object):
       return cls.get_state(obj.cycle_task_group_objects)
 
 
+@unittest.skip("This test is now obsolete since state is computed differently")
 class TestWorkflowState(ggrc.TestCase):
   """Test class for workflow state refactor.
   """

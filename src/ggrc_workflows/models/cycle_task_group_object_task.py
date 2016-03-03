@@ -7,10 +7,8 @@
 """
 
 from sqlalchemy import orm
-from sqlalchemy import or_
 
 from ggrc import db
-from ggrc.models import all_models
 from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described

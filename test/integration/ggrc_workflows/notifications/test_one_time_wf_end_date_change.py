@@ -74,14 +74,13 @@ class TestOneTimeWfEndDateChange(TestCase):
       # one email to owner and one to assigne
       self.assertEqual(mock_mail.call_count, 2)
 
-    with freeze_time("2015-05-04 03:21:34"):  # one day befor due date
+    with freeze_time("2015-05-04 03:21:34"):  # one day before due date
       _, notif_data = notifications.get_todays_notifications()
       user = get_person(self.user.id)
       self.assertIn("due_in", notif_data[user.email])
-      self.assertEqual(len(notif_data[user.email]["due_in"]),
-                       len(self.random_objects))
+      self.assertEqual(len(notif_data[user.email]["due_in"]), 2)
 
-    with freeze_time("2015-05-04 03:21:34"):  # one day befor due date
+    with freeze_time("2015-05-04 03:21:34"):  # one day before due date
       notifications.send_todays_digest_notifications()
       _, notif_data = notifications.get_todays_notifications()
       self.assertEqual(notif_data, {})
@@ -92,8 +91,7 @@ class TestOneTimeWfEndDateChange(TestCase):
     with freeze_time("2015-05-05 03:21:34"):  # due date
       _, notif_data = notifications.get_todays_notifications()
       self.assertIn("due_today", notif_data[user.email])
-      self.assertEqual(len(notif_data[user.email]["due_today"]),
-                       len(self.random_objects))
+      self.assertEqual(len(notif_data[user.email]["due_today"]), 2)
 
   @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_future(self, mock_mail):
@@ -286,6 +284,12 @@ class TestOneTimeWfEndDateChange(TestCase):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
+                "contact": person_dict(self.user.id),
+                "start_date": date(2015, 5, 1),  # friday
+                "end_date": date(2015, 5, 5),
+            }, {
+                "title": "task 2",
+                "description": "some task 2",
                 "contact": person_dict(self.user.id),
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),

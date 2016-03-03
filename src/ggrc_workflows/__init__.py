@@ -261,8 +261,6 @@ def build_cycle(cycle, current_user=None, base_date=None):
     for task_group_task in task_group.task_group_tasks:
       cycle_task_group_object_task = _create_cycle_task(
           task_group_task, cycle, cycle_task_group, current_user, base_date)
-      cycle_task_group.cycle_task_group_tasks.append(
-          cycle_task_group_object_task)
 
       for task_group_object in task_group.task_group_objects:
         object_ = task_group_object.object
