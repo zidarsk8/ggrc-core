@@ -51,6 +51,13 @@ class CustomAttributeMapable(object):
 
   @declared_attr
   def related_custom_attributes(self):
+    """CustomAttributeValues that directly map to this object.
+
+    Used just to get the backrefs on the CustomAttributeValue object.
+
+    Returns:
+       a sqlalchemy relationship
+    """
     return db.relationship(
         'CustomAttributeValue',
         primaryjoin=lambda: (
