@@ -18,6 +18,8 @@ from alembic import op
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import text
 
+from ggrc.app import app
+
 # mandatory alembic variables
 # pylint: disable=invalid-name
 
@@ -74,9 +76,10 @@ def upgrade():
         break
       if index > 1000:
         # for more than 1000 duplicates we raise error and leave it to the user
-        print '-----------------------------------------------------'
-        print 'More than 1000 duplicates for title {} and definition_type {}'\
-              .format(a['title'], a['definition_type'])
+        app.logger.error(
+            'More than 1000 duplicates for title {} and definition_type {}'.
+            format(a['title'], a['definition_type'])
+        )
         raise StandardError
     records_to_insert[(new_title, a['definition_type'])] = (a['id'], new_title)
 
@@ -89,8 +92,7 @@ def upgrade():
       conn.execute(text(update_record_query), title=v[1], id=v[0])
     transaction.commit()
   except IntegrityError as error:
-    print '---------------------------------------------'
-    print(error)
+    app.logger.error(error)
     transaction.rollback()
     raise StandardError
 
