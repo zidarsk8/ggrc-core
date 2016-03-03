@@ -142,3 +142,18 @@
     }
   }
 }
+
+.items-list {
+  @extend %reset-list;
+  li {
+    margin-bottom: 10px;
+    input {
+      margin-bottom: 0;
+    }
+    .field-wrap {
+      .btn-success {
+        margin-top: 10px;
+      }
+    }
+  }
+}
