@@ -69,8 +69,7 @@ def all_cache_entries():
       # ggrc notification models
       resource('notification_configs', 'NotificationConfig'),
       resource('notifications', 'Notification'),
-      resource('notification_recipients', 'NotificationRecipient'),
-      resource('notification_objects', 'NotificationObject'),
+      resource('notification_type', 'NotificationType'),
 
       # ggrc custom attribuess
       resource('custom_attribute_definitions', 'CustomAttributeDefinition'),
@@ -129,7 +128,7 @@ def all_mapping_entries():
       mapping('ObjectOwner', 'ownable', True),
       mapping('ObjectPerson', 'person'),
       mapping('ObjectPerson', 'personable', True),
-      mapping('Section', 'directive'), # this goes out?
+      mapping('Section', 'directive'),  # this goes out?
       mapping('Relationship', 'source', True),
       mapping('Relationship', 'destination', True),
       mapping('UserRole', 'context'),
