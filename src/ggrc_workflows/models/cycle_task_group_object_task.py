@@ -22,7 +22,6 @@ from ggrc.models.relationship import Relatable
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
-from ggrc_workflows.models.cycle_task_group_object import CycleTaskGroupObject
 
 
 class CycleTaskGroupObjectTask(

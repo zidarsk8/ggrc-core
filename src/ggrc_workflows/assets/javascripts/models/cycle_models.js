@@ -246,50 +246,6 @@
   });
 
 
-  _mustache_path = GGRC.mustache_path + "/cycle_task_group_objects";
-  can.Model.Cacheable("CMS.Models.CycleTaskGroupObject", {
-    root_object: "cycle_task_group_object",
-    root_collection: "cycle_task_group_objects",
-    category: "workflow",
-    findAll: "GET /api/cycle_task_group_objects",
-    findOne: "GET /api/cycle_task_group_objects/{id}",
-    create: "POST /api/cycle_task_group_objects",
-    update: "PUT /api/cycle_task_group_objects/{id}",
-    destroy: "DELETE /api/cycle_task_group_objects/{id}",
-
-    attributes: {
-      cycle_task_group: "CMS.Models.CycleTaskGroup.stub",
-      task_group_object: "CMS.Models.TaskGroupObject.stub",
-      cycle_task_group_object_tasks:
-        "CMS.Models.CycleTaskGroupObjectTask.stubs",
-      modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub",
-      cycle: "CMS.Models.Cycle.stub",
-      object: "CMS.Models.get_stub",
-    },
-
-    tree_view_options: {
-      show_view: _mustache_path + "/tree.mustache",
-      //footer_view: _mustache_path + "/tree_footer.mustache",
-      draw_children: false,
-      child_options: [
-        {
-          model: "CycleTaskGroupObjectTask",
-          mapping: "cycle_task_group_object_tasks",
-          allow_creating: false
-        }
-      ]
-    },
-
-    init: function() {
-      this._super.apply(this, arguments);
-      this.bind("updated", refresh_attr_wrap("cycle_task_group").bind(this));
-    }
-  }, {
-    overdue: overdue_compute
-  });
-
-
   _mustache_path = GGRC.mustache_path + "/cycle_task_group_object_tasks";
   can.Model.Cacheable("CMS.Models.CycleTaskGroupObjectTask", {
     root_object: "cycle_task_group_object_task",
@@ -302,7 +258,6 @@
     destroy: "DELETE /api/cycle_task_group_object_tasks/{id}",
 
     attributes: {
-      cycle_task_group_object: "CMS.Models.CycleTaskGroupObject.stub",
       cycle_task_group: "CMS.Models.CycleTaskGroup.stub",
       task_group_task: "CMS.Models.TaskGroupTask.stub",
       cycle_task_entries: "CMS.Models.CycleTaskEntry.stubs",
@@ -327,7 +282,6 @@
       show_view: _mustache_path + "/tree.mustache",
       attr_list : [
         {attr_title: 'Title', attr_name: 'title'},
-        {attr_title: 'Mapped Object', attr_name: 'mapped_object', attr_sort_field: 'cycle_task_group_object.title'},
         {attr_title: 'Workflow', attr_name: 'workflow', attr_sort_field: 'cycle.workflow.title'},
         {attr_title: 'State', attr_name: 'status'},
         {attr_title: 'Assignee', attr_name: 'assignee', attr_sort_field: 'contact.name|email'},
@@ -367,7 +321,7 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          instance.refresh_all_force('cycle_task_group_object', 'task_group_object', 'object').then(function(object) {
+          instance.refresh_all_force('task_group_object', 'object').then(function(object) {
             return instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
           });
         }
@@ -381,7 +335,7 @@
       });
     },
     object: function() {
-      return this.refresh_all('cycle_task_group_object', 'task_group_object', 'object').then(function(object){
+      return this.refresh_all('task_group_object', 'object').then(function(object){
         return object;
       });
     },

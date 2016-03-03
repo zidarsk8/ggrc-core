@@ -86,7 +86,6 @@ class TaskGroupable(object):
           primaryjoin=joinstr,
           backref='{0}_object'.format(cls.__name__),
           cascade='all, delete-orphan',
-          #post_update=True
           )
     cls.task_group_objects = make_task_group_objects(cls)
 
@@ -95,9 +94,7 @@ class TaskGroupable(object):
       'task_group_objects',
       ]
 
-  _include_links = [
-      #'task_group_objects',
-      ]
+  _include_links = []
 
   @classmethod
   def eager_query(cls):

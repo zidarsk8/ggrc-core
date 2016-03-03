@@ -43,7 +43,6 @@
       'cycle': CMS.Models.Cycle,
       'cycle_task_entry': CMS.Models.CycleTaskEntry,
       'cycle_task_group': CMS.Models.CycleTaskGroup,
-      'cycle_task_group_object': CMS.Models.CycleTaskGroupObject,
       'cycle_task_group_object_task': CMS.Models.CycleTaskGroupObjectTask,
       'task_group': CMS.Models.TaskGroup,
       'workflow': CMS.Models.Workflow
@@ -100,8 +99,7 @@
               return result.instance.attr("is_current");
             }),
           current_task_groups: Cross("current_cycle", "cycle_task_groups"),
-          current_task_group_objects: Cross("current_task_groups", "cycle_task_group_objects_for_page_object"),
-          current_tasks: Cross("current_task_groups", "cycle_task_group_object_tasks_for_page_object"),
+          current_tasks: Cross("current_task_groups", "cycle_task_group_object_tasks"),
           current_all_tasks: Cross("current_task_groups", "cycle_task_group_tasks"),
 
           people: Proxy(
@@ -142,37 +140,10 @@
         CycleTaskGroup: {
           cycle: Direct(
             "Cycle", "cycle_task_groups", "cycle"),
-          cycle_task_group_objects: Direct(
-            "CycleTaskGroupObject",
-            "cycle_task_group",
-            "cycle_task_group_objects"),
           cycle_task_group_tasks: Direct(
             "CycleTaskGroupObjectTask",
             "cycle_task_group",
-            "cycle_task_group_tasks"),
-          cycle_task_group_objects_for_page_object: CustomFilter(
-            "cycle_task_group_objects", function(object) {
-              var obj = object.instance.object;
-              return obj && obj.reify() === GGRC.page_instance();
-            }),
-          cycle_task_group_object_tasks_for_page_object: Cross(
-            "cycle_task_group_objects_for_page_object", "cycle_task_group_object_tasks"
-            )
-        },
-
-        CycleTaskGroupObject: {
-          cycle: Direct(
-            "Cycle", "cycle_task_group_objects", "cycle"),
-          cycle_task_group: Direct(
-            "CycleTaskGroup", "cycle_task_group_objects", "cycle_task_group"),
-          task_group_object: Direct(
-            "TaskGroupObject", "task_group_objects", "task_group_object"
-          ),
-          _object: Direct(null, null, 'object'),
-          cycle_task_group_object_tasks: Direct(
-            "CycleTaskGroupObjectTask",
-            "cycle_task_group_object",
-            "cycle_task_group_object_tasks")
+            "cycle_task_group_tasks")
         },
 
         CycleTaskGroupObjectTask: {
@@ -219,10 +190,6 @@
           objectives: TypeFilter("related_objects", "Objective"),
           cycle: Direct(
             "Cycle", "cycle_task_group_object_tasks", "cycle"),
-          cycle_task_group_object: Direct(
-            "CycleTaskGroupObject",
-            "cycle_task_group_object_tasks",
-            "cycle_task_group_object"),
           cycle_task_group: Direct(
             "CycleTaskGroup",
             "cycle_task_group_object_tasks",
@@ -231,9 +198,6 @@
             "CycleTaskEntry",
             "cycle_task_group_object_task",
             "cycle_task_entries"),
-          _object: Cross(
-            "cycle_task_group_object", '_object'
-          ),
           info_related_objects: CustomFilter("related_objects", function (related_objects) {
             return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
           }),
@@ -291,22 +255,14 @@
       if (model === undefined || model === null) {
         return;
       }
-      model.attributes.cycle_objects = 'CMS.Models.CycleTaskGroupObject.stubs';
       mappings[type] = {
         task_groups: new GGRC.ListLoaders.ProxyListLoader('TaskGroupObject', 'object', 'task_group', 'task_group_objects', null),
-        cycle_objects: Direct('CycleTaskGroupObject', 'object', 'cycle_task_group_objects'),
-        object_tasks: Cross('cycle_objects', 'cycle_task_group_object_tasks'),
+        object_tasks: TypeFilter("related_objects", "CycleTaskGroupObjectTask"),
         approval_tasks: Search(function (binding) {
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
             'cycle_task_group_object.object_id': binding.instance.id,
             'cycle_task_group_object.object_type': binding.instance.type,
             'cycle.workflow.object_approval': true
-          });
-        }, "Cycle"),
-        object_tasks_with_history: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            'cycle_task_group_object.object_id': binding.instance.id,
-            'cycle_task_group_object.object_type': binding.instance.type
           });
         }, "Cycle"),
         workflows: Cross('task_groups', 'workflow'),
@@ -382,15 +338,6 @@
             model: CMS.Models.Workflow,
             show_view: GGRC.mustache_path + "/workflows/tree.mustache",
             footer_view: null,
-            draw_children: true,
-            child_options: [{
-              title_plural: "Current Tasks",
-              model: CMS.Models.CycleTaskGroupObjectTask,
-              mapping: "current_tasks",
-              allow_creating: true,
-              show_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/tree.mustache",
-              footer_view: GGRC.mustache_path + "/cycle_task_group_object_tasks/current_tg_tree_footer.mustache"
-            }]
           }
         },
         task: {

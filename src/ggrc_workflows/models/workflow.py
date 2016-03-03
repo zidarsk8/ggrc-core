@@ -338,12 +338,3 @@ class WorkflowState(object):
   @computed_property
   def workflow_state(self):
     return WorkflowState.get_object_state(self.cycle_task_group_object_tasks)
-
-  @classmethod
-  def eager_query(cls):
-    query = super(WorkflowState, cls).eager_query()
-    return query.options(
-        orm.subqueryload('cycle_task_group_objects')
-        .undefer_group('CycleTaskGroupObject_complete'),
-        orm.subqueryload_all('cycle_task_group_objects.cycle'),
-    )

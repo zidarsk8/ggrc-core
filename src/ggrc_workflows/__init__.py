@@ -69,7 +69,6 @@ def contributed_services():
       service('cycles', models.Cycle),
       service('cycle_task_entries', models.CycleTaskEntry),
       service('cycle_task_groups', models.CycleTaskGroup),
-      service('cycle_task_group_objects', models.CycleTaskGroupObject),
       service('cycle_task_group_object_tasks', models.CycleTaskGroupObjectTask)
   ]
 
@@ -624,8 +623,6 @@ def handle_cycle_task_entry_post(
   if src['is_declining_review'] == '1':
     task = obj.cycle_task_group_object_task
     task.status = 'Declined'
-    task.cycle_task_group_object.object.os_state = 'Declined'
-    task.cycle_task_group_object.object.skip_os_state_update()
     db.session.add(obj)
   else:
     src['is_declining_review'] = 0
