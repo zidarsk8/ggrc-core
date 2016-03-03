@@ -44,10 +44,22 @@ class CustomAttributeValue(Base, db.Model):
 
   @property
   def attribute_object(self):
+    """Fetch the object referred to by attribute_object_id.
+
+    Use backrefs defined in CustomAttributeMapable.
+
+    Returns:
+        A model instance of type specified in attribute_value
+    """
     return getattr(self, self._attribute_object_attr)
 
   @attribute_object.setter
   def attribute_object(self, value):
+    """Set attribute_object_id via whole object.
+
+    Args:
+        value: model instance
+    """
     self.attribute_object_id = value.id
     return setattr(self, self._attribute_object_attr, value)
 
