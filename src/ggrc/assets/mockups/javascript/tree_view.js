@@ -6,27 +6,16 @@
 */
 
 (function (can, $, Generator) {
-   can.Control("CMS.Controllers.MockupTreeView", {
-    }, {
+  can.Control('CMS.Controllers.MockupTreeView', {
+  }, {
     init: function (el, opts) {
       can.each(this.options.instance.children, function (child) {
-        var $item = $("<li/>", {class: "tree-item"});
+        var $item = $('<li/>', {'class': 'tree-item'});
         new CMS.Controllers.MockupTreeItem($item, {
           item: child
         });
         this.element.append($item);
       }, this);
-    },
-    "{can.route} item": function (router, ev, item) {
-      if (!item || !item.length) {
-        return;
-      }
-      item = item.split("-");
-      var view = _.findWhere(this.options.instance.children, {
-            type: item[0],
-            id: item[1]
-          });
-      // view && view.attr("active", true);
     },
     '{can.route} item': function (router, ev, current, previous) {
       if (!previous) {
@@ -103,7 +92,7 @@
     }
   });
 
-  can.Control("CMS.Controllers.MockupTreeItem", {
+  can.Control('CMS.Controllers.MockupTreeItem', {
     defaults: {
       templates: {
         task: '/static/mustache/mockup_base_templates/tree_item_task.mustache',
@@ -115,15 +104,15 @@
   }, {
     init: function (el, options) {
       var template = this.options.templates[options.item.type] ||
-        this.options.templates['default'];
+        this.options.templates.default;
 
       this.element.html(can.view(template, options.item));
       can.each(options.item.children, function (child) {
-        var $item = $("<li/>", {class: "tree-item"});
+        var $item = $('<li/>', {'class': 'tree-item'});
         new CMS.Controllers.MockupTreeItem($item, {
           item: child
         });
-        this.element.find(".tree-structure").append($item);
+        this.element.find('.tree-structure').append($item);
       }, this);
     },
     '.select click': function (el, ev) {
