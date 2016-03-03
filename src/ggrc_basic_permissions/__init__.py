@@ -165,16 +165,22 @@ def objects_via_relationships_query(user_id, context_not_role=False):
   _relationship = aliased(all_models.Relationship, name="rl")
   _user_role = aliased(all_models.UserRole, name="ur")
 
-  def _add_relationship_join(query):
-    return query.join(_program, or_(
-        and_(_relationship.source_type == 'Program',
-             _program.id == _relationship.source_id),
-        and_(_relationship.destination_type == 'Program',
-             _program.id == _relationship.destination_id))).\
+  def _join_filter(query, cond):
+    return query.join(_program, cond).\
         join(_user_role, _program.context_id == _user_role.context_id).\
         join(_role, _user_role.role_id == _role.id).\
         filter(and_(_user_role.person_id == user_id, _role.name.in_(
             ('ProgramEditor', 'ProgramOwner', 'ProgramReader'))))
+
+  def _add_relationship_join(query):
+    # We do a UNION here because using an OR to JOIN both destination
+    # and source causes a full table scan
+    return _join_filter(query,
+                        and_(_relationship.source_type == 'Program',
+                             _program.id == _relationship.source_id))\
+        .union(_join_filter(query,
+                            and_(_relationship.destination_type == 'Program',
+                                 _program.id == _relationship.destination_id)))
 
   objects = _add_relationship_join(db.session.query(
       case([
