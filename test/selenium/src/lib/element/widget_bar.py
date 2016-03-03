@@ -22,4 +22,4 @@ class Tab(base.Tab):
     Returns:
         number of members (int)
     """
-    return int(self._element.text.split("(")[-1][:-1])
+    return int(self.element.text.split("(")[-1][:-1])
