@@ -872,8 +872,8 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
     var steps = 0;
     var visible = [];
     var already_visible = _.filter(this.element[0].children, function (e) {
-      // doing this manualy is 10x faster than a jQuery selector and performance
-      // here matters since it runs on every scroll event on a potentialy long
+      // doing this manually is 10x faster than a jQuery selector and performance
+      // here matters since it runs on every scroll event on a potentially long
       // list of items
       return e.tagName == "LI";
     });
