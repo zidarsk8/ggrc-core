@@ -49,6 +49,7 @@ dashboard-js-files:
   - plugins/autocomplete.js
   - plugins/ajax_extensions.js
   - plugins/canjs_extensions.js
+  - plugins/component_registry.js
   - plugins/openclose.js
   - plugins/tooltip.js
   - plugins/popover.js
