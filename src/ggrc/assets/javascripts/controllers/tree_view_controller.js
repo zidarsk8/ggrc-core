@@ -349,7 +349,17 @@ can.Control('CMS.Controllers.TreeLoader', {
         can.map(filtered_items, function (item) {
           var instance = item.instance || item;
           if (instance.custom_attribute_values) {
-            return instance.refresh_all('custom_attribute_values');
+            return instance.refresh_all('custom_attribute_values').then(function (values) {
+              var rq = new RefreshQueue();
+              _.each(values, function (value) {
+                if (value.attribute_object) {
+                  rq.enqueue(value.attribute_object);
+                }
+              });
+              return rq.trigger().then(function () {
+                return values;
+              });
+            });
           }
         }));
     } else {

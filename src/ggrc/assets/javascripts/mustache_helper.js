@@ -3209,8 +3209,9 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
   Used to get the string value for custom attributes
 */
 Mustache.registerHelper('get_custom_attr_value', function (attr_info, instance) {
-  var ins, atr, ins_type, attr_name, value = '', custom_attr_id = 0,
+  var ins, atr, ins_type, attr_name, value = '',
       custom_attr_defs = GGRC.custom_attr_defs;
+  var definition;
 
   ins = Mustache.resolve(instance);
   ins_type = ins.class.table_singular;
@@ -3219,15 +3220,19 @@ Mustache.registerHelper('get_custom_attr_value', function (attr_info, instance) 
 
   can.each(custom_attr_defs, function (item) {
     if (item.definition_type === ins_type && item.title === attr_name) {
-      custom_attr_id = item.id;
+      definition = item;
     }
   });
 
-  if (custom_attr_id) {
+  if (definition) {
     can.each(ins.custom_attribute_values, function (item) {
       item = item.reify();
-      if (item.custom_attribute_id === custom_attr_id) {
-        value = item.attribute_value;
+      if (item.custom_attribute_id === definition.id) {
+        if (definition.attribute_type.startsWith('Map:')) {
+          value = item.attribute_object.reify().display_name();
+        } else {
+          value = item.attribute_value;
+        }
       }
     });
   }
