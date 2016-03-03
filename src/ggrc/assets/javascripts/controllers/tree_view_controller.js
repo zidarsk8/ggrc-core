@@ -1046,7 +1046,7 @@ CMS.Controllers.TreeLoader("CMS.Controllers.TreeView", {
 
     can.each(current_list, function(item) {
       list_window.push(item);
-      if (list_window.length >= 50) {
+      if (list_window.length >= 500) {
         queue.push(list_window);
         list_window = [];
       }
