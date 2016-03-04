@@ -18,7 +18,14 @@
     template: can.view(GGRC.mustache_path + '/assessment_templates/attribute_field.mustache'),
     scope: {
       removeField: function (scope, el, ev) {
+        var fileds = scope.attr('fields');
+        var field = scope.attr('field');
+        var index = _.findIndex(fileds, function (item) {
+          return item.type === field.type && item.title === field.title;
+        });
 
+        ev.preventDefault();
+        fileds.splice(index, 1);
       },
       attrs: function () {
         return _.compact(_.map(this.attr('field.values').split(','), function (value) {
@@ -51,13 +58,21 @@
       addFiled: function (scope, el, ev) {
         var fields = this.attr('fields');
         var selected = this.attr('selected');
+        var title = _.trim(selected.title);
+        var type = _.trim(selected.type);
+        var values = _.uniq(_.map(
+          selected.values.split(','), _.trim)).join(',');
 
         ev.preventDefault();
+        if (!type || !values || !title) {
+          return;
+        }
 
         fields.push({
-          title: selected.title,
-          type: selected.type,
-          values: selected.values
+          title: title,
+          type: type,
+          values: values,
+          opts: new can.Map()
         });
         _.each(['title', 'values'], function (type) {
           selected.attr(type, '');
@@ -66,8 +81,10 @@
     },
     events: {
       inserted: function () {
+        var types = this.scope.attr('types');
+
         if (!this.scope.attr('selected.type')) {
-          this.scope.attr('selected', this.scope.attr('types')[0]);
+          this.scope.attr('selected.type', _.first(types).attr('type'));
         }
       }
     },
