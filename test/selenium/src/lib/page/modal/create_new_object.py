@@ -26,3 +26,13 @@ class NewOrgGroupModal(base.OrgGroupModal, base.CreateNewObjectModal):
 class NewRiskModal(base.RiskModal, base.CreateNewObjectModal):
   """Class representing a risk modal visible after creating a new
   risk from LHN"""
+
+
+class NewRequestModal(base.RequestModal, base.CreateNewObjectModal):
+  """Class representing an request modal visible after creating a new
+  request from LHN"""
+
+
+class NewIssueModal(base.IssueModal, base.CreateNewObjectModal):
+  """Class representing an issue visible after creating a new
+  issue from LHN"""
