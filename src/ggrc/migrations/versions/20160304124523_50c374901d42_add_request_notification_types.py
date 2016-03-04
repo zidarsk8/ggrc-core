@@ -1,0 +1,70 @@
+
+"""Add request notification types
+
+Revision ID: 50c374901d42
+Revises: 4e989ef86619
+Create Date: 2016-03-04 12:45:23.024224
+
+"""
+
+import sqlalchemy as sa
+from alembic import op
+from sqlalchemy.sql import column
+from sqlalchemy.sql import table
+
+# revision identifiers, used by Alembic.
+revision = '50c374901d42'
+down_revision = '1839dabd2357'
+
+NOTIFICATION_TYPES = table(
+    'notification_types',
+    column('id', sa.Integer),
+    column('name', sa.String),
+    column('description', sa.Text),
+    column('template', sa.String),
+    column('instant', sa.Boolean),
+    column('advance_notice', sa.Integer),
+    column('advance_notice_end', sa.Integer),
+    column('created_at', sa.DateTime),
+    column('modified_by_id', sa.Integer),
+    column('updated_at', sa.DateTime),
+    column('context_id', sa.Integer),
+)
+
+def upgrade():
+
+  op.bulk_insert(
+      NOTIFICATION_TYPES,
+      [{
+          "name": "request_open",
+          "description": ("Notify all assignees Requesters Assignees and "
+                          "Verifiers that a new request has been created."),
+          "template": "request_open",
+          "advance_notice": 0,
+          "instant": False,
+      }, {
+          "name": "request_declined",
+          "description": "Notify Requester that a request has been declined.",
+          "template": "request_declined",
+          "advance_notice": 0,
+          "instant": False,
+      }, {
+          "name": "request_manual",
+          "description": "Send a manual notification to the Requester.",
+          "template": "request_manual",
+          "advance_notice": 0,
+          "instant": False,
+      }]
+  )
+
+
+def downgrade():
+  op.execute(
+    NOTIFICATION_TYPES.delete().where(
+      NOTIFICATION_TYPES.c.name.in_([
+        "request_open",
+        "request_declined",
+        "request_manual",
+      ])
+    )
+  )
