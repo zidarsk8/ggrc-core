@@ -16,7 +16,74 @@ class PageHeader(object):
   PROPLE_LIST_WIDGET = "Admin Dashboard"
 
 
-class LhnMenu(object):
+class Lhn(object):
+  """Labels in the LHN menu"""
+  PROGRAMS = "programs"
+  WORKFLOWS = "workflows"
+  AUDITS = "audits"
+  ASSESSMENTS = "assessments"
+  REQUESTS = "requests"
+  ISSUES = "issues"
+
+  DIRECTIVES = "directives"
+  REGULATIONS = "regulations"
+  POLICIES = "policies"
+  STANDARDS = "standards"
+  CONTRACTS = "contracts"
+  CLAUSES = "clauses"
+  SECTIONS = "sections"
+
+  CONTROLS_OR_OBJECTIVES = "controls_or_objectives"
+  CONTROLS = "controls"
+  OBJECTIVES = "objectives"
+
+  PEOPLE_OR_GROUPS = "people_or_groups"
+  PEOPLE = "people"
+  ORG_GROUPS = "org_groups"
+  VENDORS = "vendors"
+  ACCESS_GROUPS = "access_groups"
+
+  ASSETS_OR_BUSINESS = "assets_or_business"
+  SYSTEMS = "systems"
+  PROCESSES = "processes"
+  DATA_ASSETS = "data_assets"
+  PRODUCTS = "products"
+  PROJECTS = "projects"
+  FACILITIES = "facilities"
+  MARKETS = "markets"
+
+  RISKS_OR_THREATS = "risks_or_threats"
+  RISKS = "risks"
+  THREATS = "threats"
+
+  DIRECTIVES_MEMBERS = (
+      REGULATIONS,
+      POLICIES,
+      STANDARDS,
+      CONTRACTS,
+      CLAUSES,
+      SECTIONS)
+  CONTROLS_OR_OBJECTIVES_MEMBERS = (
+    CONTROLS,
+    OBJECTIVES)
+  PEOPLE_OR_GROUPS_MEMBERS = (
+    PEOPLE,
+    ORG_GROUPS,
+    VENDORS,
+    ACCESS_GROUPS)
+  ASSETS_OR_BUSINESS_MEMBERS = (
+    SYSTEMS,
+    PROCESSES,
+    DATA_ASSETS,
+    PRODUCTS,
+    PROJECTS,
+    FACILITIES,
+    MARKETS)
+  RISKS_OR_THREATS_MEMBERS = (
+    RISKS,
+    THREATS)
+
+class ModalLhnCreateProgram(object):
   # create new program
   DATE_FORMATTING = "%d/%m/%Y"
   OBJECT_REVIEW = "Object Review"

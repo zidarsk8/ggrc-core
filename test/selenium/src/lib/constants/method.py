@@ -3,18 +3,7 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-from lib.constants import (
-  cls,
-  element,  # flake8: noqa
-  log,
-  path,
-  yaml,
-  locator,
-  method,
-  path,
-  regex,
-  url,
-  ux,
-  tag,
-  test_runner
-)
+"""Module with names of pre and postfixes of methods used in various
+classes. Note that all the values should be in lower case."""
+
+SELECT_PREFIX = "select_"

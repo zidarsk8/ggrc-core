@@ -3,18 +3,9 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-from lib.constants import (
-  cls,
-  element,  # flake8: noqa
-  log,
-  path,
-  yaml,
-  locator,
-  method,
-  path,
-  regex,
-  url,
-  ux,
-  tag,
-  test_runner
-)
+"""Module with names of pre and postfixes of classes used.
+Note that all the values should be in lower case."""
+
+TEST_MODAL_NEW_PREFIX = "modalnew"
+TEST_MODAL_NEW_POSTFIX = "page"
+INFO_POSTFIX = "info"
