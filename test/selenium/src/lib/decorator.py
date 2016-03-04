@@ -3,15 +3,20 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+"""Module containing decorators"""
+
+import time
 from functools import wraps
+
+from lib import exception
 from lib import environment
 from lib import constants
 from lib import file_ops
 
 
 def take_screenshot_on_error(fun):
+  """Decorates methods and makes a screenshot on any exception"""
   # todo: replace with pytest-selenium which automagically takes
-  # screenshots on failures
   @wraps(fun)
   def wrapper(self, *args, **kwargs):
     try:
@@ -26,4 +31,25 @@ def take_screenshot_on_error(fun):
       args[0].driver.get_screenshot_as_file(unique_file_path)
       raise
 
+  return wrapper
+
+
+def wait_for_redirect(fun):
+  """Decorates methods and waits until url has changed"""
+  @wraps(fun)
+  def wrapper(self, *args, **kwargs):
+    from_url = self._driver.current_url
+    result = fun(self, *args, **kwargs)
+
+    timer_start = time.time()
+
+    while from_url == self._driver.current_url:
+      time.sleep(0.1)
+
+      if time.time() - timer_start > constants.ux.MAX_USER_WAIT_SECONDS:
+        raise exception.RedirectTimeout(
+            "Failed to redirect from {} to {}".format(
+                from_url, self._driver.current_url))
+
+    return result
   return wrapper

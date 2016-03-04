@@ -4,7 +4,6 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import random
-import copy
 import textwrap
 from integration.ggrc import TestCase
 from freezegun import freeze_time
@@ -12,13 +11,11 @@ from datetime import date, datetime
 
 import os
 from ggrc import db
-from ggrc.models import *
-from ggrc import notification
-from ggrc_workflows.models import Workflow, TaskGroup, CycleTaskGroupObjectTask, Cycle
+from ggrc import notifications
+from ggrc.models import Notification
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
-from nose.plugins.skip import SkipTest
 
 
 if os.environ.get('TRAVIS', False):
@@ -66,7 +63,6 @@ class TestOneTimeWorkflowNotification(TestCase):
         "type": obj.__class__.__name__,
     }
 
-
   def test_one_time_wf(self):
     # setup
     with freeze_time("2015-04-07 03:21:34"):
@@ -82,23 +78,20 @@ class TestOneTimeWorkflowNotification(TestCase):
               city in New Zealand that contains 97 letter."""),
       })
 
-      tg_response, tg = self.wf_generator.generate_task_group(wf, data={
+      _, tg = self.wf_generator.generate_task_group(wf, data={
           "title": "TG #1 for the One-time WF",
           "contact": self.short_dict(self.tgassignee1, "people"),
       })
 
-      tgt_response, tgt = self.wf_generator.generate_task_group_task(tg, {
+      self.wf_generator.generate_task_group_task(tg, {
           "title": "task #1 for one-time workflow",
           "contact": self.short_dict(self.member1, "people"),
           "start_date": "04/07/2015",
           "end_date": "04/15/2015",
       })
 
-      tgo_response, tgo = self.wf_generator.generate_task_group_object(
-          tg, self.random_objects[0])
-      tgo_response, tgo = self.wf_generator.generate_task_group_object(
-          tg, self.random_objects[1])
-
+      self.wf_generator.generate_task_group_object(tg, self.random_objects[0])
+      self.wf_generator.generate_task_group_object(tg, self.random_objects[1])
 
     # test
     with freeze_time("2015-04-07 03:21:34"):
@@ -109,10 +102,7 @@ class TestOneTimeWorkflowNotification(TestCase):
       db.session.add(self.tgassignee1)
       db.session.add(self.member1)
 
-      notifications = notification.get_todays_notifications()
-
-
-
+      notifications.get_todays_notifications()
 
   def create_test_cases(self):
     def person_dict(person_id):
@@ -175,5 +165,3 @@ class TestOneTimeWorkflowNotification(TestCase):
     _, self.member2 = self.object_generator.generate_person(
         # data={"name": "User4 Member2", "email": "user4.member2@gmail.com"},
         user_role="gGRC Admin")
-
-

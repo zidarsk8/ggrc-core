@@ -3,118 +3,42 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-from lib import base
-from lib import environment
-from lib import selenium_utils
-from lib.constants import url
+"""Models for the custom attribute widget"""
+
+from lib.page.widget import base
 from lib.constants import locator
 
 
-class _Dropdown(base.Component):
-  """A generic model for a dropdown in custom attributes"""
-
-  def __init__(self, driver, locator_button_add):
-    super(_Dropdown, self).__init__(driver)
-    self.button_add = base.Button(driver, locator_button_add)
-
-  def add_new_custom_attribute(self):
-    """
-    Returns:
-        new_custom_attribute.NewCustomAttributeModal
-    """
-    selenium_utils.wait_until_stops_moving(self.button_add)
-    self.button_add.click()
-    return NewCustomAttributeModal(self._driver)
-
-
-class NewCustomAttributeModal(base.Modal):
-  """Model for the custom attribute modal"""
-
-  _locator = locator.ModalCustomAttribute
-
-  def __init__(self, driver):
-    super(NewCustomAttributeModal, self).__init__(driver)
-    self.attribute_title = base.Label(
-        self._driver, self._locator.ATTRIBUTE_TITLE)
-    self.inline_help = base.Label(self._driver, self._locator.INLINE_HELP)
-    self.attribute_type = base.Label(
-        self._driver, self._locator.ATTRIBUTE_TYPE)
-    self.placeholder = base.Label(self._driver, self._locator.PLACEHOLDER)
-    self.mandatory = base.Label(self._driver, self._locator.MANDATORY)
-    self.ui_attribute_title = base.TextInputField(
-        self._driver, self._locator.UI_ATTRIBUTE_TITLE)
-    self.ui_inline_help = base.TextInputField(
-        self._driver, self._locator.UI_INLINE_HELP)
-    self.ui_placeholder = base.TextInputField(
-        self._driver, self._locator.UI_PLACEHOLDER)
-    self.checkbox_mandatory = base.Checkbox(
-        self._driver, self._locator.CHECKBOX_MANDATORY)
-    self.button_submit = base.Button(
-        self._driver, self._locator.BUTTON_SAVE)
-    self.button_add_more = base.Button(
-        self._driver, self._locator.BUTTON_ADD_ANOTHER)
-
-  def enter_title(self, title):
-    self.ui_attribute_title.enter_text(title)
-
-  def enter_inline_help(self, inline_help):
-    self.ui_inline_help.enter_text(inline_help)
-
-  def enter_placeholder(self, placeholder):
-    self.ui_placeholder.enter_text(placeholder)
-
-  def check_is_mandatory(self):
-    self.checkbox_mandatory.click()
-
-  def save_and_close(self):
-    """
-    Returns:
-        custom_attribute.AdminCustomAttributes
-    """
-    self.button_submit.click()
-    return AdminCustomAttributes(self._driver)
-
-  def save_and_add_another(self):
-    """
-    Returns:
-        NewCustomAttributeModal
-    """
-    self.button_add_more.click_when_visible()
-    return NewCustomAttributeModal(self._driver)
-
-
-class AdminCustomAttributes(base.Widget):
-  """Model for custom attributes on the admin dashboard page"""
-
-  _locator = locator.AdminCustomAttributes
-  URL = environment.APP_URL \
-      + url.ADMIN_DASHBOARD \
-      + url.Widget.CUSTOM_ATTRIBUTES
-
-  def __init__(self, driver):
-    super(AdminCustomAttributes, self).__init__(driver)
-    self.filter = base.Filter(
-        self._driver,
-        self._locator.FILTER_INPUT_FIELD,
-        self._locator.FILTER_BUTTON_SUBMIT,
-        self._locator.FILTER_BUTTON_RESET
-    )
-    self.button_workflows = base.Button(
-        self._driver, self._locator.BUTTON_WORKFLOWS)
-    self.button_risk_assessments = base.Button(
-        self._driver, self._locator.BUTTON_RISK_ASSESSMENTS)
-    self.button_threats = base.Button(
-        self._driver, self._locator.BUTTON_THREATS)
-    self.button_risks = base.Button(
-        self._driver, self._locator.BUTTON_RISKS)
-    self.button_programs = base.Button(
-        self._driver, self._locator.BUTTON_PROGRAMS)
+class AdminCustomAttributes(base.WidgetAdminCustomAttributes):
+  """Model for custom attributes widget on the admin dashboard page"""
 
   def select_programs(self):
     """
     Returns:
-        _Dropdown
+        DropdownPrograms
     """
     self.button_programs.click()
-    return _Dropdown(self._driver,
-                     self._locator.BUTTON_ADD_CUSTOM_PROGRAM_ATTR)
+    return DropdownPrograms(self._driver)
+
+
+class NewCustomAttributeModal(base.CustomAttributeModal,
+                              base.CreateNewCustomAttributeModal):
+  """Model for the custom attribute modal"""
+
+
+class DropdownPrograms(base.Dropdown):
+  """Model for programs dropdown"""
+
+  _locator_button_add = locator.AdminCustomAttributes\
+      .BUTTON_ADD_CUSTOM_PROGRAM_ATTR
+  _locator_label_attribute_name = locator.AdminCustomAttributes\
+      .PROGRAMS_LABEL_ATTRIBUTE_NAME
+  _locator_label_attribute_type = locator.AdminCustomAttributes\
+      .PROGRAMS_LABEL_ATTRIBUTE_TYPE
+  _locator_label_mandatory = locator.AdminCustomAttributes\
+      .PROGRAMS_LABEL_MANDATORY
+  _locator_label_edit = locator.AdminCustomAttributes.PROGRAMS_LABEL_EDIT
+  _locator_listed_members = locator.AdminCustomAttributes.LISTED_MEMBERS
+  _locator_buttons_edit = locator.AdminCustomAttributes\
+      .BUTTON_LISTED_MEMBERS_EDIT
+  _cls_new_attrb_modal = NewCustomAttributeModal

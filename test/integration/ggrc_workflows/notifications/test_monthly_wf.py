@@ -10,10 +10,9 @@ from datetime import datetime
 from mock import patch
 
 import os
-from ggrc import notification
+from ggrc import notifications
 from ggrc.models import Notification, Person
 from ggrc_workflows import start_recurring_cycles
-from ggrc_workflows.views import send_todays_digest_notifications
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
@@ -51,7 +50,7 @@ class TestMonthlyWorkflowNotification(TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  @patch("ggrc.notification.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_auto_generate_cycle(self, mock_mail):
 
     with freeze_time("2015-04-01"):
@@ -61,36 +60,35 @@ class TestMonthlyWorkflowNotification(TestCase):
       person_1 = Person.query.get(self.person_1.id)
 
     with freeze_time("2015-04-02"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertIn(person_1.email, notif_data)
       self.assertIn("cycle_starts_in", notif_data[person_1.email])
 
     with freeze_time("2015-04-02"):
-      send_todays_digest_notifications()
-      _, notif_data = notification.get_todays_notifications()
+      self.api.tc.get("nightly_cron_endpoint")
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(person_1.email, notif_data)
 
     with freeze_time("2015-04-02"):
       start_recurring_cycles()
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(person_1.email, notif_data)
 
     # cycle starts on monday - 6th, and not on 5th
     with freeze_time("2015-04-03"):
       start_recurring_cycles()
 
-
     with freeze_time("2015-04-15"):  # one day befor due date
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       person_1 = Person.query.get(self.person_1.id)
       self.assertIn(person_1.email, notif_data)
 
     with freeze_time("2015-04-25"):  # due date
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       person_1 = Person.query.get(self.person_1.id)
       self.assertIn(person_1.email, notif_data)
 
-  @patch("ggrc.notification.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_manual_generate_cycle(self, mock_mail):
 
     with freeze_time("2015-04-01"):
@@ -100,16 +98,16 @@ class TestMonthlyWorkflowNotification(TestCase):
       person_1 = Person.query.get(self.person_1.id)
 
     with freeze_time("2015-04-03"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
 
     with freeze_time("2015-04-03"):
       _, cycle = self.wf_generator.generate_cycle(wf)
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       person_1 = Person.query.get(self.person_1.id)
       self.assertIn("cycle_started", notif_data[person_1.email])
 
     with freeze_time("2015-05-03"):  # two days befor due date
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       person_1 = Person.query.get(self.person_1.id)
       self.assertIn(person_1.email, notif_data)
 
