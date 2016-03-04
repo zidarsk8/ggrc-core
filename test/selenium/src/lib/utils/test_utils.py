@@ -40,7 +40,7 @@ class HtmlParser(base.Test):
     return re.sub(r'\s+', " ", text)
 
 
-class ModalNewControlPage(base.Test):
+class ModalNewControlsPage(base.Test):
   """Methods for simulating common user actions"""
 
   @staticmethod
@@ -59,9 +59,25 @@ class ModalNewControlPage(base.Test):
     modal.enter_code(append_random_string(modal_create_new.SHORT_TITLE))
 
 
-class ModalNewProgramPage(base.Test):
+class ModalNewProgramsPage(base.Test):
   """Methods for simulating common user actions"""
 
+  @staticmethod
+  def set_start_end_dates(modal, day_start, day_end):
+    """
+    Sets the dates from the datepicker in the new program/edit modal.
+
+    Args:
+      modal (lib.page.modal.edit_object.EditProgramModal)
+      day_start (int): for more info see
+        base.DatePicker.select_day_in_current_month
+      day_end (int): for more info see
+        base.DatePicker.select_day_in_current_month
+    """
+    modal.enter_effective_date_start_month(day_start)
+    modal.enter_stop_date_end_month(day_end)
+
+    
   @staticmethod
   def enter_test_data(modal):
     """Fills out all fields in the lhn_modal
@@ -81,20 +97,7 @@ class ModalNewProgramPage(base.Test):
     modal.enter_reference_url(prepend_random_string(
         modal_create_new.Program.REFERENCE_URL))
 
-  @staticmethod
-  def set_start_end_dates(modal, day_start, day_end):
-    """
-    Sets the dates from the datepicker in the new program/edit modal.
-
-    Args:
-      modal (lib.page.modal.edit_object.EditProgramModal)
-      day_start (int): for more info see
-        base.DatePicker.select_day_in_current_month
-      day_end (int): for more info see
-        base.DatePicker.select_day_in_current_month
-    """
-    modal.enter_effective_date_start_month(day_start)
-    modal.enter_stop_date_end_month(day_end)
+    ModalNewProgramsPage.set_start_end_dates(modal, 0, -1)
 
 
 class ModalNewProgramCustomAttributePage(base.Test):
@@ -113,7 +116,7 @@ class ModalNewProgramCustomAttributePage(base.Test):
         modal_custom_attribute.Program.PLACEHOLDER))
 
 
-class ModalNewOrgGroupPage(base.Test):
+class ModalNewOrgGroupsPage(base.Test):
   @staticmethod
   def enter_test_data(modal):
     """Fills out all fields in the lhn_modal
@@ -125,7 +128,7 @@ class ModalNewOrgGroupPage(base.Test):
         modal_custom_attribute.Program.TITLE))
 
 
-class ModalRiskPage(base.Test):
+class ModalNewRisksPage(base.Test):
   @staticmethod
   def enter_test_data(modal):
     """Fills out all fields in the lhn_modal
@@ -134,6 +137,30 @@ class ModalRiskPage(base.Test):
         modal (lib.page.modal.edit_object.EditRiskModal)
     """
     modal.enter_title(append_random_string(
-        modal_custom_attribute.Program.TITLE))
+        modal_create_new.SHORT_TITLE))
     modal.enter_description(append_random_string(
-        modal_custom_attribute.Program.TITLE))
+        modal_create_new.SHORT_TITLE))
+
+
+class ModalNewRequestsPage(base.Test):
+  @staticmethod
+  def enter_test_data(modal):
+    """Fills out all fields in the lhn_modal
+
+    Args:
+        modal (lib.page.modal.edit_object.EditRequestModal)
+    """
+    modal.enter_title(append_random_string(
+      modal_create_new.SHORT_TITLE))
+
+
+class ModalNewIssuesPage(base.Test):
+  @staticmethod
+  def enter_test_data(modal):
+    """Fills out all fields in the lhn_modal
+
+    Args:
+        modal (lib.page.modal.edit_object.EditIssueModal)
+    """
+    modal.enter_title(append_random_string(
+      modal_create_new.SHORT_TITLE))

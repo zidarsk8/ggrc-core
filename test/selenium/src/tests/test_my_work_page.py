@@ -17,8 +17,8 @@ from lib.page import dashboard
 from lib.page import lhn
 from lib.constants.test import batch
 from lib.page.widget import controls
-from lib import conftest_utils
-from lib import selenium_utils
+from lib.utils import conftest_utils
+from lib.utils import selenium_utils
 
 
 class TestMyWorkPage(base.Test):

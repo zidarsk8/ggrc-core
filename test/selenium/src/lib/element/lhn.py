@@ -11,7 +11,7 @@ from selenium.common import exceptions as selenium_exception
 
 from lib import base
 from lib import exception
-from lib import selenium_utils
+from lib.utils import selenium_utils
 from lib.constants import locator
 
 
@@ -68,6 +68,7 @@ class AccordionGroup(base.DropdownDynamic):
   # modal class which is used when creating a new object
   _create_new_modal_cls = None
 
+  # class for the extended info modal
   _extended_info_cls = None
 
   def __init__(self, driver):
