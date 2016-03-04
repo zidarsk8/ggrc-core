@@ -6,15 +6,16 @@
 """This module is used for handling a single line from a csv file.
 """
 
+import ggrc.services
 from ggrc import db
 from ggrc.converters import errors
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 from ggrc.services.common import Resource
-import ggrc.services
 
 
 class RowConverter(object):
+  """Base class for handling row data."""
 
   def __init__(self, block_converter, object_class, **options):
     self.block_converter = block_converter
@@ -55,8 +56,8 @@ class RowConverter(object):
               attr_name in self.attrs or \
               self.is_delete:
         continue
-      Handler = header_dict["handler"]
-      item = Handler(self, attr_name, parse=True,
+      handler = header_dict["handler"]
+      item = handler(self, attr_name, parse=True,
                      raw_value=self.row[i], **header_dict)
       if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
         self.attrs[attr_name] = item
@@ -161,8 +162,8 @@ class RowConverter(object):
 
     This function sends propper signals for all objects depending if the object
     was created, updated or deleted.
-    Note: signals are only sent for the row objects. And secondary objects such
-    as Relationships do not get any signals triggered.
+    Note: signals are only sent for the row objects. Secondary objects such as
+    Relationships do not get any signals triggered.
     ."""
     if self.ignore:
       return
@@ -183,8 +184,8 @@ class RowConverter(object):
 
     This function sends propper signals for all objects depending if the object
     was created, updated or deleted.
-    Note: signals are only sent for the row objects. And secondary objects such
-    as Relationships do not get any signals triggered.
+    Note: signals are only sent for the row objects. Secondary objects such as
+    Relationships do not get any signals triggered.
     """
     if self.ignore:
       return
