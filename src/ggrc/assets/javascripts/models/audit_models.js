@@ -1089,31 +1089,77 @@
       this._super.apply(this, arguments);
       // TODO: perform any validation here?
     }
-  },
-  {
+  }, {
+    // the object types that are not relevant to the AssessmentTemplate,
+    // i.e. it does not really make sense to assess them
+    _NON_RELEVANT_OBJ_TYPES: Object.freeze({
+      Assessment: true,
+      Audit: true,
+      CycleTaskGroupObjectTask: true,
+      Request: true,
+      TaskGroup: true,
+      TaskGroupTask: true,
+      Workflow: true
+    }),
+
     // TODO: docstring, tests
     // isNewObject: boolean (true if creating new object)
     form_preload: function (isNewObject) {
-      console.log('formPreload in Ass. Template');
-      // TODO: needed? to init/pre-fetch some data or what?
+      this.attr('_objectTypes', this._choosableObjectTypes());
     },
 
     // TODO: docstring, tests
     // TODO: why this isn't called? To perform validation, data packing etc.
     before_save: function () {
       console.log('AssessmentTemplate before_save');
-      debugger;
     },
 
     before_create: function () {
       console.log('AssessmentTemplate before_create');
-      debugger;
     },
 
     // save: function () {
     //   console.log('AssessmentTemplate saved');
     //   // return this._super.apply(this, arguments);
-    //   return 'DDDD';
     // }
+
+    /**
+     * Return the object types that can be assessed.
+     *
+     * Used to populate the "Objects under assessment" dropdown on the modal
+     * AssessmentTemplate's modal form.
+     *
+     * @return {Object} - the "assessable" object types
+     */
+    _choosableObjectTypes: function () {
+      var ignoreTypes = this._NON_RELEVANT_OBJ_TYPES;
+      var mapper;
+      var MapperModel = GGRC.Models.MapperModel;
+      var objectTypes;
+
+      mapper = new MapperModel({
+        object: 'MultitypeSearch',
+        search_only: true
+      });
+      objectTypes = mapper.types();
+
+      // the all objects group is not needed
+      delete objectTypes.all_objects;
+
+      // remove ignored types and sort the rest
+      _.each(objectTypes, function (objGroup) {
+        objGroup.items = _.filter(objGroup.items, function (item) {
+          return !ignoreTypes[item.value];
+        });
+        objGroup.items = _.sortBy(objGroup.items, 'name');
+      });
+
+      // remove the groups that have ended up being empty
+      objectTypes = _.pick(objectTypes, function (objGroup) {
+        return objGroup.items.length > 0;
+      });
+
+      return objectTypes;
+    }
   });
 })(this.can);

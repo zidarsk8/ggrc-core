@@ -20,19 +20,29 @@
       Objects under assessment
     </label>
 
-    <select class="input-medium pull-left" id="underAssessment">
-      <optgroup label="FOO">
-        <option value="foo_1" label="foo_1"></option>
-        <option value="foo_2" label="foo_2"></option>
-      </optgroup>
-      <optgroup label="BAR">
-        <option value="bar_1" label="bar_1"></option>
-        <option value="bar_2" label="bar_2"></option>
-      </optgroup>
+    {{#add_to_current_scope objectTypes=instance._objectTypes}}
+    <select
+      class="input-medium pull-left"
+      can-value="objectTypes.type"
+      name="assessed-obj-type">
+      {{#each objectTypes}}
+        {{#if items}}
+          {{#if items.length}}
+          <optgroup label="{{name}}">
+            {{#each items}}
+              {{#if name}}
+                <option value="{{value}}" label="{{name}}"></option>
+              {{/if}}
+            {{/each}}
+          </optgroup>
+          {{/if}}
+        {{/if}}
+      {{/each}}
     </select>
+    {{/add_to_current_scope}}
 
-    <label class="inline-check pull-left disabled">
-      <input type="checkbox" class="js-toggle-controlplans" disabled>
+    <label class="inline-check pull-left">
+      <input type="checkbox" class="js-toggle-controlplans">
       Use control test plans as procedures
     </label>
   </div>
