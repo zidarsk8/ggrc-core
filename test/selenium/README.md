@@ -61,7 +61,7 @@ $ ./bin/test_runner.py update_env
 $ ./bin/test_runner.py
 ```
 
-* Running under docker
+# Running under docker
 If you have setup docker as mentioned in the main [README](https://github.com/google/ggrc-core/blob/develop/README.md)
 then you can start the tests from the project root
 ```
