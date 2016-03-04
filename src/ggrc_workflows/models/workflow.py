@@ -240,7 +240,7 @@ class WorkflowState(object):
       -if all are verified -> verified
       -if all are finished -> finished
       -if all are at least finished -> finished
-      -if any are at least in progress -> in progress
+      -if any are in progress or declined -> in progress
       -if any are assigned -> assigned
 
     The function will work correctly only for non Overdue states. If the result

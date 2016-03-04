@@ -43,6 +43,10 @@ class TestWorkflowState(unittest.TestCase):
             "result": "InProgress"
         },
         {
+            "task_states": ["Finished", "Declined", "Assigned"],
+            "result": "InProgress"
+        },
+        {
             "task_states": ["Finished", "Finished", "Finished"],
             "result": "Finished"
         },
