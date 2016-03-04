@@ -12,7 +12,8 @@ class CustomAttributeValue(Base, db.Model):
   __tablename__ = 'custom_attribute_values'
 
   custom_attribute_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('custom_attribute_definitions.id')),
+      db.Column(db.Integer, db.ForeignKey('custom_attribute_definitions.id',
+                                          ondelete="CASCADE")),
       'CustomAttributeValue')
   attributable_id = deferred(db.Column(db.Integer), 'CustomAttributeValue')
   attributable_type = deferred(db.Column(db.String), 'CustomAttributeValue')
