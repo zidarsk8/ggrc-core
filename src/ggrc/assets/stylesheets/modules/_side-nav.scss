@@ -265,6 +265,21 @@ h4.search-title {
   }
 
   ul.sub-level,
+  ul.sub-actions {
+    li {
+      a {
+        .lhs-main-title {
+          &.span8 {
+            span.lhs-item {
+              width: 100% !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ul.sub-level,
   ul.sub-actions,
   ul.mid-level {
     background:#fff;

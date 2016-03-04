@@ -4,11 +4,13 @@
 # Maintained By: jernej@reciprocitylabs.com
 """Module for base classes"""
 
-import time
 import re
+
 import pyvirtualdisplay   # pylint: disable=import-error
 from selenium.webdriver.common import keys    # pylint: disable=import-error
 from selenium import webdriver    # pylint: disable=import-error
+from selenium.common import exceptions
+
 from lib import environment
 from lib import constants
 from lib import exception
@@ -21,8 +23,7 @@ class InstanceRepresentation(object):
   def __repr__(self):
     return str(
         {key: value for key, value in self.__dict__.items()
-         if "__" not in key}
-    )
+         if "__" not in key})
 
 
 class CustomDriver(webdriver.Chrome):
@@ -107,21 +108,21 @@ class Element(InstanceRepresentation):
     super(Element, self).__init__()
     self._driver = driver
     self._locator = locator
-    self._element = driver.find_element(*locator)
-    self.text = self._element.text
+    self.element = selenium_utils.get_when_visible(driver, locator)
+    self.text = self.element.text
 
   def click(self):
     """Clicks on the element"""
-    self._element.click()
+    self.element.click()
 
-  def click_when_visible(self, locator=None):
+  def click_when_visible(self):
     """Waits for the element to be visible and only then performs a
     click"""
     selenium_utils.get_when_visible(self._driver, self._locator).click()
 
 
 class Label(Element):
-  pass
+  """A generic label"""
 
 
 class RichTextInputField(Element):
@@ -130,15 +131,17 @@ class RichTextInputField(Element):
     Args:
         driver (CustomDriver):
     """
+    super(RichTextInputField, self).__init__(driver, locator)
     self._driver = driver
     self._locator = locator
-    self._element = selenium_utils.get_when_visible(driver, locator)
-    self.text = self._element.text
+    self.text = self.element.text
 
   def enter_text(self, text):
+    """Clears the fields and enteres text"""
+
     self.click_when_visible()
-    self._element.clear()
-    self._element.send_keys(text)
+    self.element.clear()
+    self.element.send_keys(text)
     self.text = text
 
   def paste_from_clipboard(self, element):
@@ -152,18 +155,22 @@ class RichTextInputField(Element):
     Args:
       element (Element)
     """
-    self._element.clear()
-    self._element.send_keys(keys.Keys.CONTROL, 'v')
+    self.element.clear()
+    self.element.send_keys(keys.Keys.CONTROL, 'v')
     element.click()
     element = self._driver.find_element(*self._locator)
     self.text = element.get_attribute("value")
 
 
 class TextInputField(RichTextInputField):
-  pass
+  """A generic model for the text input field"""
 
 
 class TextFilterDropdown(Element):
+  """Model for elements which are using autocomplete in a text field with a
+  dropdown list of found results
+  """
+
   def __init__(self, driver, textbox_locator, dropdown_locator):
     super(TextFilterDropdown, self).__init__(driver, textbox_locator)
     self._locator_dropdown = dropdown_locator
@@ -173,8 +180,8 @@ class TextFilterDropdown(Element):
   def _filter_results(self, text):
     self.text_to_filter = text
 
-    self._element.click()
-    self._element.clear()
+    self.element.click()
+    self.element.clear()
     self._driver.find_element(*self._locator).send_keys(text)
 
   def _select_first_result(self):
@@ -198,7 +205,7 @@ class Iframe(Element):
   def find_iframe_and_enter_data(self, text):
     """
     Args:
-        text (str): the string we want to enter
+        text (basestring): the string we want to enter
     """
     iframe = selenium_utils.get_when_visible(self._driver, self._locator)
     self._driver.switch_to.frame(iframe)
@@ -231,7 +238,7 @@ class DatePicker(Element):
     Returns:
         list of selenium.webdriver.remote.webelement.WebElement
     """
-    self._element.click()
+    self.element.click()
     elements = self._driver.find_elements(*self._locator_datepcker)
     return elements
 
@@ -248,7 +255,7 @@ class DatePicker(Element):
 
     # wait for fadeout in case we're above some other element
     selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
-    self.text = self._element.get_attribute("value")
+    self.text = self.element.get_attribute("value")
 
   def select_month_end(self):
     """Selects the last day of current month"""
@@ -257,7 +264,7 @@ class DatePicker(Element):
 
     # wait for fadeout in case we're above some other element
     selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
-    self.text = self._element.get_attribute("value")
+    self.text = self.element.get_attribute("value")
 
   def select_month_start(self):
     """Selects the first day of current month"""
@@ -266,12 +273,11 @@ class DatePicker(Element):
 
     # wait for fadeout in case we're above some other element
     selenium_utils.get_when_invisible(self._driver, self._locator_datepcker)
-    self.text = self._element.get_attribute("value")
+    self.text = self.element.get_attribute("value")
 
 
 class Button(Element):
   """A generic button element"""
-  pass
 
 
 class Checkbox(Element):
@@ -279,30 +285,53 @@ class Checkbox(Element):
 
   def __init__(self, driver, locator, is_checked=False):
     super(Checkbox, self).__init__(driver, locator)
-    self.is_checked = is_checked
+    self.is_checked = self.element.is_selected()
 
-  def click(self):
-    self._element.click()
-    self.is_checked = not self.is_checked
+  def check(self):
+    if not self.is_checked:
+      self.element.click()
+
+  def uncheck(self):
+    if self.is_checked:
+      self.element.click()
 
 
 class Toggle(Element):
-  def __init__(self, driver, locator, is_activated=False):
-    super(Toggle, self).__init__(driver, locator)
-    self.is_activated = is_activated
+  """A generic toggle element.
 
-  def click(self):
-    self._element.click()
-    self.is_activated = not self.is_activated
+  Note that a special function is used for detecting if an element is active
+  which may not work on an arbitrary element.
+  """
+
+  def __init__(self, driver, locator, is_active_attr_val="active"):
+    super(Toggle, self).__init__(driver, locator)
+    self.is_activated = selenium_utils.is_value_in_attr(
+        self.element, value=is_active_attr_val)
+
+  def toggle(self, on=True):
+    """Clicks on an element based on the is_active status and the "on" arg
+
+    Args:
+        on (bool)
+    """
+    if on and not self.is_activated:
+      self.element.click()
+      self.is_activated = True
+    elif not on and self.is_activated:
+      self.element.click()
+      self.is_activated = False
 
 
 class Tab(Element):
+  """A generic element representing a tab"""
   def __init__(self, driver, locator, is_activated=True):
     super(Tab, self).__init__(driver, locator)
     self.is_activated = is_activated
 
   def click(self):
-    self._element.click()
+    """When clicking on a tab we want to first make sure it's clickable i.e.
+    that this element will receive a click"""
+    selenium_utils.get_when_clickable(self._driver, self._locator).click()
     self.is_activated = True
 
 
@@ -315,7 +344,7 @@ class Dropdown(Element):
     Args:
         option_locator (tuple): locator of the dropdown element
     """
-    self._element.click()
+    self.element.click()
     self._driver.find_element(*option_locator).click()
 
 
@@ -329,7 +358,7 @@ class DropdownStatic(Element):
         *self._locator_dropdown_elements)
 
   def click(self):
-    self._element.click()
+    self.element.click()
 
   def select(self, member_name):
     """Selects the dropdown element based on dropdown element name"""
@@ -353,13 +382,6 @@ class Component(object):
     """
     self._driver = driver
 
-  def wait_for_redirect(self):
-    """Wait until the current url changes"""
-    from_url = self._driver.current_url
-
-    while from_url == self._driver.current_url:
-      time.sleep(0.1)
-
 
 class AnimatedComponent(Component):
   """Class for components where an animation must first complete before the
@@ -377,8 +399,10 @@ class AnimatedComponent(Component):
     super(AnimatedComponent, self).__init__(driver)
     self._locators = locators_to_check
 
-    self._wait_until_visible() if wait_until_visible \
-        else self._wait_until_invisible()
+    if wait_until_visible:
+      self._wait_until_visible()
+    else:
+      self._wait_until_invisible()
 
   def _wait_until_visible(self):
     for locator in self._locators:
@@ -391,7 +415,6 @@ class AnimatedComponent(Component):
 
 class Modal(Component):
   """A generic modal element"""
-  pass
 
 
 class Filter(Component):
@@ -402,7 +425,9 @@ class Filter(Component):
     super(Filter, self).__init__(driver)
     self.text_box = TextInputField(driver, locator_text_box)
     self.button_submit = Button(driver, locator_submit)
-    self.button_clear = Button(driver, locator_clear)
+
+    # the clear button is only visible after a query is entered
+    self.button_clear = driver.find_element(*locator_clear)
 
   def enter_query(self, query):
     self.text_box.enter_text(query)
@@ -411,6 +436,7 @@ class Filter(Component):
     self.button_submit.click()
 
   def clear(self):
+    """Clears the query field"""
     self.button_clear.click()
 
 
@@ -481,8 +507,6 @@ class DropdownDynamic(AnimatedComponent):
 class Selectable(Element):
   """Representing list of elements that are selectable"""
 
-  pass
-
 
 class Widget(AbstractPage):
   """A page like class for which we don't know the initial url"""
@@ -501,7 +525,9 @@ class Widget(AbstractPage):
 
 
 class ObjectWidget(Widget):
-  """Class representing all widgets except the info widget"""
+  """Class representing all widgets with filters that list objects"""
+
+  _info_pane_cls = None
 
   def __init__(self, driver, locator_widget, locator_filter_title,
                locator_button_questionmark,
@@ -527,3 +553,39 @@ class ObjectWidget(Widget):
         locator_filter_textbox,
         locator_filter_submit,
         locator_filter_clear)
+
+    try:
+      self.members_listed = self._driver.find_elements(
+          *constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
+    except exceptions.NoSuchElementException:
+      self.members_listed = None
+
+  def select_nth_member(self, member):
+    """Selects member from the list. Members start from (including) 0.
+
+    Args:
+        member (int)
+
+    Returns:
+        lib.page.widget.info.InfoWidget
+    """
+    try:
+      element = self.members_listed[member]
+
+      # wait for the listed items animation to stop
+      selenium_utils.wait_until_stops_moving(element)
+      element.click()
+
+      # wait for the info pane animation to stop
+      info_pane = selenium_utils.get_when_clickable(
+          self._driver, constants.locator.ObjectWidget.INFO_PANE)
+      selenium_utils.wait_until_stops_moving(info_pane)
+
+      return self._info_pane_cls(self._driver)
+    except exceptions.StaleElementReferenceException:
+      self.members_listed = self._driver.find_elements(
+          *constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
+      return self.select_nth_member(member)
+    except exceptions.TimeoutException:
+      # sometimes the click to the listed member results in hover
+      return self.select_nth_member(member)

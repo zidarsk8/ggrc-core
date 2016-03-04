@@ -254,7 +254,7 @@ Core code which bootstraps the core GGRC extensions (such as Workflow and GDrive
 
 #### Notifications
 
-Code relevant to sending notifications (e.g. email) is in [`src/ggrc/notification`](/src/ggrc/notification).
+Code relevant to sending notifications (e.g. email) is in [`src/ggrc/notifications`](/src/ggrc/notifications).
 
 #### Role-Based Access Control (RBAC)
 

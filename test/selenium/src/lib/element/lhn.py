@@ -2,10 +2,13 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+
 """A modul for elements contained in LHN"""
+# pylint: disable=not-callable
+# pylint: disable=not-an-iterable
 
 from selenium.common import exceptions as selenium_exception
-from selenium.webdriver.common import action_chains
+
 from lib import base
 from lib import exception
 from lib import selenium_utils
@@ -37,11 +40,11 @@ class AllObjectsTab(_Tab):
   locator_element = locator.LhnMenu.ALL_OBJECTS
 
 
-class Button(base.Button):
+class Toggle(base.Toggle):
   """A button in LHN"""
 
   def __init__(self, driver, locator_element, locator_count):
-    super(Button, self).__init__(driver, locator_element)
+    super(Toggle, self).__init__(driver, locator_element)
     count_element = selenium_utils.get_when_visible(driver, locator_count)
     self.members_count = int(count_element.text)
 
@@ -102,7 +105,7 @@ class AccordionGroup(base.DropdownDynamic):
     """Hovers over a visible member with the (unique) title "member_title"
 
     Args:
-        member_title (str or unicode): a (unique) title of a member
+        member_title (basestring): a (unique) title of a member
     Returns:
         selenium.webdriver.remote.webelement.WebElement
     """
@@ -130,7 +133,7 @@ class AccordionGroup(base.DropdownDynamic):
     """Creates a new modal for the object in the LHN
 
     Returns:
-        lib.base.Modal
+        lib.page.modal.create_new_object.CreateNewObjectModal
     """
     self.button_create_new.click()
     return self._create_new_modal_cls(self._driver)
@@ -139,13 +142,13 @@ class AccordionGroup(base.DropdownDynamic):
     """Hovers over a visible member with the (unique) title "member_title"
 
     Args:
-        member_title (str or unicode): a (unique) title of a member
+        member_title (basestring): a (unique) title of a member
     Returns:
 
     """
     try:
       el = self._get_visible_member_by_title(member_title)
-      action_chains.ActionChains(self._driver).move_to_element(el).perform()
+      selenium_utils.hover_over_element(self._driver, el)
       selenium_utils.get_when_visible(self._driver,
                                       locator.LhnMenu.EXTENDED_INFO)
       return self._extended_info_cls(self._driver)

@@ -4,6 +4,9 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 """All smoke tests relevant to risks/threats page"""
+# pylint: disable=no-self-use
+# pylint: disable=invalid-name
+# pylint: disable=too-few-public-methods
 
 import pytest    # pylint: disable=import-error
 from lib import base
@@ -22,7 +25,5 @@ class TestRiskThreatPage(base.Test):
     and closing the lhn_modal we're redirected to an url that contains an
     object id.
     """
-    # pylint: disable=no-self-use
-    # pylint: disable=invalid-name
     assert url.RISKS + "/" + new_risk.object_id in \
         new_risk.url

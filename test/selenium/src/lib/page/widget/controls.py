@@ -6,11 +6,14 @@
 """Models for the control widget"""
 
 from lib import base
+from lib.page.widget import info
 from lib.constants import locator
 
 
 class Controls(base.ObjectWidget):
   """Model for the control widget"""
+
+  _info_pane_cls = info.ControlInfo
 
   def __init__(self, driver,):
     super(Controls, self).__init__(
