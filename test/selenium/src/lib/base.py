@@ -16,7 +16,7 @@ from lib import constants
 from lib import exception
 from lib import meta
 from lib import mixin
-from lib import selenium_utils
+from lib.utils import selenium_utils
 
 
 class InstanceRepresentation(object):
@@ -515,13 +515,14 @@ class Widget(AbstractPage):
     """
     Args:
         driver (CustomDriver)
-        widget_locator (tuple)
     """
     super(Widget, self).__init__(driver)
 
-    id_, name = re.match(constants.regex.URL_WIDGET_INFO, self.url).groups()
+    object_name, id_, widget_name = re.search(
+        constants.regex.URL_WIDGET_INFO, self.url).groups()
     self.object_id = id_
-    self.widget_name = name or constants.element.WidgetBar.INFO
+    self.widget_name = widget_name or constants.element.WidgetBar.INFO
+    self.object_name = object_name
 
 
 class ObjectWidget(Widget):
