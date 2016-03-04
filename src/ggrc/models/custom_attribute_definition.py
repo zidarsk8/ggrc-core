@@ -3,8 +3,8 @@
 # Created By: laran@reciprocitylabs.com
 # Maintained By: laran@reciprocitylabs.com
 
-from sqlalchemy.sql.schema import UniqueConstraint
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc import db
 from ggrc.models import mixins
@@ -42,17 +42,20 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     DROPDOWN = "Dropdown"
     CHECKBOX = "Checkbox"
     DATE = "Date"
+    MAP = "Map"
 
 
 class CustomAttributeMapable(object):
+  # pylint: disable=too-few-public-methods
+  # because this is a mixin
 
   @declared_attr
-  def related_custom_attributes(cls):
+  def related_custom_attributes(self):
     return db.relationship(
         'CustomAttributeValue',
         primaryjoin=lambda: (
-            (CustomAttributeValue.attribute_value == cls.__name__) &
-            (CustomAttributeValue.attribute_object_id == cls.id)),
+            (CustomAttributeValue.attribute_value == self.__name__) &
+            (CustomAttributeValue.attribute_object_id == self.id)),
         foreign_keys="CustomAttributeValue.attribute_object_id",
-        backref='attribute_{0}'.format(cls.__name__),
+        backref='attribute_{0}'.format(self.__name__),
         viewonly=True)
