@@ -1,0 +1,30 @@
+# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: jernej@reciprocitylabs.com
+# Maintained By: jernej@reciprocitylabs.com
+
+"""Module containing various caches"""
+
+from lib.constants import element
+
+def _get_lhn_members():
+  """Returns a dictionary with lhn elements that are grouped together
+  into sections
+  Return:
+      dict
+  """
+  members_dct = {}
+
+  for section, members in (
+    (element.Lhn.DIRECTIVES, element.Lhn.DIRECTIVES_MEMBERS),
+    (element.Lhn.CONTROLS_OR_OBJECTIVES,
+     element.Lhn.CONTROLS_OR_OBJECTIVES_MEMBERS),
+    (element.Lhn.PEOPLE_OR_GROUPS, element.Lhn.PEOPLE_OR_GROUPS_MEMBERS),
+    (element.Lhn.ASSETS_OR_BUSINESS, element.Lhn.ASSETS_OR_BUSINESS_MEMBERS),
+    (element.Lhn.RISKS_OR_THREATS, element.Lhn.RISKS_OR_THREATS_MEMBERS)):
+    members_dct.update({member: section for member in members})
+
+  return members_dct
+
+
+LHN_SECTION_MEMBERS = _get_lhn_members()
