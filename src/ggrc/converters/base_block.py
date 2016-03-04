@@ -247,6 +247,12 @@ class BlockConverter(object):
       self.save_import()
 
   def import_objects(self):
+    """Add all objects to the database.
+
+    This function flushes all objects to the database and if the dry_run flag
+    is not set, the session gets commited and all signals for the imported
+    objects get sent.
+    """
     if self.ignore:
       return
 
@@ -255,6 +261,7 @@ class BlockConverter(object):
 
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
+        row_converter.send_pre_commit_signals()
         try:
           row_converter.insert_object()
           db.session.flush()
@@ -263,8 +270,11 @@ class BlockConverter(object):
           current_app.logger.error("Import failed with: {}".format(e.message))
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
+      for row_converter in self.row_converters:
+        row_converter.send_post_commit_signals()
 
   def save_import(self):
+    """Commit all changes in the session and update memcache."""
     try:
       modified_objects = get_modified_objects(db.session)
       update_memcache_before_commit(
