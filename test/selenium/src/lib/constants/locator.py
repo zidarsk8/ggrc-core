@@ -3,18 +3,22 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+"""Locators for all the elements"""
+# pylint: disable=too-few-public-methods
+
 from selenium.webdriver.common.by import By   # pylint: disable=import-error
 
 
 class Login(object):
   """All locators for the login page"""
+
   BUTTON_LOGIN = (By.CSS_SELECTOR, "a.btn.btn-large.btn-info")
 
 
 class PageHeader(object):
   """All locators for the dashboard header (has the same name as the elemnt"""
 
-  BUTTON_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
+  TOGGLE_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
   BUTTON_DASHBOARD = (By.CSS_SELECTOR, '.header-content .to-my-work['
                                        'href="/dashboard"]')
   BUTTON_SEARCH = (By.CSS_SELECTOR, '.header-content ['
@@ -23,7 +27,7 @@ class PageHeader(object):
                                       'href="/dashboard#task_widget"]')
   BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR, '.header-content ['
                                          'href="/objectBrowser"]')
-  BUTTON_USER_DROPDOWN = (
+  TOGGLE_USER_DROPDOWN = (
       By.CSS_SELECTOR, '.header-content .dropdown-toggle')
   BUTTON_HELP = (By.CSS_SELECTOR, '.header-content [id="#page-help"]')
 
@@ -34,6 +38,9 @@ class PageHeader(object):
   BUTTON_DATA_IMPORT = (By.CSS_SELECTOR, '.dropdown-menu [href="/import"]')
   BUTTON_DATA_EXPORT = (By.CSS_SELECTOR, '.dropdown-menu [href="/export"]')
   BUTTON_LOGOUT = (By.CSS_SELECTOR, '.dropdown-menu [href="/logout"]')
+  NOTIFICATIONS = (By.CSS_SELECTOR, '.menu .user-dropdown .notify-wrap')
+  CHECKBOX_DAILY_DIGEST = (By.CSS_SELECTOR, '.menu .user-dropdown input')
+  CHECKBOX_DISABLED = (By.CSS_SELECTOR, '.menu .user-dropdown input.disabled')
 
 
 class Dashboard(object):
@@ -68,45 +75,47 @@ class LhnMenu(object):
   LHS_ITEM = (By.CSS_SELECTOR, '[test-data-id="lhs-item_3ad27b8b"]')
   ALL_OBJECTS = (By.CSS_SELECTOR, '[data-test-id="all_objects_e0345ec4"]')
   MY_OBJECTS = (By.CSS_SELECTOR, '[data-test-id="my_objects_6fa95ae1"]')
+  PIN = (By.CSS_SELECTOR, '.lhn-pin')
 
   # lhn items
-  PROGRAMS = (By.CSS_SELECTOR, '[data-model-name="Program"]')
-  WORKFLOWS = (By.CSS_SELECTOR, '[data-model-name="Workflow"]')
-  AUDITS = (By.CSS_SELECTOR, '[data-model-name="Audit"]')
+  PROGRAMS = (By.CSS_SELECTOR, '[data-model-name="Program"]>a')
+  WORKFLOWS = (By.CSS_SELECTOR, '[data-model-name="Workflow"]>a')
+  AUDITS = (By.CSS_SELECTOR, '[data-model-name="Audit"]>a')
   ASSESSMENTS = (By.CSS_SELECTOR,
-                 '[data-model-name="Assessment"]')
-  REQUESTS = (By.CSS_SELECTOR, '[data-model-name="Request"]')
-  ISSUES = (By.CSS_SELECTOR, '[data-model-name="Issue"]')
+                 '[data-model-name="Assessment"]>a')
+  REQUESTS = (By.CSS_SELECTOR, '[data-model-name="Request"]>a')
+  ISSUES = (By.CSS_SELECTOR, '[data-model-name="Issue"]>a')
   DIRECTIVES = (By.CSS_SELECTOR, '[data-test-id="directives_66116337"]')
-  REGULATIONS = (By.CSS_SELECTOR, '[data-model-name="Regulation"]')
-  POLICIES = (By.CSS_SELECTOR, '[data-model-name="Policy"]')
-  STANDARDS = (By.CSS_SELECTOR, '[data-model-name="Standard"]')
-  CONTRACTS = (By.CSS_SELECTOR, '[data-model-name="Contract"]')
-  CLAUSES = (By.CSS_SELECTOR, '[data-model-name="Clause"]')
-  SECTIONS = (By.CSS_SELECTOR, '[data-model-name="Section"]')
+  REGULATIONS = (By.CSS_SELECTOR,
+                 '[data-model-name="Regulation"]>a')
+  POLICIES = (By.CSS_SELECTOR, '[data-model-name="Policy"]>a')
+  STANDARDS = (By.CSS_SELECTOR, '[data-model-name="Standard"]>a')
+  CONTRACTS = (By.CSS_SELECTOR, '[data-model-name="Contract"]>a')
+  CLAUSES = (By.CSS_SELECTOR, '[data-model-name="Clause"]>a')
+  SECTIONS = (By.CSS_SELECTOR, '[data-model-name="Section"]>a')
   CONTROLS_OR_OBJECTIVES = (By.CSS_SELECTOR,
                             '[data-test-id="controls/objectives_66116337"]')
-  CONTROLS = (By.CSS_SELECTOR, '[data-model-name="Control"]')
-  OBJECTIVES = (By.CSS_SELECTOR, '[data-model-name="Objective"]')
+  CONTROLS = (By.CSS_SELECTOR, '[data-model-name="Control"]>a')
+  OBJECTIVES = (By.CSS_SELECTOR, '[data-model-name="Objective"]>a')
   PEOPLE_OR_GROUPS = (By.CSS_SELECTOR,
                       '[data-test-id="people/groups_66116337"]')
-  PEOPLE = (By.CSS_SELECTOR, '[data-model-name="Person"]')
-  ORG_GROUPS = (By.CSS_SELECTOR, '[data-model-name="OrgGroup"]')
+  PEOPLE = (By.CSS_SELECTOR, '[data-model-name="Person"]>a')
+  ORG_GROUPS = (By.CSS_SELECTOR, '[data-model-name="OrgGroup"]>a')
   ASSETS_OR_BUSINESS = (By.CSS_SELECTOR,
                         '[data-test-id="assets/business_66116337"]')
-  SYSTEMS = (By.CSS_SELECTOR, '[data-model-name="System"]')
-  PROCESSES = (By.CSS_SELECTOR, '[data-model-name="Process"]')
-  DATA_ASSETS = (By.CSS_SELECTOR, '[data-model-name="DataAsset"]')
-  ACCESS_GROUPS = (By.CSS_SELECTOR, '[data-model-name="AccessGroup"]')
-  VENDORS = (By.CSS_SELECTOR, '[data-model-name="Vendor"]')
-  PRODUCTS = (By.CSS_SELECTOR, '[data-model-name="Product"]')
-  PROJECTS = (By.CSS_SELECTOR, '[data-model-name="Project"]')
+  SYSTEMS = (By.CSS_SELECTOR, '[data-model-name="System"]>a')
+  PROCESSES = (By.CSS_SELECTOR, '[data-model-name="Process"]>a')
+  DATA_ASSETS = (By.CSS_SELECTOR, '[data-model-name="DataAsset"]>a')
+  ACCESS_GROUPS = (By.CSS_SELECTOR, '[data-model-name="AccessGroup"]>a')
+  VENDORS = (By.CSS_SELECTOR, '[data-model-name="Vendor"]>a')
+  PRODUCTS = (By.CSS_SELECTOR, '[data-model-name="Product"]>a')
+  PROJECTS = (By.CSS_SELECTOR, '[data-model-name="Project"]>a')
   RISK_OR_THREATS = (By.CSS_SELECTOR,
                      '[data-test-id="risk/threats_66116337"]')
-  RISKS = (By.CSS_SELECTOR, '[data-model-name="Risk"]')
-  FACILITIES = (By.CSS_SELECTOR, '[data-model-name="Facility"]')
-  MARKETS = (By.CSS_SELECTOR, '[data-model-name="Market"]')
-  THREATS = (By.CSS_SELECTOR, '[data-model-name="Threat"]')
+  RISKS = (By.CSS_SELECTOR, '[data-model-name="Risk"]>a')
+  FACILITIES = (By.CSS_SELECTOR, '[data-model-name="Facility"]>a')
+  MARKETS = (By.CSS_SELECTOR, '[data-model-name="Market"]>a')
+  THREATS = (By.CSS_SELECTOR, '[data-model-name="Threat"]>a')
 
   # buttons create new lhn_modal
   BUTTON_CREATE_NEW_PROGRAM = (
@@ -225,8 +234,7 @@ class LhnMenu(object):
                                       '.item-count')
   AUDITS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Audit"] .item-count')
   ASSESSMENTS_COUNT = (By.CSS_SELECTOR,
-                       '[data-model-name="Assessment"] '
-                       '.item-count')
+                       '[data-model-name="Assessment"] .item-count')
   ISSUES_COUNT = (By.CSS_SELECTOR, '[data-model-name="Issue"] .item-count')
   REQUESTS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Request"] '
                                      '.item-count')
@@ -321,9 +329,14 @@ class LhnMenu(object):
       By.CSS_SELECTOR, '[data-model-name="Control"]>.content>.sub-level>li')
   ACCORDEON_ORG_GROUP_MEMBERS = (
       By.CSS_SELECTOR, '[data-model-name="OrgGroup"]>.content>.sub-level>li')
+  ACCORDEON_RISK_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="Risk"]>.content>.sub-level>li')
 
 
 class ExtendedInfo(object):
+  """Locators for the extended info tooltip in LHN after hovering over a
+  member object"""
+
   BUTTON_MAP_TO = (By.CSS_SELECTOR, '.extended-info.in .map-to-page-object')
 
 
@@ -353,9 +366,7 @@ class ModalCreateNewProgram(object):
                                            '"new_program_field_secondary_'
                                            'contact_'
                                            '86160053"]')
-  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR, '[data-toggle="modal-submit"]')
-  BUTTON_SAVE_AND_ADD_ANOTHER = (By.CSS_SELECTOR,
-                                 '[data-toggle="modal-submit-addmore"]')
+
   UI_PROGRAM_URL = (By.CSS_SELECTOR, '[data-test-id='
                                      '"new_program_field_program_url_'
                                      '86160053"]')
@@ -381,6 +392,7 @@ class ModalCreateNewProgram(object):
 class ModalCreateNewOrgGroup(object):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
+
   # labels
   MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
   TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
@@ -390,17 +402,27 @@ class ModalCreateNewOrgGroup(object):
       By.CSS_SELECTOR,
       '.modal-body form>div:nth-child(2) .span6>input')
 
-  BUTTON_SAVE_AND_CLOSE = (
+
+class ModalCreateNewRisk(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
       By.CSS_SELECTOR,
-      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
-  BUTTON_SAVE_AND_ADD_ANOTHER = (
-      By.CSS_SELECTOR,
-      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
+      '.modal-body form>div:nth-child(2) .span6>input')
+  UI_DESCRIPTION = (
+      By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
 
 
 class ModalCreateNewControl(object):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
+
   # labels
   MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
   TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
@@ -529,6 +551,20 @@ class ModalCreateNewControl(object):
   # buttons
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
   BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
+
+
+class ModalEditObject(object):
+  """Locators for a generic edit object modal"""
+
+  BUTTON_DELETE = (
+      By.CSS_SELECTOR, '.deny-buttons [data-toggle="modal-ajax-deleteform"]')
+
+
+class ModalCreateNewObject(object):
+  """Locators for a generic new object modal"""
+
+  UI_TITLE = (By.CSS_SELECTOR, '[data-id="title_txtbx"]')
+
   BUTTON_SAVE_AND_CLOSE = (
       By.CSS_SELECTOR,
       '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
@@ -553,12 +589,12 @@ class ModalCustomAttribute(object):
       '.modal-body div:nth-child(1)>input[tabindex="4"]')
   UI_PLACEHOLDER = (By.CSS_SELECTOR, '.modal-body div:nth-child(2)>input')
   CHECKBOX_MANDATORY = (By.CSS_SELECTOR, '.modal-body [type="checkbox"]')
-  BUTTON_SAVE = (By.CSS_SELECTOR, '.modal-footer .confirm-buttons '
-                                  '[data-toggle="modal-submit"]')
   BUTTON_ADD_ANOTHER = (
       By.CSS_SELECTOR,
-      '.modal-footer .confirm-buttons [data-toggle="modal-submit-addmore"]'
-  )
+      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
+  BUTTON_SAVE_AND_CLOSE = (
+      By.CSS_SELECTOR,
+      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
 
 
 class WidgetBar(object):
@@ -692,40 +728,40 @@ class WidgetBarButtonAddDropdown(object):
 
 class ObjectWidget(object):
   """Locators for a generic widget"""
+
   CONTROL_COLUMN_TITLE = (By.CSS_SELECTOR, '#control_widget .header .span4 '
                                            '.title-heading .widget-col-title')
   CONTROL_OWNER = (By.CSS_SELECTOR, '#control_widget .header .span4 '
                                     '[data-field="contact.name|email"]')
   COTNROL_STATE = (By.CSS_SELECTOR, '#control_widget .header .span4 '
                                     '[data-field="status"]')
+  MEMBERS_TITLE_LIST = (
+      By.CSS_SELECTOR,
+      '.object-area [id="control_widget"] .tree-structure .select '
+      '.span4:nth-child(1)')
+  INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
 
 
 class InfoWidget(object):
+  """Locators for the info widget"""
+
   BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
+
+
+class ModalDeleteObject(object):
+  MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
+  CONFIRMATION_TEXT = (By.CSS_SELECTOR, '.modal-body>div>p')
+  OBJECT_TITLE = (By.CSS_SELECTOR, '.modal-body>div>p>span')
+  BUTTON_DELETE = (
+      By.CSS_SELECTOR, '.modal-footer .confirm-buttons>[data-toggle="delete"]')
 
 
 class ProgramInfoWidget(object):
   """Locators for the info widget"""
 
   PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
-  DROPDOWN_SETTINGS_EDIT = (
-      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(1)')
-  DROPDOWN_SETTINGS_PERMALINK = (
-      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(2)')
-  DROPDOWN_SETTINGS_DELETE = (
-      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(3)')
-
-  MODAL_OBJECT_DELETE_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
-  MODAL_OBJECT_DELETE_CONFIRMATION_TEXT = (By.CSS_SELECTOR,
-                                           '.modal-body>div>p')
-  MODAL_OBJECT_DELETE_OBJECT_TITLE = (By.CSS_SELECTOR,
-                                      '.modal-body>div>p>span')
-  MODAL_OBJECT_DELETE_BUTTON_DELETE = (
-      By.CSS_SELECTOR, '.modal-footer .confirm-buttons>[data-toggle="delete"]')
 
   ALERT_LINK_COPIED = (By.CSS_SELECTOR, '.alert.alert-success')
-  DROPDOWN_DELETE = (By.CSS_SELECTOR,
-                     '[data-test-id="dropdown_delete_0839163b"]')
   MODAL_DELETE = (By.ID, '[id="ajax-lhn_modal-javascript:--"]')
   MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, '.lhn_modal .grcicon-x-grey')
 
@@ -758,8 +794,10 @@ class ProgramInfoWidget(object):
                    '[data-test-id="title_reference_url_aa7d1a65"]')
   REFERENCE_URL_ENTERED = (By.CSS_SELECTOR,
                            '[data-test-id="text_reference_url_aa7d1a65"]')
-  BUTTON_SHOW_ADVANCED = (By.CSS_SELECTOR,
+  TOGGLE_SHOW_ADVANCED = (By.CSS_SELECTOR,
                           '[data-test-id="button_advanced_cf47bc01"]')
+  TOGGLE_SHOW_ADVANCED_ACTIVATED = (
+      By.CSS_SELECTOR, '[data-test-id="button_advanced_cf47bc01"].active')
   CODE = (By.CSS_SELECTOR, '[data-test-id="title_code_cf47bc01"] h6')
   CODE_ENTERED = (By.CSS_SELECTOR,
                   '[data-test-id="title_code_cf47bc01"] p')
@@ -795,8 +833,63 @@ class ProgramInfoWidget(object):
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
 
 
-class ControlInfoWidget(object):
+class AdminRolesWidget(object):
+  """Locators for the roles widget on the admin dashboard"""
+
+  ROLE_EDITOR = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(2) .span8>div')
+  ROLE_GRC_ADMIN = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(3) .span8>div')
+  ROLE_PROGRAM_EDITOR = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(4) .span8>div')
+  ROLE_PROGRAM_OWNER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(5) .span8>div')
+  ROLE_PROGRAM_READER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(6) .span8>div')
+  ROLE_READER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(7) .span8>div')
+  ROLE_WORKFLOW_MEMBER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(8) .span8>div')
+  ROLE_WORKFLOW_OWNER = (
+      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(9) .span8>div')
+
+  SCOPE_EDITOR = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(2) .span4 .scope')
+  SCOPE_GRC_ADMIN = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(3) .span4 .scope')
+  SCOPE_PROGRAM_EDITOR = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(4) .span4 .scope')
+  SCOPE_PROGRAM_OWNER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(5) .span4 .scope')
+  SCOPE_PROGRAM_READER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(6) .span4 .scope')
+  SCOPE_READER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(7) .span4 .scope')
+  SCOPE_WORKFLOW_MEMBER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(8) .span4 .scope')
+  SCOPE_WORKFLOW_OWNER = (
+      By.CSS_SELECTOR,
+      '[id="roles_list_widget"] li:nth-child(9) .span4 .scope')
+
+
+class WidgetInfoSettingsButton(object):
+  """Locators for the control info widget"""
+
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"]>h3')
+
+  DROPDOWN_SETTINGS_EDIT = (
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(1)')
+  DROPDOWN_SETTINGS_PERMALINK = (
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(2)')
+  DROPDOWN_SETTINGS_DELETE = (
+      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(3)')
 
 
 class WidgetFilter(object):
@@ -820,64 +913,83 @@ class AdminCustomAttributes(object):
   FILTER_INPUT_FIELD = (By.CLASS_NAME, 'filter-input')
   FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR, '.filter-button>[type="submit"]')
   FILTER_BUTTON_RESET = (By.CSS_SELECTOR, '.filter-button>[type="reset"]')
-  BUTTON_WORKFLOWS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(1) div '
+
+  TOGGLE_WORKFLOWS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(1) div '
                                        '.openclose')
-  BUTTON_RISK_ASSESSMENTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child('
+  TOGGLE_RISK_ASSESSMENTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child('
                                               '2) div .openclose')
-  BUTTON_THREATS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(3) div '
+  TOGGLE_THREATS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(3) div '
                                      '.openclose')
-  BUTTON_RISKS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(4) div '
+  TOGGLE_RISKS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(4) div '
                                    '.openclose')
-  BUTTON_PROGRAMS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(5) div '
+  TOGGLE_PROGRAMS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(5) div '
                                       '.openclose')
-  BUTTON_AUDITS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(6) div '
+  TOGGLE_AUDITS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(6) div '
                                     '.openclose')
-  BUTTON_OBJECTIVES = (By.CSS_SELECTOR,
+  TOGGLE_OBJECTIVES = (By.CSS_SELECTOR,
                        '.tree-structure li:nth-child(7) div .openclose')
-  BUTTON_SECTIONS = (By.CSS_SELECTOR,
+  TOGGLE_SECTIONS = (By.CSS_SELECTOR,
                      '.tree-structure li:nth-child(8) div .openclose')
-  BUTTON_CONTROLS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(9) div '
+  TOGGLE_CONTROLS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(9) div '
                                       '.openclose')
-  BUTTON_ISSUES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(10) div '
+  TOGGLE_ISSUES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(10) div '
                                     '.openclose')
-  BUTTON_ASSESSMENTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(11) '
+  TOGGLE_ASSESSMENTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(11) '
                                          'div .openclose')
-  BUTTON_STANDARDS = (By.CSS_SELECTOR,
+  TOGGLE_STANDARDS = (By.CSS_SELECTOR,
                       '.tree-structure li:nth-child(12) div .openclose')
-  BUTTON_REGULATIONS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(13) '
+  TOGGLE_REGULATIONS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(13) '
                                          'div .openclose')
-  BUTTON_POLICIES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(14) div '
+  TOGGLE_POLICIES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(14) div '
                                       '.openclose')
-  BUTTON_CONTRACTS = (By.CSS_SELECTOR,
+  TOGGLE_CONTRACTS = (By.CSS_SELECTOR,
                       '.tree-structure li:nth-child(15) div .openclose')
-  BUTTON_CLAUSES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(16) div '
+  TOGGLE_CLAUSES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(16) div '
                                      '.openclose')
-  BUTTON_REQUESTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(17) div '
+  TOGGLE_REQUESTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(17) div '
                                       '.openclose')
-  BUTTON_VENDORS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(18) div '
+  TOGGLE_VENDORS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(18) div '
                                      '.openclose')
-  BUTTON_PEOPLE = (By.CSS_SELECTOR, '.tree-structure li:nth-child(19) div '
+  TOGGLE_PEOPLE = (By.CSS_SELECTOR, '.tree-structure li:nth-child(19) div '
                                     '.openclose')
-  BUTTON_ACCESS_GROUPS = (By.CSS_SELECTOR,
+  TOGGLE_ACCESS_GROUPS = (By.CSS_SELECTOR,
                           '.tree-structure li:nth-child(20) div .openclose')
-  BUTTON_ORG_GROUPS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(21) '
+  TOGGLE_ORG_GROUPS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(21) '
                                         'div .openclose')
-  BUTTON_PRODUCTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(22) div '
+  TOGGLE_PRODUCTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(22) div '
                                       '.openclose')
-  BUTTON_MARKETS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(23) div '
+  TOGGLE_MARKETS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(23) div '
                                      '.openclose')
-  BUTTON_PROCESSES = (By.CSS_SELECTOR,
+  TOGGLE_PROCESSES = (By.CSS_SELECTOR,
                       '.tree-structure li:nth-child(24) div .openclose')
-  BUTTON_FACILITIES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(25) '
+  TOGGLE_FACILITIES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(25) '
                                         'div .openclose')
-  BUTTON_PROJECTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(26) div '
+  TOGGLE_PROJECTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(26) div '
                                       '.openclose')
-  BUTTON_DATA_ASSETS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(27) '
+  TOGGLE_DATA_ASSETS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(27) '
                                          'div .openclose')
-  BUTTON_SYSTEMS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(28) div '
+  TOGGLE_SYSTEMS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(28) div '
                                      '.openclose')
 
-  # Dropdown add custom attribute lhn_modal buttons
+  # programs dropdown
   BUTTON_ADD_CUSTOM_PROGRAM_ATTR = (
       By.CSS_SELECTOR, '.tree-structure li:nth-child(5)'
                        ' [data-toggle="modal-ajax-form"]')
+  PROGRAMS_LABEL_ATTRIBUTE_NAME = (
+      By.CSS_SELECTOR,
+      '.tree-structure li:nth-child(5) div thead>tr>th:nth-child(1)')
+  PROGRAMS_LABEL_ATTRIBUTE_TYPE = (
+      By.CSS_SELECTOR,
+      '.tree-structure li:nth-child(5) div thead>tr>th:nth-child(2)')
+  PROGRAMS_LABEL_MANDATORY = (
+      By.CSS_SELECTOR,
+      '.tree-structure li:nth-child(5) div thead>tr>th:nth-child(3)')
+  PROGRAMS_LABEL_EDIT = (
+      By.CSS_SELECTOR,
+      '.tree-structure li:nth-child(5) div thead>tr>th:nth-child(4)')
+  LISTED_MEMBERS = (
+      By.CSS_SELECTOR,
+      '.tree-structure li:nth-child(5) div tbody>tr')
+  BUTTON_LISTED_MEMBERS_EDIT = (
+      By.CSS_SELECTOR,
+      '.tree-structure li:nth-child(5) div tbody>tr>td>ul .fa-pencil-square-o')

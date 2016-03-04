@@ -3,8 +3,7 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-from lib import base
+"""Constants related to batch tests (tests that require multiple objects"""
 
-
-class NewMarketModal(base.Modal):
-  pass
+# number of objects in a battery
+BATTERY = 3

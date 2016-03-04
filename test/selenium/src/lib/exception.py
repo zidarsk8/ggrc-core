@@ -5,16 +5,26 @@
 
 
 class ElementNotFound(Exception):
-  pass
+  """Raised when an element is not found. Selenium has it's own exception but
+  when we're iterating through multiple elements and expect one, we raise our
+  own.
+  """
 
 
 class DocstringsMissing(Exception):
-  pass
-
-
-class NoClassFound(Exception):
-  pass
+  """Since we require for certain classes to have docstrings, we raise this
+  exception in case the methods are missing them.
+  """
 
 
 class ElementMovingTimeout(Exception):
-  pass
+  """When trying to detect if an element stopped moving so it receives the
+  click, we usually have a timeout for that. If the timeout is reached, this
+  exception is raised.
+  """
+
+
+class RedirectTimeout(Exception):
+  """When detecting if a redirect has occured, we usually check that the
+  loop isn't infinite and raise this exception if the timeout is reached.
+  """

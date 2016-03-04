@@ -6,10 +6,10 @@
 """PyTest fixtures"""
 
 import pytest   # pylint: disable=import-error
+
 from lib import base
-from lib import test_helpers
-from lib.page import dashboard
-from lib.page import widget
+from lib import conftest_utils
+from lib.constants.test import batch
 
 
 @pytest.yield_fixture(scope="session")
@@ -35,7 +35,6 @@ def selenium():
   """
   selenium_base = base.Selenium()
   yield selenium_base
-
   selenium_base.close_resources()
 
 
@@ -43,29 +42,10 @@ def selenium():
 def custom_program_attribute(selenium):
   """Creates a custom attribute for a program object"""
   # pylint: disable=redefined-outer-name
-  modal = dashboard.AdminDashboardPage(selenium.driver) \
-      .select_custom_attributes() \
-      .select_programs() \
-      .add_new_custom_attribute()
-  test_helpers.ModalNewProgramCustomAttributePage.enter_test_data(modal)
-  cust_attr_widget = modal.save_and_close()
-
+  cust_attr_widget = conftest_utils.create_custom_program_attribute(
+      selenium.driver)
   yield cust_attr_widget
-
   # todo: delete this custom attribute
-
-
-@pytest.yield_fixture(scope="class")
-def initial_lhn(selenium):
-  """
-  Returns:
-      lib.page.lhn.LhnContents
-  """
-  # pylint: disable=redefined-outer-name
-  lhn_contents = dashboard.DashboardPage(selenium.driver) \
-      .open_lhn_menu() \
-      .select_my_objects()
-  yield lhn_contents
 
 
 @pytest.yield_fixture(scope="class")
@@ -75,23 +55,10 @@ def new_control(selenium):
   Returns:
       lib.page.modal.new_program.NewControlModal
   """
-  modal = dashboard.DashboardPage(selenium.driver) \
-      .open_lhn_menu() \
-      .select_my_objects() \
-      .select_controls_or_objectives() \
-      .select_controls() \
-      .create_new()
-  test_helpers.ModalNewControlPage.enter_test_data(modal)
-  modal.save_and_close()
-  control_info_page = widget.ControlInfo(selenium.driver)
-
+  control_info_page = conftest_utils.lhn_create_control(selenium.driver)
   yield control_info_page
-
   selenium.driver.get(control_info_page.url)
-  widget.ControlInfo(selenium.driver) \
-      .press_object_settings() \
-      .select_delete() \
-      .confirm_delete()
+  conftest_utils.delete_control(selenium.driver)
 
 
 @pytest.yield_fixture(scope="class")
@@ -102,24 +69,10 @@ def new_program(selenium, new_control):
       lib.page.modal.new_program.NewProgramModal
   """
   # pylint: disable=redefined-outer-name
-  modal = dashboard.DashboardPage(selenium.driver) \
-      .open_lhn_menu() \
-      .select_my_objects() \
-      .select_programs() \
-      .create_new()
-
-  test_helpers.ModalNewProgramPage.enter_test_data(modal)
-  test_helpers.ModalNewProgramPage.set_start_end_dates(modal, 0, -1)
-  modal.save_and_close()
-  program_info_page = widget.ProgramInfo(selenium.driver)
-
+  modal, program_info_page = conftest_utils.lhn_create_program(selenium.driver)
   yield modal, program_info_page
-
   selenium.driver.get(program_info_page.url)
-  widget.ProgramInfo(selenium.driver) \
-      .press_object_settings() \
-      .select_delete() \
-      .confirm_delete()
+  conftest_utils.delete_program(selenium.driver)
 
 
 @pytest.yield_fixture(scope="class")
@@ -129,20 +82,31 @@ def new_org_group(selenium):
   Returns:
       lib.page.modal.new_program.NewOrgGroupModal
   """
-  modal = dashboard.DashboardPage(selenium.driver) \
-      .open_lhn_menu() \
-      .select_my_objects() \
-      .select_people_or_groups() \
-      .select_org_groups() \
-      .create_new()
-  test_helpers.ModalNewOrgGroupPage.enter_test_data(modal)
-  modal.save_and_close()
-  org_group_page = widget.OrgGroupsInfo(selenium.driver)
-
+  org_group_page = conftest_utils.lhn_create_org_group(selenium.driver)
   yield org_group_page
-
   selenium.driver.get(org_group_page.url)
-  widget.OrgGroupsInfo(selenium.driver) \
-      .press_object_settings() \
-      .select_delete() \
-      .confirm_delete()
+  conftest_utils.delete_org_group(selenium.driver)
+
+
+@pytest.yield_fixture(scope="class")
+def new_risk(selenium):
+  """Creates a new risk group object.
+
+  Returns:
+      lib.page.modal.new_program.NewOrgGroupModal
+  """
+  risk_page = conftest_utils.lhn_create_risk(selenium.driver)
+  yield risk_page
+  selenium.driver.get(risk_page.url)
+  conftest_utils.delete_risk(selenium.driver)
+
+
+@pytest.yield_fixture(scope="class")
+def battery_of_controls(selenium):
+  """Creates 3 control objects"""
+  controls = []
+
+  for _ in xrange(batch.BATTERY):
+    controls.append(conftest_utils.lhn_create_control(selenium.driver))
+
+  yield controls

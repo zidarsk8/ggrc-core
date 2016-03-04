@@ -16,28 +16,8 @@ PROJECT=$( project_name "$@" -d "$PROJECT" )
 
 setup $PROJECT
 
-echo "
-###############################################################################
-"
-
-echo "Running pylint"
-docker exec -i ${PROJECT}_dev_1 su vagrant -c "
-  source /vagrant/bin/init_vagrant_env
-  pylint -f parseable src/* test/* > test/pylint.out
-" || true
-
-echo "
-###############################################################################
-"
-
-echo "Running eslint"
-docker exec -i ${PROJECT}_dev_1 su vagrant -c "
-  source /vagrant/bin/init_vagrant_env
-  eslint -f checkstyle src -o test/eslint.xml
-" || true
-
-echo "
-###############################################################################
-"
+checkstyle_tests $PROJECT && rc=$? || rc=$?
 
 teardown $PROJECT
+
+exit 0

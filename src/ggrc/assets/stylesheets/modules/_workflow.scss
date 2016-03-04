@@ -5,7 +5,7 @@
  * Maintained By: brad@reciprocitylabs.com
  */
 
-.mockup-tree {
+.new-tree {
   .tree-item-add {
     .add-single-object {
       padding-top: 4px;
@@ -48,52 +48,6 @@
   }
   .accepted {
     color: $green;
-  }
-}
-
-ul.new-tree {
-  &.mockup-tree {
-    li.tree-item {
-      font-size: 13px;
-      line-height: 30px;
-      &.selected {
-        background: $lightGray;
-      }
-      &.object-filter {
-        background: #b7b7b7;
-        span {
-          color: $black;
-        }
-      }
-    }
-    .inner-tree {
-      select {
-        height: 23px;
-      }
-    }
-    .short-field {
-      min-height: 23px;
-      margin-bottom: 0;
-      margin-top: 4px;
-    }
-    .control-wrap {
-      padding-right: 20px;
-    }
-    .assessment-review {
-      padding: 10px 20px 0 20px;
-      input[type="checkbox"] {
-        margin-top: 0;
-      }
-      .review-icon {
-        margin-top: 10px;
-        margin-left: -4px;
-      }
-    }
-    .tree-info-list {
-      i {
-        margin-top: 0;
-      }
-    }
   }
 }
 
@@ -155,115 +109,12 @@ ul.new-tree {
   padding-top: 6px;
 }
 
-.review-wrap {
-  .review-note {
-    padding-top: 10px;
-    p {
-      line-height: 16px;
-      color: $black;
-    }
-  }
-  .inner-tree {
-    padding-bottom: 20px;
-    padding-top: 0;
-    h6 {
-      margin-left: 0;
-      margin-right: 0;
-      line-height: 30px;
-      .review-note-action {
-        padding-right: 20px;
-        text-transform: none;
-        .btn {
-          padding-top: 3px;
-          padding-bottom: 3px;
-          line-height: 16px;
-          font-size: 13px;
-          margin-top: -1px;
-        }
-        span {
-          font-size: 11px;
-          font-weight: normal;
-        }
-      }
-    }
-    ul.new-tree {
-      li.tree-item {
-        margin-left: 0;
-        margin-right: 0;
-        .item-data {
-          color: $black;
-          .entry-author {
-            color: $gray;
-            font-size: 11px;
-            font-style: italic;
-            display: block;
-          }
-        }
-      }
-    }
-  }
-  .tree-description {
-    padding-bottom: 16px;
-  }
-}
-
-.inner-tree {
-  h6 {
-    .help-trigger {
-      margin-right: 19px;
-      i {
-        @include opacity(0.3);
-        @include transition(opacity 0.2s ease-in-out);
-        margin-top: 3px;
-      }
-      &:hover {
-        i {
-          @include opacity(0.7);
-        }
-      }
-    }
-  }
-}
-
-.lhs-nav {
-  ul.sub-level,
-  ul.sub-actions {
-    li {
-      a {
-        .lhs-main-title {
-          &.span8 {
-            span.lhs-item {
-              width: 100% !important;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 .tree-footer {
   .add-entry {
     padding-top: 16px;
     padding-bottom: 16px;
   }
 }
-
-.items-list {
-  @extend %reset-list;
-  li {
-    margin-bottom: 10px;
-    input {
-      margin-bottom: 0;
-    }
-    .field-wrap {
-      .btn-success {
-        margin-top: 10px;
-      }
-    }
-  }
-}
-
 
 .task-list {
   .objective-selector {

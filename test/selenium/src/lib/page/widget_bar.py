@@ -32,6 +32,7 @@ class _WidgetBar(base.Component):
 class _ObjectWidgetBar(_WidgetBar):
   """Model for a generic object widget bar (e.g. each info widget is object
   specific"""
+  # pylint: disable=not-callable
 
   _info_cls = None
 
@@ -40,6 +41,7 @@ class _ObjectWidgetBar(_WidgetBar):
     self.button_add_widget = base.Dropdown(driver,
                                            locator.WidgetBar.BUTTON_ADD)
     self.tab_info = base.Tab(self._driver, locator.WidgetBar.INFO)
+    self.tab_controls = None
 
   def add_widget(self):
     """
@@ -60,6 +62,8 @@ class _ObjectWidgetBar(_WidgetBar):
     Returns:
         widget.Controls
     """
+    self.tab_controls = base.Tab(self._driver, locator.WidgetBar.CONTROLS)\
+        .click()
     return widget.Controls(self._driver)
 
 

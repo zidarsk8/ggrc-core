@@ -78,16 +78,6 @@
 .info-pane-utility {
   @extend %clearfix;
   float: right;
-  .sticky-info-panel & {
-    position: fixed;
-    right: 47px;
-    z-index: 9999;
-    margin-top: 20px;
-  }
-  .request & {
-    position: static;
-    margin-top: 0;
-  }
 }
 
 .details-wrap {

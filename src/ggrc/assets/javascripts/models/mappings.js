@@ -682,7 +682,15 @@
         null, "source", "Relationship", "destination", "related_sources"),
       related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
       related_assessments: TypeFilter("related_objects", "Assessment"),
-      related_issues: TypeFilter("related_objects", "Issue")
+      related_issues: TypeFilter('related_objects', 'Issue'),
+      regulations: TypeFilter('related_objects', 'Regulation'),
+      policies: TypeFilter('related_objects', 'Policy'),
+      standards: TypeFilter('related_objects', 'Standard'),
+      contracts: TypeFilter('related_objects', 'Contract'),
+      sections: TypeFilter('related_objects', 'Section'),
+      clauses: TypeFilter('related_objects', 'Clause'),
+      objectives: TypeFilter('related_objects', 'Objective'),
+      controls: TypeFilter('related_objects', 'Control')
     },
     Assessment: {
       _mixins: [

@@ -16,19 +16,7 @@ PROJECT=$( project_name "$@" -d "$PROJECT" )
 
 setup $PROJECT
 
-echo "
-###############################################################################
-"
-
-echo "Running ${PROJECT}"
-docker exec -i ${PROJECT}_dev_1 su vagrant -c "
-  source /vagrant/bin/init_vagrant_env
-  /vagrant/bin/run_integration
-" && rc=$? || rc=$?
-
-echo "
-###############################################################################
-"
+integration_tests $PROJECT && rc=$? || rc=$?
 
 teardown $PROJECT
 

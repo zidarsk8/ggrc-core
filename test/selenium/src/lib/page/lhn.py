@@ -73,43 +73,37 @@ class _Directives(lhn.DropdownStatic):
 
   def __init__(self, driver):
     super(_Directives, self).__init__(driver)
-    self.button_regulations = lhn.Button(
+    self.toggle_regulations = lhn.Toggle(
         self._driver,
         locator.LhnMenu.REGULATIONS,
-        locator.LhnMenu.REGULATIONS_COUNT
-    )
-    self.button_policies = lhn.Button(
+        locator.LhnMenu.REGULATIONS_COUNT)
+    self.toggle_policies = lhn.Toggle(
         self._driver,
         locator.LhnMenu.POLICIES,
-        locator.LhnMenu.POLICIES_COUNT
-    )
-    self.button_standards = lhn.Button(
+        locator.LhnMenu.POLICIES_COUNT)
+    self.toggle_standards = lhn.Toggle(
         self._driver,
         locator.LhnMenu.STANDARDS,
-        locator.LhnMenu.STANDARDS_COUNT
-    )
-    self.button_contracts = lhn.Button(
+        locator.LhnMenu.STANDARDS_COUNT)
+    self.toggle_contracts = lhn.Toggle(
         self._driver,
         locator.LhnMenu.CONTRACTS,
-        locator.LhnMenu.CONTRACTS_COUNT
-    )
-    self.button_clauses = lhn.Button(
+        locator.LhnMenu.CONTRACTS_COUNT)
+    self.toggle_clauses = lhn.Toggle(
         self._driver,
         locator.LhnMenu.CLAUSES,
-        locator.LhnMenu.CLAUSES_COUNT
-    )
-    self.button_sections = lhn.Button(
+        locator.LhnMenu.CLAUSES_COUNT)
+    self.toggle_sections = lhn.Toggle(
         self._driver,
         locator.LhnMenu.SECTIONS,
-        locator.LhnMenu.SECTIONS_COUNT
-    )
+        locator.LhnMenu.SECTIONS_COUNT)
 
   def select_regulations(self):
     """
     Returns:
         _Regulations
     """
-    self.button_regulations.click()
+    self.toggle_regulations.toggle()
     return _Regulations(self._driver)
 
   def select_policies(self):
@@ -117,7 +111,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Policies
     """
-    self.button_policies.click()
+    self.toggle_policies.toggle()
     return _Policies(self._driver)
 
   def select_standards(self):
@@ -125,7 +119,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Standards
     """
-    self.button_standards.click()
+    self.toggle_standards.toggle()
     return _Standards(self._driver)
 
   def select_contracts(self):
@@ -133,7 +127,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Contracts
     """
-    self.button_contracts.click()
+    self.toggle_contracts.toggle()
     return _Contracts(self._driver)
 
   def select_clauses(self):
@@ -141,7 +135,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Clauses
     """
-    self.button_clauses.click()
+    self.toggle_clauses.toggle()
     return _Clauses(self._driver)
 
   def select_sections(self):
@@ -149,7 +143,7 @@ class _Directives(lhn.DropdownStatic):
     Returns:
         _Sections
     """
-    self.button_sections.click()
+    self.toggle_sections.toggle()
     return _Sections(self._driver)
 
 
@@ -202,11 +196,11 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
 
   def __init__(self, driver):
     super(_ControlsOrObjectives, self).__init__(driver)
-    self.button_controls = lhn.Button(
+    self.toggle_controls = lhn.Toggle(
         self._driver,
         locator.LhnMenu.CONTROLS,
         locator.LhnMenu.CONTROL_COUNT)
-    self.button_objectives = lhn.Button(
+    self.toggle_objectives = lhn.Toggle(
         self._driver,
         locator.LhnMenu.OBJECTIVES,
         locator.LhnMenu.OBJECTIVES_COUNT)
@@ -214,21 +208,21 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
   def select_controls(self):
     """
     Returns:
-        _Controls
+        Controls
     """
-    self.button_controls.click()
-    return _Controls(self._driver)
+    self.toggle_controls.toggle()
+    return Controls(self._driver)
 
   def select_objectives(self):
     """
     Returns:
         _Objectives
     """
-    self.button_objectives.click()
+    self.toggle_objectives.toggle()
     return _Objectives(self._driver)
 
 
-class _Controls(lhn.AccordionGroup):
+class Controls(lhn.AccordionGroup):
   """Controls dropdown in LHN"""
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CONTROL
@@ -252,33 +246,29 @@ class _PeopleOrGroups(lhn.DropdownStatic):
 
   def __init__(self, driver):
     super(_PeopleOrGroups, self).__init__(driver)
-    self.button_people = lhn.Button(
+    self.toggle_people = lhn.Toggle(
         self._driver,
         locator.LhnMenu.PEOPLE,
-        locator.LhnMenu.PEOPLE_COUNT
-    )
-    self.button_org_groups = lhn.Button(
+        locator.LhnMenu.PEOPLE_COUNT)
+    self.toggle_org_groups = lhn.Toggle(
         self._driver,
         locator.LhnMenu.ORG_GROUPS,
-        locator.LhnMenu.ORG_GROUPS_COUNT
-    )
-    self.button_vendors = lhn.Button(
+        locator.LhnMenu.ORG_GROUPS_COUNT)
+    self.toggle_vendors = lhn.Toggle(
         self._driver,
         locator.LhnMenu.VENDORS,
-        locator.LhnMenu.VENDORS_COUNT
-    )
-    self.button_access_groups = lhn.Button(
+        locator.LhnMenu.VENDORS_COUNT)
+    self.toggle_access_groups = lhn.Toggle(
         self._driver,
         locator.LhnMenu.ACCESS_GROUPS,
-        locator.LhnMenu.ACCESS_GROUPS_COUNT
-    )
+        locator.LhnMenu.ACCESS_GROUPS_COUNT)
 
   def select_people(self):
     """
     Returns:
         _People
     """
-    self.button_people.click()
+    self.toggle_people.toggle()
     return _People(self._driver)
 
   def select_org_groups(self):
@@ -286,7 +276,7 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     Returns:
         _OrgGroups
     """
-    self.button_org_groups.click()
+    self.toggle_org_groups.toggle()
     return _OrgGroups(self._driver)
 
   def select_vendors(self):
@@ -294,7 +284,7 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     Returns:
         _Vendors
     """
-    self.button_vendors.click()
+    self.toggle_vendors.toggle()
     return _Vendors(self._driver)
 
   def select_access_groups(self):
@@ -302,7 +292,7 @@ class _PeopleOrGroups(lhn.DropdownStatic):
     Returns:
         _AccessGroups
     """
-    self.button_access_groups.click()
+    self.toggle_access_groups.toggle()
     return _AccessGroups(self._driver)
 
 
@@ -343,48 +333,41 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
 
   def __init__(self, driver):
     super(_AssetsOrBusiness, self).__init__(driver)
-    self.button_systems = lhn.Button(
+    self.toggle_systems = lhn.Toggle(
         self._driver,
         locator.LhnMenu.SYSTEMS,
-        locator.LhnMenu.SYSTEMS_COUNT
-    )
-    self.button_processes = lhn.Button(
+        locator.LhnMenu.SYSTEMS_COUNT)
+    self.toggle_processes = lhn.Toggle(
         self._driver,
         locator.LhnMenu.PROCESSES,
-        locator.LhnMenu.PROCESSES_COUNT
-    )
-    self.button_data_assets = lhn.Button(
+        locator.LhnMenu.PROCESSES_COUNT)
+    self.toggle_data_assets = lhn.Toggle(
         self._driver,
         locator.LhnMenu.DATA_ASSETS,
-        locator.LhnMenu.DATA_ASSETS_COUNT
-    )
-    self.button_products = lhn.Button(
+        locator.LhnMenu.DATA_ASSETS_COUNT)
+    self.toggle_products = lhn.Toggle(
         self._driver,
         locator.LhnMenu.PRODUCTS,
-        locator.LhnMenu.PRODUCTS_COUNT
-    )
-    self.button_projects = lhn.Button(
+        locator.LhnMenu.PRODUCTS_COUNT)
+    self.toggle_projects = lhn.Toggle(
         self._driver,
         locator.LhnMenu.PROJECTS,
-        locator.LhnMenu.PROJECTS_COUNT
-    )
-    self.button_facilities = lhn.Button(
+        locator.LhnMenu.PROJECTS_COUNT)
+    self.toggle_facilities = lhn.Toggle(
         self._driver,
         locator.LhnMenu.FACILITIES,
-        locator.LhnMenu.FACILITIES_COUNT
-    )
-    self.button_markets = lhn.Button(
+        locator.LhnMenu.FACILITIES_COUNT)
+    self.toggle_markets = lhn.Toggle(
         self._driver,
         locator.LhnMenu.MARKETS,
-        locator.LhnMenu.MARKETS_COUNT
-    )
+        locator.LhnMenu.MARKETS_COUNT)
 
   def select_systems(self):
     """
     Returns:
         _Systems
     """
-    self.button_systems.click()
+    self.toggle_systems.toggle()
     return _Systems(self._driver)
 
   def select_processes(self):
@@ -392,7 +375,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Processes
     """
-    self.button_processes.click()
+    self.toggle_processes.toggle()
     return _Processes(self._driver)
 
   def select_data_assets(self):
@@ -400,7 +383,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _DataAssets
     """
-    self.button_data_assets.click()
+    self.toggle_data_assets.toggle()
     return _DataAssets(self._driver)
 
   def select_products(self):
@@ -408,7 +391,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Products
     """
-    self.button_products.click()
+    self.toggle_products.toggle()
     return _Products(self._driver)
 
   def select_projects(self):
@@ -416,7 +399,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Projects
     """
-    self.button_projects.click()
+    self.toggle_projects.toggle()
     return _Projects(self._driver)
 
   def select_facilities(self):
@@ -424,7 +407,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Facilities
     """
-    self.button_facilities.click()
+    self.toggle_facilities.toggle()
     return _Facilities(self._driver)
 
   def select_markets(self):
@@ -432,7 +415,7 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
     Returns:
         _Markets
     """
-    self.button_markets.click()
+    self.toggle_markets.toggle()
     return _Markets(self._driver)
 
 
@@ -492,23 +475,21 @@ class _RisksOrThreats(lhn.DropdownStatic):
 
   def __init__(self, driver):
     super(_RisksOrThreats, self).__init__(driver)
-    self.button_risks = lhn.Button(
+    self.toggle_risks = lhn.Toggle(
         self._driver,
         locator.LhnMenu.RISKS,
-        locator.LhnMenu.RISKS_COUNT
-    )
-    self.button_threats = lhn.Button(
+        locator.LhnMenu.RISKS_COUNT)
+    self.toggle_threats = lhn.Toggle(
         self._driver,
         locator.LhnMenu.THREATS,
-        locator.LhnMenu.THREATS_COUNT
-    )
+        locator.LhnMenu.THREATS_COUNT)
 
   def select_risks(self):
     """
     Returns:
         _Risks
     """
-    self.button_risks.click()
+    self.toggle_risks.toggle()
     return _Risks(self._driver)
 
   def select_threats(self):
@@ -516,7 +497,7 @@ class _RisksOrThreats(lhn.DropdownStatic):
     Returns:
         _Threats
     """
-    self.button_threats.click()
+    self.toggle_threats.toggle()
     return _Threats(self._driver)
 
 
@@ -525,6 +506,8 @@ class _Risks(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_RISK
   _locator_spinny = locator.LhnMenu.SPINNY_RISKS
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_RISK_MEMBERS
+  _create_new_modal_cls = modal.create_new_object.NewRiskModal
 
 
 class _Threats(lhn.AccordionGroup):
@@ -534,23 +517,31 @@ class _Threats(lhn.AccordionGroup):
   _locator_spinny = locator.LhnMenu.SPINNY_THREATS
 
 
-class LhnContents(base.Component):
-  """Model for the highest level contents in LHN"""
+class Menu(base.AnimatedComponent):
+  """Model of the LHN menu"""
 
   def __init__(self, driver):
-    super(LhnContents, self).__init__(driver)
+    super(Menu, self).__init__(
+        driver,
+        [lhn.MyObjectsTab.locator_element,
+         lhn.AllObjectsTab.locator_element],
+        wait_until_visible=True,
+    )
+    self.my_objects = lhn.MyObjectsTab(driver)
+    self.all_objects = lhn.AllObjectsTab(driver)
+    self.pin = None
     self.filter = None
-    self.button_programs = None
-    self.button_workflows = None
-    self.button_audits = None
-    self.button_assessments = None
-    self.button_requests = None
-    self.button_issues = None
-    self.button_directives = None
-    self.button_controls_or_objectives = None
-    self.button_people_or_groups = None
-    self.button_assets_or_business = None
-    self.button_risks_or_threats = None
+    self.toggle_programs = None
+    self.toggle_workflows = None
+    self.toggle_audits = None
+    self.toggle_assessments = None
+    self.toggle_requests = None
+    self.toggle_issues = None
+    self.toggle_directives = None
+    self.toggle_controls_or_objectives = None
+    self.toggle_people_or_groups = None
+    self.toggle_assets_or_business = None
+    self.toggle_risks_or_threats = None
 
     self.reload_elements()
 
@@ -562,43 +553,44 @@ class LhnContents(base.Component):
         locator.LhnMenu.FILTER_TEXT_BOX,
         locator.LhnMenu.FILTER_SUBMIT_BUTTON,
         locator.LhnMenu.FILTER_CLEAR_BUTTON)
-    self.button_programs = lhn.Button(
+    self.pin = base.Toggle(self._driver, locator.LhnMenu.PIN)
+    self.toggle_programs = lhn.Toggle(
         self._driver,
         locator.LhnMenu.PROGRAMS,
         locator.LhnMenu.PROGRAMS_COUNT)
-    self.button_workflows = lhn.Button(
+    self.toggle_workflows = lhn.Toggle(
         self._driver,
         locator.LhnMenu.WORKFLOWS,
         locator.LhnMenu.WORKFLOWS_COUNT)
-    self.button_audits = lhn.Button(
+    self.toggle_audits = lhn.Toggle(
         self._driver,
         locator.LhnMenu.AUDITS,
         locator.LhnMenu.AUDITS_COUNT)
-    self.button_assessments = lhn.Button(
+    self.toggle_assessments = lhn.Toggle(
         self._driver,
         locator.LhnMenu.ASSESSMENTS,
         locator.LhnMenu.ASSESSMENTS_COUNT)
-    self.button_requests = lhn.Button(
+    self.toggle_requests = lhn.Toggle(
         self._driver,
         locator.LhnMenu.REQUESTS,
         locator.LhnMenu.REQUESTS_COUNT)
-    self.button_issues = lhn.Button(
+    self.toggle_issues = lhn.Toggle(
         self._driver,
         locator.LhnMenu.ISSUES,
         locator.LhnMenu.ISSUES_COUNT)
-    self.button_directives = base.Button(
+    self.toggle_directives = base.Toggle(
         self._driver,
         locator.LhnMenu.DIRECTIVES)
-    self.button_controls_or_objectives = base.Button(
+    self.toggle_controls_or_objectives = base.Toggle(
         self._driver,
         locator.LhnMenu.CONTROLS_OR_OBJECTIVES)
-    self.button_people_or_groups = base.Button(
+    self.toggle_people_or_groups = base.Toggle(
         self._driver,
         locator.LhnMenu.PEOPLE_OR_GROUPS)
-    self.button_assets_or_business = base.Button(
+    self.toggle_assets_or_business = base.Toggle(
         self._driver,
         locator.LhnMenu.ASSETS_OR_BUSINESS)
-    self.button_risks_or_threats = base.Button(
+    self.toggle_risks_or_threats = base.Toggle(
         self._driver,
         locator.LhnMenu.RISK_OR_THREATS)
 
@@ -614,7 +606,7 @@ class LhnContents(base.Component):
     Returns:
         _Programs
     """
-    self.button_programs.click()
+    self.toggle_programs.toggle()
     return _Programs(self._driver)
 
   def select_workflows(self):
@@ -622,7 +614,7 @@ class LhnContents(base.Component):
     Returns:
         _Workflows
     """
-    self.button_workflows.click()
+    self.toggle_workflows.toggle()
     return _Workflows(self._driver)
 
   def select_audits(self):
@@ -630,7 +622,7 @@ class LhnContents(base.Component):
     Returns:
         _Audits
     """
-    self.button_audits.click()
+    self.toggle_audits.toggle()
     return _Audits(self._driver)
 
   def select_assessments(self):
@@ -638,7 +630,7 @@ class LhnContents(base.Component):
     Returns:
         _Assessments
     """
-    self.button_assessments.click()
+    self.toggle_assessments.toggle()
     return _Assessments(self._driver)
 
   def select_requests(self):
@@ -646,7 +638,7 @@ class LhnContents(base.Component):
     Returns:
         _Requests
     """
-    self.button_requests.click()
+    self.toggle_requests.toggle()
     return _Requests(self._driver)
 
   def select_issues(self):
@@ -654,7 +646,7 @@ class LhnContents(base.Component):
     Returns:
         _Issues
     """
-    self.button_issues.click()
+    self.toggle_issues.toggle()
     return _Issues(self._driver)
 
   def select_directives(self):
@@ -662,7 +654,7 @@ class LhnContents(base.Component):
     Returns:
         _Directives
     """
-    self.button_directives.click()
+    self.toggle_directives.toggle()
     return _Directives(self._driver)
 
   def select_controls_or_objectives(self):
@@ -670,7 +662,7 @@ class LhnContents(base.Component):
     Returns:
         _ControlsOrObjectives
     """
-    self.button_controls_or_objectives.click()
+    self.toggle_controls_or_objectives.toggle()
     return _ControlsOrObjectives(self._driver)
 
   def select_people_or_groups(self):
@@ -678,7 +670,7 @@ class LhnContents(base.Component):
     Returns:
         _PeopleOrGroups
     """
-    self.button_people_or_groups.click()
+    self.toggle_people_or_groups.toggle()
     return _PeopleOrGroups(self._driver)
 
   def select_assests_or_business(self):
@@ -686,7 +678,7 @@ class LhnContents(base.Component):
     Returns:
         _AssetsOrBusiness
     """
-    self.button_assets_or_business.click()
+    self.toggle_assets_or_business.toggle()
     return _AssetsOrBusiness(self._driver)
 
   def select_risks_or_threats(self):
@@ -694,22 +686,8 @@ class LhnContents(base.Component):
     Returns:
         _RisksOrThreats
     """
-    self.button_risks_or_threats.click()
+    self.toggle_risks_or_threats.toggle()
     return _RisksOrThreats(self._driver)
-
-
-class Menu(base.AnimatedComponent):
-  """Model of the LHN menu"""
-
-  def __init__(self, driver):
-    super(Menu, self).__init__(
-        driver,
-        [lhn.MyObjectsTab.locator_element,
-         lhn.AllObjectsTab.locator_element],
-        wait_until_visible=True,
-    )
-    self.my_objects = lhn.MyObjectsTab(driver)
-    self.all_objects = lhn.AllObjectsTab(driver)
 
   def select_my_objects(self):
     """In LHN selects the tab "My Objects"
@@ -719,7 +697,7 @@ class Menu(base.AnimatedComponent):
     """
     self.my_objects.click()
     self.all_objects.is_activated = False
-    return LhnContents(self._driver)
+    return self.__class__(self._driver)
 
   def select_all_objects(self):
     """ In LHN selects the tab "All Objects"
@@ -729,4 +707,4 @@ class Menu(base.AnimatedComponent):
     """
     self.all_objects.click()
     self.my_objects.is_activated = False
-    return LhnContents(self._driver)
+    return self.__class__(self._driver)

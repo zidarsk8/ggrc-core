@@ -5,3 +5,4 @@
 """Regexes that are used in the code"""
 
 NUMBER_FROM_WIDGET_TITLE = r"(.*)\((.*)\)"
+URL_WIDGET_INFO = r"[^#\d]*(\d*)#?([^/]*)/*"
