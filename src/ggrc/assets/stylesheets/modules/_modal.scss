@@ -97,41 +97,6 @@
     width:960px;
     margin-left:-480px;
     .modal-content {
-      .linked-controls {
-        background:$white;
-        border:1px solid #ddd;
-        height:120px;
-        overflow:auto;
-        @extend %reset-list;
-        font-size:$f-small;
-        font-weight:bold;
-        li {
-          small {
-            font-weight:normal;
-            font-size:$f-regular;
-          }
-          a {
-            display:block;
-            padding-left:10px;
-            line-height:24px;
-            border-bottom:1px solid $lightGray;
-            &:hover {
-             text-decoration:none;
-             background:lighten(#c8edfc,5%);
-             border-color:darken(#c8edfc,5%);
-            }
-          }
-          &.not-applicable {
-            background:#fffcc3;
-            font-size:$f-subTitle;
-            text-align:center;
-            line-height:120px;
-          }
-        }
-        a {
-          color:$governance;
-        }
-      }
       .linked-people {
         @extend %reset-list;
         background:$white;
@@ -163,179 +128,6 @@
             font-size:$f-subTitle;
             text-align:center;
             line-height:120px;
-          }
-        }
-      }
-    }
-    &.multi-selector {
-      .multi-select-search {
-        @extend %clearfix;
-      }
-      .multi-select-submit {
-        @include border-radius(14px 0 0 14px);
-        @include box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.075));
-        float: left;
-        border: 1px solid #ccc;
-        border-right: none;
-        background: $white;
-        margin-top: -5px;
-        padding: 4px;
-        i {
-          @include opacity(0.3);
-          margin: 2px 0 0 2px;
-        }
-        &:hover {
-          i {
-            @include opacity(0.7);
-          }
-        }
-      }
-      .multi-select-search-text {
-        @include border-radius(0 14px 14px 0);
-        margin-bottom: 0;
-        margin-top: -5px;
-        float: left;
-        border-left: none;
-      }
-      .modal-content {
-        .selector-holder {
-          .selector-custom {
-            margin-left: 0;
-          }
-          .span3 {
-            &.selector-custom {
-              width: 25.63%;
-            }
-          }
-        }
-        .selector-description {
-          border-top:1px solid #ccc;
-          [class*="span"] {
-            margin-left: 0;
-          }
-          .span3 {
-            width: 25.63%;
-          }
-          .selector-info {
-            background: $white;
-            height: 20px;
-            padding: 5px 10px;
-            font-size: 11px;
-            color: $gray;
-            font-style: italic;
-            line-height: 16px;
-            i {
-              @include opacity(0.3);
-            }
-          }
-        }
-        .selector-title {
-          border-right:1px solid #ccc;
-          padding: 10px;
-          border-bottom: 1px solid #ccc;
-          &.main-description-title {
-            border-right: none;
-          }
-        }
-        .selector-info {
-          border-right:1px solid #ccc;
-          height: 340px;
-          &.main-description {
-            border-right:none;
-          }
-        }
-        .selected-none {
-          .selector-info {
-            padding-right: 20px;
-            color: $gray;
-            font-style: italic;
-          }
-          h4 {
-            padding-top: 40px;
-            color: $gray;
-            margin-bottom: 20px;
-            line-height: 24px;
-            i {
-              @include opacity(0.3);
-              display: inline-block;
-              margin-right: 24px;
-              margin-top: 0;
-            }
-          }
-          p {
-            padding-left: 50px;
-          }
-        }
-      }
-      .selector-list {
-        border-right:1px solid #ccc;
-        border-left: none;
-        background:#f3f3f3;
-        height: 360px;
-        ul {
-          background:$white;
-          li {
-            a.openclose {
-              .row-fluid {
-                &:hover {
-                  background-image: none !important;
-                  background-color: #ffffb3 !important;
-                }
-              }
-              &.active {
-                .row-fluid {
-                  background-image: none !important;
-                  background-color: #ffffb3 !important;
-                }
-              }
-            }
-            .owner,
-            .object-url {
-              margin-bottom: 0;
-            }
-            .show-description {
-              padding-top: 7px;
-            }
-            .tier-2-info {
-              padding-left: 10px;
-              padding-right: 10px;
-              .tier-2-info-content {
-                padding-left: 0;
-                padding-right: 0;
-              }
-              &.content-open {
-                background-color: #ffffb3;
-              }
-              .show-description {
-                font-size: 13px;
-                line-height: 18px;
-              }
-            }
-            .item-data {
-              padding: 0 10px;
-            }
-            .selector-check {
-              float: right;
-              margin-top: 10px;
-            }
-          }
-        }
-        .tree-title-data {
-          @extend %oneline;
-        }
-        .spinner {
-          top: 13px !important;
-          left: 465px !important;
-        }
-      }
-      .modal-footer {
-        .confirm-text {
-          line-height: 28px;
-          display: inline-block;
-          margin-right: 9px;
-          i {
-            margin-top: 7px;
-            margin-left: -4px;
           }
         }
       }
@@ -377,7 +169,7 @@
       }
     }
   }
-  .hidden{
+  .hidden {
     display: none;
   }
 
@@ -449,16 +241,60 @@
       border-bottom: 1px solid $modalHeaderBorder;
     }
   }
+  .wrap-modal-spacing {
+    margin: 0 20px 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid $itemBorder;
+  }
+  .modal-custom-spacing,
+  .results-num {
+    margin: 0 10px;
+  }
+  .results-num {
+    margin-bottom: 30px;
+  }
+  .check-all {
+    margin-right: 15px;
+    .disabled {
+      color: $gray;
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
   .modal-body {
     max-height:none;
     padding: 20px 15px 20px 20px;
     &.choose-object-wrap {
       padding: 20px;
     }
-    .grc-path {
-      @extend %oneline;
-      font-size: 13px;
-      color: #777;
+    .add-button {
+      margin-bottom: 20px;
+    }
+    .relevance-filters {
+      margin-top:20px;
+      h6 {
+        margin-bottom:6px;
+      }
+      .objective-selector {
+        display:inline-block;
+      }
+      .add-rule {
+        font-size:13px;
+        margin-left:6px;
+      }
+      label {
+        font-size:12px;
+        font-weight:bold;
+      }
+    }
+    &.modal-filter {
+      padding-bottom: 0;
+    }
+    .filter-actions {
+      margin-bottom: 0;
+      border-bottom: 1px solid $itemBorder;
+      padding-bottom: 20px;
     }
     .small {
       font-size:$f-small;
@@ -470,10 +306,6 @@
           display: inline-block;
         }
       }
-    }
-    .scroll-block {
-      max-height: 240px;
-      overflow-y: auto;
     }
     .large {
       font-size: 16px;
@@ -500,6 +332,7 @@
       }
     }
     .single-line-filter {
+      margin-bottom:6px;
       input,
       textarea,
       select {
@@ -518,14 +351,6 @@
       .input-wide {
         width: 418px;
       }
-    }
-    .option-word {
-      float: left;
-      margin-right: 13px;
-      margin-left: -8px;
-      line-height: 27px;
-      padding-top: 1px;
-      text-transform: uppercase;
     }
     .btn {
       &.btn-add {
@@ -563,17 +388,6 @@
         margin: 0 4px 0 0;
         &:hover {
           @include opacity(0.7);
-        }
-      }
-      &.vertical-align-label {
-        margin-bottom: 0;
-        line-height: 28px;
-        font-size: 13px;
-        input[type="checkbox"] {
-          margin-top: 0;
-        }
-        i {
-          margin-top: 6px;
         }
       }
     }
@@ -728,70 +542,6 @@
         }
       }
     }
-    .modal-source {
-      h3 {
-        font-size: $f-regular;
-      }
-      .role-btn {
-        margin-right: 20px;
-        margin-top: 2px;
-      }
-      .source,
-      .target {
-        @extend %reset-list;
-        overflow-x: hidden;
-        overflow-y: auto;
-        height: 325px;
-        padding-right: 10px;
-        li {
-          @extend %default-border-bottom;
-          line-height: 28px;
-          padding: 4px 0;
-          .object-info {
-            @extend %oneline;
-          }
-          &:hover {
-            cursor: pointer;
-            background: lighten($lightGray,3%);
-          }
-          &:last-child {
-            border-bottom: none;
-          }
-          .option {
-            font-weight: bold;
-            font-size: $f-small;
-          }
-          .btn-mini {
-            padding-left: 2px;
-            padding-right: 2px;
-          }
-          .btn-group {
-            .btn-mini {
-              padding-left: 5px;
-              padding-right: 5px;
-              font-size: $f-small;
-              line-height: 18px;
-              height: 18px
-            }
-          }
-          .state {
-            font-size: $f-small;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: right;
-            &.statustextgreen {
-              color: $green;
-            }
-            &.statustextred {
-              color: $red;
-            }
-          }
-        }
-      }
-      .target {
-        margin-top: 12px;
-      }
-    }
     .selector-info {
       h4.simple-url {
         font-weight:normal;
@@ -889,15 +639,6 @@
       }
     }
   }
-  .modal-info {
-    background: $widgetFooteBgnd;
-    padding: 5px 20px 4px 20px;
-    font-size: $f-small;
-    color: $darkGray;
-    .span3 {
-      min-height: auto;
-    }
-  }
   .modal-footer {
     @include box-shadow(none);
     background: $white;
@@ -909,23 +650,6 @@
         @include opacity(0.5);
         &:hover {
           @include opacity(1);
-        }
-      }
-    }
-    .version-nav {
-      text-align: center;
-      font-size: $f-small;
-      color: $text;
-      .btn {
-        i {
-          @include opacity(0.4);
-          @include transition(opacity 0.3s ease);
-        }
-        &:hover {
-          border: 1px solid $white;
-          i {
-            @include opacity(1);
-          }
         }
       }
     }
@@ -964,22 +688,6 @@
   }
 }
 
-.modal-controls {
-  height:200px;
-  overflow-y:scroll;
-  border:1px solid $lightGray;
-}
-
-
-.modal-section {
-  @extend %default-border-bottom;
-  padding-bottom:10px;
-  &:hover {
-    @include background-image(linear-gradient(left, $white, $lightGray, $white));
-    border-bottom:1px solid darken($lightGray,10%);
-  }
-}
-
 .expand-link {
   padding: 0 0 12px 0;
 
@@ -995,30 +703,10 @@
   padding:6px 0 16px 0;
 }
 
-.role-area {
-  .checkbox-area {
-    padding: 0 0 25px 0;
-    font-size: 12px;
-    color: $darkGray;
-    input[type="checkbox"] {
-      margin-top: 0;
-    }
-  }
-}
-
 .object-url {
   @extend %oneline;
   margin-bottom:10px;
   font-size:12px;
-}
-
-p.modal-value {
-  @extend %oneline;
-  margin:0;
-  padding:0;
-  font-weight:bold;
-  color:$governance;
-  line-height:28px;
 }
 
 .ui-autocomplete {
@@ -1078,47 +766,6 @@ p.modal-value {
 }
 
 // Mockups Assessment Page V1.0
-.note {
-  font-size: $f-medium;
-}
-.workflow-accordion {
-  .accordion-group {
-    @include border-radius(0);
-    border: none;
-    border-bottom: 1px solid $footerBorder;
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-  .accordion-heading {
-    .accordion-toggle  {
-      padding: 4px 0;
-      font-weight: bold;
-    }
-  }
-  .accordion-inner {
-    border-top: none;
-    padding-left: 19px;
-    button {
-      border: none;
-      background: none;
-      padding: 0;
-      i {
-        margin-top: 5px;
-      }
-      &:focus,
-      &:active {
-        outline: 0;
-      }
-    }
-    .workflow-repeat {
-      float: left;
-      line-height: 26px;
-      margin-right: 4px;
-    }
-  }
-}
-
 #AssessmentDefineTemplate {
   .hidden-fields-area {
     padding-left: 0;
@@ -1137,10 +784,6 @@ p.modal-value {
 }
 
 // Mockups Workflow V1.1
-.gdrive-select {
-  margin-left: 10px;
-}
-
 .results {
   margin-left: 10px;
   margin-right: 10px;
@@ -1258,61 +901,4 @@ p.modal-value {
 
 label.second-in-column {
   margin-top:20px;
-}
-
-.modal {
-  .modal-body {
-    .add-button {
-      margin-bottom: 20px;
-    }
-    .relevance-filters {
-      margin-top:20px;
-      h6 {
-        margin-bottom:6px;
-      }
-      .objective-selector {
-        display:inline-block;
-      }
-      .add-rule {
-        font-size:13px;
-        margin-left:6px;
-      }
-      label {
-        font-size:12px;
-        font-weight:bold;
-      }
-    }
-    &.modal-filter {
-      padding-bottom: 0;
-    }
-    .filter-actions {
-      margin-bottom: 0;
-      border-bottom: 1px solid $itemBorder;
-      padding-bottom: 20px;
-    }
-    .single-line-filter {
-      margin-bottom:6px;
-    }
-  }
-  .wrap-modal-spacing {
-    margin: 0 20px 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid $itemBorder;
-  }
-  .modal-custom-spacing,
-  .results-num {
-    margin: 0 10px;
-  }
-  .results-num {
-    margin-bottom: 30px;
-  }
-  .check-all {
-    margin-right: 15px;
-    .disabled {
-      color: $gray;
-      &:hover {
-        text-decoration: none;
-      }
-    }
-  }
 }
