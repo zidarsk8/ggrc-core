@@ -89,22 +89,36 @@ class ProgramFactory(ModelFactory):
   class Meta:
     model = models.Program
 
-  title = 'program_title'
-  slug = 'program_slug'
+  title = factory.LazyAttribute(lambda _: random_string("program_title"))
+  slug = factory.LazyAttribute(lambda _: random_string(""))
+
+
+class AuditFactory(ModelFactory):
+
+  class Meta:
+    model = models.Audit
+
+  title = factory.LazyAttribute(lambda _: random_string("title"))
+  slug = factory.LazyAttribute(lambda _: random_string(""))
+  status = "Planned"
+  program_id = factory.LazyAttribute(lambda _: ProgramFactory().id)
 
 
 class ContractFactory(ModelFactory):
+
   class Meta:
     model = models.Contract
 
 
 class EventFactory(ModelFactory):
+
   class Meta:
     model = models.Event
   revisions = []
 
 
 class RelationshipFactory(ModelFactory):
+
   class Meta:
     model = models.Relationship
   source = None
