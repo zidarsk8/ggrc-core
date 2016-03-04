@@ -743,9 +743,11 @@ can.Model("can.Model.Cacheable", {
       }
     }.bind(this));
     this.attr('custom_attribute_definitions', definitions);
-  }
-  , setup_custom_attributes: function setup_custom_attributes() {
-    var self = this, key;
+  },
+
+  setup_custom_attributes: function () {
+    var self = this;
+    var key;
 
     // Remove existing custom_attribute validations,
     // some of them might have changed
@@ -754,13 +756,13 @@ can.Model("can.Model.Cacheable", {
         delete this.class.validations[key];
       }
     }
-    can.each(this.custom_attribute_definitions, function(definition) {
+    can.each(this.custom_attribute_definitions, function (definition) {
       if (definition.mandatory) {
         if (definition.attribute_type === 'Checkbox') {
-
-          self.class.validate('custom_attributes.' + definition.id, function(val){
-            return !val;
-          });
+          self.class.validate('custom_attributes.' + definition.id,
+              function (val) {
+                return !val;
+              });
         } else {
           self.class.validateNonBlank('custom_attributes.' + definition.id);
         }
@@ -768,43 +770,42 @@ can.Model("can.Model.Cacheable", {
     });
     if (!this.custom_attributes) {
       this.attr('custom_attributes', new can.Map());
-      can.each(this.custom_attribute_values, function(value) {
+      can.each(this.custom_attribute_values, function (value) {
         var def;
-        var attribute_value;
+        var attributeValue;
         var object;
         var stub = value;
         value = stub.reify();
         def = _.find(this.custom_attribute_definitions, {
           id: value.custom_attribute_id
         });
-        if (def && def.attribute_type.startsWith("Map:")) {
+        if (def && def.attribute_type.startsWith('Map:')) {
           object = value.attribute_object;
-          attribute_value = object.type + ":" + object.id;
+          attributeValue = object.type + ':' + object.id;
         } else {
-          attribute_value = value.attribute_value;
+          attributeValue = value.attribute_value;
         }
-        self.custom_attributes.attr(value.custom_attribute_id,
-                                    attribute_value);
+        self.custom_attributes.attr(value.custom_attribute_id, attributeValue);
       }.bind(this));
     }
   },
 
-  _custom_attribute_map: function (ca_id, object) {
+  _custom_attribute_map: function (attrId, object) {
     var definition;
-    ca_id = Number(ca_id); // coming from mustache this will be a string
-    definition = _.find(this.custom_attribute_definitions, {id: ca_id});
+    attrId = Number(attrId); // coming from mustache this will be a string
+    definition = _.find(this.custom_attribute_definitions, {id: attrId});
 
-    if (!definition || !definition.attribute_type.startsWith("Map:")) {
+    if (!definition || !definition.attribute_type.startsWith('Map:')) {
       return;
     }
-    if (typeof(object) === "string" && object.length > 0) {
+    if (typeof object === 'string' && object.length > 0) {
       return;
     }
     object = object.stub ? object.stub() : undefined;
     if (object) {
-      this.custom_attributes.attr(ca_id, object.type + ":" + object.id);
+      this.custom_attributes.attr(attrId, object.type + ':' + object.id);
     } else {
-      this.custom_attributes.removeAttr(String(ca_id));
+      this.custom_attributes.removeAttr(String(attrId));
     }
   }
 
