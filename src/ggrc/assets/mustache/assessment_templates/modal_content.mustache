@@ -151,28 +151,44 @@
   {{! <div class="hidden-fields-area" style="display:none;"> }}
   <div class="hidden-fields-area">
     <div class="row-fluid wrap-row">
-      <div class="custom-attr-table span12">
+      <div class="custom-attr-list span12">
         <assessment-template-attributes>
-          <table class="table">
-            <thead>
-              <tr>
-                <th><h6>Attribute Title</h6></th>
-                <th><h6>Attribute type</h6></th>
-                <th><h6>Attribute values</h6></th>
-                <th class="centered"><h6>Attachment required</h6></th>
-                <th class="centered"><h6>Comment required</h6></th>
-                <th class="centered"><h6>Mandatory</h6></th>
-                <th>&nbsp;</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div class="attr-titles">
+            <ul>
+              <li class="row-fluid">
+                <div class="span-custom2-and-half">
+                  <h6>Attribute Title</h6>
+                </div>
+                <div class="span-custom1-and-half">
+                  <h6>Attribute type</h6>
+                </div>
+                <div class="span2">
+                  <h6>Attribute values</h6>
+                </div>
+                <div class="span2 centered">
+                  <h6>Attachment required</h6>
+                </div>
+                <div class="span-custom1-and-half centered">
+                  <h6>Comment required</h6>
+                </div>
+                <div class="span-custom1-and-half centered">
+                  <h6>Mandatory</h6>
+                </div>
+                <div class="span-custom1-and-half">
+                  &nbsp;
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="new-attr-list">
+            <ul>
               <add-template-filed fields="fields">
               </add-template-filed>
               {{#fields}}
-              <template-filed field="." fields="fields"></template-filed>
+                <template-filed field="." fields="fields"></template-filed>
               {{/fields}}
-            </tbody>
-          </table>
+            </ul>
+          </div>
         </assessment-template-attributes>
       </div>
     </div>

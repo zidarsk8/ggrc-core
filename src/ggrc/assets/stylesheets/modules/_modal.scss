@@ -347,6 +347,9 @@
         &:first-child {
           margin-top: 6px;
         }
+        &:last-child {
+          margin-bottom: 0;
+        }
       }
     }
     .objective-selector {
@@ -812,17 +815,6 @@
 .define-attr {
   .hidden-fields-area {
     padding-left: 0;
-  }
-  .custom-attr-table {
-    select {
-      width: 100px;
-    }
-    input[type="text"] {
-      width: 150px;
-    }
-    h6 {
-      font-size: 9px;
-    }
   }
 }
 

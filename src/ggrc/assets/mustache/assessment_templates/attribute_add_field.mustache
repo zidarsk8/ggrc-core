@@ -5,30 +5,29 @@
   Maintained By: ivan@reciprocitylabs.com
 }}
 
-<tr>
-  <td>
-    <input can-value="selected.title" type="text" placeholder="Enter title">
-  </td>
-  <td>
-    <select can-value="selected.type">
+<li class="row-fluid add-field">
+  <div class="span-custom2-and-half">
+    <input class="input-block-level" can-value="selected.title" type="text" placeholder="Enter title">
+  </div>
+  <div class="span-custom1-and-half">
+    <select class="input-block-level" can-value="selected.type">
       {{#types}}
         <option>{{type}}</option>
       {{/types}}
     </select>
-  </td>
-  <td>
-    <p>{{placeholder}}</p>
-    <input can-value="selected.values" type="text" placeholder="{{placeholder}}">
-  </td>
-  <td class="centered checkbox-wrap">
-  </td>
-  <td class="centered checkbox-wrap">
-  </td>
-  <td class="centered checkbox-wrap">
-  </td>
-  <td>
+  </div>
+  <div class="span2">
+    <input class="input-block-level" can-value="selected.values" type="text" placeholder="{{placeholder}}">
+  </div>
+  <div class="span2 centered checkbox-wrap">
+  </div>
+  <div class="span-custom1-and-half centered checkbox-wrap">
+  </div>
+  <div class="span-custom1-and-half centered checkbox-wrap">
+  </div>
+  <div class="span-custom1-and-half">
     <div class="pull-right">
       <a can-click="addFiled" class="btn btn-small btn-info" href="#">Add field</a>
     </div>
-  </td>
-</tr>
+  </div>
+</li>

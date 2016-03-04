@@ -743,26 +743,49 @@ p {
   margin-top: 6px;
 }
 
-.custom-attr-table {
+.custom-attr-list {
   font-size: 11px;
-  .table {
-    td.centered,
-    th.centered {
-      text-align: center;
+  .row-fluid {
+    [class*="span"] {
+      margin-left: 1.2%;
     }
-    .checkbox-wrap {
-      input {
-        margin-top: 3px;
+  }
+  select {
+    width: 100px;
+  }
+  h6 {
+    font-size: 9px;
+  }
+  .centered {
+    text-align: center;
+  }
+  .checkbox-wrap {
+    input {
+      margin-top: 3px;
+      margin-bottom: 0;
+    }
+  }
+  .block {
+    display: block;
+  }
+  .attr-titles {
+    @extend %clearfix;
+    ul {
+      @extend %reset-list;
+    }
+  }
+  .new-attr-list {
+    @extend .attr-titles;
+    li {
+      padding: 6px 0;
+      line-height: 24px;
+      border-top: 1px solid $tabBorder;
+    }
+    .add-field {
+      input,
+      select {
         margin-bottom: 0;
       }
-    }
-    tbody {
-      td {
-        vertical-align: top;
-      }
-    }
-    .block {
-      display: block;
     }
   }
 }
