@@ -131,8 +131,6 @@
 
 <div class="custom-attr-wrap">
   <assessment-template-attributes>
-    <add-template-filed fields="fields">
-    </add-template-filed>
     <table class="table">
       <thead>
         <tr>
@@ -146,6 +144,8 @@
         </tr>
       </thead>
       <tbody>
+        <add-template-filed fields="fields">
+        </add-template-filed>
         {{#fields}}
         <template-filed field="." fields="fields"></template-filed>
         {{/fields}}
