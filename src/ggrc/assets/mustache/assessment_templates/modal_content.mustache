@@ -130,98 +130,28 @@
 </div>
 
 <div class="custom-attr-wrap">
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="info-expand-mapped">
-        <a class="show-hidden-fields info-show-hide" href="javascript://">
-          <span class="out">
-            <i class="grcicon-arrow-right"></i>
-            Custom attributes
-          </span>
-          <span class="in">
-            <i class="grcicon-arrow-bottom"></i>
-            Custom attributes
-          </span>
-        </a>
-      </div>
-    </div>
-  </div><!-- row-fluid end -->
+  <assessment-template-attributes>
+    <add-template-filed fields="fields">
+    </add-template-filed>
+    <table class="table">
+      <thead>
+        <tr>
+          <th><h6>Attribute Title</h6></th>
+          <th><h6>Attribute type</h6></th>
+          <th><h6>Attribute values</h6></th>
+          <th class="centered"><h6>Attachment required</h6></th>
+          <th class="centered"><h6>Comment required</h6></th>
+          <th class="centered"><h6>Mandatory</h6></th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#fields}}
+        <template-filed field="." fields="fields"></template-filed>
+        {{/fields}}
+      </tbody>
+  </tbody>
+</table>
 
-  <div class="hidden-fields-area" style="display:none;">
-    <div class="row-fluid wrap-row">
-      <div class="custom-attr-table span12">
-        <table class="table">
-          <thead>
-            <tr>
-              <th><h6>Attribute Title</h6></th>
-              <th><h6>Attribute type</h6></th>
-              <th><h6>Attribute values</h6></th>
-              <th class="centered"><h6>Attachment required</h6></th>
-              <th class="centered"><h6>Comment required</h6></th>
-              <th class="centered"><h6>Mandatory</h6></th>
-              <th>&nbsp;</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Assessment results</td>
-              <td>Radio</td>
-              <td>Yes, No, At Risk, Unclear, In Remediation</td>
-              <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
-              <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
-              <td class="centered checkbox-wrap"><input type="checkbox" checked></td>
-              <td>
-                <div class="pull-right">
-                  <a href="#"><i class="grcicon-edit"></i></a>
-                  <a href="#"><i class="grcicon-deleted"></i></a>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Bug number</td>
-              <td>Text</td>
-              <td></td>
-              <td class="centered checkbox-wrap"><input type="checkbox"></td>
-              <td class="centered checkbox-wrap"><input type="checkbox"></td>
-              <td class="centered checkbox-wrap"><input type="checkbox"></td>
-              <td>
-                <div class="pull-right">
-                  <a href="#"><i class="grcicon-edit"></i></a>
-                  <a href="#"><i class="grcicon-deleted"></i></a>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td><input type="text"></td>
-              <td>
-                <select>
-                  <option>Dropdown</option>
-                  <option>Checkbox</option>
-                  <option>Radio</option>
-                  <option>Text</option>
-                </select>
-              </td>
-              <td>
-                <input type="text" placeholder="Type values separated by comma">
-              </td>
-              <td class="centered checkbox-wrap">
-                <input type="checkbox">
-              </td>
-              <td class="centered checkbox-wrap">
-                <input type="checkbox">
-              </td>
-              <td class="centered checkbox-wrap">
-                <input type="checkbox">
-              </td>
-              <td>
-                <div class="pull-right">
-                  <a class="btn btn-small btn-info" href="#">Add field</a>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+  </assessment-template-attributes>
 </div><!-- custom-attr-wrap end -->

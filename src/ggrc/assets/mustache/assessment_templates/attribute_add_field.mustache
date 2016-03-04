@@ -1,0 +1,38 @@
+{{!
+  Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: ivan@reciprocitylabs.com
+  Maintained By: ivan@reciprocitylabs.com
+}}
+
+<table class="table">
+  <tbody>
+    <tr>
+      <td>
+        <input can-value="selected.title" type="text" placeholder="Enter title">
+      </td>
+      <td>
+        <select can-value="selected.type">
+          {{#types}}
+            <option>{{type}}</option>
+          {{/types}}
+        </select>
+      </td>
+      <td>
+        <p>{{placeholder}}</p>
+        <input can-value="selected.values" type="text" placeholder="{{placeholder}}">
+      </td>
+      <td class="centered checkbox-wrap">
+      </td>
+      <td class="centered checkbox-wrap">
+      </td>
+      <td class="centered checkbox-wrap">
+      </td>
+      <td>
+        <div class="pull-right">
+          <a can-click="addFiled" class="btn btn-small btn-info" href="#">Add field</a>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
