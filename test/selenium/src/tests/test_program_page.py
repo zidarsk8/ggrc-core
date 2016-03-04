@@ -95,7 +95,7 @@ class TestProgramPage(base.Test):
     _, program_info = new_program
     selenium.driver.get(program_info.url)
 
-    program_info_page = widget.ProgramInfo(selenium.driver)
+    program_info_page = widget.ProgramsInfo(selenium.driver)
     program_info_page \
         .press_object_settings() \
         .select_get_permalink()
@@ -121,15 +121,15 @@ class TestProgramPage(base.Test):
     _, program_info = new_program
     selenium.driver.get(program_info.url)
 
-    program_info_page = widget.ProgramInfo(selenium.driver)
+    program_info_page = widget.ProgramsInfo(selenium.driver)
     modal = program_info_page \
         .press_object_settings() \
         .select_edit()
-    test_helpers.ModalNewProgramPage.enter_test_data(modal)
-    test_helpers.ModalNewProgramPage.set_start_end_dates(modal, 1, -2)
+    test_helpers.ModalNewProgramsPage.enter_test_data(modal)
+    test_helpers.ModalNewProgramsPage.set_start_end_dates(modal, 1, -2)
     modal.save_and_close()
 
-    updated_program_info_page = widget.ProgramInfo(selenium.driver)
+    updated_program_info_page = widget.ProgramsInfo(selenium.driver)
     assert test_helpers.HtmlParser.parse_text(modal.ui_title.text) == \
         updated_program_info_page.title_entered.text
     assert modal.ui_description.text == \
