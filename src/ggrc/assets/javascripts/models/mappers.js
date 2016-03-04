@@ -224,8 +224,8 @@
         return this.loader.refresh_stubs(this);
       }
 
-    , refresh_instances: function () {
-        return this.loader.refresh_instances(this);
+    , refresh_instances: function (force) {
+        return this.loader.refresh_instances(this, force);
       }
 
     //  `refresh_count`
@@ -453,10 +453,10 @@
           .then(function () { return binding.list; });
       }
 
-    , refresh_instances: function (binding) {
-        if (!binding._refresh_instances_deferred) {
+    , refresh_instances: function (binding, force) {
+        if (force || !binding._refresh_instances_deferred) {
           binding._refresh_instances_deferred =
-            $.when(this._refresh_instances(binding));
+            $.when(this._refresh_instances(binding, force));
         }
         return binding._refresh_instances_deferred
           .then(
@@ -469,12 +469,12 @@
             });
       }
 
-    , _refresh_instances: function (binding) {
+    , _refresh_instances: function (binding, force) {
         return this.refresh_stubs(binding)
           .then(function () {
             var refresh_queue = new RefreshQueue();
             can.each(binding.list, function (result) {
-              refresh_queue.enqueue(result.instance);
+              refresh_queue.enqueue(result.instance, force);
             });
             return refresh_queue.trigger();
           });

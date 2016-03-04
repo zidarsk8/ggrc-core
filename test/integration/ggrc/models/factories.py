@@ -91,3 +91,21 @@ class ProgramFactory(ModelFactory):
 
   title = 'program_title'
   slug = 'program_slug'
+
+
+class ContractFactory(ModelFactory):
+  class Meta:
+    model = models.Contract
+
+
+class EventFactory(ModelFactory):
+  class Meta:
+    model = models.Event
+  revisions = []
+
+
+class RelationshipFactory(ModelFactory):
+  class Meta:
+    model = models.Relationship
+  source = None
+  destination = None

@@ -621,7 +621,11 @@ class Builder(AttributeInfo):
     class_attr = getattr(obj.__class__, attr_name)
     if isinstance(class_attr, AssociationProxy):
       if getattr(class_attr, 'publish_raw', False):
-        return getattr(obj, attr_name).copy()
+        published_attr = getattr(obj, attr_name)
+        if hasattr(published_attr, "copy"):
+          return published_attr.copy()
+        else:
+          return published_attr
       else:
         return self.publish_association_proxy(
             obj, attr_name, class_attr, inclusions, include, inclusion_filter)

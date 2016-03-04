@@ -7,6 +7,7 @@
 """
 
 from sqlalchemy import orm
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from ggrc import db
 from ggrc.models.computed_property import computed_property
@@ -62,11 +63,15 @@ class CycleTaskGroupObjectTask(
   finished_date = db.Column(db.DateTime)
   verified_date = db.Column(db.DateTime)
 
+  object_approval = association_proxy('cycle', 'workflow.object_approval')
+  object_approval.publish_raw = True
+
   @property
   def cycle_task_objects_for_cache(self):
     """Changing task state must invalidate `workflow_state` on objects
     """
-    return [(o.__class__.__name__, o.id) for o in self.related_objects]
+    return [(object_.__class__.__name__, object_.id) for object_ in
+            self.related_objects]
 
   _publish_attrs = [
       'cycle',
@@ -77,6 +82,7 @@ class CycleTaskGroupObjectTask(
       'task_type',
       'response_options',
       'selected_response_options',
+      PublishOnly('object_approval'),
       PublishOnly('finished_date'),
       PublishOnly('verified_date')
   ]

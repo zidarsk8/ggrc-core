@@ -257,14 +257,10 @@
       }
       mappings[type] = {
         task_groups: new GGRC.ListLoaders.ProxyListLoader('TaskGroupObject', 'object', 'task_group', 'task_group_objects', null),
-        object_tasks: TypeFilter("related_objects", "CycleTaskGroupObjectTask"),
-        approval_tasks: Search(function (binding) {
-          return CMS.Models.CycleTaskGroupObjectTask.findAll({
-            'cycle_task_group_object.object_id': binding.instance.id,
-            'cycle_task_group_object.object_type': binding.instance.type,
-            'cycle.workflow.object_approval': true
-          });
-        }, "Cycle"),
+        object_tasks: TypeFilter('related_objects', 'CycleTaskGroupObjectTask'),
+        approval_tasks: CustomFilter('object_tasks', function(object) {
+          return object.instance.attr("object_approval");
+        }),
         workflows: Cross('task_groups', 'workflow'),
         approval_workflows: CustomFilter('workflows', function (binding) {
           return binding.instance.attr('object_approval');

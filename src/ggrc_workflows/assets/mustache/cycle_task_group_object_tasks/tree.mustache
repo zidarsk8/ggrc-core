@@ -30,18 +30,6 @@
                       <div class="owner tree-title-area">
                         {{#instance}}
                           {{#switch attr_name}}
-                            {{#case 'mapped_object'}}
-                              {{#using instance=instance.cycle_task_group_object}}
-                                {{#using object=instance.object}}
-                                    <div class="tree-title-area">
-                                      <i class="fa fa-{{instance.object.reify.class.table_singular}} black"></i>
-                                      <span class="tiny-data">
-                                        {{firstnonempty object.title ''}}
-                                      </span>
-                                    </div>
-                                {{/using}}
-                              {{/using}}
-                            {{/case}}
                             {{#case 'workflow'}}
                               {{#using cycle=instance.cycle}}
                                 {{#using workflow=cycle.workflow}}
@@ -96,7 +84,7 @@
                   {{/with_mapping_count}}
                 </li>
                 <li>
-                  {{#with_mapping_count instance 'cycle_task_group_object'}}
+                  {{#with_mapping_count instance 'related_objects'}}
                   <span class="counter" rel="tooltip" data-placement="left" data-original-title="# of objects">
                     <i class="fa fa-list-alt"></i>
                     <strong class="error">{{count}}</strong>

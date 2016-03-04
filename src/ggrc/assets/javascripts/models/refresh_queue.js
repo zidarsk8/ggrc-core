@@ -170,7 +170,7 @@ can.Construct("RefreshQueue", {
         } else if (instance.get_binding) {
           next = instance.get_binding(prop);
           if (next) {
-            deferred = next.refresh_list();
+            deferred = next.refresh_instances(force);
           }
         }
         if (deferred) {

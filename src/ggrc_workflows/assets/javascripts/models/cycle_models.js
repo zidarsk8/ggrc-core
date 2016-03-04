@@ -182,7 +182,6 @@
     attributes: {
       cycle: "CMS.Models.Cycle.stub",
       task_group: "CMS.Models.TaskGroup.stub",
-      cycle_task_group_objects: "CMS.Models.CycleTaskGroupObject.stubs",
       cycle_task_group_tasks: "CMS.Models.CycleTaskGroupObjectTask.stubs",
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub"
@@ -214,7 +213,7 @@
           var dfd = instance.refresh_all_force('cycle', 'workflow');
           dfd.then(function(){
             return $.when(
-              instance.refresh_all_force('cycle_task_group_objects'),
+              instance.refresh_all_force('related_objects'),
               instance.refresh_all_force('cycle_task_group_tasks')
             );
           });
@@ -222,14 +221,6 @@
       });
       this.bind("destroyed", function(ev, inst) {
         if(inst instanceof that) {
-          can.each(inst.cycle_task_group_objects, function(ctgo) {
-            if (!ctgo) {
-              return;
-            }
-            ctgo = ctgo.reify();
-            can.trigger(ctgo, "destroyed");
-            can.trigger(ctgo.constructor, "destroyed", ctgo);
-          });
           can.each(inst.cycle_task_group_tasks, function(ctgt) {
             if (!ctgt) {
               return;
@@ -321,7 +312,7 @@
 
       this.bind("updated", function(ev, instance) {
         if (instance instanceof that) {
-          instance.refresh_all_force('task_group_object', 'object').then(function(object) {
+          instance.refresh_all_force('related_objects').then(function(object) {
             return instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
           });
         }
@@ -365,9 +356,6 @@
 
       try {
         vals['workflows'] = this.cycle.reify().workflow.reify().title;
-        if (this.cycle_task_group_object){
-          vals['mapped objects'] = this.cycle_task_group_object.reify().title;
-        }
       } catch (e) {}
 
       return vals;

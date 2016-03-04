@@ -159,34 +159,6 @@
         </div>
       </div>
 
-      {{#is_dashboard}}
-        {{#using instance=instance.cycle_task_group_object}}
-          {{#using object=instance.object}}
-            <div class="row-fluid wrap-row">
-              <div class="span9">
-                {{#if object.viewLink}}
-                <h6>Task to be performed on object</h6>
-                <p>
-                  <i class="fa fa-{{instance.object.reify.class.table_singular}} color smallmargin"></i>
-                  <span class="cap">{{instance.object.reify.class.table_singular}}:</span>
-                  {{#is_allowed "view_object_page" object}}
-                    <a href="{{object.viewLink}}" rel="tooltip" data-original-title="View {{instance.object.reify.class.table_singular}}">
-                      {{firstnonempty object.title instance.title}}
-                      <i class="fa fa-long-arrow-right smallmargin"></i>
-                    </a>
-                  {{else}}
-                    {{firstnonempty object.title instance.title}}
-                  {{/is_allowed}}
-                </p>
-                {{else}}
-                  <h6>No object assigned</h6>
-                {{/if}}
-              </div>
-            </div>
-          {{/using}}
-        {{/using}}
-      {{/is_dashboard}}
-
       {{#using cycle=instance.cycle}}
       {{#using workflow=cycle.workflow}}
       {{#if_helpers '\
