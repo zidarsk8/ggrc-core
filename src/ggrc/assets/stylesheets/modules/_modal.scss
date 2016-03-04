@@ -342,7 +342,11 @@
     }
     .checkbox-wrap {
       input[type="checkbox"] {
-        margin-bottom: 0;
+        display: block;
+        margin: 0 auto 12px;
+        &:first-child {
+          margin-top: 6px;
+        }
       }
     }
     .objective-selector {
@@ -764,7 +768,48 @@
 }
 
 // Mockups Assessment Page V1.0
-#AssessmentDefineTemplate {
+.note {
+  font-size: $f-medium;
+}
+.workflow-accordion {
+  .accordion-group {
+    @include border-radius(0);
+    border: none;
+    border-bottom: 1px solid $footerBorder;
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  .accordion-heading {
+    .accordion-toggle  {
+      padding: 4px 0;
+      font-weight: bold;
+    }
+  }
+  .accordion-inner {
+    border-top: none;
+    padding-left: 19px;
+    button {
+      border: none;
+      background: none;
+      padding: 0;
+      i {
+        margin-top: 5px;
+      }
+      &:focus,
+      &:active {
+        outline: 0;
+      }
+    }
+    .workflow-repeat {
+      float: left;
+      line-height: 26px;
+      margin-right: 4px;
+    }
+  }
+}
+
+.define-attr {
   .hidden-fields-area {
     padding-left: 0;
   }

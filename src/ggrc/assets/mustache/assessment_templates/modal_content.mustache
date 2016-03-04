@@ -129,29 +129,52 @@
   </div>
 </div>
 
-<div class="custom-attr-wrap">
-  <assessment-template-attributes>
-    <table class="table">
-      <thead>
-        <tr>
-          <th><h6>Attribute Title</h6></th>
-          <th><h6>Attribute type</h6></th>
-          <th><h6>Attribute values</h6></th>
-          <th class="centered"><h6>Attachment required</h6></th>
-          <th class="centered"><h6>Comment required</h6></th>
-          <th class="centered"><h6>Mandatory</h6></th>
-          <th>&nbsp;</th>
-        </tr>
-      </thead>
-      <tbody>
-        <add-template-filed fields="fields">
-        </add-template-filed>
-        {{#fields}}
-        <template-filed field="." fields="fields"></template-filed>
-        {{/fields}}
-      </tbody>
-  </tbody>
-</table>
+<div class="custom-attr-wrap define-attr">
 
-  </assessment-template-attributes>
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="info-expand">
+        <a class="show-hidden-fields info-show-hide" href="javascript://">
+          <span class="out">
+            <i class="fa fa-caret-right"></i>
+            Custom attributes
+          </span>
+          <span class="in">
+            <i class="fa fa-caret-down"></i>
+            Custom attributes
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {{! <div class="hidden-fields-area" style="display:none;"> }}
+  <div class="hidden-fields-area">
+    <div class="row-fluid wrap-row">
+      <div class="custom-attr-table span12">
+        <assessment-template-attributes>
+          <table class="table">
+            <thead>
+              <tr>
+                <th><h6>Attribute Title</h6></th>
+                <th><h6>Attribute type</h6></th>
+                <th><h6>Attribute values</h6></th>
+                <th class="centered"><h6>Attachment required</h6></th>
+                <th class="centered"><h6>Comment required</h6></th>
+                <th class="centered"><h6>Mandatory</h6></th>
+                <th>&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <add-template-filed fields="fields">
+              </add-template-filed>
+              {{#fields}}
+              <template-filed field="." fields="fields"></template-filed>
+              {{/fields}}
+            </tbody>
+          </table>
+        </assessment-template-attributes>
+      </div>
+    </div>
+  </div>
 </div><!-- custom-attr-wrap end -->
