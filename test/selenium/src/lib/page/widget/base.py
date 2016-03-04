@@ -9,7 +9,7 @@
 
 from lib import base
 from lib import environment
-from lib import selenium_utils
+from lib.utils import selenium_utils
 from lib.constants import locator
 from lib.constants import url
 

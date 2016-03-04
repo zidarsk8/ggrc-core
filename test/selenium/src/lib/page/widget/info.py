@@ -6,23 +6,26 @@
 """Page object models for the info widget of the object"""
 
 from lib import base
-from lib import environment
-from lib.constants import url
 from lib.constants import locator
 from lib.element import widget_info
 
 
 class InfoWidget(base.Widget):
   """Model for a generic info widget"""
-
+  _locator = None
   _dropdown_settings_cls = widget_info.DropdownSettingsControls
 
   def __init__(self, driver):
-    super(InfoWidget, self).__init__(driver)
-
+    # wait that the elements load before calling super
     self.button_settings = base.Button(
         driver, locator.InfoWidget.BUTTON_SETTINGS)
+
+    super(InfoWidget, self).__init__(driver)
+
     self.object_id = self.url.split("/")[-1]
+    self.title = base.Label(self._driver, self._locator.TITLE)
+    self.title_entered = base.Label(
+        self._driver, self._locator.TITLE_ENTERED)
 
   def press_object_settings(self):
     """
@@ -35,9 +38,7 @@ class InfoWidget(base.Widget):
 
 class DashboardInfo(base.Widget):
   """Model for the dashboard info widget"""
-
   _locator = locator.Dashboard
-  URL = environment.APP_URL + url.DASHBOARD
 
   def __init__(self, driver):
     super(DashboardInfo, self).__init__(driver)
@@ -69,10 +70,9 @@ class DashboardInfo(base.Widget):
     raise NotImplementedError
 
 
-class ProgramInfo(InfoWidget):
+class ProgramsInfo(InfoWidget):
   """Model for program object info widget"""
-
-  _locators = locator.ProgramInfoWidget
+  _locator = locator.ProgramInfoWidget
   _dropdown_settings_cls = widget_info.DropdownSettingsPrograms
 
   def __init__(self, driver):
@@ -80,240 +80,179 @@ class ProgramInfo(InfoWidget):
     Args:
         driver (base.CustomDriver)
     """
-    super(ProgramInfo, self).__init__(driver)
+    super(ProgramsInfo, self).__init__(driver)
+
     self.show_advanced = base.Toggle(
-        self._driver, self._locators.TOGGLE_SHOW_ADVANCED)
+        self._driver, self._locator.TOGGLE_SHOW_ADVANCED)
 
     # activate all fields
     self.show_advanced.toggle()
 
-    self.title = base.Label(self._driver, self._locators.TITLE)
-    self.title_entered = base.Label(
-        self._driver, self._locators.TITLE_ENTERED)
     self.object_review = base.Label(
-        self._driver, self._locators.OBJECT_REVIEW)
+        self._driver, self._locator.OBJECT_REVIEW)
     self.submit_for_review = base.Label(
-        self._driver, self._locators.SUBMIT_FOR_REVIEW)
-    self.description = base.Label(self._driver, self._locators.DESCRIPTION)
+        self._driver, self._locator.SUBMIT_FOR_REVIEW)
+    self.description = base.Label(self._driver, self._locator.DESCRIPTION)
     self.description_entered = base.Label(
-        self._driver, self._locators.DESCRIPTION_ENTERED)
-    self.notes = base.Label(self._driver, self._locators.NOTES)
+        self._driver, self._locator.DESCRIPTION_ENTERED)
+    self.notes = base.Label(self._driver, self._locator.NOTES)
     self.notes_entered = base.Label(
-        self._driver, self._locators.NOTES_ENTERED)
-    self.manager = base.Label(self._driver, self._locators.MANAGER)
+        self._driver, self._locator.NOTES_ENTERED)
+    self.manager = base.Label(self._driver, self._locator.MANAGER)
     self.manager_entered = base.Label(
-        self._driver, self._locators.MANAGER_ENTERED)
-    self.program_url = base.Label(self._driver, self._locators.PROGRAM_URL)
+        self._driver, self._locator.MANAGER_ENTERED)
+    self.program_url = base.Label(self._driver, self._locator.PROGRAM_URL)
     self.program_url_entered = base.Label(
-        self._driver, self._locators.PROGRAM_URL_ENTERED)
-    self.code = base.Label(self._driver, self._locators.CODE)
+        self._driver, self._locator.PROGRAM_URL_ENTERED)
+    self.code = base.Label(self._driver, self._locator.CODE)
     self.code_entered = base.Label(
-        self._driver, self._locators.CODE_ENTERED)
+        self._driver, self._locator.CODE_ENTERED)
     self.effective_date = base.Label(
-        self._driver, self._locators.EFFECTIVE_DATE)
+        self._driver, self._locator.EFFECTIVE_DATE)
     self.effective_date_entered = base.Label(
-        self._driver, self._locators.EFFECTIVE_DATE_ENTERED)
-    self.stop_date = base.Label(self._driver, self._locators.STOP_DATE)
+        self._driver, self._locator.EFFECTIVE_DATE_ENTERED)
+    self.stop_date = base.Label(self._driver, self._locator.STOP_DATE)
     self.stop_date_entered = base.Label(
-        self._driver, self._locators.STOP_DATE_ENTERED)
+        self._driver, self._locator.STOP_DATE_ENTERED)
     self.primary_contact = base.Label(
-        self._driver, self._locators.PRIMARY_CONTACT)
+        self._driver, self._locator.PRIMARY_CONTACT)
     self.primary_contact_entered = base.Label(
-        self._driver, self._locators.PRIMARY_CONTACT_ENTERED)
+        self._driver, self._locator.PRIMARY_CONTACT_ENTERED)
     self.secondary_contact = base.Label(
-        self._driver, self._locators.SECONDARY_CONTACT)
+        self._driver, self._locator.SECONDARY_CONTACT)
     self.secondary_contact_entered = base.Label(
-        self._driver, self._locators.SECONDARY_CONTACT_ENTERED)
+        self._driver, self._locator.SECONDARY_CONTACT_ENTERED)
     self.reference_url = base.Label(
-        self._driver, self._locators.REFERENCE_URL)
+        self._driver, self._locator.REFERENCE_URL)
     self.reference_url_entered = base.Label(
-        self._driver, self._locators.REFERENCE_URL_ENTERED)
+        self._driver, self._locator.REFERENCE_URL_ENTERED)
 
 
 class WorkflowInfo(InfoWidget):
   """Model for workflow object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.WORKFLOWS
+  _locator = locator.WorkflowInfoWidget
 
 
 class AuditInfo(InfoWidget):
   """Model for audit object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.AUDITS
+  _locator = locator.AuditInfoWidget
 
 
 class AssessmentsInfo(InfoWidget):
   """Model for assessment object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.ASSESSMENTS
+  _locator = locator.AssessmentInfoWidget
 
 
 class RequestsInfo(InfoWidget):
   """Model for request object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.REQUESTS
+  _locator = locator.RequestInfoWidget
 
 
 class IssuesInfo(InfoWidget):
   """Model for issue object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.ISSUES
+  _locator = locator.IssueInfoWidget
 
 
 class RegulationsInfo(InfoWidget):
   """Model for regulation object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.REGULATIONS
+  _locator = locator.RegulationsInfoWidget
 
 
 class PoliciesInfo(InfoWidget):
   """Model for policies object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.POLICIES
+  _locator = locator.PolicyInfoWidget
 
 
 class StandardsInfo(InfoWidget):
   """Model for standard object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.STANDARDS
+  _locator = locator.StandardInfoWidget
 
 
 class ContractsInfo(InfoWidget):
   """Model for contract object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.CONTRACTS
+  _locator = locator.ContractInfoWidget
 
 
 class ClausesInfo(InfoWidget):
   """Model for clause object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.CLAUSES
+  _locator = locator.ClauseInfoWidget
 
 
 class SectionsInfo(InfoWidget):
   """Model for selection object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.SECTIONS
+  _locator = locator.SectionInfoWidget
 
 
-class ControlInfo(InfoWidget):
+class ControlsInfo(InfoWidget):
   """Model for control object info widget"""
-
-  _locators = locator.WidgetInfoSettingsButton
-
-  def __init__(self, driver):
-    """
-    Args:
-        driver (base.CustomDriver)
-    """
-    super(ControlInfo, self).__init__(driver)
-    self.title_entered = base.Label(driver, self._locators.TITLE_ENTERED)
+  _locator = locator.ControlInfoWidget
 
 
 class ObjectivesInfo(InfoWidget):
   """Model for objectives object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.OBJECTIVES
+  _locator = locator.ObjectiveInfoWidget
 
 
 class PeopleInfo(base.Widget):
   """Model for people object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.PEOPLE
+  _locator = locator.PeopleInfoWidget
 
 
 class OrgGroupsInfo(InfoWidget):
   """Model for org groups object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.ORG_GROUPS
+  _locator = locator.OrgGroupInfoWidget
 
 
 class VendorsInfo(InfoWidget):
   """Model for vendors object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.VENDORS
+  _locator = locator.VendorInfoWidget
 
 
 class AccessGroupInfo(InfoWidget):
   """Model for access group object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.ACCESS_GROUPS
+  _locator = locator.AccessGroupInfoWidget
 
 
 class SystemInfo(InfoWidget):
   """Model for system object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.SYSTEMS
+  _locator = locator.SystemInfoWidget
 
 
-class ProcessInfo(InfoWidget):
+class ProcessesInfo(InfoWidget):
   """Model for process object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.PROCESSES
+  _locator = locator.ProcessInfoWidget
 
 
-class DataAssetInfo(InfoWidget):
+class DataAssetsInfo(InfoWidget):
   """Model for data asset object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.DATA_ASSETS
+  _locator = locator.DataAssetInfoWidget
 
 
-class ProductInfo(InfoWidget):
+class ProductsInfo(InfoWidget):
   """Model for product object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.PRODUCTS
+  _locator = locator.ProductInfoWidget
 
 
-class ProjectInfo(InfoWidget):
+class ProjectsInfo(InfoWidget):
   """Model for project object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.PROJECTS
+  _locator = locator.ProjectInfoWidget
 
 
-class FacilityInfo(InfoWidget):
+class FacilitiesInfo(InfoWidget):
   """Model for facility object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.FACILITIES
+  _locator = locator.FacilityInfoWidget
 
 
-class MarketInfo(InfoWidget):
+class MarketsInfo(InfoWidget):
   """Model for market object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.MARKETS
+  _locator = locator.MarketInfoWidget
 
 
-class RiskInfo(InfoWidget):
+class RisksInfo(InfoWidget):
   """Model for risk object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.RISKS
+  _locator = locator.RiskInfoWidget
 
 
-class ThreatInfo(InfoWidget):
+class ThreatsInfo(InfoWidget):
   """Model for threat object info widget"""
-
-  _locators = locator.ProgramInfoWidget
-  URL = environment.APP_URL + url.THREATS
+  _locator = locator.ThreatInfoWidget

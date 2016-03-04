@@ -13,7 +13,7 @@ from lib.constants import locator
 class Controls(base.ObjectWidget):
   """Model for the control widget"""
 
-  _info_pane_cls = info.ControlInfo
+  _info_pane_cls = info.ControlsInfo
 
   def __init__(self, driver,):
     super(Controls, self).__init__(
