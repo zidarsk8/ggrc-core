@@ -7,6 +7,7 @@
 
 from ggrc.notifications import common
 from ggrc.notifications import notification_handlers
+from ggrc.notifications import data_handlers
 
 
 CONTRIBUTED_CRON_JOBS = [
@@ -16,3 +17,9 @@ CONTRIBUTED_CRON_JOBS = [
 NOTIFICATION_LISTENERS = [
     notification_handlers.register_handlers
 ]
+
+def contributed_notifications():
+  """Get handler functions for ggrc notification file types."""
+  return {
+      "Request": data_handlers.get_request_data,
+  }
