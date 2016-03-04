@@ -300,7 +300,20 @@ class RiskModal(_Modal):
 
 
 class OrgGroupModal(_Modal):
-  """Class representing a new risk modal visible after creating a new
-  control from LHN"""
+  """Class representing a new org group modal visible after creating a new
+  org group from LHN"""
+  _locator_ui_title = locator.ModalCreateNewOrgGroup.UI_TITLE
 
-  _locators = locator.ModalCreateNewOrgGroup
+
+
+class IssueModal(_Modal):
+  """Class representing a new issue modal visible after creating a new
+  issue from LHN"""
+  _locator_ui_title = locator.ModalCreateNewIssue.UI_TITLE
+
+
+
+class RequestModal(_Modal):
+  """Class representing a new request modal visible after creating a new
+  request from LHN"""
+  _locator_ui_title = locator.ModalCreateNewRequest.UI_TITLE
