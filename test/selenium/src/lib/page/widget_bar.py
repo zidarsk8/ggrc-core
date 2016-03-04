@@ -123,7 +123,7 @@ class DashboardWidgetBarPage(_ObjectWidgetBar):
 class ProgramWidgetBarPage(_ObjectWidgetBar):
   """A model representing widget bar of the program object"""
 
-  _info_cls = widget.ProgramInfo
+  _info_cls = widget.ProgramsInfo
 
 
 class WorkflowsWidgetBarPage(_ObjectWidgetBar):
@@ -237,46 +237,46 @@ class SystemsWidgetBarPage(_ObjectWidgetBar):
 class ProcessesWidgetBarPage(_ObjectWidgetBar):
   """A model representing widget bar of the process object"""
 
-  _info_cls = widget.ProcessInfo
+  _info_cls = widget.ProcessesInfo
 
 
 class DataAssetsWidgetBarPage(_ObjectWidgetBar):
   """A model representing widget bar of the data asset object"""
 
-  _info_cls = widget.DataAssetInfo
+  _info_cls = widget.DataAssetsInfo
 
 
 class ProductsWidgetBarPage(_ObjectWidgetBar):
   """A model representing widget bar of the product object"""
 
-  _info_cls = widget.ProductInfo
+  _info_cls = widget.ProductsInfo
 
 
 class ProjectsWidgetBarPage(_ObjectWidgetBar):
   """A model representing widget bar of the project object"""
 
-  _info_cls = widget.ProjectInfo
+  _info_cls = widget.ProjectsInfo
 
 
 class FacilitiesWidgetBarPage(_ObjectWidgetBar):
   """A model representing widget bar of the facility object"""
 
-  _info_cls = widget.FacilityInfo
+  _info_cls = widget.FacilitiesInfo
 
 
 class MarketsWidgetBarPage(_ObjectWidgetBar):
   """A model representing widget bar of the market object"""
 
-  _info_cls = widget.MarketInfo
+  _info_cls = widget.MarketsInfo
 
 
 class RisksWidgetBarPage(_ObjectWidgetBar):
   """A model representing widget bar of the risk object"""
 
-  _info_cls = widget.RiskInfo
+  _info_cls = widget.RisksInfo
 
 
 class ThreatsWidgetBarPage(_ObjectWidgetBar):
   """A model representing widget bar of the threat object"""
 
-  _info_cls = widget.ThreatInfo
+  _info_cls = widget.ThreatsInfo

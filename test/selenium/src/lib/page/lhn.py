@@ -57,6 +57,9 @@ class _Requests(lhn.AccordionGroup):
 
   _locator_spinny = locator.LhnMenu.SPINNY_REQUESTS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_REQUEST
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_REQUEST_MEMBERS
+  _create_new_modal_cls = modal.create_new_object.NewRequestModal
+  _extended_info_cls = extended_info.ExtendedInfoMappable
 
 
 class _Issues(lhn.AccordionGroup):
@@ -64,6 +67,9 @@ class _Issues(lhn.AccordionGroup):
 
   _locator_spinny = locator.LhnMenu.SPINNY_ISSUES
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ISSUE
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_REQUEST_MEMBERS
+  _create_new_modal_cls = modal.create_new_object.NewIssueModal
+  _extended_info_cls = extended_info.ExtendedInfoMappable
 
 
 class _Directives(lhn.DropdownStatic):
@@ -229,7 +235,7 @@ class Controls(lhn.AccordionGroup):
   _locator_spinny = locator.LhnMenu.SPINNY_CONTROLS
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_CONTROLS_MEMBERS
   _create_new_modal_cls = modal.create_new_object.NewControlModal
-  _extended_info_cls = extended_info.Controls
+  _extended_info_cls = extended_info.ExtendedInfoMappable
 
 
 class _Objectives(lhn.AccordionGroup):
@@ -310,6 +316,7 @@ class _OrgGroups(lhn.AccordionGroup):
   _locator_spinny = locator.LhnMenu.SPINNY_ORG_GROUPS
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_ORG_GROUP_MEMBERS
   _create_new_modal_cls = modal.create_new_object.NewOrgGroupModal
+  _extended_info_cls = extended_info.ExtendedInfoMappable
 
 
 class _Vendors(lhn.AccordionGroup):
@@ -508,6 +515,7 @@ class _Risks(lhn.AccordionGroup):
   _locator_spinny = locator.LhnMenu.SPINNY_RISKS
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_RISK_MEMBERS
   _create_new_modal_cls = modal.create_new_object.NewRiskModal
+  _extended_info_cls = extended_info.ExtendedInfoMappable
 
 
 class _Threats(lhn.AccordionGroup):

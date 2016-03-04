@@ -10,27 +10,12 @@ from lib import base
 from lib.constants import locator
 
 
-class _ExtendedInfo(base.Component):
-  pass
-
-
-class ExtendedInfoMappable(_ExtendedInfo):
+class ExtendedInfoMappable(base.Component):
   """Model representing an extended info box that allows the object to be
   mapped"""
-  _locator_redirected_to_widget = None
-
   def __init__(self, driver):
     super(ExtendedInfoMappable, self).__init__(driver)
     self.button_map = base.Button(driver, locator.ExtendedInfo.BUTTON_MAP_TO)
 
   def map_to_object(self):
     self.button_map.click()
-
-
-class Controls(ExtendedInfoMappable):
-  """Extended info for controls"""
-
-  _locator_redirected_to_widget = locator.WidgetBar.CONTROLS
-
-  def __init__(self, driver):
-    super(Controls, self).__init__(driver)

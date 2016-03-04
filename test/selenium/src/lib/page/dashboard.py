@@ -35,7 +35,7 @@ class UserList(base.Component):
   def select_my_work(self):
     """
     Returns:
-        widget.DataAssetInfo
+        widget.DataAssetsInfo
     """
     self.button_my_work.click()
     return DashboardPage(self._driver)
@@ -108,7 +108,7 @@ class HeaderPage(base.Page):
   def click_on_logo(self):
     """
     Returns:
-        widget.DataAssetInfo
+        widget.DataAssetsInfo
     """
     raise NotImplementedError
 
