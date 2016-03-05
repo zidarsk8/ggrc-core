@@ -4,17 +4,14 @@
 # Maintained By: laran@reciprocitylabs.com
 
 from sqlalchemy.sql.schema import UniqueConstraint
-
-from ggrc import db
-
-from .mixins import (
-    Titled, Base
-)
-
 from sqlalchemy.ext.declarative import declared_attr
 
+from ggrc import db
+from ggrc.models import mixins
+from ggrc.models.custom_attribute_value import CustomAttributeValue
 
-class CustomAttributeDefinition(Base, Titled, db.Model):
+
+class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   __tablename__ = 'custom_attribute_definitions'
 
   definition_type = db.Column(db.String)

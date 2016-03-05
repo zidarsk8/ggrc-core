@@ -10,10 +10,10 @@ from ggrc.models.mixins import Base
 class CustomAttributeValue(Base, db.Model):
   __tablename__ = 'custom_attribute_values'
 
-  custom_attribute_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('custom_attribute_definitions.id',
-                                          ondelete="CASCADE")),
-      'CustomAttributeValue')
+  custom_attribute_id = db.Column(
+      db.Integer,
+      db.ForeignKey('custom_attribute_definitions.id', ondelete="CASCADE")
+  )
   attributable_id = db.Column(db.Integer)
   attributable_type = db.Column(db.String)
   attribute_value = db.Column(db.String)
