@@ -362,7 +362,7 @@ class TestAnnuallyWorkflow(BaseWorkflowTestCase):
       tg = db.session.query(TaskGroup).filter(
         TaskGroup.workflow_id == wf.id).one()
 
-      response = self.generator.api.delete(tg, tg.id)
+      response = self.generator.api.delete(tg)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()

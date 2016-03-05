@@ -226,7 +226,7 @@ class TestOneTimeWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
           CycleTaskGroupObjectTask.title == "one time task 2"
       ).one()
 
-      response = self.generator.api.delete(cycle_task, cycle_task.id)
+      response = self.generator.api.delete(cycle_task)
       self.assert200(response)
 
       cycle = db.session.query(Cycle).filter(

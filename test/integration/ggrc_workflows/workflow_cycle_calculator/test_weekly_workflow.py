@@ -516,7 +516,7 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
       tg = db.session.query(TaskGroup).filter(
         TaskGroup.workflow_id == wf.id).one()
 
-      response = self.generator.api.delete(tg, tg.id)
+      response = self.generator.api.delete(tg)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
@@ -585,7 +585,7 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
       tg = db.session.query(TaskGroup).filter(
         TaskGroup.workflow_id == wf.id).one()
 
-      response = self.generator.api.delete(tg, tg.id)
+      response = self.generator.api.delete(tg)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
@@ -712,7 +712,7 @@ class TestWeeklyWorkflow(BaseWorkflowTestCase):
       old_task = db.session.query(TaskGroupTask).filter(
         TaskGroupTask.task_group_id == task_group.id).one()
 
-      response = self.generator.api.delete(old_task, old_task.id)
+      response = self.generator.api.delete(old_task)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()

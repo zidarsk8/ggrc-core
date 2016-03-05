@@ -161,7 +161,7 @@ class TestCreatorProgram(TestCase):
 
   def delete(self, obj):
     """ Create a delete request for the given object """
-    return self.api.delete(obj, obj.id).status_code
+    return self.api.delete(obj).status_code
 
   def get(self, obj):
     """ Create a get request for the given object """

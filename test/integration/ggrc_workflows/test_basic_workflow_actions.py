@@ -119,7 +119,7 @@ class TestBasicWorkflowActions(TestCase):
     task_groups = db.session.query(TaskGroup).filter(TaskGroup.workflow_id == workflow.id).all()
     self.assertEqual(len(task_groups), 2)
 
-    response = self.generator.api.delete(task_group, task_group.id)
+    response = self.generator.api.delete(task_group)
     self.assert200(response)
 
     task_groups = db.session.query(TaskGroup).filter(TaskGroup.workflow_id == workflow.id).all()

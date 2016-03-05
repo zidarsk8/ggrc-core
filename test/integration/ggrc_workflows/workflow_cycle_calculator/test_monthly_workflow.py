@@ -173,7 +173,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
         TaskGroupTask.relative_start_day == 14
       ).one()
 
-      response = self.generator.api.delete(task, task.id)
+      response = self.generator.api.delete(task)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
@@ -225,7 +225,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
         TaskGroup.title == u"task group 2"
       ).one()
 
-      response = self.generator.api.delete(task_group, task_group.id)
+      response = self.generator.api.delete(task_group)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
@@ -308,7 +308,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
 
       task_group = db.session.query(TaskGroup).filter(TaskGroup.workflow_id == wf.id).one()
 
-      response = self.generator.api.delete(task_group, task_group.id)
+      response = self.generator.api.delete(task_group)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
@@ -702,7 +702,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
         CycleTaskGroupObjectTask.title == "monthly task 2"
       ).one()
 
-      response = self.generator.api.delete(cycle_task, cycle_task.id)
+      response = self.generator.api.delete(cycle_task)
       self.assert200(response)
 
       cycle = db.session.query(Cycle).filter(
@@ -814,7 +814,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
         TaskGroupTask.title == "monthly task 1"
       ).one()
 
-      response = self.generator.api.delete(task, task.id)
+      response = self.generator.api.delete(task)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
@@ -929,7 +929,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
       tg = db.session.query(TaskGroup).filter(
         TaskGroup.workflow_id == wf.id).one()
 
-      response = self.generator.api.delete(tg, tg.id)
+      response = self.generator.api.delete(tg)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
@@ -990,7 +990,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
       tg = db.session.query(TaskGroup).filter(
         TaskGroup.workflow_id == wf.id).one()
 
-      response = self.generator.api.delete(tg, tg.id)
+      response = self.generator.api.delete(tg)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
@@ -1067,10 +1067,10 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
 
       self.assertEqual(cycle.is_current, True)
 
-      response = self.generator.api.delete(cycle_task_1, cycle_task_1.id)
+      response = self.generator.api.delete(cycle_task_1)
       self.assert200(response)
 
-      response = self.generator.api.delete(cycle_task_2, cycle_task_2.id)
+      response = self.generator.api.delete(cycle_task_2)
       self.assert200(response)
 
       cycle = db.session.query(Cycle).filter(Cycle.id == cycle.id).one()
@@ -1144,7 +1144,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
       tg = db.session.query(TaskGroup).filter(
         TaskGroup.workflow_id == wf.id).one()
 
-      response = self.generator.api.delete(tg, tg.id)
+      response = self.generator.api.delete(tg)
       self.assert200(response)
 
       active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
@@ -1157,7 +1157,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
         CycleTaskGroupObjectTask.start_date == date(2015, 8, 14),
         CycleTaskGroupObjectTask.title == "monthly task 1"
       ).one()
-      response = self.generator.api.delete(cycle_task_1, cycle_task_1.id)
+      response = self.generator.api.delete(cycle_task_1)
       self.assert200(response)
 
       cycle = db.session.query(Cycle).filter(Cycle.id == cycle.id).one()
@@ -1168,7 +1168,7 @@ class TestMonthlyWorkflow(BaseWorkflowTestCase):
         CycleTaskGroupObjectTask.start_date == date(2015, 8, 17),
         CycleTaskGroupObjectTask.title == "monthly task 2"
       ).one()
-      response = self.generator.api.delete(cycle_task_2, cycle_task_2.id)
+      response = self.generator.api.delete(cycle_task_2)
       self.assert200(response)
 
       # Verify cycle got completed
