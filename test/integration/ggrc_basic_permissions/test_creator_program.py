@@ -7,7 +7,6 @@
 Test Creator role with Program scoped roles
 """
 
-import unittest
 from integration.ggrc import TestCase
 from ggrc.models import all_models
 from integration.ggrc.api_helper import Api
@@ -366,6 +365,7 @@ class TestCreatorProgram(TestCase):
     })
     self.assertEqual(response.status_code, 201)
     relationship_id = response.json.get("relationship").get("id")
-    response = self.api.get_collection(all_models.Relationship, relationship_id)
+    response = self.api.get_collection(all_models.Relationship,
+                                       relationship_id)
     num = len(response.json["relationships_collection"]["relationships"])
     self.assertEqual(num, 2)

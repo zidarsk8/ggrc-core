@@ -3,11 +3,20 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""Test api helper.
+
+This module contains an api helper that is used for simulating api calls to our
+app. This api helper is used instead of the TestCase.client in cases where we
+need to access the API during the class setup stage, when the default flaks
+test client is not yet ready.
+
+This api helper also helps with delete and put requests where it fetches the
+latest etag needed for such requests.
+"""
+
 from ggrc import db
 from ggrc.app import app
 from ggrc.services.common import Resource
-from ggrc import services
-import inspect
 import flask
 import logging
 
