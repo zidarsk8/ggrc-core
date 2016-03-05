@@ -3,17 +3,17 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""Tests for notifications for models with assignable mixin."""
 
-from freezegun import freeze_time
 from datetime import datetime
-from mock import patch
+from freezegun import freeze_time
+from sqlalchemy import and_
 
+from ggrc import db
 from ggrc.models import Notification
-from ggrc.models import Person
-from ggrc.models import Request
+from ggrc.models import NotificationType
 from integration.ggrc import converters
-from integration.ggrc.models import factories
-from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc import api_helper
 
 
 class TestAssignableNotification(converters.TestCase):
@@ -26,9 +26,10 @@ class TestAssignableNotification(converters.TestCase):
     converters.TestCase.setUp(self)
     self.client.get("/login")
     self._fix_notification_init()
+    self.api_helper = api_helper.Api()
 
   def _fix_notification_init(self):
-    """Fix Notification object init function
+    """Fix Notification object init function.
 
     This is a fix needed for correct created_at field when using freezgun. By
     default the created_at field is left empty and filed by database, which
@@ -38,6 +39,8 @@ class TestAssignableNotification(converters.TestCase):
     """
 
     def init_decorator(init):
+      """Wrapper for Notification init function."""
+
       def new_init(self, *args, **kwargs):
         init(self, *args, **kwargs)
         if hasattr(self, "created_at"):
@@ -46,17 +49,36 @@ class TestAssignableNotification(converters.TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  def _get_unsent_notifications(self):
-    return Notification.query.filter(Notification.sent_at.is_(None))
+  @classmethod
+  def _get_notifications(cls, sent=False, notif_type=None):
+    """Get a notification query.
 
-  @patch("ggrc.notifications.common.send_email")
-  def test_request_without_verifiers(self, mock_mail):
+    Args:
+      sent (boolean): flag to filter out only notifications that have been
+        sent.
+      notif_type (string): name of the notification type.
+
+    Returns:
+      sqlalchemy query for selected notifications.
+    """
+    if sent:
+      notif_filter = Notification.sent_at.isnot(None)
+    else:
+      notif_filter = Notification.sent_at.is_(None)
+
+    if notif_type:
+      notif_filter = and_(notif_filter, NotificationType.name == notif_type)
+
+    return db.session.query(Notification).join(NotificationType).filter(
+        notif_filter
+    )
+
+  def test_request_without_verifiers(self):
 
     with freeze_time("2015-04-01"):
       self.import_file("request_full_no_warnings.csv")
 
-      self.assertEqual(self._get_unsent_notifications().count(), 12)
+      self.assertEqual(self._get_notifications().count(), 12)
 
       self.client.get("/_notifications/send_todays_digest")
-      self.assertEqual(self._get_unsent_notifications().count(), 0)
-
+      self.assertEqual(self._get_notifications().count(), 0)
