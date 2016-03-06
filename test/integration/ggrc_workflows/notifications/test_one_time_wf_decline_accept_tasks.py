@@ -3,24 +3,18 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
 from integration.ggrc import TestCase
 from freezegun import freeze_time
 from datetime import date, datetime
 from mock import patch
 from sqlalchemy import and_
 
-import os
 from ggrc import db, notifications
 from ggrc.models import NotificationType, Notification, Person
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
-
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestCycleTaskStatusChange(TestCase):

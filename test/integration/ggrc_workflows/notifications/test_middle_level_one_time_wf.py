@@ -3,23 +3,17 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
 import textwrap
 from integration.ggrc import TestCase
 from freezegun import freeze_time
 from datetime import date, datetime
 
-import os
 from ggrc import db
 from ggrc import notifications
 from ggrc.models import Notification
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
-
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestOneTimeWorkflowNotification(TestCase):
