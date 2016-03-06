@@ -1204,9 +1204,16 @@ can.Model("can.Model.Cacheable", {
       this.setup_custom_attributes();
     }
     can.each(this.custom_attribute_values, function (customAttr) {
+      var value;
+      var obj;
       customAttr = customAttr.reify();
-      customAttrs[customAttrIds[customAttr.custom_attribute_id]] =
-        customAttr.attribute_value;
+      if (customAttr.attribute_object) {
+        obj = customAttr.attribute_object.reify();
+        value = _.filter([obj.email, obj.name, obj.title, obj.slug]);
+      } else {
+        value = customAttr.attribute_value;
+      }
+      customAttrs[customAttrIds[customAttr.custom_attribute_id]] = value;
     });
 
     if (!mappings[longTitle]) {
@@ -1239,13 +1246,12 @@ can.Model("can.Model.Cacheable", {
           if ($.type(val) === 'date') {
             val = val.toISOString().substring(0, 10);
           }
-          if ($.type(val) === 'string') {
+          if (_.contains(['string', 'array'], $.type(val))) {
             values[key] = val;
           }
         }
       }
     }.bind(this));
-
     return values;
   },
 
