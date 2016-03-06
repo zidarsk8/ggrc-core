@@ -71,7 +71,7 @@ class TestNotificationsForDeletedObjects(TestCase):
 
       workflow = Workflow.query.get(wf.id)
 
-      response = self.wf_generator.api.delete(workflow, workflow.id)
+      response = self.wf_generator.api.delete(workflow)
       self.assert200(response)
 
       _, notif_data = notifications.get_todays_notifications()
