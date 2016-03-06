@@ -165,7 +165,8 @@ class MysqlIndexer(SqlIndexer):
       Objects in private contexts via UserRole (e.g. for Private Programs)
       Objects for which the user is the "contact"
       Objects for which the user is the "primary_assessor" or
-      "secondary_assessor"
+        "secondary_assessor"
+      Objects to which the user is mapped via a custom attribute
       Assignable objects for which the user is an assignee
 
     This method only *limits* the result set -- Contexts and Roles will still
@@ -230,6 +231,19 @@ class MysqlIndexer(SqlIndexer):
         )
     )
     type_union_queries.append(object_owners_query)
+
+    # Objects to which the user is mapped via a custom attribute
+    ca_mapped_objects_query = db.session.query(
+        all_models.CustomAttributeValue.attributable_id.label('id'),
+        all_models.CustomAttributeValue.attributable_type.label('type'),
+        literal(None).label('context_id')
+    ).filter(
+        and_(
+            all_models.CustomAttributeValue.attribute_value == "Person",
+            all_models.CustomAttributeValue.attribute_object_id == contact_id
+        )
+    )
+    type_union_queries.append(ca_mapped_objects_query)
 
     # Objects for which the user is assigned
     model_assignee_query = db.session.query(
