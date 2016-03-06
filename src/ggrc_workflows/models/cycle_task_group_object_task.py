@@ -186,6 +186,8 @@ class CycleTaskable(object):
   """
   @computed_property
   def cycle_task_group_object_tasks(self):
+    """ Lists all the cycle tasks related to a certain object
+    """
     sources = [r.source for r in self.related_sources
                if r.source_type == "CycleTaskGroupObjectTask"]
     destinations = [r.destination for r in self.related_destinations

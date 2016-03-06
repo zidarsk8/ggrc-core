@@ -59,6 +59,7 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Cycle Task Group,", response.data)
     self.assertIn("Cycle Task Group Object Task,", response.data)
 
+
 class TestExportMultipleObjects(TestCase):
 
   """ Test data is found in the google sheet:

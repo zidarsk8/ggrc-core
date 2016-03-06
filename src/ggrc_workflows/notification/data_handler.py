@@ -6,7 +6,6 @@
 from copy import deepcopy
 from datetime import date
 from sqlalchemy import and_
-from sqlalchemy import or_
 from urlparse import urljoin
 
 from ggrc import db

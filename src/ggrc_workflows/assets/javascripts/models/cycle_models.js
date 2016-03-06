@@ -310,9 +310,9 @@
         }
       });
 
-      this.bind("updated", function(ev, instance) {
+      this.bind("updated", function (ev, instance) {
         if (instance instanceof that) {
-          instance.refresh_all_force('related_objects').then(function(object) {
+          instance.refresh_all_force('related_objects').then(function (object) {
             return instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
           });
         }
@@ -320,17 +320,17 @@
     }
   }, {
     overdue: overdue_compute,
-    workflow: function() {
-      return this.refresh_all('cycle', 'workflow').then(function(workflow){
+    workflow: function () {
+      return this.refresh_all('cycle', 'workflow').then(function (workflow) {
         return workflow;
       });
     },
-    object: function() {
-      return this.refresh_all('task_group_object', 'object').then(function(object){
+    object: function () {
+      return this.refresh_all('task_group_object', 'object').then(function (object) {
         return object;
       });
     },
-    response_options_csv: can.compute(function(val) {
+    response_options_csv: can.compute(function (val) {
       if(val != null) {
         this.attr("response_options", $.map(val.split(","), $.proxy("".trim.call, "".trim)));
       } else {
@@ -346,7 +346,7 @@
       }
     }),
 
-    get_filter_vals: function(){
+    get_filter_vals: function () {
       var filter_vals = can.Model.Cacheable.prototype.get_filter_vals;
       var mappings = jQuery.extend({}, this.class.filter_mappings, {
         'task title': 'title'

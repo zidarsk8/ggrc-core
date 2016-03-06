@@ -4,7 +4,6 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import factory
-import random
 from datetime import date
 
 

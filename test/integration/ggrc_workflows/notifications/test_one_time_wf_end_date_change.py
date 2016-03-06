@@ -4,16 +4,18 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from integration.ggrc import TestCase
+from datetime import date
+from datetime import datetime
+
 from freezegun import freeze_time
-from datetime import date, datetime
 from mock import patch
 
 from ggrc import db, notifications
 from ggrc.models import Notification, Person
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
-from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 
 class TestOneTimeWfEndDateChange(TestCase):
@@ -49,10 +51,11 @@ class TestOneTimeWfEndDateChange(TestCase):
       return db.session.query(Person).filter(Person.id == person_id).one()
 
     with freeze_time("2015-04-10 03:21:34"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-04-11 03:21:34"):
       user = get_person(self.user.id)
@@ -103,10 +106,11 @@ class TestOneTimeWfEndDateChange(TestCase):
       return db.session.query(Person).filter(Person.id == person_id).one()
 
     with freeze_time("2015-04-10 03:21:34"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-04-11 03:21:34"):
       user = get_person(self.user.id)
@@ -173,10 +177,11 @@ class TestOneTimeWfEndDateChange(TestCase):
       return db.session.query(Person).filter(Person.id == person_id).one()
 
     with freeze_time("2015-04-10 03:21:34"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02 03:21:34"):
       notifications.send_todays_digest_notifications()
@@ -216,10 +221,11 @@ class TestOneTimeWfEndDateChange(TestCase):
       return db.session.query(Person).filter(Person.id == person_id).one()
 
     with freeze_time("2015-04-10 03:21:34"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02 03:21:34"):
       notifications.send_todays_digest_notifications()

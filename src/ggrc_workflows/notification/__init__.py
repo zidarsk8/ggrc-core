@@ -53,7 +53,7 @@ def register_listeners():
     handle_cycle_task_group_object_task_put(obj)
 
   @Resource.model_put.connect_via(Cycle)
-  def cycle_post_listener(sender, obj=None, src=None, service=None):
+  def cycle_put_listener(sender, obj=None, src=None, service=None):
     handle_cycle_modify(sender, obj, src, service)
 
   @Resource.model_posted.connect_via(Cycle)

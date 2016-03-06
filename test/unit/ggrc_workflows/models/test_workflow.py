@@ -3,11 +3,14 @@
 # Created By: jost@reciprocitylabs.com
 # Maintained By: jost@reciprocitylabs.com
 
+"""Unit Tests for Workflow model and WorkflowState mixin
+"""
+
 from datetime import date
-from freezegun import freeze_time
 import unittest
 
-from ggrc import app
+from freezegun import freeze_time
+
 from ggrc_workflows.models import cycle_task_group_object_task as cycle_task
 from ggrc_workflows.models import cycle
 from ggrc_workflows.models import workflow
