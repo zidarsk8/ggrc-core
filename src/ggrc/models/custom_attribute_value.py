@@ -3,6 +3,8 @@
 # Created By: laran@reciprocitylabs.com
 # Maintained By: laran@reciprocitylabs.com
 
+from sqlalchemy import or_
+
 from ggrc import db
 from ggrc.models.mixins import Base
 
@@ -89,6 +91,29 @@ class CustomAttributeValue(Base, db.Model):
 
   @classmethod
   def mk_filter_by_custom(cls, obj_class, custom_attribute_id):
+    from ggrc.models import all_models
+    attr_def = all_models.CustomAttributeDefinition.query.filter_by(
+        id=custom_attribute_id
+    ).first()
+    if attr_def.attribute_type.startswith("Map:"):
+      map_type = attr_def.attribute_type[4:]
+      map_class = getattr(all_models, map_type, None)
+      if map_class:
+        fields = [getattr(map_class, name, None)
+                  for name in ["email", "title", "slug"]]
+        fields = [field for field in fields if field is not None]
+
+        def filter_by(predicate):
+          return cls.query.filter(
+              (cls.custom_attribute_id == custom_attribute_id) &
+              (cls.attributable_type == obj_class.__name__) &
+              (cls.attributable_id == obj_class.id) &
+              (map_class.query.filter(
+                  (map_class.id == cls.attribute_object_id) &
+                  or_(*[predicate(f) for f in fields])).exists())
+          ).exists()
+        return filter_by
+
     def filter_by(predicate):
       return cls.query.filter(
           (cls.custom_attribute_id == custom_attribute_id) &
