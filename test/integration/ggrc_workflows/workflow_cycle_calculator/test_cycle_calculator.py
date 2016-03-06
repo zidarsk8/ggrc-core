@@ -3,17 +3,16 @@
 # Created By: urban@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
+"""Tests for workflow cycle calculator."""
+
 from datetime import date
 
 from ggrc import db
 from ggrc_workflows.models import Workflow
-
-
-from integration.ggrc_workflows.workflow_cycle_calculator import \
-    base_workflow_test_case
-
 from ggrc_workflows.services.workflow_cycle_calculator.cycle_calculator import\
     CycleCalculator
+from integration.ggrc_workflows.workflow_cycle_calculator import \
+    base_workflow_test_case
 
 
 class TestCycleCalculator(base_workflow_test_case.BaseWorkflowTestCase):
@@ -43,21 +42,23 @@ class TestCycleCalculator(base_workflow_test_case.BaseWorkflowTestCase):
         },
         ]
     }
-    _, wf = self.generator.generate_workflow(weekly_wf)
-    _, tg = self.generator.generate_task_group(wf)
-    _, awf = self.generator.activate_workflow(wf)
-    active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+    _, workflow = self.generator.generate_workflow(weekly_wf)
+    self.generator.generate_task_group(workflow)
+    self.generator.activate_workflow(workflow)
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.id == workflow.id).one()
 
+    # pylint: disable=abstract-class-instantiated
     CycleCalculator.__abstractmethods__ = set()
-    cc = CycleCalculator(active_wf)
+    calc = CycleCalculator(active_wf)
 
     # Check if weekend adjustments work
-    self.assertEqual(cc.adjust_date(date(2015, 6, 20)), date(2015, 6, 19))
-    self.assertEqual(cc.adjust_date(date(2015, 6, 21)), date(2015, 6, 19))
+    self.assertEqual(calc.adjust_date(date(2015, 6, 20)), date(2015, 6, 19))
+    self.assertEqual(calc.adjust_date(date(2015, 6, 21)), date(2015, 6, 19))
 
     # Check if holiday adjustments across the years work
-    self.assertEqual(cc.adjust_date(date(2015, 1, 1)), date(2014, 12, 30))
+    self.assertEqual(calc.adjust_date(date(2015, 1, 1)), date(2014, 12, 30))
 
     # Check if holiday + weekend adjustments work
-    cc.holidays = [date(2015, 6, 24), date(2015, 6, 25), date(2015, 6, 26)]
-    self.assertEqual(cc.adjust_date(date(2015, 6, 28)), date(2015, 6, 23))
+    calc.holidays = [date(2015, 6, 24), date(2015, 6, 25), date(2015, 6, 26)]
+    self.assertEqual(calc.adjust_date(date(2015, 6, 28)), date(2015, 6, 23))
