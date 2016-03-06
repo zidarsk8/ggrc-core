@@ -3208,7 +3208,7 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
 /*
   Used to get the string value for custom attributes
 */
-Mustache.registerHelper('get_custom_attr_value', function (attr, instance) {
+Mustache.registerHelper('get_custom_attr_value', function (attr, instance, options) {
   var value = '';
   var definition;
 
@@ -3227,7 +3227,9 @@ Mustache.registerHelper('get_custom_attr_value', function (attr, instance) {
       item = item.reify();
       if (item.custom_attribute_id === definition.id) {
         if (definition.attribute_type.startsWith('Map:')) {
-          value = item.attribute_object.reify().display_name();
+          value = options.fn(options.contexts.add({
+            object: item.attribute_object.reify()
+          }));
         } else {
           value = item.attribute_value;
         }
