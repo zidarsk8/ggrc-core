@@ -4,8 +4,6 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from flask import Flask
-from flask.ext.jasmine import Asset
-from flask.ext.jasmine import Jasmine
 from flask.ext.sqlalchemy import get_debug_queries
 
 from ggrc import contributions  # noqa: imported so it can be used with getattr
@@ -26,11 +24,6 @@ for key in settings.exports:
 # Configure Flask-SQLAlchemy for app
 db.app = app
 db.init_app(app)
-
-
-if getattr(settings, "FLASK_DEBUGTOOLBAR", False):
-  from flask_debugtoolbar import DebugToolbarExtension
-  toolbar = DebugToolbarExtension(app)
 
 
 @app.before_request
@@ -86,31 +79,59 @@ permissions.get_permissions_provider()
 from ggrc.automapper import register_automapping_listeners  # noqa
 register_automapping_listeners()
 
-if settings.ENABLE_JASMINE:
-  # Configure Flask-Jasmine, for dev mode unit testing
-  jasmine = Jasmine(app)
 
-  jasmine.sources(
-      Asset("dashboard-js"),
-      Asset("dashboard-js-spec-helpers"),
-      Asset("dashboard-js-templates"))
+def _enable_debug_toolbar():
+  """Enable flask debug toolbar for benchmarking requests."""
+  if getattr(settings, "FLASK_DEBUGTOOLBAR", False):
+    from flask_debugtoolbar import DebugToolbarExtension
+    DebugToolbarExtension(app)
 
-  jasmine.specs(
-      Asset("dashboard-js-specs"))
 
-if hasattr(settings, 'SQLALCHEMY_RECORD_QUERIES')\
-        and settings.SQLALCHEMY_RECORD_QUERIES:
+def _enable_jasmine():
+  """Set jasmine sources and specs if it's enabled.
 
-  def with_prefix(statement, prefix):
-    return "\n".join([prefix + line for line in statement.splitlines()])
+  Jasmine is used for javascript tests and is not installed on the production
+  environment, that is why we must check if it enabled before tying to import
+  it.
+  """
+  if getattr(settings, "ENABLE_JASMINE", False):
+    from flask.ext.jasmine import Asset
+    from flask.ext.jasmine import Jasmine
+    # Configure Flask-Jasmine, for dev mode unit testing
+    jasmine = Jasmine(app)
 
-  @app.after_request
-  def display_queries(response):
-    queries = get_debug_queries()
-    for query in queries:
-      app.logger.info("{:.8f} {}\n{}".format(
-          query.duration,
-          query.context,
-          with_prefix(query.statement, "       ")))
-    app.logger.info("Total queries: {}".format(len(queries)))
-    return response
+    jasmine.sources(
+        Asset("dashboard-js"),
+        Asset("dashboard-js-spec-helpers"),
+        Asset("dashboard-js-templates"))
+
+    jasmine.specs(
+        Asset("dashboard-js-specs"))
+
+
+def _display_sql_queries():
+  """Display database queries
+
+  This function makes sure we display the sql queries if the record setting is
+  enabled.
+  """
+  if getattr(settings, "SQLALCHEMY_RECORD_QUERIES", False):
+
+    def with_prefix(statement, prefix):
+      return "\n".join([prefix + line for line in statement.splitlines()])
+
+    @app.after_request
+    def display_queries(response):
+      queries = get_debug_queries()
+      for query in queries:
+        app.logger.info("{:.8f} {}\n{}".format(
+            query.duration,
+            query.context,
+            with_prefix(query.statement, "       ")))
+      app.logger.info("Total queries: {}".format(len(queries)))
+      return response
+
+
+_enable_debug_toolbar()
+_enable_jasmine()
+_display_sql_queries()
