@@ -181,3 +181,30 @@
     }
   }
 }
+
+.relevance-filters {
+  margin-bottom: 20px;
+  .add-rule {
+    a {
+      font-size: 13px;
+    }
+  }
+}
+
+.single-line-filter {
+  margin-bottom: 20px;
+  .relevance-filters & {
+    margin-bottom: 6px;
+  }
+  .input-xlarge {
+    width: 85%;
+    box-sizing: border-box;
+    height: 28px;
+    .relevant-filter-group & {
+      width: 79%;
+    }
+  }
+  .objective-selector {
+    display: inline-block;
+  }
+}

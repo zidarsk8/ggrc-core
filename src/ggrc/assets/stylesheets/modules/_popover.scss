@@ -12,6 +12,11 @@
 
 .popover {
   padding: 0;
+  @include border-radius($default-border-radius);
+  width: 350px;
+  .popover-content {
+    @include border-radius($default-border-radius);
+  }
   .arrow {
     position: absolute;
     display: block;
@@ -127,6 +132,21 @@
         right: 1px;
         border-left-color: $white;
         border-right-width: 0;
+      }
+    }
+  }
+  &.popover-medium {
+    width: 420px;
+    h3 {
+      i {
+        @include opacity(.4);
+        @include transition(opacity 0.2s ease);
+        margin-right: 0;
+      }
+      a:hover {
+        i {
+          @include opacity(1);
+        }
       }
     }
   }
@@ -374,18 +394,7 @@
   }
 }
 /* slowing down fade-in only.  Fade-out remains 0.15s */
-.tooltip.fade.in, .popover.fade.in {
+.tooltip.fade.in,
+.popover.fade.in {
   @include transition(opacity 0.35s linear);
-}
-
-.filter-help-title {
-  display: none;
-}
-
-.filter-help-content {
-  display: none;
-}
-
-.popover-manual-close {
-  @include box-shadow(0 0 7px rgba(0,0,0, .25));
 }

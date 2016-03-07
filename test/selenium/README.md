@@ -60,6 +60,14 @@ $ ./bin/test_runner.py update_env
 ```
 $ ./bin/test_runner.py
 ```
+
+# Running under docker
+If you have setup docker as mentioned in the main [README](https://github.com/google/ggrc-core/blob/develop/README.md)
+then you can start the tests from the project root
+```
+$ ./bin/jenkins/run_selenium
+```
+
 # Advanced usage
 The [py.test test framework](http://pytest.org/latest//)
 is used for running the test suite and [the same flags](https://pytest.org/latest/usage.html)

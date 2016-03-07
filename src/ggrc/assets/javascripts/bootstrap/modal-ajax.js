@@ -428,31 +428,31 @@
     //reconfigureModals.call(this);   //handled by modal shown event firing.
   };
 
-  var reconfigureModals = function() {
-
-    var modal_backdrops = $(".modal-backdrop").css("z-index", function(i) {
-      return 1040 + i * 20;
+  var reconfigureModals = function () {
+    var modalBackdrops = $('.modal-backdrop').css('z-index', function (i) {
+      return 2990 + i * 20;
     });
 
-    var modals = $(".modal:visible");
-    modals.each(function(i) {
-        var parent = this.parentNode;
-        if(parent !== document.body)
-        {
-            modal_backdrops
-            .eq(i)
-            .detach()
-            .appendTo(parent);
-        }
+    var modals = $('.modal:visible');
+    modals.each(function (i) {
+      var parent = this.parentNode;
+      if (parent !== document.body) {
+        modalBackdrops
+        .eq(i)
+        .detach()
+        .appendTo(parent);
+      }
     });
-    modal_backdrops.slice(modals.length).remove();
+    modalBackdrops.slice(modals.length).remove();
 
-    modals.not(this.$element).css("z-index", function(i) {return 1050 + i * 20;});
-    this.$element.css("z-index", 1050 + (modals.length - 1) * 20)
+    modals.not(this.$element).css('z-index', function (i) {
+      return 3000 + i * 20;
+    });
+    this.$element.css('z-index', 3000 + (modals.length - 1) * 20);
 
     arrangeTopModal(modals, this.$element);
     arrangeBackgroundModals(modals, this.$element);
-  }
+  };
 
   var _modal_hide = $.fn.modal.Constructor.prototype.hide;
   $.fn.modal.Constructor.prototype.hide = function(ev) {

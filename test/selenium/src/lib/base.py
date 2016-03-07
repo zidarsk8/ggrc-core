@@ -536,7 +536,8 @@ class ObjectWidget(Widget):
     super(ObjectWidget, self).__init__(driver)
 
     # parse number from widget title
-    widget_title = self._driver.find_element(*locator_widget).text
+    widget_title = selenium_utils.get_when_visible(
+        self._driver, locator_widget).text
 
     if "(" not in widget_title:
         self.member_count = int(widget_title)
@@ -554,11 +555,15 @@ class ObjectWidget(Widget):
         locator_filter_submit,
         locator_filter_clear)
 
-    try:
+    if self.member_count:
+      # wait until the elements are loaded
+      selenium_utils.get_when_clickable(
+          self._driver, constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
+
       self.members_listed = self._driver.find_elements(
           *constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
-    except exceptions.NoSuchElementException:
-      self.members_listed = None
+    else:
+      self.members_listed = []
 
   def select_nth_member(self, member):
     """Selects member from the list. Members start from (including) 0.
