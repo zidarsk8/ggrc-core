@@ -874,43 +874,44 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   draw_visible_call_count: 0,
   draw_visible: _.debounce(function () {
     var MAX_STEPS = 100;
-    var el_position;
+    var elPosition;
     var children;
     var lo;
     var hi;
     var max;
     var steps;
     var visible;
-    var already_visible;
-    var to_render;
+    var alreadyVisible;
+    var toRender;
     var i;
     var control;
     var index;
-    var page_count;
+    var pageCount;
     var mid;
     var pos;
+    var renderStep;
     if (this.options.disable_lazy_loading || this.element === null) {
       return;
     }
-    el_position = this.el_position.bind(this);
+    elPosition = this.el_position.bind(this);
     children = this.element.children();
     lo = 0;
     hi = children.length - 1;
     max = hi;
     steps = 0;
     visible = [];
-    already_visible = _.filter(this.element[0].children, function (e) {
+    alreadyVisible = _.filter(this.element[0].children, function (e) {
       // doing this manualy is 10x faster than a jQuery selector and performance
       // here matters since it runs on every scroll event on a potentialy long
       // list of items
       return e.tagName === 'LI';
     });
-    to_render = [];
+    toRender = [];
 
     while (steps < MAX_STEPS && lo < hi) {
       steps += 1;
       mid = (lo + hi) / 2 | 0;
-      pos = el_position(children[mid]);
+      pos = elPosition(children[mid]);
       if (pos < 0) {
         lo = mid;
         continue;
@@ -922,20 +923,20 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       lo = mid;
       hi = mid;
     }
-    page_count = this.options.scroll_page_count;
-    while (lo > 0 && el_position(children[lo - 1]) >= (-page_count)) {
+    pageCount = this.options.scroll_page_count;
+    while (lo > 0 && elPosition(children[lo - 1]) >= (-pageCount)) {
       lo -= 1;
     }
-    while (hi < max && el_position(children[hi + 1]) <= page_count) {
+    while (hi < max && elPosition(children[hi + 1]) <= pageCount) {
       hi += 1;
     }
 
-    _.each(already_visible, function (visible_element) {
+    _.each(alreadyVisible, function (visible_element) {
       control = $(visible_element).control();
       if (!control) {
         return;
       }
-      if (Math.abs(this.el_position(control.element)) <= page_count) {
+      if (Math.abs(this.elPosition(control.element)) <= pageCount) {
         visible.push(control);
       } else {
         control.draw_placeholder();
@@ -954,22 +955,21 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       }
       if (!_.contains(visible, control)) {
         visible.push(control);
-        to_render.push(control);
+        toRender.push(control);
       }
     }
-    function render_step(to_render, count) {
+    renderStep = function renderStep(toRender, count) {
       // If there is nothing left to render or if draw_visible was run while
       // rendering we simply terminate.
-      if (to_render.length === 0 || this.draw_visible_call_count > count ) {
+      if (toRender.length === 0 || this.draw_visible_call_count > count) {
         return;
       }
-      to_render[0].draw_node();
+      toRender[0].draw_node();
       setTimeout(function () {
-        render_step(to_render.slice(1), count);
-      }.bind(this), 0);
-    };
-    render_step = render_step.bind(this);
-    render_step(to_render, ++this.draw_visible_call_count);
+        renderStep(toRender.slice(1), count);
+      }, 0);
+    }.bind(this);
+    renderStep(toRender, ++this.draw_visible_call_count);
   }, 100, {leading: true}),
 
   _last_scroll_top: 0,
