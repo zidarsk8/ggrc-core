@@ -7,7 +7,6 @@
 
 .modal-backdrop {
   background-color: $white;
-  z-index: 2050 !important;
 }
 
 .field-hide {
@@ -32,7 +31,6 @@
   height: auto !important;
   position: absolute;
   top: 12%;
-  z-index: 3000 !important;
   .small-info {
     h3 {
       font-weight:normal;
@@ -716,7 +714,7 @@
   overflow: visible;
   top: 28px;
   left: 24px;
-  z-index: 3020; /* Needs to be greater than modals */
+  z-index: zIndex(ui-autocomplete); /* Needs to be greater than modals */
   &.in {
     border: 1px solid $tabTitle;
     overflow: visible;
@@ -736,7 +734,7 @@
     }
     &.active {
       position: relative;
-      z-index: 1000;
+      z-index: zIndex(ui-autocomplete-active-list);
       .extended-content {
         position:absolute;
         top:-1px;
@@ -746,7 +744,7 @@
         background:#fff;
         border:1px solid #ddd;
         display: block;
-        z-index: 1500;
+        z-index: zIndex(extended-content);
       }
     }
     .extended-content {

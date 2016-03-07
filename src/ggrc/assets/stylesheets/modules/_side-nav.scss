@@ -67,7 +67,7 @@ h4.search-title {
   position:relative;
   padding-left: 10px;
   padding-right: 4px;
-  z-index: 2000;
+  z-index: zIndex(lhs);
 }
 
 // Fix for redundant lhn scroll
@@ -128,7 +128,7 @@ h4.search-title {
   position: absolute;
   top: 5px;
   right: 5px;
-  z-index: 9999;
+  z-index: zIndex(lhn-pin);
   &:hover {
     @include opacity(1);
   }
@@ -461,23 +461,17 @@ h4.search-title {
 
 .bar-v {
   @include transition(left, 0.8s);
+  background: $white url("/static/images/bgnds/drag-v.png") no-repeat 2px 50%;
   @include background-size(2px 30px);
-  background-color: $white;
-  background-image: image-url("bgnds/drag-v.png");
-  background-repeat: no-repeat;
-  background-position: 2px 50%;
   position: absolute;
   top: 0;
   right: 0;
   height:100%;
-  z-index: 100;
+  z-index: zIndex(bar-v);
   width: 6px;
   padding: 0;
   border: none;
   cursor: ew-resize;
-  &.objnav {
-    z-index: 1;  // Show object nav bar-v below title
-  }
   &.active {
     @include box-shadow(2px 2px 4px rgba(0,0,0, 0.1));
   }
