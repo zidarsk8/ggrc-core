@@ -1,0 +1,15 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: ivan@reciprocitylabs.com
+ * Maintained By: ivan@reciprocitylabs.com
+ */
+
+.pagination .status {
+  float: left;
+  padding: 0 14px;
+  line-height: ($baseLineHeight * 2) - 2;
+  text-decoration: none;
+  border: 1px solid #ddd;
+  border-left-width: 0;
+}

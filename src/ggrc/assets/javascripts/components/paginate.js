@@ -12,6 +12,48 @@
     scope: {
       list: null,
       current: 0,
+      /**
+        * Current page
+        *
+        * Returns current page, array is zero indexed so we are adding one,
+        * to be more human readable
+        *
+        * @return {Number} - Number of current page
+        */
+      currentPage: function () {
+        return this.attr('current') + 1;
+      },
+      /**
+        * Sets previous page
+        *
+        * @param {Object} scope - current page context
+        * @param {jQuery.Object} el - clicked element
+        * @param {Object} ev - click event handler
+        */
+      setPrevious: function (scope, el, ev) {
+        var current = this.attr('current') - 1;
+
+        ev.preventDefault();
+        if (current >= 0) {
+          this.attr('current', current);
+        }
+      },
+      /**
+        * Sets next page
+        *
+        * @param {Object} scope - current page context
+        * @param {jQuery.Object} el - clicked element
+        * @param {Object} ev - click event handler
+        */
+      setNext: function (scope, el, ev) {
+        var current = this.attr('current') + 1;
+        var total = this.attr('totalPages');
+
+        ev.preventDefault();
+        if (current < total) {
+          this.attr('current', current);
+        }
+      },
       perPage: '@',
       /**
         * List of currently displayed enteries
@@ -36,30 +78,12 @@
         *                     pageNum: `True page number that gets passed to setPage function`
         *                   }
         */
-      pages: function () {
+      totalPages: can.compute(function () {
         var list = this.attr('list');
         var perPage = Number(this.attr('perPage'));
-        var pages = Math.ceil(list.length / perPage);
 
-        return new can.List(_.times(pages, function (num) {
-          return {
-            number: num + 1,
-            pageNum: num
-          };
-        }));
-      },
-      /**
-        * Set current page
-        *
-        * @param {Object} page - current page context
-        * @param {jQuery.Object} el - clicked element
-        * @param {Object} ev - click event handler
-        */
-      setPage: function (page, el, ev) {
-        ev.preventDefault();
-
-        this.attr('current', page.pageNum);
-      }
+        return Math.ceil(list.length / perPage);
+      })
     }
   });
 })(window.can, window.can.$);
