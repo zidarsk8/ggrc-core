@@ -16,6 +16,7 @@ environment. To do so it depends on the system to provide:
 * g++
 * [chromedriver](https://sites.google.com/a/chromium.org/chromedriver/downloads)
 * xvfb or xephyr (depending on your distribution)
+* the tests should run on at least 1920x1080 resolution
 
 A quick way to check if they're already installed and working is to run
 the command in a terminal e.g. <br />
@@ -49,7 +50,7 @@ longer than what's defined in "src/constants/ux.py.MAX_USER_WAIT_SECONDS"
 # Quick Start
 1. clone the repo
 2. copy "src/examples/ggrc_test.yaml" into "resources/ggrc_test_local.yaml" and
-edit it
+edit it (see [Requirements](#Requirements))
 3. copy "src/examples/setup.cfg" into "[project root]/setup.cfg" and edit it
 4. update/create your environment from project root:
 ```
@@ -59,6 +60,14 @@ $ ./bin/test_runner.py update_env
 ```
 $ ./bin/test_runner.py
 ```
+
+# Running under docker
+If you have setup docker as mentioned in the main [README](https://github.com/google/ggrc-core/blob/develop/README.md)
+then you can start the tests from the project root
+```
+$ ./bin/jenkins/run_selenium
+```
+
 # Advanced usage
 The [py.test test framework](http://pytest.org/latest//)
 is used for running the test suite and [the same flags](https://pytest.org/latest/usage.html)

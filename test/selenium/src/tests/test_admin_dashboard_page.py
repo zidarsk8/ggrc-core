@@ -4,19 +4,25 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 """Admin dashboard page smoke tests"""
+# pylint: disable=no-self-use
+# pylint: disable=invalid-name
+# pylint: disable=too-few-public-methods
 
 import pytest    # pylint: disable=import-error
 from lib import base
 from lib import constants
 from lib.page import dashboard
+from lib.page.widget import custom_attribute
 
 
 class TestAdminDashboardPage(base.Test):
+  """Tests for the admin dashboard, a part of smoke tests, section 1"""
   _element = constants.element.AdminRolesWidget
 
   @pytest.mark.smoke_tests
   def test_roles_widget(self, selenium):
     """Confirms labels are present"""
+
     admin_roles_widget = dashboard\
         .AdminDashboardPage(selenium.driver)\
         .select_roles()
@@ -48,3 +54,11 @@ class TestAdminDashboardPage(base.Test):
         self._element.SCOPE_WORKFLOW
     assert admin_roles_widget.scope_workflow_owner.text == \
         self._element.SCOPE_WORKFLOW
+
+  @pytest.mark.smoke_tests
+  def test_custom_attributes(self, selenium, custom_program_attribute):
+    """Test general functions of custom attributes for the program object"""
+
+    custom_attribute.DropdownPrograms(selenium.driver)\
+        .edit_nth_member(0)\
+        .save_and_close()

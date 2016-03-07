@@ -2,9 +2,15 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
+
 """All smoke tests relevant to program page"""
+# pylint: disable=no-self-use
+# pylint: disable=invalid-name
+# pylint: disable=too-few-public-methods
+# pylint: disable=unused-argument
 
 import pytest    # pylint: disable=import-error
+
 from lib import base
 from lib import test_helpers
 from lib.constants import element
@@ -22,14 +28,12 @@ class TestProgramPage(base.Test):
   def test_object_count_updates(self, selenium, new_program):
     """Checks if the count updates in LHN after creating a new program
     object."""
-    # pylint: disable=no-self-use
-    # pylint: disable=invalid-name
     _, program_info_page = new_program
     lhn_menu = dashboard.HeaderPage(selenium.driver) \
         .open_lhn_menu() \
         .select_my_objects()
 
-    assert lhn_menu.button_programs.members_count \
+    assert lhn_menu.toggle_programs.members_count \
         >= int(program_info_page.object_id)
 
   @pytest.mark.smoke_tests
@@ -41,8 +45,6 @@ class TestProgramPage(base.Test):
     and closing the lhn_modal we're redirected to an url that contains an
     object id.
     """
-    # pylint: disable=no-self-use
-    # pylint: disable=invalid-name
     _, program_info_page = new_program
     assert url.PROGRAMS + "/" + program_info_page.object_id in \
         program_info_page.url
@@ -56,8 +58,6 @@ class TestProgramPage(base.Test):
     (which widget is active), we can simply use the url of the created
     object.
     """
-    # pylint: disable=no-self-use
-    # pylint: disable=invalid-name
     _, program_info_page = new_program
     program_info_page.navigate_to()
     horizontal_bar = widget_bar.DashboardWidgetBarPage(selenium.driver)
@@ -69,8 +69,6 @@ class TestProgramPage(base.Test):
   def test_info_tab_contains_entered_data(self, new_program):
     """Verify that the created object contains the data we've entered
     into the modal."""
-    # pylint: disable=no-self-use
-    # pylint: disable=invalid-name
     modal, program_info_page = new_program
 
     assert test_helpers.HtmlParser.parse_text(modal.ui_title.text) == \
@@ -94,8 +92,6 @@ class TestProgramPage(base.Test):
   @pytest.mark.smoke_tests
   def test_permalink(self, selenium, new_program):
     """Verify the url is copied to clipboard"""
-    # pylint: disable=no-self-use
-    # pylint: disable=invalid-name
     _, program_info = new_program
     selenium.driver.get(program_info.url)
 
@@ -122,8 +118,6 @@ class TestProgramPage(base.Test):
   @pytest.mark.smoke_tests
   def test_edit_modal(self, selenium, new_program):
     """Tests if data is saved after editing the program info page edit modal"""
-    # pylint: disable=no-self-use
-    # pylint: disable=invalid-name
     _, program_info = new_program
     selenium.driver.get(program_info.url)
 
@@ -153,9 +147,6 @@ class TestProgramPage(base.Test):
   @pytest.mark.smoke_tests
   def test_mapping_controls_via_lhn(self, selenium, new_control, new_program):
     """Tests if widget number increases when mapping via LHN"""
-    # pylint: disable=no-self-use
-    # pylint: disable=invalid-name
-    _, program_info_page = new_program
 
     # check that the widget isn't opened yet since it doesn't have any members
     assert selenium.driver.find_element(

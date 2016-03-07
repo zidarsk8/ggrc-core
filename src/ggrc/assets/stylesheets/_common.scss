@@ -31,12 +31,6 @@ select {
   }
 }
 
-.unmap {
-  &:hover {
-    color:$error;
-  }
-}
-
 .wrap-row {
   margin-bottom: 20px;
   p {
@@ -50,19 +44,6 @@ select {
     margin-bottom: 0;
     pre {
       margin-bottom: 0;
-    }
-  }
-}
-
-.read-only {
-  text-decoration: none;
-  color: $darkText;
-  display: inline-block;
-  a {
-    text-decoration: none;
-    color: $darkText;
-    &:hover {
-      text-decoration: none;
     }
   }
 }
@@ -82,7 +63,7 @@ select {
 
 .tooltip {
   // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
-  z-index: 3000 !important;
+  z-index: zIndex(tooltip) !important;
 }
 
 // status
@@ -413,23 +394,6 @@ input.disabled.pending-ajax{
   }
 }
 
-.coding {
-  @include border-radius();
-  font-family: "Courier New", Courier, monospace;
-  margin:0.5em 0 1.5em 0;
-  border:1px solid $lightGray;
-  padding:1em;
-  &.good {
-    border-color:$green;
-    color:$green;
-  }
-  &.bad {
-    border-color:$red;
-    color:$red;
-  }
-
-}
-
 .popoverfooter {
   p.smallcode {
     padding-top:4px;
@@ -481,12 +445,14 @@ select.multiple-selector {
 // Sticky headers
 .sticky-header {
   @extend %sticky;
+  z-index: zIndex(sticky);
   border-top: none !important;
 }
 
 .sticky-footer {
   @extend %sticky;
   @include box-shadow(inset 0 0 3px 0 #bbb);
+  z-index: zIndex(sticky);
   border-bottom: none !important;
 }
 
@@ -638,31 +604,6 @@ select.multiple-selector {
   }
 }
 
-.inline-warning {
-  @include border-radius();
-  background:lighten($lightRed,10%);
-  border:1px solid $lightRed;
-  color:$red;
-  padding:6px;
-  font-size:12px;
-  line-height:16px;
-  h6 {
-    color:#111;
-    font-weight:bold;
-    font-size:12px;
-  }
-  .info.info-expand,
-  .info.info-expand-mapped {
-    line-height:16px;
-    padding:0;
-    background:transparent;
-  }
-  a {
-    color:$red;
-    text-decoration:underline;
-  }
-}
-
 p {
   &.Draft {
     color:darken(#f60,10%);
@@ -682,100 +623,6 @@ p {
   color:$red !important;
   font-weight:bold;
   font-size: 10px;
-}
-
-.pos-wrap {
-  position: relative;
-  .dropdown-menu {
-    @extend %reset-list;
-    @include border-radius(0);
-    min-width: 210px;
-    float: none;
-    padding: 5px 0;
-    margin-top: 6px;
-    text-transform: none;
-    top: 100%;
-    right: 0;
-    left: auto;
-    z-index: 9999;
-    li {
-      float:none;
-      clear: both;
-      text-transform: none;
-      a {
-        display: block;
-        line-height: 30px;
-        padding: 0 10px;
-        background: none;
-        text-shadow: none;
-        color: $gray;
-        @include transition(background 0.2s ease, color 0.2s ease);
-        i {
-          margin: 7px 4px 0 0;
-          @include opacity(0.4);
-          @include transition(opacity 0.2s ease);
-        }
-        &:hover {
-          background: $headerBgnd;
-          color: $black;
-          i {
-            @include opacity(1);
-          }
-        }
-      }
-      &.border {
-        border-top: 1px solid $headerBgnd;
-        padding-top: 5px;
-        margin-top: 5px;
-      }
-    }
-  }
-}
-
-.filter-wrap {
-  background: $white;
-  .filter-border {
-    border-bottom: 1px solid $itemBorder;
-    padding: 12px 0 4px 0;
-    margin: 0 10px;
-  }
-  form {
-    margin: 0;
-  }
-  label {
-    font-size: 12px;
-    color: $tabTitle;
-    margin: 0;
-    display: inline-block;
-  }
-  input[type="text"] {
-    height: 20px;
-    min-height: 20px;
-    line-height: 18px;
-    margin-bottom: 0;
-  }
-  select {
-    height: 20px;
-    line-height: 18px;
-    margin: 0;
-  }
-  .input-medium {
-    @extend input[type="text"];
-    box-sizing: border-box;
-    max-width: 130px;
-  }
-  ul {
-    @extend %reset-list;
-    @extend %oneline;
-    @extend %clearfix;
-    li {
-      display: inline-block;
-      margin-left: 20px;
-      &:first-child {
-        margin-left: 0;
-      }
-    }
-  }
 }
 
 .hidden-widgets-list {
@@ -894,107 +741,4 @@ p {
   float: right;
   display: inline-block;
   margin-top: 6px;
-}
-
-.custom-attr-table {
-  font-size: 11px;
-  .table {
-    td.centered,
-    th.centered {
-      text-align: center;
-    }
-    .checkbox-wrap {
-      input {
-        margin-top: 3px;
-        margin-bottom: 0;
-      }
-    }
-    tbody {
-      td {
-        vertical-align: top;
-      }
-    }
-  }
-}
-
-.add-trigger {
-  .disable {
-    cursor: not-allowed;
-    &:hover {
-      i {
-        @include opacity(.25);
-      }
-    }
-  }
-}
-
-.text-top-space {
-  margin-top: 30px;
-  h3 {
-    margin-bottom: 10px;
-  }
-}
-
-.popover-child-node {
-  @include box-shadow(0 5px 10px rgba(0, 0, 0, .2));
-  border: 1px solid rgba(0,0,0, .2);
-  .arrow {
-    display: none !important;
-  }
-}
-
-.child-node-wrap {
-  a {
-    @include transition(color .2s ease);
-    padding: 0 14px 0 10px;
-    display: block;
-    line-height: 29px;
-    font-size: 13px;
-    color: $gray;
-    text-transform: none;
-    i {
-      @include opacity(.4);
-    }
-    &:hover {
-      color: $black;
-      text-decoration: none;
-      i {
-        @include opacity(1);
-      }
-    }
-  }
-}
-
-.child-node {
-  .popover-template:hover {
-    i {
-      background-position: -246px -416px;
-    }
-  }
-}
-
-.label-light {
-  background-color: lighten($blue, 55%);
-  span,
-  a {
-    color: $black;
-    text-shadow: none;
-    font-weight: normal;
-  }
-  a {
-    font-weight: bold;
-    text-decoration: none;
-    padding: 0 2px;
-    &:hover {
-      text-decoration: none;
-    }
-  }
-}
-
-.person-selector {
-  input {
-    float: left;
-    margin-right: 5px;
-    width: 70%;
-  }
 }

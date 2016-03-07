@@ -3,48 +3,52 @@
 # Created By: mouli@meics.org
 # Maintained By: miha@reciprocitylabs.com
 
-
+import jinja2
 from collections import defaultdict
-from datetime import date, datetime
-from ggrc.extensions import get_extension_modules
-from ggrc.models import Notification, NotificationConfig
-from ggrc.utils import merge_dict
-from ggrc import db
+from datetime import date
+from datetime import datetime
 from sqlalchemy import and_
+from werkzeug.exceptions import Forbidden
+
+from ggrc import db
+from ggrc import extensions
+from ggrc.models import Notification
+from ggrc.models import NotificationConfig
+from ggrc.notifications import common
+from ggrc.rbac import permissions
+from ggrc.utils import merge_dict
+
+ENV = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
 
 
-class NotificationServices():
+class Services():
+  """Helper class for notification services.
 
-  def __init__(self):
-    self.services = self.all_notifications()
+  This class is is a helper class for calling a notification service for a
+  given object. The first call get_service_function must be done after all
+  modules have been initialized.
+  """
 
-  def all_notifications(self):
-    services = {}
-    for extension_module in get_extension_modules():
-      contributions = getattr(
-          extension_module, 'contributed_notifications', None)
-      if contributions:
-        if callable(contributions):
-          contributions = contributions()
-        services.update(contributions)
-    return services
+  services = []
 
-  def get_service_function(self, name):
-    if name not in self.services:
+  @classmethod
+  def get_service_function(cls, name):
+    if not cls.services:
+      cls.services = extensions.get_module_contributions(
+          "contributed_notifications")
+    if name not in cls.services:
       raise ValueError("unknown service name: %s" % name)
-    return self.services[name]
+    return cls.services[name]
 
-  def call_service(self, name, notification):
-    service = self.get_service_function(name)
+  @classmethod
+  def call_service(cls, name, notification):
+    service = cls.get_service_function(name)
     return service(notification)
-
-
-services = NotificationServices()
 
 
 def get_filter_data(notification):
   result = {}
-  data = services.call_service(notification.object_type, notification)
+  data = Services.call_service(notification.object_type, notification)
 
   for user, user_data in data.iteritems():
     if should_receive(notification,
@@ -95,14 +99,6 @@ def get_todays_notifications():
   return notifications, get_notification_data(notifications)
 
 
-def generate_notification_email(data):
-  pass
-
-
-def dispatch_notifications():
-  pass
-
-
 def should_receive(notif, force_notif, person_id, nightly_cron=True):
   def is_enabled(notif_type):
     result = NotificationConfig.query.filter(
@@ -123,3 +119,45 @@ def should_receive(notif, force_notif, person_id, nightly_cron=True):
   has_digest = force_notif or is_enabled("Email_Digest")
 
   return has_digest
+
+
+def send_todays_digest_notifications():
+  digest_template = ENV.get_template("notifications/email_digest.html")
+  notif_list, notif_data = get_todays_notifications()
+  sent_emails = []
+  subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
+  for user_email, data in notif_data.iteritems():
+    data = common.modify_data(data)
+    email_body = digest_template.render(digest=data)
+    common.send_email(user_email, subject, email_body)
+    sent_emails.append(user_email)
+  set_notification_sent_time(notif_list)
+  return "emails sent to: <br> {}".format("<br>".join(sent_emails))
+
+
+def set_notification_sent_time(notif_list):
+  for notif in notif_list:
+    notif.sent_at = datetime.now()
+  db.session.commit()
+
+
+def show_pending_notifications():
+  if not permissions.is_admin():
+    raise Forbidden()
+  _, notif_data = get_pending_notifications()
+
+  for day, day_notif in notif_data.iteritems():
+    for user_email, data in day_notif.iteritems():
+      data = common.modify_data(data)
+  pending = ENV.get_template("notifications/view_pending_digest.html")
+  return pending.render(data=sorted(notif_data.iteritems()))
+
+
+def show_todays_digest_notifications():
+  if not permissions.is_admin():
+    raise Forbidden()
+  _, notif_data = get_todays_notifications()
+  for user_email, data in notif_data.iteritems():
+    data = common.modify_data(data)
+  todays = ENV.get_template("notifications/view_todays_digest.html")
+  return todays.render(data=notif_data)

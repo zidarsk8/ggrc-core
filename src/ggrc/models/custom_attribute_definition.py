@@ -3,10 +3,10 @@
 # Created By: laran@reciprocitylabs.com
 # Maintained By: laran@reciprocitylabs.com
 
+from sqlalchemy.sql.schema import UniqueConstraint
+
 from ggrc import db
-from ggrc.models.custom_attribute_value import CustomAttributeValue
-from ggrc.models.computed_property import computed_property
-from ggrc.models.reflection import PublishOnly
+
 from .mixins import (
     deferred, Titled, Base
 )
@@ -23,11 +23,8 @@ class CustomAttributeDefinition(Base, Titled, db.Model):
   helptext = deferred(db.Column(db.String), 'CustomAttributeDefinition')
   placeholder = deferred(db.Column(db.String), 'CustomAttributeDefinition')
 
-  # TODO: People model could use something like this as well
-  @computed_property
-  def hide_delete_button(self):
-    return db.session.query(CustomAttributeValue)\
-        .filter(CustomAttributeValue.custom_attribute_id == self.id).count() > 0
+  __table_args__ = (UniqueConstraint(
+      'title', 'definition_type', name='_unique_attribute'),)
 
   _publish_attrs = [
       'definition_type',
@@ -36,7 +33,6 @@ class CustomAttributeDefinition(Base, Titled, db.Model):
       'mandatory',
       'helptext',
       'placeholder',
-      PublishOnly('hide_delete_button')
   ]
 
   class ValidTypes(object):

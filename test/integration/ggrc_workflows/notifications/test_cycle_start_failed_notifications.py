@@ -3,23 +3,16 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
 from integration.ggrc import TestCase
 from freezegun import freeze_time
 from datetime import datetime
 from mock import patch
 
-import os
-from ggrc import notification
+from ggrc import notifications
 from ggrc.models import Notification
-from ggrc_workflows.views import send_todays_digest_notifications
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
-
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestCycleStartFailed(TestCase):
@@ -36,7 +29,8 @@ class TestCycleStartFailed(TestCase):
     Notification.query.delete()
 
     self.random_objects = self.object_generator.generate_random_objects(2)
-    _, self.user = self.object_generator.generate_person(user_role="gGRC Admin")
+    _, self.user = self.object_generator.generate_person(
+        user_role="gGRC Admin")
     self.create_test_cases()
 
     def init_decorator(init):
@@ -48,7 +42,7 @@ class TestCycleStartFailed(TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  @patch("ggrc.notification.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_start_failed(self, mock_mail):
 
     wf_owner = "user@example.com"
@@ -61,30 +55,30 @@ class TestCycleStartFailed(TestCase):
       self.assert200(response)
 
     with freeze_time("2015-01-01 13:39:20"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(wf_owner, notif_data)
 
     with freeze_time("2015-01-29 13:39:20"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertIn(wf_owner, notif_data)
       self.assertIn("cycle_starts_in", notif_data[wf_owner])
 
     with freeze_time("2015-03-05 13:39:20"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertIn(wf_owner, notif_data)
       self.assertNotIn("cycle_started", notif_data[wf_owner])
       self.assertIn(wf_owner, notif_data)
       self.assertIn("cycle_start_failed", notif_data[wf_owner])
 
-      send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
 
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(wf_owner, notif_data)
 
   # TODO: investigate why next_cycle_start date remains the same after
   # start_recurring_cycles
 
-  # @patch("ggrc.notification.email.send_email")
+  # @patch("ggrc.notifications.common.send_email")
   # def test_start_failed_send_notifications(self, mock_mail):
 
   #   wf_owner = "user@example.com"
@@ -97,34 +91,34 @@ class TestCycleStartFailed(TestCase):
   #     self.assert200(response)
 
   #   with freeze_time("2015-01-01 13:39:20"):
-  #     _, notif_data = notification.get_todays_notifications()
+  #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertNotIn(wf_owner, notif_data)
 
   #   with freeze_time("2015-01-29 13:39:20"):
-  #     _, notif_data = notification.get_todays_notifications()
+  #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertIn("cycle_starts_in", notif_data[wf_owner])
 
   #   with freeze_time("2015-02-05 13:39:20"):
-  #     _, notif_data = notification.get_todays_notifications()
+  #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertNotIn("cycle_started", notif_data[wf_owner])
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertIn("cycle_start_failed", notif_data[wf_owner])
 
   #     start_recurring_cycles()
-  #     _, notif_data = notification.get_todays_notifications()
+  #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertIn("cycle_started", notif_data[wf_owner])
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertNotIn("cycle_start_failed", notif_data[wf_owner])
 
-  #     send_todays_digest_notifications()
+  #     notifications.send_todays_digest_notifications()
 
-  #     _, notif_data = notification.get_todays_notifications()
+  #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertNotIn(wf_owner, notif_data)
 
-  # @patch("ggrc.notification.email.send_email")
+  # @patch("ggrc.notifications.common.send_email")
   # def test_start_failed_send_notifications_monthly(self, mock_mail):
 
   #   wf_owner = "user@example.com"
@@ -139,22 +133,22 @@ class TestCycleStartFailed(TestCase):
 
   #     self.assert200(response)
 
-  #     _, notif_data = notification.get_todays_notifications()
+  #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertNotIn("cycle_started", notif_data[wf_owner])
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertIn("cycle_start_failed", notif_data[wf_owner])
 
   #     start_recurring_cycles()
-  #     _, notif_data = notification.get_todays_notifications()
+  #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertIn("cycle_started", notif_data[wf_owner])
   #     self.assertIn(wf_owner, notif_data)
   #     self.assertNotIn("cycle_start_failed", notif_data[wf_owner])
 
-  #     send_todays_digest_notifications()
+  #     notifications.send_todays_digest_notifications()
 
-  #     _, notif_data = notification.get_todays_notifications()
+  #     _, notif_data = notifications.get_todays_notifications()
   #     self.assertNotIn(wf_owner, notif_data)
 
   def create_test_cases(self):
@@ -166,7 +160,7 @@ class TestCycleStartFailed(TestCase):
       }
 
     self.quarterly_wf = {
-        "title": "quarterly wf forced notification",
+        "title": "quarterly wf forced notifications",
         "notify_on_change": True,
         "description": "",
         "owners": [person_dict(self.user.id)],

@@ -3,18 +3,12 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import os
+"""Base test case for all ggrc integration tests."""
+
 import logging
 from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
 from ggrc.app import app
-from ggrc.models import create_db
-
-if os.environ.get('TRAVIS', False):
-  db.engine.execute("DROP DATABASE IF EXISTS ggrcdevtest;")
-  db.engine.execute("CREATE DATABASE ggrcdevtest; USE ggrcdevtest;")
-
-  create_db(use_migrations=True, quiet=True)
 
 # Hide errors during testing. Errors are still displayed after all tests are
 # done. This is for the bad request error messages while testing the api calls.
@@ -44,7 +38,6 @@ class TestCase(BaseTestCase):
             pass
 
     db.session.commit()
-
 
   def setUp(self):
     # this is a horrible hack because db.metadata.sorted_tables does not sort

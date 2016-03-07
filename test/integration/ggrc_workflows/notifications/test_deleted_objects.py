@@ -3,23 +3,17 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
 from integration.ggrc import TestCase
 from freezegun import freeze_time
 from datetime import datetime
 from mock import patch
 
-import os
-from ggrc import notification
+from ggrc import notifications
 from ggrc.models import Notification, Person
 from ggrc_workflows.models import Workflow
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
-
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestNotificationsForDeletedObjects(TestCase):
@@ -36,7 +30,8 @@ class TestNotificationsForDeletedObjects(TestCase):
     Notification.query.delete()
 
     self.random_objects = self.object_generator.generate_random_objects(2)
-    _, self.user = self.object_generator.generate_person(user_role="gGRC Admin")
+    _, self.user = self.object_generator.generate_person(
+        user_role="gGRC Admin")
     self.create_test_cases()
 
     def init_decorator(init):
@@ -48,7 +43,7 @@ class TestNotificationsForDeletedObjects(TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  @patch("ggrc.notification.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_delete_activated_workflow(self, mock_mail):
 
     with freeze_time("2015-02-01 13:39:20"):
@@ -60,20 +55,20 @@ class TestNotificationsForDeletedObjects(TestCase):
       user = Person.query.get(self.user.id)
 
     with freeze_time("2015-01-01 13:39:20"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
 
     with freeze_time("2015-01-29 13:39:20"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertIn(user.email, notif_data)
       self.assertIn("cycle_starts_in", notif_data[user.email])
 
       workflow = Workflow.query.get(wf.id)
 
-      response = self.wf_generator.api.delete(workflow, workflow.id)
+      response = self.wf_generator.api.delete(workflow)
       self.assert200(response)
 
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       user = Person.query.get(self.user.id)
 
       self.assertNotIn(user.email, notif_data)

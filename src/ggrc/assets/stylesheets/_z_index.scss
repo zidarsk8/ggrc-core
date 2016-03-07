@@ -1,0 +1,37 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+$zindex: (
+  'sticky': 50,
+  'header-content': 100,
+  'bar-v': 100,
+  'tree-spinner': 100,
+  'footer': 1500,
+  'file-controls': 1500,
+  'pin-content': 1500,
+  'ui-autocomplete-active-list': 1500,
+  'extended-content': 1500,
+  'lhs': 2050,
+  'event-more': 2050,
+  'tooltip': 3100,
+  'pane-header': 3100,
+  'extended-info': 3200,
+  'ui-autocomplete': 3200,
+  'flash': 9000,
+  'dropdown-menu': 9999,
+  'details-wrap': 9999,
+  'info-pane-utility': 9999,
+  'modal-header-flash': 9999,
+  'lhn-pin': 9999
+);
+
+@function zIndex($name) {
+  @if not map-has-key($zindex, $name) {
+    @warn "No value found for '#{$name}' in '$zindex' map";
+  }
+  @return map-get($zindex, $name);
+}

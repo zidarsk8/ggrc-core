@@ -7,7 +7,6 @@
 object can have it's own rules what is mappable to it"""
 
 from lib import base
-from lib import selenium_utils
 from lib.page import widget
 from lib.element import widget_bar
 from lib.constants import locator
@@ -33,6 +32,7 @@ class _WidgetBar(base.Component):
 class _ObjectWidgetBar(_WidgetBar):
   """Model for a generic object widget bar (e.g. each info widget is object
   specific"""
+  # pylint: disable=not-callable
 
   _info_cls = None
 
@@ -41,6 +41,7 @@ class _ObjectWidgetBar(_WidgetBar):
     self.button_add_widget = base.Dropdown(driver,
                                            locator.WidgetBar.BUTTON_ADD)
     self.tab_info = base.Tab(self._driver, locator.WidgetBar.INFO)
+    self.tab_controls = None
 
   def add_widget(self):
     """
@@ -61,6 +62,8 @@ class _ObjectWidgetBar(_WidgetBar):
     Returns:
         widget.Controls
     """
+    self.tab_controls = base.Tab(self._driver, locator.WidgetBar.CONTROLS)\
+        .click()
     return widget.Controls(self._driver)
 
 
@@ -92,10 +95,6 @@ class AdminDashboardWidgetBarPage(_WidgetBar):
         widget.AdminRoles
     """
     self.tab_roles.click()
-
-    # wait until elements are loaded
-    selenium_utils.get_when_visible(
-        self._driver, locator.AdminRolesWidget.ROLE_EDITOR)
     return widget.AdminRoles(self._driver)
 
   def select_events(self):

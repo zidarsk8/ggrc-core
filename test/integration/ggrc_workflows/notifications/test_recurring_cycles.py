@@ -3,23 +3,16 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
 from integration.ggrc import TestCase
 from freezegun import freeze_time
 
-import os
 from mock import patch
 
-from ggrc import notification
+from ggrc import notifications
 from ggrc.models import Person
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
-from ggrc_workflows import views
-
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestRecurringCycleNotifications(TestCase):
@@ -49,19 +42,19 @@ class TestRecurringCycleNotifications(TestCase):
       assignee = Person.query.get(self.assignee.id)
 
     with freeze_time("2015-01-01"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-01-29"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertIn(assignee.email, notif_data)
 
     with freeze_time("2015-02-01"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertIn(assignee.email, notif_data)
 
   # TODO: this should mock google email api.
-  @patch("ggrc.notification.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_marking_sent_notifications(self, mail_mock):
     mail_mock.return_value = True
 
@@ -74,16 +67,16 @@ class TestRecurringCycleNotifications(TestCase):
       assignee = Person.query.get(self.assignee.id)
 
     with freeze_time("2015-01-01"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-01-29"):
-      views.send_todays_digest_notifications()
-      _, notif_data = notification.get_todays_notifications()
+      notifications.send_todays_digest_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-02-01"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
   def create_test_cases(self):

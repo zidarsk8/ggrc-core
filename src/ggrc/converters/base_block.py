@@ -86,7 +86,7 @@ class BlockConverter(object):
       self.name = ""
       return
     self.object_headers = get_object_column_definitions(self.object_class)
-    all_header_names = map(unicode, self.get_header_names().keys())  # noqa
+    all_header_names = [unicode(key) for key in self.get_header_names().keys()]
     raw_headers = options.get("raw_headers", all_header_names)
     self.check_for_duplicate_columns(raw_headers)
     self.headers = self.clean_headers(raw_headers)
@@ -194,6 +194,15 @@ class BlockConverter(object):
       self.row_converters.append(row)
 
   def handle_row_data(self, field_list=None):
+    """Call handle row data on all row converters.
+
+    Note: When field_list is set, we are handling priority columns and we
+    don't have all the data needed for checking mandatory and duplicate values.
+
+    Args:
+      filed_list (list of strings): list of fields that should be handled by
+        row converters. This is used only for handling priority columns.
+    """
     if self.ignore:
       return
     for row_converter in self.row_converters:
@@ -202,7 +211,7 @@ class BlockConverter(object):
       self.check_mandatory_fields()
       self.check_uniq_columns()
 
-  def check_mandatory_fields(self, counts=None):
+  def check_mandatory_fields(self):
     for row_converter in self.row_converters:
       row_converter.chect_mandatory_fields()
 
@@ -247,6 +256,12 @@ class BlockConverter(object):
       self.save_import()
 
   def import_objects(self):
+    """Add all objects to the database.
+
+    This function flushes all objects to the database and if the dry_run flag
+    is not set, the session gets commited and all signals for the imported
+    objects get sent.
+    """
     if self.ignore:
       return
 
@@ -255,6 +270,7 @@ class BlockConverter(object):
 
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
+        row_converter.send_pre_commit_signals()
         try:
           row_converter.insert_object()
           db.session.flush()
@@ -263,8 +279,11 @@ class BlockConverter(object):
           current_app.logger.error("Import failed with: {}".format(e.message))
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
+      for row_converter in self.row_converters:
+        row_converter.send_post_commit_signals()
 
   def save_import(self):
+    """Commit all changes in the session and update memcache."""
     try:
       modified_objects = get_modified_objects(db.session)
       update_memcache_before_commit(
@@ -311,11 +330,11 @@ class BlockConverter(object):
   def remove_duplicate_keys(self, key, counts):
 
     for value, indexes in counts.items():
-      if not any(map(self.in_range, indexes)):
+      if not any(self.in_range(index) for index in indexes):
         continue  # ignore duplicates in other related code blocks
 
       if len(indexes) > 1:
-        str_indexes = map(str, indexes)
+        str_indexes = [str(index) for index in indexes]
         self.row_errors.append(
             errors.DUPLICATE_VALUE_IN_CSV.format(
                 line_list=", ".join(str_indexes),
@@ -332,6 +351,21 @@ class BlockConverter(object):
           self.row_converters[index].set_ignore()
 
   def _sanitize_header(self, header):
+    """Sanitaze column header string.
+
+    Since we rely on header names to get the correct handlers, we should allow
+    some room in the names for special characters for mandatory columns and we
+    should treat "map :  control" same as "map: control" or "map:control" to
+    make the headers more user friendly.
+
+    Args:
+      header (basestring): Raw header value found in the cells of each row of
+        all blocks in the imported file.
+
+    Returs:
+      String without "*" on mandatory columns and with removed extra spaces in
+      the mapping columns.
+    """
     header = header.strip("*").lower()
     if header.startswith("map:") or header.startswith("unmap:"):
       header = ":".join(map(unicode.strip, header.split(":")))  # noqa
