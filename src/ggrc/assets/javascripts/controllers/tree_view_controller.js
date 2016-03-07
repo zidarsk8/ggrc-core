@@ -936,12 +936,12 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       if (!control) {
         return;
       }
-      if (Math.abs(this.elPosition(control.element)) <= pageCount) {
+      if (Math.abs(elPosition(control.element)) <= pageCount) {
         visible.push(control);
       } else {
         control.draw_placeholder();
       }
-    }.bind(this));
+    });
 
     for (i = lo; i <= hi; i++) {
       index = this._is_scrolling_up ? (hi - (i - lo)) : i;
