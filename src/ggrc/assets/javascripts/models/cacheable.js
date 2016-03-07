@@ -779,13 +779,16 @@ can.Model("can.Model.Cacheable", {
         def = _.find(this.custom_attribute_definitions, {
           id: value.custom_attribute_id
         });
-        if (def && def.attribute_type.startsWith('Map:')) {
-          object = value.attribute_object;
-          attributeValue = object.type + ':' + object.id;
-        } else {
-          attributeValue = value.attribute_value;
+        if (def) {
+          if (def.attribute_type.startsWith('Map:')) {
+            object = value.attribute_object;
+            attributeValue = object.type + ':' + object.id;
+          } else {
+            attributeValue = value.attribute_value;
+          }
+          self.custom_attributes.attr(value.custom_attribute_id,
+                                      attributeValue);
         }
-        self.custom_attributes.attr(value.custom_attribute_id, attributeValue);
       }.bind(this));
     }
   },
