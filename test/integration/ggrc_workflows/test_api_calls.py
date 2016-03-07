@@ -3,17 +3,12 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
-from integration.ggrc import TestCase
-
-import os
-from ggrc_workflows.models import Workflow, TaskGroup
-from integration.ggrc.api_helper import Api
 from nose.plugins.skip import SkipTest
 
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
+from ggrc_workflows.models import TaskGroup
+from ggrc_workflows.models import Workflow
+from integration.ggrc import TestCase
+from integration.ggrc.api_helper import Api
 
 
 class TestWorkflowsApiPost(TestCase):
