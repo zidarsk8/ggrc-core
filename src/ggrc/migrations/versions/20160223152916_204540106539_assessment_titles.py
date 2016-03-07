@@ -6,7 +6,7 @@
 """Assessment titles
 
 Revision ID: 204540106539
-Revises: 4e989ef86619
+Revises: 1839dabd2357
 Create Date: 2016-02-23 15:29:16.361412
 
 """
@@ -20,7 +20,7 @@ from ggrc.migrations import utils
 
 # revision identifiers, used by Alembic.
 revision = '204540106539'
-down_revision = '4e989ef86619'
+down_revision = '1839dabd2357'
 
 
 def upgrade():
