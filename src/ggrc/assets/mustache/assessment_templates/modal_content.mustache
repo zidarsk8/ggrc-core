@@ -24,7 +24,7 @@
     <select
       class="input-medium pull-left"
       can-value="objectTypes.type"
-      name="assessed-obj-type">
+      name="template_object_type">
       {{#each objectTypes}}
         {{#if items}}
           {{#if items.length}}
@@ -42,7 +42,9 @@
     {{/add_to_current_scope}}
 
     <label class="inline-check pull-left">
-      <input type="checkbox" class="js-toggle-controlplans">
+      <input type="checkbox"
+        name="test_plan_procedure"
+        class="js-toggle-controlplans">
       Use control test plans as procedures
     </label>
   </div>
@@ -52,11 +54,17 @@
   <div class="span6">
     <label>
       Default procedure
-      <i class="grcicon-help-black" rel="tooltip" title="Provide more details on the purpose of this Assessment and provide context for how and when this CA might be used."></i>
-      <a data-id="hide_description_lk" href="javascript://" class="field-hide">hide</a>
+      <i class="grcicon-help-black" rel="tooltip"
+        title="Provide more details on the purpose of this Assessment and
+               provide context for how and when this CA might be used."></i>
+      <a data-id="hide_description_lk" href="javascript://"
+        class="field-hide">hide</a>
     </label>
     <div class="wysiwyg-area">
-      <textarea tabindex="2" id="system_description" class="span12 triple wysihtml5" name="description" placeholder="Enter Description"></textarea>
+      <textarea tabindex="2" id="system_description"
+        class="span12 triple wysihtml5"
+        name="procedure_description"
+        placeholder="Enter Description"></textarea>
     </div>
   </div>
 
@@ -68,16 +76,25 @@
           <span class="required">*</span>
         </label>
 
-        <select class="input-block-level js-toggle-field" data-target=".choose-assessor" data-value="other">
-          <option>Object Owners</option>
-          <option>Audit Lead</option>
+        <select
+          name="default_assessors"
+          class="input-block-level js-toggle-field"
+          can-value="">
+          <option value="Object Owners">Object Owners</option>
+          <option value="Audit Lead">Audit Lead</option>
+          <option value="Object Contact">Object Contact</option>
+          <option value="Primary Assessor">Primary Assessor</option>
+          <option value="Secondary Assessors">Secondary Assessors</option>
           <option value="other">Others...</option>
         </select>
       </div>
 
       <div class="span6">
         <label>&nbsp;</label>
-        <input type="text" class="input-block-level choose-input choose-assessor" placeholder="Add person 1, Add person 2..." disabled>
+        <input type="text"
+          name="assessors_list"
+          class="input-block-level choose-input choose-assessor"
+          placeholder="Add person 1, Add person 2...">
       </div>
     </div>
 
@@ -88,17 +105,25 @@
           <span class="required">*</span>
         </label>
 
-        <select class="input-block-level js-toggle-field" data-target=".choose-verifier" data-value="other">
-          <option>Object contact</option>
-          <option>Primary assessor</option>
-          <option>Secondary assessors</option>
+        <select
+          name="default_verifiers"
+          class="input-block-level js-toggle-field"
+          can-value="">
+          <option value="Object Owners">Object Owners</option>
+          <option value="Audit Lead">Audit Lead</option>
+          <option value="Object Contact">Object Contact</option>
+          <option value="Primary Assessor">Primary Assessor</option>
+          <option value="Secondary Assessors">Secondary Assessors</option>
           <option value="other">Others...</option>
         </select>
       </div>
 
       <div class="span6">
         <label>&nbsp;</label>
-        <input type="text" class="input-block-level choose-input choose-verifier" placeholder="Add person 1, Add person 2..." disabled>
+        <input type="text"
+          name="verifiers_list"
+          class="input-block-level choose-input choose-verifier"
+          placeholder="Add person 1, Add person 2...">
       </div>
     </div>
   </div>

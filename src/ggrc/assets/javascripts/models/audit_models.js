@@ -1087,7 +1087,6 @@
      */
     init: function () {
       this._super.apply(this, arguments);
-      // TODO: perform any validation here?
     }
   }, {
     // the object types that are not relevant to the AssessmentTemplate,
@@ -1108,20 +1107,58 @@
       this.attr('_objectTypes', this._choosableObjectTypes());
     },
 
-    // TODO: docstring, tests
-    // TODO: why this isn't called? To perform validation, data packing etc.
-    before_save: function () {
-      console.log('AssessmentTemplate before_save');
+    /**
+     * Save the model instance by sending a POST/PUT request to the server
+     *
+     * @return {can.Deferred} - a deferred object resolved or rejected
+     *   depending on the outcome of the undrelying API request
+     */
+    save: function () {
+      this.attr('test_plan_procedure', !!this.attr('test_plan_procedure'));
+      this.attr('default_people', this._packPeopleData());
+
+      return this._super.apply(this, arguments);
     },
 
-    before_create: function () {
-      console.log('AssessmentTemplate before_create');
-    },
+    /**
+     * Pack the "default people" form data into a JSON string.
+     *
+     * @return {String} - the JSON-packed default people data
+     */
+    _packPeopleData: function () {
+      var data = {};
 
-    // save: function () {
-    //   console.log('AssessmentTemplate saved');
-    //   // return this._super.apply(this, arguments);
-    // }
+      /**
+       * Convert a comma-separated list of people to an Array.
+       *
+       * The list elements have any redundant whitespace trimmed from the
+       * beginning and the end. Empty elements are discared from the result,
+       * as are any duplicates.
+       *
+       * @param {String} rawString - the string to convert
+       * @return {Array} - the JSON-packed default people data
+       */
+      function makeList(rawString) {
+        var result = rawString.split(',');
+        result = _.map(result, function (item) {
+          return item.trim();
+        });
+        return _.uniq(_.filter(result));
+      }
+
+      data.assessors = this.attr('default_assessors');
+      data.verifiers = this.attr('default_verifiers');
+
+      if (data.assessors === 'other') {
+        data.assessors = makeList(this.attr('assessors_list'));
+      }
+
+      if (data.verifiers === 'other') {
+        data.verifiers = makeList(this.attr('verifiers_list'));
+      }
+
+      return JSON.stringify(data);
+    },
 
     /**
      * Return the object types that can be assessed.

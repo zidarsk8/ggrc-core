@@ -148,4 +148,53 @@ describe('can.Model.AssessmentTemplate', function () {
       }
     );
   });
+
+  describe('_packPeopleData() method', function () {
+    it('packs default people data into a JSON string', function () {
+      var result;
+      instance.attr('default_assessors', 'Rabbits');
+      instance.attr('default_verifiers', 'Turtles');
+
+      result = instance._packPeopleData();
+
+      expect(typeof result).toEqual('string');
+      result = JSON.parse(result);
+      expect(result).toEqual({
+        assessors: 'Rabbits',
+        verifiers: 'Turtles'
+      });
+    });
+
+    it('uses the user-provided list if assessors set to "other"', function () {
+      var result;
+      instance.attr('default_assessors', 'other');
+      instance.attr('assessors_list', '  John,, Jack Mac,John,  Jill,  , ');
+      instance.attr('default_verifiers', 'Whatever');
+
+      result = instance._packPeopleData();
+
+      expect(typeof result).toEqual('string');
+      result = JSON.parse(result);
+      expect(result).toEqual({
+        assessors: ['John', 'Jack Mac', 'Jill'],
+        verifiers: 'Whatever'
+      });
+    });
+
+    it('uses the user-provided list if verifiers set to "other"', function () {
+      var result;
+      instance.attr('default_assessors', 'Whatever');
+      instance.attr('default_verifiers', 'other');
+      instance.attr('verifiers_list', '  First, ,, Sec ond   ,First, Third ');
+
+      result = instance._packPeopleData();
+
+      expect(typeof result).toEqual('string');
+      result = JSON.parse(result);
+      expect(result).toEqual({
+        assessors: 'Whatever',
+        verifiers: ['First', 'Sec ond', 'Third']
+      });
+    });
+  });
 });
