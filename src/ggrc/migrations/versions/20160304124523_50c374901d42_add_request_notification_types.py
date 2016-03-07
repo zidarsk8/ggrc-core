@@ -1,8 +1,12 @@
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
 
 """Add request notification types
 
 Revision ID: 50c374901d42
-Revises: 4e989ef86619
+Revises: 1e2abee7566c
 Create Date: 2016-03-04 12:45:23.024224
 
 """
@@ -14,7 +18,7 @@ from sqlalchemy.sql import table
 
 # revision identifiers, used by Alembic.
 revision = '50c374901d42'
-down_revision = '1839dabd2357'
+down_revision = '1e2abee7566c'
 
 NOTIFICATION_TYPES = table(
     'notification_types',
