@@ -117,6 +117,7 @@ dashboard-js-files:
   - components/people_list.js
   - components/mapped_tree_view.js
   - components/assessment_generator.js
+  - components/paginate.js
   - components/tabs.js
   #- d3.v2.js
   #- related_graph.js
@@ -148,6 +149,7 @@ dashboard-js-template-files:
   - base_objects/tabs.mustache
   - base_objects/tab_panel.mustache
   - base_objects/page_header.mustache
+  - base_objects/paginate.mustache
   - base_objects/relevance_action.mustache
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
