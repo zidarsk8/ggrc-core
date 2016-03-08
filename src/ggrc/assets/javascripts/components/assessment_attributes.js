@@ -28,12 +28,9 @@
         fileds.splice(index, 1);
       },
       attrs: function () {
-        return _.compact(_.map(this.attr('field.values').split(','), function (value) {
-          value = $.trim(value);
-          if (value) {
-            return value;
-          }
-        }));
+        return _.splitTrim(this.attr('field.values'), {
+          compact: true
+        });
       }
     }
   });
@@ -60,8 +57,9 @@
         var selected = this.attr('selected');
         var title = _.trim(selected.title);
         var type = _.trim(selected.type);
-        var values = _.uniq(_.map(
-          selected.values.split(','), _.trim)).join(',');
+        var values = _.splitTrim(selected.values, {
+          unique: true
+        }).join(',');
 
         ev.preventDefault();
         if (!type || !values || !title) {
