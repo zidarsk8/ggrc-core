@@ -61,7 +61,7 @@ describe('_.splitTrim method', function () {
       expect(result).toBe(['a', 'b', 'c', 'd', 'c', 'ab', 'f']);
     });
 
-    it('return unique split values without spaces', function () {
+    it('return unique and compact split values without spaces', function () {
       var result = _.splitTrim(input, {
         compact: true,
         unique: true

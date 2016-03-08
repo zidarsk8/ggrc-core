@@ -24,7 +24,7 @@
       }, obj);
     },
     /*
-     * Splits string into array and trims it's values
+     * Splits string into array and trims its values
      *
      * @param {String} values - Input string that should be manipulated
      * @param {String} splitter - String that is used to split `values`
@@ -42,6 +42,7 @@
         options = splitter;
         splitter = ',';
       }
+
       values = values.split(splitter);
       values = _.map(values, _.trim);
       if (options.unique) {
