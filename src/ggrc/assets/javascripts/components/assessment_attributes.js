@@ -55,7 +55,7 @@
         type: 'Text',
         text: 'Type description'
       }],
-      addFiled: function (scope, el, ev) {
+      addField: function (scope, el, ev) {
         var fields = this.attr('fields');
         var selected = this.attr('selected');
         var title = _.trim(selected.title);
