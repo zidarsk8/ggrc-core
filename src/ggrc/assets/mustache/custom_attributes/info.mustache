@@ -31,6 +31,14 @@
                   <h6>{{title}}</h6>
                   {{{value}}}
                 {{/case}}
+                {{#case 'Map:Person'}}
+                  <h6>{{title}}</h6>
+                  {{#with_object_for_id id}}
+                    {{#using person=object}}
+                      {{>'/static/mustache/people/popover.mustache'}}
+                    {{/using}}
+                  {{/with_object_for_id}}
+                {{/case}}
                 {{#default}}
                   <h6>{{title}}</h6>
                   {{value}}

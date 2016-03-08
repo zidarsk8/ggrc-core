@@ -29,6 +29,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       _types.DROPDOWN: lambda self: self.get_dropdown_value(),
       _types.CHECKBOX: lambda self: self.get_checkbox_value(),
       _types.RICH_TEXT: lambda self: self.get_rich_text_value(),
+      _types.MAP: lambda self: self.get_person_value(),
   }
 
   def parse_item(self):
@@ -39,8 +40,13 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     """
     self.definition = self.get_ca_definition()
     value = models.CustomAttributeValue(custom_attribute_id=self.definition.id)
-    value_handler = self._type_handlers[self.definition.attribute_type]
+    typ = self.definition.attribute_type.split(":")[0]
+    value_handler = self._type_handlers[typ]
     value.attribute_value = value_handler(self)
+    if isinstance(value.attribute_value, models.mixins.Identifiable):
+      obj = value.attribute_value
+      value.attribute_value = obj.__class__.__name__
+      value.attribute_object_id = obj.id
     if value.attribute_value is None:
       return None
     return value
@@ -55,6 +61,9 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     definition = self.get_ca_definition()
     for value in self.row_converter.obj.custom_attribute_values:
       if value.custom_attribute_id == definition.id:
+        if value.custom_attribute.attribute_type.startswith("Map:"):
+          obj = value.attribute_object
+          return getattr(obj, "email", getattr(obj, "slug", None))
         return value.attribute_value
     return None
 
@@ -125,3 +134,19 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     if self.mandatory and not self.raw_value:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return self.raw_value
+
+  def get_person_value(self):
+    """Fetch a person based on the email text in column.
+
+    Returns:
+        Person model instance
+    """
+    if not self.mandatory and self.raw_value == "":
+      return None  # ignore empty fields
+    if self.mandatory and not self.raw_value:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
+      return
+    value = models.Person.query.filter_by(email=self.raw_value).first()
+    if self.mandatory and not value:
+      self.add_error(errors.WRONG_VALUE, column_name=self.display_name)
+    return value

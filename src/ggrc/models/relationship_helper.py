@@ -80,6 +80,22 @@ class RelationshipHelper(object):
       )
 
   @classmethod
+  def custom_attribute_mapping(cls, object_type, related_type, related_ids):
+    return db.session.query(models.CustomAttributeValue.attributable_id)\
+        .filter(
+            (models.CustomAttributeValue.attributable_type == object_type) &
+            (models.CustomAttributeValue.attribute_value == related_type) &
+            models.CustomAttributeValue.attribute_object_id.in_(related_ids))\
+        .union(
+        db.session.query(models.CustomAttributeValue.attribute_object_id)
+        .filter(
+            (models.CustomAttributeValue.attribute_value == object_type) &
+            (models.CustomAttributeValue.attributable_type == related_type) &
+            models.CustomAttributeValue.attributable_id.in_(related_ids)
+        )
+    )
+
+  @classmethod
   def audit_request(cls, object_type, related_type, related_ids):
     if {object_type, related_type} != {"Audit", "Request"} or not related_ids:
       return None
@@ -128,6 +144,7 @@ class RelationshipHelper(object):
         cls.program_audit(object_type, related_type, related_ids),
         cls.program_risk_assessment(object_type, related_type, related_ids),
         cls.task_group_object(object_type, related_type, related_ids),
+        cls.custom_attribute_mapping(object_type, related_type, related_ids),
     ]
 
   @classmethod

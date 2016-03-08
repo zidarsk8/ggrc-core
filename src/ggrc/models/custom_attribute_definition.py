@@ -3,25 +3,26 @@
 # Created By: laran@reciprocitylabs.com
 # Maintained By: laran@reciprocitylabs.com
 
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc import db
-
-from .mixins import (
-    deferred, Titled, Base
-)
+from ggrc.models import mixins
+from ggrc.models.custom_attribute_value import CustomAttributeValue
 
 
-class CustomAttributeDefinition(Base, Titled, db.Model):
+class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   __tablename__ = 'custom_attribute_definitions'
 
-  definition_type = deferred(db.Column(db.String), 'CustomAttributeDefinition')
-  attribute_type = deferred(db.Column(db.String), 'CustomAttributeDefinition')
-  multi_choice_options = deferred(db.Column(db.String),
-                                  'CustomAttributeDefinition')
-  mandatory = deferred(db.Column(db.Boolean), 'CustomAttributeDefinition')
-  helptext = deferred(db.Column(db.String), 'CustomAttributeDefinition')
-  placeholder = deferred(db.Column(db.String), 'CustomAttributeDefinition')
+  definition_type = db.Column(db.String)
+  attribute_type = db.Column(db.String)
+  multi_choice_options = db.Column(db.String)
+  mandatory = db.Column(db.Boolean)
+  helptext = db.Column(db.String)
+  placeholder = db.Column(db.String)
+
+  attribute_values = db.relationship('CustomAttributeValue',
+                                     backref='custom_attribute')
 
   __table_args__ = (UniqueConstraint(
       'title', 'definition_type', name='_unique_attribute'),)
@@ -41,3 +42,27 @@ class CustomAttributeDefinition(Base, Titled, db.Model):
     DROPDOWN = "Dropdown"
     CHECKBOX = "Checkbox"
     DATE = "Date"
+    MAP = "Map"
+
+
+class CustomAttributeMapable(object):
+  # pylint: disable=too-few-public-methods
+  # because this is a mixin
+
+  @declared_attr
+  def related_custom_attributes(self):
+    """CustomAttributeValues that directly map to this object.
+
+    Used just to get the backrefs on the CustomAttributeValue object.
+
+    Returns:
+       a sqlalchemy relationship
+    """
+    return db.relationship(
+        'CustomAttributeValue',
+        primaryjoin=lambda: (
+            (CustomAttributeValue.attribute_value == self.__name__) &
+            (CustomAttributeValue.attribute_object_id == self.id)),
+        foreign_keys="CustomAttributeValue.attribute_object_id",
+        backref='attribute_{0}'.format(self.__name__),
+        viewonly=True)

@@ -349,7 +349,17 @@ can.Control('CMS.Controllers.TreeLoader', {
         can.map(filtered_items, function (item) {
           var instance = item.instance || item;
           if (instance.custom_attribute_values) {
-            return instance.refresh_all('custom_attribute_values');
+            return instance.refresh_all('custom_attribute_values').then(function (values) {
+              var rq = new RefreshQueue();
+              _.each(values, function (value) {
+                if (value.attribute_object) {
+                  rq.enqueue(value.attribute_object);
+                }
+              });
+              return rq.trigger().then(function () {
+                return values;
+              });
+            });
           }
         }));
     } else {
@@ -936,12 +946,12 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       if (!control) {
         return;
       }
-      if (Math.abs(this.elPosition(control.element)) <= pageCount) {
+      if (Math.abs(elPosition(control.element)) <= pageCount) {
         visible.push(control);
       } else {
         control.draw_placeholder();
       }
-    }.bind(this));
+    });
 
     for (i = lo; i <= hi; i++) {
       index = this._is_scrolling_up ? (hi - (i - lo)) : i;
