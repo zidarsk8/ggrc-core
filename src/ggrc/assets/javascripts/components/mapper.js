@@ -401,17 +401,20 @@
       }
     },
     helpers: {
-      "not_allowed_to_map": function (options) {
-        if (/false/gi.test(this.attr("is_allowed_to_map"))) {
+      not_allowed_to_map: function (options) {
+        if (/false/gi.test(this.attr('is_allowed_to_map')) &&
+          !this.attr('mapper.getList')) {
           return options.fn();
         }
         return options.inverse();
       },
-      "is_disabled": function (options) {
-        if (/true/gi.test(this.attr("is_mapped"))
-            || this.attr("is_saving")
-            || this.attr("is_loading")
-            || /false/gi.test(this.attr("is_allowed_to_map"))) {
+      is_disabled: function (options) {
+        var disable = /true/gi.test(this.attr('is_mapped')) ||
+          /false/gi.test(this.attr('is_allowed_to_map'));
+
+        if (disable && !this.attr('mapper.getList') ||
+            this.attr('is_saving') ||
+            this.attr('is_loading')) {
           return options.fn();
         }
         return options.inverse();
