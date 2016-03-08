@@ -15,6 +15,7 @@ latest etag needed for such requests.
 """
 
 from ggrc import db
+from ggrc import builder
 from ggrc.app import app
 from ggrc.services.common import Resource
 import flask
@@ -101,6 +102,13 @@ class Api():
   def get_query(self, obj, query):
     return self.data_to_json(self.tc.get(
         "{}?{}".format(self.api_link(obj), query)))
+
+  def modify_object(self, obj, data=None):
+    obj_dict = builder.json.publish(obj)
+    builder.json.publish_representation(obj_dict)
+    obj_dict.update(data)
+    data = {obj._inflector.table_singular: obj_dict}
+    return self.put(obj, data)
 
   def delete(self, obj):
     """Delete api call helper.
