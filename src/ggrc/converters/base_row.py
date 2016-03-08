@@ -6,15 +6,16 @@
 """This module is used for handling a single line from a csv file.
 """
 
+import ggrc.services
 from ggrc import db
 from ggrc.converters import errors
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 from ggrc.services.common import Resource
-import ggrc.services
 
 
 class RowConverter(object):
+  """Base class for handling row data."""
 
   def __init__(self, block_converter, object_class, **options):
     self.block_converter = block_converter
@@ -55,8 +56,8 @@ class RowConverter(object):
               attr_name in self.attrs or \
               self.is_delete:
         continue
-      Handler = header_dict["handler"]
-      item = Handler(self, attr_name, parse=True,
+      handler = header_dict["handler"]
+      item = handler(self, attr_name, parse=True,
                      raw_value=self.row[i], **header_dict)
       if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
         self.attrs[attr_name] = item
@@ -156,10 +157,44 @@ class RowConverter(object):
     for item_handler in self.attrs.values():
       item_handler.set_obj_attr()
 
-  def send_signals(self):
+  def send_post_commit_signals(self):
+    """Send after commit signals for all objects
+
+    This function sends propper signals for all objects depending if the object
+    was created, updated or deleted.
+    Note: signals are only sent for the row objects. Secondary objects such as
+    Relationships do not get any signals triggered.
+    ."""
+    if self.ignore:
+      return
     service_class = getattr(ggrc.services, self.object_class.__name__)
     service_class.model = self.object_class
-    if self.is_new:
+    if self.is_delete:
+      Resource.model_deleted_after_commit.send(
+          self.object_class, obj=self.obj, service=service_class)
+    elif self.is_new:
+      Resource.model_posted_after_commit.send(
+          self.object_class, obj=self.obj, src={}, service=service_class)
+    else:
+      Resource.model_put_after_commit.send(
+          self.object_class, obj=self.obj, src={}, service=service_class)
+
+  def send_pre_commit_signals(self):
+    """Send before commit signals for all objects.
+
+    This function sends propper signals for all objects depending if the object
+    was created, updated or deleted.
+    Note: signals are only sent for the row objects. Secondary objects such as
+    Relationships do not get any signals triggered.
+    """
+    if self.ignore:
+      return
+    service_class = getattr(ggrc.services, self.object_class.__name__)
+    service_class.model = self.object_class
+    if self.is_delete:
+      Resource.model_deleted.send(
+          self.object_class, obj=self.obj, service=service_class)
+    elif self.is_new:
       Resource.model_posted.send(
           self.object_class, obj=self.obj, src={}, service=service_class)
     else:
@@ -167,22 +202,41 @@ class RowConverter(object):
           self.object_class, obj=self.obj, src={}, service=service_class)
 
   def insert_object(self):
+    """Add the row object to the current database session."""
     if self.ignore or self.is_delete:
       return
-    else:
-      self.send_signals()
-      if self.is_new:
-        db.session.add(self.obj)
-      for handler in self.attrs.values():
-        handler.insert_object()
+
+    if self.is_new:
+      db.session.add(self.obj)
+    for handler in self.attrs.values():
+      handler.insert_object()
 
   def insert_secondary_objecs(self):
+    """Add additional objects to the current database session.
+
+    This is used for adding any extra created objects such as Relationships, to
+    the current session to be commited.
+    """
     if not self.obj or self.ignore or self.is_delete:
       return
     for secondery_object in self.objects.values():
       secondery_object.insert_object()
 
   def to_array(self, fields):
+    """Get an array representation of the current row.
+
+    Fiter the values to match the fields array and return the string
+    representation of the values.
+
+    Args:
+      fields (list of strings): A list of columns that will be included in the
+        output array. This is basically a filter of all possible fields that
+        this row contains.
+
+    Returns:
+      list of strings where each cell contains a string value of the
+      coresponding field.
+    """
     row = []
     for field in fields:
       if self.headers[field].get("type") == AttributeInfo.Type.PROPERTY:

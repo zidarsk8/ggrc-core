@@ -8,7 +8,6 @@ from uuid import uuid1
 from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import event
-from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import foreign
 from sqlalchemy.orm import relationship
@@ -629,42 +628,28 @@ class CustomAttributable(object):
 
     # 4) Instantiate custom attribute values for each of the definitions
     #    passed in (keys)
+    # pylint: disable=not-an-iterable
+    definitions = {d.id: d for d in cls.get_custom_attribute_definitions()}
     for ad_id in attributes.keys():
-      av = CustomAttributeValue(
+      new_value = CustomAttributeValue(
           custom_attribute_id=ad_id,
           attributable_id=cls.id,
           attributable_type=cls.__class__.__name__,
           attribute_value=attributes[ad_id],
       )
+      if definitions[int(ad_id)].attribute_type.startswith("Map:"):
+        obj_type, obj_id = new_value.attribute_value.split(":")
+        new_value.attribute_value = obj_type
+        new_value.attribute_object_id = obj_id
       # 5) Set the context_id for each custom attribute value to the context id
       #    of the custom attributable.
       # TODO: We are ignoring contexts for now
-      # av.context_id = cls.context_id
-      db.session.add(av)
+      # new_value.context_id = cls.context_id
+      db.session.add(new_value)
 
   _publish_attrs = ['custom_attribute_values']
   _update_attrs = ['custom_attributes']
   _include_links = []
-
-  @declared_attr
-  def custom_attribute_definitions(cls):
-    # FIXME definitions should be class scoped, not instance scoped.
-    from ggrc.models.custom_attribute_definition import \
-        CustomAttributeDefinition
-    definition_type = foreign(CustomAttributeDefinition.definition_type)
-
-    def join_function():
-      return or_(
-          definition_type == underscore_from_camelcase(cls.__name__),
-          # The bottom statement always evaluates to False, and is here just to
-          # satisfy sqlalchemys need for use of foreing keys while defining a
-          # relationship.
-          definition_type == cls.id,
-      )
-    return db.relationship(
-        "CustomAttributeDefinition",
-        primaryjoin=join_function
-    )
 
   @classmethod
   def get_custom_attribute_definitions(cls):

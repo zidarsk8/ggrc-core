@@ -94,14 +94,6 @@ owner_base = [
         "condition": "contains"
     },
     {
-        "type": "Document",
-        "terms": {
-            "list_property": "owners",
-            "value": "$current_user"
-        },
-        "condition": "contains"
-    },
-    {
         "type": "Facility",
         "terms": {
             "list_property": "owners",
@@ -243,6 +235,14 @@ owner_update = owner_base + [
         },
         "condition": "relationship",
     },
+    {
+        "type": "Comment",
+        "terms": {
+            "property_name": "modified_by",
+            "value": "$current_user"
+        },
+        "condition": "is"
+    },
 ]
 
 permissions = {
@@ -254,6 +254,7 @@ permissions = {
         "ControlCategory",
         "ControlAssertion",
         "Control",
+        "Comment",
         "Assessment",
         "Issue",
         "DataAsset",

@@ -15,15 +15,15 @@ $icon-font-path: "./src/ggrc/assets/vendor/bootstrap-sass/vendor/assets/styleshe
 $fa-font-path: "/static/fonts";
 @import "~font-awesome/scss/font-awesome";
 
-@import "variables";
+@import "setup";
 @import "colors";
 @import "mixins";
 @import "placeholders";
-@import "setup";
 @import "typography";
 @import "helpers";
 @import "custom_font_awesome_icons";
 
+@import "z_index";
 @import "layout";
 @import "modules";
 
@@ -31,7 +31,5 @@ $fa-font-path: "/static/fonts";
 @import "widget";
 @import "tree";
 @import "pin";
-@import "risk_assessment";
-@import "styleguide";
 
 @import "responsive";

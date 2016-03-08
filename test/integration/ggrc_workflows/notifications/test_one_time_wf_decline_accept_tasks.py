@@ -3,25 +3,18 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-import random
 from integration.ggrc import TestCase
 from freezegun import freeze_time
 from datetime import date, datetime
 from mock import patch
 from sqlalchemy import and_
 
-import os
-from ggrc import db, notification
+from ggrc import db, notifications
 from ggrc.models import NotificationType, Notification, Person
-from ggrc_workflows.views import send_todays_digest_notifications
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
-
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestCycleTaskStatusChange(TestCase):
@@ -134,7 +127,7 @@ class TestCycleTaskStatusChange(TestCase):
       )).all()
 
       # there is still one task in the cycle, so there should be no
-      # notification for all tasks completed
+      # notifications for all tasks completed
       self.assertEqual(notif, [])
 
       notif = db.session.query(Notification).filter(and_(
@@ -166,7 +159,7 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.assertEqual(len(notif), 1, "notifications: {}".format(str(notif)))
 
-  @patch("ggrc.notification.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_single_task_declined(self, mock_mail):
     """
     test moving the end date to the future, befor due_in and due_today
@@ -180,7 +173,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.wf_generator.activate_workflow(wf)
 
     with freeze_time("2015-05-02"):
-      send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -188,11 +181,11 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task1, "Finished")
 
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
     with freeze_time("2015-05-02"):
-      send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -201,12 +194,12 @@ class TestCycleTaskStatusChange(TestCase):
       self.task_change_status(task1, "Declined")
 
       user = Person.query.get(self.user.id)
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
 
       self.assertIn(user.email, notif_data)
       self.assertIn("task_declined", notif_data[user.email])
 
-  @patch("ggrc.notification.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_single_task_accepted(self, mock_mail):
     """
     test moving the end date to the future, befor due_in and due_today
@@ -220,7 +213,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.wf_generator.activate_workflow(wf)
 
     with freeze_time("2015-05-02"):
-      send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -228,7 +221,7 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task1, "Finished")
 
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
     with freeze_time("2015-05-03"):
@@ -239,11 +232,11 @@ class TestCycleTaskStatusChange(TestCase):
       self.task_change_status(task1)
 
       user = Person.query.get(self.user.id)
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
       self.assertIn("all_tasks_completed", notif_data["user@example.com"])
 
-  @patch("ggrc.notification.email.send_email")
+  @patch("ggrc.notifications.common.send_email")
   def test_end_cycle(self, mock_mail):
     """
     manaually ending a cycle should stop all notifications for that cycle
@@ -255,7 +248,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.wf_generator.activate_workflow(wf)
 
     with freeze_time("2015-05-03"):
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       cycle = Cycle.query.get(cycle.id)
       user = Person.query.get(self.user.id)
       self.assertIn(user.email, notif_data)
@@ -263,7 +256,7 @@ class TestCycleTaskStatusChange(TestCase):
       cycle = Cycle.query.get(cycle.id)
       self.assertFalse(cycle.is_current)
 
-      _, notif_data = notification.get_todays_notifications()
+      _, notif_data = notifications.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
 
   def create_test_cases(self):

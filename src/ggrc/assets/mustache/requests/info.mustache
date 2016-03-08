@@ -117,20 +117,8 @@
       </div>
 
       <div class="tabs-wrap">
-        <ul class="nav nav-tabs">
-          <li class="active"><a href="#tab1" data-toggle="tab">
-            Comments and Responses
-          </a></li>
-          <li><a href="#tab2" data-toggle="tab">
-            Request log
-          </a></li>
-          <li><a href="#tab3" data-toggle="tab">
-            Related Requests
-          </a></li>
-        </ul>
-
-        <div class="tab-content">
-          <div class="tab-pane fade in active" id="tab1">
+        <tabs instance="instance">
+          <tab-panel panels="panels" title="Comments and Responses" instance="instance">
             {{#if_helpers '\
               ^if_equals' status 'Verified' '\
               and ^if_equals' status 'Final' }}
@@ -140,19 +128,15 @@
               </div>
             {{/is_allowed}}
             {{/if_equals}}
-            {{{render "/static/mustache/base_templates/comment_list.mustache" instance=. update_count="false"}}}
-          </div>
-
-          <div class="tab-pane fade in" id="tab2">
-            {{{render "/static/mustache/requests/change_log.mustache" instance=.}}}
-          </div>
-
-          <div class="tab-pane fade in" id="tab3">
-            {{> /static/mustache/requests/relatable_objects.mustache }}
-          </div>
-        </div>
-
-      </div>
+            {{{render "/static/mustache/base_templates/comment_list.mustache" instance=instance update_count="false"}}}
+          </tab-panel>
+          <tab-panel panels="panels" title="Request log" instance="instance">
+            {{{render "/static/mustache/requests/change_log.mustache" instance=instance}}}
+          </tab-panel>
+          <tab-panel panels="panels" title="Request log" instance="instance">
+            {{{render "/static/mustache/requests/relatable_objects.mustache" instance=instance}}}
+          </tab-panel>
+        </tabs>
     </div>
   </section>
 {{/instance}}

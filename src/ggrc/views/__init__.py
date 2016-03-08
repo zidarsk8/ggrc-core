@@ -3,6 +3,10 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""ggrc.views
+Handle non-RESTful views, e.g. routes which return HTML rather than JSON
+"""
+
 import json
 from flask import flash
 from flask import g
@@ -34,13 +38,11 @@ from ggrc.services.common import inclusion_filter
 from ggrc.views import filters
 from ggrc.views import mockups
 from ggrc.views import converters
+from ggrc.views import cron
+from ggrc.views import notifications
 from ggrc.views.common import RedirectedPolymorphView
 from ggrc.views.registry import object_view
 
-
-"""ggrc.views
-Handle non-RESTful views, e.g. routes which return HTML rather than JSON
-"""
 
 # Needs to be secured as we are removing @login_required
 
@@ -57,6 +59,7 @@ def reindex(_):
   return app.make_response((
       'success', 200, [('Content-Type', 'text/html')]))
 
+
 def do_reindex():
   """
   update the full text search index
@@ -71,10 +74,10 @@ def do_reindex():
       all_models.Directive, all_models.SystemOrProcess,
       all_models.Response
   ]
-  models = set(all_models.all_models) - set(inheritance_base_models)
-  models = [model for model in models if model_is_indexed(model)]
+  models_ = set(all_models.all_models) - set(inheritance_base_models)
+  models_ = [model for model in models_ if model_is_indexed(model)]
 
-  for model in models:
+  for model in models_:
     mapper_class = model._sa_class_manager.mapper.base_mapper.class_
     query = model.query.options(
         db.undefer_group(mapper_class.__name__ + '_complete'),
@@ -124,8 +127,8 @@ def get_import_types(export_only=False):
   data = []
   for model in set(types().values()):
     data.append({
-      "model_singular": model.__name__,
-      "title_plural": model._inflector.title_plural
+        "model_singular": model.__name__,
+        "title_plural": model._inflector.title_plural
     })
   data.sort()
   response_json = json.dumps(data)
@@ -135,8 +138,10 @@ def get_import_types(export_only=False):
 def get_export_definitions():
   return get_import_types(export_only=True)
 
+
 def get_import_definitions():
   return get_import_types(export_only=False)
+
 
 def get_all_attributes_json():
   """Get a list of all attribute definitions
@@ -284,7 +289,7 @@ def all_object_views():
   return views
 
 
-def init_extra_views(_):
+def init_extra_views(app_):
   """Init any extra views needed by the app
 
   This should be used for any views that might use extension modules.
@@ -292,23 +297,25 @@ def init_extra_views(_):
   mockups.init_mockup_views()
   filters.init_filter_views()
   converters.init_converter_views()
+  cron.init_cron_views(app_)
+  notifications.init_notification_views(app_)
 
 
-def init_all_views(app):
+def init_all_views(app_):
   """Inits all views defined in the core module and submodules"""
   for entry in all_object_views():
     entry.service_class.add_to(
-        app,
+        app_,
         '/{0}'.format(entry.url),
         entry.model_class,
         decorators=(login_required,)
     )
 
-  init_extra_views(app)
+  init_extra_views(app_)
   for extension_module in get_extension_modules():
     ext_extra_views = getattr(extension_module, "init_extra_views", None)
     if ext_extra_views:
-      ext_extra_views(app)
+      ext_extra_views(app_)
 
 
 @app.route("/permissions")

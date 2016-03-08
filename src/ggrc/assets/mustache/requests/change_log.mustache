@@ -6,38 +6,47 @@
 }}
 
 {{#revisions_diff instance}}
-  <ul class="entry-list">
-    {{#objectChanges}}
-      <li>
-        <span class="person-label assignee"></span>
+  <paginate list="objectChanges" per-page="10">
+    <ul class="entry-list">
+      {{#entries}}
+        <li>
+          <span class="person-label assignee"></span>
 
-        <div class="w-status">
-          <span class="entry-author">
-            <a href="javascript://">{{madeBy}}</a>
-            made changes &mdash; {{date updatedAt}}
-          </span>
-
-          {{#each changes}}
-          <div class="clearfix">
-            <div class="third-col">
-              <p class="instruction">Field</p>
-              {{fieldName}}
+          <div class="w-status">
+            <span class="entry-author">
+              <a href="javascript://">{{madeBy}}</a>
+              made changes &mdash; {{date updatedAt}}
+            </span>
+            <div class="clearfix">
+              <div class="third-col">
+                <p class="instruction">Field</p>
+              </div>
+              <div class="third-col">
+                <p class="instruction">Original value</p>
+              </div>
+              <div class="third-col">
+                <p class="instruction">New value</p>
+              </div>
             </div>
-            <div class="third-col">
-              <p class="instruction">Original value</p>
-              {{origVal}}
+            {{#each changes}}
+            <div class="clearfix">
+              <div class="third-col">
+                {{fieldName}}
+              </div>
+              <div class="third-col">
+                {{origVal}}
+              </div>
+              <div class="third-col">
+                {{newVal}}
+              </div>
             </div>
-            <div class="third-col">
-              <p class="instruction">New value</p>
-              {{newVal}}
-            </div>
+            {{/each}}
           </div>
-          {{/each}}
-        </div>
-      </li>
-    {{/objectChanges}}
-    {{^objectChanges}}
-      <li>The history of changes is currently empty.</li>
-    {{/objectChanges}}
-  </ul>
+        </li>
+      {{/entries}}
+      {{^list}}
+        <li>The history of changes is currently empty.</li>
+      {{/list}}
+    </ul>
+  </paginate>
 {{/revision_diff}}

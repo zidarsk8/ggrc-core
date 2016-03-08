@@ -718,6 +718,13 @@ class Resource(ModelView):
         except Exception as e:
           current_app.logger.exception(e)
           raise
+        finally:
+          # When running integration tests, cache sometimes does not clear
+          # correctly
+          if getattr(settings, 'TESTING', False):
+            cache = get_cache()
+            if cache:
+              cache.clear()
 
   def post(*args, **kwargs):
     raise NotImplementedError()

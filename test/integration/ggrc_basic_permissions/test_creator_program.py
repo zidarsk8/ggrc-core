@@ -7,7 +7,6 @@
 Test Creator role with Program scoped roles
 """
 
-import unittest
 from integration.ggrc import TestCase
 from ggrc.models import all_models
 from integration.ggrc.api_helper import Api
@@ -161,7 +160,7 @@ class TestCreatorProgram(TestCase):
 
   def delete(self, obj):
     """ Create a delete request for the given object """
-    return self.api.delete(obj, obj.id).status_code
+    return self.api.delete(obj).status_code
 
   def get(self, obj):
     """ Create a get request for the given object """
@@ -366,6 +365,7 @@ class TestCreatorProgram(TestCase):
     })
     self.assertEqual(response.status_code, 201)
     relationship_id = response.json.get("relationship").get("id")
-    response = self.api.get_collection(all_models.Relationship, relationship_id)
+    response = self.api.get_collection(all_models.Relationship,
+                                       relationship_id)
     num = len(response.json["relationships_collection"]["relationships"])
     self.assertEqual(num, 2)

@@ -6,12 +6,20 @@
 """Utility function for selenium"""
 
 import time
+
 # pylint: disable=import-error
 from selenium.webdriver.support import expected_conditions as EC
 # pylint: disable=import-error
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common import action_chains
+
 from lib import exception
 from lib import constants
+
+
+def hover_over_element(driver, element):
+  """Moves the mouse pointer to the element and hovers"""
+  action_chains.ActionChains(driver).move_to_element(element).perform()
 
 
 def wait_until_stops_moving(element):
@@ -20,6 +28,7 @@ def wait_until_stops_moving(element):
   Args:
       selenium.webdriver.remote.webelement.WebElement
   """
+
   prev_location = None
   timer_begin = time.time()
 
@@ -32,6 +41,21 @@ def wait_until_stops_moving(element):
 
 
 def get_when_visible(driver, locator):
+  """
+  Args:
+    driver (base.CustomDriver)
+    locator (tuple)
+
+  Returns:
+      selenium.webdriver.remote.webelement.WebElement
+  """
+  return WebDriverWait(
+      driver,
+      constants.ux.MAX_USER_WAIT_SECONDS) \
+      .until(EC.visibility_of_element_located(locator))
+
+
+def get_when_clickable(driver, locator):
   """
   Args:
     driver (base.CustomDriver)
@@ -59,3 +83,29 @@ def get_when_invisible(driver, locator):
       driver,
       constants.ux.MAX_USER_WAIT_SECONDS) \
       .until(EC.invisibility_of_element_located(locator))
+
+
+def scroll_to_page_bottom(driver):
+  """Scrolls to te page bottom using JS
+
+  Args:
+      driver (base.CustomDriver)
+  """
+
+  driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+
+def is_value_in_attr(element, attr="class", value="active"):
+  """Checks if the attribute value is present for given attribute
+
+  Args:
+    element (selenium.webdriver.remote.webelement.WebElement)
+    attr (basestring): attribute name e.g. "class"
+    value (basestring): value in the class attribute that
+      indicates the element is now active/opened
+
+  Returns:
+      bool
+  """
+  attributes = element.get_attribute(attr)
+  return value in attributes.split()

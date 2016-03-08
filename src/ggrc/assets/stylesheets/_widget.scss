@@ -1,12 +1,10 @@
 /*
- * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- * Created By: brad@reciprocitylabs.com
- * Maintained By: brad@reciprocitylabs.com
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
  */
 
-
-// widgets styles
 .widget {
   .header {
     @extend %row-fluid-fix;
@@ -27,12 +25,6 @@
       i {
         display: none;
       }
-    }
-    &.left-space {
-      padding-left: 10px;
-    }
-    &.default-left-space {
-      padding: 0 12px 0 10px;
     }
     &.widget-nav {
       height: 40px;
@@ -79,105 +71,6 @@
             }
           }
         }
-      }
-    }
-  }
-  &.workflow-info-widget {
-    overflow-y: visible;
-  }
-  &.widget-tabs {
-    &.widget-tabs-horizontal {
-      .content {
-        overflow-y: auto;
-      }
-      .nav-tabs {
-        padding-left: 10px;
-        margin-right: 0;
-        li {
-          margin-bottom: 0;
-          a {
-            min-width: auto;
-            border-bottom: none;
-            padding-left: 10px;
-            padding-right: 10px;
-            margin-right: 0;
-            color: $darkText;
-            span {
-              color: $text;
-              font-size: $f-small;
-            }
-            i {
-              margin-right: 4px;
-            }
-          }
-          &.active {
-            a {
-              color: $widgetTitle;
-              span {
-                color: $widgetTitle;
-                font-size:$f-small;
-              }
-            }
-          }
-        }
-      }
-    }
-    .content {
-      padding: 0;
-      overflow-y: visible;
-    }
-    .tabs-left {
-      padding-bottom: 26px;
-    }
-    .nav-tabs {
-      background: $lightGray;
-      margin-right: 0;
-      padding: 9px 0 0 2px;
-      border: none;
-      margin-bottom: 0;
-      margin-left: 0;
-      white-space: nowrap;
-      li {
-        a {
-          @include transition(color 0.3s ease);
-          color: $text;
-          min-width: 105px;
-          .item-count {
-            font-size:$f-small;
-          }
-          i {
-            @include opacity(0.3);
-            @include transition(opacity 0.3s ease);
-            margin-right: 7px;
-          }
-          &:hover {
-            color: $black;
-            i {
-              @include opacity(1);
-            }
-          }
-        }
-        &.active {
-          a {
-            color: $infoWidgetHeader;
-            i {
-              @include opacity(1);
-            }
-          }
-        }
-      }
-    }
-  }
-  .inline-info {
-    color:$text;
-    i {
-      @include opacity(0.3);
-      margin-top:7px;
-    }
-    &.blank {
-      color:$disabled;
-      i {
-        @include opacity(0.1);
       }
     }
   }
@@ -230,24 +123,6 @@
       @extend %input-block-level;
     }
   }
-  .footer {
-    @extend %default-border-top;
-    color:$text;
-    padding:6px;
-    height: auto;
-    p {
-      font-weight:normal;
-      margin: 0;
-      color:$text;
-      line-height: 20px;
-      &.footer-right {
-        text-align: right;
-      }
-      &.footer-left {
-        text-align: left;
-      }
-    }
-  }
   .items {
     @extend %reset-list;
     h3 {
@@ -273,49 +148,6 @@
         border-bottom: 1px solid darken($lightGray,10%);
         h3 {
           color:$darkBlue;
-        }
-      }
-    }
-  }
-  .action-items {
-    margin-bottom: 5px;
-    text-align: right;
-    a {
-      @include transition(color 0.2s ease-in-out);
-      i {
-        @include opacity(0.4);
-        @include transition(opacity 0.2s ease-in-out);
-      }
-      &:hover {
-        i {
-          @include opacity(1);
-        }
-      }
-      &.btn-mini {
-        padding: 2px;
-      }
-    }
-  }
-  .tabbable {
-    position: relative;
-    .action-items {
-      margin: 4px 6px 5px 0;
-      &.action-below {
-        position: static;
-        margin-bottom: 10px;
-        text-align: right;
-      }
-    }
-  }
-  .related-button {
-    li {
-      a {
-        color: $black;
-        padding: 5px 9px;
-      }
-      &.active {
-        a {
-          color: $white;
         }
       }
     }
@@ -352,76 +184,6 @@
       }
     }
   }
-  .risk-content {
-    h3 {
-      @extend %default-border-bottom;
-      font-weight: normal;
-      padding-bottom: 5px;
-      margin-top:10px;
-      color: $headerTitle;
-    }
-    h4 {
-      padding-top: 10px;
-      font-weight:bold;
-      margin-bottom: 4px;
-      color: $headerTitle;
-    }
-    .rtf {
-      color: $text;
-      font-size:$f-regular;
-    }
-    .risk-level {
-      @include border-radius();
-      float: right;
-      font-size: $f-subTitle;
-      border:1px solid $lightGray;
-      padding:0 6px;
-      color: $red;
-      cursor:pointer;
-      margin-top: 10px;
-      &.risk-level-1 {
-        color:$white;
-        background:$green;
-        border-color:darken($green,5%);
-
-      }
-      &.risk-level-2,
-      &.risk-level-3 {
-         color:$white;
-         background:$warning;
-         border-color:darken($warning,5%);
-
-      }
-      &.risk-level-4,
-      &.risk-level-5 {
-        color:$white;
-        background:$error;
-        border-color:darken($error,5%);
-      }
-
-    }
-  }
-  ul.single-row-tabs {
-    li {
-      float: none;
-      clear: both;
-      padding: 0;
-      margin: 0;
-      a {
-        padding: 0;
-        border: none;
-        &:hover {
-          @include border-radius(0);
-          background: none;
-          border: none;
-        }
-      }
-    }
-  }
-  .inner-element {
-    @extend %oneline;
-    display: block;
-  }
   .import-help {
     display: inline-block;
     margin: 0 0 0 10px;
@@ -431,124 +193,6 @@
     padding-left: 10px;
     a {
       color: $textGray;
-    }
-  }
-}
-
-.widget-filters {
-  @include background-image(linear-gradient(top, #eee, $white));
-  @include border-radius(4px 0 4px 4px);
-  border:1px solid $widgetHeader;
-  margin-bottom:10px;
-  padding:6px;
-  form.form-inline {
-    margin-bottom:0;
-  }
-  select {
-    width:auto;
-  }
-  input {
-    width:auto;
-  }
-  .btn-reset {
-    float: right;
-  }
-  label {
-    @include text-shadow(0 1px 1px $white);
-    text-transform:uppercase;
-    color:$text;
-    display: block;
-    &.label-title {
-      margin-right:30px;
-      float: left;
-      padding-bottom: 20px;
-    }
-  }
-}
-
-.filter-trigger {
-  @include border-radius(4px 4px 0 0);
-  position:absolute;
-  bottom:0;
-  right:0;
-  &:focus {
-    @extend %outline-fix;
-  }
-
-}
-
-.widget-add-placeholder {
-  background: $popOverHeaderBgnd;
-  border: 1px solid $popOverHeaderBorder;
-  padding: 51px 0 49px 0;
-  margin-bottom: 20px;
-  text-align: center;
-  .btn-group {
-    display: inline-block;
-    .btn {
-      @include transition(color 0.3s ease);
-      @include box-shadow(none);
-      @include opacity(0.4);
-      @include transition(opacity 0.3s ease);
-      color: $black;
-      font-weight: bold;
-      padding: 0;
-      display: inline-block;
-      padding: 10px;
-      position: relative;
-      &:active {
-        @include opacity(1);
-        &:hover {
-          @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
-          background-image: none;
-          background-color: $btnActive;
-          outline: 0;
-        }
-      }
-    }
-  }
-  &:hover {
-    @include opacity(1);
-    @include gradient-vertical($white, #e6e6e6);
-    .btn-group .btn {
-      &:hover {
-        @include opacity(1);
-      }
-      @include opacity(0.7);
-      @include gradient-vertical($white, #e6e6e6);
-      color: $blue;
-      text-decoration: none;
-      background-position: 0 0;
-      i {
-        @include opacity(0.7);
-      }
-    }
-  }
-  .open {
-    .btn {
-      @include opacity(1);
-      @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
-      background-image: none;
-      background-color: $btnActive;
-      outline: 0;
-      color: $blue;
-      &:hover {
-        @include box-shadow(inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05));
-        background-image: none;
-        background-color: $btnActive;
-        outline: 0;
-      }
-    }
-  }
-  .dropdown-menu {
-    left: auto;
-    right: 137px;
-    bottom: -1px;
-    text-align: left;
-    .title {
-      padding: 0 7px 0 7px;
-      font-weight: bold;
-      line-height: 20px;
     }
   }
 }
@@ -711,22 +355,6 @@
   }
 }
 
-// Mockups Assessment Page V1.0
-.info-utility-link {
-  margin: 10px 0 15px 0;
-  padding-top:6px;
-  border-top:1px solid #eee;
-  i {
-    margin-top: 1px;
-  }
-}
-.workflow-list {
-  @extend %reset-list;
-  margin: 0 0 15px 35px;
-  li {
-    margin-bottom: 4px;
-  }
-}
 .setup-link {
   display: inline-block;
   font-size:11px;
@@ -734,38 +362,15 @@
   text-transform:uppercase;
   margin-bottom: 15px;
 }
-.right-button {
-  text-align: right;
-  padding-bottom: 10px;
-  span {
-    &.small {
-      font-size: $f-small;
-    }
-  }
-}
-.workflow-wrap {
-  border-top: 1px solid $footerBorder;
-  padding-top: 10px;
-  h3 {
-    margin-bottom: 10px;
-    span {
-      font-size: $f-medium;
-      display: block;
-    }
-  }
-  .workflow-subtitle {
-    color: $business;
-    margin-left: 17px !important;
-    padding-bottom: 0;
-    font-weight: bold;
-  }
-}
 
 // new action bar
 .action-bar {
   @extend %clearfix;
   padding-top:5px;
   margin-bottom:10px;
+  .modal & {
+    padding-top:0;
+  }
   ul {
     @extend %reset-list;
     li {
@@ -812,12 +417,6 @@
         @include border-radius(0);
       }
     }
-  }
-}
-
-.modal {
-  .action-bar {
-    padding-top:0;
   }
 }
 
@@ -887,6 +486,7 @@
     }
   }
 }
+
 .table {
   tbody {
     tr:hover {
@@ -913,274 +513,10 @@
   }
 }
 
-// Report
-.save-template-wrap {
-  @extend %clearfix;
-  padding-left: 30px;
-  padding-right: 30px;
-  .left-content {
-    float: left;
-    padding-top: 5px;
-  }
-}
-.save-template {
-  float: right;
-  label {
-    display: inline-block;
-    &.disabled {
-      color: $gray;
-    }
-  }
-  .input-medium {
-    margin-bottom: 0;
-    margin-right: 10px;
-    margin-left: 4px;
-  }
-  button {
-    margin-right: 10px;
-  }
-}
-
-.attr-wrap {
-  display: none;
-}
-
-ul.select-clear-all {
-  @extend %reset-list;
-  @extend %clearfix;
-}
-
-ul.attr-list, ul.model-list {
-  @extend %reset-list;
-  @extend %clearfix;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  .attribute-wrap & {
-    margin: 0;
-  }
-  li {
-    float: left;
-    width: 16.66%;
-    .attribute-wrap & {
-      width: auto;
-      margin-right: 15px;
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-    input {
-      margin-top: -3px;
-    }
-    &.disabled {
-      color: $lightGray;
-    }
-  }
-}
-
-.popover {
-  @include border-radius($default-border-radius);
-  width: 350px;
-  .popover-content {
-    @include border-radius($default-border-radius);
-  }
-  &.popover-medium {
-    width: 420px;
-    h3 {
-      i {
-        @include opacity(.4);
-        @include transition(opacity 0.2s ease);
-        margin-right: 0;
-      }
-      a:hover {
-        i {
-          @include opacity(1);
-        }
-      }
-    }
-  }
-}
-
-.attribute-trigger {
-  @include border-radius($default-border-radius);
-  float: right;
-  line-height: 26px;
-  height: 26px;
-  width: 12%;
-  text-align: center;
-  border: 1px solid $infoMessageText;
-  i {
-    margin-top: 5px;
-  }
-  &.active {
-    background: $darkBlue;
-  }
-}
-
-.single-line-filter {
-  margin-bottom: 20px;
-  .relevance-filters & {
-    margin-bottom: 6px;
-  }
-  .input-xlarge {
-    width: 85%;
-    box-sizing: border-box;
-    height: 28px;
-    .relevant-filter-group & {
-      width: 79%;
-    }
-  }
-  .objective-selector {
-    display: inline-block;
-  }
-}
-
 .relevant-filter-group {
   .add-object {
     margin-top: 20px;
     margin-left: 30px;
-  }
-
-}
-
-.relevance-filters {
-  margin-bottom: 20px;
-  .add-rule {
-    a {
-      font-size: 13px;
-    }
-  }
-}
-
-.date-range-text {
-  line-height: 28px;
-}
-
-.selected-object {
-  display: none;
-  padding: 10px 20px;
-  border-top: 1px solid $darkGray;
-  font-weight: bold;
-  span {
-    font-weight: normal;
-  }
-}
-
-.generated-report {
-  display: none;
-  margin: 0 20px;
-  overflow-x: auto;
-  table {
-    @include border-radius(0);
-    font-size: 12px;
-    line-height: 20px;
-    th, td {
-      min-width: 70px;
-    }
-    th {
-      i {
-        @include opacity(.4);
-      }
-      &:hover {
-        i {
-          @include opacity(1);
-        }
-      }
-      &.open {
-        i {
-          @include opacity(1);
-          background-position: -198px -416px;
-        }
-      }
-    }
-    .dropdown-menu {
-      min-width: 240px;
-      padding: 15px;
-      &.right {
-        right: 0;
-        left: auto;
-      }
-      .dropdown-input {
-        float: left;
-        margin: 0 5px 0 0;
-        width: 185px;
-      }
-      button {
-        float: left;
-        width: 40px;
-      }
-      .range {
-        float: left;
-        margin-right: 5px;
-        width: 195px;
-        input {
-          margin: 0;
-        }
-      }
-    }
-    tr {
-      background: lighten($lightGray,2%);
-      &:hover {
-        background: darken($lightGray,5%);
-      }
-      &:nth-child(odd) {
-        background: lighten($lightGray,5%);
-        &:hover {
-          background: darken($lightGray,5%);
-        }
-      }
-      th {
-        background: darken($lightGray,3%);
-        vertical-align: top;
-        position: relative;
-        padding: 8px 12px 8px 8px;
-        .table-filter {
-          position: absolute;
-          top: 30%;
-          right: -4px;
-        }
-      }
-    }
-    &.table-bordered {
-      border: 1px solid $widgetBorder;
-      border-left: none;
-      td,
-      th {
-        border-top: 1px solid $widgetBorder;
-        border-left: 1px solid $widgetBorder;
-      }
-      thead {
-        &:first-child {
-          tr {
-            &:first-child {
-              th {
-                &:first-child {
-                  @include border-radius(0);
-                }
-                &:last-child {
-                  @include border-radius(0);
-                }
-              }
-            }
-          }
-        }
-      }
-      tbody {
-        &:last-child {
-          tr {
-            &:last-child {
-              td {
-                &:first-child {
-                  @include border-radius(0);
-                }
-                &:last-child {
-                  @include border-radius(0);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
   }
 }
 
@@ -1189,55 +525,4 @@ ul.attr-list, ul.model-list {
     text-align: right;
     display: inline-block;
   }
-}
-
-.workflow-wrap-main {
-  display: none;
-}
-
-.white-widget {
-  background: $white;
-}
-
-.report-title {
-  margin-bottom: 20px;
-  h2 {
-    font-size: 24px;
-    line-height: 30px;
-    font-family: $fontTitle;
-    font-weight: normal;
-  }
-}
-
-.report-title-change {
-  display: block;
-  height: 30px;
-  input {
-    margin-bottom: 0;
-  }
-}
-
-.report-title-trigger {
-  @include border-radius($default-border-radius);
-  display: inline-block;
-  line-height: 26px;
-  height: 26px;
-  width: 50px;
-  text-align: center;
-  border: 1px solid $infoMessageText;
-  margin-left: 10px;
-  i {
-    margin-top: 4px;
-  }
-}
-
-.export-note {
-  float: left;
-  font-weight: bold;
-  margin: 4px 10px 0 0;
-}
-
-.left-right-space {
-  padding-left: 30px;
-  padding-right: 30px;
 }
