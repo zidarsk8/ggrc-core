@@ -25,7 +25,9 @@
         });
 
         ev.preventDefault();
-        fileds.splice(index, 1);
+        if (index !== -1) {
+          fileds.splice(index, 1);
+        }
       },
       attrs: function () {
         return _.splitTrim(this.attr('field.values'), {
