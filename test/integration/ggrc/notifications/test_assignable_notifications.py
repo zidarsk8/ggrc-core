@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from sqlalchemy import and_
 
 from ggrc import db
+from ggrc.models import Request
 from ggrc.models import Notification
 from ggrc.models import NotificationType
 from integration.ggrc import converters
@@ -74,11 +75,102 @@ class TestAssignableNotification(converters.TestCase):
     )
 
   def test_request_without_verifiers(self):
+    """Test setting notification entries for simple requests.
+
+    This function tests that each request gets an entry in the notifications
+    table after it's been created.
+    Second part of the tests is to make sure that request status does not add
+    any new notification entries if the request does not have a verifier.
+    """
 
     with freeze_time("2015-04-01"):
+
+      self.assertEqual(self._get_notifications().count(), 0)
       self.import_file("request_full_no_warnings.csv")
+      requests = {request.slug: request for request in Request.query}
+
+      self.assertEqual(self._get_notifications().count(), 12)
+
+      self.api_helper.delete(requests["Request 1"])
+      self.api_helper.delete(requests["Request 11"])
+
+      self.assertEqual(self._get_notifications().count(), 10)
+
+      self.client.get("/_notifications/send_todays_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      request = Request.query.get(requests["Request 9"].id)
+
+      res = self.api_helper.modify_object(request, {"status": "Final"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      res = self.api_helper.modify_object(request, {"status": "Open"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      res = self.api_helper.modify_object(request, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      res = self.api_helper.modify_object(request, {"status": "Final"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      res = self.api_helper.modify_object(request, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 0)
+
+  def test_request_with_verifiers(self):
+    """Test notifications for declined requests.
+
+    This tests makes sure there are extra notification entries added when a
+    request has been declined.
+    """
+
+    with freeze_time("2015-04-01"):
+
+      self.assertEqual(self._get_notifications().count(), 0)
+      self.import_file("request_full_no_warnings.csv")
+      requests = {request.slug: request for request in Request.query}
 
       self.assertEqual(self._get_notifications().count(), 12)
 
       self.client.get("/_notifications/send_todays_digest")
       self.assertEqual(self._get_notifications().count(), 0)
+
+      request1 = Request.query.get(requests["Request 1"].id)
+      # start and finish request 1
+      res = self.api_helper.modify_object(request1, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      res = self.api_helper.modify_object(request1, {"status": "Finished"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      # decline request 1
+      res = self.api_helper.modify_object(request1, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 1)
+      res = self.api_helper.modify_object(request1, {"status": "Finished"})
+      self.assertEqual(self._get_notifications().count(), 1)
+      # decline request 1 the second time
+      res = self.api_helper.modify_object(request1, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 1)
+
+      request6 = Request.query.get(requests["Request 6"].id)
+      # start and finish request 6
+      res = self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 1)
+      res = self.api_helper.modify_object(request6, {"status": "Finished"})
+      self.assertEqual(self._get_notifications().count(), 1)
+      # decline request 6
+      res = self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 2)
+
+      # send all notifications
+      self.client.get("/_notifications/send_todays_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      # Refresh the object because of the lost session due to the get call.
+      request6 = Request.query.get(requests["Request 6"].id)
+      res = self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      res = self.api_helper.modify_object(request6, {"status": "Finished"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      res = self.api_helper.modify_object(request6, {"status": "Verified"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      res = self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      # decline request 6
+      res = self.api_helper.modify_object(request6, {"status": "Finished"})
+      self.assertEqual(self._get_notifications().count(), 0)
+      res = self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.assertEqual(self._get_notifications().count(), 1)
