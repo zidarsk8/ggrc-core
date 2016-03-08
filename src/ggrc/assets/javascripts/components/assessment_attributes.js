@@ -6,6 +6,12 @@
 */
 
 (function (can, $) {
+  /*
+   * Assessment template main component
+   *
+   * It collects fields data and it transforms them into appropriate
+   * format for saving
+   */
   can.Component.extend({
     tag: 'assessment-template-attributes',
     template: '<content></content>',
@@ -13,10 +19,20 @@
       fields: new can.List()
     }
   });
+
+  /*
+   * Template field
+   *
+   * Represents each `field` passed from assessment-template-attributes `fields`
+   */
   can.Component.extend({
     tag: 'template-filed',
-    template: can.view(GGRC.mustache_path + '/assessment_templates/attribute_field.mustache'),
+    template: can.view(GGRC.mustache_path +
+      '/assessment_templates/attribute_field.mustache'),
     scope: {
+      /*
+       * Removes `field` from `fileds`
+       */
       removeField: function (scope, el, ev) {
         var fileds = scope.attr('fields');
         var field = scope.attr('field');
@@ -29,6 +45,11 @@
           fileds.splice(index, 1);
         }
       },
+      /*
+       * Split field values
+       *
+       * @return {Array} attrs - Returns split values as an array
+       */
       attrs: function () {
         return _.splitTrim(this.attr('field.values'), {
           compact: true
@@ -38,7 +59,8 @@
   });
   can.Component.extend({
     tag: 'add-template-filed',
-    template: can.view(GGRC.mustache_path + '/assessment_templates/attribute_add_field.mustache'),
+    template: can.view(GGRC.mustache_path +
+      '/assessment_templates/attribute_add_field.mustache'),
     scope: {
       selected: new can.Map(),
       types: [{
@@ -54,6 +76,16 @@
         type: 'Text',
         text: 'Type description'
       }],
+      /*
+       * Create new field
+       *
+       * Field must contain value title, type, values and opts.
+       * Opts are populated, once we start changing checkbox values
+       *
+       * @param {Object} scope - current (add-template-field) scope
+       * @param {jQuery.Object} el - clicked element
+       * @param {Object} ev - click event handler
+       */
       addField: function (scope, el, ev) {
         var fields = this.attr('fields');
         var selected = this.attr('selected');
@@ -80,6 +112,9 @@
       }
     },
     events: {
+      /*
+       * Set default dropdown type on init
+       */
       inserted: function () {
         var types = this.scope.attr('types');
 
@@ -89,6 +124,11 @@
       }
     },
     helpers: {
+      /*
+       * Get input placeholder value depended on type
+       *
+       * @param {Object} options - Mustache options
+       */
       placeholder: function (options) {
         var types = this.attr('types');
         var item = _.findWhere(types, {
