@@ -11,6 +11,7 @@ needed by ggrc notifications.
 
 from datetime import datetime
 from sqlalchemy import inspect
+from sqlalchemy import and_
 
 from ggrc import db
 from ggrc.services.common import Resource
@@ -31,11 +32,38 @@ def _add_notification(obj, notif_type, when=None):
   ))
 
 
+def _has_unsent_notifications(notif_type, obj):
+  """Helper for searching unsent notifications.
+
+  Args:
+    notify_type (NotificationType): type of the notifications we're looking
+      for.
+    obj (sqlalchemy model): Object for which we're looking for notifications.
+
+  Returs:
+    True if there are any unsent notifications of notif_type for the given
+    object, and False otherwise.
+  """
+  return db.session.query(notification.Notification).join(
+      notification.NotificationType).filter(and_(
+          notification.NotificationType.id == notif_type.id,
+          notification.Notification.object_id == obj.id,
+          notification.Notification.object_type == obj.type,
+          notification.Notification.sent_at.is_(None),
+      )).count() > 0
+
+
 def _add_request_declined_notification(obj):
+  """Add entries for request declined notifications.
+
+  Args:
+    obj (Request): Request for which we want to add notifications.
+  """
   notif_type = notification.NotificationType.query.filter_by(
       name="request_declined").first()
 
-  _add_notification(obj, notif_type)
+  if not _has_unsent_notifications(notif_type, obj):
+    _add_notification(obj, notif_type)
 
 
 def handle_request_modified(obj):
