@@ -45,6 +45,8 @@
 
       values = values.split(splitter);
       values = _.map(values, _.trim);
+
+      options = options || {};
       if (options.unique) {
         values = _.uniq(values);
       }
