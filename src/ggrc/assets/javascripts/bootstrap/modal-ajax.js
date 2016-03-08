@@ -255,11 +255,6 @@
         , model : model
         , current_user : GGRC.current_user
         , instance : instance
-
-        // the instance in the context of the element that triggered
-        // opening the modal
-        , parentInstance: $trigger.data('instance')
-
         , modal_title : object_params.modal_title || modal_title
         , content_view : content_view
         , mapping : mapping

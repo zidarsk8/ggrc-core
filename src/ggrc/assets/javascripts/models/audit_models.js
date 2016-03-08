@@ -1074,7 +1074,6 @@
     destroy: 'DELETE /api/assessment_templates/{id}',
     create: 'POST /api/assessment_templates',
 
-    mixins: ['unique_title'],  // TODO: does not even have a title? remove?
     is_custom_attributable: false,
 
     attributes: {

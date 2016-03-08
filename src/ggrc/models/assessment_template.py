@@ -38,6 +38,7 @@ class AssessmentTemplate(Base, Relatable, db.Model):
 
   # REST properties
   _publish_attrs = [
+      'audit_id',
       'template_object_type',
       'test_plan_procedure',
       'procedure_description',
