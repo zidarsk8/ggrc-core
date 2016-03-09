@@ -185,7 +185,6 @@
                 binding).refresh_instances();
             }));
         });
-
         $.when.apply($, relatedObjectsDeferreds).done(function () {
           _.each(_.toArray(arguments), function (relatedObjects) {
             _.each(relatedObjects, function (relObj) {
@@ -204,7 +203,6 @@
               }
             });
           });
-
           relatable.resolve(
             _.map(_.sortBy(connectionsCount, 'count').reverse(),
               function (item) {

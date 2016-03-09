@@ -26,8 +26,8 @@ Maintained By: urban@reciprocitylabs.com
     </li>
   </ul>
   <ul class="past-items-list relatables">
-    {{#defer 'related_self' instance.related_self}}
-    {{#related_self }}
+    {{#defer 'related_self' parentInstance.related_self}}
+    {{#related_self}}
     <li class="clearfix">
       <div class="mini-col">
         {{localize_date instance.created_at}}
