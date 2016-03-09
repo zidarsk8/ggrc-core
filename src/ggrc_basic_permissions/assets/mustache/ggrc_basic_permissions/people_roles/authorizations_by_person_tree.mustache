@@ -33,7 +33,8 @@
                       <li>
                         <div class="item-data">
                           <div class="tree-title-area">
-                            <span class="role" title="{{#roles}}{{role.permission_summary}} {{/roles}}">
+                            <span class="role" title="{{#roles}}{{role.permission_summary}} {{/roles}}"
+                              rel="tooltip" data-placement="left" data-original-title="{{.}} ">
                               {{#if_helpers '\
                                 #if_equals' roles.0.role.permission_summary 'Mapped' '\
                                 and ^if_equals' roles.length 1}}
