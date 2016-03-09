@@ -119,7 +119,8 @@ def get_attributes_json():
   attrs = models.CustomAttributeDefinition.eager_query().all()
   published = []
   for attr in attrs:
-    published.append(publish_representation(publish(attr)))
+    published.append(publish(attr))
+  published = publish_representation(published)
   return as_json(published)
 
 
