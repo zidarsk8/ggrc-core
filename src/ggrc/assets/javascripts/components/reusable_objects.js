@@ -10,7 +10,30 @@
     tag: 'reuse-objects',
     scope: {
       parentInstance: null,
+      /*
+       * Is passed to child component (reusable-object) and it tracks
+       * the values(objects) that should be reused
+       *
+       * {
+       *    {method}-{instance.type}-{instance.id}: `true/false`,
+       *    ...
+       * }
+       *
+       * {method} - createRelationship, createEvidenceRelationship
+       * {instance.type} - child object type
+       * {instance.id} - child object id
+       */
       reusedObjects: new can.Map(),
+      /*
+       * Reuse objects
+       *
+       * Checks reusedObjects truthy values, creates appropriate relationship
+       * and notifies user on their creation
+       *
+       * @param {Object} scope - component scope
+       * @param {jQuery.Object} el - clicked element
+       * @param {Object} ev - click event handler
+       */
       reuseIt: function (scope, el, ev) {
         var reused = this.attr('reusedObjects');
         var relatedDfds = [];
@@ -50,6 +73,12 @@
         });
         GGRC.delay_leaving_page_until(when);
       },
+      /*
+       * Creates an Relationship between parent instance and destination object
+       *
+       * @param {Object} destination - Should have `id` and `type`
+       * @return {Object} - Returns newly created Relationship as jQuery deferred
+       */
       createRelationship: function (destination) {
         var source;
         var dest;
@@ -70,15 +99,12 @@
           context: source.context
         }).save();
       },
-<<<<<<< HEAD:src/ggrc/assets/javascripts/components/reuseable_objects.js
-=======
       /*
        * Creates an Object Document Relationship  between parent instancere and destination object
        *
        * @param {Object} destination - Should have `id` and `type`
        * @return {Object} - Returns newly created Relationship as jQuery deferred
        */
->>>>>>> d8afe37... Fix typo:src/ggrc/assets/javascripts/components/reusable_objects.js
       createEvidenceRelationship: function (destination) {
         var source;
         var dest;
@@ -101,6 +127,11 @@
       }
     },
     helpers: {
+      /*
+       * Check if `Reuse` button should be enabled
+       *
+       * @param {Object} options - Mustache options object
+       */
       disableReuse: function (options) {
         var list = [];
         var reused = this.attr('reusedObjects');
@@ -118,6 +149,15 @@
     }
   });
 
+  /*
+   * Child component that tracks checkbox changes
+   *
+   * Values that we pass in:
+   * - reusable - If reusable checkbox should be visible
+   * - method - Which method from parent (reuse-objects) component should be used
+   *            for makining relationship
+   * - list - List on which set if item should be reused
+   */
   can.Component.extend({
     tag: 'reusable-object',
     template: '<content></content>',
