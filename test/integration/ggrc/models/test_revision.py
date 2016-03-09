@@ -87,7 +87,7 @@ class TestRevisions(integration.ggrc.TestCase):
     self.assertEqual(revisions_source, revisions_destination)
     self.assertEqual(len(revisions_source), 1)
 
-    self.gen.api.delete(rel, rel.id)
+    self.gen.api.delete(rel)
 
     revisions_source = _get_revisions(obj1, "source")
     revisions_destination = _get_revisions(obj2, "destination")

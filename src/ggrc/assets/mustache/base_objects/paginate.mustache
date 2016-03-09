@@ -1,0 +1,24 @@
+{{!
+    Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<content></content>
+
+{{#if totalPages}}
+<ul class="pagination">
+  <li {{#if_equals currentPage 1}}class="disabled"{{/if_equals}}>
+    <a can-click="setPrevious" href="#">Previous</a>
+  </li>
+  <li>
+    <span class="status">
+      <span>{{currentPage}} of {{totalPages}}</span>
+    </span>
+  </li>
+  <li {{#if_equals currentPage totalPages}}class="disabled"{{/if_equals}}>
+    <a can-click="setNext" href="#">Next</a>
+  </li>
+</ul>
+{{/if}}

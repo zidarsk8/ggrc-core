@@ -3,20 +3,13 @@
 # Created By: urban@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
-import random
 from freezegun import freeze_time
 from datetime import date
 
-import os
 from ggrc import db
 from ggrc_workflows.models import Workflow, Cycle, CycleTaskGroupObjectTask
-
 from integration.ggrc_workflows.workflow_cycle_calculator import \
     base_workflow_test_case
-
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 class TestOneTimeWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
@@ -226,7 +219,7 @@ class TestOneTimeWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
           CycleTaskGroupObjectTask.title == "one time task 2"
       ).one()
 
-      response = self.generator.api.delete(cycle_task, cycle_task.id)
+      response = self.generator.api.delete(cycle_task)
       self.assert200(response)
 
       cycle = db.session.query(Cycle).filter(

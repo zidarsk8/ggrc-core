@@ -4,31 +4,38 @@
 # Maintained By: david@reciprocitylabs.com
 
 import datetime
-from flask import Blueprint, session, g
 import sqlalchemy.orm
-from sqlalchemy.orm import aliased
-from sqlalchemy.orm.attributes import get_history
-from sqlalchemy import and_, or_, case, literal
+from flask import Blueprint
+from flask import g
 from ggrc import db, settings
-from ggrc.login import get_current_user, login_required
+from ggrc.app import app
+from ggrc_basic_permissions import basic_roles
+from ggrc_basic_permissions.contributed_roles import lookup_role_implications
+from ggrc_basic_permissions.contributed_roles import BasicRoleDeclarations
+from ggrc_basic_permissions.contributed_roles import BasicRoleImplications
+from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
+from ggrc_basic_permissions.models import ContextImplication
+from ggrc_basic_permissions.models import get_ids_related_to
+from ggrc_basic_permissions.models import Role
+from ggrc_basic_permissions.models import UserRole
+from ggrc.login import get_current_user
 from ggrc.models import all_models
-from ggrc.models.person import Person
 from ggrc.models.audit import Audit
-from ggrc.models.response import Response
-from ggrc.models.relationship import Relationship
-from ggrc.models.context import Context
 from ggrc.models.program import Program
+from ggrc.models.relationship import Relationship
+from ggrc.models.response import Response
 from ggrc.rbac import permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
-from ggrc.services.registry import service
-from ggrc.services.common import Resource
 from ggrc.services.common import _get_cache_manager
-from . import basic_roles
+from ggrc.services.common import Resource
+from ggrc.services.registry import service
 from ggrc.utils import benchmark
-from .contributed_roles import lookup_role_implications
-from .models import Role, UserRole, ContextImplication
-from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
-from ggrc_basic_permissions.models import get_ids_related_to
+from sqlalchemy import and_
+from sqlalchemy import case
+from sqlalchemy import literal
+from sqlalchemy import or_
+from sqlalchemy.orm import aliased
+from sqlalchemy.orm.attributes import get_history
 
 
 blueprint = Blueprint(
@@ -37,10 +44,10 @@ blueprint = Blueprint(
     template_folder='templates',
     static_folder='static',
     static_url_path='/static/ggrc_basic_permissions',
-    )
+)
 
 
-def get_public_config(current_user):
+def get_public_config(_):
   """Expose additional permissions-dependent config to client.
     Specifically here, expose GGRC_BOOTSTRAP_ADMIN values to ADMIN users.
   """
@@ -49,6 +56,94 @@ def get_public_config(current_user):
     if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS'):
       public_config['BOOTSTRAP_ADMIN_USERS'] = settings.BOOTSTRAP_ADMIN_USERS
   return public_config
+
+
+def objects_via_assignable_query(user_id, context_not_role=True):
+  """Creates a query that returns objects a user can access because she is
+     assigned via the assignable mixin.
+
+    Args:
+        user_id (int): id of the user
+
+    Returns:
+        db.session.query object that selects the following columns:
+            | id | type | context_id |
+  """
+
+  rel1 = aliased(all_models.Relationship, name="rel1")
+  rel2 = aliased(all_models.Relationship, name="rel2")
+  _attrs = aliased(all_models.RelationshipAttr, name="attrs")
+
+  def assignable_join(query):
+    """Joins relationship_attrs to the query. This filters out only the
+       relationship objects where the user is mapped with an AssigneeType.
+    """
+    return query.join(
+        _attrs, and_(
+            _attrs.relationship_id == rel1.id,
+            _attrs.attr_name == "AssigneeType",
+            case([
+                (rel1.destination_type == "Person",
+                 rel1.destination_id)
+            ], else_=rel1.source_id) == user_id))
+
+  def related_assignables():
+    """Header for the mapped_objects join"""
+    return db.session.query(
+        case([
+            (rel2.destination_type == rel1.destination_type,
+             rel2.source_id)
+        ], else_=rel2.destination_id).label('id'),
+        case([
+            (rel2.destination_type == rel1.destination_type,
+             rel2.source_type)
+        ], else_=rel2.destination_type).label('type'),
+        rel1.context_id if context_not_role else literal('R')
+    ).select_from(rel1)
+
+  # First we fetch objects where a user is mapped as an assignee
+  assigned_objects = assignable_join(db.session.query(
+      case([
+          (rel1.destination_type == "Person",
+           rel1.source_id)
+      ], else_=rel1.destination_id),
+      case([
+          (rel1.destination_type == "Person",
+           rel1.source_type)
+      ], else_=rel1.destination_type),
+      rel1.context_id if context_not_role else literal('RUD')))
+
+  # The user should also have access to objects mapped to the assigned_objects
+  # We accomplish this by filtering out relationships where the user is
+  # assigned and then joining the relationship table for the second time,
+  # retrieving the mapped objects.
+  #
+  # We have a union here because using or_ to join both by destination and
+  # source was not performing well (8s+ query times)
+  mapped_objects = assignable_join(
+      # Join by destination:
+      related_assignables()).join(rel2, and_(
+          case([
+              (rel1.destination_type == "Person",
+               rel1.source_id)
+          ], else_=rel1.destination_id) == rel2.destination_id,
+          case([
+              (rel1.destination_type == "Person",
+               rel1.source_type)
+          ], else_=rel1.destination_type) == rel2.destination_type)
+  ).union(assignable_join(
+      # Join by source:
+      related_assignables()).join(rel2, and_(
+          case([
+              (rel1.destination_type == "Person",
+               rel1.source_id)
+          ], else_=rel1.destination_id) == rel2.source_id,
+          case([
+              (rel1.destination_type == "Person",
+               rel1.source_type)
+          ], else_=rel1.destination_type) == rel2.source_type))
+  )
+  return mapped_objects.union(assigned_objects)
 
 
 def objects_via_relationships_query(user_id, context_not_role=False):
@@ -70,16 +165,22 @@ def objects_via_relationships_query(user_id, context_not_role=False):
   _relationship = aliased(all_models.Relationship, name="rl")
   _user_role = aliased(all_models.UserRole, name="ur")
 
-  def _add_relationship_join(query):
-    return query.join(_program, or_(
-        and_(_relationship.source_type == 'Program',
-             _program.id == _relationship.source_id),
-        and_(_relationship.destination_type == 'Program',
-             _program.id == _relationship.destination_id))).\
+  def _join_filter(query, cond):
+    return query.join(_program, cond).\
         join(_user_role, _program.context_id == _user_role.context_id).\
         join(_role, _user_role.role_id == _role.id).\
         filter(and_(_user_role.person_id == user_id, _role.name.in_(
             ('ProgramEditor', 'ProgramOwner', 'ProgramReader'))))
+
+  def _add_relationship_join(query):
+    # We do a UNION here because using an OR to JOIN both destination
+    # and source causes a full table scan
+    return _join_filter(query,
+                        and_(_relationship.source_type == 'Program',
+                             _program.id == _relationship.source_id))\
+        .union(_join_filter(query,
+                            and_(_relationship.destination_type == 'Program',
+                                 _program.id == _relationship.destination_id)))
 
   objects = _add_relationship_join(db.session.query(
       case([
@@ -89,17 +190,17 @@ def objects_via_relationships_query(user_id, context_not_role=False):
       case([
           (_relationship.destination_type == "Program",
            _relationship.source_type.label('type'))
-      ], else_=_relationship.destination_type.label('id')),
+      ], else_=_relationship.destination_type.label('type')),
       literal(None).label('context_id') if context_not_role else _role.name))
 
   # We also need to return relationships themselves:
-  relationships = _add_relationship_join(db.session.query(_relationship.id, literal("Relationship"), _relationship.context_id))
+  relationships = _add_relationship_join(db.session.query(
+      _relationship.id, literal("Relationship"), _relationship.context_id))
   return objects.union(relationships)
 
 
-
 class CompletePermissionsProvider(object):
-  def __init__(self, settings):
+  def __init__(self, _):
     pass
 
   def permissions_for(self, user):
@@ -113,6 +214,7 @@ class CompletePermissionsProvider(object):
   def handle_admin_user(self, user):
     pass
 
+
 class BasicUserPermissions(DefaultUserPermissions):
   """User permissions that aren't kept in session."""
   def __init__(self, user):
@@ -122,6 +224,7 @@ class BasicUserPermissions(DefaultUserPermissions):
 
   def _permissions(self):
     return self.permissions
+
 
 class UserPermissions(DefaultUserPermissions):
   @property
@@ -154,6 +257,7 @@ class UserPermissions(DefaultUserPermissions):
       with benchmark('load_permissions > load permissions for user'):
         self._request_permissions = load_permissions_for(user)
 
+
 def collect_permissions(src_permissions, context_id, permissions):
   for action, resource_permissions in src_permissions.items():
     if not resource_permissions:
@@ -182,7 +286,8 @@ def collect_permissions(src_permissions, context_id, permissions):
                 'terms': terms,
             })
 
-def load_permissions_for(user):
+
+def load_permissions_for(user):  # noqa
   """Permissions is dictionary that can be exported to json to share with
   clients. Structure is:
   ..
@@ -200,7 +305,7 @@ def load_permissions_for(user):
   'condition' is the string name of a conditional operator, such as 'contains'.
   'terms' are the arguments to the 'condition'.
   """
-  PERMISSION_CACHE_TIMEOUT = 1800 # 30 minutes
+  PERMISSION_CACHE_TIMEOUT = 1800  # 30 minutes
   permissions = {}
   key = 'permissions:{}'.format(user.id)
   cache = None
@@ -269,7 +374,7 @@ def load_permissions_for(user):
 
   # Add `ADMIN_PERMISSION` for "bootstrap admin" users
   if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
-      and user.email in settings.BOOTSTRAP_ADMIN_USERS:
+     and user.email in settings.BOOTSTRAP_ADMIN_USERS:
     admin_permissions = {
         DefaultUserPermissions.ADMIN_PERMISSION.action: [
             DefaultUserPermissions.ADMIN_PERMISSION.resource_type
@@ -304,7 +409,7 @@ def load_permissions_for(user):
   if keys and None in source_contexts_to_rolenames:
     all_context_implications = all_context_implications.filter(
         or_(
-            ContextImplication.source_context_id == None,
+            ContextImplication.source_context_id is None,
             ContextImplication.source_context_id.in_(keys),
         )).all()
   elif keys:
@@ -312,7 +417,7 @@ def load_permissions_for(user):
         ContextImplication.source_context_id.in_(keys)).all()
   elif None in source_contexts_to_rolenames:
     all_context_implications = all_context_implications.filter(
-        ContextImplication.source_context_id == None).all()
+        ContextImplication.source_context_id is None).all()
   else:
     all_context_implications = []
 
@@ -321,7 +426,7 @@ def load_permissions_for(user):
   all_implied_roles_set = set()
   for context_implication in all_context_implications:
     for rolename in source_contexts_to_rolenames.get(
-        context_implication.source_context_id, []):
+            context_implication.source_context_id, []):
       implied_role_names_list = implied_context_to_implied_roles.setdefault(
           context_implication.context_id, list())
       implied_role_names = lookup_role_implications(
@@ -339,7 +444,7 @@ def load_permissions_for(user):
       all_implied_roles_by_name[implied_role.name] = implied_role
   # Now aggregate permissions resulting from these roles
   for implied_context_id, implied_rolenames \
-      in implied_context_to_implied_roles.items():
+          in implied_context_to_implied_roles.items():
     if implied_context_id is None:
       continue
     for implied_rolename in implied_rolenames:
@@ -360,6 +465,15 @@ def load_permissions_for(user):
     actions = ["read", "view_object_page"]
     if role_name in ("ProgramEditor", "ProgramOwner"):
       actions += ["create", "update", "delete"]
+    for action in actions:
+      permissions.setdefault(action, {})\
+          .setdefault(type_, {})\
+          .setdefault('resources', list())\
+          .append(id_)
+  for id_, type_, role_name in objects_via_assignable_query(user.id, False):
+    actions = ["read", "view_object_page"]
+    if role_name == "RUD":
+      actions += ["update", "delete"]
     for action in actions:
       permissions.setdefault(action, {})\
           .setdefault(type_, {})\
@@ -424,21 +538,19 @@ def handle_program_post(sender, obj=None, src=None, service=None):
       person=get_current_user(),
       role=program_owner_role,
       context=context,
-      modified_by=get_current_user(),
-      )
-  #pass along a temporary attribute for logging the events.
+      modified_by=get_current_user())
+  # pass along a temporary attribute for logging the events.
   user_role._display_related_title = obj.title
   db.session.add(user_role)
   db.session.flush()
 
-  #Create the context implication for Program roles to default context
+  # Create the context implication for Program roles to default context
   db.session.add(ContextImplication(
       source_context=context,
       context=None,
       source_context_scope='Program',
       context_scope=None,
-      modified_by=get_current_user(),
-      ))
+      modified_by=get_current_user()))
 
   if not src.get('private'):
     # Add role implication - all users can read a public program
@@ -448,10 +560,8 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 def add_public_program_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
       .filter(
-          and_(
-            ContextImplication.context_id == context.id,
-            ContextImplication.source_context_id == None))\
-      .count() > 0:
+          and_(ContextImplication.context_id == context.id,
+               ContextImplication.source_context_id is None)).count() > 0:
     return
   db.session.add(ContextImplication(
       source_context=None,
@@ -474,12 +584,12 @@ def handle_relationship_post(sender, obj=None, src=None, service=None):
      and isinstance(obj.destination, Program) \
      and obj.destination.private \
      and db.session.query(ContextImplication) \
-      .filter(
-          and_(
-            ContextImplication.context_id == obj.destination.context.id,
-            ContextImplication.source_context_id == obj.source.context.id))\
-      .count() < 1:
-    #Create the audit -> program implication for the Program added to the Response
+     .filter(
+          and_(ContextImplication.context_id == obj.destination.context.id,
+               ContextImplication.source_context_id == obj.source.context.id))\
+     .count() < 1:
+    # Create the audit -> program implication for the
+    # Program added to the Response
     parent_program = obj.source.request.audit.program
     if parent_program != obj.destination:
       db.session.add(ContextImplication(
@@ -498,6 +608,7 @@ def handle_relationship_post(sender, obj=None, src=None, service=None):
           modified_by=get_current_user(),
       ))
 
+
 # When adding a private program to an Audit Response, ensure Auditors
 #  can read it
 @Resource.model_deleted.connect_via(Relationship)
@@ -508,41 +619,45 @@ def handle_relationship_delete(sender, obj=None, src=None, service=None):
      and isinstance(obj.destination, Program) \
      and obj.destination.private:
 
-    #figure out if any other responses in this audit are still mapped to the same prog
-    responses = [r for req in obj.source.request.audit.requests for r in req.responses]
-    relationships = [rel for resp in responses for rel in resp.related_destinations
+    # figure out if any other responses in this audit
+    # are still mapped to the same prog
+    responses = [r for req in obj.source.request.audit.requests
+                 for r in req.responses]
+    relationships = [rel for resp in responses for rel in
+                     resp.related_destinations
                      if rel != obj.destination]
     matching_programs = [p.destination for p in relationships
                          if p.destination == obj.destination]
 
-    #Delete the audit -> program implication for the Program removed from the Response
+    # Delete the audit -> program implication for the Program removed from
+    # the Response
     if len(matching_programs) < 1:
       db.session.query(ContextImplication)\
-            .filter(
-                ContextImplication.context_id == obj.destination.context_id,
-                ContextImplication.source_context_id == obj.source.context_id)\
-                    .delete()
+          .filter(
+              ContextImplication.context_id == obj.destination.context_id,
+              ContextImplication.source_context_id == obj.source.context_id)\
+          .delete()
       db.session.query(ContextImplication)\
-            .filter(
-                ContextImplication.context_id == obj.destination.context_id,
-                ContextImplication.source_context_id == obj.source.context_id)\
-                    .delete()
+          .filter(
+              ContextImplication.context_id == obj.destination.context_id,
+              ContextImplication.source_context_id == obj.source.context_id)\
+          .delete()
 
 
 @Resource.model_put.connect_via(Program)
 def handle_program_put(sender, obj=None, src=None, service=None):
-  #Check to see if the private property of the program has changed
+  # Check to see if the private property of the program has changed
   if get_history(obj, 'private').has_changes():
     if obj.private:
       # Ensure that any implications from null context are removed
       db.session.query(ContextImplication)\
           .filter(
               ContextImplication.context_id == obj.context_id,
-              ContextImplication.source_context_id == None)\
-                  .delete()
+              ContextImplication.source_context_id is None)\
+          .delete()
       db.session.flush()
     else:
-      #ensure that implications from null are present
+      # ensure that implications from null are present
       add_public_program_context_implication(obj.context, check_exists=True)
       db.session.flush()
 
@@ -550,7 +665,7 @@ def handle_program_put(sender, obj=None, src=None, service=None):
 @Resource.model_posted.connect_via(Audit)
 def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.flush()
-  #Create an audit context
+  # Create an audit context
   context = obj.build_object_context(
       context=obj.context,
       name='Audit Context {timestamp}'.format(
@@ -561,7 +676,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.add(context)
   db.session.flush()
 
-  #Create the program -> audit implication
+  # Create the program -> audit implication
   db.session.add(ContextImplication(
       source_context=obj.context,
       context=context,
@@ -570,7 +685,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
       modified_by=get_current_user(),
   ))
 
-  #Create the audit -> program implication
+  # Create the audit -> program implication
   db.session.add(ContextImplication(
       source_context=context,
       context=obj.context,
@@ -581,7 +696,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
 
   db.session.add(obj)
 
-  #Create the role implication for Auditor from Audit for default context
+  # Create the role implication for Auditor from Audit for default context
   db.session.add(ContextImplication(
       source_context=context,
       context=None,
@@ -591,49 +706,48 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   ))
   db.session.flush()
 
-  #Place the audit in the audit context
+  # Place the audit in the audit context
   obj.context = context
 
 
 @Resource.model_deleted.connect
 def handle_resource_deleted(sender, obj=None, service=None):
   if obj.context \
-      and obj.context.related_object_id \
-      and obj.id == obj.context.related_object_id \
-      and obj.__class__.__name__ == obj.context.related_object_type:
+     and obj.context.related_object_id \
+     and obj.id == obj.context.related_object_id \
+     and obj.__class__.__name__ == obj.context.related_object_type:
     db.session.query(UserRole) \
         .filter(UserRole.context_id == obj.context_id) \
         .delete()
     db.session.query(ContextImplication) \
         .filter(
-            or_(
-              ContextImplication.context_id == obj.context_id,
-              ContextImplication.source_context_id == obj.context_id
-              ))\
+            or_(ContextImplication.context_id == obj.context_id,
+                ContextImplication.source_context_id == obj.context_id))\
         .delete()
     # Deleting the context itself is problematic, because unattached objects
     #   may still exist and cause a database error.  Instead of implicitly
     #   cascading to delete those, just leave the `Context` object in place.
     #   It and its objects will be visible *only* to Admin users.
-    #db.session.delete(obj.context)
+    # db.session.delete(obj.context)
+
 
 # Removed because this is now handled purely client-side, but kept
 # here as a reference for the next one.
 # @BaseObjectView.extension_contributions.connect_via(Program)
 def contribute_to_program_view(sender, obj=None, context=None):
-  if obj.context_id != None and \
-      permissions.is_allowed_read('Role', None, 1) and \
-      permissions.is_allowed_read('UserRole', None, obj.context_id) and \
-      permissions.is_allowed_create('UserRole', None, obj.context_id) and \
-      permissions.is_allowed_update('UserRole', None, obj.context_id) and \
-      permissions.is_allowed_delete('UserRole', None, obj.context_id):
+  if obj.context_id is not None and \
+     permissions.is_allowed_read('Role', None, 1) and \
+     permissions.is_allowed_read('UserRole', None, obj.context_id) and \
+     permissions.is_allowed_create('UserRole', None, obj.context_id) and \
+     permissions.is_allowed_update('UserRole', None, obj.context_id) and \
+     permissions.is_allowed_delete('UserRole', None, obj.context_id):
     return 'permissions/programs/_role_assignments.haml'
   return None
 
-from ggrc.app import app
+
 @app.context_processor
 def authorized_users_for():
-  return {'authorized_users_for': UserRole.role_assignments_for,}
+  return {'authorized_users_for': UserRole.role_assignments_for}
 
 
 def contributed_services():
@@ -641,21 +755,20 @@ def contributed_services():
   return [
       service('roles', Role),
       service('user_roles', UserRole),
-      ]
+  ]
 
 
 def contributed_object_views():
   from ggrc.views.registry import object_view
   return [
       object_view(Role)
-      ]
+  ]
 
 
 def contributed_column_handlers():
   return COLUMN_HANDLERS
 
 
-from .contributed_roles import BasicRoleDeclarations, BasicRoleImplications
 ROLE_DECLARATIONS = BasicRoleDeclarations()
 ROLE_IMPLICATIONS = BasicRoleImplications()
 

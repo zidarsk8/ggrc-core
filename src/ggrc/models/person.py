@@ -12,12 +12,14 @@ from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.mixins import deferred, Base, CustomAttributable
+from ggrc.models.custom_attribute_definition import CustomAttributeMapable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
 
 
-class Person(CustomAttributable, HasOwnContext, Relatable, Base, db.Model):
+class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
+             Relatable, Base, db.Model):
 
   __tablename__ = 'people'
 
@@ -81,18 +83,21 @@ class Person(CustomAttributable, HasOwnContext, Relatable, Base, db.Model):
     from ggrc_basic_permissions.models import Role, UserRole
     return UserRole.query.join(Role).filter(
         (UserRole.person_id == cls.id) &
-        (UserRole.context_id == None) &
+        (UserRole.context_id == None) &  # noqa
         predicate(Role.name)
     ).exists()
 
   # Methods required by Flask-Login
+    # pylint: disable=no-self-use
   def is_authenticated(self):
     return True
 
   def is_active(self):
+    # pylint: disable=no-self-use
     return True  # self.active
 
   def is_anonymous(self):
+    # pylint: disable=no-self-use
     return False
 
   def get_id(self):

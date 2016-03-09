@@ -121,35 +121,49 @@ can.Control("GGRC.Controllers.Modals", {
 
     instance.attr(["_transient"].concat(name).join("."), value);
   },
-  autocomplete : function(el) {
+  autocomplete: function(el) {
     $.cms_autocomplete.call(this, el);
   },
   autocomplete_select: function (el, event, ui) {
-    $("#extended-info").trigger("mouseleave"); // Make sure the extra info tooltip closes
+    var path;
+    var instance;
+    var index;
+    var cb;
+    $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
 
-    var path = el.attr("name").split("."),
-        instance = this.options.instance,
-        index = 0,
-        prop = path.pop();
+    path = el.attr('name').split('.');
+    instance = this.options.instance;
+    index = 0;
+    path.pop(); // remove the prop
+    cb = el.data('lookup-cb');
+
+    if (cb) {
+      cb = cb.split(' ');
+      instance[cb[0]].apply(instance, cb.slice(1).concat([ui.item]));
+      setTimeout(function () {
+        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+      }, 0);
+      return;
+    }
 
     if (/^\d+$/.test(path[path.length - 1])) {
       index = parseInt(path.pop(), 10);
-      path = path.join(".");
+      path = path.join('.');
       if (!this.options.instance.attr(path)) {
         this.options.instance.attr(path, []);
       }
       this.options.instance.attr(path).splice(index, 1, ui.item.stub());
     } else {
-      path = path.join(".");
+      path = path.join('.');
       setTimeout(function () {
         el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
       }, 0);
 
       this.options.instance.attr(path, ui.item);
-      this.options.instance.attr("_transient." + path, ui.item);
+      this.options.instance.attr('_transient.' + path, ui.item);
     }
   },
-  immediate_find_or_create : function(el, ev, data) {
+  immediate_find_or_create: function(el, ev, data) {
     var that = this
     , prop = el.data("drop")
     , model = CMS.Models[el.data("lookup")]
@@ -331,20 +345,28 @@ can.Control("GGRC.Controllers.Modals", {
     can.each($elements.toArray(), this.proxy("set_value_from_element"));
   },
   set_value_from_element: function (el) {
+    var name;
+    var value;
+    var cb;
+    var instance = this.options.instance;
     el = el instanceof jQuery ? el : $(el);
-    var name = el.attr("name"),
-        value = el.val();
+    name = el.attr('name');
+    value = el.val();
+    cb = el.data('lookup-cb');
 
     // If no model is specified, short circuit setting values
     // Used to support ad-hoc form elements in confirmation dialogs
     if (!this.options.model) {
       return;
     }
-    if (name) {
+    if (cb) {
+      cb = cb.split(' ');
+      instance[cb[0]].apply(instance, cb.slice(1).concat([value]));
+    } else if (name) {
       this.set_value({name: name, value: value});
     }
-    if (el.is("[data-also-set]")) {
-      can.each(el.data("also-set").split(","), function(oname) {
+    if (el.is('[data-also-set]')) {
+      can.each(el.data('also-set').split(','), function(oname) {
         this.set_value({name: oname, value: value});
       }, this);
     }
@@ -767,6 +789,10 @@ can.Control("GGRC.Controllers.Modals", {
         element.attr('checked', false);
       } else if (definition.attribute_type === 'Rich Text') {
         element.data("wysihtml5").editor.clear();
+      } else if (definition.attribute_type === 'Map:Person') {
+        element = this.element.find('[name="_custom_attribute_mappings.' +
+                                    definition.id + '.email"]');
+        element.val('');
       } else {
         element.val('');
       }

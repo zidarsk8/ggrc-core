@@ -3,11 +3,20 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""Test api helper.
+
+This module contains an api helper that is used for simulating api calls to our
+app. This api helper is used instead of the TestCase.client in cases where we
+need to access the API during the class setup stage, when the default flaks
+test client is not yet ready.
+
+This api helper also helps with delete and put requests where it fetches the
+latest etag needed for such requests.
+"""
+
 from ggrc import db
 from ggrc.app import app
 from ggrc.services.common import Resource
-from ggrc import services
-import inspect
 import flask
 import logging
 
@@ -19,8 +28,6 @@ class Api():
     self.tc = app.test_client()
     self.tc.get("/login")
     self.resource = Resource()
-    self.service_dict = {s.model_class.__name__: s.name
-                         for s in services.all_services()}
     self.headers = {'Content-Type': 'application/json',
                     "X-Requested-By": "gGRC"
                     }
@@ -44,15 +51,9 @@ class Api():
     db.session.commit()
     db.session.flush()
 
-  def get_service(self, obj):
-    if inspect.isclass(obj):
-      return self.service_dict[obj.__name__]
-    else:
-      return self.service_dict[obj.__class__.__name__]
-
   def api_link(self, obj, obj_id=None):
     obj_id = "" if obj_id is None else "/" + str(obj_id)
-    return "/api/%s%s" % (self.get_service(obj), obj_id)
+    return "/api/%s%s" % (obj._inflector.table_plural, obj_id)
 
   def data_to_json(self, response):
     """ add docoded json to response object """
@@ -101,7 +102,18 @@ class Api():
     return self.data_to_json(self.tc.get(
         "{}?{}".format(self.api_link(obj), query)))
 
-  def delete(self, obj, id):
+  def delete(self, obj):
+    """Delete api call helper.
+
+    This function helps creating delete calls for a specific object by fetching
+    the data and setting the appropriate etag needed for the delete api calls.
+
+    Args:
+      obj (sqlalchemy model): object that we wish to delete.
+
+    Returns:
+      Server response.
+    """
     response = self.get(obj, obj.id)
     headers = {
         "If-Match": response.headers.get("Etag"),

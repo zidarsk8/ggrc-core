@@ -13,7 +13,6 @@ from ggrc import notifications
 from ggrc.models import Notification
 from ggrc.models import Person
 from ggrc_workflows.models import Cycle
-from ggrc_workflows.views import send_todays_digest_notifications
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
@@ -124,7 +123,7 @@ class TestOneTimeWorkflowNotification(TestCase):
       _, notif_data = notifications.get_todays_notifications()
       self.assertEqual(len(notif_data[user]["due_today"]), 3)
 
-      send_todays_digest_notifications()
+      notifications.send_todays_digest_notifications()
       self.assertEqual(mock_mail.call_count, 1)
 
   def create_test_cases(self):

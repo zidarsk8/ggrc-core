@@ -39,6 +39,7 @@ from ggrc.views import filters
 from ggrc.views import mockups
 from ggrc.views import converters
 from ggrc.views import cron
+from ggrc.views import notifications
 from ggrc.views.common import RedirectedPolymorphView
 from ggrc.views.registry import object_view
 
@@ -297,6 +298,7 @@ def init_extra_views(app_):
   filters.init_filter_views()
   converters.init_converter_views()
   cron.init_cron_views(app_)
+  notifications.init_notification_views(app_)
 
 
 def init_all_views(app_):

@@ -8,10 +8,9 @@ from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.object_person import ObjectPerson
 from ggrc.models.object_owner import ObjectOwner
-from ggrc.models.request import Request
-from ggrc.models.response import Response
 from ggrc.models.relationship import Relationship
 from ggrc_basic_permissions.models import UserRole
+from ggrc_basic_permissions import objects_via_assignable_query
 from ggrc_basic_permissions import objects_via_relationships_query
 from ggrc.rbac import permissions, context_query_filter
 from sqlalchemy import \
@@ -33,35 +32,35 @@ class MysqlRecordProperty(db.Model):
   content = db.Column(db.Text)
 
   @declared_attr
-  def __table_args__(cls):
+  def __table_args__(self):
     return (
         # NOTE
         # This is here to prevent Alembic from wanting to drop the index, but
         # the DDL below or a similar Alembic migration should be used to create
         # the index.
-        db.Index('{}_text_idx'.format(cls.__tablename__), 'content'),
+        db.Index('{}_text_idx'.format(self.__tablename__), 'content'),
         # These are real indexes
-        db.Index('ix_{}_key'.format(cls.__tablename__), 'key'),
-        db.Index('ix_{}_type'.format(cls.__tablename__), 'type'),
-        db.Index('ix_{}_tags'.format(cls.__tablename__), 'tags'),
-        db.Index('ix_{}_context_id'.format(cls.__tablename__), 'context_id'),
+        db.Index('ix_{}_key'.format(self.__tablename__), 'key'),
+        db.Index('ix_{}_type'.format(self.__tablename__), 'type'),
+        db.Index('ix_{}_tags'.format(self.__tablename__), 'tags'),
+        db.Index('ix_{}_context_id'.format(self.__tablename__), 'context_id'),
         # Only MyISAM supports fulltext indexes until newer MySQL/MariaDB
         {'mysql_engine': 'myisam'},
-        )
+    )
 
 event.listen(
     MysqlRecordProperty.__table__,
     'after_create',
     DDL('ALTER TABLE {tablename} ADD FULLTEXT INDEX {tablename}_text_idx '
-      '(content)'.format(tablename=MysqlRecordProperty.__tablename__))
-    )
+        '(content)'.format(tablename=MysqlRecordProperty.__tablename__))
+)
 
 
 class MysqlIndexer(SqlIndexer):
   record_type = MysqlRecordProperty
 
-  def _get_type_query(
-      self, model_names, permission_type='read', permission_model=None):
+  def _get_type_query(self, model_names, permission_type='read',
+                      permission_model=None):
 
     type_queries = []
     for model_name in model_names:
@@ -98,8 +97,8 @@ class MysqlIndexer(SqlIndexer):
 
         if resources:
           resource_sql = and_(
-                MysqlRecordProperty.type == model_name,
-                MysqlRecordProperty.key.in_(resources))
+              MysqlRecordProperty.type == model_name,
+              MysqlRecordProperty.key.in_(resources))
         else:
           resource_sql = false()
 
@@ -119,10 +118,11 @@ class MysqlIndexer(SqlIndexer):
 
   def _get_filter_query(self, terms):
     whitelist = or_(
-        # Because property values for custom attributes are `attribute_value_<id>`
+        # Because property values for custom attributes are
+        # `attribute_value_<id>`
         MysqlRecordProperty.property.contains('attribute_value'),
         MysqlRecordProperty.property.in_(
-           ['title', 'name', 'email', 'notes', 'description', 'slug'])
+            ['title', 'name', 'email', 'notes', 'description', 'slug'])
     )
     if not terms:
       return whitelist
@@ -144,9 +144,9 @@ class MysqlIndexer(SqlIndexer):
       type_column = case(
           value=mapper.polymorphic_on,
           whens={
-            val: m.class_.__name__
+              val: m.class_.__name__
               for val, m in mapper.polymorphic_map.items()
-            })
+          })
     return type_column
 
   def _types_to_type_models(self, types):
@@ -155,7 +155,7 @@ class MysqlIndexer(SqlIndexer):
     return [m for m in all_models.all_models if m.__name__ in types]
 
   # filters by "myview" for a given person
-  def _add_owner_query(self, query, types=None, contact_id=None):
+  def _add_owner_query(self, query, types=None, contact_id=None):  # noqa
     '''
     Finds all objects which might appear on a user's Profile or Dashboard
     pages, including:
@@ -164,7 +164,9 @@ class MysqlIndexer(SqlIndexer):
       Objects owned via ObjectOwner
       Objects in private contexts via UserRole (e.g. for Private Programs)
       Objects for which the user is the "contact"
-      Objects for which the user is the "primary_assessor" or "secondary_assessor"
+      Objects for which the user is the "primary_assessor" or
+        "secondary_assessor"
+      Objects to which the user is mapped via a custom attribute
       Assignable objects for which the user is an assignee
 
     This method only *limits* the result set -- Contexts and Roles will still
@@ -209,12 +211,12 @@ class MysqlIndexer(SqlIndexer):
           ObjectPerson.personable_id.label('id'),
           ObjectPerson.personable_type.label('type'),
           literal(None).label('context_id')
-        ).filter(
-            and_(
+      ).filter(
+          and_(
               ObjectPerson.person_id == contact_id,
               ObjectPerson.personable_type.in_(model_names)
-            )
-        )
+          )
+      )
       type_union_queries.append(object_people_query)
 
     # Objects for which the user is an "owner"
@@ -222,13 +224,26 @@ class MysqlIndexer(SqlIndexer):
         ObjectOwner.ownable_id.label('id'),
         ObjectOwner.ownable_type.label('type'),
         literal(None).label('context_id')
-      ).filter(
-          and_(
+    ).filter(
+        and_(
             ObjectOwner.person_id == contact_id,
             ObjectOwner.ownable_type.in_(model_names),
-          )
-      )
+        )
+    )
     type_union_queries.append(object_owners_query)
+
+    # Objects to which the user is mapped via a custom attribute
+    ca_mapped_objects_query = db.session.query(
+        all_models.CustomAttributeValue.attributable_id.label('id'),
+        all_models.CustomAttributeValue.attributable_type.label('type'),
+        literal(None).label('context_id')
+    ).filter(
+        and_(
+            all_models.CustomAttributeValue.attribute_value == "Person",
+            all_models.CustomAttributeValue.attribute_object_id == contact_id
+        )
+    )
+    type_union_queries.append(ca_mapped_objects_query)
 
     # Objects for which the user is assigned
     model_assignee_query = db.session.query(
@@ -258,6 +273,9 @@ class MysqlIndexer(SqlIndexer):
     if not my_objects:
       type_union_queries.append(
           objects_via_relationships_query(contact_id, True))
+      type_union_queries.append(
+          objects_via_assignable_query(contact_id)
+      )
 
     # FIXME The following line crashes if the Workflow extension is not enabled
     for model in [all_models.Program, all_models.Audit, all_models.Workflow]:
@@ -265,13 +283,13 @@ class MysqlIndexer(SqlIndexer):
           model.id.label('id'),
           literal(model.__name__).label('type'),
           literal(None).label('context_id'),
-        ).join(
-            UserRole,
-            and_(
+      ).join(
+          UserRole,
+          and_(
               UserRole.context_id == model.context_id,
               UserRole.person_id == contact_id,
-            )
-        )
+          )
+      )
       type_union_queries.append(context_query)
 
     for model, type_column in models:
@@ -281,9 +299,9 @@ class MysqlIndexer(SqlIndexer):
             model.id.label('id'),
             type_column.label('type'),
             literal(None).label('context_id')
-          ).filter(
-              model.contact_id == contact_id
-          ).distinct()
+        ).filter(
+            model.contact_id == contact_id
+        ).distinct()
         type_union_queries.append(model_type_query)
       # Objects for which the user is the "contact"
       if hasattr(model, 'secondary_contact_id'):
@@ -291,27 +309,28 @@ class MysqlIndexer(SqlIndexer):
             model.id.label('id'),
             type_column.label('type'),
             literal(None).label('context_id')
-          ).filter(
-              model.secondary_contact_id == contact_id
-          ).distinct()
+        ).filter(
+            model.secondary_contact_id == contact_id
+        ).distinct()
         type_union_queries.append(model_type_query)
-
 
       if model is all_models.Control:
         # Control also has `principal_assessor` and `secondary_assessor`
         assessor_queries = []
         if hasattr(model, 'principal_assessor_id'):
-          assessor_queries.append(or_(model.principal_assessor_id == contact_id))
+          assessor_queries.append(or_(
+              model.principal_assessor_id == contact_id))
         if hasattr(model, 'secondary_assessor_id'):
-          assessor_queries.append(or_(model.secondary_assessor_id == contact_id))
+          assessor_queries.append(or_(
+              model.secondary_assessor_id == contact_id))
 
         model_type_query = db.session.query(
             model.id.label('id'),
             type_column.label('type'),
             literal(None).label('context_id')
-          ).filter(
-              or_(*assessor_queries)
-          ).distinct()
+        ).filter(
+            or_(*assessor_queries)
+        ).distinct()
         type_union_queries.append(model_type_query)
 
     # Construct and JOIN to the UNIONed result set
@@ -319,9 +338,9 @@ class MysqlIndexer(SqlIndexer):
     query = query.join(
         type_union_query,
         and_(
-          type_union_query.c.id == MysqlRecordProperty.key,
-          type_union_query.c.type == MysqlRecordProperty.type),
-      )
+            type_union_query.c.id == MysqlRecordProperty.key,
+            type_union_query.c.type == MysqlRecordProperty.type),
+    )
 
     return query
 
@@ -350,8 +369,8 @@ class MysqlIndexer(SqlIndexer):
       model_names = [m for m in model_names if m not in extra_params]
     return model_names
 
-  def search(
-      self, terms, types=None, permission_type='read', permission_model=None, contact_id=None, extra_params={}):
+  def search(self, terms, types=None, permission_type='read',
+             permission_model=None, contact_id=None, extra_params={}):
     model_names = self._get_grouped_types(types, extra_params)
     query = db.session.query(
         self.record_type.key, self.record_type.type,
@@ -383,28 +402,31 @@ class MysqlIndexer(SqlIndexer):
     # FIXME: This only orders by `title` if title was the matching property
     query = query.union(*unions)
     query = query.order_by(case(
-      [(self.record_type.property == "title", self.record_type.content)],
-      else_=literal("ZZZZZ")))
+        [(self.record_type.property == "title", self.record_type.content)],
+        else_=literal("ZZZZZ")))
     return query
 
-  def counts(self, terms, group_by_type=True, types=None, contact_id=None, extra_params={}, extra_columns={}):
+  def counts(self, terms, group_by_type=True, types=None, contact_id=None,
+             extra_params={}, extra_columns={}):
     model_names = self._get_grouped_types(types, extra_params)
     query = db.session.query(
-        self.record_type.type, func.count(distinct(self.record_type.key)), literal(""))
+        self.record_type.type, func.count(distinct(
+            self.record_type.key)), literal(""))
     query = query.filter(self._get_type_query(model_names))
     query = query.filter(self._get_filter_query(terms))
     query = self._add_owner_query(query, types, contact_id)
     query = query.group_by(self.record_type.type)
     all_extra_columns = dict(extra_columns.items() +
-        [(p, p) for p in extra_params if p not in extra_columns]
-    )
+                             [(p, p) for p in extra_params
+                              if p not in extra_columns])
     if not all_extra_columns:
       return query.all()
 
     # Add extra_params and extra_colums:
     for k, v in all_extra_columns.iteritems():
       q = db.session.query(
-          self.record_type.type, func.count(distinct(self.record_type.key)), literal(k))
+          self.record_type.type, func.count(
+              distinct(self.record_type.key)), literal(k))
       q = q.filter(self._get_type_query([v]))
       q = q.filter(self._get_filter_query(terms))
       q = self._add_owner_query(q, [v], contact_id)

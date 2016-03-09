@@ -3208,26 +3208,31 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
 /*
   Used to get the string value for custom attributes
 */
-Mustache.registerHelper('get_custom_attr_value', function (attr_info, instance) {
-  var ins, atr, ins_type, attr_name, value = '', custom_attr_id = 0,
-      custom_attr_defs = GGRC.custom_attr_defs;
+Mustache.registerHelper('get_custom_attr_value', function (attr, instance, options) {
+  var value = '';
+  var definition;
 
-  ins = Mustache.resolve(instance);
-  ins_type = ins.class.table_singular;
-  atr = Mustache.resolve(attr_info);
-  attr_name = atr.attr_name;
+  attr = Mustache.resolve(attr);
+  instance = Mustache.resolve(instance);
 
-  can.each(custom_attr_defs, function (item) {
-    if (item.definition_type === ins_type && item.title === attr_name) {
-      custom_attr_id = item.id;
+  can.each(GGRC.custom_attr_defs, function (item) {
+    if (item.definition_type === instance.class.table_singular &&
+        item.title === attr.attr_name) {
+      definition = item;
     }
   });
 
-  if (custom_attr_id) {
-    can.each(ins.custom_attribute_values, function (item) {
+  if (definition) {
+    can.each(instance.custom_attribute_values, function (item) {
       item = item.reify();
-      if (item.custom_attribute_id === custom_attr_id) {
-        value = item.attribute_value;
+      if (item.custom_attribute_id === definition.id) {
+        if (definition.attribute_type.startsWith('Map:')) {
+          value = options.fn(options.contexts.add({
+            object: item.attribute_object.reify()
+          }));
+        } else {
+          value = item.attribute_value;
+        }
       }
     });
   }
@@ -3247,7 +3252,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
 
   audit = audits[0].instance.reify();
   programs = audit.get_mapping("_program");
-  program = programs[0].instance.reify();
+  program = programs.length ? programs[0].instance.reify() : {};
   control = instance.control ? instance.control.reify() : {};
   related_controls = instance.get_mapping('related_controls');
 

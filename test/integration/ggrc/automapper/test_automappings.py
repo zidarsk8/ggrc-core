@@ -4,17 +4,11 @@
 # Maintained By: andraz@reciprocitylabs.com
 
 import itertools
-import os
-import random
 
 import ggrc
 import ggrc.models as models
 import integration.ggrc
 import integration.ggrc.generator
-
-
-if os.environ.get('TRAVIS', False):
-  random.seed(1)  # so we can reproduce the tests if needed
 
 
 counter = 0
