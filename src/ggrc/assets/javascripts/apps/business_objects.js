@@ -309,7 +309,7 @@
           },
           Vendor: {
             mapping: "related_vendors",
-            hild_options: [related_objects_child_options],
+            child_options: [related_objects_child_options],
             draw_children: true
           },
           Process: {
@@ -761,7 +761,7 @@
           },
           Vendor: {
             mapping: 'extended_related_vendors_via_search',
-            hild_options: [related_objects_child_options],
+            child_options: [related_objects_child_options],
             draw_children: true
           },
           Process: {
