@@ -493,7 +493,17 @@
             header_view: GGRC.mustache_path + "/base_objects/tree_header.mustache",
             footer_view: GGRC.mustache_path + "/assessments/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/assessments/tree_add_item.mustache"
-          }
+          },
+          AssessmentTemplate: {
+            mapping: 'related_assessment_templates',
+            draw_children: true,
+            show_view:
+              GGRC.mustache_path + '/base_objects/tree.mustache',
+            footer_view:
+              GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+            add_item_view:
+              GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+          },
         },
         directive: {
           _mixins: [

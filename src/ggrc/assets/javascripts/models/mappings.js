@@ -312,10 +312,11 @@
     related_object: {
       _canonical: {
         "related_objects_as_source": [
-          "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process", "Product",
-          "Project", "System", "Regulation", "Policy", "Contract", "Standard",
-          "Program", "Issue", "Control", "Section", "Clause", "Objective",
-          "Audit", "Assessment", "AccessGroup", "Request", "Document"
+          "DataAsset", "Facility", "Market", "OrgGroup", "Vendor", "Process",
+          "Product", "Project", "System", "Regulation", "Policy", "Contract",
+          "Standard", "Program", "Issue", "Control", "Section", "Clause",
+          "Objective", "Audit", "Assessment", "AssessmentTemplate",
+          "AccessGroup", "Request", "Document"
         ]
       },
       related_objects_as_source: Proxy(
@@ -682,6 +683,8 @@
         null, "source", "Relationship", "destination", "related_sources"),
       related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
       related_assessments: TypeFilter("related_objects", "Assessment"),
+      related_assessment_templates: TypeFilter(
+        'related_objects', 'AssessmentTemplate'),
       related_issues: TypeFilter('related_objects', 'Issue'),
       regulations: TypeFilter('related_objects', 'Regulation'),
       policies: TypeFilter('related_objects', 'Policy'),
