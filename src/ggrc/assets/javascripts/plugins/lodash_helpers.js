@@ -35,6 +35,9 @@
      * @return {Array} - Returns array of splited values
      */
     splitTrim: function (values, splitter, options) {
+      if (!values || !values.length) {
+        return [];
+      }
       if (_.isUndefined(splitter)) {
         splitter = ',';
       }

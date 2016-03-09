@@ -70,4 +70,11 @@ describe('_.splitTrim() method', function () {
       expect(result).toEqual(['a', 'b', 'c', 'd', 'a  b', 'f']);
     });
   });
+
+  describe('Given no value', function () {
+    it('returns empty array', function () {
+      var result = _.splitTrim(undefined);
+      expect(result).toEqual([]);
+    });
+  });
 });
