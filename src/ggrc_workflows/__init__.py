@@ -222,6 +222,24 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group,
   return cycle_task_group_object_task
 
 
+def create_old_style_cycle(cycle, task_group, cycle_task_group, current_user,
+                           base_date):
+  if len(task_group.task_group_objects) == 0:
+    for task_group_task in task_group.task_group_tasks:
+      cycle_task_group_object_task = _create_cycle_task(
+          task_group_task, cycle, cycle_task_group,
+          current_user, base_date)
+
+  for task_group_object in task_group.task_group_objects:
+    object_ = task_group_object.object
+    for task_group_task in task_group.task_group_tasks:
+      cycle_task_group_object_task = _create_cycle_task(
+          task_group_task, cycle, cycle_task_group,
+          current_user, base_date)
+      db.session.add(Relationship(source=cycle_task_group_object_task,
+                                  destination=object_))
+
+
 def build_cycle(cycle, current_user=None, base_date=None):
   if not base_date:
     base_date = date.today()
@@ -257,14 +275,20 @@ def build_cycle(cycle, current_user=None, base_date=None):
         sort_index=task_group.sort_index,
     )
 
-    for task_group_task in task_group.task_group_tasks:
-      cycle_task_group_object_task = _create_cycle_task(
-          task_group_task, cycle, cycle_task_group, current_user, base_date)
+    # preserve the old cycle creation for old workflows, so each object
+    # gets its own cycle task
+    if workflow.is_old_workflow:
+      create_old_style_cycle(cycle, task_group, cycle_task_group, current_user,
+                             base_date)
+    else:
+      for task_group_task in task_group.task_group_tasks:
+        cycle_task_group_object_task = _create_cycle_task(
+            task_group_task, cycle, cycle_task_group, current_user, base_date)
 
-      for task_group_object in task_group.task_group_objects:
-        object_ = task_group_object.object
-        db.session.add(Relationship(source=cycle_task_group_object_task,
-                                    destination=object_))
+        for task_group_object in task_group.task_group_objects:
+          object_ = task_group_object.object
+          db.session.add(Relationship(source=cycle_task_group_object_task,
+                                      destination=object_))
 
   update_cycle_dates(cycle)
 

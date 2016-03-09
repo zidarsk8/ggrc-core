@@ -107,6 +107,12 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
 
   non_adjusted_next_cycle_start_date = db.Column(db.Date, nullable=True)
 
+  # this is an indicator if the workflow exists from before the change where
+  # we deleted cycle objects, which changed how the cycle is created and
+  # how objects are mapped to the cycle tasks
+  is_old_workflow = deferred(
+      db.Column(db.Boolean, default=False, nullable=True), 'Workflow')
+
   @computed_property
   def workflow_state(self):
     return WorkflowState.get_workflow_state(self.cycles)

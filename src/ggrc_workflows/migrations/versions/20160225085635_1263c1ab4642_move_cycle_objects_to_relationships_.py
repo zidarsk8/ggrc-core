@@ -12,6 +12,7 @@ Create Date: 2016-02-25 08:56:35.200703
 """
 
 from alembic import op
+import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '1263c1ab4642'
@@ -19,6 +20,9 @@ down_revision = '4ff4b445852c'
 
 
 def upgrade():
+
+  op.add_column(u'workflows', sa.Column(u'is_old_workflow',
+                                        sa.Boolean(), nullable=True))
 
   # if the cycle object exists, but the related object was deleted it won't
   # be transferred to the relationship table. If this data will still
@@ -46,6 +50,15 @@ def upgrade():
   """
   op.execute(sql)
 
+  # existing workflows will be marked with this bool, so we know that we need
+  # to create new cycles the old way, with a cartesian product between tasks
+  # and objects
+  sql = """
+    UPDATE workflows
+    SET is_old_workflow = 1
+  """
+  op.execute(sql)
+
 
 def downgrade():
-  pass
+  op.drop_column(u'workflows', u'is_old_workflow')
