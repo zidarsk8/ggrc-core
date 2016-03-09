@@ -34,9 +34,17 @@
         data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
         data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
         data-object-params='{
-          "audit_id": {{instance.id}},
+          "audit": {
+            "id": {{instance.id}},
+            "type": "{{json_escape instance.type}}"
+          },
+          "context": {
+            "id": {{instance.context.id}},
+            "type": "{{json_escape instance.context.type}}"
+          },
           "audit_title": "{{json_escape instance.title}}"
-        }'>
+        }'
+        >
         Define Assessment template
       </a>
     </li>

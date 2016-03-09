@@ -28,7 +28,6 @@ def upgrade():
   op.create_table(
       'assessment_templates',
       sa.Column('id', sa.Integer(), nullable=False),
-      sa.Column('audit_id', sa.Integer(), nullable=True),
       sa.Column(
           'template_object_type', sa.String(length=250), nullable=True),
       sa.Column('test_plan_procedure', sa.Boolean(), nullable=False),
@@ -41,8 +40,7 @@ def upgrade():
       sa.Column(
           'context_id', sa.Integer(), sa.ForeignKey('contexts.id')),
 
-      sa.PrimaryKeyConstraint('id'),
-      sa.ForeignKeyConstraint(['audit_id'], ['audits.id'], ),
+      sa.PrimaryKeyConstraint('id')
   )
 
 

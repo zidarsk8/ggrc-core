@@ -1077,7 +1077,8 @@
     is_custom_attributable: false,
 
     attributes: {
-      audit: 'CMS.Models.Audit.stub'
+      audit: 'CMS.Models.Audit.stub',
+      context: 'CMS.Models.Context.stub'
     },
 
     /**

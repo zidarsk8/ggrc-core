@@ -20,9 +20,6 @@ class AssessmentTemplate(Base, Relatable, db.Model):
   """
   __tablename__ = "assessment_templates"
 
-  # the audit related to this assessment template
-  audit_id = db.Column(db.Integer, db.ForeignKey("audits.id"), nullable=True)
-
   # the type of the object under assessment
   template_object_type = db.Column(db.String, nullable=True)
 
@@ -38,7 +35,6 @@ class AssessmentTemplate(Base, Relatable, db.Model):
 
   # REST properties
   _publish_attrs = [
-      'audit_id',
       'template_object_type',
       'test_plan_procedure',
       'procedure_description',

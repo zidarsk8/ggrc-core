@@ -23,6 +23,19 @@
         instance.delay_resolving_save_until($.when(auditDfd, objectDfd));
       }.bind(this));
     },
+    '{CMS.Models.AssessmentTemplate} created': function (model, ev, instance) {
+      var auditDfd;
+
+      if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
+        return;
+      }
+
+      this._after_pending_joins(instance, function () {
+        auditDfd = this._create_relationship(instance,
+            instance.audit, instance.audit.context);
+        instance.delay_resolving_save_until(auditDfd);
+      }.bind(this));
+    },
     '{CMS.Models.Issue} created': function (model, ev, instance) {
       var auditDfd;
       var controlDfd;
