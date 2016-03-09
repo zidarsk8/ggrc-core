@@ -11,3 +11,15 @@
     @include transition(width 0.2s);
   }
 }
+
+.row-fluid {
+  .span-custom2-and-half {
+    width: 19.14894%;
+  }
+  .span-custom1-and-half {
+    width: 10.63830%;
+  }
+  .span-custom0-and-half {
+    width: 3.19149%;
+  }
+}
