@@ -1,8 +1,8 @@
 /*!
  Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- Created By: urban@reciprocitylabs.com
- Maintained By: urban@reciprocitylabs.com
+ Created By: ivan@reciprocitylabs.com
+ Maintained By: ivan@reciprocitylabs.com
  */
 
 (function (can, $) {
@@ -70,6 +70,15 @@
           context: source.context
         }).save();
       },
+<<<<<<< HEAD:src/ggrc/assets/javascripts/components/reuseable_objects.js
+=======
+      /*
+       * Creates an Object Document Relationship  between parent instancere and destination object
+       *
+       * @param {Object} destination - Should have `id` and `type`
+       * @return {Object} - Returns newly created Relationship as jQuery deferred
+       */
+>>>>>>> d8afe37... Fix typo:src/ggrc/assets/javascripts/components/reusable_objects.js
       createEvidenceRelationship: function (destination) {
         var source;
         var dest;

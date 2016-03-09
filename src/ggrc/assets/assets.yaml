@@ -117,7 +117,7 @@ dashboard-js-files:
   - components/mapper.js
   - components/people_list.js
   - components/mapped_tree_view.js
-  - components/relatable.js
+  - components/reusable_objects.js
   - components/paginate.js
   - components/tabs.js
   #- d3.v2.js
@@ -211,7 +211,7 @@ dashboard-js-template-files:
   - assessments/tree_footer.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
-  - assessments/relatable_objects.mustache
+  - assessments/reusable_objects.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache
@@ -345,7 +345,7 @@ dashboard-js-template-files:
   - requests/modal_content.mustache
   - requests/tier2_content.mustache
   - requests/general_info.mustache
-  - requests/relatable_objects.mustache
+  - requests/reusable_objects.mustache
   - base_templates/subtree.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache
