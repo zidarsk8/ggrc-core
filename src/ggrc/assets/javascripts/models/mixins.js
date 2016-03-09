@@ -167,13 +167,13 @@
       var that = this;
       var relatable = $.Deferred();
       var connectionsCount = {};
+      var relatedObjectsDeferreds = [];
       var mappedObjectDeferreds = _.map(relevantTypes, function (rtype) {
         return this.get_binding(rtype.objectBinding).refresh_instances();
       }.bind(this));
 
-      var relatedObjectsDeferreds = [];
       $.when.apply($, mappedObjectDeferreds).done(function () {
-        _.each(arguments, function (mappedObjectInstances) {
+        _.each(_.toArray(arguments), function (mappedObjectInstances) {
           if (!mappedObjectInstances.length) {
             return;
           }
@@ -187,7 +187,7 @@
         });
 
         $.when.apply($, relatedObjectsDeferreds).done(function () {
-          _.each(arguments, function (relatedObjects) {
+          _.each(_.toArray(arguments), function (relatedObjects) {
             _.each(relatedObjects, function (relObj) {
               var type = relObj.binding.instance.type;
               var weight = relevantTypes[type].weight;
