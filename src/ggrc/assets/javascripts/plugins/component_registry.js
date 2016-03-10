@@ -6,10 +6,10 @@
   Maintained By: peter@reciprocitylabs.com
 */
 
-(function (GGRC, can) {
+(function (GGRC, can, _) {
   'use strict';
 
-  if (typeof GGRC.Components === 'function') {
+  if (_.isFunction(GGRC.Components)) {
     return;  // no need to create the component registry again
   }
 
@@ -35,7 +35,7 @@
   function Components(name, config) {
     var constructor;
 
-    if (!name || typeof name !== 'string') {
+    if (!name || !_.isString(name)) {
       throw new Error('Component name must be a nonempty string.');
     }
 
@@ -71,7 +71,7 @@
    * @return {Boolean} - true if the component exists, false false otherwise
    */
   Components.isRegistered = function (name) {
-    return typeof Components._registry[name] !== 'undefined';
+    return !_.isUndefined(Components._registry[name]);
   };
 
   /**
@@ -91,4 +91,4 @@
 
     return Components._registry[name];
   };
-})(window.GGRC = window.GGRC || {}, can);
+})(window.GGRC = window.GGRC || {}, can, _);
