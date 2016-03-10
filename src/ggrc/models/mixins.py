@@ -664,6 +664,13 @@ class CustomAttributable(object):
         CustomAttributeDefinition.definition_type ==
         underscore_from_camelcase(cls.__name__)).all()
 
+  @classmethod
+  def eager_query(cls):
+    query = super(CustomAttributable, cls).eager_query()
+    return query.options(
+        orm.subqueryload('custom_attribute_values')
+    )
+
 
 class TestPlanned(object):
 
