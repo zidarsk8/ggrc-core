@@ -218,34 +218,34 @@
         this.loader = loader;
 
         this.list = new can.Observe.List();
-      }
+      },
 
-    , refresh_stubs: function () {
+      refresh_stubs: function () {
         return this.loader.refresh_stubs(this);
-      }
+      },
 
-    , refresh_instances: function () {
-        return this.loader.refresh_instances(this);
-      }
+      refresh_instances: function (force) {
+        return this.loader.refresh_instances(this, force);
+      },
 
     //  `refresh_count`
     //  - Returns a `can.compute`, which in turn returns the length of
     //    `this.list`
     //  - Attempts to do the minimal work (e.g., loading only stubs, not full
     //    instances) to return an accurate length
-    , refresh_count: function () {
+      refresh_count: function () {
         var self = this;
         return this.refresh_stubs().then(function () {
           return can.compute(function () {
             return self.list.attr("length");
           });
         });
-      }
+      },
 
     //  `refresh_list`
     //  - Returns a list which will *only* ever contain fully loaded / reified
     //    instances
-    , refresh_list: function () {
+      refresh_list: function () {
         var loader = new GGRC.ListLoaders.ReifyingListLoader(this)
           , binding = loader.attach(this.instance)
           , self = this
@@ -257,9 +257,9 @@
         return binding.refresh_instances(this).then(function () {
           return self.refresh_instances();
         });
-      }
+      },
 
-    , refresh_instance: function () {
+      refresh_instance: function () {
         var refresh_queue = new RefreshQueue();
         refresh_queue.enqueue(this.instance);
         return refresh_queue.trigger();
@@ -272,19 +272,19 @@
       }
   }, {
       init: function () {
-      }
+      },
 
-    , attach: function (instance) {
+      attach: function (instance) {
         var binding = this.constructor.binding_factory(instance, this);
         this.init_listeners(binding);
         return binding;
-      }
+      },
 
-    , make_result: function (instance, mappings, binding) {
+      make_result: function (instance, mappings, binding) {
         return new GGRC.ListLoaders.MappingResult(instance, mappings, binding);
-      }
+      },
 
-    , find_result_by_instance: function (result, list) {
+      find_result_by_instance: function (result, list) {
         var i
           , found_result = null;
 
@@ -298,9 +298,9 @@
         }
 
         return found_result;
-      }
+      },
 
-    , is_duplicate_result: function (old_result, new_result) {
+      is_duplicate_result: function (old_result, new_result) {
         var o = old_result
           , n = new_result
           ;
@@ -337,9 +337,9 @@
         }
 
         return false;
-      }
+      },
 
-    , insert_results: function (binding, results) {
+      insert_results: function (binding, results) {
         var self = this
           , all_binding_results = []
           , new_instance_results = []
@@ -414,9 +414,9 @@
         }
 
         return all_binding_results;
-      }
+      },
 
-    , remove_instance: function (binding, instance, mappings) {
+      remove_instance: function (binding, instance, mappings) {
         var indexes_to_remove = [];
 
         if (!(can.isArray(mappings) || mappings instanceof can.Observe.List))
@@ -443,20 +443,20 @@
         can.each(indexes_to_remove.sort(), function (index_to_remove, count) {
           binding.list.splice(index_to_remove - count, 1);
         });
-      }
+      },
 
-    , refresh_stubs: function (binding) {
+      refresh_stubs: function (binding) {
         if (!binding._refresh_stubs_deferred) {
           binding._refresh_stubs_deferred = $.when(this._refresh_stubs(binding));
         }
         return binding._refresh_stubs_deferred
           .then(function () { return binding.list; });
-      }
+      },
 
-    , refresh_instances: function (binding) {
-        if (!binding._refresh_instances_deferred) {
+      refresh_instances: function (binding, force) {
+        if (force || !binding._refresh_instances_deferred) {
           binding._refresh_instances_deferred =
-            $.when(this._refresh_instances(binding));
+            $.when(this._refresh_instances(binding, force));
         }
         return binding._refresh_instances_deferred
           .then(
@@ -467,14 +467,14 @@
               }, 10);
               return this;
             });
-      }
+      },
 
-    , _refresh_instances: function (binding) {
+      _refresh_instances: function (binding, force) {
         return this.refresh_stubs(binding)
           .then(function () {
             var refresh_queue = new RefreshQueue();
             can.each(binding.list, function (result) {
-              refresh_queue.enqueue(result.instance);
+              refresh_queue.enqueue(result.instance, force);
             });
             return refresh_queue.trigger();
           });

@@ -4,16 +4,18 @@
 # Maintained By: miha@reciprocitylabs.com
 
 from integration.ggrc import TestCase
+from datetime import date
+from datetime import datetime
+
 from freezegun import freeze_time
-from datetime import date, datetime
 from mock import patch
 
 from ggrc import db, notifications
 from ggrc.models import Notification, Person
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
-from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 
 class TestOneTimeWfEndDateChange(TestCase):
@@ -49,10 +51,11 @@ class TestOneTimeWfEndDateChange(TestCase):
       return db.session.query(Person).filter(Person.id == person_id).one()
 
     with freeze_time("2015-04-10 03:21:34"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-04-11 03:21:34"):
       user = get_person(self.user.id)
@@ -74,14 +77,13 @@ class TestOneTimeWfEndDateChange(TestCase):
       # one email to owner and one to assigne
       self.assertEqual(mock_mail.call_count, 2)
 
-    with freeze_time("2015-05-04 03:21:34"):  # one day befor due date
+    with freeze_time("2015-05-04 03:21:34"):  # one day before due date
       _, notif_data = notifications.get_todays_notifications()
       user = get_person(self.user.id)
       self.assertIn("due_in", notif_data[user.email])
-      self.assertEqual(len(notif_data[user.email]["due_in"]),
-                       len(self.random_objects))
+      self.assertEqual(len(notif_data[user.email]["due_in"]), 2)
 
-    with freeze_time("2015-05-04 03:21:34"):  # one day befor due date
+    with freeze_time("2015-05-04 03:21:34"):  # one day before due date
       notifications.send_todays_digest_notifications()
       _, notif_data = notifications.get_todays_notifications()
       self.assertEqual(notif_data, {})
@@ -92,8 +94,7 @@ class TestOneTimeWfEndDateChange(TestCase):
     with freeze_time("2015-05-05 03:21:34"):  # due date
       _, notif_data = notifications.get_todays_notifications()
       self.assertIn("due_today", notif_data[user.email])
-      self.assertEqual(len(notif_data[user.email]["due_today"]),
-                       len(self.random_objects))
+      self.assertEqual(len(notif_data[user.email]["due_today"]), 2)
 
   @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_future(self, mock_mail):
@@ -105,10 +106,11 @@ class TestOneTimeWfEndDateChange(TestCase):
       return db.session.query(Person).filter(Person.id == person_id).one()
 
     with freeze_time("2015-04-10 03:21:34"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-04-11 03:21:34"):
       user = get_person(self.user.id)
@@ -175,10 +177,11 @@ class TestOneTimeWfEndDateChange(TestCase):
       return db.session.query(Person).filter(Person.id == person_id).one()
 
     with freeze_time("2015-04-10 03:21:34"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02 03:21:34"):
       notifications.send_todays_digest_notifications()
@@ -218,10 +221,11 @@ class TestOneTimeWfEndDateChange(TestCase):
       return db.session.query(Person).filter(Person.id == person_id).one()
 
     with freeze_time("2015-04-10 03:21:34"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02 03:21:34"):
       notifications.send_todays_digest_notifications()
@@ -286,6 +290,12 @@ class TestOneTimeWfEndDateChange(TestCase):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
+                "contact": person_dict(self.user.id),
+                "start_date": date(2015, 5, 1),  # friday
+                "end_date": date(2015, 5, 5),
+            }, {
+                "title": "task 2",
+                "description": "some task 2",
                 "contact": person_dict(self.user.id),
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),

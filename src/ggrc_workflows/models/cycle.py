@@ -30,8 +30,6 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
       db.Integer, db.ForeignKey('workflows.id'), nullable=False)
   cycle_task_groups = db.relationship(
       'CycleTaskGroup', backref='cycle', cascade='all, delete-orphan')
-  cycle_task_group_objects = db.relationship(
-      'CycleTaskGroupObject', backref='cycle', cascade='all, delete-orphan')
   cycle_task_group_object_tasks = db.relationship(
       'CycleTaskGroupObjectTask', backref='cycle',
       cascade='all, delete-orphan')
@@ -39,13 +37,6 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
       'CycleTaskEntry', backref='cycle', cascade='all, delete-orphan')
   is_current = db.Column(db.Boolean, default=True, nullable=False)
   next_due_date = db.Column(db.Date)
-
-  @property
-  def cycle_task_group_object_objects_for_cache(self):
-    """Changing Cycle state must invalidate `workflow_state` on objects
-    """
-    return [
-        (o.object_type, o.object_id) for o in self.cycle_task_group_objects]
 
   _publish_attrs = [
       'workflow',

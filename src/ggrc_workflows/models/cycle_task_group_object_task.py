@@ -7,10 +7,10 @@
 """
 
 from sqlalchemy import orm
-from sqlalchemy import or_
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from ggrc import db
-from ggrc.models import all_models
+from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Slugged
@@ -19,14 +19,14 @@ from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import WithContact
 from ggrc.models.reflection import PublishOnly
+from ggrc.models.relationship import Relatable
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
-from ggrc_workflows.models.cycle_task_group_object import CycleTaskGroupObject
 
 
 class CycleTaskGroupObjectTask(
-        WithContact, Stateful, Slugged, Timeboxed,
+        WithContact, Stateful, Slugged, Timeboxed, Relatable,
         Described, Titled, Base, db.Model):
   """Cycle task model
   """
@@ -44,8 +44,6 @@ class CycleTaskGroupObjectTask(
       db.Integer, db.ForeignKey('cycles.id'), nullable=False)
   cycle_task_group_id = db.Column(
       db.Integer, db.ForeignKey('cycle_task_groups.id'), nullable=False)
-  cycle_task_group_object_id = db.Column(
-      db.Integer, db.ForeignKey('cycle_task_group_objects.id'), nullable=True)
   task_group_task_id = db.Column(
       db.Integer, db.ForeignKey('task_group_tasks.id'), nullable=False)
   task_group_task = db.relationship(
@@ -65,9 +63,18 @@ class CycleTaskGroupObjectTask(
   finished_date = db.Column(db.DateTime)
   verified_date = db.Column(db.DateTime)
 
+  object_approval = association_proxy('cycle', 'workflow.object_approval')
+  object_approval.publish_raw = True
+
+  @property
+  def cycle_task_objects_for_cache(self):
+    """Changing task state must invalidate `workflow_state` on objects
+    """
+    return [(object_.__class__.__name__, object_.id) for object_ in
+            self.related_objects]
+
   _publish_attrs = [
       'cycle',
-      'cycle_task_group_object',
       'cycle_task_group',
       'task_group_task',
       'cycle_task_entries',
@@ -75,6 +82,7 @@ class CycleTaskGroupObjectTask(
       'task_type',
       'response_options',
       'selected_response_options',
+      PublishOnly('object_approval'),
       PublishOnly('finished_date'),
       PublishOnly('verified_date')
   ]
@@ -113,11 +121,13 @@ class CycleTaskGroupObjectTask(
           "display_name": "Task Type",
           "mandatory": True,
       },
-      "cycle_object": {
-          "display_name": "Cycle Object",
-          "filter_by": "_filter_by_cycle_object",
-      },
   }
+
+  @computed_property
+  def related_objects(self):
+    sources = [r.source for r in self.related_sources]
+    destinations = [r.destination for r in self.related_destinations]
+    return sources + destinations
 
   @classmethod
   def _filter_by_cycle(cls, predicate):
@@ -154,35 +164,6 @@ class CycleTaskGroupObjectTask(
     ).exists()
 
   @classmethod
-  def _filter_by_cycle_object(cls, predicate):
-    """Get query that filters cycle tasks by mapped objects.
-
-    Args:
-      predicate: lambda function that excepts a single parameter and returns
-      true of false.
-
-    Returns:
-      An sqlalchemy query that evaluates to true or false and can be used in
-      filtering cycle tasks by objects mapped to them.
-    """
-    parts = []
-    for model_name in all_models.__all__:
-      model = getattr(all_models, model_name)
-      query = getattr(model, "query", None)
-      field = getattr(model, "slug", getattr(model, "email", None))
-      if query is None or field is None or not hasattr(model, "id"):
-        continue
-      parts.append(query.filter(
-          (CycleTaskGroupObject.object_type == model_name) &
-          (model.id == CycleTaskGroupObject.object_id) &
-          predicate(field)
-      ).exists())
-    return CycleTaskGroupObject.query.filter(
-        (CycleTaskGroupObject.id == cls.cycle_task_group_object_id) &
-        or_(*parts)
-    ).exists()
-
-  @classmethod
   def eager_query(cls):
     """Add cycle task entries to cycle task eager query
 
@@ -197,3 +178,18 @@ class CycleTaskGroupObjectTask(
     return query.options(
         orm.joinedload('cycle_task_entries'),
     )
+
+
+class CycleTaskable(object):
+  """ Requires the Relatable mixin, otherwise cycle_task_group_object_tasks
+  fails to fetch related objects
+  """
+  @computed_property
+  def cycle_task_group_object_tasks(self):
+    """ Lists all the cycle tasks related to a certain object
+    """
+    sources = [r.source for r in self.related_sources
+               if r.source_type == "CycleTaskGroupObjectTask"]
+    destinations = [r.destination for r in self.related_destinations
+                    if r.destination_type == "CycleTaskGroupObjectTask"]
+    return sources + destinations

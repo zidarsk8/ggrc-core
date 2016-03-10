@@ -3,22 +3,27 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
-import bleach
-import ggrc.builder
-import ggrc.services
-import iso8601
 from datetime import datetime
-from ggrc import db
-from ggrc.login import get_current_user_id
-from ggrc.models.reflection import AttributeInfo
-from ggrc.models.types import JsonType
-from ggrc.utils import url_for, view_url_for
+
 from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.properties import RelationshipProperty
 from werkzeug.exceptions import BadRequest
+import iso8601
+import sqlalchemy
+
+from ggrc import db
+from ggrc.login import get_current_user_id
+from ggrc.models.reflection import AttributeInfo
+from ggrc.models.types import JsonType
+from ggrc.utils import url_for
+from ggrc.utils import view_url_for
+import ggrc.builder
+import ggrc.models
+import ggrc.services
 
 """JSON resource state representation handler for gGRC models."""
+
 
 def get_json_builder(obj):
   """Instantiate or retrieve a JSON representation builder for the given
@@ -36,6 +41,7 @@ def get_json_builder(obj):
     setattr(ggrc.builder, cls.__name__, builder)
   return builder
 
+
 def publish_base_properties(obj):
     ret = {}
     self_url = url_for(obj)
@@ -46,22 +52,24 @@ def publish_base_properties(obj):
       ret['viewLink'] = view_url
     return ret
 
+
 def publish(obj, inclusions=(), inclusion_filter=None):
   """Translate ``obj`` into a valid JSON value. Objects with properties are
   translated into a ``dict`` object representing a JSON object while simple
   values are returned unchanged or specially formatted if needed.
   """
   if inclusion_filter is None:
-    inclusion_filter = lambda x: True
+    def inclusion_filter(x):
+      return True
   publisher = get_json_builder(obj)
-  if publisher and hasattr(publisher, '_publish_attrs') \
-      and publisher._publish_attrs:
+  if publisher and getattr(publisher, '_publish_attrs', False):
     ret = publish_base_properties(obj)
     ret.update(publisher.publish_contribution(
-      obj, inclusions, inclusion_filter))
+        obj, inclusions, inclusion_filter))
     return ret
   # Otherwise, just return the value itself by default
   return obj
+
 
 def publish_stub(obj, inclusions=(), inclusion_filter=None):
   publisher = get_json_builder(obj)
@@ -87,8 +95,9 @@ def update(obj, json_obj):
   updater = get_json_builder(obj)
   if updater:
     updater.update(obj, json_obj)
-  #FIXME what to do if no updater??
-  #Nothing, perhaps log, assume omitted by design
+  # FIXME what to do if no updater??
+  # Nothing, perhaps log, assume omitted by design
+
 
 def create(obj, json_obj):
   """Translate the state represented by ``json_obj`` into update actions
@@ -99,6 +108,7 @@ def create(obj, json_obj):
   creator = get_json_builder(obj)
   if creator:
     creator.create(obj, json_obj)
+
 
 class UpdateAttrHandler(object):
   """Performs the translation of a JSON state representation into update
@@ -128,13 +138,12 @@ class UpdateAttrHandler(object):
       method = getattr(cls, class_attr.__class__.__name__)
       value = method(obj, json_obj, attr_name, class_attr)
     if isinstance(value, (set, list)) \
-      and (
-        not hasattr(class_attr, 'property') \
-        or not hasattr(class_attr.property, 'columns') \
-        or not isinstance(
-        class_attr.property.columns[0].type,
-        JsonType
-        )):
+       and (
+           not hasattr(class_attr, 'property') or not
+           hasattr(class_attr.property, 'columns') or not isinstance(
+            class_attr.property.columns[0].type,
+            JsonType)
+    ):
       # SQLAlchemy instrumentation botches up if we replace entire collections
       # It works if we update them with changes
       new_set = set(value)
@@ -147,8 +156,8 @@ class UpdateAttrHandler(object):
         current_user_id = get_current_user_id()
         proxied_attr = coll_class_attr.local_attr
         proxied_property = coll_class_attr.remote_attr
-        proxied_set_map = dict([(getattr(i, proxied_property.key), i)\
-            for i in getattr(obj, proxied_attr.key)])
+        proxied_set_map = dict([(getattr(i, proxied_property.key), i)
+                                for i in getattr(obj, proxied_attr.key)])
         coll_attr = getattr(obj, proxied_attr.key)
         for item in new_set - old_set:
           new_item = coll_class_attr.creator(item)
@@ -199,7 +208,7 @@ class UpdateAttrHandler(object):
       raise BadRequest(
           'Malformed DateTime {0} for parameter {1}. '
           'Error message was: {2}'.format(value, attr_name, e.message)
-          )
+      )
 
   @classmethod
   def Date(cls, obj, json_obj, attr_name, class_attr):
@@ -214,7 +223,7 @@ class UpdateAttrHandler(object):
         raise BadRequest(
             'Malformed Date {0} for parameter {1}. '
             'Error message was: {2}'.format(value, attr_name, e.message)
-            )
+        )
 
   @classmethod
   def query_for(cls, rel_class, json_obj, attr_name, uselist):
@@ -235,7 +244,7 @@ class UpdateAttrHandler(object):
         try:
           # FIXME: Should this be .one() instead of .first() ?
           return db.session.query(rel_class).filter(
-            rel_class.id == rel_obj[u'id']).first()
+              rel_class.id == rel_obj[u'id']).first()
         except(TypeError):
           raise TypeError(''.join(['Failed to convert attribute ', attr_name]))
       return None
@@ -260,7 +269,7 @@ class UpdateAttrHandler(object):
     """Translate the JSON value for an object method decorated as a
     ``property``.
     """
-    #FIXME need a way to decide this. Require link? Use URNs?
+    # FIXME need a way to decide this. Require link? Use URNs?
     #  reflective approaches won't work as this is used for polymorphic
     #  properties
     # rel_class = None
@@ -310,8 +319,6 @@ Result dispatch:
   singles = { (type, id): [<Builder>, ...] }
 """
 
-import sqlalchemy
-import ggrc.models
 
 def build_type_query(type, result_spec):
   model = ggrc.models.get_model(type)
@@ -325,9 +332,9 @@ def build_type_query(type, result_spec):
     type_column = sqlalchemy.case(
         value=mapper.polymorphic_on,
         whens={
-          val: mapper.class_.__name__
+            val: mapper.class_.__name__
             for val, mapper in mapper.polymorphic_map.items()
-          })
+        })
   columns.append(type_column)
   columns_indexes['type'] = 0
   columns.append(model.id)
@@ -406,7 +413,7 @@ def build_stub_union_query(queries):
   else:
     query = db.session.query(
         sqlalchemy.sql.expression.union(
-          *[q for q in type_queries.values()]).alias('union_query'))
+            *[q for q in type_queries.values()]).alias('union_query'))
   return results, type_column_indexes, query
 
 
@@ -418,14 +425,14 @@ def _render_stub_from_match(match, type_columns):
       'id': id,
       'context_id': match[type_columns['context_id']],
       'href': url_for(type, id=id),
-      }
+  }
 
 
 class LazyStubRepresentation(object):
   def __init__(self, type, conditions):
     self.type = type
     if isinstance(conditions, (int, long)):
-      conditions = { 'id': conditions }
+      conditions = {'id': conditions}
     self.conditions = conditions
     self.condition_key, self.condition_val = zip(*sorted(conditions.items()))
 
@@ -437,14 +444,15 @@ class LazyStubRepresentation(object):
 
   def render(self, results, type_columns):
     matches = self.get_matches(results)
-    assert len(matches) <= 1, (results, self.type, self.condition_key, self.condition_val)
+    assert len(matches) <= 1, (results, self.type, self.condition_key,
+                               self.condition_val)
     if len(matches) == 1:
       return _render_stub_from_match(matches[0], type_columns[self.type])
     else:
       return None
 
 
-def walk_representation(obj):
+def walk_representation(obj):  # noqa
   if isinstance(obj, dict):
     for k, v in obj.items():
       if isinstance(v, dict):
@@ -505,10 +513,11 @@ class Builder(AttributeInfo):
 
   def generate_link_object_for_foreign_key(self, id, type, context_id=None):
     """Generate a link object for this object reference."""
-    return {'id': id, 'type': type, 'href': url_for(type, id=id), 'context_id': context_id}
+    return {'id': id, 'type': type, 'href': url_for(type, id=id),
+            'context_id': context_id}
 
   def generate_link_object_for(
-      self, obj, inclusions, include, inclusion_filter):
+          self, obj, inclusions, include, inclusion_filter):
     """Generate a link object for this object. If there are property paths
     to be included specified in the ``inclusions`` parameter, those properties
     will be added to the object representation. If the ``include`` parameter
@@ -517,7 +526,8 @@ class Builder(AttributeInfo):
     if include and ((not inclusion_filter) or inclusion_filter(obj)):
       return publish(obj, inclusions, inclusion_filter)
     result = {
-      'id': obj.id, 'type': type(obj).__name__, 'href': url_for(obj), 'context_id': obj.context_id}
+        'id': obj.id, 'type': type(obj).__name__, 'href': url_for(obj),
+        'context_id': obj.context_id}
     for path in inclusions:
       if type(path) is not str and type(path) is not unicode:
         attr_name, remaining_path = path[0], path[1:]
@@ -528,7 +538,7 @@ class Builder(AttributeInfo):
     return result
 
   def publish_link_collection(
-      self, join_objects, inclusions, include, inclusion_filter):
+          self, join_objects, inclusions, include, inclusion_filter):
     """The ``attr_name`` attribute is a collection of object references;
     translate the collection of object references into a collection of link
     objects for the JSON dictionary representation.
@@ -540,7 +550,7 @@ class Builder(AttributeInfo):
         for o in join_objects if o is not None]
 
   def publish_link(
-      self, obj, attr_name, inclusions, include, inclusion_filter):
+          self, obj, attr_name, inclusions, include, inclusion_filter):
     """The ``attr_name`` attribute is an object reference; translate the object
     reference into a link object for the JSON dictionary representation.
     """
@@ -552,7 +562,8 @@ class Builder(AttributeInfo):
       return None
 
   def publish_association_proxy(
-      self, obj, attr_name, class_attr, inclusions, include, inclusion_filter):
+          self, obj, attr_name, class_attr, inclusions, include,
+          inclusion_filter):
     # `associationproxy` uses another table as a join table, and context
     # filtering must be done on the join table, or information leakage will
     # result.
@@ -573,7 +584,7 @@ class Builder(AttributeInfo):
         target_type = class_attr.value_attr + '_type'
         return [
             LazyStubRepresentation(
-              getattr(o, target_type), getattr(o, target_name))
+                getattr(o, target_type), getattr(o, target_name))
             for o in join_objects]
       else:
         target_mapper = class_attr.remote_attr.property.mapper
@@ -582,18 +593,23 @@ class Builder(AttributeInfo):
           target_attr = class_attr.remote_attr.property.key
           return [
               self.generate_link_object_for(
-                getattr(o, target_attr), inclusions, include, inclusion_filter)
+                  getattr(o, target_attr),
+                  inclusions,
+                  include,
+                  inclusion_filter)
               for o in join_objects]
         else:
-          target_name = list(class_attr.remote_attr.property.local_columns)[0].key
+          target_name = list(
+              class_attr.remote_attr.property.local_columns)[0].key
           target_type = class_attr.remote_attr.property.mapper.class_.__name__
           return [
               LazyStubRepresentation(
-                target_type, getattr(o, target_name))
+                  target_type, getattr(o, target_name))
               for o in join_objects]
 
   def publish_relationship(
-      self, obj, attr_name, class_attr, inclusions, include, inclusion_filter):
+          self, obj, attr_name, class_attr, inclusions, include,
+          inclusion_filter):
     uselist = class_attr.property.uselist
     if uselist:
       join_objects = getattr(obj, attr_name)
@@ -604,7 +620,7 @@ class Builder(AttributeInfo):
           obj, attr_name, inclusions, include, inclusion_filter)
     else:
       if class_attr.property.mapper.class_.__mapper__.polymorphic_on \
-          is not None:
+              is not None:
         target = getattr(obj, attr_name)
         target_type = target.__class__.__name__
       else:
@@ -617,16 +633,20 @@ class Builder(AttributeInfo):
         return None
 
   def publish_attr(
-      self, obj, attr_name, inclusions, include, inclusion_filter):
+          self, obj, attr_name, inclusions, include, inclusion_filter):
     class_attr = getattr(obj.__class__, attr_name)
     if isinstance(class_attr, AssociationProxy):
       if getattr(class_attr, 'publish_raw', False):
-        return getattr(obj, attr_name).copy()
+        published_attr = getattr(obj, attr_name)
+        if hasattr(published_attr, "copy"):
+          return published_attr.copy()
+        else:
+          return published_attr
       else:
         return self.publish_association_proxy(
             obj, attr_name, class_attr, inclusions, include, inclusion_filter)
     elif isinstance(class_attr, InstrumentedAttribute) and \
-         isinstance(class_attr.property, RelationshipProperty):
+            isinstance(class_attr.property, RelationshipProperty):
       return self.publish_relationship(
           obj, attr_name, class_attr, inclusions, include, inclusion_filter)
     elif class_attr.__class__.__name__ == 'property':
@@ -642,7 +662,7 @@ class Builder(AttributeInfo):
       return getattr(obj, attr_name)
 
   def _publish_attrs_for(
-      self, obj, attrs, json_obj, inclusions=[], inclusion_filter=None):
+          self, obj, attrs, json_obj, inclusions=[], inclusion_filter=None):
     for attr in attrs:
       if hasattr(attr, '__call__'):
         attr_name = attr.attr_name

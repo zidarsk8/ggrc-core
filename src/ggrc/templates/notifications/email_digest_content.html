@@ -25,8 +25,12 @@ Maintained By: miha@reciprocitylabs.com
                   {% for task in digest['cycle_started_tasks'].values() %}
                     <li {{ style.list_item() }} >
                       <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
-                        {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
-                      due on {{ task['end_date'] }}
+                        {{ task['title'] }}</a> due on {{ task['end_date'] }}
+                        <ul>
+                        {% for related_object_title in task['related_objects'] %}
+                          <li>{{ "%s" % related_object_title if related_object_title }}</li>
+                        {% endfor %}
+                        </ul>
                     </li>
                   {% endfor %}
                 {% endif %}
@@ -39,7 +43,12 @@ Maintained By: miha@reciprocitylabs.com
                   {% for task in digest['task_declined'].values() %}
                     <li {{ style.list_item() }} >
                       <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
-                      {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }}
+                      {{ task['title'] }}</a>
+                      <ul>
+                      {% for related_object_title in task['related_objects'] %}
+                        <li>{{ "%s" % related_object_title if related_object_title }}</li>
+                      {% endfor %}
+                      </ul>
                     </li>
                   {% endfor %}
                   </ul>
@@ -58,8 +67,12 @@ Maintained By: miha@reciprocitylabs.com
                   {% for task in digest['due_soon'].values() %}
                     <li {{ style.list_item() }} >
                       <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
-                      {{ task['title'] }}</a>{{ " - %s" % task['object_title'] if task['object_title'] }},
-                    due {{ task['fuzzy_due_in'] }}
+                      {{ task['title'] }}</a> due {{ task['fuzzy_due_in'] }}
+                      <ul>
+                      {% for related_object_title in task['related_objects'] %}
+                        <li>{{ "%s" % related_object_title if related_object_title }}</li>
+                      {% endfor %}
+                      </ul>
                     </li>
                   {% endfor %}
                   </ul>

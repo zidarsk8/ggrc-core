@@ -32,67 +32,66 @@ class TestBasicWorkflowActions(TestCase):
     pass
 
   def test_create_workflows(self):
-    _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
-    self.assertIsInstance(wf, Workflow)
+    _, wflow = self.generator.generate_workflow(self.one_time_workflow_1)
+    self.assertIsInstance(wflow, Workflow)
 
     task_groups = db.session.query(TaskGroup)\
-        .filter(TaskGroup.workflow_id == wf.id).all()
+        .filter(TaskGroup.workflow_id == wflow.id).all()
 
     self.assertEqual(len(task_groups),
                      len(self.one_time_workflow_1["task_groups"]))
 
   def test_workflows(self):
     for workflow in self.all_workflows:
-      _, wf = self.generator.generate_workflow(workflow)
-      self.assertIsInstance(wf, Workflow)
+      _, wflow = self.generator.generate_workflow(workflow)
+      self.assertIsInstance(wflow, Workflow)
 
       task_groups = db.session.query(TaskGroup)\
-          .filter(TaskGroup.workflow_id == wf.id).all()
+          .filter(TaskGroup.workflow_id == wflow.id).all()
 
       self.assertEqual(len(task_groups),
                        len(workflow["task_groups"]))
 
   def test_activate_wf(self):
     for workflow in self.all_workflows:
-      _, wf = self.generator.generate_workflow(workflow)
-      response, wf = self.generator.activate_workflow(wf)
+      _, wflow = self.generator.generate_workflow(workflow)
+      response, wflow = self.generator.activate_workflow(wflow)
 
       self.assert200(response)
 
   def test_one_time_workflow_edits(self):
-    _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
+    _, wflow = self.generator.generate_workflow(self.one_time_workflow_1)
 
     wf_dict = {"title": "modified one time wf"}
-    self.generator.modify_workflow(wf, data=wf_dict)
+    self.generator.modify_workflow(wflow, data=wf_dict)
 
-    modified_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+    modified_wf = db.session.query(Workflow).filter(
+        Workflow.id == wflow.id).one()
     self.assertEqual(wf_dict["title"], modified_wf.title)
 
   def test_one_time_wf_activate(self):
-    _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
-    self.generator.generate_cycle(wf)
-    self.generator.activate_workflow(wf)
+    _, wflow = self.generator.generate_workflow(self.one_time_workflow_1)
+    self.generator.generate_cycle(wflow)
+    self.generator.activate_workflow(wflow)
 
-    tasks = [
-        len(tg.get("task_group_tasks", [])) *
-        max(1, len(tg.get("task_group_objects", [])))
-        for tg in self.one_time_workflow_1["task_groups"]
-    ]
+    tasks = [len(tg.get("task_group_tasks", []))
+             for tg in self.one_time_workflow_1["task_groups"]]
 
     cycle_tasks = db.session.query(CycleTaskGroupObjectTask).join(
-        Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
-    active_wf = db.session.query(Workflow).filter(Workflow.id == wf.id).one()
+        Cycle).join(Workflow).filter(Workflow.id == wflow.id).all()
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.id == wflow.id).one()
 
     self.assertEqual(sum(tasks), len(cycle_tasks))
     self.assertEqual(active_wf.status, "Active")
 
   def test_one_time_wf_state_transition_dates(self):
-    _, wf = self.generator.generate_workflow(self.one_time_workflow_1)
-    self.generator.generate_cycle(wf)
-    self.generator.activate_workflow(wf)
+    _, wflow = self.generator.generate_workflow(self.one_time_workflow_1)
+    self.generator.generate_cycle(wflow)
+    self.generator.activate_workflow(wflow)
 
     cycle_tasks = db.session.query(CycleTaskGroupObjectTask).join(
-        Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
+        Cycle).join(Workflow).filter(Workflow.id == wflow.id).all()
     with freeze_time("2015-6-9 13:00:00"):
       today = datetime.now()
       transitions = [
@@ -221,31 +220,32 @@ class TestBasicWorkflowActions(TestCase):
     self.one_time_workflow_2 = {
         "title": "test_wf_title",
         "description": "some test workflow",
-        "task_groups": [{
-            "title": "tg_1",
-            "task_group_tasks": [{}, {}, {}]
-        },
-            {"title": "tg_2",
-             "task_group_tasks": [{
-                 "description": self.generator.random_str(100)
-             },
-                 {}
-             ],
-             "task_group_objects": self.random_objects[:2]
-             },
-            {"title": "tg_3",
-             "task_group_tasks": [{
-                 "title": "simple task 1",
-                 "description": self.generator.random_str(100)
-             }, {
-                 "title": self.generator.random_str(),
-                 "description": self.generator.random_str(100)
-             }, {
-                 "title": self.generator.random_str(),
-                 "description": self.generator.random_str(100)
-             }],
-             "task_group_objects": []
-             }
+        "task_groups": [
+            {
+                "title": "tg_1",
+                "task_group_tasks": [{}, {}, {}]
+            },
+            {
+                "title": "tg_2",
+                "task_group_tasks": [{
+                    "description": self.generator.random_str(100)
+                }, {}],
+                "task_group_objects": self.random_objects[:2]
+            },
+            {
+                "title": "tg_3",
+                "task_group_tasks": [{
+                    "title": "simple task 1",
+                    "description": self.generator.random_str(100)
+                }, {
+                    "title": self.generator.random_str(),
+                    "description": self.generator.random_str(100)
+                }, {
+                    "title": self.generator.random_str(),
+                    "description": self.generator.random_str(100)
+                }],
+                "task_group_objects": []
+            }
         ]
     }
 
@@ -254,29 +254,29 @@ class TestBasicWorkflowActions(TestCase):
         "description": "start this many a time",
         "frequency": "monthly",
         "task_groups": [
-            {"title": "tg_2",
-             "task_group_tasks": [{
-                 "description": self.generator.random_str(100),
-                 "relative_end_day": 1,
-                 "relative_end_month": None,
-                 "relative_start_day": 5,
-                 "relative_start_month": None,
-             },
-                 {"title": "monday task",
-                  "relative_end_day": 1,
-                  "relative_end_month": None,
-                  "relative_start_day": 1,
-                  "relative_start_month": None,
-                  },
-                 {"title": "weekend task",
-                  "relative_end_day": 4,
-                  "relative_end_month": None,
-                  "relative_start_day": 1,
-                  "relative_start_month": None,
-                  },
-             ],
+            {
+                "title": "tg_2",
+                "task_group_tasks": [{
+                     "description": self.generator.random_str(100),
+                     "relative_end_day": 1,
+                     "relative_end_month": None,
+                     "relative_start_day": 5,
+                     "relative_start_month": None,
+                }, {
+                    "title": "monday task",
+                    "relative_end_day": 1,
+                    "relative_end_month": None,
+                    "relative_start_day": 1,
+                    "relative_start_month": None,
+                }, {
+                    "title": "weekend task",
+                    "relative_end_day": 4,
+                    "relative_end_month": None,
+                    "relative_start_day": 1,
+                    "relative_start_month": None,
+                }],
                 "task_group_objects": self.random_objects
-             },
+            },
         ]
     }
     self.all_workflows = [

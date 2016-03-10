@@ -53,7 +53,7 @@ def register_listeners():
     handle_cycle_task_group_object_task_put(obj)
 
   @Resource.model_put.connect_via(Cycle)
-  def cycle_post_listener(sender, obj=None, src=None, service=None):
+  def cycle_put_listener(sender, obj=None, src=None, service=None):
     handle_cycle_modify(sender, obj, src, service)
 
   @Resource.model_posted.connect_via(Cycle)
@@ -153,7 +153,7 @@ Task and cycle_task have the following structure:
 
   task = {
       "title": title,
-      "object_title": object title or "",
+      "object_titles": list of object titles for all related objects
       "end_date": end date in MM/DD/YYYY format
       "fuzzy_due_in": "today" or "in 1 day"... "in 5 days", "in 1 week" etc.,
       "cycle_task_url" ""

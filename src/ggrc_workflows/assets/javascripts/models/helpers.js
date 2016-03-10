@@ -36,7 +36,6 @@ can.Observe("CMS.ModelHelpers.CycleTask", {
         start_date: that.cycle.reify().start_date,
         end_date: that.cycle.reify().end_date,
         task_group_task: task_group_task,
-        cycle_task_group_object: that.cycle_task_group_object,
         sort_index: that.sort_index,
         title: that.title,
         description: that.description,

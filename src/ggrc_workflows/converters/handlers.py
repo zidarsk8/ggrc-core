@@ -382,16 +382,6 @@ class ExportOnlyColumnHandler(handlers.ColumnHandler):
     pass
 
 
-class CycleObjectColumnHandler(ExportOnlyColumnHandler):
-
-  def get_value(self):
-    obj = self.row_converter.obj.cycle_task_group_object
-    if not obj or not obj.object:
-      return ""
-    return "{}: {}".format(obj.object._inflector.human_singular.title(),
-                           obj.object.slug)
-
-
 class CycleWorkflowColumnHandler(ExportOnlyColumnHandler):
 
   def get_value(self):
@@ -425,7 +415,6 @@ class TaskDescriptionColumnHandler(handlers.TextareaColumnHandler):
 
 COLUMN_HANDLERS = {
     "cycle": CycleColumnHandler,
-    "cycle_object": CycleObjectColumnHandler,
     "cycle_task_group": CycleTaskGroupColumnHandler,
     "cycle_workflow": CycleWorkflowColumnHandler,
     "frequency": FrequencyColumnHandler,

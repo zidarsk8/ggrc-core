@@ -3,11 +3,11 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from ggrc import db
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declared_attr
-from ggrc.models.mixins import deferred, Mapping, Timeboxed
+from ggrc.models.mixins import Mapping
+from ggrc.models.mixins import Timeboxed
 from ggrc.models.reflection import PublishOnly
 
 
@@ -39,14 +39,13 @@ class TaskGroupObject(Timeboxed, Mapping, db.Model):
     return (
         db.UniqueConstraint('task_group_id', 'object_id', 'object_type'),
         db.Index('ix_task_group_id', 'task_group_id'),
-        )
+    )
 
   _publish_attrs = [
       'task_group',
       'object',
-      ]
-  _sanitize_html = [
-      ]
+  ]
+  _sanitize_html = []
 
   @classmethod
   def eager_query(cls):
@@ -62,7 +61,7 @@ class TaskGroupObject(Timeboxed, Mapping, db.Model):
   def copy(self, _other=None, **kwargs):
     columns = [
         'task_group', 'object_id', 'object_type'
-        ]
+    ]
     target = self.copy_into(_other, columns, **kwargs)
     return target
 
@@ -76,28 +75,25 @@ class TaskGroupable(object):
           creator=lambda task_group: TaskGroupObject(
               task_group=task_group,
               object_type=cls.__name__,
-              )
           )
+      )
       joinstr = 'and_(foreign(TaskGroupObject.object_id) == {type}.id, '\
-                     'foreign(TaskGroupObject.object_type) == "{type}")'
+                'foreign(TaskGroupObject.object_type) == "{type}")'
       joinstr = joinstr.format(type=cls.__name__)
       return db.relationship(
           'TaskGroupObject',
           primaryjoin=joinstr,
           backref='{0}_object'.format(cls.__name__),
           cascade='all, delete-orphan',
-          #post_update=True
-          )
+      )
     cls.task_group_objects = make_task_group_objects(cls)
 
   _publish_attrs = [
       PublishOnly('task_groups'),
       'task_group_objects',
-      ]
+  ]
 
-  _include_links = [
-      #'task_group_objects',
-      ]
+  _include_links = []
 
   @classmethod
   def eager_query(cls):

@@ -3,18 +3,16 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from sqlalchemy import and_
-
 from ggrc import db
+from ggrc.models.relationship import Relationship
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroup
-from ggrc_workflows.models import CycleTaskGroupObject
 from ggrc_workflows.models import CycleTaskGroupObjectTask as CycleTask
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupObject
 from ggrc_workflows.models import TaskGroupTask
-from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
 from ggrc_workflows.models import Workflow
+from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
 
 
 def tg_task(object_type, related_type, related_ids):
@@ -147,23 +145,6 @@ def ctg_ctgot(object_type, related_type, related_ids):
         CycleTask.cycle_task_group_id.in_(related_ids))
 
 
-def ctgot_ctgo(object_type, related_type, related_ids):
-  """ relationships between Cycle Task and Cycle Task Objects """
-  if object_type == "CycleTaskGroupObjectTask":
-    return db.session.query(CycleTask.id).join(CycleTaskGroupObject).filter(
-        and_(
-            CycleTaskGroupObject.object_type == related_type,
-            CycleTaskGroupObject.object_id.in_(related_ids)
-        ))
-  else:
-    return db.session.query(CycleTaskGroupObject.object_id).join(CycleTask)\
-        .filter(
-            and_(
-                CycleTask.id.in_(related_ids),
-                CycleTaskGroupObject.object_type == object_type
-            ))
-
-
 def ctg_ctgo(object_type, related_type, related_ids):
   """ Indirect relationship helper between Cycle Task Groups and Objects
 
@@ -178,50 +159,103 @@ def ctg_ctgo(object_type, related_type, related_ids):
       are indirectly related to one of the related objects.
   """
   if object_type == "CycleTaskGroup":
-    return db.session.query(CycleTaskGroupObject.cycle_task_group_id).filter(
-        and_(
-            CycleTaskGroupObject.object_type == related_type,
-            CycleTaskGroupObject.object_id.in_(related_ids)
-        ))
+    join_by_source_id = db.session.query(CycleTask.cycle_task_group_id) \
+        .join(Relationship, CycleTask.id == Relationship.source_id) \
+        .filter(
+            Relationship.source_type == "CycleTaskGroupObjectTask",
+            Relationship.destination_type == related_type,
+            Relationship.destination_id.in_(related_ids))
+    join_by_destination_id = db.session.query(CycleTask.cycle_task_group_id) \
+        .join(Relationship, CycleTask.id == Relationship.destination_id) \
+        .filter(
+            Relationship.destination_type == "CycleTaskGroupObjectTask",
+            Relationship.source_type == related_type,
+            Relationship.source_id.in_(related_ids))
+    return join_by_source_id.union(join_by_destination_id)
   else:
-    return db.session.query(CycleTaskGroupObject.object_id).filter(
-        and_(
-            CycleTaskGroupObject.cycle_task_group_id.in_(related_ids),
-            CycleTaskGroupObject.object_type == object_type
-        ))
+    join_by_source_id = db.session.query(Relationship.destination_id) \
+        .join(CycleTask, CycleTask.id == Relationship.source_id) \
+        .filter(
+            CycleTask.cycle_task_group_id.in_(related_ids),
+            Relationship.source_type == "CycleTaskGroupObjectTask",
+            Relationship.destination_type == object_type)
+    join_by_destination_id = db.session.query(Relationship.source_id) \
+        .join(CycleTask, CycleTask.id == Relationship.destination_id) \
+        .filter(
+            CycleTask.cycle_task_group_id.in_(related_ids),
+            Relationship.destination_type == "CycleTaskGroupObjectTask",
+            Relationship.source_type == object_type)
+    return join_by_source_id.union(join_by_destination_id)
 
 
 def cycle_ctgo(object_type, related_type, related_ids):
-  """ indirect relationships between Cycles and Cycle Task Objects """
+  """ indirect relationships between Cycles and Objects mapped to CycleTask """
   if object_type == "Cycle":
-    return db.session.query(CycleTaskGroupObject.cycle_id).filter(
-        and_(
-            CycleTaskGroupObject.object_type == related_type,
-            CycleTaskGroupObject.object_id.in_(related_ids)
-        ))
+    join_by_source_id = db.session.query(CycleTask.cycle_id) \
+        .join(Relationship, CycleTask.id == Relationship.source_id) \
+        .filter(
+            Relationship.source_type == "CycleTaskGroupObjectTask",
+            Relationship.destination_type == related_type,
+            Relationship.destination_id.in_(related_ids))
+    join_by_destination_id = db.session.query(CycleTask.cycle_id) \
+        .join(Relationship, CycleTask.id == Relationship.destination_id) \
+        .filter(
+            Relationship.destination_type == "CycleTaskGroupObjectTask",
+            Relationship.source_type == related_type,
+            Relationship.source_id.in_(related_ids))
+    return join_by_source_id.union(join_by_destination_id)
   else:
-    return db.session.query(CycleTaskGroupObject.object_id).filter(
-        and_(
-            CycleTaskGroupObject.cycle_id.in_(related_ids),
-            CycleTaskGroupObject.object_type == object_type
-        ))
+    join_by_source_id = db.session.query(Relationship.destination_id) \
+        .join(CycleTask, CycleTask.id == Relationship.source_id) \
+        .filter(
+            CycleTask.cycle_id.in_(related_ids),
+            Relationship.source_type == "CycleTaskGroupObjectTask",
+            Relationship.destination_type == object_type)
+    join_by_destination_id = db.session.query(Relationship.source_id) \
+        .join(CycleTask, CycleTask.id == Relationship.destination_id) \
+        .filter(
+            CycleTask.cycle_id.in_(related_ids),
+            Relationship.destination_type == "CycleTaskGroupObjectTask",
+            Relationship.source_type == object_type)
+    return join_by_source_id.union(join_by_destination_id)
 
 
 def wf_ctgo(object_type, related_type, related_ids):
-  """ indirect relationships between Workflows and Cycle Task Objects """
+  """ indirect relationships between Workflows and Objects mapped to the
+      Tasks in the Workflow.
+  """
   if object_type == "Workflow":
-    return db.session.query(Workflow.id).join(Cycle, CycleTaskGroupObject)\
-        .filter(and_(
-            CycleTaskGroupObject.object_type == related_type,
-            CycleTaskGroupObject.object_id.in_(related_ids)
-        ))
+    join_by_source_id = db.session.query(Workflow.id).join(
+        Cycle, CycleTaskGroup, CycleTask) \
+        .join(Relationship, CycleTask.id == Relationship.source_id) \
+        .filter(
+            Relationship.source_type == "CycleTaskGroupObjectTask",
+            Relationship.destination_type == related_type,
+            Relationship.destination_id.in_(related_ids))
+    join_by_destination_id = db.session.query(Workflow.id).join(
+        Cycle, CycleTaskGroup, CycleTask) \
+        .join(Relationship, CycleTask.id == Relationship.destination_id) \
+        .filter(
+            Relationship.destination_type == "CycleTaskGroupObjectTask",
+            Relationship.source_type == related_type,
+            Relationship.source_id.in_(related_ids))
+    return join_by_source_id.union(join_by_destination_id)
   else:
-    return db.session.query(CycleTaskGroupObject.object_id)\
-        .join(Cycle, Workflow).filter(and_(
+    join_by_source_id = db.session.query(Relationship.destination_id) \
+        .join(CycleTask, CycleTask.id == Relationship.source_id) \
+        .join(Cycle, Workflow) \
+        .filter(
             Workflow.id.in_(related_ids),
-            CycleTaskGroupObject.object_type == object_type
-        ))
-
+            Relationship.source_type == "CycleTaskGroupObjectTask",
+            Relationship.destination_type == object_type)
+    join_by_destination_id = db.session.query(Relationship.source_id) \
+        .join(CycleTask, CycleTask.id == Relationship.destination_id) \
+        .join(Cycle, Workflow) \
+        .filter(
+            Workflow.id.in_(related_ids),
+            Relationship.destination_type == "CycleTaskGroupObjectTask",
+            Relationship.source_type == object_type)
+    return join_by_source_id.union(join_by_destination_id)
 
 _function_map = {
     ("Cycle", "CycleTaskGroup"): cycle_ctg,
@@ -235,14 +269,13 @@ _function_map = {
     ("TaskGroupTask", "Workflow"): workflow_tgt,
 }
 
-# add mappings for cycle tasks and cycle task objects
 for wot in WORKFLOW_OBJECT_TYPES:
-  for f, obj in [(ctgot_ctgo, "CycleTaskGroupObjectTask"),
-                 (ctg_ctgo, "CycleTaskGroup"),
-                 (cycle_ctgo, "Cycle"),
-                 (wf_ctgo, "Workflow"),
-                 (tg_tgo, "TaskGroup"),
-                 (task_tgo, "TaskGroupTask")]:
+  for f, obj in [
+          (ctg_ctgo, "CycleTaskGroup"),
+          (cycle_ctgo, "Cycle"),
+          (wf_ctgo, "Workflow"),
+          (tg_tgo, "TaskGroup"),
+          (task_tgo, "TaskGroupTask")]:
     key = tuple(sorted([obj, wot]))
     _function_map[key] = f
 

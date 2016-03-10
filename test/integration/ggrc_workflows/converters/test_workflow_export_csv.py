@@ -58,7 +58,6 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Cycle,", response.data)
     self.assertIn("Cycle Task Group,", response.data)
     self.assertIn("Cycle Task Group Object Task,", response.data)
-    self.assertIn("Cycle Object,", response.data)
 
 
 class TestExportMultipleObjects(TestCase):
@@ -219,7 +218,7 @@ class TestExportMultipleObjects(TestCase):
             },
             "fields": "all",
         }, {
-            # Task mapped to any of the two task groups, 11 tasks
+            # Task mapped to any of the two task groups, 3 tasks
             "object_name": "CycleTaskGroupObjectTask",
             "filters": {
                 "expression": {
@@ -243,10 +242,10 @@ class TestExportMultipleObjects(TestCase):
     ]
     response = self.export_csv(data).data
     self.assertEqual(3, response.count("wf-1"))  # 2 for cycles and 1 for wf
-    # 3rd block = 2, 5th block = 11, 6th block = 2.
-    self.assertEqual(15, response.count("CYCLEGROUP-"))
-    self.assertEqual(17, response.count("CYCLE-"))
-    self.assertEqual(11, response.count("CYCLETASK-"))
+    # 3rd block = 2, 5th block = 3, 6th block = 2.
+    self.assertEqual(7, response.count("CYCLEGROUP-"))
+    self.assertEqual(9, response.count("CYCLE-"))
+    self.assertEqual(3, response.count("CYCLETASK-"))
 
   def test_cycle_taks_objects(self):
     """ test cycle task and various objects """
@@ -275,8 +274,7 @@ class TestExportMultipleObjects(TestCase):
     ]
     response = self.export_csv(data).data
     self.assertEqual(2, response.count("CYCLETASK-"))
-    self.assertEqual(2, response.count("Policy: p1"))
-    self.assertIn(",p1,", response)
+    self.assertEqual(3, response.count(",p1,"))
 
   def test_workflow_no_access_users(self):
     """ test export of No Access users """
@@ -319,11 +317,14 @@ class TestExportMultipleObjects(TestCase):
 
     wf = Workflow.query.filter_by(slug="wf-1").first()
     cycle = wf.cycles[0]
-    cycle_tasks = [
-        cycle_task
-        for cycle_task in cycle.cycle_task_group_object_tasks
-        if cycle_task.cycle_task_group_object.object.slug == "p1"
-    ]
+    cycle_tasks = []
+    for cycle_task in cycle.cycle_task_group_object_tasks:
+        is_related = False
+        for related_object in cycle_task.related_objects:
+            if related_object.slug == "p1":
+                is_related = True
+        if is_related:
+            cycle_tasks.append(cycle_task)
 
     cycle_task_groups = list({cycle_task.cycle_task_group
                              for cycle_task in cycle_tasks})

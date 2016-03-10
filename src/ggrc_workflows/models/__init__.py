@@ -15,7 +15,6 @@ from .workflow_person import WorkflowPerson
 from .cycle import Cycle
 from .cycle_task_entry import CycleTaskEntry
 from .cycle_task_group import CycleTaskGroup
-from .cycle_task_group_object import CycleTaskGroupObject
 from .cycle_task_group_object_task import CycleTaskGroupObjectTask
 
 
@@ -28,7 +27,6 @@ register_model(WorkflowPerson)
 register_model(Cycle)
 register_model(CycleTaskEntry)
 register_model(CycleTaskGroup)
-register_model(CycleTaskGroupObject)
 register_model(CycleTaskGroupObjectTask)
 
 WORKFLOW_OBJECT_TYPES = {
