@@ -120,6 +120,7 @@ dashboard-js-files:
   - components/reusable_objects.js
   - components/paginate.js
   - components/tabs.js
+  - components/assessment_attributes.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -212,6 +213,10 @@ dashboard-js-template-files:
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
   - assessments/reusable_objects.mustache
+  - assessment_templates/attribute_field.mustache
+  - assessment_templates/attribute_add_field.mustache
+  - assessment_templates/modal_content.mustache
+  - assessment_templates/info.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache

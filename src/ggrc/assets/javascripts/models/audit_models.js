@@ -1088,4 +1088,153 @@
         'related_objects_as_destination', this.audit.program);
     }
   });
+
+  /**
+   * A model describing a template for the newly created Assessment objects.
+   *
+   * This is useful when creating multiple similar Assessment objects. Using an
+   * AssessmentTemplate helps avoiding repeatedly defining the same set of
+   * Assessment object properties for each new instance.
+   */
+  can.Model.Cacheable('CMS.Models.AssessmentTemplate', {
+    root_object: 'assessment_template',
+    root_collection: 'assessment_templates',
+    model_singular: 'AssessmentTemplate',
+    model_plural: 'AssessmentTemplates',
+    title_singular: 'AssessmentTemplate',
+    title_plural: 'AssessmentTemplates',
+    table_singular: 'assessment_template',
+    table_plural: 'assessment_templates',
+
+    findOne: 'GET /api/assessment_templates/{id}',
+    findAll: 'GET /api/assessment_templates',
+    update: 'PUT /api/assessment_templates/{id}',
+    destroy: 'DELETE /api/assessment_templates/{id}',
+    create: 'POST /api/assessment_templates',
+
+    is_custom_attributable: false,
+
+    attributes: {
+      audit: 'CMS.Models.Audit.stub',
+      context: 'CMS.Models.Context.stub'
+    },
+
+    /**
+     * Initialize the newly created object instance. Essentially just validate
+     * that its title is non-blank.
+     */
+    init: function () {
+      this._super.apply(this, arguments);
+    }
+  }, {
+    // the object types that are not relevant to the AssessmentTemplate,
+    // i.e. it does not really make sense to assess them
+    _NON_RELEVANT_OBJ_TYPES: Object.freeze({
+      Assessment: true,
+      Audit: true,
+      CycleTaskGroupObjectTask: true,
+      Request: true,
+      TaskGroup: true,
+      TaskGroupTask: true,
+      Workflow: true
+    }),
+
+    // TODO: docstring, tests
+    // isNewObject: boolean (true if creating new object)
+    form_preload: function (isNewObject) {
+      this.attr('_objectTypes', this._choosableObjectTypes());
+    },
+
+    /**
+     * Save the model instance by sending a POST/PUT request to the server
+     *
+     * @return {can.Deferred} - a deferred object resolved or rejected
+     *   depending on the outcome of the undrelying API request
+     */
+    save: function () {
+      this.attr('test_plan_procedure', !!this.attr('test_plan_procedure'));
+      this.attr('default_people', this._packPeopleData());
+
+      return this._super.apply(this, arguments);
+    },
+
+    /**
+     * Pack the "default people" form data into a JSON string.
+     *
+     * @return {String} - the JSON-packed default people data
+     */
+    _packPeopleData: function () {
+      var data = {};
+
+      /**
+       * Convert a comma-separated list of people to an Array.
+       *
+       * The list elements have any redundant whitespace trimmed from the
+       * beginning and the end. Empty elements are discared from the result,
+       * as are any duplicates.
+       *
+       * @param {String} rawString - the string to convert
+       * @return {Array} - the JSON-packed default people data
+       */
+      function makeList(rawString) {
+        var result = rawString.split(',');
+        result = _.map(result, function (item) {
+          return item.trim();
+        });
+        return _.uniq(_.filter(result));
+      }
+
+      data.assessors = this.attr('default_assessors');
+      data.verifiers = this.attr('default_verifiers');
+
+      if (data.assessors === 'other') {
+        data.assessors = makeList(this.attr('assessors_list'));
+      }
+
+      if (data.verifiers === 'other') {
+        data.verifiers = makeList(this.attr('verifiers_list'));
+      }
+
+      return JSON.stringify(data);
+    },
+
+    /**
+     * Return the object types that can be assessed.
+     *
+     * Used to populate the "Objects under assessment" dropdown on the modal
+     * AssessmentTemplate's modal form.
+     *
+     * @return {Object} - the "assessable" object types
+     */
+    _choosableObjectTypes: function () {
+      var ignoreTypes = this._NON_RELEVANT_OBJ_TYPES;
+      var mapper;
+      var MapperModel = GGRC.Models.MapperModel;
+      var objectTypes;
+
+      mapper = new MapperModel({
+        object: 'MultitypeSearch',
+        search_only: true
+      });
+      objectTypes = mapper.types();
+
+      // the all objects group is not needed
+      delete objectTypes.all_objects;
+
+      // remove ignored types and sort the rest
+      _.each(objectTypes, function (objGroup) {
+        objGroup.items = _.filter(objGroup.items, function (item) {
+          return !ignoreTypes[item.value];
+        });
+        objGroup.items = _.sortBy(objGroup.items, 'name');
+      });
+
+      // remove the groups that have ended up being empty
+      objectTypes = _.pick(objectTypes, function (objGroup) {
+        return objGroup.items.length > 0;
+      });
+
+      return objectTypes;
+    }
+  });
 })(this.can);

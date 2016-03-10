@@ -8,7 +8,7 @@
 (function (GGRC, _) {
   var base_widgets_by_type = {
     AccessGroup: 'Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor',
-    Audit: 'Control Assessment Issue Person Program Request Regulation Policy Standard Contract Section Clause Objective',
+    Audit: 'Control Assessment AssessmentTemplate Issue Person Program Request Regulation Policy Standard Contract Section Clause Objective',
     Clause: 'AccessGroup Audit Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor',
     Contract: 'AccessGroup Audit Clause Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Process Product Program Project Request Section System Vendor',
     Control: 'AccessGroup Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Request Section Standard System Vendor',
