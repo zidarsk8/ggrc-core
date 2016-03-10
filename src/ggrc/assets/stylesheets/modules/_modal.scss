@@ -776,20 +776,50 @@
 }
 
 // Mockups Assessment Page V1.0
-#AssessmentDefineTemplate {
+.note {
+  font-size: $f-medium;
+}
+.workflow-accordion {
+  .accordion-group {
+    @include border-radius(0);
+    border: none;
+    border-bottom: 1px solid $footerBorder;
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  .accordion-heading {
+    .accordion-toggle  {
+      padding: 4px 0;
+      font-weight: bold;
+    }
+  }
+  .accordion-inner {
+    border-top: none;
+    padding-left: 19px;
+    button {
+      border: none;
+      background: none;
+      padding: 0;
+      i {
+        margin-top: 5px;
+      }
+      &:focus,
+      &:active {
+        outline: 0;
+      }
+    }
+    .workflow-repeat {
+      float: left;
+      line-height: 26px;
+      margin-right: 4px;
+    }
+  }
+}
+
+.define-attr {
   .hidden-fields-area {
     padding-left: 0;
-  }
-  .custom-attr-table {
-    select {
-      width: 100px;
-    }
-    input[type="text"] {
-      width: 150px;
-    }
-    h6 {
-      font-size: 9px;
-    }
   }
 }
 

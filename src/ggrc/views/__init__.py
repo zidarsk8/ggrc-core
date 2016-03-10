@@ -8,6 +8,7 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
 
 import json
+
 from flask import flash
 from flask import g
 from flask import render_template
@@ -45,7 +46,6 @@ from ggrc.views.registry import object_view
 
 
 # Needs to be secured as we are removing @login_required
-
 
 @app.route("/_background_tasks/reindex", methods=["POST"])
 @queued_task
@@ -258,6 +258,7 @@ def contributed_object_views():
       object_view(models.Section),
       object_view(models.Control),
       object_view(models.Assessment),
+      object_view(models.AssessmentTemplate),
       object_view(models.Objective),
       object_view(models.System),
       object_view(models.Process),

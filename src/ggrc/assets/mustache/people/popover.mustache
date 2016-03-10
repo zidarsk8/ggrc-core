@@ -20,7 +20,7 @@
   {{/if}}
   {{#if_equals system_wide_role 'No Access'}}
     <span class="user-disabled">
-      (No Access)
+      (Inactive user)
     </span>
   {{/if}}
   <div class="custom-popover-content">
@@ -32,7 +32,7 @@
               <li><h4>{{firstnonempty name email}}
                 {{#if_equals system_wide_role 'No Access'}}
                   <span class="user-disabled">
-                    (No Access)
+                    (Inactive user)
                   </span>
                 {{/if}}
               </h4></li>

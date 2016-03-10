@@ -10,6 +10,7 @@ import sys
 from ggrc.models import inflector
 from ggrc.models.access_group import AccessGroup
 from ggrc.models.assessment import Assessment
+from ggrc.models.assessment_template import AssessmentTemplate
 from ggrc.models.audit import Audit
 from ggrc.models.audit_object import AuditObject
 from ggrc.models.background_task import BackgroundTask
@@ -65,6 +66,8 @@ from ggrc.models.vendor import Vendor
 
 all_models = [
     AccessGroup,
+    Assessment,
+    AssessmentTemplate,
     Audit,
     AuditObject,
     Categorization,
@@ -73,7 +76,6 @@ all_models = [
     ControlAssertion,
     Context,
     Control,
-    Assessment,
     Comment,
     CustomAttributeDefinition,
     CustomAttributeValue,
