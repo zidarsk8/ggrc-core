@@ -29,6 +29,7 @@ def all_cache_entries():
       resource('contexts', 'Context'),
       resource('controls', 'Control'),
       resource('assessments', 'Assessments'),
+      resource('assessment_templates', 'AssessmentTemplate'),
       resource('data_assets', 'DataAsset'),
       resource('directives', 'Directive'),
       resource('contracts', 'Contract'),

@@ -1,7 +1,12 @@
-# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
+
+"""A module with configuration of the ProgramAuditOwner role's permissions."""
+
+# pylint: disable=invalid-name
+
 
 scope = "Audit Implied"
 description = """
@@ -12,6 +17,7 @@ permissions = {
     "read": [
         "Request",
         "Assessment",
+        "AssessmentTemplate",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -31,6 +37,7 @@ permissions = {
     "create": [
         "Request",
         "Assessment",
+        "AssessmentTemplate",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -53,6 +60,7 @@ permissions = {
     "update": [
         "Request",
         "Assessment",
+        "AssessmentTemplate",
         "Issue",
         "DocumentationResponse",
         "InterviewResponse",
@@ -72,6 +80,7 @@ permissions = {
         "UserRole",
         "Request",
         "Assessment",
+        "AssessmentTemplate",
         "Issue",
         "ObjectControl",
         "ObjectDocument",
