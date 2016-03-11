@@ -16,16 +16,19 @@ down_revision = '1019280358f0'
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.sql import table, column
-from ggrc.models.track_object_state import ObjectStates, ObjectStateTables
+from ggrc.models.track_object_state import ObjectStates
+from ggrc.models.track_object_state import ObjectStateTables
+
 
 def upgrade():
   for table_name in ObjectStateTables.table_names:
-    # Set the status value to Draft in all existing records where the value is Null
+    # Set the status value to Draft in all existing records where the value is
+    # Null
     object_table = table(table_name, column('status', sa.String(length=250)))
 
     op.execute(
-      object_table.update().values(status = ObjectStates.DRAFT)\
-        .where(object_table.c.status == None)
+        object_table.update().values(status=ObjectStates.DRAFT)
+        .where(object_table.c.status == None)  # noqa
     )
 
 
