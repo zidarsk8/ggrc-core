@@ -3,13 +3,16 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-"""Widget bar models. We have multiple models for the widget bar since each
-object can have it's own rules what is mappable to it"""
+"""Widget bar models.
+We have multiple models for the widget bar since each object can have it's
+own rules what is mappable to it"""
 
 from lib import base
-from lib.page import widget
+from lib import factory
 from lib.element import widget_bar
+from lib.page.widget import admin_widget
 from lib.constants import locator
+from lib.constants import element
 
 
 class _WidgetBar(base.Component):
@@ -32,46 +35,101 @@ class _WidgetBar(base.Component):
 class _ObjectWidgetBar(_WidgetBar):
   """Model for a generic object widget bar (e.g. each info widget is object
   specific"""
-  # pylint: disable=not-callable
-
-  _info_cls = None
 
   def __init__(self, driver):
     super(_ObjectWidgetBar, self).__init__(driver)
     self.button_add_widget = base.Dropdown(driver,
                                            locator.WidgetBar.BUTTON_ADD)
     self.tab_info = base.Tab(self._driver, locator.WidgetBar.INFO)
-    self.tab_controls = None
+
+  def _get_widget(self, widget_name):
+    """Adds an attribute, clicks on the relevant tab and returns relevant
+    widget"""
+    attr_name = "tab_" + widget_name
+    setattr(
+        self,
+        attr_name,
+        widget_bar.Tab(self._driver, factory.get_locator_widget(widget_name)))
+    getattr(self, attr_name).click()
+    return factory.get_cls_widget(widget_name)(self._driver)
 
   def add_widget(self):
     """
     Returns:
-        widget.AddWidget
+        lib.element.widget_bar.AddWidget
     """
     self.button_add_widget.click()
-    return widget.AddWidget(self._driver)
+    return widget_bar.AddWidget(self._driver)
 
   def select_info(self):
     """Selects the info widget/tab. Note that each object has a different info
     page"""
     self.tab_info.click()
-    return self._info_cls(self._driver)
+    return factory.get_cls_widget(
+        self.__class__.__name__.lower(), is_info=True)(self._driver)
 
   def select_controls(self):
     """
     Returns:
-        widget.Controls
+        lib.page.widget.generic_widget.Controls
     """
-    self.tab_controls = base.Tab(self._driver, locator.WidgetBar.CONTROLS)\
-        .click()
-    return widget.Controls(self._driver)
+    return self._get_widget(element.WidgetBar.CONTROLS)
+
+  def select_issues(self):
+    """
+    Returns:
+        lib.page.widget.generic_widget.Issues
+    """
+    return self._get_widget(element.WidgetBar.ISSUES)
+
+  def select_processes(self):
+    """
+    Returns:
+        lib.page.widget.generic_widget.Processes
+    """
+    return self._get_widget(element.WidgetBar.PROCESSES)
+
+  def select_data_assets(self):
+    """
+    Returns:
+        lib.page.widget.generic_widget.DataAssets
+    """
+    return self._get_widget(element.WidgetBar.DATA_ASSETS)
+
+  def select_systems(self):
+    """
+    Returns:
+        lib.page.widget.generic_widget.Systems
+    """
+    return self._get_widget(element.WidgetBar.SYSTEMS)
+
+  def select_products(self):
+    """
+    Returns:
+        lib.page.widget.generic_widget.Products
+    """
+    return self._get_widget(element.WidgetBar.PRODUCTS)
+
+  def select_projects(self):
+    """
+    Returns:
+        lib.page.widget.generic_widget.Projects
+    """
+    return self._get_widget(element.WidgetBar.PROJECTS)
+
+  def select_programs(self):
+    """
+    Returns:
+        lib.page.widget.generic_widget.Programs
+    """
+    return self._get_widget(element.WidgetBar.PROGRAMS)
 
 
-class AdminDashboardWidgetBarPage(_WidgetBar):
+class AdminDashboard(_WidgetBar):
   """A model representing widget bar as seen only on admin dashboard"""
 
   def __init__(self, driver):
-    super(AdminDashboardWidgetBarPage, self).__init__(driver)
+    super(AdminDashboard, self).__init__(driver)
     self.tab_people = widget_bar.Tab(self._driver,
                                      locator.WidgetBar.ADMIN_PEOPLE)
     self.tab_roles = widget_bar.Tab(self._driver,
@@ -84,199 +142,145 @@ class AdminDashboardWidgetBarPage(_WidgetBar):
   def select_people(self):
     """
     Returns:
-        widget.AdminPeople
+        lib.page.widget.admin_widget.People
     """
     self.tab_people.click()
-    return widget.AdminPeople(self._driver)
+    return admin_widget.People(self._driver)
 
   def select_roles(self):
     """
     Returns:
-        widget.AdminRoles
+        lib.page.widget.admin_widget.Roles
     """
     self.tab_roles.click()
-    return widget.AdminRoles(self._driver)
+    return admin_widget.Roles(self._driver)
 
   def select_events(self):
     """
     Returns:
-        widget.AdminPeople
+        lib.page.widget.admin_widget.People
     """
     self.tab_events.click()
-    return widget.AdminEvents(self._driver)
+    return admin_widget.Events(self._driver)
 
   def select_custom_attributes(self):
     """
     Returns:
-        widget.AdminCustomAttributes
+        lib.page.widget.admin_widget.CustomAttributes
     """
     self.tab_custom_attributes.click()
-    return widget.AdminCustomAttributes(self._driver)
+    return admin_widget.CustomAttributes(self._driver)
 
 
-class DashboardWidgetBarPage(_ObjectWidgetBar):
+class Dashboard(_ObjectWidgetBar):
   """A model representing widget bar on user's dashboard"""
 
-  _info_cls = widget.DashboardInfo
+  def select_info(self):
+    raise NotImplementedError
 
-
-class ProgramWidgetBarPage(_ObjectWidgetBar):
+class Programs(_ObjectWidgetBar):
   """A model representing widget bar of the program object"""
 
-  _info_cls = widget.ProgramsInfo
 
-
-class WorkflowsWidgetBarPage(_ObjectWidgetBar):
+class Workflows(_ObjectWidgetBar):
   """A model representing widget bar of the workflow object"""
 
-  _info_cls = widget.WorkflowInfo
 
-
-class AuditsWidgetBarPage(_ObjectWidgetBar):
+class Audits(_ObjectWidgetBar):
   """A model representing widget bar of the audit object"""
 
-  _info_cls = widget.AuditInfo
 
-
-class AssessmentsWidgetBarPage(_ObjectWidgetBar):
+class Assessments(_ObjectWidgetBar):
   """A model representing widget bar of the Assessments object"""
 
-  _info_cls = widget.AssessmentsInfo
 
-
-class RequestsWidgetBarPage(_ObjectWidgetBar):
+class Requests(_ObjectWidgetBar):
   """A model representing widget bar of the requests object"""
 
-  _info_cls = widget.RequestsInfo
 
-
-class IssueWidgetBarPage(_ObjectWidgetBar):
+class Issues(_ObjectWidgetBar):
   """A model representing widget bar of the workflow object"""
 
-  _info_cls = widget.IssuesInfo
 
-
-class RegulationsWidgetBarPage(_ObjectWidgetBar):
+class Regulations(_ObjectWidgetBar):
   """A model representing widget bar of the regulations object"""
 
-  _info_cls = widget.RegulationsInfo
 
-
-class PoliciesWidgetBarPage(_ObjectWidgetBar):
+class Policies(_ObjectWidgetBar):
   """A model representing widget bar of the policies object"""
 
-  _info_cls = widget.PoliciesInfo
 
-
-class StandardsWidgetBarPage(_ObjectWidgetBar):
+class Standards(_ObjectWidgetBar):
   """A model representing widget bar of the standards object"""
 
-  _info_cls = widget.StandardsInfo
 
-
-class ContractsWidgetBarPage(_ObjectWidgetBar):
+class Contracts(_ObjectWidgetBar):
   """A model representing widget bar of the contract object"""
 
-  _info_cls = widget.ContractsInfo
 
-
-class ClausesWidgetBarPage(_ObjectWidgetBar):
+class Clauses(_ObjectWidgetBar):
   """A model representing widget bar of the clauses object"""
 
-  _info_cls = widget.ClausesInfo
 
-
-class SectionsWidgetBarPage(_ObjectWidgetBar):
+class Sections(_ObjectWidgetBar):
   """A model representing widget bar of the section object"""
 
-  _info_cls = widget.SectionsInfo
 
-
-class ControlsWidgetBarPage(_ObjectWidgetBar):
+class Controls(_ObjectWidgetBar):
   """A model representing widget bar of the controls object"""
 
-  _info_cls = widget.ContractsInfo
 
-
-class ObjectivesWidgetBarPage(_ObjectWidgetBar):
+class Objectives(_ObjectWidgetBar):
   """A model representing widget bar of the objectives object"""
 
-  _info_cls = widget.ObjectivesInfo
 
-
-class PeopleWidgetBarPage(_ObjectWidgetBar):
+class People(_ObjectWidgetBar):
   """A model representing widget bar of the people object"""
 
-  _info_cls = widget.PeopleInfo
 
-
-class OrgGroupsWidgetBarPage(_ObjectWidgetBar):
+class OrgGroups(_ObjectWidgetBar):
   """A model representing widget bar of the OrgGroups object"""
 
-  _info_cls = widget.OrgGroupsInfo
 
-
-class VendorsWidgetBarPage(_ObjectWidgetBar):
+class Vendors(_ObjectWidgetBar):
   """A model representing widget bar of the vendors object"""
 
-  _info_cls = widget.VendorsInfo
 
-
-class AccessGroupsWidgetBarPage(_ObjectWidgetBar):
+class AccessGroups(_ObjectWidgetBar):
   """A model representing widget bar of the access group object"""
 
-  _info_cls = widget.AccessGroupInfo
 
-
-class SystemsWidgetBarPage(_ObjectWidgetBar):
+class Systems(_ObjectWidgetBar):
   """A model representing widget bar of the system object"""
 
-  _info_cls = widget.SystemInfo
 
-
-class ProcessesWidgetBarPage(_ObjectWidgetBar):
+class Processes(_ObjectWidgetBar):
   """A model representing widget bar of the process object"""
 
-  _info_cls = widget.ProcessesInfo
 
-
-class DataAssetsWidgetBarPage(_ObjectWidgetBar):
+class DataAssets(_ObjectWidgetBar):
   """A model representing widget bar of the data asset object"""
 
-  _info_cls = widget.DataAssetsInfo
 
-
-class ProductsWidgetBarPage(_ObjectWidgetBar):
+class Products(_ObjectWidgetBar):
   """A model representing widget bar of the product object"""
 
-  _info_cls = widget.ProductsInfo
 
-
-class ProjectsWidgetBarPage(_ObjectWidgetBar):
+class Projects(_ObjectWidgetBar):
   """A model representing widget bar of the project object"""
 
-  _info_cls = widget.ProjectsInfo
 
-
-class FacilitiesWidgetBarPage(_ObjectWidgetBar):
+class Facilities(_ObjectWidgetBar):
   """A model representing widget bar of the facility object"""
 
-  _info_cls = widget.FacilitiesInfo
 
-
-class MarketsWidgetBarPage(_ObjectWidgetBar):
+class Markets(_ObjectWidgetBar):
   """A model representing widget bar of the market object"""
 
-  _info_cls = widget.MarketsInfo
 
-
-class RisksWidgetBarPage(_ObjectWidgetBar):
+class Risks(_ObjectWidgetBar):
   """A model representing widget bar of the risk object"""
 
-  _info_cls = widget.RisksInfo
 
-
-class ThreatsWidgetBarPage(_ObjectWidgetBar):
+class Threats(_ObjectWidgetBar):
   """A model representing widget bar of the threat object"""
-
-  _info_cls = widget.ThreatsInfo
