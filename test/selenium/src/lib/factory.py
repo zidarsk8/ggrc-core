@@ -7,7 +7,16 @@ from lib import cache
 from lib import exception
 from lib import base
 from lib import constants
-from lib.page.widget import info
+from lib.page.widget import info_widget
+from lib.page.widget import admin_widget
+from lib.page.widget import generic_widget
+
+
+def _filter_out_underscore(object_name):
+  """Since class names don't allow underscore in names, we're parsing them
+  out"""
+  return object_name if "_" not in object_name \
+      else object_name.replace("_", "")
 
 
 def _all_subclasses(cls):
@@ -25,17 +34,17 @@ def _factory(cls_name, parent_cls, search_nested_subclasses=False):
   Returns:
     cls
   """
-  cls_name.lower()
-
+  subcls_name = _filter_out_underscore(cls_name.lower())
   members = _all_subclasses(parent_cls) \
       if search_nested_subclasses \
       else parent_cls.__subclasses__()
 
   for member_cls in members:
-    if member_cls.__name__.lower() == cls_name:
+    if member_cls.__name__.lower() == subcls_name:
       break
   else:
-    raise exception.NoClassFound("%s for parent %s" % (cls_name, parent_cls))
+    raise exception.NoClassFound(
+        "%s for parent %s" % (subcls_name, parent_cls))
 
   return member_cls
 
@@ -54,20 +63,33 @@ def get_cls_test_utils(object_name):
   Args:
     object_name (basestring)
   """
-  # since class names don't allow underscore in names, we're parsing them out
-  object_subcls_name = object_name  if "_" not in object_name \
-      else object_name.replace("_", "")
-
-  cls_name = constants.cls.TEST_MODAL_NEW_PREFIX + \
-             object_subcls_name + \
-             constants.cls.TEST_MODAL_NEW_POSTFIX
-  return _factory(cls_name, base.Test)
+  cls_name = constants.cls.TEST_MODAL_NEW_PREFIX + object_name
+  return _factory(cls_name, base.Test, search_nested_subclasses=True)
 
 
-def get_cls_info_widget(object_name):
+def get_cls_widget(object_name, is_info=False, is_admin=False):
   """Returns the info widget class
   Args:
       object_name (basestring)
   """
-  cls_name = object_name.lower() + constants.cls.INFO_POSTFIX
-  return _factory(cls_name, info.InfoWidget)
+  if is_info:
+    base_cls = info_widget.Widget
+  elif is_admin:
+    base_cls = admin_widget.Widget
+  else:
+    base_cls = generic_widget.Widget
+  return _factory(object_name, base_cls)
+
+
+def get_locator_widget(widget_name):
+  """Returns the locator for the widget tab in the widget bar"""
+  # todo: unittests
+  return getattr(constants.locator.WidgetBar, widget_name.upper())
+
+
+def get_locator_add_widget(widget_name):
+  """Returns the locator for the selected widget from the add widget button
+  dropdown in the widget bar"""
+  # todo: unittests
+  return getattr(
+      constants.locator.WidgetBarButtonAddDropdown, widget_name.upper())
