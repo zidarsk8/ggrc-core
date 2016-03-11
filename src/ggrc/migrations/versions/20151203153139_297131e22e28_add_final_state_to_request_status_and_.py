@@ -2,7 +2,7 @@
 """Add final state to request status and rename Unstarted to Open
 
 Revision ID: 297131e22e28
-Revises: 18cbdd3a7fd9
+Revises: 504f541411a5
 Create Date: 2015-12-03 15:31:39.979333
 
 """
