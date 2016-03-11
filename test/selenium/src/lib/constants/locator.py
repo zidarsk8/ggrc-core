@@ -326,13 +326,26 @@ class LhnMenu(object):
   ACCORDEON_PROGRAMS_MEMBERS = (
       By.CSS_SELECTOR, '[data-model-name="Program"]>.content>.sub-level>li')
   ACCORDEON_REQUEST_MEMBERS = (
-    By.CSS_SELECTOR, '[data-model-name="Request"]>.content>.sub-level>li')
+      By.CSS_SELECTOR, '[data-model-name="Request"]>.content>.sub-level>li')
+  ACCORDEON_ISSUE_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="Issue"]>.content>.sub-level>li')
   ACCORDEON_CONTROLS_MEMBERS = (
       By.CSS_SELECTOR, '[data-model-name="Control"]>.content>.sub-level>li')
   ACCORDEON_ORG_GROUP_MEMBERS = (
       By.CSS_SELECTOR, '[data-model-name="OrgGroup"]>.content>.sub-level>li')
   ACCORDEON_RISK_MEMBERS = (
       By.CSS_SELECTOR, '[data-model-name="Risk"]>.content>.sub-level>li')
+  ACCORDEON_PROCESS_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="Process"]>.content>.sub-level>li')
+  ACCORDEON_DATA_ASSET_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="DataAsset"]>.content>.sub-level>li')
+  ACCORDEON_SYSTEM_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="System"]>.content>.sub-level>li')
+  ACCORDEON_PRODUCT_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="Product"]>.content>.sub-level>li')
+  ACCORDEON_PROJECT_MEMBERS = (
+      By.CSS_SELECTOR, '[data-model-name="Project"]>.content>.sub-level>li')
+
 
 
 class ExtendedInfo(object):
@@ -340,6 +353,9 @@ class ExtendedInfo(object):
   member object"""
 
   BUTTON_MAP_TO = (By.CSS_SELECTOR, '.extended-info.in .map-to-page-object')
+  ALREADY_MAPPED = (
+      By.CSS_SELECTOR,
+      '.extended-info.in .links .primary:not(.map-to-page-object)')
 
 
 class ModalCreateNewProgram(object):
@@ -419,6 +435,90 @@ class ModalCreateNewRisk(object):
       '.modal-body form>div:nth-child(2) .span6>input')
   UI_DESCRIPTION = (
       By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
+
+
+class ModalCreateRequest(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+    By.CSS_SELECTOR,
+    '.modal-body form>div:nth-child(2) .span6>input')
+
+
+class ModalCreateNewDataAsset(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+    By.CSS_SELECTOR,
+    '.modal-body form>div:nth-child(2) .span6>input')
+
+
+class ModalCreateNewProcess(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+    By.CSS_SELECTOR,
+    '.modal-body form>div:nth-child(2) .span6>input')
+
+
+class ModalCreateNewProject(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+    By.CSS_SELECTOR,
+    '.modal-body form>div:nth-child(2) .span6>input')
+
+
+class ModalCreateNewSystem(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+    By.CSS_SELECTOR,
+    '.modal-body form>div:nth-child(2) .span6>input')
+
+
+class ModalCreateNewProduct(object):
+  """Locators for the control modal visible when creating a new modal from
+  LHN"""
+
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+    By.CSS_SELECTOR,
+    '.modal-body form>div:nth-child(2) .span6>input')
 
 
 class ModalCreateNewControl(object):
@@ -660,6 +760,7 @@ class WidgetBar(object):
   PROCESSES = (By.CSS_SELECTOR, '[href="#process_widget"]')
   PRODUCTS = (By.CSS_SELECTOR, '[href="#product_widget"]')
   PROJECTS = (By.CSS_SELECTOR, '[href="#project_widget"]')
+  PROGRAMS = (By.CSS_SELECTOR, '[href="#program_widget"]')
   REGULATIONS = (By.CSS_SELECTOR, '[href="#regulation_widget"]')
   REQUESTS = (By.CSS_SELECTOR, '[href="#request_widget"]')
   SECTIONS = (By.CSS_SELECTOR, '[href="#section_widget"]')
@@ -759,16 +860,15 @@ class WidgetBarButtonAddDropdown(object):
 class ObjectWidget(object):
   """Locators for a generic widget"""
 
-  CONTROL_COLUMN_TITLE = (By.CSS_SELECTOR, '#control_widget .header .span4 '
-                                           '.title-heading .widget-col-title')
-  CONTROL_OWNER = (By.CSS_SELECTOR, '#control_widget .header .span4 '
-                                    '[data-field="contact.name|email"]')
-  COTNROL_STATE = (By.CSS_SELECTOR, '#control_widget .header .span4 '
-                                    '[data-field="status"]')
+  CONTROL_COLUMN_TITLE = (
+      By.CSS_SELECTOR, '.header .span4 .title-heading .widget-col-title')
+  CONTROL_OWNER = (
+      By.CSS_SELECTOR, '.header .span4 [data-field="contact.name|email"]')
+  COTNROL_STATE = (
+      By.CSS_SELECTOR, '.header .span4 [data-field="status"]')
   MEMBERS_TITLE_LIST = (
       By.CSS_SELECTOR,
-      '.object-area [id="control_widget"] .tree-structure .select '
-      '.span4:nth-child(1)')
+      '.object-area .tree-structure .select .span4:nth-child(1)')
   INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
 
 
@@ -1081,19 +1181,104 @@ class WidgetInfoSettingsButton(object):
       By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(3)')
 
 
-class WidgetFilter(object):
-  """Locators for filters in widgets"""
+class WidgetControls(object):
+  TITLE = (By.CSS_SELECTOR, '#control_widget .sticky-filter .filter-title h6')
+  TEXTFIELD = (By.CSS_SELECTOR, '#control_widget .sticky-filter .filter-input')
+  BUTTON_SUBMIT = (
+    By.CSS_SELECTOR,
+    '#control_widget .sticky-filter .filter-button  [type="submit"]')
+  BUTTON_RESET = (
+    By.CSS_SELECTOR,
+    '#control_widget .sticky-filter .filter-button  [type="reset"]')
+  BUTTON_HELP = (
+    By.CSS_SELECTOR,
+    '#control_widget .sticky-filter .filter-button  #page-help')
 
-  TITLE_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
-                                    '.filter-title h6')
-  TEXTFIELD_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
-                                        '.filter-input')
-  BUTTON_SUBMIT_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
-                                            '.filter-button  [type="submit"]')
-  BUTTON_RESET_CONTROL = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
-                                           '.filter-button  [type="reset"]')
-  BUTTON_HELP = (By.CSS_SELECTOR, '#control_widget .sticky-filter '
-                                  '.filter-button  #page-help')
+
+class WidgetProducts(object):
+  TITLE = (By.CSS_SELECTOR, '#product_widget .sticky-filter .filter-title h6')
+  TEXTFIELD = (By.CSS_SELECTOR, '#product_widget .sticky-filter .filter-input')
+  BUTTON_SUBMIT = (
+      By.CSS_SELECTOR,
+      '#product_widget .sticky-filter .filter-button [type="submit"]')
+  BUTTON_RESET = (
+      By.CSS_SELECTOR,
+      '#product_widget .sticky-filter .filter-button [type="reset"]')
+  BUTTON_HELP = (
+      By.CSS_SELECTOR,
+      '#product_widget .sticky-filter .filter-button #page-help')
+
+
+class WidgetProjects(object):
+  TITLE = (By.CSS_SELECTOR, '#project_widget .sticky-filter .filter-title h6')
+  TEXTFIELD = (By.CSS_SELECTOR, '#project_widget .sticky-filter .filter-input')
+  BUTTON_SUBMIT = (
+      By.CSS_SELECTOR,
+      '#project_widget .sticky-filter .filter-button [type="submit"]')
+  BUTTON_RESET = (
+      By.CSS_SELECTOR,
+      '#project_widget .sticky-filter .filter-button [type="reset"]')
+  BUTTON_HELP = (
+      By.CSS_SELECTOR,
+      '#project_widget .sticky-filter .filter-button #page-help')
+
+
+class WidgetSystems(object):
+  TITLE = (By.CSS_SELECTOR, '#system_widget .sticky-filter .filter-title h6')
+  TEXTFIELD = (By.CSS_SELECTOR, '#system_widget .sticky-filter .filter-input')
+  BUTTON_SUBMIT = (
+      By.CSS_SELECTOR,
+      '#system_widget .sticky-filter .filter-button [type="submit"]')
+  BUTTON_RESET = (
+      By.CSS_SELECTOR,
+      '#system_widget .sticky-filter .filter-button [type="reset"]')
+  BUTTON_HELP = (
+      By.CSS_SELECTOR,
+      '#system_widget .sticky-filter .filter-button #page-help')
+
+
+class WidgetDataAssets(object):
+  TITLE = (By.CSS_SELECTOR, '#data_asset_widget .sticky-filter .filter-title '
+                            'h6')
+  TEXTFIELD = (By.CSS_SELECTOR, '#data_asset_widget .sticky-filter '
+                                '.filter-input')
+  BUTTON_SUBMIT = (
+    By.CSS_SELECTOR,
+    '#data_asset_widget .sticky-filter .filter-button [type="submit"]')
+  BUTTON_RESET = (
+    By.CSS_SELECTOR,
+    '#data_asset_widget .sticky-filter .filter-button [type="reset"]')
+  BUTTON_HELP = (
+    By.CSS_SELECTOR,
+    '#data_asset_widget .sticky-filter .filter-button #page-help')
+
+
+class WidgetProcesses(object):
+  TITLE = (By.CSS_SELECTOR, '#process_widget .sticky-filter .filter-title h6')
+  TEXTFIELD = (By.CSS_SELECTOR, '#process_widget .sticky-filter .filter-input')
+  BUTTON_SUBMIT = (
+      By.CSS_SELECTOR,
+      '#process_widget .sticky-filter .filter-button [type="submit"]')
+  BUTTON_RESET = (
+      By.CSS_SELECTOR,
+      '#process_widget .sticky-filter .filter-button [type="reset"]')
+  BUTTON_HELP = (
+      By.CSS_SELECTOR,
+      '#process_widget .sticky-filter .filter-button #page-help')
+
+
+class WidgetIssues(object):
+  TITLE = (By.CSS_SELECTOR, '#issue_widget .sticky-filter .filter-title h6')
+  TEXTFIELD = (By.CSS_SELECTOR, '#issue_widget .sticky-filter .filter-input')
+  BUTTON_SUBMIT = (
+      By.CSS_SELECTOR,
+      '#issue_widget .sticky-filter .filter-button [type="submit"]')
+  BUTTON_RESET = (
+      By.CSS_SELECTOR,
+      '#issue_widget .sticky-filter .filter-button [type="reset"]')
+  BUTTON_HELP = (
+      By.CSS_SELECTOR,
+      '#issue_widget .sticky-filter .filter-button #page-help')
 
 
 class AdminCustomAttributes(object):

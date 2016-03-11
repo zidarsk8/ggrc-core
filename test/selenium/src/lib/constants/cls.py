@@ -7,5 +7,4 @@
 Note that all the values should be in lower case."""
 
 TEST_MODAL_NEW_PREFIX = "modalnew"
-TEST_MODAL_NEW_POSTFIX = "page"
 INFO_POSTFIX = "info"
