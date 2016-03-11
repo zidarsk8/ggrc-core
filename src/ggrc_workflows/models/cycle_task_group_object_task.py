@@ -188,8 +188,24 @@ class CycleTaskable(object):
   def cycle_task_group_object_tasks(self):
     """ Lists all the cycle tasks related to a certain object
     """
-    sources = [r.source for r in self.related_sources
-               if r.source_type == "CycleTaskGroupObjectTask"]
-    destinations = [r.destination for r in self.related_destinations
-                    if r.destination_type == "CycleTaskGroupObjectTask"]
+    sources = [r.CycleTaskGroupObjectTask_source
+               for r in self.related_sources
+               if r.CycleTaskGroupObjectTask_source is not None]
+    destinations = [r.CycleTaskGroupObjectTask_destination
+                    for r in self.related_destinations
+                    if r.CycleTaskGroupObjectTask_destination is not None]
     return sources + destinations
+
+  @classmethod
+  def eager_query(cls):
+    query = super(CycleTaskable, cls).eager_query()
+    return query.options(
+        orm.subqueryload('related_sources')
+           .joinedload('CycleTaskGroupObjectTask_source')
+           .undefer_group('CycleTaskGroupObjectTask_complete')
+           .joinedload('cycle'),
+        orm.subqueryload('related_destinations')
+           .joinedload('CycleTaskGroupObjectTask_destination')
+           .undefer_group('CycleTaskGroupObjectTask_complete')
+           .joinedload('cycle')
+    )
