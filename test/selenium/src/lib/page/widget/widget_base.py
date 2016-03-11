@@ -12,6 +12,7 @@ from lib import environment
 from lib.utils import selenium_utils
 from lib.constants import locator
 from lib.constants import url
+from lib import decorator
 
 
 class _Modal(base.Modal):
@@ -23,13 +24,14 @@ class _Modal(base.Modal):
     super(_Modal, self).__init__(driver)
 
     self.ui_attribute_title = base.TextInputField(
-        self._driver, self._locator.UI_ATTRIBUTE_TITLE)
+      self._driver, self._locator.UI_ATTRIBUTE_TITLE)
     self.button_submit = base.Button(
-        self._driver, self._locator.BUTTON_SAVE_AND_CLOSE)
+      self._driver, self._locator.BUTTON_SAVE_AND_CLOSE)
 
   def enter_title(self, title):
     self.ui_attribute_title.enter_text(title)
 
+  @decorator.handle_alert
   def save_and_close(self):
     """
     Returns:
@@ -45,12 +47,12 @@ class CreateNewCustomAttributeModal(base.Modal):
     super(CreateNewCustomAttributeModal, self).__init__(driver)
 
     self.button_add_more = base.Button(
-        self._driver, self._locator.BUTTON_ADD_ANOTHER)
+      self._driver, self._locator.BUTTON_ADD_ANOTHER)
 
   def save_and_add_another(self):
     """
     Returns:
-        NewCustomAttributeModal
+        ModalCustomAttributes
     """
     self.button_add_more.click_when_visible()
     return self.__class__(self._driver)
@@ -73,16 +75,16 @@ class Dropdown(base.Component):
 
     self.button_add = base.Button(driver, self._locator_button_add)
     self.attribute_name = base.Label(
-        driver, self._locator_label_attribute_name)
+      driver, self._locator_label_attribute_name)
     self.attribute_type = base.Label(
-        driver, self._locator_label_attribute_type)
+      driver, self._locator_label_attribute_type)
     self.mandatory = base.Label(driver, self._locator_label_mandatory)
     self.edit = base.Label(driver, self._locator_label_edit)
 
   def add_new_custom_attribute(self):
     """
     Returns:
-        new_custom_attribute.NewCustomAttributeModal
+        new_custom_attribute.ModalCustomAttributes
     """
     selenium_utils.wait_until_stops_moving(self.button_add.element)
     self.button_add.click()
@@ -97,7 +99,7 @@ class Dropdown(base.Component):
     """
     # check that the buttons are loaded
     selenium_utils.get_when_clickable(
-        self._driver, self._locator_buttons_edit)
+      self._driver, self._locator_buttons_edit)
 
     self._driver.find_elements(*self._locator_buttons_edit)[member].click()
     return CustomAttributeModal(self._driver)
@@ -109,18 +111,18 @@ class CustomAttributeModal(_Modal):
   def __init__(self, driver):
     super(CustomAttributeModal, self).__init__(driver)
     self.attribute_title = base.Label(
-        self._driver, self._locator.ATTRIBUTE_TITLE)
+      self._driver, self._locator.ATTRIBUTE_TITLE)
     self.inline_help = base.Label(self._driver, self._locator.INLINE_HELP)
     self.attribute_type = base.Label(
-        self._driver, self._locator.ATTRIBUTE_TYPE)
+      self._driver, self._locator.ATTRIBUTE_TYPE)
     self.placeholder = base.Label(self._driver, self._locator.PLACEHOLDER)
     self.mandatory = base.Label(self._driver, self._locator.MANDATORY)
     self.ui_inline_help = base.TextInputField(
-        self._driver, self._locator.UI_INLINE_HELP)
+      self._driver, self._locator.UI_INLINE_HELP)
     self.ui_placeholder = base.TextInputField(
-        self._driver, self._locator.UI_PLACEHOLDER)
+      self._driver, self._locator.UI_PLACEHOLDER)
     self.checkbox_mandatory = base.Checkbox(
-        self._driver, self._locator.CHECKBOX_MANDATORY)
+      self._driver, self._locator.CHECKBOX_MANDATORY)
 
   def enter_inline_help(self, inline_help):
     self.ui_inline_help.enter_text(inline_help)
@@ -142,77 +144,78 @@ class DynamicTreeToggle(base.Toggle):
 
 class WidgetAdminCustomAttributes(base.Widget):
   """Base model for custom attributes on the admin dashboard page"""
-
   _locator = locator.AdminCustomAttributes
   URL = environment.APP_URL \
-      + url.ADMIN_DASHBOARD \
-      + url.Widget.CUSTOM_ATTRIBUTES
+        + url.ADMIN_DASHBOARD \
+        + url.Widget.CUSTOM_ATTRIBUTES
 
   def __init__(self, driver):
     super(WidgetAdminCustomAttributes, self).__init__(driver)
     self.filter = base.Filter(
-        self._driver,
-        self._locator.FILTER_INPUT_FIELD,
-        self._locator.FILTER_BUTTON_SUBMIT,
-        self._locator.FILTER_BUTTON_RESET)
+      self._driver,
+      self._locator.FILTER_INPUT_FIELD,
+      self._locator.FILTER_BUTTON_SUBMIT,
+      self._locator.FILTER_BUTTON_RESET)
 
     self.button_workflows = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_WORKFLOWS)
+      self._driver, self._locator.TOGGLE_WORKFLOWS)
     self.button_risk_assessments = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_RISK_ASSESSMENTS)
+      self._driver, self._locator.TOGGLE_RISK_ASSESSMENTS)
     self.button_threats = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_THREATS)
+      self._driver, self._locator.TOGGLE_THREATS)
     self.button_risks = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_RISKS)
+      self._driver, self._locator.TOGGLE_RISKS)
     self.button_programs = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_PROGRAMS)
+      self._driver, self._locator.TOGGLE_PROGRAMS)
     self.button_audits = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_AUDITS)
+      self._driver, self._locator.TOGGLE_AUDITS)
     self.button_objectives = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_OBJECTIVES)
+      self._driver, self._locator.TOGGLE_OBJECTIVES)
     self.button_sections = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_SECTIONS)
+      self._driver, self._locator.TOGGLE_SECTIONS)
     self.button_controls = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_CONTROLS)
+      self._driver, self._locator.TOGGLE_CONTROLS)
     self.button_issues = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_ISSUES)
+      self._driver, self._locator.TOGGLE_ISSUES)
     self.button_assessments = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_ASSESSMENTS)
+      self._driver, self._locator.TOGGLE_ASSESSMENTS)
     self.button_standards = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_STANDARDS)
+      self._driver, self._locator.TOGGLE_STANDARDS)
     self.button_regulations = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_REGULATIONS)
+      self._driver, self._locator.TOGGLE_REGULATIONS)
     self.button_policies = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_POLICIES)
+      self._driver, self._locator.TOGGLE_POLICIES)
     self.button_contracts = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_CONTRACTS)
+      self._driver, self._locator.TOGGLE_CONTRACTS)
     self.button_clauses = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_CLAUSES)
+      self._driver, self._locator.TOGGLE_CLAUSES)
     self.button_requests = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_REQUESTS)
+      self._driver, self._locator.TOGGLE_REQUESTS)
     self.button_vendors = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_VENDORS)
+      self._driver, self._locator.TOGGLE_VENDORS)
     self.button_people = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_PEOPLE)
+      self._driver, self._locator.TOGGLE_PEOPLE)
     self.button_objectives = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_OBJECTIVES)
+      self._driver, self._locator.TOGGLE_OBJECTIVES)
     self.button_access_groups = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_ACCESS_GROUPS)
+      self._driver, self._locator.TOGGLE_ACCESS_GROUPS)
     self.button_org_groups = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_ORG_GROUPS)
+      self._driver, self._locator.TOGGLE_ORG_GROUPS)
     self.button_products = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_PRODUCTS)
+      self._driver, self._locator.TOGGLE_PRODUCTS)
     self.button_markets = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_MARKETS)
+      self._driver, self._locator.TOGGLE_MARKETS)
     self.button_processes = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_PROCESSES)
+      self._driver, self._locator.TOGGLE_PROCESSES)
     self.button_facilities = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_FACILITIES)
+      self._driver, self._locator.TOGGLE_FACILITIES)
     self.button_projects = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_PROJECTS)
+      self._driver, self._locator.TOGGLE_PROJECTS)
     self.button_contracts = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_CONTRACTS)
+      self._driver, self._locator.TOGGLE_CONTRACTS)
     self.button_data_assets = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_DATA_ASSETS)
+      self._driver, self._locator.TOGGLE_DATA_ASSETS)
     self.button_systems = DynamicTreeToggle(
-        self._driver, self._locator.TOGGLE_SYSTEMS)
+      self._driver, self._locator.TOGGLE_SYSTEMS)
+
+

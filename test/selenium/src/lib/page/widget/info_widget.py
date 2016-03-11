@@ -5,27 +5,27 @@
 
 """Page object models for the info widget of the object"""
 
+
 from lib import base
 from lib.constants import locator
 from lib.element import widget_info
 
 
-class InfoWidget(base.Widget):
-  """Model for a generic info widget"""
+class Widget(base.Widget):
+  """Abstract class for all info widgets"""
   _locator = None
-  _dropdown_settings_cls = widget_info.DropdownSettingsControls
+  _dropdown_settings_cls = None
 
   def __init__(self, driver):
     # wait that the elements load before calling super
     self.button_settings = base.Button(
-        driver, locator.InfoWidget.BUTTON_SETTINGS)
-
-    super(InfoWidget, self).__init__(driver)
-
-    self.object_id = self.url.split("/")[-1]
-    self.title = base.Label(self._driver, self._locator.TITLE)
+      driver, locator.InfoWidget.BUTTON_SETTINGS)
+    self.title = base.Label(driver, self._locator.TITLE)
     self.title_entered = base.Label(
-        self._driver, self._locator.TITLE_ENTERED)
+      driver, self._locator.TITLE_ENTERED)
+
+    super(Widget, self).__init__(driver)
+    self.object_id = self.url.split("/")[-1]
 
   def press_object_settings(self):
     """
@@ -36,7 +36,7 @@ class InfoWidget(base.Widget):
     return self._dropdown_settings_cls(self._driver)
 
 
-class DashboardInfo(base.Widget):
+class DashboardInfo(Widget):
   """Model for the dashboard info widget"""
   _locator = locator.Dashboard
 
@@ -70,17 +70,17 @@ class DashboardInfo(base.Widget):
     raise NotImplementedError
 
 
-class ProgramsInfo(InfoWidget):
+class Programs(Widget):
   """Model for program object info widget"""
   _locator = locator.ProgramInfoWidget
-  _dropdown_settings_cls = widget_info.DropdownSettingsPrograms
+  _dropdown_settings_cls = widget_info.Programs
 
   def __init__(self, driver):
     """
     Args:
         driver (base.CustomDriver)
     """
-    super(ProgramsInfo, self).__init__(driver)
+    super(Programs, self).__init__(driver)
 
     self.show_advanced = base.Toggle(
         self._driver, self._locator.TOGGLE_SHOW_ADVANCED)
@@ -128,131 +128,138 @@ class ProgramsInfo(InfoWidget):
         self._driver, self._locator.REFERENCE_URL_ENTERED)
 
 
-class WorkflowInfo(InfoWidget):
+class Workflows(Widget):
   """Model for workflow object info widget"""
   _locator = locator.WorkflowInfoWidget
 
 
-class AuditInfo(InfoWidget):
+class Audits(Widget):
   """Model for audit object info widget"""
   _locator = locator.AuditInfoWidget
 
 
-class AssessmentsInfo(InfoWidget):
+class Assessments(Widget):
   """Model for assessment object info widget"""
   _locator = locator.AssessmentInfoWidget
 
 
-class RequestsInfo(InfoWidget):
+class Requests(Widget):
   """Model for request object info widget"""
   _locator = locator.RequestInfoWidget
 
 
-class IssuesInfo(InfoWidget):
+class Issues(Widget):
   """Model for issue object info widget"""
   _locator = locator.IssueInfoWidget
 
 
-class RegulationsInfo(InfoWidget):
+class Regulations(Widget):
   """Model for regulation object info widget"""
   _locator = locator.RegulationsInfoWidget
 
 
-class PoliciesInfo(InfoWidget):
+class Policies(Widget):
   """Model for policies object info widget"""
   _locator = locator.PolicyInfoWidget
 
 
-class StandardsInfo(InfoWidget):
+class Standards(Widget):
   """Model for standard object info widget"""
   _locator = locator.StandardInfoWidget
 
 
-class ContractsInfo(InfoWidget):
+class Contracts(Widget):
   """Model for contract object info widget"""
   _locator = locator.ContractInfoWidget
 
 
-class ClausesInfo(InfoWidget):
+class Clauses(Widget):
   """Model for clause object info widget"""
   _locator = locator.ClauseInfoWidget
 
 
-class SectionsInfo(InfoWidget):
+class Sections(Widget):
   """Model for selection object info widget"""
   _locator = locator.SectionInfoWidget
 
 
-class ControlsInfo(InfoWidget):
+class Controls(Widget):
   """Model for control object info widget"""
   _locator = locator.ControlInfoWidget
+  _dropdown_settings_cls = widget_info.Controls
 
 
-class ObjectivesInfo(InfoWidget):
+class Objectives(Widget):
   """Model for objectives object info widget"""
   _locator = locator.ObjectiveInfoWidget
 
 
-class PeopleInfo(base.Widget):
+class People(base.Widget):
   """Model for people object info widget"""
   _locator = locator.PeopleInfoWidget
 
 
-class OrgGroupsInfo(InfoWidget):
+class OrgGroups(Widget):
   """Model for org groups object info widget"""
   _locator = locator.OrgGroupInfoWidget
+  _dropdown_settings_cls = widget_info.OrgGroups
 
 
-class VendorsInfo(InfoWidget):
+class Vendors(Widget):
   """Model for vendors object info widget"""
   _locator = locator.VendorInfoWidget
 
 
-class AccessGroupInfo(InfoWidget):
+class AccessGroup(Widget):
   """Model for access group object info widget"""
   _locator = locator.AccessGroupInfoWidget
 
 
-class SystemInfo(InfoWidget):
+class Systems(Widget):
   """Model for system object info widget"""
   _locator = locator.SystemInfoWidget
+  _dropdown_settings_cls = widget_info.Systems
 
 
-class ProcessesInfo(InfoWidget):
+class Processes(Widget):
   """Model for process object info widget"""
   _locator = locator.ProcessInfoWidget
+  _dropdown_settings_cls = widget_info.Processes
 
 
-class DataAssetsInfo(InfoWidget):
+class DataAssets(Widget):
   """Model for data asset object info widget"""
   _locator = locator.DataAssetInfoWidget
+  _dropdown_settings_cls = widget_info.DataAssets
 
 
-class ProductsInfo(InfoWidget):
+class Products(Widget):
   """Model for product object info widget"""
   _locator = locator.ProductInfoWidget
+  _dropdown_settings_cls = widget_info.Products
 
 
-class ProjectsInfo(InfoWidget):
+class Projects(Widget):
   """Model for project object info widget"""
   _locator = locator.ProjectInfoWidget
+  _dropdown_settings_cls = widget_info.Projects
 
 
-class FacilitiesInfo(InfoWidget):
+class Facilities(Widget):
   """Model for facility object info widget"""
   _locator = locator.FacilityInfoWidget
 
 
-class MarketsInfo(InfoWidget):
+class Markets(Widget):
   """Model for market object info widget"""
   _locator = locator.MarketInfoWidget
 
 
-class RisksInfo(InfoWidget):
+class Risks(Widget):
   """Model for risk object info widget"""
   _locator = locator.RiskInfoWidget
 
 
-class ThreatsInfo(InfoWidget):
+class Threats(Widget):
   """Model for threat object info widget"""
   _locator = locator.ThreatInfoWidget
