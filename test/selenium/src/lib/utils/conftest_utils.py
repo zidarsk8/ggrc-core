@@ -21,9 +21,11 @@ def navigate_to_page_that_contains_lhn(driver):
   """
   # pylint: disable=invalid-name
   try:
-    driver.find_element(*dashboard.HeaderPage.locator.TOGGLE_LHN)
+    driver.find_element(*dashboard.HeaderPage.locators.TOGGLE_LHN)
   except exceptions.NoSuchElementException:
     driver.get(dashboard.DashboardPage.URL)
+  except exceptions.UnexpectedAlertPresentException as e:
+    print
 
 
 def get_lhn_accordeon(driver, object_name):
@@ -37,8 +39,7 @@ def get_lhn_accordeon(driver, object_name):
       lib.element.lhn.AccordionGroup
   """
   navigate_to_page_that_contains_lhn(driver)
-  lhn_contents = dashboard.HeaderPage(driver) \
-      .open_lhn_menu()
+  lhn_contents = dashboard.HeaderPage(driver).open_lhn_menu()
 
   # if the object button is not visible, we have to open it's section first
   if object_name in cache.LHN_SECTION_MEMBERS:
@@ -48,18 +49,17 @@ def get_lhn_accordeon(driver, object_name):
   return getattr(lhn_contents, constants.method.SELECT_PREFIX + object_name)()
 
 
-
 def create_lhn_object(driver, object_name):
   """Creates a object via LHN
   Args:
       driver (lib.base.CustomDriver)
   Returns:
-      lib.page.widget.info.InfoWidget
+      lib.page.widget.info_widget.Widget
   """
   modal = get_lhn_accordeon(driver, object_name).create_new()
   factory.get_cls_test_utils(object_name).enter_test_data(modal)
   modal.save_and_close()
-  return factory.get_cls_info_widget(object_name)(driver)
+  return factory.get_cls_widget(object_name, is_info=True)(driver)
 
 
 def delete_object_on_info_widget(driver, object_name):
@@ -68,7 +68,7 @@ def delete_object_on_info_widget(driver, object_name):
       driver (lib.base.CustomDriver)
       object_name (basestring)
   """
-  factory.get_cls_info_widget(object_name)(driver)\
+  factory.get_cls_widget(object_name, is_info=True)(driver)\
       .press_object_settings() \
       .select_delete() \
       .confirm_delete()
@@ -84,5 +84,5 @@ def create_custom_program_attribute(driver):
       .select_custom_attributes() \
       .select_programs() \
       .add_new_custom_attribute()
-  test_utils.ModalNewProgramCustomAttributePage.enter_test_data(modal)
+  test_utils.ModalNewProgramCustomAttribute.enter_test_data(modal)
   return modal.save_and_close()

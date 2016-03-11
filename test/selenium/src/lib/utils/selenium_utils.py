@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 # pylint: disable=import-error
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common import action_chains
+from selenium.common import exceptions
 
 from lib import exception
 from lib import constants
@@ -91,7 +92,6 @@ def scroll_to_page_bottom(driver):
   Args:
       driver (base.CustomDriver)
   """
-
   driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
 
@@ -109,3 +109,33 @@ def is_value_in_attr(element, attr="class", value="active"):
   """
   attributes = element.get_attribute(attr)
   return value in attributes.split()
+
+
+def wait_until_alert_is_present(driver):
+  """
+  Waits until an alert is present
+  Args:
+    driver (base.CustomDriver)
+
+  Returns:
+      selenium.webdriver.common.alert.Alert
+  """
+  return WebDriverWait(
+      driver,
+      constants.ux.MAX_ALERT_WAIT) \
+      .until(EC.alert_is_present())
+
+
+def handle_alert(driver, accept=False):
+  """Wait until an alert is present and make a decision to accept or dismiss
+  it"""
+  try:
+    wait_until_alert_is_present(driver)
+    alert = driver.switch_to.alert
+
+    if accept:
+      alert.accept()
+    else:
+      alert.dismiss()
+  except (exceptions.NoAlertPresentException, exceptions.TimeoutException):
+    pass
