@@ -13,6 +13,7 @@ from lib import base
 from lib import exception
 from lib.utils import selenium_utils
 from lib.constants import locator
+from lib.page import extended_info
 
 
 class _Tab(base.Tab):
@@ -68,28 +69,25 @@ class AccordionGroup(base.DropdownDynamic):
   # modal class which is used when creating a new object
   _create_new_modal_cls = None
 
-  # class for the extended info modal
-  _extended_info_cls = None
-
   def __init__(self, driver):
     """
     Args:
         driver (base.CustomDriver)
     """
     super(AccordionGroup, self).__init__(
-        driver,
-        [self._locator_spinny],
-        wait_until_visible=False)
+      driver,
+      [self._locator_spinny],
+      wait_until_visible=False)
 
     self.button_create_new = base.Button(
-        self._driver, self._locator_button_create_new)
+      self._driver, self._locator_button_create_new)
 
     self._update_loaded_members()
     self._set_visible_members()
 
   def _update_loaded_members(self):
     self.members_loaded = self._driver.find_elements(
-        *self._locator_accordeon_members)
+      *self._locator_accordeon_members)
 
   def _set_visible_members(self):
     try:
@@ -152,6 +150,6 @@ class AccordionGroup(base.DropdownDynamic):
       selenium_utils.hover_over_element(self._driver, el)
       selenium_utils.get_when_visible(self._driver,
                                       locator.LhnMenu.EXTENDED_INFO)
-      return self._extended_info_cls(self._driver)
+      return extended_info.ExtendedInfoMappable(self._driver)
     except selenium_exception.StaleElementReferenceException:
       return self.hover_over_visible_member(member_title)
