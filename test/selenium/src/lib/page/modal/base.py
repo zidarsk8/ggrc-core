@@ -8,14 +8,14 @@ from lib import decorator
 from lib.constants import locator
 
 
-class _Modal(base.Modal):
+class _EditModal(base.Modal):
   """Base class for the edit modal"""
 
   _locator_ui_title = locator.ModalCreateNewObject.UI_TITLE
   locator_button_save = locator.ModalCreateNewObject.BUTTON_SAVE_AND_CLOSE
 
   def __init__(self, driver):
-    super(_Modal, self).__init__(driver)
+    super(_EditModal, self).__init__(driver)
     self.button_save_and_close = base.Button(driver, self.locator_button_save)
     self.ui_title = base.TextInputField(self._driver,
                                         self._locator_ui_title)
@@ -27,7 +27,7 @@ class _Modal(base.Modal):
     """
     self.ui_title.enter_text(text)
 
-  @decorator.wait_for_redirect
+  @decorator.handle_alert
   def save_and_close(self):
     """Saves this object"""
     self.button_save_and_close.click()
@@ -50,14 +50,14 @@ class CreateNewObjectModal(base.Modal):
     return self.__class__(self._driver)
 
 
-class ProgramModal(_Modal):
+class ProgramsModal(_EditModal):
   """Class representing a modal base for the program object"""
 
   _locators = locator.ModalCreateNewProgram
   _locator_ui_title = locator.ModalCreateNewProgram.UI_TITLE
 
   def __init__(self, driver):
-    super(ProgramModal, self).__init__(driver)
+    super(ProgramsModal, self).__init__(driver)
 
     # user input elements
     self.ui_description = base.Iframe(
@@ -170,13 +170,13 @@ class ProgramModal(_Modal):
     self.ui_stop_date.select_day_in_current_month(day)
 
 
-class ControlModal(_Modal):
+class ControlsModal(_EditModal):
   """Class representing a modal base for the control object"""
 
   _locators = locator.ModalCreateNewControl
 
   def __init__(self, driver):
-    super(ControlModal, self).__init__(driver)
+    super(ControlsModal, self).__init__(driver)
 
     # labels
     self.modal_title = base.Label(driver, self._locators.MODAL_TITLE)
@@ -284,7 +284,7 @@ class ControlModal(_Modal):
     self.ui_code.enter_text(text)
 
 
-class RiskModal(_Modal):
+class RisksModal(_EditModal):
   """Class representing a new risk modal visible after creating a new
   control from LHN"""
 
@@ -292,28 +292,50 @@ class RiskModal(_Modal):
   _locator_ui_title = locator.ModalCreateNewRisk.UI_TITLE
 
   def __init__(self, driver):
-    super(RiskModal, self).__init__(driver)
+    super(RisksModal, self).__init__(driver)
     self.ui_description = base.Iframe(driver, self._locators.UI_DESCRIPTION)
 
   def enter_description(self, text):
     self.ui_description.find_iframe_and_enter_data(text)
 
 
-class OrgGroupModal(_Modal):
-  """Class representing a new org group modal visible after creating a new
+class OrgGroupsModal(_EditModal):
+  """Class representing a base org group modal visible after creating a new
   org group from LHN"""
   _locator_ui_title = locator.ModalCreateNewOrgGroup.UI_TITLE
 
 
-
-class IssueModal(_Modal):
-  """Class representing a new issue modal visible after creating a new
+class IssuesModal(_EditModal):
+  """Class representing a base issue modal visible after creating a new
   issue from LHN"""
   _locator_ui_title = locator.ModalCreateNewIssue.UI_TITLE
 
 
-
-class RequestModal(_Modal):
-  """Class representing a new request modal visible after creating a new
-  request from LHN"""
+class RequestsModal(_EditModal):
+  """Class representing a base request modal"""
   _locator_ui_title = locator.ModalCreateNewRequest.UI_TITLE
+
+
+class ProcessesModal(_EditModal):
+  """Class representing a base process modal"""
+  _locator_ui_title = locator.ModalCreateNewProcess.UI_TITLE
+
+
+class DataAssetsModal(_EditModal):
+  """Class representing a base data asset modal"""
+  _locator_ui_title = locator.ModalCreateNewDataAsset.UI_TITLE
+
+
+class SystemsModal(_EditModal):
+  """Class representing a base system modal"""
+  _locator_ui_title = locator.ModalCreateNewSystem.UI_TITLE
+
+
+class ProductsModal(_EditModal):
+  """Class representing a base product modal"""
+  _locator_ui_title = locator.ModalCreateNewProduct.UI_TITLE
+
+
+class ProjectsModal(_EditModal):
+  """Class representing a base product modal"""
+  _locator_ui_title = locator.ModalCreateNewProject.UI_TITLE
