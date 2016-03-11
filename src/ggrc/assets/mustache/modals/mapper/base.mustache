@@ -10,10 +10,10 @@
     <i class="fa fa-times black"></i>
   </a>
   <h2>
-    {{#if mapper.search_only}}
-    Search
+    {{#if template.title}}
+      {{{render template.title}}
     {{else}}
-    Map {{get_object}} to {{get_title}}
+      Map {{get_object}} to {{get_title}}
     {{/if}}
   </h2>
 </div>
@@ -96,7 +96,7 @@
   <div class="relevance-filters">
     <div class="row-fluid">
       <div class="span12">
-        <relevant-filter search_only="mapper.search_only" type="mapper.type" relevant="mapper.relevant"></relevant-filter>
+        <relevant-filter search_only="mapper.search_only" type="mapper.type" relevant-to="mapper.relevantTo" relevant="mapper.relevant"></relevant-filter>
       </div>
     </div>
   </div>
@@ -182,7 +182,11 @@
           {{else}}
             {{mapper.selected.length}}
           {{/if}}
-          objects selected
+          {{#if template.count}}
+            {{template.count}}
+          {{else}}
+            object(s) selected
+          {{/if}}
         </span>
         <a class="
             {{#if_helpers '\
@@ -195,7 +199,11 @@
           {{#if mapper.is_saving}}
             Saving, please wait...
           {{else}}
-            Add Selected
+            {{#if template.submitButton}}
+              {{template.submitButton}}
+            {{else}}
+              Add Selected
+            {{/if}}
           {{/if}}
         </a>
       </div>

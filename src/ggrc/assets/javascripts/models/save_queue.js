@@ -62,7 +62,7 @@
             if (single[0] >= 200 && single[0] < 300) {
               obj._save(cb(single));
             } else {
-              obj._dfd.rejectWith(obj, [single]);
+              obj._dfd.reject(obj, single);
             }
           }
         }).always(function () {
