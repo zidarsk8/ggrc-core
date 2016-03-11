@@ -15,8 +15,8 @@ from lib import base
 from lib import exception
 from lib.page import dashboard
 from lib.page import lhn
+from lib.page.widget import generic_widget
 from lib.constants.test import batch
-from lib.page.widget import controls
 from lib.utils import conftest_utils
 from lib.utils import selenium_utils
 
@@ -42,7 +42,7 @@ class TestMyWorkPage(base.Test):
     except exception.RedirectTimeout:
       # we expect this exception since the url will stay the same for the last
       # deleted member in object list in a widget
-      assert controls.Controls(selenium.driver).members_listed == []
+      assert generic_widget.Controls(selenium.driver).members_listed == []
     else:
       assert False
 

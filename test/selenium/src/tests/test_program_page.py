@@ -12,13 +12,13 @@
 import pytest    # pylint: disable=import-error
 
 from lib import base
-from lib import test_helpers
+from lib.utils import test_utils
 from lib.constants import element
 from lib.constants import url
 from lib.constants import locator
 from lib.page import dashboard
 from lib.page import widget_bar
-from lib.page import widget
+from lib.page.widget import info_widget
 
 
 class TestProgramPage(base.Test):
@@ -37,7 +37,7 @@ class TestProgramPage(base.Test):
         >= int(program_info_page.object_id)
 
   @pytest.mark.smoke_tests
-  def test_app_redirects_to_new_program_page(self, new_program):
+  def test_modal_redirects(self, new_program):
     """Tests if after saving and closing the lhn_modal the app redirects to
     the object page.
 
@@ -60,7 +60,7 @@ class TestProgramPage(base.Test):
     """
     _, program_info_page = new_program
     program_info_page.navigate_to()
-    horizontal_bar = widget_bar.DashboardWidgetBarPage(selenium.driver)
+    horizontal_bar = widget_bar.Dashboard(selenium.driver)
 
     assert horizontal_bar.get_active_widget_name() == \
         element.LandingPage.PROGRAM_INFO_TAB
@@ -71,7 +71,7 @@ class TestProgramPage(base.Test):
     into the modal."""
     modal, program_info_page = new_program
 
-    assert test_helpers.HtmlParser.parse_text(modal.ui_title.text) == \
+    assert test_utils.HtmlParser.parse_text(modal.ui_title.text) == \
         program_info_page.title_entered.text
     assert modal.ui_description.text == \
         program_info_page.description_entered.text
@@ -95,7 +95,7 @@ class TestProgramPage(base.Test):
     _, program_info = new_program
     selenium.driver.get(program_info.url)
 
-    program_info_page = widget.ProgramsInfo(selenium.driver)
+    program_info_page = info_widget.Programs(selenium.driver)
     program_info_page \
         .press_object_settings() \
         .select_get_permalink()
@@ -121,16 +121,16 @@ class TestProgramPage(base.Test):
     _, program_info = new_program
     selenium.driver.get(program_info.url)
 
-    program_info_page = widget.ProgramsInfo(selenium.driver)
+    program_info_page = info_widget.Programs(selenium.driver)
     modal = program_info_page \
         .press_object_settings() \
         .select_edit()
-    test_helpers.ModalNewProgramsPage.enter_test_data(modal)
-    test_helpers.ModalNewProgramsPage.set_start_end_dates(modal, 1, -2)
+    test_utils.ModalNewPrograms.enter_test_data(modal)
+    test_utils.ModalNewPrograms.set_start_end_dates(modal, 1, -2)
     modal.save_and_close()
 
-    updated_program_info_page = widget.ProgramsInfo(selenium.driver)
-    assert test_helpers.HtmlParser.parse_text(modal.ui_title.text) == \
+    updated_program_info_page = info_widget.Programs(selenium.driver)
+    assert test_utils.HtmlParser.parse_text(modal.ui_title.text) == \
         updated_program_info_page.title_entered.text
     assert modal.ui_description.text == \
         updated_program_info_page.description_entered.text
@@ -160,9 +160,7 @@ class TestProgramPage(base.Test):
         .select_controls()\
         .hover_over_visible_member(new_control.title_entered.text)\
         .map_to_object()
-
-    control_widget_count = widget_bar.ProgramWidgetBarPage(selenium.driver)\
+    control_widget_count = widget_bar.Programs(selenium.driver)\
         .select_controls()\
         .member_count
-
     assert control_widget_count == 1

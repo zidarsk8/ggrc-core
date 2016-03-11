@@ -12,7 +12,7 @@ import pytest    # pylint: disable=import-error
 from lib import base
 from lib import constants
 from lib.page import dashboard
-from lib.page.widget import custom_attribute
+from lib.page.widget import admin_widget
 
 
 class TestAdminDashboardPage(base.Test):
@@ -59,6 +59,6 @@ class TestAdminDashboardPage(base.Test):
   def test_custom_attributes(self, selenium, custom_program_attribute):
     """Test general functions of custom attributes for the program object"""
 
-    custom_attribute.DropdownPrograms(selenium.driver)\
+    admin_widget.DropdownPrograms(selenium.driver)\
         .edit_nth_member(0)\
         .save_and_close()
