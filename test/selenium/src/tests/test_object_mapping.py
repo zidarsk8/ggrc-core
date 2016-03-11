@@ -12,27 +12,55 @@
 import pytest    # pylint: disable=import-error
 
 from lib import base
+from lib import factory
 from lib.utils import conftest_utils
+from lib.page import dashboard
 
 
 class TestObjectMapping(base.Test):
   """A part of smoke tests, section 4."""
 
   @pytest.mark.smoke_tests
-  def test_mapping_via_lhn(self, selenium, new_program, new_process,
-                           new_data_asset, new_system, new_product,
-                           new_project):
+  def test_mapping_via_lhn(self, selenium,  new_product,
+                           new_project, new_system, new_data_asset,
+                           new_process, new_issue):
     """LHN mapping tests from smoke tests, section 6"""
-    objects = [new_program, new_process, new_data_asset, new_system,
-               new_product, new_project]
+    objects = [new_product, new_project, new_system, new_data_asset,
+               new_process, new_issue]
 
     for object_ in objects:
       selenium.driver.get(object_.url)
 
+      # map objects
       for mapped_object in objects:
         # don't map an object to itself
         if mapped_object != object_:
-          conftest_utils.get_lhn_accordeon(
-              selenium.driver, mapped_object.object_name)\
-              .hover_over_visible_member(mapped_object.title_entered.text)\
-              .map_to_object()
+          extended_info = conftest_utils\
+              .get_lhn_accordeon(selenium.driver, mapped_object.object_name)\
+              .hover_over_visible_member(mapped_object.title_entered.text)
+
+          if not extended_info.is_already_mapped():
+            extended_info.map_to_object()
+
+          # close LHN so that the contents are seen
+          dashboard.HeaderPage(selenium.driver).close_lhn_menu()
+
+          widget = factory.get_cls_widget(mapped_object.object_name)(
+              selenium.driver)
+
+          # check that the focus is on relevant widget. Note that the label
+          # on the tab is e.g. "data assets" but the object_name (i.e. the
+          # object name we get from the url) is "data_assets"
+          assert widget.name_from_tab.lower() == \
+                 mapped_object.object_name.replace("_", " ")
+
+          # check items count
+          assert widget.member_count == 1
+
+      # check that all mapped widgets are shown
+      for mapped_object in objects:
+        if mapped_object != object_:
+          widget = factory.get_cls_widget(mapped_object.object_name)(
+              selenium.driver)
+          assert widget.name_from_tab.lower() == \
+              mapped_object.object_name.replace("_", " ")
