@@ -9,7 +9,6 @@ from lib import base
 from lib.constants import locator
 from lib.element import lhn
 from lib.page import modal
-from lib.page import extended_info
 
 
 class _Programs(lhn.AccordionGroup):
@@ -18,7 +17,7 @@ class _Programs(lhn.AccordionGroup):
   _locator_spinny = locator.LhnMenu.SPINNY_PROGRAMS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROGRAM
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_PROGRAMS_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewProgramModal
+  _create_new_modal_cls = modal.create_new_object.Programs
 
 
 class _Workflows(lhn.AccordionGroup):
@@ -30,11 +29,11 @@ class _Workflows(lhn.AccordionGroup):
   def __init__(self, driver):
     super(_Workflows, self).__init__(driver)
     self.button_active = base.Button(
-        self._driver, locator.LhnMenu.WORKFLOWS_ACTIVE)
+      self._driver, locator.LhnMenu.WORKFLOWS_ACTIVE)
     self.button_inactive = base.Button(
-        self._driver, locator.LhnMenu.WORKFLOWS_INACTIVE)
+      self._driver, locator.LhnMenu.WORKFLOWS_INACTIVE)
     self.button_draft = base.Button(
-        self._driver, locator.LhnMenu.WORKFLOWS_DRAFT)
+      self._driver, locator.LhnMenu.WORKFLOWS_DRAFT)
 
 
 class _Audits(lhn.AccordionGroup):
@@ -54,22 +53,18 @@ class _Assessments(lhn.AccordionGroup):
 
 class _Requests(lhn.AccordionGroup):
   """Requests dropdown in LHN"""
-
   _locator_spinny = locator.LhnMenu.SPINNY_REQUESTS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_REQUEST
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_REQUEST_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewRequestModal
-  _extended_info_cls = extended_info.ExtendedInfoMappable
+  _create_new_modal_cls = modal.create_new_object.Requests
 
 
 class _Issues(lhn.AccordionGroup):
   """Issues dropdown in LHN"""
-
   _locator_spinny = locator.LhnMenu.SPINNY_ISSUES
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ISSUE
-  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_REQUEST_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewIssueModal
-  _extended_info_cls = extended_info.ExtendedInfoMappable
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_ISSUE_MEMBERS
+  _create_new_modal_cls = modal.create_new_object.Issues
 
 
 class _Directives(lhn.DropdownStatic):
@@ -234,8 +229,7 @@ class Controls(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CONTROL
   _locator_spinny = locator.LhnMenu.SPINNY_CONTROLS
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_CONTROLS_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewControlModal
-  _extended_info_cls = extended_info.ExtendedInfoMappable
+  _create_new_modal_cls = modal.create_new_object.Controls
 
 
 class _Objectives(lhn.AccordionGroup):
@@ -315,8 +309,7 @@ class _OrgGroups(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ORG_GROUP
   _locator_spinny = locator.LhnMenu.SPINNY_ORG_GROUPS
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_ORG_GROUP_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewOrgGroupModal
-  _extended_info_cls = extended_info.ExtendedInfoMappable
+  _create_new_modal_cls = modal.create_new_object.OrgGroups
 
 
 class _Vendors(lhn.AccordionGroup):
@@ -431,6 +424,8 @@ class _Systems(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_SYSTEM
   _locator_spinny = locator.LhnMenu.SPINNY_SYSTEMS
+  _create_new_modal_cls = modal.create_new_object.Systems
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_SYSTEM_MEMBERS
 
 
 class _Processes(lhn.AccordionGroup):
@@ -438,6 +433,8 @@ class _Processes(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PROCESS
   _locator_spinny = locator.LhnMenu.SPINNY_PROCESSES
+  _create_new_modal_cls = modal.create_new_object.Processes
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_PROCESS_MEMBERS
 
 
 class _DataAssets(lhn.AccordionGroup):
@@ -445,6 +442,8 @@ class _DataAssets(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_DATA_ASSET
   _locator_spinny = locator.LhnMenu.SPINNY_DATA_ASSETS
+  _create_new_modal_cls = modal.create_new_object.DataAssets
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_DATA_ASSET_MEMBERS
 
 
 class _Products(lhn.AccordionGroup):
@@ -452,6 +451,8 @@ class _Products(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PRODUCT
   _locator_spinny = locator.LhnMenu.SPINNY_PRODUCTS
+  _create_new_modal_cls = modal.create_new_object.Products
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_PRODUCT_MEMBERS
 
 
 class _Projects(lhn.AccordionGroup):
@@ -459,6 +460,8 @@ class _Projects(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PROJECT
   _locator_spinny = locator.LhnMenu.SPINNY_PROJECTS
+  _create_new_modal_cls = modal.create_new_object.Processes
+  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_PROJECT_MEMBERS
 
 
 class _Facilities(lhn.AccordionGroup):
@@ -514,8 +517,7 @@ class _Risks(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_RISK
   _locator_spinny = locator.LhnMenu.SPINNY_RISKS
   _locator_accordeon_members = locator.LhnMenu.ACCORDEON_RISK_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewRiskModal
-  _extended_info_cls = extended_info.ExtendedInfoMappable
+  _create_new_modal_cls = modal.create_new_object.Risks
 
 
 class _Threats(lhn.AccordionGroup):
@@ -533,8 +535,7 @@ class Menu(base.AnimatedComponent):
         driver,
         [lhn.MyObjectsTab.locator_element,
          lhn.AllObjectsTab.locator_element],
-        wait_until_visible=True,
-    )
+        wait_until_visible=True)
     self.my_objects = lhn.MyObjectsTab(driver)
     self.all_objects = lhn.AllObjectsTab(driver)
     self.pin = None
@@ -681,7 +682,7 @@ class Menu(base.AnimatedComponent):
     self.toggle_people_or_groups.toggle()
     return _PeopleOrGroups(self._driver)
 
-  def select_assests_or_business(self):
+  def select_assets_or_business(self):
     """
     Returns:
         _AssetsOrBusiness
