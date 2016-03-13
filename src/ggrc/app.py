@@ -5,11 +5,12 @@
 
 from flask import Flask
 from flask.ext.sqlalchemy import get_debug_queries
-
+from flask.ext.sqlalchemy import SQLAlchemy
 from ggrc import contributions  # noqa: imported so it can be used with getattr
 from ggrc import db
 from ggrc import extensions
 from ggrc import settings
+from tabulate import tabulate
 
 
 app = Flask('ggrc', instance_relative_config=True)
@@ -116,18 +117,20 @@ def _display_sql_queries():
   enabled.
   """
   if getattr(settings, "SQLALCHEMY_RECORD_QUERIES", False):
-
-    def with_prefix(statement, prefix):
-      return "\n".join([prefix + line for line in statement.splitlines()])
-
     @app.after_request
     def display_queries(response):
+      EXPLAIN_THRESHOLD = 0.5  # EXPLAIN queries that ran for more than 0.5s
       queries = get_debug_queries()
-      for query in queries:
+      for query in queries[:]:
         app.logger.info("{:.8f} {}\n{}".format(
             query.duration,
             query.context,
-            with_prefix(query.statement, "       ")))
+            query.statement % query.parameters))
+        if query.duration > EXPLAIN_THRESHOLD:
+          statement = 'EXPLAIN ' + query.statement
+          engine = SQLAlchemy().get_engine(app)
+          result = engine.execute(statement, query.parameters)
+          app.logger.info(tabulate(result.fetchall(), headers=result.keys()))
       app.logger.info("Total queries: {}".format(len(queries)))
       return response
 

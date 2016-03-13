@@ -29,6 +29,7 @@ python-dateutil==2.2
 pytz==2015.2
 six==1.10.0
 SQLAlchemy==0.9.4
+tabulate==0.7.5
 webassets==0.8
 Werkzeug==0.9.3
 # Flask-SQLAlchemy must be last - it somehow mangles `distribute` / `setuptools`
