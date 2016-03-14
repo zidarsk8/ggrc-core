@@ -130,6 +130,8 @@ def _display_sql_queries():
       """
       explain_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
       queries = get_debug_queries()
+      # We have to copy the queries list below otherwise queries executed
+      # in the for loop will be appended causing an endless loop
       for query in queries[:]:
         app.logger.info("{:.8f} {}\n{}".format(
             query.duration,
