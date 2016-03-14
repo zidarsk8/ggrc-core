@@ -25,13 +25,13 @@ class Tab(base.Tab):
 
   def _set_member_count(self):
     widget_title = selenium_utils.get_when_visible(
-      self._driver, self._locator).text
+        self._driver, self._locator).text
 
     if "(" not in widget_title:
       self.member_count = int(widget_title)
     else:
       self.member_count = int(
-        re.match(regex.WIDGET_TITLE_AND_COUNT, widget_title)
+          re.match(regex.WIDGET_TITLE_AND_COUNT, widget_title)
           .group(2))
 
 

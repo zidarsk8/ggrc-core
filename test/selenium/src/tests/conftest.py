@@ -181,7 +181,7 @@ def new_project(selenium):
       lib.page.widget.ProjectInfo
   """
   project_page = conftest_utils.create_lhn_object(
-    selenium.driver, constants.element.Lhn.PROJECTS)
+      selenium.driver, constants.element.Lhn.PROJECTS)
   yield project_page
 
 

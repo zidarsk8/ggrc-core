@@ -40,30 +40,30 @@ class Roles(Widget):
     self.role_editor = base.Label(driver, self._locator.ROLE_EDITOR)
     self.role_grc_admin = base.Label(driver, self._locator.ROLE_GRC_ADMIN)
     self.role_program_editor = base.Label(
-      driver, self._locator.ROLE_PROGRAM_EDITOR)
+        driver, self._locator.ROLE_PROGRAM_EDITOR)
     self.role_program_owner = base.Label(
-      driver, self._locator.ROLE_PROGRAM_OWNER)
+        driver, self._locator.ROLE_PROGRAM_OWNER)
     self.role_program_reader = base.Label(
-      driver, self._locator.ROLE_PROGRAM_READER)
+        driver, self._locator.ROLE_PROGRAM_READER)
     self.role_reader = base.Label(driver, self._locator.ROLE_READER)
     self.role_workflow_member = base.Label(
-      driver, self._locator.ROLE_WORKFLOW_MEMBER)
+        driver, self._locator.ROLE_WORKFLOW_MEMBER)
     self.role_workflow_owner = base.Label(
-      driver, self._locator.ROLE_WORKFLOW_OWNER)
+        driver, self._locator.ROLE_WORKFLOW_OWNER)
 
     self.scope_editor = base.Label(driver, self._locator.SCOPE_EDITOR)
     self.scope_grc_admin = base.Label(driver, self._locator.SCOPE_GRC_ADMIN)
     self.scope_program_editor = base.Label(
-      driver, self._locator.SCOPE_PROGRAM_EDITOR)
+        driver, self._locator.SCOPE_PROGRAM_EDITOR)
     self.scope_program_owner = base.Label(
-      driver, self._locator.SCOPE_PROGRAM_OWNER)
+        driver, self._locator.SCOPE_PROGRAM_OWNER)
     self.scope_program_reader = base.Label(
-      driver, self._locator.SCOPE_PROGRAM_READER)
+        driver, self._locator.SCOPE_PROGRAM_READER)
     self.scope_reader = base.Label(driver, self._locator.SCOPE_READER)
     self.scope_workflow_member = base.Label(
-      driver, self._locator.SCOPE_WORKFLOW_MEMBER)
+        driver, self._locator.SCOPE_WORKFLOW_MEMBER)
     self.scope_workflow_owner = base.Label(
-      driver, self._locator.SCOPE_WORKFLOW_OWNER)
+        driver, self._locator.SCOPE_WORKFLOW_OWNER)
 
 
 class CustomAttributes(widget_base.WidgetAdminCustomAttributes):

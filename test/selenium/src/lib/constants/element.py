@@ -64,24 +64,24 @@ class Lhn(object):
       CLAUSES,
       SECTIONS)
   CONTROLS_OR_OBJECTIVES_MEMBERS = (
-    CONTROLS,
-    OBJECTIVES)
+      CONTROLS,
+      OBJECTIVES)
   PEOPLE_OR_GROUPS_MEMBERS = (
-    PEOPLE,
-    ORG_GROUPS,
-    VENDORS,
-    ACCESS_GROUPS)
+      PEOPLE,
+      ORG_GROUPS,
+      VENDORS,
+      ACCESS_GROUPS)
   ASSETS_OR_BUSINESS_MEMBERS = (
-    SYSTEMS,
-    PROCESSES,
-    DATA_ASSETS,
-    PRODUCTS,
-    PROJECTS,
-    FACILITIES,
-    MARKETS)
+      SYSTEMS,
+      PROCESSES,
+      DATA_ASSETS,
+      PRODUCTS,
+      PROJECTS,
+      FACILITIES,
+      MARKETS)
   RISKS_OR_THREATS_MEMBERS = (
-    RISKS,
-    THREATS)
+      RISKS,
+      THREATS)
 
 
 class ModalLhnCreateProgram(object):

@@ -446,8 +446,8 @@ class ModalCreateRequest(object):
 
   # user input elements
   UI_TITLE = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(2) .span6>input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
 
 
 class ModalCreateNewDataAsset(object):
@@ -460,8 +460,8 @@ class ModalCreateNewDataAsset(object):
 
   # user input elements
   UI_TITLE = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(2) .span6>input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
 
 
 class ModalCreateNewProcess(object):
@@ -474,8 +474,8 @@ class ModalCreateNewProcess(object):
 
   # user input elements
   UI_TITLE = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(2) .span6>input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
 
 
 class ModalCreateNewProject(object):
@@ -488,8 +488,8 @@ class ModalCreateNewProject(object):
 
   # user input elements
   UI_TITLE = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(2) .span6>input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
 
 
 class ModalCreateNewSystem(object):
@@ -502,8 +502,8 @@ class ModalCreateNewSystem(object):
 
   # user input elements
   UI_TITLE = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(2) .span6>input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
 
 
 class ModalCreateNewProduct(object):
@@ -516,8 +516,8 @@ class ModalCreateNewProduct(object):
 
   # user input elements
   UI_TITLE = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(2) .span6>input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
 
 
 class ModalCreateNewControl(object):
@@ -664,8 +664,8 @@ class ModalCreateNewIssue(object):
 
   # user input elements
   UI_TITLE = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(2) .span6>input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
 
 
 class ModalCreateNewRequest(object):
@@ -678,8 +678,8 @@ class ModalCreateNewRequest(object):
 
   # user input elements
   UI_TITLE = (
-    By.CSS_SELECTOR,
-    '.modal-body form>div:nth-child(2) .span6>input')
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
 
 
 class ModalEditObject(object):
@@ -1181,14 +1181,14 @@ class WidgetControls(object):
   TITLE = (By.CSS_SELECTOR, '#control_widget .sticky-filter .filter-title h6')
   TEXTFIELD = (By.CSS_SELECTOR, '#control_widget .sticky-filter .filter-input')
   BUTTON_SUBMIT = (
-    By.CSS_SELECTOR,
-    '#control_widget .sticky-filter .filter-button  [type="submit"]')
+      By.CSS_SELECTOR,
+      '#control_widget .sticky-filter .filter-button  [type="submit"]')
   BUTTON_RESET = (
-    By.CSS_SELECTOR,
-    '#control_widget .sticky-filter .filter-button  [type="reset"]')
+      By.CSS_SELECTOR,
+      '#control_widget .sticky-filter .filter-button  [type="reset"]')
   BUTTON_HELP = (
-    By.CSS_SELECTOR,
-    '#control_widget .sticky-filter .filter-button  #page-help')
+      By.CSS_SELECTOR,
+      '#control_widget .sticky-filter .filter-button  #page-help')
 
 
 class WidgetProducts(object):
@@ -1239,14 +1239,14 @@ class WidgetDataAssets(object):
   TEXTFIELD = (By.CSS_SELECTOR, '#data_asset_widget .sticky-filter '
                                 '.filter-input')
   BUTTON_SUBMIT = (
-    By.CSS_SELECTOR,
-    '#data_asset_widget .sticky-filter .filter-button [type="submit"]')
+      By.CSS_SELECTOR,
+      '#data_asset_widget .sticky-filter .filter-button [type="submit"]')
   BUTTON_RESET = (
-    By.CSS_SELECTOR,
-    '#data_asset_widget .sticky-filter .filter-button [type="reset"]')
+      By.CSS_SELECTOR,
+      '#data_asset_widget .sticky-filter .filter-button [type="reset"]')
   BUTTON_HELP = (
-    By.CSS_SELECTOR,
-    '#data_asset_widget .sticky-filter .filter-button #page-help')
+      By.CSS_SELECTOR,
+      '#data_asset_widget .sticky-filter .filter-button #page-help')
 
 
 class WidgetProcesses(object):

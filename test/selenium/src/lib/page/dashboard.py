@@ -94,9 +94,9 @@ class Header(base.Component):
       self.button_my_tasks = base.Button(self._driver,
                                          self.locators.BUTTON_MY_TASKS)
       self.button_all_objects = base.Button(
-        self._driver, self.locators.BUTTON_ALL_OBJECTS)
+          self._driver, self.locators.BUTTON_ALL_OBJECTS)
       self.toggle_user_dropdown = base.Toggle(
-        self._driver, self.locators.TOGGLE_USER_DROPDOWN)
+          self._driver, self.locators.TOGGLE_USER_DROPDOWN)
     except exceptions.StaleElementReferenceException:
       self._refresh_elements()
 

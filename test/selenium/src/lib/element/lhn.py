@@ -75,19 +75,19 @@ class AccordionGroup(base.DropdownDynamic):
         driver (base.CustomDriver)
     """
     super(AccordionGroup, self).__init__(
-      driver,
-      [self._locator_spinny],
-      wait_until_visible=False)
+        driver,
+        [self._locator_spinny],
+        wait_until_visible=False)
 
     self.button_create_new = base.Button(
-      self._driver, self._locator_button_create_new)
+        self._driver, self._locator_button_create_new)
 
     self._update_loaded_members()
     self._set_visible_members()
 
   def _update_loaded_members(self):
     self.members_loaded = self._driver.find_elements(
-      *self._locator_accordeon_members)
+        *self._locator_accordeon_members)
 
   def _set_visible_members(self):
     try:

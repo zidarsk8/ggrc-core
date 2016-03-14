@@ -84,7 +84,6 @@ class ModalNewPrograms(ModalInput):
     modal.enter_effective_date_start_month(day_start)
     modal.enter_stop_date_end_month(day_end)
 
-
   @staticmethod
   def enter_test_data(modal):
     """Fills out all fields in the lhn_modal

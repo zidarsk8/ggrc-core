@@ -22,7 +22,7 @@ class TestObjectMapping(base.Test):
   """A part of smoke tests, section 4."""
 
   @pytest.mark.smoke_tests
-  def test_mapping_via_lhn(self, selenium,  new_product,
+  def test_mapping_via_lhn(self, selenium, new_product,
                            new_project, new_system, new_data_asset,
                            new_process, new_issue):
     """LHN mapping tests from smoke tests, section 6"""
@@ -58,7 +58,7 @@ class TestObjectMapping(base.Test):
             # on the tab is e.g. "data assets" but the object_name (i.e. the
             # object name we get from the url) is "data_assets"
             assert widget.name_from_tab.lower() == \
-                   mapped_object.object_name.replace("_", " ")
+                mapped_object.object_name.replace("_", " ")
 
             # check items count
             assert widget.member_count == 1

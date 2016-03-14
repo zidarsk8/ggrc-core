@@ -29,11 +29,11 @@ class _Workflows(lhn.AccordionGroup):
   def __init__(self, driver):
     super(_Workflows, self).__init__(driver)
     self.button_active = base.Button(
-      self._driver, locator.LhnMenu.WORKFLOWS_ACTIVE)
+        self._driver, locator.LhnMenu.WORKFLOWS_ACTIVE)
     self.button_inactive = base.Button(
-      self._driver, locator.LhnMenu.WORKFLOWS_INACTIVE)
+        self._driver, locator.LhnMenu.WORKFLOWS_INACTIVE)
     self.button_draft = base.Button(
-      self._driver, locator.LhnMenu.WORKFLOWS_DRAFT)
+        self._driver, locator.LhnMenu.WORKFLOWS_DRAFT)
 
 
 class _Audits(lhn.AccordionGroup):

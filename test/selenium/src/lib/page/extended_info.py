@@ -23,12 +23,12 @@ class ExtendedInfo(base.Component):
 
   def _reload_contents(self):
     self.button_map = base.Button(
-      self._driver, self._locator.BUTTON_MAP_TO)
+        self._driver, self._locator.BUTTON_MAP_TO)
 
   def map_to_object(self):
     try:
       self.button_map = base.Button(
-        self._driver, self._locator.BUTTON_MAP_TO)
+          self._driver, self._locator.BUTTON_MAP_TO)
       self.button_map.click()
     except exceptions.StaleElementReferenceException:
       self._reload_contents()
