@@ -137,6 +137,57 @@ Maintained By: miha@reciprocitylabs.com
                   </ul>
                 {% endif %}
 
+                <br>
+                <br>
+                <br>
+                <br>
+                
+                Dummy content
+
+                {% if digest.get('assessment_open') %}
+                  <h2 {{ style.sub_title() }} >New assessments</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for assessment_id, assessment_data in digest['assessment_open'].items() %}
+                    <li {{ style.list_item() }} >
+                      assessment:{{ assessment['title'] }}
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('assessment_declined') %}
+                  <h2 {{ style.sub_title() }} >New assessments</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for assessment_id, assessment_data in digest['assessment_declined'].items() %}
+                    <li {{ style.list_item() }} >
+                      assessment:{{ assessment['title'] }}
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('request_open') %}
+                  <h2 {{ style.sub_title() }} >New Requests</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for request_id, request_data in digest['request_open'].items() %}
+                    <li {{ style.list_item() }} >
+                      Request:{{ request['title'] }}
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('request_declined') %}
+                  <h2 {{ style.sub_title() }} >New Requests</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for request_id, request_data in digest['request_declined'].items() %}
+                    <li {{ style.list_item() }} >
+                      Request:{{ request['title'] }}
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
                 <p {{ style.text_paragraph() }} >
                   Thanks,<br>
                   gGRC team
