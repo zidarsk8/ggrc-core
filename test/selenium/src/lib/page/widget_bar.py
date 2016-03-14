@@ -175,8 +175,6 @@ class AdminDashboard(_WidgetBar):
 class Dashboard(_ObjectWidgetBar):
   """A model representing widget bar on user's dashboard"""
 
-  def select_info(self):
-    raise NotImplementedError
 
 class Programs(_ObjectWidgetBar):
   """A model representing widget bar of the program object"""

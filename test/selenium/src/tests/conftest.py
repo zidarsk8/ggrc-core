@@ -101,7 +101,6 @@ def new_risk(selenium):
   yield risk_page
 
 
-
 @pytest.yield_fixture(scope="class")
 def new_request(selenium):
   """Creates a new request object.

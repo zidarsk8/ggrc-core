@@ -146,8 +146,8 @@ class WidgetAdminCustomAttributes(base.Widget):
   """Base model for custom attributes on the admin dashboard page"""
   _locator = locator.AdminCustomAttributes
   URL = environment.APP_URL \
-        + url.ADMIN_DASHBOARD \
-        + url.Widget.CUSTOM_ATTRIBUTES
+      + url.ADMIN_DASHBOARD \
+      + url.Widget.CUSTOM_ATTRIBUTES
 
   def __init__(self, driver):
     super(WidgetAdminCustomAttributes, self).__init__(driver)
@@ -217,5 +217,3 @@ class WidgetAdminCustomAttributes(base.Widget):
       self._driver, self._locator.TOGGLE_DATA_ASSETS)
     self.button_systems = DynamicTreeToggle(
       self._driver, self._locator.TOGGLE_SYSTEMS)
-
-

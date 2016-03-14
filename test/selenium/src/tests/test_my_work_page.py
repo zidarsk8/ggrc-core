@@ -27,8 +27,9 @@ class TestMyWorkPage(base.Test):
   @pytest.mark.smoke_tests
   def test_horizontal_nav_bar_tabs(self, selenium, battery_of_controls):
     """Tests that several objects in a widget can be deleted sequentially"""
+    selenium.driver.get(dashboard.Dashboard.URL)
     controls_widget = dashboard\
-        .DashboardPage(selenium.driver)\
+        .Dashboard(selenium.driver)\
         .select_controls()
 
     try:
@@ -52,24 +53,24 @@ class TestMyWorkPage(base.Test):
     the my work button in user dropdown"""
     conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
 
-    dashboard.HeaderPage(selenium.driver)\
+    dashboard.Header(selenium.driver)\
         .open_user_list()\
         .select_my_work()
 
-    assert selenium.driver.current_url == dashboard.DashboardPage.URL
+    assert selenium.driver.current_url == dashboard.Dashboard.URL
 
   @pytest.mark.smoke_tests
   def test_lhn_stays_expanded(self, selenium):
     """Tests if, after opening the LHN, it slides out and stays expanded."""
     conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
 
-    lhn_menu = dashboard.HeaderPage(selenium.driver).open_lhn_menu()
+    lhn_menu = dashboard.Header(selenium.driver).open_lhn_menu()
     initial_position = lhn_menu.my_objects.element.location
 
     selenium_utils.wait_until_stops_moving(lhn_menu.my_objects.element)
     selenium_utils.hover_over_element(
         selenium.driver,
-        dashboard.HeaderPage(selenium.driver).button_my_tasks.element)
+        dashboard.Header(selenium.driver).button_my_tasks.element)
 
     assert initial_position == \
         lhn.Menu(selenium.driver).my_objects.element.location
@@ -79,7 +80,7 @@ class TestMyWorkPage(base.Test):
     """Tests if LHN remembers which tab is selected (my or all objects) after
     closing it"""
     conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
-    header = dashboard.HeaderPage(selenium.driver)
+    header = dashboard.Header(selenium.driver)
 
     # check if my objects tab saves state
     lhn_menu = header.open_lhn_menu()
@@ -103,7 +104,7 @@ class TestMyWorkPage(base.Test):
   def test_lhn_pin(self, selenium):
     """Tests if the pin is present and if it's default state is off"""
     conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
-    lhn_menu = dashboard.HeaderPage(selenium.driver).open_lhn_menu()
+    lhn_menu = dashboard.Header(selenium.driver).open_lhn_menu()
     assert lhn_menu.pin.is_activated is False
 
   @pytest.mark.smoke_tests
@@ -112,7 +113,7 @@ class TestMyWorkPage(base.Test):
     tested since the model initializes all elements (and throws and
     exception if they're not present."""
     conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
-    user_list = dashboard.HeaderPage(selenium.driver).open_user_list()
+    user_list = dashboard.Header(selenium.driver).open_user_list()
 
     user_list.checkbox_daily_digest.click()
     user_list.checkbox_daily_digest.element.get_attribute("disabled")

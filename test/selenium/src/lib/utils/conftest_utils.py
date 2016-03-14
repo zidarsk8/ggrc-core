@@ -21,11 +21,9 @@ def navigate_to_page_that_contains_lhn(driver):
   """
   # pylint: disable=invalid-name
   try:
-    driver.find_element(*dashboard.HeaderPage.locators.TOGGLE_LHN)
+    driver.find_element(*dashboard.Header.locators.TOGGLE_LHN)
   except exceptions.NoSuchElementException:
-    driver.get(dashboard.DashboardPage.URL)
-  except exceptions.UnexpectedAlertPresentException as e:
-    print
+    driver.get(dashboard.Dashboard.URL)
 
 
 def get_lhn_accordeon(driver, object_name):
@@ -39,7 +37,7 @@ def get_lhn_accordeon(driver, object_name):
       lib.element.lhn.AccordionGroup
   """
   navigate_to_page_that_contains_lhn(driver)
-  lhn_contents = dashboard.HeaderPage(driver).open_lhn_menu()
+  lhn_contents = dashboard.Header(driver).open_lhn_menu()
 
   # if the object button is not visible, we have to open it's section first
   if object_name in cache.LHN_SECTION_MEMBERS:
@@ -80,7 +78,7 @@ def create_custom_program_attribute(driver):
       driver (lib.base.CustomDriver)
   """
 
-  modal = dashboard.AdminDashboardPage(driver) \
+  modal = dashboard.AdminDashboard(driver) \
       .select_custom_attributes() \
       .select_programs() \
       .add_new_custom_attribute()

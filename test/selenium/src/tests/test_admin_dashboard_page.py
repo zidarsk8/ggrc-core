@@ -22,9 +22,9 @@ class TestAdminDashboardPage(base.Test):
   @pytest.mark.smoke_tests
   def test_roles_widget(self, selenium):
     """Confirms labels are present"""
-
+    selenium.driver.get(dashboard.AdminDashboard.URL)
     admin_roles_widget = dashboard\
-        .AdminDashboardPage(selenium.driver)\
+        .AdminDashboard(selenium.driver)\
         .select_roles()
 
     assert admin_roles_widget.role_editor.text == self._element.EDITOR

@@ -29,7 +29,7 @@ class TestProgramPage(base.Test):
     """Checks if the count updates in LHN after creating a new program
     object."""
     _, program_info_page = new_program
-    lhn_menu = dashboard.HeaderPage(selenium.driver) \
+    lhn_menu = dashboard.Header(selenium.driver) \
         .open_lhn_menu() \
         .select_my_objects()
 
@@ -153,7 +153,7 @@ class TestProgramPage(base.Test):
         *locator.WidgetBar.CONTROLS).is_displayed() is False
 
     # map to obj
-    dashboard.HeaderPage(selenium.driver)\
+    dashboard.Header(selenium.driver)\
         .open_lhn_menu()\
         .select_my_objects()\
         .select_controls_or_objectives()\

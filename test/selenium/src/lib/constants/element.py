@@ -83,6 +83,7 @@ class Lhn(object):
     RISKS,
     THREATS)
 
+
 class ModalLhnCreateProgram(object):
   # create new program
   DATE_FORMATTING = "%d/%m/%Y"

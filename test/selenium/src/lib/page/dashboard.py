@@ -40,15 +40,15 @@ class UserList(base.Component):
         widget.DataAssets
     """
     self.button_my_work.click()
-    return DashboardPage(self._driver)
+    return Dashboard(self._driver)
 
   def select_admin_dashboard(self):
     """
     Returns:
-        admin_dashboard.AdminDashboardPage
+        admin_dashboard.AdminDashboard
     """
     self.button_my_work.click()
-    return AdminDashboardPage(self._driver)
+    return AdminDashboard(self._driver)
 
   def select_import_data(self):
     raise NotImplementedError
@@ -69,13 +69,12 @@ class UserList(base.Component):
     self.checkbox_daily_digest.uncheck()
 
 
-class HeaderPage(base.Page):
+class Header(base.Component):
   """Header of the page"""
-
   locators = locator.PageHeader
 
   def __init__(self, driver):
-    super(HeaderPage, self).__init__(driver)
+    super(Header, self).__init__(driver)
     self.toggle_lhn_menu = None
     self.button_dashboard = None
     self.button_search = None
@@ -145,19 +144,19 @@ class HeaderPage(base.Page):
     return UserList(self._driver)
 
 
-class DashboardPage(widget_bar.Dashboard, HeaderPage):
+class Dashboard(widget_bar.Dashboard, Header):
   """The main dashboard page"""
   URL = environment.APP_URL + url.DASHBOARD
 
   def __init__(self, driver):
-    super(DashboardPage, self).__init__(driver)
+    super(Dashboard, self).__init__(driver)
     self.button_help = base.Button(self._driver, self.locators.BUTTON_HELP)
 
 
-class AdminDashboardPage(widget_bar.AdminDashboard,
-                         HeaderPage):
+class AdminDashboard(widget_bar.AdminDashboard,
+                     Header):
   """Admin dashboard page model"""
   URL = environment.APP_URL + url.ADMIN_DASHBOARD
 
   def __init__(self, driver):
-    super(AdminDashboardPage, self).__init__(driver)
+    super(AdminDashboard, self).__init__(driver)

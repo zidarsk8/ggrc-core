@@ -22,7 +22,7 @@ def _filter_out_underscore(object_name):
 def _all_subclasses(cls):
   """Returns all subclassses for a parent"""
   return cls.__subclasses__() + \
-         [g for s in cls.__subclasses__() for g in _all_subclasses(s)]
+      [g for s in cls.__subclasses__() for g in _all_subclasses(s)]
 
 
 def _factory(cls_name, parent_cls, search_nested_subclasses=False):
@@ -54,8 +54,16 @@ def get_method_lhn_select(object_name):
   Args:
     object_name (basestring)
   """
-  return constants.method.SELECT_PREFIX + \
-         cache.LHN_SECTION_MEMBERS[object_name]
+  return constants.method.SELECT_PREFIX \
+      + cache.LHN_SECTION_MEMBERS[object_name]
+
+
+def get_method_select(object_name):
+  """Returns the method of LHN class
+  Args:
+    object_name (basestring)
+  """
+  return constants.method.SELECT_PREFIX + object_name
 
 
 def get_cls_test_utils(object_name):

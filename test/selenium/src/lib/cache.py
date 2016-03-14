@@ -7,6 +7,7 @@
 
 from lib.constants import element
 
+
 def _get_lhn_members():
   """Returns a dictionary with lhn elements that are grouped together
   into sections

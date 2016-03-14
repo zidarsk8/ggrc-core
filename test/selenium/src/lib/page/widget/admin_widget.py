@@ -13,6 +13,7 @@ from lib.page.widget import widget_base
 class Widget(base.Widget):
   """Base class for admin widgets"""
 
+
 class Events(Widget):
   """Model for event widget on admin dashboard"""
   URL = environment.APP_URL \
@@ -67,6 +68,13 @@ class Roles(Widget):
 
 class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
   """Model for custom attributes widget on the admin dashboard page"""
+  def select_programs(self):
+    """
+    Returns:
+        DropdownPrograms
+    """
+    self.button_programs.click()
+    return DropdownPrograms(self._driver)
 
 
 class ModalCustomAttributes(widget_base.CustomAttributeModal,
@@ -74,7 +82,7 @@ class ModalCustomAttributes(widget_base.CustomAttributeModal,
   """Model for the custom attribute modal"""
 
 
-class DropdownPrograms(base.Dropdown):
+class DropdownPrograms(widget_base.Dropdown):
   """Model for programs dropdown"""
   _locator_button_add = locator.AdminCustomAttributes \
       .BUTTON_ADD_CUSTOM_PROGRAM_ATTR

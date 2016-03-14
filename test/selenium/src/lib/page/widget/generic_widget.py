@@ -136,6 +136,7 @@ class Systems(Widget):
   _locator_widget = locator.WidgetBar.SYSTEMS
   _locator_filter = locator.WidgetSystems
 
+
 class Products(Widget):
   """Model for the product widget"""
   _info_pane_cls = info_widget.Products

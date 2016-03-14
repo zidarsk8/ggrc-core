@@ -347,7 +347,6 @@ class LhnMenu(object):
       By.CSS_SELECTOR, '[data-model-name="Project"]>.content>.sub-level>li')
 
 
-
 class ExtendedInfo(object):
   """Locators for the extended info tooltip in LHN after hovering over a
   member object"""
@@ -963,7 +962,6 @@ class ProgramInfoWidget(object):
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
 
 
-
 class RequestInfoWidget(object):
   """Locators for the request info widget"""
   TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
@@ -1006,12 +1004,10 @@ class AuditInfoWidget(object):
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-
 class AssessmentInfoWidget(object):
   """Locators for the assessment info widget"""
   TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
-
 
 
 class PolicyInfoWidget(object):
@@ -1109,6 +1105,7 @@ class MarketInfoWidget(object):
   TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
+
 class DataAssetInfoWidget(object):
   """Locators for the data asset info widget"""
   TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
@@ -1119,7 +1116,6 @@ class ThreatInfoWidget(object):
   """Locators for the data asset info widget"""
   TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
-
 
 
 class AdminRolesWidget(object):
