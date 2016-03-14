@@ -8,6 +8,7 @@ from uuid import uuid1
 from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import event
+from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import foreign
 from sqlalchemy.orm import relationship
@@ -71,7 +72,6 @@ class Identifiable(object):
 
   @classmethod
   def eager_inclusions(cls, query, include_links):
-    from sqlalchemy import orm
     options = []
     for include_link in include_links:
       inclusion_class = getattr(cls, include_link).property.mapper.class_
@@ -275,8 +275,6 @@ class Hierarchical(object):
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Hierarchical, cls).eager_query()
     return query.options(
         orm.subqueryload('children'),
@@ -556,9 +554,16 @@ class Revisionable(object):
         viewonly=True,
         foreign_keys="Revision.resource_type, Revision.resource_id")
 
+  @classmethod
+  def eager_query(cls):
+    query = super(Revisionable, cls).eager_query()
+    return query.options(
+        orm.subqueryload('revisions')
+    )
+
 
 class BusinessObject(Stateful, Noted, Described, Hyperlinked, WithContact,
-                     Titled, Slugged, Revisionable):
+                     Titled, Revisionable, Slugged):
   VALID_STATES = (
       'Draft',
       'Final',
@@ -658,6 +663,13 @@ class CustomAttributable(object):
     return CustomAttributeDefinition.query.filter(
         CustomAttributeDefinition.definition_type ==
         underscore_from_camelcase(cls.__name__)).all()
+
+  @classmethod
+  def eager_query(cls):
+    query = super(CustomAttributable, cls).eager_query()
+    return query.options(
+        orm.subqueryload('custom_attribute_values')
+    )
 
 
 class TestPlanned(object):

@@ -37,11 +37,6 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
       db.Integer, db.ForeignKey('cycles.id'), nullable=False)
   task_group_id = db.Column(
       db.Integer, db.ForeignKey('task_groups.id'), nullable=True)
-  cycle_task_group_objects = db.relationship(
-      'CycleTaskGroupObject',
-      backref='cycle_task_group',
-      cascade='all, delete-orphan'
-  )
   cycle_task_group_tasks = db.relationship(
       'CycleTaskGroupObjectTask',
       backref='cycle_task_group',
@@ -54,7 +49,6 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
   _publish_attrs = [
       'cycle',
       'task_group',
-      'cycle_task_group_objects',
       'cycle_task_group_tasks',
       'sort_index',
       'next_due_date',
@@ -97,5 +91,4 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
     query = super(CycleTaskGroup, cls).eager_query()
     return query.options(
         orm.joinedload('cycle_task_group_tasks'),
-        orm.joinedload('cycle_task_group_objects'),
     )

@@ -123,9 +123,6 @@
 %status-inprogress {
   background: $orange !important;
 }
-%status-overdue {
-  background: $red !important;
-}
 %status-active {
   background: $orange !important;
 }
@@ -155,6 +152,9 @@
 }
 %status-assigned {
   background: $status-draft !important;
+}
+%status-overdue {
+  background: $red !important;
 }
 
 // state label placeholder colors

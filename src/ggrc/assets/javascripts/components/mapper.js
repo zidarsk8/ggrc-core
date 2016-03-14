@@ -8,6 +8,9 @@
 (function (can, $) {
   'use strict';
 
+  var selectors = _.map(['unified-mapper', 'unified-search'], function (val) {
+    return '[data-toggle="' + val + '"]';
+  });
   var MapperModel = GGRC.Models.MapperModel = can.Map({
     type: 'AllObject', // We set default as All Object
     contact: {},
@@ -37,7 +40,6 @@
     get_binding_name: function (instance, plural) {
       return (instance.has_binding(plural) ? '' : 'related_') + plural;
     },
-
     model_from_type: function (type) {
       var types = _.reduce(_.values(this.types()), function (memo, val) {
         if (val.items) {
@@ -47,7 +49,6 @@
       }, []);
       return _.findWhere(types, {value: type});
     },
-
     get_forbidden: function (type) {
       var forbidden = {
         Program: ['Audit'],
@@ -57,21 +58,19 @@
       };
       return forbidden[type] ? forbidden[type] : [];
     },
-
     get_whitelist: function () {
       var whitelisted = [
         'TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'
       ];
       return this.attr('search_only') ? whitelisted : [];
     },
-
     types: can.compute(function () {
       var selectorList;
-      var canonical = GGRC.Mappings.get_canonical_mappings_for(this.object);
-      var list = GGRC.tree_view.base_widgets_by_type[this.object];
-      var forbidden = this.get_forbidden(this.object);
+      var object = this.attr('getList') ? 'MultitypeSearch' : this.object;
+      var canonical = GGRC.Mappings.get_canonical_mappings_for(object);
+      var list = GGRC.tree_view.base_widgets_by_type[object];
+      var forbidden = this.get_forbidden(object);
       var whitelist = this.get_whitelist();
-
       var groups = {
         all_objects: {
           name: 'All Objects',
@@ -94,7 +93,6 @@
           items: []
         }
       };
-
       selectorList = _.intersection.apply(
         _, _.compact([_.keys(canonical), list]));
 
@@ -134,7 +132,6 @@
   can.Component.extend({
     tag: 'modal-mapper',
     template: can.view(GGRC.mustache_path + '/modals/mapper/base.mustache'),
-
     scope: function (attrs, parentScope, el) {
       var $el = $(el);
       var data = {};
@@ -152,7 +149,6 @@
       }
 
       type = CMS.Models[type] && type;
-
       if (!data.search_only) {
         if (type) {
           data.type = type;
@@ -168,7 +164,12 @@
       }
 
       return {
-        mapper: new MapperModel(data)
+        mapper: new MapperModel(_.extend(data, {
+          relevantTo: parentScope.attr('relevantTo'),
+          callback: parentScope.attr('callback'),
+          getList: parentScope.attr('getList')
+        })),
+        template: parentScope.attr('template')
       };
     },
 
@@ -177,7 +178,22 @@
         this.setModel();
         this.setBinding();
       },
+      closeModal: function () {
+        this.scope.attr('mapper.is_saving', false);
+        // there is some kind of a race condition when filling the treview with new elements
+        // so many don't get rendered. To solve it, at the end of the loading
+        // we refresh the whole tree view. Other solutions could be to batch add the objects.
+        $('.cms_controllers_tree_view:visible').each(function () {
+          // TODO: This is terrible solution, but it's only way to refresh all tree views on page
+          var control = $(this).control();
+          if (control) {
+            control.reload_list();
+          }
+        });
 
+        // TODO: Find proper way to dismiss the modal
+        this.element.find('.modal-dismiss').trigger('click');
+      },
       deferredSave: function () {
         var source = this.scope.attr('deferred_to').instance ||
                      this.scope.attr('mapper.object');
@@ -205,14 +221,10 @@
 
         this.scope.attr('deferred_to').controller.element.trigger(
           'defer:add', [data, {map_and_save: true}]);
-        // TODO: Find proper way to dismiss the modal
-        this.element.find('.modal-dismiss').trigger('click');
+        this.closeModal();
       },
-
       '.add-button .btn modal:added': 'addNew',
-
       '.add-button .btn modal:success': 'addNew',
-
       addNew: function (el, ev, model) {
         var entries = this.scope.attr('mapper.entries');
         var getBindingName = this.scope.attr('mapper').get_binding_name;
@@ -232,35 +244,37 @@
         item.append = true;
         entries.unshift(item);
       },
-
       '.modal-footer .btn-map click': function (el, ev) {
-        var data = {};
-        var defer = [];
-        var instance;
-        var isAllObject;
+        var callback = this.scope.attr('mapper.callback');
+        var type = this.scope.attr('mapper.type');
+        var object = this.scope.attr('mapper.object');
+        var isAllObject = type === 'AllObject';
+        var instance = CMS.Models[object].findInCacheById(
+          this.scope.attr('mapper.join_object_id'));
         var mapping;
         var Model;
-        var object;
-        var que;
-        var type;
+        var data = {};
+        var defer = [];
+        var que = new RefreshQueue();
 
         ev.preventDefault();
-
         if (el.hasClass('disabled')) {
-          return undefined;
+          return;
         }
+        if (this.scope.attr('mapper.getList')) {
+          this.scope.attr('mapper.is_saving', true);
+          return callback(this.scope.attr('mapper.selected'), {
+            type: type,
+            target: object,
+            instance: instance,
+            context: this
+          });
+        }
+
         // TODO: Figure out nicer / proper way to handle deferred save
         if (this.scope.attr('deferred')) {
           return this.deferredSave();
         }
-
-        type = this.scope.attr('mapper.type');
-        object = this.scope.attr('mapper.object');
-        isAllObject = type === 'AllObject';
-        instance = CMS.Models[object].findInCacheById(
-          this.scope.attr('mapper.join_object_id'));
-        que = new RefreshQueue();
-
         this.scope.attr('mapper.is_saving', true);
 
         que.enqueue(instance).trigger().done(function (inst) {
@@ -292,21 +306,7 @@
             })
             .always(function () {
               this.scope.attr('mapper.is_saving', false);
-              // TODO: Find proper way to dismiss the modal
-              this.element.find('.modal-dismiss').trigger('click');
-
-              // there is some kind of a race condition when filling the
-              // treview with new elements so many don't get rendered. To
-              // solve it, at the end of the loading we refresh the whole tree
-              // view. Other solutions could be to batch add the objects.
-              $('.cms_controllers_tree_view:visible').each(function () {
-                // TODO: This is terrible solution, but it's only way to
-                // refresh all tree views on page
-                var control = $(this).control();
-                if (control) {
-                  control.reload_list();
-                }
-              });
+              this.closeModal();
             }.bind(this));
         }.bind(this));
       },
@@ -333,7 +333,6 @@
           }, this);
         }.bind(this));
       },
-
       setModel: function () {
         var type = this.scope.attr('mapper.type');
         var types = this.scope.attr('mapper.types');
@@ -344,12 +343,12 @@
         this.scope.attr(
           'mapper.model', this.scope.mapper.model_from_type(type));
       },
-
       '{mapper} type': function () {
-        this.scope.attr('mapper.term', '');
+        this.scope.attr('mapper.term', "");
         this.scope.attr('mapper.contact', {});
-        this.scope.attr('mapper.relevant', []);
-
+        if (!this.scope.attr('mapper.getList')) {
+          this.scope.attr('mapper.relevant').replace([]);
+        }
         this.setModel();
         this.setBinding();
       },
@@ -412,6 +411,9 @@
       is_mapped: '@',
       is_allowed_to_map: '@',
       checkbox: can.compute(function (status) {
+        if (this.attr('mapper.getList') && !this.attr('appended')) {
+          return false;
+        }
         return (
           /true/gi.test(this.attr('is_mapped')) ||
           this.attr('select_state') ||
@@ -419,7 +421,6 @@
         );
       })
     },
-
     events: {
       '{scope} selected': function () {
         this.element
@@ -431,7 +432,6 @@
             })
           );
       },
-
       '.object-check-single change': function (el, ev) {
         var scope = this.scope;
         var uid = Number(scope.attr('instance_id'));
@@ -460,25 +460,28 @@
         }
       }
     },
-
     helpers: {
       not_allowed_to_map: function (options) {
+        if (this.attr('mapper.getList')) {
+          return options.inverse();
+        }
         if (/false/gi.test(this.attr('is_allowed_to_map'))) {
           return options.fn();
         }
         return options.inverse();
       },
-
       is_disabled: function (options) {
-        if (
-          /true/gi.test(this.attr('is_mapped')) ||
-          this.attr('is_saving') ||
-          this.attr('is_loading') ||
-          /false/gi.test(this.attr('is_allowed_to_map'))
-        ) {
+        if (this.attr('is_saving') ||
+            this.attr('is_loading')) {
           return options.fn();
         }
-
+        if (this.attr('mapper.getList')) {
+          return options.inverse();
+        }
+        if (/true/gi.test(this.attr('is_mapped')) ||
+          /false/gi.test(this.attr('is_allowed_to_map'))) {
+          return options.fn();
+        }
         return options.inverse();
       }
     }
@@ -501,11 +504,8 @@
         this.element.find('.results-wrap').cms_controllers_infinite_scroll();
         this.getResults();
       },
-
       '.modalSearchButton click': 'getResults',
-
       '{scope} type': 'getResults',
-
       '{scope.entries} add': function (list, ev, added) {
         var instance;
         var option;
@@ -526,9 +526,7 @@
           href: instance.href
         });
       },
-
       '.results-wrap scrollNext': 'drawPage',
-
       '.object-check-all click': function (el, ev) {
         var entries;
         var que;
@@ -562,13 +560,11 @@
             );
           }.bind(this));
       },
-
       getItem: function (model) {
         var selected;
         var mapper;
         var binding;
         var bindings;
-
         if (!model.type) {
           return undefined;
         }
@@ -603,7 +599,6 @@
           mappings: []
         };
       },
-
       drawPage: function () {
         var page = this.scope.attr('page');
         var nextPage = page + 1;
@@ -634,7 +629,6 @@
             }.bind(this)
           );
       },
-
       searchFor: function (data) {
         var joinModel;
 
@@ -642,7 +636,6 @@
 
         joinModel = GGRC.Mappings.join_model_name_for(
           this.scope.attr('mapper.object'), data.model_name);
-
         if (joinModel !== 'TaskGroupObject' && data.model_name === 'Program') {
           data.options.permission_parms = {
             __permission_model: joinModel
@@ -654,7 +647,6 @@
           data.options.__permission_type =
             data.options.__permission_type || 'update';
         }
-
         data.model_name = _.isString(data.model_name) ?
           [data.model_name] :
           data.model_name;
@@ -662,7 +654,6 @@
         return GGRC.Models.Search.search_for_types(
           data.term || '', data.model_name, data.options);
       },
-
       getResults: function () {
         var contact = this.scope.attr('contact');
         var filters;
@@ -749,32 +740,29 @@
     }
   });
 
-  $('body').on(
-    'click',
-    '[data-toggle="unified-mapper"], [data-toggle="unified-search"]',
-    function (ev) {
-      var btn;
-      var data = {};
-      var isSearch;
+  $('body').on('click', selectors.join(', '), function (ev) {
+    var btn = $(ev.currentTarget);
+    var data = {};
+    var isSearch;
+    ev.preventDefault();
 
-      ev.preventDefault();
+    _.each(btn.data(), function (val, key) {
+      data[can.camelCaseToUnderscore(key)] = val;
+    });
 
-      btn = $(ev.currentTarget);
-
-      _.each(btn.data(), function (val, key) {
-        data[can.camelCaseToUnderscore(key)] = val;
-      });
-
-      if (data.tooltip) {
-        data.tooltip.hide();
-      }
-      isSearch = /unified-search/ig.test(data.toggle);
-      GGRC.Controllers.MapperModal.launch($(this), _.extend({
-        object: btn.data('join-object-type'),
-        type: btn.data('join-option-type'),
-        'join-object-id': btn.data('join-object-id'),
-        'search-only': isSearch
-      }, data));
+    if (data.tooltip) {
+      data.tooltip.hide();
     }
-  );
+    isSearch = /unified-search/ig.test(data.toggle);
+    GGRC.Controllers.MapperModal.launch(btn, _.extend({
+      object: btn.data('join-object-type'),
+      type: btn.data('join-option-type'),
+      'join-object-id': btn.data('join-object-id'),
+      'search-only': isSearch,
+      template: {
+        title: isSearch ?
+          '/static/mustache/base_objects/modal/search_title.mustache' : ''
+      }
+    }, data));
+  });
 })(window.can, window.can.$);

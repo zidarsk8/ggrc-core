@@ -48,7 +48,7 @@ describe("mappers", function() {
         var loader = jasmine.createSpyObj('loader', ['refresh_instances']);
         var binding = new LL.ListBinding({}, loader);
         binding.refresh_instances();
-        expect(loader.refresh_instances).toHaveBeenCalledWith(binding);
+        expect(loader.refresh_instances).toHaveBeenCalledWith(binding, undefined);
       });
 
     });

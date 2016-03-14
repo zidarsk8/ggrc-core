@@ -8,6 +8,7 @@
 from ggrc import db
 from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relatable
+from ggrc.models.types import JsonType
 
 
 class AssessmentTemplate(Base, Relatable, db.Model):
@@ -27,11 +28,11 @@ class AssessmentTemplate(Base, Relatable, db.Model):
   test_plan_procedure = db.Column(db.Boolean, nullable=False)
 
   # procedure description
-  procedure_description = db.Column(db.Text)
+  procedure_description = db.Column(db.Text, nullable=True)
 
   # the people that should be assigned by default to each assessment created
   # within the releated audit
-  default_people = db.Column(db.Text)
+  default_people = db.Column(JsonType, nullable=False)
 
   # REST properties
   _publish_attrs = [

@@ -46,7 +46,6 @@ dashboard-js-template-files:
   - tasks/modal_content.mustache
   - tasks/tree_footer.mustache
   - tasks/tree_add_item.mustache
-  - tasks/info.mustache
   - tasks/extended_info.mustache
   - tasks/tree.mustache
   - tasks/states.mustache

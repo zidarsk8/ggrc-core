@@ -5,7 +5,7 @@
     Maintained By: urban@reciprocitylabs.com
 }}
 <div class="openclose">
-  {{#if_instance_of instance "Cycle|CycleTaskGroup|CycleTaskGroupObject|CycleTaskGroupObjectTask"}}
+  {{#if_instance_of instance "Cycle|CycleTaskGroup|CycleTaskGroupObjectTask"}}
     <span class="status-label" {{addclass "status-" instance.status}} {{addclass "status-" instance.overdue}}></span>
   {{else}}
     {{#if instance.workflow_state}}

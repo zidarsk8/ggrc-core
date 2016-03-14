@@ -3,18 +3,24 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from integration.ggrc import TestCase
+from datetime import date
+from datetime import datetime
+
 from freezegun import freeze_time
-from datetime import date, datetime
 from mock import patch
 from sqlalchemy import and_
 
-from ggrc import db, notifications
-from ggrc.models import NotificationType, Notification, Person
-from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
-from integration.ggrc_workflows.generator import WorkflowsGenerator
+from ggrc import db
+from ggrc import notifications
+from ggrc.models import Notification
+from ggrc.models import NotificationType
+from ggrc.models import Person
+from ggrc_workflows.models import Cycle
+from ggrc_workflows.models import CycleTaskGroupObjectTask
+from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 
 class TestCycleTaskStatusChange(TestCase):
@@ -46,10 +52,11 @@ class TestCycleTaskStatusChange(TestCase):
 
   def test_task_declined_notification_created(self):
     with freeze_time("2015-05-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -70,10 +77,11 @@ class TestCycleTaskStatusChange(TestCase):
 
   def test_all_tasks_finished_notification_created(self):
     with freeze_time("2015-05-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -106,10 +114,11 @@ class TestCycleTaskStatusChange(TestCase):
   def test_multi_all_tasks_finished_notification_created(self):
 
     with freeze_time("2015-05-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_2)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_2)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -167,10 +176,11 @@ class TestCycleTaskStatusChange(TestCase):
     """
 
     with freeze_time("2015-05-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02"):
       notifications.send_todays_digest_notifications()
@@ -207,10 +217,11 @@ class TestCycleTaskStatusChange(TestCase):
     """
 
     with freeze_time("2015-05-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
 
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02"):
       notifications.send_todays_digest_notifications()
@@ -243,9 +254,10 @@ class TestCycleTaskStatusChange(TestCase):
     """
 
     with freeze_time("2015-05-01"):
-      _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
-      _, cycle = self.wf_generator.generate_cycle(wf)
-      self.wf_generator.activate_workflow(wf)
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1)
+      _, cycle = self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-03"):
       _, notif_data = notifications.get_todays_notifications()
@@ -295,6 +307,12 @@ class TestCycleTaskStatusChange(TestCase):
             "contact": person_dict(self.user.id),
             "task_group_tasks": [{
                 "title": "task 1",
+                "description": "two taks in wf with different objects",
+                "contact": person_dict(self.user.id),
+                "start_date": date(2015, 5, 1),  # friday
+                "end_date": date(2015, 5, 5),
+            }, {
+                "title": "task 2",
                 "description": "two taks in wf with different objects",
                 "contact": person_dict(self.user.id),
                 "start_date": date(2015, 5, 1),  # friday

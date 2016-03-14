@@ -316,6 +316,41 @@ Mustache.registerHelper("if_null", function (val1, options) {
   return exec();
 });
 
+  /**
+   * Check if the given argument is a string and render the corresponding
+   * block in the template.
+   *
+   * Example usage:
+   *
+   *   {{#if_string someValue}}
+   *      {{someValue}} is a string
+   *   {{else}}
+   *     {{someValue}} is NOT a string
+   *   {{/if_string}}
+   *
+   * @param {*} thing - the argument to check
+   * @param {Object} options - a CanJS options argument passed to every helper
+   *
+   */
+  Mustache.registerHelper('if_string', function (thing, options) {
+    var resolved;
+
+    if (arguments.length !== 2) {
+      throw new Error(
+        'Invalid number of arguments (' +
+        (arguments.length - 1) +  // do not count the auto-provided options arg
+        '), expected 1.');
+    }
+
+    resolved = Mustache.resolve(thing);
+
+    if (_.isString(resolved)) {
+      return options.fn(options.context);
+    }
+
+    return options.inverse(options.context);
+  });
+
 // Resolve and return the first computed value from a list
 Mustache.registerHelper("firstexist", function () {
   var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)

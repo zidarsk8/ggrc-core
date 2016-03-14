@@ -9,7 +9,6 @@ This contains the basic Workflow object and a mixin for determining the state
 of the Objects that are mapped to any cycle tasks.
 """
 
-from collections import OrderedDict
 from datetime import date
 from sqlalchemy import and_
 from sqlalchemy import not_
@@ -23,12 +22,12 @@ from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import deferred
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import Titled
-from ggrc.models.mixins import deferred
 from ggrc.models.person import Person
 from ggrc_basic_permissions.models import UserRole
 from ggrc_workflows.models import cycle
@@ -107,6 +106,12 @@ class Workflow(CustomAttributable, HasOwnContext, Timeboxed, Described, Titled,
   next_cycle_start_date = db.Column(db.Date, nullable=True)
 
   non_adjusted_next_cycle_start_date = db.Column(db.Date, nullable=True)
+
+  # this is an indicator if the workflow exists from before the change where
+  # we deleted cycle objects, which changed how the cycle is created and
+  # how objects are mapped to the cycle tasks
+  is_old_workflow = deferred(
+      db.Column(db.Boolean, default=False, nullable=True), 'Workflow')
 
   @computed_property
   def workflow_state(self):
@@ -234,36 +239,44 @@ class WorkflowState(object):
   _stub_attrs = []
 
   @classmethod
-  def _get_state(cls, current_objects):
-    """Get lowest state of the objects.
+  def _get_state(cls, current_tasks):
+    """Get overall state of a group of tasks.
 
-    Return the least done state off all objects. Function will work correctly
-    only for non Overdue states. If the result is overdue, it should be
-    handled outsid of this function.
+    Rules, the first that is true is selected:
+      -if all are verified -> verified
+      -if all are finished -> finished
+      -if all are at least finished -> finished
+      -if any are in progress or declined -> in progress
+      -if any are assigned -> assigned
+
+    The function will work correctly only for non Overdue states. If the result
+    is overdue, it should be handled outside of this function.
 
     Args:
-      current_objects: list of objects that are currently a part of an active
+      current_tasks: list of tasks that are currently a part of an active
         cycle or cycles that are active in an workflow.
 
     Returns:
-      Lowest state of the list of objects, ordered from least done to complete.
-      This function does not check the Overdue states. if any object is Overdue
-      the result of thi function will not be correct.
+      Overall state according to the rules described above.
     """
-    priority_states = OrderedDict([
-        # The first True state will be returned
-        ("InProgress", False),
-        ("Finished", False),
-        ("Assigned", False),
-        ("Verified", False),
-        (None, True),
-    ])
+    states = [task.status or "Assigned" for task in current_tasks]
 
-    for obj in current_objects:
-      status = obj.status or "Assigned"
-      priority_states[status] = True
+    resulting_state = ""
+    if states.count("Verified") == len(states):
+      resulting_state = "Verified"
+    elif states.count("Finished") == len(states):
+      resulting_state = "Finished"
+    elif not set(states).intersection({"InProgress", "Assigned", "Declined"}):
+      resulting_state = "Finished"
+    elif set(states).intersection({"InProgress", "Declined", "Finished",
+                                   "Verified"}):
+      resulting_state = "InProgress"
+    elif "Assigned" in states:
+      resulting_state = "Assigned"
+    else:
+      resulting_state = None
 
-    return next(k for k, v in priority_states.items() if v)
+    return resulting_state
 
   @classmethod
   def get_object_state(cls, objs):
@@ -273,34 +286,25 @@ class WorkflowState(object):
     are scanned in order: Overdue, InProgress, Finished, Assigned, Verified.
 
     Args:
-      objs: A list of cycle task group objects, which should all be mapped to
+      objs: A list of cycle group object tasks, which should all be mapped to
         the same object.
 
     Returns:
       Name of the lowest state of all active cycle tasks that relate to the
       given objects.
     """
-    current_objects = [o for o in objs if o.cycle.is_current]
+    current_tasks = [task for task in objs if task.cycle.is_current]
 
-    if not current_objects:
+    if not current_tasks:
       return None
 
-    object_ids = [o.id for o in current_objects]
-    overdue_tasks = db.session.query(
-        ctgot.CycleTaskGroupObjectTask.id).join(
-        cycle.Cycle).filter(
-        and_(
-            cycle.Cycle.is_current,
-            ctgot.CycleTaskGroupObjectTask.status != "Verified",
-            ctgot.CycleTaskGroupObjectTask.end_date <= date.today(),
-            ctgot.CycleTaskGroupObjectTask.cycle_task_group_object_id.in_(
-                object_ids),
-        )
-    ).count()
+    overdue_tasks = [task for task in current_tasks
+                     if task.status != "Verified" and
+                     task.end_date <= date.today()]
     if overdue_tasks:
       return "Overdue"
 
-    return cls._get_state(current_objects)
+    return cls._get_state(current_tasks)
 
   @classmethod
   def get_workflow_state(cls, cycles):
@@ -317,12 +321,12 @@ class WorkflowState(object):
       Name of the lowest workflow state, if there are any active cycles.
       Otherwise it returns None.
     """
-    current_cycles = [c for c in cycles if c.is_current]
+    current_cycles = [cycle_ for cycle_ in cycles if cycle_.is_current]
 
     if not current_cycles:
       return None
 
-    cycle_ids = [c.id for c in current_cycles]
+    cycle_ids = [cycle_.id for cycle_ in current_cycles]
     overdue_tasks = db.session.query(
         ctgot.CycleTaskGroupObjectTask.id).join(
         cycle.Cycle).filter(
@@ -339,13 +343,4 @@ class WorkflowState(object):
 
   @computed_property
   def workflow_state(self):
-    return WorkflowState.get_object_state(self.cycle_task_group_objects)
-
-  @classmethod
-  def eager_query(cls):
-    query = super(WorkflowState, cls).eager_query()
-    return query.options(
-        orm.subqueryload('cycle_task_group_objects')
-        .undefer_group('CycleTaskGroupObject_complete'),
-        orm.subqueryload_all('cycle_task_group_objects.cycle'),
-    )
+    return WorkflowState.get_object_state(self.cycle_task_group_object_tasks)

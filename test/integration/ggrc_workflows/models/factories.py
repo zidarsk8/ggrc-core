@@ -4,7 +4,6 @@
 # Maintained By: miha@reciprocitylabs.com
 
 import factory
-import random
 from datetime import date
 
 
@@ -75,17 +74,3 @@ class CycleTaskFactory(ModelFactory, TitledFactory):
   task_type = "text"
   start_date = date(2015, 12, 4)
   end_date = date(2015, 12, 27)
-
-
-class CycleTaskObjectFactory(ModelFactory, TitledFactory):
-
-  class Meta:
-    model = models.CycleTaskGroupObject
-
-  task_group_object= factory.SubFactory(TaskGroupObjectFactory)
-  cycle_task_group = factory.SubFactory(CycleTaskGroupFactory)
-  cycle = factory.SubFactory(CycleFactory)
-  object_id = 0
-  object_type = "test"
-
-
