@@ -22,6 +22,7 @@ def request_open_data(notif):
   data = {}
   for person, _ in req.assignees:
     data[person.email] = {
+        "user": get_person_dict(person),
         "request_open": {
             req.id: {
                 "title": req.title
@@ -47,6 +48,7 @@ def request_declined_data(notif):
                 if "Requester" in role]
   for person in requesters:
     data[person.email] = {
+        "user": get_person_dict(person),
         "request_open": {
             req.id: {
                 "title": req.title
@@ -73,3 +75,14 @@ def get_request_data(notif):
   elif notif.notification_type.name == "request_declined":
     return request_declined_data(notif)
   return {}
+
+
+def get_person_dict(person):
+  if person:
+    return {
+        "email": person.email,
+        "name": person.name,
+        "id": person.id,
+    }
+
+  return {"email": "", "name": "", "id": -1}

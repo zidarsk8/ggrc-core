@@ -10,6 +10,7 @@ from urlparse import urljoin
 
 from ggrc import db
 from ggrc.models.revision import Revision
+from ggrc.notifications import data_handlers
 from ggrc.utils import merge_dicts, get_url_root
 from ggrc_basic_permissions.models import Role, UserRole
 from ggrc_workflows.models import Cycle
@@ -35,8 +36,8 @@ def get_cycle_created_task_data(notification):
 
   force = cycle.workflow.notify_on_change
 
-  task_assignee = get_person_dict(cycle_task.contact)
-  task_group_assignee = get_person_dict(cycle_task_group.contact)
+  task_assignee = data_handlers.get_person_dict(cycle_task.contact)
+  task_group_assignee = data_handlers.get_person_dict(cycle_task_group.contact)
   workflow_owners = get_workflow_owners_dict(cycle.context_id)
   task = {
       cycle_task.id: get_cycle_task_dict(cycle_task)
@@ -100,7 +101,7 @@ def get_cycle_task_due(notification):
   force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
   return {
       cycle_task.contact.email: {
-          "user": get_person_dict(cycle_task.contact),
+          "user": data_handlers.get_person_dict(cycle_task.contact),
           "force_notifications": {
               notification.id: force
           },
@@ -141,7 +142,7 @@ def get_cycle_created_data(notification, cycle):
 
   for person in cycle.workflow.people:
     result[person.email] = {
-        "user": get_person_dict(person),
+        "user": data_handlers.get_person_dict(person),
         "force_notifications": {
             notification.id: force
         },
@@ -174,7 +175,7 @@ def get_cycle_task_declined_data(notification):
   force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
   return {
       cycle_task.contact.email: {
-          "user": get_person_dict(cycle_task.contact),
+          "user": data_handlers.get_person_dict(cycle_task.contact),
           "force_notifications": {
               notification.id: force
           },
@@ -221,7 +222,7 @@ def get_workflow_starts_in_data(notification, workflow):
 
   for wf_person in workflow.workflow_people:
     result[wf_person.person.email] = {
-        "user": get_person_dict(wf_person.person),
+        "user": data_handlers.get_person_dict(wf_person.person),
         "force_notifications": {
             notification.id: force
         },
@@ -312,7 +313,7 @@ def get_workflow_owners_dict(context_id):
   owners = db.session.query(UserRole).join(Role).filter(
       and_(UserRole.context_id == context_id,
            Role.name == "WorkflowOwner")).all()
-  return {user_role.person.id: get_person_dict(user_role.person)
+  return {user_role.person.id: data_handlers.get_person_dict(user_role.person)
           for user_role in owners}
 
 
@@ -372,17 +373,6 @@ def get_cycle_task_dict(cycle_task):
       "fuzzy_due_in": get_fuzzy_date(cycle_task.end_date),
       "cycle_task_url": get_cycle_task_url(cycle_task),
   }
-
-
-def get_person_dict(person):
-  if person:
-    return {
-        "email": person.email,
-        "name": person.name,
-        "id": person.id,
-    }
-
-  return {"email": "", "name": "", "id": -1}
 
 
 def get_cycle_dict(cycle, manual=False):
