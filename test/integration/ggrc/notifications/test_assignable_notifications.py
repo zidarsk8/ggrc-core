@@ -7,6 +7,7 @@
 
 from datetime import datetime
 from freezegun import freeze_time
+from mock import patch
 from sqlalchemy import and_
 
 from ggrc import db
@@ -72,7 +73,8 @@ class TestAssignableNotification(converters.TestCase):
         notif_filter
     )
 
-  def test_request_without_verifiers(self):
+  @patch("ggrc.notifications.common.send_email")
+  def test_request_without_verifiers(self, _):
     """Test setting notification entries for simple requests.
 
     This function tests that each request gets an entry in the notifications
@@ -110,8 +112,9 @@ class TestAssignableNotification(converters.TestCase):
       self.api_helper.modify_object(request, {"status": "In Progress"})
       self.assertEqual(self._get_notifications().count(), 0)
 
-  def test_request_with_verifiers(self):
-    """Test notifications for declined requests.
+  @patch("ggrc.notifications.common.send_email")
+  def test_request_with_verifiers(self, _):
+    """Test notifications entries for declined requests.
 
     This tests makes sure there are extra notification entries added when a
     request has been declined.
