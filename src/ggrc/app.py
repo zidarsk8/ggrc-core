@@ -7,6 +7,7 @@
 Sets up Flask app
 """
 
+import re
 from flask import Flask
 from flask.ext.sqlalchemy import get_debug_queries
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -133,11 +134,13 @@ def _display_sql_queries():
       # We have to copy the queries list below otherwise queries executed
       # in the for loop will be appended causing an endless loop
       for query in queries[:]:
-        app.logger.info("{:.8f} {}\n{}".format(
+        app.logger.info("{:.8f} {}\n{}\n{}".format(
             query.duration,
             query.context,
-            query.statement % query.parameters))
-        if query.duration > explain_threshold:
+            query.statement,
+            query.parameters))
+        is_select = bool(re.match('SELECT', query.statement, re.I))
+        if query.duration > explain_threshold and is_select:
           statement = 'EXPLAIN ' + query.statement
           engine = SQLAlchemy().get_engine(app)
           result = engine.execute(statement, query.parameters)
