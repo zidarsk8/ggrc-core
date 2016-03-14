@@ -71,7 +71,6 @@ class TestComprehensiveSheets(TestCase):
     self.client.get("/login")
 
     self.create_custom_attributes()
-    self.create_people()
     filename = "comprehensive_sheet1.csv"
     self.import_file(filename)
 
@@ -132,17 +131,3 @@ class TestComprehensiveSheets(TestCase):
     gen("program", title="my_checkbox", attribute_type="Checkbox")
     gen("program", title="my_dropdown", attribute_type="Dropdown",
         options="a,b,c,d")
-
-  def create_people(self):
-    """Generate people needed by comprehensive_sheet1.csv."""
-    emails = [
-        "user1@ggrc.com",
-        "miha@policy.com",
-        "someone.else@ggrc.com",
-        "another@user.com",
-    ]
-    for email in emails:
-      self.generator.generate_person({
-          "name": email.split("@")[0].title(),
-          "email": email,
-      }, "gGRC Admin")

@@ -32,7 +32,6 @@ class TestComprehensiveSheets(TestCase):
 
   def test_comprehensive_sheet1_with_custom_attributes(self):
     self.create_custom_attributes()
-    self.create_people()
     filename = "comprehensive_sheet1.csv"
     response = self.import_file(filename)
     indexed = {r["name"]: r for r in response}
@@ -165,11 +164,11 @@ class TestComprehensiveSheets(TestCase):
             "rows": 15,
         },
         "Person": {
-            "created": 9,
+            "created": 13,
             "ignored": 1,
             "row_errors": 1,
             "row_warnings": 0,
-            "rows": 10,
+            "rows": 14,
         }
     }
 
@@ -260,16 +259,3 @@ class TestComprehensiveSheets(TestCase):
     gen("program", title="my_dropdown", attribute_type="Dropdown",
         options="a,b,c,d")
     # gen("program", title="my_description", attribute_type="Rich Text")
-
-  def create_people(self):
-    emails = [
-        "user1@ggrc.com",
-        "miha@policy.com",
-        "someone.else@ggrc.com",
-        "another@user.com",
-    ]
-    for email in emails:
-      self.generator.generate_person({
-          "name": email.split("@")[0].title(),
-          "email": email,
-      }, "gGRC Admin")
