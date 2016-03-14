@@ -149,7 +149,7 @@ Maintained By: miha@reciprocitylabs.com
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_open'].items() %}
                     <li {{ style.list_item() }} >
-                      assessment:{{ assessment['title'] }}
+                      assessment:{{ assessment_data['title'] }}
                     </li>
                   {% endfor %}
                   </ul>
@@ -160,7 +160,7 @@ Maintained By: miha@reciprocitylabs.com
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_declined'].items() %}
                     <li {{ style.list_item() }} >
-                      assessment:{{ assessment['title'] }}
+                      assessment:{{ assessment_data['title'] }}
                     </li>
                   {% endfor %}
                   </ul>
@@ -171,7 +171,7 @@ Maintained By: miha@reciprocitylabs.com
                   <ul {{ style.list_wrap() }} >
                   {% for request_id, request_data in digest['request_open'].items() %}
                     <li {{ style.list_item() }} >
-                      Request:{{ request['title'] }}
+                      Request:{{ request_data['title'] }}
                     </li>
                   {% endfor %}
                   </ul>
@@ -182,7 +182,7 @@ Maintained By: miha@reciprocitylabs.com
                   <ul {{ style.list_wrap() }} >
                   {% for request_id, request_data in digest['request_declined'].items() %}
                     <li {{ style.list_item() }} >
-                      Request:{{ request['title'] }}
+                      Request:{{ request_data['title'] }}
                     </li>
                   {% endfor %}
                   </ul>
