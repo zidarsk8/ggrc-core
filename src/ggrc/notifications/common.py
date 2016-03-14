@@ -60,9 +60,7 @@ def get_filter_data(notification):
   data = Services.call_service(notification.object_type, notification)
 
   for user, user_data in data.iteritems():
-    if should_receive(notification,
-                      user_data["force_notifications"][notification.id],
-                      user_data["user"]["id"]):
+    if should_receive(notification, user_data):
       result[user] = user_data
   return result
 
@@ -108,7 +106,9 @@ def get_todays_notifications():
   return notifications, get_notification_data(notifications)
 
 
-def should_receive(notif, force_notif, person_id, nightly_cron=True):
+def should_receive(notif, user_data, nightly_cron=True):
+  force_notif = user_data.get("force_notifications", {}).get(notif.id, False)
+  person_id = user_data["user"]["id"]
   def is_enabled(notif_type):
     result = NotificationConfig.query.filter(
         and_(NotificationConfig.person_id == person_id,
