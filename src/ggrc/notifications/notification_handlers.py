@@ -16,6 +16,7 @@ from sqlalchemy import and_
 from ggrc import db
 from ggrc.services.common import Resource
 from ggrc.models import request
+from ggrc.models import assessment
 from ggrc.models import notification
 
 
@@ -75,9 +76,10 @@ def handle_request_modified(obj):
     _add_request_declined_notification(obj)
 
 
-def handle_request_created(obj):
+def handle_assignable_created(obj):
   notif_type = notification.NotificationType.query.filter_by(
-      name="request_open").first()
+      name="{}_open".format(obj.type.lower())
+  ).first()
 
   _add_notification(obj, notif_type)
 
@@ -101,5 +103,5 @@ def register_handlers():
     handle_request_modified(obj)
 
   @Resource.model_posted_after_commit.connect_via(request.Request)
-  def request_created_listener(sender, obj=None, src=None, service=None):
-    handle_request_created(obj)
+  def assignable_created_listener(sender, obj=None, src=None, service=None):
+    handle_assignable_created(obj)
