@@ -871,12 +871,6 @@ class ObjectWidget(object):
   INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
 
 
-class InfoWidget(object):
-  """Locators for the info widget"""
-
-  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
-
-
 class ModalDeleteObject(object):
   MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
   CONFIRMATION_TEXT = (By.CSS_SELECTOR, '.modal-body>div>p')
@@ -885,7 +879,14 @@ class ModalDeleteObject(object):
       By.CSS_SELECTOR, '.modal-footer .confirm-buttons>[data-toggle="delete"]')
 
 
-class ProgramInfoWidget(object):
+class BaseInfoWidget(object):
+  """Locators that are common to all info widgets"""
+  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
+  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
+  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
+
+
+class ProgramInfoWidget(BaseInfoWidget):
   """Locators for the info program widget"""
 
   PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
@@ -894,8 +895,6 @@ class ProgramInfoWidget(object):
   MODAL_DELETE = (By.ID, '[id="ajax-lhn_modal-javascript:--"]')
   MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, '.lhn_modal .grcicon-x-grey')
 
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
   OBJECT_REVIEW = (By.CSS_SELECTOR,
                    '[data-test-id="title_review_0ad9fbaf"] h6')
   SUBMIT_FOR_REVIEW = (By.CSS_SELECTOR,
@@ -962,160 +961,108 @@ class ProgramInfoWidget(object):
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
 
 
-class RequestInfoWidget(object):
+class RequestInfoWidget(BaseInfoWidget):
   """Locators for the request info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class RiskInfoWidget(object):
+class RiskInfoWidget(BaseInfoWidget):
   """Locators for the risk info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class OrgGroupInfoWidget(object):
+class OrgGroupInfoWidget(BaseInfoWidget):
   """Locators for the org group info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class IssueInfoWidget(object):
+class IssueInfoWidget(BaseInfoWidget):
   """Locators for the org group info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class RegulationsInfoWidget(object):
+class RegulationsInfoWidget(BaseInfoWidget):
   """Locators for the regulation info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class WorkflowInfoWidget(object):
+class WorkflowInfoWidget(BaseInfoWidget):
   """Locators for the workflow info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class AuditInfoWidget(object):
+class AuditInfoWidget(BaseInfoWidget):
   """Locators for the audit info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class AssessmentInfoWidget(object):
+class AssessmentInfoWidget(BaseInfoWidget):
   """Locators for the assessment info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class PolicyInfoWidget(object):
+class PolicyInfoWidget(BaseInfoWidget):
   """Locators for the regulation info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class StandardInfoWidget(object):
+class StandardInfoWidget(BaseInfoWidget):
   """Locators for the standard info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class ContractInfoWidget(object):
+class ContractInfoWidget(BaseInfoWidget):
   """Locators for the contract info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class ClauseInfoWidget(object):
+class ClauseInfoWidget(BaseInfoWidget):
   """Locators for the clause info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class SectionInfoWidget(object):
+class SectionInfoWidget(BaseInfoWidget):
   """Locators for the section info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class ControlInfoWidget(object):
+class ControlInfoWidget(BaseInfoWidget):
   """Locators for the control info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class ObjectiveInfoWidget(object):
+class ObjectiveInfoWidget(BaseInfoWidget):
   """Locators for the objective info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class PeopleInfoWidget(object):
+class PeopleInfoWidget(BaseInfoWidget):
   """Locators for the people info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class VendorInfoWidget(object):
+class VendorInfoWidget(BaseInfoWidget):
   """Locators for the vendor info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class AccessGroupInfoWidget(object):
+class AccessGroupInfoWidget(BaseInfoWidget):
   """Locators for the access group info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class SystemInfoWidget(object):
+class SystemInfoWidget(BaseInfoWidget):
   """Locators for the system info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class ProcessInfoWidget(object):
+class ProcessInfoWidget(BaseInfoWidget):
   """Locators for the process info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class ProductInfoWidget(object):
+class ProductInfoWidget(BaseInfoWidget):
   """Locators for the product info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class FacilityInfoWidget(object):
+class FacilityInfoWidget(BaseInfoWidget):
   """Locators for the facility info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class ProjectInfoWidget(object):
+class ProjectInfoWidget(BaseInfoWidget):
   """Locators for the project info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class MarketInfoWidget(object):
+class MarketInfoWidget(BaseInfoWidget):
   """Locators for the market info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class DataAssetInfoWidget(object):
+class DataAssetInfoWidget(BaseInfoWidget):
   """Locators for the data asset info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class ThreatInfoWidget(object):
+class ThreatInfoWidget(BaseInfoWidget):
   """Locators for the data asset info widget"""
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
-  TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
 class AdminRolesWidget(object):

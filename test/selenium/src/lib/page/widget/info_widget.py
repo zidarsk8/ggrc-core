@@ -19,7 +19,7 @@ class Widget(base.Widget):
   def __init__(self, driver):
     # wait that the elements load before calling super
     self.button_settings = base.Button(
-        driver, locator.InfoWidget.BUTTON_SETTINGS)
+        driver, locator.BaseInfoWidget.BUTTON_SETTINGS)
     self.title = base.Label(driver, self._locator.TITLE)
     self.title_entered = base.Label(
         driver, self._locator.TITLE_ENTERED)
