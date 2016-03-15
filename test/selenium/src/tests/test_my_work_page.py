@@ -51,7 +51,7 @@ class TestMyWorkPage(base.Test):
   def test_redirect(self, selenium):
     """Tests if the user is redirected to the My Work page after clicking on
     the my work button in user dropdown"""
-    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
 
     dashboard.Header(selenium.driver)\
         .open_user_list()\
@@ -62,7 +62,7 @@ class TestMyWorkPage(base.Test):
   @pytest.mark.smoke_tests
   def test_lhn_stays_expanded(self, selenium):
     """Tests if, after opening the LHN, it slides out and stays expanded."""
-    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
 
     lhn_menu = dashboard.Header(selenium.driver).open_lhn_menu()
     initial_position = lhn_menu.my_objects.element.location
@@ -79,7 +79,7 @@ class TestMyWorkPage(base.Test):
   def test_lhn_remembers_tab_state(self, selenium):
     """Tests if LHN remembers which tab is selected (my or all objects) after
     closing it"""
-    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
     header = dashboard.Header(selenium.driver)
 
     # check if my objects tab saves state
@@ -103,7 +103,7 @@ class TestMyWorkPage(base.Test):
   @pytest.mark.smoke_tests
   def test_lhn_pin(self, selenium):
     """Tests if the pin is present and if it's default state is off"""
-    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
     lhn_menu = dashboard.Header(selenium.driver).open_lhn_menu()
     assert lhn_menu.pin.is_activated is False
 
@@ -112,7 +112,7 @@ class TestMyWorkPage(base.Test):
     """Tests the user menu checkbox. With that also the user menu itself is
     tested since the model initializes all elements (and throws and
     exception if they're not present."""
-    conftest_utils.navigate_to_page_that_contains_lhn(selenium.driver)
+    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
     user_list = dashboard.Header(selenium.driver).open_user_list()
 
     user_list.checkbox_daily_digest.click()

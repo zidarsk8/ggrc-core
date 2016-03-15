@@ -68,7 +68,7 @@ def new_program(selenium, new_control):
   """Creates a new program object and returns the program info page with the
   saved modal"""
   # pylint: disable=redefined-outer-name
-  modal = conftest_utils.get_lhn_accordeon(
+  modal = conftest_utils.get_lhn_accordion(
       selenium.driver, constants.element.Lhn.PROGRAMS)\
       .create_new()
   test_utils.ModalNewPrograms.enter_test_data(modal)

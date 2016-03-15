@@ -38,7 +38,7 @@ class TestObjectMapping(base.Test):
         # don't map an object to itself
         if mapped_object != object_:
           extended_info = conftest_utils\
-              .get_lhn_accordeon(selenium.driver, mapped_object.object_name)\
+              .get_lhn_accordion(selenium.driver, mapped_object.object_name)\
               .hover_over_visible_member(mapped_object.title_entered.text)
 
           if not extended_info.is_already_mapped():

@@ -14,8 +14,8 @@ from lib.page import dashboard
 from lib.utils import test_utils
 
 
-def navigate_to_page_that_contains_lhn(driver):
-  """Navigates to dashboard since dashboard always contains the LHN button
+def navigate_to_page_with_lhn(driver):
+  """Navigates to dashboard it the LHN button isn't found.
   Args:
       driver (lib.base.CustomDriver)
   """
@@ -26,9 +26,9 @@ def navigate_to_page_that_contains_lhn(driver):
     driver.get(dashboard.Dashboard.URL)
 
 
-def get_lhn_accordeon(driver, object_name):
+def get_lhn_accordion(driver, object_name):
   """Selects the relevant section in LHN and returns the relevant section
-  accordeon
+  accordion
 
   Args:
       driver (lib.base.CustomDriver)
@@ -36,7 +36,7 @@ def get_lhn_accordeon(driver, object_name):
   Returns:
       lib.element.lhn.AccordionGroup
   """
-  navigate_to_page_that_contains_lhn(driver)
+  navigate_to_page_with_lhn(driver)
   lhn_contents = dashboard.Header(driver).open_lhn_menu()
 
   # if the object button is not visible, we have to open it's section first
@@ -54,7 +54,7 @@ def create_lhn_object(driver, object_name):
   Returns:
       lib.page.widget.info_widget.Widget
   """
-  modal = get_lhn_accordeon(driver, object_name).create_new()
+  modal = get_lhn_accordion(driver, object_name).create_new()
   factory.get_cls_test_utils(object_name).enter_test_data(modal)
   modal.save_and_close()
   return factory.get_cls_widget(object_name, is_info=True)(driver)
