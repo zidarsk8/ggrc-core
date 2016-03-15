@@ -24,16 +24,27 @@
       }.bind(this));
     },
     '{CMS.Models.AssessmentTemplate} created': function (model, ev, instance) {
-      var auditDfd;
-
       if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
         return;
       }
 
       this._after_pending_joins(instance, function () {
+        var auditDfd;
+        var attrDfd;
+
         auditDfd = this._create_relationship(instance,
             instance.audit, instance.audit.context);
-        instance.delay_resolving_save_until(auditDfd);
+        attrDfd = $.map(instance._template_attributes, function (attr) {
+          return new CMS.Models.CustomAttributeDefinition({
+            title: attr.title,
+            definition_id: instance.id,
+            definition_type: "assessment_template",
+            attribute_type: attr.type,
+            multi_choice_options: attr.values,
+            context: instance.context
+          }).save();
+        });
+        instance.delay_resolving_save_until($.when(auditDfd, attrDfd));
       }.bind(this));
     },
     '{CMS.Models.Issue} created': function (model, ev, instance) {
