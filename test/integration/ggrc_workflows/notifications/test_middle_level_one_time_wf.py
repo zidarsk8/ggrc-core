@@ -98,7 +98,6 @@ class TestOneTimeWorkflowNotification(TestCase):
 
       common.get_todays_notifications()
 
-
   def create_test_cases(self):
     def person_dict(person_id):
       return {
