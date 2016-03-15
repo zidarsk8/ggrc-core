@@ -3,78 +3,79 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-"""Data handlers for notifications for objects in ggrc module."""
+"""Data handlers for notifications for objects in ggrc module.
 
-from ggrc.models import request
+Main contributed functions are:
+  get_assignable_data,
+"""
+
+from ggrc import models
 
 
-def request_open_data(notif):
-  """Get data for open requests.
+def assignable_open_data(notif):
+  """Get data for open assignable object.
 
   Args:
-    notif (Notification): Notification entry for a request with request_open
-      notification type.
+    notif (Notification): Notification entry for an open assignable object.
 
   Returns:
     A dict containing all notification data for the given notification.
   """
-  req = request.Request.query.get(notif.object_id)
+  obj = get_notification_object(notif)
   data = {}
-  for person, _ in req.assignees:
+  for person, _ in obj.assignees:
     data[person.email] = {
         "user": get_person_dict(person),
-        "request_open": {
-            req.id: {
-                "title": req.title
+        notif.notification_type.name: {
+            obj.id: {
+                "title": obj.title
             }
         }
     }
   return data
 
 
-def request_declined_data(notif):
-  """Get data for declined requests.
+def _get_declined_people(obj):
+  """Get a list of people for declined notifications.
 
   Args:
-    notif (Notification): Notification entry for a request with
-      request_declined notification type.
+    obj (Model): An assignable model
+
+  Returns:
+    A list of people that should recieve a declined notification acording to
+    the given object type.
+  """
+  if obj.type == "Request":
+    return [person for person, role in obj.assignees
+            if "Requester" in role]
+  elif obj.type == "Assessment":
+    return [person for person, role in obj.assignees
+            if "Assessor" in role]
+  return []
+
+
+def assignable_declined_data(notif):
+  """Get data for declined assignable object.
+
+  Args:
+    notif (Notification): Notification entry for a declined assignable object.
 
   Returns:
     A dict containing all notification data for the given notification.
   """
-  req = request.Request.query.get(notif.object_id)
+  obj = get_notification_object(notif)
   data = {}
-  requesters = [person for person, role in req.assignees
-                if "Requester" in role]
-  for person in requesters:
+  people = _get_declined_people(obj)
+  for person in people:
     data[person.email] = {
         "user": get_person_dict(person),
-        "request_open": {
-            req.id: {
-                "title": req.title
+        notif.notification_type.name: {
+            obj.id: {
+                "title": obj.title
             }
         }
     }
   return data
-
-
-def get_request_data(notif):
-  """Return data for request notifications.
-
-  Args:
-    notif (Notification): notification with Request object_type.
-
-  Returns:
-    Dict with all data fro the request notification or an empty dict if the
-    notification is not for requests.
-  """
-  if notif.object_type != "Request":
-    return {}
-  elif notif.notification_type.name == "request_open":
-    return request_open_data(notif)
-  elif notif.notification_type.name == "request_declined":
-    return request_declined_data(notif)
-  return {}
 
 
 def get_person_dict(person):
@@ -86,3 +87,37 @@ def get_person_dict(person):
     }
 
   return {"email": "", "name": "", "id": -1}
+
+
+def get_notification_object(notif):
+  """Get an object for which the notification entry was made.
+
+  Args:
+    notif (Notifications): Notification entry for the given object
+
+  Returns:
+    A model based on notif.object_id and notif.object_type.
+  """
+  model = getattr(models, notif.object_type, None)
+  if model:
+    return model.query.get(notif.object_id)
+  return None
+
+
+def get_assignable_data(notif):
+  """Return data for assignable object notifications.
+
+  Args:
+    notif (Notification): notification with an Assignable object_type.
+
+  Returns:
+    Dict with all data fro the assignable notification or an empty dict if the
+    notification is not for a valid assignable object.
+  """
+  if notif.object_type not in {"Request", "Assessment"}:
+    return {}
+  elif notif.notification_type.name.endswith("_open"):
+    return assignable_open_data(notif)
+  elif notif.notification_type.name.endswith("_declined"):
+    return assignable_declined_data(notif)
+  return {}

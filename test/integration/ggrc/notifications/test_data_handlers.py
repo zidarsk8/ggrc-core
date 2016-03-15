@@ -37,7 +37,7 @@ class TestRequestDataHandlers(converters.TestCase):
   def test_open_request(self):
     """Test data handlers for opened requests."""
     notif = self._get_notification(self.request1, "request_open").first()
-    open_data = data_handlers.get_request_data(notif)
+    open_data = data_handlers.get_assignable_data(notif)
     request_1_expected_keys = set([
         "user1@a.com",
         "user2@a.com",
@@ -49,7 +49,7 @@ class TestRequestDataHandlers(converters.TestCase):
     self.assertEqual(set(open_data.keys()), request_1_expected_keys)
 
     notif = self._get_notification(self.request3, "request_open").first()
-    open_data = data_handlers.get_request_data(notif)
+    open_data = data_handlers.get_assignable_data(notif)
     request_3_expected_keys = set([
         "user1@a.com",
         "user2@a.com",
@@ -66,7 +66,7 @@ class TestRequestDataHandlers(converters.TestCase):
     self.api_helper.modify_object(self.request1, {"status": "In Progress"})
 
     notif = self._get_notification(self.request1, "request_declined").first()
-    declined_data = data_handlers.get_request_data(notif)
+    declined_data = data_handlers.get_assignable_data(notif)
     requester_emails = set([
         "user2@a.com",
         "user3@a.com",
