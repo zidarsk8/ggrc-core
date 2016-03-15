@@ -156,7 +156,7 @@ Maintained By: miha@reciprocitylabs.com
                 {% endif %}
 
                 {% if digest.get('assessment_declined') %}
-                  <h2 {{ style.sub_title() }} >New assessments</h2>
+                  <h2 {{ style.sub_title() }} >Declined assessments</h2>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_declined'].items() %}
                     <li {{ style.list_item() }} >
@@ -178,7 +178,7 @@ Maintained By: miha@reciprocitylabs.com
                 {% endif %}
 
                 {% if digest.get('request_declined') %}
-                  <h2 {{ style.sub_title() }} >New Requests</h2>
+                  <h2 {{ style.sub_title() }} >Declined Requests</h2>
                   <ul {{ style.list_wrap() }} >
                   {% for request_id, request_data in digest['request_declined'].items() %}
                     <li {{ style.list_item() }} >
