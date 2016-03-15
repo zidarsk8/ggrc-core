@@ -6,7 +6,7 @@
 """Add assignable notification types
 
 Revision ID: 50c374901d42
-Revises: 1e2abee7566c
+Revises: 204540106539
 Create Date: 2016-03-04 12:45:23.024224
 
 """
@@ -18,7 +18,7 @@ from sqlalchemy.sql import table
 
 # revision identifiers, used by Alembic.
 revision = '50c374901d42'
-down_revision = '1e2abee7566c'
+down_revision = '204540106539'
 
 NOTIFICATION_TYPES = table(
     'notification_types',
