@@ -54,40 +54,39 @@ def _has_unsent_notifications(notif_type, obj):
       )).count() > 0
 
 
-def _add_request_declined_notification(obj):
-  """Add entries for request declined notifications.
+def _add_assignable_declined_notif(obj):
+  """Add entries for assignable declined notifications.
 
   Args:
-    obj (Request): Request for which we want to add notifications.
+    obj (Assignable): Any object with assignable mixin for which we want to add
+      notifications.
   """
-  notif_type = notification.NotificationType.query.filter_by(
-      name="request_declined").first()
+  name = "{}_declined".format(obj._inflector.table_singular)
+  notif_type = notification.NotificationType.query.filter_by(name=name).first()
 
   if not _has_unsent_notifications(notif_type, obj):
     _add_notification(obj, notif_type)
 
 
-def handle_request_modified(obj):
+def handle_assignable_modified(obj):
   history = inspect(obj).attrs["status"].history
 
   # The transition from "finished" to "in progress" only happens when a task is
   # declined. So this is used as a triger for declined notifications.
   if history.deleted == [u'Finished'] and history.added == [u'In Progress']:
-    _add_request_declined_notification(obj)
+    _add_assignable_declined_notif(obj)
 
 
 def handle_assignable_created(obj):
-  notif_type = notification.NotificationType.query.filter_by(
-      name="{}_open".format(obj.type.lower())
-  ).first()
-
+  name = "{}_open".format(obj._inflector.table_singular)
+  notif_type = notification.NotificationType.query.filter_by(name=name).first()
   _add_notification(obj, notif_type)
 
 
-def handle_request_deleted(rel):
+def handle_assignable_deleted(obj):
   notification.Notification.query.filter_by(
-      object_id=rel.id,
-      object_type=rel.type,
+      object_id=obj.id,
+      object_type=obj.type,
   ).delete()
 
 
@@ -95,13 +94,16 @@ def register_handlers():
   """Register listeners for notification handlers"""
 
   @Resource.model_deleted.connect_via(request.Request)
-  def request_deleted_listener(sender, obj=None, src=None, service=None):
-    handle_request_deleted(obj)
+  @Resource.model_deleted.connect_via(assessment.Assessment)
+  def assignable_deleted_listener(sender, obj=None, src=None, service=None):
+    handle_assignable_deleted(obj)
 
   @Resource.model_put.connect_via(request.Request)
-  def request_modified_listener(sender, obj=None, src=None, service=None):
-    handle_request_modified(obj)
+  @Resource.model_put.connect_via(assessment.Assessment)
+  def assignable_modified_listener(sender, obj=None, src=None, service=None):
+    handle_assignable_modified(obj)
 
   @Resource.model_posted_after_commit.connect_via(request.Request)
+  @Resource.model_posted_after_commit.connect_via(assessment.Assessment)
   def assignable_created_listener(sender, obj=None, src=None, service=None):
     handle_assignable_created(obj)

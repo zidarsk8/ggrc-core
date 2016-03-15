@@ -22,4 +22,5 @@ def contributed_notifications():
   """Get handler functions for ggrc notification file types."""
   return {
       "Request": data_handlers.get_assignable_data,
+      "Assessment": data_handlers.get_assignable_data,
   }
