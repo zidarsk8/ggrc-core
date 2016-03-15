@@ -357,6 +357,10 @@ class FinishedDate(object):
       reflection.PublishOnly('finished_date')
   ]
 
+  _aliases = {
+      "finished_date": "Finished Date"
+  }
+
   @validates('status')
   def validate_status(self, key, value):
     """Update finished_date given the right status change."""
@@ -401,6 +405,10 @@ class VerifiedDate(object):
   _publish_attrs = [
       reflection.PublishOnly('verified_date')
   ]
+
+  _aliases = {
+      "verified_date": "Verified Date"
+  }
 
   @validates('status')
   def validate_status(self, key, value):
