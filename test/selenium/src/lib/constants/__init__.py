@@ -4,7 +4,7 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from lib.constants import (
-  cls,
+  cls_name,
   element,  # flake8: noqa
   log,
   path,

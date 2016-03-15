@@ -71,7 +71,7 @@ def get_cls_test_utils(object_name):
   Args:
     object_name (basestring)
   """
-  cls_name = constants.cls.TEST_MODAL_NEW_PREFIX + object_name
+  cls_name = constants.cls_name.TEST_MODAL_NEW_PREFIX + object_name
   return _factory(cls_name, base.Test, search_nested_subclasses=True)
 
 
