@@ -3,17 +3,16 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from integration.ggrc import TestCase
 from datetime import date
 from datetime import datetime
-
 from freezegun import freeze_time
 from mock import patch
 
-from ggrc import db
-from ggrc.notifications import common
+from ggrc.app import db
 from ggrc.models import Notification, Person
+from ggrc.notifications import common
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
+from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
@@ -82,8 +81,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_todays_notifications()
       user = get_person(self.user.id)
       self.assertIn("due_in", notif_data[user.email])
-      self.assertEqual(len(notif_data[user.email]["due_in"]),
-                       len(self.random_objects))
+      self.assertEqual(len(notif_data[user.email]["due_in"]), 2)
 
     with freeze_time("2015-05-04 03:21:34"):  # one day before due date
       common.send_todays_digest_notifications()
@@ -96,8 +94,7 @@ class TestOneTimeWfEndDateChange(TestCase):
     with freeze_time("2015-05-05 03:21:34"):  # due date
       _, notif_data = common.get_todays_notifications()
       self.assertIn("due_today", notif_data[user.email])
-      self.assertEqual(len(notif_data[user.email]["due_today"]),
-                       len(self.random_objects))
+      self.assertEqual(len(notif_data[user.email]["due_today"]), 2)
 
   @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_future(self, mock_mail):
@@ -293,6 +290,12 @@ class TestOneTimeWfEndDateChange(TestCase):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
+                "contact": person_dict(self.user.id),
+                "start_date": date(2015, 5, 1),  # friday
+                "end_date": date(2015, 5, 5),
+            }, {
+                "title": "task 2",
+                "description": "some task 2",
                 "contact": person_dict(self.user.id),
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),

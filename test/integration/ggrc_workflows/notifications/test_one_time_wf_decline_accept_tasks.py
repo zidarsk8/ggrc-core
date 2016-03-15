@@ -10,7 +10,7 @@ from freezegun import freeze_time
 from mock import patch
 from sqlalchemy import and_
 
-from ggrc import db
+from ggrc.app import db
 from ggrc.models import Notification
 from ggrc.models import NotificationType
 from ggrc.models import Person
@@ -307,6 +307,12 @@ class TestCycleTaskStatusChange(TestCase):
             "contact": person_dict(self.user.id),
             "task_group_tasks": [{
                 "title": "task 1",
+                "description": "two taks in wf with different objects",
+                "contact": person_dict(self.user.id),
+                "start_date": date(2015, 5, 1),  # friday
+                "end_date": date(2015, 5, 5),
+            }, {
+                "title": "task 2",
                 "description": "two taks in wf with different objects",
                 "contact": person_dict(self.user.id),
                 "start_date": date(2015, 5, 1),  # friday
