@@ -731,14 +731,15 @@ can.Model("can.Model.Cacheable", {
         }
       }
     });
-  }
-  , load_custom_attribute_definitions: function custom_attribute_definitions() {
+  },
+  load_custom_attribute_definitions: function loadAttrDefinitions() {
     var definitions;
     if (this.attr('custom_attribute_definitions')) {
       return;
     }
-    definitions = can.map(GGRC.custom_attr_defs, function(def) {
-      if (def.definition_type && def.definition_type === this.constructor.table_singular) {
+    definitions = can.map(GGRC.custom_attr_defs, function (def) {
+      var idCheck = !def.definition_id || def.definition_id === this.id;
+      if (idCheck && def.definition_type === this.constructor.table_singular) {
         return def;
       }
     }.bind(this));
