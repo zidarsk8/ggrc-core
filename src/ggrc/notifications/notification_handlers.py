@@ -21,6 +21,14 @@ from ggrc.models import notification
 
 
 def _add_notification(obj, notif_type, when=None):
+  """Add notification for an object.
+
+  Args:
+    obj (Model): an object for which we want te add a notification.
+    notif_type (NotificationType): type of notification that we want to store.
+    when (datetime): date and time when we want the notification to be sent.
+      default value is now.
+  """
   if not notif_type:
     return
   if not when:
@@ -92,6 +100,10 @@ def handle_assignable_deleted(obj):
 
 def register_handlers():
   """Register listeners for notification handlers"""
+
+  # Variables are used as listeners, and arguments are needed for callback
+  # functions.
+  # pylint: disable=unused-argument,unused-variable
 
   @Resource.model_deleted.connect_via(request.Request)
   @Resource.model_deleted.connect_via(assessment.Assessment)

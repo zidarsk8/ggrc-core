@@ -3,6 +3,11 @@
 # Created By: mouli@meics.org
 # Maintained By: miha@reciprocitylabs.com
 
+"""Main notifications module.
+
+This module is used for for coordinating email notifications.
+"""
+
 from ggrc import extensions
 
 

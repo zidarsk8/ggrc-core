@@ -10,14 +10,15 @@
 """
 
 
-import jinja2
 from collections import defaultdict
 from datetime import date
 from datetime import datetime
 from flask import current_app
-from google.appengine.api import mail
 from sqlalchemy import and_
 from werkzeug.exceptions import Forbidden
+
+import jinja2
+from google.appengine.api import mail
 
 from ggrc import db
 from ggrc import extensions
@@ -30,7 +31,7 @@ from ggrc.utils import merge_dict
 ENV = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
 
 
-class Services():
+class Services(object):
   """Helper class for notification services.
 
   This class is is a helper class for calling a notification service for a
@@ -82,7 +83,7 @@ def get_notification_data(notifications):
 
 def get_pending_notifications():
   notifications = db.session.query(Notification).filter(
-      Notification.sent_at == None).all()  # noqa
+      Notification.sent_at.is_(None)).all()
 
   notif_by_day = defaultdict(list)
   for notification in notifications:
@@ -101,31 +102,44 @@ def get_pending_notifications():
 def get_todays_notifications():
   notifications = db.session.query(Notification).filter(
       and_(Notification.send_on <= date.today(),
-           Notification.sent_at == None  # noqa
+           Notification.sent_at.is_(None)
            )).all()
   return notifications, get_notification_data(notifications)
 
 
-def should_receive(notif, user_data, nightly_cron=True):
+def should_receive(notif, user_data):
+  """Check if a user should receive a notification or not.
+
+  Args:
+    notif (Notification): A notification entry that we are checking.
+    user_data (dict): A dictionary containing data about user notifications.
+
+  Returns:
+    True if user should receive the given notification, or False otherwise.
+  """
   force_notif = user_data.get("force_notifications", {}).get(notif.id, False)
   person_id = user_data["user"]["id"]
 
   def is_enabled(notif_type):
+    """Check user notification settings.
+
+    Args:
+      notif_type (string): can be "Email_Digest" or "Email_Now" based on what
+        we wish to check.
+
+    Returns:
+      Boolean based on what settings users has stored or what the default
+      setting is for the given notification.
+    """
     result = NotificationConfig.query.filter(
         and_(NotificationConfig.person_id == person_id,
              NotificationConfig.notif_type == notif_type))
-    # TODO: create_user function should make entries in the notification
-    # config table. The code below should not make sure we have default
-    # values for new users.
     if result.count() == 0:
       # If we have no results, we need to use the default value, which is
       # true for digest emails.
       return notif_type == "Email_Digest"
     return result.one().enable_flag
 
-  # TODO: has_instant is not used at the moment but will be used when we
-  # implement instant notifications
-  # has_instant = force_notif or is_enabled("Email_Now")
   has_digest = force_notif or is_enabled("Email_Digest")
 
   return has_digest
@@ -146,6 +160,12 @@ def send_todays_digest_notifications():
 
 
 def set_notification_sent_time(notif_list):
+  """Set sent time to now for all notifications in the list.
+
+  Args:
+    notif_list (list of Notification): List of notification for which we want
+      to modify sent_at field.
+  """
   for notif in notif_list:
     notif.sent_at = datetime.now()
   db.session.commit()
@@ -156,8 +176,8 @@ def show_pending_notifications():
     raise Forbidden()
   _, notif_data = get_pending_notifications()
 
-  for day, day_notif in notif_data.iteritems():
-    for user_email, data in day_notif.iteritems():
+  for day_notif in notif_data.itervalues():
+    for data in day_notif.itervalues():
       data = modify_data(data)
   pending = ENV.get_template("notifications/view_pending_digest.html")
   return pending.render(data=sorted(notif_data.iteritems()))
@@ -167,13 +187,13 @@ def show_todays_digest_notifications():
   if not permissions.is_admin():
     raise Forbidden()
   _, notif_data = get_todays_notifications()
-  for user_email, data in notif_data.iteritems():
+  for data in notif_data.itervalu.itervalues():
     data = modify_data(data)
   todays = ENV.get_template("notifications/view_todays_digest.html")
   return todays.render(data=notif_data)
 
 
-def getAppEngineEmail():
+def get_app_engine_email():
   """Get notification sender email.
 
   Return the email of the user that will be set as sender. This email should be
@@ -196,7 +216,7 @@ def send_email(user_email, subject, body):
     body (basestring): Html body of the email. it can contain unicode
       characters and will be sent as a html mime type.
   """
-  sender = getAppEngineEmail()
+  sender = get_app_engine_email()
   if not mail.is_email_valid(user_email):
     current_app.logger.error("Invalid email recipient: {}".format(user_email))
     return
