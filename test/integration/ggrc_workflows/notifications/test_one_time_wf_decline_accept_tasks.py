@@ -11,10 +11,10 @@ from mock import patch
 from sqlalchemy import and_
 
 from ggrc import db
-from ggrc import notifications
 from ggrc.models import Notification
 from ggrc.models import NotificationType
 from ggrc.models import Person
+from ggrc.notifications import common
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 from integration.ggrc import TestCase
