@@ -7,7 +7,6 @@
 set -o nounset
 set -o errexit
 
-TEMPLATE="{msg_id}:{line:3d},{column}: {obj}: {msg}"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../"
@@ -17,9 +16,7 @@ function py_files() {
 }
 
 if [[ $(py_files) ]]; then
-  py_files | xargs pylint --msg-template="$TEMPLATE"
+  py_files | xargs pylint
 else
   echo "No python files changed."
 fi
-
-# TODO: add jshint and jscs checks.
