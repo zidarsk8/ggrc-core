@@ -18,6 +18,7 @@ NOTIFICATION_LISTENERS = [
     notification_handlers.register_handlers
 ]
 
+
 def contributed_notifications():
   """Get handler functions for ggrc notification file types."""
   return {

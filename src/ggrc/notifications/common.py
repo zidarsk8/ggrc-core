@@ -109,6 +109,7 @@ def get_todays_notifications():
 def should_receive(notif, user_data, nightly_cron=True):
   force_notif = user_data.get("force_notifications", {}).get(notif.id, False)
   person_id = user_data["user"]["id"]
+
   def is_enabled(notif_type):
     result = NotificationConfig.query.filter(
         and_(NotificationConfig.person_id == person_id,
