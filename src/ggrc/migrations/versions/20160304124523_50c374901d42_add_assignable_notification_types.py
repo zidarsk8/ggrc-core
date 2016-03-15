@@ -5,20 +5,20 @@
 
 """Add assignable notification types
 
-Revision ID: 50c374901d42
-Revises: 204540106539
 Create Date: 2016-03-04 12:45:23.024224
-
 """
 
+# disable Invalid constant name pylint warning for mandatory Alembic variables.
+# pylint: disable=invalid-name
+
 import sqlalchemy as sa
-from alembic import op
 from sqlalchemy.sql import column
 from sqlalchemy.sql import table
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '50c374901d42'
-down_revision = '204540106539'
+down_revision = '4fd36860d196'
 
 NOTIFICATION_TYPES = table(
     'notification_types',
@@ -70,7 +70,7 @@ NOTIFICATIONS = [{
 }, {
     "name": "assessment_manual",
     "description": "Send a manual notification to the Requester.",
-    "template": "request_manual",
+    "template": "assessment_manual",
     "advance_notice": 0,
     "instant": False,
 }]
