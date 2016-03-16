@@ -5,192 +5,198 @@
   Maintained By: peter@reciprocitylabs.com
 }}
 
-<div class="row-fluid">
-  <div class="span6">
-    <label>Audit</label>
-    <strong>{{object_params.audit_title}}</strong>
-  </div>
-</div>
+<div class="hideable-holder">
+  <form action="javascript://">
+    {{> /static/mustache/base_objects/form_restore.mustache}}
 
-<br />
+    <div class="row-fluid">
+      <div class="span6">
+        <label>Audit</label>
+        <strong>{{object_params.audit_title}}</strong>
+      </div>
+    </div>
 
-<div class="row-fluid choose-object">
-  <div class="span12">
-    <label>
-      Objects under assessment
-    </label>
+    <br />
 
-    {{#add_to_current_scope objectTypes=instance._objectTypes}}
-    <select
-      class="input-medium pull-left"
-      can-value="objectTypes.type"
-      name="template_object_type">
-      {{#each objectTypes}}
-        {{#if items}}
-          {{#if items.length}}
-          <optgroup label="{{name}}">
-            {{#each items}}
-              {{#if name}}
-                <option value="{{value}}" label="{{name}}"></option>
+    <div class="row-fluid choose-object">
+      <div class="span12">
+        <label>
+          Objects under assessment
+        </label>
+
+        {{#add_to_current_scope objectTypes=instance._objectTypes}}
+        <select
+          class="input-medium pull-left"
+          can-value="instance.template_object_type">
+          {{#each objectTypes}}
+            {{#if items}}
+              {{#if items.length}}
+              <optgroup label="{{name}}">
+                {{#each items}}
+                  {{#if name}}
+                    <option value="{{value}}" label="{{name}}"></option>
+                  {{/if}}
+                {{/each}}
+              </optgroup>
               {{/if}}
-            {{/each}}
-          </optgroup>
-          {{/if}}
-        {{/if}}
-      {{/each}}
-    </select>
-    {{/add_to_current_scope}}
-
-    <label class="inline-check pull-left">
-      <input type="checkbox"
-        name="test_plan_procedure"
-        class="js-toggle-controlplans">
-      Use control test plans as procedures
-    </label>
-  </div>
-</div>
-
-<div class="row-fluid">
-  <div class="span6">
-    <label>
-      Default procedure
-      <i class="grcicon-help-black" rel="tooltip"
-        title="Provide more details on the purpose of this Assessment and
-               provide context for how and when this CA might be used."></i>
-      <a data-id="hide_description_lk" href="javascript://"
-        class="field-hide">hide</a>
-    </label>
-    <div class="wysiwyg-area">
-      <textarea tabindex="2" id="system_description"
-        class="span12 triple wysihtml5"
-        name="procedure_description"
-        placeholder="Enter Description"></textarea>
-    </div>
-  </div>
-
-  <div class="span6">
-    <div class="row-fluid choose-from-select">
-      <div class="span6 bottom-spacing">
-        <label>
-          Default Assessors
-          <span class="required">*</span>
-        </label>
-
-        <select
-          name="default_assessors"
-          class="input-block-level js-toggle-field"
-          can-value="">
-          <option value="Object Owners">Object Owners</option>
-          <option value="Audit Lead">Audit Lead</option>
-          <option value="Object Contact">Object Contact</option>
-          <option value="Primary Assessor">Primary Assessor</option>
-          <option value="Secondary Assessors">Secondary Assessors</option>
-          <option value="other">Others...</option>
+            {{/if}}
+          {{/each}}
         </select>
+        {{/add_to_current_scope}}
+
+        <label class="inline-check pull-left">
+          <input type="checkbox"
+            can-value="instance.test_plan_procedure"
+            class="js-toggle-controlplans">
+          Use control test plans as procedures
+        </label>
+      </div>
+    </div>
+
+    <div class="row-fluid">
+      <div class="span6">
+        <label>
+          Default procedure
+          <i class="grcicon-help-black" rel="tooltip"
+            title="Provide more details on the purpose of this Assessment and
+                   provide context for how and when this CA might be used."></i>
+          <a data-id="hide_description_lk" href="javascript://"
+            class="field-hide">hide</a>
+        </label>
+        <div class="wysiwyg-area">
+          <textarea
+            id="system_description"
+            can-value="instance.procedure_description"
+            class="span12 triple wysihtml5"
+            placeholder="Enter Description"
+            tabindex="2"
+            ></textarea>
+        </div>
       </div>
 
       <div class="span6">
-        <label>&nbsp;</label>
-        <input type="text"
-          name="assessors_list"
-          class="input-block-level choose-input choose-assessor"
-          placeholder="Add person 1, Add person 2...">
+        <div class="row-fluid choose-from-select">
+          <div class="span6 bottom-spacing">
+            <label>
+              Default Assessors
+              <span class="required">*</span>
+            </label>
+
+            <select
+              can-value="instance.default_people.assessors"
+              class="input-block-level js-toggle-field">
+              <option value="Object Owners">Object Owners</option>
+              <option value="Audit Lead">Audit Lead</option>
+              <option value="Object Contact">Object Contact</option>
+              <option value="Primary Assessor">Primary Assessor</option>
+              <option value="Secondary Assessors">Secondary Assessors</option>
+              <option value="other">Others...</option>
+            </select>
+          </div>
+
+          <div class="span6">
+            <label>&nbsp;</label>
+            <input type="text"
+              can-value="instance.assessors_list"
+              class="input-block-level choose-input choose-assessor"
+              placeholder="Add person 1, Add person 2...">
+          </div>
+        </div>
+
+        <div class="row-fluid choose-from-select">
+          <div class="span6 bottom-spacing">
+            <label>
+              Default Verifier
+              <span class="required">*</span>
+            </label>
+
+            <select
+              can-value="instance.default_people.verifiers"
+              class="input-block-level js-toggle-field">
+              <option value="Object Owners">Object Owners</option>
+              <option value="Audit Lead">Audit Lead</option>
+              <option value="Object Contact">Object Contact</option>
+              <option value="Primary Assessor">Primary Assessor</option>
+              <option value="Secondary Assessors">Secondary Assessors</option>
+              <option value="other">Others...</option>
+            </select>
+          </div>
+
+          <div class="span6">
+            <label>&nbsp;</label>
+            <input type="text"
+              can-value="instance.verifiers_list"
+              class="input-block-level choose-input choose-verifier"
+              placeholder="Add person 1, Add person 2...">
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="row-fluid choose-from-select">
-      <div class="span6 bottom-spacing">
-        <label>
-          Default Verifier
-          <span class="required">*</span>
-        </label>
+    <div class="custom-attr-wrap define-attr">
 
-        <select
-          name="default_verifiers"
-          class="input-block-level js-toggle-field"
-          can-value="">
-          <option value="Object Owners">Object Owners</option>
-          <option value="Audit Lead">Audit Lead</option>
-          <option value="Object Contact">Object Contact</option>
-          <option value="Primary Assessor">Primary Assessor</option>
-          <option value="Secondary Assessors">Secondary Assessors</option>
-          <option value="other">Others...</option>
-        </select>
+      <div class="row-fluid">
+        <div class="span12">
+          <div class="info-expand">
+            <a class="show-hidden-fields info-show-hide" href="javascript://">
+              <span class="out">
+                <i class="fa fa-caret-right"></i>
+                Custom attributes
+              </span>
+              <span class="in">
+                <i class="fa fa-caret-down"></i>
+                Custom attributes
+              </span>
+            </a>
+          </div>
+        </div>
       </div>
 
-      <div class="span6">
-        <label>&nbsp;</label>
-        <input type="text"
-          name="verifiers_list"
-          class="input-block-level choose-input choose-verifier"
-          placeholder="Add person 1, Add person 2...">
+      <div class="hidden-fields-area">
+        <div class="row-fluid wrap-row">
+          <div class="custom-attr-list span12">
+            <assessment-template-attributes>
+              <div class="attr-titles">
+                <ul>
+                  <li class="row-fluid">
+                    <div class="span-custom2-and-half">
+                      <h6>Attribute Title</h6>
+                    </div>
+                    <div class="span-custom1-and-half">
+                      <h6>Attribute type</h6>
+                    </div>
+                    <div class="span2">
+                      <h6>Attribute values</h6>
+                    </div>
+                    <div class="span2 centered">
+                      <h6>Attachment required</h6>
+                    </div>
+                    <div class="span-custom1-and-half centered">
+                      <h6>Comment required</h6>
+                    </div>
+                    <div class="span-custom1-and-half centered">
+                      <h6>Mandatory</h6>
+                    </div>
+                    <div class="span-custom1-and-half">
+                      &nbsp;
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="new-attr-list">
+                <ul>
+                  <add-template-filed fields="fields">
+                  </add-template-filed>
+                  {{#fields}}
+                    <template-filed field="." fields="fields"></template-filed>
+                  {{/fields}}
+                </ul>
+              </div>
+            </assessment-template-attributes>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </div><!-- custom-attr-wrap end -->
+
+ </form>
 </div>
-
-<div class="custom-attr-wrap define-attr">
-
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="info-expand">
-        <a class="show-hidden-fields info-show-hide" href="javascript://">
-          <span class="out">
-            <i class="fa fa-caret-right"></i>
-            Custom attributes
-          </span>
-          <span class="in">
-            <i class="fa fa-caret-down"></i>
-            Custom attributes
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  {{! <div class="hidden-fields-area" style="display:none;"> }}
-  <div class="hidden-fields-area">
-    <div class="row-fluid wrap-row">
-      <div class="custom-attr-list span12">
-        <assessment-template-attributes>
-          <div class="attr-titles">
-            <ul>
-              <li class="row-fluid">
-                <div class="span-custom2-and-half">
-                  <h6>Attribute Title</h6>
-                </div>
-                <div class="span-custom1-and-half">
-                  <h6>Attribute type</h6>
-                </div>
-                <div class="span2">
-                  <h6>Attribute values</h6>
-                </div>
-                <div class="span2 centered">
-                  <h6>Attachment required</h6>
-                </div>
-                <div class="span-custom1-and-half centered">
-                  <h6>Comment required</h6>
-                </div>
-                <div class="span-custom1-and-half centered">
-                  <h6>Mandatory</h6>
-                </div>
-                <div class="span-custom1-and-half">
-                  &nbsp;
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div class="new-attr-list">
-            <ul>
-              <add-template-filed fields="fields">
-              </add-template-filed>
-              {{#fields}}
-                <template-filed field="." fields="fields"></template-filed>
-              {{/fields}}
-            </ul>
-          </div>
-        </assessment-template-attributes>
-      </div>
-    </div>
-  </div>
-</div><!-- custom-attr-wrap end -->

@@ -9,9 +9,10 @@
 
 from lib import base
 from lib import environment
-from lib import selenium_utils
+from lib.utils import selenium_utils
 from lib.constants import locator
 from lib.constants import url
+from lib import decorator
 
 
 class _Modal(base.Modal):
@@ -30,6 +31,7 @@ class _Modal(base.Modal):
   def enter_title(self, title):
     self.ui_attribute_title.enter_text(title)
 
+  @decorator.handle_alert
   def save_and_close(self):
     """
     Returns:
@@ -50,7 +52,7 @@ class CreateNewCustomAttributeModal(base.Modal):
   def save_and_add_another(self):
     """
     Returns:
-        NewCustomAttributeModal
+        ModalCustomAttributes
     """
     self.button_add_more.click_when_visible()
     return self.__class__(self._driver)
@@ -82,7 +84,7 @@ class Dropdown(base.Component):
   def add_new_custom_attribute(self):
     """
     Returns:
-        new_custom_attribute.NewCustomAttributeModal
+        new_custom_attribute.ModalCustomAttributes
     """
     selenium_utils.wait_until_stops_moving(self.button_add.element)
     self.button_add.click()
@@ -142,7 +144,6 @@ class DynamicTreeToggle(base.Toggle):
 
 class WidgetAdminCustomAttributes(base.Widget):
   """Base model for custom attributes on the admin dashboard page"""
-
   _locator = locator.AdminCustomAttributes
   URL = environment.APP_URL \
       + url.ADMIN_DASHBOARD \

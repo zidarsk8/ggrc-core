@@ -40,13 +40,13 @@ git clean -xdfq
 git reset --hard HEAD
 
 if [[ "$ARG1" != "" ]]; then
-  TEST_COMMIT=$ARG1
+  TEST_COMMIT=$(git rev-parse HEAD)
+  PARENT_1=$ARG1
 else
   TEST_COMMIT=$(git rev-parse HEAD)
+  PARENT_1=$(git show --pretty=raw $TEST_COMMIT | grep parent | head -1 | grep -oE "[^ ]*$")
 fi
 
-CURRENT_COMMIT=$(git rev-parse HEAD)
-PARENT_1=$(git show --pretty=raw $TEST_COMMIT | grep parent | head -1 | grep -oE "[^ ]*$")
 
 echo "Comparing commits $TEST_COMMIT and $PARENT_1."
 

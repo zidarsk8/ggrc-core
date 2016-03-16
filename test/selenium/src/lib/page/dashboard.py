@@ -3,6 +3,8 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
+from selenium.common import exceptions
+
 from lib import base
 from lib.constants import url
 from lib.constants import locator
@@ -13,40 +15,40 @@ from lib.page import lhn
 
 
 class UserList(base.Component):
-  locator_cls = locator.PageHeader
+  locators = locator.PageHeader
 
   def __init__(self, driver):
     super(UserList, self).__init__(driver)
     self.button_my_work = base.Button(self._driver,
-                                      self.locator_cls.BUTTON_MY_WORK)
+                                      self.locators.BUTTON_MY_WORK)
     self.button_admin_dashboard = base.Button(
-        self._driver, self.locator_cls.BUTTON_ADMIN_DASHBOARD)
+        self._driver, self.locators.BUTTON_ADMIN_DASHBOARD)
     self.button_data_import = base.Button(
-        self._driver, self.locator_cls.BUTTON_DATA_IMPORT)
+        self._driver, self.locators.BUTTON_DATA_IMPORT)
     self.button_data_export = base.Button(
-        self._driver, self.locator_cls.BUTTON_DATA_EXPORT)
+        self._driver, self.locators.BUTTON_DATA_EXPORT)
     self.button_logout = base.Button(
-        self._driver, self.locator_cls.BUTTON_LOGOUT)
+        self._driver, self.locators.BUTTON_LOGOUT)
     self.notifications = base.Label(
-        self._driver, self.locator_cls.NOTIFICATIONS)
+        self._driver, self.locators.NOTIFICATIONS)
     self.checkbox_daily_digest = base.Checkbox(
-        self._driver, self.locator_cls.CHECKBOX_DAILY_DIGEST)
+        self._driver, self.locators.CHECKBOX_DAILY_DIGEST)
 
   def select_my_work(self):
     """
     Returns:
-        widget.DataAssetInfo
+        widget.DataAssets
     """
     self.button_my_work.click()
-    return DashboardPage(self._driver)
+    return Dashboard(self._driver)
 
   def select_admin_dashboard(self):
     """
     Returns:
-        admin_dashboard.AdminDashboardPage
+        admin_dashboard.AdminDashboard
     """
     self.button_my_work.click()
-    return AdminDashboardPage(self._driver)
+    return AdminDashboard(self._driver)
 
   def select_import_data(self):
     raise NotImplementedError
@@ -67,34 +69,52 @@ class UserList(base.Component):
     self.checkbox_daily_digest.uncheck()
 
 
-class HeaderPage(base.Page):
+class Header(base.Component):
   """Header of the page"""
-
-  locator = locator.PageHeader
+  locators = locator.PageHeader
 
   def __init__(self, driver):
-    super(HeaderPage, self).__init__(driver)
-    self.toggle_lhn_menu = base.Toggle(self._driver,
-                                       self.locator.TOGGLE_LHN)
-    self.button_dashboard = base.Button(self._driver,
-                                        self.locator.BUTTON_DASHBOARD)
-    self.button_search = base.Button(self._driver,
-                                     self.locator.BUTTON_SEARCH)
-    self.button_my_tasks = base.Button(self._driver,
-                                       self.locator.BUTTON_MY_TASKS)
-    self.button_all_objects = base.Button(
-        self._driver, self.locator.BUTTON_ALL_OBJECTS)
-    self.toggle_user_dropdown = base.Toggle(
-        self._driver, self.locator.TOGGLE_USER_DROPDOWN)
+    super(Header, self).__init__(driver)
+    self.toggle_lhn_menu = None
+    self.button_dashboard = None
+    self.button_search = None
+    self.button_my_tasks = None
+    self.button_all_objects = None
+    self.toggle_user_dropdown = None
+    self._refresh_elements()
+
+  def _refresh_elements(self):
+    try:
+      self.toggle_lhn_menu = base.Toggle(self._driver,
+                                         self.locators.TOGGLE_LHN)
+      self.button_dashboard = base.Button(self._driver,
+                                          self.locators.BUTTON_DASHBOARD)
+      self.button_search = base.Button(self._driver,
+                                       self.locators.BUTTON_SEARCH)
+      self.button_my_tasks = base.Button(self._driver,
+                                         self.locators.BUTTON_MY_TASKS)
+      self.button_all_objects = base.Button(
+          self._driver, self.locators.BUTTON_ALL_OBJECTS)
+      self.toggle_user_dropdown = base.Toggle(
+          self._driver, self.locators.TOGGLE_USER_DROPDOWN)
+    except exceptions.StaleElementReferenceException:
+      self._refresh_elements()
 
   def open_lhn_menu(self):
-    """Opens LHN on the Dashboard
+    """Opens LHN on the Dashboard.
+    For some reason, after creating 2 objects via LHN (and clicking 2x on the
+    LHN button), the third time the toggle_lhn_menu signals it's not a part of
+    the DOM anymore. For this reason we're refreshing the elements.
 
     Returns:
         LhnMenu
     """
-    self.toggle_lhn_menu.toggle()
-    return lhn.Menu(self._driver)
+    try:
+      self.toggle_lhn_menu.toggle()
+      return lhn.Menu(self._driver)
+    except exceptions.StaleElementReferenceException:
+      self._refresh_elements()
+      return self.open_lhn_menu()
 
   def close_lhn_menu(self):
     """Closes LHN on the Dashboard
@@ -102,13 +122,16 @@ class HeaderPage(base.Page):
     Returns:
         LhnMenu
     """
-    self.toggle_lhn_menu.toggle(on=False)
-    return DashboardPage(self._driver)
+    try:
+      self.toggle_lhn_menu.toggle(on=False)
+    except exceptions.WebDriverException:
+      self._refresh_elements()
+      self.close_lhn_menu()
 
   def click_on_logo(self):
     """
     Returns:
-        widget.DataAssetInfo
+        widget.DataAssets
     """
     raise NotImplementedError
 
@@ -121,21 +144,19 @@ class HeaderPage(base.Page):
     return UserList(self._driver)
 
 
-class DashboardPage(widget_bar.DashboardWidgetBarPage, HeaderPage):
+class Dashboard(widget_bar.Dashboard, Header):
   """The main dashboard page"""
-
   URL = environment.APP_URL + url.DASHBOARD
 
   def __init__(self, driver):
-    super(DashboardPage, self).__init__(driver)
-    self.button_help = base.Button(self._driver, self.locator.BUTTON_HELP)
+    super(Dashboard, self).__init__(driver)
+    self.button_help = base.Button(self._driver, self.locators.BUTTON_HELP)
 
 
-class AdminDashboardPage(widget_bar.AdminDashboardWidgetBarPage,
-                         HeaderPage):
+class AdminDashboard(widget_bar.AdminDashboard,
+                     Header):
   """Admin dashboard page model"""
-
   URL = environment.APP_URL + url.ADMIN_DASHBOARD
 
   def __init__(self, driver):
-    super(AdminDashboardPage, self).__init__(driver)
+    super(AdminDashboard, self).__init__(driver)

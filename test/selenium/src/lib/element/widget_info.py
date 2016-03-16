@@ -3,7 +3,7 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-"""Elements for info widget"""
+"""Elements in the object's info widget"""
 
 from lib import base
 from lib.page import modal
@@ -14,7 +14,6 @@ class DropdownSettings(base.Component):
   """A class for the button/dropdown settings in the info widget"""
 
   _locator = locator.WidgetInfoSettingsButton
-  _edit_modal_cls = None
 
   def __init__(self, driver):
     super(DropdownSettings, self).__init__(driver)
@@ -29,9 +28,7 @@ class DropdownSettings(base.Component):
         lib.page.modal.edit_object.EditModal
     """
     self.edit.click()
-
-    # pylint: disable=not-callable
-    return self._edit_modal_cls(self._driver)
+    return getattr(modal.edit_object, self.__class__.__name__)(self._driver)
 
   def select_get_permalink(self):
     self.permalink.click()
@@ -45,13 +42,33 @@ class DropdownSettings(base.Component):
     return modal.delete_object.DeleteObjectModal(self._driver)
 
 
-class DropdownSettingsPrograms(DropdownSettings):
+class Programs(DropdownSettings):
   """A model for the settings dropdown on the program object"""
 
-  _edit_modal_cls = modal.edit_object.EditProgramModal
+
+class Controls(DropdownSettings):
+  """A model for the settings dropdown on the control object"""
 
 
-class DropdownSettingsControls(DropdownSettings):
-  """A model for the settings dropdown on the program object"""
+class Processes(DropdownSettings):
+  """A model for the settings dropdown on the process object"""
 
-  _edit_modal_cls = modal.edit_object.EditControlModal
+
+class DataAssets(DropdownSettings):
+  """A model for the settings dropdown on the data asset object"""
+
+
+class Systems(DropdownSettings):
+  """A model for the settings dropdown on the system object"""
+
+
+class Products(DropdownSettings):
+  """A model for the settings dropdown on the products object"""
+
+
+class Projects(DropdownSettings):
+  """A model for the settings dropdown on the project object"""
+
+
+class OrgGroups(DropdownSettings):
+  """A model for the settings dropdown on the org group object"""
