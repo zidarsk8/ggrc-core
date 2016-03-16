@@ -19,10 +19,10 @@ class LoginPage(base.Page):
     """Clicks on the login button on the login page
 
     Returns:
-         dashboard.DashboardPage
+         dashboard.Dashboard
     """
     self.button_login.click()
-    return dashboard.DashboardPage(self._driver)
+    return dashboard.Dashboard(self._driver)
 
   def login_as(self, user_name, user_email):
     """Clicks on the login button on the login page and logs in as a

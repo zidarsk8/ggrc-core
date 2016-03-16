@@ -10,7 +10,7 @@ from lib.page.modal import delete_object
 from lib.page.modal import base as modal_base
 
 
-class EditModal(modal_base._Modal):
+class EditModal(modal_base._EditModal):
   _button_delete_locator = locator.ModalEditObject.BUTTON_DELETE
 
   def delete_object(self):
@@ -22,21 +22,46 @@ class EditModal(modal_base._Modal):
     return delete_object.DeleteObjectModal(self._driver)
 
 
-class EditProgramModal(modal_base.ProgramModal, EditModal):
+class Programs(modal_base.ProgramsModal, EditModal):
   """Class representing a modal visible after clicking the settings button
   in the info widget of a program object and selecting edit"""
 
 
-class EditControlModal(modal_base.ControlModal, EditModal):
+class Controls(modal_base.ControlsModal, EditModal):
   """Class representing a modal visible after clicking the settings button
   in the info widget of a control object and selecting edit"""
 
 
-class EditRiskModal(modal_base.RiskModal, EditModal):
+class Risks(modal_base.RisksModal, EditModal):
   """Class representing a modal visible after clicking the settings button
   in the info widget of a risk object and selecting edit"""
 
 
-class EditOrgGroupModal(modal_base.OrgGroupModal, EditModal):
+class OrgGroups(modal_base.OrgGroupsModal, EditModal):
   """Class representing a modal visible after clicking the settings button
   in the info widget of a org group object and selecting edit"""
+
+
+class Processes(modal_base.ProcessesModal, EditModal):
+  """Class representing a modal visible after clicking the settings button
+  in the info widget of a process object and selecting edit"""
+
+
+class DataAssets(modal_base.RisksModal, EditModal):
+  """Class representing a modal visible after clicking the settings button
+  in the info widget of a data asset object and selecting edit"""
+
+
+class Systems(modal_base.RisksModal, EditModal):
+  """Class representing a modal visible after clicking the settings button
+  in the info widget of a system object and selecting edit"""
+
+
+class Products(modal_base.ProductsModal, EditModal):
+  """Class representing a modal visible after clicking the settings button
+  in the info widget of a product object and selecting edit"""
+
+
+class Projects(modal_base.ProjectsModal, EditModal):
+  """Class representing a modal visible after clicking the settings button
+  in the info widget of a project object and selecting edit"""

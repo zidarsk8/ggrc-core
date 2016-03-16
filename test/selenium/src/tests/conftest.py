@@ -7,9 +7,12 @@
 
 import pytest   # pylint: disable=import-error
 
+from lib import constants
 from lib import base
-from lib import conftest_utils
+from lib.page.widget import info_widget
 from lib.constants.test import batch
+from lib.utils import conftest_utils
+from lib.utils import test_utils
 
 
 @pytest.yield_fixture(scope="session")
@@ -53,26 +56,25 @@ def new_control(selenium):
   """Creates a new control object.
 
   Returns:
-      lib.page.modal.new_program.NewControlModal
+      lib.page.widget.Controls
   """
-  control_info_page = conftest_utils.lhn_create_control(selenium.driver)
+  control_info_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.CONTROLS)
   yield control_info_page
-  selenium.driver.get(control_info_page.url)
-  conftest_utils.delete_control(selenium.driver)
 
 
 @pytest.yield_fixture(scope="class")
 def new_program(selenium, new_control):
-  """Creates a new program object.
-
-  Returns:
-      lib.page.modal.new_program.NewProgramModal
-  """
+  """Creates a new program object and returns the program info page with the
+  saved modal"""
   # pylint: disable=redefined-outer-name
-  modal, program_info_page = conftest_utils.lhn_create_program(selenium.driver)
+  modal = conftest_utils.get_lhn_accordion(
+      selenium.driver, constants.element.Lhn.PROGRAMS)\
+      .create_new()
+  test_utils.ModalNewPrograms.enter_test_data(modal)
+  modal.save_and_close()
+  program_info_page = info_widget.Programs(selenium.driver)
   yield modal, program_info_page
-  selenium.driver.get(program_info_page.url)
-  conftest_utils.delete_program(selenium.driver)
 
 
 @pytest.yield_fixture(scope="class")
@@ -80,12 +82,11 @@ def new_org_group(selenium):
   """Creates a new org group object.
 
   Returns:
-      lib.page.modal.new_program.NewOrgGroupModal
+      lib.page.widget.OrgGroupInfo
   """
-  org_group_page = conftest_utils.lhn_create_org_group(selenium.driver)
+  org_group_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.ORG_GROUPS)
   yield org_group_page
-  selenium.driver.get(org_group_page.url)
-  conftest_utils.delete_org_group(selenium.driver)
 
 
 @pytest.yield_fixture(scope="class")
@@ -93,12 +94,95 @@ def new_risk(selenium):
   """Creates a new risk group object.
 
   Returns:
-      lib.page.modal.new_program.NewOrgGroupModal
+      lib.page.widget.Risks
   """
-  risk_page = conftest_utils.lhn_create_risk(selenium.driver)
+  risk_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.RISKS)
   yield risk_page
-  selenium.driver.get(risk_page.url)
-  conftest_utils.delete_risk(selenium.driver)
+
+
+@pytest.yield_fixture(scope="class")
+def new_request(selenium):
+  """Creates a new request object.
+
+  Returns:
+      lib.page.widget.Requests
+  """
+  request_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.REQUESTS)
+  yield request_page
+
+
+@pytest.yield_fixture(scope="class")
+def new_issue(selenium):
+  """Creates a new request object.
+
+  Returns:
+      lib.page.widget.IssueInfo
+  """
+  issue_info_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.ISSUES)
+  yield issue_info_page
+
+
+@pytest.yield_fixture(scope="class")
+def new_process(selenium):
+  """Creates a new request object.
+
+  Returns:
+      lib.page.widget.Processes
+  """
+  process_info_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.PROCESSES)
+  yield process_info_page
+
+
+@pytest.yield_fixture(scope="class")
+def new_data_asset(selenium):
+  """Creates a new data asset object.
+
+  Returns:
+      lib.page.widget.DataAssetInfo
+  """
+  data_asset_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.DATA_ASSETS)
+  yield data_asset_page
+
+
+@pytest.yield_fixture(scope="class")
+def new_system(selenium):
+  """Creates a new system object.
+
+  Returns:
+      lib.page.widget.IssueInfo
+  """
+  system_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.SYSTEMS)
+  yield system_page
+
+
+@pytest.yield_fixture(scope="class")
+def new_product(selenium):
+  """Creates a new request object.
+
+  Returns:
+      lib.page.widget.Product
+  """
+  product_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.PRODUCTS)
+  yield product_page
+
+
+@pytest.yield_fixture(scope="class")
+def new_project(selenium):
+  """Creates a new project object.
+
+  Returns:
+      lib.page.widget.ProjectInfo
+  """
+  project_page = conftest_utils.create_lhn_object(
+      selenium.driver, constants.element.Lhn.PROJECTS)
+  yield project_page
 
 
 @pytest.yield_fixture(scope="class")
@@ -107,6 +191,7 @@ def battery_of_controls(selenium):
   controls = []
 
   for _ in xrange(batch.BATTERY):
-    controls.append(conftest_utils.lhn_create_control(selenium.driver))
+    controls.append(conftest_utils.create_lhn_object(
+        selenium.driver, constants.element.Lhn.CONTROLS))
 
   yield controls

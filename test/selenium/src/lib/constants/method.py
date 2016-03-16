@@ -3,7 +3,7 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-"""Regexes that are used in the code"""
+"""Module with names of pre and postfixes of methods used in various
+classes. Note that all the values should be in lower case."""
 
-WIDGET_TITLE_AND_COUNT = r"(.*) \((.*)\)"
-URL_WIDGET_INFO = r"//[a-z\-.]*[:0-9]*?/([a-z_]*)/?(\d*)#?([^/]*)/*"
+SELECT_PREFIX = "select_"

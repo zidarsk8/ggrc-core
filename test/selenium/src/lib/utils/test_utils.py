@@ -27,7 +27,7 @@ def prepend_random_string(text):
   return str(uuid.uuid4()) + text
 
 
-class HtmlParser(base.Test):
+class HtmlParser(object):
   """The HtmlParser class simulates what happens with (non-rich)text in HTML.
   """
   @staticmethod
@@ -40,7 +40,14 @@ class HtmlParser(base.Test):
     return re.sub(r'\s+', " ", text)
 
 
-class ModalNewControlPage(base.Test):
+class ModalInput(base.Test):
+  """Base class for filling out modals"""
+  @staticmethod
+  def enter_test_data(modal):
+    modal.enter_title(append_random_string(modal_create_new.SHORT_TITLE))
+
+
+class ModalNewControls(ModalInput):
   """Methods for simulating common user actions"""
 
   @staticmethod
@@ -48,7 +55,7 @@ class ModalNewControlPage(base.Test):
     """Fills out all fields in the lhn_modal
 
     Args:
-        modal (lib.page.lhn_modal.new_control.NewControlModal)
+        modal (lib.page.lhn_modal.new_control.Controls)
     """
     modal.enter_title(append_random_string(modal_create_new.SHORT_TITLE))
     modal.enter_description(append_random_string(
@@ -59,15 +66,30 @@ class ModalNewControlPage(base.Test):
     modal.enter_code(append_random_string(modal_create_new.SHORT_TITLE))
 
 
-class ModalNewProgramPage(base.Test):
+class ModalNewPrograms(ModalInput):
   """Methods for simulating common user actions"""
+
+  @staticmethod
+  def set_start_end_dates(modal, day_start, day_end):
+    """
+    Sets the dates from the datepicker in the new program/edit modal.
+
+    Args:
+      modal (lib.page.modal.edit_object.Programs)
+      day_start (int): for more info see
+        base.DatePicker.select_day_in_current_month
+      day_end (int): for more info see
+        base.DatePicker.select_day_in_current_month
+    """
+    modal.enter_effective_date_start_month(day_start)
+    modal.enter_stop_date_end_month(day_end)
 
   @staticmethod
   def enter_test_data(modal):
     """Fills out all fields in the lhn_modal
 
     Args:
-        modal (lib.page.modal.edit_object.EditProgramModal)
+        modal (lib.page.modal.edit_object.Programs)
     """
     modal.enter_title(append_random_string(modal_create_new.SHORT_TITLE))
     modal.enter_description(append_random_string(
@@ -81,29 +103,16 @@ class ModalNewProgramPage(base.Test):
     modal.enter_reference_url(prepend_random_string(
         modal_create_new.Program.REFERENCE_URL))
 
-  @staticmethod
-  def set_start_end_dates(modal, day_start, day_end):
-    """
-    Sets the dates from the datepicker in the new program/edit modal.
-
-    Args:
-      modal (lib.page.modal.edit_object.EditProgramModal)
-      day_start (int): for more info see
-        base.DatePicker.select_day_in_current_month
-      day_end (int): for more info see
-        base.DatePicker.select_day_in_current_month
-    """
-    modal.enter_effective_date_start_month(day_start)
-    modal.enter_stop_date_end_month(day_end)
+    ModalNewPrograms.set_start_end_dates(modal, 0, -1)
 
 
-class ModalNewProgramCustomAttributePage(base.Test):
+class ModalNewProgramCustomAttribute(ModalInput):
   @staticmethod
   def enter_test_data(modal):
     """Fills out all fields in the lhn_modal
 
     Args:
-        modal (lib.page.modal.custom_attribute.NewCustomAttributeModal)
+        modal (lib.page.modal.custom_attribute.ModalCustomAttributes)
     """
     modal.enter_title(append_random_string(
         modal_custom_attribute.Program.TITLE))
@@ -113,27 +122,48 @@ class ModalNewProgramCustomAttributePage(base.Test):
         modal_custom_attribute.Program.PLACEHOLDER))
 
 
-class ModalNewOrgGroupPage(base.Test):
+class ModalNewOrgGroups(ModalInput):
+  """Utils for data entry for org group modal"""
+
+
+class ModalNewRisks(ModalInput):
+  """Utils for data entry for risk modal"""
   @staticmethod
   def enter_test_data(modal):
     """Fills out all fields in the lhn_modal
 
     Args:
-        modal (lib.page.modal.edit_object.EditOrgGroupModal)
+        modal (lib.page.modal.edit_object.EditRisksModal)
     """
     modal.enter_title(append_random_string(
-        modal_custom_attribute.Program.TITLE))
-
-
-class ModalRiskPage(base.Test):
-  @staticmethod
-  def enter_test_data(modal):
-    """Fills out all fields in the lhn_modal
-
-    Args:
-        modal (lib.page.modal.edit_object.EditRiskModal)
-    """
-    modal.enter_title(append_random_string(
-        modal_custom_attribute.Program.TITLE))
+        modal_create_new.SHORT_TITLE))
     modal.enter_description(append_random_string(
-        modal_custom_attribute.Program.TITLE))
+        modal_create_new.SHORT_TITLE))
+
+
+class ModalNewRequests(ModalInput):
+  """Utils for data entry for request modal"""
+
+
+class ModalNewIssues(ModalInput):
+  """Utils for data entry for issues modal"""
+
+
+class ModalNewProcesses(ModalInput):
+  """Utils for data entry for process modal"""
+
+
+class ModalNewDataAssets(ModalInput):
+  """Utils for data entry for data asset modal"""
+
+
+class ModalNewSystems(ModalInput):
+  """Utils for data entry for system modal"""
+
+
+class ModalNewProducts(ModalInput):
+  """Utils for data entry for product modal"""
+
+
+class ModalNewProjects(ModalInput):
+  """Utils for data entry for project modal"""

@@ -9,14 +9,13 @@ import re
 import pyvirtualdisplay   # pylint: disable=import-error
 from selenium.webdriver.common import keys    # pylint: disable=import-error
 from selenium import webdriver    # pylint: disable=import-error
-from selenium.common import exceptions
 
 from lib import environment
 from lib import constants
 from lib import exception
 from lib import meta
 from lib import mixin
-from lib import selenium_utils
+from lib.utils import selenium_utils
 
 
 class InstanceRepresentation(object):
@@ -108,8 +107,15 @@ class Element(InstanceRepresentation):
     super(Element, self).__init__()
     self._driver = driver
     self._locator = locator
-    self.element = selenium_utils.get_when_visible(driver, locator)
+    self.element = self.get_element()
     self.text = self.element.text
+
+  def get_element(self):
+    """
+    Returns:
+      selenium.webdriver.remote.webelement.WebElement
+    """
+    return selenium_utils.get_when_visible(self._driver, self._locator)
 
   def click(self):
     """Clicks on the element"""
@@ -278,6 +284,8 @@ class DatePicker(Element):
 
 class Button(Element):
   """A generic button element"""
+  def get_element(self):
+    return selenium_utils.get_when_clickable(self._driver, self._locator)
 
 
 class Checkbox(Element):
@@ -286,6 +294,9 @@ class Checkbox(Element):
   def __init__(self, driver, locator, is_checked=False):
     super(Checkbox, self).__init__(driver, locator)
     self.is_checked = self.element.is_selected()
+
+  def get_element(self):
+    return selenium_utils.get_when_clickable(self._driver, self._locator)
 
   def check(self):
     if not self.is_checked:
@@ -308,6 +319,9 @@ class Toggle(Element):
     self.is_activated = selenium_utils.is_value_in_attr(
         self.element, value=is_active_attr_val)
 
+  def get_element(self):
+    return selenium_utils.get_when_clickable(self._driver, self._locator)
+
   def toggle(self, on=True):
     """Clicks on an element based on the is_active status and the "on" arg
 
@@ -328,6 +342,9 @@ class Tab(Element):
     super(Tab, self).__init__(driver, locator)
     self.is_activated = is_activated
 
+  def get_element(self):
+    return selenium_utils.get_when_clickable(self._driver, self._locator)
+
   def click(self):
     """When clicking on a tab we want to first make sure it's clickable i.e.
     that this element will receive a click"""
@@ -337,15 +354,6 @@ class Tab(Element):
 
 class Dropdown(Element):
   """A generic dropdown"""
-
-  def select(self, option_locator):
-    """Select an option from a dropdown menu
-
-    Args:
-        option_locator (tuple): locator of the dropdown element
-    """
-    self.element.click()
-    self._driver.find_element(*option_locator).click()
 
 
 class DropdownStatic(Element):
@@ -515,82 +523,10 @@ class Widget(AbstractPage):
     """
     Args:
         driver (CustomDriver)
-        widget_locator (tuple)
     """
     super(Widget, self).__init__(driver)
-
-    id_, name = re.match(constants.regex.URL_WIDGET_INFO, self.url).groups()
+    object_name, id_, widget_name = re.search(
+        constants.regex.URL_WIDGET_INFO, self.url).groups()
     self.object_id = id_
-    self.widget_name = name or constants.element.WidgetBar.INFO
-
-
-class ObjectWidget(Widget):
-  """Class representing all widgets with filters that list objects"""
-
-  _info_pane_cls = None
-
-  def __init__(self, driver, locator_widget, locator_filter_title,
-               locator_button_questionmark,
-               locator_filter_textbox, locator_filter_submit,
-               locator_filter_clear):
-    super(ObjectWidget, self).__init__(driver)
-
-    # parse number from widget title
-    widget_title = selenium_utils.get_when_visible(
-        self._driver, locator_widget).text
-
-    if "(" not in widget_title:
-        self.member_count = int(widget_title)
-    else:
-        self.member_count = int(
-            re.match(constants.regex.NUMBER_FROM_WIDGET_TITLE, widget_title)
-            .group(2))
-
-    self.label_filter = Label(driver, locator_filter_title)
-    self.button_filter_question = Button(driver,
-                                         locator_button_questionmark)
-    self.filter = Filter(
-        driver,
-        locator_filter_textbox,
-        locator_filter_submit,
-        locator_filter_clear)
-
-    if self.member_count:
-      # wait until the elements are loaded
-      selenium_utils.get_when_clickable(
-          self._driver, constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
-
-      self.members_listed = self._driver.find_elements(
-          *constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
-    else:
-      self.members_listed = []
-
-  def select_nth_member(self, member):
-    """Selects member from the list. Members start from (including) 0.
-
-    Args:
-        member (int)
-
-    Returns:
-        lib.page.widget.info.InfoWidget
-    """
-    try:
-      element = self.members_listed[member]
-
-      # wait for the listed items animation to stop
-      selenium_utils.wait_until_stops_moving(element)
-      element.click()
-
-      # wait for the info pane animation to stop
-      info_pane = selenium_utils.get_when_clickable(
-          self._driver, constants.locator.ObjectWidget.INFO_PANE)
-      selenium_utils.wait_until_stops_moving(info_pane)
-
-      return self._info_pane_cls(self._driver)
-    except exceptions.StaleElementReferenceException:
-      self.members_listed = self._driver.find_elements(
-          *constants.locator.ObjectWidget.MEMBERS_TITLE_LIST)
-      return self.select_nth_member(member)
-    except exceptions.TimeoutException:
-      # sometimes the click to the listed member results in hover
-      return self.select_nth_member(member)
+    self.name_from_url = widget_name or constants.element.WidgetBar.INFO
+    self.object_name = object_name

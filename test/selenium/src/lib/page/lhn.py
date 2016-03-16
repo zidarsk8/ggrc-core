@@ -9,61 +9,62 @@ from lib import base
 from lib.constants import locator
 from lib.element import lhn
 from lib.page import modal
-from lib.page import extended_info
 
 
 class _Programs(lhn.AccordionGroup):
   """Programs dropdown in LHN"""
 
   _locator_spinny = locator.LhnMenu.SPINNY_PROGRAMS
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROGRAM
-  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_PROGRAMS_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewProgramModal
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROGRAMS
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_PROGRAMS
+  _create_new_modal_cls = modal.create_new_object.Programs
 
 
 class _Workflows(lhn.AccordionGroup):
   """Workflows dropdown in LHN"""
 
   _locator_spinny = locator.LhnMenu.SPINNY_WORKFLOWS
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_WORKFLOW
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_WORKFLOWS
 
   def __init__(self, driver):
     super(_Workflows, self).__init__(driver)
     self.button_active = base.Button(
-        self._driver, locator.LhnMenu.WORKFLOWS_ACTIVE)
+        self._driver, locator.LhnMenu.BUTTON_WORKFLOWS_ACTIVE)
     self.button_inactive = base.Button(
-        self._driver, locator.LhnMenu.WORKFLOWS_INACTIVE)
+        self._driver, locator.LhnMenu.BUTTON_WORKFLOWS_INACTIVE)
     self.button_draft = base.Button(
-        self._driver, locator.LhnMenu.WORKFLOWS_DRAFT)
+        self._driver, locator.LhnMenu.BUTTON_WORKFLOWS_DRAFT)
 
 
 class _Audits(lhn.AccordionGroup):
   """Audits dropdown in LHN"""
 
   _locator_spinny = locator.LhnMenu.SPINNY_AUDITS
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_AUDIT
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_AUDITS
 
 
 class _Assessments(lhn.AccordionGroup):
   """Assessments dropdown in LHN"""
 
-  _locator_spinny = locator.LhnMenu.SPINNY_CONTROL_ASSESSMENTS
+  _locator_spinny = locator.LhnMenu.SPINNY_ASSESSMENTS
   _locator_button_create_new = locator.LhnMenu \
-      .BUTTON_CREATE_NEW_CONTROL_ASSESSMENT
+      .BUTTON_CREATE_NEW_ASSESSMENTS
 
 
 class _Requests(lhn.AccordionGroup):
   """Requests dropdown in LHN"""
-
   _locator_spinny = locator.LhnMenu.SPINNY_REQUESTS
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_REQUEST
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_REQUESTS
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_REQUESTS
+  _create_new_modal_cls = modal.create_new_object.Requests
 
 
 class _Issues(lhn.AccordionGroup):
   """Issues dropdown in LHN"""
-
   _locator_spinny = locator.LhnMenu.SPINNY_ISSUES
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ISSUE
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_ISSUES
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_ISSUES
+  _create_new_modal_cls = modal.create_new_object.Issues
 
 
 class _Directives(lhn.DropdownStatic):
@@ -151,59 +152,59 @@ class _Regulations(lhn.AccordionGroup):
   """Regulations dropdown in LHN"""
 
   _locator_spinny = locator.LhnMenu.SPINNY_REGULATIONS
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_REGULATION
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_REGULATIONS
 
 
 class _Policies(lhn.AccordionGroup):
   """Policies dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_POLICY
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_POLICIES
   _locator_spinny = locator.LhnMenu.SPINNY_POLICIES
 
 
 class _Standards(lhn.AccordionGroup):
   """Standards dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_STANDARD
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_STANDARDS
   _locator_spinny = locator.LhnMenu.SPINNY_STANDARDS
 
 
 class _Contracts(lhn.AccordionGroup):
   """Contracts dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CONTRACT
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_CONTRACTS
   _locator_spinny = locator.LhnMenu.SPINNY_REGULATIONS
 
 
 class _Clauses(lhn.AccordionGroup):
   """Clauses dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CLAUSE
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_CLAUSES
   _locator_spinny = locator.LhnMenu.SPINNY_CLAUSES
 
 
 class _Sections(lhn.AccordionGroup):
   """Sections dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_SECTION
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_SECTIONS
   _locator_spinny = locator.LhnMenu.SPINNY_SECTIONS
 
 
 class _ControlsOrObjectives(lhn.DropdownStatic):
   """Controls or objects dropdown in LHN"""
 
-  _locator_element = locator.LhnMenu.CONTROLS_OR_OBJECTIVES
+  _locator_element = locator.LhnMenu.TOGGLE_CONTROLS_OR_OBJECTIVES
 
   def __init__(self, driver):
     super(_ControlsOrObjectives, self).__init__(driver)
     self.toggle_controls = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.CONTROLS,
-        locator.LhnMenu.CONTROL_COUNT)
+        locator.LhnMenu.TOGGLE_CONTROLS,
+        locator.LhnMenu.COUNT_CONTROLS)
     self.toggle_objectives = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.OBJECTIVES,
-        locator.LhnMenu.OBJECTIVES_COUNT)
+        locator.LhnMenu.TOGGLE_OBJECTIVES,
+        locator.LhnMenu.COUNT_OBJECTIVES)
 
   def select_controls(self):
     """
@@ -225,43 +226,42 @@ class _ControlsOrObjectives(lhn.DropdownStatic):
 class Controls(lhn.AccordionGroup):
   """Controls dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_CONTROL
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_CONTROLS
   _locator_spinny = locator.LhnMenu.SPINNY_CONTROLS
-  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_CONTROLS_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewControlModal
-  _extended_info_cls = extended_info.Controls
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_CONTROLS
+  _create_new_modal_cls = modal.create_new_object.Controls
 
 
 class _Objectives(lhn.AccordionGroup):
   """Objectives dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_OBJECTIVE
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_OBJECTIVES
   _locator_spinny = locator.LhnMenu.SPINNY_OBJECTIVES
 
 
 class _PeopleOrGroups(lhn.DropdownStatic):
   """People or groups dropdown in LHN"""
 
-  _locator_element = locator.LhnMenu.PEOPLE_OR_GROUPS
+  _locator_element = locator.LhnMenu.TOGGLE_PEOPLE_OR_GROUPS
 
   def __init__(self, driver):
     super(_PeopleOrGroups, self).__init__(driver)
     self.toggle_people = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.PEOPLE,
-        locator.LhnMenu.PEOPLE_COUNT)
+        locator.LhnMenu.TOGGLE_PEOPLE,
+        locator.LhnMenu.COUNT_PEOPLE)
     self.toggle_org_groups = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.ORG_GROUPS,
-        locator.LhnMenu.ORG_GROUPS_COUNT)
+        locator.LhnMenu.TOGGLE_ORG_GROUPS,
+        locator.LhnMenu.COUNT_ORG_GROUPS)
     self.toggle_vendors = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.VENDORS,
-        locator.LhnMenu.VENDORS_COUNT)
+        locator.LhnMenu.TOGGLE_VENDORS,
+        locator.LhnMenu.COUNT_VENDORS)
     self.toggle_access_groups = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.ACCESS_GROUPS,
-        locator.LhnMenu.ACCESS_GROUPS_COUNT)
+        locator.LhnMenu.TOGGLE_ACCESS_GROUPS,
+        locator.LhnMenu.COUNT_ACCESS_GROUPS)
 
   def select_people(self):
     """
@@ -299,68 +299,68 @@ class _PeopleOrGroups(lhn.DropdownStatic):
 class _People(lhn.AccordionGroup):
   """People dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PERSON
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PEOPLE
   _locator_spinny = locator.LhnMenu.SPINNY_PEOPLE
 
 
 class _OrgGroups(lhn.AccordionGroup):
   """Org groups dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ORG_GROUP
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_ORG_GROUPS
   _locator_spinny = locator.LhnMenu.SPINNY_ORG_GROUPS
-  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_ORG_GROUP_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewOrgGroupModal
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_ORG_GROUPS
+  _create_new_modal_cls = modal.create_new_object.OrgGroups
 
 
 class _Vendors(lhn.AccordionGroup):
   """Vendors dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_VENDOR
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_VENDORS
   _locator_spinny = locator.LhnMenu.SPINNY_VENDORS
 
 
 class _AccessGroups(lhn.AccordionGroup):
   """Access groups dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_ACCESS_GROUP
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_ACCESS_GROUPS
   _locator_spinny = locator.LhnMenu.SPINNY_ACCESS_GROUPS
 
 
 class _AssetsOrBusiness(lhn.DropdownStatic):
   """Assets or business dropdown in LHN"""
 
-  _locator_element = locator.LhnMenu.ASSETS_OR_BUSINESS
+  _locator_element = locator.LhnMenu.TOGGLE_ASSETS_OR_BUSINESS
 
   def __init__(self, driver):
     super(_AssetsOrBusiness, self).__init__(driver)
     self.toggle_systems = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.SYSTEMS,
-        locator.LhnMenu.SYSTEMS_COUNT)
+        locator.LhnMenu.TOGGLE_SYSTEMS,
+        locator.LhnMenu.COUNT_SYSTEMS)
     self.toggle_processes = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.PROCESSES,
-        locator.LhnMenu.PROCESSES_COUNT)
+        locator.LhnMenu.TOGGLE_PROCESSES,
+        locator.LhnMenu.COUNT_PROCESSES)
     self.toggle_data_assets = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.DATA_ASSETS,
-        locator.LhnMenu.DATA_ASSETS_COUNT)
+        locator.LhnMenu.TOGGLE_DATA_ASSETS,
+        locator.LhnMenu.COUNT_DATA_ASSETS)
     self.toggle_products = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.PRODUCTS,
-        locator.LhnMenu.PRODUCTS_COUNT)
+        locator.LhnMenu.TOGGLE_PRODUCTS,
+        locator.LhnMenu.COUNT_PRODUCTS)
     self.toggle_projects = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.PROJECTS,
-        locator.LhnMenu.PROJECTS_COUNT)
+        locator.LhnMenu.TOGGLE_PROJECTS,
+        locator.LhnMenu.COUNT_PROJECTS)
     self.toggle_facilities = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.FACILITIES,
-        locator.LhnMenu.FACILITIES_COUNT)
+        locator.LhnMenu.TOGGLE_FACILITIES,
+        locator.LhnMenu.COUNT_FACILITIES)
     self.toggle_markets = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.MARKETS,
-        locator.LhnMenu.MARKETS_COUNT)
+        locator.LhnMenu.TOGGLE_MARKETS,
+        locator.LhnMenu.COUNT_MARKETS)
 
   def select_systems(self):
     """
@@ -422,67 +422,77 @@ class _AssetsOrBusiness(lhn.DropdownStatic):
 class _Systems(lhn.AccordionGroup):
   """Systems dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_SYSTEM
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_SYSTEMS
   _locator_spinny = locator.LhnMenu.SPINNY_SYSTEMS
+  _create_new_modal_cls = modal.create_new_object.Systems
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_SYSTEMS
 
 
 class _Processes(lhn.AccordionGroup):
   """Processes dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PROCESS
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROCESSES
   _locator_spinny = locator.LhnMenu.SPINNY_PROCESSES
+  _create_new_modal_cls = modal.create_new_object.Processes
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_PROCESSES
 
 
 class _DataAssets(lhn.AccordionGroup):
   """Data assets dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_DATA_ASSET
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_DATA_ASSETS
   _locator_spinny = locator.LhnMenu.SPINNY_DATA_ASSETS
+  _create_new_modal_cls = modal.create_new_object.DataAssets
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_DATA_ASSETS
 
 
 class _Products(lhn.AccordionGroup):
   """Products dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PRODUCT
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PRODUCTS
   _locator_spinny = locator.LhnMenu.SPINNY_PRODUCTS
+  _create_new_modal_cls = modal.create_new_object.Products
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_PRODUCTS
 
 
 class _Projects(lhn.AccordionGroup):
   """Projects dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_PROJECT
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROJECTS
   _locator_spinny = locator.LhnMenu.SPINNY_PROJECTS
+  _create_new_modal_cls = modal.create_new_object.Processes
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_PROJECTS
 
 
 class _Facilities(lhn.AccordionGroup):
   """Facilities dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_FACILITY
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_FACILITIES
   _locator_spinny = locator.LhnMenu.SPINNY_FACILITIES
 
 
 class _Markets(lhn.AccordionGroup):
   """Markets dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_MARKET
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_MARKETS
   _locator_spinny = locator.LhnMenu.SPINNY_MARKETS
 
 
 class _RisksOrThreats(lhn.DropdownStatic):
   """Risks or threats dropdown in LHN"""
 
-  _locator_element = locator.LhnMenu.RISK_OR_THREATS
+  _locator_element = locator.LhnMenu.TOGGLE_RISK_OR_THREATS
 
   def __init__(self, driver):
     super(_RisksOrThreats, self).__init__(driver)
     self.toggle_risks = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.RISKS,
-        locator.LhnMenu.RISKS_COUNT)
+        locator.LhnMenu.TOGGLE_RISKS,
+        locator.LhnMenu.COUNT_RISKS)
     self.toggle_threats = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.THREATS,
-        locator.LhnMenu.THREATS_COUNT)
+        locator.LhnMenu.TOGGLE_THREATS,
+        locator.LhnMenu.COUNT_THREATS)
 
   def select_risks(self):
     """
@@ -504,16 +514,16 @@ class _RisksOrThreats(lhn.DropdownStatic):
 class _Risks(lhn.AccordionGroup):
   """Risks dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_RISK
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_RISKS
   _locator_spinny = locator.LhnMenu.SPINNY_RISKS
-  _locator_accordeon_members = locator.LhnMenu.ACCORDEON_RISK_MEMBERS
-  _create_new_modal_cls = modal.create_new_object.NewRiskModal
+  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_RISKS
+  _create_new_modal_cls = modal.create_new_object.Risks
 
 
 class _Threats(lhn.AccordionGroup):
   """Threats dropdown in LHN"""
 
-  _locator_button_create_new = locator.LhnMenu.THREATS
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_THREATS
   _locator_spinny = locator.LhnMenu.SPINNY_THREATS
 
 
@@ -525,8 +535,7 @@ class Menu(base.AnimatedComponent):
         driver,
         [lhn.MyObjectsTab.locator_element,
          lhn.AllObjectsTab.locator_element],
-        wait_until_visible=True,
-    )
+        wait_until_visible=True)
     self.my_objects = lhn.MyObjectsTab(driver)
     self.all_objects = lhn.AllObjectsTab(driver)
     self.pin = None
@@ -556,43 +565,43 @@ class Menu(base.AnimatedComponent):
     self.pin = base.Toggle(self._driver, locator.LhnMenu.PIN)
     self.toggle_programs = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.PROGRAMS,
-        locator.LhnMenu.PROGRAMS_COUNT)
+        locator.LhnMenu.TOGGLE_PROGRAMS,
+        locator.LhnMenu.COUNT_PROGRAMS)
     self.toggle_workflows = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.WORKFLOWS,
-        locator.LhnMenu.WORKFLOWS_COUNT)
+        locator.LhnMenu.TOGGLE_WORKFLOWS,
+        locator.LhnMenu.COUNT_WORKFLOWS)
     self.toggle_audits = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.AUDITS,
-        locator.LhnMenu.AUDITS_COUNT)
+        locator.LhnMenu.TOGGLE_AUDITS,
+        locator.LhnMenu.COUNT_AUDITS)
     self.toggle_assessments = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.ASSESSMENTS,
-        locator.LhnMenu.ASSESSMENTS_COUNT)
+        locator.LhnMenu.TOGGLE_ASSESSMENTS,
+        locator.LhnMenu.COUNT_ASSESSMENTS)
     self.toggle_requests = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.REQUESTS,
-        locator.LhnMenu.REQUESTS_COUNT)
+        locator.LhnMenu.TOGGLE_REQUESTS,
+        locator.LhnMenu.COUNT_REQUESTS)
     self.toggle_issues = lhn.Toggle(
         self._driver,
-        locator.LhnMenu.ISSUES,
-        locator.LhnMenu.ISSUES_COUNT)
+        locator.LhnMenu.TOGGLE_ISSUES,
+        locator.LhnMenu.COUNT_ISSUES)
     self.toggle_directives = base.Toggle(
         self._driver,
         locator.LhnMenu.DIRECTIVES)
     self.toggle_controls_or_objectives = base.Toggle(
         self._driver,
-        locator.LhnMenu.CONTROLS_OR_OBJECTIVES)
+        locator.LhnMenu.TOGGLE_CONTROLS_OR_OBJECTIVES)
     self.toggle_people_or_groups = base.Toggle(
         self._driver,
-        locator.LhnMenu.PEOPLE_OR_GROUPS)
+        locator.LhnMenu.TOGGLE_PEOPLE_OR_GROUPS)
     self.toggle_assets_or_business = base.Toggle(
         self._driver,
-        locator.LhnMenu.ASSETS_OR_BUSINESS)
+        locator.LhnMenu.TOGGLE_ASSETS_OR_BUSINESS)
     self.toggle_risks_or_threats = base.Toggle(
         self._driver,
-        locator.LhnMenu.RISK_OR_THREATS)
+        locator.LhnMenu.TOGGLE_RISK_OR_THREATS)
 
   def filter_query(self, query):
     self.filter.filter_query(query)
@@ -673,7 +682,7 @@ class Menu(base.AnimatedComponent):
     self.toggle_people_or_groups.toggle()
     return _PeopleOrGroups(self._driver)
 
-  def select_assests_or_business(self):
+  def select_assets_or_business(self):
     """
     Returns:
         _AssetsOrBusiness
