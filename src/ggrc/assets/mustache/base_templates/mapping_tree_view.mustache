@@ -5,8 +5,8 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-<ul class="attachment-list">
-  {{#expose reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod}}
+<ul class="{{#if treeViewClass}}{{treeViewClass}}{{else}}attachment-list{{/if}}">
+  {{#expose reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping baseInstance=baseInstance}}
   {{#with_mapping mapping parentInstance}}
     {{#results}}
       {{{render itemTemplate parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod}}}
