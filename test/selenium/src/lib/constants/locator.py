@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By   # pylint: disable=import-error
 from lib.constants import objects
 from lib.constants import attribute
 
+
 class Login(object):
   """All locators for the login page"""
 
@@ -81,8 +82,8 @@ class LhnMenu(object):
     @staticmethod
     def get_accordion_members(object_name):
       return (
-        By.CSS_SELECTOR,
-        '[data-model-name="{}"]>.content>.sub-level>li'.format(object_name))
+          By.CSS_SELECTOR,
+          '[data-model-name="{}"]>.content>.sub-level>li'.format(object_name))
 
     @staticmethod
     def get_spinny(object_name):
@@ -98,7 +99,6 @@ class LhnMenu(object):
         # handle underscore in object names
         if "_" in capitalized_name:
           capitalized_name = capitalized_name.title().replace("_", "")
-
 
         # set lhn items
         setattr(self, attribute.TOGGLE + object_plural,
@@ -130,22 +130,22 @@ class LhnMenu(object):
 
   # lhn items
   DIRECTIVES = (By.CSS_SELECTOR, '[data-test-id="directives_66116337"]')
-  TOGGLE_CONTROLS_OR_OBJECTIVES = (By.CSS_SELECTOR,
-                            '[data-test-id="controls/objectives_66116337"]')
-  TOGGLE_PEOPLE_OR_GROUPS = (By.CSS_SELECTOR,
-                      '[data-test-id="people/groups_66116337"]')
-  TOGGLE_ASSETS_OR_BUSINESS = (By.CSS_SELECTOR,
-                        '[data-test-id="assets/business_66116337"]')
-  TOGGLE_RISK_OR_THREATS = (By.CSS_SELECTOR,
-                     '[data-test-id="risk/threats_66116337"]')
+  TOGGLE_CONTROLS_OR_OBJECTIVES = (
+      By.CSS_SELECTOR, '[data-test-id="controls/objectives_66116337"]')
+  TOGGLE_PEOPLE_OR_GROUPS = (
+      By.CSS_SELECTOR, '[data-test-id="people/groups_66116337"]')
+  TOGGLE_ASSETS_OR_BUSINESS = (
+      By.CSS_SELECTOR, '[data-test-id="assets/business_66116337"]')
+  TOGGLE_RISK_OR_THREATS = (
+      By.CSS_SELECTOR, '[data-test-id="risk/threats_66116337"]')
 
   # workflows labels
-  BUTTON_WORKFLOWS_ACTIVE = (By.CSS_SELECTOR, '[data-for="Workflow"]>['
-                                       'data-value="Active"]')
-  BUTTON_WORKFLOWS_DRAFT = (By.CSS_SELECTOR, '[data-for="Workflow"]>['
-                                      'data-value="Draft"]')
-  BUTTON_WORKFLOWS_INACTIVE = (By.CSS_SELECTOR, '[data-for="Workflow"]>['
-                                         'data-value="Inactive"]')
+  BUTTON_WORKFLOWS_ACTIVE = (
+      By.CSS_SELECTOR, '[data-for="Workflow"]>[data-value="Active"]')
+  BUTTON_WORKFLOWS_DRAFT = (
+      By.CSS_SELECTOR, '[data-for="Workflow"]>[data-value="Draft"]')
+  BUTTON_WORKFLOWS_INACTIVE = (
+      By.CSS_SELECTOR, '[data-for="Workflow"]>[data-value="Inactive"]')
 
 
 class ExtendedInfo(object):
@@ -267,16 +267,16 @@ class ModalCreateNewControl(BaseModalCreateNew):
     @staticmethod
     def get_asessor_row(first_id, second_id):
       return (
-        By.CSS_SELECTOR,
-        '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
-        'label'.format(first_id, second_id))
+          By.CSS_SELECTOR,
+          '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
+          'label'.format(first_id, second_id))
 
     @staticmethod
     def get_dropdown_item(first_id, second_id):
       return (
-        By.CSS_SELECTOR,
-        '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
-        'select'.format(first_id, second_id))
+          By.CSS_SELECTOR,
+          '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
+          'select'.format(first_id, second_id))
 
   # labels
   DESCRIPTION = (
@@ -441,7 +441,7 @@ class WidgetBar(object):
   class __metaclass__(type):
     def __init__(self, *args):
       for object_singular, object_plural in zip(objects.ALL_SINGULAR,
-                                                  objects.ALL_PLURAL):
+                                                objects.ALL_PLURAL):
         name = object_singular.lower()
         setattr(self, object_plural, self._Locator.get_widget(name))
 
@@ -463,7 +463,6 @@ class WidgetBar(object):
 
 class WidgetBarButtonAddDropdown(object):
   """Locators for the button/dropdown "add widget" in widget bar"""
-
   class _Locator(object):
     @staticmethod
     def get_dropdown_item(object_name):
@@ -478,7 +477,6 @@ class WidgetBarButtonAddDropdown(object):
 
   THREAD_ACTORS = _Locator.get_dropdown_item("threat_actor")
   WORKFLOW_TASKS = _Locator.get_dropdown_item("workflow_task")
-
 
 
 class ObjectWidget(object):
@@ -696,20 +694,20 @@ class WidgetAdminRoles(object):
   class _Locator(object):
     @staticmethod
     def get_role(child_id):
-      return (
-        By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child({}) '
-                         '.span8>div'.format(child_id))
+      return (By.CSS_SELECTOR,
+              '[id="roles_list_widget"] li:nth-child({}) .span8>div'
+              .format(child_id))
 
     @staticmethod
     def get_scope(child_id):
-      return (
-        By.CSS_SELECTOR,
-        '[id="roles_list_widget"] li:nth-child({}) .span4 '
-        '.scope'.format(child_id))
+      return (By.CSS_SELECTOR,
+              '[id="roles_list_widget"] li:nth-child({}) .span4 '
+              '.scope'.format(child_id))
 
   class __metaclass__(type):
     def __init__(self, *args):
-      items = ("EDITOR", "GRC_ADMIN", "PROGRAM_EDITOR", "PROGRAM_OWNER",
+      items = (
+          "EDITOR", "GRC_ADMIN", "PROGRAM_EDITOR", "PROGRAM_OWNER",
           "PROGRAM_READER", "READER", "WORKFLOW_MEMBER", "WORKFLOW_OWNER")
 
       for id_, name in enumerate(items, start=2):
@@ -722,9 +720,9 @@ class WidgetInfoSettingsButton(object):
   class _Locator(object):
     @staticmethod
     def get_dropdown_item(child_id):
-      return (
-        By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child({'
-                         '})'.format(child_id))
+      return (By.CSS_SELECTOR,
+              '.info-pane-utility .dropdown-menu li:nth-child({})'
+              .format(child_id))
 
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"]>h3')
 
@@ -743,8 +741,8 @@ class BaseWidgetGeneric(object):
     implemented using properties though with more code."""
     def __init__(self, *args):
       self.TITLE = (
-          By.CSS_SELECTOR, '#{}_widget .sticky-filter .filter-title h6'.format(
-            self._object_name))
+          By.CSS_SELECTOR, '#{}_widget .sticky-filter .filter-title h6'
+            .format(self._object_name))
       self.TEXTFIELD = (
           By.CSS_SELECTOR,
           '#{}_widget .sticky-filter .filter-input'.format(self._object_name))
@@ -804,17 +802,19 @@ class AdminCustomAttributes(object):
     @staticmethod
     def get_toggle(child_id):
       return (By.CSS_SELECTOR, '.tree-structure li:nth-child({}) div '
-                        '.openclose'.format(child_id))
+              '.openclose'.format(child_id))
 
     @staticmethod
     def get_programs_label(child_id):
-      return (By.CSS_SELECTOR,
-        '.tree-structure li:nth-child(5) div thead>tr>th:nth-child({'
-        '})'.format(child_id))
+      return (
+          By.CSS_SELECTOR,
+          '.tree-structure li:nth-child(5) div thead>tr>th:nth-child({})'
+            .format(child_id))
 
   class __metaclass__(type):
     def __init__(self, *args):
-      items = (objects.WORKFLOWS, "RISK_ASSESSMENTS", objects.THREATS,
+      items = (
+          objects.WORKFLOWS, "RISK_ASSESSMENTS", objects.THREATS,
           objects.RISKS, objects.PROGRAMS, objects.AUDITS,
           objects.OBJECTIVES, objects.SECTIONS, objects.CONTROLS,
           objects.ISSUES, objects.ASSESSMENTS, objects.STANDARDS,
@@ -842,8 +842,8 @@ class AdminCustomAttributes(object):
   PROGRAMS_LABEL_MANDATORY = _Locator.get_programs_label(3)
   PROGRAMS_LABEL_EDIT = _Locator.get_programs_label(4)
   LISTED_MEMBERS = (
-    By.CSS_SELECTOR,
-    '.tree-structure li:nth-child(5) div tbody>tr')
+      By.CSS_SELECTOR,
+      '.tree-structure li:nth-child(5) div tbody>tr')
   BUTTON_LISTED_MEMBERS_EDIT = (
-    By.CSS_SELECTOR,
-    '.tree-structure li:nth-child(5) div tbody>tr>td>ul .fa-pencil-square-o')
+      By.CSS_SELECTOR,
+      '.tree-structure li:nth-child(5) div tbody>tr>td>ul .fa-pencil-square-o')

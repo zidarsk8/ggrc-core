@@ -34,6 +34,7 @@ MARKETS = "markets"
 RISKS = "risks"
 THREATS = "threats"
 
+
 def _get_singular(plurals):
   """
   Return:
@@ -63,5 +64,3 @@ def _get_singular(plurals):
 ALL_PLURAL = [k for k in globals().keys()
               if not k.startswith("_") or k == "ALL"]
 ALL_SINGULAR = _get_singular(ALL_PLURAL)
-
-

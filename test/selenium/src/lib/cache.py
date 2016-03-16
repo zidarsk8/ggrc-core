@@ -6,7 +6,6 @@
 """Module containing various caches"""
 
 from lib.constants import element
-from lib.constants import objects
 
 
 def _get_lhn_section_map():
