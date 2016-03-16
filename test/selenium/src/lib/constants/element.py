@@ -5,6 +5,8 @@
 
 """Module containing element labels or properties e.g. date formatting"""
 
+from lib.constants import objects
+
 
 class LandingPage(object):
   BUTTON_LOGIN = "Login"
@@ -18,70 +20,42 @@ class PageHeader(object):
 
 class Lhn(object):
   """Labels in the LHN menu"""
-  PROGRAMS = "programs"
-  WORKFLOWS = "workflows"
-  AUDITS = "audits"
-  ASSESSMENTS = "assessments"
-  REQUESTS = "requests"
-  ISSUES = "issues"
+  class __metaclass__(type):
+    def __init__(self, *args):
+      for object_ in objects.ALL_PLURAL:
+        setattr(self, object_, object_.lower())
 
-  DIRECTIVES = "directives"
-  REGULATIONS = "regulations"
-  POLICIES = "policies"
-  STANDARDS = "standards"
-  CONTRACTS = "contracts"
-  CLAUSES = "clauses"
-  SECTIONS = "sections"
+      self.DIRECTIVES_MEMBERS = (
+          self.REGULATIONS,
+          self.POLICIES,
+          self.STANDARDS,
+          self.CONTRACTS,
+          self.CLAUSES,
+          self.SECTIONS)
+      self.CONTROLS_OR_OBJECTIVES_MEMBERS = (
+          self.CONTROLS,
+          self.OBJECTIVES)
+      self.PEOPLE_OR_GROUPS_MEMBERS = (
+          self.PEOPLE,
+          self.ORG_GROUPS,
+          self.VENDORS,
+          self.ACCESS_GROUPS)
+      self.ASSETS_OR_BUSINESS_MEMBERS = (
+          self.SYSTEMS,
+          self.PROCESSES,
+          self.DATA_ASSETS,
+          self.PRODUCTS,
+          self.PROJECTS,
+          self.FACILITIES,
+          self.MARKETS)
+      self.RISKS_OR_THREATS_MEMBERS = (
+          self.RISKS,
+          self.THREATS)
 
   CONTROLS_OR_OBJECTIVES = "controls_or_objectives"
-  CONTROLS = "controls"
-  OBJECTIVES = "objectives"
-
   PEOPLE_OR_GROUPS = "people_or_groups"
-  PEOPLE = "people"
-  ORG_GROUPS = "org_groups"
-  VENDORS = "vendors"
-  ACCESS_GROUPS = "access_groups"
-
   ASSETS_OR_BUSINESS = "assets_or_business"
-  SYSTEMS = "systems"
-  PROCESSES = "processes"
-  DATA_ASSETS = "data_assets"
-  PRODUCTS = "products"
-  PROJECTS = "projects"
-  FACILITIES = "facilities"
-  MARKETS = "markets"
-
   RISKS_OR_THREATS = "risks_or_threats"
-  RISKS = "risks"
-  THREATS = "threats"
-
-  DIRECTIVES_MEMBERS = (
-      REGULATIONS,
-      POLICIES,
-      STANDARDS,
-      CONTRACTS,
-      CLAUSES,
-      SECTIONS)
-  CONTROLS_OR_OBJECTIVES_MEMBERS = (
-      CONTROLS,
-      OBJECTIVES)
-  PEOPLE_OR_GROUPS_MEMBERS = (
-      PEOPLE,
-      ORG_GROUPS,
-      VENDORS,
-      ACCESS_GROUPS)
-  ASSETS_OR_BUSINESS_MEMBERS = (
-      SYSTEMS,
-      PROCESSES,
-      DATA_ASSETS,
-      PRODUCTS,
-      PROJECTS,
-      FACILITIES,
-      MARKETS)
-  RISKS_OR_THREATS_MEMBERS = (
-      RISKS,
-      THREATS)
 
 
 class ModalLhnCreateProgram(object):
@@ -108,34 +82,10 @@ class WidgetBar(object):
   # identifier for the object's info page
   INFO = "Info"
 
-  PROGRAMS = "programs"
-  WORKFLOWS = "workflows"
-  AUDITS = "audits"
-  ASSESSMENTS = "assessments"
-  REQUESTS = "requests"
-  ISSUES = "issues"
-  DIRECTIVES = "directives"
-  REGULATIONS = "regulations"
-  POLICIES = "policies"
-  STANDARDS = "standards"
-  CONTRACTS = "contracts"
-  CLAUSES = "clauses"
-  SECTIONS = "sections"
-  CONTROLS = "controls"
-  OBJECTIVES = "objectives"
-  PEOPLE = "people"
-  ORG_GROUPS = "org_groups"
-  VENDORS = "vendors"
-  ACCESS_GROUPS = "access_groups"
-  SYSTEMS = "systems"
-  PROCESSES = "processes"
-  DATA_ASSETS = "data_assets"
-  PRODUCTS = "products"
-  PROJECTS = "projects"
-  FACILITIES = "facilities"
-  MARKETS = "markets"
-  RISKS = "risks"
-  THREATS = "threats"
+  class __metaclass__(type):
+    def __init__(self, *args):
+      for object_ in objects.ALL_PLURAL:
+        setattr(self, object_, object_.lower())
 
 
 class WidgetProgramInfo(object):

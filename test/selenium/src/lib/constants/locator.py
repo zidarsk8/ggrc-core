@@ -7,7 +7,8 @@
 # pylint: disable=too-few-public-methods
 
 from selenium.webdriver.common.by import By   # pylint: disable=import-error
-
+from lib.constants import objects
+from lib.constants import attribute
 
 class Login(object):
   """All locators for the login page"""
@@ -60,6 +61,56 @@ class Dashboard(object):
 
 class LhnMenu(object):
   """Locators for the menu in header"""
+  class _Locator(object):
+    @staticmethod
+    def get_accordion_button(label):
+      return (By.CSS_SELECTOR, '[data-model-name="{}"]>a'.format(label))
+
+    @staticmethod
+    def get_create_new_button(label):
+      return (
+          By.CSS_SELECTOR,
+          '[data-model-name="{}"] [data-test-id="button_lhn_create_new_program'
+          '_522c563f"]'.format(label))
+
+    @staticmethod
+    def get_accordion_count(label):
+      return (By.CSS_SELECTOR, '[data-model-name="{}"] .item-count'.format(
+          label))
+
+    @staticmethod
+    def get_accordion_members(object_name):
+      return (
+        By.CSS_SELECTOR,
+        '[data-model-name="{}"]>.content>.sub-level>li'.format(object_name))
+
+    @staticmethod
+    def get_spinny(object_name):
+      return (By.CSS_SELECTOR, '[data-model-name="{}"] .spinny'.format(
+          object_name))
+
+  class __metaclass__(type):
+    def __init__(self, *args):
+      for object_singular, object_plural in zip(objects.ALL_SINGULAR,
+                                                objects.ALL_PLURAL):
+        capitalized_name = object_singular.title()
+
+        # handle underscore in object names
+        if "_" in capitalized_name:
+          capitalized_name = capitalized_name.title().replace("_", "")
+
+
+        # set lhn items
+        setattr(self, attribute.TOGGLE + object_plural,
+                self._Locator.get_accordion_button(capitalized_name))
+        setattr(self, attribute.BUTTON_CREATE_NEW + object_plural,
+                self._Locator.get_create_new_button(capitalized_name))
+        setattr(self, attribute.COUNT + object_plural,
+                self._Locator.get_accordion_count(capitalized_name))
+        setattr(self, attribute.SPINNY + object_plural,
+                self._Locator.get_spinny(capitalized_name))
+        setattr(self, attribute.ACCORDION_MEMBERS + object_plural,
+                self._Locator.get_accordion_members(capitalized_name))
 
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
@@ -78,273 +129,23 @@ class LhnMenu(object):
   PIN = (By.CSS_SELECTOR, '.lhn-pin')
 
   # lhn items
-  PROGRAMS = (By.CSS_SELECTOR, '[data-model-name="Program"]>a')
-  WORKFLOWS = (By.CSS_SELECTOR, '[data-model-name="Workflow"]>a')
-  AUDITS = (By.CSS_SELECTOR, '[data-model-name="Audit"]>a')
-  ASSESSMENTS = (By.CSS_SELECTOR,
-                 '[data-model-name="Assessment"]>a')
-  REQUESTS = (By.CSS_SELECTOR, '[data-model-name="Request"]>a')
-  ISSUES = (By.CSS_SELECTOR, '[data-model-name="Issue"]>a')
   DIRECTIVES = (By.CSS_SELECTOR, '[data-test-id="directives_66116337"]')
-  REGULATIONS = (By.CSS_SELECTOR,
-                 '[data-model-name="Regulation"]>a')
-  POLICIES = (By.CSS_SELECTOR, '[data-model-name="Policy"]>a')
-  STANDARDS = (By.CSS_SELECTOR, '[data-model-name="Standard"]>a')
-  CONTRACTS = (By.CSS_SELECTOR, '[data-model-name="Contract"]>a')
-  CLAUSES = (By.CSS_SELECTOR, '[data-model-name="Clause"]>a')
-  SECTIONS = (By.CSS_SELECTOR, '[data-model-name="Section"]>a')
-  CONTROLS_OR_OBJECTIVES = (By.CSS_SELECTOR,
+  TOGGLE_CONTROLS_OR_OBJECTIVES = (By.CSS_SELECTOR,
                             '[data-test-id="controls/objectives_66116337"]')
-  CONTROLS = (By.CSS_SELECTOR, '[data-model-name="Control"]>a')
-  OBJECTIVES = (By.CSS_SELECTOR, '[data-model-name="Objective"]>a')
-  PEOPLE_OR_GROUPS = (By.CSS_SELECTOR,
+  TOGGLE_PEOPLE_OR_GROUPS = (By.CSS_SELECTOR,
                       '[data-test-id="people/groups_66116337"]')
-  PEOPLE = (By.CSS_SELECTOR, '[data-model-name="Person"]>a')
-  ORG_GROUPS = (By.CSS_SELECTOR, '[data-model-name="OrgGroup"]>a')
-  ASSETS_OR_BUSINESS = (By.CSS_SELECTOR,
+  TOGGLE_ASSETS_OR_BUSINESS = (By.CSS_SELECTOR,
                         '[data-test-id="assets/business_66116337"]')
-  SYSTEMS = (By.CSS_SELECTOR, '[data-model-name="System"]>a')
-  PROCESSES = (By.CSS_SELECTOR, '[data-model-name="Process"]>a')
-  DATA_ASSETS = (By.CSS_SELECTOR, '[data-model-name="DataAsset"]>a')
-  ACCESS_GROUPS = (By.CSS_SELECTOR, '[data-model-name="AccessGroup"]>a')
-  VENDORS = (By.CSS_SELECTOR, '[data-model-name="Vendor"]>a')
-  PRODUCTS = (By.CSS_SELECTOR, '[data-model-name="Product"]>a')
-  PROJECTS = (By.CSS_SELECTOR, '[data-model-name="Project"]>a')
-  RISK_OR_THREATS = (By.CSS_SELECTOR,
+  TOGGLE_RISK_OR_THREATS = (By.CSS_SELECTOR,
                      '[data-test-id="risk/threats_66116337"]')
-  RISKS = (By.CSS_SELECTOR, '[data-model-name="Risk"]>a')
-  FACILITIES = (By.CSS_SELECTOR, '[data-model-name="Facility"]>a')
-  MARKETS = (By.CSS_SELECTOR, '[data-model-name="Market"]>a')
-  THREATS = (By.CSS_SELECTOR, '[data-model-name="Threat"]>a')
-
-  # buttons create new lhn_modal
-  BUTTON_CREATE_NEW_PROGRAM = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Program"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_NEW_WORKFLOW = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Workflow"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_NEW_AUDIT = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Audit"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_NEW_CONTROL_ASSESSMENT = (
-      By.CSS_SELECTOR,
-      '[data-model-name="ControlAssessment"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_NEW_REQUEST = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Request"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_ISSUE = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Issue"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_REGULATION = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Regulation"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_POLICY = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Policy"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_STANDARD = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Standard"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_CONTRACT = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Contract"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_CLAUSE = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Clause"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_SECTION = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Section"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_CONTROL = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Control"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_OBJECTIVE = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Objective"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_PERSON = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Person"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_ORG_GROUP = (
-      By.CSS_SELECTOR,
-      '[data-model-name="OrgGroup"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_VENDOR = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Vendor"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_ACCESS_GROUP = (
-      By.CSS_SELECTOR,
-      '[data-model-name="AccessGroup"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_SYSTEM = (
-      By.CSS_SELECTOR,
-      '[data-model-name="System"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_PROCESS = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Process"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_DATA_ASSET = (
-      By.CSS_SELECTOR,
-      '[data-model-name="DataAsset"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_PRODUCT = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Product"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_PROJECT = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Project"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_FACILITY = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Facility"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_MARKET = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Market"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_RISK = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Risk"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-  BUTTON_CREATE_THREAT = (
-      By.CSS_SELECTOR,
-      '[data-model-name="Threat"] ['
-      'data-test-id="button_lhn_create_new_program_522c563f"]')
-
-  # count locators
-  PROGRAMS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Program"] '
-                                     '.item-count')
-  WORKFLOWS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Workflow"] '
-                                      '.item-count')
-  AUDITS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Audit"] .item-count')
-  ASSESSMENTS_COUNT = (By.CSS_SELECTOR,
-                       '[data-model-name="Assessment"] .item-count')
-  ISSUES_COUNT = (By.CSS_SELECTOR, '[data-model-name="Issue"] .item-count')
-  REQUESTS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Request"] '
-                                     '.item-count')
-  REGULATIONS_COUNT = (By.CSS_SELECTOR,
-                       '[data-model-name="Regulation"] .item-count')
-  POLICIES_COUNT = (By.CSS_SELECTOR,
-                    '[data-model-name="Policy"] .item-count')
-  STANDARDS_COUNT = (By.CSS_SELECTOR,
-                     '[data-model-name="Standard"] .item-count')
-  CONTRACTS_COUNT = (By.CSS_SELECTOR,
-                     '[data-model-name="Clause"] .item-count')
-  CLAUSES_COUNT = (By.CSS_SELECTOR,
-                   '[data-model-name="Regulation"] .item-count')
-  SECTIONS_COUNT = (By.CSS_SELECTOR,
-                    '[data-model-name="Section"] .item-count')
-  CONTROL_COUNT = (
-      By.CSS_SELECTOR, '[data-model-name="Control"] .item-count')
-  OBJECTIVES_COUNT = (By.CSS_SELECTOR, '[data-model-name="Objective"] '
-                                       '.item-count')
-  PEOPLE_COUNT = (By.CSS_SELECTOR, '[data-model-name="Person"] .item-count')
-  ORG_GROUPS_COUNT = (By.CSS_SELECTOR, '[data-model-name="OrgGroup"] '
-                                       '.item-count')
-  VENDORS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Vendor"] .item-count')
-  ACCESS_GROUPS_COUNT = (By.CSS_SELECTOR, '[data-model-name="AccessGroup"] '
-                                          '.item-count')
-  SYSTEMS_COUNT = (By.CSS_SELECTOR, '[data-model-name="System"] .item-count')
-  PROCESSES_COUNT = (By.CSS_SELECTOR, '[data-model-name="Process"] '
-                                      '.item-count')
-  DATA_ASSETS_COUNT = (By.CSS_SELECTOR, '[data-model-name="DataAsset"] '
-                                        '.item-count')
-  PRODUCTS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Product"] '
-                                     '.item-count')
-  PROJECTS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Project"] '
-                                     '.item-count')
-  FACILITIES_COUNT = (By.CSS_SELECTOR, '[data-model-name="Facility"] '
-                                       '.item-count')
-  MARKETS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Market"] .item-count')
-  RISKS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Risk"] .item-count')
-  THREATS_COUNT = (By.CSS_SELECTOR, '[data-model-name="Threat"] .item-count')
 
   # workflows labels
-  WORKFLOWS_ACTIVE = (By.CSS_SELECTOR, '[data-for="Workflow"]>['
+  BUTTON_WORKFLOWS_ACTIVE = (By.CSS_SELECTOR, '[data-for="Workflow"]>['
                                        'data-value="Active"]')
-  WORKFLOWS_DRAFT = (By.CSS_SELECTOR, '[data-for="Workflow"]>['
+  BUTTON_WORKFLOWS_DRAFT = (By.CSS_SELECTOR, '[data-for="Workflow"]>['
                                       'data-value="Draft"]')
-  WORKFLOWS_INACTIVE = (By.CSS_SELECTOR, '[data-for="Workflow"]>['
+  BUTTON_WORKFLOWS_INACTIVE = (By.CSS_SELECTOR, '[data-for="Workflow"]>['
                                          'data-value="Inactive"]')
-
-  # spinny
-  SPINNY_PROGRAMS = (By.CSS_SELECTOR, '[data-model-name="Program"] .spinny')
-  SPINNY_WORKFLOWS = (
-      By.CSS_SELECTOR, '[data-model-name="Workflow"] .spinny')
-  SPINNY_AUDITS = (By.CSS_SELECTOR, '[data-model-name="Audit"] .spinny')
-  SPINNY_CONTROL_ASSESSMENTS = (
-      By.CSS_SELECTOR, '[data-model-name="ControlAssessment"] .spinny')
-  SPINNY_REQUESTS = (By.CSS_SELECTOR, '[data-model-name="Request"] .spinny')
-  SPINNY_ISSUES = (By.CSS_SELECTOR, '[data-model-name="Issue"] .spinny')
-  SPINNY_REGULATIONS = (
-      By.CSS_SELECTOR, '[data-model-name="Regulation"] .spinny')
-  SPINNY_POLICIES = (By.CSS_SELECTOR, '[data-model-name="Policy"] .spinny')
-  SPINNY_STANDARDS = (
-      By.CSS_SELECTOR, '[data-model-name="Standard"] .spinny')
-  SPINNY_CONTRACTS = (
-      By.CSS_SELECTOR, '[data-model-name="Contract"] .spinny')
-  SPINNY_CLAUSES = (By.CSS_SELECTOR, '[data-model-name="Clause"] .spinny')
-  SPINNY_SECTIONS = (By.CSS_SELECTOR, '[data-model-name="Section"] .spinny')
-  SPINNY_CONTROLS = (By.CSS_SELECTOR, '[data-model-name="Control"] .spinny')
-  SPINNY_OBJECTIVES = (
-      By.CSS_SELECTOR, '[data-model-name="Objective"] .spinny')
-  SPINNY_PEOPLE = (By.CSS_SELECTOR, '[data-model-name="Person"] .spinny')
-  SPINNY_ORG_GROUPS = (
-      By.CSS_SELECTOR, '[data-model-name="OrgGroup"] .spinny')
-  SPINNY_VENDORS = (By.CSS_SELECTOR, '[data-model-name="Vendor"] .spinny')
-  SPINNY_ACCESS_GROUPS = (
-      By.CSS_SELECTOR, '[data-model-name="AccessGroup"] .spinny')
-  SPINNY_SYSTEMS = (By.CSS_SELECTOR, '[data-model-name="System"] .spinny')
-  SPINNY_PROCESSES = (By.CSS_SELECTOR, '[data-model-name="Process"] .spinny')
-  SPINNY_DATA_ASSETS = (
-      By.CSS_SELECTOR, '[data-model-name="DataAsset"] .spinny')
-  SPINNY_PRODUCTS = (By.CSS_SELECTOR, '[data-model-name="Product"] .spinny')
-  SPINNY_PROJECTS = (By.CSS_SELECTOR, '[data-model-name="Project"] .spinny')
-  SPINNY_FACILITIES = (
-      By.CSS_SELECTOR, '[data-model-name="Facility"] .spinny')
-  SPINNY_MARKETS = (By.CSS_SELECTOR, '[data-model-name="Market"] .spinny')
-  SPINNY_RISKS = (By.CSS_SELECTOR, '[data-model-name="Risk"] .spinny')
-  SPINNY_THREATS = (By.CSS_SELECTOR, '[data-model-name="Threat"] .spinny')
-
-  # accordeon members
-  ACCORDEON_PROGRAMS_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="Program"]>.content>.sub-level>li')
-  ACCORDEON_REQUEST_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="Request"]>.content>.sub-level>li')
-  ACCORDEON_ISSUE_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="Issue"]>.content>.sub-level>li')
-  ACCORDEON_CONTROLS_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="Control"]>.content>.sub-level>li')
-  ACCORDEON_ORG_GROUP_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="OrgGroup"]>.content>.sub-level>li')
-  ACCORDEON_RISK_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="Risk"]>.content>.sub-level>li')
-  ACCORDEON_PROCESS_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="Process"]>.content>.sub-level>li')
-  ACCORDEON_DATA_ASSET_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="DataAsset"]>.content>.sub-level>li')
-  ACCORDEON_SYSTEM_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="System"]>.content>.sub-level>li')
-  ACCORDEON_PRODUCT_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="Product"]>.content>.sub-level>li')
-  ACCORDEON_PROJECT_MEMBERS = (
-      By.CSS_SELECTOR, '[data-model-name="Project"]>.content>.sub-level>li')
 
 
 class ExtendedInfo(object):
@@ -357,10 +158,21 @@ class ExtendedInfo(object):
       '.extended-info.in .links .primary:not(.map-to-page-object)')
 
 
-class ModalCreateNewProgram(object):
+class BaseModalCreateNew(object):
+  """Locators shared with create new object modals"""
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
+  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
+
+  # user input elements
+  UI_TITLE = (
+      By.CSS_SELECTOR,
+      '.modal-body form>div:nth-child(2) .span6>input')
+
+
+class ModalCreateNewProgram(BaseModalCreateNew):
   """Locators for the program modal visible when creating a new modal from
   LHN"""
-
   UI_TITLE = (By.CSS_SELECTOR,
               '[data-test-id="new_program_field_title_a63ed79d"]')
   UI_DESCRIPTION = (By.CSS_SELECTOR,
@@ -406,127 +218,67 @@ class ModalCreateNewProgram(object):
                  '[data-test-id="label_program_url_2c925d94"]')
 
 
-class ModalCreateNewOrgGroup(object):
+class ModalCreateNewOrgGroup(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
 
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
 
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
-
-
-class ModalCreateNewRisk(object):
+class ModalCreateNewRisk(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
-
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
-
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
   UI_DESCRIPTION = (
       By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
 
 
-class ModalCreateRequest(object):
+class ModalCreateRequest(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
 
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
 
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
-
-
-class ModalCreateNewDataAsset(object):
+class ModalCreateNewDataAsset(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
 
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
 
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
-
-
-class ModalCreateNewProcess(object):
+class ModalCreateNewProcess(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
 
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
 
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
-
-
-class ModalCreateNewProject(object):
+class ModalCreateNewProject(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
 
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
 
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
-
-
-class ModalCreateNewSystem(object):
+class ModalCreateNewSystem(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
 
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
 
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
-
-
-class ModalCreateNewProduct(object):
+class ModalCreateNewProduct(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
 
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
 
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
-
-
-class ModalCreateNewControl(object):
+class ModalCreateNewControl(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
+  class _Locator(object):
+    @staticmethod
+    def get_asessor_row(first_id, second_id):
+      return (
+        By.CSS_SELECTOR,
+        '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
+        'label'.format(first_id, second_id))
+
+    @staticmethod
+    def get_dropdown_item(first_id, second_id):
+      return (
+        By.CSS_SELECTOR,
+        '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
+        'select'.format(first_id, second_id))
 
   # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
   DESCRIPTION = (
       By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) .span6>label')
   TEST_PLAN = (By.CSS_SELECTOR, '[data-id="test_plan_hidden"] label')
@@ -538,21 +290,12 @@ class ModalCreateNewControl(object):
   FRAUD_RELATED = (
       By.CSS_SELECTOR,
       '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(2) label')
-  EFFECTIVE_DATE = (
-      By.CSS_SELECTOR,
-      '.modal-body div>form>div>div:nth-child(3)>div:nth-child(1) label')
-  FREQUENCY = (
-      By.CSS_SELECTOR,
-      '.modal-body div>form>div>div:nth-child(4) div:nth-child(1) select')
-  ASSERTIONS = (
-      By.CSS_SELECTOR,
-      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(2) label')
-  PRINCIPAL_ASSESSOR = (
-      By.CSS_SELECTOR,
-      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(1) label')
-  SECONDARY_ASSESSOR = (
-      By.CSS_SELECTOR,
-      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(2) label')
+  EFFECTIVE_DATE = _Locator.get_asessor_row(3, 1)
+  FREQUENCY = _Locator.get_asessor_row(4, 1)
+  ASSERTIONS = _Locator.get_asessor_row(4, 2)
+  PRINCIPAL_ASSESSOR = _Locator.get_asessor_row(5, 1)
+  SECONDARY_ASSESSOR = _Locator.get_asessor_row(5, 2)
+
   OWNER = (
       By.CSS_SELECTOR,
       '.modal-body div:nth-child(1)>form>div:nth-child(3) div:nth-child(2) '
@@ -590,9 +333,6 @@ class ModalCreateNewControl(object):
       '.modal-body div>form>div>div:nth-child(5)>div:nth-child(3) label')
 
   # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
   UI_DESCRIPTION = (
       By.CSS_SELECTOR, '.modal-body form>div:nth-child(3) iframe')
   UI_TEST_PLAN = (By.CSS_SELECTOR, '[data-id="test_plan_hidden"] iframe')
@@ -623,75 +363,39 @@ class ModalCreateNewControl(object):
       '.modal-body div>form>div>div:nth-child(3)>div:nth-child(2) input')
 
   # dorpdowns
-  DROPDOWN_KIND_OR_NATURE = (
-      By.CSS_SELECTOR,
-      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(1) select')
-  DROPDOWN_FRAUD_RELATED = (
-      By.CSS_SELECTOR,
-      '.modal-body div:nth-child(6)>div:nth-child(2)>div:nth-child(2)>select')
-  DROPDOWN_SIGNIFICANCE = (
-      By.CSS_SELECTOR,
-      '.modal-body div:nth-child(6)>div:nth-child(2)>div:nth-child(3)>select')
-  DROPDOWN_TYPE_OR_MEANS = (
-      By.CSS_SELECTOR,
-      '.modal-body div:nth-child(6) div:nth-child(2) div:nth-child(4) select')
-  DROPDOWN_FREQUENCY = (
-      By.CSS_SELECTOR,
-      '.modal-body div>form>div>div:nth-child(4) div:nth-child(1) select')
-  DROPDOWN_STATE = (
-      By.CSS_SELECTOR,
-      '.modal-body div>form>div>div:nth-child(5)>div:nth-child(3) select')
+  DROPDOWN_KIND_OR_NATURE = _Locator.get_dropdown_item(2, 1)
+  DROPDOWN_FRAUD_RELATED = _Locator.get_dropdown_item(2, 2)
+  DROPDOWN_SIGNIFICANCE = _Locator.get_dropdown_item(2, 3)
+  DROPDOWN_TYPE_OR_MEANS = _Locator.get_dropdown_item(2, 4)
+  DROPDOWN_FREQUENCY = _Locator.get_dropdown_item(4, 1)
+  DROPDOWN_STATE = _Locator.get_dropdown_item(5, 3)
 
-  SELECTABLE_ASSERTIONS = (
-      By.CSS_SELECTOR,
-      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(2) select')
-  SELECTABLE_CATEGORIES = (
-      By.CSS_SELECTOR,
-      '.modal-body div>form>div>div:nth-child(4)>div:nth-child(3) select')
+  SELECTABLE_ASSERTIONS = _Locator.get_dropdown_item(4, 2)
+  SELECTABLE_CATEGORIES = _Locator.get_dropdown_item(4, 3)
 
   # buttons
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
   BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
 
 
-class ModalCreateNewIssue(object):
+class ModalCreateNewIssue(BaseModalCreateNew):
   """Locators for the issue modal visible when creating a new modal from
   LHN"""
 
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
 
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
-
-
-class ModalCreateNewRequest(object):
+class ModalCreateNewRequest(BaseModalCreateNew):
   """Locators for the request modal visible when creating a new modal from
   LHN"""
 
-  # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
 
-  # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
-
-
-class ModalEditObject(object):
+class ModalEditObject(BaseModalCreateNew):
   """Locators for a generic edit object modal"""
-
   BUTTON_DELETE = (
       By.CSS_SELECTOR, '.deny-buttons [data-toggle="modal-ajax-deleteform"]')
 
 
-class ModalCreateNewObject(object):
+class ModalCreateNewObject(BaseModalCreateNew):
   """Locators for a generic new object modal"""
-
   UI_TITLE = (By.CSS_SELECTOR, '[data-id="title_txtbx"]')
 
   BUTTON_SAVE_AND_CLOSE = (
@@ -729,131 +433,52 @@ class ModalCustomAttribute(object):
 class WidgetBar(object):
   """Locators for the bar containing the widgets/tabs"""
 
+  class _Locator(object):
+    @staticmethod
+    def get_widget(object_name):
+      return (By.CSS_SELECTOR, '[href="#{}_widget"]'.format(object_name))
+
+  class __metaclass__(type):
+    def __init__(self, *args):
+      for object_singular, object_plural in zip(objects.ALL_SINGULAR,
+                                                  objects.ALL_PLURAL):
+        name = object_singular.lower()
+        setattr(self, object_plural, self._Locator.get_widget(name))
+
   BUTTON_ADD = (By.CSS_SELECTOR,
                 '[data-test-id="button_widget_add_2c925d94"]')
   TAB_WIDGET = (By.CSS_SELECTOR, ".object-nav .active")
-  ADMIN_PEOPLE = (By.CSS_SELECTOR, '[href="#people_list_widget"]')
-  ADMIN_ROLES = (By.CSS_SELECTOR, '[href="#roles_list_widget"]')
-  ADMIN_EVENTS = (By.CSS_SELECTOR, '[href="#events_list_widget"]')
-  ADMIN_CUSTOM_ATTRIBUTE = (By.CSS_SELECTOR,
-                            '[href="#custom_attribute_widget"]')
+  ADMIN_PEOPLE = _Locator.get_widget("people_list")
+  ADMIN_ROLES = _Locator.get_widget("roles_list")
+  ADMIN_EVENTS = _Locator.get_widget("events_list")
+  ADMIN_CUSTOM_ATTRIBUTE = _Locator.get_widget("custom_attribute")
 
-  INFO = (By.CSS_SELECTOR, '[href="#info_widget"]')
-  CUSTOM_ATTRIBUTES = (By.CSS_SELECTOR, '[href="#custom_attribute_widget"]')
-  EVENTS = (By.CSS_SELECTOR, '[href="#events_list_widget"]')
-  ROLES = (By.CSS_SELECTOR, '[href="#roles_list_widget"]')
-  PEOPLE = (By.CSS_SELECTOR, '[href="#person_widget"]')
-  MARKETS = (By.CSS_SELECTOR, '[href="#market_widget"]')
-  ACCESS_GROUPS = (By.CSS_SELECTOR, '[href="#access_group_widget"]')
-  ASSESSMENT = (By.CSS_SELECTOR, '[href="#assessment_widget"]')
-  AUDITS = (By.CSS_SELECTOR, '[href="#audit_widget"]')
-  CLAUSES = (By.CSS_SELECTOR, '[href="#clause_widget"]')
-  CONTRACTS = (By.CSS_SELECTOR, '[href="#contract_widget"]')
-  CONTROLS = (By.CSS_SELECTOR, '[href="#control_widget"]')
-  DATA_ASSETS = (By.CSS_SELECTOR, '[href="#data_asset_widget"]')
-  ISSUES = (By.CSS_SELECTOR, '[href="#issue_widget"]')
-  FACILITIES = (By.CSS_SELECTOR, '[href="#facility_widget"]')
-  OBJECTIVES = (By.CSS_SELECTOR, '[href="#objective_widget"]')
-  ORG_GROUPS = (By.CSS_SELECTOR, '[href="#org_group_widget"]')
-  POLICIES = (By.CSS_SELECTOR, '[href="#policy_widget"]')
-  PROCESSES = (By.CSS_SELECTOR, '[href="#process_widget"]')
-  PRODUCTS = (By.CSS_SELECTOR, '[href="#product_widget"]')
-  PROJECTS = (By.CSS_SELECTOR, '[href="#project_widget"]')
-  PROGRAMS = (By.CSS_SELECTOR, '[href="#program_widget"]')
-  REGULATIONS = (By.CSS_SELECTOR, '[href="#regulation_widget"]')
-  REQUESTS = (By.CSS_SELECTOR, '[href="#request_widget"]')
-  SECTIONS = (By.CSS_SELECTOR, '[href="#section_widget"]')
-  STANDARDS = (By.CSS_SELECTOR, '[href="#standard_widget"]')
-  SYSTEMS = (By.CSS_SELECTOR, '[href="#system_widget"]')
-  VENDORS = (By.CSS_SELECTOR, '[href="#vendor_widget"]')
-  RISKS = (By.CSS_SELECTOR, '[href="#risks_widget"]')
-  THREATS = (By.CSS_SELECTOR, '[href="#threats_widget"]')
-  RISK_ASSESSMENTS = (By.CSS_SELECTOR, '[href="#risk_assessments_widget"]')
-  WORKFLOWS = (By.CSS_SELECTOR, '[href="#workflow_widget"]')
-  TASKS = (By.CSS_SELECTOR, '[href="#task_widget"]')
+  INFO = _Locator.get_widget("info")
+  CUSTOM_ATTRIBUTES = _Locator.get_widget("custom_attribute")
+  EVENTS = _Locator.get_widget("events_list")
+  ROLES = _Locator.get_widget("roles_list")
+  RISK_ASSESSMENTS = _Locator.get_widget("risk_assessment")
+  TASKS = _Locator.get_widget("task")
 
 
 class WidgetBarButtonAddDropdown(object):
   """Locators for the button/dropdown "add widget" in widget bar"""
 
-  AUDITS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                             '[href="#audit_widget"]')
-  CONTROLS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                               '[href="#control_widget"]')
-  DATA_ASSETS = (By.CSS_SELECTOR,
-                 '[data-test-id="button_widget_add_2c925d94"] '
-                 '[href="#data_asset_widget"]')
-  ISSUES = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                             '[href="#issues_widget"]')
-  OBJECTIVES = (By.CSS_SELECTOR,
-                '[data-test-id="button_widget_add_2c925d94"] '
-                '[href="#objective_widget"]')
-  POLICIES = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                               '[href="#policy_widget"]')
-  PRODUCTS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                               '[href="#product_widget"]')
-  REGULATIONS = (By.CSS_SELECTOR,
-                 '[data-test-id="button_widget_add_2c925d94"] '
-                 '[href="#regulation_widget"]')
-  SYSTEMS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                              '[href="#system_widget"]')
-  RISKS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                            '[href="#risk_widget"]')
-  WORKFLOWS = (
-      By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                       '[href="#workflow_widget"]')
-  CONTRACTS = (
-      By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                       '[href="#contract_widget"]')
-  ASSESSMENTS = (By.CSS_SELECTOR,
-                 '[data-test-id="button_widget_add_2c925d94"] '
-                 '[href="#assessment_widget"]')
-  FACILITIES = (By.CSS_SELECTOR,
-                '[data-test-id="button_widget_add_2c925d94"] '
-                '[href="#facility_widget"]')
-  MARKETS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                              '[href="#market_widget"]')
-  ORG_GROUPS = (By.CSS_SELECTOR,
-                '[data-test-id="button_widget_add_2c925d94"] '
-                '[href="#org_groups_widget"]')
-  PROCESSES = (By.CSS_SELECTOR,
-               '[data-test-id="button_widget_add_2c925d94"] '
-               '[href="#process_widget"]')
-  PROJECTS = (By.CSS_SELECTOR,
-              '[data-test-id="button_widget_add_2c925d94"] '
-              '[href="#project_widget"]')
-  STANDARDS = (By.CSS_SELECTOR,
-               '[data-test-id="button_widget_add_2c925d94"] '
-               '[href="#standard_widget"]')
-  VENDORS = (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                              '[href="#vendor_widget"]')
-  THREAD_ACTORS = (By.CSS_SELECTOR,
-                   '[data-test-id="button_widget_add_2c925d94"] '
-                   '[href="#thread_actors_widget"]')
-  WORKFLOW_TASKS = (By.CSS_SELECTOR,
-                    '[data-test-id="button_widget_add_2c925d94"] '
-                    '[href="#task_widget"]')
-  PERSON = (By.CSS_SELECTOR,
-            '[data-test-id="button_widget_add_2c925d94"] '
-            '[href="#person_widget"]')
-  PROGRAM = (By.CSS_SELECTOR,
-             '[data-test-id="button_widget_add_2c925d94"] '
-             '[href="#program_widget"]')
-  ACCESS_GROUP = (By.CSS_SELECTOR,
-                  '[data-test-id="button_widget_add_2c925d94"] '
-                  '[href="#access_group_widget"]')
-  CLAUSE = (By.CSS_SELECTOR,
-            '[data-test-id="button_widget_add_2c925d94"] '
-            '[href="#clause_widget"]')
-  REQUEST = (By.CSS_SELECTOR,
-             '[data-test-id="button_widget_add_2c925d94"] '
-             '[href="#request_widget"]')
-  SECTION = (By.CSS_SELECTOR,
-             '[data-test-id="button_widget_add_2c925d94"] '
-             '[href="#section_widget"]')
-  THREAT = (By.CSS_SELECTOR,
-            '[data-test-id="button_widget_add_2c925d94"] '
-            '[href="#threat_widget"]')
+  class _Locator(object):
+    @staticmethod
+    def get_dropdown_item(object_name):
+      return (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
+                               '[href="#{}_widget"]'.format(object_name))
+
+  class __metaclass__(type):
+    def __init__(self, *args):
+      for object_ in objects.ALL_PLURAL:
+        name = object_.lower()
+        setattr(self, object_, self._Locator.get_dropdown_item(name))
+
+  THREAD_ACTORS = _Locator.get_dropdown_item("threat_actor")
+  WORKFLOW_TASKS = _Locator.get_dropdown_item("workflow_task")
+
 
 
 class ObjectWidget(object):
@@ -886,7 +511,7 @@ class BaseInfoWidget(object):
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
 
-class ProgramInfoWidget(BaseInfoWidget):
+class WidgetInfoProgram(BaseInfoWidget):
   """Locators for the info program widget"""
 
   PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
@@ -961,352 +586,264 @@ class ProgramInfoWidget(BaseInfoWidget):
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
 
 
-class RequestInfoWidget(BaseInfoWidget):
+class WidgetInfoRequest(BaseInfoWidget):
   """Locators for the request info widget"""
 
 
-class RiskInfoWidget(BaseInfoWidget):
+class WidgetInfoRisk(BaseInfoWidget):
   """Locators for the risk info widget"""
 
 
-class OrgGroupInfoWidget(BaseInfoWidget):
+class WidgetInfoOrgGroup(BaseInfoWidget):
   """Locators for the org group info widget"""
 
 
-class IssueInfoWidget(BaseInfoWidget):
+class WidgetInfoIssue(BaseInfoWidget):
   """Locators for the org group info widget"""
 
 
-class RegulationsInfoWidget(BaseInfoWidget):
+class WidgetInfoRegulations(BaseInfoWidget):
   """Locators for the regulation info widget"""
 
 
-class WorkflowInfoWidget(BaseInfoWidget):
+class WidgetInfoWorkflow(BaseInfoWidget):
   """Locators for the workflow info widget"""
 
 
-class AuditInfoWidget(BaseInfoWidget):
+class WidgetInfoAudit(BaseInfoWidget):
   """Locators for the audit info widget"""
 
 
-class AssessmentInfoWidget(BaseInfoWidget):
+class WidgetInfoAssessment(BaseInfoWidget):
   """Locators for the assessment info widget"""
 
 
-class PolicyInfoWidget(BaseInfoWidget):
+class WidgetInfoPolicy(BaseInfoWidget):
   """Locators for the regulation info widget"""
 
 
-class StandardInfoWidget(BaseInfoWidget):
+class WidgetInfoStandard(BaseInfoWidget):
   """Locators for the standard info widget"""
 
 
-class ContractInfoWidget(BaseInfoWidget):
+class WidgetInfoContract(BaseInfoWidget):
   """Locators for the contract info widget"""
 
 
-class ClauseInfoWidget(BaseInfoWidget):
+class WidgetInfoClause(BaseInfoWidget):
   """Locators for the clause info widget"""
 
 
-class SectionInfoWidget(BaseInfoWidget):
+class WidgetInfoSection(BaseInfoWidget):
   """Locators for the section info widget"""
 
 
-class ControlInfoWidget(BaseInfoWidget):
+class WidgetInfoControl(BaseInfoWidget):
   """Locators for the control info widget"""
 
 
-class ObjectiveInfoWidget(BaseInfoWidget):
+class WidgetInfoObjective(BaseInfoWidget):
   """Locators for the objective info widget"""
 
 
-class PeopleInfoWidget(BaseInfoWidget):
+class WidgetInfoPeople(BaseInfoWidget):
   """Locators for the people info widget"""
 
 
-class VendorInfoWidget(BaseInfoWidget):
+class WidgetInfoVendor(BaseInfoWidget):
   """Locators for the vendor info widget"""
 
 
-class AccessGroupInfoWidget(BaseInfoWidget):
+class WidgetInfoAccessGroup(BaseInfoWidget):
   """Locators for the access group info widget"""
 
 
-class SystemInfoWidget(BaseInfoWidget):
+class WidgetInfoSystem(BaseInfoWidget):
   """Locators for the system info widget"""
 
 
-class ProcessInfoWidget(BaseInfoWidget):
+class WidgetInfoProcess(BaseInfoWidget):
   """Locators for the process info widget"""
 
 
-class ProductInfoWidget(BaseInfoWidget):
+class WidgetInfoProduct(BaseInfoWidget):
   """Locators for the product info widget"""
 
 
-class FacilityInfoWidget(BaseInfoWidget):
+class WidgetInfoFacility(BaseInfoWidget):
   """Locators for the facility info widget"""
 
 
-class ProjectInfoWidget(BaseInfoWidget):
+class WidgetInfoProject(BaseInfoWidget):
   """Locators for the project info widget"""
 
 
-class MarketInfoWidget(BaseInfoWidget):
+class WidgetInfoMarket(BaseInfoWidget):
   """Locators for the market info widget"""
 
 
-class DataAssetInfoWidget(BaseInfoWidget):
+class WidgetInfoDataAsset(BaseInfoWidget):
   """Locators for the data asset info widget"""
 
 
-class ThreatInfoWidget(BaseInfoWidget):
+class WidgetInfoThreat(BaseInfoWidget):
   """Locators for the data asset info widget"""
 
 
-class AdminRolesWidget(object):
+class WidgetAdminRoles(object):
   """Locators for the roles widget on the admin dashboard"""
 
-  ROLE_EDITOR = (
-      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(2) .span8>div')
-  ROLE_GRC_ADMIN = (
-      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(3) .span8>div')
-  ROLE_PROGRAM_EDITOR = (
-      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(4) .span8>div')
-  ROLE_PROGRAM_OWNER = (
-      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(5) .span8>div')
-  ROLE_PROGRAM_READER = (
-      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(6) .span8>div')
-  ROLE_READER = (
-      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(7) .span8>div')
-  ROLE_WORKFLOW_MEMBER = (
-      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(8) .span8>div')
-  ROLE_WORKFLOW_OWNER = (
-      By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child(9) .span8>div')
+  class _Locator(object):
+    @staticmethod
+    def get_role(child_id):
+      return (
+        By.CSS_SELECTOR, '[id="roles_list_widget"] li:nth-child({}) '
+                         '.span8>div'.format(child_id))
 
-  SCOPE_EDITOR = (
-      By.CSS_SELECTOR,
-      '[id="roles_list_widget"] li:nth-child(2) .span4 .scope')
-  SCOPE_GRC_ADMIN = (
-      By.CSS_SELECTOR,
-      '[id="roles_list_widget"] li:nth-child(3) .span4 .scope')
-  SCOPE_PROGRAM_EDITOR = (
-      By.CSS_SELECTOR,
-      '[id="roles_list_widget"] li:nth-child(4) .span4 .scope')
-  SCOPE_PROGRAM_OWNER = (
-      By.CSS_SELECTOR,
-      '[id="roles_list_widget"] li:nth-child(5) .span4 .scope')
-  SCOPE_PROGRAM_READER = (
-      By.CSS_SELECTOR,
-      '[id="roles_list_widget"] li:nth-child(6) .span4 .scope')
-  SCOPE_READER = (
-      By.CSS_SELECTOR,
-      '[id="roles_list_widget"] li:nth-child(7) .span4 .scope')
-  SCOPE_WORKFLOW_MEMBER = (
-      By.CSS_SELECTOR,
-      '[id="roles_list_widget"] li:nth-child(8) .span4 .scope')
-  SCOPE_WORKFLOW_OWNER = (
-      By.CSS_SELECTOR,
-      '[id="roles_list_widget"] li:nth-child(9) .span4 .scope')
+    @staticmethod
+    def get_scope(child_id):
+      return (
+        By.CSS_SELECTOR,
+        '[id="roles_list_widget"] li:nth-child({}) .span4 '
+        '.scope'.format(child_id))
+
+  class __metaclass__(type):
+    def __init__(self, *args):
+      items = ("EDITOR", "GRC_ADMIN", "PROGRAM_EDITOR", "PROGRAM_OWNER",
+          "PROGRAM_READER", "READER", "WORKFLOW_MEMBER", "WORKFLOW_OWNER")
+
+      for id_, name in enumerate(items, start=2):
+        setattr(self, attribute.ROLE + name, self._Locator.get_role(id_))
+        setattr(self, attribute.SCOPE + name, self._Locator.get_scope(id_))
 
 
 class WidgetInfoSettingsButton(object):
   """Locators for the control info widget"""
+  class _Locator(object):
+    @staticmethod
+    def get_dropdown_item(child_id):
+      return (
+        By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child({'
+                         '})'.format(child_id))
 
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"]>h3')
 
-  DROPDOWN_SETTINGS_EDIT = (
-      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(1)')
-  DROPDOWN_SETTINGS_PERMALINK = (
-      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(2)')
-  DROPDOWN_SETTINGS_DELETE = (
-      By.CSS_SELECTOR, '.info-pane-utility .dropdown-menu li:nth-child(3)')
+  DROPDOWN_SETTINGS_EDIT = _Locator.get_dropdown_item(1)
+  DROPDOWN_SETTINGS_PERMALINK = _Locator.get_dropdown_item(2)
+  DROPDOWN_SETTINGS_DELETE = _Locator.get_dropdown_item(3)
 
 
-class WidgetControls(object):
-  TITLE = (By.CSS_SELECTOR, '#control_widget .sticky-filter .filter-title h6')
-  TEXTFIELD = (By.CSS_SELECTOR, '#control_widget .sticky-filter .filter-input')
-  BUTTON_SUBMIT = (
-      By.CSS_SELECTOR,
-      '#control_widget .sticky-filter .filter-button  [type="submit"]')
-  BUTTON_RESET = (
-      By.CSS_SELECTOR,
-      '#control_widget .sticky-filter .filter-button  [type="reset"]')
-  BUTTON_HELP = (
-      By.CSS_SELECTOR,
-      '#control_widget .sticky-filter .filter-button  #page-help')
+class BaseWidgetGeneric(object):
+  """Locators shared amongst non info&admin widgets"""
+  _object_name = None
+
+  class __metaclass__(type):
+    """For sharing parametrized class attributes we simply define how a
+    class should look like. Note that the same functionality can be
+    implemented using properties though with more code."""
+    def __init__(self, *args):
+      self.TITLE = (
+          By.CSS_SELECTOR, '#{}_widget .sticky-filter .filter-title h6'.format(
+            self._object_name))
+      self.TEXTFIELD = (
+          By.CSS_SELECTOR,
+          '#{}_widget .sticky-filter .filter-input'.format(self._object_name))
+      self.BUTTON_SUBMIT = (
+          By.CSS_SELECTOR,
+          '#{}_widget .sticky-filter .filter-button [type="submit"]'
+            .format(self._object_name))
+      self.BUTTON_RESET = (
+          By.CSS_SELECTOR,
+          '#{}_widget .sticky-filter .filter-button [type="reset"]'
+            .format(self._object_name))
+      self.BUTTON_HELP = (
+          By.CSS_SELECTOR,
+          '#{}_widget .sticky-filter .filter-button  #page-help'
+            .format(self._object_name))
 
 
-class WidgetProducts(object):
-  TITLE = (By.CSS_SELECTOR, '#product_widget .sticky-filter .filter-title h6')
-  TEXTFIELD = (By.CSS_SELECTOR, '#product_widget .sticky-filter .filter-input')
-  BUTTON_SUBMIT = (
-      By.CSS_SELECTOR,
-      '#product_widget .sticky-filter .filter-button [type="submit"]')
-  BUTTON_RESET = (
-      By.CSS_SELECTOR,
-      '#product_widget .sticky-filter .filter-button [type="reset"]')
-  BUTTON_HELP = (
-      By.CSS_SELECTOR,
-      '#product_widget .sticky-filter .filter-button #page-help')
+class WidgetControls(BaseWidgetGeneric):
+  """Locators for control widget"""
+  _object_name = "control"
 
 
-class WidgetProjects(object):
-  TITLE = (By.CSS_SELECTOR, '#project_widget .sticky-filter .filter-title h6')
-  TEXTFIELD = (By.CSS_SELECTOR, '#project_widget .sticky-filter .filter-input')
-  BUTTON_SUBMIT = (
-      By.CSS_SELECTOR,
-      '#project_widget .sticky-filter .filter-button [type="submit"]')
-  BUTTON_RESET = (
-      By.CSS_SELECTOR,
-      '#project_widget .sticky-filter .filter-button [type="reset"]')
-  BUTTON_HELP = (
-      By.CSS_SELECTOR,
-      '#project_widget .sticky-filter .filter-button #page-help')
+class WidgetProducts(BaseWidgetGeneric):
+  """Locators for product widget"""
+  _object_name = "product"
 
 
-class WidgetSystems(object):
-  TITLE = (By.CSS_SELECTOR, '#system_widget .sticky-filter .filter-title h6')
-  TEXTFIELD = (By.CSS_SELECTOR, '#system_widget .sticky-filter .filter-input')
-  BUTTON_SUBMIT = (
-      By.CSS_SELECTOR,
-      '#system_widget .sticky-filter .filter-button [type="submit"]')
-  BUTTON_RESET = (
-      By.CSS_SELECTOR,
-      '#system_widget .sticky-filter .filter-button [type="reset"]')
-  BUTTON_HELP = (
-      By.CSS_SELECTOR,
-      '#system_widget .sticky-filter .filter-button #page-help')
+class WidgetProjects(BaseWidgetGeneric):
+  """Locators for project widget"""
+  _object_name = "project"
 
 
-class WidgetDataAssets(object):
-  TITLE = (By.CSS_SELECTOR, '#data_asset_widget .sticky-filter .filter-title '
-                            'h6')
-  TEXTFIELD = (By.CSS_SELECTOR, '#data_asset_widget .sticky-filter '
-                                '.filter-input')
-  BUTTON_SUBMIT = (
-      By.CSS_SELECTOR,
-      '#data_asset_widget .sticky-filter .filter-button [type="submit"]')
-  BUTTON_RESET = (
-      By.CSS_SELECTOR,
-      '#data_asset_widget .sticky-filter .filter-button [type="reset"]')
-  BUTTON_HELP = (
-      By.CSS_SELECTOR,
-      '#data_asset_widget .sticky-filter .filter-button #page-help')
+class WidgetSystems(BaseWidgetGeneric):
+  """Locators for system widget"""
+  _object_name = "system"
 
 
-class WidgetProcesses(object):
-  TITLE = (By.CSS_SELECTOR, '#process_widget .sticky-filter .filter-title h6')
-  TEXTFIELD = (By.CSS_SELECTOR, '#process_widget .sticky-filter .filter-input')
-  BUTTON_SUBMIT = (
-      By.CSS_SELECTOR,
-      '#process_widget .sticky-filter .filter-button [type="submit"]')
-  BUTTON_RESET = (
-      By.CSS_SELECTOR,
-      '#process_widget .sticky-filter .filter-button [type="reset"]')
-  BUTTON_HELP = (
-      By.CSS_SELECTOR,
-      '#process_widget .sticky-filter .filter-button #page-help')
+class WidgetDataAssets(BaseWidgetGeneric):
+  """Locators for system widget"""
+  _object_name = "data_asset"
 
 
-class WidgetIssues(object):
-  TITLE = (By.CSS_SELECTOR, '#issue_widget .sticky-filter .filter-title h6')
-  TEXTFIELD = (By.CSS_SELECTOR, '#issue_widget .sticky-filter .filter-input')
-  BUTTON_SUBMIT = (
-      By.CSS_SELECTOR,
-      '#issue_widget .sticky-filter .filter-button [type="submit"]')
-  BUTTON_RESET = (
-      By.CSS_SELECTOR,
-      '#issue_widget .sticky-filter .filter-button [type="reset"]')
-  BUTTON_HELP = (
-      By.CSS_SELECTOR,
-      '#issue_widget .sticky-filter .filter-button #page-help')
+class WidgetProcesses(BaseWidgetGeneric):
+  """Locators for system widget"""
+  _object_name = "process"
+
+
+class WidgetIssues(BaseWidgetGeneric):
+  """Locators for system widget"""
+  _object_name = "issue"
 
 
 class AdminCustomAttributes(object):
   """Locators for the widget custom attributes in admin dashboard"""
 
+  class _Locator(object):
+    @staticmethod
+    def get_toggle(child_id):
+      return (By.CSS_SELECTOR, '.tree-structure li:nth-child({}) div '
+                        '.openclose'.format(child_id))
+
+    @staticmethod
+    def get_programs_label(child_id):
+      return (By.CSS_SELECTOR,
+        '.tree-structure li:nth-child(5) div thead>tr>th:nth-child({'
+        '})'.format(child_id))
+
+  class __metaclass__(type):
+    def __init__(self, *args):
+      items = (objects.WORKFLOWS, "RISK_ASSESSMENTS", objects.THREATS,
+          objects.RISKS, objects.PROGRAMS, objects.AUDITS,
+          objects.OBJECTIVES, objects.SECTIONS, objects.CONTROLS,
+          objects.ISSUES, objects.ASSESSMENTS, objects.STANDARDS,
+          objects.REGULATIONS, objects.POLICIES, objects.CONTRACTS,
+          objects.CLAUSES, objects.REQUESTS, objects.VENDORS, objects.PEOPLE,
+          objects.ACCESS_GROUPS, objects.ORG_GROUPS, objects.PRODUCTS,
+          objects.MARKETS, objects.PROCESSES, objects.FACILITIES,
+          objects.PROJECTS, objects.DATA_ASSETS, objects.SYSTEMS)
+
+      for id_, name in enumerate(items, start=1):
+        setattr(self,
+                attribute.TOGGLE + name.upper(),
+                self._Locator.get_toggle(id_))
+
   FILTER_INPUT_FIELD = (By.CLASS_NAME, 'filter-input')
   FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR, '.filter-button>[type="submit"]')
   FILTER_BUTTON_RESET = (By.CSS_SELECTOR, '.filter-button>[type="reset"]')
-
-  TOGGLE_WORKFLOWS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(1) div '
-                                       '.openclose')
-  TOGGLE_RISK_ASSESSMENTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child('
-                                              '2) div .openclose')
-  TOGGLE_THREATS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(3) div '
-                                     '.openclose')
-  TOGGLE_RISKS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(4) div '
-                                   '.openclose')
-  TOGGLE_PROGRAMS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(5) div '
-                                      '.openclose')
-  TOGGLE_AUDITS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(6) div '
-                                    '.openclose')
-  TOGGLE_OBJECTIVES = (By.CSS_SELECTOR,
-                       '.tree-structure li:nth-child(7) div .openclose')
-  TOGGLE_SECTIONS = (By.CSS_SELECTOR,
-                     '.tree-structure li:nth-child(8) div .openclose')
-  TOGGLE_CONTROLS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(9) div '
-                                      '.openclose')
-  TOGGLE_ISSUES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(10) div '
-                                    '.openclose')
-  TOGGLE_ASSESSMENTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(11) '
-                                         'div .openclose')
-  TOGGLE_STANDARDS = (By.CSS_SELECTOR,
-                      '.tree-structure li:nth-child(12) div .openclose')
-  TOGGLE_REGULATIONS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(13) '
-                                         'div .openclose')
-  TOGGLE_POLICIES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(14) div '
-                                      '.openclose')
-  TOGGLE_CONTRACTS = (By.CSS_SELECTOR,
-                      '.tree-structure li:nth-child(15) div .openclose')
-  TOGGLE_CLAUSES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(16) div '
-                                     '.openclose')
-  TOGGLE_REQUESTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(17) div '
-                                      '.openclose')
-  TOGGLE_VENDORS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(18) div '
-                                     '.openclose')
-  TOGGLE_PEOPLE = (By.CSS_SELECTOR, '.tree-structure li:nth-child(19) div '
-                                    '.openclose')
-  TOGGLE_ACCESS_GROUPS = (By.CSS_SELECTOR,
-                          '.tree-structure li:nth-child(20) div .openclose')
-  TOGGLE_ORG_GROUPS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(21) '
-                                        'div .openclose')
-  TOGGLE_PRODUCTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(22) div '
-                                      '.openclose')
-  TOGGLE_MARKETS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(23) div '
-                                     '.openclose')
-  TOGGLE_PROCESSES = (By.CSS_SELECTOR,
-                      '.tree-structure li:nth-child(24) div .openclose')
-  TOGGLE_FACILITIES = (By.CSS_SELECTOR, '.tree-structure li:nth-child(25) '
-                                        'div .openclose')
-  TOGGLE_PROJECTS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(26) div '
-                                      '.openclose')
-  TOGGLE_DATA_ASSETS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(27) '
-                                         'div .openclose')
-  TOGGLE_SYSTEMS = (By.CSS_SELECTOR, '.tree-structure li:nth-child(28) div '
-                                     '.openclose')
 
   # programs dropdown
   BUTTON_ADD_CUSTOM_PROGRAM_ATTR = (
       By.CSS_SELECTOR, '.tree-structure li:nth-child(5)'
                        ' [data-toggle="modal-ajax-form"]')
-  PROGRAMS_LABEL_ATTRIBUTE_NAME = (
-      By.CSS_SELECTOR,
-      '.tree-structure li:nth-child(5) div thead>tr>th:nth-child(1)')
-  PROGRAMS_LABEL_ATTRIBUTE_TYPE = (
-      By.CSS_SELECTOR,
-      '.tree-structure li:nth-child(5) div thead>tr>th:nth-child(2)')
-  PROGRAMS_LABEL_MANDATORY = (
-      By.CSS_SELECTOR,
-      '.tree-structure li:nth-child(5) div thead>tr>th:nth-child(3)')
-  PROGRAMS_LABEL_EDIT = (
-      By.CSS_SELECTOR,
-      '.tree-structure li:nth-child(5) div thead>tr>th:nth-child(4)')
+  PROGRAMS_LABEL_ATTRIBUTE_NAME = _Locator.get_programs_label(1)
+  PROGRAMS_LABEL_ATTRIBUTE_TYPE = _Locator.get_programs_label(2)
+  PROGRAMS_LABEL_MANDATORY = _Locator.get_programs_label(3)
+  PROGRAMS_LABEL_EDIT = _Locator.get_programs_label(4)
   LISTED_MEMBERS = (
-      By.CSS_SELECTOR,
-      '.tree-structure li:nth-child(5) div tbody>tr')
+    By.CSS_SELECTOR,
+    '.tree-structure li:nth-child(5) div tbody>tr')
   BUTTON_LISTED_MEMBERS_EDIT = (
-      By.CSS_SELECTOR,
-      '.tree-structure li:nth-child(5) div tbody>tr>td>ul .fa-pencil-square-o')
+    By.CSS_SELECTOR,
+    '.tree-structure li:nth-child(5) div tbody>tr>td>ul .fa-pencil-square-o')
