@@ -16,8 +16,15 @@
       </a>
     </span>
     {{/is_allowed}}
-    <i class="fa fa-{{class.table_singular}} color"></i>
-    {{firstnonempty title description name email}}
+    {{/if}}
+
+    {{#if reusable}}
+      {{> /static/mustache/base_templates/objects_tooltip.mustache'}}
+    {{else}}
+      <i class="fa fa-{{class.table_singular}} color"></i>
+      {{firstnonempty title description name email}}
+    {{/if}}
+
 
     {{#if instance.viewLink}}
       {{#is_allowed "view_object_page" instance}}

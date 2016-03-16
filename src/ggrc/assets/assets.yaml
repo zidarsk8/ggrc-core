@@ -182,6 +182,7 @@ dashboard-js-template-files:
   - base_objects/sub_tree_type_selector.mustache
   - base_objects/modal/search_title.mustache
   - base_templates/add_comment.mustache
+  - base_templates/objects_tooltip.mustache
   - base_templates/attachment_list.mustache
   - base_templates/attachment.mustache
   - base_templates/base.mustache
