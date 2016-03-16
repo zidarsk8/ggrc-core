@@ -190,7 +190,6 @@
             _.each(relatedObjects, function (relObj) {
               var type = relObj.binding.instance.type;
               var weight = relevantTypes[type].weight;
-
               if (relObj.instance.id !== that.id) {
                 if (connectionsCount[relObj.instance.id] === undefined) {
                   connectionsCount[relObj.instance.id] = {

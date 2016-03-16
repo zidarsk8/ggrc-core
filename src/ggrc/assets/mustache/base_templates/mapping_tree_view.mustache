@@ -9,7 +9,7 @@
   {{#expose reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping baseInstance=baseInstance}}
   {{#with_mapping mapping parentInstance}}
     {{#results}}
-      {{{render itemTemplate parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod}}}
+      {{{render itemTemplate baseInstance=baseInstance parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping}}}
     {{/results}}
   {{/with_mapping}}
   {{/expose}}

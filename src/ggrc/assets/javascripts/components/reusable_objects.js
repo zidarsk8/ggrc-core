@@ -163,6 +163,17 @@
     template: '<content></content>',
     scope: {
       list: null
+    },
+    helpers: {
+      isDisabled: function (instance, options) {
+        var isMapped = GGRC.Utils.is_mapped(
+          this.attr('baseInstance'), instance, this.attr('mapping'));
+
+        if (isMapped) {
+          return options.fn(options.contexts);
+        }
+        return options.inverse(options.context);
+      }
     }
   });
 })(window.can, window.can.$);

@@ -5,9 +5,10 @@
     Maintained By: vladan@reciprocitylabs.com
 }}
 
-<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects">
+<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects" parent-instance="parentInstance" base-instance="baseInstance" mapping="mapping">
   {{#instance}}
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+    {{^if reusable}}
     {{#is_allowed "update" instance}}
     <span class="file-controls">
       <a href="javascript://" class="info-action unmap" data-toggle="unmap">
@@ -26,13 +27,12 @@
     {{/if}}
 
 
+    {{^if reusable}}
     {{#if instance.viewLink}}
       {{#is_allowed "view_object_page" instance}}
         <a class="more" href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
       {{/is_allowed}}
     {{/if}}
-    {{#if reusable}}
-      <input type="checkbox" can-value="list.{{method}}-{{instance.type}}-{{instance.id}}" />
     {{/if}}
   </li>
   {{/instance}}

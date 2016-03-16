@@ -5,8 +5,9 @@
     Maintained By: anze@reciprocitylabs.com
 }}
 
-<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects">
+<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects" parent-instance="parentInstance" base-instance="baseInstance" mapping="mapping">
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+    {{^if reusable}}
     {{#is_allowed 'update' parentInstance context='for'}}
     {{#instance}}
       <span class="file-controls">
@@ -17,14 +18,22 @@
       </span>
     {{/instance}}
     {{/is_allowed}}
+    {{/if}}
     <i class="fa fa-file-{{file_type instance}}-o"></i>
+    {{^if reusable}}
     <span class="date">{{date instance.created_at true}}</span>
+    {{/if}}
     <a href="{{schemed_url instance.link}}" href="{{schemed_url instance.link}}" target="_blank">
       <span>{{firstnonempty instance.title instance.link}}</span>
     </a>
 
-    {{#reusable}}
-      <input type="checkbox" can-value="list.{{method}}-{{instance.type}}-{{instance.id}}" />
-    {{/reusable}}
+    {{#if reusable}}
+      {{#isDisabled instance}}
+        <input type="checkbox" checked disabled />
+      {{/isDisabled}}
+      {{^isDisabled instance}}
+        <input type="checkbox" can-value="list.{{method}}-{{instance.type}}-{{instance.id}}" />
+      {{/isDisabled}}
+    {{/if}}
   </li>
 </reusable-object>
