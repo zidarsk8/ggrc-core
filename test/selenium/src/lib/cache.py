@@ -6,9 +6,10 @@
 """Module containing various caches"""
 
 from lib.constants import element
+from lib.constants import objects
 
 
-def _get_lhn_members():
+def _get_lhn_section_map():
   """Returns a dictionary with lhn elements that are grouped together
   into sections
   Return:
@@ -29,4 +30,4 @@ def _get_lhn_members():
   return members_dct
 
 
-LHN_SECTION_MEMBERS = _get_lhn_members()
+LHN_SECTION_MEMBERS = _get_lhn_section_map()

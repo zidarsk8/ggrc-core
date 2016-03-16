@@ -30,7 +30,7 @@ class People(Widget):
 
 class Roles(Widget):
   """Model for the widget admin rols on admin dashboard"""
-  _locator = locator.AdminRolesWidget
+  _locator = locator.WidgetAdminRoles
   URL = environment.APP_URL \
       + url.ADMIN_DASHBOARD \
       + url.Widget.ROLES

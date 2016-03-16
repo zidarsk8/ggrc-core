@@ -72,7 +72,7 @@ class DashboardInfo(Widget):
 
 class Programs(Widget):
   """Model for program object info widget"""
-  _locator = locator.ProgramInfoWidget
+  _locator = locator.WidgetInfoProgram
   _dropdown_settings_cls = widget_info.Programs
 
   def __init__(self, driver):
@@ -130,136 +130,136 @@ class Programs(Widget):
 
 class Workflows(Widget):
   """Model for workflow object info widget"""
-  _locator = locator.WorkflowInfoWidget
+  _locator = locator.WidgetInfoWorkflow
 
 
 class Audits(Widget):
   """Model for audit object info widget"""
-  _locator = locator.AuditInfoWidget
+  _locator = locator.WidgetInfoAudit
 
 
 class Assessments(Widget):
   """Model for assessment object info widget"""
-  _locator = locator.AssessmentInfoWidget
+  _locator = locator.WidgetInfoAssessment
 
 
 class Requests(Widget):
   """Model for request object info widget"""
-  _locator = locator.RequestInfoWidget
+  _locator = locator.WidgetInfoRequest
 
 
 class Issues(Widget):
   """Model for issue object info widget"""
-  _locator = locator.IssueInfoWidget
+  _locator = locator.WidgetInfoIssue
 
 
 class Regulations(Widget):
   """Model for regulation object info widget"""
-  _locator = locator.RegulationsInfoWidget
+  _locator = locator.WidgetInfoRegulations
 
 
 class Policies(Widget):
   """Model for policies object info widget"""
-  _locator = locator.PolicyInfoWidget
+  _locator = locator.WidgetInfoPolicy
 
 
 class Standards(Widget):
   """Model for standard object info widget"""
-  _locator = locator.StandardInfoWidget
+  _locator = locator.WidgetInfoStandard
 
 
 class Contracts(Widget):
   """Model for contract object info widget"""
-  _locator = locator.ContractInfoWidget
+  _locator = locator.WidgetInfoContract
 
 
 class Clauses(Widget):
   """Model for clause object info widget"""
-  _locator = locator.ClauseInfoWidget
+  _locator = locator.WidgetInfoClause
 
 
 class Sections(Widget):
   """Model for selection object info widget"""
-  _locator = locator.SectionInfoWidget
+  _locator = locator.WidgetInfoSection
 
 
 class Controls(Widget):
   """Model for control object info widget"""
-  _locator = locator.ControlInfoWidget
+  _locator = locator.WidgetInfoControl
   _dropdown_settings_cls = widget_info.Controls
 
 
 class Objectives(Widget):
   """Model for objectives object info widget"""
-  _locator = locator.ObjectiveInfoWidget
+  _locator = locator.WidgetInfoObjective
 
 
 class People(base.Widget):
   """Model for people object info widget"""
-  _locator = locator.PeopleInfoWidget
+  _locator = locator.WidgetInfoPeople
 
 
 class OrgGroups(Widget):
   """Model for org groups object info widget"""
-  _locator = locator.OrgGroupInfoWidget
+  _locator = locator.WidgetInfoOrgGroup
   _dropdown_settings_cls = widget_info.OrgGroups
 
 
 class Vendors(Widget):
   """Model for vendors object info widget"""
-  _locator = locator.VendorInfoWidget
+  _locator = locator.WidgetInfoVendor
 
 
 class AccessGroup(Widget):
   """Model for access group object info widget"""
-  _locator = locator.AccessGroupInfoWidget
+  _locator = locator.WidgetInfoAccessGroup
 
 
 class Systems(Widget):
   """Model for system object info widget"""
-  _locator = locator.SystemInfoWidget
+  _locator = locator.WidgetInfoSystem
   _dropdown_settings_cls = widget_info.Systems
 
 
 class Processes(Widget):
   """Model for process object info widget"""
-  _locator = locator.ProcessInfoWidget
+  _locator = locator.WidgetInfoProcess
   _dropdown_settings_cls = widget_info.Processes
 
 
 class DataAssets(Widget):
   """Model for data asset object info widget"""
-  _locator = locator.DataAssetInfoWidget
+  _locator = locator.WidgetInfoDataAsset
   _dropdown_settings_cls = widget_info.DataAssets
 
 
 class Products(Widget):
   """Model for product object info widget"""
-  _locator = locator.ProductInfoWidget
+  _locator = locator.WidgetInfoProduct
   _dropdown_settings_cls = widget_info.Products
 
 
 class Projects(Widget):
   """Model for project object info widget"""
-  _locator = locator.ProjectInfoWidget
+  _locator = locator.WidgetInfoProject
   _dropdown_settings_cls = widget_info.Projects
 
 
 class Facilities(Widget):
   """Model for facility object info widget"""
-  _locator = locator.FacilityInfoWidget
+  _locator = locator.WidgetInfoFacility
 
 
 class Markets(Widget):
   """Model for market object info widget"""
-  _locator = locator.MarketInfoWidget
+  _locator = locator.WidgetInfoMarket
 
 
 class Risks(Widget):
   """Model for risk object info widget"""
-  _locator = locator.RiskInfoWidget
+  _locator = locator.WidgetInfoRisk
 
 
 class Threats(Widget):
   """Model for threat object info widget"""
-  _locator = locator.ThreatInfoWidget
+  _locator = locator.WidgetInfoThreat
