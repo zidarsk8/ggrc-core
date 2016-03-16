@@ -26,6 +26,7 @@ Maintained By: urban@reciprocitylabs.com
     </li>
   </ul>
   <ul class="past-items-list relatables">
+    {{#expose baseInstance=parentInstance}}
     {{#defer 'related_self' parentInstance.related_self}}
     {{#related_self}}
     <li class="clearfix">
@@ -38,45 +39,44 @@ Maintained By: urban@reciprocitylabs.com
         </a>
       </div>
       <div class="small-col">
-        <ul class="mapped-list">
-          <mapping-tree-view
-            reusable="true"
-            reusable-objects="reusedObjects"
-            reuse-method="createRelationship"
-            parent-instance="instance"
-            mapping="instance.class.info_pane_options.mapped_objects.mapping"
-            item-template="instance.class.info_pane_options.mapped_objects.show_view"
-            >
-          </mapping-tree-view>
-        </ul>
+        <mapping-tree-view
+          reusable="true"
+          reusable-objects="reusedObjects"
+          reuse-method="createRelationship"
+          tree-view-class="mapped-list"
+          parent-instance="instance"
+          base-instance="baseInstance"
+          mapping="instance.class.info_pane_options.mapped_objects.mapping"
+          item-template="instance.class.info_pane_options.mapped_objects.show_view"
+          >
+        </mapping-tree-view>
       </div>
       <div class="large-col">
-        <ul class="file-list">
-          <mapping-tree-view
-            reusable="true"
-            reusable-objects="reusedObjects"
-            reuse-method="createEvidenceRelationship"
-            parent-instance="instance"
-            mapping="instance.class.info_pane_options.evidence.mapping"
-            item-template="instance.class.info_pane_options.evidence.show_view"
-            >
-          </mapping-tree-view>
-        </ul>
+        <mapping-tree-view
+          reusable="true"
+          reusable-objects="reusedObjects"
+          reuse-method="createEvidenceRelationship"
+          parent-instance="instance"
+          base-instance="baseInstance"
+          mapping="instance.class.info_pane_options.evidence.mapping"
+          item-template="instance.class.info_pane_options.evidence.show_view"
+          >
+        </mapping-tree-view>
         <br />
-        <ul class="file-list">
-          <mapping-tree-view
-            reusable="true"
-            reusable-objects="reusedObjects"
-            reuse-method="createRelationship"
-            parent-instance="instance"
-            mapping="instance.class.info_pane_options.urls.mapping"
-            item-template="instance.class.info_pane_options.urls.show_view"
-            >
-          </mapping-tree-view>
-        </ul>
+        <mapping-tree-view
+          reusable="true"
+          reusable-objects="reusedObjects"
+          reuse-method="createRelationship"
+          parent-instance="instance"
+          base-instance="baseInstance"
+          mapping="instance.class.info_pane_options.urls.mapping"
+          item-template="instance.class.info_pane_options.urls.show_view"
+          >
+        </mapping-tree-view>
       </div>
     </li>
     {{/related_self}}
     {{/defer}}
+    {{/expose}}
   </ul>
 </reuse-objects>
