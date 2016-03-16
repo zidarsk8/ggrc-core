@@ -103,7 +103,7 @@ class TestProgramPage(base.Test):
     # test notification alert
     base.AnimatedComponent(
         selenium.driver,
-        [locator.ProgramInfoWidget.ALERT_LINK_COPIED],
+        [locator.WidgetInfoProgram.ALERT_LINK_COPIED],
         wait_until_visible=True
     )
 
