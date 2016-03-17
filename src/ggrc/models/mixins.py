@@ -48,7 +48,7 @@ def deferred(column, classname):
 class Identifiable(object):
 
   """A model with an ``id`` property that is the primary key."""
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True)  # noqa
 
   # REST properties
   _publish_attrs = ['id', 'type']

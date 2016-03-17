@@ -48,9 +48,9 @@ class Assignable(object):
         New attribute value (merge with existing roles) or None if the
         attribute is not valid.
     """
-    if not set([source.type, dest.type]) == set([cls.__name__, "Person"]):
+    if set([source.type, dest.type]) != set([cls.__name__, "Person"]):
       return None
-    if not name == "AssigneeType":
+    if name != "AssigneeType":
       return None
     new_roles = value.split(",")
     if not all(role in cls.ASSIGNEE_TYPES for role in new_roles):
