@@ -21,6 +21,7 @@ dashboard-js-files:
   - mousetrap/mousetrap.min.js
   - canjs/can.jquery.js
   - canjs/can.construct.super.js
+  - canjs/can.list.sort.js
   - canjs/can.map.validations.js
   - canjs/can.control.plugin.js
   - canjs/can.construct.proxy.js

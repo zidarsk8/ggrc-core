@@ -23,8 +23,7 @@
     // TODO: tests for the default values
     scope: {
       instance: null,
-      objectChanges: new can.List(),
-      mappingsChanges: new can.List()
+      changeHistory: new can.List()
     },
 
     // the type of the object the component is operating on
@@ -43,11 +42,22 @@
         this.scope.instance
       )
       .then(function (revisions) {
-        var objChanges = this._computeObjectChanges(revisions.object);
+        var changeHistory;
         var mappingsChanges = this._computeMappingChanges(revisions.mappings);
+        var objChanges = this._computeObjectChanges(revisions.object);
 
-        this.scope.attr('objectChanges', objChanges);
-        this.scope.attr('mappingChanges', mappingsChanges);
+        // combine all the changes and sort them by date descending
+        changeHistory = objChanges.concat(mappingsChanges);
+        changeHistory.sort(function byDateDescending(x, y) {
+          var d1 = x.updatedAt;
+          var d2 = y.updatedAt;
+          if (d1.getTime() === d2.getTime()) {
+            return 0;
+          }
+          return (d1 < d2) ? 1 : -1;
+        });
+
+        this.scope.attr('changeHistory', changeHistory);
       }.bind(this));
     },
 
@@ -81,17 +91,20 @@
       // AND document in the docstring!
       var dfd = Revision.findAll({
         resource_type: this._INSTANCE_TYPE,
-        resource_id: instance.id
+        resource_id: instance.id,
+        __sort: 'updated_at'
       });
 
       var dfd2 = Revision.findAll({
         source_type: this._INSTANCE_TYPE,
-        source_id: instance.id
+        source_id: instance.id,
+        __sort: 'updated_at'
       });
 
       var dfd3 = Revision.findAll({
         destination_type: this._INSTANCE_TYPE,
-        destination_id: instance.id
+        destination_id: instance.id,
+        __sort: 'updated_at'
       });
 
       var dfdResults = can.when(
@@ -126,6 +139,7 @@
       // TODO: revisions is now can.List! and return can.List!
       // TODO: revisions must be sorted by date from oldest to newest
       // ... (or maybe sort them here? decide!)
+      // TODO: document the sort order of thereturned result!
       var diff;
       var diffList = [];
       var i;
@@ -213,6 +227,8 @@
      */
     _computeMappingChanges: function (revisions) {
       // TODO: tests
+      // TODO: document the sort order of thereturned result!
+      // can.List.map() not available in CanJS 2.0
       var result = _.map(revisions, this._mappingChange.bind(this));
       return new can.List(result);
     },
