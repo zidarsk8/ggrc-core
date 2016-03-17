@@ -1082,6 +1082,15 @@
       audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
     },
+    defaults: {
+      test_plan_procedure: false,
+      template_object_type: "Control",
+      default_people: {
+        assessors: "Object Owners",
+        verifiers: "Object Owners"
+      },
+      _template_attributes: new can.List()
+    },
 
     /**
      * Initialize the newly created object instance. Essentially just validate
@@ -1117,11 +1126,6 @@
      *
      */
     form_preload: function (isNewObject) {
-      if (isNewObject) {
-        this.attr('default_people', {});
-        this.attr('_template_attributes', new can.List());
-      }
-
       this.attr('_objectTypes', this._choosableObjectTypes());
       this._unpackPeopleData();
     },
