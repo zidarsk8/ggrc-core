@@ -20,7 +20,6 @@
       '/components/object_history/object_history.mustache'
     ),
 
-    // TODO: tests for the default values
     scope: {
       instance: null,
       changeHistory: new can.List()
@@ -32,33 +31,46 @@
     /**
      * The component's entry point. Invoked when a new component instance has
      * been created.
+     *
+     * @param {Object} element - the (unwrapped) DOM element that triggered
+     *   creating the component instance
+     * @param {Object} options - the component instantiation options
      */
-    init: function () {
-      // TODO: check and raise error if instance not set! must be passed to it!
+    init: function (element, options) {
+      if (this.scope.instance === null) {
+        throw new Error('Instance not passed through the HTML element.');
+      }
 
       this._INSTANCE_TYPE = this.scope.instance.type;
 
       this._fetchRevisionsData(
         this.scope.instance
-      )
-      .then(function (revisions) {
-        var changeHistory;
-        var mappingsChanges = this._computeMappingChanges(revisions.mappings);
-        var objChanges = this._computeObjectChanges(revisions.object);
+      ).then(
+        function success(revisions) {
+          var changeHistory;
+          var mappingsChanges = this._computeMappingChanges(revisions.mappings);
+          var objChanges = this._computeObjectChanges(revisions.object);
 
-        // combine all the changes and sort them by date descending
-        changeHistory = objChanges.concat(mappingsChanges);
-        changeHistory.sort(function byDateDescending(x, y) {
-          var d1 = x.updatedAt;
-          var d2 = y.updatedAt;
-          if (d1.getTime() === d2.getTime()) {
-            return 0;
-          }
-          return (d1 < d2) ? 1 : -1;
-        });
+          // combine all the changes and sort them by date descending
+          changeHistory = objChanges.concat(mappingsChanges);
+          changeHistory.sort(function byDateDescending(x, y) {
+            var d1 = x.updatedAt;
+            var d2 = y.updatedAt;
+            if (d1.getTime() === d2.getTime()) {
+              return 0;
+            }
+            return (d1 < d2) ? 1 : -1;
+          });
 
-        this.scope.attr('changeHistory', changeHistory);
-      }.bind(this));
+          this.scope.attr('changeHistory', changeHistory);
+        }.bind(this),
+
+        function error() {
+          $(element).trigger(
+            'ajax:flash',
+            {error: 'Failed to fetch revision history data.'});
+        }
+      );
     },
 
     /**
@@ -70,25 +82,17 @@
      *
      * @return {can.Deferred} - an object representing the async operation of
      *   fetching the data from the server. On success it is resolved with an
-     *   object containing the following:
+     *   object containing the following Revision data, order by date from
+     *   oldest to newest:
      *   - {can.List} object - the list of Revisions of the instance itself,
      *   - {can.List} mappings - the list of Revisions of all the instance's
      *      mappings
      */
     _fetchRevisionsData: function () {
-      // TODO: tests
-      //
-      // TODO: add fail handler
-      // TODO: run run when there is a change of the instance?
-      // TODO: this seems to always run when the UI tab is switched - is there
-      //       an easy way to cache the results? And for how long?
       var Revision = CMS.Models.Revision;
 
       var instance = this.scope.instance;
 
-      // TODO: make sure to order by! oldest to newest probably...
-      // __sort: "field1, field2" ... kako pa sicer? - spredaj da je obratno?
-      // AND document in the docstring!
       var dfd = Revision.findAll({
         resource_type: this._INSTANCE_TYPE,
         resource_id: instance.id,
@@ -135,20 +139,18 @@
      *   element follows the format returned by the `_objectChangeDiff` method.
      */
     _computeObjectChanges: function (revisions) {
-      // TODO: tests refactor! separate from the _objectChangeDiff()
-      // TODO: revisions is now can.List! and return can.List!
-      // TODO: revisions must be sorted by date from oldest to newest
-      // ... (or maybe sort them here? decide!)
-      // TODO: document the sort order of thereturned result!
       var diff;
       var diffList = [];
       var i;
 
       for (i = 1; i < revisions.length; i++) {
         diff = this._objectChangeDiff(revisions[i - 1], revisions[i]);
-        // TODO: what if diff empty, e.g. if no public fields changed?
-        // probably omit it! Add a test for this!
-        diffList.push(diff);
+        // It can happen that there were no changes to the publicly visible
+        // object fields, and the resulting diff object's change list is thus
+        // empty - we don't include those in the result.
+        if (diff.changes.length > 0) {
+          diffList.push(diff);
+        }
       }
 
       return new can.List(diffList);
@@ -180,7 +182,6 @@
      *         - newVal: the attribute's new (modified) value
      */
     _objectChangeDiff: function (rev1, rev2) {
-      // TODO: refactor tests! don't test through the _computeObjectChanges()
       var diff = {
         madeBy: null,
         updatedAt: null,
@@ -226,9 +227,7 @@
      *   method.
      */
     _computeMappingChanges: function (revisions) {
-      // TODO: tests
-      // TODO: document the sort order of thereturned result!
-      // can.List.map() not available in CanJS 2.0
+      // can.List.map() is not available in CanJS 2.0, thus using _.map()
       var result = _.map(revisions, this._mappingChange.bind(this));
       return new can.List(result);
     },
@@ -237,7 +236,7 @@
      * A helper function for extracting the mapping change information from a
      * Revision object.
      *
-     * @param {CMS.Models.Revision} rev - a Revision object describing a
+     * @param {CMS.Models.Revision} revision - a Revision object describing a
      *   mapping between the object instance the component is handling, and an
      *   external object
      *
@@ -257,28 +256,27 @@
      *         (*) The object on "this" side of the mapping is of course the
      *             instance the component is handling.
      */
-    _mappingChange: function (rev) {
-      // TODO: tests
+    _mappingChange: function (revision) {
       var change = {
         madeBy: null,
         updatedAt: null,
         mapping: {}
       };
 
-      change.madeBy = 'User ' + rev.modified_by.id;
-      change.updatedAt = rev.updated_at;
+      change.madeBy = 'User ' + revision.modified_by.id;
+      change.updatedAt = revision.updated_at;
 
-      change.mapping.action = _.capitalize(rev.action);
+      change.mapping.action = _.capitalize(revision.action);
 
       // The instance the component is handling can be on either side of the
       // mapping, i.e. source or destination, but we are interested in the
       // object on the "other" end of the mapping.
-      if (rev.destination_type === this._INSTANCE_TYPE) {
-        change.mapping.relatedObjId = rev.source_id;
-        change.mapping.relatedObjType = rev.source_type;
+      if (revision.destination_type === this._INSTANCE_TYPE) {
+        change.mapping.relatedObjId = revision.source_id;
+        change.mapping.relatedObjType = revision.source_type;
       } else {
-        change.mapping.relatedObjId = rev.destination_id;
-        change.mapping.relatedObjType = rev.destination_type;
+        change.mapping.relatedObjId = revision.destination_id;
+        change.mapping.relatedObjType = revision.destination_type;
       }
 
       return new can.Map(change);
