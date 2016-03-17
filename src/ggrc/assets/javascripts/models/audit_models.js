@@ -363,7 +363,10 @@
       type: 'request_type',
       'request title': 'title',
       'request description': 'description',
-      'request type': 'request_type'
+      'request type': 'request_type',
+      'verified date': 'verified_date',
+      'finished date': 'finished_date',
+      'request date': 'requested_on'
     },
     root_collection: 'requests',
     findAll: 'GET /api/requests',
