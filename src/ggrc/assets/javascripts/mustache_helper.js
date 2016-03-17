@@ -3195,11 +3195,13 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
     function (attrName, instance) {
       // attribute names considered "default" and representing a date
       var DATE_ATTRS = Object.freeze({
-        start_date: 1,
+        due_on: 1,
         end_date: 1,
-        updated_at: 1,
+        finished_date: 1,
         requested_on: 1,
-        due_on: 1
+        start_date: 1,
+        updated_at: 1,
+        verified_date: 1
       });
 
       // attribute names considered "default" and not representing a date

@@ -377,6 +377,8 @@
       assignee: 'CMS.Models.Person.stub',
       requested_on: 'date',
       due_on: 'date',
+      finished_date: 'date',
+      verified_date: 'date',
       documents: 'CMS.Models.Document.stubs',
       audit: 'CMS.Models.Audit.stub',
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
@@ -433,6 +435,14 @@
         attr_title: 'Due Date',
         attr_name: 'due_on',
         attr_sort_field: 'due_on'
+      }, {
+        attr_title: 'Verified Date',
+        attr_name: 'verified_date',
+        attr_sort_field: 'verified_date'
+      }, {
+        attr_title: 'Finished Date',
+        attr_name: 'finished_date',
+        attr_sort_field: 'finished_date'
       }, {
         attr_title: 'Request Type',
         attr_name: 'request_type'
