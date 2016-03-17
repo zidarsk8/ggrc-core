@@ -116,3 +116,17 @@ class RelatedVerifiersColumnHandler(RelatedPersonColumnHandler):
   def __init__(self, row_converter, key, **options):
     self._assignee_type = "Verifier"
     super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class RelatedCreatorsColumnHandler(RelatedPersonColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self._assignee_type = "Creator"
+    super(self.__class__, self).__init__(row_converter, key, **options)
+
+
+class RelatedAssessorsColumnHandler(RelatedPersonColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self._assignee_type = "Assessor"
+    super(self.__class__, self).__init__(row_converter, key, **options)

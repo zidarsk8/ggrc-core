@@ -41,6 +41,8 @@ _column_handlers = {
     "program": handlers.ProgramColumnHandler,
     "program_mapped": handlers.ObjectPersonColumnHandler,
     "reference_url": handlers.TextColumnHandler,
+    "related_creators": related_person.RelatedCreatorsColumnHandler,
+    "related_assessors": related_person.RelatedAssessorsColumnHandler,
     "related_assignees": related_person.RelatedAssigneesColumnHandler,
     "related_requesters": related_person.RelatedRequestersColumnHandler,
     "related_verifiers": related_person.RelatedVerifiersColumnHandler,

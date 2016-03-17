@@ -26,6 +26,8 @@ ATTRIBUTE_ORDER = (
     "test_plan",
     "owners",
     "request_type",
+    "related_assessors",
+    "related_creators",
     "related_requesters",
     "related_assignees",
     "related_verifiers",
