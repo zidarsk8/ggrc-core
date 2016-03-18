@@ -970,7 +970,9 @@
     filter_keys: ['operationally', 'operational', 'design',
                   'finished_date', 'verified_date', 'verified'],
     filter_mappings: {
-      operational: 'operationally'
+      operational: 'operationally',
+      'verified date': 'verified_date',
+      'finished date': 'finished_date'
     },
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
