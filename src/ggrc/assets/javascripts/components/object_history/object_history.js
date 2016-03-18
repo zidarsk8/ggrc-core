@@ -22,7 +22,8 @@
 
     scope: {
       instance: null,
-      changeHistory: new can.List()
+      changeHistory: new can.List(),
+      isLoading: true
     },
 
     // the type of the object the component is operating on
@@ -70,7 +71,9 @@
             'ajax:flash',
             {error: 'Failed to fetch revision history data.'});
         }
-      );
+      ).always(function () {
+        this.scope.attr('isLoading', false);
+      }.bind(this));
     },
 
     /**
