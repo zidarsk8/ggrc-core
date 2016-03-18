@@ -3,13 +3,12 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from ggrc.converters.handlers import handlers
-
 from sqlalchemy import and_
 
 from ggrc import db
-from ggrc.converters import errors
 from ggrc import models
+from ggrc.converters import errors
+from ggrc.converters.handlers import handlers
 
 
 class RelatedPersonColumnHandler(handlers.UserColumnHandler):
@@ -101,18 +100,37 @@ class RelatedAssigneesColumnHandler(RelatedPersonColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self._assignee_type = "Assignee"
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(RelatedAssigneesColumnHandler, self).__init__(row_converter, key,
+                                                        **options)
 
 
 class RelatedRequestersColumnHandler(RelatedPersonColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self._assignee_type = "Requester"
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(RelatedRequestersColumnHandler, self).__init__(row_converter, key,
+                                                         **options)
 
 
 class RelatedVerifiersColumnHandler(RelatedPersonColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self._assignee_type = "Verifier"
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(RelatedVerifiersColumnHandler, self).__init__(row_converter, key,
+                                                        **options)
+
+
+class RelatedCreatorsColumnHandler(RelatedPersonColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self._assignee_type = "Creator"
+    super(RelatedCreatorsColumnHandler, self).__init__(row_converter, key,
+                                                       **options)
+
+
+class RelatedAssessorsColumnHandler(RelatedPersonColumnHandler):
+
+  def __init__(self, row_converter, key, **options):
+    self._assignee_type = "Assessor"
+    super(RelatedAssessorsColumnHandler, self).__init__(row_converter, key,
+                                                        **options)

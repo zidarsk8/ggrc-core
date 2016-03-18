@@ -19,7 +19,6 @@ _column_handlers = {
     "delete": handlers.DeleteColumnHandler,
     "description": handlers.TextareaColumnHandler,
     "design": handlers.ConclusionColumnHandler,
-    "directive": handlers.SectionDirectiveColumnHandler,
     "documents": handlers.DocumentsColumnHandler,
     "due_on": handlers.DateColumnHandler,
     "email": handlers.EmailColumnHandler,
@@ -41,6 +40,8 @@ _column_handlers = {
     "program": handlers.ProgramColumnHandler,
     "program_mapped": handlers.ObjectPersonColumnHandler,
     "reference_url": handlers.TextColumnHandler,
+    "related_creators": related_person.RelatedCreatorsColumnHandler,
+    "related_assessors": related_person.RelatedAssessorsColumnHandler,
     "related_assignees": related_person.RelatedAssigneesColumnHandler,
     "related_requesters": related_person.RelatedRequestersColumnHandler,
     "related_verifiers": related_person.RelatedVerifiersColumnHandler,
@@ -71,6 +72,11 @@ _column_handlers = {
 
 
 def get_all_column_handlers():
+  """Search through all enabled modules for their contributed column handlers.
+
+  Returns:
+    extension_handlers (dict): dict of all extension handlers
+  """
   extension_handlers = _column_handlers
   for extension_module in get_extension_modules():
     contributed_handlers = getattr(

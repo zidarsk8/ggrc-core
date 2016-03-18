@@ -5,16 +5,13 @@
 
 import datetime
 
-from sqlalchemy import or_
-from sqlalchemy import and_
 from sqlalchemy import inspect
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.models import person
 from ggrc.models import audit
 from ggrc.models import reflection
-from ggrc.models.mixins import Assignable
+from ggrc.models.mixins_assignable import Assignable
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import deferred
@@ -141,26 +138,6 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
     return query.options(
         orm.joinedload('audit'),
         orm.subqueryload('responses'))
-
-  @classmethod
-  def _get_relate_filter(cls, predicate, related_type):
-    Rel = relationship.Relationship
-    RelAttr = relationship.RelationshipAttr
-    Person = person.Person
-    return db.session.query(Rel).join(RelAttr).join(
-        Person,
-        or_(and_(
-            Rel.source_id == Person.id,
-            Rel.source_type == Person.__name__
-        ), and_(
-            Rel.destination_id == Person.id,
-            Rel.destination_type == Person.__name__
-        ))
-    ).filter(and_(
-        RelAttr.attr_value.contains(related_type),
-        RelAttr.attr_name == "AssigneeType",
-        or_(predicate(Person.name), predicate(Person.email))
-    )).exists()
 
   @classmethod
   def _filter_by_related_assignees(cls, predicate):

@@ -4,13 +4,15 @@
 # Maintained By: anze@reciprocitylabs.com
 
 from sqlalchemy.orm import validates
+
 from ggrc import db
-from ggrc.models.mixins import Assignable
+from ggrc.models import reflection
+from ggrc.models.mixins_assignable import Assignable
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import deferred
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
-from ggrc.models.mixins import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
@@ -60,6 +62,23 @@ class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
       "url": "Assessment URL",
       "design": "Conclusion: Design",
       "operationally": "Conclusion: Operation",
+      "related_creators": {
+          "display_name": "Creator",
+          "mandatory": True,
+          "filter_by": "_filter_by_related_creators",
+          "type": reflection.AttributeInfo.Type.MAPPING,
+      },
+      "related_assessors": {
+          "display_name": "Assessor",
+          "mandatory": True,
+          "filter_by": "_filter_by_related_assessors",
+          "type": reflection.AttributeInfo.Type.MAPPING,
+      },
+      "related_verifiers": {
+          "display_name": "Verifier",
+          "filter_by": "_filter_by_related_verifiers",
+          "type": reflection.AttributeInfo.Type.MAPPING,
+      },
   }
 
   def validate_conclusion(self, value):
@@ -72,5 +91,17 @@ class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
   @validates("design")
   def validate_design(self, key, value):
     return self.validate_conclusion(value)
+
+  @classmethod
+  def _filter_by_related_creators(cls, predicate):
+    return cls._get_relate_filter(predicate, "Creator")
+
+  @classmethod
+  def _filter_by_related_assessors(cls, predicate):
+    return cls._get_relate_filter(predicate, "Assessor")
+
+  @classmethod
+  def _filter_by_related_verifiers(cls, predicate):
+    return cls._get_relate_filter(predicate, "Verifier")
 
 track_state_for_class(Assessment)

@@ -26,6 +26,8 @@ ATTRIBUTE_ORDER = (
     "test_plan",
     "owners",
     "request_type",
+    "related_assessors",
+    "related_creators",
     "related_requesters",
     "related_assignees",
     "related_verifiers",
@@ -129,7 +131,6 @@ class AttributeInfo(object):
     SPECIAL_MAPPING = "special_mapping"
     CUSTOM = "custom"
     USER_ROLE = "user_role"
-
 
   def __init__(self, tgt_class):
     self._publish_attrs = AttributeInfo.gather_publish_attrs(tgt_class)
@@ -295,9 +296,9 @@ class AttributeInfo(object):
     # push the extra delete column at the end to override any custom behavior
     if hasattr(object_class, "slug") or hasattr(object_class, "email"):
       filtered_aliases.append(("delete", {
-        "display_name": "Delete",
-        "import_only": True,
-        "description": "",
+          "display_name": "Delete",
+          "import_only": True,
+          "description": "",
       }))
 
     unique_columns = cls.get_unique_constraints(object_class)
