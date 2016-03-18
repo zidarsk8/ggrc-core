@@ -732,7 +732,7 @@ can.Model("can.Model.Cacheable", {
       }
     });
   },
-  load_custom_attribute_definitions: function loadAttrDefinitions() {
+  load_custom_attribute_definitions: function () {
     var definitions;
     if (this.attr('custom_attribute_definitions')) {
       return;
