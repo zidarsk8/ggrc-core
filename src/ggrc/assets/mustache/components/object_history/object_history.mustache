@@ -65,7 +65,14 @@
       {{/entries}}
 
       {{^list}}
-        <li>The history of changes is currently empty.</li>
+        {{#isLoading}}
+          <li class="spinner">
+            <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+          </li>
+        {{else}}
+          <li>The history of changes is currently empty.</li>
+        {{/isLoading}}
+
       {{/list}}
     </ul>
   </paginate>
