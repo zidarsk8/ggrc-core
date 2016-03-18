@@ -233,9 +233,8 @@
       });
     }
   }, {
-    overdue: overdue_compute,
+    overdue: overdue_compute
   });
-
 
   _mustache_path = GGRC.mustache_path + "/cycle_task_group_object_tasks";
   can.Model.Cacheable("CMS.Models.CycleTaskGroupObjectTask", {
@@ -247,7 +246,7 @@
     create: "POST /api/cycle_task_group_object_tasks",
     update: "PUT /api/cycle_task_group_object_tasks/{id}",
     destroy: "DELETE /api/cycle_task_group_object_tasks/{id}",
-    title_singular : "Cycle Task",
+    title_singular: "Cycle Task",
 
     attributes: {
       cycle_task_group: "CMS.Models.CycleTaskGroup.stub",
@@ -256,7 +255,7 @@
       modified_by: "CMS.Models.Person.stub",
       contact: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
-      cycle: "CMS.Models.Cycle.stub",
+      cycle: "CMS.Models.Cycle.stub"
     },
     permalink_options: {
       url: "<%= base.viewLink %>#current_widget/cycle/<%= instance.cycle.id %>/cycle_task_group/<%= instance.cycle_task_group.id %>/cycle_task_group_object_task/<%= instance.id %>",
@@ -272,7 +271,7 @@
     tree_view_options: {
       sort_property: 'sort_index',
       show_view: _mustache_path + "/tree.mustache",
-      attr_list : [
+      attr_list: [
         {attr_title: 'Title', attr_name: 'title'},
         {attr_title: 'Workflow', attr_name: 'workflow', attr_sort_field: 'cycle.workflow.title'},
         {attr_title: 'State', attr_name: 'status'},
@@ -281,8 +280,8 @@
         {attr_title: 'End Date', attr_name: 'end_date'},
         {attr_title: 'Last Updated', attr_name: 'updated_at'}
       ],
-      display_attr_names : ['title', 'mapped_object', 'workflow'],
-      mandatory_attr_name : ['title'],
+      display_attr_names: ['title', 'mapped_object', 'workflow'],
+      mandatory_attr_name: ['title'],
       draw_children: true,
       child_options: [
         {

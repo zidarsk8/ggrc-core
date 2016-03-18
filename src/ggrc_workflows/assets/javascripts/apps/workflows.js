@@ -282,25 +282,28 @@
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for workflow page
   WorkflowExtension.init_widgets = function init_widgets() {
-    var page_instance = GGRC.page_instance();
-    var tree_widgets = GGRC.tree_view.base_widgets_by_type;
-    var sub_trees = GGRC.tree_view.sub_tree_for;
+    var pageInstance = GGRC.page_instance();
+    var treeWidgets = GGRC.tree_view.base_widgets_by_type;
+    var subTrees = GGRC.tree_view.sub_tree_for;
 
     _.each(_workflow_object_types, function (type) {
-      if (!type || !tree_widgets[type]) {
+      if (!type || !treeWidgets[type]) {
         return;
       }
-      tree_widgets[type] = tree_widgets[type].concat(['TaskGroup', 'Workflow', 'CycleTaskEntry', 'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup']);
-      sub_trees[type].display_list = sub_trees[type].display_list.concat(['CycleTaskGroupObjectTask'])
-      sub_trees[type].model_list = sub_trees[type].model_list.concat({
+      treeWidgets[type] = treeWidgets[type].concat(['TaskGroup', 'Workflow',
+        'CycleTaskEntry', 'CycleTaskGroupObjectTask', 'CycleTaskGroupObject',
+        'CycleTaskGroup']);
+      subTrees[type].display_list = subTrees[type].display_list
+        .concat(['CycleTaskGroupObjectTask']);
+      subTrees[type].model_list = subTrees[type].model_list.concat({
         display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
         display_status: true,
-        model_name:'CycleTaskGroupObjectTask'});
+        model_name: 'CycleTaskGroupObjectTask'});
     });
 
-    if (page_instance instanceof CMS.Models.Workflow) {
+    if (pageInstance instanceof CMS.Models.Workflow) {
       WorkflowExtension.init_widgets_for_workflow_page();
-    } else if (page_instance instanceof CMS.Models.Person) {
+    } else if (pageInstance instanceof CMS.Models.Person) {
       WorkflowExtension.init_widgets_for_person_page();
     } else {
       WorkflowExtension.init_widgets_for_other_pages();
