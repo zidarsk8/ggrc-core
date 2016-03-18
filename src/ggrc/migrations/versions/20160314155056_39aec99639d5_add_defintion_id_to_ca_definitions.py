@@ -21,30 +21,25 @@ down_revision = '204540106539'
 
 
 def upgrade():
-  """Upgrade database schema and/or data, creating a new revision."""
+  """Add the new id field and fix some indexes/nullable issues."""
   op.add_column('custom_attribute_definitions',
                 sa.Column('definition_id', sa.Integer(), nullable=True))
   op.alter_column('custom_attribute_definitions', 'helptext',
                   existing_type=mysql.VARCHAR(length=250), nullable=True)
-  op.create_index('ix_custom_attributes_definition',
-                  'custom_attribute_definitions',
-                  ['definition_type', 'definition_id'], unique=False)
   op.drop_constraint(u'uq_custom_attribute',
                      'custom_attribute_definitions', type_='unique')
   op.create_unique_constraint('uq_custom_attribute',
                               'custom_attribute_definitions',
-                              ['title', 'definition_type', 'definition_id'])
+                              ['definition_type', 'definition_id', 'title'])
 
 
 def downgrade():
-  """Downgrade database schema and/or data back to the previous revision."""
+  """Remove the new id field and reintroduce some indexes/nullable issues."""
   op.drop_constraint('uq_custom_attribute',
                      'custom_attribute_definitions', type_='unique')
   op.create_unique_constraint(u'uq_custom_attribute',
                               'custom_attribute_definitions',
                               ['title', 'definition_type'])
-  op.drop_index('ix_custom_attributes_definition',
-                table_name='custom_attribute_definitions')
   op.alter_column('custom_attribute_definitions', 'helptext',
                   existing_type=mysql.VARCHAR(length=250),
                   nullable=False)

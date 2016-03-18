@@ -28,8 +28,6 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   __table_args__ = (
       UniqueConstraint('title', 'definition_type', 'definition_id',
                        name='uq_custom_attribute'),
-      db.Index('ix_custom_attributes_definition',
-               'definition_type', 'definition_id'),
       db.Index('ix_custom_attributes_title', 'title'))
 
   _publish_attrs = [
