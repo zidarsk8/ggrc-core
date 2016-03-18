@@ -187,7 +187,7 @@ def show_todays_digest_notifications():
   if not permissions.is_admin():
     raise Forbidden()
   _, notif_data = get_todays_notifications()
-  for data in notif_data.itervalu.itervalues():
+  for data in notif_data.itervalues():
     data = modify_data(data)
   todays = ENV.get_template("notifications/view_todays_digest.html")
   return todays.render(data=notif_data)
