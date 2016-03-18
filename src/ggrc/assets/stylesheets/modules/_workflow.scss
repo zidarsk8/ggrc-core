@@ -183,3 +183,92 @@
   color:$error;
   font-weight:normal;
 }
+
+.repeated-block {
+  padding: 20px 30px;
+  position: relative;
+  h6 {
+    padding-bottom: 6px;
+  }
+  &:nth-child(odd) {
+    background: lighten($lightGray, 3%);
+  }
+  &.info {
+    @include box-shadow(none);
+  }
+  .close-block {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    a {
+      @include opacity(0.35);
+      @include transition(opacity 0.2s ease-in-out);
+      &:hover {
+        @include opacity(1);
+      }
+    }
+  }
+}
+
+.options-wrap {
+  display: none;
+}
+
+.hideable-holder {
+  h6 {
+    display: inline-block;
+  }
+  .field-hide {
+    display: block;
+    float: right;
+    color: $warmGray;
+    font-size: 12px;
+    text-decoration: underline;
+    text-transform: none;
+    font-weight: normal;
+  }
+  [class*="span"] {
+    &.hidden {
+      display: none;
+    }
+  }
+}
+
+.dropdown-wrap {
+  position: relative;
+  .reset-form & {
+    float: left;
+    .dropdown-menu {
+      min-width: 350px;
+      left: auto;
+      right: 0;
+      padding: 10px 15px;
+      margin-top: 3px;
+      .close-dropdown {
+        margin-right: 0;
+      }
+      ul.attr-list {
+        li {
+          width: 50%;
+          &:first-child {
+            width: 100%;
+          }
+        }
+        label {
+          padding-right: 10px;
+        }
+      }
+    }
+  }
+}
+
+.state-value {
+  .reset-form & {
+    float: left;
+    margin: 5px 10px 0 0;
+  }
+}
+
+.people-regular {
+  display: none;
+}

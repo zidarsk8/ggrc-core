@@ -7,28 +7,28 @@
 
 (function (can, $, Generator) {
   can.Component.extend({
-    tag: "add-comment",
-    template: can.view("/static/mockups/base_templates/add_comment.mustache"),
+    tag: 'add-comment',
+    template: can.view('/static/mustache/mockup_base_templates/add_comment.mustache'),
     scope: {
       attachments: new can.List()
     },
     events: {
-      "cleanPanel": function () {
+      cleanPanel: function () {
         this.scope.attachments.replace([]);
-        this.element.find("textarea").val("");
+        this.element.find('textarea').val('');
       },
-      ".js-trigger-attachdata click": function (el, ev) {
-        var type = el.data("type"),
-            typeFn = Generator[type];
+      '.js-trigger-attachdata click': function (el, ev) {
+        var type = el.data('type');
+        var typeFn = Generator[type];
         if (!typeFn) {
           return;
-        };
+        }
         this.scope.attachments.push(typeFn());
       },
-      ".btn-success click": function (el, ev) {
-        var $textarea = this.element.find(".add-comment textarea"),
-            text = $.trim($textarea.val()),
-            attachments = this.scope.attachments;
+      '.btn-success click': function (el, ev) {
+        var $textarea = this.element.find('.add-comment textarea');
+        var text = $.trim($textarea.val());
+        var attachments = this.scope.attachments;
 
         if (!text.length && !attachments.length) {
           return;

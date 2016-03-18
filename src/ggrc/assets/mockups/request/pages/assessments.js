@@ -4,7 +4,7 @@
 
   GGRC.Bootstrap.Mockups.Request.Assessments = {
     title: "Assessments",
-    icon: "grcicon-assessment-color",
+    icon: "assessment",
     template: "/request/widget.mustache",
     children: GGRC.Bootstrap.Mockups.Assessor.Assessments.children
   };

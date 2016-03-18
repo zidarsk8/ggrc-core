@@ -201,6 +201,10 @@ form.import {
   }
 }
 
+.relevant-filter-group {
+  background: $white;
+}
+
 .save-template-wrap {
   @extend %clearfix;
   padding-left: 30px;
@@ -215,7 +219,7 @@ form.import {
   padding: 30px;
 }
 
-.new-relevant-block:nth-child(even) {
+.new-relevant-block:nth-child(odd) {
   background: $lightGray;
 }
 
