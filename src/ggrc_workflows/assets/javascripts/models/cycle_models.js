@@ -247,6 +247,7 @@
     create: "POST /api/cycle_task_group_object_tasks",
     update: "PUT /api/cycle_task_group_object_tasks/{id}",
     destroy: "DELETE /api/cycle_task_group_object_tasks/{id}",
+    title_singular : "Cycle Task",
 
     attributes: {
       cycle_task_group: "CMS.Models.CycleTaskGroup.stub",

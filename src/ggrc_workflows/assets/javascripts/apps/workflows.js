@@ -284,12 +284,18 @@
   WorkflowExtension.init_widgets = function init_widgets() {
     var page_instance = GGRC.page_instance();
     var tree_widgets = GGRC.tree_view.base_widgets_by_type;
+    var sub_trees = GGRC.tree_view.sub_tree_for;
 
     _.each(_workflow_object_types, function (type) {
       if (!type || !tree_widgets[type]) {
         return;
       }
       tree_widgets[type] = tree_widgets[type].concat(['TaskGroup', 'Workflow', 'CycleTaskEntry', 'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup']);
+      sub_trees[type].display_list = sub_trees[type].display_list.concat(['CycleTaskGroupObjectTask'])
+      sub_trees[type].model_list = sub_trees[type].model_list.concat({
+        display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
+        display_status: true,
+        model_name:'CycleTaskGroupObjectTask'});
     });
 
     if (page_instance instanceof CMS.Models.Workflow) {
