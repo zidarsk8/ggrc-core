@@ -717,14 +717,16 @@ class ControlCategoryColumnHandler(CategoryColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.category_base_type = "ControlCategory"
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(ControlCategoryColumnHandler, self).__init__(
+        row_converter, key, **options)
 
 
 class ControlAssertionColumnHandler(CategoryColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.category_base_type = "ControlAssertion"
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(ControlAssertionColumnHandler, self).__init__(
+        row_converter, key, **options)
 
 
 class RequestColumnHandler(ParentColumnHandler):

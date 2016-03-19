@@ -101,18 +101,21 @@ class RelatedAssigneesColumnHandler(RelatedPersonColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self._assignee_type = "Assignee"
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(RelatedAssigneesColumnHandler, self).__init__(
+        row_converter, key, **options)
 
 
 class RelatedRequestersColumnHandler(RelatedPersonColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self._assignee_type = "Requester"
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(RelatedRequestersColumnHandler, self).__init__(
+        row_converter, key, **options)
 
 
 class RelatedVerifiersColumnHandler(RelatedPersonColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self._assignee_type = "Verifier"
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(RelatedVerifiersColumnHandler, self).__init__(
+        row_converter, key, **options)
