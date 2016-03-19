@@ -7,7 +7,6 @@
 
 from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-import unittest
 
 from ggrc import db
 from ggrc.models import mixins
@@ -18,11 +17,14 @@ from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 
+from unit.ggrc.models.base_mixins import BaseMixins
 
-class TestAssessmentMixins(unittest.TestCase):
+
+class TestAssessmentMixins(BaseMixins):
   """ Tests inclusion of correct mixins and their attributes """
 
   def setUp(self):
+    self.model = Assessment
     self.included_mixins = [
         mixins.Assignable,
         mixins.BusinessObject,
@@ -65,21 +67,3 @@ class TestAssessmentMixins(unittest.TestCase):
         ('title', InstrumentedAttribute),                     # Titled
         ('url', InstrumentedAttribute),                       # HyperLinked
     ]
-
-  def test_includes_correct_mixins(self):
-    for mixin in self.included_mixins:
-      self.assertTrue(
-          issubclass(Assessment, mixin),
-          'Expected Assessment to inherit from {} but it does not'
-          .format(mixin)
-      )
-
-  def test_correct_attrs_introduced(self):
-    for attr_name, expected_type in self.attributes_introduced:
-      actual_type = type(getattr(Assessment, attr_name))
-      self.assertEqual(
-          expected_type,
-          actual_type,
-          'Expected attr "{}" to be of type {} but is actually {}'
-          .format(attr_name, expected_type, actual_type)
-      )
