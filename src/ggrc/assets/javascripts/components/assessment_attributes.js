@@ -51,6 +51,9 @@
        * @return {Array} attrs - Returns split values as an array
        */
       attrs: function () {
+        if (_.contains(['Person', 'Text'], this.field.attr('type'))) {
+          return [this.attr('field.values')];
+        }
         return _.splitTrim(this.attr('field.values'), {
           compact: true
         });
@@ -79,6 +82,7 @@
         type: 'Person',
         text: 'Type description'
       }],
+      valueAttrs: ['Dropdown', 'Checkbox', 'Radio'],
       /*
        * Create new field
        *
@@ -99,7 +103,8 @@
         }).join(',');
 
         ev.preventDefault();
-        if (!type || !values || !title) {
+        if (!type || !title ||
+            (_.contains(scope.valueAttrs, type) && !values)) {
           return;
         }
 
