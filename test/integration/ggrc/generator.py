@@ -33,12 +33,6 @@ class Generator():
     return start + datetime.timedelta(
         seconds=random.randint(0, int((end - start).total_seconds())))
 
-  def get_object(self, obj_class, obj_id):
-    try:
-      return db.session.query(obj_class).filter(obj_class.id == obj_id).one()
-    except:
-      return None
-
   def generate(self, obj_class, obj_name=None, data=None):
     if obj_name is None:
       obj_name = obj_class._inflector.table_plural
@@ -47,7 +41,7 @@ class Generator():
     response = self.api.post(obj_class, data)
     response_obj = None
     if response.json:
-      response_obj = self.get_object(obj_class, response.json[obj_name]['id'])
+      response_obj = obj_class.query.get(response.json[obj_name]['id'])
     return response, response_obj
 
   def modify(self, obj, obj_name, data):
@@ -55,7 +49,7 @@ class Generator():
     response = self.api.put(obj, data)
     response_obj = None
     if response.json:
-      response_obj = self.get_object(obj_class, response.json[obj_name]['id'])
+      response_obj = obj_class.query.get(response.json[obj_name]['id'])
     return response, response_obj
 
   def obj_to_dict(self, obj, model_name=None):
@@ -64,6 +58,12 @@ class Generator():
 
 
 class ObjectGenerator(Generator):
+  """Main object generator class.
+
+  This class is used as a helper for generating ggrc objects via the API. This
+  is used for writing integration tests on thigs that attach on api callbacs,
+  such as model_posted, model_put and model_deleted.
+  """
 
   def create_stub(self, obj):
     return {
