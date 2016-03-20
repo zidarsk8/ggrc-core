@@ -34,16 +34,8 @@
        * Removes `field` from `fileds`
        */
       removeField: function (scope, el, ev) {
-        var fileds = scope.attr('fields');
-        var field = scope.attr('field');
-        var index = _.findIndex(fileds, function (item) {
-          return item.type === field.type && item.title === field.title;
-        });
-
         ev.preventDefault();
-        if (index !== -1) {
-          fileds.splice(index, 1);
-        }
+        scope.attr('_pending_delete', true);
       },
       /*
        * Split field values
@@ -52,9 +44,9 @@
        */
       attrs: function () {
         if (_.contains(['Person', 'Text'], this.field.attr('type'))) {
-          return [this.attr('field.values')];
+          return [this.attr('field.multi_choice_options')];
         }
-        return _.splitTrim(this.attr('field.values'), {
+        return _.splitTrim(this.attr('field.multi_choice_options'), {
           compact: true
         });
       }
@@ -110,11 +102,11 @@
 
         fields.push({
           title: title,
-          type: type,
-          values: values,
+          attribute_type: type,
+          multi_choice_options: values,
           opts: new can.Map()
         });
-        _.each(['title', 'values'], function (type) {
+        _.each(['title', 'multi_choice_options'], function (type) {
           selected.attr(type, '');
         });
       }

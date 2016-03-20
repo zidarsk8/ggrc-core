@@ -23,6 +23,30 @@
         instance.delay_resolving_save_until($.when(auditDfd, objectDfd));
       }.bind(this));
     },
+    '{CMS.Models.AssessmentTemplate} updated': function (model, ev, instance) {
+      var attrDfd;
+      if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
+        return;
+      }
+      attrDfd = $.map(instance.custom_attribute_definitions, function (attr) {
+        if (attr.id && attr._pending_delete) {
+          return attr.reify().refresh().then(function (attr) {
+            attr.destroy();
+          });
+        } else if (attr.id) {
+          return;
+        }
+        return new CMS.Models.CustomAttributeDefinition({
+          title: attr.title,
+          definition_id: instance.id,
+          definition_type: "assessment_template",
+          attribute_type: attr.attribute_type,
+          multi_choice_options: attr.multi_choice_options,
+          context: instance.context
+        }).save();
+      });
+      instance.delay_resolving_save_until($.when(attrDfd));
+    },
     '{CMS.Models.AssessmentTemplate} created': function (model, ev, instance) {
       if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
         return;
@@ -34,13 +58,16 @@
 
         auditDfd = this._create_relationship(instance,
             instance.audit, instance.audit.context);
-        attrDfd = $.map(instance._template_attributes, function (attr) {
+        attrDfd = $.map(instance.custom_attribute_definitions, function (attr) {
+          if (attr._pending_delete) {
+            return;
+          }
           return new CMS.Models.CustomAttributeDefinition({
             title: attr.title,
             definition_id: instance.id,
             definition_type: "assessment_template",
-            attribute_type: attr.type,
-            multi_choice_options: attr.values,
+            attribute_type: attr.attribute_type,
+            multi_choice_options: attr.multi_choice_options,
             context: instance.context
           }).save();
         });

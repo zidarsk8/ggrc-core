@@ -1088,8 +1088,7 @@
       default_people: {
         assessors: "Object Owners",
         verifiers: "Object Owners"
-      },
-      _template_attributes: new can.List()
+      }
     },
 
     /**
@@ -1126,6 +1125,9 @@
      *
      */
     form_preload: function (isNewObject) {
+      if (!this.custom_attribute_definitions) {
+        this.attr('custom_attribute_definitions', new can.List());
+      }
       this.attr('_objectTypes', this._choosableObjectTypes());
       this._unpackPeopleData();
     },
