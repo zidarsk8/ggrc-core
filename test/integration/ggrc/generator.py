@@ -76,15 +76,72 @@ class ObjectGenerator(Generator):
     if data is None:
       data = {}
     obj_name = obj_class._inflector.table_singular
-    obj = obj_class(title=self.random_str())
+    obj = obj_class()
     obj_dict = self.obj_to_dict(obj, obj_name)
-    obj_dict[obj_name].update({"owners": [{
-        "id": 1,
-        "href": "/api/people/1",
-        "type": "Person"
-    }]})
+    obj_dict[obj_name].update({
+        "owners": [{
+            "id": 1,
+            "href": "/api/people/1",
+            "type": "Person"
+        }],
+        "title": self.random_str(),
+    })
     obj_dict[obj_name].update(data)
     return self.generate(obj_class, obj_name, obj_dict)
+
+  def generate_relationship(self, source, destination, context=None, **kwargs):
+    """Create relationship between two objects.
+
+    Args:
+      source (db.Model): source model of the relationship.
+      destination (db.Model): destination model of the relationship.
+      context (Context): context of the relationship. Usually a context of one
+        of the related objects.
+      kwargs (dict): various arguments for the given relationship, such as
+        relationship attributes.
+
+    Returns:
+      response object and the actual relationship that was created.
+    """
+    if context:
+      context = self.create_stub(context)
+    data = {
+        "source": self.create_stub(source),
+        "destination": self.create_stub(destination),
+        "context": context,
+    }
+    data.update(kwargs)
+    self.generate_object(models.Relationship, data=data)
+
+  def generate_comment(self, commentable, assignee_type, description):
+    """Create a comment on a commentable object.
+
+    This function creates a comment for a given object and generates the
+    correct relationship to that object. The result of generating the
+    relationship is discarded and the user will only see if a comment is
+    created.
+
+    Args:
+      commentable (db.Model): Model that is commentable such as Request or
+        Assessment.
+      assignee_type (string): Assignee type of the person creating the comment.
+      description (string): Comment content.
+
+    Returns:
+      Server response and the generated comment.
+    """
+    response, comment_ = self.generate_object(
+        models.Comment,
+        data={
+            "description": description,
+            "assignee_type": assignee_type,
+            "context": self.create_stub(commentable),
+        },
+    )
+    # Refresh the object after an API call.
+    commentable = commentable.__class__.query.get(commentable.id)
+    self.generate_relationship(commentable, comment_, commentable.context)
+    return response, comment_
 
   def generate_user_role(self, person, role):
     data = {
