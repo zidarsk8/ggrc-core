@@ -113,7 +113,7 @@ class ObjectGenerator(Generator):
     data.update(kwargs)
     self.generate_object(models.Relationship, data=data)
 
-  def generate_comment(self, commentable, assignee_type, description):
+  def generate_comment(self, commentable, assignee_type, description, **kwargs):
     """Create a comment on a commentable object.
 
     This function creates a comment for a given object and generates the
@@ -126,18 +126,18 @@ class ObjectGenerator(Generator):
         Assessment.
       assignee_type (string): Assignee type of the person creating the comment.
       description (string): Comment content.
+      kwargs (dict): Any additional data added to the comments.
 
     Returns:
       Server response and the generated comment.
     """
-    response, comment_ = self.generate_object(
-        models.Comment,
-        data={
-            "description": description,
-            "assignee_type": assignee_type,
-            "context": self.create_stub(commentable),
-        },
-    )
+    data = {
+        "description": description,
+        "assignee_type": assignee_type,
+        "context": self.create_stub(commentable),
+    }
+    data.update(kwargs)
+    response, comment_ = self.generate_object(models.Comment, data=data)
     # Refresh the object after an API call.
     commentable = commentable.__class__.query.get(commentable.id)
     self.generate_relationship(commentable, comment_, commentable.context)
