@@ -75,6 +75,9 @@
       }, {
         type: 'Text',
         text: 'Type description'
+      }, {
+        type: 'Person',
+        text: 'Type description'
       }],
       /*
        * Create new field
