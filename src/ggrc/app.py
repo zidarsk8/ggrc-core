@@ -141,10 +141,14 @@ def _display_sql_queries():
             query.parameters))
         is_select = bool(re.match('SELECT', query.statement, re.I))
         if query.duration > explain_threshold and is_select:
-          statement = 'EXPLAIN ' + query.statement
-          engine = SQLAlchemy().get_engine(app)
-          result = engine.execute(statement, query.parameters)
-          app.logger.info(tabulate(result.fetchall(), headers=result.keys()))
+          try:
+            statement = "EXPLAIN " + query.statement
+            engine = SQLAlchemy().get_engine(app)
+            result = engine.execute(statement, query.parameters)
+            app.logger.info(tabulate(result.fetchall(), headers=result.keys()))
+          except Exception as err:  # pylint: disable=broad-except
+            app.logger.warning("Statement failed: {}".format(statement))
+            app.logger.exception(err)
       app.logger.info("Total queries: {}".format(len(queries)))
       return response
 
