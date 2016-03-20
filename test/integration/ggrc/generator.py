@@ -3,36 +3,34 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-from datetime import date, timedelta
 import names
 import random
 import string
+import datetime
 
 from ggrc import db
+from ggrc import models
 from ggrc.app import app
-from ggrc.models import (
-    Person, Policy, Control, Objective, Standard, System, NotificationConfig,
-    CustomAttributeDefinition
-)
-from ggrc.services.common import Resource
+from ggrc.services import common
 from ggrc_basic_permissions.models import UserRole, Role
-from integration.ggrc.api_helper import Api
+from integration.ggrc import api_helper
 
 
 class Generator():
+  """Generator base class."""
 
   def __init__(self):
-    self.api = Api()
-    self.resource = Resource()
+    self.api = api_helper.Api()
+    self.resource = common.Resource()
 
   def random_str(self, length=8,
                  chars=string.ascii_uppercase + string.digits + "  _.-"):
     return ''.join(random.choice(chars) for _ in range(length))
 
-  def random_date(self, start=date.today(), end=None):
+  def random_date(self, start=datetime.date.today(), end=None):
     if not end or start > end:
-      end = start + timedelta(days=7)
-    return start + timedelta(
+      end = start + datetime.timedelta(days=7)
+    return start + datetime.timedelta(
         seconds=random.randint(0, int((end - start).total_seconds())))
 
   def get_object(self, obj_class, obj_id):
@@ -61,10 +59,8 @@ class Generator():
     return response, response_obj
 
   def obj_to_dict(self, obj, model_name=None):
-    result = {}
     with app.app_context():
-      result = self.resource.object_for_json(obj, model_name)
-    return result
+      return self.resource.object_for_json(obj, model_name)
 
 
 class ObjectGenerator(Generator):
@@ -76,11 +72,10 @@ class ObjectGenerator(Generator):
         "type": obj.type,
     }
 
-  def generate_object(self, obj_class, obj_name=None, data=None):
-    if obj_name is None:
-      obj_name = obj_class._inflector.table_plural
+  def generate_object(self, obj_class, data=None):
     if data is None:
       data = {}
+    obj_name = obj_class._inflector.table_singular
     obj = obj_class(title=self.random_str())
     obj_dict = self.obj_to_dict(obj, obj_name)
     obj_dict[obj_name].update({"owners": [{
@@ -91,50 +86,12 @@ class ObjectGenerator(Generator):
     obj_dict[obj_name].update(data)
     return self.generate(obj_class, obj_name, obj_dict)
 
-  def generate_policy(self, data={}):
-    obj_name = "policy"
-    default = {
-        obj_name: {
-            "title": "policy " + self.random_str(),
-            "custom_attribute_definitions": [],
-            "custom_attributes": {},
-            "kind": "",
-            "notes": "",
-            "status": "Draft",
-            "url": "",
-            "end_date": "",
-            "description": "",
-            "context": None,
-            "contact": {
-                "id": 1,
-                "href": "/api/people/1",
-                "type": "Person"
-            },
-            "owners": [{
-                "id": 1,
-                "href": "/api/people/1",
-                "type": "Person"
-            }],
-        }
-    }
-    default[obj_name].update(data)
-
-    return self.generate(Policy, obj_name, default)
-
   def generate_user_role(self, person, role):
     data = {
         "user_role": {
             "context": None,
-            "person": {
-                "href": "/api/person/%d" % person.id,
-                "id": person.id,
-                "type": "Person"
-            },
-            "role": {
-                "href": "/api/roles/%d" % role.id,
-                "id": role.id,
-                "type": "Role"
-            }
+            "person": self.create_stub(person),
+            "role": self.create_stub(role),
         }
     }
     return self.generate(UserRole, "user_role", data)
@@ -150,7 +107,7 @@ class ObjectGenerator(Generator):
         }
     }
     default[obj_name].update(data)
-    response, person = self.generate(Person, obj_name, default)
+    response, person = self.generate(models.Person, obj_name, default)
 
     if person and user_role:
       role = db.session.query(Role).filter(Role.name == user_role).first()
@@ -160,13 +117,17 @@ class ObjectGenerator(Generator):
 
   def generate_random_objects(self, count=5):
     random_objects = []
-    classes = [Control, Objective, Standard, System]
+    classes = [
+        models.Control,
+        models.Objective,
+        models.Standard,
+        models.System,
+        models.OrgGroup,
+    ]
     for _ in range(count):
       obj_class = random.choice(classes)
-      obj_name = obj_class.__name__.lower()
-      response, obj = self.generate_object(obj_class, obj_name)
-      if obj:
-        random_objects.append(obj)
+      response, obj = self.generate_object(obj_class)
+      random_objects.append(obj)
     return random_objects
 
   def generate_random_people(self, count=5, **kwargs):
@@ -188,7 +149,7 @@ class ObjectGenerator(Generator):
             "type": "NotificationConfig",
         }
     }
-    return self.generate(NotificationConfig, obj_name, data)
+    return self.generate(models.NotificationConfig, obj_name, data)
 
   def generate_custom_attribute(self, definition_type, **kwargs):
     obj_name = "custom_attribute_definition"
@@ -208,4 +169,4 @@ class ObjectGenerator(Generator):
         }
     }
     data[obj_name].update(kwargs)
-    self.generate(CustomAttributeDefinition, obj_name, data)
+    self.generate(models.CustomAttributeDefinition, obj_name, data)
