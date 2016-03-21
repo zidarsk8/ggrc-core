@@ -72,10 +72,10 @@
       ".btn-success click": function (el, ev) {
         var $textarea = this.element.find(".add-comment textarea"),
             description = $.trim($textarea.val()),
-            attachments = this.scope.attachments,
             source = this.scope.source_mapping,
             instance = this.scope.instance,
             data;
+        var attachments = instance._pending_joins;
 
         if (!description.length && !attachments.length) {
           return;
