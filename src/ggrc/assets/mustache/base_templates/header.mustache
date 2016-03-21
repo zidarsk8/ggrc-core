@@ -10,7 +10,13 @@
     <div class="span9">
       <h6>Title</h6>
       <h3>{{title}}</h3>
-      <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+      {{#if_helpers '\
+        #if_equals' status "Verified" '\
+        and ^if' instance.verified}}
+          {{! don't show status, because it will be replaced soon }}
+      {{else}}
+        <span class="state-value state-{{to_class status '_'}}">{{status}}</span>
+      {{/if_helpers}}
       <span class="gray">
         {{#if request_type}}
           ({{capitalize request_type}})
