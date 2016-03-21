@@ -293,12 +293,14 @@
       treeWidgets[type] = treeWidgets[type].concat(['TaskGroup', 'Workflow',
         'CycleTaskEntry', 'CycleTaskGroupObjectTask', 'CycleTaskGroupObject',
         'CycleTaskGroup']);
-      subTrees[type].display_list = subTrees[type].display_list
-        .concat(['CycleTaskGroupObjectTask']);
-      subTrees[type].model_list = subTrees[type].model_list.concat({
-        display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
-        display_status: true,
-        model_name: 'CycleTaskGroupObjectTask'});
+      if (!_.isEmpty(subTrees)) {
+        subTrees[type].display_list = subTrees[type].display_list
+          .concat(['CycleTaskGroupObjectTask']);
+        subTrees[type].model_list = subTrees[type].model_list.concat({
+          display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
+          display_status: true,
+          model_name: 'CycleTaskGroupObjectTask'});
+      }
     });
 
     if (pageInstance instanceof CMS.Models.Workflow) {
