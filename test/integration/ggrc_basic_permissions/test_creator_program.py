@@ -335,7 +335,7 @@ class TestCreatorProgram(TestCase):
                 "type": "Audit",
             },
             "due_on": "2015-12-08",
-            "requested_on": "2015-12-01",
+            "start_date": "2015-12-01",
             "request_type": "documentation"
         },
     })

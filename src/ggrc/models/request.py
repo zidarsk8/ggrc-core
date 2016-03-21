@@ -47,7 +47,7 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
   # TODO Make status via Stateful Mixin
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
                     'Request')
-  requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')
+  start_date = deferred(db.Column(db.Date, nullable=False), 'Request')
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   # TODO Remove audit_id audit_object_id on database cleanup
   audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=True)
@@ -66,7 +66,7 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       'requestor',
       'request_type',
       'gdrive_upload_path',
-      'requested_on',
+      'start_date',
       'due_on',
       'status',
       'audit',
@@ -92,7 +92,7 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       "due_on": "Due On",
       "notes": "Notes",
       "request_type": "Request Type",
-      "requested_on": "Requested On",
+      "start_date": "Starts On",
       "status": {
           "display_name": "Status",
           "handler_key": "request_status",
@@ -180,7 +180,7 @@ def _date_has_changes(attr):
 def handle_request_put(sender, obj=None, src=None, service=None):
   all_attrs = set(Request._publish_attrs)
   non_tracked_attrs = {'status'}
-  tracked_date_attrs = {'requested_on', 'due_on'}
+  tracked_date_attrs = {'start_date', 'due_on'}
   tracked_attrs = all_attrs - non_tracked_attrs - tracked_date_attrs
   has_changes = False
 

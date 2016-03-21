@@ -207,7 +207,7 @@ class QueryHelper(object):
       key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
       # handle dates
       if ("date" in key and "relative" not in key) or \
-         key in ["due_on", "requested_on"]:
+         key in ["due_on", "start_date"]:
         if isinstance(value, datetime.date):
           return value
         try:

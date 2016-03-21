@@ -375,7 +375,7 @@
     attributes: {
       context: 'CMS.Models.Context.stub',
       assignee: 'CMS.Models.Person.stub',
-      requested_on: 'date',
+      start_date: 'date',
       due_on: 'date',
       documents: 'CMS.Models.Document.stubs',
       audit: 'CMS.Models.Audit.stub',
@@ -383,7 +383,7 @@
     },
     defaults: {
       status: 'Open',
-      requested_on: moment().toDate(),
+      start_date: moment().toDate(),
       due_on: GGRC.Utils.firstWorkingDay(moment().add(1, 'weeks'))
     },
     info_pane_options: {
@@ -426,8 +426,8 @@
         attr_title: 'Last Updated',
         attr_name: 'updated_at'
       }, {
-        attr_title: 'Request Date',
-        attr_name: 'requested_on',
+        attr_title: 'Starts On',
+        attr_name: 'start_date',
         attr_sort_field: 'report_start_date'
       }, {
         attr_title: 'Due Date',
@@ -470,16 +470,16 @@
       this._super.apply(this, arguments);
       this.validateNonBlank('title');
       this.validateNonBlank('due_on');
-      this.validateNonBlank('requested_on');
+      this.validateNonBlank('start_date');
       this.validatePresenceOf('validate_assignee');
       this.validatePresenceOf('validate_requester');
       this.validatePresenceOf('audit');
 
-      this.validate(['requested_on', 'due_on'], function (newVal, prop) {
+      this.validate(['start_date', 'due_on'], function (newVal, prop) {
         var dates_are_valid;
 
-        if (this.requested_on && this.due_on) {
-          dates_are_valid = this.due_on >= this.requested_on;
+        if (this.start_date && this.due_on) {
+          dates_are_valid = this.due_on >= this.start_date;
         }
 
         if (!dates_are_valid) {
