@@ -334,6 +334,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Conclusion: Design",
         "Conclusion: Operation",
+        "Recipients",
+        "Send by default",
         "Delete",
     }
     expected_names = element_names.union(mapping_names)
@@ -888,7 +890,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["unique"])
 
   def test_request_definitions(self):
-    """ test default headers for Request """
+    """Test default headers for Request."""
 
     names = {
         "Assignee",
@@ -903,6 +905,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Verified Date",
         "Finished Date",
         "Requester",
+        "Recipients",
+        "Send by default",
         "Status",
         "Test",
         "Title",

@@ -24,12 +24,14 @@ from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
+from ggrc.models.comment import Commentable
 from ggrc.models import relationship
 
 
 class Request(AutoStatusChangable, Assignable, Documentable, Personable,
               CustomAttributable, relationship.Relatable, Titled, Slugged,
-              Described, FinishedDate, VerifiedDate, Base, db.Model):
+              Described, Commentable, FinishedDate, VerifiedDate, Base,
+              db.Model):
   """Class representing Requests.
 
   Request is an object representing a request from a Requester to Assignee
