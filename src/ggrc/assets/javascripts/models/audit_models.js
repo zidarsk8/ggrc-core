@@ -353,7 +353,7 @@
   can.Model.Cacheable('CMS.Models.Request', {
     root_object: 'request',
     filter_keys: ['assignee', 'audit', 'code', 'company', 'control',
-      'due date', 'due', 'name', 'notes', 'request',
+      'due on', 'due', 'name', 'notes', 'request',
       'requested on', 'status', 'test', 'title', 'request_type',
       'type', 'request type', 'due_on', 'request_object',
       'request object', 'request title'
@@ -376,7 +376,7 @@
       context: 'CMS.Models.Context.stub',
       assignee: 'CMS.Models.Person.stub',
       start_date: 'date',
-      due_on: 'date',
+      end_date: 'date',
       documents: 'CMS.Models.Document.stubs',
       audit: 'CMS.Models.Audit.stub',
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
@@ -384,7 +384,7 @@
     defaults: {
       status: 'Open',
       start_date: moment().toDate(),
-      due_on: GGRC.Utils.firstWorkingDay(moment().add(1, 'weeks'))
+      end_date: GGRC.Utils.firstWorkingDay(moment().add(1, 'weeks'))
     },
     info_pane_options: {
       mapped_objects: {
@@ -430,9 +430,9 @@
         attr_name: 'start_date',
         attr_sort_field: 'report_start_date'
       }, {
-        attr_title: 'Due Date',
-        attr_name: 'due_on',
-        attr_sort_field: 'due_on'
+        attr_title: 'Due On',
+        attr_name: 'end_date',
+        attr_sort_field: 'end_date'
       }, {
         attr_title: 'Request Type',
         attr_name: 'request_type'
@@ -443,7 +443,7 @@
         attr_title: 'Audit',
         attr_name: 'audit'
       }],
-      display_attr_names: ['title', 'assignee', 'due_on',
+      display_attr_names: ['title', 'assignee', 'end_date',
         'status', 'request_type'],
       mandatory_attr_names: ['title'],
       draw_children: true,
@@ -469,21 +469,21 @@
     init: function () {
       this._super.apply(this, arguments);
       this.validateNonBlank('title');
-      this.validateNonBlank('due_on');
+      this.validateNonBlank('end_date');
       this.validateNonBlank('start_date');
       this.validatePresenceOf('validate_assignee');
       this.validatePresenceOf('validate_requester');
       this.validatePresenceOf('audit');
 
-      this.validate(['start_date', 'due_on'], function (newVal, prop) {
+      this.validate(['start_date', 'end_date'], function (newVal, prop) {
         var dates_are_valid;
 
-        if (this.start_date && this.due_on) {
-          dates_are_valid = this.due_on >= this.start_date;
+        if (this.start_date && this.end_date) {
+          dates_are_valid = this.end_date >= this.start_date;
         }
 
         if (!dates_are_valid) {
-          return 'Requested and/or Due date is invalid';
+          return 'Start and/or Due date is invalid';
         }
       });
 
@@ -588,8 +588,8 @@
         title: 'title',
         description: 'description',
         state: 'status',
-        'due date': 'due_on',
-        due: 'due_on',
+        'due on': 'end_date',
+        due: 'end_date',
         code: 'slug',
         audit: 'audit'
       });
@@ -597,8 +597,8 @@
       var vals = filterVals.call(this, keys, mappings);
 
       try {
-        vals.due_on = moment(this.due_on).format('YYYY-MM-DD');
-        vals.due = vals['due date'] = vals.due_on;
+        vals.due_on = moment(this.end_date).format('YYYY-MM-DD');
+        vals.due = vals['due on'] = vals.due_on;
         if (this.assignee) {
           vals.assignee = filterVals.apply(this.assignee.reify(), []);
         }

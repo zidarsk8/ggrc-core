@@ -48,7 +48,7 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
                     'Request')
   start_date = deferred(db.Column(db.Date, nullable=False), 'Request')
-  due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
+  end_date = deferred(db.Column(db.Date, nullable=False), 'Request')
   # TODO Remove audit_id audit_object_id on database cleanup
   audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=True)
   audit_object_id = db.Column(db.Integer, db.ForeignKey('audit_objects.id'),
@@ -67,7 +67,7 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       'request_type',
       'gdrive_upload_path',
       'start_date',
-      'due_on',
+      'end_date',
       'status',
       'audit',
       'test',
@@ -89,7 +89,7 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
           "filter_by": "_filter_by_request_audit",
           "mandatory": True,
       },
-      "due_on": "Due On",
+      "end_date": "Due On",
       "notes": "Notes",
       "request_type": "Request Type",
       "start_date": "Starts On",
@@ -180,7 +180,7 @@ def _date_has_changes(attr):
 def handle_request_put(sender, obj=None, src=None, service=None):
   all_attrs = set(Request._publish_attrs)
   non_tracked_attrs = {'status'}
-  tracked_date_attrs = {'start_date', 'due_on'}
+  tracked_date_attrs = {'start_date', 'end_date'}
   tracked_attrs = all_attrs - non_tracked_attrs - tracked_date_attrs
   has_changes = False
 
