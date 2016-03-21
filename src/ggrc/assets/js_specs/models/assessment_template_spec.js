@@ -152,8 +152,11 @@ describe('can.Model.AssessmentTemplate', function () {
   describe('_packPeopleData() method', function () {
     it('packs default people data into a JSON string', function () {
       var result;
-      instance.attr('default_assessors', 'Rabbits');
-      instance.attr('default_verifiers', 'Turtles');
+
+      instance.attr('default_people', {
+        assessors: 'Rabbits',
+        verifiers: 'Turtles'
+      });
 
       result = instance._packPeopleData();
 
@@ -167,9 +170,13 @@ describe('can.Model.AssessmentTemplate', function () {
 
     it('uses the user-provided list if assessors set to "other"', function () {
       var result;
-      instance.attr('default_assessors', 'other');
+
+      instance.attr('default_people', {
+        assessors: 'other',
+        verifiers: 'Whatever'
+      });
+
       instance.attr('assessors_list', '  John,, Jack Mac,John,  Jill,  , ');
-      instance.attr('default_verifiers', 'Whatever');
 
       result = instance._packPeopleData();
 
@@ -183,8 +190,12 @@ describe('can.Model.AssessmentTemplate', function () {
 
     it('uses the user-provided list if verifiers set to "other"', function () {
       var result;
-      instance.attr('default_assessors', 'Whatever');
-      instance.attr('default_verifiers', 'other');
+
+      instance.attr('default_people', {
+        assessors: 'Whatever',
+        verifiers: 'other'
+      });
+
       instance.attr('verifiers_list', '  First, ,, Sec ond   ,First, Third ');
 
       result = instance._packPeopleData();
@@ -195,6 +206,54 @@ describe('can.Model.AssessmentTemplate', function () {
         assessors: 'Whatever',
         verifiers: ['First', 'Sec ond', 'Third']
       });
+    });
+  });
+
+  describe('_unpackPeopleData() method', function () {
+    it('converts the default assessors list to a string', function () {
+      instance.attr('default_people', {
+        assessors: new can.List([12, 5, 7])
+      });
+      instance.attr('assessors_list', '');
+
+      instance._unpackPeopleData();
+
+      expect(instance.assessors_list).toEqual('12, 5, 7');
+    });
+
+    it('sets the default assessors option to "other" if needed', function () {
+      // this is needed when the default assessors setting is actually
+      // a list of User IDs...
+      instance.attr('default_people', {
+        assessors: new can.List([12, 5, 7])
+      });
+
+      instance._unpackPeopleData();
+
+      expect(instance.default_people.assessors).toEqual('other');
+    });
+
+    it('converts the default verifiers list to a string', function () {
+      instance.attr('default_people', {
+        verifiers: new can.List([12, 5, 7])
+      });
+      instance.attr('verifiers_list', '');
+
+      instance._unpackPeopleData();
+
+      expect(instance.verifiers_list).toEqual('12, 5, 7');
+    });
+
+    it('sets the default verifiers option to "other" if needed', function () {
+      // this is needed when the default verifiers setting is actually
+      // a list of User IDs...
+      instance.attr('default_people', {
+        verifiers: new can.List([12, 5, 7])
+      });
+
+      instance._unpackPeopleData();
+
+      expect(instance.default_people.verifiers).toEqual('other');
     });
   });
 });

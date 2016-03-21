@@ -28,3 +28,7 @@ class RedirectTimeout(Exception):
   """When detecting if a redirect has occured, we usually check that the
   loop isn't infinite and raise this exception if the timeout is reached.
   """
+
+
+class NoClassFound(Exception):
+  """Raised in factory in case no class has been found"""

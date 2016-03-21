@@ -31,6 +31,6 @@ class DeleteObjectModal(base.Modal):
   def confirm_delete(self):
     """
     Returns:
-        lib.page.dashboard.DashboardPage
+        lib.page.dashboard.Dashboard
     """
     self.button_delete.click()

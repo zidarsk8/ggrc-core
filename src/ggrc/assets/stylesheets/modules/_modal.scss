@@ -88,6 +88,11 @@
       left: 3% !important;
     }
   }
+  &.modal-xwide {
+    width: 1260px;
+    margin-left: -630px;
+    left: 50%;
+  }
   &.modal-selector {
     .content {
       padding-top:0;
@@ -831,6 +836,10 @@
 .results-wrap {
   height: 240px;
   overflow-y: auto;
+  &.custom-height {
+    min-height: 100px;
+    height: auto !important;
+  }
   .info {
     @include box-shadow(none);
     display: block;

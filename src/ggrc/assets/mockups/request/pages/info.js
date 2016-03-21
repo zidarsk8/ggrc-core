@@ -4,7 +4,7 @@
 
   GGRC.Bootstrap.Mockups.Request.Info = {
     title: "Info",
-    icon: "grcicon-info",
+    icon: "info-circle",
     template: "/request/info.mustache",
     info_title: "My new audit",
     description: Generator.paragraph(7),

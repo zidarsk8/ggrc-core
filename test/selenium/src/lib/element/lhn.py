@@ -11,8 +11,9 @@ from selenium.common import exceptions as selenium_exception
 
 from lib import base
 from lib import exception
-from lib import selenium_utils
+from lib.utils import selenium_utils
 from lib.constants import locator
+from lib.page import extended_info
 
 
 class _Tab(base.Tab):
@@ -67,8 +68,6 @@ class AccordionGroup(base.DropdownDynamic):
 
   # modal class which is used when creating a new object
   _create_new_modal_cls = None
-
-  _extended_info_cls = None
 
   def __init__(self, driver):
     """
@@ -151,6 +150,6 @@ class AccordionGroup(base.DropdownDynamic):
       selenium_utils.hover_over_element(self._driver, el)
       selenium_utils.get_when_visible(self._driver,
                                       locator.LhnMenu.EXTENDED_INFO)
-      return self._extended_info_cls(self._driver)
+      return extended_info.ExtendedInfo(self._driver)
     except selenium_exception.StaleElementReferenceException:
       return self.hover_over_visible_member(member_title)

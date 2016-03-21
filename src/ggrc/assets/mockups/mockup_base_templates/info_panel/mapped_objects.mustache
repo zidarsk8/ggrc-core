@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+}}
+
+<h6>Mapped objects</h6>
+<ul class="attachment-list">
+  {{#each mapped.objects}}
+    <li>
+      <span class="file-controls">
+        <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+          <i class="fa fa-trash"></i>
+        </a>
+      </span>
+      <i class="fa fa-{{icon}} color"></i>
+      {{title}}
+      <a class="more" href="javascript://" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
+    </li>
+  {{/each}}
+</ul>
+<a class="btn btn-draft btn-small" href="javascript://">
+  Map objects
+</a>

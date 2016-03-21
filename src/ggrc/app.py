@@ -3,16 +3,22 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+"""
+Sets up Flask app
+"""
+
+import re
 from flask import Flask
 from flask.ext.sqlalchemy import get_debug_queries
-
+from flask.ext.sqlalchemy import SQLAlchemy
+from tabulate import tabulate
 from ggrc import contributions  # noqa: imported so it can be used with getattr
 from ggrc import db
 from ggrc import extensions
 from ggrc import settings
 
 
-app = Flask('ggrc', instance_relative_config=True)
+app = Flask('ggrc', instance_relative_config=True)  # noqa: valid constant name
 app.config.from_object(settings)
 if "public_config" not in app.config:
   app.config.public_config = {}
@@ -27,7 +33,7 @@ db.init_app(app)
 
 
 @app.before_request
-def _ensure_session_teardown(*args, **kwargs):
+def _ensure_session_teardown():
   """Ensure db.session is correctly removed
 
   Occasionally requests are terminated without calling the teardown methods,
@@ -110,24 +116,39 @@ def _enable_jasmine():
 
 
 def _display_sql_queries():
-  """Display database queries
+  """Set up display database queries
 
   This function makes sure we display the sql queries if the record setting is
   enabled.
   """
   if getattr(settings, "SQLALCHEMY_RECORD_QUERIES", False):
-
-    def with_prefix(statement, prefix):
-      return "\n".join([prefix + line for line in statement.splitlines()])
-
     @app.after_request
-    def display_queries(response):
+    def display_queries(response):  # noqa: not an unused variable
+      """Display database queries
+
+      Prints out SQL queries, EXPLAINs for queries above explain_threshold, and
+      a final count of queries after every HTTP request
+      """
+      explain_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
       queries = get_debug_queries()
-      for query in queries:
-        app.logger.info("{:.8f} {}\n{}".format(
+      # We have to copy the queries list below otherwise queries executed
+      # in the for loop will be appended causing an endless loop
+      for query in queries[:]:
+        app.logger.info("{:.8f} {}\n{}\n{}".format(
             query.duration,
             query.context,
-            with_prefix(query.statement, "       ")))
+            query.statement,
+            query.parameters))
+        is_select = bool(re.match('SELECT', query.statement, re.I))
+        if query.duration > explain_threshold and is_select:
+          try:
+            statement = "EXPLAIN " + query.statement
+            engine = SQLAlchemy().get_engine(app)
+            result = engine.execute(statement, query.parameters)
+            app.logger.info(tabulate(result.fetchall(), headers=result.keys()))
+          except Exception as err:  # pylint: disable=broad-except
+            app.logger.warning("Statement failed: {}".format(statement))
+            app.logger.exception(err)
       app.logger.info("Total queries: {}".format(len(queries)))
       return response
 

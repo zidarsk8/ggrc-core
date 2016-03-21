@@ -4,11 +4,13 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from lib.constants import (
+  cls_name,
   element,  # flake8: noqa
   log,
   path,
   yaml,
   locator,
+  method,
   path,
   regex,
   url,

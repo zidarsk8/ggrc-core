@@ -12,6 +12,7 @@ from lib import exception
 from lib import environment
 from lib import constants
 from lib import file_ops
+from lib.utils import selenium_utils
 
 
 def take_screenshot_on_error(fun):
@@ -51,5 +52,15 @@ def wait_for_redirect(fun):
             "Failed to redirect from {} to {}".format(
                 from_url, self._driver.current_url))
 
+    return result
+  return wrapper
+
+
+def handle_alert(fun):
+  """Accepts or dismisses an alert"""
+  @wraps(fun)
+  def wrapper(self, *args, **kwargs):
+    result = fun(self, *args, **kwargs)
+    selenium_utils.handle_alert(self._driver, accept=True)
     return result
   return wrapper

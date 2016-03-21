@@ -10,6 +10,7 @@ from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc.utils import get_mapping_rules
 from ggrc.utils import title_from_camelcase
+from ggrc.utils import underscore_from_camelcase
 
 
 ATTRIBUTE_ORDER = (
@@ -254,12 +255,16 @@ class AttributeInfo(object):
     return definitions
 
   @classmethod
-  def get_custom_attr_definitions(cls, object_class):
+  def get_custom_attr_definitions(cls, object_class, ca_cache=None):
     """ Get column definitions for custom attributes on object_class """
     definitions = {}
     if not hasattr(object_class, "get_custom_attribute_definitions"):
       return definitions
-    custom_attributes = object_class.get_custom_attribute_definitions()
+    object_name = underscore_from_camelcase(object_class.__name__)
+    if ca_cache and object_name:
+      custom_attributes = ca_cache.get(object_name, [])
+    else:
+      custom_attributes = object_class.get_custom_attribute_definitions()
     for attr in custom_attributes:
       attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.id)
       definitions[attr_name] = {
@@ -282,7 +287,7 @@ class AttributeInfo(object):
     return set(sum(unique_columns, []))
 
   @classmethod
-  def get_object_attr_definitions(cls, object_class):
+  def get_object_attr_definitions(cls, object_class, ca_cache=None):
     """ get all column definitions for object_class
 
     This function joins custm attribute definitions, mapping definitions and
@@ -318,15 +323,17 @@ class AttributeInfo(object):
         definition.update(value)
       definitions[key] = definition
 
-    definitions.update(cls.get_custom_attr_definitions(object_class))
+    definitions.update(
+        cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache))
     definitions.update(cls.get_mapping_definitions(object_class))
 
     return definitions
 
   @classmethod
-  def get_attr_definitions_array(cls, object_class):
+  def get_attr_definitions_array(cls, object_class, ca_cache=None):
     """ get all column definitions containing only json serializable data """
-    definitions = cls.get_object_attr_definitions(object_class)
+    definitions = cls.get_object_attr_definitions(object_class,
+                                                  ca_cache=ca_cache)
     order = cls.get_column_order(definitions.keys())
     result = []
     for key in order:

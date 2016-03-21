@@ -90,7 +90,6 @@ dashboard-js-files:
   - controllers/unmap_modal_controller.js
   - controllers/mapping_count_controller.js
   - controllers/info_pin_controller.js
-  - controllers/assessment_generator.js
   - controllers/automapper_controller.js
   - models/control.js
   - controllers/dashboard_controller.js
@@ -118,6 +117,7 @@ dashboard-js-files:
   - components/mapper.js
   - components/people_list.js
   - components/mapped_tree_view.js
+  - components/assessment_generator.js
   - components/paginate.js
   - components/tabs.js
   - components/assessment_attributes.js
@@ -179,6 +179,7 @@ dashboard-js-template-files:
   - base_objects/modal_contact_fields.mustache
   - base_objects/open_close.mustache
   - base_objects/sub_tree_type_selector.mustache
+  - base_objects/modal/search_title.mustache
   - base_templates/add_comment.mustache
   - base_templates/attachment_list.mustache
   - base_templates/attachment.mustache
@@ -212,6 +213,7 @@ dashboard-js-template-files:
   - assessments/tree_footer.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
+  - assessments/generator_title.mustache
   - assessment_templates/attribute_field.mustache
   - assessment_templates/attribute_add_field.mustache
   - assessment_templates/modal_content.mustache
@@ -413,6 +415,7 @@ dashboard-js-spec-helpers:
 mockup-js-files:
   - mockup_generator.js
   - javascript/generators/assessment.js
+  - javascript/generators/task.js
 
   # Assessor
   - assessor/pages/assessments.js
@@ -425,6 +428,16 @@ mockup-js-files:
   - request/pages/controls.js
   - request/pages/assessments.js
 
+  #Workflow
+  - workflow/pages/cycle.js
+  - workflow/pages/history.js
+  - workflow/pages/people.js
+  - workflow/pages/info.js
+
+  # Quick Workflow
+  - quick-workflow/pages/info.js
+  - quick-workflow/pages/controls.js
+
   # Bootstrap files shouold be above
   - javascript/add_comment.js
   - javascript/attachment_list.js
@@ -433,6 +446,8 @@ mockup-js-files:
   - mockuphelper_controller.js
   - assessor/main.js
   - request/main.js
+  - workflow/main.js
+  - quick-workflow/main.js
 
 mockup-js-template-files:
   # Request
@@ -442,39 +457,65 @@ mockup-js-template-files:
   - request/assessment_modal.mustache
   - assessor/assessments.mustache
 
+  # Workflow
+  - workflow/info.mustache
+  - workflow/cycle.mustache
+  - workflow/workflow_setup_modal.mustache
+  - workflow/workflow_modal_content.mustache
+
+  # Quick Workflow
+  - quick-workflow/info.mustache
+  - quick-workflow/workflow_modal.mustache
+
   # Base templates
-  - base_templates/modal_base.mustache
+  - mockup_base_templates/modal_base.mustache
 
   # Info panel partials
-  - base_templates/info_panel/base.mustache
-  - base_templates/info_panel/pin_actions.mustache
-  - base_templates/info_panel/header.mustache
-  - base_templates/info_panel/description.mustache
-  - base_templates/info_panel/mapped_objects.mustache
-  - base_templates/info_panel/people_list.mustache
-  - base_templates/info_panel/dates_list.mustache
-  - base_templates/info_panel/comment_list.mustache
-  - base_templates/info_panel/log_list.mustache
-  - base_templates/info_panel/past_items_list.mustache
-  - base_templates/info_panel/procedures.mustache
-  - base_templates/info_panel/assessment_results.mustache
-  - base_templates/info_panel/bug_number.mustache
-  - base_templates/info_panel/requests_list.mustache
-  - base_templates/info_panel/issues_list.mustache
-  - base_templates/info_panel/assessment_custom.mustache
-  - base_templates/info_panel/code.mustache
-  - base_templates/info_panel/test.mustache
-  - base_templates/info_panel/notes.mustache
-  - base_templates/info_panel/request_type.mustache
+  - mockup_base_templates/info_panel/base.mustache
+  - mockup_base_templates/info_panel/pin_actions.mustache
+  - mockup_base_templates/info_panel/header.mustache
+  - mockup_base_templates/info_panel/info_panel_utility.mustache
+  - mockup_base_templates/info_panel/description.mustache
+  - mockup_base_templates/info_panel/mapped_objects.mustache
+  - mockup_base_templates/info_panel/people_list.mustache
+  - mockup_base_templates/info_panel/task_people_list.mustache
+  - mockup_base_templates/info_panel/dates_list.mustache
+  - mockup_base_templates/info_panel/comment_list.mustache
+  - mockup_base_templates/info_panel/log_list.mustache
+  - mockup_base_templates/info_panel/past_items_list.mustache
+  - mockup_base_templates/info_panel/procedures.mustache
+  - mockup_base_templates/info_panel/assessment_results.mustache
+  - mockup_base_templates/info_panel/bug_number.mustache
+  - mockup_base_templates/info_panel/requests_list.mustache
+  - mockup_base_templates/info_panel/issues_list.mustache
+  - mockup_base_templates/info_panel/assessment_custom.mustache
+  - mockup_base_templates/info_panel/code.mustache
+  - mockup_base_templates/info_panel/test.mustache
+  - mockup_base_templates/info_panel/notes.mustache
+  - mockup_base_templates/info_panel/request_type.mustache
+
+  # Workflow setup
+  - mockup_base_templates/object_setup/object_input.mustache
+  - mockup_base_templates/object_setup/object_select.mustache
+  - mockup_base_templates/object_setup/object_select_type.mustache
+  - mockup_base_templates/object_setup/object_textarea.mustache
+  - mockup_base_templates/object_setup/fields_visibility_control.mustache
+  - mockup_base_templates/object_setup/type_fields.mustache
+  - mockup_base_templates/object_setup/repeating_block.mustache
+  - mockup_base_templates/object_setup/repeating_block_control.mustache
+  - mockup_base_templates/object_setup/template_master_controls.mustache
 
   # Other base templates files
-  - base_templates/request_panel.mustache
-  - base_templates/assessment_panel.mustache
-  - base_templates/tree.mustache
-  - base_templates/tree-assessor.mustache
-  - base_templates/tree_item.mustache
-  - base_templates/info_panel.mustache
-  - base_templates/filter.mustache
-  - base_templates/nav_item.mustache
-  - base_templates/attachment_list.mustache
-  - base_templates/add_comment.mustache
+  - mockup_base_templates/request_panel.mustache
+  - mockup_base_templates/assessment_panel.mustache
+  - mockup_base_templates/task_panel.mustache
+  - mockup_base_templates/tree.mustache
+  - mockup_base_templates/tree-assessor.mustache
+  - mockup_base_templates/tree-cycle.mustache
+  - mockup_base_templates/tree_item.mustache
+  - mockup_base_templates/tree_item_task.mustache
+  - mockup_base_templates/info_panel.mustache
+  - mockup_base_templates/filter.mustache
+  - mockup_base_templates/nav_item.mustache
+  - mockup_base_templates/attachment_list.mustache
+  - mockup_base_templates/add_comment.mustache

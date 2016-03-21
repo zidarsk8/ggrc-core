@@ -62,35 +62,40 @@ class ProgramOwnerColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role = Role.query.filter_by(name="ProgramOwner").one()
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(ProgramOwnerColumnHandler, self).__init__(
+        row_converter, key, **options)
 
 
 class ProgramEditorColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role = Role.query.filter_by(name="ProgramEditor").one()
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(ProgramEditorColumnHandler, self).__init__(
+        row_converter, key, **options)
 
 
 class ProgramReaderColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role = Role.query.filter_by(name="ProgramReader").one()
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(ProgramReaderColumnHandler, self).__init__(
+        row_converter, key, **options)
 
 
 class WorkflowOwnerColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role = Role.query.filter_by(name="WorkflowOwner").one()
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(WorkflowOwnerColumnHandler, self).__init__(
+        row_converter, key, **options)
 
 
 class WorkflowMemberColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.role = Role.query.filter_by(name="WorkflowMember").one()
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(WorkflowMemberColumnHandler, self).__init__(
+        row_converter, key, **options)
 
 
 class AuditAuditorColumnHandler(ObjectRoleColumnHandler):
@@ -98,12 +103,13 @@ class AuditAuditorColumnHandler(ObjectRoleColumnHandler):
   def __init__(self, row_converter, key, **options):
     self.role = Role.query.filter_by(name="Auditor").one()
     self.reader = Role.query.filter_by(name="ProgramReader").one()
-    super(self.__class__, self).__init__(row_converter, key, **options)
+    super(AuditAuditorColumnHandler, self).__init__(
+        row_converter, key, **options)
 
   def insert_object(self):
     if self.dry_run or not self.value:
       return
-    super(self.__class__, self).insert_object()
+    super(AuditAuditorColumnHandler, self).insert_object()
     user_roles = set(map(lambda ur: ur.person_id, self.get_program_roles()))
     context = self.row_converter.obj.program.context
     for auditor in self.value:

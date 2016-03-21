@@ -1103,10 +1103,25 @@
       Workflow: true
     }),
 
-    // TODO: docstring, tests
-    // isNewObject: boolean (true if creating new object)
+    /**
+     * An event handler when the add/edit form is about to be displayed.
+     *
+     * It builds a list of all object types used to populate the corresponding
+     * dropdown menu on the form.
+     * It also deserializes the default people settings so that those form
+     * fields are correctly populated.
+     *
+     * @param {Boolean} isNewObject - true if creating a new instance, false if
+     *   editing and existing one
+     *
+     */
     form_preload: function (isNewObject) {
+      if (isNewObject) {
+        this.attr('default_people', {});
+      }
+
       this.attr('_objectTypes', this._choosableObjectTypes());
+      this._unpackPeopleData();
     },
 
     /**
@@ -1116,7 +1131,6 @@
      *   depending on the outcome of the undrelying API request
      */
     save: function () {
-      this.attr('test_plan_procedure', !!this.attr('test_plan_procedure'));
       this.attr('default_people', this._packPeopleData());
 
       return this._super.apply(this, arguments);
@@ -1148,8 +1162,8 @@
         return _.uniq(_.filter(result));
       }
 
-      data.assessors = this.attr('default_assessors');
-      data.verifiers = this.attr('default_verifiers');
+      data.assessors = this.attr('default_people.assessors');
+      data.verifiers = this.attr('default_people.verifiers');
 
       if (data.assessors === 'other') {
         data.assessors = makeList(this.attr('assessors_list'));
@@ -1160,6 +1174,23 @@
       }
 
       return JSON.stringify(data);
+    },
+
+    /**
+     * Inspect the default people settings object, convert any lists of
+     * user IDs to comma-separated strings, and use that to populate the
+     * corresponding text input fields.
+     */
+    _unpackPeopleData: function () {
+      var instance = this;  // the AssessmentTemplate model instance
+      var peopleData = instance.default_people;
+
+      ['assessors', 'verifiers'].forEach(function (name) {
+        if (peopleData[name] instanceof can.List) {
+          instance.attr(name + '_list', peopleData[name].join(', '));
+          instance.attr('default_people.' + name, 'other');
+        }
+      });
     },
 
     /**

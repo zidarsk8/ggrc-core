@@ -1,0 +1,75 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: brad@reciprocitylabs.com
+-# Maintained By: brad@reciprocitylabs.com
+
+-extends 'layouts/base.haml'
+
+-block extra_javascript
+  GGRC.permissions = ={ permissions_json()|safe };
+  GGRC.current_user = ={ current_user_json()|safe };
+  GGRC.config = ={ config_json()|safe };
+  GGRC.custom_attr_defs =  ={ attributes_json()|safe }
+  GGRC.model_attr_defs =  ={ all_attributes_json()|safe }
+
+-block page_help scoped
+  dashboard
+
+-block body
+  %header.header.main
+  .area{ 'class': '={ model_display_class }' }
+    .header-content
+      %h2.logo-wrap.single
+        %a{ 'class': 'to-my-work', 'href': '/dashboard' }
+          -set logo_url = config.get("COMPANY_LOGO")
+          -if logo_url
+            %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
+      #page-header
+        -block header
+
+    %section.content
+      .flash
+        -with messages = get_flashed_messages(with_categories=True)
+          -if messages
+            -for category, message in messages
+              %div{ 'class': "{{category}}" }
+                %a.close{'href': "#", 'data-dismiss': "alert" }
+                  x
+                %p
+                  {{message}}
+        -#FIXME: Flash messages
+        -#flash.each do |type, value|
+          -value = [value] unless value.is_a?(Array)
+          -value = value.map(:presence).compact
+          -if value.size > 0
+            %div{ 'class': type }
+              %a.close{'href': "#{}", :'data-dismiss': "alert"}
+                &times;
+              -value.each do |message|
+                %p=message
+      -block main
+        .clearfix
+          //.objnav.bar-v
+          //.inner-nav
+            .object-nav
+              %ul.nav{ 'class': "internav ={ model_display_class }" }
+          .object-area
+            #show_columns.column-set{ 'data-resize': "true" }
+              #middle_column
+                .row-fluid
+                  .span12.full-width
+                    .inner-content.widget-area
+                      -block widget_area
+          .pin-content
+
+    %section.footer
+      .row-fluid
+        .span12
+          %p
+            =config.get('COPYRIGHT')
+            =config.get('COMPANY')
+            Version
+            =config.get('VERSION')
+
+  #lhn
+    #lhs.lhs.accordion{ 'data-template': '/dashboard/lhn.mustache' }
