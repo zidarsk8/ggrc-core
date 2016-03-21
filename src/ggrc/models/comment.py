@@ -10,6 +10,30 @@ from ggrc.models.object_document import Documentable
 from ggrc.models.relationship import Relatable
 
 
+class Commentable(object):
+  """Mixin for commentable objects.
+
+  This is a mixin for adding default options to objects on which people can
+  comment.
+
+  recipients is used for setting who gets notified (Verifer, Requester, ...).
+  send_by_default should be used for setting the "send notification" flag in
+    the comment modal.
+  """
+
+  recipients = db.Column(db.String, nullable=True)
+  send_by_default = db.Column(db.Boolean)
+
+  _publish_attrs = [
+      "recipients",
+      "send_by_default",
+  ]
+  _aliases = {
+      "recipients": "Recipients",
+      "send_by_default": "Send by default",
+  }
+
+
 class Comment(Relatable, Described, Documentable, Base, db.Model):
   __tablename__ = "comments"
 
