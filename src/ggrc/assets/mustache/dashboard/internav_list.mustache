@@ -12,7 +12,8 @@
       and #if' count '\
       or ^if' has_count '\
       or #if' force_show '\
-      or #if' instance.constructor.obj_nav_options.show_all_tabs}}
+      or #if' instance.constructor.obj_nav_options.show_all_tabs '\
+      or #in_array' internav_display instance.constructor.obj_nav_options.force_show_list}}
 
     <a href="{{ selector }}" rel="tooltip" data-placement="bottom" title="{{ internav_display }}">
       <div class="oneline">
@@ -45,7 +46,8 @@
           and #if' count '\
           or ^if' has_count '\
           or #if' force_show '\
-          or #if' instance.constructor.obj_nav_options.show_all_tabs}}
+          or #if' instance.constructor.obj_nav_options.show_all_tabs '\
+          or #in_array' internav_display instance.constructor.obj_nav_options.force_show_list}}
         <a href="{{ selector }}">
           <div class="oneline">
             <i class="fa fa-{{ internav_icon }} color"></i>

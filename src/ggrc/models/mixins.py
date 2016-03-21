@@ -49,7 +49,7 @@ def deferred(column, classname):
 class Identifiable(object):
 
   """A model with an ``id`` property that is the primary key."""
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True)  # noqa
 
   # REST properties
   _publish_attrs = ['id', 'type']
@@ -683,48 +683,3 @@ class TestPlanned(object):
   _fulltext_attrs = ['test_plan']
   _sanitize_html = ['test_plan']
   _aliases = {"test_plan": "Test Plan"}
-
-
-class Assignable(object):
-
-  ASSIGNEE_TYPES = set(["Assignee"])
-
-  @property
-  def assignees(self):
-    assignees = [(r.source, tuple(r.attrs["AssigneeType"].split(",")))
-                 for r in self.related_sources
-                 if "AssigneeType" in r.attrs]
-    assignees += [(r.destination, tuple(r.attrs["AssigneeType"].split(",")))
-                  for r in self.related_destinations
-                  if "AssigneeType" in r.attrs]
-    return set(assignees)
-
-  @staticmethod
-  def _validate_relationship_attr(cls, source, dest, existing, name, value):
-    """Validator that allows Assignable relationship attributes
-
-    Allow relationship attribute of name "AssigneeType" with value that is a
-    comma separated list of valid roles (as defined in target class).
-
-    Args:
-        cls (class): target class of this mixin. Think of this like a class
-                     method.
-        source (model instance): relevant relationship source
-        dest (model instance): relevant relationship destinations
-        existing (dict): current attributes on the relationship
-        name (string): attribute name
-        value (any): attribute value. Should be string for the right attribute
-
-    Returns:
-        New attribute value (merge with existing roles) or None if the
-        attribute is not valid.
-    """
-    if not set([source.type, dest.type]) == set([cls.__name__, "Person"]):
-      return None
-    if not name == "AssigneeType":
-      return None
-    new_roles = value.split(",")
-    if not all(role in cls.ASSIGNEE_TYPES for role in new_roles):
-      return None
-    roles = set(existing.get(name, "").split(",")) | set(new_roles)
-    return ",".join(role for role in roles if role)
