@@ -5,9 +5,12 @@
  Maintained By: urban@reciprocitylabs.com
  */
 
-
-(function(can, $) {
-  can.Component.extend({
+(function (can, $) {
+  /**
+   * A component that takes care of adding comments with attachments
+   *
+   */
+  GGRC.Components('addComment', {
     tag: "add-comment",
     template: can.view("/static/mustache/base_templates/add_comment.mustache"),
     scope: {
@@ -26,13 +29,13 @@
       get_assignee_type: can.compute(function () {
         // TODO: We prioritize order V > A > R
         var types = {
-              related_verifiers: "verifier",
-              related_assignees: "assignee",
-              related_requesters: "requester"
-            },
-            instance = this.attr("parent_instance"),
-            user = GGRC.current_user,
-            user_type;
+          related_verifiers: "verifier",
+          related_assignees: "assignee",
+          related_requesters: "requester"
+        };
+        var instance = this.attr("parent_instance");
+        var user = GGRC.current_user;
+        var userType;
 
         if (!instance || !user) {
           return;
@@ -43,17 +46,17 @@
             return;
           }
           if (_.filter(mappings, function (mapping) {
-              return mapping.instance.id === user.id;
-            }).length) {
+            return mapping.instance.id === user.id;
+          }).length) {
             type = can.capitalize(type);
-            user_type = user_type ? (user_type + "," + type) : type;
+            userType = userType ? (userType + "," + type) : type;
           }
         });
-        return user_type;
+        return userType;
       })
     },
     events: {
-      init: function() {
+      init: function () {
         if (!this.scope.attr("source_mapping")) {
           this.scope.attr("source_mapping", GGRC.page_instance());
         }
@@ -65,17 +68,22 @@
         instance.attr("context", this.scope.attr('parent_instance.context'));
         this.scope.attr("instance", instance);
       },
-      "cleanPanel": function () {
+      cleanPanel: function () {
         this.scope.attachments.replace([]);
         this.element.find("textarea").val("");
       },
-      ".btn-success click": function (el, ev) {
-        var $textarea = this.element.find(".add-comment textarea"),
-            description = $.trim($textarea.val()),
-            attachments = this.scope.attachments,
-            source = this.scope.source_mapping,
-            instance = this.scope.instance,
-            data;
+
+      /**
+       * The component's click event (happens when the user clicks add comment),
+       * takes care of saving the comment with appended evidence.
+       */
+      ".btn-success click": function () {
+        var $textarea = this.element.find(".add-comment textarea");
+        var description = $.trim($textarea.val());
+        var source = this.scope.source_mapping;
+        var instance = this.scope.instance;
+        var attachments = instance._pending_joins;
+        var data;
 
         if (!description.length && !attachments.length) {
           return;
@@ -91,7 +99,6 @@
           this.newInstance();
           this.cleanPanel();
         }.bind(this));
-
       }
     }
   });
@@ -99,8 +106,7 @@
   can.Control("GGRC.Controllers.Comments", {
 
   }, {
-    _create_relationship: function(source, destination) {
-
+    _create_relationship: function (source, destination) {
       if (!destination) {
         return $.Deferred().resolve();
       }
@@ -108,21 +114,20 @@
       return new CMS.Models.Relationship({
         source: source.stub(),
         destination: destination,
-        context: source.context,
+        context: source.context
       }).save();
     },
-    "{CMS.Models.Comment} created": function(model, ev, instance) {
-      if (!(instance instanceof  CMS.Models.Comment)) {
+    "{CMS.Models.Comment} created": function (model, ev, instance) {
+      if (!(instance instanceof CMS.Models.Comment)) {
         return;
       }
-      var source = instance._source_mapping || GGRC.page_instance(),
-          parent_dfd = this._create_relationship(source, instance);
-      instance.delay_resolving_save_until($.when(parent_dfd));
+      var source = instance._source_mapping || GGRC.page_instance();
+      var parentDfd = this._create_relationship(source, instance);
+      instance.delay_resolving_save_until($.when(parentDfd));
     }
   });
 
-  $(function() {
+  $(function () {
     $(document.body).ggrc_controllers_comments();
   });
-
 })(this.can, this.can.$);
