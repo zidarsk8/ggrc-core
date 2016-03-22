@@ -89,3 +89,21 @@ class TestRequestDataHandlers(converters.TestCase):
     ])
 
     self.assertEqual(set(declined_data.keys()), requester_emails)
+
+  def test_request_comments(self):
+    request1 = Request.query.filter_by(slug="Request 1").first()
+    _, comment = self.generator.generate_comment(
+        request1, "Verifier", "some comment", send_notification="true")
+
+    notif = self._get_notification(comment, "comment_created").first()
+
+    declined_data = self._call_notif_handler(notif)
+    requester_emails = set([
+        "user2@a.com",
+        "user3@a.com",
+        "user4@a.com",
+        "user5@a.com",
+        "user@example.com",
+    ])
+
+    self.assertEqual(set(declined_data.keys()), requester_emails)
