@@ -42,6 +42,7 @@
           definition_type: "assessment_template",
           attribute_type: attr.attribute_type,
           multi_choice_options: attr.multi_choice_options,
+          mandatory: attr.mandatory,
           context: instance.context
         }).save();
       });
@@ -68,6 +69,7 @@
             definition_type: "assessment_template",
             attribute_type: attr.attribute_type,
             multi_choice_options: attr.multi_choice_options,
+            mandatory: attr.mandatory,
             context: instance.context
           }).save();
         });
