@@ -215,5 +215,21 @@ def get_comment_data(notif):
   Returns:
     Dict with all data needed for sending comment notifications.
   """
-  return {}
-
+  data = {}
+  comment = get_notification_object(notif)
+  rel = models.Relationship.find_related(comment, models.Request())
+  request = rel.Request_destination or rel.Request_source
+  recipients = set(request.recipients.split(","))
+  for person, assignee_type in request.assignees:
+    if recipients.intersection(set(assignee_type)):
+      data[person.email] = {
+        "user": get_person_dict(person),
+        "comment_created": {
+            comment.id: {
+                "description": comment.description,
+                "parent_type": request._inflector.title_singular.title(),
+                "parent_id": request.id,
+            }
+        }
+    }
+  return data
