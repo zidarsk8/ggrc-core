@@ -103,7 +103,6 @@ class TestRequestDataHandlers(converters.TestCase):
         "user3@a.com",
         "user4@a.com",
         "user5@a.com",
-        "user@example.com",
     ])
 
     self.assertEqual(set(declined_data.keys()), requester_emails)

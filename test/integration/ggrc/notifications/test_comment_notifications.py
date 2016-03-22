@@ -94,5 +94,5 @@ class TestCommentNotification(converters.TestCase):
     self.assertEqual(
         self._get_notifications(notif_type="comment_created").count(),
         0,
-        "Found comment notification that was not sent."
+        "Found a comment notification that was not sent."
     )
