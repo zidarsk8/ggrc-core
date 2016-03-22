@@ -220,6 +220,18 @@ Maintained By: miha@reciprocitylabs.com
                   </ul>
                 {% endif %}
 
+                {% if digest.get('comment_created') %}
+                  <h2 {{ style.sub_title() }} >New comments</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for comment_id, comment in digest['comment_created'].items() %}
+                    <li {{ style.list_item() }} >
+                      Comment created on: {{ comment['parent_type'] }} ({{ comment['parent_id'] }})
+                      Comment: {{ comment['description'] }}
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
                 <p {{ style.text_paragraph() }} >
                   Thanks,<br>
                   gGRC team
