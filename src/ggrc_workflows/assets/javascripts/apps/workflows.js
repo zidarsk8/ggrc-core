@@ -141,10 +141,11 @@
       CycleTaskGroupObjectTask: {
         _canonical: {
           related_objects_as_source: [
-            'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process', 'Product',
-            'Project', 'System', 'Regulation', 'Policy', 'Contract', 'Standard',
-            'Program', 'Issue', 'Control', 'Section', 'Clause', 'Objective',
-            'Audit', 'Assessment', 'AccessGroup', 'Request', 'Document'
+            'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
+            'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
+            'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
+            'Objective', 'Audit', 'Assessment', 'AccessGroup', 'Request',
+            'Document', 'Risk', 'Threat'
           ]
         },
         related_objects_as_source: Proxy(
