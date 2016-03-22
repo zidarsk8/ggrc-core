@@ -90,3 +90,9 @@ class TestCommentNotification(converters.TestCase):
         1,
         "Missing comment notification entry."
     )
+    self.client.get("/_notifications/send_todays_digest")
+    self.assertEqual(
+        self._get_notifications(notif_type="comment_created").count(),
+        0,
+        "Found comment notification that was not sent."
+    )
