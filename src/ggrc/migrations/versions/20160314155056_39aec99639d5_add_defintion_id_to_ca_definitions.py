@@ -24,6 +24,8 @@ def upgrade():
   """Add the new id field and fix some indexes/nullable issues."""
   op.add_column('custom_attribute_definitions',
                 sa.Column('definition_id', sa.Integer(), nullable=True))
+  op.add_column('custom_attribute_definitions',
+                sa.Column('multi_choice_mandatory', sa.Text(), nullable=True))
   op.alter_column('custom_attribute_definitions', 'helptext',
                   existing_type=mysql.VARCHAR(length=250), nullable=True)
   op.drop_constraint(u'uq_custom_attribute',
@@ -43,4 +45,5 @@ def downgrade():
   op.alter_column('custom_attribute_definitions', 'helptext',
                   existing_type=mysql.VARCHAR(length=250),
                   nullable=False)
+  op.drop_column('custom_attribute_definitions', 'multi_choice_mandatory')
   op.drop_column('custom_attribute_definitions', 'definition_id')
