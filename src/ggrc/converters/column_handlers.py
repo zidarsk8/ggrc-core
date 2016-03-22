@@ -3,13 +3,14 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+"""List of all column handlers for objects in the ggrc module."""
 
 from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import request
 from ggrc.converters.handlers import related_person
 from ggrc.extensions import get_extension_modules
 
-_column_handlers = {
+GGRC_COLUMN_HANDLERS = {
     "assertions": handlers.ControlAssertionColumnHandler,
     "assignee": handlers.UserColumnHandler,
     "audit": handlers.AuditColumnHandler,
@@ -49,15 +50,15 @@ _column_handlers = {
     "report_start_date": handlers.DateColumnHandler,
     "request": handlers.RequestColumnHandler,
     "request_audit": handlers.RequestAuditColumnHandler,
-    "requested_on": handlers.DateColumnHandler,
+    "request_status": request.RequestStatusColumnHandler,
     "request_type": handlers.RequestTypeColumnHandler,
+    "requested_on": handlers.DateColumnHandler,
     "response_type": handlers.ResponseTypeColumnHandler,
     "secondary_assessor": handlers.UserColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,
     "slug": handlers.SlugColumnHandler,
     "start_date": handlers.DateColumnHandler,
     "status": handlers.StatusColumnHandler,
-    "request_status": request.RequestStatusColumnHandler,
     "test_plan": handlers.TextareaColumnHandler,
     "title": handlers.RequiredTextColumnHandler,
     "url": handlers.TextColumnHandler,
@@ -77,13 +78,13 @@ def get_all_column_handlers():
   Returns:
     extension_handlers (dict): dict of all extension handlers
   """
-  extension_handlers = _column_handlers
+  extension_handlers = GGRC_COLUMN_HANDLERS
   for extension_module in get_extension_modules():
     contributed_handlers = getattr(
         extension_module, "contributed_column_handlers", None)
     if callable(contributed_handlers):
       extension_handlers.update(contributed_handlers())
-    elif type(contributed_handlers) == dict:
+    elif isinstance(contributed_handlers, dict):
       extension_handlers.update(contributed_handlers)
   return extension_handlers
 
