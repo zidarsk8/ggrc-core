@@ -159,7 +159,7 @@
         </label>
         <select data-id="state_dd" class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="6">
           <option value="" {{#if_equals status ""}}selected{{/if_equals}}>---</option>
-          {{#iterate 'Draft', 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
+          {{#iterate 'Open', 'In Progress', 'Finished', 'Verified', 'Final'}}
             <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
           {{/iterate}}
         </select>

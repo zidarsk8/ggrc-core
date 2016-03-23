@@ -1,0 +1,17 @@
+{{!
+    Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: vladan@reciprocitylabs.com
+    Maintained By: vladan@reciprocitylabs.com
+}}
+
+{{#if hidable}}
+  <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+{{/if}}
+<select class="type-select span{{size}}">
+  {{#type_select}}
+    {{#each data}}
+      <option value="{{value}}">{{option_text}}</option>
+    {{/each}}
+  {{/type_select}}
+</select>

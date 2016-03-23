@@ -6,68 +6,123 @@
 */
 
 (function (can, $, Generator) {
-   can.Control("CMS.Controllers.MockupTreeView", {
-    }, {
+  can.Control('CMS.Controllers.MockupTreeView', {
+  }, {
     init: function (el, opts) {
-      _.each(this.options.children, function (child) {
-        var $item = $("<li/>", {class: "tree-item"});
+      can.each(this.options.instance.children, function (child) {
+        var $item = $('<li/>', {'class': 'tree-item'});
         new CMS.Controllers.MockupTreeItem($item, {
           item: child
         });
         this.element.append($item);
       }, this);
     },
-    "{can.route} item": function (router, ev, item) {
-      if (!item || !item.length) {
+    '{can.route} item': function (router, ev, current, previous) {
+      if (!previous) {
         return;
       }
-      item = item.split("-");
-      var view = _.findWhere(this.options.children, {
-            type: item[0],
-            id: item[1]
-          });
-      view.attr("active", true);
+      function findNeedle(list, slug) {
+        var prop;
+        var result;
+        for (prop in list) {
+          if (!list.hasOwnProperty(prop) || prop.indexOf('_') === 0) {
+            continue;
+          }
+          if (list[prop].type === slug.type &&
+              Number(list[prop].id) === Number(slug.id)) {
+            return list[prop];
+          }
+          if (list[prop].children) {
+            result = findNeedle(list[prop].children, slug);
+            if (result) {
+              return result;
+            }
+          }
+        }
+      }
+      current = current.split('__');
+      previous = previous.split('__');
+      _.each(_.difference(previous, current), function (slug) {
+        var item;
+        slug = slug.split('-');
+        item = findNeedle(this.options.instance.children, {
+          id: slug[1],
+          type: slug[0]
+        });
+        if (item) {
+          item.attr('active', false);
+        }
+      }, this);
     },
-    "{children} change": function (list, ev, which, type, status) {
-      which = which.split(".");
-      var index = +which[0],
-          prop = which[1];
-
+    '{instance.children} change': function (list, ev, which, type, status) {
+      var groups = groupChanged(which.split('.'));
+      var instance = this.options.instance;
+      var url = [];
+      function groupChanged(arr) {
+        var groups = [];
+        var check = arr;
+        while (check.length) {
+          check = arr.splice(0, 2);
+          if (check.length) {
+            groups.push(check);
+          }
+        }
+        return groups;
+      }
       if (!status) {
         return;
       }
-      _.each(this.options.children, function (child, i) {
-        var isActive = index === i;
-        child.attr("active", isActive);
-        if (isActive) {
-          can.route.attr("item", child.type + "-" + child.id);
+
+      can.each(groups, function (group) {
+        var index = Number(group[0]);
+        var prop = group[1];
+
+        if (prop === 'active') {
+          instance = instance.children[index];
+
+          url.push(instance.type + '-' + instance.id);
+          instance.attr('active', true);
+          can.route.attr('item', url.join('__'));
+        } else {
+          instance = instance[prop][index];
+          url.push(instance.type + '-' + instance.id);
+          instance.attr('active', true);
         }
-      });
+      }, this);
     }
   });
 
-  can.Control("CMS.Controllers.MockupTreeItem", {
+  can.Control('CMS.Controllers.MockupTreeItem', {
     defaults: {
-      view: "/static/mockups/base_templates/tree_item.mustache"
+      templates: {
+        task: '/static/mustache/mockup_base_templates/tree_item_task.mustache',
+        task_group: '/static/mustache/mockup_base_templates/tree_item_task.mustache',
+        workflow: '/static/mustache/mockup_base_templates/tree_item_task.mustache',
+        'default': '/static/mustache/mockup_base_templates/tree_item.mustache'
+      }
     }
   }, {
     init: function (el, options) {
-      this.element.html(can.view(this.options.view, options.item));
-      _.each(options.item.children, function (child) {
-        var $item = $("<li/>", {class: "tree-item"});
+      var template = this.options.templates[options.item.type] ||
+        this.options.templates.default;
+
+      this.element.html(can.view(template, options.item));
+      can.each(options.item.children, function (child) {
+        var $item = $('<li/>', {'class': 'tree-item'});
         new CMS.Controllers.MockupTreeItem($item, {
           item: child
         });
-        this.element.find(".tree-structure").append($item);
+        this.element.find('.tree-structure').append($item);
       }, this);
     },
-    ".select click": function (el, ev) {
-      var status = !this.options.item.active;
-      this.options.item.attr("active", status);
-    },
-    "{item} change": function (list, ev, which, type, status) {
-      if (which === "active") {
-        this.element.toggleClass("active", status);
+    '.select click': function (el, ev) {
+      var item = el.closest('.tree-item');
+      var status = this.options.item.attr('active');
+      if (this.element.is(item)) {
+        if (status) {
+          this.options.item.attr('active', false);
+        }
+        this.options.item.attr('active', true);
       }
     }
   });

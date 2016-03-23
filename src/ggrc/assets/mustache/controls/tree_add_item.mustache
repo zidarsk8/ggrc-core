@@ -7,21 +7,19 @@
 
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
-    {{^if_instance_of parent_instance "Assessment"}}
-    <a
-      class="section-add"
-      href="javascript://"
-      rel="tooltip"
-      data-placement="left"
-      data-toggle="unified-mapper"
-      data-join-mapping="{{mapping}}"
-      data-join-option-type="{{model.shortName}}"
-      data-join-object-id="{{parent_instance.id}}"
-      data-join-object-type="{{parent_instance.class.shortName}}"
-      data-exclude-option-types="{{exclude_option_types}}"
-      data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-        <i class="fa fa-plus-circle"></i>
-    </a>
-    {{/if_instance_of}}
+  <a
+    class="section-add"
+    href="javascript://"
+    rel="tooltip"
+    data-placement="left"
+    data-toggle="unified-mapper"
+    data-join-mapping="{{mapping}}"
+    data-join-option-type="{{model.shortName}}"
+    data-join-object-id="{{parent_instance.id}}"
+    data-join-object-type="{{parent_instance.class.shortName}}"
+    data-exclude-option-types="{{exclude_option_types}}"
+    data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
+      <i class="fa fa-plus-circle"></i>
+  </a>
 {{/if}}
 {{/is_allowed_to_map}}

@@ -89,7 +89,9 @@
       object_type: 'Assessment'
     },
     obj_nav_options: {
-      show_all_tabs: true
+      show_all_tabs: false,
+      force_show_list: ['In Scope Controls', 'Open Requests',
+                        'Issues', 'Assessments']
     },
     tree_view_options: {
       header_view: GGRC.mustache_path + '/audits/tree_header.mustache',

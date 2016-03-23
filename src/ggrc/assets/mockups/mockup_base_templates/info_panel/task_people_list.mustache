@@ -1,0 +1,34 @@
+{{!
+    Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: vladan@reciprocitylabs.com
+    Maintained By: vladan@reciprocitylabs.com
+}}
+
+<div class="side-content">
+  <ul class="label-list">
+    {{#each task_people}}
+    <li>
+      <label>
+        <span class="file-controls">
+          <a href="javascript://">
+            <i class="fa fa-plus-circle"></i>
+          </a>
+        </span>
+        <span class="person-label {{@key}}"></span>
+        {{@key}}
+      </label>
+      <ul>
+        {{#each .}}
+          <li>
+            <span class="file-controls">
+              <a href="javascript://"><i class="fa fa-trash"></i></a>
+            </span>
+            <a href="javascript://">{{name}}</a>
+          </li>
+        {{/each}}
+      </ul>
+    </li>
+    {{/each}}
+  </ul>
+</div>

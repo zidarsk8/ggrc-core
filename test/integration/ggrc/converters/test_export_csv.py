@@ -328,17 +328,18 @@ class TestExportSingleObject(TestCase):
           return "1"
       return "1/1/2015"
 
-    data = lambda model, attr, field: [{
-        "object_name": model.__name__,
-        "fields": "all",
-        "filters": {
-            "expression": {
-                "left": field.lower(),
-                "op": {"name": "="},
-                "right": rhs(model, attr)
-            },
-        }
-    }]
+    def data(model, attr, field):
+        return [{
+            "object_name": model.__name__,
+            "fields": "all",
+            "filters": {
+                "expression": {
+                    "left": field.lower(),
+                    "op": {"name": "="},
+                    "right": rhs(model, attr)
+                },
+            }
+        }]
 
     failed = set()
     for model in set(get_importables().values()):

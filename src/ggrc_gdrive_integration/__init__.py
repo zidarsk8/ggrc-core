@@ -129,6 +129,13 @@ class GDriveRoleContributions(RoleContributions):
           'update': ['ObjectFolder'],
           'delete': ['ObjectFolder'],
       },
+      'Editor': {
+          'read': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+          'create': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+          'update': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+          'delete': ['ObjectFolder', 'ObjectFile', 'ObjectEvent'],
+      },
+
   }
 
 ROLE_CONTRIBUTIONS = GDriveRoleContributions()
