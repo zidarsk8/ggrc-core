@@ -5,7 +5,7 @@
     Maintained By: vladan@reciprocitylabs.com
 }}
 
-<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects" parent-instance="parentInstance" base-instance="baseInstance" mapping="mapping">
+<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects" parent-instance="parentInstance" base-instance="baseInstance" mapping="mapping" isLoading="isLoading">
   {{#instance}}
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     {{^if reusable}}

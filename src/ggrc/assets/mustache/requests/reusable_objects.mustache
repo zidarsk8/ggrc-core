@@ -12,7 +12,7 @@ Maintained By: urban@reciprocitylabs.com
         <h6>Date</h6>
       </div>
       <div class="xmedium-col">
-        <h6>Request title</h6>
+        <h6>Title</h6>
       </div>
       <div class="small-col">
         <h6>Mapped objects</h6>
@@ -26,7 +26,7 @@ Maintained By: urban@reciprocitylabs.com
     </li>
   </ul>
   <ul class="past-items-list relatables">
-    {{#expose baseInstance=parentInstance}}
+    {{#expose reusedObjects=reusedObjects baseInstance=parentInstance isLoading=isLoading}}
     {{#defer 'related_self' parentInstance.related_self}}
     {{#related_self}}
     <li class="clearfix">
@@ -46,6 +46,7 @@ Maintained By: urban@reciprocitylabs.com
           tree-view-class="mapped-list"
           parent-instance="instance"
           base-instance="baseInstance"
+          is-loading="isLoading"
           mapping="instance.class.info_pane_options.mapped_objects.mapping"
           item-template="instance.class.info_pane_options.mapped_objects.show_view"
           >
@@ -58,6 +59,7 @@ Maintained By: urban@reciprocitylabs.com
           reuse-method="createEvidenceRelationship"
           parent-instance="instance"
           base-instance="baseInstance"
+          is-loading="isLoading"
           mapping="instance.class.info_pane_options.evidence.mapping"
           item-template="instance.class.info_pane_options.evidence.show_view"
           >
@@ -69,6 +71,7 @@ Maintained By: urban@reciprocitylabs.com
           reuse-method="createRelationship"
           parent-instance="instance"
           base-instance="baseInstance"
+          is-loading="isLoading"
           mapping="instance.class.info_pane_options.urls.mapping"
           item-template="instance.class.info_pane_options.urls.show_view"
           >

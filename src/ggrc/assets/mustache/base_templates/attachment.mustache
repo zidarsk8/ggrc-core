@@ -5,7 +5,7 @@
     Maintained By: anze@reciprocitylabs.com
 }}
 
-<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects" parent-instance="parentInstance" base-instance="baseInstance" mapping="mapping">
+<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects" parent-instance="parentInstance" base-instance="baseInstance" mapping="mapping" isLoading="isLoading">
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
     {{^if reusable}}
     {{#is_allowed 'update' parentInstance context='for'}}
@@ -32,7 +32,7 @@
         <input type="checkbox" checked disabled />
       {{/isDisabled}}
       {{^isDisabled instance}}
-        <input type="checkbox" can-value="list.{{method}}-{{instance.type}}-{{instance.id}}" />
+        <input type="checkbox" {{#isLoading}}disabled{{/isLoading}} can-value="list.{{method}}-{{instance.type}}-{{instance.id}}" />
       {{/isDisabled}}
     {{/if}}
   </li>

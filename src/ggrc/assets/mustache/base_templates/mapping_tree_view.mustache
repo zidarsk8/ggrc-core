@@ -6,10 +6,10 @@
 }}
 
 <ul class="{{#if treeViewClass}}{{treeViewClass}}{{else}}attachment-list{{/if}}">
-  {{#expose reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping baseInstance=baseInstance}}
+  {{#expose reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping baseInstance=baseInstance isLoading=isLoading}}
   {{#with_mapping mapping parentInstance}}
     {{#results}}
-      {{{render itemTemplate baseInstance=baseInstance parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping}}}
+      {{{render itemTemplate baseInstance=baseInstance parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping isLoading=isLoading}}}
     {{/results}}
   {{/with_mapping}}
   {{/expose}}

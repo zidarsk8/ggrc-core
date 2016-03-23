@@ -24,6 +24,7 @@
        * {instance.id} - child object id
        */
       reusedObjects: new can.Map(),
+      isLoading: false,
       /*
        * Reuse objects
        *
@@ -39,10 +40,10 @@
         var relatedDfds = [];
         var when;
 
-        if (el.hasClass('disabled')) {
+        if (el.hasClass('disabled') || this.attr('isLoading')) {
           return;
         }
-
+        this.attr('isLoading', true);
         relatedDfds = can.map(can.Map.keys(reused), function (prop) {
           var executer;
           var id;
@@ -70,7 +71,8 @@
           $(document.body).trigger('ajax:flash', {
             success: 'Selected evidences are reused'
           });
-        });
+          this.attr('isLoading', false);
+        }.bind(this));
         GGRC.delay_leaving_page_until(when);
       },
       /*
