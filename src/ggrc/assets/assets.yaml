@@ -122,9 +122,12 @@ dashboard-js-files:
   - components/tabs.js
   - components/assessment_attributes.js
   - components/autocomplete/autocomplete.js
+  - components/lazy_open_close.js
   - components/object_history/object_history.js
   - components/person/person.js
   - components/unified_mapper/mapper.js
+  - components/unified_mapper/mapper_results.js
+  - components/unified_mapper/mapper_checkbox.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -227,6 +230,7 @@ dashboard-js-template-files:
   - issues/info.mustache
   - issues/remediation_plan.mustache
   - components/autocomplete/autocomplete.mustache
+  - components/unified_mapper/mapper_results.mustache
   - components/object_history/object_history.mustache
   - components/person/person.mustache
   - custom_attributes/modal_content.mustache
