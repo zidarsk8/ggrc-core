@@ -960,28 +960,64 @@
       modified_by: 'CMS.Models.Person.stub',
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
       start_date: 'date',
-      end_date: 'date'
+      end_date: 'date',
+      finished_date: 'date',
+      verified_date: 'date'
     },
-    filter_keys: ['operationally', 'operational', 'design'],
+    filter_keys: ['operationally', 'operational', 'design',
+                  'finished_date', 'verified_date', 'verified'],
     filter_mappings: {
       operational: 'operationally'
     },
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
         '/base_objects/tree_add_item.mustache',
-      attr_list: can.Model.Cacheable.attr_list.concat([{
+      attr_list: [{
+        attr_title: 'Title',
+        attr_name: 'title'
+      }, {
+        attr_title: 'Owner',
+        attr_name: 'owner',
+        attr_sort_field: 'contact.name|email'
+      }, {
+        attr_title: 'Code',
+        attr_name: 'slug'
+      }, {
+        attr_title: 'State',
+        attr_name: 'status'
+      }, {
+        attr_title: 'Verified',
+        attr_name: 'verified'
+      }, {
+        attr_title: 'Primary Contact',
+        attr_name: 'contact',
+        attr_sort_field: 'contact.name|email'
+      }, {
+        attr_title: 'Secondary Contact',
+        attr_name: 'secondary_contact',
+        attr_sort_field: 'secondary_contact.name|email'
+      }, {
+        attr_title: 'Last Updated',
+        attr_name: 'updated_at'},
+      {
         attr_title: 'Conclusion: Design',
         attr_name: 'design'
       }, {
         attr_title: 'Conclusion: Operation',
         attr_name: 'operationally'
       }, {
+        attr_title: 'Finished Date',
+        attr_name: 'finished_date'
+      }, {
+        attr_title: 'Verified Date',
+        attr_name: 'verified_date'
+      }, {
         attr_title: 'URL',
         attr_name: 'url'
       }, {
         attr_title: 'Reference URL',
         attr_name: 'reference_url'
-      }])
+      }]
     },
     info_pane_options: {
       mapped_objects: {
