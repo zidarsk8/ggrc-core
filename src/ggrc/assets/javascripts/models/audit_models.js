@@ -1149,7 +1149,17 @@
       // the custom lists of assessor / verifier IDs if "other" is selected for
       // the corresponding default_people setting
       assessorsList: {},
-      verifiersList: {}
+      verifiersList: {},
+      people_values: [
+        {value: 'Object Owners', title: 'Object Owners'},
+        {value: 'Audit Lead', title: 'Audit Lead'},
+        {value: 'Object Contact', title: 'Object Contact'},
+        {value: 'Primary Assessor', title: 'Primary Assessor'},
+        {value: 'Secondary Assessors', title: 'Secondary Assessors'},
+        {value: 'Primary Contact', title: 'Primary Contact'},
+        {value: 'Secondary Contact', title: 'Secondary Contact'},
+        {value: 'other', title: 'Others...'}
+      ]
     },
 
     /**

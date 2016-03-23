@@ -115,7 +115,6 @@ dashboard-js-files:
   - components/relevant_filters.js
   - components/csv/export.js
   - components/csv/import.js
-  - components/mapper.js
   - components/people_list.js
   - components/mapped_tree_view.js
   - components/assessment_generator.js
@@ -125,6 +124,7 @@ dashboard-js-files:
   - components/autocomplete/autocomplete.js
   - components/object_history/object_history.js
   - components/person/person.js
+  - components/unified_mapper/mapper.js
   #- d3.v2.js
   #- related_graph.js
 
