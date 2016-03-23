@@ -356,7 +356,8 @@
       'due date', 'due', 'name', 'notes', 'request',
       'requested on', 'status', 'test', 'title', 'request_type',
       'type', 'request type', 'due_on', 'request_object',
-      'request object', 'request title'
+      'request object', 'request title',
+      'verified', 'verified_date', 'finished_date'
     ],
     filter_mappings: {
       type: 'request_type',
@@ -424,6 +425,10 @@
       }, {
         attr_title: 'Status',
         attr_name: 'status'
+      }, {
+        attr_title: 'Verified',
+        attr_name: 'verified',
+        attr_sort_field: 'verified'
       }, {
         attr_title: 'Last Updated',
         attr_name: 'updated_at'
