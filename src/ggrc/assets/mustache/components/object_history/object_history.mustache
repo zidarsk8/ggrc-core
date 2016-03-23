@@ -14,7 +14,7 @@
 
           <div class="w-status">
             <span class="entry-author">
-              <a href="javascript://">{{madeBy}}</a>
+              {{{render '/static/mustache/people/popover.mustache' person=madeBy}}
               made changes &mdash; {{date updatedAt}}
             </span>
             <div class="clearfix">
