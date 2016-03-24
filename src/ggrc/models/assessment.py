@@ -3,6 +3,8 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
+"""Module for the Assessment class"""
+
 from sqlalchemy.orm import validates
 
 from ggrc import db
@@ -25,6 +27,8 @@ from ggrc.models.track_object_state import track_state_for_class
 class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
                  Documentable, Personable, Timeboxed, Ownable,
                  Relatable, BusinessObject, db.Model):
+  """The Assessment model"""
+
   __tablename__ = 'assessments'
 
   VALID_STATES = (u"Open", u"In Progress", u"Finished", u"Verified", u"Final")

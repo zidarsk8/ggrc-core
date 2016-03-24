@@ -3,6 +3,8 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
+# flake8: noqa
+
 import datetime
 import collections
 from sqlalchemy import and_

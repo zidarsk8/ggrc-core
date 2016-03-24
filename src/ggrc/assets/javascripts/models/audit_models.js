@@ -352,11 +352,10 @@
 
   can.Model.Cacheable('CMS.Models.Request', {
     root_object: 'request',
-    filter_keys: ['assignee', 'audit', 'code', 'company', 'control',
-      'due on', 'due', 'name', 'notes', 'request',
-      'requested on', 'status', 'test', 'title', 'request_type',
-      'type', 'request type', 'due_on', 'request_object',
-      'request object', 'request title'
+    filter_keys: ['assignee', 'audit', 'code', 'company', 'control', 'due on',
+      'due', 'name', 'notes', 'request', 'starts', 'starts on', 'status',
+      'test', 'title', 'request_type', 'type', 'request type',
+      'request_object', 'request object', 'request title'
     ],
     filter_mappings: {
       type: 'request_type',
@@ -428,7 +427,7 @@
       }, {
         attr_title: 'Starts On',
         attr_name: 'start_date',
-        attr_sort_field: 'report_start_date'
+        attr_sort_field: 'start_date'
       }, {
         attr_title: 'Due On',
         attr_name: 'end_date',
@@ -585,20 +584,24 @@
     get_filter_vals: function () {
       var filterVals = can.Model.Cacheable.prototype.get_filter_vals;
       var mappings = $.extend({}, this.class.filter_mappings, {
-        title: 'title',
-        description: 'description',
-        state: 'status',
-        'due on': 'end_date',
-        due: 'end_date',
+        audit: 'audit',
         code: 'slug',
-        audit: 'audit'
+        description: 'description',
+        due: 'end_date',
+        'due on': 'end_date',
+        starts: 'start_date',
+        'starts on': 'start_date',
+        state: 'status',
+        title: 'title'
       });
       var keys = _.union(this.class.filter_keys, ['state'], _.keys(mappings));
       var vals = filterVals.call(this, keys, mappings);
 
       try {
-        vals.due_on = moment(this.end_date).format('YYYY-MM-DD');
-        vals.due = vals['due on'] = vals.due_on;
+        vals.starts = moment(this.start_date).format('YYYY-MM-DD');
+        vals['starts on'] = vals.starts;
+        vals.due = moment(this.end_date).format('YYYY-MM-DD');
+        vals['due on'] = vals.due;
         if (this.assignee) {
           vals.assignee = filterVals.apply(this.assignee.reify(), []);
         }
