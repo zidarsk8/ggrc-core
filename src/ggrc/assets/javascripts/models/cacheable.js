@@ -758,7 +758,8 @@ can.Model("can.Model.Cacheable", {
       }
     }
     can.each(this.custom_attribute_definitions, function (definition) {
-      if (definition.mandatory) {
+
+      if (definition.mandatory && !this.ignore_ca_errors) {
         if (definition.attribute_type === 'Checkbox') {
           self.class.validate('custom_attributes.' + definition.id,
               function (val) {
@@ -768,7 +769,7 @@ can.Model("can.Model.Cacheable", {
           self.class.validateNonBlank('custom_attributes.' + definition.id);
         }
       }
-    });
+    }.bind(this));
     if (!this.custom_attributes) {
       this.attr('custom_attributes', new can.Map());
       can.each(this.custom_attribute_values, function (value) {
