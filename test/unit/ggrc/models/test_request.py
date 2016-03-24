@@ -5,60 +5,61 @@
 
 """ Unit tests for the Request object """
 
-from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.orm import attributes
 
 from ggrc import db
+from ggrc.models import computed_property
 from ggrc.models import mixins
+from ggrc.models import mixins_assignable
+from ggrc.models import object_document
+from ggrc.models import object_person
+from ggrc.models import relationship
 from ggrc.models import Request
-from ggrc.models.computed_property import computed_property
-from ggrc.models.object_document import Documentable
-from ggrc.models.object_person import Personable
-from ggrc.models.relationship import Relatable
 
-from unit.ggrc.models.base_mixins import BaseMixins
+from unit.ggrc.models import test_mixins_base
 
 
-class TestRequestMixins(BaseMixins):
+class TestRequestMixins(test_mixins_base.TestMixinsBase):
   """ Tests inclusion of correct mixins and their attributes """
 
   def setUp(self):
     self.model = Request
     self.included_mixins = [
-        mixins.Assignable,
+        mixins_assignable.Assignable,
         mixins.Base,
         mixins.CustomAttributable,
         mixins.Described,
         db.Model,
-        Documentable,
-        Personable,
-        Relatable,
+        object_document.Documentable,
+        object_person.Personable,
+        relationship.Relatable,
         mixins.Revisionable,
         mixins.Slugged,
         mixins.Titled,
     ]
 
     self.attributes_introduced = [
-        ('assignees', property),                             # Assignable
-        ('audit_id', InstrumentedAttribute),
-        ('audit_object_id', InstrumentedAttribute),
-        ('custom_attribute_values', InstrumentedAttribute),  # CustomAttrib.
-        ('description', InstrumentedAttribute),              # Described
-        ('display_name', computed_property),                 # Base
-        ('due_on', InstrumentedAttribute),
-        ('gdrive_upload_path', InstrumentedAttribute),
-        ('notes', InstrumentedAttribute),
-        ('object_documents', InstrumentedAttribute),         # Documentable
-        ('object_people', InstrumentedAttribute),            # Personable
-        ('related_sources', InstrumentedAttribute),          # Relatable
-        ('related_destinations', InstrumentedAttribute),     # Relatable
-        ('request_type', InstrumentedAttribute),
-        ('requested_on', InstrumentedAttribute),
-        ('requestor', InstrumentedAttribute),
-        ('requestor_id', InstrumentedAttribute),
-        ('responses', InstrumentedAttribute),
-        ('revisions', InstrumentedAttribute),                # Revisionable
-        ('slug', InstrumentedAttribute),                     # Slugged
-        ('status', InstrumentedAttribute),
-        ('test', InstrumentedAttribute),
-        ('title', InstrumentedAttribute),                    # Titled
+        ('assignees', property),                                        # Assignable    # noqa
+        ('audit_id', attributes.InstrumentedAttribute),
+        ('audit_object_id', attributes.InstrumentedAttribute),
+        ('custom_attribute_values', attributes.InstrumentedAttribute),  # CustomAttrib. # noqa
+        ('description', attributes.InstrumentedAttribute),              # Described     # noqa
+        ('display_name', computed_property.computed_property),          # Base          # noqa
+        ('due_on', attributes.InstrumentedAttribute),
+        ('gdrive_upload_path', attributes.InstrumentedAttribute),
+        ('notes', attributes.InstrumentedAttribute),
+        ('object_documents', attributes.InstrumentedAttribute),         # Documentable  # noqa
+        ('object_people', attributes.InstrumentedAttribute),            # Personable    # noqa
+        ('related_sources', attributes.InstrumentedAttribute),          # Relatable     # noqa
+        ('related_destinations', attributes.InstrumentedAttribute),     # Relatable     # noqa
+        ('request_type', attributes.InstrumentedAttribute),
+        ('requested_on', attributes.InstrumentedAttribute),
+        ('requestor', attributes.InstrumentedAttribute),
+        ('requestor_id', attributes.InstrumentedAttribute),
+        ('responses', attributes.InstrumentedAttribute),
+        ('revisions', attributes.InstrumentedAttribute),                # Revisionable  # noqa
+        ('slug', attributes.InstrumentedAttribute),                     # Slugged       # noqa
+        ('status', attributes.InstrumentedAttribute),
+        ('test', attributes.InstrumentedAttribute),
+        ('title', attributes.InstrumentedAttribute),                    # Titled        # noqa
     ]

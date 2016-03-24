@@ -8,7 +8,7 @@
 import unittest
 
 
-class BaseMixins(unittest.TestCase):
+class TestMixinsBase(unittest.TestCase):
   """Tests inclusion of correct mixins and their attributes"""
 
   def setUp(self):

@@ -5,65 +5,66 @@
 
 """ Unit tests for the Assessment object """
 
-from sqlalchemy.ext.associationproxy import AssociationProxy
-from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.ext import associationproxy
+from sqlalchemy.orm import attributes
 
 from ggrc import db
-from ggrc.models import mixins
 from ggrc.models import Assessment
-from ggrc.models.object_document import Documentable
-from ggrc.models.object_owner import Ownable
-from ggrc.models.object_person import Personable
-from ggrc.models.relationship import Relatable
-from ggrc.models.track_object_state import HasObjectState
+from ggrc.models import mixins
+from ggrc.models import mixins_assignable
+from ggrc.models import object_document
+from ggrc.models import object_owner
+from ggrc.models import object_person
+from ggrc.models import relationship
+from ggrc.models import track_object_state
 
-from unit.ggrc.models.base_mixins import BaseMixins
+from unit.ggrc.models import test_mixins_base
 
 
-class TestAssessmentMixins(BaseMixins):
+class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
   """ Tests inclusion of correct mixins and their attributes """
 
   def setUp(self):
     self.model = Assessment
     self.included_mixins = [
-        mixins.Assignable,
+        mixins_assignable.Assignable,
         mixins.BusinessObject,
         mixins.CustomAttributable,
         db.Model,
-        Documentable,
-        HasObjectState,
+        object_document.Documentable,
+        track_object_state.HasObjectState,
         mixins.TestPlanned,
         mixins.Timeboxed,
-        Ownable,
-        Personable,
-        Relatable,
+        object_owner.Ownable,
+        object_person.Personable,
+        relationship.Relatable,
     ]
 
     self.attributes_introduced = [
         ('audit', dict),
-        ('design', InstrumentedAttribute),
-        ('operationally', InstrumentedAttribute),
+        ('design', attributes.InstrumentedAttribute),
+        ('operationally', attributes.InstrumentedAttribute),
         ('object', dict),
-        ('status', InstrumentedAttribute),                    # Stateful
-        ('assignees', property),                              # Assignable
-        ('contact_id', InstrumentedAttribute),                # WithContact
-        ('contact', InstrumentedAttribute),                   # WithContact
-        ('secondary_contact', InstrumentedAttribute),         # WithContact
-        ('custom_attribute_values', InstrumentedAttribute),   # CustomAttrib.
-        ('description', InstrumentedAttribute),               # Described
-        ('end_date', InstrumentedAttribute),                  # Timeboxed
-        ('notes', InstrumentedAttribute),                     # Noted
-        ('object_documents', InstrumentedAttribute),          # Documentable
-        ('object_people', InstrumentedAttribute),             # Personable
-        ('os_state', InstrumentedAttribute),                  # HasObjectState
-        ('owners', AssociationProxy),                         # Ownable
-        ('reference_url', InstrumentedAttribute),             # HyperLinked
-        ('related_sources', InstrumentedAttribute),           # Relatable
-        ('related_destinations', InstrumentedAttribute),      # Relatable
-        ('revisions', InstrumentedAttribute),                 # Revisionable
-        ('slug', InstrumentedAttribute),                      # Slugged
-        ('start_date', InstrumentedAttribute),                # Timeboxed
-        ('test_plan', InstrumentedAttribute),                 # TestPlanned
-        ('title', InstrumentedAttribute),                     # Titled
-        ('url', InstrumentedAttribute),                       # HyperLinked
+        ('status', attributes.InstrumentedAttribute),                    # Stateful       # noqa
+        ('assignees', property),                                         # Assignable     # noqa
+        ('contact_id', attributes.InstrumentedAttribute),                # WithContact    # noqa
+        ('contact', attributes.InstrumentedAttribute),                   # WithContact    # noqa
+        ('secondary_contact', attributes.InstrumentedAttribute),         # WithContact    # noqa
+        ('custom_attribute_values', attributes.InstrumentedAttribute),   # CustomAttrib.  # noqa
+        ('description', attributes.InstrumentedAttribute),               # Described      # noqa
+        ('end_date', attributes.InstrumentedAttribute),                  # Timeboxed      # noqa
+        ('notes', attributes.InstrumentedAttribute),                     # Noted          # noqa
+        ('object_documents', attributes.InstrumentedAttribute),          # Documentable   # noqa
+        ('object_people', attributes.InstrumentedAttribute),             # Personable     # noqa
+        ('os_state', attributes.InstrumentedAttribute),                  # HasObjectState # noqa
+        ('owners', associationproxy.AssociationProxy),                   # Ownable        # noqa
+        ('reference_url', attributes.InstrumentedAttribute),             # HyperLinked    # noqa
+        ('related_sources', attributes.InstrumentedAttribute),           # Relatable      # noqa
+        ('related_destinations', attributes.InstrumentedAttribute),      # Relatable      # noqa
+        ('revisions', attributes.InstrumentedAttribute),                 # Revisionable   # noqa
+        ('slug', attributes.InstrumentedAttribute),                      # Slugged        # noqa
+        ('start_date', attributes.InstrumentedAttribute),                # Timeboxed      # noqa
+        ('test_plan', attributes.InstrumentedAttribute),                 # TestPlanned    # noqa
+        ('title', attributes.InstrumentedAttribute),                     # Titled         # noqa
+        ('url', attributes.InstrumentedAttribute),                       # HyperLinked    # noqa
     ]
