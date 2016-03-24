@@ -45,7 +45,7 @@ class TestRequestMixins(test_mixins_base.TestMixinsBase):
         ('custom_attribute_values', attributes.InstrumentedAttribute),  # CustomAttrib. # noqa
         ('description', attributes.InstrumentedAttribute),              # Described     # noqa
         ('display_name', computed_property.computed_property),          # Base          # noqa
-        ('due_on', attributes.InstrumentedAttribute),
+        ('end_date', attributes.InstrumentedAttribute),
         ('gdrive_upload_path', attributes.InstrumentedAttribute),
         ('notes', attributes.InstrumentedAttribute),
         ('object_documents', attributes.InstrumentedAttribute),         # Documentable  # noqa
@@ -53,7 +53,7 @@ class TestRequestMixins(test_mixins_base.TestMixinsBase):
         ('related_sources', attributes.InstrumentedAttribute),          # Relatable     # noqa
         ('related_destinations', attributes.InstrumentedAttribute),     # Relatable     # noqa
         ('request_type', attributes.InstrumentedAttribute),
-        ('requested_on', attributes.InstrumentedAttribute),
+        ('start_date', attributes.InstrumentedAttribute),
         ('requestor', attributes.InstrumentedAttribute),
         ('requestor_id', attributes.InstrumentedAttribute),
         ('responses', attributes.InstrumentedAttribute),
