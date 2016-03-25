@@ -54,7 +54,7 @@
 
           // combine all the changes and sort them by date descending
           changeHistory = objChanges.concat(mappingsChanges);
-          changeHistory = _.sortBy(changeHistory, "updatedAt").reverse();
+          changeHistory = _.sortBy(changeHistory, 'updatedAt').reverse();
           this.scope.attr('changeHistory', changeHistory);
         }.bind(this),
 
@@ -115,10 +115,30 @@
         _.each(objRevisions, enqueue);
         _.each(mappingsSrc, enqueue);
         _.each(mappingsDest, enqueue);
+        _.each(mappingsSrc, function (revision) {
+          revision.destination = can.Stub.get_or_create({
+            id: revision.destination_id,
+            type: revision.destination_type
+          });
+          rq.enqueue(revision.destination);
+        });
+        _.each(mappingsDest, function (revision) {
+          revision.source = can.Stub.get_or_create({
+            id: revision.source_id,
+            type: revision.source_type
+          });
+          rq.enqueue(revision.source);
+        });
         return rq.trigger().then(function () {
           var reify = function (revision) {
             if (revision.modified_by && revision.modified_by.reify) {
-              revision.attr("modified_by", revision.modified_by.reify());
+              revision.attr('modified_by', revision.modified_by.reify());
+            }
+            if (revision.destination && revision.destination.reify) {
+              revision.attr('destination', revision.destination.reify());
+            }
+            if (revision.source && revision.source.reify()) {
+              revision.attr('source', revision.source.reify());
             }
             return revision;
           };
@@ -171,13 +191,13 @@
      * of the same object (application entity).
      *
      * NOTE: The object fields that do not have a user-friendly alias defined are
-     * considered "internal", and are thus not included in the resulting diff
+     * considered 'internal', and are thus not included in the resulting diff
      * objects, because they are not meant to be shown to the end user.
      *
      * @param {CMS.Models.Revision} rev1 - the older of the two revisions
      * @param {CMS.Models.Revision} rev2 - the newer of the two revisions
      *
-     * @return {Object} - A "diff" object describing the changes between the
+     * @return {Object} - A 'diff' object describing the changes between the
      *   revisions. The object has the following attributes:
      *   - madeBy: the user who made the changes
      *   - updatedAt: the time when the changes have been made
@@ -245,20 +265,20 @@
      *   mapping between the object instance the component is handling, and an
      *   external object
      *
-     * @return {Object} - A "change" object describing a single modification
+     * @return {Object} - A 'change' object describing a single modification
      *   of a mapping. The object has the following attributes:
      *   - madeBy: the user who made the changes
      *   - updatedAt: the time when the changes have been made
      *   - mapping:
      *       Information about the changed mapping containing the following:
      *         - action: the mapping action that was performed by a user,
-     *             can be either "Create" or "Delete"
+     *             can be either 'Create' or 'Delete'
      *         - relatedObjId: the ID of the object at the other end of the
      *             mapping (*)
      *         - relatedObjType: the type of the object at the other end of the
      *             mapping (*)
      *
-     *         (*) The object on "this" side of the mapping is of course the
+     *         (*) The object on 'this' side of the mapping is of course the
      *             instance the component is handling.
      */
     _mappingChange: function (revision) {
@@ -275,13 +295,11 @@
 
       // The instance the component is handling can be on either side of the
       // mapping, i.e. source or destination, but we are interested in the
-      // object on the "other" end of the mapping.
+      // object on the 'other' end of the mapping.
       if (revision.destination_type === this._INSTANCE_TYPE) {
-        change.mapping.relatedObjId = revision.source_id;
-        change.mapping.relatedObjType = revision.source_type;
+        change.mapping.object = revision.source;
       } else {
-        change.mapping.relatedObjId = revision.destination_id;
-        change.mapping.relatedObjType = revision.destination_type;
+        change.mapping.object = revision.destination;
       }
 
       return change;
