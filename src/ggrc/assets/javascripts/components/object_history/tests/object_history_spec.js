@@ -328,7 +328,7 @@ describe('GGRC.Components.objectHistory', function () {
           }
         };
 
-        var result = method(rev1, rev2);
+        var result = method.call({_DATE_FIELDS: {}}, rev1, rev2);
 
         expectedChangeList = [{
           fieldName: 'Object Name',
