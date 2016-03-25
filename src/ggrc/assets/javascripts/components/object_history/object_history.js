@@ -295,11 +295,21 @@
     _mappingChange: function (revision, chain) {
       var object = revision.destination_type === this._INSTANCE_TYPE ?
                    revision.source : revision.destination;
-      var fieldName = ('Mapping to ' + object.type + ': ' +
-                                       object.display_name());
-      var origVal = '—';
-      var newVal = _.capitalize(revision.action);
-      var previous = chain[_.findIndex(chain, revision) - 1];
+      var displayName;
+      var fieldName;
+      var origVal;
+      var newVal;
+      var previous;
+
+      if (object instanceof can.Stub) {
+        object = object.reify();
+      }
+
+      displayName = object.display_name() || object.description;
+      fieldName = 'Mapping to ' + object.type + ': ' + displayName;
+      origVal = '—';
+      newVal = _.capitalize(revision.action);
+      previous = chain[_.findIndex(chain, revision) - 1];
       if (revision.action !== 'deleted' &&
           _.exists(revision.content, 'attrs.AssigneeType')) {
         newVal = revision.content.attrs.AssigneeType;
