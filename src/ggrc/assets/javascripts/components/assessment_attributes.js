@@ -163,7 +163,7 @@
           multi_choice_options: values,
           opts: new can.Map()
         });
-        _.each(['title', 'multi_choice_options'], function (type) {
+        _.each(['title', 'values', 'multi_choice_options'], function (type) {
           selected.attr(type, '');
         });
       }
