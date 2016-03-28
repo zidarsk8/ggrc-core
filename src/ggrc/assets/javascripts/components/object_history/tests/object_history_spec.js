@@ -553,21 +553,25 @@ describe('GGRC.Components.objectHistory', function () {
           modified_by: 'User 17',
           updated_at: new Date('2015-05-17 17:24:01'),
           action: 'created',
-          source_id: 123,
-          source_type: 'ObjectFoo',
-          destination_id: 99,
-          destination_type: 'OtherObject'
+          destination: {
+            type: 'Other',
+            display_name: function () {
+              return 'OtherObject';
+            }
+          },
+          source_id: 99,
+          source_type: 'OtherObject'
         };
 
-        var result = method(revision);
+        var result = method(revision, [revision]);
 
         expect(result).toEqual({
           madeBy: "User 17",
           updatedAt: new Date('2015-05-17 17:24:01'),
-          mapping: {
-            action: 'Created',
-            relatedObjId: 99,
-            relatedObjType: 'OtherObject'
+          changes: {
+            origVal: '—',
+            newVal: 'Created',
+            fieldName: 'Mapping to Other: OtherObject'
           }
         });
       }
@@ -580,21 +584,25 @@ describe('GGRC.Components.objectHistory', function () {
           modified_by: 'User 17',
           updated_at: new Date('2015-05-17 17:24:01'),
           action: 'deleted',
-          source_id: 99,
-          source_type: 'OtherObject',
+          source: {
+            type: 'Other',
+            display_name: function () {
+              return 'OtherObject';
+            }
+          },
           destination_id: 123,
           destination_type: 'ObjectFoo'
         };
 
-        var result = method(revision);
+        var result = method(revision, [revision]);
 
         expect(result).toEqual({
-          madeBy: 'User 17',
+          madeBy: "User 17",
           updatedAt: new Date('2015-05-17 17:24:01'),
-          mapping: {
-            action: 'Deleted',
-            relatedObjId: 99,
-            relatedObjType: 'OtherObject'
+          changes: {
+            origVal: '—',
+            newVal: 'Deleted',
+            fieldName: 'Mapping to Other: OtherObject'
           }
         });
       }

@@ -110,24 +110,30 @@
         // result in a lot of duplication
         var rq = new RefreshQueue();
         var enqueue = function (revision) {
-          rq.enqueue(revision.modified_by);
+          if (revision.modified_by) {
+            rq.enqueue(revision.modified_by);
+          }
         };
         _.each(objRevisions, enqueue);
         _.each(mappingsSrc, enqueue);
         _.each(mappingsDest, enqueue);
         _.each(mappingsSrc, function (revision) {
-          revision.destination = can.Stub.get_or_create({
-            id: revision.destination_id,
-            type: revision.destination_type
-          });
-          rq.enqueue(revision.destination);
+          if (revision.destination_type && revision.destination_id) {
+            revision.destination = can.Stub.get_or_create({
+              id: revision.destination_id,
+              type: revision.destination_type
+            });
+            rq.enqueue(revision.destination);
+          }
         });
         _.each(mappingsDest, function (revision) {
-          revision.source = can.Stub.get_or_create({
-            id: revision.source_id,
-            type: revision.source_type
-          });
-          rq.enqueue(revision.source);
+          if (revision.source_type && revision.source_id) {
+            revision.source = can.Stub.get_or_create({
+              id: revision.source_id,
+              type: revision.source_type
+            });
+            rq.enqueue(revision.source);
+          }
         });
         return rq.trigger().then(function () {
           var reify = function (revision) {
@@ -254,7 +260,14 @@
      *   method.
      */
     _computeMappingChanges: function (revisions) {
-      return _.map(revisions, this._mappingChange.bind(this));
+      var chains = _.chain(revisions)
+                    .groupBy('resource_id')
+                    .mapValues(function (chain) {
+                      return _.sortBy(chain, 'updated_at');
+                    }).value();
+      return _.map(revisions, function (revision) {
+        return this._mappingChange(revision, chains[revision.resource_id]);
+      }.bind(this));
     },
 
     /**
@@ -265,44 +278,44 @@
      *   mapping between the object instance the component is handling, and an
      *   external object
      *
+     * @param {Array} chain - revisions of the same resource ordered
+     *   chronologically
+     *
      * @return {Object} - A 'change' object describing a single modification
      *   of a mapping. The object has the following attributes:
      *   - madeBy: the user who made the changes
      *   - updatedAt: the time when the changes have been made
-     *   - mapping:
-     *       Information about the changed mapping containing the following:
-     *         - action: the mapping action that was performed by a user,
-     *             can be either 'Create' or 'Delete'
-     *         - relatedObjId: the ID of the object at the other end of the
-     *             mapping (*)
-     *         - relatedObjType: the type of the object at the other end of the
-     *             mapping (*)
-     *
-     *         (*) The object on 'this' side of the mapping is of course the
-     *             instance the component is handling.
+     *   - changes:
+     *       A list of objects describing the modified attributes of the
+     *       instance`, with each object having the following attributes:
+     *         - fieldName: the name of the changed`instance` attribute
+     *         - origVal: the attribute's original value
+     *         - newVal: the attribute's new (modified) value
      */
-    _mappingChange: function (revision) {
-      var change = {
-        madeBy: null,
-        updatedAt: null,
-        mapping: {}
-      };
-
-      change.madeBy = revision.modified_by;
-      change.updatedAt = revision.updated_at;
-
-      change.mapping.action = _.capitalize(revision.action);
-
-      // The instance the component is handling can be on either side of the
-      // mapping, i.e. source or destination, but we are interested in the
-      // object on the 'other' end of the mapping.
-      if (revision.destination_type === this._INSTANCE_TYPE) {
-        change.mapping.object = revision.source;
-      } else {
-        change.mapping.object = revision.destination;
+    _mappingChange: function (revision, chain) {
+      var object = revision.destination_type === this._INSTANCE_TYPE ?
+                   revision.source : revision.destination;
+      var fieldName = ('Mapping to ' + object.type + ': ' +
+                                       object.display_name());
+      var origVal = '—';
+      var newVal = _.capitalize(revision.action);
+      var previous = chain[_.findIndex(chain, revision) - 1];
+      if (revision.action !== 'deleted' &&
+          _.exists(revision.content, 'attrs.AssigneeType')) {
+        newVal = revision.content.attrs.AssigneeType;
       }
-
-      return change;
+      if (_.exists(previous, 'content.attrs.AssigneeType')) {
+        origVal = previous.content.attrs.AssigneeType;
+      }
+      return {
+        madeBy: revision.modified_by,
+        updatedAt: revision.updated_at,
+        changes: {
+          origVal: origVal,
+          newVal: newVal,
+          fieldName: fieldName
+        }
+      };
     }
   });
 })(window.GGRC, window.can);
