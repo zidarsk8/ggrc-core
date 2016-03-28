@@ -225,10 +225,10 @@
           // format date fields
           if (this._DATE_FIELDS[fieldName]) {
             if (value) {
-              value = Mustache._helpers.date.fn(value);
+              value = GGRC.Utils.formatDate(value);
             }
             if (origVal) {
-              origVal = Mustache._helpers.date.fn(origVal);
+              origVal = GGRC.Utils.formatDate(origVal);
             }
           }
           diff.changes.push({
