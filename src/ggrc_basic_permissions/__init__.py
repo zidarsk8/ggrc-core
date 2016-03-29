@@ -226,6 +226,28 @@ def program_relationship_query(user_id, context_not_role=False):
   )
 
 
+def audit_relationship_query(user_id, context_not_role=False):
+  """Creates a query that returns objects a user can access via audit.
+
+    Args:
+        user_id: id of the user
+        context_not_role: use context instead of the role for the third column
+            in the search api we need to return (obj_id, obj_type, context_id),
+            but in ggrc_basic_permissions we need a role instead of a
+            context_id (obj_id, obj_type, role_name)
+
+    Returns:
+        db.session.query object that selects the following columns:
+            | id | type | role_name or context |
+  """
+  return objects_via_relationships_query(
+      model=all_models.Audit,
+      roles=('Auditor',),
+      user_id=user_id,
+      context_not_role=context_not_role
+  )
+
+
 class CompletePermissionsProvider(object):
   def __init__(self, _):
     pass
@@ -487,10 +509,20 @@ def load_permissions_for(user):  # noqa
           .setdefault('resources', list())\
           .append(object_owner.ownable_id)
 
-  for res in program_relationship_query(user.id).all():
+  for res in program_relationship_query(user.id):
     id_, type_, role_name = res
     actions = ["read", "view_object_page"]
     if role_name in ("ProgramEditor", "ProgramOwner"):
+      actions += ["create", "update", "delete"]
+    for action in actions:
+      permissions.setdefault(action, {})\
+          .setdefault(type_, {})\
+          .setdefault('resources', list())\
+          .append(id_)
+  for res in audit_relationship_query(user.id):
+    id_, type_, role_name = res
+    actions = ["read", "view_object_page"]
+    if type_ in ("Assessment", "Request"):
       actions += ["create", "update", "delete"]
     for action in actions:
       permissions.setdefault(action, {})\
