@@ -225,10 +225,10 @@
           // format date fields
           if (this._DATE_FIELDS[fieldName]) {
             if (value) {
-              value = GGRC.Utils.formatDate(value);
+              value = GGRC.Utils.formatDate(value, true);
             }
             if (origVal) {
-              origVal = GGRC.Utils.formatDate(origVal);
+              origVal = GGRC.Utils.formatDate(origVal, true);
             }
           }
           diff.changes.push({
