@@ -29,6 +29,17 @@
     // the type of the object the component is operating on
     _INSTANCE_TYPE: null,
 
+    _DATE_FIELDS: Object.freeze({
+      created_at: 1,
+      updated_at: 1,
+      start_date: 1,
+      end_date: 1,
+      requested_on: 1,
+      due_on: 1,
+      finished_date: 1,
+      verified_date: 1
+    }),
+
     /**
      * The component's entry point. Invoked when a new component instance has
      * been created.
@@ -211,13 +222,22 @@
         }
 
         if (displayName && value !== origVal) {
+          // format date fields
+          if (this._DATE_FIELDS[fieldName]) {
+            if (value) {
+              value = GGRC.Utils.formatDate(value, true);
+            }
+            if (origVal) {
+              origVal = GGRC.Utils.formatDate(origVal, true);
+            }
+          }
           diff.changes.push({
             fieldName: displayName,
             origVal: origVal,
             newVal: value
           });
         }
-      });
+      }.bind(this));
 
       return diff;
     },
