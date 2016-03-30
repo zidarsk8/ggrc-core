@@ -29,6 +29,17 @@
     // the type of the object the component is operating on
     _INSTANCE_TYPE: null,
 
+    _DATE_FIELDS: Object.freeze({
+      created_at: 1,
+      updated_at: 1,
+      start_date: 1,
+      end_date: 1,
+      requested_on: 1,
+      due_on: 1,
+      finished_date: 1,
+      verified_date: 1
+    }),
+
     /**
      * The component's entry point. Invoked when a new component instance has
      * been created.
@@ -54,7 +65,7 @@
 
           // combine all the changes and sort them by date descending
           changeHistory = objChanges.concat(mappingsChanges);
-          changeHistory = _.sortBy(changeHistory, "updatedAt").reverse();
+          changeHistory = _.sortBy(changeHistory, 'updatedAt').reverse();
           this.scope.attr('changeHistory', changeHistory);
         }.bind(this),
 
@@ -90,17 +101,20 @@
 
       var dfd = Revision.findAll({
         resource_type: this._INSTANCE_TYPE,
-        resource_id: instance.id
+        resource_id: instance.id,
+        __sort: 'updated_at'
       });
 
       var dfd2 = Revision.findAll({
         source_type: this._INSTANCE_TYPE,
-        source_id: instance.id
+        source_id: instance.id,
+        __sort: 'updated_at'
       });
 
       var dfd3 = Revision.findAll({
         destination_type: this._INSTANCE_TYPE,
-        destination_id: instance.id
+        destination_id: instance.id,
+        __sort: 'updated_at'
       });
 
       var dfdResults = can.when(
@@ -110,15 +124,41 @@
         // result in a lot of duplication
         var rq = new RefreshQueue();
         var enqueue = function (revision) {
-          rq.enqueue(revision.modified_by);
+          if (revision.modified_by) {
+            rq.enqueue(revision.modified_by);
+          }
         };
         _.each(objRevisions, enqueue);
         _.each(mappingsSrc, enqueue);
         _.each(mappingsDest, enqueue);
+        _.each(mappingsSrc, function (revision) {
+          if (revision.destination_type && revision.destination_id) {
+            revision.destination = can.Stub.get_or_create({
+              id: revision.destination_id,
+              type: revision.destination_type
+            });
+            rq.enqueue(revision.destination);
+          }
+        });
+        _.each(mappingsDest, function (revision) {
+          if (revision.source_type && revision.source_id) {
+            revision.source = can.Stub.get_or_create({
+              id: revision.source_id,
+              type: revision.source_type
+            });
+            rq.enqueue(revision.source);
+          }
+        });
         return rq.trigger().then(function () {
           var reify = function (revision) {
             if (revision.modified_by && revision.modified_by.reify) {
-              revision.attr("modified_by", revision.modified_by.reify());
+              revision.attr('modified_by', revision.modified_by.reify());
+            }
+            if (revision.destination && revision.destination.reify) {
+              revision.attr('destination', revision.destination.reify());
+            }
+            if (revision.source && revision.source.reify()) {
+              revision.attr('source', revision.source.reify());
             }
             return revision;
           };
@@ -147,20 +187,12 @@
      *   element follows the format returned by the `_objectChangeDiff` method.
      */
     _computeObjectChanges: function (revisions) {
-      var diff;
-      var diffList = [];
-      var i;
-
-      for (i = 1; i < revisions.length; i++) {
-        diff = this._objectChangeDiff(revisions[i - 1], revisions[i]);
-        // It can happen that there were no changes to the publicly visible
-        // object fields, and the resulting diff object's change list is thus
-        // empty - we don't include those in the result.
-        if (diff.changes.length > 0) {
-          diffList.push(diff);
-        }
-      }
-      return diffList;
+      var diffList = _.map(revisions, function (revision, i) {
+        // default to empty revision
+        var prev = revisions[i - 1] || {content: {}};
+        return this._objectChangeDiff(prev, revision);
+      }.bind(this));
+      return _.filter(diffList, 'changes.length');
     },
 
     /**
@@ -171,13 +203,13 @@
      * of the same object (application entity).
      *
      * NOTE: The object fields that do not have a user-friendly alias defined are
-     * considered "internal", and are thus not included in the resulting diff
+     * considered 'internal', and are thus not included in the resulting diff
      * objects, because they are not meant to be shown to the end user.
      *
      * @param {CMS.Models.Revision} rev1 - the older of the two revisions
      * @param {CMS.Models.Revision} rev2 - the newer of the two revisions
      *
-     * @return {Object} - A "diff" object describing the changes between the
+     * @return {Object} - A 'diff' object describing the changes between the
      *   revisions. The object has the following attributes:
      *   - madeBy: the user who made the changes
      *   - updatedAt: the time when the changes have been made
@@ -211,13 +243,22 @@
         }
 
         if (displayName && value !== origVal) {
+          // format date fields
+          if (this._DATE_FIELDS[fieldName]) {
+            if (value) {
+              value = GGRC.Utils.formatDate(value, true);
+            }
+            if (origVal) {
+              origVal = GGRC.Utils.formatDate(origVal, true);
+            }
+          }
           diff.changes.push({
             fieldName: displayName,
-            origVal: origVal,
-            newVal: value
+            origVal: origVal || "—",
+            newVal: value || "—"
           });
         }
-      });
+      }.bind(this));
 
       return diff;
     },
@@ -234,7 +275,14 @@
      *   method.
      */
     _computeMappingChanges: function (revisions) {
-      return _.map(revisions, this._mappingChange.bind(this));
+      var chains = _.chain(revisions)
+                    .groupBy('resource_id')
+                    .mapValues(function (chain) {
+                      return _.sortBy(chain, 'updated_at');
+                    }).value();
+      return _.map(revisions, function (revision) {
+        return this._mappingChange(revision, chains[revision.resource_id]);
+      }.bind(this));
     },
 
     /**
@@ -245,46 +293,54 @@
      *   mapping between the object instance the component is handling, and an
      *   external object
      *
-     * @return {Object} - A "change" object describing a single modification
+     * @param {Array} chain - revisions of the same resource ordered
+     *   chronologically
+     *
+     * @return {Object} - A 'change' object describing a single modification
      *   of a mapping. The object has the following attributes:
      *   - madeBy: the user who made the changes
      *   - updatedAt: the time when the changes have been made
-     *   - mapping:
-     *       Information about the changed mapping containing the following:
-     *         - action: the mapping action that was performed by a user,
-     *             can be either "Create" or "Delete"
-     *         - relatedObjId: the ID of the object at the other end of the
-     *             mapping (*)
-     *         - relatedObjType: the type of the object at the other end of the
-     *             mapping (*)
-     *
-     *         (*) The object on "this" side of the mapping is of course the
-     *             instance the component is handling.
+     *   - changes:
+     *       A list of objects describing the modified attributes of the
+     *       instance`, with each object having the following attributes:
+     *         - fieldName: the name of the changed`instance` attribute
+     *         - origVal: the attribute's original value
+     *         - newVal: the attribute's new (modified) value
      */
-    _mappingChange: function (revision) {
-      var change = {
-        madeBy: null,
-        updatedAt: null,
-        mapping: {}
-      };
+    _mappingChange: function (revision, chain) {
+      var object = revision.destination_type === this._INSTANCE_TYPE ?
+                   revision.source : revision.destination;
+      var displayName;
+      var fieldName;
+      var origVal;
+      var newVal;
+      var previous;
 
-      change.madeBy = revision.modified_by;
-      change.updatedAt = revision.updated_at;
-
-      change.mapping.action = _.capitalize(revision.action);
-
-      // The instance the component is handling can be on either side of the
-      // mapping, i.e. source or destination, but we are interested in the
-      // object on the "other" end of the mapping.
-      if (revision.destination_type === this._INSTANCE_TYPE) {
-        change.mapping.relatedObjId = revision.source_id;
-        change.mapping.relatedObjType = revision.source_type;
-      } else {
-        change.mapping.relatedObjId = revision.destination_id;
-        change.mapping.relatedObjType = revision.destination_type;
+      if (object instanceof can.Stub) {
+        object = object.reify();
       }
 
-      return change;
+      displayName = object.display_name() || object.description;
+      fieldName = 'Mapping to ' + object.type + ': ' + displayName;
+      origVal = '—';
+      newVal = _.capitalize(revision.action);
+      previous = chain[_.findIndex(chain, revision) - 1];
+      if (revision.action !== 'deleted' &&
+          _.exists(revision.content, 'attrs.AssigneeType')) {
+        newVal = revision.content.attrs.AssigneeType;
+      }
+      if (_.exists(previous, 'content.attrs.AssigneeType')) {
+        origVal = previous.content.attrs.AssigneeType;
+      }
+      return {
+        madeBy: revision.modified_by,
+        updatedAt: revision.updated_at,
+        changes: {
+          origVal: origVal,
+          newVal: newVal,
+          fieldName: fieldName
+        }
+      };
     }
   });
 })(window.GGRC, window.can);

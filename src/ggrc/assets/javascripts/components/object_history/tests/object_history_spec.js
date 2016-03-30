@@ -213,8 +213,9 @@ describe('GGRC.Components.objectHistory', function () {
 
       result = method(revisions);
 
-      expect(componentInst._objectChangeDiff.calls.count()).toEqual(2);
+      expect(componentInst._objectChangeDiff.calls.count()).toEqual(3);
 
+      expect(result.length).toEqual(2);
       expect(result[0]).toEqual(diff);
       expect(result[1]).toEqual(diff2);
     });
@@ -328,7 +329,7 @@ describe('GGRC.Components.objectHistory', function () {
           }
         };
 
-        var result = method(rev1, rev2);
+        var result = method.call({_DATE_FIELDS: {}}, rev1, rev2);
 
         expectedChangeList = [{
           fieldName: 'Object Name',
@@ -426,7 +427,8 @@ describe('GGRC.Components.objectHistory', function () {
 
       expect(Revision.findAll).toHaveBeenCalledWith({
         resource_type: 'ObjectFoo',
-        resource_id: 123
+        resource_id: 123,
+        __sort: 'updated_at'
       });
     });
 
@@ -437,7 +439,8 @@ describe('GGRC.Components.objectHistory', function () {
 
         expect(Revision.findAll).toHaveBeenCalledWith({
           source_type: 'ObjectFoo',
-          source_id: 123
+          source_id: 123,
+          __sort: 'updated_at'
         });
       }
     );
@@ -449,7 +452,8 @@ describe('GGRC.Components.objectHistory', function () {
 
         expect(Revision.findAll).toHaveBeenCalledWith({
           destination_type: 'ObjectFoo',
-          destination_id: 123
+          destination_id: 123,
+          __sort: 'updated_at'
         });
       }
     );
@@ -553,21 +557,25 @@ describe('GGRC.Components.objectHistory', function () {
           modified_by: 'User 17',
           updated_at: new Date('2015-05-17 17:24:01'),
           action: 'created',
-          source_id: 123,
-          source_type: 'ObjectFoo',
-          destination_id: 99,
-          destination_type: 'OtherObject'
+          destination: {
+            type: 'Other',
+            display_name: function () {
+              return 'OtherObject';
+            }
+          },
+          source_id: 99,
+          source_type: 'OtherObject'
         };
 
-        var result = method(revision);
+        var result = method(revision, [revision]);
 
         expect(result).toEqual({
           madeBy: "User 17",
           updatedAt: new Date('2015-05-17 17:24:01'),
-          mapping: {
-            action: 'Created',
-            relatedObjId: 99,
-            relatedObjType: 'OtherObject'
+          changes: {
+            origVal: '—',
+            newVal: 'Created',
+            fieldName: 'Mapping to Other: OtherObject'
           }
         });
       }
@@ -580,21 +588,25 @@ describe('GGRC.Components.objectHistory', function () {
           modified_by: 'User 17',
           updated_at: new Date('2015-05-17 17:24:01'),
           action: 'deleted',
-          source_id: 99,
-          source_type: 'OtherObject',
+          source: {
+            type: 'Other',
+            display_name: function () {
+              return 'OtherObject';
+            }
+          },
           destination_id: 123,
           destination_type: 'ObjectFoo'
         };
 
-        var result = method(revision);
+        var result = method(revision, [revision]);
 
         expect(result).toEqual({
-          madeBy: 'User 17',
+          madeBy: "User 17",
           updatedAt: new Date('2015-05-17 17:24:01'),
-          mapping: {
-            action: 'Deleted',
-            relatedObjId: 99,
-            relatedObjType: 'OtherObject'
+          changes: {
+            origVal: '—',
+            newVal: 'Deleted',
+            fieldName: 'Mapping to Other: OtherObject'
           }
         });
       }

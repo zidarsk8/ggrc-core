@@ -160,28 +160,10 @@
     </div>
 
     <div class="custom-attr-wrap define-attr">
-
-      <div class="row-fluid">
-        <div class="span12">
-          <div class="info-expand">
-            <a class="show-hidden-fields info-show-hide" href="javascript://">
-              <span class="out">
-                <i class="fa fa-caret-right"></i>
-                Custom attributes
-              </span>
-              <span class="in">
-                <i class="fa fa-caret-down"></i>
-                Custom attributes
-              </span>
-            </a>
-          </div>
-        </div>
-      </div>
-
       <div class="hidden-fields-area">
         <div class="row-fluid wrap-row">
           <div class="custom-attr-list span12">
-            <assessment-template-attributes>
+            <assessment-template-attributes fields="instance.custom_attribute_definitions">
               <div class="attr-titles">
                 <ul>
                   <li class="row-fluid">
@@ -197,13 +179,13 @@
                     <div class="span2 centered">
                       <h6>Attachment required</h6>
                     </div>
-                    <div class="span-custom1-and-half centered">
+                    <div class="span1 centered">
                       <h6>Comment required</h6>
                     </div>
-                    <div class="span-custom1-and-half centered">
+                    <div class="span1 centered">
                       <h6>Mandatory</h6>
                     </div>
-                    <div class="span-custom1-and-half">
+                    <div class="span2">
                       &nbsp;
                     </div>
                   </li>
