@@ -1224,18 +1224,7 @@ Mustache.registerHelper("link_to_tree", function () {
  *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
  */
 Mustache.registerHelper('date', function (date, hideTime) {
-  var currentTimezone = moment.tz.guess();
-  var m;
-
-  if (date === undefined || date === null) {
-    return '';
-  }
-
-  m = moment(new Date(date.isComputed ? date() : date));
-  if (hideTime === true) {
-    return m.format('MM/DD/YYYY');
-  }
-  return m.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A z');
+  return GGRC.Utils.formatDate(date, hideTime);
 });
 
 /**
@@ -3216,33 +3205,43 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
     function (attrName, instance) {
       // attribute names considered "default" and representing a date
       var DATE_ATTRS = Object.freeze({
-        start_date: 1,
+        due_on: 1,
         end_date: 1,
-        updated_at: 1,
+        finished_date: 1,
         requested_on: 1,
-        due_on: 1
+        start_date: 1,
+        updated_at: 1,
+        verified_date: 1
       });
 
       // attribute names considered "default" and not representing a date
       var NON_DATE_ATTRS = Object.freeze({
+        kind: 1,
+        reference_url: 1,
+        request_type: 1,
         slug: 1,
         status: 1,
         url: 1,
-        reference_url: 1,
-        kind: 1,
-        request_type: 1
+        verified: 1
       });
+
+      var res;
 
       instance = Mustache.resolve(instance);
       attrName = Mustache.resolve(attrName);
 
-      if (instance.attr(attrName)) {
+      res = instance.attr(attrName);
+
+      if (res !== undefined && res !== null) {
         if (attrName in NON_DATE_ATTRS) {
-          return instance.attr(attrName);
+          if ($.type(res) === 'boolean') {
+            res = String(res);
+          }
+          return res;
         }
         if (attrName in DATE_ATTRS) {
           // convert to a localized date
-          return moment(instance.attr(attrName)).format('MM/DD/YYYY');
+          return moment(res).format('MM/DD/YYYY');
         }
       }
 

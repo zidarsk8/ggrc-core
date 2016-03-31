@@ -606,7 +606,7 @@
         requests: 'Request',
         _program: 'Program',
         context: 'Context',
-        related_objects_as_source: ['Assessment', 'Issue']
+        related_objects_as_source: ['Assessment', 'AssessmentTemplate', 'Issue']
       },
       requests: Direct("Request", "audit", "requests"),
       active_requests: CustomFilter('requests', function (result) {
@@ -823,7 +823,8 @@
     CustomAttributable: {
       custom_attribute_definitions: Search(function (binding) {
         return CMS.Models.CustomAttributeDefinition.findAll({
-          definition_type: binding.instance.root_object
+          definition_type: binding.instance.root_object,
+          definition_id: null
         });
       }, 'CustomAttributeDefinition')
     }

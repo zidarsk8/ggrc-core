@@ -356,13 +356,17 @@
       'due date', 'due', 'name', 'notes', 'request',
       'requested on', 'status', 'test', 'title', 'request_type',
       'type', 'request type', 'due_on', 'request_object',
-      'request object', 'request title'
+      'request object', 'request title',
+      'verified', 'verified_date', 'finished_date'
     ],
     filter_mappings: {
       type: 'request_type',
       'request title': 'title',
       'request description': 'description',
-      'request type': 'request_type'
+      'request type': 'request_type',
+      'verified date': 'verified_date',
+      'finished date': 'finished_date',
+      'request date': 'requested_on'
     },
     root_collection: 'requests',
     findAll: 'GET /api/requests',
@@ -396,6 +400,8 @@
       assignee: 'CMS.Models.Person.stub',
       requested_on: 'date',
       due_on: 'date',
+      finished_date: 'date',
+      verified_date: 'date',
       documents: 'CMS.Models.Document.stubs',
       audit: 'CMS.Models.Audit.stub',
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
@@ -442,6 +448,10 @@
         attr_title: 'Status',
         attr_name: 'status'
       }, {
+        attr_title: 'Verified',
+        attr_name: 'verified',
+        attr_sort_field: 'verified'
+      }, {
         attr_title: 'Last Updated',
         attr_name: 'updated_at'
       }, {
@@ -452,6 +462,14 @@
         attr_title: 'Due Date',
         attr_name: 'due_on',
         attr_sort_field: 'due_on'
+      }, {
+        attr_title: 'Verified Date',
+        attr_name: 'verified_date',
+        attr_sort_field: 'verified_date'
+      }, {
+        attr_title: 'Finished Date',
+        attr_name: 'finished_date',
+        attr_sort_field: 'finished_date'
       }, {
         attr_title: 'Request Type',
         attr_name: 'request_type'
@@ -983,28 +1001,66 @@
       modified_by: 'CMS.Models.Person.stub',
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
       start_date: 'date',
-      end_date: 'date'
+      end_date: 'date',
+      finished_date: 'date',
+      verified_date: 'date'
     },
-    filter_keys: ['operationally', 'operational', 'design'],
+    filter_keys: ['operationally', 'operational', 'design',
+                  'finished_date', 'verified_date', 'verified'],
     filter_mappings: {
-      operational: 'operationally'
+      operational: 'operationally',
+      'verified date': 'verified_date',
+      'finished date': 'finished_date'
     },
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
         '/base_objects/tree_add_item.mustache',
-      attr_list: can.Model.Cacheable.attr_list.concat([{
+      attr_list: [{
+        attr_title: 'Title',
+        attr_name: 'title'
+      }, {
+        attr_title: 'Owner',
+        attr_name: 'owner',
+        attr_sort_field: 'contact.name|email'
+      }, {
+        attr_title: 'Code',
+        attr_name: 'slug'
+      }, {
+        attr_title: 'State',
+        attr_name: 'status'
+      }, {
+        attr_title: 'Verified',
+        attr_name: 'verified'
+      }, {
+        attr_title: 'Primary Contact',
+        attr_name: 'contact',
+        attr_sort_field: 'contact.name|email'
+      }, {
+        attr_title: 'Secondary Contact',
+        attr_name: 'secondary_contact',
+        attr_sort_field: 'secondary_contact.name|email'
+      }, {
+        attr_title: 'Last Updated',
+        attr_name: 'updated_at'},
+      {
         attr_title: 'Conclusion: Design',
         attr_name: 'design'
       }, {
         attr_title: 'Conclusion: Operation',
         attr_name: 'operationally'
       }, {
+        attr_title: 'Finished Date',
+        attr_name: 'finished_date'
+      }, {
+        attr_title: 'Verified Date',
+        attr_name: 'verified_date'
+      }, {
         attr_title: 'URL',
         attr_name: 'url'
       }, {
         attr_title: 'Reference URL',
         attr_name: 'reference_url'
-      }])
+      }]
     },
     info_pane_options: {
       mapped_objects: {
@@ -1120,6 +1176,14 @@
       audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
     },
+    defaults: {
+      test_plan_procedure: false,
+      template_object_type: "Control",
+      default_people: {
+        assessors: "Object Owners",
+        verifiers: "Object Owners"
+      }
+    },
 
     /**
      * Initialize the newly created object instance. Essentially just validate
@@ -1127,6 +1191,7 @@
      */
     init: function () {
       this._super.apply(this, arguments);
+      this.validateNonBlank('title');
     }
   }, {
     // the object types that are not relevant to the AssessmentTemplate,
@@ -1154,10 +1219,9 @@
      *
      */
     form_preload: function (isNewObject) {
-      if (isNewObject) {
-        this.attr('default_people', {});
+      if (!this.custom_attribute_definitions) {
+        this.attr('custom_attribute_definitions', new can.List());
       }
-
       this.attr('_objectTypes', this._choosableObjectTypes());
       this._unpackPeopleData();
     },
@@ -1268,6 +1332,7 @@
       });
 
       return objectTypes;
-    }
+    },
+    ignore_ca_errors: true
   });
 })(this.can);
