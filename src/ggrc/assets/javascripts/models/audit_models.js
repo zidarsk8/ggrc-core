@@ -388,7 +388,8 @@
           relatableBinding: 'related_requests',
           weight: 10
         }
-      }
+      },
+      threshold: 5
     },
     is_custom_attributable: true,
     attributes: {
@@ -974,7 +975,8 @@
           relatableBinding: 'related_assessments',
           weight: 10
         }
-      }
+      },
+      threshold: 5
     },
     is_custom_attributable: true,
     attributes: {
