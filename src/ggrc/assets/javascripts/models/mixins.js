@@ -160,10 +160,42 @@
   can.Model.Mixin('relatable', {
   }, {
     related_self: function () {
+      var model = CMS.Models[this.type];
       return this._related(
-        CMS.Models[this.type].relatable_options.relevantTypes);
+        model.relatable_options.relevantTypes,
+        model.relatable_options.threshold
+      );
     },
-    _related: function (relevantTypes) {
+    /**
+     * Return objects of single type above threshold that are
+     * mapped to specified mapped objects.
+     *
+     * @param {Object} relevantTypes - object with specified first degree
+     *   binding (objectBinding), second degree binding (relatableBinding) and
+     *   weights that individual second degree bindings are carrying.
+     *
+     *   relevantTypes = {
+     *     @ObjectType: {
+     *       objectBinding: @first-degree-mapping,
+     *       relatableBinding: @second-degree-mapping,
+     *       weight: @weight-of-objects
+     *     },
+     *     Audit: {
+     *       objectBinding: 'audits',
+     *       relatableBinding: 'program_requests',
+     *       weight: 5
+     *     },
+     *     Regulation: {
+     *       objectBinding: 'related_regulations',
+     *       relatableBinding: 'related_requests',
+     *       weight: 3
+     *     }, ...
+     *   }
+     * @param {Number} threshold - minimum weight required to render related
+     *   object
+     *
+     */
+    _related: function (relevantTypes, threshold) {
       var that = this;
       var relatable = $.Deferred();
       var connectionsCount = {};
@@ -203,7 +235,11 @@
             });
           });
           relatable.resolve(
-            _.map(_.sortBy(connectionsCount, 'count').reverse(),
+            _.map(_.sortBy(_.filter(connectionsCount, function (item) {
+                if (item.count >= threshold) {
+                  return item;
+                }
+              }), 'count').reverse(),
               function (item) {
                 return item.object;
               }));
