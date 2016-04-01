@@ -252,11 +252,13 @@
               origVal = GGRC.Utils.formatDate(origVal, true);
             }
           }
-          diff.changes.push({
-            fieldName: displayName,
-            origVal: origVal || "—",
-            newVal: value || "—"
-          });
+          if (origVal || value) {
+            diff.changes.push({
+              fieldName: displayName,
+              origVal: origVal || "—",
+              newVal: value || "—"
+            });
+          }
         }
       }.bind(this));
 
