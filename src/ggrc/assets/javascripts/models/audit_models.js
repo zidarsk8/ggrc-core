@@ -1121,8 +1121,8 @@
     root_collection: 'assessment_templates',
     model_singular: 'AssessmentTemplate',
     model_plural: 'AssessmentTemplates',
-    title_singular: 'AssessmentTemplate',
-    title_plural: 'AssessmentTemplates',
+    title_singular: 'Assessment Template',
+    title_plural: 'Assessment Templates',
     table_singular: 'assessment_template',
     table_plural: 'assessment_templates',
 
