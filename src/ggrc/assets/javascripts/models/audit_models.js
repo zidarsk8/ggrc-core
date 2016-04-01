@@ -1140,11 +1140,16 @@
     },
     defaults: {
       test_plan_procedure: false,
-      template_object_type: "Control",
+      template_object_type: 'Control',
       default_people: {
-        assessors: "Object Owners",
-        verifiers: "Object Owners"
-      }
+        assessors: 'Object Owners',
+        verifiers: 'Object Owners'
+      },
+
+      // the custom lists of assessor / verifier IDs if "other" is selected for
+      // the corresponding default_people setting
+      assessorsList: {},
+      verifiersList: {}
     },
 
     /**
@@ -1186,6 +1191,10 @@
       }
       this.attr('_objectTypes', this._choosableObjectTypes());
       this._unpackPeopleData();
+
+      // TODO: tests for this!
+      this._updateDropdownEnabled('assessors');
+      this._updateDropdownEnabled('verifiers');
     },
 
     /**
@@ -1201,40 +1210,78 @@
     },
 
     /**
+     * Event handler when an assessor is picked in an autocomplete form field.
+     * It adds the picked assessor's ID to the assessors list.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    assessorAdded: function (context, $el, ev) {
+      var user = ev.selectedItem;
+      this.assessorsList.attr(user.id, true);
+    },
+
+    /**
+     * Event handler when a verifier is picked in an autocomplete form field.
+     * It adds the picked verifier's ID to the verifiers list.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    verifierAdded: function (context, $el, ev) {
+      var user = ev.selectedItem;
+      this.verifiersList.attr(user.id, true);
+    },
+
+    // TODO: docstring, tests
+    ddAssessorsChanged: function (context, $el, ev) {
+      this._updateDropdownEnabled('assessors');
+      // TODO: clear selected assessors as well? prob. better to preserve them
+    },
+
+    // TODO: docstring, tests
+    ddVerifiersChanged: function (context, $el, ev) {
+      this._updateDropdownEnabled('verifiers');
+      // TODO: clear selected verifiers as well? prob. better to preserve them
+    },
+
+    // TODO: test, docstrings... rename.... verifiers/assessors
+    _updateDropdownEnabled: function (name) {
+      var disable = this.attr('default_people.' + name) !== 'other';
+      this.attr(name + 'DropdownDisable', disable);
+    },
+
+    /**
      * Pack the "default people" form data into a JSON string.
      *
      * @return {String} - the JSON-packed default people data
      */
     _packPeopleData: function () {
       var data = {};
-
       /**
-       * Convert a comma-separated list of people to an Array.
+       * Create a sorted (ascending) list of numbers from the given map's keys.
        *
-       * The list elements have any redundant whitespace trimmed from the
-       * beginning and the end. Empty elements are discared from the result,
-       * as are any duplicates.
-       *
-       * @param {String} rawString - the string to convert
-       * @return {Array} - the JSON-packed default people data
+       * @param {can.Map} peopleIds - the map to convert
+       * @return {Array} - ordered IDs
        */
-      function makeList(rawString) {
-        var result = rawString.split(',');
-        result = _.map(result, function (item) {
-          return item.trim();
+      function makeList(peopleIds) {
+        var result = Object.keys(peopleIds.attr()).map(Number);
+        return result.sort(function (x, y) {
+          return x - y;
         });
-        return _.uniq(_.filter(result));
       }
 
       data.assessors = this.attr('default_people.assessors');
       data.verifiers = this.attr('default_people.verifiers');
 
       if (data.assessors === 'other') {
-        data.assessors = makeList(this.attr('assessors_list'));
+        data.assessors = makeList(this.attr('assessorsList'));
       }
 
       if (data.verifiers === 'other') {
-        data.verifiers = makeList(this.attr('verifiers_list'));
+        data.verifiers = makeList(this.attr('verifiersList'));
       }
 
       return JSON.stringify(data);
@@ -1250,9 +1297,18 @@
       var peopleData = instance.default_people;
 
       ['assessors', 'verifiers'].forEach(function (name) {
-        if (peopleData[name] instanceof can.List) {
-          instance.attr(name + '_list', peopleData[name].join(', '));
+        var idsMap;
+        var peopleIds = peopleData[name];
+
+        if (peopleIds instanceof can.List) {
+          idsMap = new can.Map();
+          peopleIds.forEach(function (id) {
+            idsMap.attr(id, true);
+          });
+          instance.attr(name + 'List', idsMap);
           instance.attr('default_people.' + name, 'other');
+        } else {
+          instance.attr(name + 'List', {});
         }
       });
     },
