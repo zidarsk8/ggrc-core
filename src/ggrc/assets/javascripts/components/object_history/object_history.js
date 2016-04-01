@@ -331,6 +331,8 @@
       }
       if (_.exists(previous, 'content.attrs.AssigneeType')) {
         origVal = previous.content.attrs.AssigneeType;
+      } else if (revision.action === 'deleted') {
+        origVal = 'Created';
       }
       return {
         madeBy: revision.modified_by,
