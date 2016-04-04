@@ -68,10 +68,10 @@
               </div>
             </div>
             <div class="span3">
-              <h6>Requested on</h6>
-              {{#if request.requested_on}}
-                {{#using requested_on=request.requested_on}}
-                  {{localize_date requested_on}}
+              <h6>Starts on</h6>
+              {{#if request.start_date}}
+                {{#using start_date=request.start_date}}
+                  {{localize_date start_date}}
                 {{/using}}
               {{else}}
                 <span class="empty-message">None</span>
