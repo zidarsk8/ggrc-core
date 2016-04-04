@@ -3,6 +3,8 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+import inspect
+
 from ggrc.models.all_models import *  # noqa
 from ggrc import settings
 from ggrc import db
@@ -98,6 +100,14 @@ def init_all_models(app):
   init_hooks()
 
 
+def init_lazy_mixins():
+  from ggrc.models import all_models
+  for model in all_models.all_models:
+    for mixin in inspect.getmro(model):
+      if hasattr(mixin, '__lazy_init__') and getattr(mixin, '__lazy_init__'):
+        mixin.init(model)
+
+
 def init_session_monitor_cache():
   from sqlalchemy.orm.session import Session
   from sqlalchemy import event
@@ -176,6 +186,7 @@ def init_sanitization_hooks():
 
 def init_app(app):
   init_all_models(app)
+  init_lazy_mixins()
   init_session_monitor_cache()
   init_sanitization_hooks()
 
