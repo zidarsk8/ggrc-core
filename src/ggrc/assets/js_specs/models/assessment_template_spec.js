@@ -326,6 +326,39 @@ describe('can.Model.AssessmentTemplate', function () {
     });
   });
 
+  describe('assessorRemoved() method', function () {
+    var context;
+    var $element;
+    var eventObj;
+
+    beforeEach(function () {
+      context = {};
+      $element = $('<div></div>');
+      eventObj = $.Event();
+    });
+
+    it('removes the new assessor\'s ID from the assessors list', function () {
+      instance.attr('assessorsList', {'7': true, '42': true, '3': true});
+      eventObj.person = {id: 42};
+
+      instance.assessorRemoved(context, $element, eventObj);
+
+      expect(
+        instance.attr('assessorsList').attr()
+      ).toEqual({'7': true, '3': true});
+    });
+
+    it('silently ignores removing non-existing entries', function () {
+      instance.attr('assessorsList', {'7': true});
+      eventObj.person = {id: 50};
+
+      instance.assessorRemoved(context, $element, eventObj);
+      // there should have been no error
+
+      expect(instance.attr('assessorsList').attr()).toEqual({'7': true});
+    });
+  });
+
   describe('verifierAdded() method', function () {
     var context;
     var $element;
@@ -357,5 +390,110 @@ describe('can.Model.AssessmentTemplate', function () {
 
       expect(instance.attr('verifiersList').attr()).toEqual({'7': true});
     });
+  });
+
+  describe('verifierRemoved() method', function () {
+    var context;
+    var $element;
+    var eventObj;
+
+    beforeEach(function () {
+      context = {};
+      $element = $('<div></div>');
+      eventObj = $.Event();
+    });
+
+    it('removes the new verifier\'s ID from the verifiers list', function () {
+      instance.attr('verifiersList', {'7': true, '42': true, '3': true});
+      eventObj.person = {id: 42};
+
+      instance.verifierRemoved(context, $element, eventObj);
+
+      expect(
+        instance.attr('verifiersList').attr()
+      ).toEqual({'7': true, '3': true});
+    });
+
+    it('silently ignores removing non-existing entries', function () {
+      instance.attr('verifiersList', {'7': true});
+      eventObj.person = {id: 50};
+
+      instance.verifierRemoved(context, $element, eventObj);
+      // there should have been no error
+
+      expect(instance.attr('verifiersList').attr()).toEqual({'7': true});
+    });
+  });
+
+  describe('ddAssessorsChanged() method', function () {
+    var context;
+    var $element;
+    var eventObj;
+
+    beforeEach(function () {
+      context = {};
+      $element = $('<div></div>');
+      eventObj = $.Event();
+    });
+
+    it('sets the assessorsListDisable flag if the corresponding ' +
+      'selected option is different from "other"',
+      function () {
+        instance.attr('assessorsListDisable', false);
+        instance.attr('default_people.assessors', 'Object Owners');
+
+        instance.ddAssessorsChanged(context, $element, eventObj);
+
+        expect(instance.attr('assessorsListDisable')).toBe(true);
+      }
+    );
+
+    it('clears the assessorsListDisable flag if the corresponding ' +
+      'selected option is "other"',
+      function () {
+        instance.attr('assessorsListDisable', true);
+        instance.attr('default_people.assessors', 'other');
+
+        instance.ddAssessorsChanged(context, $element, eventObj);
+
+        expect(instance.attr('assessorsListDisable')).toBe(false);
+      }
+    );
+  });
+
+  describe('ddVerifiersChanged() method', function () {
+    var context;
+    var $element;
+    var eventObj;
+
+    beforeEach(function () {
+      context = {};
+      $element = $('<div></div>');
+      eventObj = $.Event();
+    });
+
+    it('sets the verifiersListDisable flag if the corresponding ' +
+      'selected option is different from "other"',
+      function () {
+        instance.attr('verifiersListDisable', false);
+        instance.attr('default_people.verifiers', 'Object Owners');
+
+        instance.ddVerifiersChanged(context, $element, eventObj);
+
+        expect(instance.attr('verifiersListDisable')).toBe(true);
+      }
+    );
+
+    it('clears the verifiersListDisable flag if the corresponding ' +
+      'selected option is "other"',
+      function () {
+        instance.attr('verifiersListDisable', true);
+        instance.attr('default_people.verifiers', 'other');
+
+        instance.ddVerifiersChanged(context, $element, eventObj);
+
+        expect(instance.attr('verifiersListDisable')).toBe(false);
+      }
+    );
   });
 });

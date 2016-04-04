@@ -1192,7 +1192,6 @@
       this.attr('_objectTypes', this._choosableObjectTypes());
       this._unpackPeopleData();
 
-      // TODO: tests for this!
       this._updateDropdownEnabled('assessors');
       this._updateDropdownEnabled('verifiers');
     },
@@ -1223,6 +1222,19 @@
     },
 
     /**
+     * Event handler when a user clicks to remove an assessor from the
+     * assessors list. It removes the corresponding assessor ID from the list.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    assessorRemoved: function (context, $el, ev) {
+      var user = ev.person;
+      this.assessorsList.removeAttr(String(user.id));
+    },
+
+    /**
      * Event handler when a verifier is picked in an autocomplete form field.
      * It adds the picked verifier's ID to the verifiers list.
      *
@@ -1235,22 +1247,51 @@
       this.verifiersList.attr(user.id, true);
     },
 
-    // TODO: docstring, tests
+    /**
+     * Event handler when a user clicks to remove a verifier from the verifiers
+     * list. It removes the corresponding verifier ID from the list.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    verifierRemoved: function (context, $el, ev) {
+      var user = ev.person;
+      this.verifiersList.removeAttr(String(user.id));
+    },
+
+    /**
+     * Event handler when a user changes the default assessors option.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
     ddAssessorsChanged: function (context, $el, ev) {
       this._updateDropdownEnabled('assessors');
-      // TODO: clear selected assessors as well? prob. better to preserve them
     },
 
-    // TODO: docstring, tests
+    /**
+     * Event handler when a user changes the default verifiers option.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
     ddVerifiersChanged: function (context, $el, ev) {
       this._updateDropdownEnabled('verifiers');
-      // TODO: clear selected verifiers as well? prob. better to preserve them
     },
 
-    // TODO: test, docstrings... rename.... verifiers/assessors
+    /**
+     * Update the autocomplete field's disabled flag based on the current value
+     * of the corresponding dropdown.
+     *
+     * @param {String} name - the value to inspect, must be either "assessors"
+     *   or "verifiers"
+     */
     _updateDropdownEnabled: function (name) {
       var disable = this.attr('default_people.' + name) !== 'other';
-      this.attr(name + 'DropdownDisable', disable);
+      this.attr(name + 'ListDisable', disable);
     },
 
     /**
