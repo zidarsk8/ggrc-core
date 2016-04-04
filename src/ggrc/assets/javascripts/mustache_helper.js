@@ -3198,7 +3198,6 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
         due_on: 1,
         end_date: 1,
         finished_date: 1,
-        requested_on: 1,
         start_date: 1,
         updated_at: 1,
         verified_date: 1

@@ -3,6 +3,8 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
+"""Module for the Assessment class"""
+
 from sqlalchemy.orm import validates
 
 from ggrc import db
@@ -28,6 +30,7 @@ class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
                  Documentable, Personable, Timeboxed, Ownable,
                  Relatable, FinishedDate, VerifiedDate,
                  BusinessObject, db.Model):
+  """The Assessment model"""
   __tablename__ = 'assessments'
 
   NOT_DONE_STATES = {u"Open", u"In Progress"}

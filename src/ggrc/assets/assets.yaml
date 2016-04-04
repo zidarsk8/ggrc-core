@@ -353,6 +353,7 @@ dashboard-js-template-files:
   - requests/modal_content.mustache
   - requests/tier2_content.mustache
   - requests/general_info.mustache
+  - requests/dates_list.mustache
   - base_templates/subtree.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache
