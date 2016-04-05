@@ -123,20 +123,20 @@
 
           <div class="span6">
             <label>&nbsp;</label>
-            <autocomplete
-              search-items-type="Person"
-              can-item-selected="instance.assessorAdded"
-              disable="instance.assessorsListDisable"
-              placeholder="Enter text to search for Assessors"></autocomplete>
+            {{#if_equals instance.default_people.assessors 'other'}}
+              <autocomplete
+                search-items-type="Person"
+                can-item-selected="instance.assessorAdded"
+                disable="instance.assessorsListDisable"
+                placeholder="Enter text to search for Assessors"
+              ></autocomplete>
 
-              {{#if_equals instance.default_people.assessors 'other'}}
-                Default assessors:
-                {{#each instance.assessorsList}}
-                  <person
-                    person-id="{{@key}}"
-                    can-person-remove="instance.assessorRemoved"></person>
-                {{/each}}
-              {{/if}}
+              {{#each instance.assessorsList}}
+                <person
+                  person-id="{{@key}}"
+                  can-person-remove="instance.assessorRemoved"></person>
+              {{/each}}
+            {{/if}}
           </div>
         </div>
 
@@ -162,20 +162,21 @@
 
           <div class="span6">
             <label>&nbsp;</label>
-            <autocomplete
-              search-items-type="Person"
-              can-item-selected="instance.verifierAdded"
-              disable="instance.verifiersListDisable"
-              placeholder="Enter text to search for Verifiers"></autocomplete>
 
-              {{#if_equals instance.default_people.verifiers 'other'}}
-                Default verifiers:
-                {{#each instance.verifiersList}}
-                  <person
-                    person-id="{{@key}}"
-                    can-person-remove="instance.verifierRemoved"></person>
-                {{/each}}
-              {{/if}}
+            {{#if_equals instance.default_people.verifiers 'other'}}
+              <autocomplete
+                search-items-type="Person"
+                can-item-selected="instance.verifierAdded"
+                disable="instance.verifiersListDisable"
+                placeholder="Enter text to search for Verifiers"
+              ></autocomplete>
+
+              {{#each instance.verifiersList}}
+                <person
+                  person-id="{{@key}}"
+                  can-person-remove="instance.verifierRemoved"></person>
+              {{/each}}
+            {{/if}}
           </div>
         </div>
       </div>
