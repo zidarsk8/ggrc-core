@@ -359,6 +359,18 @@ can.Control("GGRC.Controllers.Modals", {
     if (!this.options.model) {
       return;
     }
+    // if data was populated in callback, use that data from the instance
+    // except if we are editing an instance and some fields are already populated
+    if (el.attr('data-populated-in-callback') !== undefined && value === '') {
+      if (instance[name] !== undefined) {
+        if (typeof instance[name] === 'object' && instance[name] !== null) {
+          this.set_value({name: name, value: instance[name].id});
+        } else {
+          this.set_value({name: name, value: instance[name]});
+        }
+        return;
+      }
+    }
     if (cb) {
       cb = cb.split(' ');
       instance[cb[0]].apply(instance, cb.slice(1).concat([value]));
