@@ -45,7 +45,7 @@ class Assessment(AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
   ASSIGNABLE_EDIT = END_STATES
 
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
-                    default=VALID_STATES[0]), "Assessment")
+                    default=tuple(START_STATE)[0]), "Assessment")
 
   design = deferred(db.Column(db.String), "Assessment")
   operationally = deferred(db.Column(db.String), "Assessment")
