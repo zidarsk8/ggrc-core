@@ -60,7 +60,9 @@ describe('GGRC.Components.personItem', function () {
     it('sets the personObj in scope to the cached Person object ' +
       'if found there',
       function () {
-        var person42 = new can.Map({id: 42, name: 'John'});
+        var person42 = new can.Map({
+          id: 42, name: 'John', email: 'john@doe.com'
+        });
         CMS.Models.Person.cache[42] = person42;
         $(element).attr('person-id', 42);
 
@@ -73,7 +75,9 @@ describe('GGRC.Components.personItem', function () {
     it('sets the personObj in scope to the fetched Person object ' +
       'if not found in cache',
       function () {
-        var person123 = new can.Map({id: 123, name: 'Mike'});
+        var person123 = new can.Map({
+          id: 123, name: 'Mike', email: 'mike@mike.com'
+        });
 
         delete CMS.Models.Person.cache[123];
         $(element).attr('person-id', 123);
@@ -83,6 +87,25 @@ describe('GGRC.Components.personItem', function () {
 
         expect(CMS.Models.Person.findOne).toHaveBeenCalledWith({id: 123});
         expect(componentInst.scope.attr('personObj')).toBe(person123);
+      }
+    );
+
+    it('sets the personObj in scope to the fetched Person object ' +
+      'for partially loaded objects in cache',
+      function () {
+        var person123 = new can.Map({id: 123, name: '', email: ''});
+        var fetchedPerson = new can.Map({
+          id: 123, name: 'John', email: 'john@doe.com'
+        });
+
+        CMS.Models.Person.cache[123] = person123;
+        $(element).attr('person-id', 123);
+
+        init(element, options);
+        dfdFindOne.resolve(fetchedPerson);
+
+        expect(CMS.Models.Person.findOne).toHaveBeenCalledWith({id: 123});
+        expect(componentInst.scope.attr('personObj')).toBe(fetchedPerson);
       }
     );
 

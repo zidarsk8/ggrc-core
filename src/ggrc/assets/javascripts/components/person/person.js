@@ -41,7 +41,10 @@
       var personObj = CMS.Models.Person.cache[personId];
       var scope = this.scope;
 
-      if (personObj) {
+      // For some reason the cache sometimes contains partially loaded objects,
+      // thus we also need to check if "email" (a required field) is present.
+      // If it is, we can be certain that we can use the object from the cache.
+      if (personObj && personObj.attr('email')) {
         scope.attr('personObj', personObj);
         return;
       }
