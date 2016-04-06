@@ -53,7 +53,7 @@
 
     <li>
       {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context=null}}
-        {{#is_allowed_to_map 'Cycle Task' instance}}
+        {{#is_allowed 'update' instance context='for'}}
           <a
             rel="tooltip"
             data-placement="left"
@@ -71,7 +71,7 @@
               "modal_title": "Create New Task"}'>
             <i class="fa fa-calendar-check-o"></i> Create task
           </a>
-        {{/is_allowed_to_map}}
+        {{/is_allowed}}
       {{/is_allowed}}
     </li>
 

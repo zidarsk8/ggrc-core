@@ -11,22 +11,21 @@ Create Date: 2016-04-05 16:15:33.917631
 
 """
 
-# revision identifiers, used by Alembic.
-revision = '38af92d913dc'
-down_revision = '1263c1ab4642'
-
 from alembic import op
-import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
+# revision identifiers, used by Alembic.
+revision = '38af92d913dc'  # pylint: disable=invalid-name
+down_revision = '1263c1ab4642'  # pylint: disable=invalid-name
+
+
 def upgrade():
-    op.alter_column('cycle_task_group_object_tasks', 'task_group_task_id',
-               existing_type=mysql.INTEGER(display_width=11),
-               nullable=True)
+  op.alter_column('cycle_task_group_object_tasks', 'task_group_task_id',
+                  existing_type=mysql.INTEGER(display_width=11),
+                  nullable=True)
+
 
 def downgrade():
-    op.alter_column('cycle_task_group_object_tasks', 'task_group_task_id',
-               existing_type=mysql.INTEGER(display_width=11),
-               nullable=False)
-    # TODO: make a default to something, currently it defaults to 0, app might break
-    # maybe use this 0 as equal to null
+  op.alter_column('cycle_task_group_object_tasks', 'task_group_task_id',
+                  existing_type=mysql.INTEGER(display_width=11),
+                  nullable=False)

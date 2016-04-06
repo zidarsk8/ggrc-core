@@ -49,12 +49,11 @@
       );
       return;
     }
-    console.log("stage 2 triggered");
+
     workflow.refresh_all('cycles').then(function (cycleList) {
       var activeCycleList = _.filter(cycleList, {is_current: true});
       var activeCycle;
 
-      console.log(cycleList);
       if (!activeCycleList.length) {
         $(document.body).trigger(
           "ajax:flash"
@@ -69,8 +68,6 @@
       form.attr('context', {id: workflow.context.id, type: 'Context'});
       form.attr('cycle', {id: activeCycle.id, type: 'Cycle'});
       form.cycle_task_group = activeCycle.cycle_task_groups[0].id;
-
-      console.log(form);
     });
   }
 
@@ -386,7 +383,7 @@
           if (!workflowList.length) {
             $(document.body).trigger(
               "ajax:flash"
-              , {error: "No active workflows found! You need to create and activate at least one"}
+              , {warning: "No workflows named 'Backlog' found! You need to create and activate at least one with this name"}
             );
             return;
           }
@@ -395,7 +392,7 @@
         });
       } else {
         cycle = form.cycle.reify();
-        if (cycle.workflow !== undefined) {
+        if (!_.isUndefined(cycle.workflow)) {
           form.attr('workflow', cycle.workflow.reify());
         }
       }

@@ -50,7 +50,7 @@ for type_ in WORKFLOW_OBJECT_TYPES:
   model.late_init_task_groupable()
 
 
-def get_public_config(current_user):
+def get_public_config(current_user):  # noqa
   """Expose additional permissions-dependent config to client.
   """
   return {}
@@ -74,7 +74,7 @@ def contributed_services():
 
 
 def contributed_object_views():
-  from . import models
+  """Contributed object views"""
   from ggrc.views.registry import object_view
 
   return [
@@ -169,7 +169,7 @@ def update_cycle_dates(cycle):
 
 
 @Resource.model_posted.connect_via(models.Cycle)
-def handle_cycle_post(sender, obj=None, src=None, service=None):
+def handle_cycle_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if src.get('autogenerate', False):
     # When called via a REST POST, use current user.
     current_user = get_current_user()
@@ -224,6 +224,9 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group,
 
 def create_old_style_cycle(cycle, task_group, cycle_task_group, current_user,
                            base_date):
+  """ This function preserves the old style of creating cycles, so each object
+  gets its own task assigned to it.
+  """
   if len(task_group.task_group_objects) == 0:
     for task_group_task in task_group.task_group_tasks:
       cycle_task_group_object_task = _create_cycle_task(
@@ -435,7 +438,7 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
 
 
 @Resource.model_put.connect_via(models.TaskGroupTask)
-def handle_task_group_task_put(sender, obj=None, src=None, service=None):
+def handle_task_group_task_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.contact.history.has_changes():
     ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
 
@@ -451,25 +454,25 @@ def handle_task_group_task_put(sender, obj=None, src=None, service=None):
 
 
 @Resource.model_posted.connect_via(models.TaskGroupTask)
-def handle_task_group_task_post(sender, obj=None, src=None, service=None):
+def handle_task_group_task_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
   update_workflow_state(obj.task_group.workflow)
 
 
 @Resource.model_deleted.connect_via(models.TaskGroupTask)
-def handle_task_group_task_delete(sender, obj=None, src=None, service=None):
+def handle_task_group_task_delete(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   db.session.flush()
   update_workflow_state(obj.task_group.workflow)
 
 
 @Resource.model_put.connect_via(models.TaskGroup)
-def handle_task_group_put(sender, obj=None, src=None, service=None):
+def handle_task_group_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.contact.history.has_changes():
     ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
 
 
 @Resource.model_posted.connect_via(models.TaskGroup)
-def handle_task_group_post(sender, obj=None, src=None, service=None):
+def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   source_task_group = None
 
   if src.get('clone'):
@@ -493,7 +496,7 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):
 
 
 @Resource.model_deleted.connect_via(models.TaskGroup)
-def handle_task_group_delete(sender, obj=None, src=None, service=None):
+def handle_task_group_delete(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   db.session.flush()
   update_workflow_state(obj.workflow)
 
@@ -509,14 +512,14 @@ def set_internal_object_state(task_group_object, object_state, status):
 
 @Resource.model_deleted.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_delete(sender, obj=None,
-                                               src=None, service=None):
+                                               src=None, service=None):  # noqa pylint: disable=unused-argument
   db.session.flush()
   update_cycle_dates(obj.cycle)
 
 
 @Resource.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
-        sender, obj=None, src=None, service=None):
+        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
 
   if inspect(obj).attrs.contact.history.has_changes():
     ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
@@ -566,16 +569,11 @@ def handle_cycle_task_group_object_task_put(
 
 @Resource.model_posted.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_post(
-        sender, obj=None, src=None, service=None):
-  # TODO: do we just add a person while creating a task if it doesn' exist? Tomaz is handling this from backend
-  ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
+        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
 
+  ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
   update_cycle_dates(obj.cycle)
 
-  # if inspect(obj).attrs.status.history.has_changes():
-  #   # TODO: check why update_cycle_object_parent_state destroys object history
-  #   # when accepting the only task in a cycle. The listener below is a
-  #   # workaround because of that.
   Signals.status_change.send(
       obj.__class__,
       obj=obj,
@@ -583,38 +581,12 @@ def handle_cycle_task_group_object_task_post(
       old_status=None,
   )
   update_cycle_task_parent_state(obj)
-
-  # Doing this regardless of status.history.has_changes() is important in order
-  # to update objects that have been declined. It updates the os_last_updated
-  # date and last_updated_by via the call to set_internal_object_state.
-  # TODO: myb remove this--------------------------------------------------------
-  if obj.object_approval:
-    os_state = None
-    status = None
-    if obj.status == 'Verified':
-      os_state = "Approved"
-      status = "Final"
-    elif obj.status == 'Declined':
-      os_state = "Declined"
-    elif obj.status == 'InProgress':
-      os_state = "UnderReview"
-
-    for tgobj in obj.task_group_task.task_group.objects:
-      old_status = tgobj.status
-      set_internal_object_state(tgobj, os_state, status)
-      Signals.status_change.send(
-          tgobj.__class__,
-          obj=tgobj,
-          new_status=tgobj.status,
-          old_status=old_status
-      )
-      db.session.add(tgobj)
   db.session.flush()
 
 
 @Resource.model_put.connect_via(models.CycleTaskGroup)
 def handle_cycle_task_group_put(
-        sender, obj=None, src=None, service=None):
+        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
     update_cycle_task_parent_state(obj)
     update_cycle_task_child_state(obj)
@@ -676,7 +648,7 @@ def update_workflow_state(workflow):
 
 @Resource.model_put.connect_via(models.Cycle)
 def handle_cycle_put(
-        sender, obj=None, src=None, service=None):
+        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.is_current.history.has_changes():
     update_workflow_state(obj.workflow)
 
@@ -685,13 +657,13 @@ def handle_cycle_put(
 
 @Resource.model_put.connect_via(models.Workflow)
 def handle_workflow_put(
-        sender, obj=None, src=None, service=None):
+        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
   update_workflow_state(obj)
 
 
 @Resource.model_posted.connect_via(models.CycleTaskEntry)
 def handle_cycle_task_entry_post(
-        sender, obj=None, src=None, service=None):
+        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if src['is_declining_review'] == '1':
     task = obj.cycle_task_group_object_task
     task.status = 'Declined'
@@ -703,8 +675,8 @@ def handle_cycle_task_entry_post(
 
 
 @Signals.status_change.connect_via(models.Cycle)
-def handle_cycle_status_change(sender, obj=None, new_status=None,
-                               old_status=None):
+def handle_cycle_status_change(sender, obj=None, new_status=None,  # noqa pylint: disable=unused-argument
+                               old_status=None):  # noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
     if obj.status == 'Verified':
       obj.is_current = False
@@ -713,8 +685,8 @@ def handle_cycle_status_change(sender, obj=None, new_status=None,
 
 
 @Signals.status_change.connect_via(models.CycleTaskGroupObjectTask)
-def handle_cycle_task_status_change(sender, obj=None, new_status=None,
-                                    old_status=None):
+def handle_cycle_task_status_change(sender, obj=None, new_status=None,  # noqa pylint: disable=unused-argument
+                                    old_status=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
     if new_status == 'Verified':
       obj.verified_date = datetime.now()
@@ -743,7 +715,7 @@ def _find_role(role_name):
 
 
 @Resource.model_posted.connect_via(models.WorkflowPerson)
-def handle_workflow_person_post(sender, obj=None, src=None, service=None):
+def handle_workflow_person_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   db.session.flush()
 
   # add a user_roles mapping assigning the user creating the workflow
@@ -759,7 +731,7 @@ def handle_workflow_person_post(sender, obj=None, src=None, service=None):
 
 
 @Resource.model_posted.connect_via(models.Workflow)
-def handle_workflow_post(sender, obj=None, src=None, service=None):
+def handle_workflow_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   source_workflow = None
 
   if src.get('clone'):

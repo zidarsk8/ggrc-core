@@ -6,22 +6,6 @@
 }}
 
 <form action="javascript://">
-  <!--{{#using cycle=instance.cycle}}
-    {{#using workflow=cycle.workflow}}
-      {{#if_equals workflow.status 'Active'}}
-        <div class="row-fluid">
-          <div class="span12">
-              <div class="alert">
-                <button type="button" class="close" data-dismiss="alert">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                <strong>Note:</strong> Any changes made here will affect only this workflow cycle. To change future occurrences, edit task group(s) in "Setup" tab.
-              </div>
-          </div>
-        </div>
-      {{/if_equals}}
-    {{/using}}
-  {{/using}}-->
   <div class="row-fluid">
     <div class="span12">
       <h6>Task Summary <span class="required">*</span></h6>
@@ -55,11 +39,7 @@
     <div class="span4">
       {{#using contact=instance.contact model_singular=model.model_singular}}
         <h6>Assignee <span class="required">*</span></h6>
-        {{#if_cycle_assignee_privileges instance}}
         <input tabindex="3" class="input-block-level" name="contact.email" data-lookup="Person" placeholder="Enter email address" type="text" value="{{firstexist contact.email ''}}" />
-        {{else}}
-          <div>{{firstexist contact.email ''}}</div> <!-- TODO: maybe add something here as well, if the user doesn't have permissions, they can just edit people if adding from anywhere? -->
-        {{/if_cycle_assignee_privileges}}
       {{/using}}
       <br>
       {{#using workflow=instance.workflow}}
@@ -74,7 +54,6 @@
           placeholder="Select a Workflow"
           type="text"
           value="{{workflow.title}}" />
-          <!-- Chcek what happens with creatorrrrrrrrrrrrrrrrr TODO: napis example za data-params nekam -->
       {{/using}}
 
     </div>
