@@ -761,9 +761,20 @@ class CustomAttributable(object):
               src={
                   "type": obj_type,
                   "id": obj_id,
+                  "operation": "UPDATE",
                   "value": new_value,
                   "old": pv
               }, service=cls.__class__.__name__)
+      else:
+        signals.Signals.custom_attribute_changed.send(
+            cls.__class__,
+            obj=cls,
+            src={
+                "type": obj_type,
+                "id": obj_id,
+                "operation": "INSERT",
+                "value": new_value,
+            }, service=cls.__class__.__name__)
 
   _publish_attrs = ['custom_attribute_values']
   _update_attrs = ['custom_attributes']
