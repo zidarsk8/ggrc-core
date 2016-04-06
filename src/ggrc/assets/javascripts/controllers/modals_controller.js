@@ -992,6 +992,7 @@ can.Component.extend({
     instance_attr: "@",
     source_mapping: "@",
     source_mapping_source: "@",
+    default_mappings: [], // expects array of objects
     mapping: "@",
     deferred: "@",
     attributes: {},
@@ -1011,6 +1012,15 @@ can.Component.extend({
         this.scope.attr("instance", this.scope.instance.reify());
       }
 
+      this.scope.default_mappings.forEach(function (default_mapping) {
+        if (default_mapping.id && default_mapping.type) {
+          var model = CMS.Models[default_mapping.type];
+          var object_to_add = model.findInCacheById(default_mapping.id);
+          that.scope.instance.mark_for_addition("related_objects_as_source", object_to_add, {});
+          that.scope.list.push(object_to_add);
+        }
+      });
+
       if (!this.scope.source_mapping) {
         this.scope.attr("source_mapping", this.scope.mapping);
       }
@@ -1022,9 +1032,10 @@ can.Component.extend({
         .get_binding(this.scope.source_mapping)
         .refresh_instances()
         .then(function (list) {
-          this.scope.attr("list", can.map(list, function (binding) {
+          var current_list = this.scope.attr("list");
+          this.scope.attr("list", current_list.concat(can.map(list, function (binding) {
             return binding.instance;
-          }));
+          })));
         }.bind(this));
         //this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
       } else {
