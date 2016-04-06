@@ -3,15 +3,13 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
-import datetime
-
-from sqlalchemy import inspect
 from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models import audit
 from ggrc.models import reflection
-from ggrc.models import relationship
+from ggrc.models.mixins_assignable import Assignable
+from ggrc.models.mixin_autostatuschangable import AutoStatusChangable
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Described
@@ -20,25 +18,31 @@ from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import deferred
-from ggrc.models.mixins_assignable import Assignable
 from ggrc.models.object_document import Documentable
-from ggrc.models.object_document import ObjectDocument
 from ggrc.models.object_person import Personable
-from ggrc.models.relationship import Relatable
-from ggrc.services.common import Resource
+from ggrc.models import relationship
 
 
-class Request(Assignable, Documentable, Personable, CustomAttributable,
-              Relatable, Titled, Slugged, Described,
-              FinishedDate, VerifiedDate, Base, db.Model):
+class Request(AutoStatusChangable, Assignable, Documentable, Personable,
+              CustomAttributable, relationship.Relatable, Titled, Slugged,
+              Described, FinishedDate, VerifiedDate, Base, db.Model):
   __tablename__ = 'requests'
   _title_uniqueness = False
 
   VALID_TYPES = (u'documentation', u'interview')
-  NOT_DONE_STATES = {u'Open', u'In Progress'}
-  DONE_STATES = {u'Finished', u'Verified', u'Final'}
+
+  START_STATE = {u'Open'}
+  PROGRESS_STATE = {u'In Progress'}
+  DONE_STATE = {u'Finished'}
+  END_STATES = {u'Verified', u'Final'}
+
+  NOT_DONE_STATES = START_STATE | PROGRESS_STATE
+  DONE_STATES = DONE_STATE | END_STATES
   VALID_STATES = tuple(NOT_DONE_STATES | DONE_STATES)
   ASSIGNEE_TYPES = (u'Assignee', u'Requester', u'Verifier')
+
+  FIRST_CLASS_EDIT = START_STATE | END_STATES
+  ASSIGNABLE_EDIT = END_STATES
 
   # TODO Remove requestor and requestor_id on database cleanup
   requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))
@@ -78,6 +82,11 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       'title',
       'description'
   ]
+
+  _tracked_attrs = ((set(_publish_attrs) | {'slug'}) -
+                    {'status', 'requested_on', 'due_on'})
+  _tracked_date_attrs = {'requested_on', 'due_on'}
+
   _sanitize_html = [
       'gdrive_upload_path',
       'test',
