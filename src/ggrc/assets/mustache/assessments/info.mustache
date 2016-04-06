@@ -113,6 +113,9 @@
             {{/if_equals}}
             {{{render "/static/mustache/base_templates/comment_list.mustache" instance=. update_count="false"}}}
           </tab-panel>
+          <tab-panel panels="panels" title="Assessment log" instance="instance">
+            <revision-log instance="instance"></revision-log>
+          </tab-panel>
         </tabs>
       </div>
     </div><!-- tier-content end -->
