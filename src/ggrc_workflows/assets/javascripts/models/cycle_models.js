@@ -280,7 +280,7 @@
         {attr_title: 'End Date', attr_name: 'end_date'},
         {attr_title: 'Last Updated', attr_name: 'updated_at'}
       ],
-      display_attr_names: ['title', 'mapped_object', 'workflow'],
+      display_attr_names: ['title', 'assignee', 'start_date'],
       mandatory_attr_name: ['title'],
       draw_children: true,
       child_options: [
