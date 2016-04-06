@@ -425,7 +425,7 @@ describe('can.Model.AssessmentTemplate', function () {
     });
   });
 
-  describe('ddAssessorsChanged() method', function () {
+  describe('defaultAssesorsChanged() method', function () {
     var context;
     var $element;
     var eventObj;
@@ -442,7 +442,7 @@ describe('can.Model.AssessmentTemplate', function () {
         instance.attr('assessorsListDisable', false);
         instance.attr('default_people.assessors', 'Object Owners');
 
-        instance.ddAssessorsChanged(context, $element, eventObj);
+        instance.defaultAssesorsChanged(context, $element, eventObj);
 
         expect(instance.attr('assessorsListDisable')).toBe(true);
       }
@@ -454,14 +454,14 @@ describe('can.Model.AssessmentTemplate', function () {
         instance.attr('assessorsListDisable', true);
         instance.attr('default_people.assessors', 'other');
 
-        instance.ddAssessorsChanged(context, $element, eventObj);
+        instance.defaultAssesorsChanged(context, $element, eventObj);
 
         expect(instance.attr('assessorsListDisable')).toBe(false);
       }
     );
   });
 
-  describe('ddVerifiersChanged() method', function () {
+  describe('defaultVerifiersChanged() method', function () {
     var context;
     var $element;
     var eventObj;
@@ -478,7 +478,7 @@ describe('can.Model.AssessmentTemplate', function () {
         instance.attr('verifiersListDisable', false);
         instance.attr('default_people.verifiers', 'Object Owners');
 
-        instance.ddVerifiersChanged(context, $element, eventObj);
+        instance.defaultVerifiersChanged(context, $element, eventObj);
 
         expect(instance.attr('verifiersListDisable')).toBe(true);
       }
@@ -490,7 +490,7 @@ describe('can.Model.AssessmentTemplate', function () {
         instance.attr('verifiersListDisable', true);
         instance.attr('default_people.verifiers', 'other');
 
-        instance.ddVerifiersChanged(context, $element, eventObj);
+        instance.defaultVerifiersChanged(context, $element, eventObj);
 
         expect(instance.attr('verifiersListDisable')).toBe(false);
       }

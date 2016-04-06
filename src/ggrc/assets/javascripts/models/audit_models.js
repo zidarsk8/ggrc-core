@@ -1267,7 +1267,7 @@
      * @param {jQuery.Element} $el - the source of the event `ev`
      * @param {jQuery.Event} ev - the event that was triggered
      */
-    ddAssessorsChanged: function (context, $el, ev) {
+    defaultAssesorsChanged: function (context, $el, ev) {
       this._updateDropdownEnabled('assessors');
     },
 
@@ -1278,7 +1278,7 @@
      * @param {jQuery.Element} $el - the source of the event `ev`
      * @param {jQuery.Event} ev - the event that was triggered
      */
-    ddVerifiersChanged: function (context, $el, ev) {
+    defaultVerifiersChanged: function (context, $el, ev) {
       this._updateDropdownEnabled('verifiers');
     },
 
