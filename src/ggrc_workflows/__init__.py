@@ -540,7 +540,7 @@ def handle_cycle_task_group_object_task_put(
   # Doing this regardless of status.history.has_changes() is important in order
   # to update objects that have been declined. It updates the os_last_updated
   # date and last_updated_by via the call to set_internal_object_state.
-  if obj.task_group_task.object_approval:
+  if obj.object_approval:
     os_state = None
     status = None
     if obj.status == 'Verified':
@@ -562,6 +562,54 @@ def handle_cycle_task_group_object_task_put(
       )
       db.session.add(tgobj)
     db.session.flush()
+
+
+@Resource.model_posted.connect_via(models.CycleTaskGroupObjectTask)
+def handle_cycle_task_group_object_task_post(
+        sender, obj=None, src=None, service=None):
+  # TODO: do we just add a person while creating a task if it doesn' exist? Tomaz is handling this from backend
+  ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
+
+  update_cycle_dates(obj.cycle)
+
+  # if inspect(obj).attrs.status.history.has_changes():
+  #   # TODO: check why update_cycle_object_parent_state destroys object history
+  #   # when accepting the only task in a cycle. The listener below is a
+  #   # workaround because of that.
+  Signals.status_change.send(
+      obj.__class__,
+      obj=obj,
+      new_status=obj.status,
+      old_status=None,
+  )
+  update_cycle_task_parent_state(obj)
+
+  # Doing this regardless of status.history.has_changes() is important in order
+  # to update objects that have been declined. It updates the os_last_updated
+  # date and last_updated_by via the call to set_internal_object_state.
+  # TODO: myb remove this--------------------------------------------------------
+  if obj.object_approval:
+    os_state = None
+    status = None
+    if obj.status == 'Verified':
+      os_state = "Approved"
+      status = "Final"
+    elif obj.status == 'Declined':
+      os_state = "Declined"
+    elif obj.status == 'InProgress':
+      os_state = "UnderReview"
+
+    for tgobj in obj.task_group_task.task_group.objects:
+      old_status = tgobj.status
+      set_internal_object_state(tgobj, os_state, status)
+      Signals.status_change.send(
+          tgobj.__class__,
+          obj=tgobj,
+          new_status=tgobj.status,
+          old_status=old_status
+      )
+      db.session.add(tgobj)
+  db.session.flush()
 
 
 @Resource.model_put.connect_via(models.CycleTaskGroup)
