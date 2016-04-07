@@ -115,8 +115,7 @@ selenium_tests () {
 
   echo "Running Selenium tests"
   docker exec -i ${PROJECT}_selenium_1 sh -c "
-    python /selenium/src/run_selenium.py --junitxml=/selenium/logs/selenium.xml
-  " && rc=$? || rc=$?
+    python /selenium/bin/run_selenium.py" && rc=$? || rc=$?
 
   mv ./test/selenium/logs/selenium.xml ./test/selenium.xml || true
 
