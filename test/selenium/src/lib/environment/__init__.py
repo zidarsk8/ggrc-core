@@ -7,7 +7,6 @@
 import os
 import logging
 import ConfigParser
-from ast import literal_eval
 
 from lib import constants
 
@@ -25,7 +24,7 @@ def _get_settings(path):
 
 def _set_loggers(settings):
   logging_level = int(settings.get(
-    constants.settings.Section.LOGGING, constants.settings.Values.LEVEL))
+      constants.settings.Section.LOGGING, constants.settings.Values.LEVEL))
   selenium_logger = logging.getLogger(constants.log.SELENIUM_REMOTE_CONNECTION)
   selenium_logger.setLevel(logging_level)
 

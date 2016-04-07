@@ -12,7 +12,6 @@ import pytest    # pylint: disable=import-error
 from lib import base
 from lib import constants
 from lib.page import dashboard
-from lib.page.widget import admin_widget
 
 
 class TestAdminDashboardPage(base.Test):

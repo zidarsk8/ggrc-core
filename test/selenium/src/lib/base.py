@@ -482,5 +482,5 @@ class Widget(AbstractPage):
         constants.regex.URL_WIDGET_INFO, self.url).groups()
     self.object_id = id_
     self.name_from_url = widget_name.split("_")[0] or \
-                         constants.element.WidgetBar.INFO
+        constants.element.WidgetBar.INFO
     self.object_name = object_name
