@@ -3,6 +3,8 @@
 # Created By: urban@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
+import datetime
+
 from sqlalchemy import inspect
 
 from ggrc import db
@@ -18,7 +20,6 @@ class AutoStatusChangable(object):
 
   @staticmethod
   def _date_has_changes(attr):
-    import datetime
     """Date fields are always interpreted as changed because incoming data is
       of type datetime.datetime, while database field has type datetime.date.
       This function normalises this and performs the correct check.
