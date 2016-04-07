@@ -8,6 +8,10 @@
 from lib.constants import objects
 
 
+# size of the header in px
+SIZE_HEADER = 50
+
+
 class LandingPage(object):
   BUTTON_LOGIN = "Login"
   PROGRAM_INFO_TAB = "Program Info"
