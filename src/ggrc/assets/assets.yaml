@@ -123,7 +123,9 @@ dashboard-js-files:
   - components/paginate.js
   - components/tabs.js
   - components/assessment_attributes.js
+  - components/autocomplete/autocomplete.js
   - components/object_history/object_history.js
+  - components/person/person.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -226,7 +228,9 @@ dashboard-js-template-files:
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache
+  - components/autocomplete/autocomplete.mustache
   - components/object_history/object_history.mustache
+  - components/person/person.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache

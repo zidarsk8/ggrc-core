@@ -604,7 +604,7 @@ describe('GGRC.Components.objectHistory', function () {
           madeBy: "User 17",
           updatedAt: new Date('2015-05-17 17:24:01'),
           changes: {
-            origVal: '—',
+            origVal: 'Created',
             newVal: 'Deleted',
             fieldName: 'Mapping to Other: OtherObject'
           }
