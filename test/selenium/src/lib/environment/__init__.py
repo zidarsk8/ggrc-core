@@ -37,9 +37,9 @@ def _get_base_url(settings):
 
 _settings = _get_settings(PROJECT_ROOT_PATH + constants.path.CONFIG)
 APP_URL = _get_base_url(_settings)
-SERVER_WAIT_TIME = _settings.get(
+SERVER_WAIT_TIME = int(_settings.get(
     constants.settings.Section.APP,
-    constants.settings.Values.WAIT_FOR_APP_SERVER)
+    constants.settings.Values.WAIT_FOR_APP_SERVER))
 
 
 # register loggers
