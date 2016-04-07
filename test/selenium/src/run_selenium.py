@@ -59,6 +59,6 @@ if __name__ == "__main__":
       logger,
       PROJECT_ROOT_PATH + constants.path.LOGS_DIR + constants.path.TEST_RUNNER
   )
-  logger.setLevel(environment.LOGGING_LEVEL)
+  logger.setLevel(logging.DEBUG)
 
   sys.exit(pytest.main())
