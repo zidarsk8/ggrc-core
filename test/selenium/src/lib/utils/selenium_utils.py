@@ -6,6 +6,7 @@
 """Utility function for selenium"""
 
 import time
+import logging
 
 # pylint: disable=import-error
 from selenium.webdriver.support import expected_conditions as EC
@@ -16,6 +17,8 @@ from selenium.common import exceptions
 
 from lib import exception
 from lib import constants
+
+logger = logging.getLogger(__name__)
 
 
 def hover_over_element(driver, element):
@@ -139,3 +142,29 @@ def handle_alert(driver, accept=False):
       alert.dismiss()
   except (exceptions.NoAlertPresentException, exceptions.TimeoutException):
     pass
+
+
+def click_on_staleable_element(driver, el_locator):
+  """Gets elements that are modified by JS for some time. When the
+  element is not manipulated any more, we return it."""
+  time_start = time.time()
+
+  while time.time() - time_start < constants.ux.MAX_USER_WAIT_SECONDS:
+    try:
+      driver.find_element(*el_locator).click()
+      break
+    except exceptions.StaleElementReferenceException as e:
+      logger.error(e)
+      time.sleep(0.1)
+  else:
+    raise exception.ElementNotFound(el_locator)
+
+
+def scroll_into_view(driver, element):
+  driver.execute_script("return arguments[0].scrollIntoView();", element)
+
+  # compensate for the header
+  driver.execute_script(
+      "window.scrollBy(0, -{});".format(constants.element.SIZE_HEADER))
+  return element
+
