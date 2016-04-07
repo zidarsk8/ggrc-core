@@ -40,6 +40,11 @@
       verified_date: 1
     }),
 
+    _EMBED_MAPPINGS: Object.freeze({
+      Request: ['Comment', 'Document'],
+      Assessment: ['Comment', 'Document']
+    }),
+
     /**
      * The component's entry point. Invoked when a new component instance has
      * been created.
@@ -117,7 +122,7 @@
         __sort: 'updated_at'
       });
 
-      var dfdResults = can.when(
+      return can.when(
         dfd, dfd2, dfd3
       ).then(function (objRevisions, mappingsSrc, mappingsDest) {
         // manually include people for modified_by since using __include would
@@ -149,27 +154,98 @@
             rq.enqueue(revision.source);
           }
         });
-        return rq.trigger().then(function () {
-          var reify = function (revision) {
-            if (revision.modified_by && revision.modified_by.reify) {
-              revision.attr('modified_by', revision.modified_by.reify());
-            }
-            if (revision.destination && revision.destination.reify) {
-              revision.attr('destination', revision.destination.reify());
-            }
-            if (revision.source && revision.source.reify()) {
-              revision.attr('source', revision.source.reify());
-            }
-            return revision;
-          };
-          return {
-            object: _.map(objRevisions, reify),
-            mappings: _.map(mappingsSrc.concat(mappingsDest), reify)
-          };
+        return this._fetchEmbeddedRevisionData(rq.objects, rq)
+          .then(function (embedded) {
+            return rq.trigger().then(function () {
+              var reify = function (revision) {
+                if (revision.modified_by && revision.modified_by.reify) {
+                  revision.attr('modified_by', revision.modified_by.reify());
+                }
+                if (revision.destination && revision.destination.reify) {
+                  revision.attr('destination', revision.destination.reify());
+                }
+                if (revision.source && revision.source.reify()) {
+                  revision.attr('source', revision.source.reify());
+                }
+                return revision;
+              };
+              var mappings = mappingsSrc.concat(mappingsDest, embedded);
+              return {
+                object: _.map(objRevisions, reify),
+                mappings: _.map(mappings, reify)
+              };
+            });
+          });
+      }.bind(this));
+    },
+
+    /**
+     * Fetch revisions of indirect mappings ('Cross').
+     *
+     * @param {Array} mappedObjects - the list of object instances to fetch
+     *   mappings to (objects mapped to the current instance).
+     *
+     * @param {RefreshQueue} rq - current refresh queue to use for fetching
+     *   full objects.
+     *
+     * @return {Deferred} - A deferred that will resolve into a array of
+     *   revisons of the indirect mappings.
+     */
+    _fetchEmbeddedRevisionData: function (mappedObjects, rq) {
+      var dfds = _.chain(mappedObjects)
+        .filter(function (obj) {
+          return _.contains(this._EMBED_MAPPINGS[this.scope.instance.type],
+                            obj.type);
+        }.bind(this))
+        .map(function (obj) {
+          return [
+            CMS.Models.Revision.findAll({
+              source_type: obj.type,
+              source_id: obj.id,
+              __sort: 'updated_at'
+            }).then(function (revisions) {
+              return _.map(revisions, function (revision) {
+                revision = new can.Map(revision.serialize());
+                revision.attr('updated_at', new Date(revision.updated_at));
+                revision.attr('source_type', this.scope.instance.type);
+                revision.attr('source_id', this.scope.instance.id);
+                revision.attr('source', this.scope.instance);
+                revision.attr('destination', can.Stub.get_or_create({
+                  type: revision.destination_type,
+                  id: revision.destination_id
+                }));
+                rq.enqueue(revision.destination);
+                return revision;
+              }.bind(this));
+            }.bind(this)),
+            CMS.Models.Revision.findAll({
+              destination_type: obj.type,
+              destination_id: obj.id,
+              __sort: 'updated_at'
+            }).then(function (revisions) {
+              return _.map(revisions, function (revision) {
+                revision = new can.Map(revision.serialize());
+                revision.attr('updated_at', new Date(revision.updated_at));
+                revision.attr('destination_type', this.scope.instance.type);
+                revision.attr('destination_id', this.scope.instance.id);
+                revision.attr('destination', this.scope.instance);
+                revision.attr('source', can.Stub.get_or_create({
+                  type: revision.source_type,
+                  id: revision.source_id
+                }));
+                rq.enqueue(revision.source);
+                return revision;
+              }.bind(this));
+            }.bind(this))
+          ];
+        }.bind(this))
+        .flatten()
+        .value();
+      return $.when.apply($, dfds).then(function () {
+        return _.filter(_.flatten(arguments), function (revision) {
+          return revision.source.href !== revision.destination.href;
         });
       });
-
-      return dfdResults;
     },
 
     /**
@@ -255,8 +331,8 @@
           if (origVal || value) {
             diff.changes.push({
               fieldName: displayName,
-              origVal: origVal || "—",
-              newVal: value || "—"
+              origVal: origVal || '—',
+              newVal: value || '—'
             });
           }
         }
