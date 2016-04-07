@@ -33,6 +33,24 @@ class ObjectDocument(Timeboxed, Mapping, db.Model):
         else None
     return setattr(self, self.documentable_attr, value)
 
+
+  # properties to integrate into revision indexing
+  @property
+  def source_type(self):
+    return "Document"
+
+  @property
+  def source_id(self):
+    return self.document_id
+
+  @property
+  def destination_type(self):
+    return self.documentable_type
+
+  @property
+  def destination_id(self):
+    return self.documentable_id
+
   @staticmethod
   def _extra_table_args(cls):
     return (
