@@ -27,9 +27,9 @@ class TestMyWorkPage(base.Test):
   @pytest.mark.smoke_tests
   def test_horizontal_nav_bar_tabs(self, selenium, battery_of_controls):
     """Tests that several objects in a widget can be deleted sequentially"""
-    selenium.driver.get(dashboard.Dashboard.URL)
+    selenium.get(dashboard.Dashboard.URL)
     controls_widget = dashboard\
-        .Dashboard(selenium.driver)\
+        .Dashboard(selenium)\
         .select_controls()
 
     try:
@@ -43,7 +43,7 @@ class TestMyWorkPage(base.Test):
     except exception.RedirectTimeout:
       # we expect this exception since the url will stay the same for the last
       # deleted member in object list in a widget
-      assert generic_widget.Controls(selenium.driver).members_listed == []
+      assert generic_widget.Controls(selenium).members_listed == []
     else:
       assert False
 
@@ -51,36 +51,36 @@ class TestMyWorkPage(base.Test):
   def test_redirect(self, selenium):
     """Tests if the user is redirected to the My Work page after clicking on
     the my work button in user dropdown"""
-    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
+    conftest_utils.navigate_to_page_with_lhn(selenium)
 
-    dashboard.Header(selenium.driver)\
+    dashboard.Header(selenium)\
         .open_user_list()\
         .select_my_work()
 
-    assert selenium.driver.current_url == dashboard.Dashboard.URL
+    assert selenium.current_url == dashboard.Dashboard.URL
 
   @pytest.mark.smoke_tests
   def test_lhn_stays_expanded(self, selenium):
     """Tests if, after opening the LHN, it slides out and stays expanded."""
-    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
+    conftest_utils.navigate_to_page_with_lhn(selenium)
 
-    lhn_menu = dashboard.Header(selenium.driver).open_lhn_menu()
+    lhn_menu = dashboard.Header(selenium).open_lhn_menu()
     initial_position = lhn_menu.my_objects.element.location
 
     selenium_utils.wait_until_stops_moving(lhn_menu.my_objects.element)
     selenium_utils.hover_over_element(
-        selenium.driver,
-        dashboard.Header(selenium.driver).button_my_tasks.element)
+        selenium,
+        dashboard.Header(selenium).button_my_tasks.element)
 
     assert initial_position == \
-        lhn.Menu(selenium.driver).my_objects.element.location
+        lhn.Menu(selenium).my_objects.element.location
 
   @pytest.mark.smoke_tests
   def test_lhn_remembers_tab_state(self, selenium):
     """Tests if LHN remembers which tab is selected (my or all objects) after
     closing it"""
-    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
-    header = dashboard.Header(selenium.driver)
+    conftest_utils.navigate_to_page_with_lhn(selenium)
+    header = dashboard.Header(selenium)
 
     # check if my objects tab saves state
     lhn_menu = header.open_lhn_menu()
@@ -103,8 +103,8 @@ class TestMyWorkPage(base.Test):
   @pytest.mark.smoke_tests
   def test_lhn_pin(self, selenium):
     """Tests if the pin is present and if it's default state is off"""
-    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
-    lhn_menu = dashboard.Header(selenium.driver).open_lhn_menu()
+    conftest_utils.navigate_to_page_with_lhn(selenium)
+    lhn_menu = dashboard.Header(selenium).open_lhn_menu()
     assert lhn_menu.pin.is_activated is False
 
   @pytest.mark.smoke_tests
@@ -112,8 +112,8 @@ class TestMyWorkPage(base.Test):
     """Tests the user menu checkbox. With that also the user menu itself is
     tested since the model initializes all elements (and throws and
     exception if they're not present."""
-    conftest_utils.navigate_to_page_with_lhn(selenium.driver)
-    user_list = dashboard.Header(selenium.driver).open_user_list()
+    conftest_utils.navigate_to_page_with_lhn(selenium)
+    user_list = dashboard.Header(selenium).open_user_list()
 
     user_list.checkbox_daily_digest.click()
     user_list.checkbox_daily_digest.element.get_attribute("disabled")
