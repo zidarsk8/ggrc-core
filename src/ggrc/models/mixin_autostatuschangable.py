@@ -35,9 +35,15 @@ class AutoStatusChangable(object):
   def _has_changes(cls, obj, attr):
     attr = getattr(inspect(obj).attrs, attr)
     if (isinstance(attr.value, datetime.date) or
-        isinstance(attr.value, datetime.datetime)):
+       isinstance(attr.value, datetime.datetime)):
       return cls._date_has_changes(attr)
     return attr.history.has_changes()
+
+  @classmethod
+  def _get_object_from_relationship(cls, model, rel):
+    if rel.source.type == model.__name__:
+      return rel.source
+    return rel.destination
 
   @classmethod
   def init(cls, model):
@@ -49,8 +55,15 @@ class AutoStatusChangable(object):
     db.session.add(obj)
 
   @classmethod
-  def handle_first_class_edit(cls, model, obj):
+  def handle_first_class_edit(cls, model, obj, rel=None):
     if obj.status in model.FIRST_CLASS_EDIT:
+      cls.adjust_status(model, obj)
+
+  @classmethod
+  def handle_person_edit(cls, model, obj, rel):
+    history = inspect(rel).attrs.relationship_attrs.history
+    if (history.has_changes() and
+       obj.status in model.ASSIGNABLE_EDIT):
       cls.adjust_status(model, obj)
 
   @classmethod
@@ -58,7 +71,7 @@ class AutoStatusChangable(object):
     @common.Resource.model_put.connect_via(model)
     def handle_object_put(sender, obj=None, src=None, service=None):
       if (any(cls._has_changes(obj, attr) for attr in model._tracked_attrs) and
-          model.FIRST_CLASS_EDIT):
+         model.FIRST_CLASS_EDIT):
         cls.handle_first_class_edit(model, obj)
 
     @signals.Signals.custom_attribute_changed.connect_via(model)
@@ -68,22 +81,17 @@ class AutoStatusChangable(object):
     @common.Resource.model_posted.connect_via(relationship.Relationship)
     @common.Resource.model_put.connect_via(relationship.Relationship)
     def handle_relationship_post(sender, obj=None, src=None, service=None):
-      if model.__name__ in (obj.source.type, obj.destination.type):
-        if obj.source.type == model.__name__:
-          target_object = obj.source
-        else:
-          target_object = obj.destination
+      endpoints = {obj.source.type, obj.destination.type}
+      if model.__name__ in endpoints:
+        target_object = cls._get_object_from_relationship(model, obj)
 
-        if "Document" in {obj.source.type, obj.destination.type}:
-          # This captures the "Add URL" event
-          cls.handle_first_class_edit(model, target_object)
-
-        if "Person" in {obj.source.type, obj.destination.type}:
-          # This captures assignable addition
-          history = inspect(obj).attrs.relationship_attrs.history
-          if (history.has_changes() and
-             target_object.status in model.ASSIGNABLE_EDIT):
-            cls.adjust_status(model, target_object)
+        handlers = {
+            "Document": cls.handle_first_class_edit,
+            "Person": cls.handle_person_edit
+        }
+        for k in handlers.keys():
+          if k in endpoints:
+            handlers[k](model, target_object, obj)
 
     @common.Resource.model_posted.connect_via(
         object_document.ObjectDocument)
