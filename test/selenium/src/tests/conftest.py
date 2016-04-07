@@ -13,8 +13,8 @@ from lib.constants.test import batch
 from lib.utils import conftest_utils
 from lib.utils import test_utils
 
-pytest_plugins = "pep8", "flake8", "pylint", "selenium", "xdist", "xvfb", \
-                 "timeout", "flask", "rerunfailures", "timeout"
+pytest_plugins = "selenium", "xdist", "xvfb", "timeout", "flask", \
+                 "rerunfailures", "timeout"
 
 
 @pytest.yield_fixture(scope="session")
