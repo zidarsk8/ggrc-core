@@ -32,6 +32,14 @@ class AutoStatusChangable(object):
     return added != deleted
 
   @classmethod
+  def _has_changes(cls, obj, attr):
+    attr = getattr(inspect(obj).attrs, attr)
+    if (isinstance(attr.value, datetime.date) or
+        isinstance(attr.value, datetime.datetime)):
+      return cls._date_has_changes(attr)
+    return attr.history.has_changes()
+
+  @classmethod
   def init(cls, model):
     AutoStatusChangable.set_handlers(model)
 
@@ -49,17 +57,8 @@ class AutoStatusChangable(object):
   def set_handlers(cls, model):
     @common.Resource.model_put.connect_via(model)
     def handle_object_put(sender, obj=None, src=None, service=None):
-      has_changes = False
-
-      if any(getattr(inspect(obj).attrs, attr).history.has_changes()
-             for attr in model._tracked_attrs):
-        has_changes = True
-
-      if any(cls._date_has_changes(getattr(inspect(obj).attrs, attr))
-             for attr in model._tracked_date_attrs):
-        has_changes = True
-
-      if has_changes and obj.status in model.FIRST_CLASS_EDIT:
+      if (any(cls._has_changes(obj, attr) for attr in model._tracked_attrs) and
+          model.FIRST_CLASS_EDIT):
         cls.handle_first_class_edit(model, obj)
 
     @signals.Signals.custom_attribute_changed.connect_via(model)
