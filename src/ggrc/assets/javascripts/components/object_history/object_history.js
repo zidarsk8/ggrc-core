@@ -252,11 +252,13 @@
               origVal = GGRC.Utils.formatDate(origVal, true);
             }
           }
-          diff.changes.push({
-            fieldName: displayName,
-            origVal: origVal || "—",
-            newVal: value || "—"
-          });
+          if (origVal || value) {
+            diff.changes.push({
+              fieldName: displayName,
+              origVal: origVal || "—",
+              newVal: value || "—"
+            });
+          }
         }
       }.bind(this));
 
@@ -331,6 +333,8 @@
       }
       if (_.exists(previous, 'content.attrs.AssigneeType')) {
         origVal = previous.content.attrs.AssigneeType;
+      } else if (revision.action === 'deleted') {
+        origVal = 'Created';
       }
       return {
         madeBy: revision.modified_by,

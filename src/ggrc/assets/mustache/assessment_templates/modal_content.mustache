@@ -110,6 +110,7 @@
 
             <select
               can-value="instance.default_people.assessors"
+              can-change="instance.defaultAssesorsChanged"
               class="input-block-level js-toggle-field">
               <option value="Object Owners">Object Owners</option>
               <option value="Audit Lead">Audit Lead</option>
@@ -122,10 +123,20 @@
 
           <div class="span6">
             <label>&nbsp;</label>
-            <input type="text"
-              can-value="instance.assessors_list"
-              class="input-block-level choose-input choose-assessor"
-              placeholder="Add person 1, Add person 2...">
+            {{#if_equals instance.default_people.assessors 'other'}}
+              <autocomplete
+                search-items-type="Person"
+                can-item-selected="instance.assessorAdded"
+                disable="instance.assessorsListDisable"
+                placeholder="Enter text to search for Assessors"
+              ></autocomplete>
+
+              {{#each instance.assessorsList}}
+                <person
+                  person-id="{{@key}}"
+                  can-person-remove="instance.assessorRemoved"></person>
+              {{/each}}
+            {{/if}}
           </div>
         </div>
 
@@ -138,6 +149,7 @@
 
             <select
               can-value="instance.default_people.verifiers"
+              can-change="instance.defaultVerifiersChanged"
               class="input-block-level js-toggle-field">
               <option value="Object Owners">Object Owners</option>
               <option value="Audit Lead">Audit Lead</option>
@@ -150,10 +162,21 @@
 
           <div class="span6">
             <label>&nbsp;</label>
-            <input type="text"
-              can-value="instance.verifiers_list"
-              class="input-block-level choose-input choose-verifier"
-              placeholder="Add person 1, Add person 2...">
+
+            {{#if_equals instance.default_people.verifiers 'other'}}
+              <autocomplete
+                search-items-type="Person"
+                can-item-selected="instance.verifierAdded"
+                disable="instance.verifiersListDisable"
+                placeholder="Enter text to search for Verifiers"
+              ></autocomplete>
+
+              {{#each instance.verifiersList}}
+                <person
+                  person-id="{{@key}}"
+                  can-person-remove="instance.verifierRemoved"></person>
+              {{/each}}
+            {{/if}}
           </div>
         </div>
       </div>
@@ -193,8 +216,8 @@
               </div>
               <div class="new-attr-list">
                 <ul>
-                  <add-template-filed fields="fields">
-                  </add-template-filed>
+                  <add-template-field fields="fields">
+                  </add-template-field>
                   {{#fields}}
                     <template-filed field="." fields="fields"></template-filed>
                   {{/fields}}
