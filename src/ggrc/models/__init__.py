@@ -104,7 +104,7 @@ def init_lazy_mixins():
   from ggrc.models import all_models
   for model in all_models.all_models:
     for mixin in inspect.getmro(model):
-      if hasattr(mixin, '__lazy_init__') and getattr(mixin, '__lazy_init__'):
+      if getattr(mixin, '__lazy_init__', False):
         mixin.init(model)
 
 
