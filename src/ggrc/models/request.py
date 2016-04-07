@@ -84,8 +84,7 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
   ]
 
   _tracked_attrs = ((set(_publish_attrs) | {'slug'}) -
-                    {'status', 'requested_on', 'due_on'})
-  _tracked_date_attrs = {'requested_on', 'due_on'}
+                    {'status'})
 
   _sanitize_html = [
       'gdrive_upload_path',

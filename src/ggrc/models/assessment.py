@@ -79,8 +79,9 @@ class Assessment(AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
       'test_plan',
       'title',
       'url',
+      'start_date',
+      'end_date'
   }
-  _tracked_date_attrs = {'start_date', 'end_date'}
 
   _aliases = {
       "audit": {
