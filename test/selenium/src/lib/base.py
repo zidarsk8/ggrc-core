@@ -9,11 +9,9 @@ import re
 from selenium.webdriver.common import keys    # pylint: disable=import-error
 from selenium import webdriver    # pylint: disable=import-error
 
-from lib import environment
 from lib import constants
 from lib import exception
 from lib import meta
-from lib import mixin
 from lib.utils import selenium_utils
 
 
