@@ -709,10 +709,8 @@ class CustomAttributable(object):
     for v in attr_values:
       old_values[v.custom_attribute_id] += [(v.created_at, v.attribute_value)]
 
-    for key, ovs in old_values.items():
-      last_values[str(key)] = sorted(ovs,
-                                     key=lambda val: val[0],
-                                     reverse=True)[0]
+    last_values = {str(key): max(ovs, key=lambda (ca, pv): ca)
+                   for key, ovs in old_values.items()}
 
     # 2) Delete all fulltext_record_properties for the list of values
     if len(attr_value_ids) > 0:
