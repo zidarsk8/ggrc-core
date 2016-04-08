@@ -29,7 +29,7 @@ class TestProgramPage(base.Test):
     """Checks if the count updates in LHN after creating a new program
     object."""
     _, program_info_page = new_program
-    lhn_menu = dashboard.Header(selenium.driver) \
+    lhn_menu = dashboard.Header(selenium) \
         .open_lhn_menu() \
         .select_my_objects()
 
@@ -60,7 +60,7 @@ class TestProgramPage(base.Test):
     """
     _, program_info_page = new_program
     program_info_page.navigate_to()
-    horizontal_bar = widget_bar.Dashboard(selenium.driver)
+    horizontal_bar = widget_bar.Dashboard(selenium)
 
     assert horizontal_bar.get_active_widget_name() == \
         element.LandingPage.PROGRAM_INFO_TAB
@@ -93,16 +93,16 @@ class TestProgramPage(base.Test):
   def test_permalink(self, selenium, new_program):
     """Verify the url is copied to clipboard"""
     _, program_info = new_program
-    selenium.driver.get(program_info.url)
+    selenium.get(program_info.url)
 
-    program_info_page = info_widget.Programs(selenium.driver)
+    program_info_page = info_widget.Programs(selenium)
     program_info_page \
         .press_object_settings() \
         .select_get_permalink()
 
     # test notification alert
     base.AnimatedComponent(
-        selenium.driver,
+        selenium,
         [locator.WidgetInfoProgram.ALERT_LINK_COPIED],
         wait_until_visible=True
     )
@@ -119,9 +119,9 @@ class TestProgramPage(base.Test):
   def test_edit_modal(self, selenium, new_program):
     """Tests if data is saved after editing the program info page edit modal"""
     _, program_info = new_program
-    selenium.driver.get(program_info.url)
+    selenium.get(program_info.url)
 
-    program_info_page = info_widget.Programs(selenium.driver)
+    program_info_page = info_widget.Programs(selenium)
     modal = program_info_page \
         .press_object_settings() \
         .select_edit()
@@ -129,7 +129,7 @@ class TestProgramPage(base.Test):
     test_utils.ModalNewPrograms.set_start_end_dates(modal, 1, -2)
     modal.save_and_close()
 
-    updated_program_info_page = info_widget.Programs(selenium.driver)
+    updated_program_info_page = info_widget.Programs(selenium)
     assert test_utils.HtmlParser.parse_text(modal.ui_title.text) == \
         updated_program_info_page.title_entered.text
     assert modal.ui_description.text == \
@@ -149,18 +149,18 @@ class TestProgramPage(base.Test):
     """Tests if widget number increases when mapping via LHN"""
 
     # check that the widget isn't opened yet since it doesn't have any members
-    assert selenium.driver.find_element(
+    assert selenium.find_element(
         *locator.WidgetBar.CONTROLS).is_displayed() is False
 
     # map to obj
-    dashboard.Header(selenium.driver)\
+    dashboard.Header(selenium)\
         .open_lhn_menu()\
         .select_my_objects()\
         .select_controls_or_objectives()\
         .select_controls()\
         .hover_over_visible_member(new_control.title_entered.text)\
         .map_to_object()
-    control_widget_count = widget_bar.Programs(selenium.driver)\
+    control_widget_count = widget_bar.Programs(selenium)\
         .select_controls()\
         .member_count
     assert control_widget_count == 1

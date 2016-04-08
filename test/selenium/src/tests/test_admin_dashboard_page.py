@@ -12,7 +12,6 @@ import pytest    # pylint: disable=import-error
 from lib import base
 from lib import constants
 from lib.page import dashboard
-from lib.page.widget import admin_widget
 
 
 class TestAdminDashboardPage(base.Test):
@@ -22,9 +21,9 @@ class TestAdminDashboardPage(base.Test):
   @pytest.mark.smoke_tests
   def test_roles_widget(self, selenium):
     """Confirms labels are present"""
-    selenium.driver.get(dashboard.AdminDashboard.URL)
+    selenium.get(dashboard.AdminDashboard.URL)
     admin_roles_widget = dashboard\
-        .AdminDashboard(selenium.driver)\
+        .AdminDashboard(selenium)\
         .select_roles()
 
     assert admin_roles_widget.role_editor.text == self._element.EDITOR
@@ -58,7 +57,9 @@ class TestAdminDashboardPage(base.Test):
   @pytest.mark.smoke_tests
   def test_custom_attributes(self, selenium, custom_program_attribute):
     """Test general functions of custom attributes for the program object"""
-
-    admin_widget.DropdownPrograms(selenium.driver)\
+    selenium.get(dashboard.AdminDashboard.URL)
+    dashboard.AdminDashboard(selenium) \
+        .select_custom_attributes()\
+        .select_programs()\
         .edit_nth_member(0)\
         .save_and_close()
