@@ -129,7 +129,7 @@
         type: 'Text',
         text: 'Type description'
       }, {
-        type: 'Person',
+        type: 'Map:Person',
         text: ''  // not used
       }],
 
