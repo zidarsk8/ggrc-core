@@ -25,8 +25,8 @@ import pytest   # pylint: disable=import-error
 PROJECT_ROOT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/../"
 sys.path.append(PROJECT_ROOT_PATH + "src")
 
-from lib import file_ops
-from lib import environment
+from lib import file_ops  # NOQA
+from lib import environment  # NOQA
 
 
 def wait_for_server():
