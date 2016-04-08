@@ -36,6 +36,41 @@
     };
   }
 
+  function populateFromWorkflow(form, workflow) {
+    if (!workflow || typeof workflow === 'string') {
+      // We need to invalidate the form, so we remove workflow if it's not set
+      form.removeAttr('workflow');
+      return;
+    }
+    if (typeof workflow.cycles === undefined || !workflow.cycles) {
+      $(document.body).trigger(
+        "ajax:flash"
+        , {warning: "No cycles in the workflow!"}
+      );
+      return;
+    }
+
+    workflow.refresh_all('cycles').then(function (cycleList) {
+      var activeCycleList = _.filter(cycleList, {is_current: true});
+      var activeCycle;
+
+      if (!activeCycleList.length) {
+        $(document.body).trigger(
+          "ajax:flash"
+          , {warning: "No active cycles in the workflow!"}
+        );
+        return;
+      }
+      activeCycleList = _.sortByOrder(
+        activeCycleList, ['start_date'], ['desc']);
+      activeCycle = activeCycleList[0];
+      form.attr('workflow', {id: workflow.id, type: 'Workflow'});
+      form.attr('context', {id: workflow.context.id, type: 'Context'});
+      form.attr('cycle', {id: activeCycle.id, type: 'Cycle'});
+      form.cycle_task_group = activeCycle.cycle_task_groups[0].id;
+    });
+  }
+
   _mustache_path = GGRC.mustache_path + "/cycles";
   can.Model.Cacheable("CMS.Models.Cycle", {
     root_object: "cycle",
@@ -247,7 +282,6 @@
     update: "PUT /api/cycle_task_group_object_tasks/{id}",
     destroy: "DELETE /api/cycle_task_group_object_tasks/{id}",
     title_singular: "Cycle Task",
-
     attributes: {
       cycle_task_group: "CMS.Models.CycleTaskGroup.stub",
       task_group_task: "CMS.Models.TaskGroupTask.stub",
@@ -296,12 +330,12 @@
         }
       ]
     },
-
     init: function() {
       var that = this;
       this._super.apply(this, arguments);
       this.validateNonBlank("title");
       this.validateNonBlank("contact");
+      this.validateNonBlank("workflow");
       this.validateContact(["_transient.contact", "contact"]);
 
       this.validate(['start_date', 'end_date'], function (newVal, prop) {
@@ -320,10 +354,48 @@
     }
   }, {
     overdue: overdue_compute,
-    workflow: function () {
+    _workflow: function () {
       return this.refresh_all('cycle', 'workflow').then(function (workflow) {
         return workflow;
       });
+    },
+    set_properties_from_workflow: function (workflow) {
+      // The form sometimes returns plaintext instead of object, return in that case
+      if (typeof workflow === 'string') {
+        return;
+      }
+      populateFromWorkflow(this, workflow);
+    },
+    form_preload: function (newObjectForm) {
+      var form = this;
+      var workflows;
+      var _workflow;
+      var cycle;
+
+      if (newObjectForm) {
+        if (!form.contact) {
+          form.attr("contact", {id: GGRC.current_user.id, type: "Person"});
+        }
+
+        workflows = CMS.Models.Workflow.findAll({
+          __search: 'Backlog', status: 'Active'}); // TODO: INSTEAD OF hardcode BACKLOG USE A SETTING
+        workflows.then(function (workflowList) {
+          if (!workflowList.length) {
+            $(document.body).trigger(
+              "ajax:flash"
+              , {warning: "No workflows named 'Backlog' found! You need to create and activate at least one with this name"}
+            );
+            return;
+          }
+          _workflow = workflowList[0];
+          populateFromWorkflow(form, _workflow);
+        });
+      } else {
+        cycle = form.cycle.reify();
+        if (!_.isUndefined(cycle.workflow)) {
+          form.attr('workflow', cycle.workflow.reify());
+        }
+      }
     },
     object: function () {
       return this.refresh_all('task_group_object', 'object').then(function (object) {

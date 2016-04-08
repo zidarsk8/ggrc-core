@@ -45,7 +45,7 @@ class CycleTaskGroupObjectTask(
   cycle_task_group_id = db.Column(
       db.Integer, db.ForeignKey('cycle_task_groups.id'), nullable=False)
   task_group_task_id = db.Column(
-      db.Integer, db.ForeignKey('task_group_tasks.id'), nullable=False)
+      db.Integer, db.ForeignKey('task_group_tasks.id'), nullable=True)
   task_group_task = db.relationship(
       "TaskGroupTask",
       foreign_keys="CycleTaskGroupObjectTask.task_group_task_id"
@@ -71,7 +71,7 @@ class CycleTaskGroupObjectTask(
     """Changing task state must invalidate `workflow_state` on objects
     """
     return [(object_.__class__.__name__, object_.id) for object_ in
-            self.related_objects]
+            self.related_objects]  # noqa
 
   _publish_attrs = [
       'cycle',
@@ -125,8 +125,10 @@ class CycleTaskGroupObjectTask(
 
   @computed_property
   def related_objects(self):
-    sources = [r.source for r in self.related_sources]
-    destinations = [r.destination for r in self.related_destinations]
+    """Lists all the objects related to this cycle task.
+    """
+    sources = [r.source for r in self.related_sources]  # noqa
+    destinations = [r.destination for r in self.related_destinations]  # noqa
     return sources + destinations
 
   @classmethod
@@ -180,7 +182,7 @@ class CycleTaskGroupObjectTask(
     )
 
 
-class CycleTaskable(object):
+class CycleTaskable(object):  # noqa
   """ Requires the Relatable mixin, otherwise cycle_task_group_object_tasks
   fails to fetch related objects
   """
