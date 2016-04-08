@@ -145,8 +145,8 @@ def handle_alert(driver, accept=False):
 
 
 def click_on_staleable_element(driver, el_locator):
-  """Gets elements that are modified by JS for some time. When the
-  element is not manipulated any more, we return it."""
+  """Clicks an element that can be modified between the time we find it
+  and when we click on it."""
   time_start = time.time()
 
   while time.time() - time_start < constants.ux.MAX_USER_WAIT_SECONDS:
