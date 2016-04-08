@@ -101,6 +101,13 @@ def init_all_models(app):
 
 
 def init_lazy_mixins():
+  """Lazy mixins initialisation
+
+  Mixins with `__lazy__init__` property set to True will wait with their
+  initialisation until after the models have been fully initialised. This is
+  useful in cases where we need full model class, e.g. to hook up signaling
+  logic.
+  """
   from ggrc.models import all_models
   for model in all_models.all_models:
     for mixin in inspect.getmro(model):

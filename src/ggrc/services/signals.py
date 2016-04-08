@@ -3,11 +3,19 @@
 # Created By: urban@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
+"""Module for general purpose signaling"""
+
 
 from blinker import Namespace
 
 
 class Signals(object):
+  """Class storing various general purpose signals
+
+  Class storing various general purposse non-RESTful signals
+  (see ggrc.services.common.Resource for those).
+  """
+  # pylint: disable=too-few-public-methods
   signals = Namespace()
 
   custom_attribute_changed = signals.signal(

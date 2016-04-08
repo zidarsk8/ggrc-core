@@ -3,6 +3,10 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
+"""A module for Request object"""
+
+# pylint: disable=fixme
+
 from sqlalchemy import orm
 
 from ggrc import db
@@ -26,6 +30,13 @@ from ggrc.models import relationship
 class Request(AutoStatusChangable, Assignable, Documentable, Personable,
               CustomAttributable, relationship.Relatable, Titled, Slugged,
               Described, FinishedDate, VerifiedDate, Base, db.Model):
+  """Class representing Requests.
+
+  Request is an object representing a request from a Requester to Assignee
+  to provide feedback, evidence or attachment in the form of comments,
+  documents or URLs that (if specified) Verifier has to approve of
+  before Request is considered finished.
+  """
   __tablename__ = 'requests'
   _title_uniqueness = False
 
@@ -129,6 +140,7 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
   }
 
   def _display_name(self):
+    # pylint: disable=unsubscriptable-object
     if len(self.title) > 32:
       display_string = self.description[:32] + u'...'
     elif self.title:

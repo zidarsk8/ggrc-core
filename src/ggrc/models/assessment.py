@@ -3,6 +3,8 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
+"""Module for Assessment object"""
+
 from sqlalchemy.orm import validates
 
 from ggrc import db
@@ -29,6 +31,13 @@ class Assessment(AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, Documentable, Personable, Timeboxed,
                  Ownable, Relatable, FinishedDate, VerifiedDate,
                  BusinessObject, db.Model):
+  """Class representing Assessment.
+
+  Assessment is an object representing an individual assessment performed on
+  a specific object during an audit to ascertain whether or not
+  certain conditions were met for that object.
+  """
+
   __tablename__ = 'assessments'
 
   START_STATE = {u'Open'}
@@ -115,10 +124,12 @@ class Assessment(AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
 
   @validates("operationally")
   def validate_opperationally(self, key, value):
+    # pylint: disable=unused-argument
     return self.validate_conclusion(value)
 
   @validates("design")
   def validate_design(self, key, value):
+    # pylint: disable=unused-argument
     return self.validate_conclusion(value)
 
   @classmethod
