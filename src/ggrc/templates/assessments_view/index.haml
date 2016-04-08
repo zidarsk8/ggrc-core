@@ -1,0 +1,25 @@
+-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-# Created By: peter@reciprocitylabs.com
+-# Maintained By: peter@reciprocitylabs.com
+
+-extends 'layouts/base.haml'
+
+-block extra_javascript
+  GGRC.permissions = ={ permissions_json()|safe };
+  GGRC.current_user = ={ current_user_json()|safe };
+  GGRC.config = ={ config_json()|safe };
+  GGRC.custom_attr_defs =  ={ attributes_json()|safe }
+  GGRC.model_attr_defs =  ={ all_attributes_json()|safe }
+
+  // TODO: should probably be something else?
+  GGRC.page_object = { "person": ={ current_user_json()|safe } };
+
+-block page_help scoped
+  dashboard
+
+-block title
+  My Assessments
+
+-block body
+  TODO: put some content in here

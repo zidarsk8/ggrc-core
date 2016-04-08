@@ -242,6 +242,13 @@ def admin():
   return render_template("admin/index.haml")
 
 
+@app.route("/assessments_view")
+@login_required
+def assessments_view():
+  """The clutter-free list of all Person's Assessments"""
+  return render_template("assessments_view/index.haml")
+
+
 @app.route("/background_task/<id_task>", methods=['GET'])
 def get_task_response(id_task):
   """Gets the status of a background task"""

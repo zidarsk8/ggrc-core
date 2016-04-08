@@ -159,8 +159,8 @@
   };
 
   object_browser = /^\/objectBrowser\/?$/.test(location);
-  if (/^\/\w+\/\d+($|\?|\#)/.test(location) || /^\/dashboard/.test(location)
-      || object_browser) {
+  if (/^\/\w+\/\d+($|\?|\#)/.test(location) || /^\/dashboard/.test(location) ||
+      /^\/assessments_view/.test(location) || object_browser) {
     instance = GGRC.page_instance();
     model_name = instance.constructor.shortName;
     init_widgets();
