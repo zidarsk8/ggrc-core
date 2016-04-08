@@ -150,12 +150,12 @@ class AutoStatusChangable(object):
       Nothing.
     """
     @common.Resource.model_put.connect_via(model)
-    def handle_object_put(sender, obj=None):
+    def handle_object_put(sender, obj=None, src=None, service=None):
       """Handles object PUT operation
 
       Handles PUT operation submitted to object.
 
-      See blinker library documentation for other parameters.
+      See blinker library documentation for other parameters (all necessary).
 
       Args:
         obj: Object on which we will perform manipulation.
@@ -168,13 +168,13 @@ class AutoStatusChangable(object):
         cls.handle_first_class_edit(model, obj)
 
     @signals.Signals.custom_attribute_changed.connect_via(model)
-    def handle_custom_attribute_save(sender, obj=None):
+    def handle_custom_attribute_save(sender, obj=None, src=None, service=None):
       """Handles custom attribute save operation
 
       Handles INSERT or UPDATE(ish, because custom attributes are hackish)
       operations performed on custom attributes.
 
-      See blinker library documentation for other parameters.
+      See blinker library documentation for other parameters (all necessary).
 
       Args:
         obj: Object on which we will perform manipulation.
@@ -185,7 +185,7 @@ class AutoStatusChangable(object):
 
     @common.Resource.model_posted.connect_via(relationship.Relationship)
     @common.Resource.model_put.connect_via(relationship.Relationship)
-    def handle_relationship_post(sender, obj=None):
+    def handle_relationship_post(sender, obj=None, src=None, service=None):
       """Handle creation of relationships that can change object status.
 
       Adding or removing assigable persons (Assignees, Requesters, Creators,
@@ -193,7 +193,7 @@ class AutoStatusChangable(object):
 
       Adding evidence moves object back to to PROGRESS_STATE.
 
-      See blinker library documentation for other parameters.
+      See blinker library documentation for other parameters (all necessary).
 
       Args:
         obj: Object on which we will perform manipulation.
@@ -216,12 +216,12 @@ class AutoStatusChangable(object):
 
     @common.Resource.model_posted.connect_via(
         object_document.ObjectDocument)
-    def handle_objectdocument_post(sender, obj=None):
+    def handle_objectdocument_post(sender, obj=None, src=None, service=None):
       """Handles creation of URLs
 
       Adding URLs moves object back to PROGRESS_STATE.
 
-      See blinker library documentation for other parameters.
+      See blinker library documentation for other parameters (all necessary).
 
       Args:
         obj: Object on which we will perform manipulation.
