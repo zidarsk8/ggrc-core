@@ -396,7 +396,10 @@ describe('GGRC.Components.objectHistory', function () {
             id: 123,
             type: 'ObjectFoo'
           }
-        })
+        }),
+        _fetchEmbeddedRevisionData: function () {
+          return new can.Deferred().resolve([]);
+        }
       };
 
       method = Component.prototype._fetchRevisionsData.bind(componentInst);
