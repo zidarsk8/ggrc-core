@@ -40,6 +40,11 @@
       verified_date: 1
     }),
 
+    _EMBED_MAPPINGS: Object.freeze({
+      Request: ['Comment', 'Document'],
+      Assessment: ['Comment', 'Document']
+    }),
+
     /**
      * The component's entry point. Invoked when a new component instance has
      * been created.
@@ -95,42 +100,25 @@
      *      mappings
      */
     _fetchRevisionsData: function () {
-      var Revision = CMS.Models.Revision;
+      var findAll = function (attr) {
+        var query = {__sort: 'updated_at'};
+        query[attr + '_type'] = this.scope.instance.type;
+        query[attr + '_id'] = this.scope.instance.id;
+        return CMS.Models.Revision.findAll(query);
+      }.bind(this);
 
-      var instance = this.scope.instance;
-
-      var dfd = Revision.findAll({
-        resource_type: this._INSTANCE_TYPE,
-        resource_id: instance.id,
-        __sort: 'updated_at'
-      });
-
-      var dfd2 = Revision.findAll({
-        source_type: this._INSTANCE_TYPE,
-        source_id: instance.id,
-        __sort: 'updated_at'
-      });
-
-      var dfd3 = Revision.findAll({
-        destination_type: this._INSTANCE_TYPE,
-        destination_id: instance.id,
-        __sort: 'updated_at'
-      });
-
-      var dfdResults = can.when(
-        dfd, dfd2, dfd3
+      return can.when(
+        findAll('resource'), findAll('source'), findAll('destination')
       ).then(function (objRevisions, mappingsSrc, mappingsDest) {
         // manually include people for modified_by since using __include would
         // result in a lot of duplication
         var rq = new RefreshQueue();
-        var enqueue = function (revision) {
-          if (revision.modified_by) {
-            rq.enqueue(revision.modified_by);
-          }
-        };
-        _.each(objRevisions, enqueue);
-        _.each(mappingsSrc, enqueue);
-        _.each(mappingsDest, enqueue);
+        _.each(objRevisions.concat(mappingsSrc, mappingsDest),
+            function (revision) {
+              if (revision.modified_by) {
+                rq.enqueue(revision.modified_by);
+              }
+            });
         _.each(mappingsSrc, function (revision) {
           if (revision.destination_type && revision.destination_id) {
             revision.destination = can.Stub.get_or_create({
@@ -149,27 +137,102 @@
             rq.enqueue(revision.source);
           }
         });
-        return rq.trigger().then(function () {
-          var reify = function (revision) {
-            if (revision.modified_by && revision.modified_by.reify) {
-              revision.attr('modified_by', revision.modified_by.reify());
-            }
-            if (revision.destination && revision.destination.reify) {
-              revision.attr('destination', revision.destination.reify());
-            }
-            if (revision.source && revision.source.reify()) {
-              revision.attr('source', revision.source.reify());
-            }
-            return revision;
-          };
-          return {
-            object: _.map(objRevisions, reify),
-            mappings: _.map(mappingsSrc.concat(mappingsDest), reify)
-          };
+        return this._fetchEmbeddedRevisionData(rq.objects, rq)
+          .then(function (embedded) {
+            return rq.trigger().then(function () {
+              var reify = function (revision) {
+                _.each(['modified_by', 'source', 'destination'],
+                    function (field) {
+                      if (revision[field] && revision[field].reify) {
+                        revision.attr(field, revision[field].reify());
+                      }
+                    });
+                return revision;
+              };
+              var mappings = mappingsSrc.concat(mappingsDest, embedded);
+              return {
+                object: _.map(objRevisions, reify),
+                mappings: _.map(mappings, reify)
+              };
+            });
+          });
+      }.bind(this));
+    },
+
+    /**
+     * Fetch revisions of indirect mappings ('Cross').
+     *
+     * @param {Array} mappedObjects - the list of object instances to fetch
+     *   mappings to (objects mapped to the current instance).
+     *
+     * @param {RefreshQueue} rq - current refresh queue to use for fetching
+     *   full objects.
+     *
+     * @return {Deferred} - A deferred that will resolve into a array of
+     *   revisons of the indirect mappings.
+     */
+    _fetchEmbeddedRevisionData: function (mappedObjects, rq) {
+      var filterElegible = function (obj) {
+        return _.contains(this._EMBED_MAPPINGS[this.scope.instance.type],
+                          obj.type);
+      }.bind(this);
+      var fetchRevisions = function (obj) {
+        return [
+          CMS.Models.Revision.findAll({
+            source_type: obj.type,
+            source_id: obj.id,
+            __sort: 'updated_at'
+          }).then(function (revisions) {
+            return _.map(revisions, function (revision) {
+              revision = new can.Map(revision.serialize());
+              revision.attr({
+                updated_at: new Date(revision.updated_at),
+                source_type: this.scope.instance.type,
+                source_id: this.scope.instance.id,
+                source: this.scope.instance,
+                destination: can.Stub.get_or_create({
+                  type: revision.destination_type,
+                  id: revision.destination_id
+                })
+              });
+              rq.enqueue(revision.destination);
+              return revision;
+            }.bind(this));
+          }.bind(this)),
+          CMS.Models.Revision.findAll({
+            destination_type: obj.type,
+            destination_id: obj.id,
+            __sort: 'updated_at'
+          }).then(function (revisions) {
+            return _.map(revisions, function (revision) {
+              revision = new can.Map(revision.serialize());
+              revision.attr({
+                updated_at: new Date(revision.updated_at),
+                destination_type: this.scope.instance.type,
+                destination_id: this.scope.instance.id,
+                destination: this.scope.instance,
+                source: can.Stub.get_or_create({
+                  type: revision.source_type,
+                  id: revision.source_id
+                })
+              });
+              rq.enqueue(revision.source);
+              return revision;
+            }.bind(this));
+          }.bind(this))
+        ];
+      }.bind(this);
+      var dfds = _.chain(mappedObjects).filter(filterElegible)
+                                       .map(fetchRevisions)
+                                       .flatten()
+                                       .value();
+      return $.when.apply($, dfds).then(function () {
+        return _.filter(_.flatten(arguments), function (revision) {
+          // revisions where source == desitnation will be introduced when
+          // spoofing the obj <-> instance mapping
+          return revision.source.href !== revision.destination.href;
         });
       });
-
-      return dfdResults;
     },
 
     /**
@@ -255,8 +318,8 @@
           if (origVal || value) {
             diff.changes.push({
               fieldName: displayName,
-              origVal: origVal || "—",
-              newVal: value || "—"
+              origVal: origVal || '—',
+              newVal: value || '—'
             });
           }
         }

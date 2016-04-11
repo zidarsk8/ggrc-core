@@ -3,9 +3,11 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-DEFAULT_FORMAT = "%(asctime)s:" \
-                 "%(name)s:" \
-                 "%(levelname)s:" \
-                 "%(module)s:%(lineno)s:" \
-                 "%(message)s"
+FORMAT = """%(asctime)s
+         :%(name)s:
+         %(levelname)s
+         :%(module)s
+         :%(funcName)
+         :%(lineno)s
+         :%(message)s"""
 SELENIUM_REMOTE_CONNECTION = "selenium.webdriver.remote.remote_connection"

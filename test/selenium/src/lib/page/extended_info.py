@@ -10,34 +10,32 @@ from selenium.common import exceptions
 
 from lib import base
 from lib.constants import locator
+from lib.utils import selenium_utils
 
 
 class ExtendedInfo(base.Component):
   """Model representing an extended info box that allows the object to be
   mapped"""
-  _locator = locator.ExtendedInfo
+  locator_cls = locator.ExtendedInfo
 
   def __init__(self, driver):
     super(ExtendedInfo, self).__init__(driver)
+    self.is_mapped = None
     self.button_map = None
+    self.title = base.Label(driver, self.locator_cls.TITLE)
 
-  def _reload_contents(self):
-    self.button_map = base.Button(
-        self._driver, self._locator.BUTTON_MAP_TO)
+    self._set_is_mapped()
 
   def map_to_object(self):
-    try:
-      self.button_map = base.Button(
-          self._driver, self._locator.BUTTON_MAP_TO)
-      self.button_map.click()
-    except exceptions.StaleElementReferenceException:
-      self._reload_contents()
-      return self.map_to_object()
+    selenium_utils.click_on_staleable_element(
+        self._driver,
+        self.locator_cls.BUTTON_MAP_TO)
+    self.is_mapped = True
 
-  def is_already_mapped(self):
+  def _set_is_mapped(self):
     """Checks if the object is already mapped"""
     try:
-      self._driver.find_element(*self._locator.ALREADY_MAPPED)
-      return True
+      self._driver.find_element(*self.locator_cls.ALREADY_MAPPED)
+      self.is_mapped = True
     except exceptions.NoSuchElementException:
-      return False
+      self.is_mapped = False

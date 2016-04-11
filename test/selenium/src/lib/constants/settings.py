@@ -3,14 +3,16 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-LOGGING = "logging"
-FORMAT = "format"
-LEVEL = "level"
-WEBDRIVER = "webdriver"
-PATH = "path"
-APP = "app"
-WAIT_TIME = "wait_time"
-URL = "url"
-BROWSER = "browser"
-DISPLAY = "display"
-RESOLUTION = "resolution"
+
+class Section(object):
+  APP = "webapp"
+  LOGGING = "logging"
+  PYTEST = "pytest"
+
+
+class Values(object):
+  WAIT_FOR_APP_SERVER = "wait_for_app_server"
+  BASE_URL = "base_url"
+  PORT = "port"
+  LEVEL = "level"
+  FORMAT = "format"

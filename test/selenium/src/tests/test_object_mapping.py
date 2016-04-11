@@ -30,41 +30,38 @@ class TestObjectMapping(base.Test):
                new_process, new_issue]
 
     for object_ in objects:
-      selenium.driver.get(object_.url)
-      header = dashboard.Header(selenium.driver)
+      selenium.get(object_.url)
+      header = dashboard.Header(selenium)
 
       # map objects
       for mapped_object in objects:
         # don't map an object to itself
         if mapped_object != object_:
           extended_info = conftest_utils\
-              .get_lhn_accordion(selenium.driver, mapped_object.object_name)\
+              .get_lhn_accordion(selenium, mapped_object.object_name)\
               .hover_over_visible_member(mapped_object.title_entered.text)
 
-          if not extended_info.is_already_mapped():
+          if not extended_info.is_mapped:
             extended_info.map_to_object()
 
             # workaround for CORE-3324
             selenium_utils.hover_over_element(
-                selenium.driver, header.toggle_user_dropdown.element)
+                selenium, header.toggle_user_dropdown.element)
 
             # close LHN so that the contents are seen
             header.close_lhn_menu()
 
             widget = factory.get_cls_widget(mapped_object.object_name)(
-                selenium.driver)
+                selenium)
 
-            # check that the focus is on relevant widget. Note that the label
-            # on the tab is e.g. "data assets" but the object_name (i.e. the
-            # object name we get from the url) is "data_assets"
-            assert widget.name_from_tab.lower() == \
-                mapped_object.object_name.replace("_", " ")
+            # check that the focus is on relevant widget
+            assert widget.name_from_url in mapped_object.object_name
 
             # check items count
             assert widget.member_count == 1
 
       # check that all mapped widgets are shown
-      widget_bar = dashboard.Dashboard(selenium.driver)
+      widget_bar = dashboard.Dashboard(selenium)
 
       for mapped_object in objects:
         if mapped_object != object_:
@@ -74,6 +71,5 @@ class TestObjectMapping(base.Test):
 
           # verify widget
           widget = factory.get_cls_widget(mapped_object.object_name)(
-              selenium.driver)
-          assert widget.name_from_tab.lower() == \
-              mapped_object.object_name.replace("_", " ")
+              selenium)
+          assert widget.name_from_url in mapped_object.object_name

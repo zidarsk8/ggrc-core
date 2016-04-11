@@ -25,8 +25,6 @@ class Widget(base.Widget):
   def __init__(self, driver):
     # wait for the elements to load
     self.member_count = None
-    self.name_from_url = None
-    self.name_from_tab = None
     self.label_filter = base.Label(driver, self._locator_filter.TITLE)
     self.button_filter_question = base.Button(
         driver, self._locator_filter.BUTTON_HELP)
@@ -39,19 +37,27 @@ class Widget(base.Widget):
     super(Widget, self).__init__(driver)
     self._set_members_listed()
 
-  def _parse_widget_label(self):
+  def _set_member_count(self):
     """Parses the widget name and number of items from the widget tab title"""
     widget_label = selenium_utils.get_when_visible(
         self._driver, self._locator_widget).text
 
-    self.name_from_tab, item_count = re.match(
-        regex.WIDGET_TITLE_AND_COUNT, widget_label).groups(2)
+    # The widget label has 2 forms: "widget_name_plural (number_of_items)"
+    # and "number_of_items" and they change depending on how many widgets
+    # are open. In order to handle both forms, we first try to parse the
+    # first form and only then the second one.
+    parsed_label = re.match(
+        regex.WIDGET_TITLE_AND_COUNT, widget_label)
+
+    item_count = widget_label \
+        if parsed_label is None \
+        else parsed_label.group(2)
     self.member_count = int(item_count)
 
   def _set_members_listed(self):
     """Waits for the listed members to be loaded and adds them to a local
     container"""
-    self._parse_widget_label()
+    self._set_member_count()
 
     if self.member_count:
       # wait until the elements are loaded

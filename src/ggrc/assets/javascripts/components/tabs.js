@@ -5,7 +5,7 @@
     Maintained By: ivan@reciprocitylabs.com
 */
 
-(function (can, $) {
+(function (GGRC, can, $) {
   can.Component.extend({
     tag: 'tabs',
     template: can.view(GGRC.mustache_path + '/base_objects/tabs.mustache'),
@@ -54,7 +54,7 @@
     }
   });
 
-  can.Component.extend({
+  GGRC.Components("tabPanel", {
     tag: 'tab-panel',
     template: can.view(GGRC.mustache_path + '/base_objects/tab_panel.mustache'),
     scope: {
@@ -91,7 +91,12 @@
         var index;
         var panel;
 
-        item.split('.');
+        item = item.split('.');
+        if (item.length !== 3 || item[1] !== "panel" || item[2] !== "active") {
+          // if this is a change to a scope in a different panel we should
+          // not switch tabs
+          return;
+        }
         index = Number(item[0]);
         panel = list[index].panel;
         if (status && this.scope !== panel) {
@@ -100,4 +105,4 @@
       }
     }
   });
-})(window.can, window.can.$);
+})(window.GGRC, window.can, window.can.$);
