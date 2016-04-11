@@ -22,4 +22,69 @@
   My Assessments
 
 -block body
-  TODO: put some content in here
+  -# TODO: this <header> needed?
+  %header.header.main
+
+  .area{ 'class': '={ model_display_class }' }
+    .header-content
+      %h2.logo-wrap{ 'class': '={ logo_wrap_class }' }
+        %a{ 'class': 'to-my-work', 'href': '/dashboard' }
+          -set logo_url = config.get("COMPANY_LOGO")
+          -if logo_url
+            %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
+
+      -# TODO: something injects menu into the header black, we need
+      -# to remove it
+      #page-header
+        -block header
+
+    -# TODO: remove this and make sure thereis no script error
+    -# to remove it
+    -block nav
+      .top-inner-nav
+        .object-nav
+          %ul.nav{ 'class': "internav" }
+
+    %section.content
+      .flash
+        -with messages = get_flashed_messages(with_categories=True)
+          -if messages
+            -for category, message in messages
+              %div{ 'class': "{{category}}" }
+                %a.close{'href': "#", 'data-dismiss': "alert" }
+                  x
+                %p
+                  {{message}}
+        -#FIXME: Flash messages
+        -#flash.each do |type, value|
+          -value = [value] unless value.is_a?(Array)
+          -value = value.map(:presence).compact
+          -if value.size > 0
+            %div{ 'class': type }
+              %a.close{'href': "#{}", :'data-dismiss': "alert"}
+                &times;
+              -value.each do |message|
+                %p=message
+      -block main
+        .clearfix
+          //.objnav.bar-v
+          //.inner-nav
+            .object-nav
+              %ul.nav{ 'class': "internav ={ model_display_class }" }
+          .object-area
+            #show_columns.column-set{ 'data-resize': "true" }
+              #middle_column
+                .row-fluid
+                  .span12.full-width
+                    .inner-content.widget-area
+                      -block widget_area
+          .pin-content
+
+    %section.footer
+      .row-fluid
+        .span12
+          %p
+            =config.get('COPYRIGHT')
+            =config.get('COMPANY')
+            Version
+            =config.get('VERSION')

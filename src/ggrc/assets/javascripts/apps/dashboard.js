@@ -138,6 +138,8 @@
       location = window.location.pathname,
       instance, model_name, extra_page_options, defaults, object_browser;
 
+  var isAssessmentsView = /^\/assessments_view/.test(location);
+
   extra_page_options = {
       Program: {
           header_view: GGRC.mustache_path + "/base_objects/page_header.mustache"
@@ -160,11 +162,19 @@
 
   object_browser = /^\/objectBrowser\/?$/.test(location);
   if (/^\/\w+\/\d+($|\?|\#)/.test(location) || /^\/dashboard/.test(location) ||
-      /^\/assessments_view/.test(location) || object_browser) {
+      isAssessmentsView || object_browser) {
     instance = GGRC.page_instance();
     model_name = instance.constructor.shortName;
     init_widgets();
-    defaults = Object.keys(GGRC.WidgetList.get_widget_list_for(model_name));
+
+    var widgetList = GGRC.WidgetList.get_widget_list_for(model_name);
+
+    // the assessments_view only needs the Assessments widget
+    if (isAssessmentsView) {
+      widgetList = {assessment: widgetList.assessment};
+    }
+
+    defaults = Object.keys(widgetList);
 
     //Remove info and task tabs from object-browser list of tabs
     if (object_browser) {
@@ -173,8 +183,7 @@
     }
 
     $area.cms_controllers_page_object($.extend({
-      //model_descriptors: model_descriptors,
-      widget_descriptors: GGRC.WidgetList.get_widget_list_for(model_name)
+      widget_descriptors: widgetList
       , default_widgets: defaults || GGRC.default_widgets || []
       , instance: GGRC.page_instance()
       , header_view: GGRC.mustache_path + "/base_objects/page_header.mustache"
