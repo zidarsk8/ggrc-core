@@ -123,11 +123,11 @@
             {{/if_equals}}
             {{{render "/static/mustache/base_templates/comment_list.mustache" instance=instance update_count="false"}}}
           </tab-panel>
-          <tab-panel panels="panels" title="Related Assessments" instance="instance">
-            {{{render "/static/mustache/assessments/reusable_objects.mustache" instance=instance}}}
-          </tab-panel>
           <tab-panel panels="panels" title="Assessment Log" instance="instance">
             <revision-log instance="instance"></revision-log>
+          </tab-panel>
+          <tab-panel panels="panels" title="Related Assessments" instance="instance">
+            {{{render "/static/mustache/assessments/reusable_objects.mustache" instance=instance}}}
           </tab-panel>
         </tabs>
       </div>
