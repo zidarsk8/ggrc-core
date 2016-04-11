@@ -3,18 +3,18 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-import inspect
-
 from ggrc.models.all_models import *  # noqa
 from ggrc import settings
 from ggrc import db
 
 """All gGRC model objects and associated utilities."""
 
+
 def create_db_with_create_all():
   import ggrc.models.all_models  # noqa
 
   db.create_all()
+
 
 def create_db_with_migrations(quiet=False):
   from ggrc.migrate import upgradeall
@@ -27,6 +27,7 @@ def create_db_with_migrations(quiet=False):
   if quiet:
     logging.disable(logging.NOTSET)
 
+
 def drop_db_with_drop_all():
   import ggrc.models.all_models  # noqa
 
@@ -34,6 +35,7 @@ def drop_db_with_drop_all():
     db.engine.execute('SET FOREIGN_KEY_CHECKS = 0')
 
   db.drop_all()
+
 
 def drop_db_with_migrations(quiet=False):
   from ggrc.migrate import downgradeall
@@ -49,6 +51,7 @@ def drop_db_with_migrations(quiet=False):
     logging.disable(logging.NOTSET)
   if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
     db.engine.execute('SET FOREIGN_KEY_CHECKS = 1')
+
 
 def create_db(use_migrations=False, quiet=False):
   if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
@@ -94,18 +97,19 @@ def init_all_models(app):
       ext_init_models(app)
   init_hooks()
 
+
 def init_session_monitor_cache():
   from sqlalchemy.orm.session import Session
   from sqlalchemy import event
   from ggrc.services.common import get_cache
 
   def update_cache_before_flush(session, flush_context, objects):
-    cache = get_cache(create = True)
+    cache = get_cache(create=True)
     if cache:
       cache.update_before_flush(session, flush_context)
 
   def update_cache_after_flush(session, flush_context):
-    cache = get_cache(create = False)
+    cache = get_cache(create=False)
     if cache:
       cache.update_after_flush(session, flush_context)
 
