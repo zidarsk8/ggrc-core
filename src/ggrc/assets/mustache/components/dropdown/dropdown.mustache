@@ -5,8 +5,12 @@
   Maintained By: ivan@reciprocitylabs.com
 }}
 
-<select class="input-block-level" can-value="{{name}}" name="{{name}}">
-  {{#list}}
+<select
+  class="{{getClassName}}"
+  can-value="{{name}}"
+  can-change="onChange"
+  >
+  {{#optionsList}}
     <option value="{{value}}" label="{{title}}"></option>
-  {{/list}}
+  {{/optionsList}}
 </select>

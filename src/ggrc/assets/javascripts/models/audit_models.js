@@ -1138,6 +1138,7 @@
       audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
     },
+
     defaults: {
       test_plan_procedure: false,
       template_object_type: 'Control',
@@ -1145,7 +1146,6 @@
         assessors: 'Object Owners',
         verifiers: 'Object Owners'
       },
-
       // the custom lists of assessor / verifier IDs if "other" is selected for
       // the corresponding default_people setting
       assessorsList: {},
