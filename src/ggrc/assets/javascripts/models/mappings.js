@@ -309,6 +309,17 @@
       documents: Proxy(
         "Document", "document", "ObjectDocument", "documentable", "object_documents")
     },
+    assignable: {
+      urls: TypeFilter("related_objects", "Document"),
+      info_related_objects: CustomFilter("related_objects", function (related_objects) {
+        return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
+      }),
+      comments: TypeFilter("related_objects", "Comment"),
+      documents_from_comments: Cross("comments", "documents"),
+      urls_from_comments: Cross("comments", "urls"),
+      all_documents: Multi(["documents", "documents_from_comments"]),
+      all_urls: Multi(["urls", "urls_from_comments"])
+    },
     related_object: {
       _canonical: {
         "related_objects_as_source": [
@@ -697,16 +708,12 @@
     },
     Assessment: {
       _mixins: [
-        "related_object", "personable", "ownable", "documentable"
+        "related_object", "personable", "ownable", "documentable", "assignable"
       ],
       related_creators: AttrFilter("related_objects", "AssigneeType", "Creator", "Person"),
       related_assessors: AttrFilter("related_objects", "AssigneeType", "Assessor", "Person"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
-      comments: TypeFilter("related_objects", "Comment"),
-      info_related_objects: CustomFilter("related_objects", function (related_objects) {
-        return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
-      }),
-      people: AttrFilter("related_objects", "AssigneeType", null, "Person"),
+      people: AttrFilter("related_objects", "AssigneeType", null, "Person")
     },
     AssessmentTemplate: {
       _mixins: ['related_object']
@@ -717,22 +724,13 @@
       ],
     },
     Request: {
-      _mixins: ["related_object", "personable", "ownable", "business_object", "documentable"],
+      _mixins: ["related_object", "personable", "ownable", "business_object", "documentable", "assignable"],
       business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
       audits: Direct("Audit", "requests", "audit"),
-      urls: TypeFilter("related_objects", "Document"),
       related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee", "Person"),
       related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester", "Person"),
       related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
       people: AttrFilter("related_objects", "AssigneeType", null, "Person"),
-      info_related_objects: CustomFilter("related_objects", function (related_objects) {
-        return !_.includes(["Comment", "Document", "Person"], related_objects.instance.type);
-      }),
-      comments: TypeFilter("related_objects", "Comment"),
-      documents_from_comments: Cross("comments", "documents"),
-      urls_from_comments: Cross("comments", "urls"),
-      all_documents: Multi(["documents", "documents_from_comments"]),
-      all_urls: Multi(["urls", "urls_from_comments"]),
       related_objects_via_search: Search(function (binding) {
         var types = [
           "Program", "Regulation", "Contract", "Policy", "Standard",
