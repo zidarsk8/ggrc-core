@@ -11,20 +11,12 @@
   GGRC.config = ={ config_json()|safe };
   GGRC.custom_attr_defs =  ={ attributes_json()|safe }
   GGRC.model_attr_defs =  ={ all_attributes_json()|safe }
-
-  // TODO: should probably be something else?
   GGRC.page_object = { "person": ={ current_user_json()|safe } };
 
 -block page_help scoped
   dashboard
 
--block title
-  My Assessments
-
 -block body
-  -# TODO: this <header> needed?
-  %header.header.main
-
   .area{ 'class': '={ model_display_class }' }
     .header-content
       %h2.logo-wrap{ 'class': '={ logo_wrap_class }' }
@@ -33,13 +25,10 @@
           -if logo_url
             %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
 
-      -# TODO: something injects menu into the header black, we need
-      -# to remove it
-      #page-header
-        -block header
+      %h1.entities
+        %span.title-content
+          My Assessments
 
-    -# TODO: remove this and make sure thereis no script error
-    -# to remove it
     -block nav
       .top-inner-nav
         .object-nav
@@ -67,10 +56,9 @@
                 %p=message
       -block main
         .clearfix
-          //.objnav.bar-v
-          //.inner-nav
-            .object-nav
-              %ul.nav{ 'class': "internav ={ model_display_class }" }
+          .object-nav
+            %ul.nav{ 'class': "internav ={ model_display_class }" }
+
           .object-area
             #show_columns.column-set{ 'data-resize': "true" }
               #middle_column
