@@ -6,10 +6,6 @@
 import os
 import logging
 
-try:
-  import yaml
-except ImportError:
-  pass
 
 logger = logging.getLogger(__name__)
 
@@ -26,15 +22,6 @@ def create_directory(path):
   if not os.path.exists(path):
     logger.info("Creating directory: %s", path)
     os.makedirs(path)
-
-
-def load_yaml_contents(file_path):
-  logger.info("Loading yaml: %s" % file_path)
-
-  with open(file_path) as f:
-    contents = yaml.load(f)
-
-  return contents
 
 
 def get_unique_postfix(file_path, extension):

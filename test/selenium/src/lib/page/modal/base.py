@@ -4,18 +4,16 @@
 # Maintained By: jernej@reciprocitylabs.com
 
 from lib import base
-from lib import decorator
 from lib.constants import locator
 
 
-class _EditModal(base.Modal):
+class BaseModal(base.Modal):
   """Base class for the edit modal"""
-
   _locator_ui_title = locator.ModalCreateNewObject.UI_TITLE
   locator_button_save = locator.ModalCreateNewObject.BUTTON_SAVE_AND_CLOSE
 
   def __init__(self, driver):
-    super(_EditModal, self).__init__(driver)
+    super(BaseModal, self).__init__(driver)
     self.button_save_and_close = base.Button(driver, self.locator_button_save)
     self.ui_title = base.TextInputField(self._driver,
                                         self._locator_ui_title)
@@ -27,30 +25,11 @@ class _EditModal(base.Modal):
     """
     self.ui_title.enter_text(text)
 
-  @decorator.handle_alert
   def save_and_close(self):
-    """Saves this object"""
-    self.button_save_and_close.click()
+    raise NotImplementedError
 
 
-class CreateNewObjectModal(base.Modal):
-  """Base create modal model"""
-
-  _locator_button_add_another = locator.ModalCreateNewObject \
-      .BUTTON_SAVE_AND_ADD_ANOTHER
-
-  def __init__(self, driver):
-    super(CreateNewObjectModal, self).__init__(driver)
-    self.button_save_and_add_another = base.Button(
-        driver, self._locator_button_add_another)
-
-  def save_and_add_other(self):
-    """Saves this objects and opens a new modal"""
-    self.button_save_and_add_another.click()
-    return self.__class__(self._driver)
-
-
-class ProgramsModal(_EditModal):
+class ProgramsModal(BaseModal):
   """Class representing a modal base for the program object"""
 
   _locators = locator.ModalCreateNewProgram
@@ -170,7 +149,7 @@ class ProgramsModal(_EditModal):
     self.ui_stop_date.select_day_in_current_month(day)
 
 
-class ControlsModal(_EditModal):
+class ControlsModal(BaseModal):
   """Class representing a modal base for the control object"""
 
   _locators = locator.ModalCreateNewControl
@@ -284,7 +263,7 @@ class ControlsModal(_EditModal):
     self.ui_code.enter_text(text)
 
 
-class RisksModal(_EditModal):
+class RisksModal(BaseModal):
   """Class representing a new risk modal visible after creating a new
   control from LHN"""
 
@@ -299,43 +278,43 @@ class RisksModal(_EditModal):
     self.ui_description.find_iframe_and_enter_data(text)
 
 
-class OrgGroupsModal(_EditModal):
+class OrgGroupsModal(BaseModal):
   """Class representing a base org group modal visible after creating a new
   org group from LHN"""
   _locator_ui_title = locator.ModalCreateNewOrgGroup.UI_TITLE
 
 
-class IssuesModal(_EditModal):
+class IssuesModal(BaseModal):
   """Class representing a base issue modal visible after creating a new
   issue from LHN"""
   _locator_ui_title = locator.ModalCreateNewIssue.UI_TITLE
 
 
-class RequestsModal(_EditModal):
+class RequestsModal(BaseModal):
   """Class representing a base request modal"""
   _locator_ui_title = locator.ModalCreateNewRequest.UI_TITLE
 
 
-class ProcessesModal(_EditModal):
+class ProcessesModal(BaseModal):
   """Class representing a base process modal"""
   _locator_ui_title = locator.ModalCreateNewProcess.UI_TITLE
 
 
-class DataAssetsModal(_EditModal):
+class DataAssetsModal(BaseModal):
   """Class representing a base data asset modal"""
   _locator_ui_title = locator.ModalCreateNewDataAsset.UI_TITLE
 
 
-class SystemsModal(_EditModal):
+class SystemsModal(BaseModal):
   """Class representing a base system modal"""
   _locator_ui_title = locator.ModalCreateNewSystem.UI_TITLE
 
 
-class ProductsModal(_EditModal):
+class ProductsModal(BaseModal):
   """Class representing a base product modal"""
   _locator_ui_title = locator.ModalCreateNewProduct.UI_TITLE
 
 
-class ProjectsModal(_EditModal):
+class ProjectsModal(BaseModal):
   """Class representing a base product modal"""
   _locator_ui_title = locator.ModalCreateNewProject.UI_TITLE

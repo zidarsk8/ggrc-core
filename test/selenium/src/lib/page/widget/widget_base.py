@@ -8,11 +8,11 @@
 # pylint: disable=not-an-iterable
 
 from lib import base
+from lib import decorator
 from lib import environment
 from lib.utils import selenium_utils
 from lib.constants import locator
 from lib.constants import url
-from lib import decorator
 
 
 class _Modal(base.Modal):
@@ -87,6 +87,7 @@ class Dropdown(base.Component):
         new_custom_attribute.ModalCustomAttributes
     """
     selenium_utils.wait_until_stops_moving(self.button_add.element)
+    selenium_utils.scroll_into_view(self._driver, self.button_add.element)
     self.button_add.click()
     return self._cls_new_attrb_modal(self._driver)
 
@@ -101,7 +102,8 @@ class Dropdown(base.Component):
     selenium_utils.get_when_clickable(
         self._driver, self._locator_buttons_edit)
 
-    self._driver.find_elements(*self._locator_buttons_edit)[member].click()
+    elements = self._driver.find_elements(*self._locator_buttons_edit)
+    selenium_utils.scroll_into_view(self._driver, elements[member]).click()
     return CustomAttributeModal(self._driver)
 
 
