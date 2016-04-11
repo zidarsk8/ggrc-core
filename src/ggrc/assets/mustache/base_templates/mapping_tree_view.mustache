@@ -5,10 +5,12 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
-<ul class="attachment-list">
+<ul class="{{#if treeViewClass}}{{treeViewClass}}{{else}}attachment-list{{/if}}">
+  {{#expose reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping baseInstance=baseInstance isLoading=isLoading}}
   {{#with_mapping mapping parentInstance}}
     {{#results}}
-      {{{render itemTemplate parentInstance=parentInstance}}}
+      {{{render itemTemplate baseInstance=baseInstance parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping isLoading=isLoading}}}
     {{/results}}
   {{/with_mapping}}
+  {{/expose}}
 </ul>

@@ -11,6 +11,7 @@
     template: can.view(GGRC.mustache_path + '/base_objects/tabs.mustache'),
     scope: {
       panels: [],
+      index: 0,
       /**
        * Activate currently clicked panel
        *
@@ -21,6 +22,7 @@
       setActive: function (scope, el, ev) {
         ev.preventDefault();
         scope.panel.attr('active', true);
+        this.attr('index', Number(el.data('index')));
       }
     },
     events: {
@@ -32,8 +34,9 @@
        * @param {String} item - item that got changed
        * @param {String} action - in our case it can be `add` or `remove`
        */
-      '{scope.panels} length': function (list, ev, item, action) {
+      '{scope.panels} change': _.throttle(function (list, ev, item, action) {
         var panels = this.element.find('tab-panel');
+        var index = this.scope.attr('index');
         var active;
 
         if (list.length !== panels.length) {
@@ -45,9 +48,9 @@
           }
         });
         if (!active.length) {
-          list[0].panel.attr('active', true);
+          list[index].panel.attr('active', true);
         }
-      }
+      }, 10)
     }
   });
 

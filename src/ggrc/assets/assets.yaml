@@ -118,6 +118,7 @@ dashboard-js-files:
   - components/mapper.js
   - components/people_list.js
   - components/mapped_tree_view.js
+  - components/reusable_objects.js
   - components/assessment_generator.js
   - components/paginate.js
   - components/tabs.js
@@ -185,6 +186,7 @@ dashboard-js-template-files:
   - base_objects/sub_tree_type_selector.mustache
   - base_objects/modal/search_title.mustache
   - base_templates/add_comment.mustache
+  - base_templates/objects_tooltip.mustache
   - base_templates/attachment_list.mustache
   - base_templates/url_list.mustache
   - base_templates/attachment.mustache
@@ -218,6 +220,7 @@ dashboard-js-template-files:
   - assessments/tree_footer.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
+  - assessments/reusable_objects.mustache
   - assessments/generator_title.mustache
   - assessment_templates/attribute_field.mustache
   - assessment_templates/attribute_add_field.mustache
@@ -358,6 +361,7 @@ dashboard-js-template-files:
   - requests/modal_content.mustache
   - requests/tier2_content.mustache
   - requests/general_info.mustache
+  - requests/reusable_objects.mustache
   - base_templates/subtree.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache
