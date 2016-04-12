@@ -5,6 +5,12 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
+.people-list__label {
+  .modal-body & {
+    display: none;
+  }
+}
+
 .person-label {
   @include border-radius(50%);
   width: 35px;
