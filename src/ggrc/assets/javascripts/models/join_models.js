@@ -248,8 +248,8 @@ can.Model.Join("CMS.Models.ObjectOwner", {
   update: 'PUT /api/object_owners/{id}',
   destroy: 'DELETE /api/object_owners/{id}',
   join_keys: {
-    ownable: 'can.Model.Cacheable',
-    person: 'CMS.Models.Person'
+    ownable: can.Model.Cacheable,
+    person: CMS.Models.Person
   },
   attributes: {
     context: 'CMS.Models.Context.stub',
