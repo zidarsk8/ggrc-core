@@ -99,7 +99,7 @@ def assign_people(assignees, assignee_role, assessment, relationships):
   assignees = assignees if isinstance(assignees, list) else [assignees]
   assignees = [assignee for assignee in assignees if assignee is not None]
 
-  if not len(assignees) and assignee_role != "Verifier":
+  if not assignees and assignee_role != "Verifier":
     assignees.append(assessment.modified_by)
 
   for assignee in assignees:
