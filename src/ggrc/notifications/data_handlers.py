@@ -9,7 +9,24 @@ Main contributed functions are:
   get_assignable_data,
 """
 
+import datetime
+import urlparse
+
+from ggrc import utils
 from ggrc import models
+
+
+def get_object_url(obj):
+  """Get url for the object info page.
+
+  Args:
+    obj (db.Model): Object for which we want to info page url.
+
+  Returns:
+    string: Url for the object info page.
+  """
+  url = "{}/{}#current_widget".format(obj.type, obj.id)
+  return urlparse.urljoin(utils.get_url_root(), url)
 
 
 def assignable_open_data(notif):
@@ -24,11 +41,18 @@ def assignable_open_data(notif):
   obj = get_notification_object(notif)
   data = {}
   for person, _ in obj.assignees:
+    # Requests have "requested_on" field instead of "start_date" and we should
+    # default to today() if no appropriate field is found on the object.
+    start_date = getattr(obj, "start_date",
+                         getattr(obj, "requested_on",
+                                 datetime.date.today()))
     data[person.email] = {
         "user": get_person_dict(person),
         notif.notification_type.name: {
             obj.id: {
-                "title": obj.title
+                "title": obj.title,
+                "fuzzy_start_date": utils.get_fuzzy_date(start_date),
+                "url": get_object_url(obj),
             }
         }
     }
