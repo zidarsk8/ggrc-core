@@ -803,7 +803,9 @@
           Assessment: {
             mapping: 'extended_related_assessment_via_search',
             child_options: [related_objects_child_options],
-            draw_children: true
+            draw_children: true,
+            header_view:
+              GGRC.mustache_path + '/assessments/tree_header.mustache',
           }
         }
       });
