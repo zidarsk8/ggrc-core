@@ -32,15 +32,6 @@
         }]
        */
       optionsList: null
-    },
-    helpers: {
-      getClassName: function (options) {
-        var className = this.attr('className');
-        if (className) {
-          return className;
-        }
-        return 'input-block-level';
-      }
     }
   });
 })(window.can, window.can.$);
