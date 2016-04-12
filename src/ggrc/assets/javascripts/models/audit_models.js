@@ -1252,7 +1252,7 @@
           weight: 10
         }
       };
-      return this._related(relevantTypes);
+      return this._related(relevantTypes, 5);
     },
     related_requests: function () {
       var relevantTypes = {
@@ -1272,7 +1272,7 @@
           weight: 10
         }
       };
-      return this._related(relevantTypes);
+      return this._related(relevantTypes, 5);
     }
   });
 
