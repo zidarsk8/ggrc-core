@@ -213,6 +213,35 @@ def title_from_camelcase(name):
   return _prefix_camelcase(name, " ")
 
 
+def get_fuzzy_date(delta_date):
+  """Get a human readable date string.
+
+  This function returns a human friendly time delta compared to today.
+
+  Args:
+    delta_date (date): Date that we want to show to the user.
+
+  Returns:
+    string: A human readable representation date delta.
+
+  Examples:
+    >>> get_fuzzy_date(date(2016,4,14))
+    'in 2 days'
+    >>> get_fuzzy_date(date(2016,4,12))
+    'today'
+    >>> get_fuzzy_date(date(2016,4,11))
+    '1 day ago'
+  """
+  delta = delta_date - datetime.date.today()
+  if delta.days < 0:
+    days = abs(delta.days)
+    return "{} day{} ago".format(days, "s" if days > 1 else "")
+  if delta.days == 0:
+    return "today"
+  # TODO: use format_timedelta from babel package.
+  return "in {} day{}".format(delta.days, "s" if delta.days > 1 else "")
+
+
 # pylint: disable=too-few-public-methods
 # because this is a small context manager
 class QueryCounter(object):

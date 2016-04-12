@@ -9,6 +9,7 @@ from sqlalchemy import and_
 from urlparse import urljoin
 
 from ggrc import db
+from ggrc import utils
 from ggrc.models.revision import Revision
 from ggrc.notifications import data_handlers
 from ggrc.utils import merge_dicts, get_url_root
@@ -231,7 +232,7 @@ def get_workflow_starts_in_data(notification, workflow):
                 "workflow_owners": workflow_owners,
                 "workflow_url": get_workflow_url(workflow),
                 "start_date": workflow.next_cycle_start_date,
-                "fuzzy_start_date": get_fuzzy_date(
+                "fuzzy_start_date": utils.get_fuzzy_date(
                     workflow.next_cycle_start_date),
                 "custom_message": workflow.notify_custom_message,
                 "title": workflow.title,
@@ -263,7 +264,7 @@ def get_cycle_start_failed_data(notification, workflow):
                 "workflow_owners": workflow_owners,
                 "workflow_url": get_workflow_url(workflow),
                 "start_date": workflow.next_cycle_start_date,
-                "fuzzy_start_date": get_fuzzy_date(
+                "fuzzy_start_date": utils.get_fuzzy_date(
                     workflow.next_cycle_start_date),
                 "custom_message": workflow.notify_custom_message,
                 "title": workflow.title,
@@ -296,17 +297,6 @@ def get_object(obj_class, obj_id):
   if result.count() == 1:
     return result.one()
   return None
-
-
-def get_fuzzy_date(end_date):
-  delta = end_date - date.today()
-  if delta.days < 0:
-    days = abs(delta.days)
-    return "{} day{} ago".format(days, "s" if days > 1 else "")
-  if delta.days == 0:
-    return "today"
-  # TODO: use format_timedelta from babel package.
-  return "in {} day{}".format(delta.days, "s" if delta.days > 1 else "")
 
 
 def get_workflow_owners_dict(context_id):
@@ -370,7 +360,7 @@ def get_cycle_task_dict(cycle_task):
       "title": cycle_task.title,
       "related_objects": object_titles,
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
-      "fuzzy_due_in": get_fuzzy_date(cycle_task.end_date),
+      "fuzzy_due_in": utils.get_fuzzy_date(cycle_task.end_date),
       "cycle_task_url": get_cycle_task_url(cycle_task),
   }
 
