@@ -67,12 +67,11 @@
         };
 
         if (assessmentTemplate) {
-          if (assessmentTemplate.procedure_description &&
-              assessmentTemplate.procedure_description.length) {
+          if (_.exists(assessmentTemplate, 'procedure_description.length')) {
             data.test_plan = assessmentTemplate.procedure_description;
           }
-          if (assessmentTemplate.test_plan_procedure &&
-              object.test_plan && object.test_plan.length) {
+          if (_.exists(assessmentTemplate, 'test_plan_procedure') &&
+              _.exists(object, 'test_plan.length')) {
             data.test_plan = object.test_plan;
           }
         }
