@@ -1,70 +1,59 @@
 {{!
-    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: anze@reciprocitylabs.com
-    Maintained By: anze@reciprocitylabs.com
+  Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: anze@reciprocitylabs.com
+  Maintained By: peter@reciprocitylabs.com
 }}
 
-{{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
-
-<header class="header sticky sticky-header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
-  <div class="row-fluid">
-    <div class="span4">
+{{#if_equals original_list.length 0}}
+  <div class="zero-state">
+    <h2>
+      {{#is_profile}}
+        You have
+      {{else}}
+        {{#with_page_object_as 'page_object'}}
+          {{page_object.type}} has
+        {{/with_page_object_as}}
+      {{/is_profile}}
+      no assigned tasks
+    </h2>
+  </div>
+{{else}}
+  {{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
+  <header
+    class="header sticky sticky-header tree-header
+          {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+    <div class="row-fluid">
+      <div class="span{{display_options.title_width}}">
         <div class="title-heading oneline">
           <span class="widget-col-title" data-field="title|description_inline|name|email">
             {{model.title_singular}} Title
             <i class="fa fa-caret-up"></i>
           </span>
-      </div>
-    </div>
-    <div class="span1">
-      <div class="oneline">
-        <span class="widget-col-title" data-field="owners.0.name|email">
-          Owner
-          <i class="fa fa-caret-up"></i>
-        </span>
-      </div>
-    </div>
-    <div class="span2">
-      <div class="row-fluid">
-        <div class="span6">
-          <div class="oneline centered">
-            <span class="widget-col-title" data-field="design">
-              Design
-              <i class="fa fa-caret-up"></i>
-            </span>
-          </div>
-        </div>
-        <div class="span6">
-          <div class="oneline centered">
-            <span class="widget-col-title" data-field="operationally">
-              Operational
-              <i class="fa fa-caret-up"></i>
-            </span>
-          </div>
         </div>
       </div>
-    </div>
-    <div class="span1">
-      <div class="oneline">
-        <span class="widget-col-title" data-field="status">
-          State
-          <i class="fa fa-caret-up"></i>
-        </span>
+
+      {{{> "/static/mustache/base_objects/tree_column_names.mustache"}}}
+
+      <div class="span{{display_options.action_width}}">
+          <ul class="tree-action-list">
+
+          {{{> "/static/mustache/import_export/import_export_buttons.mustache}}}
+          <assessment-generator-button
+            audit="parent_instance"></assessment-generator-button>
+          {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
+          {{{> "/static/mustache/base_objects/tree_column_selector.mustache"}}}
+          {{{> "/static/mustache/base_objects/sub_tree_type_selector.mustache"}}}
+
+          {{#if add_item_view}}
+            <li>
+              {{{renderLive add_item_view}}}
+            </li>
+          {{/if}}
+        </ul>
       </div>
     </div>
-    <div class="span4">
-        <ul class="tree-action-list">
-        {{{> "/static/mustache/import_export/import_export_buttons.mustache}}}
-        <assessment-generator-button audit="parent_instance"></assessment-generator-button>
-        {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
-        {{#if add_item_view}}
-          <li>
-            {{{renderLive add_item_view}}}
-          </li>
-        {{/if}}
-      </ul>
-    </div>
-  </div>
-</header>
+  </header>
+{{/if_equals}}
+
 <div class="clearfix"></div>
