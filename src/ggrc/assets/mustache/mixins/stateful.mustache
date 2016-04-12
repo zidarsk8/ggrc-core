@@ -9,11 +9,34 @@
   <div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
 
   {{#if_in instance.status "Open,In Progress"}}
-    {{#if_verifiers_defined instance}}
-        <button href="javascript://" class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Finished">Finish</button>
+    {{#if_helpers '\
+      #if_null' instance._mandatory_comment_msg '\
+      and #if_null' instance._mandatory_attachment_msg}}
+      {{#if_verifiers_defined instance}}
+          <button href="javascript://"
+                  class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
+                  data-name="status"
+                  data-value="Finished">
+            Finish
+          </button>
+      {{else}}
+          <button href="javascript://"
+                  class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
+                  data-name="status"
+                  data-value="Final">
+            Finish
+          </button>
+      {{/if_verifiers_defined}}
     {{else}}
-        <button href="javascript://" class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Final">Finish</button>
-    {{/if_verifiers_defined}}
+      <button href="javascript://"
+              class="btn btn-small btn-primary pull-right btn-info-pin-header disabled"
+              rel="tooltip"
+              title="{{instance._mandatory_comment_msg}}
+                     {{^if_null instance._mandatory_comment_msg}} | {{/if}}
+                     {{instance._mandatory_attachment_msg}}">
+        Finish
+      </button>
+    {{/if_helpers}}
   {{/if_in}}
 
   {{#if_equals instance.status "Finished"}}
