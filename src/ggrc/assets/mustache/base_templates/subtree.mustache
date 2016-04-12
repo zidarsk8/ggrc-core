@@ -5,24 +5,35 @@
     Maintained By: vladan@reciprocitylabs.com
 }}
 
-{{#instance}}
-<li>
-  {{#is_allowed "update" instance}}
-  <span class="file-controls">
-    <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-      <span class="result" {{data "result"}}></span>
-      <i class="fa fa-ban"></i>
-    </a>
-  </span>
-  {{/is_allowed}}
-  <i class="fa fa-{{class.table_singular}} color"></i>
-  {{firstnonempty title description name email}}
-
-  {{#if instance.viewLink}}
-    {{#is_allowed "view_object_page" instance}}
-      <a class="more" href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
+<reusable-object reusable="reusable" method="reuseMethod" list="reusedObjects" parent-instance="parentInstance" base-instance="baseInstance" mapping="mapping" isLoading="isLoading">
+  {{#instance}}
+  <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+    {{^if reusable}}
+    {{#is_allowed "update" instance}}
+    <span class="file-controls">
+      <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+        <span class="result" {{data "result"}}></span>
+        <i class="fa fa-ban"></i>
+      </a>
+    </span>
     {{/is_allowed}}
-  {{/if}}
+    {{/if}}
 
-</li>
-{{/instance}}
+    {{#if reusable}}
+      {{> /static/mustache/base_templates/objects_tooltip.mustache'}}
+    {{else}}
+      <i class="fa fa-{{class.table_singular}} color"></i>
+      {{firstnonempty title description name email}}
+    {{/if}}
+
+
+    {{^if reusable}}
+    {{#if instance.viewLink}}
+      {{#is_allowed "view_object_page" instance}}
+        <a class="more" href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
+      {{/is_allowed}}
+    {{/if}}
+    {{/if}}
+  </li>
+  {{/instance}}
+</reusable-object>

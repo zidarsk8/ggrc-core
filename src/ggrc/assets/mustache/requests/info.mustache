@@ -79,7 +79,7 @@
       </div>
 
       <div class="tabs-wrap">
-        <tabs instance="instance">
+        <tabs instance=".">
           <tab-panel panels="panels" title="Comments and Responses" instance="instance">
             {{#if_helpers '\
               ^if_equals' status 'Verified' '\
@@ -92,8 +92,11 @@
             {{/if_equals}}
             {{{render "/static/mustache/base_templates/comment_list.mustache" instance=instance update_count="false"}}}
           </tab-panel>
-          <tab-panel panels="panels" title="Request log" instance="instance">
+          <tab-panel panels="panels" title="Request Log" instance="instance">
             <revision-log instance="instance"></revision-log>
+          </tab-panel>
+          <tab-panel panels="panels" title="Related Requests" instance="instance">
+            {{{render "/static/mustache/requests/reusable_objects.mustache" instance=instance}}}
           </tab-panel>
         </tabs>
     </div>

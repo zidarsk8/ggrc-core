@@ -10,6 +10,7 @@
   <li {{#if panel.active}}class="active"{{/if}}>
     <a {{data 'panel'}}
       can-click='setActive'
+      data-index="{{@index}}"
       href="#tab-{{@index}}">
       {{title}}
     </a>

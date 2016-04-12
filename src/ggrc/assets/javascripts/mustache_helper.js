@@ -914,6 +914,16 @@ Mustache.registerHelper("show_long", function () {
   ].join('');
 });
 
+Mustache.registerHelper('expose', function (options) {
+  var frame = new can.Observe();
+  if (options.hash) {
+    can.each(options.hash, function (val, prop) {
+      frame.attr(prop, Mustache.resolve(val));
+    });
+  }
+  return options.fn(options.contexts.add(frame));
+});
+
 Mustache.registerHelper("using", function (options) {
   var refresh_queue = new RefreshQueue()
     , context

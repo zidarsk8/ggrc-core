@@ -626,21 +626,24 @@
       history: CustomFilter('requests', function (result) {
         return result.instance.status === 'Accepted';
       }),
-      _program: Direct("Program", "audits", "program"),
-      program_controls: Cross("_program", "controls"),
-      objects: Proxy(null, "auditable", "AuditObject", "audit", "audit_objects"),
-      objectives: TypeFilter("objects", "Objective"),
-      objectives_via_program: Cross("_program", "objectives"),
-      responses_via_requests: Cross("requests", "related_objects"),
+      _program: Direct('Program', 'audits', 'program'),
+      program_controls: Cross('_program', 'controls'),
+      program_requests: Cross('_program', 'related_requests'),
+      program_issues: Cross('_program', 'related_issues'),
+      program_assessments: Cross('_program', 'related_assessments'),
+      objects: Proxy(null, 'auditable', 'AuditObject', 'audit', 'audit_objects'),
+      objectives: TypeFilter('objects', 'Objective'),
+      objectives_via_program: Cross('_program', 'objectives'),
+      responses_via_requests: Cross('requests', 'related_objects'),
       related_objects_via_requests: Multi(['requests', 'responses_via_requests']),
-      context: Direct("Context", "related_object", "context"),
-      authorizations: Cross("context", "user_roles"),
-      authorized_program_people: Cross("_program", 'authorized_people'),
-      authorized_audit_people: Cross("authorizations", "person"),
+      context: Direct('Context', 'related_object', 'context'),
+      authorizations: Cross('context', 'user_roles'),
+      authorized_program_people: Cross('_program', 'authorized_people'),
+      authorized_audit_people: Cross('authorizations', 'person'),
       authorized_people: Multi(['authorized_audit_people', 'authorized_program_people']),
-      auditor_authorizations: CustomFilter("authorizations", function (result) {
+      auditor_authorizations: CustomFilter('authorizations', function (result) {
         return new RefreshQueue().enqueue(result.instance.role.reify()).trigger().then(function (roles) {
-          return roles[0].name === "Auditor";
+          return roles[0].name === 'Auditor';
         });
       }),
       auditors: Cross("auditor_authorizations", "person"),
@@ -708,36 +711,41 @@
     },
     Assessment: {
       _mixins: [
-        "related_object", "personable", "ownable", "documentable", "assignable"
+        'related_object', 'personable', 'ownable', 'documentable', 'assignable'
       ],
-      related_creators: AttrFilter("related_objects", "AssigneeType", "Creator", "Person"),
-      related_assessors: AttrFilter("related_objects", "AssigneeType", "Assessor", "Person"),
-      related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
-      people: AttrFilter("related_objects", "AssigneeType", null, "Person")
+      audits: TypeFilter('related_objects', 'Audit'),
+      related_controls: TypeFilter('related_objects', 'Control'),
+      related_regulations: TypeFilter('related_objects', 'Regulation'),
+      related_creators: AttrFilter('related_objects', 'AssigneeType', 'Creator', 'Person'),
+      related_assessors: AttrFilter('related_objects', 'AssigneeType', 'Assessor', 'Person'),
+      related_verifiers: AttrFilter('related_objects', 'AssigneeType', 'Verifier', 'Person'),
+      people: AttrFilter('related_objects', 'AssigneeType', null, 'Person')
     },
     AssessmentTemplate: {
       _mixins: ['related_object']
     },
     Issue: {
       _mixins: [
-        "related_object", "personable", "ownable"
-      ],
+        'related_object', 'personable', 'ownable'
+      ]
     },
     Request: {
-      _mixins: ["related_object", "personable", "ownable", "business_object", "documentable", "assignable"],
-      business_objects: Multi(["related_objects", "controls", "documents", "people", "sections", "clauses"]),
-      audits: Direct("Audit", "requests", "audit"),
-      related_assignees: AttrFilter("related_objects", "AssigneeType", "Assignee", "Person"),
-      related_requesters: AttrFilter("related_objects", "AssigneeType", "Requester", "Person"),
-      related_verifiers: AttrFilter("related_objects", "AssigneeType", "Verifier", "Person"),
-      people: AttrFilter("related_objects", "AssigneeType", null, "Person"),
+      _mixins: ['related_object', 'personable', 'ownable', 'business_object', 'documentable', 'assignable'],
+      business_objects: Multi(['related_objects', 'controls', 'documents', 'people', 'sections', 'clauses']),
+      audits: Direct('Audit', 'requests', 'audit'),
+      related_controls: TypeFilter('related_objects', 'Control'),
+      related_regulations: TypeFilter('related_objects', 'Regulation'),
+      related_assignees: AttrFilter('related_objects', 'AssigneeType', 'Assignee', 'Person'),
+      related_requesters: AttrFilter('related_objects', 'AssigneeType', 'Requester', 'Person'),
+      related_verifiers: AttrFilter('related_objects', 'AssigneeType', 'Verifier', 'Person'),
+      people: AttrFilter('related_objects', 'AssigneeType', null, 'Person'),
       related_objects_via_search: Search(function (binding) {
         var types = [
-          "Program", "Regulation", "Contract", "Policy", "Standard",
-          "Section", "Clause", "Objective", "Control", "AccessGroup",
-          "System", "Process", "DataAsset", "Product", "Project", "Facility",
-          "Market", "OrgGroup", "Vendor", "Audit", "Issue", "Assessment",
-          "Request" //, "Response"
+          'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
+          'Section', 'Clause', 'Objective', 'Control', 'AccessGroup',
+          'System', 'Process', 'DataAsset', 'Product', 'Project', 'Facility',
+          'Market', 'OrgGroup', 'Vendor', 'Audit', 'Issue', 'Assessment',
+          'Request'
         ];
 
         //checkfor window.location
