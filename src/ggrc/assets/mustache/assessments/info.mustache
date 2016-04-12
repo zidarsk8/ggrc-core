@@ -14,101 +14,124 @@
     <div class="tier-content">
       {{> /static/mustache/base_templates/header.mustache}}
       <div class="row-fluid">
-        <div data-test-id="title_description_7a906d2e" class="span6">
-          <h6>Description</h6>
-          <div data-test-id="title_description_content_7a906d2e" class="rtf-block">
-            {{#instance}}
-              {{{firstnonempty description '<span class="empty-message">None</span>'}}}
-            {{/instance}}
+        <div class="span8">
+          <div class="row-fluid wrap-row">
+            <div data-test-id="title_description_7a906d2e" class="span12">
+              <h6>Description</h6>
+              <div data-test-id="title_description_content_7a906d2e" class="rtf-block">
+                {{#instance}}
+                  {{{firstnonempty description '<span class="empty-message">None</span>'}}}
+                {{/instance}}
+              </div>
+            </div>
           </div>
+
+          <div {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true"
+            data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+            {{{render '/static/mustache/base_objects/test_plan.mustache' instance=instance}}}
+          </div>
+
+          {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
+
+          <div class="row-fluid wrap-row">
+            <div class="span12">
+              {{{render "/static/mustache/base_templates/mapped_objects.mustache" instance=. update_count="false"}}}
+            </div>
+          </div>
+
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <h6>Evidence</h6>
+              {{{render "/static/mustache/base_templates/attachment_list.mustache" instance=. update_count="false"}}}
+            </div>
+            <div class="span6">
+              <h6>URL</h6>
+              {{> "/static/mustache/base_templates/url_list.mustache"}}
+            </div>
+          </div>
+
+          {{{render '/static/mustache/base_objects/urls.mustache' is_program=true instance=instance}}}
+          {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+
+          <div class="row-fluid wrap-row" {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true"
+            data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+            <div class="span6">
+              <h6>Conclusion: Design</h6>
+              <p><small><em>Is this control design effective?</em></small></p>
+              {{#is_allowed 'update' instance context='for'}}
+                <select class="input-medium visual-selector" name="design">
+                  <option value="" {{#if_equals design ""}}selected{{/if_equals}}>---</option>
+                  {{#iterate 'Effective' 'Ineffective' 'Needs improvement' 'Not Applicable'}}
+                    <option {{#if_equals iterator design}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                  {{/iterate}}
+                </select>
+              {{else}}
+                {{firstnonempty design '--'}}
+              {{/is_allowed}}
+            </div>
+            <div class="span6">
+              <h6>Conclusion: Operation</h6>
+              <p><small><em>Is this control operationally effective?</em></small></p>
+              {{#is_allowed 'update' instance context='for'}}
+                <select class="input-medium visual-selector" name="operationally">
+                  <option value="" {{#if_equals operationally ""}}selected{{/if_equals}}>---</option>
+                  {{#iterate 'Effective' 'Ineffective' 'Needs improvement' 'Not Applicable'}}
+                    <option {{#if_equals iterator operationally}}selected="true"{{/if_equals}}>{{iterator}}</option>
+                  {{/iterate}}
+                </select>
+              {{else}}
+                {{firstnonempty operationally '--'}}
+              {{/is_allowed}}
+            </div>
+          </div>
+
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <ul class="repeated-utility">
+                {{#is_allowed 'update' instance context='for'}}
+                {{#with_mapping 'related_audits' instance}}
+                {{#with_mapping 'related_controls' instance}}
+                {{#using control=control}}
+                {{#with_create_issue_json instance}}
+                <li>
+                  <a class="btn btn-small btn-info" href="javascript://" data-toggle="modal-ajax-form"
+                    data-modal-class="modal-wide" data-object-singular="Issue" data-object-plural="issues"
+                    data-object-params='{{create_issue_json}}'>
+                    Create Issue
+                  </a>
+                </li>
+                <li>
+                  <a class="btn btn-small btn-info" href="javascript://" data-toggle="modal-ajax-form"
+                    data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests"
+                    data-object-params='{{create_issue_json}}'>
+                    Create Request
+                  </a>
+                </li>
+                {{/with_create_issue_json}}
+                {{/using}}
+                {{/with_mapping}}
+                {{/with_mapping}}
+                {{/is_allowed}}
+              </ul>
+            </div>
+          </div>
+
         </div>
-        <div class="span6">
-          <people-list instance="instance" editable="true"></people-list>
-        </div>
-      </div>
-      <div class="row-fluid wrap-row" {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true" data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
-        <div class="span6">
-          {{{render '/static/mustache/base_objects/test_plan.mustache' instance=instance}}}
-        </div>
-        <div class="span3">
-          <h6>Conclusion: Design</h6>
-          <p><small><em>Is this control design effective?</em></small></p>
-          {{#is_allowed 'update' instance context='for'}}
-            <select class="input-medium visual-selector" name="design">
-              <option value="" {{#if_equals design ""}}selected{{/if_equals}}>---</option>
-              {{#iterate 'Effective' 'Ineffective' 'Needs improvement' 'Not Applicable'}}
-                <option {{#if_equals iterator design}}selected="true"{{/if_equals}}>{{iterator}}</option>
-              {{/iterate}}
-            </select>
-          {{else}}
-            {{firstnonempty design '--'}}
-          {{/is_allowed}}
-        </div>
-        <div class="span3">
-          <h6>Conclusion: Operation</h6>
-          <p><small><em>Is this control operationally effective?</em></small></p>
-          {{#is_allowed 'update' instance context='for'}}
-            <select class="input-medium visual-selector" name="operationally">
-              <option value="" {{#if_equals operationally ""}}selected{{/if_equals}}>---</option>
-              {{#iterate 'Effective' 'Ineffective' 'Needs improvement' 'Not Applicable'}}
-                <option {{#if_equals iterator operationally}}selected="true"{{/if_equals}}>{{iterator}}</option>
-              {{/iterate}}
-            </select>
-          {{else}}
-            {{firstnonempty operationally '--'}}
-          {{/is_allowed}}
+        <div class="span4">
+          <div class="row-fluid wrap-row">
+            <div class="span12">
+              <people-list instance="instance" editable="true"></people-list>
+            </div>
+          </div>
+
+          <div class="row-fluid wrap-row">
+            <div class="span12">
+              {{> /static/mustache/base_templates/dates_list.mustache}}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="row-fluid wrap-row">
-        <div class="span6">
-          {{{render '/static/mustache/base_objects/notes.mustache' instance=instance}}}
-        </div>
-        <div class="span6">
-          <ul class="repeated-utility">
-            {{#is_allowed 'update' instance context='for'}}
-            {{#with_mapping 'related_audits' instance}}
-            {{#with_mapping 'related_controls' instance}}
-            {{#using control=control}}
-            {{#with_create_issue_json instance}}
-            <li>
-                <a class="btn btn-small btn-info" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Issue" data-object-plural="issues" data-object-params='{{create_issue_json}}'>
-                  Create Issue
-                </a>
-            </li>
-            <li>
-                <a class="btn btn-small btn-info" href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{{create_issue_json}}'>
-                  Create Request
-                </a>
-            </li>
-            {{/with_create_issue_json}}
-            {{/using}}
-            {{/with_mapping}}
-            {{/with_mapping}}
-            {{/is_allowed}}
-          </ul>
-        </div>
-      </div>
-      <div class="row-fluid wrap-row">
-        <div class="span6">
-          {{{render "/static/mustache/base_templates/mapped_objects.mustache" instance=. update_count="false"}}}
-        </div>
-        <div class="span6">
-          {{> /static/mustache/base_templates/dates_list.mustache}}
-        </div>
-      </div>
-      <div class="row-fluid wrap-row">
-        <div class="span6">
-          <h6>Evidence</h6>
-          {{{render "/static/mustache/base_templates/attachment_list.mustache" instance=. update_count="false"}}}
-        </div>
-        <div class="span6">
-          <h6>URL</h6>
-          {{> "/static/mustache/base_templates/url_list.mustache"}}
-        </div>
-      </div>
-      {{{render '/static/mustache/base_objects/urls.mustache' is_program=true instance=instance}}}
-      {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
       <div class="tabs-wrap">
         <tabs instance="instance">
           <tab-panel panels="panels" title="Comments" instance="instance">
@@ -141,7 +164,10 @@
         <em>
           Created at {{date created_at}}
           &nbsp;&nbsp;&nbsp;&nbsp;
-          Modified by {{#using person=modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date updated_at}}
+          Modified by
+          {{#using person=modified_by}}
+            {{{render '/static/mustache/people/popover.mustache' person=person}}}
+          {{/using}} on {{date updated_at}}
         </em>
       </small>
     </p>
