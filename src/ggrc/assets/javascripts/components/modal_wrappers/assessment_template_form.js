@@ -15,24 +15,8 @@
       instance: null
     },
     events: {
-      '{scope.instance} template_object_type  ': function () {
+      '{scope.instance} template_object_type': function () {
         this.scope.attr('instance.test_plan_procedure', false);
-      }
-    },
-    helpers: {
-      allowDescription: function (options) {
-        var defaultProcedure = this.attr('instance.test_plan_procedure');
-        if (defaultProcedure) {
-          return options.inverse();
-        }
-        return options.fn(options.context);
-      },
-      hasPlanProcedure: function (options) {
-        var type = this.attr('instance.template_object_type');
-        if (type === 'Control') {
-          return options.fn(options.context);
-        }
-        return options.inverse();
       }
     }
   });

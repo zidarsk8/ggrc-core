@@ -71,14 +71,14 @@
         </select>
         {{/add_to_current_scope}}
 
-        {{#hasPlanProcedure}}
+        {{#if_equals instance.template_object_type 'Control'}}
         <label class="inline-check pull-left">
           <input type="checkbox"
             can-value="instance.test_plan_procedure"
             class="js-toggle-controlplans">
           Use control test plans as assessment test plan
         </label>
-        {{/hasPlanProcedure}}
+        {{/if_equals}}
       </div>
     </div>
 
@@ -93,7 +93,16 @@
             class="field-hide">hide</a>
         </label>
 
-        {{#allowDescription}}
+        {{#if instance.test_plan_procedure}}
+          <div class="wysiwyg-area">
+            <textarea
+              class="span12 triple"
+              placeholder="Enter Description"
+              tabindex="2"
+              disabled
+              ></textarea>
+          </div>
+        {{else}}
           <div class="wysiwyg-area">
             <textarea
               id="system_description"
@@ -103,16 +112,7 @@
               tabindex="2"
               ></textarea>
           </div>
-        {{else}}
-          <div class="wysiwyg-area">
-            <textarea
-              class="span12 triple"
-              placeholder="Enter Description"
-              tabindex="2"
-              disabled
-              ></textarea>
-          </div>
-        {{/allowDescription}}
+        {{/if}}
       </div>
 
       <div class="span6">
