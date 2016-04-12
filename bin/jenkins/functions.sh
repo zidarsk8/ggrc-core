@@ -117,7 +117,7 @@ selenium_tests () {
   docker exec -i ${PROJECT}_selenium_1 sh -c "
     python /selenium/bin/run_selenium.py" && rc=$? || rc=$?
 
-  mv ./test/selenium/logs/selenium.xml ./test/selenium.xml || true
+  mv ./test/selenium/logs/results.xml ./test/selenium.xml || true
 
   print_line
   return $rc
