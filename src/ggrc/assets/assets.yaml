@@ -111,11 +111,14 @@ dashboard-js-files:
   - apps/quick_search.js
   - apps/business_objects.js
   - apps/custom_attributes.js
+  - components/unified_mapper/mapper.js
+  - components/unified_mapper/mapper_results.js
+  - components/unified_mapper/mapper_checkbox.js
+  - components/dropdown/dropdown.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
   - components/csv/export.js
   - components/csv/import.js
-  - components/mapper.js
   - components/people_list.js
   - components/mapped_tree_view.js
   - components/reusable_objects.js
@@ -124,8 +127,14 @@ dashboard-js-files:
   - components/tabs.js
   - components/assessment_attributes.js
   - components/autocomplete/autocomplete.js
+  - components/lazy_open_close.js
   - components/object_history/object_history.js
   - components/person/person.js
+  - components/unified_mapper/mapper.js
+  - components/unified_mapper/mapper_results.js
+  - components/unified_mapper/mapper_checkbox.js
+  - components/assessment_templates/assessment_templates.js
+  - components/modal_wrappers/assessment_template_form.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -230,6 +239,9 @@ dashboard-js-template-files:
   - issues/info.mustache
   - issues/remediation_plan.mustache
   - components/autocomplete/autocomplete.mustache
+  - components/unified_mapper/mapper_results.mustache
+  - components/assessment_templates/assessment_templates.mustache
+  - components/dropdown/dropdown.mustache
   - components/object_history/object_history.mustache
   - components/person/person.mustache
   - custom_attributes/modal_content.mustache

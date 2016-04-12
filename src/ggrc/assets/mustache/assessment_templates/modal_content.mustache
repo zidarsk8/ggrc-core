@@ -6,6 +6,7 @@
 }}
 
 <div class="hideable-holder">
+  <wrapper-assessment-template instance='instance'>
   <form action="javascript://">
     {{> /static/mustache/base_objects/form_restore.mustache}}
 
@@ -70,12 +71,14 @@
         </select>
         {{/add_to_current_scope}}
 
+        {{#if_equals instance.template_object_type 'Control'}}
         <label class="inline-check pull-left">
           <input type="checkbox"
             can-value="instance.test_plan_procedure"
             class="js-toggle-controlplans">
           Use control test plans as assessment test plan
         </label>
+        {{/if_equals}}
       </div>
     </div>
 
@@ -89,15 +92,27 @@
           <a data-id="hide_description_lk" href="javascript://"
             class="field-hide">hide</a>
         </label>
-        <div class="wysiwyg-area">
-          <textarea
-            id="system_description"
-            can-value="instance.procedure_description"
-            class="span12 triple wysihtml5"
-            placeholder="Enter Description"
-            tabindex="2"
-            ></textarea>
-        </div>
+
+        {{#if instance.test_plan_procedure}}
+          <div class="wysiwyg-area">
+            <textarea
+              class="span12 triple"
+              placeholder="Enter Description"
+              tabindex="2"
+              disabled
+              ></textarea>
+          </div>
+        {{else}}
+          <div class="wysiwyg-area">
+            <textarea
+              id="system_description"
+              can-value="instance.procedure_description"
+              class="span12 triple wysihtml5"
+              placeholder="Enter Description"
+              tabindex="2"
+              ></textarea>
+          </div>
+        {{/if}}
       </div>
 
       <div class="span6">
@@ -107,18 +122,12 @@
               Default Assessors
               <span class="required">*</span>
             </label>
-
-            <select
-              can-value="instance.default_people.assessors"
-              can-change="instance.defaultAssesorsChanged"
-              class="input-block-level js-toggle-field">
-              <option value="Object Owners">Object Owners</option>
-              <option value="Audit Lead">Audit Lead</option>
-              <option value="Object Contact">Object Contact</option>
-              <option value="Primary Assessor">Primary Assessor</option>
-              <option value="Secondary Assessors">Secondary Assessors</option>
-              <option value="other">Others...</option>
-            </select>
+            <dropdown
+              class-name="input-block-level js-toggle-field"
+              options-list="instance.people_values"
+              name="instance.default_people.assessors"
+              on-change="instance.defaultAssesorsChanged"
+            ></dropdown>
           </div>
 
           <div class="span6">
@@ -147,17 +156,12 @@
               <span class="required">*</span>
             </label>
 
-            <select
-              can-value="instance.default_people.verifiers"
-              can-change="instance.defaultVerifiersChanged"
-              class="input-block-level js-toggle-field">
-              <option value="Object Owners">Object Owners</option>
-              <option value="Audit Lead">Audit Lead</option>
-              <option value="Object Contact">Object Contact</option>
-              <option value="Primary Assessor">Primary Assessor</option>
-              <option value="Secondary Assessors">Secondary Assessors</option>
-              <option value="other">Others...</option>
-            </select>
+            <dropdown
+              class-name="input-block-level js-toggle-field"
+              options-list="instance.people_values"
+              name="instance.default_people.verifiers"
+              on-change="instance.defaultVerifiersChanged"
+            ></dropdown>
           </div>
 
           <div class="span6">
@@ -228,6 +232,6 @@
         </div>
       </div>
     </div><!-- custom-attr-wrap end -->
-
  </form>
+ </wrapper-assessment-template>
 </div>
