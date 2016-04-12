@@ -27,7 +27,7 @@
           </div>
 
           <div {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true"
-          data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+            data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
             {{{render '/static/mustache/base_objects/test_plan.mustache' instance=instance}}}
           </div>
 
@@ -54,7 +54,7 @@
           {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
 
           <div class="row-fluid wrap-row" {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true"
-          data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+            data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
             <div class="span6">
               <h6>Conclusion: Design</h6>
               <p><small><em>Is this control design effective?</em></small></p>
@@ -95,15 +95,15 @@
                 {{#with_create_issue_json instance}}
                 <li>
                   <a class="btn btn-small btn-info" href="javascript://" data-toggle="modal-ajax-form"
-                  data-modal-class="modal-wide" data-object-singular="Issue" data-object-plural="issues"
-                  data-object-params='{{create_issue_json}}'>
+                    data-modal-class="modal-wide" data-object-singular="Issue" data-object-plural="issues"
+                    data-object-params='{{create_issue_json}}'>
                     Create Issue
                   </a>
                 </li>
                 <li>
                   <a class="btn btn-small btn-info" href="javascript://" data-toggle="modal-ajax-form"
-                  data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests"
-                  data-object-params='{{create_issue_json}}'>
+                    data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests"
+                    data-object-params='{{create_issue_json}}'>
                     Create Request
                   </a>
                 </li>
