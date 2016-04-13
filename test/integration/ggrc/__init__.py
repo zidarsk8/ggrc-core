@@ -6,6 +6,7 @@
 """Base test case for all ggrc integration tests."""
 
 import logging
+from sqlalchemy import exc
 from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
 from ggrc.app import app
@@ -22,19 +23,24 @@ class TestCase(BaseTestCase):
   @classmethod
   def clear_data(cls):
     ignore_tables = (
-        "test_model", "roles", "notification_types", "object_types", "options",
         "categories",
+        "notification_types",
+        "object_types",
+        "options",
+        "relationship_test_mock_model",
+        "roles",
+        "test_model",
     )
     tables = set(db.metadata.tables).difference(ignore_tables)
     for _ in range(len(tables)):
       if len(tables) == 0:
         break  # stop the loop once all tables have been deleted
       for table in reversed(db.metadata.sorted_tables):
-        if table.name not in ignore_tables:
+        if table.name in tables:
           try:
             db.engine.execute(table.delete())
             tables.remove(table.name)
-          except:
+          except exc.IntegrityError:
             pass
 
     db.session.commit()
