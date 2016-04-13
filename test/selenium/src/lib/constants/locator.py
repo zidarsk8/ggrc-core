@@ -802,7 +802,7 @@ class AdminCustomAttributes(object):
   class _Locator(object):
     @staticmethod
     def get_toggle(child_id):
-      return (By.CSS_SELECTOR, '.tree-structure li:nth-child({}) div '
+      return (By.CSS_SELECTOR, '#custom_attribute_widget li:nth-child({}) '
               '.openclose'.format(child_id))
 
     @staticmethod
