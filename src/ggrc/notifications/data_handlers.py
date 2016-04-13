@@ -29,18 +29,20 @@ def get_object_url(obj):
   return urlparse.urljoin(utils.get_url_root(), url)
 
 
-def assignable_open_data(notif):
-  """Get data for open assignable object.
+def _get_assignable_dict(people, notif):
+  """Get dict data for assignable object in notification.
 
   Args:
-    notif (Notification): Notification entry for an open assignable object.
-
+    people (List[Person]): List o people objects who should receive the
+      notification.
+    notif (Notification): Notification that should be sent.
   Returns:
-    A dict containing all notification data for the given notification.
+    dict: dictionary containing notification data for all people in the given
+      list.
   """
   obj = get_notification_object(notif)
   data = {}
-  for person, _ in obj.assignees:
+  for person in people:
     # Requests have "requested_on" field instead of "start_date" and we should
     # default to today() if no appropriate field is found on the object.
     start_date = getattr(obj, "start_date",
@@ -57,6 +59,21 @@ def assignable_open_data(notif):
         }
     }
   return data
+
+
+def assignable_open_data(notif):
+  """Get data for open assignable object.
+
+  Args:
+    notif (Notification): Notification entry for an open assignable object.
+
+  Returns:
+    A dict containing all notification data for the given notification.
+  """
+  obj = get_notification_object(notif)
+  people = [person for person, _ in obj.assignees]
+
+  return _get_assignable_dict(people, notif)
 
 
 def _get_declined_people(obj):
@@ -88,21 +105,19 @@ def assignable_declined_data(notif):
     A dict containing all notification data for the given notification.
   """
   obj = get_notification_object(notif)
-  data = {}
   people = _get_declined_people(obj)
-  for person in people:
-    data[person.email] = {
-        "user": get_person_dict(person),
-        notif.notification_type.name: {
-            obj.id: {
-                "title": obj.title
-            }
-        }
-    }
-  return data
+  return _get_assignable_dict(people, notif)
 
 
 def get_person_dict(person):
+  """Return dictionary with basic person info.
+
+  Args:
+    person (Person): Person object for which we want to get a dictionary.
+
+  Returns:
+    dict: dictionary with persons email, name and id.
+  """
   if person:
     return {
         "email": person.email,
