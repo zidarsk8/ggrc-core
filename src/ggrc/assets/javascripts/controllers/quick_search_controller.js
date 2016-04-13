@@ -702,6 +702,8 @@ can.Control("CMS.Controllers.LHN_Search", {
       });
     },
     post_init: function () {
+      var refreshCounts = _.debounce(this.refresh_counts.bind(this), 1000);
+
       this.init_object_lists();
       this.init_list_views();
 
@@ -715,7 +717,7 @@ can.Control("CMS.Controllers.LHN_Search", {
         }
 
         modelNames = can.map(
-          this.get_visible_lists(), this.proxy('get_list_model'))
+          this.get_visible_lists(), this.proxy('get_list_model'));
         modelName = instance.constructor.shortName;
 
         if (modelNames.indexOf(modelName) > -1) {
@@ -723,7 +725,7 @@ can.Control("CMS.Controllers.LHN_Search", {
           this.options.results_lists[modelName].unshift(instance);
         }
         // Refresh the counts whenever the lists change
-        this.refresh_counts();
+        refreshCounts();
       }.bind(this));
     }
 
