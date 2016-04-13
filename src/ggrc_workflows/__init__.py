@@ -151,11 +151,16 @@ def update_cycle_dates(cycle):
                 .joinedload('cycle_task_group_tasks')
                 ).one()
 
-  if not cycle.cycle_task_group_object_tasks:
+  if not cycle.cycle_task_group_object_tasks and \
+     cycle.workflow.kind != "Backlog":
     cycle.start_date, cycle.end_date = None, None
     cycle.next_due_date = None
     cycle.is_current = False
     db.session.add(cycle)
+    return
+
+  # Don't update cycle and cycle task group dates for backlog workflows
+  if cycle.workflow.kind == "Backlog":
     return
 
   for ctg in cycle.cycle_task_groups:
@@ -189,6 +194,7 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):  # noqa pylint:
 
 def _create_cycle_task(task_group_task, cycle, cycle_task_group,
                        current_user, base_date=None):
+  """Create a cycle task along with relations to other objects"""
   # TaskGroupTasks for one_time workflows don't save relative start/end
   # month/day. They only saves start and end dates.
   # TaskGroupTasks for all other workflow frequencies save the relative
@@ -244,6 +250,8 @@ def create_old_style_cycle(cycle, task_group, cycle_task_group, current_user,
 
 
 def build_cycle(cycle, current_user=None, base_date=None):
+  """Build a cycle with it's child objects"""
+
   if not base_date:
     base_date = date.today()
 
@@ -342,6 +350,8 @@ def update_cycle_task_child_state(obj):
 
 
 def update_cycle_task_parent_state(obj):  # noqa
+  """Propagate changes to obj's parents"""
+
   parent_attrs = _cycle_task_parent_attr.get(type(obj), [])
   for parent_attr in parent_attrs:
     if not parent_attr:
@@ -349,6 +359,11 @@ def update_cycle_task_parent_state(obj):  # noqa
 
     parent = getattr(obj, parent_attr, None)
     if not parent:
+      continue
+
+    # Don't propagate changes to CycleTaskGroup if it's a part of backlog wf
+    if isinstance(parent, models.CycleTaskGroup) \
+       and parent.cycle.workflow.kind == "Backlog":
       continue
 
     # If any child is `InProgress`, then parent should be `InProgress`
@@ -406,6 +421,8 @@ def update_cycle_task_parent_state(obj):  # noqa
 
 
 def ensure_assignee_is_workflow_member(workflow, assignee):
+  """Checks what role assignee has in the context of
+  a workflow. If he has none he gets the Workflow Member role."""
   if not assignee:
     return
 
@@ -975,16 +992,17 @@ class WorkflowRoleContributions(RoleContributions):
           'create': ['Workflow'],
       },
       'Creator': {
-          'read': [],
-          'create': ['Workflow'],
+          'create': ['Workflow', 'CycleTaskGroupObjectTask']
       },
       'Editor': {
-          'read': ['Workflow'],
-          'create': ['Workflow'],
+          'read': ['Workflow', 'CycleTaskGroupObjectTask'],
+          'create': ['Workflow', 'CycleTaskGroupObjectTask'],
+          'edit': ['CycleTaskGroupObjectTask'],
+          'delete': ['CycleTaskGroupObjectTask']
       },
       'Reader': {
-          'read': ['Workflow'],
-          'create': ['Workflow'],
+          'read': ['Workflow', 'CycleTaskGroupObjectTask'],
+          'create': ['Workflow', 'CycleTaskGroupObjectTask'],
       },
       'ProgramEditor': {
           'read': ['Workflow'],
