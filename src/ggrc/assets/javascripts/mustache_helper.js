@@ -719,18 +719,6 @@ Mustache.registerHelper("iterate_string", function (str, separator, options) {
   return ret.join("");
 });
 
-Mustache.registerHelper("is_private", function (options) {
-  var context = this;
-  if (options.isComputed) {
-    context = resolve_computed(options);
-    options = arguments[1];
-  }
-  if (context && context.attr('private')) {
-    return options.fn(context);
-  }
-  return options.inverse(context);
-});
-
 Mustache.registerHelper("option_select", function (object, attr_name, role, options) {
   var selected_option = object.attr(attr_name)
     , selected_id = selected_option ? selected_option.id : null
