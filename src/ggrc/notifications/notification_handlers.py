@@ -36,7 +36,7 @@ def _add_notification(obj, notif_type, when=None):
   db.session.add(notification.Notification(
       object_id=obj.id,
       object_type=obj.type,
-      send_on=datetime.now(),
+      send_on=when,
       notification_type=notif_type,
   ))
 
