@@ -117,24 +117,27 @@
     scope: {
       selected: new can.Map(),
       types: [{
-        type: 'Dropdown',
-        text: 'Type values separated by comma'
+        type: 'Text',
+        text: 'Type description'
+      }, {
+        type: 'Rich Text',
+        text: 'Type description'
+      }, {
+        type: 'Date',
+        text: 'MM/DD/YYYY'
       }, {
         type: 'Checkbox',
         text: 'Type label'
       }, {
-        type: 'Radio',
+        type: 'Dropdown',
         text: 'Type values separated by comma'
-      }, {
-        type: 'Text',
-        text: 'Type description'
       }, {
         type: 'Map:Person',
         text: ''  // not used
       }],
 
       // the field types that require a list of possible values to be defined
-      valueAttrs: ['Dropdown', 'Checkbox', 'Radio'],
+      valueAttrs: ['Dropdown', 'Checkbox'],
 
       /*
        * Create a new field.
