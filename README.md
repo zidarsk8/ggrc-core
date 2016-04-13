@@ -284,6 +284,11 @@ vagrant up
 
 To reprovision a docker container run the following:
 
+Remove files that are not in the repository e.g. python cache:
+```sh
+git clean -df
+```
+Start reprovisioning:
 ```sh
 docker-compose build --pull --no-cache
 ```
