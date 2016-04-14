@@ -739,6 +739,10 @@ can.Model("can.Model.Cacheable", {
     if (this.attr('custom_attribute_definitions')) {
       return;
     }
+    if (GGRC.custom_attr_defs === undefined) {
+      GGRC.custom_attr_defs = {};
+      console.warn("Missing injected custom attribute definitions");
+    }
     definitions = can.map(GGRC.custom_attr_defs, function (def) {
       var idCheck = !def.definition_id || def.definition_id === this.id;
       if (idCheck && def.definition_type === this.constructor.table_singular) {
