@@ -245,7 +245,8 @@ already have it running.
     vagrant up
 
     # run the following if there were any changes in the provisioning files,
-    # requirements, dev-requirements, or npm requirements...
+    # requirements, requirements-dev, requirements-selenium, or npm
+    requirements...
     vagrant provision
 
     vagrant ssh
