@@ -12,6 +12,7 @@ from selenium import webdriver    # pylint: disable=import-error
 from lib import constants
 from lib import exception
 from lib import meta
+from lib import mixin
 from lib.utils import selenium_utils
 
 
@@ -49,7 +50,11 @@ class CustomDriver(webdriver.Chrome):
 
 
 class Test(InstanceRepresentation):
-  __metaclass__ = meta.RequireDocs
+  __metaclass__ = mixin.MetaTestDecorator
+
+
+class TestUtil(InstanceRepresentation):
+  """Abstract class for all test util classes"""
 
 
 class Element(InstanceRepresentation):
