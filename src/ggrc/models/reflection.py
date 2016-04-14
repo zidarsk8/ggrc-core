@@ -129,7 +129,8 @@ class AttributeInfo(object):
     PROPERTY = "property"
     MAPPING = "mapping"
     SPECIAL_MAPPING = "special_mapping"
-    CUSTOM = "custom"
+    CUSTOM = "custom"  # normal custom attribute
+    OBJECT_CUSTOM = "object_custom"  # object level custom attribute
     USER_ROLE = "user_role"
 
   def __init__(self, tgt_class):
@@ -265,14 +266,19 @@ class AttributeInfo(object):
     else:
       custom_attributes = object_class.get_custom_attribute_definitions()
     for attr in custom_attributes:
-      attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.id)
+      if attr.definition_id:
+        ca_type = cls.Type.OBJECT_CUSTOM
+      else:
+        ca_type = cls.Type.CUSTOM
+      attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title)
+
       definitions[attr_name] = {
           "display_name": attr.title,
           "attr_name": attr.title,
           "mandatory": attr.mandatory,
           "unique": False,
           "description": "",
-          "type": cls.Type.CUSTOM,
+          "type": ca_type,
       }
     return definitions
 
