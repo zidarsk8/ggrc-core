@@ -5,7 +5,7 @@
 
 """Main notifications module.
 
-This module is used for for coordinating email notifications.
+This module is used for coordinating email notifications.
 """
 
 from ggrc import extensions

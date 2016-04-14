@@ -225,11 +225,11 @@ def get_fuzzy_date(delta_date):
     string: A human readable representation date delta.
 
   Examples:
-    >>> get_fuzzy_date(date(2016,4,14))
+    >>> get_fuzzy_date(datetime.date.today() + datetime.timedelta(2))
     'in 2 days'
-    >>> get_fuzzy_date(date(2016,4,12))
+    >>> get_fuzzy_date(datetime.date.today())
     'today'
-    >>> get_fuzzy_date(date(2016,4,11))
+    >>> get_fuzzy_date(datetime.date.today() + datetime.timedelta(-1))
     '1 day ago'
   """
   delta = delta_date - datetime.date.today()

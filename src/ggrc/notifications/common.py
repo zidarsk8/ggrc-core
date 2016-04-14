@@ -34,15 +34,28 @@ ENV = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
 class Services(object):
   """Helper class for notification services.
 
-  This class is is a helper class for calling a notification service for a
-  given object. The first call get_service_function must be done after all
-  modules have been initialized.
+  This class is a helper class for calling a notification service for a given
+  object. The first call get_service_function must be done after all modules
+  have been initialized.
   """
 
   services = []
 
   @classmethod
   def get_service_function(cls, name):
+    """Get callback function for an object.
+
+    This returns a service function which is a registered callback for an
+    object that has a notification.
+
+    Args:
+      name: Name of an object for which we want to get a service function, such
+        as "Request", "CycleTask", "Assessment", etc.
+
+    Returns:
+      callable: A function that takes a notification and returns a data dict
+        with all the data for that notification.
+    """
     if not cls.services:
       cls.services = extensions.get_module_contributions(
           "contributed_notifications")
@@ -51,14 +64,38 @@ class Services(object):
     return cls.services[name]
 
   @classmethod
-  def call_service(cls, name, notification):
-    service = cls.get_service_function(name)
-    return service(notification)
+  def call_service(cls, notif):
+    """Call data handler service for the object in the notification.
+
+    Args:
+      notif (Notification): Notification object for which we want to get the
+        notification data dict.
+
+    Returns:
+      dict: Result of the data handler for the object in the notification.
+    """
+    service = cls.get_service_function(notif.object_type)
+    return service(notif)
 
 
 def get_filter_data(notification):
+  """Get filtered notification data.
+
+  This function gets notification data for all users who should receive it. A
+  single notification can be for multiple users (such as all assignees) but
+  only some should receive it depending on if it's an instant notification or
+  a daily digest and the specific users notification settings.
+
+  Args:
+    notification (Notification): Notification object for which we want to get
+      data.
+
+  Returns:
+    dict: dictionary containing notification data for all users who should
+      receive it, according to their notification settings.
+  """
   result = {}
-  data = Services.call_service(notification.object_type, notification)
+  data = Services.call_service(notification)
 
   for user, user_data in data.iteritems():
     if should_receive(notification, user_data):
@@ -67,6 +104,19 @@ def get_filter_data(notification):
 
 
 def get_notification_data(notifications):
+  """Get notification data for all notifications.
+
+  This function returns a filtered data for all notifications for the users
+  that should receive it.
+
+  Args:
+    notifications (list of Notification): List of notification for which we
+      want to get notification data.
+
+  Returns:
+    dict: Filtered dictionary containing all the data that should be sent for
+      the given notification list.
+  """
   if not notifications:
     return {}
   aggregate_data = {}
@@ -82,6 +132,15 @@ def get_notification_data(notifications):
 
 
 def get_pending_notifications():
+  """Get notification data for all future notifications.
+
+  The data dict that get's returned here contains notification data grouped by
+  dates on which the notifications should be received.
+
+  Returns
+    list of Notifications, data: a tuple of notifications that were handled
+      and corresponding data for those notifications.
+  """
   notifications = db.session.query(Notification).filter(
       Notification.sent_at.is_(None)).all()
 
@@ -100,6 +159,12 @@ def get_pending_notifications():
 
 
 def get_todays_notifications():
+  """Get notification data for all future notifications.
+
+  Returns
+    list of Notifications, data: a tuple of notifications that were handled
+      and corresponding data for those notifications.
+  """
   notifications = db.session.query(Notification).filter(
       and_(Notification.send_on <= date.today(),
            Notification.sent_at.is_(None)
@@ -146,6 +211,11 @@ def should_receive(notif, user_data):
 
 
 def send_todays_digest_notifications():
+  """Send emails for todays or overdue notifications.
+
+  Returns:
+    str: String containing a simple list of who received the notification.
+  """
   digest_template = ENV.get_template("notifications/email_digest.html")
   notif_list, notif_data = get_todays_notifications()
   sent_emails = []
@@ -172,6 +242,18 @@ def set_notification_sent_time(notif_list):
 
 
 def show_pending_notifications():
+  """Get notification html for all future notifications.
+
+  The data shown here is grouped by dates on which notifications should be
+  sent.
+
+  Note that the dates for all future notifications will be wrong since they are
+  based on the current date which will be different when the notification is
+  actually sent.
+
+  Returns:
+    str: Html containing all future notifications.
+  """
   if not permissions.is_admin():
     raise Forbidden()
   _, notif_data = get_pending_notifications()
@@ -184,6 +266,11 @@ def show_pending_notifications():
 
 
 def show_todays_digest_notifications():
+  """Get notification html for todays notifications.
+
+  Returns:
+    str: Html containing all todays notifications.
+  """
   if not permissions.is_admin():
     raise Forbidden()
   _, notif_data = get_todays_notifications()
@@ -234,9 +321,17 @@ def send_email(user_email, subject, body):
 
 
 def modify_data(data):
-  """
-  for easier use in templates, it joins the due_in and due today fields
-  together
+  """Modify notification data dictionary.
+
+  For easier use in templates, it joins the due_in and due today fields
+  together.
+
+  Args:
+    data (dict): notification data.
+
+  Returns:
+    dict: the received dict with some additional fields for easier traversal
+      in the notification template.
   """
 
   data["due_soon"] = {}
