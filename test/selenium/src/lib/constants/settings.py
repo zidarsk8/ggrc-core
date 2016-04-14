@@ -16,3 +16,4 @@ class Values(object):
   PORT = "port"
   LEVEL = "level"
   FORMAT = "format"
+  RERUN_FAILED_TEST = "rerun_failed_test"
