@@ -1140,12 +1140,96 @@
         }
       });
     },
+    init: function () {
+      if (this._super) {
+        this._super.apply(this, arguments);
+      }
+      this._set_mandatory_msgs();
+      this.get_mapping('comments').bind('length',
+          this._set_mandatory_msgs.bind(this));
+      this.get_mapping('all_documents').bind('length',
+          this._set_mandatory_msgs.bind(this));
+    },
     before_save: function (newForm) {
       if (!this.isNew()) {
         return;
       }
       this.mark_for_addition(
         'related_objects_as_destination', this.audit.program);
+    },
+    after_save: function () {
+      this._set_mandatory_msgs();
+    },
+    _set_mandatory_msgs: function () {
+      var instance = this;
+      var FLAGS = {
+        COMMENT: 1,
+        ATTACHMENT: 2 // binary 10
+      };
+      var needed = {
+        comment: [],
+        attachment: []
+      };
+      var rq = new RefreshQueue();
+
+      if (!instance.custom_attribute_definitions) {
+        instance.load_custom_attribute_definitions();
+      }
+
+      _.each(instance.custom_attribute_values, function (cav) {
+        rq.enqueue(cav);
+      });
+      $.when(
+          instance.get_binding('comments').refresh_count(),
+          instance.get_binding('all_documents').refresh_count(),
+          rq.trigger()
+      ).then(function (commentCount, attachmentCount, rqRes) {
+        commentCount = commentCount();
+        attachmentCount = attachmentCount();
+        _.each(instance.custom_attribute_values, function (cav) {
+          var definition;
+          var i;
+          var mandatory;
+          cav = cav.reify();
+          definition = _.find(instance.custom_attribute_definitions, {
+            id: cav.custom_attribute_id
+          });
+          if (!definition.multi_choice_options ||
+              !definition.multi_choice_mandatory) {
+            return;
+          }
+          i = definition.multi_choice_options.split(',')
+                    .indexOf(cav.attribute_value);
+          mandatory = definition.multi_choice_mandatory.split(',')[i];
+          if (mandatory === undefined) {
+            return;
+          }
+          mandatory = Number(mandatory);
+          if (mandatory & FLAGS.COMMENT) {
+            needed.comment.push(definition.title + ': ' + cav.attribute_value);
+          }
+          if (mandatory & FLAGS.ATTACHMENT) {
+            needed.attachment.push(definition.title + ': ' +
+                                   cav.attribute_value);
+          }
+        });
+        if (!commentCount && needed.comment.length) {
+          instance.attr(
+              '_mandatory_comment_msg',
+              'Comment required by: ' + needed.comment.join(', ')
+          );
+        } else {
+          instance.removeAttr('_mandatory_comment_msg');
+        }
+        if (!attachmentCount && needed.attachment.length) {
+          instance.attr(
+              '_mandatory_attachment_msg',
+              'Evidence required by: ' + needed.attachment.join(', ')
+          );
+        } else {
+          instance.removeAttr('_mandatory_attachment_msg');
+        }
+      });
     }
   });
 
