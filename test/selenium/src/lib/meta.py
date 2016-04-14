@@ -27,7 +27,7 @@ class DecorateFlakyTests(type):
               constants.test_runner.TEST_METHOD_POSTFIX]
            ]) and callable(value):
         dct[attr_name] = pytest.mark.flaky(
-          reruns=environment.RERUN_FAILED_TEST)(value)
+            reruns=environment.RERUN_FAILED_TEST)(value)
 
     return super(DecorateFlakyTests, mcs).__new__(mcs, name, bases, dct)
 
