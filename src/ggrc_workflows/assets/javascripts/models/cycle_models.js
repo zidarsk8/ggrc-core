@@ -42,6 +42,10 @@
       form.removeAttr('workflow');
       return;
     }
+    // if we get a stub, reify it
+    if (workflow.state === undefined) {
+      workflow = workflow.reify();
+    }
     if (typeof workflow.cycles === undefined || !workflow.cycles) {
       $(document.body).trigger(
         "ajax:flash"
@@ -379,7 +383,6 @@
           // if we are creating a task from the workflow page, the preset
           // workflow should be that one
           if (form.workflow !== undefined) {
-            console.log("workflow preset");
             populateFromWorkflow(form, form.workflow);
             return;
           }

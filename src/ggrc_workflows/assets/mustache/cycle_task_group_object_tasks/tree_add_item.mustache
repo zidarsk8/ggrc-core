@@ -18,7 +18,18 @@
       data-toggle="modal-ajax-form"
       data-modal-reset="reset"
       data-object-params='{
-        "modal_title": "Create New Cycle Task", {{#if_equals parent_instance.type 'Workflow'}}"workflow":{"id":{{parent_instance.id}},"type":"Workflow"} {{/if_equals}} }'>
+        {{^if_instance_of parent_instance 'Person|Workflow'}}
+          "pre_mapped_objects": [{
+            "type": "{{ parent_instance.type }}",
+            "id": {{ parent_instance.id }}
+          }],
+        {{/if_instance_of}}
+        "modal_title": "Create New Cycle Task"
+        {{#if_equals parent_instance.type 'Workflow'}}
+          ,"workflow":{"id":{{parent_instance.id}},"type":"Workflow"}
+        {{/if_equals}}
+        }'>
+
       <i class="fa fa-plus-circle"></i>
     </a>
 {{/is_allowed}}
