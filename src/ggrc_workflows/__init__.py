@@ -997,6 +997,7 @@ class WorkflowRoleContributions(RoleContributions):
       'Editor': {
           'read': ['Workflow', 'CycleTaskGroupObjectTask'],
           'create': ['Workflow', 'CycleTaskGroupObjectTask'],
+          'update': ['CycleTaskGroupObjectTask'],
           'edit': ['CycleTaskGroupObjectTask'],
           'delete': ['CycleTaskGroupObjectTask']
       },
