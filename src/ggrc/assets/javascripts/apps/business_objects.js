@@ -212,11 +212,6 @@
             widget_id: "Request",
             widget_name: "Open Requests"
           },
-          Control: {
-            widget_id: "control",
-            widget_name: "In Scope Controls",
-            widget_icon: "control"
-          },
           program: {
             widget_id: "program",
             widget_name: "Program",
@@ -451,17 +446,6 @@
             show_view: GGRC.mustache_path + "/requests/tree.mustache",
             footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache"
-          },
-          Control: {
-            mapping: "program_controls",
-            parent_instance: GGRC.page_instance(),
-            draw_children: true,
-            model: CMS.Models.Control,
-            show_view: GGRC.mustache_path + "/controls/tree.mustache",
-            footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/controls/tree_add_item.mustache",
-            allow_mapping: false,
-            allow_creating: false
           },
           Program: {
             mapping: "_program",
