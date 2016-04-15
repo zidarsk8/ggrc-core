@@ -193,6 +193,7 @@ def get_mapping_rules():
       "Risk": "AccessGroup Clause Contract Assessment Control DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor Threat CycleTaskGroupObjectTask",  # noqa
       "Threat": "AccessGroup Clause Contract Assessment Control DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor Risk CycleTaskGroupObjectTask",  # noqa
       "CycleTaskGroupObjectTask": "AccessGroup Clause Contract Assessment Control DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor Risk Threat",  # noqa
+      "AssessmentTemplate": "Audit",
   }
 
   split_rules = {k: v.split() for k, v in business_object_rules.items()}
