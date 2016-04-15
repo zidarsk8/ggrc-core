@@ -309,19 +309,18 @@ class TestGetObjectColumnDefinitions(TestCase):
 
   def test_assessment_definitions(self):
     """ test default headers for Assessment """
-    definitions = get_object_column_definitions(models.Assessment)
-    mapping_names = get_mapping_names(models.Assessment.__name__)
-    display_names = {val["display_name"] for val in definitions.values()}
-    element_names = {
+
+
+    names = {
         "Title",
         "Description",
-        "Notes",
         "Test Plan",
+        "Notes",
+        "Object",
         "Audit",
-        "Owner",
+        "Creator",
         "Assessor",
         "Verifier",
-        "Creator",
         "Primary Contact",
         "Secondary Contact",
         "Assessment URL",
@@ -337,6 +336,25 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Recipients",
         "Send by default",
         "Delete",
+    }
+    mandatory = {
+        "Title",
+        "Object",
+        "Audit",
+        "Creator",
+        "Assessor",
+        "Code",
+    }
+    unique = {
+        "Code",
+    }
+    self._test_single_object(models.Assessment, names, mandatory, unique)
+
+
+    definitions = get_object_column_definitions(models.Assessment)
+    mapping_names = get_mapping_names(models.Assessment.__name__)
+    display_names = {val["display_name"] for val in definitions.values()}
+    element_names = {
     }
     expected_names = element_names.union(mapping_names)
     self.assertEqual(expected_names, display_names)
