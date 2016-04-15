@@ -352,13 +352,13 @@ There are three primary classes of requirements for GGRC-Core: Submodules, Pytho
 
 There are two pip requirements files: a runtime requirements file,
 `src/requirements.txt`, for application package dependencies and a
-development requirements file, `src/dev-requirements.txt`, for additional
+development requirements file, `src/requirements-dev.txt`, for additional
 development-time package dependencies. The runtime requirements are deployed
 with the application while the development requirements are only used in the
 development environment (largely for testing purposes).
 
 Most requirements changes should be in either `src/requirements.txt` or
-`src/dev-requirements.txt` and would manifest as module import failures.
+`src/requirements-dev.txt` and would manifest as module import failures.
 
 ### Environment Variables
 
@@ -413,8 +413,8 @@ requirements.
 To Manually update the requirements, you can login to vagrant or docker virtual machine and run
 
 ```sh
-pip install -r src/dev-requirements.txt
-pip install --no-deps -r src/requirements.txt
+pip install -r src/requirements-dev.txt
+pip install --no-deps -r src/requirements-basic.txt
 ```
 
 Note that if you're using `launch_gae_ggrc`, then changes to

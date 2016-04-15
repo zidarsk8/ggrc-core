@@ -14,6 +14,7 @@ this module.
 
 import uuid
 import re
+
 from lib import base
 from lib.constants.test import modal_create_new
 from lib.constants.test import modal_custom_attribute
@@ -40,7 +41,7 @@ class HtmlParser(object):
     return re.sub(r'\s+', " ", text)
 
 
-class ModalInput(base.Test):
+class ModalInput(base.TestUtil):
   """Base class for filling out modals"""
   @staticmethod
   def enter_test_data(modal):

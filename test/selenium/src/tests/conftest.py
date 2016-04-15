@@ -13,8 +13,9 @@ from lib.constants.test import batch
 from lib.utils import conftest_utils
 from lib.utils import test_utils
 
+# pylint: disable=redefined-outer-name
 pytest_plugins = "selenium", "xdist", "xvfb", "timeout", "flask", \
-                 "rerunfailures", "timeout"
+                 "rerunfailures", "timeout", "repeat", "pycharm"
 
 
 @pytest.yield_fixture(scope="session")
@@ -31,8 +32,14 @@ def db_migrate():
   pass
 
 
+@pytest.yield_fixture(scope="function")
 def selenium(selenium):
   """Setup test resources for running test in headless mode"""
+
+  # todo: here we should use selenium.maximize_window() and env variables to
+  #  set xvfb resolution in the docker container. Setting the env vars
+  # currently doesn't work for selenium-docker
+  selenium.set_window_size(1440, 900)
   yield selenium
 
 

@@ -104,11 +104,12 @@ $(DEV_PREFIX)/opt/dev_virtualenv :
 
 dev_virtualenv : $(DEV_PREFIX)/opt/dev_virtualenv
 
-dev_virtualenv_packages : dev_virtualenv src/dev-requirements.txt src/requirements.txt
+dev_virtualenv_packages : dev_virtualenv src/requirements-dev.txt src/requirements.txt  src/requirements-selenium.txt
 	source "$(PREFIX)/bin/init_env"; \
 		pip install -U pip==7.1.2; \
 		pip install --no-deps -r src/requirements.txt; \
-		pip install -r src/dev-requirements.txt
+		pip install -r src/requirements-dev.txt; \
+		pip install -r src/requirements-selenium.txt
 
 git_submodules :
 	git submodule update --init

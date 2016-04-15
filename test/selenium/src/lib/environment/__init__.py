@@ -40,7 +40,9 @@ APP_URL = _get_base_url(_settings)
 SERVER_WAIT_TIME = int(_settings.get(
     constants.settings.Section.APP,
     constants.settings.Values.WAIT_FOR_APP_SERVER))
-
+RERUN_FAILED_TEST = int(_settings.get(
+    constants.settings.Section.PYTEST,
+    constants.settings.Values.RERUN_FAILED_TEST))
 
 # register loggers
 _set_loggers(_settings)

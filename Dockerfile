@@ -46,7 +46,7 @@ RUN cd /vagrant-dev \
 COPY ./Makefile ./bower.json /vagrant/
 RUN make bower_components DEV_PREFIX=/vagrant-dev
 
-COPY ./src/requirements.txt ./src/dev-requirements.txt /vagrant/src/
+COPY ./src/requirements*.txt /vagrant/src/
 COPY ./bin/init_env ./bin/setup_linked_packages.py /vagrant/bin/
 COPY ./extras /vagrant/extras
 RUN make setup_dev DEV_PREFIX=/vagrant-dev \
