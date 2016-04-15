@@ -169,6 +169,7 @@ dashboard-js-template-files:
   - base_objects/relevance_action.mustache
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
+  - base_objects/title.mustache
   - base_objects/tree.mustache
   - base_objects/tree_placeholder.mustache
   - base_objects/tree_footer_no_access.mustache
@@ -277,6 +278,7 @@ dashboard-js-template-files:
   - help/help_modal_header.mustache
   - help/filters_helper_content.mustache
   - markets/modal_content.mustache
+  - mapped_objects/dropdown_menu_tier2.mustache
   - modals/close_buttons.mustache
   - modals/confirm.mustache
   - modals/confirm_buttons.mustache
