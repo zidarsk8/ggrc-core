@@ -87,7 +87,7 @@ class AutoStatusChangable(object):
     Returns:
       Nothing.
     """
-    AutoStatusChangable.set_handlers(model)
+    cls.set_handlers(model)
 
   @staticmethod
   def adjust_status(model, obj):
