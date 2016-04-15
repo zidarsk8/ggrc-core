@@ -617,7 +617,7 @@
         requests: 'Request',
         _program: 'Program',
         context: 'Context',
-        related_objects_as_source: ['Assessment', 'AssessmentTemplate', 'Issue']
+
       },
       _mixins: [
         'related_object'
