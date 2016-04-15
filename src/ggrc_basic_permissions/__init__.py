@@ -3,10 +3,18 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+"""Initialize RBAC"""
+
 import datetime
 import sqlalchemy.orm
 from flask import Blueprint
 from flask import g
+from sqlalchemy import and_
+from sqlalchemy import case
+from sqlalchemy import literal
+from sqlalchemy import or_
+from sqlalchemy.orm import aliased
+from sqlalchemy.orm.attributes import get_history
 from ggrc import db, settings
 from ggrc.app import app
 from ggrc_basic_permissions import basic_roles
@@ -30,12 +38,6 @@ from ggrc.services.common import _get_cache_manager
 from ggrc.services.common import Resource
 from ggrc.services.registry import service
 from ggrc.utils import benchmark
-from sqlalchemy import and_
-from sqlalchemy import case
-from sqlalchemy import literal
-from sqlalchemy import or_
-from sqlalchemy.orm import aliased
-from sqlalchemy.orm.attributes import get_history
 
 
 blueprint = Blueprint(

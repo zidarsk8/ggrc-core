@@ -3,6 +3,8 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
+"""Test audit RBAC"""
+
 from os.path import abspath
 from os.path import dirname
 from os.path import join
@@ -28,8 +30,8 @@ class TestAuditRBAC(TestCase):
     self.audit = all_models.Audit.eager_query().first()
     sources = set(r.source for r in self.audit.related_sources)
     destinations = set(r.destination for r in self.audit.related_destinations)
-    related = filter(lambda x: not isinstance(x, all_models.Person),
-                     sources.union(destinations))
+    related = [obj for obj in sources.union(destinations)
+               if not isinstance(obj, all_models.Person)]
     self.related_objects = related
     self.sanity_check()
 
