@@ -439,7 +439,7 @@
           }
         },
         Audit: {
-          _mixins: ['issues', 'governance_objects'],
+          _mixins: ['issues', 'governance_objects', 'business_objects'],
           Request: {
             mapping: "active_requests",
             draw_children: true,
@@ -488,6 +488,17 @@
             add_item_view:
               GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
           },
+          Person: {
+            widget_id: "person",
+            widget_name: "People",
+            widget_icon: "person",
+            content_controller: GGRC.Controllers.TreeView,
+            content_controller_options: {
+              mapping: "authorized_people",
+              allow_mapping: false,
+              allow_creating: false
+            }
+          }
         },
         directive: {
           _mixins: [
