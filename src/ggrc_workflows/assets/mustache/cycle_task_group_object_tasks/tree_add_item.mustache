@@ -18,7 +18,7 @@
       data-toggle="modal-ajax-form"
       data-modal-reset="reset"
       data-object-params='{
-        "modal_title": "Create New Cycle Task"}'>
+        "modal_title": "Create New Cycle Task", {{#if_equals parent_instance.type 'Workflow'}}"workflow":{"id":{{parent_instance.id}},"type":"Workflow"} {{/if_equals}} }'>
       <i class="fa fa-plus-circle"></i>
     </a>
 {{/is_allowed}}

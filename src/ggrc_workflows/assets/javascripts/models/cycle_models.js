@@ -373,19 +373,31 @@
           form.attr("contact", {id: GGRC.current_user.id, type: "Person"});
         }
 
-        workflows = CMS.Models.Workflow.findAll({
-          kind: 'Backlog', status: 'Active', __sort: '-created_at'});
-        workflows.then(function (workflowList) {
-          if (!workflowList.length) {
-            $(document.body).trigger(
-              "ajax:flash"
-              , {warning: "No Backlog workflows found! You can create one by going to /admin/ensure_backlog_workflow_exists"}
-            );
+        // using setTimeout to execute this after the modal is loaded
+        // so we can see when the workflow is already set and use that one
+        setTimeout(function () {
+          // if we are creating a task from the workflow page, the preset
+          // workflow should be that one
+          if (form.workflow !== undefined) {
+            console.log("workflow preset");
+            populateFromWorkflow(form, form.workflow);
             return;
           }
-          _workflow = workflowList[0];
-          populateFromWorkflow(form, _workflow);
-        });
+
+          workflows = CMS.Models.Workflow.findAll({
+            kind: 'Backlog', status: 'Active', __sort: '-created_at'});
+          workflows.then(function (workflowList) {
+            if (!workflowList.length) {
+              $(document.body).trigger(
+                "ajax:flash"
+                , {warning: "No Backlog workflows found! Contact your administrator to enable this functionality."}
+              );
+              return;
+            }
+            _workflow = workflowList[0];
+            populateFromWorkflow(form, _workflow);
+          });
+        }, 0);
       } else {
         cycle = form.cycle.reify();
         if (!_.isUndefined(cycle.workflow)) {
