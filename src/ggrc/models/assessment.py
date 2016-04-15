@@ -99,10 +99,22 @@ class Assessment(mixins_statusable.Statusable,
   }
 
   _aliases = {
+      "owners": None,
+      "assessment_object": {
+          "display_name": "Object",
+          "mandatory": True,
+          "ignore_on_update": True,
+      },
+      "assessment_template": {
+          "display_name": "Template",
+          "ignore_on_update": True,
+      },
       "audit": {
           "display_name": "Audit",
           "mandatory": True,
           "filter_by": "_filter_by_audit",
+          "ignore_on_update": True,
+          "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "url": "Assessment URL",
       "design": "Conclusion: Design",
