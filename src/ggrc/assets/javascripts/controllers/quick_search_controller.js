@@ -702,7 +702,10 @@ can.Control("CMS.Controllers.LHN_Search", {
       });
     },
     post_init: function () {
-      var refreshCounts = _.debounce(this.refresh_counts.bind(this), 1000);
+      var refreshCounts = _.debounce(this.refresh_counts.bind(this), 1000, {
+        leading: true,
+        trailing: false
+      });
 
       this.init_object_lists();
       this.init_list_views();
