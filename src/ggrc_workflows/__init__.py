@@ -588,7 +588,8 @@ def handle_cycle_task_group_object_task_put(
 def handle_cycle_task_group_object_task_post(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
 
-  ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
+  if obj.cycle.workflow.kind != "Backlog":
+    ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
   update_cycle_dates(obj.cycle)
 
   Signals.status_change.send(

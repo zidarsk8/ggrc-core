@@ -42,8 +42,7 @@
       form.removeAttr('workflow');
       return;
     }
-    // if we get a stub, reify it
-    if (workflow.state === undefined) {
+    if (workflow instanceof can.Stub) {
       workflow = workflow.reify();
     }
     if (typeof workflow.cycles === undefined || !workflow.cycles) {
