@@ -374,12 +374,12 @@
         }
 
         workflows = CMS.Models.Workflow.findAll({
-          __search: 'Backlog', status: 'Active'}); // TODO: INSTEAD OF hardcode BACKLOG USE A SETTING
+          kind: 'Backlog', status: 'Active', __sort: '-created_at'});
         workflows.then(function (workflowList) {
           if (!workflowList.length) {
             $(document.body).trigger(
               "ajax:flash"
-              , {warning: "No workflows named 'Backlog' found! You need to create and activate at least one with this name"}
+              , {warning: "No Backlog workflows found! You can create one by going to /admin/ensure_backlog_workflow_exists"}
             );
             return;
           }
