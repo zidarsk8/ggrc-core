@@ -302,6 +302,7 @@ class TestGetObjectColumnDefinitions(TestCase):
 
     names = {
         "Title",
+        "Template",
         "Description",
         "Test Plan",
         "Notes",
@@ -334,9 +335,15 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Creator",
             "Assessor",
             "Code",
+            "State",
         },
         "unique": {
             "Code",
+        },
+        "ignore_on_update": {
+            "Template",
+            "Object",
+            "Audit",
         }
     }
     self._test_single_object(models.Assessment, names, expected_fields)
