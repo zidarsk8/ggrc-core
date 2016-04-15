@@ -232,6 +232,10 @@ def get_fuzzy_date(delta_date):
     >>> get_fuzzy_date(datetime.date.today() + datetime.timedelta(-1))
     '1 day ago'
   """
+  if not delta_date:
+    return ""
+  if isinstance(delta_date, datetime.datetime):
+    delta_date = delta_date.date()
   delta = delta_date - datetime.date.today()
   if delta.days < 0:
     days = abs(delta.days)
