@@ -153,7 +153,7 @@ class AutoStatusChangable(object):
     def handle_object_put(sender, obj=None, src=None, service=None):
       """Handles object PUT operation
 
-      Handles PUT operation submitted to object.
+      Handles edit operation submitted to object.
 
       See blinker library documentation for other parameters (all necessary).
 
