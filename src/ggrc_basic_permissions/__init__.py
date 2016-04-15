@@ -165,13 +165,17 @@ def objects_via_relationships_query(model, roles, user_id, context_not_role):
         (where the user has a listed role) and the corresponding relationships.
   """
   _role = aliased(all_models.Role, name="r")
+  _implications = aliased(all_models.ContextImplication, name="ci")
   _model = aliased(model, name="p")
   _relationship = aliased(all_models.Relationship, name="rl")
   _user_role = aliased(all_models.UserRole, name="ur")
 
   def _join_filter(query, cond):
     return query.join(_model, cond).\
-        join(_user_role, _model.context_id == _user_role.context_id).\
+        join(_implications,
+             _model.context_id == _implications.source_context_id).\
+        join(_user_role, _user_role.context_id.in_(
+            (_implications.source_context_id, _implications.context_id))).\
         join(_role, _user_role.role_id == _role.id).\
         filter(and_(_user_role.person_id == user_id, _role.name.in_(roles)))
 
