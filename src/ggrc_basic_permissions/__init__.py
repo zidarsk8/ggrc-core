@@ -246,7 +246,7 @@ def audit_relationship_query(user_id, context_not_role=False):
   """
   return objects_via_relationships_query(
       model=all_models.Audit,
-      roles=('Auditor',),
+      roles=('Auditor', 'ProgramEditor', 'ProgramOwner', 'ProgramReader'),
       user_id=user_id,
       context_not_role=context_not_role
   )
@@ -526,7 +526,10 @@ def load_permissions_for(user):  # noqa
   for res in audit_relationship_query(user.id):
     id_, type_, role_name = res
     actions = ["read", "view_object_page"]
-    if type_ in ("Assessment", "Request"):
+    if role_name == "Auditor":
+      if type_ in ("Assessment", "Request"):
+        actions += ["create", "update", "delete"]
+    if role_name in ("ProgramOwner", "ProgramEditor"):
       actions += ["create", "update", "delete"]
     for action in actions:
       permissions.setdefault(action, {})\
