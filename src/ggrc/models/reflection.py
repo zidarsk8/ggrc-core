@@ -15,7 +15,9 @@ from ggrc.utils import underscore_from_camelcase
 
 ATTRIBUTE_ORDER = (
     "slug",
+    "assessment_template",
     "audit",
+    "assessment_object",
     "request_audit",
     "control",
     "program",
@@ -46,6 +48,8 @@ ATTRIBUTE_ORDER = (
     "report_end_date",
     "relative_start_date",
     "relative_end_date",
+    "finished_date",
+    "verified_date",
     "status",
     "assertions",
     "categories",
@@ -72,6 +76,9 @@ ATTRIBUTE_ORDER = (
     "company",
     "user_role",
     "test",
+    "recipients",
+    "send_by_default",
+    "delete",
 )
 
 
