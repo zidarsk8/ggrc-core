@@ -1,12 +1,15 @@
 {{!
-    Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: goodson@google.com
-    Maintained By: ?
+  Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: goodson@google.com
+  Maintained By: ?
 }}
 
 {{#each results}}
-<li class="tree-item task-item" data-object-type="{{instance.class.table_singular}}" {{#instance}}{{ data 'option' }}{{/instance}} data-id="{{ instance.id }}">
+<li class="tree-item task-item"
+    data-object-type="{{instance.class.table_singular}}"
+    {{#instance}}{{ data 'option' }}{{/instance}}
+    data-id="{{ instance.id }}">
   <div class="item-main">
     <div class="item-wrap">
       <div class="openclose" {{data 'expandable'}}>
@@ -21,7 +24,7 @@
                 <i class="fa fa-{{instance.class.table_singular}} color"></i>
                 {{firstexist instance.name instance.title instance.description}}
                 <span class="url-link">
-                {{firstexist instance.email instance.link}}
+                  {{firstexist instance.email instance.link}}
                 </span>
               </div>
             </div> <!-- span8 end -->
@@ -43,18 +46,13 @@
     <div class="tier-2-info-content">
       <lazy-openclose>
         {{#show}}
-          <div class="show-description">
-            <div class="row-fluid">
-              <div class="span12">
-                <div class="tree-description">
-                  <div class="tier-content">
-                    {{> /static/mustache/base_objects/title.mustache}}
-                    {{> /static/mustache/base_objects/description.mustache}}
-                    {{> /static/mustache/base_objects/notes.mustache}}
-                  </div>
-                </div>
-              </div>
-            </div>
+          {{#instance}}
+            {{{render '/static/mustache/mapped_objects/dropdown_menu_tier2.mustache' instance=instance}}}
+          {{/instance}}
+          <div class="tier-content">
+            {{> /static/mustache/base_objects/title.mustache}}
+            {{> /static/mustache/base_objects/description.mustache}}
+            {{> /static/mustache/base_objects/notes.mustache}}
           </div>
         {{/show}}
       </lazy-openclose>

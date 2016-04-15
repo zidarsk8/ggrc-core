@@ -161,7 +161,6 @@ dashboard-js-template-files:
   - base_objects/view_link.mustache
   - base_objects/unmap.mustache
   - base_objects/map_related_modal_content.mustache
-  - base_objects/mapped_objects_option_items.mustache
   - base_objects/mappings_detail.mustache
   - base_objects/tabs.mustache
   - base_objects/tab_panel.mustache
@@ -279,6 +278,7 @@ dashboard-js-template-files:
   - help/help_modal_header.mustache
   - help/filters_helper_content.mustache
   - markets/modal_content.mustache
+  - mapped_objects/dropdown_menu_tier2.mustache
   - modals/close_buttons.mustache
   - modals/confirm.mustache
   - modals/confirm_buttons.mustache
