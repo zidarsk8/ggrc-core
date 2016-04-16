@@ -1214,6 +1214,7 @@
     // the object types that are not relevant to the AssessmentTemplate,
     // i.e. it does not really make sense to assess them
     _NON_RELEVANT_OBJ_TYPES: Object.freeze({
+      AssessmentTemplate: true,
       Assessment: true,
       Audit: true,
       CycleTaskGroupObjectTask: true,

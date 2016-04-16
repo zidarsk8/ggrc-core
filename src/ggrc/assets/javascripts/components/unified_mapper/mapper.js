@@ -54,12 +54,27 @@
         Assessment: [],
         Request: ['Workflow', 'TaskGroup', 'Person']
       };
+      if (this.attr('getList')) {
+        return [
+          'AssessmentTemplate',
+          'Assessment',
+          'Audit',
+          'CycleTaskGroupObjectTask',
+          'Request',
+          'TaskGroup',
+          'TaskGroupTask',
+          'Workflow'
+        ];
+      }
       return forbidden[type] ? forbidden[type] : [];
     },
     get_whitelist: function () {
       var whitelisted = [
         'TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'
       ];
+      if (this.attr('getList')) {
+        return [];
+      }
       return this.attr('search_only') ? whitelisted : [];
     },
     types: can.compute(function () {
