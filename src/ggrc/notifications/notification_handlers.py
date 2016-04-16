@@ -98,6 +98,14 @@ def handle_assignable_deleted(obj):
   ).delete()
 
 
+def handle_reminder(obj, reminder_type):
+  if reminder_type in obj.REMINDERABLE_HANDLERS:
+    reminder_settings = obj.REMINDERABLE_HANDLERS[reminder_type]
+    handler = reminder_settings['handler']
+    data = reminder_settings['data']
+    handler(obj, data)
+
+
 def register_handlers():
   """Register listeners for notification handlers"""
 
@@ -119,3 +127,9 @@ def register_handlers():
   @Resource.model_posted_after_commit.connect_via(assessment.Assessment)
   def assignable_created_listener(sender, obj=None, src=None, service=None):
     handle_assignable_created(obj)
+
+  @Resource.model_put.connect_via(assessment.Assessment)
+  def assessment_send_reminder(sender, obj=None, src=None, service=None):
+    reminder_type = src.get("reminderType", False)
+    if reminder_type:
+      handle_reminder(obj, reminder_type)
