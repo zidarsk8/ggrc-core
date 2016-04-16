@@ -123,3 +123,19 @@ class RelationshipFactory(ModelFactory):
     model = models.Relationship
   source = None
   destination = None
+
+
+class RelationshipAttrFactory(ModelFactory):
+
+  class Meta:
+    model = models.RelationshipAttr
+
+  relationship_id = None
+  attr_name = None
+  attr_value = None
+
+
+class PersonFactory(ModelFactory):
+
+  class Meta:
+    model = models.Person
