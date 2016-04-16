@@ -233,6 +233,7 @@ dashboard-js-template-files:
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
   - assessments/reusable_objects.mustache
+  - assessments/header.mustache
   - assessments/generator_title.mustache
   - assessment_templates/attribute_field.mustache
   - assessment_templates/attribute_add_field.mustache
