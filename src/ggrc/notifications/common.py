@@ -17,7 +17,6 @@ from flask import current_app
 from sqlalchemy import and_
 from werkzeug.exceptions import Forbidden
 
-import jinja2
 from google.appengine.api import mail
 
 from ggrc import db
@@ -27,8 +26,6 @@ from ggrc.models import Notification
 from ggrc.models import NotificationConfig
 from ggrc.rbac import permissions
 from ggrc.utils import merge_dict
-
-ENV = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
 
 
 class Services(object):
@@ -216,13 +213,12 @@ def send_todays_digest_notifications():
   Returns:
     str: String containing a simple list of who received the notification.
   """
-  digest_template = ENV.get_template("notifications/email_digest.html")
   notif_list, notif_data = get_todays_notifications()
   sent_emails = []
   subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
   for user_email, data in notif_data.iteritems():
     data = modify_data(data)
-    email_body = digest_template.render(digest=data)
+    email_body = settings.EMAIL_DIGEST.render(digest=data)
     send_email(user_email, subject, email_body)
     sent_emails.append(user_email)
   set_notification_sent_time(notif_list)
@@ -261,8 +257,7 @@ def show_pending_notifications():
   for day_notif in notif_data.itervalues():
     for data in day_notif.itervalues():
       data = modify_data(data)
-  pending = ENV.get_template("notifications/view_pending_digest.html")
-  return pending.render(data=sorted(notif_data.iteritems()))
+  return settings.EMAIL_PENDING.render(data=sorted(notif_data.iteritems()))
 
 
 def show_todays_digest_notifications():
@@ -276,8 +271,7 @@ def show_todays_digest_notifications():
   _, notif_data = get_todays_notifications()
   for data in notif_data.itervalues():
     data = modify_data(data)
-  todays = ENV.get_template("notifications/view_todays_digest.html")
-  return todays.render(data=notif_data)
+  return settings.EMAIL_TODAYS.render(data=notif_data)
 
 
 def get_app_engine_email():
