@@ -12,8 +12,8 @@ Main contributed functions are:
 import datetime
 import urlparse
 
-from ggrc import utils
 from ggrc import models
+from ggrc import utils
 
 
 def get_object_url(obj):
@@ -109,6 +109,42 @@ def assignable_declined_data(notif):
   return _get_assignable_dict(people, notif)
 
 
+def get_assessment_url(assessment):
+  return urlparse.urljoin(
+      utils.get_url_root(),
+      "assessments/{}".format(assessment.id))
+
+
+def assignable_reminder(notif):
+  """Get data for assignable object for reminders"""
+  obj = get_notification_object(notif)
+  reminder = next((attrs for attrs in obj.REMINDERABLE_HANDLERS.values()
+                   if notif.notification_type.name in attrs['reminders']),
+                  False)
+
+  notif_data = {}
+  if reminder:
+    data = reminder['data']
+    if obj.status not in data:
+      # In case object already moved out of targeted state
+      return notif_data
+    assignee_group = data[obj.status]
+    people = [a for a, roles in obj.assignees if assignee_group in roles]
+
+    for person in people:
+      notif_data[person.email] = {
+          "user": get_person_dict(person),
+          notif.notification_type.name: {
+              obj.id: {
+                  "title": obj.title,
+                  "end_date": obj.end_date.strftime("%m/%d/%Y"),
+                  "url": get_assessment_url(obj)
+              }
+          }
+      }
+  return notif_data
+
+
 def get_person_dict(person):
   """Return dictionary with basic person info.
 
@@ -159,4 +195,6 @@ def get_assignable_data(notif):
     return assignable_open_data(notif)
   elif notif.notification_type.name.endswith("_declined"):
     return assignable_declined_data(notif)
+  elif notif.notification_type.name.endswith("_reminder"):
+    return assignable_reminder(notif)
   return {}
