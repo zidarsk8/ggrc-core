@@ -163,7 +163,7 @@ def get_todays_notifications():
       and corresponding data for those notifications.
   """
   notifications = db.session.query(Notification).filter(
-      and_(Notification.send_on <= datetime.now(),
+      and_(Notification.send_on <= datetime.today(),
            Notification.sent_at.is_(None)
            )).all()
   return notifications, get_notification_data(notifications)
