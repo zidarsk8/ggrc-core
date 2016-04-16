@@ -137,7 +137,8 @@ def assignable_reminder(notif):
           notif.notification_type.name: {
               obj.id: {
                   "title": obj.title,
-                  "end_date": obj.end_date.strftime("%m/%d/%Y"),
+                  "end_date": obj.end_date.strftime("%m/%d/%Y")
+                  if obj.end_date else None,
                   "url": get_assessment_url(obj)
               }
           }

@@ -23,7 +23,11 @@ Maintained By: miha@reciprocitylabs.com
                   This is a friendly reminder that you have an open control assessments assigned to you in GGRC.
                   {% for assessment_id, assessment_data in digest['assessment_assessor_reminder'].items() %}
                   <li {{ style.list_item() }} >
-                    Assessment "<a href="{{ assessment_data['url'] }}">{{ assessment_data['title'] }}</a>" is due on {{ assessment_data['end_date'] }}.
+                    {% if assessment_data['end_date'] %}
+                      Assessment "<a href="{{ assessment_data['url'] }}">{{ assessment_data['title'] }}</a>" is due on {{ assessment_data['end_date'] }}.
+                    {% else %}
+                      Assessment "<a href="{{ assessment_data['url'] }}">{{ assessment_data['title'] }}</a>".
+                    {% endif %}
                   </li>
                   {% endfor %}
                 </ul>
