@@ -6,7 +6,7 @@
 """Add AssessmentTemplate
 
 Revision ID: 1894405f14ef
-Revises: 4e989ef86619
+Revises: 1e2abee7566c
 Create Date: 2016-02-25 11:49:25.128231
 
 """

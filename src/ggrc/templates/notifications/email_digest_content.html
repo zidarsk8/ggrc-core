@@ -83,7 +83,7 @@ Maintained By: miha@reciprocitylabs.com
                     {{ "cycles" if digest['cycle_started']|length > 1 else "cycle" }}
                     started</h2>
                   <ul {{ style.list_wrap() }} >
-                  {% for cycle_id, cycle in digest['cycle_started'].items() %}
+                  {% for cycle_id, cycle in digest['cycle_started'].iteritems() %}
                     <li {{ style.list_item() }} >
                       New cycle of
                       <a href="{{ cycle['cycle_url'] }}" {{ style.link_text() }} >{{ cycle['cycle_title'] }}</a>.
@@ -97,7 +97,7 @@ Maintained By: miha@reciprocitylabs.com
                     {{ "cycles" if digest['cycle_start_failed']|length > 1 else "cycle" }}
                     failed to start</h2>
                   <ul {{ style.list_wrap() }} >
-                  {% for workflow_id, workflow in digest['cycle_start_failed'].items() %}
+                  {% for workflow_id, workflow in digest['cycle_start_failed'].iteritems() %}
                     <li {{ style.list_item() }} >
                       New cycle of
                       <a href="{{ workflow['workflow_url'] }}" {{ style.link_text() }} >
@@ -112,7 +112,7 @@ Maintained By: miha@reciprocitylabs.com
                     {{ "cycles" if digest['all_tasks_completed']|length > 1 else "cycle" }}
                     </h2>
                   <ul {{ style.list_wrap() }} >
-                  {% for cycle_id, cycle in digest['all_tasks_completed'].items() %}
+                  {% for cycle_id, cycle in digest['all_tasks_completed'].iteritems() %}
                     <li {{ style.list_item() }} >
                       Completed cycle of
                       <a href="{{ cycle['cycle_url'] }}" {{ style.link_text() }} >{{ cycle['cycle_title'] }}</a>.
@@ -126,12 +126,74 @@ Maintained By: miha@reciprocitylabs.com
                     {{ "workflows" if digest['cycle_starts_in']|length > 1 else "workflow" }}
                   </h2>
                   <ul {{ style.list_wrap() }} >
-                  {% for workflow_id, workflow in digest['cycle_starts_in'].items() %}
+                  {% for workflow_id, workflow in digest['cycle_starts_in'].iteritems() %}
                     <li {{ style.list_item() }} >
                       New cycle of
                       <a href="{{ workflow['workflow_url'] }}" {{ style.link_text() }} >
                         {{ workflow['title'] }}</a>
                       starts {{ workflow['fuzzy_start_date'] }}.
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('assessment_open') %}
+                  <h2 {{ style.sub_title() }} >New assessments are created</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for assessment_id, assessment_data in digest['assessment_open'].iteritems() %}
+                    <li {{ style.list_item() }} >
+                      Assessment:
+                      <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
+                        {{ assessment_data['title'] }}
+                      </a> 
+                      {% if assessment_data.get('fuzzy_start_date') %}
+                        starts {{ assessment_data['fuzzy_start_date'] }}.
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('assessment_declined') %}
+                  <h2 {{ style.sub_title() }} >Declined assessments</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for assessment_id, assessment_data in digest['assessment_declined'].iteritems() %}
+                    <li {{ style.list_item() }} >
+                      Assessment:
+                      <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
+                        {{ assessment_data['title'] }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('request_open') %}
+                  <h2 {{ style.sub_title() }} >New Requests</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for request_id, request_data in digest['request_open'].iteritems() %}
+                    <li {{ style.list_item() }} >
+                      Request:
+                      <a href="{{ request_data['url'] }}" {{ style.link_text() }} >
+                        {{ request_data['title'] }}
+                      </a> 
+                      {% if request_data.get('fuzzy_start_date') %}
+                        starts {{ request_data['fuzzy_start_date'] }}.
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('request_declined') %}
+                  <h2 {{ style.sub_title() }} >Declined Requests</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for request_id, request_data in digest['request_declined'].iteritems() %}
+                    <li {{ style.list_item() }} >
+                      Request:
+                      <a href="{{ request_data['url'] }}" {{ style.link_text() }} >
+                        {{ request_data['title'] }}
+                      </a>
                     </li>
                   {% endfor %}
                   </ul>

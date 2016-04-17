@@ -10,13 +10,271 @@
 """
 
 
+from collections import defaultdict
+from datetime import date
+from datetime import datetime
 from flask import current_app
+from sqlalchemy import and_
+from werkzeug.exceptions import Forbidden
+
 from google.appengine.api import mail
 
+from ggrc import db
+from ggrc import extensions
 from ggrc import settings
+from ggrc.models import Notification
+from ggrc.models import NotificationConfig
+from ggrc.rbac import permissions
+from ggrc.utils import merge_dict
 
 
-def getAppEngineEmail():
+class Services(object):
+  """Helper class for notification services.
+
+  This class is a helper class for calling a notification service for a given
+  object. The first call get_service_function must be done after all modules
+  have been initialized.
+  """
+
+  services = []
+
+  @classmethod
+  def get_service_function(cls, name):
+    """Get callback function for an object.
+
+    This returns a service function which is a registered callback for an
+    object that has a notification.
+
+    Args:
+      name: Name of an object for which we want to get a service function, such
+        as "Request", "CycleTask", "Assessment", etc.
+
+    Returns:
+      callable: A function that takes a notification and returns a data dict
+        with all the data for that notification.
+    """
+    if not cls.services:
+      cls.services = extensions.get_module_contributions(
+          "contributed_notifications")
+    if name not in cls.services:
+      raise ValueError("unknown service name: %s" % name)
+    return cls.services[name]
+
+  @classmethod
+  def call_service(cls, notif):
+    """Call data handler service for the object in the notification.
+
+    Args:
+      notif (Notification): Notification object for which we want to get the
+        notification data dict.
+
+    Returns:
+      dict: Result of the data handler for the object in the notification.
+    """
+    service = cls.get_service_function(notif.object_type)
+    return service(notif)
+
+
+def get_filter_data(notification):
+  """Get filtered notification data.
+
+  This function gets notification data for all users who should receive it. A
+  single notification can be for multiple users (such as all assignees) but
+  only some should receive it depending on if it's an instant notification or
+  a daily digest and the specific users notification settings.
+
+  Args:
+    notification (Notification): Notification object for which we want to get
+      data.
+
+  Returns:
+    dict: dictionary containing notification data for all users who should
+      receive it, according to their notification settings.
+  """
+  result = {}
+  data = Services.call_service(notification)
+
+  for user, user_data in data.iteritems():
+    if should_receive(notification, user_data):
+      result[user] = user_data
+  return result
+
+
+def get_notification_data(notifications):
+  """Get notification data for all notifications.
+
+  This function returns a filtered data for all notifications for the users
+  that should receive it.
+
+  Args:
+    notifications (list of Notification): List of notification for which we
+      want to get notification data.
+
+  Returns:
+    dict: Filtered dictionary containing all the data that should be sent for
+      the given notification list.
+  """
+  if not notifications:
+    return {}
+  aggregate_data = {}
+
+  for notification in notifications:
+    filtered_data = get_filter_data(notification)
+    aggregate_data = merge_dict(aggregate_data, filtered_data)
+
+  # Remove notifications for objects without a contact (such as task groups)
+  aggregate_data.pop("", None)
+
+  return aggregate_data
+
+
+def get_pending_notifications():
+  """Get notification data for all future notifications.
+
+  The data dict that get's returned here contains notification data grouped by
+  dates on which the notifications should be received.
+
+  Returns
+    list of Notifications, data: a tuple of notifications that were handled
+      and corresponding data for those notifications.
+  """
+  notifications = db.session.query(Notification).filter(
+      Notification.sent_at.is_(None)).all()
+
+  notif_by_day = defaultdict(list)
+  for notification in notifications:
+    notif_by_day[notification.send_on.date()].append(notification)
+
+  data = defaultdict(dict)
+  today = date.today()
+  for day, notif in notif_by_day.iteritems():
+    current_day = max(day, today)
+    data[current_day] = merge_dict(data[current_day],
+                                   get_notification_data(notif))
+
+  return notifications, data
+
+
+def get_todays_notifications():
+  """Get notification data for all future notifications.
+
+  Returns
+    list of Notifications, data: a tuple of notifications that were handled
+      and corresponding data for those notifications.
+  """
+  notifications = db.session.query(Notification).filter(
+      and_(Notification.send_on <= datetime.now(),
+           Notification.sent_at.is_(None)
+           )).all()
+  return notifications, get_notification_data(notifications)
+
+
+def should_receive(notif, user_data):
+  """Check if a user should receive a notification or not.
+
+  Args:
+    notif (Notification): A notification entry that we are checking.
+    user_data (dict): A dictionary containing data about user notifications.
+
+  Returns:
+    True if user should receive the given notification, or False otherwise.
+  """
+  force_notif = user_data.get("force_notifications", {}).get(notif.id, False)
+  person_id = user_data["user"]["id"]
+
+  def is_enabled(notif_type):
+    """Check user notification settings.
+
+    Args:
+      notif_type (string): can be "Email_Digest" or "Email_Now" based on what
+        we wish to check.
+
+    Returns:
+      Boolean based on what settings users has stored or what the default
+      setting is for the given notification.
+    """
+    result = NotificationConfig.query.filter(
+        and_(NotificationConfig.person_id == person_id,
+             NotificationConfig.notif_type == notif_type))
+    if result.count() == 0:
+      # If we have no results, we need to use the default value, which is
+      # true for digest emails.
+      return notif_type == "Email_Digest"
+    return result.one().enable_flag
+
+  has_digest = force_notif or is_enabled("Email_Digest")
+
+  return has_digest
+
+
+def send_todays_digest_notifications():
+  """Send emails for todays or overdue notifications.
+
+  Returns:
+    str: String containing a simple list of who received the notification.
+  """
+  notif_list, notif_data = get_todays_notifications()
+  sent_emails = []
+  subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
+  for user_email, data in notif_data.iteritems():
+    data = modify_data(data)
+    email_body = settings.EMAIL_DIGEST.render(digest=data)
+    send_email(user_email, subject, email_body)
+    sent_emails.append(user_email)
+  set_notification_sent_time(notif_list)
+  return "emails sent to: <br> {}".format("<br>".join(sent_emails))
+
+
+def set_notification_sent_time(notif_list):
+  """Set sent time to now for all notifications in the list.
+
+  Args:
+    notif_list (list of Notification): List of notification for which we want
+      to modify sent_at field.
+  """
+  for notif in notif_list:
+    notif.sent_at = datetime.now()
+  db.session.commit()
+
+
+def show_pending_notifications():
+  """Get notification html for all future notifications.
+
+  The data shown here is grouped by dates on which notifications should be
+  sent.
+
+  Note that the dates for all future notifications will be wrong since they are
+  based on the current date which will be different when the notification is
+  actually sent.
+
+  Returns:
+    str: Html containing all future notifications.
+  """
+  if not permissions.is_admin():
+    raise Forbidden()
+  _, notif_data = get_pending_notifications()
+
+  for day_notif in notif_data.itervalues():
+    for data in day_notif.itervalues():
+      data = modify_data(data)
+  return settings.EMAIL_PENDING.render(data=sorted(notif_data.iteritems()))
+
+
+def show_todays_digest_notifications():
+  """Get notification html for todays notifications.
+
+  Returns:
+    str: Html containing all todays notifications.
+  """
+  if not permissions.is_admin():
+    raise Forbidden()
+  _, notif_data = get_todays_notifications()
+  for data in notif_data.itervalues():
+    data = modify_data(data)
+  return settings.EMAIL_TODAYS.render(data=notif_data)
+
+
+def get_app_engine_email():
   """Get notification sender email.
 
   Return the email of the user that will be set as sender. This email should be
@@ -39,7 +297,7 @@ def send_email(user_email, subject, body):
     body (basestring): Html body of the email. it can contain unicode
       characters and will be sent as a html mime type.
   """
-  sender = getAppEngineEmail()
+  sender = get_app_engine_email()
   if not mail.is_email_valid(user_email):
     current_app.logger.error("Invalid email recipient: {}".format(user_email))
     return
@@ -57,9 +315,17 @@ def send_email(user_email, subject, body):
 
 
 def modify_data(data):
-  """
-  for easier use in templates, it joins the due_in and due today fields
-  together
+  """Modify notification data dictionary.
+
+  For easier use in templates, it joins the due_in and due today fields
+  together.
+
+  Args:
+    data (dict): notification data.
+
+  Returns:
+    dict: the received dict with some additional fields for easier traversal
+      in the notification template.
   """
 
   data["due_soon"] = {}

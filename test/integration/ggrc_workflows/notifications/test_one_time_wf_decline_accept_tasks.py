@@ -10,11 +10,11 @@ from freezegun import freeze_time
 from mock import patch
 from sqlalchemy import and_
 
-from ggrc import db
-from ggrc import notifications
+from ggrc.app import db
 from ggrc.models import Notification
 from ggrc.models import NotificationType
 from ggrc.models import Person
+from ggrc.notifications import common
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 from integration.ggrc import TestCase
@@ -183,7 +183,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02"):
-      notifications.send_todays_digest_notifications()
+      common.send_todays_digest_notifications()
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -191,11 +191,11 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task1, "Finished")
 
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
     with freeze_time("2015-05-02"):
-      notifications.send_todays_digest_notifications()
+      common.send_todays_digest_notifications()
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -204,7 +204,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.task_change_status(task1, "Declined")
 
       user = Person.query.get(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
 
       self.assertIn(user.email, notif_data)
       self.assertIn("task_declined", notif_data[user.email])
@@ -224,7 +224,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-02"):
-      notifications.send_todays_digest_notifications()
+      common.send_todays_digest_notifications()
 
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -232,7 +232,7 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task1, "Finished")
 
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})
 
     with freeze_time("2015-05-03"):
@@ -243,7 +243,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.task_change_status(task1)
 
       user = Person.query.get(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
       self.assertIn("all_tasks_completed", notif_data["user@example.com"])
 
@@ -260,7 +260,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.wf_generator.activate_workflow(workflow)
 
     with freeze_time("2015-05-03"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       cycle = Cycle.query.get(cycle.id)
       user = Person.query.get(self.user.id)
       self.assertIn(user.email, notif_data)
@@ -268,7 +268,7 @@ class TestCycleTaskStatusChange(TestCase):
       cycle = Cycle.query.get(cycle.id)
       self.assertFalse(cycle.is_current)
 
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
 
   def create_test_cases(self):
