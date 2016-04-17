@@ -3,10 +3,18 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: david@reciprocitylabs.com
 
+"""Initialize RBAC"""
+
 import datetime
 import sqlalchemy.orm
 from flask import Blueprint
 from flask import g
+from sqlalchemy import and_
+from sqlalchemy import case
+from sqlalchemy import literal
+from sqlalchemy import or_
+from sqlalchemy.orm import aliased
+from sqlalchemy.orm.attributes import get_history
 from ggrc import db, settings
 from ggrc.app import app
 from ggrc_basic_permissions import basic_roles
@@ -30,12 +38,6 @@ from ggrc.services.common import _get_cache_manager
 from ggrc.services.common import Resource
 from ggrc.services.registry import service
 from ggrc.utils import benchmark
-from sqlalchemy import and_
-from sqlalchemy import case
-from sqlalchemy import literal
-from sqlalchemy import or_
-from sqlalchemy.orm import aliased
-from sqlalchemy.orm.attributes import get_history
 
 
 blueprint = Blueprint(
@@ -165,13 +167,17 @@ def objects_via_relationships_query(model, roles, user_id, context_not_role):
         (where the user has a listed role) and the corresponding relationships.
   """
   _role = aliased(all_models.Role, name="r")
+  _implications = aliased(all_models.ContextImplication, name="ci")
   _model = aliased(model, name="p")
   _relationship = aliased(all_models.Relationship, name="rl")
   _user_role = aliased(all_models.UserRole, name="ur")
 
   def _join_filter(query, cond):
     return query.join(_model, cond).\
-        join(_user_role, _model.context_id == _user_role.context_id).\
+        join(_implications,
+             _model.context_id == _implications.source_context_id).\
+        join(_user_role, _user_role.context_id.in_(
+            (_implications.source_context_id, _implications.context_id))).\
         join(_role, _user_role.role_id == _role.id).\
         filter(and_(_user_role.person_id == user_id, _role.name.in_(roles)))
 
@@ -242,7 +248,7 @@ def audit_relationship_query(user_id, context_not_role=False):
   """
   return objects_via_relationships_query(
       model=all_models.Audit,
-      roles=('Auditor',),
+      roles=('Auditor', 'ProgramEditor', 'ProgramOwner', 'ProgramReader'),
       user_id=user_id,
       context_not_role=context_not_role
   )
@@ -522,7 +528,10 @@ def load_permissions_for(user):  # noqa
   for res in audit_relationship_query(user.id):
     id_, type_, role_name = res
     actions = ["read", "view_object_page"]
-    if type_ in ("Assessment", "Request"):
+    if role_name == "Auditor":
+      if type_ in ("Assessment", "Request"):
+        actions += ["create", "update", "delete"]
+    if role_name in ("ProgramOwner", "ProgramEditor"):
       actions += ["create", "update", "delete"]
     for action in actions:
       permissions.setdefault(action, {})\
