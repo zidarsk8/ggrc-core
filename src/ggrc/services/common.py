@@ -617,7 +617,7 @@ class Resource(ModelView):
 
   signals = Namespace()
   model_posted = signals.signal(
-      'Model POSTed',
+      "Model POSTed",
       """
       Indicates that a model object was received via POST and will be committed
       to the database. The sender in the signal will be the model class of the
@@ -629,7 +629,7 @@ class Resource(ModelView):
         :service: The instance of Resource handling the POST request.
       """,)
   model_posted_after_commit = signals.signal(
-      'Model POSTed - after',
+      "Model POSTed - after",
       """
       Indicates that a model object was received via POST and has been
       committed to the database. The sender in the signal will be the model
@@ -641,7 +641,7 @@ class Resource(ModelView):
         :service: The instance of Resource handling the POST request.
       """,)
   model_put = signals.signal(
-      'Model PUT',
+      "Model PUT",
       """
       Indicates that a model object update was received via PUT and will be
       updated in the database. The sender in the signal will be the model class
@@ -653,7 +653,7 @@ class Resource(ModelView):
         :service: The instance of Resource handling the PUT request.
       """,)
   model_put_after_commit = signals.signal(
-      'Model PUT - after',
+      "Model PUT - after",
       """
       Indicates that a model object update was received via PUT and has been
       updated in the database. The sender in the signal will be the model class
@@ -665,7 +665,7 @@ class Resource(ModelView):
         :service: The instance of Resource handling the PUT request.
       """,)
   model_deleted = signals.signal(
-      'Model DELETEd',
+      "Model DELETEd",
       """
       Indicates that a model object was DELETEd and will be removed from the
       databse. The sender in the signal will be the model class of the DELETEd
@@ -675,7 +675,7 @@ class Resource(ModelView):
         :service: The instance of Resource handling the DELETE request.
       """,)
   model_deleted_after_commit = signals.signal(
-      'Model DELETEd - after',
+      "Model DELETEd - after",
       """
       Indicates that a model object was DELETEd and has been removed from the
       database. The sender in the signal will be the model class of the DELETEd

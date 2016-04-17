@@ -3,15 +3,17 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
-import datetime
+"""A module for Request object"""
 
-from sqlalchemy import inspect
+# pylint: disable=fixme
+
 from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models import audit
 from ggrc.models import reflection
-from ggrc.models import relationship
+from ggrc.models.mixins_assignable import Assignable
+from ggrc.models.mixin_autostatuschangable import AutoStatusChangable
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Described
@@ -20,25 +22,38 @@ from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import deferred
-from ggrc.models.mixins_assignable import Assignable
 from ggrc.models.object_document import Documentable
-from ggrc.models.object_document import ObjectDocument
 from ggrc.models.object_person import Personable
-from ggrc.models.relationship import Relatable
-from ggrc.services.common import Resource
+from ggrc.models import relationship
 
 
-class Request(Assignable, Documentable, Personable, CustomAttributable,
-              Relatable, Titled, Slugged, Described,
-              FinishedDate, VerifiedDate, Base, db.Model):
+class Request(AutoStatusChangable, Assignable, Documentable, Personable,
+              CustomAttributable, relationship.Relatable, Titled, Slugged,
+              Described, FinishedDate, VerifiedDate, Base, db.Model):
+  """Class representing Requests.
+
+  Request is an object representing a request from a Requester to Assignee
+  to provide feedback, evidence or attachment in the form of comments,
+  documents or URLs that (if specified) Verifier has to approve of
+  before Request is considered finished.
+  """
   __tablename__ = 'requests'
   _title_uniqueness = False
 
   VALID_TYPES = (u'documentation', u'interview')
-  NOT_DONE_STATES = {u'Open', u'In Progress'}
-  DONE_STATES = {u'Finished', u'Verified', u'Final'}
+
+  START_STATE = {u'Open'}
+  PROGRESS_STATE = {u'In Progress'}
+  DONE_STATE = {u'Finished'}
+  END_STATES = {u'Verified', u'Final'}
+
+  NOT_DONE_STATES = START_STATE | PROGRESS_STATE
+  DONE_STATES = DONE_STATE | END_STATES
   VALID_STATES = tuple(NOT_DONE_STATES | DONE_STATES)
   ASSIGNEE_TYPES = (u'Assignee', u'Requester', u'Verifier')
+
+  FIRST_CLASS_EDIT = START_STATE | END_STATES
+  ASSIGNABLE_EDIT = END_STATES
 
   # TODO Remove requestor and requestor_id on database cleanup
   requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))
@@ -48,8 +63,8 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
   request_type = deferred(db.Column(db.Enum(*VALID_TYPES), nullable=False),
                           'Request')
   # TODO Make status via Stateful Mixin
-  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
-                    'Request')
+  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
+                              default=tuple(START_STATE)[0]), 'Request')
   requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   # TODO Remove audit_id audit_object_id on database cleanup
@@ -78,6 +93,10 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
       'title',
       'description'
   ]
+
+  _tracked_attrs = ((set(_publish_attrs) | {'slug'}) -
+                    {'status'})
+
   _sanitize_html = [
       'gdrive_upload_path',
       'test',
@@ -121,6 +140,7 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
   }
 
   def _display_name(self):
+    # pylint: disable=unsubscriptable-object
     if len(self.title) > 32:
       display_string = self.description[:32] + u'...'
     elif self.title:
@@ -164,70 +184,3 @@ class Request(Assignable, Documentable, Personable, CustomAttributable,
   @classmethod
   def default_request_type(cls):
     return cls.VALID_TYPES[0]
-
-
-def _date_has_changes(attr):
-  """Date fields are always interpreted as changed because incoming data is
-    of type datetime.datetime, while database field has type datetime.date.
-    This function normalises this and performs the correct check.
-  """
-  if not attr.history.added or not attr.history.deleted:
-    return False
-  added, deleted = attr.history.added[0], attr.history.deleted[0]
-  if isinstance(added, datetime.datetime):
-    added = added.date()
-  return added != deleted
-
-
-@Resource.model_put.connect_via(Request)
-def handle_request_put(sender, obj=None, src=None, service=None):
-  all_attrs = set(Request._publish_attrs)
-  non_tracked_attrs = {'status'}
-  tracked_date_attrs = {'requested_on', 'due_on'}
-  tracked_attrs = all_attrs - non_tracked_attrs - tracked_date_attrs
-  has_changes = False
-
-  if any(getattr(inspect(obj).attrs, attr).history.has_changes()
-         for attr in tracked_attrs):
-    has_changes = True
-
-  if any(_date_has_changes(getattr(inspect(obj).attrs, attr))
-         for attr in tracked_date_attrs):
-    has_changes = True
-
-  if has_changes and obj.status in {"Open", "Final", "Verified"}:
-    obj.status = "In Progress"
-
-
-@Resource.model_posted.connect_via(relationship.Relationship)
-def handle_relationship_post(sender, obj=None, src=None, service=None):
-  has_changes = False
-  if "Request" in (obj.source.type, obj.destination.type):
-    if obj.source.type == "Request":
-      req = obj.source
-    else:
-      req = obj.destination
-
-    if "Document" in (obj.source.type, obj.destination.type):
-      # This captures the "Add URL" event
-      has_changes = True
-
-    if "Person" in (obj.source.type, obj.destination.type):
-      # This captures assignable addition
-      history = inspect(obj).attrs.relationship_attrs.history
-      if history.has_changes() and req.status in {"Final", "Verified"}:
-        has_changes = True
-
-    if has_changes and req.status in {"Open", "Final", "Verified"}:
-      req.status = "In Progress"
-      db.session.add(req)
-
-
-@Resource.model_posted.connect_via(ObjectDocument)
-def handle_objectdocument_post(sender, obj=None, src=None, service=None):
-  # This captures "Attach Evidence" event
-  if obj.documentable.type == "Request":
-    req = obj.documentable
-    if req.status in {"Open", "Final", "Verified"}:
-      req.status = "In Progress"
-      db.session.add(req)

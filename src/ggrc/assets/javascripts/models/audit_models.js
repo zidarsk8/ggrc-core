@@ -1007,6 +1007,9 @@
       finished_date: 'date',
       verified_date: 'date'
     },
+    defaults: {
+      status: "Open"
+    },
     filter_keys: ['operationally', 'operational', 'design',
                   'finished_date', 'verified_date', 'verified'],
     filter_mappings: {

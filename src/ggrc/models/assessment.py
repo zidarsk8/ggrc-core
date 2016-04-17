@@ -3,10 +3,14 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
+"""Module for Assessment object"""
+
 from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.models import reflection
+from ggrc.models.mixins_assignable import Assignable
+from ggrc.models.mixin_autostatuschangable import AutoStatusChangable
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import FinishedDate
@@ -14,7 +18,6 @@ from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import deferred
-from ggrc.models.mixins_assignable import Assignable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
@@ -24,19 +27,34 @@ from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.track_object_state import track_state_for_class
 
 
-class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
-                 Documentable, Personable, Timeboxed, Ownable,
-                 Relatable, FinishedDate, VerifiedDate,
+class Assessment(AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
+                 CustomAttributable, Documentable, Personable, Timeboxed,
+                 Ownable, Relatable, FinishedDate, VerifiedDate,
                  BusinessObject, db.Model):
+  """Class representing Assessment.
+
+  Assessment is an object representing an individual assessment performed on
+  a specific object during an audit to ascertain whether or not
+  certain conditions were met for that object.
+  """
+
   __tablename__ = 'assessments'
 
-  NOT_DONE_STATES = {u"Open", u"In Progress"}
-  DONE_STATES = {u"Finished", u"Verified", u"Final"}
+  START_STATE = {u'Open'}
+  PROGRESS_STATE = {u'In Progress'}
+  DONE_STATE = {u'Finished'}
+  END_STATES = {u'Verified', u'Final'}
+
+  NOT_DONE_STATES = START_STATE | PROGRESS_STATE
+  DONE_STATES = DONE_STATE | END_STATES
   VALID_STATES = tuple(NOT_DONE_STATES | DONE_STATES)
   ASSIGNEE_TYPES = (u"Creator", u"Assessor", u"Verifier")
 
+  FIRST_CLASS_EDIT = START_STATE | END_STATES
+  ASSIGNABLE_EDIT = END_STATES
+
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
-                    default=VALID_STATES[0]), "Assessment")
+                    default=tuple(START_STATE)[0]), "Assessment")
 
   design = deferred(db.Column(db.String), "Assessment")
   operationally = deferred(db.Column(db.String), "Assessment")
@@ -58,6 +76,21 @@ class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
       PublishOnly('audit'),
       PublishOnly('object')
   ]
+
+  _tracked_attrs = {
+      'contact_id',
+      'description',
+      'design',
+      'notes',
+      'operationally',
+      'reference_url',
+      'secondary_contact_id',
+      'test_plan',
+      'title',
+      'url',
+      'start_date',
+      'end_date'
+  }
 
   _aliases = {
       "audit": {
@@ -91,10 +124,12 @@ class Assessment(Assignable, HasObjectState, TestPlanned, CustomAttributable,
 
   @validates("operationally")
   def validate_opperationally(self, key, value):
+    # pylint: disable=unused-argument
     return self.validate_conclusion(value)
 
   @validates("design")
   def validate_design(self, key, value):
+    # pylint: disable=unused-argument
     return self.validate_conclusion(value)
 
   @classmethod
