@@ -617,8 +617,11 @@
         requests: 'Request',
         _program: 'Program',
         context: 'Context',
-        related_objects_as_source: ['Assessment', 'AssessmentTemplate', 'Issue']
+
       },
+      _mixins: [
+        'related_object'
+      ],
       requests: Direct("Request", "audit", "requests"),
       active_requests: CustomFilter('requests', function (result) {
         return result.instance.status !== 'Accepted';
@@ -632,8 +635,6 @@
       program_issues: Cross('_program', 'related_issues'),
       program_assessments: Cross('_program', 'related_assessments'),
       objects: Proxy(null, 'auditable', 'AuditObject', 'audit', 'audit_objects'),
-      objectives: TypeFilter('objects', 'Objective'),
-      objectives_via_program: Cross('_program', 'objectives'),
       responses_via_requests: Cross('requests', 'related_objects'),
       related_objects_via_requests: Multi(['requests', 'responses_via_requests']),
       context: Direct('Context', 'related_object', 'context'),
@@ -684,30 +685,13 @@
         else
           return false;
       }),
-      //related_mapped_requests: TypeFilter("related_mapped_objects", "Request"),
-      related_requests: TypeFilter("related_objects_via_relationship", "Request"),
       related_mapped_documentation_responses: TypeFilter("related_mapped_objects", "DocumentationResponse"),
       related_mapped_interview_responses: TypeFilter("related_mapped_objects", "InterviewResponse"),
       related_mapped_population_sample_responses: TypeFilter("related_mapped_objects", "PopulationSampleResponse"),
       related_mapped_responses: Multi(["related_mapped_documentation_responses", "related_mapped_interview_responses", "related_mapped_population_sample_responses"]),
       extended_related_objects: Cross("requests", "extended_related_objects"),
-      related_objects_as_source: Proxy(
-        null, "destination", "Relationship", "source", "related_destinations"),
-      related_objects_as_destination: Proxy(
-        null, "source", "Relationship", "destination", "related_sources"),
-      related_objects: Multi(["related_objects_as_source", "related_objects_as_destination"]),
-      related_assessments: TypeFilter("related_objects", "Assessment"),
       related_assessment_templates: TypeFilter(
-        'related_objects', 'AssessmentTemplate'),
-      related_issues: TypeFilter('related_objects', 'Issue'),
-      regulations: TypeFilter('related_objects', 'Regulation'),
-      policies: TypeFilter('related_objects', 'Policy'),
-      standards: TypeFilter('related_objects', 'Standard'),
-      contracts: TypeFilter('related_objects', 'Contract'),
-      sections: TypeFilter('related_objects', 'Section'),
-      clauses: TypeFilter('related_objects', 'Clause'),
-      objectives: TypeFilter('related_objects', 'Objective'),
-      controls: TypeFilter('related_objects', 'Control')
+        'related_objects', 'AssessmentTemplate')
     },
     Assessment: {
       _mixins: [

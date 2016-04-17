@@ -26,6 +26,9 @@ def init_hook():
     """Apply custom attribute definitions and map people roles
     when generating Assessmet with template"""
 
+    if not src.get("template", None):
+      return
+
     related = {
         "template": get_by_id(src.get("template", None)),
         "obj": get_by_id(src.get("object", None)),

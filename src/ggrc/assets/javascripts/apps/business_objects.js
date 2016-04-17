@@ -212,11 +212,6 @@
             widget_id: "Request",
             widget_name: "Open Requests"
           },
-          Control: {
-            widget_id: "control",
-            widget_name: "In Scope Controls",
-            widget_icon: "control"
-          },
           program: {
             widget_id: "program",
             widget_name: "Program",
@@ -444,24 +439,13 @@
           }
         },
         Audit: {
-          _mixins: ['issues', 'governance_objects'],
+          _mixins: ['issues', 'governance_objects', 'business_objects'],
           Request: {
             mapping: "active_requests",
             draw_children: true,
             show_view: GGRC.mustache_path + "/requests/tree.mustache",
             footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
             add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache"
-          },
-          Control: {
-            mapping: "program_controls",
-            parent_instance: GGRC.page_instance(),
-            draw_children: true,
-            model: CMS.Models.Control,
-            show_view: GGRC.mustache_path + "/controls/tree.mustache",
-            footer_view: GGRC.mustache_path + "/controls/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/controls/tree_add_item.mustache",
-            allow_mapping: false,
-            allow_creating: false
           },
           Program: {
             mapping: "_program",
@@ -504,6 +488,17 @@
             add_item_view:
               GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
           },
+          Person: {
+            widget_id: "person",
+            widget_name: "People",
+            widget_icon: "person",
+            content_controller: GGRC.Controllers.TreeView,
+            content_controller_options: {
+              mapping: "authorized_people",
+              allow_mapping: false,
+              allow_creating: false
+            }
+          }
         },
         directive: {
           _mixins: [

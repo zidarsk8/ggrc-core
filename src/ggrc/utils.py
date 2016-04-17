@@ -167,7 +167,8 @@ def get_mapping_rules():
   # TODO: Read these rules from different modules and combine them here.
   business_object_rules = {
       "AccessGroup": "Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor Risk Threat CycleTaskGroupObjectTask",  # noqa
-      "Audit": "Control Assessment Issue Person Program Request Regulation Policy Standard Contract Section Clause Objective",  # noqa
+      "Audit": "AccessGroup Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",  # noqa
+      # "AssessmentTemplate": "Audit", # Uncomment this line when we add support for assessment templates in exports # noqa
       "Clause": "AccessGroup Audit Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor Risk Threat CycleTaskGroupObjectTask",  # noqa
       "Contract": "AccessGroup Audit Clause Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Process Product Program Project Request Section System Vendor Risk Threat CycleTaskGroupObjectTask",  # noqa
       "Control": "AccessGroup Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Request Section Standard System Vendor Risk Threat CycleTaskGroupObjectTask",  # noqa
