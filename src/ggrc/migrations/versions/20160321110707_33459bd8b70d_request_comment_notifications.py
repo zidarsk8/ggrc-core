@@ -41,6 +41,7 @@ def upgrade():
   op.alter_column('requests', 'title', existing_type=sa.String(length=250),
                   nullable=False)
 
+
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   # Updates due to added commentable mixin

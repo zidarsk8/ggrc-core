@@ -201,6 +201,7 @@ def get_assignable_data(notif):
     return assignable_reminder(notif)
   return {}
 
+
 def get_comment_data(notif):
   """Return data for comment notifications.
 
@@ -210,7 +211,7 @@ def get_comment_data(notif):
   function will return an empty dict.
 
   Args:
-    notif (Notification): notification with an Comment object_type.
+    notif (Notification): notification with a Comment object_type.
 
   Returns:
     Dict with all data needed for sending comment notifications.
@@ -228,15 +229,13 @@ def get_comment_data(notif):
   for person, assignee_type in comment_obj.assignees:
     if recipients.intersection(set(assignee_type)):
       data[person.email] = {
-        "user": get_person_dict(person),
-        "comment_created": {
-            comment.id: {
-                "description": comment.description,
-                "parent_type": comment_obj._inflector.title_singular.title(),
-                "parent_id": comment_obj.id,
-            }
-        }
-    }
-  print "AAAAAAAAAAAA"*50
-  print data
+          "user": get_person_dict(person),
+          "comment_created": {
+              comment.id: {
+                  "description": comment.description,
+                  "parent_type": comment_obj._inflector.title_singular.title(),
+                  "parent_id": comment_obj.id,
+              }
+          }
+      }
   return data

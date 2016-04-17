@@ -3,6 +3,8 @@
 # Created By: andraz@reciprocitylabs.com
 # Maintained By: andraz@reciprocitylabs.com
 
+"""Module containing comment model and comment related mixins."""
+
 from ggrc import db
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
@@ -35,15 +37,16 @@ class Commentable(object):
 
 
 class Comment(Relatable, Described, Documentable, Base, db.Model):
+  """Basic comment model."""
   __tablename__ = "comments"
 
   assignee_type = db.Column(db.String)
 
   # REST properties
   _publish_attrs = [
-    "assignee_type",
+      "assignee_type",
   ]
 
   _sanitize_html = [
-    "description",
+      "description",
   ]

@@ -113,7 +113,8 @@ class ObjectGenerator(Generator):
     data.update(kwargs)
     self.generate_object(models.Relationship, data=data)
 
-  def generate_comment(self, commentable, assignee_type, description, **kwargs):
+  def generate_comment(self, commentable, assignee_type, description,
+                       **kwargs):
     """Create a comment on a commentable object.
 
     This function creates a comment for a given object and generates the
