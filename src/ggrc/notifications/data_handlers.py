@@ -217,19 +217,26 @@ def get_comment_data(notif):
   """
   data = {}
   comment = get_notification_object(notif)
-  rel = models.Relationship.find_related(comment, models.Request())
-  request = rel.Request_destination or rel.Request_source
-  recipients = set(request.recipients.split(","))
-  for person, assignee_type in request.assignees:
+  rel = (models.Relationship.find_related(comment, models.Request()) or
+         models.Relationship.find_related(comment, models.Assessment()))
+
+  if rel:
+    comment_obj = (rel.Request_destination or rel.Request_source or
+                   rel.Assessment_destination or rel.Assessment_source)
+
+  recipients = set(comment_obj.recipients.split(","))
+  for person, assignee_type in comment_obj.assignees:
     if recipients.intersection(set(assignee_type)):
       data[person.email] = {
         "user": get_person_dict(person),
         "comment_created": {
             comment.id: {
                 "description": comment.description,
-                "parent_type": request._inflector.title_singular.title(),
-                "parent_id": request.id,
+                "parent_type": comment_obj._inflector.title_singular.title(),
+                "parent_id": comment_obj.id,
             }
         }
     }
+  print "AAAAAAAAAAAA"*50
+  print data
   return data
