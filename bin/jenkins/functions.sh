@@ -249,4 +249,12 @@ checkstyle_tests () {
   " || true
 
   print_line
+
+  echo "Running flake8"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    flake8 --config setup.cfg src/ test/ > test/flake8.out
+  " || true
+
+  print_line
 }
