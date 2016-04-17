@@ -5,6 +5,16 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 <div class="add-comment">
+  {{^if_null parent_instance._mandatory_comment_msg}}
+    <div class="row-fluid">
+      <div class="span8">
+        <div class="alert alert-info alert-dismissible" role="alert">
+          {{parent_instance._mandatory_comment_msg}}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
+        </div>
+      </div>
+    </div>
+  {{/if_null}}
   <div class="row-fluid">
     <div class="span8">
       <div class="controls top">
