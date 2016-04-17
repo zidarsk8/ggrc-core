@@ -77,11 +77,15 @@
             instance = this.scope.instance,
             data;
 
+        var $sendNotificaiton = this.element.find("[name=send_notification]");
+        var sendNotification = $sendNotificaiton[0].checked;
+
         if (!description.length && !attachments.length) {
           return;
         }
         data = {
           description: description,
+          send_notification: sendNotification,
           context: source.context,
           assignee_type: this.scope.attr("get_assignee_type")
         };

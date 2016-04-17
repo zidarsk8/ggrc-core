@@ -1129,6 +1129,7 @@
     form_preload: function (newObjectForm) {
       var pageInstance = GGRC.page_instance();
       var currentUser = CMS.Models.get_instance(GGRC.current_user);
+      this._set_recipients(this.attr('recipients'));
 
       if (!newObjectForm) {
         return;
@@ -1159,6 +1160,25 @@
       }
       this.mark_for_addition(
         'related_objects_as_destination', this.audit.program);
+    },
+    _set_recipients: function(recipients) {
+      if (recipients){
+        labels = ['Creator', 'Assessor', 'Verifier'];
+        _.each(labels, function(label) {
+          this.attr(label, recipients.indexOf(label) > -1);
+        }.bind(this));
+      }
+    },
+    _get_recipients: function(){
+      labels = ['Creator', 'Assessor', 'Verifier'];
+      return _.map(labels, function(label) {
+        return this.attr(label) ? label : '';
+      }.bind(this)).join(',');
+    },
+    save: function () {
+      this.attr('recipients', this._get_recipients());
+
+      return this._super.apply(this, arguments);
     },
     after_save: function () {
       this._set_mandatory_msgs();
