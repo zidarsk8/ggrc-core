@@ -5,8 +5,8 @@
  Maintained By: urban@reciprocitylabs.com
  */
 
-(function (can, $) {
-  can.Component.extend({
+(function (can, $, GGRC) {
+  GGRC.Components('addComment', {
     tag: 'add-comment',
     template: can.view('/static/mustache/base_templates/add_comment.mustache'),
     scope: {
@@ -75,8 +75,8 @@
         var source = this.scope.source_mapping;
         var instance = this.scope.instance;
         var data;
-        var $sendNotificaiton = this.element.find('[name=send_notification]');
-        var sendNotification = $sendNotificaiton[0].checked;
+        var $sendNotification = this.element.find('[name=send_notification]');
+        var sendNotification = $sendNotification[0].checked;
 
         if (!description.length && !attachments.length) {
           return;
@@ -123,4 +123,4 @@
   $(function () {
     $(document.body).ggrc_controllers_comments();
   });
-})(this.can, this.can.$);
+})(this.can, this.can.$, this.GGRC);
