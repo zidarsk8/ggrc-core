@@ -104,10 +104,12 @@ class Assessment(mixins_statusable.Statusable,
           "display_name": "Object",
           "mandatory": True,
           "ignore_on_update": True,
+          "filter_by": "_ignore_filter",
       },
       "assessment_template": {
           "display_name": "Template",
           "ignore_on_update": True,
+          "filter_by": "_ignore_filter",
       },
       "audit": {
           "display_name": "Audit",
@@ -178,5 +180,10 @@ class Assessment(mixins_statusable.Statusable,
   @classmethod
   def _filter_by_related_verifiers(cls, predicate):
     return cls._get_relate_filter(predicate, "Verifier")
+
+  @classmethod
+  def _ignore_filter(cls, predicate):
+    return None
+
 
 track_state_for_class(Assessment)
