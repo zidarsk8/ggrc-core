@@ -42,6 +42,9 @@
       form.removeAttr('workflow');
       return;
     }
+    if (workflow instanceof can.Stub) {
+      workflow = workflow.reify();
+    }
     if (typeof workflow.cycles === undefined || !workflow.cycles) {
       $(document.body).trigger(
         "ajax:flash"
@@ -334,15 +337,11 @@
       var that = this;
       this._super.apply(this, arguments);
       this.validateNonBlank("title");
-      this.validateNonBlank("contact");
       this.validateNonBlank("workflow");
+      this.validateNonBlank("cycle");
       this.validateContact(["_transient.contact", "contact"]);
-
-      this.validate(['start_date', 'end_date'], function (newVal, prop) {
-        if (!(this.start_date && this.end_date)) {
-          return "Start and/or end date is invalid";
-        }
-      });
+      this.validateNonBlank("start_date");
+      this.validateNonBlank("end_date");
 
       this.bind("updated", function (ev, instance) {
         if (instance instanceof that) {
@@ -377,19 +376,30 @@
           form.attr("contact", {id: GGRC.current_user.id, type: "Person"});
         }
 
-        workflows = CMS.Models.Workflow.findAll({
-          __search: 'Backlog', status: 'Active'}); // TODO: INSTEAD OF hardcode BACKLOG USE A SETTING
-        workflows.then(function (workflowList) {
-          if (!workflowList.length) {
-            $(document.body).trigger(
-              "ajax:flash"
-              , {warning: "No workflows named 'Backlog' found! You need to create and activate at least one with this name"}
-            );
+        // using setTimeout to execute this after the modal is loaded
+        // so we can see when the workflow is already set and use that one
+        setTimeout(function () {
+          // if we are creating a task from the workflow page, the preset
+          // workflow should be that one
+          if (form.workflow !== undefined) {
+            populateFromWorkflow(form, form.workflow);
             return;
           }
-          _workflow = workflowList[0];
-          populateFromWorkflow(form, _workflow);
-        });
+
+          workflows = CMS.Models.Workflow.findAll({
+            kind: 'Backlog', status: 'Active', __sort: '-created_at'});
+          workflows.then(function (workflowList) {
+            if (!workflowList.length) {
+              $(document.body).trigger(
+                "ajax:flash"
+                , {warning: "No Backlog workflows found! Contact your administrator to enable this functionality."}
+              );
+              return;
+            }
+            _workflow = workflowList[0];
+            populateFromWorkflow(form, _workflow);
+          });
+        }, 0);
       } else {
         cycle = form.cycle.reify();
         if (!_.isUndefined(cycle.workflow)) {
