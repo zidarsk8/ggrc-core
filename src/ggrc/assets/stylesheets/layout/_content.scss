@@ -10,7 +10,7 @@
   overflow-x: hidden;
   padding-top: 20px;
   background: $contentBgnd;
-  .simple-view & {
+  .area--distraction-free & {
     padding-top: 38px;
   }
   &.import-area {
