@@ -1,0 +1,24 @@
+{{!
+Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+Created By: urban@reciprocitylabs.com
+Maintained By: urban@reciprocitylabs.com
+}}
+
+<div class="row-fluid wrap-row">
+<ul class="past-items-list relatables">
+  {{#expose reusedObjects=reusedObjects}}
+  {{#defer 'related_requests' instance.related_requests}}
+  {{#related_requests}}
+  <li class="clearfix">
+    <div class="xmedium-col">
+      <a href="{{instance.viewLink}}" target="_blank">
+        {{instance.title}}
+      </a>
+    </div>
+  </li>
+  {{/related_requests}}
+  {{/defer}}
+  {{/expose}}
+</ul>
+</div>
