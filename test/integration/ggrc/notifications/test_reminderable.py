@@ -27,8 +27,6 @@ class TestReminderable(ggrc.TestCase):
     self.client.get("/login")
     self._fix_notification_init()
     self.api_helper = api_helper.Api()
-    # self.generator = generator.Generator()
-    # self.object_generator = generator.ObjectGenerator()
 
   def _fix_notification_init(self):
     """Fix Notification object init function.
@@ -182,6 +180,7 @@ class TestReminderable(ggrc.TestCase):
 
   def test_assessment_inprogress_reminder(self):
     """Tests that notifications get generated when in `In Progress` state."""
+    # pylint: disable=invalid-name
     with freeze_time("2015-04-01 17:13:15"):
       assessment = self.create_assessment()
 
@@ -200,6 +199,7 @@ class TestReminderable(ggrc.TestCase):
 
   def test_assessment_finished_reminder(self):
     """Tests that there are no notifications when in `Finished` state"""
+    # pylint: disable=invalid-name
     with freeze_time("2015-04-01 17:13:15"):
       assessment = self.create_assessment()
 
@@ -223,6 +223,7 @@ class TestReminderable(ggrc.TestCase):
     Tests that notifications don't get sent out if assessment has been moved to
     `Finished` state since reminder was activated.
     """
+    # pylint: disable=invalid-name
 
     with freeze_time("2015-04-01 17:13:15"):
       assessment = self.create_assessment()
@@ -238,5 +239,5 @@ class TestReminderable(ggrc.TestCase):
 
       self.change_status(assessment, "Finished")
 
-      notif_list, notif_data = common.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertEqual(notif_data, {})

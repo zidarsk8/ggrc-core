@@ -25,6 +25,7 @@ def get_object_url(obj):
   Returns:
     string: Url for the object info page.
   """
+  # pylint: disable=protected-access
   url = "{}/{}".format(obj._inflector.table_plural, obj.id)
   return urlparse.urljoin(utils.get_url_root(), url)
 

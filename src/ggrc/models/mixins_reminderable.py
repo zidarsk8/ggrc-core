@@ -3,12 +3,27 @@
 # Created By: urban@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
+"""Mixin for processing reminderable handlers"""
+
 
 class Reminderable(object):
+  """
+  Mixin for processing various handlers for reminders
+  """
+  # pylint: disable=too-few-public-methods
   REMINDERABLE_HANDLERS = {}
 
   @staticmethod
   def handle_state_to_person_reminder(obj, data):
+    """Handle reminder that are based on status of an object
+
+    Args:
+      obj: Model object that reminder is connected with
+      data: handlers settings for deciding whether to process the notification
+        at all and to who send the notification to. E.g. send it to verifiers
+        if object In Progress.
+      """
+    # pylint: disable=protected-access
     from ggrc.notifications import notification_handlers
     from ggrc.models import notification
 

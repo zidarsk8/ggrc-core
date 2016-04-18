@@ -69,6 +69,7 @@ def _add_assignable_declined_notif(obj):
     obj (Assignable): Any object with assignable mixin for which we want to add
       notifications.
   """
+  # pylint: disable=protected-access
   name = "{}_declined".format(obj._inflector.table_singular)
   notif_type = notification.NotificationType.query.filter_by(name=name).first()
 
@@ -99,6 +100,12 @@ def handle_assignable_deleted(obj):
 
 
 def handle_reminder(obj, reminder_type):
+  """Handles reminders for an object
+
+  Args:
+    obj: Object to process
+    reminder_type: Reminder handler to use for processing event
+    """
   if reminder_type in obj.REMINDERABLE_HANDLERS:
     reminder_settings = obj.REMINDERABLE_HANDLERS[reminder_type]
     handler = reminder_settings['handler']
