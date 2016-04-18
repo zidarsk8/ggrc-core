@@ -128,40 +128,6 @@ class TestBasicCsvImport(converters.TestCase):
         "Line 3: title 'will this work' already exists.Record will be ignored."
     ])
 
-  def test_assessments_import_update(self):
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
-    filename = "pci_program.csv"
-    response = self.import_file(filename)
-
-    for response_block in response:
-      for message in messages:
-        self.assertEqual(set(), set(response_block[message]))
-
-    ca = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
-    au = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
-    self.assertEqual(len(ca.owners), 1)
-    self.assertEqual(ca.owners[0].email, "danny@reciprocitylabs.com")
-    self.assertEqual(ca.contact.email, "danny@reciprocitylabs.com")
-    self.assertEqual(ca.design, "Effective")
-    self.assertEqual(ca.operationally, "Effective")
-    self.assertIsNone(models.Relationship.find_related(ca, au))
-
-    filename = "pci_program_update.csv"
-    response = self.import_file(filename)
-
-    for response_block in response:
-      for message in messages:
-        self.assertEqual(set(), set(response_block[message]))
-
-    ca = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
-    au = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
-    self.assertEqual(ca.owners[0].email, "miha@reciprocitylabs.com")
-    self.assertEqual(ca.contact.email, "albert@reciprocitylabs.com")
-    self.assertEqual(ca.design, "Needs improvement")
-    self.assertEqual(ca.operationally, "Ineffective")
-    self.assertIsNotNone(models.Relationship.find_related(ca, au))
-
   def test_person_imports(self):
     """Test imports for Person object with user roles."""
     filename = "people_test.csv"
