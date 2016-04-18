@@ -70,7 +70,7 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
   requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   # TODO Remove audit_id audit_object_id on database cleanup
-  audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=True)
+  audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False)
   audit_object_id = db.Column(db.Integer, db.ForeignKey('audit_objects.id'),
                               nullable=True)
   gdrive_upload_path = deferred(db.Column(db.String, nullable=True),

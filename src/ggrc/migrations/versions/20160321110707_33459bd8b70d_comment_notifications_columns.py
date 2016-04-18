@@ -3,7 +3,7 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: peter@reciprocitylabs.com
 
-"""Request comment notifications.
+"""Add comment notifications columns.
 
 Create Date: 2016-03-21 11:07:07.327760
 """
@@ -25,6 +25,15 @@ def upgrade():
 
   # Updates due to added commentable mixin
   op.add_column(
+      'assessments',
+      sa.Column('recipients', sa.String(length=250), nullable=True)
+  )
+  op.add_column(
+      'assessments',
+      sa.Column('send_by_default', sa.Boolean(), nullable=True)
+  )
+
+  op.add_column(
       'requests',
       sa.Column('recipients', sa.String(length=250), nullable=True)
   )
@@ -36,8 +45,6 @@ def upgrade():
   # These changes are just to sync the current database table and the model.
   # There are no changes in the code regarding these model updates.
   op.drop_column('requests', 'assignee_id')
-  op.alter_column('requests', 'audit_id', existing_type=sa.Integer(),
-                  nullable=True)
   op.alter_column('requests', 'title', existing_type=sa.String(length=250),
                   nullable=False)
 
@@ -48,11 +55,12 @@ def downgrade():
   op.drop_column('requests', 'send_by_default')
   op.drop_column('requests', 'recipients')
 
+  op.drop_column('assessments', 'send_by_default')
+  op.drop_column('assessments', 'recipients')
+
   # These changes are just to sync the current database table and the model.
   # There are no changes in the code regarding these model updates.
   op.alter_column('requests', 'title', existing_type=mysql.VARCHAR(length=250),
                   nullable=True)
-  op.alter_column('requests', 'audit_id', existing_type=sa.Integer(),
-                  nullable=False)
   op.add_column('requests',
                 sa.Column('assignee_id', sa.Integer(), nullable=True))
