@@ -6,6 +6,7 @@
 }}
 
 {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context=null}}
+  {{^if_recurring_workflow parent_instance}}
     <a
       class="section-add"
       href="javascript://"
@@ -32,4 +33,5 @@
 
       <i class="fa fa-plus-circle"></i>
     </a>
+  {{/if_recurring_workflow}}
 {{/is_allowed}}
