@@ -243,11 +243,7 @@ def get_comment_data(notif):
     recipients = set(comment_obj.recipients.split(","))
 
   for person, assignee_type in comment_obj.assignees:
-    if recipients:
-      if recipients.intersection(set(assignee_type)):
-        data[person.email] = generate_comment_notification(
-            comment_obj, comment, person)
-    else:
+    if not recipients or recipients.intersection(set(assignee_type)):
       data[person.email] = generate_comment_notification(
           comment_obj, comment, person)
   return data
