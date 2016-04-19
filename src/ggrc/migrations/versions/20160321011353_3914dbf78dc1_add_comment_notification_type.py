@@ -19,7 +19,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '3914dbf78dc1'
-down_revision = '50c374901d42'
+down_revision = '11cee57a4149'
 
 
 NOTIFICATION_TYPES = table(
