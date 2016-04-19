@@ -1,10 +1,14 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: vraj@reciprocitylabs.com
+# Maintained By: urban@reciprocitylabs.com
+
+"""Factories for models"""
+
+import random
 
 import factory
-import random
+
 from ggrc import db
 from ggrc import models
 
@@ -17,6 +21,9 @@ def random_string(prefix=''):
 
 
 class ModelFactory(factory.Factory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
+
   # modified_by_id = 1
 
   @classmethod
@@ -28,16 +35,22 @@ class ModelFactory(factory.Factory):
 
 
 class TitledFactory(factory.Factory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
   title = factory.LazyAttribute(lambda m: random_string('title'))
 
 
 class DirectiveFactory(ModelFactory, TitledFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.Directive
 
 
 class ControlFactory(ModelFactory, TitledFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.Control
@@ -54,12 +67,16 @@ class ControlFactory(ModelFactory, TitledFactory):
 
 
 class AssessmentFactory(ModelFactory, TitledFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.Assessment
 
 
 class ControlCategoryFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.ControlCategory
@@ -73,6 +90,8 @@ class ControlCategoryFactory(ModelFactory):
 
 
 class CategorizationFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.Categorization
@@ -85,6 +104,8 @@ class CategorizationFactory(ModelFactory):
 
 
 class ProgramFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.Program
@@ -94,6 +115,8 @@ class ProgramFactory(ModelFactory):
 
 
 class AuditFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.Audit
@@ -105,12 +128,16 @@ class AuditFactory(ModelFactory):
 
 
 class ContractFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.Contract
 
 
 class EventFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.Event
@@ -118,8 +145,30 @@ class EventFactory(ModelFactory):
 
 
 class RelationshipFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
 
   class Meta:
     model = models.Relationship
   source = None
   destination = None
+
+
+class RelationshipAttrFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
+
+  class Meta:
+    model = models.RelationshipAttr
+
+  relationship_id = None
+  attr_name = None
+  attr_value = None
+
+
+class PersonFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
+
+  class Meta:
+    model = models.Person

@@ -18,6 +18,7 @@ from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import deferred
+from ggrc.models import mixins_reminderable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
@@ -28,7 +29,8 @@ from ggrc.models.track_object_state import track_state_for_class
 
 
 class Assessment(AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
-                 CustomAttributable, Documentable, Personable, Timeboxed,
+                 CustomAttributable, Documentable, Personable,
+                 mixins_reminderable.Reminderable, Timeboxed,
                  Ownable, Relatable, FinishedDate, VerifiedDate,
                  BusinessObject, db.Model):
   """Class representing Assessment.
@@ -52,6 +54,18 @@ class Assessment(AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
 
   FIRST_CLASS_EDIT = START_STATE | END_STATES
   ASSIGNABLE_EDIT = END_STATES
+
+  REMINDERABLE_HANDLERS = {
+      "statusToPerson": {
+          "handler":
+              mixins_reminderable.Reminderable.handle_state_to_person_reminder,
+          "data": {
+              "Open": "Assessor",
+              "In Progress": "Assessor"
+          },
+          "reminders": {"assessment_assessor_reminder", }
+      }
+  }
 
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
                     default=tuple(START_STATE)[0]), "Assessment")
