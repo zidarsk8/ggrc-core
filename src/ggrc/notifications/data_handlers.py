@@ -208,8 +208,11 @@ def generate_comment_notification(obj, comment, person):
       "comment_created": {
           comment.id: {
               "description": comment.description,
+              "commentator": get_person_dict(comment.modified_by),
               "parent_type": obj._inflector.title_singular.title(),
               "parent_id": obj.id,
+              "parent_url": get_object_url(obj),
+              "parent_title": obj.title
           }
       }
   }
