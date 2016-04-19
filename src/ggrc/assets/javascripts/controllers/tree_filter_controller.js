@@ -26,10 +26,10 @@ can.Control("GGRC.Controllers.TreeFilter", {
             current_filter.expression.op.name != "text_search" &&
             current_filter.expression.op.name != "exclude_text_search";
 
-      this.element.find('.filter-input').toggleClass("expression", is_expression);
-      this.element.find('.filter-input span i')
+      this.element.find('.tree-filter__input-relative').toggleClass("expression", is_expression);
+      this.element.find('.tree-filter__input-relative span i')
         .toggleClass("fa-check-circle green", is_expression);
-      this.element.find('.filter-input span i')
+      this.element.find('.tree-filter__input-relative span i')
         .toggleClass("fa-check-circle-o", !is_expression);
   }
   , apply_filter : function(filter_string){

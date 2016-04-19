@@ -8,14 +8,13 @@
 <div class="row-fluid wrap-row">
   <div class="span10">
     <h6>Filter Query</h6>
-    <div class="inline-filtering inline-filtering-transparent">
-      <div class="filter-input{{#isFilterActive}} expression{{/isFilterActive}}">
-        <input can-value="item.filter" name="filter_query" type="text" class="input-wide">
-        <span class="is-expression">
+    <div class="tree-filter__inline-filtering tree-filter__inline-filtering--transparent">
+      <div class="tree-filter__input-relative{{#isFilterActive}} tree-filter__input-relative--expression{{/isFilterActive}}">
+        <input can-value="item.filter" name="filter_query" type="text" class="tree-filter__input tree-filter__input--wide">
+        <span class="tree-filter__input-relative__is-expression">
           <i class="fa {{#if isFilterActive}}fa-check-circle green{{else}}fa-check-circle-o{{/if}}"></i>
         </span>
       </div>
     </div>
   </div>
 </div>
-

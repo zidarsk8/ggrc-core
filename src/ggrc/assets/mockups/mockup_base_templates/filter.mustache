@@ -4,27 +4,27 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 }}
-<div class="sticky sticky-header filter-holder" data-height="42" data-margin-bottom="25" {{#view.hide_filter}}style="display: none"{{/view.hide_filter}}>
+<div class="sticky sticky-header tree-filter" data-height="42" data-margin-bottom="25" {{#view.hide_filter}}style="display: none"{{/view.hide_filter}}>
   <div class="sticky-filter inner-filter-sticky">
-    <div class="inline-filtering clearfix">
-      <div class="fluid-wrap">
-        <div class="filter-title-wrap">
-          <div class="filter-title">
+    <div class="tree-filter__inline-filtering clearfix">
+      <div class="tree-filter__fluid-wrap">
+        <div class="tree-filter__title-wrap">
+          <div class="tree-filter__title">
             <h6>
               Filter
             </h6>
           </div>
         </div>
-        <div class="filter-input-wrap">
-          <div class="filter-input">
-            <input name="filter_query" type="text" class="input-wide">
-            <span class="is-expression">
+        <div class="tree-filter__input-wrap">
+          <div class="tree-filter__input-relative">
+            <input name="filter_query" type="text" class="tree-filter__input tree-filter__input--wide">
+            <span class="tree-filter__input-relative__is-expression">
               <i class="fa fa-check-circle-o"></i>
             </span>
           </div>
         </div>
-        <div class="filter-button-wrap">
-          <div class="filter-button">
+        <div class="tree-filter__button-wrap">
+          <div class="tree-filter__button">
             <a id="page-help" class="popover-template" data-get-template="help/filters_helper_content" href="javascript://">
               <i class="fa fa-question-circle"></i>
             </a>

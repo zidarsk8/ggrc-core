@@ -11,53 +11,40 @@
   }
 }
 
-.filter-holder {
+.tree-filter {
   margin-bottom: 25px;
   overflow: hidden;
-}
-
-.inline-filtering {
-  line-height: 39px;
-  height: 39px;
-  background: $white;
-  border-bottom: 3px solid $warmGray;
-  padding: 0 16px 0 10px;
-  margin-bottom: 8px;
-  &.inline-filtering-transparent {
-    line-height: 26px;
-    height: 26px;
-    background: none;
-    border-bottom: none;
-    padding: 0;
-    margin-bottom: 0;
-    .filter-input {
-      .is-expression {
-        top: 3px;
+  &__fluid-wrap {
+    position: relative;
+  }
+  &__inline-filtering {
+    line-height: 39px;
+    height: 39px;
+    background: $white;
+    border-bottom: 3px solid $warmGray;
+    padding: 0 16px 0 10px;
+    margin-bottom: 8px;
+    &--transparent {
+      line-height: 26px;
+      height: 26px;
+      background: none;
+      border-bottom: none;
+      padding: 0;
+      margin-bottom: 0;
+      .tree-filter__input-relative {
+        .tree-filter__input-relative__is-expression {
+          top: 3px;
+        }
       }
     }
   }
-  .fluid-wrap {
-    position: relative;
-  }
-  .filter-title-wrap,
-  .filter-button-wrap {
+  &__title-wrap {
     position: absolute;
     top: 0;
-  }
-  .filter-title-wrap {
     width: 45px;
     left: 0;
   }
-  .filter-input-wrap {
-    width: auto;
-    margin-right: 164px;
-    margin-left: 45px;
-  }
-  .filter-button-wrap {
-    width: 164px;
-    right: 0;
-  }
-  .filter-title {
+  &__title {
     h6 {
       @extend %oneline;
       font-weight: normal;
@@ -67,16 +54,21 @@
       padding-top: 10px;
     }
   }
-  .filter-input {
+  &__input-wrap {
+    width: auto;
+    margin-right: 164px;
+    margin-left: 45px;
+  }
+  &__input-relative {
     position: relative;
-    .is-expression {
+    &__is-expression {
       @include opacity(0.25);
       position: absolute;
       right: 6px;
       top: 1px;
     }
-    &.expression {
-      .is-expression {
+    &--expression {
+      .tree-filter__input-relative__is-expression {
         @include opacity(1);
         i {
           background-position: -246px -176px;
@@ -84,7 +76,36 @@
       }
     }
   }
-  .filter-button {
+  &__input {
+    @include box-shadow(none !important);
+    @include border-radius(0 !important);
+    line-height: 26px !important;
+    height: 26px !important;
+    padding: 2px 4px !important;
+    font-size: 12px !important;
+    margin: -2px 0 0 0 !important;
+    box-sizing: border-box !important;
+    &--wide {
+      width: 100%;
+    }
+    &--medium {
+      width: 170px;
+    }
+    &--date {
+      width: 80px;
+      padding: 2px 4px 2px 26px;
+      &.date {
+        background-position: -342px -365px;
+      }
+    }
+  }
+  &__button-wrap {
+    position: absolute;
+    top: 0;
+    width: 164px;
+    right: 0;
+  }
+  &__button {
     @extend %clearfix;
     a {
       float: right;
@@ -109,29 +130,9 @@
       }
     }
   }
-  input[type="text"] {
-    @include box-shadow(none);
-    @include border-radius(0);
-    line-height: 26px;
-    height: 26px;
-    padding: 2px 4px;
-    font-size: 12px;
-    margin: -2px 0 0 0;
-    box-sizing: border-box;
-    &.input-wide {
-      width: 100%;
-    }
-    &.input-medium {
-      width: 170px;
-    }
-    &.input-date {
-      width: 80px;
-      padding: 2px 4px 2px 26px;
-      &.date {
-        background-position: -342px -365px;
-      }
-    }
-  }
+}
+
+.inline-filtering {
   label {
     font-size:11px;
     text-transform:uppercase;

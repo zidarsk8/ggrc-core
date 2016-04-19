@@ -1295,7 +1295,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   },
 
   hide_filter: function () {
-    var $filter = this.element.parent().find('.filter-holder');
+    var $filter = this.element.parent().find('.tree-filter');
     var height = $filter.height();
     var margin = $filter.css('margin-bottom').replace('px', '');
 
@@ -1318,7 +1318,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   },
 
   show_filter: function () {
-    var $filter = this.element.parent().find('.filter-holder');
+    var $filter = this.element.parent().find('.tree-filter');
 
     $filter
         .height($filter.data('height'))
