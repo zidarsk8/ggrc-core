@@ -57,9 +57,11 @@
             <a data-id="hide_frequency_hidden_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <select data-id="frequency_dd" tabindex="4" class="input-block-level" id="frequency" name="frequency" {{^if new_object_form}}disabled="disabled"{{/if new_object_form}}>
-            {{#iterate "one_time" "One time" "weekly" "Weekly" "monthly" "Monthly" "quarterly" "Quarterly" "annually" "Annually" step=2}}
-            <option value="{{iterator_0}}" {{#if_equals instance.frequency iterator_0}}selected="true"{{/if_equals}}>{{iterator_1}}</option>
-            {{/iterate}}
+            <option value="one_time" {{#if_equals instance.frequency 'one_time'}}selected="selected"{{/if_equals}}>One time</option>
+            <option value="weekly" {{#if_equals instance.frequency 'weekly'}}selected="selected"{{/if_equals}}>Weekly</option>
+            <option value="monthly" {{#if_equals instance.frequency 'monthly'}}selected="selected"{{/if_equals}}>Monthly</option>
+            <option value="quarterly" {{#if_equals instance.frequency 'quarterly'}}selected="selected"{{/if_equals}}>Quarterly</option>
+            <option value="annually" {{#if_equals instance.frequency 'annually'}}selected="selected"{{/if_equals}}>Annually</option>
           </select>
         </div>
       </div>
