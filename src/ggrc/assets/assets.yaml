@@ -135,6 +135,8 @@ dashboard-js-files:
   - components/unified_mapper/mapper_checkbox.js
   - components/assessment_templates/assessment_templates.js
   - components/modal_wrappers/assessment_template_form.js
+  - components/reminder.js
+
   #- d3.v2.js
   #- related_graph.js
 
@@ -231,11 +233,14 @@ dashboard-js-template-files:
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
   - assessments/reusable_objects.mustache
+  - assessments/header.mustache
   - assessments/generator_title.mustache
   - assessment_templates/attribute_field.mustache
   - assessment_templates/attribute_add_field.mustache
   - assessment_templates/modal_content.mustache
   - assessment_templates/info.mustache
+  - assessments/related_issues.mustache
+  - assessments/related_requests.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache

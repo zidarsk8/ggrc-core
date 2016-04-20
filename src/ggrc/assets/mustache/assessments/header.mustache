@@ -1,0 +1,109 @@
+{{!
+Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: urban@reciprocitylabs.com
+  Maintained By: urban@reciprocitylabs.com
+}}
+
+  <div class="pane-header">
+    <div class="row-fluid wrap-row">
+      <div class="span9">
+        <h6>Title</h6>
+        <h3>{{title}}</h3>
+        {{#if_helpers '\
+        #if_equals' status "Verified" '\
+        and ^if' instance.verified}}
+        {{! don't show status, because it will be replaced soon }}
+        {{else}}
+        <span class="state-value">{{status}}</span>
+        {{/if_helpers}}
+      <span class="gray">
+        {{#if request_type}}
+          ({{capitalize request_type}})
+        {{/if}}
+      </span>
+        {{#if verified}}
+        <i class="fa fa-check-circle green"
+           rel="tooltip"
+           title="Verified on {{localize_date verified_date}}"/>
+        {{/if}}
+      </div>
+      <div class="span3">
+        <div class="info-pane-utility">
+          <div class="details-wrap">
+            <a class="btn btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+              {{#is_allowed 'update' instance context='for'}}
+              {{> /static/mustache/base_objects/edit_object_link.mustache}}
+              {{/is_allowed}}
+              <li>
+                <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_url}}" />
+              </li>
+
+              {{#is_info_pin}}
+              {{#is_allowed_to_map page_instance instance}}
+              {{^options.is_in_selector}}
+              {{> /static/mustache/base_objects/unmap.mustache}}
+
+              {{/options}}
+              {{/is_allowed_to_map}}
+              {{#if instance.viewLink}}
+              {{#is_allowed "view_object_page" instance}}
+              <li>
+                <a href="{{instance.viewLink}}">
+                  <i class="fa fa-long-arrow-right"></i>
+                  View {{instance.class.title_singular}}
+                </a>
+              </li>
+              {{/is_allowed}}
+              {{/if}}
+              {{/is_info_pin}}
+
+              {{#if_in instance.status "Open,In Progress"}}
+              <li>
+                {{#if_verifiers_defined instance}}
+                  <reminder
+                    instance="instance"
+                    type="statusToPerson"
+                    modal_title="Reminder for Assessors set"
+                    modal_description="Tomorrow all Assessors will receive a notification to look at this Assessment if they didn't move it to 'Finished' in between."
+                  >
+                    <a href="javascript://" can-click="reminder">
+                      <i class="fa fa-bell-o"></i>
+                      Send reminder to assessors</a>
+                  </reminder>
+                {{else}}
+                  <reminder
+                    instance="instance"
+                    type="statusToPerson"
+                    modal_title="Reminder for Assessors set"
+                    modal_description="Tomorrow all Assessors will receive a notification to look at this Assessment if they didn't move it to 'Final' in between."
+                  >
+                    <a href="javascript://" can-click="reminder">
+                      <i class="fa fa-bell-o"></i>
+                      Send reminder to assessors</a>
+                  </reminder>
+                {{/if_verifiers_defined}}
+              </li>
+              {{/if_in}}
+
+              {{#is_allowed 'delete' instance}}
+              <li>
+                <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                  <i class="fa fa-trash"></i>
+                  Delete
+                </a>
+              </li>
+              {{/is_allowed}}
+
+            </ul>
+          </div>
+        </div>
+        {{> /static/mustache/mixins/stateful.mustache }}
+      </div>
+    </div>
+  </div>

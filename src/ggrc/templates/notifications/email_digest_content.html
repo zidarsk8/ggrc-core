@@ -17,6 +17,26 @@ Maintained By: miha@reciprocitylabs.com
                   Hi, {{ macro.user_name(digest['user']) }}.
                 </h1>
 
+                {% if digest.get('assessment_assessor_reminder') %}
+                <h2 {{ style.sub_title() }} >Reminders</h2>
+                <ul {{ style.list_wrap() }} >
+                  This is a friendly reminder that you have an open control assessments assigned to you in GGRC.
+                  {% for assessment_id, assessment_data in digest['assessment_assessor_reminder'].items() %}
+                  <li {{ style.list_item() }} >
+                    {% if assessment_data['end_date'] %}
+                      Assessment "<a href="{{ assessment_data['url'] }}">{{ assessment_data['title'] }}</a>" is due on {{ assessment_data['end_date'] }}.
+                    {% else %}
+                      Assessment "<a href="{{ assessment_data['url'] }}">{{ assessment_data['title'] }}</a>".
+                    {% endif %}
+                  </li>
+                  {% endfor %}
+                </ul>
+
+                {% if digest|length > 1 %}
+                <hr />
+                {% endif %}
+                {% endif %}
+
                 {% if digest['cycle_started_tasks'] %}
                   <h2 {{ style.sub_title() }} >Following
                     {{ "tasks are" if digest['cycle_started_tasks']|length > 1 else "task is" }}
@@ -33,6 +53,7 @@ Maintained By: miha@reciprocitylabs.com
                         </ul>
                     </li>
                   {% endfor %}
+                  </ul>
                 {% endif %}
 
                 {% if digest['task_declined'] %}
