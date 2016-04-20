@@ -163,7 +163,7 @@ def get_todays_notifications():
       and corresponding data for those notifications.
   """
   notifications = db.session.query(Notification).filter(
-      and_(Notification.send_on <= datetime.now(),
+      and_(Notification.send_on <= datetime.today(),
            Notification.sent_at.is_(None)
            )).all()
   return notifications, get_notification_data(notifications)
@@ -213,6 +213,7 @@ def send_todays_digest_notifications():
   Returns:
     str: String containing a simple list of who received the notification.
   """
+  # pylint: disable=invalid-name
   notif_list, notif_data = get_todays_notifications()
   sent_emails = []
   subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
@@ -266,6 +267,7 @@ def show_todays_digest_notifications():
   Returns:
     str: Html containing all todays notifications.
   """
+  # pylint: disable=invalid-name
   if not permissions.is_admin():
     raise Forbidden()
   _, notif_data = get_todays_notifications()
