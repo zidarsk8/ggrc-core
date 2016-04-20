@@ -10,9 +10,6 @@
   overflow-x: hidden;
   padding-top: 20px;
   background: $contentBgnd;
-  .area--distraction-free & {
-    padding-top: 38px;
-  }
   &.import-area {
     margin-left: 0;
     .widget {
