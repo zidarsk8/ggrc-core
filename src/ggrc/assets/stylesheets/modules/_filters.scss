@@ -165,24 +165,6 @@
   }
 }
 
-.inline-filtering {
-  &.task-filtering {
-    input {
-      &[class*="span"],
-      &.input-block-level {
-        padding: 4px;
-        min-height: 20px;
-      }
-      &.input-block-level {
-        margin-top: 5px;
-      }
-      &[type="checkbox"] {
-        margin-top: -2px;
-      }
-    }
-  }
-}
-
 .relevance-filters {
   margin-bottom: 20px;
   .add-rule {
