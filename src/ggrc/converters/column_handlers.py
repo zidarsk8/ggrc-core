@@ -9,10 +9,12 @@ from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import request
 from ggrc.converters.handlers import related_person
 from ggrc.converters.handlers import list_handlers
+from ggrc.converters.handlers import assessment_object
 from ggrc.extensions import get_extension_modules
 
 GGRC_COLUMN_HANDLERS = {
     "assertions": handlers.ControlAssertionColumnHandler,
+    "assessment_object": assessment_object.AssessmentObjectColumnHandler,
     "assignee": handlers.UserColumnHandler,
     "audit": handlers.AuditColumnHandler,
     "categories": handlers.ControlCategoryColumnHandler,

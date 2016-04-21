@@ -105,6 +105,7 @@ class Assessment(mixins_statusable.Statusable,
           "mandatory": True,
           "ignore_on_update": True,
           "filter_by": "_ignore_filter",
+          "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "assessment_template": {
           "display_name": "Template",
