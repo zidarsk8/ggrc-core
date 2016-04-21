@@ -208,7 +208,8 @@
   Mustache.registerHelper("if_recurring_workflow", function (object, options) {
     object = Mustache.resolve(object);
     if (object.type === 'Workflow' &&
-        ['weekly', 'monthly', 'annually'].indexOf(object.frequency) >= 0) {
+        _.includes(['weekly', 'monthly', 'quarterly', 'annually'],
+                   object.frequency)) {
       return options.fn(this);
     } else {
       return options.inverse(this);
