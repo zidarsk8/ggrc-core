@@ -1190,8 +1190,9 @@
         ATTACHMENT: 2 // binary 10
       };
       var needed = {
+        attachment: [],
         comment: [],
-        attachment: []
+        value: []
       };
       var rq = new RefreshQueue();
 
@@ -1207,13 +1208,21 @@
           instance.get_binding('all_documents').refresh_count(),
           rq.trigger()
       ).then(function (commentCount, attachmentCount, rqRes) {
+        var values = _.map(instance.custom_attribute_values, function (cav) {
+          return cav.reify();
+        });
         commentCount = commentCount();
         attachmentCount = attachmentCount();
-        _.each(instance.custom_attribute_values, function (cav) {
+        _.each(instance.custom_attribute_definitions, function (definition) {
+          var pred = {custom_attribute_id: definition.id};
+          if (definition.mandatory && !_.some(values, pred)) {
+            needed.value.push(definition.title);
+          }
+        });
+        _.each(values, function (cav) {
           var definition;
           var i;
           var mandatory;
-          cav = cav.reify();
           definition = _.find(instance.custom_attribute_definitions, {
             id: cav.custom_attribute_id
           });
@@ -1252,9 +1261,18 @@
         } else {
           instance.removeAttr('_mandatory_attachment_msg');
         }
+        if (needed.value.length) {
+          instance.attr(
+              '_mandatory_value_msg',
+              'Values required for: ' + needed.value.join(', ')
+          );
+        } else {
+          instance.removeAttr('_mandatory_value_msg');
+        }
         instance.attr(
             '_mandatory_msg',
             _.filter([
+              instance.attr('_mandatory_value_msg'),
               instance.attr('_mandatory_attachment_msg'),
               instance.attr('_mandatory_comment_msg')
             ]).join('; <br />') || null
