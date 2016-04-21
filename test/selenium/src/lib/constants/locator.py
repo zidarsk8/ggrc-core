@@ -746,7 +746,8 @@ class BaseWidgetGeneric(object):
             .format(self._object_name))
       self.TEXTFIELD = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__input-relative'.format(self._object_name))
+          '#{}_widget .sticky-filter .tree-filter__input-relative'
+            .format(self._object_name))
       self.BUTTON_SUBMIT = (
           By.CSS_SELECTOR,
           '#{}_widget .sticky-filter .tree-filter__button [type="submit"]'
@@ -831,8 +832,10 @@ class AdminCustomAttributes(object):
                 self._Locator.get_toggle(id_))
 
   FILTER_INPUT_FIELD = (By.CLASS_NAME, 'tree-filter__input-relative')
-  FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR, '.tree-filter__button>[type="submit"]')
-  FILTER_BUTTON_RESET = (By.CSS_SELECTOR, '.tree-filter__button>[type="reset"]')
+  FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR,
+                          '.tree-filter__button>[type="submit"]')
+  FILTER_BUTTON_RESET = (By.CSS_SELECTOR,
+                         '.tree-filter__button>[type="reset"]')
 
   # programs dropdown
   BUTTON_ADD_CUSTOM_PROGRAM_ATTR = (
