@@ -27,7 +27,10 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
   VALID_STATES = (u'Assigned', u'InProgress', u'Finished', u'Verified')
 
   workflow_id = db.Column(
-      db.Integer, db.ForeignKey('workflows.id'), nullable=False)
+      db.Integer,
+      db.ForeignKey('workflows.id', ondelete="CASCADE"),
+      nullable=False,
+  )
   cycle_task_groups = db.relationship(
       'CycleTaskGroup', backref='cycle', cascade='all, delete-orphan')
   cycle_task_group_object_tasks = db.relationship(

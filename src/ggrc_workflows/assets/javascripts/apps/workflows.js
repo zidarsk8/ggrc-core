@@ -135,6 +135,13 @@
         cycle_task_group_tasks: Direct(
           'CycleTaskGroupObjectTask',
           'cycle_task_group',
+          'cycle_task_group_tasks'),
+
+        // effectively an alias for 'cycle_task_group_tasks', specifying just
+        // the latter's name as a string does not work for some reason
+        cycle_task_group_object_tasks: Direct(
+          'CycleTaskGroupObjectTask',
+          'cycle_task_group',
           'cycle_task_group_tasks')
       },
 

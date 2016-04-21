@@ -34,13 +34,19 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
     return "TASK"
 
   task_group_id = db.Column(
-      db.Integer, db.ForeignKey('task_groups.id'), nullable=False)
+      db.Integer,
+      db.ForeignKey('task_groups.id', ondelete="CASCADE"),
+      nullable=False,
+  )
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
+
   object_approval = db.Column(
       db.Boolean, nullable=False, default=False)
+
   task_type = db.Column(
       db.String(length=250), default=default_task_type, nullable=False)
+
   response_options = db.Column(
       JsonType(), nullable=False, default='[]')
 

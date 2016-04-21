@@ -15,7 +15,10 @@ class TaskGroupObject(Timeboxed, Mapping, db.Model):
   __tablename__ = 'task_group_objects'
 
   task_group_id = db.Column(
-      db.Integer, db.ForeignKey('task_groups.id'), nullable=False)
+      db.Integer,
+      db.ForeignKey('task_groups.id', ondelete="CASCADE"),
+      nullable=False,
+  )
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String, nullable=False)
 

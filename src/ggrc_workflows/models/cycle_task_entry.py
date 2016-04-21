@@ -15,24 +15,26 @@ class CycleTaskEntry(Described, Documentable, Base, db.Model):
   _is_declining_review = db.Column(db.Boolean, nullable=True)
 
   cycle_id = db.Column(
-      db.Integer, db.ForeignKey('cycles.id'), nullable=False)
+      db.Integer,
+      db.ForeignKey('cycles.id', ondelete="CASCADE"),
+      nullable=False,
+  )
   cycle_task_group_object_task_id = db.Column(
       db.Integer,
-      db.ForeignKey('cycle_task_group_object_tasks.id'),
-      nullable=False
-      )
+      db.ForeignKey('cycle_task_group_object_tasks.id', ondelete="CASCADE"),
+      nullable=False,
+  )
   cycle_task_group_object_task = db.relationship(
     'CycleTaskGroupObjectTask',
     foreign_keys='CycleTaskEntry.cycle_task_group_object_task_id',
     backref='cycle_task_entries',
-    )
+  )
 
   _publish_attrs = [
       'cycle',
       'cycle_task_group_object_task',
       'is_declining_review'
-      ]
-
+  ]
 
   @hybrid_property
   def is_declining_review(self):

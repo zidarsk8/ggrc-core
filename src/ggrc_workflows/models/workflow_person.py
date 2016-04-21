@@ -17,9 +17,10 @@ class WorkflowPerson(Mapping, db.Model):
   __tablename__ = 'workflow_people'
 
   workflow_id = db.Column(
-      db.Integer, db.ForeignKey('workflows.id'), nullable=False)
-  #workflow = db.relationship(
-  #    'Workflow', backref=backref('workflow_people', cascade='all, delete-orphan'))
+      db.Integer,
+      db.ForeignKey('workflows.id', ondelete="CASCADE"),
+      nullable=False,
+  )
   person_id = db.Column(
       db.Integer, db.ForeignKey('people.id'), nullable=False)
   person = db.relationship(

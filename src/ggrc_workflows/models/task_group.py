@@ -22,8 +22,10 @@ class TaskGroup(
   _title_uniqueness = False
 
   workflow_id = db.Column(
-      db.Integer, db.ForeignKey('workflows.id'), nullable=False)
-
+      db.Integer,
+      db.ForeignKey('workflows.id', ondelete="CASCADE"),
+      nullable=False,
+  )
   lock_task_order = db.Column(db.Boolean(), nullable=True)
 
   task_group_objects = db.relationship(
