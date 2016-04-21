@@ -30,7 +30,6 @@ GGRC_COLUMN_HANDLERS = {
     "key_control": handlers.CheckboxColumnHandler,
     "kind": handlers.OptionColumnHandler,
     "link": handlers.TextColumnHandler,
-    "mapped_objects": handlers.ResponseMappedObjectsColumnHandler,
     "means": handlers.OptionColumnHandler,
     "name": handlers.TextColumnHandler,
     "network_zone": handlers.OptionColumnHandler,

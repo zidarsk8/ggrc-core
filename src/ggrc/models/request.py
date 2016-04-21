@@ -67,9 +67,6 @@ class Request(mixins_statusable.Statusable,
   # TODO Remove test and notes columns on database cleanup
   test = deferred(db.Column(db.Text, nullable=True), 'Request')
   notes = deferred(db.Column(db.Text, nullable=True), 'Request')
-  # TODO Remove responses on database cleanup
-  responses = db.relationship('Response', backref='request',
-                              cascade='all, delete-orphan')
 
   _publish_attrs = [
       'requestor',
@@ -150,8 +147,7 @@ class Request(mixins_statusable.Statusable,
   def eager_query(cls):
     query = super(Request, cls).eager_query()
     return query.options(
-        orm.joinedload('audit'),
-        orm.subqueryload('responses'))
+        orm.joinedload('audit'))
 
   @classmethod
   def _filter_by_related_assignees(cls, predicate):

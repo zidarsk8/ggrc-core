@@ -24,7 +24,6 @@ class Converter(object):
       "Risk Assessment",
       "Audit",
       "Request",
-      "Response",
       "Policy",
       "Regulation",
       "Standard",

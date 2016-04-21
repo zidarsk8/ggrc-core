@@ -31,7 +31,6 @@ from ggrc.models import all_models
 from ggrc.models.audit import Audit
 from ggrc.models.program import Program
 from ggrc.models.relationship import Relationship
-from ggrc.models.response import Response
 from ggrc.rbac import permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.common import _get_cache_manager
@@ -665,8 +664,7 @@ def handle_relationship_post(sender, obj=None, src=None, service=None):
   db.session.add(obj)
   db.session.flush()
 
-  if isinstance(obj.source, Response) \
-     and isinstance(obj.destination, Program) \
+  if isinstance(obj.destination, Program) \
      and obj.destination.private \
      and db.session.query(ContextImplication) \
      .filter(
@@ -700,8 +698,7 @@ def handle_relationship_post(sender, obj=None, src=None, service=None):
 def handle_relationship_delete(sender, obj=None, src=None, service=None):
   db.session.flush()
 
-  if isinstance(obj.source, Response) \
-     and isinstance(obj.destination, Program) \
+  if isinstance(obj.destination, Program) \
      and obj.destination.private:
 
     # figure out if any other responses in this audit
