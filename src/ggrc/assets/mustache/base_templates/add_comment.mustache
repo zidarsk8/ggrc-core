@@ -52,12 +52,11 @@
         {{/instance._pending_joins}}
         </ul>
       </div>
-      <div class="controls">
-        <a href="javascript://" class="btn btn-success btn-small">Add</a>
-        <label class="input--inline">
-          <input type="checkbox" 
-                name="send_notification"
-                {{#parent_instance.send_by_default}}checked{{/send_by_default}}>
+      <div class="controls clearfix">
+        <a href="javascript://" class="btn btn-success btn-small pull-left">Add</a>
+        <label class="input--inline pull-left">
+          <input type="checkbox" name="send_notification"
+            {{#parent_instance.send_by_default}}checked{{/send_by_default}}>
           Send Notifications
         </label>
       </div>
