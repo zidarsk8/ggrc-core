@@ -10,9 +10,12 @@ PREFIX := $(shell pwd)
 DEV_PREFIX ?= $(PREFIX)
 DEV_PREFIX := $(shell cd $(DEV_PREFIX); pwd)
 
-APPENGINE_VERSION=1.9.35
-APPENGINE_ZIP_NAME=google_appengine_$(APPENGINE_VERSION).zip
-APPENGINE_ZIP_HREF=https://commondatastorage.googleapis.com/appengine-sdks/featured/$(APPENGINE_ZIP_NAME)
+# APPENGINE_ZIP_NAME and APPENGINE_ZIP_HREF are independent but should be
+# updated together to ensure update is forced during `vagrant provision`
+APPENGINE_ZIP_HREF=https://commondatastorage.googleapis.com/appengine-sdks/deprecated/193/google_appengine_1.9.3.zip
+# For App Engine SDK V.1.8.X, use this location:
+# APPENGINE_ZIP_HREF=http://googleappengine.googlecode.com/files/$(APPENGINE_ZIP_NAME)
+APPENGINE_ZIP_NAME=google_appengine_1.9.3.zip
 APPENGINE_ZIP_PATH=$(DEV_PREFIX)/opt/$(APPENGINE_ZIP_NAME)
 APPENGINE_SDK_PATH=$(DEV_PREFIX)/opt/google_appengine
 APPENGINE_SQLITE_PATCH_PATH=$(PREFIX)/extras/google_appengine__enable_sqlite3.diff
@@ -101,11 +104,12 @@ $(DEV_PREFIX)/opt/dev_virtualenv :
 
 dev_virtualenv : $(DEV_PREFIX)/opt/dev_virtualenv
 
-dev_virtualenv_packages : dev_virtualenv src/dev-requirements.txt src/requirements.txt
+dev_virtualenv_packages : dev_virtualenv src/requirements-dev.txt src/requirements.txt  src/requirements-selenium.txt
 	source "$(PREFIX)/bin/init_env"; \
 		pip install -U pip==7.1.2; \
 		pip install --no-deps -r src/requirements.txt; \
-		pip install -r src/dev-requirements.txt
+		pip install -r src/requirements-dev.txt; \
+		pip install -r src/requirements-selenium.txt
 
 git_submodules :
 	git submodule update --init

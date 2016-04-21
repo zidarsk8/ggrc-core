@@ -72,7 +72,7 @@ def get_cls_test_utils(object_name):
     object_name (basestring)
   """
   cls_name = constants.cls_name.TEST_MODAL_NEW_PREFIX + object_name
-  return _factory(cls_name, base.Test, search_nested_subclasses=True)
+  return _factory(cls_name, base.TestUtil, search_nested_subclasses=True)
 
 
 def get_cls_widget(object_name, is_info=False, is_admin=False):

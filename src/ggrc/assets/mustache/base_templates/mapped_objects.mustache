@@ -11,14 +11,16 @@
   parent-instance="instance"
   mapping="instance.class.info_pane_options.mapped_objects.mapping"
   item-template="instance.class.info_pane_options.mapped_objects.show_view"
->
+  tree-view-class="tree-structure new-tree mapped-objects-tree">
 </mapping-tree-view>
+
 {{#is_allowed 'update' instance context='for'}}
   <a
     class="btn btn-draft btn-small"
     href="javascript://"
     rel="tooltip"
-    data-placement="left"
+    data-type="Program"
+    data-placement="right"
     data-toggle="unified-mapper"
     data-join-mapping="related_objects"
     data-join-option-type="{{model.shortName}}"

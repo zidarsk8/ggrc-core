@@ -9,7 +9,7 @@ from freezegun import freeze_time
 from datetime import date, datetime
 
 from ggrc import db
-from ggrc import notifications
+from ggrc.notifications import common
 from ggrc.models import Notification
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
@@ -96,7 +96,7 @@ class TestOneTimeWorkflowNotification(TestCase):
       db.session.add(self.tgassignee1)
       db.session.add(self.member1)
 
-      notifications.get_todays_notifications()
+      common.get_todays_notifications()
 
   def create_test_cases(self):
     def person_dict(person_id):

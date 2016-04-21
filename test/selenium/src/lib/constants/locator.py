@@ -152,10 +152,11 @@ class ExtendedInfo(object):
   """Locators for the extended info tooltip in LHN after hovering over a
   member object"""
 
-  BUTTON_MAP_TO = (By.CSS_SELECTOR, '.extended-info.in .map-to-page-object')
+  BUTTON_MAP_TO = (
+      By.CSS_SELECTOR, '[data-test-id="extended_info_button_map"]')
   ALREADY_MAPPED = (
-      By.CSS_SELECTOR,
-      '.extended-info.in .links .primary:not(.map-to-page-object)')
+      By.CSS_SELECTOR, '[data-test-id="extended_info_object_already_mapped"]')
+  TITLE = (By.CSS_SELECTOR, '#extended-info .main-title')
 
 
 class BaseModalCreateNew(object):
@@ -801,7 +802,7 @@ class AdminCustomAttributes(object):
   class _Locator(object):
     @staticmethod
     def get_toggle(child_id):
-      return (By.CSS_SELECTOR, '.tree-structure li:nth-child({}) div '
+      return (By.CSS_SELECTOR, '#custom_attribute_widget li:nth-child({}) '
               '.openclose'.format(child_id))
 
     @staticmethod
@@ -835,8 +836,8 @@ class AdminCustomAttributes(object):
 
   # programs dropdown
   BUTTON_ADD_CUSTOM_PROGRAM_ATTR = (
-      By.CSS_SELECTOR, '.tree-structure li:nth-child(5)'
-                       ' [data-toggle="modal-ajax-form"]')
+      By.CSS_SELECTOR,
+      '.tree-item:nth-child(5) [data-test-id="button_add-86eaf948"]')
   PROGRAMS_LABEL_ATTRIBUTE_NAME = _Locator.get_programs_label(1)
   PROGRAMS_LABEL_ATTRIBUTE_TYPE = _Locator.get_programs_label(2)
   PROGRAMS_LABEL_MANDATORY = _Locator.get_programs_label(3)

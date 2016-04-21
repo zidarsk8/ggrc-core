@@ -21,3 +21,5 @@ selenium:
   environment:
    - PYTHONDONTWRITEBYTECODE=true
    - PYTHONPATH=/selenium/src
+   - SCREEN_WIDTH=1440
+   - SCREEN_HEIGHT=900

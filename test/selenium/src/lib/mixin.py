@@ -6,5 +6,5 @@
 from lib import meta
 
 
-class MetaDocsDecorator(meta.RequireDocs, meta.DecoratePublicMethods):
-  pass
+class MetaTestDecorator(meta.RequireDocs, meta.DecorateFlakyTests):
+  """Composition of multiple metaclasses"""

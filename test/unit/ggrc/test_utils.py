@@ -17,19 +17,16 @@ class TestUtilsFunctions(TestCase):
     for object_name, object_mappings in mappings.items():
       for mapping in object_mappings:
         try:
-          # Audits do not have direct mappings and do not have all objects
-          # listed, that is why we don't check both ways.
-          if mapping != "Audit":
-            # If obj A is in obj B mappings, make sure that obj B is also in
-            #obj A mappings
-            self.assertIn(
-                mapping, mappings,
-                "- {} is not in the mappings dict".format(mapping)
-            )
-            self.assertIn(
-                object_name, mappings[mapping],
-                "{} not found in {} mappings".format(object_name, mapping)
-            )
+          # If obj A is in obj B mappings, make sure that obj B is also in
+          # obj A mappings
+          self.assertIn(
+              mapping, mappings,
+              "- {} is not in the mappings dict".format(mapping)
+          )
+          self.assertIn(
+              object_name, mappings[mapping],
+              "{} not found in {} mappings".format(object_name, mapping)
+          )
         except AssertionError as e:
           verificationErrors.append(str(e))
 

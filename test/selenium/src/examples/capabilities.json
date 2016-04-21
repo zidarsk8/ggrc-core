@@ -1,0 +1,12 @@
+{ "capabilities": {
+  "browserName": "Chrome",
+  "platform": "Any"
+  },
+  "loggingPrefs": {
+    "browser": "ALL",
+    "client": "ALL",
+    "driver": "ALL",
+    "performance": "ALL",
+    "server": "ALL"
+  }
+}

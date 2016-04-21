@@ -111,18 +111,32 @@ dashboard-js-files:
   - apps/quick_search.js
   - apps/business_objects.js
   - apps/custom_attributes.js
+  - components/unified_mapper/mapper.js
+  - components/unified_mapper/mapper_results.js
+  - components/unified_mapper/mapper_checkbox.js
+  - components/dropdown/dropdown.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
   - components/csv/export.js
   - components/csv/import.js
-  - components/mapper.js
   - components/people_list.js
   - components/mapped_tree_view.js
+  - components/reusable_objects.js
   - components/assessment_generator.js
   - components/paginate.js
   - components/tabs.js
   - components/assessment_attributes.js
+  - components/autocomplete/autocomplete.js
+  - components/lazy_open_close.js
   - components/object_history/object_history.js
+  - components/person/person.js
+  - components/unified_mapper/mapper.js
+  - components/unified_mapper/mapper_results.js
+  - components/unified_mapper/mapper_checkbox.js
+  - components/assessment_templates/assessment_templates.js
+  - components/modal_wrappers/assessment_template_form.js
+  - components/reminder.js
+
   #- d3.v2.js
   #- related_graph.js
 
@@ -157,6 +171,7 @@ dashboard-js-template-files:
   - base_objects/relevance_action.mustache
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
+  - base_objects/title.mustache
   - base_objects/tree.mustache
   - base_objects/tree_placeholder.mustache
   - base_objects/tree_footer_no_access.mustache
@@ -183,7 +198,9 @@ dashboard-js-template-files:
   - base_objects/sub_tree_type_selector.mustache
   - base_objects/modal/search_title.mustache
   - base_templates/add_comment.mustache
+  - base_templates/objects_tooltip.mustache
   - base_templates/attachment_list.mustache
+  - base_templates/url_list.mustache
   - base_templates/attachment.mustache
   - base_templates/base.mustache
   - base_templates/comment_list.mustache
@@ -215,15 +232,24 @@ dashboard-js-template-files:
   - assessments/tree_footer.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
+  - assessments/reusable_objects.mustache
+  - assessments/header.mustache
   - assessments/generator_title.mustache
   - assessment_templates/attribute_field.mustache
   - assessment_templates/attribute_add_field.mustache
   - assessment_templates/modal_content.mustache
   - assessment_templates/info.mustache
+  - assessments/related_issues.mustache
+  - assessments/related_requests.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache
+  - components/autocomplete/autocomplete.mustache
+  - components/unified_mapper/mapper_results.mustache
+  - components/assessment_templates/assessment_templates.mustache
+  - components/dropdown/dropdown.mustache
   - components/object_history/object_history.mustache
+  - components/person/person.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
@@ -257,6 +283,7 @@ dashboard-js-template-files:
   - help/help_modal_header.mustache
   - help/filters_helper_content.mustache
   - markets/modal_content.mustache
+  - mapped_objects/dropdown_menu_tier2.mustache
   - modals/close_buttons.mustache
   - modals/confirm.mustache
   - modals/confirm_buttons.mustache
@@ -354,6 +381,7 @@ dashboard-js-template-files:
   - requests/tier2_content.mustache
   - requests/general_info.mustache
   - requests/dates_list.mustache
+  - requests/reusable_objects.mustache
   - base_templates/subtree.mustache
   - objectives/autocomplete_result.mustache
   - responses/confirm_delete_evidence.mustache

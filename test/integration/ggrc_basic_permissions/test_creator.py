@@ -7,13 +7,13 @@
 Test Program Creator role
 """
 
-import unittest
 from integration.ggrc import TestCase
 from ggrc.models import get_model
 from ggrc.models import all_models
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
+
 
 class TestCreator(TestCase):
   """ TestCreator """
@@ -45,7 +45,7 @@ class TestCreator(TestCase):
     self.api.set_user(self.users["creator"])
     all_errors = []
     base_models = set([
-        "Control", "Assessment", "DataAsset", "Contract",
+        "Control", "DataAsset", "Contract",
         "Policy", "Regulation", "Standard", "Document", "Facility",
         "Market", "Objective", "OrgGroup", "Vendor", "Product",
         "Clause", "System", "Process", "Issue", "Project", "AccessGroup"
@@ -84,7 +84,8 @@ class TestCreator(TestCase):
             "{}_collection".format(table_plural)).get(table_plural)
         if len(collection) != 0:
           all_errors.append(
-              "{} can retrieve object if not owner (collection)".format(model_singular))
+              "{} can retrieve object if not owner (collection)"
+              .format(model_singular))
           continue
         # Become an owner
         response = self.api.post(all_models.ObjectOwner, {"object_owner": {
@@ -113,7 +114,8 @@ class TestCreator(TestCase):
             "{}_collection".format(table_plural)).get(table_plural)
         if len(collection) == 0:
           all_errors.append(
-              "{} cannot retrieve object even if owner (collection)".format(model_singular))
+              "{} cannot retrieve object even if owner (collection)"
+              .format(model_singular))
           continue
       except:
           all_errors.append("{} exception thrown".format(model_singular))
@@ -121,7 +123,7 @@ class TestCreator(TestCase):
     self.assertEqual(all_errors, [])
 
   def test_creator_search(self):
-    """ Test if creator can see the correct object while using the search api """
+    """Test if creator can see the correct object while using the search api"""
     self.api.set_user(self.users['admin'])
     self.api.post(all_models.Regulation, {
         "regulation": {"title": "Admin regulation", "context": None},
@@ -162,7 +164,7 @@ class TestCreator(TestCase):
     self.assertEqual(admin_count, creator_count)
 
   def test_creator_cannot_be_owner(self):
-    """ Test if creater cannot become owner of the object he has not created """
+    """Test if creater cannot become owner of the object he has not created"""
     self.api.set_user(self.users['admin'])
     _, obj = self.generator.generate(all_models.Regulation, "regulation", {
         "regulation": {"title": "Test regulation", "context": None},
@@ -187,19 +189,22 @@ class TestCreator(TestCase):
     _, obj_1 = self.generator.generate(all_models.Regulation, "regulation", {
         "regulation": {"title": "Test regulation 2", "context": None},
     })
-    response, rel = self.generator.generate(all_models.Relationship, "relationship", {
-        "relationship": {"source": {
-            "id": obj_0.id,
-            "type": "Regulation"
-        }, "destination": {
-            "id": obj_1.id,
-            "type": "Regulation"
-        }, "context": None},
-    })
+    response, rel = self.generator.generate(
+        all_models.Relationship, "relationship", {
+            "relationship": {"source": {
+                "id": obj_0.id,
+                "type": "Regulation"
+            }, "destination": {
+                "id": obj_1.id,
+                "type": "Regulation"
+            }, "context": None},
+        }
+    )
     relationship_id = rel.id
     self.assertEqual(response.status_code, 201)
     self.api.set_user(self.users['creator'])
-    response = self.api.get_collection(all_models.Relationship, relationship_id)
+    response = self.api.get_collection(all_models.Relationship,
+                                       relationship_id)
     self.assertEqual(response.status_code, 200)
     num = len(response.json["relationships_collection"]["relationships"])
     self.assertEqual(num, 0)

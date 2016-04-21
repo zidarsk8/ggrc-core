@@ -14,7 +14,6 @@ codes 1 and 2 are reserved by pytest and status 0 is returned only if all the
 tests pass.
 """
 
-import logging
 import os
 import sys
 import time
@@ -22,14 +21,12 @@ import urllib
 
 import pytest   # pylint: disable=import-error
 
-from lib import constants
-from lib import file_ops
-from lib import log
-from lib import environment
-
+# add src to path so that we can do imports from our src
 PROJECT_ROOT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/../"
+sys.path.append(PROJECT_ROOT_PATH + "src")
 
-logger = logging.getLogger("selenium.webdriver.remote.remote_connection")
+from lib import file_ops  # NOQA
+from lib import environment  # NOQA
 
 
 def wait_for_server():
@@ -55,10 +52,5 @@ if __name__ == "__main__":
 
   file_ops.create_directory(environment.LOG_PATH)
   file_ops.delete_directory_contents(environment.LOG_PATH)
-  log.set_default_file_handler(
-      logger,
-      PROJECT_ROOT_PATH + constants.path.LOGS_DIR + constants.path.TEST_RUNNER
-  )
-  logger.setLevel(environment.LOGGING_LEVEL)
 
   sys.exit(pytest.main())

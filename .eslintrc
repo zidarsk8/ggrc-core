@@ -46,9 +46,10 @@
       // x, y, z - Point coordinates
       // i, j, k - Loop indexes
       // k, v - Key, Value
+      // a, b - common parameter names in sorting comparison helper functions
       // e - exception
       // $, _ - libraries
-      "exceptions": ["x", "y", "z", "i", "j", "k", "v", "e", "$", "_"]
+      "exceptions": ["x", "y", "z", "i", "j", "k", "v", "a", "b", "e", "$", "_"]
     }],
     "require-jsdoc": 0,
     "space-before-function-paren": [

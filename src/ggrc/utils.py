@@ -167,7 +167,8 @@ def get_mapping_rules():
   # TODO: Read these rules from different modules and combine them here.
   business_object_rules = {
       "AccessGroup": "Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor Risk Threat CycleTaskGroupObjectTask",  # noqa
-      "Audit": "Control Assessment Issue Person Program Request Regulation Policy Standard Contract Section Clause Objective",  # noqa
+      "Audit": "AccessGroup Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor",  # noqa
+      # "AssessmentTemplate": "Audit", # Uncomment this line when we add support for assessment templates in exports # noqa
       "Clause": "AccessGroup Audit Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor Risk Threat CycleTaskGroupObjectTask",  # noqa
       "Contract": "AccessGroup Audit Clause Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Process Product Program Project Request Section System Vendor Risk Threat CycleTaskGroupObjectTask",  # noqa
       "Control": "AccessGroup Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Request Section Standard System Vendor Risk Threat CycleTaskGroupObjectTask",  # noqa
@@ -211,6 +212,39 @@ def underscore_from_camelcase(name):
 
 def title_from_camelcase(name):
   return _prefix_camelcase(name, " ")
+
+
+def get_fuzzy_date(delta_date):
+  """Get a human readable date string.
+
+  This function returns a human friendly time delta compared to today.
+
+  Args:
+    delta_date (date): Date that we want to show to the user.
+
+  Returns:
+    string: A human readable representation date delta.
+
+  Examples:
+    >>> get_fuzzy_date(datetime.date.today() + datetime.timedelta(2))
+    'in 2 days'
+    >>> get_fuzzy_date(datetime.date.today())
+    'today'
+    >>> get_fuzzy_date(datetime.date.today() + datetime.timedelta(-1))
+    '1 day ago'
+  """
+  if not delta_date:
+    return ""
+  if isinstance(delta_date, datetime.datetime):
+    delta_date = delta_date.date()
+  delta = delta_date - datetime.date.today()
+  if delta.days < 0:
+    days = abs(delta.days)
+    return "{} day{} ago".format(days, "s" if days > 1 else "")
+  if delta.days == 0:
+    return "today"
+  # TODO: use format_timedelta from babel package.
+  return "in {} day{}".format(delta.days, "s" if delta.days > 1 else "")
 
 
 # pylint: disable=too-few-public-methods

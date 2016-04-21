@@ -15,10 +15,7 @@ from lib.utils import test_utils
 
 
 def navigate_to_page_with_lhn(driver):
-  """Navigates to dashboard it the LHN button isn't found.
-  Args:
-      driver (lib.base.CustomDriver)
-  """
+  """Navigates to dashboard it the LHN button isn't found"""
   # pylint: disable=invalid-name
   try:
     driver.find_element(*dashboard.Header.locators.TOGGLE_LHN)
@@ -28,14 +25,7 @@ def navigate_to_page_with_lhn(driver):
 
 def get_lhn_accordion(driver, object_name):
   """Selects the relevant section in LHN and returns the relevant section
-  accordion
-
-  Args:
-      driver (lib.base.CustomDriver)
-      object_name (basestring)
-  Returns:
-      lib.element.lhn.AccordionGroup
-  """
+  accordion"""
   navigate_to_page_with_lhn(driver)
   lhn_contents = dashboard.Header(driver).open_lhn_menu()
 
@@ -48,12 +38,7 @@ def get_lhn_accordion(driver, object_name):
 
 
 def create_lhn_object(driver, object_name):
-  """Creates a object via LHN
-  Args:
-      driver (lib.base.CustomDriver)
-  Returns:
-      lib.page.widget.info_widget.Widget
-  """
+  """Creates a object via LHN"""
   modal = get_lhn_accordion(driver, object_name).create_new()
   factory.get_cls_test_utils(object_name).enter_test_data(modal)
   modal.save_and_close()
@@ -61,11 +46,7 @@ def create_lhn_object(driver, object_name):
 
 
 def delete_object_on_info_widget(driver, object_name):
-  """Deletes a object when the info widget is opened
-  Args:
-      driver (lib.base.CustomDriver)
-      object_name (basestring)
-  """
+  """Deletes a object when the info widget is opened"""
   factory.get_cls_widget(object_name, is_info=True)(driver)\
       .press_object_settings() \
       .select_delete() \
@@ -73,11 +54,8 @@ def delete_object_on_info_widget(driver, object_name):
 
 
 def create_custom_program_attribute(driver):
-  """Creates a custom text attribute for a program object
-  Args:
-      driver (lib.base.CustomDriver)
-  """
-
+  """Creates a custom text attribute for a program object"""
+  driver.get(dashboard.AdminDashboard.URL)
   modal = dashboard.AdminDashboard(driver) \
       .select_custom_attributes() \
       .select_programs() \

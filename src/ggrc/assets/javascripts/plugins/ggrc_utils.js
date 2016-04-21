@@ -63,11 +63,16 @@
         data: JSON.stringify(request.data || {})
       });
     },
-    is_mapped: function (target, destination) {
-      var tablePlural = CMS.Models[destination.type].table_plural;
-      var bindings = target.get_binding(
-        (target.has_binding(tablePlural) ? '' : 'related_') + tablePlural);
+    is_mapped: function (target, destination, mapping) {
+      var tablePlural;
+      var bindings;
 
+      if (_.isUndefined(mapping)) {
+        tablePlural = CMS.Models[destination.type].table_plural;
+        mapping = (target.has_binding(tablePlural) ? '' : 'related_') +
+          tablePlural;
+      }
+      bindings = target.get_binding(mapping);
       if (bindings && bindings.list && bindings.list.length) {
         return _.find(bindings.list, function (item) {
           return item.instance.id === destination.id;

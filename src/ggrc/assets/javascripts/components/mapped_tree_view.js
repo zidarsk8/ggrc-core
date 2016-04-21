@@ -5,19 +5,21 @@
     Maintained By: ivan@reciprocitylabs.com
 */
 
-
-(function(can, $) {
+(function (can, $) {
   can.Component.extend({
-    tag: "mapping-tree-view",
-    template: can.view(GGRC.mustache_path + "/base_templates/mapping_tree_view.mustache"),
+    tag: 'mapping-tree-view',
+    template: can.view(GGRC.mustache_path + '/base_templates/mapping_tree_view.mustache'),
     scope: {
+      reusable: '@',
+      reuseMethod: '@',
+      treeViewClass: '@'
     },
     events: {
-      "[data-toggle=unmap] click": function (el, ev) {
+      '[data-toggle=unmap] click': function (el, ev) {
+        var instance = el.find('.result').data('result');
+        var mappings = this.scope.parentInstance.get_mapping(this.scope.mapping);
+        var binding;
         ev.stopPropagation();
-        var instance = el.find(".result").data("result"),
-            mappings = this.scope.parentInstance.get_mapping(this.scope.mapping),
-            binding;
 
         binding = _.find(mappings, function (mapping) {
           return mapping.instance.id === instance.id &&

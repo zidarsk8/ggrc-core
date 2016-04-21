@@ -49,14 +49,8 @@ longer than what's defined in "src/constants/ux.py.MAX_USER_WAIT_SECONDS"
 
 # Quick Start
 1. clone the repo
-2. copy "src/examples/ggrc_test.yaml" into "resources/ggrc_test_local.yaml" and
-edit it (see [Requirements](#Requirements))
-3. copy "src/examples/setup.cfg" into "[project root]/setup.cfg" and edit it
-4. update/create your environment from project root:
-```
-$ ./bin/test_runner.py update_env
-```
-5.start the test suite by executing the test_runner.py from project root
+2. modify pytest.ini
+3. start the test suite by executing the test_runner.py from project root
 ```
 $ ./bin/test_runner.py
 ```

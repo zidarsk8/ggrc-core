@@ -6,11 +6,9 @@
 
 import re
 
-import pyvirtualdisplay   # pylint: disable=import-error
 from selenium.webdriver.common import keys    # pylint: disable=import-error
 from selenium import webdriver    # pylint: disable=import-error
 
-from lib import environment
 from lib import constants
 from lib import exception
 from lib import meta
@@ -51,48 +49,12 @@ class CustomDriver(webdriver.Chrome):
     raise exception.ElementNotFound(locator)
 
 
-class Selenium(object):
-  """Selenium resource handler"""
-
-  __metaclass__ = mixin.MetaDocsDecorator
-
-  def __init__(self):
-    """Prepares resources.
-
-    Configures virtual display buffer for running the test suite in
-    headless mode. Also the webdriver is configured here with custom
-    resolution and separate log path.
-    """
-    options = webdriver.ChromeOptions()
-    options.add_argument("--verbose")
-
-    self.display = pyvirtualdisplay.Display(
-        visible=environment.DISPLAY_WINDOWS,
-        size=environment.WINDOW_RESOLUTION
-    )
-    self.display.start()
-    self.driver = CustomDriver(
-        executable_path=environment.CHROME_DRIVER_PATH,
-        chrome_options=options,
-        service_log_path=environment.PROJECT_ROOT_PATH +
-        constants.path.LOGS_DIR +
-        constants.path.CHROME_DRIVER
-    )
-    width, height = environment.WINDOW_RESOLUTION
-    self.driver.set_window_size(width, height)
-
-  def close_resources(self):
-    """Closes resources.
-
-    Closes and quits used resources in testing methods to prevent leaks and
-    saves a screenshot on error with a unique file name.
-    """
-    self.driver.quit()
-    self.display.stop()
-
-
 class Test(InstanceRepresentation):
-  __metaclass__ = mixin.MetaDocsDecorator
+  __metaclass__ = mixin.MetaTestDecorator
+
+
+class TestUtil(InstanceRepresentation):
+  """Abstract class for all test util classes"""
 
 
 class Element(InstanceRepresentation):
@@ -100,10 +62,6 @@ class Element(InstanceRepresentation):
   __metaclass__ = meta.RequireDocs
 
   def __init__(self, driver, locator):
-    """
-    Args:
-        driver (CustomDriver):
-    """
     super(Element, self).__init__()
     self._driver = driver
     self._locator = locator
@@ -378,7 +336,7 @@ class DropdownStatic(Element):
       exception.ElementNotFound(member_name)
 
 
-class Component(object):
+class Component(InstanceRepresentation):
   """The Component class is a container for elements"""
 
   __metaclass__ = meta.RequireDocs
@@ -528,5 +486,6 @@ class Widget(AbstractPage):
     object_name, id_, widget_name = re.search(
         constants.regex.URL_WIDGET_INFO, self.url).groups()
     self.object_id = id_
-    self.name_from_url = widget_name or constants.element.WidgetBar.INFO
+    self.name_from_url = widget_name.split("_")[0] or \
+        constants.element.WidgetBar.INFO
     self.object_name = object_name

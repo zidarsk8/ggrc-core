@@ -4,6 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from uuid import uuid1
+import collections
 import datetime
 
 from flask import current_app
@@ -679,9 +680,16 @@ class CustomAttributable(object):
   def custom_attributes(cls, attributes):
     from ggrc.fulltext.mysql import MysqlRecordProperty
     from ggrc.models.custom_attribute_value import CustomAttributeValue
+    from ggrc.services import signals
+
     if 'custom_attributes' not in attributes:
       return
+
     attributes = attributes['custom_attributes']
+
+    old_values = collections.defaultdict(list)
+    last_values = dict()
+
     # attributes looks like this:
     #    [ {<id of attribute definition> : attribute value, ... }, ... ]
 
@@ -693,6 +701,17 @@ class CustomAttributable(object):
     attr_value_ids = [v.id for v in attr_values]
     ftrp_properties = [
         "attribute_value_{id}".format(id=_id) for _id in attr_value_ids]
+
+    # Save previous value of custom attribute. This is a bit complicated by
+    # the fact that imports can save multiple values at the time of writing.
+    # old_values holds all previous values of attribute, last_values holds
+    # chronologically last value.
+    for v in attr_values:
+      old_values[v.custom_attribute_id] += [(v.created_at, v.attribute_value)]
+
+    last_values = {str(key): max(old_vals,
+                                 key=lambda (created_at, _): created_at)
+                   for key, old_vals in old_values.iteritems()}
 
     # 2) Delete all fulltext_record_properties for the list of values
     if len(attr_value_ids) > 0:
@@ -715,10 +734,12 @@ class CustomAttributable(object):
     # pylint: disable=not-an-iterable
     definitions = {d.id: d for d in cls.get_custom_attribute_definitions()}
     for ad_id in attributes.keys():
+      obj_type = cls.__class__.__name__
+      obj_id = cls.id
       new_value = CustomAttributeValue(
           custom_attribute_id=ad_id,
-          attributable_id=cls.id,
-          attributable_type=cls.__class__.__name__,
+          attributable_id=obj_id,
+          attributable_type=obj_type,
           attribute_value=attributes[ad_id],
       )
       if definitions[int(ad_id)].attribute_type.startswith("Map:"):
@@ -730,6 +751,29 @@ class CustomAttributable(object):
       # TODO: We are ignoring contexts for now
       # new_value.context_id = cls.context_id
       db.session.add(new_value)
+      if ad_id in last_values:
+        ca, pv = last_values[ad_id]  # created_at, previous_value
+        if pv != attributes[ad_id]:
+          signals.Signals.custom_attribute_changed.send(
+              cls.__class__,
+              obj=cls,
+              src={
+                  "type": obj_type,
+                  "id": obj_id,
+                  "operation": "UPDATE",
+                  "value": new_value,
+                  "old": pv
+              }, service=cls.__class__.__name__)
+      else:
+        signals.Signals.custom_attribute_changed.send(
+            cls.__class__,
+            obj=cls,
+            src={
+                "type": obj_type,
+                "id": obj_id,
+                "operation": "INSERT",
+                "value": new_value,
+            }, service=cls.__class__.__name__)
 
   _publish_attrs = ['custom_attribute_values']
   _update_attrs = ['custom_attributes']

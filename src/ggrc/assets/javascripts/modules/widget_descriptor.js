@@ -80,7 +80,7 @@
         model: far_model,
         content_controller_options: {
           child_options: [],
-          draw_children: false,
+          draw_children: true,
           parent_instance: instance,
           model: far_model,
           list_loader: function () {

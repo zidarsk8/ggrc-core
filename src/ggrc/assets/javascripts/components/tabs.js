@@ -5,12 +5,13 @@
     Maintained By: ivan@reciprocitylabs.com
 */
 
-(function (can, $) {
+(function (GGRC, can, $) {
   can.Component.extend({
     tag: 'tabs',
     template: can.view(GGRC.mustache_path + '/base_objects/tabs.mustache'),
     scope: {
       panels: [],
+      index: 0,
       /**
        * Activate currently clicked panel
        *
@@ -21,6 +22,7 @@
       setActive: function (scope, el, ev) {
         ev.preventDefault();
         scope.panel.attr('active', true);
+        this.attr('index', Number(el.data('index')));
       }
     },
     events: {
@@ -32,8 +34,9 @@
        * @param {String} item - item that got changed
        * @param {String} action - in our case it can be `add` or `remove`
        */
-      '{scope.panels} length': function (list, ev, item, action) {
+      '{scope.panels} change': _.throttle(function (list, ev, item, action) {
         var panels = this.element.find('tab-panel');
+        var index = this.scope.attr('index');
         var active;
 
         if (list.length !== panels.length) {
@@ -45,13 +48,13 @@
           }
         });
         if (!active.length) {
-          list[0].panel.attr('active', true);
+          list[index].panel.attr('active', true);
         }
-      }
+      }, 10)
     }
   });
 
-  can.Component.extend({
+  GGRC.Components("tabPanel", {
     tag: 'tab-panel',
     template: can.view(GGRC.mustache_path + '/base_objects/tab_panel.mustache'),
     scope: {
@@ -88,7 +91,12 @@
         var index;
         var panel;
 
-        item.split('.');
+        item = item.split('.');
+        if (item.length !== 3 || item[1] !== "panel" || item[2] !== "active") {
+          // if this is a change to a scope in a different panel we should
+          // not switch tabs
+          return;
+        }
         index = Number(item[0]);
         panel = list[index].panel;
         if (status && this.scope !== panel) {
@@ -97,4 +105,4 @@
       }
     }
   });
-})(window.can, window.can.$);
+})(window.GGRC, window.can, window.can.$);

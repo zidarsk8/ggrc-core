@@ -130,7 +130,8 @@ make appengine_packages_zip
 The application will be accessible via this URL: <http://localhost:8080/>
 
 If you're running the Google App Engine SDK, the App Engine management console
-will be avaiable via this URL: <http://localhost:8000/>
+will be avaiable via this URL: <http://localhost:8000/>. You can login as
+user@example.com with admin rights and setup other users later.
 
 ## Running Tests
 
@@ -283,6 +284,11 @@ vagrant up
 
 To reprovision a docker container run the following:
 
+Remove files that are not in the repository e.g. python cache:
+```sh
+git clean -df
+```
+Start reprovisioning:
 ```sh
 docker-compose build --pull --no-cache
 ```
@@ -346,13 +352,13 @@ There are three primary classes of requirements for GGRC-Core: Submodules, Pytho
 
 There are two pip requirements files: a runtime requirements file,
 `src/requirements.txt`, for application package dependencies and a
-development requirements file, `src/dev-requirements.txt`, for additional
+development requirements file, `src/requirements-dev.txt`, for additional
 development-time package dependencies. The runtime requirements are deployed
 with the application while the development requirements are only used in the
 development environment (largely for testing purposes).
 
 Most requirements changes should be in either `src/requirements.txt` or
-`src/dev-requirements.txt` and would manifest as module import failures.
+`src/requirements-dev.txt` and would manifest as module import failures.
 
 ### Environment Variables
 
@@ -407,8 +413,8 @@ requirements.
 To Manually update the requirements, you can login to vagrant or docker virtual machine and run
 
 ```sh
-pip install -r src/dev-requirements.txt
-pip install --no-deps -r src/requirements.txt
+pip install -r src/requirements-dev.txt
+pip install --no-deps -r src/requirements-basic.txt
 ```
 
 Note that if you're using `launch_gae_ggrc`, then changes to

@@ -373,7 +373,27 @@
     create: 'POST /api/requests',
     update: 'PUT /api/requests/{id}',
     destroy: 'DELETE /api/requests/{id}',
-    mixins: ['unique_title'],
+    mixins: ['unique_title', 'relatable'],
+    relatable_options: {
+      relevantTypes: {
+        Audit: {
+          objectBinding: 'audits',
+          relatableBinding: 'program_requests',
+          weight: 5
+        },
+        Regulation: {
+          objectBinding: 'related_regulations',
+          relatableBinding: 'related_requests',
+          weight: 3
+        },
+        Control: {
+          objectBinding: 'related_controls',
+          relatableBinding: 'related_requests',
+          weight: 10
+        }
+      },
+      threshold: 5
+    },
     is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
@@ -958,7 +978,27 @@
     update: 'PUT /api/assessments/{id}',
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
-    mixins: ['ownable', 'contactable', 'unique_title'],
+    mixins: ['ownable', 'contactable', 'unique_title', 'relatable'],
+    relatable_options: {
+      relevantTypes: {
+        Audit: {
+          objectBinding: 'audits',
+          relatableBinding: 'program_assessments',
+          weight: 5
+        },
+        Regulation: {
+          objectBinding: 'related_regulations',
+          relatableBinding: 'related_assessments',
+          weight: 3
+        },
+        Control: {
+          objectBinding: 'related_controls',
+          relatableBinding: 'related_assessments',
+          weight: 10
+        }
+      },
+      threshold: 5
+    },
     is_custom_attributable: true,
     attributes: {
       control: 'CMS.Models.Control.stub',
@@ -969,6 +1009,9 @@
       end_date: 'date',
       finished_date: 'date',
       verified_date: 'date'
+    },
+    defaults: {
+      status: "Open"
     },
     filter_keys: ['operationally', 'operational', 'design',
                   'finished_date', 'verified_date', 'verified'],
@@ -1103,12 +1146,136 @@
         }
       });
     },
+    init: function () {
+      if (this._super) {
+        this._super.apply(this, arguments);
+      }
+      this._set_mandatory_msgs();
+      this.get_mapping('comments').bind('length',
+          this._set_mandatory_msgs.bind(this));
+      this.get_mapping('all_documents').bind('length',
+          this._set_mandatory_msgs.bind(this));
+    },
     before_save: function (newForm) {
       if (!this.isNew()) {
         return;
       }
       this.mark_for_addition(
         'related_objects_as_destination', this.audit.program);
+    },
+    after_save: function () {
+      this._set_mandatory_msgs();
+    },
+    _set_mandatory_msgs: function () {
+      var instance = this;
+      var FLAGS = {
+        COMMENT: 1,
+        ATTACHMENT: 2 // binary 10
+      };
+      var needed = {
+        comment: [],
+        attachment: []
+      };
+      var rq = new RefreshQueue();
+
+      if (!instance.custom_attribute_definitions) {
+        instance.load_custom_attribute_definitions();
+      }
+
+      _.each(instance.custom_attribute_values, function (cav) {
+        rq.enqueue(cav);
+      });
+      $.when(
+          instance.get_binding('comments').refresh_count(),
+          instance.get_binding('all_documents').refresh_count(),
+          rq.trigger()
+      ).then(function (commentCount, attachmentCount, rqRes) {
+        commentCount = commentCount();
+        attachmentCount = attachmentCount();
+        _.each(instance.custom_attribute_values, function (cav) {
+          var definition;
+          var i;
+          var mandatory;
+          cav = cav.reify();
+          definition = _.find(instance.custom_attribute_definitions, {
+            id: cav.custom_attribute_id
+          });
+          if (!definition.multi_choice_options ||
+              !definition.multi_choice_mandatory) {
+            return;
+          }
+          i = definition.multi_choice_options.split(',')
+                    .indexOf(cav.attribute_value);
+          mandatory = definition.multi_choice_mandatory.split(',')[i];
+          if (mandatory === undefined) {
+            return;
+          }
+          mandatory = Number(mandatory);
+          if (mandatory & FLAGS.COMMENT) {
+            needed.comment.push(definition.title + ': ' + cav.attribute_value);
+          }
+          if (mandatory & FLAGS.ATTACHMENT) {
+            needed.attachment.push(definition.title + ': ' +
+                                   cav.attribute_value);
+          }
+        });
+        if (!commentCount && needed.comment.length) {
+          instance.attr(
+              '_mandatory_comment_msg',
+              'Comment required by: ' + needed.comment.join(', ')
+          );
+        } else {
+          instance.removeAttr('_mandatory_comment_msg');
+        }
+        if (!attachmentCount && needed.attachment.length) {
+          instance.attr(
+              '_mandatory_attachment_msg',
+              'Evidence required by: ' + needed.attachment.join(', ')
+          );
+        } else {
+          instance.removeAttr('_mandatory_attachment_msg');
+        }
+      });
+    },
+    related_issues: function () {
+      var relevantTypes = {
+        Audit: {
+          objectBinding: 'audits',
+          relatableBinding: 'program_issues',
+          weight: 5
+        },
+        Regulation: {
+          objectBinding: 'related_regulations',
+          relatableBinding: 'related_issues',
+          weight: 3
+        },
+        Control: {
+          objectBinding: 'related_controls',
+          relatableBinding: 'related_issues',
+          weight: 10
+        }
+      };
+      return this._related(relevantTypes, 5);
+    },
+    related_requests: function () {
+      var relevantTypes = {
+        Audit: {
+          objectBinding: 'audits',
+          relatableBinding: 'program_requests',
+          weight: 5
+        },
+        Regulation: {
+          objectBinding: 'related_regulations',
+          relatableBinding: 'related_requests',
+          weight: 3
+        },
+        Control: {
+          objectBinding: 'related_controls',
+          relatableBinding: 'related_requests',
+          weight: 10
+        }
+      };
+      return this._related(relevantTypes, 5);
     }
   });
 
@@ -1141,13 +1308,28 @@
       audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
     },
+
     defaults: {
       test_plan_procedure: false,
-      template_object_type: "Control",
+      template_object_type: 'Control',
       default_people: {
-        assessors: "Object Owners",
-        verifiers: "Object Owners"
-      }
+        assessors: 'Object Owners',
+        verifiers: 'Object Owners'
+      },
+      // the custom lists of assessor / verifier IDs if "other" is selected for
+      // the corresponding default_people setting
+      assessorsList: {},
+      verifiersList: {},
+      people_values: [
+        {value: 'Object Owners', title: 'Object Owners'},
+        {value: 'Audit Lead', title: 'Audit Lead'},
+        {value: 'Object Contact', title: 'Object Contact'},
+        {value: 'Primary Assessor', title: 'Primary Assessor'},
+        {value: 'Secondary Assessors', title: 'Secondary Assessors'},
+        {value: 'Primary Contact', title: 'Primary Contact'},
+        {value: 'Secondary Contact', title: 'Secondary Contact'},
+        {value: 'other', title: 'Others...'}
+      ]
     },
 
     /**
@@ -1162,6 +1344,7 @@
     // the object types that are not relevant to the AssessmentTemplate,
     // i.e. it does not really make sense to assess them
     _NON_RELEVANT_OBJ_TYPES: Object.freeze({
+      AssessmentTemplate: true,
       Assessment: true,
       Audit: true,
       CycleTaskGroupObjectTask: true,
@@ -1189,6 +1372,9 @@
       }
       this.attr('_objectTypes', this._choosableObjectTypes());
       this._unpackPeopleData();
+
+      this._updateDropdownEnabled('assessors');
+      this._updateDropdownEnabled('verifiers');
     },
 
     /**
@@ -1204,40 +1390,120 @@
     },
 
     /**
+     * Event handler when an assessor is picked in an autocomplete form field.
+     * It adds the picked assessor's ID to the assessors list.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    assessorAdded: function (context, $el, ev) {
+      var user = ev.selectedItem;
+      this.assessorsList.attr(user.id, true);
+    },
+
+    /**
+     * Event handler when a user clicks to remove an assessor from the
+     * assessors list. It removes the corresponding assessor ID from the list.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    assessorRemoved: function (context, $el, ev) {
+      var user = ev.person;
+      this.assessorsList.removeAttr(String(user.id));
+    },
+
+    /**
+     * Event handler when a verifier is picked in an autocomplete form field.
+     * It adds the picked verifier's ID to the verifiers list.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    verifierAdded: function (context, $el, ev) {
+      var user = ev.selectedItem;
+      this.verifiersList.attr(user.id, true);
+    },
+
+    /**
+     * Event handler when a user clicks to remove a verifier from the verifiers
+     * list. It removes the corresponding verifier ID from the list.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    verifierRemoved: function (context, $el, ev) {
+      var user = ev.person;
+      this.verifiersList.removeAttr(String(user.id));
+    },
+
+    /**
+     * Event handler when a user changes the default assessors option.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    defaultAssesorsChanged: function (context, $el, ev) {
+      this._updateDropdownEnabled('assessors');
+    },
+
+    /**
+     * Event handler when a user changes the default verifiers option.
+     *
+     * @param {can.Map} context - the Mustache context of the `$el`
+     * @param {jQuery.Element} $el - the source of the event `ev`
+     * @param {jQuery.Event} ev - the event that was triggered
+     */
+    defaultVerifiersChanged: function (context, $el, ev) {
+      this._updateDropdownEnabled('verifiers');
+    },
+
+    /**
+     * Update the autocomplete field's disabled flag based on the current value
+     * of the corresponding dropdown.
+     *
+     * @param {String} name - the value to inspect, must be either "assessors"
+     *   or "verifiers"
+     */
+    _updateDropdownEnabled: function (name) {
+      var disable = this.attr('default_people.' + name) !== 'other';
+      this.attr(name + 'ListDisable', disable);
+    },
+
+    /**
      * Pack the "default people" form data into a JSON string.
      *
      * @return {String} - the JSON-packed default people data
      */
     _packPeopleData: function () {
       var data = {};
-
       /**
-       * Convert a comma-separated list of people to an Array.
+       * Create a sorted (ascending) list of numbers from the given map's keys.
        *
-       * The list elements have any redundant whitespace trimmed from the
-       * beginning and the end. Empty elements are discared from the result,
-       * as are any duplicates.
-       *
-       * @param {String} rawString - the string to convert
-       * @return {Array} - the JSON-packed default people data
+       * @param {can.Map} peopleIds - the map to convert
+       * @return {Array} - ordered IDs
        */
-      function makeList(rawString) {
-        var result = rawString.split(',');
-        result = _.map(result, function (item) {
-          return item.trim();
+      function makeList(peopleIds) {
+        var result = Object.keys(peopleIds.attr()).map(Number);
+        return result.sort(function (x, y) {
+          return x - y;
         });
-        return _.uniq(_.filter(result));
       }
 
       data.assessors = this.attr('default_people.assessors');
       data.verifiers = this.attr('default_people.verifiers');
 
       if (data.assessors === 'other') {
-        data.assessors = makeList(this.attr('assessors_list'));
+        data.assessors = makeList(this.attr('assessorsList'));
       }
 
       if (data.verifiers === 'other') {
-        data.verifiers = makeList(this.attr('verifiers_list'));
+        data.verifiers = makeList(this.attr('verifiersList'));
       }
 
       return JSON.stringify(data);
@@ -1253,9 +1519,18 @@
       var peopleData = instance.default_people;
 
       ['assessors', 'verifiers'].forEach(function (name) {
-        if (peopleData[name] instanceof can.List) {
-          instance.attr(name + '_list', peopleData[name].join(', '));
+        var idsMap;
+        var peopleIds = peopleData[name];
+
+        if (peopleIds instanceof can.List) {
+          idsMap = new can.Map();
+          peopleIds.forEach(function (id) {
+            idsMap.attr(id, true);
+          });
+          instance.attr(name + 'List', idsMap);
           instance.attr('default_people.' + name, 'other');
+        } else {
+          instance.attr(name + 'List', {});
         }
       });
     },

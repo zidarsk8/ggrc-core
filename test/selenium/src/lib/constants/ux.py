@@ -3,6 +3,6 @@
 # Created By: jernej@reciprocitylabs.com
 # Maintained By: jernej@reciprocitylabs.com
 
-MAX_USER_WAIT_SECONDS = 10
+MAX_USER_WAIT_SECONDS = 60
 MAX_ALERT_WAIT = 1
 ELEMENT_MOVING_TIMEOUT = 5
