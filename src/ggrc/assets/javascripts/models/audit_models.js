@@ -618,7 +618,7 @@
     },
     after_save: function () {
       // Create a relationship between request & assessment & control
-      var dfds = can.map(['control', 'assessment'], function (obj) {
+      var dfds = can.map(['assessment'], function (obj) {
         if (!(this.attr(obj) && this.attr(obj).stub)) {
           return undefined;
         }
