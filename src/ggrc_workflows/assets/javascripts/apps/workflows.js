@@ -348,6 +348,8 @@
             show_view: GGRC.mustache_path + '/cycle_task_group_object_tasks/tree.mustache',
             header_view: GGRC.mustache_path + '/cycle_task_group_object_tasks/tree_header.mustache',
             footer_view: GGRC.mustache_path + '/cycle_task_group_object_tasks/tree_footer.mustache',
+            add_item_view: GGRC.mustache_path +
+              '/cycle_task_group_object_tasks/tree_add_item.mustache',
             sort_property: null,
             sort_function: _task_sort_function,
             draw_children: true,
@@ -495,7 +497,9 @@
             parent_instance: object,
             model: 'Cycle',
             mapping: 'current_cycle',
-            header_view: GGRC.mustache_path + '/cycles/tree_header.mustache'
+            header_view: GGRC.mustache_path + '/cycles/tree_header.mustache',
+            add_item_view: GGRC.mustache_path +
+              '/cycle_task_group_object_tasks/tree_add_item.mustache'
           }
         };
         new_widget_descriptors.history = history_widget_descriptor;

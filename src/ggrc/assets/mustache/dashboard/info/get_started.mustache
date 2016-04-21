@@ -20,6 +20,26 @@
     </li>
     {{/is_allowed}}
   {{/start_menu}}
+
+  {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context=null}}
+      <a
+        rel="tooltip"
+        data-placement="left"
+        data-original-title="Create Cycle Task for object"
+        data-object-plural="cycle_task_group_object_tasks"
+        data-modal-class="modal-wide" href="javascript://"
+        data-object-singular="CycleTaskGroupObjectTask"
+        data-toggle="modal-ajax-form"
+        data-modal-reset="reset"
+        data-object-params='{
+          "modal_title": "Create New Cycle Task"}'>
+        <span class="icon-wrap">
+            <i class="fa fa-calendar-check-o white"></i>
+        </span>
+        Create a Task
+      </a>
+  {{/is_allowed}}
+
   {{#any_allowed 'create' object_menu context=null}}
     <li class="top-space hidden-widgets-list">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown">
