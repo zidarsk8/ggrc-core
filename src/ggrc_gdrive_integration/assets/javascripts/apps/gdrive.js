@@ -47,6 +47,11 @@
       _audit : new GGRC.ListLoaders.DirectListLoader("Audit", "requests", "audit"),
       extended_folders: new GGRC.ListLoaders.CrossListLoader("audits", "folders")
     },
+    Assessment: {
+      audits: GGRC.MapperHelpers.TypeFilter("related_objects", "Audit"),
+      folders : new GGRC.ListLoaders.CrossListLoader("audits", "folders"),
+      extended_folders: new GGRC.ListLoaders.CrossListLoader("audits", "folders")
+    },
     DocumentationResponse : {
       _mixins : ["fileable", "folderable"],
       _request : new GGRC.ListLoaders.DirectListLoader("Request", "responses", "request"),

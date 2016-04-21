@@ -84,21 +84,18 @@ class Header(base.Component):
     self._refresh_elements()
 
   def _refresh_elements(self):
-    try:
-      self.toggle_lhn_menu = base.Toggle(self._driver,
-                                         self.locators.TOGGLE_LHN)
-      self.button_dashboard = base.Button(self._driver,
-                                          self.locators.BUTTON_DASHBOARD)
-      self.button_search = base.Button(self._driver,
-                                       self.locators.BUTTON_SEARCH)
-      self.button_my_tasks = base.Button(self._driver,
-                                         self.locators.BUTTON_MY_TASKS)
-      self.button_all_objects = base.Button(
-          self._driver, self.locators.BUTTON_ALL_OBJECTS)
-      self.toggle_user_dropdown = base.Toggle(
-          self._driver, self.locators.TOGGLE_USER_DROPDOWN)
-    except exceptions.StaleElementReferenceException:
-      self._refresh_elements()
+    self.button_dashboard = base.Button(self._driver,
+                                        self.locators.BUTTON_DASHBOARD)
+    self.button_search = base.Button(self._driver,
+                                     self.locators.BUTTON_SEARCH)
+    self.button_my_tasks = base.Button(self._driver,
+                                       self.locators.BUTTON_MY_TASKS)
+    self.button_all_objects = base.Button(
+        self._driver, self.locators.BUTTON_ALL_OBJECTS)
+    self.toggle_user_dropdown = base.Toggle(
+        self._driver, self.locators.TOGGLE_USER_DROPDOWN)
+    self.toggle_lhn_menu = base.Toggle(self._driver,
+                                       self.locators.TOGGLE_LHN)
 
   def open_lhn_menu(self):
     """Opens LHN on the Dashboard.

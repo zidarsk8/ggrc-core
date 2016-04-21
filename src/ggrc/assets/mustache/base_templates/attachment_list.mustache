@@ -5,6 +5,14 @@
     Maintained By: ivan@reciprocitylabs.com
 }}
 
+
+{{^if_null instance._mandatory_attachment_msg}}
+  <div class="alert alert-info alert-dismissible" role="alert">
+    {{instance._mandatory_attachment_msg}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
+  </div>
+{{/if_null}}
+
 <mapping-tree-view
   parent-instance="instance"
   mapping="instance.class.info_pane_options.evidence.mapping"

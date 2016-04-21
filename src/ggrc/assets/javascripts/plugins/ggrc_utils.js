@@ -63,11 +63,16 @@
         data: JSON.stringify(request.data || {})
       });
     },
-    is_mapped: function (target, destination) {
-      var tablePlural = CMS.Models[destination.type].table_plural;
-      var bindings = target.get_binding(
-        (target.has_binding(tablePlural) ? '' : 'related_') + tablePlural);
+    is_mapped: function (target, destination, mapping) {
+      var tablePlural;
+      var bindings;
 
+      if (_.isUndefined(mapping)) {
+        tablePlural = CMS.Models[destination.type].table_plural;
+        mapping = (target.has_binding(tablePlural) ? '' : 'related_') +
+          tablePlural;
+      }
+      bindings = target.get_binding(mapping);
       if (bindings && bindings.list && bindings.list.length) {
         return _.find(bindings.list, function (item) {
           return item.instance.id === destination.id;
@@ -149,7 +154,9 @@
 
       canMap = Permission.is_allowed_for('update', source) ||
         sourceType === 'Person' ||
-        _.contains(createContexts, sourceContext);
+        _.contains(createContexts, sourceContext) ||
+        // Also allow mapping to source if the source is about to be created.
+        _.isUndefined(source.created_at);
 
       if (target instanceof can.Model) {
         canMap = canMap &&

@@ -133,11 +133,12 @@
           } else {
             original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
-              var autocomplete_select = ctl.autocomplete_select || ctl.scope.autocomplete_select;
-              if (autocomplete_select) {
-                autocomplete_select($this, original_event, {
-                  item: new_obj
-                });
+              if (ctl.scope && ctl.scope.autocomplete_select) {
+                return ctl.scope.autocomplete_select(
+                  $this, original_event, {item: new_obj});
+              } else if (ctl.autocomplete_select) {
+                return ctl.autocomplete_select(
+                  $this, original_event, {item: new_obj});
               }
               $this.trigger("autocomplete:select", [{
                 item: new_obj

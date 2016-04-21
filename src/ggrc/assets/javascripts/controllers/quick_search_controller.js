@@ -700,32 +700,36 @@ can.Control("CMS.Controllers.LHN_Search", {
           );
         }
       });
-    }
+    },
+    post_init: function () {
+      var refreshCounts = _.debounce(this.refresh_counts.bind(this), 1000, {
+        leading: true,
+        trailing: false
+      });
 
-  , post_init: function() {
-      var self = this;
       this.init_object_lists();
       this.init_list_views();
 
-      can.Model.Cacheable.bind("created", function(ev, instance) {
+      can.Model.Cacheable.bind('created', function (ev, instance) {
+        var modelNames;
+        var modelName;
 
         if (instance instanceof can.Model.Join) {
           // Don't refresh LHN counts when joins are created
           return;
         }
 
-        var visible_model_names =
-              can.map(self.get_visible_lists(), self.proxy("get_list_model"))
-          , model_name = instance.constructor.shortName
-          ;
+        modelNames = can.map(
+          this.get_visible_lists(), this.proxy('get_list_model'));
+        modelName = instance.constructor.shortName;
 
-        if(visible_model_names.indexOf(model_name) > -1) {
-          self.options.visible_lists[model_name].unshift(instance);
-          self.options.results_lists[model_name].unshift(instance);
+        if (modelNames.indexOf(modelName) > -1) {
+          this.options.visible_lists[modelName].unshift(instance);
+          this.options.results_lists[modelName].unshift(instance);
         }
         // Refresh the counts whenever the lists change
-        self.refresh_counts();
-      });
+        refreshCounts();
+      }.bind(this));
     }
 
   , "{list_toggle_selector} click": function (el, ev) {
@@ -1092,25 +1096,25 @@ can.Control("CMS.Controllers.LHN_Search", {
       });
 
       return $.when.apply($, dfds);
-    }
+    },
+    refresh_counts: function () {
+      var search_id = this.search_id;
+      var models;
+      var extraModels;
 
-  , refresh_counts: function() {
-      var self = this
-        , search_id = this.search_id
-        , models
-        , extra_models;
-      models = can.map(this.get_lists(), this.proxy("get_list_model"));
-      extra_models = can.map(this.get_lists(), this.proxy("get_extra_list_model"));
+      models = can.map(this.get_lists(), this.proxy('get_list_model'));
+      extraModels = can.map(
+        this.get_lists(), this.proxy('get_extra_list_model'));
+
       // Retrieve and display counts
       return GGRC.Models.Search.counts_for_types(
-          this.current_term, models, this.current_params, extra_models
-        ).then(function() {
-          if (self.search_id === search_id) {
-            return self.display_counts.apply(self, arguments);
+          this.current_term, models, this.current_params, extraModels
+        ).then(function () {
+          if (this.search_id === search_id) {
+            return this.display_counts.apply(this, arguments);
           }
-        });
+        }.bind(this));
     }
-
   , refresh_visible_lists: function() {
       var self = this
         , search_id = this.search_id

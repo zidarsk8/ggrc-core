@@ -123,16 +123,6 @@
                     {{/child_options}}
                     {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
                   </li>
-                  {{#instance}}
-                    {{#is_private}}
-                      <li>
-                        <div class="counter">
-                          <i class="fa fa-lock"></i>
-                        </div>
-                      </li>
-                    {{/is_private}}
-                  {{/instance}}
-
                   {{^instance.contact}}
                     <li>
                       <div class="counter">

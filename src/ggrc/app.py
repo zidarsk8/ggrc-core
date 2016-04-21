@@ -3,9 +3,7 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-"""
-Sets up Flask app
-"""
+"""Sets up Flask app."""
 
 import re
 from flask import Flask
@@ -15,6 +13,7 @@ from tabulate import tabulate
 from ggrc import contributions  # noqa: imported so it can be used with getattr
 from ggrc import db
 from ggrc import extensions
+from ggrc import notifications
 from ggrc import settings
 
 
@@ -43,47 +42,60 @@ def _ensure_session_teardown():
     db.session.remove()
 
 
-# Initialize models
-import ggrc.models  # noqa
-ggrc.models.init_app(app)
+def init_models(app_):
+  import ggrc.models
+  ggrc.models.init_app(app_)
 
-# Configure Flask-Login
-import ggrc.login  # noqa
-ggrc.login.init_app(app)
 
-# Configure webassets for app
-from ggrc import assets  # noqa
-app.jinja_env.add_extension('webassets.ext.jinja2.assets')
-app.jinja_env.assets_environment = assets.environment
+def configure_flask_login(app_):
+  import ggrc.login
+  ggrc.login.init_app(app_)
 
-# Configure Jinja2 extensions for app
-app.jinja_env.add_extension('jinja2.ext.autoescape')
-app.jinja_env.autoescape = True
-app.jinja_env.add_extension('jinja2.ext.with_')
-app.jinja_env.add_extension('hamlpy.ext.HamlPyExtension')
 
-# Initialize services
-import ggrc.services  # noqa
-ggrc.services.init_all_services(app)
+def configure_webassets(app_):
+  """Add basic webassets configuration."""
+  from ggrc import assets
+  app_.jinja_env.add_extension('webassets.ext.jinja2.assets')
+  app_.jinja_env.assets_environment = assets.environment
 
-# Initialize views
-import ggrc.views  # noqa
-ggrc.views.init_all_views(app)
 
-# Initialize extension blueprints
-for extension_module in extensions.get_extension_modules():
-  if hasattr(extension_module, 'blueprint'):
-    app.register_blueprint(extension_module.blueprint)
+def configure_jinja(app_):
+  """Add basic jinja configuration."""
+  app_.jinja_env.add_extension('jinja2.ext.autoescape')
+  app_.jinja_env.autoescape = True
+  app_.jinja_env.add_extension('jinja2.ext.with_')
+  app_.jinja_env.add_extension('hamlpy.ext.HamlPyExtension')
 
-# Initialize configured and default extensions
-from ggrc.fulltext import get_indexer  # noqa
-ggrc.indexer = get_indexer()
 
-from ggrc.rbac import permissions  # noqa
-permissions.get_permissions_provider()
+def init_services(app_):
+  import ggrc.services
+  ggrc.services.init_all_services(app_)
 
-from ggrc.automapper import register_automapping_listeners  # noqa
-register_automapping_listeners()
+
+def init_views(app_):
+  import ggrc.views
+  ggrc.views.init_all_views(app_)
+
+
+def init_extension_blueprints(app_):
+  for extension_module in extensions.get_extension_modules():
+    if hasattr(extension_module, 'blueprint'):
+      app_.register_blueprint(extension_module.blueprint)
+
+
+def init_indexer():
+  import ggrc.fulltext
+  ggrc.indexer = ggrc.fulltext.get_indexer()
+
+
+def init_permissions_provider():
+  from ggrc.rbac import permissions
+  permissions.get_permissions_provider()
+
+
+def init_extra_listeners():
+  from ggrc.automapper import register_automapping_listeners
+  register_automapping_listeners()
 
 
 def _enable_debug_toolbar():
@@ -122,6 +134,7 @@ def _display_sql_queries():
   enabled.
   """
   if getattr(settings, "SQLALCHEMY_RECORD_QUERIES", False):
+    # pylint: disable=unused-variable
     @app.after_request
     def display_queries(response):  # noqa: not an unused variable
       """Display database queries
@@ -152,6 +165,16 @@ def _display_sql_queries():
       app.logger.info("Total queries: {}".format(len(queries)))
       return response
 
+init_models(app)
+configure_flask_login(app)
+configure_webassets(app)
+configure_jinja(app)
+init_services(app)
+init_views(app)
+init_indexer()
+init_permissions_provider()
+init_extra_listeners()
+notifications.register_notification_listeners()
 
 _enable_debug_toolbar()
 _enable_jasmine()

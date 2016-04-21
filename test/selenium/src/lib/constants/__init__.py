@@ -8,7 +8,6 @@ from lib.constants import (
   element,  # flake8: noqa
   log,
   path,
-  yaml,
   locator,
   method,
   path,
@@ -16,5 +15,6 @@ from lib.constants import (
   url,
   ux,
   tag,
-  test_runner
+  test_runner,
+  settings
 )

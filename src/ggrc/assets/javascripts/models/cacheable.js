@@ -61,7 +61,9 @@
         && !/^\d+-\d+-\d+$/.test(date) && !/^\d+\/\d+\/\d+$/.test(date)
         //  Don't correct timezone if `moment.js` has already done it
         && !/[-+]\d\d:?\d\d/.test(date)) {
-      ret.subtract(new Date().getTimezoneOffset(), 'minute');
+      // Use the UTC offset that was active at the moment in time to correct
+      // the date's timezone.
+      ret.add(ret.utcOffset(), 'minute');
     }
 
     if (oldValue && oldValue.getTime
@@ -736,6 +738,10 @@ can.Model("can.Model.Cacheable", {
     var definitions;
     if (this.attr('custom_attribute_definitions')) {
       return;
+    }
+    if (GGRC.custom_attr_defs === undefined) {
+      GGRC.custom_attr_defs = {};
+      console.warn("Missing injected custom attribute definitions");
     }
     definitions = can.map(GGRC.custom_attr_defs, function (def) {
       var idCheck = !def.definition_id || def.definition_id === this.id;

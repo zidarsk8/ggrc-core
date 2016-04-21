@@ -11,8 +11,8 @@ import string
 from ggrc import db
 from ggrc.app import app
 from ggrc.models import (
-  Person, Policy, Control, Objective, Standard, System, NotificationConfig,
-  CustomAttributeDefinition
+    Person, Policy, Control, Objective, Standard, System, NotificationConfig,
+    CustomAttributeDefinition
 )
 from ggrc.services.common import Resource
 from ggrc_basic_permissions.models import UserRole, Role
@@ -41,7 +41,11 @@ class Generator():
     except:
       return None
 
-  def generate(self, obj_class, obj_name, data):
+  def generate(self, obj_class, obj_name=None, data=None):
+    if obj_name is None:
+      obj_name = obj_class._inflector.table_plural
+    if data is None:
+      data = {}
     response = self.api.post(obj_class, data)
     response_obj = None
     if response.json:
@@ -65,7 +69,18 @@ class Generator():
 
 class ObjectGenerator(Generator):
 
-  def generate_object(self, obj_class, obj_name, data={}):
+  def create_stub(self, obj):
+    return {
+        "id": obj.id,
+        "href": "/api/{}/{}".format(obj._inflector.table_name, obj.id),
+        "type": obj.type,
+    }
+
+  def generate_object(self, obj_class, obj_name=None, data=None):
+    if obj_name is None:
+      obj_name = obj_class._inflector.table_plural
+    if data is None:
+      data = {}
     obj = obj_class(title=self.random_str())
     obj_dict = self.obj_to_dict(obj, obj_name)
     obj_dict[obj_name].update({"owners": [{

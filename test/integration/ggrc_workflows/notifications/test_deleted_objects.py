@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from datetime import datetime
 from mock import patch
 
-from ggrc import notifications
+from ggrc.notifications import common
 from ggrc.models import Notification, Person
 from ggrc_workflows.models import Workflow
 from integration.ggrc_workflows.generator import WorkflowsGenerator
@@ -55,11 +55,11 @@ class TestNotificationsForDeletedObjects(TestCase):
       user = Person.query.get(self.user.id)
 
     with freeze_time("2015-01-01 13:39:20"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
 
     with freeze_time("2015-01-29 13:39:20"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
       self.assertIn("cycle_starts_in", notif_data[user.email])
 
@@ -68,7 +68,7 @@ class TestNotificationsForDeletedObjects(TestCase):
       response = self.wf_generator.api.delete(workflow)
       self.assert200(response)
 
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       user = Person.query.get(self.user.id)
 
       self.assertNotIn(user.email, notif_data)

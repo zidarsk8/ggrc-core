@@ -5,8 +5,23 @@
 
 """Lists of ggrc contributions."""
 
-from ggrc.notifications import send_todays_digest_notifications
+from ggrc.notifications import common
+from ggrc.notifications import notification_handlers
+from ggrc.notifications import data_handlers
+
 
 CONTRIBUTED_CRON_JOBS = [
-    send_todays_digest_notifications
+    common.send_todays_digest_notifications
 ]
+
+NOTIFICATION_LISTENERS = [
+    notification_handlers.register_handlers
+]
+
+
+def contributed_notifications():
+  """Get handler functions for ggrc notification file types."""
+  return {
+      "Request": data_handlers.get_assignable_data,
+      "Assessment": data_handlers.get_assignable_data,
+  }

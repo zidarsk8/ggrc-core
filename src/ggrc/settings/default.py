@@ -4,6 +4,7 @@
 # Maintained By: dan@reciprocitylabs.com
 
 import os
+import jinja2
 
 DEBUG = False
 TESTING = False
@@ -60,4 +61,9 @@ exports = ['VERSION', 'MAX_INSTANCES']
 # Users with authorized domains will automatically get Creator role.
 # After parsing, AUTHORIZED_DOMAINS must be set of strings.
 AUTHORIZED_DOMAINS = {
-  d.strip() for d in os.environ.get('AUTHORIZED_DOMAINS', "").split(",")}
+    d.strip() for d in os.environ.get('AUTHORIZED_DOMAINS', "").split(",")}
+
+JINJA2 = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
+EMAIL_DIGEST = JINJA2.get_template("notifications/email_digest.html")
+EMAIL_TODAYS = JINJA2.get_template("notifications/view_todays_digest.html")
+EMAIL_PENDING = JINJA2.get_template("notifications/view_pending_digest.html")

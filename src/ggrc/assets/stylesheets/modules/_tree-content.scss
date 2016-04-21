@@ -393,6 +393,24 @@ ul.new-tree {
       }
     }
   }
+  &.mapped-objects-tree {
+    margin-bottom: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    & .tier-2-info {
+      padding: 14px 10px 0 10px;
+      .tier-2-info-content {
+        padding: 0 0 0 32px;
+      }
+    }
+    &.tree-open li.tree-item.item-open {
+      border-bottom: 2px solid #757575;
+      margin: 0;
+    }
+    .tier-2-info {
+      border-top: 1px solid #e0e0e0;
+    }
+  }
 }
 
 .show-details {

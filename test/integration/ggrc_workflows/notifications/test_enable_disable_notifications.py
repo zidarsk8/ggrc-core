@@ -8,8 +8,8 @@ from freezegun import freeze_time
 from datetime import datetime
 from mock import patch
 
-from ggrc import notifications
-from ggrc.models import Notification, Person
+from ggrc.notifications import common
+from ggrc import models
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
@@ -26,7 +26,7 @@ class TestEnableAndDisableNotifications(TestCase):
     self.api = Api()
     self.wf_generator = WorkflowsGenerator()
     self.object_generator = ObjectGenerator()
-    Notification.query.delete()
+    models.Notification.query.delete()
 
     self.random_objects = self.object_generator.generate_random_objects(2)
     _, self.user = self.object_generator.generate_person(
@@ -40,7 +40,7 @@ class TestEnableAndDisableNotifications(TestCase):
           self.created_at = datetime.now()
       return new_init
 
-    Notification.__init__ = init_decorator(Notification.__init__)
+    models.Notification.__init__ = init_decorator(models.Notification.__init__)
 
   @patch("ggrc.notifications.common.send_email")
   def test_default_notificaitons_settings(self, mock_mail):
@@ -51,14 +51,14 @@ class TestEnableAndDisableNotifications(TestCase):
 
       self.assert200(response)
 
-      user = Person.query.get(self.user.id)
+      user = models.Person.query.get(self.user.id)
 
     with freeze_time("2015-01-01 13:39:20"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
 
     with freeze_time("2015-01-29 13:39:20"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
   @patch("ggrc.notifications.common.send_email")
@@ -73,14 +73,14 @@ class TestEnableAndDisableNotifications(TestCase):
       self.object_generator.generate_notification_setting(
           self.user.id, "Email_Digest", False)
 
-      user = Person.query.get(self.user.id)
+      user = models.Person.query.get(self.user.id)
 
     with freeze_time("2015-01-01 13:39:20"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
 
     with freeze_time("2015-01-29 13:39:20"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertNotIn(user.email, notif_data)
 
   @patch("ggrc.notifications.common.send_email")
@@ -92,15 +92,15 @@ class TestEnableAndDisableNotifications(TestCase):
       self.assert200(response)
 
     with freeze_time("2015-01-29 13:39:20"):
-      user = Person.query.get(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      user = models.Person.query.get(self.user.id)
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
       self.object_generator.generate_notification_setting(
           self.user.id, "Email_Digest", True)
 
-      user = Person.query.get(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      user = models.Person.query.get(self.user.id)
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
   @patch("ggrc.notifications.common.send_email")
@@ -112,17 +112,17 @@ class TestEnableAndDisableNotifications(TestCase):
 
       self.assert200(response)
 
-      user = Person.query.get(self.user.id)
+      user = models.Person.query.get(self.user.id)
 
     with freeze_time("2015-01-29 13:39:20"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
       self.object_generator.generate_notification_setting(
           self.user.id, "Email_Digest", True)
 
-      user = Person.query.get(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      user = models.Person.query.get(self.user.id)
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
 
   @patch("ggrc.notifications.common.send_email")
@@ -137,10 +137,10 @@ class TestEnableAndDisableNotifications(TestCase):
 
       self.assert200(response)
 
-      user = Person.query.get(self.user.id)
+      user = models.Person.query.get(self.user.id)
 
     with freeze_time("2015-01-29 13:39:20"):
-      _, notif_data = notifications.get_todays_notifications()
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
       self.assertIn("cycle_starts_in", notif_data[user.email])
       self.assertIn(wf_forced.id, notif_data[user.email]["cycle_starts_in"])
@@ -149,8 +149,8 @@ class TestEnableAndDisableNotifications(TestCase):
       self.object_generator.generate_notification_setting(
           self.user.id, "Email_Digest", False)
 
-      user = Person.query.get(self.user.id)
-      _, notif_data = notifications.get_todays_notifications()
+      user = models.Person.query.get(self.user.id)
+      _, notif_data = common.get_todays_notifications()
       self.assertIn(user.email, notif_data)
       self.assertIn("cycle_starts_in", notif_data[user.email])
       self.assertIn(wf_forced.id, notif_data[user.email]["cycle_starts_in"])

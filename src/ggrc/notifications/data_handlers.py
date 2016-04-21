@@ -1,0 +1,202 @@
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+# Created By: miha@reciprocitylabs.com
+# Maintained By: miha@reciprocitylabs.com
+
+"""Data handlers for notifications for objects in ggrc module.
+
+Main contributed functions are:
+  get_assignable_data,
+"""
+
+import datetime
+import urlparse
+
+from ggrc import models
+from ggrc import utils
+
+
+def get_object_url(obj):
+  """Get url for the object info page.
+
+  Args:
+    obj (db.Model): Object for which we want to info page url.
+
+  Returns:
+    string: Url for the object info page.
+  """
+  # pylint: disable=protected-access
+  url = "{}/{}".format(obj._inflector.table_plural, obj.id)
+  return urlparse.urljoin(utils.get_url_root(), url)
+
+
+def _get_assignable_dict(people, notif):
+  """Get dict data for assignable object in notification.
+
+  Args:
+    people (List[Person]): List o people objects who should receive the
+      notification.
+    notif (Notification): Notification that should be sent.
+  Returns:
+    dict: dictionary containing notification data for all people in the given
+      list.
+  """
+  obj = get_notification_object(notif)
+  data = {}
+  for person in people:
+    # Requests have "requested_on" field instead of "start_date" and we should
+    # default to today() if no appropriate field is found on the object.
+    start_date = getattr(obj, "start_date",
+                         getattr(obj, "requested_on",
+                                 datetime.date.today()))
+    data[person.email] = {
+        "user": get_person_dict(person),
+        notif.notification_type.name: {
+            obj.id: {
+                "title": obj.title,
+                "fuzzy_start_date": utils.get_fuzzy_date(start_date),
+                "url": get_object_url(obj),
+            }
+        }
+    }
+  return data
+
+
+def assignable_open_data(notif):
+  """Get data for open assignable object.
+
+  Args:
+    notif (Notification): Notification entry for an open assignable object.
+
+  Returns:
+    A dict containing all notification data for the given notification.
+  """
+  obj = get_notification_object(notif)
+  people = [person for person, _ in obj.assignees]
+
+  return _get_assignable_dict(people, notif)
+
+
+def _get_declined_people(obj):
+  """Get a list of people for declined notifications.
+
+  Args:
+    obj (Model): An assignable model
+
+  Returns:
+    A list of people that should recieve a declined notification acording to
+    the given object type.
+  """
+  if obj.type == "Request":
+    return [person for person, role in obj.assignees
+            if "Requester" in role]
+  elif obj.type == "Assessment":
+    return [person for person, role in obj.assignees
+            if "Assessor" in role]
+  return []
+
+
+def assignable_declined_data(notif):
+  """Get data for declined assignable object.
+
+  Args:
+    notif (Notification): Notification entry for a declined assignable object.
+
+  Returns:
+    A dict containing all notification data for the given notification.
+  """
+  obj = get_notification_object(notif)
+  people = _get_declined_people(obj)
+  return _get_assignable_dict(people, notif)
+
+
+def get_assessment_url(assessment):
+  return urlparse.urljoin(
+      utils.get_url_root(),
+      "assessments/{}".format(assessment.id))
+
+
+def assignable_reminder(notif):
+  """Get data for assignable object for reminders"""
+  obj = get_notification_object(notif)
+  reminder = next((attrs for attrs in obj.REMINDERABLE_HANDLERS.values()
+                   if notif.notification_type.name in attrs['reminders']),
+                  False)
+
+  notif_data = {}
+  if reminder:
+    data = reminder['data']
+    if obj.status not in data:
+      # In case object already moved out of targeted state
+      return notif_data
+    assignee_group = data[obj.status]
+    people = [a for a, roles in obj.assignees if assignee_group in roles]
+
+    for person in people:
+      notif_data[person.email] = {
+          "user": get_person_dict(person),
+          notif.notification_type.name: {
+              obj.id: {
+                  "title": obj.title,
+                  "end_date": obj.end_date.strftime("%m/%d/%Y")
+                  if obj.end_date else None,
+                  "url": get_assessment_url(obj)
+              }
+          }
+      }
+  return notif_data
+
+
+def get_person_dict(person):
+  """Return dictionary with basic person info.
+
+  Args:
+    person (Person): Person object for which we want to get a dictionary.
+
+  Returns:
+    dict: dictionary with persons email, name and id.
+  """
+  if person:
+    return {
+        "email": person.email,
+        "name": person.name,
+        "id": person.id,
+    }
+
+  return {"email": "", "name": "", "id": -1}
+
+
+def get_notification_object(notif):
+  """Get an object for which the notification entry was made.
+
+  Args:
+    notif (Notifications): Notification entry for the given object
+
+  Returns:
+    A model based on notif.object_id and notif.object_type.
+  """
+  model = getattr(models, notif.object_type, None)
+  if model:
+    return model.query.get(notif.object_id)
+  return None
+
+
+def get_assignable_data(notif):
+  """Return data for assignable object notifications.
+
+  Args:
+    notif (Notification): notification with an Assignable object_type.
+
+  Returns:
+    Dict with all data fro the assignable notification or an empty dict if the
+    notification is not for a valid assignable object.
+  """
+  if notif.object_type not in {"Request", "Assessment"}:
+    return {}
+  elif notif.notification_type.name.endswith("_open"):
+    return assignable_open_data(notif)
+  elif notif.notification_type.name.endswith("_declined"):
+    return assignable_declined_data(notif)
+  elif notif.notification_type.name.endswith("_reminder"):
+    return assignable_reminder(notif)
+  return {}

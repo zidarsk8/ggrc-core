@@ -69,7 +69,8 @@ skip_files:
 # Custom GGRC excludes here
 - requirements\.txt
 - requirements\.txt\.md5
-- dev-requirements\.txt
+- requirements-dev\.txt
+- requirements-selenium\.txt
 - migrations/.*
 - tests/.*
 - service_specs/.*

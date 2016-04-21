@@ -15,16 +15,21 @@ Work in develop is work that is not scheduled for the upcoming release. If
 it's not scheduled for the upcoming release, it should go into develop (unless
 it's an epic, which we'll talk about below).
 
-## Feature Branches (feature/*)
+## Feature Branches
 
 Feature branches are used for creating pull requests against develop. When
-the changes are reviewed, they are merged into develop by the reviewer. The
-reviewer is also responsible for deleting the feature branch after the changes
-are merged.
+the changes are reviewed, they are merged into develop by the reviewer.
 
 The base for a feature branch is always the current develop branch:
 
-    git checkout origin/develop -b feature/new-feature
+    git checkout origin/develop -b new-feature
+
+Because feature branches are only on repo forks, we don't have strict naming
+policy, but suggestions are as follows:
+
+ - Branches created for a specific ticket should start with ticket id and
+   optional description (CORE-123, CORE-456-update-documentation)
+ - Quickfix branches should have a "quickfix-"  prefix
 
 
 ## Release Branch (release/*)

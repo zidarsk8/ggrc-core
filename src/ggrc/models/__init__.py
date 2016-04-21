@@ -3,16 +3,20 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
-from ggrc.models.all_models import *
+import inspect
+
+from ggrc.models.all_models import *  # noqa
 from ggrc import settings
 from ggrc import db
 
 """All gGRC model objects and associated utilities."""
 
+
 def create_db_with_create_all():
-  import ggrc.models.all_models
+  import ggrc.models.all_models  # noqa
 
   db.create_all()
+
 
 def create_db_with_migrations(quiet=False):
   from ggrc.migrate import upgradeall
@@ -25,17 +29,19 @@ def create_db_with_migrations(quiet=False):
   if quiet:
     logging.disable(logging.NOTSET)
 
+
 def drop_db_with_drop_all():
-  import ggrc.models.all_models
+  import ggrc.models.all_models  # noqa
 
   if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
     db.engine.execute('SET FOREIGN_KEY_CHECKS = 0')
 
   db.drop_all()
 
+
 def drop_db_with_migrations(quiet=False):
   from ggrc.migrate import downgradeall
-  import ggrc.models.all_models
+  import ggrc.models.all_models  # noqa
   import logging
 
   if quiet:
@@ -47,6 +53,7 @@ def drop_db_with_migrations(quiet=False):
     logging.disable(logging.NOTSET)
   if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
     db.engine.execute('SET FOREIGN_KEY_CHECKS = 1')
+
 
 def create_db(use_migrations=False, quiet=False):
   if 'mysql' in settings.SQLALCHEMY_DATABASE_URI:
@@ -73,6 +80,11 @@ def init_models(app):
   [model._inflector for model in all_models]
 
 
+def init_hooks():
+  from ggrc.models import hooks
+  hooks.init_hooks()
+
+
 def init_all_models(app):
   """Register all gGRC models services with the Flask application ``app``."""
 
@@ -85,21 +97,36 @@ def init_all_models(app):
     ext_init_models = getattr(extension_module, 'init_models', None)
     if ext_init_models:
       ext_init_models(app)
+  init_hooks()
+
+
+def init_lazy_mixins():
+  """Lazy mixins initialisation
+
+  Mixins with `__lazy__init__` property set to True will wait with their
+  initialisation until after the models have been fully initialised. This is
+  useful in cases where we need full model class, e.g. to hook up signaling
+  logic.
+  """
+  from ggrc.models import all_models
+  for model in all_models.all_models:
+    for mixin in inspect.getmro(model):
+      if getattr(mixin, '__lazy_init__', False):
+        mixin.init(model)
 
 
 def init_session_monitor_cache():
   from sqlalchemy.orm.session import Session
   from sqlalchemy import event
-  from .cache import Cache
   from ggrc.services.common import get_cache
 
   def update_cache_before_flush(session, flush_context, objects):
-    cache = get_cache(create = True)
+    cache = get_cache(create=True)
     if cache:
       cache.update_before_flush(session, flush_context)
 
   def update_cache_after_flush(session, flush_context):
-    cache = get_cache(create = False)
+    cache = get_cache(create=False)
     if cache:
       cache.update_after_flush(session, flush_context)
 
@@ -129,12 +156,12 @@ def init_sanitization_hooks():
       'hr', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul',
       'ol', 'li', 'dl', 'dt', 'dd', 'abbr', 'acronym', 'a', 'img',
       'blockquote', 'del', 'ins', 'table', 'tbody', 'tr', 'td', 'th',
-      ] + bleach.ALLOWED_TAGS
+  ] + bleach.ALLOWED_TAGS
   bleach_attrs = {}
   attrs = [
       'href', 'src', 'width', 'height', 'alt', 'cite', 'datetime',
       'title', 'class', 'name', 'xml:lang', 'abbr'
-      ]
+  ]
 
   for tag in bleach_tags:
     bleach_attrs[tag] = attrs
@@ -154,8 +181,7 @@ def init_sanitization_hooks():
       value = parser.unescape(value)
 
     ret = parser.unescape(
-      bleach.clean(value, bleach_tags, bleach_attrs, strip=True)
-      )
+        bleach.clean(value, bleach_tags, bleach_attrs, strip=True))
     return ret
 
   for model in all_models:
@@ -167,7 +193,8 @@ def init_sanitization_hooks():
 
 def init_app(app):
   init_all_models(app)
+  init_lazy_mixins()
   init_session_monitor_cache()
   init_sanitization_hooks()
 
-from .inflector import get_model
+from .inflector import get_model  # noqa

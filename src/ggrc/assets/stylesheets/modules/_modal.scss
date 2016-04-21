@@ -551,6 +551,9 @@
           font-size: $f-regular;
         }
       }
+      &.bottom-no-margin {
+        margin-bottom:0px;
+      }
     }
     .selector-info {
       h4.simple-url {
@@ -773,6 +776,10 @@
       }
     }
   }
+}
+
+.person a.unmap {
+  margin-left: 0.4em;
 }
 
 // Mockups Assessment Page V1.0

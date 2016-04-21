@@ -6,6 +6,7 @@
 """Module containing decorators"""
 
 import time
+import logging
 from functools import wraps
 
 from lib import exception
@@ -14,22 +15,25 @@ from lib import constants
 from lib import file_ops
 from lib.utils import selenium_utils
 
+logger = logging.getLogger(__name__)
+
 
 def take_screenshot_on_error(fun):
   """Decorates methods and makes a screenshot on any exception"""
   # todo: replace with pytest-selenium which automagically takes
-  @wraps(fun)
-  def wrapper(self, *args, **kwargs):
+
+  def wrapper(self, *args):
     try:
-      return fun(self, *args, **kwargs)
-    except Exception:
-      file_path = environment.PROJECT_ROOT_PATH \
-          + constants.path.LOGS_DIR \
-          + self.__class__.__name__ \
-          + "." \
-          + args[0].driver.title
+      return fun(self, *args)
+    except Exception as e:
+      logger.error(e)
+
+      file_path = environment.LOG_PATH\
+          + self.__class__.__name__\
+          + "."\
+          + self._driver.title
       unique_file_path = file_ops.get_unique_postfix(file_path, ".png")
-      args[0].driver.get_screenshot_as_file(unique_file_path)
+      self._driver.get_screenshot_as_file(unique_file_path)
       raise
 
   return wrapper

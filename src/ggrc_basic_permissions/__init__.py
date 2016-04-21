@@ -554,7 +554,35 @@ def load_permissions_for(user):  # noqa
       # the query has executed.
       cache.set(key, permissions, PERMISSION_CACHE_TIMEOUT)
 
+  # add permissions for backlog workflows to everyone
+  actions = ["read", "edit", "update"]
+  _types = ["Workflow", "Cycle", "CycleTaskGroup",
+            "CycleTaskGroupObjectTask", "TaskGroup"]
+  for _, _, wf_context_id in backlog_workflows().all():
+    for _type in _types:
+      if _type == "CycleTaskGroupObjectTask":
+        actions += ["delete"]
+      for action in actions:
+        permissions.setdefault(action, {})\
+            .setdefault(_type, {})\
+            .setdefault('contexts', list())\
+            .append(wf_context_id)
   return permissions
+
+
+def backlog_workflows():
+  """Creates a query that returns all backlog workflows which
+  all users can access.
+
+    Returns:
+        db.session.query object that selects the following columns:
+            | id | type | context_id |
+  """
+  _workflow = aliased(all_models.Workflow, name="wf")
+  return db.session.query(_workflow.id,
+                          literal("Workflow").label("type"),
+                          _workflow.context_id)\
+                   .filter(_workflow.kind == "Backlog")
 
 
 def _get_or_create_personal_context(user):
