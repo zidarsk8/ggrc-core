@@ -302,7 +302,6 @@ class AttributeInfo(object):
     if hasattr(object_class, "slug") or hasattr(object_class, "email"):
       filtered_aliases.append(("delete", {
           "display_name": "Delete",
-          "import_only": True,
           "description": "",
       }))
 
