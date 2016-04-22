@@ -7,6 +7,8 @@
 
 from dateutil.parser import parse
 
+from sqlalchemy import and_
+
 from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
@@ -80,11 +82,12 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     self.dry_run = True
 
   def get_ca_definition(self):
-    for definition in self.row_converter.object_class\
-            .get_custom_attribute_definitions():
-      if definition.title == self.display_name:
-        return definition
-    return None
+    cad = models.CustomAttributeDefinition
+    return cad.eager_query().filter(and_(
+      cad.definition_type == self.row_converter.obj._inflector.table_singular,
+      cad.definition_id.is_(None),
+      cad.title == self.display_name,
+    )).first()
 
   def get_date_value(self):
     if not self.mandatory and self.raw_value == "":
