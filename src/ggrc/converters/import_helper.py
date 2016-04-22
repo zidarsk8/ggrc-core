@@ -13,9 +13,21 @@ from ggrc.converters.handlers import custom_attribute
 
 
 def get_object_column_definitions(object_class):
-  """ Attach additional info to attribute definitions """
+  """Attach additional info to attribute definitions.
+
+  Fetches the attribute info (_aliases) for the given object class and adds
+  additional data (handler class, validator function, default value) )needed
+  for imports.
+
+  Args:
+    object_class (db.Model): Model for which we want to get column definitions
+      for imports.
+
+  Returns:
+    dict: Updated attribute definitions dict with additional data.
+  """
   attributes = AttributeInfo.get_object_attr_definitions(object_class)
-  for key, attr in attributes.items():
+  for key, attr in attributes.iteritems():
     handler_key = attr.get("handler_key", key)
     handler = COLUMN_HANDLERS.get(handler_key, handlers.ColumnHandler)
     validator = None
@@ -26,11 +38,16 @@ def get_object_column_definitions(object_class):
     elif attr["type"] == AttributeInfo.Type.MAPPING:
       handler = COLUMN_HANDLERS.get(key, handlers.MappingColumnHandler)
     elif attr["type"] == AttributeInfo.Type.CUSTOM:
-      handler = custom_attribute.CustomAttributeColumHandler
+      handler = COLUMN_HANDLERS.get(
+          key, custom_attribute.CustomAttributeColumHandler)
+    elif attr["type"] == AttributeInfo.Type.OBJECT_CUSTOM:
+      handler = COLUMN_HANDLERS.get(
+          key, custom_attribute.ObjectCaColumnHandler)
     attr["handler"] = attr.get("handler", handler)
     attr["validator"] = attr.get("validator", validator)
     attr["default"] = attr.get("default", default)
   return attributes
+
 
 def get_column_order(columns):
   return AttributeInfo.get_column_order(columns)

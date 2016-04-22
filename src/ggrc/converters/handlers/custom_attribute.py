@@ -150,3 +150,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     if self.mandatory and not value:
       self.add_error(errors.WRONG_VALUE, column_name=self.display_name)
     return value
+
+
+class ObjectCaColumnHandler(CustomAttributeColumHandler):
+  pass
