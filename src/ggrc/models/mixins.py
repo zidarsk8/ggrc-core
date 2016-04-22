@@ -9,6 +9,7 @@ import datetime
 
 from flask import current_app
 from sqlalchemy import and_
+from sqlalchemy import or_
 from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy import or_
@@ -804,10 +805,16 @@ class CustomAttributable(object):
   @classmethod
   def get_custom_attribute_definitions(cls):
     from ggrc.models.custom_attribute_definition import \
-        CustomAttributeDefinition
-    return CustomAttributeDefinition.query.filter(
-        CustomAttributeDefinition.definition_type ==
-        underscore_from_camelcase(cls.__name__)).all()
+        CustomAttributeDefinition as cad
+    if cls.__name__ == "Assessment":
+      return cad.query.filter(or_(
+          cad.definition_type == underscore_from_camelcase(cls.__name__),
+          cad.definition_type == "assessment_template",
+      )).all()
+    else:
+      return cad.query.filter(
+          cad.definition_type == underscore_from_camelcase(cls.__name__)
+      ).all()
 
   @classmethod
   def eager_query(cls):
