@@ -83,10 +83,11 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
 
   def get_ca_definition(self):
     cad = models.CustomAttributeDefinition
+    definition_type = self.row_converter.obj._inflector.table_singular
     return cad.eager_query().filter(and_(
-      cad.definition_type == self.row_converter.obj._inflector.table_singular,
-      cad.definition_id.is_(None),
-      cad.title == self.display_name,
+        cad.definition_type == definition_type,
+        cad.definition_id.is_(None),
+        cad.title == self.display_name,
     )).first()
 
   def get_date_value(self):
@@ -156,4 +157,24 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
 
 
 class ObjectCaColumnHandler(CustomAttributeColumHandler):
-  pass
+
+  def set_value(self):
+    pass
+
+  def set_obj_attr(self):
+    if self.dry_run:
+      return
+    self.value = self.parse_item()
+    if self.value:
+      self.row_converter.obj.custom_attribute_values.append(self.value)
+
+  def get_ca_definition(self):
+    if self.row_converter.obj.id is None:
+      return None
+    cad = models.CustomAttributeDefinition
+    definition_type = self.row_converter.obj._inflector.table_singular
+    return cad.eager_query().filter(and_(
+        cad.definition_type == definition_type,
+        cad.definition_id == self.row_converter.obj.id,
+        cad.title == self.display_name,
+    )).first()
