@@ -13,12 +13,11 @@ Create Date: 2016-04-21 14:19:28.527745
 import sqlalchemy as sa
 
 from alembic import op
-from sqlalchemy.sql import column
-from sqlalchemy.sql import table
 
 # revision identifiers, used by Alembic.
 revision = '1257140cbce5'
 down_revision = '11cee57a4149'
+
 
 def upgrade():
     """Upgrade database schema and/or data, creating a new revision."""
@@ -52,5 +51,7 @@ def downgrade():
         sa.Index('sample_worksheet_document', 'sample_worksheet_id')
     )
 
-    op.add_column('meetings', sa.Column('response_id', sa.Integer(), nullable=False))
-    op.create_foreign_key('meetings_ibfk_3', 'meetings', 'responses', ['response_id'], ['id'])
+    op.add_column(
+        'meetings', sa.Column('response_id', sa.Integer(), nullable=False))
+    op.create_foreign_key(
+        'meetings_ibfk_3', 'meetings', 'responses', ['response_id'], ['id'])

@@ -17,7 +17,6 @@ from ggrc import db
 from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import errors
 from ggrc.converters import get_exportables
-from ggrc.converters import get_importables
 from ggrc.login import get_current_user
 from ggrc.models import Audit
 from ggrc.models import CategoryBase

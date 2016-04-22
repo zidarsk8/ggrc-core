@@ -4,7 +4,7 @@
 # Maintained By: vraj@reciprocitylabs.com
 
 from ggrc import db
-from .mixins import deferred, Described, Hyperlinked, Base
+from .mixins import Described, Base
 from .object_person import Personable
 
 
@@ -19,12 +19,9 @@ class Meeting(Personable, Described, Base, db.Model):
       'start_at',
       'end_at',
       'title'
-      ]
-  _sanitize_html = [
-      ]
+  ]
+  _sanitize_html = []
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     return super(Meeting, cls).eager_query()

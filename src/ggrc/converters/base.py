@@ -4,8 +4,6 @@
 # Maintained By: dan@reciprocitylabs.com
 
 from collections import defaultdict
-from itertools import chain
-from itertools import product
 
 from ggrc import settings
 from ggrc.cache.memcache import MemCache
