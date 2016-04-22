@@ -6,6 +6,8 @@
 """This module is used for handling a single line from a csv file.
 """
 
+import collections
+
 import ggrc.services
 from ggrc import db
 from ggrc.converters import errors
@@ -28,8 +30,8 @@ class RowConverter(object):
     self.ignore = False
     self.index = options.get("index", -1)
     self.row = options.get("row", [])
-    self.attrs = {}
-    self.objects = {}
+    self.attrs = collections.OrderedDict()
+    self.objects = collections.OrderedDict()
     self.id_key = ""
     offset = 3  # 2 header rows and 1 for 0 based index
     self.line = self.index + self.block_converter.offset + offset
