@@ -938,19 +938,9 @@ can.Control("GGRC.Controllers.Modals", {
           && ev.target === this.element[0]
           && !this.options.skip_refresh
           && !this.options.instance.isNew()) {
-        this.options.instance.refresh().then(this.proxy("open_created"));
+        this.options.instance.refresh();
       }
     }
-
-  , open_created : function() {
-    var instance = this.options.instance;
-    if (instance instanceof CMS.Models.Response) {
-      // Open newly created responses
-      var object_type = instance.constructor.table_singular;
-      $('[data-object-id="'+instance.id+'"][data-object-type="'+object_type+'"]')
-        .find('.openclose').click().openclose("open");
-    }
-  }
 
   , destroy : function() {
     if(this.options.model && this.options.model.cache) {

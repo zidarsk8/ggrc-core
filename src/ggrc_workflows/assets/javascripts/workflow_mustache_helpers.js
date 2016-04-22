@@ -183,18 +183,4 @@
     }, workflow_dfd);
   });
 
-
-  Mustache.registerHelper("if_can_edit_response", function(instance, status, options) {
-    var cycle = Mustache.resolve(instance).cycle.reify();
-    var can_edit;
-
-    status = Mustache.resolve(status);
-    can_edit = cycle.is_current && ["Finished", "Verified"].indexOf(status) === -1;
-    if (can_edit) {
-      return options.fn(options.contexts);
-    } else {
-      return options.inverse(options.contexts);
-    }
-  });
-
 })(this.can, this.can.$, this.Mustache);

@@ -1842,7 +1842,7 @@ Mustache.registerHelper("is_profile", function (parent_instance, options) {
   else
     options = parent_instance;
 
-  if (GGRC.page_instance() instanceof CMS.Models.Person && (!instance || instance.constructor.shortName !== 'DocumentationResponse'))
+  if (GGRC.page_instance() instanceof CMS.Models.Person)
     return options.fn(options.contexts);
   else
     return options.inverse(options.contexts);
@@ -2268,11 +2268,6 @@ Mustache.registerHelper("if_instance_of", function (inst, cls, options) {
 
 Mustache.registerHelper("prune_context", function (options) {
   return options.fn(new can.view.Scope(options.context));
-});
-
-// Turns DocumentationResponse to Response
-Mustache.registerHelper("type_to_readable", function (str, options) {
-  return resolve_computed(str, true).replace(/([A-Z])/g, ' $1').split(' ').pop();
 });
 
 Mustache.registerHelper("mixed_content_check", function (url, options) {
