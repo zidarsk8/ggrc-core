@@ -2469,20 +2469,6 @@ can.each({
                 || options.map
                 || options.create));
     }
-  },
-  "if_can_create_response": {
-    assignee_states: ["Requested", "Amended Request"],
-    program_editor_states: ["Requested", "Amended Request"],
-    predicate: function(options) {
-      return (!options.draft && (options.admin || options.editor))
-          || options.can_assignee_edit
-          || options.can_program_editor_edit
-          || (!options.accepted
-              && !options.draft
-              && (options.update
-                || options.map
-                || options.create));
-    }
   }
 }, function(fn_opts, name) {
 
