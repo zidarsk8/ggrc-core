@@ -8,26 +8,12 @@
 <h1 class="entities">
   {{#if_equals model.table_singular 'person'}}
     {{#is_dashboard_or_all}}
-      {{^system_role 'No Access'}}
-        <button class="lhn-trigger">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-      {{/system_role}}
       {{#is_dashboard}}
         My Work
       {{else}}
         All Objects
       {{/is_dashboard}}
     {{else}}
-      {{^system_role 'No Access'}}
-        <button class="lhn-trigger pull-left">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-      {{/system_role}}
       <span class="title-content">
         <i class="fa fa-{{model.table_singular}}"></i>
         {{firstnonempty instance.name instance.email}}
@@ -36,11 +22,6 @@
   {{/if_equals}}
 
   {{^if_equals model.table_singular 'person'}}
-    <button class="lhn-trigger">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
     <span class="title-content">
       <i class="fa fa-{{model.table_singular}}"></i>
       {{instance.title}}

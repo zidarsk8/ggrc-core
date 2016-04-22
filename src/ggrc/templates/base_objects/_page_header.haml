@@ -4,11 +4,6 @@
 -# Maintained By: brad@reciprocitylabs.com
 
 %h1.entities
-  -if current_user.system_wide_role.lower() != 'no access'
-    %button{ 'class': 'lhn-trigger', 'href': 'javascript://'}
-      %span.icon-bar
-      %span.icon-bar
-      %span.icon-bar
 
   %span.title-content
     -if request.path.startswith('/admin')
