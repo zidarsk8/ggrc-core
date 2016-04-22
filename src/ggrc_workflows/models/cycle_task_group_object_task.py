@@ -131,7 +131,13 @@ class CycleTaskGroupObjectTask(
 
   @computed_property
   def related_objects(self):
-    """Lists all the objects related to this cycle task.
+    """Compute and return a list of all the objects related to this cycle task.
+
+    Related objects are those that are found either on the "source" side, or
+    on the "destination" side of any of the instance's relations.
+
+    Returns:
+      (list) All objects related to the instance.
     """
     # pylint: disable=not-an-iterable
     sources = [r.source for r in self.related_sources]

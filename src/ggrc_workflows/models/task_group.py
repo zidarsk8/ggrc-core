@@ -1,7 +1,10 @@
 # Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: dan@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
+# Maintained By: peter@reciprocitylabs.com
+
+"""A module containing the workflow TaskGroup model."""
+
 
 from sqlalchemy import or_
 
@@ -18,6 +21,8 @@ from ggrc_workflows.models.task_group_object import TaskGroupObject
 
 class TaskGroup(
         WithContact, Timeboxed, Described, Titled, Slugged, db.Model):
+  """Workflow TaskGroup model."""
+
   __tablename__ = 'task_groups'
   _title_uniqueness = False
 
@@ -83,7 +88,7 @@ class TaskGroup(
         'context'
     ]
 
-    if(kwargs.get('clone_people', False)):
+    if kwargs.get('clone_people', False):
       columns.append('contact')
 
     target = self.copy_into(_other, columns, **kwargs)
@@ -97,6 +102,7 @@ class TaskGroup(
     return target
 
   def copy_objects(self, target, **kwargs):
+    # pylint: disable=unused-argument
     for task_group_object in self.task_group_objects:
       target.task_group_objects.append(task_group_object.copy(
           task_group=target,
