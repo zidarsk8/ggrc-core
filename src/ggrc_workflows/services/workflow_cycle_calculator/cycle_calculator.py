@@ -241,7 +241,8 @@ class CycleCalculator(object):
     Usually this is first element of self.tasks,
 
     Args:
-      base_date: The start date of the time unit we are operating on.
+      base_date: (datetime.date) The start date of the time unit we are
+        operating on.
     Returns:
       datetime.date: Adjusted date when the next cycle is going to be
                      generated.
