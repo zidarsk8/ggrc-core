@@ -31,7 +31,8 @@
           value: `value`
         }]
        */
-      optionsList: null
+      optionsList: null,
+      isDisabled: '@'
     }
   });
 })(window.can, window.can.$);
