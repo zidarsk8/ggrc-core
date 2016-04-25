@@ -8,6 +8,15 @@
 &.get-started {
   &__header {
     margin: 6px 0 4px;
+    h2 {
+      @extend %oneline;
+      font-size: 18px;
+      line-height: 27px;
+      color: $black;
+      margin-bottom: 0;
+      font-weight: normal;
+      font-family: $fontTitle;
+    }
   }
   &__content {
     @include box-shadow(none);
@@ -17,10 +26,10 @@
   }
   &__list {
     @extend %reset-list;
-    li {
+    &__item {
       margin-bottom: 5px;
       position: relative;
-      &.top-space {
+      &--top-space {
         margin-top: 15px;
       }
       &:last-child {
@@ -44,7 +53,7 @@
         color: $white;
       }
     }
-    .icon-wrap {
+    &__icon-wrap {
       display: inline-block;
       line-height: 35px;
       height: 35px;
