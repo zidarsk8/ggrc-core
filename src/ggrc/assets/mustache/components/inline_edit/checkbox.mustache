@@ -1,0 +1,22 @@
+{{!
+  Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: ivan@reciprocitylabs.com
+  Maintained By: ivan@reciprocitylabs.com
+}}
+
+<h6 class="inline-edit__title">{{context.title}}</h6>
+
+<div class="inline-edit__content">
+{{#if context.isEdit}}
+  {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+  {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+  <label class="inline-edit__checkbox">
+    <input can-value="context.value" type="checkbox"> {{label}}
+  </label>
+{{else}}
+  <label class="inline-edit__checkbox">
+    <input disabled type="checkbox" can-value="context.value"> {{label}}
+  </label>
+{{/if}}
+</div>

@@ -1,0 +1,20 @@
+{{!
+  Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: ivan@reciprocitylabs.com
+  Maintained By: ivan@reciprocitylabs.com
+}}
+
+<h6 class="inline-edit__title">{{firstnonempty context.title context.label}}</h6>
+
+<div class="inline-edit__content">
+{{#if context.isEdit}}
+  {{#mandatory}}<span class="required">*</span>{{/mandatory}}
+  {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+  <input type="text" can-value="context.value" />
+{{else}}
+  <div class="inline-edit__text">
+    {{{firstnonempty context.value '<span class="empty-message">None</span>'}}}
+  </div>
+{{/if}}
+</div>
