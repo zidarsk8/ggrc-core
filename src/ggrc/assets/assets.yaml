@@ -111,6 +111,7 @@ dashboard-js-files:
   - apps/quick_search.js
   - apps/business_objects.js
   - apps/custom_attributes.js
+  - components/spinner/spinner.js
   - components/unified_mapper/mapper.js
   - components/unified_mapper/mapper_results.js
   - components/unified_mapper/mapper_checkbox.js
@@ -259,6 +260,7 @@ dashboard-js-template-files:
   - components/dropdown/dropdown.mustache
   - components/object_history/object_history.mustache
   - components/person/person.mustache
+  - components/spinner/spinner.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
