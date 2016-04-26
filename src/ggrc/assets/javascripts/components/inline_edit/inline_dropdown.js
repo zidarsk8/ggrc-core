@@ -8,7 +8,7 @@
 (function (can, $) {
   'use strict';
 
-  GGRC.Components('inline-dropdown', {
+  GGRC.Components('inlineDropdown', {
     tag: 'inline-dropdown',
     template: can.view(
       GGRC.mustache_path +

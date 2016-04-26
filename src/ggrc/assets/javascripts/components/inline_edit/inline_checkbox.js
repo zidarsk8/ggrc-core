@@ -8,7 +8,7 @@
 (function (can, $) {
   'use strict';
 
-  GGRC.Components('inline-checkbox', {
+  GGRC.Components('inlineCheckbox', {
     tag: 'inline-checkbox',
     template: can.view(
       GGRC.mustache_path +

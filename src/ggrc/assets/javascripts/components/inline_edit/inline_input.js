@@ -8,7 +8,7 @@
 (function (can, $) {
   'use strict';
 
-  GGRC.Components('inline-input', {
+  GGRC.Components('inlineInput', {
     tag: 'inline-input',
     template: can.view(
       GGRC.mustache_path +
