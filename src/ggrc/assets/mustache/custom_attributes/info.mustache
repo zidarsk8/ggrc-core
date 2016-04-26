@@ -22,14 +22,53 @@
               {{#with_value_for_id id}}
                 {{#switch attribute_type}}
                 {{#case 'Checkbox'}}
-                  <h6>
-                    <input type="checkbox" disabled="disabled" {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
-                    {{title}}
-                  </h6>
+                  <inline-edit
+                    instance="instance"
+                    ca-id="id"
+                    property="value"
+                    label="title"
+                    type="checkbox"
+                    mandatory="mandatory"
+                    placeholder="placeholder"
+                    helptext="helptext"
+                  ></inline-edit>
                 {{/case}}
                 {{#case 'Rich Text'}}
-                  <h6>{{title}}</h6>
-                  {{{value}}}
+                  <inline-edit
+                    instance="instance"
+                    ca-id="id"
+                    property="value"
+                    label="title"
+                    type="text"
+                    mandatory="mandatory"
+                    placeholder="placeholder"
+                    helptext="helptext"
+                  ></inline-edit>
+                {{/case}}
+                {{#case 'Dropdown'}}
+                  <inline-edit
+                    instance="instance"
+                    ca-id="id"
+                    property="value"
+                    label="title"
+                    type="dropdown"
+                    mandatory="mandatory"
+                    values="multi_choice_options"
+                    placeholder="placeholder"
+                    helptext="helptext"
+                  ></inline-edit>
+                {{/case}}
+                {{#case 'Text'}}
+                  <inline-edit
+                    instance="instance"
+                    ca-id="id"
+                    property="value"
+                    label="title"
+                    type="text"
+                    mandatory="mandatory"
+                    placeholder="placeholder"
+                    helptext="helptext"
+                  ></inline-edit>
                 {{/case}}
                 {{#case 'Map:Person'}}
                   <h6>{{title}}</h6>
