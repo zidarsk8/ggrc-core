@@ -6,9 +6,9 @@
 }}
 
 <div class="inline-edit">
-  {{#if isSave}}
-    <span {{attach_spinner '{ "radius": 2.5, "length": 2.5, "width": 2 }' 'display:inline-block; top: -5px; left: 2px;' }}></span>
-  {{else}}
+  <spinner toggle="isSave"></spinner>
+
+  {{^if isSave}}
     {{#switch type}}
       {{#case 'checkbox'}}
         <inline-checkbox context="context"></inline-checkbox>
