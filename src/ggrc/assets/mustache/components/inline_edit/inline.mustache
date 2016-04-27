@@ -6,9 +6,11 @@
 }}
 
 <div class="inline-edit">
-  <spinner toggle="isSave"></spinner>
+  <h6 class="inline-edit__title">{{firstnonempty context.title context.label}}</h6>
 
+  <spinner toggle="isSave"></spinner>
   {{^if isSave}}
+  <div class="inline-edit__content">
     {{#switch type}}
       {{#case 'checkbox'}}
         <inline-checkbox context="context"></inline-checkbox>
@@ -26,7 +28,6 @@
         <content></content>
       {{/default}}
     {{/switch}}
-
     <ul class="inline-edit__controls">
       {{#if context.isEdit}}
       <li class="inline-edit__controls--edit-mode"><a can-click="onSave" href="#"><i class="fa fa-check"></i></a></li>
@@ -35,5 +36,6 @@
       <li><a can-click="enableEdit" href="#"><i class="fa fa-pencil"></i></a></li>
       {{/if}}
     </ul>
+  </div>
   {{/if}}
 </div>
