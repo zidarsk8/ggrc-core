@@ -11,7 +11,7 @@
 {{#if context.isEdit}}
   {{#mandatory}}<span class="required">*</span>{{/mandatory}}
   {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
-  <input type="text" can-value="context.value" />
+  <textarea type="text" can-value="context.value"></textarea>
 {{else}}
   <div class="inline-edit__text">
     {{{firstnonempty context.value '<span class="empty-message">None</span>'}}}
