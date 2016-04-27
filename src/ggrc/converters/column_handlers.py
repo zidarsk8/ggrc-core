@@ -54,7 +54,6 @@ GGRC_COLUMN_HANDLERS = {
     "request_status": request.RequestStatusColumnHandler,
     "request_type": handlers.RequestTypeColumnHandler,
     "requested_on": handlers.DateColumnHandler,
-    "response_type": handlers.ResponseTypeColumnHandler,
     "secondary_assessor": handlers.UserColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,
     "send_by_default": handlers.CheckboxColumnHandler,
