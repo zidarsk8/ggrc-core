@@ -7,6 +7,7 @@
 
 <h6 class="inline-edit__title">{{firstnonempty context.title context.label}}</h6>
 
+<div class="inline-edit__content">
 {{#if context.isEdit}}
   {{#mandatory}}<span class="required">*</span>{{/mandatory}}
   {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
@@ -15,9 +16,11 @@
     options-list="context.values"
     name="context.value"
     no-value="true"
+    class-name="input-medium"
     ></dropdown>
 {{else}}
   <p class="inline-edit__value">
     {{{firstnonempty context.value '<span class="empty-message">None</span>'}}}
   </p>
 {{/if}}
+</div>

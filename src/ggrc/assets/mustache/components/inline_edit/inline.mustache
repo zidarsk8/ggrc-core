@@ -29,8 +29,8 @@
 
     <ul class="inline-edit__controls">
       {{#if context.isEdit}}
-      <li><a can-click="onSave" href="#"><i class="fa fa-check"></i></a></li>
-      <li><a can-click="onCancel" href="#"><i class="fa fa-times"></i></a></li>
+      <li class="inline-edit__controls--edit-mode"><a can-click="onSave" href="#"><i class="fa fa-check"></i></a></li>
+      <li class="inline-edit__controls--edit-mode"><a can-click="onCancel" href="#"><i class="fa fa-times"></i></a></li>
       {{else}}
       <li><a can-click="enableEdit" href="#"><i class="fa fa-pencil"></i></a></li>
       {{/if}}
