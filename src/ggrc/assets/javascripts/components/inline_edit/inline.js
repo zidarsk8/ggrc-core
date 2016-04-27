@@ -42,9 +42,15 @@
         var caid = this.attr('caId');
         var prop = this.attr('property');
         var instance = this.attr('instance');
+        var oldValue = this.attr('property');
         var value = this.attr('context.value');
 
         ev.preventDefault();
+        this.attr('context.isEdit', false);
+
+        if (oldValue === value) {
+          return;
+        }
 
         if (this.attr('caId')) {
           instance.attr('custom_attributes.' + caid, value);
@@ -52,7 +58,6 @@
           instance.attr(prop, value);
         }
 
-        this.attr('context.isEdit', false);
         this.attr('isSaving', true);
         instance.save().then(function () {
           this.attr('isSaving', false);
