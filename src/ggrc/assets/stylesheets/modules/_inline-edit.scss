@@ -6,23 +6,54 @@
  */
 
 .inline-edit {
-  max-width: 100%;
-  box-sizing: border-box;
-  display: inline-block;
-  position: relative;
-  padding-right: 40px;
+  &__title {
+    padding-left: 4px;
+  }
+  &__content {
+    @include border-radius(2px);
+    max-width: 100%;
+    box-sizing: border-box;
+    display: inline-block;
+    position: relative;
+    padding: 2px 26px 2px 4px;
+    border: 1px solid transparent;
+    &:hover {
+      border-color: $warmGray;
+      .inline-edit__controls {
+        display: block;
+        height: 100%;
+      }
+    }
+    input,
+    textarea,
+    select {
+      margin-bottom: 0;
+    }
+  }
   &__controls {
     display: none;
     @extend %reset-list;
     position: absolute;
-    top: 23px;
+    top: 0;
     right: 0;
-    width: 36px;
+    width: 24px;
+    text-align: center;
+    padding-top: 2px;
+    box-sizing: border-box;
+    border-left: 1px solid $warmGray;
+    background: $pbcListGray;
     li {
       display: inline-block;
     }
     &--edit-mode {
-      margin-top: 5px;
+      top: auto;
+      right: -1px;
+      bottom: -22px;
+      width: 40px;
+      height: auto;
+      border: 1px solid $warmGray;
+      border-top: none;
+      background: $pbcListGray;
     }
     a {
       @include opacity(0.6);
@@ -32,9 +63,19 @@
       }
     }
   }
-  &:hover {
+  &--active {
     .inline-edit__controls {
       display: block;
+    }
+    .inline-edit__content {
+      @include border-radius(2px 2px 0 2px);
+      padding: 2px 2px 2px 4px;
+      border: 1px solid $warmGray;
+      &:hover {
+        .inline-edit__controls {
+          height: auto;
+        }
+      }
     }
   }
 }

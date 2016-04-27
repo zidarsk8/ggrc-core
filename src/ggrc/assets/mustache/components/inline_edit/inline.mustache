@@ -5,7 +5,7 @@
   Maintained By: ivan@reciprocitylabs.com
 }}
 
-<div class="inline-edit">
+<div class="inline-edit {{#if context.isEdit}}inline-edit--active{{/if}}">
   <h6 class="inline-edit__title">{{firstnonempty context.title context.label}}</h6>
 
   <spinner toggle="isSave"></spinner>
@@ -28,10 +28,10 @@
         <content></content>
       {{/default}}
     {{/switch}}
-    <ul class="inline-edit__controls">
+    <ul class="inline-edit__controls {{#if context.isEdit}}inline-edit__controls--edit-mode{{/if}}">
       {{#if context.isEdit}}
-      <li class="inline-edit__controls--edit-mode"><a can-click="onSave" href="#"><i class="fa fa-check"></i></a></li>
-      <li class="inline-edit__controls--edit-mode"><a can-click="onCancel" href="#"><i class="fa fa-times"></i></a></li>
+      <li><a can-click="onSave" href="#"><i class="fa fa-check"></i></a></li>
+      <li><a can-click="onCancel" href="#"><i class="fa fa-times"></i></a></li>
       {{else}}
       <li><a can-click="enableEdit" href="#"><i class="fa fa-pencil"></i></a></li>
       {{/if}}
