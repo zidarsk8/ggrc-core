@@ -29,6 +29,16 @@
     select {
       margin-bottom: 0;
     }
+    .inline-edit--active & {
+      @include border-radius(2px 2px 0 2px);
+      padding: 2px 2px 2px 4px;
+      border: 1px solid $warmGray;
+      &:hover {
+        .inline-edit__controls {
+          height: auto;
+        }
+      }
+    }
   }
   &__controls {
     display: none;
@@ -45,6 +55,13 @@
     li {
       display: inline-block;
     }
+    a {
+      @include opacity(0.6);
+      @include transition(opacity 0.2s ease);
+      &:hover {
+        @include opacity(1);
+      }
+    }
     &--edit-mode {
       top: auto;
       right: -1px;
@@ -55,27 +72,8 @@
       border-top: none;
       background: $pbcListGray;
     }
-    a {
-      @include opacity(0.6);
-      @include transition(opacity 0.2s ease);
-      &:hover {
-        @include opacity(1);
-      }
-    }
-  }
-  &--active {
-    .inline-edit__controls {
+    .inline-edit--active & {
       display: block;
-    }
-    .inline-edit__content {
-      @include border-radius(2px 2px 0 2px);
-      padding: 2px 2px 2px 4px;
-      border: 1px solid $warmGray;
-      &:hover {
-        .inline-edit__controls {
-          height: auto;
-        }
-      }
     }
   }
 }
