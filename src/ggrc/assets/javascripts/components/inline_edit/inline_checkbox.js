@@ -17,7 +17,6 @@
     scope: {
     },
     events: {
-
     }
   });
 })(window.can, window.can.$);

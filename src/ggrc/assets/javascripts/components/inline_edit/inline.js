@@ -53,6 +53,9 @@
         }
 
         if (this.attr('caId')) {
+          if (this.attr('type') === 'checkbox') {
+            value = value ? 1 : 0;
+          }
           instance.attr('custom_attributes.' + caid, value);
         } else {
           instance.attr(prop, value);
@@ -66,12 +69,16 @@
     },
     init: function () {
       var scope = this.scope;
+      var value = scope.attr('property');
 
       if (!scope.instance.custom_attributes) {
         _.defer(scope.instance.setup_custom_attributes.bind(scope.instance));
       }
 
-      scope.attr('context.value', scope.attr('property'));
+      if (scope.attr('caId') && scope.attr('type') === 'checkbox') {
+        value = value === '1';
+      }
+      scope.attr('context.value', value);
       scope.attr('context.title', scope.attr('title'));
       scope.attr('context.label', scope.attr('label'));
       if (_.isString(scope.attr('values'))) {
