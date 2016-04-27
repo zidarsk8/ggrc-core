@@ -408,7 +408,7 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     defaults: {
-      status: 'Open',
+      status: 'Not Started',
       requested_on: moment().toDate(),
       due_on: GGRC.Utils.firstWorkingDay(moment().add(1, 'weeks'))
     },
@@ -1008,7 +1008,7 @@
       verified_date: 'date'
     },
     defaults: {
-      status: "Open"
+      status: 'Not Started'
     },
     filter_keys: ['operationally', 'operational', 'design',
                   'finished_date', 'verified_date', 'verified'],
