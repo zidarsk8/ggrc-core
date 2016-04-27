@@ -175,11 +175,14 @@ def objects_via_relationships_query(model, roles, user_id, context_not_role):
   def _join_filter(query, cond):
     return query.join(_model, cond).\
         join(_implications,
-             _model.context_id == _implications.source_context_id).\
-        join(_user_role, _user_role.context_id.in_(
-            (_implications.source_context_id, _implications.context_id))).\
-        join(_role, _user_role.role_id == _role.id).\
-        filter(and_(_user_role.person_id == user_id, _role.name.in_(roles)))
+             or_(_model.context_id == _implications.source_context_id,
+                 _model.context_id == _implications.context_id)).\
+        join(_user_role,
+             and_(_user_role.person_id == user_id,
+                  _user_role.context_id == _implications.context_id)).\
+        join(_role, and_(_user_role.role_id == _role.id,
+                         _role.name.in_(roles))).\
+        distinct()
 
   def _add_relationship_join(query):
     # We do a UNION here because using an OR to JOIN both destination
