@@ -24,9 +24,7 @@
       context: {
         isEdit: false,
         value: null,
-        values: null,
-        title: null,
-        label: null
+        values: null
       },
       enableEdit: function (ctx, el, ev) {
         ev.preventDefault();
@@ -92,8 +90,6 @@
         value = value === '1';
       }
       scope.attr('context.value', value);
-      scope.attr('context.title', scope.attr('title'));
-      scope.attr('context.label', scope.attr('label'));
       if (_.isString(scope.attr('values'))) {
         scope.attr('context.values', scope.attr('values').split(','));
       }

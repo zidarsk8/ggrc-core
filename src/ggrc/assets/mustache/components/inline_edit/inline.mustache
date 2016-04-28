@@ -6,7 +6,7 @@
 }}
 
 <div class="inline-edit {{#if context.isEdit}}inline-edit--active{{/if}}">
-  <h6 class="inline-edit__title">{{firstnonempty context.title context.label}}</h6>
+  <h6 class="inline-edit__title">{{firstnonempty title label}}</h6>
 
   <spinner toggle="isSave"></spinner>
   {{^if isSave}}
