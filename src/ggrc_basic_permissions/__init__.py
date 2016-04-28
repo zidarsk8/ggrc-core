@@ -498,11 +498,13 @@ def load_permissions_for(user):  # noqa
   # add permissions for backlog workflows to everyone
   actions = ["read", "edit", "update"]
   _types = ["Workflow", "Cycle", "CycleTaskGroup",
-            "CycleTaskGroupObjectTask", "TaskGroup"]
+            "CycleTaskGroupObjectTask", "TaskGroup", "CycleTaskEntry"]
   for _, _, wf_context_id in backlog_workflows().all():
     for _type in _types:
       if _type == "CycleTaskGroupObjectTask":
         actions += ["delete"]
+      if _type == "CycleTaskEntry":
+        actions += ["create"]
       for action in actions:
         permissions.setdefault(action, {})\
             .setdefault(_type, {})\
