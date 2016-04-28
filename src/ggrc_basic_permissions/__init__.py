@@ -173,16 +173,30 @@ def objects_via_relationships_query(model, roles, user_id, context_not_role):
   _user_role = aliased(all_models.UserRole, name="ur")
 
   def _join_filter(query, cond):
-    return query.join(_model, cond).\
-        join(_implications,
-             or_(_model.context_id == _implications.source_context_id,
-                 _model.context_id == _implications.context_id)).\
-        join(_user_role,
-             and_(_user_role.person_id == user_id,
-                  _user_role.context_id == _implications.context_id)).\
-        join(_role, and_(_user_role.role_id == _role.id,
-                         _role.name.in_(roles))).\
-        distinct()
+    """Filter a query based on user roles
+
+    Args:
+        query (sqlalchemy.orm.query.Query): query to be filtered
+        cond (sqlalchemy.sql.elements.BooleanClauseList): condition used for
+            the initial model query
+
+    Returns:
+        query (sqlalchemy.orm.query.Query): object with applied conditions
+    """
+    user_role_cond = and_(_user_role.person_id == user_id,
+                          _user_role.context_id == _implications.context_id)
+    role_cond = and_(_user_role.role_id == _role.id,
+                     _role.name.in_(roles))
+    return query.join(_model, cond).join(
+        _implications, _model.context_id == _implications.source_context_id).\
+        join(_user_role, user_role_cond).\
+        join(_role, role_cond).\
+        distinct().\
+        union(query.join(_model, cond).join(_implications,
+              _model.context_id == _implications.context_id).
+              join(_user_role, user_role_cond).
+              join(_role, role_cond).
+              distinct())
 
   def _add_relationship_join(query):
     # We do a UNION here because using an OR to JOIN both destination
