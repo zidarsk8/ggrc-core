@@ -1252,6 +1252,13 @@
         } else {
           instance.removeAttr('_mandatory_attachment_msg');
         }
+        instance.attr(
+            '_mandatory_msg',
+            _.filter([
+              instance.attr('_mandatory_attachment_msg'),
+              instance.attr('_mandatory_comment_msg')
+            ]).join('; <br />') || null
+        );
       });
     },
     related_issues: function () {
