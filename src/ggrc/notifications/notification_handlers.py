@@ -80,7 +80,8 @@ def handle_assignable_modified(obj):
 
   # The transition from "finished" to "in progress" only happens when a task is
   # declined. So this is used as a triger for declined notifications.
-  if history.deleted == [u'Finished'] and history.added == [u'In Progress']:
+  if (history.deleted == [obj.DONE_STATE] and
+     history.added == [obj.PROGRESS_STATE]):
     _add_assignable_declined_notif(obj)
 
 

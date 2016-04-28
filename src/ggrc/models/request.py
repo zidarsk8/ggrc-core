@@ -22,13 +22,15 @@ from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import deferred
+from ggrc.models import mixins_statusable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
 from ggrc.models.comment import Commentable
 from ggrc.models import relationship
 
 
-class Request(AutoStatusChangable, Assignable, Documentable, Personable,
+class Request(mixins_statusable.Statusable,
+              AutoStatusChangable, Assignable, Documentable, Personable,
               CustomAttributable, relationship.Relatable, Titled, Slugged,
               Described, Commentable, FinishedDate, VerifiedDate, Base,
               db.Model):
@@ -44,18 +46,7 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
 
   VALID_TYPES = (u'documentation', u'interview')
 
-  START_STATE = {u'Open'}
-  PROGRESS_STATE = {u'In Progress'}
-  DONE_STATE = {u'Finished'}
-  END_STATES = {u'Verified', u'Final'}
-
-  NOT_DONE_STATES = START_STATE | PROGRESS_STATE
-  DONE_STATES = DONE_STATE | END_STATES
-  VALID_STATES = tuple(NOT_DONE_STATES | DONE_STATES)
   ASSIGNEE_TYPES = (u'Assignee', u'Requester', u'Verifier')
-
-  FIRST_CLASS_EDIT = START_STATE | END_STATES
-  ASSIGNABLE_EDIT = END_STATES
 
   # TODO Remove requestor and requestor_id on database cleanup
   requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))
@@ -64,9 +55,7 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
   # TODO Remove request_type on database cleanup
   request_type = deferred(db.Column(db.Enum(*VALID_TYPES), nullable=False),
                           'Request')
-  # TODO Make status via Stateful Mixin
-  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
-                              default=tuple(START_STATE)[0]), 'Request')
+
   requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   # TODO Remove audit_id audit_object_id on database cleanup

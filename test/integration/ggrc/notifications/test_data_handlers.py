@@ -78,8 +78,8 @@ class TestRequestDataHandlers(converters.TestCase):
 
     # decline request 1
     request1 = Request.query.filter_by(slug="Request 1").first()
-    self.api_helper.modify_object(request1, {"status": "Finished"})
-    self.api_helper.modify_object(request1, {"status": "In Progress"})
+    self.api_helper.modify_object(request1, {"status": Request.DONE_STATE})
+    self.api_helper.modify_object(request1, {"status": Request.PROGRESS_STATE})
 
     notif = self._get_notification(self.request1, "request_declined").first()
     declined_data = self._call_notif_handler(notif)

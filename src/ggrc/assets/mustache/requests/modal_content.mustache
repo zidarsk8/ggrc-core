@@ -11,7 +11,7 @@
   {{> /static/mustache/base_objects/form_restore.mustache}}
 
   {{^if new_object_form}}
-    {{#if_in instance.status "Open,Final,Verified"}}
+    {{#if_in instance.status "Not Started,Completed,Verified"}}
       <div class="alert warning">
         <i class="fa fa-exclamation-triangle red"></i>
         You are about to move request from "{{instance.status}}" to "In Progress".
