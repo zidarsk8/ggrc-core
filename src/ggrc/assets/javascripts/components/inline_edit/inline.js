@@ -63,9 +63,20 @@
             instance.attr(prop, value);
           }
 
-          instance.save().then(function () {
-            this.attr('isSaving', false);
-          }.bind(this));
+          instance.save()
+            .done(function () {
+              $(document.body).trigger('ajax:flash', {
+                success: 'Saved'
+              });
+            })
+            .fail(function () {
+              $(document.body).trigger('ajax:flash', {
+                error: 'There was a problem saving'
+              });
+            })
+            .always(function () {
+              this.attr('isSaving', false);
+            }.bind(this));
         }.bind(this));
       }
     },
