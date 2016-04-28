@@ -5,12 +5,8 @@
   Maintained By: ivan@reciprocitylabs.com
 }}
 
-<select
-  class="{{firstnonempty className 'input-block-level'}}"
-  can-value="{{name}}"
-  can-change="onChange"
-  >
-  {{#options}}
-    <option value="{{value}}" label="{{title}}"></option>
-  {{/options}}
-</select>
+{{#toggle}}
+<div class="spinner">
+  <i class="spinner-icon {{#size}}spinner-size__{{size}}{{/size}}fa fa-spinner fa-pulse" aria-hidden="true"></i>
+</div>
+{{/toggle}}
