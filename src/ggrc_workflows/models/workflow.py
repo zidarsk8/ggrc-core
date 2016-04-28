@@ -10,6 +10,7 @@ of the Objects that are mapped to any cycle tasks.
 """
 
 from datetime import date
+from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import orm
 
@@ -27,7 +28,6 @@ from ggrc.models.person import Person
 from ggrc_basic_permissions.models import UserRole
 from ggrc_workflows.models import cycle
 from ggrc_workflows.models import cycle_task_group
-from ggrc_workflows.models import cycle_task_group_object_task as ctgot
 from ggrc_workflows.models import workflow_person
 
 
@@ -338,7 +338,6 @@ class WorkflowState(object):
     """
     states = [task.status or "Assigned" for task in current_tasks]
 
-    resulting_state = ""
     if states.count("Verified") == len(states):
       resulting_state = "Verified"
     elif states.count("Finished") == len(states):

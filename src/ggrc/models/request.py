@@ -65,8 +65,8 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
   # TODO Make status via Stateful Mixin
   status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
                               default=tuple(START_STATE)[0]), 'Request')
-  requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')
-  due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
+  start_date = deferred(db.Column(db.Date, nullable=False), 'Request')
+  end_date = deferred(db.Column(db.Date, nullable=False), 'Request')
   # TODO Remove audit_id audit_object_id on database cleanup
   audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=True)
   audit_object_id = db.Column(db.Integer, db.ForeignKey('audit_objects.id'),
