@@ -17,14 +17,14 @@
                   class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
                   data-name="status"
                   data-value="Ready for Review">
-            Finish
+            Complete
           </button>
       {{else}}
           <button href="javascript://"
                   class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
                   data-name="status"
                   data-value="Completed">
-            Finish
+            Complete
           </button>
       {{/if_verifiers_defined}}
     {{else}}
@@ -34,7 +34,7 @@
               title="{{instance._mandatory_comment_msg}}
                      {{^if_null instance._mandatory_comment_msg}} | {{/if}}
                      {{instance._mandatory_attachment_msg}}">
-        Finish
+        Complete
       </button>
     {{/if_helpers}}
   {{/if_in}}
@@ -42,7 +42,7 @@
   {{#if_equals instance.status "Ready for Review"}}
     {{#if_verifier instance}}
       <button href="javascript://" class="btn btn-small btn-success pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Verified">Verify</button>
-      <button href="javascript://" class="btn btn-small btn-danger pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="In Progress">Decline</button>
+      <button href="javascript://" class="btn btn-small btn-danger pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="In Progress">Reject</button>
     {{/if_verifier}}
   {{/if_equals}}
 
