@@ -173,14 +173,15 @@ def objects_via_relationships_query(model, roles, user_id, context_not_role):
   _user_role = aliased(all_models.UserRole, name="ur")
 
   def _join_filter(query, cond):
-    """Filters a query based on user roles
+    """Filter a query based on user roles
 
     Args:
-        query: query to be filtered
-        cond: condition used for the initial model query
+        query (sqlalchemy.orm.query.Query): query to be filtered
+        cond (sqlalchemy.sql.elements.BooleanClauseList): condition used for
+            the initial model query
 
     Returns:
-        query object with applied conditions
+        query (sqlalchemy.orm.query.Query): object with applied conditions
     """
     user_role_cond = and_(_user_role.person_id == user_id,
                           _user_role.context_id == _implications.context_id)
