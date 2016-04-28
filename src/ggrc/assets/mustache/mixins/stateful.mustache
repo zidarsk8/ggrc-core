@@ -9,9 +9,7 @@
   <div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
 
   {{#if_in instance.status "Not Started,In Progress"}}
-    {{#if_helpers '\
-      #if_null' instance._mandatory_comment_msg '\
-      and #if_null' instance._mandatory_attachment_msg}}
+    {{#if_null instance._mandatory_msg}}
       {{#if_verifiers_defined instance}}
           <button href="javascript://"
                   class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
@@ -31,12 +29,10 @@
       <button href="javascript://"
               class="btn btn-small btn-primary pull-right btn-info-pin-header disabled"
               rel="tooltip"
-              title="{{instance._mandatory_comment_msg}}
-                     {{^if_null instance._mandatory_comment_msg}} | {{/if}}
-                     {{instance._mandatory_attachment_msg}}">
+              title="{{instance._mandatory_msg}}">
         Complete
       </button>
-    {{/if_helpers}}
+    {{/if_null}}
   {{/if_in}}
 
   {{#if_equals instance.status "Ready for Review"}}
