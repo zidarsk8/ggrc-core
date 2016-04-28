@@ -41,7 +41,7 @@
 
   {{#if_equals instance.status "Ready for Review"}}
     {{#if_verifier instance}}
-      <button href="javascript://" class="btn btn-small btn-success pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Completed">Verify</button>
+      <button href="javascript://" class="btn btn-small btn-success pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="Verified">Verify</button>
       <button href="javascript://" class="btn btn-small btn-danger pull-right btn-info-pin-header {{instance._disabled}}" data-name="status" data-value="In Progress">Decline</button>
     {{/if_verifier}}
   {{/if_equals}}
