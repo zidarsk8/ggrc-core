@@ -52,18 +52,20 @@
           return;
         }
 
-        if (this.attr('caId')) {
-          if (this.attr('type') === 'checkbox') {
-            value = value ? 1 : 0;
-          }
-          instance.attr('custom_attributes.' + caid, value);
-        } else {
-          instance.attr(prop, value);
-        }
-
         this.attr('isSaving', true);
-        instance.save().then(function () {
-          this.attr('isSaving', false);
+        instance.refresh().then(function () {
+          if (this.attr('caId')) {
+            if (this.attr('type') === 'checkbox') {
+              value = value ? 1 : 0;
+            }
+            instance.attr('custom_attributes.' + caid, value);
+          } else {
+            instance.attr(prop, value);
+          }
+
+          instance.save().then(function () {
+            this.attr('isSaving', false);
+          }.bind(this));
         }.bind(this));
       }
     },
