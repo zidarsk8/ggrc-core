@@ -42,8 +42,11 @@
       form.removeAttr('workflow');
       return;
     }
-    if (workflow instanceof can.Stub) {
+    if (workflow.reify) {
       workflow = workflow.reify();
+    } else {
+      console.log("Can't reify workflow");
+      return;
     }
     if (typeof workflow.cycles === undefined || !workflow.cycles) {
       $(document.body).trigger(
