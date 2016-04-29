@@ -1,7 +1,7 @@
 # Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: dan@reciprocitylabs.com
-# Maintained By: peter@reciprocitylabs.com
+# Created By: goodson@google.com
+# Maintained By: goodson@google.com
 
 """Delete responses table and any other references to responses
 
@@ -16,7 +16,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '1257140cbce5'
-down_revision = '33459bd8b70d'
+down_revision = '5599d1769f25'
 
 
 def upgrade():
