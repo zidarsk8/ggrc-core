@@ -6,7 +6,7 @@
 """Make Request First-class object
 
 Revision ID: 27684e5f313a
-Revises: 3c8f204ba7a9
+Revises: 1bad7fe16295
 Create Date: 2015-10-16 17:48:06.875436
 
 """
