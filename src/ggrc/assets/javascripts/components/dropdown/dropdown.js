@@ -24,6 +24,7 @@
       name: '@',
       className: '@',
       onChange: $.noop,
+      noValue: '@',
       /*
         Options list should be an `array` of object containing `title` and `value`
         [{
@@ -32,7 +33,26 @@
         }]
        */
       optionsList: null,
-      isDisabled: '@'
+      isDisabled: '@',
+      options: function () {
+        var none = [{
+          title: 'None',
+          value: ''
+        }];
+        var list = can.map(this.attr('optionsList'), function (option) {
+          if (_.isString(option)) {
+            return {
+              value: option,
+              title: option
+            };
+          }
+          return option;
+        });
+        if (this.attr('noValue')) {
+          return none.concat(list);
+        }
+        return list;
+      }
     }
   });
 })(window.can, window.can.$);

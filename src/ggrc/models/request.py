@@ -22,14 +22,18 @@ from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import deferred
+from ggrc.models import mixins_statusable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
+from ggrc.models.comment import Commentable
 from ggrc.models import relationship
 
 
-class Request(AutoStatusChangable, Assignable, Documentable, Personable,
+class Request(mixins_statusable.Statusable,
+              AutoStatusChangable, Assignable, Documentable, Personable,
               CustomAttributable, relationship.Relatable, Titled, Slugged,
-              Described, FinishedDate, VerifiedDate, Base, db.Model):
+              Described, Commentable, FinishedDate, VerifiedDate, Base,
+              db.Model):
   """Class representing Requests.
 
   Request is an object representing a request from a Requester to Assignee
@@ -42,18 +46,7 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
 
   VALID_TYPES = (u'documentation', u'interview')
 
-  START_STATE = {u'Open'}
-  PROGRESS_STATE = {u'In Progress'}
-  DONE_STATE = {u'Finished'}
-  END_STATES = {u'Verified', u'Final'}
-
-  NOT_DONE_STATES = START_STATE | PROGRESS_STATE
-  DONE_STATES = DONE_STATE | END_STATES
-  VALID_STATES = tuple(NOT_DONE_STATES | DONE_STATES)
   ASSIGNEE_TYPES = (u'Assignee', u'Requester', u'Verifier')
-
-  FIRST_CLASS_EDIT = START_STATE | END_STATES
-  ASSIGNABLE_EDIT = END_STATES
 
   # TODO Remove requestor and requestor_id on database cleanup
   requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))
@@ -62,13 +55,11 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
   # TODO Remove request_type on database cleanup
   request_type = deferred(db.Column(db.Enum(*VALID_TYPES), nullable=False),
                           'Request')
-  # TODO Make status via Stateful Mixin
-  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
-                              default=tuple(START_STATE)[0]), 'Request')
+
   requested_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   due_on = deferred(db.Column(db.Date, nullable=False), 'Request')
   # TODO Remove audit_id audit_object_id on database cleanup
-  audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=True)
+  audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False)
   audit_object_id = db.Column(db.Integer, db.ForeignKey('audit_objects.id'),
                               nullable=True)
   gdrive_upload_path = deferred(db.Column(db.String, nullable=True),
@@ -76,9 +67,6 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
   # TODO Remove test and notes columns on database cleanup
   test = deferred(db.Column(db.Text, nullable=True), 'Request')
   notes = deferred(db.Column(db.Text, nullable=True), 'Request')
-  # TODO Remove responses on database cleanup
-  responses = db.relationship('Response', backref='request',
-                              cascade='all, delete-orphan')
 
   _publish_attrs = [
       'requestor',
@@ -159,8 +147,7 @@ class Request(AutoStatusChangable, Assignable, Documentable, Personable,
   def eager_query(cls):
     query = super(Request, cls).eager_query()
     return query.options(
-        orm.joinedload('audit'),
-        orm.subqueryload('responses'))
+        orm.joinedload('audit'))
 
   @classmethod
   def _filter_by_related_assignees(cls, predicate):

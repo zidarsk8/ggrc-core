@@ -19,6 +19,7 @@ from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import deferred
 from ggrc.models import mixins_reminderable
+from ggrc.models import mixins_statusable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
@@ -26,10 +27,12 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.track_object_state import track_state_for_class
+from ggrc.models.comment import Commentable
 
 
-class Assessment(AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
-                 CustomAttributable, Documentable, Personable,
+class Assessment(mixins_statusable.Statusable,
+                 AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
+                 CustomAttributable, Documentable, Commentable, Personable,
                  mixins_reminderable.Reminderable, Timeboxed,
                  Ownable, Relatable, FinishedDate, VerifiedDate,
                  BusinessObject, db.Model):
@@ -42,33 +45,19 @@ class Assessment(AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
 
   __tablename__ = 'assessments'
 
-  START_STATE = {u'Open'}
-  PROGRESS_STATE = {u'In Progress'}
-  DONE_STATE = {u'Finished'}
-  END_STATES = {u'Verified', u'Final'}
-
-  NOT_DONE_STATES = START_STATE | PROGRESS_STATE
-  DONE_STATES = DONE_STATE | END_STATES
-  VALID_STATES = tuple(NOT_DONE_STATES | DONE_STATES)
   ASSIGNEE_TYPES = (u"Creator", u"Assessor", u"Verifier")
-
-  FIRST_CLASS_EDIT = START_STATE | END_STATES
-  ASSIGNABLE_EDIT = END_STATES
 
   REMINDERABLE_HANDLERS = {
       "statusToPerson": {
           "handler":
               mixins_reminderable.Reminderable.handle_state_to_person_reminder,
           "data": {
-              "Open": "Assessor",
+              mixins_statusable.Statusable.START_STATE: "Assessor",
               "In Progress": "Assessor"
           },
           "reminders": {"assessment_assessor_reminder", }
       }
   }
-
-  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False,
-                    default=tuple(START_STATE)[0]), "Assessment")
 
   design = deferred(db.Column(db.String), "Assessment")
   operationally = deferred(db.Column(db.String), "Assessment")

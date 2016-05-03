@@ -9,7 +9,7 @@
   float: left;
   height: 27px;
   line-height: 27px;
-  margin: 10px 20px 0 46px;
+  margin: 10px 20px 0 0;
   &.single {
     margin: 10px 20px 0 10px;
   }
@@ -55,7 +55,6 @@
 
 .lhn-trigger {
   @include transition(all 0.3s ease);
-  display: block;
   height: 15px;
   width: 16px;
   margin: 16px 30px 0 10px;
