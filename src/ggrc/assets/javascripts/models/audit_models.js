@@ -619,10 +619,11 @@
     after_save: function () {
       // Create a relationship between request & assessment
       // if the request is created from the assessment view page
+      var dfd;
       if (!(this.attr('assessment') && this.attr('assessment').stub)) {
         return;
       }
-      var dfd = new CMS.Models.Relationship({
+      dfd = new CMS.Models.Relationship({
         source: this.attr('assessment').stub(),
         destination: this.stub(),
         context: this.context.stub()
