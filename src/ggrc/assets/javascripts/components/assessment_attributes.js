@@ -32,8 +32,8 @@
         var el = $(this.element);
         var sortables = el.find('li.sortable-item');
 
-        // It's not nices way to rely on DOM for sorting,
-        // but with the time given, was the easiest solution for me
+        // It's not nice way to rely on DOM for sorting,
+        // but it was easiest for implementation
         this.scope.fields.replace(_.map(sortables, function (item) {
           return $(item).data('field');
         }));
@@ -185,17 +185,20 @@
             (_.contains(scope.valueAttrs, type) && !values)) {
           return;
         }
+        // We need to defer adding in modal since validation is preventing
+        // on adding the first item
+        _.defer(function () {
+          fields.push({
+            id: scope.attr('id'),
+            title: title,
+            attribute_type: type,
+            multi_choice_options: values,
+            opts: new can.Map()
+          });
 
-        fields.push({
-          id: scope.attr('id'),
-          title: title,
-          attribute_type: type,
-          multi_choice_options: values,
-          opts: new can.Map()
-        });
-
-        _.each(['title', 'values', 'multi_choice_options'], function (type) {
-          selected.attr(type, '');
+          _.each(['title', 'values', 'multi_choice_options'], function (type) {
+            selected.attr(type, '');
+          });
         });
       }
     },
