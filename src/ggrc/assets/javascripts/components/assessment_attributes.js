@@ -17,6 +17,27 @@
     template: '<content></content>',
     scope: {
       fields: new can.List()
+    },
+    events: {
+      inserted: function () {
+        var el = $(this.element);
+        var list = el.find('.sortable-list');
+        list.sortable({
+          items: 'li.sortable-item',
+          placeholder: 'sortable-placeholder'
+        });
+        list.find('.sortable-item').disableSelection();
+      },
+      '.sortable-list sortstop': function () {
+        var el = $(this.element);
+        var sortables = el.find('li.sortable-item');
+
+        // It's not nices way to rely on DOM for sorting,
+        // but with the time given, was the easiest solution for me
+        this.scope.fields.replace(_.map(sortables, function (item) {
+          return $(item).data('field');
+        }));
+      }
     }
   });
 
