@@ -67,6 +67,7 @@ permissions = {
         "Person",
         "Program",
         "Request",
+        "Revision",
         "Role",
         "UserRole",
         "Context",
