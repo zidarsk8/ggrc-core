@@ -628,7 +628,7 @@
         destination: this.stub(),
         context: this.context.stub()
       }).save();
-      GGRC.delay_leaving_page_until($.when(dfd));
+      GGRC.delay_leaving_page_until(dfd);
     },
     _refresh: function (bindings) {
       var refresh_queue = new RefreshQueue();
