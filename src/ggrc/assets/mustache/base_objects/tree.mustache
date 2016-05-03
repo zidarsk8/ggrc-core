@@ -5,7 +5,11 @@
     Maintained By: brad@reciprocitylabs.com
 }}
 
-  <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
+  <li class="tree-item "
+    data-object-id="{{instance.id}}"
+    data-object-type="{{instance.class.table_singular}}"
+    {{addclass "t-" instance.workflow_state}}>
+
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="item-wrap">
         {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
