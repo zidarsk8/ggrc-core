@@ -6,7 +6,7 @@
 """add relationship attrs
 
 Revision ID: 45693b1959f7
-Revises: 1ef8f4f504ae
+Revises: 3c8f204ba7a9
 Create Date: 2015-10-16 10:28:22.241136
 
 """

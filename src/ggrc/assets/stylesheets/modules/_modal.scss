@@ -345,6 +345,11 @@
     input[type="checkbox"] {
       margin-bottom: 9px;
     }
+    .input--inline {
+      input[type="checkbox"] {
+        margin: -1px 0 0 0;
+      }
+    }
     .checkbox-wrap {
       input[type="checkbox"] {
         display: block;

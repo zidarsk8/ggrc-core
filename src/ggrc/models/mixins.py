@@ -428,7 +428,7 @@ class VerifiedDate(object):
     if (value in self.VERIFIED_STATES and
        self.status not in self.VERIFIED_STATES):
       self.verified_date = datetime.datetime.now()
-      value = "Final"
+      value = self.FINAL_STATE
     elif (value not in self.VERIFIED_STATES and
           value not in self.DONE_STATES and
           (self.status in self.VERIFIED_STATES or

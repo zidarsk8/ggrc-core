@@ -133,27 +133,32 @@ class TestAssignableNotification(converters.TestCase):
 
       request1 = Request.query.get(requests["Request 1"].id)
       # start and finish request 1
-      self.api_helper.modify_object(request1, {"status": "In Progress"})
+      self.api_helper.modify_object(request1,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request1, {"status": "Finished"})
+      self.api_helper.modify_object(request1, {"status": Request.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
       # decline request 1
-      self.api_helper.modify_object(request1, {"status": "In Progress"})
+      self.api_helper.modify_object(request1,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
-      self.api_helper.modify_object(request1, {"status": "Finished"})
+      self.api_helper.modify_object(request1, {"status": Request.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
       # decline request 1 the second time
-      self.api_helper.modify_object(request1, {"status": "In Progress"})
+      self.api_helper.modify_object(request1,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
 
       request6 = Request.query.get(requests["Request 6"].id)
       # start and finish request 6
-      self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.api_helper.modify_object(request6,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
-      self.api_helper.modify_object(request6, {"status": "Finished"})
+      self.api_helper.modify_object(request6, {"status": Request.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
       # decline request 6
-      self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.api_helper.modify_object(request6,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 2)
 
       # send all notifications
@@ -162,16 +167,21 @@ class TestAssignableNotification(converters.TestCase):
 
       # Refresh the object because of the lost session due to the get call.
       request6 = Request.query.get(requests["Request 6"].id)
-      self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.api_helper.modify_object(request6,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request6, {"status": "Finished"})
+      self.api_helper.modify_object(request6,
+                                    {"status": Request.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request6, {"status": "Verified"})
+      self.api_helper.modify_object(request6,
+                                    {"status": Request.VERIFIED_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.api_helper.modify_object(request6,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
       # decline request 6
-      self.api_helper.modify_object(request6, {"status": "Finished"})
+      self.api_helper.modify_object(request6, {"status": Request.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request6, {"status": "In Progress"})
+      self.api_helper.modify_object(request6,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 1)

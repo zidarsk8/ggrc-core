@@ -560,7 +560,7 @@ def handle_cycle_task_group_object_task_put(
   # Doing this regardless of status.history.has_changes() is important in order
   # to update objects that have been declined. It updates the os_last_updated
   # date and last_updated_by via the call to set_internal_object_state.
-  if obj.object_approval:
+  if getattr(obj.task_group_task, 'object_approval', None):
     os_state = None
     status = None
     if obj.status == 'Verified':
