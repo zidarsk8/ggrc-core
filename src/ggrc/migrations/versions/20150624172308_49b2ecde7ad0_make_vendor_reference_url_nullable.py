@@ -6,7 +6,7 @@
 """Make vendor reference_url nullable
 
 Revision ID: 49b2ecde7ad0
-Revises: 1d1e9807c46c
+Revises: 1306a9036135
 Create Date: 2015-06-24 17:23:08.955375
 
 """

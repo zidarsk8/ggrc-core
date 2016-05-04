@@ -55,7 +55,6 @@ class TestRequestMixins(test_mixins_base.TestMixinsBase):
         ('start_date', attributes.InstrumentedAttribute),
         ('requestor', attributes.InstrumentedAttribute),
         ('requestor_id', attributes.InstrumentedAttribute),
-        ('responses', attributes.InstrumentedAttribute),
         ('slug', attributes.InstrumentedAttribute),                     # Slugged       # noqa
         ('status', attributes.InstrumentedAttribute),
         ('test', attributes.InstrumentedAttribute),

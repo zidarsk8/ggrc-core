@@ -6,7 +6,7 @@
 """add automapping id column
 
 Revision ID: 1306a9036135
-Revises: 3261848aaa2b
+Revises: 1d1e9807c46c
 Create Date: 2015-06-05 13:14:56.644865
 
 """

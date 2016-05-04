@@ -5,23 +5,23 @@
  Maintained By: urban@reciprocitylabs.com
  */
 
-(function (can, $) {
+(function (can, $, GGRC) {
   /**
    * A component that takes care of adding comments with attachments
    *
    */
   GGRC.Components('addComment', {
-    tag: "add-comment",
-    template: can.view("/static/mustache/base_templates/add_comment.mustache"),
+    tag: 'add-comment',
+    template: can.view('/static/mustache/base_templates/add_comment.mustache'),
     scope: {
       attachments: new can.List(),
       parent_instance: null,
       instance: null,
-      instance_attr: "@",
+      instance_attr: '@',
       source_mapping: null,
-      source_mapping_source: "@",
-      mapping: "@",
-      deferred: "@",
+      source_mapping_source: '@',
+      mapping: '@',
+      deferred: '@',
       attributes: {},
       list: [],
       // the following are just for the case when we have no object to start with,
@@ -29,13 +29,13 @@
       get_assignee_type: can.compute(function () {
         // TODO: We prioritize order V > A > R
         var types = {
-          related_verifiers: "verifier",
-          related_assignees: "assignee",
-          related_requesters: "requester"
+          related_verifiers: 'verifier',
+          related_assignees: 'assignee',
+          related_requesters: 'requester'
         };
-        var instance = this.attr("parent_instance");
+        var instance = this.attr('parent_instance');
         var user = GGRC.current_user;
-        var userType;
+        var user_type;
 
         if (!instance || !user) {
           return;
@@ -49,49 +49,51 @@
             return mapping.instance.id === user.id;
           }).length) {
             type = can.capitalize(type);
-            userType = userType ? (userType + "," + type) : type;
+            user_type = user_type ? (user_type + ',' + type) : type;
           }
         });
-        return userType;
+        return user_type;
       })
     },
     events: {
       init: function () {
-        if (!this.scope.attr("source_mapping")) {
-          this.scope.attr("source_mapping", GGRC.page_instance());
+        if (!this.scope.attr('source_mapping')) {
+          this.scope.attr('source_mapping', GGRC.page_instance());
         }
         this.newInstance();
       },
       newInstance: function () {
         var instance = CMS.Models.Comment();
-        instance._source_mapping = this.scope.attr("source_mapping");
-        instance.attr("context", this.scope.attr('parent_instance.context'));
-        this.scope.attr("instance", instance);
+        instance._source_mapping = this.scope.attr('source_mapping');
+        instance.attr('context', this.scope.attr('parent_instance.context'));
+        this.scope.attr('instance', instance);
       },
       cleanPanel: function () {
         this.scope.attachments.replace([]);
-        this.element.find("textarea").val("");
+        this.element.find('textarea').val('');
       },
-
       /**
        * The component's click event (happens when the user clicks add comment),
        * takes care of saving the comment with appended evidence.
        */
-      ".btn-success click": function () {
-        var $textarea = this.element.find(".add-comment textarea");
+      '.btn-success click': function (el, ev) {
+        var $textarea = this.element.find('.add-comment textarea');
         var description = $.trim($textarea.val());
+        var attachments = this.scope.attachments;
         var source = this.scope.source_mapping;
         var instance = this.scope.instance;
-        var attachments = instance._pending_joins;
         var data;
+        var $sendNotification = this.element.find('[name=send_notification]');
+        var sendNotification = $sendNotification[0].checked;
 
         if (!description.length && !attachments.length) {
           return;
         }
         data = {
           description: description,
+          send_notification: sendNotification,
           context: source.context,
-          assignee_type: this.scope.attr("get_assignee_type")
+          assignee_type: this.scope.attr('get_assignee_type')
         };
         instance.attr(data).save().then(function () {
           return instance.constructor.resolve_deferred_bindings(instance);
@@ -103,8 +105,7 @@
     }
   });
 
-  can.Control("GGRC.Controllers.Comments", {
-
+  can.Control('GGRC.Controllers.Comments', {
   }, {
     _create_relationship: function (source, destination) {
       if (!destination) {
@@ -117,17 +118,17 @@
         context: source.context
       }).save();
     },
-    "{CMS.Models.Comment} created": function (model, ev, instance) {
+    '{CMS.Models.Comment} created': function (model, ev, instance) {
       if (!(instance instanceof CMS.Models.Comment)) {
         return;
       }
       var source = instance._source_mapping || GGRC.page_instance();
-      var parentDfd = this._create_relationship(source, instance);
-      instance.delay_resolving_save_until($.when(parentDfd));
+      var parent_dfd = this._create_relationship(source, instance);
+      instance.delay_resolving_save_until($.when(parent_dfd));
     }
   });
 
   $(function () {
     $(document.body).ggrc_controllers_comments();
   });
-})(this.can, this.can.$);
+})(this.can, this.can.$, this.GGRC);
