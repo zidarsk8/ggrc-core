@@ -617,18 +617,18 @@
       return this._super.apply(this, arguments);
     },
     after_save: function () {
-      // Create a relationship between request & assessment & control
-      var dfds = can.map(['control', 'assessment'], function (obj) {
-        if (!(this.attr(obj) && this.attr(obj).stub)) {
-          return undefined;
-        }
-        return new CMS.Models.Relationship({
-          source: this.attr(obj).stub(),
-          destination: this.stub(),
-          context: this.context.stub()
-        }).save();
-      }.bind(this));
-      GGRC.delay_leaving_page_until($.when.apply($, dfds));
+      // Create a relationship between request & assessment
+      // if the request is created from the assessment view page
+      var dfd;
+      if (!(this.attr('assessment') && this.attr('assessment').stub)) {
+        return;
+      }
+      dfd = new CMS.Models.Relationship({
+        source: this.attr('assessment').stub(),
+        destination: this.stub(),
+        context: this.context.stub()
+      }).save();
+      GGRC.delay_leaving_page_until(dfd);
     },
     _refresh: function (bindings) {
       var refresh_queue = new RefreshQueue();
