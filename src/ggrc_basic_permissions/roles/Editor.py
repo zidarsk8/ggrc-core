@@ -49,6 +49,7 @@ permissions = {
         "Process",
         "Person",
         "Program",
+        "Revision",
         "Role",
         "Request",
         "Context",
