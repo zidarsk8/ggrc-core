@@ -141,10 +141,11 @@
       CycleTaskGroupObjectTask: {
         _canonical: {
           related_objects_as_source: [
-            'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process', 'Product',
-            'Project', 'System', 'Regulation', 'Policy', 'Contract', 'Standard',
-            'Program', 'Issue', 'Control', 'Section', 'Clause', 'Objective',
-            'Audit', 'Assessment', 'AccessGroup', 'Request', 'Document'
+            'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
+            'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
+            'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
+            'Objective', 'Audit', 'Assessment', 'AccessGroup', 'Request',
+            'Document', 'Risk', 'Threat'
           ]
         },
         related_objects_as_source: Proxy(
@@ -293,12 +294,14 @@
       treeWidgets[type] = treeWidgets[type].concat(['TaskGroup', 'Workflow',
         'CycleTaskEntry', 'CycleTaskGroupObjectTask', 'CycleTaskGroupObject',
         'CycleTaskGroup']);
-      subTrees[type].display_list = subTrees[type].display_list
-        .concat(['CycleTaskGroupObjectTask']);
-      subTrees[type].model_list = subTrees[type].model_list.concat({
-        display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
-        display_status: true,
-        model_name: 'CycleTaskGroupObjectTask'});
+      if (!_.isEmpty(subTrees)) {
+        subTrees[type].display_list = subTrees[type].display_list
+          .concat(['CycleTaskGroupObjectTask']);
+        subTrees[type].model_list = subTrees[type].model_list.concat({
+          display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
+          display_status: true,
+          model_name: 'CycleTaskGroupObjectTask'});
+      }
     });
 
     if (pageInstance instanceof CMS.Models.Workflow) {
@@ -345,6 +348,8 @@
             show_view: GGRC.mustache_path + '/cycle_task_group_object_tasks/tree.mustache',
             header_view: GGRC.mustache_path + '/cycle_task_group_object_tasks/tree_header.mustache',
             footer_view: GGRC.mustache_path + '/cycle_task_group_object_tasks/tree_footer.mustache',
+            add_item_view: GGRC.mustache_path +
+              '/cycle_task_group_object_tasks/tree_add_item.mustache',
             sort_property: null,
             sort_function: _task_sort_function,
             draw_children: true,
@@ -492,7 +497,9 @@
             parent_instance: object,
             model: 'Cycle',
             mapping: 'current_cycle',
-            header_view: GGRC.mustache_path + '/cycles/tree_header.mustache'
+            header_view: GGRC.mustache_path + '/cycles/tree_header.mustache',
+            add_item_view: GGRC.mustache_path +
+              '/cycle_task_group_object_tasks/tree_add_item.mustache'
           }
         };
         new_widget_descriptors.history = history_widget_descriptor;

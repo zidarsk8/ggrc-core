@@ -70,12 +70,12 @@
       <div class="row-fluid">
         <div class="span6">
           <label>
-            Requested On
+            Starts On
             <span class="required">*</span>
           </label>
           <div class="input-group">
             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-            <input tabindex="4" class="input-block-level date" name="requested_on" data-toggle="datepicker" data-before="due_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date requested_on}}">
+            <input tabindex="4" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
           </div>
         </div>
         <div class="span6">
@@ -85,7 +85,7 @@
           </label>
           <div class="input-group">
             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-            <input tabindex="5" class="input-block-level date" name="due_on" data-toggle="datepicker" data-after="requested_on" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
+            <input tabindex="5" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
           </div>
         </div>
       </div>

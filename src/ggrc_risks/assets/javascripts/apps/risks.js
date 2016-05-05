@@ -111,7 +111,13 @@
       Person: {
         owned_risks: Indirect("Risk", "contact"),
         owned_threats: Indirect("Threat", "contact"),
-      },
+        all_risks: Search(function (binding) {
+          return CMS.Models.Risk.findAll({});
+        }),
+        all_threats: Search(function (binding) {
+          return CMS.Models.Threat.findAll({});
+        })
+      }
     };
 
     can.each(_risk_object_types, function (type) {
@@ -137,7 +143,9 @@
           var model = CMS.Models[type] || {};
           return model.title_plural || type;
         });
-
+    if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
+      related_or_owned = 'all_';
+    }
     // Init widget descriptors:
     can.each(sorted_widget_types, function (model_name) {
       var widgets_by_type = GGRC.tree_view.base_widgets_by_type,

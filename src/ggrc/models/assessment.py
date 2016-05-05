@@ -8,18 +8,19 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.models import mixins_reminderable
+from ggrc.models import mixins_statusable
 from ggrc.models import reflection
-from ggrc.models.mixins_assignable import Assignable
+from ggrc.models.comment import Commentable
 from ggrc.models.mixin_autostatuschangable import AutoStatusChangable
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import FinishedDate
-from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import deferred
-from ggrc.models import mixins_reminderable
-from ggrc.models import mixins_statusable
+from ggrc.models.mixins_assignable import Assignable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
@@ -27,7 +28,6 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.track_object_state import track_state_for_class
-from ggrc.models.comment import Commentable
 
 
 class Assessment(mixins_statusable.Statusable,

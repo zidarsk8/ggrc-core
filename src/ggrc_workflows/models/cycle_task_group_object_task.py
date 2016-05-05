@@ -45,7 +45,7 @@ class CycleTaskGroupObjectTask(
   cycle_task_group_id = db.Column(
       db.Integer, db.ForeignKey('cycle_task_groups.id'), nullable=False)
   task_group_task_id = db.Column(
-      db.Integer, db.ForeignKey('task_group_tasks.id'), nullable=False)
+      db.Integer, db.ForeignKey('task_group_tasks.id'), nullable=True)
   task_group_task = db.relationship(
       "TaskGroupTask",
       foreign_keys="CycleTaskGroupObjectTask.task_group_task_id"
@@ -125,6 +125,8 @@ class CycleTaskGroupObjectTask(
 
   @computed_property
   def related_objects(self):
+    """Lists all the objects related to this cycle task.
+    """
     # pylint: disable=not-an-iterable
     sources = [r.source for r in self.related_sources]
     destinations = [r.destination for r in self.related_destinations]

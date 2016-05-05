@@ -556,6 +556,9 @@
           font-size: $f-regular;
         }
       }
+      &.bottom-no-margin {
+        margin-bottom:0px;
+      }
     }
     .selector-info {
       h4.simple-url {

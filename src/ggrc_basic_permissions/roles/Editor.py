@@ -64,7 +64,7 @@ permissions = {
     ],
     "create": [
         "Audit",
-        "Workflow"
+        "Workflow",
         "Categorization",
         "Category",
         "Comment",
@@ -173,7 +173,7 @@ permissions = {
     ],
     "delete": [
         "Audit",
-        "Workflow"
+        "Workflow",
         "Categorization",
         "Category",
         "Comment",
