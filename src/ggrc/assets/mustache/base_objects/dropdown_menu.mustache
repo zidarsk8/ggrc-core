@@ -76,7 +76,11 @@
     </li>
 
     <li>
-      <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_for_object instance}}" />
+      <clipboard-link
+              data-test-id="dropdown_settings_get_permalink_75e3bf91"
+              title="Get permalink"
+              notify="true"
+              text="{{get_permalink_for_object instance}}" />
     </li>
 
     {{#is_info_pin}}
@@ -100,7 +104,7 @@
 
     {{#is_allowed 'delete' instance}}
       <li>
-        <a data-test-id="dropdown_delete_0839163b"
+        <a data-test-id="dropdown_settings_delete_6a62eaaf"
            data-toggle="modal-ajax-deleteform"
            data-object-plural="{{model.table_plural}}"
            data-object-singular="{{model.model_singular}}"
