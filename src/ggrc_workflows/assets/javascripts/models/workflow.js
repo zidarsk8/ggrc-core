@@ -27,7 +27,8 @@
         {title: 'Monthly', value: 'monthly'},
         {title: 'Quarterly', value: 'quarterly'},
         {title: 'Annually', value: 'annually'}
-      ]
+      ],
+      frequency: 'one_time' // default value
     },
 
     attributes: {

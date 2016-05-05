@@ -63,7 +63,7 @@
             name="instance.frequency"
             data-id="frequency_dd"
             tabindex="4"
-            is-disabled="new_object_form"
+            {{^new_object_form}}is-disabled="true"{{/new_object_form}}
           ></dropdown>
         </div>
       </div>
