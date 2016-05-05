@@ -351,6 +351,35 @@ Mustache.registerHelper("if_null", function (val1, options) {
     return options.inverse(options.context);
   });
 
+  /**
+   * Return the value of the given object's property.
+   *
+   * If the first argument is not an object, an error is raised.
+   *
+   * @param {Object | Function} object - the object itself
+   * @param {String | Function} key - the name of the property to retrieve
+   * @param {Object} options - the Mustache options object
+   *
+   * @return {*} - the value of the property object[key]
+   */
+  Mustache.registerHelper('get_item', function (object, key, options) {
+    if (arguments.length !== 3) {
+      throw new Error(
+        'Invalid number of arguments (' +
+        (arguments.length - 1) +  // do not count the auto-provided options arg
+        '), expected 2.');
+    }
+
+    object = Mustache.resolve(object);
+
+    if (!_.isObject(object)) {
+      throw new Error('First argument must be an object.');
+    }
+
+    key = Mustache.resolve(key);
+    return object[key];
+  });
+
 // Resolve and return the first computed value from a list
 Mustache.registerHelper("firstexist", function () {
   var args = can.makeArray(arguments).slice(0, arguments.length - 1);  // ignore the last argument (some Can object)
