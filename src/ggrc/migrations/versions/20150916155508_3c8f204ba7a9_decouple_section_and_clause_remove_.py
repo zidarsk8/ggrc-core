@@ -6,7 +6,7 @@
 """Decouple section and clause, remove directive foreign key, remove type
 
 Revision ID: 3c8f204ba7a9
-Revises: 29dca3ce0556
+Revises: 39be15719884
 Create Date: 2015-09-16 15:55:08.889667
 
 """

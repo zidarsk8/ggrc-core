@@ -6,7 +6,7 @@
 """Add Comments
 
 Revision ID: 4cd52e0a17b8
-Revises: 3c8f204ba7a9
+Revises: 45693b1959f7
 Create Date: 2015-10-23 13:00:18.555497
 
 """

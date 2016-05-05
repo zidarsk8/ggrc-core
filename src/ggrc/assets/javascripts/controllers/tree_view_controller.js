@@ -1458,7 +1458,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       }
     }
   }
-
 });
 
 can.Control('CMS.Controllers.TreeViewNode', {
@@ -1522,16 +1521,38 @@ can.Control('CMS.Controllers.TreeViewNode', {
       this.draw_node();
     }
   },
+
+  /**
+   * Trigger rendering the tree node in the DOM.
+   */
   draw_node: function () {
+    var isActive;
+
     if (this._draw_node_in_progress) {
       return;
     }
+
     this._draw_node_in_progress = true;
     this.add_child_lists_to_child();
-    can.view(this.options.show_view, this.options, this._ifNotRemoved(function (frag) {
-      this.replace_element(frag);
-      this._draw_node_deferred.resolve();
-    }.bind(this)));
+
+    // the node's isActive state is not stored anywhere, thus we need to
+    // determine it from the presemce of the corresponding CSS class
+    isActive = this.element.hasClass('active');
+
+    can.view(
+      this.options.show_view,
+      this.options,
+      this._ifNotRemoved(function (frag) {
+        this.replace_element(frag);
+
+        if (isActive) {
+          this.element.addClass('active');
+        }
+
+        this._draw_node_deferred.resolve();
+      }.bind(this))
+    );
+
     this._draw_node_in_progress = false;
     this.options.attr('is_subtree',
         this.element && this.element.closest('.inner-tree').length > 0);
@@ -1713,10 +1734,16 @@ can.Control('CMS.Controllers.TreeViewNode', {
     }
   },
 
+  /**
+   * Mark the tree node as active (and all other tree nodes as inactive).
+   */
   select: function () {
     var $tree = this.element;
 
-    $tree.closest('section').find('.cms_controllers_tree_view_node').removeClass('active');
+    $tree.closest('section')
+      .find('.cms_controllers_tree_view_node')
+      .removeClass('active');
+
     $tree.addClass('active');
 
     this.update_hash_fragment();

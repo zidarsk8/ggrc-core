@@ -6,6 +6,10 @@
  */
 
 (function (can, $, GGRC) {
+  /**
+   * A component that takes care of adding comments with attachments
+   *
+   */
   GGRC.Components('addComment', {
     tag: 'add-comment',
     template: can.view('/static/mustache/base_templates/add_comment.mustache'),
@@ -68,6 +72,10 @@
         this.scope.attachments.replace([]);
         this.element.find('textarea').val('');
       },
+      /**
+       * The component's click event (happens when the user clicks add comment),
+       * takes care of saving the comment with appended evidence.
+       */
       '.btn-success click': function (el, ev) {
         var $textarea = this.element.find('.add-comment textarea');
         var description = $.trim($textarea.val());

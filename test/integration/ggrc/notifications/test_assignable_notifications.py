@@ -101,13 +101,13 @@ class TestAssignableNotification(converters.TestCase):
 
       request = Request.query.get(requests["Request 9"].id)
 
-      self.api_helper.modify_object(request, {"status": "Final"})
+      self.api_helper.modify_object(request, {"status": "Completed"})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request, {"status": "Open"})
+      self.api_helper.modify_object(request, {"status": "Not Started"})
       self.assertEqual(self._get_notifications().count(), 0)
       self.api_helper.modify_object(request, {"status": "In Progress"})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request, {"status": "Final"})
+      self.api_helper.modify_object(request, {"status": "Completed"})
       self.assertEqual(self._get_notifications().count(), 0)
       self.api_helper.modify_object(request, {"status": "In Progress"})
       self.assertEqual(self._get_notifications().count(), 0)
