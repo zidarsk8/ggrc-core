@@ -27,8 +27,8 @@ def init_hook():
     """Apply custom attribute definitions and map people roles
     when generating Assessmet with template"""
 
-    map_object(src["object"], obj)
-    map_object(src["audit"], obj)
+    map_object(src.get("object", None), obj)
+    map_object(src.get("audit", None), obj)
 
     if not src.get("template", None):
       return
@@ -44,6 +44,8 @@ def init_hook():
 
 def map_object(obj, assessment):
   """Creates a relationship object and generates automappings"""
+  if not obj:
+    return
   rel = Relationship(**{
       "source": assessment,
       "destination_id": obj["id"],
