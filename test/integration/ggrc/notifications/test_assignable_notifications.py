@@ -101,15 +101,17 @@ class TestAssignableNotification(converters.TestCase):
 
       request = Request.query.get(requests["Request 9"].id)
 
-      self.api_helper.modify_object(request, {"status": "Completed"})
+      self.api_helper.modify_object(request, {"status": Request.FINAL_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request, {"status": "Not Started"})
+      self.api_helper.modify_object(request, {"status": Request.START_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request, {"status": "In Progress"})
+      self.api_helper.modify_object(request,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request, {"status": "Completed"})
+      self.api_helper.modify_object(request, {"status": Request.FINAL_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request, {"status": "In Progress"})
+      self.api_helper.modify_object(request,
+                                    {"status": Request.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
 
   @patch("ggrc.notifications.common.send_email")
