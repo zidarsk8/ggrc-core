@@ -58,6 +58,7 @@
           template);
         var title = object.title + ' assessment for ' + this.scope.audit.title;
         var data = {
+          _generated: true,
           audit: this.scope.audit,
           object: object.stub(),
           context: this.scope.audit.context,
