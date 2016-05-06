@@ -1528,7 +1528,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
   draw_node: function () {
     var isActive;
 
-    if (this._draw_node_in_progress) {
+    if (this._draw_node_in_progress || !this.element) {
       return;
     }
 
