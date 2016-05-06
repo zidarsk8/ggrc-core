@@ -149,6 +149,7 @@ dashboard-js-files:
   - components/add_comment/add_comment.js
   - components/inline_edit/inline_person.js
   - components/inline_edit/inline_datepicker.js
+  - components/cloner.js
   #- d3.v2.js
   #- related_graph.js
 
