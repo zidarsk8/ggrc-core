@@ -12,10 +12,11 @@
 
 from ggrc import db
 from ggrc.login import get_current_user_id
+from ggrc.automapper import AutomapperGenerator
+from ggrc.models import all_models
 from ggrc.models import Assessment
 from ggrc.models import Person
 from ggrc.models import Relationship
-from ggrc.models import all_models
 from ggrc.services.common import Resource
 
 
@@ -28,6 +29,9 @@ def init_hook():
     """Apply custom attribute definitions and map people roles
     when generating Assessmet with template"""
 
+    map_object(src["object"], obj)
+    map_object(src["audit"], obj)
+
     if not src.get("_generated", False):
       return
 
@@ -38,6 +42,18 @@ def init_hook():
     }
     relate_assignees(obj, related)
     relate_ca(obj, related)
+
+
+def map_object(obj, assessment):
+  """Creates a relationship object and generates automappings"""
+  rel = Relationship(**{
+      "source": assessment,
+      "destination_id": obj["id"],
+      "destination_type": obj["type"],
+      "context": assessment.context,
+  })
+  AutomapperGenerator().generate_automappings(rel)
+  db.session.add(rel)
 
 
 def get_by_id(obj):
