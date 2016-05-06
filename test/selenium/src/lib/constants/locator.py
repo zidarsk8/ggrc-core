@@ -49,14 +49,14 @@ class Dashboard(object):
   """Locators for the dashbord page"""
 
   BUTTON_START_NEW_PROGRAM = (
-      By.CSS_SELECTOR, '.quick-list [data-object-singular="Program"]')
+      By.CSS_SELECTOR, '.get-started__list [data-object-singular="Program"]')
   BUTTON_START_NEW_AUDIT = (
-      By.CSS_SELECTOR, '.quick-list [data-object-singular="Audit"]')
+      By.CSS_SELECTOR, '.get-started__list [data-object-singular="Audit"]')
   BUTTON_START_NEW_WORKFLOW = (
-      By.CSS_SELECTOR, '.quick-list [data-object-singular="Workflow"]')
+      By.CSS_SELECTOR, '.get-started__list [data-object-singular="Workflow"]')
   BUTTON_CREATE_NEW_OBJECT = (
-      By.CSS_SELECTOR, '.quick-list [href="#"]')
-  BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR, '.quick-list '
+      By.CSS_SELECTOR, '.get-started__list [href="#"]')
+  BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR, '.get-started__list '
                                          '[href="/objectBrowser"]')
 
 
