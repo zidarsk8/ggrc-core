@@ -41,9 +41,15 @@ class CycleTaskGroupObjectTask(
                   'Finished', 'Declined', 'Verified')
 
   cycle_id = db.Column(
-      db.Integer, db.ForeignKey('cycles.id'), nullable=False)
+      db.Integer,
+      db.ForeignKey('cycles.id', ondelete="CASCADE"),
+      nullable=False,
+  )
   cycle_task_group_id = db.Column(
-      db.Integer, db.ForeignKey('cycle_task_groups.id'), nullable=False)
+      db.Integer,
+      db.ForeignKey('cycle_task_groups.id', ondelete="CASCADE"),
+      nullable=False,
+  )
   task_group_task_id = db.Column(
       db.Integer, db.ForeignKey('task_group_tasks.id'), nullable=True)
   task_group_task = db.relationship(
@@ -125,7 +131,13 @@ class CycleTaskGroupObjectTask(
 
   @computed_property
   def related_objects(self):
-    """Lists all the objects related to this cycle task.
+    """Compute and return a list of all the objects related to this cycle task.
+
+    Related objects are those that are found either on the "source" side, or
+    on the "destination" side of any of the instance's relations.
+
+    Returns:
+      (list) All objects related to the instance.
     """
     # pylint: disable=not-an-iterable
     sources = [r.source for r in self.related_sources]
