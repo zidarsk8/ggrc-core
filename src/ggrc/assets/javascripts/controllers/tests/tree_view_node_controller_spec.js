@@ -41,6 +41,11 @@ describe('CMS.Controllers.TreeViewNode', function () {
       spyOn(can, 'view');
     });
 
+    it('doesn\'t render if DOM element is null', function () {
+      ctrlInst.element = undefined;
+      expect(method()).toBe(undefined);
+    });
+
     it('renders the DOM element with the "active" CSS class if node active',
       function () {
         var callArgs;
