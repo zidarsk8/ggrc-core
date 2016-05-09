@@ -1109,7 +1109,6 @@
       people_values: [
         {value: 'Object Owners', title: 'Object Owners'},
         {value: 'Audit Lead', title: 'Audit Lead'},
-        {value: 'Object Contact', title: 'Object Contact'},
         {value: 'Primary Assessor', title: 'Principal Assessor'},
         {value: 'Secondary Assessors', title: 'Secondary Assessors'},
         {value: 'Primary Contact', title: 'Primary Contact'},

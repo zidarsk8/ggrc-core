@@ -76,7 +76,6 @@ def get_value(which, audit, obj, template=None):
           owner.person for owner in getattr(obj, 'object_owners', None)
       ],
       "Audit Lead": getattr(audit, 'contact', None),
-      "Object Contact": getattr(obj, 'contact', None),
       "Primary Contact": getattr(obj, 'contact', None),
       "Secondary Contact": getattr(obj, 'secondary_contact', None),
       "Primary Assessor": getattr(obj, 'principal_assessor', None),
