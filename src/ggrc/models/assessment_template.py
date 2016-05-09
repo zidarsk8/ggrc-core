@@ -66,7 +66,11 @@ class AssessmentTemplate(Slugged, Base, relationship.Relatable, Titled,
     return "TEMPLATE"
 
   def _clone(self):
-    """Assessment Template object clone"""
+    """Clone Assessment Template.
+
+    Returns:
+      Instance of assessment template copy.
+    """
     data = {
         "title": self.title,
         "template_object_type": self.template_object_type,
