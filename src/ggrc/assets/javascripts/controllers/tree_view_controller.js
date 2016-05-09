@@ -1696,12 +1696,21 @@ can.Control('CMS.Controllers.TreeViewNode', {
     return $.when.apply($, child_tree_dfds);
   },
 
+  /**
+   * Expand the tree node to make its subnodes visible.
+   *
+   * @return {can.Deferred} - a deferred object resolved when all the child
+   *   nodes have been loaded and displayed
+   */
   expand: function () {
     var that = this;
-    if (this._expand_deferred) {
-      //  If we've already expanded, then short-circuit the call.  However,
-      //  we still need to toggle `expanded`, but if it's the first time
-      //  expanding, `this.add_child_lists_to_child` *must* be called first.
+    var $el = this.element;
+
+    if (this._expand_deferred && $el.find('.openclose').is('.active')) {
+      // If we have already expanded and are currently still expanded, then
+      // short-circuit the call. However, we still need to toggle `expanded`,
+      // but if it's the first time expanding, `this.add_child_lists_to_child`
+      // *must* be called first.
       this.options.attr('expanded', true);
       return this._expand_deferred;
     }
@@ -1739,6 +1748,10 @@ can.Control('CMS.Controllers.TreeViewNode', {
    */
   select: function () {
     var $tree = this.element;
+
+    if ($tree.hasClass('active')) {
+      return;  // tree node already selected, no need to activate it again
+    }
 
     $tree.closest('section')
       .find('.cms_controllers_tree_view_node')
