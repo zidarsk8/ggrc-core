@@ -324,8 +324,54 @@
           }
         }
       }.bind(this));
-
+      diff.changes = diff.changes.concat(
+          this._objectCADiff(
+            rev1.content.custom_attributes,
+            rev1.content.custom_attribute_definitions,
+            rev2.content.custom_attributes,
+            rev2.content.custom_attribute_definitions));
       return diff;
+    },
+
+    _objectCADiff: function (origValues, origDefs, newValues, newDefs) {
+      var ids;
+      var defs;
+      var showValue = function (value, def) {
+        var obj;
+        switch (def.attribute_type) {
+          case 'Checkbox':
+            return value.attribute_value ? '✓' : undefined;
+          case 'Map:Person':
+            obj = CMS.Models.Person.findInCacheById(value.attribute_object_id);
+            if (obj === undefined) {
+              return value.attribute_value;
+            }
+            return obj.name || obj.email || value.attribute_value;
+          default:
+            return value.attribute_value;
+        }
+      };
+
+      origValues = _.indexBy(origValues, 'custom_attribute_id');
+      origDefs = _.indexBy(origDefs, 'id');
+      newValues = _.indexBy(newValues, 'custom_attribute_id');
+      newDefs = _.indexBy(newDefs, 'id');
+
+      ids = _.unique(_.keys(origValues).concat(_.keys(newValues)));
+      defs = _.merge(origDefs, newDefs);
+
+      return _.chain(ids).map(function (id) {
+        var def = defs[id];
+        var diff = {
+          fieldName: def.title,
+          origVal: showValue(origValues[id] || {}, def) || '—',
+          newVal: showValue(newValues[id] || {}, def) || '—'
+        };
+        if (diff.origVal === diff.newVal) {
+          return undefined;
+        }
+        return diff;
+      }).filter().value();
     },
 
     /**
