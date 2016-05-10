@@ -6,7 +6,7 @@
 """Make section and clause titles unique
 
 Revision ID: 18cbdd3a7fd9
-Revises: 27684e5f313a
+Revises: 3c1619ff36e8
 Create Date: 2015-11-17 20:13:55.593299
 
 """

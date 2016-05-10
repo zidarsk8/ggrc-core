@@ -183,4 +183,22 @@
     }, workflow_dfd);
   });
 
+  /*
+   if_recurring_workflow mustache helper
+
+   Given an object, it  determines if it's a workflow, and if it's a recurring
+   workflow or not.
+
+   @param object - the object we want to check
+   */
+  Mustache.registerHelper("if_recurring_workflow", function (object, options) {
+    object = Mustache.resolve(object);
+    if (object.type === 'Workflow' &&
+        _.includes(['weekly', 'monthly', 'quarterly', 'annually'],
+                   object.frequency)) {
+      return options.fn(this);
+    } else {
+      return options.inverse(this);
+    }
+  });
 })(this.can, this.can.$, this.Mustache);

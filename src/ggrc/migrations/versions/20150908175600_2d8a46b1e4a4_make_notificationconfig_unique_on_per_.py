@@ -6,7 +6,7 @@
 """Make NotificationConfig unique on per-type + per-person basis
 
 Revision ID: 2d8a46b1e4a4
-Revises: 49b2ecde7ad0
+Revises: 3046ce611147
 Create Date: 2015-09-08 17:56:00.151641
 
 """
