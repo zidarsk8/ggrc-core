@@ -23,13 +23,15 @@ down_revision = '3715694bd315'
 def upgrade():
     """Upgrade database schema and/or data, creating a new revision."""
     op.execute(
-        'DELETE FROM relationships '
-        'WHERE source_type IN '
-        '  ("Response", "DocumentationResponse", "InterviewResponse",'
-        '   "PopulationSampleResponse") '
-        '  OR destination_type IN '
-        '    ("Response", "DocumentationResponse", "InterviewResponse", '
-        '     "PopulationSampleResponse")')
+        """
+        DELETE FROM relationships
+        WHERE source_type IN 
+          ("Response", "DocumentationResponse", "InterviewResponse",
+           "PopulationSampleResponse")
+          OR destination_type IN
+            ("Response", "DocumentationResponse", "InterviewResponse",
+             "PopulationSampleResponse")
+        """)
 
 
 def downgrade():
