@@ -140,9 +140,27 @@ class AutoStatusChangable(object):
     Returns:
       Nothing.
     """
+    adjust_state = False
+
     history = inspect(rel).attrs.relationship_attrs.history
-    if (history.has_changes() and
+    added = inspect(rel).attrs.relationship_attrs.history.added
+    deleted = inspect(rel).attrs.relationship_attrs.history.deleted
+    attr_changed = ({ra.attr_name for ra in deleted} |
+                    {ra.attr_name for ra in added})
+
+    # When object attributes are added or edited, adjust. If user still has
+    # some other role, operation is considered edit. has_changes is required to
+    # detect addition.
+    if ("AssigneeType" in attr_changed and
+       history.has_changes() and
        obj.status in model.ASSIGNABLE_EDIT):
+      adjust_state = True
+
+    # When user has no more roles on an object, relationship is deleted.
+    if inspect(rel).deleted:
+      adjust_state = True
+
+    if adjust_state:
       cls.adjust_status(model, obj)
 
   @classmethod
@@ -190,7 +208,8 @@ class AutoStatusChangable(object):
 
     @common.Resource.model_posted.connect_via(relationship.Relationship)
     @common.Resource.model_put.connect_via(relationship.Relationship)
-    def handle_relationship_post(sender, obj=None, src=None, service=None):
+    @common.Resource.model_deleted.connect_via(relationship.Relationship)
+    def handle_relationship(sender, obj=None, src=None, service=None):
       """Handle creation of relationships that can change object status.
 
       Adding or removing assigable persons (Assignees, Requesters, Creators,
@@ -220,6 +239,8 @@ class AutoStatusChangable(object):
             handlers[k](model, target_object, obj)
 
     @common.Resource.model_posted.connect_via(
+        object_document.ObjectDocument)
+    @common.Resource.model_deleted.connect_via(
         object_document.ObjectDocument)
     def handle_objectdocument_post(sender, obj=None, src=None, service=None):
       """Handles creation of URLs
