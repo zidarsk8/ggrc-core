@@ -29,8 +29,8 @@ def init_hook():
     """Apply custom attribute definitions and map people roles
     when generating Assessmet with template"""
 
-    map_object(src.get("object", None), obj)
-    map_object(src.get("audit", None), obj)
+    map_assessment(obj, src.get("object"))
+    map_assessment(obj, src.get("audit"))
 
     if not src.get("_generated", False):
       return
@@ -44,9 +44,19 @@ def init_hook():
     relate_ca(obj, related)
 
 
-def map_object(obj, assessment):
-  """Creates a relationship object and generates automappings"""
-  if not obj:
+def map_assessment(assessment, obj):
+  """Creates a relationship between an assessment and an object. This also
+  generates automappings. Fails silently if obj dict does not have id and type
+  keys.
+
+  Args:
+    assessment (models.Assessment): The assessment model
+    obj (dict): A dict with `id` and `type`.
+  Returns:
+    None
+  """
+  obj = obj or {}
+  if 'id' not in obj or 'type' not in obj:
     return
   rel = Relationship(**{
       "source": assessment,
