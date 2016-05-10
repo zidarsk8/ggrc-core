@@ -82,10 +82,6 @@
       var scope = this.scope;
       var value = scope.attr('property');
 
-      if (!scope.instance.custom_attributes) {
-        _.defer(scope.instance.setup_custom_attributes.bind(scope.instance));
-      }
-
       if (scope.attr('caId') && scope.attr('type') === 'checkbox') {
         value = value === '1';
       }
