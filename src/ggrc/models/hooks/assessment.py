@@ -31,6 +31,7 @@ def init_hook():
 
     map_assessment(obj, src.get("object"))
     map_assessment(obj, src.get("audit"))
+    map_assessment(obj, src.get("program"))
 
     if not src.get("_generated"):
       return

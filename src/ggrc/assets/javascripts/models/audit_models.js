@@ -914,7 +914,7 @@
     },
     save: function () {
       this.attr('recipients', this._get_recipients());
-
+      this.attr('program', this.attr('audit.program'));
       return this._super.apply(this, arguments);
     },
     after_save: function () {
