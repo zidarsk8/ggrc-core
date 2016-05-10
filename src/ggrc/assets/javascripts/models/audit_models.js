@@ -768,10 +768,6 @@
         attr_title: 'Title',
         attr_name: 'title'
       }, {
-        attr_title: 'Owner',
-        attr_name: 'owner',
-        attr_sort_field: 'contact.name|email'
-      }, {
         attr_title: 'Code',
         attr_name: 'slug'
       }, {
