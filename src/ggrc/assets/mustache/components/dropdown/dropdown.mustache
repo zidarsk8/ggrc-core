@@ -11,7 +11,16 @@
   can-change="onChange"
   {{#isDisabled}}disabled="disabled"{{/isDisabled}}
   >
-  {{#options}}
+{{#options}}
+  {{#if title}}
     <option value="{{value}}" label="{{title}}"></option>
-  {{/options}}
+  {{/if}}
+  {{#if group}}
+    <optgroup label="{{group}}">
+    {{#subitems}}
+      <option value="{{value}}" label="{{title}}"></option>
+    {{/subitems}}
+    </optgroup>
+  {{/if}}
+{{/options}}
 </select>
