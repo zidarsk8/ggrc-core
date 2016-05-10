@@ -106,9 +106,12 @@
                 }
               } else if (roles.length) {
                 rel.attrs.attr('AssigneeType', roles.join(','));
-                rel.save();
+                rel.save().then(function () {
+                  instance.refresh();
+                });
               } else {
                 rel.destroy();
+                instance.refresh();
               }
             }.bind(this));
           }
@@ -224,7 +227,9 @@
           model.done(function (model) {
             var type = model.attr('attrs.AssigneeType');
             model.attr('attrs.AssigneeType', role + (type ? ',' + type : ''));
-            model.save();
+            model.save().then(function () {
+              instance.refresh();
+            });
           });
         }
       },
