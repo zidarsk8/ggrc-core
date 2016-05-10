@@ -29,24 +29,35 @@ def init_hook():
     """Apply custom attribute definitions and map people roles
     when generating Assessmet with template"""
 
-    map_object(src.get("object", None), obj)
-    map_object(src.get("audit", None), obj)
+    map_assessment(obj, src.get("object"))
+    map_assessment(obj, src.get("audit"))
+    map_assessment(obj, src.get("program"))
 
-    if not src.get("_generated", False):
+    if not src.get("_generated"):
       return
 
     related = {
-        "template": get_by_id(src.get("template", None)),
-        "obj": get_by_id(src.get("object", None)),
-        "audit": get_by_id(src.get("audit", None)),
+        "template": get_by_id(src.get("template")),
+        "obj": get_by_id(src.get("object")),
+        "audit": get_by_id(src.get("audit")),
     }
     relate_assignees(obj, related)
     relate_ca(obj, related)
 
 
-def map_object(obj, assessment):
-  """Creates a relationship object and generates automappings"""
-  if not obj:
+def map_assessment(assessment, obj):
+  """Creates a relationship between an assessment and an object. This also
+  generates automappings. Fails silently if obj dict does not have id and type
+  keys.
+
+  Args:
+    assessment (models.Assessment): The assessment model
+    obj (dict): A dict with `id` and `type`.
+  Returns:
+    None
+  """
+  obj = obj or {}
+  if 'id' not in obj or 'type' not in obj:
     return
   rel = Relationship(**{
       "source": assessment,
@@ -100,7 +111,7 @@ def get_value(which, audit, obj, template=None):
       "Primary Assessor": getattr(obj, 'principal_assessor', None),
       "Secondary Assessor": getattr(obj, 'secondary_assessor', None),
   }
-  people = template.default_people.get(which, None)
+  people = template.default_people.get(which)
   if not people:
     return None
 
@@ -109,7 +120,7 @@ def get_value(which, audit, obj, template=None):
         'type': 'Person',
         'id': person_id
     }) for person_id in people]
-  return types.get(people, None)
+  return types.get(people)
 
 
 def assign_people(assignees, assignee_role, assessment, relationships):
