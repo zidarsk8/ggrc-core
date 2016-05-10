@@ -9,6 +9,7 @@
   class="{{firstnonempty className 'input-block-level'}}"
   can-value="{{name}}"
   can-change="onChange"
+  {{#isDisabled}}disabled="disabled"{{/isDisabled}}
   >
 {{#options}}
   {{#if title}}
