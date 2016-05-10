@@ -32,13 +32,13 @@ def init_hook():
     map_assessment(obj, src.get("object"))
     map_assessment(obj, src.get("audit"))
 
-    if not src.get("_generated", False):
+    if not src.get("_generated"):
       return
 
     related = {
-        "template": get_by_id(src.get("template", None)),
-        "obj": get_by_id(src.get("object", None)),
-        "audit": get_by_id(src.get("audit", None)),
+        "template": get_by_id(src.get("template")),
+        "obj": get_by_id(src.get("object")),
+        "audit": get_by_id(src.get("audit")),
     }
     relate_assignees(obj, related)
     relate_ca(obj, related)
@@ -110,7 +110,7 @@ def get_value(which, audit, obj, template=None):
       "Primary Assessor": getattr(obj, 'principal_assessor', None),
       "Secondary Assessor": getattr(obj, 'secondary_assessor', None),
   }
-  people = template.default_people.get(which, None)
+  people = template.default_people.get(which)
   if not people:
     return None
 
@@ -119,7 +119,7 @@ def get_value(which, audit, obj, template=None):
         'type': 'Person',
         'id': person_id
     }) for person_id in people]
-  return types.get(people, None)
+  return types.get(people)
 
 
 def assign_people(assignees, assignee_role, assessment, relationships):
