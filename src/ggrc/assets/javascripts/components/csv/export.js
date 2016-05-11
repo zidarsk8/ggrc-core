@@ -128,7 +128,7 @@
             currentFilter.expression.op.name !== 'exclude_text_search';
         this.scope.attr('isFilterActive', isExpression);
       },
-      '.tree-filter__input-relative input keyup': function (el, ev) {
+      '.tree-filter__expression-holder input keyup': function (el, ev) {
         this.toggleIndicator(GGRC.query_parser.parse(el.val()));
       },
       '.option-type-selector change': function (el, ev) {

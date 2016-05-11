@@ -18,11 +18,11 @@
     position: relative;
   }
   &__inline-filtering {
-    line-height: 39px;
-    height: 39px;
+    line-height: 26px;
+    height: 26px;
     background: $white;
     border-bottom: 3px solid $warmGray;
-    padding: 0 16px 0 10px;
+    padding: 7px 16px 6px 10px;
     margin-bottom: 8px;
     &--transparent {
       line-height: 26px;
@@ -31,11 +31,6 @@
       border-bottom: none;
       padding: 0;
       margin-bottom: 0;
-      .tree-filter__input-relative {
-        .tree-filter__input-relative__is-expression {
-          top: 3px;
-        }
-      }
     }
     label {
       font-size:11px;
@@ -76,7 +71,7 @@
       text-transform: none;
       font-size: 16px;
       line-height: 20px;
-      padding-top: 10px;
+      padding-top: 3px;
     }
   }
   &__input-wrap {
@@ -84,7 +79,7 @@
     margin-right: 164px;
     margin-left: 45px;
   }
-  &__input-relative {
+  &__expression-holder {
     position: relative;
     &__is-expression {
       @include opacity(0.25);
@@ -92,8 +87,8 @@
       right: 6px;
       top: 1px;
     }
-    &--expression {
-      .tree-filter__input-relative__is-expression {
+    &--active {
+      .tree-filter__expression-holder__is-expression {
         @include opacity(1);
         i {
           background-position: -246px -176px;
@@ -138,7 +133,6 @@
       margin-left: 10px;
     }
     input[type="submit"] {
-      margin-top: 7px;
       float: right;
     }
     input[type="reset"] {
