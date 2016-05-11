@@ -828,7 +828,9 @@ Mustache.registerHelper("get_permalink_for_object", function (instance, options)
 
 Mustache.registerHelper("get_view_link", function (instance, options) {
   function finish(link) {
-    return "<a href=" + link + " target=\"_blank\"><i class=\"fa fa-long-arrow-right\"></i></a>";
+    return "<a href=" + link + " target=\"_blank\" class=\"view-link\">" +
+           "  <i class=\"fa fa-long-arrow-right\"></i>" +
+           "</a>";
   }
   instance = resolve_computed(instance);
   if (!instance.viewLink && !instance.get_permalink) {

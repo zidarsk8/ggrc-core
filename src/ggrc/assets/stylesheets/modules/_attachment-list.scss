@@ -30,12 +30,16 @@
     }
     a {
       @extend %oneline;
+      width: 68%;
       display: inline-block;
-      margin-top: 5px;
       &.more {
         display: inline;
         width: auto;
       }
+    }
+    a.view-link {
+      margin-top: 5px;
+      width: 100%;
     }
     .tree-title-area {
       margin-top: 5px;
