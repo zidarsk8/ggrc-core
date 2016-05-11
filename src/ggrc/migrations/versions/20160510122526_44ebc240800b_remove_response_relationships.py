@@ -11,8 +11,6 @@ Create Date: 2016-05-10 12:25:26.383695
 # disable Invalid constant name pylint warning for mandatory Alembic variables.
 # pylint: disable=invalid-name
 
-import sqlalchemy as sa
-
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -21,19 +19,19 @@ down_revision = '3715694bd315'
 
 
 def upgrade():
-    """Upgrade database schema and/or data, creating a new revision."""
-    op.execute(
-        """
-        DELETE FROM relationships
-        WHERE source_type IN 
+  """Upgrade database schema and/or data, creating a new revision."""
+  op.execute(
+      """
+      DELETE FROM relationships
+      WHERE source_type IN
+        ("Response", "DocumentationResponse", "InterviewResponse",
+         "PopulationSampleResponse")
+        OR destination_type IN
           ("Response", "DocumentationResponse", "InterviewResponse",
            "PopulationSampleResponse")
-          OR destination_type IN
-            ("Response", "DocumentationResponse", "InterviewResponse",
-             "PopulationSampleResponse")
-        """)
+      """)
 
 
 def downgrade():
-    """Downgrade database schema and/or data back to the previous revision."""
-    pass
+  """Downgrade database schema and/or data back to the previous revision."""
+  pass
