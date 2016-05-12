@@ -108,7 +108,7 @@ class AutoStatusChangable(object):
     db.session.add(obj)
 
   @classmethod
-  def handle_first_class_edit(cls, model, obj, rel=None):
+  def handle_first_class_edit(cls, model, obj, rel=None, method=None):
     """Handles first class edit
 
     Performs check whether object received first class edit (ordinary edit
@@ -130,13 +130,14 @@ class AutoStatusChangable(object):
       cls.adjust_status(model, obj)
 
   @classmethod
-  def handle_person_edit(cls, model, obj, rel):
+  def handle_person_edit(cls, model, obj, rel, method):
     """Handles person edit
 
     Args:
       model: Class from which to read ASSIGNABLE_EDIT property.
       obj: Object on which to perform operations.
       rel: Relationship whose attribute have to be inspected for changes.
+      method: HTTP method used that triggered signal
     Returns:
       Nothing.
     """
@@ -236,7 +237,8 @@ class AutoStatusChangable(object):
         }
         for k in handlers.keys():
           if k in endpoints:
-            handlers[k](model, target_object, obj)
+            handlers[k](model, target_object, obj,
+                        method=service.request.method)
 
     @common.Resource.model_posted.connect_via(
         object_document.ObjectDocument)
