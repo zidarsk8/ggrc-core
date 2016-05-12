@@ -1,8 +1,8 @@
 {{!
-    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     Created By: brad@reciprocitylabs.com
-    Maintained By: brad@reciprocitylabs.com
+    Maintained By: urban@reciprocitylabs.com
 }}
 
 <h1 class="entities">
@@ -72,6 +72,12 @@
         <a href="/dashboard">
           <i class="fa fa-home orange"></i>
           My Work ({{current_user.system_wide_role}})
+        </a>
+      </li>
+      <li class="full-opacity">
+        <a href="/assessments_view">
+          <i class="fa fa-assessment red"></i>
+          My Assessments
         </a>
       </li>
       {{#current_user_is_admin}}
