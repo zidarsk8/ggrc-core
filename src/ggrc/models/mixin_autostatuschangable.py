@@ -254,9 +254,9 @@ class AutoStatusChangable(object):
     @common.Resource.model_deleted.connect_via(
         object_document.ObjectDocument)
     def handle_objectdocument_post(sender, obj=None, src=None, service=None):
-      """Handles creation of URLs
+      """Handles addition and deletion of evidences
 
-      Adding URLs moves object back to PROGRESS_STATE.
+      Adding evidence moves object back to PROGRESS_STATE.
 
       See blinker library documentation for other parameters (all necessary).
 
