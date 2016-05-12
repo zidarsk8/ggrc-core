@@ -178,10 +178,10 @@ class TestMixinAutoStatusChangable(integration.ggrc.TestCase):
       person = factories.PersonFactory(email=person)
 
       attrs = {
-          "AssigneeType": roles
+          "AssigneeType": roles,
       }
       response, relationship = self.objgen.generate_relationship(
-          person, obj, attrs=attrs)
+          person, obj, context=obj.context, attrs=attrs)
       self.assertEqual(response.status_code, 201)
 
       relationships += [relationship]
@@ -243,6 +243,8 @@ class TestMixinAutoStatusChangable(integration.ggrc.TestCase):
       Assessment object.
     """
     assessment = factories.AssessmentFactory()
+    context = factories.ContextFactory(related_object=assessment)
+    assessment.context = context
 
     if not people:
       people = [
