@@ -37,7 +37,9 @@
         });
         _.each(binding.get_mappings(), function (mapping) {
           mapping.refresh().then(function () {
-            mapping.destroy();
+            mapping.destroy().then(function () {
+              mapping.documentable.reify().refresh();
+            });
           });
         });
       }
