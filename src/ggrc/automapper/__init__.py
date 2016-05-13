@@ -36,6 +36,7 @@ class AutomapperGenerator(object):
     self.processed = set()
     self.queue = set()
     self.cache = collections.defaultdict(set)
+    self.instance_cache = {}
     self.auto_mappings = set()
     if use_benchmark:
       self.benchmark = benchmark
@@ -66,16 +67,24 @@ class AutomapperGenerator(object):
                    Relationship.destination_id).in_(
                        [(s.type, s.id) for s in stubs]))
     ).all()
+    batch_requests = collections.defaultdict(set)
     for (src_type, src_id, dst_type, dst_id) in relationships:
       src = Stub(src_type, src_id)
       dst = Stub(dst_type, dst_id)
       # only store a neighbour if we queried for it since this way we know
       # we'll be storing complete neighbourhood by the end of the loop
+      batch_requests[src_type].add(src_id)
+      batch_requests[dst_type].add(dst_id)
       if src in stubs:
         self.cache[src].add(dst)
       if dst in stubs:
         self.cache[dst].add(src)
 
+    for type_, ids in batch_requests.iteritems():
+      model = getattr(models, type_)
+      instances = model.query.filter(model.id.in_(ids))
+      for instance in instances:
+        self.instance_cache[Stub(type_, instance.id)] = instance
     return self.cache[obj]
 
   def relate(self, src, dst):
@@ -171,8 +180,11 @@ class AutomapperGenerator(object):
     if not hasattr(models, src.type):
       logging.warning('Automapping by attr: cannot find model %s' % src.type)
       return
-    model = getattr(models, src.type)
-    instance = model.query.filter(model.id == src.id).first()
+    instance = self.instance_cache.get(src)
+    if instance is None:
+      model = getattr(models, src.type)
+      instance = model.query.filter(model.id == src.id).first()
+      self.instance_cache[src] = instance
     if instance is None:
       logging.warning("Automapping by attr: cannot load model %s: %s" %
                       (src.type, str(src.id)))
