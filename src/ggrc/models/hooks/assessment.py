@@ -99,15 +99,17 @@ def get_value(people_group, audit, obj, template=None):
     Either a Person object, a list of Person objects, or None if no people
     matching the criteria are found.
   """
+  auditors = (
+      user_role.person for user_role in audit.context.user_roles
+      if user_role.role.name == u"Auditor"
+  )
+
   if not template:
     if people_group == "creator":
       # don't use get_current_user because that returns a proxy
       return Person.query.get(get_current_user_id())
     elif people_group == "assessors":
-      return [
-          user_role.person for user_role in audit.context.user_roles
-          if user_role.role.name == u"Auditor"
-      ]
+      return list(auditors)
 
     return None
 
@@ -130,6 +132,11 @@ def get_value(people_group, audit, obj, template=None):
         'type': 'Person',
         'id': person_id
     }) for person_id in people]
+
+  # only consume the generator if it will be used in the return value
+  if people == u"Auditors":
+    types[u"Auditors"] = list(auditors)
+
   return types.get(people)
 
 
@@ -181,6 +188,7 @@ def relate_assignees(assessment, related):
         related (dict): Dict containing model instances related to assessment
                         - obj
                         - audit
+                        - template (an AssessmentTemplate, can be None)
   """
   people_types = {
       "assessors": "Assessor",
