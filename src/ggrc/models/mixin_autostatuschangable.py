@@ -144,14 +144,15 @@ class AutoStatusChangable(object):
     adjust_state = False
 
     if method == "POST":
-      # On relationship creation inspect(rel) shows relationship attributes as
-      # unchanged. Because POST can only ever be issued for creation, we can
-      # use this as a guarantee that this was an editable event that should
-      # adjust status.
+      # On relationship creation inspect(rel) sometime shows relationship
+      # attributes as unchanged and sometimes as added.
+      # But because POST can only ever be issued for creation, we can use this
+      # as a guarantee that this was an editable event that should adjust
+      # status.
       unchanged = inspect(rel).attrs.relationship_attrs.history.unchanged
-      attr_set = {ra.attr_name for ra in unchanged}
-      if "AssigneeType" in attr_set and obj.status in model.ASSIGNABLE_EDIT:
-        adjust_state = True
+      added = inspect(rel).attrs.relationship_attrs.history.added
+      attr_changed = ({ra.attr_name for ra in unchanged} |
+                      {ra.attr_name for ra in added})
     else:
       # Ensures that we only adjust status for AssigneeType relationship
       # attribute.
@@ -160,11 +161,11 @@ class AutoStatusChangable(object):
       attr_changed = ({ra.attr_name for ra in deleted} |
                       {ra.attr_name for ra in added})
 
-      # When object attributes are added or edited, adjust. If user still has
-      # some other role, operation is considered edit.
-      if ("AssigneeType" in attr_changed and
-         obj.status in model.ASSIGNABLE_EDIT):
-        adjust_state = True
+    # When object attributes are added or edited, adjust. If user still has
+    # some other role, operation is considered edit.
+    if ("AssigneeType" in attr_changed and
+       obj.status in model.ASSIGNABLE_EDIT):
+      adjust_state = True
 
     # When user has no more roles on an object, relationship is deleted.
     if inspect(rel).deleted:
