@@ -7,6 +7,7 @@ from datetime import datetime
 import collections
 import logging
 
+from sqlalchemy.sql.expression import tuple_
 from ggrc import db
 from ggrc import models
 from ggrc.automapper.rules import rules
@@ -17,7 +18,6 @@ from ggrc.models.request import Request
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource
 from ggrc.utils import benchmark, with_nop
-from sqlalchemy.sql.expression import tuple_
 
 
 class Stub(collections.namedtuple("Stub", ["type", "id"])):
@@ -178,7 +178,7 @@ class AutomapperGenerator(object):
 
   def _step_implicit(self, src, dst, implicit):
     if not hasattr(models, src.type):
-      logging.warning('Automapping by attr: cannot find model %s' % src.type)
+      logging.warning('Automapping by attr: cannot find model %s', src.type)
       return
     instance = self.instance_cache.get(src)
     if instance is None:
@@ -186,8 +186,8 @@ class AutomapperGenerator(object):
       instance = model.query.filter(model.id == src.id).first()
       self.instance_cache[src] = instance
     if instance is None:
-      logging.warning("Automapping by attr: cannot load model %s: %s" %
-                      (src.type, str(src.id)))
+      logging.warning("Automapping by attr: cannot load model %s: %s",
+                      src.type, str(src.id))
       return
     for attr in implicit:
       if hasattr(instance, attr.name):
@@ -200,11 +200,11 @@ class AutomapperGenerator(object):
             if entry not in self.processed:
               self.queue.add(entry)
           else:
-            logging.warning('Automapping by attr: %s is None' % attr.name)
+            logging.warning('Automapping by attr: %s is None', attr.name)
       else:
         logging.warning(
-            'Automapping by attr: object %s has no attribute %s' %
-            (str(src), str(attr.name))
+            'Automapping by attr: object %s has no attribute %s',
+            str(src), str(attr.name)
         )
 
   def _ensure_relationship(self, src, dst):
