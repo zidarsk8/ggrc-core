@@ -170,7 +170,7 @@ class TestMixinAutoStatusChangable(integration.ggrc.TestCase):
       persons: [("(string) email", "Assignee roles"), ...] A list of people
         and their roles
     Returns:
-      List of relationship instances.
+      List of relationship.
     """
 
     relationships = []
@@ -255,11 +255,11 @@ class TestMixinAutoStatusChangable(integration.ggrc.TestCase):
           ("verifier_2@example.com", "Verifier"),
       ]
 
-    defined_assessors = sum([1 for _, role in people
+    defined_assessors = len([1 for _, role in people
                              if "Assessor" in role])
-    defined_creators = sum([1 for _, role in people
+    defined_creators = len([1 for _, role in people
                             if "Creator" in role])
-    defined_verifiers = sum([1 for _, role in people
+    defined_verifiers = len([1 for _, role in people
                              if "Verifier" in role])
 
     self.create_assignees(assessment, people)
