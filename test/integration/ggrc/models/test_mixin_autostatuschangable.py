@@ -170,7 +170,7 @@ class TestMixinAutoStatusChangable(integration.ggrc.TestCase):
       persons: [("(string) email", "Assignee roles"), ...] A list of people
         and their roles
     Returns:
-      # TODO
+      List of relationship instances.
     """
 
     relationships = []
