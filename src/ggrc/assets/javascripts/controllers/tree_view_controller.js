@@ -995,8 +995,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     setTimeout(this.draw_visible.bind(this), 0);
   },
 
-  '.tree-item-placeholder mouseenter': function (el, ev) {
     el.control().draw_node();
+  '.tree-item-placeholder click': function (el, ev) {
   },
 
   '{original_list} add': function (list, ev, newVals, index) {
