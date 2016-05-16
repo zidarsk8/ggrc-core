@@ -19,6 +19,7 @@
     {{/instance}}
     {{/is_allowed}}
     {{/if}}
+    <span class="date">{{date instance.created_at true}}</span>
     <a href="{{schemed_url instance.link}}" target="_blank">
       <span>{{firstnonempty instance.title instance.link}}</span>
     </a>
