@@ -899,7 +899,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var pageCount;
     var mid;
     var pos;
-    var renderStep;
     if (this.options.disable_lazy_loading || this.element === null) {
       return;
     }
@@ -968,20 +967,19 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         toRender.push(control);
       }
     }
-    renderStep = function renderStep(toRender, count) {
-      // If there is nothing left to render or if draw_visible was run while
-      // rendering we simply terminate.
-      if (toRender.length === 0 || this.draw_visible_call_count > count) {
-        return;
-      }
-      toRender[0].draw_node();
-      setTimeout(function () {
-        renderStep(toRender.slice(1), count);
-      }, 0);
-    }.bind(this);
-    renderStep(toRender, ++this.draw_visible_call_count);
+    this.renderStep(toRender, ++this.draw_visible_call_count);
   }, 100, {leading: true}),
-
+  renderStep: function renderStep(toRender, count) {
+    // If there is nothing left to render or if draw_visible was run while
+    // rendering we simply terminate.
+    if (toRender.length === 0 || this.draw_visible_call_count > count) {
+      return;
+    }
+    toRender[0].draw_node();
+    setTimeout(function () {
+      this.renderStep(toRender.slice(1), count);
+    }.bind(this), 0);
+  },
   _last_scroll_top: 0,
 
   _is_scrolling_up: false,
@@ -996,8 +994,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     setTimeout(this.draw_visible.bind(this), 0);
   },
 
-  '.tree-item-placeholder mouseenter': function (el, ev) {
-    el.control().draw_node();
+  '.tree-item-placeholder click': function (el, ev) {
+    var node = el.control();
+    node.draw_node();
+    node.select();
   },
 
   '{original_list} add': function (list, ev, newVals, index) {
@@ -1527,8 +1527,15 @@ can.Control('CMS.Controllers.TreeViewNode', {
    */
   draw_node: function () {
     var isActive;
+    var isPlaceholder;
+    var lazyLoading = this.options.disable_lazy_loading;
 
-    if (this._draw_node_in_progress || !this.element) {
+    if (!this.element) {
+      return;
+    }
+    isPlaceholder = this.element.hasClass('tree-item-placeholder');
+
+    if (this._draw_node_in_progress || !lazyLoading && !isPlaceholder) {
       return;
     }
 

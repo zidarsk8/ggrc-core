@@ -52,6 +52,7 @@ describe('CMS.Controllers.TreeViewNode', function () {
         var callback;
 
         ctrlInst.options.attr('isActive', false);
+        ctrlInst.options.attr('disable_lazy_loading', true);
         $element.addClass('active');
 
         method();
@@ -81,6 +82,7 @@ describe('CMS.Controllers.TreeViewNode', function () {
         var callback;
 
         ctrlInst.options.attr('isActive', false);
+        ctrlInst.options.attr('disable_lazy_loading', true);
         $element.removeClass('active');  // make sure it is indeed inactive
 
         method();
