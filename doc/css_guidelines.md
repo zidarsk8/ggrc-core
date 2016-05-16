@@ -57,7 +57,7 @@ Nesting in SASS should be avoided wherever possible. This is [WHY](http://cssgui
 
 ### Naming
 
-For naming we are using [BEM](https://en.bem.info/method/) medotology. BEM stands for:
+For naming we are using [BEM](https://en.bem.info/method/) methodology. BEM stands for:
 
 - Block: The sole root of the component.
 - Element: A component part of the Block.
