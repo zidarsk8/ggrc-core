@@ -103,7 +103,7 @@ preemptively perform the same check locally, do the following:
 
 * Make sure that you are currently on a branch containing the changes that will
   be submitted with the pull request (the PR branch), and that you have these
-  changes commited,
+  changes committed,
 * Make sure that you don't have any pending local file modifications. Use
   `git stash` if necessary,
 * Run the following in the development container's console:
@@ -132,7 +132,7 @@ When the Karma server (a Javascript test runner) starts, open
 server and run all Javascript unit tests. The outcome of the tests will be
 printed to the console, make sure they all pass.
 
-_NOTE: The offically supported browser by the application is Chrome. It is thus
+_NOTE: The officially supported browser by the application is Chrome. It is thus
 strongly recommended that you, too, use Chrome for running the tests locally._
 
 

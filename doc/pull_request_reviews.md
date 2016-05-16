@@ -85,7 +85,7 @@ alphabetically):
 * `next release` - the PR will be merged after the current release has branched
   off of the main development branch, and should not be merged just yet,
 * `please review` - the author asked that the PR should be reviewed with a
-  higher pripority. This label is usually used when the PR has not received
+  higher priority. This label is usually used when the PR has not received
   enough attention for a considerable time period, or because it is important
   and attempts to resolve an important/blocking issue,
 * `question` - the PR author seeks advice/feedback on some code feature and/or
@@ -147,7 +147,7 @@ A pull request **must be rejected** if **any** of the following is true:
   issues,
 * The new code is not sufficiently covered with automated tests (subject to
   exceptions, e.g. when a test would be disproportionally difficult and
-  time-consuiming to write, or for little UI changes like changing an icon or a
+  time-consuming to write, or for little UI changes like changing an icon or a
   font color).
 
 The reviewer must mark the pull request with the `needs work` label, signalling
@@ -297,7 +297,7 @@ already have it running.
     _NOTE: You have to close all current incognito browsers to get a clean
     session._
 
-    Test the pull request as decribed in the
+    Test the pull request as described in the
     [relevant section](#reviewing-and-merging-pull-requests) of this guide.
 
 1. Go back to your branch and continue with your work:
