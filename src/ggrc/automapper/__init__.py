@@ -254,7 +254,6 @@ def register_automapping_listeners():
 
   # pylint: disable=unused-variable
   @Resource.model_posted_after_commit.connect_via(Audit)
-  @Resource.model_put_after_commit.connect_via(Audit)
   def handle_audit(sender, obj=None, src=None, service=None):
     if obj is None:
       logging.warning("Automapping audit listener: "
