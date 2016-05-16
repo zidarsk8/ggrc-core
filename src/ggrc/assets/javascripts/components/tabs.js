@@ -6,7 +6,9 @@
 */
 
 (function (GGRC, can, $) {
-  can.Component.extend({
+  'use strict';
+
+  GGRC.Components('tabsContainer', {
     tag: 'tabs',
     template: can.view(GGRC.mustache_path + '/base_objects/tabs.mustache'),
     scope: {
@@ -35,18 +37,29 @@
        * @param {String} action - in our case it can be `add` or `remove`
        */
       '{scope.panels} change': _.throttle(function (list, ev, item, action) {
-        var panels = this.element.find('tab-panel');
-        var index = this.scope.attr('index');
         var active;
+        var index;
+        var panels;
+
+        // Sometimes the handler is invoked when DOM element does not (yet?)
+        // exist, and we need to safeguard against this.
+        if (!this.element) {
+          return;
+        }
+
+        index = this.scope.attr('index');
+        panels = this.element.find('tab-panel');
 
         if (list.length !== panels.length) {
           return;
         }
+
         active = _.filter(list, function (item) {
           if (item.panel) {
             return item.panel.attr('active');
           }
         });
+
         if (!active.length) {
           list[index].panel.attr('active', true);
         }
