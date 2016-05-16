@@ -1528,8 +1528,15 @@ can.Control('CMS.Controllers.TreeViewNode', {
    */
   draw_node: function () {
     var isActive;
+    var isPlaceholder;
+    var lazyLoading = this.options.disable_lazy_loading;
 
-    if (this._draw_node_in_progress || !this.element) {
+    if (!this.element) {
+      return;
+    }
+    isPlaceholder = this.element.hasClass('tree-item-placeholder');
+
+    if (this._draw_node_in_progress || !lazyLoading && !isPlaceholder) {
       return;
     }
 
