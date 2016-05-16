@@ -98,7 +98,7 @@ when the PR branch was forked from the target branch (i.e. the _merge base_).
 The target branch is the one the PR will be sent to, usually `develop`.
 
 If the issue count difference is positive, the check will fail, because new
-code should not not increase the number of Javascript issues. To avoid that and
+code should not increase the number of Javascript issues. To avoid that and
 preemptively perform the same check locally, do the following:
 
 * Make sure that you are currently on a branch containing the changes that will
