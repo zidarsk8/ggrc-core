@@ -5,6 +5,36 @@
   Maintained By: andraz@reciprocitylabs.com
 */
 
+describe('GGRC.Components.tabsContainer', function () {
+  'use strict';
+
+  var component;
+
+  beforeAll(function () {
+    component = GGRC.Components.get('tabsContainer');
+  });
+
+  describe('panels change handler', function () {
+    var compInst;  // fake component instance
+    var handler;
+
+    beforeEach(function () {
+      compInst = {};
+      handler = component.prototype.events['{scope.panels} change'];
+      handler = handler.bind(compInst);
+    });
+
+    it('does not throw an error if element is null', function () {
+      compInst.element = null;
+      try {
+        handler();
+      } catch (err) {
+        fail('Handler should not have thrown an error (' + err + ')');
+      }
+    });
+  });
+});
+
 describe('GGRC.Components.tabPanel', function () {
   'use strict';
 
