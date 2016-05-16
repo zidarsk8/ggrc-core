@@ -995,8 +995,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     setTimeout(this.draw_visible.bind(this), 0);
   },
 
-    el.control().draw_node();
   '.tree-item-placeholder click': function (el, ev) {
+    var node = el.control();
+    node.draw_node();
+    node.select();
   },
 
   '{original_list} add': function (list, ev, newVals, index) {
