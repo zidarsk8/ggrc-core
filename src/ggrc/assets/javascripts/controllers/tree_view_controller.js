@@ -899,7 +899,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var pageCount;
     var mid;
     var pos;
-    var renderStep;
     if (this.options.disable_lazy_loading || this.element === null) {
       return;
     }
