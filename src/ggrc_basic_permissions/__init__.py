@@ -30,7 +30,6 @@ from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.audit import Audit
 from ggrc.models.program import Program
-from ggrc.models.relationship import Relationship
 from ggrc.rbac import permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.common import _get_cache_manager
@@ -684,76 +683,6 @@ def add_public_program_context_implication(context, check_exists=False):
       context_scope='Program',
       modified_by=get_current_user(),
   ))
-
-
-# When adding a private program to an Audit Response, ensure Auditors
-#  can read it
-@Resource.model_posted.connect_via(Relationship)
-def handle_relationship_post(sender, obj=None, src=None, service=None):
-  db.session.flush()
-  db.session.add(obj)
-  db.session.flush()
-
-  if isinstance(obj.destination, Program) \
-     and obj.destination.private \
-     and db.session.query(ContextImplication) \
-     .filter(
-          and_(ContextImplication.context_id == obj.destination.context.id,
-               ContextImplication.source_context_id == obj.source.context.id))\
-     .count() < 1:
-    # Create the audit -> program implication for the
-    # Program added to the Response
-    parent_program = obj.source.request.audit.program
-    if parent_program != obj.destination:
-      db.session.add(ContextImplication(
-          source_context=obj.source.context,
-          context=obj.destination.context,
-          source_context_scope='Audit',
-          context_scope='Program',
-          modified_by=get_current_user(),
-      ))
-
-      db.session.add(ContextImplication(
-          source_context=parent_program.context,
-          context=obj.destination.context,
-          source_context_scope='Program',
-          context_scope='Program',
-          modified_by=get_current_user(),
-      ))
-
-
-# When adding a private program to an Audit Response, ensure Auditors
-#  can read it
-@Resource.model_deleted.connect_via(Relationship)
-def handle_relationship_delete(sender, obj=None, src=None, service=None):
-  db.session.flush()
-
-  if isinstance(obj.destination, Program) \
-     and obj.destination.private:
-
-    # figure out if any other responses in this audit
-    # are still mapped to the same prog
-    responses = [r for req in obj.source.request.audit.requests
-                 for r in req.responses]
-    relationships = [rel for resp in responses for rel in
-                     resp.related_destinations
-                     if rel != obj.destination]
-    matching_programs = [p.destination for p in relationships
-                         if p.destination == obj.destination]
-
-    # Delete the audit -> program implication for the Program removed from
-    # the Response
-    if len(matching_programs) < 1:
-      db.session.query(ContextImplication)\
-          .filter(
-              ContextImplication.context_id == obj.destination.context_id,
-              ContextImplication.source_context_id == obj.source.context_id)\
-          .delete()
-      db.session.query(ContextImplication)\
-          .filter(
-              ContextImplication.context_id == obj.destination.context_id,
-              ContextImplication.source_context_id == obj.source.context_id)\
-          .delete()
 
 
 @Resource.model_put.connect_via(Program)
