@@ -213,17 +213,14 @@ class AutomapperGenerator(object):
     if src in self.cache.get(dst, []):
       return False
 
-    created = False
-    if Relationship.find_related(src, dst) is None:
-      self.auto_mappings.add((src, dst))
-      created = True
+    self.auto_mappings.add((src, dst))
 
     if src in self.cache:
       self.cache[src].add(dst)
     if dst in self.cache:
       self.cache[dst].add(src)
 
-    return created
+    return True
 
 
 def register_automapping_listeners():
@@ -254,7 +251,6 @@ def register_automapping_listeners():
 
   # pylint: disable=unused-variable
   @Resource.model_posted_after_commit.connect_via(Audit)
-  @Resource.model_put_after_commit.connect_via(Audit)
   def handle_audit(sender, obj=None, src=None, service=None):
     if obj is None:
       logging.warning("Automapping audit listener: "
