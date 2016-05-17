@@ -1550,13 +1550,16 @@ can.Control('CMS.Controllers.TreeViewNode', {
   },
 
   draw_placeholder: function () {
-    var that = this;
-    can.view(GGRC.mustache_path + '/base_objects/tree_placeholder.mustache', that.options, this._ifNotRemoved(function (frag) {
-      that.replace_element(frag);
-      that._draw_node_deferred.resolve();
-      that.expanded = false;
-      delete that._expand_deferred;
-    }));
+    can.view(
+      GGRC.mustache_path + '/base_objects/tree_placeholder.mustache',
+      this.options,
+      this._ifNotRemoved(function (frag) {
+        this.replace_element(frag);
+        this._draw_node_deferred.resolve();
+        this.options.expanded = false;
+        delete this._expand_deferred;
+      }.bind(this))
+    );
   },
 
   should_draw_children: function () {
@@ -1694,7 +1697,6 @@ can.Control('CMS.Controllers.TreeViewNode', {
    *   nodes have been loaded and displayed
    */
   expand: function () {
-    var that = this;
     var $el = this.element;
 
     if (this._expand_deferred && $el.find('.openclose').is('.active')) {
@@ -1710,12 +1712,13 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
     this._expand_deferred = new $.Deferred();
     setTimeout(this._ifNotRemoved(function () {
-      that.display_subtrees().then(that._ifNotRemoved(function () {
-        that.element.trigger('subtree_loaded');
-        that.element.trigger('loaded');
-        that._expand_deferred.resolve();
-      }));
-    }), 0);
+      this.display_subtrees()
+        .then(this._ifNotRemoved(function () {
+          this.element.trigger('subtree_loaded');
+          this.element.trigger('loaded');
+          this._expand_deferred.resolve();
+        }.bind(this)));
+    }.bind(this)), 0);
     return this._expand_deferred;
   },
 
