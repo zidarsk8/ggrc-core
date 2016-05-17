@@ -58,8 +58,8 @@ class AutoStatusChangable(object):
     """Detects if object attribute has changes
 
     Args:
-      obj: Object on which to perform attribute inspection.
-      attr: Attribute to inspect
+      obj: (db.Model instance) Object on which to perform attribute inspection.
+      attr: (string) Attribute to inspect
     Returns:
       A boolean representing if models attribute changed.
     """
@@ -74,8 +74,9 @@ class AutoStatusChangable(object):
     """Get instance of an model object from relationship.
 
     Args:
-      model: Class whose instance we want to retrieve from relationship.
-      rel: Instance of relationship object.
+      model: (db.Model class) Class whose instance we want to retrieve from
+        relationship.
+      rel: (Relationship) Instance of relationship object.
     Returns:
       An instance of class model.
     """
@@ -88,9 +89,7 @@ class AutoStatusChangable(object):
     """Initialisation method to run after models have been initialised.
 
     Args:
-      model: Class on which to run set_handlers method.
-    Returns:
-      Nothing.
+      model: (db.Model class) Class on which to run set_handlers method.
     """
     cls.set_handlers(model)
 
@@ -99,10 +98,9 @@ class AutoStatusChangable(object):
     """Switches state on object to the PROGRESS_STATE
 
     Args:
-      model: Class from which to read PROGRESS_STATE value.
-      obj: object on which to perform status transition operation.
-    Returns:
-      Nothing.
+      model: (db.Model class) Class from which to read PROGRESS_STATE value.
+      obj: (db.Model instance) object on which to perform status transition
+        operation.
     """
     obj.status = model.PROGRESS_STATE
     db.session.add(obj)
@@ -116,12 +114,12 @@ class AutoStatusChangable(object):
     or one of END_STATES.
 
     Args:
-      model: Class from which to read FIRST_CLASS_EDIT property.
-      obj: Object on which to perform operations.
-      rel: Relationship object, needed here to maintain equal type signature
-        with handle_person_edit.
-    Returns:
-      Nothing.
+      model: (db.Model class) Class from which to read FIRST_CLASS_EDIT
+        property.
+      obj: (db.Model instance) Object on which to perform operations.
+      rel: (Relationship) Relationship object, needed here to maintain equal
+        type signature with handle_person_edit.
+      method: (string) HTTP method used that triggered signal
     """
 
     # pylint: disable=unused-argument,unused-variable
@@ -134,12 +132,12 @@ class AutoStatusChangable(object):
     """Handles person edit
 
     Args:
-      model: Class from which to read ASSIGNABLE_EDIT property.
-      obj: Object on which to perform operations.
-      rel: Relationship whose attribute have to be inspected for changes.
-      method: HTTP method used that triggered signal
-    Returns:
-      Nothing.
+      model: (db.Model class) Class from which to read ASSIGNABLE_EDIT
+        property.
+      obj: (db.Model instance) Object on which to perform operations.
+      rel: (Relationship) Relationship whose attribute have to be inspected for
+        changes.
+      method: (string) HTTP method used that triggered signal
     """
     adjust_state = False
 
@@ -180,8 +178,6 @@ class AutoStatusChangable(object):
 
     Args:
       model: Class on which handlers will be set up.
-    Returns:
-      Nothing.
     """
     @common.Resource.model_put.connect_via(model)
     def handle_object_put(sender, obj=None, src=None, service=None):
@@ -192,10 +188,9 @@ class AutoStatusChangable(object):
       See blinker library documentation for other parameters (all necessary).
 
       Args:
-        obj: Object on which we will perform manipulation.
-      Returns:
-        Nothing.
+        obj: (db.Model instance) Object on which we will perform manipulation.
       """
+
       # pylint: disable=unused-argument,unused-variable,protected-access
       if (any(cls._has_changes(obj, attr) for attr in model._tracked_attrs) and
          model.FIRST_CLASS_EDIT):
@@ -211,7 +206,7 @@ class AutoStatusChangable(object):
       See blinker library documentation for other parameters (all necessary).
 
       Args:
-        obj: Object on which we will perform manipulation.
+        obj: (db.Model instance) Object on which we will perform manipulation.
       """
       # pylint: disable=unused-argument,unused-variable
 
@@ -231,9 +226,7 @@ class AutoStatusChangable(object):
       See blinker library documentation for other parameters (all necessary).
 
       Args:
-        obj: Object on which we will perform manipulation.
-      Returns:
-        Nothing
+        obj: (db.Model instance) Object on which we will perform manipulation.
       """
       # pylint: disable=unused-argument,unused-variable
 
@@ -262,7 +255,7 @@ class AutoStatusChangable(object):
       See blinker library documentation for other parameters (all necessary).
 
       Args:
-        obj: Object on which we will perform manipulation.
+        obj: (db.Model instance) Object on which we will perform manipulation.
       """
       # pylint: disable=unused-argument,unused-variable
 
