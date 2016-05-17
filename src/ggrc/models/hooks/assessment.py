@@ -95,9 +95,15 @@ def get_value(which, audit, obj, template=None):
             (it can be any object in our app ie. Control,Issue, Facility...)
   """
   if not template:
-    if which in ("assessors", "creator"):
+    if which == "creator":
       # don't use get_current_user because that returns a proxy
       return Person.query.get(get_current_user_id())
+    elif which == "assessors":
+      return [
+          user_role.person for user_role in audit.context.user_roles
+          if user_role.role.name == u"Auditor"
+      ]
+
     return None
 
   types = {
