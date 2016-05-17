@@ -1533,7 +1533,6 @@ can.Control('CMS.Controllers.TreeViewNode', {
     }
 
     this._draw_node_in_progress = true;
-    this.add_child_lists_to_child();
 
     // the node's isActive state is not stored anywhere, thus we need to
     // determine it from the presemce of the corresponding CSS class
@@ -1582,17 +1581,20 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
   // add all child options to one TreeViewOptions object
   add_child_lists_to_child: function () {
-    var original_child_options = this.options.child_options;
-    var new_child_options = [];
+    var originalChildList = this.options.child_options;
+    var newChildList = [];
 
+    if (this.options.attr('_added_child_list')) {
+      return;
+    }
     this.options.attr('child_options', new can.Observe.List());
 
-    if (original_child_options.length === null) {
-      original_child_options = [original_child_options];
+    if (originalChildList.length === null) {
+      originalChildList = [originalChildList];
     }
 
     if (this.should_draw_children()) {
-      can.each(original_child_options, function (data, i) {
+      can.each(originalChildList, function (data, i) {
         var options = new can.Observe();
         data.each(function (v, k) {
           options.attr(k, v);
@@ -1604,10 +1606,11 @@ can.Control('CMS.Controllers.TreeViewNode', {
           parent: this,
           parent_instance: this.options.instance
         });
-        new_child_options.push(options);
+        newChildList.push(options);
       }.bind(this));
 
-      this.options.attr('child_options', new_child_options);
+      this.options.attr('child_options', newChildList);
+      this.options.attr('_added_child_list', true);
     }
   },
 
@@ -1709,6 +1712,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
   expand: function () {
     var $el = this.element;
 
+    this.add_child_lists_to_child();
     if (this._expand_deferred && $el.find('.openclose').is('.active')) {
       // If we have already expanded and are currently still expanded, then
       // short-circuit the call. However, we still need to toggle `expanded`,
