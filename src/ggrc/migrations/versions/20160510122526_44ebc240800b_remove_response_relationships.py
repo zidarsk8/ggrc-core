@@ -30,6 +30,13 @@ def upgrade():
           ("Response", "DocumentationResponse", "InterviewResponse",
            "PopulationSampleResponse")
       """)
+  op.execute(
+      """
+      DELETE FROM object_documents
+      WHERE documentable_type IN
+        ("Response", "DocumentationResponse", "InterviewResponse",
+         "PopulationSampleResponse")
+      """)
 
 
 def downgrade():
