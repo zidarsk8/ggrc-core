@@ -8,7 +8,8 @@
 (function (can, $) {
   can.Component.extend({
     tag: 'mapping-tree-view',
-    template: can.view(GGRC.mustache_path + '/base_templates/mapping_tree_view.mustache'),
+    template: can.view(GGRC.mustache_path +
+      '/base_templates/mapping_tree_view.mustache'),
     scope: {
       reusable: '@',
       reuseMethod: '@',
@@ -27,8 +28,10 @@
     events: {
       '[data-toggle=unmap] click': function (el, ev) {
         var instance = el.find('.result').data('result');
-        var mappings = this.scope.parentInstance.get_mapping(this.scope.mapping);
+        var mappings = this.scope.parentInstance.get_mapping(
+          this.scope.mapping);
         var binding;
+
         ev.stopPropagation();
 
         binding = _.find(mappings, function (mapping) {
