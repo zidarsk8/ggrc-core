@@ -401,6 +401,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     add_item_view: null,
     parent: null,
     list: null,
+    filteredList: [],
     single_object: false,
     find_params: {},
     sort_property: null,
@@ -899,28 +900,33 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var pageCount;
     var mid;
     var pos;
-    if (this.options.disable_lazy_loading || this.element === null) {
+    var options = this.options;
+
+    if (options.disable_lazy_loading ||
+        !this.element ||
+        options.attr('drawingItems')) {
       return;
     }
     elPosition = this.el_position.bind(this);
-    children = this.element.children();
+    children = options.attr('filteredList');
     lo = 0;
     hi = children.length - 1;
     max = hi;
     steps = 0;
     visible = [];
-    alreadyVisible = _.filter(this.element[0].children, function (e) {
-      // doing this manualy is 10x faster than a jQuery selector and performance
-      // here matters since it runs on every scroll event on a potentialy long
-      // list of items
-      return e.tagName === 'LI';
-    });
     toRender = [];
+
+    if (!children.length || !children[0].element) {
+      return;
+    }
+    alreadyVisible = _.filter(children, function (child) {
+      return !child.options.attr('isPlaceholder');
+    });
 
     while (steps < MAX_STEPS && lo < hi) {
       steps += 1;
       mid = (lo + hi) / 2 | 0;
-      pos = elPosition(children[mid]);
+      pos = elPosition(children[mid].element);
       if (pos < 0) {
         lo = mid;
         continue;
@@ -932,16 +938,15 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       lo = mid;
       hi = mid;
     }
-    pageCount = this.options.scroll_page_count;
-    while (lo > 0 && elPosition(children[lo - 1]) >= (-pageCount)) {
+    pageCount = options.scroll_page_count;
+    while (lo > 0 && elPosition(children[lo - 1].element) >= (-pageCount)) {
       lo -= 1;
     }
-    while (hi < max && elPosition(children[hi + 1]) <= pageCount) {
+    while (hi < max && elPosition(children[hi + 1].element) <= pageCount) {
       hi += 1;
     }
 
-    _.each(alreadyVisible, function (visible_element) {
-      control = $(visible_element).control();
+    _.each(alreadyVisible, function (control) {
       if (!control) {
         return;
       }
@@ -954,8 +959,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
     for (i = lo; i <= hi; i++) {
       index = this._is_scrolling_up ? (hi - (i - lo)) : i;
-      control = $(children[index]).control();
-      if (control === undefined || control === null) {
+      control = children[index];
+      if (!control) {
         // TODO this should not be necessary
         // draw_visible is called too soon when controlers are not yet
         // available and then again when they are. Remove the too soon
@@ -1128,6 +1133,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var sortProp = this.options.sort_property;
     var sortFunction = this.options.sort_function;
     var filter = this.options.filter;
+    var filteredItems = [];
     var res;
 
     items = can.makeArray(optionsList);
@@ -1154,6 +1160,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       }
       control = new CMS.Controllers.TreeViewNode(elem, options);
       drawItemsDfds.push(control._draw_node_deferred);
+      filteredItems.push(control);
       return control.element;
     }.bind(this));
 
@@ -1165,9 +1172,11 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     if (this.options.sortable) {
       $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
     }
+    this.options.attr('filteredList', filteredItems);
     res = $.when.apply($, drawItemsDfds);
+
     res.then(function () {
-      setTimeout(this.draw_visible.bind(this), 0);
+      _.defer(this.draw_visible.bind(this));
     }.bind(this));
     return res;
   },
@@ -1543,7 +1552,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
         this._draw_node_deferred.resolve();
       }.bind(this))
     );
-
+    this.options.attr('isPlaceholder', false);
     this._draw_node_in_progress = false;
     this.options.attr('is_subtree',
         this.element && this.element.closest('.inner-tree').length > 0);
@@ -1560,6 +1569,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
         delete this._expand_deferred;
       }.bind(this))
     );
+    this.options.attr('isPlaceholder', true);
   },
 
   should_draw_children: function () {
