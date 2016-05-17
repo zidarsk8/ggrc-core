@@ -107,11 +107,12 @@
               } else if (roles.length) {
                 rel.attrs.attr('AssigneeType', roles.join(','));
                 rel.save().then(function () {
-                  instance.refresh();
+                  return instance.refresh();
                 });
               } else {
-                rel.destroy();
-                instance.refresh();
+                rel.destroy().then(function () {
+                  return instance.refresh();
+                });
               }
             }.bind(this));
           }
