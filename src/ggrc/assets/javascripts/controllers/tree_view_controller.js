@@ -881,7 +881,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     }
     return 0;
   },
-  draw_visible_call_count: 0,
+  draw_visible_call_id: 0,
   draw_visible: _.debounce(function () {
     var MAX_STEPS = 100;
     var elPosition;
@@ -904,6 +904,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     }
     elPosition = this.el_position.bind(this);
     children = this.element.children();
+
     lo = 0;
     hi = children.length - 1;
     max = hi;
@@ -942,13 +943,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
     _.each(alreadyVisible, function (visible_element) {
       control = $(visible_element).control();
-      if (!control) {
-        return;
-      }
-      if (Math.abs(elPosition(control.element)) <= pageCount) {
+      if (control && Math.abs(elPosition(control.element)) <= pageCount) {
         visible.push(control);
-      } else {
-        control.draw_placeholder();
       }
     });
 
@@ -967,19 +963,19 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         toRender.push(control);
       }
     }
-    this.renderStep(toRender, ++this.draw_visible_call_count);
-  }, 100, {leading: true}),
-  renderStep: function renderStep(toRender, count) {
-    // If there is nothing left to render or if draw_visible was run while
-    // rendering we simply terminate.
-    if (toRender.length === 0 || this.draw_visible_call_count > count) {
-      return;
-    }
-    toRender[0].draw_node();
-    setTimeout(function () {
-      this.renderStep(toRender.slice(1), count);
-    }.bind(this), 0);
-  },
+
+    // Increment call ID so that all previous draw_node calls will be skipped.
+    this.draw_visible_call_id++;
+    _.each(toRender, function (step) {
+      callId = this.draw_visible_call_id;
+      setTimeout(function () {
+        if (this.draw_visible_call_id === callId) {
+          step.draw_node();
+        }
+      }.bind(this), 0);
+    }.bind(this));
+  }, 30, {leading: true}),
+
   _last_scroll_top: 0,
 
   _is_scrolling_up: false,
