@@ -39,11 +39,13 @@
                  mapping.instance.type === instance.type;
         });
         _.each(binding.get_mappings(), function (mapping) {
-          mapping.refresh().then(function () {
-            mapping.destroy().then(function () {
-              mapping.documentable.reify().refresh();
+          mapping.refresh()
+            .then(function () {
+              return mapping.destroy();
+            })
+            .then(function () {
+              return mapping.documentable.reify();
             });
-          });
         });
       }
     }
