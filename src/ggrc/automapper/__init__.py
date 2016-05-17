@@ -81,7 +81,7 @@ class AutomapperGenerator(object):
         self.cache[dst].add(src)
 
     for type_, ids in batch_requests.iteritems():
-      model = getattr(models, type_)
+      model = getattr(models.all_models, type_)
       instances = model.query.filter(model.id.in_(ids))
       for instance in instances:
         self.instance_cache[Stub(type_, instance.id)] = instance
@@ -177,12 +177,12 @@ class AutomapperGenerator(object):
           self.queue.add(entry)
 
   def _step_implicit(self, src, dst, implicit):
-    if not hasattr(models, src.type):
+    if not hasattr(models.all_models, src.type):
       logging.warning('Automapping by attr: cannot find model %s', src.type)
       return
     instance = self.instance_cache.get(src)
     if instance is None:
-      model = getattr(models, src.type)
+      model = getattr(models.all_models, src.type)
       instance = model.query.filter(model.id == src.id).first()
       self.instance_cache[src] = instance
     if instance is None:
