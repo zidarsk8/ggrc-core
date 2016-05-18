@@ -142,6 +142,7 @@
 
               {{#each instance.assessorsList}}
                 <person
+                  editable="true"
                   person-id="{{@key}}"
                   can-person-remove="instance.assessorRemoved"></person>
               {{/each}}
@@ -177,6 +178,7 @@
 
               {{#each instance.verifiersList}}
                 <person
+                  editable="true"
                   person-id="{{@key}}"
                   can-person-remove="instance.verifierRemoved"></person>
               {{/each}}
