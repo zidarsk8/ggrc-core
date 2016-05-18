@@ -7,7 +7,13 @@
 
 .rich-text {
   &__wrapper {
-    margin: -2px -2px -2px -4px;
+    @include border-radius(2px);
+    border: 1px solid $warmGray;
+    .inline-edit--active & {
+      @include border-radius(0);
+      border: none;
+      margin: -2px -2px -2px -4px;
+    }
   }
   &__toolbar {
     background: $itemBgnd;
