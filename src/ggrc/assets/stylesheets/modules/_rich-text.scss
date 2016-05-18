@@ -12,5 +12,12 @@
   &__toolbar {
     background: $itemBgnd;
     border-top: 1px solid $warmGray;
+    padding: 3px !important;
+  }
+  &__content {
+    padding: 8px 10px !important;
+    .ql-editor {
+      min-height: 44px;
+    }
   }
 }
