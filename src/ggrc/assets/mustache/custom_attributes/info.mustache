@@ -64,11 +64,17 @@
                 ></inline-edit>
               {{/case}}
               {{#case 'Map:Person'}}
-                <h6>{{title}}</h6>
                 {{#with_object_for_id id}}
-                  {{#using person=object}}
-                    {{>'/static/mustache/people/popover.mustache'}}
-                  {{/using}}
+                  <inline-edit
+                    instance="instance"
+                    ca-id="id"
+                    value="object"
+                    label="title"
+                    type="person"
+                    mandatory="mandatory"
+                    placeholder="placeholder"
+                    helptext="helptext"
+                  ></inline-edit>
                 {{/with_object_for_id}}
               {{/case}}
               {{#default}}

@@ -43,10 +43,10 @@
         var instance = this.attr('instance');
         var oldValue = this.attr('value');
         var value = this.attr('context.value');
+        var type = this.attr('type');
 
         ev.preventDefault();
         this.attr('context.isEdit', false);
-
         if (oldValue === value) {
           return;
         }
@@ -54,8 +54,11 @@
         this.attr('isSaving', true);
         instance.refresh().then(function () {
           if (this.attr('caId')) {
-            if (this.attr('type') === 'checkbox') {
+            if (type === 'checkbox') {
               value = value ? 1 : 0;
+            }
+            if (type === 'person') {
+              value = 'Person:' + value.id;
             }
             instance.attr('custom_attributes.' + caid, value);
           } else {
