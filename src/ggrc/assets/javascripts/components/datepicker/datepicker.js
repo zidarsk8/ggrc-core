@@ -16,11 +16,32 @@
     ),
     scope: {
       date: null,
-      format: '@'
+      format: '@',
+      datepicker: null,
+      isShown: false,
+      onSelect: function (val, ev) {
+        this.attr('date', val);
+      },
+      onFocus: function () {
+        this.attr('isShown', true);
+      }
     },
     events: {
       inserted: function () {
-        this.element.find('.datepicker__input').datepicker();
+        var element = this.element.find('.datepicker__calendar');
+        var datepicker = element.datepicker({
+          altField: this.element.find('.datepicker__input'),
+          onSelect: this.scope.onSelect.bind(this.scope)
+        }).data('datepicker');
+        this.scope.attr('datepicker', datepicker);
+      },
+      '{window} mousedown': function (el, ev) {
+        var isInside = this.element.has(ev.target).length ||
+                       this.element.is(ev.target);
+
+        if (this.scope.isShown && !isInside) {
+          this.scope.attr('isShown', false);
+        }
       }
     }
   });
