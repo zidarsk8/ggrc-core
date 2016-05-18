@@ -19,6 +19,7 @@ dashboard-js-files:
   - zeroclipboard/dist/ZeroClipboard.min.js
   - stickyfill/stickyfill.js
   - mousetrap/mousetrap.min.js
+  - quill/dist/quill.min.js
   - canjs/can.jquery.js
   - canjs/can.construct.super.js
   - canjs/can.list.sort.js
