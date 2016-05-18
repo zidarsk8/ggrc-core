@@ -6,11 +6,14 @@
 }}
 
 <div class="inline-edit {{#if context.isEdit}}inline-edit--active{{/if}}">
-  <h6 class="inline-edit__title">{{firstnonempty title label}}</h6>
+  <h6 class="inline-edit__title">
+    {{firstnonempty title label}}
+    {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+  </h6>
 
   <spinner toggle="isSave"></spinner>
   {{^if isSave}}
-  <div class="inline-edit__content">
+  <div class="inline-edit__content {{#if_equals type 'text'}}inline-edit__content--wide{{/if_equals}}">
     {{#switch type}}
       {{#case 'checkbox'}}
         <inline-checkbox context="context"></inline-checkbox>
