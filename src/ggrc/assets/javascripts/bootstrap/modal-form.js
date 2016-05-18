@@ -320,7 +320,11 @@
       var message;
       var messageI;
       var flashClass;
-      var flashClassMappings = {notice: 'success'};
+      var flashClassMappings = {
+        notice: 'success',
+        Running: 'progress',
+        Pending: 'progress'
+      };
       var $html;
       var gotMessage = _.some(_.values(flash), function (msg) {
         return !!msg;

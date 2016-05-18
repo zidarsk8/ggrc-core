@@ -53,7 +53,7 @@
 
 .alert-progress {
   color: $darkText;
-  background: image-url('ajax-loader.gif') no-repeat 10px 9px;
+  background: url('/static/images/ajax-loader.gif') no-repeat 10px 9px;
   background-color: $messagePurple;
   padding-left: 35px;
 }
