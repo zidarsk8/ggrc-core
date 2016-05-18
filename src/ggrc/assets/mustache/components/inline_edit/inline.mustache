@@ -13,7 +13,7 @@
 
   <spinner toggle="isSave"></spinner>
   {{^if isSave}}
-  <div class="inline-edit__content">
+  <div class="inline-edit__content {{#if_equals type 'text'}}inline-edit__content--wide{{/if_equals}}">
     {{#switch type}}
       {{#case 'checkbox'}}
         <inline-checkbox context="context"></inline-checkbox>

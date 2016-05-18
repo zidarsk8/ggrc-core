@@ -24,6 +24,11 @@
         height: 100%;
       }
     }
+    &--wide {
+      .inline-edit--active & {
+        width: 100%;
+      }
+    }
     input,
     textarea,
     select {
@@ -37,6 +42,14 @@
         .inline-edit__controls {
           height: auto;
         }
+      }
+      .rich-text__wrapper {
+        margin: -2px -2px -2px -4px;
+      }
+      .rich-text__toolbar {
+        // border-left: 1px solid $warmGray;
+        background: $itemBgnd;
+        border-bottom: 1px solid $warmGray;
       }
     }
   }
