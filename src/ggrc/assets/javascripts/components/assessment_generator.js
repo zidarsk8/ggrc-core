@@ -37,6 +37,16 @@
           callback: this.generateAssessments.bind(this)
         });
       },
+      showDialog: function (task) {
+        var types = {
+          'Success': 'success',
+          'Failure': 'error',
+          'Running': 'progress',
+        }
+        var argh = {};
+        argh[types[task.status]] = "Generating assessments " +  task.status.toLowerCase() + "...";
+        $('body').trigger('ajax:flash', argh);
+      },
       generateAssessments: function (list, options) {
         var que = new RefreshQueue();
 
@@ -48,15 +58,16 @@
           }.bind(this));
           this._results = results;
           $.when.apply($, results)
-            .always(function () {
-              // We reload page after creation of assessments
-              // because currently is no way to get custom attributes dynamically
-              setTimeout(function () {
-                window.location.reload();
-              }, 3000);
-            })
-            .done(this.notify.bind(this))
-            .fail(this.notify.bind(this));
+            .then(function (task) {
+              if (!task) {
+                return;
+              }
+              this.showDialog(task);
+              task.poll().then(function (task){
+                this.showDialog(task);
+              }.bind(this));
+              this.notify.bind(this);
+            }.bind(this));
         }.bind(this));
       },
       generateModel: function (object, template) {
@@ -82,6 +93,7 @@
             data.test_plan = object.test_plan;
           }
         }
+        data.run_in_background = true;
         return new CMS.Models.Assessment(data).save();
       },
       notify: function () {
