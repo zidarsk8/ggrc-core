@@ -29,7 +29,7 @@
             <i class="fa fa-question-circle" rel="tooltip" title="Object for this Assessment"></i>
           </label>
           <input tabindex="2" class="input-block-level" name="object.title" data-permission-type="update"
-                 data-lookup="Program,AccessGroup,Clause,Control,Facility,Issue,Market,Objective,OrgGroup,Person,Process,Product,Project,Request,Section,System,Vendor,Policy,Regulation,Standard,Contract"
+                 data-lookup="Program,AccessGroup,Clause,Control,DataAsset,Facility,Issue,Market,Objective,OrgGroup,Person,Process,Product,Project,Request,Risk,Section,System,Vendor,Policy,Regulation,Standard,Contract,Threat"
                  data-template="/directives/autocomplete_result.mustache" placeholder="Choose Object"
                  type="text" value="{{firstexist object.title ''}}" />
       </div>
@@ -70,35 +70,35 @@
         <div class="span12 hidable">
           <div class="comment-notification">
             <label>
-              <input type="checkbox" 
+              <input type="checkbox"
                      name="send_by_default"
                      {{# send_by_default}}checked{{/send_by_default}}>
               Enable notifications on comments
             </label>
             <ul class="comment-notification__list">
               <li>
-								<label class="input--inline">
-                  <input type="checkbox" 
+                <label class="input--inline">
+                  <input type="checkbox"
                         name="Creator"
                         {{# Creator}}checked{{/Creator}}>
                   Notify creator(s)
-								</label>
+                </label>
               </li>
               <li>
-								<label class="input--inline">
-                  <input type="checkbox" 
+                <label class="input--inline">
+                  <input type="checkbox"
                         name="Assessor"
                         {{# Assessor}}checked{{/Assessor}}>
                   Notify assessor(s)
-								</label>
+                </label>
               </li>
               <li>
-								<label class="input--inline">
-                  <input type="checkbox" 
+                <label class="input--inline">
+                  <input type="checkbox"
                         name="Verifier"
                         {{# Verifier}}checked{{/Verifier}}>
                   Notify verifier(s)
-								</label>
+                </label>
               </li>
             </ul>
           </div>
