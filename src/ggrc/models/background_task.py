@@ -3,6 +3,7 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
+from werkzeug import Headers
 from ggrc import db, settings
 from ggrc.login import get_current_user
 from .mixins import deferred, Base, Stateful
@@ -35,6 +36,7 @@ class BackgroundTask(Base, Stateful, db.Model):
     self.status = "Running"
     db.session.add(self)
     db.session.commit()
+    db.session.flush()
 
   def finish(self, status, result):
     # Ensure to not commit any not-yet-committed changes
@@ -73,10 +75,8 @@ def create_task(name, url, queued_task=None, parameters={}):
   # schedule a task queue
   if getattr(settings, 'APP_ENGINE', False):
     from google.appengine.api import taskqueue
-    if request.method == "POST":
-      headers = [h for h in request.headers if h[0] == 'Cookie']
-    else:
-      headers = request.headers
+    headers = Headers(request.headers)
+    headers.add('x-task-id', task.id)
     taskqueue.add(
         queue_name="ggrc",
         url=url,

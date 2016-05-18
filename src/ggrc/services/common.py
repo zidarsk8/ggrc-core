@@ -10,6 +10,7 @@ resources.
 
 import datetime
 import hashlib
+import json
 import logging
 import time
 import traceback
@@ -855,7 +856,8 @@ class Resource(ModelView):
             self.object_for_json(task, 'background_task'),
             self.modified_at(task))
     else:
-      task = BackgroundTask.query.get(request.args.get("task_id"))
+      task_id = int(request.headers.get('x-task-id'))
+      task = BackgroundTask.query.get(task_id)
     task.start()
     try:
       with benchmark("Query for object"):
@@ -1155,7 +1157,23 @@ class Resource(ModelView):
     if self.request.mimetype != 'application/json':
       return current_app.make_response((
           'Content-Type must be application/json', 415, []))
-    body = self.request.json
+
+    if 'X-GGRC-BackgroundTask' in request.headers:
+      if 'X-Appengine-Taskname' not in request.headers:
+        task = create_task(request.method, request.full_path,
+                           None, request.data)
+        if getattr(settings, 'APP_ENGINE', False):
+          return self.json_success_response(
+              self.object_for_json(task, 'background_task'),
+              self.modified_at(task))
+        body = self.request.json
+      else:
+        task_id = int(self.request.headers.get('x-task-id'))
+        task = BackgroundTask.query.get(task_id)
+        body = json.loads(task.parameters)
+      task.start()
+    else:
+      body = self.request.json
     wrap = type(body) == dict
     if wrap:
       body = [body]
@@ -1189,8 +1207,15 @@ class Resource(ModelView):
         headers["X-Flash-Error"] = ' || '.join((error for _, error in errors))
       else:
         status = 200
-    return current_app.make_response(
+    result = current_app.make_response(
         (self.as_json(res), status, headers))
+
+    if 'X-GGRC-BackgroundTask' in request.headers:
+      if status == 200:
+        task.finish("Success", result)
+      else:
+        task.finish("Failure", result)
+    return result
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
