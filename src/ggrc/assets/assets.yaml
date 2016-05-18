@@ -138,6 +138,7 @@ dashboard-js-files:
   - components/assessment_templates/assessment_templates.js
   - components/modal_wrappers/assessment_template_form.js
   - components/reminder.js
+  - components/datepicker/datepicker.js
   - components/inline_edit/inline.js
   - components/inline_edit/inline_checkbox.js
   - components/inline_edit/inline_dropdown.js
@@ -267,6 +268,7 @@ dashboard-js-template-files:
   - components/person/person.mustache
   - components/spinner/spinner.mustache
   - components/rich_text/rich_text.mustache
+  - components/datepicker/datepicker.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
