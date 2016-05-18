@@ -56,7 +56,7 @@
     padding-top: 2px;
     box-sizing: border-box;
     border-left: 1px solid $warmGray;
-    background: $pbcListGray;
+    background: $itemBgnd;
     li {
       display: inline-block;
     }
@@ -75,7 +75,7 @@
       height: auto;
       border: 1px solid $warmGray;
       border-top: none;
-      background: $pbcListGray;
+      background: $itemBgnd;
     }
     .inline-edit--active & {
       display: block;
