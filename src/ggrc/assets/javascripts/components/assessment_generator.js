@@ -37,15 +37,24 @@
           callback: this.generateAssessments.bind(this)
         });
       },
-      showDialog: function (task) {
-        var types = {
-          'Success': 'success',
-          'Failure': 'error',
-          'Running': 'progress',
+      showDialog: function (statuses) {
+        var dialog = {};
+        var type;
+        var messages = {
+          error: 'Generating assessments has failed.',
+          progress: 'Generating assessments is in progress.',
+          success: 'Assessments generated successfully. {reload_link}'
+        };
+        if (statuses.Failure > 0) {
+          type = 'error';
+        } else if (statuses.Pending > 0 || statuses.Running > 0) {
+          type = 'progress';
+        } else {
+          type = 'success';
         }
-        var argh = {};
-        argh[types[task.status]] = "Generating assessments " +  task.status.toLowerCase() + "...";
-        $('body').trigger('ajax:flash', argh);
+
+        dialog[type] = messages[type];
+        $('body').trigger('ajax:flash', dialog);
       },
       generateAssessments: function (list, options) {
         var que = new RefreshQueue();
@@ -58,15 +67,33 @@
           }.bind(this));
           this._results = results;
           $.when.apply($, results)
-            .then(function (task) {
-              if (!task) {
+            .then(function () {
+              var tasks = arguments;
+              var ids;
+              var interval;
+              this.showDialog({Pending: 1});
+              options.context.closeModal();
+              if (!tasks.length || tasks[0] instanceof CMS.Models.Assessment) {
+                // We did not create a task
+                window.location.reload();
                 return;
               }
-              this.showDialog(task);
-              task.poll().then(function (task){
-                this.showDialog(task);
-              }.bind(this));
-              this.notify.bind(this);
+              ids = _.uniq(_.map(arguments, function (task) {
+                return task.id;
+              }));
+              interval = setInterval(function () {
+                CMS.Models.BackgroundTask.findAll({
+                  id__in: ids.join(',')
+                }).then(function (tasks) {
+                  var statuses = _.countBy(tasks, function (task) {
+                    return task.status;
+                  });
+                  if (!statuses.Pending && !statuses.Running) {
+                    clearInterval(interval);
+                  }
+                  this.showDialog(statuses);
+                }.bind(this));
+              }.bind(this), 2000);
             }.bind(this));
         }.bind(this));
       },
