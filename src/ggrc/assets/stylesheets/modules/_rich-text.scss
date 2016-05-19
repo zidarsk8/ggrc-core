@@ -1,0 +1,29 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.rich-text {
+  &__wrapper {
+    @include border-radius(2px);
+    border: 1px solid $warmGray;
+    .inline-edit--active & {
+      @include border-radius(0);
+      border: none;
+      margin: -2px -2px -2px -4px;
+    }
+  }
+  &__toolbar {
+    background: $itemBgnd;
+    border-top: 1px solid $warmGray;
+    padding: 3px !important;
+  }
+  &__content {
+    padding: 8px 10px !important;
+    .ql-editor {
+      min-height: 44px;
+    }
+  }
+}
