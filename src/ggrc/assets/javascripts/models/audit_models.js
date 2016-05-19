@@ -895,16 +895,16 @@
           this._set_mandatory_msgs.bind(this));
     },
     _set_recipients: function (recipients) {
-      if (recipients){
+      if (recipients) {
         labels = ['Creator', 'Assessor', 'Verifier'];
-        _.each(labels, function(label) {
+        _.each(labels, function (label) {
           this.attr(label, _.includes(recipients, label));
         }.bind(this));
       }
     },
-    _get_recipients: function (){
+    _get_recipients: function () {
       labels = ['Creator', 'Assessor', 'Verifier'];
-      return _.map(labels, function(label) {
+      return _.map(labels, function (label) {
         return this.attr(label) ? label : '';
       }.bind(this)).join(',');
     },
