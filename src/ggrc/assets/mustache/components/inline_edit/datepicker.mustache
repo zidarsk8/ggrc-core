@@ -7,7 +7,6 @@
 
 {{#if context.isEdit}}
   {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-  {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
   <datepicker date="context.value"></datepicker>
 {{else}}
   <p class="inline-edit__text">
