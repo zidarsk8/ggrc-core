@@ -13,7 +13,6 @@ import hashlib
 import json
 import logging
 import time
-import traceback
 from exceptions import TypeError
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
@@ -1191,8 +1190,8 @@ class Resource(ModelView):
       except Exception as e:
         if not src_res or 200 <= src_res[0] < 300:
           src_res = (getattr(e, "code", 500), e.message)
-        current_app.logger.warn("Collection POST commit failed: " + str(e) +
-                                "\n" + traceback.format_exc())
+        current_app.logger.warn("Collection POST commit failed:")
+        current_app.logger.exception(e)
         db.session.rollback()
       res.append(src_res)
     headers = {"Content-Type": "application/json"}

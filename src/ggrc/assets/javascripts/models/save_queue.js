@@ -61,15 +61,13 @@
             }
           }
           if ("background_task" in data) {
-            return CMS.Models.BackgroundTask.findOne(
-              {id: data.background_task.id}
-            ).then(function (task) {
-              var i;
+            return CMS.Models.BackgroundTask.findOne({
+              id: data.background_task.id
+            }).then(function (task) {
               // Resolve all the dfds with the task
-              for (i = 0; i < objs.length; i++) {
-                obj = objs[i];
+              can.each(objs, function (obj) {
                 obj._dfd.resolve(task);
-              }
+              });
             });
           }
           cb = function (single) {

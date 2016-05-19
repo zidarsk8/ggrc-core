@@ -37,8 +37,8 @@
           callback: this.generateAssessments.bind(this)
         });
       },
-      showDialog: function (statuses) {
-        var dialog = {};
+      showFlash: function (statuses) {
+        var flash = {};
         var type;
         var messages = {
           error: 'Generating assessments has failed.',
@@ -53,8 +53,8 @@
           type = 'success';
         }
 
-        dialog[type] = messages[type];
-        $('body').trigger('ajax:flash', dialog);
+        flash[type] = messages[type];
+        $('body').trigger('ajax:flash', flash);
       },
       generateAssessments: function (list, options) {
         var que = new RefreshQueue();
@@ -71,7 +71,7 @@
               var tasks = arguments;
               var ids;
               var interval;
-              this.showDialog({Pending: 1});
+              this.showFlash({Pending: 1});
               options.context.closeModal();
               if (!tasks.length || tasks[0] instanceof CMS.Models.Assessment) {
                 // We did not create a task
@@ -91,7 +91,7 @@
                   if (!statuses.Pending && !statuses.Running) {
                     clearInterval(interval);
                   }
-                  this.showDialog(statuses);
+                  this.showFlash(statuses);
                 }.bind(this));
               }.bind(this), 2000);
             }.bind(this));
