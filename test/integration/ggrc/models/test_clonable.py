@@ -9,7 +9,7 @@ from ggrc import db
 from ggrc import models
 
 import integration.ggrc
-from integration.ggrc import api_helper
+from integration.ggrc import generator
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
@@ -27,14 +27,21 @@ class TestClonable(integration.ggrc.TestCase):
   def setUp(self):
     integration.ggrc.TestCase.setUp(self)
     self.client.get("/login")
-    self.api_helper = api_helper.Api()
+    self.generator = generator.Generator()
+    self.object_generator = generator.ObjectGenerator()
 
-  def clone_object(self, obj, associated_objects=[]):
-    # pylint: disable=dangerous-default-value
-    return self.api_helper.modify_object(obj, {
-        "operation": "clone",
-        "associatedObjects": associated_objects
-    })
+  def clone_object(self, obj, mapped_objects=[]):
+    return self.object_generator.generate_object(
+        models.Audit,
+        {
+            "context": self.object_generator.create_stub(obj.context),
+            "operation": "clone",
+            "status": "Not Started",
+            "cloneOptions": {
+                "sourceObjectId": obj.id,
+                "mappedObjects": mapped_objects
+            }
+        })
 
   def test_audit_clone(self):
     """Test that assessment templates get copied correctly"""
