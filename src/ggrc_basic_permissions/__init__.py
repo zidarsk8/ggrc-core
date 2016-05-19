@@ -751,8 +751,9 @@ def create_audit_context(audit):
 
 @Resource.model_posted.connect_via(Audit)
 def handle_audit_post(sender, obj=None, src=None, service=None):
-  db.session.flush()
-  create_audit_context(obj)
+  if not src.get("operation", None):
+    db.session.flush()
+    create_audit_context(obj)
 
 
 @Resource.model_deleted.connect
