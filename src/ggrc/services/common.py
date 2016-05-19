@@ -988,6 +988,11 @@ class Resource(ModelView):
 
       else:
         cache_objs, database_objs = self.get_matched_resources(matches)
+        # Disable caching for background tasks
+        # Because setting background task status circumvents our memcache
+        # invalidation logic we are disabling memcache for this object.
+        if self.model.__name__ == 'BackgroundTask':
+          cache_objs = []
         objs = {}
         objs.update(cache_objs)
         objs.update(database_objs)
