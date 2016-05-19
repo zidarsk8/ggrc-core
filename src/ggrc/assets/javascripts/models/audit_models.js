@@ -172,6 +172,14 @@
     object_model: can.compute(function () {
       return CMS.Models[this.attr('object_type')];
     }),
+    clone: function (options) {
+      var model = CMS.Models.Audit;
+      return new model({
+        operation: 'clone',
+        cloneOptions: options.cloneOptions,
+        context: this.context
+      });
+    },
     save: function () {
       // Make sure the context is always set to the parent program
       if (!this.context || !this.context.id) {
