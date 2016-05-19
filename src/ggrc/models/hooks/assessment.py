@@ -84,20 +84,31 @@ def get_model_query(model_type):
   return db.session.query(model)
 
 
-def get_value(which, audit, obj, template=None):
-  """Gets person value from string
+def get_value(people_group, audit, obj, template=None):
+  """Return the people related to an Audit belonging to the given role group.
 
-      Args:
-        which (string): type of people we are getting from template
-        template (model instance): Template related to Assessment
-        audit (model instance): Audit related to Assessment
-        obj (model instance): Object related to Assessment
-            (it can be any object in our app ie. Control,Issue, Facility...)
+  Args:
+    people_group: (string) the name of the group of people to return,
+      e.g. "assessors"
+    template: (ggrc.models.AssessmentTemplate) a template to take into
+      consideration
+    audit: (ggrc.models.Audit) an audit instance
+    obj: an object related to `audit`, can be anything that can be mapped
+      to an Audit, e.g. Control, Issue, Facility, etc.
+  Returns:
+    Either a Person object, a list of Person objects, or None if no people
+    matching the criteria are found.
   """
   if not template:
-    if which in ("assessors", "creator"):
+    if people_group == "creator":
       # don't use get_current_user because that returns a proxy
       return Person.query.get(get_current_user_id())
+    elif people_group == "assessors":
+      return [
+          user_role.person for user_role in audit.context.user_roles
+          if user_role.role.name == u"Auditor"
+      ]
+
     return None
 
   types = {
@@ -110,7 +121,7 @@ def get_value(which, audit, obj, template=None):
       "Primary Assessor": getattr(obj, 'principal_assessor', None),
       "Secondary Assessor": getattr(obj, 'secondary_assessor', None),
   }
-  people = template.default_people.get(which)
+  people = template.default_people.get(people_group)
   if not people:
     return None
 
