@@ -3,15 +3,18 @@
 # Created By: anze@reciprocitylabs.com
 # Maintained By: anze@reciprocitylabs.com
 
-from werkzeug import Headers
-from ggrc import db, settings
-from ggrc.login import get_current_user
-from .mixins import deferred, Base, Stateful
 from functools import wraps
+from time import time
 from flask import request
 from flask.wrappers import Response
+from werkzeug.datastructures import Headers
+from ggrc import db
+from ggrc import settings
+from ggrc.login import get_current_user
+from ggrc.models.mixins import Base
+from ggrc.models.mixins import deferred
+from ggrc.models.mixins import Stateful
 from ggrc.models.types import CompressedType
-from time import time
 
 
 class BackgroundTask(Base, Stateful, db.Model):
@@ -36,7 +39,6 @@ class BackgroundTask(Base, Stateful, db.Model):
     self.status = "Running"
     db.session.add(self)
     db.session.commit()
-    db.session.flush()
 
   def finish(self, status, result):
     # Ensure to not commit any not-yet-committed changes
@@ -63,9 +65,11 @@ class BackgroundTask(Base, Stateful, db.Model):
                               self.result['headers']))
 
 
-def create_task(name, url, queued_task=None, parameters={}):
+def create_task(name, url, queued_callback=None, parameters=None):
 
   # task name must be unique
+  if not parameters:
+    parameters = {}
   task = BackgroundTask(name=name + str(int(time())))
   task.parameters = parameters
   task.modified_by = get_current_user()
@@ -84,13 +88,13 @@ def create_task(name, url, queued_task=None, parameters={}):
         params={'task_id': task.id},
         method=request.method,
         headers=headers)
-  elif queued_task:
-    queued_task(task)
+  elif queued_callback:
+    queued_callback(task)
   return task
 
 
-def make_task_response(id):
-  task = BackgroundTask.query.get(id)
+def make_task_response(id_):
+  task = BackgroundTask.query.get(id_)
   return task.make_response()
 
 
