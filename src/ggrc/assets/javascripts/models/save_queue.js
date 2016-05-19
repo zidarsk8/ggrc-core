@@ -120,7 +120,7 @@
       };
       if (obj.isNew()) {
         type = obj.constructor.table_singular;
-        bucketName = type + obj.run_in_background ? "_bg" : "";
+        bucketName = type + (obj.run_in_background ? "_bg" : "");
         bucket = this._buckets[bucketName];
 
         if (_.isUndefined(bucket)) {
