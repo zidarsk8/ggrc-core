@@ -23,12 +23,16 @@ class Clonable(object):
 
   @classmethod
   def set_handlers(cls, model):
-    @common.Resource.model_put_after_commit.connect_via(model)
+    @common.Resource.model_posted.connect_via(model)
     def handle_model_clone(sender, obj=None, src=None, service=None):
       # pylint: disable=unused-argument, unused-variable
       if src.get("operation", "") == u"clone":
-        associated_objects = src.get("associatedObjects", [])
-        obj.clone(children={obj for obj in associated_objects
+        options = src.get("cloneOptions")
+        mapped_objects = options.get("mappedObjects", [])
+        source_id = int(options.get("sourceObjectId"))
+        obj.clone(
+            source_id=source_id,
+            mapped_objects={obj for obj in mapped_objects
                             if obj in model.CLONEABLE_CHILDREN})
 
   def generate_attribute(self, attribute):
@@ -47,7 +51,11 @@ class Clonable(object):
 
   def clone_custom_attribute_values(self, obj):
     """Copy object's custom attribute values"""
-    ca_values = self.custom_attribute_values
+    ca_values = obj.custom_attribute_values
 
     for value in ca_values:
-      value._clone(obj)  # pylint: disable=protected-access
+      value._clone(self)  # pylint: disable=protected-access
+
+  def update_attrs(self, values):
+    for key, value in values.items():
+      setattr(self, key, value)
