@@ -987,11 +987,6 @@ class Resource(ModelView):
 
       else:
         cache_objs, database_objs = self.get_matched_resources(matches)
-        # Disable caching for background tasks
-        # Because setting background task status circumvents our memcache
-        # invalidation logic we are disabling memcache for this object.
-        if self.model.__name__ == 'BackgroundTask':
-          cache_objs = []
         objs = {}
         objs.update(cache_objs)
         objs.update(database_objs)
@@ -1027,6 +1022,11 @@ class Resource(ModelView):
   def get_resources_from_cache(self, matches):
     """Get resources from cache for specified matches"""
     resources = {}
+    # Disable caching for background tasks
+    # Setting background task status circumvents our memcache
+    # invalidation logic so we have to disabling memcache.
+    if self.model.__name__ == 'BackgroundTask':
+      return resources
     # Skip right to memcache
     memcache_client = self.request.cache_manager.cache_object.memcache_client
     key_matches = {}
