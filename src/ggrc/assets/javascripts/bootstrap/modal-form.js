@@ -320,6 +320,8 @@
       var message;
       var messageI;
       var flashClass;
+      var addLink;
+      var $link;
       var flashClassMappings = {
         notice: 'success',
         Running: 'progress',
@@ -359,14 +361,28 @@
 
           $html = $('<div></div>');
           $html.addClass('alert').addClass('alert-' + flashClass);
+          if (flashClass !== 'progress') {
+            $html.addClass('alert-autohide');
+          }
           $html.append('<a href="#" class="close" data-dismiss="alert">x</a>');
 
           for (messageI in flash[type]) {
-            message = flash[type][messageI];
+            addLink = flash[type][messageI].indexOf('{reload_link}') > -1;
+            message = flash[type][messageI].replace('{reload_link}', '');
+            if (addLink) {
+              $html.removeClass('alert-autohide');
+            }
             // Skip error codes. To force display use String(...) when
             // triggering the flash.
             if (_.isString(message)) {
-              $html.append($('<span></span>').text(flash[type][messageI]));
+              $html.append($('<span></span>').text(message));
+              if (addLink) {
+                $link = $('<a href="javascript://">Show results</a>');
+                $link.on('click', function () {
+                  window.location.reload();
+                });
+                $html.append($link);
+              }
             }
           }
           $flashHolder.append($html);
