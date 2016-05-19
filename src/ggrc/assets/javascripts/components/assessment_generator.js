@@ -37,6 +37,25 @@
           callback: this.generateAssessments.bind(this)
         });
       },
+      showFlash: function (statuses) {
+        var flash = {};
+        var type;
+        var messages = {
+          error: 'Generating assessments has failed.',
+          progress: 'Generating assessments is in progress.',
+          success: 'Assessments generated successfully. {reload_link}'
+        };
+        if (statuses.Failure > 0) {
+          type = 'error';
+        } else if (statuses.Pending > 0 || statuses.Running > 0) {
+          type = 'progress';
+        } else {
+          type = 'success';
+        }
+
+        flash[type] = messages[type];
+        $('body').trigger('ajax:flash', flash);
+      },
       generateAssessments: function (list, options) {
         var que = new RefreshQueue();
 
@@ -48,15 +67,34 @@
           }.bind(this));
           this._results = results;
           $.when.apply($, results)
-            .always(function () {
-              // We reload page after creation of assessments
-              // because currently is no way to get custom attributes dynamically
-              setTimeout(function () {
+            .then(function () {
+              var tasks = arguments;
+              var ids;
+              var interval;
+              this.showFlash({Pending: 1});
+              options.context.closeModal();
+              if (!tasks.length || tasks[0] instanceof CMS.Models.Assessment) {
+                // We did not create a task
                 window.location.reload();
-              }, 3000);
-            })
-            .done(this.notify.bind(this))
-            .fail(this.notify.bind(this));
+                return;
+              }
+              ids = _.uniq(_.map(arguments, function (task) {
+                return task.id;
+              }));
+              interval = setInterval(function () {
+                CMS.Models.BackgroundTask.findAll({
+                  id__in: ids.join(',')
+                }).then(function (tasks) {
+                  var statuses = _.countBy(tasks, function (task) {
+                    return task.status;
+                  });
+                  if (!statuses.Pending && !statuses.Running) {
+                    clearInterval(interval);
+                  }
+                  this.showFlash(statuses);
+                }.bind(this));
+              }.bind(this), 2000);
+            }.bind(this));
         }.bind(this));
       },
       generateModel: function (object, template) {
@@ -82,6 +120,7 @@
             data.test_plan = object.test_plan;
           }
         }
+        data.run_in_background = true;
         return new CMS.Models.Assessment(data).save();
       },
       notify: function () {

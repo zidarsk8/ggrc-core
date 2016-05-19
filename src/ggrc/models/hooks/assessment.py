@@ -204,7 +204,12 @@ def relate_assignees(assessment, related):
 
   for person in people_list:
     if person['source'] is not None and person['destination'] is not None:
-      db.session.add(Relationship(**person))
+      rel = Relationship(
+          source=person['source'],
+          destination=person['destination'],
+          context=person['context'])
+      rel.attrs = person['attrs']
+      db.session.add(rel)
 
 
 def relate_ca(assessment, related):
