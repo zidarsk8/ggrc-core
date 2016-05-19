@@ -173,7 +173,7 @@ class AuditFactory(ModelFactory):
   class Meta:
     model = models.Audit
 
-  title = factory.LazyAttribute(lambda _: random_string("title"))
+  title = factory.LazyAttribute(lambda _: random_string("audit title "))
   slug = factory.LazyAttribute(lambda _: random_string(""))
   status = "Planned"
   program_id = factory.LazyAttribute(lambda _: ProgramFactory().id)
