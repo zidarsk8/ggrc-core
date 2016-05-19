@@ -39,6 +39,7 @@ class AssessmentTemplate(Base, Relatable, Titled, db.Model):
   DEFAULT_PEOPLE_LABELS = {
       "Object Owners": "Object Owners",
       "Audit Lead": "Audit Lead",
+      "Auditors": "Auditors",
       "Primary Assessor": "Principal Assessor",
       "Secondary Assessors": "Secondary Assessors",
       "Primary Contact": "Primary Contact",
