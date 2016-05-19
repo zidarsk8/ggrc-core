@@ -65,8 +65,7 @@ class Audit(mixins_clonable.Clonable,
       'program',
       'requests',
       'object_type',
-      PublishOnly('audit_objects'),
-      PublishOnly("_operation_data")
+      PublishOnly('audit_objects')
   ]
 
   _sanitize_html = [
@@ -103,41 +102,34 @@ class Audit(mixins_clonable.Clonable,
       "reference_url": None,
   }
 
-  def _clone(self):
+  def _clone(self, source_object):
     """Clone audit and all relevant attributes.
 
     Keeps the internals of actual audit cloning and everything that is related
     to audit itself (auditors, audit firm, context setting,
     custom attribute values, etc.)
-
-    Returns:
-      New audit instance that is flushed but not committed.
     """
     from ggrc_basic_permissions import create_audit_context
 
     data = {
-        "title": self.generate_attribute("title"),
-        "description": self.description,
-        "audit_firm": self.audit_firm,
-        "start_date": self.start_date,
-        "end_date": self.end_date,
-        "program": self.program,
-        "status": self.VALID_STATES[0],
-        "report_start_date": self.report_start_date,
-        "report_end_date": self.report_end_date,
-        "contact": self.contact
+        "title": source_object.generate_attribute("title"),
+        "description": source_object.description,
+        "audit_firm": source_object.audit_firm,
+        "start_date": source_object.start_date,
+        "end_date": source_object.end_date,
+        "program": source_object.program,
+        "status": source_object.VALID_STATES[0],
+        "report_start_date": source_object.report_start_date,
+        "report_end_date": source_object.report_end_date,
+        "contact": source_object.contact
     }
 
-    audit_copy = Audit(**data)
-    db.session.add(audit_copy)
+    self.update_attrs(data)
     db.session.flush()
 
-    create_audit_context(audit_copy)
-
-    self._clone_auditors(audit_copy)
-    self.clone_custom_attribute_values(audit_copy)
-
-    return audit_copy
+    create_audit_context(self)
+    self._clone_auditors(source_object)
+    self.clone_custom_attribute_values(source_object)
 
   def _clone_auditors(self, audit):
     """Clone auditors of specified audit.
@@ -149,45 +141,37 @@ class Audit(mixins_clonable.Clonable,
 
     role = Role.query.filter_by(name="Auditor").first()
     auditors = [ur.person for ur in UserRole.query.filter_by(
-        role=role, context=self.context).all()]
+        role=role, context=audit.context).all()]
 
     for auditor in auditors:
       user_role = UserRole(
-          context=audit.context,
+          context=self.context,
           person=auditor,
           role=role
       )
       db.session.add(user_role)
     db.session.flush()
 
-  def clone(self, children=None):
+  def clone(self, source_id, mapped_objects=None):
     """Clone audit with specified whitelisted children.
 
     Children that can be cloned should be specified in CLONEABLE_CHILDREN.
 
     Args:
-      children: A list of related objects that should also be copied and linked
-        to a new audit.
+      mapped_objects: A list of related objects that should also be copied and
+      linked to a new audit.
     """
-    if not children:
-      children = []
+    if not mapped_objects:
+      mapped_objects = []
 
-    audit_copy = self._clone()
+    source_object = Audit.query.get(source_id)
+    self._clone(source_object)
 
-    if any(children):
-      related_children = self.related_objects(children)
+    if any(mapped_objects):
+      related_children = source_object.related_objects(mapped_objects)
 
       for obj in related_children:
-        obj.clone(audit_copy)
-
-    self._operation_data = {
-        "clone": {
-            "audit": {
-                "id": audit_copy.id
-            }
-        }
-    }
-    db.session.commit()
+        obj.clone(self)
 
   @classmethod
   def _filter_by_program(cls, predicate):
