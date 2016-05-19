@@ -37,12 +37,14 @@
           skip_refresh: true,
           button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache'
         }, function () {
-          instance.attr('operation', 'clone');
-          instance.attr('associatedObjects', this.getIncluded());
-          $.when(instance.save()).then(function (object) {
-            var url = '/' + instance.class.root_collection + '/' +
-              object._operation_data.clone.audit.id;
-            GGRC.navigate(url);
+          var clonedInstance = instance.clone({
+            cloneOptions: {
+              sourceObjectId: instance.id,
+              mappedObjects: this.getIncluded()
+            }
+          });
+          $.when(clonedInstance.save()).done(function (object) {
+            GGRC.navigate(object.viewLink);
           });
         }.bind(this));
       }
