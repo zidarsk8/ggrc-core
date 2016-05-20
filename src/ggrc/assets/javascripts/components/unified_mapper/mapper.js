@@ -181,7 +181,8 @@
           relevantTo: parentScope.attr('relevantTo'),
           callback: parentScope.attr('callback'),
           getList: parentScope.attr('getList'),
-          useTemplates: parentScope.attr('useTemplates')
+          useTemplates: parentScope.attr('useTemplates'),
+          assessmentGenerator: parentScope.attr('assessmentGenerator')
         })),
         template: parentScope.attr('template')
       };
