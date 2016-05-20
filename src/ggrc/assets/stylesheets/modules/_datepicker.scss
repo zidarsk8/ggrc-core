@@ -12,6 +12,14 @@
     top: 5px;
     left: 5px;
   }
+}
+
+.datepicker__calendar {
+  position: absolute;
+  z-index: zIndex(ui-autocomplete);
+}
+
+.ui-datepicker-inline {
   .ui-datepicker-prev,
   .ui-datepicker-next {
     &.ui-corner-all {
@@ -61,8 +69,4 @@
       }
     }
   }
-}
-.datepicker__calendar {
-  position: absolute;
-  z-index: zIndex(ui-autocomplete);
 }
