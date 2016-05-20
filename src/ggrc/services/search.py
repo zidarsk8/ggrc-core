@@ -4,9 +4,11 @@
 # Maintained By: david@reciprocitylabs.com
 
 import json
+import ggrc.models.relationship
 from flask import request, current_app
 from ggrc.fulltext import get_indexer
 from ggrc.utils import GrcEncoder, url_for, benchmark
+from ggrc import db
 
 def search():
   terms = request.args.get('q')
@@ -33,6 +35,9 @@ def search():
   extra_params = request.args.get('extra_params', {})
   extra_columns = request.args.get('extra_columns', {})
 
+  relevant_type = request.args.get('relevant_type', None)
+  relevant_ids = request.args.get('relevant_ids', None)
+
   if extra_params:
     # Parse t1:a=b,c=d;t2:e=f into dict {t1:{a:b,c:d},t2:{e:f}}
     extra_params = {k: {kk: vv for kk, vv in
@@ -47,11 +52,27 @@ def search():
   else:
     extra_columns = {}
 
+  if (relevant_type is None) != (relevant_ids is None):
+    return current_app.make_reponse((
+        'Parameters relevant_type and relevant_ids must both be provided.',
+        400,
+        [('Content-Type', 'text/plain')],
+    ))
+
+  if relevant_ids is not None:
+    relevant_ids = relevant_ids.split(',')
+
   if should_just_count:
     return do_counts(terms, types, contact_id, extra_params, extra_columns)
   if should_group_by_type:
-    return group_by_type_search(terms, types, contact_id, extra_params)
-  return basic_search(terms, types, permission_type, permission_model, contact_id, extra_params)
+    return group_by_type_search(terms, types, contact_id, extra_params,
+                                relevant_type, relevant_ids)
+  return basic_search(
+      terms, types,
+      permission_type, permission_model,
+      contact_id, extra_params,
+      relevant_type, relevant_ids
+  )
 
 def do_counts(terms, types=None, contact_id=None, extra_params={}, extra_columns={}):
   from ggrc.rbac import permissions
@@ -79,19 +100,37 @@ def do_counts(terms, types=None, contact_id=None, extra_params={}, extra_columns
 
 def do_search(
     terms, list_for_type, types=None, permission_type='read',
-    permission_model=None, contact_id=None, extra_params=None):
+    permission_model=None, contact_id=None, extra_params=None,
+    relevant_type=None, relevant_ids=None):
   indexer = get_indexer()
   with benchmark("Search"):
     results = indexer.search(
         terms, types=types, permission_type=permission_type,
         permission_model=permission_model, contact_id=contact_id, extra_params=extra_params)
+
+  related_filter = None
+  if relevant_type and relevant_ids:
+    R = ggrc.models.relationship.Relationship
+    src_query = db.session.query(R.source_type, R.source_id).filter(
+        R.source_type.in_(types) | (types is None),
+        R.destination_type == relevant_type,
+        R.destination_id.in_(relevant_ids)
+    )
+    dst_query = db.session.query(R.destination_type, R.destination_id).filter(
+        R.destination_type.in_(types) | (types is None),
+        R.source_type == relevant_type,
+        R.source_id.in_(relevant_ids)
+    )
+    related_filter = set(src_query.union(dst_query))
+
   seen_results = {}
 
   for result in results:
     id = result.key
     model_type = result.type
     result_pair = (model_type, id)
-    if result_pair not in seen_results:
+    if (result_pair not in seen_results and
+        (related_filter is None or result_pair in related_filter)):
       seen_results[result_pair] = True
       entries_list = list_for_type(model_type)
       entries_list.append({
@@ -113,17 +152,19 @@ def make_search_result(entries):
 
 def basic_search(
     terms, types=None, permission_type='read', permission_model=None,
-    contact_id=None, extra_params=None):
+    contact_id=None, extra_params=None, relevant_type=None, relevant_ids=None):
   entries = []
   list_for_type = lambda t: entries
   do_search(terms, list_for_type, types, permission_type, permission_model,
-            contact_id, extra_params)
+            contact_id, extra_params, relevant_type, relevant_ids)
   return make_search_result(entries)
 
-def group_by_type_search(terms, types=None, contact_id=None, extra_params={}):
+def group_by_type_search(terms, types=None, contact_id=None, extra_params={},
+                         relevant_type=None, relevant_ids=None):
   entries = {}
   list_for_type = \
       lambda t: entries[t] if t in entries else entries.setdefault(t, [])
   do_search(terms, list_for_type, types, contact_id=contact_id,
-            extra_params=extra_params)
+            extra_params=extra_params,
+            relevant_type=relevant_type, relevant_ids=relevant_ids)
   return make_search_result(entries)
