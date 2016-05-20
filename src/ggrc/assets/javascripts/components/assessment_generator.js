@@ -41,9 +41,10 @@
         var flash = {};
         var type;
         var messages = {
-          error: 'Generating assessments has failed.',
-          progress: 'Generating assessments is in progress.',
-          success: 'Assessments generated successfully. {reload_link}'
+          error: 'Assessment generation has failed.',
+          progress: 'Assessment generation is in process. This may take ' +
+                    'multiple hours depending on the volume.',
+          success: 'Assessment generation successful. {reload_link}'
         };
         if (statuses.Failure > 0) {
           type = 'error';
