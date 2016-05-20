@@ -11,6 +11,7 @@ from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import event
 from sqlalchemy import orm
+from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import foreign
@@ -664,17 +665,37 @@ class BusinessObject(Stateful, Noted, Described, Hyperlinked, WithContact,
 class CustomAttributable(object):
 
   @declared_attr
-  def custom_attribute_values(cls):
+  def custom_attribute_values(self):
+    """Load custom attribute values"""
     from ggrc.models.custom_attribute_value import CustomAttributeValue
 
     def join_function():
       return and_(
-          foreign(CustomAttributeValue.attributable_id) == cls.id,
-          foreign(CustomAttributeValue.attributable_type) == cls.__name__)
+          foreign(CustomAttributeValue.attributable_id) == self.id,
+          foreign(CustomAttributeValue.attributable_type) == self.__name__)
     return relationship(
         "CustomAttributeValue",
         primaryjoin=join_function,
-        backref='{0}_custom_attributable'.format(cls.__name__),
+        backref='{0}_custom_attributable'.format(self.__name__),
+        cascade='all, delete-orphan',
+    )
+
+  @declared_attr
+  def custom_attribute_definitions(self):
+    """Load custom attribute definitions"""
+    from ggrc.models.custom_attribute_definition\
+        import CustomAttributeDefinition
+
+    def join_function():
+      definition_id = foreign(CustomAttributeDefinition.definition_id)
+      definition_type = foreign(CustomAttributeDefinition.definition_type)
+      return and_(or_(definition_id == self.id, definition_id.is_(None)),
+                  definition_type == self._inflector.table_singular)
+
+    return relationship(
+        "CustomAttributeDefinition",
+        primaryjoin=join_function,
+        backref='{0}_custom_attributable_definition'.format(self.__name__),
         cascade='all, delete-orphan',
     )
 
@@ -776,9 +797,9 @@ class CustomAttributable(object):
                 "value": new_value,
             }, service=cls.__class__.__name__)
 
-  _publish_attrs = ['custom_attribute_values']
+  _publish_attrs = ['custom_attribute_values', 'custom_attribute_definitions']
   _update_attrs = ['custom_attributes']
-  _include_links = []
+  _include_links = ['custom_attribute_definitions']
 
   @classmethod
   def get_custom_attribute_definitions(cls):
@@ -792,7 +813,8 @@ class CustomAttributable(object):
   def eager_query(cls):
     query = super(CustomAttributable, cls).eager_query()
     return query.options(
-        orm.subqueryload('custom_attribute_values')
+        orm.subqueryload('custom_attribute_values'),
+        orm.subqueryload('custom_attribute_definitions')
     )
 
   def log_json(self):

@@ -115,7 +115,9 @@ def get_current_user_json():
 
 def get_attributes_json():
   """Get a list of all custom attribute definitions"""
-  attrs = models.CustomAttributeDefinition.eager_query().all()
+  attrs = models.CustomAttributeDefinition.eager_query().filter(
+      models.CustomAttributeDefinition.definition_id.is_(None)
+  )
   published = []
   for attr in attrs:
     published.append(publish(attr))
