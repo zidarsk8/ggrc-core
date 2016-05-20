@@ -143,6 +143,8 @@ class Api():
     api_link = self.api_link(obj, obj.id)
     return self.tc.delete(api_link, headers=headers)
 
-  def search(self, types, q="", counts=False):
-    return (self.tc.get('/search?q={}&types={}&counts_only={}'.format(
-        q, types, counts)), self.headers)
+  def search(self, types, q="", counts=False, relevant_objects=None):
+    query = '/search?q={}&types={}&counts_only={}'.format(q, types, counts)
+    if relevant_objects is not None:
+      query += '&relevant_objects=' + relevant_objects
+    return (self.tc.get(query), self.headers)
