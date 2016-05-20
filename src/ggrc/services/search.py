@@ -39,8 +39,7 @@ def search():
   extra_params = request.args.get('extra_params', {})
   extra_columns = request.args.get('extra_columns', {})
 
-  relevant_type = request.args.get('relevant_type', None)
-  relevant_ids = request.args.get('relevant_ids', None)
+  relevant_objects = request.args.get('relevant_objects', None)
 
   if extra_params:
     # Parse t1:a=b,c=d;t2:e=f into dict {t1:{a:b,c:d},t2:{e:f}}
@@ -60,26 +59,19 @@ def search():
   else:
     extra_columns = {}
 
-  if (relevant_type is None) != (relevant_ids is None):
-    return current_app.make_reponse((
-        'Parameters relevant_type and relevant_ids must both be provided.',
-        400,
-        [('Content-Type', 'text/plain')],
-    ))
-
-  if relevant_ids is not None:
-    relevant_ids = relevant_ids.split(',')
+  if relevant_objects is not None:
+    relevant_objects = [tuple(obj.split(':'))
+                        for obj in relevant_objects.split(',')]
 
   if should_just_count:
     return do_counts(terms, types, contact_id, extra_params, extra_columns)
   if should_group_by_type:
     return group_by_type_search(terms, types, contact_id, extra_params,
-                                relevant_type, relevant_ids)
+                                relevant_objects)
   return basic_search(
       terms, types,
       permission_type, permission_model,
-      contact_id, extra_params,
-      relevant_type, relevant_ids
+      contact_id, extra_params, relevant_objects
   )
 
 
@@ -109,9 +101,37 @@ def do_counts(terms, types=None, contact_id=None,
   ))
 
 
+def _build_relevant_filter(types, relevant_objects):
+  if relevant_objects is None:
+    relevant_objects = []
+  filters = []
+  for relevant_type, relevant_id in relevant_objects:
+    relationship = ggrc.models.relationship.Relationship
+    src_query = db.session.query(
+        relationship.source_type, relationship.source_id
+    ).filter(
+        relationship.source_type.in_(types) | (types is None),
+        relationship.destination_type == relevant_type,
+        relationship.destination_id == relevant_id
+    )
+    dst_query = db.session.query(
+        relationship.destination_type, relationship.destination_id
+    ).filter(
+        relationship.destination_type.in_(types) | (types is None),
+        relationship.source_type == relevant_type,
+        relationship.source_id == relevant_id
+    )
+    filters.append(set(src_query.union(dst_query)))
+
+  def check(result_pair):
+    return all(result_pair in bucket for bucket in filters)
+
+  return check
+
+
 def do_search(terms, list_for_type, types=None, permission_type='read',
               permission_model=None, contact_id=None, extra_params=None,
-              relevant_type=None, relevant_ids=None):
+              relevant_objects=None):
   indexer = get_indexer()
   with benchmark("Search"):
     results = indexer.search(
@@ -120,33 +140,14 @@ def do_search(terms, list_for_type, types=None, permission_type='read',
         extra_params=extra_params
     )
 
-  related_filter = None
-  if relevant_type and relevant_ids:
-    relationship = ggrc.models.relationship.Relationship
-    src_query = db.session.query(
-        relationship.source_type, relationship.source_id
-    ).filter(
-        relationship.source_type.in_(types) | (types is None),
-        relationship.destination_type == relevant_type,
-        relationship.destination_id.in_(relevant_ids)
-    )
-    dst_query = db.session.query(
-        relationship.destination_type, relationship.destination_id
-    ).filter(
-        relationship.destination_type.in_(types) | (types is None),
-        relationship.source_type == relevant_type,
-        relationship.source_id.in_(relevant_ids)
-    )
-    related_filter = set(src_query.union(dst_query))
-
+  related_filter = _build_relevant_filter(types, relevant_objects)
   seen_results = {}
 
   for result in results:
     id = result.key
     model_type = result.type
     result_pair = (model_type, id)
-    if (result_pair not in seen_results and
-       (related_filter is None or result_pair in related_filter)):
+    if result_pair not in seen_results and related_filter(result_pair):
       seen_results[result_pair] = True
       entries_list = list_for_type(model_type)
       entries_list.append({
@@ -171,26 +172,24 @@ def make_search_result(entries):
 
 def basic_search(terms, types=None,
                  permission_type='read', permission_model=None,
-                 contact_id=None, extra_params=None,
-                 relevant_type=None, relevant_ids=None):
+                 contact_id=None, extra_params=None, relevant_objects=None):
   entries = []
 
   def list_for_type(_):
     return entries
 
   do_search(terms, list_for_type, types, permission_type, permission_model,
-            contact_id, extra_params, relevant_type, relevant_ids)
+            contact_id, extra_params, relevant_objects)
   return make_search_result(entries)
 
 
 def group_by_type_search(terms, types=None, contact_id=None, extra_params={},
-                         relevant_type=None, relevant_ids=None):
+                         relevant_objects=None):
   entries = {}
 
   def list_for_type(t):
     return entries[t] if t in entries else entries.setdefault(t, [])
 
   do_search(terms, list_for_type, types, contact_id=contact_id,
-            extra_params=extra_params,
-            relevant_type=relevant_type, relevant_ids=relevant_ids)
+            extra_params=extra_params, relevant_objects=relevant_objects)
   return make_search_result(entries)
