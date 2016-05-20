@@ -21,13 +21,14 @@
         GGRC.Controllers.MapperModal.launch(el, {
           object: 'Audit',
           type: 'Control',
-          'join-object-id': this.scope.audit.id,
+          'join-object-id': instance.id,
           'join-mapping': 'program_controls',
           getList: true,
           useTemplates: true,
+          assessmentGenerator: true,
           relevantTo: [{
-            type: instance.program.type,
-            id: instance.program.id
+            type: instance.type,
+            id: instance.id
           }],
           template: {
             title: '/static/mustache/assessments/generator_title.mustache',
