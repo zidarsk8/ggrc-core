@@ -6,13 +6,14 @@
 """A module containing the implementation of the assessment template entity."""
 
 from ggrc import db
-from ggrc.models.mixins import Base, Titled
+from ggrc.models.mixins import Base, Titled, CustomAttributable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.types import JsonType
 
 
-class AssessmentTemplate(Base, Relatable, Titled, db.Model):
+class AssessmentTemplate(Base, Relatable, Titled,
+                         CustomAttributable, db.Model):
   """A class representing the assessment template entity.
 
   An Assessment Template is a template that allows users for easier creation of

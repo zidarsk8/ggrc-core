@@ -31,7 +31,7 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
                        name='uq_custom_attribute'),
       db.Index('ix_custom_attributes_title', 'title'))
 
-  _publish_attrs = [
+  _include_links = _publish_attrs = [
       'definition_type',
       'definition_id',
       'attribute_type',
