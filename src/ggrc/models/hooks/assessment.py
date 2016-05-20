@@ -12,7 +12,6 @@
 
 from ggrc import db
 from ggrc.login import get_current_user_id
-from ggrc.automapper import AutomapperGenerator
 from ggrc.models import all_models
 from ggrc.models import Assessment
 from ggrc.models import Person
@@ -65,7 +64,6 @@ def map_assessment(assessment, obj):
       "destination_type": obj["type"],
       "context": assessment.context,
   })
-  AutomapperGenerator().generate_automappings(rel)
   db.session.add(rel)
 
 
