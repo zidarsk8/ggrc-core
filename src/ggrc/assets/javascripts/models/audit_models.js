@@ -884,15 +884,20 @@
         }
       });
     },
+    info_pane_preload: function () {
+      if (!this._pane_preloaded) {
+        this._set_mandatory_msgs();
+        this.get_mapping('comments').bind('length',
+            this._set_mandatory_msgs.bind(this));
+        this.get_mapping('all_documents').bind('length',
+            this._set_mandatory_msgs.bind(this));
+        this._pane_preloaded = true;
+      }
+    },
     init: function () {
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      this._set_mandatory_msgs();
-      this.get_mapping('comments').bind('length',
-          this._set_mandatory_msgs.bind(this));
-      this.get_mapping('all_documents').bind('length',
-          this._set_mandatory_msgs.bind(this));
     },
     _set_recipients: function (recipients) {
       if (recipients) {
