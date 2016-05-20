@@ -87,8 +87,8 @@ def get_cache_class(obj):
   return obj.__class__.__name__
 
 
-def get_related_keys_for_expiration(context, o):
-  cls = get_cache_class(o)
+def get_related_keys_for_expiration(context, obj):
+  cls = get_cache_class(obj)
   keys = []
   mappings = context.cache_manager.supported_mappings.get(cls, [])
   if len(mappings) > 0:
@@ -96,11 +96,11 @@ def get_related_keys_for_expiration(context, o):
       if polymorph:
         key = get_cache_key(
             None,
-            type=getattr(o, '{0}_type'.format(attr)),
-            id=getattr(o, '{0}_id'.format(attr)))
+            type=getattr(obj, '{0}_type'.format(attr)),
+            id=getattr(obj, '{0}_id'.format(attr)))
         keys.append(key)
       else:
-        obj = getattr(o, attr, None)
+        obj = getattr(obj, attr, None)
         if obj:
           if isinstance(obj, list):
             for inner_o in obj:
@@ -112,7 +112,7 @@ def get_related_keys_for_expiration(context, o):
   return keys
 
 
-def set_ids_for_new_custom_attribute_values(objects, obj):
+def set_ids_for_new_custom_attributes(objects, obj):
   """
   When we are creating custom attribute values for
   POST requests, obj.id is not yet defined. This is why we update
@@ -128,15 +128,15 @@ def set_ids_for_new_custom_attribute_values(objects, obj):
   """
 
   from ggrc.models.custom_attribute_value import CustomAttributeValue
-  for object in objects:
-    if not isinstance(object, CustomAttributeValue):
+  for obj in objects:
+    if not isinstance(obj, CustomAttributeValue):
       continue
-    object.attributable_id = obj.id
+    obj.attributable_id = obj.id
     # Disable state updating so that a newly create object doesn't go straight
     # from Draft to Modified.
-    if hasattr(object, '_skip_os_state_update'):
-      object.skip_os_state_update()
-    db.session.add(object)
+    if hasattr(obj, '_skip_os_state_update'):
+      obj.skip_os_state_update()
+    db.session.add(obj)
   db.session.flush()
 
 
@@ -151,13 +151,13 @@ def memcache_mark_for_deletion(context, objects_to_mark):
   Returns:
     None
   """
-  for o, _ in objects_to_mark:
-    cls = get_cache_class(o)
+  for obj, _ in objects_to_mark:
+    cls = get_cache_class(obj)
     if cls in context.cache_manager.supported_classes:
-      key = get_cache_key(o)
+      key = get_cache_key(obj)
       context.cache_manager.marked_for_delete.append(key)
       context.cache_manager.marked_for_delete.extend(
-          get_related_keys_for_expiration(context, o))
+          get_related_keys_for_expiration(context, obj))
 
 
 def update_memcache_before_commit(context, modified_objects, expiry_time):
@@ -461,11 +461,11 @@ class ModelView(View):
     joinlist = []
     if request.args:
       querybuilder = AttributeQueryBuilder(self.model)
-      filter, joinlist, options = querybuilder.collection_filters(request.args)
-      if filter is not None:
+      filter_, joinlist, _ = querybuilder.collection_filters(request.args)
+      if filter_ is not None:
         for j in joinlist:
           query = query.join(j)
-        query = query.filter(filter)
+        query = query.filter(filter_)
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
       resources = permissions.read_resources_for(self.model.__name__)
@@ -713,12 +713,12 @@ class Resource(ModelView):
             return self.delete(*args, **kwargs)
           else:
             raise NotImplementedError()
-        except (IntegrityError, ValidationError) as v:
-          message = translate_message(v)
+        except (IntegrityError, ValidationError) as err:
+          message = translate_message(err)
           current_app.logger.warn(message)
           return (message, 403, [])
-        except Exception as e:
-          current_app.logger.exception(e)
+        except Exception as err:
+          current_app.logger.exception(err)
           raise
         finally:
           # When running integration tests, cache sometimes does not clear
@@ -1001,11 +1001,8 @@ class Resource(ModelView):
       # TODO this can be optimized by filter_resource() not retrieving
       # the other fields to being with
       if '__fields' in request.args:
-          custom_fields = request.args['__fields'].split(',')
-          objs = [
-              {f: o[f] for f in custom_fields if f in o}
-              for o in objs]
-
+        custom_fields = request.args['__fields'].split(',')
+        objs = [{f: o[f] for f in custom_fields if f in o} for o in objs]
       with benchmark("Serialize collection"):
         collection = self.build_collection_representation(
             objs, extras=extras)
@@ -1086,7 +1083,7 @@ class Resource(ModelView):
     """Do NOTHING by default"""
     pass
 
-  def collection_post_step(self, src):
+  def collection_post_step(self, src, no_result):
     try:
       obj = self.model()
       root_attribute = self.model._inflector.table_singular
@@ -1123,7 +1120,7 @@ class Resource(ModelView):
       with benchmark("Get modified objects"):
         modified_objects = get_modified_objects(db.session)
       with benchmark("Update custom attribute values"):
-        set_ids_for_new_custom_attribute_values(modified_objects.new, obj)
+        set_ids_for_new_custom_attributes(modified_objects.new, obj)
       with benchmark("Log event"):
         log_event(db.session, obj)
       with benchmark("Update memcache before commit for collection POST"):
@@ -1139,7 +1136,7 @@ class Resource(ModelView):
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
                                             src=src, service=self)
       with benchmark("Serialize object"):
-        object_for_json = self.object_for_json(obj)
+        object_for_json = {} if no_result else self.object_for_json(obj)
       with benchmark("Make response"):
         return (201, object_for_json)
     except (IntegrityError, ValidationError) as e:
@@ -1176,16 +1173,19 @@ class Resource(ModelView):
         task = BackgroundTask.query.get(task_id)
         body = json.loads(task.parameters)
       task.start()
+      no_result = True
     else:
       body = self.request.json
-    wrap = type(body) == dict
+      no_result = False
+    wrap = isinstance(body, dict)
     if wrap:
       body = [body]
     res = []
     for src in body:
       try:
         src_res = None
-        src_res = self.collection_post_step(UnicodeSafeJsonWrapper(src))
+        src_res = self.collection_post_step(
+            UnicodeSafeJsonWrapper(src), no_result)
         db.session.commit()
       except Exception as e:
         if not src_res or 200 <= src_res[0] < 300:
@@ -1198,13 +1198,13 @@ class Resource(ModelView):
     errors = []
     if wrap:
       status, res = res[0]
-      if type(res) == dict and len(res) == 1:
+      if isinstance(res, dict) and len(res) == 1:
         value = res.values()[0]
         if "id" in value:
           headers['Location'] = self.url_for(id=value["id"])
     else:
       for res_status, body in res:
-        if not (200 <= res_status < 300):
+        if not 200 <= res_status < 300:
           errors.append((res_status, body))
       if len(errors) > 0:
         status = errors[0][0]
@@ -1379,7 +1379,7 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
   if user_permissions is None:
     user_permissions = permissions.permissions_for(get_current_user())
 
-  if type(resource) in (list, tuple):
+  if isinstance(resource, (list, tuple)):
     filtered = []
     for sub_resource in resource:
       filtered_sub_resource = filter_resource(
@@ -1387,7 +1387,7 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
       if filtered_sub_resource is not None:
         filtered.append(filtered_sub_resource)
     return filtered
-  elif type(resource) is dict and 'type' in resource:
+  elif isinstance(resource, dict) and 'type' in resource:
     # First check current level
     context_id = False
     if 'context' in resource:
