@@ -11,6 +11,7 @@ from ggrc import db
 from ggrc.models import mixins_reminderable
 from ggrc.models import mixins_statusable
 from ggrc.models import reflection
+from ggrc.models.audit import Audit
 from ggrc.models.comment import Commentable
 from ggrc.models.mixin_autostatuschangable import AutoStatusChangable
 from ggrc.models.mixins import BusinessObject
@@ -26,6 +27,7 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
+from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.track_object_state import track_state_for_class
 
@@ -99,6 +101,7 @@ class Assessment(mixins_statusable.Statusable,
       "audit": {
           "display_name": "Audit",
           "mandatory": True,
+          "filter_by": "_filter_by_audit",
       },
       "url": "Assessment URL",
       "design": "Conclusion: Design",
@@ -134,6 +137,22 @@ class Assessment(mixins_statusable.Statusable,
   def validate_design(self, key, value):
     # pylint: disable=unused-argument
     return self.validate_conclusion(value)
+
+  @classmethod
+  def _filter_by_audit(cls, predicate):
+    return Relationship.query.filter(
+        Relationship.source_type == cls.__name__,
+        Relationship.source_id == cls.id,
+        Relationship.destination_type == Audit.__name__,
+    ).join(Audit, Relationship.destination_id == Audit.id).filter(
+        predicate(Audit.slug)
+    ).exists() | Relationship.query.filter(
+        Relationship.destination_type == cls.__name__,
+        Relationship.destination_id == cls.id,
+        Relationship.source_type == Audit.__name__,
+    ).join(Audit, Relationship.source_id == Audit.id).filter(
+        predicate(Audit.slug)
+    ).exists()
 
   @classmethod
   def _filter_by_related_creators(cls, predicate):
