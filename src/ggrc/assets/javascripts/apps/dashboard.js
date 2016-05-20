@@ -246,4 +246,9 @@
       model_class: notesModel
     });
   });
+
+  // We remove loading class
+  $(window).on('load', function () {
+    $('html').removeClass('no-js');
+  });
 })(this, jQuery);
