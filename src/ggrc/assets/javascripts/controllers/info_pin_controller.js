@@ -5,14 +5,12 @@
     Maintained By: anze@reciprocitylabs.com
 */
 
-
 can.Control("CMS.Controllers.InfoPin", {
   defaults: {
     view: GGRC.mustache_path + "/base_objects/info.mustache"
   }
 }, {
   init: function (el, options) {
-    var instance = GGRC.page_instance();
     this.element.height(0);
   },
   findView: function (instance) {
@@ -161,4 +159,3 @@ can.Control("CMS.Controllers.InfoPin", {
     el.find("i").css({"opacity": 1});
   }
 });
-
