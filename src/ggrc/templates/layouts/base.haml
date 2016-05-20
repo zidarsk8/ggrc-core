@@ -5,7 +5,7 @@
 -# Maintained By: brad@reciprocitylabs.com
 -#
 !!! 5
-%html{ lang:"en" }
+%html{ lang:"en", "class": "no-js" }
   %head
     %meta{ content:"text/html; charset=utf-8", 'http-equiv':"Content-Type" }
     %meta{ charset:"utf-8" }
@@ -23,6 +23,11 @@
     %link{ 'href': '={ url_for("static", filename="favicon.ico") }', 'rel':'icon', 'type':'image/x-icon' }
 
   %body
+    %div{ 'class': 'page-loader'}
+      %div{ 'class': 'page-loader__wrapper'}
+        %span{ 'class': 'page-loader__icon' }
+        %span{ 'class': 'page-loader__text' } Page is loading, please wait...
+
     -block body
 
     %script
