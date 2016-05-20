@@ -1086,7 +1086,7 @@ class Resource(ModelView):
     """Do NOTHING by default"""
     pass
 
-  def collection_post_step(self, src):
+  def collection_post_step(self, src, noResult):
     try:
       obj = self.model()
       root_attribute = self.model._inflector.table_singular
@@ -1139,7 +1139,10 @@ class Resource(ModelView):
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
                                             src=src, service=self)
       with benchmark("Serialize object"):
-        object_for_json = self.object_for_json(obj)
+        if noResult:
+          object_for_json = {}
+        else:
+          object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
         return (201, object_for_json)
     except (IntegrityError, ValidationError) as e:
@@ -1176,8 +1179,10 @@ class Resource(ModelView):
         task = BackgroundTask.query.get(task_id)
         body = json.loads(task.parameters)
       task.start()
+      noResult = True
     else:
       body = self.request.json
+      noResult = False
     wrap = type(body) == dict
     if wrap:
       body = [body]
@@ -1185,7 +1190,8 @@ class Resource(ModelView):
     for src in body:
       try:
         src_res = None
-        src_res = self.collection_post_step(UnicodeSafeJsonWrapper(src))
+        src_res = self.collection_post_step(
+            UnicodeSafeJsonWrapper(src), noResult)
         db.session.commit()
       except Exception as e:
         if not src_res or 200 <= src_res[0] < 300:
