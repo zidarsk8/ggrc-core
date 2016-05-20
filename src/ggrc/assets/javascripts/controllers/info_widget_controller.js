@@ -32,7 +32,9 @@ can.Control("GGRC.Controllers.InfoWidget", {
     if (this.element.data('widget-view')) {
       this.options.widget_view = GGRC.mustache_path + this.element.data('widget-view');
     }
-
+    if (this.options.instance.info_pane_preload) {
+      this.options.instance.info_pane_preload();
+    }
     this.options.context = new can.Observe({
         model : this.options.model,
         instance : this.options.instance,

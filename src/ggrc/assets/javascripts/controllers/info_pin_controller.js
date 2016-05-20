@@ -25,6 +25,9 @@ can.Control("CMS.Controllers.InfoPin", {
     } else {
       view = this.options.view;
     }
+    if (instance.info_pane_preload) {
+      instance.info_pane_preload();
+    }
     return view;
   },
   findOptions: function (el) {
