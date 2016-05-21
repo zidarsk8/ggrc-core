@@ -134,17 +134,15 @@ can.Control("CMS.Controllers.Dashboard", {
         can.each(this.options.default_widgets, function (name) {
           this.add_dashboard_widget_from_descriptor(this.options.widget_descriptors[name]);
       }.bind(this));
-    }
+    },
 
-  , hide_widget_area: function() {
-      this.get_active_widget_containers().hide();
-    }
-
-  , show_widget_area: function() {
-      this.get_active_widget_containers().show();
-    }
-
-  , " widgets_updated" : "update_inner_nav",
+  hide_widget_area: function () {
+    this.get_active_widget_containers().addClass('hidden');
+  },
+  show_widget_area: function () {
+    this.get_active_widget_containers().removeClass('hidden');
+  },
+  " widgets_updated" : "update_inner_nav",
   " updateCount": function (el, ev, count, updateCount) {
     if (_.isBoolean(updateCount) && !updateCount) {
       return;
