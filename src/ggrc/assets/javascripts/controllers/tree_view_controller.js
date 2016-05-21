@@ -1093,6 +1093,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       queue.push(listWindow);
     }
     this.options.attr('filter_shown', 0);
+    this.options.attr('filteredList', []);
     finalDfd = _.foldl(queue, function (dfd, listWindow) {
       return dfd.then(function () {
         var res = $.Deferred();
@@ -1133,7 +1134,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var sortProp = this.options.sort_property;
     var sortFunction = this.options.sort_function;
     var filter = this.options.filter;
-    var filteredItems = [];
+    var filteredItems = this.options.attr('filteredList') || [];
     var res;
 
     items = can.makeArray(optionsList);
