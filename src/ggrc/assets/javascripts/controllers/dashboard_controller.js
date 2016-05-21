@@ -134,17 +134,15 @@ can.Control("CMS.Controllers.Dashboard", {
         can.each(this.options.default_widgets, function (name) {
           this.add_dashboard_widget_from_descriptor(this.options.widget_descriptors[name]);
       }.bind(this));
-    }
+    },
 
-  , hide_widget_area: function() {
-      this.get_active_widget_containers().hide();
-    }
-
-  , show_widget_area: function() {
-      this.get_active_widget_containers().show();
-    }
-
-  , " widgets_updated" : "update_inner_nav",
+  hide_widget_area: function () {
+    this.get_active_widget_containers().addClass('hidden');
+  },
+  show_widget_area: function () {
+    this.get_active_widget_containers().removeClass('hidden');
+  },
+  " widgets_updated" : "update_inner_nav",
   " updateCount": function (el, ev, count, updateCount) {
     if (_.isBoolean(updateCount) && !updateCount) {
       return;
@@ -362,25 +360,26 @@ can.Control("CMS.Controllers.InnerNav", {
       this.options.contexts.attr("active_widget", widget);
       this.show_active_widget();
     }
-  }
+  },
 
-  , show_active_widget: function (selector) {
-    var panel_selector = selector || this.options.contexts.attr('active_widget').selector,
-        widget = $(panel_selector),
-        dashboard_controller = this.options.dashboard_controller,
-        info_pin_controller = dashboard_controller.info_pin.element.control();
+  show_active_widget: function (selector) {
+    var panel = selector ||
+        this.options.contexts.attr('active_widget').selector;
+    var widget = $(panel);
+    var dashboardCtr = this.options.dashboard_controller;
+    var infopinCtr = dashboardCtr.info_pin.element.control();
 
-    if (info_pin_controller) {
-      info_pin_controller.hideInstance();
+    if (infopinCtr) {
+      infopinCtr.hideInstance();
     }
 
     if (widget.length) {
-      dashboard_controller.show_widget_area();
-      widget.siblings(':visible').hide().trigger('widget_hidden');
-      widget.show().trigger('widget_shown');
-      $("[href=" + panel_selector + "]")
-        .closest("li").addClass("active")
-        .siblings().removeClass("active");
+      dashboardCtr.show_widget_area();
+      widget.siblings().addClass('hidden').trigger('widget_hidden');
+      widget.removeClass('hidden').trigger('widget_shown');
+      $('[href=' + panel + ']')
+        .closest('li').addClass('active')
+        .siblings().removeClass('active');
     }
   }
 
