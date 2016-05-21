@@ -58,6 +58,25 @@
         flash[type] = messages[type];
         $('body').trigger('ajax:flash', flash);
       },
+      updateStatus: function (ids, count) {
+        var wait = [2, 4, 8, 16, 32, 64];
+        if (count >= wait.length) {
+          count = wait.length - 1;
+        }
+        CMS.Models.BackgroundTask.findAll({
+          id__in: ids.join(',')
+        }).then(function (tasks) {
+          var statuses = _.countBy(tasks, function (task) {
+            return task.status;
+          });
+          this.showFlash(statuses);
+          if (statuses.Pending || statuses.Running) {
+            setTimeout(function () {
+              this.updateStatus(ids, ++count);
+            }.bind(this), wait[count] * 1000);
+          }
+        }.bind(this));
+      },
       generateAssessments: function (list, options) {
         var que = new RefreshQueue();
 
@@ -72,7 +91,6 @@
             .then(function () {
               var tasks = arguments;
               var ids;
-              var interval;
               this.showFlash({Pending: 1});
               options.context.closeModal();
               if (!tasks.length || tasks[0] instanceof CMS.Models.Assessment) {
@@ -83,19 +101,7 @@
               ids = _.uniq(_.map(arguments, function (task) {
                 return task.id;
               }));
-              interval = setInterval(function () {
-                CMS.Models.BackgroundTask.findAll({
-                  id__in: ids.join(',')
-                }).then(function (tasks) {
-                  var statuses = _.countBy(tasks, function (task) {
-                    return task.status;
-                  });
-                  if (!statuses.Pending && !statuses.Running) {
-                    clearInterval(interval);
-                  }
-                  this.showFlash(statuses);
-                }.bind(this));
-              }.bind(this), 2000);
+              this.updateStatus(ids, 0);
             }.bind(this));
         }.bind(this));
       },
