@@ -87,8 +87,8 @@ def get_cache_class(obj):
   return obj.__class__.__name__
 
 
-def get_related_keys_for_expiration(context, obj):
-  cls = get_cache_class(obj)
+def get_related_keys_for_expiration(context, o):
+  cls = get_cache_class(o)
   keys = []
   mappings = context.cache_manager.supported_mappings.get(cls, [])
   if len(mappings) > 0:
@@ -96,11 +96,11 @@ def get_related_keys_for_expiration(context, obj):
       if polymorph:
         key = get_cache_key(
             None,
-            type=getattr(obj, '{0}_type'.format(attr)),
-            id=getattr(obj, '{0}_id'.format(attr)))
+            type=getattr(o, '{0}_type'.format(attr)),
+            id=getattr(o, '{0}_id'.format(attr)))
         keys.append(key)
       else:
-        obj = getattr(obj, attr, None)
+        obj = getattr(o, attr, None)
         if obj:
           if isinstance(obj, list):
             for inner_o in obj:
@@ -151,13 +151,13 @@ def memcache_mark_for_deletion(context, objects_to_mark):
   Returns:
     None
   """
-  for obj, _ in objects_to_mark:
-    cls = get_cache_class(obj)
+  for o, _ in objects_to_mark:
+    cls = get_cache_class(o)
     if cls in context.cache_manager.supported_classes:
-      key = get_cache_key(obj)
+      key = get_cache_key(o)
       context.cache_manager.marked_for_delete.append(key)
       context.cache_manager.marked_for_delete.extend(
-          get_related_keys_for_expiration(context, obj))
+          get_related_keys_for_expiration(context, o))
 
 
 def update_memcache_before_commit(context, modified_objects, expiry_time):
