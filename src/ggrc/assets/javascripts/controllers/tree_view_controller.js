@@ -1080,11 +1080,12 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var listWindow = [];
     var finalDfd;
     var queue = [];
+    var BATCH = 200;
     var opId = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1;
 
     can.each(currentList, function (item) {
       listWindow.push(item);
-      if (listWindow.length >= 500) {
+      if (listWindow.length >= BATCH) {
         queue.push(listWindow);
         listWindow = [];
       }
