@@ -6,6 +6,8 @@
  */
 
 (function (can, $, GGRC) {
+  'use strict';
+
   can.Control('GGRC.Controllers.Comments', {
   }, {
     _create_relationship: function (source, destination) {
@@ -20,12 +22,17 @@
       }).save();
     },
     '{CMS.Models.Comment} created': function (model, ev, instance) {
+      var parentDfd;
+      var source;
+
       if (!(instance instanceof CMS.Models.Comment)) {
         return;
       }
-      var source = instance._source_mapping || GGRC.page_instance();
-      var parent_dfd = this._create_relationship(source, instance);
-      instance.delay_resolving_save_until($.when(parent_dfd));
+
+      source = instance._source_mapping || GGRC.page_instance();
+      parentDfd = this._create_relationship(source, instance);
+
+      instance.delay_resolving_save_until($.when(parentDfd));
     }
   });
 
