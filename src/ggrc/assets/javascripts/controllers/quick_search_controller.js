@@ -305,29 +305,34 @@ can.Control("CMS.Controllers.LHN", {
           .removeClass("active");
 
       this.options.display_prefs.setLHNState({is_open: false});
-   }
+   },
+  open_lhn: function () {
+    var lhsCtr = $('#lhs').control();
+    this.set_active_tab();
 
-  , open_lhn: function () {
-      this.set_active_tab();
+    // not nested
+    $('.lhn-trigger').removeClass('hide').addClass('active');
 
-      // not nested
-      $(".lhn-trigger").removeClass('hide').addClass("active");
+    this.element.find('.lhs-holder')
+      .css('left', '')
+      .addClass('active');
 
-      this.element.find(".lhs-holder")
-          .css("left", "")
-          .addClass("active");
+    this.element.find('.lhn-type')
+      .css('left', '')
+      .addClass('active');
 
-      this.element.find(".lhn-type")
-          .css("left", "")
-          .addClass("active");
+    this.element.find('.bar-v')
+      .addClass('active');
 
-      this.element.find(".bar-v")
-          .addClass("active");
+    this.element.find('.lhs-search')
+      .addClass('active');
 
-      this.element.find(".lhs-search")
-          .addClass("active");
-
-      this.options.display_prefs.setLHNState({is_open: true});
+    this.options.display_prefs.setLHNState({
+      is_open: true
+    });
+    if (lhsCtr.options._hasPendingRefresh) {
+      lhsCtr.refresh_counts();
+    }
   }
 
   , set_active_tab: function (newval) {
@@ -702,6 +707,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       });
     },
     post_init: function () {
+      var lhnCtr = $('#lhn').control();
       var refreshCounts = _.debounce(this.refresh_counts.bind(this), 1000, {
         leading: true,
         trailing: false
@@ -718,7 +724,10 @@ can.Control("CMS.Controllers.LHN_Search", {
           // Don't refresh LHN counts when joins are created
           return;
         }
-
+        if (!lhnCtr.is_lhn_open()) {
+          this.options._hasPendingRefresh = true;
+          return;
+        }
         modelNames = can.map(
           this.get_visible_lists(), this.proxy('get_list_model'));
         modelName = instance.constructor.shortName;
@@ -1106,6 +1115,7 @@ can.Control("CMS.Controllers.LHN_Search", {
       extraModels = can.map(
         this.get_lists(), this.proxy('get_extra_list_model'));
 
+      this.options._hasPendingRefresh = false;
       // Retrieve and display counts
       return GGRC.Models.Search.counts_for_types(
           this.current_term, models, this.current_params, extraModels
