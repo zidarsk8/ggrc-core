@@ -22,6 +22,7 @@
       source_mapping_source: '@',
       mapping: '@',
       deferred: '@',
+      isSaving: false,  // is there a save operation currently in progress
       attributes: {},
       list: [],
       // the following are just for the case when we have no object to start with,
@@ -95,12 +96,20 @@
           context: source.context,
           assignee_type: this.scope.attr('get_assignee_type')
         };
-        instance.attr(data).save().then(function () {
-          return instance.constructor.resolve_deferred_bindings(instance);
-        }).then(function () {
-          this.newInstance();
-          this.cleanPanel();
-        }.bind(this));
+
+        this.scope.attr('isSaving', true);
+
+        instance.attr(data).save()
+          .then(function () {
+            return instance.constructor.resolve_deferred_bindings(instance);
+          })
+          .then(function () {
+            this.newInstance();
+            this.cleanPanel();
+          }.bind(this))
+          .always(function () {
+            this.scope.attr('isSaving', false);
+          }.bind(this));
       }
     }
   });
