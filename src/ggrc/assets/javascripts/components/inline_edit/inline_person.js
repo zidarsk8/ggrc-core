@@ -17,6 +17,10 @@
     scope: {
       setPerson: function (scope, el, ev) {
         this.attr('context.value', ev.selectedItem.serialize());
+      },
+      unsetPerson: function (scope, el, ev) {
+        ev.preventDefault();
+        this.attr('context.value', undefined);
       }
     }
   });

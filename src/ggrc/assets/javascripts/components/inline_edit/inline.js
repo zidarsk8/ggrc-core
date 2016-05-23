@@ -58,7 +58,7 @@
               value = value ? 1 : 0;
             }
             if (type === 'person') {
-              value = 'Person:' + value.id;
+              value = value ? ('Person:' + value.id) : value;
             }
             instance.attr('custom_attributes.' + caid, value);
           } else {
@@ -88,9 +88,15 @@
       var values = scope.attr('values');
       var property = scope.attr('property');
       var instance = scope.attr('instance');
+      var type = scope.attr('type');
 
-      if (scope.attr('caId') && scope.attr('type') === 'checkbox') {
-        value = value === '1';
+      if (scope.attr('caId')) {
+        if (type === 'checkbox') {
+          value = value === '1';
+        }
+        if (type === 'person') {
+          value = _.isEmpty(value.serialize()) ? undefined : value;
+        }
       }
       if (property) {
         value = instance.attr(property);

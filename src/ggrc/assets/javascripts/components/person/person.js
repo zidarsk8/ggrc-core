@@ -52,6 +52,10 @@
       }
       scope.attr('editable', editable);
 
+      if (person && _.isEmpty(person.serialize()) && _.isNaN(personId)) {
+        console.warn('`personObj` or `personId` are missing');
+        return;
+      }
       if (!person) {
         person = CMS.Models.Person.cache[personId];
       }
