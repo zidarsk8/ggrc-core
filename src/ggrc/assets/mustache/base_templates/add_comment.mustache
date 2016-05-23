@@ -54,17 +54,8 @@
         </ul>
       </div>
       <div class="controls clearfix">
-        isSaving: {{isSaving}}
-        {{#isSaving}}YESSS{{/isSaving}}
-        {{^isSaving}}NOOOO{{/isSaving}}
-
-        <div
-          style="background-color: {{#if isSaving}}red{{else}}green{{/if}}">teeest</div>
-
-        <spinner
-          toggle="isSaving"
-          style="display: inline-block"></spinner>
-
+        <spinner toggle="isSaving"></spinner>
+        {{^if isSaving}}
         <a
           href="javascript://"
           class="btn btn-success btn-small pull-left"
