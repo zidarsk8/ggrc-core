@@ -82,3 +82,10 @@
     }
   }
 }
+
+// Datepicker inline edit
+.inline-edit--date {
+  .inline-edit__controls.inline-edit__controls--edit-mode {
+    bottom: -234px;
+  }
+}
