@@ -41,7 +41,7 @@
         {{/is_allowed}}
       </div>
       <div class="wysiwyg-area">
-        <textarea rows="4" class="span12 triple wysihtml5" name="comment-description" id="comment-description" placeholder="Enter comment (optional)"></textarea>
+        <textarea {{#isSaving}}disabled="disabled"{{/isSaving}} rows="4" class="span12 triple wysihtml5" name="comment-description" id="comment-description" placeholder="Enter comment (optional)"></textarea>
       </div>
       <div class="attachments-preview">
         <ul>
@@ -67,6 +67,7 @@
             {{#parent_instance.send_by_default}}checked{{/send_by_default}}>
           Send Notifications
         </label>
+        {{/if}}
       </div>
     </div>
   </div>
