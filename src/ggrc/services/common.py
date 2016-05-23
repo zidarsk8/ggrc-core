@@ -112,16 +112,16 @@ def get_related_keys_for_expiration(context, o):
   return keys
 
 
-def set_ids_for_new_custom_attributes(objects, obj):
+def set_ids_for_new_custom_attributes(objects, parent_obj):
   """
   When we are creating custom attribute values for
-  POST requests, obj.id is not yet defined. This is why we update
+  POST requests, parent object ID is not yet defined. This is why we update
   custom attribute values at this point and set the correct attributable_id
 
   Args:
     objects: newly created objects (we update only the ones that
              are CustomAttributeValue
-    obj: parent object to be set as attributable
+    parent_obj: parent object to be set as attributable
 
   Returns:
     None
@@ -131,7 +131,7 @@ def set_ids_for_new_custom_attributes(objects, obj):
   for obj in objects:
     if not isinstance(obj, CustomAttributeValue):
       continue
-    obj.attributable_id = obj.id
+    obj.attributable_id = parent_obj.id
     # Disable state updating so that a newly create object doesn't go straight
     # from Draft to Modified.
     if hasattr(obj, '_skip_os_state_update'):
