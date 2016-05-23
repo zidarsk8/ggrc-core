@@ -17,7 +17,17 @@
           {{^new_object_form}}
             {{#is_allowed 'delete' instance}}
               {{^if_equals modal_title 'Edit Person'}}
-                <a tabindex="37" class="btn btn-small btn-danger" data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">Delete</a>
+                <a
+                  tabindex="37"
+                  class="btn btn-small btn-danger"
+                  data-toggle="modal-ajax-deleteform"
+                  data-object-plural="{{model.table_plural}}"
+                  data-object-singular="{{model.model_singular}}"
+                  data-modal-reset="reset"
+                  data-modal-class="modal"
+                  data-object-id="{{instance.id}}"
+                  href="javascript://"
+                  >Delete</a>
               {{/if_equals}}
             {{/is_allowed}}
           {{/new_object_form}}
@@ -27,18 +37,46 @@
     <div class="span7">
       <div class="confirm-buttons">
         {{#mapping}}
-        <input type="checkbox" id="map-and-save" checked="checked">&nbsp;<label style="display:inline" for="map-and-save"> Map and save</label>
-        <a tabindex="25" class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}" data-toggle="modal-submit" href="javascript://">Save &amp; Close</a>
+        <input
+          type="checkbox"
+          id="map-and-save"
+          checked="checked"
+          >&nbsp;<label style="display:inline" for="map-and-save"> Map and save</label>
+        <a
+          tabindex="25"
+          class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}"
+          data-toggle="modal-submit"
+          href="javascript://"
+          >Save &amp; Close</a>
         {{/mapping}}
         {{^mapping}}
           {{^new_object_form}}
-            <a tabindex="25" class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}" data-toggle="modal-submit" href="javascript://">Save &amp; Close</a>
+            <a
+              tabindex="25"
+              class="btn btn-small btn-success preventdoubleclick"
+              data-toggle="modal-submit"
+              href="javascript://"
+              >Save &amp; Close</a>
           {{/new_object_form}}
           {{#new_object_form}}
-            <a tabindex="24" class="btn btn-small btn-info preventdoubleclick {{disable_if_errors instance}}" data-toggle="modal-submit-addmore" href="javascript://">Save & Add Another</a>
-            <a tabindex="25" class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}" data-toggle="modal-submit" href="javascript://">Save & Close</a>
+            <a
+              tabindex="24"
+              class="btn btn-small btn-info preventdoubleclick {{disable_if_errors instance}}"
+              data-toggle="modal-submit-addmore"
+              href="javascript://"
+              >Save &amp; Add Another</a>
+            <a
+              tabindex="25"
+              class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}"
+              data-toggle="modal-submit"
+              href="javascript://"
+              >Save &amp; Close</a>
           {{/new_object_form}}
         {{/mapping}}
+
+        <spinner
+          toggle="isSaving"
+          style="display: inline-block"></spinner>
       </div>
     </div>
   </div>

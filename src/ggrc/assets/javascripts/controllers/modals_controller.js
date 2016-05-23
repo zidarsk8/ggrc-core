@@ -28,6 +28,7 @@ can.Control("GGRC.Controllers.Modals", {
     , add_more : false
     , ui_array : []
     , reset_visible : false
+    , isSaving: false  // is there a save/map operation currently in progress
   }
 
   , init : function() {
@@ -783,20 +784,25 @@ can.Control("GGRC.Controllers.Modals", {
     // Normal saving process
     if (el.is(':not(.disabled)')) {
       ajd = this.save_instance(el, ev);
-      if (this.options.add_more) {
-        if (ajd) {
-          this.bindXHRToButton_disable(ajd, save_close_btn);
-          this.bindXHRToButton_disable(ajd, save_addmore_btn);
 
-          this.bindXHRToBackdrop(ajd, modal_backdrop, "Saving, please wait...");
-        }
-      } else {
-        if (ajd) {
-          this.bindXHRToButton(ajd, save_close_btn, "Saving, please wait...");
-          this.bindXHRToButton(ajd, save_addmore_btn);
-        }
+      if (!ajd) {
+        return;
       }
 
+      this.options.attr('isSaving', true);
+
+      ajd.always(function () {
+        this.options.attr('isSaving', false);
+      }.bind(this));
+
+      if (this.options.add_more) {
+        this.bindXHRToButton_disable(ajd, save_close_btn);
+        this.bindXHRToButton_disable(ajd, save_addmore_btn);
+        this.bindXHRToBackdrop(ajd, modal_backdrop, "Saving, please wait...");
+      } else {
+        this.bindXHRToButton(ajd, save_close_btn, "Saving, please wait...");
+         this.bindXHRToButton(ajd, save_addmore_btn);
+      }
     }
     // Queue a save if clicked after verifying the email address
     else if (this._email_check) {

@@ -173,6 +173,7 @@
             object(s) selected
           {{/if}}
         </span>
+
         <a class="
             {{#if_helpers '\
               ^if' mapper.selected.length '\
@@ -191,6 +192,10 @@
             {{/if}}
           {{/if}}
         </a>
+
+        <spinner
+          toggle="mapper.is_saving"
+          style="display: inline-block"></spinner>
       </div>
     </div>
   </div>
