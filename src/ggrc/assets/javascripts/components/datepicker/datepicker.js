@@ -19,12 +19,29 @@
       format: '@',
       datepicker: null,
       isShown: false,
+      persistent: false,
       onSelect: function (val, ev) {
         this.attr('date', val);
       },
-      onFocus: function () {
+      onFocus: function (el, ev) {
         this.attr('isShown', true);
       }
+    },
+    init: function (el, options) {
+      var $el = $(el);
+      var attrVal = $el.attr('persistent');
+      var persistent;
+      var scope = this.scope;
+
+      if (attrVal === '' || attrVal === 'false') {
+        persistent = false;
+      } else if (attrVal === 'true') {
+        persistent = true;
+      } else {
+        persistent = Boolean(scope.attr('persistent'));
+      }
+
+      scope.attr('persistent', persistent);
     },
     events: {
       inserted: function () {
@@ -36,12 +53,25 @@
         this.scope.attr('datepicker', datepicker);
       },
       '{window} mousedown': function (el, ev) {
-        var isInside = this.element.has(ev.target).length ||
-                       this.element.is(ev.target);
+        var isInside;
+
+        if (this.scope.attr('persistent')) {
+          return;
+        }
+        isInside = this.element.has(ev.target).length ||
+                   this.element.is(ev.target);
 
         if (this.scope.isShown && !isInside) {
           this.scope.attr('isShown', false);
         }
+      }
+    },
+    helpers: {
+      isHidden: function (opts) {
+        if (this.attr('isShown') || this.attr('persistent')) {
+          return opts.inverse();
+        }
+        return opts.fn();
       }
     }
   });
