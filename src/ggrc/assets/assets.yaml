@@ -144,6 +144,7 @@ dashboard-js-files:
   - components/inline_edit/inline_input.js
   - components/inline_edit/inline_text.js
   - components/rich_text/rich_text.js
+  - components/add_comment/add_comment.js
   #- d3.v2.js
   #- related_graph.js
 
