@@ -20,6 +20,7 @@
       {{{render '/static/mustache/base_objects/general_info.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/description.mustache' instance=instance}}}
       {{{render '/static/mustache/base_objects/contacts.mustache' instance=instance}}}
+      {{{render '/static/mustache/base_objects/urls.mustache' instance=instance}}}
 
       <div class="custom-attr-wrap">
         <div class="row-fluid">
@@ -66,14 +67,6 @@
               {{else}}
                 <span class="empty-message">None</span>
               {{/if}}
-            </div>
-          </div><!-- row-fluid end -->
-          <div class="row-fluid wrap-row">
-            <div class="span4">
-              <h6>State</h6>
-              <p>
-                {{status}}
-              </p>
             </div>
           </div><!-- row-fluid end -->
         </div><!-- hidden-fields-area end -->
