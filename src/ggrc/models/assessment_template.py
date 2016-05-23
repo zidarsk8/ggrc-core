@@ -80,14 +80,6 @@ class AssessmentTemplate(mixins.Slugged, mixins.Base, relationship.Relatable,
     db.session.flush()
     return assessment_template_copy
 
-  def get_custom_attributes(self):
-    """Get custom attributes defined for certain assessment template"""
-    from ggrc.models import CustomAttributeDefinition
-    return CustomAttributeDefinition.query.filter(
-        CustomAttributeDefinition.definition_type == "assessment_template",
-        CustomAttributeDefinition.definition_id == self.id,
-    ).all()
-
   def clone(self, target):
     """Clone Assessment Template and related custom attributes."""
     assessment_template_copy = self._clone()
@@ -98,7 +90,7 @@ class AssessmentTemplate(mixins.Slugged, mixins.Base, relationship.Relatable,
     db.session.add(rel)
     db.session.flush()
 
-    for cad in self.get_custom_attributes():
+    for cad in self.custom_attribute_definitions:
       # pylint: disable=protected-access
       cad._clone(assessment_template_copy)
 
