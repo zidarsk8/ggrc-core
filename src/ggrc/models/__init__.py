@@ -174,15 +174,14 @@ def init_sanitization_hooks():
 
     parser = HTMLParser()
     value = unicode(value)
-    lastvalue = value
-    value = parser.unescape(value)
-    while value != lastvalue:
+    while True:
       lastvalue = value
-      value = parser.unescape(value)
-
-    ret = parser.unescape(
-        bleach.clean(value, bleach_tags, bleach_attrs, strip=True))
-    return ret
+      value = parser.unescape(
+          bleach.clean(value, bleach_tags, bleach_attrs, strip=True)
+      )
+      if value == lastvalue:
+        break
+    return value
 
   for model in all_models:
     attr_info = SanitizeHtmlInfo(model)
