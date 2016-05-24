@@ -38,14 +38,32 @@
     init: function (element, options) {
       var $el = $(element);
       var personId = Number($el.attr('person-id'));
-      var personObj = CMS.Models.Person.cache[personId];
       var scope = this.scope;
+      var person = scope.attr('personObj');
+      var editableVal = $el.attr('editable');
+      var editable;
 
+      if (editableVal === '' || editableVal === 'false') {
+        editable = false;
+      } else if (editableVal === 'true') {
+        editable = true;
+      } else {
+        editable = Boolean(scope.attr('editable'));
+      }
+      scope.attr('editable', editable);
+
+      if (person && _.isEmpty(person.serialize()) && _.isNaN(personId)) {
+        console.warn('`personObj` or `personId` are missing');
+        return;
+      }
+      if (!person) {
+        person = CMS.Models.Person.cache[personId];
+      }
       // For some reason the cache sometimes contains partially loaded objects,
       // thus we also need to check if "email" (a required field) is present.
       // If it is, we can be certain that we can use the object from the cache.
-      if (personObj && personObj.attr('email')) {
-        scope.attr('personObj', personObj);
+      if (person && person.attr('email')) {
+        scope.attr('personObj', person);
         return;
       }
 
