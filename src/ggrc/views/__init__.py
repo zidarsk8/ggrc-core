@@ -107,14 +107,28 @@ def get_config_json():
     return json.dumps(public_config)
 
 
-def get_current_user_json():
-  """Get current user"""
-  with benchmark("Get current user JSON"):
+def get_full_user_json():
+  """Get the full current user"""
+  with benchmark("Get full user JSON"):
     from ggrc.models.person import Person
     current_user = get_current_user()
     person = Person.eager_query().filter_by(id=current_user.id).one()
     result = publish_representation(publish(person, (), inclusion_filter))
     return as_json(result)
+
+
+def get_current_user_json():
+  """Get current user"""
+  with benchmark("Get current user JSON"):
+    person = get_current_user()
+    return as_json({
+        "id": person.id,
+        "company": person.company,
+        "email": person.email,
+        "language": person.language,
+        "name": person.name,
+        "system_wide_role": person.system_wide_role,
+    })
 
 
 def get_attributes_json():
@@ -179,6 +193,7 @@ def base_context():
       permissions=permissions,
       config_json=get_config_json,
       current_user_json=get_current_user_json,
+      full_user_json=get_full_user_json,
       attributes_json=get_attributes_json,
       all_attributes_json=get_all_attributes_json,
       import_definitions=get_import_definitions,
