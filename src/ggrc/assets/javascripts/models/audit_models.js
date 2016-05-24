@@ -964,7 +964,8 @@
           definition = _.find(instance.custom_attribute_definitions, {
             id: cav.custom_attribute_id
           });
-          if (!definition.multi_choice_options ||
+          if (!definition ||
+              !definition.multi_choice_options ||
               !definition.multi_choice_mandatory) {
             return;
           }
