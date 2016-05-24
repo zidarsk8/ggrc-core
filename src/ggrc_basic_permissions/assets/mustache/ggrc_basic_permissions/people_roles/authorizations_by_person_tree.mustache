@@ -8,7 +8,7 @@
     <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
       <div class="item-main" {{#instance}}{{data 'person'}}{{/instance}}>
         <div class="item-wrap">
-          {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
+          {{> '/static/mustache/base_objects/open_close.mustache'}}
           <div class="select">
             <div class="item-data">
               <div class="row-fluid">

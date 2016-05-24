@@ -12,9 +12,7 @@
 
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="item-wrap">
-      {{#instance}}
-        {{{renderLive '/static/mustache/base_objects/open_close.mustache' instance=this}}}
-      {{/instance}}
+       {{> '/static/mustache/base_objects/open_close.mustache'}}
         <div class="select">
           <div class="item-data">
             <div class="row-fluid">
