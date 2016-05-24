@@ -40,6 +40,10 @@
       verified_date: 1
     }),
 
+    _LIST_FIELDS: Object.freeze({
+      recipients: 1
+    }),
+
     _EMBED_MAPPINGS: Object.freeze({
       Request: ['Comment', 'Document'],
       Assessment: ['Comment', 'Document']
@@ -317,6 +321,14 @@
             }
             if (origVal) {
               origVal = GGRC.Utils.formatDate(origVal, true);
+            }
+          }
+          if (this._LIST_FIELDS[fieldName]) {
+            if (value) {
+              value = _(value).splitTrim(',').compact().join(', ');
+            }
+            if (origVal) {
+              origVal = _(origVal).splitTrim(',').compact().join(', ');
             }
           }
           if (origVal || value) {
