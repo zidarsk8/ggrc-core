@@ -95,7 +95,10 @@
           value = value === '1';
         }
         if (type === 'person') {
-          value = _.isEmpty(value.serialize()) ? undefined : value;
+          if (value && value instanceof can.Map) {
+            value = value.serialize();
+          }
+          value = _.isEmpty(value) ? undefined : value;
         }
       }
       if (property) {
