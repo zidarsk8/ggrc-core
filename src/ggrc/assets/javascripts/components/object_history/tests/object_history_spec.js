@@ -247,6 +247,9 @@ describe('GGRC.Components.objectHistory', function () {
     beforeAll(function () {
       method = Component.prototype._objectChangeDiff.bind({
         _DATE_FIELDS: {},
+        _LIST_FIELDS: {
+          fake_list: 1
+        },
         _objectCADiff: function () {
           return [];
         }
@@ -301,7 +304,8 @@ describe('GGRC.Components.objectHistory', function () {
       beforeEach(function () {
         GGRC.model_attr_defs = {
           Audit: [
-            {attr_name: 'title', display_name: 'Object Name'}
+            {attr_name: 'title', display_name: 'Object Name'},
+            {attr_name: 'fake_list', display_name: 'Fake List'}
           ]
         };
       });
@@ -377,6 +381,43 @@ describe('GGRC.Components.objectHistory', function () {
           // GGRC.model_attr_defs, and is thus considered internal, meaning
           // that it should be omitted from the resulting diff object
           expect(result.changes.length).toEqual(0);
+        }
+      );
+
+      it('compacts the list fields in the diff',
+        function () {
+          var rev1 = {
+            updated_at: '2016-01-25T16:36:29',
+            modified_by: {
+              reify: function () {
+                return "User 5";
+              }
+            },
+            resource_type: 'Audit',
+            content: {
+              fake_list: 'foo,,bar,'
+            }
+          };
+          var rev2 = {
+            updated_at: '2016-01-30T13:22:59',
+            modified_by: {
+              reify: function () {
+                return "User 5";
+              }
+            },
+            resource_type: 'Audit',
+            content: {
+              fake_list: ',,bar,baz'
+            }
+          };
+
+          var result = method(rev1, rev2);
+
+          expect(result.changes).toEqual([{
+            fieldName: 'Fake List',
+            origVal: 'foo, bar',
+            newVal: 'bar, baz'
+          }]);
         }
       );
     });
