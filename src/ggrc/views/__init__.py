@@ -162,7 +162,10 @@ def get_all_attributes_json():
   with benchmark('Loading all attributes JSON'):
     published = {}
     ca_cache = collections.defaultdict(list)
-    for attr in models.CustomAttributeDefinition.eager_query().all():
+    definitions = models.CustomAttributeDefinition.eager_query().group_by(
+        models.CustomAttributeDefinition.title,
+        models.CustomAttributeDefinition.definition_type)
+    for attr in definitions:
       ca_cache[attr.definition_type].append(attr)
     for model in all_models.all_models:
       published[model.__name__] = \
