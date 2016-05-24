@@ -11,7 +11,7 @@ import sys
 import time
 
 from flask import current_app, request
-from settings import CUSTOM_URL_ROOT
+from ggrc.settings import CUSTOM_URL_ROOT
 
 
 class GrcEncoder(json.JSONEncoder):
