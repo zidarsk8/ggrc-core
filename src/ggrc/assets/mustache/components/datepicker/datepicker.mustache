@@ -7,6 +7,12 @@
 
 <div class="datepicker__wrapper">
   <i class="fa fa-calendar"></i>
-  <input can-focus="onFocus" type="text" class="datepicker__input date">
+  <input
+    placeholder="MM/DD/YYYY"
+    type="text"
+    class="datepicker__input date"
+    can-value="date"
+    can-focus="onFocus"
+  >
   <div class="datepicker__calendar {{#isHidden}}hidden{{/isHidden}}"></div>
 </div>
