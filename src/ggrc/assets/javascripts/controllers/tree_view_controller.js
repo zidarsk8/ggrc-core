@@ -967,7 +967,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     // Increment call ID so that all previous draw_node calls will be skipped.
     this.draw_visible_call_id++;
     _.each(toRender, function (step) {
-      callId = this.draw_visible_call_id;
+      var callId = this.draw_visible_call_id;
       setTimeout(function () {
         if (this.draw_visible_call_id === callId) {
           step.draw_node();
