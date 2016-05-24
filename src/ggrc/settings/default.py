@@ -69,3 +69,5 @@ EMAIL_TODAYS = JINJA2.get_template("notifications/view_todays_digest.html")
 EMAIL_PENDING = JINJA2.get_template("notifications/view_pending_digest.html")
 
 USE_APP_ENGINE_ASSETS_SUBDOMAIN = False
+
+BACKGROUND_COLLECTION_POST_SLEEP = 0

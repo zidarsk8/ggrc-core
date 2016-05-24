@@ -1190,7 +1190,7 @@ class Resource(ModelView):
             UnicodeSafeJsonWrapper(src), no_result)
         db.session.commit()
         if running_async:
-          time.sleep(2)
+          time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
       except Exception as e:
         if not src_res or 200 <= src_res[0] < 300:
           src_res = (getattr(e, "code", 500), e.message)
