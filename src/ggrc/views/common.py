@@ -49,13 +49,18 @@ class BaseObjectView(ModelView):
         'instance': obj,
         'controller': self,
         'instance_json':
-        lambda: as_json({
-            self.model._inflector.table_singular:
-            filter_resource(
-                ggrc.builder.json.publish_representation(
-                    ggrc.builder.json.publish(obj, (), inclusion_filter)))
-        })
+        lambda: self.get_object_json(obj)
     }
+
+  def get_object_json(self, obj):
+    """Returns object json"""
+    with benchmark("Get object JSON"):
+      return as_json({
+          self.model._inflector.table_singular:
+          filter_resource(
+              ggrc.builder.json.publish_representation(
+                  ggrc.builder.json.publish(obj, (), inclusion_filter)))
+      })
 
   def get_model_template_paths_for_object(self, obj):
     # Generate lookup paths for templates based on inheritance
