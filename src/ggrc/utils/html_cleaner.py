@@ -3,14 +3,15 @@
 # Created By: andraz@reciprocitylabs.com
 # Maintained By: andraz@reciprocitylabs.com
 
-
-import bleach
+"""Provides an HTML cleaner function with sqalchemy compatible API"""
 
 from HTMLParser import HTMLParser
 
+import bleach
+
 
 # Set up custom tags/attributes for bleach
-bleach_tags = [
+BLEACH_TAGS = [
     'caption', 'strong', 'em', 'b', 'i', 'p', 'code', 'pre', 'tt', 'samp',
     'kbd', 'var', 'sub', 'sup', 'dfn', 'cite', 'big', 'small', 'address',
     'hr', 'br', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul',
@@ -18,18 +19,28 @@ bleach_tags = [
     'blockquote', 'del', 'ins', 'table', 'tbody', 'tr', 'td', 'th',
 ] + bleach.ALLOWED_TAGS
 
-bleach_attrs = {}
+BLEACH_ATTRS = {}
 
-attrs = [
+ATTRS = [
     'href', 'src', 'width', 'height', 'alt', 'cite', 'datetime',
     'title', 'class', 'name', 'xml:lang', 'abbr'
 ]
 
-for tag in bleach_tags:
-  bleach_attrs[tag] = attrs
+for tag in BLEACH_TAGS:
+  BLEACH_ATTRS[tag] = ATTRS
 
 
-def cleaner(target, value, oldvalue, initiator):
+def cleaner(dummy, value, *_):
+  """Cleans out unsafe HTML tags.
+
+  Uses bleach and unescape until it reaches a fix point.
+
+  Args:
+    dummy: unused, sqalchemy will pass in the model class
+    value: html (string) to be cleaned
+  Returns:
+    Html (string) without unsafe tags.
+  """
   # Some cases like Request don't use the title value
   #  and it's nullable, so check for that
   if value is None:
@@ -40,7 +51,7 @@ def cleaner(target, value, oldvalue, initiator):
   while True:
     lastvalue = value
     value = parser.unescape(
-        bleach.clean(value, bleach_tags, bleach_attrs, strip=True)
+        bleach.clean(value, BLEACH_TAGS, BLEACH_ATTRS, strip=True)
     )
     if value == lastvalue:
       break
