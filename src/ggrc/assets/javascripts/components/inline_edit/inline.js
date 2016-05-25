@@ -78,6 +78,7 @@
             })
             .always(function () {
               this.attr('isSaving', false);
+              this.attr('value', this.attr('context.value'));
             }.bind(this));
         }.bind(this));
       }
