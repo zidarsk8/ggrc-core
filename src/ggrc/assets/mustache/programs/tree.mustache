@@ -111,14 +111,6 @@
                       <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
                     </li>
                   {{/infer_roles}}
-
-                  {{^instance.contact}}
-                    <li>
-                      <div class="counter">
-                        <i class="fa fa-person red"></i>
-                      </div>
-                    </li>
-                  {{/instance.contact}}
                   <li>
                     {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
                   </li>
