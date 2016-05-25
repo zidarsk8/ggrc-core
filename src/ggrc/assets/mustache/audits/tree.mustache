@@ -107,14 +107,6 @@
                 {{#with_page_object_as 'page_object'}}
                   {{#if_instance_of page_object 'Person'}}
 
-                    {{^instance.contact}}
-                      <li>
-                        <div class="counter">
-                          <i class="fa fa-person red"></i>
-                        </div>
-                      </li>
-                    {{/instance.contact}}
-
                     {{#mapping_count instance 'related_owned_objects'}}
                       <li>
                         <div class="counter">
@@ -131,13 +123,6 @@
                       </li>
                     {{/mapping_count}}
                     {{else}}
-                    {{^instance.contact}}
-                      <li>
-                        <div class="counter">
-                          <i class="fa fa-person red"></i>
-                        </div>
-                      </li>
-                    {{/instance.contact}}
                   {{/if_instance_of}}
                 {{/with_page_object_as}}
               </ul>

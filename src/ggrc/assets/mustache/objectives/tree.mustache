@@ -108,13 +108,6 @@
                     {{/child_options}}
                     {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' instance=instance parent_instance=parent_instance}}}
                   </li>
-                  {{^instance.contact}}
-                    <li>
-                      <div class="counter">
-                        <i class="fa fa-person red"></i>
-                      </div>
-                    </li>
-                  {{/instance.contact}}
                   <li>
                     {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
                   </li>
