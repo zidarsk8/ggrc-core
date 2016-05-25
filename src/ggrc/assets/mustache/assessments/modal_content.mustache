@@ -75,32 +75,29 @@
                      {{# send_by_default}}checked{{/send_by_default}}>
               Enable notifications on comments
             </label>
+
+            <checkbox-to-list property="recipients" instance="instance">
             <ul class="comment-notification__list">
               <li>
                 <label class="input--inline">
-                  <input type="checkbox"
-                        name="Creator"
-                        {{# Creator}}checked{{/Creator}}>
+                  <input type="checkbox" can-value="values.Creator">
                   Notify creator(s)
                 </label>
               </li>
               <li>
                 <label class="input--inline">
-                  <input type="checkbox"
-                        name="Assessor"
-                        {{# Assessor}}checked{{/Assessor}}>
+                  <input type="checkbox" can-value="values.Assessor">
                   Notify assessor(s)
                 </label>
               </li>
               <li>
                 <label class="input--inline">
-                  <input type="checkbox"
-                        name="Verifier"
-                        {{# Verifier}}checked{{/Verifier}}>
+                  <input type="checkbox" can-value="values.Verifier">
                   Notify verifier(s)
                 </label>
               </li>
             </ul>
+            </checkbox-to-list>
           </div>
         </div>
       </div>
