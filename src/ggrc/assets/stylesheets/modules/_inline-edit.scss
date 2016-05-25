@@ -82,3 +82,10 @@
     }
   }
 }
+
+// Datepicker inline edit
+.inline-edit--date {
+  .datepicker__calendar {
+    top: -218px;
+  }
+}

@@ -1,0 +1,72 @@
+/*
+ * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ * Created By: vladan@reciprocitylabs.com
+ * Maintained By: vladan@reciprocitylabs.com
+ */
+
+.datepicker__wrapper {
+  position: relative;
+  .fa {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+  }
+}
+
+.datepicker__calendar {
+  position: absolute;
+  z-index: zIndex(ui-autocomplete);
+}
+
+.ui-datepicker-inline {
+  .ui-datepicker-prev,
+  .ui-datepicker-next {
+    &.ui-corner-all {
+      background: none;
+      width: 20px;
+      height: 20px;
+      vertical-align: top;
+      text-align: center;
+      display: inline-block;
+      font: normal normal normal 20px/1 FontAwesome; // shortening font declaration
+      text-rendering: auto; // optimizelegibility throws things off #1094
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    &.ui-state-hover {
+      &.ui-corner-all {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+  .ui-datepicker-prev {
+    &:hover {
+      text-decoration: none;
+    }
+    &:before {
+      content: $fa-var-caret-left;
+    }
+    .ui-icon-circle-triangle-w {
+      text-indent: -9999em !important;
+      &:before {
+        content: "";
+      }
+    }
+  }
+  .ui-datepicker-next {
+    &:hover {
+      text-decoration: none;
+    }
+    &:before {
+      content: $fa-var-caret-right;
+    }
+    .ui-icon-circle-triangle-e {
+      text-indent: -9999em !important;
+      &:before {
+        content: "";
+      }
+    }
+  }
+}
