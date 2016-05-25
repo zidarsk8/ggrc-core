@@ -942,11 +942,11 @@
         rq.enqueue(cav);
       });
       $.when(
-          instance.refresh('custom_attributes_values'),
+          instance.refresh_all('custom_attributes_values'),
           instance.get_binding('comments').refresh_count(),
           instance.get_binding('all_documents').refresh_count(),
           rq.trigger()
-      ).then(function (assessment, commentCount, attachmentCount, rqRes) {
+      ).then(function (customAttrVals, commentCount, attachmentCount, rqRes) {
         var values = _.map(instance.custom_attribute_values, function (cav) {
           return cav.reify();
         });
