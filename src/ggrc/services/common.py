@@ -1159,6 +1159,7 @@ class Resource(ModelView):
       return current_app.make_response((
           'Content-Type must be application/json', 415, []))
 
+    running_async = False
     if 'X-GGRC-BackgroundTask' in request.headers:
       if 'X-Appengine-Taskname' not in request.headers:
         task = create_task(request.method, request.full_path,
@@ -1172,6 +1173,7 @@ class Resource(ModelView):
         task_id = int(self.request.headers.get('x-task-id'))
         task = BackgroundTask.query.get(task_id)
         body = json.loads(task.parameters)
+        running_async = True
       task.start()
       no_result = True
     else:
@@ -1187,6 +1189,8 @@ class Resource(ModelView):
         src_res = self.collection_post_step(
             UnicodeSafeJsonWrapper(src), no_result)
         db.session.commit()
+        if running_async:
+          time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
       except Exception as e:
         if not src_res or 200 <= src_res[0] < 300:
           src_res = (getattr(e, "code", 500), e.message)
