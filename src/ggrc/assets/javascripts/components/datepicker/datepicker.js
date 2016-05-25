@@ -20,6 +20,7 @@
       datepicker: null,
       isShown: false,
       persistent: false,
+      pattern: 'MM/DD/YYYY',
       onSelect: function (val, ev) {
         this.attr('date', val);
       },
@@ -46,10 +47,15 @@
     events: {
       inserted: function () {
         var element = this.element.find('.datepicker__calendar');
+        var date = this.scope.date;
         var datepicker = element.datepicker({
           altField: this.element.find('.datepicker__input'),
           onSelect: this.scope.onSelect.bind(this.scope)
         }).data('datepicker');
+
+        if (date && moment(date, this.scope.pattern, true).isValid()) {
+          element.datepicker('setDate', date);
+        }
         this.scope.attr('datepicker', datepicker);
       },
       '{window} mousedown': function (el, ev) {

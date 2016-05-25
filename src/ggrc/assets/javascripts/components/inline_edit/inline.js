@@ -60,10 +60,6 @@
             if (type === 'person') {
               value = value ? ('Person:' + value.id) : value;
             }
-            if (type === 'date') {
-              value = moment(value).isValid() ? value : undefined;
-              this.attr('context.value', value);
-            }
             instance.attr('custom_attributes.' + caid, value);
           } else {
             instance.attr(property, value);

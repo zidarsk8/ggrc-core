@@ -15,8 +15,17 @@
       '/components/inline_edit/datepicker.mustache'
     ),
     scope: {
+      context: null
     },
     events: {
+      '{scope.context} value': function (scope, ev, val) {
+        if (_.isEmpty(val)) {
+          return;
+        }
+        if (!moment(val, 'MM/DD/YYYY', true).isValid()) {
+          this.scope.attr('context.value', undefined);
+        }
+      }
     }
   });
 })(window.can, window.can.$);
