@@ -166,7 +166,7 @@ class AutoStatusChangable(object):
       adjust_state = True
 
     # When user has no more roles on an object, relationship is deleted.
-    if inspect(rel).deleted:
+    if method == "DELETE":
       adjust_state = True
 
     if adjust_state:
