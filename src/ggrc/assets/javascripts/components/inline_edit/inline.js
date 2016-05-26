@@ -60,6 +60,11 @@
             if (type === 'person') {
               value = value ? ('Person:' + value.id) : value;
             }
+            if (type === 'dropdown') {
+              if (value && value === '') {
+                value = undefined;
+              }
+            }
             instance.attr('custom_attributes.' + caid, value);
           } else {
             instance.attr(property, value);
@@ -100,6 +105,11 @@
             value = value.serialize();
           }
           value = _.isEmpty(value) ? undefined : value;
+        }
+        if (type === 'dropdown') {
+          if (_.isNull(value) || _.isUndefined(value)) {
+            value = '';
+          }
         }
       }
       if (property) {
