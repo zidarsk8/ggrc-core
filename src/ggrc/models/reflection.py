@@ -260,7 +260,7 @@ class AttributeInfo(object):
     if not hasattr(object_class, "get_custom_attribute_definitions"):
       return definitions
     object_name = underscore_from_camelcase(object_class.__name__)
-    if ca_cache and object_name:
+    if isinstance(ca_cache, dict) and object_name:
       custom_attributes = ca_cache.get(object_name, [])
     else:
       custom_attributes = object_class.get_custom_attribute_definitions()
