@@ -29,13 +29,12 @@
       },
       enableEdit: function (ctx, el, ev) {
         ev.preventDefault();
-
         this.attr('context.isEdit', true);
       },
       onCancel: function (ctx, el, ev) {
         ev.preventDefault();
         this.attr('context.isEdit', false);
-        this.attr('context.value', this.attr('value'));
+        this.attr('context.value', this.attr('_value'));
       },
       onSave: function (ctx, el, ev) {
         var caid = this.attr('caId');
@@ -51,6 +50,7 @@
           return;
         }
 
+        this.attr('_value', value);
         this.attr('isSaving', true);
         instance.refresh().then(function () {
           if (this.attr('caId')) {
@@ -77,13 +77,13 @@
               });
             })
             .fail(function () {
+              this.attr('context.value', this.attr('_value'));
               $(document.body).trigger('ajax:flash', {
                 error: 'There was a problem saving'
               });
-            })
+            }.bind(this))
             .always(function () {
               this.attr('isSaving', false);
-              this.attr('value', this.attr('context.value'));
             }.bind(this));
         }.bind(this));
       }
@@ -95,7 +95,6 @@
       var property = scope.attr('property');
       var instance = scope.attr('instance');
       var type = scope.attr('type');
-
       if (scope.attr('caId')) {
         if (type === 'checkbox') {
           value = value === '1';
@@ -115,6 +114,7 @@
       if (property) {
         value = instance.attr(property);
       }
+      scope.attr('_value', value);
       scope.attr('context.value', value);
 
       if (values && _.isString(values)) {
@@ -123,15 +123,16 @@
       scope.attr('context.values', values);
     },
     events: {
-      click: function () {
-        this.scope.attr('isInside', true);
-      },
-      '{window} click': function (el, ev) {
-        if (this.scope.attr('context.isEdit') &&
-            !this.scope.attr('isInside')) {
-          this.scope.onSave(this.scope, el, ev);
+      '{window} mousedown': function (el, ev) {
+        var isInside = this.element.has(ev.target).length ||
+                   this.element.is(ev.target);
+
+        if (!isInside &&
+            this.scope.attr('context.isEdit')) {
+          _.defer(function () {
+            this.scope.onSave(this.scope, this.element, ev);
+          }.bind(this));
         }
-        this.scope.attr('isInside', false);
       }
     }
   });
