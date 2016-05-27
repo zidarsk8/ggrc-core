@@ -3,10 +3,10 @@
 # Created By: brodul@reciprocitylabs.com
 # Maintained By: brodul@reciprocitylabs.com
 """
-Test if Global Creator role has the permission to access the workflow objects,
+Test if global creator role has the permission to access the workflow objects,
 owned by Admin.
 """
-# TODO: write tests for create, update, delete
+# T0D0: write tests for create, update, delete
 
 from ggrc_workflows.models import Workflow
 from ggrc_workflows.models import WorkflowPerson
@@ -20,13 +20,17 @@ from ggrc_workflows.models import CycleTaskGroupObjectTask
 from integration.ggrc_workflows.roles import WorkflowRolesTestCase
 
 
-class GlobalCreatorTest(WorkflowRolesTestCase):
+class GlobalCreatorGetTest(WorkflowRolesTestCase):
+  """ Get workflow objects owned by another user as global creator.
+  """
 
   def setUp(self):
-    super(GlobalCreatorTest, self).setUp()
+    # old-style class
+    WorkflowRolesTestCase.setUp(self)
     self.api.set_user(self.users['creator'])
 
-  def test_get_workflow_objects(self):
+  def test_get_obj(self):
+    """ Get workflow objects from draft workflow """
     workflow_res = self.api.get(Workflow, self.workflow_obj.id)
     self.assert403(workflow_res)
 
@@ -45,7 +49,8 @@ class GlobalCreatorTest(WorkflowRolesTestCase):
         WorkflowPerson, self.first_workflow_person.id)
     self.assert403(workflow_person_res)
 
-  def test_get_active_workflow_objects(self):
+  def test_get_active_obj(self):
+    """ Get workflow objects from active workflow """
     self.workflow_res, self.workflow_obj = \
         self.activate_workflow_with_cycle(self.workflow_obj)
     self.get_first_objects()
@@ -82,12 +87,13 @@ class GlobalCreatorTest(WorkflowRolesTestCase):
         CycleTaskGroup, cycle_task_group_obj.id)
     self.assert403(cycle_task_group_res)
 
-    cycle_task_group_object_task_obj =\
+    # cycle_object is cycle task group object task
+    cycle_object_obj =\
         self.session.query(CycleTaskGroupObjectTask)\
         .filter(
             CycleTaskGroupObjectTask.cycle_task_group_id ==
             cycle_task_group_obj.id)\
         .first()
-    cycle_task_group_object_task_res = self.api.get(
-        CycleTaskGroupObjectTask, cycle_task_group_object_task_obj.id)
-    self.assert403(cycle_task_group_object_task_res)
+    cycle_object_res = self.api.get(
+        CycleTaskGroupObjectTask, cycle_object_obj.id)
+    self.assert403(cycle_object_res)

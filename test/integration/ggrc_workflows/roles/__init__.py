@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: brodul@reciprocitylabs.com
 # Maintained By: brodul@reciprocitylabs.com
+"""Test how different roles can access Workflow specific object"""
 
 from datetime import date
 
@@ -14,9 +15,17 @@ from integration.ggrc_workflows import WorkflowTestCase
 
 
 class WorkflowRolesTestCase(WorkflowTestCase):
+  """Workflow roles test case"""
 
   def setUp(self):
-    super(WorkflowRolesTestCase, self).setUp()
+    # old-style class
+    WorkflowTestCase.setUp(self)
+
+    self.workflow_res = None
+    self.workflow_obj = None
+
+    self.users = {}
+
     self.session = db.session
     self.init_users()
     self.random_objects = self.object_generator.generate_random_objects()
@@ -24,6 +33,7 @@ class WorkflowRolesTestCase(WorkflowTestCase):
     self.get_first_objects()
 
   def get_first_objects(self):
+    """ Get the first object from the database set them as attributes """
     self.first_task_group = self.get_task_groups(self.workflow_obj.id)[0]
     self.first_task_group_task = self.get_task_group_tasks(
         self.first_task_group.id)[0]
@@ -41,7 +51,6 @@ class WorkflowRolesTestCase(WorkflowTestCase):
         ("editor", "Editor"),
         ("admin", "gGRC Admin")
     ]
-    self.users = {}
     for (name, role) in users:
       _, user = self.object_generator.generate_person(
           data={"name": name}, user_role=role)

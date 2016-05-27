@@ -3,10 +3,10 @@
 # Created By: brodul@reciprocitylabs.com
 # Maintained By: brodul@reciprocitylabs.com
 """
-Test if Global Editor role has the permission to access the workflow objects,
-owned by Admin.
+Test if global editor and global reader role has the permission to access
+the workflow objects, owned by Admin.
 """
-# TODO: write tests for create, update, delete
+# T0D0: write tests for create, update, delete
 
 from ggrc_workflows.models import Workflow
 from ggrc_workflows.models import WorkflowPerson
@@ -20,30 +20,45 @@ from ggrc_workflows.models import CycleTaskGroupObjectTask
 from integration.ggrc_workflows.roles import WorkflowRolesTestCase
 
 
-class GlobalEditorReaderTest(WorkflowRolesTestCase):
+class GlobalEditorReaderGetTest(WorkflowRolesTestCase):
+  """ Get workflow objects owned by another user
+  as global editor and global reader.
+  """
+
+  def setUp(self):
+    # old-style class
+    WorkflowRolesTestCase.setUp(self)
 
   def assert200_helper(self, response, message=None):
+    """Helper that adds the info of the current user to the message.
+    """
     message = message or \
         "Requests as user: '{}' Response returned {} instead of 200."\
         .format(self.api.person_name, response.status_code)
     self.assert200(response, message)
 
-  def setUp(self):
-    super(GlobalEditorReaderTest, self).setUp()
-
-  def test_get_workflow_objects_editor(self):
+  def test_get_obj_as_editor(self):
+    """ Get workflow object from draft workflow as a editor """
     self._get_workflow_objects(self.users['editor'])
 
-  def test_get_active_workflow_objects_editor(self):
+  def test_get_active_obj_as_editor(self):
+    """ Get workflow object from active workflow as a editor """
     self._get_active_workflow_objects(self.users['editor'])
 
-  def test_get_workflow_objects_reader(self):
+  def test_get_obj_as_reader(self):
+    """ Get workflow object from draft workflow as a reader """
     self._get_workflow_objects(self.users['reader'])
 
-  def test_get_active_workflow_objects_reader(self):
+  def test_get_active_obj_as_reader(self):
+    """ Get workflow object from active workflow as a reader """
     self._get_active_workflow_objects(self.users['reader'])
 
   def _get_workflow_objects(self, user):
+    """ Helper method that runs tests for draft workflow
+    Args:
+       user: Person object
+    """
+
     self.api.set_user(user)
     workflow_res = self.api.get(Workflow, self.workflow_obj.id)
     self.assert200_helper(workflow_res)
@@ -64,6 +79,10 @@ class GlobalEditorReaderTest(WorkflowRolesTestCase):
     self.assert200_helper(workflow_person_res)
 
   def _get_active_workflow_objects(self, user):
+    """ Helper method that runs tests for active workflow
+    Args:
+       user: Person object
+    """
     self.api.set_user(user)
     self.workflow_res, self.workflow_obj = \
         self.activate_workflow_with_cycle(self.workflow_obj)
@@ -101,12 +120,13 @@ class GlobalEditorReaderTest(WorkflowRolesTestCase):
         CycleTaskGroup, cycle_task_group_obj.id)
     self.assert200_helper(cycle_task_group_res)
 
-    cycle_task_group_object_task_obj =\
+    # cycle_object is cycle task group object task
+    cycle_object_obj =\
         self.session.query(CycleTaskGroupObjectTask)\
         .filter(
             CycleTaskGroupObjectTask.cycle_task_group_id ==
             cycle_task_group_obj.id)\
         .first()
-    cycle_task_group_object_task_res = self.api.get(
-        CycleTaskGroupObjectTask, cycle_task_group_object_task_obj.id)
-    self.assert200_helper(cycle_task_group_object_task_res)
+    cycle_object_res = self.api.get(
+        CycleTaskGroupObjectTask, cycle_object_obj.id)
+    self.assert200_helper(cycle_object_res)
