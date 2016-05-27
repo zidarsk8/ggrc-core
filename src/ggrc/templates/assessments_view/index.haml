@@ -11,7 +11,7 @@
   GGRC.config = ={ config_json()|safe };
   GGRC.custom_attr_defs =  ={ attributes_json()|safe }
   GGRC.model_attr_defs =  ={ all_attributes_json()|safe }
-  GGRC.page_object = { "person": ={ current_user_json()|safe } };
+  GGRC.page_object = { "person": ={ full_user_json()|safe } };
 
 -block page_help scoped
   dashboard

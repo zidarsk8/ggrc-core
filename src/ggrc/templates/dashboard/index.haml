@@ -12,6 +12,6 @@
 
 -block extra_javascript
   =super()
-  GGRC.page_object = { "person": ={ current_user_json()|safe } };
+  GGRC.page_object = { "person": ={ full_user_json()|safe } };
 
 -block widget_area
