@@ -43,8 +43,10 @@ class Api():
               "email": person.email,
           })
       }
+      self.person_name, self.person_email = person.name, person.email
     else:
       self.user_headers = {}
+      self.person_name, self.person_email = None, None
 
     self.tc.get("/logout")
     self.tc.get("/login", headers=self.user_headers)
