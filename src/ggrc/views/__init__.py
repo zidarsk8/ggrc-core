@@ -153,7 +153,7 @@ def get_import_definitions():
     return get_import_types(export_only=False)
 
 
-def get_all_attributes_json():
+def get_all_attributes_json(load_custom_attributes=False):
   """Get a list of all attribute definitions
 
   This exports all attributes related to a given model, including custom
@@ -162,11 +162,12 @@ def get_all_attributes_json():
   with benchmark('Loading all attributes JSON'):
     published = {}
     ca_cache = collections.defaultdict(list)
-    definitions = models.CustomAttributeDefinition.eager_query().group_by(
-        models.CustomAttributeDefinition.title,
-        models.CustomAttributeDefinition.definition_type)
-    for attr in definitions:
-      ca_cache[attr.definition_type].append(attr)
+    if load_custom_attributes:
+      definitions = models.CustomAttributeDefinition.eager_query().group_by(
+          models.CustomAttributeDefinition.title,
+          models.CustomAttributeDefinition.definition_type)
+      for attr in definitions:
+        ca_cache[attr.definition_type].append(attr)
     for model in all_models.all_models:
       published[model.__name__] = \
           AttributeInfo.get_attr_definitions_array(model, ca_cache=ca_cache)
