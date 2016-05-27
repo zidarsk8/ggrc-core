@@ -868,7 +868,7 @@
   }, {
     form_preload: function (newObjectForm) {
       var pageInstance = GGRC.page_instance();
-      var currentUser = CMS.Models.get_instance(GGRC.current_user);
+      var currentUser = CMS.Models.get_instance("Person", GGRC.current_user);
       this._set_recipients(this.attr('recipients'));
 
       if (!newObjectForm) {
