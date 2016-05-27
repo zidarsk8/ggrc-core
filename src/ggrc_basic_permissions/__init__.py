@@ -592,8 +592,7 @@ def add_public_program_context_implication(context, check_exists=False):
       .filter(
           and_(
               ContextImplication.context_id == context.id,
-              ContextImplication.source_context_id.is_(None)))\
-      .count() > 0:
+              ContextImplication.source_context_id.is_(None))).count() > 0:
     return
   db.session.add(ContextImplication(
       source_context=None,

@@ -85,7 +85,8 @@ class GlobalCreatorTest(WorkflowRolesTestCase):
     cycle_task_group_object_task_obj =\
         self.session.query(CycleTaskGroupObjectTask)\
         .filter(
-            CycleTaskGroupObjectTask.cycle_task_group_id == cycle_task_group_obj.id)\
+            CycleTaskGroupObjectTask.cycle_task_group_id ==
+            cycle_task_group_obj.id)\
         .first()
     cycle_task_group_object_task_res = self.api.get(
         CycleTaskGroupObjectTask, cycle_task_group_object_task_obj.id)
