@@ -11,8 +11,8 @@
     {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
   </h6>
 
-  <spinner toggle="isSave"></spinner>
-  {{^if isSave}}
+  <spinner toggle="isSaving"></spinner>
+  {{^if isSaving}}
   <div class="inline-edit__content {{#if_equals type 'text'}}inline-edit__content--wide{{/if_equals}}">
     {{#switch type}}
       {{#case 'checkbox'}}
