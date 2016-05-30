@@ -851,6 +851,7 @@
         this._super.apply(this, arguments);
       }
       this.validatePresenceOf('object');
+      this.validatePresenceOf('audit');
       this.validatePresenceOf('validate_creator');
       this.validatePresenceOf('validate_assessor');
       this.validateNonBlank('title');
