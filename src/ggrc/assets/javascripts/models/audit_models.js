@@ -553,7 +553,8 @@
       var audit;
       var that = this;
       var assignees = {};
-      var current_user = CMS.Models.get_instance(GGRC.current_user);
+      var current_user = CMS.Models.get_instance('Person',
+                                                 GGRC.current_user.id);
       var contact;
 
       if (new_object_form) {
