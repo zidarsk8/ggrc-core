@@ -70,7 +70,7 @@
             mapping: "risk_assessments",
             parent_instance: page_instance,
             model: CMS.Models.RiskAssessment,
-            show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
+            show_view: GGRC.mustache_path + "/risk_assessments/tree.mustache",
             draw_children: true,
           }
         }
