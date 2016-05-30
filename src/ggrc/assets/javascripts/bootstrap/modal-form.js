@@ -367,16 +367,15 @@
           $html.append('<a href="#" class="close" data-dismiss="alert">x</a>');
 
           for (messageI in flash[type]) {
-            addLink = flash[type][messageI].indexOf('{reload_link}') > -1;
-            message = flash[type][messageI].replace('{reload_link}', '');
-            if (addLink) {
-              $html.removeClass('alert-autohide');
-            }
+            message = flash[type][messageI];
             // Skip error codes. To force display use String(...) when
             // triggering the flash.
             if (_.isString(message)) {
+              addLink = message.indexOf('{reload_link}') > -1;
+              message = message.replace('{reload_link}', '');
               $html.append($('<span></span>').text(message));
               if (addLink) {
+                $html.removeClass('alert-autohide');
                 $link = $('<a href="javascript://">Show results</a>');
                 $link.on('click', function () {
                   window.location.reload();
