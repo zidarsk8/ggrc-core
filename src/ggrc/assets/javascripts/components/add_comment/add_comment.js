@@ -32,6 +32,7 @@
       get_assignee_type: can.compute(function () {
         // TODO: We prioritize order V > A > R
         var types = {
+          related_creators: 'creator',
           related_verifiers: 'verifier',
           related_assignees: 'assignee',
           related_requesters: 'requester'
