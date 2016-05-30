@@ -159,15 +159,15 @@ class AutoStatusChangable(object):
       attr_changed = ({ra.attr_name for ra in deleted} |
                       {ra.attr_name for ra in added})
 
-    # When object attributes are added or edited, adjust. If user still has
-    # some other role, operation is considered edit.
-    if ("AssigneeType" in attr_changed and
-       obj.status in model.ASSIGNABLE_EDIT):
-      adjust_state = True
+    if obj.status in model.ASSIGNABLE_EDIT:
+      # When object attributes are added or edited, adjust. If user still has
+      # some other role, operation is considered edit.
+      if "AssigneeType" in attr_changed:
+        adjust_state = True
 
-    # When user has no more roles on an object, relationship is deleted.
-    if method == "DELETE":
-      adjust_state = True
+      # When user has no more roles on an object, relationship is deleted.
+      if method == "DELETE":
+        adjust_state = True
 
     if adjust_state:
       cls.adjust_status(model, obj)

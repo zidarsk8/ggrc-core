@@ -37,6 +37,41 @@ class TestMixinAutoStatusChangable(integration.ggrc.TestCase):
     assessment = self.refresh_object(assessment)
     self.assertEqual(assessment.status, models.Assessment.PROGRESS_STATE)
 
+  def test_chaning_assignees_when_open_should_not_change_status(self):
+    """Adding/chaning/removing assignees shouldn't change status when open"""
+    people = [
+        ("creator@example.com", "Creator"),
+        ("assessor_1@example.com", "Assessor"),
+        ("assessor_2@example.com", "Assessor"),
+    ]
+
+    assessment = self.create_assessment(people)
+
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status,
+                     models.Assessment.START_STATE)
+
+    self.modify_assignee(assessment,
+                         "creator@example.com",
+                         "Creator,Assessor")
+
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status,
+                     models.Assessment.START_STATE)
+
+    new_assessors = [("assessor_3_added_later@example.com", "Verifier")]
+    self.create_assignees_restful(assessment, new_assessors)
+
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status,
+                     models.Assessment.START_STATE)
+
+    self.delete_assignee(assessment, "assessor_1@example.com")
+
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status,
+                     models.Assessment.START_STATE)
+
   def test_assessment_verifiers_full_cycle_first_class_edit(self):
     """Test Assessment with verifiers full flow
 
