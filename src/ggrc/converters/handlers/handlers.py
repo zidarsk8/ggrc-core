@@ -420,7 +420,7 @@ class MappingColumnHandler(ColumnHandler):
     self.dry_run = True
 
   def get_value(self):
-    if self.unmap:
+    if self.unmap or not self.mapping_object:
       return ""
     related_slugs = []
     related_ids = RelationshipHelper.get_ids_related_to(
