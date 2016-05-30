@@ -38,7 +38,7 @@
           title: 'None',
           value: ''
         }];
-        var list = can.map(this.attr('optionsList'), function (option) {
+        var list = can.map(this.attr('optionsList') || [], function (option) {
           if (_.isString(option)) {
             return {
               value: option,

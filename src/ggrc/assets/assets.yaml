@@ -137,6 +137,7 @@ dashboard-js-files:
   - components/unified_mapper/mapper_checkbox.js
   - components/assessment_templates/assessment_templates.js
   - components/modal_wrappers/assessment_template_form.js
+  - components/modal_wrappers/checkboxes_to_list.js
   - components/reminder.js
   - components/datepicker/datepicker.js
   - components/inline_edit/inline.js
