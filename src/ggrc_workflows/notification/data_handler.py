@@ -214,7 +214,7 @@ def get_workflow_starts_in_data(notification, workflow):
   if workflow.status != "Active":
     return {}
   if (not workflow.next_cycle_start_date or
-     workflow.next_cycle_start_date < date.today()):
+          workflow.next_cycle_start_date < date.today()):
     return {}  # this can only be if the cycle has successfully started
   result = {}
 
@@ -246,7 +246,7 @@ def get_cycle_start_failed_data(notification, workflow):
   if workflow.status != "Active":
     return {}
   if (not workflow.next_cycle_start_date or
-     workflow.next_cycle_start_date >= date.today()):
+          workflow.next_cycle_start_date >= date.today()):
     return {}  # this can only be if the cycle has successfully started
 
   result = {}
@@ -350,7 +350,7 @@ def get_cycle_task_dict(cycle_task):
     object_data = db.session.query(Revision).filter(
         Revision.resource_type == removed_object_type,
         Revision.resource_id == removed_object_id,
-    ).one()
+    ).order_by(Revision.id.desc()).first()
 
     object_titles.append(
         u"{} [removed from task]".format(object_data.content["display_name"])
