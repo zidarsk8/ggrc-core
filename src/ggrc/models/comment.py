@@ -24,6 +24,8 @@ class Commentable(object):
   send_by_default should be used for setting the "send notification" flag in
     the comment modal.
   """
+  # pylint: disable=too-few-public-methods
+
   VALID_RECIPIENTS = frozenset([
       "Assessor",
       "Assignee",
@@ -42,8 +44,13 @@ class Commentable(object):
                         list of comma separated `VALID_RECIPIENTS`
     """
     # pylint: disable=unused-argument
-    if value and set(value.split(',')).issubset(self.VALID_RECIPIENTS):
-      return value
+    if value:
+      value = set(name for name in value.split(",") if name)
+
+    if value and value.issubset(self.VALID_RECIPIENTS):
+      # The validator is a bit more smart and also makes some filtering of the
+      # given data - this is intended.
+      return ",".join(value)
     elif not value:
       return ""
     else:
