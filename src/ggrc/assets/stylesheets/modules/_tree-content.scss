@@ -630,11 +630,6 @@ ul.new-tree {
       @include opacity(1);
       color: $subTitle;
     }
-    &.all-relevant {
-      i {
-        margin-top:4px;
-      }
-    }
   }
 }
 
