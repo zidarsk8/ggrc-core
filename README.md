@@ -2,6 +2,7 @@ Google Governance, Risk and Compliance (GGRC)
 =========
 
 [![Build Status](https://jenkins.reciprocitylabs.com/job/ggrc_develop_build/badge/icon)](https://jenkins.reciprocitylabs.com/job/ggrc_develop_build/)
+[![Issue Stats](http://www.issuestats.com/github/google/ggrc-core/badge/pr?style=flat)](http://www.issuestats.com/github/google/ggrc-core)
 
 Governance, Risk Management, and Compliance are activities necessary for any organization with regulatory or contractual obligations.
 
