@@ -39,33 +39,35 @@
             dfd = this.options.source_for_refreshable_objects.call(this, request);
           }
 
-          this.options.controller.bindXHRToButton(
-            // Retrieve full people data
+          dfd.then(function(objects) {
+            that.last_stubs = objects;
+            can.each(objects.slice(request.start, request.start + MAX_RESULTS), function(object) {
+              queue.enqueue(object);
+            });
+            queue.trigger().then(function(objs) {
+              objs = that.options.apply_filter.call(that, objs, request);
+              if (objs.length || is_next_page) {
+                // Envelope the object to not break model instance due to
+                // shallow copy done by jQuery in `response()`
+                objs = can.map(objs, function(obj) {
+                  return {
+                    item: obj
+                  };
+                });
+                response(objs);
+              } else {
+                // show the no-results option iff no results come through here,
+                //  and not merely showing paging.
+                that._suggest([]);
+                that._trigger("open");
+              }
+            });
+          });
 
-            dfd.then(function(objects) {
-              that.last_stubs = objects;
-              can.each(objects.slice(request.start, request.start + MAX_RESULTS), function(object) {
-                queue.enqueue(object);
-              });
-              queue.trigger().then(function(objs) {
-                objs = that.options.apply_filter.call(that, objs, request);
-                if (objs.length || is_next_page) {
-                  // Envelope the object to not break model instance due to
-                  // shallow copy done by jQuery in `response()`
-                  objs = can.map(objs, function(obj) {
-                    return {
-                      item: obj
-                    };
-                  });
-                  response(objs);
-                } else {
-                  // show the no-results option iff no results come through here,
-                  //  and not merely showing paging.
-                  that._suggest([]);
-                  that._trigger("open");
-                }
-              });
-            }), $(this.element), null, false);
+          if (this.options.controller) {
+          this.options.controller.bindXHRToButton(dfd,
+            $(this.element), null, false);
+          }
         },
 
         apply_filter: function(objects) {
@@ -124,21 +126,24 @@
 
           if (ui.item) {
             $this.trigger("autocomplete:select", [ui]);
-            if (ctl.scope && ctl.scope.autocomplete_select) {
-              return ctl.scope.autocomplete_select($this, ev, ui);
-            } else if (ctl.autocomplete_select) {
-              return ctl.autocomplete_select($this, ev, ui);
+            if (ctl) {
+              if (ctl.scope && ctl.scope.autocomplete_select) {
+                return ctl.scope.autocomplete_select($this, ev, ui);
+              } else if (ctl.autocomplete_select) {
+                return ctl.autocomplete_select($this, ev, ui);
+              }
             }
-
           } else {
             original_event = ev;
             $(document.body).off(".autocomplete").one("modal:success.autocomplete", function(_ev, new_obj) {
-              if (ctl.scope && ctl.scope.autocomplete_select) {
-                return ctl.scope.autocomplete_select(
-                  $this, original_event, {item: new_obj});
-              } else if (ctl.autocomplete_select) {
-                return ctl.autocomplete_select(
-                  $this, original_event, {item: new_obj});
+              if (ctl) {
+                if (ctl.scope && ctl.scope.autocomplete_select) {
+                  return ctl.scope.autocomplete_select(
+                    $this, original_event, {item: new_obj});
+                } else if (ctl.autocomplete_select) {
+                  return ctl.autocomplete_select(
+                    $this, original_event, {item: new_obj});
+                }
               }
               $this.trigger("autocomplete:select", [{
                 item: new_obj

@@ -63,6 +63,12 @@
     },
 
     events: {
+      inserted: function (el, ev) {
+        this.element.find('.autocomplete--input').ggrc_autocomplete({
+          appendTo: this.element.find('.autocomplete--wrapper')
+        });
+      },
+
       /**
        * Event handler when an item is selected from the list of autocomplete's
        * search results.
