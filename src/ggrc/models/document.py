@@ -8,11 +8,12 @@ from sqlalchemy.orm import validates
 from ggrc import db
 from ggrc.models.mixins import deferred
 from ggrc.models.mixins import Base
+from ggrc.models.relationship import Relatable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.utils import validate_option
 
 
-class Document(Ownable, Base, db.Model):
+class Document(Ownable, Relatable, Base, db.Model):
   __tablename__ = 'documents'
 
   title = deferred(db.Column(db.String), 'Document')
