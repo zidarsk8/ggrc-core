@@ -319,6 +319,7 @@
     @include box-shadow(0 0 5px rgba(0,0,0, .3));
     width: 60%;
     border: 1px solid $warmGray;
+    z-index: zIndex(filter-help);
     .popover-inner {
       width: auto;
       .popover-title {
