@@ -59,9 +59,9 @@
       "ignoreComments": true,
       "ignoreUrls": true
     }],
-    "quotes": [
-        1, "single", {"avoidEscape": true}
-    ],
+    "quotes": [2, "single", {
+      "avoidEscape": true
+    }],
     "no-implicit-coercion": [2, {"boolean": false}],
     "no-inline-comments": 0,
     "no-negated-condition": 0,
