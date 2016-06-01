@@ -20,7 +20,7 @@
       <option value="{{model_singular}}" label="{{title_plural}}"></option>
     {{/importable}}
   </select>
-  <p>CSV template will be generated for following object types:</p>
+  <p>A CSV template will be generated for the following object types:</p>
   <ul class="import-list">
     {{#each selected}}
       <li><a data-index="{{@index}}" href="#"><i class="fa fa-trash"></i></a> {{name}}</li>
@@ -31,6 +31,5 @@
       <i class="fa fa-cloud-upload white"></i>
       Download template
     </a>
-    <small>Click to download</small>
   </div>
 </div>
