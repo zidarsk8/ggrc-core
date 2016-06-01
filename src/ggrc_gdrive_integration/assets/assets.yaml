@@ -9,6 +9,7 @@ dashboard-js-files:
   - controllers/gapi_controllers.js
   - apps/gdrive.js
   - controllers/gdrive_workflows_controller.js
+  - components/gdrive_picker_launcher.js
   - mustache_helpers.js
 
 dashboard-js-spec-files:
