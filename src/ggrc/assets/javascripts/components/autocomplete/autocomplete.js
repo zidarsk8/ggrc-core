@@ -23,6 +23,7 @@
     scope: {
       placeholder: '@',
       searchItemsType: '@',
+      size: '@',
 
       // disable automatically mapping the picked item from the live search
       // results to the instance object of the current context
