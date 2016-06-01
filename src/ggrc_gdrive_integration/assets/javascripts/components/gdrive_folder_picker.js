@@ -362,6 +362,11 @@
             if (scope.deferred && scope.instance._transient) {
               scope.instance.attr('_transient.folder', files[0]);
             }
+          })
+          .fail(function (error) {
+            scope.attr('_folder_change_pending', false);
+            scope.attr('current_folder', null);
+            scope.attr('folder_error', error);
           });
         return dfd;
       }
