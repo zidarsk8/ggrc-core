@@ -10,6 +10,7 @@ dashboard-js-files:
   - apps/gdrive.js
   - controllers/gdrive_workflows_controller.js
   - components/gdrive_picker_launcher.js
+  - components/gdrive_folder_picker.js
   - mustache_helpers.js
 
 dashboard-js-spec-files:
