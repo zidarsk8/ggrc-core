@@ -54,6 +54,7 @@ permissions = {
         "Role",
         "Request",
         "Context",
+        "UserRole",
         {
             "type": "BackgroundTask",
             "terms": {
