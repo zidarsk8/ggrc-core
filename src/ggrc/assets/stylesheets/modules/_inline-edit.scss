@@ -15,7 +15,6 @@
     box-sizing: border-box;
     display: inline-block;
     min-width: 120px;
-    min-height: 24px;
     position: relative;
     padding: 2px 26px 2px 4px;
     border: 1px solid transparent;
@@ -49,7 +48,6 @@
   }
   &__controls {
     display: none;
-
     position: absolute;
     top: 0;
     right: 0;
