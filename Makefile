@@ -154,7 +154,7 @@ src/app.yaml : src/app.yaml.dist
 bower_components : bower.json
 	mkdir -p $(FLASH_PATH)
 	mkdir -p $(DEV_BOWER_PATH)
-	ln -s $(DEV_BOWER_PATH) $(BOWER_PATH)
+	ln -sf $(DEV_BOWER_PATH) $(BOWER_PATH)
 	$(BOWER_BIN_PATH) install --allow-root
 	cp $(BOWER_PATH)/zeroclipboard/dist/ZeroClipboard.swf $(FLASH_PATH)/ZeroClipboard.swf
 	cp -r $(NODE_MODULES_PATH)/font-awesome/fonts $(STATIC_PATH)
