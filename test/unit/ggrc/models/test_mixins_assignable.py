@@ -5,8 +5,9 @@
 
 """Tests for assignable mixin."""
 
-from ggrc.models.mixins_assignable import Assignable
 import unittest
+
+from ggrc.models.mixins_assignable import Assignable
 
 
 class DummyAssignable(Assignable):
