@@ -27,7 +27,10 @@
         value: null,
         values: null
       },
-      enableEdit: function (ctx, el, ev) {
+
+      emptyText: '@',
+
+      enableEdit: function (scope, $el, ev) {
         ev.preventDefault();
         this.attr('context.isEdit', true);
       },
@@ -98,17 +101,21 @@
       if (scope.attr('caId')) {
         if (type === 'checkbox') {
           value = value === '1';
-        }
-        if (type === 'person') {
+        } else if (type === 'person') {
           if (value && value instanceof can.Map) {
             value = value.serialize();
           }
           value = _.isEmpty(value) ? undefined : value;
         }
+
         if (type === 'dropdown') {
           if (_.isNull(value) || _.isUndefined(value)) {
             value = '';
           }
+        }
+
+        if (!scope.attr('emptyText')) {
+          scope.attr('emptyText', 'None');  // default for custom attributes
         }
       }
       if (property) {
