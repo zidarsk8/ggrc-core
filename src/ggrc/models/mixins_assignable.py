@@ -33,7 +33,29 @@ class Assignable(object):
     assignees += [(r.destination, tuple(r.attrs["AssigneeType"].split(",")))
                   for r in self.related_destinations
                   if "AssigneeType" in r.attrs]
-    return set(assignees)
+    return assignees
+
+  def get_assignees(self, filter_=None):
+    """Get assignees by type.
+
+    This is helper for fetching only specific assignee types.
+
+    Args:
+      filter_: String containing assignee type or a list with desired assignee
+        types. If None, all assignees are returned (see self.assignees).
+
+    Returs:
+      Filtered list of assignees.
+    """
+    if filter_ is None:
+      return self.assignees
+    elif isinstance(filter_, basestring):
+      filter_ = [filter_]
+
+    filter_ = set(filter_)
+
+    return [(person, roles) for person, roles in self.assignees
+            if filter_.intersection(roles)]
 
   @staticmethod
   def _validate_relationship_attr(cls, source, dest, existing, name, value):
