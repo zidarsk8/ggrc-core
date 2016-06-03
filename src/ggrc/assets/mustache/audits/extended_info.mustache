@@ -33,13 +33,15 @@
   <div class="row-fluid">
     <div class="span12">
       <h6>Audit Lead</h6>
-      <p>
+      <p class="oneline">
         {{#if instance.contact}}
           {{#using contact=instance.contact}}
-          {{firstnonempty contact.name contact.email}}
+            {{#using person=contact}}
+              {{>'/static/mustache/people/popover.mustache'}}
+            {{/using}}
           {{/using}}
         {{else}}
-          Not assigned
+          <span class="empty-message">Not assigned</span>
         {{/if}}
       </p>
     </div>
@@ -88,6 +90,26 @@
   <div class="row-fluid">
     <div class="span6">
       <h6>Auditor</h6>
+      <p class="oneline">
+        {{#with_mapping 'authorizations' instance}}
+          {{#with_auditors instance decoy=authorizations}}
+            <ul class="inner-count-list">
+              {{#each authorizations}}
+                <li>
+                  {{#using auditor=auditors.0.person}}
+                    {{#using contact=instance.person}}
+                      {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                    {{/using}}
+                  {{/using}}
+                </li>
+              {{/each}}
+            </ul>
+          {{else}}
+            <span class="empty-message">Not assigned</span>
+          {{/with_auditors}}
+        {{/with_mapping}}
+      </p>
+      <!--
       <p>
         {{! `with_auditors` requires `authorizations` mapping, so preload it }}
         {{#with_mapping 'authorizations' instance}}
@@ -100,6 +122,7 @@
           {{/with_auditors}}
         {{/with_mapping}}
       </p>
+      -->
     </div>
     <div class="span6">
       <h6>Audit firm</h6>
