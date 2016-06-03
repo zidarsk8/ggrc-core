@@ -44,6 +44,7 @@ from ggrc.views import mockups
 from ggrc.views import notifications
 from ggrc.views.common import RedirectedPolymorphView
 from ggrc.views.registry import object_view
+from ggrc.utils import benchmark
 
 
 # Needs to be secured as we are removing @login_required
@@ -90,37 +91,57 @@ def do_reindex():
 
 def get_permissions_json():
   """Get all permissions for current user"""
-  permissions.permissions_for(permissions.get_user())
-  return json.dumps(getattr(g, '_request_permissions', None))
+  with benchmark("Get permission JSON"):
+    permissions.permissions_for(permissions.get_user())
+    return json.dumps(getattr(g, '_request_permissions', None))
 
 
 def get_config_json():
   """Get public app config"""
-  public_config = dict(app.config.public_config)
-  for extension_module in get_extension_modules():
-    if hasattr(extension_module, 'get_public_config'):
-      public_config.update(
-          extension_module.get_public_config(get_current_user()))
-  return json.dumps(public_config)
+  with benchmark("Get config JSON"):
+    public_config = dict(app.config.public_config)
+    for extension_module in get_extension_modules():
+      if hasattr(extension_module, 'get_public_config'):
+        public_config.update(
+            extension_module.get_public_config(get_current_user()))
+    return json.dumps(public_config)
+
+
+def get_full_user_json():
+  """Get the full current user"""
+  with benchmark("Get full user JSON"):
+    from ggrc.models.person import Person
+    current_user = get_current_user()
+    person = Person.eager_query().filter_by(id=current_user.id).one()
+    result = publish_representation(publish(person, (), inclusion_filter))
+    return as_json(result)
 
 
 def get_current_user_json():
   """Get current user"""
-  from ggrc.models.person import Person
-  current_user = get_current_user()
-  person = Person.eager_query().filter_by(id=current_user.id).one()
-  result = publish_representation(publish(person, (), inclusion_filter))
-  return as_json(result)
+  with benchmark("Get current user JSON"):
+    person = get_current_user()
+    return as_json({
+        "id": person.id,
+        "company": person.company,
+        "email": person.email,
+        "language": person.language,
+        "name": person.name,
+        "system_wide_role": person.system_wide_role,
+    })
 
 
 def get_attributes_json():
   """Get a list of all custom attribute definitions"""
-  attrs = models.CustomAttributeDefinition.eager_query().all()
-  published = []
-  for attr in attrs:
-    published.append(publish(attr))
-  published = publish_representation(published)
-  return as_json(published)
+  with benchmark("Get attributes JSON"):
+    attrs = models.CustomAttributeDefinition.eager_query().filter(
+        models.CustomAttributeDefinition.definition_id.is_(None)
+    )
+    published = []
+    for attr in attrs:
+      published.append(publish(attr))
+    published = publish_representation(published)
+    return as_json(published)
 
 
 def get_import_types(export_only=False):
@@ -137,27 +158,34 @@ def get_import_types(export_only=False):
 
 
 def get_export_definitions():
-  return get_import_types(export_only=True)
+  with benchmark("Get export definitions"):
+    return get_import_types(export_only=True)
 
 
 def get_import_definitions():
-  return get_import_types(export_only=False)
+  with benchmark("Get import definitions"):
+    return get_import_types(export_only=False)
 
 
-def get_all_attributes_json():
+def get_all_attributes_json(load_custom_attributes=False):
   """Get a list of all attribute definitions
 
   This exports all attributes related to a given model, including custom
-  attributies and mapping attributes, that are used in csv import and export.
+  attributes and mapping attributes, that are used in csv import and export.
   """
-  published = {}
-  ca_cache = collections.defaultdict(list)
-  for attr in models.CustomAttributeDefinition.eager_query().all():
-    ca_cache[attr.definition_type].append(attr)
-  for model in all_models.all_models:
-    published[model.__name__] = \
-        AttributeInfo.get_attr_definitions_array(model, ca_cache=ca_cache)
-  return as_json(published)
+  with benchmark('Loading all attributes JSON'):
+    published = {}
+    ca_cache = collections.defaultdict(list)
+    if load_custom_attributes:
+      definitions = models.CustomAttributeDefinition.eager_query().group_by(
+          models.CustomAttributeDefinition.title,
+          models.CustomAttributeDefinition.definition_type)
+      for attr in definitions:
+        ca_cache[attr.definition_type].append(attr)
+    for model in all_models.all_models:
+      published[model.__name__] = \
+          AttributeInfo.get_attr_definitions_array(model, ca_cache=ca_cache)
+    return as_json(published)
 
 
 @app.context_processor
@@ -169,6 +197,7 @@ def base_context():
       permissions=permissions,
       config_json=get_config_json,
       current_user_json=get_current_user_json,
+      full_user_json=get_full_user_json,
       attributes_json=get_attributes_json,
       all_attributes_json=get_all_attributes_json,
       import_definitions=get_import_definitions,

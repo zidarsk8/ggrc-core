@@ -16,10 +16,18 @@
       <label>
         Title
         <span class="required">*</span>
-        <i class="fa fa-question-circle" rel="tooltip" title="Give new Risks a name that's easy to search for and indicates the main goals of this Risk."></i>
+        <i class="fa fa-question-circle" rel="tooltip"
+           title="Give new Risks a name that's easy to search for and indicates the main goals of this Risk."></i>
       </label>
-      <input tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" autofocus>
-      {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
+      <input tabindex="1"
+             class="input-block-level"
+             placeholder="Enter Title"
+             name="title"
+             type="text"
+             value="{{instance.title}}" autofocus>
+      {{#instance.computed_errors.title}}
+        <label class="help-inline warning">{{this}}</label>
+      {{/instance.computed_errors.title}}
     </div>
   </div>
 
@@ -28,10 +36,18 @@
       <label>
         Description
         <span class="required">*</span>
-        <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this Risk and provide context for how and when this Risk might be used."></i>
-      </label> {{#instance.computed_errors.description}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.description}}
+        <i class="fa fa-question-circle" rel="tooltip"
+           title="Provide more details on the purpose of this Risk and provide context for how and when this Risk might be used."></i>
+      </label>
+      {{#instance.computed_errors.description}}
+        <label class="help-inline warning">{{this}}</label>
+      {{/instance.computed_errors.description}}
       <div class="wysiwyg-area">
-        <textarea tabindex="2" id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description">{{{instance.description}}}</textarea>
+        <textarea tabindex="2"
+                  id="program_description"
+                  class="span12 triple wysihtml5"
+                  name="description"
+                  placeholder="Enter Description">{{{instance.description}}}</textarea>
       </div>
     </div>
     <div class="span6 hide-wrap">
@@ -48,11 +64,51 @@
     <div data-id="note_hidden" class="span6 hidable">
       <label>
         Notes
-        <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
-        <a data-id="hide_note_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <i class="fa fa-question-circle" rel="tooltip"
+           title="Append simple text or html notes here."></i>
+        <a data-id="hide_note_lk" href="javascript://" class="field-hide"
+           tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
-        <textarea data-id="note_txtbx" tabindex="6" id="notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
+        <textarea data-id="note_txtbx" tabindex="6" id="notes"
+                  class="span12 double wysihtml5"
+                  name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
+      </div>
+    </div>
+
+    <div class="span6 hide-wrap hidable">
+      <div class="row-fluid inner-hide">
+        <div data-id="url_hidden" class="span12 hidable">
+          <label>
+            Risk URL
+            <i class="fa fa-question-circle" rel="tooltip"
+               title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
+            <a data-id="hide_url_lk" href="javascript://"
+               class="field-hide" tabindex="-1">hide</a>
+          </label>
+          <input data-id="url_txtbx" tabindex="7"
+                 class="input-block-level" name="url"
+                 placeholder="http://www.domain.com/"
+                 type="text" value="{{url}}">
+        </div>
+      </div>
+      <div class="row-fluid inner-hide">
+        <div data-id="reference_url_hidden" class="span12 hidable">
+          <label>
+            Reference URL
+            <i class="fa fa-question-circle"
+               rel="tooltip"
+               title="Web links to other references."></i>
+            <a data-id="hide_reference_url_lk"
+               href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          </label>
+          <input data-id="reference_url_txtbx" tabindex="8"
+                 id="reference_url"
+                 class="input-block-level"
+                 placeholder="https://www.example.com/"
+                 name="reference_url"
+                 type="text" value="{{reference_url}}">
+        </div>
       </div>
     </div>
   </div>
@@ -61,33 +117,48 @@
     <div class="span4 hidable">
       <label>
         Code
-        <i class="fa fa-question-circle" rel="tooltip" title="The ZenGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+        <i class="fa fa-question-circle" rel="tooltip"
+           title="The ZenGRC application will automatically provide codes for new objects. If you would like to override this feature you may manually enter a code of your choosing. You should have a specific reason for doing this."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <input tabindex="5" class="input-block-level" name="slug" placeholder="RISK-XXX" type="text" value="{{slug}}">
+      <input tabindex="5" class="input-block-level" name="slug"
+             placeholder="RISK-XXX" type="text" value="{{slug}}">
     </div>
 
     <div class="span4 hidable">
       <label>
         Effective Date
-        <i class="fa fa-question-circle" rel="tooltip" title="Enter the date this object becomes effective."></i>
+        <i class="fa fa-question-circle" rel="tooltip"
+           title="Enter the date this object becomes effective."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-        <input tabindex="6" class="input-block-level date" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date start_date}}">
+        <input tabindex="6" class="input-block-level date"
+               name="start_date"
+               data-toggle="datepicker"
+               data-before="end_date"
+               placeholder="MM/DD/YYYY"
+               type="text"
+               value="{{localize_date start_date}}">
       </div>
     </div>
 
     <div class="span4 hidable">
       <label>
         Stop Date
-        <i class="fa fa-question-circle" rel="tooltip" title="Enter the date the object stops being effective."></i>
+        <i class="fa fa-question-circle" rel="tooltip"
+           title="Enter the date the object stops being effective."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-        <input tabindex="7" class="input-block-level date" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date end_date}}">
+        <input tabindex="7" class="input-block-level date"
+               name="end_date"
+               data-toggle="datepicker"
+               data-after="start_date"
+               placeholder="MM/DD/YYYY"
+               type="text" value="{{localize_date end_date}}">
       </div>
     </div>
   </div>
@@ -96,10 +167,12 @@
     <div class="span4 hidable">
       <label>
         State
-        <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
+        <i class="fa fa-question-circle" rel="tooltip"
+           title="Indicates the status of this object."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <select class="input-block-level" name="status" null-if-empty="null-if-empty" tabindex="8">
+      <select class="input-block-level"
+              name="status" null-if-empty="null-if-empty" tabindex="8">
         <option value="" {{#if_equals status ""}}selected{{/if_equals}}>---</option>
         {{#iterate 'Draft', 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
           <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>

@@ -83,7 +83,7 @@ can.Construct("Permission", {
     if ($.type(value) == 'string') {
       if (value[0] == '$') {
         if (value == '$current_user') {
-          return CMS.Models.get_instance(GGRC.current_user);
+          return CMS.Models.get_instance('Person', GGRC.current_user.id);
         }
         throw new Error('unknown permission variable: ' + value);
       }

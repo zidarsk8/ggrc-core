@@ -111,7 +111,7 @@ class ObjectGenerator(Generator):
         "context": context,
     }
     data.update(kwargs)
-    self.generate_object(models.Relationship, data=data)
+    return self.generate_object(models.Relationship, data=data)
 
   def generate_comment(self, commentable, assignee_type, description,
                        **kwargs):

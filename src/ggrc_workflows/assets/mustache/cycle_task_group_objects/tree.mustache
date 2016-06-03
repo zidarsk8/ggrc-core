@@ -9,7 +9,7 @@
 <li class="tree-item t-assigned" {{addclass "t-" instance.status}} {{addclass "t-" instance.overdue}} data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
     <div class="item-wrap">
-      {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
+      {{> '/static/mustache/base_objects/open_close.mustache'}}
       <div class="select">
         <div class="item-data">
           <div class="row-fluid">

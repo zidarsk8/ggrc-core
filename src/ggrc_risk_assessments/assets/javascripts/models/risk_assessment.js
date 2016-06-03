@@ -32,6 +32,22 @@
       custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
     },
     tree_view_options: {
+      attr_list: [
+        {attr_title: 'Title', attr_name: 'title'},
+        {attr_title: 'Code', attr_name: 'slug'},
+        {attr_title: 'Effective Date', attr_name: 'start_date'},
+        {attr_title: 'Stop Date', attr_name: 'end_date'},
+        {
+          attr_title: 'Risk Manager',
+          attr_name: 'ra_manager',
+          attr_sort_field: 'ra_manager.name|email'
+        },
+        {
+          attr_title: 'Risk Counsel',
+          attr_name: 'ra_counsel',
+          attr_sort_field: 'ra_counsel.name|email'
+        }
+      ],
       add_item_view: _mustache_path + "/tree_add_item.mustache",
       child_options: [{
         model: "Document",

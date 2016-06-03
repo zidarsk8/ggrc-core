@@ -954,12 +954,14 @@ def adjust_next_cycle_start_date(
       if last_cycle_start_date >= first_task_reified:
         last_cycle_start_date = last_cycle_start_date + calculator.time_delta
 
-      workflow.non_adjusted_next_cycle_start_date = \
-          calculator.relative_day_to_date(
-              relative_day=first_task.relative_start_day,
-              relative_month=first_task.relative_start_month,
-              base_date=last_cycle_start_date
-          )
+      result = calculator.relative_day_to_date(
+          relative_day=first_task.relative_start_day,
+          relative_month=first_task.relative_start_month,
+          base_date=last_cycle_start_date
+      )
+      if isinstance(result, datetime):
+        result = result.date()
+      workflow.non_adjusted_next_cycle_start_date = result
 
   # Unless we are moving forward one interval we just want to recalculate
   # the next_cycle_start_date to reflect the latest changes to the

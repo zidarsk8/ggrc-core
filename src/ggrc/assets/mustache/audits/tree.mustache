@@ -10,7 +10,7 @@
 <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
     <div class="item-wrap">
-      {{{render '/static/mustache/base_objects/open_close.mustache' instance=instance}}}
+      {{> '/static/mustache/base_objects/open_close.mustache'}}
       <div class="select">
         <div class="item-data">
           <div class="row-fluid">
@@ -107,14 +107,6 @@
                 {{#with_page_object_as 'page_object'}}
                   {{#if_instance_of page_object 'Person'}}
 
-                    {{^instance.contact}}
-                      <li>
-                        <div class="counter">
-                          <i class="fa fa-person red"></i>
-                        </div>
-                      </li>
-                    {{/instance.contact}}
-
                     {{#mapping_count instance 'related_owned_objects'}}
                       <li>
                         <div class="counter">
@@ -131,13 +123,6 @@
                       </li>
                     {{/mapping_count}}
                     {{else}}
-                    {{^instance.contact}}
-                      <li>
-                        <div class="counter">
-                          <i class="fa fa-person red"></i>
-                        </div>
-                      </li>
-                    {{/instance.contact}}
                   {{/if_instance_of}}
                 {{/with_page_object_as}}
               </ul>

@@ -19,6 +19,7 @@ dashboard-js-files:
   - zeroclipboard/dist/ZeroClipboard.min.js
   - stickyfill/stickyfill.js
   - mousetrap/mousetrap.min.js
+  - quill/dist/quill.min.js
   - canjs/can.jquery.js
   - canjs/can.construct.super.js
   - canjs/can.list.sort.js
@@ -136,12 +137,18 @@ dashboard-js-files:
   - components/unified_mapper/mapper_checkbox.js
   - components/assessment_templates/assessment_templates.js
   - components/modal_wrappers/assessment_template_form.js
+  - components/modal_wrappers/checkboxes_to_list.js
   - components/reminder.js
+  - components/datepicker/datepicker.js
   - components/inline_edit/inline.js
   - components/inline_edit/inline_checkbox.js
   - components/inline_edit/inline_dropdown.js
   - components/inline_edit/inline_input.js
   - components/inline_edit/inline_text.js
+  - components/rich_text/rich_text.js
+  - components/add_comment/add_comment.js
+  - components/inline_edit/inline_person.js
+  - components/inline_edit/inline_datepicker.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -254,6 +261,8 @@ dashboard-js-template-files:
   - components/inline_edit/input.mustache
   - components/inline_edit/checkbox.mustache
   - components/inline_edit/dropdown.mustache
+  - components/inline_edit/person.mustache
+  - components/inline_edit/datepicker.mustache
   - components/autocomplete/autocomplete.mustache
   - components/unified_mapper/mapper_results.mustache
   - components/assessment_templates/assessment_templates.mustache
@@ -261,6 +270,8 @@ dashboard-js-template-files:
   - components/object_history/object_history.mustache
   - components/person/person.mustache
   - components/spinner/spinner.mustache
+  - components/rich_text/rich_text.mustache
+  - components/datepicker/datepicker.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache

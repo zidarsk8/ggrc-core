@@ -5,32 +5,34 @@
     Maintained By: brad@reciprocitylabs.com
 */
 
-(function(can, $) {
+(function (can, $) {
+can.Control('GGRC.Controllers.Modals', {
+  BUTTON_VIEW_DONE: GGRC.mustache_path + '/modals/done_buttons.mustache',
+  BUTTON_VIEW_CLOSE: GGRC.mustache_path + '/modals/close_buttons.mustache',
+  BUTTON_VIEW_SAVE_CANCEL:
+    GGRC.mustache_path + '/modals/save_cancel_buttons.mustache',
+  BUTTON_VIEW_SAVE_CANCEL_DELETE:
+    GGRC.mustache_path + '/modals/save_cancel_delete_buttons.mustache',
 
-can.Control("GGRC.Controllers.Modals", {
-  BUTTON_VIEW_DONE : GGRC.mustache_path + "/modals/done_buttons.mustache"
-  , BUTTON_VIEW_CLOSE : GGRC.mustache_path + "/modals/close_buttons.mustache"
-//  BUTTON_VIEW_SAVE
-  , BUTTON_VIEW_SAVE_CANCEL : GGRC.mustache_path + "/modals/save_cancel_buttons.mustache"
-  , BUTTON_VIEW_SAVE_CANCEL_DELETE : GGRC.mustache_path + "/modals/save_cancel_delete_buttons.mustache"
+  defaults: {
+    preload_view: GGRC.mustache_path + '/dashboard/modal_preload.mustache',
+    content_view: GGRC.mustache_path + '/help/help_modal_content.mustache',
+    header_view: GGRC.mustache_path + '/modals/modal_header.mustache',
+    custom_attributes_view:
+      GGRC.mustache_path + '/custom_attributes/modal_content.mustache',
+    button_view: null,
+    model: null,    // model class to use when finding or creating new
+    instance: null, // model instance to use instead of finding/creating (e.g. for update)
+    new_object_form: false,
+    mapping: false,
+    find_params: {},
+    add_more: false,
+    ui_array: [],
+    reset_visible: false,
+    isSaving: false  // is there a save/map operation currently in progress
+  },
 
-  , defaults : {
-    preload_view : GGRC.mustache_path + "/dashboard/modal_preload.mustache"
-    , content_view : GGRC.mustache_path + "/help/help_modal_content.mustache"
-    , header_view : GGRC.mustache_path + "/modals/modal_header.mustache"
-    , custom_attributes_view : GGRC.mustache_path + "/custom_attributes/modal_content.mustache"
-    , button_view : null
-    , model : null    // model class to use when finding or creating new
-    , instance : null // model instance to use instead of finding/creating (e.g. for update)
-    , new_object_form : false
-    , mapping : false
-    , find_params : {}
-    , add_more : false
-    , ui_array : []
-    , reset_visible : false
-  }
-
-  , init : function() {
+  init: function () {
     this.defaults.button_view = this.BUTTON_VIEW_DONE;
   }
 
@@ -774,40 +776,46 @@ can.Control("GGRC.Controllers.Modals", {
     });
   }
 
-  , triggerSave : function(el, ev) {
-    var ajd,
-        save_close_btn = this.element.find("a.btn[data-toggle=modal-submit]"),
-        save_addmore_btn = this.element.find("a.btn[data-toggle=modal-submit-addmore]"),
-        modal_backdrop = this.element.data("modal_form").$backdrop;
+  , triggerSave: function (el, ev) {
+    var ajd;
+    var saveCloseBtn = this.element.find('a.btn[data-toggle=modal-submit]');
+    var saveAddmoreBtn = this.element.find(
+      'a.btn[data-toggle=modal-submit-addmore]');
+    var modalBackdrop = this.element.data('modal_form').$backdrop;
 
     // Normal saving process
     if (el.is(':not(.disabled)')) {
       ajd = this.save_instance(el, ev);
-      if (this.options.add_more) {
-        if (ajd) {
-          this.bindXHRToButton_disable(ajd, save_close_btn);
-          this.bindXHRToButton_disable(ajd, save_addmore_btn);
 
-          this.bindXHRToBackdrop(ajd, modal_backdrop, "Saving, please wait...");
-        }
-      } else {
-        if (ajd) {
-          this.bindXHRToButton(ajd, save_close_btn, "Saving, please wait...");
-          this.bindXHRToButton(ajd, save_addmore_btn);
-        }
+      if (!ajd) {
+        return;
       }
 
-    }
-    // Queue a save if clicked after verifying the email address
-    else if (this._email_check) {
-      this._email_check.done(function(data) {
-        if (data.length != null)
+      this.options.attr('isSaving', true);
+
+      ajd.always(function () {
+        this.options.attr('isSaving', false);
+      }.bind(this));
+
+      if (this.options.add_more) {
+        this.bindXHRToButton_disable(ajd, saveCloseBtn);
+        this.bindXHRToButton_disable(ajd, saveAddmoreBtn);
+        this.bindXHRToBackdrop(ajd, modalBackdrop, 'Saving, please wait...');
+      } else {
+        this.bindXHRToButton(ajd, saveCloseBtn, 'Saving, please wait...');
+        this.bindXHRToButton(ajd, saveAddmoreBtn);
+      }
+    } else if (this._email_check) {
+      // Queue a save if clicked after verifying the email address
+      this._email_check.done(function (data) {
+        if (!_.isNull(data.length) && !_.isUndefined(data.length)) {
           data = data[0];
+        }
         if (data) {
-          setTimeout(function() {
-            delete that._email_check;
+          setTimeout(function () {
+            delete this._email_check;
             el.trigger('click');
-          }, 0);
+          }.bind(this), 0);
         }
       });
     }
@@ -1285,5 +1293,4 @@ can.Component.extend({
     }
   },
 });
-
 })(window.can, window.can.$);

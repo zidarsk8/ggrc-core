@@ -490,11 +490,11 @@ blueprint = Blueprint(
 
 This will set up an extension to be recognized by Flask.
 
-Asset hierarchies in extensions should follow the ggrc-core model: assets.yaml should define the bundles for dasboard-js,
-dashboard-templates, and dashboard-js-specs; The folder naming convension for these bundles (`assets/javascripts`, `assets/mustache`,
+Asset hierarchies in extensions should follow the ggrc-core model: assets.yaml should define the bundles for dashboard-js,
+dashboard-templates, and dashboard-js-specs; The folder naming convention for these bundles (`assets/javascripts`, `assets/mustache`,
 and `assets/js_specs`, respectively) should be followed for each extension.  An important caveat is that the assets bundler can only
 bundle one asset with a given path over all base folders, so you should avoid re-using paths known to exist in ggrc-core or other
-extenions (e.g. "mustache_helper.js" and "models/mixins.js" already exist in ggrc-core, so don't name your files the same as these).
+extensions (e.g. "mustache_helper.js" and "models/mixins.js" already exist in ggrc-core, so don't name your files the same as these).
 
 DB migrations should be set up in `migrations/versions` as in ggrc-core.  Once the extension is created and the settings path added to
 GGRC\_SETTINGS\_MODULE, db_migrate should pick up any migrations automatically.  To completely undo the migrations from an extension
@@ -509,7 +509,7 @@ GGRC\_SETTINGS\_MODULE, db_migrate should pick up any migrations automatically. 
 
 * Services
 
- Services provide the CRUD object endpoints over REST to allow instaces of your extension models.  ggrc-core provides a contributions
+ Services provide the CRUD object endpoints over REST to allow instances of your extension models.  ggrc-core provides a contributions
  mechanism for defining more services from your extension at startup time.  The services contribution is done as such:
 
  ```python

@@ -21,7 +21,17 @@
       select_state: false,
       loading_or_saving: can.compute(function () {
         return this.attr('page_loading') || this.attr('mapper.is_saving');
-      })
+      }),
+      isRelevantToCurrent: function () {
+        var relevant = this.attr('mapper.relevant');
+        var instance = GGRC.page_instance();
+        if (relevant.length !== 1) {
+          return false;
+        }
+        relevant = relevant[0].filter;
+        return relevant.id === instance.id &&
+               relevant.type === instance.type;
+      }
     },
     events: {
       inserted: function () {
@@ -29,7 +39,9 @@
         this.getResults();
       },
       '.modalSearchButton click': 'getResults',
-      '{scope} type': 'getResults',
+      '{scope} type': function () {
+        _.defer(this.getResults.bind(this));
+      },
       '{scope.entries} add': function (list, ev, added) {
         var instance;
         var option;
@@ -178,13 +190,17 @@
         return GGRC.Models.Search.search_for_types(
           data.term || '', data.model_name, data.options);
       },
+
       getResults: function () {
         var contact = this.scope.attr('contact');
         var filters;
         var list;
         var modelName = this.scope.attr('type');
-        var permissionParams = {};
-        var search = [];
+        var params = {};
+        var relevantList = this.scope.attr('mapper.relevant');
+        var binding;
+        var instance;
+        var term = this.scope.attr('term');
 
         if (this.scope.attr('mapper.page_loading') ||
             this.scope.attr('mapper.is_saving')) {
@@ -198,62 +214,51 @@
         this.scope.attr('select_state', false);
         this.scope.attr('mapper.all_selected', false);
 
-        filters = _.compact(_.map(
-          this.scope.attr('mapper.relevant'),
-          function (relevant) {
-            var Loader;
-            var mappings;
-
-            if (!relevant.value) {
-              return undefined;
-            }
-
-            if (modelName === 'AllObject') {
-              Loader = GGRC.ListLoaders.MultiListLoader;
-              mappings = _.compact(_.map(
-                GGRC.Mappings.get_mappings_for(
-                  relevant.filter.constructor.shortName),
-                function (mapping) {
-                  if (mapping instanceof GGRC.ListLoaders.DirectListLoader ||
-                      mapping instanceof GGRC.ListLoaders.ProxyListLoader) {
-                    return mapping;
-                  }
-                }
-              ));
-            } else {
-              Loader = GGRC.ListLoaders.TypeFilteredListLoader;
-              mappings = GGRC.Mappings.get_canonical_mapping_name(
-                relevant.model_name, modelName);
-              mappings = mappings.replace('_as_source', '');
-            }
-            return new Loader(mappings, [modelName]).attach(relevant.filter);
+        if (this.scope.attr('mapper.assessmentGenerator') &&
+            this.scope.isRelevantToCurrent() &&
+            (!term || !contact)) {
+          instance = GGRC.page_instance();
+          binding = this.scope.mapper.get_binding_name(
+            instance,
+            this.scope.attr('mapper.model.table_plural')
+          );
+          if (instance.has_binding(binding)) {
+            this.scope.attr('mapper.page_loading', false);
+            this.scope.attr('entries', instance.get_mapping(binding));
+            this.drawPage();
+            return undefined;
           }
-        ));
+        }
+
+        filters = _.compact(_.map(relevantList, function (relevant) {
+          if (!relevant.value || !relevant.filter) {
+            return undefined;
+          }
+          return relevant.filter.type + ':' + relevant.filter.id;
+        }));
 
         if (modelName === 'AllObject') {
           modelName = this.scope.attr('types.all_objects.models');
         }
 
         if (!_.isEmpty(contact)) {
-          permissionParams.contact_id = contact.id;
+          params.contact_id = contact.id;
+        }
+        if (!_.isEmpty(filters)) {
+          params.relevant_objects = filters.join(',');
         }
 
         this.scope.attr('mapper.page_loading', true);
 
-        search = new GGRC.ListLoaders.SearchListLoader(function (binding) {
+        list = new GGRC.ListLoaders.SearchListLoader(function (binding) {
           return this.searchFor({
-            term: this.scope.attr('term'),
+            term: term,
             model_name: modelName,
-            options: permissionParams
+            options: params
           }).then(function (mappings) {
             return mappings.entries;
           });
         }.bind(this)).attach({});
-
-        search = filters.concat(search);
-        list = (search.length > 1) ?
-                new GGRC.ListLoaders.IntersectingListLoader(search).attach() :
-                search[0];
 
         list.refresh_stubs().then(function (options) {
           this.scope.attr('mapper.page_loading', false);

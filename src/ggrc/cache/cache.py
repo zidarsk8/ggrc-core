@@ -22,6 +22,7 @@ def all_cache_entries():
   ret = [
       resource('access_groups', 'AccessGroup'),
       resource('audits', 'Audit'),
+      resource('custom_attribute_values', 'CustomAttributeValue'),
       resource('categorizations', 'Categorization'),
       resource('category_bases', 'CategoryBase'),
       resource('control_categories', 'ControlCategory'),
@@ -113,6 +114,7 @@ def all_mapping_entries():
       mapping('Audit', 'requests'),
       mapping('Audit', 'program'),
       mapping('Request', 'audit'),
+      mapping('CustomAttributeValue', 'attributable', True),
       mapping('Request', 'responses'),
       mapping('ObjectDocument', 'document'),
       mapping('ObjectDocument', 'documentable', True),

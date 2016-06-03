@@ -4,6 +4,7 @@
     Created By: ivan@reciprocitylabs.com
     Maintained By: ivan@reciprocitylabs.com
 }}
+
 <div class="add-comment">
   {{^if_null parent_instance._mandatory_comment_msg}}
     <div class="row-fluid">
@@ -40,7 +41,7 @@
         {{/is_allowed}}
       </div>
       <div class="wysiwyg-area">
-        <textarea rows="4" class="span12 triple wysihtml5" name="comment-description" id="comment-description" placeholder="Enter comment (optional)"></textarea>
+        <textarea {{#isSaving}}disabled="disabled"{{/isSaving}} rows="4" class="span12 triple wysihtml5" name="comment-description" id="comment-description" placeholder="Enter comment (optional)"></textarea>
       </div>
       <div class="attachments-preview">
         <ul>
@@ -53,12 +54,20 @@
         </ul>
       </div>
       <div class="controls clearfix">
-        <a href="javascript://" class="btn btn-success btn-small pull-left">Add</a>
+        <spinner toggle="isSaving"></spinner>
+        {{^if isSaving}}
+        <a
+          href="javascript://"
+          class="btn btn-success btn-small pull-left"
+          {{#if isSaving}}disabled="disabled"{{/if}}
+          >Add</a>
+
         <label class="input--inline pull-left">
           <input type="checkbox" name="send_notification"
             {{#parent_instance.send_by_default}}checked{{/send_by_default}}>
           Send Notifications
         </label>
+        {{/if}}
       </div>
     </div>
   </div>

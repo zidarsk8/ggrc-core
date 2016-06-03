@@ -47,7 +47,7 @@ def _has_unsent_notifications(notif_type, obj):
       for.
     obj (sqlalchemy model): Object for which we're looking for notifications.
 
-  Returs:
+  Returns:
     True if there are any unsent notifications of notif_type for the given
     object, and False otherwise.
   """

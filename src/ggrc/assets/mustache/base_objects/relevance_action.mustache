@@ -9,51 +9,25 @@
 {{^is_dashboard}}
   {{#with_page_object_as 'page_instance'}}
     {{^if_equals parent_instance page_instance}}
-      {{#if multiple_mapping_case}}
-      {{#with_mappable_instances_as 'processed_list' list}}
-      {{#with_direct_mappings_as 'mappings' page_instance processed_list}}
-      {{#with_mapping_instances_as 'mapped_instances' mappings}}
-      {{#with_subtracted_list_as 'unmapped_instances' processed_list mapped_instances}}
-        {{#if_equals unmapped_instances.length 0}}
-          {{#with_allowed_as 'deletable_mappings' 'delete' mappings}}
-            {{#if deletable_mappings.length}}
-              <a href="javascript://" class="info-action unmap pull-right relevant-action all-relevant" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make All Relevant">
-                {{#deletable_mappings}}<span class="result" {{data 'result'}}></span>{{/deletable_mappings}}
+      {{#^if multiple_mapping_case}}
+        {{#with_direct_mappings_as 'mappings' page_instance instance}}
+          {{^if_equals page_instance instance}}
+          {{#is_allowed_to_map page_instance instance join=true}}
+          {{#if mappings.length}}
+            {{#is_allowed_all 'delete' mappings}}
+              <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make Relevant">
+                {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
                 <i class="fa fa-check-square-o"></i>
               </a>
-            {{/if}}
-          {{/with_allowed_as}}
-        {{else}}
-          {{#if unmapped_instances.length}}
-            {{! we permission checked for create up in with_mappable_instances_as}}
-            <a class="info-action pull-right map-to-page-object relevant-action all-relevant" href="javascript://" {{#with processed_list}}{{data 'instance'}}{{/with}} {{#with mappings}}{{data 'existing_mappings'}}{{/with}} rel="tooltip" data-placement="left" data-original-title="Make All Relevant">
+            {{/is_allowed_all}}
+          {{else}}
+            <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}} rel="tooltip" data-placement="left" data-original-title="Make Relevant">
               <i class="fa fa-square-o"></i>
             </a>
           {{/if}}
-        {{/if_equals}}
-      {{/with_subtracted_list_as}}
-      {{/with_mapping_instances_as}}
-      {{/with_direct_mapping_as}}
-      {{/with_mappable_instances_as}}
-      {{else}}
-      {{#with_direct_mappings_as 'mappings' page_instance instance}}
-        {{^if_equals page_instance instance}}
-        {{#is_allowed_to_map page_instance instance join=true}}
-        {{#if mappings.length}}
-          {{#is_allowed_all 'delete' mappings}}
-            <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make Relevant">
-              {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
-              <i class="fa fa-check-square-o"></i>
-            </a>
-          {{/is_allowed_all}}
-        {{else}}
-          <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}} rel="tooltip" data-placement="left" data-original-title="Make Relevant">
-            <i class="fa fa-square-o"></i>
-          </a>
-        {{/if}}
-        {{/is_allowed_to_map}}
-        {{/if_equals}}
-      {{/with_direct_mapping_as}}
+          {{/is_allowed_to_map}}
+          {{/if_equals}}
+        {{/with_direct_mapping_as}}
       {{/if}}
     {{/if_equals}}
   {{/with_page_object_as}}

@@ -7,6 +7,7 @@ from datetime import datetime
 import collections
 import logging
 
+from sqlalchemy.sql.expression import tuple_
 from ggrc import db
 from ggrc import models
 from ggrc.automapper.rules import rules
@@ -17,7 +18,6 @@ from ggrc.models.request import Request
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource
 from ggrc.utils import benchmark, with_nop
-from sqlalchemy.sql.expression import tuple_
 
 
 class Stub(collections.namedtuple("Stub", ["type", "id"])):
@@ -36,6 +36,7 @@ class AutomapperGenerator(object):
     self.processed = set()
     self.queue = set()
     self.cache = collections.defaultdict(set)
+    self.instance_cache = {}
     self.auto_mappings = set()
     if use_benchmark:
       self.benchmark = benchmark
@@ -66,16 +67,24 @@ class AutomapperGenerator(object):
                    Relationship.destination_id).in_(
                        [(s.type, s.id) for s in stubs]))
     ).all()
+    batch_requests = collections.defaultdict(set)
     for (src_type, src_id, dst_type, dst_id) in relationships:
       src = Stub(src_type, src_id)
       dst = Stub(dst_type, dst_id)
       # only store a neighbour if we queried for it since this way we know
       # we'll be storing complete neighbourhood by the end of the loop
+      batch_requests[src_type].add(src_id)
+      batch_requests[dst_type].add(dst_id)
       if src in stubs:
         self.cache[src].add(dst)
       if dst in stubs:
         self.cache[dst].add(src)
 
+    for type_, ids in batch_requests.iteritems():
+      model = getattr(models.all_models, type_)
+      instances = model.query.filter(model.id.in_(ids))
+      for instance in instances:
+        self.instance_cache[Stub(type_, instance.id)] = instance
     return self.cache[obj]
 
   def relate(self, src, dst):
@@ -168,14 +177,17 @@ class AutomapperGenerator(object):
           self.queue.add(entry)
 
   def _step_implicit(self, src, dst, implicit):
-    if not hasattr(models, src.type):
-      logging.warning('Automapping by attr: cannot find model %s' % src.type)
+    if not hasattr(models.all_models, src.type):
+      logging.warning('Automapping by attr: cannot find model %s', src.type)
       return
-    model = getattr(models, src.type)
-    instance = model.query.filter(model.id == src.id).first()
+    instance = self.instance_cache.get(src)
     if instance is None:
-      logging.warning("Automapping by attr: cannot load model %s: %s" %
-                      (src.type, str(src.id)))
+      model = getattr(models.all_models, src.type)
+      instance = model.query.filter(model.id == src.id).first()
+      self.instance_cache[src] = instance
+    if instance is None:
+      logging.warning("Automapping by attr: cannot load model %s: %s",
+                      src.type, str(src.id))
       return
     for attr in implicit:
       if hasattr(instance, attr.name):
@@ -188,11 +200,11 @@ class AutomapperGenerator(object):
             if entry not in self.processed:
               self.queue.add(entry)
           else:
-            logging.warning('Automapping by attr: %s is None' % attr.name)
+            logging.warning('Automapping by attr: %s is None', attr.name)
       else:
         logging.warning(
-            'Automapping by attr: object %s has no attribute %s' %
-            (str(src), str(attr.name))
+            'Automapping by attr: object %s has no attribute %s',
+            str(src), str(attr.name)
         )
 
   def _ensure_relationship(self, src, dst):
@@ -201,17 +213,14 @@ class AutomapperGenerator(object):
     if src in self.cache.get(dst, []):
       return False
 
-    created = False
-    if Relationship.find_related(src, dst) is None:
-      self.auto_mappings.add((src, dst))
-      created = True
+    self.auto_mappings.add((src, dst))
 
     if src in self.cache:
       self.cache[src].add(dst)
     if dst in self.cache:
       self.cache[dst].add(src)
 
-    return created
+    return True
 
 
 def register_automapping_listeners():
@@ -242,7 +251,6 @@ def register_automapping_listeners():
 
   # pylint: disable=unused-variable
   @Resource.model_posted_after_commit.connect_via(Audit)
-  @Resource.model_put_after_commit.connect_via(Audit)
   def handle_audit(sender, obj=None, src=None, service=None):
     if obj is None:
       logging.warning("Automapping audit listener: "

@@ -8,17 +8,30 @@
 (function (can, $) {
   can.Component.extend({
     tag: 'mapping-tree-view',
-    template: can.view(GGRC.mustache_path + '/base_templates/mapping_tree_view.mustache'),
+    template: can.view(GGRC.mustache_path +
+      '/base_templates/mapping_tree_view.mustache'),
     scope: {
       reusable: '@',
       reuseMethod: '@',
-      treeViewClass: '@'
+      treeViewClass: '@',
+      expandable: '@',
+      isExpandable: function () {
+        var expandable = this.attr('expandable');
+        if (expandable === null || expandable === undefined) {
+          return true;
+        } else if (typeof expandable === 'string') {
+          return expandable === 'true';
+        }
+        return expandable;
+      }
     },
     events: {
       '[data-toggle=unmap] click': function (el, ev) {
         var instance = el.find('.result').data('result');
-        var mappings = this.scope.parentInstance.get_mapping(this.scope.mapping);
+        var mappings = this.scope.parentInstance.get_mapping(
+          this.scope.mapping);
         var binding;
+
         ev.stopPropagation();
 
         binding = _.find(mappings, function (mapping) {
@@ -26,9 +39,13 @@
                  mapping.instance.type === instance.type;
         });
         _.each(binding.get_mappings(), function (mapping) {
-          mapping.refresh().then(function () {
-            mapping.destroy();
-          });
+          mapping.refresh()
+            .then(function () {
+              return mapping.destroy();
+            })
+            .then(function () {
+              return mapping.documentable.reify();
+            });
         });
       }
     }

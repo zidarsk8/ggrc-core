@@ -135,3 +135,14 @@ class TestUtilsFunctions(TestCase):
     }
     expected_result = utils.merge_dicts(dict1, dict2, dict3)
     self.assertEqual(result, expected_result)
+
+  def test_html_cleaner(self):
+    def clean(value):
+      return utils.html_cleaner.cleaner(None, value, None, None)
+
+    self.assertEqual(clean("<script>alert(1)</script>"), "alert(1)")
+
+    nested = ("<<script>s<script>c<script>r<script>i<script>p<script>t"
+              "<script>>alert(2)<<script>/<script>s<script>c<script>r<script>"
+              "i<script>p<script>t<script>>")
+    self.assertEqual(clean(nested), "alert(2)")

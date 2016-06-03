@@ -1,0 +1,18 @@
+{{!
+  Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Created By: peter@reciprocitylabs.com
+  Maintained By: peter@reciprocitylabs.com
+}}
+
+<div class="datepicker__wrapper">
+  <i class="fa fa-calendar"></i>
+  <input
+    placeholder="{{pattern}}"
+    type="text"
+    class="datepicker__input date"
+    can-value="date"
+    can-focus="onFocus"
+  >
+  <div class="datepicker__calendar {{#isHidden}}hidden{{/isHidden}}"></div>
+</div>

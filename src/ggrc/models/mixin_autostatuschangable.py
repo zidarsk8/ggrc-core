@@ -58,8 +58,8 @@ class AutoStatusChangable(object):
     """Detects if object attribute has changes
 
     Args:
-      obj: Object on which to perform attribute inspection.
-      attr: Attribute to inspect
+      obj: (db.Model instance) Object on which to perform attribute inspection.
+      attr: (string) Attribute to inspect
     Returns:
       A boolean representing if models attribute changed.
     """
@@ -74,8 +74,9 @@ class AutoStatusChangable(object):
     """Get instance of an model object from relationship.
 
     Args:
-      model: Class whose instance we want to retrieve from relationship.
-      rel: Instance of relationship object.
+      model: (db.Model class) Class whose instance we want to retrieve from
+        relationship.
+      rel: (Relationship) Instance of relationship object.
     Returns:
       An instance of class model.
     """
@@ -88,9 +89,7 @@ class AutoStatusChangable(object):
     """Initialisation method to run after models have been initialised.
 
     Args:
-      model: Class on which to run set_handlers method.
-    Returns:
-      Nothing.
+      model: (db.Model class) Class on which to run set_handlers method.
     """
     cls.set_handlers(model)
 
@@ -99,16 +98,15 @@ class AutoStatusChangable(object):
     """Switches state on object to the PROGRESS_STATE
 
     Args:
-      model: Class from which to read PROGRESS_STATE value.
-      obj: object on which to perform status transition operation.
-    Returns:
-      Nothing.
+      model: (db.Model class) Class from which to read PROGRESS_STATE value.
+      obj: (db.Model instance) object on which to perform status transition
+        operation.
     """
     obj.status = model.PROGRESS_STATE
     db.session.add(obj)
 
   @classmethod
-  def handle_first_class_edit(cls, model, obj, rel=None):
+  def handle_first_class_edit(cls, model, obj, rel=None, method=None):
     """Handles first class edit
 
     Performs check whether object received first class edit (ordinary edit
@@ -116,12 +114,12 @@ class AutoStatusChangable(object):
     or one of END_STATES.
 
     Args:
-      model: Class from which to read FIRST_CLASS_EDIT property.
-      obj: Object on which to perform operations.
-      rel: Relationship object, needed here to maintain equal type signature
-        with handle_person_edit.
-    Returns:
-      Nothing.
+      model: (db.Model class) Class from which to read FIRST_CLASS_EDIT
+        property.
+      obj: (db.Model instance) Object on which to perform operations.
+      rel: (Relationship) Relationship object, needed here to maintain equal
+        type signature with handle_person_edit.
+      method: (string) HTTP method used that triggered signal
     """
 
     # pylint: disable=unused-argument,unused-variable
@@ -130,19 +128,48 @@ class AutoStatusChangable(object):
       cls.adjust_status(model, obj)
 
   @classmethod
-  def handle_person_edit(cls, model, obj, rel):
+  def handle_person_edit(cls, model, obj, rel, method):
     """Handles person edit
 
     Args:
-      model: Class from which to read ASSIGNABLE_EDIT property.
-      obj: Object on which to perform operations.
-      rel: Relationship whose attribute have to be inspected for changes.
-    Returns:
-      Nothing.
+      model: (db.Model class) Class from which to read ASSIGNABLE_EDIT
+        property.
+      obj: (db.Model instance) Object on which to perform operations.
+      rel: (Relationship) Relationship whose attribute have to be inspected for
+        changes.
+      method: (string) HTTP method used that triggered signal
     """
-    history = inspect(rel).attrs.relationship_attrs.history
-    if (history.has_changes() and
-       obj.status in model.ASSIGNABLE_EDIT):
+    adjust_state = False
+
+    if method == "POST":
+      # On relationship creation inspect(rel) sometime shows relationship
+      # attributes as unchanged and sometimes as added.
+      # But because POST can only ever be issued for creation, we can use this
+      # as a guarantee that this was an editable event that should adjust
+      # status.
+      unchanged = inspect(rel).attrs.relationship_attrs.history.unchanged
+      added = inspect(rel).attrs.relationship_attrs.history.added
+      attr_changed = ({ra.attr_name for ra in unchanged} |
+                      {ra.attr_name for ra in added})
+    else:
+      # Ensures that we only adjust status for AssigneeType relationship
+      # attribute.
+      added = inspect(rel).attrs.relationship_attrs.history.added
+      deleted = inspect(rel).attrs.relationship_attrs.history.deleted
+      attr_changed = ({ra.attr_name for ra in deleted} |
+                      {ra.attr_name for ra in added})
+
+    if obj.status in model.ASSIGNABLE_EDIT:
+      # When object attributes are added or edited, adjust. If user still has
+      # some other role, operation is considered edit.
+      if "AssigneeType" in attr_changed:
+        adjust_state = True
+
+      # When user has no more roles on an object, relationship is deleted.
+      if method == "DELETE":
+        adjust_state = True
+
+    if adjust_state:
       cls.adjust_status(model, obj)
 
   @classmethod
@@ -151,8 +178,6 @@ class AutoStatusChangable(object):
 
     Args:
       model: Class on which handlers will be set up.
-    Returns:
-      Nothing.
     """
     @common.Resource.model_put.connect_via(model)
     def handle_object_put(sender, obj=None, src=None, service=None):
@@ -163,10 +188,9 @@ class AutoStatusChangable(object):
       See blinker library documentation for other parameters (all necessary).
 
       Args:
-        obj: Object on which we will perform manipulation.
-      Returns:
-        Nothing.
+        obj: (db.Model instance) Object on which we will perform manipulation.
       """
+
       # pylint: disable=unused-argument,unused-variable,protected-access
       if (any(cls._has_changes(obj, attr) for attr in model._tracked_attrs) and
          model.FIRST_CLASS_EDIT):
@@ -182,7 +206,7 @@ class AutoStatusChangable(object):
       See blinker library documentation for other parameters (all necessary).
 
       Args:
-        obj: Object on which we will perform manipulation.
+        obj: (db.Model instance) Object on which we will perform manipulation.
       """
       # pylint: disable=unused-argument,unused-variable
 
@@ -190,7 +214,8 @@ class AutoStatusChangable(object):
 
     @common.Resource.model_posted.connect_via(relationship.Relationship)
     @common.Resource.model_put.connect_via(relationship.Relationship)
-    def handle_relationship_post(sender, obj=None, src=None, service=None):
+    @common.Resource.model_deleted.connect_via(relationship.Relationship)
+    def handle_relationship(sender, obj=None, src=None, service=None):
       """Handle creation of relationships that can change object status.
 
       Adding or removing assigable persons (Assignees, Requesters, Creators,
@@ -201,9 +226,7 @@ class AutoStatusChangable(object):
       See blinker library documentation for other parameters (all necessary).
 
       Args:
-        obj: Object on which we will perform manipulation.
-      Returns:
-        Nothing
+        obj: (db.Model instance) Object on which we will perform manipulation.
       """
       # pylint: disable=unused-argument,unused-variable
 
@@ -217,19 +240,22 @@ class AutoStatusChangable(object):
         }
         for k in handlers.keys():
           if k in endpoints:
-            handlers[k](model, target_object, obj)
+            handlers[k](model, target_object, obj,
+                        method=service.request.method)
 
     @common.Resource.model_posted.connect_via(
         object_document.ObjectDocument)
+    @common.Resource.model_deleted.connect_via(
+        object_document.ObjectDocument)
     def handle_objectdocument_post(sender, obj=None, src=None, service=None):
-      """Handles creation of URLs
+      """Handles addition and deletion of evidences
 
-      Adding URLs moves object back to PROGRESS_STATE.
+      Adding evidence moves object back to PROGRESS_STATE.
 
       See blinker library documentation for other parameters (all necessary).
 
       Args:
-        obj: Object on which we will perform manipulation.
+        obj: (db.Model instance) Object on which we will perform manipulation.
       """
       # pylint: disable=unused-argument,unused-variable
 

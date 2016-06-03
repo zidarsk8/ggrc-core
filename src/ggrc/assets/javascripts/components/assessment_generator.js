@@ -21,13 +21,14 @@
         GGRC.Controllers.MapperModal.launch(el, {
           object: 'Audit',
           type: 'Control',
-          'join-object-id': this.scope.audit.id,
+          'join-object-id': instance.id,
           'join-mapping': 'program_controls',
           getList: true,
           useTemplates: true,
+          assessmentGenerator: true,
           relevantTo: [{
-            type: instance.program.type,
-            id: instance.program.id
+            type: instance.type,
+            id: instance.id
           }],
           template: {
             title: '/static/mustache/assessments/generator_title.mustache',
@@ -36,6 +37,45 @@
           },
           callback: this.generateAssessments.bind(this)
         });
+      },
+      showFlash: function (statuses) {
+        var flash = {};
+        var type;
+        var messages = {
+          error: 'Assessment generation has failed.',
+          progress: 'Assessment generation is in process. This may take ' +
+                    'multiple hours depending on the volume.',
+          success: 'Assessment generation successful. {reload_link}'
+        };
+        if (statuses.Failure > 0) {
+          type = 'error';
+        } else if (statuses.Pending > 0 || statuses.Running > 0) {
+          type = 'progress';
+        } else {
+          type = 'success';
+        }
+
+        flash[type] = messages[type];
+        $('body').trigger('ajax:flash', flash);
+      },
+      updateStatus: function (ids, count) {
+        var wait = [2, 4, 8, 16, 32, 64];
+        if (count >= wait.length) {
+          count = wait.length - 1;
+        }
+        CMS.Models.BackgroundTask.findAll({
+          id__in: ids.join(',')
+        }).then(function (tasks) {
+          var statuses = _.countBy(tasks, function (task) {
+            return task.status;
+          });
+          this.showFlash(statuses);
+          if (statuses.Pending || statuses.Running) {
+            setTimeout(function () {
+              this.updateStatus(ids, ++count);
+            }.bind(this), wait[count] * 1000);
+          }
+        }.bind(this));
       },
       generateAssessments: function (list, options) {
         var que = new RefreshQueue();
@@ -47,11 +87,22 @@
             return this.generateModel(item, id);
           }.bind(this));
           this._results = results;
-
           $.when.apply($, results)
-            .always(options.context.closeModal.bind(options.context))
-            .done(this.notify.bind(this))
-            .fail(this.notify.bind(this));
+            .then(function () {
+              var tasks = arguments;
+              var ids;
+              this.showFlash({Pending: 1});
+              options.context.closeModal();
+              if (!tasks.length || tasks[0] instanceof CMS.Models.Assessment) {
+                // We did not create a task
+                window.location.reload();
+                return;
+              }
+              ids = _.uniq(_.map(arguments, function (task) {
+                return task.id;
+              }));
+              this.updateStatus(ids, 0);
+            }.bind(this));
         }.bind(this));
       },
       generateModel: function (object, template) {
@@ -77,6 +128,7 @@
             data.test_plan = object.test_plan;
           }
         }
+        data.run_in_background = true;
         return new CMS.Models.Assessment(data).save();
       },
       notify: function () {

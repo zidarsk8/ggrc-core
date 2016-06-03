@@ -43,10 +43,10 @@
         var instance = this.attr('instance');
         var oldValue = this.attr('value');
         var value = this.attr('context.value');
+        var type = this.attr('type');
 
         ev.preventDefault();
         this.attr('context.isEdit', false);
-
         if (oldValue === value) {
           return;
         }
@@ -54,8 +54,11 @@
         this.attr('isSaving', true);
         instance.refresh().then(function () {
           if (this.attr('caId')) {
-            if (this.attr('type') === 'checkbox') {
+            if (type === 'checkbox') {
               value = value ? 1 : 0;
+            }
+            if (type === 'person') {
+              value = value ? ('Person:' + value.id) : value;
             }
             instance.attr('custom_attributes.' + caid, value);
           } else {
@@ -82,19 +85,31 @@
     init: function () {
       var scope = this.scope;
       var value = scope.attr('value');
+      var values = scope.attr('values');
       var property = scope.attr('property');
       var instance = scope.attr('instance');
+      var type = scope.attr('type');
 
-      if (scope.attr('caId') && scope.attr('type') === 'checkbox') {
-        value = value === '1';
+      if (scope.attr('caId')) {
+        if (type === 'checkbox') {
+          value = value === '1';
+        }
+        if (type === 'person') {
+          if (value && value instanceof can.Map) {
+            value = value.serialize();
+          }
+          value = _.isEmpty(value) ? undefined : value;
+        }
       }
       if (property) {
         value = instance.attr(property);
       }
       scope.attr('context.value', value);
-      if (_.isString(scope.attr('values'))) {
-        scope.attr('context.values', scope.attr('values').split(','));
+
+      if (values && _.isString(values)) {
+        values = values.split(',');
       }
+      scope.attr('context.values', values);
     },
     events: {
       click: function () {

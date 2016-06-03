@@ -148,7 +148,7 @@
         text: 'MM/DD/YYYY'
       }, {
         type: 'Checkbox',
-        text: 'Type label'
+        text: ''
       }, {
         type: 'Dropdown',
         text: 'Type values separated by comma'
@@ -158,7 +158,7 @@
       }],
 
       // the field types that require a list of possible values to be defined
-      valueAttrs: ['Dropdown', 'Checkbox'],
+      valueAttrs: ['Dropdown'],
 
       /*
        * Create a new field.

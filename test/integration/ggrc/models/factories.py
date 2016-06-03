@@ -66,6 +66,18 @@ class ControlFactory(ModelFactory, TitledFactory):
   notes = None
 
 
+class ContextFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
+
+  class Meta:
+    model = models.Context
+
+  name = factory.LazyAttribute(lambda _: random_string("context "))
+  related_object_id = None
+  related_object_type = None
+
+
 class AssessmentFactory(ModelFactory, TitledFactory):
   # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
   # pylint: disable=no-init

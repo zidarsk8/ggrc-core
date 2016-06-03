@@ -553,7 +553,8 @@
       var audit;
       var that = this;
       var assignees = {};
-      var current_user = CMS.Models.get_instance(GGRC.current_user);
+      var current_user = CMS.Models.get_instance('Person',
+                                                 GGRC.current_user.id);
       var contact;
 
       if (new_object_form) {
@@ -754,7 +755,7 @@
     defaults: {
       status: 'Not Started'
     },
-    filter_keys: ['operationally', 'operational', 'design',
+    filter_keys: ['title', 'state', 'operationally', 'operational', 'design',
                   'finished_date', 'verified_date', 'verified'],
     filter_mappings: {
       operational: 'operationally',
@@ -767,10 +768,6 @@
       attr_list: [{
         attr_title: 'Title',
         attr_name: 'title'
-      }, {
-        attr_title: 'Owner',
-        attr_name: 'owner',
-        attr_sort_field: 'contact.name|email'
       }, {
         attr_title: 'Code',
         attr_name: 'slug'
@@ -854,6 +851,7 @@
         this._super.apply(this, arguments);
       }
       this.validatePresenceOf('object');
+      this.validatePresenceOf('audit');
       this.validatePresenceOf('validate_creator');
       this.validatePresenceOf('validate_assessor');
       this.validateNonBlank('title');
@@ -872,8 +870,8 @@
   }, {
     form_preload: function (newObjectForm) {
       var pageInstance = GGRC.page_instance();
-      var currentUser = CMS.Models.get_instance(GGRC.current_user);
-      this._set_recipients(this.attr('recipients'));
+      var currentUser = CMS.Models.get_instance('Person',
+        GGRC.current_user.id, GGRC.current_user);
 
       if (!newObjectForm) {
         return;
@@ -888,40 +886,25 @@
         }
       });
     },
+    info_pane_preload: function () {
+      if (!this._pane_preloaded) {
+        this._set_mandatory_msgs();
+        this.get_mapping('comments').bind('length',
+            this._set_mandatory_msgs.bind(this));
+        this.get_mapping('all_documents').bind('length',
+            this._set_mandatory_msgs.bind(this));
+        this._pane_preloaded = true;
+      }
+    },
     init: function () {
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      this._set_mandatory_msgs();
-      this.get_mapping('comments').bind('length',
-          this._set_mandatory_msgs.bind(this));
-      this.get_mapping('all_documents').bind('length',
-          this._set_mandatory_msgs.bind(this));
-    },
-    before_save: function (newForm) {
-      if (!this.isNew()) {
-        return;
-      }
-      this.mark_for_addition(
-        'related_objects_as_destination', this.audit.program);
-    },
-    _set_recipients: function (recipients) {
-      if (recipients){
-        labels = ['Creator', 'Assessor', 'Verifier'];
-        _.each(labels, function(label) {
-          this.attr(label, _.includes(recipients, label));
-        }.bind(this));
-      }
-    },
-    _get_recipients: function (){
-      labels = ['Creator', 'Assessor', 'Verifier'];
-      return _.map(labels, function(label) {
-        return this.attr(label) ? label : '';
-      }.bind(this)).join(',');
     },
     save: function () {
-      this.attr('recipients', this._get_recipients());
-
+      if (!this.attr('program')) {
+        this.attr('program', this.attr('audit.program'));
+      }
       return this._super.apply(this, arguments);
     },
     after_save: function () {
@@ -948,10 +931,11 @@
         rq.enqueue(cav);
       });
       $.when(
+          instance.refresh_all('custom_attribute_values'),
           instance.get_binding('comments').refresh_count(),
           instance.get_binding('all_documents').refresh_count(),
           rq.trigger()
-      ).then(function (commentCount, attachmentCount, rqRes) {
+      ).then(function (customAttrVals, commentCount, attachmentCount, rqRes) {
         var values = _.map(instance.custom_attribute_values, function (cav) {
           return cav.reify();
         });
@@ -1109,6 +1093,7 @@
       people_values: [
         {value: 'Object Owners', title: 'Object Owners'},
         {value: 'Audit Lead', title: 'Audit Lead'},
+        {value: 'Auditors', title: 'Auditors'},
         {value: 'Primary Assessor', title: 'Principal Assessor'},
         {value: 'Secondary Assessors', title: 'Secondary Assessors'},
         {value: 'Primary Contact', title: 'Primary Contact'},
