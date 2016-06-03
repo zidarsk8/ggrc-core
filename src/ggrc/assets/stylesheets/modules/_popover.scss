@@ -306,6 +306,7 @@
     color:$black;
   }
   &.person-tooltip {
+    z-index: zIndex(person-tooltip) !important;
     .popover-inner,
     .popover-content {
       margin: -10px 0;
