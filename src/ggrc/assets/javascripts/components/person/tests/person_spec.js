@@ -27,30 +27,18 @@ describe('GGRC.Components.personItem', function () {
   });
 
   describe('init() method', function () {
-    var componentInst;  // fake component instance
     var dfdFindOne;
-    var element;  // the DOM element passed to the component instance
-    var init;  // the method under test
-    var options;
+    var template;  // the DOM element passed to the component instance
     var origPersonCache;
-
-    beforeAll(function () {
-      componentInst = {};
-
-      init = Component.prototype.init.bind(componentInst);
-    });
+    var component;
+    var frag;
 
     beforeEach(function () {
-      element = $('<div></div>')[0];
-      options = {};
-
       dfdFindOne = new can.Deferred();
       spyOn(CMS.Models.Person, 'findOne').and.returnValue(dfdFindOne);
 
       origPersonCache = CMS.Models.Person.cache;
       CMS.Models.Person.cache = {};
-
-      componentInst.scope = new can.Map({});
     });
 
     afterEach(function () {
@@ -64,11 +52,13 @@ describe('GGRC.Components.personItem', function () {
           id: 42, name: 'John', email: 'john@doe.com'
         });
         CMS.Models.Person.cache[42] = person42;
-        $(element).attr('person-id', 42);
 
-        init(element, options);
+        template = can.view.mustache('<person person-id="42"></person>');
+        frag = template();
+        frag = $(frag);
+        component = frag.find('person').control();
 
-        expect(componentInst.scope.attr('personObj')).toBe(person42);
+        expect(component.scope.attr('personObj')).toBe(person42);
       }
     );
 
@@ -79,14 +69,18 @@ describe('GGRC.Components.personItem', function () {
           id: 123, name: 'Mike', email: 'mike@mike.com'
         });
 
-        delete CMS.Models.Person.cache[123];
-        $(element).attr('person-id', 123);
+        template = can.view.mustache('<person person-id="123"></person>');
+        frag = template();
 
-        init(element, options);
+        frag = $(frag);
+        component = frag.find('person').control();
+
+        delete CMS.Models.Person.cache[123];
+
         dfdFindOne.resolve(person123);
 
         expect(CMS.Models.Person.findOne).toHaveBeenCalledWith({id: 123});
-        expect(componentInst.scope.attr('personObj')).toBe(person123);
+        expect(component.scope.attr('personObj')).toBe(person123);
       }
     );
 
@@ -98,32 +92,18 @@ describe('GGRC.Components.personItem', function () {
           id: 123, name: 'John', email: 'john@doe.com'
         });
 
-        CMS.Models.Person.cache[123] = person123;
-        $(element).attr('person-id', 123);
+        template = can.view.mustache('<person person-id="123"></person>');
+        frag = template();
 
-        init(element, options);
+        CMS.Models.Person.cache[123] = person123;
+
+        frag = $(frag);
+        component = frag.find('person').control();
+
         dfdFindOne.resolve(fetchedPerson);
 
         expect(CMS.Models.Person.findOne).toHaveBeenCalledWith({id: 123});
-        expect(componentInst.scope.attr('personObj')).toBe(fetchedPerson);
-      }
-    );
-
-    it('displays a toaster error if fetching the Person object fails',
-      function () {
-        var $fakeElement = $('<div person-id="123"></div>');
-        spyOn($fakeElement, 'trigger');
-        spyOn(window, '$').and.returnValue($fakeElement);
-        delete CMS.Models.Person.cache[123];
-
-        init(element, options);
-        dfdFindOne.reject('Server error');
-
-        expect(window.$).toHaveBeenCalledWith(element);
-        expect($fakeElement.trigger).toHaveBeenCalledWith(
-          'ajax:flash',
-          {error: 'Failed to fetch data for person 123.'}
-        );
+        expect(component.scope.attr('personObj')).toBe(fetchedPerson);
       }
     );
   });

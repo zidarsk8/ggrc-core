@@ -18,6 +18,7 @@ describe('CanJS extensions', function () {
     it('should return dash case from camel case', function () {
       expect(method('helloWorld')).toBe('hello-world');
       expect(method('helloWorldHiThere')).toBe('hello-world-hi-there');
+      expect(method('MyNumber4AndNumber5')).toBe('my-number4and-number5');
     });
     it('should return same value for one word', function () {
       expect(method('hello')).toBe('hello');
