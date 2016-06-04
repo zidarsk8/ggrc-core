@@ -58,4 +58,10 @@
   can.camelCaseToUnderscore = function (string) {
     return string.replace(/([A-Z])/g, '_$1').toLowerCase();
   };
+  can.camelCaseToDashCase = function (string) {
+    if (!_.isString(string)) {
+      return '';
+    }
+    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  };
 })(jQuery, can);
