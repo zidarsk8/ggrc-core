@@ -102,7 +102,7 @@ can.Control("CMS.Controllers.InfoPin", {
     $(window).trigger("resize");
     var $objectArea = $(".object-area"),
         $header = $(".tree-header:visible"),
-        $filter = $(".filter-holder:visible"),
+        $filter = $(".tree-filter:visible"),
         elTop = el.offset().top,
         elBottom = elTop + el.height(),
         headerTop = $header.offset().top,

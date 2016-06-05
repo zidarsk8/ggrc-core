@@ -740,22 +740,23 @@ class BaseWidgetGeneric(object):
     implemented using properties though with more code."""
     def __init__(self, *args):
       self.TITLE = (
-          By.CSS_SELECTOR, '#{}_widget .sticky-filter .filter-title h6'
+          By.CSS_SELECTOR, '#{}_widget .sticky-filter .tree-filter__title h6'
             .format(self._object_name))
       self.TEXTFIELD = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .filter-input'.format(self._object_name))
+          '#{}_widget .sticky-filter .tree-filter__expression-holder'
+            .format(self._object_name))
       self.BUTTON_SUBMIT = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .filter-button [type="submit"]'
+          '#{}_widget .sticky-filter .tree-filter__button [type="submit"]'
             .format(self._object_name))
       self.BUTTON_RESET = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .filter-button [type="reset"]'
+          '#{}_widget .sticky-filter .tree-filter__button [type="reset"]'
             .format(self._object_name))
       self.BUTTON_HELP = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .filter-button  #page-help'
+          '#{}_widget .sticky-filter .tree-filter__button  #page-help'
             .format(self._object_name))
 
 
@@ -828,9 +829,11 @@ class AdminCustomAttributes(object):
                 attribute.TOGGLE + name.upper(),
                 self._Locator.get_toggle(id_))
 
-  FILTER_INPUT_FIELD = (By.CLASS_NAME, 'filter-input')
-  FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR, '.filter-button>[type="submit"]')
-  FILTER_BUTTON_RESET = (By.CSS_SELECTOR, '.filter-button>[type="reset"]')
+  FILTER_INPUT_FIELD = (By.CLASS_NAME, 'tree-filter__expression-holder')
+  FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR,
+                          '.tree-filter__button>[type="submit"]')
+  FILTER_BUTTON_RESET = (By.CSS_SELECTOR,
+                         '.tree-filter__button>[type="reset"]')
 
   # programs dropdown
   BUTTON_ADD_CUSTOM_PROGRAM_ATTR = (

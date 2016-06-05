@@ -5,23 +5,23 @@
     Maintained By: miha@reciprocitylabs.com
 }}
 
-<div class="inline-filtering sticky-filter search-filters">
-  <form class="form-search" onsubmit="return false" autocomplete="off">
+<div class="tree-filter__inline-filtering sticky-filter search-filters">
+  <form onsubmit="return false" autocomplete="off">
     <div class="row-fluid">
       <div class="span3">
-        <div class="filter-title">
+        <div class="tree-filter__title">
           <h6>
             Filter People
           </h6>
         </div>
       </div>
       <div class="span9">
-        <ul class="quick-filters">
+        <ul class="tree-filter__filter-people">
           <li>
             <label>
               By Name
             </label>
-            <input name="search" type="text" value="" class="input-medium" value="{{search_query}}" placeholder="By name, email or company">
+            <input name="search" type="text" value="" class="tree-filter__input tree-filter__input--medium" value="{{search_query}}" placeholder="By name, email or company">
           </li>
           <li>
             <label>

@@ -96,7 +96,7 @@
         can.Control.prototype.destroy.call(this);
       },
       ".filter-trigger click": function (el, ev) {
-        this.element.find(".filter-holder").slideToggle(this.options.slide_speed);
+        this.element.find(".tree-filter").slideToggle(this.options.slide_speed);
       }
   });
 

@@ -11,72 +11,84 @@
   }
 }
 
-.filter-holder {
+.tree-filter {
   margin-bottom: 25px;
   overflow: hidden;
-}
-
-.inline-filtering {
-  line-height: 39px;
-  height: 39px;
-  background: $white;
-  border-bottom: 3px solid $warmGray;
-  padding: 0 16px 0 10px;
-  margin-bottom: 8px;
-  &.inline-filtering-transparent {
-    line-height: 26px;
-    height: 26px;
-    background: none;
-    border-bottom: none;
-    padding: 0;
-    margin-bottom: 0;
-    .filter-input {
-      .is-expression {
-        top: 3px;
-      }
-    }
-  }
-  .fluid-wrap {
+  &__fluid-wrap {
     position: relative;
   }
-  .filter-title-wrap,
-  .filter-button-wrap {
+  &__inline-filtering {
+    line-height: 26px;
+    height: 26px;
+    background: $white;
+    border-bottom: 3px solid $warmGray;
+    padding: 7px 16px 6px 10px;
+    margin-bottom: 8px;
+    &--transparent {
+      line-height: 26px;
+      height: 26px;
+      background: none;
+      border-bottom: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+    label {
+      font-size:11px;
+      text-transform:uppercase;
+      display: inline-block;
+    }
+    select {
+      line-height:20px;
+      font-size:12px;
+      height:20px;
+      width:120px;
+      display: inline-block;
+      margin-bottom: 0;
+      &.input-small {
+        width: 90px;
+      }
+    }
+    h6 {
+      display:inline-block;
+      line-height:30px;
+      color:#000;
+      font-weight:bold;
+    }
+    form {
+      margin: 0;
+    }
+  }
+  &__title-wrap {
     position: absolute;
     top: 0;
-  }
-  .filter-title-wrap {
     width: 45px;
     left: 0;
   }
-  .filter-input-wrap {
-    width: auto;
-    margin-right: 164px;
-    margin-left: 45px;
-  }
-  .filter-button-wrap {
-    width: 164px;
-    right: 0;
-  }
-  .filter-title {
+  &__title {
     h6 {
       @extend %oneline;
       font-weight: normal;
       text-transform: none;
       font-size: 16px;
       line-height: 20px;
-      padding-top: 10px;
+      padding-top: 3px;
     }
   }
-  .filter-input {
+  &__input-wrap {
+    width: auto;
+    margin-right: 164px;
+    margin-left: 45px;
+  }
+  &__expression-holder {
     position: relative;
-    .is-expression {
+    &__is-expression {
       @include opacity(0.25);
       position: absolute;
       right: 6px;
       top: 1px;
     }
-    &.expression {
-      .is-expression {
+    &--active {
+      .tree-filter__expression-holder__is-expression {
         @include opacity(1);
         i {
           background-position: -246px -176px;
@@ -84,7 +96,36 @@
       }
     }
   }
-  .filter-button {
+  &__input {
+    @include box-shadow(none !important);
+    @include border-radius(0 !important);
+    line-height: 26px !important;
+    height: 26px !important;
+    padding: 2px 4px !important;
+    font-size: 12px !important;
+    margin: -2px 0 0 0 !important;
+    box-sizing: border-box !important;
+    &--wide {
+      width: 100%;
+    }
+    &--medium {
+      width: 170px;
+    }
+    &--date {
+      width: 80px;
+      padding: 2px 4px 2px 26px;
+      &.date {
+        background-position: -342px -365px;
+      }
+    }
+  }
+  &__button-wrap {
+    position: absolute;
+    top: 0;
+    width: 164px;
+    right: 0;
+  }
+  &__button {
     @extend %clearfix;
     a {
       float: right;
@@ -92,7 +133,6 @@
       margin-left: 10px;
     }
     input[type="submit"] {
-      margin-top: 7px;
       float: right;
     }
     input[type="reset"] {
@@ -109,55 +149,7 @@
       }
     }
   }
-  input[type="text"] {
-    @include box-shadow(none);
-    @include border-radius(0);
-    line-height: 26px;
-    height: 26px;
-    padding: 2px 4px;
-    font-size: 12px;
-    margin: -2px 0 0 0;
-    box-sizing: border-box;
-    &.input-wide {
-      width: 100%;
-    }
-    &.input-medium {
-      width: 170px;
-    }
-    &.input-date {
-      width: 80px;
-      padding: 2px 4px 2px 26px;
-      &.date {
-        background-position: -342px -365px;
-      }
-    }
-  }
-  label {
-    font-size:11px;
-    text-transform:uppercase;
-    display: inline-block;
-  }
-  select {
-    line-height:20px;
-    font-size:12px;
-    height:20px;
-    width:120px;
-    display: inline-block;
-    margin-bottom: 0;
-    &.input-small {
-      width: 90px;
-    }
-  }
-  h6 {
-    display:inline-block;
-    line-height:30px;
-    color:#000;
-    font-weight:bold;
-  }
-  form {
-    margin: 0;
-  }
-  ul.quick-filters {
+  &__filter-people {
     @extend %reset-list;
     float:right;
     li {
@@ -165,25 +157,27 @@
       margin-left: 20px;
     }
   }
-  &.task-filtering {
-    input {
-      &[class*="span"],
-      &.input-block-level {
-        padding: 4px;
-        min-height: 20px;
-      }
-      &.input-block-level {
-        margin-top: 5px;
-      }
-      &[type="checkbox"] {
-        margin-top: -2px;
-      }
-    }
-  }
 }
 
 .relevance-filters {
   margin-bottom: 20px;
+  .modal-body & {
+    margin-top:20px;
+    h6 {
+      margin-bottom:6px;
+    }
+    .objective-selector {
+      display:inline-block;
+    }
+    .add-rule {
+      font-size:13px;
+      margin-left:6px;
+    }
+    label {
+      font-size:12px;
+      font-weight:bold;
+    }
+  }
   .add-rule {
     a {
       font-size: 13px;
