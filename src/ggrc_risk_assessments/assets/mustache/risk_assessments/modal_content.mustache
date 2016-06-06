@@ -24,16 +24,22 @@
         <span class="start-text">Start Date</span>
         <span class="required">*</span>
       </label>
-      <input tabindex="2" class="date input-block-level" name="start_date" data-toggle="datepicker" placeholder="MM/DD/YYYY"
-        type="text" value="{{localize_date instance.start_date}}">
+      <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input tabindex="2" class="date input-block-level" name="start_date" data-toggle="datepicker"
+          placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.start_date}}">
+      </div>
     </div>
     <div class="span3">
       <label>
         <span>End Date</span>
         <span class="required">*</span>
       </label>
-      <input tabindex="3" class="date input-block-level" name="end_date" data-toggle="datepicker" placeholder="MM/DD/YYYY"
-        type="text" value="{{localize_date instance.end_date}}">
+      <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input tabindex="3" class="date input-block-level" name="end_date" data-toggle="datepicker"
+          placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
+      </div>
     </div>
     <div class="span3 hidable">
       {{#using manager=instance.ra_manager model_singular=model.model_singular}}
