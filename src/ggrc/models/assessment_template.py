@@ -6,13 +6,16 @@
 """A module containing the implementation of the assessment template entity."""
 
 from ggrc import db
-from ggrc.models.mixins import Base, Titled, CustomAttributable
+from ggrc.models.mixins import Base
+from ggrc.models.mixins import Slugged
+from ggrc.models.mixins import Titled
+from ggrc.models.mixins import CustomAttributable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.types import JsonType
 
 
-class AssessmentTemplate(Base, Relatable, Titled,
+class AssessmentTemplate(Slugged, Base, Relatable, Titled,
                          CustomAttributable, db.Model):
   """A class representing the assessment template entity.
 
@@ -57,3 +60,7 @@ class AssessmentTemplate(Base, Relatable, Titled,
       "default_people",
       PublishOnly("DEFAULT_PEOPLE_LABELS")
   ]
+
+  @classmethod
+  def generate_slug_prefix_for(cls, obj):
+    return "TEMPLATE"

@@ -6,6 +6,7 @@
 """Base test case for all ggrc integration tests."""
 
 import logging
+from sqlalchemy import exc
 from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
 from ggrc.app import app
@@ -16,50 +17,59 @@ logging.disable(logging.CRITICAL)
 
 
 class TestCase(BaseTestCase):
+  # pylint: disable=invalid-name
+  # because it's required by unittests.
+
+  """Base test case for all ggrc integration tests."""
 
   maxDiff = None
 
   @classmethod
   def clear_data(cls):
+    """Remove data from ggrc tables.
+
+    This is a helper function to remove any data that might have been generated
+    during a test. The ignored tables are the ones that don't exist or have
+    constant data in them, that was populated with migrations.
+
+
+    Note:
+      This is a hack because db.metadata.sorted_tables does not sort by
+      dependencies. The events table is given before Person table and reversed
+      order in then incorrect.
+    """
     ignore_tables = (
-        "test_model", "roles", "notification_types", "object_types", "options",
         "categories",
+        "notification_types",
+        "object_types",
+        "options",
+        "relationship_test_mock_model",
+        "roles",
+        "test_model",
     )
     tables = set(db.metadata.tables).difference(ignore_tables)
     for _ in range(len(tables)):
       if len(tables) == 0:
         break  # stop the loop once all tables have been deleted
       for table in reversed(db.metadata.sorted_tables):
-        if table.name not in ignore_tables:
+        if table.name in tables:
           try:
             db.engine.execute(table.delete())
             tables.remove(table.name)
-          except:
+          except exc.IntegrityError:
             pass
 
     db.session.commit()
 
   def setUp(self):
-    # this is a horrible hack because db.metadata.sorted_tables does not sort
-    # by dependencies. Events table is before Person table - reversed is bad.
     self.clear_data()
-
-    # if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
-    #   from google.appengine.api import memcache
-    #   from google.appengine.ext import testbed
-    #   self.testbed = testbed.Testbed()
-    #   self.testbed.activate()
-    #   self.testbed.init_memcache_stub()
 
   def tearDown(self):
     db.session.remove()
 
-    # if getattr(settings, 'MEMCACHE_MECHANISM', False) is True:
-    #   from google.appengine.api import memcache
-    #   from google.appengine.ext import testbed
-    #   self.testbed.deactivate()
-
-  def create_app(self):
+  @classmethod
+  def create_app(cls):
+    """Flask specific function for running an app instance."""
     app.config["SERVER_NAME"] = "localhost"
     app.testing = True
     app.debug = False
