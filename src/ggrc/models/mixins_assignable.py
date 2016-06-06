@@ -3,15 +3,17 @@
 # Created By: jost@reciprocitylabs.com
 # Maintained By: jost@reciprocitylabs.com
 
+"""Contains the Assignable mixin.
+
+This allows adding various assignee types to the object, like Verifier,
+Requester, etc.
+"""
+
 from sqlalchemy import and_
 from sqlalchemy import or_
 from ggrc.models import person
 from ggrc import db
 from ggrc.models import relationship
-
-"""Contains the Assignable mixin. This allows adding various assignee types
-  to the object, like Verifier, Requester, etc.
-"""
 
 
 class Assignable(object):
@@ -33,17 +35,39 @@ class Assignable(object):
     assignees += [(r.destination, tuple(r.attrs["AssigneeType"].split(",")))
                   for r in self.related_destinations
                   if "AssigneeType" in r.attrs]
-    return set(assignees)
+    return assignees
+
+  def get_assignees(self, filter_=None):
+    """Get assignees by type.
+
+    This is helper for fetching only specific assignee types.
+
+    Args:
+      filter_: String containing assignee type or a list with desired assignee
+        types. If None, all assignees are returned (see self.assignees).
+
+    Returs:
+      Filtered list of assignees.
+    """
+    if filter_ is None:
+      return self.assignees
+    elif isinstance(filter_, basestring):
+      filter_ = [filter_]
+
+    filter_set = set(filter_)
+
+    return [(person_, roles) for person_, roles in self.assignees
+            if filter_set.intersection(roles)]
 
   @staticmethod
-  def _validate_relationship_attr(cls, source, dest, existing, name, value):
+  def _validate_relationship_attr(class_, source, dest, existing, name, value):
     """Validator that allows Assignable relationship attributes
 
     Allow relationship attribute of name "AssigneeType" with value that is a
     comma separated list of valid roles (as defined in target class).
 
     Args:
-        cls (class): target class of this mixin. Think of this like a class
+        class_ (class): target class of this mixin. Think of this like a class
                      method.
         source (model instance): relevant relationship source
         dest (model instance): relevant relationship destinations
@@ -55,12 +79,12 @@ class Assignable(object):
         New attribute value (merge with existing roles) or None if the
         attribute is not valid.
     """
-    if set([source.type, dest.type]) != set([cls.__name__, "Person"]):
+    if set([source.type, dest.type]) != set([class_.__name__, "Person"]):
       return None
     if name != "AssigneeType":
       return None
     new_roles = value.split(",")
-    if not all(role in cls.ASSIGNEE_TYPES for role in new_roles):
+    if not all(role in class_.ASSIGNEE_TYPES for role in new_roles):
       return None
     roles = set(existing.get(name, "").split(",")) | set(new_roles)
     return ",".join(role for role in roles if role)
@@ -72,6 +96,8 @@ class Assignable(object):
     Returns:
         Boolean stating whether such an assignee exists.
     """
+    # pylint: disable=invalid-name
+    # The upper case variables are allowed here to shorthand the class names.
     Rel = relationship.Relationship
     RelAttr = relationship.RelationshipAttr
     Person = person.Person
