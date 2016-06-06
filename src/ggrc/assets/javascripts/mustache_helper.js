@@ -3400,4 +3400,51 @@ Mustache.registerHelper("un_camel_case", function (str, options) {
   }
   return newval;
 });
+
+  /**
+   * Check if the current user is allowed to edit a comment, and render the
+   * corresponding block in the template.
+   *
+   * Example usage:
+   *
+   *   {{#canEditComment commentInstance parentIntance}}
+   *     ... (display e.g. an edit button) ...
+   *   {{else}}
+   *     ... (no edit button) ...
+   *   {{/canEditComment}}
+   *
+   * @param {can.Model} comment - the Comment instance to check
+   * @param {can.Model} parentInstance - the object the comment was posted
+   *    under, e.g. an Assessment or a Request instance
+   * @param {Object} options - a CanJS options argument passed to every helper
+   *
+   */
+  Mustache.registerHelper('canEditComment',
+    function (comment, parentInstance, options) {
+      var END_STATES = Object.freeze({
+        Verified: true,
+        Completed: true
+      });
+
+      var canEdit = true;
+      var isAdmin = Permission.is_allowed('__GGRC_ADMIN__');
+
+      comment = Mustache.resolve(comment);
+      parentInstance = Mustache.resolve(parentInstance);
+
+      if (!Permission.is_allowed_for('update', comment)) {
+        canEdit = false;
+      } else if (!isAdmin && parentInstance.status in END_STATES) {
+        // non-administrators cannot edit comments if the underlying object is
+        // in final or verfiied state
+        canEdit = false;
+      }
+
+      if (canEdit) {
+        return options.fn(options.context);
+      }
+
+      return options.inverse(options.context);
+    }
+  );
 })(this, jQuery, can);
