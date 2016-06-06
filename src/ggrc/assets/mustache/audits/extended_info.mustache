@@ -34,15 +34,7 @@
     <div class="span12">
       <h6>Audit Lead</h6>
       <p class="oneline">
-        {{#if instance.contact}}
-          {{#using contact=instance.contact}}
-            {{#using person=contact}}
-              {{>'/static/mustache/people/popover.mustache'}}
-            {{/using}}
-          {{/using}}
-        {{else}}
-          <span class="empty-message">Not assigned</span>
-        {{/if}}
+        <person person-obj="instance.contact"></person>
       </p>
     </div>
   </div>
@@ -97,9 +89,7 @@
               {{#each authorizations}}
                 <li>
                   {{#using auditor=auditors.0.person}}
-                    {{#using contact=instance.person}}
-                      {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                    {{/using}}
+                    <person person-obj="instance.person"></person>
                   {{/using}}
                 </li>
               {{/each}}
