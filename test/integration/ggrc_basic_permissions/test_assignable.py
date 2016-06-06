@@ -26,7 +26,7 @@ class TestReader(TestCase):
   def init_users(self):
     """ Init users needed by the test cases """
     users = [("creator", "Creator"), ("reader", "Reader"),
-             ("editor", "Editor"), ("admin", "gGRC Admin")]
+             ("editor", "Editor"), ("admin", "Administrator")]
     self.users = {}
     for (name, role) in users:
       _, user = self.object_generator.generate_person(

@@ -150,7 +150,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       return u"Superuser"
 
     ROLE_HIERARCHY = {
-        u'gGRC Admin': 0,
+        u'Administrator': 0,
         u'Editor': 1,
         u'Reader': 2,
         u'Creator': 3,

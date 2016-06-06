@@ -263,7 +263,7 @@ class TestAutomappings(integration.ggrc.TestCase):
 
   def test_automapping_permissions_check(self):
     _, creator = self.gen.generate_person(user_role="Creator")
-    _, admin = self.gen.generate_person(user_role="gGRC Admin")
+    _, admin = self.gen.generate_person(user_role="Administrator")
 
     program = self.create_object(models.Program, {
         'title': make_name('Program')

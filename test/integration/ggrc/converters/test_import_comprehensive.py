@@ -196,14 +196,14 @@ class TestComprehensiveSheets(TestCase):
     filename = "full_good_import_no_warnings.csv"
     response = self.import_file(filename)
 
-    ggrc_admin = db.session.query(Role.id).filter(Role.name == "gGRC Admin")
+    admin = db.session.query(Role.id).filter(Role.name == "Administrator")
     reader = db.session.query(Role.id).filter(Role.name == "Reader")
     creator = db.session.query(Role.id).filter(Role.name == "Creator")
-    ggrc_admins = UserRole.query.filter(UserRole.role_id == ggrc_admin).all()
+    admins = UserRole.query.filter(UserRole.role_id == admin).all()
     readers = UserRole.query.filter(UserRole.role_id == reader).all()
     creators = UserRole.query.filter(UserRole.role_id == creator).all()
     access_groups = db.session.query(AccessGroup).all()
-    self.assertEqual(len(ggrc_admins), 12)
+    self.assertEqual(len(admins), 13)
     self.assertEqual(len(readers), 5)
     self.assertEqual(len(creators), 6)
     self.assertEqual(len(access_groups), 10)

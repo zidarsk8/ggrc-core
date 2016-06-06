@@ -29,7 +29,7 @@ class TestNotificationsForDeletedObjects(TestCase):
 
     self.random_objects = self.object_generator.generate_random_objects(2)
     _, self.user = self.object_generator.generate_person(
-        user_role="gGRC Admin")
+        user_role="Administrator")
     self.create_test_cases()
 
     def init_decorator(init):

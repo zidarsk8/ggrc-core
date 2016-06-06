@@ -29,7 +29,7 @@ class TestCsvImport(TestCase):
       self.generator.generate_person({
           "name": person,
           "email": "{}@reciprocitylabs.com".format(person),
-      }, "gGRC Admin")
+      }, "Administrator")
 
   def test_multi_basic_policy_orggroup_product(self):
     filename = "multi_basic_policy_orggroup_product.csv"

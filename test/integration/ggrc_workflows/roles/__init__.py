@@ -47,7 +47,7 @@ class WorkflowRolesTestCase(WorkflowTestCase):
         ("creator", "Creator"),
         ("reader", "Reader"),
         ("editor", "Editor"),
-        ("admin", "gGRC Admin")
+        ("admin", "Administrator")
     ]
     for (name, role) in users:
       _, user = self.object_generator.generate_person(

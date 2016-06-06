@@ -31,7 +31,7 @@ class TestOneTimeWorkflowNotification(TestCase):
 
     self.random_objects = self.object_generator.generate_random_objects()
     self.random_people = self.object_generator.generate_random_people(
-        user_role="gGRC Admin"
+        user_role="Administrator"
     )
     self.create_test_cases()
 

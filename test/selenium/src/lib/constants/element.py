@@ -117,7 +117,7 @@ class WidgetProgramInfo(object):
 
 class AdminRolesWidget(object):
   EDITOR = "Editor"
-  GRC_ADMIN = "gGRC Admin"
+  GRC_ADMIN = "Administrator"
   PROGRAM_EDITOR = "Program Editor"
   PROGRAM_OWNER = "Program Manager"
   PROGRAM_READER = "Program Reader"
