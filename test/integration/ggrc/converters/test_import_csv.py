@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
+"""Tests for basic csv imports."""
 
 from ggrc import models
 from ggrc.converters import errors
@@ -162,8 +163,15 @@ class TestBasicCsvImport(converters.TestCase):
     self.assertIsNotNone(models.Relationship.find_related(ca, au))
 
   def test_person_imports(self):
+    """Test imports for Person object with user roles."""
     filename = "people_test.csv"
-    response = self.import_file(filename)
-    self.assertIn("Line 8: Field Email is required. The line will be ignored.",
-                  response[0]["row_errors"])
+    response = self.import_file(filename)[0]
+
+    expected_errors = set([
+        errors.MISSING_VALUE_ERROR.format(line=8, column_name="Email"),
+        errors.WRONG_VALUE_ERROR.format(line=10, column_name="Email"),
+        errors.WRONG_VALUE_ERROR.format(line=11, column_name="Email"),
+    ])
+
+    self.assertEqual(expected_errors, set(response["row_errors"]))
     self.assertEqual(0, models.Person.query.filter_by(email=None).count())
