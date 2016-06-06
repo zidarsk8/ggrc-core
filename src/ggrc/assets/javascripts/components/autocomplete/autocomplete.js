@@ -23,6 +23,7 @@
     scope: {
       placeholder: '@',
       searchItemsType: '@',
+      className: '@',
 
       // disable automatically mapping the picked item from the live search
       // results to the instance object of the current context
@@ -63,6 +64,12 @@
     },
 
     events: {
+      inserted: function (el, ev) {
+        this.element.find('.autocomplete--input').ggrc_autocomplete({
+          appendTo: this.element.find('.autocomplete--wrapper')
+        });
+      },
+
       /**
        * Event handler when an item is selected from the list of autocomplete's
        * search results.

@@ -5,13 +5,12 @@
   Maintained By: peter@reciprocitylabs.com
 }}
 
-<div class="span12 objective-selector field-wrap">
+<div class="{{className}} objective-selector autocomplete--wrapper">
   <input type="text"
     data-lookup="{{searchItemsType}}"
     null-if-empty="true"
     {{#if disable}}disabled{{/if}}
-    {{autocomplete_select}}
     data-no-automap="{{automappingOff}}"
-    class="search-icon"
+    class="{{^if context.isEdit}}input-block-level{{/if}} autocomplete--input"
     placeholder="{{placeholder}}">
 </div>
