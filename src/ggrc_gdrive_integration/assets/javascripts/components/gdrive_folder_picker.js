@@ -344,30 +344,28 @@
         }
 
         dfd
-          .then(function () {
-            if (scope.deferred) {
-              return $.when.apply($,
-                can.map(files, function (file) {
-                  scope.instance.mark_for_addition('folders', file);
-                  return file.refresh();
-                })
-              );
-            }
-            return attachFiles(files, el.data('type'), scope.instance);
-          })
-          .then(function () {
-            scope.attr('_folder_change_pending', false);
-            scope.attr('folder_error', null);
-            scope.attr('current_folder', files[0]);
-            if (scope.deferred && scope.instance._transient) {
-              scope.instance.attr('_transient.folder', files[0]);
-            }
-          })
-          .fail(function (error) {
-            scope.attr('_folder_change_pending', false);
-            scope.attr('current_folder', null);
-            scope.attr('folder_error', error);
-          });
+        .always(function () {
+          this.scope.attr('_folder_change_pending', false);
+        }.bind(this))
+        .then(function () {
+          if (scope.deferred) {
+            return $.when.apply($,
+              can.map(files, function (file) {
+                scope.instance.mark_for_addition('folders', file);
+                return file.refresh();
+              })
+            );
+          }
+          return attachFiles(files, el.data('type'), scope.instance);
+        })
+        .then(function () {
+          scope.attr('folder_error', null);
+          scope.attr('current_folder', files[0]);
+          if (scope.deferred && scope.instance._transient) {
+            scope.instance.attr('_transient.folder', files[0]);
+          }
+        })
+        .fail(this.setCurrentFail.bind(this));
         return dfd;
       }
     }
