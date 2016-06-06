@@ -22,7 +22,8 @@
     ),
 
     scope: {
-      personObj: null
+      personObj: null,
+      emptyText: '@'
     },
 
     _EV_REMOVE_CLICK: 'person-remove',
@@ -56,6 +57,7 @@
         console.warn('`personObj` or `personId` are missing');
         return;
       }
+
       if (!person) {
         person = CMS.Models.Person.cache[personId];
       }
@@ -65,6 +67,10 @@
       if (person && person.attr('email')) {
         scope.attr('personObj', person);
         return;
+      }
+
+      if (_.isNaN(personId) || personId <= 0) {
+        personId = person.attr('id');
       }
 
       // but if not in cache, we need to fetch the person object...
