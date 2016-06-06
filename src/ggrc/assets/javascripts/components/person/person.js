@@ -22,7 +22,8 @@
     ),
 
     scope: {
-      personObj: null
+      personObj: null,
+      emptyText: '@'
     },
 
     _EV_REMOVE_CLICK: 'person-remove',
