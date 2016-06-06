@@ -105,7 +105,6 @@ permissions = {
         "System",
         "Process",
         "ObjectOwner",
-        "Person",
         "Program",
         "Role",
         "UserRole",
