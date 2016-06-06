@@ -58,6 +58,7 @@
     tag: 'ggrc-gdrive-folder-picker',
     template: can.view(GGRC.mustache_path + '/gdrive/gdrive_folder.mustache'),
     scope: {
+      _folder_change_pending: false,
       no_detach: '@',
       deferred: '@',
       tabindex: '@',
@@ -106,22 +107,27 @@
         return function (folders) {
           var folder = folders[0] ? folders[0].instance : null;
           if (unsetPending) {
-            this.scope.removeAttr('_folder_change_pending');
+            this.scope.attr('_folder_change_pending', false);
           }
           this.scope.attr('current_folder', folder);
           this.scope.attr('folder_list').replace(folders);
         }.bind(this);
       },
       setCurrentFail: function (error) {
-        this.scope.removeAttr('_folder_change_pending');
+        this.scope.attr('_folder_change_pending', false);
         this.scope.attr('folder_error', error);
+      },
+      unsetCurrent: function () {
+        this.scope.attr('_folder_change_pending', false);
+        this.scope.attr('folder_error', null);
+        this.scope.attr('current_folder', null);
       },
       setExtendedFolder: function () {
         // Try to load extended folders if main folder was not found
         if (!this.scope.instance.get_binding('extended_folders') ||
              this.scope.current_folder ||
              this.scope.folder_error) {
-          return this.scope.removeAttr('_folder_change_pending');
+          return this.scope.attr('_folder_change_pending', false);
         }
         this.scope.instance.get_binding('extended_folders')
           .refresh_instances()
@@ -174,7 +180,7 @@
        *   has been triggered.
        * @param {Object} ev - The event object.
        */
-      'a[data-toggle=gdrive-remover] click' : function (el, ev) {
+      'a[data-toggle=gdrive-remover] click': function (el, ev) {
         var scope = this.scope,
           dfd;
 
@@ -222,79 +228,84 @@
         });
       },
 
-      'a[data-toggle=gdrive-picker] click' : function (el, ev) {
+      'a[data-toggle=gdrive-picker] click': function (el, ev) {
+        var dfd = GGRC.Controllers.GAPI.authorize(['https://www.googleapis.com/auth/drive.file']);
+        var folder_id = el.data('folder-id');
 
-        var dfd = GGRC.Controllers.GAPI.authorize(['https://www.googleapis.com/auth/drive.file']),
-          folder_id = el.data('folder-id');
-        dfd.then(function () {
-          gapi.load('picker', {'callback': createPicker});
+        // Create and render a Picker object for searching images.
+        function createPicker() {
+          window.oauth_dfd.done(function (token, oauth_user) {
+            var dialog;
+            var view;
+            var docsUploadView;
+            var docsView;
+            var picker = new google.picker.PickerBuilder()
+                  .setOAuthToken(gapi.auth.getToken().access_token)
+                  .setDeveloperKey(GGRC.config.GAPI_KEY)
+                  .setCallback(pickerCallback);
 
-          // Create and render a Picker object for searching images.
-          function createPicker() {
-            window.oauth_dfd.done(function (token, oauth_user) {
-              var dialog,
-                picker = new google.picker.PickerBuilder()
-                    .setOAuthToken(gapi.auth.getToken().access_token)
-                    .setDeveloperKey(GGRC.config.GAPI_KEY)
-                    .setCallback(pickerCallback);
+            if (el.data('type') === 'folders') {
+              view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+                .setMimeTypes(['application/vnd.google-apps.folder'])
+                .setSelectFolderEnabled(true);
+              picker.setTitle('Select folder');
+              picker.addView(view);
+            } else {
+              docsUploadView = new google.picker.DocsUploadView()
+                .setParent(folder_id);
+              docsView = new google.picker.DocsView()
+                .setParent(folder_id);
 
-              if (el.data('type') === 'folders') {
-                var view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-                  .setMimeTypes(['application/vnd.google-apps.folder'])
-                  .setSelectFolderEnabled(true);
-                picker.setTitle('Select folder');
-                picker.addView(view);
-              }
-              else {
-                var docsUploadView = new google.picker.DocsUploadView()
-                      .setParent(folder_id),
-                  docsView = new google.picker.DocsView()
-                      .setParent(folder_id);
+              picker.addView(docsUploadView)
+                .addView(docsView)
+                .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
+            }
+            picker = picker.build();
+            picker.setVisible(true);
+            // use undocumented fu to make the Picker be "modal" - https://b2.corp.google.com/issues/18628239
+            // this is the "mask" displayed behind the dialog box div
+            $('div.picker-dialog-bg').css('zIndex', 4000);  // there are multiple divs of that sort
+            // and this is the dialog box modal div, which we must display on top of our modal, if any
 
-                picker.addView(docsUploadView)
-                  .addView(docsView)
-                  .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
-              }
-              picker = picker.build();
-              picker.setVisible(true);
-              // use undocumented fu to make the Picker be "modal" - https://b2.corp.google.com/issues/18628239
-              // this is the "mask" displayed behind the dialog box div
-              $('div.picker-dialog-bg').css('zIndex', 4000);  // there are multiple divs of that sort
-              // and this is the dialog box modal div, which we must display on top of our modal, if any
+            dialog = GGRC.Utils.getPickerElement(picker);
+            if (dialog) {
+              dialog.style.zIndex = 4001; // our modals start with 2050
+            }
+          });
+        }
 
-              dialog = GGRC.Utils.getPickerElement(picker);
-              if (dialog) {
-                dialog.style.zIndex = 4001; // our modals start with 2050
-              }
+        function pickerCallback(data) {
+          var files;
+          var model;
+          var PICKED = google.picker.Action.PICKED;
+          var ACTION = google.picker.Response.ACTION;
+          var DOCUMENTS = google.picker.Response.DOCUMENTS;
+          var CANCEL = google.picker.Action.CANCEL;
+
+          if (data[ACTION] === PICKED) {
+            if (el.data('type') === 'folders') {
+              model = CMS.Models.GDriveFolder;
+            } else {
+              model = CMS.Mdoels.GDriveFile;
+            }
+            files = model.models(data[DOCUMENTS]);
+            el.trigger('picked', {
+              files: files
             });
+          } else if (data[ACTION] === CANCEL) {
+            el.trigger('rejected');
           }
+        }
 
-          function pickerCallback(data) {
-
-            var files, model,
-              PICKED = google.picker.Action.PICKED,
-              ACTION = google.picker.Response.ACTION,
-              DOCUMENTS = google.picker.Response.DOCUMENTS,
-              CANCEL = google.picker.Action.CANCEL;
-
-            if (data[ACTION] === PICKED) {
-              if (el.data('type') === 'folders') {
-                model = CMS.Models.GDriveFolder;
-              } else {
-                model = CMS.Mdoels.GDriveFile;
-              }
-              files = model.models(data[DOCUMENTS]);
-              el.trigger('picked', {
-                files: files
-              });
-            }
-            else if (data[ACTION] === CANCEL) {
-              el.trigger('rejected');
-            }
-          }
-        });
+        dfd.fail(this.unsetCurrent.bind(this))
+          .done(function () {
+            gapi.load('picker', {
+              callback: createPicker
+            });
+          });
       },
-      /**
+
+      /*
        * Handle an event of the user picking a new GDrive upload folder.
        *
        * @param {Object} el - The jQuery-wrapped DOM element on which the event
@@ -320,7 +331,6 @@
         }
 
         this.scope.attr('_folder_change_pending', true);
-
         if (!el.data('replace')) {
           dfd = $.when();
         } else if (scope.deferred) {
