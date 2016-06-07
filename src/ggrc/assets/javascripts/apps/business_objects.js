@@ -527,26 +527,36 @@
         Contract: {
           _mixins: ["directive", "issues"]
         },
+        extended_audits: {
+          Audit: {
+            mapping: "related_audits_via_related_responses",
+            allow_mapping: false,
+            allow_creating: false,
+            draw_children: true,
+            show_view: GGRC.mustache_path + "/audits/tree.mustache",
+            footer_view: null
+          },
+        },
         Clause: {
-          _mixins: ['governance_objects', 'business_objects', 'issues'],
+          _mixins: ['governance_objects', 'business_objects', 'extended_audits', 'issues'],
           Audit: {
             mapping: 'related_audits'
           }
         },
         Section: {
-          _mixins: ['governance_objects', 'business_objects', 'issues'],
+          _mixins: ['governance_objects', 'business_objects', 'extended_audits', 'issues'],
           Audit: {
             mapping: 'related_audits'
           }
         },
         Objective: {
-          _mixins: ['governance_objects', 'business_objects', 'issues'],
+          _mixins: ['governance_objects', 'business_objects', 'extended_audits', 'issues'],
           Audit: {
             mapping: 'related_audits'
           }
         },
         Control: {
-          _mixins: ['governance_objects', 'business_objects', 'issues'],
+          _mixins: ['governance_objects', 'business_objects', 'extended_audits', 'issues'],
           Audit: {
             mapping: 'related_audits'
           }
@@ -612,37 +622,37 @@
           },
         },
         AccessGroup: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         DataAsset: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         Facility: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         Market: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         OrgGroup: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         Vendor: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         Process: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         Product: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         Project: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         System: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         Document: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ["governance_objects", "business_objects", "extended_audits", "issues"]
         },
         Person: {
           _mixins: ["issues"],
