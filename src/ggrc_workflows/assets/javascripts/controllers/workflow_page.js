@@ -31,20 +31,6 @@
     }
   });
 
-  can.Component.extend({
-    tag: "workflow-deactivate",
-    template: "<content/>",
-    events: {
-      click: function() {
-        var workflow = GGRC.page_instance();
-        workflow.refresh().then(function(workflow) {
-          workflow.attr('recurrences', false).save();
-        });
-      }
-    }
-  });
-
-
   can.Model.Cacheable("CMS.ModelHelpers.CloneWorkflow", {
     defaults : {
       clone_people: true,
