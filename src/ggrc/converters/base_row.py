@@ -64,9 +64,7 @@ class RowConverter(object):
       else:
         self.objects[attr_name] = item
 
-      if attr_name == "email" and not self.get_value(attr_name):
-        self.add_error(errors.MISSING_VALUE_ERROR, column_name="Email")
-      elif attr_name in ("slug", "email"):
+      if not self.ignore and attr_name in ("slug", "email"):
         self.id_key = attr_name
         self.obj = self.get_or_generate_object(attr_name)
         item.set_obj_attr()

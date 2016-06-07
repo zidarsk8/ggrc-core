@@ -300,7 +300,13 @@ class EmailColumnHandler(ColumnHandler):
 
   def parse_item(self):
     """ emails are case insensitive """
-    return self.raw_value.lower()
+    email = self.raw_value.lower()
+    if not email:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name="Email")
+    elif not Person.is_valid_email(email):
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+      return ""
+    return email
 
 
 class TextColumnHandler(ColumnHandler):
