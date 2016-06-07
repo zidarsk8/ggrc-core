@@ -149,13 +149,13 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     if self.email in getattr(settings, "BOOTSTRAP_ADMIN_USERS", []):
       return u"Superuser"
 
-    ROLE_HIERARCHY = {
+    role_hierarchy = {
         u'Administrator': 0,
         u'Editor': 1,
         u'Reader': 2,
         u'Creator': 3,
     }
-    system_wide_roles = ROLE_HIERARCHY.keys()
+    system_wide_roles = role_hierarchy.keys()
     unique_roles = set([
         user_role.role.name
         for user_role in self.user_roles
@@ -167,5 +167,5 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       # -1 as default to make items not in this list appear on top
       # and thus shown to the user
       sorted_roles = sorted(unique_roles,
-                            key=lambda x: ROLE_HIERARCHY.get(x, -1))
+                            key=lambda x: role_hierarchy.get(x, -1))
       return sorted_roles[0]

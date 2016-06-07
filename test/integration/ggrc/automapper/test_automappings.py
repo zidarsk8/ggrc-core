@@ -245,7 +245,7 @@ class TestAutomappings(integration.ggrc.TestCase):
     objective = self.create_object(models.Objective, {
         'title': make_name('Test Objective')
     })
-    controlP = self.create_object(models.Control, {
+    control_p = self.create_object(models.Control, {
         'title': make_name('Test control')
     })
     control1 = self.create_object(models.Control, {
@@ -255,9 +255,9 @@ class TestAutomappings(integration.ggrc.TestCase):
         'title': make_name('Test control')
     })
     self.assert_mapping_implication(
-        to_create=[(objective, controlP),
-                   (controlP, control1),
-                   (controlP, control2)],
+        to_create=[(objective, control_p),
+                   (control_p, control1),
+                   (control_p, control2)],
         implied=[(objective, control1), (objective, control2)]
     )
 

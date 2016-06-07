@@ -45,8 +45,8 @@ class TestNotificationsForDeletedObjects(TestCase):
   def test_delete_activated_workflow(self, mock_mail):
 
     with freeze_time("2015-02-01 13:39:20"):
-      _, wf = self.wf_generator.generate_workflow(self.quarterly_wf_1)
-      response, wf = self.wf_generator.activate_workflow(wf)
+      _, workflow = self.wf_generator.generate_workflow(self.quarterly_wf_1)
+      response, workflow = self.wf_generator.activate_workflow(workflow)
 
       self.assert200(response)
 
@@ -61,7 +61,7 @@ class TestNotificationsForDeletedObjects(TestCase):
       self.assertIn(user.email, notif_data)
       self.assertIn("cycle_starts_in", notif_data[user.email])
 
-      workflow = Workflow.query.get(wf.id)
+      workflow = Workflow.query.get(workflow.id)
 
       response = self.wf_generator.api.delete(workflow)
       self.assert200(response)
