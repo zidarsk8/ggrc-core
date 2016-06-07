@@ -13,16 +13,17 @@ test client is not yet ready.
 This api helper also helps with delete and put requests where it fetches the
 latest etag needed for such requests.
 """
+import logging
+
+import flask
 
 from ggrc import db
 from ggrc.app import app
 from ggrc.services.common import Resource
-import flask
-import logging
 
 
 # style: should the class name be all capitals?
-class Api():
+class Api(object):
 
   def __init__(self):
     self.tc = app.test_client()
@@ -32,6 +33,8 @@ class Api():
                     "X-Requested-By": "gGRC"
                     }
     self.user_headers = {}
+    self.person_name = None
+    self.person_email = None
 
   def set_user(self, person=None):
     # Refresh the person instance from the db:
@@ -43,8 +46,10 @@ class Api():
               "email": person.email,
           })
       }
+      self.person_name, self.person_email = person.name, person.email
     else:
       self.user_headers = {}
+      self.person_name, self.person_email = None, None
 
     self.tc.get("/logout")
     self.tc.get("/login", headers=self.user_headers)
@@ -59,11 +64,12 @@ class Api():
     """ add docoded json to response object """
     try:
       response.json = flask.json.loads(response.data)
-    except:
+    except StandardError:
       response.json = None
     return response
 
-  def send_request(self, request, obj, data, headers={}, api_link=None):
+  def send_request(self, request, obj, data, headers=None, api_link=None):
+    headers = headers or {}
     if api_link is None:
       api_link = self.api_link(obj)
 
@@ -91,8 +97,8 @@ class Api():
   def post(self, obj, data):
     return self.send_request(self.tc.post, obj, data)
 
-  def get(self, obj, id):
-    return self.data_to_json(self.tc.get(self.api_link(obj, id)))
+  def get(self, obj, id_):
+    return self.data_to_json(self.tc.get(self.api_link(obj, id_)))
 
   def get_collection(self, obj, ids):
     return self.data_to_json(self.tc.get(
