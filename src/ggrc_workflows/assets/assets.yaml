@@ -10,6 +10,7 @@ dashboard-js-files:
   - workflow_mustache_helpers.js
   - controllers/approval_workflow_controller.js
   - components/workflow_clone.js
+  - components/taskgroup_clone.js
 
 dashboard-js-spec-files:
 
