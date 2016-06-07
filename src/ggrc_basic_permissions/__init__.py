@@ -15,17 +15,9 @@ from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm.attributes import get_history
-from ggrc import db, settings
+from ggrc import db
+from ggrc import settings
 from ggrc.app import app
-from ggrc_basic_permissions import basic_roles
-from ggrc_basic_permissions.contributed_roles import lookup_role_implications
-from ggrc_basic_permissions.contributed_roles import BasicRoleDeclarations
-from ggrc_basic_permissions.contributed_roles import BasicRoleImplications
-from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
-from ggrc_basic_permissions.models import ContextImplication
-from ggrc_basic_permissions.models import get_ids_related_to
-from ggrc_basic_permissions.models import Role
-from ggrc_basic_permissions.models import UserRole
 from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.audit import Audit
@@ -36,6 +28,15 @@ from ggrc.services.common import _get_cache_manager
 from ggrc.services.common import Resource
 from ggrc.services.registry import service
 from ggrc.utils import benchmark
+from ggrc_basic_permissions import basic_roles
+from ggrc_basic_permissions.contributed_roles import lookup_role_implications
+from ggrc_basic_permissions.contributed_roles import BasicRoleDeclarations
+from ggrc_basic_permissions.contributed_roles import BasicRoleImplications
+from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
+from ggrc_basic_permissions.models import ContextImplication
+from ggrc_basic_permissions.models import get_ids_related_to
+from ggrc_basic_permissions.models import Role
+from ggrc_basic_permissions.models import UserRole
 
 
 blueprint = Blueprint(
@@ -270,6 +271,7 @@ def audit_relationship_query(user_id, context_not_role=False):
 
 
 class CompletePermissionsProvider(object):
+  """Permission provider set in the USER_PERMISSIONS_PROVIDER setting"""
   def __init__(self, _):
     pass
 
