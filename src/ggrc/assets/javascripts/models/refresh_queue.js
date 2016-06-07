@@ -172,6 +172,11 @@ can.Construct("RefreshQueue", {
           next = instance.get_binding(prop);
           hasBinding = instance.has_binding(prop);
 
+          if (!hasBinding) {
+            dfd.reject({
+              message: prop + ' binding not found'
+            });
+          }
           if (hasBinding && next) {
             deferred = next.refresh_instances(force);
           }

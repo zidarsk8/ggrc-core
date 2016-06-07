@@ -71,7 +71,11 @@
         $.when(
           workflow.refresh_all('task_groups', 'task_group_objects'),
           workflow.refresh_all('task_groups', 'task_group_tasks')
-        ).then(function () {
+        )
+        .always(function () {
+          self.attr('waiting', false);
+        })
+        .done(function () {
           var task_groups = workflow.task_groups.reify();
           var can_activate = task_groups.length;
 
@@ -81,7 +85,9 @@
             }
           });
           self.attr('can_activate', can_activate);
-          self.attr('waiting', false);
+        })
+        .fail(function (error) {
+          console.warn('Workflow activate error', error.message);
         });
       },
       _handle_refresh: function (model) {
