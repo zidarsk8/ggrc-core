@@ -6,30 +6,30 @@
 */
 
 
-(function(can) {
+(function (can) {
 
   var _mustache_path,
-      overdue_compute;
+    overdue_compute;
 
-  overdue_compute = can.compute(function(val) {
-    if (this.attr("status") === "Verified") {
-      return "";
+  overdue_compute = can.compute(function (val) {
+    if (this.attr('status') === 'Verified') {
+      return '';
     }
-    var date = moment(this.attr("next_due_date") || this.attr("end_date"));
-    if(date && date.isBefore(new Date())){
-      return "overdue";
+    var date = moment(this.attr('next_due_date') || this.attr('end_date'));
+    if(date && date.isBefore(new Date())) {
+      return 'overdue';
     }
-    return "";
+    return '';
   });
 
-  function refresh_attr(instance, attr){
+  function refresh_attr(instance, attr) {
     if (instance.attr(attr).reify().selfLink) {
       instance.attr(attr).reify().refresh();
     }
   }
 
-  function refresh_attr_wrap(attr){
-    return function(ev, instance) {
+  function refresh_attr_wrap(attr) {
+    return function (ev, instance) {
       if (instance instanceof this) {
         refresh_attr(instance, attr);
       }
@@ -50,8 +50,8 @@
     }
     if (typeof workflow.cycles === undefined || !workflow.cycles) {
       $(document.body).trigger(
-        "ajax:flash"
-        , {warning: "No cycles in the workflow!"}
+        'ajax:flash', 
+        {warning: 'No cycles in the workflow!'}
       );
       return;
     }
@@ -62,8 +62,8 @@
 
       if (!activeCycleList.length) {
         $(document.body).trigger(
-          "ajax:flash"
-          , {warning: "No active cycles in the workflow!"}
+          'ajax:flash', 
+          {warning: 'No active cycles in the workflow!'}
         );
         return;
       }
@@ -77,73 +77,73 @@
     });
   }
 
-  _mustache_path = GGRC.mustache_path + "/cycles";
-  can.Model.Cacheable("CMS.Models.Cycle", {
-    root_object: "cycle",
-    root_collection: "cycles",
-    category: "workflow",
-    findAll: "GET /api/cycles",
-    findOne: "GET /api/cycles/{id}",
-    create: "POST /api/cycles",
-    update: "PUT /api/cycles/{id}",
-    destroy: "DELETE /api/cycles/{id}",
+  _mustache_path = GGRC.mustache_path + '/cycles';
+  can.Model.Cacheable('CMS.Models.Cycle', {
+    root_object: 'cycle',
+    root_collection: 'cycles',
+    category: 'workflow',
+    findAll: 'GET /api/cycles',
+    findOne: 'GET /api/cycles/{id}',
+    create: 'POST /api/cycles',
+    update: 'PUT /api/cycles/{id}',
+    destroy: 'DELETE /api/cycles/{id}',
 
     attributes: {
-      workflow: "CMS.Models.Workflow.stub",
-      cycle_task_groups: "CMS.Models.CycleTaskGroup.stubs",
-      modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      workflow: 'CMS.Models.Workflow.stub',
+      cycle_task_groups: 'CMS.Models.CycleTaskGroup.stubs',
+      modified_by: 'CMS.Models.Person.stub',
+      context: 'CMS.Models.Context.stub'
     },
 
     tree_view_options: {
-      show_view: _mustache_path + "/tree.mustache",
-      header_view : _mustache_path + "/tree_header.mustache",
+      show_view: _mustache_path + '/tree.mustache',
+      header_view: _mustache_path + '/tree_header.mustache',
       draw_children: true,
       child_options: [
         {
-          model: "CycleTaskGroup",
-          mapping: "cycle_task_groups",
+          model: 'CycleTaskGroup',
+          mapping: 'cycle_task_groups',
           allow_creating: false
         }
       ]
     },
-    init: function(){
+    init: function () {
       var that = this;
       this._super.apply(this, arguments);
-      this.bind("created", refresh_attr_wrap('workflow').bind(this));
-      this.bind("destroyed", function(ev, inst) {
+      this.bind('created', refresh_attr_wrap('workflow').bind(this));
+      this.bind('destroyed', function (ev, inst) {
         if(inst instanceof that) {
-          can.each(inst.cycle_task_groups, function(cycle_task_group) {
+          can.each(inst.cycle_task_groups, function (cycle_task_group) {
             if (!cycle_task_group) {
               return;
             }
             cycle_task_group = cycle_task_group.reify();
-            can.trigger(cycle_task_group, "destroyed");
-            can.trigger(cycle_task_group.constructor, "destroyed", cycle_task_group);
+            can.trigger(cycle_task_group, 'destroyed');
+            can.trigger(cycle_task_group.constructor, 'destroyed', cycle_task_group);
           });
         }
       });
     }
   }, {
-    init: function() {
+    init: function () {
       var that = this;
       this._super.apply(this, arguments);
-      this.bind("status", function(ev, newVal) {
+      this.bind('status', function (ev, newVal) {
         if (newVal === 'Verified') {
-          new RefreshQueue().enqueue(this.workflow.reify()).trigger().then(function(wfs) {
-            return wfs[0].get_binding("owners").refresh_instances();
-          }).then(function(wf_owner_bindings) {
+          new RefreshQueue().enqueue(this.workflow.reify()).trigger().then(function (wfs) {
+            return wfs[0].get_binding('owners').refresh_instances();
+          }).then(function (wf_owner_bindings) {
             var current_user = CMS.Models.get_instance('Person',
                                                        GGRC.current_user.id);
             if(~can.inArray(
               current_user,
-              can.map(wf_owner_bindings, function(wf_owner_binding) {
+              can.map(wf_owner_bindings, function (wf_owner_binding) {
                 return wf_owner_binding.instance;
               })
             )) {
-              that.refresh().then(function() {
-                if(that.attr("is_current")) {
-                  that.attr("is_current", false);
+              that.refresh().then(function () {
+                if(that.attr('is_current')) {
+                  that.attr('is_current', false);
                   that.save();
                 }
               });
@@ -152,56 +152,56 @@
         }
       });
     },
-    overdue: overdue_compute,
+    overdue: overdue_compute
   });
 
-  _mustache_path = GGRC.mustache_path + "/cycle_task_entries";
-  can.Model.Cacheable("CMS.Models.CycleTaskEntry", {
-    root_object: "cycle_task_entry",
-    root_collection: "cycle_task_entries",
-    category: "workflow",
-    findAll: "GET /api/cycle_task_entries",
-    findOne: "GET /api/cycle_task_entries/{id}",
-    create: "POST /api/cycle_task_entries",
-    update: "PUT /api/cycle_task_entries/{id}",
-    destroy: "DELETE /api/cycle_task_entries/{id}",
+  _mustache_path = GGRC.mustache_path + '/cycle_task_entries';
+  can.Model.Cacheable('CMS.Models.CycleTaskEntry', {
+    root_object: 'cycle_task_entry',
+    root_collection: 'cycle_task_entries',
+    category: 'workflow',
+    findAll: 'GET /api/cycle_task_entries',
+    findOne: 'GET /api/cycle_task_entries/{id}',
+    create: 'POST /api/cycle_task_entries',
+    update: 'PUT /api/cycle_task_entries/{id}',
+    destroy: 'DELETE /api/cycle_task_entries/{id}',
 
     attributes: {
-      cycle_task_group_object_task: "CMS.Models.CycleTaskGroupObjectTask.stub",
-      modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub",
-      object_documents: "CMS.Models.ObjectDocument.stubs",
-      documents: "CMS.Models.Document.stubs",
-      cycle: "CMS.Models.Cycle.stub"
+      cycle_task_group_object_task: 'CMS.Models.CycleTaskGroupObjectTask.stub',
+      modified_by: 'CMS.Models.Person.stub',
+      context: 'CMS.Models.Context.stub',
+      object_documents: 'CMS.Models.ObjectDocument.stubs',
+      documents: 'CMS.Models.Document.stubs',
+      cycle: 'CMS.Models.Cycle.stub'
     },
 
     tree_view_options: {
-      show_view: _mustache_path + "/tree.mustache",
-      footer_view: _mustache_path + "/tree_footer.mustache",
+      show_view: _mustache_path + '/tree.mustache',
+      footer_view: _mustache_path + '/tree_footer.mustache',
       child_options: [{
-        //0: Documents
-        model: "Document",
-        mapping: "documents",
-        show_view: _mustache_path + "/documents.mustache",
-        footer_view: _mustache_path + "/documents_footer.mustache"
-      }],
+        // 0: Documents
+        model: 'Document',
+        mapping: 'documents',
+        show_view: _mustache_path + '/documents.mustache',
+        footer_view: _mustache_path + '/documents_footer.mustache'
+      }]
     },
-    init: function(){
+    init: function () {
       this._super.apply(this, arguments);
-      this.bind("created",
-        refresh_attr_wrap("cycle_task_group_object_task").bind(this));
-      this.validateNonBlank("description");
+      this.bind('created',
+        refresh_attr_wrap('cycle_task_group_object_task').bind(this));
+      this.validateNonBlank('description');
     }
   }, {
-    workflowFolder: function() {
-      return this.refresh_all('cycle', 'workflow').then(function(workflow){
+    workflowFolder: function () {
+      return this.refresh_all('cycle', 'workflow').then(function (workflow) {
         if (workflow.has_binding('folders')) {
-          return workflow.refresh_all('folders').then(function(folders){
+          return workflow.refresh_all('folders').then(function (folders) {
             if (folders.length === 0) {
               return null;  // workflow folder has not been assigned
             }
             return folders[0].instance;
-          }, function(result) {
+          }, function (result) {
             return result;
           });
         }
@@ -210,50 +210,50 @@
   });
 
 
-  _mustache_path = GGRC.mustache_path + "/cycle_task_groups";
-  can.Model.Cacheable("CMS.Models.CycleTaskGroup", {
-    root_object: "cycle_task_group",
-    root_collection: "cycle_task_groups",
-    category: "workflow",
-    findAll: "GET /api/cycle_task_groups",
-    findOne: "GET /api/cycle_task_groups/{id}",
-    create: "POST /api/cycle_task_groups",
-    update: "PUT /api/cycle_task_groups/{id}",
-    destroy: "DELETE /api/cycle_task_groups/{id}",
+  _mustache_path = GGRC.mustache_path + '/cycle_task_groups';
+  can.Model.Cacheable('CMS.Models.CycleTaskGroup', {
+    root_object: 'cycle_task_group',
+    root_collection: 'cycle_task_groups',
+    category: 'workflow',
+    findAll: 'GET /api/cycle_task_groups',
+    findOne: 'GET /api/cycle_task_groups/{id}',
+    create: 'POST /api/cycle_task_groups',
+    update: 'PUT /api/cycle_task_groups/{id}',
+    destroy: 'DELETE /api/cycle_task_groups/{id}',
 
     attributes: {
-      cycle: "CMS.Models.Cycle.stub",
-      task_group: "CMS.Models.TaskGroup.stub",
-      cycle_task_group_tasks: "CMS.Models.CycleTaskGroupObjectTask.stubs",
-      modified_by: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub"
+      cycle: 'CMS.Models.Cycle.stub',
+      task_group: 'CMS.Models.TaskGroup.stub',
+      cycle_task_group_tasks: 'CMS.Models.CycleTaskGroupObjectTask.stubs',
+      modified_by: 'CMS.Models.Person.stub',
+      context: 'CMS.Models.Context.stub'
     },
 
     tree_view_options: {
       sort_property: 'sort_index',
-      show_view: _mustache_path + "/tree.mustache",
-      //footer_view: _mustache_path + "/tree_footer.mustache",
+      show_view: _mustache_path + '/tree.mustache',
+      // footer_view: _mustache_path + "/tree_footer.mustache",
       draw_children: true,
       child_options: [
         {
           title: 'Tasks',
-          model: "CycleTaskGroupObjectTask",
-          mapping: "cycle_task_group_tasks",
+          model: 'CycleTaskGroupObjectTask',
+          mapping: 'cycle_task_group_tasks',
           allow_creating: false
         }
       ]
     },
 
-    init: function() {
+    init: function () {
       var that = this;
       this._super.apply(this, arguments);
 
-      this.validateNonBlank("contact");
-      this.validateContact(["_transient.contact", "contact"]);
-      this.bind("updated", function(ev, instance) {
+      this.validateNonBlank('contact');
+      this.validateContact(['_transient.contact', 'contact']);
+      this.bind('updated', function (ev, instance) {
         if (instance instanceof that) {
           var dfd = instance.refresh_all_force('cycle', 'workflow');
-          dfd.then(function(){
+          dfd.then(function () {
             return $.when(
               instance.refresh_all_force('related_objects'),
               instance.refresh_all_force('cycle_task_group_tasks')
@@ -261,15 +261,15 @@
           });
         }
       });
-      this.bind("destroyed", function(ev, inst) {
+      this.bind('destroyed', function (ev, inst) {
         if(inst instanceof that) {
-          can.each(inst.cycle_task_group_tasks, function(ctgt) {
+          can.each(inst.cycle_task_group_tasks, function (ctgt) {
             if (!ctgt) {
               return;
             }
             ctgt = ctgt.reify();
-            can.trigger(ctgt, "destroyed");
-            can.trigger(ctgt.constructor, "destroyed", ctgt);
+            can.trigger(ctgt, 'destroyed');
+            can.trigger(ctgt.constructor, 'destroyed', ctgt);
           });
         }
       });
@@ -278,29 +278,29 @@
     overdue: overdue_compute
   });
 
-  _mustache_path = GGRC.mustache_path + "/cycle_task_group_object_tasks";
-  can.Model.Cacheable("CMS.Models.CycleTaskGroupObjectTask", {
-    root_object: "cycle_task_group_object_task",
-    root_collection: "cycle_task_group_object_tasks",
-    category: "workflow",
-    findAll: "GET /api/cycle_task_group_object_tasks",
-    findOne: "GET /api/cycle_task_group_object_tasks/{id}",
-    create: "POST /api/cycle_task_group_object_tasks",
-    update: "PUT /api/cycle_task_group_object_tasks/{id}",
-    destroy: "DELETE /api/cycle_task_group_object_tasks/{id}",
-    title_singular: "Cycle Task",
+  _mustache_path = GGRC.mustache_path + '/cycle_task_group_object_tasks';
+  can.Model.Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
+    root_object: 'cycle_task_group_object_task',
+    root_collection: 'cycle_task_group_object_tasks',
+    category: 'workflow',
+    findAll: 'GET /api/cycle_task_group_object_tasks',
+    findOne: 'GET /api/cycle_task_group_object_tasks/{id}',
+    create: 'POST /api/cycle_task_group_object_tasks',
+    update: 'PUT /api/cycle_task_group_object_tasks/{id}',
+    destroy: 'DELETE /api/cycle_task_group_object_tasks/{id}',
+    title_singular: 'Cycle Task',
     attributes: {
-      cycle_task_group: "CMS.Models.CycleTaskGroup.stub",
-      task_group_task: "CMS.Models.TaskGroupTask.stub",
-      cycle_task_entries: "CMS.Models.CycleTaskEntry.stubs",
-      modified_by: "CMS.Models.Person.stub",
-      contact: "CMS.Models.Person.stub",
-      context: "CMS.Models.Context.stub",
-      cycle: "CMS.Models.Cycle.stub"
+      cycle_task_group: 'CMS.Models.CycleTaskGroup.stub',
+      task_group_task: 'CMS.Models.TaskGroupTask.stub',
+      cycle_task_entries: 'CMS.Models.CycleTaskEntry.stubs',
+      modified_by: 'CMS.Models.Person.stub',
+      contact: 'CMS.Models.Person.stub',
+      context: 'CMS.Models.Context.stub',
+      cycle: 'CMS.Models.Cycle.stub'
     },
     permalink_options: {
-      url: "<%= base.viewLink %>#current_widget/cycle/<%= instance.cycle.id %>/cycle_task_group/<%= instance.cycle_task_group.id %>/cycle_task_group_object_task/<%= instance.id %>",
-      base: "cycle:workflow"
+      url: '<%= base.viewLink %>#current_widget/cycle/<%= instance.cycle.id %>/cycle_task_group/<%= instance.cycle_task_group.id %>/cycle_task_group_object_task/<%= instance.id %>',
+      base: 'cycle:workflow'
     },
     info_pane_options: {
       mapped_objects: {
@@ -311,7 +311,7 @@
     },
     tree_view_options: {
       sort_property: 'sort_index',
-      show_view: _mustache_path + "/tree.mustache",
+      show_view: _mustache_path + '/tree.mustache',
       attr_list: [
         {attr_title: 'Title', attr_name: 'title'},
         {attr_title: 'Workflow', attr_name: 'workflow', attr_sort_field: 'cycle.workflow.title'},
@@ -326,8 +326,8 @@
       draw_children: true,
       child_options: [
         {
-          model: "CycleTaskEntry",
-          mapping: "cycle_task_entries",
+          model: 'CycleTaskEntry',
+          mapping: 'cycle_task_entries',
           allow_creating: true
         },
         {
@@ -337,17 +337,17 @@
         }
       ]
     },
-    init: function() {
+    init: function () {
       var that = this;
       this._super.apply(this, arguments);
-      this.validateNonBlank("title");
-      this.validateNonBlank("workflow");
-      this.validateNonBlank("cycle");
-      this.validateContact(["_transient.contact", "contact"]);
-      this.validateNonBlank("start_date");
-      this.validateNonBlank("end_date");
+      this.validateNonBlank('title');
+      this.validateNonBlank('workflow');
+      this.validateNonBlank('cycle');
+      this.validateContact(['_transient.contact', 'contact']);
+      this.validateNonBlank('start_date');
+      this.validateNonBlank('end_date');
 
-      this.bind("updated", function (ev, instance) {
+      this.bind('updated', function (ev, instance) {
         if (instance instanceof that) {
           instance.refresh_all_force('related_objects').then(function (object) {
             return instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
@@ -376,8 +376,12 @@
       var cycle;
 
       if (newObjectForm) {
+        // prepopulate dates with default ones
+        this.attr('start_date', new Date());
+        this.attr('end_date', moment().add({month: 3}).toDate());
+
         if (!form.contact) {
-          form.attr("contact", {id: GGRC.current_user.id, type: "Person"});
+          form.attr('contact', {id: GGRC.current_user.id, type: 'Person'});
         }
 
         // using setTimeout to execute this after the modal is loaded
@@ -395,8 +399,8 @@
           workflows.then(function (workflowList) {
             if (!workflowList.length) {
               $(document.body).trigger(
-                "ajax:flash"
-                , {warning: "No Backlog workflows found! Contact your administrator to enable this functionality."}
+                'ajax:flash'
+                , {warning: 'No Backlog workflows found! Contact your administrator to enable this functionality.'}
               );
               return;
             }
@@ -418,17 +422,17 @@
     },
     response_options_csv: can.compute(function (val) {
       if(val != null) {
-        this.attr("response_options", $.map(val.split(","), $.proxy("".trim.call, "".trim)));
+        this.attr('response_options', $.map(val.split(','), $.proxy(''.trim.call, ''.trim)));
       } else {
-        return (this.attr("response_options") || []).join(", ");
+        return (this.attr('response_options') || []).join(', ');
       }
     }),
 
-    selected_response_options_csv: can.compute(function(val) {
+    selected_response_options_csv: can.compute(function (val) {
       if(val != null) {
-        this.attr("selected_response_options", $.map(val.split(","), $.proxy("".trim.call, "".trim)));
+        this.attr('selected_response_options', $.map(val.split(','), $.proxy(''.trim.call, ''.trim)));
       } else {
-        return (this.attr("selected_response_options") || []).join(", ");
+        return (this.attr('selected_response_options') || []).join(', ');
       }
     }),
 
