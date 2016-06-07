@@ -23,7 +23,15 @@
 
     scope: {
       personObj: null,
-      emptyText: '@'
+      emptyText: '@',
+      define: {
+        personId: {
+          type: 'number'
+        },
+        editable: {
+          type: 'boolean'
+        }
+      }
     },
 
     _EV_REMOVE_CLICK: 'person-remove',
@@ -37,21 +45,9 @@
      * @param {Object} options - the component instantiation options
      */
     init: function (element, options) {
-      var $el = $(element);
-      var personId = Number($el.attr('person-id'));
       var scope = this.scope;
+      var personId = scope.attr('personId');
       var person = scope.attr('personObj');
-      var editableVal = $el.attr('editable');
-      var editable;
-
-      if (editableVal === '' || editableVal === 'false') {
-        editable = false;
-      } else if (editableVal === 'true') {
-        editable = true;
-      } else {
-        editable = Boolean(scope.attr('editable'));
-      }
-      scope.attr('editable', editable);
 
       if (person && _.isEmpty(person.serialize()) && _.isNaN(personId)) {
         console.warn('`personObj` or `personId` are missing');
@@ -79,7 +75,7 @@
         .then(function (person) {
           scope.attr('personObj', person);
         }, function () {
-          $el.trigger(
+          $(document.body).trigger(
             'ajax:flash',
             {error: 'Failed to fetch data for person ' + personId + '.'});
         });

@@ -34,6 +34,7 @@
    */
   function Components(name, config) {
     var constructor;
+    var definitions;
 
     if (!name || !_.isString(name)) {
       throw new Error('Component name must be a nonempty string.');
@@ -43,11 +44,78 @@
       throw new Error('Component already exists: ' + name);
     }
 
+    if (config.scope && _.isObject(config.scope.define)) {
+      definitions = config.scope.define;
+      delete config.scope.define;
+    }
+
     constructor = can.Component.extend(config);
     Components._registry[name] = constructor;
 
+    if (definitions) {
+      Components._extendInit(constructor, definitions);
+    }
+
     return constructor;
   }
+
+  /**
+   * Wrap component init function
+   *
+   * @param {Function} constructor - Component constructor function
+   * @param {Object} definitions - Type definitions and their defaults
+   *
+   * @return {Any} - Returns casted types
+   */
+  Components._extendInit = function (constructor, definitions) {
+    var oldInit = constructor.prototype.init;
+
+    constructor.prototype.init = function (element, options) {
+      var scope = this.scope;
+      var val;
+      var el = $(element);
+
+      _.each(definitions, function (obj, key) {
+        if (!scope.attr(key)) {
+          val = el.attr(can.camelCaseToDashCase(key));
+          val = Components._castValue(val, obj.type);
+          if (_.isEmpty(val) && val.default) {
+            val = val.default;
+          }
+          scope.attr(key, val);
+        }
+      }, this);
+      return oldInit.call(this, arguments);
+    };
+    return constructor;
+  };
+
+  /**
+   * Cast scope values for default types
+   *
+   * @param {String} val - Value we get from element attribute
+   * @param {String} type - Type for the value we need to get
+   *
+   * @return {Any} - Returns casted types
+   */
+  Components._castValue = function (val, type) {
+    var types = {
+      'boolean': function (bool) {
+        return bool === 'true';
+      },
+      string: function (str) {
+        return String(str);
+      },
+      number: function (num) {
+        return Number(num);
+      }
+    };
+    if (!types[type]) {
+      console.warn('Cast value for `' + type + '` is not defined');
+      return undefined;
+    }
+    return types[type](val);
+  };
 
   // the internal storage of the registered components
   Components._registry = {};
