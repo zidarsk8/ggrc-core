@@ -24,7 +24,7 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
   """Workflow TaskGroupTask model."""
 
   __tablename__ = 'task_group_tasks'
-  __table_args__ = (
+  _extra_table_args = (
       schema.CheckConstraint('start_date <= end_date'),
   )
   _title_uniqueness = False

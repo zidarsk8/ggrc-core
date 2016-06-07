@@ -26,7 +26,7 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   attribute_values = db.relationship('CustomAttributeValue',
                                      backref='custom_attribute')
 
-  __table_args__ = (
+  _extra_table_args = (
       UniqueConstraint('definition_type', 'definition_id', 'title',
                        name='uq_custom_attribute'),
       db.Index('ix_custom_attributes_title', 'title'))
