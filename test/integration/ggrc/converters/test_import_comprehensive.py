@@ -30,12 +30,9 @@ class TestComprehensiveSheets(TestCase):
     TestCase.setUp(self)
     self.generator = ObjectGenerator()
     self.client.get("/login")
-    pass
 
-  def tearDown(self):
-    pass
-
-  def test_comprehensive_sheet1_with_custom_attributes(self):
+  def test_comprehensive_with_ca(self):
+    """Test comprehensive sheet with custom attributes."""
     self.create_custom_attributes()
     filename = "comprehensive_sheet1.csv"
     response = self.import_file(filename)
@@ -196,16 +193,15 @@ class TestComprehensiveSheets(TestCase):
     expected_custom_vals = ['0', 'a', '2015-12-12 00:00:00', 'test1']
     self.assertEqual(set(custom_vals), set(expected_custom_vals))
 
-  def test_full_good_import_no_warnings(self):
+  def test_full_good_import(self):
+    """Test import of all objects with no warnings or errors."""
     filename = "full_good_import_no_warnings.csv"
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
-    response = self.import_file(filename, dry_run=True)
+    response = self.import_file(filename)
     for block in response:
       for message in messages:
         self.assertEqual(set(), set(block[message]))
-
-    response = self.import_file(filename)
 
     for message in messages:  # response[0] = Person block
       self.assertEqual(set(response[0][message]), set())
@@ -226,15 +222,12 @@ class TestComprehensiveSheets(TestCase):
         self.assertEqual(set(), set(block[message]))
 
   def test_errors_and_warnings(self):
-    """
+    """Test all possible errors and warnings.
+
     This test should test for all possible warnings and errors but it is still
     incomplete.
     """
-    filename = "import_with_all_warnings_and_errors.csv"
-
-    dry_response = self.import_file(filename, dry_run=True)
-
-    response = self.import_file(filename)
+    response = self.import_file("import_with_all_warnings_and_errors.csv")
 
     expected_errors = {
         "Control": {
@@ -249,7 +242,6 @@ class TestComprehensiveSheets(TestCase):
             ])
         }
     }
-    self.assertEqual(dry_response, response)
 
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
