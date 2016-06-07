@@ -362,7 +362,6 @@
       sections: TypeFilter("related_objects", "Section"),
       clauses: TypeFilter("related_objects", "Clause"),
       objectives: TypeFilter("related_objects", "Objective"),
-      related_audits_via_related_responses: Cross("related_responses", "audit_via_request")
     },
     // Program
     Program: {
