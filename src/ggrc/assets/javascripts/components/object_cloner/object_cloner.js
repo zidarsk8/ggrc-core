@@ -23,8 +23,6 @@
       },
       cloneObject: function (scope, el, ev) {
         var instance = this.instance;
-
-        instance.refresh();
         this.attr('includeObjects', {});
 
         GGRC.Controllers.Modals.confirm({
@@ -43,7 +41,7 @@
               mappedObjects: this.getIncluded()
             }
           });
-          $.when(clonedInstance.save()).done(function (object) {
+          clonedInstance.save().done(function (object) {
             GGRC.navigate(object.viewLink);
           });
         }.bind(this));
