@@ -10,11 +10,13 @@ from flask import render_template
 from werkzeug.exceptions import BadRequest
 
 from ggrc.app import app
-from ggrc.login import login_required
 from ggrc.converters.base import Converter
-from ggrc.converters.query_helper import QueryHelper, BadQueryException
 from ggrc.converters.import_helper import generate_csv_string
 from ggrc.converters.import_helper import read_csv_file
+from ggrc.converters.query_helper import BadQueryException
+from ggrc.converters.query_helper import QueryHelper
+from ggrc.login import login_required
+from ggrc.utils import benchmark
 
 
 def check_required_headers(required_headers):
@@ -103,12 +105,14 @@ def init_converter_views():
   @app.route("/_service/export_csv", methods=["POST"])
   @login_required
   def handle_export_csv():
-    return handle_export_request()
+    with benchmark("handle export request"):
+      return handle_export_request()
 
   @app.route("/_service/import_csv", methods=["POST"])
   @login_required
   def handle_import_csv():
-    return handle_import_request()
+    with benchmark("handle import request"):
+      return handle_import_request()
 
   @app.route("/import")
   @login_required
