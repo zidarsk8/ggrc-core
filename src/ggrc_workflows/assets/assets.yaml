@@ -11,6 +11,7 @@ dashboard-js-files:
   - controllers/approval_workflow_controller.js
   - components/workflow_clone.js
   - components/taskgroup_clone.js
+  - components/end_cycle.js
 
 dashboard-js-spec-files:
 
