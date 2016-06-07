@@ -186,7 +186,7 @@ class BlockConverter(object):
     if self.ignore or not self.object_ids:
       return
     self.row_converters = []
-    objects = self.object_class.query.filter(
+    objects = self.object_class.eager_query().filter(
         self.object_class.id.in_(self.object_ids)).all()
     # TODO: this needs to be moved to query_helper, but it's here for now,
     # so we don't have to fetch same objects twice from the database.
