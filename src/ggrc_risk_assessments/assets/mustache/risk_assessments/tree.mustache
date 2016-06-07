@@ -98,7 +98,7 @@
                     </li>
                   {{/infer_roles}}
                   <li>
-                    {{{renderLive '/static/mustache/base_objects/relevance_action.mustache' list=original_list parent_instance=instance multiple_mapping_case=true}}}
+                    {{>'/static/mustache/base_objects/relevance_action.mustache'}}
                   </li>
                   <li>
                     {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
