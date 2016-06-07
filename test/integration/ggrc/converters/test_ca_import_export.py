@@ -11,6 +11,7 @@ from integration.ggrc.converters import TestCase
 from integration.ggrc.generator import ObjectGenerator
 from ggrc.models import AccessGroup
 from ggrc.models import Product
+from ggrc.converters import errors
 
 
 class TestCustomAttributeImportExport(TestCase):
@@ -98,18 +99,14 @@ class TestCustomAttributeImportExport(TestCase):
         "Line 14: normal Date contains invalid data. The value will be"
         " ignored.",
         "Line 16: man Date contains invalid data. The value will be ignored.",
-        "Line 21: Owner field does not contain a valid owner. You will be"
-        " assigned as object owner.",
+        errors.OWNER_MISSING.format(line=21, column_name="Owner"),
         "Line 22: Specified user 'kr@en.com' does not exist. That user will be"
         " ignored.",
-        "Line 22: Owner field does not contain a valid owner. You will be"
-        " assigned as object owner.",
-        "Line 26: Owner field does not contain a valid owner. You will be"
-        " assigned as object owner.",
+        errors.OWNER_MISSING.format(line=22, column_name="Owner"),
+        errors.OWNER_MISSING.format(line=26, column_name="Owner"),
         "Line 27: Specified user 'user@exameuple.com' does not exist. That"
         " user will be ignored.",
-        "Line 27: Owner field does not contain a valid owner. You will be"
-        " assigned as object owner."
+        errors.OWNER_MISSING.format(line=27, column_name="Owner"),
     }
 
     expected_errors = {

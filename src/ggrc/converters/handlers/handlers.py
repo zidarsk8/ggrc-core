@@ -247,7 +247,7 @@ class OwnerColumnHandler(UserColumnHandler):
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
     if not owners:
-      self.add_warning(errors.OWNER_MISSING)
+      self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
       owners.add(get_current_user())
 
     return list(owners)

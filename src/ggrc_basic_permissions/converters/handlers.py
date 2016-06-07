@@ -31,7 +31,7 @@ class ObjectRoleColumnHandler(UserColumnHandler):
     """
     users = self.get_users_list()
     if not users and self.key in self.owner_columns:
-      self.add_warning(errors.OWNER_MISSING)
+      self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
       users.append(get_current_user())
 
     if self.row_converter.is_new and self.mandatory and not users:

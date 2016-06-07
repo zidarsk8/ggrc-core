@@ -2,6 +2,11 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
+"""Comprehensive import tests.
+
+These tests should eventually contain all good imports and imports with all
+possible errors and warnings.
+"""
 
 from ggrc import db
 from ggrc.models import AccessGroup
@@ -231,24 +236,27 @@ class TestComprehensiveSheets(TestCase):
 
     response = self.import_file(filename)
 
-    block_messages = [
-        {  # warnings and error of the first imported block
+    expected_errors = {
+        "Control": {
             "block_errors": set([
                 errors.DUPLICATE_COLUMN.format(
                     line=1, duplicates="Notes, Test Plan"),
             ])
+        },
+        "Program": {
+            "row_warnings": set([
+                errors.OWNER_MISSING.format(line=7, column_name="Manager"),
+            ])
         }
-    ]
+    }
     self.assertEqual(dry_response, response)
 
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
-    for message_block, response_block in zip(block_messages, response):
+    for block in response:
       for message in messages:
-        self.assertEqual(
-            message_block.get(message, set()),
-            set(response_block[message])
-        )
+        expected = expected_errors.get(block["name"], {}).get(message, set())
+        self.assertEqual(expected, set(block[message]))
 
   def create_custom_attributes(self):
     gen = self.generator.generate_custom_attribute
