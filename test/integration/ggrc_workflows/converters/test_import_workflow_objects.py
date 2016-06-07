@@ -56,6 +56,26 @@ class TestWorkflowObjectsImport(TestCase):
     self.assertIn("ch2", task3.response_options)
     self.assertIn("option 1", task4.response_options)
 
+  def test_bad_imports(self):
+    """Test workflow import with errors and warnings"""
+    filename = "workflow_with_warnings_and_errors.csv"
+    response = self.import_file(filename)
+
+    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
+    expected_errors = {
+        "Workflow": {
+            "row_errors": [
+                errors.MISSING_VALUE_ERROR.format(
+                    line=8, column_name="Manager")
+            ],
+        }
+    }
+    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
+    for block in response:
+      for message in messages:
+        expected = expected_errors.get(block["name"], {}).get(message, [])
+        self.assertEqual(set(block[message]), set(expected))
+
   def test_import_task_date_format(self):
     """Test import of tasks for workflows
 

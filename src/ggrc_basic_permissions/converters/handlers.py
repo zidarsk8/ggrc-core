@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
+"""Handlers columns dealing with user roles."""
 
 
 from sqlalchemy import and_
@@ -17,15 +18,25 @@ from ggrc_basic_permissions.models import UserRole
 
 
 class ObjectRoleColumnHandler(UserColumnHandler):
+  """Basic User role handler"""
 
   role = -1
   owner_columns = ("program_owner")
 
   def parse_item(self):
+    """Parse new line separated list of emails
+
+    Returns:
+      list of User models.
+    """
     users = self.get_users_list()
     if not users and self.key in self.owner_columns:
       self.add_warning(errors.OWNER_MISSING)
       users.append(get_current_user())
+
+    if self.row_converter.is_new and self.mandatory and not users:
+      self.add_error(errors.MISSING_VALUE_ERROR,
+                     column_name=self.display_name)
     return list(users)
 
   def set_obj_attr(self):
