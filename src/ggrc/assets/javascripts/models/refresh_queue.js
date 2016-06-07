@@ -157,19 +157,22 @@ can.Construct("RefreshQueue", {
 
       // Helper function called recursively for each property
       function _refresh_all(instance, props, dfd) {
-        var prop = props[0],
-            next_props = props.slice(1),
-            next = instance[prop],
-            refresh_queue = new RefreshQueue(),
-            dfds = [],
-            deferred;
+        var prop = props[0];
+        var next_props = props.slice(1);
+        var next = instance[prop];
+        var refresh_queue = new RefreshQueue();
+        var dfds = [];
+        var deferred;
+        var hasBinding;
 
         if (next) {
           refresh_queue.enqueue(next, force);
           deferred = refresh_queue.trigger();
         } else if (instance.get_binding) {
           next = instance.get_binding(prop);
-          if (next) {
+          hasBinding = instance.has_binding(prop);
+
+          if (hasBinding && next) {
             deferred = next.refresh_instances(force);
           }
         }
