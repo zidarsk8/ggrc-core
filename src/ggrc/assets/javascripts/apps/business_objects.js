@@ -352,6 +352,13 @@
             child_options: [related_objects_child_options],
             draw_children: true
           },
+          Audit: {
+            mapping: "related_audits",
+            draw_children: true,
+            child_options: [related_objects_child_options],
+            allow_mapping: true,
+            add_item_view: GGRC.mustache_path + "/audits/tree_add_item.mustache"
+          }
         },
         issues: {
           Issue: {
