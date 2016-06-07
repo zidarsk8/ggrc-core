@@ -376,6 +376,10 @@
       var cycle;
 
       if (newObjectForm) {
+        // prepopulate dates with default ones
+        this.attr("start_date", new Date());
+        this.attr("end_date", moment().add({month: 3}).toDate());
+
         if (!form.contact) {
           form.attr("contact", {id: GGRC.current_user.id, type: "Person"});
         }
