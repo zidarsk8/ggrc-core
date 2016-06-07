@@ -12,6 +12,7 @@ dashboard-js-files:
   - components/workflow_clone.js
   - components/taskgroup_clone.js
   - components/end_cycle.js
+  - components/workflow_active.js
 
 dashboard-js-spec-files:
 
