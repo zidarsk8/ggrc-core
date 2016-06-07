@@ -259,6 +259,7 @@ class TestComprehensiveSheets(TestCase):
         self.assertEqual(expected, set(block[message]))
 
   def create_custom_attributes(self):
+    """Generate custom attributes needed for comprehensive sheet."""
     gen = self.generator.generate_custom_attribute
     gen("control", title="my custom text", mandatory=True)
     gen("program", title="my_text", mandatory=True)
@@ -267,3 +268,17 @@ class TestComprehensiveSheets(TestCase):
     gen("program", title="my_dropdown", attribute_type="Dropdown",
         options="a,b,c,d")
     # gen("program", title="my_description", attribute_type="Rich Text")
+
+  def test_case_sensitive_slugs(self):
+    """Test that mapping with case sensitive slugs work."""
+
+    response = self.import_file("case_sensitive_slugs.csv")
+
+    expected_errors = {}
+
+    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
+
+    for block in response:
+      for message in messages:
+        expected = expected_errors.get(block["name"], {}).get(message, set())
+        self.assertEqual(expected, set(block[message]))
