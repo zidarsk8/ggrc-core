@@ -132,6 +132,40 @@
               {{{firstnonempty instance.description 'No additional details'}}}
             </div>
           {{/if_helpers}}
+          {{#if_equals instance.task_type 'menu'}}
+            <h6>Response Options</h6>
+            {{! here we need to start a quick form or other componenet}}
+            <ggrc-quick-update instance="instance">
+              <dropdown
+                name="selected_response_options.0"
+                class-name="noop" {{! to not use default from component}}
+                is-disabled="!{{can_edit_response instance instance.status}}"
+                options-list="instance.response_options"></dropdown>
+            </ggrc-quick-update>
+          {{/if_equals}}
+          {{#if_equals instance.task_type 'checkbox'}}
+            <h6>Response Options</h6>
+            <ggrc-quick-update instance="instance">
+              {{#each instance.response_options}}
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <input
+                      type="checkbox"
+                      {{^if_can_edit_response instance instance.status}}
+                        disabled="disabled"
+                      {{/if}}
+                      multiple="multiple"
+                      name="selected_response_options"
+                      value="{{.}}"
+                      {{#in_array this instance.selected_response_options}}
+                        checked="checked"
+                      {{/in_array}}>
+                    {{.}}
+                  </div>
+                </div>
+              {{/each}}
+            </ggrc-quick-update>
+          {{/if_equals}}
           <br>
         </div>
       </div>
