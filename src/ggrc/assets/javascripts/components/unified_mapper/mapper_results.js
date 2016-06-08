@@ -31,6 +31,43 @@
         relevant = relevant[0].filter;
         return relevant.id === instance.id &&
                relevant.type === instance.type;
+      },
+      unselectAll: function (scope, el, ev) {
+        ev.preventDefault();
+
+        this.attr('mapper.all_selected', false);
+        this.attr('select_state', false);
+        scope.attr('selected').replace([]);
+      },
+      selectAll: function (scope, el, ev) {
+        var entries;
+        var que;
+
+        ev.preventDefault();
+
+        if (el.hasClass('disabled')) {
+          return;
+        }
+
+        que = new RefreshQueue();
+        entries = this.attr('entries');
+
+        this.attr('select_state', true);
+        this.attr('mapper.all_selected', true);
+        this.attr('is_loading', true);
+
+        que.enqueue(_.pluck(entries, 'instance'))
+          .trigger()
+          .then(function (models) {
+            this.attr('is_loading', false);
+            this.attr('selected', _.map(models, function (model) {
+              return {
+                id: model.id,
+                type: model.type,
+                href: model.href
+              };
+            }));
+          }.bind(this));
       }
     },
     events: {
@@ -63,39 +100,6 @@
         });
       },
       '.results-wrap scrollNext': 'drawPage',
-      '.object-check-all click': function (el, ev) {
-        var entries;
-        var que;
-
-        ev.preventDefault();
-
-        if (el.hasClass('disabled')) {
-          return;
-        }
-
-        que = new RefreshQueue();
-        entries = this.scope.attr('entries');
-
-        this.scope.attr('select_state', true);
-        this.scope.attr('mapper.all_selected', true);
-        this.scope.attr('is_loading', true);
-
-        que.enqueue(_.pluck(entries, 'instance'))
-          .trigger()
-          .then(function (models) {
-            this.scope.attr('is_loading', false);
-            this.scope.attr(
-              'selected',
-              _.map(models, function (model) {
-                return {
-                  id: model.id,
-                  type: model.type,
-                  href: model.href
-                };
-              })
-            );
-          }.bind(this));
-      },
       getItem: function (model) {
         var selected;
         var mapper;
@@ -268,8 +272,16 @@
       }
     },
     helpers: {
-      loading_or_saving: function (options) {
+      inProgress: function (options) {
         if (this.attr('mapper.page_loading') || this.attr('mapper.is_saving')) {
+          return options.fn();
+        }
+        return options.inverse();
+      },
+      allSelected: function (options) {
+        if (this.attr('mapper.page_loading') ||
+            this.attr('mapper.is_saving') ||
+            this.attr('mapper.all_selected')) {
           return options.fn();
         }
         return options.inverse();
