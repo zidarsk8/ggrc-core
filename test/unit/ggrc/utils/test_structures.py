@@ -40,8 +40,8 @@ class TestCaseInsensitiveDict(unittest.TestCase):
     self.ci_dict["fOO"] = "bar"
 
     self.assertEqual(
-      sorted(self.ci_dict.items()),
-      sorted([("HELLO", "World"),("fOO", "bar")])
+        sorted(self.ci_dict.items()),
+        sorted([("HELLO", "World"), ("fOO", "bar")])
     )
 
   def test_lower_items(self):
@@ -50,9 +50,10 @@ class TestCaseInsensitiveDict(unittest.TestCase):
     self.ci_dict["FOO"] = "BAR"
 
     self.assertEqual(
-      sorted(self.ci_dict.lower_items()),
-      sorted([("hello", "World"),("foo", "BAR")])
+        sorted(self.ci_dict.lower_items()),
+        sorted([("hello", "World"), ("foo", "BAR")])
     )
+
 
 class TestCaseInsensitiveDefDict(unittest.TestCase):
 
@@ -81,8 +82,8 @@ class TestCaseInsensitiveDefDict(unittest.TestCase):
     self.ci_dict["fOO"] = "bar"
 
     self.assertEqual(
-      sorted(self.ci_dict.items()),
-      sorted([("HELLO", "World"),("fOO", "bar")])
+        sorted(self.ci_dict.items()),
+        sorted([("HELLO", "World"), ("fOO", "bar")])
     )
 
   def test_lower_items(self):
@@ -91,6 +92,6 @@ class TestCaseInsensitiveDefDict(unittest.TestCase):
     self.ci_dict["FOO"] = "BAR"
 
     self.assertEqual(
-      sorted(self.ci_dict.lower_items()),
-      sorted([("hello", "World"),("foo", "BAR")])
+        sorted(self.ci_dict.lower_items()),
+        sorted([("hello", "World"), ("foo", "BAR")])
     )

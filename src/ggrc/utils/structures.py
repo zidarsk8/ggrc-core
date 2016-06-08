@@ -60,7 +60,8 @@ class CaseInsensitiveDict(collections.MutableMapping):
   def __repr__(self):
     return '%s(%r)' % (self.__class__.__name__, dict(self.items()))
 
-  def _key(self, key):
+  @classmethod
+  def _key(cls, key):
     return key.lower() if isinstance(key, basestring) else key
 
   def lower_items(self):
@@ -81,10 +82,7 @@ class CaseInsensitiveDefaultDict(CaseInsensitiveDict):
 
   def __init__(self, _default, data=None, **kwargs):
     self._default = _default
-    self._store = dict()
-    if data is None:
-      data = {}
-    self.update(data, **kwargs)
+    super(CaseInsensitiveDefaultDict, self).__init__(data, **kwargs)
 
   def __missing__(self, key):
     """Set a new missing value and return it."""

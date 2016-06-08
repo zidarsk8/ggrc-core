@@ -370,7 +370,7 @@ class MappingColumnHandler(ColumnHandler):
     slugs = set(line.strip().lower() for line in self.raw_value.splitlines())
     objects = []
     for slug in slugs:
-      obj = class_.query.filter_by(slug = slug).first()
+      obj = class_.query.filter_by(slug=slug).first()
       if obj:
         if permissions.is_allowed_update_for(obj):
           objects.append(obj)

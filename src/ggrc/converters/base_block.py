@@ -371,5 +371,5 @@ class BlockConverter(object):
     """
     header = header.strip("*").lower()
     if header.startswith("map:") or header.startswith("unmap:"):
-      header = ":".join(map(unicode.strip, header.split(":")))  # noqa
+      header = ":".join(part.strip() for part in header.split(":"))
     return header

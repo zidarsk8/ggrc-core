@@ -3,6 +3,8 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+"""Base objects for csv file converters."""
+
 from collections import defaultdict
 
 from ggrc import settings
@@ -16,6 +18,13 @@ from ggrc.fulltext import get_indexer
 
 
 class Converter(object):
+  """Base class for csv converters.
+
+  This class contains and handles all block converters and makes sure that
+  blocks and columns are handled in the correct order. It also holds cache
+  objects that need to be shared between all blocks and rows for mappings and
+  similar uses.
+  """
 
   class_order = [
       "Person",
@@ -68,7 +77,8 @@ class Converter(object):
       # multi block csv must have first column empty
       two_empty_lines = [[], []]
       block_data = csv_header + csv_body + two_empty_lines
-      [line.insert(0, "") for line in block_data]
+      for line in block_data:
+        line.insert(0, "")
       block_data[0][0] = "Object type"
       block_data[1][0] = block_converter.name
       csv_data.extend(block_data)
@@ -150,7 +160,8 @@ class Converter(object):
   def get_object_names(self):
     return [c.object_class.__name__ for c in self.block_converters]
 
-  def drop_cache(self):
+  @classmethod
+  def drop_cache(cls):
     if not getattr(settings, 'MEMCACHE_MECHANISM', False):
       return
     memcache = MemCache()
