@@ -11,9 +11,11 @@
       <span>{{firstnonempty instance.title instance.link}}</span>
     </a>
     {{#is_allowed 'update'}}
-    <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-      {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-      <i class="fa fa-trash"></i>
-    </a>
+    <span class="file-controls">
+      <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+        {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+        <i class="fa fa-trash"></i>
+      </a>
+    </span>
     {{/is_allowed}}
   </li>
