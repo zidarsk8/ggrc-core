@@ -536,13 +536,7 @@
       extended_related_projects: Multi(["related_projects", "owned_projects"]),
       extended_related_systems: Multi(["related_systems", "owned_systems"]),
       related_objects_via_search: Search(function (binding) {
-        var types = [
-          "Program", "Regulation", "Contract", "Policy", "Standard",
-          "Section", "Clause", "Objective", "Control", "AccessGroup",
-          "System", "Process", "DataAsset", "Product", "Project", "Facility",
-          "Market", "OrgGroup", "Vendor", "Audit", "Issue", "Assessment",
-          "Request"
-        ];
+        var types = this.observe_types;
 
         //checkfor window.location
         if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
