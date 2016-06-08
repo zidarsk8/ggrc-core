@@ -201,4 +201,10 @@
       return options.inverse(this);
     }
   });
+
+  Mustache.registerHelper('can_edit_response', function (instance, status) {
+    var cycle = Mustache.resolve(instance).cycle.reify();
+    status = Mustache.resolve(status);
+    return cycle.is_current && ['Finished', 'Verified'].indexOf(status) === -1;
+  });
 })(this.can, this.can.$, this.Mustache);
