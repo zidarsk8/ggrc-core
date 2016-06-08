@@ -196,8 +196,6 @@ class TestComprehensiveSheets(TestCase):
   def test_full_good_import(self):
     """Test import of all objects with no warnings or errors."""
     filename = "full_good_import_no_warnings.csv"
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
     response = self.import_file(filename)
 
     ggrc_admin = db.session.query(Role.id).filter(Role.name == "gGRC Admin")
@@ -251,9 +249,28 @@ class TestComprehensiveSheets(TestCase):
 
   def test_case_sensitive_slugs(self):
     """Test that mapping with case sensitive slugs work."""
-    # response = self.import_file("case_sensitive_slugs.csv")
-    # expected_errors = {}
-    # self._check_response(response, expected_errors)
+    response = self.import_file("case_sensitive_slugs.csv")
+    expected_errors = {
+        "Control": {
+            "row_errors": [
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line_list="3, 4",
+                    column_name="Code",
+                    s="",
+                    value="a",
+                    ignore_lines="4",
+                ),
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line_list="3, 4",
+                    column_name="Title",
+                    s="",
+                    value="a",
+                    ignore_lines="4",
+                ),
+            ]
+        }
+    }
+    self._check_response(response, expected_errors)
 
   def _check_response(self, response, expected_errors):
     """Test that response contains all expected errors and warnigs.
@@ -272,4 +289,4 @@ class TestComprehensiveSheets(TestCase):
     for block in response:
       for message in messages:
         expected = expected_errors.get(block["name"], {}).get(message, set())
-        self.assertEqual(expected, set(block[message]))
+        self.assertEqual(set(expected), set(block[message]))
