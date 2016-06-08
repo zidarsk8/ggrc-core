@@ -34,17 +34,6 @@
           <li>
             <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_url}}" />
           </li>
-
-          {{#if_equals instance.is_current true}}
-          {{#is_allowed 'delete' workflow}}
-              <li>
-                <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{workflow.id}}" href="javascript://">
-                  <i class="fa fa-trash"></i>
-                  Delete
-                </a>
-              </li>
-          {{/is_allowed}}
-          {{/if_equals}}
         </ul>
       </div>
     {{/using}}
