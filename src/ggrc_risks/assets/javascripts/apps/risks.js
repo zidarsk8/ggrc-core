@@ -110,8 +110,8 @@
         orphaned_objects: Multi([])
       },
       Person: {
-        owned_risks: Indirect("Risk", "contact"),
-        owned_threats: Indirect("Threat", "contact"),
+        owned_risks: TypeFilter('related_objects_via_search', 'Risk'),
+        owned_threats: TypeFilter('related_objects_via_search', 'Threat'),
         all_risks: Search(function (binding) {
           return CMS.Models.Risk.findAll({});
         }),
@@ -120,6 +120,11 @@
         })
       }
     };
+
+    // patch Person to extend query for dashboard
+    GGRC.Mappings.modules.ggrc_core
+      .Person.related_objects_via_search
+      .observe_types.push("Risk", "Threat");
 
     can.each(_risk_object_types, function (type) {
         mappings[type] = _.extend(mappings[type] || {}, {
