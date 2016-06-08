@@ -24,6 +24,9 @@
                   mandatory="mandatory"
                   placeholder="placeholder"
                   helptext="helptext"
+                  {{^is_allowed 'update' instance context='for'}}
+                    readonly
+                  {{/is_allowed}}
                 ></inline-edit>
               {{/case}}
               {{#case 'Rich Text'}}
@@ -36,6 +39,9 @@
                   mandatory="mandatory"
                   placeholder="placeholder"
                   helptext="helptext"
+                  {{^is_allowed 'update' instance context='for'}}
+                    readonly
+                  {{/is_allowed}}
                 ></inline-edit>
               {{/case}}
               {{#case 'Dropdown'}}
@@ -49,6 +55,9 @@
                   values="multi_choice_options"
                   placeholder="placeholder"
                   helptext="helptext"
+                  {{^is_allowed 'update' instance context='for'}}
+                    readonly
+                  {{/is_allowed}}
                 ></inline-edit>
               {{/case}}
               {{#case 'Date'}}
@@ -61,6 +70,9 @@
                   mandatory="mandatory"
                   placeholder="placeholder"
                   helptext="helptext"
+                  {{^is_allowed 'update' instance context='for'}}
+                    readonly
+                  {{/is_allowed}}
                 ></inline-edit>
               {{/case}}
               {{#case 'Text'}}
@@ -73,6 +85,9 @@
                   mandatory="mandatory"
                   placeholder="placeholder"
                   helptext="helptext"
+                  {{^is_allowed 'update' instance context='for'}}
+                    readonly
+                  {{/is_allowed}}
                 ></inline-edit>
               {{/case}}
               {{#case 'Map:Person'}}
@@ -86,6 +101,9 @@
                     mandatory="mandatory"
                     placeholder="placeholder"
                     helptext="helptext"
+                    {{^is_allowed 'update' instance context='for'}}
+                      readonly
+                    {{/is_allowed}}
                   ></inline-edit>
                 {{/with_object_for_id}}
               {{/case}}
