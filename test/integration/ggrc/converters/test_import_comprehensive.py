@@ -199,12 +199,7 @@ class TestComprehensiveSheets(TestCase):
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
     response = self.import_file(filename)
-    for block in response:
-      for message in messages:
-        self.assertEqual(set(), set(block[message]))
 
-    for message in messages:  # response[0] = Person block
-      self.assertEqual(set(response[0][message]), set())
     ggrc_admin = db.session.query(Role.id).filter(Role.name == "gGRC Admin")
     reader = db.session.query(Role.id).filter(Role.name == "Reader")
     creator = db.session.query(Role.id).filter(Role.name == "Creator")
@@ -217,9 +212,8 @@ class TestComprehensiveSheets(TestCase):
     self.assertEqual(len(creators), 6)
     self.assertEqual(len(access_groups), 10)
 
-    for block in response:
-      for message in messages:
-        self.assertEqual(set(), set(block[message]))
+    expected_errors = {}
+    self._check_response(response, expected_errors)
 
   def test_errors_and_warnings(self):
     """Test all possible errors and warnings.
@@ -228,7 +222,6 @@ class TestComprehensiveSheets(TestCase):
     incomplete.
     """
     response = self.import_file("import_with_all_warnings_and_errors.csv")
-
     expected_errors = {
         "Control": {
             "block_errors": set([
@@ -243,12 +236,7 @@ class TestComprehensiveSheets(TestCase):
         }
     }
 
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
-    for block in response:
-      for message in messages:
-        expected = expected_errors.get(block["name"], {}).get(message, set())
-        self.assertEqual(expected, set(block[message]))
+    self._check_response(response, expected_errors)
 
   def create_custom_attributes(self):
     """Generate custom attributes needed for comprehensive sheet."""
@@ -263,10 +251,21 @@ class TestComprehensiveSheets(TestCase):
 
   def test_case_sensitive_slugs(self):
     """Test that mapping with case sensitive slugs work."""
+    # response = self.import_file("case_sensitive_slugs.csv")
+    # expected_errors = {}
+    # self._check_response(response, expected_errors)
 
-    response = self.import_file("case_sensitive_slugs.csv")
+  def _check_response(self, response, expected_errors):
+    """Test that response contains all expected errors and warnigs.
 
-    expected_errors = {}
+    Args:
+      response: api response object.
+      expected_errors: dict of all expected errors by object type.
+
+    Raises:
+      AssertionError if an expected error or warning is not found in the
+        propper response block.
+    """
 
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
