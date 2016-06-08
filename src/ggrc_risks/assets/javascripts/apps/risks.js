@@ -140,28 +140,35 @@
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for risk page
   RisksExtension.init_widgets = function init_widgets() {
-    var page_instance = GGRC.page_instance(),
-        is_my_work = function is_my_work() {
-          return page_instance && page_instance.type === "Person";
-        },
-        related_or_owned = is_my_work() ? 'owned_' : 'related_',
-        sorted_widget_types = _.sortBy(_risk_object_types, function(type) {
-          var model = CMS.Models[type] || {};
-          return model.title_plural || type;
-        });
+    var page_instance = GGRC.page_instance();
+    var is_my_work = function () {
+      return page_instance && page_instance.type === 'Person';
+    };
+
+    var related_or_owned = is_my_work() ? 'owned_' : 'related_';
+    var sorted_widget_types = _.sortBy(_risk_object_types, function (type) {
+      var model = CMS.Models[type] || {};
+      return model.title_plural || type;
+    });
+    var baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
+    var moduleObjectNames = ['Risk', 'Threat'];
+    var extendedModuleTypes = _risk_object_types.concat(moduleObjectNames);
+
     if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
       related_or_owned = 'all_';
     }
     // Init widget descriptors:
     can.each(sorted_widget_types, function (model_name) {
-      var widgets_by_type = GGRC.tree_view.base_widgets_by_type,
-          model;
+      var model;
 
-      if (model_name === "MultitypeSearch" || !widgets_by_type[model_name]) {
+      if (model_name === "MultitypeSearch" || !baseWidgetsByType[model_name]) {
         return;
       }
       model = CMS.Models[model_name];
-      widgets_by_type[model_name] = widgets_by_type[model_name].concat(["Risk", "Threat"]);
+
+      // First we add Risk and Threat to other object's maps
+      baseWidgetsByType[model_name] = baseWidgetsByType[model_name].concat(
+        moduleObjectNames);
 
       related_object_descriptors[model_name] = {
         content_controller: CMS.Controllers.TreeView,
@@ -180,6 +187,37 @@
         }
       };
     });
+
+    // Add risk and Threat to base widget types
+    can.each(moduleObjectNames, function (obj) {
+      GGRC.tree_view.base_widgets_by_type[obj] = extendedModuleTypes;
+    });
+
+    // Set up tree_view.basic_model_list and tree_view.sub_tree_for
+    can.each(moduleObjectNames, function (name) {
+      var widgetList = baseWidgetsByType[name].sort();
+      var child_model_list = [];
+
+      GGRC.tree_view.basic_model_list.push({
+        model_name: name,
+        display_name: CMS.Models[name].title_singular
+      });
+
+      can.each(widgetList, function (item) {
+        if (extendedModuleTypes.indexOf(item) !== -1) {
+          child_model_list.push({
+            model_name: item,
+            display_name: CMS.Models[item].title_singular
+          });
+        }
+      });
+
+      GGRC.tree_view.sub_tree_for[name] = {
+        model_list: child_model_list,
+        display_list: CMS.Models[name].tree_view_options.child_tree_display_list || widgetList
+      };
+    });
+
     threat_descriptor = {
       content_controller: CMS.Controllers.TreeView,
       content_controller_selector: "ul",
