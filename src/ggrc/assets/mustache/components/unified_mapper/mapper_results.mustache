@@ -8,7 +8,7 @@
 <div class="filter-actions wrap-modal-spacing">
   <div class="row-fluid">
     <div class="span12">
-      <a class="btn btn-small btn-info pull-right modalSearchButton {{#loading_or_saving}}disabled{{/loading_or_saving}}" href="javascript://">
+      <a class="btn btn-small btn-info pull-right modalSearchButton {{#inProgress}}disabled{{/inProgress}}" href="javascript://">
         Search
       </a>
     </div>
@@ -25,16 +25,21 @@
       <div class="span3">
         {{^if mapper.search_only}}
         <div class="pull-right check-all">
+          <spinner toggle="is_loading"></spinner>
+          Select:
             <a
               href="#"
+              class="object-uncheck-all {{#inProgress}}disabled{{/inProgress}}"
+              can-click="unselectAll"
+              >None</a>,
+            <a
+              href="#"
+              can-click="selectAll"
+              class="object-check-all {{#allSelected}}disabled{{/allSelected}}"
               rel="tooltip"
-              class="object-check-all
-                {{#if_helpers '\
-                  #if' loading_or_saving '\
-                  or #if' mapper.all_selected}}disabled{{/if}}"
               data-placement="right"
-              data-original-title="Mapping more than 100 items may take a long time to process. Please consider refining your search criteria."
-              >Select all</a>
+              data-original-title="Processing more than 100 items may take long time. Please consider refining your search criteria."
+              >All</a>
           </label>
         </div>
         {{/if}}
@@ -49,10 +54,8 @@
         {{> /static/mustache/selectors/object_selector_option_items.mustache}}
       {{/if}}
     </ul>
-    {{#if page_loading}}
-      <div class="row-fluid clearfix">
-        <span {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
-      </div>
-    {{/if}}
+    <div class="row-fluid centered clearfix">
+      <spinner size="large" toggle="page_loading"></spinner>
+    </div>
   </div>
 </div>
