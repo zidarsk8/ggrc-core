@@ -31,7 +31,7 @@
       _.each(['mapping', 'itemTemplate'], function (prop) {
         if (!this.scope.attr(prop)) {
           this.scope.attr(prop,
-            el.attr(can.dashCaseToCamelCase(prop)));
+            el.attr(can.camelCaseToDashCase(prop)));
         }
       }, this);
     },
