@@ -89,13 +89,13 @@
         _canonical: {
           "related_objects_as_source": ['Risk'].concat(_risk_object_types)
         },
-        related_risks: TypeFilter("related_objects", "Risk"),
+        related_risks: TypeFilter("related_objects", "Risk")
       },
       related_threat: {
         _canonical: {
           "related_objects_as_source": ['Threat'].concat(_risk_object_types)
         },
-        related_threats: TypeFilter("related_objects", "Threat"),
+        related_threats: TypeFilter("related_objects", "Threat")
       },
       ownable: {
         owners: Proxy(
@@ -103,7 +103,7 @@
       },
       Risk: {
         _mixins: ['related', 'related_objects', 'related_threat', 'ownable'],
-        orphaned_objects: Multi([]),
+        orphaned_objects: Multi([])
       },
       Threat: {
         _mixins: ['related', 'related_objects', 'related_risk', 'ownable'],
@@ -132,6 +132,32 @@
     new GGRC.Mappings("ggrc_risks", mappings);
   };
 
+  var treeViewDepth = 2;
+  var relatedObjectsChildOptions = getRelatedObjectsChildOptions(treeViewDepth);
+  function getRelatedObjectsChildOptions(depth) {
+    if (!depth) {
+      return [];
+    }
+
+    var relatedObjects = {
+      model: can.Model.Cacheable,
+      mapping: "related_objects",
+      show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
+      draw_children: false
+    };
+
+    if (depth === 1) {
+      return $.extend(relatedObjects, {
+        child_options: [getRelatedObjectsChildOptions(depth - 1)]
+      });
+    }
+    return $.extend(relatedObjects, {
+      draw_children: true,
+      child_options: [getRelatedObjectsChildOptions(depth - 1)]
+    });
+  }
+
+  var isDrawChildren = treeViewDepth ? true : false;
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for risk page
   RisksExtension.init_widgets = function init_widgets() {
@@ -157,7 +183,6 @@
       }
       model = CMS.Models[model_name];
       widgets_by_type[model_name] = widgets_by_type[model_name].concat(["Risk", "Threat"]);
-
       related_object_descriptors[model_name] = {
         content_controller: CMS.Controllers.TreeView,
         content_controller_selector: "ul",
@@ -167,11 +192,11 @@
         widget_icon: model.table_singular,
         content_controller_options: {
           add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
-          child_options: [],
-          draw_children: false,
+          child_options: relatedObjectsChildOptions,
+          draw_children: isDrawChildren,
           parent_instance: page_instance,
           model: model,
-          mapping: "related_" + model.table_plural,
+          mapping: "related_" + model.table_plural
         }
       };
     });
@@ -183,8 +208,8 @@
       widget_name: CMS.Models.Threat.title_plural,
       widget_icon: CMS.Models.Threat.table_singular,
       content_controller_options: {
-        child_options: [],
-        draw_children: false,
+        child_options: relatedObjectsChildOptions,
+        draw_children: isDrawChildren,
         parent_instance: page_instance,
         model: CMS.Models.Threat,
         mapping: related_or_owned + CMS.Models.Threat.table_plural,
@@ -199,8 +224,8 @@
       widget_name: CMS.Models.Risk.title_plural,
       widget_icon: CMS.Models.Risk.table_singular,
       content_controller_options: {
-        child_options: [],
-        draw_children: false,
+        child_options: relatedObjectsChildOptions,
+        draw_children: isDrawChildren,
         parent_instance: page_instance,
         model: CMS.Models.Risk,
         mapping: related_or_owned + CMS.Models.Risk.table_plural,
@@ -253,7 +278,7 @@
       );
 
       new GGRC.WidgetList("ggrc_risks", {
-        Person: people_widgets,
+        Person: people_widgets
       });
   };
 
@@ -264,7 +289,7 @@
       if (page_instance && ~can.inArray(page_instance.constructor.shortName, _risk_object_types)) {
         descriptor[page_instance.constructor.shortName] = {
           risk: risk_descriptor,
-          threat: threat_descriptor,
+          threat: threat_descriptor
         };
       }
       new GGRC.WidgetList("ggrc_risks", descriptor);

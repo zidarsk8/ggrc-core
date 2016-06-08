@@ -85,4 +85,17 @@
         </div><!-- item-wrap end -->
       </div><!-- item-main end -->
 
+    {{#if expanded}}
+        <div class="tier-2-info item-content">
+            <div class="tier-2-info-content">
+              {{#if draw_children}}
+                {{#child_options}}
+                    <div class="inner-tree {{^if list.length}}hide{{/list}}">
+                        <ul class="tree-structure new-tree" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
+                              </div>
+                              {{/child_options}}
+                    {{/if}}
+                    </div>
+                        </div>
+                    {{/if}}
     </li>

@@ -4,7 +4,7 @@
     Created By: urban@reciprocitylabs.com
     Maintained By: urban@reciprocitylabs.com
 }}
-<div class="openclose">
+<div class="openclose{{^if draw_children}}__empty{{/if}}" >
   {{#if_instance_of instance "Cycle|CycleTaskGroup|CycleTaskGroupObjectTask"}}
     <span class="status-label" {{addclass "status-" instance.status}} {{addclass "status-" instance.overdue}}></span>
   {{else}}
@@ -14,5 +14,7 @@
       <span class="status-label"></span>
     {{/if}}
   {{/if_instance_of}}
-  <i class="fa fa-caret-right"></i>
+  {{#if draw_children}}
+      <i class="fa fa-caret-right"></i>
+  {{/if}}
 </div>
