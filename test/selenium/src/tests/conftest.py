@@ -10,6 +10,8 @@ import pytest   # pylint: disable=import-error
 from lib import constants
 from lib.page.widget import info_widget
 from lib.constants.test import batch
+from lib.service.rest_service import (ProgramsService, AuditsService,
+                                      ControlsService)
 from lib.utils import conftest_utils
 from lib.utils import test_utils
 
@@ -197,3 +199,24 @@ def battery_of_controls(selenium):
         selenium, constants.element.Lhn.CONTROLS))
 
   yield controls
+
+
+@pytest.yield_fixture(scope="function")
+def new_program_rest():
+  """Creates Program via REST API"""
+  service = ProgramsService()
+  yield service.create_programs(1)[0]
+
+
+@pytest.yield_fixture(scope="function")
+def new_audit_rest(new_program_rest):
+  """Creates Audit via REST API"""
+  service = AuditsService()
+  yield service.create_audits(1, program=new_program_rest)[0]
+
+
+@pytest.yield_fixture(scope="function")
+def new_control_rest():
+  """Creates Control via REST API"""
+  service = ControlsService()
+  yield service.create_controls(1)[0]
