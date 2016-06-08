@@ -136,11 +136,6 @@
         mapping: 'related_owned_requests',
         allow_creating: true,
         parent_find_param: 'audit.id'
-      }, {
-        model: 'Request',
-        mapping: 'related_mapped_requests',
-        allow_creating: false,
-        parent_find_param: 'audit.id'
       }]
     },
     init: function () {
