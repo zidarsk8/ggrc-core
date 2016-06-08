@@ -8,27 +8,23 @@
 {{!  multiple instances case }}
 {{^is_dashboard}}
   {{#with_page_object_as 'page_instance'}}
-    {{^if_equals parent_instance page_instance}}
-      {{#^if multiple_mapping_case}}
-        {{#with_direct_mappings_as 'mappings' page_instance instance}}
-          {{^if_equals page_instance instance}}
-          {{#is_allowed_to_map page_instance instance join=true}}
-          {{#if mappings.length}}
-            {{#is_allowed_all 'delete' mappings}}
-              <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make Relevant">
-                {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
-                <i class="fa fa-check-square-o"></i>
-              </a>
-            {{/is_allowed_all}}
-          {{else}}
-            <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}} rel="tooltip" data-placement="left" data-original-title="Make Relevant">
-              <i class="fa fa-square-o"></i>
+    {{^if_equals instance page_instance}}
+      {{#with_direct_mappings_as 'mappings' page_instance instance}}
+        {{#is_allowed_to_map page_instance instance join=true}}
+        {{#if mappings.length}}
+          {{#is_allowed_all 'delete' mappings}}
+            <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make Relevant">
+              {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
+              <i class="fa fa-check-square-o"></i>
             </a>
-          {{/if}}
-          {{/is_allowed_to_map}}
-          {{/if_equals}}
-        {{/with_direct_mapping_as}}
-      {{/if}}
+          {{/is_allowed_all}}
+        {{else}}
+          <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}} rel="tooltip" data-placement="left" data-original-title="Make Relevant">
+            <i class="fa fa-square-o"></i>
+          </a>
+        {{/if}}
+        {{/is_allowed_to_map}}
+      {{/with_direct_mapping_as}}
     {{/if_equals}}
   {{/with_page_object_as}}
 {{/is_dashboard}}
