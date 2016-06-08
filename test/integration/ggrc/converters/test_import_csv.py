@@ -32,10 +32,12 @@ class TestBasicCsvImport(converters.TestCase):
     self.import_file(filename)
     self.assertEqual(models.Policy.query.count(), 3)
 
-  def test_policy_import_working_with_warnings_dry_run(self):
+  def test_policy_import_working_with_warnings(self):
+    def test_owners(policy):
+      self.assertNotEqual([], policy.owners)
+      self.assertEqual("user@example.com", policy.owners[0].email)
     filename = "policy_import_working_with_warnings.csv"
-
-    response_json = self.import_file(filename, dry_run=True)
+    response_json = self.import_file(filename)
 
     expected_warnings = set([
         errors.UNKNOWN_USER_WARNING.format(line=3, email="miha@policy.com"),
@@ -50,15 +52,6 @@ class TestBasicCsvImport(converters.TestCase):
     response_errors = response_json[0]["row_errors"]
     self.assertEqual(set(), set(response_errors))
     self.assertEqual(4, response_json[0]["created"])
-    policies = models.Policy.query.all()
-    self.assertEqual(len(policies), 0)
-
-  def test_policy_import_working_with_warnings(self):
-    def test_owners(policy):
-      self.assertNotEqual([], policy.owners)
-      self.assertEqual("user@example.com", policy.owners[0].email)
-    filename = "policy_import_working_with_warnings.csv"
-    self.import_file(filename)
 
     policies = models.Policy.query.all()
     self.assertEqual(len(policies), 4)
