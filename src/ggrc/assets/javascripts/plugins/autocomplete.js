@@ -263,22 +263,22 @@
 
       $ul.unbind('scrollNext')
         .bind('scrollNext', function (ev, data) {
-          if (this.scroll_op_in_progress) {
+          if (context.attr('scroll_op_in_progress')) {
             return;
           }
-          this.scroll_op_in_progress = true;
+          context.attr('scroll_op_in_progress', true);
           this.last_request = this.last_request || {};
           this.last_request.start = this.last_request.start || 0;
           this.last_request.start += MAX_RESULTS;
           context.attr('items_loading', true);
           this.source(this.last_request, function (items) {
-            context.items.push.apply(context.items, can.map(items, function (item) {
+            context.attr('items').concat(can.map(items, function (item) {
               return item.item;
             }));
             context.removeAttr('items_loading');
-            setTimeout(function () {
-              this.scroll_op_in_progress = undefined;
-            }.bind(this), 10);
+            _.defer(function () {
+              context.attr('scroll_op_in_progress', false);
+            });
           });
         }.bind(this));
 
