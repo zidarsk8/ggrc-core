@@ -10,7 +10,8 @@
 
   var MapperModel = GGRC.Models.MapperModel = can.Map({
     type: 'AllObject', // We set default as All Object
-    contact: {},
+    contact: null,
+    contactEmail: null,
     deferred: '@',
     deferred_to: '@',
     term: '',
@@ -34,6 +35,14 @@
         this.attr('join_object_id')
       );
     }),
+
+    setContact: function (scope, el, ev) {
+      this.attr('contact', ev.selectedItem);
+
+      _.defer(function () {
+        this.attr('contactEmail', ev.selectedItem.email);
+      }.bind(this));
+    },
 
     get_binding_name: function (instance, plural) {
       return (instance.has_binding(plural) ? '' : 'related_') + plural;
@@ -362,7 +371,8 @@
       },
       '{mapper} type': function () {
         this.scope.attr('mapper.term', '');
-        this.scope.attr('mapper.contact', {});
+        this.scope.attr('mapper.contact', null);
+        this.scope.attr('mapper.contactEmail', null);
         if (!this.scope.attr('mapper.getList')) {
           this.scope.attr('mapper.relevant').replace([]);
         }

@@ -112,20 +112,14 @@
     <div class="span4">
       <h6>Filter by owner or contact</h6>
       <div class="modal-search objective-selector">
-          {{#mapper.contact}}
-          <input
-            id="search-by-owner"
-            class="search-by-owner input-block-level"
-            placeholder="Find owner or contact"
-            type="text"
-            name="contact"
-            value="{{firstnonempty name email title}}"
-            data-lookup="Person"
-            data-template="/people/autocomplete_result.mustache"
-            null-if-empty="null-if-empty"
-            {{ autocomplete_select }}
-          >
-          {{/mapper.contact}}
+        <autocomplete
+          search-items-type="Person"
+          can-item-selected="mapper.setContact"
+          disable="mapper.is_saving"
+          placeholder="Find owner or contact"
+          value="mapper.contactEmail"
+          class-name="search-by-owner input-block-level"
+        ></autocomplete>
       </div>
     </div>
   </div>
