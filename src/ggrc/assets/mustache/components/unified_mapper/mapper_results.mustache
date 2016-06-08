@@ -25,12 +25,13 @@
       <div class="span3">
         {{^if mapper.search_only}}
         <div class="pull-right check-all">
+          <spinner toggle="is_loading"></spinner>
           Select:
             <a
               href="#"
               class="object-uncheck-all {{#inProgress}}disabled{{/inProgress}}"
               can-click="unselectAll"
-              >None</a>
+              >None</a>,
             <a
               href="#"
               can-click="selectAll"
@@ -53,10 +54,8 @@
         {{> /static/mustache/selectors/object_selector_option_items.mustache}}
       {{/if}}
     </ul>
-    {{#if page_loading}}
-      <div class="row-fluid clearfix">
-        <span {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
-      </div>
-    {{/if}}
+    <div class="row-fluid centered clearfix">
+      <spinner size="large" toggle="page_loading"></spinner>
+    </div>
   </div>
 </div>

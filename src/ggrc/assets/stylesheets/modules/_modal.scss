@@ -257,7 +257,11 @@
     margin-bottom: 30px;
   }
   .check-all {
+    color: $gray;
     margin-right: 15px;
+    .spinner {
+      color: $black;
+    }
     .disabled {
       color: $gray;
       &:hover {
