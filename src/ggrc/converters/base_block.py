@@ -9,6 +9,7 @@ from collections import Counter
 from flask import current_app
 
 from ggrc import db
+from ggrc.utils import structures
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters.base_row import RowConverter
@@ -64,7 +65,9 @@ class BlockConverter(object):
     classes = sharing_rules.get(object_class, object_class)
     shared_state = self.converter.shared_state
     if classes not in shared_state:
-      shared_state[classes] = defaultdict(lambda: defaultdict(list))
+      shared_state[classes] = defaultdict(
+          lambda: structures.CaseInsensitiveDefaultDict(list)
+      )
     return shared_state[classes]
 
   def __init__(self, converter, **options):

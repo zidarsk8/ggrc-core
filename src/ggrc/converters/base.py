@@ -6,6 +6,7 @@
 from collections import defaultdict
 
 from ggrc import settings
+from ggrc.utils import structures
 from ggrc.cache.memcache import MemCache
 from ggrc.converters import get_exportables
 from ggrc.converters.base_block import BlockConverter
@@ -45,7 +46,7 @@ class Converter(object):
     self.csv_data = kwargs.get("csv_data", [])
     self.ids_by_type = kwargs.get("ids_by_type", [])
     self.block_converters = []
-    self.new_objects = defaultdict(dict)
+    self.new_objects = defaultdict(structures.CaseInsensitiveDict)
     self.shared_state = {}
     self.response_data = []
     self.exportable = get_exportables()
