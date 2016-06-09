@@ -390,17 +390,17 @@ def update_cycle_task_parent_state(obj):  # noqa
     elif obj.status in {"Finished", "Verified", "Assigned"}:
       children_attrs = _cycle_task_children_attr.get(type(parent), [])
       for children_attr in children_attrs:
-        if children_attr:
-          children = getattr(parent, children_attr, None)
-          if not len(children):
-            continue
-          children_statues = [c.status for c in children]
-          # Check if all parent's children have the same status
-          all_equal = lambda lst, st: lst[0] == st and len(set(lst)) == 1
-          for status in ["Verified", "Finished", "Assigned"]:
-            if all_equal(children_statues, status):
-              new_status = status
-              update_parent(parent, old_status, new_status)
+        children = getattr(parent, children_attr, None)
+        if not len(children):
+          continue
+
+        children_statues = [c.status for c in children]
+        # Check if all parent's children have the same status
+        all_equal = lambda lst, st: lst[0] == st and len(set(lst)) == 1
+        for status in ["Verified", "Finished", "Assigned"]:
+          if all_equal(children_statues, status):
+            new_status = status
+            update_parent(parent, old_status, new_status)
 
 
 def ensure_assignee_is_workflow_member(workflow, assignee):
