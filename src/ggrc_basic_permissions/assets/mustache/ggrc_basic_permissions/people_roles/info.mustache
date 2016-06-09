@@ -60,19 +60,6 @@
             View Profile Page
           </a>
         </li>
-        {{#is_allowed 'delete' instance}}
-          <li>
-            <a data-modal-reset="reset" data-modal-class="modal"
-               data-object-id="{{instance.id}}" href="javascript://"
-               data-object-plural="{{instance.class.model_plural}}"
-               data-object-singular="{{instance.class.model_singular}}"
-               data-test-id="dropdown_delete_0839163b"
-               data-toggle="modal-ajax-deleteform">
-              <i class="fa fa-trash"></i>
-              Delete
-            </a>
-          </li>
-        {{/is_allowed}}
       </ul>
     </div>
   </div>
