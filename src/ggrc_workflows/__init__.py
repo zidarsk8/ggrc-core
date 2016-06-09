@@ -395,16 +395,11 @@ def update_cycle_task_parent_state(obj):  # noqa
           children = getattr(parent, children_attr, None)
           if not len(children):
             continue
-          children_finished = True
-          children_verified = True
-          children_assigned = True
-          for child in children:
-            if child.status != "Verified":
-              children_verified = False
-              if child.status != "Finished":
-                children_finished = False
-                if child.status != "Assigned":
-                  children_assigned = False
+          statuses = [c.status for c in children]
+          all_equal = lambda lst, st: lst[0] == st and len(set(lst)) == 1
+          children_finished = all_equal(statuses, "Finished")
+          children_verified = all_equal(statuses, "Verified")
+          children_assigned = all_equal(statuses, "Assigned")
           if children_verified:
             new_status = "Verified"
             update_parent(parent, old_status, new_status)
