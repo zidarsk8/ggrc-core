@@ -38,7 +38,6 @@ permissions = {
         "Request",
         "Assessment",
         "Issue",
-        "Comment"
     ],
     "delete": [
         "Request",
