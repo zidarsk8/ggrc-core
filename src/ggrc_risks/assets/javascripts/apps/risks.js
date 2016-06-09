@@ -188,13 +188,12 @@
       };
     });
 
-    // Add risk and Threat to base widget types
-    can.each(moduleObjectNames, function (obj) {
-      GGRC.tree_view.base_widgets_by_type[obj] = extendedModuleTypes;
-    });
-
-    // Set up tree_view.basic_model_list and tree_view.sub_tree_for
+    // Add risk and Threat to base widget types and set up
+    // tree_view.basic_model_list and tree_view.sub_tree_for for risk module
+    // objects
     can.each(moduleObjectNames, function (name) {
+      baseWidgetsByType[name] = extendedModuleTypes;
+
       var widgetList = baseWidgetsByType[name].sort();
       var child_model_list = [];
 
