@@ -1146,12 +1146,26 @@
     },
 
     /**
-     * Initialize the newly created object instance. Essentially just validate
-     * that its title is non-blank.
+     * Initialize the newly created object instance. Validate that its title is
+     * non-blank and its default assessors / verifiers lists are set if
+     * applicable.
      */
     init: function () {
       this._super.apply(this, arguments);
       this.validateNonBlank('title');
+
+      this.validateListNonBlank(
+        'assessorsList',
+        function () {
+          return this.attr('default_people.assessors') === 'other';
+        }
+      );
+      this.validateListNonBlank(
+        'verifiersList',
+        function () {
+          return this.attr('default_people.verifiers') === 'other';
+        }
+      );
     }
   }, {
     // the object types that are not relevant to the AssessmentTemplate,

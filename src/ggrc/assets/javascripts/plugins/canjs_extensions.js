@@ -35,6 +35,35 @@
       });
     };
 
+  /**
+   * Validate an autocomplete list field to be not blank.
+   *
+   * It checks in the field contains either a false-value, or a
+   * non-constructor, or a constructor that builds an empty object and if so,
+   * returns a non_blank error message.
+   *
+   * @param {String} listFieldName - the name of the field with the
+   * autocomplete list
+   * @param {Function} condition - a zero-parameter function; the validation
+   * will be fired only if condition returns true or is undefined
+   * @param {Object} options - a CanJS options argument passed to CanJS
+   * validate function
+   *
+   */
+  can.Model.validateListNonBlank =
+    can.Map.validateListNonBlank = function (listFieldName, condition,
+                                             options) {
+      this.validate(listFieldName, options, function (newVal, prop) {
+        if (_.isUndefined(condition) || condition.call(this)) {
+          if (!newVal ||
+              !_.isFunction(newVal.attr) ||
+              _.isEmpty(newVal.attr())) {
+            return this.constructor.validationMessages.non_blank;
+          }
+        }
+      });
+    };
+
   // Adding reduce, a generally useful array comprehension.
   //  Bitovi decided against including it in core CanJS, but
   //  adding it here for easy universal use across can.List
