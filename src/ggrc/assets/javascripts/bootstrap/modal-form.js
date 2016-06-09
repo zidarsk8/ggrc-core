@@ -27,12 +27,15 @@
   $.extend(ModalForm.prototype, {
 
     init: function () {
-      var that = this;
-
       this.$element
         .on('preload', function () {
-          that.is_form_dirty(true);
-        })
+          this.is_form_dirty(true);
+          this.control = this.$element.control();
+          if (this.control.options && this.control.options.instance) {
+            this.instance = this.control.options.instance;
+            this.instance.backup();
+          }
+        }.bind(this))
         .on('keypress', 'form', $.proxy(this.keypress_submit, this))
         .on('keyup', 'form', $.proxy(this.keyup_escape, this))
         .on('click.modal-form.close', '[data-dismiss="modal"]', $.proxy(this.hide, this))
@@ -159,10 +162,10 @@
 
     hide: function (e) {
       var that = this;
-      var control = this.$element.control();
+      var control = this.control;
       var options = control && control.options;
 
-        // If the hide was initiated by the backdrop, check for dirty form data before continuing
+      // If the hide was initiated by the backdrop, check for dirty form data before continuing
       if (e && $(e.target).is('.modal-backdrop')) {
         if ($(e.target).is('.disabled')) {
             // In the case of a disabled modal backdrop, treat it like any other disabled data-dismiss,
@@ -170,7 +173,7 @@
           e.stopPropagation();
           return;
         }
-        if (this.is_form_dirty()) {
+        if (this.is_form_dirty() || this.instance && this.instance.isDirty()) {
             // Confirm that the user wants to lose the data prior to hiding
           GGRC.Controllers.Modals.confirm({
             modal_title: 'Discard Changes',
@@ -221,7 +224,7 @@
     }
   });
 
-  $.fn.modal_form = function (option, trigger) {
+  $.fn.modal_form = function (option, trigger, params) {
     return this.each(function () {
       var $this = $(this);
       var data = $this.data('modal_form');
