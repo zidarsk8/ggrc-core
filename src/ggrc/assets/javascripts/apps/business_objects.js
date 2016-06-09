@@ -609,6 +609,7 @@
           Issue: {
             mapping: "related_issues",
             footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+            add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
           },
           Audit: {
             mapping: "related_audits",
