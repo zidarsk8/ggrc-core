@@ -391,7 +391,7 @@ def update_cycle_task_parent_state(obj):  # noqa
       children_attrs = _cycle_task_children_attr.get(type(parent), [])
       for children_attr in children_attrs:
         children = getattr(parent, children_attr, None)
-        if not len(children):
+        if not children:
           continue
 
         children_statues = [c.status for c in children]
