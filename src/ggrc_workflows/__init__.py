@@ -352,6 +352,14 @@ def update_cycle_task_child_state(obj):
 def update_cycle_task_parent_state(obj):  # noqa
   """Propagate changes to obj's parents"""
 
+  def send_signal(parent, old_status):
+    Signals.status_change.send(
+        parent.__class__,
+        obj=parent,
+        new_status=parent.status,
+        old_status=old_status
+    )
+
   parent_attrs = _cycle_task_parent_attr.get(type(obj), [])
   for parent_attr in parent_attrs:
     if not parent_attr:
@@ -374,12 +382,7 @@ def update_cycle_task_parent_state(obj):  # noqa
           old_status = parent.status
           parent.status = 'InProgress'
           db.session.add(parent)
-          Signals.status_change.send(
-              parent.__class__,
-              obj=parent,
-              new_status=parent.status,
-              old_status=old_status
-          )
+          send_signal(parent, old_status)
         update_cycle_task_parent_state(parent)
     # If all children are `Finished` or `Verified`, then parent should be same
     elif (obj.status == 'Finished' or
@@ -403,36 +406,21 @@ def update_cycle_task_parent_state(obj):  # noqa
                                  parent.id, parent.context.id):
               old_status = parent.status
               parent.status = 'Verified'
-              Signals.status_change.send(
-                  parent.__class__,
-                  obj=parent,
-                  new_status=parent.status,
-                  old_status=old_status
-              )
+              send_signal(parent, old_status)
             update_cycle_task_parent_state(parent)
           elif children_finished and len(children) > 0:
             if is_allowed_update(parent.__class__.__name__,
                                  parent.id, parent.context.id):
               old_status = parent.status
               parent.status = 'Finished'
-              Signals.status_change.send(
-                  parent.__class__,
-                  obj=parent,
-                  new_status=parent.status,
-                  old_status=old_status
-              )
+              send_signal(parent, old_status)
             update_cycle_task_parent_state(parent)
           elif children_assigned and len(children) > 0:
             if is_allowed_update(parent.__class__.__name__,
                                  parent.id, parent.context.id):
               old_status = parent.status
               parent.status = "Assigned"
-              Signals.status_change.send(
-                  parent.__class__,
-                  obj=parent,
-                  new_status=parent.status,
-                  old_status=old_status
-              )
+              send_signal(parent, old_status)
               update_cycle_task_parent_state(parent)
 
 
