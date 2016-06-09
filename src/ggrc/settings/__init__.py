@@ -24,7 +24,9 @@ BOWER_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'bower_components'))
 from default import *
 
 SETTINGS_MODULE = os.environ.get("GGRC_SETTINGS_MODULE", '')
-CUSTOM_URL_ROOT = os.environ.get("GGRC_CUSTOM_URL_ROOT", None)
+CUSTOM_URL_ROOT = os.environ.get("GGRC_CUSTOM_URL_ROOT")
+ABOUT_URL = os.environ.get("GGRC_ABOUT_URL")
+ABOUT_TEXT = os.environ.get("GGRC_ABOUT_TEXT")
 
 if len(SETTINGS_MODULE.strip()) == 0:
   raise RuntimeError(
