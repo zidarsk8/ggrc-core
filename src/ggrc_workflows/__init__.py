@@ -353,6 +353,7 @@ def update_cycle_task_parent_state(obj):  # noqa
   """Propagate changes to obj's parents"""
 
   def update_parent(parent, old_status, new_status):
+    """Update a parent element and emit a signal about the change"""
     parent.status = new_status
     db.session.add(parent)
     Signals.status_change.send(
@@ -395,10 +396,10 @@ def update_cycle_task_parent_state(obj):  # noqa
           continue
 
         children_statues = [c.status for c in children]
-        # Check if all parent's children have the same status
-        all_equal = lambda lst, st: lst[0] == st and len(set(lst)) == 1
+        unique_statuses = set(children_statues)
         for status in ["Verified", "Finished", "Assigned"]:
-          if all_equal(children_statues, status):
+          # Check if all elements match a certain state
+          if children_statues[0] == status and len(unique_statuses) == 1:
             new_status = status
             update_parent(parent, old_status, new_status)
 
