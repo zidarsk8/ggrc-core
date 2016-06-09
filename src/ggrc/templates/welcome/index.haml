@@ -39,4 +39,6 @@
           %a.btn.btn-large.btn-info{:href => "/dashboard"} Login
           %br
           %br
-          %a.about-link{:href => "http://goto.google.com/ggrc", :target => "_blank"} About gGRC
+          -if about_url
+            %a.about-link{:href => "{{about_url}}", :target => "_blank"}
+              {{about_text}}
