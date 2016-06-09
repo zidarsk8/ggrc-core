@@ -944,8 +944,7 @@ class Resource(ModelView):
 
     database_objs = {}
     if len(database_matches) > 0:
-      with benchmark("Query database for resources"):
-        database_objs = self.get_resources_from_database(matches)
+      database_objs = self.get_resources_from_database(matches)
       if self.has_cache():
         with benchmark("Add resources to cache"):
           self.add_resources_to_cache(database_objs)
@@ -1301,13 +1300,17 @@ class Resource(ModelView):
     # FIXME: This is cheating -- `matches` should be allowed to be any model
     model = self.model
     ids = {m[0]: m for m in matches}
-    query = model.eager_query()
-    objs = query.filter(model.id.in_(ids.keys()))
-    resources = {}
-    includes = self.get_properties_to_include(request.args.get('__include'))
-    for obj in objs:
-      resources[ids[obj.id]] = ggrc.builder.json.publish(obj, includes)
-    ggrc.builder.json.publish_representation(resources)
+    with benchmark("Query database for matches"):
+      query = model.eager_query()
+      # We force the query here so that we can benchmark it
+      objs = query.filter(model.id.in_(ids.keys())).all()
+    with benchmark("Publish objects"):
+      resources = {}
+      includes = self.get_properties_to_include(request.args.get('__include'))
+      for obj in objs:
+        resources[ids[obj.id]] = ggrc.builder.json.publish(obj, includes)
+    with benchmark("Publish representation"):
+      ggrc.builder.json.publish_representation(resources)
     return resources
 
   def build_collection_representation(self, objs, extras=None):
