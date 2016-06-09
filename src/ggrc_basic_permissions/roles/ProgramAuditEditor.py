@@ -61,7 +61,6 @@ permissions = {
             "condition": "contains"
         },
         "Request",
-        "Comment",
         "Audit",
         "AuditObject",
         "Meeting",
