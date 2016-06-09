@@ -500,6 +500,13 @@ class CheckboxColumnHandler(ColumnHandler):
       current_app.logger.error(error)
 
 
+class KeyControlColumnHandler(CheckboxColumnHandler):
+
+  ALLOWED_VALUES = {"key", "non-key", "--", "---"}
+  TRUE_VALUES = {"key"}
+  NONE_VALUES = {"--", "---"}
+
+
 class ParentColumnHandler(ColumnHandler):
 
   """ handler for directly mapped columns """

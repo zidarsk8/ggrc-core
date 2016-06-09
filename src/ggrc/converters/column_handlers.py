@@ -27,7 +27,7 @@ GGRC_COLUMN_HANDLERS = {
     "end_date": handlers.DateColumnHandler,
     "fraud_related": handlers.CheckboxColumnHandler,
     "is_enabled": handlers.CheckboxColumnHandler,
-    "key_control": handlers.CheckboxColumnHandler,
+    "key_control": handlers.KeyControlColumnHandler,
     "kind": handlers.OptionColumnHandler,
     "link": handlers.TextColumnHandler,
     "means": handlers.OptionColumnHandler,
