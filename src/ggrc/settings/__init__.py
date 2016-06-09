@@ -6,22 +6,27 @@
 """Settings for Flask and Flask-SQLAlchemy
 
 Flask: http://flask.pocoo.org/docs/config/
-Flask-SQLAlchemy: https://github.com/mitsuhiko/flask-sqlalchemy/blob/master/docs/config.rst
+Flask-SQLAlchemy:
+  https://github.com/mitsuhiko/flask-sqlalchemy/blob/master/docs/config.rst
 
 Default settings should go in `settings.default`.
 
-Environment/deployment-specific settings should go in `settings.<environment_name>`.
+Environment/deployment-specific settings should go in
+`settings.<environment_name>`.
 """
 
 import os
 
-BASE_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..'))
+BASE_DIR = os.path.realpath(os.path.join(
+    os.path.dirname(__file__), '..', '..'))
 MODULE_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 SETTINGS_DIR = os.path.join(BASE_DIR, 'ggrc', 'settings')
 THIRD_PARTY_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'third_party'))
 BOWER_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'bower_components'))
 
-from default import *
+from ggrc.settings.default import *  # noqa
+from ggrc.settings.default import exports  # noqa
+from ggrc.settings.default import EXTENSIONS  # noqa
 
 SETTINGS_MODULE = os.environ.get("GGRC_SETTINGS_MODULE", '')
 CUSTOM_URL_ROOT = os.environ.get("GGRC_CUSTOM_URL_ROOT")
@@ -29,14 +34,12 @@ ABOUT_URL = os.environ.get("GGRC_ABOUT_URL")
 ABOUT_TEXT = os.environ.get("GGRC_ABOUT_TEXT")
 
 if len(SETTINGS_MODULE.strip()) == 0:
-  raise RuntimeError(
-    "Specify your settings using the `GGRC_SETTINGS_MODULE` environment variable")
+  raise RuntimeError("Specify your settings using the `GGRC_SETTINGS_MODULE` "
+                     "environment variable")
 
 for module_name in SETTINGS_MODULE.split(" "):
   if len(module_name.strip()) == 0:
     continue
-
-  #logging.info("Loading settings file: {0}".format(module_name))
 
   filename = "{0}.py".format(module_name)
   fullpath = os.path.join(SETTINGS_DIR, filename)
@@ -63,7 +66,5 @@ for module_name in SETTINGS_MODULE.split(" "):
       _exports += exports
     exports = _exports
     del _exports
-  except Exception, e:
+  except Exception:
     raise
-
-#logging.info("SQLALCHEMY_DATABASE_URI: {0}".format(locals().get("SQLALCHEMY_DATABASE_URI", None)))
