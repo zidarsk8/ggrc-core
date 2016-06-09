@@ -63,6 +63,20 @@
         data: JSON.stringify(request.data || {})
       });
     },
+    hasPending: function (parentInstance, instance, how) {
+      var list = parentInstance._pending_joins;
+      how = how || 'add';
+
+      if (!list || !list.length) {
+        return false;
+      }
+      if (list instanceof can.List) {
+        list = list.serialize();
+      }
+      return _.find(list, function (pending) {
+        return pending.how === how && pending.what === instance;
+      });
+    },
     is_mapped: function (target, destination, mapping) {
       var tablePlural;
       var bindings;
