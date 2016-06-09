@@ -706,12 +706,10 @@ def handle_program_put(sender, obj=None, src=None, service=None):
       db.session.flush()
 
 
-@Resource.model_posted.connect_via(Audit)
-def handle_audit_post(sender, obj=None, src=None, service=None):
-  db.session.flush()
+def create_audit_context(audit):
   # Create an audit context
-  context = obj.build_object_context(
-      context=obj.context,
+  context = audit.build_object_context(
+      context=audit.context,
       name='Audit Context {timestamp}'.format(
           timestamp=datetime.datetime.now()),
       description='',
@@ -722,7 +720,7 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
 
   # Create the program -> audit implication
   db.session.add(ContextImplication(
-      source_context=obj.context,
+      source_context=audit.context,
       context=context,
       source_context_scope='Program',
       context_scope='Audit',
@@ -732,13 +730,13 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   # Create the audit -> program implication
   db.session.add(ContextImplication(
       source_context=context,
-      context=obj.context,
+      context=audit.context,
       source_context_scope='Audit',
       context_scope='Program',
       modified_by=get_current_user(),
   ))
 
-  db.session.add(obj)
+  db.session.add(audit)
 
   # Create the role implication for Auditor from Audit for default context
   db.session.add(ContextImplication(
@@ -751,7 +749,14 @@ def handle_audit_post(sender, obj=None, src=None, service=None):
   db.session.flush()
 
   # Place the audit in the audit context
-  obj.context = context
+  audit.context = context
+
+
+@Resource.model_posted.connect_via(Audit)
+def handle_audit_post(sender, obj=None, src=None, service=None):
+  if not src.get("operation", None):
+    db.session.flush()
+    create_audit_context(obj)
 
 
 @Resource.model_deleted.connect

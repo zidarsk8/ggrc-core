@@ -69,6 +69,7 @@
     create: 'POST /api/audits',
     mixins: ['contactable', 'unique_title'],
     is_custom_attributable: true,
+    is_clonable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       program: 'CMS.Models.Program.stub',
@@ -166,6 +167,14 @@
     object_model: can.compute(function () {
       return CMS.Models[this.attr('object_type')];
     }),
+    clone: function (options) {
+      var model = CMS.Models.Audit;
+      return new model({
+        operation: 'clone',
+        cloneOptions: options.cloneOptions,
+        context: this.context
+      });
+    },
     save: function () {
       // Make sure the context is always set to the parent program
       if (!this.context || !this.context.id) {
