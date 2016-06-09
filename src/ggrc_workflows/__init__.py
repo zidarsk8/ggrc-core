@@ -382,18 +382,22 @@ def update_cycle_task_parent_state(obj):  # noqa
           )
         update_cycle_task_parent_state(parent)
     # If all children are `Finished` or `Verified`, then parent should be same
-    elif obj.status == 'Finished' or obj.status == 'Verified':
+    elif (obj.status == 'Finished' or
+          obj.status == 'Verified' or obj.status == "Assigned"):
       children_attrs = _cycle_task_children_attr.get(type(parent), [])
       for children_attr in children_attrs:
         if children_attr:
           children = getattr(parent, children_attr, None)
           children_finished = True
           children_verified = True
+          children_assigned = True
           for child in children:
             if child.status != 'Verified':
               children_verified = False
               if child.status != 'Finished':
                 children_finished = False
+                if child.status != "Assigned":
+                  children_assigned = False
           if children_verified and len(children) > 0:
             if is_allowed_update(parent.__class__.__name__,
                                  parent.id, parent.context.id):
@@ -418,6 +422,18 @@ def update_cycle_task_parent_state(obj):  # noqa
                   old_status=old_status
               )
             update_cycle_task_parent_state(parent)
+          elif children_assigned and len(children) > 0:
+            if is_allowed_update(parent.__class__.__name__,
+                                 parent.id, parent.context.id):
+              old_status = parent.status
+              parent.status = "Assigned"
+              Signals.status_change.send(
+                  parent.__class__,
+                  obj=parent,
+                  new_status=parent.status,
+                  old_status=old_status
+              )
+              update_cycle_task_parent_state(parent)
 
 
 def ensure_assignee_is_workflow_member(workflow, assignee):
