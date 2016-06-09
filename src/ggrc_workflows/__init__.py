@@ -352,13 +352,16 @@ def update_cycle_task_child_state(obj):
 def update_cycle_task_parent_state(obj):  # noqa
   """Propagate changes to obj's parents"""
 
-  def send_signal(parent, old_status):
+  def update_parent(parent, old_status, new_status):
+    parent.status = new_status
+    db.session.add(parent)
     Signals.status_change.send(
         parent.__class__,
         obj=parent,
-        new_status=parent.status,
-        old_status=old_status
+        old_status=old_status,
+        new_status=new_status,
     )
+    update_cycle_task_parent_state(parent)
 
   parent_attrs = _cycle_task_parent_attr.get(type(obj), [])
   for parent_attr in parent_attrs:
@@ -366,6 +369,7 @@ def update_cycle_task_parent_state(obj):  # noqa
       continue
 
     parent = getattr(obj, parent_attr, None)
+    old_status = parent.status
     if not parent:
       continue
 
@@ -381,11 +385,8 @@ def update_cycle_task_parent_state(obj):  # noqa
     # If any child is `InProgress`, then parent should be `InProgress`
     if obj.status in {"InProgress", "Declined"}:
       if parent.status != "InProgress":
-        old_status = parent.status
-        parent.status = "InProgress"
-        db.session.add(parent)
-        send_signal(parent, old_status)
-        update_cycle_task_parent_state(parent)
+        new_status = "InProgress"
+        update_parent(parent, old_status, new_status)
     # If all children are `Finished` or `Verified`, then parent should be same
     elif obj.status in {"Finished", "Verified", "Assigned"}:
       children_attrs = _cycle_task_children_attr.get(type(parent), [])
@@ -403,20 +404,14 @@ def update_cycle_task_parent_state(obj):  # noqa
                 if child.status != "Assigned":
                   children_assigned = False
           if children_verified and len(children) > 0:
-            old_status = parent.status
-            parent.status = "Verified"
-            send_signal(parent, old_status)
-            update_cycle_task_parent_state(parent)
+            new_status = "Verified"
+            update_parent(parent, old_status, new_status)
           elif children_finished and len(children) > 0:
-            old_status = parent.status
-            parent.status = "Finished"
-            send_signal(parent, old_status)
-            update_cycle_task_parent_state(parent)
+            new_status = "Finished"
+            update_parent(parent, old_status, new_status)
           elif children_assigned and len(children) > 0:
-            old_status = parent.status
-            parent.status = "Assigned"
-            send_signal(parent, old_status)
-            update_cycle_task_parent_state(parent)
+            new_status = "Assigned"
+            update_parent(parent, old_status, new_status)
 
 
 def ensure_assignee_is_workflow_member(workflow, assignee):
