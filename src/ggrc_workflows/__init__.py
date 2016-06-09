@@ -383,10 +383,9 @@ def update_cycle_task_parent_state(obj):  # noqa
       update_cycle_task_parent_state(parent)
 
     # If any child is `InProgress`, then parent should be `InProgress`
-    if obj.status in {"InProgress", "Declined"}:
-      if parent.status != "InProgress":
-        new_status = "InProgress"
-        update_parent(parent, old_status, new_status)
+    if obj.status in {"InProgress", "Declined"} and old_status != "InProgress":
+      new_status = "InProgress"
+      update_parent(parent, old_status, new_status)
     # If all children are `Finished` or `Verified`, then parent should be same
     elif obj.status in {"Finished", "Verified", "Assigned"}:
       children_attrs = _cycle_task_children_attr.get(type(parent), [])
