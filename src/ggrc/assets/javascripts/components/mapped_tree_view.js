@@ -15,6 +15,8 @@
       reuseMethod: '@',
       treeViewClass: '@',
       expandable: '@',
+      parentInstance: null,
+      mappedObjects: [],
       isExpandable: function () {
         var expandable = this.attr('expandable');
         if (expandable === null || expandable === undefined) {
@@ -24,6 +26,23 @@
         }
         return expandable;
       }
+    },
+    init: function (element) {
+      var el = $(element);
+      var binding;
+
+      _.each(['mapping', 'itemTemplate'], function (prop) {
+        if (!this.scope.attr(prop)) {
+          this.scope.attr(prop,
+            el.attr(can.camelCaseToDashCase(prop)));
+        }
+      }, this);
+
+      binding = this.scope.parentInstance.get_binding(this.scope.mapping);
+
+      binding.refresh_instances().then(function (mappedObjects) {
+        this.scope.attr('mappedObjects').replace(mappedObjects);
+      }.bind(this));
     },
     events: {
       '[data-toggle=unmap] click': function (el, ev) {

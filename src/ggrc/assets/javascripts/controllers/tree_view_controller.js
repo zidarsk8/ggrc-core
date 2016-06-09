@@ -858,7 +858,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     original._child_options_prepared = v;
     return v;
   },
-
   el_position: function (el) {
     var se = this.options.scroll_element;
     var se_o = se.offset().top;
@@ -1515,7 +1514,9 @@ can.Control('CMS.Controllers.TreeViewNode', {
         this.draw_placeholder();
       }
     }.bind(this), 0);
+
   },
+
   '{instance} change': function (inst, ev, prop) {
     if (prop === 'custom_attribute_values') {
       this.draw_node();

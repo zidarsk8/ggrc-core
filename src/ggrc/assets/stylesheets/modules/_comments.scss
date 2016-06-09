@@ -133,3 +133,7 @@
     display: none;
   }
 }
+
+.comment-list {
+  @extend .entry-list;
+}

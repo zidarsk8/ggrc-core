@@ -726,9 +726,9 @@
       }, "Program,Regulation,Contract,Policy,Standard,Section,Clause,Objective,Control,System,Process,DataAsset,AccessGroup,Product,Project,Facility,Market,OrgGroup,Vendor,Audit,Assessment,Request"),
     },
     Comment: {
-      _mixins: ["related_object", "documentable"],
-      urls: TypeFilter("related_objects", "Document"),
-      documents_and_urls: Multi(["documents", "urls"])
+      _mixins: ['related_object', 'documentable', 'ownable'],
+      urls: TypeFilter('related_objects', 'Document'),
+      documents_and_urls: Multi(['documents', 'urls'])
     },
     Meeting: {
       _mixins: ["personable"]
