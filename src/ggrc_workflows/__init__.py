@@ -374,15 +374,17 @@ def update_cycle_task_parent_state(obj):  # noqa
        and parent.cycle.workflow.kind == "Backlog":
       continue
 
+    if not is_allowed_update(parent.__class__.__name__,
+                             parent.id, parent.context.id):
+      update_cycle_task_parent_state(parent)
+
     # If any child is `InProgress`, then parent should be `InProgress`
     if obj.status in {"InProgress", "Declined"}:
       if parent.status != "InProgress":
-        if is_allowed_update(parent.__class__.__name__,
-                             parent.id, parent.context.id):
-          old_status = parent.status
-          parent.status = "InProgress"
-          db.session.add(parent)
-          send_signal(parent, old_status)
+        old_status = parent.status
+        parent.status = "InProgress"
+        db.session.add(parent)
+        send_signal(parent, old_status)
         update_cycle_task_parent_state(parent)
     # If all children are `Finished` or `Verified`, then parent should be same
     elif obj.status in {"Finished", "Verified", "Assigned"}:
@@ -401,26 +403,20 @@ def update_cycle_task_parent_state(obj):  # noqa
                 if child.status != "Assigned":
                   children_assigned = False
           if children_verified and len(children) > 0:
-            if is_allowed_update(parent.__class__.__name__,
-                                 parent.id, parent.context.id):
-              old_status = parent.status
-              parent.status = "Verified"
-              send_signal(parent, old_status)
+            old_status = parent.status
+            parent.status = "Verified"
+            send_signal(parent, old_status)
             update_cycle_task_parent_state(parent)
           elif children_finished and len(children) > 0:
-            if is_allowed_update(parent.__class__.__name__,
-                                 parent.id, parent.context.id):
-              old_status = parent.status
-              parent.status = "Finished"
-              send_signal(parent, old_status)
+            old_status = parent.status
+            parent.status = "Finished"
+            send_signal(parent, old_status)
             update_cycle_task_parent_state(parent)
           elif children_assigned and len(children) > 0:
-            if is_allowed_update(parent.__class__.__name__,
-                                 parent.id, parent.context.id):
-              old_status = parent.status
-              parent.status = "Assigned"
-              send_signal(parent, old_status)
-              update_cycle_task_parent_state(parent)
+            old_status = parent.status
+            parent.status = "Assigned"
+            send_signal(parent, old_status)
+            update_cycle_task_parent_state(parent)
 
 
 def ensure_assignee_is_workflow_member(workflow, assignee):
