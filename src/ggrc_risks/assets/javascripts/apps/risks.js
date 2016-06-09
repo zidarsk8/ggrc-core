@@ -153,6 +153,7 @@
     var baseWidgetsByType = GGRC.tree_view.base_widgets_by_type;
     var moduleObjectNames = ['Risk', 'Threat'];
     var extendedModuleTypes = _risk_object_types.concat(moduleObjectNames);
+    var subTrees = GGRC.tree_view.sub_tree_for;
 
     if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
       related_or_owned = 'all_';
@@ -211,10 +212,12 @@
         }
       });
 
-      GGRC.tree_view.sub_tree_for[name] = {
-        model_list: child_model_list,
-        display_list: CMS.Models[name].tree_view_options.child_tree_display_list || widgetList
-      };
+      if (!_.isEmpty(subTrees)) {
+        subTrees[name] = {
+          model_list: child_model_list,
+          display_list: CMS.Models[name].tree_view_options.child_tree_display_list || widgetList
+        };
+      }
     });
 
     threat_descriptor = {
