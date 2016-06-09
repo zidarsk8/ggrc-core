@@ -465,14 +465,18 @@ class OptionColumnHandler(ColumnHandler):
 
 class CheckboxColumnHandler(ColumnHandler):
 
+  ALLOWED_VALUES = {"yes", "true", "no", "false", "--", "---"}
+  TRUE_VALUES = {"yes", "true"}
+  NONE_VALUES = {"--", "---"}
+
   def parse_item(self):
     """ mandatory checkboxes will get evelauted to false on empty value """
     if self.raw_value == "":
       return False
-    value = self.raw_value.lower() in ("yes", "true")
-    if self.raw_value == "--":
+    value = self.raw_value.lower() in self.TRUE_VALUES
+    if self.raw_value == self.NONE_VALUES:
       value = None
-    if self.raw_value.lower() not in ("yes", "true", "no", "false", "--"):
+    if self.raw_value.lower() not in self.ALLOWED_VALUES:
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
     return value
 
