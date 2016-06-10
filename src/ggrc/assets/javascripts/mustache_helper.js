@@ -2699,6 +2699,34 @@ Mustache.registerHelper("fadeout", function (delay, prop, options) {
   }
 });
 
+  Mustache.registerHelper('current_cycle_assignee',
+    function (instance, options) {
+      var mapping = instance.get_mapping('current_approval_cycles');
+      var approvalCycle;
+      var binding;
+      var finish;
+      var progress;
+
+      if (!mapping || !mapping.length) {
+        return options.inverse();
+      }
+      approvalCycle = mapping[0].instance;
+      binding = approvalCycle.get_binding('cycle_task_groups');
+
+      finish = function (tasks) {
+        return options.fn(options.contexts.add({
+          person: tasks[0].instance.contact
+        }));
+      };
+      progress = function () {
+        return options.inverse(options.contexts);
+      };
+
+      return defer_render('span', {
+        done: finish, progress: progress
+      }, binding.refresh_instances());
+    });
+
 Mustache.registerHelper("with_mapping_count", function (instance, mapping_names, options) {
   var args = can.makeArray(arguments)
     , options = args[args.length-1]  // FIXME duplicate declaration
