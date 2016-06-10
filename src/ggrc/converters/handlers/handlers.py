@@ -374,11 +374,10 @@ class MappingColumnHandler(ColumnHandler):
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     class_ = self.mapping_object
-    lines = set(self.raw_value.splitlines())
-    slugs = filter(unicode.strip, lines)  # noqa
+    slugs = set(line.strip().lower() for line in self.raw_value.splitlines())
     objects = []
     for slug in slugs:
-      obj = class_.query.filter(class_.slug == slug).first()
+      obj = class_.query.filter_by(slug=slug).first()
       if obj:
         if permissions.is_allowed_update_for(obj):
           objects.append(obj)

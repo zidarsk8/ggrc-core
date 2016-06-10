@@ -32,15 +32,17 @@ class TestBasicCsvImport(converters.TestCase):
     self.import_file(filename)
     self.assertEqual(models.Policy.query.count(), 3)
 
-  def test_policy_import_working_with_warnings_dry_run(self):
+  def test_policy_import_working_with_warnings(self):
+    def test_owners(policy):
+      self.assertNotEqual([], policy.owners)
+      self.assertEqual("user@example.com", policy.owners[0].email)
     filename = "policy_import_working_with_warnings.csv"
-
-    response_json = self.import_file(filename, dry_run=True)
+    response_json = self.import_file(filename)
 
     expected_warnings = set([
         errors.UNKNOWN_USER_WARNING.format(line=3, email="miha@policy.com"),
         errors.UNKNOWN_OBJECT.format(
-            line=3, object_type="Program", slug="P753"),
+            line=3, object_type="Program", slug="p753"),
         errors.OWNER_MISSING.format(line=4, column_name="Owner"),
         errors.UNKNOWN_USER_WARNING.format(line=6, email="not@a.user"),
         errors.OWNER_MISSING.format(line=6, column_name="Owner"),
@@ -50,15 +52,6 @@ class TestBasicCsvImport(converters.TestCase):
     response_errors = response_json[0]["row_errors"]
     self.assertEqual(set(), set(response_errors))
     self.assertEqual(4, response_json[0]["created"])
-    policies = models.Policy.query.all()
-    self.assertEqual(len(policies), 0)
-
-  def test_policy_import_working_with_warnings(self):
-    def test_owners(policy):
-      self.assertNotEqual([], policy.owners)
-      self.assertEqual("user@example.com", policy.owners[0].email)
-    filename = "policy_import_working_with_warnings.csv"
-    self.import_file(filename)
 
     policies = models.Policy.query.all()
     self.assertEqual(len(policies), 4)
@@ -138,14 +131,14 @@ class TestBasicCsvImport(converters.TestCase):
       for message in messages:
         self.assertEqual(set(), set(response_block[message]))
 
-    ca = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
-    au = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
-    self.assertEqual(len(ca.owners), 1)
-    self.assertEqual(ca.owners[0].email, "danny@reciprocitylabs.com")
-    self.assertEqual(ca.contact.email, "danny@reciprocitylabs.com")
-    self.assertEqual(ca.design, "Effective")
-    self.assertEqual(ca.operationally, "Effective")
-    self.assertIsNone(models.Relationship.find_related(ca, au))
+    assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
+    audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
+    self.assertEqual(len(assessment.owners), 1)
+    self.assertEqual(assessment.owners[0].email, "danny@reciprocitylabs.com")
+    self.assertEqual(assessment.contact.email, "danny@reciprocitylabs.com")
+    self.assertEqual(assessment.design, "Effective")
+    self.assertEqual(assessment.operationally, "Effective")
+    self.assertIsNone(models.Relationship.find_related(assessment, audit))
 
     filename = "pci_program_update.csv"
     response = self.import_file(filename)
@@ -154,13 +147,13 @@ class TestBasicCsvImport(converters.TestCase):
       for message in messages:
         self.assertEqual(set(), set(response_block[message]))
 
-    ca = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
-    au = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
-    self.assertEqual(ca.owners[0].email, "miha@reciprocitylabs.com")
-    self.assertEqual(ca.contact.email, "albert@reciprocitylabs.com")
-    self.assertEqual(ca.design, "Needs improvement")
-    self.assertEqual(ca.operationally, "Ineffective")
-    self.assertIsNotNone(models.Relationship.find_related(ca, au))
+    assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
+    audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
+    self.assertEqual(assessment.owners[0].email, "miha@reciprocitylabs.com")
+    self.assertEqual(assessment.contact.email, "albert@reciprocitylabs.com")
+    self.assertEqual(assessment.design, "Needs improvement")
+    self.assertEqual(assessment.operationally, "Ineffective")
+    self.assertIsNotNone(models.Relationship.find_related(assessment, audit))
 
   def test_person_imports(self):
     """Test imports for Person object with user roles."""

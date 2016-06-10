@@ -30,12 +30,9 @@ class TestComprehensiveSheets(TestCase):
     TestCase.setUp(self)
     self.generator = ObjectGenerator()
     self.client.get("/login")
-    pass
 
-  def tearDown(self):
-    pass
-
-  def test_comprehensive_sheet1_with_custom_attributes(self):
+  def test_comprehensive_with_ca(self):
+    """Test comprehensive sheet with custom attributes."""
     self.create_custom_attributes()
     filename = "comprehensive_sheet1.csv"
     response = self.import_file(filename)
@@ -196,19 +193,11 @@ class TestComprehensiveSheets(TestCase):
     expected_custom_vals = ['0', 'a', '2015-12-12 00:00:00', 'test1']
     self.assertEqual(set(custom_vals), set(expected_custom_vals))
 
-  def test_full_good_import_no_warnings(self):
+  def test_full_good_import(self):
+    """Test import of all objects with no warnings or errors."""
     filename = "full_good_import_no_warnings.csv"
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
-    response = self.import_file(filename, dry_run=True)
-    for block in response:
-      for message in messages:
-        self.assertEqual(set(), set(block[message]))
-
     response = self.import_file(filename)
 
-    for message in messages:  # response[0] = Person block
-      self.assertEqual(set(response[0][message]), set())
     ggrc_admin = db.session.query(Role.id).filter(Role.name == "gGRC Admin")
     reader = db.session.query(Role.id).filter(Role.name == "Reader")
     creator = db.session.query(Role.id).filter(Role.name == "Creator")
@@ -221,21 +210,16 @@ class TestComprehensiveSheets(TestCase):
     self.assertEqual(len(creators), 6)
     self.assertEqual(len(access_groups), 10)
 
-    for block in response:
-      for message in messages:
-        self.assertEqual(set(), set(block[message]))
+    expected_errors = {}
+    self._check_response(response, expected_errors)
 
   def test_errors_and_warnings(self):
-    """
+    """Test all possible errors and warnings.
+
     This test should test for all possible warnings and errors but it is still
     incomplete.
     """
-    filename = "import_with_all_warnings_and_errors.csv"
-
-    dry_response = self.import_file(filename, dry_run=True)
-
-    response = self.import_file(filename)
-
+    response = self.import_file("import_with_all_warnings_and_errors.csv")
     expected_errors = {
         "Control": {
             "block_errors": set([
@@ -249,16 +233,11 @@ class TestComprehensiveSheets(TestCase):
             ])
         }
     }
-    self.assertEqual(dry_response, response)
 
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
-    for block in response:
-      for message in messages:
-        expected = expected_errors.get(block["name"], {}).get(message, set())
-        self.assertEqual(expected, set(block[message]))
+    self._check_response(response, expected_errors)
 
   def create_custom_attributes(self):
+    """Generate custom attributes needed for comprehensive sheet."""
     gen = self.generator.generate_custom_attribute
     gen("control", title="my custom text", mandatory=True)
     gen("program", title="my_text", mandatory=True)
@@ -267,3 +246,47 @@ class TestComprehensiveSheets(TestCase):
     gen("program", title="my_dropdown", attribute_type="Dropdown",
         options="a,b,c,d")
     # gen("program", title="my_description", attribute_type="Rich Text")
+
+  def test_case_sensitive_slugs(self):
+    """Test that mapping with case sensitive slugs work."""
+    response = self.import_file("case_sensitive_slugs.csv")
+    expected_errors = {
+        "Control": {
+            "row_errors": [
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line_list="3, 4",
+                    column_name="Code",
+                    s="",
+                    value="a",
+                    ignore_lines="4",
+                ),
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line_list="3, 4",
+                    column_name="Title",
+                    s="",
+                    value="a",
+                    ignore_lines="4",
+                ),
+            ]
+        }
+    }
+    self._check_response(response, expected_errors)
+
+  def _check_response(self, response, expected_errors):
+    """Test that response contains all expected errors and warnigs.
+
+    Args:
+      response: api response object.
+      expected_errors: dict of all expected errors by object type.
+
+    Raises:
+      AssertionError if an expected error or warning is not found in the
+        propper response block.
+    """
+
+    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
+
+    for block in response:
+      for message in messages:
+        expected = expected_errors.get(block["name"], {}).get(message, set())
+        self.assertEqual(set(expected), set(block[message]))
