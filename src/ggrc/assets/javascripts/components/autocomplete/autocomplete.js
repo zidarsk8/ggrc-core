@@ -24,44 +24,20 @@
       placeholder: '@',
       searchItemsType: '@',
       className: '@',
+      value: null,
 
       // disable automatically mapping the picked item from the live search
       // results to the instance object of the current context
       automappingOff: true,
-
-      disable: false
+      define: {
+        disable: {
+          type: 'boolean',
+          'default': false
+        }
+      }
     },
 
     _EV_ITEM_SELECTED: 'item-selected',
-
-    /**
-     * The component's entry point. Invoked when a new component instance has
-     * been created.
-     *
-     * @param {Object} element - the (unwrapped) DOM element that triggered the
-     *   creation of the component instance
-     * @param {Object} options - the component instantiation options
-     */
-    init: function (element, options) {
-      var $el = $(element);
-      var attrVal = $el.attr('disable');
-      var disable;
-      var scope = this.scope;
-
-      // By default CanJS evaluates the component element's attribute values in
-      // the current context, but we want to support passing in literal values
-      // as well. We thus inspect some of the directly and override what CanJS
-      // initializes in scope.
-      if (attrVal === '' || attrVal === 'false') {
-        disable = false;
-      } else if (attrVal === 'true') {
-        disable = true;
-      } else {
-        disable = Boolean(scope.attr('disable'));
-      }
-
-      scope.attr('disable', disable);
-    },
 
     events: {
       inserted: function (el, ev) {

@@ -114,6 +114,16 @@ dashboard-js-files:
   - apps/custom_attributes.js
   - components/spinner/spinner.js
   - components/dropdown/dropdown.js
+  - components/autocomplete/autocomplete.js
+  - components/datepicker/datepicker.js
+  - components/person/person.js
+  - components/inline_edit/inline.js
+  - components/inline_edit/inline_checkbox.js
+  - components/inline_edit/inline_dropdown.js
+  - components/inline_edit/inline_input.js
+  - components/inline_edit/inline_text.js
+  - components/inline_edit/inline_person.js
+  - components/inline_edit/inline_datepicker.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
   - components/csv/export.js
@@ -125,10 +135,8 @@ dashboard-js-files:
   - components/paginate.js
   - components/tabs.js
   - components/assessment_attributes.js
-  - components/autocomplete/autocomplete.js
   - components/lazy_open_close.js
   - components/object_history/object_history.js
-  - components/person/person.js
   - components/unified_mapper/mapper.js
   - components/unified_mapper/mapper_results.js
   - components/unified_mapper/mapper_checkbox.js
@@ -136,16 +144,8 @@ dashboard-js-files:
   - components/modal_wrappers/assessment_template_form.js
   - components/modal_wrappers/checkboxes_to_list.js
   - components/reminder.js
-  - components/datepicker/datepicker.js
-  - components/inline_edit/inline.js
-  - components/inline_edit/inline_checkbox.js
-  - components/inline_edit/inline_dropdown.js
-  - components/inline_edit/inline_input.js
-  - components/inline_edit/inline_text.js
   - components/rich_text/rich_text.js
   - components/add_comment/add_comment.js
-  - components/inline_edit/inline_person.js
-  - components/inline_edit/inline_datepicker.js
   - components/object_cloner/object_cloner.js
   #- d3.v2.js
   #- related_graph.js
