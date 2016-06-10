@@ -24,18 +24,13 @@
 
               <div class="span1">
                 <div class="object-check" align="left">
+
                   <mapper-checkbox
-                    is_mapped="{{#if_helpers '\
-                                  #if' mappings.length '\
-                                  and #result_direct_mappings' bindings_compute selected_object '\
-                                  or #has_pending_addition' selected_object instance '\
-                                  or #has_mapped_objects' selected_object instance}}
-                                  true
-                                {{else}}
-                                  false
-                                {{/if_helpers}}"
-                    is_allowed_to_map="{{#is_allowed_to_map selected_object instance}}true{{else}}false{{/is_allowed_to_map}}"
+                    {{#is_allowed_to_map selected_object instance}}
+                      allowed-to-map="true"
+                    {{/is_allowed_to_map}}
                     appended="appended"
+                    instance="instance"
                     instance_id="{{instance.id}}"
                     instance_type="{{instance.type}}"
                     is_loading="is_loading"

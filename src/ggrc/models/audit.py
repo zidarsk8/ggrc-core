@@ -1,13 +1,17 @@
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: vraj@reciprocitylabs.com
-# Maintained By: vraj@reciprocitylabs.com
+# Created By: urban@reciprocitylabs.com
+# Maintained By: urban@reciprocitylabs.com
+
+"""Audit model."""
 
 from ggrc import db
 from .mixins import (
     deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact,
     Titled, Slugged, CustomAttributable
 )
+
+from ggrc.models import mixins_clonable
 from ggrc.models.relationship import Relatable
 from ggrc.models.object_person import Personable
 from ggrc.models.context import HasOwnContext
@@ -17,10 +21,12 @@ from ggrc.models.program import Program
 from ggrc.models.person import Person
 
 
-class Audit(
-        CustomAttributable, Personable, HasOwnContext, Relatable,
-        Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled, Slugged,
-        db.Model):
+class Audit(mixins_clonable.Clonable,
+            CustomAttributable, Personable, HasOwnContext, Relatable,
+            Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled,
+            Slugged, db.Model):
+  """Audit model."""
+
   __tablename__ = 'audits'
   _slug_uniqueness = False
 
@@ -28,6 +34,8 @@ class Audit(
       u'Planned', u'In Progress', u'Manager Review',
       u'Ready for External Review', u'Completed'
   )
+
+  CLONEABLE_CHILDREN = {"AssessmentTemplate"}
 
   report_start_date = deferred(db.Column(db.Date), 'Audit')
   report_end_date = deferred(db.Column(db.Date), 'Audit')
@@ -93,6 +101,77 @@ class Audit(
       "url": None,
       "reference_url": None,
   }
+
+  def _clone(self, source_object):
+    """Clone audit and all relevant attributes.
+
+    Keeps the internals of actual audit cloning and everything that is related
+    to audit itself (auditors, audit firm, context setting,
+    custom attribute values, etc.)
+    """
+    from ggrc_basic_permissions import create_audit_context
+
+    data = {
+        "title": source_object.generate_attribute("title"),
+        "description": source_object.description,
+        "audit_firm": source_object.audit_firm,
+        "start_date": source_object.start_date,
+        "end_date": source_object.end_date,
+        "program": source_object.program,
+        "status": source_object.VALID_STATES[0],
+        "report_start_date": source_object.report_start_date,
+        "report_end_date": source_object.report_end_date,
+        "contact": source_object.contact
+    }
+
+    self.update_attrs(data)
+    db.session.flush()
+
+    create_audit_context(self)
+    self._clone_auditors(source_object)
+    self.clone_custom_attribute_values(source_object)
+
+  def _clone_auditors(self, audit):
+    """Clone auditors of specified audit.
+
+    Args:
+      audit: Audit instance
+    """
+    from ggrc_basic_permissions.models import Role, UserRole
+
+    role = Role.query.filter_by(name="Auditor").first()
+    auditors = [ur.person for ur in UserRole.query.filter_by(
+        role=role, context=audit.context).all()]
+
+    for auditor in auditors:
+      user_role = UserRole(
+          context=self.context,
+          person=auditor,
+          role=role
+      )
+      db.session.add(user_role)
+    db.session.flush()
+
+  def clone(self, source_id, mapped_objects=None):
+    """Clone audit with specified whitelisted children.
+
+    Children that can be cloned should be specified in CLONEABLE_CHILDREN.
+
+    Args:
+      mapped_objects: A list of related objects that should also be copied and
+      linked to a new audit.
+    """
+    if not mapped_objects:
+      mapped_objects = []
+
+    source_object = Audit.query.get(source_id)
+    self._clone(source_object)
+
+    if any(mapped_objects):
+      related_children = source_object.related_objects(mapped_objects)
+
+      for obj in related_children:
+        obj.clone(self)
 
   @classmethod
   def _filter_by_program(cls, predicate):

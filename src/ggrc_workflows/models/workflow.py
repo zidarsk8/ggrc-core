@@ -234,7 +234,8 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   def eager_query(cls):
     return super(Workflow, cls).eager_query().options(
         orm.subqueryload('cycles').undefer_group('Cycle_complete')
-           .subqueryload("cycle_task_group_object_tasks"),
+           .subqueryload("cycle_task_group_object_tasks")
+           .undefer_group("CycleTaskGroupObjectTask_complete"),
         orm.subqueryload('task_groups'),
         orm.subqueryload('workflow_people'),
     )

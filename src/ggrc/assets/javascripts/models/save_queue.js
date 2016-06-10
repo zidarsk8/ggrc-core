@@ -50,11 +50,6 @@
           }
         }).promise();
         dfd.always(function (data, type) {
-          var cb;
-          var single;
-          var obj;
-          var i = 0;
-
           if (type === 'error') {
             data = data.responseJSON;
             if (_.isUndefined(data)) {
@@ -71,32 +66,43 @@
               });
             });
           }
-          cb = function (single) {
-            return function () {
-              this.created(single[1][bucket.type]);
-              return $.when(
-                can.Model.Cacheable.resolve_deferred_bindings(this));
-            };
-          };
-          for (; i < objs.length; i++) {
-            single = data[i];
-            obj = objs[i];
-            if (single[0] >= 200 && single[0] < 300) {
-              obj._save(cb(single));
-            } else {
-              obj._dfd.reject(obj, single);
-            }
-          }
+
+          // Push the response to a queue for later processing.
+          bucket.save_responses.push([objs, data]);
         }).always(function () {
           if (bucket.objs.length) {
             that._step(that._enqueue_bucket(bucket));
           } else {
+            // Process all of the batches of save responses.
+            that._process_save_responses(bucket);
             bucket.in_flight = false;
           }
         });
 
         return dfd;
       };
+    },
+
+    _process_save_responses: function (bucket) {
+      can.each(bucket.save_responses, function (resp) {
+        var objs = resp[0];
+        var data = resp[1];
+        var cb = function (single) {
+          return function () {
+            this.created(single[1][bucket.type]);
+            return $.when(
+              can.Model.Cacheable.resolve_deferred_bindings(this));
+          };
+        };
+        can.each(objs, function (obj, idx) {
+          var single = data[idx];
+          if (single[0] >= 200 && single[0] < 300) {
+            obj._save(cb(single));
+          } else {
+            obj._dfd.reject(obj, single);
+          }
+        });
+      });
     },
 
     _step: function (elem) {
@@ -129,6 +135,8 @@
             type: type,
             plural: plural,
             background: obj.run_in_background,
+            // List of batch request responses that are yet to be processed.
+            save_responses: [],
             in_flight: false // is there a "thread" running for this bucket
           };
           this._buckets[bucketName] = bucket;

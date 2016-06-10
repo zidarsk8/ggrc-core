@@ -197,6 +197,7 @@
 
       getResults: function () {
         var contact = this.scope.attr('contact');
+        var contactEmail = this.scope.attr('mapper.contactEmail');
         var filters;
         var list;
         var modelName = this.scope.attr('type');
@@ -210,7 +211,6 @@
             this.scope.attr('mapper.is_saving')) {
           return;
         }
-
         this.scope.attr('page', 0);
         this.scope.attr('entries', []);
         this.scope.attr('selected', []);
@@ -244,8 +244,7 @@
         if (modelName === 'AllObject') {
           modelName = this.scope.attr('types.all_objects.models');
         }
-
-        if (!_.isEmpty(contact)) {
+        if (contact && contactEmail) {
           params.contact_id = contact.id;
         }
         if (!_.isEmpty(filters)) {

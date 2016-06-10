@@ -2,16 +2,14 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
+"""Generic handlers for imports and exports."""
 
-"""Generic handlers for imports and exports.
-"""
-
+import re
+import traceback
 from dateutil.parser import parse
 from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import or_
-import re
-import traceback
 
 from ggrc import db
 from ggrc.automapper import AutomapperGenerator
@@ -42,6 +40,11 @@ CUSTOM_ATTR_PREFIX = "__custom__:"
 
 
 class ColumnHandler(object):
+  """Default column handler.
+
+  This handler can be used on any model attribute that can accept normal text
+  value.
+  """
 
   def __init__(self, row_converter, key, **options):
     self.row_converter = row_converter
@@ -115,6 +118,7 @@ class ColumnHandler(object):
 
 
 class DeleteColumnHandler(ColumnHandler):
+  """Column handler for deleting objects."""
 
   # this is a white list of objects that can be deleted in a cascade
   # e.g. deleting a Market can delete the associated ObjectOwner object too
@@ -192,7 +196,6 @@ class StatusColumnHandler(ColumnHandler):
 
 
 class UserColumnHandler(ColumnHandler):
-
   """ Handler for primary and secondary contacts """
 
   def get_users_list(self):
@@ -233,6 +236,10 @@ class UserColumnHandler(ColumnHandler):
 
 
 class OwnerColumnHandler(UserColumnHandler):
+  """Handler for object owners.
+
+  This handler can accept a new line separated list of owner emails.
+  """
 
   def parse_item(self):
     owners = set()
@@ -367,11 +374,10 @@ class MappingColumnHandler(ColumnHandler):
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     class_ = self.mapping_object
-    lines = set(self.raw_value.splitlines())
-    slugs = filter(unicode.strip, lines)  # noqa
+    slugs = set(line.strip().lower() for line in self.raw_value.splitlines())
     objects = []
     for slug in slugs:
-      obj = class_.query.filter(class_.slug == slug).first()
+      obj = class_.query.filter_by(slug=slug).first()
       if obj:
         if permissions.is_allowed_update_for(obj):
           objects.append(obj)
@@ -461,39 +467,6 @@ class OptionColumnHandler(ColumnHandler):
     if callable(option.title):
       return option.title()
     return option.title
-
-
-class CheckboxColumnHandler(ColumnHandler):
-
-  def parse_item(self):
-    """ mandatory checkboxes will get evelauted to false on empty value """
-    if self.raw_value == "":
-      return False
-    value = self.raw_value.lower() in ("yes", "true")
-    if self.raw_value == "--":
-      value = None
-    if self.raw_value.lower() not in ("yes", "true", "no", "false", "--"):
-      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-    return value
-
-  def get_value(self):
-    val = getattr(self.row_converter.obj, self.key, False)
-    if val is None:
-      return "--"
-    return "true" if val else "false"
-
-  def set_obj_attr(self):
-    """ handle set object for boolean values
-
-    This is the only handler that will allow setting a None value"""
-    try:
-      setattr(self.row_converter.obj, self.key, self.value)
-    except:
-      self.row_converter.add_error(errors.UNKNOWN_ERROR)
-      trace = traceback.format_exc()
-      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
-          self.row_converter.obj, self.key, self.value, trace)
-      current_app.logger.error(error)
 
 
 class ParentColumnHandler(ColumnHandler):

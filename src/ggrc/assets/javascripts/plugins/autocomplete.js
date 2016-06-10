@@ -7,6 +7,7 @@
 (function ($) {
   'use strict';
   var MAX_RESULTS = 20;
+  var SEARCH_DEBOUNCE = 50;
 
   $.widget('ggrc.autocomplete', $.ui.autocomplete, {
     options: {
@@ -18,7 +19,7 @@
         $(event.target).trigger('change');
       },
       minLength: 0,
-      source: function (request, response) {
+      source: _.debounce(function (request, response) {
         // Search based on the term
         var query = request.term || '';
         var queue = new RefreshQueue();
@@ -66,7 +67,7 @@
           this.options.controller.bindXHRToButton(dfd,
             $(this.element), null, false);
         }
-      },
+      }, SEARCH_DEBOUNCE),
 
       apply_filter: function (objects) {
         return objects;
@@ -263,22 +264,26 @@
 
       $ul.unbind('scrollNext')
         .bind('scrollNext', function (ev, data) {
-          if (this.scroll_op_in_progress) {
+          if (context.attr('scroll_op_in_progress') ||
+              context.attr('oldLen') === context.attr('items').length) {
             return;
           }
-          this.scroll_op_in_progress = true;
+
           this.last_request = this.last_request || {};
           this.last_request.start = this.last_request.start || 0;
           this.last_request.start += MAX_RESULTS;
+          context.attr('scroll_op_in_progress', true);
           context.attr('items_loading', true);
           this.source(this.last_request, function (items) {
-            context.items.push.apply(context.items, can.map(items, function (item) {
+            var listItems = context.attr('items');
+            context.attr('oldLen', listItems.length);
+            listItems.push.apply(listItems, can.map(items, function (item) {
               return item.item;
             }));
             context.removeAttr('items_loading');
-            setTimeout(function () {
-              this.scroll_op_in_progress = undefined;
-            }.bind(this), 10);
+            _.defer(function () {
+              context.attr('scroll_op_in_progress', false);
+            });
           });
         }.bind(this));
 

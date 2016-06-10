@@ -8,24 +8,43 @@
 (function (can, $) {
   'use strict';
 
-  can.Component.extend({
+  GGRC.Components('mapperCheckbox', {
     tag: 'mapper-checkbox',
     template: '<content />',
     scope: {
-      instance_id: '@',
-      instance_type: '@',
-      is_mapped: '@',
-      is_allowed_to_map: '@',
+      instance: null,
       checkbox: can.compute(function (status) {
         if (this.attr('mapper.getList') && !this.attr('appended')) {
           return false;
         }
         return (
-          /true/gi.test(this.attr('is_mapped')) ||
+          this.attr('isMapped') ||
           this.attr('select_state') ||
           this.attr('appended')
         );
-      })
+      }),
+      define: {
+        isMapped: {
+          type: 'boolean',
+          'default': false
+        },
+        allowedToMap: {
+          type: 'boolean',
+          'default': false
+        }
+      }
+    },
+    init: function () {
+      var scope = this.scope;
+      var parentInstance = scope.mapper.get_instance();
+      var instance = scope.attr('instance');
+      var isMapped = GGRC.Utils.is_mapped(parentInstance, instance);
+      var hasPending = GGRC.Utils.hasPending(parentInstance, instance, 'add');
+
+      if (isMapped || hasPending) {
+        scope.attr('isMapped', true);
+        scope.attr('checkbox', true);
+      }
     },
     events: {
       '{scope} selected': function () {
@@ -34,16 +53,16 @@
           .prop(
             'checked',
             _.findWhere(this.scope.attr('selected'), {
-              id: Number(this.scope.attr('instance_id'))
+              id: Number(this.scope.attr('instance').id)
             })
           );
       },
       '.object-check-single change': function (el, ev) {
         var scope = this.scope;
-        var uid = Number(scope.attr('instance_id'));
-        var type = scope.attr('instance_type');
+        var instance = scope.attr('instance');
         var item = _.find(scope.attr('options'), function (option) {
-          return option.instance.id === uid && option.instance.type === type;
+          return option.instance.id === instance.id &&
+                 option.instance.type === instance.type;
         });
         var status = el.prop('checked');
         var selected = this.scope.attr('selected');
@@ -71,7 +90,7 @@
         if (this.attr('mapper.getList')) {
           return options.inverse();
         }
-        if (/false/gi.test(this.attr('is_allowed_to_map'))) {
+        if (!this.attr('allowedToMap')) {
           return options.fn();
         }
         return options.inverse();
@@ -84,8 +103,8 @@
         if (this.attr('mapper.getList')) {
           return options.inverse();
         }
-        if (/true/gi.test(this.attr('is_mapped')) ||
-          /false/gi.test(this.attr('is_allowed_to_map'))) {
+        if (this.attr('isMapped') ||
+            !this.attr('allowedToMap')) {
           return options.fn();
         }
         return options.inverse();

@@ -21,16 +21,36 @@
       property: '@',
       value: null,
       values: null,
+      readonly: false,  // whether or not the value can be edited
       isSaving: false,
       context: {
         isEdit: false,
         value: null,
         values: null
       },
-      enableEdit: function (ctx, el, ev) {
+
+      emptyText: '@',
+
+      $rootEl: null,
+
+      _EV_INSTANCE_SAVE: 'on-save',
+
+      /**
+       * Enter the edit mode if editing is allowed (i.e. the readonly option is
+       * not set). If the readonly option is enabled, do not do anything.
+       *
+       * @param {can.Map} scope - the scope object itself (this)
+       * @param {jQuery.Element} $el - the DOM element that triggered the event
+       * @param {jQuery.Event} ev - the event object
+       */
+      enableEdit: function (scope, $el, ev) {
         ev.preventDefault();
-        this.attr('context.isEdit', true);
+
+        if (!this.attr('readonly')) {
+          this.attr('context.isEdit', true);
+        }
       },
+
       onCancel: function (ctx, el, ev) {
         ev.preventDefault();
         this.attr('context.isEdit', false);
@@ -41,10 +61,28 @@
         var property = this.attr('property');
         var instance = this.attr('instance');
         var oldValue = this.attr('value');
+        var onSaveHandler = this.$rootEl.attr('can-' + this._EV_INSTANCE_SAVE);
         var value = this.attr('context.value');
         var type = this.attr('type');
 
         ev.preventDefault();
+
+        // If a custom onSave handler is provided, trigger it, otherwise use
+        // the component's onSave logic (deprecated, should be moved out of the
+        // component as it is not the latter's resposnisiblity).
+        if (onSaveHandler) {
+          // CAUTION: triggering the event must come before changing any of the
+          // scope attributes, otherwise the event gets lost for some reason
+          this.$rootEl.triggerHandler({
+            type: this._EV_INSTANCE_SAVE,
+            oldVal: oldValue,
+            newVal: value
+          });
+
+          this.attr('context.isEdit', false);
+          return;
+        }
+
         this.attr('context.isEdit', false);
         if (oldValue === value) {
           return;
@@ -88,29 +126,37 @@
         }.bind(this));
       }
     },
-    init: function () {
+    init: function (element, options) {
       var scope = this.scope;
       var value = scope.attr('value');
       var values = scope.attr('values');
       var property = scope.attr('property');
       var instance = scope.attr('instance');
       var type = scope.attr('type');
+
+      scope.attr('$rootEl', $(element));
+
       if (scope.attr('caId')) {
         if (type === 'checkbox') {
           value = value === '1';
-        }
-        if (type === 'person') {
+        } else if (type === 'person') {
           if (value && value instanceof can.Map) {
             value = value.serialize();
           }
           value = _.isEmpty(value) ? undefined : value;
         }
+
         if (type === 'dropdown') {
           if (_.isNull(value) || _.isUndefined(value)) {
             value = '';
           }
         }
+
+        if (!scope.attr('emptyText')) {
+          scope.attr('emptyText', 'None');  // default for custom attributes
+        }
       }
+
       if (property) {
         value = instance.attr(property);
       }

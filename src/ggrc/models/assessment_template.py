@@ -6,17 +6,14 @@
 """A module containing the implementation of the assessment template entity."""
 
 from ggrc import db
-from ggrc.models.mixins import Base
-from ggrc.models.mixins import Slugged
-from ggrc.models.mixins import Titled
-from ggrc.models.mixins import CustomAttributable
+from ggrc.models import mixins
 from ggrc.models.reflection import PublishOnly
-from ggrc.models.relationship import Relatable
+from ggrc.models import relationship
 from ggrc.models.types import JsonType
 
 
-class AssessmentTemplate(Slugged, Base, Relatable, Titled,
-                         CustomAttributable, db.Model):
+class AssessmentTemplate(mixins.Slugged, mixins.Base, relationship.Relatable,
+                         mixins.Titled, mixins.CustomAttributable, db.Model):
   """A class representing the assessment template entity.
 
   An Assessment Template is a template that allows users for easier creation of
@@ -64,3 +61,37 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
   @classmethod
   def generate_slug_prefix_for(cls, obj):
     return "TEMPLATE"
+
+  def _clone(self):
+    """Clone Assessment Template.
+
+    Returns:
+      Instance of assessment template copy.
+    """
+    data = {
+        "title": self.title,
+        "template_object_type": self.template_object_type,
+        "test_plan_procedure": self.test_plan_procedure,
+        "procedure_description": self.procedure_description,
+        "default_people": self.default_people,
+    }
+    assessment_template_copy = AssessmentTemplate(**data)
+    db.session.add(assessment_template_copy)
+    db.session.flush()
+    return assessment_template_copy
+
+  def clone(self, target):
+    """Clone Assessment Template and related custom attributes."""
+    assessment_template_copy = self._clone()
+    rel = relationship.Relationship(
+        source=target,
+        destination=assessment_template_copy
+    )
+    db.session.add(rel)
+    db.session.flush()
+
+    for cad in self.custom_attribute_definitions:
+      # pylint: disable=protected-access
+      cad._clone(assessment_template_copy)
+
+    return (assessment_template_copy, rel)
