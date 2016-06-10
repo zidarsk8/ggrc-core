@@ -105,7 +105,7 @@ can.Control("CMS.Controllers.InfoPin", {
         $filter = $(".tree-filter:visible"),
         elTop = el.offset().top,
         elBottom = elTop + el.height(),
-        headerTop = $header.offset().top,
+        headerTop = $header.length ? $header.offset().top : 0,
         headerBottom = headerTop + $header.height(),
         infoTop = this.element.offset().top;
 
