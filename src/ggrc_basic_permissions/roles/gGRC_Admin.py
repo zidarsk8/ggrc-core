@@ -12,7 +12,15 @@ permissions = {
     "create": [],
     "delete": [],
     "__GGRC_ADMIN__": [
-        "__GGRC_ALL__"
+        {
+            "type": "__GGRC_ALL__",
+            "condition": "forbid",
+            "terms": {
+                "blacklist": {
+                    "delete": ["Cycle", "Person"]
+                }
+            },
+        },
     ],
     "update": []
 }

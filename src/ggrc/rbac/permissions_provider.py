@@ -60,7 +60,7 @@ def get_deep_attr(instance, names):
   return value
 
 
-def contains_condition(instance, value, list_property):
+def contains_condition(instance, value, list_property, **_):
   """Check if instance contains a value in a list.
      Example:
         "terms": {
@@ -74,7 +74,7 @@ def contains_condition(instance, value, list_property):
   return value in list_value
 
 
-def is_condition(instance, value, property_name):
+def is_condition(instance, value, property_name, **_):
   """Check if instance attribute is of a given value
      Example:
       "terms": {
@@ -89,13 +89,13 @@ def is_condition(instance, value, property_name):
   return value == property_value
 
 
-def in_condition(instance, value, property_name):
+def in_condition(instance, value, property_name, **_):
   value = resolve_permission_variable(value)
   property_value = get_deep_attr(instance, property_name)
   return property_value in value
 
 
-def relationship_condition(instance, action, property_name):
+def relationship_condition(instance, action, property_name, **_):
   if getattr(instance, 'context') is not None:
     context_id = getattr(instance.context, 'id')
   else:
@@ -114,6 +114,11 @@ def relationship_condition(instance, action, property_name):
       return False
   return True
 
+
+def forbid_condition(instance, blacklist, _current_action, **_):
+  return instance.type not in blacklist.get(_current_action, ())
+
+
 """
 All functions with a signature
 
@@ -126,6 +131,7 @@ _CONDITIONS_MAP = {
     'is': is_condition,
     'in': in_condition,
     'relationship': relationship_condition,
+    'forbid': forbid_condition
 }
 
 
@@ -190,10 +196,21 @@ class DefaultUserPermissions(UserPermissions):
         permissions)
 
   def _is_allowed_for(self, instance, action):
-    # Check for admin permission
-    if self._permission_match(self.ADMIN_PERMISSION, self._permissions()):
-      return True
     permissions = self._permissions()
+    # Check for admin permission
+    if self._permission_match(self.ADMIN_PERMISSION, permissions):
+      conditions = permissions[self.ADMIN_PERMISSION.action]\
+          .get(self.ADMIN_PERMISSION.resource_type)\
+          .get("conditions", {})\
+          .get(None, [])
+      if not conditions:
+        return True
+      for condition in conditions:
+        func = _CONDITIONS_MAP[str(condition['condition'])]
+        terms = condition.setdefault('terms', {})
+        if func(instance, _current_action=action, **terms):
+          return True
+      return False
     if not permissions.get(action) or not permissions[action].get(instance._inflector.model_singular):
       return False
     resources = self._permissions()\
