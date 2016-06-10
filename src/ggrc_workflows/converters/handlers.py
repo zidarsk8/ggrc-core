@@ -13,6 +13,7 @@ from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters import get_importables
 from ggrc.converters.handlers import handlers
+from ggrc.converters.handlers import boolean
 from ggrc_basic_permissions import models as bp_models
 from ggrc_workflows import models as wf_models
 
@@ -418,7 +419,7 @@ COLUMN_HANDLERS = {
     "cycle_task_group": CycleTaskGroupColumnHandler,
     "cycle_workflow": CycleWorkflowColumnHandler,
     "frequency": FrequencyColumnHandler,
-    "notify_on_change": handlers.CheckboxColumnHandler,
+    "notify_on_change": boolean.CheckboxColumnHandler,
     "relative_end_date": TaskEndColumnHandler,
     "relative_start_date": TaskStartColumnHandler,
     "task_description": TaskDescriptionColumnHandler,
