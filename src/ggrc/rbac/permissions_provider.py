@@ -12,9 +12,13 @@ from ggrc.rbac.permissions import is_allowed_create
 from ggrc.models import get_model
 from ggrc.models import Person
 
-Permission = namedtuple('Permission', 'action resource_type resource_id context_id')
+Permission = namedtuple(
+    'Permission',
+    'action resource_type resource_id context_id'
+)
 
 _contributing_resource_types = {}
+
 
 def get_contributing_resource_types(resource_type):
   """Return a list of resource types using the same context space.
@@ -28,10 +32,12 @@ def get_contributing_resource_types(resource_type):
     if resource_model:
       resource_manager = resource_model._sa_class_manager
       resource_types.extend(
-          manager.class_.__name__ for manager in
-            resource_manager.subclass_managers(True))
+          manager.class_.__name__
+          for manager in resource_manager.subclass_managers(True)
+      )
     _contributing_resource_types[resource_type] = resource_types
   return resource_types
+
 
 class DefaultUserPermissionsProvider(object):
   def __init__(self, settings):
@@ -40,13 +46,16 @@ class DefaultUserPermissionsProvider(object):
   def permissions_for(self, user):
     return DefaultUserPermissions()
 
+
 def resolve_permission_variable(value):
-  if type(value) is str or type(value) is unicode:
+  if isinstance(value, str) or isinstance(value, unicode):
     if value.startswith('$'):
       if value == '$current_user':
         return current_user
       raise Exception(
-          'The permission condition variable {0} is not defined!'.format(value))
+          'The permission condition variable {0} is not defined!'
+          .format(value)
+      )
     else:
       return value
   else:
@@ -142,7 +151,7 @@ class DefaultUserPermissions(UserPermissions):
       '__GGRC_ALL__',
       None,
       0,
-      )
+  )
 
   def _admin_permission_for_context(self, context_id):
     """Create an admin permission object for the given context"""
@@ -156,28 +165,29 @@ class DefaultUserPermissions(UserPermissions):
     """Check if the user has the given permission"""
 
     if None in \
-      permissions\
-        .get(permission.action, {})\
-        .get(permission.resource_type, {})\
-        .get('contexts', []):
+        permissions\
+            .get(permission.action, {})\
+            .get(permission.resource_type, {})\
+            .get('contexts', []):
       return True
     return \
         permission.resource_id in permissions\
-            .get(permission.action, {})\
-            .get(permission.resource_type, {})\
-            .get('resources', [])\
+        .get(permission.action, {})\
+        .get(permission.resource_type, {})\
+        .get('resources', [])\
         or permission.context_id in \
-          permissions\
-            .get(permission.action, {})\
-            .get(permission.resource_type, {})\
-            .get('contexts', [])\
+        permissions\
+        .get(permission.action, {})\
+        .get(permission.resource_type, {})\
+        .get('contexts', [])\
         or permission.context_id in \
-          permissions\
-            .get(permission.action, {})\
-            .get(self.ADMIN_PERMISSION.resource_type, {})\
-            .get('contexts', [])
+        permissions\
+        .get(permission.action, {})\
+        .get(self.ADMIN_PERMISSION.resource_type, {})\
+        .get('contexts', [])
 
-  def _permissions(self):
+  @staticmethod
+  def _permissions():
     """Returns request permission from the global scope"""
     return getattr(g, '_request_permissions', {})
 
@@ -195,6 +205,16 @@ class DefaultUserPermissions(UserPermissions):
         self._admin_permission_for_context(permission.context_id),
         permissions)
 
+  @staticmethod
+  def _check_conditions(instance, action, conditions):
+    """Check if any condition is valid for the instance."""
+    for condition in conditions:
+      func = _CONDITIONS_MAP[str(condition['condition'])]
+      terms = condition.setdefault('terms', {})
+      if func(instance, _current_action=action, **terms):
+        return True
+    return False
+
   def _is_allowed_for(self, instance, action):
     permissions = self._permissions()
     # Check for admin permission
@@ -205,13 +225,9 @@ class DefaultUserPermissions(UserPermissions):
           .get(None, [])
       if not conditions:
         return True
-      for condition in conditions:
-        func = _CONDITIONS_MAP[str(condition['condition'])]
-        terms = condition.setdefault('terms', {})
-        if func(instance, _current_action=action, **terms):
-          return True
-      return False
-    if not permissions.get(action) or not permissions[action].get(instance._inflector.model_singular):
+      return self._check_conditions(instance, action, conditions)
+    if (not permissions.get(action) or
+       not permissions[action].get(instance._inflector.model_singular)):
       return False
     resources = self._permissions()\
         .setdefault(action, {})\
@@ -244,17 +260,13 @@ class DefaultUserPermissions(UserPermissions):
     # Check any conditions applied per resource
     if (None in contexts or context_id in contexts) and not conditions:
       return True
-    for condition in conditions:
-      func = _CONDITIONS_MAP[str(condition['condition'])]
-      terms = condition.setdefault('terms', {})
-      if func(instance, **terms):
-        return True
-    return False
+    return self._check_conditions(instance, action, conditions)
 
   def is_allowed_create(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to create a resource of the specified
     type in the context."""
-    return self._is_allowed(Permission('create', resource_type, resource_id, context_id))
+    return self._is_allowed(
+        Permission('create', resource_type, resource_id, context_id))
 
   def is_allowed_create_for(self, instance):
     """Whether or not the user is allowed to create the given instance"""
@@ -263,7 +275,8 @@ class DefaultUserPermissions(UserPermissions):
   def is_allowed_read(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to read a resource of the specified
     type in the context."""
-    return self._is_allowed(Permission('read', resource_type, resource_id, context_id))
+    return self._is_allowed(
+        Permission('read', resource_type, resource_id, context_id))
 
   def is_allowed_read_for(self, instance):
     """Whether or not the user is allowed to read the given instance"""
@@ -272,23 +285,26 @@ class DefaultUserPermissions(UserPermissions):
   def is_allowed_update(self, resource_type, resource_id, context_id):
     """Whether or not the user is allowed to update a resource of the specified
     type in the context."""
-    return self._is_allowed(Permission('update', resource_type, resource_id, context_id))
+    return self._is_allowed(
+        Permission('update', resource_type, resource_id, context_id))
 
   def is_allowed_update_for(self, instance):
     """Whether or not the user is allowed to update the given instance"""
     return self._is_allowed_for(instance, 'update')
 
   def is_allowed_delete(self, resource_type, resource_id, context_id):
-    """Whether or not the user is allowed to delete a resource of the specified
-    type in the context."""
-    return self._is_allowed(Permission('delete', resource_type, resource_id, context_id))
+    """Whether or not the user is allowed to delete a resource of the
+    specified type in the context."""
+    return self._is_allowed(
+        Permission('delete', resource_type, resource_id, context_id))
 
   def is_allowed_delete_for(self, instance):
     """Whether or not the user is allowed to delete the given instance"""
     return self._is_allowed_for(instance, 'delete')
 
   def _get_resources_for(self, action, resource_type):
-    """Get resources resources (object ids) for a given action and resource_type"""
+    """Get resources resources (object ids) for a given action and
+    resource_type"""
     permissions = self._permissions()
 
     if self._permission_match(self.ADMIN_PERMISSION, permissions):
@@ -321,16 +337,15 @@ class DefaultUserPermissions(UserPermissions):
 
     ret = []
     for resource_type in resource_types:
-      ret.extend(permissions\
-          .get(action, {})\
-          .get(resource_type, {})\
-          .get('contexts', []))
+      ret.extend(permissions.get(action, {})
+                            .get(resource_type, {})
+                            .get('contexts', []))
 
     # Extend with the list of all contexts for which the user is an ADMIN
     admin_list = list(
-        permissions.get(self.ADMIN_PERMISSION.action, {})\
-            .get(self.ADMIN_PERMISSION.resource_type, {})\
-            .get('contexts', ()))
+        permissions.get(self.ADMIN_PERMISSION.action, {})
+        .get(self.ADMIN_PERMISSION.resource_type, {})
+        .get('contexts', ()))
     ret.extend(admin_list)
     if None in ret:
       return None
