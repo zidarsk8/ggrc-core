@@ -220,7 +220,13 @@ def index():
               information <b>*MUST NOT*</b> be entered or stored here.
               For any questions, please contact your administrator.""",
           "alert alert-warning")
-  return render_template("welcome/index.haml")
+  about_url = getattr(settings, "ABOUT_URL", None)
+  about_text = getattr(settings, "ABOUT_TEXT", "About gGRC")
+  return render_template(
+      "welcome/index.haml",
+      about_url=about_url,
+      about_text=about_text,
+  )
 
 
 @app.route("/dashboard")
