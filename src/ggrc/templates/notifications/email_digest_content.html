@@ -109,7 +109,9 @@ Maintained By: miha@reciprocitylabs.com
                       New cycle of
                       <a href="{{ cycle['cycle_url'] }}" {{ style.link_text() }} >{{ cycle['cycle_title'] }}</a>.
                     </li>
-                    <p {{ style.text_paragraph() }}><strong>Custom message:</strong> {{ cycle['custom_message'] }}</p>
+                    {{ if cycle['custom_message']|length }}
+                      <p {{ style.text_paragraph() }}><strong>Custom message:</strong> {{ cycle['custom_message'] }}</p>
+                    {% endif %}
                   {% endfor %}
                   </ul>
                 {% endif %}
