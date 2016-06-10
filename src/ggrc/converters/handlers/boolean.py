@@ -2,7 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
-
 """Handlers for boolean attributes."""
 
 import traceback
@@ -46,7 +45,7 @@ class CheckboxColumnHandler(handlers.ColumnHandler):
     This is the only handler that will allow setting a None value"""
     try:
       setattr(self.row_converter.obj, self.key, self.value)
-    except:
+    except Exception:  # pylint: disable=broad-except
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
       trace = traceback.format_exc()
       error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(

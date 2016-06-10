@@ -2,15 +2,14 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
-
 """Generic handlers for imports and exports."""
 
+import re
+import traceback
 from dateutil.parser import parse
 from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import or_
-import re
-import traceback
 
 from ggrc import db
 from ggrc.automapper import AutomapperGenerator
@@ -41,6 +40,11 @@ CUSTOM_ATTR_PREFIX = "__custom__:"
 
 
 class ColumnHandler(object):
+  """Default column handler.
+
+  This handler can be used on any model attribute that can accept normal text
+  value.
+  """
 
   def __init__(self, row_converter, key, **options):
     self.row_converter = row_converter
@@ -114,6 +118,7 @@ class ColumnHandler(object):
 
 
 class DeleteColumnHandler(ColumnHandler):
+  """Column handler for deleting objects."""
 
   # this is a white list of objects that can be deleted in a cascade
   # e.g. deleting a Market can delete the associated ObjectOwner object too
@@ -191,7 +196,6 @@ class StatusColumnHandler(ColumnHandler):
 
 
 class UserColumnHandler(ColumnHandler):
-
   """ Handler for primary and secondary contacts """
 
   def get_users_list(self):
@@ -232,6 +236,10 @@ class UserColumnHandler(ColumnHandler):
 
 
 class OwnerColumnHandler(UserColumnHandler):
+  """Handler for object owners.
+
+  This handler can accept a new line separated list of owner emails.
+  """
 
   def parse_item(self):
     owners = set()
