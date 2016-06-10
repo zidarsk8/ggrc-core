@@ -164,6 +164,9 @@
       var that = this;
       var control = this.control;
       var options = control && control.options;
+      var instance = this.instance;
+      var hasPending;
+      var changedInstance;
 
       // If the hide was initiated by the backdrop, check for dirty form data before continuing
       if (e && $(e.target).is('.modal-backdrop')) {
@@ -173,7 +176,11 @@
           e.stopPropagation();
           return;
         }
-        if (this.is_form_dirty() || this.instance && this.instance.isDirty()) {
+        if (instance) {
+          changedInstance = instance.isDirty();
+          hasPending = GGRC.Utils.hasPending(instance);
+        }
+        if (this.is_form_dirty() || changedInstance || hasPending) {
             // Confirm that the user wants to lose the data prior to hiding
           GGRC.Controllers.Modals.confirm({
             modal_title: 'Discard Changes',
