@@ -9,6 +9,7 @@ from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import request
 from ggrc.converters.handlers import related_person
 from ggrc.converters.handlers import list_handlers
+from ggrc.converters.handlers import boolean
 from ggrc.extensions import get_extension_modules
 
 GGRC_COLUMN_HANDLERS = {
@@ -25,9 +26,9 @@ GGRC_COLUMN_HANDLERS = {
     "due_on": handlers.DateColumnHandler,
     "email": handlers.EmailColumnHandler,
     "end_date": handlers.DateColumnHandler,
-    "fraud_related": handlers.CheckboxColumnHandler,
-    "is_enabled": handlers.CheckboxColumnHandler,
-    "key_control": handlers.KeyControlColumnHandler,
+    "fraud_related": boolean.CheckboxColumnHandler,
+    "is_enabled": boolean.CheckboxColumnHandler,
+    "key_control": boolean.KeyControlColumnHandler,
     "kind": handlers.OptionColumnHandler,
     "link": handlers.TextColumnHandler,
     "means": handlers.OptionColumnHandler,
@@ -37,7 +38,7 @@ GGRC_COLUMN_HANDLERS = {
     "operationally": handlers.ConclusionColumnHandler,
     "owners": handlers.OwnerColumnHandler,
     "principal_assessor": handlers.UserColumnHandler,
-    "private": handlers.CheckboxColumnHandler,
+    "private": boolean.CheckboxColumnHandler,
     "program": handlers.ProgramColumnHandler,
     "program_mapped": handlers.ObjectPersonColumnHandler,
     "recipients": list_handlers.ValueListHandler,
@@ -56,7 +57,7 @@ GGRC_COLUMN_HANDLERS = {
     "requested_on": handlers.DateColumnHandler,
     "secondary_assessor": handlers.UserColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,
-    "send_by_default": handlers.CheckboxColumnHandler,
+    "send_by_default": boolean.CheckboxColumnHandler,
     "slug": handlers.SlugColumnHandler,
     "start_date": handlers.DateColumnHandler,
     "status": handlers.StatusColumnHandler,

@@ -3,8 +3,7 @@
 # Created By: miha@reciprocitylabs.com
 # Maintained By: miha@reciprocitylabs.com
 
-"""Generic handlers for imports and exports.
-"""
+"""Generic handlers for imports and exports."""
 
 from dateutil.parser import parse
 from flask import current_app
@@ -461,50 +460,6 @@ class OptionColumnHandler(ColumnHandler):
     if callable(option.title):
       return option.title()
     return option.title
-
-
-class CheckboxColumnHandler(ColumnHandler):
-
-  ALLOWED_VALUES = {"yes", "true", "no", "false", "--", "---"}
-  TRUE_VALUES = {"yes", "true"}
-  NONE_VALUES = {"--", "---"}
-
-  def parse_item(self):
-    """ mandatory checkboxes will get evelauted to false on empty value """
-    if self.raw_value == "":
-      return False
-    value = self.raw_value.lower() in self.TRUE_VALUES
-    if self.raw_value == self.NONE_VALUES:
-      value = None
-    if self.raw_value.lower() not in self.ALLOWED_VALUES:
-      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-    return value
-
-  def get_value(self):
-    val = getattr(self.row_converter.obj, self.key, False)
-    if val is None:
-      return "--"
-    return "true" if val else "false"
-
-  def set_obj_attr(self):
-    """ handle set object for boolean values
-
-    This is the only handler that will allow setting a None value"""
-    try:
-      setattr(self.row_converter.obj, self.key, self.value)
-    except:
-      self.row_converter.add_error(errors.UNKNOWN_ERROR)
-      trace = traceback.format_exc()
-      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
-          self.row_converter.obj, self.key, self.value, trace)
-      current_app.logger.error(error)
-
-
-class KeyControlColumnHandler(CheckboxColumnHandler):
-
-  ALLOWED_VALUES = {"key", "non-key", "--", "---"}
-  TRUE_VALUES = {"key"}
-  NONE_VALUES = {"--", "---"}
 
 
 class ParentColumnHandler(ColumnHandler):
