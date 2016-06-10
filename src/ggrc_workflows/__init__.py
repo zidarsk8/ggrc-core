@@ -352,6 +352,10 @@ def update_cycle_task_child_state(obj):
 def update_cycle_task_parent_state(obj):  # noqa
   """Propagate changes to obj's parents"""
 
+  if not is_allowed_update(obj.__class__.__name__,
+                           obj.id, obj.context.id):
+    return
+
   def update_parent(parent, old_status, new_status):
     """Update a parent element and emit a signal about the change"""
     parent.status = new_status
@@ -378,10 +382,6 @@ def update_cycle_task_parent_state(obj):  # noqa
     if isinstance(parent, models.CycleTaskGroup) \
        and parent.cycle.workflow.kind == "Backlog":
       continue
-
-    if not is_allowed_update(parent.__class__.__name__,
-                             parent.id, parent.context.id):
-      update_cycle_task_parent_state(parent)
 
     # If any child is `InProgress`, then parent should be `InProgress`
     if obj.status in {"InProgress", "Declined"} and old_status != "InProgress":
