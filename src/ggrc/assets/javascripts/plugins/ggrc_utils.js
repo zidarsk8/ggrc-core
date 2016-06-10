@@ -73,8 +73,13 @@
       if (list instanceof can.List) {
         list = list.serialize();
       }
+
       return _.find(list, function (pending) {
-        return pending.how === how && pending.what === instance;
+        var method = pending.how === how;
+        if (!instance) {
+          return method;
+        }
+        return method && pending.what === instance;
       });
     },
     is_mapped: function (target, destination, mapping) {
