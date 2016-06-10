@@ -12,6 +12,7 @@ from ggrc import db
 from ggrc.utils import structures
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
+from ggrc.converters import pre_commit_checks
 from ggrc.converters.base_row import RowConverter
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
@@ -271,6 +272,9 @@ class BlockConverter(object):
     for row_converter in self.row_converters:
       row_converter.setup_object()
 
+    for row_converter in self.row_converters:
+      self._check_object(row_converter)
+
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
         row_converter.send_pre_commit_signals()
@@ -373,3 +377,19 @@ class BlockConverter(object):
     if header.startswith("map:") or header.startswith("unmap:"):
       header = ":".join(part.strip() for part in header.split(":"))
     return header
+
+  def _check_object(self, row_converter):
+    """Check object if it has any pre commit checks.
+
+    Object will not be checked if there's already an error on and it's marked
+    as ignored. The check functions can mutate the row_converter object and
+    mark it to be ignored if there are any errors detected.
+
+    Args:
+      row_converter: Row converter for the row we want to check
+    """
+    if row_converter.ignore:
+      return
+    checker = pre_commit_checks.CHECKS.get(row_converter.obj.type)
+    if checker and callable(checker):
+      checker(row_converter)
