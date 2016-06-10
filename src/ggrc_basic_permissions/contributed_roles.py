@@ -8,7 +8,7 @@ from ggrc_basic_permissions.roles import (
     Auditor, AuditorProgramReader, AuditorReader, Editor,
     ProgramAuditEditor, ProgramAuditOwner, ProgramAuditReader,
     ProgramBasicReader, ProgramCreator, ProgramEditor, ProgramMappingEditor,
-    ProgramOwner, ProgramReader, Reader, Creator
+    ProgramOwner, ProgramReader, Reader, Creator, gGRC_Admin
 )
 
 
@@ -152,6 +152,7 @@ class BasicRoleDeclarations(RoleDeclarations):
         'ProgramAuditEditor': ProgramAuditEditor,
         'ProgramAuditReader': ProgramAuditReader,
         'Auditor': Auditor,
+        'gGRC Admin': gGRC_Admin,
     }
 
 
