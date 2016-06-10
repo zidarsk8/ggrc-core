@@ -65,7 +65,6 @@
       }
     }
   });
-
   /*
    * Template field
    *
@@ -162,7 +161,6 @@
       }
     }
   });
-
   GGRC.Components('addTemplateField', {
     tag: 'add-template-field',
     template: can.view(GGRC.mustache_path +
@@ -189,12 +187,23 @@
           var selected = scope.attr('selected');
           var title = _.trim(selected.title);
           var type = _.trim(selected.type);
+          var invalidInput = false;
           var values = _.splitTrim(selected.values, {
             unique: true
           }).join(',');
           ev.preventDefault();
-          if (!type || !title ||
-            (_.contains(scope.valueAttrs, type) && values === '')) {
+          scope.attr('selected.invalidTitle', false);
+          scope.attr('selected.invalidValues', false);
+
+          if (this.isInvalidTitle(fields, title)) {
+            this.attr('selected.invalidTitle', true);
+            invalidInput = true;
+          }
+          if (this.isInvalidValues(scope.valueAttrs, type, values)) {
+            scope.attr('selected.invalidValues', true);
+            invalidInput = true;
+          }
+          if (invalidInput) {
             return;
           }
           // We need to defer adding in modal since validation is preventing
@@ -212,6 +221,16 @@
                 selected.attr(type, '');
               });
           });
+        },
+        isInvalidValues: function (valueAttrs, type, values) {
+          return _.contains(valueAttrs, type) && !values;
+        },
+        isInvalidTitle: function (fields, selectedTitle) {
+          var duplicateField = _.some(fields, function (item) {
+            return item.title === selectedTitle && !item._pending_delete;
+          });
+          return (fields.length && duplicateField) ||
+            !selectedTitle;
         }
       });
     },
@@ -234,7 +253,9 @@
        */
       placeholder: function (options) {
         var types = this.attr('types');
-        var item = _.findWhere(types, {type: this.attr('selected.type')});
+        var item = _.findWhere(types, {
+          type: this.attr('selected.type')
+        });
         if (item) {
           return item.text;
         }
