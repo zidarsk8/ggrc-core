@@ -78,7 +78,12 @@
                   {{/is_allowed}}
                 {{else}}
                   <i class="fa fa-check-square-o gray"></i>
-                  <span class="setup-link">Review in progress</span>
+                  <span class="setup-link">
+                    Review in progress
+                    {{#current_cycle_assignee instance}}
+                      by <person class="inline-block" person-obj="person"></person>
+                    {{/current_cycle_assignee}}
+                  </span>
                 {{/if_equals}}
               {{/with_mapping_count}}
             {{/is_allowed}}
