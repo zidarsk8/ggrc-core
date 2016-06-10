@@ -13,6 +13,7 @@ TEST_DB_NAME="ggrcdevtest"
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 ROOT_PATH="${SCRIPTPATH}/../"
 DUMP_FILE=${1:-}
+HOST=${GGRC_DATABASE_HOST-"127.0.0.1"}
 
 if [[ "$DUMP_FILE" == "-h" || "$DUMP_FILE" == "--help" ]] ; then
   echo "Usage: $(basename $0) [sql_dump_file.sql]"
@@ -32,14 +33,16 @@ if [[ -f "$DUMP_FILE" ]] && grep "^USE " $DUMP_FILE; then
   exit 1
 fi
 
-mysql -uroot -proot -e "drop database if exists $DB_NAME"
-mysql -uroot -proot -e "create database $DB_NAME character set utf8"
-mysql -uroot -proot -e "drop database if exists $TEST_DB_NAME"
-mysql -uroot -proot -e "create database $TEST_DB_NAME character set utf8"
+
+
+mysql -uroot -proot -h$HOST -e "drop database if exists $DB_NAME"
+mysql -uroot -proot -h$HOST -e "create database $DB_NAME character set utf8"
+mysql -uroot -proot -h$HOST -e "drop database if exists $TEST_DB_NAME"
+mysql -uroot -proot -h$HOST -e "create database $TEST_DB_NAME character set utf8"
 
 if [[ -f "$DUMP_FILE" ]]; then
   echo "Importing: $DUMP_FILE"
-  mysql -uroot -proot $DB_NAME < $DUMP_FILE
+  mysql -uroot -proot -h$HOST $DB_NAME < $DUMP_FILE
 fi
 
 db_migrate
