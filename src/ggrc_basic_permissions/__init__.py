@@ -347,7 +347,7 @@ def collect_permissions(src_permissions, context_id, permissions):
           .setdefault('contexts', list())
       if context_id is not None:
         permissions[action][resource_type]['contexts'].append(context_id)
-      elif condition is None:
+      elif condition in (None, "forbid"):
         permissions[action][resource_type]['contexts'].append(context_id)
       if condition:
         permissions[action][resource_type]\
