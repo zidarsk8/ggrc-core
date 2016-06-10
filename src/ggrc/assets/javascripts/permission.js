@@ -32,6 +32,10 @@ var ADMIN_PERMISSION
       }
       return value.indexOf(property_value) >= 0;
     }
+    , forbid: function (instance, args, action) {
+      var blacklist = args.blacklist[action] || [];
+      return blacklist.indexOf(instance.type) < 0;
+    }
   }
 , permissions_compute = can.compute(GGRC.permissions);
 
@@ -94,8 +98,34 @@ can.Construct("Permission", {
 
   , _is_allowed_for : function(permissions, instance, action) {
     // Check for admin permission
-    if (this._permission_match(permissions, this._admin_permission_for_context(0)))
+    var checkAdmin = function (contextId) {
+      var permission = this._admin_permission_for_context(contextId);
+      var conditions;
+      var i;
+      var condition;
+      if (this._permission_match(permissions, permission)) {
+        conditions = _.toArray(_.exists(permissions,
+            permission.action,
+            permission.resource_type,
+            "conditions",
+            contextId))
+        if (!conditions.length) {
+          return true;
+        }
+        for (i = 0; i < conditions.length; i++) {
+          condition = conditions[i];
+          if (_CONDITIONS_MAP[condition.condition](
+                instance, condition.terms, action)) {
+            return true;
+          }
+        }
+        return false;
+      }
+      return false;
+    }.bind(this);
+    if (checkAdmin(0) || checkAdmin(null)) {
       return true;
+    }
 
     var action_obj = permissions[action] || {}
       , instance_type =
@@ -104,24 +134,28 @@ can.Construct("Permission", {
       , conditions_by_context = type_obj['conditions'] || {}
       , resources = type_obj.resources || []
       , context = instance.context || {id: null}
-      , conditions = conditions_by_context[context.id] || [];
+      , conditions = conditions_by_context[context.id];
 
     if (~resources.indexOf(instance.id)) {
       return true;
     }
-    if (this._is_allowed(permissions,
-        new Permission(action, instance_type, null))) {
-      return true;
-    }
     if (!this._is_allowed(permissions,
-        new Permission(action, instance_type, context.id))) {
+          new Permission(action, instance_type, null)) &&
+        !this._is_allowed(permissions,
+          new Permission(action, instance_type, context.id))) {
       return false;
     }
     // Check any conditions applied per instance
-    if (conditions.length === 0) return true;
+    if (!conditions) {
+      return false;
+    }
+    if (conditions.length === 0) {
+      return true;
+    }
     for (var i = 0; i < conditions.length; i++) {
       var condition = conditions[i];
-      if (_CONDITIONS_MAP[condition.condition](instance, condition.terms)) {
+      if (_CONDITIONS_MAP[condition.condition](
+            instance, condition.terms, action)) {
         return true;
       }
     }
