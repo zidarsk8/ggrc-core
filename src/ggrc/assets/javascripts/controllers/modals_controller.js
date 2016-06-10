@@ -640,7 +640,7 @@ can.Control('GGRC.Controllers.Modals', {
     var i, ui_arr_length = this.options.ui_array.length,
         $form = this.element.find("form"),
         $body = $form.closest(".modal-body"),
-        uiElements = $body.find("[uiindex]")
+        uiElements = $body.find("[uiindex]"),
         $hideButton = this.element.find("#formHide");
 
     for (i = 0; i < ui_arr_length; i++) {
