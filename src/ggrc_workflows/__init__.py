@@ -352,12 +352,29 @@ def update_cycle_task_child_state(obj):
 def update_cycle_task_parent_state(obj):  # noqa
   """Propagate changes to obj's parents"""
 
+  if not is_allowed_update(obj.__class__.__name__,
+                           obj.id, obj.context.id):
+    return
+
+  def update_parent(parent, old_status, new_status):
+    """Update a parent element and emit a signal about the change"""
+    parent.status = new_status
+    db.session.add(parent)
+    Signals.status_change.send(
+        parent.__class__,
+        obj=parent,
+        old_status=old_status,
+        new_status=new_status,
+    )
+    update_cycle_task_parent_state(parent)
+
   parent_attrs = _cycle_task_parent_attr.get(type(obj), [])
   for parent_attr in parent_attrs:
     if not parent_attr:
       continue
 
     parent = getattr(obj, parent_attr, None)
+    old_status = parent.status
     if not parent:
       continue
 
@@ -367,57 +384,24 @@ def update_cycle_task_parent_state(obj):  # noqa
       continue
 
     # If any child is `InProgress`, then parent should be `InProgress`
-    if obj.status == 'InProgress' or obj.status == 'Declined':
-      if parent.status != 'InProgress':
-        if is_allowed_update(parent.__class__.__name__,
-                             parent.id, parent.context.id):
-          old_status = parent.status
-          parent.status = 'InProgress'
-          db.session.add(parent)
-          Signals.status_change.send(
-              parent.__class__,
-              obj=parent,
-              new_status=parent.status,
-              old_status=old_status
-          )
-        update_cycle_task_parent_state(parent)
+    if obj.status in {"InProgress", "Declined"} and old_status != "InProgress":
+      new_status = "InProgress"
+      update_parent(parent, old_status, new_status)
     # If all children are `Finished` or `Verified`, then parent should be same
-    elif obj.status == 'Finished' or obj.status == 'Verified':
+    elif obj.status in {"Finished", "Verified", "Assigned"}:
       children_attrs = _cycle_task_children_attr.get(type(parent), [])
       for children_attr in children_attrs:
-        if children_attr:
-          children = getattr(parent, children_attr, None)
-          children_finished = True
-          children_verified = True
-          for child in children:
-            if child.status != 'Verified':
-              children_verified = False
-              if child.status != 'Finished':
-                children_finished = False
-          if children_verified and len(children) > 0:
-            if is_allowed_update(parent.__class__.__name__,
-                                 parent.id, parent.context.id):
-              old_status = parent.status
-              parent.status = 'Verified'
-              Signals.status_change.send(
-                  parent.__class__,
-                  obj=parent,
-                  new_status=parent.status,
-                  old_status=old_status
-              )
-            update_cycle_task_parent_state(parent)
-          elif children_finished and len(children) > 0:
-            if is_allowed_update(parent.__class__.__name__,
-                                 parent.id, parent.context.id):
-              old_status = parent.status
-              parent.status = 'Finished'
-              Signals.status_change.send(
-                  parent.__class__,
-                  obj=parent,
-                  new_status=parent.status,
-                  old_status=old_status
-              )
-            update_cycle_task_parent_state(parent)
+        children = getattr(parent, children_attr, None)
+        if not children:
+          continue
+
+        children_statues = [c.status for c in children]
+        unique_statuses = set(children_statues)
+        for status in ["Verified", "Finished", "Assigned"]:
+          # Check if all elements match a certain state
+          if children_statues[0] == status and len(unique_statuses) == 1:
+            new_status = status
+            update_parent(parent, old_status, new_status)
 
 
 def ensure_assignee_is_workflow_member(workflow, assignee):
