@@ -1083,6 +1083,14 @@ class Resource(ModelView):
     """Do NOTHING by default"""
     pass
 
+  def _check_contexts_for_post(self, src):
+    if (src.get('private') is True and
+            self.get_context_id_from_json(src) is not None):
+      raise BadRequest(
+          'context MUST be "null" when creating a private resource.')
+    elif 'context' not in src:
+      raise BadRequest('context MUST be specified.')
+
   def collection_post_step(self, src, no_result):
     try:
       obj = self.model()
@@ -1098,12 +1106,7 @@ class Resource(ModelView):
             self.get_context_id_from_json(src))\
            and not permissions.has_conditions('create', self.model.__name__):
           raise Forbidden()
-      if src.get('private') is True and src.get('context') is not None \
-         and src['context'].get('id') is not None:
-        raise BadRequest(
-            'context MUST be "null" when creating a private resource.')
-      elif 'context' not in src:
-        raise BadRequest('context MUST be specified.')
+      self._check_contexts_for_post(src)
 
       with benchmark("Deserialize object"):
         self.json_create(obj, src)
@@ -1139,7 +1142,7 @@ class Resource(ModelView):
         object_for_json = {} if no_result else self.object_for_json(obj)
       with benchmark("Make response"):
         return (201, object_for_json)
-    except (IntegrityError, ValidationError) as e:
+    except IntegrityError as e:
       msg = e.orig.args[1]
       if obj.type == "Relationship" and \
          msg.startswith("Duplicate entry") and \
@@ -1150,9 +1153,16 @@ class Resource(ModelView):
         db.session.flush()
         object_for_json = self.object_for_json(obj)
         return (200, object_for_json)
-      message = translate_message(e)
-      current_app.logger.warn(message)
-      return (403, message)
+      return self._make_error_from_exception(e)
+    except ValidationError as e:
+      return self._make_error_from_exception(e)
+
+  @staticmethod
+  def _make_error_from_exception(exc):
+    """Return a 403-code with the exception message."""
+    message = translate_message(exc)
+    current_app.logger.warn(message)
+    return (403, message)
 
   def collection_post(self):  # noqa
     if self.request.mimetype != 'application/json':

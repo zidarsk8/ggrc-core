@@ -5,7 +5,12 @@
 
 """A module containing the implementation of the assessment template entity."""
 
+import json
+
+from sqlalchemy.orm import validates
+
 from ggrc import db
+from ggrc.models.exceptions import ValidationError
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
@@ -64,3 +69,20 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
   @classmethod
   def generate_slug_prefix_for(cls, obj):
     return "TEMPLATE"
+
+  @validates('default_people')
+  def validate_default_people(self, key, value):
+    """Check that default people lists are not empty."""
+    # pylint: disable=no-self-use
+    # pylint: disable=unused-argument
+    if value is not None:
+      parsed = json.loads(value)
+      for field_name, field_value in parsed.iteritems():
+        if not field_value:
+          raise ValidationError(
+              'Invalid value for default_people.{field}. Expected a non-empty '
+              'string or a list of people ids, recieved {value}.'
+              .format(field=field_name, value=field_value),
+          )
+
+    return value
