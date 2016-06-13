@@ -46,6 +46,7 @@ class Assessment(mixins_statusable.Statusable,
   """
 
   __tablename__ = 'assessments'
+  _title_uniqueness = False
 
   ASSIGNEE_TYPES = (u"Creator", u"Assessor", u"Verifier")
 
