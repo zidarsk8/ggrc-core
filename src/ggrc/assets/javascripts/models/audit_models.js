@@ -579,7 +579,7 @@
       }
       return 'Request "' + out_name + '"';
     },
-    form_preload: function (new_object_form) {
+    form_preload: function (new_object_form, object_params) {
       var audit;
       var that = this;
       var assignees = {};
@@ -591,9 +591,9 @@
         // Current user should be Requester
         assignees[current_user.email] = 'Requester';
 
-        if (_.exists(GGRC, 'page_model.type') === 'Audit') {
+        if (_.exists(object_params, 'audit.id')) {
           this.attr('audit', {
-            id: GGRC.page_model.id,
+            id: object_params.audit.id,
             type: 'Audit'
           });
         }

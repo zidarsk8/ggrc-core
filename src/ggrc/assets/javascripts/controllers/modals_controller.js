@@ -279,7 +279,10 @@ can.Control('GGRC.Controllers.Modals', {
 
 
       that.options.instance._transient || that.options.instance.attr("_transient", new can.Observe({}));
-      that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
+      if (that.options.instance.form_preload) {
+        that.options.instance.form_preload(that.options.new_object_form,
+                                           that.options.object_params);
+      }
     });
   }
 
@@ -855,7 +858,10 @@ can.Control('GGRC.Controllers.Modals', {
           this.element.trigger("loaded");
         }
         this.options.instance._transient || this.options.instance.attr("_transient", new can.Observe({}));
-        this.options.instance.form_preload && this.options.instance.form_preload(this.options.new_object_form);
+        if (this.options.instance.form_preload) {
+          this.options.instance.form_preload(this.options.new_object_form,
+                                             this.options.object_params);
+        }
       }.bind(this))
       .then(this.proxy("apply_object_params"))
       .then(this.proxy("serialize_form"))
