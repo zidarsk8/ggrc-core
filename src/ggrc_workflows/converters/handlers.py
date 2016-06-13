@@ -91,6 +91,8 @@ class TaskDateColumnHandler(handlers.ColumnHandler):
   def parse_item(self):
     """ parse start and end columns fow workflow tasks
     """
+    if not self.raw_value.strip():
+      return None
     raw_parts = self.raw_value.lower().split(" ")
     try:
       if len(raw_parts) == 2:
@@ -143,6 +145,8 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
     """ set all possible start date attributes """
     # disable false parentheses warning for 'not (a < b < c)'
     # pylint: disable=C0325
+    if not self.value:
+      return
     freq = self.row_converter.obj.task_group.workflow.frequency
     if freq == "one_time":
       if len(self.value) != 3:
@@ -187,6 +191,8 @@ class TaskEndColumnHandler(TaskDateColumnHandler):
     """ set all possible end date attributes """
     # disable false parentheses warning for 'not (a < b < c)'
     # pylint: disable=C0325
+    if not self.value:
+      return
     freq = self.row_converter.obj.task_group.workflow.frequency
     if freq == "one_time":
       if len(self.value) != 3:
