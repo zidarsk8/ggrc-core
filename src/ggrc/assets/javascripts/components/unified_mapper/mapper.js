@@ -179,6 +179,8 @@
         } else {
           data.type = treeView.display_list[0];
         }
+      } else {
+        data.type = 'Program';
       }
 
       if (id || GGRC.page_instance()) {
