@@ -161,10 +161,10 @@
     },
 
     hide: function (e) {
-      var that = this;
       var control = this.control;
       var options = control && control.options;
       var instance = this.instance;
+      var pending;
       var hasPending;
       var changedInstance;
 
@@ -186,31 +186,30 @@
             modal_title: 'Discard Changes',
             modal_description: 'Are you sure that you want to discard your changes?',
             modal_confirm: 'Discard',
-            instance: options.instance,
+            instance: instance,
             model: options.model,
             skip_refresh: true
           }, function () {
-            $.when(function () {
-              can.trigger(options.instance, 'modal:dismiss');
-            }).then(function () {
-              that.$element.find("[data-dismiss='modal'], [data-dismiss='modal-reset']").trigger('click');
-              that.hide();
-            });
-          });
+            can.trigger(instance, 'modal:dismiss');
+            this.$element
+              .find("[data-dismiss='modal'], [data-dismiss='modal-reset']")
+              .trigger('click');
+            this.hide();
+          }.bind(this));
           return;
         }
       }
 
-        // Hide the modal like normal
-      $.when(function () {
-        if (options) {
-          return can.trigger(options.instance, 'modal:dismiss');
+      // Hide the modal like normal
+      if (instance) {
+        pending = instance.attr('_pending_joins');
+        if (pending && pending.length) {
+          instance.attr('_pending_joins', []);
         }
-        return;
-      }).then(function () {
-        $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
-        this.$element.off('modal_form');
-      }.bind(this));
+        can.trigger(instance, 'modal:dismiss');
+      }
+      $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
+      this.$element.off('modal_form');
     },
 
     focus_first_input: function (ev) {
