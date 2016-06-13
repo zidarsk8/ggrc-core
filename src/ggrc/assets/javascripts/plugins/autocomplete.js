@@ -272,14 +272,15 @@
           this.last_request.start += MAX_RESULTS;
           context.attr('items_loading', true);
           this.source(this.last_request, function (items) {
-            context.items.push.apply(context.items, can.map(items, function (item) {
-              return item.item;
-            }));
+            context.items.push.apply(context.items, can.map(items,
+              function (el) {
+                return el.item;
+              }));
             context.removeAttr('items_loading');
             setTimeout(function () {
               this.scroll_op_in_progress = undefined;
             }.bind(this), 10);
-          });
+          }.bind(this));
         }.bind(this));
 
       can.view.render(GGRC.mustache_path + template,
