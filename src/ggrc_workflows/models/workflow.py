@@ -375,9 +375,12 @@ class WorkflowState(object):
     if not current_tasks:
       return None
 
-    overdue_tasks = [task for task in current_tasks
-                     if task.status != "Verified" and
-                     task.end_date <= date.today()]
+    today = date.today()
+    overdue_tasks = any(task.end_date and
+                        task.end_date <= today and
+                        task.status != "Verified"
+                        for task in current_tasks)
+
     if overdue_tasks:
       return "Overdue"
 
