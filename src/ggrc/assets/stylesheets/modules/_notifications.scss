@@ -13,6 +13,7 @@
   margin-left: 25%;
   z-index: zIndex(flash);
   font-size: 11px;
+
   .notice {
     background-color: $messageGreen;
     p {
@@ -59,8 +60,8 @@
 }
 
 .alert {
-  @include border-radius(0);
-  border: none;
+  @include border-radius(2px);
+  border: 1px solid;
   margin-bottom: 20px;
   p {
     margin-bottom: 0;
