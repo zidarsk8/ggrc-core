@@ -62,16 +62,17 @@
 
   $doc.ready(function () {
     // monitor target, where flash messages are added
+    var AUTOHIDE_TIMEOUT = 10000;
     var target = $('section.content div.flash')[0];
     var observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
         // check for new nodes
         if (mutation.addedNodes !== null) {
           // remove the success message from non-expandable
-          // flash success messages after five seconds
+          // flash success messages after timeout
           setTimeout(function () {
             $('.flash .alert-autohide').remove();
-          }, 5000);
+          }, AUTOHIDE_TIMEOUT);
         }
       });
     });
