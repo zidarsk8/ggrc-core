@@ -143,12 +143,8 @@ select {
     cursor: default;
     background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 6px;
     border: 1px solid $ajaxBtnDisabled;
-    color: $ajaxGray;
     text-shadow: none;
     padding-left: 28px;
-    &:hover {
-      color: $ajaxGray;
-    }
     &:active {
       @include box-shadow(none);
       background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 5px;
