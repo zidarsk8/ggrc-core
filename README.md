@@ -58,7 +58,7 @@ directory
     git submodule update --init
     docker-compose up -d
     docker exec -it ggrccore_dev_1 su vagrant
-    make bower_components
+    make -B bower_components
     build_css
     build_assets
     db_reset
