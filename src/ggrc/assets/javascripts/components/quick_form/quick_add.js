@@ -66,7 +66,7 @@
       }
     },
     events: {
-      init: function() {
+      init: function () {
         this.scope.attr("controller", this);
       },
       // The inserted event fires when the component content is added to the DOM.
@@ -78,19 +78,19 @@
         }.bind(this));
       },
       "a[data-toggle=submit]:not(.disabled) click": function (el, ev) {
-        var scope = this.scope,
-            join_model_class,
-            join_object,
-            quick_create,
-            created_dfd,
-            verify_dfd = $.Deferred();
+        var scope = this.scope;
+        var join_model_class;
+        var join_object;
+        var quick_create;
+        var created_dfd;
+        var verify_dfd = $.Deferred();
 
         if (scope.attr("verify_event")) {
           GGRC.Controllers.Modals.confirm({
             modal_description: scope.attr("modal_description"),
             modal_confirm: scope.attr("modal_button"),
             modal_title: scope.attr("modal_title"),
-            button_view : GGRC.mustache_path + "/quick_form/confirm_buttons.mustache",
+            button_view: GGRC.mustache_path + "/quick_form/confirm_buttons.mustache"
           }, verify_dfd.resolve);
         } else {
           verify_dfd.resolve();
