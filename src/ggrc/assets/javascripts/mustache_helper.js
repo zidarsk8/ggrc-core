@@ -3386,20 +3386,15 @@ Add spaces to a CamelCase string.
 Example:
 {{un_camel_case "InProgress"}} becomes "In Progress"
 */
-Mustache.registerHelper("un_camel_case", function (str, options) {
-  var val = Mustache.resolve(str);
-  if (!val || val == "") {
-    return val;
-  }
-  var newval = val[0];
-  for (var i=1; i<val.length; i++) {
-    if (val[i] == val[i].toUpperCase()) {
-      newval += " ";
+  Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
+    var value = Mustache.resolve(str);
+    toLowerCase = typeof toLowerCase !== 'object';
+    if (!value) {
+      return value;
     }
-    newval += val[i];
-  }
-  return newval;
-});
+    value = value.replace(/([A-Z]+)/g, ' $1').replace(/([A-Z][a-z])/g, ' $1');
+    return toLowerCase ? value.toLowerCase() : value;
+  });
 
   /**
    * Check if the current user is allowed to edit a comment, and render the
