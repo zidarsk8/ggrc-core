@@ -280,7 +280,9 @@ can.Control('GGRC.Controllers.Modals', {
     // If the modal is closed early, the element no longer exists
     if (this.element) {
       // Do the fields (re-)setting
-      setFieldsCb();
+      if (_.isFunction(setFieldsCb)) {
+        setFieldsCb();
+      }
       // This is to trigger `focus_first_element` in modal_ajax handling
       this.element.trigger('loaded');
     }

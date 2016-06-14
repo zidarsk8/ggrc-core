@@ -581,6 +581,7 @@
     },
     form_preload: function (new_object_form, object_params) {
       var audit;
+      var auditId;
       var that = this;
       var assignees = {};
       var current_user = CMS.Models.get_instance('Person',
@@ -591,9 +592,16 @@
         // Current user should be Requester
         assignees[current_user.email] = 'Requester';
 
-        if (_.exists(object_params, 'audit.id')) {
+        // auditId = the audit info from the request creation button ||
+        //           the audit from the current page if we are on audit page
+        auditId = _.exists(object_params, 'audit.id') ||
+          (_.exists(GGRC, 'page_model.type') === 'Audit' ?
+           GGRC.page_model.id :
+           undefined);
+
+        if (auditId) {
           this.attr('audit', {
-            id: object_params.audit.id,
+            id: auditId,
             type: 'Audit'
           });
         }
