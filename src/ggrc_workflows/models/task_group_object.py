@@ -7,6 +7,8 @@
 
 
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy import orm
+
 
 from ggrc import db
 from ggrc.models.mixins import Mapping
@@ -76,6 +78,7 @@ class TaskGroupObject(Timeboxed, Mapping, db.Model):
 
 
 class TaskGroupable(object):
+
   @classmethod
   def late_init_task_groupable(cls):
     def make_task_group_objects(cls):
@@ -101,13 +104,10 @@ class TaskGroupable(object):
       PublishOnly('task_groups'),
       'task_group_objects',
   ]
-
   _include_links = []
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(TaskGroupable, cls).eager_query()
     return cls.eager_inclusions(query, TaskGroupable._include_links).options(
         orm.subqueryload('task_group_objects'))

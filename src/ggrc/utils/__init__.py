@@ -9,6 +9,7 @@ import re
 import sqlalchemy
 import sys
 import time
+import collections
 
 from flask import current_app, request
 from ggrc.settings import CUSTOM_URL_ROOT
@@ -279,6 +280,8 @@ class QueryCounter(object):
 
 class BenchmarkContextManager(object):
 
+  results = collections.defaultdict(list)
+
   def __init__(self, message):
     self.message = message
 
@@ -286,9 +289,49 @@ class BenchmarkContextManager(object):
     self.start = time.time()
 
   def __exit__(self, exc_type, exc_value, exc_trace):
-    end = time.time()
-    current_app.logger.info("{:.4f} {}".format(end - self.start, self.message))
+    duration = time.time() - self.start
+    self.results[self.message].append(duration)
+    # current_app.logger.info("{:.4f} {}".format(duration, self.message))
+    # current_app.logger.info("{:.4f} {}".format(duration, self.message))
 
+  @classmethod
+  def print_results(cls):
+    for k, v in sorted(cls.results.items(), key=lambda x: sum(x[1]), reverse=True):
+      print "  all: {:.6f} - avg: {:.6f} - calls: {:4d} - {}".format(
+        sum(v), sum(v)/len(v), len(v), k)
+
+
+
+class BenchmarkContextManagerB(object):
+
+  results = collections.defaultdict(lambda: collections.defaultdict(float))
+
+  def __init__(self, message):
+    self.message = message
+
+  def __enter__(self):
+    self.start = time.time()
+
+  @staticmethod
+  def _result_str(message, values):
+    return "  all: {all:.6f} - avg: {avg:.6f} - calls: {count:4.0f} - {message}".format(
+        message=message,
+        avg=values["all"]/values["count"],
+        **values
+    )
+
+  def __exit__(self, exc_type, exc_value, exc_trace):
+    duration = time.time() - self.start
+    self.results[self.message]["all"] += duration
+    self.results[self.message]["count"] += 1
+    self.results[self.message]["last"] = duration
+    # current_app.logger.info(
+    #     self._result_str(self.message, self.results[self.message]))
+
+  @classmethod
+  def print_results(cls):
+    for message, values in sorted(cls.results.items(), key=lambda x: x[1]["all"], reverse=True):
+      print cls._result_str(message, values)
 
 class WithNop(object):
 

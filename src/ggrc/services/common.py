@@ -1304,11 +1304,13 @@ class Resource(ModelView):
       query = model.eager_query()
       # We force the query here so that we can benchmark it
       objs = query.filter(model.id.in_(ids.keys())).all()
-    with benchmark("Publish objects"):
+    with benchmark("Publish objects ({})".format(len(objs))):
       resources = {}
       includes = self.get_properties_to_include(request.args.get('__include'))
       for obj in objs:
         resources[ids[obj.id]] = ggrc.builder.json.publish(obj, includes)
+
+    benchmark.print_results()
     with benchmark("Publish representation"):
       ggrc.builder.json.publish_representation(resources)
     return resources

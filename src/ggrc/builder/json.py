@@ -18,6 +18,7 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.types import JsonType
 from ggrc.utils import url_for
 from ggrc.utils import view_url_for
+from ggrc.utils import benchmark
 import ggrc.builder
 import ggrc.models
 import ggrc.services
@@ -63,9 +64,11 @@ def publish(obj, inclusions=(), inclusion_filter=None):
       return True
   publisher = get_json_builder(obj)
   if publisher and getattr(publisher, '_publish_attrs', False):
-    ret = publish_base_properties(obj)
-    ret.update(publisher.publish_contribution(
-        obj, inclusions, inclusion_filter))
+    with benchmark("publish base properties"):
+      ret = publish_base_properties(obj)
+    with benchmark("publish contributions"):
+      ret.update(publisher.publish_contribution(
+          obj, inclusions, inclusion_filter))
     return ret
   # Otherwise, just return the value itself by default
   return obj
@@ -567,45 +570,52 @@ class Builder(AttributeInfo):
     # `associationproxy` uses another table as a join table, and context
     # filtering must be done on the join table, or information leakage will
     # result.
-    join_objects = []
-    for join_object in getattr(obj, class_attr.local_attr.key):
-      if (not inclusion_filter) or inclusion_filter(join_object):
-        join_objects.append(join_object)
+    with benchmark("publish association proxy: {}".format(attr_name)):
+      with benchmark("get object list for: {}".format(attr_name)):
+        import ipdb; ipdb.set_trace()
+        join_objects = []
+        with benchmark("get objects for: {} - {}".format(attr_name, class_attr.local_attr.key)):
+          all_objects = getattr(obj, class_attr.local_attr.key)
+        for join_object in all_objects:
+          if (not inclusion_filter) or inclusion_filter(join_object):
+            join_objects.append(join_object)
 
-    if include:
-      target_objects = [
-          getattr(join_object, class_attr.remote_attr.key)
-          for join_object in join_objects]
-      return self.publish_link_collection(
-          target_objects, inclusions, include, inclusion_filter)
-    else:
-      if isinstance(class_attr.remote_attr, property):
-        target_name = class_attr.value_attr + '_id'
-        target_type = class_attr.value_attr + '_type'
-        return [
-            LazyStubRepresentation(
-                getattr(o, target_type), getattr(o, target_name))
-            for o in join_objects]
+      if include:
+        target_objects = [
+            getattr(join_object, class_attr.remote_attr.key)
+            for join_object in join_objects]
+        return self.publish_link_collection(
+            target_objects, inclusions, include, inclusion_filter)
       else:
-        target_mapper = class_attr.remote_attr.property.mapper
-        # Handle inheritance -- we must check the object itself for the type
-        if len(list(target_mapper.self_and_descendants)) > 1:
-          target_attr = class_attr.remote_attr.property.key
-          return [
-              self.generate_link_object_for(
-                  getattr(o, target_attr),
-                  inclusions,
-                  include,
-                  inclusion_filter)
-              for o in join_objects]
-        else:
-          target_name = list(
-              class_attr.remote_attr.property.local_columns)[0].key
-          target_type = class_attr.remote_attr.property.mapper.class_.__name__
+        if isinstance(class_attr.remote_attr, property):
+          target_name = class_attr.value_attr + '_id'
+          target_type = class_attr.value_attr + '_type'
           return [
               LazyStubRepresentation(
-                  target_type, getattr(o, target_name))
+                  getattr(o, target_type), getattr(o, target_name))
               for o in join_objects]
+        else:
+          target_mapper = class_attr.remote_attr.property.mapper
+          # Handle inheritance -- we must check the object itself for the type
+          if len(list(target_mapper.self_and_descendants)) > 1:
+            target_attr = class_attr.remote_attr.property.key
+            return [
+                self.generate_link_object_for(
+                    getattr(o, target_attr),
+                    inclusions,
+                    include,
+                    inclusion_filter)
+                for o in join_objects]
+          else:
+            target_name = list(
+                class_attr.remote_attr.property.local_columns)[0].key
+            target_type = class_attr.remote_attr.property.mapper.class_.__name__
+            with benchmark("generate result list for: {}".format(attr_name)):
+              result_list = [
+                  LazyStubRepresentation(
+                      target_type, getattr(o, target_name))
+                  for o in join_objects]
+            return result_list
 
   def publish_relationship(
           self, obj, attr_name, class_attr, inclusions, include,
@@ -663,19 +673,22 @@ class Builder(AttributeInfo):
 
   def _publish_attrs_for(
           self, obj, attrs, json_obj, inclusions=[], inclusion_filter=None):
-    for attr in attrs:
-      if hasattr(attr, '__call__'):
-        attr_name = attr.attr_name
-      else:
-        attr_name = attr
-      local_inclusion = ()
-      for inclusion in inclusions:
-        if inclusion[0] == attr_name:
-          local_inclusion = inclusion
-          break
-      json_obj[attr_name] = self.publish_attr(
-          obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0,
-          inclusion_filter)
+    with benchmark("publish attrs for, atttr count: {}".format(len(attrs))):
+      for attr in attrs:
+        with benchmark("publish attr for attr: {}".format(attr)):
+          if hasattr(attr, '__call__'):
+            attr_name = attr.attr_name
+          else:
+            attr_name = attr
+          local_inclusion = ()
+          with benchmark("find attr inclusion: {}".format(attr_name)):
+            for inclusion in inclusions:
+              if inclusion[0] == attr_name:
+                local_inclusion = inclusion
+                break
+          json_obj[attr_name] = self.publish_attr(
+              obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0,
+              inclusion_filter)
 
   def publish_attrs(self, obj, json_obj, extra_inclusions, inclusion_filter):
     """Translate the state represented by ``obj`` into the JSON dictionary
@@ -693,8 +706,8 @@ class Builder(AttributeInfo):
       [('directives'),('cycles')]
       [('directives', ('audit_frequency','organization')),('cycles')]
     """
-    inclusions = tuple((attr,) for attr in self._include_links)
-    inclusions = tuple(set(inclusions).union(set(extra_inclusions)))
+    inclusions_set = set((attr,) for attr in self._include_links)
+    inclusions = inclusions_set.union(set(extra_inclusions))
     return self._publish_attrs_for(
         obj, self._publish_attrs, json_obj, inclusions, inclusion_filter)
 
