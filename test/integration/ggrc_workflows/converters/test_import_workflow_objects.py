@@ -171,6 +171,31 @@ class TestWorkflowObjectsImport(TestCase):
     for task_type, slugs in task_types.items():
       self._test_task_types(task_type, slugs)
 
+  def test_bad_task_dates(self):
+    """Test import updates with invalid task dates.
+
+    This import checks if it's possible to update task dates with start date
+    being bigger than the end date.
+    """
+    self.import_file("workflow_small_sheet.csv")
+    response = self.import_file("workflow_bad_task_dates.csv")
+
+    expected_errors = {
+        "Task Group Task": {
+            "row_errors": set([
+                errors.INVALID_START_END_DATES.format(
+                    line=4, start_date="Start date", end_date="End date"),
+                errors.INVALID_START_END_DATES.format(
+                    line=5, start_date="Start date", end_date="End date"),
+                errors.INVALID_START_END_DATES.format(
+                    line=6, start_date="Start date", end_date="End date"),
+                errors.INVALID_START_END_DATES.format(
+                    line=7, start_date="Start date", end_date="End date"),
+            ])
+        },
+    }
+    self._check_response(response, expected_errors)
+
   def _test_task_types(self, expected_type, task_slugs):
     """Test that all listed tasks have rich text type.
 
