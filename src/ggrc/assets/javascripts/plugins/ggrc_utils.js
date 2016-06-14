@@ -165,6 +165,18 @@
            _.contains(createContexts, targetContext));
       }
       return canMap;
+    },
+    isEmptyCA: function (value, type) {
+      switch (type) {
+        case 'Checkbox':
+          value = value === '1';
+          break;
+        case 'Rich Text':
+          value = value.replace(/<(?:.|\n)*?>/gm, '');
+          break;
+        default:
+      }
+      return !value;
     }
   };
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

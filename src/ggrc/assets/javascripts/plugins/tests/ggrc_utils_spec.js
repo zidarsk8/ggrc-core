@@ -94,3 +94,58 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
   });
 });
+
+describe('GGRC utils isEmptyCA() method', function () {
+  'use strict';
+
+  var isEmptyCA;
+
+  beforeAll(function () {
+    isEmptyCA = GGRC.Utils.isEmptyCA;
+  });
+
+  describe('check Rich Text value', function () {
+    it('returns true for empty div', function () {
+      var result = isEmptyCA('<div></div>', 'Rich Text');
+      expect(result).toBe(true);
+    });
+
+    it('returns true for div with a line break', function () {
+      var result = isEmptyCA('<div><br></div>', 'Rich Text');
+      expect(result).toBe(true);
+    });
+
+    it('returns true for div with a empty list', function () {
+      var result = isEmptyCA('<div><ul><li></li></ul></div>', 'Rich Text');
+      expect(result).toBe(true);
+    });
+
+    it('returns true for div with a empty paragraph', function () {
+      var result = isEmptyCA('<div><p></p></div>', 'Rich Text');
+      expect(result).toBe(true);
+    });
+
+    it('returns false for div with the text', function () {
+      var result = isEmptyCA('<div>Very important text!</div>', 'Rich Text');
+      expect(result).toBe(false);
+    });
+
+    it('returns false for not empty list', function () {
+      var result = isEmptyCA('<div><ul><li>One</li><li>Two</li></ul></div>',
+        'Rich Text');
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('check Checkbox value', function () {
+    it('returns false for unchecked', function () {
+      var result = isEmptyCA('0', 'Checkbox');
+      expect(result).toBe(true);
+    });
+
+    it('returns true for checked', function () {
+      var result = isEmptyCA('1', 'Checkbox');
+      expect(result).toBe(false);
+    });
+  });
+});

@@ -972,13 +972,12 @@
         commentCount = commentCount();
         attachmentCount = attachmentCount();
         _.each(instance.custom_attribute_definitions, function (definition) {
-          var attrValue = _.result(_.find(values, function (cav) {
+          var attr = _.result(_.find(values, function (cav) {
             return cav.custom_attribute_id === definition.id;
           }), 'attribute_value');
-          if (definition.attribute_type === 'Checkbox') {
-            attrValue = attrValue === '1';
-          }
-          if (definition.mandatory && !attrValue) {
+
+          if (definition.mandatory &&
+            GGRC.Utils.isEmptyCA(attr, definition.attribute_type)) {
             needed.value.push(definition.title);
           }
         });
