@@ -42,14 +42,28 @@
       modal_title: "@",
       modal_button: "@",
       attributes: {},
-      create_url: function() {
-        var value = this.element.find("input[type='text']").val();
+      create_url: function () {
+        var value = $.trim(this.element.find("input[type='text']").val());
+
+        // We are not validating the URL because application can locally we can
+        // have URL's that are valid, but they wouldn't pass validation i.e.
+        // - hi/there
+        // - hi.something
+        // - http://something.com etc
+        // and thus we decided to validate just string existence
+        if (!value || _.isEmpty(value)) {
+          return $.Deferred().reject({
+            message: 'Please enter a URL'
+          });
+        }
         return new CMS.Models.Document({
           link: value,
           title: value,
-          context: this.scope.parent_instance.context || new CMS.Models.Context({id : null}),
-        });
-      },
+          context: this.scope.parent_instance.context || new CMS.Models.Context({
+            id: null
+          })
+        }).save();
+      }
     },
     events: {
       init: function() {
@@ -88,9 +102,15 @@
             if (quick_create) {
               created_dfd = quick_create();
               if (!this.scope.deferred) {
-                created_dfd = created_dfd.save().then(function(data){
-                  this.scope.attr("instance", data);
-                }.bind(this));
+                created_dfd
+                  .fail(function (error) {
+                    $(document.body).trigger('ajax:flash', {
+                      error: error.message
+                    });
+                  })
+                  .done(function (data) {
+                    this.scope.attr('instance', data);
+                  }.bind(this));
               }
             }
           }
