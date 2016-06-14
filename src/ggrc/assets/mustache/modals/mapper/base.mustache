@@ -11,7 +11,7 @@
   </a>
   <h2>
     {{#if template.title}}
-      {{{render template.title}}
+      {{{render template.title mapper=mapper}}}
     {{else}}
       Map {{get_object}} to {{get_title}}
     {{/if}}
