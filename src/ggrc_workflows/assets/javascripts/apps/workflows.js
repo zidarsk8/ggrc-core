@@ -328,6 +328,20 @@
         GGRC.mustache_path + '/base_objects/approval_link.mustache'
         );
     });
+
+    // Patch Person to extend query for dashboard
+    GGRC.Mappings.modules.ggrc_core
+      .Person.related_objects_via_search
+      .observe_types.push('Workflow');
+    can.each(['Person'], function (type) {
+        mappings[type] = _.extend(mappings[type] || {}, {
+          _canonical: {
+            'related_objects_as_source': ['Workflow']
+          },
+          _mixins: ['related', 'related_workflow', 'related_workflow'],
+        });
+    });
+
     new GGRC.Mappings('ggrc_workflows', mappings);
   };
 

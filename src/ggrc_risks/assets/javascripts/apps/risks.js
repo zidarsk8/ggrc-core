@@ -15,7 +15,7 @@
       "Objective", "Control", "Section", "Clause", "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
       "MultitypeSearch", "Issue", "Assessment", "AccessGroup", "Request",
-      "Person", "OrgGroup", "Vendor", "Workflow"
+      "Person", "OrgGroup", "Vendor"
     ],
     related_object_descriptors = {},
     threat_descriptor, risk_descriptor;
@@ -81,8 +81,7 @@
         related_requests: TypeFilter("related_objects", "Request"),
         related_people: TypeFilter("related_objects", "Person"),
         related_org_groups: TypeFilter("related_objects", "OrgGroup"),
-        related_vendors: TypeFilter("related_objects", "Vendor"),
-        related_workflows: TypeFilter("related_objects", "Workflow")
+        related_vendors: TypeFilter("related_objects", "Vendor")
 
       },
       related_risk: {
