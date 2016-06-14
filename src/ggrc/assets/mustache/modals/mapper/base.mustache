@@ -25,7 +25,7 @@
         {{#if_helpers "\
           ^if_equals" mapper.type "AllObject" "\
           and ^if" mapper.search_only}}
-          {{#is_allowed 'create' mapper.model.singular context=null}}
+          {{#is_allowed 'create' mapper.model.singular context='any'}}
 
             {{#if_equals mapper.type 'AssessmentTemplate'}}
               <a
