@@ -11,23 +11,18 @@
   {{#if_in instance.status "Not Started,In Progress"}}
     {{#if_null instance._mandatory_msg}}
       {{#if_verifiers_defined instance}}
-          <button href="javascript://"
-                  class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
+          <button class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
                   data-name="status"
                   data-value="Ready for Review">
             Complete
           </button>
       {{else}}
-          <button href="javascript://"
-                  class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
+          <button class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
                   data-name="status"
-                  data-value="Completed">
-            Complete
-          </button>
+                  data-value="Completed">Complete</button>
       {{/if_verifiers_defined}}
     {{else}}
-      <button href="javascript://"
-              class="btn btn-small btn-primary pull-right btn-info-pin-header disabled"
+      <button class="btn btn-small btn-primary pull-right btn-info-pin-header disabled"
               rel="tooltip"
               title="{{instance._mandatory_msg}}">
         Complete
@@ -38,24 +33,20 @@
   {{#if_equals instance.status "Ready for Review"}}
       {{#if_null instance._mandatory_msg}}
           {{#if_verifier instance}}
-              <button href="javascript://"
-                      class="btn btn-small btn-success pull-right btn-info-pin-header {{instance._disabled}}"
+              <button class="btn btn-small btn-success pull-right btn-info-pin-header {{instance._disabled}}"
                       data-name="status"
                       data-value="Verified">Verify</button>
-              <button href="javascript://"
-                      class="btn btn-small btn-danger pull-right btn-info-pin-header {{instance._disabled}}"
+              <button class="btn btn-small btn-danger pull-right btn-info-pin-header {{instance._disabled}}"
                       data-name="status"
                       data-value="In Progress">Reject</button>
           {{/if_verifier}}
       {{else}}
           {{#if_verifier instance}}
-              <button href="javascript://"
-                      class="btn btn-small btn-success pull-right btn-info-pin-header disabled"
+              <button class="btn btn-small btn-success pull-right btn-info-pin-header disabled"
                       data-name="status"
                       data-value="Verified"
                       title="{{instance._mandatory_msg}}">Verify</button>
-              <button href="javascript://"
-                      class="btn btn-small btn-danger pull-right btn-info-pin-header disabled"
+              <button class="btn btn-small btn-danger pull-right btn-info-pin-header disabled"
                       data-name="status"
                       data-value="In Progress"
                       title="{{instance._mandatory_msg}}">Reject</button>
