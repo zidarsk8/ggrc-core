@@ -975,6 +975,9 @@
           var attrValue = _.result(_.find(values, function (cav) {
             return cav.custom_attribute_id === definition.id;
           }), 'attribute_value');
+          if (definition.attribute_type === 'Checkbox') {
+            attrValue = attrValue === '1';
+          }
           if (definition.mandatory && !attrValue) {
             needed.value.push(definition.title);
           }
