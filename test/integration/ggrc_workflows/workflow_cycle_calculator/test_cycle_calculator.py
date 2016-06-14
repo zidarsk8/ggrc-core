@@ -7,12 +7,16 @@
 
 from datetime import date
 
+from ggrc import app  # noqa #pylint: disable=unused-import
 from ggrc import db
-from ggrc_workflows.models import Workflow
-from ggrc_workflows.services.workflow_cycle_calculator.cycle_calculator import\
-    CycleCalculator
-from integration.ggrc_workflows.workflow_cycle_calculator import \
-    base_workflow_test_case
+from ggrc_workflows import models
+from ggrc_workflows.services.workflow_cycle_calculator import cycle_calculator
+
+
+from integration.ggrc_workflows.workflow_cycle_calculator \
+    import base_workflow_test_case
+
+# pylint: disable=invalid-name
 
 
 class TestCycleCalculator(base_workflow_test_case.BaseWorkflowTestCase):
@@ -42,15 +46,16 @@ class TestCycleCalculator(base_workflow_test_case.BaseWorkflowTestCase):
         },
         ]
     }
-    _, workflow = self.generator.generate_workflow(weekly_wf)
-    self.generator.generate_task_group(workflow)
-    self.generator.activate_workflow(workflow)
-    active_wf = db.session.query(Workflow).filter(
-        Workflow.id == workflow.id).one()
+    _, wf = self.generator.generate_workflow(weekly_wf)
+    self.generator.generate_task_group(wf)
+    self.generator.activate_workflow(wf)
+    active_wf = db.session.query(models.Workflow).filter(
+        models.Workflow.id == wf.id).one()
 
-    # pylint: disable=abstract-class-instantiated
-    CycleCalculator.__abstractmethods__ = set()
-    calc = CycleCalculator(active_wf)
+    cycle_calculator.CycleCalculator.__abstractmethods__ = set()
+    cycle_calculator.CycleCalculator.get_relative_start = \
+        lambda self, task: 4  # RFC 1149.5
+    calc = cycle_calculator.CycleCalculator(active_wf)  # noqa # pylint: disable=abstract-class-instantiated
 
     # Check if weekend adjustments work
     self.assertEqual(calc.adjust_date(date(2015, 6, 20)), date(2015, 6, 19))
