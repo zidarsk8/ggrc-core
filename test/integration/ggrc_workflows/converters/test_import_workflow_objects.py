@@ -37,11 +37,7 @@ class TestWorkflowObjectsImport(TestCase):
     filename = "workflow_small_sheet.csv"
     response = self.import_file(filename)
 
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
-    for block in response:
-      for message in messages:
-        self.assertEqual(set(), set(block[message]))
+    self._check_response(response, {})
 
     self.assertEqual(1, Workflow.query.count())
     self.assertEqual(1, TaskGroup.query.count())
@@ -61,7 +57,6 @@ class TestWorkflowObjectsImport(TestCase):
     filename = "workflow_with_warnings_and_errors.csv"
     response = self.import_file(filename)
 
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
     expected_errors = {
         "Workflow": {
             "row_errors": [
@@ -70,11 +65,7 @@ class TestWorkflowObjectsImport(TestCase):
             ],
         }
     }
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-    for block in response:
-      for message in messages:
-        expected = expected_errors.get(block["name"], {}).get(message, [])
-        self.assertEqual(set(block[message]), set(expected))
+    self._check_response(response, expected_errors)
 
   def test_import_task_date_format(self):
     """Test import of tasks for workflows
@@ -140,9 +131,7 @@ class TestWorkflowObjectsImport(TestCase):
     """
     filename = "workflow_big_sheet.csv"
     response = self.import_file(filename)
-    expected_messages = {
-        "Workflow": {},
-        "Task Group": {},
+    expected_errors = {
         "Task Group Task": {
             "row_warnings": set([
                 errors.WRONG_REQUIRED_VALUE.format(
@@ -157,21 +146,7 @@ class TestWorkflowObjectsImport(TestCase):
             ])
         },
     }
-    messages = (
-        "block_errors",
-        "block_warnings",
-        "row_errors",
-        "row_warnings",
-    )
-    # Assert that there were no import errors
-    for obj in response:
-      if obj['name'] in expected_messages:
-        for message in messages:
-          self.assertEqual(
-              set(obj[message]),
-              expected_messages[obj["name"]].get(message, set())
-          )
-          self.assertEqual(obj["ignored"], 0)
+    self._check_response(response, expected_errors)
 
     task_types = {
         "text": [
