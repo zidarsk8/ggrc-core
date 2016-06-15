@@ -5,12 +5,15 @@
  * Maintained By: vladan@reciprocitylabs.com
  */
 
-spinner {
+.spinner {
   display: inline-block;
 }
-.spinner-size__large {
-  font-size: 2em;
-}
-.spinner-size__huge {
-  font-size: 3em;
+
+.spinner-size {
+  &__large {
+    font-size: 2em;
+  }
+  &__huge {
+    font-size: 3em;
+  }
 }
