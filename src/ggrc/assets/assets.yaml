@@ -146,6 +146,7 @@ dashboard-js-files:
   - components/rich_text/rich_text.js
   - components/add_comment/add_comment.js
   - components/object_cloner/object_cloner.js
+  - components/object_counter/object_counter.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -269,6 +270,7 @@ dashboard-js-template-files:
   - components/spinner/spinner.mustache
   - components/rich_text/rich_text.mustache
   - components/datepicker/datepicker.mustache
+  - components/object_counter/object_counter.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
