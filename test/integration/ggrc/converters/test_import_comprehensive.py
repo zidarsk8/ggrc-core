@@ -271,22 +271,3 @@ class TestComprehensiveSheets(TestCase):
         }
     }
     self._check_response(response, expected_errors)
-
-  def _check_response(self, response, expected_errors):
-    """Test that response contains all expected errors and warnigs.
-
-    Args:
-      response: api response object.
-      expected_errors: dict of all expected errors by object type.
-
-    Raises:
-      AssertionError if an expected error or warning is not found in the
-        propper response block.
-    """
-
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
-    for block in response:
-      for message in messages:
-        expected = expected_errors.get(block["name"], {}).get(message, set())
-        self.assertEqual(set(expected), set(block[message]))

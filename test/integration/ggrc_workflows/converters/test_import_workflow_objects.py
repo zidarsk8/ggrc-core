@@ -37,11 +37,7 @@ class TestWorkflowObjectsImport(TestCase):
     filename = "workflow_small_sheet.csv"
     response = self.import_file(filename)
 
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
-    for block in response:
-      for message in messages:
-        self.assertEqual(set(), set(block[message]))
+    self._check_response(response, {})
 
     self.assertEqual(1, Workflow.query.count())
     self.assertEqual(1, TaskGroup.query.count())
@@ -61,7 +57,6 @@ class TestWorkflowObjectsImport(TestCase):
     filename = "workflow_with_warnings_and_errors.csv"
     response = self.import_file(filename)
 
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
     expected_errors = {
         "Workflow": {
             "row_errors": [
@@ -70,11 +65,7 @@ class TestWorkflowObjectsImport(TestCase):
             ],
         }
     }
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-    for block in response:
-      for message in messages:
-        expected = expected_errors.get(block["name"], {}).get(message, [])
-        self.assertEqual(set(block[message]), set(expected))
+    self._check_response(response, expected_errors)
 
   def test_import_task_date_format(self):
     """Test import of tasks for workflows
@@ -140,9 +131,7 @@ class TestWorkflowObjectsImport(TestCase):
     """
     filename = "workflow_big_sheet.csv"
     response = self.import_file(filename)
-    expected_messages = {
-        "Workflow": {},
-        "Task Group": {},
+    expected_errors = {
         "Task Group Task": {
             "row_warnings": set([
                 errors.WRONG_REQUIRED_VALUE.format(
@@ -157,21 +146,7 @@ class TestWorkflowObjectsImport(TestCase):
             ])
         },
     }
-    messages = (
-        "block_errors",
-        "block_warnings",
-        "row_errors",
-        "row_warnings",
-    )
-    # Assert that there were no import errors
-    for obj in response:
-      if obj['name'] in expected_messages:
-        for message in messages:
-          self.assertEqual(
-              set(obj[message]),
-              expected_messages[obj["name"]].get(message, set())
-          )
-          self.assertEqual(obj["ignored"], 0)
+    self._check_response(response, expected_errors)
 
     task_types = {
         "text": [
@@ -195,6 +170,31 @@ class TestWorkflowObjectsImport(TestCase):
 
     for task_type, slugs in task_types.items():
       self._test_task_types(task_type, slugs)
+
+  def test_bad_task_dates(self):
+    """Test import updates with invalid task dates.
+
+    This import checks if it's possible to update task dates with start date
+    being bigger than the end date.
+    """
+    self.import_file("workflow_small_sheet.csv")
+    response = self.import_file("workflow_bad_task_dates.csv")
+
+    expected_errors = {
+        "Task Group Task": {
+            "row_errors": set([
+                errors.INVALID_START_END_DATES.format(
+                    line=4, start_date="Start date", end_date="End date"),
+                errors.INVALID_START_END_DATES.format(
+                    line=5, start_date="Start date", end_date="End date"),
+                errors.INVALID_START_END_DATES.format(
+                    line=6, start_date="Start date", end_date="End date"),
+                errors.INVALID_START_END_DATES.format(
+                    line=7, start_date="Start date", end_date="End date"),
+            ])
+        },
+    }
+    self._check_response(response, expected_errors)
 
   def _test_task_types(self, expected_type, task_slugs):
     """Test that all listed tasks have rich text type.

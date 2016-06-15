@@ -64,13 +64,32 @@ class TestCase(BaseTestCase):
   def setUp(self):
     self.clear_data()
 
-  def tearDown(self):
+  def tearDown(self):  # pylint: disable=no-self-use
     db.session.remove()
 
-  @classmethod
-  def create_app(cls):
+  @staticmethod
+  def create_app():
     """Flask specific function for running an app instance."""
     app.config["SERVER_NAME"] = "localhost"
     app.testing = True
     app.debug = False
     return app
+
+  def _check_response(self, response, expected_errors):
+    """Test that response contains all expected errors and warnigs.
+
+    Args:
+      response: api response object.
+      expected_errors: dict of all expected errors by object type.
+
+    Raises:
+      AssertionError if an expected error or warning is not found in the
+        propper response block.
+    """
+
+    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
+
+    for block in response:
+      for message in messages:
+        expected = expected_errors.get(block["name"], {}).get(message, set())
+        self.assertEqual(set(expected), set(block[message]))

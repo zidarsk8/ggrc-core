@@ -80,7 +80,10 @@ DELETE_NEW_OBJECT_ERROR = (u"Line {line}: Tried to create and delete the same"
 DELETE_CASCADE_ERROR = (u"Line {line}: Cannot delete object {object_type}:"
                         " {slug} without deleting other objects")
 
-UNKNOWN_ERROR = "Line {line}: Import failed due to unknown error."
+UNKNOWN_ERROR = u"Line {line}: Import failed due to unknown error."
 
-REQUEST_INVALID_STATE = ("LINE {line}: Can not set Request state to Completed "
-                         "or Verified via imports.")
+REQUEST_INVALID_STATE = (u"Line {line}: Can not set Request state to Completed"
+                         u" or Verified via imports.")
+
+INVALID_START_END_DATES = (u"Line {line}: {start_date} can not be after "
+                           u"{end_date}. The line will be ignored.")
