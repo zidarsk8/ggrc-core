@@ -3,6 +3,7 @@
 # Created By: dan@reciprocitylabs.com
 # Maintained By: urban@reciprocitylabs.com
 
+"""Module for Clause model."""
 
 from ggrc import db
 from ggrc.models.mixins import CustomAttributable
@@ -48,6 +49,7 @@ class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
       "directive": None,
   }
 
+  # pylint: disable=invalid-name
   na = deferred(db.Column(db.Boolean, default=False, nullable=False),
                 'Clause')
   notes = deferred(db.Column(db.Text), 'Clause')
