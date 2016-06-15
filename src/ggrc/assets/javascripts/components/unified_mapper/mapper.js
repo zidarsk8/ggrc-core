@@ -151,7 +151,11 @@
     })
   });
 
-  can.Component.extend({
+  /**
+   * A component implementing a modal for mapping objects to other objects,
+   * taking the object type mapping constraints into account.
+   */
+  GGRC.Components('modalMapper', {
     tag: 'modal-mapper',
     template: can.view(GGRC.mustache_path + '/modals/mapper/base.mustache'),
     scope: function (attrs, parentScope, el) {
