@@ -187,7 +187,7 @@ can.Control('CMS.Controllers.TreeLoader', {
     return this._display_deferred;
   },
 
-  draw_list: function (list, is_reload, force_prepare_chilren) {
+  draw_list: function (list, is_reload, force_prepare_children) {
     var that = this;
     var refresh_queue = new RefreshQueue();
     var sort_function;
@@ -226,7 +226,7 @@ can.Control('CMS.Controllers.TreeLoader', {
     temp_list = [];
     if (!is_reload) {
       list.each(function (v) {
-        var item = that.prepare_child_options(v, force_prepare_chilren);
+        var item = that.prepare_child_options(v, force_prepare_children);
         temp_list.push(item);
         if (!item.instance.selfLink) {
           refresh_queue.enqueue(v.instance);
@@ -264,7 +264,7 @@ can.Control('CMS.Controllers.TreeLoader', {
         return o;
       }
     });
-    this._draw_list_deferred = this.enqueue_items(temp_list, is_reload, force_prepare_chilren);
+    this._draw_list_deferred = this.enqueue_items(temp_list, is_reload, force_prepare_children);
     return this._draw_list_deferred;
   },
 
@@ -301,7 +301,7 @@ can.Control('CMS.Controllers.TreeLoader', {
     };
   },
 
-  enqueue_items: function (items, is_reload, force_prepare_chilren) {
+  enqueue_items: function (items, is_reload, force_prepare_children) {
     var child_tree_display_list = [];
     var filtered_items = [];
     var i;
@@ -366,26 +366,36 @@ can.Control('CMS.Controllers.TreeLoader', {
       refreshed_deferred = new $.Deferred().resolve();
     }
     refreshed_deferred.then(function () {
-      that.insert_items(filtered_items, force_prepare_chilren);
+      that.insert_items(filtered_items, force_prepare_children);
       that._ifNotRemoved(that._loading_finished).call(that);
     });
     return this._loading_deferred;
   },
 
-  insert_items: function (items, force_prepare_chilren) {
+  insert_items: function (items, force_prepare_children) {
     var that = this;
-    var prepped_items = [];
+    var preppedItems = [];
+    var idMap = {};
+    var toInsert;
 
-    can.each(items, function (item) {
-      var prepped = that.prepare_child_options(item, force_prepare_chilren);
+    // Check the list of items to be inserted for any duplicate items.
+    can.each(this.options.list || [], function (item) {
+      idMap[item.instance.type + item.instance.id] = true;
+    });
+    toInsert = _.filter(items, function (item) {
+      return !idMap[item.instance.type + item.instance.id];
+    });
+
+    can.each(toInsert, function (item) {
+      var prepped = that.prepare_child_options(item, force_prepare_children);
       if (prepped.instance.selfLink) {
-        prepped_items.push(prepped);
+        preppedItems.push(prepped);
       }
     });
 
-    if (prepped_items.length > 0) {
-      this.options.list.push.apply(this.options.list, prepped_items);
-      this.add_child_lists(prepped_items);
+    if (preppedItems.length > 0) {
+      this.options.list.push.apply(this.options.list, preppedItems);
+      this.add_child_lists(preppedItems);
     }
   }
 });
