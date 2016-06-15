@@ -26,9 +26,9 @@ from ggrc.models.track_object_state import track_state_for_class
 
 
 class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
-              WithContact, Titled, Slugged, Stateful, db.Model,
+              WithContact, Titled, Stateful, db.Model,
               CustomAttributable, Documentable, Personable,
-              Ownable, Relatable):
+              Ownable, Relatable, Slugged):
   VALID_STATES = [
       'Draft',
       'Final',
