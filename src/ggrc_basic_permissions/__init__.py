@@ -22,7 +22,7 @@ from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.audit import Audit
 from ggrc.models.program import Program
-from ggrc.rbac import permissions
+from ggrc.rbac import permissions as rbac_permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.common import _get_cache_manager
 from ggrc.services.common import Resource
@@ -47,13 +47,15 @@ blueprint = Blueprint(
     static_url_path='/static/ggrc_basic_permissions',
 )
 
+PERMISSION_CACHE_TIMEOUT = 3600  # 60 minutes
+
 
 def get_public_config(_):
   """Expose additional permissions-dependent config to client.
     Specifically here, expose GGRC_BOOTSTRAP_ADMIN values to ADMIN users.
   """
   public_config = {}
-  if permissions.is_admin():
+  if rbac_permissions.is_admin():
     if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS'):
       public_config['BOOTSTRAP_ADMIN_USERS'] = settings.BOOTSTRAP_ADMIN_USERS
   return public_config
@@ -326,7 +328,7 @@ class UserPermissions(DefaultUserPermissions):
     if user is None or user.is_anonymous():
       self._request_permissions = {}
     else:
-      with benchmark('load_permissions > load permissions for user'):
+      with benchmark('load_permissions'):
         self._request_permissions = load_permissions_for(user)
 
 
@@ -359,47 +361,44 @@ def collect_permissions(src_permissions, context_id, permissions):
             })
 
 
-def load_permissions_for(user):  # noqa
-  """Permissions is dictionary that can be exported to json to share with
-  clients. Structure is:
-  ..
+def query_memcache(key):
+  """Check if cached permissions are available
 
-    permissions[action][resource_type][contexts]
-                                      [conditions][context][context_conditions]
-
-  'action' is one of 'create', 'read', 'update', 'delete'.
-  'resource_type' is the name of a valid gGRC resource type.
-  'contexts' is a list of context_id where the action is allowed.
-  'conditions' is a dictionary of 'context_conditions' indexed by 'context'
-    where 'context' is a context_id.
-  'context_conditions' is a list of dictionaries with 'condition' and 'terms'
-    keys.
-  'condition' is the string name of a conditional operator, such as 'contains'.
-  'terms' are the arguments to the 'condition'.
+  Args:
+      key (string): key of the stored permissions
+  Returns:
+      cache (memcache_client): memcache client or None if caching
+                               is not available
+      permissions_cache (dict): dict with all permissions or None if there
+                                was a cache miss
   """
-  PERMISSION_CACHE_TIMEOUT = 1800  # 30 minutes
-  permissions = {}
-  key = 'permissions:{}'.format(user.id)
-  cache = None
+  if not getattr(settings, 'MEMCACHE_MECHANISM', False):
+    return None, None
 
-  if getattr(settings, 'MEMCACHE_MECHANISM', False):
-    cache = _get_cache_manager().cache_object.memcache_client
-    cached_keys_set = cache.get('permissions:list') or set()
-    if key not in cached_keys_set:
-      # We set the permissions:list variable so that we are able to batch
-      # remove all permissions related keys from memcache
-      cached_keys_set.add(key)
-      cache.set('permissions:list', cached_keys_set, PERMISSION_CACHE_TIMEOUT)
-    else:
-      permissions_cache = cache.get(key)
-      if permissions_cache:
-        # If the key is both in permissions:list and in memcache itself
-        # it is safe to return the cached permissions
-        return permissions_cache
+  cache = _get_cache_manager().cache_object.memcache_client
+  cached_keys_set = cache.get('permissions:list') or set()
+  if key not in cached_keys_set:
+    # We set the permissions:list variable so that we are able to batch
+    # remove all permissions related keys from memcache
+    cached_keys_set.add(key)
+    cache.set('permissions:list', cached_keys_set, PERMISSION_CACHE_TIMEOUT)
+    return cache, None
 
-  # Add default `Help` and `NotificationConfig` permissions for everyone
-  # FIXME: This should be made into a global base role so it can be extended
-  #   from extensions
+  permissions_cache = cache.get(key)
+  if permissions_cache:
+    # If the key is both in permissions:list and in memcache itself
+    # it is safe to return the cached permissions
+    return cache, permissions_cache
+
+
+def load_default_permissions(permissions):
+  """Load default permissions for all users
+
+  Args:
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      None
+  """
   default_permissions = {
       "read": [
           "Help",
@@ -444,6 +443,16 @@ def load_permissions_for(user):  # noqa
   }
   collect_permissions(default_permissions, None, permissions)
 
+
+def load_bootstrap_admin(user, permissions):
+  """Add bootstrap admin permissions if user is in BOOTSTRAP_ADMIN_USERS
+
+  Args:
+      user (Person): Person object
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      None
+  """
   # Add `ADMIN_PERMISSION` for "bootstrap admin" users
   if hasattr(settings, 'BOOTSTRAP_ADMIN_USERS') \
      and user.email in settings.BOOTSTRAP_ADMIN_USERS:
@@ -457,7 +466,17 @@ def load_permissions_for(user):  # noqa
         DefaultUserPermissions.ADMIN_PERMISSION.context_id,
         permissions)
 
-  # Now add permissions from all DB-managed roles
+
+def load_user_roles(user, permissions):
+  """Load all user roles for user
+
+  Args:
+      user (Person): Person object
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      source_contexts_to_rolenames (dict): Role names for contexts
+  """
+  # Add permissions from all DB-managed roles
   user_roles = db.session.query(UserRole)\
       .options(
           sqlalchemy.orm.undefer_group('UserRole_complete'),
@@ -474,7 +493,17 @@ def load_permissions_for(user):  # noqa
     if isinstance(user_role.role.permissions, dict):
       collect_permissions(
           user_role.role.permissions, user_role.context_id, permissions)
+  return source_contexts_to_rolenames
 
+
+def load_all_context_implications(source_contexts_to_rolenames):
+  """Load context implications based on rolenames
+
+  Args:
+      source_contexts_to_rolenames (dict): Role names for contexts
+  Returns:
+      all_context_implications (list): List of possible context implications
+  """
   # apply role implications per context implication
   all_context_implications = db.session.query(ContextImplication)
   keys = [k for k in source_contexts_to_rolenames.keys() if k is not None]
@@ -492,7 +521,20 @@ def load_permissions_for(user):  # noqa
         ContextImplication.source_context_id.is_(None)).all()
   else:
     all_context_implications = []
+  return all_context_implications
 
+
+def load_implied_roles(permissions, source_contexts_to_rolenames,
+                       all_context_implications):
+  """Load roles from implied contexts
+
+  Args:
+      permissions (dict): dict where the permissions will be stored
+      source_contexts_to_rolenames (dict): Role names for contexts
+      all_context_implications (list): List of possible context implications
+  Returns:
+      None
+  """
   # Gather all roles required by context implications
   implied_context_to_implied_roles = {}
   all_implied_roles_set = set()
@@ -524,7 +566,16 @@ def load_permissions_for(user):  # noqa
       collect_permissions(
           implied_role.permissions, implied_context_id, permissions)
 
-  # Agregate from owners:
+
+def load_object_owners(user, permissions):
+  """Load object owners permissions
+
+  Args:
+      user (Person): Person object
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      None
+  """
   for object_owner in user.object_owners:
     for action in ["read", "create", "update", "delete", "view_object_page"]:
       permissions.setdefault(action, {})\
@@ -532,6 +583,16 @@ def load_permissions_for(user):  # noqa
           .setdefault('resources', list())\
           .append(object_owner.ownable_id)
 
+
+def load_program_relationships(user, permissions):
+  """Load program relationship permissions
+
+  Args:
+      user (Person): Person object
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      None
+  """
   for res in program_relationship_query(user.id):
     id_, type_, role_name = res
     actions = ["read", "view_object_page"]
@@ -542,6 +603,17 @@ def load_permissions_for(user):  # noqa
           .setdefault(type_, {})\
           .setdefault('resources', list())\
           .append(id_)
+
+
+def load_audit_relationships(user, permissions):
+  """Load audit relationship permissions
+
+  Args:
+      user (Person): Person object
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      None
+  """
   for res in audit_relationship_query(user.id):
     id_, type_, role_name = res
     actions = ["read", "view_object_page"]
@@ -555,6 +627,17 @@ def load_permissions_for(user):  # noqa
           .setdefault(type_, {})\
           .setdefault('resources', list())\
           .append(id_)
+
+
+def load_assignee_relationships(user, permissions):
+  """Load assignee relationship permissions
+
+  Args:
+      user (Person): Person object
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      None
+  """
   for id_, type_, role_name in objects_via_assignable_query(user.id, False):
     actions = ["read", "view_object_page"]
     if role_name == "RUD":
@@ -565,6 +648,16 @@ def load_permissions_for(user):  # noqa
           .setdefault('resources', list())\
           .append(id_)
 
+
+def load_personal_context(user, permissions):
+  """Load personal context for user
+
+  Args:
+      user (Person): Person object
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      None
+  """
   personal_context = _get_or_create_personal_context(user)
 
   permissions.setdefault('__GGRC_ADMIN__', {})\
@@ -572,14 +665,15 @@ def load_permissions_for(user):  # noqa
       .setdefault('contexts', list())\
       .append(personal_context.id)
 
-  if cache is not None:
-    cached_keys_set = cache.get('permissions:list') or set()
-    if key in cached_keys_set:
-      # We only add the permissions to the cache if the
-      # key still exists in the permissions:list after
-      # the query has executed.
-      cache.set(key, permissions, PERMISSION_CACHE_TIMEOUT)
 
+def load_backlog_workflows(permissions):
+  """Load permissions for backlog workflows
+
+  Args:
+      permissions (dict): dict where the permissions will be stored
+  Returns:
+      None
+  """
   # add permissions for backlog workflows to everyone
   actions = ["read", "edit", "update"]
   _types = ["Workflow", "Cycle", "CycleTaskGroup",
@@ -595,6 +689,94 @@ def load_permissions_for(user):  # noqa
             .setdefault(_type, {})\
             .setdefault('contexts', list())\
             .append(wf_context_id)
+
+
+def store_results_into_memcache(permissions, cache, key):
+  """Load personal context for user
+
+  Args:
+      permissions (dict): dict where the permissions will be stored
+      cache (cache_manager): Cache manager that should be used for storing
+                             permissions
+      key (string): key of under wich permissions should be stored
+  Returns:
+      None
+  """
+  if cache is None:
+    return
+
+  cached_keys_set = cache.get('permissions:list') or set()
+  if key in cached_keys_set:
+    # We only add the permissions to the cache if the
+    # key still exists in the permissions:list after
+    # the query has executed.
+    cache.set(key, permissions, PERMISSION_CACHE_TIMEOUT)
+
+
+def load_permissions_for(user):
+  """Permissions is dictionary that can be exported to json to share with
+  clients. Structure is:
+  ..
+
+    permissions[action][resource_type][contexts]
+                                      [conditions][context][context_conditions]
+
+  'action' is one of 'create', 'read', 'update', 'delete'.
+  'resource_type' is the name of a valid gGRC resource type.
+  'contexts' is a list of context_id where the action is allowed.
+  'conditions' is a dictionary of 'context_conditions' indexed by 'context'
+    where 'context' is a context_id.
+  'context_conditions' is a list of dictionaries with 'condition' and 'terms'
+    keys.
+  'condition' is the string name of a conditional operator, such as 'contains'.
+  'terms' are the arguments to the 'condition'.
+  """
+  permissions = {}
+  key = 'permissions:{}'.format(user.id)
+
+  with benchmark("load_permissions > query memcache"):
+    cache, result = query_memcache(key)
+    if result:
+      return result
+
+  with benchmark("load_permissions > load default permissions"):
+    load_default_permissions(permissions)
+
+  with benchmark("load_permissions > load bootstrap admins"):
+    load_bootstrap_admin(user, permissions)
+
+  with benchmark("load_permissions > load user roles"):
+    source_contexts_to_rolenames = load_user_roles(user, permissions)
+
+  with benchmark("load_permissions > load context implications"):
+    all_context_implications = load_all_context_implications(
+        source_contexts_to_rolenames)
+
+  with benchmark("load_permissions > load implied roles"):
+    load_implied_roles(permissions, source_contexts_to_rolenames,
+                       all_context_implications)
+
+  with benchmark("load_permissions > load object owners"):
+    load_object_owners(user, permissions)
+
+  with benchmark("load_permissions > load program relationships"):
+    load_program_relationships(user, permissions)
+
+  with benchmark("load_permissions > load audit relationships"):
+    load_audit_relationships(user, permissions)
+
+  with benchmark("load_permissions > load assignee relationships"):
+    load_assignee_relationships(user, permissions)
+
+  with benchmark("load_permissions > load personal context"):
+    load_personal_context(user, permissions)
+
+  with benchmark("load_permissions > load backlog workflows"):
+    load_backlog_workflows(permissions)
+
+  with benchmark("load_permissions > store results into memcache"):
+    store_results_into_memcache(permissions, cache, key)
+
   return permissions
 
 
@@ -785,11 +967,11 @@ def handle_resource_deleted(sender, obj=None, service=None):
 # @BaseObjectView.extension_contributions.connect_via(Program)
 def contribute_to_program_view(sender, obj=None, context=None):
   if obj.context_id is not None and \
-     permissions.is_allowed_read('Role', None, 1) and \
-     permissions.is_allowed_read('UserRole', None, obj.context_id) and \
-     permissions.is_allowed_create('UserRole', None, obj.context_id) and \
-     permissions.is_allowed_update('UserRole', None, obj.context_id) and \
-     permissions.is_allowed_delete('UserRole', None, obj.context_id):
+     rbac_permissions.is_allowed_read('Role', None, 1) and \
+     rbac_permissions.is_allowed_read('UserRole', None, obj.context_id) and \
+     rbac_permissions.is_allowed_create('UserRole', None, obj.context_id) and \
+     rbac_permissions.is_allowed_update('UserRole', None, obj.context_id) and \
+     rbac_permissions.is_allowed_delete('UserRole', None, obj.context_id):
     return 'permissions/programs/_role_assignments.haml'
   return None
 
