@@ -85,19 +85,19 @@
       }
     },
 
-  /**
-   * Determine if `source` is allowed to be mapped to `target`.
-   *
-   * By symmetry, this method can be also used to check whether `source` can
-   * be unmapped from `target`.
-   *
-   * @param {Object} source - the source object the mapping
-   * @param {Object} target - the target object of the mapping
-   * @param {Object} options - the options objects, similar to the one that is
-   *   passed as an argument to Mustache helpers
-   *
-   * @return {Boolean} - true if mapping is allowed, false otherwise
-   */
+    /**
+     * Determine if `source` is allowed to be mapped to `target`.
+     *
+     * By symmetry, this method can be also used to check whether `source` can
+     * be unmapped from `target`.
+     *
+     * @param {Object} source - the source object the mapping
+     * @param {Object} target - the target object of the mapping
+     * @param {Object} options - the options objects, similar to the one that is
+     *   passed as an argument to Mustache helpers
+     *
+     * @return {Boolean} - true if mapping is allowed, false otherwise
+     */
     allowed_to_map: function (source, target, options) {
       var canMap = false;
       var types;
@@ -144,7 +144,7 @@
         targetType);
 
       if (_.exists(options, 'hash.join') && (!canonical || !hasWidget) ||
-          (canonical && !canonicalMapping.model_name)) {
+        (canonical && !canonicalMapping.model_name)) {
         return false;
       }
       targetContext = _.exists(target, 'context.id');
@@ -167,16 +167,23 @@
       return canMap;
     },
     isEmptyCA: function (value, type) {
-      switch (type) {
-        case 'Checkbox':
-          value = value === '1';
-          break;
-        case 'Rich Text':
-          value = value.replace(/<(?:.|\n)*?>/gm, '');
-          break;
-        default:
+      var result = false;
+      var types = ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
+        'Map:Person'];
+      var options = {
+        Checkbox: function (value) {
+          return value === '0';
+        },
+        'Rich Text': function (value) {
+          return _.isEmpty($(value).text());
+        }
+      };
+      if (types.indexOf(type) >= 0 && options[type]) {
+        result = options[type](value);
+      } else if (types.indexOf(type) >= 0) {
+        result = _.isEmpty(value);
       }
-      return !value;
+      return result;
     }
   };
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

@@ -148,4 +148,59 @@ describe('GGRC utils isEmptyCA() method', function () {
       expect(result).toBe(false);
     });
   });
+
+  describe('check Text value', function () {
+    it('returns false for not empty', function () {
+      var result = isEmptyCA('some text', 'Text');
+      expect(result).toBe(false);
+    });
+
+    it('returns true for empty', function () {
+      var result = isEmptyCA('', 'Text');
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('check Map:Person type', function () {
+    it('returns false for selected', function () {
+      var result = isEmptyCA('Person', 'Map:Person');
+      expect(result).toBe(false);
+    });
+
+    it('returns true for not selected', function () {
+      var result = isEmptyCA('', 'Map:Person');
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('check Date type', function () {
+    it('returns false for selected', function () {
+      var result = isEmptyCA('01/01/2016', 'Date');
+      expect(result).toBe(false);
+    });
+
+    it('returns true for not selected', function () {
+      var result = isEmptyCA('', 'Date');
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('check Dropdown type', function () {
+    it('returns false for selected', function () {
+      var result = isEmptyCA('value', 'Dropdown');
+      expect(result).toBe(false);
+    });
+
+    it('returns true for not selected', function () {
+      var result = isEmptyCA('', 'Dropdown');
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('check invalid type', function () {
+    it('returns false for invalid type', function () {
+      var result = isEmptyCA('some value', 'Invalid');
+      expect(result).toBe(false);
+    });
+  });
 });
