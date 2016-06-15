@@ -48,7 +48,9 @@
       <br>
       <div class="{{#instance.computed_errors.workflow}}field-failure{{/instance.computed_errors.workflow}} {{#instance.computed_errors.cycle}}field-failure{{/instance.computed_errors.cycle}}">
         {{#using workflow=instance.workflow}}
-          <h6>Workflow <span class="required">*</span></h6>
+          <h6 title="An active workflow should be created in advance">
+            Active Workflow <span class="required">*</span>
+          </h6>
           <input
             class="input-block-level required"
             name="workflow."
