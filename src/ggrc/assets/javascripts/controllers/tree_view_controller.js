@@ -374,28 +374,28 @@ can.Control('CMS.Controllers.TreeLoader', {
 
   insert_items: function (items, force_prepare_children) {
     var that = this;
-    var prepped_items = [];
-    var id_map = {};
-    var to_insert;
+    var preppedItems = [];
+    var idMap = {};
+    var toInsert;
 
     // Check the list of items to be inserted for any duplicate items.
     can.each(this.options.list || [], function (item) {
-      id_map[item.instance.type + item.instance.id] = true;
+      idMap[item.instance.type + item.instance.id] = true;
     });
-    to_insert = _.filter(items, function (item) {
-      return !id_map[item.instance.type + item.instance.id];
+    toInsert = _.filter(items, function (item) {
+      return !idMap[item.instance.type + item.instance.id];
     });
 
-    can.each(to_insert, function (item) {
+    can.each(toInsert, function (item) {
       var prepped = that.prepare_child_options(item, force_prepare_children);
       if (prepped.instance.selfLink) {
-        prepped_items.push(prepped);
+        preppedItems.push(prepped);
       }
     });
 
-    if (prepped_items.length > 0) {
-      this.options.list.push.apply(this.options.list, prepped_items);
-      this.add_child_lists(prepped_items);
+    if (preppedItems.length > 0) {
+      this.options.list.push.apply(this.options.list, preppedItems);
+      this.add_child_lists(preppedItems);
     }
   }
 });
