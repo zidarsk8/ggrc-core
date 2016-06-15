@@ -594,10 +594,11 @@
 
         // auditId = the audit info from the request creation button ||
         //           the audit from the current page if we are on audit page
-        auditId = _.exists(object_params, 'audit.id') ||
-          (_.exists(GGRC, 'page_model.type') === 'Audit' ?
-           GGRC.page_model.id :
-           undefined);
+        if (_.exists(object_params, 'audit.id')) {
+          auditId = object_params.audit.id;
+        } else if (_.exists(GGRC, 'page_model.type') === 'Audit') {
+          auditId = GGRC.page_model.id;
+        }
 
         if (auditId) {
           this.attr('audit', {
