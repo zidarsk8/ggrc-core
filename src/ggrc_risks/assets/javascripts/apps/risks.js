@@ -132,35 +132,11 @@
     new GGRC.Mappings("ggrc_risks", mappings);
   };
 
-  var treeViewDepth = 2;
-  var relatedObjectsChildOptions = getRelatedObjectsChildOptions(treeViewDepth);
-  function getRelatedObjectsChildOptions(depth) {
-    if (!depth) {
-      return [];
-    }
-
-    var relatedObjects = {
-      model: can.Model.Cacheable,
-      mapping: "related_objects",
-      show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
-      draw_children: false
-    };
-
-    if (depth === 1) {
-      return $.extend(relatedObjects, {
-        child_options: [getRelatedObjectsChildOptions(depth - 1)]
-      });
-    }
-    return $.extend(relatedObjects, {
-      draw_children: true,
-      child_options: [getRelatedObjectsChildOptions(depth - 1)]
-    });
-  }
-
-  var isDrawChildren = treeViewDepth ? true : false;
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for risk page
   RisksExtension.init_widgets = function init_widgets() {
+    var treeViewDepth = 2;
+    var relatedObjectsChildOptions = [GGRC.Utils.getRelatedObjects(treeViewDepth)];
     var page_instance = GGRC.page_instance(),
         is_my_work = function is_my_work() {
           return page_instance && page_instance.type === "Person";
@@ -191,9 +167,9 @@
         widget_name: model.model_plural,
         widget_icon: model.table_singular,
         content_controller_options: {
-          add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
+          add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
           child_options: relatedObjectsChildOptions,
-          draw_children: isDrawChildren,
+          draw_children: true,
           parent_instance: page_instance,
           model: model,
           mapping: "related_" + model.table_plural
@@ -209,7 +185,7 @@
       widget_icon: CMS.Models.Threat.table_singular,
       content_controller_options: {
         child_options: relatedObjectsChildOptions,
-        draw_children: isDrawChildren,
+        draw_children: true,
         parent_instance: page_instance,
         model: CMS.Models.Threat,
         mapping: related_or_owned + CMS.Models.Threat.table_plural,
@@ -225,7 +201,7 @@
       widget_icon: CMS.Models.Risk.table_singular,
       content_controller_options: {
         child_options: relatedObjectsChildOptions,
-        draw_children: isDrawChildren,
+        draw_children: true,
         parent_instance: page_instance,
         model: CMS.Models.Risk,
         mapping: related_or_owned + CMS.Models.Risk.table_plural,

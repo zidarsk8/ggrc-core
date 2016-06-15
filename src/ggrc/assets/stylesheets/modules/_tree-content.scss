@@ -16,10 +16,25 @@ ul.new-tree {
   .openclose__empty,
   .openclose {
     float: left;
-    .fa {
+    &.active {
+      .fa-caret-right {
+        @include opacity(1);
+        &:before {
+          content: $fa-var-caret-down;
+        }
+      }
+    }
+    .fa-caret-right {
       cursor: pointer;
       display: inline-block;
       width: 20px;
+      @include opacity(0.25);
+      margin: 5px 0 0 4px;
+    }
+    .tier-2-info & {
+      .fa-caret-right {
+        margin: 7px 0 0 4px;
+      }
     }
     .dashboard & {
       width: auto;
@@ -27,11 +42,11 @@ ul.new-tree {
       clear: both;
     }
   }
-  .openclose{
+  .openclose {
     width: 55px;
-  }
-  .openclose__empty{
-    width: 35px;
+    &__empty {
+      width: 35px;
+    }
   }
   .select {
     overflow: hidden;
@@ -130,20 +145,6 @@ ul.new-tree {
       > .item-wrap {
         margin: 0 10px;
         border-bottom: 1px solid $itemBorder;
-        > .openclose {
-          .fa-caret-right {
-            @include opacity(0.25);
-            margin: 5px 0 0 4px;
-          }
-          &.active {
-            .fa-caret-right {
-              @include opacity(1);
-              &:before {
-                content: $fa-var-caret-down;
-              }
-            }
-          }
-        }
         .openclose,
         .select {
           padding: 6px 0;
@@ -375,6 +376,7 @@ ul.new-tree {
         }
         &.item-open {
           margin: 0;
+          border-bottom: 1px solid $itemBorder;
           > .item-main {
             > .item-wrap {
               border-color: transparent;

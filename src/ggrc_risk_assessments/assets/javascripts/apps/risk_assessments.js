@@ -50,43 +50,12 @@
   // Override GGRC.extra_widget_descriptors and GGRC.extra_default_widgets
   // Initialize widgets for risk assessment page
   RiskAssessmentsExtension.init_widgets = function init_widgets() {
-    var descriptor = {},
-        page_instance = GGRC.page_instance(),
-        tree_widgets = GGRC.tree_view.base_widgets_by_type,
-        treeViewDepth = 2,
-        relatedObjectsChildOptions,
-        isDrawChildren;
-    
-    function getRelatedObjects(depth) {
-      if (!depth) {
-        return [];
-      }
+    var descriptor = {};
+    var page_instance = GGRC.page_instance();
+    var tree_widgets = GGRC.tree_view.base_widgets_by_type;
+    var treeViewDepth = 2;
+    var relatedObjectsOptions = [GGRC.Utils.getRelatedObjects(treeViewDepth)];
 
-      var relatedObjects = {
-        model: can.Model.Cacheable,
-        mapping: "related_objects",
-        show_view: GGRC.mustache_path + "/base_objects/tree.mustache",
-        footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-        add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
-        draw_children: false
-      };
-
-      if (depth === 1) {
-        return $.extend(relatedObjects, {
-          child_options: [getRelatedObjects(depth - 1)]
-        });
-      }
-
-      return $.extend(relatedObjects, {
-        draw_children: true,
-        child_options: [getRelatedObjects(depth - 1)]
-      });
-    }
-
-    isDrawChildren = treeViewDepth ? true : false;
-
-    relatedObjectsChildOptions = getRelatedObjects(treeViewDepth);
-    
     _.each(_risk_assessments_object_types, function (type) {
       if (!type || !tree_widgets[type]) {
         return;
@@ -104,8 +73,8 @@
             parent_instance: page_instance,
             model: CMS.Models.RiskAssessment,
             show_view: GGRC.mustache_path + "/risk_assessments/tree.mustache",
-            child_options: relatedObjectsChildOptions,
-            draw_children: isDrawChildren
+            draw_children: true,
+            child_options: relatedObjectsOptions
           }
         }
       };

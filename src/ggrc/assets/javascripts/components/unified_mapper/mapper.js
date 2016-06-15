@@ -184,7 +184,8 @@
           useTemplates: parentScope.attr('useTemplates'),
           assessmentGenerator: parentScope.attr('assessmentGenerator')
         })),
-        template: parentScope.attr('template')
+        template: parentScope.attr('template'),
+        draw_children: true
       };
     },
 
