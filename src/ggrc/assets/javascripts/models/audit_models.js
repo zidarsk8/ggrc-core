@@ -579,8 +579,9 @@
       }
       return 'Request "' + out_name + '"';
     },
-    form_preload: function (new_object_form) {
+    form_preload: function (new_object_form, object_params) {
       var audit;
+      var auditId;
       var that = this;
       var assignees = {};
       var current_user = CMS.Models.get_instance('Person',
@@ -591,9 +592,17 @@
         // Current user should be Requester
         assignees[current_user.email] = 'Requester';
 
-        if (_.exists(GGRC, 'page_model.type') === 'Audit') {
+        // auditId = the audit info from the request creation button ||
+        //           the audit from the current page if we are on audit page
+        if (_.exists(object_params, 'audit.id')) {
+          auditId = object_params.audit.id;
+        } else if (_.exists(GGRC, 'page_model.type') === 'Audit') {
+          auditId = GGRC.page_model.id;
+        }
+
+        if (auditId) {
           this.attr('audit', {
-            id: GGRC.page_model.id,
+            id: auditId,
             type: 'Audit'
           });
         }

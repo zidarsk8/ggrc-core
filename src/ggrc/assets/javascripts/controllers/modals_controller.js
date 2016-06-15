@@ -266,21 +266,33 @@ can.Control('GGRC.Controllers.Modals', {
         );
       });
     }
-    return dfd.done(function() {
-      // If the modal is closed early, the element no longer exists
-      if (that.element) {
+    return dfd.done(function () {
+      this.reset_form(function () {
         // Make sure custom attr validations/values are set
         if (instance && instance.setup_custom_attributes) {
           instance.setup_custom_attributes();
         }
-        // This is to trigger `focus_first_element` in modal_ajax handling
-        that.element.trigger("loaded");
+      });
+    }.bind(that));
+  },
+
+  reset_form: function (setFieldsCb) {
+    // If the modal is closed early, the element no longer exists
+    if (this.element) {
+      // Do the fields (re-)setting
+      if (_.isFunction(setFieldsCb)) {
+        setFieldsCb();
       }
-
-
-      that.options.instance._transient || that.options.instance.attr("_transient", new can.Observe({}));
-      that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
-    });
+      // This is to trigger `focus_first_element` in modal_ajax handling
+      this.element.trigger('loaded');
+    }
+    if (!this.options.instance._transient) {
+      this.options.instance.attr('_transient', new can.Observe({}));
+    }
+    if (this.options.instance.form_preload) {
+      this.options.instance.form_preload(this.options.new_object_form,
+                                            this.options.object_params);
+    }
   }
 
   , fetch_all : function() {
@@ -846,17 +858,12 @@ can.Control('GGRC.Controllers.Modals', {
     }, this);
 
     $.when(this.options.attr('instance', new_instance))
-      .done (function() {
-        // If the modal is closed early, the element no longer exists
-        if (this.element) {
+      .done(function () {
+        this.reset_form(function () {
           var $form = $(this.element).find('form');
           $form.trigger('reset');
-          // This is to trigger `focus_first_element` in modal_ajax handling
-          this.element.trigger("loaded");
-        }
-        this.options.instance._transient || this.options.instance.attr("_transient", new can.Observe({}));
-        this.options.instance.form_preload && this.options.instance.form_preload(this.options.new_object_form);
-      }.bind(this))
+        });
+      })
       .then(this.proxy("apply_object_params"))
       .then(this.proxy("serialize_form"))
       .then(this.proxy("autocomplete"));
