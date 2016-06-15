@@ -30,6 +30,7 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
   object.
   """
   __tablename__ = "assessment_templates"
+  _mandatory_default_people = ("assessors", "verifiers")
 
   # the type of the object under assessment
   template_object_type = db.Column(db.String, nullable=True)
@@ -72,17 +73,24 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
 
   @validates('default_people')
   def validate_default_people(self, key, value):
-    """Check that default people lists are not empty."""
-    # pylint: disable=no-self-use
+    """Check that default people lists are not empty.
+
+    Check if the default_people contains both assessors and verifiers. The
+    values of those fields must be thruthy, and if the value is a string it
+    must be a valid default people label. If the value is not a string, it
+    should be a list of valid user ids, but that is too expensive to test in
+    this validator.
+    """
     # pylint: disable=unused-argument
-    if value is not None:
-      parsed = json.loads(value)
-      for field_name, field_value in parsed.iteritems():
-        if not field_value:
-          raise ValidationError(
-              'Invalid value for default_people.{field}. Expected a non-empty '
-              'string or a list of people ids, recieved {value}.'
-              .format(field=field_name, value=field_value),
-          )
+    parsed = json.loads(value)
+    for mandatory in self._mandatory_default_people:
+      mandatory_value = parsed.get(mandatory)
+      if (not mandatory_value or isinstance(mandatory_value, basestring) and
+              mandatory_value not in self.DEFAULT_PEOPLE_LABELS):
+        raise ValidationError(
+            'Invalid value for default_people.{field}. Expected a non-empty '
+            'string or a list of people ids, recieved {value}.'
+            .format(field=mandatory, value=mandatory_value),
+        )
 
     return value
