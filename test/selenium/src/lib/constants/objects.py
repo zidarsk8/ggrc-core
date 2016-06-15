@@ -61,6 +61,10 @@ def _get_singular(plurals):
   return singulars
 
 
+def get_singular(plural):
+  return _get_singular([plural])[0].title()
+
+
 ALL_PLURAL = [k for k in globals().keys()
               if not k.startswith("_") or k == "ALL"]
 ALL_SINGULAR = _get_singular(ALL_PLURAL)
