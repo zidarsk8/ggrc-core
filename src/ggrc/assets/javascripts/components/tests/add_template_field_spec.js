@@ -23,9 +23,9 @@ describe('GGRC.Components.addTemplateField', function () {
     beforeEach(function () {
       var parentScope = {
         attr: function (attrName) {
-          return {}
+          return {};
         }
-      }
+      };
       var scope_ = Component.prototype.scope({}, parentScope);
       addField = scope_.addField;
 

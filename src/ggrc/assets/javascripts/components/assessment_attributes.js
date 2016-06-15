@@ -1,9 +1,9 @@
 /*!
- Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
- Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- Created By: ivan@reciprocitylabs.com
- Maintained By: ivan@reciprocitylabs.com
- */
+    Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+    Created By: ivan@reciprocitylabs.com
+    Maintained By: ivan@reciprocitylabs.com
+*/
 
 (function (can, $) {
   /*
@@ -44,7 +44,7 @@
       }])
     },
     events: {
-      inserted: function() {
+      inserted: function () {
         var el = $(this.element);
         var list = el.find('.sortable-list');
         list.sortable({
@@ -53,17 +53,19 @@
         });
         list.find('.sortable-item').disableSelection();
       },
-      '.sortable-list sortstop': function() {
+      '.sortable-list sortstop': function () {
         var el = $(this.element);
         var sortables = el.find('li.sortable-item');
         // It's not nice way to rely on DOM for sorting,
         // but it was easiest for implementation
-        this.scope.fields.replace(_.map(sortables, function(item) {
-          return $(item).data('field');
-        }));
+        this.scope.fields.replace(_.map(sortables,
+          function (item) {
+            return $(item).data('field');
+          }));
       }
     }
   });
+
   /*
    * Template field
    *
@@ -73,7 +75,7 @@
     tag: 'template-field',
     template: can.view(GGRC.mustache_path +
       '/assessment_templates/attribute_field.mustache'),
-    scope: function(attrs, parentScope) {
+    scope: function (attrs, parentScope) {
       return {
         types: parentScope.attr('types'),
         pads: {
@@ -83,7 +85,7 @@
         /*
          * Removes `field` from `fileds`
          */
-        removeField: function(scope, el, ev) {
+        removeField: function (scope, el, ev) {
           ev.preventDefault();
           scope.attr('_pending_delete', true);
         },
@@ -92,7 +94,7 @@
          *
          * @return {Array} attrs - Returns split values as an array
          */
-        attrs: function() {
+        attrs: function () {
           if (_.contains(['Person', 'Text'], this.field.attr('type'))) {
             return [this.attr('field.multi_choice_options')];
           }
@@ -108,7 +110,7 @@
          *   attachment-2: true, comment-2: false
          * }
          */
-        denormalize_mandatory: function(field, pads) {
+        denormalize_mandatory: function (field, pads) {
           var options = _.splitTrim(field.attr('multi_choice_options'));
           var vals = _.splitTrim(field.attr('multi_choice_mandatory'));
           var mand = new can.Map();
@@ -128,7 +130,7 @@
          *   attachment-1: true, comment-1: true }
          * is normalized into "2, 3" (10b, 11b).
          */
-        normalize_mandatory: function(field, pads) {
+        normalize_mandatory: function (field, pads) {
           var options = _.splitTrim(field.attr('multi_choice_options'));
           var opts = field.attr('opts');
           var mand = $.map(options, function (val) {
@@ -141,18 +143,18 @@
       };
     },
     events: {
-      init: function() {
+      init: function () {
         var field = this.scope.attr('field');
         var pads = this.scope.attr('pads');
         var denormalized = this.scope.denormalize_mandatory(field, pads);
         var types = this.scope.attr('types');
-        var item = _.find(types, function(obj) {
+        var item = _.find(types, function (obj) {
           return obj.type === field.attr('attribute_type');
         });
         this.scope.field.attr('attribute_name', item.name);
         this.scope.field.attr('opts', denormalized);
       },
-      '{field.opts} change': function(opts) {
+      '{field.opts} change': function (opts) {
         var field = this.scope.attr('field');
         var pads = this.scope.attr('pads');
         var normalized = this.scope.normalize_mandatory(field, pads);
@@ -160,11 +162,12 @@
       }
     }
   });
+
   GGRC.Components('addTemplateField', {
     tag: 'add-template-field',
     template: can.view(GGRC.mustache_path +
       '/assessment_templates/attribute_add_field.mustache'),
-    scope: function(attrs, parentScope) {
+    scope: function (attrs, parentScope) {
       return new can.Map({
         selected: new can.Map(),
         fields: parentScope.attr('fields'),
@@ -181,7 +184,7 @@
          * @param {jQuery.Object} el - the clicked DOM element
          * @param {Object} ev - the event object
          */
-        addField: function(scope, el, ev) {
+        addField: function (scope, el, ev) {
           var fields = scope.attr('fields');
           var selected = scope.attr('selected');
           var title = _.trim(selected.title);
@@ -191,12 +194,12 @@
           }).join(',');
           ev.preventDefault();
           if (!type || !title ||
-            (_.contains(scope.valueAttrs, type) && values === '')){
+            (_.contains(scope.valueAttrs, type) && values === '')) {
             return;
           }
           // We need to defer adding in modal since validation is preventing
           // on adding the first item
-          _.defer(function() {
+          _.defer(function () {
             fields.push({
               id: scope.attr('id'),
               title: title,
@@ -204,9 +207,10 @@
               multi_choice_options: values,
               opts: new can.Map()
             });
-            _.each(['title', 'values', 'multi_choice_options'], function(type) {
-              selected.attr(type, '');
-            });
+            _.each(['title', 'values', 'multi_choice_options'],
+              function (type) {
+                selected.attr(type, '');
+              });
           });
         }
       });
@@ -215,7 +219,7 @@
       /*
        * Set default dropdown type on init
        */
-      inserted: function() {
+      inserted: function () {
         var types = this.scope.attr('types');
         if (!this.scope.attr('selected.type')) {
           this.scope.attr('selected.type', _.first(types).attr('type'));
@@ -228,11 +232,9 @@
        *
        * @param {Object} options - Mustache options
        */
-      placeholder: function(options) {
+      placeholder: function (options) {
         var types = this.attr('types');
-        var item = _.findWhere(types, {
-          type: this.attr('selected.type')
-        });
+        var item = _.findWhere(types, {type: this.attr('selected.type')});
         if (item) {
           return item.text;
         }
