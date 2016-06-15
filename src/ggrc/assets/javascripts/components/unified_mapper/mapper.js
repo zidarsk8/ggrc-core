@@ -133,6 +133,10 @@
         cmsModel = CMS.Models[modelName];
         group = !groups[cmsModel.category] ? 'governance' : cmsModel.category;
 
+        if (cmsModel.title_singular === 'Reference') {
+          return;
+        }
+
         groups[group].items.push({
           name: cmsModel.title_plural,
           value: cmsModel.shortName,
