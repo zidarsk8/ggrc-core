@@ -130,7 +130,7 @@
             ></dropdown>
           </div>
 
-          <div class="span6 {{#instance.computed_errors.assessorsList}}field-failure{{/instance.computed_errors.assessorsList}}">
+          <div class="span6{{#instance.computed_errors.assessorsList}} field-failure{{/instance.computed_errors.assessorsList}}">
             <label>&nbsp;</label>
             {{#if_equals instance.default_people.assessors 'other'}}
               <autocomplete
@@ -169,7 +169,7 @@
             ></dropdown>
           </div>
 
-          <div class="span6 {{#instance.computed_errors.verifiersList}}field-failure{{/instance.computed_errors.verifiersList}}">
+          <div class="span6{{#instance.computed_errors.verifiersList}} field-failure{{/instance.computed_errors.verifiersList}}">
             <label>&nbsp;</label>
 
             {{#if_equals instance.default_people.verifiers 'other'}}
