@@ -25,9 +25,8 @@ from ggrc.models.track_object_state import track_state_for_class
 
 
 class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
-             WithContact, Titled, Slugged, Stateful,
-             db.Model, CustomAttributable, Documentable,
-             Personable, Ownable, Timeboxed, Relatable):
+             WithContact, Titled, Stateful, CustomAttributable, Documentable,
+             Personable, Ownable, Timeboxed, Relatable, Slugged, db.Model):
 
   VALID_STATES = [
       'Draft',

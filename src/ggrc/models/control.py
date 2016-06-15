@@ -107,8 +107,8 @@ class AssertionCategorized(Categorizable):
 
 class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
               Personable, ControlCategorized, AssertionCategorized,
-              Hierarchical, Timeboxed, Ownable, BusinessObject, Auditable,
-              TestPlanned, db.Model):
+              Hierarchical, Timeboxed, Ownable, Auditable,
+              TestPlanned, BusinessObject, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
