@@ -40,7 +40,6 @@
         {{#with_program_roles_as "roles" result}}
           {{#if_helpers '\
             #if_equals' roles.length 1 '\
-            and #if_equals' roles.0.role.permission_summary "Mapped" '\
             and #if' result.mappings '\
             and #is_allowed_all' 'delete' result.mappings}}
             <li class="border">
