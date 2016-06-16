@@ -139,7 +139,9 @@ can.Control('GGRC.Controllers.Modals', {
       return current;
     }, '_transient');
 
-    instance.attr(['_transient'].concat(name).join('.'), value);
+    if (name.length) {
+      instance.attr(['_transient'].concat(name).join('.'), value);
+    }
   },
 
   autocomplete: function (el) {
