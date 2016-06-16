@@ -21,13 +21,13 @@
       '/components/object_counter/object_counter.mustache'),
     scope: {
       counter: '@',
-      count: '@',
+      count: null,
       updateCount: function () {
         var counter = this.attr('counter');
         if (_.isUndefined(GGRC.page_object.counts[counter])) {
           throw new Error('Specified counter doesn\'t exist.');
         }
-        this.attr('count', GGRC.page_object.counts[counter]);
+        this.attr('count', parseInt(GGRC.page_object.counts[counter], 10));
       }
     },
     events: {
