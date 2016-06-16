@@ -11,5 +11,7 @@
 -block extra_javascript
   =super()
   GGRC.page_object = { "person": ={ full_user_json()|safe } };
+  GGRC.page_object.counts = { "user_task_count": ={ user_task_count()|safe } };
+
 
 -block widget_area
