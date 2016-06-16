@@ -85,11 +85,14 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
     parsed = json.loads(value)
     for mandatory in self._mandatory_default_people:
       mandatory_value = parsed.get(mandatory)
-      if (not mandatory_value or isinstance(mandatory_value, basestring) and
+      if (not mandatory_value or
+              isinstance(mandatory_value, list) and
+              any(not isinstance(p_id, int) for p_id in mandatory_value) or
+              isinstance(mandatory_value, basestring) and
               mandatory_value not in self.DEFAULT_PEOPLE_LABELS):
         raise ValidationError(
-            'Invalid value for default_people.{field}. Expected a non-empty '
-            'string or a list of people ids, recieved {value}.'
+            'Invalid value for default_people.{field}. Expected a people '
+            'label in string or a list of int people ids, recieved {value}.'
             .format(field=mandatory, value=mandatory_value),
         )
 
