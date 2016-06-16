@@ -195,4 +195,6 @@ class Audit(mixins_clonable.Clonable,
     return query.options(
         orm.joinedload('program'),
         orm.subqueryload('requests'),
-        orm.subqueryload('object_people').joinedload('person'))
+        orm.subqueryload('object_people').joinedload('person'),
+        orm.subqueryload('audit_objects'),
+    )
