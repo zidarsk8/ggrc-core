@@ -1107,95 +1107,98 @@ can.Control("CMS.Controllers.LHN_Search", {
 
       return $.when.apply($, dfds);
     },
-    refresh_counts: function () {
-      if (!$(".lhn-trigger").hasClass("active")) {
-        this.options._hasPendingRefresh = true;
-        return can.Deferred().resolve();
-      }
 
-      var search_id = this.search_id;
-      var models;
-      var extraModels;
+  refresh_counts: function () {
+    var search_id = this.search_id;
+    var models;
+    var extraModels;
 
-      models = can.map(this.get_lists(), this.proxy('get_list_model'));
-      extraModels = can.map(
-        this.get_lists(), this.proxy('get_extra_list_model'));
-
-      this.options._hasPendingRefresh = false;
-      // Retrieve and display counts
-      return GGRC.Models.Search.counts_for_types(
-          this.current_term, models, this.current_params, extraModels
-        ).then(function () {
-          if (this.search_id === search_id) {
-            return this.display_counts.apply(this, arguments);
-          }
-        }.bind(this));
+    if (!$('.lhn-trigger').hasClass('active')) {
+      this.options._hasPendingRefresh = true;
+      return can.Deferred().resolve();
     }
-  , refresh_visible_lists: function() {
-      if (!$(".lhn-trigger").hasClass("active")) {
-        this.options._hasPendingRefresh = true;
-        return can.Deferred().resolve();
-      }
-      var self = this
-        , search_id = this.search_id
-        , lists = this.get_visible_lists()
-        , models = can.map(lists, this.proxy("get_list_model"))
-        ;
 
-      models = can.map(models, function(model_name) {
-        if (self.options.loaded_lists.indexOf(model_name) == -1)
-          return model_name;
+
+    models = can.map(this.get_lists(), this.proxy('get_list_model'));
+    extraModels = can.map(
+      this.get_lists(), this.proxy('get_extra_list_model'));
+
+    this.options._hasPendingRefresh = false;
+    // Retrieve and display counts
+    return GGRC.Models.Search.counts_for_types(
+        this.current_term, models, this.current_params, extraModels
+      ).then(function () {
+        if (this.search_id === search_id) {
+          return this.display_counts.apply(this, arguments);
+        }
+      }.bind(this));
+  },
+
+  refresh_visible_lists: function() {
+    var self = this;
+    var search_id = this.search_id;
+    var lists = this.get_visible_lists();
+    var models = can.map(lists, this.proxy("get_list_model"));
+
+    if (!$('.lhn-trigger').hasClass('active')) {
+      this.options._hasPendingRefresh = true;
+      return can.Deferred().resolve();
+    }
+
+    models = can.map(models, function(model_name) {
+      if (self.options.loaded_lists.indexOf(model_name) == -1)
+        return model_name;
+    });
+
+    if (models.length > 0) {
+      // Register that the lists are loaded
+      can.each(models, function(model_name) {
+        self.options.loaded_lists.push(model_name);
       });
 
-      if (models.length > 0) {
-        // Register that the lists are loaded
-        can.each(models, function(model_name) {
-          self.options.loaded_lists.push(model_name);
-        });
-
-        $.when.apply(
-          $
-          , models.map(function(model_name) {
-            return CMS.Models.LocalListCache.findAll({ "name" : "search_" + model_name});
-          })
-        ).then(function() {
-          var types = {}, fake_search_result;
-          can.each(can.makeArray(arguments), function(a) {
-            var a = a[0];
-            if (a
-                && a.search_text == self.current_term
-                && a.my_work == (self.current_params && self.current_params.contact_id)
-                && a.extra_params == (self.current_params && self.current_params.extra_params)) {
-              types[a.name] = a.objects;
-            }
-          });
-
-          if (Object.keys(types).length > 0) {
-            fake_search_result = {
-              getResultsForType : function(type) {
-                if(types["search_" + type]) {
-                  return types["search_" + type];
-                }
-              }
-            };
-            return fake_search_result;
+      $.when.apply(
+        $
+        , models.map(function(model_name) {
+          return CMS.Models.LocalListCache.findAll({ "name" : "search_" + model_name});
+        })
+      ).then(function() {
+        var types = {}, fake_search_result;
+        can.each(can.makeArray(arguments), function(a) {
+          var a = a[0];
+          if (a
+              && a.search_text == self.current_term
+              && a.my_work == (self.current_params && self.current_params.contact_id)
+              && a.extra_params == (self.current_params && self.current_params.extra_params)) {
+            types[a.name] = a.objects;
           }
-        }).done(function(fake_search_result) {
-          if (fake_search_result)
-            self.display_lists(fake_search_result, true);
         });
 
-        return GGRC.Models.Search.search_for_types(
-            this.current_term, models, this.current_params
-          ).then(function() {
-            if (self.search_id === search_id) {
-              return self.display_lists.apply(self, arguments);
+        if (Object.keys(types).length > 0) {
+          fake_search_result = {
+            getResultsForType : function(type) {
+              if(types["search_" + type]) {
+                return types["search_" + type];
+              }
             }
-          });
-      } else {
-        return new $.Deferred().resolve();
-      }
+          };
+          return fake_search_result;
+        }
+      }).done(function(fake_search_result) {
+        if (fake_search_result)
+          self.display_lists(fake_search_result, true);
+      });
+
+      return GGRC.Models.Search.search_for_types(
+          this.current_term, models, this.current_params
+        ).then(function() {
+          if (self.search_id === search_id) {
+            return self.display_lists.apply(self, arguments);
+          }
+        });
+    } else {
+      return new $.Deferred().resolve();
     }
+  }
 
   , run_search: function(term, extra_params) {
       var self = this
