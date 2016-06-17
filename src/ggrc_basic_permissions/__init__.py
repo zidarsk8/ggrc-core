@@ -14,7 +14,6 @@ from sqlalchemy import case
 from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
-from sqlalchemy.orm.attributes import get_history
 from ggrc import db
 from ggrc import settings
 from ggrc.app import app
@@ -868,24 +867,6 @@ def add_public_program_context_implication(context, check_exists=False):
       context_scope='Program',
       modified_by=get_current_user(),
   ))
-
-
-@Resource.model_put.connect_via(Program)
-def handle_program_put(sender, obj=None, src=None, service=None):
-  # Check to see if the private property of the program has changed
-  if get_history(obj, 'private').has_changes():
-    if obj.private:
-      # Ensure that any implications from null context are removed
-      db.session.query(ContextImplication)\
-          .filter(
-              ContextImplication.context_id == obj.context_id,
-              ContextImplication.source_context_id.is_(None))\
-          .delete()
-      db.session.flush()
-    else:
-      # ensure that implications from null are present
-      add_public_program_context_implication(obj.context, check_exists=True)
-      db.session.flush()
 
 
 def create_audit_context(audit):

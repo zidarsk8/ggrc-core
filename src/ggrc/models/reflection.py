@@ -56,7 +56,6 @@ ATTRIBUTE_ORDER = (
     "key_control",
     "kind",
     "link",
-    "private",
     "means",
     "network_zone",
     "operationally",

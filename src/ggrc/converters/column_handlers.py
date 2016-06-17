@@ -38,7 +38,6 @@ GGRC_COLUMN_HANDLERS = {
     "operationally": handlers.ConclusionColumnHandler,
     "owners": handlers.OwnerColumnHandler,
     "principal_assessor": handlers.UserColumnHandler,
-    "private": boolean.CheckboxColumnHandler,
     "program": handlers.ProgramColumnHandler,
     "program_mapped": handlers.ObjectPersonColumnHandler,
     "recipients": list_handlers.ValueListHandler,
