@@ -5,7 +5,12 @@
 
 """A module containing the implementation of the assessment template entity."""
 
+import json
+
+from sqlalchemy.orm import validates
+
 from ggrc import db
+from ggrc.models.exceptions import ValidationError
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
@@ -25,6 +30,7 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
   object.
   """
   __tablename__ = "assessment_templates"
+  _mandatory_default_people = ("assessors", "verifiers")
 
   # the type of the object under assessment
   template_object_type = db.Column(db.String, nullable=True)
@@ -64,3 +70,30 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
   @classmethod
   def generate_slug_prefix_for(cls, obj):
     return "TEMPLATE"
+
+  @validates('default_people')
+  def validate_default_people(self, key, value):
+    """Check that default people lists are not empty.
+
+    Check if the default_people contains both assessors and verifiers. The
+    values of those fields must be thruthy, and if the value is a string it
+    must be a valid default people label. If the value is not a string, it
+    should be a list of valid user ids, but that is too expensive to test in
+    this validator.
+    """
+    # pylint: disable=unused-argument
+    parsed = json.loads(value)
+    for mandatory in self._mandatory_default_people:
+      mandatory_value = parsed.get(mandatory)
+      if (not mandatory_value or
+              isinstance(mandatory_value, list) and
+              any(not isinstance(p_id, int) for p_id in mandatory_value) or
+              isinstance(mandatory_value, basestring) and
+              mandatory_value not in self.DEFAULT_PEOPLE_LABELS):
+        raise ValidationError(
+            'Invalid value for default_people.{field}. Expected a people '
+            'label in string or a list of int people ids, recieved {value}.'
+            .format(field=mandatory, value=mandatory_value),
+        )
+
+    return value

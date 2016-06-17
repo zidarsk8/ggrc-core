@@ -130,7 +130,7 @@
             ></dropdown>
           </div>
 
-          <div class="span6">
+          <div class="span6{{#instance.computed_errors.assessorsList}} field-failure{{/instance.computed_errors.assessorsList}}">
             <label>&nbsp;</label>
             {{#if_equals instance.default_people.assessors 'other'}}
               <autocomplete
@@ -139,6 +139,10 @@
                 disable="instance.assessorsListDisable"
                 placeholder="Enter text to search for Assessors"
               ></autocomplete>
+
+              {{#instance.computed_errors.assessorsList}}
+                <label class="help-inline warning">{{this}}</label>
+              {{/instance.computed_errors.assessorsList}}
 
               {{#each instance.assessorsList}}
                 <person
@@ -165,7 +169,7 @@
             ></dropdown>
           </div>
 
-          <div class="span6">
+          <div class="span6{{#instance.computed_errors.verifiersList}} field-failure{{/instance.computed_errors.verifiersList}}">
             <label>&nbsp;</label>
 
             {{#if_equals instance.default_people.verifiers 'other'}}
@@ -175,6 +179,10 @@
                 disable="instance.verifiersListDisable"
                 placeholder="Enter text to search for Verifiers"
               ></autocomplete>
+
+              {{#instance.computed_errors.verifiersList}}
+                <label class="help-inline warning">{{this}}</label>
+              {{/instance.computed_errors.verifiersList}}
 
               {{#each instance.verifiersList}}
                 <person
