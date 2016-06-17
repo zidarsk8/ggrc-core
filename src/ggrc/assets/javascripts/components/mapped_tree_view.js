@@ -38,14 +38,12 @@
     init: function (element) {
       var $el = $(element);
       var scope = this.scope;
-      var event = $el.data('event-type');
       var refreshMappedObjects = scope.refreshMappedObjects.bind(scope);
       _.each(['mapping', 'itemTemplate'], function (prop) {
         if (!scope.attr(prop)) {
           scope.attr(prop, $el.attr(can.camelCaseToDashCase(prop)));
         }
       }, this);
-      $('body').on('update-mapping:' + event, refreshMappedObjects);
 
       refreshMappedObjects();
     },
@@ -81,6 +79,11 @@
               }
             });
         });
+      },
+      '{CMS.Models.Relationship} created': function (model, ev, instance) {
+        if (instance instanceof CMS.Models.Relationship) {
+          this.scope.refreshMappedObjects();
+        }
       }
     }
   });

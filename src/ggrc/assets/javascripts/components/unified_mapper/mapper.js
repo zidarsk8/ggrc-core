@@ -318,9 +318,6 @@
           }, this);
 
           $.when.apply($, defer)
-            .done(function () {
-              $('body').trigger('update-mapping:mapped-objects');
-            })
             .fail(function (response, message) {
               $('body').trigger('ajax:flash', {error: message});
             })
