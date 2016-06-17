@@ -332,6 +332,7 @@ can.Control("CMS.Controllers.LHN", {
     });
     if (lhsCtr.options._hasPendingRefresh) {
       lhsCtr.refresh_counts();
+      lhsCtr.refresh_visible_lists();
     }
   }
 
@@ -1107,6 +1108,11 @@ can.Control("CMS.Controllers.LHN_Search", {
       return $.when.apply($, dfds);
     },
     refresh_counts: function () {
+      if (!$(".lhn-trigger").hasClass("active")) {
+        this.options._hasPendingRefresh = true;
+        return can.Deferred().resolve();
+      }
+
       var search_id = this.search_id;
       var models;
       var extraModels;
@@ -1126,6 +1132,10 @@ can.Control("CMS.Controllers.LHN_Search", {
         }.bind(this));
     }
   , refresh_visible_lists: function() {
+      if (!$(".lhn-trigger").hasClass("active")) {
+        this.options._hasPendingRefresh = true;
+        return can.Deferred().resolve();
+      }
       var self = this
         , search_id = this.search_id
         , lists = this.get_visible_lists()
