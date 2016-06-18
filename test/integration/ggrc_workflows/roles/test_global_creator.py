@@ -1,7 +1,5 @@
 # Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: brodul@reciprocitylabs.com
-# Maintained By: brodul@reciprocitylabs.com
 """
 Test if global creator role has the permission to access the workflow objects,
 owned by Admin.

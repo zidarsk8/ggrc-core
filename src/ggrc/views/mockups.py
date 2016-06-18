@@ -1,7 +1,5 @@
-# Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: miha@reciprocitylabs.com
-# Maintained By: miha@reciprocitylabs.com
 
 # Disable pylint warnings for unsued variables that are caused by the decorated
 # functions: mockup_home, mockup_request, mockup_assessor, mockup_workflow,
