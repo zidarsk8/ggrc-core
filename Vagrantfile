@@ -1,10 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: dan@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/trusty64"
