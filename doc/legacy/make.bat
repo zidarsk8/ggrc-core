@@ -1,7 +1,7 @@
 @ECHO OFF
 
 REM Command file for Sphinx documentation
-REM Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+REM Copyright (C) 2016 Google Inc., authors, and contributors
 REM Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 if "%SPHINXBUILD%" == "" (

@@ -1,12 +1,12 @@
 # good test file: src/ggrc/assets/javascripts/application.js
 # replace comments that look like this:
 #/*
-# * Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+# * Copyright (C) 2016 Google Inc., authors, and contributors
 # * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 # */
 # with this:
 #/*!
-#    Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+#    Copyright (C) 2016 Google Inc., authors, and contributors
 #    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 #*/
 for x in `grep -rlI --include=*.js --exclude-dir=tmp "*" . | grep -v --file=doc/copyright_add/excludes.grep`
