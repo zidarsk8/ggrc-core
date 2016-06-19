@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Copyright (C) 2016 Google Inc., authors, and contributors
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+cd "${SCRIPTPATH}/.."
+
+year=$(date +"%Y")
+
+find . -type f -print0 | xargs -0 sed -i "s/Copyright (C) [0-9]\{4\} Google/Copyright (C) $year Google/g"
