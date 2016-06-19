@@ -6,7 +6,6 @@ import json
 import re
 import sqlalchemy
 import sys
-import time
 
 from flask import request
 from ggrc.settings import CUSTOM_URL_ROOT
@@ -276,5 +275,5 @@ class QueryCounter(object):
     return len(self.queries)
 
 
-benchmark = benchmarks.BenchmarkContextManager
+benchmark = benchmarks.get_benchmark()
 with_nop = benchmarks.WithNop

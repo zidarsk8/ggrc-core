@@ -3,6 +3,7 @@
 
 """Benchmark context managers."""
 
+import os
 import inspect
 import logging
 import time
@@ -113,3 +114,12 @@ class DebugBenchmark(object):
           avg=stat["sum"] / stat["count"] if stat["count"] else 0,
           **stat
       ))
+
+
+def get_benchmark():
+  """Get a benchmark context manager."""
+  if os.environ.get("GGRC_BENCHMARK"):
+    logging.basicConfig(format="%(message)s", level=logging.DEBUG)
+    return DebugBenchmark
+  else:
+    return BenchmarkContextManager
