@@ -20,7 +20,7 @@ class BenchmarkContextManager(object):
   """
   # pylint: disable=too-few-public-methods
 
-  def __init__(self, message):
+  def __init__(self, message, **kwargs):
     self.message = message
     self.start = 0
 
@@ -40,7 +40,7 @@ class WithNop(object):
   """
   # pylint: disable=too-few-public-methods
 
-  def __init__(self, message):
+  def __init__(self, message, **kwargs):
     pass
 
   def __enter__(self):
