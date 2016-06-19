@@ -56,7 +56,10 @@ class DebugBenchmark(object):
   This benchmark should be used when debugging performance issues. It has the
   most comprehensive output of all context managers.
 
-  To enable this, just set GGRC_BENCHMARK env var on the server.
+  To enable this, just set GGRC_BENCHMARK env var on the server. You can choose
+  the summary type by setting the GGRC_BENCHMARK to "all" or "last", where last
+  will output stats for the last benchmark tree, and all will show data for the
+  entire history.
 
   Note that this benchmark is useful inside for loops with quiet set to True.
   The benchmark itself has some overhead. It's about 10 times slower than
@@ -76,6 +79,12 @@ class DebugBenchmark(object):
 
   _stats = defaultdict(lambda: defaultdict(float))
   _all_stats = defaultdict(lambda: defaultdict(float))
+
+  STATS = {
+      "all": _all_stats,
+      "last": _stats,
+  }
+  _summary = "all"
 
   def __init__(self, message, func_name=None, form=COMPACT_FORM, quiet=False):
     """Initialize a new instance of this benchmark.
@@ -126,7 +135,7 @@ class DebugBenchmark(object):
       )
       logging.fatal(msg)
     if DebugBenchmark._depth == 0:
-      self._print_stats(self._stats)
+      self._print_stats(self.STATS[self._summary])
 
   def _update_stats(self, stats, duration):
     """Add duration data to stats.
@@ -155,7 +164,7 @@ class DebugBenchmark(object):
 
   @classmethod
   def _reset_stats(cls):
-    cls._stats = defaultdict(lambda: defaultdict(float))
+    cls._stats.clear()
 
   @classmethod
   def _print_stats(cls, stats, sort_key="sum"):
@@ -170,11 +179,18 @@ class DebugBenchmark(object):
       )
       logging.info(msg)
 
+  @classmethod
+  def set_summary(cls, summary):
+    if summary.lower() in cls.STATS:
+      cls._summary = summary.lower()
+
 
 def get_benchmark():
   """Get a benchmark context manager."""
-  if os.environ.get("GGRC_BENCHMARK"):
+  benchmark = os.environ.get("GGRC_BENCHMARK")
+  if benchmark:
     logging.basicConfig(format="%(message)s", level=logging.DEBUG)
+    DebugBenchmark.set_summary(benchmark)
     return DebugBenchmark
   else:
     return BenchmarkContextManager
