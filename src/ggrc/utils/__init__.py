@@ -8,8 +8,9 @@ import sqlalchemy
 import sys
 import time
 
-from flask import current_app, request
+from flask import request
 from ggrc.settings import CUSTOM_URL_ROOT
+from ggrc.utils import benchmarks
 
 
 class GrcEncoder(json.JSONEncoder):
@@ -275,30 +276,5 @@ class QueryCounter(object):
     return len(self.queries)
 
 
-class BenchmarkContextManager(object):
-
-  def __init__(self, message):
-    self.message = message
-
-  def __enter__(self):
-    self.start = time.time()
-
-  def __exit__(self, exc_type, exc_value, exc_trace):
-    end = time.time()
-    current_app.logger.info("{:.4f} {}".format(end - self.start, self.message))
-
-
-class WithNop(object):
-
-  def __init__(self, message):
-    pass
-
-  def __enter__(self):
-    pass
-
-  def __exit__(self, exc_type, exc_value, exc_trace):
-    pass
-
-
-benchmark = BenchmarkContextManager
-with_nop = WithNop
+benchmark = benchmarks.BenchmarkContextManager
+with_nop = benchmarks.WithNop
