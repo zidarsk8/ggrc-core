@@ -5,11 +5,14 @@
   Maintained By: ivan@reciprocitylabs.com
 }}
 
-<div class="span-custom2-and-half">
+<div class="span-custom2-and-half{{#selected.invalidTitle}} field-failure{{/selected.invalidTitle}}">
   <input class="input-block-level"
     type="text"
     can-value="selected.title"
     placeholder="Enter title">
+    {{#selected.invalidTitle}}
+      <label class="warning">A custom attribute with this title already exists</label>
+    {{/selected.invalidTitle}}
 </div>
 <div class="span-custom1-and-half">
   <select class="input-block-level" can-value="selected.type">
@@ -18,12 +21,15 @@
     {{/types}}
   </select>
 </div>
-<div class="span2">
+<div class="span2{{#selected.invalidValues}} field-failure{{/selected.invalidValues}}">
   {{#in_array selected.type valueAttrs}}
     <input class="input-block-level"
       can-value="selected.values"
       type="text"
       placeholder="{{placeholder}}">
+    {{#selected.invalidValues}}
+        <label class="warning">Cannot be blank</label>
+    {{/selected.invalidValues}}
   {{else}}
     N/A
   {{/in_array}}

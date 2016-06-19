@@ -19,14 +19,16 @@ describe('GGRC.Components.addTemplateField', function () {
     var $el;
     var ev;
     var scope;
+    var parentScope;
+    var scope_;
 
     beforeEach(function () {
-      var parentScope = {
-        attr: function (attrName) {
+      parentScope = {
+        attr: function () {
           return {};
         }
       };
-      var scope_ = Component.prototype.scope({}, parentScope);
+      scope_ = Component.prototype.scope({}, parentScope);
       addField = scope_.addField;
 
       $el = $('<div></div>');
@@ -37,9 +39,12 @@ describe('GGRC.Components.addTemplateField', function () {
         fields: new can.List(),
         selected: new can.Map(),
         valueAttrs: ['Dropdown'],
-        id: 123
+        id: 123,
+        isInvalidTitle: scope_.isInvalidTitle.bind(scope),
+        isInvalidValues: scope_.isInvalidValues.bind(scope)
       });
     });
+
     it('does not require the "values" field to add a field of type Map:Person',
       function (done) {
         var selectedObj = new can.Map({
@@ -121,19 +126,120 @@ describe('GGRC.Components.addTemplateField', function () {
         }, 3);
       }
     );
-    it('requires the "type" field to add a field',
+  });
+
+  describe('isInvalidTitle() method', function () {
+    var isInvalidTitle;  // the method under test
+    var result;
+    var selectedTitle;
+    var fields;
+
+    beforeAll(function () {
+      var parentScope = {
+        attr: function () {
+          return {};
+        }
+      };
+      var scope_ = Component.prototype.scope({}, parentScope);
+      isInvalidTitle = scope_.isInvalidTitle;
+    });
+
+    beforeEach(function () {
+      fields = new can.List();
+      result = undefined;
+    });
+
+    it('has to not allow to input titles that are already in "fields"',
       function (done) {
-        var selectedObj = new can.Map({
-          title: 'Title example',
-          type: '',
-          values: ''
+        fields.push({
+          id: 123,
+          title: 'title',
+          attribute_type: 'Text',
+          multi_choice_options: '',
+          opts: new can.Map()
         });
-        scope.attr('selected', selectedObj);
-        addField.call(scope, scope, $el, ev);
-        setTimeout(function () {
-          expect(scope.fields.length).toEqual(0);
-          done();
-        }, 3);
+        selectedTitle = 'title';
+
+        result = isInvalidTitle(fields, selectedTitle);
+
+        expect(result).toEqual(true);
+        done();
+      }
+    );
+
+    it('has to allow to input titles that are not in "fields"',
+      function (done) {
+        fields.push({
+          id: 123,
+          title: 'title',
+          attribute_type: 'Text',
+          multi_choice_options: '',
+          opts: new can.Map()
+        });
+        selectedTitle = 'new title';
+
+        result = isInvalidTitle(fields, selectedTitle);
+
+        expect(result).toEqual(false);
+        done();
+      }
+    );
+
+    it('has not to allow to input empty titles',
+      function (done) {
+        selectedTitle = '';
+
+        result = isInvalidTitle(fields, selectedTitle);
+
+        expect(result).toEqual(true);
+        done();
+      }
+    );
+  });
+
+  describe('isInvalidValues() method', function () {
+    var isInvalidValues;  // the method under test
+    var valueAttrs;
+    var result;
+    var parentScope;
+    var scope_;
+
+    beforeAll(function () {
+      valueAttrs = ['Dropdown'];
+      parentScope = {
+        attr: function () {
+          return {};
+        }
+      };
+      scope_ = Component.prototype.scope({}, parentScope);
+      isInvalidValues = scope_.isInvalidValues;
+    });
+
+    beforeEach(function () {
+      result = undefined;
+    });
+
+    it('has to not allow to input type "Dropdown" with not set values',
+      function (done) {
+        result = isInvalidValues(valueAttrs, 'Dropdown', '');
+        expect(result).toEqual(true);
+        done();
+      }
+    );
+
+    it('has to allow to input type "Dropdown" with set values',
+      function (done) {
+        result = isInvalidValues(valueAttrs, 'DropDown', 'some values');
+        expect(result).toEqual(false);
+        done();
+      }
+    );
+
+    it('has to allow to input type "Text" with not set values',
+      function (done) {
+        result = isInvalidValues(valueAttrs, 'Text', '');
+        expect(result).toEqual(false);
+        done();
       }
     );
   });

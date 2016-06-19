@@ -6,31 +6,33 @@
 }}
 
 {{^field._pending_delete}}
+<li {{data 'field'}} class="row-fluid sortable-item">
   <div class="span-custom2-and-half">{{field.title}}</div>
-  <div class="span-custom1-and-half">{{field.attribute_name}}</div>
-  <div class="span2">
-    {{#attrs}}
-      <span class="block">{{.}}</span>
-    {{/attrs}}
-  </div>
-  <div class="span2 centered checkbox-wrap">
-    {{#attrs}}
-      <input can-value="field.opts.attachment-{{.}}" type="checkbox">
-    {{/attrs}}
-  </div>
-  <div class="span1 centered checkbox-wrap">
-    {{#attrs}}
-      <input can-value="field.opts.comment-{{.}}" type="checkbox">
-    {{/attrs}}
-  </div>
-  <div class="span1 centered checkbox-wrap">
-    <input type="checkbox" can-value="field.mandatory">
-  </div>
-  <div class="span2">
-    <div class="pull-right">
-      {{#field}}
-        <a can-click="removeField" href="#"><i class="fa fa-trash"></i></a>
-      {{/field}}
+    <div class="span-custom1-and-half">{{field.attribute_name}}</div>
+    <div class="span2">
+      {{#attrs}}
+        <span class="block">{{.}}</span>
+      {{/attrs}}
     </div>
-  </div>
+    <div class="span2 centered checkbox-wrap">
+      {{#attrs}}
+        <input can-value="field.opts.attachment-{{.}}" type="checkbox">
+      {{/attrs}}
+    </div>
+    <div class="span1 centered checkbox-wrap">
+      {{#attrs}}
+        <input can-value="field.opts.comment-{{.}}" type="checkbox">
+      {{/attrs}}
+    </div>
+    <div class="span1 centered checkbox-wrap">
+      <input type="checkbox" can-value="field.mandatory">
+    </div>
+    <div class="span2">
+      <div class="pull-right">
+        {{#field}}
+          <a can-click="removeField" href="#"><i class="fa fa-trash"></i></a>
+        {{/field}}
+      </div>
+    </div>
+  </li>
 {{/field._pending_delete}}
