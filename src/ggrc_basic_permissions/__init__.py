@@ -577,12 +577,16 @@ def load_object_owners(user, permissions):
   Returns:
       None
   """
-  for object_owner in user.object_owners:
-    for action in ["read", "create", "update", "delete", "view_object_page"]:
-      permissions.setdefault(action, {})\
-          .setdefault(object_owner.ownable_type, {})\
-          .setdefault('resources', list())\
-          .append(object_owner.ownable_id)
+  with benchmark("load_object_owners > get owners"):
+    object_owners = user.object_owners
+  with benchmark("load_object_owners > update permissions"):
+    actions = ("read", "create", "update", "delete", "view_object_page")
+    for object_owner in object_owners:
+      for action in actions:
+        permissions.setdefault(action, {})\
+            .setdefault(object_owner.ownable_type, {})\
+            .setdefault('resources', list())\
+            .append(object_owner.ownable_id)
 
 
 def load_program_relationships(user, permissions):
