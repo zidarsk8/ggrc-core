@@ -24,11 +24,10 @@
       count: null,
       updateCount: function () {
         var counter = this.attr('counter');
-        if (_.isUndefined(GGRC.page_object.counts[counter])) {
+        if (_.isUndefined(GGRC.counters[counter])) {
           throw new Error('Specified counter doesn\'t exist.');
         }
-        this.attr('count', parseInt(GGRC.page_object.counts[counter], 10));
-      }
+        this.attr('count', parseInt(GGRC.counters[counter], 10));
     },
     events: {
       inserted: function () {
