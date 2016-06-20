@@ -1,8 +1,6 @@
 ..
-  Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+  Copyright (C) 2016 Google Inc., authors, and contributors
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-  Created By: david@reciprocitylabs.com
-  Maintained By: david@reciprocitylabs.com
 
 
 ***************
@@ -15,7 +13,6 @@ header **MUST** be defined in ``license_header.txt``.
 Creators and Maintainers
 ========================
 
-The license header will include ``Created By:`` and ``Maintained By:`` fields.
 These fields **SHOULD** be kept accurate and up to date.
 
 Updating Headers

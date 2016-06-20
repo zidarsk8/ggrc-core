@@ -1,7 +1,5 @@
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2016 Google Inc., authors, and contributors
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: brad@reciprocitylabs.com
-# Maintained By: brad@reciprocitylabs.com
 
 Feature: Some object types can have an owner as recorded in an ObjectOwner
   resource. A role, such as Editor, might grant priveleges like delete

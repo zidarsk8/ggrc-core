@@ -1,8 +1,6 @@
 /*!
-    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2016 Google Inc., authors, and contributors
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: ivan@reciprocitylabs.com
-    Maintained By: ivan@reciprocitylabs.com
 */
 (function($, moment) {
   // On-demand creation of datepicker() objects

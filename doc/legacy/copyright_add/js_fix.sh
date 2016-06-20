@@ -1,17 +1,13 @@
 # good test file: src/ggrc/assets/javascripts/application.js
 # replace comments that look like this:
 #/*
-# * Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# * Copyright (C) 2016 Google Inc., authors, and contributors
 # * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# * Created By: brad@reciprocitylabs.com
-# * Maintained By: brad@reciprocitylabs.com
 # */
 # with this:
 #/*!
-#    Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+#    Copyright (C) 2016 Google Inc., authors, and contributors
 #    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-#    Created By: 
-#    Maintained By:
 #*/
 for x in `grep -rlI --include=*.js --exclude-dir=tmp "*" . | grep -v --file=doc/copyright_add/excludes.grep`
 # save the seventh line on (tail -n +7), do swap on lines before that (head -6)

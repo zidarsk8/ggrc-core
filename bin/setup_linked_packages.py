@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2013 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2016 Google Inc., authors, and contributors
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: dan@reciprocitylabs.com
-# Maintained By: dan@reciprocitylabs.com
 
 """Setup linked packages required for GGRC
 """
 
 import subprocess
 
+
 def run_shell(script):
   proc = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
   proc.wait()
   return proc.returncode, proc.stdout.read()
+
 
 def ln_package(source, target, force=True):
   force = "-f" if force else ""
@@ -24,6 +24,7 @@ def ln_package(source, target, force=True):
     print(command)
     return subprocess.call(command, shell=True)
 
+
 def _run_system_python_script_output(script, unindent=None):
   # Unindent and escape script
   script_lines = script.lstrip('\n').rstrip().splitlines()
@@ -31,9 +32,9 @@ def _run_system_python_script_output(script, unindent=None):
   script = "\\n".join(script_lines)
 
   script = """%(python_path)s -c 'exec("%(script)s")'""" % {
-    'python_path': "/usr/bin/python",
-    'script': script,
-    }
+      'python_path': "/usr/bin/python",
+      'script': script,
+  }
 
   return_code, result = run_shell(script)
   if return_code == 0:
@@ -44,8 +45,8 @@ def _run_system_python_script_output(script, unindent=None):
   else:
     return None
 
+
 def _get_system_python_import_path(module, path_getter):
-  python_path = "/usr/bin/python"
 
   script = """
     try:
@@ -54,9 +55,9 @@ def _get_system_python_import_path(module, path_getter):
     except ImportError, e:
       print ""
   """ % {
-    'module': module,
-    'path_getter': path_getter
-    }
+      'module': module,
+      'path_getter': path_getter
+  }
 
   return _run_system_python_script_output(script, unindent=4)
 
@@ -66,7 +67,8 @@ def setup_mysql_packages(packages_dir):
   This links MySQLdb module to opt/packages for use inside
   the otherwise-isolated virtual environment
   """
-  module_path = _get_system_python_import_path('MySQLdb', 'MySQLdb.__path__[0]')
+  module_path = _get_system_python_import_path(
+      'MySQLdb', 'MySQLdb.__path__[0]')
   if module_path:
     ln_package(module_path, packages_dir)
   else:
@@ -78,11 +80,13 @@ def setup_mysql_packages(packages_dir):
   else:
     print("Failed to import _mysql -- ensure it is available")
 
-  module_path = _get_system_python_import_path('_mysql_exceptions', '_mysql_exceptions.__file__')
+  module_path = _get_system_python_import_path(
+      '_mysql_exceptions', '_mysql_exceptions.__file__')
   if module_path:
     ln_package(module_path, packages_dir)
   else:
     print("Failed to import _mysql_exceptions -- ensure it is available")
+
 
 def setup_imaging_packages(packages_dir):
   module_path = _get_system_python_import_path('PIL', 'PIL.__path__[0]')
@@ -90,6 +94,7 @@ def setup_imaging_packages(packages_dir):
     ln_package(module_path, packages_dir)
   else:
     print("Failed to import PIL -- ensure it is available")
+
 
 def setup_google_packages(opt_dir, packages_dir):
   """
@@ -99,10 +104,11 @@ def setup_google_packages(opt_dir, packages_dir):
   try:
     import google
     google_path = google.__path__[0]
-  except ImportError as e:
+  except ImportError:
     google_path = "%s/google_appengine/google" % (opt_dir,)
 
   ln_package(google_path, packages_dir)
+
 
 def main(packages_dir):
   command = "mkdir -p {packages_dir}".format(packages_dir=packages_dir)

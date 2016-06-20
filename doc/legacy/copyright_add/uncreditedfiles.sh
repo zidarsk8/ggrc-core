@@ -1,3 +1,6 @@
+# Copyright (C) 2016 Google Inc., authors, and contributors
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
 # arg1 is grep file that lists regexes for files you want to match
 # arg2 is email address of person you want to credit
 for x in `grep -rlI --exclude-dir=tmp "Created By: *$" . | grep -v --file=doc/copyright_add/excludes.grep | egrep --file=$1`
