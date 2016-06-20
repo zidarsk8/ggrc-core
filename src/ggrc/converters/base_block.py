@@ -7,6 +7,7 @@ from collections import defaultdict
 from collections import OrderedDict
 from collections import Counter
 from flask import current_app
+from sqlalchemy import exc
 
 from ggrc import db
 from ggrc.utils import structures
@@ -259,9 +260,10 @@ class BlockConverter(object):
         try:
           row_converter.insert_secondary_objects()
           db.session.flush()
-        except Exception as e:
+        except exc.SQLAlchemyError as err:
           db.session.rollback()
-          current_app.logger.error("Import failed with: {}".format(e.message))
+          current_app.logger.error(
+              "Import failed with: {}".format(err.message))
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
 
@@ -287,9 +289,10 @@ class BlockConverter(object):
         try:
           row_converter.insert_object()
           db.session.flush()
-        except Exception as e:
+        except exc.SQLAlchemyError as err:
           db.session.rollback()
-          current_app.logger.error("Import failed with: {}".format(e.message))
+          current_app.logger.error(
+              "Import failed with: {}".format(err.message))
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
       for row_converter in self.row_converters:
@@ -304,9 +307,10 @@ class BlockConverter(object):
       db.session.commit()
       update_memcache_after_commit(self)
       update_index(db.session, modified_objects)
-    except Exception as e:
+    except exc.SQLAlchemyError as err:
       db.session.rollback()
-      current_app.logger.error("Import failed with: {}".format(e.message))
+      current_app.logger.error(
+          "Import failed with: {}".format(err.message))
       self.add_errors(errors.UNKNOWN_ERROR, line=self.offset + 2)
 
   def add_errors(self, template, **kwargs):
