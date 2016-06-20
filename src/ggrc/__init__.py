@@ -1,5 +1,8 @@
-
 # Copyright (C) 2016 Google Inc., authors, and contributors
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from .bootstrap import db, logger
+from ggrc.bootstrap import db
+
+__all__ = [
+    db
+]
