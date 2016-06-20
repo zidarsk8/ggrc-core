@@ -4,7 +4,6 @@
 import os
 import sys
 
-from flask.ext.sqlalchemy import SQLAlchemy
 
 from ggrc import settings
 
@@ -17,8 +16,10 @@ def set_appengine_packages_path():
       sys.path.insert(0, os.path.join(settings.BASE_DIR, 'packages.zip'))
 
 
-def extend_db_string(db):
-  """Set the default string lenght to 250."""
+def get_db():
+  """Get modified db object."""
+  from flask.ext.sqlalchemy import SQLAlchemy
+  db = SQLAlchemy()
 
   class String(db.String):
     """Simple subclass of sqlalchemy.orm.String which provides a default
@@ -31,8 +32,7 @@ def extend_db_string(db):
         length = 250
       return super(String, self).__init__(length, *args, **kwargs)
   db.String = String
+  return db
 
 
-db = SQLAlchemy()
-extend_db_string(db)
 set_appengine_packages_path()
