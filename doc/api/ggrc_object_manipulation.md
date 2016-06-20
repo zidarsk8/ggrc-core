@@ -416,7 +416,6 @@
          "custom_attribute_values":[ ],
          "people":[],
          "updated_at":"2016-05-19T12:09:15",
-         "private":false,
          "task_group_objects":[],
          "audits":[],
          "id":10,

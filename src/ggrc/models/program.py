@@ -3,14 +3,19 @@
 
 from ggrc import db
 from ggrc.models.context import HasOwnContext
-from ggrc.models.mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
+from ggrc.models.mixins import BusinessObject
+from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
-from ggrc.models.object_person import Personable, ObjectPerson
+from ggrc.models.object_person import ObjectPerson
+from ggrc.models.object_person import Personable
 from ggrc.models.person import Person
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
-from ggrc.models.track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.track_object_state import HasObjectState
+from ggrc.models.track_object_state import track_state_for_class
 
 
 class Program(HasObjectState, CustomAttributable, Documentable,
@@ -21,7 +26,6 @@ class Program(HasObjectState, CustomAttributable, Documentable,
   KINDS = ['Directive']
   KINDS_HIDDEN = ['Company Controls Policy']
 
-  private = db.Column(db.Boolean, default=False, nullable=False)
   kind = deferred(db.Column(db.String), 'Program')
 
   audits = db.relationship(
@@ -30,7 +34,6 @@ class Program(HasObjectState, CustomAttributable, Documentable,
   _publish_attrs = [
       'kind',
       'audits',
-      'private',
   ]
   _include_links = []
   _aliases = {
@@ -74,9 +77,9 @@ class Program(HasObjectState, CustomAttributable, Documentable,
   @classmethod
   def _filter_by_program_mapped(cls, predicate):
     return ObjectPerson.query.join(Person).filter(
-      (ObjectPerson.personable_type == "Program") &
-      (ObjectPerson.personable_id == cls.id) &
-      (predicate(Person.email) | predicate(Person.name))
+        (ObjectPerson.personable_type == "Program") &
+        (ObjectPerson.personable_id == cls.id) &
+        (predicate(Person.email) | predicate(Person.name))
     ).exists()
 
   @classmethod
