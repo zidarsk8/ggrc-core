@@ -39,8 +39,7 @@
         </li>
         {{#with_program_roles_as "roles" result}}
           {{#if_helpers '\
-            #if_equals' roles.length 1 '\
-            and #if' result.mappings '\
+            #if' result.mappings '\
             and #is_allowed_all' 'delete' result.mappings}}
             <li class="border">
               <a href="javascript://" class="unmap" data-toggle="unmap">
