@@ -22,7 +22,7 @@
     scope: {
       counter: '@',
       count: null,
-      updateCount: function () {
+      initialCount: function () {
         var counter = this.attr('counter');
         if (_.isUndefined(GGRC.counters[counter])) {
           throw new Error('Specified counter doesn\'t exist.');
@@ -31,7 +31,7 @@
     },
     events: {
       inserted: function () {
-        this.scope.updateCount();
+        this.scope.initialCount();
       }
     }
   });
