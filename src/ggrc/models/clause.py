@@ -1,6 +1,7 @@
 # Copyright (C) 2016 Google Inc., authors, and contributors
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Module for Clause model."""
 
 from ggrc import db
 from ggrc.models.mixins import CustomAttributable
@@ -23,9 +24,8 @@ from ggrc.models.track_object_state import track_state_for_class
 
 
 class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
-             WithContact, Titled, Slugged, Stateful,
-             db.Model, CustomAttributable, Documentable,
-             Personable, Ownable, Timeboxed, Relatable):
+             WithContact, Titled, Stateful, CustomAttributable, Documentable,
+             Personable, Ownable, Timeboxed, Relatable, Slugged, db.Model):
 
   VALID_STATES = [
       'Draft',
@@ -47,6 +47,7 @@ class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
       "directive": None,
   }
 
+  # pylint: disable=invalid-name
   na = deferred(db.Column(db.Boolean, default=False, nullable=False),
                 'Clause')
   notes = deferred(db.Column(db.Text), 'Clause')

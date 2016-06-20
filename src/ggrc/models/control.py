@@ -1,26 +1,31 @@
 # Copyright (C) 2016 Google Inc., authors, and contributors
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from ggrc import db
+"""Module for control model and related classes."""
+
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
-from .category import CategoryBase
-from .categorization import Categorizable
-from .mixins import (
-    deferred, BusinessObject, Hierarchical, Timeboxed, CustomAttributable,
-    TestPlanned
-)
-from .object_document import Documentable
-from .object_owner import Ownable
-from .object_person import Personable
-from .audit_object import Auditable
-from .reflection import PublishOnly
-from .utils import validate_option
-from .person import Person
-from .relationship import Relatable
-from .option import Option
 
-from .track_object_state import HasObjectState, track_state_for_class
+from ggrc import db
+from ggrc.models.audit_object import Auditable
+from ggrc.models.categorization import Categorizable
+from ggrc.models.category import CategoryBase
+from ggrc.models.mixins import BusinessObject
+from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import Hierarchical
+from ggrc.models.mixins import TestPlanned
+from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import deferred
+from ggrc.models.object_document import Documentable
+from ggrc.models.object_owner import Ownable
+from ggrc.models.object_person import Personable
+from ggrc.models.option import Option
+from ggrc.models.person import Person
+from ggrc.models.reflection import PublishOnly
+from ggrc.models.relationship import Relatable
+from ggrc.models.track_object_state import HasObjectState
+from ggrc.models.track_object_state import track_state_for_class
+from ggrc.models.utils import validate_option
 
 
 class ControlCategory(CategoryBase):
@@ -53,8 +58,8 @@ class ControlCategorized(Categorizable):
 
   _aliases = {
       "categories": {
-        "display_name": "Categories",
-        "filter_by": "_filter_by_categories",
+          "display_name": "Categories",
+          "filter_by": "_filter_by_categories",
       },
   }
 
@@ -85,8 +90,8 @@ class AssertionCategorized(Categorizable):
   _include_links = []
   _aliases = {
       "assertions": {
-        "display_name": "Assertions",
-        "filter_by": "_filter_by_assertions",
+          "display_name": "Assertions",
+          "filter_by": "_filter_by_assertions",
       },
   }
 
@@ -105,8 +110,8 @@ class AssertionCategorized(Categorizable):
 
 class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
               Personable, ControlCategorized, AssertionCategorized,
-              Hierarchical, Timeboxed, Ownable, BusinessObject, Auditable,
-              TestPlanned, db.Model):
+              Hierarchical, Timeboxed, Ownable, Auditable,
+              TestPlanned, BusinessObject, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
@@ -147,7 +152,7 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
       uselist=False)
 
   @staticmethod
-  def _extra_table_args(cls):
+  def _extra_table_args(_):
     return (
         db.Index('ix_controls_principal_assessor', 'principal_assessor_id'),
         db.Index('ix_controls_secondary_assessor', 'secondary_assessor_id'),
@@ -179,25 +184,25 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
   _aliases = {
       "url": "Control URL",
       "kind": {
-        "display_name": "Kind/Nature",
-        "filter_by": "_filter_by_kind",
+          "display_name": "Kind/Nature",
+          "filter_by": "_filter_by_kind",
       },
       "means": {
-        "display_name": "Type/Means",
-        "filter_by": "_filter_by_means",
+          "display_name": "Type/Means",
+          "filter_by": "_filter_by_means",
       },
       "verify_frequency": {
-        "display_name": "Frequency",
-        "filter_by": "_filter_by_verify_frequency",
+          "display_name": "Frequency",
+          "filter_by": "_filter_by_verify_frequency",
       },
       "fraud_related": "Fraud Related",
       "principal_assessor": {
-        "display_name": "Principal Assessor",
-        "filter_by": "_filter_by_principal_assessor",
+          "display_name": "Principal Assessor",
+          "filter_by": "_filter_by_principal_assessor",
       },
       "secondary_assessor": {
-        "display_name": "Secondary Assessor",
-        "filter_by": "_filter_by_secondary_assessor",
+          "display_name": "Secondary Assessor",
+          "filter_by": "_filter_by_secondary_assessor",
       },
       "key_control": "Significance",
   }
@@ -210,13 +215,13 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
   @classmethod
   def _filter_by_kind(cls, predicate):
     return Option.query.filter(
-      (Option.id == cls.kind_id) & predicate(Option.title)
+        (Option.id == cls.kind_id) & predicate(Option.title)
     ).exists()
 
   @classmethod
   def _filter_by_means(cls, predicate):
     return Option.query.filter(
-      (Option.id == cls.means_id) & predicate(Option.title)
+        (Option.id == cls.means_id) & predicate(Option.title)
     ).exists()
 
   @classmethod
