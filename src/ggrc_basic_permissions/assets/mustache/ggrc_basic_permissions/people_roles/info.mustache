@@ -38,17 +38,17 @@
           <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_for_object instance}}" />
         </li>
         {{#with_program_roles_as "roles" result}}
-          {{#if_helpers '\
-            #if' result.mappings '\
-            and #is_allowed_all' 'delete' result.mappings}}
-            <li class="border">
-              <a href="javascript://" class="unmap" data-toggle="unmap">
-                {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-                <i class="fa fa-ban"></i>
-                Unmap
-              </a>
-            </li>
-          {{/if_helpers}}
+          {{#if result.mappings}}
+            {{#is_allowed_all 'delete' result.mappings}}
+              <li class="border">
+                <a href="javascript://" class="unmap" data-toggle="unmap">
+                  {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+                  <i class="fa fa-ban"></i>
+                  Unmap
+                </a>
+              </li>
+            {{/is_allowed_all}}
+          {{/result.mappings}}
         {{/with_program_roles_as}}
         <li>
           <a href="/people/{{instance.id}}">
