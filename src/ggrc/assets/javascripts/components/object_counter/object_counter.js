@@ -83,6 +83,16 @@
         }.bind(this));
       }, 10000)
     },
+    init: function () {
+      var updateEvents = ['created', 'updated', 'destroyed'];
+      var modelName = this.scope.attr('modelName');
+      var model = CMS.Models[modelName];
+
+      _.forEach(updateEvents, function (eventName) {
+        model.bind(eventName, function () {
+          this.scope.updateCount();
+        }.bind(this));
+      }.bind(this));
     },
     events: {
       inserted: function () {
