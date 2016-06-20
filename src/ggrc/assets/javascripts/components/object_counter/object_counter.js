@@ -16,12 +16,15 @@
    *  translates string to value (e.g., 'current_user' gets resolved to
    *  GGRC.current_user.id) before making a GET request.
    *
+   *  Search keys and search values lists should be of equal length and
+   *  shouldn't be empty (unless that is expected as a query).
+   *
    *  @param {string} counter - Counter returned by backend in
    *    GGRC.counters.
    *  @param {string} ModelName - Name of a model to perform search on
    *  @param {string} searchKeys - a list semi-colon separated keys to use for
    *    searching
-   *  @param {string} searchValues - a list of somi-colon separated values for
+   *  @param {string} searchValues - a list of semi-colon separated values for
    *  corresponding keys that will be used for searching.
    *
    */
