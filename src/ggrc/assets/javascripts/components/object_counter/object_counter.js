@@ -1,8 +1,6 @@
 /*!
- Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
+ Copyright (C) 2016 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- Created By: urban@reciprocitylabs.com
- Maintained By: urban@reciprocitylabs.com
  */
 
 (function (can, $) {
@@ -10,10 +8,22 @@
 
   /**
    *  Component for object counting. This component relies on backend to
-   *  provide specified counter in GGRC.page_object.counts.
+   *  provide specified counter in GGRC.counts namespace for initial load
+   *  and performs stub-only findAll query calls only on create/update/delete
+   *  events for specific models.
+   *
+   *  Search values are strings so there's a translation table _getValue that
+   *  translates string to value (e.g., 'current_user' gets resolved to
+   *  GGRC.current_user.id) before making a GET request.
    *
    *  @param {string} counter - Counter returned by backend in
-   *    GGRC.page_object.counts.
+   *    GGRC.counters.
+   *  @param {string} ModelName - Name of a model to perform search on
+   *  @param {string} searchKeys - a list semi-colon separated keys to use for
+   *    searching
+   *  @param {string} searchValues - a list of somi-colon separated values for
+   *  corresponding keys that will be used for searching.
+   *
    */
   GGRC.Components('ObjectCounter', {
     tag: 'object-counter',
@@ -21,6 +31,14 @@
       '/components/object_counter/object_counter.mustache'),
     scope: {
       counter: '@',
+      modelName: '@',
+      searchKeys: '@',
+      searchValues: '@',
+      _getValue: {
+        current_user: GGRC.current_user.id,
+        'true': true,
+        'false': false
+      },
       count: null,
       initialCount: function () {
         var counter = this.attr('counter');
@@ -28,6 +46,42 @@
           throw new Error('Specified counter doesn\'t exist.');
         }
         this.attr('count', parseInt(GGRC.counters[counter], 10));
+      },
+      updateCount: _.throttle(function () {
+        var searchData = {};
+        var i;
+        var key;
+        var value;
+        var data;
+
+        var modelName = this.attr('modelName');
+        var keys = this.attr('searchKeys').split(';');
+        var values = this.attr('searchValues').split(';');
+
+        if (!GGRC.current_user || !GGRC.current_user.id) {
+          return;
+        }
+
+        if (keys.length !== values.length) {
+          throw new Error('Search keys and values must be of equal length.');
+        }
+
+        if (_.isUndefined(CMS.Models[modelName])) {
+          throw new Error('Non-existing model');
+        }
+
+        for (i = 0; i < keys.length; i++) {
+          key = keys[i].trim();
+          value = this._getValue[values[i].trim()] || values[i];
+          searchData[key] = value;
+        }
+
+        data = CMS.Models[modelName].findAll(searchData);
+        data.done(function (objectList) {
+          this.attr('count', objectList.length);
+        }.bind(this));
+      }, 10000)
+    },
     },
     events: {
       inserted: function () {
