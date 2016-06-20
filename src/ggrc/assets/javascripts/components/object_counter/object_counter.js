@@ -65,14 +65,6 @@
           return;
         }
 
-        if (keys.length !== values.length) {
-          throw new Error('Search keys and values must be of equal length.');
-        }
-
-        if (_.isUndefined(CMS.Models[modelName])) {
-          throw new Error('Non-existing model');
-        }
-
         for (i = 0; i < keys.length; i++) {
           key = keys[i].trim();
           value = this._getValue[values[i].trim()] || values[i];
@@ -88,8 +80,20 @@
     },
     init: function () {
       var updateEvents = ['created', 'updated', 'destroyed'];
+      var model;
       var modelName = this.scope.attr('modelName');
-      var model = CMS.Models[modelName];
+      var keys = this.scope.attr('searchKeys').split(';');
+      var values = this.scope.attr('searchValues').split(';');
+
+      if (_.isUndefined(CMS.Models[modelName])) {
+        throw new Error('Non-existing model');
+      }
+
+      if (keys.length !== values.length) {
+        throw new Error('Search keys and values must be of equal length.');
+      }
+
+      model = CMS.Models[modelName];
 
       _.forEach(updateEvents, function (eventName) {
         model.bind(eventName, function () {
