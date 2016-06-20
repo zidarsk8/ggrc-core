@@ -75,6 +75,7 @@
           value = this._getValue[values[i].trim()] || values[i];
           searchData[key] = value;
         }
+        searchData.__stubs_only = true;
 
         data = CMS.Models[modelName].findAll(searchData);
         data.done(function (objectList) {
