@@ -162,11 +162,11 @@ class BlockConverter(object):
         self.add_warning(errors.UNKNOWN_COLUMN,
                          line=self.offset + 2,
                          column_name=header)
-        self.remove_culumn(index - removed_count)
+        self.remove_column(index - removed_count)
         removed_count += 1
     return clean_headers
 
-  def remove_culumn(self, index):
+  def remove_column(self, index):
     """ Remove a column from all rows """
     for row in self.rows:
       if len(row) > index:
@@ -256,7 +256,13 @@ class BlockConverter(object):
 
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
-        row_converter.insert_secondary_objecs()
+        try:
+          row_converter.insert_secondary_objects()
+          db.session.flush()
+        except Exception as e:
+          db.session.rollback()
+          current_app.logger.error("Import failed with: {}".format(e.message))
+          row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
 
   def import_objects(self):

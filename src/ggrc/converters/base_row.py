@@ -213,7 +213,7 @@ class RowConverter(object):
     for handler in self.attrs.values():
       handler.insert_object()
 
-  def insert_secondary_objecs(self):
+  def insert_secondary_objects(self):
     """Add additional objects to the current database session.
 
     This is used for adding any extra created objects such as Relationships, to

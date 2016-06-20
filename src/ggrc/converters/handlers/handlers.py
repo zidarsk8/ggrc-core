@@ -620,6 +620,7 @@ class ObjectPersonColumnHandler(UserColumnHandler):
           context=self.row_converter.obj.context
       )
       db.session.add(object_person)
+      db.session.flush()
     self.dry_run = True
 
 
