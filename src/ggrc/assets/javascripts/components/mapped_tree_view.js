@@ -41,6 +41,11 @@
       binding.refresh_instances().then(function (mappedObjects) {
         this.scope.attr('mappedObjects').replace(mappedObjects);
       }.bind(this));
+
+      // We are tracking binding changes, so mapped items update accordingly
+      binding.list.on('change', function () {
+        this.scope.attr('mappedObjects').replace(binding.list);
+      }.bind(this));
     },
     events: {
       '[data-toggle=unmap] click': function (el, ev) {
