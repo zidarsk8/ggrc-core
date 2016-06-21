@@ -5,13 +5,13 @@
 
 import datetime
 import sqlalchemy.orm
-from flask import Blueprint
-from flask import g
 from sqlalchemy import and_
 from sqlalchemy import case
 from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
+from flask import Blueprint
+from flask import g
 from ggrc import db
 from ggrc import settings
 from ggrc.app import app
@@ -248,28 +248,6 @@ def program_relationship_query(user_id, context_not_role=False):
   )
 
 
-def audit_relationship_query(user_id, context_not_role=False):
-  """Creates a query that returns objects a user can access via audit.
-
-    Args:
-        user_id: id of the user
-        context_not_role: use context instead of the role for the third column
-            in the search api we need to return (obj_id, obj_type, context_id),
-            but in ggrc_basic_permissions we need a role instead of a
-            context_id (obj_id, obj_type, role_name)
-
-    Returns:
-        db.session.query object that selects the following columns:
-            | id | type | role_name or context |
-  """
-  return objects_via_relationships_query(
-      model=all_models.Audit,
-      roles=('Auditor', 'ProgramEditor', 'ProgramOwner', 'ProgramReader'),
-      user_id=user_id,
-      context_not_role=context_not_role
-  )
-
-
 class CompletePermissionsProvider(object):
   """Permission provider set in the USER_PERMISSIONS_PROVIDER setting"""
 
@@ -277,6 +255,7 @@ class CompletePermissionsProvider(object):
     pass
 
   def permissions_for(self, user):
+    """Load user permissions and make sure they get loaded into session"""
     ret = UserPermissions()
     # force the permissions to be loaded into session, otherwise templates
     # that depend on the permissions being available in session may assert
@@ -592,8 +571,43 @@ def load_object_owners(user, permissions):
             .append(ownable_id)
 
 
-def load_program_relationships(user, permissions):
-  """Load program relationship permissions
+def context_relationship_query(contexts):
+  """Load a list of objects related to the given contexts
+
+  Args:
+    contexts (list(int)): A list of context ids
+  Returns:
+    objects (list((id, type, None))): Related objects
+  """
+  if not len(contexts):
+    return []
+
+  _context = aliased(all_models.Context, name="c")
+  _relationship = aliased(all_models.Relationship, name="rl")
+
+  headers = (case([
+      (_relationship.destination_type == _context.related_object_type,
+       _relationship.source_id.label('id'))
+  ], else_=_relationship.destination_id.label('id')),
+      case([
+          (_relationship.destination_type == _context.related_object_type,
+           _relationship.source_type.label('type'))
+      ], else_=_relationship.destination_type.label('type')),
+      literal(None))
+
+  return db.session.query(*headers).join(_context, and_(
+      _context.id.in_(contexts),
+      _relationship.destination_id == _context.related_object_id,
+      _relationship.destination_type == _context.related_object_type,
+  )).union(db.session.query(*headers).join(_context, and_(
+      _context.id.in_(contexts),
+      _relationship.source_id == _context.related_object_id,
+      _relationship.source_type == _context.related_object_type,
+  ))).all()
+
+
+def load_context_relationships(permissions):
+  """Load context relationship permissions
 
   Args:
       user (Person): Person object
@@ -601,35 +615,36 @@ def load_program_relationships(user, permissions):
   Returns:
       None
   """
-  for res in program_relationship_query(user.id):
-    id_, type_, role_name = res
+  read_contexts = set(
+      permissions.get('read', {}).
+      get('Program', {}).
+      get('contexts', []) +
+      permissions.get('read', {}).
+      get('Audit', {}).
+      get('contexts', []))
+  write_contexts = set(
+      permissions.get('update', {}).
+      get('Program', {}).
+      get('contexts', []) +
+      permissions.get('update', {}).
+      get('Audit', {}).
+      get('contexts', []))
+  read_only_contexts = read_contexts - write_contexts
+
+  read_objects = context_relationship_query(read_only_contexts)
+  for res in read_objects:
+    id_, type_, _ = res
     actions = ["read", "view_object_page"]
-    if role_name in ("ProgramEditor", "ProgramOwner"):
-      actions += ["create", "update", "delete"]
     for action in actions:
       permissions.setdefault(action, {})\
           .setdefault(type_, {})\
           .setdefault('resources', list())\
           .append(id_)
 
-
-def load_audit_relationships(user, permissions):
-  """Load audit relationship permissions
-
-  Args:
-      user (Person): Person object
-      permissions (dict): dict where the permissions will be stored
-  Returns:
-      None
-  """
-  for res in audit_relationship_query(user.id):
+  write_objects = context_relationship_query(write_contexts)
+  for res in write_objects:
     id_, type_, role_name = res
-    actions = ["read", "view_object_page"]
-    if role_name == "Auditor":
-      if type_ in ("Assessment", "Request"):
-        actions += ["create", "update", "delete"]
-    if role_name in ("ProgramOwner", "ProgramEditor"):
-      actions += ["create", "update", "delete"]
+    actions = ["read", "view_object_page", "create", "update", "delete"]
     for action in actions:
       permissions.setdefault(action, {})\
           .setdefault(type_, {})\
@@ -767,11 +782,8 @@ def load_permissions_for(user):
   with benchmark("load_permissions > load object owners"):
     load_object_owners(user, permissions)
 
-  with benchmark("load_permissions > load program relationships"):
-    load_program_relationships(user, permissions)
-
-  with benchmark("load_permissions > load audit relationships"):
-    load_audit_relationships(user, permissions)
+  with benchmark("load_permissions > load context relationships"):
+    load_context_relationships(permissions)
 
   with benchmark("load_permissions > load assignee relationships"):
     load_assignee_relationships(user, permissions)
