@@ -29,10 +29,12 @@
     <div class="row-fluid wrap-row">
       <div class="span4">
         <h6>Supporting files</h6>
-        {{#options.child_options.0}}
-          <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
-          </ul>
-        {{/child_options}}
+        <mapping-tree-view
+          parent-instance="instance"
+          mapping="documents"
+          item-template="/static/mustache/risk_assessments/documents.mustache"
+          >
+        </mapping-tree-view>
         {{#is_allowed 'update'}}
           <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach supporting file" click_event="trigger_upload">
           </ggrc-gdrive-picker-launcher>
