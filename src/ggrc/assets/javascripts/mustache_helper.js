@@ -1740,8 +1740,11 @@ Mustache.registerHelper("infer_roles", function (instance, options) {
           program_roles.done(function (roles) {
             can.each(authorizations, function (auth) {
               var role = CMS.Models.Role.findInCacheById(auth.role.id);
+              var roleName;
               if (role) {
-                state.attr('roles').push(role.name);
+                roleName = (role.name === 'ProgramOwner') ?
+                           'Program Manager' : role.name;
+                state.attr('roles').push(roleName);
               }
             });
           });
