@@ -19,6 +19,7 @@ from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.audit import Audit
 from ggrc.models.program import Program
+from ggrc.models.object_owner import ObjectOwner
 from ggrc.rbac import permissions as rbac_permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.common import _get_cache_manager
@@ -190,11 +191,11 @@ def objects_via_relationships_query(model, roles, user_id, context_not_role):
         join(_user_role, user_role_cond).\
         join(_role, role_cond).\
         distinct().\
-        union(query.join(_model, cond).join(_implications,
-              _model.context_id == _implications.context_id).
-              join(_user_role, user_role_cond).
-              join(_role, role_cond).
-              distinct())
+        union(query.join(_model, cond).join(
+            _implications, _model.context_id == _implications.context_id).
+        join(_user_role, user_role_cond).
+        join(_role, role_cond).
+        distinct())
 
   def _add_relationship_join(query):
     # We do a UNION here because using an OR to JOIN both destination
@@ -271,6 +272,7 @@ def audit_relationship_query(user_id, context_not_role=False):
 
 class CompletePermissionsProvider(object):
   """Permission provider set in the USER_PERMISSIONS_PROVIDER setting"""
+
   def __init__(self, _):
     pass
 
@@ -288,6 +290,7 @@ class CompletePermissionsProvider(object):
 
 class BasicUserPermissions(DefaultUserPermissions):
   """User permissions that aren't kept in session."""
+
   def __init__(self, user):
     self.user = user
     with benchmark('BasicUserPermissions > load permissions for user'):
@@ -298,6 +301,7 @@ class BasicUserPermissions(DefaultUserPermissions):
 
 
 class UserPermissions(DefaultUserPermissions):
+
   @property
   def _request_permissions(self):
     return getattr(g, '_request_permissions', None)
@@ -575,15 +579,17 @@ def load_object_owners(user, permissions):
       None
   """
   with benchmark("load_object_owners > get owners"):
-    object_owners = user.object_owners
+    object_owners = db.session.query(
+        ObjectOwner.ownable_type, ObjectOwner.ownable_id
+    ).filter(ObjectOwner.person_id == user.id).all()
   with benchmark("load_object_owners > update permissions"):
     actions = ("read", "create", "update", "delete", "view_object_page")
-    for object_owner in object_owners:
+    for ownable_type, ownable_id in object_owners:
       for action in actions:
         permissions.setdefault(action, {})\
-            .setdefault(object_owner.ownable_type, {})\
+            .setdefault(ownable_type, {})\
             .setdefault('resources', list())\
-            .append(object_owner.ownable_id)
+            .append(ownable_id)
 
 
 def load_program_relationships(user, permissions):
@@ -794,7 +800,7 @@ def backlog_workflows():
   return db.session.query(_workflow.id,
                           literal("Workflow").label("type"),
                           _workflow.context_id)\
-                   .filter(_workflow.kind == "Backlog")
+      .filter(_workflow.kind == "Backlog")
 
 
 def _get_or_create_personal_context(user):
