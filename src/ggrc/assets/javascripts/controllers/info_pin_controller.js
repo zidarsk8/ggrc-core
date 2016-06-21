@@ -121,6 +121,10 @@ can.Control('CMS.Controllers.InfoPin', {
     $header = $('.tree-header:visible');
     $filter = $('.tree-filter:visible');
 
+    if (_.isEmpty(el) || _.isEmpty($header)) {
+      return;
+    }
+
     elTop = el.offset().top;
     elBottom = elTop + el.height();
 
