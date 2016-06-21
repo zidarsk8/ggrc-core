@@ -42,15 +42,11 @@
       </div>
       <div class="span4">
         <h6>Risk Manager</h6>
-        {{#using person=instance.ra_manager}}
-          {{{render '/static/mustache/people/popover.mustache'}}}
-        {{/using}}
+        <person person-obj="instance.ra_manager"></person>
       </div>
       <div class="span4">
         <h6>Risk Counsel</h6>
-        {{#using person=instance.ra_counsel}}
-          {{{render '/static/mustache/people/popover.mustache'}}}
-        {{/using}}
+        <person person-obj="instance.ra_counsel"></person>
       </div>
     </div>
 
