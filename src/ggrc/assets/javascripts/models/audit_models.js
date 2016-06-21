@@ -948,6 +948,7 @@
     },
     after_save: function () {
       this._set_mandatory_msgs();
+      this.audit.refresh();
     },
     _set_mandatory_msgs: function () {
       var instance = this;
