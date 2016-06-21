@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc., authors, and contributors
+# Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A module for extended info page models (visible in LHN on hover over
