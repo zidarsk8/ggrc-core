@@ -1635,145 +1635,192 @@ Mustache.registerHelper("with_program_roles_as", function (
 });
 
 
-// Determines and serializes the roles for a user
-var program_roles;
-Mustache.registerHelper("infer_roles", function (instance, options) {
-  instance = resolve_computed(instance);
-  var state = options.contexts.attr("__infer_roles")
-    , page_instance = GGRC.page_instance()
-    , person = page_instance instanceof CMS.Models.Person ? page_instance : null
-    , init_state = function () {
-        if (!state.roles) {
-          state.attr({
-            status: 'loading'
-            , count: 0
-            , roles: new can.Observe.List()
-          });
-        }
-      }
-    ;
+  var programRoles;  // needed for the infer_roles helper
 
-  if (!state) {
-    state = new can.Observe();
-    options.context.attr("__infer_roles", state);
-  }
+  /**
+   * Determine and serialize the roles for a user.
+   *
+   * @param {can.Model} instance - the object to infer the current user's
+   *   roles for
+   * @param {Object} options - a CanJS options argument passed to every helper
+   */
+  Mustache.registerHelper('infer_roles', function (instance, options) {
+    var pageInstance;
+    var person;
+    var refreshQueue;
+    var requests;
+    var state;
 
-  if (!state.attr('status')) {
-    if (person) {
-      init_state();
-
-      // Check whether current user is audit lead (for audits) or contact (for everything else)
-      if (instance.contact && instance.contact.id === person.id) {
-        if (instance instanceof CMS.Models.Audit) {
-          state.attr('roles').push('Audit Lead');
-        } else {
-          state.attr('roles').push('Contact');
-        }
-      }
-
-      // Check for Audit roles
-      if (instance instanceof CMS.Models.Audit) {
-        var requests = instance.requests || new can.Observe.List()
-          , refresh_queue = new RefreshQueue()
-          ;
-
-        refresh_queue.enqueue(requests.reify());
-        refresh_queue.trigger().then(function (requests) {
-          can.each(requests, function (request) {
-            if (request.assignee && request.assignee.id === person.id
-                && !~can.inArray('Request Assignee', state.attr('roles'))) {
-              state.attr('roles').push('Request Assignee');
-            };
-          });
-        });
-      }
-
-      // Check for assessor roles
-      if (instance.attr('principal_assessor') && instance.principal_assessor.id === person.id) {
-        state.attr('roles').push('Principal Assessor');
-      }
-      if (instance.attr('secondary_assessor') && instance.secondary_assessor.id === person.id) {
-        state.attr('roles').push('Secondary Assessor');
-      }
-
-      // Check for people
-      if (instance.people && ~can.inArray(person.id, $.map(instance.people, function (person) { return person.id; }))) {
-        state.attr('roles').push('Mapped');
-      }
-
-      if (instance instanceof CMS.Models.Audit) {
-        $.when(
-          instance.reify().get_binding('authorizations').refresh_list(),
-          instance.findAuditors()
-        ).then(function (authorizations, auditors) {
-          if (~can.inArray(person.id, $.map(auditors, function (p) { return p.person.id; }))) {
-            state.attr('roles').push('Auditor');
-          }
-          authorizations.bind("change", function () {
-            state.attr('roles', can.map(state.attr('roles'), function (role) {
-              if (role != 'Auditor')
-                return role;
-            }));
-            instance.findAuditors().then(function (auds) {
-              if (~can.inArray(person.id, $.map(auds, function (p) { return p.person.id; }))) {
-                state.attr('roles').push('Auditor');
-              }
-            });
-          });
-        });
-      }
-
-      // Check for ownership
-      if (instance.owners && ~can.inArray(person.id, $.map(instance.owners, function (person) { return person.id; }))) {// && !~can.inArray("Auditor", state.attr('roles'))) {
-        state.attr('roles').push('Owner');
-      }
-
-      // Check for authorizations
-      if (instance instanceof CMS.Models.Program && instance.context && instance.context.id) {
-        person.get_list_loader("authorizations").done(function (authorizations) {
-          authorizations = can.map(authorizations, function (auth) {
-            if (auth.instance.context && auth.instance.context.id === instance.context.id) {
-              return auth.instance;
-            }
-          });
-          !program_roles && (program_roles = CMS.Models.Role.findAll({ scope__in: "Private Program,Audit" }));
-          program_roles.done(function (roles) {
-            can.each(authorizations, function (auth) {
-              var role = CMS.Models.Role.findInCacheById(auth.role.id);
-              var roleName;
-              if (role) {
-                roleName = (role.name === 'ProgramOwner') ?
-                           'Program Manager' : role.name;
-                state.attr('roles').push(roleName);
-              }
-            });
-          });
+    function initState() {
+      if (!state.roles) {
+        state.attr({
+          status: 'loading',
+          count: 0,
+          roles: new can.Observe.List()
         });
       }
     }
-    // When we're not on a profile page
-    else {
-      // Check for ownership
-      if (instance.owners && ~can.inArray(GGRC.current_user.id, $.map(instance.owners, function (person) { return person.id; }))) {
-        init_state();
+
+    instance = resolve_computed(instance);
+
+    state = options.contexts.attr('__infer_roles');
+    pageInstance = GGRC.page_instance();
+    person = pageInstance instanceof CMS.Models.Person ? pageInstance : null;
+
+    if (!state) {
+      state = new can.Observe();
+      options.context.attr('__infer_roles', state);
+    }
+
+    if (!state.attr('status')) {
+      if (person) {
+        initState();
+
+        // Check whether current user is audit lead (for audits) or contact (for everything else)
+        if (instance.contact && instance.contact.id === person.id) {
+          if (instance instanceof CMS.Models.Audit) {
+            state.attr('roles').push('Audit Lead');
+          } else {
+            state.attr('roles').push('Contact');
+          }
+        }
+
+        // Check for Audit roles
+        if (instance instanceof CMS.Models.Audit) {
+          requests = instance.requests || new can.Observe.List();
+          refreshQueue = new RefreshQueue();
+
+          refreshQueue.enqueue(requests.reify());
+          refreshQueue.trigger().then(function (requests) {
+            can.each(requests, function (request) {
+              if (
+                request.assignee &&
+                request.assignee.id === person.id &&
+                !_.includes(state.attr('roles'), 'Request Assignee')
+              ) {
+                state.attr('roles').push('Request Assignee');
+              }
+            });
+          });
+        }
+
+        // Check for assessor roles
+        if (
+          instance.attr('principal_assessor') &&
+          instance.principal_assessor.id === person.id
+        ) {
+          state.attr('roles').push('Principal Assessor');
+        }
+
+        if (
+          instance.attr('secondary_assessor') &&
+          instance.secondary_assessor.id === person.id
+        ) {
+          state.attr('roles').push('Secondary Assessor');
+        }
+
+        // Check for people
+        if (
+          instance.people &&
+          _.contains(_.map(instance.people, 'id'), person.id)
+        ) {
+          state.attr('roles').push('Mapped');
+        }
+
+        if (instance instanceof CMS.Models.Audit) {
+          $.when(
+            instance.reify().get_binding('authorizations').refresh_list(),
+            instance.findAuditors()
+          ).then(function (authorizations, auditors) {
+            if (_.includes(_.map(auditors, 'person.id'), person.id)) {
+              state.attr('roles').push('Auditor');
+            }
+
+            function changeHandler() {
+              var roleList = can.map(state.attr('roles'), function (role) {
+                if (role !== 'Auditor') {
+                  return role;
+                }
+              });
+              state.attr('roles', roleList);
+
+              instance.findAuditors().then(function (auds) {
+                if (_.includes(_.map(auds, 'person.id'), person.id)) {
+                  state.attr('roles').push('Auditor');
+                }
+              });
+            }
+
+            authorizations.bind('change', changeHandler);
+          });
+        }
+
+        // Check for ownership
+        if (
+          instance.owners &&
+          _.includes(_.map(instance.owners, 'id'), person.id)
+        ) {
+          state.attr('roles').push('Owner');
+        }
+
+        // Check for authorizations
+        if (
+          instance instanceof CMS.Models.Program &&
+          instance.context &&
+          instance.context.id
+        ) {
+          person.get_list_loader('authorizations')
+            .done(function (authorizations) {
+              authorizations = can.map(authorizations, function (auth) {
+                if (
+                  auth.instance.context &&
+                  auth.instance.context.id === instance.context.id
+                ) {
+                  return auth.instance;
+                }
+              });
+
+              if (!programRoles) {
+                programRoles = CMS.Models.Role.findAll(
+                  {scope__in: 'Private Program,Audit'}
+                );
+              }
+
+              programRoles.done(function (roles) {
+                can.each(authorizations, function (auth) {
+                  var role = CMS.Models.Role.findInCacheById(auth.role.id);
+                  var roleName;
+                  if (role) {
+                    roleName = (role.name === 'ProgramOwner') ?
+                               'Program Manager' : role.name;
+                    state.attr('roles').push(roleName);
+                  }
+                });
+              });
+            }
+          );  // end person.get_list_loader()
+        }
+      } else if (  // When we're not on a profile page, check for ownership
+        instance.owners &&
+        _.includes(_.map(instance.owners, 'id'), GGRC.current_user.id)
+      ) {
+        initState();
         state.attr('roles').push('Yours');
       }
     }
-  }
 
-  // Return the result
-  if (!state.attr('roles') || state.attr('status') === 'failed') {
-    return '';
-  }
-  else if (state.attr('roles').attr('length') === 0 && state.attr('status') === 'loading') {
-    return options.inverse(options.contexts);
-  }
-  else {
-    if (state.attr('roles').attr('length')) {
+    // Return the result
+    if (!state.attr('roles') || state.attr('status') === 'failed') {
+      return '';
+    } else if (
+      state.attr('roles').attr('length') === 0 &&
+      state.attr('status') === 'loading'
+    ) {
+      return options.inverse(options.contexts);
+    } else if (state.attr('roles').attr('length')) {
       return options.fn(options.contexts.add(state.attr('roles').join(', ')));
     }
-  }
-});
+  });
 
 function get_observe_context(scope) {
   if (!scope) return null;
