@@ -26,20 +26,36 @@
     var Multi = GGRC.MapperHelpers.Multi;
     var TypeFilter = GGRC.MapperHelpers.TypeFilter;
 
-        var mappings = {
-          Program: {
-            _canonical: {
-              risk_assessments: "RiskAssessment"
-            },
-            risk_assessments: Direct(
-              "RiskAssessment", "program", "risk_assessments"),
-          },
-          RiskAssessment: {
-            documents: Proxy(
-              "Document", "document", "ObjectDocument", "documentable", "object_documents"),
-          },
-        };
-        new GGRC.Mappings("ggrc_risk_assessments", mappings);
+    var mappings = {
+      Program: {
+        _canonical: {
+          risk_assessments: 'RiskAssessment'
+        },
+        risk_assessments: Direct('RiskAssessment',
+          'program', 'risk_assessments')
+      },
+      RiskAssessment: {
+        related_objects_as_source: Proxy(
+          null,
+          'destination', 'Relationship',
+          'source', 'related_destinations'
+        ),
+        related_objects_as_destination: Proxy(
+          null,
+          'source', 'Relationship',
+          'destination', 'related_sources'
+        ),
+        related_objects: Multi(
+          ['related_objects_as_source', 'related_objects_as_destination']
+        ),
+        destinations: Direct('Relationship', 'source', 'related_destinations'),
+        sources: Direct('Relationship', 'destination', 'related_sources'),
+        documents: Proxy('Document', 'document',
+          'ObjectDocument', 'documentable', 'object_documents'),
+        cycle_task_group_object_tasks: TypeFilter('related_objects',
+          'CycleTaskGroupObjectTask')
+      }
+    };
     new GGRC.Mappings('ggrc_risk_assessments', mappings);
   };
 
