@@ -13,10 +13,11 @@ from ggrc.models.mixins import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.person import Person
 from ggrc.models.program import Program
+from ggrc.models.relationship import Relatable
 
 
 class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
-                     CustomAttributable, Titled, Base, db.Model):
+                     CustomAttributable, Titled, Relatable, Base, db.Model):
   __tablename__ = 'risk_assessments'
   _title_uniqueness = False
 
@@ -49,12 +50,12 @@ class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
 
   _aliases = {
       "ra_manager": {
-        "display_name": "Risk Manager",
-        "filter_by": "_filter_by_risk_manager",
+          "display_name": "Risk Manager",
+          "filter_by": "_filter_by_risk_manager",
       },
       "ra_counsel": {
-        "display_name": "Risk Counsel",
-        "filter_by": "_filter_by_risk_counsel",
+          "display_name": "Risk Counsel",
+          "filter_by": "_filter_by_risk_counsel",
       },
       "start_date": {
           "display_name": "Start Date",
@@ -81,13 +82,13 @@ class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
   @classmethod
   def _filter_by_risk_manager(cls, predicate):
     return Person.query.filter(
-      (Person.id == cls.ra_manager_id) &
-      (predicate(Person.name) | predicate(Person.email))
+        (Person.id == cls.ra_manager_id) &
+        (predicate(Person.name) | predicate(Person.email))
     ).exists()
 
   @classmethod
   def _filter_by_risk_counsel(cls, predicate):
     return Person.query.filter(
-      (Person.id == cls.ra_counsel_id) &
-      (predicate(Person.name) | predicate(Person.email))
+        (Person.id == cls.ra_counsel_id) &
+        (predicate(Person.name) | predicate(Person.email))
     ).exists()
