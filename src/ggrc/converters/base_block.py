@@ -259,7 +259,6 @@ class BlockConverter(object):
       for row_converter in self.row_converters:
         try:
           row_converter.insert_secondary_objects()
-          db.session.flush()
         except exc.SQLAlchemyError as err:
           db.session.rollback()
           current_app.logger.error(
