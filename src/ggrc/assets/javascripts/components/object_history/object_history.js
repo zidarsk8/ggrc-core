@@ -436,6 +436,7 @@
       var object = revision.destination_type === this._INSTANCE_TYPE ?
                    revision.source : revision.destination;
       var displayName;
+      var displayType;
       var fieldName;
       var origVal;
       var newVal;
@@ -446,7 +447,9 @@
       }
 
       displayName = object.display_name() || object.description;
-      fieldName = 'Mapping to ' + object.type + ': ' + displayName;
+      displayType = object.display_type() || object.type;
+
+      fieldName = 'Mapping to ' + displayType + ': ' + displayName;
       origVal = '—';
       newVal = _.capitalize(revision.action);
       previous = chain[_.findIndex(chain, revision) - 1];
