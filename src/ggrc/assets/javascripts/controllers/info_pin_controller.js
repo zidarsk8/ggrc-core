@@ -107,23 +107,33 @@ can.Control('CMS.Controllers.InfoPin', {
     }
   },
   ensureElementVisible: function (el) {
-    var $objectArea = $('.object-area');
-    var $header = $('.tree-header:visible');
-    var $filter = $('.tree-filter:visible');
-    var elTop = el.offset().top;
-    var elBottom = elTop + el.height();
-    var headerTop = $header.length ? $header.offset().top : 0;
-    var headerBottom = headerTop + $header.height();
-    var infoTop = this.element.offset().top;
+    var $objectArea;
+    var $header;
+    var $filter;
+    var elTop;
+    var elBottom;
+    var headerTop;
+    var headerBottom;
+    var infoTop;
 
     $(window).trigger('resize');
+    $objectArea = $('.object-area');
+    $header = $('.tree-header:visible');
+    $filter = $('.tree-filter:visible');
+
+    elTop = el.offset().top;
+    elBottom = elTop + el.height();
+
+    headerTop = $header.offset().top;
+    headerBottom = headerTop + $header.height();
+    infoTop = this.element.offset().top;
 
     if (elTop < headerBottom || elBottom > infoTop) {
       el[0].scrollIntoView(false);
       if (elTop < headerBottom) {
         el[0].scrollIntoView(true);
-        $objectArea.scrollTop($objectArea.scrollTop() - $header.height() -
-          $filter.height());
+        $objectArea.scrollTop(
+          $objectArea.scrollTop() - $header.height() - $filter.height());
       } else {
         el[0].scrollIntoView(false);
       }
