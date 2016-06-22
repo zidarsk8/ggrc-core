@@ -1,8 +1,6 @@
 /*!
-    Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+    Copyright (C) 2016 Google Inc., authors, and contributors
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    Created By: ivan@reciprocitylabs.com
-    Maintained By: ivan@reciprocitylabs.com
 */
 
 (function (can, $) {
@@ -43,6 +41,11 @@
       binding.refresh_instances().then(function (mappedObjects) {
         this.scope.attr('mappedObjects').replace(mappedObjects);
       }.bind(this));
+
+      // We are tracking binding changes, so mapped items update accordingly
+      binding.list.on('change', function () {
+        this.scope.attr('mappedObjects').replace(binding.list);
+      }.bind(this));
     },
     events: {
       '[data-toggle=unmap] click': function (el, ev) {
@@ -55,7 +58,7 @@
 
         binding = _.find(mappings, function (mapping) {
           return mapping.instance.id === instance.id &&
-                 mapping.instance.type === instance.type;
+            mapping.instance.type === instance.type;
         });
         _.each(binding.get_mappings(), function (mapping) {
           mapping.refresh()
@@ -63,7 +66,20 @@
               return mapping.destroy();
             })
             .then(function () {
-              return mapping.documentable.reify();
+              if (mapping.documentable) {
+                return mapping.documentable.reify();
+              }
+            })
+            .fail(function (err) {
+              var messages = {
+                '403': 'You don\'t have the permission to access the ' +
+                'requested resource. It is either read-protected or not ' +
+                'readable by the server.'
+              };
+              if (messages[err.status]) {
+                $('body').trigger('ajax:flash',
+                  {warning: messages[err.status]});
+              }
             });
         });
       }
