@@ -1438,7 +1438,7 @@ can.Observe.List.prototype.stubs = function() {
   return new can.Observe.List(can.map(this, function(obj) {
     return obj.stub();
   }));
-}
+};
 
 can.Observe.prototype.reify = function() {
   var type, model;
@@ -1455,8 +1455,9 @@ can.Observe.prototype.reify = function() {
 
   if (!model) {
     console.debug("`reify()` called with unrecognized type", this);
+  } else {
+    return model.model(this);
   }
-  return model.model(this);
 };
 
 can.Observe.List.prototype.reify = function() {
