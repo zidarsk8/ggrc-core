@@ -250,6 +250,10 @@ class TestComprehensiveSheets(TestCase):
             "row_errors": set([
                 errors.UNKNOWN_DATE_FORMAT.format(
                     line=8, column_name="Effective Date"),
+                errors.WRONG_VALUE_ERROR.format(
+                    line=9, column_name="Effective Date"),
+                errors.WRONG_VALUE_ERROR.format(
+                    line=9, column_name="Stop Date"),
             ]),
         },
     }
