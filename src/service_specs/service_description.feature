@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc., authors, and contributors
+# Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 Feature: Rather than have clients keep a list of the endpoint URLs for
