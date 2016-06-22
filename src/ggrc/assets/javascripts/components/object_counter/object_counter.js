@@ -62,9 +62,9 @@
         var value;
         var data;
 
-        var modelName = this.attr('modelName');
-        var keys = this.attr('searchKeys').split(';');
-        var values = this.attr('searchValues').split(';');
+        var modelName = this.scope.attr('modelName');
+        var keys = this.scope.attr('searchKeys').split(';');
+        var values = this.scope.attr('searchValues').split(';');
 
         if (!GGRC.current_user || !GGRC.current_user.id) {
           return;
@@ -72,14 +72,14 @@
 
         for (i = 0; i < keys.length; i++) {
           key = keys[i].trim();
-          value = this._getValue[values[i].trim()] || values[i];
+          value = this.scope._getValue[values[i].trim()] || values[i];
           searchData[key] = value;
         }
         searchData.__stubs_only = true;
 
         data = CMS.Models[modelName].findAll(searchData);
         data.done(function (objectList) {
-          this.attr('count', objectList.length);
+          this.scope.attr('count', objectList.length);
         }.bind(this));
       }, 10000) // See component documentation for explanation
     },
@@ -101,9 +101,7 @@
       model = CMS.Models[modelName];
 
       _.forEach(updateEvents, function (eventName) {
-        model.bind(eventName, function () {
-          this.scope.updateCount();
-        }.bind(this));
+        model.bind(eventName, this.scope.updateCount.bind(this));
       }.bind(this));
     },
     events: {
