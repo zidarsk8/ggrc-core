@@ -865,7 +865,7 @@ can.Control('GGRC.Controllers.Modals', {
           var $form = $(this.element).find('form');
           $form.trigger('reset');
         });
-      })
+      }.bind(this))
       .then(this.proxy("apply_object_params"))
       .then(this.proxy("serialize_form"))
       .then(this.proxy("autocomplete"));
