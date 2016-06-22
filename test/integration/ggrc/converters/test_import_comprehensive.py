@@ -241,13 +241,17 @@ class TestComprehensiveSheets(TestCase):
             "block_errors": set([
                 errors.DUPLICATE_COLUMN.format(
                     line=1, duplicates="Notes, Test Plan"),
-            ])
+            ]),
         },
         "Program": {
             "row_warnings": set([
                 errors.OWNER_MISSING.format(line=7, column_name="Manager"),
-            ])
-        }
+            ]),
+            "row_errors": set([
+                errors.UNKNOWN_DATE_FORMAT.format(
+                    line=8, column_name="Effective Date"),
+            ]),
+        },
     }
     self.assertEqual(dry_response, response)
 

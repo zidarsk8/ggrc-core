@@ -84,3 +84,7 @@ UNKNOWN_ERROR = "Line {line}: Import failed due to unknown error."
 
 REQUEST_INVALID_STATE = ("LINE {line}: Can not set Request state to Completed "
                          "or Verified via imports.")
+
+UNKNOWN_DATE_FORMAT = (u"Line {line}: Field {column_name} contains invalid "
+                       u"date format, use YYYY-MM-DD or MM/DD/YYYY. The line "
+                       u"will be ignored.")
