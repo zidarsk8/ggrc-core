@@ -50,8 +50,8 @@ class TestCreatorAudit(TestCase):
                 },
                 "mapped_Assessment": {
                     "get": 200,
-                    "put": 200,
-                    "delete": 200
+                    "put": 403,
+                    "delete": 403
                 },
                 "unrelated_Assessment": {
                     "get": 403,
