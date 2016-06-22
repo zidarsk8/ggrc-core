@@ -47,6 +47,7 @@
       },
       create_url: function () {
         var value = $.trim(this.element.find("input[type='text']").val());
+        var dfd;
 
         // We are not validating the URL because application can locally we can
         // have URL's that are valid, but they wouldn't pass validation i.e.
@@ -55,17 +56,20 @@
         // - http://something.com etc
         // and thus we decided to validate just string existence
         if (!value || _.isEmpty(value)) {
-          return $.Deferred().reject({
+          dfd = $.Deferred();
+          dfd.reject({
             message: 'Please enter a URL'
           });
+          return dfd.promise();
         }
-        return new CMS.Models.Document({
+        dfd = new CMS.Models.Document({
           link: value,
           title: value,
           context: this.scope.parent_instance.context || new CMS.Models.Context({
             id: null
           })
-        }).save();
+        });
+        return dfd.save();
       }
     },
     events: {
@@ -119,6 +123,15 @@
           }
           if (!created_dfd) {
             created_dfd = $.Deferred().resolve();
+          }
+
+          if (created_dfd.state() === 'rejected') {
+            created_dfd.fail(function (error) {
+              $(document.body).trigger('ajax:flash', {
+                error: error.message
+              });
+            });
+            return;
           }
 
           if (this.scope.deferred) {
