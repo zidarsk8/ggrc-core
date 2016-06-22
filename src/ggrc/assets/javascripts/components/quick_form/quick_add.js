@@ -135,8 +135,11 @@
           }
 
           if (this.scope.deferred) {
-            this.scope.parent_instance.mark_for_addition("related_objects_as_source", created_dfd);
-            el.trigger("modal:success", created_dfd);
+            created_dfd.done(function (instance) {
+              this.scope.parent_instance
+                .mark_for_addition('related_objects_as_source', instance);
+              el.trigger('modal:success', instance);
+            }.bind(this));
             return;
           }
 
