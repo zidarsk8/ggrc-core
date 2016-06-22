@@ -286,8 +286,7 @@ class DateColumnHandler(ColumnHandler):
     try:
       return parse(self.raw_value)
     except:
-      self.add_error(
-          u"Unknown date format, use YYYY-MM-DD or MM/DD/YYYY format")
+      self.add_error(errors.UNKNOWN_DATE_FORMAT, column_name=self.display_name)
 
   def get_value(self):
     date = getattr(self.row_converter.obj, self.key)
