@@ -19,6 +19,11 @@
    *  Search keys and search values lists should be of equal length and
    *  shouldn't be empty (unless that is expected as a query).
    *
+   *  `updateCount` function is throttled because of a bug where if user
+   *  starts multiple cycles manually `N` times, each subsequent start of a
+   *  cycle triggers N events and could spam our server with 10 update requests
+   *  if user started 10 cycles without refreshing the page in between.
+   *
    *  @param {string} counter - Counter returned by backend in
    *    GGRC.counters.
    *  @param {string} ModelName - Name of a model to perform search on
@@ -76,7 +81,7 @@
         data.done(function (objectList) {
           this.attr('count', objectList.length);
         }.bind(this));
-      }, 10000)
+      }, 10000) // See component documentation for explanation
     },
     init: function () {
       var updateEvents = ['created', 'updated', 'destroyed'];
