@@ -283,10 +283,17 @@ class SlugColumnHandler(ColumnHandler):
 class DateColumnHandler(ColumnHandler):
 
   def parse_item(self):
+    value = self.raw_value.strip()
+    if value and not re.match(r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|"
+                              r"[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}",
+                              self.raw_value.strip()):
+      self.add_error(errors.UNKNOWN_DATE_FORMAT, column_name=self.display_name)
+      return
+
     try:
       return parse(self.raw_value)
     except:
-      self.add_error(errors.UNKNOWN_DATE_FORMAT, column_name=self.display_name)
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
 
   def get_value(self):
     date = getattr(self.row_converter.obj, self.key)
