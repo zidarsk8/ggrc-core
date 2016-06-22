@@ -20,7 +20,7 @@
     with other methods to do that is fine.  You can also just pass it in when
     instantiating the component.
   */
-  can.Component.extend({
+  GGRC.Components('quickAdd', {
     tag: "ggrc-quick-add",
     // <content> in a component template will be replaced with whatever is contained
     //  within the component tag.  Since the views for the original uses of these components
@@ -30,7 +30,6 @@
     scope: {
       parent_instance: null,
       source_mapping: null,
-      deferred: "@",
       join_model: "@",
       model: null,
       delay: "@",
@@ -40,6 +39,12 @@
       modal_title: "@",
       modal_button: "@",
       attributes: {},
+      define: {
+        deferred: {
+          type: 'boolean',
+          'default': false
+        }
+      },
       create_url: function () {
         var value = $.trim(this.element.find("input[type='text']").val());
 
