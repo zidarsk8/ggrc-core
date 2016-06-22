@@ -170,6 +170,7 @@ select {
 
 // Disabled state
 .btn.disabled, .btn[disabled] {
+  pointer-events: none;
   @include opacity(0.25);
 }
 

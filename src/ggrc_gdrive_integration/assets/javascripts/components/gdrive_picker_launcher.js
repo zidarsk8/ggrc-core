@@ -30,6 +30,8 @@
         var folder_id = el.data('folder-id');
         var dfd;
 
+        scope.attr('pickerActive', true);
+
         // Create and render a Picker object for searching images.
         function createPicker() {
           window.oauth_dfd.done(function (token, oauth_user) {
@@ -64,6 +66,9 @@
             if (dialog) {
               dialog.style.zIndex = 4001; // our modals start with 2050
             }
+          })
+          .fail(function () {
+            scope.attr('pickerActive', false);
           });
         }
 
@@ -77,6 +82,8 @@
           if (data[ACTION] === PICKED) {
             files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
             that.attr('pending', true);
+            scope.attr('pickerActive', false);
+
             return new RefreshQueue().enqueue(files).trigger().then(function (files) {
               var doc_dfds = that.handle_file_upload(files);
               $.when.apply($, doc_dfds).then(function () {
@@ -87,8 +94,8 @@
               });
             });
           } else if (data[ACTION] === CANCEL) {
-            // TODO: hadle canceled uplads
             el.trigger('rejected');
+            scope.attr('pickerActive', false);
           }
         }
 
@@ -98,7 +105,7 @@
             modal_confirm: scope.attr('modal_button'),
             modal_title: scope.attr('modal_title'),
             button_view: GGRC.mustache_path + '/gdrive/confirm_buttons.mustache'
-          }, verify_dfd.resolve);
+          }, verify_dfd.resolve, verify_dfd.reject);
         } else {
           verify_dfd.resolve();
         }
@@ -107,7 +114,12 @@
           dfd = GGRC.Controllers.GAPI.authorize(['https://www.googleapis.com/auth/drive']);
           dfd.then(function () {
             gapi.load('picker', {callback: createPicker});
+          }).fail(function () {
+            scope.attr('pickerActive', false);
           });
+        })
+        .fail(function () {
+          scope.attr('pickerActive', false);
         });
       },
 
@@ -277,6 +289,7 @@
         if (!this.scope.link_class) {
           this.scope.attr('link_class', 'btn');
         }
+        this.scope.attr('pickerActive', false);
       },
       '{scope} modal:success': function (_scope, _event) {
         var instance = this.scope.instance.reify();
