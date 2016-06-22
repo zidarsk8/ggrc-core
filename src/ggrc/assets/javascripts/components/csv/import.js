@@ -63,7 +63,9 @@
         }.bind(this))
         .fail(function (data) {
           this.scope.attr("state", "select");
-          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
+          $("body").trigger("ajax:flash", {
+            "error": $(data.responseText.split("\n")[3]).text()
+          });
         }.bind(this))
         .always(function () {
           this.scope.attr("isLoading", false);
@@ -113,7 +115,9 @@
         }.bind(this))
         .fail(function (data) {
           this.scope.attr("state", "select");
-          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
+          $("body").trigger("ajax:flash", {
+            "error": $(data.responseText.split("\n")[3]).text()
+          });
         }.bind(this))
         .always(function () {
           this.scope.attr("isLoading", false);
