@@ -6,6 +6,7 @@
 }}
 
 {{!  multiple instances case }}
+{{#is_subtree}}
 {{^is_dashboard}}
   {{#with_page_object_as 'page_instance'}}
     {{^if_equals parent_instance page_instance}}
@@ -15,13 +16,13 @@
           {{#is_allowed_to_map page_instance instance join=true}}
           {{#if mappings.length}}
             {{#is_allowed_all 'delete' mappings}}
-              <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Make Relevant">
+              <a href="javascript://" class="info-action unmap pull-right relevant-action" data-toggle="unmap" rel="tooltip" data-placement="left" data-original-title="Unmap">
                 {{#mappings}}<span class="result" {{data 'result'}}></span>{{/mappings}}
                 <i class="fa fa-check-square-o"></i>
               </a>
             {{/is_allowed_all}}
           {{else}}
-            <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}} rel="tooltip" data-placement="left" data-original-title="Make Relevant">
+            <a class="info-action pull-right map-to-page-object relevant-action" href="javascript://" {{#instance}}{{data 'instance'}}{{/instance}} rel="tooltip" data-placement="left" data-original-title="Map">
               <i class="fa fa-square-o"></i>
             </a>
           {{/if}}
@@ -32,3 +33,4 @@
     {{/if_equals}}
   {{/with_page_object_as}}
 {{/is_dashboard}}
+{{/is_subtree}}
