@@ -1,14 +1,10 @@
 # Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# Created By: nejc@reciprocitylabs.com
-# Maintained By: nejc@reciprocitylabs.com
 
-"""Rename admin role from gGRC Admin to Administrator.
+"""
+Rename admin role from gGRC Admin to Administrator.
 
-Revision ID: c9218e757bc
-Revises: 3bf028a83e79
 Create Date: 2016-06-03 12:02:09.438599
-
 """
 
 from alembic import op
@@ -17,7 +13,7 @@ from sqlalchemy.sql import table, column
 
 # revision identifiers, used by Alembic.
 revision = 'c9218e757bc'
-down_revision = '3bf028a83e79'
+down_revision = '4d5180ab1b42'
 
 roles_table = table(
     'roles',

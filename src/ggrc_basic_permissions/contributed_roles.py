@@ -150,7 +150,7 @@ class BasicRoleDeclarations(RoleDeclarations):
         'ProgramAuditEditor': ProgramAuditEditor,
         'ProgramAuditReader': ProgramAuditReader,
         'Auditor': Auditor,
-        'gGRC Admin': gGRC_Admin,
+        'Administrator': gGRC_Admin,
     }
 
 

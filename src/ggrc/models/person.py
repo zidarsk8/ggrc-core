@@ -155,11 +155,10 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
         u'Reader': 2,
         u'Creator': 3,
     }
-    system_wide_roles = role_hierarchy.keys()
     unique_roles = set([
         user_role.role.name
         for user_role in self.user_roles
-        if user_role.role.name in system_wide_roles
+        if user_role.role.name in role_hierarchy
     ])
     if len(unique_roles) == 0:
       return u"No Access"
