@@ -479,7 +479,7 @@ def load_permissions_for(user):  # noqa
   if keys and None in source_contexts_to_rolenames:
     all_context_implications = all_context_implications.filter(
         or_(
-            ContextImplication.source_context_id is None,
+            ContextImplication.source_context_id.is_(None),
             ContextImplication.source_context_id.in_(keys),
         )).all()
   elif keys:
@@ -487,7 +487,7 @@ def load_permissions_for(user):  # noqa
         ContextImplication.source_context_id.in_(keys)).all()
   elif None in source_contexts_to_rolenames:
     all_context_implications = all_context_implications.filter(
-        ContextImplication.source_context_id is None).all()
+        ContextImplication.source_context_id.is_(None)).all()
   else:
     all_context_implications = []
 
@@ -674,7 +674,7 @@ def add_public_program_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
       .filter(
           and_(ContextImplication.context_id == context.id,
-               ContextImplication.source_context_id is None)).count() > 0:
+               ContextImplication.source_context_id.is_(None))).count() > 0:
     return
   db.session.add(ContextImplication(
       source_context=None,
@@ -694,7 +694,7 @@ def handle_program_put(sender, obj=None, src=None, service=None):
       db.session.query(ContextImplication)\
           .filter(
               ContextImplication.context_id == obj.context_id,
-              ContextImplication.source_context_id is None)\
+              ContextImplication.source_context_id.is_(None))\
           .delete()
       db.session.flush()
     else:
