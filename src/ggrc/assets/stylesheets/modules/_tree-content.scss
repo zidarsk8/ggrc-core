@@ -25,7 +25,6 @@ ul.new-tree {
       }
     }
     .fa-caret-right {
-      cursor: pointer;
       display: inline-block;
       width: 20px;
       @include opacity(0.25);
@@ -44,6 +43,7 @@ ul.new-tree {
   }
   .openclose {
     width: 55px;
+    cursor: pointer;
     &__empty {
       width: 35px;
     }
