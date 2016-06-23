@@ -704,7 +704,9 @@ describe('GGRC.Components.objectHistory', function () {
           updated_at: new Date('2015-05-17 17:24:01'),
           action: 'created',
           destination: {
-            type: 'Other',
+            display_type: function () {
+              return 'Other';
+            },
             display_name: function () {
               return 'OtherObject';
             }
@@ -735,7 +737,9 @@ describe('GGRC.Components.objectHistory', function () {
           updated_at: new Date('2015-05-17 17:24:01'),
           action: 'deleted',
           source: {
-            type: 'Other',
+            display_type: function () {
+              return 'Other';
+            },
             display_name: function () {
               return 'OtherObject';
             }
