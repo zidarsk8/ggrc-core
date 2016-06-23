@@ -32,12 +32,22 @@
       list_pending: [],
       list_mapped: [],
       computed_mapping: false,
+      /**
+        * Get pending joins for current instance
+        *
+        * @return {Array} - the list of current pending joins
+        */
       get_pending: function () {
         if (!this.attr('deferred')) {
           return [];
         }
         return this.attr('instance._pending_joins');
       },
+      /**
+        * Get people mapped to this instance
+        *
+        * @return {Array} - the list of current mapped people
+        */
       get_mapped: function () {
         // We call get_mapping only once because canjs events can get caught in a loop
         // computed_mapping needs to be in scope so its separated from other people lists
@@ -48,6 +58,15 @@
         }
         return this.attr('list_mapped');
       },
+      /**
+        * Remove a person's role from current pending joins list
+        *
+        * Removes the role that is stated in `this.type`
+        *
+        * @param {Person} person - a person whose role should be removed
+        *
+        * @return {Array} - a new pending joins list
+        */
       remove_pending: function (person) {
         var results = this.attr('results');
         var list = this.attr('list_pending');
@@ -75,6 +94,15 @@
         index = _.findIndex(list, findInList);
         return list.splice(index, 1);
       },
+      /**
+        * Remove a role assignment from a person
+        *
+        * Called with a role removal button
+        *
+        * @param {Object} parentScope - current page context
+        * @param {jQuery.Object} el - clicked element
+        * @param {Object} ev - click event handler
+        */
       remove_role: function (parentScope, el, ev) {
         var person = CMS.Models.Person.findInCacheById(el.data('person'));
         var instance = this.instance;
@@ -116,6 +144,14 @@
           }
         });
       },
+      /**
+        * Get saved roles list for a person
+        *
+        * @param {Person} person - the person whose roles to get
+        * @param {Object} instance - the object to which the person is assigned
+        *
+        * @return {jQuery.Deferred} - a promise with the role list
+        */
       get_roles: function (person, instance) {
         var rel = function (obj) {
           return _.map(_.union(obj.related_sources, obj.related_destinations),
