@@ -46,7 +46,11 @@
         {{#instance._pending_joins}}
           <li class="label label-light">
             <span>{{what.title}}</span>
-            <a href="#" class="js-trigger-removeattachment">&times;</a>
+            <a
+              href="#"
+              class="js-trigger-removeattachment"
+              can-click="removePending"
+            >&times;</a>
           </li>
         {{/instance._pending_joins}}
         </ul>
