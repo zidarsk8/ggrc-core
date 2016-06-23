@@ -20,7 +20,7 @@
     with other methods to do that is fine.  You can also just pass it in when
     instantiating the component.
   */
-  can.Component.extend({
+  GGRC.Components('quickAdd', {
     tag: "ggrc-quick-add",
     // <content> in a component template will be replaced with whatever is contained
     //  within the component tag.  Since the views for the original uses of these components
@@ -30,7 +30,6 @@
     scope: {
       parent_instance: null,
       source_mapping: null,
-      deferred: "@",
       join_model: "@",
       model: null,
       delay: "@",
@@ -40,8 +39,15 @@
       modal_title: "@",
       modal_button: "@",
       attributes: {},
+      define: {
+        deferred: {
+          type: 'boolean',
+          'default': false
+        }
+      },
       create_url: function () {
         var value = $.trim(this.element.find("input[type='text']").val());
+        var dfd;
 
         // We are not validating the URL because application can locally we can
         // have URL's that are valid, but they wouldn't pass validation i.e.
@@ -50,17 +56,20 @@
         // - http://something.com etc
         // and thus we decided to validate just string existence
         if (!value || _.isEmpty(value)) {
-          return $.Deferred().reject({
+          dfd = $.Deferred();
+          dfd.reject({
             message: 'Please enter a URL'
           });
+          return dfd.promise();
         }
-        return new CMS.Models.Document({
+        dfd = new CMS.Models.Document({
           link: value,
           title: value,
           context: this.scope.parent_instance.context || new CMS.Models.Context({
             id: null
           })
-        }).save();
+        });
+        return dfd.save();
       }
     },
     events: {
@@ -116,9 +125,21 @@
             created_dfd = $.Deferred().resolve();
           }
 
+          if (created_dfd.state() === 'rejected') {
+            created_dfd.fail(function (error) {
+              $(document.body).trigger('ajax:flash', {
+                error: error.message
+              });
+            });
+            return;
+          }
+
           if (this.scope.deferred) {
-            this.scope.parent_instance.mark_for_addition("related_objects_as_source", created_dfd);
-            el.trigger("modal:success", created_dfd);
+            created_dfd.done(function (instance) {
+              this.scope.parent_instance
+                .mark_for_addition('related_objects_as_source', instance);
+              el.trigger('modal:success', instance);
+            }.bind(this));
             return;
           }
 

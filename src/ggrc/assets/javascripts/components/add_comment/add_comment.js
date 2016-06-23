@@ -27,6 +27,19 @@
       list: [],
       // the following are just for the case when we have no object to start with,
       changes: [],
+      removePending: function (scope, el, ev) {
+        var joins = this.instance._pending_joins;
+        var model = scope.what;
+        var index = _.findIndex(joins.serialize(), function (join) {
+          return join.what.id === model.id &&
+            join.what.type === model.type;
+        });
+
+        model.refresh().then(function () {
+          model.destroy();
+          joins.splice(index, 1);
+        });
+      },
       get_assignee_type: can.compute(function () {
         // TODO: We prioritize order V > A > R
         var types = {
