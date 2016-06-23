@@ -948,7 +948,9 @@
     },
     after_save: function () {
       this._set_mandatory_msgs();
-      this.audit.refresh();
+      if (this.audit && this.audit.selfLink) {
+        this.audit.refresh();
+      }
     },
     _set_mandatory_msgs: function () {
       var instance = this;
