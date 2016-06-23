@@ -19,7 +19,9 @@
       {{/instance}}
       {{/is_allowed}}
     {{/if}}
-    <i class="fa fa-file-{{file_type instance}}-o"></i>
+    {{#instance.selfLink}}
+      <i class="fa fa-file-{{file_type instance}}-o"></i>
+    {{/instance.selfLink}}
     {{^if reusable}}
     <span class="date">{{date instance.created_at true}}</span>
     {{/if}}
