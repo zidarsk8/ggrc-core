@@ -775,7 +775,8 @@ can.Model("can.Model.Cacheable", {
         if (definition.attribute_type === 'Checkbox') {
           self.class.validate('custom_attributes.' + definition.id,
               function (val) {
-                return !val;
+                var msg = val ? '' : 'must be checked';
+                return msg;
               });
         } else {
           self.class.validateNonBlank('custom_attributes.' + definition.id);
