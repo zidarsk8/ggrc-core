@@ -13,7 +13,7 @@
       "Objective", "Control", "Section", "Clause", "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
       "MultitypeSearch", "Issue", "Assessment", "AccessGroup", "Request",
-      "Person", "OrgGroup", "Vendor", "Workflow"
+      "Person", "OrgGroup", "Vendor"
     ],
     related_object_descriptors = {},
     threat_descriptor, risk_descriptor;

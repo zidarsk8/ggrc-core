@@ -59,25 +59,29 @@
     <div class="template-setup">
       <div class="row-fluid wrap-row">
         <div class="span8 task-list">
-          {{#child_options.1}}
-            <h3>Tasks (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
-            <h4 class="inline-explanation">Define and reorder tasks</h4>
-            <ul class="tree-structure new-tree" {{data 'options'}}
-              {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}
-              {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
+          {{#with_mapping 'task_group_tasks' instance}}
+            <h3>Tasks (<span>{{task_group_tasks.length}}</span>)</h3>
+            <h4 class="inline-explanation">Define tasks</h4>
+            <ul class="tree-structure new-tree">
+              {{#each task_group_tasks}}
+                {{>'/static/mustache/task_group_tasks/task_group_subtree.mustache'}}
+              {{/each}}
+              {{>'/static/mustache/task_group_tasks/task_group_subtree_footer.mustache'}}
             </ul>
-          {{/child_options.1}}
+          {{/with_mapping}}
         </div>
 
         <div class="span4">
-          {{#child_options.0}}
-            <h3>Objects (<span>{{list.length}}{{#if_null list}}...{{/if_null}}</span>)</h3>
+          {{#with_mapping 'objects' instance}}
+            <h3>Objects (<span>{{objects.length}}</span>)</h3>
             <h4 class="inline-explanation">Choose objects that tasks will apply to</h4>
-
-            <ul class="tree-structure new-tree" {{data 'options'}}
-              {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+            <ul class="tree-structure new-tree">
+              {{#each objects}}
+                {{>'/static/mustache/base_objects/task_group_subtree.mustache'}}
+              {{/each}}
+              {{>'/static/mustache/base_objects/task_group_subtree_footer.mustache'}}
             </ul>
-          {{/child_options.0}}
+          {{/with_mapping}}
         </div>
       </div>
     </div>
