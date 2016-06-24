@@ -1062,11 +1062,14 @@ can.Model("can.Model.Cacheable", {
       }
     });
     return serial;
-  }
-  , display_name : function() {
+  },
+  display_name: function () {
     return this.title || this.name;
-  }
-  , autocomplete_label : function() {
+  },
+  display_type: function () {
+    return this.type;
+  },
+  autocomplete_label : function () {
     return this.title;
   },
   get_permalink: function () {

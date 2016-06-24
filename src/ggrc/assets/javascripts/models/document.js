@@ -56,6 +56,12 @@ can.Model.Cacheable("CMS.Models.Document", {
   }
 
 }, {
+  display_type: function () {
+    if (_.isEmpty(this.object_documents)) {
+      return 'URL';
+    }
+    return 'Evidence';
+  }
 });
 
 })(this, can);
