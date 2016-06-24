@@ -5,11 +5,14 @@
 
 //= require can.jquery-all
 //= require controllers/quick_search_controller
+
 (function(namespace, $) {
-
-$(function() {
-  $("#lhn").cms_controllers_lhn();
-
+  $(document.body).on("click", ".lhn-no-init", function() {
+    $(this).removeClass('lhn-no-init');
+    $("#lhn").cms_controllers_lhn();
+    $(".lhn-trigger").trigger('click');
+    $(document.body).ggrc_controllers_recently_viewed();
+  });
   $(document.body).on("click", "a[data-toggle=unmap]", function(ev) {
     var $el = $(this)
       ;
@@ -137,11 +140,5 @@ $(function() {
     }
 
   });
-
-});
-
-$(function(){
-  $(document.body).ggrc_controllers_recently_viewed();
-});
 
 })(this, jQuery);
