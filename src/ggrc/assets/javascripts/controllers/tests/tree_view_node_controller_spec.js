@@ -128,6 +128,7 @@ describe('CMS.Controllers.TreeViewNode', function () {
         _ifNotRemoved: jasmine.createSpy().and.callFake(function (callback) {
           return callback;
         }),
+        add_child_lists_to_child: jasmine.createSpy(),
         display_subtrees:
           jasmine.createSpy().and.returnValue(displaySubtreesDfd)
       };

@@ -409,6 +409,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     add_item_view: null,
     parent: null,
     list: null,
+    filteredList: [],
     single_object: false,
     find_params: {},
     sort_property: null,
@@ -906,28 +907,33 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var pageCount;
     var mid;
     var pos;
-    if (this.options.disable_lazy_loading || this.element === null) {
+    var options = this.options;
+
+    if (options.disable_lazy_loading ||
+        !this.element ||
+        options.attr('drawingItems')) {
       return;
     }
     elPosition = this.el_position.bind(this);
-    children = this.element.children();
+    children = options.attr('filteredList');
     lo = 0;
     hi = children.length - 1;
     max = hi;
     steps = 0;
     visible = [];
-    alreadyVisible = _.filter(this.element[0].children, function (e) {
-      // doing this manualy is 10x faster than a jQuery selector and performance
-      // here matters since it runs on every scroll event on a potentialy long
-      // list of items
-      return e.tagName === 'LI';
-    });
     toRender = [];
+
+    if (!children.length || !children[0].element) {
+      return;
+    }
+    alreadyVisible = _.filter(children, function (child) {
+      return !child.options.attr('isPlaceholder');
+    });
 
     while (steps < MAX_STEPS && lo < hi) {
       steps += 1;
       mid = (lo + hi) / 2 | 0;
-      pos = elPosition(children[mid]);
+      pos = elPosition(children[mid].element);
       if (pos < 0) {
         lo = mid;
         continue;
@@ -939,16 +945,15 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       lo = mid;
       hi = mid;
     }
-    pageCount = this.options.scroll_page_count;
-    while (lo > 0 && elPosition(children[lo - 1]) >= (-pageCount)) {
+    pageCount = options.scroll_page_count;
+    while (lo > 0 && elPosition(children[lo - 1].element) >= (-pageCount)) {
       lo -= 1;
     }
-    while (hi < max && elPosition(children[hi + 1]) <= pageCount) {
+    while (hi < max && elPosition(children[hi + 1].element) <= pageCount) {
       hi += 1;
     }
 
-    _.each(alreadyVisible, function (visible_element) {
-      control = $(visible_element).control();
+    _.each(alreadyVisible, function (control) {
       if (!control) {
         return;
       }
@@ -961,8 +966,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
     for (i = lo; i <= hi; i++) {
       index = this._is_scrolling_up ? (hi - (i - lo)) : i;
-      control = $(children[index]).control();
-      if (control === undefined || control === null) {
+      control = children[index];
+      if (!control) {
         // TODO this should not be necessary
         // draw_visible is called too soon when controlers are not yet
         // available and then again when they are. Remove the too soon
@@ -1082,11 +1087,12 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var listWindow = [];
     var finalDfd;
     var queue = [];
+    var BATCH = 200;
     var opId = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1;
 
     can.each(currentList, function (item) {
       listWindow.push(item);
-      if (listWindow.length >= 500) {
+      if (listWindow.length >= BATCH) {
         queue.push(listWindow);
         listWindow = [];
       }
@@ -1095,6 +1101,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       queue.push(listWindow);
     }
     this.options.attr('filter_shown', 0);
+    this.options.attr('filteredList', []);
     finalDfd = _.foldl(queue, function (dfd, listWindow) {
       return dfd.then(function () {
         var res = $.Deferred();
@@ -1129,68 +1136,56 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     return finalDfd;
   },
   draw_items: function (optionsList) {
+    var items;
     var $footer = this.element.children('.tree-item-add').first();
-    var $items = $();
-    var $existing = this.element.children('.cms_controllers_tree_view_node');
     var drawItemsDfds = [];
     var sortProp = this.options.sort_property;
     var sortFunction = this.options.sort_function;
     var filter = this.options.filter;
+    var filteredItems = this.options.attr('filteredList') || [];
     var res;
 
-    optionsList = can.makeArray(optionsList);
-    can.map(optionsList, function (options) {
-      var $li = $('<li />');
-      if (!filter || filter.evaluate(options.instance.get_filter_vals())) {
-        if (this.options.disable_lazy_loading) {
-          options.disable_lazy_loading = true;
-        }
-        $li.cms_controllers_tree_view_node(options);
-        drawItemsDfds.push($li.control()._draw_node_deferred);
-        $items.push($li[0]);
-      }
-    }.bind(this));
+    items = can.makeArray(optionsList);
+    if (filter) {
+      items = _.filter(items, function (option) {
+        return filter.evaluate(option.instance.get_filter_vals());
+      });
+    }
 
     if (sortProp || sortFunction) {
       if (!sortFunction) {
         sortFunction = this._sort_property_comparator(sortProp);
       }
-      $items.each(function (i, item) {
-        var j;
-        var $item = $(item);
-        var compare;
-        var newItem = $item.control().options.instance;
-        var oldItem;
-
-        for (j = $existing.length - 1; j >= 0; j--) {
-          oldItem = $existing.eq(j).control().options.instance;
-          compare = sortFunction(oldItem, newItem);
-          if (compare <= 0) {
-            $item.insertAfter($existing.eq(j));
-            $existing.splice(j + 1, 0, item);
-            return;
-          }
-        }
-        if ($existing.length) {
-          $item.insertBefore($existing.eq(0));
-        } else if ($footer.length) {
-          $item.insertBefore($footer);
-        } else {
-          $item.appendTo(this.element);
-        }
-        $existing.splice(0, 0, item);
-      }.bind(this));
-      if (this.options.sortable) {
-        $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
-      }
-    } else if ($footer.length) {
-      $items.insertBefore($footer);
-    } else {
-      $items.appendTo(this.element);
+      items.sort(function (a, b) {
+        return sortFunction(a.instance, b.instance);
+      });
     }
+
+    items = _.map(items, function (options) {
+      var control;
+      var elem = document.createElement('li');
+      if (this.options.disable_lazy_loading) {
+        options.disable_lazy_loading = true;
+      }
+      control = new CMS.Controllers.TreeViewNode(elem, options);
+      drawItemsDfds.push(control._draw_node_deferred);
+      filteredItems.push(control);
+      return control.element;
+    }.bind(this));
+
+    if ($footer.length) {
+      $(items).insertBefore($footer);
+    } else {
+      this.element.append(items);
+    }
+    if (this.options.sortable) {
+      $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
+    }
+    this.options.attr('filteredList', filteredItems);
     res = $.when.apply($, drawItemsDfds);
+
     res.then(function () {
-      setTimeout(this.draw_visible.bind(this), 0);
+      _.defer(this.draw_visible.bind(this));
     }.bind(this));
     return res;
   },
@@ -1549,7 +1544,6 @@ can.Control('CMS.Controllers.TreeViewNode', {
     }
 
     this._draw_node_in_progress = true;
-    this.add_child_lists_to_child();
 
     // the node's isActive state is not stored anywhere, thus we need to
     // determine it from the presemce of the corresponding CSS class
@@ -1568,20 +1562,24 @@ can.Control('CMS.Controllers.TreeViewNode', {
         this._draw_node_deferred.resolve();
       }.bind(this))
     );
-
+    this.options.attr('isPlaceholder', false);
     this._draw_node_in_progress = false;
     this.options.attr('is_subtree',
         this.element && this.element.closest('.inner-tree').length > 0);
   },
 
   draw_placeholder: function () {
-    var that = this;
-    can.view(GGRC.mustache_path + '/base_objects/tree_placeholder.mustache', that.options, this._ifNotRemoved(function (frag) {
-      that.replace_element(frag);
-      that._draw_node_deferred.resolve();
-      that.expanded = false;
-      delete that._expand_deferred;
-    }));
+    can.view(
+      GGRC.mustache_path + '/base_objects/tree_placeholder.mustache',
+      this.options,
+      this._ifNotRemoved(function (frag) {
+        this.replace_element(frag);
+        this._draw_node_deferred.resolve();
+        this.options.expanded = false;
+        delete this._expand_deferred;
+      }.bind(this))
+    );
+    this.options.attr('isPlaceholder', true);
   },
 
   should_draw_children: function () {
@@ -1594,17 +1592,20 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
   // add all child options to one TreeViewOptions object
   add_child_lists_to_child: function () {
-    var original_child_options = this.options.child_options;
-    var new_child_options = [];
+    var originalChildList = this.options.child_options;
+    var newChildList = [];
 
+    if (this.options.attr('_added_child_list')) {
+      return;
+    }
     this.options.attr('child_options', new can.Observe.List());
 
-    if (original_child_options.length === null) {
-      original_child_options = [original_child_options];
+    if (originalChildList.length === null) {
+      originalChildList = [originalChildList];
     }
 
     if (this.should_draw_children()) {
-      can.each(original_child_options, function (data, i) {
+      can.each(originalChildList, function (data, i) {
         var options = new can.Observe();
         data.each(function (v, k) {
           options.attr(k, v);
@@ -1616,10 +1617,11 @@ can.Control('CMS.Controllers.TreeViewNode', {
           parent: this,
           parent_instance: this.options.instance
         });
-        new_child_options.push(options);
+        newChildList.push(options);
       }.bind(this));
 
-      this.options.attr('child_options', new_child_options);
+      this.options.attr('child_options', newChildList);
+      this.options.attr('_added_child_list', true);
     }
   },
 
@@ -1719,9 +1721,9 @@ can.Control('CMS.Controllers.TreeViewNode', {
    *   nodes have been loaded and displayed
    */
   expand: function () {
-    var that = this;
     var $el = this.element;
 
+    this.add_child_lists_to_child();
     if (this._expand_deferred && $el.find('.openclose').is('.active')) {
       // If we have already expanded and are currently still expanded, then
       // short-circuit the call. However, we still need to toggle `expanded`,
@@ -1735,12 +1737,13 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
     this._expand_deferred = new $.Deferred();
     setTimeout(this._ifNotRemoved(function () {
-      that.display_subtrees().then(that._ifNotRemoved(function () {
-        that.element.trigger('subtree_loaded');
-        that.element.trigger('loaded');
-        that._expand_deferred.resolve();
-      }));
-    }), 0);
+      this.display_subtrees()
+        .then(this._ifNotRemoved(function () {
+          this.element.trigger('subtree_loaded');
+          this.element.trigger('loaded');
+          this._expand_deferred.resolve();
+        }.bind(this)));
+    }.bind(this)), 0);
     return this._expand_deferred;
   },
 
