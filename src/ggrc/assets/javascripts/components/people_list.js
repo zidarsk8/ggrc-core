@@ -68,7 +68,6 @@
         * @return {Array} - a new pending joins list
         */
       remove_pending: function (person) {
-        var results = this.attr('results');
         var list = this.attr('list_pending');
         var listPerson = _.find(list, findInList);
         var personRoles = can.getObject('extra.attrs.AssigneeType',
@@ -83,12 +82,9 @@
                    item.what.id === person.id;
         }
         if (personRoles.length > 1) {
-          listPerson.extra.attrs.AssigneeType = _.without(personRoles,
-            can.capitalize(type)).join(',');
-          index = _.findIndex(results, function (result) {
-            return result.id === person.id;
-          });
-          results.splice(index, 1);
+          listPerson.attr('extra.attrs.AssigneeType',
+                          _.without(personRoles, can.capitalize(type))
+                          .join(','));
           return list;
         }
         index = _.findIndex(list, findInList);
@@ -106,29 +102,70 @@
       remove_role: function (parentScope, el, ev) {
         var person = CMS.Models.Person.findInCacheById(el.data('person'));
         var instance = this.instance;
-        var type = this.attr('type');
-        var that = this;
+        var roleToRemove = can.capitalize(this.attr('type'));
+        var deferred = this.attr('deferred');
+
+        var listPending;
+        var currentAdd;
+        var currentRemove;
+        var currentAddRoles = [];
+
+        // manipulations with pending joins don't apply unless `deferred`
+        if (deferred) {
+          listPending = _.filter(this.get_pending(), function (join) {
+            return join.what.type === 'Person' && join.what.id === person.id;
+          });
+
+          // get relevant addition/removal, if able
+          currentAdd = _.find(listPending, function (join) {
+            return join.how === 'add';
+          });
+          currentRemove = _.find(listPending, function (join) {
+            return join.how === 'remove';
+          });
+
+          if (_.isFunction(_.exists(currentAdd,
+                                    'extra.attrs.AssigneeType.split'))) {
+            currentAddRoles = currentAdd.extra.attrs.AssigneeType.split(',');
+          }
+        }
 
         this.get_roles(person, instance).then(function (result) {
           var roles = result.roles;
-          var ids = result.ids;
-          var rel = result.relationship;
+          var ids = result.relationshipsIds;
+          var relationship = result.relationship;
 
-          if (!ids.length && that.attr('deferred')) {
-            return that.remove_pending(person);
+          if (!ids.length && deferred) {
+            return this.remove_pending(person);
           }
 
-          roles = _.filter(roles, function (role) {
-            return role && (role.toLowerCase() !== type);
-          });
+          if (currentRemove) {
+            // the old roles set was removed, only the added one remains
+            roles = currentAddRoles;
+          } else {
+            // both the old roles set and the new one apply
+            roles = _.union(roles, currentAddRoles);
+          }
 
-          if (that.attr('deferred') === 'true') {
+          roles = _.without(roles, roleToRemove);
+
+          if (deferred) {
             el.closest('li').remove();
-            if (!roles.length) {
-              instance.mark_for_deletion('related_objects_as_destination',
-                person);
+            if (currentRemove ||
+                !_.find(result.roles, function (item) {
+                  return roleToRemove === item;
+                })) {
+              // the relationship has already been queued for removal ||
+              // the role to remove is only in the deferred value
+              this.remove_pending(person);
+            } else if (!roles.length) {
+              instance.mark_for_deletion(
+                'related_objects_as_destination',
+                person
+              );
             } else {
-              instance.mark_for_change('related_objects_as_destination',
+              instance.mark_for_change(
+                'related_objects_as_destination',
                 person, {
                   attrs: {
                     AssigneeType: roles.join(',')
@@ -137,12 +174,12 @@
               );
             }
           } else if (roles.length) {
-            rel.attrs.attr('AssigneeType', roles.join(','));
-            rel.save();
+            relationship.attrs.attr('AssigneeType', roles.join(','));
+            relationship.save();
           } else {
-            rel.destroy();
+            relationship.destroy();
           }
-        });
+        }.bind(this));
       },
       /**
         * Get saved roles list for a person
@@ -153,24 +190,27 @@
         * @return {jQuery.Deferred} - a promise with the role list
         */
       get_roles: function (person, instance) {
-        var rel = function (obj) {
+        var getRelationshipsIds = function (obj) {
           return _.map(_.union(obj.related_sources, obj.related_destinations),
             function (relationship) {
               return relationship.id;
-            });
+            }
+          );
         };
         var rolesDfd = $.Deferred();
-        var ids = _.intersection(rel(person), rel(instance));
+        var relationshipsIds = _.intersection(getRelationshipsIds(person),
+                                              getRelationshipsIds(instance));
         var found = false;
-        _.each(ids, function (id) {
-          var rel = CMS.Models.Relationship.findInCacheById(id);
-          if (rel && rel.attrs && rel.attrs.AssigneeType) {
+        _.each(relationshipsIds, function (relationshipId) {
+          var relationship = CMS.Models.Relationship.findInCacheById(
+            relationshipId);
+          if (_.exists(relationship, 'attrs.AssigneeType')) {
             found = true;
-            rel.refresh().then(function (rel) {
-              var roles = rel.attrs.AssigneeType.split(',');
+            relationship.refresh().then(function (relationship) {
+              var roles = relationship.attrs.AssigneeType.split(',');
               var result = {roles: roles,
-                            relationship: rel,
-                            ids: ids};
+                            relationship: relationship,
+                            relationshipsIds: relationshipsIds};
               rolesDfd.resolve(result);
             });
           }
@@ -178,7 +218,7 @@
         // If the person has no assigneeType relationshipAttr for this instance
         // then he has no roles
         if (!found) {
-          rolesDfd.resolve({roles: [], ids: ids});
+          rolesDfd.resolve({roles: [], relationshipsIds: relationshipsIds});
         }
         return rolesDfd;
       }
@@ -246,18 +286,22 @@
         var person = ui.item;
         var role = can.capitalize(this.scope.type);
         var instance = this.scope.attr('instance');
-        var listPending = this.scope.attr('list_pending');
         var deferred = this.scope.attr('deferred');
         var pending;
-        var model;
+        var relationship;
+
+        var listPending = _.filter(this.scope.get_pending(), function (join) {
+          return join.what.type === 'Person' && join.what.id === person.id;
+        });
 
         if (deferred) {
           pending = true;
           if (listPending) {
+            // find a pending addition and update its attrs
             _.each(listPending, function (join) {
               var existing;
               var roles;
-              if (join.what === person && join.how === 'add') {
+              if (join.how === 'add') {
                 existing = can.getObject(
                   'extra.attrs.AssigneeType', join) || '';
                 roles = _.union(existing.split(','), [role]).join(',');
@@ -269,49 +313,59 @@
           // If user already has a role then we change relationshipattr else
           // we add it.
           if (pending) {
+            // no pending addition for this person
             this.scope.get_roles(person, instance).then(function (result) {
               var roles = result.roles || [];
-              if (roles.length) {
+              var pendingRemoval = _.find(listPending, function (join) {
+                return join.how === 'remove';
+              });
+              if (roles.length && !pendingRemoval) {
+                // request an existing relationship update
                 roles.push(role);
-                instance.mark_for_change('related_objects_as_destination',
-                    person, {
-                      attrs: {
-                        AssigneeType: roles.join(',')
-                      },
-                      context: instance.context
-                    }
-                  );
+                instance.mark_for_change(
+                  'related_objects_as_destination',
+                  person, {
+                    attrs: {
+                      AssigneeType: roles.join(',')
+                    },
+                    context: instance.context
+                  }
+                );
               } else {
-                instance.mark_for_addition('related_objects_as_destination',
+                // request a new relationship creation
+                instance.mark_for_addition(
+                  'related_objects_as_destination',
                   person, {
                     attrs: {
                       AssigneeType: role
                     },
                     context: instance.context
-                  });
+                  }
+                );
               }
             });
           }
         } else {
-          model = CMS.Models.Relationship.get_relationship(person, instance);
-          if (!model) {
-            model = CMS.Models.Relationship.createAssignee({
+          // create or modify a relationship without caching
+          relationship = CMS.Models.Relationship.get_relationship(person,
+                                                                  instance);
+          if (!relationship) {
+            relationship = CMS.Models.Relationship.createAssignee({
               role: role,
               source: person,
               destination: instance,
               context: instance.context
             });
-            model = $.Deferred().resolve(model);
+            relationship = $.Deferred().resolve(relationship);
           } else {
-            model = model.refresh();
+            relationship = relationship.refresh();
           }
 
-          model.done(function (model) {
-            var type = model.attr('attrs.AssigneeType');
-            model.attr('attrs.AssigneeType', role + (type ? ',' + type : ''));
-            model.save().then(function () {
-              instance.refresh();
-            });
+          relationship.done(function (relationship) {
+            var type = relationship.attr('attrs.AssigneeType');
+            relationship.attr('attrs.AssigneeType',
+                              role + (type ? ',' + type : ''));
+            relationship.save().then(instance.refresh);
           });
         }
       },
