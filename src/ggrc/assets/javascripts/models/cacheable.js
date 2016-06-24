@@ -388,7 +388,10 @@ can.Model("can.Model.Cacheable", {
     }
   }
   , resolve_deferred_bindings : function(obj) {
-    var _pjs, refresh_dfds = [], dfds = [];
+    var _pjs;
+    var refresh_dfds = [];
+    var dfds = [];
+    var dfds_apply;
     if (obj._pending_joins && obj._pending_joins.length) {
       _pjs = obj._pending_joins.slice(0); //refresh of bindings later will muck up the pending joins on the object
       can.each(can.unique(can.map(_pjs, function(pj) { return pj.through; })), function(binding) {
@@ -401,12 +404,13 @@ can.Model("can.Model.Cacheable", {
           var inst
           , binding = obj.get_binding(pj.through)
           , model = CMS.Models[binding.loader.model_name] || GGRC.Models[binding.loader.model_name];
+          // changed means that mark_for_change was called
+          var changed = pj.opts && pj.opts.change;
           if(pj.how === "add") {
             //Don't re-add -- if the object is already mapped (could be direct or through a proxy)
             // move on to the next one
             // Note: if it is marked as 'change' then you must add it regardless if it exists because it will
             // be deleted.
-            var changed = pj.opts && pj.opts.change;
             if(!changed && ~can.inArray(pj.what, can.map(binding.list, function(bo) { return bo.instance; }))
                || (binding.loader.option_attr
                   && ~can.inArray(
@@ -418,6 +422,11 @@ can.Model("can.Model.Cacheable", {
                   )
             )) {
               return;
+            }
+            // make sure the `changed` flag gets posted to the backend
+            // as it matters
+            if (changed) {
+              pj.attr('extra.changed', true);
             }
             inst = pj.what instanceof model
               ? pj.what
@@ -445,7 +454,11 @@ can.Model("can.Model.Cacheable", {
               if(bound_obj.instance === pj.what || bound_obj.instance[binding.loader.option_attr] === pj.what) {
                 can.each(bound_obj.get_mappings(), function(mapping) {
                   dfds.push(mapping.refresh().then(function() {
-                    mapping.destroy();
+                    if (changed) {
+                      mapping.destroyed();
+                    } else {
+                      mapping.destroy();
+                    }
                   }));
                 });
               }
@@ -453,9 +466,12 @@ can.Model("can.Model.Cacheable", {
           }
         });
 
+        dfds_apply = $.when.apply($, dfds);
+
         obj.attr('_pending_joins', []);
-        obj.attr('_pending_joins_dfd', $.when.apply($, dfds));
-        return $.when.apply($, dfds).then(function() {
+        obj.attr('_pending_joins_dfd', dfds_apply);
+
+        return dfds_apply.then(function() {
           can.trigger(this, "resolved");
           return obj.refresh();
         });

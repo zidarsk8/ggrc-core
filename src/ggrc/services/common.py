@@ -1091,6 +1091,39 @@ class Resource(ModelView):
     elif 'context' not in src:
       raise BadRequest('context MUST be specified.')
 
+  def _try_recover_integrity_error(self, src, obj, error):
+    """Recover and complete the request if possible, return new response.
+
+    Returns (code, object) if recover possible, None elsewise.
+    """
+    msg = error.orig.args[1]
+    if (obj.type == "Relationship" and
+            msg.startswith("Duplicate entry") and
+            msg.endswith("'uq_relationships'")):
+      db.session.rollback()
+      if src.get('changed'):
+        # Note: this is a dirty hack to make the requests currently sent by the
+        # frontend work. Two requests are sent if we need to update a person's
+        # assigned roles: one to delete the old assignment, another to create a
+        # new assignment with a new set of roles. As they are sent
+        # concurrently, there is a race condition that can cause invalid
+        # reassignment (no old role deletion or no new role addition). This
+        # code ensures that the old assignment is deleted prior to adding a new
+        # assignment.
+
+        # remove the conflicting relationship
+        db.session.delete(obj.__class__.find_related(obj.source,
+                                                     obj.destination))
+        db.session.flush()
+        db.session.add(obj)
+      else:
+        # just append the new attrs values
+        obj = obj.__class__.update_attributes(obj.source, obj.destination,
+                                              obj.attrs)
+      db.session.flush()
+      object_for_json = self.object_for_json(obj)
+      return (200, object_for_json)
+
   def collection_post_step(self, src, no_result):
     try:
       obj = self.model()
@@ -1143,17 +1176,12 @@ class Resource(ModelView):
       with benchmark("Make response"):
         return (201, object_for_json)
     except IntegrityError as e:
-      msg = e.orig.args[1]
-      if obj.type == "Relationship" and \
-         msg.startswith("Duplicate entry") and \
-         msg.endswith("'uq_relationships'"):
-        db.session.rollback()
-        obj = obj.__class__.update_attributes(obj.source, obj.destination,
-                                              obj.attrs)
-        db.session.flush()
-        object_for_json = self.object_for_json(obj)
-        return (200, object_for_json)
-      return self._make_error_from_exception(e)
+      response_after_recover = self._try_recover_integrity_error(
+          src, obj, e)
+      if response_after_recover:
+        return response_after_recover
+      else:
+        return self._make_error_from_exception(e)
     except ValidationError as e:
       return self._make_error_from_exception(e)
 
