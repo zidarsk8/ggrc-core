@@ -1102,6 +1102,15 @@ class Resource(ModelView):
             msg.endswith("'uq_relationships'")):
       db.session.rollback()
       if src.get('changed'):
+        # Note: this is a dirty hack to make the requests currently sent by the
+        # frontend work. Two requests are sent if we need to update a person's
+        # assigned roles: one to delete the old assignment, another to create a
+        # new assignment with a new set of roles. As they are sent
+        # concurrently, there is a race condition that can cause invalid
+        # reassignment (no old role deletion or no new role addition). This
+        # code ensures that the old assignment is deleted prior to adding a new
+        # assignment.
+
         # remove the conflicting relationship
         db.session.delete(obj.__class__.find_related(obj.source,
                                                      obj.destination))

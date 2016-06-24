@@ -404,7 +404,7 @@ can.Model("can.Model.Cacheable", {
           var inst
           , binding = obj.get_binding(pj.through)
           , model = CMS.Models[binding.loader.model_name] || GGRC.Models[binding.loader.model_name];
-          // changed iff mark_for_change was called
+          // changed means that mark_for_change was called
           var changed = pj.opts && pj.opts.change;
           if(pj.how === "add") {
             //Don't re-add -- if the object is already mapped (could be direct or through a proxy)
