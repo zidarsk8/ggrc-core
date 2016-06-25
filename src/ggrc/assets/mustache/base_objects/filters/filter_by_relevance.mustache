@@ -8,14 +8,14 @@
 <div class="relevance-filters">
   <div class="row-fluid">
     <div class="span12">
-      <h6>Filter by mapping relevance</h6>
+      <h6>Filter by mapping</h6>
       {{#each filter_list}}
       <div class="single-line-filter">
         <button type="submit" data-index="{{@index}}" class="remove_filter">
           <i class="fa fa-trash"></i>
         </button>
         <label>
-          {{#if @index}}AND {{/if}}Relevant to:
+          {{#if @index}}AND {{/if}}Mapped to:
         </label>
         <select class="input-small filter-type-selector select-filter{{@index}}" can-value="model_name">
           {{#option_type_menu_2}}
