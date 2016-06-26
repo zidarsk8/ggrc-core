@@ -1,26 +1,31 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from sqlalchemy import and_
+"""Handlers for default people fields in assessment templates.
+
+These should be used on default verifiers and default assessors.
+"""
+
 from flask import current_app
 from flask import json
 
-from ggrc import db
 from ggrc.models import AssessmentTemplate
-from ggrc.models import Person
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 
+
 class DefaultPersonColumnHandler(handlers.ColumnHandler):
+  """Handler for default verifiers and assessors."""
 
   KEY_MAP = {
-    "default_assessors": "assessors",
-    "default_verifier": "verifiers",
+      "default_assessors": "assessors",
+      "default_verifier": "verifiers",
   }
 
   PEOPLE_LABELS_MAP = {
-    display_name.lower(): value
-    for value, display_name in AssessmentTemplate.DEFAULT_PEOPLE_LABELS.items()
+      display_name.lower(): value
+      for value, display_name
+      in AssessmentTemplate.DEFAULT_PEOPLE_LABELS.items()
   }
 
   def _parse_email_values(self):
@@ -29,20 +34,19 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     This is the "other" option in the default assessor dropdown menu.
     """
     self.add_error("Default people does not support email lists.")
-    return
-    lines = [line.strip() for line in self.raw_value.splitlines()]
-    value = []
-    for email in lines:
-      if not email:
-        continue
-      if not Person.is_valid_email(email):
-        add_warning("invalid email")
-      else:
-        value.append(email)
+    # lines = [line.strip() for line in self.raw_value.splitlines()]
+    # value = []
+    # for email in lines:
+    #   if not email:
+    #     continue
+    #   if not Person.is_valid_email(email):
+    #     self.add_warning("invalid email")
+    #   else:
+    #     value.append(email)
 
-    if not value:
-      self.add_error("missing value error")
-    return value
+    # if not value:
+    #   self.add_error("missing value error")
+    # return value
 
   def _parse_label_values(self):
     """Parse predefined default assessors.
@@ -51,7 +55,9 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     """
     value = self.PEOPLE_LABELS_MAP.get(self.raw_value.strip().lower())
     if not value:
-      self.add_error("wrong label")
+      self.add_error(errors.WRONG_REQUIRED_VALUE,
+                     column_name=self.display_name,
+                     value=self.raw_value.strip().lower())
     return value
 
   def parse_item(self):
@@ -64,11 +70,10 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     else:
       return self._parse_label_values()
 
-
     current_app.logger.debug("%s parsed value: %s", self.key, self.value)
 
-
   def _get_inital_people(self):
+    """Get the default_people dict from current object."""
     try:
       value = json.loads(self.row_converter.obj.default_people)
       if not value:
@@ -77,8 +82,18 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
       value = {}
     return value
 
-
   def set_obj_attr(self):
+    """Set default_people attribute.
+
+    This is a joint function for default assessors and verifiers. The first
+    column that gets handled will save the value to "_default_people" and the
+    second column that gets handled will take that value, include it with its
+    own and store it into the correct "default_people" field.
+
+    NOTE: This is a temporary hack that that should be refactored once this
+    code is merged into the develop branch. The joining of default_assessors
+    and default_verifiers should be done by pre_commit_checks for imports.
+    """
     current_app.logger.debug("%s set obj attr: %s", self.key, self.value)
     if not self.value or self.row_converter.ignore:
       return
@@ -90,10 +105,7 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
 
     if _default_people:
       default_people.update(_default_people)
-      setattr(self.row_converter.obj, "default_people", json.dumps(default_people))
+      setattr(self.row_converter.obj, "default_people",
+              json.dumps(default_people))
     else:
       setattr(self.row_converter.obj, "_default_people", default_people)
-
-
-
-

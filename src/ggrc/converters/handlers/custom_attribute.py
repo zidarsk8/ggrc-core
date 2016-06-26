@@ -74,6 +74,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       self.row_converter.obj.custom_attribute_values.append(self.value)
 
   def insert_object(self):
+    """Add custom attribute objects to db session."""
     if self.dry_run or self.value is None:
       return
     self.value.attributable_type = self.row_converter.obj.__class__.__name__
@@ -82,6 +83,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     self.dry_run = True
 
   def get_ca_definition(self):
+    """Get custom attribute definition."""
     cad = models.CustomAttributeDefinition
     definition_type = self.row_converter.obj._inflector.table_singular
     return cad.eager_query().filter(and_(
@@ -91,6 +93,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     )).first()
 
   def get_date_value(self):
+    """Get date value from input string date."""
     if not self.mandatory and self.raw_value == "":
       return None  # ignore empty fields
     value = None
@@ -158,6 +161,8 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
 
 class ObjectCaColumnHandler(CustomAttributeColumHandler):
 
+  """Handler for object level custom attributes."""
+
   def set_value(self):
     pass
 
@@ -169,6 +174,7 @@ class ObjectCaColumnHandler(CustomAttributeColumHandler):
       self.row_converter.obj.custom_attribute_values.append(self.value)
 
   def get_ca_definition(self):
+    """Get custom attribute definition for a specific object."""
     if self.row_converter.obj.id is None:
       return None
     cad = models.CustomAttributeDefinition

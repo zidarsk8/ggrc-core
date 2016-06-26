@@ -3,6 +3,8 @@
 # Created By: david@reciprocitylabs.com
 # Maintained By: dan@reciprocitylabs.com
 
+"""Module for basic mixing for orm models."""
+
 from uuid import uuid1
 import collections
 import datetime
@@ -12,7 +14,6 @@ from sqlalchemy import and_
 from sqlalchemy import or_
 from sqlalchemy import event
 from sqlalchemy import orm
-from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import foreign

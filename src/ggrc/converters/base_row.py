@@ -38,6 +38,15 @@ class RowConverter(object):
     self.headers = options.get("headers", [])
 
   def add_error(self, template, **kwargs):
+    """Add error for current row.
+
+    Add an error entry for the current row and mark it as ignored. If the error
+    occurred on a new object, it gets removed from the new object cache dict.
+
+    Args:
+      template: String template.
+      **kwargs: Arguments needed to format the string template.
+    """
     message = template.format(line=self.line, **kwargs)
     self.block_converter.row_errors.append(message)
     new_objects = self.block_converter.converter.new_objects[self.object_class]
@@ -73,9 +82,9 @@ class RowConverter(object):
       item.check_unique_consistency()
 
   def handle_obj_row_data(self):
-    for i, (attr_name, header_dict) in enumerate(self.headers.items()):
-      Handler = header_dict["handler"]
-      item = Handler(self, attr_name, **header_dict)
+    for attr_name, header_dict in self.headers.items():
+      handler = header_dict["handler"]
+      item = handler(self, attr_name, **header_dict)
       if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
         self.attrs[attr_name] = item
       else:
@@ -88,6 +97,7 @@ class RowConverter(object):
       self.handle_csv_row_data(field_list)
 
   def chect_mandatory_fields(self):
+    """Check if new object contain all mandatory columns."""
     if not self.is_new or self.is_delete:
       return
     headers = self.block_converter.object_headers
@@ -139,6 +149,13 @@ class RowConverter(object):
     return obj
 
   def setup_secondary_objects(self, slugs_dict):
+    """Import secondary object.
+
+    This function creates and stores all secondary object such as relationships
+    and any linked object that need the original object to be saved before they
+    can be processed. This is usually due to needing the id of the original
+    object that is created with a csv import.
+    """
     if not self.obj or self.ignore or self.is_delete:
       return
     for mapping in self.objects.values():

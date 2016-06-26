@@ -92,6 +92,12 @@ GGRC_EXPORTABLE = {}
 
 
 def _get_types(attr):
+  """Get contributed attribute types.
+
+  Args:
+    attr: String containing selected type. Either contributed_importables or
+      contributed_exportables.
+  """
   res = {}
   for extension_module in get_extension_modules():
     contributed = getattr(extension_module, attr, None)

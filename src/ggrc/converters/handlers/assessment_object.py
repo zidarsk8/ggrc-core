@@ -13,6 +13,8 @@ from ggrc.converters.handlers import handlers
 class AssessmentObjectColumnHandler(handlers.MappingColumnHandler,
                                     multi_object.ObjectsColumnHandler):
 
+  """Handler for Assessment object column."""
+
   def __init__(self, row_converter, key, **options):
     handlers.MappingColumnHandler.__init__(self, row_converter, key, **options)
     multi_object.ObjectsColumnHandler.__init__(

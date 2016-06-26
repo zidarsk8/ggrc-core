@@ -9,8 +9,10 @@ from ggrc import converters
 
 
 class TemplateObjectColumnHandler(handlers.ColumnHandler):
+  """Handler for template object type field."""
 
   def parse_item(self):
+    """Parse object type field for assessment templates."""
     exportables = converters.get_exportables()
     object_type = exportables.get(self.raw_value.strip().lower())
     if not object_type:
