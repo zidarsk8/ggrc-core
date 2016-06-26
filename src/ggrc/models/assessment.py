@@ -32,7 +32,39 @@ from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.track_object_state import track_state_for_class
 
 
-class Assessment(mixins_statusable.Statusable,
+class AuditRelationship(object):
+
+  """Mixin for mandatory link to an Audit via Relationships."""
+
+  _aliases = {
+      "audit": {
+          "display_name": "Audit",
+          "mandatory": True,
+          "filter_by": "_filter_by_audit",
+          "ignore_on_update": True,
+          "type": reflection.AttributeInfo.Type.MAPPING,
+      },
+  }
+
+  @classmethod
+  def _filter_by_audit(cls, predicate):
+    """Get filter for objects related to an Audit."""
+    return Relationship.query.filter(
+        Relationship.source_type == cls.__name__,
+        Relationship.source_id == cls.id,
+        Relationship.destination_type == Audit.__name__,
+    ).join(Audit, Relationship.destination_id == Audit.id).filter(
+        predicate(Audit.slug)
+    ).exists() | Relationship.query.filter(
+        Relationship.destination_type == cls.__name__,
+        Relationship.destination_id == cls.id,
+        Relationship.source_type == Audit.__name__,
+    ).join(Audit, Relationship.source_id == Audit.id).filter(
+        predicate(Audit.slug)
+    ).exists()
+
+
+class Assessment(mixins_statusable.Statusable, AuditRelationship,
                  AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, Documentable, Commentable, Personable,
                  mixins_reminderable.Reminderable, Timeboxed,
@@ -113,13 +145,6 @@ class Assessment(mixins_statusable.Statusable,
           "filter_by": "_ignore_filter",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
-      "audit": {
-          "display_name": "Audit",
-          "mandatory": True,
-          "filter_by": "_filter_by_audit",
-          "ignore_on_update": True,
-          "type": reflection.AttributeInfo.Type.MAPPING,
-      },
       "url": "Assessment URL",
       "design": "Conclusion: Design",
       "operationally": "Conclusion: Operation",
@@ -154,22 +179,6 @@ class Assessment(mixins_statusable.Statusable,
   def validate_design(self, key, value):
     # pylint: disable=unused-argument
     return self.validate_conclusion(value)
-
-  @classmethod
-  def _filter_by_audit(cls, predicate):
-    return Relationship.query.filter(
-        Relationship.source_type == cls.__name__,
-        Relationship.source_id == cls.id,
-        Relationship.destination_type == Audit.__name__,
-    ).join(Audit, Relationship.destination_id == Audit.id).filter(
-        predicate(Audit.slug)
-    ).exists() | Relationship.query.filter(
-        Relationship.destination_type == cls.__name__,
-        Relationship.destination_id == cls.id,
-        Relationship.source_type == Audit.__name__,
-    ).join(Audit, Relationship.source_id == Audit.id).filter(
-        predicate(Audit.slug)
-    ).exists()
 
   @classmethod
   def _filter_by_related_creators(cls, predicate):
