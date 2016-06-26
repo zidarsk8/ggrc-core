@@ -37,7 +37,7 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
   template_object_type = db.Column(db.String, nullable=True)
 
   # whether to use the control test plan as a procedure
-  test_plan_procedure = db.Column(db.Boolean, nullable=False)
+  test_plan_procedure = db.Column(db.Boolean, nullable=False, default=False)
 
   # procedure description
   procedure_description = db.Column(db.Text, nullable=True)
