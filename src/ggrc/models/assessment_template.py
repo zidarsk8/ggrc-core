@@ -3,6 +3,7 @@
 # Created By: peter@reciprocitylabs.com
 # Maintained By: peter@reciprocitylabs.com
 
+
 """A module containing the implementation of the assessment template entity."""
 
 import json
@@ -10,7 +11,6 @@ import json
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from ggrc.models.reflection import AttributeInfo
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Slugged
@@ -73,12 +73,17 @@ class AssessmentTemplate(assessment.AuditRelationship, Slugged, Base,
       "default_assessors": {
           "display_name": "Default Assessors",
           "mandatory": True,
+          "filter_by": "_nop_filter",
       },
       "default_verifier": {
           "display_name": "Default Verifier",
           "mandatory": True,
+          "filter_by": "_nop_filter",
       },
-      "default_test_plan": "Default Test Plan",
+      "default_test_plan": {
+          "display_name": "Default Test Plan",
+          "filter_by": "_nop_filter",
+      },
       "test_plan_procedure": "Use Control Test Plan",
       "template_object_type": {
           "display_name": "Object Under Assessment",
@@ -86,6 +91,16 @@ class AssessmentTemplate(assessment.AuditRelationship, Slugged, Base,
       },
 
   }
+
+  @classmethod
+  def _nop_filter(cls, _):
+    """No operation filter.
+
+    This is used for objects for which we can not implement a normal sql query
+    filter. Example is default_verifier field that is a json string in the db
+    and we can not create direct queries on json fields.
+    """
+    return None
 
   @classmethod
   def generate_slug_prefix_for(cls, obj):
