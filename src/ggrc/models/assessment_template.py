@@ -85,7 +85,7 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
       },
       "default_test_plan": "Default Test Plan",
       "test_plan_procedure": "Use Control Test Plan",
-      "object_under_assessment": {
+      "template_object_type": {
           "display_name": "Object Under Assessment",
           "mandatory": True,
       },
