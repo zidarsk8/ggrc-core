@@ -17,6 +17,7 @@ from ggrc.extensions import get_extension_modules
 GGRC_COLUMN_HANDLERS = {
     "default_assessors": default_people.DefaultPersonColumnHandler,
     "default_verifier": default_people.DefaultPersonColumnHandler,
+    "test_plan_procedure": handlers.CheckboxColumnHandler,
     "assertions": handlers.ControlAssertionColumnHandler,
     "assessment_object": assessment_object.AssessmentObjectColumnHandler,
     "assessment_template": assessment_template.TemplateColumnHandler,
