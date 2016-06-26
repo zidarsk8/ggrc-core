@@ -12,12 +12,14 @@ from ggrc.converters.handlers import list_handlers
 from ggrc.converters.handlers import assessment_object
 from ggrc.converters.handlers import assessment_template
 from ggrc.converters.handlers import default_people
+from ggrc.converters.handlers import template
 from ggrc.extensions import get_extension_modules
 
 GGRC_COLUMN_HANDLERS = {
     "default_assessors": default_people.DefaultPersonColumnHandler,
     "default_verifier": default_people.DefaultPersonColumnHandler,
     "test_plan_procedure": handlers.CheckboxColumnHandler,
+    "template_object_type": template.TemplateObjectColumnHandler,
     "assertions": handlers.ControlAssertionColumnHandler,
     "assessment_object": assessment_object.AssessmentObjectColumnHandler,
     "assessment_template": assessment_template.TemplateColumnHandler,
