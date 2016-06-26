@@ -84,7 +84,10 @@ class AssessmentTemplate(assessment.AuditRelationship, Slugged, Base,
           "display_name": "Default Test Plan",
           "filter_by": "_nop_filter",
       },
-      "test_plan_procedure": "Use Control Test Plan",
+      "test_plan_procedure": {
+          "display_name": "Use Control Test Plan",
+          "mandatory": False,
+      },
       "template_object_type": {
           "display_name": "Object Under Assessment",
           "mandatory": True,
