@@ -10,6 +10,7 @@ from ggrc.models import AccessGroup
 from ggrc.models import Audit
 from ggrc.models import Control
 from ggrc.models import Assessment
+from ggrc.models import AssessmentTemplate
 from ggrc.models import DataAsset
 from ggrc.models import Contract
 from ggrc.models import Policy
@@ -55,6 +56,8 @@ GGRC_IMPORTABLE = {
     "access group": AccessGroup,
     "access_group": AccessGroup,
     "accessgroup": AccessGroup,
+    "assessment template": AssessmentTemplate,
+    "assessment_template": AssessmentTemplate,
     "assessment": Assessment,
     "audit": Audit,
     "clause": Clause,
