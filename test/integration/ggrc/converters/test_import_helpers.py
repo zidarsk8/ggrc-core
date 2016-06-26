@@ -297,8 +297,41 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Internal Audit Lead"]["mandatory"])
 
+  def test_assessment_template_defs(self):
+    """Test default headers for Assessment Template."""
+
+    names = {
+        "Title",
+        "Audit",
+        "Object Under Assessment",
+        "Use Control Test Plan",
+        "Default Test Plan",
+        "Default Assessors",
+        "Default Verifier",
+        "Code",
+        "Delete",
+    }
+    expected_fields = {
+        "mandatory": {
+            "Title",
+            "Object Under Assessment",
+            "Audit",
+            "Code",
+            "Default Assessors",
+            "Default Verifier",
+        },
+        "unique": {
+            "Code",
+        },
+        "ignore_on_update": {
+            "Audit",
+        }
+    }
+    self._test_single_object(models.AssessmentTemplate, names, expected_fields,
+                             has_mappings=False)
+
   def test_assessment_definitions(self):
-    """ test default headers for Assessment """
+    """Test default headers for Assessment."""
 
     names = {
         "Title",
