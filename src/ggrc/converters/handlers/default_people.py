@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from sqlalchemy import and_
+from flask import current_app
+from flask import json
 
 from ggrc import db
 from ggrc.models import AssessmentTemplate
@@ -9,8 +11,89 @@ from ggrc.models import Person
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 
-class AssessorColumnHandler(handlers.ColumnHandler):
-  pass
+class DefaultPersonColumnHandler(handlers.ColumnHandler):
 
-class VerifierColumnHandler(handlers.ColumnHandler):
-  pass
+  KEY_MAP = {
+    "default_assessors": "assessors",
+    "default_verifier": "verifiers",
+  }
+
+  PEOPLE_LABELS_MAP = {
+    display_name.lower(): value
+    for value, display_name in AssessmentTemplate.DEFAULT_PEOPLE_LABELS.items()
+  }
+
+  def _parse_email_values(self):
+    """Parse an email list of default assessors.
+
+    This is the "other" option in the default assessor dropdown menu.
+    """
+    self.add_error("Default people does not support email lists.")
+    return
+    lines = [line.strip() for line in self.raw_value.splitlines()]
+    value = []
+    for email in lines:
+      if not email:
+        continue
+      if not Person.is_valid_email(email):
+        add_warning("invalid email")
+      else:
+        value.append(email)
+
+    if not value:
+      self.add_error("missing value error")
+    return value
+
+  def _parse_label_values(self):
+    """Parse predefined default assessors.
+
+    These values are the normal selection in the default assessor dropdown.
+    """
+    value = self.PEOPLE_LABELS_MAP.get(self.raw_value.strip().lower())
+    if not value:
+      self.add_error("wrong label")
+    return value
+
+  def parse_item(self):
+    """Parse values for default assessors."""
+
+    current_app.logger.debug("%s parse item: %s", self.key, self.raw_value)
+
+    if "@" in self.raw_value:
+      return self._parse_email_values()
+    else:
+      return self._parse_label_values()
+
+
+    current_app.logger.debug("%s parsed value: %s", self.key, self.value)
+
+
+  def _get_inital_people(self):
+    try:
+      value = json.loads(self.row_converter.obj.default_people)
+      if not value:
+        value = {}
+    except TypeError:
+      value = {}
+    return value
+
+
+  def set_obj_attr(self):
+    current_app.logger.debug("%s set obj attr: %s", self.key, self.value)
+    if not self.value or self.row_converter.ignore:
+      return
+
+    default_people = self._get_inital_people()
+    default_people[self.KEY_MAP[self.key]] = self.value
+
+    _default_people = getattr(self.row_converter.obj, "_default_people", {})
+
+    if _default_people:
+      default_people.update(_default_people)
+      setattr(self.row_converter.obj, "default_people", json.dumps(default_people))
+    else:
+      setattr(self.row_converter.obj, "_default_people", default_people)
+
+
+
+
