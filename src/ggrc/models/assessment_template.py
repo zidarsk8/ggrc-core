@@ -10,6 +10,7 @@ import json
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Slugged
@@ -66,6 +67,30 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
       "default_people",
       PublishOnly("DEFAULT_PEOPLE_LABELS")
   ]
+
+  _aliases = {
+      "audit": {
+          "display_name": "Audit",
+          "mandatory": True,
+          "type": AttributeInfo.Type.MAPPING,
+          "ignore_on_update": True,
+      },
+      "default_assessors": {
+          "display_name": "Default Assessors",
+          "mandatory": True,
+      },
+      "default_verifier": {
+          "display_name": "Default Verifier",
+          "mandatory": True,
+      },
+      "default_test_plan": "Default Test Plan",
+      "use_control_test_plan": "Use Control Test Plan",
+      "object_under_assessment": {
+          "display_name": "Object Under Assessment",
+          "mandatory": True,
+      },
+
+  }
 
   @classmethod
   def generate_slug_prefix_for(cls, obj):
