@@ -56,7 +56,6 @@ GGRC_IMPORTABLE = {
     "access_group": AccessGroup,
     "accessgroup": AccessGroup,
     "assessment": Assessment,
-    "assessment": Assessment,
     "audit": Audit,
     "clause": Clause,
     "contract": Contract,
