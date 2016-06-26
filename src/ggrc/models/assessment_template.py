@@ -101,7 +101,7 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
     """Check that default people lists are not empty.
 
     Check if the default_people contains both assessors and verifiers. The
-    values of those fields must be thruthy, and if the value is a string it
+    values of those fields must be truthy, and if the value is a string it
     must be a valid default people label. If the value is not a string, it
     should be a list of valid user ids, but that is too expensive to test in
     this validator.
