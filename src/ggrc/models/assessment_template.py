@@ -95,7 +95,6 @@ class AssessmentTemplate(assessment.AuditRelationship, Slugged, Base,
       },
       "template_custom_attributes": {
           "display_name": "Custom Attributes",
-          "mandatory": True,
           "type": AttributeInfo.Type.SPECIAL_MAPPING,
           "description": (
               "List of custom attributes for the assessment template\n"
