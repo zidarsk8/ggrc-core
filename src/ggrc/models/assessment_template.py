@@ -96,6 +96,7 @@ class AssessmentTemplate(assessment.AuditRelationship, Slugged, Base,
       "template_custom_attributes": {
           "display_name": "Custom Attributes",
           "type": AttributeInfo.Type.SPECIAL_MAPPING,
+          "filter_by": "_nop_filter",
           "description": (
               "List of custom attributes for the assessment template\n"
               "One attribute per line. fields are separated by commas ','\n"
