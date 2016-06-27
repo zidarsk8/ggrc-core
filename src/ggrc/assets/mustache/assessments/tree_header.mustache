@@ -5,24 +5,9 @@
   Maintained By: peter@reciprocitylabs.com
 }}
 
-{{#if_equals original_list.length 0}}
-  <div class="zero-state">
-    <h2>
-      {{#is_profile}}
-        You have
-      {{else}}
-        {{#with_page_object_as 'page_object'}}
-          {{page_object.type}} has
-        {{/with_page_object_as}}
-      {{/is_profile}}
-      no assigned tasks
-    </h2>
-  </div>
-{{else}}
   {{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
   <header
-    class="header sticky sticky-header tree-header
-          {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+    class="header sticky sticky-header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
     <div class="row-fluid">
       <div class="span{{display_options.title_width}}">
         <div class="title-heading oneline">
@@ -54,6 +39,5 @@
       </div>
     </div>
   </header>
-{{/if_equals}}
 
 <div class="clearfix"></div>
