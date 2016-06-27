@@ -11,6 +11,7 @@ from ggrc import db
 from ggrc import converters
 from ggrc.models import CustomAttributeDefinition as CAD
 from ggrc.converters.handlers import handlers
+from ggrc.converters import errors
 
 
 class TemplateObjectColumnHandler(handlers.ColumnHandler):
@@ -21,7 +22,7 @@ class TemplateObjectColumnHandler(handlers.ColumnHandler):
     exportables = converters.get_exportables()
     object_type = exportables.get(self.raw_value.strip().lower())
     if not object_type:
-      self.add_error("invalid template object type")
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
       return
 
     return object_type.__name__
