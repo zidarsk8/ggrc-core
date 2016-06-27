@@ -58,18 +58,42 @@
         }
         return this.attr('list_mapped');
       },
+      /**
+        * Get the first (or only) pending join for a person
+        *
+        * @param {Person} person - the person whose join to get
+        *
+        * @return {Object} - the pending join for the person if able
+        *                    or undefined
+        */
       get_pending_operation: function (person) {
         return _.find(this.get_pending(), function(join) {
           return join.what === person;
         });
       },
+      /**
+        * Change pending joins list to add a role to a person
+        *
+        * If there is a pending 'add' or 'update', extends roles list in it.
+        * If there is a pending 'remove', cancels it and creates a new 'update'
+        * with the role.
+        * If there is no pending join and the person already has roles assigned,
+        * creates a new 'update' with extended roles list.
+        * If there is no pending join and the person has no roles assigned yet,
+        * creates a new 'add' with the role.
+        *
+        * @param {Person} person - the person who gets the new role
+        * @param {String} role - the role that is added
+        */
       deferred_add_role: function (person, role) {
         var pendingOperation = this.get_pending_operation(person);
         if (!pendingOperation) {
+          // no pending join for this person
           this.get_roles(person, this.instance).then(function (result) {
             var roles = result.roles;
 
             if (roles.length) {
+              // the person already has roles assigned, create 'update'
               this.add_or_replace_operation(
                 person,
                 {
@@ -78,6 +102,7 @@
                 }
               );
             } else {
+              // the person was not yet assigned, create 'add'
               this.add_or_replace_operation(
                 person,
                 {
@@ -88,6 +113,8 @@
             }
           }.bind(this));
         } else if (pendingOperation.how === 'remove') {
+          // 'remove' pending for this person, cancel it and create 'update'
+          // with single role
           this.add_or_replace_operation(
             person,
             {
@@ -97,6 +124,7 @@
           );
         } else if (pendingOperation.how === 'add' ||
                    pendingOperation.how === 'update') {
+          // 'add' or 'update' pending, extend the roles list with the role
           this.add_or_replace_operation(
             person,
             {
@@ -106,16 +134,31 @@
           );
         }
       },
+      /**
+        * Change pending joins list to remove a role from a person
+        *
+        * If there is a pending 'add' or 'update', cancels this role addition.
+        * If there is a pending 'remove', does nothing.
+        * If there is no pending join and the person has several roles assigned,
+        * creates a new 'update' with all stored roles except the role.
+        * If there is no pending join and the person has a single role assigned,
+        * creates a new 'remove'.
+        *
+        * @param {Person} person - the person who loses the role
+        * @param {String} role - the role that is removed
+        */
       deferred_remove_role: function (person, role) {
         var pendingOperation = this.get_pending_operation(person);
         var roles;
 
         if (!pendingOperation) {
+          // no pending join for this person
           this.get_roles(person, this.instance).then(function (result) {
             var roles = result.roles;
 
             roles = _.without(roles, role);
             if (roles.length) {
+              // there are still roles remaining, create 'update'
               this.add_or_replace_operation(
                 person,
                 {
@@ -124,6 +167,7 @@
                 }
               );
             } else {
+              // there are no roles remaining, create 'remove'
               this.add_or_replace_operation(
                 person,
                 {
@@ -136,9 +180,11 @@
           // no action required
         } else if (pendingOperation.how === 'add' ||
                    pendingOperation.how === 'update') {
+          // 'add' or 'update' pending, cancel the role addition
           roles = this.parse_roles_list(pendingOperation);
           roles = _.without(roles, role);
           if (roles.length) {
+            // update the roles list in the pending join
             this.add_or_replace_operation(
               person,
               {
@@ -148,11 +194,13 @@
             );
           } else {
             if (pendingOperation.how === 'add') {
+              // cancel the pending 'add'
               this.add_or_replace_operation(
                 person,
                 null
               );
             } else if (pendingOperation.how === 'update') {
+              // replace the 'update' with 'remove'
               this.add_or_replace_operation(
                 person,
                 {
@@ -163,12 +211,24 @@
           }
         }
       },
+      /**
+        * Add a new pending join, remove all pending joins for same person
+        *
+        * @param {Person} person - the person to be joined
+        * @param {Object} operation - a description of the new pending join;
+        * if operation is false-value, all pending joins would be removed,
+        * but none will be added.
+        * @param {String} operation.how - the type of the operation
+        * ('add', 'remove' or 'update')
+        * @param {String} operation.roles - the list of added/updated roles
+        */
       add_or_replace_operation: function (person, operation) {
         var roles;
         if (!operation) {
           // just remove all pending joins for person
           this.instance.remove_duplicate_pending_joins(person);
         } else {
+          // convert roles list to a string
           if (_.isArray(operation.roles)) {
             roles = operation.roles.join(',');
           } else if (_.isString(operation.roles)) {
@@ -203,6 +263,15 @@
           }
         }
       },
+      /**
+        * Get roles list from a pending join and split it into a list.
+        *
+        * Returns [] if no roles list exists.
+        *
+        * @param {Object} operation - a pending join object
+        *
+        * @returns {List} - a list of roles
+        */
       parse_roles_list: function (operation) {
         var roles = _.exists(operation, 'extra.attrs.AssigneeType');
         return roles ? roles.split(',') : [];
