@@ -3,6 +3,7 @@
 
 """Handlers specific for Assessment templates."""
 
+from sqlalchemy import and_
 
 from ggrc import db
 from ggrc import converters
@@ -79,10 +80,29 @@ class TemplateCaColumnHandler(handlers.ColumnHandler):
   def set_obj_attr(self):
     pass
 
+  def _remove_current_attrs(self):
+    """Remove all template custom attributes stored in the db.
+
+    This is used for clean up when updating existing assessment template.
+
+    Note: this should be done with checking each attribute and modifying it if
+    needed.
+    """
+    if self.row_converter.is_new or not self.row_converter.obj.id:
+      return
+
+    db.session.query(CAD).filter(and_(
+        CAD.definition_type == "assessment_template",
+        CAD.definition_id == self.row_converter.obj.id
+    )).delete()
+    db.session.flush()
+
   def insert_object(self):
     """Add custom attributes to db session."""
     if not self.value or self.row_converter.ignore:
       return
+
+    self._remove_current_attrs()
 
     for attribute in self.value:
       attribute.definition_id = self.row_converter.obj.id
