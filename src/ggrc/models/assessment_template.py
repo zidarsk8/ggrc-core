@@ -17,6 +17,7 @@ from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models import assessment
 from ggrc.models.mixins import CustomAttributable
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.types import JsonType
@@ -92,7 +93,11 @@ class AssessmentTemplate(assessment.AuditRelationship, Slugged, Base,
           "display_name": "Object Under Assessment",
           "mandatory": True,
       },
-
+      "template_custom_attributes": {
+          "display_name": "Custom Attributes",
+          "mandatory": True,
+          "type": AttributeInfo.Type.SPECIAL_MAPPING,
+      },
   }
 
   @classmethod
