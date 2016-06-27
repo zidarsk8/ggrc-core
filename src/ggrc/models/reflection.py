@@ -81,6 +81,14 @@ ATTRIBUTE_ORDER = (
     "delete",
 )
 
+EXCLUDE_CUSTOM_ATTRIBUTES = set([
+    "AssessmentTemplate",
+])
+
+EXCLUDE_MAPPINGS = set([
+    "AssessmentTemplate",
+])
+
 
 class DontPropagate(object):
 
@@ -334,9 +342,12 @@ class AttributeInfo(object):
         definition.update(value)
       definitions[key] = definition
 
-    definitions.update(
-        cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache))
-    definitions.update(cls.get_mapping_definitions(object_class))
+    if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
+      definitions.update(
+          cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache))
+
+    if object_class.__name__ not in EXCLUDE_MAPPINGS:
+      definitions.update(cls.get_mapping_definitions(object_class))
 
     return definitions
 
