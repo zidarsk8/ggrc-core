@@ -50,14 +50,14 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     DATE = "Date"
     MAP = "Map"
 
-  VALID_TYPES = [
-      "Text",
-      "Rich Text",
-      "Dropdown",
-      "Checkbox",
-      "Date",
-      "Map",
-  ]
+  VALID_TYPES = {
+      "Text": "Text",
+      "Rich Text": "Rich Text",
+      "Dropdown": "Dropdown",
+      "Checkbox": "Checkbox",
+      "Date": "Date",
+      "Person": "Map",
+  }
 
 
 class CustomAttributeMapable(object):
