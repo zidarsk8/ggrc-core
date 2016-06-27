@@ -20,3 +20,7 @@ class TemplateObjectColumnHandler(handlers.ColumnHandler):
       return
 
     return object_type.__name__
+
+
+class TemplateCaColumnHandler(handlers.ColumnHandler):
+  pass
