@@ -50,6 +50,15 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     DATE = "Date"
     MAP = "Map"
 
+  VALID_TYPES = [
+      "Text",
+      "Rich Text",
+      "Dropdown",
+      "Checkbox",
+      "Date",
+      "Map",
+  ]
+
 
 class CustomAttributeMapable(object):
   # pylint: disable=too-few-public-methods
