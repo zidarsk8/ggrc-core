@@ -4,8 +4,10 @@
 """Handlers specific for Assessment templates."""
 
 
-from ggrc.converters.handlers import handlers
+from ggrc import db
 from ggrc import converters
+from ggrc.models import CustomAttributeDefinition as CAD
+from ggrc.converters.handlers import handlers
 
 
 class TemplateObjectColumnHandler(handlers.ColumnHandler):
@@ -23,4 +25,65 @@ class TemplateObjectColumnHandler(handlers.ColumnHandler):
 
 
 class TemplateCaColumnHandler(handlers.ColumnHandler):
-  pass
+
+  """Handler for Template custom attributes column."""
+
+  TYPE_MAP = {k.lower(): v for k, v in CAD.VALID_TYPES.iteritems()}
+
+  @staticmethod
+  def _get_ca_type(definition_str):
+    """Get type and mandatory flag for custom attribute."""
+    ca_type = definition_str.strip().lower()
+    mandatory = False
+    if ca_type.lower().startswith("mandatory "):
+      mandatory = True
+      ca_type = ca_type[10:].strip()
+    return ca_type, mandatory
+
+  def _handle_ca_line(self, line):
+    """Parse single custom attribute definition line."""
+    parts = [part.strip() for part in line.split(",")]
+
+    ca_type, mandatory = self._get_ca_type(parts[0])
+    ca_title = parts[1]
+
+    if len(parts) > 2:
+      self.add_error("line {line}: Dropdown is currently not supported.")
+      return
+
+    if ca_type not in self.TYPE_MAP:
+      self.add_error("line {line}: Invalid custom attribute type.")
+      return
+
+    if ca_type == "person":
+      self.add_error("line {line}: Person custom attribute currently not "
+                     "supported.")
+      return
+
+    attribute = CAD()
+    attribute.attribute_type = self.TYPE_MAP[ca_type]
+    attribute.mandatory = mandatory
+    attribute.title = ca_title
+    attribute.definition_type = "assessment_template"
+    return attribute
+
+  def parse_item(self):
+    """Parse a list of custom attributes."""
+    lines = self.raw_value.splitlines()
+    lines = [line for line in lines if line]
+    custom_attributes = []
+    for line in lines:
+      custom_attributes.append(self._handle_ca_line(line))
+    return custom_attributes
+
+  def set_obj_attr(self):
+    pass
+
+  def insert_object(self):
+    """Add custom attributes to db session."""
+    if not self.value or self.row_converter.ignore:
+      return
+
+    for attribute in self.value:
+      attribute.definition_id = self.row_converter.obj.id
+      db.session.add(attribute)
