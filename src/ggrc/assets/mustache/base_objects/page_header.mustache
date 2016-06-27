@@ -38,7 +38,12 @@
       <i class="fa fa-calendar-check-o"></i>
       <span>
         My Tasks
-        <span class="task-count"></span>
+        <object-counter
+          counter="user_task_count"
+          model-name="CycleTaskGroupObjectTask"
+          search-keys="contact_id;cycle.is_current;status__in"
+          search-values="current_user;true;Assigned,InProgress,Finished,Declined"
+        ></object-counter>
       </span>
     </a>
   </li>

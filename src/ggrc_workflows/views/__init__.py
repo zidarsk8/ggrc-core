@@ -11,9 +11,31 @@ from flask import url_for
 from ggrc import db
 from ggrc.app import app
 from ggrc.login import login_required
+from ggrc.login import get_current_user
+from ggrc.utils import benchmark
 from ggrc.views.cron import run_job
+
 from ggrc_workflows import start_recurring_cycles
+from ggrc_workflows.models import Cycle
+from ggrc_workflows.models import CycleTaskGroupObjectTask
 from ggrc_workflows.models import Workflow
+
+
+def get_user_task_count():
+  with benchmark("Get user task count RAW"):
+    current_user = get_current_user()
+    return CycleTaskGroupObjectTask.query.join(Cycle).filter(
+        CycleTaskGroupObjectTask.contact_id == current_user.id,
+        CycleTaskGroupObjectTask.status.in_(
+            ["Assigned", "InProgress", "Finished", "Declined"]),
+        Cycle.is_current == True).count()  # noqa # pylint: disable=singleton-comparison
+
+
+@app.context_processor
+def workflow_context():
+  return {
+      "user_task_count": get_user_task_count
+  }
 
 
 def _get_unstarted_workflows():

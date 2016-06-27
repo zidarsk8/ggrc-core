@@ -20,8 +20,10 @@
       font-weight: bold;
       line-height: 16px;
       text-align: center;
-      width: 16px;
+      width: 14px;
       height: 16px;
+      padding: 0 2px 0 1px;
+      display: inline-block;
     }
     &.user {
       text-transform:lowercase;
