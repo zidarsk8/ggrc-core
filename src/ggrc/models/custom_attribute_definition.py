@@ -12,6 +12,13 @@ from ggrc.models.custom_attribute_value import CustomAttributeValue
 
 
 class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
+  """Custom attribute definition model.
+
+  Attributes:
+    multi_choice_mandatory: comma separated values of mandatory bitmaps.
+      First lsb is for comment, second bit is for attachement.
+  """
+
   __tablename__ = 'custom_attribute_definitions'
 
   definition_type = db.Column(db.String, nullable=False)
