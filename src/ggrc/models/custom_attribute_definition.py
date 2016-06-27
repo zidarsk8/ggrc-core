@@ -63,7 +63,7 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       "Dropdown": "Dropdown",
       "Checkbox": "Checkbox",
       "Date": "Date",
-      "Person": "Map",
+      "Person": "Map:Person",
   }
 
 

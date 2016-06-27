@@ -56,11 +56,6 @@ class TemplateCaColumnHandler(handlers.ColumnHandler):
       self.add_error("line {line}: Invalid custom attribute type.")
       return
 
-    if ca_type == "person":
-      self.add_error("line {line}: Person custom attribute currently not "
-                     "supported.")
-      return
-
     attribute = CAD()
     attribute.attribute_type = self.TYPE_MAP[ca_type]
     attribute.mandatory = mandatory
