@@ -76,16 +76,19 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   , getSingleton : function () {
     var deferred,
         prefs;
+    if (this.cache) {
+      return $.when(this.cache);
+    }
 
-    this.findAll().then(function(d) {
-        if(d.length > 0) {
-            prefs = d[0];
-        } else {
-            prefs = new CMS.Models.DisplayPrefs();
-            prefs.save();
-        }
+    this.findAll().then(function (d) {
+      if (d.length > 0) {
+        prefs = d[0];
+      } else {
+        prefs = new CMS.Models.DisplayPrefs();
+        prefs.save();
+      }
     });
-
+    this.cache = prefs;
     return $.when(prefs);
   }
 }, {

@@ -57,7 +57,7 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
 
       this._prepare_deferred = $.when(
         can.view(this.options.widget_view, $.when(this.options))
-        , CMS.Models.DisplayPrefs.findAll()
+        , CMS.Models.DisplayPrefs.getSingleton()
       ).then(this.proxy("draw_widget"));
 
       return this._prepare_deferred;
@@ -70,12 +70,8 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
 
     var content = this.element
       , controller_content = null;
-    if(prefs.length < 1) {
-      prefs.push(new CMS.Models.DisplayPrefs());
-      prefs[0].save();
-    }
 
-    if(prefs[0].getCollapsed(window.getPageToken(), this.element.attr("id"))) {
+    if (prefs.getCollapsed(window.getPageToken(), this.element.attr("id"))) {
 
       this.element
       .find(".widget-showhide > a")
