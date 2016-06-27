@@ -308,6 +308,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Default Test Plan",
         "Default Assessors",
         "Default Verifier",
+        "Custom Attributes",
         "Code",
         "Delete",
     }
