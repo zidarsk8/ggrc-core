@@ -18,7 +18,7 @@
   .area{ 'class': '={ model_display_class }' }
     .header-content
       -if current_user.system_wide_role.lower() != 'no access'
-        %button{ 'class': 'lhn-trigger pull-left', 'href': 'javascript://'}
+        %button{ 'class': 'lhn-trigger lhn-no-init pull-left', 'href': 'javascript://'}
           %span.icon-bar
           %span.icon-bar
           %span.icon-bar

@@ -414,12 +414,7 @@ can.Control("CMS.Controllers.LHN", {
     Mousetrap.bind("alt+m", this.toggle_lhn.bind(this));
 
     this.resize_lhn();
-
-    if (this.options.display_prefs.getLHNState().is_pinned) {
-      this.open_lhn();
-    }else{
-      this.close_lhn();
-    }
+    this.open_lhn();
   }
   , lhn_width : function(){
     return $(".lhs-holder").width()+8;
