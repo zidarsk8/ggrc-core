@@ -3,6 +3,8 @@
 
 """Handlers specific for Assessment templates."""
 
+import re
+
 from sqlalchemy import and_
 
 from ggrc import db
@@ -41,26 +43,35 @@ class TemplateCaColumnHandler(handlers.ColumnHandler):
       ca_type = ca_type[10:].strip()
     return ca_type, mandatory
 
+  def _get_multiple_choice(self, choices):
+    """Get option and mandatory strings for a list of choices."""
+    options = []
+    mandatory = []
+    for option in choices:
+      man = 0
+      if "(c)" in option.lower():
+        man += 1
+      if "(a)" in option.lower():
+        man += 2
+      options.append(re.sub("\([aAcC]\)", "", option).strip())
+      mandatory.append(str(man))
+    return ",".join(options), ",".join(mandatory)
+
   def _handle_ca_line(self, line):
     """Parse single custom attribute definition line."""
     parts = [part.strip() for part in line.split(",")]
 
     ca_type, mandatory = self._get_ca_type(parts[0])
     ca_title = parts[1]
-
-    if len(parts) > 2:
-      self.add_error("line {line}: Dropdown is currently not supported.")
-      return
-
-    if ca_type not in self.TYPE_MAP:
-      self.add_error("line {line}: Invalid custom attribute type.")
-      return
+    multi_options, multi_mandatory = self._get_multiple_choice(parts[2:])
 
     attribute = CAD()
     attribute.attribute_type = self.TYPE_MAP[ca_type]
     attribute.mandatory = mandatory
     attribute.title = ca_title
     attribute.definition_type = "assessment_template"
+    attribute.multi_choice_options = multi_options
+    attribute.multi_choice_mandatory = multi_mandatory
     return attribute
 
   def parse_item(self):
