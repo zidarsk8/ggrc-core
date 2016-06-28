@@ -171,7 +171,7 @@ Full text search is enabled for certain models. It is enabled by a class attribu
 
 #### Database Migrations
 
-Migrations are implemented and executed via [alembic](http://alembic.readthedocs.org/en/latest/), augmented to support extension modules in ggrc.migrate.  (The standard `alembic` command will *not* do the right thing.)
+Migrations are implemented and executed via [alembic](http://alembic.zzzcomputing.com/en/latest/), augmented to support extension modules in ggrc.migrate.  (The standard `alembic` command will *not* do the right thing.)
 
 Migration scripts are written in Python and live in [`src/<module>/migrations/versions`](/src/ggrc/migrations/versions).
 
