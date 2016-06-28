@@ -279,6 +279,9 @@
       }
     }
   });
+  var csvExport = $("#csv_export");
+  if (csvExport.length) {
+    csvExport.html(can.view(GGRC.mustache_path + "/import_export/export.mustache", {}));
+  }
 
-  $("#csv_export").html(can.view(GGRC.mustache_path + "/import_export/export.mustache", {}));
 })(window.can, window.can.$);
