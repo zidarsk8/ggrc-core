@@ -162,7 +162,7 @@
         return mappings;
       }
 
-      
+
       var far_models = base_widgets_by_type[object.constructor.shortName],
         // here we are going to define extra descriptor options, meaning that
         //  these will be used as extra options to create widgets on top of
@@ -354,10 +354,20 @@
         },
         issues: {
           Issue: {
-            mapping: "related_issues",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
-            child_options: relatedObjectsChildOptions,
+            mapping: 'related_issues',
+            footer_view: GGRC.mustache_path +
+              '/base_objects/tree_footer.mustache',
+            add_item_view: GGRC.mustache_path +
+              '/base_objects/tree_add_item.mustache',
+            child_options: relatedObjectsChildOptions.concat({
+              model: CMS.Models.Person,
+              mapping: 'people',
+              show_view: GGRC.mustache_path +
+                '/base_objects/tree.mustache',
+              footer_view: GGRC.mustache_path +
+                '/base_objects/tree_footer.mustache',
+              draw_children: false
+            }),
             draw_children: true
           }
         },
