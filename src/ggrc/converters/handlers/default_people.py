@@ -33,20 +33,9 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
 
     This is the "other" option in the default assessor dropdown menu.
     """
-    self.add_error("Default people does not support email lists.")
-    # lines = [line.strip() for line in self.raw_value.splitlines()]
-    # value = []
-    # for email in lines:
-    #   if not email:
-    #     continue
-    #   if not Person.is_valid_email(email):
-    #     self.add_warning("invalid email")
-    #   else:
-    #     value.append(email)
-
-    # if not value:
-    #   self.add_error("missing value error")
-    # return value
+    self.add_error(errors.UNSUPPORTED_LIST_ERROR,
+                   column_name=self.display_name,
+                   value_type="email lists")
 
   def _parse_label_values(self):
     """Parse predefined default assessors.

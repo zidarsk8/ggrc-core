@@ -88,3 +88,6 @@ REQUEST_INVALID_STATE = ("LINE {line}: Can not set Request state to Completed "
 UNKNOWN_DATE_FORMAT = (u"Line {line}: Field {column_name} contains invalid "
                        u"date format, use YYYY-MM-DD or MM/DD/YYYY. The line "
                        u"will be ignored.")
+
+UNSUPPORTED_LIST_ERROR = (u"Line {line}: Field {column_name} does not support "
+                          u"{value_type}.")
