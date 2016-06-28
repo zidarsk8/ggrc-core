@@ -74,12 +74,9 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
 
   def _get_inital_people(self):
     """Get the default_people dict from current object."""
-    try:
-      value = json.loads(self.row_converter.obj.default_people)
-      if not value:
-        value = {}
-    except TypeError:
-      value = {}
+    if self.row_converter.obj.default_people is None:
+      return {}
+    value = json.loads(self.row_converter.obj.default_people)
     return value
 
   def set_obj_attr(self):
