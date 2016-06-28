@@ -61,6 +61,8 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       None.
     """
     definition = self.get_ca_definition()
+    if not definition:
+      return ""
     for value in self.row_converter.obj.custom_attribute_values:
       if value.custom_attribute_id == definition.id:
         if value.custom_attribute.attribute_type.startswith("Map:"):
