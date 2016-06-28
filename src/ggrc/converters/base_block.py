@@ -214,13 +214,13 @@ class BlockConverter(object):
       row_converter.handle_row_data(field_list)
     if field_list is None:
       self.check_mandatory_fields()
-      self.check_uniq_columns()
+      self.check_unique_columns()
 
   def check_mandatory_fields(self):
     for row_converter in self.row_converters:
-      row_converter.chect_mandatory_fields()
+      row_converter.check_mandatory_fields()
 
-  def check_uniq_columns(self, counts=None):
+  def check_unique_columns(self, counts=None):
     self.generate_unique_counts()
     for key, counts in self.unique_counts.items():
       self.remove_duplicate_keys(key, counts)

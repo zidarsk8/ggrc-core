@@ -87,7 +87,7 @@ class RowConverter(object):
     else:
       self.handle_csv_row_data(field_list)
 
-  def chect_mandatory_fields(self):
+  def check_mandatory_fields(self):
     if not self.is_new or self.is_delete:
       return
     headers = self.block_converter.object_headers
