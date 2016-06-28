@@ -1171,6 +1171,10 @@ class Resource(ModelView):
       with benchmark("Send model POSTed - after commit event"):
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
                                             src=src, service=self)
+      # Note: In model_posted_after_commit necessary mapping and relashionships
+      # are set, so need to commit the changes
+      db.session.commit()
+
       with benchmark("Serialize object"):
         object_for_json = {} if no_result else self.object_for_json(obj)
       with benchmark("Make response"):
