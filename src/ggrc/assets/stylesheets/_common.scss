@@ -771,6 +771,11 @@ p {
   .block {
     display: block;
   }
+  .single-line {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .attr-titles {
     @extend %clearfix;
     ul {
