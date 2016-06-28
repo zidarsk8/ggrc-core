@@ -5,7 +5,10 @@
     Maintained By: vladan@reciprocitylabs.com
 }}
 
-  <div class="sticky sticky-header tree-filter" {{#filter_is_hidden}}style="height: 0px; margin-bottom: 0px;"{{/filter_is_hidden}} data-height="42" data-margin-bottom="25">
+  <div class="sticky sticky-header tree-filter"
+       {{#filter_is_hidden}}style="height: 0; margin-bottom: 0;"{{/filter_is_hidden}}
+       data-height="42"
+       data-margin-bottom="25">
     <div class="sticky-filter inner-filter-sticky">
       <div class="tree-filter__inline-filtering clearfix" {{ (el) -> el.ggrc_controllers_tree_filter() }} >
 
