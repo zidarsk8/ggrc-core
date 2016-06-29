@@ -166,3 +166,20 @@ class TestBasicCsvImport(converters.TestCase):
 
     self.assertEqual(expected_errors, set(response["row_errors"]))
     self.assertEqual(0, models.Person.query.filter_by(email=None).count())
+
+  def test_duplicate_people(self):
+    """Test adding two of the same object people objects in the same row."""
+    filename = "duplicate_object_person.csv"
+    response = self.import_file(filename)[0]
+
+    self.assertEqual(0, len(response["row_warnings"]))
+    self.assertEqual(0, len(response["row_errors"]))
+
+  def test_duplicate_people_objective_error(self):
+    """Test duplicate error that causes request to fail."""
+    self.generator.generate_object(models.Objective, {"slug": "objective1"})
+    filename = "duplicate_object_person_objective_error.csv"
+    response = self.import_file(filename)[0]
+
+    self.assertEqual(0, len(response["row_warnings"]))
+    self.assertEqual(0, len(response["row_errors"]))

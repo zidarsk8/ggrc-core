@@ -5,6 +5,7 @@ from collections import defaultdict
 from collections import OrderedDict
 from collections import Counter
 from flask import current_app
+from sqlalchemy import exc
 
 from ggrc import db
 from ggrc.utils import structures
@@ -160,11 +161,11 @@ class BlockConverter(object):
         self.add_warning(errors.UNKNOWN_COLUMN,
                          line=self.offset + 2,
                          column_name=header)
-        self.remove_culumn(index - removed_count)
+        self.remove_column(index - removed_count)
         removed_count += 1
     return clean_headers
 
-  def remove_culumn(self, index):
+  def remove_column(self, index):
     """ Remove a column from all rows """
     for row in self.rows:
       if len(row) > index:
@@ -211,13 +212,13 @@ class BlockConverter(object):
       row_converter.handle_row_data(field_list)
     if field_list is None:
       self.check_mandatory_fields()
-      self.check_uniq_columns()
+      self.check_unique_columns()
 
   def check_mandatory_fields(self):
     for row_converter in self.row_converters:
-      row_converter.chect_mandatory_fields()
+      row_converter.check_mandatory_fields()
 
-  def check_uniq_columns(self, counts=None):
+  def check_unique_columns(self, counts=None):
     self.generate_unique_counts()
     for key, counts in self.unique_counts.items():
       self.remove_duplicate_keys(key, counts)
@@ -254,7 +255,13 @@ class BlockConverter(object):
 
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
-        row_converter.insert_secondary_objecs()
+        try:
+          row_converter.insert_secondary_objects()
+        except exc.SQLAlchemyError as err:
+          db.session.rollback()
+          current_app.logger.error(
+              "Import failed with: {}".format(err.message))
+          row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
 
   def import_objects(self):
@@ -279,9 +286,10 @@ class BlockConverter(object):
         try:
           row_converter.insert_object()
           db.session.flush()
-        except Exception as e:
+        except exc.SQLAlchemyError as err:
           db.session.rollback()
-          current_app.logger.error("Import failed with: {}".format(e.message))
+          current_app.logger.error(
+              "Import failed with: {}".format(err.message))
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
       for row_converter in self.row_converters:
@@ -296,9 +304,10 @@ class BlockConverter(object):
       db.session.commit()
       update_memcache_after_commit(self)
       update_index(db.session, modified_objects)
-    except Exception as e:
+    except exc.SQLAlchemyError as err:
       db.session.rollback()
-      current_app.logger.error("Import failed with: {}".format(e.message))
+      current_app.logger.error(
+          "Import failed with: {}".format(err.message))
       self.add_errors(errors.UNKNOWN_ERROR, line=self.offset + 2)
 
   def add_errors(self, template, **kwargs):

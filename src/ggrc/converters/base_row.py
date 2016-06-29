@@ -85,7 +85,7 @@ class RowConverter(object):
     else:
       self.handle_csv_row_data(field_list)
 
-  def chect_mandatory_fields(self):
+  def check_mandatory_fields(self):
     if not self.is_new or self.is_delete:
       return
     headers = self.block_converter.object_headers
@@ -211,7 +211,7 @@ class RowConverter(object):
     for handler in self.attrs.values():
       handler.insert_object()
 
-  def insert_secondary_objecs(self):
+  def insert_secondary_objects(self):
     """Add additional objects to the current database session.
 
     This is used for adding any extra created objects such as Relationships, to
