@@ -24,7 +24,7 @@
        * @prop {Array of objects} assignable_list - A list of available roles
        *  with mappins to those roles.
        */
-      checkConflict: function () {
+      _checkConflict: function () {
         var conflicts = this.instance.class.conflicts;
         var assignableList = this.instance.class.assignable_list;
         var bindings = {};
@@ -50,7 +50,7 @@
 
         // Set up listening to change event on role bindings.
         _.each(conflicts, function (conflictRoles) {
-          return _.each(conflictRoles, function (role) {
+          _.each(conflictRoles, function (role) {
             var roleMapping = _.find(
               assignableList, _.matchesProperty('type', role)).mapping;
             var roleBinding = this.instance.get_binding(roleMapping);
@@ -62,7 +62,7 @@
     },
     events: {
       inserted: function () {
-        this.scope.checkConflict();
+        this.scope._checkConflict();
       }
     }
   });
