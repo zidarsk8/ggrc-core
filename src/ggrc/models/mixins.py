@@ -813,6 +813,7 @@ class CustomAttributable(object):
     return query.options(
         orm.subqueryload('custom_attribute_values'),
         orm.subqueryload('custom_attribute_definitions')
+           .undefer_group('CustomAttributeDefinition_complete')
     )
 
   def log_json(self):
