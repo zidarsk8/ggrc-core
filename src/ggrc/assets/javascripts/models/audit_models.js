@@ -872,6 +872,12 @@
         show_view: GGRC.mustache_path + '/base_templates/urls.mustache'
       }
     },
+    confirmEditModal: {
+      title: 'Confirm moving Request to "In Progress"',
+      description: 'You are about to move request from ' +
+      '"{{status}}" to "In Progress" - are you sure about that?',
+      button: 'Confirm'
+    },
     assignable_list: [{
       type: 'creator',
       mapping: 'related_creators',

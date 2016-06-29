@@ -44,7 +44,8 @@ describe('GGRC.Components.inlineEdit', function () {
         preventDefault: jasmine.createSpy()
       };
       scope = new can.Map({
-        context: {}
+        context: {},
+        instance: {}
       });
     });
 
@@ -58,6 +59,7 @@ describe('GGRC.Components.inlineEdit', function () {
 
       it('enters the edit mode if editing allowed', function () {
         scope.attr('context.isEdit', false);
+        scope.attr('instance.status', 'In Progress');
         scope.attr('readonly', false);
 
         enableEdit(scope, $el, ev);
@@ -66,6 +68,7 @@ describe('GGRC.Components.inlineEdit', function () {
 
       it('does not enter the edit mode if editing not allowed', function () {
         scope.attr('context.isEdit', false);
+        scope.attr('instance.status', 'In Progress');
         scope.attr('readonly', true);
 
         enableEdit(scope, $el, ev);
