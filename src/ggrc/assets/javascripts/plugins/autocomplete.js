@@ -324,10 +324,25 @@
 
   $.widget.bridge('ggrc_mapping_autocomplete', $.ggrc.mapping_autocomplete);
 
+  /**
+   * Convert an input element to an autocomplete field.
+   *
+   * If an element is not given, it tries to use the first suitable element
+   * within the current DOM context (i.e. a DOM node containing form elements),
+   * if such context exists.
+   *
+   * @param {DOM.Element} el - the element to convert
+   */
   $.cms_autocomplete = function (el) {
     var ctl = this;
     // Add autocomplete to the owner field
     if (!el) {
+      if (!this.element) {
+        // It can happen that this.element is already null when we want to init
+        // autocomplete on it, e.g. when its containing modal form is already
+        // being destoryed. In such cases we simply don't do anything.
+        return;
+      }
       el = this.element.find('input[data-lookup]');
     } else {
       el = $(el);
