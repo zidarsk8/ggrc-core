@@ -10,6 +10,7 @@
     '{CMS.Models.AssessmentTemplate} updated': function (model, ev, instance) {
       var attrDfd;
       var definitions = instance.custom_attribute_definitions;
+      var cachedCADefinitions = instance._cachedCADefinitions;
 
       if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
         return;
@@ -19,9 +20,21 @@
         var CADefinition = CMS.Models.CustomAttributeDefinition;
         var params = can.extend({
           definition_id: instance.id,
-          definition_type: "assessment_template",
+          definition_type: 'assessment_template',
           context: instance.context
         }, attr.serialize());
+        /**
+         * Temporary solution and after updated the backend it need to be deleted
+         * Start deprecated block
+         */
+        if (cachedCADefinitions[i].id === params.id) {
+          params.mandatory = cachedCADefinitions[i].mandatory;
+          params.multi_choice_mandatory = cachedCADefinitions[i]
+            .multi_choice_mandatory;
+        }
+        /**
+         * End deprecated block
+         */
         if (attr.id && attr._pending_delete) {
           return attr.reify().refresh().then(function (attr) {
             attr.destroy();
@@ -36,6 +49,7 @@
         }
         return new CADefinition(params).save().then(function (definition) {
           instance.custom_attribute_definitions[i] = definition;
+          instance.refresh();
         });
       });
       instance.delay_resolving_save_until($.when(attrDfd));
@@ -58,13 +72,14 @@
           }
           return new CMS.Models.CustomAttributeDefinition(can.extend({
             definition_id: instance.id,
-            definition_type: "assessment_template",
+            definition_type: 'assessment_template',
             context: instance.context
           }, attr.serialize())).save().then(function (attributeDefinition) {
             instance.custom_attribute_definitions[i] = attributeDefinition;
           });
         });
         instance.delay_resolving_save_until($.when(auditDfd, attrDfd));
+        instance.refresh();
       }.bind(this));
     },
     '{CMS.Models.Issue} created': function (model, ev, instance) {
