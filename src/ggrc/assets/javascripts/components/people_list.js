@@ -12,19 +12,19 @@
       editable: '@',
       deferred: '@',
       validate: '@',
+      /*
+       * Checks whether there are any conflicts between assignable roles.
+       *
+       * If `conflicts` is specified on an object with assignable mixin,
+       * bind to the role's mapping and on any change to it check if any
+       * user is holding roles that are in violation of the rules.
+       *
+       * @prop {Array of Arrays} conflicts - Array of an array containing
+       *  conflicting roles that no single user should hold at the same time.
+       * @prop {Array of objects} assignable_list - A list of available roles
+       *  with mappins to those roles.
+       */
       checkConflict: function () {
-        /*
-         * Checks whether there are any conflicts between assignable roles.
-         *
-         * If `conflicts` is specified on an object with assignable mixin,
-         * bind to the role's mapping and on any change to it check if any
-         * user is holding roles that are in violation of the rules.
-         *
-         * @attr {Array of Arrays} conflicts - Array of an array containing
-         *  conflicting roles that no single user should hold at the same time.
-         * @attr {Array of objects} assignable_list - A list of available roles
-         *  with mappins to those roles.
-         */
         var conflicts = this.instance.class.conflicts;
         var assignableList = this.instance.class.assignable_list;
         var bindings = {};
