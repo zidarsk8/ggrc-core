@@ -878,6 +878,9 @@
       mapping: 'related_verifiers',
       required: false
     }],
+    conflicts: [
+      ['assessor', 'verifier']
+    ],
     init: function () {
       if (this._super) {
         this._super.apply(this, arguments);
