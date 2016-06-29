@@ -207,54 +207,57 @@
       </div>
     </div>
 
-    <div class="custom-attr-wrap define-attr">
-      <div class="hidden-fields-area">
-        <div class="row-fluid wrap-row">
-          <div class="custom-attr-list span12">
-            <assessment-template-attributes fields="instance.custom_attribute_definitions">
-              <div class="attr-titles">
-                <ul>
-                  <li class="row-fluid">
-                    <div class="span-custom2-and-half">
-                      <h6>Attribute Title</h6>
-                    </div>
-                    <div class="span-custom1-and-half">
-                      <h6>Attribute type</h6>
-                    </div>
-                    <div class="span2">
-                      <h6>Attribute values</h6>
-                    </div>
-                    <div class="span2 centered">
-                      <h6>Attachment required</h6>
-                    </div>
-                    <div class="span1 centered">
-                      <h6>Comment required</h6>
-                    </div>
-                    <div class="span1 centered">
-                      <h6>Mandatory</h6>
-                    </div>
-                    <div class="span2">
-                      &nbsp;
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              <div class="sortable-list new-attr-list">
-                <ul>
-                  <li class="row-fluid add-field">
-                    <add-template-field fields="fields">
-                    </add-template-field>
-                  </li>
-                  {{#fields}}
-                    <template-field field="." fields="fields"></template-field>
-                  {{/fields}}
-                </ul>
-              </div>
-            </assessment-template-attributes>
+    <div class="row-fluid hidable">
+      <label>Custom Attributes</label>
+      <div class="custom-attr-wrap define-attr">
+        <div class="hidden-fields-area">
+          <div class="row-fluid wrap-row">
+            <div class="custom-attr-list span12">
+              <assessment-template-attributes fields="instance.custom_attribute_definitions">
+                <div class="attr-titles">
+                  <ul>
+                    <li class="row-fluid">
+                      <div class="span-custom2-and-half">
+                        <h6>Attribute Title</h6>
+                      </div>
+                      <div class="span-custom1-and-half">
+                        <h6>Attribute type</h6>
+                      </div>
+                      <div class="span2">
+                        <h6>Attribute values</h6>
+                      </div>
+                      <div class="span2 centered">
+                        <h6>Attachment required</h6>
+                      </div>
+                      <div class="span1 centered">
+                        <h6>Comment required</h6>
+                      </div>
+                      <div class="span1 centered">
+                        <h6>Mandatory</h6>
+                      </div>
+                      <div class="span2">
+                        &nbsp;
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div class="sortable-list new-attr-list">
+                  <ul>
+                    <li class="row-fluid add-field">
+                      <add-template-field fields="fields">
+                      </add-template-field>
+                    </li>
+                    {{#fields}}
+                      <template-field field="." fields="fields"></template-field>
+                    {{/fields}}
+                  </ul>
+                </div>
+              </assessment-template-attributes>
+            </div>
           </div>
         </div>
-      </div>
-    </div><!-- custom-attr-wrap end -->
+      </div><!-- custom-attr-wrap end -->
+    </div>
  </form>
  </wrapper-assessment-template>
 </div>
