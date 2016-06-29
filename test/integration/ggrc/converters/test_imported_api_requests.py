@@ -31,6 +31,9 @@ class TestComprehensiveSheets(TestCase):
             for model_name in all_models.__all__
             if model_name not in WHITELIST]
 
+  # limit found by trial and error, may need tweaking if models change
+  LIMIT = 30
+
   def setUp(self):
     TestCase.setUp(self)
     self.generator = ObjectGenerator()
@@ -52,21 +55,21 @@ class TestComprehensiveSheets(TestCase):
   def test_queries_per_api_call(self):
     """Import comprehensive_sheet1 and count db requests per collection get.
 
-    Query count should be <100 for all model types.
+    Query count should be <LIMIT for all model types.
     """
     with QueryCounter() as counter:
       for model in self.MODELS:
         counter.queries = []
         self.generator.api.get_query(model, "")
-        if counter.get > 100 or model.__name__ == "CycleTaskGroupObjectTask":
+        if counter.get > self.LIMIT:
           print collections.Counter(counter.queries).most_common(1)
-        self.assertLess(counter.get, 100,
+        self.assertLess(counter.get, self.LIMIT,
                         "Query count for API GET " + model.__name__)
 
   def test_queries_per_object_page(self):
     """Import comprehensive_sheet1 and count db requests per collection get.
 
-    Query count should be <100 for all model types.
+    Query count should be <LIMIT for all model types.
     """
     with QueryCounter() as counter:
       for view in all_object_views():
@@ -79,20 +82,20 @@ class TestComprehensiveSheets(TestCase):
         counter.queries = []
         res = self.client.get("/{}/{}".format(view.url, instance.id))
         self.assertEqual(res.status_code, 200)
-        self.assertLess(counter.get, 100,
+        self.assertLess(counter.get, self.LIMIT,
                         "Query count for object page " + model.__name__)
 
   def test_queries_for_dashboard(self):
     with QueryCounter() as counter:
       res = self.client.get("/permissions")
       self.assertEqual(res.status_code, 200)
-      self.assertLess(counter.get, 100, "Query count for dashboard")
+      self.assertLess(counter.get, self.LIMIT, "Query count for dashboard")
 
   def test_queries_for_permissions(self):
     with QueryCounter() as counter:
       res = self.client.get("/dashboard")
       self.assertEqual(res.status_code, 200)
-      self.assertLess(counter.get, 100, "Query count for permissions")
+      self.assertLess(counter.get, self.LIMIT, "Query count for permissions")
 
   def create_custom_attributes(self):
     """Generate custom attributes needed by comprehensive_sheet1.csv."""
