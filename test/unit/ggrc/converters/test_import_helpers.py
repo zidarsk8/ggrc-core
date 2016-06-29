@@ -109,7 +109,7 @@ class TestSplitArry(unittest.TestCase):
     self.assertEqual(offests[2], 9)
 
 
-class TestCulumnOrder(unittest.TestCase):
+class TestColumnOrder(unittest.TestCase):
 
   """Tests for colum order function.
   """
