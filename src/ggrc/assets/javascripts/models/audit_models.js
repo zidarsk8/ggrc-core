@@ -90,7 +90,7 @@
     },
     obj_nav_options: {
       show_all_tabs: false,
-      force_show_list: ['In Scope Controls', 'Open Requests',
+      force_show_list: ['In Scope Controls', 'Requests',
                         'Issues', 'Assessments']
     },
     tree_view_options: {
