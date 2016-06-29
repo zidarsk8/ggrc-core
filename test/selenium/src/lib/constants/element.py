@@ -117,7 +117,7 @@ class WidgetProgramInfo(object):
 
 class AdminRolesWidget(object):
   EDITOR = "Editor"
-  GRC_ADMIN = "Administrator"
+  ADMINISTRATOR = "Administrator"
   PROGRAM_EDITOR = "Program Editor"
   PROGRAM_OWNER = "Program Manager"
   PROGRAM_READER = "Program Reader"
@@ -126,6 +126,6 @@ class AdminRolesWidget(object):
   WORKFLOW_OWNER = "Workflow Manager"
 
   SCOPE_SYSTEM = "SYSTEM"
-  SCOPE_ADMIN = "ADMIN"
+  SCOPE_ADMINISTRATOR = "ADMIN"
   SCOPE_PRIVATE_PROGRAM = "PRIVATE PROGRAM"
   SCOPE_WORKFLOW = "WORKFLOW"
