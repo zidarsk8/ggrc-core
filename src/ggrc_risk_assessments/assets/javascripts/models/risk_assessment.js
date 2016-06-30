@@ -7,8 +7,8 @@
  */
 
 (function (can) {
+  var path = GGRC.mustache_path + "/risk_assessments";
 
-  _mustache_path = GGRC.mustache_path + "/risk_assessments";
   can.Model.Cacheable("CMS.Models.RiskAssessment", {
     root_object: "risk_assessment",
     root_collection: "risk_assessments",
@@ -46,12 +46,13 @@
           attr_sort_field: 'ra_counsel.name|email'
         }
       ],
-      add_item_view: _mustache_path + "/tree_add_item.mustache",
+      add_item_view: path + '/tree_add_item.mustache',
       child_options: [{
-        model: "Document",
-        mapping: "documents",
-        show_view: _mustache_path + "/documents.mustache",
-      }],
+        model: can.Model.Cacheable,
+        mapping: 'related_objects',
+        show_view: path + '/tree.mustache',
+        draw_children: true
+      }]
     },
     init: function () {
       this._super && this._super.apply(this, arguments);
