@@ -209,8 +209,8 @@
             }
           },
           Request: {
-            widget_id: "Request",
-            widget_name: "Open Requests"
+            widget_id: 'Request',
+            widget_name: 'Requests'
           },
           program: {
             widget_id: "program",
