@@ -20,14 +20,6 @@ owner_base = [
         "condition": "contains"
     },
     {
-        "type": "Assessment",
-        "terms": {
-            "list_property": "owners",
-            "value": "$current_user"
-        },
-        "condition": "contains"
-    },
-    {
         "type": "Control",
         "terms": {
             "list_property": "owners",

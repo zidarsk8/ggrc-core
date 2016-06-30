@@ -21,7 +21,6 @@ from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import deferred
 from ggrc.models.mixins_assignable import Assignable
 from ggrc.models.object_document import Documentable
-from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
@@ -34,7 +33,7 @@ class Assessment(mixins_statusable.Statusable,
                  AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, Documentable, Commentable, Personable,
                  mixins_reminderable.Reminderable, Timeboxed,
-                 Ownable, Relatable, FinishedDate, VerifiedDate,
+                 Relatable, FinishedDate, VerifiedDate,
                  BusinessObject, db.Model):
   """Class representing Assessment.
 

@@ -3,7 +3,6 @@
 
 """ Unit tests for the Assessment object """
 
-from sqlalchemy.ext import associationproxy
 from sqlalchemy.orm import attributes
 
 from ggrc import db
@@ -11,7 +10,6 @@ from ggrc.models import Assessment
 from ggrc.models import mixins
 from ggrc.models import mixins_assignable
 from ggrc.models import object_document
-from ggrc.models import object_owner
 from ggrc.models import object_person
 from ggrc.models import relationship
 from ggrc.models import track_object_state
@@ -33,7 +31,6 @@ class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
         track_object_state.HasObjectState,
         mixins.TestPlanned,
         mixins.Timeboxed,
-        object_owner.Ownable,
         object_person.Personable,
         relationship.Relatable,
     ]
@@ -55,7 +52,6 @@ class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
         ('object_documents', attributes.InstrumentedAttribute),          # Documentable   # noqa
         ('object_people', attributes.InstrumentedAttribute),             # Personable     # noqa
         ('os_state', attributes.InstrumentedAttribute),                  # HasObjectState # noqa
-        ('owners', associationproxy.AssociationProxy),                   # Ownable        # noqa
         ('reference_url', attributes.InstrumentedAttribute),             # HyperLinked    # noqa
         ('related_sources', attributes.InstrumentedAttribute),           # Relatable      # noqa
         ('related_destinations', attributes.InstrumentedAttribute),      # Relatable      # noqa

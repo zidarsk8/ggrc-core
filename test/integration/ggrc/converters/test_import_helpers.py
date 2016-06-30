@@ -316,7 +316,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Notes",
         "Test Plan",
         "Audit",
-        "Owner",
         "Assessor",
         "Verifier",
         "Creator",
@@ -340,7 +339,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.values()}
     self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Audit"]["mandatory"])
 
   def test_issue_definitions(self):

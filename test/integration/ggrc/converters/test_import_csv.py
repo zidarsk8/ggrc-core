@@ -131,8 +131,6 @@ class TestBasicCsvImport(converters.TestCase):
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
-    self.assertEqual(len(assessment.owners), 1)
-    self.assertEqual(assessment.owners[0].email, "danny@reciprocitylabs.com")
     self.assertEqual(assessment.contact.email, "danny@reciprocitylabs.com")
     self.assertEqual(assessment.design, "Effective")
     self.assertEqual(assessment.operationally, "Effective")
@@ -147,7 +145,6 @@ class TestBasicCsvImport(converters.TestCase):
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
-    self.assertEqual(assessment.owners[0].email, "miha@reciprocitylabs.com")
     self.assertEqual(assessment.contact.email, "albert@reciprocitylabs.com")
     self.assertEqual(assessment.design, "Needs improvement")
     self.assertEqual(assessment.operationally, "Ineffective")
