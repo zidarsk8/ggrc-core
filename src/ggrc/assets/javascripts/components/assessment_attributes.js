@@ -20,11 +20,11 @@
       types: new can.List([{
         type: 'Text',
         name: 'Text',
-        text: 'Type description'
+        text: 'Enter description'
       }, {
         type: 'Rich Text',
         name: 'Rich Text',
-        text: 'Type description'
+        text: 'Enter description'
       }, {
         type: 'Date',
         name: 'Date',
@@ -36,7 +36,7 @@
       }, {
         type: 'Dropdown',
         name: 'Dropdown',
-        text: 'Type values separated by comma'
+        text: 'Enter values separated by comma'
       }, {
         type: 'Map:Person',
         name: 'Person',

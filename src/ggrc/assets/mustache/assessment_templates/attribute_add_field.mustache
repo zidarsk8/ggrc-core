@@ -21,13 +21,15 @@
     {{/types}}
   </select>
 </div>
-<div class="span2{{#selected.invalidValues}} field-failure{{/selected.invalidValues}}">
+<div class="span2{{#selected.invalidValues}}
+            field-failure{{/selected.invalidValues}}
+            ca-values">
   {{#in_array selected.type valueAttrs}}
     <input class="input-block-level"
       can-value="selected.values"
       type="text"
-      title="{{placeholder}}"
       placeholder="{{placeholder}}">
+      <i class="fa fa-question-circle" rel="tooltip" title="{{placeholder}}"></i>
     {{#selected.invalidValues}}
         <label class="warning">Cannot be blank</label>
     {{/selected.invalidValues}}

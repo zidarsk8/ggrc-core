@@ -794,6 +794,20 @@ p {
       select {
         margin-bottom: 0;
       }
+      .ca-values {
+        input {
+          float: left;
+          width: 80%;
+        }
+        i.fa {
+          float: left;
+          margin: 6px 0 0 6px;
+          opacity: 0.2;
+          &:hover {
+            opacity: 0.7;
+          };
+        }
+      }
     }
   }
 }
