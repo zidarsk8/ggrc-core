@@ -500,7 +500,8 @@
           AssessmentTemplate: {
             mapping: 'related_assessment_templates',
             child_options: relatedObjectsChildOptions,
-            draw_children: true,
+            draw_children: false,
+            allow_mapping: false,
             show_view: GGRC.mustache_path +
               '/base_objects/tree.mustache',
             footer_view: GGRC.mustache_path +
