@@ -61,9 +61,9 @@
       /**
         * Get the first (or only) pending join for a person
         *
-        * @param {Person} person - the person whose join to get
+        * @param {CMS.Models.Person} person - the person whose join to get
         *
-        * @return {Object} - the pending join for the person if able
+        * @return {Object} - the pending join for the person if available
         *                    or undefined
         */
       get_pending_operation: function (person) {
@@ -82,7 +82,7 @@
         * If there is no pending join and the person has no roles assigned yet,
         * creates a new 'add' with the role.
         *
-        * @param {Person} person - the person who gets the new role
+        * @param {CMS.Models.Person} person - the person who gets the new role
         * @param {String} role - the role that is added
         */
       deferred_add_role: function (person, role) {
@@ -144,7 +144,7 @@
         * If there is no pending join and the person has a single role assigned,
         * creates a new 'remove'.
         *
-        * @param {Person} person - the person who loses the role
+        * @param {CMS.Model.Person} person - the person who loses the role
         * @param {String} role - the role that is removed
         */
       deferred_remove_role: function (person, role) {
@@ -178,6 +178,7 @@
           }.bind(this));
         } else if (pendingOperation.how === 'remove') {
           // no action required
+          return;
         } else if (pendingOperation.how === 'add' ||
                    pendingOperation.how === 'update') {
           // 'add' or 'update' pending, cancel the role addition
@@ -214,7 +215,7 @@
       /**
         * Add a new pending join, remove all pending joins for same person
         *
-        * @param {Person} person - the person to be joined
+        * @param {CMS.Model.Person} person - the person to be joined
         * @param {Object} operation - a description of the new pending join;
         * if operation is false-value, all pending joins would be removed,
         * but none will be added.
@@ -229,11 +230,7 @@
           this.instance.remove_duplicate_pending_joins(person);
         } else {
           // convert roles list to a string
-          if (_.isArray(operation.roles)) {
-            roles = operation.roles.join(',');
-          } else if (_.isString(operation.roles)) {
-            roles = operation.roles;
-          }
+          roles = operation.roles.join(',');
           if (operation.how === 'add') {
             this.instance.mark_for_addition(
               'related_objects_as_destination',
@@ -270,7 +267,7 @@
         *
         * @param {Object} operation - a pending join object
         *
-        * @returns {List} - a list of roles
+        * @returns {Array} - an array of roles
         */
       parse_roles_list: function (operation) {
         var roles = _.exists(operation, 'extra.attrs.AssigneeType');
@@ -329,7 +326,7 @@
       /**
         * Get saved roles list for a person
         *
-        * @param {Person} person - the person whose roles to get
+        * @param {CMS.Models.Person} person - the person whose roles to get
         * @param {Object} instance - the object to which the person is assigned
         *
         * @return {jQuery.Deferred} - a promise with the role list
@@ -400,7 +397,7 @@
           // any person who has `type` in their `add` or `update` roles list
           var roles = this.scope.parse_roles_list(item);
           return (item.how === 'add' || item.how === 'update') &&
-            _.contains(roles, type);
+            _.includes(roles, type);
         }.bind(this));
         var removed = _.filter(pending, function (item) {
           // any person who was mapped and has `remove` join or has no `type`
@@ -411,7 +408,7 @@
           });
           return person_mapped &&
             (item.how === 'remove' ||
-             item.how === 'update' && !_.contains(roles, type));
+             item.how === 'update' && !_.includes(roles, type));
         }.bind(this));
 
         function getInstances(arr) {

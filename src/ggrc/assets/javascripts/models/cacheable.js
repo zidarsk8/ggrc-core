@@ -408,9 +408,9 @@ can.Model("can.Model.Cacheable", {
           if(pj.how === "add") {
             //Don't re-add -- if the object is already mapped (could be direct or through a proxy)
             // move on to the next one
-            if(_.contains(_.map(binding.list, 'instance'), pj.what) ||
+            if(_.includes(_.map(binding.list, 'instance'), pj.what) ||
                (binding.loader.option_attr &&
-                _.contains(_.map(binding.list, function (join_obj) {
+                _.includes(_.map(binding.list, function (join_obj) {
                   return join_obj.instance[binding.loader.option_attr];
                 }), pj.what))) {
               return;
@@ -436,10 +436,10 @@ can.Model("can.Model.Cacheable", {
               })
             );
           } else if (pj.how === 'update') {
-            _.map(binding.list, function (bound_obj) {
+            binding.list.forEach(function (bound_obj) {
               if (bound_obj.instance === pj.what ||
                   bound_obj.instance[binding.loader.option_attr] === pj.what) {
-                _.map(bound_obj.get_mappings(), function (mapping) {
+                bound_obj.get_mappings().forEach(function (mapping) {
                   dfds.push(mapping.refresh().then(function () {
                     if (pj.extra) {
                       mapping.attr(pj.extra);
