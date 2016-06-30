@@ -23,6 +23,7 @@
       values: null,
       readonly: false,  // whether or not the value can be edited
       isSaving: false,
+      mandatory: null,
       context: {
         isEdit: false,
         value: null,
