@@ -501,12 +501,12 @@
             mapping: 'related_assessment_templates',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
-            show_view:
-              GGRC.mustache_path + '/base_objects/tree.mustache',
-            footer_view:
-              GGRC.mustache_path + '/base_objects/tree_footer.mustache',
-            add_item_view:
-              GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+            show_view: GGRC.mustache_path +
+              '/base_objects/tree.mustache',
+            footer_view: GGRC.mustache_path +
+              '/base_objects/tree_footer.mustache',
+            add_item_view: GGRC.mustache_path +
+              '/assessment_templates/tree_add_item.mustache'
           },
           Person: {
             widget_id: "person",

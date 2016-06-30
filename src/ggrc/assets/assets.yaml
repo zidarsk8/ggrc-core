@@ -249,6 +249,7 @@ dashboard-js-template-files:
   - assessment_templates/modal_content.mustache
   - assessment_templates/info.mustache
   - assessment_templates/tier2_content.mustache
+  - assessment_templates/tree_add_item.mustache
   - assessments/related_issues.mustache
   - assessments/related_requests.mustache
   - issues/modal_content.mustache
