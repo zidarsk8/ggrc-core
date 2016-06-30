@@ -7,7 +7,9 @@
 
 import datetime
 
+from sqlalchemy import event
 from sqlalchemy import inspect
+from sqlalchemy.orm.session import Session
 
 from ggrc import db
 from ggrc.models import relationship
@@ -109,9 +111,10 @@ class AutoStatusChangable(object):
   def handle_first_class_edit(cls, model, obj, rel=None, method=None):
     """Handles first class edit
 
-    Performs check whether object received first class edit (ordinary edit
+    Performs check whether object received first class edit (ordinary edit)
     that should transition object to PROGRESS_STATE from either: START_STATE
-    or one of END_STATES.
+    or one of END_STATES and sets obj._need_status_reset to True if the state
+    transition is needed.
 
     Args:
       model: (db.Model class) Class from which to read FIRST_CLASS_EDIT
@@ -122,10 +125,25 @@ class AutoStatusChangable(object):
       method: (string) HTTP method used that triggered signal
     """
 
-    # pylint: disable=unused-argument,unused-variable
+    # pylint: disable=unused-argument,protected-access
 
     if obj.status in model.FIRST_CLASS_EDIT:
-      cls.adjust_status(model, obj)
+      obj._need_status_reset = True
+
+  @classmethod
+  def adjust_status_before_flush(cls, session, flush_context, instances):
+    """Reset status of AutoStatusChangable objects with _need_status_reset.
+
+    Is registered to listen for 'before_flush' events on a later stage.
+    """
+
+    # pylint: disable=unused-argument
+
+    for obj in session.identity_map.values():
+      if (isinstance(obj, AutoStatusChangable) and
+              getattr(obj, '_need_status_reset', False)):
+        cls.adjust_status(type(obj), obj)
+        delattr(obj, '_need_status_reset')
 
   @classmethod
   def handle_person_edit(cls, model, obj, rel, method):
@@ -261,3 +279,6 @@ class AutoStatusChangable(object):
 
       if obj.documentable.type == model.__name__:
         cls.handle_first_class_edit(model, obj.documentable)
+
+event.listen(Session, 'before_flush',
+             AutoStatusChangable.adjust_status_before_flush)
