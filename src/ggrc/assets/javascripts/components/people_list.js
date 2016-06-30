@@ -11,7 +11,59 @@
     scope: {
       editable: '@',
       deferred: '@',
-      validate: '@'
+      validate: '@',
+      /*
+       * Checks whether there are any conflicts between assignable roles.
+       *
+       * If `conflicts` is specified on an object with assignable mixin,
+       * bind to the role's mapping and on any change to it check if any
+       * user is holding roles that are in violation of the rules.
+       *
+       * @prop {Array of Arrays} conflicts - Array of an array containing
+       *  conflicting roles that no single user should hold at the same time.
+       * @prop {Array of objects} assignable_list - A list of available roles
+       *  with mappins to those roles.
+       */
+      _checkConflict: function () {
+        var conflicts = this.instance.class.conflicts;
+        var assignableList = this.instance.class.assignable_list;
+        var bindings = {};
+
+        if (_.isUndefined(conflicts)) {
+          return;
+        }
+
+        function checkConflicts() {
+          // Verify that there is not intersections between role bindings and
+          // show warning if it exists.
+          _.each(conflicts, function (conflictRoles) {
+            var rolePeople = _.map(conflictRoles, function (role) {
+              return _.map(bindings[role].list, function (person) {
+                return person.instance.id;
+              });
+            });
+            var hasConflicts = !_.isEmpty(
+                _.intersection.apply(null, rolePeople));
+            this.instance.attr('roleConflicts', hasConflicts);
+          }.bind(this));
+        }
+
+        // Set up listening to change event on role bindings.
+        _.each(conflicts, function (conflictRoles) {
+          _.each(conflictRoles, function (role) {
+            var roleMapping = _.find(
+              assignableList, _.matchesProperty('type', role)).mapping;
+            var roleBinding = this.instance.get_binding(roleMapping);
+            bindings[role] = roleBinding;
+            roleBinding.list.bind('change', checkConflicts.bind(this));
+          }.bind(this));
+        }.bind(this));
+      }
+    },
+    events: {
+      inserted: function () {
+        this.scope._checkConflict();
+      }
     }
   });
 

@@ -5,6 +5,16 @@
 
 <h6 class="people-list__label">People</h6>
 <div class="side-content">
+  {{#instance.roleConflicts}}
+    <div class="centered">
+      <div class="alert alert-error">
+        <p>
+          Assignee and Verifier cannot be the same person!
+        </p>
+      </div>
+    </div>
+  {{/instance.roleConflicts}}
+
   <ul class="label-list">
     {{#instance.class.assignable_list}}
       {{#if required}}
