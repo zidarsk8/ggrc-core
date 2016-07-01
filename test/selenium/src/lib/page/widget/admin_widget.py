@@ -27,7 +27,7 @@ class People(Widget):
 
 
 class Roles(Widget):
-  """Model for the widget admin rols on admin dashboard"""
+  """Model for the widget admin roles on admin dashboard"""
   _locator = locator.WidgetAdminRoles
   URL = environment.APP_URL \
       + url.ADMIN_DASHBOARD \
@@ -36,7 +36,8 @@ class Roles(Widget):
   def __init__(self, driver):
     super(Roles, self).__init__(driver)
     self.role_editor = base.Label(driver, self._locator.ROLE_EDITOR)
-    self.role_grc_admin = base.Label(driver, self._locator.ROLE_GRC_ADMIN)
+    self.role_administrator = base.Label(
+        driver, self._locator.ROLE_ADMINISTRATOR)
     self.role_program_editor = base.Label(
         driver, self._locator.ROLE_PROGRAM_EDITOR)
     self.role_program_owner = base.Label(
@@ -50,7 +51,8 @@ class Roles(Widget):
         driver, self._locator.ROLE_WORKFLOW_OWNER)
 
     self.scope_editor = base.Label(driver, self._locator.SCOPE_EDITOR)
-    self.scope_grc_admin = base.Label(driver, self._locator.SCOPE_GRC_ADMIN)
+    self.scope_administrator = base.Label(
+        driver, self._locator.SCOPE_ADMINISTRATOR)
     self.scope_program_editor = base.Label(
         driver, self._locator.SCOPE_PROGRAM_EDITOR)
     self.scope_program_owner = base.Label(

@@ -76,7 +76,7 @@ class TestCustomAttributeImportExport(TestCase):
       self.generator.generate_person({
           "name": email.split("@")[0].title(),
           "email": email,
-      }, "gGRC Admin")
+      }, "Administrator")
 
   def test_product_ca_import(self):
     """Test import of product with all custom attributes.

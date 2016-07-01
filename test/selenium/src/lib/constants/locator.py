@@ -706,10 +706,11 @@ class WidgetAdminRoles(object):
   class __metaclass__(type):
     def __init__(self, *args):
       items = (
-          "EDITOR", "GRC_ADMIN", "PROGRAM_EDITOR", "PROGRAM_OWNER",
-          "PROGRAM_READER", "READER", "WORKFLOW_MEMBER", "WORKFLOW_OWNER")
+          "ADMINISTRATOR", "CREATOR", "EDITOR", "PROGRAM_EDITOR",
+          "PROGRAM_OWNER", "PROGRAM_READER", "READER", "WORKFLOW_MEMBER",
+          "WORKFLOW_OWNER")
 
-      for id_, name in enumerate(items, start=2):
+      for id_, name in enumerate(items, start=1):
         setattr(self, attribute.ROLE + name, self._Locator.get_role(id_))
         setattr(self, attribute.SCOPE + name, self._Locator.get_scope(id_))
 

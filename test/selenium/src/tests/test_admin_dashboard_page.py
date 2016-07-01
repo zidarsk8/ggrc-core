@@ -25,7 +25,8 @@ class TestAdminDashboardPage(base.Test):
         .select_roles()
 
     assert admin_roles_widget.role_editor.text == self._element.EDITOR
-    assert admin_roles_widget.role_grc_admin.text == self._element.GRC_ADMIN
+    assert admin_roles_widget.role_administrator.text == \
+        self._element.ADMINISTRATOR
     assert admin_roles_widget.role_program_editor.text == \
         self._element.PROGRAM_EDITOR
     assert admin_roles_widget.role_program_owner.text == \
@@ -39,7 +40,8 @@ class TestAdminDashboardPage(base.Test):
         self._element.WORKFLOW_OWNER
 
     assert admin_roles_widget.scope_editor.text == self._element.SCOPE_SYSTEM
-    assert admin_roles_widget.scope_grc_admin.text == self._element.SCOPE_ADMIN
+    assert admin_roles_widget.scope_administrator.text == \
+        self._element.SCOPE_ADMINISTRATOR
     assert admin_roles_widget.scope_program_editor.text == \
         self._element.SCOPE_PRIVATE_PROGRAM
     assert admin_roles_widget.scope_program_owner.text == \

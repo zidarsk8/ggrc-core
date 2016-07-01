@@ -22,7 +22,7 @@ class TestRecurringCycleNotifications(TestCase):
     self.object_generator = ObjectGenerator()
 
     _, self.assignee = self.object_generator.generate_person(
-        user_role="gGRC Admin")
+        user_role="Administrator")
 
     self.create_test_cases()
 

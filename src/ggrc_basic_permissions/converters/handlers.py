@@ -144,13 +144,14 @@ class AuditAuditorColumnHandler(ObjectRoleColumnHandler):
 class UserRoleColumnHandler(UserColumnHandler):
 
   _role_map = {
-      "admin": "ggrc admin"
+      "admin": "administrator",
+      "ggrc admin": "administrator",
   }
 
   _allowed_roles = [
       "Reader",
       "Editor",
-      "gGRC Admin",
+      "Administrator",
   ]
 
   def parse_item(self):
@@ -177,7 +178,7 @@ class UserRoleColumnHandler(UserColumnHandler):
       return
     self.remove_current_roles()
     context = None
-    if self.value.name == "gGRC Admin":
+    if self.value.name == "Administrator":
       context = Context.query.filter_by(name="System Administration").first()
     user_role = UserRole(
         role=self.value,

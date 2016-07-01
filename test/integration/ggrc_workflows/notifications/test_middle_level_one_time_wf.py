@@ -28,7 +28,7 @@ class TestOneTimeWorkflowNotification(TestCase):
 
     self.random_objects = self.object_generator.generate_random_objects()
     self.random_people = [
-        self.object_generator.generate_person(user_role="gGRC Admin")[1]
+        self.object_generator.generate_person(user_role="Administrator")[1]
         for _ in range(5)]
     self.create_test_cases()
 
@@ -146,14 +146,14 @@ class TestOneTimeWorkflowNotification(TestCase):
   def create_users(self):
     _, self.owner1 = self.object_generator.generate_person(
         # data={"name": "User1 Owner1", "email": "user1.owner1@gmail.com"},
-        user_role="gGRC Admin")
+        user_role="Administrator")
     _, self.tgassignee1 = self.object_generator.generate_person(
         # data={"name": "User2 TGassignee1",
         #       "email": "user2.tgassignee1@gmail.com"},
-        user_role="gGRC Admin")
+        user_role="Administrator")
     _, self.member1 = self.object_generator.generate_person(
         # data={"name": "User3 Member1", "email": "user3.member1@gmail.com"},
-        user_role="gGRC Admin")
+        user_role="Administrator")
     _, self.member2 = self.object_generator.generate_person(
         # data={"name": "User4 Member2", "email": "user4.member2@gmail.com"},
-        user_role="gGRC Admin")
+        user_role="Administrator")
