@@ -99,15 +99,17 @@ class AssessmentTemplate(assessment.AuditRelationship, Slugged, Base,
           "filter_by": "_nop_filter",
           "description": (
               "List of custom attributes for the assessment template\n"
-              "One attribute per line. fields are separated by commas ','\n"
+              "One attribute per line. fields are separated by commas ','\n\n"
               "<attribute type>, <attribute name>, [<attribute value1>, "
-              "<attribute value2>, ...]\n"
+              "<attribute value2>, ...]\n\n"
               "Valid attribute types: Text, Rich Text, Date, Checkbox, Person,"
               "Dropdown.\n"
-              "attribute name: any single line string without commas. Leading "
+              "attribute name: Any single line string without commas. Leading "
               "and trailing spaces are ignored.\n"
-              "list of attribute values: comma separetd list, only used if "
-              "attribute type is 'Dropdown'.\n"
+              "list of attribute values: Comma separated list, only used if "
+              "attribute type is 'Dropdown'. Prepend '(a)' if the value has a "
+              "mandatory attachment and/or (c) if the value requires a "
+              "mandatory comment.\n\n"
               "Limitations: Dropdown values can not start with either '(a)' or"
               "'(c)' and attribute names can not contain commas ','."
           ),
