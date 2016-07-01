@@ -27,11 +27,9 @@
          * Temporary solution and after updated the backend it need to be deleted
          * Start deprecated block
          */
-        if (cachedCADefinitions[i].id === params.id) {
-          params.mandatory = cachedCADefinitions[i].mandatory;
-          params.multi_choice_mandatory = cachedCADefinitions[i]
+        params.mandatory = cachedCADefinitions[attr.id].mandatory;
+        params.multi_choice_mandatory = cachedCADefinitions[attr.id]
             .multi_choice_mandatory;
-        }
         /**
          * End deprecated block
          */
@@ -47,10 +45,7 @@
             return definition.save();
           });
         }
-        return new CADefinition(params).save().then(function (definition) {
-          instance.custom_attribute_definitions[i] = definition;
-          instance.refresh();
-        });
+        return new CADefinition(params).save();
       });
       instance.delay_resolving_save_until($.when(attrDfd));
     },
@@ -74,12 +69,9 @@
             definition_id: instance.id,
             definition_type: 'assessment_template',
             context: instance.context
-          }, attr.serialize())).save().then(function (attributeDefinition) {
-            instance.custom_attribute_definitions[i] = attributeDefinition;
-          });
+          }, attr.serialize())).save();
         });
         instance.delay_resolving_save_until($.when(auditDfd, attrDfd));
-        instance.refresh();
       }.bind(this));
     },
     '{CMS.Models.Issue} created': function (model, ev, instance) {
