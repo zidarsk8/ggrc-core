@@ -6,7 +6,6 @@
 These should be used on default verifiers and default assessors.
 """
 
-from flask import current_app
 from flask import json
 
 from ggrc.models import AssessmentTemplate
@@ -51,15 +50,10 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
 
   def parse_item(self):
     """Parse values for default assessors."""
-
-    current_app.logger.debug("%s parse item: %s", self.key, self.raw_value)
-
     if "@" in self.raw_value:
       return self._parse_email_values()
     else:
       return self._parse_label_values()
-
-    current_app.logger.debug("%s parsed value: %s", self.key, self.value)
 
   def _get_inital_people(self):
     """Get the default_people dict from current object."""
@@ -80,7 +74,6 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     code is merged into the develop branch. The joining of default_assessors
     and default_verifiers should be done by pre_commit_checks for imports.
     """
-    current_app.logger.debug("%s set obj attr: %s", self.key, self.value)
     if not self.value or self.row_converter.ignore:
       return
 

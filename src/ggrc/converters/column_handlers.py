@@ -18,7 +18,7 @@ from ggrc.extensions import get_extension_modules
 GGRC_COLUMN_HANDLERS = {
     "assertions": handlers.ControlAssertionColumnHandler,
     "assessment_object": assessment_object.AssessmentObjectColumnHandler,
-    "assessment_template": assessment_template.TemplateColumnHandler,
+    "assessment_template": assessment_template.AssessmentTemplateColumnHandler,
     "assignee": handlers.UserColumnHandler,
     "audit": handlers.AuditColumnHandler,
     "categories": handlers.ControlCategoryColumnHandler,

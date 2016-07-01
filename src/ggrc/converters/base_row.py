@@ -97,7 +97,7 @@ class RowConverter(object):
       self.handle_csv_row_data(field_list)
 
   def chect_mandatory_fields(self):
-    """Check if new object contain all mandatory columns."""
+    """Check if the new object contains all mandatory columns."""
     if not self.is_new or self.is_delete:
       return
     headers = self.block_converter.object_headers
@@ -122,10 +122,11 @@ class RowConverter(object):
     self.ignore = ignore
 
   def get_or_generate_object(self, attr_name):
-    """ fetch existing object if possible or create and return a new one
+    """Fetch an existing object if possible or create and return a new one.
 
-    Person object is the only exception here since it does not have a slug
-    field."""
+    Note: Person object is the only exception here since it does not have a
+    slug field.
+    """
     value = self.get_value(attr_name)
     new_objects = self.block_converter.converter.new_objects[self.object_class]
     if value in new_objects:
@@ -149,7 +150,7 @@ class RowConverter(object):
     return obj
 
   def setup_secondary_objects(self, slugs_dict):
-    """Import secondary object.
+    """Import secondary objects.
 
     This function creates and stores all secondary object such as relationships
     and any linked object that need the original object to be saved before they

@@ -11,7 +11,7 @@ from ggrc import models
 from ggrc.converters.handlers import handlers
 
 
-class TemplateColumnHandler(handlers.MappingColumnHandler):
+class AssessmentTemplateColumnHandler(handlers.MappingColumnHandler):
 
   def __init__(self, row_converter, key, **options):
     self.key = key
