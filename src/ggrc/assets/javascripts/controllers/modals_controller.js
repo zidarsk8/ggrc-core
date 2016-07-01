@@ -898,11 +898,10 @@ can.Control('GGRC.Controllers.Modals', {
      * Temporary solution and after updated the backend it need to be deleted
      * Start deprecated block
      */
-    instance._cachedCADefinitions = [];
+    instance._cachedCADefinitions = {};
 
-    _.forEach(instance.custom_attribute_definitions, function (attr, i) {
-      instance._cachedCADefinitions[i] = {
-        id: attr.id,
+    _.forEach(instance.custom_attribute_definitions, function (attr) {
+      instance._cachedCADefinitions[attr.id] = {
         multi_choice_mandatory: attr.multi_choice_mandatory || '',
         mandatory: !!attr.mandatory
       };
