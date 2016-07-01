@@ -5,21 +5,22 @@
     Maintained By: anze@reciprocitylabs.com
 */
 
-can.Control("CMS.Controllers.InfoPin", {
+can.Control('CMS.Controllers.InfoPin', {
   defaults: {
-    view: GGRC.mustache_path + "/base_objects/info.mustache"
+    view: GGRC.mustache_path + '/base_objects/info.mustache'
   }
 }, {
   init: function (el, options) {
     this.element.height(0);
   },
   findView: function (instance) {
-    var view = instance.class.table_plural + "/info";
+    var view = instance.class.table_plural + '/info';
 
     if (instance instanceof CMS.Models.Person) {
-      view = GGRC.mustache_path + "/ggrc_basic_permissions/people_roles/info.mustache";
+      view = GGRC.mustache_path +
+        '/ggrc_basic_permissions/people_roles/info.mustache';
     } else if (view in GGRC.Templates) {
-      view = GGRC.mustache_path + "/" + view + ".mustache";
+      view = GGRC.mustache_path + '/' + view + '.mustache';
     } else {
       view = this.options.view;
     }
@@ -29,51 +30,60 @@ can.Control("CMS.Controllers.InfoPin", {
     return view;
   },
   findOptions: function (el) {
-    var tree_node = el.closest(".cms_controllers_tree_view_node").control();
-    return tree_node.options;
+    var treeNode = el.closest('.cms_controllers_tree_view_node').control();
+    return treeNode.options;
   },
-  loadChildTrees: function() {
-    var child_tree_dfds = [],
-        that = this;
+  loadChildTrees: function () {
+    var childTreeDfds = [];
+    var that = this;
+    var $el;
+    var childTreeControl;
 
-    this.element.find("." + CMS.Controllers.TreeView._fullName).each(function (_, el) {
-      var $el = $(el),
-          child_tree_control;
+    this.element.find('.' + CMS.Controllers.TreeView._fullName)
+      .each(function (_, el) {
+        $el = $(el);
 
-      //  Ensure this targets only direct child trees, not sub-tree trees
-      if ($el.closest("." + that.constructor._fullName).is(that.element)) {
-        child_tree_control = $el.control();
-        if (child_tree_control)
-          child_tree_dfds.push(child_tree_control.display());
-      }
-    });
+        //  Ensure this targets only direct child trees, not sub-tree trees
+        if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
+          childTreeControl = $el.control();
+          if (childTreeControl)
+            childTreeDfds.push(childTreeControl.display());
+        }
+      });
   },
   hideInstance: function () {
     this.element.stop(true);
-    this.element.height(0).html("");
-    $(window).trigger("resize");
+    this.element.height(0).html('');
+    $(window).trigger('resize');
   },
   unsetInstance: function () {
     this.element.stop(true);
     this.element.animate({
-        height: 0
-      }, {
-        duation: 800,
-        complete: function () {
-          this.element.html("");
-          $(".cms_controllers_tree_view_node").removeClass("active");
-          $(window).trigger("resize");
-        }.bind(this)
-      });
+      height: 0
+    }, {
+      duation: 800,
+      complete: function () {
+        this.element.html('');
+        $('.cms_controllers_tree_view_node').removeClass('active');
+        $(window).trigger('resize');
+      }.bind(this)
+    });
   },
   setInstance: function (instance, el) {
-    var options = this.findOptions(el),
-        view = this.findView(instance),
-        panelHeight = $(window).height() / 3;
+    var options = this.findOptions(el);
+    var view = this.findView(instance);
+    var panelHeight = $(window).height() / 3;
+    var confirmEdit = instance.class.confirmEditModal ?
+      instance.class.confirmEditModal : {};
+
+    if (!_.isEmpty(confirmEdit)) {
+      confirmEdit.confirm = this.confirmEdit;
+    }
 
     this.element.html(can.view(view, {
       instance: instance,
       model: instance.class,
+      confirmEdit: confirmEdit,
       is_info_pin: true,
       options: options,
       result: options.result,
@@ -89,7 +99,7 @@ can.Control("CMS.Controllers.InfoPin", {
         height: panelHeight
       }, {
         duration: 800,
-        easing: "easeOutExpo",
+        easing: 'easeOutExpo',
         complete: function () {
           this.ensureElementVisible(el);
         }.bind(this)
@@ -99,63 +109,77 @@ can.Control("CMS.Controllers.InfoPin", {
     }
   },
   ensureElementVisible: function (el) {
-    $(window).trigger("resize");
-    var $objectArea = $(".object-area"),
-        $header = $(".tree-header:visible"),
-        $filter = $(".tree-filter:visible"),
-        elTop = el.offset().top,
-        elBottom = elTop + el.height(),
-        headerTop = $header.length ? $header.offset().top : 0,
-        headerBottom = headerTop + $header.height(),
-        infoTop = this.element.offset().top;
+    var $objectArea = $('.object-area');
+    var $header = $('.tree-header:visible');
+    var $filter = $('.tree-filter:visible');
+    var elTop = el.offset().top;
+    var elBottom = elTop + el.height();
+    var headerTop = $header.length ? $header.offset().top : 0;
+    var headerBottom = headerTop + $header.height();
+    var infoTop = this.element.offset().top;
+
+    $(window).trigger('resize');
 
     if (elTop < headerBottom || elBottom > infoTop) {
       el[0].scrollIntoView(false);
       if (elTop < headerBottom) {
         el[0].scrollIntoView(true);
-        $objectArea.scrollTop($objectArea.scrollTop() - $header.height() - $filter.height());
+        $objectArea.scrollTop($objectArea.scrollTop() - $header.height() -
+          $filter.height());
       } else {
         el[0].scrollIntoView(false);
       }
     }
   },
-  ".pin-action a click": function (el) {
-    var $win = $(window),
-        win_height = $win.height(),
-        options = {
-          duration: 800,
-          easing: "easeOutExpo"
-        },
-        target_height =  {
-          min: 75,
-          normal: (win_height / 3),
-          max: (win_height * 3 / 4)
-        },
-        $info = this.element.find(".info"),
-        type = el.data("size"),
-        size = target_height[type];
+  confirmEdit: function (instance, modalDetails) {
+    var confirmDfd = $.Deferred();
+    var renderer = can.view.mustache(modalDetails.description);
+    GGRC.Controllers.Modals.confirm({
+      modal_description: renderer(instance).textContent,
+      modal_confirm: modalDetails.button,
+      modal_title: modalDetails.title,
+      button_view: GGRC.mustache_path + '/quick_form/confirm_buttons.mustache'
+    }, confirmDfd.resolve);
+    return confirmDfd;
+  },
+  '.pin-action a click': function (el) {
+    var $win = $(window);
+    var winHeight = $win.height();
+    var options = {
+      duration: 800,
+      easing: 'easeOutExpo'
+    };
+    var targetHeight = {
+      min: 75,
+      normal: (winHeight / 3),
+      max: (winHeight * 3 / 4)
+    };
+    var $info = this.element.find('.info');
+    var type = el.data('size');
+    var size = targetHeight[type];
 
-    if (type === "deselect") {
+    if (type === 'deselect') {
       // TODO: Make some direct communication between the components
-      //       and make sure only one widget has "widget-active" class
-      el.find("[rel=tooltip]").data("tooltip").hide();
-      $(".widget-area .widget:visible").find(".cms_controllers_tree_view").control().deselect();
+      //       and make sure only one widget has 'widget-active' class
+      el.find('[rel=tooltip]').data('tooltip').hide();
+      $('.widget-area .widget:visible').find('.cms_controllers_tree_view')
+        .control().deselect();
       this.unsetInstance();
       return;
     }
-    this.element.find(".pin-action i").css({"opacity": 0.25});
+    this.element.find('.pin-action i').css({opacity: 0.25});
 
     if (size < $info.height()) {
       options.start = function () {
-        $win.trigger("resize", size);
+        $win.trigger('resize', size);
       };
     } else {
       options.complete = function () {
-        $win.trigger("resize");
+        $win.trigger('resize');
       };
     }
 
     this.element.animate({height: size}, options);
-    el.find("i").css({"opacity": 1});
+    el.find('i').css({opacity: 1});
   }
 });

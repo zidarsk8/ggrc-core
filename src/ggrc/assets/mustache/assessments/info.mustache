@@ -47,7 +47,12 @@
           </div>
 
           {{{render '/static/mustache/base_objects/urls.mustache' is_program=true instance=instance}}}
-          {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+
+          {{#if_in instance.status "Completed,Verified"}}
+            {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance confirmEdit=confirmEdit}}}
+          {{else}}
+            {{{render '/static/mustache/custom_attributes/info.mustache' instance=instance}}}
+          {{/if_in}}
 
           <div class="row-fluid wrap-row" {{#instance}}{{data 'model'}}{{/instance}} data-force-refresh="true"
             data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
