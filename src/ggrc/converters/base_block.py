@@ -9,6 +9,7 @@ from collections import Counter
 from flask import current_app
 
 from ggrc import db
+from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters.base_row import RowConverter
@@ -93,6 +94,14 @@ class BlockConverter(object):
     self.unique_counts = self.get_unique_counts_dict(self.object_class)
     self.name = self.object_class._inflector.human_singular.title()
     self.organize_fields(options.get("fields", []))
+    self.ca_definitions_cache = self._create_ca_definitions_cache()
+
+  def _create_ca_definitions_cache(self):
+    cad = models.CustomAttributeDefinition
+    definition_type = self.object_class._inflector.table_singular
+    defs = cad.eager_query().filter(cad.definition_type == definition_type)
+    return {(d.definition_id, d.title):d for d in defs}
+
 
   def check_for_duplicate_columns(self, raw_headers):
     counter = Counter(raw_headers)

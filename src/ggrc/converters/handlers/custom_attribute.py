@@ -84,16 +84,6 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     db.session.add(self.value)
     self.dry_run = True
 
-  def get_ca_definition(self):
-    """Get custom attribute definition."""
-    cad = models.CustomAttributeDefinition
-    definition_type = self.row_converter.obj._inflector.table_singular
-    return cad.eager_query().filter(and_(
-        cad.definition_type == definition_type,
-        cad.definition_id.is_(None),
-        cad.title == self.display_name,
-    )).first()
-
   def get_date_value(self):
     """Get date value from input string date."""
     if not self.mandatory and self.raw_value == "":
@@ -160,6 +150,11 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       self.add_error(errors.WRONG_VALUE, column_name=self.display_name)
     return value
 
+  def get_ca_definition(self):
+    """Get custom attribute definition."""
+    return self.row_converter.block_converter.ca_definitions_cache.get(
+      (self.row_converter.obj.id, self.display_name))
+
 
 class ObjectCaColumnHandler(CustomAttributeColumHandler):
 
@@ -179,10 +174,5 @@ class ObjectCaColumnHandler(CustomAttributeColumHandler):
     """Get custom attribute definition for a specific object."""
     if self.row_converter.obj.id is None:
       return None
-    cad = models.CustomAttributeDefinition
-    definition_type = self.row_converter.obj._inflector.table_singular
-    return cad.eager_query().filter(and_(
-        cad.definition_type == definition_type,
-        cad.definition_id == self.row_converter.obj.id,
-        cad.title == self.display_name,
-    )).first()
+    return self.row_converter.block_converter.ca_definitions_cache.get(
+      (self.row_converter.obj.id, self.display_name))
