@@ -422,17 +422,8 @@ class MappingColumnHandler(ColumnHandler):
   def get_value(self):
     if self.unmap or not self.mapping_object:
       return ""
-    related_slugs = []
-    related_ids = RelationshipHelper.get_ids_related_to(
-        self.mapping_object.__name__,
-        self.row_converter.object_class.__name__,
-        [self.row_converter.obj.id])
-    if related_ids:
-      related_objects = self.mapping_object.query.filter(
-          self.mapping_object.id.in_(related_ids))
-      related_slugs = (getattr(o, "slug", getattr(o, "email", None))
-                       for o in related_objects)
-      related_slugs = [slug for slug in related_slugs if slug is not None]
+    cache = self.row_converter.block_converter.get_mapping_cache()
+    related_slugs = cache[self.row_converter.obj.id][self.mapping_object.__name__]
     return "\n".join(related_slugs)
 
   def set_value(self):

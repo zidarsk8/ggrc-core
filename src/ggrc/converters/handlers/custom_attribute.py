@@ -7,8 +7,6 @@
 
 from dateutil.parser import parse
 
-from sqlalchemy import and_
-
 from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
@@ -153,7 +151,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
   def get_ca_definition(self):
     """Get custom attribute definition."""
     return self.row_converter.block_converter.ca_definitions_cache.get(
-      (self.row_converter.obj.id, self.display_name))
+        (self.row_converter.obj.id, self.display_name))
 
 
 class ObjectCaColumnHandler(CustomAttributeColumHandler):
@@ -175,4 +173,4 @@ class ObjectCaColumnHandler(CustomAttributeColumHandler):
     if self.row_converter.obj.id is None:
       return None
     return self.row_converter.block_converter.ca_definitions_cache.get(
-      (self.row_converter.obj.id, self.display_name))
+        (self.row_converter.obj.id, self.display_name))
