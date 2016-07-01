@@ -52,11 +52,11 @@ OWNER_MISSING = (u"Line {line}: {column_name} field does not contain a valid "
 WRONG_MULTI_VALUE = (u"Line {line}: {column_name} contains invalid line. The"
                      u" value '{value}' will be ignored.")
 
-WRONG_VALUE = (u"Line {line}: {column_name} contains invalid data. The value"
-               u" will be ignored.")
+WRONG_VALUE = (u"Line {line}: Field '{column_name}' contains invalid data. The"
+               u" value will be ignored.")
 
-WRONG_VALUE_ERROR = (u"Line {line}: {column_name} contains invalid data. The"
-                     u" line will be ignored.")
+WRONG_VALUE_ERROR = (u"Line {line}: Field '{column_name}' contains invalid "
+                     u"data. The line will be ignored.")
 
 WRONG_REQUIRED_VALUE = (u"Line {line}: Required field {column_name} contains"
                         u" invalid data '{value}'. The default value will be"
