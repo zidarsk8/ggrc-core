@@ -280,5 +280,8 @@ class AutoStatusChangable(object):
       if obj.documentable.type == model.__name__:
         cls.handle_first_class_edit(model, obj.documentable)
 
+# pylint: disable=fixme
+# TODO: find a way to listen for updates only for classes that use
+# AutoStatusChangable, not for every flush event for every session
 event.listen(Session, 'before_flush',
              AutoStatusChangable.adjust_status_before_flush)
