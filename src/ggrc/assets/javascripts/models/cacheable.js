@@ -401,32 +401,19 @@ can.Model("can.Model.Cacheable", {
       return $.when.apply($, refresh_dfds)
       .then(function() {
         can.each(obj._pending_joins, function(pj) {
-          var inst
-          , binding = obj.get_binding(pj.through)
-          , model = CMS.Models[binding.loader.model_name] || GGRC.Models[binding.loader.model_name];
-          // changed means that mark_for_change was called
-          var changed = pj.opts && pj.opts.change;
+          var inst;
+          var binding = obj.get_binding(pj.through);
+          var model = (CMS.Models[binding.loader.model_name] ||
+                       GGRC.Models[binding.loader.model_name]);
           if(pj.how === "add") {
             //Don't re-add -- if the object is already mapped (could be direct or through a proxy)
             // move on to the next one
-            // Note: if it is marked as 'change' then you must add it regardless if it exists because it will
-            // be deleted.
-            if(!changed && ~can.inArray(pj.what, can.map(binding.list, function(bo) { return bo.instance; }))
-               || (binding.loader.option_attr
-                  && ~can.inArray(
-                    pj.what
-                    , can.map(
-                      binding.list
-                      , function(join_obj) { return join_obj.instance[binding.loader.option_attr]; }
-                    )
-                  )
-            )) {
+            if(_.includes(_.map(binding.list, 'instance'), pj.what) ||
+               (binding.loader.option_attr &&
+                _.includes(_.map(binding.list, function (join_obj) {
+                  return join_obj.instance[binding.loader.option_attr];
+                }), pj.what))) {
               return;
-            }
-            // make sure the `changed` flag gets posted to the backend
-            // as it matters
-            if (changed) {
-              pj.attr('extra.changed', true);
             }
             inst = pj.what instanceof model
               ? pj.what
@@ -445,20 +432,30 @@ can.Model("can.Model.Cacheable", {
                 if(pj.extra) {
                   inst.attr(pj.extra);
                 }
-                return inst.save();
+                 return inst.save();
               })
             );
+          } else if (pj.how === 'update') {
+            binding.list.forEach(function (bound_obj) {
+              if (bound_obj.instance === pj.what ||
+                  bound_obj.instance[binding.loader.option_attr] === pj.what) {
+                bound_obj.get_mappings().forEach(function (mapping) {
+                  dfds.push(mapping.refresh().then(function () {
+                    if (pj.extra) {
+                      mapping.attr(pj.extra);
+                    }
+                    return mapping.save();
+                  }));
+                });
+              }
+            });
           } else if(pj.how === "remove") {
 
             can.map(binding.list, function(bound_obj) {
               if(bound_obj.instance === pj.what || bound_obj.instance[binding.loader.option_attr] === pj.what) {
                 can.each(bound_obj.get_mappings(), function(mapping) {
                   dfds.push(mapping.refresh().then(function() {
-                    if (changed) {
-                      mapping.destroyed();
-                    } else {
-                      mapping.destroy();
-                    }
+                    mapping.destroy();
                   }));
                 });
               }
@@ -1106,11 +1103,21 @@ can.Model("can.Model.Cacheable", {
     return dfd.promise();
   },
 
-  mark_for_change: function (join_attr, obj, extra_attrs) {
-    extra_attrs = extra_attrs || {};
-    var args = can.makeArray(arguments).concat({change: true});
-    this.mark_for_deletion.apply(this, args);
-    this.mark_for_addition.apply(this, args);
+  /**
+    * Set up a deferred join object update when this object is updated.
+    */
+  mark_for_update: function (join_attr, obj, extra_attrs, options) {
+    obj = obj.reify ? obj.reify() : obj;
+    extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
+
+    this.remove_duplicate_pending_joins(obj);
+    this._pending_joins.push({
+      how: 'update',
+      what: obj,
+      through: join_attr,
+      extra: extra_attrs,
+      opts: options
+    });
   },
 
 
@@ -1120,7 +1127,7 @@ can.Model("can.Model.Cacheable", {
   mark_for_deletion: function (join_attr, obj, extra_attrs, options) {
     obj = obj.reify ? obj.reify() : obj;
 
-    this.is_pending_join(obj);
+    this.remove_duplicate_pending_joins(obj);
     this._pending_joins.push({how: "remove", what: obj, through: join_attr, opts: options});
   },
 
@@ -1131,11 +1138,11 @@ can.Model("can.Model.Cacheable", {
     obj = obj.reify ? obj.reify() : obj;
     extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
 
-    this.is_pending_join(obj);
+    this.remove_duplicate_pending_joins(obj);
     this._pending_joins.push({how: "add", what: obj, through: join_attr, extra: extra_attrs, opts: options});
   },
 
-  is_pending_join: function (needle) {
+  remove_duplicate_pending_joins: function (obj) {
     var joins;
     var len;
     if (!this._pending_joins) {
@@ -1143,9 +1150,7 @@ can.Model("can.Model.Cacheable", {
     }
     len = this._pending_joins.length;
     joins = _.filter(this._pending_joins, function (val) {
-      var isNeedle = val.what === needle;
-      var isChanged = val.opts && val.opts.change;
-      return !(isNeedle && !isChanged);
+      return val.what !== obj;
     }.bind(this));
     if (len !== joins.length) {
       this.attr('_pending_joins').replace(joins);

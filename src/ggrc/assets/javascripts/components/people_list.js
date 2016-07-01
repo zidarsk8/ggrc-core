@@ -6,7 +6,7 @@
 */
 
 (function (can) {
-  can.Component.extend({
+  GGRC.Components('peopleList', {
     tag: 'people-list',
     template: can.view(GGRC.mustache_path +
       '/base_templates/people_list.mustache'),
@@ -17,7 +17,7 @@
     }
   });
 
-  can.Component.extend({
+  GGRC.Components('peopleGroup', {
     tag: 'people-group',
     template: can.view(GGRC.mustache_path +
       '/base_templates/people_group.mustache'),
@@ -59,36 +59,219 @@
         return this.attr('list_mapped');
       },
       /**
-        * Remove a person's role from current pending joins list
+        * Get the first (or only) pending join for a person
         *
-        * Removes the role that is stated in `this.type`
+        * @param {CMS.Models.Person} person - the person whose join to get
         *
-        * @param {Person} person - a person whose role should be removed
-        *
-        * @return {Array} - a new pending joins list
+        * @return {Object} - the pending join for the person if available
+        *                    or undefined
         */
-      remove_pending: function (person) {
-        var list = this.attr('list_pending');
-        var listPerson = _.find(list, findInList);
-        var personRoles = can.getObject('extra.attrs.AssigneeType',
-                                        listPerson)
-                             .split(',');
-        var type = this.type;
-        var index;
+      get_pending_operation: function (person) {
+        return _.find(this.get_pending(), function(join) {
+          return join.what === person;
+        });
+      },
+      /**
+        * Change pending joins list to add a role to a person
+        *
+        * If there is a pending 'add' or 'update', extends roles list in it.
+        * If there is a pending 'remove', cancels it and creates a new 'update'
+        * with the role.
+        * If there is no pending join and the person already has roles assigned,
+        * creates a new 'update' with extended roles list.
+        * If there is no pending join and the person has no roles assigned yet,
+        * creates a new 'add' with the role.
+        *
+        * @param {CMS.Models.Person} person - the person who gets the new role
+        * @param {String} role - the role that is added
+        */
+      deferred_add_role: function (person, role) {
+        var pendingOperation = this.get_pending_operation(person);
+        if (!pendingOperation) {
+          // no pending join for this person
+          this.get_roles(person, this.instance).then(function (result) {
+            var roles = result.roles;
 
-        function findInList(item) {
-          return item.what.type === 'Person' &&
-                   item.how === 'add' &&
-                   item.what.id === person.id;
+            if (roles.length) {
+              // the person already has roles assigned, create 'update'
+              this.add_or_replace_operation(
+                person,
+                {
+                  how: 'update',
+                  roles: _.union(roles, [role])
+                }
+              );
+            } else {
+              // the person was not yet assigned, create 'add'
+              this.add_or_replace_operation(
+                person,
+                {
+                  how: 'add',
+                  roles: [role]
+                }
+              );
+            }
+          }.bind(this));
+        } else if (pendingOperation.how === 'remove') {
+          // 'remove' pending for this person, cancel it and create 'update'
+          // with single role
+          this.add_or_replace_operation(
+            person,
+            {
+              how: 'update',
+              roles: [role]
+            }
+          );
+        } else if (pendingOperation.how === 'add' ||
+                   pendingOperation.how === 'update') {
+          // 'add' or 'update' pending, extend the roles list with the role
+          this.add_or_replace_operation(
+            person,
+            {
+              how: pendingOperation.how,
+              roles: _.union(this.parse_roles_list(pendingOperation), [role])
+            }
+          );
         }
-        if (personRoles.length > 1) {
-          listPerson.attr('extra.attrs.AssigneeType',
-                          _.without(personRoles, can.capitalize(type))
-                          .join(','));
-          return list;
+      },
+      /**
+        * Change pending joins list to remove a role from a person
+        *
+        * If there is a pending 'add' or 'update', cancels this role addition.
+        * If there is a pending 'remove', does nothing.
+        * If there is no pending join and the person has several roles assigned,
+        * creates a new 'update' with all stored roles except the role.
+        * If there is no pending join and the person has a single role assigned,
+        * creates a new 'remove'.
+        *
+        * @param {CMS.Model.Person} person - the person who loses the role
+        * @param {String} role - the role that is removed
+        */
+      deferred_remove_role: function (person, role) {
+        var pendingOperation = this.get_pending_operation(person);
+        var roles;
+
+        if (!pendingOperation) {
+          // no pending join for this person
+          this.get_roles(person, this.instance).then(function (result) {
+            var roles = result.roles;
+
+            roles = _.without(roles, role);
+            if (roles.length) {
+              // there are still roles remaining, create 'update'
+              this.add_or_replace_operation(
+                person,
+                {
+                  how: 'update',
+                  roles: roles
+                }
+              );
+            } else {
+              // there are no roles remaining, create 'remove'
+              this.add_or_replace_operation(
+                person,
+                {
+                  how: 'remove'
+                }
+              );
+            }
+          }.bind(this));
+        } else if (pendingOperation.how === 'remove') {
+          // no action required
+          return;
+        } else if (pendingOperation.how === 'add' ||
+                   pendingOperation.how === 'update') {
+          // 'add' or 'update' pending, cancel the role addition
+          roles = this.parse_roles_list(pendingOperation);
+          roles = _.without(roles, role);
+          if (roles.length) {
+            // update the roles list in the pending join
+            this.add_or_replace_operation(
+              person,
+              {
+                how: pendingOperation.how,
+                roles: roles
+              }
+            );
+          } else {
+            if (pendingOperation.how === 'add') {
+              // cancel the pending 'add'
+              this.add_or_replace_operation(
+                person,
+                null
+              );
+            } else if (pendingOperation.how === 'update') {
+              // replace the 'update' with 'remove'
+              this.add_or_replace_operation(
+                person,
+                {
+                  how: 'remove'
+                }
+              );
+            }
+          }
         }
-        index = _.findIndex(list, findInList);
-        return list.splice(index, 1);
+      },
+      /**
+        * Add a new pending join, remove all pending joins for same person
+        *
+        * @param {CMS.Model.Person} person - the person to be joined
+        * @param {Object} operation - a description of the new pending join;
+        * if operation is false-value, all pending joins would be removed,
+        * but none will be added.
+        * @param {String} operation.how - the type of the operation
+        * ('add', 'remove' or 'update')
+        * @param {String} operation.roles - the list of added/updated roles
+        */
+      add_or_replace_operation: function (person, operation) {
+        var roles;
+        if (!operation) {
+          // just remove all pending joins for person
+          this.instance.remove_duplicate_pending_joins(person);
+        } else {
+          // convert roles list to a string
+          roles = operation.roles.join(',');
+          if (operation.how === 'add') {
+            this.instance.mark_for_addition(
+              'related_objects_as_destination',
+              person,
+              {
+                attrs: {
+                  AssigneeType: roles
+                },
+                context: instance.context
+              }
+            );
+          } else if (operation.how === 'update') {
+            this.instance.mark_for_update(
+              'related_objects_as_destination',
+              person,
+              {
+                attrs: {
+                  AssigneeType: roles
+                }
+              }
+            );
+          } else if (operation.how === 'remove') {
+            this.instance.mark_for_deletion(
+              'related_objects_as_destination',
+              person
+            );
+          }
+        }
+      },
+      /**
+        * Get roles list from a pending join and split it into a list.
+        *
+        * Returns [] if no roles list exists.
+        *
+        * @param {Object} operation - a pending join object
+        *
+        * @returns {Array} - an array of roles
+        */
+      parse_roles_list: function (operation) {
+        var roles = _.exists(operation, 'extra.attrs.AssigneeType');
+        return roles ? roles.split(',') : [];
       },
       /**
         * Remove a role assignment from a person
@@ -121,86 +304,29 @@
         var roleToRemove = can.capitalize(this.attr('type'));
         var deferred = this.attr('deferred');
 
-        var listPending;
-        var currentAdd;
-        var currentRemove;
-        var currentAddRoles = [];
-
-        // manipulations with pending joins don't apply unless `deferred`
         if (deferred) {
-          listPending = _.filter(this.get_pending(), function (join) {
-            return join.what.type === 'Person' && join.what.id === person.id;
-          });
+          this.deferred_remove_role(person, roleToRemove);
+        } else {
+          this.get_roles(person, instance).then(function (result) {
+            var roles = result.roles;
+            var ids = result.relationshipsIds;
+            var relationship = result.relationship;
 
-          // get relevant addition/removal, if able
-          currentAdd = _.find(listPending, function (join) {
-            return join.how === 'add';
-          });
-          currentRemove = _.find(listPending, function (join) {
-            return join.how === 'remove';
-          });
+            roles = _.without(roles, roleToRemove);
 
-          if (_.isFunction(_.exists(currentAdd,
-                                    'extra.attrs.AssigneeType.split'))) {
-            currentAddRoles = currentAdd.extra.attrs.AssigneeType.split(',');
-          }
-        }
-
-        this.get_roles(person, instance).then(function (result) {
-          var roles = result.roles;
-          var ids = result.relationshipsIds;
-          var relationship = result.relationship;
-
-          if (!ids.length && deferred) {
-            return this.remove_pending(person);
-          }
-
-          if (currentRemove) {
-            // the old roles set was removed, only the added one remains
-            roles = currentAddRoles;
-          } else {
-            // both the old roles set and the new one apply
-            roles = _.union(roles, currentAddRoles);
-          }
-
-          roles = _.without(roles, roleToRemove);
-
-          if (deferred) {
-            el.closest('li').remove();
-            if (currentRemove ||
-                !_.find(result.roles, function (item) {
-                  return roleToRemove === item;
-                })) {
-              // the relationship has already been queued for removal ||
-              // the role to remove is only in the deferred value
-              this.remove_pending(person);
-            } else if (!roles.length) {
-              instance.mark_for_deletion(
-                'related_objects_as_destination',
-                person
-              );
+            if (roles.length) {
+              relationship.attrs.attr('AssigneeType', roles.join(','));
+              relationship.save();
             } else {
-              instance.mark_for_change(
-                'related_objects_as_destination',
-                person, {
-                  attrs: {
-                    AssigneeType: roles.join(',')
-                  }
-                }
-              );
+              relationship.destroy();
             }
-          } else if (roles.length) {
-            relationship.attrs.attr('AssigneeType', roles.join(','));
-            relationship.save();
-          } else {
-            relationship.destroy();
-          }
-        }.bind(this));
+          }.bind(this));
+        }
       },
       /**
         * Get saved roles list for a person
         *
-        * @param {Person} person - the person whose roles to get
+        * @param {CMS.Models.Person} person - the person whose roles to get
         * @param {Object} instance - the object to which the person is assigned
         *
         * @return {jQuery.Deferred} - a promise with the role list
@@ -260,7 +386,7 @@
           this.scope.attr('type'), !!this.scope.results.length);
       },
       updateResult: function () {
-        var type = this.scope.type;
+        var type = can.capitalize(this.scope.type);
         var mapped = _.map(this.scope.get_mapped(), function (item) {
           return item.instance;
         });
@@ -268,15 +394,22 @@
           return item.what.type === 'Person';
         });
         var added = _.filter(pending, function (item) {
-          var roles = can.getObject('extra.attrs', item);
-          return item.how === 'add' && (roles &&
-            _.contains(roles.AssigneeType.split(','), can.capitalize(type)));
-        });
+          // any person who has `type` in their `add` or `update` roles list
+          var roles = this.scope.parse_roles_list(item);
+          return (item.how === 'add' || item.how === 'update') &&
+            _.includes(roles, type);
+        }.bind(this));
         var removed = _.filter(pending, function (item) {
-          return item.how === 'remove' && _.find(mapped, function (map) {
+          // any person who was mapped and has `remove` join or has no `type`
+          // in their `update` roles list
+          var roles = this.scope.parse_roles_list(item);
+          var person_mapped = _.find(mapped, function (map) {
             return map.id === item.what.id;
           });
-        });
+          return person_mapped &&
+            (item.how === 'remove' ||
+             item.how === 'update' && !_.includes(roles, type));
+        }.bind(this));
 
         function getInstances(arr) {
           return _.map(arr, function (item) {
@@ -303,64 +436,10 @@
         var role = can.capitalize(this.scope.type);
         var instance = this.scope.attr('instance');
         var deferred = this.scope.attr('deferred');
-        var pending;
         var relationship;
 
-        var listPending = _.filter(this.scope.get_pending(), function (join) {
-          return join.what.type === 'Person' && join.what.id === person.id;
-        });
-
         if (deferred) {
-          pending = true;
-          if (listPending) {
-            // find a pending addition and update its attrs
-            _.each(listPending, function (join) {
-              var existing;
-              var roles;
-              if (join.how === 'add') {
-                existing = can.getObject(
-                  'extra.attrs.AssigneeType', join) || '';
-                roles = _.union(existing.split(','), [role]).join(',');
-                join.extra.attr('attrs.AssigneeType', roles);
-                pending = false;
-              }
-            });
-          }
-          // If user already has a role then we change relationshipattr else
-          // we add it.
-          if (pending) {
-            // no pending addition for this person
-            this.scope.get_roles(person, instance).then(function (result) {
-              var roles = result.roles || [];
-              var pendingRemoval = _.find(listPending, function (join) {
-                return join.how === 'remove';
-              });
-              if (roles.length && !pendingRemoval) {
-                // request an existing relationship update
-                roles.push(role);
-                instance.mark_for_change(
-                  'related_objects_as_destination',
-                  person, {
-                    attrs: {
-                      AssigneeType: roles.join(',')
-                    },
-                    context: instance.context
-                  }
-                );
-              } else {
-                // request a new relationship creation
-                instance.mark_for_addition(
-                  'related_objects_as_destination',
-                  person, {
-                    attrs: {
-                      AssigneeType: role
-                    },
-                    context: instance.context
-                  }
-                );
-              }
-            });
-          }
+          this.scope.deferred_add_role(person, role);
         } else {
           // create or modify a relationship without caching
           relationship = CMS.Models.Relationship.get_relationship(person,
