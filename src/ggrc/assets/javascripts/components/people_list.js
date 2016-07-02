@@ -239,7 +239,7 @@
                 attrs: {
                   AssigneeType: roles
                 },
-                context: instance.context
+                context: this.instance.context
               }
             );
           } else if (operation.how === 'update') {
