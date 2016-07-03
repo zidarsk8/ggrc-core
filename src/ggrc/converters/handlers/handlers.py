@@ -33,7 +33,6 @@ from ggrc.models import Request
 from ggrc.models import Standard
 from ggrc.models import all_models
 from ggrc.models.reflection import AttributeInfo
-from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.rbac import permissions
 
 
@@ -423,8 +422,8 @@ class MappingColumnHandler(ColumnHandler):
     if self.unmap or not self.mapping_object:
       return ""
     cache = self.row_converter.block_converter.get_mapping_cache()
-    related_slugs = cache[self.row_converter.obj.id][self.mapping_object.__name__]
-    return "\n".join(related_slugs)
+    slugs = cache[self.row_converter.obj.id][self.mapping_object.__name__]
+    return "\n".join(slugs)
 
   def set_value(self):
     pass
