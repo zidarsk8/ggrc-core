@@ -373,7 +373,7 @@ class MappingColumnHandler(ColumnHandler):
     """ Remove multiple spaces and new lines from text """
     class_ = self.mapping_object
     lines = set(self.raw_value.splitlines())
-    slugs = filter(unicode.strip, lines)  # noqa
+    slugs = [slug for slug in lines if slug.strip()]
     objects = []
     for slug in slugs:
       obj = class_.query.filter(class_.slug == slug).first()
