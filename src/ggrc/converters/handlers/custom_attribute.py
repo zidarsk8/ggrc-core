@@ -7,6 +7,8 @@
 
 from dateutil.parser import parse
 
+from sqlalchemy import and_
+
 from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
@@ -172,5 +174,12 @@ class ObjectCaColumnHandler(CustomAttributeColumHandler):
     """Get custom attribute definition for a specific object."""
     if self.row_converter.obj.id is None:
       return None
-    return self.row_converter.block_converter.ca_definitions_cache.get(
+    cad = models.CustomAttributeDefinition
+    definition = self.row_converter.block_converter.ca_definitions_cache.get(
         (self.row_converter.obj.id, self.display_name))
+    if not definition:
+      definition = cad.query.filter(and_(
+          cad.definition_id == self.row_converter.obj.id,
+          cad.title == self.display_name
+      )).first()
+    return definition
