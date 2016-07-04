@@ -41,14 +41,14 @@
         });
       },
       get_assignee_type: can.compute(function () {
-        // TODO: We prioritize order V > A > R
-        var types = {
-          related_verifiers: 'verifier',
-          related_assessors: 'assessor',
-          related_assignees: 'assignee',
-          related_requesters: 'requester',
-          related_creators: 'creator'
-        };
+        var types = new Map([
+          ['related_verifiers', 'verifier'],
+          ['related_assessors', 'assessor'],
+          ['related_assignees', 'assignee'],
+          ['related_requesters', 'requester'],
+          ['related_creators', 'creator']
+        ]);
+
         var instance = this.attr('parent_instance');
         var user = GGRC.current_user;
         var user_type;
@@ -56,7 +56,7 @@
         if (!instance || !user) {
           return;
         }
-        _.each(types, function (type, mapping) {
+        types.forEach(function (type, mapping) {
           var mappings = instance.get_mapping(mapping);
           if (!mappings.length) {
             return;
