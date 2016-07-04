@@ -528,8 +528,6 @@
       this.validateNonBlank('title');
       this.validateNonBlank('end_date');
       this.validateNonBlank('start_date');
-      this.validatePresenceOf('validate_assignee');
-      this.validatePresenceOf('validate_requester');
       this.validatePresenceOf('audit');
 
       this.validate(['start_date', 'end_date'], function (newVal, prop) {
@@ -544,11 +542,17 @@
         }
       });
 
-      this.validate(['validate_assignee', 'validate_requester'],
+      this.validate(
+        'validate_assignee',
         function (newVal, prop) {
           if (!this.validate_assignee) {
             return 'You need to specify at least one assignee';
           }
+        }
+      );
+      this.validate(
+        'validate_requester',
+        function (newVal, prop) {
           if (!this.validate_requester) {
             return 'You need to specify at least one requester';
           }
@@ -897,15 +901,19 @@
       }
       this.validatePresenceOf('object');
       this.validatePresenceOf('audit');
-      this.validatePresenceOf('validate_creator');
-      this.validatePresenceOf('validate_assessor');
       this.validateNonBlank('title');
 
-      this.validate(['validate_creator', 'validate_assessor'],
+      this.validate(
+        'validate_creator',
         function (newVal, prop) {
           if (!this.validate_creator) {
             return 'You need to specify at least one creator';
           }
+        }
+      );
+      this.validate(
+        'validate_assessor',
+        function (newVal, prop) {
           if (!this.validate_assessor) {
             return 'You need to specify at least one assessor';
           }
