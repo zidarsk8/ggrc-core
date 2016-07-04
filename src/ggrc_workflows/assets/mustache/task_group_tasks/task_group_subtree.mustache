@@ -3,12 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-  <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+  <li data-object-id="{{instance.id}}"
+      data-object-type="{{instance.class.table_singular}}">
     <div class="objective-selector field-wrap task-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
       <div class="row-fluid">
         <div class="span4">
           <div class="oneline">
-            <i class="fa fa-{{instance.class.table_singular}} color"></i>
+            {{#is_allowed 'update' instance}}
+            {{^if_equals instanceworkflow.reify.status 'Inactive'}}
+            <a class="drag {{#parent_instance.lock_task_order}}disabled{{/parent_instance.lock_task_order}}" href="javascript://">
+              <i class="fa fa-arrows-v"></i>
+            </a>
+            {{/if_equals}}
+            {{/is_allowed}}
             <span class="inline-data-content">{{instance.title}}</span>
           </div>
         </div>

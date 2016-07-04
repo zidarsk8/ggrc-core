@@ -62,12 +62,15 @@
           {{#with_mapping 'task_group_tasks' instance}}
             <h3>Tasks (<span>{{task_group_tasks.length}}</span>)</h3>
             <h4 class="inline-explanation">Define tasks</h4>
-            <ul class="tree-structure new-tree">
-              {{#each task_group_tasks}}
-                {{>'/static/mustache/task_group_tasks/task_group_subtree.mustache'}}
-              {{/each}}
-              {{>'/static/mustache/task_group_tasks/task_group_subtree_footer.mustache'}}
-            </ul>
+            <sort-by-sort-index mapping="task_group_tasks">
+              <ul class="tree-structure new-tree"
+                  {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
+                {{#each sorted}}
+                  {{>'/static/mustache/task_group_tasks/task_group_subtree.mustache'}}
+                {{/each}}
+                {{>'/static/mustache/task_group_tasks/task_group_subtree_footer.mustache'}}
+              </ul>
+            </sort-by-sort-index>
           {{/with_mapping}}
         </div>
 
