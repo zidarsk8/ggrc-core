@@ -103,7 +103,10 @@ class RowConverter(object):
     headers = self.block_converter.object_headers
     mandatory = [key for key, header in headers.items() if header["mandatory"]]
     missing_keys = set(mandatory).difference(set(self.headers.keys()))
-    missing = [headers[key]["display_name"] for key in missing_keys]
+    # TODO: fix mandatory checks for individual rows based on object level
+    # custom attributes.
+    missing = [headers[key]["display_name"] for key in missing_keys if
+               headers[key]["type"] != AttributeInfo.Type.OBJECT_CUSTOM]
     if missing:
       self.add_error(errors.MISSING_COLUMN,
                      s="s" if len(missing) > 1 else "",
