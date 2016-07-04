@@ -55,13 +55,6 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     else:
       return self._parse_label_values()
 
-  def _get_inital_people(self):
-    """Get the default_people dict from current object."""
-    if self.row_converter.obj.default_people is None:
-      return {}
-    value = json.loads(self.row_converter.obj.default_people)
-    return value
-
   def set_obj_attr(self):
     """Set default_people attribute.
 
@@ -77,7 +70,7 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     if not self.value or self.row_converter.ignore:
       return
 
-    default_people = self._get_inital_people()
+    default_people = self.row_converter.obj.default_people or {}
     default_people[self.KEY_MAP[self.key]] = self.value
 
     _default_people = getattr(self.row_converter.obj, "_default_people", {})
