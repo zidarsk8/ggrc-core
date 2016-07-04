@@ -91,3 +91,6 @@ UNKNOWN_DATE_FORMAT = (u"Line {line}: Field {column_name} contains invalid "
 
 UNSUPPORTED_LIST_ERROR = (u"Line {line}: Field {column_name} does not support "
                           u"{value_type}.")
+
+UNSUPPORTED_OPERATION_ERROR = (u"Line {line}: {operation} is not supported. "
+                               u"The line will be ignored.")

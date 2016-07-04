@@ -9,16 +9,20 @@ from sqlalchemy.orm.session import make_transient
 from ggrc import db
 from ggrc import models
 from ggrc.converters.handlers import handlers
+from ggrc.converters import errors
 
 
 class AssessmentTemplateColumnHandler(handlers.MappingColumnHandler):
 
-  def __init__(self, row_converter, key, **options):
-    self.key = key
-    self.mapping_object = models.AssessmentTemplate
-    self.new_slugs = {}
-    super(handlers.MappingColumnHandler, self).__init__(
-        row_converter, key, **options)
+  def parse_item(self):
+    if len(self.raw_value.splitlines()) > 1:
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+      return
+    if self.raw_value in self.new_slugs:
+      self.add_error(errors.UNSUPPORTED_OPERATION_ERROR, operation="Creating "
+                     "and using assessment templates in one sheet")
+      return
+    return super(AssessmentTemplateColumnHandler, self).parse_item()
 
   def set_obj_attr(self):
     self.value = self.parse_item()
