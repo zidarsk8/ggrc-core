@@ -44,6 +44,7 @@
         // TODO: We prioritize order V > A > R
         var types = {
           related_verifiers: 'verifier',
+          related_assessors: 'assessor',
           related_assignees: 'assignee',
           related_requesters: 'requester',
           related_creators: 'creator'
