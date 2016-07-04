@@ -147,6 +147,7 @@ dashboard-js-files:
   - components/add_comment/add_comment.js
   - components/object_cloner/object_cloner.js
   - components/object_counter/object_counter.js
+  - components/sort_by_sort_index/sort_by_sort_index.js
   #- d3.v2.js
   #- related_graph.js
 
