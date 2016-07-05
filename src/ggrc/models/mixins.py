@@ -696,6 +696,32 @@ class CustomAttributable(object):
         "CustomAttributeDefinition",
         primaryjoin=join_function,
         backref='{0}_custom_attributable_definition'.format(self.__name__),
+        viewonly=True,
+    )
+
+  @declared_attr
+  def _custom_attributes_deletion(self):
+    """This declared attribute is used only for handling cascade deletions
+       for CustomAttributes. This is done in order not to try to delete
+       "global" custom attributes that don't have any definition_id related.
+       Attempt to delete custom attributes with definition_id=None causes the
+       IntegrityError as we shouldn't be able to delete global attributes along
+       side with any other object (e.g. Assessments).
+    """
+    from ggrc.models.custom_attribute_definition import (
+        CustomAttributeDefinition
+    )
+
+    def join_function():
+      """Join condition used for deletion"""
+      definition_id = foreign(CustomAttributeDefinition.definition_id)
+      definition_type = foreign(CustomAttributeDefinition.definition_type)
+      return and_(definition_id == self.id,
+                  definition_type == self._inflector.table_singular)
+
+    return relationship(
+        "CustomAttributeDefinition",
+        primaryjoin=join_function,
         cascade='all, delete-orphan',
     )
 
