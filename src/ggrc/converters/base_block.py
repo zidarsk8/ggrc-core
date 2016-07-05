@@ -129,9 +129,10 @@ class BlockConverter(object):
         cache = defaultdict(lambda: defaultdict(list))
         for rel in relationships:
           if rel.source_type == self.object_class.__name__:
-            cache[rel.source_id][rel.destination_type].append(
-                identifier(rel.destination))
-          else:
+            if rel.destination:
+              cache[rel.source_id][rel.destination_type].append(
+                  identifier(rel.destination))
+          elif rel.source:
             cache[rel.destination_id][rel.source_type].append(
                 identifier(rel.source))
       return cache
