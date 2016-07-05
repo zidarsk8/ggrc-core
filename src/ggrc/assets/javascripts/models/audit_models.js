@@ -156,10 +156,6 @@
           }
         }
       );
-      // Preload auditor role:
-      CMS.Models.Role.findAll({
-        name__in: 'Auditor'
-      });
     }
   }, {
     object_model: can.compute(function () {

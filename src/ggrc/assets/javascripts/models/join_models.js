@@ -192,15 +192,12 @@ can.Model.Join("CMS.Models.UserRole", {
   }
 }, {
   save: function() {
-    var roles,
+    var role,
         _super =  this._super;
     if(!this.role && this.role_name) {
-      roles = can.map(
-        CMS.Models.Role.cache,
-        function(role) { if(role.name === this.role_name) return role; }.bind(this)
-      );
-      if(roles.length > 0) {
-        this.attr("role", roles[0].stub());
+      role = _.find(CMS.Models.Role.cache, {name: this.role_name});
+      if(role) {
+        this.attr("role", role.stub());
         return _super.apply(this, arguments);
       } else {
         return CMS.Models.Role.findAll({ name__in : this.role_name }).then(function(roles) {
