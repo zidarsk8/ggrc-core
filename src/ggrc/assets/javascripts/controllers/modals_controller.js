@@ -270,9 +270,14 @@ can.Control('GGRC.Controllers.Modals', {
     }
     return dfd.done(function () {
       this.reset_form(function () {
-        // Make sure custom attr validations/values are set
-        if (instance && instance.setup_custom_attributes) {
-          instance.setup_custom_attributes();
+        if (instance) {
+          // Make sure custom attr validations/values are reset
+          if (instance.custom_attributes) {
+            instance.custom_attributes = undefined;
+          }
+          if (instance.setup_custom_attributes) {
+            instance.setup_custom_attributes();
+          }
         }
       });
     }.bind(that));
