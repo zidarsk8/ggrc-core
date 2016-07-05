@@ -222,49 +222,53 @@ can.Control('GGRC.Controllers.Modals', {
     ).done(this.proxy('draw'));
   }
 
-  , fetch_data : function(params) {
-    var that = this,
-        dfd,
-        instance;
+  , fetch_data: function (params) {
+    var that = this;
+    var dfd;
+    var instance;
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
     if (this.options.skip_refresh && this.options.instance) {
       return new $.Deferred().resolve(this.options.instance);
-    }
-    else if (this.options.instance) {
+    } else if (this.options.instance) {
       dfd = this.options.instance.refresh();
-    }
-    else if (this.options.model) {
-      dfd = this.options.new_object_form
-          ? $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
-          : this.options.model.findAll(params).then(function(data) {
-            var h;
-            if(data.length) {
-              that.options.attr("instance", data[0]);
-              return data[0].refresh(); //have to refresh (get ETag) to be editable.
-            } else {
-              that.options.attr("new_object_form", true);
-              that.options.attr("instance", new that.options.model(params));
-              return that.options.instance;
-            }
-          }).done(function() {
-            // Check if modal was closed
-            if(that.element !== null)
-              that.on(); //listen to instance.
-          });
-    }
-    else {
-      this.options.attr("instance", new can.Observe(params));
+    } else if (this.options.model) {
+      if (this.options.new_object_form) {
+        dfd = $.when(this.options.attr(
+          'instance',
+          new this.options.model(params).attr('_suppress_errors', true)
+        ));
+      } else {
+        dfd = this.options.model.findAll(params).then(function (data) {
+          if (data.length) {
+            that.options.attr('instance', data[0]);
+            return data[0].refresh(); // have to refresh (get ETag) to be editable.
+          }
+          that.options.attr('new_object_form', true);
+          that.options.attr('instance', new that.options.model(params));
+          return that.options.instance;
+        }).done(function () {
+          // Check if modal was closed
+          if (that.element !== null) {
+            that.on(); // listen to instance.
+          }
+        });
+      }
+    } else {
+      this.options.attr('instance', new can.Observe(params));
       that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     instance = this.options.instance;
     if (instance) {
       // Make sure custom attributes are preloaded:
-      dfd = dfd.then(function(){
+      dfd = dfd.then(function () {
         return $.when(
-          instance.load_custom_attribute_definitions && instance.load_custom_attribute_definitions(),
-          instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
+          instance.load_custom_attribute_definitions &&
+            instance.load_custom_attribute_definitions(),
+          instance.custom_attribute_values ?
+            instance.refresh_all('custom_attribute_values') :
+            []
         );
       });
     }

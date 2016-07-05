@@ -153,33 +153,36 @@
   }
 
   , hide: function (e) {
-    var that = this,
-      control = this.$element.control(),
-      options = control && control.options;
+    var that = this;
+    var control = this.$element.control();
+    var options = control && control.options;
 
-      // If the hide was initiated by the backdrop, check for dirty form data before continuing
+    // If the hide was initiated by the backdrop, check for dirty form data
+    // before continuing
     if (e && $(e.target).is('.modal-backdrop')) {
-
-      if ($(e.target).is(".disabled")) {
-          // In the case of a disabled modal backdrop, treat it like any other disabled data-dismiss,
-          //  i.e. do nothing.
+      if ($(e.target).is('.disabled')) {
+        // In the case of a disabled modal backdrop, treat it like any other disabled data-dismiss,
+        //  i.e. do nothing.
         e.stopPropagation();
         return;
       }
       if (this.is_form_dirty()) {
-          // Confirm that the user wants to lose the data prior to hiding
+        // Confirm that the user wants to lose the data prior to hiding
         GGRC.Controllers.Modals.confirm({
-          modal_title : "Discard Changes"
-            , modal_description : "Are you sure that you want to discard your changes?"
-            , modal_confirm : "Discard"
-            , instance : options.instance
-            , model : options.model
-            , skip_refresh : true
+          modal_title: 'Discard Changes',
+          modal_description:
+            'Are you sure that you want to discard your changes?',
+          modal_confirm: 'Discard',
+          instance: options.instance,
+          model: options.model,
+          skip_refresh: true
         }, function () {
           $.when((function () {
-            can.trigger(options.instance, "modal:dismiss");
+            can.trigger(options.instance, 'modal:dismiss');
           })()).then(function () {
-            that.$element.find("[data-dismiss='modal'], [data-dismiss='modal-reset']").trigger("click");
+            that.$element.find(
+              "[data-dismiss='modal'], [data-dismiss='modal-reset']"
+            ).trigger('click');
             that.hide();
           });
         });
@@ -187,10 +190,10 @@
       }
     }
 
-      // Hide the modal like normal
+    // Hide the modal like normal
     $.when((function () {
       if (options) {
-        return can.trigger(options.instance, "modal:dismiss");
+        return can.trigger(options.instance, 'modal:dismiss');
       }
       return;
     })()).then(function () {
