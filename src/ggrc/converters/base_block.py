@@ -128,13 +128,19 @@ class BlockConverter(object):
       with benchmark("building cache"):
         cache = defaultdict(lambda: defaultdict(list))
         for rel in relationships:
-          if rel.source_type == self.object_class.__name__:
-            if rel.destination:
-              cache[rel.source_id][rel.destination_type].append(
-                  identifier(rel.destination))
-          elif rel.source:
-            cache[rel.destination_id][rel.source_type].append(
-                identifier(rel.source))
+          try:
+            if rel.source_type == self.object_class.__name__:
+              if rel.destination:
+                cache[rel.source_id][rel.destination_type].append(
+                    identifier(rel.destination))
+            elif rel.source:
+              cache[rel.destination_id][rel.source_type].append(
+                  identifier(rel.source))
+          except AttributeError:
+            # TODO fix the root cause of the bad relationship object and remove
+            # this try except block
+            current_app.logger.error("Failed adding object to relationship "
+                                     "cache. Rel id: %s", rel.id)
       return cache
 
   def get_mapping_cache(self):
