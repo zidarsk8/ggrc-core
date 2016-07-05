@@ -276,9 +276,7 @@ can.Control('GGRC.Controllers.Modals', {
       this.reset_form(function () {
         if (instance) {
           // Make sure custom attr validations/values are reset
-          if (instance.custom_attributes) {
-            instance.custom_attributes = undefined;
-          }
+          instance.custom_attributes = undefined;
           if (instance.setup_custom_attributes) {
             instance.setup_custom_attributes();
           }
