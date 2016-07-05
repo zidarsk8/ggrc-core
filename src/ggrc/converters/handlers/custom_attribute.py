@@ -153,7 +153,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
   def get_ca_definition(self):
     """Get custom attribute definition."""
     return self.row_converter.block_converter.ca_definitions_cache.get(
-        (self.row_converter.obj.id, self.display_name))
+        (None, self.display_name))
 
 
 class ObjectCaColumnHandler(CustomAttributeColumHandler):
