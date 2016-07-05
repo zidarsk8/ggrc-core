@@ -984,13 +984,13 @@
           instance.get_binding('all_documents').refresh_count(),
           rq.trigger()
       ).then(function (customAttrVals, commentCount, attachmentCount, rqRes) {
-        var values = _.map(instance.custom_attribute_values, function (cav) {
-          return cav.reify();
-        });
+        var values = instance.custom_attribute_values.reify();
+        var definitions = instance.custom_attribute_definitions.reify();
+
         commentCount = commentCount();
         attachmentCount = attachmentCount();
-        _.each(instance.custom_attribute_definitions, function (definition) {
-          var attr = _.result(_.find(values, function (cav) {
+        _.each(definitions, function (definition) {
+          var attr = _.result(_.find(definitions, function (cav) {
             return cav.custom_attribute_id === definition.id;
           }), 'attribute_value');
 
@@ -1003,10 +1003,14 @@
           var definition;
           var i;
           var mandatory;
-          definition = _.find(instance.custom_attribute_definitions, {
+          definition = _.find(definitions, {
             id: cav.custom_attribute_id
           });
-          if (!definition.multi_choice_options ||
+          if (!definition) {
+            console.warn('CAV id %d is not reified properly.', cav.id);
+          }
+          if (!definition ||
+              !definition.multi_choice_options ||
               !definition.multi_choice_mandatory) {
             return;
           }
