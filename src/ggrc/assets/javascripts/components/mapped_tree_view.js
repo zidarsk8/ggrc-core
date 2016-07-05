@@ -38,7 +38,7 @@
 
       binding = this.scope.parentInstance.get_binding(this.scope.mapping);
 
-      binding.refresh_instances().then(function (mappedObjects) {
+      binding.refresh_list().then(function (mappedObjects) {
         this.scope.attr('mappedObjects').replace(mappedObjects);
       }.bind(this));
 
