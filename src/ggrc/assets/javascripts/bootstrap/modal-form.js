@@ -176,9 +176,9 @@
             , model : options.model
             , skip_refresh : true
         }, function () {
-          $.when(function () {
+          $.when((function () {
             can.trigger(options.instance, "modal:dismiss");
-          }).then(function () {
+          })()).then(function () {
             that.$element.find("[data-dismiss='modal'], [data-dismiss='modal-reset']").trigger("click");
             that.hide();
           });
@@ -188,12 +188,12 @@
     }
 
       // Hide the modal like normal
-    $.when(function () {
+    $.when((function () {
       if (options) {
         return can.trigger(options.instance, "modal:dismiss");
       }
       return;
-    }).then(function () {
+    })()).then(function () {
       $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
       this.$element.off('modal_form');
     }.bind(this));
