@@ -111,7 +111,8 @@
       var canonicalMapping;
       var forbidden = {
         'audit program': true,
-        'audit request': true
+        'audit request': true,
+        'assessmenttemplate cacheable': true
       };
 
       if (target instanceof can.Model) {
