@@ -257,8 +257,12 @@ jQuery(function($) {
       }
     });
   }
+  function updateNotifications() {
+    CMS.Models.NotificationConfig.findActive().then(checkActive);
+    $('body').off('click', '.user-dropdown > .dropdown-toggle', updateNotifications);
+  }
 
-  CMS.Models.NotificationConfig.findActive().then(checkActive);
+  $('body').on('click', '.user-dropdown > .dropdown-toggle', updateNotifications);
 
   // Don't close the dropdown if clicked on checkbox
   $('body').on('click', '.notify-wrap', function(ev){
