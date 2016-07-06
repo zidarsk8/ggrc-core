@@ -8,46 +8,51 @@
 (function (can, $) {
   can.Control('GGRC.Controllers.PbcWorkflows', {}, {
     '{CMS.Models.AssessmentTemplate} updated': function (model, ev, instance) {
+      var self = this;
       var attrDfd;
+      var delDfds;
+      var resolveDfd;
       var definitions = instance.custom_attribute_definitions;
-      var cachedCADefinitions = instance._cachedCADefinitions;
 
       if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
         return;
       }
 
-      attrDfd = $.map(definitions, function (attr, i) {
-        var CADefinition = CMS.Models.CustomAttributeDefinition;
-        var params = can.extend({
-          definition_id: instance.id,
-          definition_type: 'assessment_template',
-          context: instance.context
-        }, attr.serialize());
-        /**
-         * Temporary solution and after updated the backend it need to be deleted
-         * Start deprecated block
-         */
-        params.mandatory = cachedCADefinitions[attr.id].mandatory;
-        params.multi_choice_mandatory = cachedCADefinitions[attr.id]
-            .multi_choice_mandatory;
-        /**
-         * End deprecated block
-         */
-        if (attr.id && attr._pending_delete) {
+      // First remove CAD
+      delDfds = _.chain(definitions)
+        .filter(function (attr) {
+          return attr.id && attr._pending_delete;
+        })
+        .map(function (attr) {
           return attr.reify().refresh().then(function (attr) {
-            attr.destroy();
+            return attr.destroy();
           });
-        } else if (attr.id) {
-          return CADefinition.findOne({
-            id: attr.id
-          }).then(function (definition) {
-            definition.attr(params);
-            return definition.save();
-          });
-        }
-        return new CADefinition(params).save();
+        }).value();
+
+      resolveDfd = $.when.apply($, delDfds).then(function () {
+        attrDfd = _.chain(definitions)
+          .filter(function (attr) {
+            return !attr._pending_delete;
+          })
+          .map(function (attr) {
+            var CADefinition = CMS.Models.CustomAttributeDefinition;
+            var params = self._buildParams(instance, attr);
+
+            if (attr.id) {
+              return CADefinition.findOne({
+                id: attr.id
+              }).then(function (definition) {
+                definition.attr(params);
+                return definition.save();
+              });
+            }
+            return new CADefinition(params).save();
+          }).value();
+
+        return $.when.apply($, attrDfd);
       });
-      instance.delay_resolving_save_until($.when(attrDfd));
+
+      instance.delay_resolving_save_until(resolveDfd);
     },
     '{CMS.Models.AssessmentTemplate} created': function (model, ev, instance) {
       if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
@@ -157,6 +162,26 @@
         destination: destination,
         context: context
       }).save();
+    },
+    _buildParams: function (instance, attr) {
+      var cached = instance._cachedCADefinitions[attr.id];
+      var params = can.extend({
+        definition_id: instance.id,
+        definition_type: 'assessment_template',
+        context: instance.context
+      }, attr.serialize());
+      /**
+       * Temporary solution and after updated the backend it need to be deleted
+       * Start deprecated block
+       */
+      if (cached.id === params.id) {
+        params.mandatory = cached.mandatory;
+        params.multi_choice_mandatory = cached.multi_choice_mandatory;
+      }
+      /**
+       * End deprecated block
+       */
+      return params;
     }
   });
 
