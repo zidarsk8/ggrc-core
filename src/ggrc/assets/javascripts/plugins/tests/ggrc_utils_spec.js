@@ -1,8 +1,6 @@
 /*!
-  Copyright (C) 2015 Google Inc., authors, and contributors <see AUTHORS file>
+  Copyright (C) 2016 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-  Created By: peter@reciprocitylabs.com
-  Maintained By: peter@reciprocitylabs.com
 */
 
 describe('GGRC utils allowed_to_map() method', function () {
@@ -13,8 +11,6 @@ describe('GGRC utils allowed_to_map() method', function () {
   var fakeProgram;
   var fakeRequest;
   var fakeAudit;
-  var fakeCA;
-  var fakePersonCreator;
 
   beforeAll(function () {
     allowedToMap = GGRC.Utils.allowed_to_map;
@@ -68,28 +64,27 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
   });
 
-  describe('given a Person and Assessment pair', function () {
+  describe('given a Person instance', function () {
+    var origShortName;
+    var otherInstance;
+    var person;
+
+    beforeAll(function () {
+      origShortName = can.Model.shortName;
+      can.Model.shortName = 'cacheable';
+    });
+
+    afterAll(function () {
+      can.Model.shortName = origShortName;
+    });
+
     beforeEach(function () {
-      fakeCA = new CMS.Models.Assessment({type: 'Assessment'});
-      fakePersonCreator = new CMS.Models.Person({type: 'Person'});
-
-      spyOn(Permission, 'is_allowed_for').and.returnValue(false);
-      spyOn(GGRC.Mappings, 'get_canonical_mapping_name');
+      person = new CMS.Models.Person({type: 'Person'});
+      otherInstance = new can.Model({type: 'Foo'});
     });
 
-    it('returns true for Assessment as source and Person as target', function () {
-      var result;
-      GGRC.Mappings.get_canonical_mapping_name.and.returnValue('people');
-      result = allowedToMap(fakeCA, fakePersonCreator, fakeOptions);
-
-      expect(result).toBe(false);
-    });
-
-    it('returns false for Person as source and as Assessment target', function () {
-      var result;
-      GGRC.Mappings.get_canonical_mapping_name.and.returnValue('related_objects');
-      result = allowedToMap(fakePersonCreator, fakeCA, fakeOptions);
-
+    it('returns false for any object', function () {
+      var result = allowedToMap(otherInstance, person);
       expect(result).toBe(false);
     });
   });
