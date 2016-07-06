@@ -3,6 +3,7 @@
 # Created By: peter@reciprocitylabs.com
 # Maintained By: peter@reciprocitylabs.com
 
+
 """A module containing the implementation of the assessment template entity."""
 
 import json
@@ -14,14 +15,16 @@ from ggrc.models.exceptions import ValidationError
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
+from ggrc.models import assessment
 from ggrc.models.mixins import CustomAttributable
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.types import JsonType
 
 
-class AssessmentTemplate(Slugged, Base, Relatable, Titled,
-                         CustomAttributable, db.Model):
+class AssessmentTemplate(assessment.AuditRelationship, Slugged, Base,
+                         Relatable, Titled, CustomAttributable, db.Model):
   """A class representing the assessment template entity.
 
   An Assessment Template is a template that allows users for easier creation of
@@ -36,7 +39,7 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
   template_object_type = db.Column(db.String, nullable=True)
 
   # whether to use the control test plan as a procedure
-  test_plan_procedure = db.Column(db.Boolean, nullable=False)
+  test_plan_procedure = db.Column(db.Boolean, nullable=False, default=False)
 
   # procedure description
   procedure_description = db.Column(db.Text, nullable=True)
@@ -67,6 +70,62 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
       PublishOnly("DEFAULT_PEOPLE_LABELS")
   ]
 
+  _aliases = {
+      "default_assessors": {
+          "display_name": "Default Assessors",
+          "mandatory": True,
+          "filter_by": "_nop_filter",
+      },
+      "default_verifier": {
+          "display_name": "Default Verifier",
+          "mandatory": True,
+          "filter_by": "_nop_filter",
+      },
+      "default_test_plan": {
+          "display_name": "Default Test Plan",
+          "filter_by": "_nop_filter",
+      },
+      "test_plan_procedure": {
+          "display_name": "Use Control Test Plan",
+          "mandatory": False,
+      },
+      "template_object_type": {
+          "display_name": "Object Under Assessment",
+          "mandatory": True,
+      },
+      "template_custom_attributes": {
+          "display_name": "Custom Attributes",
+          "type": AttributeInfo.Type.SPECIAL_MAPPING,
+          "filter_by": "_nop_filter",
+          "description": (
+              "List of custom attributes for the assessment template\n"
+              "One attribute per line. fields are separated by commas ','\n\n"
+              "<attribute type>, <attribute name>, [<attribute value1>, "
+              "<attribute value2>, ...]\n\n"
+              "Valid attribute types: Text, Rich Text, Date, Checkbox, Person,"
+              "Dropdown.\n"
+              "attribute name: Any single line string without commas. Leading "
+              "and trailing spaces are ignored.\n"
+              "list of attribute values: Comma separated list, only used if "
+              "attribute type is 'Dropdown'. Prepend '(a)' if the value has a "
+              "mandatory attachment and/or (c) if the value requires a "
+              "mandatory comment.\n\n"
+              "Limitations: Dropdown values can not start with either '(a)' or"
+              "'(c)' and attribute names can not contain commas ','."
+          ),
+      },
+  }
+
+  @classmethod
+  def _nop_filter(cls, _):
+    """No operation filter.
+
+    This is used for objects for which we can not implement a normal sql query
+    filter. Example is default_verifier field that is a json string in the db
+    and we can not create direct queries on json fields.
+    """
+    return None
+
   @classmethod
   def generate_slug_prefix_for(cls, obj):
     return "TEMPLATE"
@@ -76,7 +135,7 @@ class AssessmentTemplate(Slugged, Base, Relatable, Titled,
     """Check that default people lists are not empty.
 
     Check if the default_people contains both assessors and verifiers. The
-    values of those fields must be thruthy, and if the value is a string it
+    values of those fields must be truthy, and if the value is a string it
     must be a valid default people label. If the value is not a string, it
     should be a list of valid user ids, but that is too expensive to test in
     this validator.

@@ -151,29 +151,24 @@ class TestGetObjectColumnDefinitions(TestCase):
     else:
       self.assertEqual(set(), mapping_names)
 
-  def _test_mandatory_fields(self, obj_class, mandatory):
-    """ Test mandatory column definitions
+  def _test_definition_fields(self, obj_class, field_name, expected):
+    """ Test expected fields in column definitions.
 
-    Check that all the correct and only the correct fields are marked as
-    mandotory
+    Check that the definitions contain correct values in the fields for all
+    names in the expected list.
+
+    Args:
+      obj_class (db.Model): class to check definitions.
+      field_name (str): Name of the field we want to check (ie. manatory).
+      expected (list of str): List of display names for all attributes that
+        should have the field field_name set to true.
     """
     definitions = get_object_column_definitions(obj_class)
-    mandatory_names = {val["display_name"] for val in definitions.values()
-                       if val["mandatory"]}
-    self.assertEqual(mandatory_names, mandatory)
+    definiton_fields = {val["display_name"] for val in definitions.itervalues()
+                        if val.get(field_name)}
+    self.assertEqual(definiton_fields, expected)
 
-  def _test_unique_fields(self, obj_class, unique):
-    """ Test unique column definitions
-
-    Check that all the correct and only the correct fields are marked as
-    unique
-    """
-    definitions = get_object_column_definitions(obj_class)
-    mandatory_names = {val["display_name"] for val in definitions.values()
-                       if val["unique"]}
-    self.assertEqual(mandatory_names, unique)
-
-  def _test_single_object(self, obj_class, names, mandatory, unique,
+  def _test_single_object(self, obj_class, names, expected_fields,
                           has_mappings=True):
     """ Test object definitions
 
@@ -187,17 +182,12 @@ class TestGetObjectColumnDefinitions(TestCase):
       errors += "\n\n{} definition names missmatch.\n{}".format(
           obj_class.__name__, str(e))
 
-    try:
-      self._test_mandatory_fields(obj_class, mandatory)
-    except AssertionError as e:
-      errors += "\n\n{} mandatory fields missmatch.\n{}".format(
-          obj_class.__name__, str(e))
-
-    try:
-      self._test_unique_fields(obj_class, unique)
-    except AssertionError as e:
-      errors += "\n\n{} unique fields missmatch.\n{}".format(
-          obj_class.__name__, str(e))
+    for field_name, expected in expected_fields.iteritems():
+      try:
+        self._test_definition_fields(obj_class, field_name, expected)
+      except AssertionError as e:
+        errors += "\n\n{} {} fields missmatch.\n{}".format(
+            obj_class.__name__, field_name, str(e))
 
     self.assertEqual(errors, "", errors)
 
@@ -307,21 +297,54 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Title"]["unique"])
     self.assertTrue(vals["Internal Audit Lead"]["mandatory"])
 
-  def test_assessment_definitions(self):
-    """ test default headers for Assessment """
-    definitions = get_object_column_definitions(models.Assessment)
-    mapping_names = get_mapping_names(models.Assessment.__name__)
-    display_names = {val["display_name"] for val in definitions.values()}
-    element_names = {
+  def test_assessment_template_defs(self):
+    """Test default headers for Assessment Template."""
+
+    names = {
         "Title",
-        "Description",
-        "Notes",
-        "Test Plan",
         "Audit",
-        "Owner",
+        "Object Under Assessment",
+        "Use Control Test Plan",
+        "Default Test Plan",
+        "Default Assessors",
+        "Default Verifier",
+        "Custom Attributes",
+        "Code",
+        "Delete",
+    }
+    expected_fields = {
+        "mandatory": {
+            "Title",
+            "Object Under Assessment",
+            "Audit",
+            "Code",
+            "Default Assessors",
+            "Default Verifier",
+        },
+        "unique": {
+            "Code",
+        },
+        "ignore_on_update": {
+            "Audit",
+        }
+    }
+    self._test_single_object(models.AssessmentTemplate, names, expected_fields,
+                             has_mappings=False)
+
+  def test_assessment_definitions(self):
+    """Test default headers for Assessment."""
+
+    names = {
+        "Title",
+        "Template",
+        "Description",
+        "Test Plan",
+        "Notes",
+        "Object",
+        "Audit",
+        "Creator",
         "Assessor",
         "Verifier",
-        "Creator",
         "Primary Contact",
         "Secondary Contact",
         "Assessment URL",
@@ -338,13 +361,26 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Delete",
     }
-    expected_names = element_names.union(mapping_names)
-    self.assertEqual(expected_names, display_names)
-    vals = {val["display_name"]: val for val in definitions.values()}
-    self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Owner"]["mandatory"])
-    self.assertTrue(vals["Title"]["unique"])
-    self.assertTrue(vals["Audit"]["mandatory"])
+    expected_fields = {
+        "mandatory": {
+            "Title",
+            "Object",
+            "Audit",
+            "Creator",
+            "Assessor",
+            "Code",
+            "State",
+        },
+        "unique": {
+            "Code",
+        },
+        "ignore_on_update": {
+            "Template",
+            "Object",
+            "Audit",
+        }
+    }
+    self._test_single_object(models.Assessment, names, expected_fields)
 
   def test_issue_definitions(self):
     """ test default headers for Issue """
@@ -912,21 +948,23 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Verifier",
     }
-    mandatory = {
-        "Assignee",
-        "Audit",
-        "Code",
-        "Due On",
-        "Request Type",
-        "Starts On",
-        "Requester",
-        "Status",
-        "Title",
+    expected_fields = {
+        "mandatory": {
+            "Assignee",
+            "Audit",
+            "Code",
+            "Due On",
+            "Request Type",
+            "Starts On",
+            "Requester",
+            "Status",
+            "Title",
+        },
+        "unique": {
+            "Code",
+        }
     }
-    unique = {
-        "Code",
-    }
-    self._test_single_object(models.Request, names, mandatory, unique)
+    self._test_single_object(models.Request, names, expected_fields)
 
 
 class TestGetWorkflowObjectColumnDefinitions(TestCase):

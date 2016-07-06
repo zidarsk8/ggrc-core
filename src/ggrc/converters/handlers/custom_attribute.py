@@ -7,6 +7,8 @@
 
 from dateutil.parser import parse
 
+from sqlalchemy import and_
+
 from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
@@ -59,6 +61,8 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       None.
     """
     definition = self.get_ca_definition()
+    if not definition:
+      return ""
     for value in self.row_converter.obj.custom_attribute_values:
       if value.custom_attribute_id == definition.id:
         if value.custom_attribute.attribute_type.startswith("Map:"):
@@ -72,6 +76,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       self.row_converter.obj.custom_attribute_values.append(self.value)
 
   def insert_object(self):
+    """Add custom attribute objects to db session."""
     if self.dry_run or self.value is None:
       return
     self.value.attributable_type = self.row_converter.obj.__class__.__name__
@@ -79,14 +84,8 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     db.session.add(self.value)
     self.dry_run = True
 
-  def get_ca_definition(self):
-    for definition in self.row_converter.object_class\
-            .get_custom_attribute_definitions():
-      if definition.title == self.display_name:
-        return definition
-    return None
-
   def get_date_value(self):
+    """Get date value from input string date."""
     if not self.mandatory and self.raw_value == "":
       return None  # ignore empty fields
     value = None
@@ -150,3 +149,37 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     if self.mandatory and not value:
       self.add_error(errors.WRONG_VALUE, column_name=self.display_name)
     return value
+
+  def get_ca_definition(self):
+    """Get custom attribute definition."""
+    return self.row_converter.block_converter.ca_definitions_cache.get(
+        (None, self.display_name))
+
+
+class ObjectCaColumnHandler(CustomAttributeColumHandler):
+
+  """Handler for object level custom attributes."""
+
+  def set_value(self):
+    pass
+
+  def set_obj_attr(self):
+    if self.dry_run:
+      return
+    self.value = self.parse_item()
+    if self.value:
+      self.row_converter.obj.custom_attribute_values.append(self.value)
+
+  def get_ca_definition(self):
+    """Get custom attribute definition for a specific object."""
+    if self.row_converter.obj.id is None:
+      return None
+    cad = models.CustomAttributeDefinition
+    definition = self.row_converter.block_converter.ca_definitions_cache.get(
+        (self.row_converter.obj.id, self.display_name))
+    if not definition:
+      definition = cad.query.filter(and_(
+          cad.definition_id == self.row_converter.obj.id,
+          cad.title == self.display_name
+      )).first()
+    return definition

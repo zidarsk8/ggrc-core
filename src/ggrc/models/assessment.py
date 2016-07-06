@@ -32,7 +32,39 @@ from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.track_object_state import track_state_for_class
 
 
-class Assessment(mixins_statusable.Statusable,
+class AuditRelationship(object):
+
+  """Mixin for mandatory link to an Audit via Relationships."""
+
+  _aliases = {
+      "audit": {
+          "display_name": "Audit",
+          "mandatory": True,
+          "filter_by": "_filter_by_audit",
+          "ignore_on_update": True,
+          "type": reflection.AttributeInfo.Type.MAPPING,
+      },
+  }
+
+  @classmethod
+  def _filter_by_audit(cls, predicate):
+    """Get filter for objects related to an Audit."""
+    return Relationship.query.filter(
+        Relationship.source_type == cls.__name__,
+        Relationship.source_id == cls.id,
+        Relationship.destination_type == Audit.__name__,
+    ).join(Audit, Relationship.destination_id == Audit.id).filter(
+        predicate(Audit.slug)
+    ).exists() | Relationship.query.filter(
+        Relationship.destination_type == cls.__name__,
+        Relationship.destination_id == cls.id,
+        Relationship.source_type == Audit.__name__,
+    ).join(Audit, Relationship.source_id == Audit.id).filter(
+        predicate(Audit.slug)
+    ).exists()
+
+
+class Assessment(mixins_statusable.Statusable, AuditRelationship,
                  AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, Documentable, Commentable, Personable,
                  mixins_reminderable.Reminderable, Timeboxed,
@@ -46,6 +78,7 @@ class Assessment(mixins_statusable.Statusable,
   """
 
   __tablename__ = 'assessments'
+  _title_uniqueness = False
 
   ASSIGNEE_TYPES = (u"Creator", u"Assessor", u"Verifier")
 
@@ -98,10 +131,22 @@ class Assessment(mixins_statusable.Statusable,
   }
 
   _aliases = {
-      "audit": {
-          "display_name": "Audit",
+      "owners": None,
+      "assessment_object": {
+          "display_name": "Object",
           "mandatory": True,
-          "filter_by": "_filter_by_audit",
+          "ignore_on_update": True,
+          "filter_by": "_ignore_filter",
+          "type": reflection.AttributeInfo.Type.MAPPING,
+          "description": ("A single object that will be mapped to the audit.\n"
+                          "Example:\n\nControl: Control-slug-1\n"
+                          "Market : MARKET-55"),
+      },
+      "assessment_template": {
+          "display_name": "Template",
+          "ignore_on_update": True,
+          "filter_by": "_ignore_filter",
+          "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "url": "Assessment URL",
       "design": "Conclusion: Design",
@@ -139,22 +184,6 @@ class Assessment(mixins_statusable.Statusable,
     return self.validate_conclusion(value)
 
   @classmethod
-  def _filter_by_audit(cls, predicate):
-    return Relationship.query.filter(
-        Relationship.source_type == cls.__name__,
-        Relationship.source_id == cls.id,
-        Relationship.destination_type == Audit.__name__,
-    ).join(Audit, Relationship.destination_id == Audit.id).filter(
-        predicate(Audit.slug)
-    ).exists() | Relationship.query.filter(
-        Relationship.destination_type == cls.__name__,
-        Relationship.destination_id == cls.id,
-        Relationship.source_type == Audit.__name__,
-    ).join(Audit, Relationship.source_id == Audit.id).filter(
-        predicate(Audit.slug)
-    ).exists()
-
-  @classmethod
   def _filter_by_related_creators(cls, predicate):
     return cls._get_relate_filter(predicate, "Creator")
 
@@ -165,5 +194,10 @@ class Assessment(mixins_statusable.Statusable,
   @classmethod
   def _filter_by_related_verifiers(cls, predicate):
     return cls._get_relate_filter(predicate, "Verifier")
+
+  @classmethod
+  def _ignore_filter(cls, predicate):
+    return None
+
 
 track_state_for_class(Assessment)

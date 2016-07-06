@@ -7,29 +7,30 @@
 
 from ggrc.extensions import get_extension_modules
 from ggrc.models import AccessGroup
-from ggrc.models import Audit
-from ggrc.models import Control
 from ggrc.models import Assessment
-from ggrc.models import DataAsset
+from ggrc.models import AssessmentTemplate
+from ggrc.models import Audit
+from ggrc.models import Clause
 from ggrc.models import Contract
-from ggrc.models import Policy
-from ggrc.models import Regulation
-from ggrc.models import Standard
+from ggrc.models import Control
+from ggrc.models import DataAsset
 from ggrc.models import Facility
+from ggrc.models import Issue
 from ggrc.models import Market
 from ggrc.models import Objective
 from ggrc.models import OrgGroup
-from ggrc.models import Vendor
 from ggrc.models import Person
+from ggrc.models import Policy
+from ggrc.models import Process
 from ggrc.models import Product
 from ggrc.models import Program
 from ggrc.models import Project
+from ggrc.models import Regulation
 from ggrc.models import Request
 from ggrc.models import Section
-from ggrc.models import Clause
+from ggrc.models import Standard
 from ggrc.models import System
-from ggrc.models import Process
-from ggrc.models import Issue
+from ggrc.models import Vendor
 
 
 def get_shared_unique_rules():
@@ -55,41 +56,48 @@ GGRC_IMPORTABLE = {
     "access group": AccessGroup,
     "access_group": AccessGroup,
     "accessgroup": AccessGroup,
+    "assessment template": AssessmentTemplate,
+    "assessment": Assessment,
+    "assessment_template": AssessmentTemplate,
     "audit": Audit,
-    "control": Control,
+    "clause": Clause,
+    "contract": Contract,
     "control assessment": Assessment,
-    "assessment": Assessment,
-    "assessment": Assessment,
+    "control": Control,
     "data asset": DataAsset,
     "data_asset": DataAsset,
     "dataasset": DataAsset,
-    "contract": Contract,
-    "policy": Policy,
-    "regulation": Regulation,
-    "standard": Standard,
     "facility": Facility,
+    "issue": Issue,
     "market": Market,
     "objective": Objective,
     "org group": OrgGroup,
     "org_group": OrgGroup,
     "orggroup": OrgGroup,
-    "vendor": Vendor,
     "person": Person,
+    "policy": Policy,
+    "process": Process,
     "product": Product,
     "program": Program,
     "project": Project,
+    "regulation": Regulation,
     "request": Request,
     "section": Section,
-    "clause": Clause,
+    "standard": Standard,
     "system": System,
-    "process": Process,
-    "issue": Issue,
+    "vendor": Vendor,
 }
 
 GGRC_EXPORTABLE = {}
 
 
 def _get_types(attr):
+  """Get contributed attribute types.
+
+  Args:
+    attr: String containing selected type. Either contributed_importables or
+      contributed_exportables.
+  """
   res = {}
   for extension_module in get_extension_modules():
     contributed = getattr(extension_module, attr, None)

@@ -52,11 +52,11 @@ OWNER_MISSING = (u"Line {line}: {column_name} field does not contain a valid "
 WRONG_MULTI_VALUE = (u"Line {line}: {column_name} contains invalid line. The"
                      u" value '{value}' will be ignored.")
 
-WRONG_VALUE = (u"Line {line}: {column_name} contains invalid data. The value"
-               u" will be ignored.")
+WRONG_VALUE = (u"Line {line}: Field '{column_name}' contains invalid data. The"
+               u" value will be ignored.")
 
-WRONG_VALUE_ERROR = (u"Line {line}: {column_name} contains invalid data. The"
-                     u" line will be ignored.")
+WRONG_VALUE_ERROR = (u"Line {line}: Field '{column_name}' contains invalid "
+                     u"data. The line will be ignored.")
 
 WRONG_REQUIRED_VALUE = (u"Line {line}: Required field {column_name} contains"
                         u" invalid data '{value}'. The default value will be"
@@ -88,3 +88,9 @@ REQUEST_INVALID_STATE = ("LINE {line}: Can not set Request state to Completed "
 UNKNOWN_DATE_FORMAT = (u"Line {line}: Field {column_name} contains invalid "
                        u"date format, use YYYY-MM-DD or MM/DD/YYYY. The line "
                        u"will be ignored.")
+
+UNSUPPORTED_LIST_ERROR = (u"Line {line}: Field {column_name} does not support "
+                          u"{value_type}.")
+
+UNSUPPORTED_OPERATION_ERROR = (u"Line {line}: {operation} is not supported. "
+                               u"The line will be ignored.")

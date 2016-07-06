@@ -33,7 +33,6 @@ from ggrc.models import Request
 from ggrc.models import Standard
 from ggrc.models import all_models
 from ggrc.models.reflection import AttributeInfo
-from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.rbac import permissions
 
 
@@ -374,7 +373,7 @@ class MappingColumnHandler(ColumnHandler):
     """ Remove multiple spaces and new lines from text """
     class_ = self.mapping_object
     lines = set(self.raw_value.splitlines())
-    slugs = filter(unicode.strip, lines)  # noqa
+    slugs = [slug for slug in lines if slug.strip()]
     objects = []
     for slug in slugs:
       obj = class_.query.filter(class_.slug == slug).first()
@@ -420,20 +419,11 @@ class MappingColumnHandler(ColumnHandler):
     self.dry_run = True
 
   def get_value(self):
-    if self.unmap:
+    if self.unmap or not self.mapping_object:
       return ""
-    related_slugs = []
-    related_ids = RelationshipHelper.get_ids_related_to(
-        self.mapping_object.__name__,
-        self.row_converter.object_class.__name__,
-        [self.row_converter.obj.id])
-    if related_ids:
-      related_objects = self.mapping_object.query.filter(
-          self.mapping_object.id.in_(related_ids))
-      related_slugs = (getattr(o, "slug", getattr(o, "email", None))
-                       for o in related_objects)
-      related_slugs = [slug for slug in related_slugs if slug is not None]
-    return "\n".join(related_slugs)
+    cache = self.row_converter.block_converter.get_mapping_cache()
+    slugs = cache[self.row_converter.obj.id][self.mapping_object.__name__]
+    return "\n".join(slugs)
 
   def set_value(self):
     pass

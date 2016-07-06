@@ -6,9 +6,14 @@
 from collections import defaultdict
 from collections import OrderedDict
 from collections import Counter
+
 from flask import current_app
+from sqlalchemy import or_
+from sqlalchemy import and_
 
 from ggrc import db
+from ggrc import models
+from ggrc.utils import benchmark
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters.base_row import RowConverter
@@ -68,6 +73,7 @@ class BlockConverter(object):
     return shared_state[classes]
 
   def __init__(self, converter, **options):
+    self._mapping_cache = None
     self.converter = converter
     self.offset = options.get("offset", 0)
     self.object_class = options.get("object_class")
@@ -93,6 +99,54 @@ class BlockConverter(object):
     self.unique_counts = self.get_unique_counts_dict(self.object_class)
     self.name = self.object_class._inflector.human_singular.title()
     self.organize_fields(options.get("fields", []))
+    self.ca_definitions_cache = self._create_ca_definitions_cache()
+
+  def _create_ca_definitions_cache(self):
+    cad = models.CustomAttributeDefinition
+    definition_type = self.object_class._inflector.table_singular
+    defs = cad.eager_query().filter(cad.definition_type == definition_type)
+    return {(d.definition_id, d.title): d for d in defs}
+
+  def _create_mapping_cache(self):
+    def identifier(obj):
+      return getattr(obj, "slug", getattr(obj, "email", None))
+
+    relationship = models.Relationship
+
+    with benchmark("cache for: {}".format(self.object_class.__name__)):
+      with benchmark("cache query"):
+        relationships = relationship.eager_query().filter(or_(
+            and_(
+                relationship.source_type == self.object_class.__name__,
+                relationship.source_id.in_(self.object_ids),
+            ),
+            and_(
+                relationship.destination_type == self.object_class.__name__,
+                relationship.destination_id.in_(self.object_ids),
+            )
+        )).all()
+      with benchmark("building cache"):
+        cache = defaultdict(lambda: defaultdict(list))
+        for rel in relationships:
+          try:
+            if rel.source_type == self.object_class.__name__:
+              if rel.destination:
+                cache[rel.source_id][rel.destination_type].append(
+                    identifier(rel.destination))
+            elif rel.source:
+              cache[rel.destination_id][rel.source_type].append(
+                  identifier(rel.source))
+          except AttributeError:
+            # TODO fix the root cause of the bad relationship object and remove
+            # this try except block
+            current_app.logger.error("Failed adding object to relationship "
+                                     "cache. Rel id: %s", rel.id)
+      return cache
+
+  def get_mapping_cache(self):
+    if self._mapping_cache is None:
+      self._mapping_cache = self._create_mapping_cache()
+    return self._mapping_cache
 
   def check_for_duplicate_columns(self, raw_headers):
     counter = Counter(raw_headers)
