@@ -998,7 +998,7 @@
         commentCount = commentCount();
         attachmentCount = attachmentCount();
         _.each(definitions, function (definition) {
-          var attr = _.result(_.find(definitions, function (cav) {
+          var attr = _.result(_.find(values, function (cav) {
             return cav.custom_attribute_id === definition.id;
           }), 'attribute_value');
 
