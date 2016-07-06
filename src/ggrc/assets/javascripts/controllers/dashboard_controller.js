@@ -107,17 +107,6 @@ can.Control("CMS.Controllers.Dashboard", {
     this.info_pin = new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
   }
 
-  , '.user-dropdown click': function (el, ev) {
-    var email_now = el.find('input[value="Email_Now"]'),
-        email_digest = el.find('input[value="Email_Digest"]'),
-        email_now_label = email_now.closest('label');
-
-    if (email_digest[0].checked) {
-      email_now_label.removeClass('disabled');
-      email_now.prop('disabled', false);
-    }
-  }
-
     , ".nav-logout click": function (el, ev) {
       can.Model.LocalStorage.clearAll();
     }
