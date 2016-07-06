@@ -65,8 +65,13 @@
           this.scope.instance
         ).then(
           function success(revisions) {
+            var changeHistory;
+
+            // calculate history of role changes
+            this.roleHistory = this._computeRoleChanges(revisions);
+
             // combine all the changes and sort them by date descending
-            var changeHistory = _([]).concat(
+            changeHistory = _([]).concat(
                 _.toArray(this._computeObjectChanges(revisions.object)),
                 _.toArray(this._computeMappingChanges(revisions.mappings))
             ).sortBy('updatedAt').reverse().value();
@@ -284,6 +289,7 @@
      *   revisions. The object has the following attributes:
      *   - madeBy: the user who made the changes
      *   - updatedAt: the time when the changes have been made
+     *   - role: highest role at the time of change
      *   - changes:
      *       A list of objects describing the modified attributes of the
      *       instance`, with each object having the following attributes:
@@ -301,6 +307,7 @@
 
       diff.madeBy = rev2.modified_by;
       diff.updatedAt = rev2.updated_at;
+      diff.role = this._getRoleAtTime(rev2.modified_by.id, rev2.updated_at);
 
       can.each(rev2.content, function (value, fieldName) {
         var origVal = rev1.content[fieldName];
@@ -427,6 +434,7 @@
      *   of a mapping. The object has the following attributes:
      *   - madeBy: the user who made the changes
      *   - updatedAt: the time when the changes have been made
+     *   - role: highest role at the time of change
      *   - changes:
      *       A list of objects describing the modified attributes of the
      *       instance`, with each object having the following attributes:
@@ -464,12 +472,152 @@
       return {
         madeBy: revision.modified_by,
         updatedAt: revision.updated_at,
+        role: this._getRoleAtTime(
+          revision.modified_by.id, revision.updated_at),
         changes: {
           origVal: origVal,
           newVal: newVal,
           fieldName: fieldName
         }
       };
+    },
+    /**
+     * A function to calculate each person's role history.
+     *
+     * It groups together all people mapping changes and for each change
+     * gets the highest role at the time of change.
+     *
+     * If however the revision history isn't complete (they don't start with
+     * "created" action, e.g. old assessments) it then adds "no role" to the
+     * start of person's history.
+     *
+     * If we don't have any revisions to person mappings but he is current
+     * assignee, we select the highest current role.
+     *
+     * If user has no role and was not or is not an assignee, we just add a
+     * single role change ("no role").
+     *
+     * @param {CMS.Models.Revision} revision - a Revision object describing a
+     *   mapping between the object instance the component is handling, and an
+     *   external object
+     *
+     * @return {Object} - An object containing user IDs as keys and person's
+     *   role history through time ordered in increasing order.
+     */
+
+    _computeRoleChanges: function (revisions) {
+      var mappings = _.sortBy(revisions.mappings, 'updated_at');
+      var instance = this.scope.instance;
+      var assigneeList = instance.class.assignable_list;
+      var peopleMappings;
+      var perPersonMappings;
+      var perPersonRoleHistory;
+      var modifiers;
+      var currentAssignees;
+      var assigneeRoles;
+      var unmodifiedAssignees;
+      var unassignedPeople;
+
+      peopleMappings = _.filter(mappings, function (rev) {
+        if (rev.source_type === 'Person' || rev.destination_type === 'Person') {
+          return rev;
+        }
+      });
+
+      perPersonMappings = _.groupBy(peopleMappings, function (rev) {
+        if (rev.source_type === 'Person') {
+          return rev.source_id;
+        }
+        return rev.destination_id;
+      });
+
+      perPersonRoleHistory = _.zipObject(
+        _.map(perPersonMappings, function (revisions, pid) {
+          var history = _.map(revisions, function (rev) {
+            if (rev.action === 'deleted') {
+              return {
+                updated_at: rev.updated_at,
+                role: 'none'
+              };
+            }
+            return {
+              updated_at: rev.updated_at,
+              role: GGRC.Utils.get_highest_assignee_role(
+                instance,
+                rev.content.attrs.AssigneeType.split(','))
+            };
+          });
+
+          if (revisions[0].action !== 'created') {
+            history.unshift({
+              role: 'none',
+              updated_at: instance.created_at
+            });
+          }
+          return [pid, history];
+        }));
+
+      modifiers = _.unique(
+        _.map(
+          _.union(
+            revisions.object,
+            revisions.mappings),
+          'modified_by.id')).map(String);
+
+      currentAssignees = _.groupBy(
+        _.flattenDeep(_.map(assigneeList, function (assignableType) {
+          return _.map(instance.get_binding(assignableType.mapping).list,
+            function (person) {
+              return {
+                id: person.instance.id,
+                type: assignableType.type
+              };
+            });
+        })), 'id');
+
+      assigneeRoles = _.zipObject(
+        _.map(currentAssignees, function (rolePeople, pid) {
+          return [pid, _.map(rolePeople, 'type')];
+        }));
+
+      unmodifiedAssignees = _.difference(
+        _.keys(assigneeRoles), _.keys(perPersonRoleHistory));
+
+      _.forEach(unmodifiedAssignees, function (pid) {
+        var existingRoles = assigneeRoles[pid];
+        var role = GGRC.Utils.get_highest_assignee_role(
+          instance, existingRoles);
+        perPersonRoleHistory[pid] = [{
+          updated_at: instance.created_at,
+          role: role.toLowerCase()
+        }];
+      });
+
+      unassignedPeople = _.difference(
+        modifiers, _.keys(perPersonRoleHistory));
+
+      _.forEach(unassignedPeople, function (pid) {
+        perPersonRoleHistory[pid] = [{
+          updated_at: instance.created_at,
+          role: 'none'
+        }];
+      });
+
+      return perPersonRoleHistory;
+    },
+    /**
+     * A function to return person's highest role at a certain time
+     *
+     * @param {String|Number} personId - Person ID
+     * @param {Date} timePoint - Time of change
+     * @return {String} - Lowercase role string
+     */
+    _getRoleAtTime: function (personId, timePoint) {
+      var personHistory = this.roleHistory[personId];
+      var role = _.last(_.takeWhile(personHistory, function (roleChange) {
+        return roleChange.updated_at <= timePoint;
+      }));
+      return role.role.toLowerCase();
     }
   });
 })(window.GGRC, window.can);
