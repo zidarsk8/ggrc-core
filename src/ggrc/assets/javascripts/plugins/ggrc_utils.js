@@ -109,11 +109,14 @@
       var canonical;
       var hasWidget;
       var canonicalMapping;
-      var forbidden = {
+
+      // NOTE: the names in every type pair must be sorted alphabetically!
+      var FORBIDDEN = Object.freeze({
         'audit program': true,
         'audit request': true,
-        'assessmenttemplate cacheable': true
-      };
+        'assessmenttemplate cacheable': true,
+        'cacheable person': true
+      });
 
       if (target instanceof can.Model) {
         targetType = target.constructor.shortName;
@@ -127,7 +130,7 @@
       // - mapping an Audit to a Request is not allowed
       // (and vice versa)
       types = [sourceType.toLowerCase(), targetType.toLowerCase()].sort();
-      if (forbidden[types.join(' ')]) {
+      if (FORBIDDEN[types.join(' ')]) {
         return false;
       }
 
