@@ -50,6 +50,10 @@
           }).value();
 
         return $.when.apply($, attrDfd);
+      }).then(function () {
+        // Make sure instance.custom_attribute_definitions cache is cleared
+        instance.custom_attribute_definitions.splice(0,
+            instance.custom_attribute_definitions.length);
       });
 
       instance.delay_resolving_save_until(resolveDfd);
