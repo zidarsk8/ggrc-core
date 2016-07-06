@@ -59,9 +59,10 @@
         // It's not nice way to rely on DOM for sorting,
         // but it was easiest for implementation
         this.scope.fields.replace(_.map(sortables,
-          function (item) {
-            return $(item).data('field');
-          }));
+           function (item) {
+             return $(item).data('field');
+           }
+        ));
       }
     }
   });
@@ -74,7 +75,7 @@
     tag: 'template-field',
     template: can.view(GGRC.mustache_path +
       '/assessment_templates/attribute_field.mustache'),
-    scope: function (attrs, parentScope) {
+    scope: function (attrs, parentScope, element) {
       return {
         types: parentScope.attr('types'),
         pads: {
