@@ -188,7 +188,7 @@
     }
 
     // Hide the modal like normal
-    if (options) {
+    if (options && options.instance) {
       can.trigger(options.instance, 'modal:dismiss');
     }
     $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
