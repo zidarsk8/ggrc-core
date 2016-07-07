@@ -482,7 +482,7 @@
       };
     },
     /**
-     * A function to calculate each person's role history.
+     * Calculate each person's role history.
      *
      * It groups together all people mapping changes and for each change
      * gets the highest role at the time of change.
