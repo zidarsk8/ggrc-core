@@ -25,12 +25,16 @@
     </a>
 
     {{#if reusable}}
-      {{#isDisabled instance}}
-        <input type="checkbox" checked disabled />
-      {{/isDisabled}}
-      {{^isDisabled instance}}
-        <input type="checkbox" {{#isLoading}}disabled{{/isLoading}} can-value="list.{{method}}-{{instance.type}}-{{instance.id}}" />
-      {{/isDisabled}}
+      {{#is_allowed 'update' baseInstance context='for'}}
+        {{#is_allowed 'update' instance context='for'}}
+          {{#isDisabled instance}}
+            <input type="checkbox" checked disabled />
+          {{/isDisabled}}
+          {{^isDisabled instance}}
+            <input type="checkbox" {{#isLoading}}disabled{{/isLoading}} can-value="list.{{method}}-{{instance.type}}-{{instance.id}}" />
+          {{/isDisabled}}
+        {{/is_allowed}}
+      {{/is_allowed}}
     {{/if}}
   </li>
 </reusable-object>
