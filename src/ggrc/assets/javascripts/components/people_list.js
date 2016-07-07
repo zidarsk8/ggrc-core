@@ -304,6 +304,10 @@
         var roleToRemove = can.capitalize(this.attr('type'));
         var deferred = this.attr('deferred');
 
+        // Turn off popover for the removed person
+        $(el).closest('li').find('.person-tooltip-trigger')
+          .removeClass('person-tooltip-trigger');
+
         if (deferred) {
           this.deferred_remove_role(person, roleToRemove);
         } else {
