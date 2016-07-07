@@ -42,7 +42,8 @@ describe('GGRC.Components.objectHistory', function () {
       componentInst = {
         _fetchRevisionsData: jasmine.createSpy(),
         _computeMappingChanges: jasmine.createSpy(),
-        _computeObjectChanges: jasmine.createSpy()
+        _computeObjectChanges: jasmine.createSpy(),
+        _computeRoleChanges: jasmine.createSpy()
       };
 
       method = Component.prototype.init.bind(componentInst);
@@ -68,6 +69,7 @@ describe('GGRC.Components.objectHistory', function () {
       componentInst._fetchRevisionsData.calls.reset();
       componentInst._computeMappingChanges.calls.reset();
       componentInst._computeObjectChanges.calls.reset();
+      componentInst._computeRoleChanges.calls.reset();
     });
 
     it('raises an error if the instance is not passed to the component',
@@ -252,6 +254,12 @@ describe('GGRC.Components.objectHistory', function () {
         },
         _objectCADiff: function () {
           return [];
+        },
+        _computeRoleChange: function () {
+          return {};
+        },
+        _getRoleAtTime: function () {
+          return 'none';
         }
       });
     });
@@ -692,7 +700,10 @@ describe('GGRC.Components.objectHistory', function () {
 
     beforeAll(function () {
       componentInst = {
-        _INSTANCE_TYPE: 'ObjectFoo'
+        _INSTANCE_TYPE: 'ObjectFoo',
+        _getRoleAtTime: function () {
+          return 'none';
+        }
       };
 
       method = Component.prototype._mappingChange.bind(componentInst);
@@ -719,6 +730,7 @@ describe('GGRC.Components.objectHistory', function () {
 
         expect(result).toEqual({
           madeBy: "User 17",
+          role: 'none',
           updatedAt: new Date('2015-05-17 17:24:01'),
           changes: {
             origVal: '—',
@@ -750,6 +762,7 @@ describe('GGRC.Components.objectHistory', function () {
 
         expect(result).toEqual({
           madeBy: "User 17",
+          role: 'none',
           updatedAt: new Date('2015-05-17 17:24:01'),
           changes: {
             origVal: 'Created',
