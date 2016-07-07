@@ -247,14 +247,8 @@
 
       roles = _.map(roles, _.capitalize);
 
-      _.forEach(roles, function (role) {
-        var roleIndex = roleOrder.indexOf(role);
-        if (roleIndex > currentMax) {
-          highestRole = role;
-          currentMax = roleIndex;
-        }
-      });
-      return highestRole;
+      roles.unshift('none');
+      return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
     }
   };
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);
