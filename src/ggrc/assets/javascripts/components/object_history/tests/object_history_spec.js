@@ -773,4 +773,41 @@ describe('GGRC.Components.objectHistory', function () {
       }
     );
   });
+
+  describe('_getRoleAtTime() method', function () {
+    var componentInst;  // fake component instance
+    var method;  // the method under test
+
+    beforeAll(function () {
+      componentInst = {
+        roleHistory: {
+          '1': [{
+            role: 'creator',
+            updated_at: 1
+          }, {
+            role: 'verifier',
+            updated_at: 2
+          }, {
+            role: 'assignee',
+            updated_at: 3
+          }]
+        }
+      };
+
+      method = Component.prototype._getRoleAtTime.bind(componentInst);
+    });
+
+    it('returns correct role for a given person', function () {
+      expect(method(1, 1)).toEqual('creator');
+      expect(method(1, 2)).toEqual('verifier');
+      expect(method(1, 2.5)).toEqual('verifier');
+      expect(method(1, 3)).toEqual('assignee');
+      expect(method(1, 4)).toEqual('assignee');
+    });
+
+    it('returns "none" if there is no known role', function () {
+      expect(method(1, 0)).toEqual('none');
+      expect(method(0, 3)).toEqual('none');
+    });
+  });
 });
