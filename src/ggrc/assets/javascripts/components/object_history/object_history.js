@@ -613,11 +613,14 @@
      * @return {String} - Lowercase role string
      */
     _getRoleAtTime: function (personId, timePoint) {
-      var personHistory = this.roleHistory[personId];
+      var personHistory = this.roleHistory[personId] || [];
       var role = _.last(_.takeWhile(personHistory, function (roleChange) {
         return roleChange.updated_at <= timePoint;
       }));
-      return role.role.toLowerCase();
+      if (role) {
+        return role.role.toLowerCase();
+      }
+      return 'none';
     }
   });
 })(window.GGRC, window.can);
