@@ -771,6 +771,10 @@ can.Model("can.Model.Cacheable", {
     this.attr('custom_attribute_definitions', definitions);
   },
 
+  /**
+   * Setup the instance's custom attribute validations, and initialize their
+   * values, if necessary.
+   */
   setup_custom_attributes: function () {
     var self = this;
     var key;
@@ -782,8 +786,9 @@ can.Model("can.Model.Cacheable", {
         delete this.class.validations[key];
       }
     }
-    can.each(this.custom_attribute_definitions, function (definition) {
 
+    // setup validators for custom attributes based on their definitions
+    can.each(this.custom_attribute_definitions, function (definition) {
       if (definition.mandatory && !this.ignore_ca_errors) {
         if (definition.attribute_type === 'Checkbox') {
           self.class.validate('custom_attributes.' + definition.id,
@@ -796,6 +801,8 @@ can.Model("can.Model.Cacheable", {
         }
       }
     }.bind(this));
+
+    // if necessary, initialize custom attributes' values on the instance
     if (!this.custom_attributes) {
       this.attr('custom_attributes', new can.Map());
       can.each(this.custom_attribute_values, function (value) {
@@ -819,6 +826,13 @@ can.Model("can.Model.Cacheable", {
         }
       }.bind(this));
     }
+
+    // Due to the current lack on any information on sort order, just use the
+    // order the custom attributes were defined in.
+    function sortById(a, b) {
+      return a.id - b.id;
+    }
+    this.attr('custom_attribute_definitions').sort(sortById);
   },
 
   _custom_attribute_map: function (attrId, object) {
