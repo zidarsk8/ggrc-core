@@ -194,6 +194,7 @@ can.Component.extend({
         link: value,
         title: value,
         context: this.scope.parent_instance.context || new CMS.Models.Context({id : null}),
+        owners: [CMS.Models.Person.findInCacheById(GGRC.current_user.id)],
       });
     },
   },
