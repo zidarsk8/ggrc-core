@@ -509,7 +509,6 @@
       var mappings = _.sortBy(revisions.mappings, 'updated_at');
       var instance = this.scope.instance;
       var assigneeList = instance.class.assignable_list;
-      var peopleMappings;
       var perPersonMappings;
       var perPersonRoleHistory;
       var modifiers;
@@ -518,18 +517,18 @@
       var unmodifiedAssignees;
       var unassignedPeople;
 
-      peopleMappings = _.filter(mappings, function (rev) {
-        if (rev.source_type === 'Person' || rev.destination_type === 'Person') {
-          return rev;
-        }
-      });
-
-      perPersonMappings = _.groupBy(peopleMappings, function (rev) {
-        if (rev.source_type === 'Person') {
-          return rev.source_id;
-        }
-        return rev.destination_id;
-      });
+      perPersonMappings = _(mappings)
+        .filter(function (rev) {
+          if (rev.source_type === 'Person' || rev.destination_type === 'Person') {
+            return rev;
+          }
+        })
+        .groupBy(function (rev) {
+          if (rev.source_type === 'Person') {
+            return rev.source_id;
+          }
+          return rev.destination_id;
+        }).value();
 
       perPersonRoleHistory = _.zipObject(
         _.map(perPersonMappings, function (revisions, pid) {
