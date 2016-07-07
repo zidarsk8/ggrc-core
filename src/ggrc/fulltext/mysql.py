@@ -1,6 +1,20 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from sqlalchemy import alias
+from sqlalchemy import and_
+from sqlalchemy import case
+from sqlalchemy import distinct
+from sqlalchemy import event
+from sqlalchemy import func
+from sqlalchemy import literal
+from sqlalchemy import or_
+from sqlalchemy import union
+from sqlalchemy.sql import false
+from sqlalchemy.schema import DDL
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import aliased
+from sqlalchemy.sql.expression import select
 from ggrc import db
 from ggrc.login import get_current_user
 from ggrc.models import all_models
@@ -12,14 +26,6 @@ from ggrc_basic_permissions import objects_via_assignable_query
 from ggrc_basic_permissions import program_relationship_query
 from ggrc_basic_permissions import backlog_workflows
 from ggrc.rbac import permissions, context_query_filter
-from sqlalchemy import \
-    event, and_, or_, literal, union, alias, case, func, distinct
-from sqlalchemy.sql import false
-from sqlalchemy.schema import DDL
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import aliased
-from sqlalchemy.sql.expression import select
-from sqlalchemy.sql.expression import union
 from .sql import SqlIndexer
 
 
