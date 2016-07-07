@@ -41,6 +41,10 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       CustomAttributeValue with the correct definition type and value.
     """
     self.definition = self.get_ca_definition()
+    if self.definition is None:
+      self.add_warning(errors.INVALID_ATTRIBUTE_WARNING,
+                       column_name=self.display_name)
+      return None
     value = models.CustomAttributeValue(custom_attribute_id=self.definition.id)
     typ = self.definition.attribute_type.split(":")[0]
     value_handler = self._type_handlers[typ]
