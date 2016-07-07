@@ -325,7 +325,7 @@ describe('GGRC.Components.objectHistory', function () {
           updated_at: '2016-01-25T16:36:29',
           modified_by: {
             reify: function () {
-              return "User 5";
+              return 'User 5';
             }
           },
           resource_type: 'Audit',
@@ -337,7 +337,7 @@ describe('GGRC.Components.objectHistory', function () {
           updated_at: '2016-01-30T13:22:59',
           modified_by: {
             reify: function () {
-              return "User 5";
+              return 'User 5';
             }
           },
           resource_type: 'Audit',
@@ -362,7 +362,7 @@ describe('GGRC.Components.objectHistory', function () {
             updated_at: '2016-01-25T16:36:29',
             modified_by: {
               reify: function () {
-                return "User 5";
+                return 'User 5';
               }
             },
             resource_type: 'Audit',
@@ -374,7 +374,7 @@ describe('GGRC.Components.objectHistory', function () {
             updated_at: '2016-01-30T13:22:59',
             modified_by: {
               reify: function () {
-                return "User 5";
+                return 'User 5';
               }
             },
             resource_type: 'Audit',
@@ -398,7 +398,7 @@ describe('GGRC.Components.objectHistory', function () {
             updated_at: '2016-01-25T16:36:29',
             modified_by: {
               reify: function () {
-                return "User 5";
+                return 'User 5';
               }
             },
             resource_type: 'Audit',
@@ -410,7 +410,7 @@ describe('GGRC.Components.objectHistory', function () {
             updated_at: '2016-01-30T13:22:59',
             modified_by: {
               reify: function () {
-                return "User 5";
+                return 'User 5';
               }
             },
             resource_type: 'Audit',
@@ -729,7 +729,7 @@ describe('GGRC.Components.objectHistory', function () {
         var result = method(revision, [revision]);
 
         expect(result).toEqual({
-          madeBy: "User 17",
+          madeBy: 'User 17',
           role: 'none',
           updatedAt: new Date('2015-05-17 17:24:01'),
           changes: {
@@ -761,7 +761,7 @@ describe('GGRC.Components.objectHistory', function () {
         var result = method(revision, [revision]);
 
         expect(result).toEqual({
-          madeBy: "User 17",
+          madeBy: 'User 17',
           role: 'none',
           updatedAt: new Date('2015-05-17 17:24:01'),
           changes: {
