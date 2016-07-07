@@ -822,5 +822,10 @@ describe('GGRC.Components.objectHistory', function () {
       function () {
         expect(method(0, new Date(2016, 1, 10))).toEqual('none');
       });
+    it('returns "none" if there is no known role and no user history ' +
+       'exists on specific dates',
+        function () {
+          expect(method(0, new Date(2016, 1, 2))).toEqual('none');
+        });
   });
 });
