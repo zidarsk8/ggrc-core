@@ -797,17 +797,30 @@ describe('GGRC.Components.objectHistory', function () {
       method = Component.prototype._getRoleAtTime.bind(componentInst);
     });
 
-    it('returns correct role for a given person', function () {
+    it('returns correct role for a given person at initial time', function () {
       expect(method(1, new Date(2016, 0, 1))).toEqual('creator');
+    });
+    it('returns correct role for a given person on first change', function () {
       expect(method(1, new Date(2016, 1, 2))).toEqual('verifier');
-      expect(method(1, new Date(2016, 1, 15))).toEqual('verifier');
+    });
+    it('returns correct role for a given person in the middle of interval',
+      function () {
+        expect(method(1, new Date(2016, 1, 15))).toEqual('verifier');
+      });
+    it('returns correct role for a given person on third change', function () {
       expect(method(1, new Date(2016, 2, 3))).toEqual('assignee');
-      expect(method(1, new Date(2016, 3, 1))).toEqual('assignee');
     });
+    it('returns correct role for a given person after last change',
+      function () {
+        expect(method(1, new Date(2016, 3, 1))).toEqual('assignee');
+      });
 
-    it('returns "none" if there is no known role', function () {
+    it('returns "none" if there is no known role at that time', function () {
       expect(method(1, new Date(2015, 1, 1))).toEqual('none');
-      expect(method(0, new Date(2016, 1, 10))).toEqual('none');
     });
+    it('returns "none" if there is no known role if no user history exists',
+      function () {
+        expect(method(0, new Date(2016, 1, 10))).toEqual('none');
+      });
   });
 });
