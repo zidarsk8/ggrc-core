@@ -30,6 +30,8 @@ permissions = {
         "Document",
         "Meeting",
         "Context",
+        "CustomAttributeDefinition",
+        "CustomAttributeValue",
     ],
     "create": [
         "Request",
@@ -45,7 +47,9 @@ permissions = {
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting"
+        "Meeting",
+        "CustomAttributeDefinition",
+        "CustomAttributeValue",
     ],
     "view_object_page": [
         "__GGRC_ALL__"
@@ -64,7 +68,9 @@ permissions = {
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting"
+        "Meeting",
+        "CustomAttributeDefinition",
+        "CustomAttributeValue",
     ],
     "delete": [
         "UserRole",
@@ -79,6 +85,8 @@ permissions = {
         "Document",
         "Meeting"
         "AuditObject",
-        "Audit"
+        "Audit",
+        "CustomAttributeDefinition",
+        "CustomAttributeValue",
     ]
 }
