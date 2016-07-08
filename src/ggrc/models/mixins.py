@@ -697,7 +697,7 @@ class CustomAttributable(object):
         cascade='all, delete-orphan',
     )
 
-  def custom_attributes(cls, attributes):
+  def custom_attributes(self, attributes):
     from ggrc.fulltext.mysql import MysqlRecordProperty
     from ggrc.models.custom_attribute_value import CustomAttributeValue
     from ggrc.services import signals
@@ -715,8 +715,8 @@ class CustomAttributable(object):
 
     # 1) Get all custom attribute values for the CustomAttributable instance
     attr_values = db.session.query(CustomAttributeValue).filter(and_(
-        CustomAttributeValue.attributable_type == cls.__class__.__name__,
-        CustomAttributeValue.attributable_id == cls.id)).all()
+      CustomAttributeValue.attributable_type == self.__class__.__name__,
+      CustomAttributeValue.attributable_id == self.id)).all()
 
     attr_value_ids = [v.id for v in attr_values]
     ftrp_properties = [
@@ -738,7 +738,7 @@ class CustomAttributable(object):
       db.session.query(MysqlRecordProperty)\
           .filter(
               and_(
-                  MysqlRecordProperty.type == cls.__class__.__name__,
+                MysqlRecordProperty.type == self.__class__.__name__,
                   MysqlRecordProperty.property.in_(ftrp_properties)))\
           .delete(synchronize_session='fetch')
 
@@ -752,10 +752,10 @@ class CustomAttributable(object):
     # 4) Instantiate custom attribute values for each of the definitions
     #    passed in (keys)
     # pylint: disable=not-an-iterable
-    definitions = {d.id: d for d in cls.get_custom_attribute_definitions()}
+    definitions = {d.id: d for d in self.get_custom_attribute_definitions()}
     for ad_id in attributes.keys():
-      obj_type = cls.__class__.__name__
-      obj_id = cls.id
+      obj_type = self.__class__.__name__
+      obj_id = self.id
       new_value = CustomAttributeValue(
           custom_attribute_id=ad_id,
           attributable_id=obj_id,
@@ -770,30 +770,30 @@ class CustomAttributable(object):
       #    of the custom attributable.
       # TODO: We are ignoring contexts for now
       # new_value.context_id = cls.context_id
-      cls.custom_attribute_values.append(new_value)
+      self.custom_attribute_values.append(new_value)
       if ad_id in last_values:
         ca, pv = last_values[ad_id]  # created_at, previous_value
         if pv != attributes[ad_id]:
           signals.Signals.custom_attribute_changed.send(
-              cls.__class__,
-              obj=cls,
+              self.__class__,
+              obj=self,
               src={
                   "type": obj_type,
                   "id": obj_id,
                   "operation": "UPDATE",
                   "value": new_value,
                   "old": pv
-              }, service=cls.__class__.__name__)
+              }, service=self.__class__.__name__)
       else:
         signals.Signals.custom_attribute_changed.send(
-            cls.__class__,
-            obj=cls,
+            self.__class__,
+            obj=self,
             src={
                 "type": obj_type,
                 "id": obj_id,
                 "operation": "INSERT",
                 "value": new_value,
-            }, service=cls.__class__.__name__)
+            }, service=self.__class__.__name__)
 
   _publish_attrs = ['custom_attribute_values', 'custom_attribute_definitions']
   _update_attrs = ['custom_attributes']
