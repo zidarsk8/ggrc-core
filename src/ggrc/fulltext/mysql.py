@@ -1,6 +1,20 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from sqlalchemy import alias
+from sqlalchemy import and_
+from sqlalchemy import case
+from sqlalchemy import distinct
+from sqlalchemy import event
+from sqlalchemy import func
+from sqlalchemy import literal
+from sqlalchemy import or_
+from sqlalchemy import union
+from sqlalchemy.sql import false
+from sqlalchemy.schema import DDL
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import aliased
+from sqlalchemy.sql.expression import select
 from ggrc import db
 from ggrc.login import get_current_user
 from ggrc.models import all_models
@@ -12,11 +26,6 @@ from ggrc_basic_permissions import objects_via_assignable_query
 from ggrc_basic_permissions import program_relationship_query
 from ggrc_basic_permissions import backlog_workflows
 from ggrc.rbac import permissions, context_query_filter
-from sqlalchemy import \
-    event, and_, or_, literal, union, alias, case, func, distinct
-from sqlalchemy.sql import false
-from sqlalchemy.schema import DDL
-from sqlalchemy.ext.declarative import declared_attr
 from .sql import SqlIndexer
 
 
@@ -373,9 +382,13 @@ class MysqlIndexer(SqlIndexer):
   def search(self, terms, types=None, permission_type='read',
              permission_model=None, contact_id=None, extra_params={}):
     model_names = self._get_grouped_types(types, extra_params)
-    query = db.session.query(
-        self.record_type.key, self.record_type.type,
-        self.record_type.property, self.record_type.content)
+    columns = (
+        self.record_type.key.label('key'),
+        self.record_type.type.label('type'),
+        self.record_type.property.label('property'),
+        self.record_type.content.label('content'))
+
+    query = db.session.query(*columns)
     query = query.filter(
         self._get_type_query(model_names, permission_type, permission_model))
     query = query.filter(self._get_filter_query(terms))
@@ -385,14 +398,12 @@ class MysqlIndexer(SqlIndexer):
     if types is not None:
       model_names = [m for m in model_names if m in types]
 
-    unions = []
+    unions = [query]
     # Add extra_params and extra_colums:
     for k, v in extra_params.iteritems():
       if k not in model_names:
         continue
-      q = db.session.query(
-          self.record_type.key, self.record_type.type,
-          self.record_type.property, self.record_type.content)
+      q = db.session.query(*columns)
       q = q.filter(
           self._get_type_query([k], permission_type, permission_model))
       q = q.filter(self._get_filter_query(terms))
@@ -401,11 +412,11 @@ class MysqlIndexer(SqlIndexer):
       unions.append(q)
     # Sort by title:
     # FIXME: This only orders by `title` if title was the matching property
-    query = query.union(*unions)
-    query = query.order_by(case(
-        [(self.record_type.property == "title", self.record_type.content)],
-        else_=literal("ZZZZZ")))
-    return query
+    all_queries = union(*unions)
+    all_queries = aliased(all_queries.order_by(case(
+        [(all_queries.c.property == "title", all_queries.c.content)],
+        else_=literal("ZZZZZ"))))
+    return db.session.execute(select([all_queries.c.key, all_queries.c.type]))
 
   def counts(self, terms, group_by_type=True, types=None, contact_id=None,
              extra_params={}, extra_columns={}):
