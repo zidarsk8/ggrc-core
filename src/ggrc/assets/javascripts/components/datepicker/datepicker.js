@@ -16,6 +16,7 @@
       date: null,
       format: '@',
       label: '@',
+      helptext: '@',
       isShown: false,
       pattern: 'MM/DD/YYYY',
       setMinDate: null,

@@ -4,7 +4,12 @@
 }}
 <div class="datepicker__wrapper">
   {{#label}}
-    <label>{{label}}</label>
+    <label>
+      {{label}}
+      {{#helptext}}
+        <i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>
+      {{/helptext}}
+    </label>
   {{/label}}
   <div class="datepicker__input-wrapper">
     <i class="fa fa-calendar"></i>
