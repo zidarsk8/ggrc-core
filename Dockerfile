@@ -1,4 +1,4 @@
-FROM phusion/baseimage
+FROM phusion/baseimage:0.9.15
 
 RUN rm /usr/sbin/policy-rc.d \
   && curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash \
