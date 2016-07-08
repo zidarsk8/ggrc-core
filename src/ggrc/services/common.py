@@ -112,7 +112,7 @@ def get_related_keys_for_expiration(context, o):
 
 def set_ids_for_new_custom_attributes(objects, parent_obj):
   """
-  When we are creating custom attribute values for
+  When we are creating custom attribute values and definitions for
   POST requests, parent object ID is not yet defined. This is why we update
   custom attribute values at this point and set the correct attributable_id
 
@@ -126,10 +126,20 @@ def set_ids_for_new_custom_attributes(objects, parent_obj):
   """
 
   from ggrc.models.custom_attribute_value import CustomAttributeValue
+  from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+
+  object_attrs = {
+    "CustomAttributeValue": "attributable_id",
+    "CustomAttributeDefinition": "definition_id"
+  }
+
   for obj in objects:
-    if not isinstance(obj, CustomAttributeValue):
+    if obj.type not in object_attrs:
       continue
-    obj.attributable_id = parent_obj.id
+
+    attr = object_attrs[obj.type]
+    setattr(obj, attr, parent_obj.id)
+
     # Disable state updating so that a newly create object doesn't go straight
     # from Draft to Modified.
     if hasattr(obj, '_skip_os_state_update'):
