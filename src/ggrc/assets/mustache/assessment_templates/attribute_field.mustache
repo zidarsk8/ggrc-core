@@ -5,10 +5,10 @@
 
 {{^field._pending_delete}}
   <div class="span-custom2-and-half">{{field.title}}</div>
-  <div class="span-custom1-and-half">{{field.attribute_type}}</div>
+  <div class="span-custom1-and-half">{{field.attribute_name}}</div>
   <div class="span2">
     {{#attrs}}
-      <span class="block">{{.}}</span>
+      <span class="block single-line" title="{{.}}">{{.}}</span>
     {{/attrs}}
   </div>
   <div class="span2 centered checkbox-wrap">

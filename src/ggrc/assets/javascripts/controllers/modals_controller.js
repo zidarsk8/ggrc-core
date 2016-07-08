@@ -137,7 +137,9 @@ can.Control('GGRC.Controllers.Modals', {
       return current;
     }, '_transient');
 
-    instance.attr(['_transient'].concat(name).join('.'), value);
+    if (name.length) {
+      instance.attr(['_transient'].concat(name).join('.'), value);
+    }
   },
 
   autocomplete: function (el) {
@@ -218,67 +220,86 @@ can.Control('GGRC.Controllers.Modals', {
     ).done(this.proxy('draw'));
   }
 
-  , fetch_data : function(params) {
-    var that = this,
-        dfd,
-        instance;
+  , fetch_data: function (params) {
+    var that = this;
+    var dfd;
+    var instance;
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
     if (this.options.skip_refresh && this.options.instance) {
       return new $.Deferred().resolve(this.options.instance);
-    }
-    else if (this.options.instance) {
+    } else if (this.options.instance) {
       dfd = this.options.instance.refresh();
-    }
-    else if (this.options.model) {
-      dfd = this.options.new_object_form
-          ? $.when(this.options.attr("instance", new this.options.model(params).attr("_suppress_errors", true)))
-          : this.options.model.findAll(params).then(function(data) {
-            var h;
-            if(data.length) {
-              that.options.attr("instance", data[0]);
-              return data[0].refresh(); //have to refresh (get ETag) to be editable.
-            } else {
-              that.options.attr("new_object_form", true);
-              that.options.attr("instance", new that.options.model(params));
-              return that.options.instance;
-            }
-          }).done(function() {
-            // Check if modal was closed
-            if(that.element !== null)
-              that.on(); //listen to instance.
-          });
-    }
-    else {
-      this.options.attr("instance", new can.Observe(params));
+    } else if (this.options.model) {
+      if (this.options.new_object_form) {
+        dfd = $.when(this.options.attr(
+          'instance',
+          new this.options.model(params).attr('_suppress_errors', true)
+        ));
+      } else {
+        dfd = this.options.model.findAll(params).then(function (data) {
+          if (data.length) {
+            that.options.attr('instance', data[0]);
+            return data[0].refresh(); // have to refresh (get ETag) to be editable.
+          }
+          that.options.attr('new_object_form', true);
+          that.options.attr('instance', new that.options.model(params));
+          return that.options.instance;
+        }).done(function () {
+          // Check if modal was closed
+          if (that.element !== null) {
+            that.on(); // listen to instance.
+          }
+        });
+      }
+    } else {
+      this.options.attr('instance', new can.Observe(params));
       that.on();
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     instance = this.options.instance;
     if (instance) {
       // Make sure custom attributes are preloaded:
-      dfd = dfd.then(function(){
+      dfd = dfd.then(function () {
         return $.when(
-          instance.load_custom_attribute_definitions && instance.load_custom_attribute_definitions(),
-          instance.custom_attribute_values ? instance.refresh_all('custom_attribute_values') : []
+          instance.load_custom_attribute_definitions &&
+            instance.load_custom_attribute_definitions(),
+          instance.custom_attribute_values ?
+            instance.refresh_all('custom_attribute_values') :
+            []
         );
       });
     }
-    return dfd.done(function() {
-      // If the modal is closed early, the element no longer exists
-      if (that.element) {
-        // Make sure custom attr validations/values are set
-        if (instance && instance.setup_custom_attributes) {
-          instance.setup_custom_attributes();
+    return dfd.done(function () {
+      this.reset_form(function () {
+        if (instance) {
+          // Make sure custom attr validations/values are reset
+          instance.custom_attributes = undefined;
+          if (instance.setup_custom_attributes) {
+            instance.setup_custom_attributes();
+          }
         }
-        // This is to trigger `focus_first_element` in modal_ajax handling
-        that.element.trigger("loaded");
+      });
+    }.bind(that));
+  },
+
+  reset_form: function (setFieldsCb) {
+    // If the modal is closed early, the element no longer exists
+    if (this.element) {
+      // Do the fields (re-)setting
+      if (_.isFunction(setFieldsCb)) {
+        setFieldsCb();
       }
-
-
-      that.options.instance._transient || that.options.instance.attr("_transient", new can.Observe({}));
-      that.options.instance.form_preload && that.options.instance.form_preload(that.options.new_object_form);
-    });
+      // This is to trigger `focus_first_element` in modal_ajax handling
+      this.element.trigger('loaded');
+    }
+    if (!this.options.instance._transient) {
+      this.options.instance.attr('_transient', new can.Observe({}));
+    }
+    if (this.options.instance.form_preload) {
+      this.options.instance.form_preload(this.options.new_object_form,
+                                            this.options.object_params);
+    }
   }
 
   , fetch_all : function() {
@@ -638,7 +659,7 @@ can.Control('GGRC.Controllers.Modals', {
     var i, ui_arr_length = this.options.ui_array.length,
         $form = this.element.find("form"),
         $body = $form.closest(".modal-body"),
-        uiElements = $body.find("[uiindex]")
+        uiElements = $body.find("[uiindex]"),
         $hideButton = this.element.find("#formHide");
 
     for (i = 0; i < ui_arr_length; i++) {
@@ -844,16 +865,11 @@ can.Control('GGRC.Controllers.Modals', {
     }, this);
 
     $.when(this.options.attr('instance', new_instance))
-      .done (function() {
-        // If the modal is closed early, the element no longer exists
-        if (this.element) {
+      .done(function () {
+        this.reset_form(function () {
           var $form = $(this.element).find('form');
           $form.trigger('reset');
-          // This is to trigger `focus_first_element` in modal_ajax handling
-          this.element.trigger("loaded");
-        }
-        this.options.instance._transient || this.options.instance.attr("_transient", new can.Observe({}));
-        this.options.instance.form_preload && this.options.instance.form_preload(this.options.new_object_form);
+        });
       }.bind(this))
       .then(this.proxy("apply_object_params"))
       .then(this.proxy("serialize_form"))
@@ -883,6 +899,21 @@ can.Control('GGRC.Controllers.Modals', {
       }
 
       this.disable_hide = true;
+    /**
+     * Temporary solution and after updated the backend it need to be deleted
+     * Start deprecated block
+     */
+    instance._cachedCADefinitions = {};
+
+    _.forEach(instance.custom_attribute_definitions, function (attr) {
+      instance._cachedCADefinitions[attr.id] = {
+        multi_choice_mandatory: attr.multi_choice_mandatory || '',
+        mandatory: !!attr.mandatory
+      };
+    });
+    /**
+     * End deprecated block
+     */
       ajd = instance.save();
       ajd.fail(this.save_error.bind(this))
         .done(function (obj) {

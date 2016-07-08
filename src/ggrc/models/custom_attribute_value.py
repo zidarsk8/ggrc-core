@@ -102,7 +102,7 @@ class CustomAttributeValue(Base, db.Model):
     attr_def = all_models.CustomAttributeDefinition.query.filter_by(
         id=custom_attribute_id
     ).first()
-    if attr_def.attribute_type.startswith("Map:"):
+    if attr_def and attr_def.attribute_type.startswith("Map:"):
       map_type = attr_def.attribute_type[4:]
       map_class = getattr(all_models, map_type, None)
       if map_class:

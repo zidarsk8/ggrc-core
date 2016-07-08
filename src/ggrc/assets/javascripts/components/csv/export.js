@@ -84,7 +84,9 @@
           GGRC.Utils.download("import_template.csv", data);
         }.bind(this))
         .fail(function (data) {
-          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
+          $("body").trigger("ajax:flash", {
+            "error": $(data.responseText.split("\n")[3]).text()
+          });
         }.bind(this));
       },
       ".import-list a click": function (el, ev) {
@@ -165,7 +167,9 @@
           GGRC.Utils.download(this.scope.attr("export.get_filename"), data);
         }.bind(this))
         .fail(function (data) {
-          $("body").trigger("ajax:flash", {"error": data.responseText.split("\n")[3]});
+          $("body").trigger("ajax:flash", {
+            "error": $(data.responseText.split("\n")[3]).text()
+          });
         }.bind(this))
         .always(function () {
           this.scope.attr("export.loading", false);

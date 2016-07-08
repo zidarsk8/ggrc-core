@@ -1,15 +1,17 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Module for basic mixing for orm models."""
+
 from uuid import uuid1
 import collections
 import datetime
 
 from flask import current_app
 from sqlalchemy import and_
+from sqlalchemy import or_
 from sqlalchemy import event
 from sqlalchemy import orm
-from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import foreign
@@ -694,6 +696,32 @@ class CustomAttributable(object):
         "CustomAttributeDefinition",
         primaryjoin=join_function,
         backref='{0}_custom_attributable_definition'.format(self.__name__),
+        viewonly=True,
+    )
+
+  @declared_attr
+  def _custom_attributes_deletion(self):
+    """This declared attribute is used only for handling cascade deletions
+       for CustomAttributes. This is done in order not to try to delete
+       "global" custom attributes that don't have any definition_id related.
+       Attempt to delete custom attributes with definition_id=None causes the
+       IntegrityError as we shouldn't be able to delete global attributes along
+       side with any other object (e.g. Assessments).
+    """
+    from ggrc.models.custom_attribute_definition import (
+        CustomAttributeDefinition
+    )
+
+    def join_function():
+      """Join condition used for deletion"""
+      definition_id = foreign(CustomAttributeDefinition.definition_id)
+      definition_type = foreign(CustomAttributeDefinition.definition_type)
+      return and_(definition_id == self.id,
+                  definition_type == self._inflector.table_singular)
+
+    return relationship(
+        "CustomAttributeDefinition",
+        primaryjoin=join_function,
         cascade='all, delete-orphan',
     )
 
@@ -802,10 +830,16 @@ class CustomAttributable(object):
   @classmethod
   def get_custom_attribute_definitions(cls):
     from ggrc.models.custom_attribute_definition import \
-        CustomAttributeDefinition
-    return CustomAttributeDefinition.query.filter(
-        CustomAttributeDefinition.definition_type ==
-        underscore_from_camelcase(cls.__name__)).all()
+        CustomAttributeDefinition as cad
+    if cls.__name__ == "Assessment":
+      return cad.query.filter(or_(
+          cad.definition_type == underscore_from_camelcase(cls.__name__),
+          cad.definition_type == "assessment_template",
+      )).all()
+    else:
+      return cad.query.filter(
+          cad.definition_type == underscore_from_camelcase(cls.__name__)
+      ).all()
 
   @classmethod
   def eager_query(cls):

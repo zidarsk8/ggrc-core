@@ -8,7 +8,7 @@
 
   var gdrive_findAll;
   var gapi_request_with_auth;
-  var scopes = ['https://www.googleapis.com/auth/drive.file',
+  var scopes = ['https://www.googleapis.com/auth/drive',
     'https://www.googleapis.com/auth/apps.groups.settings'];
 
   /*

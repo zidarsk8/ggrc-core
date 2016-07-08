@@ -17,30 +17,37 @@ describe('GGRC.Components.addTemplateField', function () {
     var $el;
     var ev;
     var scope;
-
-    beforeAll(function () {
-      addField = Component.prototype.scope.addField;
-    });
+    var parentScope;
+    var scope_;
 
     beforeEach(function () {
-      $el = $('<div></div>');
+      parentScope = {
+        attr: function () {
+          return {};
+        }
+      };
+      scope_ = Component.prototype.scope({}, parentScope);
+      addField = scope_.addField;
 
+      $el = $('<div></div>');
       ev = {
         preventDefault: jasmine.createSpy()
       };
-
       scope = new can.Map({
         fields: new can.List(),
         selected: new can.Map(),
-        id: 123
+        valueAttrs: ['Dropdown'],
+        id: 123,
+        isInvalidTitle: scope_.isInvalidTitle.bind(scope),
+        isInvalidValues: scope_.isInvalidValues.bind(scope)
       });
     });
 
-    it('does not require the "values" field to add a field of type Person',
+    it('does not require the "values" field to add a field of type Map:Person',
       function (done) {
         var selectedObj = new can.Map({
           title: 'External Reviewer',
-          type: 'Person',
+          type: 'Map:Person',
           values: ''
         });
         scope.attr('selected', selectedObj);
@@ -55,6 +62,182 @@ describe('GGRC.Components.addTemplateField', function () {
           expect(scope.fields.length).toEqual(1);
           done();
         }, 3);
+      }
+    );
+    it('requires the "values" field to add a field of type Dropdown',
+      function (done) {
+        var selectedObj = new can.Map({
+          title: 'External Reviewer',
+          type: 'Dropdown',
+          values: 'value0 value1'
+        });
+        scope.attr('selected', selectedObj);
+        addField.call(scope, scope, $el, ev);
+        setTimeout(function () {
+          expect(scope.fields.length).toEqual(1);
+          done();
+        }, 3);
+      }
+    );
+    it('requires the "values" field to add a field of type Dropdown',
+      function (done) {
+        var selectedObj = new can.Map({
+          title: 'External Reviewer',
+          type: 'Dropdown',
+          values: ''
+        });
+        scope.attr('selected', selectedObj);
+        addField.call(scope, scope, $el, ev);
+        setTimeout(function () {
+          expect(scope.fields.length).toEqual(0);
+          done();
+        }, 3);
+      }
+    );
+    it('requires the "values" field to add a field of type Text',
+      function (done) {
+        var selectedObj = new can.Map({
+          title: 'External Reviewer',
+          type: 'Text',
+          values: ''
+        });
+        scope.attr('selected', selectedObj);
+        addField.call(scope, scope, $el, ev);
+        setTimeout(function () {
+          expect(scope.fields.length).toEqual(1);
+          done();
+        }, 3);
+      }
+    );
+    it('requires the "title" field to add a field',
+      function (done) {
+        var selectedObj = new can.Map({
+          title: '',
+          type: 'Text',
+          values: ''
+        });
+        scope.attr('selected', selectedObj);
+        addField.call(scope, scope, $el, ev);
+        setTimeout(function () {
+          expect(scope.fields.length).toEqual(0);
+          done();
+        }, 3);
+      }
+    );
+  });
+
+  describe('isInvalidTitle() method', function () {
+    var isInvalidTitle;  // the method under test
+    var result;
+    var selectedTitle;
+    var fields;
+
+    beforeAll(function () {
+      var parentScope = {
+        attr: function () {
+          return {};
+        }
+      };
+      var scope_ = Component.prototype.scope({}, parentScope);
+      isInvalidTitle = scope_.isInvalidTitle;
+    });
+
+    beforeEach(function () {
+      fields = new can.List();
+      result = undefined;
+    });
+
+    it('has to not allow to input titles that are already in "fields"',
+      function (done) {
+        fields.push({
+          id: 123,
+          title: 'title',
+          attribute_type: 'Text',
+          multi_choice_options: '',
+          opts: new can.Map()
+        });
+        selectedTitle = 'title';
+
+        result = isInvalidTitle(fields, selectedTitle);
+
+        expect(result).toEqual(true);
+        done();
+      }
+    );
+
+    it('has to allow to input titles that are not in "fields"',
+      function (done) {
+        fields.push({
+          id: 123,
+          title: 'title',
+          attribute_type: 'Text',
+          multi_choice_options: '',
+          opts: new can.Map()
+        });
+        selectedTitle = 'new title';
+
+        result = isInvalidTitle(fields, selectedTitle);
+
+        expect(result).toEqual(false);
+        done();
+      }
+    );
+
+    it('has not to allow to input empty titles',
+      function (done) {
+        selectedTitle = '';
+
+        result = isInvalidTitle(fields, selectedTitle);
+
+        expect(result).toEqual(true);
+        done();
+      }
+    );
+  });
+
+  describe('isInvalidValues() method', function () {
+    var isInvalidValues;  // the method under test
+    var valueAttrs;
+    var result;
+    var parentScope;
+    var scope_;
+
+    beforeAll(function () {
+      valueAttrs = ['Dropdown'];
+      parentScope = {
+        attr: function () {
+          return {};
+        }
+      };
+      scope_ = Component.prototype.scope({}, parentScope);
+      isInvalidValues = scope_.isInvalidValues;
+    });
+
+    beforeEach(function () {
+      result = undefined;
+    });
+
+    it('has to not allow to input type "Dropdown" with not set values',
+      function (done) {
+        result = isInvalidValues(valueAttrs, 'Dropdown', '');
+        expect(result).toEqual(true);
+        done();
+      }
+    );
+
+    it('has to allow to input type "Dropdown" with set values',
+      function (done) {
+        result = isInvalidValues(valueAttrs, 'DropDown', 'some values');
+        expect(result).toEqual(false);
+        done();
+      }
+    );
+
+    it('has to allow to input type "Text" with not set values',
+      function (done) {
+        result = isInvalidValues(valueAttrs, 'Text', '');
+        expect(result).toEqual(false);
+        done();
       }
     );
   });

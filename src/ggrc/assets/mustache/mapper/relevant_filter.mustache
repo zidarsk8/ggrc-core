@@ -3,14 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<h6>Filter by mapping relevance</h6>
+<h6>Filter by mapping</h6>
 {{#each relevant}}
   <div class="single-line-filter">
     <button type="submit" data-index="{{@index}}" class="remove_filter">
       <i class="fa fa-trash"></i>
     </button>
     <label>
-      {{#if @index}}AND {{/if}}Relevant to:
+      {{#if @index}}AND {{/if}}Mapped to:
     </label>
     <select class="input-small filter-type-selector select-filter{{@index}}" can-value="model_name">
       {{#menu}}

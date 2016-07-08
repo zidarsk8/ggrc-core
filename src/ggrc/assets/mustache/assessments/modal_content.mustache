@@ -57,8 +57,8 @@
     </div>
 
 
-    <div class="span6">
-      <div class="row-fluid wrap-row">
+    <div class="span6 hide-wrap">
+      <div class="row-fluid inner-hide wrap-row">
         <div class="span12">
           <people-list instance="instance" editable="true" deferred="true" validate="true"></people-list>
         </div>
@@ -67,6 +67,7 @@
       <div class="row-fluid inner-hide">
         <div data-id="notifications_hidden" class="span12 hidable">
           <div class="comment-notification">
+            <a data-id="hide_notification_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
             <label>
               <input type="checkbox"
                      name="send_by_default"

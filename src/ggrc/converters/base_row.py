@@ -5,6 +5,7 @@
 """
 
 from sqlalchemy import func
+import collections
 
 import ggrc.services
 from ggrc import db
@@ -28,14 +29,23 @@ class RowConverter(object):
     self.ignore = False
     self.index = options.get("index", -1)
     self.row = options.get("row", [])
-    self.attrs = {}
-    self.objects = {}
+    self.attrs = collections.OrderedDict()
+    self.objects = collections.OrderedDict()
     self.id_key = ""
     offset = 3  # 2 header rows and 1 for 0 based index
     self.line = self.index + self.block_converter.offset + offset
     self.headers = options.get("headers", [])
 
   def add_error(self, template, **kwargs):
+    """Add error for current row.
+
+    Add an error entry for the current row and mark it as ignored. If the error
+    occurred on a new object, it gets removed from the new object cache dict.
+
+    Args:
+      template: String template.
+      **kwargs: Arguments needed to format the string template.
+    """
     message = template.format(line=self.line, **kwargs)
     self.block_converter.row_errors.append(message)
     new_objects = self.block_converter.converter.new_objects[self.object_class]
@@ -71,9 +81,9 @@ class RowConverter(object):
       item.check_unique_consistency()
 
   def handle_obj_row_data(self):
-    for i, (attr_name, header_dict) in enumerate(self.headers.items()):
-      Handler = header_dict["handler"]
-      item = Handler(self, attr_name, **header_dict)
+    for attr_name, header_dict in self.headers.items():
+      handler = header_dict["handler"]
+      item = handler(self, attr_name, **header_dict)
       if header_dict.get("type") == AttributeInfo.Type.PROPERTY:
         self.attrs[attr_name] = item
       else:
@@ -85,13 +95,17 @@ class RowConverter(object):
     else:
       self.handle_csv_row_data(field_list)
 
-  def check_mandatory_fields(self):
+  def chect_mandatory_fields(self):
+    """Check if the new object contains all mandatory columns."""
     if not self.is_new or self.is_delete:
       return
     headers = self.block_converter.object_headers
     mandatory = [key for key, header in headers.items() if header["mandatory"]]
     missing_keys = set(mandatory).difference(set(self.headers.keys()))
-    missing = [headers[key]["display_name"] for key in missing_keys]
+    # TODO: fix mandatory checks for individual rows based on object level
+    # custom attributes.
+    missing = [headers[key]["display_name"] for key in missing_keys if
+               headers[key]["type"] != AttributeInfo.Type.OBJECT_CUSTOM]
     if missing:
       self.add_error(errors.MISSING_COLUMN,
                      s="s" if len(missing) > 1 else "",
@@ -112,10 +126,11 @@ class RowConverter(object):
     self.ignore = ignore
 
   def get_or_generate_object(self, attr_name):
-    """ fetch existing object if possible or create and return a new one
+    """Fetch an existing object if possible or create and return a new one.
 
-    Person object is the only exception here since it does not have a slug
-    field."""
+    Note: Person object is the only exception here since it does not have a
+    slug field.
+    """
     value = self.get_value(attr_name)
     new_objects = self.block_converter.converter.new_objects[self.object_class]
     if value in new_objects:
@@ -139,6 +154,13 @@ class RowConverter(object):
     return obj
 
   def setup_secondary_objects(self, slugs_dict):
+    """Import secondary objects.
+
+    This function creates and stores all secondary object such as relationships
+    and any linked object that need the original object to be saved before they
+    can be processed. This is usually due to needing the id of the original
+    object that is created with a csv import.
+    """
     if not self.obj or self.ignore or self.is_delete:
       return
     for mapping in self.objects.values():

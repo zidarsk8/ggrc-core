@@ -13,7 +13,9 @@ from ggrc.utils import underscore_from_camelcase
 
 ATTRIBUTE_ORDER = (
     "slug",
+    "assessment_template",
     "audit",
+    "assessment_object",
     "request_audit",
     "control",
     "program",
@@ -44,6 +46,8 @@ ATTRIBUTE_ORDER = (
     "report_end_date",
     "relative_start_date",
     "relative_end_date",
+    "finished_date",
+    "verified_date",
     "status",
     "assertions",
     "categories",
@@ -69,7 +73,18 @@ ATTRIBUTE_ORDER = (
     "company",
     "user_role",
     "test",
+    "recipients",
+    "send_by_default",
+    "delete",
 )
+
+EXCLUDE_CUSTOM_ATTRIBUTES = set([
+    "AssessmentTemplate",
+])
+
+EXCLUDE_MAPPINGS = set([
+    "AssessmentTemplate",
+])
 
 
 class DontPropagate(object):
@@ -126,7 +141,8 @@ class AttributeInfo(object):
     PROPERTY = "property"
     MAPPING = "mapping"
     SPECIAL_MAPPING = "special_mapping"
-    CUSTOM = "custom"
+    CUSTOM = "custom"  # normal custom attribute
+    OBJECT_CUSTOM = "object_custom"  # object level custom attribute
     USER_ROLE = "user_role"
 
   def __init__(self, tgt_class):
@@ -262,14 +278,19 @@ class AttributeInfo(object):
     else:
       custom_attributes = object_class.get_custom_attribute_definitions()
     for attr in custom_attributes:
-      attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.id)
+      if attr.definition_id:
+        ca_type = cls.Type.OBJECT_CUSTOM
+      else:
+        ca_type = cls.Type.CUSTOM
+      attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title)
+
       definitions[attr_name] = {
           "display_name": attr.title,
           "attr_name": attr.title,
           "mandatory": attr.mandatory,
           "unique": False,
           "description": "",
-          "type": cls.Type.CUSTOM,
+          "type": ca_type,
       }
     return definitions
 
@@ -318,9 +339,12 @@ class AttributeInfo(object):
         definition.update(value)
       definitions[key] = definition
 
-    definitions.update(
-        cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache))
-    definitions.update(cls.get_mapping_definitions(object_class))
+    if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
+      definitions.update(
+          cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache))
+
+    if object_class.__name__ not in EXCLUDE_MAPPINGS:
+      definitions.update(cls.get_mapping_definitions(object_class))
 
     return definitions
 

@@ -11,8 +11,6 @@ describe('GGRC utils allowed_to_map() method', function () {
   var fakeProgram;
   var fakeRequest;
   var fakeAudit;
-  var fakeCA;
-  var fakePersonCreator;
 
   beforeAll(function () {
     allowedToMap = GGRC.Utils.allowed_to_map;
@@ -66,29 +64,159 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
   });
 
-  describe('given a Person and Assessment pair', function () {
+  describe('given a Person instance', function () {
+    var origShortName;
+    var otherInstance;
+    var person;
+
+    beforeAll(function () {
+      origShortName = can.Model.shortName;
+      can.Model.shortName = 'cacheable';
+    });
+
+    afterAll(function () {
+      can.Model.shortName = origShortName;
+    });
+
     beforeEach(function () {
-      fakeCA = new CMS.Models.Assessment({type: 'Assessment'});
-      fakePersonCreator = new CMS.Models.Person({type: 'Person'});
-
-      spyOn(Permission, 'is_allowed_for').and.returnValue(false);
-      spyOn(GGRC.Mappings, 'get_canonical_mapping_name');
+      person = new CMS.Models.Person({type: 'Person'});
+      otherInstance = new can.Model({type: 'Foo'});
     });
 
-    it('returns true for Assessment as source and Person as target', function () {
-      var result;
-      GGRC.Mappings.get_canonical_mapping_name.and.returnValue('people');
-      result = allowedToMap(fakeCA, fakePersonCreator, fakeOptions);
-
-      expect(result).toBe(false);
-    });
-
-    it('returns false for Person as source and as Assessment target', function () {
-      var result;
-      GGRC.Mappings.get_canonical_mapping_name.and.returnValue('related_objects');
-      result = allowedToMap(fakePersonCreator, fakeCA, fakeOptions);
-
+    it('returns false for any object', function () {
+      var result = allowedToMap(otherInstance, person);
       expect(result).toBe(false);
     });
   });
 });
+
+describe('GGRC utils isEmptyCA() method', function () {
+  'use strict';
+
+  var isEmptyCA;
+
+  beforeAll(function () {
+    isEmptyCA = GGRC.Utils.isEmptyCA;
+  });
+
+  describe('check Rich Text value', function () {
+    it('returns true for empty div', function () {
+      var result = isEmptyCA('<div></div>', 'Rich Text');
+      expect(result).toBe(true);
+    });
+
+    it('returns true for div with a line break', function () {
+      var result = isEmptyCA('<div><br></div>', 'Rich Text');
+      expect(result).toBe(true);
+    });
+
+    it('returns true for div with a empty list', function () {
+      var result = isEmptyCA('<div><ul><li></li></ul></div>', 'Rich Text');
+      expect(result).toBe(true);
+    });
+
+    it('returns true for div with a empty paragraph', function () {
+      var result = isEmptyCA('<div><p></p></div>', 'Rich Text');
+      expect(result).toBe(true);
+    });
+
+    it('returns false for div with the text', function () {
+      var result = isEmptyCA('<div>Very important text!</div>', 'Rich Text');
+      expect(result).toBe(false);
+    });
+
+    it('returns false for not empty list', function () {
+      var result = isEmptyCA('<div><ul><li>One</li><li>Two</li></ul></div>',
+        'Rich Text');
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('check Checkbox value', function () {
+    it('returns false for unchecked', function () {
+      var result = isEmptyCA('0', 'Checkbox');
+      expect(result).toBe(true);
+    });
+
+    it('returns true for checked', function () {
+      var result = isEmptyCA('1', 'Checkbox');
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('check Text value', function () {
+    it('returns false for not empty', function () {
+      var result = isEmptyCA('some text', 'Text');
+      expect(result).toBe(false);
+    });
+
+    it('returns true for empty', function () {
+      var result = isEmptyCA('', 'Text');
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('check Map:Person type', function () {
+    it('returns false for selected', function () {
+      var result = isEmptyCA('Person', 'Map:Person');
+      expect(result).toBe(false);
+    });
+
+    it('returns true for not selected', function () {
+      var result = isEmptyCA('', 'Map:Person');
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('check Date type', function () {
+    it('returns false for selected', function () {
+      var result = isEmptyCA('01/01/2016', 'Date');
+      expect(result).toBe(false);
+    });
+
+    it('returns true for not selected', function () {
+      var result = isEmptyCA('', 'Date');
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('check Dropdown type', function () {
+    it('returns false for selected', function () {
+      var result = isEmptyCA('value', 'Dropdown');
+      expect(result).toBe(false);
+    });
+
+    it('returns true for not selected', function () {
+      var result = isEmptyCA('', 'Dropdown');
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('check invalid type', function () {
+    it('returns false for invalid type', function () {
+      var result = isEmptyCA('some value', 'Invalid');
+      expect(result).toBe(false);
+    });
+  });
+});
+
+describe('GGRC utils getRelatedObjects() method', function () {
+  it('returns related object only for second tier', function () {
+    var result = GGRC.Utils.getRelatedObjects(1);
+    expect(result).toEqual(jasmine.any(Object));
+    expect(result.mapping).toEqual('related_objects');
+    expect(result.draw_children).toBeFalsy();
+    expect(result.child_options).toEqual([{}]);
+  });
+
+  it('returns related objects for second and third tier', function () {
+    var result = GGRC.Utils.getRelatedObjects(2);
+    expect(result).toEqual(jasmine.any(Object));
+    expect(result.mapping).toEqual('related_objects');
+    expect(result.draw_children).toBeTruthy();
+    expect(result.child_options).toEqual(jasmine.any(Object));
+    expect(result.child_options[0].draw_children).toBeFalsy();
+    expect(result.child_options[0].mapping).toEqual('related_objects');
+  });
+});
+

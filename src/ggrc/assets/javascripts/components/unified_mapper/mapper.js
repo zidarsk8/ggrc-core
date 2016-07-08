@@ -59,7 +59,7 @@
         Program: ['Audit'],
         Audit: ['Assessment', 'Program', 'Request'],
         Assessment: [],
-        Request: ['Workflow', 'TaskGroup', 'Person']
+        Request: ['Workflow', 'TaskGroup', 'Person', 'Audit']
       };
       if (this.attr('getList')) {
         return [
@@ -201,7 +201,8 @@
           useTemplates: parentScope.attr('useTemplates'),
           assessmentGenerator: parentScope.attr('assessmentGenerator')
         })),
-        template: parentScope.attr('template')
+        template: parentScope.attr('template'),
+        draw_children: true
       };
     },
 

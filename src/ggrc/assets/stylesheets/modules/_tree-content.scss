@@ -11,14 +11,39 @@
 ul.new-tree {
   @extend %reset-list;
   margin-bottom: 40px;
+  .openclose__empty,
   .openclose {
-    cursor: pointer;
-    width: 60px;
     float: left;
+    &.active {
+      .fa-caret-right {
+        @include opacity(1);
+        &:before {
+          content: $fa-var-caret-down;
+        }
+      }
+    }
+    .fa-caret-right {
+      display: inline-block;
+      width: 20px;
+      @include opacity(0.25);
+      margin: 5px 0 0 4px;
+    }
+    .tier-2-info & {
+      .fa-caret-right {
+        margin: 7px 0 0 4px;
+      }
+    }
     .dashboard & {
       width: auto;
       float: none;
       clear: both;
+    }
+  }
+  .openclose {
+    width: 55px;
+    cursor: pointer;
+    &__empty {
+      width: 35px;
     }
   }
   .select {
@@ -118,20 +143,6 @@ ul.new-tree {
       > .item-wrap {
         margin: 0 10px;
         border-bottom: 1px solid $itemBorder;
-        > .openclose {
-          .fa-caret-right {
-            @include opacity(0.25);
-            margin: 5px 0 0 4px;
-          }
-          &.active {
-            .fa-caret-right {
-              @include opacity(1);
-              &:before {
-                content: $fa-var-caret-down;
-              }
-            }
-          }
-        }
         .openclose,
         .select {
           padding: 6px 0;
@@ -163,6 +174,7 @@ ul.new-tree {
           border-bottom: none;
         }
         > .item-main {
+          > .status-container,
           > .openclose {
             > .item-wrap {
               border-bottom: none;
@@ -330,6 +342,7 @@ ul.new-tree {
       }
       .dashboard & {
         > .item-main {
+          > .status-container,
           > .openclose {
             > .item-wrap {
               border-color: transparent;
@@ -361,6 +374,7 @@ ul.new-tree {
         }
         &.item-open {
           margin: 0;
+          border-bottom: 1px solid $itemBorder;
           > .item-main {
             > .item-wrap {
               border-color: transparent;

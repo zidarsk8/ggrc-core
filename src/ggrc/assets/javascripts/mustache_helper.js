@@ -3462,20 +3462,15 @@ Add spaces to a CamelCase string.
 Example:
 {{un_camel_case "InProgress"}} becomes "In Progress"
 */
-Mustache.registerHelper("un_camel_case", function (str, options) {
-  var val = Mustache.resolve(str);
-  if (!val || val == "") {
-    return val;
-  }
-  var newval = val[0];
-  for (var i=1; i<val.length; i++) {
-    if (val[i] == val[i].toUpperCase()) {
-      newval += " ";
+  Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
+    var value = Mustache.resolve(str);
+    toLowerCase = typeof toLowerCase !== 'object';
+    if (!value) {
+      return value;
     }
-    newval += val[i];
-  }
-  return newval;
-});
+    value = value.replace(/([A-Z]+)/g, ' $1').replace(/([A-Z][a-z])/g, ' $1');
+    return toLowerCase ? value.toLowerCase() : value;
+  });
 
   /**
    * Check if the current user is allowed to edit a comment, and render the
@@ -3521,6 +3516,46 @@ Mustache.registerHelper("un_camel_case", function (str, options) {
       }
 
       return options.inverse(options.context);
+    }
+  );
+
+  /**
+   * Check if Custom Atttribute's value did not pass validation, and render the
+   * corresponding block in the template. The error messages, if any, are
+   * available in the "error" variable within the "truthy" block.
+   *
+   * Example usage:
+   *
+   *   {{#ca_validation_error validationErrors customAttrId}}
+   *     Invalid value for the Custom Attribute {{customAttrId}}: {{errors.0}}
+   *   {{else}}
+   *     Hooray, no errors, a correct value is set!
+   *   {{/ca_validation_error}}
+   *
+   * @param {Object} validationErrors - an object containing validation results
+   *   of a can.Model instance
+   * @param {Number} customAttrId - ID of the Custom Attribute to check for
+   *   validation errors
+   * @param {Object} options - a CanJS options argument passed to every helper
+   */
+  Mustache.registerHelper(
+    'ca_validation_error',
+    function (validationErrors, customAttrId, options) {
+      var errors;
+      var contextStack;
+      var property;
+
+      validationErrors = Mustache.resolve(validationErrors) || {};
+      customAttrId = Mustache.resolve(customAttrId);
+
+      property = 'custom_attributes.' + customAttrId;
+      errors = validationErrors[property] || [];
+
+      if (errors.length > 0) {
+        contextStack = options.contexts.add({errors: errors});
+        return options.fn(contextStack);
+      }
+      return options.inverse(options.contexts);
     }
   );
 })(this, jQuery, can);

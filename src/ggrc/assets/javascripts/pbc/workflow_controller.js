@@ -6,37 +6,55 @@
 (function (can, $) {
   can.Control('GGRC.Controllers.PbcWorkflows', {}, {
     '{CMS.Models.AssessmentTemplate} updated': function (model, ev, instance) {
+      var self = this;
       var attrDfd;
+      var delDfds;
+      var resolveDfd;
       var definitions = instance.custom_attribute_definitions;
 
       if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
         return;
       }
 
-      attrDfd = $.map(definitions, function (attr, i) {
-        var CADefinition = CMS.Models.CustomAttributeDefinition;
-        var params = can.extend({
-          definition_id: instance.id,
-          definition_type: "assessment_template",
-          context: instance.context
-        }, attr.serialize());
-        if (attr.id && attr._pending_delete) {
+      // First remove CAD
+      delDfds = _.chain(definitions)
+        .filter(function (attr) {
+          return attr.id && attr._pending_delete;
+        })
+        .map(function (attr) {
           return attr.reify().refresh().then(function (attr) {
-            attr.destroy();
+            return attr.destroy();
           });
-        } else if (attr.id) {
-          return CADefinition.findOne({
-            id: attr.id
-          }).then(function (definition) {
-            definition.attr(params);
-            return definition.save();
-          });
-        }
-        return new CADefinition(params).save().then(function (definition) {
-          instance.custom_attribute_definitions[i] = definition;
-        });
+        }).value();
+
+      resolveDfd = $.when.apply($, delDfds).then(function () {
+        attrDfd = _.chain(definitions)
+          .filter(function (attr) {
+            return !attr._pending_delete;
+          })
+          .map(function (attr) {
+            var CADefinition = CMS.Models.CustomAttributeDefinition;
+            var params = self._buildParams(instance, attr);
+
+            if (attr.id) {
+              return CADefinition.findOne({
+                id: attr.id
+              }).then(function (definition) {
+                definition.attr(params);
+                return definition.save();
+              });
+            }
+            return new CADefinition(params).save();
+          }).value();
+
+        return $.when.apply($, attrDfd);
+      }).then(function () {
+        // Make sure instance.custom_attribute_definitions cache is cleared
+        instance.custom_attribute_definitions.splice(0,
+            instance.custom_attribute_definitions.length);
       });
-      instance.delay_resolving_save_until($.when(attrDfd));
+
+      instance.delay_resolving_save_until(resolveDfd);
     },
     '{CMS.Models.AssessmentTemplate} created': function (model, ev, instance) {
       if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
@@ -56,11 +74,9 @@
           }
           return new CMS.Models.CustomAttributeDefinition(can.extend({
             definition_id: instance.id,
-            definition_type: "assessment_template",
+            definition_type: 'assessment_template',
             context: instance.context
-          }, attr.serialize())).save().then(function (attributeDefinition) {
-            instance.custom_attribute_definitions[i] = attributeDefinition;
-          });
+          }, attr.serialize())).save();
         });
         instance.delay_resolving_save_until($.when(auditDfd, attrDfd));
       }.bind(this));
@@ -148,6 +164,24 @@
         destination: destination,
         context: context
       }).save();
+    },
+    _buildParams: function (instance, attr) {
+      var cached = instance._cachedCADefinitions[attr.id];
+      var params = can.extend({
+        definition_id: instance.id,
+        definition_type: 'assessment_template',
+        context: instance.context
+      }, attr.serialize());
+      /**
+       * Temporary solution and after updated the backend it need to be deleted
+       * Start deprecated block
+       */
+      params.mandatory = cached.mandatory;
+      params.multi_choice_mandatory = cached.multi_choice_mandatory;
+      /**
+       * End deprecated block
+       */
+      return params;
     }
   });
 

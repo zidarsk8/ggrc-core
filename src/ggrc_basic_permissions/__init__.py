@@ -877,9 +877,8 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 def add_public_program_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
       .filter(
-          and_(
-              ContextImplication.context_id == context.id,
-              ContextImplication.source_context_id.is_(None))).count() > 0:
+          and_(ContextImplication.context_id == context.id,
+               ContextImplication.source_context_id.is_(None))).count() > 0:
     return
   db.session.add(ContextImplication(
       source_context=None,
@@ -890,6 +889,25 @@ def add_public_program_context_implication(context, check_exists=False):
   ))
 
 
+@Resource.model_put.connect_via(Program)
+def handle_program_put(sender, obj=None, src=None, service=None):
+  # Check to see if the private property of the program has changed
+  if get_history(obj, 'private').has_changes():
+    if obj.private:
+      # Ensure that any implications from null context are removed
+      db.session.query(ContextImplication)\
+          .filter(
+              ContextImplication.context_id == obj.context_id,
+              ContextImplication.source_context_id.is_(None))\
+          .delete()
+      db.session.flush()
+    else:
+      # ensure that implications from null are present
+      add_public_program_context_implication(obj.context, check_exists=True)
+      db.session.flush()
+
+
+@Resource.model_posted.connect_via(Audit)
 def create_audit_context(audit):
   # Create an audit context
   context = audit.build_object_context(

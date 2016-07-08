@@ -1080,6 +1080,31 @@ class Resource(ModelView):
     """Do NOTHING by default"""
     pass
 
+  def _check_contexts_for_post(self, src):
+    if (src.get('private') is True and
+            self.get_context_id_from_json(src) is not None):
+      raise BadRequest(
+          'context MUST be "null" when creating a private resource.')
+    elif 'context' not in src:
+      raise BadRequest('context MUST be specified.')
+
+  def _try_recover_integrity_error(self, obj, error):
+    """Recover and complete the request if possible, return new response.
+
+    Returns (code, object) if recover possible, None elsewise.
+    """
+    msg = error.orig.args[1]
+    if (obj.type == "Relationship" and
+            msg.startswith("Duplicate entry") and
+            msg.endswith("'uq_relationships'")):
+      db.session.rollback()
+      # just append the new attrs values
+      obj = obj.__class__.update_attributes(obj.source, obj.destination,
+                                            obj.attrs)
+      db.session.flush()
+      object_for_json = self.object_for_json(obj)
+      return (200, object_for_json)
+
   def collection_post_step(self, src, no_result):
     try:
       obj = self.model()
@@ -1095,12 +1120,7 @@ class Resource(ModelView):
             self.get_context_id_from_json(src))\
            and not permissions.has_conditions('create', self.model.__name__):
           raise Forbidden()
-      if src.get('private') is True and src.get('context') is not None \
-         and src['context'].get('id') is not None:
-        raise BadRequest(
-            'context MUST be "null" when creating a private resource.')
-      elif 'context' not in src:
-        raise BadRequest('context MUST be specified.')
+      self._check_contexts_for_post(src)
 
       with benchmark("Deserialize object"):
         self.json_create(obj, src)
@@ -1132,24 +1152,29 @@ class Resource(ModelView):
       with benchmark("Send model POSTed - after commit event"):
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
                                             src=src, service=self)
+      # Note: In model_posted_after_commit necessary mapping and relashionships
+      # are set, so need to commit the changes
+      db.session.commit()
+
       with benchmark("Serialize object"):
         object_for_json = {} if no_result else self.object_for_json(obj)
       with benchmark("Make response"):
         return (201, object_for_json)
-    except (IntegrityError, ValidationError) as e:
-      msg = e.orig.args[1]
-      if obj.type == "Relationship" and \
-         msg.startswith("Duplicate entry") and \
-         msg.endswith("'uq_relationships'"):
-        db.session.rollback()
-        obj = obj.__class__.update_attributes(obj.source, obj.destination,
-                                              obj.attrs)
-        db.session.flush()
-        object_for_json = self.object_for_json(obj)
-        return (200, object_for_json)
-      message = translate_message(e)
-      current_app.logger.warn(message)
-      return (403, message)
+    except IntegrityError as e:
+      response_after_recover = self._try_recover_integrity_error(obj, e)
+      if response_after_recover:
+        return response_after_recover
+      else:
+        return self._make_error_from_exception(e)
+    except ValidationError as e:
+      return self._make_error_from_exception(e)
+
+  @staticmethod
+  def _make_error_from_exception(exc):
+    """Return a 403-code with the exception message."""
+    message = translate_message(exc)
+    current_app.logger.warn(message)
+    return (403, message)
 
   def collection_post(self):  # noqa
     if self.request.mimetype != 'application/json':

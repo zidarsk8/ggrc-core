@@ -12,7 +12,8 @@
       // Ensure that the input.change event still occurs
       change: function (event, ui) {
         if (!$(event.target).parents(document.body).length) {
-          console.warn('autocomplete menu change event is coming from detached nodes');
+          console.warn(
+            'autocomplete menu change event is coming from detached nodes');
         }
         $(event.target).trigger('change');
       },
@@ -38,9 +39,12 @@
 
         dfd.then(function (objects) {
           this.last_stubs = objects;
-          can.each(objects.slice(request.start, request.start + MAX_RESULTS), function (object) {
-            queue.enqueue(object);
-          });
+          can.each(
+            objects.slice(request.start, request.start + MAX_RESULTS),
+            function (object) {
+              queue.enqueue(object);
+            }
+          );
           queue.trigger().then(function (objs) {
             objs = this.options.apply_filter(objs, request);
             if (objs.length || isNextPage) {
@@ -119,11 +123,10 @@
       },
 
       select: function (ev, ui) {
-        var original_event;
+        var origEvent;
         var $this = $(this);
         var widgetName = $this.data('autocomplete-widget-name');
         var ctl = $this.data(widgetName).options.controller;
-        var widget_name;
 
         if (ui.item) {
           $this.trigger('autocomplete:select', [ui]);
@@ -135,23 +138,23 @@
             }
           }
         } else {
-          original_event = ev;
+          origEvent = ev;
           $(document.body)
             .off('.autocomplete')
-            .one('modal:success.autocomplete', function (_ev, new_obj) {
+            .one('modal:success.autocomplete', function (_ev, newObj) {
               if (ctl) {
                 if (ctl.scope && ctl.scope.autocomplete_select) {
                   return ctl.scope.autocomplete_select(
-                    $this, original_event, {item: new_obj});
+                    $this, origEvent, {item: newObj});
                 } else if (ctl.autocomplete_select) {
                   return ctl.autocomplete_select(
-                    $this, original_event, {item: new_obj});
+                    $this, origEvent, {item: newObj});
                 }
               }
               $this.trigger('autocomplete:select', [{
-                item: new_obj
+                item: newObj
               }]);
-              $this.trigger('modal:success', new_obj);
+              $this.trigger('modal:success', newObj);
             })
             .one('hidden', function () {
               setTimeout(function () {
@@ -159,11 +162,13 @@
               }, 100);
             });
 
-          while ((original_event = original_event.originalEvent)) {
-            if (original_event.type === 'keydown') {
-              // This selection event was generated from a keydown, so click the add new link.
-              widget_name = el.data('autocompleteWidgetName');
-              el.data(widget_name).menu.active.find('a').click();
+          while ((origEvent = origEvent.originalEvent)) {
+            if (origEvent.type === 'keydown') {
+              // This selection event was generated from a keydown, so click
+              // the add new link.
+              // FIXME: el is not defined, this would result in an error
+              widgetName = el.data('autocompleteWidgetName');
+              el.data(widgetName).menu.active.find('a').click();
               break;
             }
           }
@@ -178,15 +183,16 @@
     _create: function () {
       var that = this;
       var $that = $(this.element);
-      var base_search = $that.data('lookup');
-      var from_list = $that.data('from-list');
-      var search_params = $that.data('params');
+      var baseSearch = $that.data('lookup');
+      var fromList = $that.data('from-list');
+      var searchParams = $that.data('params');
       var permission = $that.data('permission-type');
       var searchtypes;
+      var typeNames;
 
       this._super.apply(this, arguments);
       this.options.search_params = {
-        extra_params: search_params
+        extra_params: searchParams
       };
       if (permission) {
         this.options.search_params.__permission_type = permission;
@@ -198,34 +204,45 @@
         $(this).data(that.widgetFullName).search($(this).val());
       });
 
-      if (from_list) {
-        this.options.searchlist = $.when.apply(this, $.map(from_list.list, function (item) {
-          var props = base_search.trim().split('.');
-          return item.instance.refresh_all.apply(item.instance, props);
-        }));
-      } else if (base_search) {
-        base_search = base_search.trim();
-        if (base_search.indexOf('__mappable') === 0 || base_search.indexOf('__all') === 0) {
+      if (fromList) {
+        this.options.searchlist = $.when.apply(
+          this,
+          $.map(fromList.list, function (item) {
+            var props = baseSearch.trim().split('.');
+            return item.instance.refresh_all.apply(item.instance, props);
+          })
+        );
+      } else if (baseSearch) {
+        baseSearch = baseSearch.trim();
+        if (
+          baseSearch.indexOf('__mappable') === 0 ||
+          baseSearch.indexOf('__all') === 0
+        ) {
           searchtypes = GGRC.Mappings.get_canonical_mappings_for(
             this.options.parent_instance.constructor.shortName
           );
-          if (base_search.indexOf('__mappable') === 0) {
+          if (baseSearch.indexOf('__mappable') === 0) {
             searchtypes = can.map(searchtypes, function (mapping) {
-              return mapping instanceof GGRC.ListLoaders.ProxyListLoader ? mapping : undefined;
+              return (mapping instanceof GGRC.ListLoaders.ProxyListLoader) ?
+                     mapping : undefined;
             });
           }
-          if (base_search.indexOf('_except:')) {
-            can.each(base_search.substr(base_search.indexOf('_except:') + 8).split(','), function (remove) {
+          if (baseSearch.indexOf('_except:')) {
+            typeNames = baseSearch.substr(
+              baseSearch.indexOf('_except:') + 8
+            ).split(',');
+
+            can.each(typeNames, function (remove) {
               delete searchtypes[remove];
             });
           }
           searchtypes = Object.keys(searchtypes);
         } else {
-          searchtypes = base_search.split(',');
+          searchtypes = baseSearch.split(',');
         }
 
-        this.options.searchtypes = can.map(searchtypes, function (t) {
-          return CMS.Models[t].model_singular;
+        this.options.searchtypes = can.map(searchtypes, function (typeName) {
+          return CMS.Models[typeName].model_singular;
         });
       }
     },
@@ -253,7 +270,10 @@
       var $ul = $(ul);
 
       if (!template) {
-        if (model && GGRC.Templates[model.table_plural + '/autocomplete_result']) {
+        if (
+          model &&
+          GGRC.Templates[model.table_plural + '/autocomplete_result']
+        ) {
           template = '/' + model.table_plural + '/autocomplete_result.mustache';
         } else {
           template = '/base_objects/autocomplete_result.mustache';
@@ -310,7 +330,10 @@
       },
       apply_filter: function (objects, request) {
         return can.map(objects, function (object) {
-          if (!request.term || object.title && ~object.title.indexOf(request.term)) {
+          if (
+            !request.term ||
+            object.title && _.includes(object.title, request.term)
+          ) {
             return object;
           }
           return undefined;
@@ -319,17 +342,33 @@
     },
     _setup_menu_context: function (items) {
       return $.extend(this._super(items), {
-        mapping: _.isUndefined(this.options.mapping) ? this.element.data('mapping') : this.options.mapping
+        mapping: _.isUndefined(this.options.mapping) ?
+                this.element.data('mapping') : this.options.mapping
       });
     }
   });
 
   $.widget.bridge('ggrc_mapping_autocomplete', $.ggrc.mapping_autocomplete);
 
+  /**
+   * Convert an input element to an autocomplete field.
+   *
+   * If an element is not given, it tries to use the first suitable element
+   * within the current DOM context (i.e. a DOM node containing form elements),
+   * if such context exists.
+   *
+   * @param {DOM.Element} el - the element to convert
+   */
   $.cms_autocomplete = function (el) {
     var ctl = this;
     // Add autocomplete to the owner field
     if (!el) {
+      if (!this.element) {
+        // It can happen that this.element is already null when we want to init
+        // autocomplete on it, e.g. when its containing modal form is already
+        // being destoryed. In such cases we simply don't do anything.
+        return;
+      }
       el = this.element.find('input[data-lookup]');
     } else {
       el = $(el);

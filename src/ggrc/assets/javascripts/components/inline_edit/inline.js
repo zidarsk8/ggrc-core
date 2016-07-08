@@ -9,8 +9,7 @@
   GGRC.Components('inlineEdit', {
     tag: 'inline-edit',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/inline_edit/inline.mustache'
+      GGRC.mustache_path + '/components/inline_edit/inline.mustache'
     ),
     scope: {
       instance: null,
@@ -21,6 +20,7 @@
       values: null,
       readonly: false,  // whether or not the value can be edited
       isSaving: false,
+      mandatory: null,
       context: {
         isEdit: false,
         value: null,
@@ -43,12 +43,15 @@
        */
       enableEdit: function (scope, $el, ev) {
         ev.preventDefault();
-
-        if (!this.attr('readonly')) {
+        if (!this.attr('readonly') && scope.needConfirm) {
+          scope.needConfirm.confirm(scope.instance, scope.needConfirm)
+            .done(function () {
+              this.attr('context.isEdit', true);
+            }.bind(this));
+        } else if (!this.attr('readonly')) {
           this.attr('context.isEdit', true);
         }
       },
-
       onCancel: function (ctx, el, ev) {
         ev.preventDefault();
         this.attr('context.isEdit', false);

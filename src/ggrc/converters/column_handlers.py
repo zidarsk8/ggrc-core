@@ -3,20 +3,28 @@
 
 """List of all column handlers for objects in the ggrc module."""
 
-from ggrc.converters.handlers import handlers
-from ggrc.converters.handlers import request
-from ggrc.converters.handlers import related_person
-from ggrc.converters.handlers import list_handlers
+from ggrc.converters.handlers import assessment_object
+from ggrc.converters.handlers import assessment_template
 from ggrc.converters.handlers import boolean
+from ggrc.converters.handlers import default_people
+from ggrc.converters.handlers import handlers
+from ggrc.converters.handlers import list_handlers
+from ggrc.converters.handlers import related_person
+from ggrc.converters.handlers import request
+from ggrc.converters.handlers import template
 from ggrc.extensions import get_extension_modules
 
 GGRC_COLUMN_HANDLERS = {
     "assertions": handlers.ControlAssertionColumnHandler,
+    "assessment_object": assessment_object.AssessmentObjectColumnHandler,
+    "assessment_template": assessment_template.AssessmentTemplateColumnHandler,
     "assignee": handlers.UserColumnHandler,
     "audit": handlers.AuditColumnHandler,
     "categories": handlers.ControlCategoryColumnHandler,
     "company": handlers.TextColumnHandler,
     "contact": handlers.UserColumnHandler,
+    "default_assessors": default_people.DefaultPersonColumnHandler,
+    "default_verifier": default_people.DefaultPersonColumnHandler,
     "delete": handlers.DeleteColumnHandler,
     "description": handlers.TextareaColumnHandler,
     "design": handlers.ConclusionColumnHandler,
@@ -40,9 +48,9 @@ GGRC_COLUMN_HANDLERS = {
     "program_mapped": handlers.ObjectPersonColumnHandler,
     "recipients": list_handlers.ValueListHandler,
     "reference_url": handlers.TextColumnHandler,
-    "related_creators": related_person.RelatedCreatorsColumnHandler,
     "related_assessors": related_person.RelatedAssessorsColumnHandler,
     "related_assignees": related_person.RelatedAssigneesColumnHandler,
+    "related_creators": related_person.RelatedCreatorsColumnHandler,
     "related_requesters": related_person.RelatedRequestersColumnHandler,
     "related_verifiers": related_person.RelatedVerifiersColumnHandler,
     "report_end_date": handlers.DateColumnHandler,
@@ -58,7 +66,10 @@ GGRC_COLUMN_HANDLERS = {
     "slug": handlers.SlugColumnHandler,
     "start_date": handlers.DateColumnHandler,
     "status": handlers.StatusColumnHandler,
+    "template_custom_attributes": template.TemplateCaColumnHandler,
+    "template_object_type": template.TemplateObjectColumnHandler,
     "test_plan": handlers.TextareaColumnHandler,
+    "test_plan_procedure": boolean.CheckboxColumnHandler,
     "title": handlers.RequiredTextColumnHandler,
     "url": handlers.TextColumnHandler,
     "verify_frequency": handlers.OptionColumnHandler,
