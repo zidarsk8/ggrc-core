@@ -17,8 +17,10 @@
       format: '@',
       label: '@',
       isShown: false,
-      persistent: false,
       pattern: 'MM/DD/YYYY',
+      setMinDate: null,
+      setMaxDate: null,
+      persistent: false,
       onSelect: function (val, ev) {
         this.attr('date', val);
       },
@@ -51,10 +53,23 @@
           onSelect: this.scope.onSelect.bind(this.scope)
         }).data('datepicker');
 
-        if (date && moment(date, this.scope.pattern, true).isValid()) {
-          element.datepicker('setDate', date);
+        if (!date || !this.isValidDate(date)) {
+          date = null;
         }
+        element.datepicker('setDate', date);
+        this.scope.attr('picker', element);
         this.scope.attr('datepicker', datepicker);
+      },
+      isValidDate: function (date) {
+        return moment(date, this.scope.pattern, true).isValid();
+      },
+      '{scope} setMinDate': function (scope, ev, date) {
+        date = this.isValidDate(date) ? date : null;
+        this.scope.picker.datepicker('option', 'minDate', date);
+      },
+      '{scope} setMaxDate': function (scope, ev, date) {
+        date = this.isValidDate(date) ? date : null;
+        this.scope.picker.datepicker('option', 'maxDate', date);
       },
       '{window} mousedown': function (el, ev) {
         var isInside;
