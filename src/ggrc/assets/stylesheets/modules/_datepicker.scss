@@ -17,6 +17,10 @@
   z-index: zIndex(ui-autocomplete);
 }
 
+.datepicker__input-wrapper {
+  position: relative;
+}
+
 .ui-datepicker-inline {
   .ui-datepicker-prev,
   .ui-datepicker-next {

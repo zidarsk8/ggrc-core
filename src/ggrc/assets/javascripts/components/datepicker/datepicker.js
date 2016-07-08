@@ -15,7 +15,7 @@
     scope: {
       date: null,
       format: '@',
-      datepicker: null,
+      label: '@',
       isShown: false,
       persistent: false,
       pattern: 'MM/DD/YYYY',
