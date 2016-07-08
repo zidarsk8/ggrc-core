@@ -94,3 +94,6 @@ UNSUPPORTED_LIST_ERROR = (u"Line {line}: Field {column_name} does not support "
 
 UNSUPPORTED_OPERATION_ERROR = (u"Line {line}: {operation} is not supported. "
                                u"The line will be ignored.")
+
+INVALID_ATTRIBUTE_WARNING = (u"Line {line}: Object does not contain attribute "
+                             u"'{column_name}'. The value will be ignored.")
