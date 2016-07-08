@@ -95,7 +95,7 @@ class RowConverter(object):
     else:
       self.handle_csv_row_data(field_list)
 
-  def chect_mandatory_fields(self):
+  def check_mandatory_fields(self):
     """Check if the new object contains all mandatory columns."""
     if not self.is_new or self.is_delete:
       return
