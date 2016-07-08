@@ -23,23 +23,27 @@ def upgrade():
 
   # Remove duplicate lines and include only the newest ones.
   # This relies on the newest lines having the biggest id.
+  connection = op.get_bind()
+  good_rows = connection.execute("""
+      SELECT MAX(id) AS id
+      FROM custom_attribute_values
+      GROUP BY custom_attribute_id, attributable_id
+  """).fetchall()
+  all_rows = connection.execute(
+      "SELECT id FROM custom_attribute_values"
+  ).fetchall()
+  good_ids = set(row[0] for row in good_rows)
+  all_ids = set(row[0] for row in all_rows)
 
-  op.execute(
-      """
-      CREATE TEMPORARY TABLE latest_cav AS (
-          SELECT MAX(id) AS id
-          FROM custom_attribute_values
-          GROUP BY custom_attribute_id, attributable_id
-      )
-      """
-  )
-  op.execute(
-      """
-      DELETE FROM custom_attribute_values
-      WHERE id NOT IN (SELECT id FROM latest_cav)
-      """
-  )
-  op.execute("DROP TEMPORARY TABLE latest_cav")
+  bad_ids = [str(i) for i in all_ids.difference(good_ids)]
+
+  if bad_ids:
+    op.execute(
+        """
+        DELETE FROM custom_attribute_values
+        WHERE id IN ({bad_ids})
+        """.format(bad_ids=",".join(bad_ids))
+    )
 
   # The unique constraint does not include the attributable_type since that is
   # already specified in the custom attribute definition (custom_attribute_id)

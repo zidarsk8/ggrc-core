@@ -143,3 +143,9 @@ class CustomAttributeValue(Base, db.Model):
     db.session.add(ca_value)
     db.session.flush()
     return ca_value
+
+  @staticmethod
+  def _extra_table_args(cls):
+    return (
+        db.UniqueConstraint('attributable_id', 'custom_attribute_id'),
+    )
