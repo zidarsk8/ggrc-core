@@ -21,6 +21,8 @@ class AssessmentTemplate(relationship.Relatable, mixins.Titled,
   """
   __tablename__ = "assessment_templates"
 
+  PER_OBJECT_CUSTOM_ATTRIBUTABLE = True
+
   # the type of the object under assessment
   template_object_type = db.Column(db.String, nullable=True)
 
