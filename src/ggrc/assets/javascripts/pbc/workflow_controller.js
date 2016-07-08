@@ -178,10 +178,8 @@
        * Temporary solution and after updated the backend it need to be deleted
        * Start deprecated block
        */
-      if (cached.id === params.id) {
-        params.mandatory = cached.mandatory;
-        params.multi_choice_mandatory = cached.multi_choice_mandatory;
-      }
+      params.mandatory = cached.mandatory;
+      params.multi_choice_mandatory = cached.multi_choice_mandatory;
       /**
        * End deprecated block
        */
