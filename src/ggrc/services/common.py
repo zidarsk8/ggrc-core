@@ -134,7 +134,8 @@ def set_ids_for_new_custom_attributes(objects, parent_obj):
   }
 
   for obj in objects:
-    if obj.type not in object_attrs:
+    if (obj.type not in object_attrs or
+           not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE")):
       continue
 
     attr = object_attrs[obj.type]
