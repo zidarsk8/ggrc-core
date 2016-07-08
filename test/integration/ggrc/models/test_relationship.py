@@ -46,6 +46,11 @@ class TestRelationship(TestCase):
           "__GGRC_ADMIN__": {"__GGRC_ALL__": {"contexts": [0]}}
       }
 
+    self.m1 = self.mock_model()
+    self.m2 = self.mock_model()
+    self.rel = Relationship(source=self.m1, destination=self.m2)
+    db.session.add(self.rel)
+
   def mock_model(self, id=None, modified_by_id=1, **kwarg):
     if 'id' not in kwarg:
       kwarg['id'] = random.randint(0, 999999999)
@@ -54,15 +59,22 @@ class TestRelationship(TestCase):
     mock = RelationshipTestMockModel(**kwarg)
     return mock
 
-  def test_attrs_validation(self):
-    m1 = self.mock_model()
-    m2 = self.mock_model()
-    rel = Relationship(source=m1, destination=m2)
+  def test_attrs_validation_ok(self):
+    self.rel.attrs["validated_attr"] = "123"
+
+    db.session.commit()
+
+  def test_attrs_validation_invalid_attr(self):
+    self.rel.attrs["foo"] = "bar"
+
     with self.assertRaises(werkzeug.exceptions.BadRequest):
-      rel.attrs["foo"] = "bar"
+      db.session.commit()
+
+  def test_attrs_validation_invalid_value(self):
+    self.rel.attrs["validated_attr"] = "wrong value"
+
     with self.assertRaises(werkzeug.exceptions.BadRequest):
-      rel.attrs["validated_attr"] = "wrong value"
-    rel.attrs["validated_attr"] = "123"
+      db.session.commit()
 
 
 class TestRelationshipAttr(TestCase):
