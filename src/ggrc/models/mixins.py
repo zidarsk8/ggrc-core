@@ -678,6 +678,49 @@ class CustomAttributable(object):
         cascade='all, delete-orphan',
     )
 
+  def insert_definition(self, definition):
+    from ggrc.models.custom_attribute_definition \
+      import CustomAttributeDefinition
+    field_names = AttributeInfo.gather_publish_attrs(
+      CustomAttributeDefinition)
+
+    data = {}
+    for field_name in field_names:
+      if field_name in definition:
+        data[field_name] = definition[field_name]
+    cad = CustomAttributeDefinition(**data)
+    cad.definition_type = self._inflector.table_singular
+    db.session.add(cad)
+
+  def update_definition(self, definition):
+    from ggrc.models.custom_attribute_definition \
+      import CustomAttributeDefinition
+    from ggrc.rbac import permissions
+    from werkzeug.exceptions import Forbidden
+
+    field_names = AttributeInfo.gather_publish_attrs(
+      CustomAttributeDefinition)
+
+    cadef = CustomAttributeDefinition.query.get(definition["id"])
+    if not permissions.is_allowed_update_for(cadef):
+      raise Forbidden()
+
+    blacklisted = ["id", "modified_by"]
+    for bl in blacklisted:
+      del definition[bl]
+
+    for field_name in field_names:
+      if field_name in definition:
+        setattr(cadef, field_name, definition[field_name])
+    db.session.add(cadef)
+
+  def process_definitions(self, definitions):
+    for definition in definitions:
+      if "id" in definition:
+        self.update_definition(definition)
+      else:
+        self.insert_definition(definition)
+
   @declared_attr
   def custom_attribute_definitions(self):
     """Load custom attribute definitions"""
@@ -701,6 +744,10 @@ class CustomAttributable(object):
     from ggrc.fulltext.mysql import MysqlRecordProperty
     from ggrc.models.custom_attribute_value import CustomAttributeValue
     from ggrc.services import signals
+
+    definitions = attributes.get("custom_attribute_definitions", {})
+    if definitions:
+      self.process_definitions(definitions)
 
     if 'custom_attributes' not in attributes:
       return
