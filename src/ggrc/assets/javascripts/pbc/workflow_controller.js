@@ -5,7 +5,7 @@
  * Maintained By: brad@reciprocitylabs.com
  */
 
-(function (can, $) {
+(function (can, $, Permission) {
   can.Control('GGRC.Controllers.PbcWorkflows', {}, {
     '{CMS.Models.AssessmentTemplate} updated': function (model, ev, instance) {
       var attrDfd;
@@ -138,6 +138,13 @@
       });
       instance.delay_resolving_save_until(dfd);
     },
+    '{CMS.Models.Assessment} created': function (model, ev, instance) {
+      if (!(instance instanceof CMS.Models.Assessment)) {
+        return;
+      }
+
+      instance.delay_resolving_save_until(Permission.refresh());
+    },
     _after_pending_joins: function (instance, callback) {
       var dfd = instance.attr('_pending_joins_dfd');
       if (!dfd) {
@@ -163,4 +170,4 @@
   $(function () {
     $(document.body).ggrc_controllers_pbc_workflows();
   });
-})(this.can, this.can.$);
+})(this.can, this.can.$, window.Permission);
