@@ -1,17 +1,19 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from ggrc import db
-from ggrc.models.mixins import Identifiable
-from ggrc.models.mixins import Mapping
+import functools
+import inspect
+
 from sqlalchemy import event
 from sqlalchemy import or_, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from werkzeug.exceptions import BadRequest
-import functools
-import inspect
+
+from ggrc import db
+from ggrc.models.mixins import Identifiable
+from ggrc.models.mixins import Mapping
 
 
 class Relationship(Mapping, db.Model):
