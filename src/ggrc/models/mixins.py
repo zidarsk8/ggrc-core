@@ -689,30 +689,20 @@ class CustomAttributable(object):
     cad = CustomAttributeDefinition(**data)
     db.session.add(cad)
 
-  def update_definition(self, definition):
-    from ggrc.models.custom_attribute_definition \
-      import CustomAttributeDefinition
-
-    field_names = AttributeInfo.gather_publish_attrs(
-      CustomAttributeDefinition)
-
-    cadef = CustomAttributeDefinition.query.get(definition["id"])
-
-    blacklisted = ["id", "modified_by"]
-    for bl in blacklisted:
-      del definition[bl]
-
-    for field_name in field_names:
-      if field_name in definition:
-        setattr(cadef, field_name, definition[field_name])
-    db.session.add(cadef)
-
   def process_definitions(self, definitions):
+    from ggrc.models.custom_attribute_definition \
+      import CustomAttributeDefinition as CADef
+
+    db.session.query(CADef).filter(
+      CADef.definition_id == self.id,
+      CADef.definition_type == self._inflector.table_singular
+    ).delete()
+    db.session.commit()
+
     for definition in definitions:
-      if "id" in definition:
-        self.update_definition(definition)
-      else:
-        self.insert_definition(definition)
+      if "_pending_delete" in definition and definition["_pending_delete"]:
+        continue
+      self.insert_definition(definition)
 
   @declared_attr
   def custom_attribute_definitions(self):
