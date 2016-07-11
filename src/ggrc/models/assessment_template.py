@@ -18,9 +18,9 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.types import JsonType
 
 
-class AssessmentTemplate(assessment.AuditRelationship, mixins.Slugged,
-                         mixins.Base, relationship.Relatable, mixins.Titled,
-                         mixins.CustomAttributable, db.Model):
+class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
+                         mixins.Titled, mixins.CustomAttributable,
+                         mixins.Slugged, mixins.Base, db.Model):
   """A class representing the assessment template entity.
 
   An Assessment Template is a template that allows users for easier creation of
