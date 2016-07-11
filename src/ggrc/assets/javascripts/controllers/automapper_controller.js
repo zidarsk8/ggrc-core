@@ -6,7 +6,7 @@
 */
 
 ;(function (CMS, GGRC, can, $) {
-  var MIN_WAIT = 200;
+  var MIN_WAIT = 2000;
   var MAX_WAIT = 5000;
 
   var refresher = {

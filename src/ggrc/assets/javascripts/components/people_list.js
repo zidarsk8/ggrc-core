@@ -269,7 +269,7 @@
         *
         * @param {Object} operation - a pending join object
         *
-        * @returns {Array} - an array of roles
+        * @return {Array} - an array of roles
         */
       parse_roles_list: function (operation) {
         var roles = _.exists(operation, 'extra.attrs.AssigneeType');
@@ -315,8 +315,8 @@
         } else {
           this.get_roles(person, instance).then(function (result) {
             var roles = result.roles;
-            var ids = result.relationshipsIds;
             var relationship = result.relationship;
+            //  var ids = result.relationshipsIds;
 
             roles = _.without(roles, roleToRemove);
 
@@ -326,7 +326,7 @@
             } else {
               relationship.destroy();
             }
-          }.bind(this));
+          });
         }
       },
       /**
@@ -439,10 +439,12 @@
       },
       '.person-selector input autocomplete:select': function (el, ev, ui) {
         var person = ui.item;
-        var role = can.capitalize(this.scope.type);
-        var instance = this.scope.attr('instance');
-        var deferred = this.scope.attr('deferred');
+        var scope = this.scope;
+        var role = can.capitalize(scope.type);
+        var instance = scope.attr('instance');
+        var deferred = scope.attr('deferred');
         var relationship;
+        var $personElement;
 
         if (deferred) {
           this.scope.deferred_add_role(person, role);
@@ -465,8 +467,37 @@
           relationship.done(function (relationship) {
             var type = relationship.attr('attrs.AssigneeType');
             relationship.attr('attrs.AssigneeType',
-                              role + (type ? ',' + type : ''));
-            relationship.save().then(instance.refresh);
+              role + (type ? ',' + type : ''));
+            relationship.save()
+              .then(function (rel) {
+                var instanceDfd = $.Deferred();
+                var personDfd = $.Deferred();
+                function checkRelationship(related, id) {
+                  return _.findWhere(related, {id: id});
+                }
+                function onInstanceChange() {
+                  if (checkRelationship(this.related_sources, rel.id)) {
+                    instance.unbind('change', onInstanceChange);
+                    instanceDfd.resolve();
+                  }
+                }
+                function onPersonChange() {
+                  if (checkRelationship(this.related_destinations, rel.id)) {
+                    person.unbind('change', onPersonChange);
+                    personDfd.resolve();
+                  }
+                }
+                $personElement = $(el).closest('ul')
+                  .find('[data-person=' + person.id + ']').parent();
+                $personElement.hide();
+                instance.on('change', onInstanceChange);
+                person.on('change', onPersonChange);
+                return $.when(instanceDfd, personDfd);
+              })
+              .then(function () {
+                $personElement.show();
+              })
+              .then(instance.refresh);
           });
         }
       },
