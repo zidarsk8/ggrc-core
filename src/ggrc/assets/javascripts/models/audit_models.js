@@ -798,9 +798,10 @@
     defaults: {
       status: 'Not Started'
     },
-    filter_keys: ['title', 'state', 'operationally', 'operational', 'design',
+    filter_keys: ['title', 'status', 'operationally', 'operational', 'design',
                   'finished_date', 'verified_date', 'verified'],
     filter_mappings: {
+      state: 'status',
       operational: 'operationally',
       'verified date': 'verified_date',
       'finished date': 'finished_date'
