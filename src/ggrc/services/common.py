@@ -125,9 +125,6 @@ def set_ids_for_new_custom_attributes(objects, parent_obj):
     None
   """
 
-  from ggrc.models.custom_attribute_value import CustomAttributeValue
-  from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
-
   object_attrs = {
     "CustomAttributeValue": "attributable_id",
     "CustomAttributeDefinition": "definition_id"
@@ -834,6 +831,8 @@ class Resource(ModelView):
       self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
+    with benchmark("Update custom attribute values"):
+      set_ids_for_new_custom_attributes(modified_objects.new, obj)
     with benchmark("Log event"):
       log_event(db.session, obj)
     with benchmark("Update memcache before commit for collection PUT"):
