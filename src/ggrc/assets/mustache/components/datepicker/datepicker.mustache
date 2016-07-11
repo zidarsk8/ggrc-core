@@ -9,6 +9,9 @@
       {{#helptext}}
         <i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>
       {{/helptext}}
+      {{#required}}
+        <span class="required">*</span>
+      {{/required}}
     </label>
   {{/label}}
   <div class="datepicker__input-wrapper">
@@ -17,7 +20,7 @@
       placeholder="{{pattern}}"
       type="text"
       class="datepicker__input date"
-      can-value="date"
+      can-value="_date"
       can-focus="onFocus"
     >
     <div class="datepicker__calendar {{#isHidden}}hide{{/isHidden}}"></div>

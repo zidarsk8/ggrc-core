@@ -22,7 +22,10 @@
       setMinDate: null,
       setMaxDate: null,
       persistent: false,
+      required: false,
+      _date: null,
       onSelect: function (val, ev) {
+        this.attr('_date', val);
         this.attr('date', val);
       },
       onFocus: function (el, ev) {
@@ -48,18 +51,24 @@
     events: {
       inserted: function () {
         var element = this.element.find('.datepicker__calendar');
-        var date = this.scope.date;
+        var date = this.getDate(this.scope.date);
         var datepicker = element.datepicker({
           altField: this.element.find('.datepicker__input'),
           onSelect: this.scope.onSelect.bind(this.scope)
         }).data('datepicker');
 
-        if (!date || !this.isValidDate(date)) {
-          date = null;
-        }
         element.datepicker('setDate', date);
+        this.scope.attr('_date', date);
         this.scope.attr('picker', element);
         this.scope.attr('datepicker', datepicker);
+      },
+      getDate: function (date) {
+        if (date instanceof Date) {
+          date = moment(date).format(this.scope.pattern);
+        } else if (!this.isValidDate(date)) {
+          date = null;
+        }
+        return date;
       },
       isValidDate: function (date) {
         return moment(date, this.scope.pattern, true).isValid();
