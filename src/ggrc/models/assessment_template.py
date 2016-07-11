@@ -98,7 +98,9 @@ class AssessmentTemplate(relationship.Relatable, mixins.Titled,
 
     return (assessment_template_copy, rel)
 
+
 def create_audit_relationship(audit_stub, obj):
+  """Create audit to assessment template relationship"""
   parent_audit = audit.Audit.query.get(audit_stub["id"])
 
   rel = relationship.Relationship(
@@ -107,7 +109,13 @@ def create_audit_relationship(audit_stub, obj):
       context=parent_audit.context)
   db.session.add(rel)
 
+
 @common.Resource.model_posted.connect_via(AssessmentTemplate)
 def handle_assessment_template(sender, obj=None, src=None, service=None):
+  # pylint: disable=unused-argument
+  """Handle Assessment Template POST
+
+  If "audit" is set on POST, create relationship with Assessment template.
+  """
   if "audit" in src:
       create_audit_relationship(src["audit"], obj)

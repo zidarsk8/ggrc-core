@@ -679,10 +679,17 @@ class CustomAttributable(object):
     )
 
   def insert_definition(self, definition):
+    """Insert a new custom attribute definition into database
+
+    Args:
+      definition: dictionary with field_name: value
+    Returns:
+      Nothing.
+    """
     from ggrc.models.custom_attribute_definition \
-      import CustomAttributeDefinition
+        import CustomAttributeDefinition
     field_names = AttributeInfo.gather_create_attrs(
-      CustomAttributeDefinition)
+        CustomAttributeDefinition)
 
     data = {fname: definition.get(fname) for fname in field_names}
     data["definition_type"] = self._inflector.table_singular
@@ -690,12 +697,23 @@ class CustomAttributable(object):
     db.session.add(cad)
 
   def process_definitions(self, definitions):
+    """
+    Process custom attribute definitions
+
+    If present, delete all related custom attribute definition and insert new
+    custom attribute definitions in the order provided.
+
+    Args:
+      definitions: Ordered list of custom attribute definitions
+    Returns:
+     Nothing
+    """
     from ggrc.models.custom_attribute_definition \
-      import CustomAttributeDefinition as CADef
+        import CustomAttributeDefinition as CADef
 
     db.session.query(CADef).filter(
-      CADef.definition_id == self.id,
-      CADef.definition_type == self._inflector.table_singular
+        CADef.definition_id == self.id,
+        CADef.definition_type == self._inflector.table_singular
     ).delete()
     db.session.commit()
 
@@ -746,8 +764,8 @@ class CustomAttributable(object):
 
     # 1) Get all custom attribute values for the CustomAttributable instance
     attr_values = db.session.query(CustomAttributeValue).filter(and_(
-      CustomAttributeValue.attributable_type == self.__class__.__name__,
-      CustomAttributeValue.attributable_id == self.id)).all()
+        CustomAttributeValue.attributable_type == self.__class__.__name__,
+        CustomAttributeValue.attributable_id == self.id)).all()
 
     attr_value_ids = [v.id for v in attr_values]
     ftrp_properties = [
@@ -769,7 +787,7 @@ class CustomAttributable(object):
       db.session.query(MysqlRecordProperty)\
           .filter(
               and_(
-                MysqlRecordProperty.type == self.__class__.__name__,
+                  MysqlRecordProperty.type == self.__class__.__name__,
                   MysqlRecordProperty.property.in_(ftrp_properties)))\
           .delete(synchronize_session='fetch')
 
