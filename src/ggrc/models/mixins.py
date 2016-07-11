@@ -706,7 +706,7 @@ class CustomAttributable(object):
     Args:
       definitions: Ordered list of custom attribute definitions
     Returns:
-     Nothing
+      Nothing
     """
     from ggrc.models.custom_attribute_definition \
         import CustomAttributeDefinition as CADef
