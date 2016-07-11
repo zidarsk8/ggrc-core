@@ -729,7 +729,7 @@ class CustomAttributable(object):
     from ggrc.models.custom_attribute_value import CustomAttributeValue
     from ggrc.services import signals
 
-    definitions = attributes.get("custom_attribute_definitions", {})
+    definitions = attributes.get("custom_attribute_definitions")
     if definitions:
       self.process_definitions(definitions)
 
