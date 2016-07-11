@@ -137,7 +137,7 @@ class AssessmentTemplate(assessment.AuditRelationship, mixins.Slugged,
         "template_object_type": self.template_object_type,
         "test_plan_procedure": self.test_plan_procedure,
         "procedure_description": self.procedure_description,
-        "default_people": self.default_people,
+        "default_people": json.dumps(self.default_people),
     }
     assessment_template_copy = AssessmentTemplate(**data)
     db.session.add(assessment_template_copy)
