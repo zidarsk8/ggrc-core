@@ -734,6 +734,7 @@ class CustomAttributable(object):
         primaryjoin=join_function,
         backref='{0}_custom_attributable_definition'.format(self.__name__),
         cascade='all, delete-orphan',
+        order_by="CustomAttributeDefinition.id"
     )
 
   def custom_attributes(self, attributes):
