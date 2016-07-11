@@ -4,10 +4,12 @@
 """A module containing the implementation of the assessment template entity."""
 
 from ggrc import db
+from ggrc.models import audit
 from ggrc.models import mixins
 from ggrc.models.reflection import PublishOnly
 from ggrc.models import relationship
 from ggrc.models.types import JsonType
+from ggrc.services import common
 
 
 class AssessmentTemplate(relationship.Relatable, mixins.Titled,
@@ -95,3 +97,17 @@ class AssessmentTemplate(relationship.Relatable, mixins.Titled,
       cad._clone(assessment_template_copy)
 
     return (assessment_template_copy, rel)
+
+def create_audit_relationship(audit_stub, obj):
+  parent_audit = audit.Audit.query.get(audit_stub["id"])
+
+  rel = relationship.Relationship(
+      source=parent_audit,
+      destination=obj,
+      context=parent_audit.context)
+  db.session.add(rel)
+
+@common.Resource.model_posted.connect_via(AssessmentTemplate)
+def handle_assessment_template(sender, obj=None, src=None, service=None):
+  if "audit" in src:
+      create_audit_relationship(src["audit"], obj)
