@@ -684,10 +684,7 @@ class CustomAttributable(object):
     field_names = AttributeInfo.gather_create_attrs(
       CustomAttributeDefinition)
 
-    data = {}
-    for field_name in field_names:
-      if field_name in definition:
-        data[field_name] = definition[field_name]
+    data = {fname: definition.get(fname) for fname in field_names}
     cad = CustomAttributeDefinition(**data)
     cad.definition_type = self._inflector.table_singular
     db.session.add(cad)
