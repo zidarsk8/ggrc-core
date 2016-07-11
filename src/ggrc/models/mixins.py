@@ -681,7 +681,7 @@ class CustomAttributable(object):
   def insert_definition(self, definition):
     from ggrc.models.custom_attribute_definition \
       import CustomAttributeDefinition
-    field_names = AttributeInfo.gather_publish_attrs(
+    field_names = AttributeInfo.gather_create_attrs(
       CustomAttributeDefinition)
 
     data = {}
