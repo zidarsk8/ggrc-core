@@ -18,9 +18,11 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
       <div class="medium-col">
         <h6>Evidence</h6>
       </div>
-      <div class="mini-col">
-        <a href="javascript://" can-click="reuseIt" class="btn {{#disableReuse}}disabled{{/disableReuse}} btn-small btn-full btn-draft js-trigger-reuse">Reuse</a>
-      </div>
+      {{#is_allowed 'update' parentInstance context='for'}}
+        <div class="mini-col">
+          <a href="javascript://" can-click="reuseIt" class="btn {{#disableReuse}}disabled{{/disableReuse}} btn-small btn-full btn-draft js-trigger-reuse">Reuse</a>
+        </div>
+      {{/is_allowed}}
     </li>
   </ul>
   <ul class="past-items-list relatables">

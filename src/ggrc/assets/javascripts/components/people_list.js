@@ -280,7 +280,9 @@
           this.instance.remove_duplicate_pending_joins(person);
         } else {
           // convert roles list to a string
-          roles = operation.roles.join(',');
+          if (_.isArray(operation.roles)) {
+            roles = operation.roles.join(',');
+          }
           if (operation.how === 'add') {
             this.instance.mark_for_addition(
               'related_objects_as_destination',
