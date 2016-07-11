@@ -695,15 +695,11 @@ class CustomAttributable(object):
   def update_definition(self, definition):
     from ggrc.models.custom_attribute_definition \
       import CustomAttributeDefinition
-    from ggrc.rbac import permissions
-    from werkzeug.exceptions import Forbidden
 
     field_names = AttributeInfo.gather_publish_attrs(
       CustomAttributeDefinition)
 
     cadef = CustomAttributeDefinition.query.get(definition["id"])
-    if not permissions.is_allowed_update_for(cadef):
-      raise Forbidden()
 
     blacklisted = ["id", "modified_by"]
     for bl in blacklisted:
