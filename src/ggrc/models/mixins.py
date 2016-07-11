@@ -685,8 +685,8 @@ class CustomAttributable(object):
       CustomAttributeDefinition)
 
     data = {fname: definition.get(fname) for fname in field_names}
+    data["definition_type"] = self._inflector.table_singular
     cad = CustomAttributeDefinition(**data)
-    cad.definition_type = self._inflector.table_singular
     db.session.add(cad)
 
   def update_definition(self, definition):
