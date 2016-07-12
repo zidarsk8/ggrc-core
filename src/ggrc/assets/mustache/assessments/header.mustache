@@ -66,29 +66,31 @@ Copyright (C) 2016 Google Inc., authors, and contributors <see AUTHORS file>
               {{#if_in instance.status "Not Started,In Progress"}}
                 {{#is_allowed 'update' instance context='for'}}
                   <li>
-                    {{#if_verifiers_defined instance}}
-                      <reminder
-                        instance="instance"
-                        type="statusToPerson"
-                        modal_title="Reminder for Assessors set"
-                        modal_description="Tomorrow all Assessors will receive a notification to look at this Assessment if they didn't move it to 'Finished' in between."
-                      >
-                        <a href="javascript://" can-click="reminder">
-                          <i class="fa fa-bell-o"></i>
-                          Send reminder to assessors</a>
-                      </reminder>
-                    {{else}}
-                      <reminder
-                        instance="instance"
-                        type="statusToPerson"
-                        modal_title="Reminder for Assessors set"
-                        modal_description="Tomorrow all Assessors will receive a notification to look at this Assessment if they didn't move it to 'Final' in between."
-                      >
-                        <a href="javascript://" can-click="reminder">
-                          <i class="fa fa-bell-o"></i>
-                          Send reminder to assessors</a>
-                      </reminder>
-                    {{/if_verifiers_defined}}
+                    {{#unless instance._disabled}}
+                      {{#if_verifiers_defined instance}}
+                        <reminder
+                            instance="instance"
+                            type="statusToPerson"
+                            modal_title="Reminder for Assessors set"
+                            modal_description="Tomorrow all Assessors will receive a notification to look at this Assessment if they didn't move it to 'Finished' in between."
+                        >
+                          <a href="javascript://" can-click="reminder">
+                            <i class="fa fa-bell-o"></i>
+                            Send reminder to assessors</a>
+                        </reminder>
+                      {{else}}
+                        <reminder
+                            instance="instance"
+                            type="statusToPerson"
+                            modal_title="Reminder for Assessors set"
+                            modal_description="Tomorrow all Assessors will receive a notification to look at this Assessment if they didn't move it to 'Final' in between."
+                        >
+                          <a href="javascript://" can-click="reminder">
+                            <i class="fa fa-bell-o"></i>
+                            Send reminder to assessors</a>
+                        </reminder>
+                      {{/if_verifiers_defined}}
+                    {{/unless}}
                   </li>
                 {{/is_allowed}}
               {{/if_in}}

@@ -422,6 +422,7 @@
             return item.what;
           });
         }
+        this.scope.instance.attr('_disabled', 'disabled');
         added = getInstances(added);
         removed = getInstances(removed);
         this.scope.attr('results').replace(
@@ -429,6 +430,7 @@
             return !_.findWhere(removed, {id: item.id});
           }
         ), added));
+        this.scope.instance.attr('_disabled', '');
       },
       '{scope.list_mapped} change': 'updateResult',
       '{scope.list_pending} change': 'updateResult',
