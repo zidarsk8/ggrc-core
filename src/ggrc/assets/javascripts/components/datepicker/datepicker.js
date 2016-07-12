@@ -61,6 +61,13 @@
         this.scope.attr('_date', date);
         this.scope.attr('picker', element);
         this.scope.attr('datepicker', datepicker);
+
+        if (this.scope.setMinDate) {
+          this.setDate('minDate', this.scope.setMinDate);
+        }
+        if (this.scope.setMaxDate) {
+          this.setDate('maxDate', this.scope.setMaxDate);
+        }
       },
       getDate: function (date) {
         if (date instanceof Date) {
@@ -73,13 +80,15 @@
       isValidDate: function (date) {
         return moment(date, this.scope.pattern, true).isValid();
       },
+      setDate: function (type, date) {
+        date = this.getDate(date);
+        this.scope.picker.datepicker('option', type, date);
+      },
       '{scope} setMinDate': function (scope, ev, date) {
-        date = this.isValidDate(date) ? date : null;
-        this.scope.picker.datepicker('option', 'minDate', date);
+        this.setDate('minDate', date);
       },
       '{scope} setMaxDate': function (scope, ev, date) {
-        date = this.isValidDate(date) ? date : null;
-        this.scope.picker.datepicker('option', 'maxDate', date);
+        this.setDate('maxDate', date);
       },
       '{window} mousedown': function (el, ev) {
         var isInside;
