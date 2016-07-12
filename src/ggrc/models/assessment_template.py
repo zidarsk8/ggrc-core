@@ -4,10 +4,12 @@
 """A module containing the implementation of the assessment template entity."""
 
 from ggrc import db
+from ggrc.models import audit
 from ggrc.models import mixins
 from ggrc.models.reflection import PublishOnly
 from ggrc.models import relationship
 from ggrc.models.types import JsonType
+from ggrc.services import common
 
 
 class AssessmentTemplate(relationship.Relatable, mixins.Titled,
@@ -20,6 +22,8 @@ class AssessmentTemplate(relationship.Relatable, mixins.Titled,
   object.
   """
   __tablename__ = "assessment_templates"
+
+  PER_OBJECT_CUSTOM_ATTRIBUTABLE = True
 
   # the type of the object under assessment
   template_object_type = db.Column(db.String, nullable=True)
@@ -93,3 +97,25 @@ class AssessmentTemplate(relationship.Relatable, mixins.Titled,
       cad._clone(assessment_template_copy)
 
     return (assessment_template_copy, rel)
+
+
+def create_audit_relationship(audit_stub, obj):
+  """Create audit to assessment template relationship"""
+  parent_audit = audit.Audit.query.get(audit_stub["id"])
+
+  rel = relationship.Relationship(
+      source=parent_audit,
+      destination=obj,
+      context=parent_audit.context)
+  db.session.add(rel)
+
+
+@common.Resource.model_posted.connect_via(AssessmentTemplate)
+def handle_assessment_template(sender, obj=None, src=None, service=None):
+  # pylint: disable=unused-argument
+  """Handle Assessment Template POST
+
+  If "audit" is set on POST, create relationship with Assessment template.
+  """
+  if "audit" in src:
+      create_audit_relationship(src["audit"], obj)

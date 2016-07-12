@@ -112,7 +112,7 @@ def get_related_keys_for_expiration(context, o):
 
 def set_ids_for_new_custom_attributes(objects, parent_obj):
   """
-  When we are creating custom attribute values for
+  When we are creating custom attribute values and definitions for
   POST requests, parent object ID is not yet defined. This is why we update
   custom attribute values at this point and set the correct attributable_id
 
@@ -125,11 +125,19 @@ def set_ids_for_new_custom_attributes(objects, parent_obj):
     None
   """
 
-  from ggrc.models.custom_attribute_value import CustomAttributeValue
+  object_attrs = {
+      "CustomAttributeValue": "attributable_id",
+      "CustomAttributeDefinition": "definition_id"
+  }
+
   for obj in objects:
-    if not isinstance(obj, CustomAttributeValue):
+    if (obj.type not in object_attrs or
+       not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE")):
       continue
-    obj.attributable_id = parent_obj.id
+
+    attr = object_attrs[obj.type]
+    setattr(obj, attr, parent_obj.id)
+
     # Disable state updating so that a newly create object doesn't go straight
     # from Draft to Modified.
     if hasattr(obj, '_skip_os_state_update'):
@@ -823,6 +831,8 @@ class Resource(ModelView):
       self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
+    with benchmark("Update custom attribute values"):
+      set_ids_for_new_custom_attributes(modified_objects.new, obj)
     with benchmark("Log event"):
       log_event(db.session, obj)
     with benchmark("Update memcache before commit for collection PUT"):

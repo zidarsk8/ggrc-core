@@ -236,9 +236,11 @@
                     </add-template-field>
                   </li>
                   {{#fields}}
-                  <li {{data 'field'}} class="row-fluid sortable-item">
-                    <template-filed field="." fields="fields"></template-filed>
-                  </li>
+                    {{^if _pending_delete}}
+                      <li {{data 'field'}} class="row-fluid sortable-item">
+                        <template-filed field="." fields="fields"></template-filed>
+                      </li>
+                    {{/if}}
                   {{/fields}}
                 </ul>
               </div>
