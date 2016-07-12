@@ -1,17 +1,19 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from ggrc import db
-from ggrc.models.mixins import Identifiable
-from ggrc.models.mixins import Mapping
+import functools
+import inspect
+
+from sqlalchemy import event
 from sqlalchemy import or_, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import validates
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from werkzeug.exceptions import BadRequest
-import functools
-import inspect
+
+from ggrc import db
+from ggrc.models.mixins import Identifiable
+from ggrc.models.mixins import Mapping
 
 
 class Relationship(Mapping, db.Model):
@@ -69,15 +71,19 @@ class Relationship(Mapping, db.Model):
         else None
     return setattr(self, self.destination_attr, value)
 
-  @validates('relationship_attrs')
-  def _validate_attr(self, key, attr):
+  @staticmethod
+  def validate_attrs(mapper, connection, relationship):
     """
       Only white-listed attributes can be stored, so users don't use this
       for storing arbitrary data.
     """
-    RelationshipAttr.validate_attr(self.source, self.destination,
-                                   self.attrs, attr)
-    return attr
+    # pylint: disable=unused-argument
+    for attr_name, attr_value in relationship.attrs.iteritems():
+      attr = RelationshipAttr(attr_name=attr_name, attr_value=attr_value)
+      RelationshipAttr.validate_attr(relationship.source,
+                                     relationship.destination,
+                                     relationship.attrs,
+                                     attr)
 
   @classmethod
   def find_related(cls, object1, object2):
@@ -135,6 +141,9 @@ class Relationship(Mapping, db.Model):
     # manually add attrs since the base log_json only captures table columns
     json["attrs"] = self.attrs.copy()  # copy in order to detach from orm
     return json
+
+event.listen(Relationship, 'before_insert', Relationship.validate_attrs)
+event.listen(Relationship, 'before_update', Relationship.validate_attrs)
 
 
 class Relatable(object):

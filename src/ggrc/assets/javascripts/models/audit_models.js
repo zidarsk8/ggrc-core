@@ -1237,6 +1237,11 @@
 
       return this._super.apply(this, arguments);
     },
+    after_save: function () {
+      if (this.audit) {
+        this.audit.reify().refresh('related_assessment_templates');
+      }
+    },
 
     /**
      * Event handler when an assessor is picked in an autocomplete form field.
