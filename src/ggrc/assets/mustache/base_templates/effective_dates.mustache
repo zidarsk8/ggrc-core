@@ -1,0 +1,26 @@
+{{!
+  Copyright (C) 2016 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div data-id="effective_date_hidden" class="span4 hidable">
+    <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+    <datepicker
+      label="Effective Date"
+      date="start_date"
+      set-max-date="end_date"
+      helptext="Enter the date this object becomes effective."
+      {{#required}}required="true"{{/required}}
+      />
+  </div>
+  <div data-id="stop_date_hidden" class="span4 hidable">
+    <a data-id="hide_stop_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+    <datepicker
+      label="Stop Date"
+      set-min-date="start_date"
+      date="end_date"
+      helptext="Enter the date the object stops being effective."
+      {{#required}}required="true"{{/required}}
+      />
+  </div>
+</div>
