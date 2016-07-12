@@ -46,23 +46,24 @@ can.Model.Cacheable("CMS.Models.Directive", {
           return CMS.Models.Standard.model(params);
       }
       console.debug("Invalid Directive:", params);
+    },
+    attributes : {
+      context: 'CMS.Models.Context.stub',
+      modified_by: 'CMS.Models.Person.stub',
+      object_people: 'CMS.Models.ObjectPerson.stubs',
+      people: 'CMS.Models.Person.stubs',
+      object_documents: 'CMS.Models.ObjectDocument.stubs',
+      documents: 'CMS.Models.Document.stubs',
+      related_sources: 'CMS.Models.Relationship.stubs',
+      related_destinations: 'CMS.Models.Relationship.stubs',
+      objectives: 'CMS.Models.Objective.stubs',
+      programs: 'CMS.Models.Program.stubs',
+      sections: 'CMS.Models.get_stubs',
+      controls: 'CMS.Models.Control.stubs',
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
+      start_date: 'date',
+      end_date: 'date'
     }
-
-  , attributes : {
-    context : "CMS.Models.Context.stub"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , related_sources : "CMS.Models.Relationship.stubs"
-    , related_destinations : "CMS.Models.Relationship.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , programs : "CMS.Models.Program.stubs"
-    , sections : "CMS.Models.get_stubs"
-    , controls : "CMS.Models.Control.stubs"
-    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
-  }
   , defaults : {
   }
   , init : function() {
