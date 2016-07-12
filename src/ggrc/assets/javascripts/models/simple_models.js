@@ -36,21 +36,23 @@ can.Model.Cacheable("CMS.Models.Program", {
   , mixins : ["contactable", "unique_title"]
   , is_custom_attributable: true
   , attributes : {
-      context : "CMS.Models.Context.stub"
-    , owners : "CMS.Models.Person.stubs"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , related_sources : "CMS.Models.Relationship.stubs"
-    , related_destinations : "CMS.Models.Relationship.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , sections : "CMS.Models.get_stubs"
-    , directives : "CMS.Models.Directive.stubs"
-    , controls : "CMS.Models.Control.stubs"
-    , audits : "CMS.Models.Audit.stubs"
-    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
+      context: 'CMS.Models.Context.stub',
+      owners: 'CMS.Models.Person.stubs',
+      modified_by: 'CMS.Models.Person.stub',
+      object_people: 'CMS.Models.ObjectPerson.stubs',
+      people: 'CMS.Models.Person.stubs',
+      object_documents: 'CMS.Models.ObjectDocument.stubs',
+      documents: 'CMS.Models.Document.stubs',
+      related_sources: 'CMS.Models.Relationship.stubs',
+      related_destinations: 'CMS.Models.Relationship.stubs',
+      objectives: 'CMS.Models.Objective.stubs',
+      sections: 'CMS.Models.get_stubs',
+      directives: 'CMS.Models.Directive.stubs',
+      controls: 'CMS.Models.Control.stubs',
+      audits: 'CMS.Models.Audit.stubs',
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
+      start_date: 'date',
+      end_date: 'date'
   }
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/programs/tree.mustache"
