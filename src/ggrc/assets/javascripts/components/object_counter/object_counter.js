@@ -1,6 +1,6 @@
 /*!
- Copyright (C) 2016 Google Inc., authors, and contributors
- Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+   Copyright (C) 2016 Google Inc.
+   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 (function (can, $) {
@@ -43,7 +43,7 @@
       searchKeys: '@',
       searchValues: '@',
       _getValue: {
-        current_user: GGRC.current_user.id,
+        current_user: GGRC.current_user ? GGRC.current_user.id : -1,
         'true': true,
         'false': false
       },
