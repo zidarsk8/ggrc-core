@@ -32,6 +32,7 @@
       list_pending: [],
       list_mapped: [],
       computed_mapping: false,
+      forbiddenForUnmap: [],
       /**
         * Get pending joins for current instance
         *
@@ -67,7 +68,7 @@
         *                    or undefined
         */
       get_pending_operation: function (person) {
-        return _.find(this.get_pending(), function(join) {
+        return _.find(this.get_pending(), function (join) {
           return join.what === person;
         });
       },
@@ -193,22 +194,20 @@
                 roles: roles
               }
             );
-          } else {
-            if (pendingOperation.how === 'add') {
-              // cancel the pending 'add'
-              this.add_or_replace_operation(
-                person,
-                null
-              );
-            } else if (pendingOperation.how === 'update') {
-              // replace the 'update' with 'remove'
-              this.add_or_replace_operation(
-                person,
-                {
-                  how: 'remove'
-                }
-              );
-            }
+          } else if (pendingOperation.how === 'add') {
+            // cancel the pending 'add'
+            this.add_or_replace_operation(
+              person,
+              null
+            );
+          } else if (pendingOperation.how === 'update') {
+            // replace the 'update' with 'remove'
+            this.add_or_replace_operation(
+              person,
+              {
+                how: 'remove'
+              }
+            );
           }
         }
       },
@@ -316,7 +315,6 @@
           this.get_roles(person, instance).then(function (result) {
             var roles = result.roles;
             var relationship = result.relationship;
-            //  var ids = result.relationshipsIds;
 
             roles = _.without(roles, roleToRemove);
 
@@ -409,10 +407,10 @@
           // any person who was mapped and has `remove` join or has no `type`
           // in their `update` roles list
           var roles = this.scope.parse_roles_list(item);
-          var person_mapped = _.find(mapped, function (map) {
+          var personMapped = _.find(mapped, function (map) {
             return map.id === item.what.id;
           });
-          return person_mapped &&
+          return personMapped &&
             (item.how === 'remove' ||
              item.how === 'update' && !_.includes(roles, type));
         }.bind(this));
@@ -439,12 +437,10 @@
       },
       '.person-selector input autocomplete:select': function (el, ev, ui) {
         var person = ui.item;
-        var scope = this.scope;
-        var role = can.capitalize(scope.type);
-        var instance = scope.attr('instance');
-        var deferred = scope.attr('deferred');
+        var role = can.capitalize(this.scope.type);
+        var instance = this.scope.attr('instance');
+        var deferred = this.scope.attr('deferred');
         var relationship;
-        var $personElement;
 
         if (deferred) {
           this.scope.deferred_add_role(person, role);
@@ -464,6 +460,9 @@
             relationship = relationship.refresh();
           }
 
+          this.scope.attr('forbiddenForUnmap').push(person);
+          this.scope.attr('isLoading', true);
+
           relationship.done(function (relationship) {
             var type = relationship.attr('attrs.AssigneeType');
             relationship.attr('attrs.AssigneeType',
@@ -475,30 +474,29 @@
                 function checkRelationship(related, id) {
                   return _.findWhere(related, {id: id});
                 }
-                function onInstanceChange() {
-                  if (checkRelationship(this.related_sources, rel.id)) {
-                    instance.unbind('change', onInstanceChange);
+
+                instance.related_sources.on('change', function cb() {
+                  if (checkRelationship(this, rel.id)) {
+                    instance.related_sources.unbind('change', cb);
                     instanceDfd.resolve();
                   }
-                }
-                function onPersonChange() {
-                  if (checkRelationship(this.related_destinations, rel.id)) {
-                    person.unbind('change', onPersonChange);
+                });
+                person.related_destinations.on('change', function cb() {
+                  if (checkRelationship(this, rel.id)) {
+                    person.related_destinations.unbind('change', cb);
                     personDfd.resolve();
                   }
-                }
-                $personElement = $(el).closest('ul')
-                  .find('[data-person=' + person.id + ']').parent();
-                $personElement.hide();
-                instance.on('change', onInstanceChange);
-                person.on('change', onPersonChange);
+                });
                 return $.when(instanceDfd, personDfd);
               })
               .then(function () {
-                $personElement.show();
-              })
-              .then(instance.refresh);
-          });
+                _.remove(this.scope.attr('forbiddenForUnmap'), function (item) {
+                  return item.id === person.id;
+                });
+                this.scope.attr('isLoading', false);
+                instance.refresh();
+              }.bind(this));
+          }.bind(this));
         }
       },
       'modal:success': function () {
@@ -518,6 +516,12 @@
       can_unmap: function (options) {
         var results = this.attr('results');
         var required = this.attr('required');
+        var hiddens = this.attr('forbiddenForUnmap');
+        var isLoading = this.attr('isLoading');
+
+        if (isLoading && _.findWhere(hiddens, {id: options.context.id})) {
+          return options.inverse(options.context);
+        }
 
         if (required) {
           if (results.length > 1) {
