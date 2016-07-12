@@ -534,80 +534,85 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
   }
 }, {});
 
-can.Model.Cacheable("CMS.Models.Market", {
-  root_object : "market"
-  , root_collection : "markets"
-  , category : "business"
-  , findAll : "GET /api/markets"
-  , findOne : "GET /api/markets/{id}"
-  , create : "POST /api/markets"
-  , update : "PUT /api/markets/{id}"
-  , destroy : "DELETE /api/markets/{id}"
-  , mixins : ["ownable", "contactable", "unique_title"]
-  , is_custom_attributable: true
-  , attributes : {
-      context : "CMS.Models.Context.stub"
-    , owners : "CMS.Models.Person.stubs"
-    , modified_by : "CMS.Models.Person.stub"
-    , object_people : "CMS.Models.ObjectPerson.stubs"
-    , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
-    , related_sources : "CMS.Models.Relationship.stubs"
-    , related_destinations : "CMS.Models.Relationship.stubs"
-    , objectives : "CMS.Models.Objective.stubs"
-    , controls : "CMS.Models.Control.stubs"
-    , sections : "CMS.Models.get_stubs"
-    , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
-  }
-  , tree_view_options : {
-    show_view : GGRC.mustache_path + "/base_objects/tree.mustache"
-    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
-    , attr_list : can.Model.Cacheable.attr_list.concat([
-      {attr_title: 'URL', attr_name: 'url'},
-      {attr_title: 'Reference URL', attr_name: 'reference_url'},
-      {attr_title: 'Effective Date', attr_name: 'start_date'},
-      {attr_title: 'Stop Date', attr_name: 'end_date'}
-    ])
-    , add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
-    , child_options : [{
-      model : null
-      , find_params : {
-        "destination_type" : "Process"
-        , "source_type" : "Market"
-        , relationship_type_id : "market_has_process"
-      }
-      , parent_find_param : "source_id"
-      , draw_children : true
-      , find_function : "findRelated"
-      , related_side : "source"
-      , create_link : true
-    }]}
-  , links_to : {
-    "System" : {}
-    , "Process" : {}
-    , "Program" : {}
-    , "Product" : {}
-    , "Facility" : {}
-    , "OrgGroup" : {}
-    , "Vendor" : {}
-    , "Project" : {}
-    , "DataAsset" : {}
-    , "AccessGroup" : {}
-    , "Market" : {}
+  can.Model.Cacheable("CMS.Models.Market", {
+    root_object: 'market',
+    root_collection: 'markets',
+    category: 'business',
+    findAll: 'GET /api/markets',
+    findOne: 'GET /api/markets/{id}',
+    create: 'POST /api/markets',
+    update: 'PUT /api/markets/{id}',
+    destroy: 'DELETE /api/markets/{id}',
+    mixins: ['ownable', 'contactable', 'unique_title'],
+    is_custom_attributable: true,
+    attributes: {
+      context: 'CMS.Models.Context.stub',
+      owners: 'CMS.Models.Person.stubs',
+      modified_by: 'CMS.Models.Person.stub',
+      object_people: 'CMS.Models.ObjectPerson.stubs',
+      people: 'CMS.Models.Person.stubs',
+      object_documents: 'CMS.Models.ObjectDocument.stubs',
+      documents: 'CMS.Models.Document.stubs',
+      related_sources: 'CMS.Models.Relationship.stubs',
+      related_destinations: 'CMS.Models.Relationship.stubs',
+      objectives: 'CMS.Models.Objective.stubs',
+      controls: 'CMS.Models.Control.stubs',
+      sections: 'CMS.Models.get_stubs',
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
+      start_date: 'date',
+      end_date: 'date'
     },
-  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+    tree_view_options: {
+      show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
+      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+      attr_list: can.Model.Cacheable.attr_list.concat([
+        {attr_title: 'URL', attr_name: 'url'},
+        {attr_title: 'Reference URL', attr_name: 'reference_url'},
+        {attr_title: 'Effective Date', attr_name: 'start_date'},
+        {attr_title: 'Stop Date', attr_name: 'end_date'}
+      ]),
+      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
+      child_options: [{
+        model: null,
+        find_params: {
+          destination_type: 'Process',
+          source_type: 'Market',
+          relationship_type_id: 'market_has_process'
+        },
+        parent_find_param: 'source_id',
+        draw_children: true,
+        find_function: 'findRelated',
+        related_side: 'source',
+        create_link: true
+      }]
+    },
+    links_to: {
+      System: {},
+      Process: {},
+      Program: {},
+      Product: {},
+      Facility: {},
+      OrgGroup: {},
+      Vendor: {},
+      Project: {},
+      DataAsset: {},
+      AccessGroup: {},
+      Market: {}
+    },
+    statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
-  init: function () {
-    var that = this;
-    this._super && this._super.apply(this, arguments);
-    $(function(){
-      that.tree_view_options.child_options[0].model = CMS.Models.Process;
-    });
+    init: function () {
+      var that = this;
+      if (this._super) {
+        this._super.apply(this, arguments);
+      }
+      $(function () {
+        that.tree_view_options.child_options[0].model = CMS.Models.Process;
+      });
 
-    this.validateNonBlank("title");
-  }
-}, {});
+      this.validateNonBlank('title');
+    }
+  }, {});
 
 can.Model.Cacheable("CMS.Models.Vendor", {
   root_object : "vendor"
