@@ -21,11 +21,9 @@
         <span class="required">*</span>
         <i class="fa fa-question-circle" rel="tooltip" title="Choose the type of attribute to create."></i>
       </label>
-      <select name="attribute_type" tabindex="2">
-        {{#iterate 'Text', 'Rich Text', 'Date', 'Checkbox' 'Dropdown' 'Map:Person'}} {{! 'File upload' }}
-        <option {{#if_equals iterator attribute_type}}selected="true"{{/if_equals}}>{{iterator}}</option>
-        {{/iterate}}
-      </select>
+        <dropdown options-list="model.attributeTypes"
+                  name="attribute_type">
+        </dropdown>
     </div>
     <div class="span2">
       <label>

@@ -63,6 +63,8 @@
     defaults: {
       "title": ""
     },
+    attributeTypes: ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
+      'Map:Person'],
     init: function() {
       this.validateNonBlank("title");
       this._super.apply(this, arguments);

@@ -105,8 +105,10 @@ CMS.Models.SystemOrProcess("CMS.Models.System", {
   , defaults : {
       title : ""
     , url : ""
-    }
-  , init : function() {
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
     this._super && this._super.apply(this, arguments);
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options, {
@@ -149,8 +151,10 @@ CMS.Models.SystemOrProcess("CMS.Models.Process", {
   , defaults : {
       title : ""
     , url : ""
-    }
-  , init : function() {
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
     this._super && this._super.apply(this, arguments);
     this.tree_view_options = $.extend({}, CMS.Models.SystemOrProcess.tree_view_options);

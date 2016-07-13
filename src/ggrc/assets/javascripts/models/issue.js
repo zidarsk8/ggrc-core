@@ -27,14 +27,16 @@
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
       ])
     },
-    init : function() {
+    statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+    init: function () {
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");
     }
   }, {
     object_model: can.compute(function() {
       return CMS.Models[this.attr("object_type")];
-    }),
+    })
   });
 
 })(this.can);

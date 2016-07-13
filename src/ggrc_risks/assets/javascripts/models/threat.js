@@ -41,6 +41,8 @@
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
       ])
     },
+    statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
     init: function () {
       this._super && this._super.apply(this, arguments);
       this.validatePresenceOf("title");

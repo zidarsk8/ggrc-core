@@ -58,12 +58,10 @@
               <h6>Conclusion: Design</h6>
               <p><small><em>Is this control design effective?</em></small></p>
               {{#is_allowed 'update' instance context='for'}}
-                <select class="input-medium visual-selector" name="design">
-                  <option value="" {{#if_equals design ""}}selected{{/if_equals}}>---</option>
-                  {{#iterate 'Effective' 'Ineffective' 'Needs improvement' 'Not Applicable'}}
-                    <option {{#if_equals iterator design}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                  {{/iterate}}
-                </select>
+                  <dropdown options-list="model.conclusions"
+                            no-value="true"
+                            name="design">
+                  </dropdown>
               {{else}}
                 {{firstnonempty design '--'}}
               {{/is_allowed}}
@@ -72,12 +70,10 @@
               <h6>Conclusion: Operation</h6>
               <p><small><em>Is this control operationally effective?</em></small></p>
               {{#is_allowed 'update' instance context='for'}}
-                <select class="input-medium visual-selector" name="operationally">
-                  <option value="" {{#if_equals operationally ""}}selected{{/if_equals}}>---</option>
-                  {{#iterate 'Effective' 'Ineffective' 'Needs improvement' 'Not Applicable'}}
-                    <option {{#if_equals iterator operationally}}selected="true"{{/if_equals}}>{{iterator}}</option>
-                  {{/iterate}}
-                </select>
+                  <dropdown options-list="model.conclusions"
+                            no-value="true"
+                            name="operationally">
+                  </dropdown>
               {{else}}
                 {{firstnonempty operationally '--'}}
               {{/is_allowed}}

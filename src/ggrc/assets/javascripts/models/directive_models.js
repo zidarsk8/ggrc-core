@@ -99,8 +99,10 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Standard" ]
-  , cache : can.getObject("cache", CMS.Models.Directive, true)
-  , init : function() {
+  , cache : can.getObject("cache", CMS.Models.Directive, true),
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
     this._super.apply(this, arguments);
   }
@@ -126,8 +128,10 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Regulation" ]
-  , cache : can.getObject("cache", CMS.Models.Directive, true)
-  , init : function() {
+  , cache : can.getObject("cache", CMS.Models.Directive, true),
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
     this._super.apply(this, arguments);
   }
@@ -154,8 +158,10 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
-  , cache : can.getObject("cache", CMS.Models.Directive, true)
-  , init : function() {
+  , cache : can.getObject("cache", CMS.Models.Directive, true),
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
     can.extend(this.tree_view_options, CMS.Models.Directive.tree_view_options);
     this.tree_view_options.attr_list = can.Model.Cacheable.attr_list.concat([
@@ -190,8 +196,10 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , attributes : {
   }
   , meta_kinds : [ "Contract" ]
-  , cache : can.getObject("cache", CMS.Models.Directive, true)
-  , init : function() {
+  , cache : can.getObject("cache", CMS.Models.Directive, true),
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     can.extend(this.attributes, CMS.Models.Directive.attributes);
     this._super.apply(this, arguments);
   }
