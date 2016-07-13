@@ -456,47 +456,50 @@
               context: instance.context
             });
             relationship = $.Deferred().resolve(relationship);
+            this.scope.attr('forbiddenForUnmap').push(person);
+            this.scope.attr('isNew', true);
           } else {
             relationship = relationship.refresh();
           }
 
-          this.scope.attr('forbiddenForUnmap').push(person);
-          this.scope.attr('isLoading', true);
-
-          relationship.done(function (relationship) {
+          relationship.then(function (relationship) {
             var type = relationship.attr('attrs.AssigneeType');
             relationship.attr('attrs.AssigneeType',
               role + (type ? ',' + type : ''));
-            relationship.save()
-              .then(function (rel) {
-                var instanceDfd = $.Deferred();
-                var personDfd = $.Deferred();
-                function checkRelationship(related, id) {
-                  return _.findWhere(related, {id: id});
-                }
+            return relationship.save();
+          })
+            .then(function (rel) {
+              var props = ['related_sources', 'related_destinations'];
+              var dfds = [];
 
-                instance.related_sources.on('change', function cb() {
-                  if (checkRelationship(this, rel.id)) {
-                    instance.related_sources.unbind('change', cb);
-                    instanceDfd.resolve();
-                  }
+              if (this.scope.attr('isNew')) {
+                [instance, person].forEach(function (model) {
+                  var dfd = $.Deferred();
+                  props.forEach(function (prop) {
+                    function checkRelationship(related, id) {
+                      return _.findWhere(related, {id: id});
+                    }
+                    model[prop].on('change', function cb() {
+                      if (checkRelationship(this, rel.id)) {
+                        person[prop].unbind('change', cb);
+                        dfd.resolve();
+                      }
+                    });
+                  });
+                  dfds.push(dfd);
                 });
-                person.related_destinations.on('change', function cb() {
-                  if (checkRelationship(this, rel.id)) {
-                    person.related_destinations.unbind('change', cb);
-                    personDfd.resolve();
-                  }
-                });
-                return $.when(instanceDfd, personDfd);
-              })
-              .then(function () {
+              }
+              return $.when.apply($, dfds);
+            }.bind(this))
+            .then(function () {
+              if (this.scope.attr('isNew')) {
                 _.remove(this.scope.attr('forbiddenForUnmap'), function (item) {
                   return item.id === person.id;
                 });
-                this.scope.attr('isLoading', false);
-                instance.refresh();
-              }.bind(this));
-          }.bind(this));
+                this.scope.attr('isNew', false);
+              }
+              instance.refresh();
+            }.bind(this));
         }
       },
       'modal:success': function () {
@@ -517,9 +520,9 @@
         var results = this.attr('results');
         var required = this.attr('required');
         var hiddens = this.attr('forbiddenForUnmap');
-        var isLoading = this.attr('isLoading');
+        var isNew = this.attr('isNew');
 
-        if (isLoading && _.findWhere(hiddens, {id: options.context.id})) {
+        if (isNew && _.findWhere(hiddens, {id: options.context.id})) {
           return options.inverse(options.context);
         }
 
