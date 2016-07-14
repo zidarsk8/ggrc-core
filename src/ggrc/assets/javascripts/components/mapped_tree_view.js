@@ -13,6 +13,7 @@
       reuseMethod: '@',
       treeViewClass: '@',
       expandable: '@',
+      sortField: '@',
       parentInstance: null,
       mappedObjects: [],
       isExpandable: function () {
@@ -39,13 +40,33 @@
       binding = this.scope.parentInstance.get_binding(this.scope.mapping);
 
       binding.refresh_instances().then(function (mappedObjects) {
-        this.scope.attr('mappedObjects').replace(mappedObjects);
+        this.scope.attr('mappedObjects').replace(
+          this._sortObjects(mappedObjects)
+        );
       }.bind(this));
 
       // We are tracking binding changes, so mapped items update accordingly
       binding.list.on('change', function () {
-        this.scope.attr('mappedObjects').replace(binding.list);
+        this.scope.attr('mappedObjects').replace(
+          this._sortObjects(binding.list)
+        );
       }.bind(this));
+    },
+    /**
+      * Sort objects list by this.scope.sortField, if defined
+      *
+      * @param {Array} mappedObjects - the list of objects to be sorted
+      *
+      * @return {Array} - if this.scope.sortField is defined, mappedObjects
+      *                   sorted by field this field;
+      *                   if this.scope.sortField is undefined, unsorted
+      *                   mappedObjects.
+      */
+    _sortObjects: function (mappedObjects) {
+      if (this.scope.attr('sortField')) {
+        return _.sortBy(mappedObjects, this.scope.attr('sortField'));
+      }
+      return mappedObjects;
     },
     events: {
       '[data-toggle=unmap] click': function (el, ev) {
