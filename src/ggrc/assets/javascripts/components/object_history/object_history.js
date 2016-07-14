@@ -588,7 +588,7 @@
           instance, existingRoles);
         perPersonRoleHistory[pid] = [{
           updated_at: instance.created_at,
-          role: role.toLowerCase()
+          role: role
         }];
       });
 
@@ -617,7 +617,7 @@
         return roleChange.updated_at <= timePoint;
       }));
       if (role) {
-        return role.role.toLowerCase();
+        return role.role;
       }
       return 'none';
     }
