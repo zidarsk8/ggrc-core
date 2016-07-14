@@ -774,6 +774,208 @@ describe('GGRC.Components.objectHistory', function () {
     );
   });
 
+  describe('_computeRoleChanges method', function () {
+    var componentInst;  // fake component instance
+    var method;  // the method under test
+    var revisions = new can.Map({
+      object: new can.List([
+        {
+          id: 10,
+          modified_by: {
+            id: 166
+          }
+        }
+      ]),
+      mappings: new can.List([
+        {
+          id: 1,
+          modified_by: {
+            id: 166
+          },
+          action: 'created',
+          source_type: 'Person',
+          source_id: 166,
+          destination_type: 'ObjectFoo',
+          destination_id: 123,
+          updated_at: new Date(2016, 0, 1),
+          type: 'Revision',
+          content: {
+            attrs: {
+              AssigneeType: 'Requester,Assignee'
+            }
+          }
+        },
+        {
+          id: 2,
+          modified_by: {
+            id: 166
+          },
+          action: 'modified',
+          source_type: 'Person',
+          source_id: 166,
+          destination_type: 'ObjectFoo',
+          destination_id: 123,
+          updated_at: new Date(2016, 0, 2),
+          type: 'Revision',
+          content: {
+            attrs: {
+              AssigneeType: 'Requester,Assignee,Verifier'
+            }
+          }
+        },
+        {
+          id: 3,
+          modified_by: {
+            id: 166
+          },
+          action: 'modified',
+          source_type: 'Person',
+          source_id: 166,
+          destination_type: 'ObjectFoo',
+          destination_id: 123,
+          updated_at: new Date(2016, 0, 4),
+          type: 'Revision',
+          content: {
+            attrs: {
+              AssigneeType: 'Requester'
+            }
+          }
+        },
+        {
+          id: 4,
+          modified_by: {
+            id: 166
+          },
+          action: 'deleted',
+          source_type: 'Person',
+          source_id: 166,
+          destination_type: 'ObjectFoo',
+          destination_id: 123,
+          updated_at: new Date(2016, 0, 5),
+          type: 'Revision',
+          content: {
+            attrs: {
+              AssigneeType: 'Requester'
+            }
+          }
+        }
+      ])
+    });
+
+    beforeAll(function () {
+      componentInst = {
+        _INSTANCE_TYPE: 'ObjectFoo',
+        scope: new can.Map({
+          instance: {
+            id: 123,
+            type: 'ObjectFoo',
+            created_at: new Date(2016, 0, 1),
+            'class': {
+              assignable_list: [{
+                type: 'requester',
+                mapping: 'related_requesters'
+              }, {
+                type: 'assignee',
+                mapping: 'related_assignees'
+              }, {
+                type: 'verifier',
+                mapping: 'related_verifiers'
+              }]
+            },
+            get_binding: function (mappingName) {
+              var bindingData = {
+                related_requesters: {
+                  list: [
+                    {
+                      instance: {id: 166}
+                    }
+                  ]
+                },
+                related_assignees: {
+                  list: [
+                    {
+                      instance: {id: 166}
+                    }
+                  ]
+                },
+                related_verifiers: {
+                  list: [
+                    {
+                      instance: {id: 166}
+                    }
+                  ]
+                }
+              };
+              return bindingData[mappingName];
+            }
+          }
+        })
+      };
+
+      method = Component.prototype._computeRoleChanges.bind(componentInst);
+    });
+
+    it('returns current max role when no revisions exist', function () {
+      var roleHistory = method([]);
+      expect(roleHistory).toEqual({
+        '166': [{
+          role: 'Verifier',
+          updated_at: new Date(2016, 0, 1)
+        }]
+      });
+    });
+
+    it('returns correct full history when present', function () {
+      var roleHistory = method(revisions);
+      expect(roleHistory).toEqual({
+        '166': [
+          {
+            updated_at: new Date(2016, 0, 1),
+            role: 'Assignee'
+          },
+          {
+            updated_at: new Date(2016, 0, 2),
+            role: 'Verifier'
+          },
+          {
+            updated_at: new Date(2016, 0, 4),
+            role: 'Requester'
+          },
+          {
+            updated_at: new Date(2016, 0, 5),
+            role: 'none'
+          }
+        ]
+      });
+    });
+
+    it('builds correct full history when creation is not present', function () {
+      var roleHistory;
+      revisions.mappings.shift(); // remove first ("created") mapping
+      roleHistory = method(revisions);
+      expect(roleHistory).toEqual({
+        '166': [
+          {
+            updated_at: new Date(2016, 0, 1),
+            role: 'none'
+          },
+          {
+            updated_at: new Date(2016, 0, 2),
+            role: 'Verifier'
+          },
+          {
+            updated_at: new Date(2016, 0, 4),
+            role: 'Requester'
+          },
+          {
+            updated_at: new Date(2016, 0, 5),
+            role: 'none'
+          }
+        ]
+      });
+    });
+  });
+
   describe('_getRoleAtTime() method', function () {
     var componentInst;  // fake component instance
     var method;  // the method under test
