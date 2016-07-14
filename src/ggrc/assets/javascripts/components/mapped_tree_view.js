@@ -87,7 +87,9 @@
               return mapping.destroy();
             })
             .then(function () {
-              return mapping.documentable.reify();
+              if (mapping.documentable) {
+                return mapping.documentable.reify();
+              }
             });
         });
       }
