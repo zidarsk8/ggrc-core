@@ -200,9 +200,14 @@ class TaskEndColumnHandler(TaskDateColumnHandler):
       month, day, year = self.value
       try:
         self.row_converter.obj.end_date = datetime.date(year, month, day)
-      except ValueError:
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
+      except ValueError as error:
+        if error.message == "Start date can not be after end date.":
+          self.add_error(errors.INVALID_START_END_DATES,
+                         start_date="Start date",
+                         end_date="End date")
+        else:
+          self.add_error(errors.WRONG_VALUE_ERROR,
+                         column_name=self.display_name)
         return
     elif freq in ["weekly", "monthly"]:
       if len(self.value) != 1 or \
