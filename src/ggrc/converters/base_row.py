@@ -260,8 +260,11 @@ class RowConverter(object):
     """
     row = []
     for field in fields:
-      if self.headers[field].get("type") == AttributeInfo.Type.PROPERTY:
-        row.append(self.attrs[field].get_value() or "")
+      field_type = self.headers.get(field, {}).get("type")
+      if field_type == AttributeInfo.Type.PROPERTY:
+        field_handler = self.attrs.get(field)
       else:
-        row.append(self.objects[field].get_value() or "")
+        field_handler = self.objects.get(field)
+      value = field_handler.get_value() if field_handler else ""
+      row.append(value or "")
     return row
