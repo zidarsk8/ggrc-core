@@ -82,12 +82,6 @@ describe('GGRC.Components.objectHistory', function () {
       }
     );
 
-    it('stores the correct instance type', function () {
-      instance.attr('type', 'ObjectFoo');
-      method(element);
-      expect(componentInst._INSTANCE_TYPE).toEqual('ObjectFoo');
-    });
-
     it('fetches history data for the correct object instance', function () {
       method(element);
       expect(componentInst._fetchRevisionsData).toHaveBeenCalledWith(instance);
@@ -541,7 +535,6 @@ describe('GGRC.Components.objectHistory', function () {
       // obtain a reference to the method under test, and bind it to a fake
       // instance context
       var componentInst = {
-        _INSTANCE_TYPE: 'ObjectFoo',
         scope: new can.Map({
           instance: {
             id: 123,
@@ -698,10 +691,15 @@ describe('GGRC.Components.objectHistory', function () {
 
     beforeAll(function () {
       componentInst = {
-        _INSTANCE_TYPE: 'ObjectFoo',
         _getRoleAtTime: function () {
           return 'none';
-        }
+        },
+        scope: new can.Map({
+          instance: {
+            id: 123,
+            type: 'ObjectFoo'
+          }
+        })
       };
 
       method = Component.prototype._mappingChange.bind(componentInst);
@@ -866,7 +864,6 @@ describe('GGRC.Components.objectHistory', function () {
 
     beforeAll(function () {
       componentInst = {
-        _INSTANCE_TYPE: 'ObjectFoo',
         scope: new can.Map({
           instance: {
             id: 123,
