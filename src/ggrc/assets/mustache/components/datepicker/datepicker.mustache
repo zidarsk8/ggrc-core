@@ -22,6 +22,9 @@
       class="datepicker__input date"
       can-value="_date"
       can-focus="onFocus"
+      {{#testId}}
+      data-test-id="{{testId}}"
+      {{/testId}}
     >
     <div class="datepicker__calendar {{#isHidden}}hide{{/isHidden}}"></div>
   </div>
