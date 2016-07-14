@@ -7,6 +7,7 @@ from collections import defaultdict
 
 from ggrc import settings
 from ggrc.utils import structures
+from ggrc.utils import benchmark
 from ggrc.cache.memcache import MemCache
 from ggrc.converters import get_exportables
 from ggrc.converters.base_block import BlockConverter
@@ -61,6 +62,7 @@ class Converter(object):
 
   def to_array(self):
     self.block_converters_from_ids()
+    return [[]]
     self.handle_row_data()
     return self.to_block_array()
 
@@ -111,14 +113,15 @@ class Converter(object):
     object_map = {o.__name__: o for o in self.exportable.values()}
     for object_data in self.ids_by_type:
       class_name = object_data["object_name"]
-      object_class = object_map[class_name]
-      object_ids = object_data.get("ids", [])
-      fields = object_data.get("fields")
-      block_converter = BlockConverter(self, object_class=object_class,
-                                       fields=fields, object_ids=object_ids,
-                                       class_name=class_name)
-      block_converter.row_converters_from_ids()
-      self.block_converters.append(block_converter)
+      with benchmark("Block data for: {}".format(class_name)):
+        object_class = object_map[class_name]
+        object_ids = object_data.get("ids", [])
+        fields = object_data.get("fields")
+        block_converter = BlockConverter(self, object_class=object_class,
+                                        fields=fields, object_ids=object_ids,
+                                        class_name=class_name)
+        block_converter.row_converters_from_ids()
+        self.block_converters.append(block_converter)
 
   def block_converters_from_csv(self):
     """Prepare BlockConverters and order them like specified in

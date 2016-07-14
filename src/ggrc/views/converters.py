@@ -49,19 +49,24 @@ def parse_export_request():
 def handle_export_request():
   try:
     data = parse_export_request()
-    query_helper = QueryHelper(data)
-    converter = Converter(ids_by_type=query_helper.get_ids())
-    csv_data = converter.to_array()
-    csv_string = generate_csv_string(csv_data)
+    with benchmark("Create Query helper"):
+      query_helper = QueryHelper(data)
+    with benchmark("get ids"):
+      converter = Converter(ids_by_type=query_helper.get_ids())
+    with benchmark("generate array"):
+      csv_data = converter.to_array()
+    with benchmark("generate csv string"):
+      csv_string = generate_csv_string(csv_data)
 
-    object_names = "_".join(converter.get_object_names())
-    filename = "{}.csv".format(object_names)
+    with benchmark("return csv response"):
+      object_names = "_".join(converter.get_object_names())
+      filename = "{}.csv".format(object_names)
 
-    headers = [
-        ("Content-Type", "text/csv"),
-        ("Content-Disposition", "attachment; filename='{}'".format(filename)),
-    ]
-    return current_app.make_response((csv_string, 200, headers))
+      headers = [
+          ("Content-Type", "text/csv"),
+          ("Content-Disposition", "attachment; filename='{}'".format(filename)),
+      ]
+      return current_app.make_response((csv_string, 200, headers))
   except BadQueryException as exception:
     raise BadRequest(exception.message)
   except Exception as exception:

@@ -9,6 +9,7 @@ from sqlalchemy import exc
 
 from ggrc import db
 from ggrc.utils import structures
+from ggrc.utils import benchmark
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import pre_commit_checks
@@ -185,16 +186,20 @@ class BlockConverter(object):
     """ Generate a row converter object for every csv row """
     if self.ignore or not self.object_ids:
       return
-    self.row_converters = []
-    objects = self.object_class.eager_query().filter(
-        self.object_class.id.in_(self.object_ids)).all()
-    # TODO: this needs to be moved to query_helper, but it's here for now,
-    # so we don't have to fetch same objects twice from the database.
-    objects = [o for o in objects if permissions.is_allowed_read_for(o)]
-    for i, obj in enumerate(objects):
-      row = RowConverter(self, self.object_class, obj=obj,
-                         headers=self.headers, index=i)
-      self.row_converters.append(row)
+    with benchmark("eager query for all objects"):
+      self.row_converters = []
+      objects = self.object_class.eager_query().filter(
+          self.object_class.id.in_(self.object_ids)).all()
+
+    with benchmark("filter by permissions: object_count - {}".format(len(objects))):
+      # TODO: this needs to be moved to query_helper, but it's here for now,
+      # so we don't have to fetch same objects twice from the database.
+      objects = [o for o in objects if permissions.is_allowed_read_for(o)]
+    with benchmark("generate row converters"):
+      for i, obj in enumerate(objects):
+        row = RowConverter(self, self.object_class, obj=obj,
+                          headers=self.headers, index=i)
+        self.row_converters.append(row)
 
   def handle_row_data(self, field_list=None):
     """Call handle row data on all row converters.
