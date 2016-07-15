@@ -491,8 +491,8 @@
      * "created" action, e.g. old assessments) it then adds "no role" to the
      * start of person's history.
      *
-     * If we don't have any revisions to person mappings but he is current
-     * assignee, we select the highest current role.
+     * If we don't have any revisions to person mappings but they are
+     * currently an assignee, we select the highest current role.
      *
      * If user has no role and was not or is not an assignee, we just add a
      * single role change ("no role").
