@@ -837,6 +837,54 @@ Mustache.registerHelper("get_view_link", function (instance, options) {
   return defer_render("a", finish, instance.get_permalink());
 });
 
+  /**
+   * Generate an anchor element that opens the instance's view page in a
+   * new browser tab/window.
+   *
+   * If the instance does not have such a page, an empty string is returned.
+   * The inner content of the tag is used as the text for the link.
+   *
+   * This helper is a modification of the `get_view_link` helper - the latter
+   * generates a link with an arrow icon instead of the text.
+   *
+   * Example usage:
+   *
+   *   {{{#view_object_link instance}}}
+   *     Open {{firstexist instance.name instance.title}}
+   *   {{{/view_object_link}}}
+   *
+   * NOTE: Since an HTML snippet is generated, the helper should be used with
+   * an unescaping block (tripple braces).
+   *
+   * @param {can.Model} instance - the object to generate the link for
+   * @param {Object} options - a CanJS options argument passed to every helper
+   * @return {String} - the link HTML snippet
+   */
+  Mustache.registerHelper('view_object_link', function (instance, options) {
+    var linkText;
+
+    function onRenderComplete(link) {
+      var html = [
+        '<a ',
+        '  href="' + link + '"',
+        '  target="_blank"',
+        '  class="view-link">',
+        linkText,
+        '</a>'
+      ].join('');
+      return html;
+    }
+
+    instance = resolve_computed(instance);
+    if (!instance.viewLink && !instance.get_permalink) {
+      return '';
+    }
+
+    linkText = options.fn(options.contexts);
+
+    return defer_render('a', onRenderComplete, instance.get_permalink());
+  });
+
 Mustache.registerHelper("schemed_url", function (url) {
   var domain, max_label, url_split;
 
