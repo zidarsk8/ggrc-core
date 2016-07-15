@@ -78,6 +78,7 @@ class BlockConverter(object):
 
   def __init__(self, converter, **options):
     self._mapping_cache = None
+    self._ca_definitions_cache = None
     self.converter = converter
     self.offset = options.get("offset", 0)
     self.object_class = options.get("object_class")
@@ -103,13 +104,17 @@ class BlockConverter(object):
     self.unique_counts = self.get_unique_counts_dict(self.object_class)
     self.name = self.object_class._inflector.human_singular.title()
     self.organize_fields(options.get("fields", []))
-    self.ca_definitions_cache = self._create_ca_definitions_cache()
 
   def _create_ca_definitions_cache(self):
     cad = models.CustomAttributeDefinition
     definition_type = self.object_class._inflector.table_singular
     defs = cad.eager_query().filter(cad.definition_type == definition_type)
     return {(d.definition_id, d.title): d for d in defs}
+
+  def get_ca_definitions_cache(self):
+    if self._ca_definitions_cache is None:
+      self._ca_definitions_cache = self._create_ca_definitions_cache()
+    return self._ca_definitions_cache
 
   def _create_mapping_cache(self):
     def identifier(obj):
