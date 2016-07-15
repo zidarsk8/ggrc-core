@@ -21,17 +21,16 @@
             <div class="span8">
               <div class="tree-title-area">
                 <i class="fa fa-{{instance.class.table_singular}} color"></i>
-                {{firstexist instance.name instance.title instance.description}}
+
+                {{{#view_object_link instance}}}
+                  {{firstexist instance.name instance.title instance.description}}
+                {{{/view_object_link}}}
+
                 <span class="url-link">
                   {{firstexist instance.email instance.link}}
                 </span>
               </div>
             </div> <!-- span8 end -->
-            <div class="span4">
-              <div class="show-details">
-                  {{{get_view_link instance}}}
-              </div>
-            </div>
           </div> <!-- row-fluid end -->
         </div> <!-- item-data end -->
       </div> <!-- select end -->
