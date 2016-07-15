@@ -222,20 +222,13 @@ can.Control('CMS.Controllers.TreeLoader', {
     this.on();
 
     temp_list = [];
-    if (!is_reload) {
-      list.each(function (v) {
-        var item = that.prepare_child_options(v, force_prepare_children);
-        temp_list.push(item);
-        if (!item.instance.selfLink) {
-          refresh_queue.enqueue(v.instance);
-        }
-      });
-    } else {
-      list.each(function (v) {
-        temp_list.push(v);
-      });
-    }
-
+    list.each(function (v) {
+      var item = that.prepare_child_options(v, force_prepare_children);
+      temp_list.push(item);
+      if (!is_reload && !item.instance.selfLink) {
+        refresh_queue.enqueue(v.instance);
+      }
+    });
     if (this.options.sort_property || this.options.sort_function) {
       original_function = this.options.sort_function ||
                           this._sort_property_comparator(this.options.sort_property);

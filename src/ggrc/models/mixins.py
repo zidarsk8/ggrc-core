@@ -713,6 +713,9 @@ class CustomAttributable(object):
     from ggrc.models.custom_attribute_definition \
         import CustomAttributeDefinition as CADef
 
+    if not hasattr(self, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
+      return
+
     db.session.query(CADef).filter(
         CADef.definition_id == self.id,
         CADef.definition_type == self._inflector.table_singular
