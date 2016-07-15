@@ -8,17 +8,19 @@
 
   {{#if_in instance.status "Not Started,In Progress"}}
     {{#if_null instance._mandatory_msg}}
-      {{#if_verifiers_defined instance}}
+      {{#unless instance._disabled}}
+        {{#if_verifiers_defined instance}}
           <button class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
                   data-name="status"
                   data-value="Ready for Review">
             Complete
           </button>
-      {{else}}
+        {{else}}
           <button class="btn btn-small btn-primary pull-right btn-info-pin-header {{instance._disabled}}"
                   data-name="status"
                   data-value="Completed">Complete</button>
-      {{/if_verifiers_defined}}
+        {{/if_verifiers_defined}}
+      {{/unless}}
     {{else}}
       <button class="btn btn-small btn-primary pull-right btn-info-pin-header disabled"
               title="{{instance._mandatory_msg}}">

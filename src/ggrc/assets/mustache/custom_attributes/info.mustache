@@ -4,104 +4,25 @@
 }}
 
 <custom-attributes instance="instance" load="true">
-  {{#if instance.custom_attribute_definitions.length}}
-    {{#iterate_by_two instance.custom_attribute_definitions}}
-      <div class="row-fluid wrap-row">
-      {{#list}}
-        <div class="span6">
-          <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
-            {{#with_value_for_id id}}
-              {{#switch attribute_type}}
-              {{#case 'Checkbox'}}
-                <inline-edit
-                  instance="instance"
-                  need-confirm="confirmEdit"
-                  ca-id="id"
-                  value="value"
-                  label="title"
-                  type="checkbox"
-                  mandatory="mandatory"
-                  placeholder="placeholder"
-                  helptext="helptext"
-                  {{^is_allowed 'update' instance context='for'}}
-                    readonly
-                  {{/is_allowed}}
-                ></inline-edit>
-              {{/case}}
-              {{#case 'Rich Text'}}
-                <inline-edit
-                  instance="instance"
-                  need-confirm="confirmEdit"
-                  ca-id="id"
-                  value="value"
-                  label="title"
-                  type="text"
-                  mandatory="mandatory"
-                  placeholder="placeholder"
-                  helptext="helptext"
-                  {{^is_allowed 'update' instance context='for'}}
-                    readonly
-                  {{/is_allowed}}
-                ></inline-edit>
-              {{/case}}
-              {{#case 'Dropdown'}}
-                <inline-edit
-                  instance="instance"
-                  need-confirm="confirmEdit"
-                  ca-id="id"
-                  value="value"
-                  label="title"
-                  type="dropdown"
-                  mandatory="mandatory"
-                  values="multi_choice_options"
-                  placeholder="placeholder"
-                  helptext="helptext"
-                  {{^is_allowed 'update' instance context='for'}}
-                    readonly
-                  {{/is_allowed}}
-                ></inline-edit>
-              {{/case}}
-              {{#case 'Date'}}
-                <inline-edit
-                  instance="instance"
-                  need-confirm="confirmEdit"
-                  ca-id="id"
-                  value="value"
-                  label="title"
-                  type="date"
-                  mandatory="mandatory"
-                  placeholder="placeholder"
-                  helptext="helptext"
-                  {{^is_allowed 'update' instance context='for'}}
-                    readonly
-                  {{/is_allowed}}
-                ></inline-edit>
-              {{/case}}
-              {{#case 'Text'}}
-                <inline-edit
-                  instance="instance"
-                  need-confirm="confirmEdit"
-                  ca-id="id"
-                  value="value"
-                  label="title"
-                  type="input"
-                  mandatory="mandatory"
-                  placeholder="placeholder"
-                  helptext="helptext"
-                  {{^is_allowed 'update' instance context='for'}}
-                    readonly
-                  {{/is_allowed}}
-                ></inline-edit>
-              {{/case}}
-              {{#case 'Map:Person'}}
-                {{#with_object_for_id id}}
+  {{^loading}}
+    {{#if instance.custom_attribute_definitions.length}}
+      {{#iterate_by_two instance.custom_attribute_definitions}}
+        <div class="row-fluid wrap-row">
+        {{#list}}
+          <div class="span6">
+            <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
+              {{#with_value_for_id id}}
+                {{#switch attribute_type}}
+                {{#case 'Checkbox'}}
                   <inline-edit
                     instance="instance"
                     need-confirm="confirmEdit"
                     ca-id="id"
-                    value="object"
+                    value="value"
                     label="title"
-                    type="person"
+                    type="checkbox"Since slugs are now case insensitive, the errors show all slugs in lower
+case and the tests need to be updated accordingly.
+commit 623c05117551ac3c7caccc353a6455c2a4e16f76
                     mandatory="mandatory"
                     placeholder="placeholder"
                     helptext="helptext"
@@ -109,18 +30,101 @@
                       readonly
                     {{/is_allowed}}
                   ></inline-edit>
-                {{/with_object_for_id}}
-              {{/case}}
-              {{#default}}
-                <h6>{{title}}</h6>
-                {{value}}
-              {{/default}}
-              {{/switch}}
-            {{/with_value_for_id}}
+                {{/case}}
+                {{#case 'Rich Text'}}
+                  <inline-edit
+                    instance="instance"
+                    need-confirm="confirmEdit"
+                    ca-id="id"
+                    value="value"
+                    label="title"
+                    type="text"
+                    mandatory="mandatory"
+                    placeholder="placeholder"
+                    helptext="helptext"
+                    {{^is_allowed 'update' instance context='for'}}
+                      readonly
+                    {{/is_allowed}}
+                  ></inline-edit>
+                {{/case}}
+                {{#case 'Dropdown'}}
+                  <inline-edit
+                    instance="instance"
+                    need-confirm="confirmEdit"
+                    ca-id="id"
+                    value="value"
+                    label="title"
+                    type="dropdown"
+                    mandatory="mandatory"
+                    values="multi_choice_options"
+                    placeholder="placeholder"
+                    helptext="helptext"
+                    {{^is_allowed 'update' instance context='for'}}
+                      readonly
+                    {{/is_allowed}}
+                  ></inline-edit>
+                {{/case}}
+                {{#case 'Date'}}
+                  <inline-edit
+                    instance="instance"
+                    need-confirm="confirmEdit"
+                    ca-id="id"
+                    value="value"
+                    label="title"
+                    type="date"
+                    mandatory="mandatory"
+                    placeholder="placeholder"
+                    helptext="helptext"
+                    {{^is_allowed 'update' instance context='for'}}
+                      readonly
+                    {{/is_allowed}}
+                  ></inline-edit>
+                {{/case}}
+                {{#case 'Text'}}
+                  <inline-edit
+                    instance="instance"
+                    need-confirm="confirmEdit"
+                    ca-id="id"
+                    value="value"
+                    label="title"
+                    type="input"
+                    mandatory="mandatory"
+                    placeholder="placeholder"
+                    helptext="helptext"
+                    {{^is_allowed 'update' instance context='for'}}
+                      readonly
+                    {{/is_allowed}}
+                  ></inline-edit>
+                {{/case}}
+                {{#case 'Map:Person'}}
+                  {{#with_object_for_id id}}
+                    <inline-edit
+                      instance="instance"
+                      need-confirm="confirmEdit"
+                      ca-id="id"
+                      value="object"
+                      label="title"
+                      type="person"
+                      mandatory="mandatory"
+                      placeholder="placeholder"
+                      helptext="helptext"
+                      {{^is_allowed 'update' instance context='for'}}
+                        readonly
+                      {{/is_allowed}}
+                    ></inline-edit>
+                  {{/with_object_for_id}}
+                {{/case}}
+                {{#default}}
+                  <h6>{{title}}</h6>
+                  {{value}}
+                {{/default}}
+                {{/switch}}
+              {{/with_value_for_id}}
+            </div>
           </div>
+        {{/list}}
         </div>
-      {{/list}}
-      </div>
-    {{/iterate_by_two}}
-  {{/if}}
+      {{/iterate_by_two}}
+    {{/if}}
+  {{/loading}}
 </custom-attributes>

@@ -438,10 +438,15 @@ class ConclusionColumnHandler(ColumnHandler):
 
   """ Handler for design and operationally columns in ControlAssesments """
 
+  CONCLUSION_MAP = {i.lower(): i for i in Assessment.VALID_CONCLUSIONS}
+
   def parse_item(self):
-    conclusion_map = {i.lower(): i for i in
-                      Assessment.VALID_CONCLUSIONS}
-    return conclusion_map.get(self.raw_value.lower(), "")
+    """Parse conclusion design and operational values."""
+
+    value = self.CONCLUSION_MAP.get(self.raw_value.lower(), "")
+    if self.raw_value and not value:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    return value
 
 
 class OptionColumnHandler(ColumnHandler):

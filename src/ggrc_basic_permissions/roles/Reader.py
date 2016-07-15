@@ -87,6 +87,7 @@ permissions = {
         "Control",
         "Comment",
         "Assessment",
+        "AssessmentTemplate",
         "Issue",
         "DataAsset",
         "AccessGroup",

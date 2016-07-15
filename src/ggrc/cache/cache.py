@@ -23,6 +23,7 @@ def all_cache_entries():
       resource('custom_attribute_values', 'CustomAttributeValue'),
       resource('categorizations', 'Categorization'),
       resource('category_bases', 'CategoryBase'),
+      resource('comments', 'Comment'),
       resource('control_categories', 'ControlCategory'),
       resource('control_assertions', 'ControlAssertion'),
       resource('contexts', 'Context'),

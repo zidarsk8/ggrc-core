@@ -233,6 +233,8 @@ def relate_ca(assessment, related):
   ca_definitions = ca_query.filter_by(
       definition_id=related["template"].id,
       definition_type="assessment_template",
+  ).order_by(
+      all_models.CustomAttributeDefinition.id
   )
 
   for definition in ca_definitions:

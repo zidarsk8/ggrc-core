@@ -82,6 +82,7 @@
       list_pending: [],
       list_mapped: [],
       computed_mapping: false,
+      forbiddenForUnmap: [],
       /**
         * Get pending joins for current instance
         *
@@ -117,7 +118,7 @@
         *                    or undefined
         */
       get_pending_operation: function (person) {
-        return _.find(this.get_pending(), function(join) {
+        return _.find(this.get_pending(), function (join) {
           return join.what === person;
         });
       },
@@ -243,22 +244,20 @@
                 roles: roles
               }
             );
-          } else {
-            if (pendingOperation.how === 'add') {
-              // cancel the pending 'add'
-              this.add_or_replace_operation(
-                person,
-                null
-              );
-            } else if (pendingOperation.how === 'update') {
-              // replace the 'update' with 'remove'
-              this.add_or_replace_operation(
-                person,
-                {
-                  how: 'remove'
-                }
-              );
-            }
+          } else if (pendingOperation.how === 'add') {
+            // cancel the pending 'add'
+            this.add_or_replace_operation(
+              person,
+              null
+            );
+          } else if (pendingOperation.how === 'update') {
+            // replace the 'update' with 'remove'
+            this.add_or_replace_operation(
+              person,
+              {
+                how: 'remove'
+              }
+            );
           }
         }
       },
@@ -319,7 +318,7 @@
         *
         * @param {Object} operation - a pending join object
         *
-        * @returns {Array} - an array of roles
+        * @return {Array} - an array of roles
         */
       parse_roles_list: function (operation) {
         var roles = _.exists(operation, 'extra.attrs.AssigneeType');
@@ -365,7 +364,6 @@
         } else {
           this.get_roles(person, instance).then(function (result) {
             var roles = result.roles;
-            var ids = result.relationshipsIds;
             var relationship = result.relationship;
 
             roles = _.without(roles, roleToRemove);
@@ -376,7 +374,7 @@
             } else {
               relationship.destroy();
             }
-          }.bind(this));
+          });
         }
       },
       /**
@@ -459,10 +457,10 @@
           // any person who was mapped and has `remove` join or has no `type`
           // in their `update` roles list
           var roles = this.scope.parse_roles_list(item);
-          var person_mapped = _.find(mapped, function (map) {
+          var personMapped = _.find(mapped, function (map) {
             return map.id === item.what.id;
           });
-          return person_mapped &&
+          return personMapped &&
             (item.how === 'remove' ||
              item.how === 'update' && !_.includes(roles, type));
         }.bind(this));
@@ -472,6 +470,7 @@
             return item.what;
           });
         }
+        this.scope.instance.attr('_disabled', 'disabled');
         added = getInstances(added);
         removed = getInstances(removed);
         this.scope.attr('results').replace(
@@ -479,6 +478,7 @@
             return !_.findWhere(removed, {id: item.id});
           }
         ), added));
+        this.scope.instance.attr('_disabled', '');
       },
       '{scope.list_mapped} change': 'updateResult',
       '{scope.list_pending} change': 'updateResult',
@@ -508,16 +508,50 @@
               context: instance.context
             });
             relationship = $.Deferred().resolve(relationship);
+            this.scope.attr('forbiddenForUnmap').push(person);
+            this.scope.attr('isNew', true);
           } else {
             relationship = relationship.refresh();
           }
 
-          relationship.done(function (relationship) {
+          relationship.then(function (relationship) {
             var type = relationship.attr('attrs.AssigneeType');
             relationship.attr('attrs.AssigneeType',
-                              role + (type ? ',' + type : ''));
-            relationship.save().then(instance.refresh);
-          });
+              role + (type ? ',' + type : ''));
+            return relationship.save();
+          })
+            .then(function (rel) {
+              var props = ['related_sources', 'related_destinations'];
+              var dfds = [];
+
+              if (this.scope.attr('isNew')) {
+                [instance, person].forEach(function (model) {
+                  var dfd = $.Deferred();
+                  props.forEach(function (prop) {
+                    function checkRelationship(related, id) {
+                      return _.findWhere(related, {id: id});
+                    }
+                    model[prop].on('change', function cb() {
+                      if (checkRelationship(this, rel.id)) {
+                        person[prop].unbind('change', cb);
+                        dfd.resolve();
+                      }
+                    });
+                  });
+                  dfds.push(dfd);
+                });
+              }
+              return $.when.apply($, dfds);
+            }.bind(this))
+            .then(function () {
+              if (this.scope.attr('isNew')) {
+                _.remove(this.scope.attr('forbiddenForUnmap'), function (item) {
+                  return item.id === person.id;
+                });
+                this.scope.attr('isNew', false);
+              }
+              instance.refresh();
+            }.bind(this));
         }
       },
       'modal:success': function () {
@@ -537,6 +571,12 @@
       can_unmap: function (options) {
         var results = this.attr('results');
         var required = this.attr('required');
+        var hiddens = this.attr('forbiddenForUnmap');
+        var isNew = this.attr('isNew');
+
+        if (isNew && _.findWhere(hiddens, {id: options.context.id})) {
+          return options.inverse(options.context);
+        }
 
         if (required) {
           if (results.length > 1) {
