@@ -48,7 +48,7 @@
     }
     if (typeof workflow.cycles === undefined || !workflow.cycles) {
       $(document.body).trigger(
-        'ajax:flash', 
+        'ajax:flash',
         {warning: 'No cycles in the workflow!'}
       );
       return;
@@ -60,7 +60,7 @@
 
       if (!activeCycleList.length) {
         $(document.body).trigger(
-          'ajax:flash', 
+          'ajax:flash',
           {warning: 'No active cycles in the workflow!'}
         );
         return;

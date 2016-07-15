@@ -824,18 +824,18 @@ Mustache.registerHelper("get_permalink_for_object", function (instance, options)
   return window.location.origin + instance.viewLink;
 });
 
-Mustache.registerHelper("get_view_link", function (instance, options) {
-  function finish(link) {
-    return "<a href=" + link + " target=\"_blank\" class=\"view-link\">" +
-           "  <i class=\"fa fa-long-arrow-right\"></i>" +
-           "</a>";
-  }
-  instance = resolve_computed(instance);
-  if (!instance.viewLink && !instance.get_permalink) {
-    return "";
-  }
-  return defer_render("a", finish, instance.get_permalink());
-});
+  Mustache.registerHelper('get_view_link', function (instance, options) {
+    function finish(link) {
+      return '<a href=' + link + ' target="_blank" class="view-link">' +
+             '  <i class="fa fa-long-arrow-right"></i>' +
+             '</a>';
+    }
+    instance = resolve_computed(instance);
+    if (!instance.viewLink && !instance.get_permalink) {
+      return '';
+    }
+    return defer_render('a', finish, instance.get_permalink());
+  });
 
   /**
    * Generate an anchor element that opens the instance's view page in a
