@@ -37,7 +37,7 @@ class TestCustomAttributeImportExport(TestCase):
     """Generate custom attributes needed for csv import
 
     This function generates all custom attributes on Product and Access Group,
-    that are used in product_with_all_custom_attributes.csv and
+    that are used in custom_attribute_tests.csv and
     multi_word_object_custom_attribute_test.csv files.
     """
     gen = self.generator.generate_custom_attribute
@@ -84,7 +84,7 @@ class TestCustomAttributeImportExport(TestCase):
     This tests covers all possible custom attributes with mandatory flag turned
     off and on, and checks for all warnings that should be present.
     """
-    filename = "product_with_all_custom_attributes.csv"
+    filename = "custom_attribute_tests.csv"
     response = self.import_file(filename)[0]
     expected_warnings = {
         errors.WRONG_VALUE.format(line=6, column_name="man CH"),
@@ -130,7 +130,7 @@ class TestCustomAttributeImportExport(TestCase):
     This tests relys on the import tests to work. If those fail they need to be
     fixied before this one.
     """
-    filename = "product_with_all_custom_attributes.csv"
+    filename = "custom_attribute_tests.csv"
     self.import_file(filename)
 
     data = [{
