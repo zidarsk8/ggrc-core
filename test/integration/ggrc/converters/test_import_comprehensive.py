@@ -203,7 +203,7 @@ class TestComprehensiveSheets(TestCase):
     readers = UserRole.query.filter(UserRole.role_id == reader).all()
     creators = UserRole.query.filter(UserRole.role_id == creator).all()
     access_groups = db.session.query(AccessGroup).all()
-    self.assertEqual(len(admins), 13)
+    self.assertEqual(len(admins), 12)
     self.assertEqual(len(readers), 5)
     self.assertEqual(len(creators), 6)
     self.assertEqual(len(access_groups), 10)

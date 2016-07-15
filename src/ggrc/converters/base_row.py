@@ -112,8 +112,6 @@ class RowConverter(object):
                      column_names=", ".join(missing))
 
   def find_by_key(self, key, value):
-    if key == "slug":
-      value = func.binary(value)  # slugs need to be case sensitive
     return self.object_class.query.filter_by(**{key: value}).first()
 
   def get_value(self, key):
