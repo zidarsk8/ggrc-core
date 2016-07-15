@@ -222,6 +222,36 @@
       relatedObject.draw_children = true;
 
       return relatedObject;
+    },
+    /**
+     * A function that returns the highest role in an array of strings of roles
+     * or a comma-separated string of roles.
+     *
+     * @param {CMS.Models.Cacheable} obj - Assignable object with defined
+     *   assignable_list class property holding assignable roles ordered in
+     *   increasing importance.
+     * Return highest assignee role from a list of roles
+     * @param {Array|String} roles - An Array of strings or a String with comma
+     *   separated values of roles.
+     * @return {string} - Highest role from an array of strings or 'none' if
+     *   none found.
+     */
+    get_highest_assignee_role: function (obj, roles) {
+      var currentMax = -1;
+      var highestRole = 'none';
+
+      var roleOrder = _.map(
+        _.map(obj.class.assignable_list, 'type'),
+        _.capitalize);
+
+      if (_.isString(roles)) {
+        roles = roles.split(',');
+      }
+
+      roles = _.map(roles, _.capitalize);
+
+      roles.unshift('none');
+      return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
     }
   };
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);
