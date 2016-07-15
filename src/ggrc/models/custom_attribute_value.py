@@ -98,6 +98,17 @@ class CustomAttributeValue(Base, db.Model):
 
   @classmethod
   def mk_filter_by_custom(cls, obj_class, custom_attribute_id):
+    """Get filter for custom attributable object.
+
+    This returns an exists filter for the given predicate, matching it to
+    either a custom attribute value, or a value of the matched object.
+
+    Args:
+      obj_class: Class of the attributable object.
+      custom_attribute_id: Id of the attribute definition.
+    Returns:
+      A function that will generate a filter for a given predicate.
+    """
     from ggrc.models import all_models
     attr_def = all_models.CustomAttributeDefinition.query.filter_by(
         id=custom_attribute_id
@@ -110,7 +121,7 @@ class CustomAttributeValue(Base, db.Model):
                   for name in ["email", "title", "slug"]]
         fields = [field for field in fields if field is not None]
 
-        def filter_by(predicate):
+        def filter_by_mapping(predicate):
           return cls.query.filter(
               (cls.custom_attribute_id == custom_attribute_id) &
               (cls.attributable_type == obj_class.__name__) &
@@ -119,16 +130,16 @@ class CustomAttributeValue(Base, db.Model):
                   (map_class.id == cls.attribute_object_id) &
                   or_(*[predicate(f) for f in fields])).exists())
           ).exists()
-        return filter_by
+        return filter_by_mapping
 
-    def filter_by(predicate):
+    def filter_by_custom(predicate):
       return cls.query.filter(
           (cls.custom_attribute_id == custom_attribute_id) &
           (cls.attributable_type == obj_class.__name__) &
           (cls.attributable_id == obj_class.id) &
           predicate(cls.attribute_value)
       ).exists()
-    return filter_by
+    return filter_by_custom
 
   def _clone(self, obj):
     """Clone a custom value to a new object."""
@@ -143,3 +154,9 @@ class CustomAttributeValue(Base, db.Model):
     db.session.add(ca_value)
     db.session.flush()
     return ca_value
+
+  @staticmethod
+  def _extra_table_args(_):
+    return (
+        db.UniqueConstraint('attributable_id', 'custom_attribute_id'),
+    )
