@@ -39,6 +39,7 @@
       showFlash: function (statuses) {
         var flash = {};
         var type;
+        var redirectLink;
         var messages = {
           error: 'Assessment generation has failed.',
           progress: 'Assessment generation is in process. This may take ' +
@@ -51,10 +52,11 @@
           type = 'progress';
         } else {
           type = 'success';
+          redirectLink = window.location.pathname + '#assessment_widget';
         }
 
         flash[type] = messages[type];
-        $('body').trigger('ajax:flash', flash);
+        $('body').trigger('ajax:flash', [flash, redirectLink]);
       },
       updateStatus: function (ids, count) {
         var wait = [2, 4, 8, 16, 32, 64];

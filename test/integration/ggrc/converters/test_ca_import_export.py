@@ -87,23 +87,19 @@ class TestCustomAttributeImportExport(TestCase):
     filename = "product_with_all_custom_attributes.csv"
     response = self.import_file(filename)[0]
     expected_warnings = {
-        "Line 6: man CH contains invalid data. The value will be ignored.",
-        "Line 8: normal select contains invalid data. The value will be"
-        " ignored.",
-        "Line 10: man select contains invalid data. The value will be"
-        " ignored.",
-        "Line 11: normal CH contains invalid data. The value will be ignored.",
-        "Line 12: man CH contains invalid data. The value will be ignored.",
-        "Line 14: normal Date contains invalid data. The value will be"
-        " ignored.",
-        "Line 16: man Date contains invalid data. The value will be ignored.",
+        errors.WRONG_VALUE.format(line=6, column_name="man CH"),
+        errors.WRONG_VALUE.format(line=8, column_name="normal select"),
+        errors.WRONG_VALUE.format(line=10, column_name="man select"),
+        errors.WRONG_VALUE.format(line=11, column_name="normal CH"),
+        errors.WRONG_VALUE.format(line=12, column_name="man CH"),
+        errors.WRONG_VALUE.format(line=14, column_name="normal Date"),
+        errors.WRONG_VALUE.format(line=16, column_name="man Date"),
         errors.OWNER_MISSING.format(line=21, column_name="Owner"),
-        "Line 22: Specified user 'kr@en.com' does not exist. That user will be"
-        " ignored.",
+        errors.UNKNOWN_USER_WARNING.format(line=22, email="kr@en.com"),
         errors.OWNER_MISSING.format(line=22, column_name="Owner"),
         errors.OWNER_MISSING.format(line=26, column_name="Owner"),
-        "Line 27: Specified user 'user@exameuple.com' does not exist. That"
-        " user will be ignored.",
+        errors.UNKNOWN_USER_WARNING.format(
+            line=27, email="user@exameuple.com"),
         errors.OWNER_MISSING.format(line=27, column_name="Owner"),
     }
 

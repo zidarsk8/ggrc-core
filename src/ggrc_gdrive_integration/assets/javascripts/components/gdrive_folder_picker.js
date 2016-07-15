@@ -227,7 +227,7 @@
       },
 
       'a[data-toggle=gdrive-picker] click': function (el, ev) {
-        var dfd = GGRC.Controllers.GAPI.authorize(['https://www.googleapis.com/auth/drive.file']);
+        var dfd = GGRC.Controllers.GAPI.authorize(['https://www.googleapis.com/auth/drive']);
         var folder_id = el.data('folder-id');
 
         // Create and render a Picker object for searching images.

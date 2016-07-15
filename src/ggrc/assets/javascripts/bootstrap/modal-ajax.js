@@ -241,16 +241,16 @@
       $target
       .modal_form(option, $trigger)
       .ggrc_controllers_modals({
-        new_object_form: !$trigger.attr('data-object-id')
-        , object_params: object_params
-        , button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE
-        , model: model
-        , current_user: GGRC.current_user
-        , instance: instance
-        , modal_title: object_params.modal_title || modal_title
-        , content_view: content_view
-        , mapping: mapping
-        , $trigger: $trigger
+        new_object_form: !$trigger.attr('data-object-id'),
+        object_params: object_params,
+        button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE,
+        model: model,
+        current_user: GGRC.current_user,
+        instance: instance,
+        modal_title: object_params.modal_title || modal_title,
+        content_view: content_view,
+        mapping: mapping,
+        $trigger: $trigger,
       });
 
       $target.on('modal:success', function (e, data, xhr) {

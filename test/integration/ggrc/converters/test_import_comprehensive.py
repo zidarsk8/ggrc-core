@@ -203,7 +203,7 @@ class TestComprehensiveSheets(TestCase):
     readers = UserRole.query.filter(UserRole.role_id == reader).all()
     creators = UserRole.query.filter(UserRole.role_id == creator).all()
     access_groups = db.session.query(AccessGroup).all()
-    self.assertEqual(len(admins), 13)
+    self.assertEqual(len(admins), 12)
     self.assertEqual(len(readers), 5)
     self.assertEqual(len(creators), 6)
     self.assertEqual(len(access_groups), 10)
@@ -223,13 +223,21 @@ class TestComprehensiveSheets(TestCase):
             "block_errors": set([
                 errors.DUPLICATE_COLUMN.format(
                     line=1, duplicates="Notes, Test Plan"),
-            ])
+            ]),
         },
         "Program": {
             "row_warnings": set([
                 errors.OWNER_MISSING.format(line=7, column_name="Manager"),
-            ])
-        }
+            ]),
+            "row_errors": set([
+                errors.UNKNOWN_DATE_FORMAT.format(
+                    line=8, column_name="Effective Date"),
+                errors.WRONG_VALUE_ERROR.format(
+                    line=9, column_name="Effective Date"),
+                errors.WRONG_VALUE_ERROR.format(
+                    line=9, column_name="Stop Date"),
+            ]),
+        },
     }
 
     self._check_response(response, expected_errors)

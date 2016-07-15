@@ -4,7 +4,8 @@
 }}
 
 <a href="javascript://"
-    class="{{link_class}} btn-small btn-draft"
+    class="{{link_class}} btn-small btn-draft
+           {{#if pickerActive}}disabled{{/if}}"
     data-object-source="true"
     data-toggle="evidence-gdrive-picker"
     can-click="{{click_event}}">

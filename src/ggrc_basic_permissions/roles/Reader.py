@@ -87,6 +87,7 @@ permissions = {
         "Control",
         "Comment",
         "Assessment",
+        "AssessmentTemplate",
         "Issue",
         "DataAsset",
         "AccessGroup",
@@ -100,7 +101,14 @@ permissions = {
         "Help",
         "Market",
         "Objective",
-        "ObjectDocument",
+        {
+            "type": "ObjectDocument",
+            "terms": {
+                "property_name": "document,documentable",
+                "action": "update",
+            },
+            "condition": "relationship",
+        },
         "ObjectPerson",
         "Option",
         "OrgGroup",

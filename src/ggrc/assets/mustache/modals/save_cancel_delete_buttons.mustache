@@ -51,18 +51,20 @@
           {{^new_object_form}}
             <a
               tabindex="25"
-              class="btn btn-small btn-success preventdoubleclick"
+              class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}"
               data-toggle="modal-submit"
               href="javascript://"
               >Save &amp; Close</a>
           {{/new_object_form}}
           {{#new_object_form}}
+            {{^if_equals model.shortName "AssessmentTemplate"}}
             <a
               tabindex="24"
               class="btn btn-small btn-info preventdoubleclick {{disable_if_errors instance}}"
               data-toggle="modal-submit-addmore"
               href="javascript://"
               >Save &amp; Add Another</a>
+            {{/if_equals}}
             <a
               tabindex="25"
               class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}"

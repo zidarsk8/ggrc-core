@@ -57,6 +57,7 @@
         // includes only the filter, not the column headers
         '/static/mustache/people/filters.mustache',
       list_view: '/static/mustache/people/object_list.mustache',
+      draw_children: true,
       fetch_post_process: sortByNameEmail
     },
     roles: {

@@ -1,6 +1,6 @@
 /*!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Copyright (C) 2016 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 (function (GGRC, can, $) {
@@ -65,12 +65,14 @@
     }
   });
 
-  GGRC.Components("tabPanel", {
+  GGRC.Components('tabPanel', {
     tag: 'tab-panel',
-    template: can.view(GGRC.mustache_path + '/base_objects/tab_panel.mustache'),
+    template: can.view(
+      GGRC.mustache_path + '/base_objects/tab_panel.mustache'
+    ),
     scope: {
       active: false,
-      title: '@',
+      titleText: '@',
       panels: null
     },
     events: {
@@ -84,10 +86,11 @@
       inserted: function () {
         var panels = this.scope.attr('panels');
         panels.push({
-          title: this.scope.attr('title'),
+          title: this.scope.attr('titleText'),
           panel: this.scope
         });
       },
+
       /**
        * Check if other tabs are active and deactivate them
        *
@@ -95,15 +98,15 @@
        * @param {Object} ev - event triggered on change
        * @param {String} item - item that got changed
        * @param {String} action - what got changed on the object
-       * @param {String} status - status of changed item, we are looking for `active`
-       *                          property change to either `true` or `false`
+       * @param {String} status - status of changed item, we are looking for
+       *   `active` property change to either `true` or `false`
        */
       '{scope.panels} change': function (list, ev, item, action, status) {
         var index;
         var panel;
 
         item = item.split('.');
-        if (item.length !== 3 || item[1] !== "panel" || item[2] !== "active") {
+        if (item.length !== 3 || item[1] !== 'panel' || item[2] !== 'active') {
           // if this is a change to a scope in a different panel we should
           // not switch tabs
           return;

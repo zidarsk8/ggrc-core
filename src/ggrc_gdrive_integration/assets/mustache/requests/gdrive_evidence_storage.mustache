@@ -29,25 +29,25 @@
           >
         </ggrc-gdrive-picker-launcher>
         <i class="fa fa-exclamation-triangle red" style="margin-top:4px" rel="tooltip" data-placement="bottom" data-original-title="Audit folder not set. Files will be uploaded to your GDrive root folder."></i>
-      {{/if_in}}
+      {{/if}}
     {{else}}
       {{#if extended_folders.length}}
         <ggrc-gdrive-picker-launcher
-          icon="attach"
+          icon="paperclip"
           instance="instance"
           link_text="Attach evidence"
           click_event="trigger_upload_parent">
         </ggrc-gdrive-picker-launcher>
       {{else}}
         <ggrc-gdrive-picker-launcher
-          icon="attach"
+          icon="paperclip"
           instance="instance"
           link_text="Attach evidence"
           click_event="trigger_upload">
         </ggrc-gdrive-picker-launcher>
         <i class="fa fa-exclamation-triangle red" style="margin-top:4px" rel="tooltip" data-placement="bottom" data-original-title="Audit folder not set. Files will be uploaded to your GDrive root folder."></i>
-      {{/if_in}}
-    {{/if}}
+      {{/if}}
+    {{/if_in}}
   </div>
 {{else}}
   {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}

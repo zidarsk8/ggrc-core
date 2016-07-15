@@ -24,7 +24,7 @@ class Converter(object):
   similar uses.
   """
 
-  class_order = [
+  CLASS_ORDER = [
       "Person",
       "Program",
       "Risk Assessment",
@@ -35,6 +35,8 @@ class Converter(object):
       "Standard",
       "Section",
       "Control",
+      "Assessment Template",
+      "Custom Attribute Definition",
       "Assessment",
       "Workflow",
       "Task Group",
@@ -122,7 +124,7 @@ class Converter(object):
 
   def block_converters_from_csv(self):
     """Prepare BlockConverters and order them like specified in
-    self.class_order.
+    self.CLASS_ORDER.
     """
     offsets, data_blocks = split_array(self.csv_data)
     for offset, data in zip(offsets, data_blocks):
@@ -137,7 +139,7 @@ class Converter(object):
       self.block_converters.append(block_converter)
 
     order = defaultdict(int)
-    order.update({c: i for i, c in enumerate(self.class_order)})
+    order.update({c: i for i, c in enumerate(self.CLASS_ORDER)})
     order["Person"] = -1
     self.block_converters.sort(key=lambda x: order[x.name])
 

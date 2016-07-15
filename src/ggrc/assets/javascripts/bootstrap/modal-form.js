@@ -336,7 +336,7 @@
       }
     });
 
-    $('body').on('ajax:flash', function (e, flash) {
+    $('body').on('ajax:flash', function (e, flash, redirectLink) {
       var $target;
       var $flashHolder;
       var type;
@@ -404,6 +404,10 @@
                 $html.removeClass('alert-autohide');
                 $link = $('<a href="javascript://">Show results</a>');
                 $link.on('click', function () {
+                  if (redirectLink) {
+                    $('html').addClass('no-js');
+                    window.location.href = redirectLink;
+                  }
                   window.location.reload();
                 });
                 $html.append($link);

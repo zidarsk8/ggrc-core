@@ -79,7 +79,7 @@
 
         binding = _.find(mappings, function (mapping) {
           return mapping.instance.id === instance.id &&
-                 mapping.instance.type === instance.type;
+            mapping.instance.type === instance.type;
         });
         _.each(binding.get_mappings(), function (mapping) {
           mapping.refresh()
@@ -89,6 +89,17 @@
             .then(function () {
               if (mapping.documentable) {
                 return mapping.documentable.reify();
+              }
+            })
+            .fail(function (err) {
+              var messages = {
+                '403': 'You don\'t have the permission to access the ' +
+                'requested resource. It is either read-protected or not ' +
+                'readable by the server.'
+              };
+              if (messages[err.status]) {
+                $('body').trigger('ajax:flash',
+                  {warning: messages[err.status]});
               }
             });
         });

@@ -9,9 +9,9 @@ import datetime
 from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
-from ggrc.converters import get_importables
-from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import boolean
+from ggrc.converters.handlers import handlers
+from ggrc.converters.handlers import multi_object
 from ggrc_basic_permissions import models as bp_models
 from ggrc_workflows import models as wf_models
 
@@ -185,6 +185,23 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
 class TaskEndColumnHandler(TaskDateColumnHandler):
   """ handler for end column in task group tasks """
 
+  def _set_obj_attr_one_time(self):
+    if len(self.value) != 3:
+      self.add_error(errors.WRONG_VALUE_ERROR,
+                     column_name=self.display_name)
+      return
+    month, day, year = self.value
+    try:
+      self.row_converter.obj.end_date = datetime.date(year, month, day)
+    except ValueError as error:
+      if error.message == "Start date can not be after end date.":
+        self.add_error(errors.INVALID_START_END_DATES,
+                       start_date="Start date",
+                       end_date="End date")
+      else:
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
+
   def set_obj_attr(self):
     """ set all possible end date attributes """
     # disable false parentheses warning for 'not (a < b < c)'
@@ -193,17 +210,8 @@ class TaskEndColumnHandler(TaskDateColumnHandler):
       return
     freq = self.row_converter.obj.task_group.workflow.frequency
     if freq == "one_time":
-      if len(self.value) != 3:
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
-        return
-      month, day, year = self.value
-      try:
-        self.row_converter.obj.end_date = datetime.date(year, month, day)
-      except ValueError:
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
-        return
+      self._set_obj_attr_one_time()
+      return
     elif freq in ["weekly", "monthly"]:
       if len(self.value) != 1 or \
          (freq == "weekly" and not (1 <= self.value[0] <= 5)) or \
@@ -309,38 +317,7 @@ class WorkflowPersonColumnHandler(handlers.UserColumnHandler):
     self.dry_run = True
 
 
-class ObjectsColumnHandler(handlers.ColumnHandler):
-
-  def __init__(self, row_converter, key, **options):
-    self.mappable = get_importables()
-    self.new_slugs = row_converter.block_converter.converter.new_objects
-    super(ObjectsColumnHandler, self).__init__(row_converter, key, **options)
-
-  def parse_item(self):
-    lines = [line.split(":", 1) for line in self.raw_value.splitlines()]
-    objects = []
-    for line in lines:
-      if len(line) != 2:
-        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-        continue
-      object_class, slug = line
-      slug = slug.strip()
-      class_ = self.mappable.get(object_class.strip().lower())
-      if class_ is None:
-        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-        continue
-      new_object_slugs = self.new_slugs[class_]
-      obj = class_.query.filter(class_.slug == slug).first()
-      if obj:
-        objects.append(obj)
-      elif not (slug in new_object_slugs and self.dry_run):
-        self.add_warning(errors.UNKNOWN_OBJECT,
-                         object_type=class_._inflector.human_singular.title(),
-                         slug=slug)
-    return objects
-
-  def set_obj_attr(self):
-    self.value = self.parse_item()
+class ObjectsColumnHandler(multi_object.ObjectsColumnHandler):
 
   def get_value(self):
     task_group_objects = wf_models.TaskGroupObject.query.filter_by(
@@ -364,9 +341,6 @@ class ObjectsColumnHandler(handlers.ColumnHandler):
       )
       db.session.add(tgo)
     db.session.flush()
-
-  def set_value(self):
-    pass
 
 
 class ExportOnlyColumnHandler(handlers.ColumnHandler):

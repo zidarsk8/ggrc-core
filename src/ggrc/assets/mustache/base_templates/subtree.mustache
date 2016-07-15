@@ -43,11 +43,6 @@
     <div class="tier-2-info-content">
       <lazy-openclose>
         {{#show}}
-          {{#is_allowed 'update' parentInstance context='for'}}
-            {{#instance}}
-              {{{render '/static/mustache/mapped_objects/dropdown_menu_tier2.mustache' instance=instance}}}
-            {{/instance}}
-          {{/is_allowed}}
           <div class="tier-content">
             {{> /static/mustache/base_objects/title.mustache}}
             {{> /static/mustache/base_objects/description.mustache}}

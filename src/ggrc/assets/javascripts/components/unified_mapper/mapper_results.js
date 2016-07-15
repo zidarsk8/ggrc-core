@@ -71,12 +71,8 @@
     events: {
       inserted: function () {
         this.element.find('.results-wrap').cms_controllers_infinite_scroll();
-        this.getResults();
       },
       '.modalSearchButton click': 'getResults',
-      '{scope} type': function () {
-        _.defer(this.getResults.bind(this));
-      },
       '{scope.entries} add': function (list, ev, added) {
         var instance;
         var option;

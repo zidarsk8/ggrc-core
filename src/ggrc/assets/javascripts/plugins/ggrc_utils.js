@@ -102,19 +102,19 @@
       }
     },
 
-  /**
-   * Determine if `source` is allowed to be mapped to `target`.
-   *
-   * By symmetry, this method can be also used to check whether `source` can
-   * be unmapped from `target`.
-   *
-   * @param {Object} source - the source object the mapping
-   * @param {Object} target - the target object of the mapping
-   * @param {Object} options - the options objects, similar to the one that is
-   *   passed as an argument to Mustache helpers
-   *
-   * @return {Boolean} - true if mapping is allowed, false otherwise
-   */
+    /**
+     * Determine if `source` is allowed to be mapped to `target`.
+     *
+     * By symmetry, this method can be also used to check whether `source` can
+     * be unmapped from `target`.
+     *
+     * @param {Object} source - the source object the mapping
+     * @param {Object} target - the target object of the mapping
+     * @param {Object} options - the options objects, similar to the one that is
+     *   passed as an argument to Mustache helpers
+     *
+     * @return {Boolean} - true if mapping is allowed, false otherwise
+     */
     allowed_to_map: function (source, target, options) {
       var canMap = false;
       var types;
@@ -126,10 +126,14 @@
       var canonical;
       var hasWidget;
       var canonicalMapping;
-      var forbidden = {
+
+      // NOTE: the names in every type pair must be sorted alphabetically!
+      var FORBIDDEN = Object.freeze({
         'audit program': true,
-        'audit request': true
-      };
+        'audit request': true,
+        'assessmenttemplate cacheable': true,
+        'cacheable person': true
+      });
 
       if (target instanceof can.Model) {
         targetType = target.constructor.shortName;
@@ -143,7 +147,7 @@
       // - mapping an Audit to a Request is not allowed
       // (and vice versa)
       types = [sourceType.toLowerCase(), targetType.toLowerCase()].sort();
-      if (forbidden[types.join(' ')]) {
+      if (FORBIDDEN[types.join(' ')]) {
         return false;
       }
 
@@ -161,7 +165,7 @@
         targetType);
 
       if (_.exists(options, 'hash.join') && (!canonical || !hasWidget) ||
-          (canonical && !canonicalMapping.model_name)) {
+        (canonical && !canonicalMapping.model_name)) {
         return false;
       }
       targetContext = _.exists(target, 'context.id');
@@ -182,6 +186,59 @@
            _.contains(createContexts, targetContext));
       }
       return canMap;
+    },
+    isEmptyCA: function (value, type) {
+      var result = false;
+      var types = ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
+        'Map:Person'];
+      var options = {
+        Checkbox: function (value) {
+          return value === '0';
+        },
+        'Rich Text': function (value) {
+          return _.isEmpty($(value).text());
+        }
+      };
+      if (types.indexOf(type) >= 0 && options[type]) {
+        result = options[type](value);
+      } else if (types.indexOf(type) >= 0) {
+        result = _.isEmpty(value);
+      }
+      return result;
+    },
+    /**
+     * Add subtree for object tree view
+     * @param {Number} depth - for subtree
+     * @return {Object} - mapping of related objects
+     */
+    getRelatedObjects: function (depth) {
+      var basedRelatedObjects;
+      var relatedObject;
+      var mustachePath = GGRC.mustache_path;
+      if (!depth) {
+        return {};
+      }
+
+      basedRelatedObjects = {
+        model: can.Model.Cacheable,
+        mapping: 'related_objects',
+        show_view: mustachePath + '/base_objects/tree.mustache',
+        footer_view: mustachePath + '/base_objects/tree_footer.mustache',
+        add_item_view: mustachePath + '/base_objects/tree_add_item.mustache',
+        draw_children: false
+      };
+
+      relatedObject = $.extend(basedRelatedObjects, {
+        child_options: [this.getRelatedObjects(depth - 1)]
+      });
+
+      if (depth === 1) {
+        return relatedObject;
+      }
+
+      relatedObject.draw_children = true;
+
+      return relatedObject;
     }
   };
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

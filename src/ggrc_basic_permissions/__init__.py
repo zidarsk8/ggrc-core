@@ -877,9 +877,8 @@ def handle_program_post(sender, obj=None, src=None, service=None):
 def add_public_program_context_implication(context, check_exists=False):
   if check_exists and db.session.query(ContextImplication)\
       .filter(
-          and_(
-              ContextImplication.context_id == context.id,
-              ContextImplication.source_context_id.is_(None))).count() > 0:
+          and_(ContextImplication.context_id == context.id,
+               ContextImplication.source_context_id.is_(None))).count() > 0:
     return
   db.session.add(ContextImplication(
       source_context=None,

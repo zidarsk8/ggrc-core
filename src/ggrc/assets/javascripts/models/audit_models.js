@@ -89,7 +89,7 @@
     },
     obj_nav_options: {
       show_all_tabs: false,
-      force_show_list: ['In Scope Controls', 'Open Requests',
+      force_show_list: ['In Scope Controls', 'Requests',
                         'Issues', 'Assessments']
     },
     tree_view_options: {
@@ -526,8 +526,6 @@
       this.validateNonBlank('title');
       this.validateNonBlank('end_date');
       this.validateNonBlank('start_date');
-      this.validatePresenceOf('validate_assignee');
-      this.validatePresenceOf('validate_requester');
       this.validatePresenceOf('audit');
 
       this.validate(['start_date', 'end_date'], function (newVal, prop) {
@@ -542,11 +540,17 @@
         }
       });
 
-      this.validate(['validate_assignee', 'validate_requester'],
+      this.validate(
+        'validate_assignee',
         function (newVal, prop) {
           if (!this.validate_assignee) {
             return 'You need to specify at least one assignee';
           }
+        }
+      );
+      this.validate(
+        'validate_requester',
+        function (newVal, prop) {
           if (!this.validate_requester) {
             return 'You need to specify at least one requester';
           }
@@ -577,8 +581,9 @@
       }
       return 'Request "' + out_name + '"';
     },
-    form_preload: function (new_object_form) {
+    form_preload: function (new_object_form, object_params) {
       var audit;
+      var auditId;
       var that = this;
       var assignees = {};
       var current_user = CMS.Models.get_instance('Person',
@@ -589,9 +594,17 @@
         // Current user should be Requester
         assignees[current_user.email] = 'Requester';
 
-        if (_.exists(GGRC, 'page_model.type') === 'Audit') {
+        // auditId = the audit info from the request creation button ||
+        //           the audit from the current page if we are on audit page
+        if (_.exists(object_params, 'audit.id')) {
+          auditId = object_params.audit.id;
+        } else if (_.exists(GGRC, 'page_model.type') === 'Audit') {
+          auditId = GGRC.page_model.id;
+        }
+
+        if (auditId) {
           this.attr('audit', {
-            id: GGRC.page_model.id,
+            id: auditId,
             type: 'Audit'
           });
         }
@@ -783,9 +796,10 @@
     defaults: {
       status: 'Not Started'
     },
-    filter_keys: ['title', 'state', 'operationally', 'operational', 'design',
+    filter_keys: ['title', 'status', 'operationally', 'operational', 'design',
                   'finished_date', 'verified_date', 'verified'],
     filter_mappings: {
+      state: 'status',
       operational: 'operationally',
       'verified date': 'verified_date',
       'finished date': 'finished_date'
@@ -861,6 +875,12 @@
         show_view: GGRC.mustache_path + '/base_templates/urls.mustache'
       }
     },
+    confirmEditModal: {
+      title: 'Confirm moving Request to "In Progress"',
+      description: 'You are about to move request from ' +
+      '"{{status}}" to "In Progress" - are you sure about that?',
+      button: 'Confirm'
+    },
     assignable_list: [{
       type: 'creator',
       mapping: 'related_creators',
@@ -883,15 +903,19 @@
       }
       this.validatePresenceOf('object');
       this.validatePresenceOf('audit');
-      this.validatePresenceOf('validate_creator');
-      this.validatePresenceOf('validate_assessor');
       this.validateNonBlank('title');
 
-      this.validate(['validate_creator', 'validate_assessor'],
+      this.validate(
+        'validate_creator',
         function (newVal, prop) {
           if (!this.validate_creator) {
             return 'You need to specify at least one creator';
           }
+        }
+      );
+      this.validate(
+        'validate_assessor',
+        function (newVal, prop) {
           if (!this.validate_assessor) {
             return 'You need to specify at least one assessor';
           }
@@ -940,6 +964,9 @@
     },
     after_save: function () {
       this._set_mandatory_msgs();
+      if (this.audit && this.audit.selfLink) {
+        this.audit.refresh();
+      }
     },
     _set_mandatory_msgs: function () {
       var instance = this;
@@ -967,14 +994,18 @@
           instance.get_binding('all_documents').refresh_count(),
           rq.trigger()
       ).then(function (customAttrVals, commentCount, attachmentCount, rqRes) {
-        var values = _.map(instance.custom_attribute_values, function (cav) {
-          return cav.reify();
-        });
+        var values = instance.custom_attribute_values.reify();
+        var definitions = instance.custom_attribute_definitions.reify();
+
         commentCount = commentCount();
         attachmentCount = attachmentCount();
-        _.each(instance.custom_attribute_definitions, function (definition) {
-          var pred = {custom_attribute_id: definition.id};
-          if (definition.mandatory && !_.some(values, pred)) {
+        _.each(definitions, function (definition) {
+          var attr = _.result(_.find(values, function (cav) {
+            return cav.custom_attribute_id === definition.id;
+          }), 'attribute_value');
+
+          if (definition.mandatory &&
+            GGRC.Utils.isEmptyCA(attr, definition.attribute_type)) {
             needed.value.push(definition.title);
           }
         });
@@ -982,10 +1013,14 @@
           var definition;
           var i;
           var mandatory;
-          definition = _.find(instance.custom_attribute_definitions, {
+          definition = _.find(definitions, {
             id: cav.custom_attribute_id
           });
-          if (!definition.multi_choice_options ||
+          if (!definition) {
+            console.warn('CAV id %d is not reified properly.', cav.id);
+          }
+          if (!definition ||
+              !definition.multi_choice_options ||
               !definition.multi_choice_mandatory) {
             return;
           }
@@ -1134,12 +1169,26 @@
     },
 
     /**
-     * Initialize the newly created object instance. Essentially just validate
-     * that its title is non-blank.
+     * Initialize the newly created object instance. Validate that its title is
+     * non-blank and its default assessors / verifiers lists are set if
+     * applicable.
      */
     init: function () {
       this._super.apply(this, arguments);
       this.validateNonBlank('title');
+
+      this.validateListNonBlank(
+        'assessorsList',
+        function () {
+          return this.attr('default_people.assessors') === 'other';
+        }
+      );
+      this.validateListNonBlank(
+        'verifiersList',
+        function () {
+          return this.attr('default_people.verifiers') === 'other';
+        }
+      );
     }
   }, {
     // the object types that are not relevant to the AssessmentTemplate,

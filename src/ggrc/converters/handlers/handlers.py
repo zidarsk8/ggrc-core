@@ -29,7 +29,6 @@ from ggrc.models import Request
 from ggrc.models import Standard
 from ggrc.models import all_models
 from ggrc.models.reflection import AttributeInfo
-from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.rbac import permissions
 
 
@@ -288,11 +287,17 @@ class SlugColumnHandler(ColumnHandler):
 class DateColumnHandler(ColumnHandler):
 
   def parse_item(self):
+    value = self.raw_value.strip()
+    if value and not re.match(r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|"
+                              r"[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}",
+                              self.raw_value.strip()):
+      self.add_error(errors.UNKNOWN_DATE_FORMAT, column_name=self.display_name)
+      return
+
     try:
       return parse(self.raw_value)
     except:
-      self.add_error(
-          u"Unknown date format, use YYYY-MM-DD or MM/DD/YYYY format")
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
 
   def get_value(self):
     date = getattr(self.row_converter.obj, self.key)
@@ -372,7 +377,8 @@ class MappingColumnHandler(ColumnHandler):
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     class_ = self.mapping_object
-    slugs = set(line.strip().lower() for line in self.raw_value.splitlines())
+    lines = set(self.raw_value.splitlines())
+    slugs = set([slug.lower() for slug in lines if slug.strip()])
     objects = []
     for slug in slugs:
       obj = class_.query.filter_by(slug=slug).first()
@@ -418,20 +424,11 @@ class MappingColumnHandler(ColumnHandler):
     self.dry_run = True
 
   def get_value(self):
-    if self.unmap:
+    if self.unmap or not self.mapping_object:
       return ""
-    related_slugs = []
-    related_ids = RelationshipHelper.get_ids_related_to(
-        self.mapping_object.__name__,
-        self.row_converter.object_class.__name__,
-        [self.row_converter.obj.id])
-    if related_ids:
-      related_objects = self.mapping_object.query.filter(
-          self.mapping_object.id.in_(related_ids))
-      related_slugs = (getattr(o, "slug", getattr(o, "email", None))
-                       for o in related_objects)
-      related_slugs = [slug for slug in related_slugs if slug is not None]
-    return "\n".join(related_slugs)
+    cache = self.row_converter.block_converter.get_mapping_cache()
+    slugs = cache[self.row_converter.obj.id][self.mapping_object.__name__]
+    return "\n".join(slugs)
 
   def set_value(self):
     pass
@@ -441,10 +438,15 @@ class ConclusionColumnHandler(ColumnHandler):
 
   """ Handler for design and operationally columns in ControlAssesments """
 
+  CONCLUSION_MAP = {i.lower(): i for i in Assessment.VALID_CONCLUSIONS}
+
   def parse_item(self):
-    conclusion_map = {i.lower(): i for i in
-                      Assessment.VALID_CONCLUSIONS}
-    return conclusion_map.get(self.raw_value.lower(), "")
+    """Parse conclusion design and operational values."""
+
+    value = self.CONCLUSION_MAP.get(self.raw_value.lower(), "")
+    if self.raw_value and not value:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    return value
 
 
 class OptionColumnHandler(ColumnHandler):
