@@ -167,28 +167,28 @@ class Cache:
   def get_name(self):
     return None
 
-  def get(self, category, resource, filter):
+  def get(self, *_):
     return None
 
-  def add(self, category, resource, data, expiration_time=0):
+  def add(self, *_):
     return None
 
-  def update(self, category, resource, data, expiration_time=0):
+  def update(self, *_):
     return None
 
-  def remove(self, category, resource, data, lockadd_seconds=0):
+  def remove(self, *_):
     return None
 
-  def get_multi(self, filter):
+  def get_multi(self, *_):
     return None
 
-  def add_multi(self, data, expiration_time=0):
+  def add_multi(self, *_):
     return None
 
-  def update_multi(self, data, expiration_time=0):
+  def update_multi(self, *_):
     return None
 
-  def remove_multi(self, category, resource, data, lockadd_seconds=0):
+  def remove_multi(self, *_):
     return None
 
   def clean(self):
