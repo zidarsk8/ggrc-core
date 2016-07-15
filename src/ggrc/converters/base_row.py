@@ -4,7 +4,6 @@
 """This module is used for handling a single line from a csv file.
 """
 
-from sqlalchemy import func
 import collections
 
 import ggrc.services

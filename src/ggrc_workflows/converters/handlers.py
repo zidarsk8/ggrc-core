@@ -185,6 +185,23 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
 class TaskEndColumnHandler(TaskDateColumnHandler):
   """ handler for end column in task group tasks """
 
+  def _set_obj_attr_one_time(self):
+    if len(self.value) != 3:
+      self.add_error(errors.WRONG_VALUE_ERROR,
+                     column_name=self.display_name)
+      return
+    month, day, year = self.value
+    try:
+      self.row_converter.obj.end_date = datetime.date(year, month, day)
+    except ValueError as error:
+      if error.message == "Start date can not be after end date.":
+        self.add_error(errors.INVALID_START_END_DATES,
+                       start_date="Start date",
+                       end_date="End date")
+      else:
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
+
   def set_obj_attr(self):
     """ set all possible end date attributes """
     # disable false parentheses warning for 'not (a < b < c)'
@@ -193,22 +210,8 @@ class TaskEndColumnHandler(TaskDateColumnHandler):
       return
     freq = self.row_converter.obj.task_group.workflow.frequency
     if freq == "one_time":
-      if len(self.value) != 3:
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
-        return
-      month, day, year = self.value
-      try:
-        self.row_converter.obj.end_date = datetime.date(year, month, day)
-      except ValueError as error:
-        if error.message == "Start date can not be after end date.":
-          self.add_error(errors.INVALID_START_END_DATES,
-                         start_date="Start date",
-                         end_date="End date")
-        else:
-          self.add_error(errors.WRONG_VALUE_ERROR,
-                         column_name=self.display_name)
-        return
+      self._set_obj_attr_one_time()
+      return
     elif freq in ["weekly", "monthly"]:
       if len(self.value) != 1 or \
          (freq == "weekly" and not (1 <= self.value[0] <= 5)) or \
