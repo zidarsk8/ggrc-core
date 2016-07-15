@@ -17,6 +17,7 @@
       format: '@',
       label: '@',
       helptext: '@',
+      testId: '@',
       isShown: false,
       pattern: 'MM/DD/YYYY',
       setMinDate: null,
@@ -52,16 +53,16 @@
       inserted: function () {
         var element = this.element.find('.datepicker__calendar');
         var date = this.getDate(this.scope.date);
-        var datepicker = element.datepicker({
+
+        element.datepicker({
           altField: this.element.find('.datepicker__input'),
           onSelect: this.scope.onSelect.bind(this.scope)
-        }).data('datepicker');
+        });
 
-        element.datepicker('setDate', date);
         this.scope.attr('_date', date);
         this.scope.attr('picker', element);
-        this.scope.attr('datepicker', datepicker);
 
+        this.scope.picker.datepicker('setDate', date);
         if (this.scope.setMinDate) {
           this.setDate('minDate', this.scope.setMinDate);
         }

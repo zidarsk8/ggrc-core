@@ -54,7 +54,7 @@ def get_when_visible(driver, locator):
   return WebDriverWait(
       driver,
       constants.ux.MAX_USER_WAIT_SECONDS) \
-      .until(EC.visibility_of_element_located(locator))
+      .until(EC.presence_of_element_located(locator))
 
 
 def get_when_clickable(driver, locator):

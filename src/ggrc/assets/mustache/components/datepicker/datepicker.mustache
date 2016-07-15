@@ -2,7 +2,7 @@
   Copyright (C) 2016 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<div class="datepicker__wrapper">
+<div class="datepicker__wrapper" {{#testId}}data-test-id="{{testId}}"{{/testId}}>
   {{#label}}
     <label>
       {{label}}
@@ -22,9 +22,6 @@
       class="datepicker__input date"
       can-value="_date"
       can-focus="onFocus"
-      {{#testId}}
-      data-test-id="{{testId}}"
-      {{/testId}}
     >
     <div class="datepicker__calendar {{#isHidden}}hide{{/isHidden}}"></div>
   </div>

@@ -7,21 +7,27 @@
     <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
     <datepicker
       label="Effective Date"
-      date="start_date"
-      set-max-date="end_date"
+      date="instance.start_date"
+      set-max-date="instance.end_date"
       helptext="Enter the date this object becomes effective."
-      test-id="startTestId"
-      {{#required}}required="true"{{/required}}
+      {{#startTestId}}
+      test-id="{{startTestId}}"
+      {{/startTestId}}
+      {{#required}}
+      required="true"
+      {{/required}}
       />
   </div>
   <div data-id="stop_date_hidden" class="span4 hidable">
     <a data-id="hide_stop_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
     <datepicker
       label="Stop Date"
-      set-min-date="start_date"
-      date="end_date"
+      set-min-date="instance.start_date"
+      date="instance.end_date"
       helptext="Enter the date the object stops being effective."
-      test-id="endTestId"
+      {{#endTestId}}
+      test-id="{{endTestId}}"
+      {{/endTestId}}
       {{#required}}required="true"{{/required}}
       />
   </div>
