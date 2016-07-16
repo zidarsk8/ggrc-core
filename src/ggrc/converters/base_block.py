@@ -1,6 +1,12 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Module for handling a single import block.
+
+Each import block should contain data for one Object type. The blocks are
+separated in the csv file with empty lines.
+"""
+
 from collections import defaultdict
 from collections import OrderedDict
 from collections import Counter
@@ -77,6 +83,10 @@ class BlockConverter(object):
     return shared_state[classes]
 
   def __init__(self, converter, **options):
+    # pylint: disable=too-many-instance-attributes,protected-access
+    # This class holds cache and object data for all rows and handlers below
+    # it, so it is expected to hold a lot of instance attributes.
+    # The protected access is a false warning for inflector access.
     self._mapping_cache = None
     self._ca_definitions_cache = None
     self.converter = converter
@@ -102,13 +112,19 @@ class BlockConverter(object):
     self.check_for_duplicate_columns(raw_headers)
     self.headers = self.clean_headers(raw_headers)
     self.unique_counts = self.get_unique_counts_dict(self.object_class)
+    self.table_singular = self.object_class._inflector.table_singular
     self.name = self.object_class._inflector.human_singular.title()
     self.organize_fields(options.get("fields", []))
 
   def _create_ca_definitions_cache(self):
+    """Create dict cache for custom attribute definitions.
+
+    Returns:
+        dict containing custom attribute definitions for the current object
+        type.
+    """
     cad = models.CustomAttributeDefinition
-    definition_type = self.object_class._inflector.table_singular
-    defs = cad.eager_query().filter(cad.definition_type == definition_type)
+    defs = cad.eager_query().filter(cad.definition_type == self.table_singular)
     return {(d.definition_id, d.title): d for d in defs}
 
   def get_ca_definitions_cache(self):
@@ -117,6 +133,7 @@ class BlockConverter(object):
     return self._ca_definitions_cache
 
   def _create_mapping_cache(self):
+    """Create mapping cache for object in the current block."""
     def identifier(obj):
       return getattr(obj, "slug", getattr(obj, "email", None))
 
@@ -146,8 +163,9 @@ class BlockConverter(object):
               cache[rel.destination_id][rel.source_type].append(
                   identifier(rel.source))
           except AttributeError:
-            # TODO fix the root cause of the bad relationship object and remove
-            # this try except block
+            # Some relationships have an invalid state in the database and make
+            # rel.source or rel.destination fail. These relationships are
+            # ignored everywhere and should eventually be purged from the db
             current_app.logger.error("Failed adding object to relationship "
                                      "cache. Rel id: %s", rel.id)
       return cache
@@ -158,6 +176,12 @@ class BlockConverter(object):
     return self._mapping_cache
 
   def check_for_duplicate_columns(self, raw_headers):
+    """Check for duplicate column names in the current block.
+
+    Having duplicate column names can happen with custom attribute names and in
+    that case it is impossible to determine the correct handler for all
+    columns. Blocks with duplicate names are ignored.
+    """
     counter = Counter(raw_headers)
     duplicates = [header for header, count in counter.items() if count > 1]
     if duplicates:

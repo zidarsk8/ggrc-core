@@ -66,20 +66,28 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     return None
 
   def _get_or_create_ca(self):
+    """Get a CA value object for the current definition.
+
+    This function returns a custom attribute value object that already existed
+    or creates a new one.
+
+    Returns:
+        custom attribute value object.
+    """
     ca_definition = self.get_ca_definition()
     if not self.row_converter.obj or not ca_definition:
       return None
     for ca_value in self.row_converter.obj.custom_attribute_values:
       if ca_value.custom_attribute_id == ca_definition.id:
         return ca_value
-    ca = models.CustomAttributeValue(
+    ca_value = models.CustomAttributeValue(
         custom_attribute=ca_definition,
         custom_attribute_id=ca_definition.id,
         attributable_type=self.row_converter.obj.__class__.__name__,
         attributable_id=self.row_converter.obj.id,
     )
-    db.session.add(ca)
-    return ca
+    db.session.add(ca_value)
+    return ca_value
 
   def insert_object(self):
     """Add custom attribute objects to db session."""
@@ -108,6 +116,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     return value
 
   def get_checkbox_value(self):
+    """Get boolean value for checkbox fields."""
     if not self.mandatory and self.raw_value == "":
       return None  # ignore empty fields
     value = self.raw_value.lower() in ("yes", "true")
@@ -119,6 +128,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     return value
 
   def get_dropdown_value(self):
+    """Get valid value of the dropdown field."""
     choices_list = self.definition.multi_choice_options.split(",")
     valid_choices = [val.strip() for val in choices_list]
     choice_map = {choice.lower(): choice for choice in valid_choices}
