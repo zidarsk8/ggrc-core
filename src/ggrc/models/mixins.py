@@ -22,6 +22,7 @@ from sqlalchemy.orm.session import Session
 from ggrc import db
 from ggrc.models import reflection
 from ggrc.models.computed_property import computed_property
+from ggrc.models.deferred import deferred
 from ggrc.models.inflector import ModelInflectorDescriptor
 from ggrc.models.reflection import AttributeInfo
 from ggrc.utils import underscore_from_camelcase
@@ -35,19 +36,6 @@ must also inherit from ``db.Model``. For example:
        __tablename__ = 'markets'
 
 """
-
-
-def deferred(column, classname):
-  """Defer column loading for basic properties, such as boolean or string, so
-  that they are not loaded on joins. However, Identifiable provides an
-  eager_query implementation that will specify undefer in the options so that
-  when the resource is loaded itself, rather than through a join, it is
-  completely loaded.
-
-  In join tables, this function should not wrap foreign keys nor should it wrap
-  type properties for polymorphic relations.
-  """
-  return db.deferred(column, group=classname + '_complete')
 
 
 class Identifiable(object):
