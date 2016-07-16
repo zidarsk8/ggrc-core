@@ -5,6 +5,7 @@ from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Titled, Slugged
 
+
 class Help(Titled, Slugged, db.Model):
   __tablename__ = 'helps'
   _title_uniqueness = False
@@ -13,10 +14,10 @@ class Help(Titled, Slugged, db.Model):
 
   _fulltext_attrs = [
       'content',
-      ]
+  ]
   _publish_attrs = [
       'content',
-      ]
+  ]
   _sanitize_html = [
       'content',
-      ]
+  ]

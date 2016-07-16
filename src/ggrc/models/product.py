@@ -5,13 +5,14 @@ from ggrc import db
 from sqlalchemy.orm import validates
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
-from .object_document import Documentable
-from .object_owner import Ownable
-from .object_person import Personable
-from .option import Option
-from .relationship import Relatable
-from .utils import validate_option
-from .track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.object_document import Documentable
+from ggrc.models.object_owner import Ownable
+from ggrc.models.object_person import Personable
+from ggrc.models.option import Option
+from ggrc.models.relationship import Relatable
+from ggrc.models.utils import validate_option
+from ggrc.models.track_object_state import HasObjectState
+from ggrc.models.track_object_state import track_state_for_class
 
 
 class Product(HasObjectState, CustomAttributable, Documentable, Personable,
@@ -23,8 +24,8 @@ class Product(HasObjectState, CustomAttributable, Documentable, Personable,
 
   kind = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(Product.kind_id) == Option.id, '\
-                       'Option.role == "product_type")',
+      primaryjoin='and_(foreign(Product.kind_id) == Option.id, '
+      'Option.role == "product_type")',
       uselist=False,
   )
 
@@ -32,13 +33,13 @@ class Product(HasObjectState, CustomAttributable, Documentable, Personable,
       'kind',
       'version',
   ]
-  _sanitize_html = ['version',]
+  _sanitize_html = ['version', ]
   _aliases = {
-    "url": "Product URL",
-    "kind": {
-      "display_name": "Kind/Type",
-      "filter_by": "_filter_by_kind",
-    },
+      "url": "Product URL",
+      "kind": {
+          "display_name": "Kind/Type",
+          "filter_by": "_filter_by_kind",
+      },
   }
 
   @validates('kind')
