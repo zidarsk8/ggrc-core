@@ -69,12 +69,9 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     ca_definition = self.get_ca_definition()
     if not self.row_converter.obj or not ca_definition:
       return None
-    ca = models.CustomAttributeValue.query.filter(and_(
-        models.CustomAttributeValue.custom_attribute_id==ca_definition.id,
-        models.CustomAttributeValue.attributable_id==self.row_converter.obj.id,
-    )).first()
-    if ca:
-      return ca
+    for ca_value in self.row_converter.obj.custom_attribute_values:
+      if ca_value.custom_attribute_id == ca_definition.id:
+        return ca_value
     ca = models.CustomAttributeValue(
         custom_attribute=ca_definition,
         custom_attribute_id=ca_definition.id,
@@ -177,6 +174,11 @@ class ObjectCaColumnHandler(CustomAttributeColumHandler):
     pass
 
   def set_obj_attr(self):
+    """Parse item and set the current value.
+
+    This is a hack to get set_value on this handler called after all other
+    values have already been set.
+    """
     if self.dry_run:
       return
     self.value = self.parse_item()

@@ -79,7 +79,6 @@ class BlockConverter(object):
   def __init__(self, converter, **options):
     self._mapping_cache = None
     self._ca_definitions_cache = None
-    self._ca_values_cache = None
     self.converter = converter
     self.offset = options.get("offset", 0)
     self.object_class = options.get("object_class")
@@ -116,14 +115,6 @@ class BlockConverter(object):
     if self._ca_definitions_cache is None:
       self._ca_definitions_cache = self._create_ca_definitions_cache()
     return self._ca_definitions_cache
-
-  def _generate_ca_values_cache(self):
-    cav = models.CustomAttributeValue
-
-  def get_ca_values_cache(self):
-    if self._ca_values_cache is None:
-      self._ca_values_cache = self._generate_ca_values_cache()
-    return self._ca_values_cache
 
   def _create_mapping_cache(self):
     def identifier(obj):
