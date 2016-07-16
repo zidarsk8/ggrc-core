@@ -5,6 +5,9 @@
 
 .attachment-list {
   @extend %reset-list;
+  .fa {
+    vertical-align: bottom;
+  }
   .date {
     color: $gray;
     font-size: 11px;
@@ -38,9 +41,10 @@
     a.view-link {
       margin-top: 5px;
       width: 100%;
+      vertical-align: bottom;
     }
     .tree-title-area {
-      margin-top: 5px;
+      margin-top: 0px;
     }
   }
   .past-items-list & {
