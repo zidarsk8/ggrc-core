@@ -1,32 +1,6 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Module for basic mixing for orm models."""
-
-from uuid import uuid1
-import collections
-import datetime
-
-from flask import current_app
-from sqlalchemy import and_
-from sqlalchemy import or_
-from sqlalchemy import event
-from sqlalchemy import orm
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import foreign
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import validates
-from sqlalchemy.orm.session import Session
-
-from ggrc import db
-from ggrc.models import reflection
-from ggrc.models.computed_property import computed_property
-from ggrc.models.deferred import deferred
-from ggrc.models.inflector import ModelInflectorDescriptor
-from ggrc.models.reflection import AttributeInfo
-from ggrc.utils import underscore_from_camelcase
-
 """Mixins to add common attributes and relationships. Note, all model classes
 must also inherit from ``db.Model``. For example:
 
@@ -36,6 +10,25 @@ must also inherit from ``db.Model``. For example:
        __tablename__ = 'markets'
 
 """
+
+from uuid import uuid1
+import datetime
+
+from flask import current_app
+from sqlalchemy import event
+from sqlalchemy import orm
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import validates
+from sqlalchemy.orm.session import Session
+
+from ggrc import db
+from ggrc.models import reflection
+from ggrc.models.computed_property import computed_property
+from ggrc.models.deferred import deferred
+from ggrc.models.inflector import ModelInflectorDescriptor
+from ggrc.models.reflection import AttributeInfo
+from ggrc.models.mixins.customattributable import CustomAttributable
 
 
 class Identifiable(object):
@@ -661,3 +654,26 @@ class TestPlanned(object):
   _fulltext_attrs = ['test_plan']
   _sanitize_html = ['test_plan']
   _aliases = {"test_plan": "Test Plan"}
+
+
+__all__ = [
+    Base,
+    BusinessObject,
+    ChangeTracked,
+    ContextRBAC,
+    CustomAttributable,
+    Described,
+    FinishedDate,
+    Hierarchical,
+    Hyperlinked,
+    Identifiable,
+    Mapping,
+    Noted,
+    Slugged,
+    Stateful,
+    TestPlanned,
+    Timeboxed,
+    Titled,
+    VerifiedDate,
+    WithContact,
+]
