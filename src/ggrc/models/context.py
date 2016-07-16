@@ -4,7 +4,8 @@
 import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from ggrc import db
-from ggrc.models.mixins import deferred, Base
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import  Base
 
 
 class Context(Base, db.Model):

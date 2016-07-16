@@ -21,7 +21,7 @@ from ggrc.models import reflection
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
-from ggrc.models.mixins import deferred
+from ggrc.models.deferred import deferred
 from ggrc.models.person import Person
 from ggrc_basic_permissions.models import UserRole
 from ggrc_workflows.models import cycle

@@ -4,8 +4,9 @@
 """Audit model."""
 
 from ggrc import db
-from .mixins import (
-    deferred, Timeboxed, Noted, Described, Hyperlinked, WithContact,
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import (
+    Timeboxed, Noted, Described, Hyperlinked, WithContact,
     Titled, Slugged, CustomAttributable
 )
 

@@ -6,7 +6,8 @@ from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import validates
 from .categorization import Categorization
-from .mixins import deferred, Base, Hierarchical
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import Base, Hierarchical
 
 
 class CategorizedPublishable(object):
@@ -41,7 +42,7 @@ class CategoryBase(Hierarchical, Base, db.Model):
 
   categorizations = db.relationship(
       'ggrc.models.categorization.Categorization',
-      backref='category', 
+      backref='category',
       cascade='all, delete-orphan',
       )
 

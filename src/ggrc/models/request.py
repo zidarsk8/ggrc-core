@@ -21,7 +21,7 @@ from ggrc.models.mixins import FinishedDate
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import VerifiedDate
-from ggrc.models.mixins import deferred
+from ggrc.models.deferred import deferred
 from ggrc.models.mixins_assignable import Assignable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable

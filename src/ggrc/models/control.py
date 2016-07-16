@@ -15,7 +15,7 @@ from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Hierarchical
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
-from ggrc.models.mixins import deferred
+from ggrc.models.deferred import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable

@@ -4,8 +4,8 @@
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import deferred, Base
-from .reflection import PublishOnly
+from ggrc.models.mixins import Base
+from ggrc.models.reflection import PublishOnly
 
 class AuditObject(Base, db.Model):
   __tablename__ = 'audit_objects'

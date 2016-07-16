@@ -6,7 +6,7 @@ from sqlalchemy import event
 from datetime import datetime
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import deferred
+from ggrc.models.deferred import deferred
 from ggrc.login import get_current_user_id
 from .reflection import PublishOnly
 

@@ -4,7 +4,8 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
 from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable

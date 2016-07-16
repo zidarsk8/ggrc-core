@@ -10,7 +10,7 @@ from ggrc import db
 from ggrc import settings
 from ggrc.login import get_current_user
 from ggrc.models.mixins import Base
-from ggrc.models.mixins import deferred
+from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Stateful
 from ggrc.models.types import CompressedType
 

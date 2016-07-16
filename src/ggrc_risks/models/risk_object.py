@@ -6,7 +6,8 @@
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from ggrc.models.mixins import deferred, Mapping
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import Mapping
 from ggrc.models.reflection import PublishOnly
 
 

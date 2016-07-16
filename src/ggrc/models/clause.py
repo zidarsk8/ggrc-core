@@ -5,7 +5,7 @@
 
 from ggrc import db
 from ggrc.models.mixins import CustomAttributable
-from ggrc.models.mixins import deferred
+from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Hierarchical
 from ggrc.models.mixins import Hyperlinked
