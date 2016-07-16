@@ -8,11 +8,11 @@ from sqlalchemy.orm import attributes
 from ggrc import db
 from ggrc.models import Assessment
 from ggrc.models import mixins
-from ggrc.models import mixins_assignable
 from ggrc.models import object_document
 from ggrc.models import object_person
 from ggrc.models import relationship
 from ggrc.models import track_object_state
+from ggrc.models.mixins import assignable
 
 from unit.ggrc.models import test_mixins_base
 
@@ -23,7 +23,7 @@ class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
   def setUp(self):
     self.model = Assessment
     self.included_mixins = [
-        mixins_assignable.Assignable,
+        assignable.Assignable,
         mixins.BusinessObject,
         mixins.CustomAttributable,
         db.Model,

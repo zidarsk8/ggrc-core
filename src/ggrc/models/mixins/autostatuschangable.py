@@ -14,7 +14,7 @@ from ggrc.models import relationship
 from ggrc.models import object_document
 from ggrc.services import common
 from ggrc.services import signals
-from ggrc.models import mixins_statusable
+from ggrc.models.mixins import statusable
 
 
 class AutoStatusChangable(object):
@@ -28,9 +28,9 @@ class AutoStatusChangable(object):
   __lazy_init__ = True
   _tracked_attrs = set()
 
-  FIRST_CLASS_EDIT = ({mixins_statusable.Statusable.START_STATE} |
-                      mixins_statusable.Statusable.END_STATES)
-  ASSIGNABLE_EDIT = mixins_statusable.Statusable.END_STATES
+  FIRST_CLASS_EDIT = ({statusable.Statusable.START_STATE} |
+                      statusable.Statusable.END_STATES)
+  ASSIGNABLE_EDIT = statusable.Statusable.END_STATES
 
   @staticmethod
   def _date_has_changes(attr):

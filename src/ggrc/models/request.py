@@ -9,11 +9,9 @@ from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models import audit
-from ggrc.models import mixins_statusable
 from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models.comment import Commentable
-from ggrc.models.mixin_autostatuschangable import AutoStatusChangable
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Described
@@ -21,13 +19,15 @@ from ggrc.models.mixins import FinishedDate
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import VerifiedDate
+from ggrc.models.mixins import statusable
+from ggrc.models.mixins.autostatuschangable import AutoStatusChangable
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins_assignable import Assignable
+from ggrc.models.mixins.assignable import Assignable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
 
 
-class Request(mixins_statusable.Statusable,
+class Request(statusable.Statusable,
               AutoStatusChangable, Assignable, Documentable, Personable,
               CustomAttributable, relationship.Relatable, Titled, Slugged,
               Described, Commentable, FinishedDate, VerifiedDate, Base,
