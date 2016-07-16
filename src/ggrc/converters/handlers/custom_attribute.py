@@ -69,11 +69,20 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     ca_definition = self.get_ca_definition()
     if not self.row_converter.obj or not ca_definition:
       return None
-    return models.CustomAttributeValue(
-        custom_attribute_id=ca_definition.id
-        attributable_type = self.row_converter.obj.__class__.__name__
-        attributable_id = self.row_converter.obj.id
+    ca = models.CustomAttributeValue.query.filter(and_(
+        models.CustomAttributeValue.custom_attribute_id==ca_definition.id,
+        models.CustomAttributeValue.attributable_id==self.row_converter.obj.id,
+    )).first()
+    if ca:
+        return ca
+    ca = models.CustomAttributeValue(
+        custom_attribute=ca_definition,
+        custom_attribute_id=ca_definition.id,
+        attributable_type=self.row_converter.obj.__class__.__name__,
+        attributable_id=self.row_converter.obj.id,
     )
+    db.session.add(ca)
+    return ca
 
   def insert_object(self):
     """Add custom attribute objects to db session."""
@@ -81,16 +90,11 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       return
 
     ca = self._get_or_create_ca()
-
     ca.attribute_value = self.value
     if isinstance(ca.attribute_value, models.mixins.Identifiable):
       obj = ca.attribute_value
       ca.attribute_value = obj.__class__.__name__
       ca.attribute_object_id = obj.id
-    if ca.attribute_value is None:
-      return None
-
-    db.session.add(self.value)
     self.dry_run = True
 
   def get_date_value(self):
