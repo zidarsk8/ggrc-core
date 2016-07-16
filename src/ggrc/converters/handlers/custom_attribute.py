@@ -43,17 +43,9 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       self.add_warning(errors.INVALID_ATTRIBUTE_WARNING,
                        column_name=self.display_name)
       return None
-    value = models.CustomAttributeValue(custom_attribute_id=self.definition.id)
-    typ = self.definition.attribute_type.split(":")[0]
-    value_handler = self._type_handlers[typ]
-    value.attribute_value = value_handler(self)
-    if isinstance(value.attribute_value, models.mixins.Identifiable):
-      obj = value.attribute_value
-      value.attribute_value = obj.__class__.__name__
-      value.attribute_object_id = obj.id
-    if value.attribute_value is None:
-      return None
-    return value
+    type_ = self.definition.attribute_type.split(":")[0]
+    value_handler = self._type_handlers[type_]
+    return value_handler(self)
 
   def get_value(self):
     """Return the value of the custom attrbute field.
@@ -73,16 +65,31 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
         return value.attribute_value
     return None
 
-  def set_obj_attr(self):
-    if self.value:
-      self.row_converter.obj.custom_attribute_values.append(self.value)
+  def _get_or_create_ca(self):
+    ca_definition = self.get_ca_definition()
+    if not self.row_converter.obj or not ca_definition:
+      return None
+    return models.CustomAttributeValue(
+        custom_attribute_id=ca_definition.id
+        attributable_type = self.row_converter.obj.__class__.__name__
+        attributable_id = self.row_converter.obj.id
+    )
 
   def insert_object(self):
     """Add custom attribute objects to db session."""
     if self.dry_run or self.value is None:
       return
-    self.value.attributable_type = self.row_converter.obj.__class__.__name__
-    self.value.attributable_id = self.row_converter.obj.id
+
+    ca = self._get_or_create_ca()
+
+    ca.attribute_value = self.value
+    if isinstance(ca.attribute_value, models.mixins.Identifiable):
+      obj = ca.attribute_value
+      ca.attribute_value = obj.__class__.__name__
+      ca.attribute_object_id = obj.id
+    if ca.attribute_value is None:
+      return None
+
     db.session.add(self.value)
     self.dry_run = True
 
