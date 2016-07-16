@@ -11,6 +11,10 @@ must also inherit from ``db.Model``. For example:
 
 """
 
+# pylint: disable=no-self-argument
+# All declared_attr properties that are class level as per sqlalchemy
+# documentatio, are reported as false positives by pylint.
+
 from uuid import uuid1
 import datetime
 
@@ -331,10 +335,10 @@ class FinishedDate(object):
   # pylint: disable=method-hidden
   # because validator only sets date per model instance
   @declared_attr
-  def finished_date(self):
+  def finished_date(cls):
     return deferred(
         db.Column(db.Date, nullable=True),
-        self.__name__
+        cls.__name__
     )
 
   _publish_attrs = [
@@ -380,10 +384,10 @@ class VerifiedDate(object):
   # pylint: disable=method-hidden
   # because validator only sets date per model instance
   @declared_attr
-  def verified_date(self):
+  def verified_date(cls):
     return deferred(
         db.Column(db.Date, nullable=True),
-        self.__name__
+        cls.__name__
     )
 
   @hybrid_property
