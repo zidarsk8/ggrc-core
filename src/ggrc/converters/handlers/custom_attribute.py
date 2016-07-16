@@ -74,7 +74,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
         models.CustomAttributeValue.attributable_id==self.row_converter.obj.id,
     )).first()
     if ca:
-        return ca
+      return ca
     ca = models.CustomAttributeValue(
         custom_attribute=ca_definition,
         custom_attribute_id=ca_definition.id,
@@ -180,8 +180,6 @@ class ObjectCaColumnHandler(CustomAttributeColumHandler):
     if self.dry_run:
       return
     self.value = self.parse_item()
-    if self.value:
-      self.row_converter.obj.custom_attribute_values.append(self.value)
 
   def get_ca_definition(self):
     """Get custom attribute definition for a specific object."""
