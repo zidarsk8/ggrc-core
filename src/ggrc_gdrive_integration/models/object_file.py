@@ -1,12 +1,11 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from sqlalchemy import orm
+
 from ggrc import db
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declared_attr
-from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Base
-from ggrc.models.reflection import PublishOnly
+
 
 class ObjectFile(Base, db.Model):
   __tablename__ = 'object_files'
@@ -31,51 +30,43 @@ class ObjectFile(Base, db.Model):
         else None
     return setattr(self, self.fileable_attr, value)
 
-  @staticmethod
-  def _extra_table_args(cls):
-    return (
-        #db.UniqueConstraint('file_id', 'fileable_id', 'fileable_type'),
-        )
-
   _publish_attrs = [
       'file_id',
       'parent_folder_id',
       'fileable',
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(ObjectFile, cls).eager_query()
     return query.options()
 
   def _display_name(self):
     return self.fileable.display_name + '<-> gdrive file' + self.file_id
 
+
 class Fileable(object):
+
   @classmethod
   def late_init_fileable(cls):
     def make_object_files(cls):
       joinstr = 'and_(foreign(ObjectFile.fileable_id) == {type}.id, '\
-                     'foreign(ObjectFile.fileable_type) == "{type}")'
+          'foreign(ObjectFile.fileable_type) == "{type}")'
       joinstr = joinstr.format(type=cls.__name__)
       return db.relationship(
           'ObjectFile',
           primaryjoin=joinstr,
           backref='{0}_fileable'.format(cls.__name__),
           cascade='all, delete-orphan',
-          )
+      )
     cls.object_files = make_object_files(cls)
 
   _publish_attrs = [
       'object_files',
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Fileable, cls).eager_query()
     return query.options(
         orm.subqueryload('object_files'))
