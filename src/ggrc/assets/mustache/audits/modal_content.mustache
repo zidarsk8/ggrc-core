@@ -64,11 +64,9 @@
           <a data-id="hide_status_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div tabindex="4">
-          <select data-id="status_dd" class="input-block-level" name="status" {{#new_object_form}}disabled="true"{{/new_object_form}}>
-            {{#iterate 'Planned' 'In Progress' 'Manager Review' 'Ready for External Review' 'Completed'}}
-            <option {{#if_equals iterator instance.status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-            {{/iterate}}
-          </select>
+            <dropdown options-list="model.statuses"
+                      name="status">
+            </dropdown>
         </div>
       </div>
     </div>

@@ -87,6 +87,8 @@
       status: 'Draft',
       object_type: 'Assessment'
     },
+    statuses: ['Planned', 'In Progress', 'Manager Review',
+      'Ready for External Review', 'Completed'],
     obj_nav_options: {
       show_all_tabs: false,
       force_show_list: ['In Scope Controls', 'Requests',
@@ -897,6 +899,8 @@
     conflicts: [
       ['assessor', 'verifier']
     ],
+    conclusions: ['Effective', 'Ineffective', 'Needs improvement',
+      'Not Applicable'],
     init: function () {
       if (this._super) {
         this._super.apply(this, arguments);

@@ -80,8 +80,10 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , "DataAsset" : {}
     , "AccessGroup" : {}
     , "Market" : {}
-    }
-  , init : function() {
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){
@@ -154,8 +156,10 @@ can.Model.Cacheable("CMS.Models.Project", {
     , "DataAsset" : {}
     , "AccessGroup" : {}
     , "Market" : {}
-    }
-  , init : function() {
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){
@@ -241,9 +245,11 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , "DataAsset" : {}
     , "AccessGroup" : {}
     , "Market" : {}
-    }
-  , init : function() {
-    var that = this
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
+    var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
@@ -332,9 +338,11 @@ can.Model.Cacheable("CMS.Models.Product", {
     , "DataAsset" : {}
     , "AccessGroup" : {}
     , "Market" : {}
-    }
-  , init : function() {
-    var that = this
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
+    var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){
       that.tree_view_options.child_options[0].model = CMS.Models.Process;
@@ -421,8 +429,10 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , "DataAsset" : {}
     , "AccessGroup" : {}
     , "Market" : {}
-    }
-  , init : function() {
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){
@@ -509,8 +519,10 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
     , "DataAsset" : {}
     , "AccessGroup" : {}
     , "Market" : {}
-    }
-  , init : function() {
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+    'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){
@@ -583,8 +595,10 @@ can.Model.Cacheable("CMS.Models.Market", {
     , "DataAsset" : {}
     , "AccessGroup" : {}
     , "Market" : {}
-    }
-  , init : function() {
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){
@@ -670,8 +684,10 @@ can.Model.Cacheable("CMS.Models.Vendor", {
     , "DataAsset" : {}
     , "AccessGroup" : {}
     , "Market" : {}
-    }
-  , init : function() {
+    },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     var that = this;
     this._super && this._super.apply(this, arguments);
     $(function(){

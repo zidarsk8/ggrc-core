@@ -79,9 +79,10 @@ can.Model.Cacheable("CMS.Models.Program", {
     , "AccessGroup" : {}
     , "Product" : {}
     , "Market" : {}
-  }
-  , init : function() {
-    var that = this;
+  },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     this.validateNonBlank("title");
     this._super.apply(this, arguments);
   }
@@ -161,9 +162,10 @@ can.Model.Cacheable("CMS.Models.Objective", {
       , title_plural : "Business Objects"
       , draw_children : false
     }]
-  }
-
-  , init : function() {
+  },
+  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  init: function () {
     this.validateNonBlank("title");
     this._super.apply(this, arguments);
   }

@@ -6,6 +6,8 @@
 <select
   class="{{firstnonempty className 'input-block-level'}}"
   can-value="{{name}}"
+  name="{{name}}"
+  null-if-empty="null-if-empty"
   can-change="onChange"
   {{#isDisabled}}disabled="disabled"{{/isDisabled}}
   >

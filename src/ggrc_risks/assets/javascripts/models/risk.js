@@ -28,8 +28,9 @@
     tree_view_options: {
       add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
     },
-
-    init: function() {
+    statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
+      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+    init: function () {
       this._super && this._super.apply(this, arguments);
       var req_fields = ["title", "description", "contact"];
       for (var i = 0; i < req_fields.length; i++) {

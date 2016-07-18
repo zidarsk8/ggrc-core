@@ -23,6 +23,7 @@
       className: '@',
       onChange: $.noop,
       noValue: '@',
+      noValueLabel: '@',
       /*
         Options list should be an `array` of object containing `title` and `value`
         [{
@@ -33,7 +34,7 @@
       optionsList: null,
       options: function () {
         var none = [{
-          title: 'None',
+          title: this.attr('noValueLabel') || 'None',
           value: ''
         }];
         var list = can.map(this.attr('optionsList') || [], function (option) {

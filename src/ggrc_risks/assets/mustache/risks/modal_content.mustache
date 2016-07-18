@@ -169,13 +169,11 @@
            title="Indicates the status of this object."></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <select class="input-block-level"
-              name="status" null-if-empty="null-if-empty" tabindex="8">
-        <option value="" {{#if_equals status ""}}selected{{/if_equals}}>---</option>
-        {{#iterate 'Draft', 'Final', 'Effective', 'Ineffective', 'Launched', 'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'}}
-          <option {{#if_equals iterator status}}selected="true"{{/if_equals}}>{{iterator}}</option>
-        {{/iterate}}
-      </select>
+        <dropdown options-list="model.statuses"
+                  no-value="true"
+                  no-value-label="---"
+                  name="status">
+        </dropdown>
     </div>
   </div>
 
