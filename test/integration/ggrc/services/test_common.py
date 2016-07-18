@@ -36,6 +36,7 @@ RESOURCE_ALLOWED = ['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS']
 
 
 class TestResource(TestCase):
+
   def setUp(self):
     super(TestResource, self).setUp()
     # Explicitly create test tables
@@ -194,6 +195,7 @@ class TestResource(TestCase):
   def test_collection_post_successful(self):
     data = json.dumps(
         {'services_test_mock_model': {'foo': 'bar', 'context': None}})
+    self.client.get("/login")
     response = self.client.post(
         URL_MOCK_COLLECTION,
         content_type='application/json',
@@ -221,6 +223,7 @@ class TestResource(TestCase):
   def test_collection_post_successful_single_array(self):
     data = json.dumps(
         [{'services_test_mock_model': {'foo': 'bar', 'context': None}}])
+    self.client.get("/login")
     response = self.client.post(
         URL_MOCK_COLLECTION,
         content_type='application/json',
@@ -243,6 +246,7 @@ class TestResource(TestCase):
       {'services_test_mock_model': {'foo': 'bar1', 'context': None}},
       {'services_test_mock_model': {'foo': 'bar2', 'context': None}},
     ])
+    self.client.get("/login")
     response = self.client.post(
         URL_MOCK_COLLECTION,
         content_type='application/json',
@@ -272,6 +276,7 @@ class TestResource(TestCase):
       {'services_test_mock_model':
         {'foo': 'bar2', 'code': 'f2', 'context': None}},
     ])
+    self.client.get("/login")
     response = self.client.post(
         URL_MOCK_COLLECTION,
         content_type='application/json',
