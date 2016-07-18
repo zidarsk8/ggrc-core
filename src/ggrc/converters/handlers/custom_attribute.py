@@ -43,17 +43,9 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       self.add_warning(errors.INVALID_ATTRIBUTE_WARNING,
                        column_name=self.display_name)
       return None
-    value = models.CustomAttributeValue(custom_attribute_id=self.definition.id)
-    typ = self.definition.attribute_type.split(":")[0]
-    value_handler = self._type_handlers[typ]
-    value.attribute_value = value_handler(self)
-    if isinstance(value.attribute_value, models.mixins.Identifiable):
-      obj = value.attribute_value
-      value.attribute_value = obj.__class__.__name__
-      value.attribute_object_id = obj.id
-    if value.attribute_value is None:
-      return None
-    return value
+    type_ = self.definition.attribute_type.split(":")[0]
+    value_handler = self._type_handlers[type_]
+    return value_handler(self)
 
   def get_value(self):
     """Return the value of the custom attrbute field.
@@ -73,17 +65,41 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
         return value.attribute_value
     return None
 
-  def set_obj_attr(self):
-    if self.value:
-      self.row_converter.obj.custom_attribute_values.append(self.value)
+  def _get_or_create_ca(self):
+    """Get a CA value object for the current definition.
+
+    This function returns a custom attribute value object that already existed
+    or creates a new one.
+
+    Returns:
+        custom attribute value object.
+    """
+    ca_definition = self.get_ca_definition()
+    if not self.row_converter.obj or not ca_definition:
+      return None
+    for ca_value in self.row_converter.obj.custom_attribute_values:
+      if ca_value.custom_attribute_id == ca_definition.id:
+        return ca_value
+    ca_value = models.CustomAttributeValue(
+        custom_attribute=ca_definition,
+        custom_attribute_id=ca_definition.id,
+        attributable_type=self.row_converter.obj.__class__.__name__,
+        attributable_id=self.row_converter.obj.id,
+    )
+    db.session.add(ca_value)
+    return ca_value
 
   def insert_object(self):
     """Add custom attribute objects to db session."""
     if self.dry_run or self.value is None:
       return
-    self.value.attributable_type = self.row_converter.obj.__class__.__name__
-    self.value.attributable_id = self.row_converter.obj.id
-    db.session.add(self.value)
+
+    ca = self._get_or_create_ca()
+    ca.attribute_value = self.value
+    if isinstance(ca.attribute_value, models.mixins.Identifiable):
+      obj = ca.attribute_value
+      ca.attribute_value = obj.__class__.__name__
+      ca.attribute_object_id = obj.id
     self.dry_run = True
 
   def get_date_value(self):
@@ -100,6 +116,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     return value
 
   def get_checkbox_value(self):
+    """Get boolean value for checkbox fields."""
     if not self.mandatory and self.raw_value == "":
       return None  # ignore empty fields
     value = self.raw_value.lower() in ("yes", "true")
@@ -111,6 +128,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     return value
 
   def get_dropdown_value(self):
+    """Get valid value of the dropdown field."""
     choices_list = self.definition.multi_choice_options.split(",")
     valid_choices = [val.strip() for val in choices_list]
     choice_map = {choice.lower(): choice for choice in valid_choices}
@@ -154,8 +172,8 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
 
   def get_ca_definition(self):
     """Get custom attribute definition."""
-    return self.row_converter.block_converter.ca_definitions_cache.get(
-        (None, self.display_name))
+    cache = self.row_converter.block_converter.get_ca_definitions_cache()
+    return cache.get((None, self.display_name))
 
 
 class ObjectCaColumnHandler(CustomAttributeColumHandler):
@@ -166,19 +184,22 @@ class ObjectCaColumnHandler(CustomAttributeColumHandler):
     pass
 
   def set_obj_attr(self):
+    """Parse item and set the current value.
+
+    This is a hack to get set_value on this handler called after all other
+    values have already been set.
+    """
     if self.dry_run:
       return
     self.value = self.parse_item()
-    if self.value:
-      self.row_converter.obj.custom_attribute_values.append(self.value)
 
   def get_ca_definition(self):
     """Get custom attribute definition for a specific object."""
     if self.row_converter.obj.id is None:
       return None
     cad = models.CustomAttributeDefinition
-    definition = self.row_converter.block_converter.ca_definitions_cache.get(
-        (self.row_converter.obj.id, self.display_name))
+    cache = self.row_converter.block_converter.get_ca_definitions_cache()
+    definition = cache.get((self.row_converter.obj.id, self.display_name))
     if not definition:
       definition = cad.query.filter(and_(
           cad.definition_id == self.row_converter.obj.id,

@@ -37,7 +37,7 @@ class TestCustomAttributeImportExport(TestCase):
     """Generate custom attributes needed for csv import
 
     This function generates all custom attributes on Product and Access Group,
-    that are used in product_with_all_custom_attributes.csv and
+    that are used in custom_attribute_tests.csv and
     multi_word_object_custom_attribute_test.csv files.
     """
     gen = self.generator.generate_custom_attribute
@@ -84,7 +84,7 @@ class TestCustomAttributeImportExport(TestCase):
     This tests covers all possible custom attributes with mandatory flag turned
     off and on, and checks for all warnings that should be present.
     """
-    filename = "product_with_all_custom_attributes.csv"
+    filename = "custom_attribute_tests.csv"
     response = self.import_file(filename)[0]
     expected_warnings = {
         errors.WRONG_VALUE.format(line=6, column_name="man CH"),
@@ -121,6 +121,32 @@ class TestCustomAttributeImportExport(TestCase):
     self.assertEqual(9, response["ignored"])
     self.assertEqual(17, Product.query.count())
 
+  def test_product_ca_import_update(self):
+    """Test updating of product with all custom attributes.
+
+    This tests covers updates for all possible custom attributes
+    """
+    self.import_file("custom_attribute_tests.csv")
+    self.import_file("custom_attribute_update_tests.csv")
+    prod_0 = Product.query.filter(Product.slug == "prod0").first()
+    prod_0_expected = {
+        u"normal text": u"edited normal text",
+        u"man text": u"edited man text",
+        u"normal RT": u"some <br> edited rich <br> text",
+        u"man RT": u"other edited <br> rich text",
+        u"normal Date": u"2017-09-14 00:00:00",
+        u"man Date": u"2018-01-17 00:00:00",
+        u"normal CH": u"1",
+        u"man CH": u"0",
+        u"normal select": u"a",
+        u"man select": u"f",
+        u"normal person": u"Person",
+        u"man person": u"Person",
+    }
+    prod_0_new = {c.custom_attribute.title: c.attribute_value
+                  for c in prod_0.custom_attribute_values}
+    self.assertEqual(prod_0_expected, prod_0_new)
+
   def tests_ca_export(self):
     """Test exporting products with custom attributes
 
@@ -130,7 +156,7 @@ class TestCustomAttributeImportExport(TestCase):
     This tests relys on the import tests to work. If those fail they need to be
     fixied before this one.
     """
-    filename = "product_with_all_custom_attributes.csv"
+    filename = "custom_attribute_tests.csv"
     self.import_file(filename)
 
     data = [{
