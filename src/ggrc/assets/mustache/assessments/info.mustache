@@ -60,6 +60,7 @@
               {{#is_allowed 'update' instance context='for'}}
                   <dropdown options-list="model.conclusions"
                             no-value="true"
+                            no-value-label="---"
                             name="design">
                   </dropdown>
               {{else}}
@@ -72,6 +73,7 @@
               {{#is_allowed 'update' instance context='for'}}
                   <dropdown options-list="model.conclusions"
                             no-value="true"
+                            no-value-label="---"
                             name="operationally">
                   </dropdown>
               {{else}}
