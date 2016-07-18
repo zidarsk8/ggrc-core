@@ -9,7 +9,8 @@ from ggrc import settings
 from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
 from ggrc.models.exceptions import ValidationError
-from ggrc.models.mixins import deferred, Base, CustomAttributable
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import Base, CustomAttributable
 from ggrc.models.custom_attribute_definition import CustomAttributeMapable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable

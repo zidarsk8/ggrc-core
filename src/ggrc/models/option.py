@@ -2,7 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
-from .mixins import deferred, Base, Described
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import Base, Described
+
 
 class Option(Described, Base, db.Model):
   __tablename__ = 'options'
@@ -15,13 +17,13 @@ class Option(Described, Base, db.Model):
   def _extra_table_args(cls):
     return (
         db.Index('ix_options_role', 'role'),
-        )
+    )
 
   _publish_attrs = [
       'role',
       'title',
       'required',
-      ]
+  ]
   _sanitize_html = [
       'title',
-      ]
+  ]

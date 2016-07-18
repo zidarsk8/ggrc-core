@@ -4,17 +4,19 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from .mixins import deferred, BusinessObject, Timeboxed, CustomAttributable
-from .object_document import Documentable
-from .object_owner import Ownable
-from .object_person import Personable
-from .option import Option
-from .relationship import Relatable
-from .utils import validate_option
-from .track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
+from ggrc.models.object_document import Documentable
+from ggrc.models.object_owner import Ownable
+from ggrc.models.object_person import Personable
+from ggrc.models.option import Option
+from ggrc.models.relationship import Relatable
+from ggrc.models.utils import validate_option
+from ggrc.models import track_object_state
 
 
-class SystemOrProcess(HasObjectState, Timeboxed, BusinessObject, db.Model):
+class SystemOrProcess(track_object_state.HasObjectState, Timeboxed,
+                      BusinessObject, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'
   __tablename__ = 'systems'
@@ -25,8 +27,8 @@ class SystemOrProcess(HasObjectState, Timeboxed, BusinessObject, db.Model):
   network_zone_id = deferred(db.Column(db.Integer), 'SystemOrProcess')
   network_zone = db.relationship(
       'Option',
-      primaryjoin='and_(foreign(SystemOrProcess.network_zone_id) == Option.id, '\
-                       'Option.role == "network_zone")',
+      primaryjoin='and_(foreign(SystemOrProcess.network_zone_id) == Option.id,'
+      ' Option.role == "network_zone")',
       uselist=False,
   )
 
@@ -49,8 +51,8 @@ class SystemOrProcess(HasObjectState, Timeboxed, BusinessObject, db.Model):
   _sanitize_html = ['version']
   _aliases = {
       "network_zone": {
-        "display_name": "Network Zone",
-        "filter_by": "_filter_by_network_zone",
+          "display_name": "Network Zone",
+          "filter_by": "_filter_by_network_zone",
       },
   }
 
@@ -80,7 +82,7 @@ class SystemOrProcess(HasObjectState, Timeboxed, BusinessObject, db.Model):
                  'is_biz_process'),
     )
 
-track_state_for_class(SystemOrProcess)
+track_object_state.track_state_for_class(SystemOrProcess)
 
 
 class System(CustomAttributable, Documentable, Personable,

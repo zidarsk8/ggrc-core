@@ -9,7 +9,7 @@ from ggrc.models.mixins import Noted
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import Titled
-from ggrc.models.mixins import deferred
+from ggrc.models.deferred import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.person import Person
 from ggrc.models.program import Program

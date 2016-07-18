@@ -4,7 +4,7 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from ggrc.models.mixins import deferred
+from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relatable
 from ggrc.models.object_owner import Ownable

@@ -3,13 +3,13 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
-from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import validates
-from .categorization import Categorization
-from .mixins import deferred, Base, Hierarchical
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import Base, Hierarchical
 
 
 class CategorizedPublishable(object):
+
   def __init__(self, attr_name, type_name):
     self.attr_name = attr_name
     self.type_name = type_name
@@ -37,13 +37,13 @@ class CategoryBase(Hierarchical, Base, db.Model):
 
   __mapper_args__ = {
       'polymorphic_on': type
-      }
+  }
 
   categorizations = db.relationship(
       'ggrc.models.categorization.Categorization',
-      backref='category', 
+      backref='category',
       cascade='all, delete-orphan',
-      )
+  )
 
   @validates('type')
   def validates_type(self, key, value):
@@ -54,14 +54,12 @@ class CategoryBase(Hierarchical, Base, db.Model):
       'name',
       'type',
       'required',
-      #'scope_id',
-      ]
+  ]
   _sanitize_html = [
       'name',
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
     query = super(CategoryBase, cls).eager_query()
     return query.options()

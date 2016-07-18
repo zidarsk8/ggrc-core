@@ -6,7 +6,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.models.mixins import deferred, Mapping, Timeboxed
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import Mapping, Timeboxed
 from ggrc.models.reflection import PublishOnly
 
 

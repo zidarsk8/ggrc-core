@@ -1,11 +1,11 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from sqlalchemy import orm
+
 from ggrc import db
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declared_attr
-from ggrc.models.mixins import deferred, Base
-from ggrc.models.reflection import PublishOnly
+from ggrc.models.mixins import Base
+
 
 class ObjectEvent(Base, db.Model):
   __tablename__ = 'object_events'
@@ -30,51 +30,43 @@ class ObjectEvent(Base, db.Model):
         else None
     return setattr(self, self.eventable_attr, value)
 
-  @staticmethod
-  def _extra_table_args(cls):
-    return (
-        #db.UniqueConstraint('event_id', 'eventable_id', 'eventable_type'),
-        )
-
   _publish_attrs = [
       'event_id',
       'calendar_id',
       'eventable',
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(ObjectEvent, cls).eager_query()
     return query.options()
 
   def _display_name(self):
     return self.eventable.display_name + '<-> gdrive event' + self.event_id
 
+
 class Eventable(object):
+
   @classmethod
   def late_init_eventable(cls):
     def make_object_events(cls):
       joinstr = 'and_(foreign(ObjectEvent.eventable_id) == {type}.id, '\
-                     'foreign(ObjectEvent.eventable_type) == "{type}")'
+          'foreign(ObjectEvent.eventable_type) == "{type}")'
       joinstr = joinstr.format(type=cls.__name__)
       return db.relationship(
           'ObjectEvent',
           primaryjoin=joinstr,
           backref='{0}_eventable'.format(cls.__name__),
           cascade='all, delete-orphan',
-          )
+      )
     cls.object_events = make_object_events(cls)
 
   _publish_attrs = [
       'object_events',
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Eventable, cls).eager_query()
     return query.options(
         orm.subqueryload('object_events'))

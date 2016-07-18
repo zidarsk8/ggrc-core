@@ -12,7 +12,7 @@ from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import WithContact
-from ggrc.models.mixins import deferred
+from ggrc.models.deferred import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable

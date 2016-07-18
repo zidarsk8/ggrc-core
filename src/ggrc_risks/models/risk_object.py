@@ -5,8 +5,7 @@
 
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declared_attr
-from ggrc.models.mixins import deferred, Mapping
+from ggrc.models.mixins import Mapping
 from ggrc.models.reflection import PublishOnly
 
 
@@ -38,14 +37,14 @@ class RiskObject(Mapping, db.Model):
     return (
         db.UniqueConstraint('risk_id', 'object_id', 'object_type'),
         db.Index('ix_risk_id', 'risk_id'),
-        )
+    )
 
   _publish_attrs = [
       'risk',
       'object',
-      ]
+  ]
   _sanitize_html = [
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
@@ -60,6 +59,7 @@ class RiskObject(Mapping, db.Model):
 
 
 class Riskable(object):
+
   @classmethod
   def late_init_riskable(cls):
     def make_risk_objects(cls):
@@ -68,26 +68,26 @@ class Riskable(object):
           creator=lambda risk: RiskObject(
               risk=risk,
               object_type=cls.__name__,
-              )
           )
+      )
       joinstr = 'and_(foreign(RiskObject.object_id) == {type}.id, '\
-                     'foreign(RiskObject.object_type) == "{type}")'
+          'foreign(RiskObject.object_type) == "{type}")'
       joinstr = joinstr.format(type=cls.__name__)
       return db.relationship(
           'RiskObject',
           primaryjoin=joinstr,
           backref='{0}_object'.format(cls.__name__),
           cascade='all, delete-orphan',
-          )
+      )
     cls.risk_objects = make_risk_objects(cls)
 
   _publish_attrs = [
       PublishOnly('risks'),
       'risk_objects',
-      ]
+  ]
 
   _include_links = [
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
@@ -96,4 +96,3 @@ class Riskable(object):
     query = super(Riskable, cls).eager_query()
     return cls.eager_inclusions(query, Riskable._include_links).options(
         orm.subqueryload('risk_objects'))
-

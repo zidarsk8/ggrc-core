@@ -4,8 +4,9 @@
 from ggrc import db
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-from .mixins import deferred, Base
-from .reflection import PublishOnly
+from ggrc.models.mixins import Base
+from ggrc.models.reflection import PublishOnly
+
 
 class AuditObject(Base, db.Model):
   __tablename__ = 'audit_objects'
@@ -15,7 +16,7 @@ class AuditObject(Base, db.Model):
   auditable_id = db.Column(db.Integer, nullable=False)
   auditable_type = db.Column(db.String, nullable=False)
   requests = db.relationship(
-     'Request', backref='audit_object')
+      'Request', backref='audit_object')
 
   @property
   def auditable_attr(self):
@@ -36,14 +37,14 @@ class AuditObject(Base, db.Model):
   def _extra_table_args(cls):
     return (
         db.UniqueConstraint(
-          'audit_id', 'auditable_id', 'auditable_type'),
+            'audit_id', 'auditable_id', 'auditable_type'),
         db.Index('ix_audit_id', 'audit_id'),
-        )
+    )
 
   _publish_attrs = [
       'audit',
       'auditable',
-      ]
+  ]
 
   @classmethod
   def eager_query(cls):
@@ -60,32 +61,31 @@ class AuditObject(Base, db.Model):
 
 
 class Auditable(object):
+
   @declared_attr
   def audit_objects(cls):
     cls.audits = association_proxy(
         'audit_objects', 'audit',
         creator=lambda control: AuditObject(
-            audit=audit,
+            audit=audit,  # noqa
             auditable_type=cls.__name__,
-            )
         )
+    )
     joinstr = 'and_(foreign(AuditObject.auditable_id) == {type}.id, '\
-                   'foreign(AuditObject.auditable_type) == "{type}")'
+        'foreign(AuditObject.auditable_type) == "{type}")'
     joinstr = joinstr.format(type=cls.__name__)
     return db.relationship(
         'AuditObject',
         primaryjoin=joinstr,
         backref='{0}_auditable'.format(cls.__name__),
         cascade='all, delete-orphan',
-        )
+    )
 
   _publish_attrs = [
       PublishOnly('audits'),
       'audit_objects',
-      ]
-  _include_links = [
-    #'audit_objects',
-    ]
+  ]
+  _include_links = []
 
   @classmethod
   def eager_query(cls):
