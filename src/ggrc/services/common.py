@@ -132,7 +132,7 @@ def set_ids_for_new_custom_attributes(objects, parent_obj):
 
   for obj in objects:
     if (obj.type not in object_attrs or
-       not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE")):
+            not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE")):
       continue
 
     attr = object_attrs[obj.type]
@@ -1196,7 +1196,7 @@ class Resource(ModelView):
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
           task = create_task(request.method, request.full_path,
-                            None, request.data)
+                             None, request.data)
           if getattr(settings, 'APP_ENGINE', False):
             return self.json_success_response(
                 self.object_for_json(task, 'background_task'),
@@ -1247,7 +1247,8 @@ class Resource(ModelView):
               errors.append((res_status, body))
           if len(errors) > 0:
             status = errors[0][0]
-            headers["X-Flash-Error"] = ' || '.join((error for _, error in errors))
+            headers[
+                "X-Flash-Error"] = ' || '.join((error for _, error in errors))
           else:
             status = 200
       with benchmark("collection post > make response"):
@@ -1406,6 +1407,7 @@ class Resource(ModelView):
 
 
 class ReadOnlyResource(Resource):
+
   def dispatch_request(self, *args, **kwargs):
     method = request.method
 
