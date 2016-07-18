@@ -1187,75 +1187,80 @@ class Resource(ModelView):
     return (403, message)
 
   def collection_post(self):  # noqa
-    if self.request.mimetype != 'application/json':
-      return current_app.make_response((
-          'Content-Type must be application/json', 415, []))
+    with benchmark("collection post"):
+      if self.request.mimetype != 'application/json':
+        return current_app.make_response((
+            'Content-Type must be application/json', 415, []))
 
-    running_async = False
-    if 'X-GGRC-BackgroundTask' in request.headers:
-      if 'X-Appengine-Taskname' not in request.headers:
-        task = create_task(request.method, request.full_path,
-                           None, request.data)
-        if getattr(settings, 'APP_ENGINE', False):
-          return self.json_success_response(
-              self.object_for_json(task, 'background_task'),
-              self.modified_at(task))
+      running_async = False
+      if 'X-GGRC-BackgroundTask' in request.headers:
+        if 'X-Appengine-Taskname' not in request.headers:
+          task = create_task(request.method, request.full_path,
+                            None, request.data)
+          if getattr(settings, 'APP_ENGINE', False):
+            return self.json_success_response(
+                self.object_for_json(task, 'background_task'),
+                self.modified_at(task))
+          body = self.request.json
+        else:
+          task_id = int(self.request.headers.get('x-task-id'))
+          task = BackgroundTask.query.get(task_id)
+          body = json.loads(task.parameters)
+          running_async = True
+        task.start()
+        no_result = True
+      else:
         body = self.request.json
-      else:
-        task_id = int(self.request.headers.get('x-task-id'))
-        task = BackgroundTask.query.get(task_id)
-        body = json.loads(task.parameters)
-        running_async = True
-      task.start()
-      no_result = True
-    else:
-      body = self.request.json
-      no_result = False
-    wrap = isinstance(body, dict)
-    if wrap:
-      body = [body]
-    res = []
-    for src in body:
-      try:
-        src_res = None
-        src_res = self.collection_post_step(
-            UnicodeSafeJsonWrapper(src), no_result)
-        db.session.commit()
-        if running_async:
-          time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
-      except Exception as e:
-        if not src_res or 200 <= src_res[0] < 300:
-          src_res = (getattr(e, "code", 500), e.message)
-        current_app.logger.warn("Collection POST commit failed:")
-        current_app.logger.exception(e)
-        db.session.rollback()
-      res.append(src_res)
-    headers = {"Content-Type": "application/json"}
-    errors = []
-    if wrap:
-      status, res = res[0]
-      if isinstance(res, dict) and len(res) == 1:
-        value = res.values()[0]
-        if "id" in value:
-          headers['Location'] = self.url_for(id=value["id"])
-    else:
-      for res_status, body in res:
-        if not 200 <= res_status < 300:
-          errors.append((res_status, body))
-      if len(errors) > 0:
-        status = errors[0][0]
-        headers["X-Flash-Error"] = ' || '.join((error for _, error in errors))
-      else:
-        status = 200
-    result = current_app.make_response(
-        (self.as_json(res), status, headers))
+        no_result = False
+      wrap = isinstance(body, dict)
+      if wrap:
+        body = [body]
+      res = []
+      with benchmark("collection post > body loop: {}".format(len(body))):
+        for src in body:
+          try:
+            src_res = None
+            src_res = self.collection_post_step(
+                UnicodeSafeJsonWrapper(src), no_result)
+            db.session.commit()
+            if running_async:
+              time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
+          except Exception as e:
+            if not src_res or 200 <= src_res[0] < 300:
+              src_res = (getattr(e, "code", 500), e.message)
+            current_app.logger.warn("Collection POST commit failed:")
+            current_app.logger.exception(e)
+            db.session.rollback()
+          res.append(src_res)
+      with benchmark("collection post > calculate response statuses"):
+        headers = {"Content-Type": "application/json"}
+        errors = []
+        if wrap:
+          status, res = res[0]
+          if isinstance(res, dict) and len(res) == 1:
+            value = res.values()[0]
+            if "id" in value:
+              headers['Location'] = self.url_for(id=value["id"])
+        else:
+          for res_status, body in res:
+            if not 200 <= res_status < 300:
+              errors.append((res_status, body))
+          if len(errors) > 0:
+            status = errors[0][0]
+            headers["X-Flash-Error"] = ' || '.join((error for _, error in errors))
+          else:
+            status = 200
+      with benchmark("collection post > make response"):
+        result = current_app.make_response(
+            (self.as_json(res), status, headers))
 
-    if 'X-GGRC-BackgroundTask' in request.headers:
-      if status == 200:
-        task.finish("Success", result)
-      else:
-        task.finish("Failure", result)
-    return result
+      with benchmark("collection post > return resullt"):
+        if 'X-GGRC-BackgroundTask' in request.headers:
+          if status == 200:
+            task.finish("Success", result)
+          else:
+            task.finish("Failure", result)
+        return result
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
