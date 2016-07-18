@@ -1142,7 +1142,7 @@ class Resource(ModelView):
           raise Forbidden()
       with benchmark("Send model POSTed event"):
         self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
-      obj.modified_by_id = get_current_user_id()
+      obj.modified_by = get_current_user()
       db.session.add(obj)
       with benchmark("Get modified objects"):
         modified_objects = get_modified_objects(db.session)
