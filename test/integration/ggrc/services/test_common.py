@@ -243,8 +243,8 @@ class TestResource(TestCase):
 
   def test_collection_post_successful_multiple(self):
     data = json.dumps([
-      {'services_test_mock_model': {'foo': 'bar1', 'context': None}},
-      {'services_test_mock_model': {'foo': 'bar2', 'context': None}},
+        {'services_test_mock_model': {'foo': 'bar1', 'context': None}},
+        {'services_test_mock_model': {'foo': 'bar2', 'context': None}},
     ])
     self.client.get("/login")
     response = self.client.post(
@@ -267,14 +267,14 @@ class TestResource(TestCase):
 
   def test_collection_post_successful_multiple_with_errors(self):
     data = json.dumps([
-      {'services_test_mock_model':
-        {'foo': 'bar1', 'code': 'f1', 'context': None}},
-      {'services_test_mock_model':
-        {'foo': 'bar1', 'code': 'f1', 'context': None}},
-      {'services_test_mock_model':
-        {'foo': 'bar2', 'code': 'f2', 'context': None}},
-      {'services_test_mock_model':
-        {'foo': 'bar2', 'code': 'f2', 'context': None}},
+        {'services_test_mock_model':
+         {'foo': 'bar1', 'code': 'f1', 'context': None}},
+        {'services_test_mock_model':
+            {'foo': 'bar1', 'code': 'f1', 'context': None}},
+        {'services_test_mock_model':
+            {'foo': 'bar2', 'code': 'f2', 'context': None}},
+        {'services_test_mock_model':
+            {'foo': 'bar2', 'code': 'f2', 'context': None}},
     ])
     self.client.get("/login")
     response = self.client.post(
