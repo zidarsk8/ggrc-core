@@ -899,21 +899,7 @@ can.Control('GGRC.Controllers.Modals', {
       }
 
       this.disable_hide = true;
-    /**
-     * Temporary solution and after updated the backend it need to be deleted
-     * Start deprecated block
-     */
-    instance._cachedCADefinitions = {};
 
-    _.forEach(instance.custom_attribute_definitions, function (attr) {
-      instance._cachedCADefinitions[attr.id] = {
-        multi_choice_mandatory: attr.multi_choice_mandatory || '',
-        mandatory: !!attr.mandatory
-      };
-    });
-    /**
-     * End deprecated block
-     */
       ajd = instance.save();
       ajd.fail(this.save_error.bind(this))
         .done(function (obj) {
