@@ -7,6 +7,9 @@
   can.Control('GGRC.Controllers.PbcWorkflows', {}, {
     '{CMS.Models.AssessmentTemplate} updated': function (model, ev, instance) {
       // Make sure instance.custom_attribute_definitions cache is cleared
+      if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
+        return;
+      }
       instance.custom_attribute_definitions.splice(0,
         instance.custom_attribute_definitions.length);
     },
