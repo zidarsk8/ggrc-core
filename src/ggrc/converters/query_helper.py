@@ -108,7 +108,7 @@ class QueryHelper(object):
     return query
 
   def _clean_filters(self, expression):
-    """ prepair the filter expression for building the query """
+    """Prepare the filter expression for building the query."""
     if not expression or type(expression) != dict:
       return
     slugs = expression.get("slugs")

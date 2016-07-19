@@ -348,7 +348,7 @@ class BlockConverter(object):
     """Add all objects to the database.
 
     This function flushes all objects to the database and if the dry_run flag
-    is not set, the session gets commited and all signals for the imported
+    is not set, the session gets committed and all signals for the imported
     objects get sent.
     """
     if self.ignore:
