@@ -298,26 +298,26 @@ class ModalCreateNewControl(BaseModalCreateNew):
 
   TEST_PLAN = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_test_plan_9cc51ca3"] label')
+      '[data-test-id="control_test_plan_d8b5a2f4"] label')
   UI_TEST_PLAN = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_test_plan_9cc51ca3"] iframe')
+      '[data-test-id="control_test_plan_d8b5a2f4"] iframe')
 
   NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] label')
 
   CODE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_code_9cc51ca3"] label')
+      '[data-test-id="control_code_f8abbcc9"] label')
   UI_CODE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_code_9cc51ca3"] input')
+      '[data-test-id="control_code_f8abbcc9"] input')
 
   KIND_OR_NATURE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_kind_nature_9cc51ca3"] label')
+      '[data-test-id="control_kind_nature_dadc232f"] label')
   DROPDOWN_KIND_OR_NATURE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_kind_nature_9cc51ca3"] select')
+      '[data-test-id="control_kind_nature_dadc232f"] select')
 
   FRAUD_RELATED = (
       By.CSS_SELECTOR,
@@ -328,33 +328,33 @@ class ModalCreateNewControl(BaseModalCreateNew):
 
   FREQUENCY = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_frequency_9cc51ca3"] label')
+      '[data-test-id="control_frequency_fb20318a"] label')
   DROPDOWN_FREQUENCY = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_frequency_9cc51ca3"] select')
+      '[data-test-id="control_frequency_fb20318a"] select')
 
   ASSERTIONS = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_assertions_9cc51ca3"] label')
+      '[data-test-id="control_assertions_5d8b7f7a"] label')
   SELECTABLE_ASSERTIONS = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_assertions_9cc51ca3"] select')
+      '[data-test-id="control_assertions_5d8b7f7a"] select')
 
   PRINCIPAL_ASSESSOR = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_primary_assessor_9cc51ca3"] label')
+      '[data-test-id="control_primary_assessor_f7379330"] label')
   SECONDARY_ASSESSOR = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_secondary_assessor_9cc51ca3"] label')
+      '[data-test-id="control_secondary_assessor_b9439af6"] label')
 
   OWNER = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_owner_9cc51ca3"] label')
+      '[data-test-id="control_owner_587d12d6"] label')
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
 
   PRIMARY_CONTACT = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_contacts_9cc51ca3"] '
+      '[data-test-id="control_contacts_8bd3d8c7"] '
       '.row-fluid:nth-child(1) label')
   UI_PRIMARY_CONTACT = (
       By.CSS_SELECTOR,
@@ -362,7 +362,7 @@ class ModalCreateNewControl(BaseModalCreateNew):
 
   SECONDARY_CONTACT = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_contacts_9cc51ca3"] '
+      '[data-test-id="control_contacts_8bd3d8c7"] '
       '.row-fluid:nth-child(2) label')
   UI_SECONDARY_CONTACT = (
       By.CSS_SELECTOR,
@@ -370,64 +370,64 @@ class ModalCreateNewControl(BaseModalCreateNew):
 
   CONTROL_URL = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_control_url-label_9cc51ca3"]')
+      '[data-test-id="control_control_url-label_c4038873"]')
   UI_CONTROL_URL = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_control_url-input_9cc51ca3"]')
+      '[data-test-id="control_control_url-input_c4038873"]')
 
   REFERENCE_URL = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_reference_url-label_9cc51ca3"]')
+      '[data-test-id="control_reference_url-label_8931063d"]')
   UI_REFERENCE_URL = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_reference_url-input_9cc51ca3"]')
+      '[data-test-id="control_reference_url-input_8931063d"]')
 
   SIGNIFICANCE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_significance_9cc51ca3"] label')
+      '[data-test-id="control_significance_18f15545"] label')
   DROPDOWN_SIGNIFICANCE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_significance_9cc51ca3"] select')
+      '[data-test-id="control_significance_18f15545"] select')
 
   TYPE_OR_MEANS = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_type_means_9cc51ca3"] label')
+      '[data-test-id="control_type_means_2ffa1b64"] label')
   DROPDOWN_TYPE_OR_MEANS = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_type_means_9cc51ca3"] select')
+      '[data-test-id="control_type_means_2ffa1b64"] select')
 
   CATEGORIES = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_categories_9cc51ca3"] label')
+      '[data-test-id="control_categories_1eb33246"] label')
   SELECTABLE_CATEGORIES = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_categories_9cc51ca3"] select')
+      '[data-test-id="control_categories_1eb33246"] select')
 
   STATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_state_9cc51ca3"] label')
+      '[data-test-id="control_state_5d184456"] label')
   DROPDOWN_STATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_state_9cc51ca3"] select')
+      '[data-test-id="control_state_5d184456"] select')
 
   UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] iframe')
 
   EFFECTIVE_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_effective_date_2502b7b2"] '
+      '[data-test-id="control_effective_date_0376cf90"] '
       '.datepicker__input')
   DATEPICKER_EFFECTIVE_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_effective_date_2502b7b2"] '
+      '[data-test-id="control_effective_date_0376cf90"] '
       '[data-handler="selectDay"]')
 
   STOP_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_end_date_2502b7b2"] '
+      '[data-test-id="control_end_date_91ec027a"] '
       '.datepicker__input')
   DATEPICKER_STOP_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_end_date_2502b7b2"] '
+      '[data-test-id="control_end_date_91ec027a"] '
       '[data-handler="selectDay"]')
 
   # buttons
