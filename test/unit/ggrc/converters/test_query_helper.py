@@ -18,6 +18,8 @@ class TestQueryHelper(unittest.TestCase):
       complex query
       invalid complex query
     """
+    # pylint: disable=protected-access
+    # needed for testing protected function inside the query helper
     query = mock.MagicMock()
     helper = query_helper.QueryHelper(query)
 
@@ -57,4 +59,4 @@ class TestQueryHelper(unittest.TestCase):
     ]
 
     for expected_result, expression in expressions:
-      self.assertEqual(expected_result, helper.expression_keys(expression))
+      self.assertEqual(expected_result, helper._expression_keys(expression))
