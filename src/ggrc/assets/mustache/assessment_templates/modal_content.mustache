@@ -247,7 +247,7 @@
                     </li>
                     {{#fields}}
                       {{^if _pending_delete}}
-                          <li class="row-fluid{{#new_object_form}} sortable-item{{/new_object_form}}" {{data 'field'}}>
+                          <li class="row-fluid sortable-item" {{data 'field'}}>
                               <template-field field="." fields="fields"></template-field>
                           </li>
                       {{/if _pending_delete}}
