@@ -205,6 +205,21 @@ code_style_tests () {
 
   print_line
 
+  echo "Running misspell"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    make misspell
+  " && misspell_rc=$? || misspell_rc=$?
+
+  if [[ misspell_rc -eq 0 ]]; then
+    echo "PASS"
+    misspell_error=''
+  else
+    echo "FAIL"
+    misspell_error='<error type="misspell" message="Misspell error"></error>'
+  fi
+
+  print_line
+
   teardown $PROJECT
 
   echo '<?xml version="1.0" encoding="UTF-8"?>
@@ -212,10 +227,11 @@ code_style_tests () {
   <testcase classname="pylint.pylint" name="pylint" time="0">'$pylint_error'</testcase>
   <testcase classname="flake8.flake8" name="flake8" time="0">'$flake8_error'</testcase>
   <testcase classname="eslint.eslint" name="eslint" time="0">'$eslint_error'</testcase>
+  <testcase classname="misspell.misspell" name="misspell" time="0">'$misspell_error'</testcase>
 </testsuite>' > test/lint.xml
 
   print_line
-  return $((pylint_rc * pylint_rc + flake_rc * flake_rc + eslint_rc * eslint_rc))
+  return $((pylint_rc * pylint_rc + flake_rc * flake_rc + eslint_rc * eslint_rc + misspell_rc * misspell_rc))
 }
 
 
@@ -252,6 +268,14 @@ checkstyle_tests () {
   docker exec -i ${PROJECT}_dev_1 su vagrant -c "
     source /vagrant/bin/init_vagrant_env
     flake8 --config setup.cfg src/ test/ > test/flake8.out
+  " || true
+
+  print_line
+
+  echo "Running misspell"
+  docker exec -i ${PROJECT}_dev_1 su vagrant -c "
+    source /vagrant/bin/init_vagrant_env
+    make misspell
   " || true
 
   print_line
