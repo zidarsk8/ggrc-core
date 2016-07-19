@@ -28,6 +28,7 @@
       onSelect: function (val, ev) {
         this.attr('_date', val);
         this.attr('date', val);
+        this.attr('isShown', false);
       },
       onFocus: function (el, ev) {
         this.attr('showTop', false);
