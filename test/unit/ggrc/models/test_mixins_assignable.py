@@ -5,7 +5,7 @@
 
 import unittest
 
-from ggrc.models.mixins_assignable import Assignable
+from ggrc.models.mixins.assignable import Assignable
 
 
 class DummyAssignable(Assignable):

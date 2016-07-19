@@ -8,11 +8,11 @@ from sqlalchemy.orm import attributes
 from ggrc import db
 from ggrc.models import computed_property
 from ggrc.models import mixins
-from ggrc.models import mixins_assignable
 from ggrc.models import object_document
 from ggrc.models import object_person
 from ggrc.models import relationship
 from ggrc.models import Request
+from ggrc.models.mixins import assignable
 
 from unit.ggrc.models import test_mixins_base
 
@@ -23,7 +23,7 @@ class TestRequestMixins(test_mixins_base.TestMixinsBase):
   def setUp(self):
     self.model = Request
     self.included_mixins = [
-        mixins_assignable.Assignable,
+        assignable.Assignable,
         mixins.Base,
         mixins.CustomAttributable,
         mixins.Described,

@@ -6,20 +6,20 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from ggrc.models import mixins_reminderable
-from ggrc.models import mixins_statusable
 from ggrc.models import reflection
 from ggrc.models.audit import Audit
 from ggrc.models.comment import Commentable
-from ggrc.models.mixin_autostatuschangable import AutoStatusChangable
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import FinishedDate
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import VerifiedDate
+from ggrc.models.mixins import reminderable
+from ggrc.models.mixins import statusable
+from ggrc.models.mixins.assignable import Assignable
+from ggrc.models.mixins.autostatuschangable import AutoStatusChangable
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins_assignable import Assignable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import PublishOnly
@@ -61,10 +61,10 @@ class AuditRelationship(object):
     ).exists()
 
 
-class Assessment(mixins_statusable.Statusable, AuditRelationship,
+class Assessment(statusable.Statusable, AuditRelationship,
                  AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, Documentable, Commentable, Personable,
-                 mixins_reminderable.Reminderable, Timeboxed,
+                 reminderable.Reminderable, Timeboxed,
                  Relatable, FinishedDate, VerifiedDate,
                  BusinessObject, db.Model):
   """Class representing Assessment.
@@ -82,9 +82,9 @@ class Assessment(mixins_statusable.Statusable, AuditRelationship,
   REMINDERABLE_HANDLERS = {
       "statusToPerson": {
           "handler":
-              mixins_reminderable.Reminderable.handle_state_to_person_reminder,
+              reminderable.Reminderable.handle_state_to_person_reminder,
           "data": {
-              mixins_statusable.Statusable.START_STATE: "Assessor",
+              statusable.Statusable.START_STATE: "Assessor",
               "In Progress": "Assessor"
           },
           "reminders": {"assessment_assessor_reminder", }
