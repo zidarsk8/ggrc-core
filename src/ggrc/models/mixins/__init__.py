@@ -507,7 +507,7 @@ class Slugged(Base):
       "slug": {
           "display_name": "Code",
           "description": ("Must be unique. Can be left empty for "
-                          "autogeneration. If updating or deleting, "
+                          "auto generation. If updating or deleting, "
                           "code is required"),
       }
   }
