@@ -31,10 +31,11 @@ class QueryHelper(object):
   query object = [
     {
       object_name: search class name,
+      permissions: either read or update, if none are given it defaults to read
       filters: {
         relevant_filters:
           these filters will return all ids of the "search class name" object
-          that are mapped to objects defined in the dictionary insde the list.
+          that are mapped to objects defined in the dictionary inside the list.
           [ list of filters joined by OR expression
             [ list of filters joined by AND expression
               {
@@ -297,8 +298,12 @@ class QueryHelper(object):
     filter_expression = build_expression(expression)
     if filter_expression is not None:
       query = query.filter(filter_expression)
-    object_ids = [o.id for o in query if permissions.is_allowed_read_for(o)]
-    return object_ids
+    requested_permissions = object_query.get("permissions", "read")
+    if requested_permissions == "update":
+      ids = [o.id for o in query if permissions.is_allowed_update_for(o)]
+    else:
+      ids = [o.id for o in query if permissions.is_allowed_read_for(o)]
+    return ids
 
   def _slugs_to_ids(self, object_name, slugs):
     object_class = self.object_map.get(object_name)
