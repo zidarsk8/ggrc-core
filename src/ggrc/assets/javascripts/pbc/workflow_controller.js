@@ -6,80 +6,9 @@
 (function (can, $, Permission) {
   can.Control('GGRC.Controllers.PbcWorkflows', {}, {
     '{CMS.Models.AssessmentTemplate} updated': function (model, ev, instance) {
-      var self = this;
-      var attrDfd;
-      var delDfds;
-      var resolveDfd;
-      var definitions = instance.custom_attribute_definitions;
-
-      if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
-        return;
-      }
-
-      // First remove CAD
-      delDfds = _.chain(definitions)
-        .filter(function (attr) {
-          return attr.id && attr._pending_delete;
-        })
-        .map(function (attr) {
-          return attr.reify().refresh().then(function (attr) {
-            return attr.destroy();
-          });
-        }).value();
-
-      resolveDfd = $.when.apply($, delDfds).then(function () {
-        attrDfd = _.chain(definitions)
-          .filter(function (attr) {
-            return !attr._pending_delete;
-          })
-          .map(function (attr) {
-            var CADefinition = CMS.Models.CustomAttributeDefinition;
-            var params = self._buildParams(instance, attr);
-
-            if (attr.id) {
-              return CADefinition.findOne({
-                id: attr.id
-              }).then(function (definition) {
-                definition.attr(params);
-                return definition.save();
-              });
-            }
-            return new CADefinition(params).save();
-          }).value();
-
-        return $.when.apply($, attrDfd);
-      }).then(function () {
-        // Make sure instance.custom_attribute_definitions cache is cleared
-        instance.custom_attribute_definitions.splice(0,
-            instance.custom_attribute_definitions.length);
-      });
-
-      instance.delay_resolving_save_until(resolveDfd);
-    },
-    '{CMS.Models.AssessmentTemplate} created': function (model, ev, instance) {
-      if (!(instance instanceof CMS.Models.AssessmentTemplate)) {
-        return;
-      }
-
-      this._after_pending_joins(instance, function () {
-        var auditDfd;
-        var attrDfd;
-        var definitions = instance.custom_attribute_definitions;
-
-        auditDfd = this._create_relationship(instance,
-            instance.audit, instance.audit.context);
-        attrDfd = $.map(definitions, function (attr, i) {
-          if (attr._pending_delete) {
-            return;
-          }
-          return new CMS.Models.CustomAttributeDefinition(can.extend({
-            definition_id: instance.id,
-            definition_type: 'assessment_template',
-            context: instance.context
-          }, attr.serialize())).save();
-        });
-        instance.delay_resolving_save_until($.when(auditDfd, attrDfd));
-      }.bind(this));
+      // Make sure instance.custom_attribute_definitions cache is cleared
+      instance.custom_attribute_definitions.splice(0,
+        instance.custom_attribute_definitions.length);
     },
     '{CMS.Models.Issue} created': function (model, ev, instance) {
       var auditDfd;
@@ -171,24 +100,6 @@
         destination: destination,
         context: context
       }).save();
-    },
-    _buildParams: function (instance, attr) {
-      var cached = instance._cachedCADefinitions[attr.id];
-      var params = can.extend({
-        definition_id: instance.id,
-        definition_type: 'assessment_template',
-        context: instance.context
-      }, attr.serialize());
-      /**
-       * Temporary solution and after updated the backend it need to be deleted
-       * Start deprecated block
-       */
-      params.mandatory = cached.mandatory;
-      params.multi_choice_mandatory = cached.multi_choice_mandatory;
-      /**
-       * End deprecated block
-       */
-      return params;
     }
   });
 
