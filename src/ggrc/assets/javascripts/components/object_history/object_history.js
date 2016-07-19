@@ -24,9 +24,6 @@
       isLoading: true
     },
 
-    // the type of the object the component is operating on
-    _INSTANCE_TYPE: null,
-
     _DATE_FIELDS: Object.freeze({
       created_at: 1,
       updated_at: 1,
@@ -57,8 +54,6 @@
      */
     init: function (element, options) {
       var setUp = function () {
-        this._INSTANCE_TYPE = this.scope.instance.type;
-
         this._fetchRevisionsData(
           this.scope.instance
         ).then(
@@ -441,14 +436,20 @@
      *         - newVal: the attribute's new (modified) value
      */
     _mappingChange: function (revision, chain) {
-      var object = revision.destination_type === this._INSTANCE_TYPE ?
-                   revision.source : revision.destination;
+      var object;
       var displayName;
       var displayType;
       var fieldName;
       var origVal;
       var newVal;
       var previous;
+
+      if (revision.destination_type === this.scope.instance.type &&
+        revision.destination_id === this.scope.instance.id) {
+        object = revision.source;
+      } else {
+        object = revision.destination;
+      }
 
       if (object instanceof can.Stub) {
         object = object.reify();
