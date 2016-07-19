@@ -23,6 +23,9 @@
       can-value="_date"
       can-focus="onFocus"
     >
-    <div class="datepicker__calendar {{#isHidden}}hide{{/isHidden}}"></div>
+    <div
+      class="datepicker__calendar {{#showTop}}datepicker__calendar--top{{/showTop}}
+      {{#isHidden}}hide{{/isHidden}}"
+    ></div>
   </div>
 </div>

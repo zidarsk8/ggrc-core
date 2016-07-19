@@ -15,6 +15,13 @@
 .datepicker__calendar {
   position: absolute;
   z-index: zIndex(ui-autocomplete);
+  &.datepicker__calendar--top {
+    bottom: 54px;
+  }
+}
+
+.datepicker__input {
+  margin-bottom: 0;
 }
 
 .datepicker__input-wrapper {

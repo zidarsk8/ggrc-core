@@ -30,7 +30,12 @@
         this.attr('date', val);
       },
       onFocus: function (el, ev) {
+        this.attr('showTop', false);
         this.attr('isShown', true);
+
+        if (!GGRC.Utils.inViewport(this.picker)) {
+          this.attr('showTop', true);
+        }
       }
     },
     init: function (el, options) {
