@@ -71,11 +71,12 @@ class CustomAttributable(object):
     if not hasattr(self, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
       return
 
-    db.session.query(CADef).filter(
-        CADef.definition_id == self.id,
-        CADef.definition_type == self._inflector.table_singular
-    ).delete()
-    db.session.commit()
+    if self.id is not None:
+      db.session.query(CADef).filter(
+          CADef.definition_id == self.id,
+          CADef.definition_type == self._inflector.table_singular
+      ).delete()
+      db.session.commit()
 
     for definition in definitions:
       if "_pending_delete" in definition and definition["_pending_delete"]:
