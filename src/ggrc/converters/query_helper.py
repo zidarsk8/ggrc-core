@@ -9,6 +9,7 @@ from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
 
+from ggrc.rbac import permissions
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
@@ -296,7 +297,7 @@ class QueryHelper(object):
     filter_expression = build_expression(expression)
     if filter_expression is not None:
       query = query.filter(filter_expression)
-    object_ids = [o.id for o in query.all()]
+    object_ids = [o.id for o in query if permissions.is_allowed_read_for(o)]
     return object_ids
 
   def _slugs_to_ids(self, object_name, slugs):
