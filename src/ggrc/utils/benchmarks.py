@@ -18,7 +18,9 @@ class BenchmarkContextManager(object):
   This should be used used on appengine instances and by default on dev
   instances.
   """
-  # pylint: disable=too-few-public-methods
+  # pylint: disable=too-few-public-methods,unused-argument
+  # unused arguments is for kwargs that has to be in the init so that all
+  # benchmark context managers are compatible. See DebugBenchmark init.
 
   def __init__(self, message, **kwargs):
     self.message = message
@@ -70,6 +72,7 @@ class DebugBenchmark(object):
   """
 
   _depth = 0
+  PRINT_TREE = False
   PREFIX = "|   "
   COMPACT_FORM = "{prefix}{last:.4f}"
   FULL_FORM = ("{prefix}current: {last:.4f} - max: {max:.4f} - min: "
@@ -82,8 +85,11 @@ class DebugBenchmark(object):
 
   STATS = {
       "all": _all_stats,
+      "only": _all_stats,
       "last": _stats,
+      "only_last": _stats,
   }
+
   _summary = "all"
 
   def __init__(self, message, func_name=None, form=COMPACT_FORM, quiet=False):
@@ -102,7 +108,7 @@ class DebugBenchmark(object):
     self.quiet = quiet
     self.form = form
     self.start = 0
-    if func_name is None:
+    if func_name is None and self._summary in {"all", "last"}:
       curframe = inspect.currentframe()
       calframe = inspect.getouterframes(curframe, 0)
       func_name = calframe[1][3]
@@ -110,7 +116,7 @@ class DebugBenchmark(object):
 
   def __enter__(self):
     """Start the benchmark timer."""
-    if not self.quiet:
+    if not self.quiet and self._summary in {"all", "last"}:
       msg = "{}{}: {}".format(
           self.PREFIX * DebugBenchmark._depth, self.func_name, self.message)
       logging.info(msg)
@@ -128,7 +134,7 @@ class DebugBenchmark(object):
     duration = time.time() - self.start
     DebugBenchmark._depth -= 1
     self.update_stats(duration)
-    if not self.quiet:
+    if not self.quiet and self._summary in {"all", "last"}:
       msg = self.form.format(
           prefix=self.PREFIX * DebugBenchmark._depth,
           **self._stats[self.message]
@@ -181,6 +187,18 @@ class DebugBenchmark(object):
 
   @classmethod
   def set_summary(cls, summary):
+    """Set the summary type for the benchmark context manager.
+
+    Three valid summary types are:
+      all - print all steps and summary of entire history.
+      last - print all steps and summary of the last request.
+      only - print only summary of entire history on each request, the tree
+        of execution steps will be hidden.
+      only_last - print only summary of last request, the tree of execution
+        steps will be hidden.
+
+    If an invalid parameter is set, stats will not be updated.
+    """
     if summary.lower() in cls.STATS:
       cls._summary = summary.lower()
 
