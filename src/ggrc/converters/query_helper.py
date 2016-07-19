@@ -303,6 +303,13 @@ class QueryHelper(object):
       ids = [o.id for o in query if permissions.is_allowed_update_for(o)]
     else:
       ids = [o.id for o in query if permissions.is_allowed_read_for(o)]
+
+    if "limit" in object_query:
+      try:
+        from_, to_ = object_query["limit"]
+        ids = ids[from_: to_]
+      except:
+        raise BadQueryException("Bad query: Invalid limit operand.")
     return ids
 
   def _slugs_to_ids(self, object_name, slugs):
