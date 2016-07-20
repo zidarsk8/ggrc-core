@@ -27,7 +27,7 @@ import ggrc.builder.json
 import ggrc.models
 from flask.ext.sqlalchemy import Pagination
 from ggrc import db, utils
-from ggrc.utils import as_json, UnicodeSafeJsonWrapper, benchmark
+from ggrc.utils import as_json, benchmark
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.login import get_current_user_id, get_current_user
@@ -796,7 +796,7 @@ class Resource(ModelView):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
-    src = UnicodeSafeJsonWrapper(self.request.json)
+    src = self.request.json
     with benchmark("Query update permissions"):
       if not permissions.is_allowed_update(
           self.model.__name__, obj.id, obj.context_id)\
@@ -1220,8 +1220,7 @@ class Resource(ModelView):
         for src in body:
           try:
             src_res = None
-            src_res = self.collection_post_step(
-                UnicodeSafeJsonWrapper(src), no_result)
+            src_res = self.collection_post_step(src, no_result)
             db.session.commit()
             if running_async:
               time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)

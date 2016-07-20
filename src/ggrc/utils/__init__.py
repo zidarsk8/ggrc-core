@@ -35,22 +35,6 @@ class GrcEncoder(json.JSONEncoder):
       return super(GrcEncoder, self).default(obj)
 
 
-class UnicodeSafeJsonWrapper(dict):
-
-  """JSON received via POST has keys as unicode. This makes get work with plain
-  `str` keys.
-  """
-
-  def __getitem__(self, key):
-    ret = self.get(key)
-    if ret is None:
-      raise KeyError(key)
-    return ret
-
-  def get(self, key, default=None):
-    return super(UnicodeSafeJsonWrapper, self).get(unicode(key), default)  # noqa
-
-
 def as_json(obj, **kwargs):
   return json.dumps(obj, cls=GrcEncoder, **kwargs)
 
