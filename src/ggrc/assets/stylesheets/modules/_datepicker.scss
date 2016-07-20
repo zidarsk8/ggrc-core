@@ -20,8 +20,13 @@
   }
 }
 
-.datepicker__input {
+.modal .datepicker__input {
+  @extend %border-box;
+  max-width: 100%;
+  width: 100% !important;
   margin-bottom: 0;
+  // This is not good, but our global inputs have fixed height and paddings
+  height: 26px !important;
 }
 
 .datepicker__input-wrapper {

@@ -11,6 +11,10 @@
   }
 }
 
+%border-box {
+  @include box-sizing(border-box);
+}
+
 %outline-fix {
   outline:0;
 }
