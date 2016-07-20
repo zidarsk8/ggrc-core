@@ -43,8 +43,8 @@ class TestCycle(TestCase):
     next_month = date(2014, 8, 5)
     start_of_february = date(2014, 2, 1)
     end_of_february = date(2014, 2, 28)
-    december_1 = date(2014, 12, 1)
-    end_of_december = date(2014, 12, 31)
+    dec_1 = date(2014, 12, 1)
+    end_of_dec = date(2014, 12, 31)
     january_2015 = date(2015, 1, 1)
     #test 1, adjusting for the weekend
     self.assertEqual(
@@ -73,7 +73,7 @@ class TestCycle(TestCase):
     #test 4, end date rolls over to next year if day of month is before
     # start date and start date is in December
     self.assertEqual(
-      calc_end_date("monthly", december_1, end_of_december),
+      calc_end_date("monthly", dec_1, end_of_dec),
       january_2015
       )
 
