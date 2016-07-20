@@ -20,7 +20,7 @@ from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import statusable
-from ggrc.models.mixins.autostatuschangable import AutoStatusChangable
+from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins.assignable import Assignable
 from ggrc.models.object_document import Documentable
@@ -28,7 +28,7 @@ from ggrc.models.object_person import Personable
 
 
 class Request(statusable.Statusable,
-              AutoStatusChangable, Assignable, Documentable, Personable,
+              AutoStatusChangeable, Assignable, Documentable, Personable,
               CustomAttributable, relationship.Relatable, Titled, Slugged,
               Described, Commentable, FinishedDate, VerifiedDate, Base,
               db.Model):

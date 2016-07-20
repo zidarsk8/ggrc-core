@@ -18,7 +18,7 @@ from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import reminderable
 from ggrc.models.mixins import statusable
 from ggrc.models.mixins.assignable import Assignable
-from ggrc.models.mixins.autostatuschangable import AutoStatusChangable
+from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
 from ggrc.models.deferred import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
@@ -62,7 +62,7 @@ class AuditRelationship(object):
 
 
 class Assessment(statusable.Statusable, AuditRelationship,
-                 AutoStatusChangable, Assignable, HasObjectState, TestPlanned,
+                 AutoStatusChangeable, Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, Documentable, Commentable, Personable,
                  reminderable.Reminderable, Timeboxed,
                  Relatable, FinishedDate, VerifiedDate,
