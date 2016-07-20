@@ -5,93 +5,18 @@ import ggrc
 import ggrc.builder
 import ggrc.services
 import json
-import random
 import time
 from datetime import datetime
-from ggrc import db
-from ggrc.models.mixins import Base
-from ggrc.services.common import Resource
-from integration.ggrc import TestCase
 from urlparse import urlparse
 from wsgiref.handlers import format_date_time
 from nose.plugins.skip import SkipTest
-
-
-class ServicesTestMockModel(Base, ggrc.db.Model):
-  __tablename__ = 'test_model'
-  foo = db.Column(db.String)
-  code = db.Column(db.String, unique=True)
-
-  # REST properties
-  _publish_attrs = ['modified_by_id', 'foo', 'code']
-  _update_attrs = ['foo', 'code']
-
-URL_MOCK_COLLECTION = '/api/mock_resources'
-URL_MOCK_RESOURCE = '/api/mock_resources/{0}'
-Resource.add_to(
-    ggrc.app.app, URL_MOCK_COLLECTION, model_class=ServicesTestMockModel)
+from integration.ggrc import services
 
 COLLECTION_ALLOWED = ['HEAD', 'GET', 'POST', 'OPTIONS']
 RESOURCE_ALLOWED = ['HEAD', 'GET', 'PUT', 'DELETE', 'OPTIONS']
 
 
-class TestResource(TestCase):
-
-  def setUp(self):
-    super(TestResource, self).setUp()
-    # Explicitly create test tables
-    if not ServicesTestMockModel.__table__.exists(db.engine):
-      ServicesTestMockModel.__table__.create(db.engine)
-    with self.client.session_transaction() as session:
-      session['permissions'] = {
-          "__GGRC_ADMIN__": {"__GGRC_ALL__": {"contexts": [0]}}
-      }
-
-  def tearDown(self):
-    super(TestResource, self).tearDown()
-    # Explicitly destroy test tables
-    # Note: This must be after the 'super()', because the session is
-    #   closed there.  (And otherwise it might stall due to locks).
-    if ServicesTestMockModel.__table__.exists(db.engine):
-      ServicesTestMockModel.__table__.drop(db.engine)
-
-  def mock_url(self, resource=None):
-    if resource is not None:
-      return URL_MOCK_RESOURCE.format(resource)
-    return URL_MOCK_COLLECTION
-
-  def mock_json(self, model):
-    format = '%Y-%m-%dT%H:%M:%S'
-    updated_at = unicode(model.updated_at.strftime(format))
-    created_at = unicode(model.created_at.strftime(format))
-    return {
-        u'id': int(model.id),
-        u'selfLink': unicode(URL_MOCK_RESOURCE.format(model.id)),
-        u'type': unicode(model.__class__.__name__),
-        u'modified_by': {
-            u'href': u'/api/people/1',
-            u'id': model.modified_by_id,
-            u'type': 'Person',
-            u'context_id': None
-        } if model.modified_by_id is not None else None,
-        u'modified_by_id': int(model.modified_by_id),
-        u'updated_at': updated_at,
-        u'created_at': created_at,
-        u'context':
-            {u'id': model.context_id}
-            if model.context_id is not None else None,
-        u'foo': (unicode(model.foo) if model.foo else None),
-    }
-
-  def mock_model(self, id=None, modified_by_id=1, **kwarg):
-    if 'id' not in kwarg:
-      kwarg['id'] = random.randint(0, 999999999)
-    if 'modified_by_id' not in kwarg:
-      kwarg['modified_by_id'] = 1
-    mock = ServicesTestMockModel(**kwarg)
-    ggrc.db.session.add(mock)
-    ggrc.db.session.commit()
-    return mock
+class TestServices(services.TestCase):
 
   def http_timestamp(self, timestamp):
     return format_date_time(time.mktime(timestamp.utctimetuple()))
@@ -184,12 +109,12 @@ class TestResource(TestCase):
 
   def test_collection_put(self):
     self.assertAllow(
-        self.client.put(URL_MOCK_COLLECTION, headers=self.headers()),
+        self.client.put(self.mock_url(), headers=self.headers()),
         COLLECTION_ALLOWED)
 
   def test_collection_delete(self):
     self.assertAllow(
-        self.client.delete(URL_MOCK_COLLECTION, headers=self.headers()),
+        self.client.delete(self.mock_url(), headers=self.headers()),
         COLLECTION_ALLOWED)
 
   def test_collection_post_successful(self):
@@ -197,7 +122,7 @@ class TestResource(TestCase):
         {'services_test_mock_model': {'foo': 'bar', 'context': None}})
     self.client.get("/login")
     response = self.client.post(
-        URL_MOCK_COLLECTION,
+        self.mock_url(),
         content_type='application/json',
         data=data,
         headers=self.headers(),
@@ -213,7 +138,7 @@ class TestResource(TestCase):
     self.assertIn('foo', response.json['services_test_mock_model'])
     self.assertEqual('bar', response.json['services_test_mock_model']['foo'])
     # check the collection, too
-    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    response = self.client.get(self.mock_url(), headers=self.headers())
     self.assert200(response)
     self.assertEqual(
         1, len(response.json['test_model_collection']['test_model']))
@@ -225,7 +150,7 @@ class TestResource(TestCase):
         [{'services_test_mock_model': {'foo': 'bar', 'context': None}}])
     self.client.get("/login")
     response = self.client.post(
-        URL_MOCK_COLLECTION,
+        self.mock_url(),
         content_type='application/json',
         data=data,
         headers=self.headers(),
@@ -234,7 +159,7 @@ class TestResource(TestCase):
     self.assertEqual(type(response.json), list)
     self.assertEqual(len(response.json), 1)
 
-    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    response = self.client.get(self.mock_url(), headers=self.headers())
     self.assert200(response)
     self.assertEqual(
         1, len(response.json['test_model_collection']['test_model']))
@@ -248,7 +173,7 @@ class TestResource(TestCase):
     ])
     self.client.get("/login")
     response = self.client.post(
-        URL_MOCK_COLLECTION,
+        self.mock_url(),
         content_type='application/json',
         data=data,
         headers=self.headers(),
@@ -260,7 +185,7 @@ class TestResource(TestCase):
         'bar1', response.json[0][1]['services_test_mock_model']['foo'])
     self.assertEqual(
         'bar2', response.json[1][1]['services_test_mock_model']['foo'])
-    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    response = self.client.get(self.mock_url(), headers=self.headers())
     self.assert200(response)
     self.assertEqual(
         2, len(response.json['test_model_collection']['test_model']))
@@ -278,7 +203,7 @@ class TestResource(TestCase):
     ])
     self.client.get("/login")
     response = self.client.post(
-        URL_MOCK_COLLECTION,
+        self.mock_url(),
         content_type='application/json',
         data=data,
         headers=self.headers(),
@@ -290,14 +215,14 @@ class TestResource(TestCase):
         'bar1', response.json[0][1]['services_test_mock_model']['foo'])
     self.assertEqual(
         'bar2', response.json[2][1]['services_test_mock_model']['foo'])
-    response = self.client.get(URL_MOCK_COLLECTION, headers=self.headers())
+    response = self.client.get(self.mock_url(), headers=self.headers())
     self.assert200(response)
     self.assertEqual(
         2, len(response.json['test_model_collection']['test_model']))
 
   def test_collection_post_bad_request(self):
     response = self.client.post(
-        URL_MOCK_COLLECTION,
+        self.mock_url(),
         content_type='application/json',
         data='This is most definitely not valid content.',
         headers=self.headers(),
@@ -306,7 +231,7 @@ class TestResource(TestCase):
 
   def test_collection_post_bad_content_type(self):
     response = self.client.post(
-        URL_MOCK_COLLECTION,
+        self.mock_url(),
         content_type='text/plain',
         data="Doesn't matter, now does it?",
         headers=self.headers(),
@@ -369,8 +294,8 @@ class TestResource(TestCase):
     self.assertRequiredHeaders(response)
     obj = response.json
     obj['services_test_mock_model']['foo'] = 'rocks'
-    mock = ggrc.db.session.query(ServicesTestMockModel).filter(
-        ServicesTestMockModel.id == mock.id).one()
+    mock = ggrc.db.session.query(services.ServicesTestMockModel).filter(
+        services.ServicesTestMockModel.id == mock.id).one()
     mock.foo = 'dirt'
     ggrc.db.session.add(mock)
     ggrc.db.session.commit()
@@ -454,7 +379,7 @@ class TestResource(TestCase):
 
   def test_collection_get_bad_accept(self):
     response = self.client.get(
-        URL_MOCK_COLLECTION,
+        self.mock_url(),
         headers=self.headers(('Accept', 'text/plain')))
     self.assertStatus(response, 406)
     self.assertEqual('text/plain', response.headers.get('Content-Type'))
@@ -481,12 +406,12 @@ class TestResource(TestCase):
   def test_collection_get_if_non_match(self):
     self.mock_model(foo='baz')
     response = self.client.get(
-        URL_MOCK_COLLECTION,
+        self.mock_url(),
         headers=self.headers(('Accept', 'application/json')))
     self.assert200(response)
     previous_headers = dict(response.headers)
     response = self.client.get(
-        URL_MOCK_COLLECTION,
+        self.mock_url(),
         headers=self.headers(
             ('Accept', 'application/json'),
             ('If-None-Match', previous_headers['Etag']),
