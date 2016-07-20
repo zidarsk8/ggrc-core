@@ -77,7 +77,7 @@ def drop_db(use_migrations=False, quiet=False):
 
 
 def init_models(app):
-  from .all_models import all_models
+  from ggrc.models.all_models import all_models  # noqa
   [model._inflector for model in all_models]
 
 
@@ -146,7 +146,7 @@ def init_session_monitor_cache():
 
 def init_sanitization_hooks():
   # Register event listener on all String and Text attributes to sanitize them.
-  for model in all_models.all_models:
+  for model in all_models.all_models:  # noqa
     attr_info = SanitizeHtmlInfo(model)
     for attr_name in attr_info._sanitize_html:
       attr = getattr(model, attr_name)
@@ -159,4 +159,4 @@ def init_app(app):
   init_session_monitor_cache()
   init_sanitization_hooks()
 
-from .inflector import get_model  # noqa
+from ggrc.models.inflector import get_model  # noqa
