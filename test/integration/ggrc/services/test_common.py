@@ -9,7 +9,6 @@ import time
 from datetime import datetime
 from urlparse import urlparse
 from wsgiref.handlers import format_date_time
-from nose.plugins.skip import SkipTest
 from integration.ggrc import services
 
 COLLECTION_ALLOWED = ['HEAD', 'GET', 'POST', 'OPTIONS']
@@ -64,48 +63,6 @@ class TestServices(services.TestCase):
   def test_missing_resource_get(self):
     response = self.client.get(self.mock_url('foo'), headers=self.headers())
     self.assert404(response)
-
-  @SkipTest
-  def test_collection_get(self):
-    date1 = datetime(2013, 4, 17, 0, 0, 0, 0)
-    date2 = datetime(2013, 4, 20, 0, 0, 0, 0)
-    mock1 = self.mock_model(
-        modified_by_id=42, created_at=date1, updated_at=date1)
-    mock2 = self.mock_model(
-        modified_by_id=43, created_at=date2, updated_at=date2)
-    response = self.client.get(self.mock_url(), headers=self.headers())
-    self.assert200(response)
-    self.assertRequiredHeaders(
-        response,
-        {
-            'Last-Modified': self.http_timestamp(date2),
-            'Content-Type': 'application/json',
-        })
-    self.assertIn('test_model_collection', response.json)
-    self.assertEqual(2, len(response.json['test_model_collection']))
-    self.assertIn('selfLink', response.json['test_model_collection'])
-    self.assertIn('test_model', response.json['test_model_collection'])
-    collection = response.json['test_model_collection']['test_model']
-    self.assertEqual(2, len(collection))
-    self.assertDictEqual(self.mock_json(mock2), collection[0])
-    self.assertDictEqual(self.mock_json(mock1), collection[1])
-
-  @SkipTest
-  def test_resource_get(self):
-    date1 = datetime(2013, 4, 17, 0, 0, 0, 0)
-    mock1 = self.mock_model(
-        modified_by_id=42, created_at=date1, updated_at=date1)
-    response = self.client.get(self.mock_url(mock1.id), headers=self.headers())
-    self.assert200(response)
-    self.assertRequiredHeaders(
-        response,
-        {
-            'Last-Modified': self.http_timestamp(date1),
-            'Content-Type': 'application/json',
-        })
-    self.assertIn('services_test_mock_model', response.json)
-    self.assertDictEqual(self.mock_json(mock1),
-                         response.json['services_test_mock_model'])
 
   def test_collection_put(self):
     self.assertAllow(
@@ -286,77 +243,6 @@ class TestServices(services.TestCase):
     )
     self.assert400(response)
 
-  @SkipTest
-  def test_put_and_delete_conflict(self):
-    mock = self.mock_model(foo='mudder')
-    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
-    self.assert200(response)
-    self.assertRequiredHeaders(response)
-    obj = response.json
-    obj['services_test_mock_model']['foo'] = 'rocks'
-    mock = ggrc.db.session.query(services.ServicesTestMockModel).filter(
-        services.ServicesTestMockModel.id == mock.id).one()
-    mock.foo = 'dirt'
-    ggrc.db.session.add(mock)
-    ggrc.db.session.commit()
-    url = urlparse(obj['services_test_mock_model']['selfLink']).path
-    original_headers = dict(response.headers)
-    response = self.client.put(
-        url,
-        data=json.dumps(obj),
-        headers=self.headers(
-            ('If-Unmodified-Since', original_headers['Last-Modified']),
-            ('If-Match', original_headers['Etag'])
-        ),
-        content_type='application/json',
-    )
-    self.assertStatus(response, 409)
-    response = self.client.delete(
-        url,
-        headers=self.headers(
-            ('If-Unmodified-Since', original_headers['Last-Modified']),
-            ('If-Match', original_headers['Etag'])
-        ),
-        content_type='application/json',
-    )
-    self.assertStatus(response, 409)
-
-  @SkipTest
-  def test_put_and_delete_missing_precondition(self):
-    mock = self.mock_model(foo='tricky')
-    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
-    self.assert200(response)
-    obj = response.json
-    obj['services_test_mock_model']['foo'] = 'strings'
-    url = urlparse(obj['services_test_mock_model']['selfLink']).path
-    response = self.client.put(
-        url,
-        data=json.dumps(obj),
-        content_type='application/json',
-        headers=self.headers(),
-    )
-    self.assertStatus(response, 428)
-    response = self.client.delete(url, headers=self.headers())
-    self.assertStatus(response, 428)
-
-  @SkipTest
-  def test_delete_successful(self):
-    mock = self.mock_model(foo='delete me')
-    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
-    self.assert200(response)
-    url = urlparse(response.json['services_test_mock_model']['selfLink']).path
-    response = self.client.delete(
-        url,
-        headers=self.headers(
-            ('If-Unmodified-Since', response.headers['Last-Modified']),
-            ('If-Match', response.headers['Etag']),
-        ),
-    )
-    self.assert200(response)
-    response = self.client.get(url, headers=self.headers())
-    # 410 would be nice! But, requires a tombstone.
-    self.assert404(response)
-
   def test_options(self):
     mock = self.mock_model()
     response = self.client.open(
@@ -394,24 +280,6 @@ class TestServices(services.TestCase):
     previous_headers = dict(response.headers)
     response = self.client.get(
         self.mock_url(mock1.id),
-        headers=self.headers(
-            ('Accept', 'application/json'),
-            ('If-None-Match', previous_headers['Etag']),
-        ),
-    )
-    self.assertStatus(response, 304)
-    self.assertIn('Etag', response.headers)
-
-  @SkipTest
-  def test_collection_get_if_non_match(self):
-    self.mock_model(foo='baz')
-    response = self.client.get(
-        self.mock_url(),
-        headers=self.headers(('Accept', 'application/json')))
-    self.assert200(response)
-    previous_headers = dict(response.headers)
-    response = self.client.get(
-        self.mock_url(),
         headers=self.headers(
             ('Accept', 'application/json'),
             ('If-None-Match', previous_headers['Etag']),
