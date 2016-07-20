@@ -336,7 +336,7 @@
           Request: {
             mapping: "related_requests",
             child_options: [
-              _.extend({}, relatedObjectsChildOptions, {
+              _.extend({}, relatedObjectsChildOptions[0], {
                 mapping: "info_related_objects"
               })
             ],
