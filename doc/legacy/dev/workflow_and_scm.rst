@@ -68,7 +68,7 @@ General Workflow
 
          git hf feature finish
 
-    Occassionally the local branch won't be deleted and an error message will
+    Occasionally the local branch won't be deleted and an error message will
     suggest a command to delete the local branch. It should be used, as follows:
 
       .. sourcecode:: bash

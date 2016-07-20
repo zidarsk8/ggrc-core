@@ -5,7 +5,7 @@ set -o nounset
 set -o errexit
 
 project_name () {
-  # Get propper project name
+  # Get proper project name
   # args:
   #  -p: if set the project name will be the name of the repo parent folder.
   #  -d: default project name, if parent folder is not set or valid.

@@ -11,7 +11,7 @@
     return;  // no need to create the component registry again
   }
 
-  // make the registry publicly avilable
+  // make the registry publicly available
   GGRC.Components = Components;
 
   /**

@@ -33,7 +33,7 @@ environment:
 **NOTE for Windows/OSX users:** The easiest way of getting docker is by installing the
 [docker toolbox](https://www.docker.com/products/docker-toolbox).
 
-Or alternatively with our legacy vagrant environemnt:
+Or alternatively with our legacy vagrant environment:
 
 |               Prerequisite               |               Description                |
 |------------------------------------------|------------------------------------------|
@@ -133,7 +133,7 @@ make appengine_packages_zip
 The application will be accessible via this URL: <http://localhost:8080/>
 
 If you're running the Google App Engine SDK, the App Engine management console
-will be avaiable via this URL: <http://localhost:8000/>. You can login as
+will be available via this URL: <http://localhost:8000/>. You can login as
 user@example.com with admin rights and setup other users later.
 
 ## Running Tests
@@ -199,7 +199,7 @@ python /selenium/src/run_selenium.py
 
 You should also feel free to check how the `./bin/jenkins/run_selenium` script works.
 
-_NOTE: that the "ggrccore" part of the name is due to the repository parent folder name. if you have your repo in a different folder, change the first part acordingly._
+_NOTE: that the "ggrccore" part of the name is due to the repository parent folder name. if you have your repo in a different folder, change the first part accordingly._
 
 
 ## Quickstart Breakdown

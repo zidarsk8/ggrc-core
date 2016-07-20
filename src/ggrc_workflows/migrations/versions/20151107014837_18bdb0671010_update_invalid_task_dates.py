@@ -23,7 +23,7 @@ def upgrade():
 
   This is the easiest solution for solving bad dates that might have been
   imported (such as 12/31/15). We can assume that such data is not in
-  production. Setting todays date is still less wrong than having a 2000 year
+  production. Setting today's date is still less wrong than having a 2000 year
   old task that might break the app.
   """
 

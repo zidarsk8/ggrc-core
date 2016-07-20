@@ -101,9 +101,9 @@ def upgrade():
       ],
       )
 
-  # Eliminate target_context_id to get rid of possible privelege escalation
-  # where a user who has role editor priveleges in one context creates
-  # similar priveleges for themselves or others in another context
+  # Eliminate target_context_id to get rid of possible privilege escalation
+  # where a user who has role editor privileges in one context creates
+  # similar privileges for themselves or others in another context
   op.drop_column('users_roles', 'target_context_id')
 
 def downgrade():

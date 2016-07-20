@@ -71,7 +71,7 @@ class TestCycle(TestCase):
       end_of_february
       )
     #test 4, end date rolls over to next year if day of month is before
-    # start date and start date is in december
+    # start date and start date is in December
     self.assertEqual(
       calc_end_date("monthly", december_1, end_of_december),
       january_2015

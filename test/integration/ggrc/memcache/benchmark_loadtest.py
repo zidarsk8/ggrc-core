@@ -4,7 +4,7 @@
 """
  Benchmark load tests for stubs and collection
 
- The stubs for resources in benchmark such as Regulations are retreived and it is followed by a collection get. 
+ The stubs for resources in benchmark such as Regulations are retrieved and it is followed by a collection get. 
  The batch size for the collection get (batch_size) and number of test iterations (num_iterations) are
  configurable. The iterations of test allows to get consistent time for getting stubs and collection in gGRC
 

@@ -3463,7 +3463,7 @@ Mustache.registerHelper("pretty_role_name", function (name) {
 
 /*
 Add new variables to current scope. This is useful for passing variables
-to intialize a tree view.
+to initialize a tree view.
 
 Example:
   {{#add_to_current_scope example1="a" example2="b"}}

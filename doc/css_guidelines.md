@@ -14,7 +14,7 @@ Based and borrowed from [CSS Guidelines](http://cssguidelin.es/)
 
 ### Anathomy of a selector
 
-Selectors should be writen across multiple lines
+Selectors should be written across multiple lines
 
 ```
 [selector] {

@@ -103,7 +103,7 @@ class TestBacklogWorkflow(TestCase):
 
   @mock.patch('ggrc_basic_permissions.get_current_user')
   def test_permissions_for_backlog_workflow(self, mock_get_current_user):  # noqa # pylint: disable=invalid-name
-    """Tests whether the creator has all the neccessary permissions for
+    """Tests whether the creator has all the necessary permissions for
     backlog workflow."""
 
     my_person = Person(name="kekec", email="abc@abc.com")

@@ -321,7 +321,7 @@
         if (action === google.picker.Action.PICKED) {
           dfd.resolve(CMS.Models.GDriveFile.models(data[google.picker.Response.DOCUMENTS]));
         } else if (action === google.picker.Action.CANCEL) {
-          dfd.reject('action cancelled');
+          dfd.reject('action canceled');
         }
       }
       return dfd.promise();

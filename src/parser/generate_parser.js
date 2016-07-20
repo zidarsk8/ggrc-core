@@ -7,7 +7,7 @@
 /*
 Script used to generate ggrc_filter_query_parser.js 
 
--- updating dev enviroment by running: 
+-- updating dev environment by running: 
 
   vagrant provision 
 

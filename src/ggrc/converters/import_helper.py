@@ -79,7 +79,7 @@ def extract_relevant_data(csv_data):
 
 
 def equalize_array(array):
-  """ Expand all rows of 2D array to the same lenght """
+  """ Expand all rows of 2D array to the same length """
   if len(array) == 0:
     return array
   max_length = max(map(len, array))

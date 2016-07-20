@@ -39,7 +39,7 @@ class AutoStatusChangable(object):
     Date fields are always interpreted as changed because incoming data is
     of type datetime.datetime, while database field has type datetime.date.
 
-    This function normalises this and performs the correct check.
+    This function normalizes this and performs the correct check.
 
     Args:
       attr: (datetime.date|datetime.datetime) Attribute value
@@ -86,7 +86,7 @@ class AutoStatusChangable(object):
 
   @classmethod
   def init(cls, model):
-    """Initialisation method to run after models have been initialised.
+    """Initialisation method to run after models have been initialized.
 
     Args:
       model: (db.Model class) Class on which to run set_handlers method.

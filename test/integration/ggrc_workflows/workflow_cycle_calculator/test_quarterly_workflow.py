@@ -510,7 +510,7 @@ class TestQuarterlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
       self.assertEqual(cycle.end_date, datetime.date(2015, 9, 4))
 
   def test_too_long_month(self):
-    """Test too big date behaviour
+    """Test too big date behavior
 
     Test round down if the month doesn't have enough days (e.g. February)
 
@@ -1059,7 +1059,7 @@ class TestQuarterlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
                        datetime.date(2016, 7, 13))
 
   def test_multiple_tgs_multiple_tasks_multiple_quarters_future(self):
-    """Test behaviour of multiple task groups with multiple tasks
+    """Test behavior of multiple task groups with multiple tasks
     spread across multiple quarters
 
     Task group  | Tasks | Start day           | End day
@@ -1148,7 +1148,7 @@ class TestQuarterlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         self.assertEqual(active_wf.next_cycle_start_date, datetime.date(*ncsd))
 
   def test_multiple_tgs_multiple_tasks_multiple_quarters_in_middle(self):
-    """Test behaviour of multiple task groups with multiple tasks
+    """Test behavior of multiple task groups with multiple tasks
     spread across multiple quarters
 
     Task group  | Tasks | Start day           | End day
@@ -1233,7 +1233,7 @@ class TestQuarterlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         self.assertEqual(active_wf.next_cycle_start_date, datetime.date(*ncsd))
 
   def test_multiple_tgs_multiple_ts_multiple_quarts_last_quarter_middle(self):
-    """Test behaviour of multiple task groups with multiple tasks spread
+    """Test behavior of multiple task groups with multiple tasks spread
     across multiple quarters
 
     Task group  | Tasks | Start day           | End day
@@ -1321,7 +1321,7 @@ class TestQuarterlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
                        datetime.date(2016, 8, 1))
 
   def test_multiple_tgs_multiple_ts_multiple_quarts_last_quarter_past(self):
-    """Test behaviour of multiple task groups with multiple tasks spread
+    """Test behavior of multiple task groups with multiple tasks spread
     across multiple quarters
 
     Task group  | Tasks | Start day           | End day
@@ -1404,7 +1404,7 @@ class TestQuarterlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
 
   def test_multiple_tgs_multiple_ts_multiple_quarts_ts_in_reverse_order(self):
     """
-    Test behaviour of multiple task groups with multiple tasks spread
+    Test behavior of multiple task groups with multiple tasks spread
     across multiple quarters in reverse oreder
 
     Task group  | Tasks | Start day           | End day
@@ -1492,7 +1492,7 @@ class TestQuarterlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         self.assertEqual(active_wf.next_cycle_start_date, datetime.date(*ncsd))
 
   def test_tasks_multi_quarter_manual_start(self):
-    """Test behaviour of multiple tasks spread across multiple quarters and
+    """Test behavior of multiple tasks spread across multiple quarters and
     with manual cycle generation
 
     Task group  | Tasks | Start day           | End day
@@ -1591,7 +1591,7 @@ class TestQuarterlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         self.assertEqual(active_wf.next_cycle_start_date, datetime.date(*ncsd))
 
   def test_tasks_multi_quarter_span_generate_on_date(self):
-    """Test behaviour of multiple tasks spread across multiple quarters and
+    """Test behavior of multiple tasks spread across multiple quarters and
     with on-date task generation
 
     Task group  | Tasks | Start day           | End day

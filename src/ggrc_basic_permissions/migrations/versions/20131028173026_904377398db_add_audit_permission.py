@@ -202,11 +202,11 @@ def upgrade():
       'ProgramDirective',
       'Relationship',
       ])
-  #create join table for infered permissions
+  #create join table for inferred permissions
   #define auditor role
-  #define program owner priveleges for audit context
-  #define program editor priveleges for audit context
-  #define program reader priveleges for audit context
+  #define program owner privileges for audit context
+  #define program editor privileges for audit context
+  #define program reader privileges for audit context
   #set_audit_permissions([
       #'Audit',
       #'Request',

@@ -100,7 +100,7 @@ def add_cycle_task_notifications(obj, start_notif_type=None):
 
 def add_cycle_task_reassigned_notification(obj):
   """Add or update notifications for reassigned cycle tasks."""
-  # check if the current assignee allready got the first notification
+  # check if the current assignee already got the first notification
   result = db.session.query(Notification)\
       .join(NotificationType)\
       .filter(and_(Notification.object_id == obj.id,  # noqa
