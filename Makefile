@@ -134,7 +134,7 @@ golang_packages :
 setup_dev : dev_virtualenv_packages linked_packages golang_packages
 
 misspell :
-	find src -name '*' | xargs $(GOLANG_PACKAGES)/misspell -error
+	find . -type f -name "*" ! -path "*/.*" ! -path "./node_modules/*" ! -path "./tmp/*" ! -path "./third_party/*" ! -path "./*.sql" ! -path "./*.ini"| xargs $(GOLANG_PACKAGES)/misspell -error -locale US
 
 ## Deployment!
 
