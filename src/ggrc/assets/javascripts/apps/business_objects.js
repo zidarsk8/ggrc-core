@@ -237,12 +237,6 @@
       //     { Objective: { Person: false } }
       overridden_models = {
         Program: {
-          //  Objective: false
-          //, Control: false
-          //, Regulation: false
-          //, Policy: false
-          //, Standard: false
-          //, Contract: false
         },
         all: {
           Document: false
@@ -271,6 +265,13 @@
           }
         },
         business_objects: {
+          Audit: {
+            mapping: 'related_audits',
+            draw_children: true,
+            child_options: relatedObjectsChildOptions,
+            allow_mapping: true,
+            add_item_view: path + '/audits/tree_add_item.mustache'
+          },
           AccessGroup: {
             mapping: "related_access_groups",
             child_options: relatedObjectsChildOptions,
@@ -329,7 +330,7 @@
           Request: {
             mapping: "related_requests",
             child_options: [
-              _.extend({}, relatedObjectsChildOptions, {
+              _.extend({}, relatedObjectsChildOptions[0], {
                 mapping: "info_related_objects"
               })
             ],
@@ -688,7 +689,6 @@
         Person: {
           _mixins: ["issues"],
           Request: {
-            //mapping: "open_audit_requests",
             mapping: (/^\/objectBrowser\/?$/.test(window.location.pathname)) ?
               "all_open_audit_requests" : "open_audit_requests",
             draw_children: true,
@@ -834,7 +834,7 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             header_view:
-              path + '/assessments/tree_header.mustache',
+              path + '/assessments/tree_header.mustache'
           }
         }
       });
@@ -891,7 +891,6 @@
             content_controller_options: extra_content_controller_options[object.constructor.shortName][model_name]
           });
         }
-
         widget_list.add_widget(object.constructor.shortName, widget_id, descriptor);
       });
     }
