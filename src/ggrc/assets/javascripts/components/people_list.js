@@ -334,22 +334,6 @@
         * @param {Object} ev - click event handler
         */
       remove_role: function (parentScope, el, ev) {
-        /* FIXME: The current implementation does not do role reassignment
-         * correctly.
-         *
-         * What needs to happen is we need to look at the diff between the
-         * previous state and the new state and send the requests for each user
-         * (=relationship) based on the following rules:
-         *
-         * For each of user (= each relationship objects) we need to do the
-         * following check:
-         * 1. If the user did not have any roles before the edit, but now has
-         * at least one role, we need to send a POST request
-         * 2. If the user had roles, but the roles have now changed, we need to
-         * send a PUT request
-         * 3. If the user had roles, but now doesn't have them anymore, we need
-         * to send a DELETE request
-         */
         var person = CMS.Models.Person.findInCacheById(el.data('person'));
         var instance = this.instance;
         var roleToRemove = can.capitalize(this.attr('type'));
