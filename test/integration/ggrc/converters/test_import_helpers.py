@@ -162,8 +162,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         should have the field field_name set to true.
     """
     definitions = get_object_column_definitions(obj_class)
-    definition_fields = {val["display_name"] for val in definitions.itervalues()
-                        if val.get(field_name)}
+    definition_fields = {
+        val["display_name"] for val in definitions.itervalues()
+        if val.get(field_name)
+    }
     self.assertEqual(definition_fields, expected)
 
   def _test_single_object(self, obj_class, names, expected_fields,
