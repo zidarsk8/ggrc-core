@@ -2,15 +2,30 @@
   Copyright (C) 2016 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-
-<div class="datepicker__wrapper">
-  <i class="fa fa-calendar"></i>
-  <input
-    placeholder="{{pattern}}"
-    type="text"
-    class="datepicker__input date"
-    can-value="date"
-    can-focus="onFocus"
-  >
-  <div class="datepicker__calendar {{#isHidden}}hidden{{/isHidden}}"></div>
+<div class="datepicker__wrapper" {{#testId}}data-test-id="{{testId}}"{{/testId}}>
+  {{#label}}
+    <label>
+      {{label}}
+      {{#helptext}}
+        <i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>
+      {{/helptext}}
+      {{#required}}
+        <span class="required">*</span>
+      {{/required}}
+    </label>
+  {{/label}}
+  <div class="datepicker__input-wrapper">
+    <i class="fa fa-calendar"></i>
+    <input
+      placeholder="{{pattern}}"
+      type="text"
+      class="datepicker__input date"
+      can-value="_date"
+      can-focus="onFocus"
+    >
+    <div
+      class="datepicker__calendar {{#showTop}}datepicker__calendar--top{{/showTop}}
+      {{#isHidden}}hide{{/isHidden}}"
+    ></div>
+  </div>
 </div>

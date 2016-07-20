@@ -61,11 +61,11 @@ class ProgramsModal(BaseModal):
         self._driver, self._locators.UI_REFERENCE_URL)
     self.ui_effective_date = base.DatePicker(
         self._driver,
-        self._locators.DATE_PICKER,
+        self._locators.EFFECTIVE_DATE_DATEPICKER,
         self._locators.UI_EFFECTIVE_DATE)
     self.ui_stop_date = base.DatePicker(
         self._driver,
-        self._locators.DATE_PICKER,
+        self._locators.STOP_DATE_DATEPICKER,
         self._locators.UI_STOP_DATE)
 
     # static elements

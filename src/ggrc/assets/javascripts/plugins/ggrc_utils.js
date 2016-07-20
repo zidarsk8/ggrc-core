@@ -8,6 +8,19 @@
    * A module containing various utility functions.
    */
   GGRC.Utils = {
+    win: window,
+    inViewport: function (el) {
+      var bounds;
+      var isVisible;
+
+      el = el instanceof jQuery ? el[0] : el;
+      bounds = el.getBoundingClientRect();
+
+      isVisible = this.win.innerHeight > bounds.bottom &&
+        this.win.innerWidth > bounds.right;
+
+      return isVisible;
+    },
     firstWorkingDay: function (date) {
       date = moment(date);
       // 6 is Saturday 0 is Sunday

@@ -10,14 +10,17 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
   category: 'business',
   findAll: 'GET /api/systems_or_processes',
   model: function (params) {
-    if (this.shortName !== 'SystemOrProcess')
+    if (this.shortName !== 'SystemOrProcess') {
       return this._super(params);
-    if (!params)
+    }
+    if (!params) {
       return params;
+    }
     params = this.object_from_resource(params);
     if (!params.selfLink) {
-      if (params.type !== 'SystemOrProcess')
+      if (params.type !== 'SystemOrProcess') {
         return CMS.Models[params.type].model(params);
+      }
     } else if (params.is_biz_process) {
       return CMS.Models.Process.model(params);
     } else {
@@ -39,7 +42,9 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
     controls: 'CMS.Models.Control.stubs',
     sections: 'CMS.Models.get_stubs',
     network_zone: 'CMS.Models.Option.stub',
-    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
+    start_date: 'date',
+    end_date: 'date'
   },
   tree_view_options: {
     show_view: '/static/mustache/base_objects/tree.mustache',

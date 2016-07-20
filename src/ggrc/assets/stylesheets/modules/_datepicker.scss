@@ -5,7 +5,7 @@
 
 .datepicker__wrapper {
   position: relative;
-  .fa {
+  .fa-calendar {
     position: absolute;
     top: 5px;
     left: 5px;
@@ -15,6 +15,22 @@
 .datepicker__calendar {
   position: absolute;
   z-index: zIndex(ui-autocomplete);
+  &.datepicker__calendar--top {
+    bottom: 54px;
+  }
+}
+
+.modal .datepicker__input {
+  @extend %border-box;
+  max-width: 100%;
+  width: 100% !important;
+  margin-bottom: 0;
+  // This is not good, but our global inputs have fixed height and paddings
+  height: 26px !important;
+}
+
+.datepicker__input-wrapper {
+  position: relative;
 }
 
 .ui-datepicker-inline {

@@ -118,20 +118,24 @@
     <div class="span4" id="frequency-div">
       <div class="row-fluid">
         <div class="span5 {{#instance.computed_errors.start_date}}field-failure{{/instance.computed_errors.start_date}}">
-          <h6>Start Date <span class="required">*</span></h6>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-            <input tabindex="5" class="date input-small" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text"  value="{{localize_date instance.start_date}}">
+          <datepicker
+            set-max-date="end_date"
+            date="start_date"
+            requred="true"
+            label="Starts Date"
+            />
             {{#instance.computed_errors.start_date}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.start_date}}
           </div>
         </div>
         <div class="span2">
         </div>
         <div class="span5 {{#instance.computed_errors.end_date}}field-failure{{/instance.computed_errors.end_date}}">
-          <h6>Due On <span class="required">*</span></h6>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-            <input tabindex="6" class="date input-small" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text"  value="{{localize_date instance.end_date}}">
+          <datepicker
+            set-min-date="start_date"
+            date="end_date"
+            requred="true"
+            label="Due Date"
+            />
             {{#instance.computed_errors.end_date}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.end_date}}
           </div>
         </div>

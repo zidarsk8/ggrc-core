@@ -81,24 +81,20 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
         </label>
         <label class="smaller">
-          <span class="start-text">
-            Start Date
-            <span class="required">*</span>
-          </span>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-            <input tabindex="4" class="date input-block-level" name="start_date" data-toggle="datepicker" data-before="end_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.start_date}}">
-          </div>
+           <datepicker
+            set-max-date="end_date"
+            date="start_date"
+            requred="true"
+            label="Starts Date"
+            />
         </label>
         <label class="smaller">
-          <span class="start-text">
-            End Date
-            <span class="required">*</span>
-          </span>
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-            <input tabindex="5" class="date input-block-level" name="end_date" data-toggle="datepicker" data-after="start_date" placeholder="MM/DD/YYYY" type="text" value="{{localize_date instance.end_date}}">
-          </div>
+          <datepicker
+            set-min-date="start_date"
+            date="end_date"
+            requred="true"
+            label="Due Date"
+            />
         </label>
       </div>
       {{/case}}

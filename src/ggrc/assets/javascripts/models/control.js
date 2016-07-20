@@ -38,7 +38,9 @@
       verify_frequency: 'CMS.Models.Option.stub',
       principal_assessor: 'CMS.Models.Person.stub',
       secondary_assessor: 'CMS.Models.Person.stub',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
+      start_date: 'date',
+      end_date: 'date'
     },
     links_to: {},
     defaults: {
