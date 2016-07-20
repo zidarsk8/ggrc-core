@@ -271,6 +271,13 @@
           }
         },
         business_objects: {
+          Audit: {
+            mapping: 'related_audits',
+            draw_children: true,
+            child_options: relatedObjectsChildOptions,
+            allow_mapping: true,
+            add_item_view: path + '/audits/tree_add_item.mustache'
+          },
           AccessGroup: {
             mapping: "related_access_groups",
             child_options: relatedObjectsChildOptions,
