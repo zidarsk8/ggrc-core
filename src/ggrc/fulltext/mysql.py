@@ -387,7 +387,7 @@ class MysqlIndexer(SqlIndexer):
         self.record_type.content.label('content'),
         case(
             [(self.record_type.property == 'title', literal(0))],
-            else_=literal(1)).label('sort'))
+            else_=literal(1)).label('sort_key'))
 
     query = db.session.query(*columns)
     query = query.filter(
@@ -413,7 +413,7 @@ class MysqlIndexer(SqlIndexer):
       unions.append(q)
     all_queries = union(*unions)
     all_queries = aliased(all_queries.order_by(
-        all_queries.c.sort, all_queries.c.content))
+        all_queries.c.sort_key, all_queries.c.content))
     return db.session.execute(
         select([all_queries.c.key, all_queries.c.type]).distinct())
 
