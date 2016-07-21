@@ -5,6 +5,8 @@
 
 import json
 
+from ggrc import db
+from ggrc import models
 from integration.ggrc import services
 
 
@@ -140,3 +142,66 @@ class TestCollectionPost(services.TestCase):
         headers=self.headers(),
     )
     self.assertStatus(response, 415)
+
+  def test_collection_post_relationship(self):
+    """Test integrity error on relationship collection post.
+
+    Posting duplicate relationships should have a mechanism for removing
+    duplicates from the post request and fixing unique integrity errors.
+    """
+    db.session.add(models.Policy(id=144, title="hello"))
+    db.session.add(models.Policy(id=233, title="world"))
+    db.session.add(models.Policy(id=377, title="bye"))
+    db.session.commit()
+
+    self.client.get("/login")
+    data = json.dumps([{
+        "relationship": {
+            "source": {"id": 144, "type": "Policy"},
+            "destination": {"id": 233, "type": "Policy"},
+            "context": None,
+        },
+    }])
+    response = self.client.post(
+        "/api/relationships",
+        content_type='application/json',
+        data=data,
+        headers=self.headers(),
+    )
+
+    self.assert200(response)
+    relationships = models.Relationship.eager_query().all()
+    self.assertEqual(len(relationships), 1)
+    rel1 = relationships[0]
+    self.assertEqual({144, 233}, {rel1.source.id, rel1.destination.id})
+
+    data = json.dumps([{
+        "relationship": {  # this should be ignored
+            "source": {"id": 144, "type": "Policy"},
+            "destination": {"id": 233, "type": "Policy"},
+            "context": None,
+        },
+    }, {
+        "relationship": {
+            "source": {"id": 377, "type": "Policy"},
+            "destination": {"id": 144, "type": "Policy"},
+            "context": None,
+        },
+    }, {
+        "relationship": {  # Refactored api will ignore this
+            "source": {"id": 144, "type": "Policy"},
+            "destination": {"id": 377, "type": "Policy"},
+            "context": None,
+        },
+    }])
+    response = self.client.post(
+        "/api/relationships",
+        content_type='application/json',
+        data=data,
+        headers=self.headers(),
+    )
+
+    self.assert200(response)
+    relationships = models.Relationship.eager_query().all()
+    self.assertEqual(len(relationships), 3)  # This should be 2
+    rel1 = relationships[0]
