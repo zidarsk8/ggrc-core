@@ -117,8 +117,6 @@ class MysqlIndexer(SqlIndexer):
             ),
             resource_sql)
         type_queries.append(type_query)
-      else:
-        type_queries.append(MysqlRecordProperty.type == model_name)
 
     return and_(
         MysqlRecordProperty.type.in_(model_names),
@@ -386,7 +384,10 @@ class MysqlIndexer(SqlIndexer):
         self.record_type.key.label('key'),
         self.record_type.type.label('type'),
         self.record_type.property.label('property'),
-        self.record_type.content.label('content'))
+        self.record_type.content.label('content'),
+        case(
+            [(self.record_type.property == 'title', literal(0))],
+            else_=literal(1)).label('sort_key'))
 
     query = db.session.query(*columns)
     query = query.filter(
@@ -410,13 +411,11 @@ class MysqlIndexer(SqlIndexer):
       q = self._add_owner_query(q, [k], contact_id)
       q = self._add_extra_params_query(q, k, v)
       unions.append(q)
-    # Sort by title:
-    # FIXME: This only orders by `title` if title was the matching property
     all_queries = union(*unions)
-    all_queries = aliased(all_queries.order_by(case(
-        [(all_queries.c.property == "title", all_queries.c.content)],
-        else_=literal("ZZZZZ"))))
-    return db.session.execute(select([all_queries.c.key, all_queries.c.type]))
+    all_queries = aliased(all_queries.order_by(
+        all_queries.c.sort_key, all_queries.c.content))
+    return db.session.execute(
+        select([all_queries.c.key, all_queries.c.type]).distinct())
 
   def counts(self, terms, group_by_type=True, types=None, contact_id=None,
              extra_params={}, extra_columns={}):
