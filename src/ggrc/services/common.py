@@ -1090,9 +1090,36 @@ class Resource(ModelView):
     """Do NOTHING by default"""
     pass
 
-  def _check_contexts_for_post(self, src):
+  def _unwrap_collection_post_src(self, wrapped_src):
+    """Get a valid source dict.
+
+    Wrapped source example:
+      {"policy": {"title": "A", context: None}}
+
+    This function unwraps the first dict, returns only a dict containing
+    model attributes and checks that the source contains a mandatory context
+    attribute.
+
+    Args:
+      wrapped_src: dict containing a dict with all model attributes.
+
+    Returns:
+      inner dict containing only the model attributes.
+
+    Raises:
+      BadRequest if any of the required attributes are missing.
+    """
+    root_attribute = self.model._inflector.table_singular
+    try:
+      src = wrapped_src[root_attribute]
+    except KeyError:
+      raise BadRequest('Required attribute "{0}" not found'.format(
+          root_attribute))
+
     if 'context' not in src:
       raise BadRequest('context MUST be specified.')
+
+    return src
 
   def _try_recover_integrity_error(self, obj, error):
     """Recover and complete the request if possible, return new response.
@@ -1111,22 +1138,16 @@ class Resource(ModelView):
       object_for_json = self.object_for_json(obj)
       return (200, object_for_json)
 
-  def collection_post_step(self, src, no_result):
+  def collection_post_step(self, wrapped_src, no_result):
     try:
       obj = self.model()
-      root_attribute = self.model._inflector.table_singular
-      try:
-        src = src[root_attribute]
-      except KeyError, e:
-        raise BadRequest('Required attribute "{0}" not found'.format(
-            root_attribute))
+      src = self._unwrap_collection_post_src(wrapped_src)
       with benchmark("Query create permissions"):
         if not permissions.is_allowed_create(
             self.model.__name__, None,
             self.get_context_id_from_json(src))\
            and not permissions.has_conditions('create', self.model.__name__):
           raise Forbidden()
-      self._check_contexts_for_post(src)
 
       with benchmark("Deserialize object"):
         self.json_create(obj, src)
