@@ -3,14 +3,8 @@
 
 """Tests for collection post service."""
 
-import ggrc
-import ggrc.builder
-import ggrc.services
 import json
-import time
-from datetime import datetime
-from urlparse import urlparse
-from wsgiref.handlers import format_date_time
+
 from integration.ggrc import services
 
 

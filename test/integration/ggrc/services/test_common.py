@@ -4,7 +4,6 @@
 import json
 import time
 from urlparse import urlparse
-from wsgiref.handlers import format_date_time
 from integration.ggrc import services
 
 COLLECTION_ALLOWED = ['HEAD', 'GET', 'POST', 'OPTIONS']
