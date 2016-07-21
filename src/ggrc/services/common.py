@@ -1142,25 +1142,22 @@ class Resource(ModelView):
     try:
       obj = self.model()
       src = self._unwrap_collection_post_src(wrapped_src)
-      with benchmark("Query create permissions"):
-        if not permissions.is_allowed_create(
-            self.model.__name__, None,
-            self.get_context_id_from_json(src))\
-           and not permissions.has_conditions('create', self.model.__name__):
-          raise Forbidden()
 
       with benchmark("Deserialize object"):
         self.json_create(obj, src)
+      with benchmark("Send model POSTed event"):
+        self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+
       with benchmark("Query create permissions"):
         if not permissions.is_allowed_create_for(obj):
           # json_create sometimes adds objects to session, so we need to
           # make sure the session is cleared
           db.session.expunge_all()
           raise Forbidden()
-      with benchmark("Send model POSTed event"):
-        self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+
       obj.modified_by = get_current_user()
       db.session.add(obj)
+
       with benchmark("Get modified objects"):
         modified_objects = get_modified_objects(db.session)
       with benchmark("Update custom attribute values"):
