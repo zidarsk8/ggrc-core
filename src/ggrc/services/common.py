@@ -1091,11 +1091,7 @@ class Resource(ModelView):
     pass
 
   def _check_contexts_for_post(self, src):
-    if (src.get('private') is True and
-            self.get_context_id_from_json(src) is not None):
-      raise BadRequest(
-          'context MUST be "null" when creating a private resource.')
-    elif 'context' not in src:
+    if 'context' not in src:
       raise BadRequest('context MUST be specified.')
 
   def _try_recover_integrity_error(self, obj, error):
