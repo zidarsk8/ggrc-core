@@ -79,13 +79,14 @@ class ControlCategorized(Categorizable):
 class AssertionCategorized(Categorizable):
 
   @declared_attr
-  def assertions(cls):
+  def categorized_assertions(cls):
     return cls.declare_categorizable(
-        "ControlAssertion", "assertion", "assertions", "assertions")
+        "ControlAssertion", "assertion", "assertions",
+        "categorized_assertions")
 
   _publish_attrs = [
       'assertions',
-      PublishOnly('assertions'),
+      PublishOnly('categorized_assertions'),
   ]
   _include_links = []
   _aliases = {
@@ -104,7 +105,7 @@ class AssertionCategorized(Categorizable):
     from sqlalchemy import orm
     query = super(AssertionCategorized, cls).eager_query()
     return query.options(
-        orm.subqueryload('assertions').joinedload('category'),
+        orm.subqueryload('categorized_assertions').joinedload('category'),
     )
 
 
