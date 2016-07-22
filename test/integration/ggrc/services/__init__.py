@@ -11,6 +11,16 @@ from ggrc.services.common import Resource
 from integration.ggrc import TestCase as BaseTestCase
 
 
+def reset_first_request_flag():
+  """Reset GGRC app _got_first_request flag to allow endpoint registering.
+
+  This function is required for the case where another test suite runs before
+  this module gets imported.
+  """
+  # pylint: disable=protected-access
+  ggrc.app.app._got_first_request = False
+
+
 class ServicesTestMockModel(Base, ggrc.db.Model):
   __tablename__ = 'test_model'
   foo = db.Column(db.String)
@@ -22,6 +32,8 @@ class ServicesTestMockModel(Base, ggrc.db.Model):
 
 URL_MOCK_COLLECTION = '/api/mock_resources'
 URL_MOCK_RESOURCE = '/api/mock_resources/{0}'
+
+reset_first_request_flag()
 Resource.add_to(
     ggrc.app.app, URL_MOCK_COLLECTION, model_class=ServicesTestMockModel)
 
