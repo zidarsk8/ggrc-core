@@ -1,21 +1,21 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from mock import MagicMock
+
 import ggrc.builder
 import ggrc.models
 from ggrc.builder.json import publish
 from ggrc.services.common import Resource
-from mock import MagicMock
 from integration.ggrc import TestCase
-from nose.plugins.skip import SkipTest
 
 
-@SkipTest
 class TestBuilder(TestCase):
   """Note: Since we are using module member lookup to wire the builders up,
   we have to clean up after every test. This is why we're using mock and
   removing the builders on tearDown.
   """
+  
   def mock_service(self, name):
     svc = MagicMock(Resource)
     svc.url_for.return_value = '/some-url'
@@ -35,7 +35,7 @@ class TestBuilder(TestCase):
   def mock_model(self, name, bases=(), _publish_attrs=None, **kwarg):
     model = MagicMock()
     model.__class__ = self.mock_class(name, bases, _publish_attrs)
-    for k,v in kwarg.items():
+    for k, v in kwarg.items():
       setattr(model, k, v)
     return model
 
@@ -58,7 +58,7 @@ class TestBuilder(TestCase):
         foo='bar',
         id=1,
         _publish_attrs=['foo'],
-        )
+    )
     json_obj = publish(model)
     self.assertIn('foo', json_obj)
     self.assertEqual('bar', json_obj['foo'])
@@ -72,7 +72,7 @@ class TestBuilder(TestCase):
         foo='bar',
         boo='far',
         _publish_attrs=['foo'],
-        )
+    )
     json_obj = publish(model)
     self.assertDictContainsSubset(
         {'foo': 'bar', 'boo': 'far'},
@@ -85,12 +85,16 @@ class TestBuilder(TestCase):
     mixin_subclass = self.mock_class(
         'MixinSubclass', (mixin,), _publish_attrs=['mixin_subclass'])
     model_a = self.mock_model('ModelA',
-        bases=(mixin_subclass,),
-        prop_a='prop_a', mixin='mixin_a', mixin_subclass='mixin_subclass_a',
-        _publish_attrs=['prop_a'])
+                              bases=(mixin_subclass,),
+                              prop_a='prop_a', 
+                              mixin='mixin_a', 
+                              mixin_subclass='mixin_subclass_a',
+                              _publish_attrs=['prop_a'])
     model_b = self.mock_model('ModelB',
-        bases=(mixin,), prop_b='prop_b', mixin='mixin_b',
-        _publish_attrs=['prop_b'])
+                              bases=(mixin,), 
+                              prop_b='prop_b', 
+                              mixin='mixin_b',
+                              _publish_attrs=['prop_b'])
     json_obj = publish(model_a)
     self.assertDictContainsSubset(
         {'prop_a': 'prop_a', 'mixin': 'mixin_a',
