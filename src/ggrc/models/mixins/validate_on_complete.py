@@ -9,8 +9,13 @@ one of NOT_DONE_STATES to DONE_STATES.
 
 from collections import namedtuple
 
+from sqlalchemy import case
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy import orm
 from sqlalchemy.orm import validates
 
+from ggrc import db
+from ggrc.models.comment import Comment
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models.exceptions import ValidationError
 
@@ -22,21 +27,42 @@ class ValidateOnComplete(object):
 
   # pylint: disable=too-few-public-methods
 
-  def _find_value_for_definition(self, cad):
-    """Find CA value for CA definition in self.custom_attribute_values."""
-    cav = [cav for cav in self.custom_attribute_values
-           if int(cav.custom_attribute_id) == cad.id]
-    assert len(cav) <= 1
-    cav = cav[0] if cav else None
-    return cav
+  @declared_attr
+  def _related_comments(self):
+    """Comments related to self via Relationship table."""
+    from ggrc.models.relationship import Relationship
+    comment_id = case(
+        [(Relationship.destination_type == 'Comment',
+          Relationship.destination_id)],
+        else_=Relationship.source_id,
+    )
+    commentable_id = case(
+        [(Relationship.destination_type == 'Comment',
+          Relationship.source_id)],
+        else_=Relationship.destination_id,
+    )
+
+    return db.relationship(
+        Comment,
+        primaryjoin=lambda: self.id == commentable_id,
+        secondary=Relationship.__table__,
+        secondaryjoin=lambda: Comment.id == comment_id,
+        viewonly=True,
+    )
+
+  @classmethod
+  def eager_query(cls):
+    """Special query to fetch all required fields."""
+    query = super(ValidateOnComplete, cls).eager_query()
+    return query.options(
+        orm.subqueryload('_related_comments')
+           .joinedload('revision'),
+    )
 
   def _get_custom_attributes_comments(self):
-    # pylint: disable=no-self-use
-    return []  # not implemented yet
-
-  def _get_relevant_evidences(self):
-    # pylint: disable=no-self-use
-    return []  # not implemented yet
+    # pylint: disable=not-an-iterable; self._related_comments is a list-like
+    return [comment for comment in self._related_comments
+            if comment.revision_id]
 
   @staticmethod
   def _multi_choice_options_to_flags(cad):
@@ -87,18 +113,23 @@ class ValidateOnComplete(object):
       # CA checks
       errors = []
       comments = self._get_custom_attributes_comments()
-      evidences = self._get_relevant_evidences()
+      self._definition_value_map = {int(cav.custom_attribute_id): cav
+                                    for cav in self.custom_attribute_values}
+      self._ca_comment_map = {
+          int(comment.revision
+              .content['custom_attribute_id']): comment
+          for comment in comments
+      }
       for cad in self.custom_attribute_definitions:
         # find the value for this definition
-        cav = self._find_value_for_definition(cad)
+        cav = self._definition_value_map.get(cad.id)
 
         # check mandatory values
         errors += self._check_mandatory_value(cad, cav)
 
         # check relevant comments and attachments
         if cad.attribute_type == CustomAttributeDefinition.ValidTypes.DROPDOWN:
-          errors += self._check_dropdown_requirements(cad, cav, comments,
-                                                      evidences)
+          errors += self._check_dropdown_requirements(cad, cav)
 
       if errors:
         raise ValidationError('. '.join(errors))
@@ -115,7 +146,7 @@ class ValidateOnComplete(object):
     else:
       return []
 
-  def _check_dropdown_requirements(self, cad, cav, comments, evidences):
+  def _check_dropdown_requirements(self, cad, cav):
     """Check mandatory comment and evidence for the CA value."""
     errors = []
     options_to_flags = self._multi_choice_options_to_flags(cad)
@@ -124,23 +155,24 @@ class ValidateOnComplete(object):
       if flags:
         if flags.comment_required:
           # check the presence of a comment mapped to the CA
-          errors += self._check_mandatory_comment(cad, cav, comments)
+          errors += self._check_mandatory_comment(cad, cav)
         if flags.evidence_required:
           # check the presence of an evidence
-          errors += self._check_mandatory_evidence(cad, cav, evidences)
+          errors += self._check_mandatory_evidence(cad, cav)
     return errors
 
-  def _check_mandatory_comment(self, cad, cav, comments):
+  def _check_mandatory_comment(self, cad, cav):
     """Check mandatory comment for the CA value."""
-    # pylint: disable=no-self-use
-    # pylint: disable=unused-argument
-    for comment in comments:
-      # check if the comment is relevant to the cad
-      # not implemented yet
-      pass
-    return []
+    if not self._ca_comment_map.get(cad.id):
+      return [
+          "Comment required by {cad.id} on "
+          "value '{cav.attribute_value}'"
+          .format(cad=cad, cav=cav),
+      ]
+    else:
+      return []
 
-  def _check_mandatory_evidence(self, cad, cav, evidences):
+  def _check_mandatory_evidence(self, cad, cav):
     # pylint: disable=no-self-use
     # pylint: disable=unused-argument
     # not implemented yet
