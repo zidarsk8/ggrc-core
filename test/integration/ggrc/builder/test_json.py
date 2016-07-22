@@ -15,7 +15,7 @@ class TestBuilder(TestCase):
   we have to clean up after every test. This is why we're using mock and
   removing the builders on tearDown.
   """
-  
+
   def mock_service(self, name):
     svc = MagicMock(Resource)
     svc.url_for.return_value = '/some-url'
@@ -86,13 +86,13 @@ class TestBuilder(TestCase):
         'MixinSubclass', (mixin,), _publish_attrs=['mixin_subclass'])
     model_a = self.mock_model('ModelA',
                               bases=(mixin_subclass,),
-                              prop_a='prop_a', 
-                              mixin='mixin_a', 
+                              prop_a='prop_a',
+                              mixin='mixin_a',
                               mixin_subclass='mixin_subclass_a',
                               _publish_attrs=['prop_a'])
     model_b = self.mock_model('ModelB',
-                              bases=(mixin,), 
-                              prop_b='prop_b', 
+                              bases=(mixin,),
+                              prop_b='prop_b',
                               mixin='mixin_b',
                               _publish_attrs=['prop_b'])
     json_obj = publish(model_a)
