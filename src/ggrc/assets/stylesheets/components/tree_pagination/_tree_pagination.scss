@@ -1,0 +1,97 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.footer-wrapper {
+  padding: 0 16px;
+}
+
+.tree-pagination {
+  &__count {
+    display: inline-block;
+    width: 170px;
+    margin-right: 20px;
+    button {
+      line-height: 26px;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    h6 {
+      font-weight: normal;
+      text-transform: none;
+      font-size: 12px;
+      text-align: right;
+      padding-top: 5px;
+    }
+  }
+  .dropdown-menu {
+    padding: 10px;
+    line-height: 39px;
+    min-width: 140px;
+    .btn-group {
+      .btn {
+        color: $black;
+        font-size: 14px;
+        font-weight: normal;
+        border: 1px solid $widgetBorder;
+        background: $white;
+        border-radius: 0;
+        &.active {
+          background: $lightGray;
+        }
+      }
+    }
+  }
+  .pagination {
+    margin: 0;
+    display: inline-block;
+    ul {
+      margin-left: 10px;
+    }
+    li {
+      &:first-child {
+        a {
+          border-left-width: 1px;
+        }
+      }
+      &.disabled {
+        a {
+          i {
+            color: $gray;
+          }
+        }
+      }
+      a {
+        border: 1px solid $widgetBorder;
+        border-left-width: 0;
+        line-height: 24px;
+        background: $white;
+        padding: 0 10px;
+        i {
+          color: $black;
+          &:hover {
+            color: $gray;
+          }
+        }
+
+      }
+      input {
+        vertical-align: top;
+        border-radius: 0;
+        height: 16px;
+        margin-bottom: 0;
+        background-color: $white;
+        border-top: 1px solid $widgetBorder;
+        border-bottom: 1px solid $widgetBorder;
+        border-left-width: 0;
+        width: 120px;
+        float: left;
+        text-align: center;
+        &:focus {
+          border-color: $widgetBorder;
+        }
+      }
+    }
+  }
+}
