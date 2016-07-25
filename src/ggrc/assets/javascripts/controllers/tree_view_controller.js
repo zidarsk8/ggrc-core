@@ -1515,6 +1515,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
   '{instance} change': function (inst, ev, prop) {
     if (prop === 'custom_attribute_values') {
+      this.draw_placeholder();
       this.draw_node();
     }
   },
