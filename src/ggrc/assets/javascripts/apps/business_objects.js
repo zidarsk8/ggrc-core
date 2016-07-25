@@ -846,7 +846,7 @@
           if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {
             can.extend(options, {
               allow_creating: false,
-              allow_mapping: false
+              allow_mapping: true
             });
           }
         });

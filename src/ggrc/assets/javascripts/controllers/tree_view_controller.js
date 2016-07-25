@@ -1542,7 +1542,14 @@ can.Control('CMS.Controllers.TreeViewNode', {
     // the node's isActive state is not stored anywhere, thus we need to
     // determine it from the presemce of the corresponding CSS class
     isActive = this.element.hasClass('active');
-
+    if (this.options.child_options) {
+      this.options.child_options.each(function (option) {
+        option.attr({
+          parent: this,
+          parent_instance: this.options.instance
+        });
+      }.bind(this));
+    }
     can.view(
       this.options.show_view,
       this.options,
