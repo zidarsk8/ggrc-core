@@ -1121,27 +1121,38 @@ class Resource(ModelView):
 
     return src
 
-  def _try_recover_integrity_error(self, obj, error):
-    """Recover and complete the request if possible, return new response.
+  def _get_model_instance(self, src=None):
+    """Get a model instance.
 
-    Returns (code, object) if recover possible, None elsewise.
+    This function creates a new model instance and returns it. The function is
+    needed for correct handling of Relationship objects. Relationship post
+    request should not fail if a relationship already exists, since some
+    relationships can be created with auto mappings.
+
+    Args:
+      src: dict containing new object source.
+
+    Returns:
+      An instance of current model.
     """
-    msg = error.orig.args[1]
-    if (obj.type == "Relationship" and
-            msg.startswith("Duplicate entry") and
-            msg.endswith("'uq_relationships'")):
-      db.session.rollback()
-      # just append the new attrs values
-      obj = obj.__class__.update_attributes(obj.source, obj.destination,
-                                            obj.attrs)
-      db.session.flush()
-      object_for_json = self.object_for_json(obj)
-      return (200, object_for_json)
+
+    obj = None
+    if self.model.__name__ == "Relationship":
+      obj = self.model.query.filter(and_(
+          self.model.source_id == src["source"]["id"],
+          self.model.source_type == src["source"]["type"],
+          self.model.destination_id == src["destination"]["id"],
+          self.model.destination_type == src["destination"]["type"],
+      )).first()
+    if obj is None:
+      obj = self.model()
+      db.session.add(obj)
+    return obj
 
   def collection_post_step(self, wrapped_src, no_result):
     try:
-      obj = self.model()
       src = self._unwrap_collection_post_src(wrapped_src)
+      obj = self._get_model_instance(src)
 
       with benchmark("Deserialize object"):
         self.json_create(obj, src)
@@ -1156,7 +1167,6 @@ class Resource(ModelView):
           raise Forbidden()
 
       obj.modified_by = get_current_user()
-      db.session.add(obj)
 
       with benchmark("Get modified objects"):
         modified_objects = get_modified_objects(db.session)
@@ -1185,11 +1195,7 @@ class Resource(ModelView):
       with benchmark("Make response"):
         return (201, object_for_json)
     except IntegrityError as e:
-      response_after_recover = self._try_recover_integrity_error(obj, e)
-      if response_after_recover:
-        return response_after_recover
-      else:
-        return self._make_error_from_exception(e)
+      return self._make_error_from_exception(e)
     except ValidationError as e:
       return self._make_error_from_exception(e)
 
