@@ -1232,22 +1232,22 @@ class Resource(ModelView):
         body = [body]
       res = []
       with benchmark("collection post > body loop: {}".format(len(body))):
-        for src in body:
-          try:
+        try:
+          for src in body:
             src_res = None
             src_res = self.collection_post_step(src, no_result)
             if running_async:
               time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
-          except (IntegrityError, ValidationError) as e:
-            src_res = self._make_error_from_exception(e)
-            db.session.rollback()
-          except Exception as e:
-            if not src_res or 200 <= src_res[0] < 300:
-              src_res = (getattr(e, "code", 500), e.message)
-            current_app.logger.warn("Collection POST commit failed:")
-            current_app.logger.exception(e)
-            db.session.rollback()
-          res.append(src_res)
+            res.append(src_res)
+        except (IntegrityError, ValidationError) as e:
+          res.append(self._make_error_from_exception(e))
+          db.session.rollback()
+        except Exception as e:
+          if not src_res or 200 <= src_res[0] < 300:
+            res.append((getattr(e, "code", 500), e.message))
+          current_app.logger.warn("Collection POST commit failed:")
+          current_app.logger.exception(e)
+          db.session.rollback()
       with benchmark("collection post > calculate response statuses"):
         headers = {"Content-Type": "application/json"}
         errors = []
