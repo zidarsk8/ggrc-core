@@ -486,16 +486,16 @@
             draw_children: true
           },
           Assessment: {
-            mapping: "related_assessments",
+            mapping: 'related_assessments',
             parent_instance: GGRC.page_instance(),
             allow_mapping: true,
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             model: CMS.Models.Assessment,
-            show_view: path + "/base_objects/tree.mustache",
-            header_view: path + "/base_objects/tree_header.mustache",
-            footer_view: path + "/assessments/tree_footer.mustache",
-            add_item_view: path + "/assessments/tree_add_item.mustache"
+            show_view: path + '/base_objects/tree.mustache',
+            header_view: path + '/base_objects/tree_header.mustache',
+            footer_view: path + '/assessments/tree_footer.mustache',
+            add_item_view: path + '/assessments/tree_add_item.mustache'
           },
           AssessmentTemplate: {
             mapping: 'related_assessment_templates',
