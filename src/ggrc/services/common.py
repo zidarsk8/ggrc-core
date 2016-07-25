@@ -1150,54 +1150,49 @@ class Resource(ModelView):
     return obj
 
   def collection_post_step(self, wrapped_src, no_result):
-    try:
-      src = self._unwrap_collection_post_src(wrapped_src)
-      obj = self._get_model_instance(src)
+    src = self._unwrap_collection_post_src(wrapped_src)
+    obj = self._get_model_instance(src)
 
-      with benchmark("Deserialize object"):
-        self.json_create(obj, src)
-      with benchmark("Send model POSTed event"):
-        self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+    with benchmark("Deserialize object"):
+      self.json_create(obj, src)
+    with benchmark("Send model POSTed event"):
+      self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
 
-      with benchmark("Query create permissions"):
-        if not permissions.is_allowed_create_for(obj):
-          # json_create sometimes adds objects to session, so we need to
-          # make sure the session is cleared
-          db.session.expunge_all()
-          raise Forbidden()
+    with benchmark("Query create permissions"):
+      if not permissions.is_allowed_create_for(obj):
+        # json_create sometimes adds objects to session, so we need to
+        # make sure the session is cleared
+        db.session.expunge_all()
+        raise Forbidden()
 
-      obj.modified_by = get_current_user()
+    obj.modified_by = get_current_user()
 
-      with benchmark("Get modified objects"):
-        modified_objects = get_modified_objects(db.session)
-      with benchmark("Update custom attribute values"):
-        set_ids_for_new_custom_attributes(modified_objects.new, obj)
-      with benchmark("Log event"):
-        log_event(db.session, obj)
-      with benchmark("Update memcache before commit for collection POST"):
-        update_memcache_before_commit(
-            self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
-      with benchmark("Commit"):
-        db.session.commit()
-      with benchmark("Update index"):
-        update_index(db.session, modified_objects)
-      with benchmark("Update memcache after commit for collection POST"):
-        update_memcache_after_commit(self.request)
-      with benchmark("Send model POSTed - after commit event"):
-        self.model_posted_after_commit.send(obj.__class__, obj=obj,
-                                            src=src, service=self)
-      # Note: In model_posted_after_commit necessary mapping and relashionships
-      # are set, so need to commit the changes
+    with benchmark("Get modified objects"):
+      modified_objects = get_modified_objects(db.session)
+    with benchmark("Update custom attribute values"):
+      set_ids_for_new_custom_attributes(modified_objects.new, obj)
+    with benchmark("Log event"):
+      log_event(db.session, obj)
+    with benchmark("Update memcache before commit for collection POST"):
+      update_memcache_before_commit(
+          self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
+    with benchmark("Commit"):
       db.session.commit()
+    with benchmark("Update index"):
+      update_index(db.session, modified_objects)
+    with benchmark("Update memcache after commit for collection POST"):
+      update_memcache_after_commit(self.request)
+    with benchmark("Send model POSTed - after commit event"):
+      self.model_posted_after_commit.send(obj.__class__, obj=obj,
+                                          src=src, service=self)
+    # Note: In model_posted_after_commit necessary mapping and relashionships
+    # are set, so need to commit the changes
+    db.session.commit()
 
-      with benchmark("Serialize object"):
-        object_for_json = {} if no_result else self.object_for_json(obj)
-      with benchmark("Make response"):
-        return (201, object_for_json)
-    except IntegrityError as e:
-      return self._make_error_from_exception(e)
-    except ValidationError as e:
-      return self._make_error_from_exception(e)
+    with benchmark("Serialize object"):
+      object_for_json = {} if no_result else self.object_for_json(obj)
+    with benchmark("Make response"):
+      return (201, object_for_json)
 
   @staticmethod
   def _make_error_from_exception(exc):
@@ -1241,9 +1236,11 @@ class Resource(ModelView):
           try:
             src_res = None
             src_res = self.collection_post_step(src, no_result)
-            db.session.commit()
             if running_async:
               time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
+          except (IntegrityError, ValidationError) as e:
+            src_res = self._make_error_from_exception(e)
+            db.session.rollback()
           except Exception as e:
             if not src_res or 200 <= src_res[0] < 300:
               src_res = (getattr(e, "code", 500), e.message)
