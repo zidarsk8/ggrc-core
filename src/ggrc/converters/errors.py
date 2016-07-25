@@ -90,6 +90,10 @@ UNKNOWN_DATE_FORMAT = (u"Line {line}: Field {column_name} contains invalid "
                        u"date format, use YYYY-MM-DD or MM/DD/YYYY. The line "
                        u"will be ignored.")
 
+WRONG_DATE_FORMAT = (u"Line {line}: Field {column_name} contains invalid "
+                     u"date format. Expected MM/DD, but found MM/DD/YYYY, "
+                     u"the YYYY part of the date will be ignored.")
+
 UNSUPPORTED_LIST_ERROR = (u"Line {line}: Field {column_name} does not support "
                           u"{value_type}.")
 

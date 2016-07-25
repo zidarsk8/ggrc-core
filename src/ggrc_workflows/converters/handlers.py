@@ -167,6 +167,10 @@ class TaskStartColumnHandler(TaskDateColumnHandler):
         return
       self.row_converter.obj.relative_start_day = self.value[0]
     elif freq in ["quarterly", "annually"]:
+      if len(self.value) == 3:
+        self.add_warning(errors.WRONG_DATE_FORMAT,
+                         column_name=self.display_name)
+        self.value = self.value[:2]
       if len(self.value) != 2 or \
          (freq == "quarterly" and not (1 <= self.value[0] <= 3)) or \
          (freq == "annually" and not (1 <= self.value[0] <= 12)) or \
@@ -221,6 +225,10 @@ class TaskEndColumnHandler(TaskDateColumnHandler):
         return
       self.row_converter.obj.relative_end_day = self.value[0]
     elif freq in ["quarterly", "annually"]:
+      if len(self.value) == 3:
+        self.add_warning(errors.WRONG_DATE_FORMAT,
+                         column_name=self.display_name)
+        self.value = self.value[:2]
       if len(self.value) != 2 or \
          (freq == "quarterly" and not (1 <= self.value[0] <= 3)) or \
          (freq == "annually" and not (1 <= self.value[0] <= 12)) or \
