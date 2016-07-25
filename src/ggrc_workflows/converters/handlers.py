@@ -106,142 +106,97 @@ class TaskDateColumnHandler(handlers.ColumnHandler):
       return
 
   def get_value(self):
-    start = "start" in self.key
-    obj = self.row_converter.obj
-    freq = obj.task_group.workflow.frequency
-    date = getattr(obj, "start_date" if start else "end_date", None)
-    month = getattr(obj, "relative_start_month" if start
-                    else "relative_end_month", None)
-    day = getattr(obj, "relative_start_day" if start
-                       else "relative_end_day", None)
+    freq = self.row_converter.obj.task_group.workflow.frequency
+    date = self._get_obj_attr("{}_date")
+    day = self._get_obj_attr("relative_{}_day")
+    month = self._get_obj_attr("relative_{}_month")
     if freq == "one_time":
-      if date is None:
-        return ""
-      return "{}/{}/{}".format(date.month, date.day, date.year)
+      return "" if date is None else "{}/{}/{}".format(
+          date.month,
+          date.day,
+          date.year
+      )
     elif freq in ["weekly", "monthly"]:
-      if day is None:
-        return ""
-      return str(day)
+      return "" if day is None else str(day)
     elif freq == "quarterly":
       quarter = self.quarterly_names.get(month, None)
-      if None in [day, quarter]:
-        return ""
-      return "{} {}".format(quarter, day)
+      return "" if None in [day, quarter] else "{} {}".format(quarter, day)
     elif freq == "annually":
-      if None in [day, month]:
-        return ""
-      return "{}/{}".format(month, day)
+      return "" if None in [day, month] else "{}/{}".format(month, day)
     else:
       return ""
 
-
-class TaskStartColumnHandler(TaskDateColumnHandler):
-
-  """ handler for start column in task group tasks """
-
   def set_obj_attr(self):
-    """ set all possible start date attributes """
-    # disable false parentheses warning for 'not (a < b < c)'
-    # pylint: disable=C0325
     if not self.value:
       return
     freq = self.row_converter.obj.task_group.workflow.frequency
-    if freq == "one_time":
-      if len(self.value) != 3:
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
-        return
-      month, day, year = self.value
-      try:
-        self.row_converter.obj.start_date = datetime.date(year, month, day)
-      except ValueError:
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
-        return
-    elif freq in ["weekly", "monthly"]:
-      if len(self.value) != 1 or \
-         (freq == "weekly" and not (1 <= self.value[0] <= 5)) or \
-         (freq == "monthly" and not (1 <= self.value[0] <= 31)):
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
-        return
-      self.row_converter.obj.relative_start_day = self.value[0]
-    elif freq in ["quarterly", "annually"]:
-      if len(self.value) == 3:
-        self.add_warning(errors.WRONG_DATE_FORMAT,
-                         column_name=self.display_name)
-        self.value = self.value[:2]
-      if len(self.value) != 2 or \
-         (freq == "quarterly" and not (1 <= self.value[0] <= 3)) or \
-         (freq == "annually" and not (1 <= self.value[0] <= 12)) or \
-         not (1 <= self.value[1] <= 31):
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
-        return
-      self.row_converter.obj.relative_start_day = self.value[1]
-      self.row_converter.obj.relative_start_month = self.value[0]
-    else:
-      self.add_error(errors.WRONG_VALUE_ERROR,
-                     column_name=self.display_name)
-      return
+    handler_map = {
+        "one_time": (
+            lambda v: v,
+            lambda v: len(v) == 3,
+            self._set_obj_date,
+        ),
+        "weekly": (
+            lambda v: v,
+            lambda v: len(v) == 1 and 1 <= v[0] <= 5,
+            self._set_obj_relative_day,
+        ),
+        "monthly": (
+            lambda v: v,
+            lambda v: len(v) == 1 and 1 <= v[0] <= 31,
+            self._set_obj_relative_day,
+        ),
+        "quarterly": (
+            self._prepare_month_day,
+            lambda v: len(v) == 2 and 1 <= v[0] <= 3 and 1 <= v[1] <= 31,
+            self._set_obj_relative_month_day,
+        ),
+        "annually": (
+            self._prepare_month_day,
+            lambda v: len(v) == 2 and 1 <= v[0] <= 12 and 1 <= v[1] <= 31,
+            self._set_obj_relative_month_day,
+        ),
+    }
+    prepare, validate, set_obj_attr = handler_map[freq]
+    self.value = prepare(self.value)
+    if not validate(self.value):
+      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+    set_obj_attr(self.value)
 
+  def _prepare_month_day(self, value):
+    if len(value) == 3:
+      self.add_warning(errors.WRONG_DATE_FORMAT, column_name=self.display_name)
+      value = value[:2]
+    return value
 
-class TaskEndColumnHandler(TaskDateColumnHandler):
-  """ handler for end column in task group tasks """
-
-  def _set_obj_attr_one_time(self):
-    if len(self.value) != 3:
-      self.add_error(errors.WRONG_VALUE_ERROR,
-                     column_name=self.display_name)
-      return
-    month, day, year = self.value
+  def _set_obj_date(self, value):
+    month, day, year = value
     try:
-      self.row_converter.obj.end_date = datetime.date(year, month, day)
+      self._set_obj_attr("{}_date", datetime.date(year, month, day))
     except ValueError as error:
       if error.message == "Start date can not be after end date.":
         self.add_error(errors.INVALID_START_END_DATES,
                        start_date="Start date",
                        end_date="End date")
       else:
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
+        self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
 
-  def set_obj_attr(self):
-    """ set all possible end date attributes """
-    # disable false parentheses warning for 'not (a < b < c)'
-    # pylint: disable=C0325
-    if not self.value:
-      return
-    freq = self.row_converter.obj.task_group.workflow.frequency
-    if freq == "one_time":
-      self._set_obj_attr_one_time()
-      return
-    elif freq in ["weekly", "monthly"]:
-      if len(self.value) != 1 or \
-         (freq == "weekly" and not (1 <= self.value[0] <= 5)) or \
-         (freq == "monthly" and not (1 <= self.value[0] <= 31)):
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
-        return
-      self.row_converter.obj.relative_end_day = self.value[0]
-    elif freq in ["quarterly", "annually"]:
-      if len(self.value) == 3:
-        self.add_warning(errors.WRONG_DATE_FORMAT,
-                         column_name=self.display_name)
-        self.value = self.value[:2]
-      if len(self.value) != 2 or \
-         (freq == "quarterly" and not (1 <= self.value[0] <= 3)) or \
-         (freq == "annually" and not (1 <= self.value[0] <= 12)) or \
-         not (1 <= self.value[1] <= 31):
-        self.add_error(errors.WRONG_VALUE_ERROR,
-                       column_name=self.display_name)
-        return
-      self.row_converter.obj.relative_end_day = self.value[1]
-      self.row_converter.obj.relative_end_month = self.value[0]
-    else:
-      self.add_error(errors.WRONG_VALUE_ERROR,
-                     column_name=self.display_name)
-      return
+  def _set_obj_relative_day(self, value):
+    self._set_obj_attr("relative_{}_day", value[0])
+
+  def _set_obj_relative_month_day(self, value):
+    self._set_obj_attr("relative_{}_month", value[0])
+    self._set_obj_attr("relative_{}_day", value[1])
+
+  def _obj_attr_name(self, template):
+    key = "start" if "start" in self.key else "end"
+    return template.format(key)
+
+  def _get_obj_attr(self, attr):
+    return getattr(self.row_converter.obj, self._obj_attr_name(attr), None)
+
+  def _set_obj_attr(self, attr, value):
+    setattr(self.row_converter.obj, self._obj_attr_name(attr), value)
 
 
 class TaskTypeColumnHandler(handlers.ColumnHandler):
@@ -406,8 +361,8 @@ COLUMN_HANDLERS = {
     "cycle_workflow": CycleWorkflowColumnHandler,
     "frequency": FrequencyColumnHandler,
     "notify_on_change": boolean.CheckboxColumnHandler,
-    "relative_end_date": TaskEndColumnHandler,
-    "relative_start_date": TaskStartColumnHandler,
+    "relative_end_date": TaskDateColumnHandler,
+    "relative_start_date": TaskDateColumnHandler,
     "task_description": TaskDescriptionColumnHandler,
     "task_group": TaskGroupColumnHandler,
     "task_group_objects": ObjectsColumnHandler,
