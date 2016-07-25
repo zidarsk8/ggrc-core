@@ -312,9 +312,8 @@ can.Control('CMS.Controllers.TreeLoader', {
          {} // all hope is lost, skip filtering
         ).display_list;
 
-      // check if all objects selected, then skip filter
-      if (child_tree_display_list === undefined ||
-          child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
+      // check if no objects selected, then skip filter
+      if (!child_tree_display_list) {
         // skip filter
         filtered_items = items;
       } else if (child_tree_display_list.length === 0) { // no item is selected to filter, so just return
