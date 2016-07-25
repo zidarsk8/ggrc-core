@@ -979,6 +979,7 @@ can.Control('GGRC.Controllers.Modals', {
           && !this.options.skip_refresh
           && !this.options.instance.isNew()) {
         this.options.instance.refresh();
+        this.options.instance.restore(true);
       }
     }
 
