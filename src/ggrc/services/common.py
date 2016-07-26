@@ -1149,6 +1149,24 @@ class Resource(ModelView):
       db.session.add(obj)
     return obj
 
+  def _check_post_permissions(self, objects):
+    """Check create permissions for a list of objects.append
+
+    Args:
+      objects: List of objects.
+
+    Raises:
+      Forbidden error if user does not have create permission for all objects
+      in the objects list.
+    """
+    with benchmark("Check create permissions"):
+      for obj in objects:
+        if not permissions.is_allowed_create_for(obj):
+          # json_create sometimes adds objects to session, so we need to
+          # make sure the session is cleared
+          db.session.expunge_all()
+          raise Forbidden()
+
   def collection_post_loop(self, body, res, no_result, running_async):
     for wrapped_src in body:
       if running_async:
@@ -1162,12 +1180,7 @@ class Resource(ModelView):
       with benchmark("Send model POSTed event"):
         self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
 
-      with benchmark("Query create permissions"):
-        if not permissions.is_allowed_create_for(obj):
-          # json_create sometimes adds objects to session, so we need to
-          # make sure the session is cleared
-          db.session.expunge_all()
-          raise Forbidden()
+      self._check_post_permissions([obj])
 
       obj.modified_by = get_current_user()
 
