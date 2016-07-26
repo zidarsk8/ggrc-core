@@ -115,13 +115,11 @@ class TestCollectionPost(services.TestCase):
     )
 
     self.assertEqual(403, response.status_code)
-    self.assertEqual([201, 403], [i[0] for i in response.json])
-    self.assertEqual(
-        'bar1', response.json[0][1]['services_test_mock_model']['foo'])
+    self.assertEqual([403], [i[0] for i in response.json])
     response = self.client.get(self.mock_url(), headers=self.headers())
     self.assert200(response)
     self.assertEqual(
-        1, len(response.json['test_model_collection']['test_model']))
+        0, len(response.json['test_model_collection']['test_model']))
 
   def test_collection_post_bad_request(self):
     response = self.client.post(
