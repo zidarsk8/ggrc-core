@@ -24,7 +24,9 @@
         {{/if}}
         {{^count}}{{#has_count}}
           {{^instance.constructor.obj_nav_options.show_all_tabs}}
-            <span class="closed"><i class="fa fa-times"></i></span>
+            {{^in_array internav_display instance.constructor.obj_nav_options.force_show_list}}
+              <span class="closed"><i class="fa fa-times"></i></span>
+            {{/in_array}}
           {{/instance.constructor.obj_nav_options.show_all_tabs}}
         {{/has_count}}{{/count}}
       </div>
