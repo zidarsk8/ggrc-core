@@ -1222,13 +1222,13 @@ class Resource(ModelView):
     with benchmark("Update memcache after commit for collection POST"):
       update_memcache_after_commit(self.request)
 
-    for obj in objects:
-      with benchmark("Send model POSTed - after commit event"):
+    with benchmark("Send model POSTed - after commit event"):
+      for obj in objects:
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
                                             src=src, service=self)
         # Note: In model_posted_after_commit necessary mapping and
         # relationships are set, so need to commit the changes
-        db.session.commit()
+      db.session.commit()
 
     with benchmark("Serialize objects"):
       for obj in objects:
