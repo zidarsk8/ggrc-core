@@ -1,7 +1,7 @@
 /*!
-  Copyright (C) 2016 Google Inc.
-  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 describe('CMS.Controllers.TreeView', function () {
   'use strict';
@@ -39,5 +39,85 @@ describe('CMS.Controllers.TreeView', function () {
     });
 
     // test cases here...
+  });
+
+  describe('_buildRequestParams() method', function () {
+    var ctrlInst;
+    var method;
+
+    beforeEach(function () {
+      ctrlInst = {
+        options: new can.Map({
+          parent_instance: {},
+          model: {},
+          filter: '',
+          paging: {
+            current: 1,
+            total: null,
+            pageSize: 10,
+            count: 6
+          }
+        })
+      };
+
+      method = Ctrl.prototype._buildRequestParams.bind(ctrlInst);
+    });
+
+    describe('Assessment related to Audit', function () {
+      beforeEach(function () {
+        ctrlInst.options.parent_instance = {
+          id: 1,
+          type: 'Audit'
+        };
+        ctrlInst.options.model.shortName = 'Assessment';
+      });
+
+      it('return default params for paging request', function () {
+        var result = method()[0];
+
+        expect(result.object_name).toEqual('Assessment');
+        expect(result.limit).toEqual([0, 9]);
+        expect(result.filters.expression.object_name).toEqual('Audit');
+      });
+
+      it('return limit for 3rd page', function () {
+        var result;
+        ctrlInst.options.paging.current = 3;
+        ctrlInst.options.paging.pageSize = 50;
+
+        result = method()[0];
+
+        expect(result.limit).toEqual([100, 149]);
+      });
+    });
+
+    describe('Request related to Assessment', function () {
+      beforeEach(function () {
+        ctrlInst.options.parent_instance = {
+          id: 1,
+          type: 'Assessment'
+        };
+        ctrlInst.options.model.shortName = 'Request';
+      });
+
+      it('return default params for paging request', function () {
+        var result = method()[0];
+
+        expect(result.object_name).toEqual('Request');
+        expect(result.limit).toEqual([0, 9]);
+        expect(result.filters.expression.object_name).toEqual('Assessment');
+      });
+
+      it('return expression for filter', function () {
+        var filterResult;
+        ctrlInst.options.attr('filter', 'status="in progress"');
+
+        filterResult = method()[0].filters.expression.right;
+
+        expect(filterResult.left).toEqual('status');
+        expect(filterResult.right).toEqual('in progress');
+        expect(filterResult.op.name).toEqual('=');
+      });
+    });
   });
 });

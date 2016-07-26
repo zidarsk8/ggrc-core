@@ -1466,12 +1466,14 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     }
   },
   _buildRequestParams: function () {
-    var paging = this.options.paging;
+    var paging = this.options.attr('paging');
     var filter = this.options.attr('filter');
     var relevantFilter = '#' + this.options.parent_instance.type + ',' +
       this.options.parent_instance.id + '#';
     var first = (paging.current - 1) * paging.pageSize;
-    var last = paging.current * paging.pageSize;
+    var last = paging.current * paging.pageSize - 1;
+    var sortBy = this.options.sort_by;
+    var sortDirection = this.options.sort_direction === 'asc';
     return [{
       object_name: this.options.model.shortName,
       limit: [first, last],
