@@ -1173,38 +1173,40 @@ class Resource(ModelView):
       Forbidden error if user does not have create permission for all objects
       in the objects list.
     """
-    with benchmark("Check create permissions"):
-      for obj in objects:
-        if not permissions.is_allowed_create_for(obj):
-          # json_create sometimes adds objects to session, so we need to
-          # make sure the session is cleared
-          db.session.expunge_all()
-          raise Forbidden()
+    for obj in objects:
+      if not permissions.is_allowed_create_for(obj):
+        # json_create sometimes adds objects to session, so we need to
+        # make sure the session is cleared
+        db.session.expunge_all()
+        raise Forbidden()
 
   def collection_post_loop(self, body, res, no_result, running_async):
-    objects = []
-    for wrapped_src in body:
-      if running_async:
-        time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
 
-      src = self._unwrap_collection_post_src(wrapped_src)
-      obj = self._get_model_instance(src)
+    with benchmark("Generate objects"):
+      objects = []
+      for wrapped_src in body:
+        if running_async:
+          time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
 
-      with benchmark("Deserialize object"):
-        self.json_create(obj, src)
-      with benchmark("Send model POSTed event"):
-        self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+        src = self._unwrap_collection_post_src(wrapped_src)
+        obj = self._get_model_instance(src)
 
-      obj.modified_by = get_current_user()
-      with benchmark("Update custom attribute values"):
-        set_ids_for_new_custom_attributes(obj)
+        with benchmark("Deserialize object"):
+          self.json_create(obj, src)
+        with benchmark("Send model POSTed event"):
+          self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
 
-      objects.append(obj)
+        obj.modified_by = get_current_user()
+        with benchmark("Update custom attribute values"):
+          set_ids_for_new_custom_attributes(obj)
+
+        objects.append(obj)
 
     with benchmark("Send model POSTed event"):
       self.collection_posted.send(obj.__class__, objects=objects)
 
-    self._check_post_permissions(objects)
+    with benchmark("Check create permissions"):
+      self._check_post_permissions(objects)
 
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
