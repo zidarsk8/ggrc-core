@@ -1233,9 +1233,9 @@ class Resource(ModelView):
       res = []
       with benchmark("collection post > body loop: {}".format(len(body))):
         try:
-          for src in body:
+          for wrapped_src in body:
             src_res = None
-            src_res = self.collection_post_step(src, no_result)
+            src_res = self.collection_post_step(wrapped_src, no_result)
             if running_async:
               time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
             res.append(src_res)
