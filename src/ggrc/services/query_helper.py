@@ -12,6 +12,7 @@ from flask import current_app
 
 from ggrc.builder import json
 from ggrc.converters.query_helper import QueryHelper
+from ggrc.login import login_required
 from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
 from ggrc.utils import as_json
@@ -91,3 +92,12 @@ def get_objects_by_query():
       collection,
       get_last_modified(model, objects),
   )
+
+
+def init_query_view(app):
+  # pylint: disable=unused-variable
+  @app.route('/query', methods=['POST'])
+  @login_required
+  def query_objects():
+    """Advanced object collection queries view."""
+    return get_objects_by_query()
