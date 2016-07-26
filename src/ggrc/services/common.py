@@ -110,15 +110,13 @@ def get_related_keys_for_expiration(context, o):
   return keys
 
 
-def set_ids_for_new_custom_attributes(objects, parent_obj):
+def set_ids_for_new_custom_attributes(parent_obj):
   """
   When we are creating custom attribute values and definitions for
   POST requests, parent object ID is not yet defined. This is why we update
   custom attribute values at this point and set the correct attributable_id
 
   Args:
-    objects: newly created objects (we update only the ones that
-             are CustomAttributeValue
     parent_obj: parent object to be set as attributable
 
   Returns:
@@ -127,12 +125,14 @@ def set_ids_for_new_custom_attributes(objects, parent_obj):
   if not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
     return
 
+  modified_objects = get_modified_objects(db.session).new
+
   object_attrs = {
       "CustomAttributeValue": "attributable_id",
       "CustomAttributeDefinition": "definition_id"
   }
 
-  for obj in objects:
+  for obj in modified_objects:
     if obj.type not in object_attrs:
       continue
 
@@ -833,7 +833,7 @@ class Resource(ModelView):
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Update custom attribute values"):
-      set_ids_for_new_custom_attributes(modified_objects.new, obj)
+      set_ids_for_new_custom_attributes(obj)
     with benchmark("Log event"):
       log_event(db.session, obj)
     with benchmark("Update memcache before commit for collection PUT"):
@@ -1188,7 +1188,7 @@ class Resource(ModelView):
       with benchmark("Get modified objects"):
         modified_objects = get_modified_objects(db.session)
       with benchmark("Update custom attribute values"):
-        set_ids_for_new_custom_attributes(modified_objects.new, obj)
+        set_ids_for_new_custom_attributes(obj)
 
       with benchmark("Log event"):
         log_event(db.session, obj)
