@@ -1181,6 +1181,14 @@ class Resource(ModelView):
         raise Forbidden()
 
   def collection_post_loop(self, body, res, no_result, running_async):
+    """Handle all posted objects.
+
+    Args:
+      body: list of dictionaries containing json object representations.
+      res: List that will get responses appended to it.
+      no_result: Flag for suppressing results.
+      running_async: Flag for async jobs.
+    """
 
     with benchmark("Generate objects"):
       objects = []
@@ -1199,7 +1207,7 @@ class Resource(ModelView):
         obj.modified_by = get_current_user()
         objects.append(obj)
 
-    with benchmark("Send model POSTed event"):
+    with benchmark("Send collection POSTed event"):
       self.collection_posted.send(obj.__class__, objects=objects)
     with benchmark("Check create permissions"):
       self._check_post_permissions(objects)
