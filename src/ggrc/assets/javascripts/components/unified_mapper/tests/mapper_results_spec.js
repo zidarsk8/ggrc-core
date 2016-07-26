@@ -29,5 +29,10 @@ describe('GGRC.Components.mapperResults', function () {
       expect(scope.entries).toBeDefined();
       expect(scope.entries.attr()).toEqual([]);
     });
+
+    it('initializes the options to an empty list', function () {
+      expect(scope.options).toBeDefined();
+      expect(scope.options.attr()).toEqual([]);
+    });
   });
 });
