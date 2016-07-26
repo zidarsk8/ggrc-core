@@ -20,6 +20,7 @@ from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql.expression import tuple_
 import sqlalchemy.orm.exc
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -1135,7 +1136,33 @@ class Resource(ModelView):
 
     return src
 
-  def _get_model_instance(self, src=None):
+  def _get_relationships_cache(self, body):
+    cache = getattr(self, "_relationship_cache", None)
+    if cache is not None:
+      return cache
+    relationships = self.model.query.filter(tuple_(
+        self.model.source_id, self.model.source_type,
+        self.model.destination_id, self.model.destination_type).in_((
+            src["relationship"]["source"].get("id", -1),
+            src["relationship"]["source"].get("type"),
+            src["relationship"]["destination"].get("id", -1),
+            src["relationship"]["destination"].get("type")
+        ) for src in body)
+    )
+
+    cache = {
+        (
+            relationship.source_id,
+            relationship.source_type,
+            relationship.destination_id,
+            relationship.destination_type,
+        ): relationship
+        for relationship in relationships
+    }
+    setattr(self, "_relationship_cache", cache)
+    return cache
+
+  def _get_model_instance(self, src=None, body=None):
     """Get a model instance.
 
     This function creates a new model instance and returns it. The function is
@@ -1152,12 +1179,12 @@ class Resource(ModelView):
 
     obj = None
     if self.model.__name__ == "Relationship":
-      obj = self.model.query.filter(and_(
-          self.model.source_id == src["source"]["id"],
-          self.model.source_type == src["source"]["type"],
-          self.model.destination_id == src["destination"]["id"],
-          self.model.destination_type == src["destination"]["type"],
-      )).first()
+      obj = self._get_relationships_cache(body).get((
+          src["source"]["id"],
+          src["source"]["type"],
+          src["destination"]["id"],
+          src["destination"]["type"]
+      ))
     if obj is None:
       obj = self.model()
       db.session.add(obj)
@@ -1196,7 +1223,7 @@ class Resource(ModelView):
         if running_async:
           time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
         src = self._unwrap_collection_post_src(wrapped_src)
-        obj = self._get_model_instance(src)
+        obj = self._get_model_instance(src, body)
         with benchmark("Deserialize object"):
           self.json_create(obj, src)
         with benchmark("Send model POSTed event"):
