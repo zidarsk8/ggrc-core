@@ -1181,14 +1181,14 @@ class Resource(ModelView):
       with benchmark("Send model POSTed event"):
         self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
 
-      self._check_post_permissions([obj])
-
       obj.modified_by = get_current_user()
+      with benchmark("Update custom attribute values"):
+        set_ids_for_new_custom_attributes(obj)
+
+      self._check_post_permissions([obj])
 
       with benchmark("Get modified objects"):
         modified_objects = get_modified_objects(db.session)
-      with benchmark("Update custom attribute values"):
-        set_ids_for_new_custom_attributes(obj)
 
       with benchmark("Log event"):
         log_event(db.session, obj)
