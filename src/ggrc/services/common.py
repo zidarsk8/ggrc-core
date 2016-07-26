@@ -637,6 +637,18 @@ class Resource(ModelView):
         :src: The original POSTed JSON dictionary.
         :service: The instance of Resource handling the POST request.
       """,)
+  collection_posted = signals.signal(
+      "Collection POSTed",
+      """
+      Indicates that a list of models was received via POST and will be
+      committed to the database. The sender in the signal will be the model
+      class of the POSTed resource. The following arguments will be sent along
+      with the signal:
+
+        :objects: The model instance created from the POSTed JSON.
+        :src: The original POSTed JSON dictionary.
+        :service: The instance of Resource handling the POST request.
+      """,)
   model_posted_after_commit = signals.signal(
       "Model POSTed - after",
       """
@@ -1187,6 +1199,9 @@ class Resource(ModelView):
         set_ids_for_new_custom_attributes(obj)
 
       objects.append(obj)
+
+    with benchmark("Send model POSTed event"):
+      self.collection_posted.send(obj.__class__, objects=objects)
 
     self._check_post_permissions(objects)
 

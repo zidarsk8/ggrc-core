@@ -222,7 +222,16 @@ class AutomapperGenerator(object):
 
 
 def register_automapping_listeners():
-  @Resource.model_posted.connect_via(Relationship)
+
+  @Resource.collection_posted.connect_via(Relationship)
+  def handle_relationship_collection_post(sender, objects=None, **kwargs):
+    automapper = AutomapperGenerator()
+    for obj in objects:
+      if obj is None:
+        logging.warning("Automapping listener: no obj, no mappings created")
+        return
+      automapper.generate_automappings(obj)
+
   def handle_relationship_post(sender, obj=None, src=None, service=None):
     if obj is None:
       logging.warning("Automapping listener: no obj, no mappings created")
