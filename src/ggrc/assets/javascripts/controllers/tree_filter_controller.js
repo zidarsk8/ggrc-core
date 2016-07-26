@@ -37,9 +37,7 @@ can.Control("GGRC.Controllers.TreeFilter", {
             .find(".cms_controllers_tree_view").control();
 
       this.toggle_indicator(current_filter);
-      parent_control.options.attr('sort_function', current_filter.order_by.compare);
-      parent_control.options.attr('filter', current_filter);
-      parent_control.reload_list();
+      parent_control.filter(filter_string);
   }
 
   , "input[type=reset] click" : function(el, ev) {

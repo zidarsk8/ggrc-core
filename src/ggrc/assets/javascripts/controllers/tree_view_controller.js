@@ -173,7 +173,7 @@ can.Control('CMS.Controllers.TreeLoader', {
 
     this._display_deferred = this._display_deferred
       .then(this._ifNotRemoved(function () {
-        return $.when(useOldAPI ? that.fetch_list() : that.loadPage(),
+        return $.when(useOldAPI ? that.fetch_list() : that.loadPage(), // loadPage
           that.init_view());
       }))
       .then(that._ifNotRemoved(that.proxy('draw_list')))
@@ -1149,11 +1149,12 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var res;
 
     items = can.makeArray(optionsList);
-    if (filter) {
-      items = _.filter(items, function (option) {
-        return filter.evaluate(option.instance.get_filter_vals());
-      });
-    }
+    // Currently comment this code, but in future need to remove it
+    // if (filter) {
+    //   items = _.filter(items, function (option) {
+    //     return filter.evaluate(option.instance.get_filter_vals());
+    //   });
+    // }
 
     if (sortProp || sortFunction) {
       if (!sortFunction) {
@@ -1465,12 +1466,15 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     }
   },
   _buildRequestParams: function () {
-    var filter = 'status="Not started"'; // mock filter string
+    var paging = this.options.paging;
+    var filter = this.options.attr('filter');
     var relevantFilter = '#' + this.options.parent_instance.type + ',' +
       this.options.parent_instance.id + '#';
+    var first = (paging.current - 1) * paging.pageSize;
+    var last = paging.current * paging.pageSize;
     return [{
       object_name: this.options.model.shortName,
-      limit: [0, 15],
+      limit: [first, last],
       filters: GGRC.query_parser.join_queries(
         GGRC.query_parser.parse(relevantFilter || ''),
         GGRC.query_parser.parse(filter || '')
@@ -1478,24 +1482,20 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     }];
   },
 
-  loadPage: function () {
-    // var self = this;
+  filter: function (filterString) {
+    this.options.attr('filter', filterString);
+    this.options.paging.attr('current', 1);
 
+    this.loadPage()
+      .then(function (data) {
+        this.element.children('.cms_controllers_tree_view_node').remove();
+        return data;
+      }.bind(this))
+      .then(this._ifNotRemoved(this.proxy('draw_list')));
+  },
+
+  loadPage: function () {
     return this.options.model.query({data: this._buildRequestParams()});
-      // .then(function (data) {
-      //   var realAdd = [];
-      //   self.savePagingInfo();
-      //   self.element.children('.cms_controllers_tree_view_node').remove();
-      //   can.each(data, function (newVal) {
-      //     var _newVal = newVal.instance ? newVal.instance : newVal;
-      //     if (self.oldList && ~can.inArray(_newVal, self.oldList)) {
-      //       self.oldList.splice(can.inArray(_newVal, self.oldList), 1);
-      //     } else if (self.element) {
-      //       realAdd.push(newVal);
-      //     }
-      //   });
-      //   self.enqueue_items(realAdd);
-      // });
   }
 });
 
