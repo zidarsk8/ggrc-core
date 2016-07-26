@@ -1211,12 +1211,8 @@ class Resource(ModelView):
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
 
-
-    with benchmark("Pre collection post log flush"):
-      db.session.flush()
     with benchmark("Log event for all objects"):
-      for obj in objects:
-        log_event(db.session, obj, flush=False)
+      log_event(db.session, obj, flush=False)
 
     with benchmark("Update memcache before commit for collection POST"):
       update_memcache_before_commit(
