@@ -10,7 +10,7 @@
    * It collects fields data and it transforms them into appropriate
    * format for saving
    */
-  can.Component.extend({
+  GGRC.Components('templateAttributes', {
     tag: 'assessment-template-attributes',
     template: '<content></content>',
     scope: {
@@ -69,7 +69,7 @@
    *
    * Represents each `field` passed from assessment-template-attributes `fields`
    */
-  can.Component.extend({
+  GGRC.Components('templateAttributesField', {
     tag: 'template-field',
     template: can.view(GGRC.mustache_path +
       '/assessment_templates/attribute_field.mustache'),
@@ -160,6 +160,7 @@
       }
     }
   });
+
   GGRC.Components('addTemplateField', {
     tag: 'add-template-field',
     template: can.view(GGRC.mustache_path +
