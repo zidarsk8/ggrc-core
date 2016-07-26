@@ -332,7 +332,7 @@ def log_event(session, obj=None, current_user_id=None, flush=True):
   if obj is None:
     resource_id = 0
     resource_type = None
-    action = 'IMPORT'
+    action = 'BULK'
     context_id = 0
   else:
     resource_id = obj.id
