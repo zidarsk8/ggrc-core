@@ -313,9 +313,10 @@ def update_index(session, cache):
     session.commit()
 
 
-def log_event(session, obj=None, current_user_id=None):
+def log_event(session, obj=None, current_user_id=None, flush=True):
   revisions = []
-  session.flush()
+  if flush:
+    session.flush()
   if current_user_id is None:
     current_user_id = get_current_user_id()
   cache = get_cache()
@@ -1208,9 +1209,12 @@ class Resource(ModelView):
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
 
-    for obj in objects:
-      with benchmark("Log event"):
-        log_event(db.session, obj)
+
+    with benchmark("Pre collection post log flush"):
+      db.session.flush()
+    with benchmark("Log event for all objects"):
+      for obj in objects:
+        log_event(db.session, obj, flush=False)
 
     with benchmark("Update memcache before commit for collection POST"):
       update_memcache_before_commit(
