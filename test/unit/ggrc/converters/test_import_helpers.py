@@ -118,7 +118,7 @@ class TestColumnOrder(unittest.TestCase):
     """Test sorting of colums by a predined positions.
 
     The predifined positions for all columns can be found in reflection.py.
-    Attr_list is created in an expected correct order, aganist which a newly
+    Attr_list is created in an expected correct order, against which a newly
     orderd list is compaired.
     """
     attr_list = [

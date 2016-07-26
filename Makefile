@@ -3,6 +3,8 @@
 
 SHELL := /bin/bash
 
+.PHONY: clean misspell
+
 PREFIX := $(shell pwd)
 
 DEV_PREFIX ?= $(PREFIX)
@@ -32,6 +34,9 @@ BOWER_PATH=$(PREFIX)/bower_components
 DEV_BOWER_PATH=$(DEV_PREFIX)/bower_components
 BOWER_BIN_PATH=/vagrant-dev/node_modules/bower/bin/bower
 NODE_MODULES_PATH=$(DEV_PREFIX)/node_modules
+GOLANG_PATH=/vagrant-dev/golang
+GOLANG_BIN=$(GOLANG_PATH)/go/bin/go
+GOLANG_PACKAGES=$(GOLANG_PATH)/bin
 
 $(APPENGINE_SDK_PATH) : $(APPENGINE_ZIP_PATH)
 	@echo $( dirname $(APPENGINE_ZIP_PATH) )
@@ -117,8 +122,31 @@ linked_packages : dev_virtualenv_packages
 	source bin/init_env; \
 		setup_linked_packages.py $(DEV_PREFIX)/opt/linked_packages
 
-setup_dev : dev_virtualenv_packages linked_packages
+golang_packages : export GOPATH=$(GOLANG_PATH)
+golang_packages : export GOROOT=$(GOLANG_PATH)/go
+golang_packages :
+	mkdir -p $(GOLANG_PATH)
+	wget https://storage.googleapis.com/golang/go1.6.3.linux-amd64.tar.gz -O $(GOLANG_PATH)/go.tar.gz
+	tar -C $(GOLANG_PATH) -xzf $(GOLANG_PATH)/go.tar.gz
+	rm $(GOLANG_PATH)/go.tar.gz
+	$(GOLANG_BIN) get -u github.com/client9/misspell/cmd/misspell
 
+setup_dev : dev_virtualenv_packages linked_packages golang_packages
+
+misspell :
+	find . -type f -name "*" \
+		! -path "*/.*"\
+		! -path "./node_modules/*"\
+		! -path "./tmp/*"\
+		! -path "./third_party/*"\
+		! -path "./*.sql"\
+		! -path "./*.gz"\
+		! -path "./*.ini"\
+		! -path "./venv/*"\
+		! -path "./src/ggrc/assets/vendor/*"\
+		! -path "./src/ggrc/static/*"\
+		! -path "./test/selenium/src/lib/file_ops.py"\
+		| xargs $(GOLANG_PACKAGES)/misspell -error -locale US
 
 ## Deployment!
 

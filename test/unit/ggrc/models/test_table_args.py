@@ -1,7 +1,7 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Tests for overriden __table_args__."""
+"""Tests for overridden __table_args__."""
 
 import unittest
 

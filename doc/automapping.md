@@ -3,7 +3,7 @@
 This is a process that automatically creates mappings based on user created mappings.
 
 ## `ggrc.automapper`
-This defines the entry point `register_automapping_listeners` that registers an event listener that fires on every user-created mapping. Based on the neighbourhood of the two mapped objects it fires the appropriate rules and creates new mappings. The process is then repeated for newly created mappings. This effectively traverses the local relevant subgraph as defined by the rules.
+This defines the entry point `register_automapping_listeners` that registers an event listener that fires on every user-created mapping. Based on the neighborhood of the two mapped objects it fires the appropriate rules and creates new mappings. The process is then repeated for newly created mappings. This effectively traverses the local relevant subgraph as defined by the rules.
 
 ## `ggrc.automapper.rules`
 

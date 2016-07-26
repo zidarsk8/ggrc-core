@@ -128,7 +128,7 @@ class ModelFactoryMetaClass(FactoryMetaClass):
   def __new__(cls, class_name, bases, attrs, extra_attrs=None):
     """Use model reflection to build up the list of factory attributes.
     The default attributes can be overridden by defining a subclass
-    of `ModelFactory` and defining the attribute to be overriden.
+    of `ModelFactory` and defining the attribute to be overridden.
     """
     model_class = attrs.pop('MODEL', None)
     if model_class:

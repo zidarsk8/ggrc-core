@@ -97,7 +97,7 @@ def get_module_contributions(name):
     name (string): name of the contributed attribute that will be collected.
 
   Returns:
-    A list of all collected atributes.
+    A list of all collected attributes.
 
   """
   all_contributions = []

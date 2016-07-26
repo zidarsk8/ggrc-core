@@ -38,7 +38,7 @@ Feature: Role CRUD
     And GET of "role" is allowed
     And DELETE of "role" is allowed
 
-  Scenario: A non-adminstrative user cannot access role information
+  Scenario: A non-administrative user cannot access role information
     Given the current user
       """
       { "email": "example.admin@example.com", "name": "Jo Admin",

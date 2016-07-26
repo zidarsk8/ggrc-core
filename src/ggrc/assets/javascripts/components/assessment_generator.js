@@ -159,7 +159,7 @@
           }
         } else {
           msg = {
-            error: 'An error occured when creating Assessments.'
+            error: 'An error occurred when creating Assessments.'
           };
         }
 

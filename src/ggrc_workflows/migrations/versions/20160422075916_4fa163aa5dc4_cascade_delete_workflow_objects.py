@@ -160,7 +160,7 @@ def _update_fk_constraint(
       record is deleted. Must be either CASCADE, DELETE or RESTRICT. If not
       provided, the behavior depends on the database defaults.
   """
-  # Since this helper function is essentialy just a wrapper around Alembic's
+  # Since this helper function is essentially just a wrapper around Alembic's
   # method with a similar signature, silencing pylint is kind of justifiable.
   #
   # pylint: disable=too-many-arguments

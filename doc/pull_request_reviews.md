@@ -150,7 +150,7 @@ A pull request **must be rejected** if **any** of the following is true:
   time-consuming to write, or for little UI changes like changing an icon or a
   font color).
 
-The reviewer must mark the pull request with the `needs work` label, signalling
+The reviewer must mark the pull request with the `needs work` label, signaling
 to the author that the PR cannot yet been merged as-is, and additional changes
 are required. Along with the tagging, the reviewer should clearly explain why
 the PR has temporarily been rejected, and what needs to be done before it can

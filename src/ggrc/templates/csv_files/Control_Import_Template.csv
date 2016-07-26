@@ -50,7 +50,7 @@ TRAINING","*Optional.
 You can assign Assertions to your Controls on import by specifying the names of the Assertions.  Use <option><return> to deliniate between Assertions and use only Assertions that already exist in gGRC.
 Example:
 
-OCCURANCE
+OCCURRENCE
 UNDERSTANDABILITY","*Optional.  
 Can be ""Continuous"", ""Ad-Hoc"", ""Semi-Annual"", ""Bi-Annual"", ""Annual"", ""Indeterminate"", ""Hourly"", ""Daily"", ""Weekly"", ""Monthly"", ""Quarterly"", or ""Transactional""","*Optional.
 You can map a person to be the Person of Contact for the Control by entering an email address that already exists in your gGRC instance. Only 1 email address may be entered.

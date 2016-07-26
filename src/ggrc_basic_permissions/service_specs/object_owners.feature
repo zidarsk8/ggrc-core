@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 Feature: Some object types can have an owner as recorded in an ObjectOwner
-  resource. A role, such as Editor, might grant priveleges like delete
+  resource. A role, such as Editor, might grant privileges like delete
   to the owners ownly.
 
   Background:

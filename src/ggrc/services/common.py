@@ -175,7 +175,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
 
   Args:
     context: POST/PUT/DELETE HTTP request or import Converter contextual object
-    modified_objects:  objects in cache maintained prior to commiting to DB
+    modified_objects:  objects in cache maintained prior to committing to DB
     expiry_time: Expiry time specified for memcache ADD and DELETE
   Returns:
     None
@@ -217,7 +217,7 @@ def update_memcache_after_commit(context):
 
   Args:
     context: POST/PUT/DELETE HTTP request or import Converter contextual object
-    modified_objects:  objects in cache maintained prior to commiting to DB
+    modified_objects:  objects in cache maintained prior to committing to DB
   Returns:
     None
 

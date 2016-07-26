@@ -9,7 +9,7 @@
 ### GGRC attribute
 |Field name|Type|Description|
 |---|---|---|
-|AssigneeType|str|comma seperated sequence of [Assignee Type](#assignee-type)|
+|AssigneeType|str|comma separated sequence of [Assignee Type](#assignee-type)|
 
 
 ## Types
@@ -123,4 +123,4 @@
 |weekly|
 |monthly|
 |quarterly|
-|annualy|
+|annually|
