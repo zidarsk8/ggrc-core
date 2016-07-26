@@ -212,6 +212,8 @@ class UpdateAttrHandler(object):
   def Date(cls, obj, json_obj, attr_name, class_attr):
     """Translate the JSON value for a ``Date`` column."""
     value = json_obj.get(attr_name)
+    value = value.split('T')[0] if isinstance(value, basestring) else value
+
     try:
       return datetime.strptime(value, "%Y-%m-%d") if value else None
     except ValueError as e:

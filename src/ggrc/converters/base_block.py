@@ -27,7 +27,6 @@ from ggrc.converters import pre_commit_checks
 from ggrc.converters.base_row import RowConverter
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
-from ggrc.rbac import permissions
 from ggrc.services.common import get_modified_objects
 from ggrc.services.common import update_index
 from ggrc.services.common import update_memcache_after_commit
@@ -272,9 +271,6 @@ class BlockConverter(object):
     self.row_converters = []
     objects = self.object_class.eager_query().filter(
         self.object_class.id.in_(self.object_ids)).all()
-    # TODO: this needs to be moved to query_helper, but it's here for now,
-    # so we don't have to fetch same objects twice from the database.
-    objects = [o for o in objects if permissions.is_allowed_read_for(o)]
     for i, obj in enumerate(objects):
       row = RowConverter(self, self.object_class, obj=obj,
                          headers=self.headers, index=i)
@@ -352,7 +348,7 @@ class BlockConverter(object):
     """Add all objects to the database.
 
     This function flushes all objects to the database and if the dry_run flag
-    is not set, the session gets commited and all signals for the imported
+    is not set, the session gets committed and all signals for the imported
     objects get sent.
     """
     if self.ignore:

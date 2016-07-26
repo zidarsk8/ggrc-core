@@ -3,7 +3,8 @@
 
 """Mixins to add common attributes and relationships. Note, all model classes
 must also inherit from ``db.Model``. For example:
-
+color
+color
   ..
 
      class Market(BusinessObject, db.Model):
@@ -310,7 +311,7 @@ class Stateful(object):
 
   @validates('status')
   def validate_status(self, key, value):
-    # Sqlalchemy only uses one validator per status (not neccessarily the
+    # Sqlalchemy only uses one validator per status (not necessarily the
     # first) and ignores others. This enables cooperation between validators
     # since there are other mixins that want to touch 'status'.
     if hasattr(super(Stateful, self), "validate_status"):
@@ -352,7 +353,7 @@ class FinishedDate(object):
   @validates('status')
   def validate_status(self, key, value):
     """Update finished_date given the right status change."""
-    # Sqlalchemy only uses one validator per status (not neccessarily the
+    # Sqlalchemy only uses one validator per status (not necessarily the
     # first) and ignores others. This enables cooperation between validators
     # since 'status' is not defined here.
     if hasattr(super(FinishedDate, self), "validate_status"):
@@ -373,7 +374,7 @@ class FinishedDate(object):
 class VerifiedDate(object):
   """Adds 'Verified Date' which is set when status is set to 'Verified'.
 
-  When object is verified the status is overriden to 'Final' and the
+  When object is verified the status is overridden to 'Final' and the
   information about verification exposed as the 'verified' boolean.
   Requires Stateful to be mixed in as well.
   """
@@ -406,7 +407,7 @@ class VerifiedDate(object):
   @validates('status')
   def validate_status(self, key, value):
     """Update verified_date on status change, make verified status final."""
-    # Sqlalchemy only uses one validator per status (not neccessarily the
+    # Sqlalchemy only uses one validator per status (not necessarily the
     # first) and ignores others. This enables cooperation between validators
     # since 'status' is not defined here.
     if hasattr(super(VerifiedDate, self), "validate_status"):

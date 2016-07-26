@@ -108,7 +108,7 @@ class CycleCalculator(object):
     """Adjust date if it's not a work day.
 
     Calculates the first workday by going backwards by either subtracting
-    appropriate number of days (if ddate is during weekend) or substracting
+    appropriate number of days (if ddate is during weekend) or subtracting
     by one day if it's a holiday. In case we still aren't on a workday we
     repeat the process recursively until we find the first workday.
 
@@ -223,7 +223,7 @@ class CycleCalculator(object):
         relative_month=task.relative_end_month,
         base_date=base_date)
 
-    # On initialisation `reified_tasks` haven't been initialised yet, making
+    # On initialisation `reified_tasks` haven't been initialized yet, making
     # this check unnecessary (and impossible).
     if not initialisation:
       min_rsm, min_rsd = self.get_month_day_pair_from_relative(

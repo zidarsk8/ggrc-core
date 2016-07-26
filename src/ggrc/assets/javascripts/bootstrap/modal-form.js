@@ -175,7 +175,7 @@
           return;
         }
         if (instance) {
-          changedInstance = instance.isDirty();
+          changedInstance = instance.isDirty(true);
           hasPending = GGRC.Utils.hasPending(instance);
         }
         if (this.is_form_dirty() || changedInstance || hasPending) {

@@ -23,7 +23,7 @@ class ElementMovingTimeout(Exception):
 
 
 class RedirectTimeout(Exception):
-  """When detecting if a redirect has occured, we usually check that the
+  """When detecting if a redirect has occurred, we usually check that the
   loop isn't infinite and raise this exception if the timeout is reached.
   """
 

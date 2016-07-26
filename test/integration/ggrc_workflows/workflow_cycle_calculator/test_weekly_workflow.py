@@ -716,7 +716,7 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
       self.assertEqual(cycle.end_date, datetime.date(2015, 9, 3))
 
       _, cycle = self.generator.generate_cycle(
-          wf)  # 2015-9-7 is Labour day in US
+          wf)  # 2015-9-7 is Labor day in US
       self.assertEqual(cycle.start_date, datetime.date(2015, 9, 4))
       self.assertEqual(cycle.end_date, datetime.date(2015, 9, 10))
 

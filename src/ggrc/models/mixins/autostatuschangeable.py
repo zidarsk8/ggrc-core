@@ -17,7 +17,7 @@ from ggrc.services import signals
 from ggrc.models.mixins import statusable
 
 
-class AutoStatusChangable(object):
+class AutoStatusChangeable(object):
   """
   Mixin for automatic status changes
 
@@ -39,7 +39,7 @@ class AutoStatusChangable(object):
     Date fields are always interpreted as changed because incoming data is
     of type datetime.datetime, while database field has type datetime.date.
 
-    This function normalises this and performs the correct check.
+    This function normalizes this and performs the correct check.
 
     Args:
       attr: (datetime.date|datetime.datetime) Attribute value
@@ -86,7 +86,7 @@ class AutoStatusChangable(object):
 
   @classmethod
   def init(cls, model):
-    """Initialisation method to run after models have been initialised.
+    """Initialisation method to run after models have been initialized.
 
     Args:
       model: (db.Model class) Class on which to run set_handlers method.
@@ -130,7 +130,7 @@ class AutoStatusChangable(object):
 
   @classmethod
   def adjust_status_before_flush(cls, session, flush_context, instances):
-    """Reset status of AutoStatusChangable objects with _need_status_reset.
+    """Reset status of AutoStatusChangeable objects with _need_status_reset.
 
     Is registered to listen for 'before_flush' events on a later stage.
     """
@@ -138,7 +138,7 @@ class AutoStatusChangable(object):
     # pylint: disable=unused-argument
 
     for obj in session.identity_map.values():
-      if (isinstance(obj, AutoStatusChangable) and
+      if (isinstance(obj, AutoStatusChangeable) and
               getattr(obj, '_need_status_reset', False)):
         cls.adjust_status(type(obj), obj)
         delattr(obj, '_need_status_reset')
@@ -280,6 +280,6 @@ class AutoStatusChangable(object):
 
 # pylint: disable=fixme
 # TODO: find a way to listen for updates only for classes that use
-# AutoStatusChangable, not for every flush event for every session
+# AutoStatusChangeable, not for every flush event for every session
 event.listen(Session, 'before_flush',
-             AutoStatusChangable.adjust_status_before_flush)
+             AutoStatusChangeable.adjust_status_before_flush)

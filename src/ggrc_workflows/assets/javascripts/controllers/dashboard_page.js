@@ -87,7 +87,7 @@
           //Filter workflows with a current cycle
           cur_wfs = self.filter_current_workflows(wfs);
           self.scope.attr('workflow_count', cur_wfs.length);
-          //Sort the workflows in accending order by first_end_date
+          //Sort the workflows in ascending order by first_end_date
           cur_wfs.sort(self.sort_by_end_date);
           workflow_data.cur_wfs = cur_wfs;
 

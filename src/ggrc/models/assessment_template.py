@@ -185,7 +185,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
               mandatory_value not in self.DEFAULT_PEOPLE_LABELS):
         raise ValidationError(
             'Invalid value for default_people.{field}. Expected a people '
-            'label in string or a list of int people ids, recieved {value}.'
+            'label in string or a list of int people ids, received {value}.'
             .format(field=mandatory, value=mandatory_value),
         )
 

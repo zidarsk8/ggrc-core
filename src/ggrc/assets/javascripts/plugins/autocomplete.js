@@ -366,7 +366,7 @@
       if (!this.element) {
         // It can happen that this.element is already null when we want to init
         // autocomplete on it, e.g. when its containing modal form is already
-        // being destoryed. In such cases we simply don't do anything.
+        // being destroyed. In such cases we simply don't do anything.
         return;
       }
       el = this.element.find('input[data-lookup]');

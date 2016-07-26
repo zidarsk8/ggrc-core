@@ -82,7 +82,7 @@ class TestCase(BaseTestCase):
 
     Raises:
       AssertionError if an expected error or warning is not found in the
-        propper response block.
+        proper response block.
     """
 
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")

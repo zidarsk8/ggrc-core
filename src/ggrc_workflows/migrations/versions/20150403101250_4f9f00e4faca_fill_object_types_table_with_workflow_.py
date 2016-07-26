@@ -20,7 +20,7 @@ down_revision = '8e530ce276a'
 def upgrade():
   # This migration has been removed due to remove_object_type_table migration.
   # The object_types table has been removed and there should not be any more
-  # refferences to that table.
+  # references to that table.
   pass
 
 

@@ -260,7 +260,7 @@
             }
             picker = picker.build();
             picker.setVisible(true);
-            // use undocumented fu to make the Picker be "modal" - https://b2.corp.google.com/issues/18628239
+            // use undocumented fu to make the Picker be "modal"
             // this is the "mask" displayed behind the dialog box div
             $('div.picker-dialog-bg').css('zIndex', 4000);  // there are multiple divs of that sort
             // and this is the dialog box modal div, which we must display on top of our modal, if any

@@ -14,7 +14,7 @@ from lib.constants import objects
 
 
 class TemplateProvider(object):
-  """Proccesses json templates"""
+  """Processes json templates"""
   RELATIVE_PATH_TEMPLATE = "template/{0}.json"
   parsed_data = dict()
 

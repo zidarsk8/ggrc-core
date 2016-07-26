@@ -206,7 +206,7 @@ def should_receive(notif, user_data):
 
 
 def send_todays_digest_notifications():
-  """Send emails for todays or overdue notifications.
+  """Send emails for today's or overdue notifications.
 
   Returns:
     str: String containing a simple list of who received the notification.
@@ -260,10 +260,10 @@ def show_pending_notifications():
 
 
 def show_todays_digest_notifications():
-  """Get notification html for todays notifications.
+  """Get notification html for today's notifications.
 
   Returns:
-    str: Html containing all todays notifications.
+    str: Html containing all today's notifications.
   """
   # pylint: disable=invalid-name
   if not permissions.is_admin():

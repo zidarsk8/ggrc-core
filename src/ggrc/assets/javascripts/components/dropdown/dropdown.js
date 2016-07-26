@@ -9,7 +9,7 @@
   /*
     Component abstracts <select> dropdown in HTML.
 
-    It recieves `name` of the attribute that should be set and `optionsList`
+    It receives `name` of the attribute that should be set and `optionsList`
     with titles and values
    */
   GGRC.Components('dropdown', {

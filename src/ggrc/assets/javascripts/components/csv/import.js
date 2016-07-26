@@ -73,7 +73,7 @@
         var file = el[0].files[0],
             formData = new FormData();
 
-        this.scope.attr("state", "analysing");
+        this.scope.attr("state", "analyzing");
         this.scope.attr("isLoading", true);
         this.scope.attr("filename", file.name);
         formData.append("file", file);

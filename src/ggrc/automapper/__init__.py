@@ -44,7 +44,7 @@ class AutomapperGenerator(object):
   def related(self, obj):
     if obj in self.cache:
       return self.cache[obj]
-    # Pre-fetch neighbourhood for enqueued object since we're gonna need that
+    # Pre-fetch neighborhood for enqueued object since we're gonna need that
     # results in a few steps. This drastically reduces number of queries.
     stubs = {s for rel in self.queue for s in rel}
     stubs.add(obj)
@@ -69,8 +69,8 @@ class AutomapperGenerator(object):
     for (src_type, src_id, dst_type, dst_id) in relationships:
       src = Stub(src_type, src_id)
       dst = Stub(dst_type, dst_id)
-      # only store a neighbour if we queried for it since this way we know
-      # we'll be storing complete neighbourhood by the end of the loop
+      # only store a neighbor if we queried for it since this way we know
+      # we'll be storing complete neighborhood by the end of the loop
       batch_requests[src_type].add(src_id)
       batch_requests[dst_type].add(dst_id)
       if src in stubs:
@@ -96,7 +96,7 @@ class AutomapperGenerator(object):
     with self.benchmark("Automapping generate_automappings"):
       # initial relationship is special since it is already created and
       # processing it would abort the loop so we manually enqueue the
-      # neighbourhood
+      # neighborhood
       src = Stub.from_source(relationship)
       dst = Stub.from_destination(relationship)
       self._step(src, dst)

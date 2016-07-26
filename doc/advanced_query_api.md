@@ -1,6 +1,6 @@
 # Advanced query API
 
-Quick overview of the expected advanced API behaviour.
+Quick overview of the expected advanced API behavior.
 
 API endpoint should be `/query` and in the future it should replace the current
 `/search`. Due to expected bigger queries it should listen for both GET or POST

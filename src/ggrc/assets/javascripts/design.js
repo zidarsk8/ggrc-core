@@ -364,7 +364,7 @@ $('body').on('click', '#showCompanyDirectory', function(e) {
 
 
   // status js
-  var userHasPriviledge = true;
+  var userHasPrivilege = true;
   $('body').on('click', '#actionButton', function(e) {
     e.preventDefault();
 
@@ -379,7 +379,7 @@ $('body').on('click', '#showCompanyDirectory', function(e) {
         $status = $this.closest(".modal").find("#statusValue"),
         $currentStatus = $this.closest(".modal").find("#statusValue").html();
 
-    if(userHasPriviledge) {
+    if(userHasPrivilege) {
 
       if ($currentStatus === "Draft") {
         $status

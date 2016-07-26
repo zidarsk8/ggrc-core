@@ -194,6 +194,39 @@ class TestWorkflowObjectsImport(TestCase):
     }
     self._check_response(response, expected_errors)
 
+  def test_malformed_task_dates(self):
+    """Test import updates with malformed task dates.
+
+    Check that the warnings for task dates in MM/DD/YYYY format of annually
+    workflow are shown up and YYYY part of date is ignored.
+
+    Raises:
+      AssertionError: When file import does not return correct warnings for the
+        example csv, or if any of the tasks does not have the expected
+        relative dates.
+    """
+    response = self.import_file("workflow_malformed_task_dates.csv")
+
+    expected_errors = {
+        "Task Group Task": {
+            "row_warnings": set([
+                errors.WRONG_DATE_FORMAT.format(line=15, column_name="Start"),
+                errors.WRONG_DATE_FORMAT.format(line=15, column_name="End"),
+                errors.WRONG_DATE_FORMAT.format(line=16, column_name="Start"),
+                errors.WRONG_DATE_FORMAT.format(line=17, column_name="End"),
+            ]),
+        },
+    }
+    self._check_response(response, expected_errors)
+    task_slugs = ["t-1", "t-2", "t-3", "t-4"]
+    tasks = db.session.query(TaskGroupTask).filter(
+        TaskGroupTask.slug.in_(task_slugs)).all()
+    for task in tasks:
+      self.assertEqual(task.relative_start_month, 7)
+      self.assertEqual(task.relative_start_day, 10)
+      self.assertEqual(task.relative_end_month, 12)
+      self.assertEqual(task.relative_end_day, 30)
+
   def _test_task_types(self, expected_type, task_slugs):
     """Test that all listed tasks have rich text type.
 

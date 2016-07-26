@@ -1,7 +1,7 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Integration test for AutoStatusChangable mixin"""
+"""Integration test for AutoStatusChangeable mixin"""
 
 from ggrc import models
 
@@ -11,9 +11,9 @@ from integration.ggrc import generator
 from integration.ggrc.models import factories
 
 
-class TestMixinAutoStatusChangable(integration.ggrc.TestCase):
+class TestMixinAutoStatusChangeable(integration.ggrc.TestCase):
 
-  """Test case for AutoStatusChangable mixin"""
+  """Test case for AutoStatusChangeable mixin"""
 
   # pylint: disable=invalid-name
 

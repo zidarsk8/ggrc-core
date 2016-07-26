@@ -41,7 +41,7 @@ class WorkflowRolesTestCase(WorkflowTestCase):
         self.workflow_obj.id)[0]
 
   def init_users(self):
-    """Intializes users needed by the test"""
+    """Initializes users needed by the test"""
 
     users = [
         ("creator", "Creator"),
@@ -82,7 +82,7 @@ class WorkflowRolesTestCase(WorkflowTestCase):
   def activate_workflow_with_cycle(self, workflow_obj):
     """
     Args:
-        workflow_obj: Workflow model isntance
+        workflow_obj: Workflow model instance
     Returns:
         A tuple with a response object and the reference to mutated workflow
     """

@@ -150,7 +150,7 @@ class TestCustomAttributeImportExport(TestCase):
   def tests_ca_export(self):
     """Test exporting products with custom attributes
 
-    This test checks that we get a propper response when exporting objects with
+    This test checks that we get a proper response when exporting objects with
     custom attributes and that the response data actually contains more lines
     than an empty template would.
     This tests relys on the import tests to work. If those fail they need to be
