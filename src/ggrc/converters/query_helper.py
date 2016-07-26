@@ -9,6 +9,7 @@ from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
 
+from ggrc.rbac import permissions
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
@@ -30,10 +31,11 @@ class QueryHelper(object):
   query object = [
     {
       object_name: search class name,
+      permissions: either read or update, if none are given it defaults to read
       filters: {
         relevant_filters:
           these filters will return all ids of the "search class name" object
-          that are mapped to objects defined in the dictionary insde the list.
+          that are mapped to objects defined in the dictionary inside the list.
           [ list of filters joined by OR expression
             [ list of filters joined by AND expression
               {
@@ -55,10 +57,10 @@ class QueryHelper(object):
   def __init__(self, query):
     importable = get_exportables()
     self.object_map = {o.__name__: o for o in importable.values()}
-    self.query = self.clean_query(query)
-    self.set_attr_name_map()
+    self.query = self._clean_query(query)
+    self._set_attr_name_map()
 
-  def set_attr_name_map(self):
+  def _set_attr_name_map(self):
     """ build a map for attributes names and display names
 
     Dict containing all display_name to attr_name mappings
@@ -82,7 +84,8 @@ class QueryHelper(object):
         if value:
           self.attr_name_map[object_class][value.lower()] = (key.lower(),
                                                              filter_by)
-      custom_attrs = AttributeInfo.get_custom_attr_definitions(object_class)
+      custom_attrs = AttributeInfo.get_custom_attr_definitions(
+          object_class)
       for key, definition in custom_attrs.items():
         if not key.startswith("__custom__:") or \
            "display_name" not in definition:
@@ -96,22 +99,22 @@ class QueryHelper(object):
         name = definition["display_name"].lower()
         self.attr_name_map[object_class][name] = (name, filter_by)
 
-  def clean_query(self, query):
+  def _clean_query(self, query):
     """ sanitize the query object """
     for object_query in query:
       filters = object_query.get("filters", {}).get("expression")
-      self.clean_filters(filters)
-      self.macro_expand_object_query(object_query)
+      self._clean_filters(filters)
+      self._macro_expand_object_query(object_query)
     return query
 
-  def clean_filters(self, expression):
-    """ prepair the filter expression for building the query """
+  def _clean_filters(self, expression):
+    """Prepare the filter expression for building the query."""
     if not expression or type(expression) != dict:
       return
     slugs = expression.get("slugs")
     if slugs:
       ids = expression.get("ids", [])
-      ids.extend(self.slugs_to_ids(expression["object_name"], slugs))
+      ids.extend(self._slugs_to_ids(expression["object_name"], slugs))
       expression["ids"] = ids
     try:
       expression["ids"] = map(int, expression.get("ids", []))
@@ -121,21 +124,21 @@ class QueryHelper(object):
         raise BadQueryException("Invalid relevant filter for {}".format(
                                 expression.get("object_name", "")))
       raise e
-    self.clean_filters(expression.get("left"))
-    self.clean_filters(expression.get("right"))
+    self._clean_filters(expression.get("left"))
+    self._clean_filters(expression.get("right"))
 
-  def expression_keys(self, exp):
+  def _expression_keys(self, exp):
     op = exp.get("op", {}).get("name", None)
     if op in ["AND", "OR"]:
-      return self.expression_keys(exp["left"]).union(
-          self.expression_keys(exp["right"]))
+      return self._expression_keys(exp["left"]).union(
+          self._expression_keys(exp["right"]))
     left = exp.get("left", None)
     if left is not None and isinstance(left, collections.Hashable):
       return set([left])
     else:
       return set()
 
-  def macro_expand_object_query(self, object_query):
+  def _macro_expand_object_query(self, object_query):
     def expand_task_dates(exp):
       if type(exp) is not dict or "op" not in exp:
         return
@@ -151,7 +154,8 @@ class QueryHelper(object):
             try:
               month, day, year = map(int, parts)
             except Exception:
-              raise BadQueryException("Date must consist of numbers")
+              raise BadQueryException(
+                  "Date must consist of numbers")
             exp["left"] = key + "_date"
             exp["right"] = datetime.date(year, month, day)
           elif len(parts) == 2:
@@ -178,21 +182,24 @@ class QueryHelper(object):
       filters = object_query.get("filters")
       if filters is not None:
         exp = filters["expression"]
-        keys = self.expression_keys(exp)
+        keys = self._expression_keys(exp)
         if "start" in keys or "end" in keys:
           expand_task_dates(exp)
 
   def get_ids(self):
-    """ get list of objects and their ids according to the query
+    """Get a list of filtered object IDs.
+
+    self.query should contain a list of queries for different objects which
+    will get evaluated and turned into a list of object IDs.
 
     Returns:
       list of dicts: same query as the input with all ids that match the filter
     """
     for object_query in self.query:
-      object_query["ids"] = self.get_object_ids(object_query)
+      object_query["ids"] = self._get_object_ids(object_query)
     return self.query
 
-  def get_object_ids(self, object_query):
+  def _get_object_ids(self, object_query):
     """ get a set of object ids described in the filters """
     object_name = object_query["object_name"]
     expression = object_query.get("filters", {}).get("expression")
@@ -240,7 +247,8 @@ class QueryHelper(object):
 
       def with_key(key, p):
         key = key.lower()
-        key, filter_by = self.attr_name_map[object_class].get(key, (key, None))
+        key, filter_by = self.attr_name_map[
+            object_class].get(key, (key, None))
         if hasattr(filter_by, "__call__"):
           return filter_by(p)
         else:
@@ -290,10 +298,21 @@ class QueryHelper(object):
     filter_expression = build_expression(expression)
     if filter_expression is not None:
       query = query.filter(filter_expression)
-    object_ids = [o.id for o in query.all()]
-    return object_ids
+    requested_permissions = object_query.get("permissions", "read")
+    if requested_permissions == "update":
+      ids = [o.id for o in query if permissions.is_allowed_update_for(o)]
+    else:
+      ids = [o.id for o in query if permissions.is_allowed_read_for(o)]
 
-  def slugs_to_ids(self, object_name, slugs):
+    if "limit" in object_query:
+      try:
+        from_, to_ = object_query["limit"]
+        ids = ids[from_: to_]
+      except:
+        raise BadQueryException("Bad query: Invalid limit operand.")
+    return ids
+
+  def _slugs_to_ids(self, object_name, slugs):
     object_class = self.object_map.get(object_name)
     if not object_class:
       return []

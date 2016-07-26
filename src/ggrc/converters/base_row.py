@@ -179,7 +179,7 @@ class RowConverter(object):
   def send_post_commit_signals(self):
     """Send after commit signals for all objects
 
-    This function sends propper signals for all objects depending if the object
+    This function sends proper signals for all objects depending if the object
     was created, updated or deleted.
     Note: signals are only sent for the row objects. Secondary objects such as
     Relationships do not get any signals triggered.
@@ -201,7 +201,7 @@ class RowConverter(object):
   def send_pre_commit_signals(self):
     """Send before commit signals for all objects.
 
-    This function sends propper signals for all objects depending if the object
+    This function sends proper signals for all objects depending if the object
     was created, updated or deleted.
     Note: signals are only sent for the row objects. Secondary objects such as
     Relationships do not get any signals triggered.
@@ -234,7 +234,7 @@ class RowConverter(object):
     """Add additional objects to the current database session.
 
     This is used for adding any extra created objects such as Relationships, to
-    the current session to be commited.
+    the current session to be committed.
     """
     if not self.obj or self.ignore or self.is_delete:
       return
