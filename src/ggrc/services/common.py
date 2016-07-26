@@ -1187,37 +1187,30 @@ class Resource(ModelView):
       for wrapped_src in body:
         if running_async:
           time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
-
         src = self._unwrap_collection_post_src(wrapped_src)
         obj = self._get_model_instance(src)
-
         with benchmark("Deserialize object"):
           self.json_create(obj, src)
         with benchmark("Send model POSTed event"):
           self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
-
-        obj.modified_by = get_current_user()
         with benchmark("Update custom attribute values"):
           set_ids_for_new_custom_attributes(obj)
 
+        obj.modified_by = get_current_user()
         objects.append(obj)
 
     with benchmark("Send model POSTed event"):
       self.collection_posted.send(obj.__class__, objects=objects)
-
     with benchmark("Check create permissions"):
       self._check_post_permissions(objects)
-
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
-
     with benchmark("Log event for all objects"):
       log_event(db.session, obj, flush=False)
-
     with benchmark("Update memcache before commit for collection POST"):
       update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
-    with benchmark("Commit"):
+    with benchmark("Commit collection"):
       db.session.commit()
     with benchmark("Update index"):
       update_index(db.session, modified_objects)
