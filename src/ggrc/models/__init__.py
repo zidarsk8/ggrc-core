@@ -105,7 +105,7 @@ def init_lazy_mixins():
   """Lazy mixins initialisation
 
   Mixins with `__lazy__init__` property set to True will wait with their
-  initialisation until after the models have been fully initialized. This is
+  initialization until after the models have been fully initialized. This is
   useful in cases where we need full model class, e.g. to hook up signaling
   logic.
   """
