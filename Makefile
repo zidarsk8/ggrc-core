@@ -140,9 +140,11 @@ misspell :
 		! -path "./tmp/*"\
 		! -path "./third_party/*"\
 		! -path "./*.sql"\
+		! -path "./*.gz"\
 		! -path "./*.ini"\
+		! -path "./venv/*"\
 		! -path "./src/ggrc/assets/vendor/*"\
-		! -path "./src/ggrc/static/dashboard.js"\
+		! -path "./src/ggrc/static/*"\
 		! -path "./test/selenium/src/lib/file_ops.py"\
 		| xargs $(GOLANG_PACKAGES)/misspell -error -locale US
 
