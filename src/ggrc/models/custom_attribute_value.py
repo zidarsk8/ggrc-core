@@ -69,6 +69,10 @@ class CustomAttributeValue(Base, db.Model):
     Args:
         value: model instance
     """
+    if value is None:
+      # We get here if a CustomAttributeValue is POSTed via the REST API.
+      # As no attribute_object manipulations make sense if it is None, return.
+      return
     self.attribute_object_id = value.id
     return setattr(self, self._attribute_object_attr, value)
 
