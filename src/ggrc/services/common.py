@@ -1149,9 +1149,11 @@ class Resource(ModelView):
       db.session.add(obj)
     return obj
 
-  def collection_post_loop(self, body, res, no_result):
+  def collection_post_loop(self, body, res, no_result, running_async):
     for wrapped_src in body:
-      src_res = None
+      if running_async:
+        time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
+
       src = self._unwrap_collection_post_src(wrapped_src)
       obj = self._get_model_instance(src)
 
@@ -1194,11 +1196,7 @@ class Resource(ModelView):
       with benchmark("Serialize object"):
         object_for_json = {} if no_result else self.object_for_json(obj)
       with benchmark("Make response"):
-        return (201, object_for_json)
-
-      if running_async:
-        time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
-    res.append(src_res)
+        res.append((201, object_for_json))
 
   @staticmethod
   def _make_error_from_exception(exc):
@@ -1236,16 +1234,15 @@ class Resource(ModelView):
       wrap = isinstance(body, dict)
       if wrap:
         body = [body]
+      res = []
       with benchmark("collection post > body loop: {}".format(len(body))):
-        res = []
         try:
-          self.collection_post_loop(body, res, no_result)
+          self.collection_post_loop(body, res, no_result, running_async)
         except (IntegrityError, ValidationError) as e:
           res.append(self._make_error_from_exception(e))
           db.session.rollback()
         except Exception as e:
-          if not src_res or 200 <= src_res[0] < 300:
-            res.append((getattr(e, "code", 500), e.message))
+          res.append((getattr(e, "code", 500), e.message))
           current_app.logger.warn("Collection POST commit failed:")
           current_app.logger.exception(e)
           db.session.rollback()
