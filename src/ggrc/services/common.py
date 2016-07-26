@@ -1188,6 +1188,7 @@ class Resource(ModelView):
         modified_objects = get_modified_objects(db.session)
       with benchmark("Update custom attribute values"):
         set_ids_for_new_custom_attributes(modified_objects.new, obj)
+
       with benchmark("Log event"):
         log_event(db.session, obj)
       with benchmark("Update memcache before commit for collection POST"):
@@ -1202,9 +1203,9 @@ class Resource(ModelView):
       with benchmark("Send model POSTed - after commit event"):
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
                                             src=src, service=self)
-      # Note: In model_posted_after_commit necessary mapping and relashionships
-      # are set, so need to commit the changes
-      db.session.commit()
+        # Note: In model_posted_after_commit necessary mapping and
+        # relationships are set, so need to commit the changes
+        db.session.commit()
 
       with benchmark("Serialize object"):
         object_for_json = {} if no_result else self.object_for_json(obj)
