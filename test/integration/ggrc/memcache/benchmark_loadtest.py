@@ -78,8 +78,8 @@ def run_benchmark_tests(prefix, targethost, num_iterations, headers,  # noqa
       for key, value in decoded_result[key].items():
         if key == resource:
           for item in value:
-            id = item[u'id']
-            resource_collection[resource].append(id)
+            id_ = item[u'id']
+            resource_collection[resource].append(id_)
 
   print "Running benchmark load tests for collection"
   for resource, objids in resource_collection.items():
