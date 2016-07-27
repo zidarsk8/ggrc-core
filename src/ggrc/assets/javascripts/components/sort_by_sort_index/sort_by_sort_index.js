@@ -30,7 +30,9 @@
         });
         this.scope.attr('sorted', arr);
         last = arr[arr.length - 1];
-        lastIndex = (last !== -Infinity) ? last.instance.sort_index : '0';
+        lastIndex = (last !== -Infinity && last) ?
+            last.instance.sort_index :
+            '0';
         this.scope.attr('next_sort_index',
             GGRC.Math.string_half(
                 GGRC.Math.string_add(
