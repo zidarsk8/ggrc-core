@@ -6,7 +6,7 @@
 (function (can, $) {
   'use strict';
 
-  can.Component.extend({
+  GGRC.Components('mapperResults', {
     tag: 'mapper-results',
     template: can.view(
       GGRC.mustache_path +
@@ -70,6 +70,8 @@
     },
     events: {
       inserted: function () {
+        this.scope.attr('entries', []);
+        this.scope.attr('options', []);
         this.element.find('.results-wrap').cms_controllers_infinite_scroll();
       },
       '.modalSearchButton click': 'getResults',
