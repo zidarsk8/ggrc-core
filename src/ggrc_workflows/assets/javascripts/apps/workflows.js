@@ -335,22 +335,45 @@
     var pageInstance = GGRC.page_instance();
     var treeWidgets = GGRC.tree_view.base_widgets_by_type;
     var subTrees = GGRC.tree_view.sub_tree_for;
-
+    var subTreeItems = ['Cycle'];
+    var models = ['TaskGroup', 'Workflow', 'CycleTaskEntry',
+      'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
     _.each(_workflowObjectTypes, function (type) {
+      var widget;
       if (!type || !treeWidgets[type]) {
         return;
       }
-      treeWidgets[type] = treeWidgets[type].concat(['TaskGroup', 'Workflow',
-        'CycleTaskEntry', 'CycleTaskGroupObjectTask', 'CycleTaskGroupObject',
-        'CycleTaskGroup']);
-      if (!_.isEmpty(subTrees)) {
-        subTrees[type].display_list = subTrees[type].display_list
-          .concat(['CycleTaskGroupObjectTask']);
-        subTrees[type].model_list = subTrees[type].model_list.concat({
-          display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
-          display_status: true,
-          model_name: 'CycleTaskGroupObjectTask'});
+
+      widget = subTrees[type];
+
+      treeWidgets[type] = treeWidgets[type].concat(models);
+      if (!_.isEmpty(subTrees.serialize)) {
+        widget.attr({
+          display_list: widget.display_list
+            .concat(['CycleTaskGroupObjectTask']),
+          model_list: widget.model_list
+            .concat({
+              display_name: CMS.Models.CycleTaskGroupObjectTask.title_singular,
+              display_status: true,
+              model_name: 'CycleTaskGroupObjectTask'
+            })
+        });
       }
+    });
+    subTreeItems.forEach(function (item) {
+      var defaults = {
+        model_list: GGRC.tree_view.basic_model_list,
+        display_list: can.Map.keys(GGRC.tree_view.base_widgets_by_type)
+      };
+      defaults.display_list.concat(models);
+
+      treeWidgets.attr(item,
+        can.Map.keys(GGRC.tree_view.base_widgets_by_type).concat(models));
+      subTrees.attr(item, {
+        display_list: defaults.display_list
+          .concat(models),
+        model_list: defaults.model_list
+      });
     });
 
     if (pageInstance instanceof CMS.Models.Workflow) {
