@@ -82,7 +82,7 @@ def _get_declined_people(obj):
     obj (Model): An assignable model
 
   Returns:
-    A list of people that should recieve a declined notification acording to
+    A list of people that should receive a declined notification according to
     the given object type.
   """
   if obj.type == "Request":

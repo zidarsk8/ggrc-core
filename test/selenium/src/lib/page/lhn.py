@@ -14,7 +14,7 @@ class _Programs(lhn.AccordionGroup):
 
   _locator_spinny = locator.LhnMenu.SPINNY_PROGRAMS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROGRAMS
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_PROGRAMS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_PROGRAMS
   _create_new_modal_cls = modal.create_new_object.Programs
 
 
@@ -53,7 +53,7 @@ class _Requests(lhn.AccordionGroup):
   """Requests dropdown in LHN"""
   _locator_spinny = locator.LhnMenu.SPINNY_REQUESTS
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_REQUESTS
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_REQUESTS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_REQUESTS
   _create_new_modal_cls = modal.create_new_object.Requests
 
 
@@ -61,7 +61,7 @@ class _Issues(lhn.AccordionGroup):
   """Issues dropdown in LHN"""
   _locator_spinny = locator.LhnMenu.SPINNY_ISSUES
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_ISSUES
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_ISSUES
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_ISSUES
   _create_new_modal_cls = modal.create_new_object.Issues
 
 
@@ -226,7 +226,7 @@ class Controls(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_CONTROLS
   _locator_spinny = locator.LhnMenu.SPINNY_CONTROLS
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_CONTROLS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_CONTROLS
   _create_new_modal_cls = modal.create_new_object.Controls
 
 
@@ -306,7 +306,7 @@ class _OrgGroups(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_ORG_GROUPS
   _locator_spinny = locator.LhnMenu.SPINNY_ORG_GROUPS
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_ORG_GROUPS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_ORG_GROUPS
   _create_new_modal_cls = modal.create_new_object.OrgGroups
 
 
@@ -423,7 +423,7 @@ class _Systems(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_SYSTEMS
   _locator_spinny = locator.LhnMenu.SPINNY_SYSTEMS
   _create_new_modal_cls = modal.create_new_object.Systems
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_SYSTEMS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_SYSTEMS
 
 
 class _Processes(lhn.AccordionGroup):
@@ -432,7 +432,7 @@ class _Processes(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROCESSES
   _locator_spinny = locator.LhnMenu.SPINNY_PROCESSES
   _create_new_modal_cls = modal.create_new_object.Processes
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_PROCESSES
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_PROCESSES
 
 
 class _DataAssets(lhn.AccordionGroup):
@@ -441,7 +441,7 @@ class _DataAssets(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_DATA_ASSETS
   _locator_spinny = locator.LhnMenu.SPINNY_DATA_ASSETS
   _create_new_modal_cls = modal.create_new_object.DataAssets
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_DATA_ASSETS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_DATA_ASSETS
 
 
 class _Products(lhn.AccordionGroup):
@@ -450,7 +450,7 @@ class _Products(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PRODUCTS
   _locator_spinny = locator.LhnMenu.SPINNY_PRODUCTS
   _create_new_modal_cls = modal.create_new_object.Products
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_PRODUCTS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_PRODUCTS
 
 
 class _Projects(lhn.AccordionGroup):
@@ -459,7 +459,7 @@ class _Projects(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_PROJECTS
   _locator_spinny = locator.LhnMenu.SPINNY_PROJECTS
   _create_new_modal_cls = modal.create_new_object.Processes
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_PROJECTS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_PROJECTS
 
 
 class _Facilities(lhn.AccordionGroup):
@@ -514,7 +514,7 @@ class _Risks(lhn.AccordionGroup):
 
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_RISKS
   _locator_spinny = locator.LhnMenu.SPINNY_RISKS
-  _locator_accordeon_members = locator.LhnMenu.ACCORDION_MEMBERS_RISKS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_RISKS
   _create_new_modal_cls = modal.create_new_object.Risks
 
 

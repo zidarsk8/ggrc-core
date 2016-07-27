@@ -132,7 +132,7 @@ class TestGetObjectColumnDefinitions(TestCase):
   def setUp(self):
     pass
 
-  def _test_definiton_names(self, obj_class, names, has_mappings=True):
+  def _test_definition_names(self, obj_class, names, has_mappings=True):
     """ Test name definitions for one class
 
     This function checks if names returned by get_object_column_definitions
@@ -177,7 +177,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     """
     errors = ""
     try:
-      self._test_definiton_names(obj_class, names, has_mappings)
+      self._test_definition_names(obj_class, names, has_mappings)
     except AssertionError as e:
       errors += "\n\n{} definition names missmatch.\n{}".format(
           obj_class.__name__, str(e))

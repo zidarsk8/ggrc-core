@@ -14,13 +14,13 @@ def init_notification_views(app):
     app: current flask app.
   """
   app.add_url_rule(
-      "/_notifications/send_todays_digest", "send_todays_digest_notifications",
-      view_func=common.send_todays_digest_notifications)
+      "/_notifications/send_daily_digest", "send_daily_digest_notifications",
+      view_func=common.send_daily_digest_notifications)
 
   app.add_url_rule(
       "/_notifications/show_pending", "show_pending_notifications",
       view_func=login_required(common.show_pending_notifications))
 
   app.add_url_rule(
-      "/_notifications/show_todays_digest", "show_todays_digest_notifications",
-      view_func=login_required(common.show_todays_digest_notifications))
+      "/_notifications/show_daily_digest", "show_daily_digest_notifications",
+      view_func=login_required(common.show_daily_digest_notifications))

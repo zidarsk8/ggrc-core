@@ -173,7 +173,7 @@ class TestReminderable(ggrc.TestCase):
           1)
 
     with freeze_time("2015-04-02 01:01:01"):
-      self.client.get("/_notifications/send_todays_digest")
+      self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
 
   def test_assessment_inprogress_reminder(self):
@@ -192,7 +192,7 @@ class TestReminderable(ggrc.TestCase):
           1)
 
     with freeze_time("2015-04-02 01:01:01"):
-      self.client.get("/_notifications/send_todays_digest")
+      self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
 
   def test_assessment_finished_reminder(self):
@@ -213,7 +213,7 @@ class TestReminderable(ggrc.TestCase):
           0)
 
     with freeze_time("2015-04-02 01:01:01"):
-      self.client.get("/_notifications/send_todays_digest")
+      self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
 
   def test_assessment_inprogress_reminder_finish_afterwards(self):
@@ -239,5 +239,5 @@ class TestReminderable(ggrc.TestCase):
 
       self.change_status(assessment, models.Assessment.DONE_STATE)
 
-      _, notif_data = common.get_todays_notifications()
+      _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
