@@ -62,7 +62,7 @@ class AccordionGroup(base.DropdownDynamic):
 
   _locator_spinny = None
   _locator_button_create_new = None
-  _locator_accordeon_members = None
+  _locator_accordion_members = None
 
   # modal class which is used when creating a new object
   _create_new_modal_cls = None
@@ -85,7 +85,7 @@ class AccordionGroup(base.DropdownDynamic):
 
   def _update_loaded_members(self):
     self.members_loaded = self._driver.find_elements(
-        *self._locator_accordeon_members)
+        *self._locator_accordion_members)
 
   def _set_visible_members(self):
     try:
