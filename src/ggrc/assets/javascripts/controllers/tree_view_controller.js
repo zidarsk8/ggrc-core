@@ -173,7 +173,7 @@ can.Control('CMS.Controllers.TreeLoader', {
 
     this._display_deferred = this._display_deferred
       .then(this._ifNotRemoved(function () {
-        return $.when(useOldAPI ? that.fetch_list() : that.loadPage(), // loadPage
+        return $.when(useOldAPI ? that.fetch_list() : that.loadPage(),
           that.init_view());
       }))
       .then(that._ifNotRemoved(that.proxy('draw_list')))
@@ -748,7 +748,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       dfds.push(
         can.view(this.options.footer_view, this.options,
           this._ifNotRemoved(function (frag) {
-            this.element.append(frag);
+            this.element.after(frag);
           }.bind(this))
         ));
     }
@@ -1487,7 +1487,13 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   filter: function (filterString) {
     this.options.attr('filter', filterString);
     this.options.paging.attr('current', 1);
+    this.refreshList();
+  },
 
+  loadPage: function () {
+    return this.options.model.query({data: this._buildRequestParams()});
+  },
+  refreshList: function () {
     this.loadPage()
       .then(function (data) {
         this.element.children('.cms_controllers_tree_view_node').remove();
@@ -1495,10 +1501,12 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       }.bind(this))
       .then(this._ifNotRemoved(this.proxy('draw_list')));
   },
-
-  loadPage: function () {
-    return this.options.model.query({data: this._buildRequestParams()});
-  }
+  '{paging} change': _.debounce(
+    function (object, event, type, action, newVal, oldVal) {
+      if (oldVal !== newVal && _.contains(['current', 'pageSize'], type)) {
+        this.refreshList();
+      }
+    })
 });
 
 can.Control('CMS.Controllers.TreeViewNode', {
