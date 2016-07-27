@@ -211,11 +211,11 @@
         }
       });
 
-      if (!_.isEmpty(subTrees)) {
-        subTrees[name] = {
+      if (!_.isEmpty(subTrees.serialize())) {
+        subTrees.attr(name, {
           model_list: child_model_list,
           display_list: CMS.Models[name].tree_view_options.child_tree_display_list || widgetList
-        };
+        });
       }
     });
 

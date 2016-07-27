@@ -40,12 +40,13 @@
         return;
       }
 
-      valid_models = Object.keys(GGRC.tree_view.base_widgets_by_type);
+      valid_models = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
     // only change the display list
       can.each(valid_models, function (m_name) {
         saved_child_tree_display_list = this.display_prefs.getChildTreeDisplayList(m_name);
         if (saved_child_tree_display_list !== null) {
-          GGRC.tree_view.sub_tree_for[m_name].display_list = saved_child_tree_display_list;
+          GGRC.tree_view.sub_tree_for.attr(m_name + '.display_list',
+            saved_child_tree_display_list);
         }
       }.bind(this));
     },

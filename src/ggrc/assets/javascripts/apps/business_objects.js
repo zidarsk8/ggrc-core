@@ -91,14 +91,14 @@
         instance: object,
         widget_view: info_widget_views[object_table]
       });
-
-      model_names = Object.keys(base_widgets_by_type);
+      model_names = can.Map.keys(base_widgets_by_type);
       model_names.sort();
       possible_model_type = model_names.slice();
       possible_model_type.push('Request'); // Missing model-type by selection
       can.each(model_names, function (name) {
         var w_list;
         var child_model_list = [];
+
         GGRC.tree_view.basic_model_list.push({
           model_name: name,
           display_name: CMS.Models[name].title_singular
@@ -114,10 +114,10 @@
             });
           }
         });
-        GGRC.tree_view.sub_tree_for[name] = {
+        GGRC.tree_view.sub_tree_for.attr(name, {
           model_list: child_model_list,
           display_list: CMS.Models[name].tree_view_options.child_tree_display_list || w_list
-        };
+        });
       });
 
       function sort_sections(sections) {

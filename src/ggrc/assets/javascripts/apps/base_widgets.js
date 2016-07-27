@@ -33,6 +33,6 @@
   base_widgets_by_type = _.mapValues(base_widgets_by_type, function (conf) {
     return conf.split(' ');
   });
-  GGRC.tree_view = GGRC.tree_view || {};
-  GGRC.tree_view.base_widgets_by_type = base_widgets_by_type;
+  GGRC.tree_view = GGRC.tree_view || new can.Map();
+  GGRC.tree_view.attr('base_widgets_by_type', base_widgets_by_type);
 })(this.GGRC, this._);
