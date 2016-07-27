@@ -9,7 +9,7 @@ from ggrc.notifications import data_handlers
 
 
 CONTRIBUTED_CRON_JOBS = [
-    common.send_todays_digest_notifications
+    common.send_daily_digest_notifications
 ]
 
 NOTIFICATION_LISTENERS = [

@@ -63,7 +63,7 @@ AUTHORIZED_DOMAINS = {
 
 JINJA2 = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
 EMAIL_DIGEST = JINJA2.get_template("notifications/email_digest.html")
-EMAIL_TODAYS = JINJA2.get_template("notifications/view_todays_digest.html")
+EMAIL_DAILY = JINJA2.get_template("notifications/view_daily_digest.html")
 EMAIL_PENDING = JINJA2.get_template("notifications/view_pending_digest.html")
 
 USE_APP_ENGINE_ASSETS_SUBDOMAIN = False

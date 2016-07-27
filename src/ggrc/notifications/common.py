@@ -153,7 +153,7 @@ def get_pending_notifications():
   return notifications, data
 
 
-def get_todays_notifications():
+def get_daily_notifications():
   """Get notification data for all future notifications.
 
   Returns
@@ -205,14 +205,14 @@ def should_receive(notif, user_data):
   return has_digest
 
 
-def send_todays_digest_notifications():
+def send_daily_digest_notifications():
   """Send emails for today's or overdue notifications.
 
   Returns:
     str: String containing a simple list of who received the notification.
   """
   # pylint: disable=invalid-name
-  notif_list, notif_data = get_todays_notifications()
+  notif_list, notif_data = get_daily_notifications()
   sent_emails = []
   subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
   for user_email, data in notif_data.iteritems():
@@ -259,7 +259,7 @@ def show_pending_notifications():
   return settings.EMAIL_PENDING.render(data=sorted(notif_data.iteritems()))
 
 
-def show_todays_digest_notifications():
+def show_daily_digest_notifications():
   """Get notification html for today's notifications.
 
   Returns:
@@ -268,10 +268,10 @@ def show_todays_digest_notifications():
   # pylint: disable=invalid-name
   if not permissions.is_admin():
     raise Forbidden()
-  _, notif_data = get_todays_notifications()
+  _, notif_data = get_daily_notifications()
   for data in notif_data.itervalues():
     data = modify_data(data)
-  return settings.EMAIL_TODAYS.render(data=notif_data)
+  return settings.EMAIL_DAILY.render(data=notif_data)
 
 
 def get_app_engine_email():

@@ -40,15 +40,15 @@ class TestRecurringCycleNotifications(TestCase):
       assignee = Person.query.get(self.assignee.id)
 
     with freeze_time("2015-01-01"):
-      _, notif_data = common.get_todays_notifications()
+      _, notif_data = common.get_daily_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-01-29"):
-      _, notif_data = common.get_todays_notifications()
+      _, notif_data = common.get_daily_notifications()
       self.assertIn(assignee.email, notif_data)
 
     with freeze_time("2015-02-01"):
-      _, notif_data = common.get_todays_notifications()
+      _, notif_data = common.get_daily_notifications()
       self.assertIn(assignee.email, notif_data)
 
   # TODO: this should mock google email api.
@@ -65,16 +65,16 @@ class TestRecurringCycleNotifications(TestCase):
       assignee = Person.query.get(self.assignee.id)
 
     with freeze_time("2015-01-01"):
-      _, notif_data = common.get_todays_notifications()
+      _, notif_data = common.get_daily_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-01-29"):
-      common.send_todays_digest_notifications()
-      _, notif_data = common.get_todays_notifications()
+      common.send_daily_digest_notifications()
+      _, notif_data = common.get_daily_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
     with freeze_time("2015-02-01"):
-      _, notif_data = common.get_todays_notifications()
+      _, notif_data = common.get_daily_notifications()
       self.assertNotIn(assignee.email, notif_data)
 
   def create_test_cases(self):

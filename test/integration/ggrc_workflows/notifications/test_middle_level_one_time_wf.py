@@ -94,7 +94,7 @@ class TestOneTimeWorkflowNotification(TestCase):
       db.session.add(self.tgassignee1)
       db.session.add(self.member1)
 
-      common.get_todays_notifications()
+      common.get_daily_notifications()
 
   def create_test_cases(self):
     def person_dict(person_id):

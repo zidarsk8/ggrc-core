@@ -94,7 +94,7 @@ class TestAssignableNotification(converters.TestCase):
 
       self.assertEqual(self._get_notifications().count(), 10)
 
-      self.client.get("/_notifications/send_todays_digest")
+      self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
 
       request = Request.query.get(requests["Request 9"].id)
@@ -128,7 +128,7 @@ class TestAssignableNotification(converters.TestCase):
 
       self.assertEqual(self._get_notifications().count(), 12)
 
-      self.client.get("/_notifications/send_todays_digest")
+      self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
 
       request1 = Request.query.get(requests["Request 1"].id)
@@ -162,7 +162,7 @@ class TestAssignableNotification(converters.TestCase):
       self.assertEqual(self._get_notifications().count(), 2)
 
       # send all notifications
-      self.client.get("/_notifications/send_todays_digest")
+      self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
 
       # Refresh the object because of the lost session due to the get call.
