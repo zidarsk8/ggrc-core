@@ -161,6 +161,7 @@ can.Control('CMS.Controllers.TreeLoader', {
     var that = this;
     var tracker_stop = GGRC.Tracker.start(
           'TreeView', 'display', this.options.model.shortName);
+    // Use Query API only for first tier in TreeViewController
     var loader = useOldAPI || !this.loadPage ?
       this.fetch_list.bind(this) : this.loadPage.bind(this);
 
@@ -230,7 +231,7 @@ can.Control('CMS.Controllers.TreeLoader', {
       var item = that.prepare_child_options(v, force_prepare_children);
       temp_list.push(item);
       if (!is_reload && !item.instance.selfLink) {
-        refresh_queue.enqueue(item.instance);
+        refresh_queue.enqueue(v.instance);
       }
     });
     if (this.options.sort_property || this.options.sort_function) {
@@ -1471,7 +1472,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var relevantFilter = '#' + this.options.parent_instance.type + ',' +
       this.options.parent_instance.id + '#';
     var first = (paging.current - 1) * paging.pageSize;
-    var last = paging.current * paging.pageSize - 1;
+    var last = paging.current * paging.pageSize;
     // var sortBy = this.options.sort_by;
     // var sortDirection = this.options.sort_direction === 'asc';
     return [{
@@ -1491,12 +1492,15 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   },
 
   loadPage: function () {
-    return this.options.model.query({data: this._buildRequestParams()})
-      .then(function (data) {
-        var list = data.values;
+    var loader = new GGRC.ListLoaders.TreePageLoader(this.options.model,
+      this.options.parent_instance, this.options.mapping);
 
+    return loader.load({data: this._buildRequestParams()})
+      .then(function (data) {
         this.options.paging.attr('total', data.count);
-        return list;
+        this.options.paging.attr('count',
+          Math.ceil(data.count / this.options.paging.pageSize));
+        return data.values;
       }.bind(this));
   },
   refreshList: function () {

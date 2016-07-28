@@ -76,7 +76,7 @@ describe('CMS.Controllers.TreeView', function () {
         var result = method()[0];
 
         expect(result.object_name).toEqual('Assessment');
-        expect(result.limit).toEqual([0, 9]);
+        expect(result.limit).toEqual([0, 10]);
         expect(result.filters.expression.object_name).toEqual('Audit');
       });
 
@@ -87,7 +87,7 @@ describe('CMS.Controllers.TreeView', function () {
 
         result = method()[0];
 
-        expect(result.limit).toEqual([100, 149]);
+        expect(result.limit).toEqual([100, 150]);
       });
     });
 
@@ -104,7 +104,7 @@ describe('CMS.Controllers.TreeView', function () {
         var result = method()[0];
 
         expect(result.object_name).toEqual('Request');
-        expect(result.limit).toEqual([0, 9]);
+        expect(result.limit).toEqual([0, 10]);
         expect(result.filters.expression.object_name).toEqual('Assessment');
       });
 
