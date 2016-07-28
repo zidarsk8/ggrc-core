@@ -335,7 +335,7 @@
     var pageInstance = GGRC.page_instance();
     var treeWidgets = GGRC.tree_view.base_widgets_by_type;
     var subTrees = GGRC.tree_view.sub_tree_for;
-    var subTreeItems = ['Cycle'];
+    var subTreeItems = ['Cycle', 'Request'];
     var models = ['TaskGroup', 'Workflow', 'CycleTaskEntry',
       'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
     _.each(_workflowObjectTypes, function (type) {
