@@ -161,6 +161,8 @@ can.Control('CMS.Controllers.TreeLoader', {
     var that = this;
     var tracker_stop = GGRC.Tracker.start(
           'TreeView', 'display', this.options.model.shortName);
+    var loader = useOldAPI || !this.loadPage ?
+      this.fetch_list.bind(this) : this.loadPage.bind(this);
 
     if (this._display_deferred) {
       if (!this._will_navigate()) {
@@ -173,8 +175,7 @@ can.Control('CMS.Controllers.TreeLoader', {
 
     this._display_deferred = this._display_deferred
       .then(this._ifNotRemoved(function () {
-        return $.when(useOldAPI ? that.fetch_list() : that.loadPage(),
-          that.init_view());
+        return $.when(loader(), that.init_view());
       }))
       .then(that._ifNotRemoved(that.proxy('draw_list')))
       .done(tracker_stop);
@@ -1144,7 +1145,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var drawItemsDfds = [];
     var sortProp = this.options.sort_property;
     var sortFunction = this.options.sort_function;
-    var filter = this.options.filter;
     var filteredItems = this.options.attr('filteredList') || [];
     var res;
 
@@ -1472,8 +1472,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       this.options.parent_instance.id + '#';
     var first = (paging.current - 1) * paging.pageSize;
     var last = paging.current * paging.pageSize - 1;
-    var sortBy = this.options.sort_by;
-    var sortDirection = this.options.sort_direction === 'asc';
+    // var sortBy = this.options.sort_by;
+    // var sortDirection = this.options.sort_direction === 'asc';
     return [{
       object_name: this.options.model.shortName,
       limit: [first, last],
@@ -1491,7 +1491,13 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   },
 
   loadPage: function () {
-    return this.options.model.query({data: this._buildRequestParams()});
+    return this.options.model.query({data: this._buildRequestParams()})
+      .then(function (data) {
+        var list = data.values;
+
+        this.options.paging.attr('total', data.count);
+        return list;
+      }.bind(this));
   },
   refreshList: function () {
     this.loadPage()
