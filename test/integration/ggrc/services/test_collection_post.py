@@ -114,8 +114,8 @@ class TestCollectionPost(services.TestCase):
         headers=self.headers(),
     )
 
-    self.assertEqual(403, response.status_code)
-    self.assertEqual([403], [i[0] for i in response.json])
+    self.assertEqual(400, response.status_code)
+    self.assertEqual([400], [i[0] for i in response.json])
     response = self.client.get(self.mock_url(), headers=self.headers())
     self.assert200(response)
     self.assertEqual(
