@@ -91,6 +91,8 @@
       context: "CMS.Models.Context.stub",
       modified_by: "CMS.Models.Person.stub",
       task_group: "CMS.Models.TaskGroup.stub",
+      start_date: 'date',
+      end_date: 'date'
     },
 
     init: function() {
@@ -101,19 +103,18 @@
       this.validateContact(["_transient.contact", "contact"]);
 
       this.validate(["start_date", "end_date"], function (newVal, prop) {
-        var that = this,
-         workflow = GGRC.page_instance(),
-         dates_are_valid = true;
+        var that = this;
+        var workflow = GGRC.page_instance();
+        var dates_are_valid = true;
 
-
-        if (!(workflow instanceof CMS.Models.Workflow))
+        if (!(workflow instanceof CMS.Models.Workflow)) {
           return;
+        }
 
         // Handle cases of a workflow with start and end dates
         if (workflow.frequency === 'one_time') {
-            dates_are_valid =
-                 that.start_date && 0 < that.start_date.length
-              && that.end_date && 0 < that.end_date.length;
+          dates_are_valid = that.start_date && that.end_date &&
+              that.start_date <= that.end_date;
         }
 
         if (!dates_are_valid) {
