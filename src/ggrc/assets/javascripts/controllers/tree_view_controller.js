@@ -193,8 +193,6 @@ can.Control('CMS.Controllers.TreeLoader', {
   draw_list: function (list, is_reload, force_prepare_children) {
     var that = this;
     var refresh_queue = new RefreshQueue();
-    var sort_function;
-    var original_function;
     var temp_list;
 
     is_reload = is_reload === true;
@@ -234,26 +232,6 @@ can.Control('CMS.Controllers.TreeLoader', {
         refresh_queue.enqueue(v.instance);
       }
     });
-    if (this.options.sort_property || this.options.sort_function) {
-      original_function = this.options.sort_function ||
-                          this._sort_property_comparator(this.options.sort_property);
-      sort_function = function (old_item, new_item) {
-        return original_function(old_item.instance, new_item.instance);
-      };
-      if (original_function.deep_property && original_function.comparator) {
-        _.each(temp_list, function (v) {
-          v.__sort_key = v.instance.get_deep_property(original_function.deep_property);
-        });
-        temp_list.sort(function (a, b) {
-          return original_function.comparator(a.__sort_key, b.__sort_key);
-        });
-        _.each(temp_list, function (v) {
-          delete v.__sort_key;
-        });
-      } else {
-        temp_list.sort(sort_function);
-      }
-    }
 
     temp_list = can.map(temp_list, function (o) {
       if (o.instance.selfLink) {
@@ -281,20 +259,6 @@ can.Control('CMS.Controllers.TreeLoader', {
       this._loading_deferred = null;
       loading_deferred.resolve();
     }
-  },
-
-  _sort_property_comparator: function (property) {
-    return function (old_item, new_item) {
-      var a = old_item[property];
-      var b = new_item[property];
-      if (GGRC.Math.string_less_than(a, b)) {
-        return -1;
-      }
-      if (GGRC.Math.string_less_than(b, a)) {
-        return 1;
-      }
-      return 0;
-    };
   },
 
   enqueue_items: function (items, is_reload, force_prepare_children) {
@@ -420,7 +384,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     sort_property: null,
     sort_direction: null,
     sort_by: null,
-    sort_function: null,
     sortable: true,
     filter: null,
     start_expanded: false, // true
@@ -719,10 +682,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
                 }.bind(this)
             );
 
-            can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
-                          'click',
-                          this.sort.bind(this)
-                         );
             can.bind.call(this.element.parent().find('.set-tree-attrs'),
                           'click',
                           this.set_tree_attrs.bind(this)
@@ -1144,27 +1103,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var items;
     var $footer = this.element.children('.tree-item-add').first();
     var drawItemsDfds = [];
-    var sortProp = this.options.sort_property;
-    var sortFunction = this.options.sort_function;
     var filteredItems = this.options.attr('filteredList') || [];
     var res;
 
     items = can.makeArray(optionsList);
-    // Currently comment this code, but in future need to remove it
-    // if (filter) {
-    //   items = _.filter(items, function (option) {
-    //     return filter.evaluate(option.instance.get_filter_vals());
-    //   });
-    // }
-
-    if (sortProp || sortFunction) {
-      if (!sortFunction) {
-        sortFunction = this._sort_property_comparator(sortProp);
-      }
-      items.sort(function (a, b) {
-        return sortFunction(a.instance, b.instance);
-      });
-    }
 
     items = _.map(items, function (options) {
       var control;
@@ -1193,32 +1135,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       _.defer(this.draw_visible.bind(this));
     }.bind(this));
     return res;
-  },
-
-  ' sortupdate': function (el, ev, ui) { // eslint-disable-line quote-props
-    var that = this;
-    var $item = $(ui.item);
-    var $before = $item.prev('li.cms_controllers_tree_view_node');
-    var $after = $item.next('li.cms_controllers_tree_view_node');
-    var before_index = $before.length ?
-                       $before.control().options.instance[this.options.sort_property] :
-                       '0';
-    var after_index = $after.length ?
-                      $after.control().options.instance[this.options.sort_property] :
-                      Number.MAX_SAFE_INTEGER.toString(10);
-
-    ev.stopPropagation();
-
-    if (!this.options.sort_property) {
-      return;
-    }
-
-    $item.control().options.instance.refresh().then(function (inst) {
-      inst.attr(
-        that.options.sort_property,
-        GGRC.Math.string_half(GGRC.Math.string_add(before_index, after_index))
-      ).save();
-    });
   },
 
   ' removeChild': function (el, ev, data) { // eslint-disable-line quote-props
@@ -1380,51 +1296,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     });
     this.display_prefs.setTreeViewHeaders(this.options.model.model_singular, attr_to_save);
     this.display_prefs.save();
-
-    can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
-                  'click',
-                  this.sort.bind(this)
-                 );
-  },
-
-  sort: function (event) {
-    var $el = $(event.currentTarget);
-    var key = $el.data('field');
-    var key_tree = can.Model.Cacheable.parse_deep_property_descriptor(key);
-    var order;
-    var order_factor;
-    var comparator;
-
-    if (key !== this.options.sort_by) {
-      this.options.sort_direction = null;
-    }
-
-    order = this.options.sort_direction === 'asc' ? 'desc' : 'asc';
-    order_factor = order === 'asc' ? 1 : -1;
-
-    comparator = function (a, b) {
-      return String.naturalCaseCompare(a, b) * order_factor;
-    };
-    this.options.sort_function = function (val1, val2) {
-      var a = val1.get_deep_property(key_tree);
-      var b = val2.get_deep_property(key_tree);
-      return comparator(a, b);
-    };
-
-    this.options.sort_function.deep_property = key_tree;
-    this.options.sort_function.comparator = comparator;
-
-    this.options.sort_direction = order;
-    this.options.sort_by = key;
-
-    $el.closest('.tree-header')
-        .find('.widget-col-title')
-        .removeClass('asc')
-        .removeClass('desc');
-
-    $el.addClass(order);
-
-    this.reload_list();
   },
 
   set_tree_display_list: function (ev) {

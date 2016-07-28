@@ -139,9 +139,9 @@ can.Control('GGRC.Controllers.TreeFilter', {}, {
     path = path.split('.');
     can.each(path, function (prop) {
       // If the name is blank, use email
-      if (prop === 'name' && obj.attr && (!obj.attr(prop) ||
-        !obj.attr(prop).trim()) && obj.attr('email') &&
-        obj.attr('email').trim()) {
+      if (prop === 'name' && obj.attr &&
+        (!obj.attr(prop) || !obj.attr(prop).trim()) &&
+        obj.attr('email') && obj.attr('email').trim()) {
         prop = 'email';
       }
       if (obj.instance) {
@@ -149,7 +149,7 @@ can.Control('GGRC.Controllers.TreeFilter', {}, {
       }
       obj = obj.attr ? obj.attr(prop) : obj.prop;
       obj = obj && obj.reify ? obj.reify() : obj;
-      return obj !== null; // stop iterating in case of null/undefined.
+      return !_.isEmpty(obj); // stop iterating in case of null/undefined.
     });
     return obj;
   }
