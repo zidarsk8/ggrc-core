@@ -195,18 +195,79 @@ class QueryHelper(object):
     Returns:
       list of dicts: same query as the input with all ids that match the filter
     """
+    return self.get(ids=True)
+
+  def get(self, ids=False):
+    """Filter the objects and get their information.
+
+    Updates self.query items with their results.
+
+    Args:
+      ids: if True, provide ids of the filtered objects under ["ids"];
+
+    Returns:
+      list of dicts: same query as the input with requested results that match
+                     the filter.
+    """
+    if not ids:
+      # no additional info requested, no action required
+      return self.query
     for object_query in self.query:
-      object_query["ids"] = self._get_object_ids(object_query)
+      objects = self._get_objects(object_query)
+      objects = self._apply_limit(
+          objects,
+          limit=object_query.get("limit"),
+      )
+      if ids:
+        object_query["ids"] = [o.id for o in objects]
     return self.query
 
-  def _get_object_ids(self, object_query):
-    """ get a set of object ids described in the filters """
+  def _get_objects(self, object_query):
+    """Get a set of objects described in the filters."""
     object_name = object_query["object_name"]
     expression = object_query.get("filters", {}).get("expression")
 
     if expression is None:
       return set()
     object_class = self.object_map[object_name]
+
+    query = object_class.query
+    filter_expression = self._build_expression(expression, object_class)
+    if filter_expression is not None:
+      query = query.filter(filter_expression)
+    requested_permissions = object_query.get("permissions", "read")
+    if requested_permissions == "update":
+      objs = [o for o in query if permissions.is_allowed_update_for(o)]
+    else:
+      objs = [o for o in query if permissions.is_allowed_read_for(o)]
+
+    return objs
+
+  @staticmethod
+  def _apply_limit(objects, limit=None):
+    """Apply limits for pagination.
+
+    Args:
+      objects: a list of objects to sort and limit;
+      limit: a tuple of indexes in format (from, to); objects is sliced to
+             objects[from, to]
+
+    Returns:
+      a sliced list of objects
+    """
+    if limit:
+      try:
+        from_, to_ = limit
+        objects = objects[from_: to_]
+      except:
+        raise BadQueryException("Bad query: Invalid 'limit' parameter.")
+
+    return objects
+
+  def _build_expression(self, exp, object_class):
+    """Make an SQLAlchemy filtering expression from exp expression tree."""
+    if "op" not in exp:
+      return None
 
     def autocast(o_key, value):
       if type(o_key) not in [str, unicode]:
@@ -226,91 +287,69 @@ class QueryHelper(object):
       # fallback
       return value
 
-    def build_expression(exp):
-      if "op" not in exp:
-        return None
+    def relevant():
+      query = (self.query[exp["ids"][0]]
+               if exp["object_name"] == "__previous__" else exp)
+      return object_class.id.in_(
+          RelationshipHelper.get_ids_related_to(
+              object_class.__name__,
+              query["object_name"],
+              query["ids"],
+          )
+      )
 
-      def relevant():
-        query = (self.query[exp["ids"][0]]
-                 if exp["object_name"] == "__previous__" else exp)
-        return object_class.id.in_(
-            RelationshipHelper.get_ids_related_to(
-                object_name,
-                query["object_name"],
-                query["ids"],
-            )
-        )
+    def unknown():
+      raise BadQueryException("Unknown operator \"{}\""
+                              .format(exp["op"]["name"]))
 
-      def unknown():
-        raise BadQueryException("Unknown operator \"{}\""
-                                .format(exp["op"]["name"]))
+    def with_key(key, p):
+      key = key.lower()
+      key, filter_by = self.attr_name_map[
+          object_class].get(key, (key, None))
+      if hasattr(filter_by, "__call__"):
+        return filter_by(p)
+      else:
+        attr = getattr(object_class, key, None)
+        if attr is None:
+          raise BadQueryException("Bad query: object '{}' does "
+                                  "not have attribute '{}'."
+                                  .format(object_class.__name__, key))
+        return p(attr)
 
-      def with_key(key, p):
-        key = key.lower()
-        key, filter_by = self.attr_name_map[
-            object_class].get(key, (key, None))
-        if hasattr(filter_by, "__call__"):
-          return filter_by(p)
-        else:
-          attr = getattr(object_class, key, None)
-          if attr is None:
-            raise BadQueryException("Bad query: object '{}' does "
-                                    "not have attribute '{}'."
-                                    .format(object_class.__name__, key))
-          return p(attr)
+    with_left = lambda p: with_key(exp["left"], p)
 
-      with_left = lambda p: with_key(exp["left"], p)
+    lift_bin = lambda f: f(self._build_expression(exp["left"], object_class),
+                           self._build_expression(exp["right"], object_class))
 
-      lift_bin = lambda f: f(build_expression(exp["left"]),
-                             build_expression(exp["right"]))
+    def text_search():
+      existing_fields = self.attr_name_map[object_class]
+      text = "%{}%".format(exp["text"])
+      p = lambda f: f.ilike(text)
+      return or_(*(
+          with_key(field, p)
+          for field in object_query.get("fields", [])
+          if field in existing_fields
+      ))
 
-      def text_search():
-        existing_fields = self.attr_name_map[object_class]
-        text = "%{}%".format(exp["text"])
-        p = lambda f: f.ilike(text)
-        return or_(*(
-            with_key(field, p)
-            for field in object_query.get("fields", [])
-            if field in existing_fields
-        ))
+    rhs = lambda: autocast(exp["left"], exp["right"])
 
-      rhs = lambda: autocast(exp["left"], exp["right"])
+    ops = {
+        "AND": lambda: lift_bin(and_),
+        "OR": lambda: lift_bin(or_),
+        "=": lambda: with_left(lambda l: l == rhs()),
+        "!=": lambda: not_(with_left(
+                           lambda l: l == rhs())),
+        "~": lambda: with_left(lambda l:
+                               l.ilike("%{}%".format(rhs()))),
+        "!~": lambda: not_(with_left(
+                           lambda l: l.ilike("%{}%".format(rhs())))),
+        "<": lambda: with_left(lambda l: l < rhs()),
+        ">": lambda: with_left(lambda l: l > rhs()),
+        "relevant": relevant,
+        "text_search": text_search
+    }
 
-      ops = {
-          "AND": lambda: lift_bin(and_),
-          "OR": lambda: lift_bin(or_),
-          "=": lambda: with_left(lambda l: l == rhs()),
-          "!=": lambda: not_(with_left(
-                             lambda l: l == rhs())),
-          "~": lambda: with_left(lambda l:
-                                 l.ilike("%{}%".format(rhs()))),
-          "!~": lambda: not_(with_left(
-                             lambda l: l.ilike("%{}%".format(rhs())))),
-          "<": lambda: with_left(lambda l: l < rhs()),
-          ">": lambda: with_left(lambda l: l > rhs()),
-          "relevant": relevant,
-          "text_search": text_search
-      }
-
-      return ops.get(exp["op"]["name"], unknown)()
-
-    query = object_class.query
-    filter_expression = build_expression(expression)
-    if filter_expression is not None:
-      query = query.filter(filter_expression)
-    requested_permissions = object_query.get("permissions", "read")
-    if requested_permissions == "update":
-      ids = [o.id for o in query if permissions.is_allowed_update_for(o)]
-    else:
-      ids = [o.id for o in query if permissions.is_allowed_read_for(o)]
-
-    if "limit" in object_query:
-      try:
-        from_, to_ = object_query["limit"]
-        ids = ids[from_: to_]
-      except:
-        raise BadQueryException("Bad query: Invalid limit operand.")
-    return ids
+    return ops.get(exp["op"]["name"], unknown)()
 
   def _slugs_to_ids(self, object_name, slugs):
     object_class = self.object_map.get(object_name)
