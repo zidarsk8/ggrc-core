@@ -1497,9 +1497,9 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
     return loader.load({data: this._buildRequestParams()})
       .then(function (data) {
-        this.options.paging.attr('total', data.count);
+        this.options.paging.attr('total', data.total);
         this.options.paging.attr('count',
-          Math.ceil(data.count / this.options.paging.pageSize));
+          Math.ceil(data.total / this.options.paging.pageSize));
         return data.values;
       }.bind(this));
   },

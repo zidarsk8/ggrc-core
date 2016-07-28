@@ -486,7 +486,7 @@
       url: '/query',
       data: JSON.stringify(request.data || {})
     }).then(function (sourceData) {
-      var count;
+      var values = [];
       var listDfd = $.Deferred();
       if (sourceData.length) {
         sourceData = sourceData[0];
@@ -495,22 +495,18 @@
       }
 
       if (sourceData[self.shortName]) {
-        count = sourceData[self.shortName].count;
-        sourceData = sourceData[self.shortName].values;
-      } else {
-        sourceData = [];
+        sourceData = sourceData[self.shortName];
+        values = sourceData.values;
       }
 
-      if (!sourceData.splice) {
-        sourceData = [sourceData];
+      if (!values.splice) {
+        values = [values];
       }
-      self._modelize(sourceData, listDfd);
+      self._modelize(values, listDfd);
 
       listDfd.then(function (list) {
-        deferred.resolve({
-          values: list,
-          count: count
-        });
+        sourceData.values = list;
+        deferred.resolve(sourceData);
       });
     }, function () {
       deferred.reject.apply(deferred, arguments);
