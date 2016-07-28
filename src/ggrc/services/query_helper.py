@@ -18,11 +18,12 @@ from ggrc.services.common import etag
 from ggrc.utils import as_json
 
 
-def build_collection_representation(model, objects):
+def build_collection_representation(model, objects, total):
   """Enclose objects list into type-describing block."""
   # pylint: disable=protected-access
   collection = [{
       model.__name__: {
+          "total": total,
           "count": len(objects),
           "values": objects,
       },
@@ -67,24 +68,20 @@ def get_objects_by_query():
   object_type = request_json.get('object_name')
   query_helper = QueryHelper([request_json])
 
-  result = query_helper.get_ids()[0]
   if query_type == 'values':
-    ids, object_type = result.get('ids', []), result.get('object_name', '')
-    model = get_model(object_type)
-    query = model.eager_query()
-    if ids:
-      objects = query.filter(model.id.in_(ids)).all()
-    else:
-      # avoid invoking IN-predicate with empty sequence
-      objects = []
+    result = query_helper.get(values=True, total=True)[0]
+    object_type = result['object_name']
+    total = result['total']
+    objects = result['values']
 
+    model = get_model(object_type)
     objects_json = [json.publish(obj) for obj in objects]
     objects_json = json.publish_representation(objects_json)
 
     if result.get('fields'):
       objects_json = [{f: o.get(f) for f in result['fields']}
                       for o in objects_json]
-    collection = build_collection_representation(model, objects_json)
+    collection = build_collection_representation(model, objects_json, total)
   else:
     raise NotImplementedError("Only 'values' queries are supported now")
 

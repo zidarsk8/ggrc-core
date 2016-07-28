@@ -197,27 +197,35 @@ class QueryHelper(object):
     """
     return self.get(ids=True)
 
-  def get(self, ids=False):
+  def get(self, ids=False, total=False, values=False):
     """Filter the objects and get their information.
 
     Updates self.query items with their results.
 
     Args:
       ids: if True, provide ids of the filtered objects under ["ids"];
+      total: if True, provide the total number of the filtered objects
+             before "limit" is applied under ["total"];
+      values: if True, provide the filtered objects themselves under ["values"].
 
     Returns:
       list of dicts: same query as the input with requested results that match
                      the filter.
     """
-    if not ids:
+    if not (ids or total or values):
       # no additional info requested, no action required
       return self.query
     for object_query in self.query:
       objects = self._get_objects(object_query)
-      objects = self._apply_limit(
+      if total:
+        object_query["total"] = len(objects)
+      objects = self._apply_order_by_and_limit(
           objects,
+          order_by=object_query.get("order_by"),
           limit=object_query.get("limit"),
       )
+      if values:
+        object_query["values"] = objects
       if ids:
         object_query["ids"] = [o.id for o in objects]
     return self.query
@@ -244,17 +252,33 @@ class QueryHelper(object):
     return objs
 
   @staticmethod
-  def _apply_limit(objects, limit=None):
-    """Apply limits for pagination.
+  def _apply_order_by_and_limit(objects, order_by=None, limit=None):
+    """Order objects and apply limits for pagination.
 
     Args:
       objects: a list of objects to sort and limit;
+      order_by: a list of dicts with keys "name" (the name of the field by which
+                to sort) and "desc" (optional; do reverse sort if True);
       limit: a tuple of indexes in format (from, to); objects is sliced to
              objects[from, to]
 
     Returns:
-      a sliced list of objects
+      a sorted and sliced list of objects
     """
+    if order_by:
+      try:
+        # Note: currently we sort only by the first column from the list
+        order_by = order_by[0]
+        order_field = order_by["name"]
+        order_desc = order_by.get("desc", False)
+        objects = sorted(
+            objects,
+            key=lambda obj: getattr(obj, order_field),
+            reverse=order_desc,
+        )
+      except:
+        raise BadQueryException("Bad query: Invalid 'order_by' parameter")
+
     if limit:
       try:
         from_, to_ = limit
