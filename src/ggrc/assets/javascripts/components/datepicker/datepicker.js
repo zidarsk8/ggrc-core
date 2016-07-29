@@ -56,7 +56,6 @@
           onSelect: this.scope.onSelect.bind(this.scope)
         });
 
-        this.scope.attr('_date', date);
         this.scope.attr('picker', element);
 
         this.scope.picker.datepicker('setDate', date);
@@ -66,6 +65,7 @@
         if (this.scope.setMaxDate) {
           this.setDate('maxDate', this.scope.setMaxDate);
         }
+        this.scope._date = date;
       },
       getDate: function (date) {
         if (date instanceof Date) {
