@@ -22,16 +22,24 @@ class BadQueryException(Exception):
 
 class QueryHelper(object):
 
-  """ Helper class for handling request queries
+  """Helper class for handling request queries
 
-  Primary use for this class is to get list of object ids for each object
-  defined in the query. All object ids must pass the query filters if they
-  are defined.
+  Primary use for this class is to get list of objects or object ids for each
+  object type defined in the query. All objects must pass the query filters
+  if they are defined.
 
   query object = [
     {
       object_name: search class name,
       permissions: either read or update, if none are given it defaults to read
+      order_by: [
+        Note: only the first order_by list item is processed
+        {
+          "name": the name of the field by which to do the sorting
+          "desc": optional; if True, invert the sorting order
+        }
+      ]
+      limit: [from, to] - limit the result list to a slice result[from, to]
       filters: {
         relevant_filters:
           these filters will return all ids of the "search class name" object
@@ -52,6 +60,24 @@ class QueryHelper(object):
       }
     }
   ]
+
+  After the query is done (typically by `get` method), the results are appended
+  to each query object:
+
+  query object with results = [
+    {
+      object_name: search class name,
+      (all other object query fields)
+      "count": the number of items returned
+      "total": the number of items filtered before applying "limit"
+      "ids": [ list of filtered objects ids ]
+      "values": [ list of filtered objects themselves ]
+    }
+  ]
+
+  The result fields may or may not be present in the resulting query depending
+  on the attributes of `get` method.
+
   """
 
   def __init__(self, query):
