@@ -27,7 +27,6 @@
       _date: null,
       onSelect: function (val, ev) {
         this.attr('_date', val);
-        this.attr('date', val);
         this.attr('isShown', false);
       },
       onFocus: function (el, ev) {
@@ -96,6 +95,9 @@
       },
       '{scope} setMaxDate': function (scope, ev, date) {
         this.setDate('maxDate', date);
+      },
+      '{scope} _date': function (scope, ev, val) {
+        scope.attr('date', val);
       },
       '{window} mousedown': function (el, ev) {
         var isInside;
