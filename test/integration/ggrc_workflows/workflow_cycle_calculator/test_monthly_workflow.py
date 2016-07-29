@@ -1121,8 +1121,8 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
       )
       self.assertEqual(cycle.count(), 0)
 
-  def test_setup_tasks_didnt_get_deleted_cycle_tasks_got_deleted(self):
-    """Test usecase where user deletes latest cycle"s tasks but
+  def test_cycle_task_delition(self):
+    """Test use case where user deletes latest cycle's tasks but
     NOT setup tasks"""
     monthly_workflow = {
         "title": "monthly test wf",

@@ -721,7 +721,7 @@ def store_results_into_memcache(permissions, cache, key):
       permissions (dict): dict where the permissions will be stored
       cache (cache_manager): Cache manager that should be used for storing
                              permissions
-      key (string): key of under wich permissions should be stored
+      key (string): key of under which permissions should be stored
   Returns:
       None
   """

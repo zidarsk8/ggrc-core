@@ -15,7 +15,6 @@ logging.disable(logging.CRITICAL)
 
 
 class TestCase(BaseTestCase):
-  # pylint: disable=invalid-name
   # because it's required by unittests.
 
   """Base test case for all ggrc integration tests."""

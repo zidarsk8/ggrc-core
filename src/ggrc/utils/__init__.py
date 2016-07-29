@@ -80,7 +80,7 @@ def view_url_for(obj, id=None):
 
 
 def encoded_dict(in_dict):
-  # http://stackoverflow.com/questions/6480723/urllib-urlencode-doesnt-like-unicode-values-how-about-this-workaround
+  # http://stackoverflow.com/questions/6480723/urllib-urlencode-doesn't-like-unicode-values-how-about-this-workaround
   out_dict = {}
   for k, v in in_dict.iteritems():
     if isinstance(v, unicode):  # noqa
