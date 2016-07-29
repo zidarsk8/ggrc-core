@@ -13,7 +13,7 @@ Create Date: 2016-02-23 15:29:16.361412
 
 from alembic import op
 from ggrc.models import assessment
-from ggrc.migrations import utils
+from ggrc.migrations.utils.resolve_duplicates import resolve_duplicates
 
 
 # revision identifiers, used by Alembic.
@@ -26,6 +26,6 @@ def upgrade():
 
 
 def downgrade():
-  utils.resolve_duplicates(assessment.Assessment, 'title', ' ')
+  resolve_duplicates(assessment.Assessment, 'title', ' ')
   op.create_unique_constraint('uq_t_control_assessments',
                               'assessments', ['title'])
