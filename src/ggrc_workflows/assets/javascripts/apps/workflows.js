@@ -360,7 +360,7 @@
         });
       }
     });
-    subTreeItems.forEach(function (item) {
+    subTreeItems.concat(models).forEach(function (item) {
       var defaults = {
         model_list: GGRC.tree_view.basic_model_list,
         display_list: can.Map.keys(GGRC.tree_view.base_widgets_by_type)
