@@ -6,7 +6,7 @@
 {{#if options.allow_mapping}}
   {{#if options.mappings}}
     {{#is_allowed_to_map instance page_instance}}
-      {{^is_dashboard}}
+      {{^is_dashboard_or_all}}
         <li class="border">
           <a href="javascript://" class="unmap" data-toggle="unmap">
             {{#options.result}}<span class="result" {{data 'result'}}></span>{{/options.result}}
@@ -14,7 +14,7 @@
             Unmap
           </a>
         </li>
-      {{/is_dashboard}}
+      {{/is_dashboard_or_all}}
     {{/is_allowed_all}}
   {{/if}}
 {{/if}}
