@@ -22,10 +22,10 @@ from ggrc.utils import as_json
 def build_collection_representation(model, **kwargs):
   """Enclose `kwargs` collection description into a type-describing block."""
   # pylint: disable=protected-access
-  collection = [{
+  collection = {
       model.__name__: kwargs,
       "selfLink": None,  # not implemented yet
-  }]
+  }
   return collection
 
 
@@ -57,15 +57,26 @@ def http_timestamp(timestamp):
 
 
 def get_objects_by_query():
-  """Return objects corresponding to a POST'ed query."""
-  # Note: only a single query in a single request is supported now. If we get
-  # several queries in a single request, we process only the first one
-  request_json = request.json[0]
+  """Return objects corresponding to a POST'ed query list."""
+  request_json = request.json
 
+  results, last_modified_list = zip(*(_process_single_query(query_object)
+                                      for query_object in request_json))
+
+  if None in last_modified_list:
+    last_modified = None
+  else:
+    last_modified = max(last_modified_list)
+
+  return json_success_response(results, last_modified)
+
+
+def _process_single_query(query_object):
+  """Get results for a single query."""
   # valid types should be: 'values', 'ids', 'count'
-  query_type = request_json.get('type', 'values')
-  object_type = request_json.get('object_name')
-  query_helper = QueryHelper([request_json])
+  query_type = query_object.get('type', 'values')
+  object_type = query_object.get('object_name')
+  query_helper = QueryHelper([query_object])
 
   last_modified = None
 
@@ -118,10 +129,7 @@ def get_objects_by_query():
     raise NotImplementedError("Only 'values', 'ids' and 'count' queries "
                               "are supported now")
 
-  return json_success_response(
-      collection,
-      last_modified,
-  )
+  return collection, last_modified
 
 
 def init_query_view(app):
