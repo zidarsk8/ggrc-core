@@ -3,17 +3,17 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <div class="datepicker__wrapper" {{#testId}}data-test-id="{{testId}}"{{/testId}}>
-  {{#label}}
+  {{#if label}}
     <label>
       {{label}}
-      {{#helptext}}
+      {{#if helptext}}
         <i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>
-      {{/helptext}}
-      {{#required}}
+      {{/if}}
+      {{#if required}}
         <span class="required">*</span>
-      {{/required}}
+      {{/if}}
     </label>
-  {{/label}}
+  {{/if}}
   <div class="datepicker__input-wrapper">
     <i class="fa fa-calendar"></i>
     <input
