@@ -119,8 +119,8 @@
       <div class="row-fluid">
         <div class="{{#instance.computed_errors.start_date}}field-failure{{/instance.computed_errors.start_date}}">
           <datepicker
-            set-max-date="end_date"
-            date="start_date"
+            set-max-date="instance.end_date"
+            date="instance.start_date"
             required="true"
             label="Starts Date"
             />
@@ -129,8 +129,8 @@
         </div>
         <div class="{{#instance.computed_errors.end_date}}field-failure{{/instance.computed_errors.end_date}}">
           <datepicker
-            set-min-date="start_date"
-            date="end_date"
+            set-min-date="instance.start_date"
+            date="instance.end_date"
             required="true"
             label="Due Date"
             />
