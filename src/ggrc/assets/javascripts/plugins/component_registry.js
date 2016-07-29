@@ -47,12 +47,12 @@
       delete config.scope.define;
     }
 
+    if (definitions) {
+      config.init = Components._extendInit(config.init, definitions);
+    }
+
     constructor = can.Component.extend(config);
     Components._registry[name] = constructor;
-
-    if (definitions) {
-      Components._extendInit(constructor, definitions);
-    }
 
     return constructor;
   }
@@ -60,22 +60,20 @@
   /**
    * Wrap component init function
    *
-   * @param {Function} constructor - Component constructor function
+   * @param {Function} init - Component init function
    * @param {Object} definitions - Type definitions and their defaults
    *
-   * @return {Any} - Returns casted types
+   * @return {Function} - Returns wrapped init function
    */
-  Components._extendInit = function (constructor, definitions) {
-    var oldInit = constructor.prototype.init;
+  Components._extendInit = function (init, definitions) {
+    init = init || $.noop;
 
-    constructor.prototype.init = function (element, options) {
+    return function (element, options) {
       var scope = this.scope;
       var val;
-      var el = $(element);
-
       _.each(definitions, function (obj, key) {
         if (!scope.attr(key)) {
-          val = el.attr(can.camelCaseToDashCase(key));
+          val = element.getAttribute(can.camelCaseToDashCase(key));
           val = Components._castValue(val, obj.type);
           if (_.isEmpty(val) && val.default) {
             val = val.default;
@@ -83,9 +81,8 @@
           scope.attr(key, val);
         }
       }, this);
-      return oldInit.call(this, arguments);
+      return init.call(this, arguments);
     };
-    return constructor;
   };
 
   /**

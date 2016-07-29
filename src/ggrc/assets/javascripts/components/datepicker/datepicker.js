@@ -22,9 +22,17 @@
       pattern: 'MM/DD/YYYY',
       setMinDate: null,
       setMaxDate: null,
-      persistent: false,
-      required: false,
       _date: null,
+      define: {
+        required: {
+          type: 'boolean',
+          'default': false
+        },
+        persistent: {
+          type: 'boolean',
+          'default': false
+        }
+      },
       onSelect: function (val, ev) {
         this.attr('_date', val);
         this.attr('isShown', false);
@@ -37,22 +45,6 @@
           this.attr('showTop', true);
         }
       }
-    },
-    init: function (el, options) {
-      var $el = $(el);
-      var attrVal = $el.attr('persistent');
-      var persistent;
-      var scope = this.scope;
-
-      if (attrVal === '' || attrVal === 'false') {
-        persistent = false;
-      } else if (attrVal === 'true') {
-        persistent = true;
-      } else {
-        persistent = Boolean(scope.attr('persistent'));
-      }
-
-      scope.attr('persistent', persistent);
     },
     events: {
       inserted: function () {
