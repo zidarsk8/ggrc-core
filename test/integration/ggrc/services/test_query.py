@@ -5,6 +5,7 @@
 
 from os.path import abspath, dirname, join
 from flask import json
+from nose.plugins.skip import SkipTest
 
 from ggrc.app import app
 from integration.ggrc import TestCase
@@ -82,9 +83,11 @@ class TestAdvancedQueryAPI(TestCase):
     self.assertEqual(programs["count"], 12)
     self.assertEqual(len(programs["values"]), 12)
 
+  @SkipTest
   def test_basic_query(self):
     pass
 
+  @SkipTest
   def test_basic_query_filter(self):
     pass
 
@@ -141,15 +144,19 @@ class TestAdvancedQueryAPI(TestCase):
 
     self.assertEqual(programs_limit["total"], programs_no_limit["total"])
 
+  @SkipTest
   def test_mapped_query(self):
     pass
 
+  @SkipTest
   def test_mapped_query_filter(self):
     pass
 
+  @SkipTest
   def test_mapped_query_pagination(self):
     pass
 
+  @SkipTest
   def test_self_link(self):
     # It would be good if the api accepted get requests and we could add the
     # query into a get parameter, then each request would also get a self link
