@@ -2,23 +2,24 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
-from .mixins import Base
+from ggrc.models.mixins import Base
+
 
 class Event(Base, db.Model):
   __tablename__ = 'events'
 
-  action = db.Column(db.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT', u'GET'), nullable = False)
+  action = db.Column(
+      db.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT', u'GET'),
+      nullable=False,
+  )
   resource_id = db.Column(db.Integer)
   resource_type = db.Column(db.String)
 
-  revisions = db.relationship('Revision', backref='event', cascade='all, delete-orphan')
-
-  @staticmethod
-  def _extra_table_args(cls):
-    return (
-        db.Index('events_modified_by', 'modified_by_id'),
-        db.Index('ix_{}_updated_at'.format(cls.__tablename__), 'updated_at'),
-        )
+  revisions = db.relationship(
+      'Revision',
+      backref='event',
+      cascade='all, delete-orphan',
+  )
 
   _publish_attrs = [
       'action',
@@ -31,6 +32,16 @@ class Event(Base, db.Model):
       'revisions',
   ]
 
+  @staticmethod
+  def _extra_table_args(class_):
+    return (
+        db.Index('events_modified_by', 'modified_by_id'),
+        db.Index(
+            'ix_{}_updated_at'.format(class_.__tablename__),
+            'updated_at',
+        ),
+    )
+
   @classmethod
   def eager_query(cls):
     from sqlalchemy import orm
@@ -38,4 +49,4 @@ class Event(Base, db.Model):
     query = super(Event, cls).eager_query()
     return query.options(
         orm.subqueryload('revisions').undefer_group('Revision_complete'),
-        )
+    )
