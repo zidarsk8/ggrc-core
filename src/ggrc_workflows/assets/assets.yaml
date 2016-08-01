@@ -49,7 +49,6 @@ dashboard-js-template-files:
   - dashboard/info/my_audit_requests.mustache
   - dashboard/info/errors.mustache
   - tasks/modal_content.mustache
-  - tasks/tree_footer.mustache
   - tasks/tree_add_item.mustache
   - tasks/extended_info.mustache
   - tasks/tree.mustache
@@ -57,7 +56,6 @@ dashboard-js-template-files:
   - task_groups/info.mustache
   - task_groups/modal_content.mustache
   - task_groups/tree.mustache
-  - task_groups/tree_footer.mustache
   - task_groups/tree_add_item.mustache
   - task_groups/tree_header.mustache
   - task_group_tasks/modal_content.mustache
@@ -70,6 +68,7 @@ dashboard-js-template-files:
   - workflows/info.mustache
   - workflows/contacts.mustache
   - workflows/tree.mustache
+  - workflows/tree_footer.mustache
   - workflows/search_result.mustache
   - workflows/lhn_search.mustache
   - workflows/extended_info.mustache
@@ -82,7 +81,6 @@ dashboard-js-template-files:
   - selectors/multitype_multiselect_option_column.mustache
   - selectors/multitype_multiselect_option_items.mustache
   - wf_people/tree_add_item.mustache
-  - wf_people/tree_footer.mustache
   - wf_people/people_items.mustache
   - task_groups/tier2_content.mustache
   - tasks/tier2_content.mustache

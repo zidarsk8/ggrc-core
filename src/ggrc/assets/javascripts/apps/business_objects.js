@@ -365,7 +365,7 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             show_view: path + '/objectives/tree.mustache',
-            footer_view: path + '/objectives/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/objectives/tree_add_item.mustache'
           }
         },
@@ -375,7 +375,7 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             show_view: path + '/controls/tree.mustache',
-            footer_view: path + '/controls/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/controls/tree_add_item.mustache'
           }
         },
@@ -440,7 +440,8 @@
           Assessment: {
             mapping: 'related_assessments',
             child_options: relatedObjectsChildOptions,
-            draw_children: true
+            draw_children: true,
+            footer_view: path + '/base_objects/tree_footer.mustache'
           },
           Request: {
             mapping: 'related_requests',
@@ -493,7 +494,7 @@
             draw_children: true,
             fetch_post_process: sort_sections,
             show_view: path + '/directives/tree.mustache',
-            footer_view: path + '/directives/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/directives/tree_add_item.mustache'
           },
           Contract: {
@@ -502,7 +503,7 @@
             draw_children: true,
             fetch_post_process: sort_sections,
             show_view: path + '/directives/tree.mustache',
-            footer_view: path + '/directives/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache'
           },
           Policy: {
             mapping: 'policies',
@@ -510,7 +511,7 @@
             draw_children: true,
             fetch_post_process: sort_sections,
             show_view: path + '/directives/tree.mustache',
-            footer_view: path + '/directives/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/directives/tree_add_item.mustache'
           },
           Standard: {
@@ -519,7 +520,7 @@
             draw_children: true,
             fetch_post_process: sort_sections,
             show_view: path + '/directives/tree.mustache',
-            footer_view: path + '/directives/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/directives/tree_add_item.mustache'
           },
           Control: {
@@ -555,12 +556,12 @@
             draw_children: true,
             show_view: path + '/audits/tree.mustache',
             header_view: path + '/audits/tree_header.mustache',
-            footer_view: path + '/audits/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/audits/tree_add_item.mustache'
           },
           Person: {
             show_view: path + '/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache',
-            footer_view: path + '/ggrc_basic_permissions/people_roles/authorizations_by_person_tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             parent_instance: GGRC.page_instance(),
             allow_reading: true,
             allow_mapping: true,
@@ -578,7 +579,7 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             show_view: path + '/requests/tree.mustache',
-            footer_view: path + '/requests/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/requests/tree_add_item.mustache'
           },
           Program: {
@@ -610,7 +611,7 @@
             model: CMS.Models.Assessment,
             show_view: path + '/base_objects/tree.mustache',
             header_view: path + '/base_objects/tree_header.mustache',
-            footer_view: path + '/assessments/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/assessments/tree_add_item.mustache'
           },
           AssessmentTemplate: {
@@ -741,7 +742,7 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             show_view: path + '/requests/tree.mustache',
-            footer_view: path + '/requests/tree_footer.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/requests/tree_add_item.mustache'
           }
         },
@@ -812,9 +813,8 @@
             draw_children: true,
             child_options: relatedObjectsChildOptions,
             show_view: GGRC.mustache_path + '/requests/tree.mustache',
-            footer_view: GGRC.mustache_path + '/requests/tree_footer.mustache',
-            add_item_view:
-              GGRC.mustache_path + '/requests/tree_add_item.mustache'
+            footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+            add_item_view: GGRC.mustache_path + '/requests/tree_add_item.mustache'
           },
           Program: {
             mapping: 'extended_related_programs_via_search',
@@ -854,7 +854,8 @@
             mapping: 'extended_related_audits_via_search',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
-            show_view: path + '/audits/tree.mustache'
+            show_view: path + '/audits/tree.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache'
           },
           Section: {
             model: CMS.Models.Section,
@@ -897,7 +898,8 @@
           Issue: {
             mapping: 'extended_related_issues_via_search',
             child_options: relatedObjectsChildOptions,
-            draw_children: true
+            draw_children: true,
+            footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache'
           },
           AccessGroup: {
             mapping: 'extended_related_access_groups_via_search',
@@ -957,8 +959,8 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             add_item_view: null,
-            header_view:
-              path + '/assessments/tree_header.mustache'
+            header_view: path + '/assessments/tree_header.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache'
           }
         }
       });

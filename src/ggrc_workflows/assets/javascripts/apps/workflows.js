@@ -404,7 +404,7 @@
             parent_instance: pageInstance,
             model: CMS.Models.Workflow,
             show_view: GGRC.mustache_path + '/workflows/tree.mustache',
-            footer_view: null
+            footer_view: GGRC.mustache_path + '/workflows/tree_footer.mustache'
           }
         },
         task: {
@@ -511,7 +511,7 @@
               '/ggrc_basic_permissions/people_roles/' +
               'authorizations_by_person_tree.mustache',
             footer_view:
-              GGRC.mustache_path + '/wf_people/tree_footer.mustache',
+              GGRC.mustache_path + '/base_objects/tree_footer.mustache',
             add_item_view:
               GGRC.mustache_path + '/wf_people/tree_add_item.mustache'
           }

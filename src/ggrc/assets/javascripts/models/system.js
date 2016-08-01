@@ -124,10 +124,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
     this.tree_view_options = $.extend({},
       CMS.Models.SystemOrProcess.tree_view_options, {
         // systems is a special case; can be imported to programs
-        footer_view: GGRC.mustache_path +
-        (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program ?
-          '/systems/tree_footer.mustache' :
-          '/base_objects/tree_footer.mustache'),
+        footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
         add_item_view: GGRC.mustache_path +
         (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program ?
           '/systems/tree_add_item.mustache' :
