@@ -3,6 +3,7 @@
 
 """Tests for /query api endpoint."""
 
+from datetime import datetime
 from os.path import abspath, dirname, join
 from flask import json
 from nose.plugins.skip import SkipTest
@@ -13,6 +14,10 @@ from integration.ggrc import TestCase
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, '../converters/test_csvs/')
+
+# to be moved into converters.query_helper
+DATE_FORMAT_REQUEST = "%m/%d/%Y"
+DATE_FORMAT_RESPONSE = "%Y-%m-%d"
 
 
 class TestAdvancedQueryAPI(TestCase):
@@ -48,15 +53,16 @@ class TestAdvancedQueryAPI(TestCase):
     headers = {'Content-Type': 'application/json', }
     return self.client.post("/query", data=json.dumps(data), headers=headers)
 
-  def test_simple_export_query(self):
-    """Test basic queries."""
+  def test_basic_query_eq(self):
+    """Filter by = operator."""
+    title = "Cat ipsum 1"
     data = {
         "object_name": "Program",
         "filters": {
             "expression": {
                 "left": "title",
                 "op": {"name": "="},
-                "right": "Cat ipsum 1",
+                "right": title,
             },
         },
     }
@@ -64,9 +70,12 @@ class TestAdvancedQueryAPI(TestCase):
     programs = response.get("Program")
     self.assertIsNot(programs, None)
     self.assertEqual(programs["count"], 1)
-    self.assertEqual(len(programs["values"]), 1)
-    self.assertEqual(programs["values"][0]["title"], "Cat ipsum 1")
+    self.assertEqual(len(programs["values"]), programs["count"])
+    self.assertEqual(programs["values"][0]["title"], title)
 
+  def test_basic_query_in(self):
+    """Filter by ~ operator."""
+    title_pattern = "1"
     data = {
         "object_name": "Program",
         "filters": {
@@ -81,11 +90,123 @@ class TestAdvancedQueryAPI(TestCase):
     programs = response.get("Program")
     self.assertIsNot(programs, None)
     self.assertEqual(programs["count"], 12)
-    self.assertEqual(len(programs["values"]), 12)
+    self.assertEqual(len(programs["values"]), programs["count"])
+    self.assertTrue(all(title_pattern in program["title"]
+                        for program in programs["values"]))
 
-  @SkipTest
-  def test_basic_query(self):
-    pass
+  def test_basic_query_ne(self):
+    """Filter by != operator."""
+    title = "Cat ipsum 1"
+    data = {
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "!="},
+                "right": title,
+            },
+        },
+    }
+    response = json.loads(self._post(data).data)[0]
+    programs = response.get("Program")
+    self.assertIsNot(programs, None)
+    self.assertEqual(programs["count"], 22)
+    self.assertEqual(len(programs["values"]), programs["count"])
+    self.assertTrue(all(program["title"] != title
+                        for program in programs["values"]))
+
+  def test_basic_query_not_in(self):
+    """Filter by !~ operator."""
+    title_pattern = "1"
+    data = {
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "!~"},
+                "right": title_pattern,
+            },
+        },
+    }
+    response = json.loads(self._post(data).data)[0]
+    programs = response.get("Program")
+    self.assertIsNot(programs, None)
+    self.assertEqual(programs["count"], 11)
+    self.assertEqual(len(programs["values"]), programs["count"])
+    self.assertTrue(all(title_pattern not in program["title"]
+                        for program in programs["values"]))
+
+  def test_basic_query_lt(self):
+    """Filter by < operator."""
+    date = datetime(2015, 5, 18)
+    data = {
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "effective date",
+                "op": {"name": "<"},
+                "right": date.strftime(DATE_FORMAT_REQUEST),
+            },
+        },
+    }
+    response = json.loads(self._post(data).data)[0]
+    programs = response.get("Program")
+    self.assertIsNot(programs, None)
+    self.assertEqual(programs["count"], 9)
+    self.assertEqual(len(programs["values"]), programs["count"])
+    self.assertTrue(
+        all(datetime.strptime(program["start_date"],
+                              DATE_FORMAT_RESPONSE) < date
+            for program in programs["values"]),
+    )
+
+  def test_basic_query_gt(self):
+    """Filter by > operator."""
+    date = datetime(2015, 5, 18)
+    data = {
+        "object_name": "Program",
+        "filters": {
+            "expression": {
+                "left": "effective date",
+                "op": {"name": ">"},
+                "right": date.strftime(DATE_FORMAT_REQUEST),
+            },
+        },
+    }
+    response = json.loads(self._post(data).data)[0]
+    programs = response.get("Program")
+    self.assertIsNot(programs, None)
+    self.assertEqual(programs["count"], 13)
+    self.assertEqual(len(programs["values"]), programs["count"])
+    self.assertTrue(
+        all(datetime.strptime(program["start_date"],
+                              DATE_FORMAT_RESPONSE) > date
+            for program in programs["values"]),
+    )
+
+  def test_basic_query_text_search(self):
+    """Filter by fulltext search."""
+    text_pattern = "ea"
+    data = {
+        "object_name": "Regulation",
+        "fields": ["description", "notes"],
+        "filters": {
+            "expression": {
+                "op": {"name": "text_search"},
+                "text": text_pattern,
+            },
+        },
+    }
+    response = json.loads(self._post(data).data)[0]
+    regulations = response.get("Regulation")
+    self.assertIsNot(regulations, None)
+    self.assertEqual(regulations["count"], 21)
+    self.assertEqual(len(regulations["values"]), regulations["count"])
+    self.assertTrue(all((regulation["description"] and
+                         text_pattern in regulation["description"]) or
+                        (regulation["notes"] and
+                         text_pattern in regulation.get("notes", ""))
+                        for regulation in regulations["values"]))
 
   @SkipTest
   def test_basic_query_filter(self):
