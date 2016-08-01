@@ -30,6 +30,7 @@ class Stub(collections.namedtuple("Stub", ["type", "id"])):
 
 
 class AutomapperGenerator(object):
+
   def __init__(self, use_benchmark=True):
     self.processed = set()
     self.queue = set()
@@ -221,45 +222,59 @@ class AutomapperGenerator(object):
     return True
 
 
-def register_automapping_listeners():
-  @Resource.model_posted.connect_via(Relationship)
-  def handle_relationship_post(sender, obj=None, src=None, service=None):
-    if obj is None:
-      logging.warning("Automapping listener: no obj, no mappings created")
-      return
-    AutomapperGenerator().generate_automappings(obj)
+def handle_relationship_post(source, destination):
+  """Handle posting of special relationships.
 
+  This function handles direct relationships that do not have a relationship
+  object. A fake object is created with source and destination and auto
+  mappings are then generated.
+
+  Args:
+    source: Source model of relationship
+    destination: Destination model of relationship
+
+  """
+  if source is None:
+    logging.warning("Automapping request listener: "
+                    "no source, no mappings created")
+    return
+  if destination is None:
+    logging.warning("Automapping request listener: "
+                    "no destination, no mappings created")
+    return
+  relationship = Relationship(source_type=source.type,
+                              source_id=source.id,
+                              destination_type=destination.type,
+                              destination_id=destination.id)
+  AutomapperGenerator().generate_automappings(relationship)
+
+
+def register_automapping_listeners():
+  """Register event listeners for auto mapper."""
   # pylint: disable=unused-variable
+
+  @Resource.collection_posted.connect_via(Relationship)
+  def handle_relationship_collection_post(sender, objects=None, **kwargs):
+    """Handle bulk creation of relationships.
+
+    This handler reuses auto mapper cache and is more efficient than handling
+    one object at a time.
+
+    Args:
+      objects: list of relationship Models.
+    """
+    automapper = AutomapperGenerator()
+    for obj in objects:
+      if obj is None:
+        logging.warning("Automapping listener: no obj, no mappings created")
+        return
+      automapper.generate_automappings(obj)
+
   @Resource.model_posted_after_commit.connect_via(Request)
   @Resource.model_put_after_commit.connect_via(Request)
   def handle_request(sender, obj=None, src=None, service=None):
-    if obj is None:
-      logging.warning("Automapping request listener: "
-                      "no obj, no mappings created")
-      return
-    if obj.audit is None:
-      logging.warning("Automapping request listener: "
-                      "no audit, no mappings created")
-      return
-    rel = Relationship(source_type=obj.type,
-                       source_id=obj.id,
-                       destination_type=obj.audit.type,
-                       destination_id=obj.audit.id)
-    handle_relationship_post(sender, obj=rel)
+    handle_relationship_post(obj, obj.audit)
 
-  # pylint: disable=unused-variable
   @Resource.model_posted_after_commit.connect_via(Audit)
   def handle_audit(sender, obj=None, src=None, service=None):
-    if obj is None:
-      logging.warning("Automapping audit listener: "
-                      "no obj, no mappings created")
-      return
-    if obj.program is None:
-      logging.warning("Automapping audit listener: "
-                      "no program, no mappings created")
-      return
-    rel = Relationship(source_type=obj.type,
-                       source_id=obj.id,
-                       destination_type=obj.program.type,
-                       destination_id=obj.program.id)
-    handle_relationship_post(sender, obj=rel)
+    handle_relationship_post(obj, obj.program)

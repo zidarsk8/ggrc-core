@@ -20,6 +20,7 @@ from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql.expression import tuple_
 import sqlalchemy.orm.exc
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -110,29 +111,30 @@ def get_related_keys_for_expiration(context, o):
   return keys
 
 
-def set_ids_for_new_custom_attributes(objects, parent_obj):
+def set_ids_for_new_custom_attributes(parent_obj):
   """
   When we are creating custom attribute values and definitions for
   POST requests, parent object ID is not yet defined. This is why we update
   custom attribute values at this point and set the correct attributable_id
 
   Args:
-    objects: newly created objects (we update only the ones that
-             are CustomAttributeValue
     parent_obj: parent object to be set as attributable
 
   Returns:
     None
   """
+  if not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
+    return
+
+  modified_objects = get_modified_objects(db.session).new
 
   object_attrs = {
       "CustomAttributeValue": "attributable_id",
       "CustomAttributeDefinition": "definition_id"
   }
 
-  for obj in objects:
-    if (obj.type not in object_attrs or
-            not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE")):
+  for obj in modified_objects:
+    if obj.type not in object_attrs:
       continue
 
     attr = object_attrs[obj.type]
@@ -312,9 +314,10 @@ def update_index(session, cache):
     session.commit()
 
 
-def log_event(session, obj=None, current_user_id=None):
+def log_event(session, obj=None, current_user_id=None, flush=True):
   revisions = []
-  session.flush()
+  if flush:
+    session.flush()
   if current_user_id is None:
     current_user_id = get_current_user_id()
   cache = get_cache()
@@ -330,7 +333,7 @@ def log_event(session, obj=None, current_user_id=None):
   if obj is None:
     resource_id = 0
     resource_type = None
-    action = 'IMPORT'
+    action = 'BULK'
     context_id = 0
   else:
     resource_id = obj.id
@@ -636,6 +639,18 @@ class Resource(ModelView):
         :src: The original POSTed JSON dictionary.
         :service: The instance of Resource handling the POST request.
       """,)
+  collection_posted = signals.signal(
+      "Collection POSTed",
+      """
+      Indicates that a list of models was received via POST and will be
+      committed to the database. The sender in the signal will be the model
+      class of the POSTed resource. The following arguments will be sent along
+      with the signal:
+
+        :objects: The model instance created from the POSTed JSON.
+        :src: The original POSTed JSON dictionary.
+        :service: The instance of Resource handling the POST request.
+      """,)
   model_posted_after_commit = signals.signal(
       "Model POSTed - after",
       """
@@ -832,7 +847,7 @@ class Resource(ModelView):
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Update custom attribute values"):
-      set_ids_for_new_custom_attributes(modified_objects.new, obj)
+      set_ids_for_new_custom_attributes(obj)
     with benchmark("Log event"):
       log_event(db.session, obj)
     with benchmark("Update memcache before commit for collection PUT"):
@@ -1121,7 +1136,33 @@ class Resource(ModelView):
 
     return src
 
-  def _get_model_instance(self, src=None):
+  def _get_relationships_cache(self, body):
+    cache = getattr(self, "_relationship_cache", None)
+    if cache is not None:
+      return cache
+    relationships = self.model.query.filter(tuple_(
+        self.model.source_id, self.model.source_type,
+        self.model.destination_id, self.model.destination_type).in_((
+            src["relationship"]["source"].get("id", -1),
+            src["relationship"]["source"].get("type"),
+            src["relationship"]["destination"].get("id", -1),
+            src["relationship"]["destination"].get("type")
+        ) for src in body)
+    )
+
+    cache = {
+        (
+            relationship.source_id,
+            relationship.source_type,
+            relationship.destination_id,
+            relationship.destination_type,
+        ): relationship
+        for relationship in relationships
+    }
+    setattr(self, "_relationship_cache", cache)
+    return cache
+
+  def _get_model_instance(self, src=None, body=None):
     """Get a model instance.
 
     This function creates a new model instance and returns it. The function is
@@ -1138,12 +1179,12 @@ class Resource(ModelView):
 
     obj = None
     if self.model.__name__ == "Relationship":
-      obj = self.model.query.filter(and_(
-          self.model.source_id == src["source"]["id"],
-          self.model.source_type == src["source"]["type"],
-          self.model.destination_id == src["destination"]["id"],
-          self.model.destination_type == src["destination"]["type"],
-      )).first()
+      obj = self._get_relationships_cache(body).get((
+          src["source"]["id"],
+          src["source"]["type"],
+          src["destination"]["id"],
+          src["destination"]["type"]
+      ))
     if obj is None:
       obj = self.model()
       db.session.add(obj)
@@ -1159,57 +1200,67 @@ class Resource(ModelView):
       Forbidden error if user does not have create permission for all objects
       in the objects list.
     """
-    with benchmark("Check create permissions"):
-      for obj in objects:
-        if not permissions.is_allowed_create_for(obj):
-          # json_create sometimes adds objects to session, so we need to
-          # make sure the session is cleared
-          db.session.expunge_all()
-          raise Forbidden()
+    for obj in objects:
+      if not permissions.is_allowed_create_for(obj):
+        # json_create sometimes adds objects to session, so we need to
+        # make sure the session is cleared
+        db.session.expunge_all()
+        raise Forbidden()
 
   def collection_post_loop(self, body, res, no_result, running_async):
-    for wrapped_src in body:
-      if running_async:
-        time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
+    """Handle all posted objects.
 
-      src = self._unwrap_collection_post_src(wrapped_src)
-      obj = self._get_model_instance(src)
+    Args:
+      body: list of dictionaries containing json object representations.
+      res: List that will get responses appended to it.
+      no_result: Flag for suppressing results.
+      running_async: Flag for async jobs.
+    """
 
-      with benchmark("Deserialize object"):
-        self.json_create(obj, src)
-      with benchmark("Send model POSTed event"):
-        self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+    with benchmark("Generate objects"):
+      objects = []
+      for wrapped_src in body:
+        src = self._unwrap_collection_post_src(wrapped_src)
+        obj = self._get_model_instance(src, body)
+        with benchmark("Deserialize object"):
+          self.json_create(obj, src)
+        with benchmark("Send model POSTed event"):
+          self.model_posted.send(obj.__class__, obj=obj, src=src, service=self)
+        with benchmark("Update custom attribute values"):
+          set_ids_for_new_custom_attributes(obj)
 
-      self._check_post_permissions([obj])
+        obj.modified_by = get_current_user()
+        objects.append(obj)
 
-      obj.modified_by = get_current_user()
+    with benchmark("Send collection POSTed event"):
+      self.collection_posted.send(obj.__class__, objects=objects)
+    with benchmark("Check create permissions"):
+      self._check_post_permissions(objects)
+    with benchmark("Get modified objects"):
+      modified_objects = get_modified_objects(db.session)
+    with benchmark("Log event for all objects"):
+      log_event(db.session, obj, flush=False)
+    with benchmark("Update memcache before commit for collection POST"):
+      update_memcache_before_commit(
+          self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
+    with benchmark("Commit collection"):
+      db.session.commit()
+    with benchmark("Update index"):
+      update_index(db.session, modified_objects)
+    with benchmark("Update memcache after commit for collection POST"):
+      update_memcache_after_commit(self.request)
 
-      with benchmark("Get modified objects"):
-        modified_objects = get_modified_objects(db.session)
-      with benchmark("Update custom attribute values"):
-        set_ids_for_new_custom_attributes(modified_objects.new, obj)
-
-      with benchmark("Log event"):
-        log_event(db.session, obj)
-      with benchmark("Update memcache before commit for collection POST"):
-        update_memcache_before_commit(
-            self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
-      with benchmark("Commit"):
-        db.session.commit()
-      with benchmark("Update index"):
-        update_index(db.session, modified_objects)
-      with benchmark("Update memcache after commit for collection POST"):
-        update_memcache_after_commit(self.request)
-      with benchmark("Send model POSTed - after commit event"):
+    with benchmark("Send model POSTed - after commit event"):
+      for obj in objects:
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
                                             src=src, service=self)
         # Note: In model_posted_after_commit necessary mapping and
         # relationships are set, so need to commit the changes
-        db.session.commit()
+      db.session.commit()
 
-      with benchmark("Serialize object"):
+    with benchmark("Serialize objects"):
+      for obj in objects:
         object_for_json = {} if no_result else self.object_for_json(obj)
-      with benchmark("Make response"):
         res.append((201, object_for_json))
 
   @staticmethod
