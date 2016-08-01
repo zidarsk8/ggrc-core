@@ -157,13 +157,17 @@ can.Control('CMS.Controllers.TreeLoader', {
     return !!window.location.hash.match(/#.+(\/.+)+/);
   },
 
-  display: function (useOldAPI) {
+  display: function () {
     var that = this;
     var tracker_stop = GGRC.Tracker.start(
           'TreeView', 'display', this.options.model.shortName);
+    // TODO: Currently Query API doesn't support CustomAttributable.
+    var isCustomAttr = this.options.model.shortName === 'CustomAttributable';
+    var isTreeView = this instanceof CMS.Controllers.TreeView;
     // Use Query API only for first tier in TreeViewController
-    var loader = useOldAPI || !this.loadPage ?
-      this.fetch_list.bind(this) : this.loadPage.bind(this);
+    var loader = !isTreeView || isCustomAttr ||
+      this.options.attr('is_subtree') ?
+        this.fetch_list.bind(this) : this.loadPage.bind(this);
 
     if (this._display_deferred) {
       if (!this._will_navigate()) {
@@ -605,6 +609,9 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
 
       this.element.uniqueId();
+
+      this.options.attr('is_subtree',
+        this.element && this.element.closest('.inner-tree').length > 0);
 
       if ('parent_instance' in opts && 'status' in opts.parent_instance) {
         setAllowMapping = function () {
@@ -1503,8 +1510,6 @@ can.Control('CMS.Controllers.TreeViewNode', {
     );
     this.options.attr('isPlaceholder', false);
     this._draw_node_in_progress = false;
-    this.options.attr('is_subtree',
-        this.element && this.element.closest('.inner-tree').length > 0);
   },
 
   draw_placeholder: function () {
@@ -1645,7 +1650,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
       if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
         child_tree_control = $el.control();
         if (child_tree_control) {
-          child_tree_dfds.push(child_tree_control.display(true));
+          child_tree_dfds.push(child_tree_control.display());
         }
       }
     });

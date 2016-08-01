@@ -36,11 +36,11 @@ can.Control('GGRC.Controllers.TreeFilter', {}, {
     parentControl.filter(filterString);
   },
   'input[type=reset] click': function (el, ev) {
-    this.element.find('input[type=text]')[0].value = '';
+    this.element.find('input[type=text]').val('');
     this.apply_filter('');
   },
   'input[type=submit] click': function (el, ev) {
-    this.apply_filter(this.element.find('input[type=text]')[0].value);
+    this.apply_filter(this.element.find('input[type=text]').val());
   },
   'input keyup': function (el, ev) {
     this.toggle_indicator(GGRC.query_parser.parse(el.val()));
