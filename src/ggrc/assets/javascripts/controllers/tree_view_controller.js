@@ -1162,7 +1162,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       control = new CMS.Controllers.TreeViewNode(elem, options);
       drawItemsDfds.push(control._draw_node_deferred);
       filteredItems.push(control);
-      return control.element;
+      return control.element[0];
     }.bind(this));
 
     if ($footer.length) {
