@@ -1394,7 +1394,14 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       if (oldVal !== newVal && _.contains(['current', 'pageSize'], type)) {
         this.refreshList();
       }
-    })
+    }),
+  '{CMS.Models.Relationship} created': function (model, ev, instance) {
+    if (instance instanceof CMS.Models.Relationship &&
+      this.options.model.shortName === instance.destination.type &&
+      $(this.element).is(':visible')) {
+      this.refreshList();
+    }
+  }
 });
 
 can.Control('CMS.Controllers.TreeViewNode', {
