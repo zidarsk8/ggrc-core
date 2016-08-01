@@ -142,6 +142,7 @@
       var resources = type_obj.resources || [];
       var context = instance.context || {id: null};
       var conditions = conditions_by_context[context.id];
+      var contexts_by_type = type_obj.contexts || [];
       var condition;
       var i;
 
@@ -152,7 +153,7 @@
       if (~resources.indexOf(instance.id)) {
         return true;
       }
-      
+
       if (!conditions && contexts_by_type.indexOf(context.id) > -1) {
         return true;
       }
