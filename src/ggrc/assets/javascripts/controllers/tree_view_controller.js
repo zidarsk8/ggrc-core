@@ -19,10 +19,10 @@ function _firstElementChild(el) {
 }
 
 if (!GGRC.tree_view) {
-  GGRC.tree_view = {};
+  GGRC.tree_view = new can.Map();
 }
-GGRC.tree_view.basic_model_list = new can.Observe.List([]);
-GGRC.tree_view.sub_tree_for = {};
+GGRC.tree_view.attr('basic_model_list', []);
+GGRC.tree_view.attr('sub_tree_for', {});
 
 function _display_tree_subpath(el, path, attempt_counter) {
   var rest = path.split('/');
@@ -312,9 +312,8 @@ can.Control('CMS.Controllers.TreeLoader', {
          {} // all hope is lost, skip filtering
         ).display_list;
 
-      // check if all objects selected, then skip filter
-      if (child_tree_display_list === undefined ||
-          child_tree_display_list.length === this.options.parent.options.child_tree_model_list.length) {
+      // check if no objects selected, then skip filter
+      if (!child_tree_display_list) {
         // skip filter
         filtered_items = items;
       } else if (child_tree_display_list.length === 0) { // no item is selected to filter, so just return
@@ -520,15 +519,15 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     // Set child tree options
     model_name = model.model_singular;
     child_tree_model_list = [];
-    valid_models = Object.keys(GGRC.tree_view.base_widgets_by_type);
+    valid_models = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
 
     w_list = GGRC.tree_view.base_widgets_by_type[model_name]; // possible widget/mapped model_list
     if (w_list === undefined) {
       child_tree_model_list = GGRC.tree_view.basic_model_list;
-      GGRC.tree_view.sub_tree_for[model_name] = {
+      GGRC.tree_view.sub_tree_for.attr(model_name, {
         model_list: child_tree_model_list,
         display_list: valid_models
-      };
+      });
     }
 
     sub_tree = GGRC.tree_view.sub_tree_for[model_name];
@@ -1433,7 +1432,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       selected_items.push(this.value);
     });
     // update GGRC.tree_view
-    GGRC.tree_view.sub_tree_for[model_name].display_list = selected_items;
+    GGRC.tree_view.sub_tree_for.attr(model_name + '.display_list',
+      selected_items);
 
     // save in local storage
     this.display_prefs.setChildTreeDisplayList(model_name, selected_items);

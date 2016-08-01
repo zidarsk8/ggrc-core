@@ -110,7 +110,6 @@
   {{#if expanded}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
-      {{^if_equals instance.status "Not Started"}}
       {{#if draw_children}}
         {{#each child_options}}
           <div class="inner-tree">
@@ -119,9 +118,7 @@
           </div>
         {{/each}}
       {{/if}}
-      {{/if_equals}}
     </div>
   </div>
   {{/if}}
-
 </li>
