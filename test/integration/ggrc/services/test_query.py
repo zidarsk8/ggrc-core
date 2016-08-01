@@ -357,3 +357,131 @@ class TestAdvancedQueryAPI(TestCase):
     # In the end, instead of returning mapped object stubs like we do now, we'd
     # just return a self link for fetching those objects.
     pass
+
+  def test_multiple_queries(self):
+    """Multiple queries POST is identical to multiple single-query POSTs."""
+    data_list = [
+        {
+            "object_name": "Program",
+            "order_by": [{
+                "name": "title",
+            }],
+            "limit": [1, 12],
+            "filters": {
+                "expression": {
+                    "left": "title",
+                    "op": {"name": "~"},
+                    "right": "Cat ipsum",
+                },
+            },
+        },
+        {
+            "object_name": "Program",
+            "type": "values",
+            "filters": {
+                "expression": {
+                    "left": "title",
+                    "op": {"name": "~"},
+                    "right": "Cat ipsum",
+                },
+            },
+        },
+        {
+            "object_name": "Program",
+            "type": "count",
+            "filters": {
+                "expression": {
+                    "left": "title",
+                    "op": {"name": "~"},
+                    "right": "Cat ipsum",
+                },
+            },
+        },
+        {
+            "object_name": "Program",
+            "type": "ids",
+            "filters": {
+                "expression": {
+                    "left": "title",
+                    "op": {"name": "~"},
+                    "right": "Cat ipsum",
+                },
+            },
+        },
+        {
+            "object_name": "Program",
+            "filters": {
+                "expression": {
+                    "left": "title",
+                    "op": {"name": "="},
+                    "right": "Cat ipsum 1",
+                },
+            },
+        },
+        {
+            "object_name": "Program",
+            "filters": {
+                "expression": {
+                    "left": "title",
+                    "op": {"name": "~"},
+                    "right": "1",
+                },
+            },
+        },
+        {
+            "object_name": "Program",
+            "filters": {
+                "expression": {
+                    "left": "title",
+                    "op": {"name": "!="},
+                    "right": "Cat ipsum 1",
+                },
+            },
+        },
+        {
+            "object_name": "Program",
+            "filters": {
+                "expression": {
+                    "left": "title",
+                    "op": {"name": "!~"},
+                    "right": "`",
+                },
+            },
+        },
+        {
+            "object_name": "Program",
+            "filters": {
+                "expression": {
+                    "left": "effective date",
+                    "op": {"name": "<"},
+                    "right": "05/18/2015",
+                },
+            },
+        },
+        {
+            "object_name": "Program",
+            "filters": {
+                "expression": {
+                    "left": "effective date",
+                    "op": {"name": ">"},
+                    "right": "05/18/2015",
+                },
+            },
+        },
+        {
+            "object_name": "Regulation",
+            "fields": ["description", "notes"],
+            "filters": {
+                "expression": {
+                    "op": {"name": "text_search"},
+                    "text": "ea",
+                },
+            },
+        },
+    ]
+
+    response_multiple_posts = [json.loads(self._post(data).data)[0]
+                               for data in data_list]
+    response_single_post = json.loads(self._post(data_list).data)
+
+    self.assertEqual(response_multiple_posts, response_single_post)
