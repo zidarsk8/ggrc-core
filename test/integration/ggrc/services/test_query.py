@@ -144,6 +144,77 @@ class TestAdvancedQueryAPI(TestCase):
 
     self.assertEqual(programs_limit["total"], programs_no_limit["total"])
 
+  def test_query_count(self):
+    """The value of "count" is same for "values" and "count" queries."""
+    data_values = {
+        "object_name": "Program",
+        "type": "values",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "~"},
+                "right": "Cat ipsum",
+            },
+        },
+    }
+    response_values = json.loads(self._post(data_values).data)[0]
+    programs_values = response_values.get("Program")
+    self.assertIsNot(programs_values, None)
+
+    data_count = {
+        "object_name": "Program",
+        "type": "count",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "~"},
+                "right": "Cat ipsum",
+            },
+        },
+    }
+    response_count = json.loads(self._post(data_count).data)[0]
+    programs_count = response_count.get("Program")
+    self.assertIsNot(programs_count, None)
+
+    self.assertEqual(programs_values["count"], programs_count["count"])
+
+  def test_query_ids(self):
+    """The ids are the same for "values" and "ids" queries."""
+    data_values = {
+        "object_name": "Program",
+        "type": "values",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "~"},
+                "right": "Cat ipsum",
+            },
+        },
+    }
+    response_values = json.loads(self._post(data_values).data)[0]
+    programs_values = response_values.get("Program")
+    self.assertIsNot(programs_values, None)
+
+    data_ids = {
+        "object_name": "Program",
+        "type": "ids",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "~"},
+                "right": "Cat ipsum",
+            },
+        },
+    }
+    response_ids = json.loads(self._post(data_ids).data)[0]
+    programs_ids = response_ids.get("Program")
+    self.assertIsNot(programs_ids, None)
+
+    self.assertEqual(
+        set(obj.get("id") for obj in programs_values["values"]),
+        set(programs_ids["ids"]),
+    )
+
   @SkipTest
   def test_mapped_query(self):
     pass
