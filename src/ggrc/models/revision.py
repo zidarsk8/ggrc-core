@@ -28,7 +28,13 @@ class Revision(Base, db.Model):
 
   @staticmethod
   def _extra_table_args(_):
-    return (db.Index('revisions_modified_by', 'modified_by_id'),)
+    return (
+        db.Index("revisions_modified_by", "modified_by_id"),
+        db.Index("fk_revisions_resource", "resource_type", "resource_id"),
+        db.Index("fk_revisions_source", "source_type", "source_id"),
+        db.Index("fk_revisions_destination",
+                 "destination_type", "destination_id"),
+    )
 
   _publish_attrs = [
       'resource_id',
