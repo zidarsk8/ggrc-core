@@ -1220,8 +1220,6 @@ class Resource(ModelView):
     with benchmark("Generate objects"):
       objects = []
       for wrapped_src in body:
-        if running_async:
-          time.sleep(settings.BACKGROUND_COLLECTION_POST_SLEEP)
         src = self._unwrap_collection_post_src(wrapped_src)
         obj = self._get_model_instance(src, body)
         with benchmark("Deserialize object"):
