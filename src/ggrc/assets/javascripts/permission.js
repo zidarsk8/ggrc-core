@@ -152,6 +152,11 @@
       if (~resources.indexOf(instance.id)) {
         return true;
       }
+      
+      if (!conditions && contexts_by_type.indexOf(context.id) > -1) {
+        return true;
+      }
+      
       if (!this._is_allowed(permissions,
           new Permission(action, instance_type, null)) &&
         !this._is_allowed(permissions,
