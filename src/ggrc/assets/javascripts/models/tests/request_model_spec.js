@@ -19,7 +19,8 @@ describe('CMS.Models.Request', function () {
     beforeEach(function () {
       instance = new can.Map({
         title: 'Request 18',
-        id: 18
+        id: 18,
+        type: 'Request'
       });
       method = Model.prototype.display_name.bind(instance);
     });
@@ -28,7 +29,7 @@ describe('CMS.Models.Request', function () {
       var result;
       instance.attr('title', undefined);
       result = method();
-      expect(result).toEqual('"Request 18" (DELETED)');
+      expect(result).toEqual('"Request ID: 18" (DELETED)');
     });
   });
 });
