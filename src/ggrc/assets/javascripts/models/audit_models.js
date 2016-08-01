@@ -573,16 +573,6 @@
         this._super.apply(this, arguments);
       }
     },
-    display_name: function () {
-      var desc = this.title;
-      var max_len = 20;
-      var out_name = desc;
-      // Truncate if greater than max_len chars
-      if (desc.length > max_len) {
-        out_name = desc.slice(0, max_len) + ' ...';
-      }
-      return 'Request "' + out_name + '"';
-    },
     form_preload: function (new_object_form, object_params) {
       var audit;
       var auditId;
