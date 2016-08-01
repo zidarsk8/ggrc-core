@@ -110,6 +110,7 @@ dashboard-js-files:
   - apps/business_objects.js
   - apps/custom_attributes.js
   - components/spinner/spinner.js
+  - components/assessment/read-more.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
@@ -157,6 +158,7 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/assessment/read-more.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
@@ -247,6 +249,11 @@ dashboard-js-template-files:
   - assessments/info.mustache
   - assessments/reusable_objects.mustache
   - assessments/header.mustache
+  - assessments/urls.mustache
+  - assessments/dates_list.mustache
+  - assessments/test_plan.mustache
+  - assessments/description.mustache
+  - assessments/notes.mustache
   - assessments/generator_title.mustache
   - assessment_templates/attribute_field.mustache
   - assessment_templates/attribute_add_field.mustache

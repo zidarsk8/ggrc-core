@@ -1,0 +1,42 @@
+/* Read-More Component CSS spec */
+
+assessment-read-more {
+  position: relative;
+  display: block;
+
+  .assessment-read-more__body {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0;
+    box-sizing: border-box;
+
+    .assessment-read-more__body-content {
+      line-height: 18px;
+      position: relative;
+
+      * {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+
+  .assessment-read-more__controls {
+    padding: 0;
+    height: 24px;
+    margin: 0;
+    text-align: right;
+    position: relative;
+  }
+
+  .assessment-read-more__btn {
+    cursor: pointer;
+    line-height: 24px;
+    transition: display 0.3s ease;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
