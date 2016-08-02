@@ -7,7 +7,7 @@
   'use strict';
 
   var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/inline.mustache');
+    '/components/assessment/inline/inline.mustache');
   var innerTplFolder = GGRC.mustache_path + '/components/assessment/inline';
 
   function mapValueForCA(value, type) {

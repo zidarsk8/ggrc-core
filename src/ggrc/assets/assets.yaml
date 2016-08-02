@@ -118,6 +118,11 @@ dashboard-js-files:
   - components/assessment/mapped-objects/filter.js
   - components/assessment/urls-list.js
   - components/assessment/attachments-list.js
+  - components/assessment/custom_attributes.js
+  - components/assessment/inline.js
+  - components/assessment/add_comment.js
+  - components/assessment/modal_attachments.js
+  - components/assessment/validation-icon.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
@@ -173,6 +178,19 @@ dashboard-js-template-files:
   - components/assessment/mapped-objects/popover.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/attachments-list.mustache
+  - components/assessment/custom_attributes.mustache
+  - components/assessment/inline/inline.mustache
+  - components/assessment/inline/text.mustache
+  - components/assessment/inline/input.mustache
+  - components/assessment/inline/dropdown.mustache
+  - components/assessment/inline/date.mustache
+  - components/assessment/inline/person.mustache
+  - components/assessment/inline/checkbox.mustache
+  - components/assessment/add_comment.mustache
+  - components/assessment/modal/attachments.mustache
+  - components/assessment/comment/input.mustache
+  - components/assessment/comment/controls.mustache
+  - components/assessment/validation-icon.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache

@@ -13,6 +13,9 @@
       {{/using}}
       added a response - {{date created_at}}
     </span>
+    {{#instance.custom_attribute_revision}}
+        <h6 class="comment-list__ca-description">{{instance.custom_attribute_revision.custom_attribute.title}}: {{instance.custom_attribute_revision.custom_attribute_stored_value}}</h6>
+    {{/instance.custom_attribute_revision}}
     <div class="rtf-block">
       <inline-edit
         type="text"

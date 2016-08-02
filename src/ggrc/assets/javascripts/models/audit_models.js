@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can) {
+(function (can, CMS) {
   function update_program_authorizations(programs, person) {
     return $.when(
       programs[0],
@@ -15,29 +15,29 @@
       CMS.Models.Role.findAll({
         name: 'ProgramEditor'
       })
-    ).then(function (program, people_bindings, auth_bindings,
+    ).then(function (program, peopleBindings, authBindings,
                      reader_roles, editor_roles) {
       // ignore readers.  Give users an editor role
-      var reader_authorizations = [];
-      var delete_dfds;
-      var editor_authorized_people = can.map(auth_bindings, function (ab) {
+      var readerAuthorizations = [];
+      var deleteDfds;
+      var editorAuthorizedPeople = can.map(authBindings, function (ab) {
         if (~can.inArray(ab.instance.role.reify(), reader_roles)) {
-          reader_authorizations.push(ab.instance);
+          readerAuthorizations.push(ab.instance);
         } else {
           return ab.instance.person.reify();
         }
       });
 
       if (Permission.is_allowed('create', 'UserRole', program.context.id) &&
-          !~can.inArray(person.reify(), editor_authorized_people)) {
-        delete_dfds = can.map(reader_authorizations, function (ra) {
+          !~can.inArray(person.reify(), editorAuthorizedPeople)) {
+        deleteDfds = can.map(readerAuthorizations, function (ra) {
           if (ra.person.reify() === person.reify()) {
             return ra.refresh().then(function () {
               return ra.destroy();
             });
           }
         });
-        return $.when.apply($, delete_dfds).then(function () {
+        return $.when.apply($, deleteDfds).then(function () {
           return new CMS.Models.UserRole({
             person: person,
             role: editor_roles[0].stub(),
@@ -147,12 +147,16 @@
       this.validatePresenceOf('contact');
       this.validateNonBlank('title');
       this.validate(['_transient.audit_firm', 'audit_firm'],
-        function (newVal, prop) {
-          var audit_firm = this.attr('audit_firm');
-          var transient_audit_firm = this.attr('_transient.audit_firm');
+        function () {
+          var auditFirm = this.attr('audit_firm');
+          var transientAuditFirm = this.attr('_transient.audit_firm');
 
-          if (!audit_firm && transient_audit_firm) {
-            if (_.isObject(transient_audit_firm) && (audit_firm.reify().title !== transient_audit_firm.reify().title) || (transient_audit_firm !== '' && transient_audit_firm !== null && audit_firm !== null && transient_audit_firm !== audit_firm.reify().title)) {
+          if (!auditFirm && transientAuditFirm) {
+            if (_.isObject(transientAuditFirm) &&
+              (auditFirm.reify().title !== transientAuditFirm.reify().title) ||
+              (transientAuditFirm !== '' && transientAuditFirm !== null &&
+              auditFirm !== null &&
+              transientAuditFirm !== auditFirm.reify().title)) {
               return 'No valid org group selected for firm';
             }
           }
@@ -187,18 +191,18 @@
       ).then(update_program_authorizations);
       GGRC.delay_leaving_page_until(dfd);
     },
-    findAuditors: function (return_list) {
-      // If return_list is true, use findAuditors in the
+    findAuditors: function (returnList) {
+      // If returnList is true, use findAuditors in the
       //  classical way, where the exact state of the list
-      //  isn't needed immeidately (as in a Mustache helper);
+      //  isn't needed immediately (as in a Mustache helper);
       //  if false, return a deferred that resolves to the list
       //  when the list is fully ready, for cases like permission
       //  checks for other modules.
       var loader = this.get_binding('authorizations');
-      var auditors_list = new can.List();
+      var auditorsList = new can.List();
       var dfds = [];
 
-      if (return_list) {
+      if (returnList) {
         $.map(loader.list, function (binding) {
           // FIXME: This works for now, but is sad.
           var role;
@@ -209,7 +213,7 @@
 
           function checkRole() {
             if (role.attr('name') === 'Auditor') {
-              auditors_list.push({
+              auditorsList.push({
                 person: binding.instance.person.reify(),
                 binding: binding.instance
               });
@@ -221,7 +225,7 @@
             role.refresh().then(checkRole);
           }
         });
-        return auditors_list;
+        return auditorsList;
       }
       return loader.refresh_instances().then(function () {
         $.map(loader.list, function (binding) {
@@ -239,7 +243,7 @@
 
             function checkRole() {
               if (role.attr('name') === 'Auditor') {
-                auditors_list.push({
+                auditorsList.push({
                   person: instance.person.reify(),
                   binding: instance
                 });
@@ -253,7 +257,7 @@
           }));
         });
         return $.when.apply($, dfds).then(function () {
-          return auditors_list;
+          return auditorsList;
         });
       });
     },
@@ -334,9 +338,9 @@
       }
     }
   }, {
-    form_preload: function (new_object_form) {
-      var page_instance = GGRC.page_instance();
-      this.attr('comment', page_instance);
+    form_preload: function () {
+      var pageInstance = GGRC.page_instance();
+      this.attr('comment', pageInstance);
     },
     /**
      * Update the description of an instance. Mainly used as an event handler for
@@ -530,21 +534,21 @@
       this.validateNonBlank('start_date');
       this.validatePresenceOf('audit');
 
-      this.validate(['start_date', 'end_date'], function (newVal, prop) {
-        var dates_are_valid;
+      this.validate(['start_date', 'end_date'], function () {
+        var datesAreValid;
 
         if (this.start_date && this.end_date) {
-          dates_are_valid = this.end_date >= this.start_date;
+          datesAreValid = this.end_date >= this.start_date;
         }
 
-        if (!dates_are_valid) {
+        if (!datesAreValid) {
           return 'Start and/or Due date is invalid';
         }
       });
 
       this.validate(
         'validate_assignee',
-        function (newVal, prop) {
+        function () {
           if (!this.validate_assignee) {
             return 'You need to specify at least one assignee';
           }
@@ -552,7 +556,7 @@
       );
       this.validate(
         'validate_requester',
-        function (newVal, prop) {
+        function () {
           if (!this.validate_requester) {
             return 'You need to specify at least one requester';
           }
@@ -901,7 +905,7 @@
 
       this.validate(
         'validate_creator',
-        function (newVal, prop) {
+        function () {
           if (!this.validate_creator) {
             return 'You need to specify at least one creator';
           }
@@ -909,7 +913,7 @@
       );
       this.validate(
         'validate_assessor',
-        function (newVal, prop) {
+        function () {
           if (!this.validate_assessor) {
             return 'You need to specify at least one assessor';
           }
@@ -990,9 +994,10 @@
       ).then(function (customAttrVals, commentCount, attachmentCount, rqRes) {
         var values = instance.custom_attribute_values.reify();
         var definitions = instance.custom_attribute_definitions.reify();
-
+        var invalidCustomAttributes = [];
         commentCount = commentCount();
         attachmentCount = attachmentCount();
+
         _.each(definitions, function (definition) {
           var attr = _.result(_.find(values, function (cav) {
             return cav.custom_attribute_id === definition.id;
@@ -1003,6 +1008,7 @@
             needed.value.push(definition.title);
           }
         });
+
         _.each(values, function (cav) {
           var definition;
           var i;
@@ -1025,30 +1031,49 @@
             return;
           }
           mandatory = Number(mandatory);
+
           if (mandatory & FLAGS.COMMENT) {
-            needed.comment.push(definition.title + ': ' + cav.attribute_value);
+            needed.comment.push({
+              msg: definition.title + ': ' + cav.attribute_value,
+              id: definition.id
+            });
           }
           if (mandatory & FLAGS.ATTACHMENT) {
-            needed.attachment.push(definition.title + ': ' +
-                                   cav.attribute_value);
+            needed.attachment.push({
+              msg: definition.title + ': ' + cav.attribute_value,
+              id: definition.id
+            });
           }
         });
+
         if (!commentCount && needed.comment.length) {
-          instance.attr(
-              '_mandatory_comment_msg',
-              'Comment required by: ' + needed.comment.join(', ')
-          );
+          invalidCustomAttributes =
+            invalidCustomAttributes
+              .concat(needed.comment.map(function (obj) {
+                return obj.id;
+              }));
+          instance.attr('_mandatory_comment_msg',
+            'Comment required by: ' + needed.comment.map(function (obj) {
+              return obj.msg;
+            }).join(', '));
         } else {
           instance.removeAttr('_mandatory_comment_msg');
         }
+
         if (!attachmentCount && needed.attachment.length) {
-          instance.attr(
-              '_mandatory_attachment_msg',
-              'Evidence required by: ' + needed.attachment.join(', ')
-          );
+          invalidCustomAttributes =
+            invalidCustomAttributes
+              .concat(needed.attachment.map(function (obj) {
+                return obj.id;
+              }));
+          instance.attr('_mandatory_attachment_msg',
+            'Evidence required by: ' + needed.attachment.map(function (obj) {
+              return obj.msg;
+            }).join(', '));
         } else {
           instance.removeAttr('_mandatory_attachment_msg');
         }
+
         if (needed.value.length) {
           instance.attr(
               '_mandatory_value_msg',
@@ -1065,6 +1090,7 @@
               instance.attr('_mandatory_comment_msg')
             ]).join('; <br />') || null
         );
+        instance.attr('invalidCustomAttributes', invalidCustomAttributes);
       });
     },
     related_issues: function () {
@@ -1424,4 +1450,4 @@
     },
     ignore_ca_errors: true
   });
-})(this.can);
+})(window.can, window.CMS);
