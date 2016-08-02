@@ -71,16 +71,23 @@
     return function (element, options) {
       var scope = this.scope;
       var val;
+
       _.each(definitions, function (obj, key) {
-        if (!scope.attr(key)) {
-          val = element.getAttribute(can.camelCaseToDashCase(key));
-          val = Components._castValue(val, obj.type);
-          if (_.isEmpty(val) && val.default) {
-            val = val.default;
+        var prefix = '';
+        if (!_.has(scope, key)) {
+          if (obj.type === 'function') {
+            prefix = 'can-';
           }
-          scope.attr(key, val);
+          val = element.getAttribute(prefix + can.camelCaseToDashCase(key));
+          val = Components._castValue(val, obj.type, options);
+          if (_.isUndefined(val) && _.has(obj, 'default')) {
+            val = obj.default;
+          }
+          scope[key] = val;
+          scope._data[key] = val;
         }
       }, this);
+
       return init.call(this, arguments);
     };
   };
@@ -90,26 +97,54 @@
    *
    * @param {String} val - Value we get from element attribute
    * @param {String} type - Type for the value we need to get
+   * @param {object} options - init function options
    *
    * @return {Any} - Returns casted types
    */
-  Components._castValue = function (val, type) {
+  Components._castValue = function (val, type, options) {
     var types = {
       'boolean': function (bool) {
+        if (_.isBoolean(bool)) {
+          return bool;
+        }
         return bool === 'true';
       },
       string: function (str) {
+        if (_.isString(str)) {
+          return str;
+        }
+        if (_.isEmpty(str)) {
+          return;
+        }
         return String(str);
       },
       number: function (num) {
-        return Number(num);
+        if (_.isNumber(num)) {
+          return num;
+        }
+        num = parseInt(num, 10);
+        if (_.isNaN(num)) {
+          return;
+        }
+        return num;
+      },
+      'function': function (fn, options) {
+        if (!fn || !options.scope.attr(fn)) {
+          return;
+        }
+        return options.scope.attr(fn);
       }
     };
     if (!types[type]) {
       console.warn('Cast value for `' + type + '` is not defined');
       return undefined;
     }
-    return types[type](val);
+    if (val &&
+        type !== 'function' &&
+        options.scope.attr(val)) {
+      val = options.scope.attr(val);
+    }
+    return types[type](val, options);
   };
 
   // the internal storage of the registered components
