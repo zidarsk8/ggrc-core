@@ -41,6 +41,9 @@
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
       ])
     },
+    defaults: {
+      status: 'Draft'
+    },
     statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
     init: function () {

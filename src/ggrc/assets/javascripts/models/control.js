@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require can.jquery-all
-//= require models/cacheable
 (function (namespace, $) {
   can.Model.Cacheable('CMS.Models.Control', {
   // static properties
@@ -48,7 +46,8 @@
       title: '',
       slug: '',
       description: '',
-      url: ''
+      url: '',
+      status: 'Draft'
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/controls/tree.mustache',

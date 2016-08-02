@@ -60,7 +60,8 @@
     },
     links_to: {},
     defaults: {
-      title: ''
+      title: '',
+      attribute_type: 'Text'
     },
     attributeTypes: ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
       'Map:Person'],

@@ -94,13 +94,14 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , create : "POST /api/standards"
   , update : "PUT /api/standards/{id}"
   , destroy : "DELETE /api/standards/{id}"
-  , defaults : {
-    kind : "Standard"
-  }
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Standard" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
+  defaults: {
+    status: 'Draft',
+    kind: 'Standard'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -123,13 +124,14 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , create : "POST /api/regulations"
   , update : "PUT /api/regulations/{id}"
   , destroy : "DELETE /api/regulations/{id}"
-  , defaults : {
-    kind : "Regulation"
-  }
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [ "Regulation" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
+  defaults: {
+    status: 'Draft',
+    kind: 'Regulation'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -152,14 +154,15 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , create : "POST /api/policies"
   , update : "PUT /api/policies/{id}"
   , destroy : "DELETE /api/policies/{id}"
-  , defaults : {
-      kind : null
-    }
   , tree_view_options : {}
   , is_custom_attributable: true
   , attributes : {}
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
+  defaults: {
+    status: 'Draft',
+    kind: null
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -190,14 +193,15 @@ CMS.Models.Directive("CMS.Models.Contract", {
   , create : "POST /api/contracts"
   , update : "PUT /api/contracts/{id}"
   , destroy : "DELETE /api/contracts/{id}"
-  , defaults : {
-    kind : "Contract"
-  }
   , is_custom_attributable: true
   , attributes : {
   }
   , meta_kinds : [ "Contract" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
+  defaults: {
+    status: 'Draft',
+    kind: 'Contract'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
