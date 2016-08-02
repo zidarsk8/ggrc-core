@@ -266,7 +266,11 @@ class QueryHelper(object):
     object_class = self.object_map[object_name]
 
     query = object_class.query
-    filter_expression = self._build_expression(expression, object_class)
+    filter_expression = self._build_expression(
+        expression,
+        object_class,
+        object_query.get('fields', []),
+    )
     if filter_expression is not None:
       query = query.filter(filter_expression)
     requested_permissions = object_query.get("permissions", "read")
@@ -314,7 +318,7 @@ class QueryHelper(object):
 
     return objects
 
-  def _build_expression(self, exp, object_class):
+  def _build_expression(self, exp, object_class, fields):
     """Make an SQLAlchemy filtering expression from exp expression tree."""
     if "op" not in exp:
       return None
@@ -368,8 +372,10 @@ class QueryHelper(object):
 
     with_left = lambda p: with_key(exp["left"], p)
 
-    lift_bin = lambda f: f(self._build_expression(exp["left"], object_class),
-                           self._build_expression(exp["right"], object_class))
+    lift_bin = lambda f: f(self._build_expression(exp["left"], object_class,
+                                                  fields),
+                           self._build_expression(exp["right"], object_class,
+                                                  fields))
 
     def text_search():
       existing_fields = self.attr_name_map[object_class]
@@ -377,7 +383,7 @@ class QueryHelper(object):
       p = lambda f: f.ilike(text)
       return or_(*(
           with_key(field, p)
-          for field in object_query.get("fields", [])
+          for field in fields
           if field in existing_fields
       ))
 
