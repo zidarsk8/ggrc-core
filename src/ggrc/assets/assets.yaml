@@ -111,6 +111,11 @@ dashboard-js-files:
   - apps/custom_attributes.js
   - components/spinner/spinner.js
   - components/assessment/read-more.js
+  - components/assessment/mapped-objects/wrapper.js
+  - components/assessment/mapped-objects/title.js
+  - components/assessment/mapped-objects/list.js
+  - components/assessment/mapped-objects/popover.js
+  - components/assessment/mapped-objects/filter.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
@@ -159,6 +164,11 @@ app-init-files:
 
 dashboard-js-template-files:
   - components/assessment/read-more.mustache
+  - components/assessment/mapped-objects/wrapper.mustache
+  - components/assessment/mapped-objects/title.mustache
+  - components/assessment/mapped-objects/item.mustache
+  - components/assessment/mapped-objects/list.mustache
+  - components/assessment/mapped-objects/popover.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
