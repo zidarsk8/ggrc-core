@@ -35,15 +35,14 @@ class TitledFactory(factory.Factory):
   title = factory.LazyAttribute(lambda m: random_string('title'))
 
 
-class CustomAttributeDefinitionFactory(ModelFactory):
+class CustomAttributeDefinitionFactory(ModelFactory, TitledFactory):
 
   class Meta:
     model = models.CustomAttributeDefinition
 
-  title = None
   definition_type = None
   definition_id = None
-  attribute_type = None
+  attribute_type = "Text"
   multi_choice_options = None
 
 
@@ -52,7 +51,7 @@ class CustomAttributeValueFactory(ModelFactory):
   class Meta:
     model = models.CustomAttributeValue
 
-  custom_attribute_id = None
+  custom_attribute = None
   attributable_id = None
   attributable_type = None
   attribute_value = None
