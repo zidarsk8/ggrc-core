@@ -1106,7 +1106,13 @@ can.Model('can.Model.Cacheable', {
     return serial;
   },
   display_name: function () {
-    return this.title || this.name;
+    var displayName = this.title || this.name;
+
+    if (_.isUndefined(displayName)) {
+      return '"' + this.type + ' ID: ' + this.id + '" (DELETED)';
+    }
+
+    return displayName;
   },
   display_type: function () {
     return this.type;
