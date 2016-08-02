@@ -180,7 +180,7 @@ class Relatable(object):
     Args:
       _types: A set of object types
     Returns:
-      A list (or subset if _types is specified) of related objects.
+      A set (or subset if _types is specified) of related objects.
     """
     # pylint: disable=not-an-iterable
     source_objs = [obj.source for obj in self.related_sources]
@@ -188,7 +188,7 @@ class Relatable(object):
     related = source_objs + dest_objs
 
     if _types:
-      return [obj for obj in related if obj.type in _types]
+      return {obj for obj in related if obj.type in _types}
     return set(related)
 
   _publish_attrs = [
