@@ -116,6 +116,8 @@ dashboard-js-files:
   - components/assessment/mapped-objects/list.js
   - components/assessment/mapped-objects/popover.js
   - components/assessment/mapped-objects/filter.js
+  - components/assessment/urls-list.js
+  - components/assessment/attachments-list.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
@@ -169,6 +171,8 @@ dashboard-js-template-files:
   - components/assessment/mapped-objects/item.mustache
   - components/assessment/mapped-objects/list.mustache
   - components/assessment/mapped-objects/popover.mustache
+  - components/assessment/urls-list.mustache
+  - components/assessment/attachments-list.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
