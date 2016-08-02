@@ -127,4 +127,260 @@ describe('GGRC component registry', function () {
       .toThrow(new Error('Component not found: foo'));
     });
   });
+
+  describe('casting default values', function () {
+    var componentConfig;
+    var template;
+    var frag;
+    var control;
+
+    beforeEach(function () {
+      template = null;
+      frag = null;
+      control = null;
+      componentConfig = {
+        tag: 'foo-bar',
+        template: 'Hello World!',
+        scope: {
+        }
+      };
+      Components.unregister('fakeComponent');
+    });
+
+    describe('for booleans', function () {
+      it('should get value from scope', function () {
+        componentConfig.scope.hasValue = false;
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar has-value="hasValue" />');
+        frag = template({
+          hasValue: true
+        });
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe(true);
+      });
+      it('should cast value from element', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'boolean',
+            'default': false
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar has-value="true" />');
+        frag = template();
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe(true);
+      });
+      it('should have default value', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'boolean',
+            'default': false
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar />');
+        frag = template();
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe(false);
+      });
+      it('shouldn\'t pickup default value if exists on scope', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'boolean',
+            'default': false
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar has-value="hasValue" />');
+        frag = template({
+          hasValue: true
+        });
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe(true);
+      });
+    });
+
+    describe('for numbers', function () {
+      it('should get value from scope', function () {
+        componentConfig.scope.hasValue = 1;
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar has-value="hasValue" />');
+        frag = template({
+          hasValue: 42
+        });
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe(42);
+      });
+      it('should cast value from element', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'number',
+            'default': 42
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar has-value="1" />');
+        frag = template();
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe(1);
+      });
+      it('should have default value', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'number',
+            'default': 42
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar />');
+        frag = template();
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe(42);
+      });
+      it('shouldn\'t pickup default value if exists on scope', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'number',
+            'default': 42
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar has-value="hasValue" />');
+        frag = template({
+          hasValue: 1
+        });
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe(1);
+      });
+    });
+    describe('for strings', function () {
+      it('should get value from scope', function () {
+        componentConfig.scope.hasValue = 'World';
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar has-value="hasValue" />');
+        frag = template({
+          hasValue: 'Hello'
+        });
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe('Hello');
+      });
+      it('should cast value from element', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'string',
+            'default': 'Hello'
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar has-value="World" />');
+        frag = template();
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe('World');
+      });
+      it('should have default value', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'string',
+            'default': 'Hello'
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar />');
+        frag = template();
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe('Hello');
+      });
+      it('shouldn\'t pickup default value if exists on scope', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'string',
+            'default': 'Hello'
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar has-value="hasValue" />');
+        frag = template({
+          hasValue: 'World'
+        });
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')).toBe('World');
+      });
+    });
+    describe('for functions', function () {
+      it('should get function from parent scope', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'function'
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar can-has-value="hasValue" />');
+        frag = template({
+          hasValue: function () {
+            return 'Hi';
+          }
+        });
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')()).toBe('Hi');
+      });
+      it('should get function from scope default value', function () {
+        componentConfig.scope.define = {
+          hasValue: {
+            type: 'function',
+            'default': function () {
+              return 'Hi';
+            }
+          }
+        };
+        Components('fakeComponent', componentConfig);
+
+        template = can.view.mustache('<foo-bar />');
+        frag = template();
+
+        frag = $(frag);
+        control = frag.find('foo-bar').control();
+        expect(control.scope.attr('hasValue')()).toBe('Hi');
+      });
+    });
+  });
 });
