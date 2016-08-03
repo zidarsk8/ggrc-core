@@ -141,8 +141,7 @@
       var conditions_by_context = type_obj.conditions || {};
       var resources = type_obj.resources || [];
       var context = instance.context || {id: null};
-      var conditions = conditions_by_context[context.id];
-      var contexts = type_obj.contexts || [];
+      var conditions = conditions_by_context[context.id] || [];
       var condition;
       var i;
 
@@ -152,9 +151,6 @@
       if (~resources.indexOf(instance.id)) {
         return true;
       }
-      if (!conditions && contexts.indexOf(context.id) > -1) {
-        return true;
-      }
       if (!this._is_allowed(permissions,
           new Permission(action, instance_type, null)) &&
         !this._is_allowed(permissions,
@@ -162,9 +158,6 @@
         return false;
       }
       // Check any conditions applied per instance
-      if (!conditions) {
-        return false;
-      }
       if (conditions.length === 0) {
         return true;
       }
