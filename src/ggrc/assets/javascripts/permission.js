@@ -158,6 +158,8 @@
         return false;
       }
       // Check any conditions applied per instance
+      // If there are no conditions, the user has unconditional access to
+      // the current instance. We can safely return true in this case.
       if (conditions.length === 0) {
         return true;
       }
