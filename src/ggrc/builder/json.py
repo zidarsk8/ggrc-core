@@ -118,6 +118,7 @@ class UpdateAttrHandler(object):
     equivalent in ``obj`` and ``json_obj``.
     """
     class_attr = getattr(obj.__class__, attr)
+    update_raw = attr in getattr(obj.__class__, "_update_raw", [])
     if (hasattr(attr, '__call__')):
       # The attribute has been decorated with a callable, grab the name and
       # invoke the callable to get the value
@@ -128,6 +129,9 @@ class UpdateAttrHandler(object):
       # CustomAttributable mixin
       attr_name = attr
       value = class_attr(obj, json_obj)
+    elif update_raw:
+      attr_name = attr
+      value = json_obj.get(attr_name)
     else:
       # Lookup the method to use to perform the update. Use reflection to
       # key off of the type of the attribute and invoke the method of the
@@ -135,13 +139,13 @@ class UpdateAttrHandler(object):
       attr_name = attr
       method = getattr(cls, class_attr.__class__.__name__)
       value = method(obj, json_obj, attr_name, class_attr)
-    if isinstance(value, (set, list)) \
-       and (
+    if (isinstance(value, (set, list)) and
+        not update_raw and (
            not hasattr(class_attr, 'property') or not
            hasattr(class_attr.property, 'columns') or not isinstance(
             class_attr.property.columns[0].type,
             JsonType)
-    ):
+    )):
       # SQLAlchemy instrumentation botches up if we replace entire collections
       # It works if we update them with changes
       new_set = set(value)
