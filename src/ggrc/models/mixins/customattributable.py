@@ -22,8 +22,9 @@ class CustomAttributable(object):
   """Custom Attributable mixin."""
 
   _publish_attrs = ['custom_attribute_values', 'custom_attribute_definitions']
-  _update_attrs = ['custom_attributes']
-  _include_links = ['custom_attribute_definitions']
+  _update_attrs = ['custom_attribute_values', 'custom_attributes']
+  _include_links = ['custom_attribute_values', 'custom_attribute_definitions']
+  _update_raw = ['custom_attribute_values']
 
   @declared_attr
   def custom_attribute_definitions(self):
