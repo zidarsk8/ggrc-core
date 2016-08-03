@@ -18,6 +18,57 @@ from ggrc.models.reflection import AttributeInfo
 
 
 class CustomAttributable(object):
+  """Custom Attributable mixin."""
+
+  _publish_attrs = ['custom_attribute_values', 'custom_attribute_definitions']
+  _update_attrs = ['custom_attributes']
+  _include_links = ['custom_attribute_definitions']
+
+  @declared_attr
+  def custom_attribute_definitions(self):
+    """Load custom attribute definitions"""
+    from ggrc.models.custom_attribute_definition\
+        import CustomAttributeDefinition
+
+    def join_function():
+      definition_id = foreign(CustomAttributeDefinition.definition_id)
+      definition_type = foreign(CustomAttributeDefinition.definition_type)
+      return and_(or_(definition_id == self.id, definition_id.is_(None)),
+                  definition_type == self._inflector.table_singular)
+
+    return relationship(
+        "CustomAttributeDefinition",
+        primaryjoin=join_function,
+        backref='{0}_custom_attributable_definition'.format(self.__name__),
+        viewonly=True,
+    )
+
+  @declared_attr
+  def _custom_attributes_deletion(self):
+    """This declared attribute is used only for handling cascade deletions
+       for CustomAttributes. This is done in order not to try to delete
+       "global" custom attributes that don't have any definition_id related.
+       Attempt to delete custom attributes with definition_id=None causes the
+       IntegrityError as we shouldn't be able to delete global attributes along
+       side with any other object (e.g. Assessments).
+    """
+    from ggrc.models.custom_attribute_definition import (
+        CustomAttributeDefinition
+    )
+
+    def join_function():
+      """Join condition used for deletion"""
+      definition_id = foreign(CustomAttributeDefinition.definition_id)
+      definition_type = foreign(CustomAttributeDefinition.definition_type)
+      return and_(definition_id == self.id,
+                  definition_type == self._inflector.table_singular)
+
+    return relationship(
+        "CustomAttributeDefinition",
+        primaryjoin=join_function,
+        cascade='all, delete-orphan',
+        order_by="CustomAttributeDefinition.id"
+    )
 
   @declared_attr
   def custom_attribute_values(self):
@@ -82,52 +133,6 @@ class CustomAttributable(object):
       if "_pending_delete" in definition and definition["_pending_delete"]:
         continue
       self.insert_definition(definition)
-
-  @declared_attr
-  def custom_attribute_definitions(self):
-    """Load custom attribute definitions"""
-    from ggrc.models.custom_attribute_definition\
-        import CustomAttributeDefinition
-
-    def join_function():
-      definition_id = foreign(CustomAttributeDefinition.definition_id)
-      definition_type = foreign(CustomAttributeDefinition.definition_type)
-      return and_(or_(definition_id == self.id, definition_id.is_(None)),
-                  definition_type == self._inflector.table_singular)
-
-    return relationship(
-        "CustomAttributeDefinition",
-        primaryjoin=join_function,
-        backref='{0}_custom_attributable_definition'.format(self.__name__),
-        viewonly=True,
-    )
-
-  @declared_attr
-  def _custom_attributes_deletion(self):
-    """This declared attribute is used only for handling cascade deletions
-       for CustomAttributes. This is done in order not to try to delete
-       "global" custom attributes that don't have any definition_id related.
-       Attempt to delete custom attributes with definition_id=None causes the
-       IntegrityError as we shouldn't be able to delete global attributes along
-       side with any other object (e.g. Assessments).
-    """
-    from ggrc.models.custom_attribute_definition import (
-        CustomAttributeDefinition
-    )
-
-    def join_function():
-      """Join condition used for deletion"""
-      definition_id = foreign(CustomAttributeDefinition.definition_id)
-      definition_type = foreign(CustomAttributeDefinition.definition_type)
-      return and_(definition_id == self.id,
-                  definition_type == self._inflector.table_singular)
-
-    return relationship(
-        "CustomAttributeDefinition",
-        primaryjoin=join_function,
-        cascade='all, delete-orphan',
-        order_by="CustomAttributeDefinition.id"
-    )
 
   def custom_attributes(self, attributes):
     from ggrc.fulltext.mysql import MysqlRecordProperty
@@ -230,10 +235,6 @@ class CustomAttributable(object):
                 "operation": "INSERT",
                 "value": new_value,
             }, service=self.__class__.__name__)
-
-  _publish_attrs = ['custom_attribute_values', 'custom_attribute_definitions']
-  _update_attrs = ['custom_attributes']
-  _include_links = ['custom_attribute_definitions']
 
   @classmethod
   def get_custom_attribute_definitions(cls):
