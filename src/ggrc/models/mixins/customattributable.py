@@ -9,6 +9,7 @@ from sqlalchemy import and_
 from sqlalchemy import orm
 from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import foreign
 from sqlalchemy.orm import relationship
 
@@ -71,7 +72,7 @@ class CustomAttributable(object):
     )
 
   @declared_attr
-  def custom_attribute_values(self):
+  def _custom_attribute_values(self):
     """Load custom attribute values"""
     from ggrc.models.custom_attribute_value import CustomAttributeValue
 
@@ -85,6 +86,71 @@ class CustomAttributable(object):
         backref='{0}_custom_attributable'.format(self.__name__),
         cascade='all, delete-orphan',
     )
+
+  @hybrid_property
+  def custom_attribute_values(self):
+    return self._custom_attribute_values
+
+  @custom_attribute_values.setter
+  def custom_attribute_values(self, values):
+    """Setter function for custom attribute values.
+
+    This setter function accepts 2 kinds of values:
+      - list of custom attributes. This is used on the back-end by developers.
+      - list of dictionaries containing custom attribute values. This is to
+        have a clean API where the front-end can put the custom attribute
+        values into the custom_attribute_values property and the json builder
+        can then handle the attributes just by setting them.
+
+    Args:
+      value: List of custom attribute values or dicts containing json
+        representation of custom attribute values.
+    """
+    if not values:
+      return
+
+    self._values_map = {
+        value.custom_attribute_id or value.custom_attribute.id: value
+        for value in self.custom_attribute_values
+    }
+
+    if isinstance(values[0], dict):
+      self._add_ca_value_dicts(values)
+    else:
+      self._add_ca_values(values)
+
+  def _add_ca_values(self, values):
+    for new_value in values:
+      existing_value = self._values_map.get(new_value.custom_attribute.id)
+      if existing_value:
+        existing_value.attribute_value = new_value.attribute_value
+        existing_value.attribute_object_id = new_value.attribute_object_id
+      else:
+        new_value.attributable = self
+        self._custom_attribute_values.append(new_value)
+
+  def _add_ca_value_dicts(self, values):
+    from ggrc.models.custom_attribute_value import CustomAttributeValue
+
+    for value in values:
+      attr = self._values_map.get(value.get("custom_attribute_id"))
+      if attr:
+        attr.attributable=self
+        attr.attribute_value = value.get("attribute_value")
+        attr.attribute_object_id = value.get("attribute_object_id")
+      elif "custom_attribute_id" in value:
+        self._custom_attribute_values.append(CustomAttributeValue(
+            attributable=self,
+            custom_attribute_id=value.get("custom_attribute_id"),
+            attribute_value=value.get("attribute_value"),
+            attribute_object_id=value.get("attribute_object_id"),
+        ))
+      elif "self_link" in value:
+        # Ignore setting of custom attribute stubs. Getting here means that the
+        # front-end is not using the API correctly and needs to be updated.
+        current_app.logger.info("Ignoring post/put of custom attribute stubs.")
+      else:
+        raise BadRequest("Bad custom attribute value inserted")
 
   def insert_definition(self, definition):
     """Insert a new custom attribute definition into database
