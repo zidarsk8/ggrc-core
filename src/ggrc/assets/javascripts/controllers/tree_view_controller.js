@@ -1381,25 +1381,55 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         return data.values;
       }.bind(this));
   },
-  refreshList: function () {
+  refreshList: _.debounce(function () {
     this.loadPage()
       .then(function (data) {
         this.element.children('.cms_controllers_tree_view_node').remove();
         return data;
       }.bind(this))
       .then(this._ifNotRemoved(this.proxy('draw_list')));
-  },
+  }),
   '{paging} change': _.debounce(
     function (object, event, type, action, newVal, oldVal) {
       if (oldVal !== newVal && _.contains(['current', 'pageSize'], type)) {
         this.refreshList();
       }
     }),
-  '{CMS.Models.Relationship} created': function (model, ev, instance) {
-    if (instance instanceof CMS.Models.Relationship &&
-      this.options.model.shortName === instance.destination.type &&
-      $(this.element).is(':visible')) {
+  _verifyRelationship: function (instance) {
+    var self = this;
+    var props = ['destination', 'source'];
+    var typeChecking = _.reduce(props, function (result, prop) {
+      return result || self.options.model.shortName === instance[prop].type;
+    }, false);
+
+    return typeChecking && $(this.element).is(':visible');
+  },
+  '{can.Model.Cacheable} created': function (model, ev, instance) {
+    var isNewRelationship = instance instanceof CMS.Models.Relationship &&
+      this._verifyRelationship(instance);
+    var isNewCurrModel = this.options.model.shortName === model.shortName;
+    if (isNewRelationship) {
+      this.options.parent_instance.on('change', function cb() {
+        this.options.parent_instance.unbind('change', cb);
+        this.refreshList();
+      }.bind(this));
+    } else if (isNewCurrModel) {
       this.refreshList();
+    }
+  },
+  '{can.Model.Cacheable} destroyed': function (model, ev, instance) {
+    var isDestroyedRelationship = instance instanceof CMS.Models.Relationship &&
+      this._verifyRelationship(instance);
+    var isDestroyedCurrModel = this.options.model.shortName === model.shortName;
+    if (isDestroyedRelationship || isDestroyedCurrModel) {
+      this.options.paging.attr('current', 1);
+      this.refreshList();
+      // TODO: This is a workaround. We need to update communication between
+      //       info-pin and tree views through Observer
+      if (!this.element.closest('.cms_controllers_info_pin').length) {
+        $('.cms_controllers_info_pin').control().unsetInstance();
+      }
+      this.show_info_pin();
     }
   }
 });

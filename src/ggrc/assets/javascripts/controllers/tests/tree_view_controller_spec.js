@@ -120,4 +120,81 @@ describe('CMS.Controllers.TreeView', function () {
       });
     });
   });
+
+  describe('_verifyRelationship() method', function () {
+    var ctrlInst;
+    var method;
+    var relationship;
+
+    beforeEach(function () {
+      ctrlInst = {
+        options: new can.Map({
+          model: {
+            shortName: 'foo'
+          }
+        })
+      };
+
+      relationship = new CMS.Models.Relationship();
+
+      method = Ctrl.prototype._verifyRelationship.bind(ctrlInst);
+    });
+
+    describe('Hidden tab', function () {
+      beforeEach(function () {
+        spyOn($.fn, 'is').and.returnValue(false);
+      });
+
+      it('wrong relationship', function () {
+        var result;
+
+        relationship.source = {type: 'bar'};
+        relationship.destination = {type: 'baz'};
+
+        result = method(relationship);
+
+        expect(result).toBeFalsy();
+      });
+
+      it('right relationship', function () {
+        var result;
+
+        relationship.source = {type: 'bar'};
+        relationship.destination = {type: 'foo'};
+
+        result = method(relationship);
+
+        expect(result).toBeFalsy();
+        // expect(result).toBeTruthy();
+      });
+    });
+
+    describe('Visible tab', function () {
+      beforeEach(function () {
+        spyOn($.fn, 'is').and.returnValue(true);
+      });
+
+      it('wrong relationship', function () {
+        var result;
+
+        relationship.source = {type: 'bar'};
+        relationship.destination = {type: 'baz'};
+
+        result = method(relationship);
+
+        expect(result).toBeFalsy();
+      });
+
+      it('right relationship', function () {
+        var result;
+
+        relationship.source = {type: 'bar'};
+        relationship.destination = {type: 'foo'};
+
+        result = method(relationship);
+
+        expect(result).toBeTruthy();
+      });
+    });
+  });
 });

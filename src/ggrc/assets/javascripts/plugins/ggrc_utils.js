@@ -387,6 +387,32 @@
 
       roles.unshift('none');
       return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
+    },
+    /**
+     * A function that returns the Relationship between two objects.
+     *
+     * @param {CMS.Models.Cacheable} first - First object.
+     * @param {CMS.Models.Cacheable} second - Second object.
+     * @return {CMS.Models.Relationship} - Relationship instance
+     */
+    getRelationshipBetweenInstances: function (first, second) {
+      var relationshipIds = _.intersection(getRelationshipsIds(first),
+        getRelationshipsIds(second));
+      var result;
+
+      function getRelationshipsIds(obj) {
+        return _.map(_.union(obj.related_sources, obj.related_destinations),
+          function (relationship) {
+            return relationship.id;
+          }
+        );
+      }
+      if (relationshipIds.length === 1) {
+        result = CMS.Models.Relationship.findInCacheById(relationshipIds[0]);
+      } else if (relationshipIds.length > 1) {
+        throw new Error('Can\'t be more than one Relationship');
+      }
+      return result;
     }
   };
 

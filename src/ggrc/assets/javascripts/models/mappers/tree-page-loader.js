@@ -29,21 +29,22 @@
     },
     getResultFromMapping: function (mapping) {
       var binding = this.binding;
-      return this.makeResult({
-        instance: mapping.reify(),
-        mappings: [{
-          instance: mapping,
+      return this.makeResult(mapping.reify(), binding);
+    },
+    makeResult: function (instance, binding) {
+      var relationship =
+        GGRC.Utils.getRelationshipBetweenInstances(binding.instance, instance);
+      return new GGRC.ListLoaders.MappingResult(instance, [
+        {
+          binding: binding,
+          instance: relationship,
           mappings: [{
             instance: true,
             mappings: [],
             binding: binding
-          }],
-          binding: binding
-        }]
-      });
-    },
-    makeResult: function (instance, mappings, binding) {
-      return new GGRC.ListLoaders.MappingResult(instance, mappings, binding);
+          }]
+        }
+      ], binding);
     }
   });
 })(GGRC, can);
