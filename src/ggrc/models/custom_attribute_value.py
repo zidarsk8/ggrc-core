@@ -28,6 +28,14 @@ class CustomAttributeValue(Base, db.Model):
   # in attribute_object_id and string 'Person' in attribute_value.
   attribute_object_id = db.Column(db.Integer)
 
+  # pylint: disable=protected-access
+  # This is just a mapping for accessing local functions so protected access
+  # warning is a false positive
+  _validator_map = {
+      "Dropdown": lambda self: self._validate_dropdown(),
+      "Map:Person": lambda self: self._validate_map_person(),
+  }
+
   @property
   def attributable_attr(self):
     return '{0}_attributable'.format(self.attributable_type)
@@ -165,3 +173,43 @@ class CustomAttributeValue(Base, db.Model):
     return (
         db.UniqueConstraint('attributable_id', 'custom_attribute_id'),
     )
+
+  def _validate_map_person(self):
+    """Validate and correct mapped person values
+
+    Mapped person custom attribute is only valid if both attribute_value and
+    attribute_object_id are set. To keep the custom attribute api consistent
+    with other types, we allow setting the value to a string containing both
+    in this way "attribute_value:attribute_object_id". This validator checks
+    Both scenarios and changes the string value to proper values needed by
+    this custom attribute.
+
+    Note: this validator does not check if id is a proper person id.
+    """
+    if ":" in self.attribute_value:
+      value, id_ = self.attribute_value.split(":")
+      self.attribute_value = value
+      self.attribute_object_id = id_
+
+
+  def _validate_dropdown(self):
+    """Validate dropdown opiton."""
+    valid_options = self.custom_attribute.multi_choice_options.split(",")
+    is_mandatory = self.custom_attribute.multi_choice_mandatory
+    if self.attribute_value and self.attribute_value not in valid_options:
+      raise ValueError("Invalid custom attribute dropdown option")
+    elif not self.attribute_value and is_mandatory:
+      raise ValueError("Missing mandatory custom attribute dropdown option")
+
+  def validate(self):
+    """Validate custom attribute value."""
+    # pylint: disable=protected-access
+    attributable_type = self.attributable._inflector.table_singular
+    if not self.custom_attribute:
+      raise ValueError("Custom attribute definition not found: Can not "
+                       "validate custom attribute value")
+    if self.custom_attribute.definition_type != attributable_type:
+      raise ValueError("Invalid custom attribute definition used.")
+    validator = self._validator_map.get(self.custom_attribute.attribute_type)
+    if validator:
+      validator(self)
