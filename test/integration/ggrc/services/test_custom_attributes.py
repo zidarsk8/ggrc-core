@@ -13,7 +13,6 @@ These tests include:
 
 from ggrc import utils
 from ggrc import models
-from ggrc import builder
 
 from integration.ggrc import services
 from integration.ggrc.generator import ObjectGenerator
@@ -26,6 +25,16 @@ class TestGlobalCustomAttributes(services.TestCase):
     self.generator = ObjectGenerator()
     self.client.get("/login")
 
+  def _put(self, url, data, extra_headers=None):
+    headers = {'X-Requested-By': 'Unit Tests'}
+    headers.update(extra_headers)
+    return self.client.put(
+        url,
+        content_type='application/json',
+        data=utils.as_json(data),
+        headers=headers,
+    )
+
   def _post(self, data):
     return self.client.post(
         "/api/products",
@@ -35,10 +44,9 @@ class TestGlobalCustomAttributes(services.TestCase):
     )
 
   def test_custom_attribute_post(self):
+    """Test post object with custom attributes."""
     gen = self.generator.generate_custom_attribute
     _, cad = gen("product", attribute_type="Text", title="normal text")
-    cad_json = builder.json.publish(cad.__class__.query.get(cad.id))
-    cad_json = builder.json.publish_representation(cad_json)
     pid = models.Person.query.first().id
 
     product_data = [
@@ -47,8 +55,8 @@ class TestGlobalCustomAttributes(services.TestCase):
                 "kind": None,
                 "owners": [],
                 "custom_attribute_values": [{
-                  "attribute_value": "my custom attribute value",
-                  "custom_attribute_id": cad.id,
+                    "attribute_value": "my custom attribute value",
+                    "custom_attribute_id": cad.id,
                 }],
                 "contact": {
                     "id": pid,
@@ -68,11 +76,139 @@ class TestGlobalCustomAttributes(services.TestCase):
     ]
 
     response = self._post(product_data)
-    import ipdb; ipdb.set_trace()
+    ca_json = response.json[0][1]["product"]["custom_attribute_values"][0]
+    self.assertIn("attributable_id", ca_json)
+    self.assertIn("attributable_type", ca_json)
+    self.assertIn("attribute_value", ca_json)
+    self.assertIn("id", ca_json)
+    self.assertEqual(ca_json["attribute_value"],
+                     "my custom attribute value")
 
     product = models.Product.eager_query().first()
     self.assertEqual(len(product.custom_attribute_values), 1)
     self.assertEqual(
-      product.custom_attribute_values[0].attribute_value,
-      "my custom attribute value"
+        product.custom_attribute_values[0].attribute_value,
+        "my custom attribute value"
     )
+
+  def test_custom_attribute_put_add(self):
+    gen = self.generator.generate_custom_attribute
+    _, cad = gen("product", attribute_type="Text", title="normal text")
+    pid = models.Person.query.first().id
+
+    product_data = [
+        {
+            "product": {
+                "kind": None,
+                "owners": [],
+                "contact": {
+                    "id": pid,
+                    "href": "/api/people/{}".format(pid),
+                    "type": "Person"
+                },
+                "title": "simple product",
+                "description": "",
+                "secondary_contact": None,
+                "notes": "",
+                "url": "",
+                "reference_url": "",
+                "slug": "",
+                "context": None
+            }
+        }
+    ]
+
+    response = self._post(product_data)
+    product_url = response.json[0][1]["product"]["selfLink"]
+    headers = self.client.get(product_url).headers
+
+    product_data[0]["product"]["custom_attribute_values"] = [{
+        "attribute_value": "added value",
+        "custom_attribute_id": cad.id,
+    }]
+
+    response = self._put(product_url, product_data[0], extra_headers={
+        'If-Unmodified-Since': headers["Last-Modified"],
+        'If-Match': headers["Etag"],
+    })
+
+    product = response.json["product"]
+
+    self.assertEqual(len(product["custom_attribute_values"]), 1)
+    ca_json = product["custom_attribute_values"][0]
+    self.assertIn("attributable_id", ca_json)
+    self.assertIn("attributable_type", ca_json)
+    self.assertIn("attribute_value", ca_json)
+    self.assertIn("id", ca_json)
+    self.assertEqual(ca_json["attribute_value"],
+                     "added value")
+
+    product = models.Product.eager_query().first()
+    self.assertEqual(len(product.custom_attribute_values), 1)
+    self.assertEqual(
+        product.custom_attribute_values[0].attribute_value,
+        "added value"
+    )
+
+    headers = self.client.get(product_url).headers
+
+    product_data[0]["product"]["custom_attribute_values"] = [{
+        "attribute_value": "edited value",
+        "custom_attribute_id": cad.id,
+    }]
+
+    response = self._put(product_url, product_data[0], extra_headers={
+        'If-Unmodified-Since': headers["Last-Modified"],
+        'If-Match': headers["Etag"],
+    })
+
+    product = response.json["product"]
+    ca_json = product["custom_attribute_values"][0]
+    self.assertIn("attributable_id", ca_json)
+    self.assertIn("attributable_type", ca_json)
+    self.assertIn("attribute_value", ca_json)
+    self.assertIn("id", ca_json)
+    self.assertEqual(ca_json["attribute_value"],
+                     "edited value")
+
+  def test_custom_attribute_get(self):
+    gen = self.generator.generate_custom_attribute
+    _, cad = gen("product", attribute_type="Text", title="normal text")
+    pid = models.Person.query.first().id
+
+    product_data = [
+        {
+            "product": {
+                "kind": None,
+                "owners": [],
+                "custom_attribute_values": [{
+                    "attribute_value": "my custom attribute value",
+                    "custom_attribute_id": cad.id,
+                }],
+                "contact": {
+                    "id": pid,
+                    "href": "/api/people/{}".format(pid),
+                    "type": "Person"
+                },
+                "title": "simple product",
+                "description": "",
+                "secondary_contact": None,
+                "notes": "",
+                "url": "",
+                "reference_url": "",
+                "slug": "",
+                "context": None
+            }
+        }
+    ]
+
+    response = self._post(product_data)
+    product_url = response.json[0][1]["product"]["selfLink"]
+    get_response = self.client.get(product_url)
+    product = get_response.json["product"]
+    self.assertIn("custom_attribute_values", product)
+    self.assertEqual(len(product["custom_attribute_values"]), 1)
+    cav = product["custom_attribute_values"][0]
+    self.assertIn("custom_attribute_id", cav)
+    self.assertIn("attribute_value", cav)
+    self.assertIn("id", cav)
