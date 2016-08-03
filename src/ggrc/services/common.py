@@ -1236,6 +1236,12 @@ class Resource(ModelView):
       self.collection_posted.send(obj.__class__, objects=objects)
     with benchmark("Check create permissions"):
       self._check_post_permissions(objects)
+    with benchmark("Flush posted objects"):
+      db.session.flush()
+    with benchmark("Validate custom attributes"):
+      for obj in objects:
+        if hasattr(obj, "validate_custom_attributes"):
+          obj.validate_custom_attributes()
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Log event for all objects"):
