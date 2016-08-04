@@ -152,11 +152,13 @@
         forbidden = [];
         result = [];
       }
+      result = _.partial(_.without, result);
+      result = result.apply(result, forbidden);
+
       if (options.whitelist) {
         result = _.union(result, options.whitelist);
       }
-      result = _.partial(_.without, result);
-      return result.apply(result, forbidden);
+      return result;
     },
 
     /**
