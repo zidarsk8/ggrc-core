@@ -6,10 +6,9 @@
 (function (_, GGRC, can, CMS) {
   'use strict';
 
-  var namespace = 'assessment';
   var tag = 'assessment-add-comment';
   var template = can.view(GGRC.mustache_path +
-    '/components/' + namespace + '/add_comment.mustache');
+    '/components/assessment/add_comment.mustache');
   var defaultState = new can.Map({
     open: false,
     save: false,
@@ -75,7 +74,7 @@
           this.attr('commentEl').val('');
         }
       },
-      removeEmptyMark: function (el) {
+      removeEmptyMark: function (scope, el) {
         this.attr('state.empty', !el.val().length);
       },
       getCommentData: function () {
@@ -151,9 +150,6 @@
         if (val) {
           this.scope.applyState();
         }
-      },
-      'textarea keyup': function (el) {
-        this.scope.removeEmptyMark(el);
       }
     }
   });

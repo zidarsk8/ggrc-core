@@ -6,10 +6,9 @@
 (function (GGRC, can) {
   'use strict';
 
-  var namespace = 'assessment';
   var tag = 'assessment-urls-list';
   var template = can.view(GGRC.mustache_path +
-    '/components/' + namespace + '/urls-list.mustache');
+    '/components/assessment/urls-list.mustache');
 
   /**
    * Wrapper Component for rendering and managing of url lists

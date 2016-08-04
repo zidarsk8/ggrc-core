@@ -6,19 +6,17 @@
 (function (can, GGRC) {
   'use strict';
 
-  var namespace = 'assessment';
-  var cmpName = 'mapped-objects';
   var tpl = can.view(GGRC.mustache_path +
-    '/components/' + namespace + '/' + cmpName + '/wrapper.mustache');
+    '/components/assessment/mapped-objects/mapped-objects.mustache');
   var tag = 'assessment-mapped-objects';
   /**
    * Assessment specific mapped objects view component
    */
-  GGRC.Components('assessmentMappedObjectsWrapper', {
+  GGRC.Components('assessmentMappedObjects', {
     tag: tag,
     template: tpl,
     scope: {
-      content: '</content>',
+      content: '<content></content>',
       titleText: '@',
       filter: '@',
       mapping: null,

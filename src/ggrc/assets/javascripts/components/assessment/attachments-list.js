@@ -6,10 +6,9 @@
 (function (GGRC, can) {
   'use strict';
 
-  var namespace = 'assessment';
   var tag = 'assessment-attachments-list';
   var template = can.view(GGRC.mustache_path +
-    '/components/' + namespace + '/attachments-list.mustache');
+    '/components/assessment/attachments-list.mustache');
 
   /**
    * Wrapper Component for rendering and managing of attachments lists

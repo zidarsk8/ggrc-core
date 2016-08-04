@@ -54,12 +54,14 @@
       },
       toggle: function (isOpen) {
         var modal;
+        var isPerson =
+          this.attr('modifiedField.value') &&
+          this.attr('modifiedField.type') === 'person';
+
         this.setAttachmentFields(isOpen);
         this.attr('modalCls', isOpen ? baseCls + '-open' : '');
         this.attr('modalOverlayCls', isOpen ? baseCls + '__overlay-open' : '');
-        this.attr('isPerson',
-          this.attr('modifiedField.value') &&
-          this.attr('modifiedField.type') === 'person');
+        this.attr('isPerson', isPerson);
 
         if (isOpen && this.attr('modalEl')) {
           modal = this.attr('modalEl');
@@ -71,16 +73,16 @@
         }
       },
       setAttachmentFields: function (isOpen) {
-        var attachments = this.attr().modifiedField.requiredAttachments;
+        var attachments = this.attr('modifiedField.requiredAttachments');
 
         if (attachments && attachments.length) {
-          attachments.map(function (item) {
-            return this.attr(item, isOpen);
+          attachments.forEach(function (item) {
+            this.attr(item, isOpen);
           }.bind(this));
         }
       },
       mapToInternal: function () {
-        this.attr('modifiedField', this.attr().instance._modifiedAttribute);
+        this.attr('modifiedField', this.attr('instance._modifiedAttribute'));
       }
     },
     events: {

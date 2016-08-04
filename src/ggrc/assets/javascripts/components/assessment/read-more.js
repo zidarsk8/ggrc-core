@@ -6,10 +6,8 @@
 (function (can, GGRC) {
   'use strict';
 
-  var namespace = 'assessment';
-  var cmpName = 'read-more';
   var tpl = can.view(GGRC.mustache_path +
-    '/components/' + namespace + '/' + cmpName + '.mustache');
+    '/components/assessment/read-more.mustache');
   var tag = 'assessment-read-more';
   var rootCls = '.assessment-read-more';
   var bodyCls = rootCls + '__body';

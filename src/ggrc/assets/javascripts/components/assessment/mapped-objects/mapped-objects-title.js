@@ -6,10 +6,8 @@
 (function (can, GGRC) {
   'use strict';
 
-  var namespace = 'assessment';
-  var cmpName = 'mapped-objects';
   var tpl = can.view(GGRC.mustache_path +
-    '/components/' + namespace + '/' + cmpName + '/title.mustache');
+    '/components/assessment/mapped-objects/mapped-objects-title.mustache');
   var tag = 'assessment-mapped-objects-title';
   /**
    * Assessment specific filtering mapped objects component

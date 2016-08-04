@@ -6,10 +6,8 @@
 (function (can, GGRC) {
   'use strict';
 
-  var namespace = 'assessment';
-  var cmpName = 'mapped-objects';
   var tpl = can.view(GGRC.mustache_path +
-    '/components/' + namespace + '/' + cmpName + '/list.mustache');
+    '/components/assessment/mapped-objects/mapped-objects-list.mustache');
   var tag = 'assessment-mapped-objects-list';
   var baseCls = '.assessment-mapped-objects';
   var popoverCls = baseCls + '__popover';
@@ -20,7 +18,7 @@
     tag: tag,
     template: tpl,
     scope: {
-      content: '</content>',
+      content: '<content></content>',
       titleText: '@',
       selectedItem: null,
       selectedEl: null,

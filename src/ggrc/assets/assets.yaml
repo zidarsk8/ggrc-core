@@ -111,11 +111,11 @@ dashboard-js-files:
   - apps/custom_attributes.js
   - components/spinner/spinner.js
   - components/assessment/read-more.js
-  - components/assessment/mapped-objects/wrapper.js
-  - components/assessment/mapped-objects/title.js
-  - components/assessment/mapped-objects/list.js
-  - components/assessment/mapped-objects/popover.js
-  - components/assessment/mapped-objects/filter.js
+  - components/assessment/mapped-objects/mapped-objects.js
+  - components/assessment/mapped-objects/mapped-objects-title.js
+  - components/assessment/mapped-objects/mapped-objects-list.js
+  - components/assessment/mapped-objects/mapped-objects-popover.js
+  - components/assessment/mapped-objects/mapped-objects-filter.js
   - components/assessment/urls-list.js
   - components/assessment/attachments-list.js
   - components/assessment/custom_attributes.js
@@ -171,11 +171,11 @@ app-init-files:
 
 dashboard-js-template-files:
   - components/assessment/read-more.mustache
-  - components/assessment/mapped-objects/wrapper.mustache
-  - components/assessment/mapped-objects/title.mustache
-  - components/assessment/mapped-objects/item.mustache
-  - components/assessment/mapped-objects/list.mustache
-  - components/assessment/mapped-objects/popover.mustache
+  - components/assessment/mapped-objects/mapped-objects.mustache
+  - components/assessment/mapped-objects/mapped-objects-title.mustache
+  - components/assessment/mapped-objects/mapped-objects-item.mustache
+  - components/assessment/mapped-objects/mapped-objects-list.mustache
+  - components/assessment/mapped-objects/mapped-objects-popover.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/attachments-list.mustache
   - components/assessment/custom_attributes.mustache

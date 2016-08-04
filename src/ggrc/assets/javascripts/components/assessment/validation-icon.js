@@ -6,10 +6,9 @@
 (function (can, GGRC) {
   'use strict';
 
-  var namespace = 'assessment';
   var cmpName = 'validation-icon';
   var tpl = can.view(GGRC.mustache_path +
-    '/components/' + namespace + '/' + cmpName + '.mustache');
+    '/components/assessment/validation-icon.mustache');
   var tag = 'assessment-' + cmpName;
   /**
    * State object to present possible icons for validation
@@ -20,11 +19,6 @@
     valid: 'fa-check-circle validation-icon-valid',
     invalid: 'fa-times-circle validation-icon-invalid'
   };
-  var defaultState = new can.Map({
-    mandatory: false,
-    empty: false,
-    valid: true
-  });
 
   /**
    * Assessment specific validation icon component
@@ -37,7 +31,7 @@
       instance: null,
       validation: null,
       iconCls: icons.noValidation,
-      applyState: function applyState() {
+      applyState: function () {
         var icon = icons.noValidation;
 
         if (this.attr('validation.mandatory')) {
@@ -62,8 +56,6 @@
     },
     events: {
       init: function () {
-        this.scope.attr('validation',
-          this.scope.attr('validation') || defaultState);
         this.scope.applyState();
       },
       '{scope.validation} change': function () {

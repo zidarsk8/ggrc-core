@@ -13,22 +13,32 @@
   GGRC.Components('assessmentMappedObjectsFilter', {
     tag: tag,
     scope: {
-      content: '</content>',
+      content: '<content></content>',
       mapping: null,
       items: null,
       filter: null,
       filteredItems: [],
       filterFn: function (item) {
         var isControlOnly = this.filter === 'control';
-        return isControlOnly ?
-        item.instance.type === 'Control' : item.instance.type !== 'Control';
+        var isControlType = item.instance.type === 'Control';
+        if (isControlOnly) {
+          return isControlType;
+        }
+        return !isControlType;
       },
       setFilteredItems: function (objects) {
-        var filteredItems = new can.List();
-        objects.forEach(function (obj) {
-          return this.filterFn(obj) ?
-            filteredItems.push(obj) : null;
-        }.bind(this), this);
+        var filteredItems;
+        objects = objects.serialize();
+        filteredItems = objects
+          .map(function (obj) {
+            if (this.filterFn(obj)) {
+              return obj;
+            }
+          }.bind(this))
+          .filter(function (item) {
+            return Boolean(item);
+          });
+
         this.attr('filteredItems').replace(filteredItems);
       }
     },

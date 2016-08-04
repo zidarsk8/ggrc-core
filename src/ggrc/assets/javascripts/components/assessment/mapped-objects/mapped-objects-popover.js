@@ -6,12 +6,9 @@
 (function (can, GGRC) {
   'use strict';
 
-  var folder = 'mapped-objects';
-  var namespace = 'assessment';
-  var cmpName = 'mapped-objects-popover';
   var tpl = can.view(GGRC.mustache_path +
-    '/components/' + namespace + '/' + folder + '/popover.mustache');
-  var tag = namespace + '-' + cmpName;
+    '/components/assessment/mapped-objects/mapped-objects-popover.mustache');
+  var tag = 'assessment-mapped-objects-popover';
   /**
    * Assessment specific mapped objects popover view component
    */
