@@ -48,7 +48,15 @@
           or #if' force_show '\
           or #if' instance.constructor.obj_nav_options.show_all_tabs '\
           or #in_array' internav_display instance.constructor.obj_nav_options.force_show_list}}
-        <a href="{{ selector }}">
+        <a
+          href="{{ selector }}"
+          {{#is_mappable_type instance.type model.shortName}}
+            data-toggle="unified-mapper"
+            data-join-option-type="{{model.shortName}}"
+            data-join-object-id="{{instance.id}}"
+            data-join-object-type="{{instance.class.shortName}}"
+          {{/is_mappable_type}}
+        >
           <div class="oneline">
             <i class="fa fa-{{ internav_icon }} color"></i>
             {{internav_display}}
