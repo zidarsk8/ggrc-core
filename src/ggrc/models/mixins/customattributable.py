@@ -203,19 +203,18 @@ class CustomAttributable(object):
         continue
       self.insert_definition(definition)
 
-  def custom_attributes(self, attributes):
+  def custom_attributes(self, src):
     from ggrc.fulltext.mysql import MysqlRecordProperty
     from ggrc.models.custom_attribute_value import CustomAttributeValue
     from ggrc.services import signals
 
-    definitions = attributes.get("custom_attribute_definitions")
+    definitions = src.get("custom_attribute_definitions")
     if definitions:
       self.process_definitions(definitions)
 
-    if 'custom_attributes' not in attributes:
+    attributes = src.get("custom_attributes")
+    if not attributes:
       return
-
-    attributes = attributes['custom_attributes']
 
     old_values = collections.defaultdict(list)
     last_values = dict()
