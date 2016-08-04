@@ -172,6 +172,28 @@ class TestCustomAttributeImportExport(TestCase):
     self.assert200(response)
     self.assertEqual(len(response.data.splitlines()), 21)
 
+  def tests_ca_export_filters(self):
+    """Test filtering on custom attribute values."""
+
+    filename = "custom_attribute_tests.csv"
+    self.import_file(filename)
+
+    data = [{
+        "object_name": "Product",
+        "filters": {
+            "expression": {
+                "left": "normal text",
+                "op": {"name": "="},
+                "right": "some text",
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.client.post("/_service/export_csv", data=dumps(data),
+                                headers=self.headers)
+    self.assert200(response)
+    self.assertIn("some text", response.data)
+
   def test_multi_word_object_with_ca(self):
     """Test multi-word (e.g. Access Group, Data Asset) object import"""
     filename = "multi_word_object_custom_attribute_test.csv"
