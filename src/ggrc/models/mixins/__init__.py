@@ -110,19 +110,6 @@ class Identifiable(object):
     return target
 
 
-def created_at_args():
-  """Sqlite doesn't have a server, per se, so the server_* args are useless."""
-  return {'default': db.text('current_timestamp'), }
-
-
-def updated_at_args():
-  """Sqlite doesn't have a server, per se, so the server_* args are useless."""
-  return {
-      'default': db.text('current_timestamp'),
-      'onupdate': db.text('current_timestamp'),
-  }
-
-
 class ChangeTracked(object):
 
   """A model with fields to tracked the last user to modify the model, the
@@ -136,15 +123,22 @@ class ChangeTracked(object):
 
   @declared_attr
   def created_at(cls):
-    return deferred(db.Column(
+    column = db.Column(
         db.DateTime,
-        **created_at_args()), cls.__name__)
+        nullable=False,
+        default=db.text('current_timestamp'),
+    )
+    return deferred(column, cls.__name__)
 
   @declared_attr
   def updated_at(cls):
-    return deferred(db.Column(
+    column = db.Column(
         db.DateTime,
-        **updated_at_args()), cls.__name__)
+        nullable=False,
+        default=db.text('current_timestamp'),
+        onupdate=db.text('current_timestamp'),
+    )
+    return deferred(column, cls.__name__)
 
   @declared_attr
   def modified_by(cls):

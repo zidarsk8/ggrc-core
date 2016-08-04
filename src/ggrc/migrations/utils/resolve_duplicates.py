@@ -1,9 +1,20 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from ggrc import db
+"""
+Resolve duplicates.
+
+This helper is used by the following migrations:
+
+* ggrc.migrations.verisions.20160223152916_204540106539;
+* ggrc_risk_assessments.migrations.verisions.20151112161029_62f26762d0a.
+
+"""
+
 from sqlalchemy import and_
 from sqlalchemy.orm import aliased
+
+from ggrc import db
 
 
 def resolve_duplicates(model, attr, separator=u"-"):
