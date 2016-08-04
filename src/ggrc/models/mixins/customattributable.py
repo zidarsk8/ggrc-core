@@ -275,8 +275,7 @@ class CustomAttributable(object):
       obj_id = self.id
       new_value = CustomAttributeValue(
           custom_attribute_id=ad_id,
-          attributable_id=obj_id,
-          attributable_type=obj_type,
+          attributable=self,
           attribute_value=attributes[ad_id],
       )
       if definitions[int(ad_id)].attribute_type.startswith("Map:"):
