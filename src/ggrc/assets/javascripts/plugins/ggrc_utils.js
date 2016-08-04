@@ -31,17 +31,17 @@
     },
     formatDate: function (date, hideTime) {
       var currentTimezone = moment.tz.guess();
-      var m;
+      var inst;
 
       if (date === undefined || date === null) {
         return '';
       }
 
-      m = moment(new Date(date.isComputed ? date() : date));
+      inst = moment(new Date(date.isComputed ? date() : date));
       if (hideTime === true) {
-        return m.format('MM/DD/YYYY');
+        return inst.format('MM/DD/YYYY');
       }
-      return m.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A z');
+      return inst.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A z');
     },
     getPickerElement: function (picker) {
       return _.find(_.values(picker), function (val) {
@@ -332,9 +332,6 @@
      *   none found.
      */
     get_highest_assignee_role: function (obj, roles) {
-      var currentMax = -1;
-      var highestRole = 'none';
-
       var roleOrder = _.map(
         _.map(obj.class.assignable_list, 'type'),
         _.capitalize);
