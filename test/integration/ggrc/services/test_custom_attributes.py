@@ -19,7 +19,8 @@ from integration.ggrc import services
 from integration.ggrc.generator import ObjectGenerator
 
 
-class TestGlobalCustomAttributes(services.TestCase):
+class ProductTestCase(services.TestCase):
+  """Test case for Product post and put requests."""
 
   def setUp(self):
     services.TestCase.setUp(self)
@@ -27,6 +28,7 @@ class TestGlobalCustomAttributes(services.TestCase):
     self.client.get("/login")
 
   def _put(self, url, data, extra_headers=None):
+    """Perform a put request."""
     headers = {'X-Requested-By': 'Unit Tests'}
     headers.update(extra_headers)
     return self.client.put(
@@ -37,12 +39,17 @@ class TestGlobalCustomAttributes(services.TestCase):
     )
 
   def _post(self, data):
+    """Perform a post request."""
     return self.client.post(
         "/api/products",
         content_type='application/json',
         data=utils.as_json(data),
         headers={'X-Requested-By': 'Unit Tests'},
     )
+
+
+class TestGlobalCustomAttributes(ProductTestCase):
+  """Tests for API updates for custom attribute values."""
 
   def test_custom_attribute_post(self):
     """Test post object with custom attributes."""
@@ -93,6 +100,7 @@ class TestGlobalCustomAttributes(services.TestCase):
     )
 
   def test_custom_attribute_put_add(self):
+    """Test edits with adding new CA values."""
     gen = self.generator.generate_custom_attribute
     _, cad = gen("product", attribute_type="Text", title="normal text")
     pid = models.Person.query.first().id
@@ -173,6 +181,7 @@ class TestGlobalCustomAttributes(services.TestCase):
                      "edited value")
 
   def test_custom_attribute_get(self):
+    """Check if get returns the whole CA value and not just the stub."""
     gen = self.generator.generate_custom_attribute
     _, cad = gen("product", attribute_type="Text", title="normal text")
     pid = models.Person.query.first().id
@@ -215,30 +224,12 @@ class TestGlobalCustomAttributes(services.TestCase):
     self.assertIn("id", cav)
 
 
-class TestOldApiCompatibility(services.TestCase):
+class TestOldApiCompatibility(ProductTestCase):
+  """Test Legacy CA values API.
 
-  def setUp(self):
-    services.TestCase.setUp(self)
-    self.generator = ObjectGenerator()
-    self.client.get("/login")
-
-  def _put(self, url, data, extra_headers=None):
-    headers = {'X-Requested-By': 'Unit Tests'}
-    headers.update(extra_headers)
-    return self.client.put(
-        url,
-        content_type='application/json',
-        data=utils.as_json(data),
-        headers=headers,
-    )
-
-  def _post(self, data):
-    return self.client.post(
-        "/api/products",
-        content_type='application/json',
-        data=utils.as_json(data),
-        headers={'X-Requested-By': 'Unit Tests'},
-    )
+  These tests check that the old way of setting custom attribute values still
+  works and that If both ways are used, the legacy code is ignored.
+  """
 
   def test_custom_attribute_post_both(self):
     """Test post with both custom attribute api options.

@@ -79,6 +79,7 @@ class ObjectGenerator(Generator):
 
   @staticmethod
   def create_stub(obj):
+    # pylint: disable=protected-access
     return {
         "id": obj.id,
         "href": "/api/{}/{}".format(obj._inflector.table_name, obj.id),
@@ -87,6 +88,7 @@ class ObjectGenerator(Generator):
 
   def generate_object(self, obj_class, data=None):
     """Generate an object of `obj_class` with fields from `data`."""
+    # pylint: disable=protected-access
     if data is None:
       data = {}
     obj_name = obj_class._inflector.table_singular
@@ -204,7 +206,7 @@ class ObjectGenerator(Generator):
     ]
     for _ in range(count):
       obj_class = random.choice(classes)
-      _, obj = self.generate_object(obj_class)
+      obj = self.generate_object(obj_class)[1]
       random_objects.append(obj)
     return random_objects
 

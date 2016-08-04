@@ -35,6 +35,7 @@ class CustomAttributable(object):
         import CustomAttributeDefinition
 
     def join_function():
+      """Object and CAD join function."""
       definition_id = foreign(CustomAttributeDefinition.definition_id)
       definition_type = foreign(CustomAttributeDefinition.definition_type)
       return and_(or_(definition_id == self.id, definition_id.is_(None)),
@@ -123,6 +124,11 @@ class CustomAttributable(object):
       self._add_ca_values(values)
 
   def _add_ca_values(self, values):
+    """Add CA value objects to _custom_attributes_values property.
+
+    Args:
+      values: list of CustomAttributeValue models
+    """
     for new_value in values:
       existing_value = self._values_map.get(new_value.custom_attribute.id)
       if existing_value:
@@ -133,6 +139,14 @@ class CustomAttributable(object):
         self._custom_attribute_values.append(new_value)
 
   def _add_ca_value_dicts(self, values):
+    """Add CA dict representations to _custom_attributes_values property.
+
+    This adds or updates the _custom_attribute_values with the values in the
+    custom attribute values serialized dictionary.
+
+    Args:
+      values: List of dictionaries that represent custom attribute values.
+    """
     from ggrc.models.custom_attribute_value import CustomAttributeValue
 
     for value in values:
@@ -160,8 +174,6 @@ class CustomAttributable(object):
 
     Args:
       definition: dictionary with field_name: value
-    Returns:
-      Nothing.
     """
     from ggrc.models.custom_attribute_definition \
         import CustomAttributeDefinition
@@ -182,8 +194,6 @@ class CustomAttributable(object):
 
     Args:
       definitions: Ordered list of custom attribute definitions
-    Returns:
-      Nothing
     """
     from ggrc.models.custom_attribute_definition \
         import CustomAttributeDefinition as CADef
@@ -204,6 +214,11 @@ class CustomAttributable(object):
       self.insert_definition(definition)
 
   def custom_attributes(self, src):
+    """Legacy setter for custom attribute values and definitions.
+
+    This code should only be used for custom attribute definitions until
+    setter for that is updated.
+    """
     from ggrc.fulltext.mysql import MysqlRecordProperty
     from ggrc.models.custom_attribute_value import CustomAttributeValue
     from ggrc.services import signals
@@ -235,7 +250,7 @@ class CustomAttributable(object):
         CustomAttributeValue.attributable_type == self.__class__.__name__,
         CustomAttributeValue.attributable_id == self.id)).all()
 
-    attr_value_ids = [v.id for v in attr_values]
+    attr_value_ids = [value.id for value in attr_values]
     ftrp_properties = [
         "attribute_value_{id}".format(id=_id) for _id in attr_value_ids]
 
@@ -243,8 +258,9 @@ class CustomAttributable(object):
     # the fact that imports can save multiple values at the time of writing.
     # old_values holds all previous values of attribute, last_values holds
     # chronologically last value.
-    for v in attr_values:
-      old_values[v.custom_attribute_id] += [(v.created_at, v.attribute_value)]
+    for value in attr_values:
+      old_values[value.custom_attribute_id].append(
+          (value.created_at, value.attribute_value))
 
     last_values = {str(key): max(old_vals,
                                  key=lambda (created_at, _): created_at)
@@ -288,8 +304,8 @@ class CustomAttributable(object):
       # new_value.context_id = cls.context_id
       self.custom_attribute_values.append(new_value)
       if ad_id in last_values:
-        ca, pv = last_values[ad_id]  # created_at, previous_value
-        if pv != attributes[ad_id]:
+        _, previous_value = last_values[ad_id]
+        if previous_value != attributes[ad_id]:
           signals.Signals.custom_attribute_changed.send(
               self.__class__,
               obj=self,
@@ -298,7 +314,7 @@ class CustomAttributable(object):
                   "id": obj_id,
                   "operation": "UPDATE",
                   "value": new_value,
-                  "old": pv
+                  "old": previous_value
               }, service=self.__class__.__name__)
       else:
         signals.Signals.custom_attribute_changed.send(
