@@ -11,18 +11,23 @@ from integration.ggrc import services
 
 
 class TestCollectionPost(services.TestCase):
+  """Test for collection post api calls."""
 
-  def get_location(self, response):
+  @staticmethod
+  def get_location(response):
     """Ignore the `http://localhost` prefix of the Location"""
     return response.headers['Location'][16:]
 
-  def headers(self, *args, **kwargs):
+  @staticmethod
+  def headers(*args, **kwargs):
+    """Get request headers."""
     ret = list(args)
     ret.append(('X-Requested-By', 'Unit Tests'))
     ret.extend(kwargs.items())
     return ret
 
   def test_collection_post_successful(self):
+    """Test normal successful collection post call."""
     data = json.dumps(
         {'services_test_mock_model': {'foo': 'bar', 'context': None}})
     self.client.get("/login")
@@ -50,7 +55,8 @@ class TestCollectionPost(services.TestCase):
     self.assertEqual(
         'bar', response.json['test_model_collection']['test_model'][0]['foo'])
 
-  def test_collection_post_successful_single_array(self):
+  def test_successful_single_array(self):
+    """Test collection post successful single array."""
     data = json.dumps(
         [{'services_test_mock_model': {'foo': 'bar', 'context': None}}])
     self.client.get("/login")
@@ -71,7 +77,8 @@ class TestCollectionPost(services.TestCase):
     self.assertEqual(
         'bar', response.json['test_model_collection']['test_model'][0]['foo'])
 
-  def test_collection_post_successful_multiple(self):
+  def test_successful_multiple(self):
+    """Test collection post successful multiple."""
     data = json.dumps([
         {'services_test_mock_model': {'foo': 'bar1', 'context': None}},
         {'services_test_mock_model': {'foo': 'bar2', 'context': None}},
@@ -95,7 +102,8 @@ class TestCollectionPost(services.TestCase):
     self.assertEqual(
         2, len(response.json['test_model_collection']['test_model']))
 
-  def test_collection_post_successful_multiple_with_errors(self):
+  def test_multiple_with_errors(self):
+    """Test collection post successful multiple with errors."""
     data = json.dumps([
         {'services_test_mock_model':
          {'foo': 'bar1', 'code': 'f1', 'context': None}},
@@ -121,7 +129,8 @@ class TestCollectionPost(services.TestCase):
     self.assertEqual(
         0, len(response.json['test_model_collection']['test_model']))
 
-  def test_collection_post_bad_request(self):
+  def test_post_bad_request(self):
+    """Test collection post with invalid content."""
     response = self.client.post(
         self.mock_url(),
         content_type='application/json',
@@ -130,7 +139,8 @@ class TestCollectionPost(services.TestCase):
     )
     self.assert400(response)
 
-  def test_collection_post_bad_content_type(self):
+  def test_bad_content_type(self):
+    """Test post with bad content type."""
     response = self.client.post(
         self.mock_url(),
         content_type='text/plain',
@@ -139,7 +149,7 @@ class TestCollectionPost(services.TestCase):
     )
     self.assertStatus(response, 415)
 
-  def test_collection_post_relationship(self):
+  def test_post_relationship(self):
     """Test integrity error on relationship collection post.
 
     Posting duplicate relationships should have a mechanism for removing
