@@ -122,7 +122,13 @@ class UpdateAttrHandler(object):
     """
     class_attr = getattr(obj.__class__, attr)
     update_raw = attr in getattr(obj.__class__, "_update_raw", [])
-    if hasattr(attr, '__call__'):
+    if update_raw:
+      # The attribute has a special setter that can handle raw json fields
+      # properly. This is used for special mappings such as custom attribute
+      # values
+      attr_name = attr
+      value = json_obj.get(attr_name)
+    elif hasattr(attr, '__call__'):
       # The attribute has been decorated with a callable, grab the name and
       # invoke the callable to get the value
       attr_name = attr.attr_name
@@ -132,9 +138,6 @@ class UpdateAttrHandler(object):
       # CustomAttributable mixin
       attr_name = attr
       value = class_attr(obj, json_obj)
-    elif update_raw:
-      attr_name = attr
-      value = json_obj.get(attr_name)
     else:
       # Lookup the method to use to perform the update. Use reflection to
       # key off of the type of the attribute and invoke the method of the
