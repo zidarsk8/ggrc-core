@@ -114,6 +114,50 @@
         });
       }
     },
+    /**
+     * Get list of mappable objects for certain type
+     *
+     * @param {String} type - Type of object we want to
+     *                      get list of mappable objects for
+     * @param {Object} options - accepts:
+     *        {Array} whitelist - list of added objects
+     *        {Array} forbidden - list blacklisted objects
+     *
+     * @return {Array} - List of mappable objects
+     */
+    getMappableTypes: function (type, options) {
+      var result;
+      var canonical = GGRC.Mappings.get_canonical_mappings_for(type);
+      var list = GGRC.tree_view.base_widgets_by_type[type];
+      var forbidden;
+      var forbiddenList = {
+        Program: ['Audit'],
+        Audit: ['Assessment', 'Program', 'Request'],
+        Assessment: [],
+        Request: ['Workflow', 'TaskGroup', 'Person', 'Audit'],
+        Person: '*',
+        AssessmentTemplate: '*'
+      };
+      options = options || {};
+      if (!type) {
+        return [];
+      }
+      if (options.forbidden) {
+        forbidden = options.forbidden;
+      } else {
+        forbidden = forbiddenList[type] || [];
+      }
+      result = _.intersection.apply(_, _.compact([_.keys(canonical), list]));
+      if (_.isString(forbidden) && forbidden === '*') {
+        forbidden = [];
+        result = [];
+      }
+      if (options.whitelist) {
+        result = _.union(result, options.whitelist);
+      }
+      result = _.partial(_.without, result);
+      return result.apply(result, forbidden);
+    },
 
     /**
      * Determine if `source` is allowed to be mapped to `target`.
