@@ -15,6 +15,8 @@ from ggrc.converters import errors
 class TestCustomAttributeImportExport(TestCase):
   """Test import and export with custom attributes."""
 
+  _set_up = True
+
   def setUp(self):
     """Setup stage for each test.
 
@@ -22,16 +24,18 @@ class TestCustomAttributeImportExport(TestCase):
     containing custom attributes. This stage also initializes a http client
     that is used for sending import/export requests.
     """
-    TestCase.setUp(self)
-    self.generator = ObjectGenerator()
-    self.create_custom_attributes()
-    self.create_people()
+    if TestCustomAttributeImportExport._set_up:
+      TestCase.setUp(self)
+      self.generator = ObjectGenerator()
+      self.create_custom_attributes()
+      self.create_people()
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',
         "X-Requested-By": "gGRC",
         "X-export-view": "blocks",
     }
+    TestCustomAttributeImportExport._set_up = False
 
   def create_custom_attributes(self):
     """Generate custom attributes needed for csv import
