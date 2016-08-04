@@ -57,33 +57,47 @@ class TestComprehensiveSheets(TestCase):
 
     Query count should be <LIMIT for all model types.
     """
+    errors = set()
     with QueryCounter() as counter:
       for model in self.MODELS:
-        counter.queries = []
-        self.generator.api.get_query(model, "")
-        if counter.get > self.LIMIT:
-          print collections.Counter(counter.queries).most_common(1)
-        self.assertLess(counter.get, self.LIMIT,
-                        "Query count for API GET " + model.__name__)
+        try:
+          counter.queries = []
+          self.generator.api.get_query(model, "")
+          if counter.get > self.LIMIT:
+            print collections.Counter(counter.queries).most_common(1)
+          self.assertLess(counter.get, self.LIMIT,
+                          "Query count for object {} exceeded: {}/{}".format(
+                              model.__name__, counter.get, self.LIMIT)
+                          )
+        except AssertionError as error:
+          errors.add(error.message)
+    self.assertEqual(errors, set())
 
   def test_queries_per_object_page(self):
     """Import comprehensive_sheet1 and count db requests per collection get.
 
     Query count should be <LIMIT for all model types.
     """
+    errors = set()
     with QueryCounter() as counter:
       for view in all_object_views():
-        model = view.model_class
-        if model not in self.MODELS:
-          continue
-        instance = model.query.first()
-        if instance is None or getattr(instance, "id", None) is None:
-          continue
-        counter.queries = []
-        res = self.client.get("/{}/{}".format(view.url, instance.id))
-        self.assertEqual(res.status_code, 200)
-        self.assertLess(counter.get, self.LIMIT,
-                        "Query count for object page " + model.__name__)
+        try:
+          model = view.model_class
+          if model not in self.MODELS:
+            continue
+          instance = model.query.first()
+          if instance is None or getattr(instance, "id", None) is None:
+            continue
+          counter.queries = []
+          res = self.client.get("/{}/{}".format(view.url, instance.id))
+          self.assertEqual(res.status_code, 200)
+          self.assertLess(counter.get, self.LIMIT,
+                          "Query count for object {} exceeded: {}/{}".format(
+                              model.__name__, counter.get, self.LIMIT)
+                          )
+        except AssertionError as e:
+          errors.add(e.message)
+    self.assertEqual(errors, set())
 
   def test_queries_for_dashboard(self):
     with QueryCounter() as counter:
