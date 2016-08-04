@@ -13,6 +13,7 @@ These tests include:
 
 from ggrc import utils
 from ggrc import models
+from ggrc import builder
 
 from integration.ggrc import services
 from integration.ggrc.generator import ObjectGenerator
@@ -212,3 +213,135 @@ class TestGlobalCustomAttributes(services.TestCase):
     self.assertIn("custom_attribute_id", cav)
     self.assertIn("attribute_value", cav)
     self.assertIn("id", cav)
+
+
+class TestOldApiCompatibility(services.TestCase):
+
+  def setUp(self):
+    services.TestCase.setUp(self)
+    self.generator = ObjectGenerator()
+    self.client.get("/login")
+
+  def _put(self, url, data, extra_headers=None):
+    headers = {'X-Requested-By': 'Unit Tests'}
+    headers.update(extra_headers)
+    return self.client.put(
+        url,
+        content_type='application/json',
+        data=utils.as_json(data),
+        headers=headers,
+    )
+
+  def _post(self, data):
+    return self.client.post(
+        "/api/products",
+        content_type='application/json',
+        data=utils.as_json(data),
+        headers={'X-Requested-By': 'Unit Tests'},
+    )
+
+  def test_custom_attribute_post_both(self):
+    """Test post with both custom attribute api options.
+
+    This tests tries to set a custom attribute on the new and the old way at
+    once. The old option should be ignored and the new value should be set.
+    """
+    gen = self.generator.generate_custom_attribute
+    _, cad = gen("product", attribute_type="Text", title="normal text")
+    cad_json = builder.json.publish(cad.__class__.query.get(cad.id))
+    cad_json = builder.json.publish_representation(cad_json)
+    pid = models.Person.query.first().id
+
+    product_data = [
+        {
+            "product": {
+                "kind": None,
+                "owners": [],
+                "custom_attribute_definitions":[
+                    cad_json,
+                ],
+                "custom_attribute_values": [{
+                    "attribute_value": "new value",
+                    "custom_attribute_id": cad.id,
+                }],
+                "custom_attributes": {
+                    cad.id: "old value",
+                },
+                "contact": {
+                    "id": pid,
+                    "href": "/api/people/{}".format(pid),
+                    "type": "Person"
+                },
+                "title": "simple product",
+                "description": "",
+                "secondary_contact": None,
+                "notes": "",
+                "url": "",
+                "reference_url": "",
+                "slug": "",
+                "context": None
+            }
+        }
+    ]
+
+    response = self._post(product_data)
+    ca_json = response.json[0][1]["product"]["custom_attribute_values"][0]
+    self.assertEqual(ca_json["attribute_value"], "new value")
+
+    product = models.Product.eager_query().first()
+    self.assertEqual(len(product.custom_attribute_values), 1)
+    self.assertEqual(
+        product.custom_attribute_values[0].attribute_value,
+        "new value"
+    )
+
+  def test_custom_attribute_post_old(self):
+    """Test post with old style custom attribute values.
+
+    This tests that the legacy way of setting custom attribute values still
+    works.
+    """
+    gen = self.generator.generate_custom_attribute
+    _, cad = gen("product", attribute_type="Text", title="normal text")
+    cad_json = builder.json.publish(cad.__class__.query.get(cad.id))
+    cad_json = builder.json.publish_representation(cad_json)
+    pid = models.Person.query.first().id
+
+    product_data = [
+        {
+            "product": {
+                "kind": None,
+                "owners": [],
+                "custom_attribute_definitions":[
+                    cad_json,
+                ],
+                "custom_attributes": {
+                    cad.id: "old value",
+                },
+                "contact": {
+                    "id": pid,
+                    "href": "/api/people/{}".format(pid),
+                    "type": "Person"
+                },
+                "title": "simple product",
+                "description": "",
+                "secondary_contact": None,
+                "notes": "",
+                "url": "",
+                "reference_url": "",
+                "slug": "",
+                "context": None
+            }
+        }
+    ]
+
+    response = self._post(product_data)
+    ca_json = response.json[0][1]["product"]["custom_attribute_values"][0]
+    self.assertEqual(ca_json["attribute_value"], "old value")
+
+    product = models.Product.eager_query().first()
+    self.assertEqual(len(product.custom_attribute_values), 1)
+    self.assertEqual(
+        product.custom_attribute_values[0].attribute_value,
+        "old value"
+    )
