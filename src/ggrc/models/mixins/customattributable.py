@@ -138,7 +138,7 @@ class CustomAttributable(object):
     for value in values:
       attr = self._values_map.get(value.get("custom_attribute_id"))
       if attr:
-        attr.attributable=self
+        attr.attributable = self
         attr.attribute_value = value.get("attribute_value")
         attr.attribute_object_id = value.get("attribute_object_id")
       elif "custom_attribute_id" in value:
@@ -207,6 +207,14 @@ class CustomAttributable(object):
     from ggrc.fulltext.mysql import MysqlRecordProperty
     from ggrc.models.custom_attribute_value import CustomAttributeValue
     from ggrc.services import signals
+
+    ca_values = src.get("custom_attribute_values")
+    if ca_values and "attribute_value" in ca_values[0]:
+      # This indicates that the new CA API is being used and the legacy API
+      # should be ignored. If we need to use the legacy API the
+      # custom_attribute_values property should contain stubs instead of entire
+      # objects.
+      return
 
     definitions = src.get("custom_attribute_definitions")
     if definitions:
