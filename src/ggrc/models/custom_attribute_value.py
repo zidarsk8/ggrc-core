@@ -194,11 +194,8 @@ class CustomAttributeValue(Base, db.Model):
   def _validate_dropdown(self):
     """Validate dropdown opiton."""
     valid_options = self.custom_attribute.multi_choice_options.split(",")
-    is_mandatory = self.custom_attribute.multi_choice_mandatory
     if self.attribute_value and self.attribute_value not in valid_options:
       raise ValueError("Invalid custom attribute dropdown option")
-    elif not self.attribute_value and is_mandatory:
-      raise ValueError("Missing mandatory custom attribute dropdown option")
 
   def validate(self):
     """Validate custom attribute value."""
