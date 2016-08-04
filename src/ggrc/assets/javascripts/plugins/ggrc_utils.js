@@ -160,6 +160,25 @@
     },
 
     /**
+     * Determine if two types of models can be mapped
+     *
+     * @param {String} target - the target type of model
+     * @param {String} source - the source type of model
+     * @param {Object} options - accepts:
+     *        {Array} whitelist - list of added objects
+     *        {Array} forbidden - list blacklisted objects
+     *
+     * @return {Boolean} - true if mapping is allowed, false otherwise
+     */
+    isMappableType: function (target, source, options) {
+      var result;
+      if (!target || !source) {
+        return false;
+      }
+      result = this.getMappableTypes(target, options);
+      return _.contains(result, source);
+    },
+    /**
      * Determine if `source` is allowed to be mapped to `target`.
      *
      * By symmetry, this method can be also used to check whether `source` can
