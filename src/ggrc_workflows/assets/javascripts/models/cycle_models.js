@@ -307,6 +307,11 @@
         model: can.Model.Cacheable,
         mapping: 'info_related_objects',
         show_view: GGRC.mustache_path + '/base_templates/subtree.mustache'
+      },
+      comments: {
+        model: can.Model.Cacheable,
+        mapping: 'cycle_task_entries',
+        show_view: GGRC.mustache_path + '/cycle_task_entries/tree.mustache'
       }
     },
     tree_view_options: {
