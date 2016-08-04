@@ -323,9 +323,10 @@ class CustomAttributable(object):
   def eager_query(cls):
     query = super(CustomAttributable, cls).eager_query()
     return query.options(
-        orm.subqueryload('custom_attribute_values'),
         orm.subqueryload('custom_attribute_definitions')
-           .undefer_group('CustomAttributeDefinition_complete')
+           .undefer_group('CustomAttributeDefinition_complete'),
+        orm.subqueryload('_custom_attribute_values')
+           .undefer_group('CustomAttributeValue_complete'),
     )
 
   def log_json(self):
