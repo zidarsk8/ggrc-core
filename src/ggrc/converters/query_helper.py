@@ -13,6 +13,8 @@ from sqlalchemy import or_
 
 from ggrc.rbac import permissions
 from ggrc.models.custom_attribute_value import CustomAttributeValue
+from ggrc.models.custom_attribute_definition import \
+    CustomAttributeDefinition as CAD
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
@@ -118,8 +120,11 @@ class QueryHelper(object):
            "display_name" not in definition:
           continue
         try:
-          attr_id = int(key[11:])
-        except (TypeError, ValueError):
+          # Global custom attribute definition can only have a single id on
+          # their name, so it is safe for that. Currently the filters do not
+          # work with object level custom attributes.
+          attr_id = definition["definition_ids"][0]
+        except KeyError:
           continue
         filter_by = CustomAttributeValue.mk_filter_by_custom(object_class,
                                                              attr_id)
