@@ -3568,6 +3568,25 @@ Example:
   );
 
   /**
+   * Checks if two object types are mappable
+   *
+   * @param {String} source - Source type
+   * @param {String} target - Target type
+   *   validation errors
+   * @param {Object} options - a CanJS options argument passed to every helper
+   */
+  Mustache.registerHelper('is_mappable_type',
+    function (source, target, options) {
+      target = Mustache.resolve(target);
+      source = Mustache.resolve(source);
+      if (GGRC.Utils.isMappableType(source, target)) {
+        return options.fn(options.contexts);
+      }
+      return options.inverse(options.contexts);
+    }
+  );
+
+  /**
    * Check if Custom Atttribute's value did not pass validation, and render the
    * corresponding block in the template. The error messages, if any, are
    * available in the "error" variable within the "truthy" block.
