@@ -40,7 +40,6 @@ class QueryHelper(object):
       object_name: search class name,
       permissions: either read or update, if none are given it defaults to read
       order_by: [
-        Note: only the first order_by list item is processed
         {
           "name": the name of the field by which to do the sorting
           "desc": optional; if True, invert the sorting order
@@ -235,9 +234,8 @@ class QueryHelper(object):
     """
     for object_query in self.query:
       objects = self._get_objects(object_query)
-      objects = self._apply_order_by_and_limit(
+      objects = self._apply_limit(
           objects,
-          order_by=object_query.get("order_by"),
           limit=object_query.get("limit"),
       )
       object_query["ids"] = [o.id for o in objects]
@@ -260,6 +258,12 @@ class QueryHelper(object):
     )
     if filter_expression is not None:
       query = query.filter(filter_expression)
+    if object_query.get("order_by"):
+      query = self._apply_order_by(
+          object_class,
+          query,
+          object_query["order_by"],
+      )
     requested_permissions = object_query.get("permissions", "read")
     if requested_permissions == "update":
       objs = [o for o in query if permissions.is_allowed_update_for(o)]
@@ -269,48 +273,43 @@ class QueryHelper(object):
     return objs
 
   @staticmethod
-  def _apply_order_by_and_limit(objects, order_by=None, limit=None):
-    """Order objects and apply limits for pagination.
+  def _apply_order_by(model, query, order_by):
+    """Add ordering parameters to a query for objects.
 
     Args:
-      objects: a list of objects to sort and limit;
-      order_by: a list of dicts with keys "name" (the name of the field by which
-                to sort) and "desc" (optional; do reverse sort if True);
-      limit: a tuple of indexes in format (from, to); objects is sliced to
-             objects[from, to]
+      model: the model instances of which are requested in query;
+      query: a query to get objects from the db;
+      order_by: a list of dicts with keys "field" (the name of the field by
+                which to sort) and "desc" (optional; do reverse sort if True).
 
     If order_by["name"] == "__similarity__" (a special non-field value),
     similarity weights returned by get_similar_objects_query are used for
     sorting.
 
     Returns:
-      a sorted and sliced list of objects
+      the query with sorting parameters.
     """
-    if order_by:
-      try:
-        # Note: currently we sort only by the first column from the list
-        order_by = order_by[0]
-        order_field = order_by["name"]
-        order_desc = order_by.get("desc", False)
+    def model_field(ob):
+      # __similarity__ is not implemented yet
+      return getattr(model, ob["name"])
 
-        if order_field == "__similarity__" and objects:
-          # a special case to sort by weights from WithSimilarityScore
-          object_class = type(objects[0])
-          id_weight_map = {obj.id: obj.weight for obj in
-                           getattr(flask.g, "query_api_similar_objects", [])}
-          def key(obj):
-            return id_weight_map.get(obj.id)
-        else:
-          key = attrgetter(order_field)
+    return query.order_by(
+      *(model_field(ob) if not ob.get("desc") else model_field(ob).desc()
+        for ob in order_by)
+    )
 
-        objects = sorted(
-            objects,
-            key=key,
-            reverse=order_desc,
-        )
-      except:
-        raise BadQueryException("Bad query: Invalid 'order_by' parameter")
+  @staticmethod
+  def _apply_limit(objects, limit):
+    """Apply limits for pagination.
 
+    Args:
+      objects: a list of objects to limit;
+      limit: a tuple of indexes in format (from, to); objects is sliced to
+             objects[from, to].
+
+    Returns:
+      a sliced list of objects.
+    """
     if limit:
       try:
         from_, to_ = limit
