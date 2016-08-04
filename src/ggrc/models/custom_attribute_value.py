@@ -191,7 +191,6 @@ class CustomAttributeValue(Base, db.Model):
       self.attribute_value = value
       self.attribute_object_id = id_
 
-
   def _validate_dropdown(self):
     """Validate dropdown opiton."""
     valid_options = self.custom_attribute.multi_choice_options.split(",")

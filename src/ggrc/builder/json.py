@@ -1,26 +1,29 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""JSON resource state representation handler for gGRC models."""
+
+# pylint: disable=no-name-in-module
+# false positive for RelationshipProperty
+
 from datetime import datetime
 
+import iso8601
+import sqlalchemy
 from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.properties import RelationshipProperty
 from werkzeug.exceptions import BadRequest
-import iso8601
-import sqlalchemy
 
+import ggrc.builder
+import ggrc.models
+import ggrc.services
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.types import JsonType
 from ggrc.utils import url_for
 from ggrc.utils import view_url_for
-import ggrc.builder
-import ggrc.models
-import ggrc.services
-
-"""JSON resource state representation handler for gGRC models."""
 
 
 def get_json_builder(obj):
@@ -41,14 +44,14 @@ def get_json_builder(obj):
 
 
 def publish_base_properties(obj):
-    ret = {}
-    self_url = url_for(obj)
-    if self_url:
-      ret['selfLink'] = self_url
-    view_url = view_url_for(obj)
-    if view_url:
-      ret['viewLink'] = view_url
-    return ret
+  ret = {}
+  self_url = url_for(obj)
+  if self_url:
+    ret['selfLink'] = self_url
+  view_url = view_url_for(obj)
+  if view_url:
+    ret['viewLink'] = view_url
+  return ret
 
 
 def publish(obj, inclusions=(), inclusion_filter=None):
@@ -57,10 +60,10 @@ def publish(obj, inclusions=(), inclusion_filter=None):
   values are returned unchanged or specially formatted if needed.
   """
   if inclusion_filter is None:
-    def inclusion_filter(x):
+    def inclusion_filter(_):
       return True
   publisher = get_json_builder(obj)
-  if publisher and getattr(publisher, '_publish_attrs', False):
+  if publisher and getattr(publisher, '_publish_attrs', []):
     ret = publish_base_properties(obj)
     ret.update(publisher.publish_contribution(
         obj, inclusions, inclusion_filter))
@@ -78,7 +81,7 @@ def publish_stub(obj, inclusions=(), inclusion_filter=None):
       ret['href'] = self_url
     ret['type'] = obj.__class__.__name__
     ret['context_id'] = obj.context_id
-    if hasattr(publisher, '_stub_attrs') and publisher._stub_attrs:
+    if getattr(publisher, '_stub_attrs', []):
       ret.update(publisher.publish_stubs(obj, inclusions, inclusion_filter))
     return ret
   # Otherwise, just return the value itself by default
@@ -119,7 +122,7 @@ class UpdateAttrHandler(object):
     """
     class_attr = getattr(obj.__class__, attr)
     update_raw = attr in getattr(obj.__class__, "_update_raw", [])
-    if (hasattr(attr, '__call__')):
+    if hasattr(attr, '__call__'):
       # The attribute has been decorated with a callable, grab the name and
       # invoke the callable to get the value
       attr_name = attr.attr_name
@@ -141,8 +144,8 @@ class UpdateAttrHandler(object):
       value = method(obj, json_obj, attr_name, class_attr)
     if (isinstance(value, (set, list)) and
         not update_raw and (
-           not hasattr(class_attr, 'property') or not
-           hasattr(class_attr.property, 'columns') or not isinstance(
+        not hasattr(class_attr, 'property') or not
+        hasattr(class_attr.property, 'columns') or not isinstance(
             class_attr.property.columns[0].type,
             JsonType)
     )):
@@ -201,15 +204,15 @@ class UpdateAttrHandler(object):
     value = json_obj.get(attr_name)
     try:
       if value:
-        d = iso8601.parse_date(value)
-        d = d.replace(tzinfo=None)
+        date = iso8601.parse_date(value)
+        date = date.replace(tzinfo=None)
       else:
-        d = None
-      return d
-    except iso8601.ParseError as e:
+        date = None
+      return date
+    except iso8601.ParseError as error:
       raise BadRequest(
           'Malformed DateTime {0} for parameter {1}. '
-          'Error message was: {2}'.format(value, attr_name, e.message)
+          'Error message was: {2}'.format(value, attr_name, error.message)
       )
 
   @classmethod
@@ -220,13 +223,13 @@ class UpdateAttrHandler(object):
 
     try:
       return datetime.strptime(value, "%Y-%m-%d") if value else None
-    except ValueError as e:
+    except ValueError:
       try:
         return datetime.strptime(value, "%m/%d/%Y") if value else None
-      except ValueError as e:
+      except ValueError as error:
         raise BadRequest(
             'Malformed Date {0} for parameter {1}. '
-            'Error message was: {2}'.format(value, attr_name, e.message)
+            'Error message was: {2}'.format(value, attr_name, error.message)
         )
 
   @classmethod
@@ -249,7 +252,7 @@ class UpdateAttrHandler(object):
           # FIXME: Should this be .one() instead of .first() ?
           return db.session.query(rel_class).filter(
               rel_class.id == rel_obj[u'id']).first()
-        except(TypeError):
+        except TypeError:
           raise TypeError(''.join(['Failed to convert attribute ', attr_name]))
       return None
 
@@ -280,7 +283,6 @@ class UpdateAttrHandler(object):
     # return cls.query_for(rel_class, json_obj, attr_name, True)
     attr_value = json_obj.get(attr_name, None)
     if attr_value:
-      import ggrc.models
       rel_class_name = json_obj[attr_name]['type']
       rel_class = ggrc.models.get_model(rel_class_name)
       return cls.query_for(rel_class, json_obj, attr_name, False)
@@ -422,19 +424,20 @@ def build_stub_union_query(queries):
 
 
 def _render_stub_from_match(match, type_columns):
-  type = match[type_columns['type']]
+  type_ = match[type_columns['type']]
   id = match[type_columns['id']]
   return {
-      'type': type,
+      'type': type_,
       'id': id,
       'context_id': match[type_columns['context_id']],
-      'href': url_for(type, id=id),
+      'href': url_for(type_, id=id),
   }
 
 
 class LazyStubRepresentation(object):
-  def __init__(self, type, conditions):
-    self.type = type
+
+  def __init__(self, type_, conditions):
+    self.type = type_
     if isinstance(conditions, (int, long)):
       conditions = {'id': conditions}
     self.conditions = conditions
@@ -458,25 +461,25 @@ class LazyStubRepresentation(object):
 
 def walk_representation(obj):  # noqa
   if isinstance(obj, dict):
-    for k, v in obj.items():
-      if isinstance(v, dict):
-        for x in walk_representation(v):
-          yield x
-      elif isinstance(v, (list, tuple)):
-        for x in walk_representation(v):
-          yield x
+    for key, value in obj.items():
+      if isinstance(value, dict):
+        for attr in walk_representation(value):
+          yield attr
+      elif isinstance(value, (list, tuple)):
+        for attr in walk_representation(value):
+          yield attr
       else:
-        yield v, k, obj
+        yield value, key, obj
   elif isinstance(obj, (list, tuple)):
-    for i, v in enumerate(obj):
-      if isinstance(v, dict):
-        for x in walk_representation(v):
-          yield x
-      elif isinstance(v, (list, tuple)):
-        for x in walk_representation(v):
-          yield x
+    for index, value in enumerate(obj):
+      if isinstance(value, dict):
+        for attr in walk_representation(value):
+          yield attr
+      elif isinstance(value, (list, tuple)):
+        for attr in walk_representation(value):
+          yield attr
       else:
-        yield v, i, obj
+        yield value, index, obj
 
 
 def gather_queries(resource):
@@ -655,7 +658,7 @@ class Builder(AttributeInfo):
           obj, attr_name, class_attr, inclusions, include, inclusion_filter)
     elif class_attr.__class__.__name__ == 'property':
       if not inclusions or include:
-        if (getattr(obj, '{0}_id'.format(attr_name))):
+        if getattr(obj, '{0}_id'.format(attr_name)):
           return LazyStubRepresentation(
               getattr(obj, '{0}_type'.format(attr_name)),
               getattr(obj, '{0}_id'.format(attr_name)))

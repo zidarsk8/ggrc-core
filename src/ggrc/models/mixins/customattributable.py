@@ -5,6 +5,7 @@
 
 import collections
 
+from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import orm
 from sqlalchemy import or_
@@ -12,6 +13,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import foreign
 from sqlalchemy.orm import relationship
+from werkzeug.exceptions import BadRequest
 
 from ggrc import db
 from ggrc import utils
