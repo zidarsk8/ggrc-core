@@ -30,7 +30,7 @@
     <div class="span12">
       <h6>Audit Lead</h6>
       <p class="oneline">
-        <person empty-text="Not assigned" person-obj="instance.contact"></person>
+        <person-info empty-text="Not assigned" person-obj="instance.contact"></person-info>
       </p>
     </div>
   </div>
@@ -85,7 +85,7 @@
               {{#each authorizations}}
                 <li>
                   {{#using auditor=auditors.0.person}}
-                    <person empty-text="Not assigned" person-obj="instance.person"></person>
+                    <person-info empty-text="Not assigned" person-obj="instance.person"></person-info>
                   {{/using}}
                 </li>
               {{/each}}

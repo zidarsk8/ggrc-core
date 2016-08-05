@@ -143,10 +143,10 @@
               {{/instance.computed_errors.assessorsList}}
 
               {{#each instance.assessorsList}}
-                <person
+                <person-info
                   editable="true"
                   person-id="{{@key}}"
-                  can-person-remove="instance.assessorRemoved"></person>
+                  can-person-remove="instance.assessorRemoved"></person-info>
               {{/each}}
             {{/if}}
           </div>
@@ -183,10 +183,10 @@
               {{/instance.computed_errors.verifiersList}}
 
               {{#each instance.verifiersList}}
-                <person
+                <person-info
                   editable="true"
                   person-id="{{@key}}"
-                  can-person-remove="instance.verifierRemoved"></person>
+                  can-person-remove="instance.verifierRemoved"></person-info>
               {{/each}}
             {{/if}}
           </div>

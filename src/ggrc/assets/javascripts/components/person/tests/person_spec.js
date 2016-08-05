@@ -51,10 +51,11 @@ describe('GGRC.Components.personItem', function () {
         });
         CMS.Models.Person.cache[42] = person42;
 
-        template = can.view.mustache('<person person-id="42"></person>');
+        template = can.view
+          .mustache('<person-info person-id="42"></person-info>');
         frag = template();
         frag = $(frag);
-        component = frag.find('person').control();
+        component = frag.find('person-info').control();
 
         expect(component.scope.attr('personObj')).toBe(person42);
       }
@@ -67,11 +68,12 @@ describe('GGRC.Components.personItem', function () {
           id: 123, name: 'Mike', email: 'mike@mike.com'
         });
 
-        template = can.view.mustache('<person person-id="123"></person>');
+        template = can.view
+          .mustache('<person-info person-id="123"></person-info>');
         frag = template();
 
         frag = $(frag);
-        component = frag.find('person').control();
+        component = frag.find('person-info').control();
 
         delete CMS.Models.Person.cache[123];
 
@@ -90,13 +92,14 @@ describe('GGRC.Components.personItem', function () {
           id: 123, name: 'John', email: 'john@doe.com'
         });
 
-        template = can.view.mustache('<person person-id="123"></person>');
+        template = can.view
+          .mustache('<person-info person-id="123"></person-info>');
         frag = template();
 
         CMS.Models.Person.cache[123] = person123;
 
         frag = $(frag);
-        component = frag.find('person').control();
+        component = frag.find('person-info').control();
 
         dfdFindOne.resolve(fetchedPerson);
 

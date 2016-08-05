@@ -12,7 +12,7 @@
 
   // the component's configuration object (i.e. its constructor's prototype)
   var component = {
-    tag: 'person',
+    tag: 'person-info',
 
     template: can.view(
       GGRC.mustache_path +
