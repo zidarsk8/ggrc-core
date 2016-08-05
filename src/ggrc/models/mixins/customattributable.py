@@ -162,7 +162,7 @@ class CustomAttributable(object):
             attribute_value=value.get("attribute_value"),
             attribute_object_id=value.get("attribute_object_id"),
         ))
-      elif "self_link" in value:
+      elif "href" in value:
         # Ignore setting of custom attribute stubs. Getting here means that the
         # front-end is not using the API correctly and needs to be updated.
         current_app.logger.info("Ignoring post/put of custom attribute stubs.")
