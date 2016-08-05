@@ -206,6 +206,10 @@
               No comments.
             {{/count}}
           {{/with_mapping_count}}
+
+          <ul class="add-task-comment">
+            {{{render '/static/mustache/cycle_task_entries/tree_footer.mustache' parent_instance=instance}}}
+          </ul>
         </div>
       </div>
 
