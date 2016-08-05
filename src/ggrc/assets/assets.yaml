@@ -32,7 +32,6 @@ dashboard-js-files:
   - moment/min/moment.min.js
   - moment-timezone/builds/moment-timezone-with-data.min.js
   - spinjs/spin.js
-  - string-natural-compare/natural-compare.min.js
   # end 3rd party
   - bootstrap/wysihtml5.js
   - bootstrap/sticky-popover.js
