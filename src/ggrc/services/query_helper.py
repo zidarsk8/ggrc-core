@@ -15,53 +15,54 @@ class QueryAPIQueryHelper(QueryHelper):
   query object = [
     {
       # the same parameters as in QueryHelper
+      query_type: "values", "ids" or "count" - the type of results requested
       fields: [ a list of fields to include in JSON if query_type is "values" ]
     }
   ]
 
-  After the query is done (by `get` method), the results are appended
+  After the query is done (by `get_results` method), the results are appended
   to each query object:
 
   query object with results = [
     {
       # the same fields as in QueryHelper
-      values: [ filtered objects in JSON ]
-              (present if values parameter is True)
-      ids: [ ids of filtered objects ] (present if ids parameter is True)
+      values: [ filtered objects in JSON ] (present if query_type is "values")
+      ids: [ ids of filtered objects ] (present if query_type is "ids")
       count: the number of objects filtered, after "limit" is applied
       total: the number of objects filtered, before "limit" is applied
-             (present if total parameter is True)
   """
-  def get(self, ids=False, total=False, values=False):
+  def get_results(self):
     """Filter the objects and get their information.
 
-    Updates self.query items with their results.
-
-    Args:
-      ids: if True, provide ids of the filtered objects under ["ids"];
-      total: if True, provide the total number of the filtered objects
-             before "limit" is applied under ["total"];
-      values: if True, provide the filtered objects themselves under ["values"]
+    Updates self.query items with their results. The type of results required
+    is read from "type" parameter of every object_query in self.query.
 
     Returns:
       list of dicts: same query as the input with requested results that match
                      the filter.
     """
-    if not (ids or total or values):
-      # no additional info requested, no action required
-      return self.query
     for object_query in self.query:
+      query_type = object_query.get("type", "values")
+      if query_type not in {"values", "ids", "count"}:
+        raise NotImplementedError("Only 'values', 'ids' and 'count' queries "
+                                  "are supported now")
+      model = self.object_map[object_query["object_name"]]
       objects = self._get_objects(object_query)
-      if total:
-        object_query["total"] = len(objects)
+      object_query["total"] = len(objects)
+
       objects = self._apply_order_by_and_limit(
           objects,
           order_by=object_query.get("order_by"),
           limit=object_query.get("limit"),
       )
-      if values:
-        object_query["values"] = objects
-      if ids:
+      object_query["count"] = len(objects)
+      object_query["last_modified"] = self._get_last_modified(model, objects)
+      if query_type == "values":
+        object_query["values"] = self._transform_to_json(
+            objects,
+            object_query.get("fields"),
+        )
+      if query_type == "ids":
         object_query["ids"] = [o.id for o in objects]
     return self.query
 

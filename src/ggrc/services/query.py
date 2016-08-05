@@ -11,7 +11,6 @@ from flask import request
 from flask import current_app
 from werkzeug.exceptions import BadRequest
 
-from ggrc.builder import json
 from ggrc.services.query_helper import QueryAPIQueryHelper
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model
@@ -19,11 +18,11 @@ from ggrc.services.common import etag
 from ggrc.utils import as_json
 
 
-def build_collection_representation(model, **kwargs):
-  """Enclose `kwargs` collection description into a type-describing block."""
+def build_collection_representation(model, description):
+  """Enclose collection description into a type-describing block."""
   # pylint: disable=protected-access
   collection = {
-      model.__name__: kwargs,
+      model.__name__: description,
       "selfLink": None,  # not implemented yet
   }
   return collection
@@ -58,78 +57,36 @@ def http_timestamp(timestamp):
 
 def get_objects_by_query():
   """Return objects corresponding to a POST'ed query list."""
-  request_json = request.json
+  query = request.json
 
-  results, last_modified_list = zip(*(_process_single_query(query_object)
-                                      for query_object in request_json))
-
-  if None in last_modified_list:
-    last_modified = None
-  else:
-    last_modified = max(last_modified_list)
-
-  return json_success_response(results, last_modified)
-
-
-def _process_single_query(query_object):
-  """Get results for a single query."""
-  # valid types should be: 'values', 'ids', 'count'
-  query_type = query_object.get('type', 'values')
-  object_type = query_object.get('object_name')
-  query_helper = QueryAPIQueryHelper([query_object])
+  query_helper = QueryAPIQueryHelper(query)
+  results = query_helper.get_results()
 
   last_modified = None
+  collections = []
+  collection_fields = ["ids", "values", "count", "total"]
 
-  if query_type == 'values':
-    result = query_helper.get(values=True, total=True)[0]
-    object_type = result['object_name']
-    total = result['total']
-    objects = result['values']
+  for result in results:
+    if last_modified is None:
+      last_modified = result["last_modified"]
+    elif result["last_modified"] is not None:
+      last_modified = max(last_modified, result["last_modified"])
 
-    model = get_model(object_type)
-    objects_json = [json.publish(obj) for obj in objects]
-    objects_json = json.publish_representation(objects_json)
+    model = get_model(result["object_name"])
 
-    if result.get('fields'):
-      objects_json = [{f: o.get(f) for f in result['fields']}
-                      for o in objects_json]
     collection = build_collection_representation(
         model,
-        values=objects_json,
-        count=len(objects_json),
-        total=total,
+        {
+            field: result[field] for field in collection_fields
+            if field in result
+        }
     )
-    last_modified = get_last_modified(model, objects)
-  elif query_type == 'ids':
-    result = query_helper.get(ids=True, total=True)[0]
-    object_type = result['object_name']
-    total = result['total']
-    ids = result['ids']
+    collections.append(collection)
 
-    model = get_model(object_type)
-    collection = build_collection_representation(
-        model,
-        ids=ids,
-        count=len(ids),
-        total=total,
-    )
-  elif query_type == 'count':
-    result = query_helper.get(ids=True, total=True)[0]
-    object_type = result['object_name']
-    total = result['total']
-    count = len(result['ids'])
+  if last_modified is None:
+    last_modified = datetime.now()
 
-    model = get_model(object_type)
-    collection = build_collection_representation(
-        model,
-        count=count,
-        total=total,
-    )
-  else:
-    raise NotImplementedError("Only 'values', 'ids' and 'count' queries "
-                              "are supported now")
-
-  return collection, last_modified
+  return json_success_response(collections, last_modified)
 
 
 def init_query_view(app):
