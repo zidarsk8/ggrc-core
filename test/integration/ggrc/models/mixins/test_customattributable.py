@@ -20,7 +20,7 @@ class TestCustomAttributableMixin(integration.ggrc.TestCase):
     """Test normal setting of custom attribute values."""
     prog = ProgramFactory()
     cad1 = CAD(definition_type="program", title="CA 1",)
-    cad3 = CAD(definition_type="program", title="CA 3",)
+    cad2 = CAD(definition_type="program", title="CA 2",)
 
     prog = prog.__class__.query.get(prog.id)
 
@@ -30,7 +30,7 @@ class TestCustomAttributableMixin(integration.ggrc.TestCase):
     )
     val2 = models.CustomAttributeValue(
         attribute_value="129aaaaaa",
-        custom_attribute=cad3,
+        custom_attribute=cad2,
     )
 
     prog.custom_attribute_values = [val1, val1, val1]
@@ -108,7 +108,7 @@ class TestCustomAttributableMixin(integration.ggrc.TestCase):
     """Test setting custom attribute values dict."""
     prog = ProgramFactory()
     cad1 = CAD(definition_type="program", title="CA 1",)
-    cad3 = CAD(definition_type="program", title="CA 3",)
+    cad2 = CAD(definition_type="program", title="CA 2",)
 
     prog.custom_attribute_values = [
         {
@@ -116,7 +116,7 @@ class TestCustomAttributableMixin(integration.ggrc.TestCase):
             "custom_attribute_id": cad1.id,
         }, {
             "attribute_value": "129aaaaaa",
-            "custom_attribute_id": cad3.id,
+            "custom_attribute_id": cad2.id,
         }
     ]
     db.session.commit()
