@@ -12,7 +12,7 @@ from flask import current_app
 from werkzeug.exceptions import BadRequest
 
 from ggrc.builder import json
-from ggrc.converters.query_helper import QueryHelper
+from ggrc.services.query_helper import QueryAPIQueryHelper
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
@@ -76,7 +76,7 @@ def _process_single_query(query_object):
   # valid types should be: 'values', 'ids', 'count'
   query_type = query_object.get('type', 'values')
   object_type = query_object.get('object_name')
-  query_helper = QueryHelper([query_object])
+  query_helper = QueryAPIQueryHelper([query_object])
 
   last_modified = None
 
