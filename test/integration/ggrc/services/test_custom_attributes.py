@@ -306,6 +306,11 @@ class TestOldApiCompatibility(ProductTestCase):
                 "custom_attribute_definitions":[
                     cad_json,
                 ],
+                "custom_attribute_values": [{
+                    "id": 1,
+                    "href": "/api/custom_attribute_values/1",
+                    "type": "CustomAttributeValues"
+                }],
                 "custom_attributes": {
                     cad.id: "old value",
                 },
@@ -327,6 +332,7 @@ class TestOldApiCompatibility(ProductTestCase):
     ]
 
     response = self._post(product_data)
+    self.assert200(response)
     ca_json = response.json[0][1]["product"]["custom_attribute_values"][0]
     self.assertEqual(ca_json["attribute_value"], "old value")
 
