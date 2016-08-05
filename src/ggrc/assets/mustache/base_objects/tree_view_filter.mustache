@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-  <div class="sticky sticky-header tree-filter"
+  <div class="sticky sticky-header tree-filter {{#if original_list.length}}tree-filter_paging{{/if}}"
        {{#filter_is_hidden}}style="height: 0; margin-bottom: 0;"{{/filter_is_hidden}}
        data-height="42"
        data-margin-bottom="25">
@@ -38,8 +38,12 @@
               <input type="submit" class="btn btn-small btn-info" name="" value="Filter">
             </div>
           </div>
+          <div class="tree-filter__paging-wrap">
+            <div class="tree-filter__paging">
+                <tree-pagination paging="paging"></tree-pagination>
+            </div>
+          </div>
         </div>
-
       </div>
     </div>
   </div>

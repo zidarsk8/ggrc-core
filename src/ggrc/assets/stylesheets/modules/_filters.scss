@@ -11,7 +11,6 @@
 
 .tree-filter {
   margin-bottom: 25px;
-  overflow: hidden;
   &__fluid-wrap {
     position: relative;
   }
@@ -147,12 +146,33 @@
       }
     }
   }
+  &__paging-wrap {
+    display: none;
+  }
   &__filter-people {
     @extend %reset-list;
     float:right;
     li {
       display:inline-block;
       margin-left: 20px;
+    }
+  }
+
+  &.tree-filter_paging {
+    .tree-filter {
+      &__input-wrap {
+        margin-right: 594px;
+      }
+      &__button-wrap {
+        right: 440px;
+      }
+      &__paging-wrap {
+        display: block;
+        position: absolute;
+        width: 440px;
+        right: 0;
+        top: 0;
+      }
     }
   }
 }
