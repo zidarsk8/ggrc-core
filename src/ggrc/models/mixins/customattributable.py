@@ -381,8 +381,8 @@ class CustomAttributable(object):
     return res
 
   def validate_custom_attributes(self):
-    definitions_map = {d.id: d for d in self.custom_attribute_definitions}
+    map_ = {d.id: d for d in self.custom_attribute_definitions}
     for value in self._custom_attribute_values:
-      if not value.custom_attribute:
-        value.custom_attribute = definitions_map.get(value.custom_attribute_id)
+      if not value.custom_attribute and value.custom_attribute_id:
+        value.custom_attribute = map_.get(int(value.custom_attribute_id))
       value.validate()
