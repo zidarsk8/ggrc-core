@@ -3572,7 +3572,6 @@ Example:
    *
    * @param {String} source - Source type
    * @param {String} target - Target type
-   *   validation errors
    * @param {Object} options - a CanJS options argument passed to every helper
    */
   Mustache.registerHelper('is_mappable_type',
