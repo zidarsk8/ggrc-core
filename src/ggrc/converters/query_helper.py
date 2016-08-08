@@ -1,6 +1,8 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""This module contains a class for handling request queries."""
+
 # flake8: noqa
 
 import datetime
@@ -20,13 +22,15 @@ class BadQueryException(Exception):
   pass
 
 
+# pylint: disable=too-few-public-methods
+
 class QueryHelper(object):
 
   """Helper class for handling request queries
 
-  Primary use for this class is to get list of objects or object ids for each
-  object type defined in the query. All objects must pass the query filters
-  if they are defined.
+  Primary use for this class is to get list of object ids for each object type
+  defined in the query. All objects must pass the query filters if they are
+  defined.
 
   query object = [
     {
@@ -61,17 +65,14 @@ class QueryHelper(object):
     }
   ]
 
-  After the query is done (typically by `get` method), the results are appended
-  to each query object:
+  After the query is done (by `get_ids` method), the results are appended to
+  each query object:
 
   query object with results = [
     {
       object_name: search class name,
       (all other object query fields)
-      "count": the number of items returned
-      "total": the number of items filtered before applying "limit"
-      "ids": [ list of filtered objects ids ]
-      "values": [ list of filtered objects themselves ]
+      ids: [ list of filtered objects ids ]
     }
   ]
 
@@ -102,7 +103,7 @@ class QueryHelper(object):
       self.attr_name_map[object_class] = {}
       for key, value in aliases.items():
         filter_by = None
-        if type(value) is dict:
+        if isinstance(value, dict):
           filter_name = value.get("filter_by", None)
           if filter_name is not None:
             filter_by = getattr(object_class, filter_name, None)
@@ -118,7 +119,7 @@ class QueryHelper(object):
           continue
         try:
           attr_id = int(key[11:])
-        except Exception:
+        except (TypeError, ValueError):
           continue
         filter_by = CustomAttributeValue.mk_filter_by_custom(object_class,
                                                              attr_id)
@@ -135,7 +136,7 @@ class QueryHelper(object):
 
   def _clean_filters(self, expression):
     """Prepare the filter expression for building the query."""
-    if not expression or type(expression) != dict:
+    if not expression or not isinstance(expression, dict):
       return
     slugs = expression.get("slugs")
     if slugs:
@@ -143,19 +144,19 @@ class QueryHelper(object):
       ids.extend(self._slugs_to_ids(expression["object_name"], slugs))
       expression["ids"] = ids
     try:
-      expression["ids"] = map(int, expression.get("ids", []))
-    except ValueError as e:
+      expression["ids"] = [int(id_) for id_ in expression.get("ids", [])]
+    except ValueError as error:
       # catch missing relevant filter (undefined id)
       if expression.get("op", {}).get("name", "") == "relevant":
         raise BadQueryException("Invalid relevant filter for {}".format(
                                 expression.get("object_name", "")))
-      raise e
+      raise error
     self._clean_filters(expression.get("left"))
     self._clean_filters(expression.get("right"))
 
   def _expression_keys(self, exp):
-    op = exp.get("op", {}).get("name", None)
-    if op in ["AND", "OR"]:
+    operator = exp.get("op", {}).get("name", None)
+    if operator in ["AND", "OR"]:
       return self._expression_keys(exp["left"]).union(
           self._expression_keys(exp["right"]))
     left = exp.get("left", None)
@@ -166,19 +167,19 @@ class QueryHelper(object):
 
   def _macro_expand_object_query(self, object_query):
     def expand_task_dates(exp):
-      if type(exp) is not dict or "op" not in exp:
+      if not isinstance(exp, dict) or "op" not in exp:
         return
-      op = exp["op"]["name"]
-      if op in ["AND", "OR"]:
+      operator = exp["op"]["name"]
+      if operator in ["AND", "OR"]:
         expand_task_dates(exp["left"])
         expand_task_dates(exp["right"])
-      elif type(exp["left"]) in [str, unicode]:
+      elif isinstance(exp["left"], (str, unicode)):
         key = exp["left"]
         if key in ["start", "end"]:
           parts = exp["right"].split("/")
           if len(parts) == 3:
             try:
-              month, day, year = map(int, parts)
+              month, day, year = [int(part) for part in parts]
             except Exception:
               raise BadQueryException(
                   "Date must consist of numbers")
@@ -188,12 +189,12 @@ class QueryHelper(object):
             month, day = parts
             exp["op"] = {"name": u"AND"}
             exp["left"] = {
-                "op": {"name": op},
+                "op": {"name": operator},
                 "left": "relative_" + key + "_month",
                 "right": month,
             }
             exp["right"] = {
-                "op": {"name": op},
+                "op": {"name": operator},
                 "left": "relative_" + key + "_day",
                 "right": day,
             }
@@ -221,39 +222,14 @@ class QueryHelper(object):
     Returns:
       list of dicts: same query as the input with all ids that match the filter
     """
-    return self.get(ids=True)
-
-  def get(self, ids=False, total=False, values=False):
-    """Filter the objects and get their information.
-
-    Updates self.query items with their results.
-
-    Args:
-      ids: if True, provide ids of the filtered objects under ["ids"];
-      total: if True, provide the total number of the filtered objects
-             before "limit" is applied under ["total"];
-      values: if True, provide the filtered objects themselves under ["values"].
-
-    Returns:
-      list of dicts: same query as the input with requested results that match
-                     the filter.
-    """
-    if not (ids or total or values):
-      # no additional info requested, no action required
-      return self.query
     for object_query in self.query:
       objects = self._get_objects(object_query)
-      if total:
-        object_query["total"] = len(objects)
       objects = self._apply_order_by_and_limit(
           objects,
           order_by=object_query.get("order_by"),
           limit=object_query.get("limit"),
       )
-      if values:
-        object_query["values"] = objects
-      if ids:
-        object_query["ids"] = [o.id for o in objects]
+      object_query["ids"] = [o.id for o in objects]
     return self.query
 
   def _get_objects(self, object_query):
@@ -324,7 +300,8 @@ class QueryHelper(object):
       return None
 
     def autocast(o_key, value):
-      if type(o_key) not in [str, unicode]:
+      """Try to guess the type of `value` and parse it from the string."""
+      if not isinstance(o_key, (str, unicode)):
         return value
       key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
       # handle dates
@@ -333,7 +310,7 @@ class QueryHelper(object):
         if isinstance(value, datetime.date):
           return value
         try:
-          month, day, year = map(int, value.split("/"))
+          month, day, year = [int(part) for part in value.split("/")]
           return datetime.date(year, month, day)
         except Exception:
           raise BadQueryException("Field \"{}\" expects a MM/DD/YYYY date"
@@ -342,6 +319,7 @@ class QueryHelper(object):
       return value
 
     def relevant():
+      """Filter by relevant object."""
       query = (self.query[exp["ids"][0]]
                if exp["object_name"] == "__previous__" else exp)
       return object_class.id.in_(
@@ -378,6 +356,10 @@ class QueryHelper(object):
                                                   fields))
 
     def text_search():
+      """Filter by text search.
+
+      The search is done only in fields listed in external `fields` var.
+      """
       existing_fields = self.attr_name_map[object_class]
       text = "%{}%".format(exp["text"])
       p = lambda f: f.ilike(text)
