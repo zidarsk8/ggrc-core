@@ -1,0 +1,41 @@
+{{!
+    Copyright (C) 2016 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<div class="attachment-modal {{modalCls}}">
+    <div class="modal-header">
+        <h4>{{modifiedField.modalTitleText}}</h4>
+        <a class="modal-dismiss" can-click="hide">
+            <i class="fa fa-times black"></i>
+        </a>
+    </div>
+    <form class="modal-body attachment-modal__body">
+        <div class="attachment-modal__field">
+            <h6 class="attachment-modal__field-title">{{modifiedField.fieldTitleText}}</h6>
+            <div class="attachment-modal__field-value">
+                {{#if isPerson}}
+                    <person-info person-obj="modifiedField.value"></person-info>
+                {{else}}
+                    <assessment-read-more text="modifiedField.value"></assessment-read-more>
+                {{/if}}
+            </div>
+        </div>
+        <div class="attachment-modal__controls">
+          {{#comment}}
+              <assessment-add-comment instance="instance" state="state"></assessment-add-comment>
+          {{/comment}}
+          {{#evidence}}
+              <assessment-attachments-list class="attachment-list" source_mapping="instance" parent_instance="instance"></assessment-attachments-list>
+          {{/evidence}}
+        </div>
+    </form>
+    <div class="modal-footer">
+        <div class="row-fluid">
+            <div class="confirm-buttons">
+                <a class="attachment-modal__btn-close" can-click="hide">Close</a>
+                <button class="btn btn-small btn-success" {{#state.empty}}disabled{{/state.empty}} can-click="saveAttachments">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="attachment-modal__overlay {{modalOverlayCls}}"></div>

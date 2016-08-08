@@ -3,9 +3,13 @@
 
 """Module containing comment model and comment related mixins."""
 
+from sqlalchemy import orm
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.models.computed_property import computed_property
+from ggrc.models.deferred import deferred
+from ggrc.models.revision import Revision
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
 from ggrc.models.object_document import Documentable
@@ -77,12 +81,93 @@ class Comment(Relatable, Described, Documentable, Ownable, Base, db.Model):
   __tablename__ = "comments"
 
   assignee_type = db.Column(db.String)
+  revision_id = deferred(db.Column(
+      db.Integer,
+      db.ForeignKey('revisions.id', ondelete='SET NULL'),
+      nullable=True,
+  ), 'Comment')
+  revision = db.relationship(
+      'Revision',
+      uselist=False,
+  )
+  custom_attribute_definition_id = deferred(db.Column(
+      db.Integer,
+      db.ForeignKey('custom_attribute_definitions.id', ondelete='SET NULL'),
+      nullable=True,
+  ), 'Comment')
+  custom_attribute_definition = db.relationship(
+      'CustomAttributeDefinition',
+      uselist=False,
+  )
 
   # REST properties
   _publish_attrs = [
       "assignee_type",
+      "custom_attribute_revision",
+  ]
+
+  _update_attrs = [
+      "assignee_type",
+      "custom_attribute_revision_upd",
   ]
 
   _sanitize_html = [
       "description",
   ]
+
+  @classmethod
+  def eager_query(cls):
+    query = super(Comment, cls).eager_query()
+    return query.options(
+        orm.joinedload('revision'),
+        orm.joinedload('custom_attribute_definition')
+           .undefer_group('CustomAttributeDefinition_complete'),
+    )
+
+  @computed_property
+  def custom_attribute_revision(self):
+    """Get the historical value of the relevant CA value."""
+    if not self.revision:
+      return None
+    revision = self.revision.content
+    cav_stored_value = revision['attribute_value']
+    cad = self.custom_attribute_definition
+    return {
+        'custom_attribute': {
+            'id': cad.id if cad else None,
+            'title': cad.title if cad else 'DELETED DEFINITION',
+        },
+        'custom_attribute_stored_value': cav_stored_value,
+    }
+
+  def custom_attribute_revision_upd(self, value):
+    """Create a Comment-CA mapping with current CA value stored."""
+    ca_revision_dict = value.get('custom_attribute_revision_upd')
+    if not ca_revision_dict:
+      return
+    ca_val_dict = self._get_ca_value(ca_revision_dict)
+
+    ca_val_id = ca_val_dict['id']
+    ca_val_revision = Revision.query.filter_by(
+        resource_type='CustomAttributeValue',
+        resource_id=ca_val_id,
+        action='created',
+    ).one()
+
+    self.revision_id = ca_val_revision.id
+    self.custom_attribute_definition_id = ca_val_revision.content.get(
+        'custom_attribute_id',
+    )
+
+  @staticmethod
+  def _get_ca_value(ca_revision_dict):
+    """Get CA value dict from json and do a basic validation."""
+    ca_val_dict = ca_revision_dict.get('custom_attribute_value')
+    if not ca_val_dict:
+      raise ValueError("CA value expected under "
+                       "'custom_attribute_value': {}"
+                       .format(ca_revision_dict))
+    if not ca_val_dict.get('id'):
+      raise ValueError("CA value id expected under 'id': {}"
+                       .format(ca_val_dict))
+    return ca_val_dict

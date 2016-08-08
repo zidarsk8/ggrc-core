@@ -69,6 +69,11 @@ class CustomAttributeValue(Base, db.Model):
     Args:
         value: model instance
     """
+    if value is None:
+      # We get here if "attribute_object" does not get resolved.
+      # TODO: make sure None value can be set for removing CA attribute object
+      # value
+      return
     self.attribute_object_id = value.id
     return setattr(self, self._attribute_object_attr, value)
 
