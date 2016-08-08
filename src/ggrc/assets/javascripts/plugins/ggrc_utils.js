@@ -119,9 +119,9 @@
      *
      * @param {String} type - Type of object we want to
      *                      get list of mappable objects for
-     * @param {Object} options - accepts:
-     *        {Array} whitelist - list of added objects
-     *        {Array} forbidden - list blacklisted objects
+     * @param {Object} options - Options
+     *   @param {Array} options.whitelist - List of objects that will always appear
+     *   @param {Array} options.forbidden - List of objects that will always be removed
      *
      * @return {Array} - List of mappable objects
      */
