@@ -80,6 +80,12 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     DATE = "Date"
     MAP = "Map"
 
+  class MultiChoiceMandatoryFlags(object):
+    """Enum representing flags in multi_choice_mandatory bitmaps."""
+    # pylint: disable=too-few-public-methods
+    COMMENT_REQUIRED = 0b01
+    EVIDENCE_REQUIRED = 0b10
+
   VALID_TYPES = {
       "Text": "Text",
       "Rich Text": "Rich Text",

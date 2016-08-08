@@ -1,10 +1,13 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-import names
+"""This module contains object generation utilities."""
+
+import datetime
 import random
 import string
-import datetime
+
+import names
 
 from ggrc import db
 from ggrc import models
@@ -14,24 +17,28 @@ from ggrc_basic_permissions import models as permissions_models
 from integration.ggrc import api_helper
 
 
-class Generator():
+class Generator(object):
   """Generator base class."""
 
   def __init__(self):
     self.api = api_helper.Api()
     self.resource = common.Resource()
 
-  def random_str(self, length=8,
+  @staticmethod
+  def random_str(length=8,
                  chars=string.ascii_uppercase + string.digits + "  _.-"):
     return ''.join(random.choice(chars) for _ in range(length))
 
-  def random_date(self, start=datetime.date.today(), end=None):
+  @staticmethod
+  def random_date(start=datetime.date.today(), end=None):
+    """Generate a random date between start and end."""
     if not end or start > end:
       end = start + datetime.timedelta(days=7)
     return start + datetime.timedelta(
         seconds=random.randint(0, int((end - start).total_seconds())))
 
   def generate(self, obj_class, obj_name=None, data=None):
+    """Generate `obj_class` instance with fields populated from `data`."""
     if obj_name is None:
       obj_name = obj_class._inflector.table_plural
     if data is None:
@@ -49,6 +56,7 @@ class Generator():
     return response, response_obj
 
   def modify(self, obj, obj_name, data):
+    """Make a PUT request to modify `obj` with new fields in `data`."""
     obj_class = obj.__class__
     response = self.api.put(obj, data)
     response_obj = None
@@ -69,7 +77,8 @@ class ObjectGenerator(Generator):
   such as model_posted, model_put and model_deleted.
   """
 
-  def create_stub(self, obj):
+  @staticmethod
+  def create_stub(obj):
     return {
         "id": obj.id,
         "href": "/api/{}/{}".format(obj._inflector.table_name, obj.id),
@@ -77,6 +86,7 @@ class ObjectGenerator(Generator):
     }
 
   def generate_object(self, obj_class, data=None):
+    """Generate an object of `obj_class` with fields from `data`."""
     if data is None:
       data = {}
     obj_name = obj_class._inflector.table_singular
@@ -149,6 +159,7 @@ class ObjectGenerator(Generator):
     return response, comment_
 
   def generate_user_role(self, person, role):
+    """Generate a mapping between `role` and `person`."""
     data = {
         "user_role": {
             "context": None,
@@ -158,7 +169,10 @@ class ObjectGenerator(Generator):
     }
     return self.generate(permissions_models.UserRole, "user_role", data)
 
-  def generate_person(self, data={}, user_role=None):
+  def generate_person(self, data=None, user_role=None):
+    """Generate a person with fields from `data` and with an optional role."""
+    if data is None:
+      data = {}
     obj_name = 'person'
     name = names.get_full_name()
     default = {
@@ -179,6 +193,7 @@ class ObjectGenerator(Generator):
     return response, person
 
   def generate_random_objects(self, count=5):
+    """Generate `count` objects of random types."""
     random_objects = []
     classes = [
         models.Control,
@@ -189,11 +204,12 @@ class ObjectGenerator(Generator):
     ]
     for _ in range(count):
       obj_class = random.choice(classes)
-      response, obj = self.generate_object(obj_class)
+      _, obj = self.generate_object(obj_class)
       random_objects.append(obj)
     return random_objects
 
   def generate_random_people(self, count=5, **kwargs):
+    """Generate `count` random people."""
     random_people = []
     for _ in range(count):
       _, person = self.generate_person(**kwargs)
@@ -202,6 +218,7 @@ class ObjectGenerator(Generator):
     return random_people
 
   def generate_notification_setting(self, user_id, notif_type, enable_flag):
+    """Generate notification setting for user `user_id` of `notif_type`."""
     obj_name = "notification_config"
     data = {
         obj_name: {
@@ -215,6 +232,7 @@ class ObjectGenerator(Generator):
     return self.generate(models.NotificationConfig, obj_name, data)
 
   def generate_custom_attribute(self, definition_type, **kwargs):
+    """Generate a CA definition of `definition_type`."""
     obj_name = "custom_attribute_definition"
     data = {
         obj_name: {
@@ -232,4 +250,22 @@ class ObjectGenerator(Generator):
         }
     }
     data[obj_name].update(kwargs)
-    self.generate(models.CustomAttributeDefinition, obj_name, data)
+    return self.generate(models.CustomAttributeDefinition, obj_name, data)
+
+  def generate_custom_attribute_value(self, custom_attribute_id, attributable,
+                                      **kwargs):
+    """Generate a CA value in `attributable` for CA def with certain id."""
+    obj_name = "custom_attribute_value"
+    data = {
+        obj_name: {
+            "title": kwargs.get("title", self.random_str()),
+            "custom_attribute_id": custom_attribute_id,
+            "attributable_type": attributable.__class__.__name__,
+            "attributable_id": attributable.id,
+            "attribute_value": kwargs.get("attribute_value"),
+            # "attribute_object": not implemented
+            "context": {"id": None},
+        },
+    }
+    data[obj_name].update(kwargs)
+    return self.generate(models.CustomAttributeValue, obj_name, data)
