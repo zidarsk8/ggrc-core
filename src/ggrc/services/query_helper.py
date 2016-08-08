@@ -3,8 +3,6 @@
 
 """This module contains special query helper class for query API."""
 
-from datetime import datetime
-
 from ggrc.builder import json
 from ggrc.converters.query_helper import QueryHelper
 
@@ -81,9 +79,7 @@ class QueryAPIQueryHelper(QueryHelper):
   @staticmethod
   def _get_last_modified(model, objects):
     """Get the time of last update of an object in the list."""
-    if not objects:
+    if not objects or not hasattr(model, "updated_at"):
       return None
-    elif hasattr(model, "updated_at"):
-      return max(obj.updated_at for obj in objects)
     else:
-      return datetime.now()
+      return max(obj.updated_at for obj in objects)

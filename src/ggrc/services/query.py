@@ -3,7 +3,6 @@
 
 """This module contains logic to handle '/query' endpoint."""
 
-from datetime import datetime
 import time
 from wsgiref.handlers import format_date_time
 
@@ -39,13 +38,13 @@ def get_last_modified(model, objects):
 
 def json_success_response(response_object, last_modified=None, status=200):
   """Build a 200-response with metadata headers."""
-  if last_modified is None:
-    last_modified = datetime.now()
   headers = [
-      ('Last-Modified', http_timestamp(last_modified)),
       ('Etag', etag(response_object)),
       ('Content-Type', 'application/json'),
   ]
+  if last_modified is not None:
+    headers.append(('Last-Modified', http_timestamp(last_modified)))
+
   return current_app.make_response(
       (as_json(response_object), status, headers),
   )
@@ -62,7 +61,9 @@ def get_objects_by_query():
   query_helper = QueryAPIQueryHelper(query)
   results = query_helper.get_results()
 
-  last_modified = None
+  last_modified_list = [result["last_modified"] for result in results
+                        if result["last_modified"]]
+  last_modified = max(last_modified_list) if last_modified_list else None
   collections = []
   collection_fields = ["ids", "values", "count", "total"]
 
@@ -82,9 +83,6 @@ def get_objects_by_query():
         }
     )
     collections.append(collection)
-
-  if last_modified is None:
-    last_modified = datetime.now()
 
   return json_success_response(collections, last_modified)
 
