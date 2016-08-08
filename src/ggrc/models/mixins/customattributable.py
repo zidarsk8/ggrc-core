@@ -5,12 +5,15 @@
 
 import collections
 
+from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import orm
 from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import foreign
 from sqlalchemy.orm import relationship
+from werkzeug.exceptions import BadRequest
 
 from ggrc import db
 from ggrc import utils
@@ -18,70 +21,12 @@ from ggrc.models.reflection import AttributeInfo
 
 
 class CustomAttributable(object):
+  """Custom Attributable mixin."""
 
-  @declared_attr
-  def custom_attribute_values(self):
-    """Load custom attribute values"""
-    from ggrc.models.custom_attribute_value import CustomAttributeValue
-
-    def join_function():
-      return and_(
-          foreign(CustomAttributeValue.attributable_id) == self.id,
-          foreign(CustomAttributeValue.attributable_type) == self.__name__)
-    return relationship(
-        "CustomAttributeValue",
-        primaryjoin=join_function,
-        backref='{0}_custom_attributable'.format(self.__name__),
-        cascade='all, delete-orphan',
-    )
-
-  def insert_definition(self, definition):
-    """Insert a new custom attribute definition into database
-
-    Args:
-      definition: dictionary with field_name: value
-    Returns:
-      Nothing.
-    """
-    from ggrc.models.custom_attribute_definition \
-        import CustomAttributeDefinition
-    field_names = AttributeInfo.gather_create_attrs(
-        CustomAttributeDefinition)
-
-    data = {fname: definition.get(fname) for fname in field_names}
-    data["definition_type"] = self._inflector.table_singular
-    cad = CustomAttributeDefinition(**data)
-    db.session.add(cad)
-
-  def process_definitions(self, definitions):
-    """
-    Process custom attribute definitions
-
-    If present, delete all related custom attribute definition and insert new
-    custom attribute definitions in the order provided.
-
-    Args:
-      definitions: Ordered list of custom attribute definitions
-    Returns:
-      Nothing
-    """
-    from ggrc.models.custom_attribute_definition \
-        import CustomAttributeDefinition as CADef
-
-    if not hasattr(self, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
-      return
-
-    if self.id is not None:
-      db.session.query(CADef).filter(
-          CADef.definition_id == self.id,
-          CADef.definition_type == self._inflector.table_singular
-      ).delete()
-      db.session.commit()
-
-    for definition in definitions:
-      if "_pending_delete" in definition and definition["_pending_delete"]:
-        continue
-      self.insert_definition(definition)
+  _publish_attrs = ['custom_attribute_values', 'custom_attribute_definitions']
+  _update_attrs = ['custom_attribute_values', 'custom_attributes']
+  _include_links = ['custom_attribute_values', 'custom_attribute_definitions']
+  _update_raw = ['custom_attribute_values']
 
   @declared_attr
   def custom_attribute_definitions(self):
@@ -90,6 +35,7 @@ class CustomAttributable(object):
         import CustomAttributeDefinition
 
     def join_function():
+      """Object and CAD join function."""
       definition_id = foreign(CustomAttributeDefinition.definition_id)
       definition_type = foreign(CustomAttributeDefinition.definition_type)
       return and_(or_(definition_id == self.id, definition_id.is_(None)),
@@ -129,19 +75,169 @@ class CustomAttributable(object):
         order_by="CustomAttributeDefinition.id"
     )
 
-  def custom_attributes(self, attributes):
+  @declared_attr
+  def _custom_attribute_values(self):
+    """Load custom attribute values"""
+    from ggrc.models.custom_attribute_value import CustomAttributeValue
+
+    def join_function():
+      return and_(
+          foreign(CustomAttributeValue.attributable_id) == self.id,
+          foreign(CustomAttributeValue.attributable_type) == self.__name__)
+    return relationship(
+        "CustomAttributeValue",
+        primaryjoin=join_function,
+        backref='{0}_custom_attributable'.format(self.__name__),
+        cascade='all, delete-orphan',
+    )
+
+  @hybrid_property
+  def custom_attribute_values(self):
+    return self._custom_attribute_values
+
+  @custom_attribute_values.setter
+  def custom_attribute_values(self, values):
+    """Setter function for custom attribute values.
+
+    This setter function accepts 2 kinds of values:
+      - list of custom attributes. This is used on the back-end by developers.
+      - list of dictionaries containing custom attribute values. This is to
+        have a clean API where the front-end can put the custom attribute
+        values into the custom_attribute_values property and the json builder
+        can then handle the attributes just by setting them.
+
+    Args:
+      value: List of custom attribute values or dicts containing json
+        representation of custom attribute values.
+    """
+    if not values:
+      return
+
+    self._values_map = {
+        value.custom_attribute_id or value.custom_attribute.id: value
+        for value in self.custom_attribute_values
+    }
+
+    if isinstance(values[0], dict):
+      self._add_ca_value_dicts(values)
+    else:
+      self._add_ca_values(values)
+
+  def _add_ca_values(self, values):
+    """Add CA value objects to _custom_attributes_values property.
+
+    Args:
+      values: list of CustomAttributeValue models
+    """
+    for new_value in values:
+      existing_value = self._values_map.get(new_value.custom_attribute.id)
+      if existing_value:
+        existing_value.attribute_value = new_value.attribute_value
+        existing_value.attribute_object_id = new_value.attribute_object_id
+      else:
+        new_value.attributable = self
+        self._custom_attribute_values.append(new_value)
+
+  def _add_ca_value_dicts(self, values):
+    """Add CA dict representations to _custom_attributes_values property.
+
+    This adds or updates the _custom_attribute_values with the values in the
+    custom attribute values serialized dictionary.
+
+    Args:
+      values: List of dictionaries that represent custom attribute values.
+    """
+    from ggrc.models.custom_attribute_value import CustomAttributeValue
+
+    for value in values:
+      attr = self._values_map.get(value.get("custom_attribute_id"))
+      if attr:
+        attr.attributable = self
+        attr.attribute_value = value.get("attribute_value")
+        attr.attribute_object_id = value.get("attribute_object_id")
+      elif "custom_attribute_id" in value:
+        self._custom_attribute_values.append(CustomAttributeValue(
+            attributable=self,
+            custom_attribute_id=value.get("custom_attribute_id"),
+            attribute_value=value.get("attribute_value"),
+            attribute_object_id=value.get("attribute_object_id"),
+        ))
+      elif "href" in value:
+        # Ignore setting of custom attribute stubs. Getting here means that the
+        # front-end is not using the API correctly and needs to be updated.
+        current_app.logger.info("Ignoring post/put of custom attribute stubs.")
+      else:
+        raise BadRequest("Bad custom attribute value inserted")
+
+  def insert_definition(self, definition):
+    """Insert a new custom attribute definition into database
+
+    Args:
+      definition: dictionary with field_name: value
+    """
+    from ggrc.models.custom_attribute_definition \
+        import CustomAttributeDefinition
+    field_names = AttributeInfo.gather_create_attrs(
+        CustomAttributeDefinition)
+
+    data = {fname: definition.get(fname) for fname in field_names}
+    data["definition_type"] = self._inflector.table_singular
+    cad = CustomAttributeDefinition(**data)
+    db.session.add(cad)
+
+  def process_definitions(self, definitions):
+    """
+    Process custom attribute definitions
+
+    If present, delete all related custom attribute definition and insert new
+    custom attribute definitions in the order provided.
+
+    Args:
+      definitions: Ordered list of custom attribute definitions
+    """
+    from ggrc.models.custom_attribute_definition \
+        import CustomAttributeDefinition as CADef
+
+    if not hasattr(self, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
+      return
+
+    if self.id is not None:
+      db.session.query(CADef).filter(
+          CADef.definition_id == self.id,
+          CADef.definition_type == self._inflector.table_singular
+      ).delete()
+      db.session.commit()
+
+    for definition in definitions:
+      if "_pending_delete" in definition and definition["_pending_delete"]:
+        continue
+      self.insert_definition(definition)
+
+  def custom_attributes(self, src):
+    """Legacy setter for custom attribute values and definitions.
+
+    This code should only be used for custom attribute definitions until
+    setter for that is updated.
+    """
     from ggrc.fulltext.mysql import MysqlRecordProperty
     from ggrc.models.custom_attribute_value import CustomAttributeValue
     from ggrc.services import signals
 
-    definitions = attributes.get("custom_attribute_definitions")
+    ca_values = src.get("custom_attribute_values")
+    if ca_values and "attribute_value" in ca_values[0]:
+      # This indicates that the new CA API is being used and the legacy API
+      # should be ignored. If we need to use the legacy API the
+      # custom_attribute_values property should contain stubs instead of entire
+      # objects.
+      return
+
+    definitions = src.get("custom_attribute_definitions")
     if definitions:
       self.process_definitions(definitions)
 
-    if 'custom_attributes' not in attributes:
+    attributes = src.get("custom_attributes")
+    if not attributes:
       return
-
-    attributes = attributes['custom_attributes']
 
     old_values = collections.defaultdict(list)
     last_values = dict()
@@ -154,7 +250,7 @@ class CustomAttributable(object):
         CustomAttributeValue.attributable_type == self.__class__.__name__,
         CustomAttributeValue.attributable_id == self.id)).all()
 
-    attr_value_ids = [v.id for v in attr_values]
+    attr_value_ids = [value.id for value in attr_values]
     ftrp_properties = [
         "attribute_value_{id}".format(id=_id) for _id in attr_value_ids]
 
@@ -162,8 +258,9 @@ class CustomAttributable(object):
     # the fact that imports can save multiple values at the time of writing.
     # old_values holds all previous values of attribute, last_values holds
     # chronologically last value.
-    for v in attr_values:
-      old_values[v.custom_attribute_id] += [(v.created_at, v.attribute_value)]
+    for value in attr_values:
+      old_values[value.custom_attribute_id].append(
+          (value.created_at, value.attribute_value))
 
     last_values = {str(key): max(old_vals,
                                  key=lambda (created_at, _): created_at)
@@ -194,8 +291,7 @@ class CustomAttributable(object):
       obj_id = self.id
       new_value = CustomAttributeValue(
           custom_attribute_id=ad_id,
-          attributable_id=obj_id,
-          attributable_type=obj_type,
+          attributable=self,
           attribute_value=attributes[ad_id],
       )
       if definitions[int(ad_id)].attribute_type.startswith("Map:"):
@@ -208,8 +304,8 @@ class CustomAttributable(object):
       # new_value.context_id = cls.context_id
       self.custom_attribute_values.append(new_value)
       if ad_id in last_values:
-        ca, pv = last_values[ad_id]  # created_at, previous_value
-        if pv != attributes[ad_id]:
+        _, previous_value = last_values[ad_id]
+        if previous_value != attributes[ad_id]:
           signals.Signals.custom_attribute_changed.send(
               self.__class__,
               obj=self,
@@ -218,7 +314,7 @@ class CustomAttributable(object):
                   "id": obj_id,
                   "operation": "UPDATE",
                   "value": new_value,
-                  "old": pv
+                  "old": previous_value
               }, service=self.__class__.__name__)
       else:
         signals.Signals.custom_attribute_changed.send(
@@ -230,10 +326,6 @@ class CustomAttributable(object):
                 "operation": "INSERT",
                 "value": new_value,
             }, service=self.__class__.__name__)
-
-  _publish_attrs = ['custom_attribute_values', 'custom_attribute_definitions']
-  _update_attrs = ['custom_attributes']
-  _include_links = ['custom_attribute_definitions']
 
   @classmethod
   def get_custom_attribute_definitions(cls):
@@ -253,9 +345,10 @@ class CustomAttributable(object):
   def eager_query(cls):
     query = super(CustomAttributable, cls).eager_query()
     return query.options(
-        orm.subqueryload('custom_attribute_values'),
         orm.subqueryload('custom_attribute_definitions')
-           .undefer_group('CustomAttributeDefinition_complete')
+           .undefer_group('CustomAttributeDefinition_complete'),
+        orm.subqueryload('_custom_attribute_values')
+           .undefer_group('CustomAttributeValue_complete'),
     )
 
   def log_json(self):
@@ -286,3 +379,10 @@ class CustomAttributable(object):
       res["custom_attributes"] = []
 
     return res
+
+  def validate_custom_attributes(self):
+    map_ = {d.id: d for d in self.custom_attribute_definitions}
+    for value in self._custom_attribute_values:
+      if not value.custom_attribute and value.custom_attribute_id:
+        value.custom_attribute = map_.get(int(value.custom_attribute_id))
+      value.validate()
