@@ -31,17 +31,17 @@
     },
     formatDate: function (date, hideTime) {
       var currentTimezone = moment.tz.guess();
-      var m;
+      var inst;
 
       if (date === undefined || date === null) {
         return '';
       }
 
-      m = moment(new Date(date.isComputed ? date() : date));
+      inst = moment(new Date(date.isComputed ? date() : date));
       if (hideTime === true) {
-        return m.format('MM/DD/YYYY');
+        return inst.format('MM/DD/YYYY');
       }
-      return m.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A z');
+      return inst.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A z');
     },
     getPickerElement: function (picker) {
       return _.find(_.values(picker), function (val) {
@@ -114,7 +114,72 @@
         });
       }
     },
+    /**
+     * Get list of mappable objects for certain type
+     *
+     * @param {String} type - Type of object we want to
+     *                      get list of mappable objects for
+     * @param {Object} options - Options
+     *   @param {Array} options.whitelist - List of objects that will always appear
+     *   @param {Array} options.forbidden - List of objects that will always be removed
+     *
+     * @return {Array} - List of mappable objects
+     */
+    getMappableTypes: function (type, options) {
+      var result;
+      var canonical = GGRC.Mappings.get_canonical_mappings_for(type);
+      var list = GGRC.tree_view.base_widgets_by_type[type];
+      var forbidden;
+      var forbiddenList = {
+        Program: ['Audit'],
+        Audit: ['Assessment', 'Program', 'Request'],
+        Assessment: [],
+        Request: ['Workflow', 'TaskGroup', 'Person', 'Audit'],
+        Person: '*',
+        AssessmentTemplate: '*'
+      };
+      options = options || {};
+      if (!type) {
+        return [];
+      }
+      if (options.forbidden) {
+        forbidden = options.forbidden;
+      } else {
+        forbidden = forbiddenList[type] || [];
+      }
+      result = _.intersection.apply(_, _.compact([_.keys(canonical), list]));
+      if (_.isString(forbidden) && forbidden === '*') {
+        forbidden = [];
+        result = [];
+      }
+      result = _.partial(_.without, result);
+      result = result.apply(result, forbidden);
 
+      if (options.whitelist) {
+        result = _.union(result, options.whitelist);
+      }
+      return result;
+    },
+
+    /**
+     * Determine if two types of models can be mapped
+     *
+     * @param {String} target - the target type of model
+     * @param {String} source - the source type of model
+     * @param {Object} options - accepts:
+     *        {Array} whitelist - list of added objects
+     *        {Array} forbidden - list blacklisted objects
+     *
+     * @return {Boolean} - true if mapping is allowed, false otherwise
+     */
+    isMappableType: function (target, source, options) {
+      var result;
+      if (!target || !source) {
+        return false;
+      }
+      result = this.getMappableTypes(target, options);
+      return _.contains(result, source);
+    },
     /**
      * Determine if `source` is allowed to be mapped to `target`.
      *
@@ -267,9 +332,6 @@
      *   none found.
      */
     get_highest_assignee_role: function (obj, roles) {
-      var currentMax = -1;
-      var highestRole = 'none';
-
       var roleOrder = _.map(
         _.map(obj.class.assignable_list, 'type'),
         _.capitalize);

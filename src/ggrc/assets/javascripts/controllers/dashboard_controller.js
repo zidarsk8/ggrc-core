@@ -445,7 +445,8 @@
       widget.attr({
         internav_icon: icon,
         internav_display: title,
-        spinner: this.options.spinners['#' + $widget.attr('id')]
+        spinner: this.options.spinners['#' + $widget.attr('id')],
+        model: widget_options && widget_options.model
       });
 
       index = this.options.widget_list.length;

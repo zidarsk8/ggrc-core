@@ -54,43 +54,11 @@
       }, []);
       return _.findWhere(types, {value: type});
     },
-    get_forbidden: function (type) {
-      var forbidden = {
-        Program: ['Audit'],
-        Audit: ['Assessment', 'Program', 'Request'],
-        Assessment: [],
-        Request: ['Workflow', 'TaskGroup', 'Person', 'Audit']
-      };
-      if (this.attr('getList')) {
-        return [
-          'AssessmentTemplate',
-          'Assessment',
-          'Audit',
-          'CycleTaskGroupObjectTask',
-          'Request',
-          'TaskGroup',
-          'TaskGroupTask',
-          'Workflow'
-        ];
-      }
-      return forbidden[type] ? forbidden[type] : [];
-    },
-    get_whitelist: function () {
-      var whitelisted = [
-        'TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'
-      ];
-      if (this.attr('getList')) {
-        return [];
-      }
-      return this.attr('search_only') ? whitelisted : [];
-    },
     types: can.compute(function () {
-      var selectorList;
       var object = this.attr('getList') ? 'MultitypeSearch' : this.object;
-      var canonical = GGRC.Mappings.get_canonical_mappings_for(object);
-      var list = GGRC.tree_view.base_widgets_by_type[object];
-      var forbidden = this.get_forbidden(object);
-      var whitelist = this.get_whitelist();
+      var list;
+      var forbidden;
+      var whitelist;
       var groups = {
         all_objects: {
           name: 'All Objects',
@@ -113,18 +81,27 @@
           items: []
         }
       };
-      selectorList = _.intersection.apply(
-        _, _.compact([_.keys(canonical), list]));
 
-      selectorList = _.union(selectorList, whitelist);
+      if (this.attr('getList')) {
+        forbidden = ['AssessmentTemplate', 'Assessment', 'Audit',
+          'CycleTaskGroupObjectTask', 'Request', 'TaskGroup',
+          'TaskGroupTask', 'Workflow'];
+      }
+      if (this.attr('search_only')) {
+        whitelist = ['TaskGroupTask', 'TaskGroup',
+          'CycleTaskGroupObjectTask'];
+      }
+      list = GGRC.Utils.getMappableTypes(object, this.type, {
+        whitelist: whitelist,
+        forbidden: forbidden
+      });
 
-      can.each(selectorList, function (modelName) {
+      can.each(list, function (modelName) {
         var cmsModel;
         var group;
 
         if (!modelName ||
-            !CMS.Models[modelName] ||
-            ~forbidden.indexOf(modelName)) {
+            !CMS.Models[modelName]) {
           return;
         }
 
