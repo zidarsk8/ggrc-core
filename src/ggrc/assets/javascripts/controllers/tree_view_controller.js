@@ -222,9 +222,7 @@ can.Control('CMS.Controllers.TreeLoader', {
       return undefined;  // controller has been destroyed
     }
 
-    if (!this.options.original_list) {
-      this.options.attr('original_list', list);
-    }
+    this.options.attr('original_list', list);
     this.options.attr('list', []);
     this.on();
 
@@ -386,8 +384,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     },
     fields: [],
     sort_property: null,
-    sort_direction: null,
-    sort_by: null,
+    sortDirection: null,
+    sortBy: null,
     sortable: true,
     filter: null,
     start_expanded: false, // true
@@ -401,7 +399,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     // example child option:
     // { property: "controls", model: CMS.Models.Control, }
     // { parent_find_param: "system_id" ... }
-    scroll_page_count: 0.5, // pages above and below viewport
+    scroll_page_count: 1, // pages above and below viewport
     is_subtree: false
   },
   do_not_propagate: [
@@ -689,6 +687,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
                 }.bind(this)
             );
 
+            can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
+                          'click',
+                          this.sort.bind(this)
+                         );
             can.bind.call(this.element.parent().find('.set-tree-attrs'),
                           'click',
                           this.set_tree_attrs.bind(this)
@@ -960,8 +962,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     }
     toRender[0].draw_node();
     setTimeout(function () {
-      this.renderStep(toRender.slice(1), count);
-    }.bind(this), 0);
+      renderStep(toRender.slice(1), count);
+    }, 0);
   },
   _last_scroll_top: 0,
 
@@ -1187,6 +1189,14 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     if (this._add_child_lists_id) {
       this._add_child_lists_id += 1;
     }
+
+    CMS.Models.Relationship.unbind('created', this.onCreatedRS);
+    CMS.Models[this.options.model.shortName].unbind('created',
+      this.onCreated);
+    CMS.Models.Relationship.unbind('destroyed', this.onDestroyedRS);
+    CMS.Models[this.options.model.shortName].unbind('destroyed',
+      this.onDestroyedModel);
+
     return false;
   },
 
@@ -1194,7 +1204,81 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     if (this.options.original_list) {
       setTimeout(this.reload_list.bind(this), 0);
     }
+
+    this.onCreatedRS = this.onCreatedRS.bind(this);
+    this.onCreatedModel = this.onCreatedModel.bind(this);
+    this.onDestroyedRS = this.onDestroyedRS.bind(this);
+    this.onDestroyedModel = this.onDestroyedModel.bind(this);
+
+    CMS.Models.Relationship.bind('created', this.onCreatedRS);
+    CMS.Models[this.options.model.shortName].bind('created',
+      this.onCreatedModel);
+    CMS.Models.Relationship.bind('destroyed', this.onDestroyedRS);
+    CMS.Models[this.options.model.shortName].bind('destroyed',
+      this.onDestroyedModel);
+
     return false;
+  },
+
+  _verifyRelationship: function (instance) {
+    var self = this;
+    var props = ['destination', 'source'];
+    var typeChecking = _.reduce(props, function (result, prop) {
+      return result || self.options.model.shortName === instance[prop].type;
+    }, false);
+
+    return typeChecking;
+  },
+
+  onCreatedRS: function (ev, instance) {
+    if (instance instanceof CMS.Models.Relationship &&
+      this._verifyRelationship(instance)) {
+      this.options.parent_instance.on('change', function cb() {
+        this.options.parent_instance.unbind('change', cb);
+        this.onCreated();
+      }.bind(this));
+    }
+  },
+
+  onCreatedModel: function (ev, instance) {
+    if (instance instanceof CMS.Models[this.options.model.shortName]) {
+      this.onCreated();
+    }
+  },
+
+  onCreated: _.debounce(function () {
+    this.options.attr('sortDirection', 'desc');
+    this.options.attr('sortBy', 'updated_at');
+    this.options.attr('paging.current', 1);
+    this.refreshList();
+  }),
+
+  onDestroyedRS: function (ev, instance) {
+    if (instance instanceof CMS.Models.Relationship &&
+      this._verifyRelationship(instance)) {
+      this.onDestroyed();
+    }
+  },
+
+  onDestroyedModel: function (ev, instance) {
+    if (instance instanceof CMS.Models[this.options.model.shortName]) {
+      this.onDestroyed();
+    }
+  },
+
+  onDestroyed: function () {
+    var current;
+    if (this.options.attr('original_list').length === 1) {
+      current = this.options.attr('paging.current');
+      this.options.attr('paging.current', current > 1 ? current - 1 : 1);
+    }
+    this.refreshList();
+    // TODO: This is a workaround. We need to update communication between
+    //       info-pin and tree views through Observer
+    if (!this.element.closest('.cms_controllers_info_pin').length) {
+      $('.cms_controllers_info_pin').control().unsetInstance();
+    }
+    this.show_info_pin();
   },
 
   '.edit-object modal:success': function (el, ev, data) {
@@ -1301,8 +1385,12 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     can.each(this.options.display_attr_list, function (item) {
       attr_to_save.push(item.attr_name);
     });
-    this.display_prefs.setTreeViewHeaders(this.options.model.model_singular, attr_to_save);
+    this.display_prefs.setTreeViewHeaders(this.options.model.model_singular,
+      attr_to_save);
     this.display_prefs.save();
+
+    can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
+      'click',this.sort.bind(this));
   },
 
   set_tree_display_list: function (ev) {
@@ -1351,21 +1439,52 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       this.options.parent_instance.id + '#';
     var first = (paging.current - 1) * paging.pageSize;
     var last = paging.current * paging.pageSize;
-    // var sortBy = this.options.sort_by;
-    // var sortDirection = this.options.sort_direction === 'asc';
-    return [{
+    var sortBy = this.options.sortBy;
+    var sortDirection = this.options.sortDirection === 'desc';
+    var params = {
       object_name: this.options.model.shortName,
       limit: [first, last],
       filters: GGRC.query_parser.join_queries(
         GGRC.query_parser.parse(relevantFilter || ''),
         GGRC.query_parser.parse(filter || '')
       )
-    }];
+    };
+
+    if (sortBy) {
+      params.order_by = [{name: sortBy, desc: sortDirection}];
+    }
+
+    return [params];
+  },
+
+  sort: function (event) {
+    var $el = $(event.currentTarget);
+    var key = $el.data('field');
+    var order;
+
+    if (key !== this.options.sortBy) {
+      this.options.sortDirection = null;
+    }
+
+    order = this.options.sortDirection === 'asc' ? 'desc' : 'asc';
+
+    this.options.sortDirection = order;
+    this.options.sortBy = key;
+
+    $el.closest('.tree-header')
+        .find('.widget-col-title')
+        .removeClass('asc')
+        .removeClass('desc');
+
+    $el.addClass(order);
+
+    this.options.attr('paging.current', 1);
+    this.refreshList();
   },
 
   filter: function (filterString) {
     this.options.attr('filter', filterString);
-    this.options.paging.attr('current', 1);
+    this.options.attr('paging.current', 1);
     this.refreshList();
   },
 
@@ -1375,8 +1494,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
     return loader.load({data: this._buildRequestParams()})
       .then(function (data) {
-        this.options.paging.attr('total', data.total);
-        this.options.paging.attr('count',
+        this.options.attr('paging.total', data.total);
+        this.options.attr('paging.count',
           Math.ceil(data.total / this.options.paging.pageSize));
         return data.values;
       }.bind(this));
@@ -1394,44 +1513,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       if (oldVal !== newVal && _.contains(['current', 'pageSize'], type)) {
         this.refreshList();
       }
-    }),
-  _verifyRelationship: function (instance) {
-    var self = this;
-    var props = ['destination', 'source'];
-    var typeChecking = _.reduce(props, function (result, prop) {
-      return result || self.options.model.shortName === instance[prop].type;
-    }, false);
-
-    return typeChecking && $(this.element).is(':visible');
-  },
-  '{can.Model.Cacheable} created': function (model, ev, instance) {
-    var isNewRelationship = instance instanceof CMS.Models.Relationship &&
-      this._verifyRelationship(instance);
-    var isNewCurrModel = this.options.model.shortName === model.shortName;
-    if (isNewRelationship) {
-      this.options.parent_instance.on('change', function cb() {
-        this.options.parent_instance.unbind('change', cb);
-        this.refreshList();
-      }.bind(this));
-    } else if (isNewCurrModel) {
-      this.refreshList();
-    }
-  },
-  '{can.Model.Cacheable} destroyed': function (model, ev, instance) {
-    var isDestroyedRelationship = instance instanceof CMS.Models.Relationship &&
-      this._verifyRelationship(instance);
-    var isDestroyedCurrModel = this.options.model.shortName === model.shortName;
-    if (isDestroyedRelationship || isDestroyedCurrModel) {
-      this.options.paging.attr('current', 1);
-      this.refreshList();
-      // TODO: This is a workaround. We need to update communication between
-      //       info-pin and tree views through Observer
-      if (!this.element.closest('.cms_controllers_info_pin').length) {
-        $('.cms_controllers_info_pin').control().unsetInstance();
-      }
-      this.show_info_pin();
-    }
-  }
+    })
 });
 
 can.Control('CMS.Controllers.TreeViewNode', {

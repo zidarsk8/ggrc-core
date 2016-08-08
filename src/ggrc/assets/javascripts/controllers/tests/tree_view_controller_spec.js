@@ -140,61 +140,26 @@ describe('CMS.Controllers.TreeView', function () {
       method = Ctrl.prototype._verifyRelationship.bind(ctrlInst);
     });
 
-    describe('Hidden tab', function () {
-      beforeEach(function () {
-        spyOn($.fn, 'is').and.returnValue(false);
-      });
+    it('wrong relationship', function () {
+      var result;
 
-      it('wrong relationship', function () {
-        var result;
+      relationship.source = {type: 'bar'};
+      relationship.destination = {type: 'baz'};
 
-        relationship.source = {type: 'bar'};
-        relationship.destination = {type: 'baz'};
+      result = method(relationship);
 
-        result = method(relationship);
-
-        expect(result).toBeFalsy();
-      });
-
-      it('right relationship', function () {
-        var result;
-
-        relationship.source = {type: 'bar'};
-        relationship.destination = {type: 'foo'};
-
-        result = method(relationship);
-
-        expect(result).toBeFalsy();
-        // expect(result).toBeTruthy();
-      });
+      expect(result).toBeFalsy();
     });
 
-    describe('Visible tab', function () {
-      beforeEach(function () {
-        spyOn($.fn, 'is').and.returnValue(true);
-      });
+    it('right relationship', function () {
+      var result;
 
-      it('wrong relationship', function () {
-        var result;
+      relationship.source = {type: 'bar'};
+      relationship.destination = {type: 'foo'};
 
-        relationship.source = {type: 'bar'};
-        relationship.destination = {type: 'baz'};
+      result = method(relationship);
 
-        result = method(relationship);
-
-        expect(result).toBeFalsy();
-      });
-
-      it('right relationship', function () {
-        var result;
-
-        relationship.source = {type: 'bar'};
-        relationship.destination = {type: 'foo'};
-
-        result = method(relationship);
-
-        expect(result).toBeTruthy();
-      });
+      expect(result).toBeTruthy();
     });
   });
 });
