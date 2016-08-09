@@ -98,6 +98,25 @@ class TestServices(services.TestCase):
         original_headers['Etag'], response.headers['Etag'])
     self.assertEqual('baz', response.json['services_test_mock_model']['foo'])
 
+  def test_put_value_error(self):
+    """Test response code for put request with value errors."""
+    mock = self.mock_model(foo='buzz')
+    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
+    obj = response.json
+    obj['services_test_mock_model']['validated'] = 'Value Error'
+    url = urlparse(obj['services_test_mock_model']['selfLink']).path
+    original_headers = dict(response.headers)
+    response = self.client.put(
+        url,
+        data=json.dumps(obj),
+        headers=self.headers(
+            ('If-Unmodified-Since', original_headers['Last-Modified']),
+            ('If-Match', original_headers['Etag']),
+        ),
+        content_type='application/json',
+    )
+    self.assertEqual(response.status_code, 400)
+
   def test_put_bad_request(self):
     mock = self.mock_model(foo='tough')
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())

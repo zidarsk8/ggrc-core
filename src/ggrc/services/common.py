@@ -734,10 +734,10 @@ class Resource(ModelView):
             return self.delete(*args, **kwargs)
           else:
             raise NotImplementedError()
-        except (IntegrityError, ValidationError) as err:
+        except (IntegrityError, ValidationError, ValueError) as err:
           message = translate_message(err)
           current_app.logger.warn(message)
-          return (message, 403, [])
+          return (message, 400, [])
         except Exception as err:
           current_app.logger.exception(err)
           raise
