@@ -42,7 +42,11 @@
     {{/defer}}
     {{/with_mapping}}
     {{/if_equals}}
-    <span class="entry-author">Modified by {{#using person=instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}} on {{date instance.created_at}}</span>
+    <span class="entry-author">
+      Modified by
+      {{#using person=instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}}
+      {{#if instance.created_at}}on {{date instance.created_at}}{{/if}}
+    </span>
   </div>
   <div class="entry-actions pull-right">
     <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
