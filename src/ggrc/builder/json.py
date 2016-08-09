@@ -10,6 +10,7 @@ from datetime import datetime
 
 import iso8601
 import sqlalchemy
+from flask import g
 from sqlalchemy.ext.associationproxy import AssociationProxy
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.properties import RelationshipProperty
@@ -252,7 +253,9 @@ class UpdateAttrHandler(object):
       rel_obj = json_obj.get(attr_name)
       if rel_obj:
         try:
-          # FIXME: Should this be .one() instead of .first() ?
+          cache = getattr(g, "referenced_objects", {})
+          if rel_class in cache:
+            return cache.get(rel_class, {}).get(rel_obj[u'id'])
           return db.session.query(rel_class).filter(
               rel_class.id == rel_obj[u'id']).first()
         except TypeError:
