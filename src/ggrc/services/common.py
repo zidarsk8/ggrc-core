@@ -12,6 +12,7 @@ import itertools
 import json
 import logging
 import time
+from collections import defaultdict
 from exceptions import TypeError
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
@@ -19,6 +20,7 @@ from urllib import urlencode
 from blinker import Namespace
 from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
+from flask import g
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import tuple_
@@ -1211,6 +1213,29 @@ class Resource(ModelView):
         db.session.expunge_all()
         raise Forbidden()
 
+  def _gather_referenced_objects(self, data, accomulator=None):
+    if accomulator is None:
+      accomulator = defaultdict(set)
+    if isinstance(data, list):
+      for value in data:
+        self._gather_referenced_objects(value, accomulator)
+    elif isinstance(data, dict):
+      if "type" in data and data.get("id"):
+        accomulator[data["type"]].add(data["id"])
+      for value in data.values():
+        self._gather_referenced_objects(value, accomulator)
+    return accomulator
+
+  def _build_request_stub_cache(self, data):
+    objects = self._gather_referenced_objects(data)
+    g.referenced_objects = {}
+    for class_name, ids in objects.items():
+      class_ = getattr(ggrc.models, class_name, None)
+      if hasattr(class_, "query"):
+        g.referenced_objects[class_] = {
+            obj.id: obj for obj in class_.query.filter(class_.id.in_(ids))
+        }
+
   def collection_post_loop(self, body, res, no_result, running_async):
     """Handle all posted objects.
 
@@ -1313,6 +1338,8 @@ class Resource(ModelView):
         body = [body]
       res = []
       with benchmark("collection post > body loop: {}".format(len(body))):
+        with benchmark("Build stub query cache"):
+          self._build_request_stub_cache(body)
         try:
           self.collection_post_loop(body, res, no_result, running_async)
         except (IntegrityError, ValidationError, ValueError) as e:
@@ -1323,6 +1350,8 @@ class Resource(ModelView):
           current_app.logger.warn("Collection POST commit failed:")
           current_app.logger.exception(e)
           db.session.rollback()
+        if hasattr(g, "referenced_objects"):
+          delattr(g, "referenced_objects")
       with benchmark("collection post > calculate response statuses"):
         headers = {"Content-Type": "application/json"}
         errors = []
