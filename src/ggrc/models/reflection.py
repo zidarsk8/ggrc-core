@@ -284,6 +284,9 @@ class AttributeInfo(object):
         ca_type = cls.Type.CUSTOM
       attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title)
 
+      definition_ids = definitions.get(attr_name, {}).get("definition_ids", [])
+      definition_ids.append(attr.id)
+
       definitions[attr_name] = {
           "display_name": attr.title,
           "attr_name": attr.title,
@@ -291,6 +294,7 @@ class AttributeInfo(object):
           "unique": False,
           "description": "",
           "type": ca_type,
+          "definition_ids": definition_ids,
       }
     return definitions
 
