@@ -46,9 +46,10 @@
       var scope = this.scope;
       var personId = scope.attr('personId');
       var person = scope.attr('personObj');
-      var noPerson = person && _.isEmpty(person.serialize());
+      var noPerson = _.isEmpty(
+        person && person.serialize ? person.serialize() : person);
 
-      if (noPerson && _.isNaN(personId)) {
+      if (noPerson && isNaN(personId)) {
         console.warn('`personObj` or `personId` are missing');
         return;
       }
@@ -64,7 +65,7 @@
         return;
       }
 
-      if (_.isNaN(personId) || personId <= 0) {
+      if (isNaN(personId) || personId <= 0) {
         personId = person.attr('id');
       }
 
