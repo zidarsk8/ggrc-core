@@ -107,6 +107,20 @@ describe('GGRC.Components.personItem', function () {
         expect(component.scope.attr('personObj')).toBe(fetchedPerson);
       }
     );
+    it('does not make a get request when person-id is undefined',
+      function () {
+        spyOn(console, 'warn');
+        template = can.view
+          .mustache('<person-info person-id=""></person-info>');
+        frag = template();
+
+        frag = $(frag);
+        component = frag.find('person-info').control();
+
+        expect(CMS.Models.Person.findOne).not.toHaveBeenCalled();
+        expect(console.warn).toHaveBeenCalled();
+      }
+    );
   });
 
   describe('unmap person click event handler', function () {
