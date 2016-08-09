@@ -24,6 +24,7 @@
        *  total: {Number}, - total amount of elements
        *  count: {Number}, - total amount of pages
        *  pageSizeSelect: {Array} - array of numbers that used for pageSize popover
+       *  inProgress: {Boolean} - true if frontend doesn't finish request to the server otherwise false
        * }
        */
       if (!this.scope.attr('paging')) {
@@ -35,36 +36,46 @@
        * Gets value from input and after validation set it to paging.current
        * @param {Object} object - paging object
        * @param {Object} input - DOM element
+       * @param {Object} event - DOM event
        */
-      setCurrentPage: function (object, input) {
-        var _value = parseInt(input.val(), 10);
-        var _page = Math.min(Math.max(_value, 1) || 1, this.paging.count);
+      setCurrentPage: function (object, input, event) {
+        var _value;
+        var _page;
+        event.stopPropagation();
+        if (!this.paging.attr('inProgress')) {
+          _value = parseInt(input.val(), 10);
+          _page = Math.min(Math.max(_value, 1) || 1, this.paging.count);
 
-        this.paging.attr('current', _page);
+          this.paging.attr('current', _page);
+        }
         input.val('');
         input.blur();
       },
       changePageSize: function (size) {
-        this.paging.attr('pageSize', size);
-        this.paging.attr('current', 1);
+        if (!this.paging.attr('inProgress')) {
+          this.paging.attr('pageSize', size);
+          this.paging.attr('current', 1);
+        }
       },
       setLastPage: function () {
-        if (this.paging.current < this.paging.count) {
+        if (this.paging.current < this.paging.count &&
+          !this.paging.attr('inProgress')) {
           this.paging.attr('current', this.paging.count);
         }
       },
       setFirstPage: function () {
-        if (this.paging.current > 1) {
+        if (this.paging.current > 1 && !this.paging.attr('inProgress')) {
           this.paging.attr('current', 1);
         }
       },
       setPrevPage: function () {
-        if (this.paging.current > 1) {
+        if (this.paging.current > 1 && !this.paging.attr('inProgress')) {
           this.paging.attr('current', this.paging.current - 1);
         }
       },
       setNextPage: function () {
-        if (this.paging.current < this.paging.count) {
+        if (this.paging.current < this.paging.count &&
+          !this.paging.attr('inProgress')) {
           this.paging.attr('current', this.paging.current + 1);
         }
       }
