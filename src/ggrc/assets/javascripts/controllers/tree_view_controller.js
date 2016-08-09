@@ -162,7 +162,7 @@ can.Control('CMS.Controllers.TreeLoader', {
     var tracker_stop = GGRC.Tracker.start(
           'TreeView', 'display', this.options.model.shortName);
     // TODO: Currently Query API doesn't support CustomAttributable.
-    var isCustomAttr = this.options.model.shortName === 'CustomAttributable';
+    var isCustomAttr = /CustomAttr/.test(this.options.model.shortName);
     var isTreeView = this instanceof CMS.Controllers.TreeView;
     // Use Query API only for first tier in TreeViewController
     var loader = !isTreeView || isCustomAttr ||
@@ -602,6 +602,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     this.element.closest('.widget').on('widget_shown', this.widget_shown.bind(this));
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       var allowed;
+      // TODO: Currently Query API doesn't support CustomAttributable.
+      var isCustomAttr = /CustomAttr/.test(this.options.model.shortName);
 
       this.display_prefs = display_prefs;
       this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
@@ -610,6 +612,11 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
       this.options.attr('is_subtree',
         this.element && this.element.closest('.inner-tree').length > 0);
+
+      if (!this.options.attr('is_subtree') && !isCustomAttr) {
+        this.page_loader = new GGRC.ListLoaders.TreePageLoader(this.options.model,
+          this.options.parent_instance, this.options.mapping);
+      }
 
       if ('parent_instance' in opts && 'status' in opts.parent_instance) {
         setAllowMapping = function () {
@@ -626,7 +633,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       }
 
       if (this.element.parent().length === 0 || // element not attached
-          this.element.data('disable-lazy-loading')) { // comment list
+          this.element.data('disable-lazy-loading') || // comment list
+          !this.options.attr('is_subtree')) {
         this.options.disable_lazy_loading = true;
       }
 
@@ -1489,10 +1497,9 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   },
 
   loadPage: function () {
-    var loader = new GGRC.ListLoaders.TreePageLoader(this.options.model,
-      this.options.parent_instance, this.options.mapping);
+    this._draw_list_deferred = false;
 
-    return loader.load({data: this._buildRequestParams()})
+    return this.page_loader.load({data: this._buildRequestParams()})
       .then(function (data) {
         this.options.attr('paging.total', data.total);
         this.options.attr('paging.count',
@@ -1562,6 +1569,15 @@ can.Control('CMS.Controllers.TreeViewNode', {
     }
     this._draw_node_deferred = new $.Deferred();
 
+    if (this.options.child_options) {
+      this.options.child_options.each(function (option) {
+        option.attr({
+          parent: this,
+          parent_instance: this.options.instance
+        });
+      }.bind(this));
+    }
+
     // this timeout is required because the invoker will access the control via
     // the element synchronously so we must not replace the element just yet
     setTimeout(function () {
@@ -1606,14 +1622,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
     // the node's isActive state is not stored anywhere, thus we need to
     // determine it from the presemce of the corresponding CSS class
     isActive = this.element.hasClass('active');
-    if (this.options.child_options) {
-      this.options.child_options.each(function (option) {
-        option.attr({
-          parent: this,
-          parent_instance: this.options.instance
-        });
-      }.bind(this));
-    }
+
     can.view(
       this.options.show_view,
       this.options,
