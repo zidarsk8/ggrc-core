@@ -188,16 +188,31 @@
       {{/if_helpers}}
       {{/using}}
       {{/using}}
-    {{!#prune_context}} {{! this line is just chopping the context stack down to one element}}
-        {{#options.child_options.0}}
-        <div class="row-fluid wrap-row">
-          <div class="span12">
-            <h6>Comments ({{list.length}})</h6>
-            <ul class="entry-list" data-disable-lazy-loading="true" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}></ul>
-          </div>
+
+      <div class="row-fluid wrap-row">
+        <div class="span12">
+          {{#with_mapping_count instance 'cycle_task_entries'}}
+            {{#count}}
+              <h6>Comments ({{count}})</h6>
+              <mapping-tree-view
+                parent-instance="instance"
+                mapping="instance.class.info_pane_options.comments.mapping"
+                item-template="instance.class.info_pane_options.comments.show_view"
+                tree-view-class="tree-structure new-tree mapped-objects-tree">
+              </mapping-tree-view>
+            {{/count}}
+            {{^count}}
+              <h6>Comments</h6>
+              No comments.
+            {{/count}}
+          {{/with_mapping_count}}
+
+          <ul class="add-task-comment">
+            {{{render '/static/mustache/cycle_task_entries/tree_footer.mustache' parent_instance=instance}}}
+          </ul>
         </div>
-        {{/options.child_options.0}}
-    {{!/prune_context}}
+      </div>
+
     </div>
   </section>
 {{/instance}}

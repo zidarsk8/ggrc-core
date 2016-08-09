@@ -3,33 +3,32 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-
 (function (can) {
+  var _mustachePath;
+  var overdueCompute;
 
-  var _mustache_path,
-    overdue_compute;
-
-  overdue_compute = can.compute(function (val) {
+  overdueCompute = can.compute(function (val) {
+    var date;
     if (this.attr('status') === 'Verified') {
       return '';
     }
-    var date = moment(this.attr('next_due_date') || this.attr('end_date'));
-    if(date && date.isBefore(new Date())) {
+    date = moment(this.attr('next_due_date') || this.attr('end_date'));
+    if (date && date.isBefore(new Date())) {
       return 'overdue';
     }
     return '';
   });
 
-  function refresh_attr(instance, attr) {
+  function refreshAttr(instance, attr) {
     if (instance.attr(attr).reify().selfLink) {
       instance.attr(attr).reify().refresh();
     }
   }
 
-  function refresh_attr_wrap(attr) {
+  function refreshAttrWrap(attr) {
     return function (ev, instance) {
       if (instance instanceof this) {
-        refresh_attr(instance, attr);
+        refreshAttr(instance, attr);
       }
     };
   }
@@ -75,7 +74,7 @@
     });
   }
 
-  _mustache_path = GGRC.mustache_path + '/cycles';
+  _mustachePath = GGRC.mustache_path + '/cycles';
   can.Model.Cacheable('CMS.Models.Cycle', {
     root_object: 'cycle',
     root_collection: 'cycles',
@@ -94,8 +93,8 @@
     },
 
     tree_view_options: {
-      show_view: _mustache_path + '/tree.mustache',
-      header_view: _mustache_path + '/tree_header.mustache',
+      show_view: _mustachePath + '/tree.mustache',
+      header_view: _mustachePath + '/tree_header.mustache',
       draw_children: true,
       child_options: [
         {
@@ -108,16 +107,17 @@
     init: function () {
       var that = this;
       this._super.apply(this, arguments);
-      this.bind('created', refresh_attr_wrap('workflow').bind(this));
+      this.bind('created', refreshAttrWrap('workflow').bind(this));
       this.bind('destroyed', function (ev, inst) {
-        if(inst instanceof that) {
-          can.each(inst.cycle_task_groups, function (cycle_task_group) {
-            if (!cycle_task_group) {
+        if (inst instanceof that) {
+          can.each(inst.cycle_task_groups, function (cycleTaskGroup) {
+            if (!cycleTaskGroup) {
               return;
             }
-            cycle_task_group = cycle_task_group.reify();
-            can.trigger(cycle_task_group, 'destroyed');
-            can.trigger(cycle_task_group.constructor, 'destroyed', cycle_task_group);
+            cycleTaskGroup = cycleTaskGroup.reify();
+            can.trigger(cycleTaskGroup, 'destroyed');
+            can.trigger(
+              cycleTaskGroup.constructor, 'destroyed', cycleTaskGroup);
           });
         }
       });
@@ -128,32 +128,37 @@
       this._super.apply(this, arguments);
       this.bind('status', function (ev, newVal) {
         if (newVal === 'Verified') {
-          new RefreshQueue().enqueue(this.workflow.reify()).trigger().then(function (wfs) {
-            return wfs[0].get_binding('owners').refresh_instances();
-          }).then(function (wf_owner_bindings) {
-            var current_user = CMS.Models.get_instance('Person',
-                                                       GGRC.current_user.id);
-            if(~can.inArray(
-              current_user,
-              can.map(wf_owner_bindings, function (wf_owner_binding) {
-                return wf_owner_binding.instance;
-              })
-            )) {
-              that.refresh().then(function () {
-                if(that.attr('is_current')) {
-                  that.attr('is_current', false);
-                  that.save();
-                }
-              });
-            }
-          });
+          new RefreshQueue().enqueue(this.workflow.reify())
+            .trigger()
+            .then(function (wfs) {
+              return wfs[0].get_binding('owners').refresh_instances();
+            })
+            .then(function (wfOwnerBindings) {
+              var currentUser = CMS.Models.get_instance(
+                'Person', GGRC.current_user.id);
+              if (
+                ~can.inArray(
+                  currentUser,
+                  can.map(wfOwnerBindings, function (wfOwnerBinding) {
+                    return wfOwnerBinding.instance;
+                  })
+                )
+              ) {
+                that.refresh().then(function () {
+                  if (that.attr('is_current')) {
+                    that.attr('is_current', false);
+                    that.save();
+                  }
+                });
+              }
+            });
         }
       });
     },
-    overdue: overdue_compute
+    overdue: overdueCompute
   });
 
-  _mustache_path = GGRC.mustache_path + '/cycle_task_entries';
+  _mustachePath = GGRC.mustache_path + '/cycle_task_entries';
   can.Model.Cacheable('CMS.Models.CycleTaskEntry', {
     root_object: 'cycle_task_entry',
     root_collection: 'cycle_task_entries',
@@ -174,20 +179,20 @@
     },
 
     tree_view_options: {
-      show_view: _mustache_path + '/tree.mustache',
-      footer_view: _mustache_path + '/tree_footer.mustache',
+      show_view: _mustachePath + '/tree.mustache',
+      footer_view: _mustachePath + '/tree_footer.mustache',
       child_options: [{
         // 0: Documents
         model: 'Document',
         mapping: 'documents',
-        show_view: _mustache_path + '/documents.mustache',
-        footer_view: _mustache_path + '/documents_footer.mustache'
+        show_view: _mustachePath + '/documents.mustache',
+        footer_view: _mustachePath + '/documents_footer.mustache'
       }]
     },
     init: function () {
       this._super.apply(this, arguments);
       this.bind('created',
-        refresh_attr_wrap('cycle_task_group_object_task').bind(this));
+        refreshAttrWrap('cycle_task_group_object_task').bind(this));
       this.validateNonBlank('description');
     }
   }, {
@@ -207,8 +212,7 @@
     }
   });
 
-
-  _mustache_path = GGRC.mustache_path + '/cycle_task_groups';
+  _mustachePath = GGRC.mustache_path + '/cycle_task_groups';
   can.Model.Cacheable('CMS.Models.CycleTaskGroup', {
     root_object: 'cycle_task_group',
     root_collection: 'cycle_task_groups',
@@ -229,8 +233,7 @@
 
     tree_view_options: {
       sort_property: 'sort_index',
-      show_view: _mustache_path + '/tree.mustache',
-      // footer_view: _mustache_path + "/tree_footer.mustache",
+      show_view: _mustachePath + '/tree.mustache',
       draw_children: true,
       child_options: [
         {
@@ -249,8 +252,9 @@
       this.validateNonBlank('contact');
       this.validateContact(['_transient.contact', 'contact']);
       this.bind('updated', function (ev, instance) {
+        var dfd;
         if (instance instanceof that) {
-          var dfd = instance.refresh_all_force('cycle', 'workflow');
+          dfd = instance.refresh_all_force('cycle', 'workflow');
           dfd.then(function () {
             return $.when(
               instance.refresh_all_force('related_objects'),
@@ -260,7 +264,7 @@
         }
       });
       this.bind('destroyed', function (ev, inst) {
-        if(inst instanceof that) {
+        if (inst instanceof that) {
           can.each(inst.cycle_task_group_tasks, function (ctgt) {
             if (!ctgt) {
               return;
@@ -273,10 +277,10 @@
       });
     }
   }, {
-    overdue: overdue_compute
+    overdue: overdueCompute
   });
 
-  _mustache_path = GGRC.mustache_path + '/cycle_task_group_object_tasks';
+  _mustachePath = GGRC.mustache_path + '/cycle_task_group_object_tasks';
   can.Model.Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     root_object: 'cycle_task_group_object_task',
     root_collection: 'cycle_task_group_object_tasks',
@@ -307,19 +311,47 @@
         model: can.Model.Cacheable,
         mapping: 'info_related_objects',
         show_view: GGRC.mustache_path + '/base_templates/subtree.mustache'
+      },
+      comments: {
+        model: can.Model.Cacheable,
+        mapping: 'cycle_task_entries',
+        show_view: GGRC.mustache_path + '/cycle_task_entries/tree.mustache'
       }
     },
     tree_view_options: {
       sort_property: 'sort_index',
-      show_view: _mustache_path + '/tree.mustache',
+      show_view: _mustachePath + '/tree.mustache',
       attr_list: [
-        {attr_title: 'Title', attr_name: 'title'},
-        {attr_title: 'Workflow', attr_name: 'workflow', attr_sort_field: 'cycle.workflow.title'},
-        {attr_title: 'State', attr_name: 'status'},
-        {attr_title: 'Assignee', attr_name: 'assignee', attr_sort_field: 'contact.name|email'},
-        {attr_title: 'Start Date', attr_name: 'start_date'},
-        {attr_title: 'End Date', attr_name: 'end_date'},
-        {attr_title: 'Last Updated', attr_name: 'updated_at'}
+        {
+          attr_title: 'Title',
+          attr_name: 'title'
+        },
+        {
+          attr_title: 'Workflow',
+          attr_name: 'workflow',
+          attr_sort_field: 'cycle.workflow.title'
+        },
+        {
+          attr_title: 'State',
+          attr_name: 'status'
+        },
+        {
+          attr_title: 'Assignee',
+          attr_name: 'assignee',
+          attr_sort_field: 'contact.name|email'
+        },
+        {
+          attr_title: 'Start Date',
+          attr_name: 'start_date'
+        },
+        {
+          attr_title: 'End Date',
+          attr_name: 'end_date'
+        },
+        {
+          attr_title: 'Last Updated',
+          attr_name: 'updated_at'
+        }
       ],
       display_attr_names: ['title', 'assignee', 'start_date'],
       mandatory_attr_name: ['title'],
@@ -350,13 +382,14 @@
       this.bind('updated', function (ev, instance) {
         if (instance instanceof that) {
           instance.refresh_all_force('related_objects').then(function (object) {
-            return instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
+            return instance.refresh_all_force(
+              'cycle_task_group', 'cycle', 'workflow');
           });
         }
       });
     }
   }, {
-    overdue: overdue_compute,
+    overdue: overdueCompute,
     _workflow: function () {
       return this.refresh_all('cycle', 'workflow').then(function (workflow) {
         return workflow;
@@ -399,8 +432,8 @@
           workflows.then(function (workflowList) {
             if (!workflowList.length) {
               $(document.body).trigger(
-                'ajax:flash'
-                , {warning: 'No Backlog workflows found! Contact your administrator to enable this functionality.'}
+                'ajax:flash',
+                {warning: 'No Backlog workflows found! Contact your administrator to enable this functionality.'}
               );
               return;
             }
@@ -416,41 +449,48 @@
       }
     },
     object: function () {
-      return this.refresh_all('task_group_object', 'object').then(function (object) {
+      return this.refresh_all(
+        'task_group_object', 'object'
+      ).then(function (object) {
         return object;
       });
     },
     response_options_csv: can.compute(function (val) {
-      if(val != null) {
-        this.attr('response_options', $.map(val.split(','), $.proxy(''.trim.call, ''.trim)));
+      if (val != null) {
+        this.attr(
+          'response_options',
+          $.map(val.split(','), $.proxy(''.trim.call, ''.trim))
+        );
       } else {
         return (this.attr('response_options') || []).join(', ');
       }
     }),
 
     selected_response_options_csv: can.compute(function (val) {
-      if(val != null) {
-        this.attr('selected_response_options', $.map(val.split(','), $.proxy(''.trim.call, ''.trim)));
+      if (val != null) {
+        this.attr(
+          'selected_response_options',
+          $.map(val.split(','), $.proxy(''.trim.call, ''.trim))
+        );
       } else {
         return (this.attr('selected_response_options') || []).join(', ');
       }
     }),
 
     get_filter_vals: function () {
-      var filter_vals = can.Model.Cacheable.prototype.get_filter_vals;
+      var filterVals = can.Model.Cacheable.prototype.get_filter_vals;
       var mappings = jQuery.extend({}, this.class.filter_mappings, {
         'task title': 'title'
       });
 
-      var vals = filter_vals.apply(this, [this.class.filter_keys, mappings]);
+      var vals = filterVals.apply(this, [this.class.filter_keys, mappings]);
 
       try {
-        vals['workflows'] = this.cycle.reify().workflow.reify().title;
+        vals.workflows = this.cycle.reify().workflow.reify().title;
       } catch (e) {}
 
       return vals;
     }
 
   });
-
 })(window.can);
