@@ -3,28 +3,46 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+/**
+ * A component that wraps a button for ending a Workflow cycle, and
+ * automatically handles a click on it.
+ *
+ * As a result, the Cycle instance passed to the component is ended, and
+ * a couple of affected objects are refreshed in the process.
+ *
+ * Usage example (state and permission checks not included):
+ *
+ *   <cycle-end-cycle cycle="instance">
+ *       <button>Click to end a Cycle</button>
+ *   </cycle-end-cycle>
+ *
+ */
 (function (GGRC, can) {
   'use strict';
 
-  can.Component.extend({
-    tag: "cycle-end-cycle",
-    template: "<content/>",
+  GGRC.Components('endCycleButtonWrap', {
+    tag: 'cycle-end-cycle',
+    template: '<content/>',
     events: {
-      click: function() {
-        this.scope.cycle.refresh().then(function(cycle) {
-          cycle.attr('is_current', false).save().then(function() {
+      click: function () {
+        this.scope.cycle
+          .refresh()
+          .then(function (cycle) {
+            return cycle.attr('is_current', false).save();
+          })
+          .then(function () {
             return GGRC.page_instance().refresh();
-          }).then(function(){
+          })
+          .then(function () {
             // We need to update person's assigned_tasks mapping manually
-            var person_id = GGRC.current_user.id,
-                person = CMS.Models.Person.cache[person_id];
-                binding = person.get_binding('assigned_tasks');
+            var person = CMS.Models.Person.cache[GGRC.current_user.id];
+            var binding = person.get_binding('assigned_tasks');
 
-            // FIXME: Find a better way of removing stagnant items from the list.
+            // FIXME: Find a better way of removing stagnant
+            // items from the list.
             binding.list.splice(0, binding.list.length);
             return binding.loader.refresh_list(binding);
           });
-        });
       }
     }
   });
