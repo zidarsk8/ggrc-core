@@ -24,7 +24,7 @@
        *  total: {Number}, - total amount of elements
        *  count: {Number}, - total amount of pages
        *  pageSizeSelect: {Array} - array of numbers that used for pageSize popover
-       *  inProgress: {Boolean} - true if frontend doesn't finish request to the server otherwise false
+       *  disabled: {Boolean} - true if frontend doesn't finish request to the server otherwise false
        * }
        */
       if (!this.scope.attr('paging')) {
@@ -42,7 +42,7 @@
         var _value;
         var _page;
         event.stopPropagation();
-        if (!this.paging.attr('inProgress')) {
+        if (!this.paging.attr('disabled')) {
           _value = parseInt(input.val(), 10);
           _page = Math.min(Math.max(_value, 1) || 1, this.paging.count);
 
@@ -52,30 +52,30 @@
         input.blur();
       },
       changePageSize: function (size) {
-        if (!this.paging.attr('inProgress')) {
+        if (!this.paging.attr('disabled')) {
           this.paging.attr('pageSize', size);
           this.paging.attr('current', 1);
         }
       },
       setLastPage: function () {
         if (this.paging.current < this.paging.count &&
-          !this.paging.attr('inProgress')) {
+          !this.paging.attr('disabled')) {
           this.paging.attr('current', this.paging.count);
         }
       },
       setFirstPage: function () {
-        if (this.paging.current > 1 && !this.paging.attr('inProgress')) {
+        if (this.paging.current > 1 && !this.paging.attr('disabled')) {
           this.paging.attr('current', 1);
         }
       },
       setPrevPage: function () {
-        if (this.paging.current > 1 && !this.paging.attr('inProgress')) {
+        if (this.paging.current > 1 && !this.paging.attr('disabled')) {
           this.paging.attr('current', this.paging.current - 1);
         }
       },
       setNextPage: function () {
         if (this.paging.current < this.paging.count &&
-          !this.paging.attr('inProgress')) {
+          !this.paging.attr('disabled')) {
           this.paging.attr('current', this.paging.current + 1);
         }
       }

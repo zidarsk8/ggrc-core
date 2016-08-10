@@ -19,7 +19,7 @@ describe('GGRC.Components.treePagination', function () {
       current: 1,
       pageSize: 10,
       count: 3,
-      inProgress: false
+      disabled: false
     });
   });
 
@@ -67,7 +67,7 @@ describe('GGRC.Components.treePagination', function () {
       });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        scope.paging.attr('inProgress', true);
+        scope.paging.attr('disabled', true);
         scope.paging.attr('current', 3);
         scope.setNextPage();
         expect(scope.paging.current).toEqual(3);
@@ -87,7 +87,7 @@ describe('GGRC.Components.treePagination', function () {
       });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        scope.paging.attr('inProgress', true);
+        scope.paging.attr('disabled', true);
         scope.paging.attr('current', 2);
         scope.setPrevPage();
         expect(scope.paging.current).toEqual(2);
@@ -101,7 +101,7 @@ describe('GGRC.Components.treePagination', function () {
     });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        scope.paging.attr('inProgress', true);
+        scope.paging.attr('disabled', true);
         scope.paging.attr('current', 3);
         scope.setFirstPage();
         expect(scope.paging.current).toEqual(3);
@@ -115,7 +115,7 @@ describe('GGRC.Components.treePagination', function () {
     });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        scope.paging.attr('inProgress', true);
+        scope.paging.attr('disabled', true);
         scope.paging.attr('current', 2);
         scope.setLastPage();
         expect(scope.paging.current).toEqual(2);
@@ -131,7 +131,7 @@ describe('GGRC.Components.treePagination', function () {
     });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        scope.paging.attr('inProgress', true);
+        scope.paging.attr('disabled', true);
         scope.paging.attr('current', 2);
         expect(scope.paging.pageSize).toEqual(10);
         scope.changePageSize(25);
@@ -178,7 +178,7 @@ describe('GGRC.Components.treePagination', function () {
     });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        scope.paging.attr('inProgress', true);
+        scope.paging.attr('disabled', true);
         scope.paging.attr('current', 2);
         input.value = 5;
         scope.setCurrentPage({}, input, event);
