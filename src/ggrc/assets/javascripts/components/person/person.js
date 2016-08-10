@@ -59,7 +59,7 @@
         (person && !person.email)) {
         personModel = CMS.Models.Person.cache[personId || person.id];
         if (personModel) {
-          personModel.reify();
+          personModel = personModel.reify();
         }
       }
 
