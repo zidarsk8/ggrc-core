@@ -18,7 +18,8 @@ describe('GGRC.Components.treePagination', function () {
     scope.paging = new can.Map({
       current: 1,
       pageSize: 10,
-      count: 3
+      count: 3,
+      disabled: false
     });
   });
 
@@ -64,6 +65,13 @@ describe('GGRC.Components.treePagination', function () {
         scope.setNextPage();
         expect(scope.paging.current).toEqual(3);
       });
+    it('doesn\'t change current value if inProgress equal true',
+      function () {
+        scope.paging.attr('disabled', true);
+        scope.paging.attr('current', 3);
+        scope.setNextPage();
+        expect(scope.paging.current).toEqual(3);
+      });
   });
   describe('setPrevPage() method ', function () {
     it('changes current and decrease it by 1', function () {
@@ -77,6 +85,13 @@ describe('GGRC.Components.treePagination', function () {
         scope.setPrevPage();
         expect(scope.paging.current).toEqual(1);
       });
+    it('doesn\'t change current value if inProgress equal true',
+      function () {
+        scope.paging.attr('disabled', true);
+        scope.paging.attr('current', 2);
+        scope.setPrevPage();
+        expect(scope.paging.current).toEqual(2);
+      });
   });
   describe('setFirstPage() method ', function () {
     it('changes current if current more than 1', function () {
@@ -84,6 +99,13 @@ describe('GGRC.Components.treePagination', function () {
       scope.setFirstPage();
       expect(scope.paging.current).toEqual(1);
     });
+    it('doesn\'t change current value if inProgress equal true',
+      function () {
+        scope.paging.attr('disabled', true);
+        scope.paging.attr('current', 3);
+        scope.setFirstPage();
+        expect(scope.paging.current).toEqual(3);
+      });
   });
   describe('setLastPage() method ', function () {
     it('changes current if current less than amount of pages', function () {
@@ -91,6 +113,13 @@ describe('GGRC.Components.treePagination', function () {
       scope.setLastPage();
       expect(scope.paging.current).toEqual(3);
     });
+    it('doesn\'t change current value if inProgress equal true',
+      function () {
+        scope.paging.attr('disabled', true);
+        scope.paging.attr('current', 2);
+        scope.setLastPage();
+        expect(scope.paging.current).toEqual(2);
+      });
   });
   describe('changePageSize() method ', function () {
     it('changes current to first page and page size', function () {
@@ -100,9 +129,19 @@ describe('GGRC.Components.treePagination', function () {
       expect(scope.paging.pageSize).toEqual(25);
       expect(scope.paging.current).toEqual(1);
     });
+    it('doesn\'t change current value if inProgress equal true',
+      function () {
+        scope.paging.attr('disabled', true);
+        scope.paging.attr('current', 2);
+        expect(scope.paging.pageSize).toEqual(10);
+        scope.changePageSize(25);
+        expect(scope.paging.pageSize).toEqual(10);
+        expect(scope.paging.current).toEqual(2);
+      });
   });
   describe('setCurrentPage() method ', function () {
     var input;
+    var event;
     beforeEach(function () {
       input = {
         value: null,
@@ -111,28 +150,39 @@ describe('GGRC.Components.treePagination', function () {
         },
         blur: jasmine.createSpy()
       };
+      event = {
+        stopPropagation: jasmine.createSpy()
+      };
     });
     it('changes current if value more than 1 and less than amount of pages',
       function () {
         input.value = 2;
-        scope.setCurrentPage({}, input);
+        scope.setCurrentPage({}, input, event);
         expect(scope.paging.current).toEqual(2);
       });
     it('changes current to 1 if value less than 1', function () {
       input.value = -1;
-      scope.setCurrentPage({}, input);
+      scope.setCurrentPage({}, input, event);
       expect(scope.paging.current).toEqual(1);
     });
     it('changes current to last if value more than amount of pages',
       function () {
         input.value = 5;
-        scope.setCurrentPage({}, input);
+        scope.setCurrentPage({}, input, event);
         expect(scope.paging.current).toEqual(3);
       });
     it('changes current to 1 if value is NaN', function () {
       input.value = 'test word';
-      scope.setCurrentPage({}, input);
+      scope.setCurrentPage({}, input, event);
       expect(scope.paging.current).toEqual(1);
     });
+    it('doesn\'t change current value if inProgress equal true',
+      function () {
+        scope.paging.attr('disabled', true);
+        scope.paging.attr('current', 2);
+        input.value = 5;
+        scope.setCurrentPage({}, input, event);
+        expect(scope.paging.current).toEqual(2);
+      });
   });
 });
