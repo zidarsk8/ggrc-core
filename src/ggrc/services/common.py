@@ -734,10 +734,10 @@ class Resource(ModelView):
             return self.delete(*args, **kwargs)
           else:
             raise NotImplementedError()
-        except (IntegrityError, ValidationError) as err:
+        except (IntegrityError, ValidationError, ValueError) as err:
           message = translate_message(err)
           current_app.logger.warn(message)
-          return (message, 403, [])
+          return (message, 400, [])
         except Exception as err:
           current_app.logger.exception(err)
           raise
@@ -1274,10 +1274,10 @@ class Resource(ModelView):
 
   @staticmethod
   def _make_error_from_exception(exc):
-    """Return a 403-code with the exception message."""
+    """Return a 400-code with the exception message."""
     message = translate_message(exc)
     current_app.logger.warn(message)
-    return (403, message)
+    return (400, message)
 
   def collection_post(self):  # noqa
     with benchmark("collection post"):
@@ -1312,7 +1312,7 @@ class Resource(ModelView):
       with benchmark("collection post > body loop: {}".format(len(body))):
         try:
           self.collection_post_loop(body, res, no_result, running_async)
-        except (IntegrityError, ValidationError) as e:
+        except (IntegrityError, ValidationError, ValueError) as e:
           res.append(self._make_error_from_exception(e))
           db.session.rollback()
         except Exception as e:

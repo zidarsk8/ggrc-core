@@ -1,12 +1,16 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+import random
+
+from sqlalchemy.orm import validates
+
 import ggrc
 import ggrc.builder
 import ggrc.services
-import random
 from ggrc import db
 from ggrc.models.mixins import Base
+from ggrc.models.exceptions import ValidationError
 from ggrc.services.common import Resource
 from integration.ggrc import TestCase as BaseTestCase
 
@@ -21,14 +25,23 @@ def reset_first_request_flag():
   ggrc.app.app._got_first_request = False
 
 
-class ServicesTestMockModel(Base, ggrc.db.Model):
+class ServicesTestMockModel(Base, db.Model):
   __tablename__ = 'test_model'
   foo = db.Column(db.String)
   code = db.Column(db.String, unique=True)
+  validated = db.Column(db.String, nullable=True)
+
+  @validates('validated')
+  def validate_status(self, key, value):
+    if value == "Value Error":
+      raise ValueError("raised Value Error")
+    elif value == "Validation Error":
+      raise ValidationError("raised Validation Error")
+    return value
 
   # REST properties
-  _publish_attrs = ['modified_by_id', 'foo', 'code']
-  _update_attrs = ['foo', 'code']
+  _publish_attrs = ['modified_by_id', 'foo', 'code', 'validated']
+  _update_attrs = ['foo', 'code', 'validated']
 
 URL_MOCK_COLLECTION = '/api/mock_resources'
 URL_MOCK_RESOURCE = '/api/mock_resources/{0}'
