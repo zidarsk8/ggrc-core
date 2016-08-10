@@ -136,7 +136,8 @@ class CustomAttributable(object):
         existing_value.attribute_object_id = new_value.attribute_object_id
       else:
         new_value.attributable = self
-        self._custom_attribute_values.append(new_value)
+        # new_value is automatically appended to self._custom_attribute_values
+        # on new_value.attributable = self
 
   def _add_ca_value_dicts(self, values):
     """Add CA dict representations to _custom_attributes_values property.
@@ -156,12 +157,14 @@ class CustomAttributable(object):
         attr.attribute_value = value.get("attribute_value")
         attr.attribute_object_id = value.get("attribute_object_id")
       elif "custom_attribute_id" in value:
-        self._custom_attribute_values.append(CustomAttributeValue(
+        # this is automatically appended to self._custom_attribute_values
+        # on attributable=self
+        CustomAttributeValue(
             attributable=self,
             custom_attribute_id=value.get("custom_attribute_id"),
             attribute_value=value.get("attribute_value"),
             attribute_object_id=value.get("attribute_object_id"),
-        ))
+        )
       elif "href" in value:
         # Ignore setting of custom attribute stubs. Getting here means that the
         # front-end is not using the API correctly and needs to be updated.
