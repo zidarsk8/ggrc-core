@@ -385,7 +385,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
-      sections:'"CMS.Models.get_stubs',
+      sections:'CMS.Models.get_stubs',
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
       start_date: 'date',
       end_date: 'date'
