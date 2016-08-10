@@ -706,7 +706,7 @@
             return;
           }
           return _.any(binding.mappings, function (mapping) {
-            instance = mapping.instance;
+            var instance = mapping.instance;
             if (instance instanceof CMS.Models.Relationship) {
               if (_.exists(instance, "attrs") &&
                   instance.attrs[prop] &&
