@@ -21,6 +21,7 @@ from ggrc.models.computed_property import computed_property
 from ggrc.models.reflection import AttributeInfo
 
 
+# pylint: disable=attribute-defined-outside-init; CustomAttributable is a mixin
 class CustomAttributable(object):
   """Custom Attributable mixin."""
 
@@ -337,6 +338,7 @@ class CustomAttributable(object):
 
   @classmethod
   def get_custom_attribute_definitions(cls):
+    """Get all applicable CA definitions (even ones without a value yet)."""
     from ggrc.models.custom_attribute_definition import \
         CustomAttributeDefinition as cad
     if cls.__name__ == "Assessment":
@@ -351,6 +353,7 @@ class CustomAttributable(object):
 
   @classmethod
   def eager_query(cls):
+    """Define fields to be loaded eagerly to lower the count of DB queries."""
     query = super(CustomAttributable, cls).eager_query()
     query = query.options(
         orm.subqueryload('custom_attribute_definitions')
@@ -395,6 +398,7 @@ class CustomAttributable(object):
     return res
 
   def validate_custom_attributes(self):
+    # pylint: disable=not-an-iterable; we can iterate over relationships
     map_ = {d.id: d for d in self.custom_attribute_definitions}
     for value in self._custom_attribute_values:
       if not value.custom_attribute and value.custom_attribute_id:
@@ -403,10 +407,12 @@ class CustomAttributable(object):
 
   @computed_property
   def preconditions_failed(self):
+    """Returns True if any mandatory CAV, comment or evidence is missing."""
     values_map = {
         cav.custom_attribute_id or cav.custom_attribute.id: cav
         for cav in self.custom_attribute_values
     }
+    # pylint: disable=not-an-iterable; we can iterate over relationships
     for cad in self.custom_attribute_definitions:
       if cad.mandatory:
         cav = values_map.get(cad.id)
