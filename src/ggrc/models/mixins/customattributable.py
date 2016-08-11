@@ -352,12 +352,18 @@ class CustomAttributable(object):
   @classmethod
   def eager_query(cls):
     query = super(CustomAttributable, cls).eager_query()
-    return query.options(
+    query = query.options(
         orm.subqueryload('custom_attribute_definitions')
            .undefer_group('CustomAttributeDefinition_complete'),
         orm.subqueryload('_custom_attribute_values')
            .undefer_group('CustomAttributeValue_complete'),
     )
+    if hasattr(cls, 'comments'):
+      # only for Commentable classess
+      query = query.options(
+          orm.subqueryload('comments'),
+      )
+    return query
 
   def log_json(self):
     """Log custom attribute values."""
