@@ -194,27 +194,27 @@ can.Model.Cacheable("CMS.Models.Event", {
     }
 }, {});
 
-can.Model.Cacheable("CMS.Models.Role", {
-  root_object : "role"
-  , root_collection : "roles"
-  , findAll : "GET /api/roles"
-  , findOne : "GET /api/roles/{id}"
-  , update : "PUT /api/roles/{id}"
-  , destroy : "DELETE /api/roles/{id}"
-  , create : "POST /api/roles"
-  , scopes : [
-        "Private Program",
-        "Workflow",
-        "System"
-    ]
-  , defaults : {
-      permissions: {
-          read: []
-        , update: []
-        , create: []
-        , "delete": []
-      }
+can.Model.Cacheable('CMS.Models.Role', {
+  root_object: 'role',
+  root_collection: 'roles',
+  findAll: 'GET /api/roles',
+  findOne: 'GET /api/roles/{id}',
+  update: 'PUT /api/roles/{id}',
+  destroy: 'DELETE /api/roles/{id}',
+  create: 'POST /api/roles',
+  scopes: [
+    'Private Program',
+    'Workflow',
+    'System'
+  ],
+  defaults: {
+    permissions: {
+      read: [],
+      update: [],
+      create: [],
+      delete: []
     }
+  }
 }, {
 
   allowed : function(operation, object_or_class) {

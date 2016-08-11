@@ -196,23 +196,27 @@
   }, {
     save: function () {
       var role;
-      if (!this.role && this.role_name) {
-        role = _.find(CMS.Models.Role.cache, {name: this.role_name});
-        if (role) {
-          this.attr('role', role.stub());
-          return this._super.apply(this, arguments);
-        }
-        return CMS.Models.Role.findAll({
-          name__in: this.role_name
-        }).then(function (roles) {
-          if (roles.length < 1) {
-            return new $.Deferred().reject('Role not found');
-          }
-          this.attr('role', roles[0].stub());
-          return this._super.apply(this, arguments);
-        }.bind(this));
+      var _super = this._super;
+
+      if (this.role && !this.role_name) {
+        return _super.apply(this, arguments);
       }
-      return this._super.apply(this, arguments);
+
+      role = _.find(CMS.Models.Role.cache, {name: this.role_name});
+      if (role) {
+        this.attr('role', role.stub());
+        return _super.apply(this, arguments);
+      }
+      return CMS.Models.Role.findAll({
+        name__in: this.role_name
+      }).then(function (role) {
+        if (!role.length) {
+          return new $.Deferred().reject('Role not found');
+        }
+        role = role[0];
+        this.attr('role', role.stub());
+        return _super.apply(this, arguments);
+      }.bind(this));
     }
   });
 
