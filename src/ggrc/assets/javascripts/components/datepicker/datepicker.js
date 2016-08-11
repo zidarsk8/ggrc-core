@@ -16,7 +16,6 @@
       date: null,
       format: '@',
       helptext: '@',
-      testId: '@',
       isShown: false,
       pattern: 'MM/DD/YYYY',
       setMinDate: null,
