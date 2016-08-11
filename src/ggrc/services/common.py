@@ -1252,6 +1252,10 @@ class Resource(ModelView):
     with benchmark("Update memcache before commit for collection POST"):
       update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
+    with benchmark("Serialize objects"):
+      for obj in objects:
+        object_for_json = {} if no_result else self.object_for_json(obj)
+        res.append((201, object_for_json))
     with benchmark("Commit collection"):
       db.session.commit()
     with benchmark("Update index"):
@@ -1266,11 +1270,6 @@ class Resource(ModelView):
         # Note: In model_posted_after_commit necessary mapping and
         # relationships are set, so need to commit the changes
       db.session.commit()
-
-    with benchmark("Serialize objects"):
-      for obj in objects:
-        object_for_json = {} if no_result else self.object_for_json(obj)
-        res.append((201, object_for_json))
 
   @staticmethod
   def _make_error_from_exception(exc):
