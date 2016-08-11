@@ -188,6 +188,7 @@
             model: options.model,
             skip_refresh: true
           }, function () {
+            instance.restore(true);
             can.trigger(instance, 'modal:dismiss');
             this.$element
               .find("[data-dismiss='modal'], [data-dismiss='modal-reset']")

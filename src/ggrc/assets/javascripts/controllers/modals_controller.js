@@ -181,6 +181,9 @@ can.Control('GGRC.Controllers.Modals', {
       }, 0);
 
       this.options.instance.attr(path, ui.item);
+      if (!this.options.instance._transient) {
+        this.options.instance.attr('_transient', can.Map());
+      }
       this.options.instance.attr('_transient.' + path, ui.item);
     }
   },
@@ -979,7 +982,6 @@ can.Control('GGRC.Controllers.Modals', {
           && !this.options.skip_refresh
           && !this.options.instance.isNew()) {
         this.options.instance.refresh();
-        this.options.instance.restore(true);
       }
     }
 
