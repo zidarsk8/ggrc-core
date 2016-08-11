@@ -82,17 +82,12 @@ can.Control('CMS.Controllers.TreeLoader', {
   init_spinner: function () {
     var spinner;
     var $spinner;
-    var $spinner_li;
     var $footer;
+    var $wrapper;
+    var spinnerTopOffset = '40%';
+    var elementOffset = $(window).height() - this.element.offset().top;
 
     if (this.element) {
-      // Only show the spinner if this is the last subtree
-      // FIXME: This spinner will disappear when this list is completely
-      //   loaded, even if other lists are still pending.
-      if (this.element.next().length > 0) {
-        return;
-      }
-
       $footer = this.element.children('.tree-item-add').first();
       spinner = new Spinner({
         radius: 4,
@@ -100,21 +95,31 @@ can.Control('CMS.Controllers.TreeLoader', {
         width: 2
       }).spin();
       $spinner = $(spinner.el);
-      $spinner_li = $('<li class="tree-item-add tree-item tree-spinner" />');
-      $spinner_li.append($spinner);
+      $wrapper = $('<div class="tree-spinner"/>');
+      if (!this.element.next().length) {
+        $wrapper.css('height', '40px');
+      }
+
+      if (this.element.height() > elementOffset) {
+        spinnerTopOffset = Math.floor(elementOffset / 2) + 'px';
+      }
+
+      $wrapper.append($spinner);
       $spinner.css({
-        display: 'inline-block',
-        paddingLeft: '20px',
-        left: '10px',
-        top: '-4px'
+        display: 'absolute',
+        left: '50%',
+        top: spinnerTopOffset
       });
+
       // Admin dashboard
-      if ($footer.length === 0 && this.element.children('.tree-structure').length > 0) {
-        this.element.children('.tree-structure').append($spinner_li);
+      if ($footer.length === 0 &&
+        this.element.children('.tree-structure').length > 0) {
+        this.element.children('.tree-structure')
+          .addClass('new-tree_loading').append($wrapper);
       } else if ($footer.length === 0) { // My work
-        this.element.append($spinner_li);
+        this.element.addClass('new-tree_loading').append($wrapper);
       } else {
-        $footer.before($spinner_li);
+        $footer.before($wrapper);
       }
     }
   },
@@ -257,6 +262,11 @@ can.Control('CMS.Controllers.TreeLoader', {
     if (this._loading_deferred) {
       this.element.trigger('loaded');
       this.element.find('.tree-spinner').remove();
+      if (this.element.hasClass('new-tree_loading')) {
+        this.element.removeClass('new-tree_loading');
+      } else {
+        this.element.find('.new-tree_loading').removeClass('new-tree_loading');
+      }
       loading_deferred = this._loading_deferred;
       this._loading_deferred = null;
       loading_deferred.resolve();
@@ -326,10 +336,12 @@ can.Control('CMS.Controllers.TreeLoader', {
     } else {
       refreshed_deferred = new $.Deferred().resolve();
     }
-    refreshed_deferred.then(function () {
-      that.insert_items(filtered_items, force_prepare_children);
-      that._ifNotRemoved(that._loading_finished).call(that);
-    });
+    refreshed_deferred
+      .then(function () {
+        return that.insert_items(filtered_items, force_prepare_children);
+      })
+      .then(this._ifNotRemoved(this.proxy('_loading_finished')));
+
     return this._loading_deferred;
   },
 
@@ -338,6 +350,7 @@ can.Control('CMS.Controllers.TreeLoader', {
     var preppedItems = [];
     var idMap = {};
     var toInsert;
+    var dfd;
 
     // Check the list of items to be inserted for any duplicate items.
     can.each(this.options.list || [], function (item) {
@@ -356,8 +369,12 @@ can.Control('CMS.Controllers.TreeLoader', {
 
     if (preppedItems.length > 0) {
       this.options.list.push.apply(this.options.list, preppedItems);
-      this.add_child_lists(preppedItems);
+      dfd = this.add_child_lists(preppedItems);
+    } else {
+      dfd = $.Deferred().resolve();
     }
+
+    return dfd;
   }
 });
 
@@ -380,7 +397,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       total: null,
       pageSize: 10,
       count: null,
-      pageSizeSelect: [10, 25, 50]
+      pageSizeSelect: [10, 25, 50],
+      disabled: false
     },
     fields: [],
     sort_property: null,
@@ -1095,7 +1113,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
             return;
           }
           draw = that._ifNotRemoved(that.draw_items.bind(that));
-          res.resolve(draw(listWindow));
+          draw(listWindow).then(res.resolve);
         }, 0);
         return res;
       });
@@ -1508,12 +1526,17 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       }.bind(this));
   },
   refreshList: _.debounce(function () {
+    this.options.attr('paging.disabled', true);
+    this._loading_started();
     this.loadPage()
       .then(function (data) {
         this.element.children('.cms_controllers_tree_view_node').remove();
         return data;
       }.bind(this))
-      .then(this._ifNotRemoved(this.proxy('draw_list')));
+      .then(this._ifNotRemoved(this.proxy('draw_list')))
+      .then(function () {
+        this.options.attr('paging.disabled', false);
+      }.bind(this));
   }),
   '{paging} change': _.debounce(
     function (object, event, type, action, newVal, oldVal) {

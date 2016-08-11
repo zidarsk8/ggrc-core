@@ -4,7 +4,10 @@
  */
 
 .tree-spinner {
-  position: relative;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  top: 0;
   z-index: zIndex(tree-spinner) !important;
 }
 
@@ -54,6 +57,11 @@ ul.new-tree {
     .item-data {
       padding-left: 0;
     }
+  }
+
+  &.new-tree_loading {
+    opacity: .5;
+    position: relative;
   }
 
   &.event-tree {
