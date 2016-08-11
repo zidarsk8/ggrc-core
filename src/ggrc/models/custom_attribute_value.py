@@ -38,7 +38,7 @@ class CustomAttributeValue(Base, db.Model):
 
   @property
   def attributable_attr(self):
-    return '{0}_attributable'.format(self.attributable_type)
+    return '{0}_custom_attributable'.format(self.attributable_type)
 
   @property
   def attributable(self):
