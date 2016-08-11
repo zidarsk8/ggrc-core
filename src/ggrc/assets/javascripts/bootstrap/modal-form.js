@@ -167,7 +167,7 @@
       var changedInstance;
 
       // If the hide was initiated by the backdrop, check for dirty form data before continuing
-      if (e && $(e.target).is('.modal-backdrop')) {
+      if (e && $(e.target).is('.modal-backdrop,.fa-times')) {
         if ($(e.target).is('.disabled')) {
             // In the case of a disabled modal backdrop, treat it like any other disabled data-dismiss,
             //  i.e. do nothing.
