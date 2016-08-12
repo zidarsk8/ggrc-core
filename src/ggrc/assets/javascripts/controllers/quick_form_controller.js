@@ -47,7 +47,7 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
       setTimeout(function () {
         this.options.instance.save().then(function () {
           var obj = this.options.instance.attr(prop);
-          if (obj && obj.attr) {
+          if (obj.attr) {
             obj.attr("saved", true);
           }
         }.bind(this));
