@@ -54,7 +54,7 @@
               return;
             }
           }
-          if ("background_task" in data) {
+          if ('background_task' in data) {
             return CMS.Models.BackgroundTask.findOne({
               id: data.background_task.id
             }).then(function (task) {
@@ -101,6 +101,8 @@
           }
         });
       });
+
+      bucket.save_responses.length = 0;
     },
 
     _step: function (elem) {
@@ -123,7 +125,7 @@
       };
       if (obj.isNew()) {
         type = obj.constructor.table_singular;
-        bucketName = type + (obj.run_in_background ? "_bg" : "");
+        bucketName = type + (obj.run_in_background ? '_bg' : '');
         bucket = this._buckets[bucketName];
 
         if (_.isUndefined(bucket)) {
