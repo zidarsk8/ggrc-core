@@ -2,7 +2,7 @@
     Copyright (C) 2016 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-;(function (can) {
+(function (can) {
   can.Model.Cacheable('CMS.Models.Issue', {
     root_object: 'issue',
     root_collection: 'issues',
@@ -32,7 +32,9 @@
     statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
     init: function () {
-      this._super && this._super.apply(this, arguments);
+      if (this._super) {
+        this._super.apply(this, arguments);
+      }
       this.validateNonBlank('title');
     }
   }, {
