@@ -157,6 +157,12 @@ class CustomAttributable(object):
     from ggrc.models.custom_attribute_value import CustomAttributeValue
 
     for value in values:
+      if not value.get("attribute_object_id"):
+        # value.get("attribute_object", {}).get("id") won't help because
+        # value["attribute_object"] can be None
+        value["attribute_object_id"] = (value["attribute_object"].get("id") if
+                                        value.get("attribute_object") else
+                                        None)
       attr = self._values_map.get(value.get("custom_attribute_id"))
       if attr:
         attr.attributable = self
