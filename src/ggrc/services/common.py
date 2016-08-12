@@ -8,6 +8,7 @@ resources.
 
 import datetime
 import hashlib
+import itertools
 import json
 import logging
 import time
@@ -1222,6 +1223,7 @@ class Resource(ModelView):
 
     with benchmark("Generate objects"):
       objects = []
+      sources = []
       for wrapped_src in body:
         src = self._unwrap_collection_post_src(wrapped_src)
         obj = self._get_model_instance(src, body)
@@ -1234,11 +1236,13 @@ class Resource(ModelView):
 
         obj.modified_by = get_current_user()
         objects.append(obj)
+        sources.append(src)
 
-    with benchmark("Send collection POSTed event"):
-      self.collection_posted.send(obj.__class__, objects=objects)
     with benchmark("Check create permissions"):
       self._check_post_permissions(objects)
+    with benchmark("Send collection POSTed event"):
+      self.collection_posted.send(obj.__class__,
+                                  objects=objects, sources=sources)
     with benchmark("Flush posted objects"):
       db.session.flush()
     with benchmark("Validate custom attributes"):
@@ -1264,7 +1268,7 @@ class Resource(ModelView):
       update_memcache_after_commit(self.request)
 
     with benchmark("Send model POSTed - after commit event"):
-      for obj in objects:
+      for obj, src in itertools.izip(objects, sources):
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
                                             src=src, service=self)
         # Note: In model_posted_after_commit necessary mapping and
