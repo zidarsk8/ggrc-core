@@ -2797,11 +2797,14 @@ Mustache.registerHelper("fadeout", function (delay, prop, options) {
 
   Mustache.registerHelper('current_cycle_assignee',
     function (instance, options) {
-      var mapping = instance.get_mapping('current_approval_cycles');
+      var mapping;
       var approvalCycle;
       var binding;
       var finish;
       var progress;
+
+      instance = Mustache.resolve(instance);
+      mapping = instance.get_mapping('current_approval_cycles');
 
       if (!mapping || !mapping.length) {
         return options.inverse();
@@ -2824,6 +2827,7 @@ Mustache.registerHelper("fadeout", function (delay, prop, options) {
     });
 
 Mustache.registerHelper("with_mapping_count", function (instance, mapping_names, options) {
+  
   var args = can.makeArray(arguments)
     , options = args[args.length-1]  // FIXME duplicate declaration
     , mapping_name
