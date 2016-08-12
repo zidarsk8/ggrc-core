@@ -5,12 +5,17 @@
 
 from collections import namedtuple
 
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy import and_
 from sqlalchemy import or_
+from sqlalchemy import orm
+from sqlalchemy.orm import foreign
 
 from ggrc import db
 from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.reflection import PublishOnly
+from ggrc.models.revision import Revision
 
 
 class CustomAttributeValue(Base, db.Model):
@@ -39,6 +44,36 @@ class CustomAttributeValue(Base, db.Model):
       "Dropdown": lambda self: self._validate_dropdown(),
       "Map:Person": lambda self: self._validate_map_person(),
   }
+
+  @property
+  def latest_revision(self):
+    """Latest revision of CAV (used for comment precondition check)."""
+    # TODO: make eager_query fetch only the first Revision
+    return self._related_revisions[0]
+
+  @declared_attr
+  def _related_revisions(self):
+    def join_function():
+      """Function to join CAV to its latest revision."""
+      resource_id = foreign(Revision.resource_id)
+      resource_type = foreign(Revision.resource_type)
+      return and_(resource_id == self.id,
+                  resource_type == "CustomAttributeValue")
+
+    return db.relationship(
+        Revision,
+        primaryjoin=join_function,
+        viewonly=True,
+        order_by=Revision.created_at.desc(),
+    )
+
+  @classmethod
+  def eager_query(cls):
+    query = super(CustomAttributeValue, cls).eager_query()
+    query = query.options(
+        orm.subqueryload('_related_revisions'),
+    )
+    return query
 
   @property
   def attributable_attr(self):
@@ -272,8 +307,7 @@ class CustomAttributeValue(Base, db.Model):
       comment_found = any(
           self.custom_attribute_id == (comment
                                        .custom_attribute_definition_id) and
-          self.id == comment.revision.resource_id and
-          self.__class__.__name__ == comment.revision.resource_type
+          self.latest_revision.id == comment.revision_id
           for comment in self.attributable.comments
       )
     else:
