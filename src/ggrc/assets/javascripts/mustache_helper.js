@@ -2826,8 +2826,8 @@ Mustache.registerHelper("fadeout", function (delay, prop, options) {
       }, binding.refresh_instances());
     });
 
-Mustache.registerHelper("with_mapping_count", function (instance, mapping_names, options) {
-  
+Mustache.registerHelper('with_mapping_count', function (instance, mapping_names, options) {
+
   var args = can.makeArray(arguments)
     , options = args[args.length-1]  // FIXME duplicate declaration
     , mapping_name
