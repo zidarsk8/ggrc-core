@@ -72,6 +72,7 @@ class CustomAttributeValue(Base, db.Model):
     query = super(CustomAttributeValue, cls).eager_query()
     query = query.options(
         orm.subqueryload('_related_revisions'),
+        orm.joinedload('custom_attribute'),
     )
     return query
 

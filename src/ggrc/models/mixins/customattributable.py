@@ -365,12 +365,16 @@ class CustomAttributable(object):
         orm.subqueryload('custom_attribute_definitions')
            .undefer_group('CustomAttributeDefinition_complete'),
         orm.subqueryload('_custom_attribute_values')
-           .undefer_group('CustomAttributeValue_complete'),
+           .undefer_group('CustomAttributeValue_complete')
+           .subqueryload('{0}_custom_attributable'.format(cls.__name__)),
+        orm.subqueryload('_custom_attribute_values')
+           .subqueryload('_related_revisions'),
     )
     if hasattr(cls, 'comments'):
       # only for Commentable classess
       query = query.options(
-          orm.subqueryload('comments'),
+          orm.subqueryload('comments')
+             .undefer_group('Comment_complete'),
       )
     return query
 
