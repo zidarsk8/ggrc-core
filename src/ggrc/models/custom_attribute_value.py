@@ -320,9 +320,25 @@ class CustomAttributeValue(Base, db.Model):
 
   def _check_mandatory_evidence(self):
     """Check presence of mandatory evidence."""
-    # pylint: disable=no-self-use
-    # not implemented yet
-    return []
+    if hasattr(self.attributable, "object_documents"):
+      # Note: this is a suboptimal implementation of mandatory evidence check;
+      # it should be refactored once Evicence-CA mapping is introduced
+      def evidence_required(cav):
+        """Return True if an evidence is required for this `cav`."""
+        flags = (self._multi_choice_options_to_flags(cav.custom_attribute)
+                 .get(cav.attribute_value))
+        return flags and flags.evidence_required
+      evidence_found = (len(self.attributable.object_documents) >=
+                        len([cav
+                             for cav in self.attributable
+                                            .custom_attribute_values
+                             if evidence_required(cav)]))
+    else:
+      evidence_found = False
+    if not evidence_found:
+      return ["evidence"]
+    else:
+      return []
 
   @staticmethod
   def _multi_choice_options_to_flags(cad):
