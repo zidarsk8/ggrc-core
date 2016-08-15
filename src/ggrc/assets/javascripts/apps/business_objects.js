@@ -833,6 +833,7 @@
             mapping: 'extended_related_assessment_via_search',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
+            add_item_view: null,
             header_view:
               path + '/assessments/tree_header.mustache'
           }
