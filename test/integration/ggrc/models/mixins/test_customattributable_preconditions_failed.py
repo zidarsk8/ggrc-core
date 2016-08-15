@@ -139,6 +139,20 @@ class TestPreconditionsFailed(TestCase):
     self.assertEqual(preconditions_failed, True)
     self.assertEqual(ca.value.preconditions_failed, ["comment"])
 
+  def test_preconditions_failed_with_missing_mandatory_evidence(self):
+    """Preconditions failed if evidence required by CA is missing."""
+    ca = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,evidence_required", "0,2"),
+        value="evidence_required",
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, True)
+    self.assertEqual(ca.value.preconditions_failed, ["evidence"])
+
   def test_preconditions_failed_with_present_mandatory_comment(self):
     """No preconditions failed if comment required by CA is present."""
     ca = CustomAttributeMock(
@@ -172,6 +186,42 @@ class TestPreconditionsFailed(TestCase):
 
     self.assertEqual(preconditions_failed, False)
     self.assertFalse(ca.value.preconditions_failed)
+
+  def test_preconditions_failed_with_present_mandatory_evidence(self):
+    """No preconditions failed if evidence required by CA is present."""
+    ca = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,evidence_required", "0,2"),
+        value="evidence_required",
+    )
+    evidence = factories.DocumentFactory(
+        title="Mandatory evidence",
+    )
+    factories.ObjectDocumentFactory(
+        documentable=self.assessment,
+        document=evidence,
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(ca.value.preconditions_failed)
+
+  def test_preconditions_failed_with_mandatory_comment_and_evidence(self):
+    """Preconditions failed with mandatory comment and evidence missing."""
+    ca = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,comment_and_evidence_required", "0,3"),
+        value="comment_and_evidence_required",
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, True)
+    self.assertEqual(set(ca.value.preconditions_failed),
+                     {"comment", "evidence"})
 
   def test_preconditions_failed_with_changed_value(self):
     """Preconditions failed and comment invalidated on update to CAV."""
@@ -220,3 +270,47 @@ class TestPreconditionsFailed(TestCase):
     preconditions_failed = self.assessment.preconditions_failed
 
     self.assertEqual(preconditions_failed, True)
+
+  def test_preconditions_failed_with_several_mandatory_evidences(self):
+    """Preconditions failed if count(evidences) < count(evidences_required)."""
+    ca1 = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,evidence_required", "0,2"),
+        value="evidence_required"
+    )
+    ca2 = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,evidence_required", "0,2"),
+        value="evidence_required"
+    )
+    # only one evidence provided yet
+    evidence = factories.DocumentFactory(
+        title="Mandatory evidence",
+    )
+    factories.ObjectDocumentFactory(
+        documentable=self.assessment,
+        document=evidence,
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, True)
+    self.assertEqual(ca1.value.preconditions_failed, ["evidence"])
+    self.assertEqual(ca2.value.preconditions_failed, ["evidence"])
+
+    # the second evidence
+    evidence = factories.DocumentFactory(
+        title="Second mandatory evidence",
+    )
+    factories.ObjectDocumentFactory(
+        documentable=self.assessment,
+        document=evidence,
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(ca1.value.preconditions_failed)
+    self.assertFalse(ca2.value.preconditions_failed)
