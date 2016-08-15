@@ -172,3 +172,51 @@ class TestPreconditionsFailed(TestCase):
 
     self.assertEqual(preconditions_failed, False)
     self.assertFalse(ca.value.preconditions_failed)
+
+  def test_preconditions_failed_with_changed_value(self):
+    """Preconditions failed and comment invalidated on update to CAV."""
+    ca = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,comment_required", "0,1"),
+        value=None,  # the value is made with generator to store revision too
+    )
+    _, ca.value = GENERATOR.generate_custom_attribute_value(
+        custom_attribute_id=ca.definition.id,
+        attributable=self.assessment,
+        attribute_value="comment_required",
+    )
+    comment = factories.CommentFactory(
+        assignee_type="Assessor",
+        description="Mandatory comment",
+    )
+    comment.custom_attribute_revision_upd({
+        "custom_attribute_revision_upd": {
+            "custom_attribute_value": {
+                "id": ca.value.id,
+            },
+        },
+    })
+    factories.RelationshipFactory(
+        source=self.assessment,
+        destination=comment,
+    )
+
+    # new CA value not requiring comment
+    self.assessment.custom_attribute_values = [{
+        "attribute_value": "foo",
+        "custom_attribute_id": ca.definition.id,
+    }]
+    GENERATOR.api.modify_object(self.assessment, {})
+
+    # new CA value requiring comment; the old comment should be considered
+    # invalid
+    self.assessment.custom_attribute_values = [{
+        "attribute_value": "comment_required",
+        "custom_attribute_id": ca.definition.id,
+    }]
+    GENERATOR.api.modify_object(self.assessment, {})
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, True)
