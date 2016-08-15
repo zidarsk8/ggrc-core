@@ -5,7 +5,7 @@
 
 <ul class="get-started__list">
   {{#start_menu}}
-    {{#is_allowed 'create' model_name context=null}}
+    {{#is_allowed 'create' model_name context='any'}}
     <li class="get-started__list__item">
       <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide"
           data-object-singular="{{model_name}}" data-object-plural="{{model_plural}}"
@@ -19,7 +19,7 @@
     {{/is_allowed}}
   {{/start_menu}}
 
-  {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context=null}}
+  {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context='any'}}
     <li class="get-started__list__item">
       <a
         rel="tooltip"
@@ -40,7 +40,7 @@
     </li>
   {{/is_allowed}}
 
-  {{#any_allowed 'create' object_menu context=null}}
+  {{#any_allowed 'create' object_menu context='any'}}
     <li class="get-started__list__item get-started__list__item--top-space hidden-widgets-list">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         <span class="get-started__list__icon-wrap">
@@ -50,7 +50,7 @@
       </a>
       <div class="dropdown-menu" role="menu">
         {{#object_menu}}
-          {{#is_allowed 'create' model_name context=null}}
+          {{#is_allowed 'create' model_name context='any'}}
           <div class="inner-nav-item">
             <a href="javascript://" data-toggle="modal-ajax-form" data-modal-class="modal-wide"
             data-object-singular="{{model_name}}" data-object-plural="{{model_plural}}"
