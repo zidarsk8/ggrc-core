@@ -365,6 +365,9 @@ def clear_permission_cache():
 
 
 class ModelView(View):
+  """Basic view handler for all models"""
+  # pylint: disable=protected-access
+  # access to _sa_class_manager is needed for fetching the right mapper
   DEFAULT_PAGE_SIZE = 20
   MAX_PAGE_SIZE = 100
   pk = 'id'
@@ -1341,13 +1344,13 @@ class Resource(ModelView):
           self._build_request_stub_cache(body)
         try:
           self.collection_post_loop(body, res, no_result, running_async)
-        except (IntegrityError, ValidationError, ValueError) as e:
-          res.append(self._make_error_from_exception(e))
+        except (IntegrityError, ValidationError, ValueError) as error:
+          res.append(self._make_error_from_exception(error))
           db.session.rollback()
-        except Exception as e:
-          res.append((getattr(e, "code", 500), e.message))
+        except Exception as error:
+          res.append((getattr(error, "code", 500), error.message))
           current_app.logger.warn("Collection POST commit failed:")
-          current_app.logger.exception(e)
+          current_app.logger.exception(error)
           db.session.rollback()
         if hasattr(g, "referenced_objects"):
           delattr(g, "referenced_objects")
