@@ -844,6 +844,7 @@ can.Control('GGRC.Controllers.Modals', {
   }
 
   , new_instance: function (data) {
+    var wysihtml5;
     var params = this.find_params(),
         new_instance;
     new_instance = new this.options.model(params);
@@ -857,7 +858,13 @@ can.Control('GGRC.Controllers.Modals', {
       if (definition.attribute_type === 'Checkbox') {
         element.attr('checked', false);
       } else if (definition.attribute_type === 'Rich Text') {
-        element.data("wysihtml5").editor.clear();
+        // Check that wysihtml5 is still alive, otherwise just clean textarea
+        wysihtml5 = element.data("wysihtml5");
+        if (wysihtml5) {
+          wysihtml5.editor.clear();
+        } else {
+          element.val('');
+        }
       } else if (definition.attribute_type === 'Map:Person') {
         element = this.element.find('[name="_custom_attribute_mappings.' +
                                     definition.id + '.email"]');
