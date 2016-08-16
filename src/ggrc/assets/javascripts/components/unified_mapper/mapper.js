@@ -325,14 +325,18 @@
 
       setBinding: function () {
         var binding;
-        var getBindingName = this.scope.attr('mapper').get_binding_name;
-        var selected = this.scope.attr('mapper.get_instance');
-        var tablePlural = getBindingName(
-          selected, this.scope.attr('mapper.model.table_plural'));
+        var getBindingName;
+        var selected;
+        var tablePlural;
 
         if (this.scope.attr('mapper.search_only')) {
           return;
         }
+
+        getBindingName = this.scope.attr('mapper').get_binding_name;
+        selected = this.scope.attr('mapper.get_instance');
+        tablePlural = getBindingName(
+          selected, this.scope.attr('mapper.model.table_plural'));
 
         if (!selected.has_binding(tablePlural)) {
           return;
