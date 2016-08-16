@@ -113,7 +113,8 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
   attributes: {},
   defaults: {
     title: '',
-    url: ''
+    url: '',
+    status: 'Draft'
   },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
     'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
@@ -160,7 +161,8 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
   attributes: {},
   defaults: {
     title: '',
-    url: ''
+    url: '',
+    status: 'Draft'
   },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
     'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],

@@ -82,6 +82,9 @@ can.Model.Cacheable("CMS.Models.Program", {
     , "Product" : {}
     , "Market" : {}
   },
+  defaults: {
+    status: 'Draft'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -141,10 +144,6 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , objective_objects : "CMS.Models.ObjectObjective.stubs"
     , custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
   }
-
-  , defaults : {
-  }
-
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/objectives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/objectives/tree_footer.mustache"
@@ -164,6 +163,9 @@ can.Model.Cacheable("CMS.Models.Objective", {
       , title_plural : "Business Objects"
       , draw_children : false
     }]
+  },
+  defaults: {
+    status: 'Draft'
   },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],

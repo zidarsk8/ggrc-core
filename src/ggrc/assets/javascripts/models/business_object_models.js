@@ -83,6 +83,9 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
     , "AccessGroup" : {}
     , "Market" : {}
     },
+  defaults: {
+    status: 'Draft'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -161,6 +164,9 @@ can.Model.Cacheable("CMS.Models.Project", {
     , "AccessGroup" : {}
     , "Market" : {}
     },
+  defaults: {
+    status: 'Draft'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -252,6 +258,9 @@ can.Model.Cacheable("CMS.Models.Facility", {
     , "AccessGroup" : {}
     , "Market" : {}
     },
+  defaults: {
+    status: 'Draft'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -347,6 +356,9 @@ can.Model.Cacheable("CMS.Models.Product", {
     , "AccessGroup" : {}
     , "Market" : {}
     },
+  defaults: {
+    status: 'Draft'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -440,6 +452,9 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
     , "AccessGroup" : {}
     , "Market" : {}
     },
+  defaults: {
+    status: 'Draft'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -530,6 +545,9 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
     , "AccessGroup" : {}
     , "Market" : {}
     },
+  defaults: {
+    status: 'Draft'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
     'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
@@ -608,6 +626,9 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
       DataAsset: {},
       AccessGroup: {},
       Market: {}
+    },
+    defaults: {
+      status: 'Draft'
     },
     statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
@@ -702,6 +723,9 @@ can.Model.Cacheable("CMS.Models.Vendor", {
     , "AccessGroup" : {}
     , "Market" : {}
     },
+  defaults: {
+    status: 'Draft'
+  },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
       'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {

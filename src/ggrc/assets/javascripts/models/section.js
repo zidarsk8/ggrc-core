@@ -3,9 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require can.jquery-all
-//= require controls/control
-//= require models/cacheable
 
 // this model doesn't exist anymore, can we get rid of it?
 can.Model.Cacheable('CMS.Models.Section', {
@@ -68,6 +65,9 @@ can.Model.Cacheable('CMS.Models.Section', {
         add_item_view: GGRC.mustache_path + '/controls/tree_add_item.mustache'
       }]
     }]
+  },
+  defaults: {
+    status: 'Draft'
   },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
     'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
@@ -138,6 +138,9 @@ can.Model.Cacheable('CMS.Models.Clause', {
         add_item_view: GGRC.mustache_path + '/controls/tree_add_item.mustache'
       }]
     }]
+  },
+  defaults: {
+    status: 'Draft'
   },
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
     'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
