@@ -75,8 +75,8 @@
       }
 
       // but if not in cache, we need to fetch the person object...
-      CMS.Models.Person
-        .findOne({id: personId})
+      person = new CMS.Models.Person({id: personId});
+      new RefreshQueue().enqueue(person).trigger()
         .then(function (person) {
           scope.attr('personObj', person);
         }, function () {
