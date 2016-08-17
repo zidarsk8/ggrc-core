@@ -27,29 +27,24 @@ describe('GGRC.Components.personItem', function () {
   describe('init() method', function () {
     var dfdFindOne;
     var template;  // the DOM element passed to the component instance
-    var origPersonCache;
     var component;
     var frag;
 
     beforeEach(function () {
       dfdFindOne = new can.Deferred();
       spyOn(CMS.Models.Person, 'findOne').and.returnValue(dfdFindOne);
-
-      origPersonCache = CMS.Models.Person.cache;
-      CMS.Models.Person.cache = {};
     });
 
     afterEach(function () {
-      CMS.Models.Person.cache = origPersonCache;
+      CMS.Models.Person.cache = {};
     });
 
     it('sets the personObj in scope to the cached Person object ' +
       'if found there',
       function () {
-        var person42 = new can.Map({
+        var person42 = new CMS.Models.Person({
           id: 42, name: 'John', email: 'john@doe.com'
         });
-        CMS.Models.Person.cache[42] = person42;
 
         template = can.view
           .mustache('<person-info person-id="42"></person-info>');
@@ -57,7 +52,8 @@ describe('GGRC.Components.personItem', function () {
         frag = $(frag);
         component = frag.find('person-info').control();
 
-        expect(component.scope.attr('personObj')).toBe(person42);
+        expect(component.scope.attr('personObj'))
+          .toBe(person42);
       }
     );
 
@@ -107,6 +103,55 @@ describe('GGRC.Components.personItem', function () {
         expect(component.scope.attr('personObj')).toBe(fetchedPerson);
       }
     );
+    it('does not make a get request when person-id is undefined',
+      function () {
+        spyOn(console, 'warn');
+        template = can.view
+          .mustache('<person-info person-id=""></person-info>');
+        frag = template();
+
+        frag = $(frag);
+        component = frag.find('person-info').control();
+
+        expect(CMS.Models.Person.findOne).not.toHaveBeenCalled();
+        expect(console.warn).toHaveBeenCalled();
+      }
+    );
+    it('gets stub from cache and then makes a request', function () {
+      var person123 = new CMS.Models.Person({
+        id: 123, name: '', type: 'Person'
+      });
+
+      template = can.view
+        .mustache('<person-info person-obj="person"></person-info>');
+      frag = template({
+        person: person123
+      });
+      frag = $(frag);
+      component = frag.find('person-info').control();
+
+      expect(CMS.Models.Person.findOne).toHaveBeenCalledWith({id: 123});
+    });
+    it('gets person object from and doesn\'t make a request', function () {
+      var personObj = new can.Map({
+        id: 123, name: '', type: 'Person'
+      });
+      new CMS.Models.Person({
+        id: 123, name: 'Ivan', email: 'ivan@google.com', type: 'Person'
+      });
+
+      template = can.view
+        .mustache('<person-info person-obj="person"></person-info>');
+      frag = template({
+        person: personObj
+      });
+      frag = $(frag);
+      component = frag.find('person-info').control();
+
+      expect(component.scope.attr('personObj'))
+          .toBe(CMS.Models.Person.cache['123']);
+      expect(CMS.Models.Person.findOne).not.toHaveBeenCalled();
+    });
   });
 
   describe('unmap person click event handler', function () {

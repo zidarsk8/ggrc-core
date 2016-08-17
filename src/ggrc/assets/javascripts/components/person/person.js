@@ -46,26 +46,32 @@
       var scope = this.scope;
       var personId = scope.attr('personId');
       var person = scope.attr('personObj');
-      var noPerson = person && _.isEmpty(person.serialize());
+      var personModel;
+      var noPerson = _.isEmpty(
+        person && person.serialize ? person.serialize() : person);
 
-      if (noPerson && _.isNaN(personId)) {
+      if (noPerson && isNaN(personId)) {
         console.warn('`personObj` or `personId` are missing');
         return;
       }
 
-      if (!person) {
-        person = CMS.Models.Person.cache[personId];
+      if (noPerson ||
+        (person && !person.email)) {
+        personModel = CMS.Models.Person.cache[personId || person.id];
+        if (personModel) {
+          personModel = personModel.reify();
+        }
       }
+
       // For some reason the cache sometimes contains partially loaded objects,
       // thus we also need to check if "email" (a required field) is present.
       // If it is, we can be certain that we can use the object from the cache.
-      if (person && person.attr('email')) {
-        scope.attr('personObj', person);
+      if (personModel && personModel.email) {
+        scope.attr('personObj', personModel);
         return;
       }
-
-      if (_.isNaN(personId) || personId <= 0) {
-        personId = person.attr('id');
+      if (isNaN(personId) || personId <= 0) {
+        personId = person.id;
       }
 
       // but if not in cache, we need to fetch the person object...
