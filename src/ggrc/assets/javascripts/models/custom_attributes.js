@@ -3,9 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require can.jquery-all
-//= require models/cacheable
-(function (namespace, $) {
+(function (can, GGRC, CMS) {
   /* function sortCustomAttributables
    *
    * Groups custom attributes by category.
@@ -32,8 +30,8 @@
     findAll: function () {
       var types;
       types = GGRC.custom_attributable_types.sort(sortCustomAttributables);
-      return $.when(can.map(types, function (type, i) {
-        return new CMS.Models.CustomAttributable($.extend(type, {
+      return can.when(can.map(types, function (type, i) {
+        return new CMS.Models.CustomAttributable(can.extend(type, {
           id: i
         }));
       }));
@@ -91,9 +89,6 @@
       modified_by: 'CMS.Models.Person.stub'
     },
     links_to: {},
-    defaults: {
-      title: ''
-    },
     init: function () {
       this._super.apply(this, arguments);
     }
@@ -102,4 +97,4 @@
       this._super.apply(this, arguments);
     }
   });
-})(this, can.$);
+})(window.can, window.GGRC, window.CMS);

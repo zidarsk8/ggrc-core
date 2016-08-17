@@ -3,8 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-;(function (GGRC, can) {
-
+(function (GGRC, can) {
   /*  GGRC.ListLoaders
    *
    *  - Generates and manages lists of related objects, pairing each instance
@@ -215,7 +214,7 @@
         this.instance = instance;
         this.loader = loader;
 
-        this.list = new can.Observe.List();
+        this.list = new can.List();
       },
 
       refresh_stubs: function () {
@@ -1754,4 +1753,4 @@
     return instance._all_local_results_binding.refresh_stubs();
   };
 
-})(GGRC, can);
+})(window.GGRC, window.can);
