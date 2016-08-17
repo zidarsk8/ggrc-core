@@ -204,20 +204,24 @@ class ModalCreateNewProgram(BaseModalCreateNew):
 
   UI_EFFECTIVE_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="new_program_field_effective_date_f2783a28"] '
+      '[test-id="new_program_field_effective_date_f2783a28"] '
+      '[data-id="effective_date_hidden"] '
       '.datepicker__input')
   EFFECTIVE_DATE_DATEPICKER = (
       By.CSS_SELECTOR,
       '[test-id="new_program_field_effective_date_f2783a28"] '
+      '[data-id="effective_date_hidden"] '
       '[data-handler="selectDay"]')
 
   UI_STOP_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="new_program_field_stop_date_f2783a28"] '
+      '[test-id="new_program_field_effective_date_f2783a28"] '
+      '[data-id="stop_date_hidden"] '
       '.datepicker__input')
   STOP_DATE_DATEPICKER = (
       By.CSS_SELECTOR,
-      '[test-id="new_program_field_stop_date_f2783a28"] '
+      '[test-id="new_program_field_effective_date_f2783a28"] '
+      '[data-id="stop_date_hidden"] '
       '[data-handler="selectDay"]')
 
   TITLE = (By.CSS_SELECTOR, '[data-test-id="label_title_2c925d94"]')
@@ -414,20 +418,24 @@ class ModalCreateNewControl(BaseModalCreateNew):
 
   EFFECTIVE_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_effective_date_0376cf90"] '
+      '[test-id="control_effective_dates_0376cf90"] '
+      '[data-id="effective_date_hidden"] '
       '.datepicker__input')
   DATEPICKER_EFFECTIVE_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_effective_date_0376cf90"] '
+      '[test-id="control_effective_dates_0376cf90"] '
+      '[data-id="effective_date_hidden"] '
       '[data-handler="selectDay"]')
 
   STOP_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_end_date_91ec027a"] '
+      '[test-id="control_effective_dates_0376cf90"] '
+      '[data-id="stop_date_hidden"] '
       '.datepicker__input')
   DATEPICKER_STOP_DATE = (
       By.CSS_SELECTOR,
-      '[data-test-id="control_end_date_91ec027a"] '
+      '[test-id="control_effective_dates_0376cf90"] '
+      '[data-id="stop_date_hidden"] '
       '[data-handler="selectDay"]')
 
   # buttons

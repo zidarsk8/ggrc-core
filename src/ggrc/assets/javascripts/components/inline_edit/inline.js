@@ -13,7 +13,6 @@
     ),
     scope: {
       instance: null,
-      type: '@',
       caId: null,
       property: '@',
       value: null,
@@ -26,11 +25,13 @@
         value: null,
         values: null
       },
-
       emptyText: '@',
-
       $rootEl: null,
-
+      define: {
+        type: {
+          type: 'string'
+        }
+      },
       _EV_INSTANCE_SAVE: 'on-save',
 
       /**
@@ -108,7 +109,6 @@
           } else {
             instance.attr(property, value);
           }
-
           instance.save()
             .done(function () {
               $(document.body).trigger('ajax:flash', {

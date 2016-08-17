@@ -3,126 +3,37 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<custom-attributes instance="instance" load="true">
+<custom-attributes instance="instance">
   {{^loading}}
     {{#if instance.custom_attribute_definitions.length}}
-      {{#iterate_by_two instance.custom_attribute_definitions}}
-        <div class="row-fluid wrap-row">
-        {{#list}}
-          <div class="span6">
-            <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
-              {{#with_value_for_id id}}
-                {{#switch attribute_type}}
-                {{#case 'Checkbox'}}
-                  <inline-edit
-                    instance="instance"
-                    need-confirm="confirmEdit"
-                    ca-id="id"
-                    value="value"
-                    label="title"
-                    type="checkbox"
-                    mandatory="mandatory"
-                    placeholder="placeholder"
-                    helptext="helptext"
-                    {{^is_allowed 'update' instance context='for'}}
-                      readonly
-                    {{/is_allowed}}
-                  ></inline-edit>
-                {{/case}}
-                {{#case 'Rich Text'}}
-                  <inline-edit
-                    instance="instance"
-                    need-confirm="confirmEdit"
-                    ca-id="id"
-                    value="value"
-                    label="title"
-                    type="text"
-                    mandatory="mandatory"
-                    placeholder="placeholder"
-                    helptext="helptext"
-                    {{^is_allowed 'update' instance context='for'}}
-                      readonly
-                    {{/is_allowed}}
-                  ></inline-edit>
-                {{/case}}
-                {{#case 'Dropdown'}}
-                  <inline-edit
-                    instance="instance"
-                    need-confirm="confirmEdit"
-                    ca-id="id"
-                    value="value"
-                    label="title"
-                    type="dropdown"
-                    mandatory="mandatory"
-                    values="multi_choice_options"
-                    placeholder="placeholder"
-                    helptext="helptext"
-                    {{^is_allowed 'update' instance context='for'}}
-                      readonly
-                    {{/is_allowed}}
-                  ></inline-edit>
-                {{/case}}
-                {{#case 'Date'}}
-                  <inline-edit
-                    instance="instance"
-                    need-confirm="confirmEdit"
-                    ca-id="id"
-                    value="value"
-                    label="title"
-                    type="date"
-                    mandatory="mandatory"
-                    placeholder="placeholder"
-                    helptext="helptext"
-                    {{^is_allowed 'update' instance context='for'}}
-                      readonly
-                    {{/is_allowed}}
-                  ></inline-edit>
-                {{/case}}
-                {{#case 'Text'}}
-                  <inline-edit
-                    instance="instance"
-                    need-confirm="confirmEdit"
-                    ca-id="id"
-                    value="value"
-                    label="title"
-                    type="input"
-                    mandatory="mandatory"
-                    placeholder="placeholder"
-                    helptext="helptext"
-                    {{^is_allowed 'update' instance context='for'}}
-                      readonly
-                    {{/is_allowed}}
-                  ></inline-edit>
-                {{/case}}
-                {{#case 'Map:Person'}}
-                  {{#with_object_for_id id}}
-                    <inline-edit
-                      instance="instance"
-                      need-confirm="confirmEdit"
-                      ca-id="id"
-                      value="object"
-                      label="title"
-                      type="person"
-                      mandatory="mandatory"
-                      placeholder="placeholder"
-                      helptext="helptext"
-                      {{^is_allowed 'update' instance context='for'}}
-                        readonly
-                      {{/is_allowed}}
-                    ></inline-edit>
-                  {{/with_object_for_id}}
-                {{/case}}
-                {{#default}}
-                  <h6>{{title}}</h6>
-                  {{value}}
-                {{/default}}
-                {{/switch}}
-              {{/with_value_for_id}}
-            </div>
+      <div class="row-fluid wrap-row">
+      {{#getValues}}
+        <div class="span6">
+          <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
+            <inline-edit
+              instance="instance"
+              need-confirm="confirmEdit"
+              ca-id="cad.id"
+              {{#if cav.attribute_object}}
+              value="cav.attribute_object"
+              {{else}}
+              value="cav.attribute_value"
+              {{/if}}
+              values="cad.values"
+              title="cad.title"
+              label="cad.label"
+              type="type"
+              mandatory="cad.mandatory"
+              placeholder="cad.placeholder"
+              helptext="cad.helptext"
+              {{^is_allowed 'update' instance context='for'}}
+                readonly
+              {{/is_allowed}}
+            ></inline-edit>
           </div>
-        {{/list}}
         </div>
-      {{/iterate_by_two}}
+      {{/getValues}}
+      </div>
     {{/if}}
   {{/loading}}
 </custom-attributes>

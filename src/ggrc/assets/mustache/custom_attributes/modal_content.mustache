@@ -8,43 +8,42 @@
 <custom-attributes instance="instance">
   <div class="hideable-holder bare">
     <div class="row-fluid">
-      {{#each instance.custom_attribute_definitions}}
-      {{#with_value_for_id id}}
+      {{#getValues}}
+        <div class="{{^cad.mandatory}}hidable{{/cad.mandatory}} span6
+          {{#ca_validation_error instance.computed_errors id}}field-failure{{/ca_validation_error}}">
 
-      <div class="{{^mandatory}}hidable{{/mandatory}} span6
-                  {{#ca_validation_error instance.computed_errors id}}field-failure{{/ca_validation_error}}">
-        {{#switch attribute_type}}
+        {{#switch cad.attribute_type}}
         {{#case 'Text'}}
           <label>
-            {{title}}
-            {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-            {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            {{cad.title}}
+            {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
+            {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <input tabindex="{{add_index 20 @index}}" data-ram="{{@index}}" class="input-block-level" value="{{value}}" placeholder="{{placeholder}}" name="custom_attributes.{{id}}" type="text">
+          <input tabindex="{{add_index 20 @index}}" data-ram="{{@index}}" class="input-block-level" value="{{cav.attribute_value}}" placeholder="{{cad.placeholder}}" name="custom_attributes.{{cad.id}}" type="text">
         {{/case}}
         {{#case 'Rich Text'}}
           <label>
-            {{title}}
-            {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-            {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            {{cad.title}}
+            {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
+            {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
           <div class="wysiwyg-area">
-            <textarea tabindex="{{add_index 20 @index}}" id="{{title}}" class="span12 double wysihtml5" name="custom_attributes.{{id}}" placeholder="{{placeholder}}">{{{value}}}</textarea>
+            <textarea tabindex="{{add_index 20 @index}}" id="{{cad.title}}" class="span12 double wysihtml5" name="custom_attributes.{{cad.id}}" placeholder="{{cad.placeholder}}">{{{cav.attribute_value}}}</textarea>
           </div>
         {{/case}}
         {{#case 'Dropdown'}}
           <label>
-            {{title}}
-            {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-            {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+            {{cad.title}}
+            {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
+            {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <select class="input-block-level" name="custom_attributes.{{id}}" null-if-empty="null-if-empty" tabindex="20">
-            <option value="" {{#if_equals "" value}}selected="true"{{/if_equals}}>---</option>
-            {{#iterate_string multi_choice_options ','}}
-              <option {{#if_equals iterator value}}selected="true"{{/if_equals}}>{{iterator}}</option>
+          <select class="input-block-level" name="custom_attributes.{{cad.id}}" null-if-empty="null-if-empty" tabindex="20">
+            <option value="" {{#if_equals "" cav.attribute_value}}selected="true"{{/if_equals}}>---</option>
+            {{#iterate_string cad.multi_choice_options ','}}
+              <option {{#if_equals iterator cav.attribute_value}}selected="true"{{/if_equals}}>{{iterator}}</option>
             {{/iterate}}
           </select>
         {{/case}}
@@ -52,10 +51,10 @@
           <label>&nbsp;</label>
           <div class="checkbox-area">
             <label>
-              <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{id}}" type="checkbox"  {{#if_equals value "1"}}checked="checked"{{/if_equals}}>
-              {{title}}
-              {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-              {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+              <input tabindex="{{add_index 20 @index}}" name="custom_attributes.{{cad.id}}" type="checkbox"  {{#if_equals cav.attribute_value "1"}}checked="checked"{{/if_equals}}>
+              {{cad.title}}
+              {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
+              {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
               <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
             </label>
           </div>
@@ -63,28 +62,28 @@
         {{#case 'Date'}}
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <datepicker
-          label="{{title}}"
-          date="instance.custom_attributes.{{id}}"
-          required="{{mandatory}}"
-          helptext="{{helptext}}"
+          label="cad.title"
+          date="instance.custom_attributes.{{cad.id}}"
+          required="cad.mandatory"
+          helptext="cad.helptext"
           />
         {{/case}}
         {{#case 'Map:Person'}}
         <label>
-          {{title}}
-          {{#mandatory}}<span class="required">*</span>{{/mandatory}}
-          {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
+          {{cad.title}}
+          {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
+          {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        {{#with_object_for_id id}}
+          {{#using person=cav.attribute_object}}
           <input class="input-block-level"
-                 name="_custom_attribute_mappings.{{id}}.email"
+                 name="_custom_attribute_mappings.{{cad.id}}.email"
                  data-lookup="Person" placeholder="Enter email address"
-                 data-lookup-cb="_custom_attribute_map {{id}}"
+                 data-lookup-cb="_custom_attribute_map {{cad.id}}"
                  null-if-empty="null-if-empty"
                  type="text"
-                 value="{{object.email}}" />
-        {{/with_object_for_id}}
+                 value="{{person.email}}" />
+          {{/using}}
         {{/case}}
         {{/switch}}
 
@@ -92,9 +91,7 @@
           <label class="help-inline warning">{{errors.0}}</label>
         {{/ca_validation_error}}
       </div>
-
-      {{/with_value_for_id}}
-      {{/instance.custom_attribute_definitions}}
+      {{/getValues}}
     </div>
   </div>
 </custom-attributes>

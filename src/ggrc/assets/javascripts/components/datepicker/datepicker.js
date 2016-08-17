@@ -15,15 +15,16 @@
     scope: {
       date: null,
       format: '@',
-      label: '@',
       helptext: '@',
-      testId: '@',
       isShown: false,
       pattern: 'MM/DD/YYYY',
       setMinDate: null,
       setMaxDate: null,
       _date: null,
       define: {
+        label: {
+          type: 'string'
+        },
         required: {
           type: 'boolean',
           'default': false

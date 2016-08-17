@@ -4,80 +4,48 @@
 */
 
 (function (can, $) {
-  can.Component.extend({
+  'use strict';
+
+  GGRC.Components('customAttributes', {
     tag: 'custom-attributes',
     scope: {
       instance: null,
-      // Make sure custom_attribute_definitions & custom_attribute_values
-      // get loaded
-      load: '@',
-      loading: false,
-      refreshAttributes: function () {
-        this.attr('loading', true);
-        $.when(
-          this.instance.load_custom_attribute_definitions(),
-          this.instance.refresh_all('custom_attribute_values')
-            .then(function (values) {
-              var rq = new RefreshQueue();
-              _.each(values, function (value) {
-                if (value.attribute_object) {
-                  rq.enqueue(value.attribute_object);
+      getValues: function () {
+        var types = {
+          Checkbox: 'checkbox',
+          'Rich Text': 'text',
+          Dropdown: 'dropdown',
+          Date: 'date',
+          Text: 'input',
+          'Map:Person': 'person'
+        };
+        var result = [];
+
+        can.each(this.attr('instance.custom_attribute_definitions'),
+          function (cad) {
+            var cav;
+            var type = cad.attribute_type;
+            can.each(this.attr('instance.custom_attribute_values'),
+              function (val) {
+                val = val.reify();
+                if (val.custom_attribute_id === cad.id) {
+                  cav = val;
                 }
               });
-              return rq.trigger();
-            })
-            .then(function () {
-              this.instance.setup_custom_attributes();
-            }.bind(this))
-        ).always(function () {
-          this.attr('loading', false);
-        }.bind(this));
+            result.push({
+              cav: cav,
+              cad: cad,
+              type: types[type] ? types[type] : types.text
+            });
+          }.bind(this));
+        return result;
       }
     },
     content: '<content/>',
-    events: {
-      '{scope.instance} updated': function () {
-        this.scope.refreshAttributes();
-      }
-    },
     init: function () {
-      if (!this.scope.instance.class.is_custom_attributable) {
-        return;
-      }
-      if (this.scope.load) {
-        this.scope.refreshAttributes();
-      }
+      this.scope.instance.setup_custom_attributes();
     },
-    helpers: {
-      with_value_for_id: function (id, options) {
-        var ret;
-        id = Mustache.resolve(id);
-        can.each(this.instance.custom_attribute_values, function (value) {
-          value = value.reify();
-          if (value.custom_attribute_id === id) {
-            ret = value.attribute_value;
-          }
-        });
-        return options.fn(options.contexts.add({
-          value: ret
-        }));
-      },
-      with_object_for_id: function (id, options) {
-        var ret;
-        id = Mustache.resolve(id);
-        can.each(this.instance.custom_attribute_values, function (value) {
-          value = value.reify();
-          if (value.custom_attribute_id === id) {
-            ret = value.attribute_object;
-            if (ret) {
-              ret = ret.reify();
-            }
-          }
-        });
-        return options.fn(options.contexts.add({
-          object: ret
-        }));
-      }
+    events: {
     }
   });
 })(window.can, window.can.$);

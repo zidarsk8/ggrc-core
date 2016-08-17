@@ -83,8 +83,7 @@
           if (_.isUndefined(val) && _.has(obj, 'default')) {
             val = obj.default;
           }
-          scope[key] = val;
-          scope._data[key] = val;
+          scope.attr(key, val);
         }
       }, this);
 

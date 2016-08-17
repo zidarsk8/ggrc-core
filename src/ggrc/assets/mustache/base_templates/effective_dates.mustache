@@ -10,12 +10,8 @@
       date="instance.start_date"
       set-max-date="instance.end_date"
       helptext="Enter the date this object becomes effective."
-      {{#startTestId}}
-      test-id="{{startTestId}}"
-      {{/startTestId}}
-      {{#required}}
-      required="true"
-      {{/required}}
+      test-id="startTestId"
+      required="required"
       />
   </div>
   <div data-id="stop_date_hidden" class="span4 hidable">
@@ -25,10 +21,8 @@
       set-min-date="instance.start_date"
       date="instance.end_date"
       helptext="Enter the date the object stops being effective."
-      {{#endTestId}}
-      test-id="{{endTestId}}"
-      {{/endTestId}}
-      {{#required}}required="true"{{/required}}
+      test-id="endTestId"
+      required="required"
       />
   </div>
 </div>

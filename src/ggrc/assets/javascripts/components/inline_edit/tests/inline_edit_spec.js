@@ -88,8 +88,11 @@ describe('GGRC.Components.inlineEdit', function () {
     var instance;
     var method;
     var componentInst;
+    var el;
+    var options = {};
 
     beforeAll(function () {
+      el = document.createElement('DIV');
       method = Component.prototype.init;
     });
     beforeEach(function () {
@@ -98,6 +101,7 @@ describe('GGRC.Components.inlineEdit', function () {
         toggle: true,
         dropdown: ''
       });
+
       scope = new can.Map({
         instance: instance,
         context: {
@@ -116,12 +120,12 @@ describe('GGRC.Components.inlineEdit', function () {
       });
       it('context.value should be false for 0', function () {
         scope.attr('value', '0');
-        method.call(componentInst);
+        method.call(componentInst, el, options);
         expect(scope.attr('context.value')).toEqual(false);
       });
       it('context.value should be true for 1', function () {
         scope.attr('value', '1');
-        method.call(componentInst);
+        method.call(componentInst, el, options);
         expect(scope.attr('context.value')).toEqual(true);
       });
     });
@@ -132,12 +136,12 @@ describe('GGRC.Components.inlineEdit', function () {
       });
       it('context.value should be false', function () {
         scope.attr('instance.toggle', false);
-        method.call(componentInst);
+        method.call(componentInst, el, options);
         expect(scope.attr('context.value')).toEqual(false);
       });
       it('context.value should be true', function () {
         scope.attr('instance.toggle', true);
-        method.call(componentInst);
+        method.call(componentInst, el, options);
         expect(scope.attr('context.value')).toEqual(true);
       });
     });
@@ -148,14 +152,14 @@ describe('GGRC.Components.inlineEdit', function () {
       it('context.values should be list when string', function () {
         var options = 'a,b,c,d';
         scope.attr('values', options);
-        method.call(componentInst);
+        method.call(componentInst, el, options);
         expect(scope.attr('context.values').serialize())
           .toEqual(['a', 'b', 'c', 'd']);
       });
       it('context.values should be list when string', function () {
         var options = ['a', 'b', 'c', 'd'];
         scope.attr('values', options);
-        method.call(componentInst);
+        method.call(componentInst, el, options);
 
         expect(scope.attr('context.values').serialize())
           .toEqual(['a', 'b', 'c', 'd']);
