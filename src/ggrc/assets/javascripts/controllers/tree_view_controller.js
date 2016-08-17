@@ -398,14 +398,13 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       pageSize: 10,
       count: null,
       pageSizeSelect: [10, 25, 50],
+      filter: null,
+      sortDirection: null,
+      sortBy: null,
       disabled: false
     },
     fields: [],
-    sort_property: null,
-    sortDirection: null,
-    sortBy: null,
     sortable: true,
-    filter: null,
     start_expanded: false, // true
     draw_children: true,
     find_function: null,
@@ -1109,11 +1108,19 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         }
         setTimeout(function () {
           var draw;
+          var drawDfd;
           if (that._add_child_lists_id !== opId) {
             return;
           }
           draw = that._ifNotRemoved(that.draw_items.bind(that));
-          draw(listWindow).then(res.resolve);
+
+          drawDfd = draw(listWindow);
+
+          if (drawDfd) {
+            drawDfd.then(res.resolve);
+          } else {
+            res.resolve();
+          }
         }, 0);
         return res;
       });
@@ -1273,8 +1280,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   },
 
   onCreated: _.debounce(function () {
-    this.options.attr('sortDirection', 'desc');
-    this.options.attr('sortBy', 'updated_at');
+    this.options.attr('paging.sortDirection', 'desc');
+    this.options.attr('paging.sortBy', 'updated_at');
     this.options.attr('paging.current', 1);
     this.refreshList();
   }),
@@ -1458,44 +1465,21 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       }
     }
   },
-  _buildRequestParams: function () {
-    var paging = this.options.attr('paging');
-    var filter = this.options.attr('filter');
-    var relevantFilter = '#' + this.options.parent_instance.type + ',' +
-      this.options.parent_instance.id + '#';
-    var first = (paging.current - 1) * paging.pageSize;
-    var last = paging.current * paging.pageSize;
-    var sortBy = this.options.sortBy;
-    var sortDirection = this.options.sortDirection === 'desc';
-    var params = {
-      object_name: this.options.model.shortName,
-      limit: [first, last],
-      filters: GGRC.query_parser.join_queries(
-        GGRC.query_parser.parse(relevantFilter || ''),
-        GGRC.query_parser.parse(filter || '')
-      )
-    };
-
-    if (sortBy) {
-      params.order_by = [{name: sortBy, desc: sortDirection}];
-    }
-
-    return [params];
-  },
 
   sort: function (event) {
     var $el = $(event.currentTarget);
     var key = $el.data('field');
     var order;
 
-    if (key !== this.options.sortBy) {
-      this.options.sortDirection = null;
+    if (key !== this.options.attr('paging.sortBy')) {
+      this.options.attr('paging.sortDirection', null);
     }
 
-    order = this.options.sortDirection === 'asc' ? 'desc' : 'asc';
+    order =
+      this.options.attr('paging.sortDirection') === 'asc' ? 'desc' : 'asc';
 
-    this.options.sortDirection = order;
-    this.options.sortBy = key;
+    this.options.attr('paging.sortDirection', order);
+    this.options.attr('paging.sortBy', key);
 
     $el.closest('.tree-header')
         .find('.widget-col-title')
@@ -1509,15 +1493,23 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   },
 
   filter: function (filterString) {
-    this.options.attr('filter', filterString);
+    this.options.attr('paging.filter', filterString);
     this.options.attr('paging.current', 1);
     this.refreshList();
   },
 
   loadPage: function () {
-    this._draw_list_deferred = false;
+    var options = this.options;
+    var params = GGRC.Utils.buildReqParamForQueryAPI(
+      options.model.shortName,
+      options.paging,
+      {
+        type: options.parent_instance.type,
+        id: options.parent_instance.id
+      });
 
-    return this.page_loader.load({data: this._buildRequestParams()})
+    this._draw_list_deferred = false;
+    return this.page_loader.load({data: params})
       .then(function (data) {
         this.options.attr('paging.total', data.total);
         this.options.attr('paging.count',

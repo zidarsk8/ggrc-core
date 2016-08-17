@@ -474,46 +474,40 @@
       return ms;
     },
 
-      query: function (request) {
-    var deferred = $.Deferred();
-    var self = this;
+    query: function (request) {
+      var deferred = $.Deferred();
+      var self = this;
 
-    $.ajax({
-      type: 'POST',
-      headers: $.extend({
-        'Content-Type': 'application/json'
-      }, request.headers || {}),
-      url: '/query',
-      data: JSON.stringify(request.data || {})
-    }).then(function (sourceData) {
-      var values = [];
-      var listDfd = $.Deferred();
-      if (sourceData.length) {
-        sourceData = sourceData[0];
-      } else {
-        sourceData = {};
-      }
+      GGRC.Utils.QueryAPI.makeRequest(request)
+        .then(function (sourceData) {
+          var values = [];
+          var listDfd = $.Deferred();
+          if (sourceData.length) {
+            sourceData = sourceData[0];
+          } else {
+            sourceData = {};
+          }
 
-      if (sourceData[self.shortName]) {
-        sourceData = sourceData[self.shortName];
-        values = sourceData.values;
-      }
+          if (sourceData[self.shortName]) {
+            sourceData = sourceData[self.shortName];
+            values = sourceData.values;
+          }
 
-      if (!values.splice) {
-        values = [values];
-      }
-      self._modelize(values, listDfd);
+          if (!values.splice) {
+            values = [values];
+          }
+          self._modelize(values, listDfd);
 
-      listDfd.then(function (list) {
-        sourceData.values = list;
-        deferred.resolve(sourceData);
-      });
-    }, function () {
-      deferred.reject.apply(deferred, arguments);
-    });
+          listDfd.then(function (list) {
+            sourceData.values = list;
+            deferred.resolve(sourceData);
+          });
+        }, function () {
+          deferred.reject.apply(deferred, arguments);
+        });
 
-    return deferred;
-  },
+      return deferred;
+    },
 
   _modelize: function (sourceData, deferred) {
     var obsList = new this.List([]);
