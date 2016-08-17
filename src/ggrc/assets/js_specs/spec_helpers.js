@@ -9,7 +9,7 @@
  */
 
 // polls check function and calls done when truthy
-function waitsFor(check, done) {
+window.waitsFor = function (check, done) {
   if (!check()) {
     setTimeout(function () {
       waitsFor(check, done);
@@ -17,14 +17,18 @@ function waitsFor(check, done) {
   } else {
     done();
   }
-}
+};
 
 // This is primarily useful for passing as the fail case for
-//  promises, since every item passed to it will show up in 
+//  promises, since every item passed to it will show up in
 //  the jasmine output.
-window.failAll = function(done) {
-  return function() {
-    can.each(arguments, function(arg) { fail(JSON.stringify(arg)); });
-    done && done();
+window.failAll = function (done) {
+  return function () {
+    can.each(arguments, function (arg) {
+      fail(JSON.stringify(arg));
+    });
+    if (done) {
+      done();
+    }
   };
 };
