@@ -32,7 +32,7 @@ describe('GGRC.Components.personItem', function () {
 
     beforeEach(function () {
       dfdFindOne = new can.Deferred();
-      spyOn(CMS.Models.Person, 'findOne').and.returnValue(dfdFindOne);
+      spyOn(RefreshQueue.prototype, 'trigger').and.returnValue(dfdFindOne);
     });
 
     afterEach(function () {
@@ -75,7 +75,7 @@ describe('GGRC.Components.personItem', function () {
 
         dfdFindOne.resolve(person123);
 
-        expect(CMS.Models.Person.findOne).toHaveBeenCalledWith({id: 123});
+        expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
         expect(component.scope.attr('personObj')).toBe(person123);
       }
     );
@@ -99,7 +99,7 @@ describe('GGRC.Components.personItem', function () {
 
         dfdFindOne.resolve(fetchedPerson);
 
-        expect(CMS.Models.Person.findOne).toHaveBeenCalledWith({id: 123});
+        expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
         expect(component.scope.attr('personObj')).toBe(fetchedPerson);
       }
     );
@@ -113,7 +113,7 @@ describe('GGRC.Components.personItem', function () {
         frag = $(frag);
         component = frag.find('person-info').control();
 
-        expect(CMS.Models.Person.findOne).not.toHaveBeenCalled();
+        expect(RefreshQueue.prototype.trigger).not.toHaveBeenCalled();
         expect(console.warn).toHaveBeenCalled();
       }
     );
@@ -130,7 +130,7 @@ describe('GGRC.Components.personItem', function () {
       frag = $(frag);
       component = frag.find('person-info').control();
 
-      expect(CMS.Models.Person.findOne).toHaveBeenCalledWith({id: 123});
+      expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
     });
     it('gets person object from and doesn\'t make a request', function () {
       var personObj = new can.Map({
@@ -150,7 +150,7 @@ describe('GGRC.Components.personItem', function () {
 
       expect(component.scope.attr('personObj'))
           .toBe(CMS.Models.Person.cache['123']);
-      expect(CMS.Models.Person.findOne).not.toHaveBeenCalled();
+      expect(RefreshQueue.prototype.trigger).not.toHaveBeenCalled();
     });
   });
 
