@@ -53,6 +53,7 @@
     tag: tag,
     template: template,
     scope: {
+      caIds: null,
       instance: null,
       commentEl: null,
       notificationEl: null,
@@ -95,13 +96,12 @@
           assignee_type: getAssigneeType(this.attr('instance'))
         };
         // Extra data to map Custom Attribute and Custom Attribute Value with Comment
-        if (this.attr('instance._modifiedAttribute') &&
-          this.attr('instance._modifiedAttribute.valueId')) {
+        if (this.attr('caIds') && this.attr('caIds.valueId')) {
           data.custom_attribute_revision_upd = {
             custom_attribute_value:
-              {id: this.attr('instance._modifiedAttribute.valueId')},
+              {id: this.attr('caIds.valueId')},
             custom_attribute_definition:
-              {id: this.attr('instance._modifiedAttribute.caId')}
+              {id: this.attr('caIds.defId')}
           };
         }
         return data;
