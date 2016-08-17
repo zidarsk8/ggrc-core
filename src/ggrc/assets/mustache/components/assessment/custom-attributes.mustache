@@ -1,0 +1,10 @@
+{{!
+    Copyright (C) 2016 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+{{#items}}
+    <ca-object-validation def="def" value-id="{{id}}" errors="preconditions_failed" value="attribute_value" modal="modal" is-modified="isModified">
+        <ca-object instance="instance" value-id="{{id}}" def="def" value="attribute_value" modal="modal" type="attributeType" is-modified="isModified"></ca-object>
+    </ca-object-validation>
+{{/items}}
+<ca-object-modal modal="modal" instance="instance"></ca-object-modal>
