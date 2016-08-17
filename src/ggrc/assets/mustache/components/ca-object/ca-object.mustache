@@ -7,8 +7,9 @@
         value="input.value"
         options="input.options"
         type="input.type"
-        title="input.title"
+        title-text="input.title"
         placeholder="input.placeholder"
+        is-saving="isSaving"
   {{^is_allowed 'update' instance context='for'}}
         readonly
   {{/is_allowed}}

@@ -95,13 +95,13 @@
       mapped_objects: {
         model: can.Model.Cacheable,
         mapping: 'info_related_objects',
-        show_view: GGRC.mustache_path + '/base_templates/subtree.mustache',
-        sort_function: GGRC.Utils.sortingHelpers.commentSort
+        show_view: GGRC.mustache_path + '/base_templates/subtree.mustache'
       },
       evidence: {
         model: CMS.Models.Document,
         mapping: 'all_documents',
-        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache'
+        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
+        sort_function: GGRC.Utils.sortingHelpers.commentSort
       },
       comments: {
         model: can.Model.Cacheable,
@@ -280,16 +280,19 @@
         }
       });
     },
+    refreshInstance: function () {
+      return this.refresh().then(function () {
+        this.updateValidation();
+      }.bind(this));
+    },
     info_pane_preload: function () {
       if (!this._pane_preloaded) {
-        this.refresh().then(function () {
-          this.updateValidation();
-          this.get_mapping('comments').bind('length',
-            this.updateValidation.bind(this));
-          this.get_mapping('all_documents').bind('length',
-            this.updateValidation.bind(this));
-          this._pane_preloaded = true;
-        }.bind(this));
+        this.get_mapping('comments').bind('length',
+          this.refreshInstance.bind(this));
+        this.get_mapping('all_documents').bind('length',
+          this.refreshInstance.bind(this));
+        this.refreshInstance();
+        this._pane_preloaded = true;
       }
     },
     related_issues: function () {

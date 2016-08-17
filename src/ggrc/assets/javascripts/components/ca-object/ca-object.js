@@ -54,6 +54,7 @@
       type: null,
       def: null,
       value: null,
+      isSaving: false,
       addComment: function () {
         can.batch.start();
         this.attr('modal', {
@@ -73,15 +74,34 @@
 
         this.attr('modal.open', true);
       },
-      updateValueInstance: function (value) {
+      initInputAttrs: function () {
+        var value = this.attr('value');
+        var options = this.attr('def.multi_choice_options');
+        var type = this.attr('type');
+
+        if (options && _.isString(options)) {
+          options = options.split(',');
+        }
+
+        this.attr('input', {
+          options: options,
+          value: mapValueForCA(value, type),
+          type: type,
+          title: this.attr('def.title')
+        });
+      },
+      updateValueInstance: function (value, type) {
+        value = mapValuesToCA(value, type);
         this.attr('value', value || null);
-        this.attr('isModified', this.attr('def').id);
+        this.attr('isModified', this.attr('def.id'));
       },
       save: function (value) {
         var instance = this.attr('instance');
         var type = this.attr('type');
-        value = mapValuesToCA(value, type);
-        this.updateValueInstance(value);
+
+        this.attr('isSaving', true);
+
+        this.updateValueInstance(value, type);
         instance.save()
           .done(function () {
             $(document.body).trigger('ajax:flash', {
@@ -100,22 +120,7 @@
     },
     events: {
       init: function () {
-        var scope = this.scope;
-        var value = scope.attr('value');
-        var options = scope.attr('def.multi_choice_options');
-        var type = scope.attr('type');
-
-        if (options && _.isString(options)) {
-          options = options.split(',');
-        }
-
-        this.scope.attr('input', {
-          options: options,
-          value: mapValueForCA(value, type),
-          type: type,
-          title: scope.attr('def.title')
-        });
-        console.info('This scope', this.scope.attr());
+        this.scope.initInputAttrs();
       },
       '{scope.input} value': function (scope, ev, val) {
         this.scope.save(val);

@@ -68,7 +68,8 @@
           fields: fields
         });
         can.batch.stop();
-
+        this.clearValidation();
+        this.attr('isModified', null);
         this.attr('modal.open', true);
       }
     },

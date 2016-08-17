@@ -19,7 +19,7 @@
     tag: 'assessment-inline-edit',
     template: tpl,
     scope: {
-      title: null,
+      titleText: null,
       type: null,
       value: null,
       options: null,
@@ -70,7 +70,6 @@
           return;
         }
         this.attr('_value', value);
-        //this.attr('isSaving', true);
         this.attr('value', value);
       }
     },
@@ -81,7 +80,6 @@
       scope.attr('_value', value);
       scope.attr('context.value', value);
     },
-
     events: {
       '{window} mousedown': function (el, ev) {
         var scope = this.scope;

@@ -40,7 +40,6 @@
             if (value.custom_attribute_id === id) {
               value.attr('def', def);
               value.attr('attributeType', type);
-              //value.attr('id', value.id);
               value.attribute_value = value.attribute_object ?
                 value.attribute_object.reify() : value.attribute_value;
               valueData = value;
