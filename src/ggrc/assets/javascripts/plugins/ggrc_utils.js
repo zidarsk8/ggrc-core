@@ -1,14 +1,33 @@
 /*!
-  Copyright (C) 2016 Google Inc.
-  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 (function ($, GGRC, moment, Permission) {
+  var customAttributesType = {
+    Text: 'input',
+    'Rich Text': 'text',
+    'Map:Person': 'person',
+    Date: 'date',
+    Input: 'input',
+    Checkbox: 'checkbox',
+    Dropdown: 'dropdown'
+  };
   /**
    * A module containing various utility functions.
    */
   GGRC.Utils = {
     win: window,
+    sortingHelpers: {
+      commentSort: function (a, b) {
+        if (a.created_at < b.created_at) {
+          return 1;
+        } else if (a.created_at > b.created_at) {
+          return -1;
+        }
+        return 0;
+      }
+    },
     inViewport: function (el) {
       var bounds;
       var isVisible;
@@ -160,7 +179,6 @@
       }
       return result;
     },
-
     /**
      * Determine if two types of models can be mapped
      *
@@ -261,10 +279,18 @@
       if (target instanceof can.Model) {
         canMap = canMap &&
           (Permission.is_allowed_for('update', target) ||
-           targetType === 'Person' ||
-           _.contains(createContexts, targetContext));
+          targetType === 'Person' ||
+          _.contains(createContexts, targetContext));
       }
       return canMap;
+    },
+    /**
+     * Return normalized Custom Attribute Type from Custom Attribute Definition
+     * @param {String} type - String Custom Attribute Value from JSON
+     * @return {String} - Normalized Custom Attribute Type
+     */
+    mapCAType: function (type) {
+      return customAttributesType[type];
     },
     isEmptyCA: function (value, type) {
       var result = false;
@@ -279,9 +305,9 @@
           return _.isEmpty(value);
         }
       };
-      if (types.indexOf(type) >= 0 && options[type]) {
+      if (types.indexOf(type) > -1 && options[type]) {
         result = options[type](value);
-      } else if (types.indexOf(type) >= 0) {
+      } else if (types.indexOf(type) > -1) {
         result = _.isEmpty(value);
       }
       return result;
