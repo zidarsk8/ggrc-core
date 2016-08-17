@@ -4,6 +4,8 @@
 """Initialize RBAC"""
 
 import datetime
+import itertools
+
 import sqlalchemy.orm
 from sqlalchemy import and_
 from sqlalchemy import case
@@ -12,6 +14,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 from flask import Blueprint
 from flask import g
+
 from ggrc import db
 from ggrc import settings
 from ggrc.app import app
@@ -935,11 +938,12 @@ def create_audit_context(audit):
   audit.context = context
 
 
-@Resource.model_posted.connect_via(Audit)
-def handle_audit_post(sender, obj=None, src=None, service=None):
-  if not src.get("operation", None):
-    db.session.flush()
-    create_audit_context(obj)
+@Resource.collection_posted.connect_via(Audit)
+def handle_audit_post(sender, objects=None, sources=None):
+  for obj, src in itertools.izip(objects, sources):
+    if not src.get("operation", None):
+      db.session.flush()
+      create_audit_context(obj)
 
 
 @Resource.model_deleted.connect
