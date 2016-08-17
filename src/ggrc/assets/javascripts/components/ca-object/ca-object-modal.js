@@ -7,7 +7,7 @@
   'use strict';
 
   var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/modal/attachments.mustache');
+    '/components/ca-object/ca-object-modal.mustache');
   var baseCls = 'attachment-modal';
 
   function recalculatePosition(el) {
@@ -20,8 +20,8 @@
     return {top: top, left: left};
   }
 
-  GGRC.Components('assessmentModalAttachments', {
-    tag: 'assessment-modal-attachments',
+  GGRC.Components('customAttributeObjectModal', {
+    tag: 'ca-object-modal',
     template: tpl,
     scope: {
       instance: null,
@@ -29,9 +29,9 @@
       modalCls: '',
       modalOverlayCls: '',
       modalEl: null,
+      isPerson: false,
       comment: false,
       evidence: false,
-      isPerson: false,
       state: {
         open: false,
         save: false,
@@ -62,7 +62,6 @@
         this.attr('modalCls', isOpen ? baseCls + '-open' : '');
         this.attr('modalOverlayCls', isOpen ? baseCls + '__overlay-open' : '');
         this.attr('isPerson', isPerson);
-
         if (isOpen && this.attr('modalEl')) {
           modal = this.attr('modalEl');
           modal.offset(recalculatePosition(modal));
@@ -73,7 +72,7 @@
         }
       },
       setAttachmentFields: function (isOpen) {
-        var attachments = this.attr('modifiedField.requiredAttachments');
+        var attachments = this.attr('modifiedField.fields');
 
         if (attachments && attachments.length) {
           attachments.forEach(function (item) {
@@ -82,7 +81,7 @@
         }
       },
       mapToInternal: function () {
-        this.attr('modifiedField', this.attr('instance._modifiedAttribute'));
+        this.attr('modifiedField', this.attr('modal'));
       }
     },
     events: {
@@ -98,15 +97,9 @@
           this.scope.show();
         }
       },
-      '{scope.instance._modifiedAttribute} showModal': 'show',
+      '{scope.modal} open': 'show',
       '{scope.state} open': function () {
         this.scope.applyState();
-      }
-    },
-    helpers: {
-      renderFieldValue: function (value) {
-        value = value();
-        return value || '<span class="empty-message">None</span>';
       }
     }
   });
