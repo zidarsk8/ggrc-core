@@ -83,10 +83,11 @@ class QueryHelper(object):
 
   """
 
-  def __init__(self, query):
+  def __init__(self, query, ca_disabled=False):
     importable = get_exportables()
     self.object_map = {o.__name__: o for o in importable.values()}
     self.query = self._clean_query(query)
+    self.ca_disabled = ca_disabled
     self._set_attr_name_map()
 
   def _set_attr_name_map(self):
@@ -113,8 +114,12 @@ class QueryHelper(object):
         if value:
           self.attr_name_map[object_class][value.lower()] = (key.lower(),
                                                              filter_by)
-      custom_attrs = AttributeInfo.get_custom_attr_definitions(
-          object_class)
+      if not self.ca_disabled:
+        custom_attrs = AttributeInfo.get_custom_attr_definitions(
+            object_class)
+      else:
+        custom_attrs = {}
+
       for key, definition in custom_attrs.items():
         if not key.startswith("__custom__:") or \
            "display_name" not in definition:

@@ -58,7 +58,7 @@ def get_objects_by_query():
   """Return objects corresponding to a POST'ed query list."""
   query = request.json
 
-  query_helper = QueryAPIQueryHelper(query)
+  query_helper = QueryAPIQueryHelper(query, ca_disabled=True)
   results = query_helper.get_results()
 
   last_modified_list = [result["last_modified"] for result in results
