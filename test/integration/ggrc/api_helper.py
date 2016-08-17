@@ -120,6 +120,8 @@ class Api(object):
       response, db.Model: The put response from the server and the modified
         object if the put request was successful.
     """
+    if data is None:
+      data = {}
     obj_dict = builder.json.publish(obj)
     builder.json.publish_representation(obj_dict)
     obj_dict.update(data)
