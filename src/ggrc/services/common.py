@@ -12,6 +12,7 @@ import itertools
 import json
 import logging
 import time
+from collections import defaultdict
 from exceptions import TypeError
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
@@ -364,6 +365,9 @@ def clear_permission_cache():
 
 
 class ModelView(View):
+  """Basic view handler for all models"""
+  # pylint: disable=protected-access
+  # access to _sa_class_manager is needed for fetching the right mapper
   DEFAULT_PAGE_SIZE = 20
   MAX_PAGE_SIZE = 100
   pk = 'id'
@@ -1211,6 +1215,29 @@ class Resource(ModelView):
         db.session.expunge_all()
         raise Forbidden()
 
+  def _gather_referenced_objects(self, data, accomulator=None):
+    if accomulator is None:
+      accomulator = defaultdict(set)
+    if isinstance(data, list):
+      for value in data:
+        self._gather_referenced_objects(value, accomulator)
+    elif isinstance(data, dict):
+      if "type" in data and data.get("id"):
+        accomulator[data["type"]].add(data["id"])
+      for value in data.values():
+        self._gather_referenced_objects(value, accomulator)
+    return accomulator
+
+  def _build_request_stub_cache(self, data):
+    objects = self._gather_referenced_objects(data)
+    g.referenced_objects = {}
+    for class_name, ids in objects.items():
+      class_ = getattr(ggrc.models, class_name, None)
+      if hasattr(class_, "query"):
+        g.referenced_objects[class_] = {
+            obj.id: obj for obj in class_.query.filter(class_.id.in_(ids))
+        }
+
   def collection_post_loop(self, body, res, no_result, running_async):
     """Handle all posted objects.
 
@@ -1313,16 +1340,20 @@ class Resource(ModelView):
         body = [body]
       res = []
       with benchmark("collection post > body loop: {}".format(len(body))):
+        with benchmark("Build stub query cache"):
+          self._build_request_stub_cache(body)
         try:
           self.collection_post_loop(body, res, no_result, running_async)
-        except (IntegrityError, ValidationError, ValueError) as e:
-          res.append(self._make_error_from_exception(e))
+        except (IntegrityError, ValidationError, ValueError) as error:
+          res.append(self._make_error_from_exception(error))
           db.session.rollback()
-        except Exception as e:
-          res.append((getattr(e, "code", 500), e.message))
+        except Exception as error:
+          res.append((getattr(error, "code", 500), error.message))
           current_app.logger.warn("Collection POST commit failed:")
-          current_app.logger.exception(e)
+          current_app.logger.exception(error)
           db.session.rollback()
+        if hasattr(g, "referenced_objects"):
+          delattr(g, "referenced_objects")
       with benchmark("collection post > calculate response statuses"):
         headers = {"Content-Type": "application/json"}
         errors = []
