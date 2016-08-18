@@ -7,6 +7,7 @@ from sqlalchemy import case
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
+from werkzeug.exceptions import BadRequest
 
 from ggrc import db
 from ggrc.models.computed_property import computed_property
@@ -176,8 +177,13 @@ class Comment(Relatable, Described, Documentable, Ownable, Base, db.Model):
     ca_val_revision = Revision.query.filter_by(
         resource_type='CustomAttributeValue',
         resource_id=ca_val_id,
-        action='created',
-    ).one()
+    ).order_by(
+        Revision.created_at.desc(),
+    ).limit(1).first()
+    if not ca_val_revision:
+      raise BadRequest("No Revision found for CA value with id provided under "
+                       "'custom_attribute_value': {}"
+                       .format(ca_val_dict))
 
     self.revision_id = ca_val_revision.id
     self.custom_attribute_definition_id = ca_val_revision.content.get(
