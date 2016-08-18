@@ -227,7 +227,7 @@ class CustomAttributeValue(Base, db.Model):
 
     Note: this validator does not check if id is a proper person id.
     """
-    if ":" in self.attribute_value:
+    if self.attribute_value and ":" in self.attribute_value:
       value, id_ = self.attribute_value.split(":")
       self.attribute_value = value
       self.attribute_object_id = id_
