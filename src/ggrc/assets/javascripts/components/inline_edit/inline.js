@@ -44,12 +44,7 @@
        */
       enableEdit: function (scope, $el, ev) {
         ev.preventDefault();
-        if (!this.attr('readonly') && scope.needConfirm) {
-          scope.needConfirm.confirm(scope.instance, scope.needConfirm)
-            .done(function () {
-              this.attr('context.isEdit', true);
-            }.bind(this));
-        } else if (!this.attr('readonly')) {
+        if (!this.attr('readonly')) {
           this.attr('context.isEdit', true);
         }
       },
