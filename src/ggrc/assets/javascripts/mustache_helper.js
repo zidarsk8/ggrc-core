@@ -3416,6 +3416,7 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
 
   var audits = instance.get_mapping("related_audits"),
       audit, programs, program, control, json, related_controls;
+  var canMap;
 
   if (!audits.length) {
     return "";
@@ -3443,8 +3444,18 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
       table_singular: instance.class.table_singular
     }
   };
-
-  return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));
+  // Check permissions
+  canMap = can.map([audit, program, control, instance], function (obj) {
+    if (_.isEmpty(obj)) {
+      return true;
+    }
+    return Permission.is_allowed_for('update', obj);
+  }).indexOf(false) === -1;
+  if (canMap) {
+    return options.fn(options.contexts.add(
+        {'create_issue_json': JSON.stringify(json)}));
+  }
+  return options.inverse(options.contexts);
 });
 
 Mustache.registerHelper("pretty_role_name", function (name) {
