@@ -3450,12 +3450,12 @@ Mustache.registerHelper('with_create_issue_json', function (instance, options) {
     }
   };
   // Check permissions
-  canMap = can.map([audit, program, control, instance], function (obj) {
+  canMap = [audit, program, control, instance].every(function (obj) {
     if (_.isEmpty(obj)) {
       return true;
     }
     return Permission.is_allowed_for('update', obj);
-  }).indexOf(false) === -1;
+  });
   if (canMap) {
     return options.fn(options.contexts.add(
         {create_issue_json: JSON.stringify(json)}));
