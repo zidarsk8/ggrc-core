@@ -95,8 +95,12 @@ can.Control('CMS.Controllers.TreeLoader', {
         width: 2
       }).spin();
       $spinner = $(spinner.el);
-      $wrapper = $('<div class="tree-spinner"/>');
-      if (!this.element.next().length) {
+      if (this.options.is_subtree) {
+        $wrapper = $('<li class="tree-item tree-spinner"/>');
+      } else {
+        $wrapper = $('<div class="tree-spinner"/>');
+      }
+      if (!this.options.is_subtree && !this.element.next().length) {
         $wrapper.css('height', '40px');
       }
 
@@ -1349,8 +1353,11 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     $filter
         .data('height', height)
         .data('margin-bottom', margin)
-        .height(0)
-        .css('margin-bottom', 0);
+        .css({
+          'margin-bottom': 0,
+          height: 0,
+          overflow: 'hidden'
+        });
 
     this.element.parent().find('.filter-trigger > a')
         .removeClass('active')
@@ -1368,8 +1375,11 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var $filter = this.element.parent().find('.tree-filter');
 
     $filter
-        .height($filter.data('height'))
-        .css('margin-bottom', $filter.data('margin-bottom'));
+        .css({
+          'margin-bottom': $filter.data('margin-bottom'),
+          height: $filter.data('height'),
+          overflow: ''
+        });
 
     this.element.parent().find('.filter-trigger > a')
         .addClass('active')
