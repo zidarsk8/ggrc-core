@@ -1,7 +1,7 @@
 /*!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 (function($) {
   function openclose(command) {
     var $that = $(this),
@@ -14,14 +14,7 @@
         $content = $li.children('.item-content'),
         $icon = $main.find('.openclose'),
         $parentTree = $this.closest('ul.new-tree'),
-        cmd = command,
-        callback
-      ;
-
-      callback = function() {
-        //  Trigger update for sticky headers and footers
-        $this.trigger("updateSticky");
-      };
+        cmd = command;
 
       if (typeof cmd !== "string" || cmd === "toggle") {
         cmd = $icon.hasClass("active") ? "close" : "open";
@@ -32,7 +25,6 @@
           $content.slideUp('fast', callback);
         } else {
           $content.css("display", "none");
-          callback();
         }
         $icon.removeClass('active');
         $li.removeClass('item-open');
@@ -44,7 +36,6 @@
           $content.slideDown('fast', callback);
         } else {
           $content.css("display", "block");
-          callback();
         }
         $icon.addClass('active');
         $li.addClass('item-open');
