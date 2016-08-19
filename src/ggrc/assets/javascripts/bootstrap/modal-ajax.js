@@ -254,6 +254,8 @@
       });
 
       $target.on('modal:success', function (e, data, xhr) {
+        var cssSelector;
+
         if (form_target == 'refresh') {
           refresh_page();
         } else if (form_target == 'redirect') {
@@ -280,6 +282,16 @@
             $active.closest('.active').removeClass('active');
             $active.click();
           }
+
+          // For some reason it can happen that the original $trigger element
+          // is removed from the DOM and replaced with another identical
+          // element. We thus need to trigger the event on that new element
+          // (present in the DOM) if we want event handlers to be invoked.
+          if (!document.contains($trigger[0])) {
+            cssSelector = '.' + $trigger.attr('class').replace(/ /g, '.');
+            $trigger = $(cssSelector);
+          }
+
           $trigger.trigger('routeparam', $trigger.data('route'));
           $trigger.trigger('modal:success', Array.prototype.slice.call(arguments, 1));
         }
