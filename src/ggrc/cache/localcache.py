@@ -1,34 +1,37 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-
 from collections import OrderedDict
 from cache import Cache
 from cache import all_cache_entries
 
-
 """
-    LocalCache implements the caching mechanism that is local to the AppEngine instance
-
+LocalCache implements the caching mechanism that is local to
+the AppEngine instance
 """
+
+
 class LocalCache(Cache):
-  """ LocalCache inherits from cache and it provides caching mechanism that is local to a particular gGRC instance
+  """ LocalCache inherits from cache and it provides caching mechanism that is
+      local to a particular gGRC instance
 
       Attributes:
-        cache_entries: Ordered dictionary containing resource id as key and value as JSON object (dictionary)
+        cache_entries: Ordered dictionary containing resource id as key and
+        value as JSON object (dictionary)
   """
 
-  cache_entries=OrderedDict()
+  cache_entries = OrderedDict()
 
   def __init__(self):
     self.name = 'local'
 
     for cache_entry in all_cache_entries():
       if cache_entry.cache_type is self.name:
-        self.supported_resources[cache_entry.model_plural]=cache_entry.class_name
+        self.supported_resources[cache_entry.model_plural] = \
+            cache_entry.class_name
 
     for key in self.supported_resources.keys():
-      self.cache_entries['collection:'+key] =  {}
+      self.cache_entries['collection:' + key] = {}
 
   def get_name(self):
     return self.name
@@ -51,7 +54,7 @@ class LocalCache(Cache):
 
     cache_key = self.get_key(category, resource)
     if cache_key is None:
-      return  None
+      return None
 
     entries = self.cache_entries.get(cache_key)
     if entries is None:
@@ -128,7 +131,8 @@ class LocalCache(Cache):
 
   def get_data(self, keys, cacheitems, attrs):
     """ Get data from cache for the given set of keys and attributes in cache
-        TODO(dan): all or none default policy is implemeted here, it should be in cachemanager
+        TODO(dan): all or none default policy is implemeted here, it should be
+        in cachemanager
     Args:
       keys: set of keys to search from local cache
       cacheitems: cache entries
@@ -138,26 +142,26 @@ class LocalCache(Cache):
       None on any errors
       mapping of DTO formatted string, e.g. JSON string representation
     """
-    data=OrderedDict()
+    data = OrderedDict()
 
     for key in keys:
-      if not cacheitems.has_key(key):
-        #  ALL or None Policy: if a key is not in cache, stop processing and continue as before going to Data-ORM layer
-        #
+      if key not in cacheitems:
+        #  ALL or None Policy: if a key is not in cache, stop processing and
+        #  continue as before going to Data-ORM layer
         return None
       attrvalues = cacheitems.get(key)
-      targetattrs=None
+      targetattrs = None
       if attrs is None and attrvalues is not None:
-        targetattrs=attrvalues.keys()
+        targetattrs = attrvalues.keys()
       elif attrvalues is None:
         # Do nothing as there are no attrs to get
         continue
       else:
-        targetattrs=attrs
+        targetattrs = attrs
 
       attr_dict = {}
       for attr in targetattrs:
-        if attrvalues.has_key(attr):
+        if attr in attrvalues:
           attr_dict[attr] = attrvalues.get(attr)
 
       data[key] = attr_dict
