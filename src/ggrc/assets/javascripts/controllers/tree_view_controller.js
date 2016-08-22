@@ -1510,13 +1510,21 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
   loadPage: function () {
     var options = this.options;
-    var params = GGRC.Utils.buildReqParamForQueryAPI(
-      options.model.shortName,
-      options.paging,
-      {
-        type: options.parent_instance.type,
-        id: options.parent_instance.id
-      });
+    var isObjectBrowser = /^\/objectBrowser\/?$/.test(window.location.pathname);
+    var params;
+    if (isObjectBrowser) {
+      params = GGRC.Utils.QueryAPI.buildParams(
+        options.model.shortName,
+        options.paging);
+    } else {
+      params = GGRC.Utils.QueryAPI.buildParams(
+        options.model.shortName,
+        options.paging,
+        {
+          type: options.parent_instance.type,
+          id: options.parent_instance.id
+        });
+    }
 
     this._draw_list_deferred = false;
     return this.page_loader.load({data: params})
