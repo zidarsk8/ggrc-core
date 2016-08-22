@@ -48,7 +48,7 @@ class BlockConverter(object):
     row_errors (list of str): list containing row errors
     row_warnings (list of str): list containing row warnings
     object_ids (list of int): list containing all ids for the converted objects
-    rows (list of list of str): 2D array containg csv data
+    rows (list of list of str): 2D array containing csv data
     row_converters (list of RowConverter): list of row convertor objects with
       data from the coresponding row in rows attribute
     object_headers (dict): A dictionary containing object headers

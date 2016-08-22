@@ -234,7 +234,7 @@
                                        .value();
       return $.when.apply($, dfds).then(function () {
         return _.filter(_.flatten(arguments), function (revision) {
-          // revisions where source == desitnation will be introduced when
+          // revisions where source == destination will be introduced when
           // spoofing the obj <-> instance mapping
           return revision.source.href !== revision.destination.href;
         });

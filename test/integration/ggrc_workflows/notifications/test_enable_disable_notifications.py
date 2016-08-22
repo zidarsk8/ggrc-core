@@ -41,7 +41,7 @@ class TestEnableAndDisableNotifications(TestCase):
     models.Notification.__init__ = init_decorator(models.Notification.__init__)
 
   @patch("ggrc.notifications.common.send_email")
-  def test_default_notificaitons_settings(self, mock_mail):
+  def test_default_notifications_settings(self, mock_mail):
 
     with freeze_time("2015-02-01 13:39:20"):
       _, wf = self.wf_generator.generate_workflow(self.quarterly_wf)

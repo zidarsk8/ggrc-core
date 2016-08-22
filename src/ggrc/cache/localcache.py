@@ -12,8 +12,8 @@ from cache import all_cache_entries
 
 """
 class LocalCache(Cache):
-  """ LocalCache inherits from cache and it provides caching mechanims that is local to a particular gGRC instance
-      
+  """ LocalCache inherits from cache and it provides caching mechanism that is local to a particular gGRC instance
+
       Attributes:
         cache_entries: Ordered dictionary containing resource id as key and value as JSON object (dictionary)
   """
@@ -43,7 +43,7 @@ class LocalCache(Cache):
 
     Returns:
       All or None policy is applied by default
-      None on any errors 
+      None on any errors
       Mapping of DTO formatted string, e.g. JSON string representation
     """
     if not self.is_caching_supported(category, resource):
@@ -109,7 +109,7 @@ class LocalCache(Cache):
       data: List of keys
 
     Returns:
-      None on any errors 
+      None on any errors
       mapping of DTO formatted string, e.g. JSON string representation
     """
     if not self.is_caching_supported(category, resource):
@@ -135,9 +135,9 @@ class LocalCache(Cache):
       attrs:  set of attributes to search from local cache
 
     Returns:
-      None on any errors 
+      None on any errors
       mapping of DTO formatted string, e.g. JSON string representation
-    """ 
+    """
     data=OrderedDict()
 
     for key in keys:

@@ -136,7 +136,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     """ Test name definitions for one class
 
     This function checks if names returned by get_object_column_definitions
-    match provided list of names with the approprate mapping names fro that
+    match provided list of names with the appropriate mapping names fro that
     class if has_mappings attribute is set.
     """
     definitions = get_object_column_definitions(obj_class)
