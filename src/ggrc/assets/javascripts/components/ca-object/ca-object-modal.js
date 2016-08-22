@@ -29,7 +29,10 @@
       modalCls: '',
       modalOverlayCls: '',
       modalEl: null,
-      isPerson: false,
+      isPerson: function () {
+        return this.attr('modifiedField.value') &&
+          this.attr('modifiedField.type') === 'person';
+      },
       comment: false,
       evidence: false,
       state: {
@@ -37,9 +40,6 @@
         save: false,
         empty: false,
         controls: false
-      },
-      applyState: function () {
-        this.toggle(this.attr('state.open'));
       },
       saveAttachments: function () {
         this.attr('state.save', true);
@@ -53,19 +53,10 @@
         this.attr('state.save', false);
       },
       toggle: function (isOpen) {
-        var modal;
-        var isPerson =
-          this.attr('modifiedField.value') &&
-          this.attr('modifiedField.type') === 'person';
-
         this.setAttachmentFields(isOpen);
         this.attr('modalCls', isOpen ? baseCls + '-open' : '');
         this.attr('modalOverlayCls', isOpen ? baseCls + '__overlay-open' : '');
-        this.attr('isPerson', isPerson);
-        if (isOpen && this.attr('modalEl')) {
-          modal = this.attr('modalEl');
-          modal.offset(recalculatePosition(modal));
-        }
+        this.setPosition(isOpen);
 
         if (this.attr('comment')) {
           this.attr('state.empty', true);
@@ -82,6 +73,12 @@
       },
       mapToInternal: function () {
         this.attr('modifiedField', this.attr('modal'));
+      },
+      setPosition: function (isOpen) {
+        var modal = this.attr('modalEl');
+        if (isOpen && modal) {
+          modal.offset(recalculatePosition(modal));
+        }
       }
     },
     events: {
@@ -98,8 +95,12 @@
         }
       },
       '{scope.modal} open': 'show',
-      '{scope.state} open': function () {
-        this.scope.applyState();
+      '{scope.state} open': function (scope, ev, val) {
+        this.scope.toggle(val);
+      },
+      '{window} resize': function () {
+        var isOpen = this.scope.attr('modifiedField.open');
+        this.scope.setPosition(isOpen);
       }
     }
   });

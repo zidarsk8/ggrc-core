@@ -30,6 +30,7 @@
             attributable_id: scope.id,
             custom_attribute_id: id,
             attribute_value: null,
+            attribute_object: null,
             preconditions_failed: (def.mandatory) ? ['value'] : [],
             def: def,
             attributeType: type
@@ -39,8 +40,6 @@
             if (value.custom_attribute_id === id) {
               value.attr('def', def);
               value.attr('attributeType', type);
-              value.attribute_value = value.attribute_object ?
-                value.attribute_object.reify() : value.attribute_value;
               valueData = value;
             }
           });

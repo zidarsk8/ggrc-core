@@ -3,14 +3,4 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <ca-object-title title-text="def.title"></ca-object-title>
-<assessment-inline-edit
-        value="input.value"
-        options="input.options"
-        type="input.type"
-        title-text="input.title"
-        placeholder="input.placeholder"
-        is-saving="isSaving"
-  {{^is_allowed 'update' instance context='for'}}
-        readonly
-  {{/is_allowed}}
-></assessment-inline-edit>
+<content></content>

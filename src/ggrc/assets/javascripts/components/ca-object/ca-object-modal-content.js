@@ -8,7 +8,6 @@
 
   var tpl = can.view(GGRC.mustache_path +
     '/components/ca-object/ca-object-modal-content.mustache');
-  var baseCls = 'attachment-modal';
 
   GGRC.Components('customAttributeObjectModalContent', {
     tag: 'ca-object-modal-content',
