@@ -840,7 +840,10 @@ can.Model('can.Model.Cacheable', {
     function sortById(a, b) {
       return a.id - b.id;
     }
-    this.attr('custom_attribute_definitions').sort(sortById);
+    // Sort only if definitions were attached.
+    if (this.attr('custom_attribute_definitions')) {
+      this.attr('custom_attribute_definitions').sort(sortById);
+    }
   },
 
   _custom_attribute_map: function (attrId, object) {
