@@ -19,7 +19,8 @@
     related_creators: 'creator',
     related_verifiers: 'verifier',
     related_assignees: 'assignee',
-    related_requesters: 'requester'
+    related_requesters: 'requester',
+    related_assessors: 'assessor'
   };
 
   function getAssigneeType(instance) {
