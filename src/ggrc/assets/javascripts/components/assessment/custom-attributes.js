@@ -13,7 +13,6 @@
     template: tpl,
     scope: {
       instance: null,
-      needConfirm: false,
       values: null,
       definitions: null,
       isModified: null,
@@ -21,7 +20,7 @@
         open: false
       },
       items: [],
-      prepareCustomAttributeValues: function (defs, values) {
+      updateValues: function (defs, values) {
         var scope = this;
         return can.map(defs, function (def) {
           var valueData = false;
@@ -49,32 +48,24 @@
           return valueData || new can.Map(stub);
         });
       },
-      refresh: function () {
+      refresh: function (isReady) {
         var scope = this;
-        scope.attr('values')
-          .replace(scope.prepareCustomAttributeValues(scope.attr('definitions'),
-            scope.attr('values')));
-        scope.attr('items', scope.attr('values'));
-      }
-    },
-    init: function () {
-      var scope = this.scope;
-      var status = scope.instance.status;
-      var needConfirm = status === 'Completed' || status === 'Verified';
-
-      if (!scope.instance.class.is_custom_attributable) {
-        return;
-      }
-      scope.attr('needConfirm', needConfirm);
-    },
-    events: {
-      '{scope.instance} isReadyForRender': function (sc, ev, isReady) {
-        var scope = this.scope;
         if (isReady) {
-          scope.refresh();
+          scope.attr('values')
+            .replace(scope.updateValues(scope.attr('definitions'),
+              scope.attr('values')));
+          scope.attr('items', scope.attr('values'));
         }
       }
     },
-    helpers: {}
+    init: function () {
+      var isReady = this.scope.attr('instance.isReadyForRender');
+      this.scope.refresh(isReady);
+    },
+    events: {
+      '{scope.instance} isReadyForRender': function (sc, ev, isReady) {
+        this.scope.refresh(isReady);
+      }
+    }
   });
 })(window.can, window.GGRC, window.CMS);

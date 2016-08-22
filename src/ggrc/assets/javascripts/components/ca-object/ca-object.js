@@ -9,7 +9,7 @@
   var tpl = can.view(GGRC.mustache_path +
     '/components/ca-object/ca-object.mustache');
 
-  function mapValueForCA(value, type) {
+  function mapValueFromCA(value, type) {
     if (type === 'checkbox') {
       return value === '1';
     }
@@ -32,8 +32,12 @@
     if (type === 'checkbox') {
       return value ? 1 : 0;
     }
+
     if (type === 'person') {
-      return value ? 'Person:' + value.id : value;
+      if (value && value instanceof can.Map) {
+        return 'Person:' + value.id;
+      }
+      return _.isEmpty(value) ? undefined : value;
     }
     return value;
   }
@@ -51,9 +55,10 @@
       },
       isModified: null,
       valueId: '@',
+      value: null,
+      valueObj: null,
       type: null,
       def: null,
-      value: null,
       isSaving: false,
       addComment: function () {
         can.batch.start();
@@ -74,18 +79,17 @@
 
         this.attr('modal.open', true);
       },
+      getOptions: function (options) {
+        return options && _.isString(options) ? options.split(',') : [];
+      },
       initInputAttrs: function () {
         var value = this.attr('value');
         var options = this.attr('def.multi_choice_options');
         var type = this.attr('type');
 
-        if (options && _.isString(options)) {
-          options = options.split(',');
-        }
-
         this.attr('input', {
-          options: options,
-          value: mapValueForCA(value, type),
+          options: this.getOptions(options),
+          value: mapValueFromCA(value, type),
           type: type,
           title: this.attr('def.title')
         });
@@ -104,12 +108,12 @@
         this.updateValueInstance(value, type);
         instance.save()
           .done(function () {
-            $(document.body).trigger('ajax:flash', {
+            can.$(document.body).trigger('ajax:flash', {
               success: 'Saved'
             });
           })
           .fail(function () {
-            $(document.body).trigger('ajax:flash', {
+            can.$(document.body).trigger('ajax:flash', {
               error: 'There was a problem saving'
             });
           })

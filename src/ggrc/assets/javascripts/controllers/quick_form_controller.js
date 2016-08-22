@@ -2,7 +2,7 @@
     Copyright (C) 2016 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-;(function(cam, $, GGRC) {
+(function(can, $, GGRC) {
 
 GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
   defaults : {
@@ -127,25 +127,20 @@ GGRC.Controllers.Modals("GGRC.Controllers.QuickForm", {
       that.options.instance.attr('_disabled', '');
     });
   }
-  }
-
-
-  , "a.undo click" : function(el, ev){
+  },
+  'a.undo click': function (el, ev) {
+    var newValue = this.options.instance.attr('_undo').shift();
     ev.stopPropagation();
-    var that = this
-      , name = el.data('name')
-      , old_value = this.options.instance.attr(name) || "";
 
-    new_value = that.options.instance.attr('_undo').shift();
-    that.options.instance.attr('_disabled', 'disabled');
-    that.options.instance.refresh().then(function(instance){
-      can.each(new_value, function(value, name) {
-        that.set_value({ name: name, value: value });
-      });
+    this.options.instance.attr('_disabled', 'disabled');
+    this.options.instance.refresh().then(function (instance) {
+      can.each(newValue, function (value, name) {
+        this.set_value({name: name, value: value});
+      }.bind(this));
       return instance.save();
-    }).then(function(){
-      that.options.instance.attr('_disabled', '');
-    });
+    }).then(function () {
+      this.options.instance.attr('_disabled', '');
+    }.bind(this));
   }
 });
-})(this.can, this.can.$, this.GGRC);
+})(window.can, window.can.$, window.GGRC);
