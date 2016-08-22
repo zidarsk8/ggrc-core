@@ -72,6 +72,7 @@
       var scope = this.scope;
       var val;
 
+      can.batch.start();
       _.each(definitions, function (obj, key) {
         var prefix = '';
         if (!_.has(scope, key)) {
@@ -85,8 +86,8 @@
           }
           scope.attr(key, val);
         }
-      }, this);
-
+      });
+      can.batch.stop();
       return init.call(this, arguments);
     };
   };
