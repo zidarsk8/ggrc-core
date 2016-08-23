@@ -59,7 +59,23 @@ dashboard-js-files:
   - client_record_replay.js
   - mustache_helper.js
   - generated/ggrc_filter_query_parser.js
-  - models/mappers.js
+  - models/mappers/mapping-result.js
+  - models/mappers/list-binding.js
+  - models/mappers/base-list-loader.js
+  - models/mappers/stub-filtered-list-loader.js
+  - models/mappers/cross-list-loader.js
+  - models/mappers/type-filtered-list-loader.js
+  - models/mappers/attr-filtered-list-loader.js
+  - models/mappers/first-element-loader.js
+  - models/mappers/custom-filtered-list-loader.js
+  - models/mappers/multi-list-loader.js
+  - models/mappers/intersecting-list-loader.js
+  - models/mappers/proxy-list-loader.js
+  - models/mappers/direct-list-loader.js
+  - models/mappers/indirect-list-loader.js
+  - models/mappers/search-list-loader.js
+  - models/mappers/reifying-list-loader.js
+  - models/mappers/mapper-helpers.js
   - models/mappings.js
   - models/mixins.js
   - models/cacheable.js
