@@ -4,8 +4,6 @@
 */
 
 (function (GGRC, can) {
-  'use strict';
-
   /*  SearchListLoader
    *  - handles search relationships
    *
@@ -111,10 +109,10 @@
 
       if (mappings) {
         this.insert_instances_from_mappings(binding, mappings);
-        return new $.Deferred().resolve(mappings);
+        result = new $.Deferred().resolve(mappings);
       } else {
         result = this.query_function(binding);
-        return result.pipe(function (mappings) {
+        result.pipe(function (mappings) {
           can.each(mappings, function (entry, i) {
             var _class = (can.getObject('CMS.Models.' + entry.type) ||
             can.getObject('GGRC.Models.' + entry.type));
@@ -126,6 +124,7 @@
           return mappings;
         });
       }
+      return result;
     },
     refresh_list: function (binding) {
       return this._refresh_stubs(binding);

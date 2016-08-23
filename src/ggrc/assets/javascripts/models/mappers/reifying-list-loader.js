@@ -4,8 +4,6 @@
 */
 
 (function (GGRC, can) {
-  'use strict';
-
   GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.ReifyingListLoader', {}, {
     init: function (source) {
       this._super();

@@ -1,15 +1,13 @@
 /*!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 (function (GGRC, can) {
-  'use strict';
-
-  GGRC.ListLoaders.StubFilteredListLoader("GGRC.ListLoaders.AttrFilteredListLoader", {
-    }, {
+  GGRC.ListLoaders.StubFilteredListLoader(
+    'GGRC.ListLoaders.AttrFilteredListLoader', {}, {
       init: function (source, prop, value, type) {
-        var filter_fn = function (binding) {
+        var filterFn = function (binding) {
           // TODO: We should filter by type as well
           if (!binding.mappings) {
             return;
@@ -17,34 +15,38 @@
           return _.any(binding.mappings, function (mapping) {
             var instance = mapping.instance;
             if (instance instanceof CMS.Models.Relationship) {
-              if (_.exists(instance, "attrs") &&
-                  instance.attrs[prop] &&
-                  (!value || _.contains(instance.attrs[prop].split(","), value))) {
+              if (_.exists(instance, 'attrs') &&
+                  instance.attrs[prop] && (!value ||
+                _.contains(instance.attrs[prop].split(','), value))) {
                 return true;
               }
             }
-            return filter_fn(mapping);
+            return filterFn(mapping);
           });
         };
         this.prop_name = prop;
         this.keyword = value;
         this.object_type = type;
-        this._super(source, filter_fn);
+        this._super(source, filterFn);
       },
       init_listeners: function (binding) {
         this._super(binding);
-        function itemFromList (list, id) {
+        function itemFromList(list, id) {
           return _.first(can.makeArray(list).filter(function (item) {
             return item.instance.id === id;
           }));
         }
 
-        CMS.Models.Relationship.bind("updated", function (ev, model) {
+        CMS.Models.Relationship.bind('updated', function (ev, model) {
+          var value;
+          var needle;
+          var active;
+          var activeInList;
+          var contains;
           if (!(model instanceof CMS.Models.Relationship)) {
             return;
           }
-          var value = can.getObject("attrs." + this.prop_name, model),
-              needle, active, activeInList, contains;
+          value = can.getObject('attrs.' + this.prop_name, model);
 
           if (model.source.type === this.object_type) {
             needle = model.source;
@@ -60,7 +62,7 @@
           if (!active) {
             return;
           }
-          contains = _.contains(value.split(","), this.keyword);
+          contains = _.contains(value.split(','), this.keyword);
           if (!contains && activeInList) {
             binding.list.splice(
                 _.map(binding.list, function (e) {
@@ -74,5 +76,5 @@
           }
         }.bind(this));
       }
-  });
+    });
 })(window.GGRC, window.can);

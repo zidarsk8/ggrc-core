@@ -1,76 +1,81 @@
 /*!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 (function (GGRC, can) {
-  'use strict';
-
   /*
-    CustomFilteredListLoader allows any sort of filter to be applied on instances
-    to create a new set of filtered items.  This depends on refresh_instances from
-    the source list loader and a filter function applied to each MappingResult.
+   CustomFilteredListLoader allows any sort of filter to be applied on instances
+   to create a new set of filtered items.  This depends on refresh_instances from
+   the source list loader and a filter function applied to each MappingResult.
 
-    The signature of the filter function is (MappingResult) -> truthy | falsy | Deferred
+   The signature of the filter function is (MappingResult) -> truthy | falsy | Deferred
 
-    if the filter function returns a Deferred, inclusion of the instance in the new
-    ListBinding will be contingent on the Deferred resolving to a truthy value.
+   if the filter function returns a Deferred, inclusion of the instance in the new
+   ListBinding will be contingent on the Deferred resolving to a truthy value.
 
-    Rejected Deferreds are treated as false.
-  */
-  GGRC.ListLoaders.StubFilteredListLoader("GGRC.ListLoaders.CustomFilteredListLoader", {
-  }, {
-      process_result : function (binding, result, new_result, include) {
+   Rejected Deferreds are treated as false.
+   */
+  GGRC.ListLoaders.StubFilteredListLoader(
+    'GGRC.ListLoaders.CustomFilteredListLoader', {}, {
+      process_result: function (binding, result, newResult, include) {
         var self = this;
         if (include) {
-          if(typeof include.then === "function") {
-            //return nothing yet. push in later if it is needed.
-            include.then(function (real_include) {
-              if(real_include) {
-                self.insert_results(binding, [new_result]);
+          if (typeof include.then === 'function') {
+            // return nothing yet. push in later if it is needed.
+            include.then(function (realInclude) {
+              if (realInclude) {
+                self.insert_results(binding, [newResult]);
               } else {
                 self.remove_instance(binding, result.instance, result);
               }
             }, function () {
-              //remove instance (if it exists) if the deferred rejects
+              // remove instance (if it exists) if the deferred rejects
               self.remove_instance(binding, result.instance, result);
             });
           } else {
-            self.insert_results(binding, [new_result]);
+            self.insert_results(binding, [newResult]);
           }
         } else {
           self.remove_instance(binding, result.instance, result);
         }
-
       },
 
       init_listeners: function (binding) {
         var self = this;
+        function resultCompute(result) {
+          return can.compute(function () {
+            return self.filter_fn(result);
+          });
+        }
 
-        if (typeof this.source === "string") {
+        if (typeof this.source === 'string') {
           binding.source_binding = binding.instance.get_binding(this.source);
         } else {
           binding.source_binding = this.source;
         }
 
-        binding.source_binding.list.bind("add", function (ev, results) {
+        binding.source_binding.list.bind('add', function (ev, results) {
           binding.refresh_instances().done(function () {
             new RefreshQueue().enqueue(
-              can.map(results, function (res) { return res.instance; })
+              can.map(results, function (res) {
+                return res.instance;
+              })
             ).trigger().done(function () {
               can.map(can.makeArray(results), function (result) {
-                var new_result = self.make_result(result.instance, [result], binding);
-                new_result.compute = can.compute(function () {
-                  return self.filter_fn(result);
-                });
-                new_result.compute.bind("change", $.proxy(self, "process_result", binding, result, new_result));
-                self.process_result(binding, result, new_result, new_result.compute());
+                var newResult =
+                  self.make_result(result.instance, [result], binding);
+                newResult.compute = resultCompute(result);
+                newResult.compute.bind('change',
+                  $.proxy(self, 'process_result', binding, result, newResult));
+                self.process_result(binding, result, newResult,
+                  newResult.compute());
               });
             });
           });
         });
 
-        binding.source_binding.list.bind("remove", function (ev, results) {
+        binding.source_binding.list.bind('remove', function (ev, results) {
           can.each(results, function (result) {
             self.remove_instance(binding, result.instance, result);
           });
@@ -83,18 +88,23 @@
         return binding.source_binding.refresh_instances()
           .then(function (results) {
             new RefreshQueue().enqueue(
-              can.map(results, function (res) { return res.instance; })
+              can.map(results, function (res) {
+                return res.instance;
+              })
             ).trigger().done(function () {
               can.map(can.makeArray(results), function (result) {
-                var new_result = self.make_result(result.instance, [result], binding);
-                new_result.compute = can.compute(function () {
+                var newResult =
+                  self.make_result(result.instance, [result], binding);
+                newResult.compute = can.compute(function () {
                   return self.filter_fn(result);
                 });
-                new_result.compute.bind("change", $.proxy(self, "process_result", binding, result, new_result));
-                self.process_result(binding, result, new_result, new_result.compute());
+                newResult.compute.bind('change',
+                  $.proxy(self, 'process_result', binding, result, newResult));
+                self.process_result(binding, result, newResult,
+                  newResult.compute());
               });
             });
           });
       }
-  });
+    });
 })(window.GGRC, window.can);

@@ -4,8 +4,6 @@
 */
 
 (function (GGRC, can) {
-  'use strict';
-
   GGRC.MapperHelpers = {};
 
   GGRC.MapperHelpers.Proxy = function Proxy(
