@@ -198,3 +198,15 @@ class CommentFactory(ModelFactory):
 
   class Meta:
     model = models.Comment
+
+
+class DocumentFactory(ModelFactory):
+
+  class Meta:
+    model = models.Document
+
+
+class ObjectDocumentFactory(ModelFactory):
+
+  class Meta:
+    model = models.ObjectDocument
