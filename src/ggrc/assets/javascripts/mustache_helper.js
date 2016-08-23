@@ -3411,24 +3411,30 @@ Mustache.registerHelper('get_custom_attr_value', function (attr, instance, optio
   return value;
 });
 
-Mustache.registerHelper("with_create_issue_json", function (instance, options) {
+Mustache.registerHelper('with_create_issue_json', function (instance, options) {
+  var audits;
+  var audit;
+  var programs;
+  var program;
+  var control;
+  var json;
+  var relatedControls;
+  var canMap;
+
   instance = Mustache.resolve(instance);
-
-  var audits = instance.get_mapping("related_audits"),
-      audit, programs, program, control, json, related_controls;
-
+  audits = instance.get_mapping('related_audits');
   if (!audits.length) {
-    return "";
+    return options.inverse(options.contexts);
   }
 
   audit = audits[0].instance.reify();
-  programs = audit.get_mapping("_program");
+  programs = audit.get_mapping('_program');
   program = programs.length ? programs[0].instance.reify() : {};
   control = instance.control ? instance.control.reify() : {};
-  related_controls = instance.get_mapping('related_controls');
+  relatedControls = instance.get_mapping('related_controls');
 
-  if (!control.id && related_controls.length) {
-    control = related_controls[0].instance;
+  if (!control.id && relatedControls.length) {
+    control = relatedControls[0].instance;
   }
   json = {
     audit: {title: audit.title, id: audit.id, type: audit.type},
@@ -3443,8 +3449,18 @@ Mustache.registerHelper("with_create_issue_json", function (instance, options) {
       table_singular: instance.class.table_singular
     }
   };
-
-  return options.fn(options.contexts.add({'create_issue_json': JSON.stringify(json)}));
+  // Check permissions
+  canMap = [audit, program, control, instance].every(function (obj) {
+    if (_.isEmpty(obj)) {
+      return true;
+    }
+    return Permission.is_allowed_for('update', obj);
+  });
+  if (canMap) {
+    return options.fn(options.contexts.add(
+        {create_issue_json: JSON.stringify(json)}));
+  }
+  return options.inverse(options.contexts);
 });
 
 Mustache.registerHelper("pretty_role_name", function (name) {
