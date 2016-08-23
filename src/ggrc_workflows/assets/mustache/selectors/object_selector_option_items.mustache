@@ -24,9 +24,7 @@
                 <div class="object-check" align="left">
 
                   <mapper-checkbox
-                    {{#is_allowed_to_map selected_object instance}}
-                      allowed-to-map="true"
-                    {{/is_allowed_to_map}}
+                    {{#is_allowed_to_map selected_object instance}}allowed-to-map="true"{{/is_allowed_to_map}}
                     appended="appended"
                     instance="instance"
                     instance_id="{{instance.id}}"
