@@ -11,6 +11,8 @@
   var tag = 'assessment-mapped-objects-list';
   var baseCls = '.assessment-mapped-objects';
   var popoverCls = baseCls + '__popover';
+  var itemTplsBasePath = GGRC.mustache_path +
+      '/components/assessment/mapped-objects/item-templates/';
   /**
    * Assessment specific mapped objects view component
    */
@@ -18,11 +20,13 @@
     tag: tag,
     template: tpl,
     scope: {
-      content: '<content></content>',
       selectedItem: null,
       selectedEl: null,
-      itemTpl: null,
+      itemsTpl: null,
       items: [],
+      getComputedItemsTpl: function (tpl) {
+        return itemTplsBasePath + tpl + '.mustache';
+      },
       addSelection: function (ctx, el) {
         this.removeSelection();
         this.attr('selectedEl', el);
@@ -37,8 +41,12 @@
         });
       }
     },
-    init: function () {
-      this.scope.attr('isOneItemTpl', this.scope.attr('itemTpl') === 'one');
+    helpers: {
+      renderItemsTpl: function (options) {
+        var tpl = this.attr('itemsTpl');
+        tpl = this.getComputedItemsTpl(tpl);
+        return can.view.render(tpl, options.scope);
+      }
     },
     events: {
       '{window} click': function (el, ev) {

@@ -2,11 +2,7 @@
     Copyright (C) 2016 Google Inc., authors, and contributors
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-{{#each items}}
-  {{#if isOneItemTpl}}
-    {{> '/static/mustache/components/assessment/mapped-objects/mapped-objects-item-one-row.mustache'}}
-  {{else}}
-    {{> '/static/mustache/components/assessment/mapped-objects/mapped-objects-item-two-row.mustache'}}
-  {{/if}}
-{{/each}}
+{{#items}}
+  {{#renderItemsTpl}}{{/renderItemsTpl}}
+{{/items}}
 <content></content>

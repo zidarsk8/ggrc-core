@@ -177,10 +177,10 @@ dashboard-js-template-files:
   - components/collapsible-panel/collapsible-panel-body.mustache
   - components/collapsible-panel/collapsible-panel-header.mustache
   - components/assessment/mapped-objects/mapped-objects.mustache
-  - components/assessment/mapped-objects/mapped-objects-item-one-row.mustache
-  - components/assessment/mapped-objects/mapped-objects-item-two-row.mustache
   - components/assessment/mapped-objects/mapped-objects-list.mustache
   - components/assessment/mapped-objects/mapped-objects-popover.mustache
+  - components/assessment/mapped-objects/item-templates/title.mustache
+  - components/assessment/mapped-objects/item-templates/title-and-description.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/attachments-list.mustache
   - components/assessment/custom_attributes.mustache

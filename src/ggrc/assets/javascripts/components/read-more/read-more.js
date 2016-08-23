@@ -12,6 +12,7 @@
   var defaultTextLength = 200;
   var readMore = 'Read More';
   var readLess = 'Read Less';
+  var overflowPostfix = '...';
   /**
    * Assessment specific read more view component
    */
@@ -22,27 +23,36 @@
       maxTextLength: null,
       text: null,
       expanded: false,
-      btnText: readMore,
       resultedText: null,
       overflowing: false,
-      toggle: function () {
-        var newValue = !this.attr('expanded');
-        this.attr('expanded', newValue);
-        this.attr('btnText', newValue ? readLess : readMore);
+      btnText: function () {
+        return this.attr('expanded') ? readLess : readMore;
       },
+      toggle: function () {
+        this.attr('expanded', !this.attr('expanded'));
+      },
+      /**
+       * Get Limited text string
+       * @param {String} text - is original text
+       * @param {Number} limit - is maximum allowed text length
+       * @return {string} - returns resulted text part with "..." ending
+         */
       getSlicedText: function (text, limit) {
-        limit -= 3;
-        return text.slice(0, limit) + '...';
+        // As we add extra postfix at the end - remove it's length from the limit
+        limit -= overflowPostfix.length;
+        return text.slice(0, limit) + overflowPostfix;
+      },
+      getTrimmedText: function (originalText) {
+        return can.$('<span>').html(originalText).text().trim();
       },
       setValues: function (originalText) {
         var limit = this.attr('maxTextLength') || defaultTextLength;
-        var resultedText =
-          can.$('<span>' + originalText + '</span>').text().trim();
-        var isOverflowing = resultedText.length >= limit;
+        var trimmedText = this.getTrimmedText(originalText);
+        var isOverflowing = trimmedText.length >= limit;
         this.attr('maxTextLength', limit);
         this.attr('overflowing', isOverflowing);
         this.attr('resultedText', isOverflowing ?
-          this.getSlicedText(resultedText, limit) :
+          this.getSlicedText(trimmedText, limit) :
           originalText);
       }
     },

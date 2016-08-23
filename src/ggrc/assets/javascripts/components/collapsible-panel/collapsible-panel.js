@@ -19,7 +19,12 @@
       titleText: '@',
       titleIcon: '@',
       expanded: true,
-      collapsed: '@'
+      define: {
+        collapsed: {
+          type: 'boolean',
+          'default': false
+        }
+      }
     },
     init: function () {
       this.scope.attr('expanded', !(this.scope.attr('collapsed')));

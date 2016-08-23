@@ -16,7 +16,6 @@
     tag: tag,
     template: tpl,
     scope: {
-      content: '<content></content>',
       titleText: '@',
       filter: '@',
       mapping: null,
@@ -24,7 +23,7 @@
       expanded: true,
       parentInstance: null,
       mappedObjects: [],
-      itemTpl: '@',
+      itemsTpl: '@',
       setMappedObjects: function (items) {
         this.attr('mappedObjects', items);
       },

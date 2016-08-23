@@ -11,7 +11,6 @@ describe('GGRC.Component.ReadMore', function () {
     ' Proin sollicitudin enim ante,' +
     ' sit amet elementum ipsum fringilla sed';
   var readMore = 'Read More';
-  var btnNewText = 'Read Less';
 
   var defaultScopeState = {
     text: testingText,
@@ -35,12 +34,10 @@ describe('GGRC.Component.ReadMore', function () {
 
     it('switch default state', function () {
       scope.attr('expanded', true);
-      scope.attr('btnText', btnNewText);
 
       toggle();
 
       expect(scope.attr('expanded')).toBe(defaultScopeState.expanded);
-      expect(scope.attr('btnText')).toBe(defaultScopeState.btnText);
     });
   });
   describe('.setValues() method', function () {
@@ -64,6 +61,25 @@ describe('GGRC.Component.ReadMore', function () {
       expect(scope.attr('text')).toBe(testingText);
       expect(scope.attr('overflowing')).toBe(true);
       expect(scope.attr('resultedText')).toBe(testingText.slice(0, 7) + '...');
+    });
+  });
+  describe('.getTrimmedText() method', function () {
+    var Component;  // the component under test
+    var getTrimmedText;
+    var scope;
+
+    beforeEach(function () {
+      Component = GGRC.Components.get('readMore');
+      scope = new can.Map(Component.prototype.scope);
+      getTrimmedText = Component.prototype.scope.getTrimmedText;
+      getTrimmedText = getTrimmedText.bind(scope);
+    });
+
+    it('switch update resultedText, overflowing', function () {
+      var errorText = '<img src="" />Some text';
+      var result = getTrimmedText(errorText);
+
+      expect(result).toBe('Some text');
     });
   });
 });
