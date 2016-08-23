@@ -312,7 +312,7 @@ class CustomAttributable(object):
       if definitions[int(ad_id)].attribute_type.startswith("Map:"):
         obj_type, obj_id = new_value.attribute_value.split(":")
         new_value.attribute_value = obj_type
-        new_value.attribute_object_id = obj_id
+        new_value.attribute_object_id = long(obj_id)
       # 5) Set the context_id for each custom attribute value to the context id
       #    of the custom attributable.
       # TODO: We are ignoring contexts for now
