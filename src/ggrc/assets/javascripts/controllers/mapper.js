@@ -33,7 +33,6 @@
     var btn = $(ev.currentTarget);
     var data = {};
     var isSearch;
-    ev.preventDefault();
 
     _.each(btn.data(), function (val, key) {
       data[can.camelCaseToUnderscore(key)] = val;
@@ -42,6 +41,10 @@
     if (data.tooltip) {
       data.tooltip.hide();
     }
+    if (!data.clickable) {
+      ev.preventDefault();
+    }
+
     isSearch = /unified-search/ig.test(data.toggle);
     GGRC.Controllers.MapperModal.launch(btn, _.extend({
       object: btn.data('join-object-type'),

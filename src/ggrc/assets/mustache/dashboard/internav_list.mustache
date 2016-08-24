@@ -51,6 +51,7 @@
         <a
           href="{{ selector }}"
           {{#is_mappable_type instance.type model.shortName}}
+            data-clickable="true"
             data-toggle="unified-mapper"
             data-join-option-type="{{model.shortName}}"
             data-join-object-id="{{instance.id}}"
