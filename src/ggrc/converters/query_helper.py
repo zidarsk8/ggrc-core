@@ -7,14 +7,14 @@
 
 import datetime
 import collections
+from operator import attrgetter
+
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
 
 from ggrc.rbac import permissions
 from ggrc.models.custom_attribute_value import CustomAttributeValue
-from ggrc.models.custom_attribute_definition import \
-    CustomAttributeDefinition as CAD
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
@@ -289,7 +289,7 @@ class QueryHelper(object):
         order_desc = order_by.get("desc", False)
         objects = sorted(
             objects,
-            key=lambda obj: getattr(obj, order_field),
+            key=attrgetter(order_field),
             reverse=order_desc,
         )
       except:
@@ -339,6 +339,19 @@ class QueryHelper(object):
               query["ids"],
           )
       )
+
+    def similar():
+      """Filter by relationships similarity."""
+      similar_class = self.object_map[exp["object_name"]]
+      if not hasattr(similar_class, "get_similar_objects"):
+        return BadQueryException("{} does not define weights to count "
+                                 "relationships similarity"
+                                 .format(similar_class.__name__))
+      similar_objects = similar_class.get_similar_objects(
+          id_=exp["id"],
+          types=[object_class.__name__],
+      )
+      return object_class.id.in_([obj.id for obj in similar_objects])
 
     def unknown():
       raise BadQueryException("Unknown operator \"{}\""
@@ -394,7 +407,8 @@ class QueryHelper(object):
         "<": lambda: with_left(lambda l: l < rhs()),
         ">": lambda: with_left(lambda l: l > rhs()),
         "relevant": relevant,
-        "text_search": text_search
+        "text_search": text_search,
+        "similar": similar,
     }
 
     return ops.get(exp["op"]["name"], unknown)()
