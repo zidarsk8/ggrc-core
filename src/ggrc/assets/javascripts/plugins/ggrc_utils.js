@@ -131,7 +131,7 @@
       var list = GGRC.tree_view.base_widgets_by_type[type];
       var forbidden;
       var forbiddenList = {
-        Program: ['Audit'],
+        Program: ['Audit', 'RiskAssessment'],
         Audit: ['Assessment', 'Program', 'Request'],
         Assessment: [],
         Request: ['Workflow', 'TaskGroup', 'Person', 'Audit'],
@@ -209,6 +209,7 @@
       var FORBIDDEN = Object.freeze({
         'audit program': true,
         'audit request': true,
+        'program riskassessment': true,
         'assessmenttemplate cacheable': true,
         'cacheable person': true
       });

@@ -81,6 +81,8 @@
           widget_name: 'Risk Assessments',
           content_controller: GGRC.Controllers.TreeView,
           content_controller_options: {
+            add_item_view: GGRC.mustache_path +
+              '/risk_assessments/tree_add_item.mustache',
             mapping: 'risk_assessments',
             parent_instance: page_instance,
             model: CMS.Models.RiskAssessment,
