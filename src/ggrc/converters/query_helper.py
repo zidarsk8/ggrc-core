@@ -9,6 +9,7 @@ import datetime
 import collections
 from operator import attrgetter
 
+import flask
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
@@ -278,6 +279,10 @@ class QueryHelper(object):
       limit: a tuple of indexes in format (from, to); objects is sliced to
              objects[from, to]
 
+    If order_by["name"] == "__similarity__" (a special non-field value),
+    similarity weights returned by WithSimilarityScore.get_similar_objects are
+    used for sorting.
+
     Returns:
       a sorted and sliced list of objects
     """
@@ -287,9 +292,20 @@ class QueryHelper(object):
         order_by = order_by[0]
         order_field = order_by["name"]
         order_desc = order_by.get("desc", False)
+
+        if order_field == "__similarity__" and objects:
+          # a special case to sort by weights from WithSimilarityScore
+          object_class = type(objects[0])
+          id_weight_map = {obj.id: obj.weight for obj in
+                           getattr(flask.g, "query_api_similar_objects", [])}
+          def key(obj):
+            return id_weight_map.get(obj.id)
+        else:
+          key = attrgetter(order_field)
+
         objects = sorted(
             objects,
-            key=attrgetter(order_field),
+            key=key,
             reverse=order_desc,
         )
       except:
@@ -351,6 +367,7 @@ class QueryHelper(object):
           id_=exp["id"],
           types=[object_class.__name__],
       )
+      flask.g.query_api_similar_objects = similar_objects  # used for sorting
       return object_class.id.in_([obj.id for obj in similar_objects])
 
     def unknown():
