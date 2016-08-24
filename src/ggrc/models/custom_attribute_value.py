@@ -234,9 +234,13 @@ class CustomAttributeValue(Base, db.Model):
 
   def _validate_dropdown(self):
     """Validate dropdown opiton."""
-    valid_options = self.custom_attribute.multi_choice_options.split(",")
-    if self.attribute_value and self.attribute_value not in valid_options:
-      raise ValueError("Invalid custom attribute dropdown option")
+    valid_options = set(self.custom_attribute.multi_choice_options.split(","))
+    if self.attribute_value:
+      self.attribute_value = self.attribute_value.strip()
+      if self.attribute_value not in valid_options:
+        raise ValueError("Invalid custom attribute dropdown option: {v}, "
+                         "expected one of {l}"
+                         .format(v=self.attribute_value, l=valid_options))
 
   def validate(self):
     """Validate custom attribute value."""
