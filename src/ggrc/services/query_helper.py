@@ -15,8 +15,8 @@ class QueryAPIQueryHelper(QueryHelper):
   query object = [
     {
       # the same parameters as in QueryHelper
-      query_type: "values", "ids" or "count" - the type of results requested
-      fields: [ a list of fields to include in JSON if query_type is "values" ]
+      type: "values", "ids" or "count" - the type of results requested
+      fields: [ a list of fields to include in JSON if type is "values" ]
     }
   ]
 
@@ -26,8 +26,8 @@ class QueryAPIQueryHelper(QueryHelper):
   query object with results = [
     {
       # the same fields as in QueryHelper
-      values: [ filtered objects in JSON ] (present if query_type is "values")
-      ids: [ ids of filtered objects ] (present if query_type is "ids")
+      values: [ filtered objects in JSON ] (present if type is "values")
+      ids: [ ids of filtered objects ] (present if type is "ids")
       count: the number of objects filtered, after "limit" is applied
       total: the number of objects filtered, before "limit" is applied
   """
