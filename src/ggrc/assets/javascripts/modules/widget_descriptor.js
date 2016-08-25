@@ -36,7 +36,8 @@
             instance: instance,
             model: instance.constructor,
             widget_view: widget_view || default_info_widget_view
-          }
+          },
+          order: 0
         });
     },
     /*

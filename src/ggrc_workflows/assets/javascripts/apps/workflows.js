@@ -397,6 +397,7 @@
         workflow: {
           widget_id: 'workflow',
           widget_name: 'Workflows',
+          order: 400,
           content_controller: GGRC.Controllers.TreeView,
           content_controller_options: {
             mapping: 'workflows',
@@ -409,6 +410,7 @@
         task: {
           widget_id: 'task',
           widget_name: 'Workflow Tasks',
+          order: 410,
           content_controller: GGRC.Controllers.TreeView,
           content_controller_options: {
             mapping: 'object_tasks',

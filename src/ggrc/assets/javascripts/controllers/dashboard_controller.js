@@ -145,6 +145,7 @@
           this.inner_nav_controller.update_widget_list(
             this.get_active_widget_elements());
         }
+        this.inner_nav_controller.sortWidgets();
       }
     },
 
@@ -387,6 +388,23 @@
       })[0] || undefined;
     },
 
+    /**
+     * Sort widgets in place by their `order` attribute in ascending order.
+     *
+     * The widgets with non-existing / non-numeric `order` value are placed
+     * at the end of the list.
+     */
+    sortWidgets: function () {
+      function sortByOrderAttr(widget, widget2) {
+        var order = _.isNumber(widget.order) ?
+                                widget.order : Number.MAX_SAFE_INTEGER;
+        var order2 = _.isNumber(widget2.order) ?
+                                 widget2.order : Number.MAX_SAFE_INTEGER;
+        return order - order2;
+      }
+      this.options.widget_list.sort(sortByOrderAttr);
+    },
+
     update_widget_list: function (widget_elements) {
       var widget_list = this.options.widget_list.slice(0);
       var that = this;
@@ -446,7 +464,8 @@
         internav_icon: icon,
         internav_display: title,
         spinner: this.options.spinners['#' + $widget.attr('id')],
-        model: widget_options && widget_options.model
+        model: widget_options && widget_options.model,
+        order: (widget_options || widget).order
       });
 
       index = this.options.widget_list.length;
@@ -464,6 +483,7 @@
           this.options.widget_list.push(widget);
         }
       }
+
       return widget;
     },
 

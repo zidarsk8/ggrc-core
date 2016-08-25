@@ -89,7 +89,8 @@
         widget_id: 'info',
         content_controller: GGRC.Controllers.InfoWidget,
         instance: object,
-        widget_view: info_widget_views[object_table]
+        widget_view: info_widget_views[object_table],
+        order: 0
       });
       model_names = can.Map.keys(base_widgets_by_type);
       model_names.sort();
@@ -168,11 +169,82 @@
 
       extra_descriptor_options = {
         all: {
-          Person: {
-            widget_icon: 'fa fa-person'
+          Standard: {
+            order: 10
+          },
+          Regulation: {
+            order: 20
+          },
+          Contract: {
+            order: 30
+          },
+          Section: {
+            order: 40
+          },
+          Objective: {
+            order: 50
+          },
+          Control: {
+            order: 60
+          },
+          AccessGroup: {
+            order: 100
+          },
+          Assessment: {
+            order: 110
+          },
+          Audit: {
+            order: 120
+          },
+          Clause: {
+            order: 130
+          },
+          DataAsset: {
+            order: 140
           },
           Document: {
-            widget_icon: 'fa fa-link'
+            widget_icon: 'fa fa-link',
+            order: 150
+          },
+          Facility: {
+            order: 160
+          },
+          Issue: {
+            order: 170
+          },
+          Market: {
+            order: 180
+          },
+          OrgGroup: {
+            order: 190
+          },
+          Person: {
+            widget_icon: 'fa fa-person',
+            order: 200
+          },
+          Policy: {
+            order: 210
+          },
+          Process: {
+            order: 220
+          },
+          Product: {
+            order: 230
+          },
+          Program: {
+            order: 240
+          },
+          Project: {
+            order: 250
+          },
+          Request: {
+            order: 260
+          },
+          System: {
+            order: 270
+          },
+          Vendor: {
+            order: 280
           }
         },
         Contract: {
