@@ -188,11 +188,9 @@
               success: 'Saved'
             });
             this.afterSave();
-          }.bind(this)).fail(function () {
+          }.bind(this)).fail(function (instance, err) {
             this.attr('context.value', this.attr('_value'));
-            $(document.body).trigger('ajax:flash', {
-              error: 'There was a problem saving'
-            });
+            GGRC.Errors.notifier()(err);
           }.bind(this)).always(function () {
             this.attr('isSaving', false);
           }.bind(this));

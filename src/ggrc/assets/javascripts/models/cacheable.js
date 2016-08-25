@@ -1226,7 +1226,7 @@ can.Model('can.Model.Cacheable', {
       })
       .fail(function (response) {
         that.notifier.on_empty(function () {
-          dfd.reject(that, response.responseText);
+          dfd.reject(that, response);
         });
       })
       .done(function () {
