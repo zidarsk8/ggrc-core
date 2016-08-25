@@ -7,14 +7,16 @@
 
 import datetime
 import collections
-from operator import attrgetter
 
 import flask
 from sqlalchemy import and_
+from sqlalchemy import case
 from sqlalchemy import not_
 from sqlalchemy import or_
+from sqlalchemy import orm
 
 from ggrc.rbac import permissions
+from ggrc import models
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
@@ -272,31 +274,100 @@ class QueryHelper(object):
 
     return objs
 
-  @staticmethod
-  def _apply_order_by(model, query, order_by):
+  def _apply_order_by(self, model, query, order_by):
     """Add ordering parameters to a query for objects.
+
+    This works only on direct model properties and related objects defined with
+    foreign keys and fails if any CAs are specified in order_by.
 
     Args:
       model: the model instances of which are requested in query;
       query: a query to get objects from the db;
-      order_by: a list of dicts with keys "field" (the name of the field by
-                which to sort) and "desc" (optional; do reverse sort if True).
+      order_by: a list of dicts with keys "name" (the name of the field by which
+                to sort) and "desc" (optional; do reverse sort if True).
 
     If order_by["name"] == "__similarity__" (a special non-field value),
     similarity weights returned by get_similar_objects_query are used for
     sorting.
 
+    If sorting by a relationship field is requested, the following sorting is
+    applied:
+    1. If the field is a relationship to a Titled model, sort by its title.
+    2. If the field is a relationship to Person, sort by its name or email (if
+       name is None or empty string for a person object).
+    3. Otherwise, raise a NotImplementedError.
+
     Returns:
       the query with sorting parameters.
     """
-    def model_field(ob):
-      # __similarity__ is not implemented yet
-      return getattr(model, ob["name"])
+    def join_and_order(clause):
+      """Get join operation and ordering field from item of order_by list.
 
-    return query.order_by(
-      *(model_field(ob) if not ob.get("desc") else model_field(ob).desc()
-        for ob in order_by)
-    )
+      Args:
+        clause: {"name": the name of model's field,
+                 "desc": reverse sort on this field if True}
+
+      Returns:
+
+        (join, order) - a tuple of join required for this ordering to work and
+                        ordering clause itself;
+                        join is None if no join required or
+                        (aliased entity, relationship field) if join required.
+      """
+      join = None
+      order = None
+
+      # transform clause["name"] into a model's field name
+      key = clause["name"].lower()
+
+      if key == "__similarity__":
+        # special case
+        if hasattr(flask.g, "similar_objects_query"):
+          join_target = flask.g.similar_objects_query.subquery()
+          join_condition = model.id == join_target.c.id
+          join = join_target, join_condition
+          order = join_target.c.weight
+        else:
+          raise BadQueryException("Can't order by '__similarity__' when no ",
+                                  "'similar' filter was applied.")
+      else:
+        key, _ = self.attr_name_map[model].get(key, (key, None))
+        attr = getattr(model, key, None)
+        if attr is None:
+          raise BadQueryException("Model '{model.__name__}' does not have "
+                                  "'{key}' attribute"
+                                  .format(model=model, key=key))
+        if (isinstance(attr, orm.attributes.InstrumentedAttribute) and
+                isinstance(attr.property, orm.properties.RelationshipProperty)):
+          # a relationship
+          related_model = attr.property.mapper.class_
+          if issubclass(related_model, models.mixins.Titled):
+            join = alias, _ = orm.aliased(attr), attr
+            order = alias.title
+          elif issubclass(related_model, models.Person):
+            join = alias, _ = orm.aliased(attr), attr
+            order = case([(not_(or_(alias.name.is_(None), alias.name == '')),
+                           alias.name)],
+                         else_=alias.email)
+          else:
+            raise NotImplementedError("Sorting by {model.__name__} is "
+                                      "not implemented yet."
+                                      .format(model=related_model))
+        else:
+          # a simple attribute
+          order = attr
+
+      if clause.get("desc", False):
+        order = order.desc()
+
+      return join, order
+
+    joins, orders = zip(*[join_and_order(clause) for clause in order_by])
+    for join in joins:
+      if join is not None:
+        query = query.outerjoin(*join)
+
+    return query.order_by(*orders)
 
   @staticmethod
   def _apply_limit(objects, limit):
@@ -362,11 +433,12 @@ class QueryHelper(object):
         return BadQueryException("{} does not define weights to count "
                                  "relationships similarity"
                                  .format(similar_class.__name__))
-      similar_objects = similar_class.get_similar_objects_query(
+      similar_objects_query = similar_class.get_similar_objects_query(
           id_=exp["id"],
           types=[object_class.__name__],
-      ).all()
-      flask.g.query_api_similar_objects = similar_objects  # used for sorting
+      )
+      flask.g.similar_objects_query = similar_objects_query
+      similar_objects = similar_objects_query.all()
       return object_class.id.in_([obj.id for obj in similar_objects])
 
     def unknown():

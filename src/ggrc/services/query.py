@@ -10,6 +10,7 @@ from flask import request
 from flask import current_app
 from werkzeug.exceptions import BadRequest
 
+from ggrc.converters.query_helper import BadQueryException
 from ggrc.services.query_helper import QueryAPIQueryHelper
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model
@@ -95,5 +96,5 @@ def init_query_view(app):
     """Advanced object collection queries view."""
     try:
       return get_objects_by_query()
-    except NotImplementedError as exc:
+    except (NotImplementedError, BadQueryException) as exc:
       raise BadRequest(exc.message)
