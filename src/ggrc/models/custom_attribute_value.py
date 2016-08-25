@@ -290,7 +290,7 @@ class CustomAttributeValue(Base, db.Model):
     if (self.custom_attribute.attribute_type ==
             self.custom_attribute.ValidTypes.DROPDOWN):
       failed_preconditions += self._check_dropdown_requirements()
-    return failed_preconditions
+    return failed_preconditions or None
 
   def _check_dropdown_requirements(self):
     """Check mandatory comment and mandatory evidence for dropdown CAV."""

@@ -214,6 +214,7 @@
         });
         // If Custom Attribute Value is presented - do all required checks
         if (cav) {
+          cav.preconditions_failed = cav.preconditions_failed || [];
           if (cad.mandatory &&
             GGRC.Utils.isEmptyCA(value, cad.attribute_type)) {
             errorsList.value.push(cad.title);

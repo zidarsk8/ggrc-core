@@ -19,9 +19,6 @@
       value: null,
       isModified: null,
       validation: {},
-      clearValidation: function () {
-        this.attr('errors').replace([]);
-      },
       isEmpty: function () {
         var errors = this.attr('errors');
         return errors.length && this.hasError(errors, 'value');
@@ -68,7 +65,6 @@
           fields: fields
         });
         can.batch.stop();
-        this.clearValidation();
         this.attr('isModified', null);
         this.attr('modal.open', true);
       }
@@ -77,9 +73,6 @@
       init: function () {
         this.scope.setValidation();
         this.scope.checkRequired();
-      },
-      '{scope} value': function () {
-        this.scope.clearValidation();
       }
     }
   });

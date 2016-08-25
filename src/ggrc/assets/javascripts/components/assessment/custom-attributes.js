@@ -40,6 +40,8 @@
             if (value.custom_attribute_id === id) {
               value.attr('def', def);
               value.attr('attributeType', type);
+              value.attr('preconditions_failed',
+                value.attr('preconditions_failed') || []);
               valueData = value;
             }
           });
