@@ -27,7 +27,7 @@
             var type = cad.attribute_type;
             can.each(this.attr('instance.custom_attribute_values'),
               function (val) {
-                val = val.reify();
+                val = val.isStub ? val : val.reify();
                 if (val.custom_attribute_id === cad.id) {
                   cav = val;
                 }
@@ -41,9 +41,10 @@
         return result;
       }
     },
-    content: '<content/>',
     init: function () {
-      this.scope.instance.setup_custom_attributes();
+      if (this.scope.instance.class.is_custom_attributable) {
+        this.scope.instance.setup_custom_attributes();
+      }
     },
     events: {
     }

@@ -826,7 +826,7 @@
           var attributeValue;
           var object;
           var stub = value;
-          value = stub.reify();
+          value = value.isStub ? value : stub.reify();
           def = _.find(this.custom_attribute_definitions, {
             id: value.custom_attribute_id
           });

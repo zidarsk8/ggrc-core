@@ -33,6 +33,7 @@
       threshold: 5
     },
     is_custom_attributable: true,
+    isAssessment: true,
     attributes: {
       control: 'CMS.Models.Control.stub',
       context: 'CMS.Models.Context.stub',

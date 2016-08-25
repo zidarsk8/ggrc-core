@@ -27,6 +27,7 @@
           var id = def.id;
           var type = GGRC.Utils.mapCAType(def.attribute_type);
           var stub = {
+            isStub: true,
             attributable_id: scope.id,
             custom_attribute_id: id,
             attribute_value: null,

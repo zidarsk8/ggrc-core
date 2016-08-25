@@ -1,27 +1,25 @@
 /*!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
-
-(function(can, $) {
-/*  RefreshQueue
- *
- *  enqueue(obj, force=false) -> queue or null
- *  trigger() -> Deferred
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-can.Construct("ModelRefreshQueue", {
-}, {
-    init: function(model) {
+(function (can, $) {
+  /*  RefreshQueue
+   *
+   *  enqueue(obj, force=false) -> queue or null
+   *  trigger() -> Deferred
+   */
+
+  can.Construct('ModelRefreshQueue', {}, {
+    init: function (model) {
       this.model = model;
       this.ids = [];
       this.deferred = new $.Deferred();
       this.triggered = false;
       this.completed = false;
       this.updated_at = Date.now();
-    }
-
-  , enqueue: function(id) {
+    },
+    enqueue: function (id) {
       if (this.triggered) {
         return null;
       }
@@ -30,14 +28,13 @@ can.Construct("ModelRefreshQueue", {
         this.updated_at = Date.now();
       }
       return this;
-    }
-
-  , trigger: function () {
+    },
+    trigger: function () {
       var self = this;
       if (!this.triggered) {
         this.triggered = true;
-        if (this.ids.length) {
-          this.model.findAll({ id__in: this.ids.join(",") }).then(function () {
+        if (this.ids.length && this.model) {
+          this.model.findAll({id__in: this.ids.join(',')}).then(function () {
             self.completed = true;
             self.deferred.resolve();
           }, function () {
@@ -49,123 +46,122 @@ can.Construct("ModelRefreshQueue", {
         }
       }
       return this.deferred;
-    }
-
-  , trigger_with_debounce: function(delay, manager) {
-      var ms_to_wait = (delay || 0) + this.updated_at - Date.now();
+    },
+    trigger_with_debounce: function (delay, manager) {
+      var msToWait = (delay || 0) + this.updated_at - Date.now();
 
       if (!this.triggered) {
-        if (ms_to_wait < 0 && (!manager || manager.triggered_queues().length < 6)) {
+        if (msToWait < 0 &&
+          (!manager || manager.triggered_queues().length < 6)) {
           this.trigger();
         } else {
-          setTimeout(this.proxy('trigger_with_debounce', delay, manager), ms_to_wait);
+          setTimeout(
+            this.proxy('trigger_with_debounce', delay, manager), msToWait);
         }
       }
 
       return this.deferred;
     }
-});
+  });
 
-can.Construct("RefreshQueueManager", {
+  can.Construct('RefreshQueueManager', {
     model_bases: {
       // This won't work until Relatable/Documentable/etc mixins can handle
       // queries with multiple `type` values.
       //  Regulation: 'Directive'
-      //, Contract: 'Directive'
-      //, Policy: 'Directive'
-      //, Standard: 'Directive'
-      //, System: 'SystemOrProcess'
-      //, Process: 'SystemOrProcess'
+      // , Contract: 'Directive'
+      // , Policy: 'Directive'
+      // , Standard: 'Directive'
+      // , System: 'SystemOrProcess'
+      // , Process: 'SystemOrProcess'
     }
-}, {
-    init: function() {
+  }, {
+    init: function () {
       this.null_queue = new ModelRefreshQueue(null);
       this.queues = [];
-    }
-
-  , triggered_queues: function() {
-      return can.map(this.queues, function(queue) {
+    },
+    triggered_queues: function () {
+      return can.map(this.queues, function (queue) {
         if (queue.triggered)
           return queue;
       });
-    }
-
-  , enqueue: function(obj, force) {
-      var self = this
-        , model = obj.constructor
-        , model_name = model.shortName
-        , found_queue = null
-        , id = obj.id
-        ;
+    },
+    enqueue: function (obj, force) {
+      var self = this;
+      var model = obj.constructor;
+      var modelName = model.shortName;
+      var foundQueue = null;
+      var id = obj.id;
 
       if (!obj.selfLink) {
         if (obj instanceof can.Model) {
-          model_name = obj.constructor.shortName;
+          modelName = obj.constructor.shortName;
         } else if (obj.type) {
           // FIXME: obj.kind is to catch invalid stubs coming from Directives
-          model_name = obj.type || obj.kind;
+          modelName = obj.type || obj.kind;
         }
       }
-      model = CMS.Models[model_name];
+      model = CMS.Models[modelName];
 
-      if (this.constructor.model_bases[model_name]) {
-        model_name = this.constructor.model_bases[model_name];
-        model = CMS.Models[model_name];
+      if (this.constructor.model_bases[modelName]) {
+        modelName = this.constructor.model_bases[modelName];
+        model = CMS.Models[modelName];
       }
 
       if (!force)
-        // Check if the ID is already contained in another queue
-        can.each(this.queues, function(queue) {
-          if (!found_queue
-              && queue.model === model && queue.ids.indexOf(id) > -1)
-            found_queue = queue;
+      // Check if the ID is already contained in another queue
+        can.each(this.queues, function (queue) {
+          if (!foundQueue &&
+            queue.model === model && queue.ids.indexOf(id) > -1)
+            foundQueue = queue;
         });
 
-      if (!found_queue) {
-        can.each(this.queues, function(queue) {
-          if (!found_queue && queue.model === model
-              && !queue.triggered && queue.ids.length < 150) {
-            found_queue = queue.enqueue(id);
+      if (!foundQueue) {
+        can.each(this.queues, function (queue) {
+          if (!foundQueue &&
+            queue.model === model &&
+            !queue.triggered && queue.ids.length < 150) {
+            foundQueue = queue.enqueue(id);
             return false;
           }
         });
-        if (!found_queue) {
-          found_queue = new ModelRefreshQueue(model);
-          this.queues.push(found_queue)
-          found_queue.enqueue(id);
-          found_queue.deferred.done(function() {
-            var index = self.queues.indexOf(found_queue);
+        if (!foundQueue) {
+          foundQueue = new ModelRefreshQueue(model);
+          this.queues.push(foundQueue);
+          foundQueue.enqueue(id);
+          foundQueue.deferred.done(function () {
+            var index = self.queues.indexOf(foundQueue);
             if (index > -1)
               self.queues.splice(index, 1);
           });
         }
       }
 
-      return found_queue;
+      return foundQueue;
     }
-});
+  });
 
-can.Construct("RefreshQueue", {
+  can.Construct('RefreshQueue', {
     refresh_queue_manager: new RefreshQueueManager(),
-    refresh_all: function(instance, props, force) {
-      var dfd = new $.Deferred();
+    refresh_all: function (instance, props, force) {
+      var dfd = new can.Deferred();
 
-      _refresh_all(instance, props, dfd);
+      refreshAll(instance, props, dfd);
       return dfd;
 
       // Helper function called recursively for each property
-      function _refresh_all(instance, props, dfd) {
+      function refreshAll(instance, props, dfd) {
         var prop = props[0];
-        var next_props = props.slice(1);
+        var nextProps = props.slice(1);
         var next = instance[prop];
-        var refresh_queue = new RefreshQueue();
+        var refreshQueue = new RefreshQueue();
         var dfds = [];
         var deferred;
         var hasBinding;
 
         if (next) {
-          refresh_queue.enqueue(next, force);
-          deferred = refresh_queue.trigger();
+          refreshQueue.enqueue(next, force);
+          deferred = refreshQueue.trigger();
         } else if (instance.get_binding) {
           next = instance.get_binding(prop);
           hasBinding = instance.has_binding(prop);
@@ -180,18 +176,18 @@ can.Construct("RefreshQueue", {
           }
         }
         if (deferred) {
-          deferred.then(function(refreshed_items) {
-            if (next_props.length) {
-              can.each(refreshed_items, function(item) {
-                var d = new $.Deferred();
-                _refresh_all(item, next_props, d);
-                dfds.push(d);
+          deferred.then(function (refreshedItems) {
+            if (nextProps.length) {
+              can.each(refreshedItems, function (item) {
+                var df = new can.Deferred();
+                refreshAll(item, nextProps, df);
+                dfds.push(df);
               });
               // Resolve the original deferred only when all list deferreds
               //   have been resolved
-              $.when.apply($, dfds).then(function(items) {
+              $.when.apply($, dfds).then(function (items) {
                 dfd.resolve(items);
-              }, function() {
+              }, function () {
                 dfd.reject.apply(this, arguments);
               });
               return;
@@ -199,20 +195,20 @@ can.Construct("RefreshQueue", {
             // All items were refreshed, resolve the deferred
             if (next.push || next.list) {
               // Last refreshed property was a list
-              dfd.resolve(refreshed_items);
+              dfd.resolve(refreshedItems);
             }
             // Last refreshed property was a single instance, return it as such
-            dfd.resolve(refreshed_items[0]);
-          }, function() {
+            dfd.resolve(refreshedItems[0]);
+          }, function () {
             dfd.reject.apply(this, arguments);
           });
         } else {
-          console.warn("refresh_all failed at", prop);
+          console.warn('refresh_all failed at', prop);
         }
       }
-    },
-}, {
-    init: function() {
+    }
+  }, {
+    init: function () {
       this.objects = [];
       this.queues = [];
       this.deferred = new $.Deferred();
@@ -220,9 +216,9 @@ can.Construct("RefreshQueue", {
       this.completed = false;
 
       return this;
-    }
-
-  , enqueue: function (obj, force) {
+    },
+    enqueue: function (obj, force) {
+      var queue;
       if (!obj) {
         return;
       }
@@ -243,20 +239,20 @@ can.Construct("RefreshQueue", {
           this.queues.push(queue);
       }
       return this;
-    }
-
-  , trigger: function (delay) {
-      var self = this
-        , deferreds = []
-        ;
+    },
+    trigger: function (delay) {
+      var self = this;
+      var deferreds = [];
 
       if (!delay) {
         delay = 150;
       }
 
       this.triggered = true;
-      can.each(this.queues, function(queue) {
-        deferreds.push(queue.trigger_with_debounce(delay, self.constructor.refresh_queue_manager));
+      can.each(this.queues, function (queue) {
+        deferreds.push(
+          queue.trigger_with_debounce(delay,
+            self.constructor.refresh_queue_manager));
       });
 
       if (deferreds.length) {
@@ -273,7 +269,5 @@ can.Construct("RefreshQueue", {
 
       return this.deferred;
     }
-});
-
-
+  });
 })(window.can, window.can.$);
