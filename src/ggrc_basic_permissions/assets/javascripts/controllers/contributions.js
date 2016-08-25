@@ -484,7 +484,7 @@
       extra_join_query = { context_id: context.id };
     }
     // Otherwise use the page context
-    else if (GGRC.page_object) {
+    else if (GGRC.page_object && !GGRC.page_object.person) {
       context = GGRC.make_model_instance(GGRC.page_object).context;
       if (!context)
         throw new Error("`context` is required for Assignments model");
