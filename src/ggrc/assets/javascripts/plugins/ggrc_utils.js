@@ -133,7 +133,7 @@
       var forbiddenList = {
         Program: ['Audit'],
         Audit: ['Assessment', 'Program', 'Request'],
-        Assessment: ['TaskGroup'],
+        Assessment: ['Workflow', 'TaskGroup'],
         Request: ['Workflow', 'TaskGroup', 'Person', 'Audit'],
         Person: '*',
         AssessmentTemplate: '*'
