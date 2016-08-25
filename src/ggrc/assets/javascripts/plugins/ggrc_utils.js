@@ -275,7 +275,8 @@
           return value === '0';
         },
         'Rich Text': function (value) {
-          return _.isEmpty($(value).text());
+          value = GGRC.Utils.getPlainText(value);
+          return _.isEmpty(value);
         }
       };
       if (types.indexOf(type) >= 0 && options[type]) {
@@ -284,6 +285,15 @@
         result = _.isEmpty(value);
       }
       return result;
+    },
+    /**
+     * Remove all HTML tags from the string
+     * @param {String} originalText - original string for parsing
+     * @return {string} - plain text without tags
+       */
+    getPlainText: function (originalText) {
+      originalText = originalText || '';
+      return originalText.replace(/<[^>]*>?/g, '').trim();
     },
     /**
      * Add subtree for object tree view

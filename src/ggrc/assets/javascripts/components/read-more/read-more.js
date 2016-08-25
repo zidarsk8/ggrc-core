@@ -42,12 +42,9 @@
         limit -= overflowPostfix.length;
         return text.slice(0, limit) + overflowPostfix;
       },
-      getTrimmedText: function (originalText) {
-        return can.$('<span>').html(originalText).text().trim();
-      },
       setValues: function (originalText) {
         var limit = this.attr('maxTextLength') || defaultTextLength;
-        var trimmedText = this.getTrimmedText(originalText);
+        var trimmedText = GGRC.Utils.getPlainText(originalText);
         var isOverflowing = trimmedText.length >= limit;
         this.attr('maxTextLength', limit);
         this.attr('overflowing', isOverflowing);
