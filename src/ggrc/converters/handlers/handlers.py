@@ -651,12 +651,20 @@ class PersonUnmappingColumnHandler(ObjectPersonColumnHandler):
   def insert_object(self):
     if self.dry_run or not self.value:
       return
+    obj = self.row_converter.obj
+    context = getattr(obj, 'context', None)
+    user_role = getattr(all_models, 'UserRole', None)
     for person in self.value:
       ObjectPerson.query.filter_by(
-          personable_id=self.row_converter.obj.id,
-          personable_type=self.row_converter.obj.__class__.__name__,
+          personable_id=obj.id,
+          personable_type=obj.__class__.__name__,
           person=person
       ).delete()
+      if context and user_role:
+        # The fix is a bit hackish, because it uses ``UserRole`` model
+        # from ``ggrc_basic_permissions``. But it is the only way I found to
+        # fix the issue, without massive refactoring.
+        user_role.query.filter_by(person=person, context=context).delete()
     self.dry_run = True
 
 
