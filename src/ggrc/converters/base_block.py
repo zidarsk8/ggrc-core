@@ -31,6 +31,7 @@ from ggrc.services.common import get_modified_objects
 from ggrc.services.common import update_index
 from ggrc.services.common import update_memcache_after_commit
 from ggrc.services.common import update_memcache_before_commit
+from ggrc.services.common import log_event
 
 
 CACHE_EXPIRY_IMPORT = 600
@@ -379,6 +380,7 @@ class BlockConverter(object):
     """Commit all changes in the session and update memcache."""
     try:
       modified_objects = get_modified_objects(db.session)
+      log_event(db.session, None)
       update_memcache_before_commit(
           self, modified_objects, CACHE_EXPIRY_IMPORT)
       db.session.commit()
