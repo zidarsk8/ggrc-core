@@ -143,8 +143,10 @@
         this._super.apply(this, arguments);
       }
       this.validatePresenceOf('program');
-      this.validatePresenceOf('contact');
       this.validateNonBlank('title');
+      this.validatePresenceOf(['_transient.contact', 'contact'], {
+        message: 'Internal audit lead cannot be empty'
+      });
       this.validate(['_transient.audit_firm', 'audit_firm'],
         function () {
           var auditFirm = this.attr('audit_firm');
