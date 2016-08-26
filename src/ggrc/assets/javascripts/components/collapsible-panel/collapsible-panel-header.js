@@ -6,17 +6,18 @@
 (function (can, GGRC) {
   'use strict';
 
+  var tag = 'collapsible-panel-header';
   var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/mapped-objects/mapped-objects-title.mustache');
-  var tag = 'assessment-mapped-objects-title';
+    '/components/collapsible-panel/collapsible-panel-header.mustache');
   /**
-   * Assessment specific filtering mapped objects component
+   * Collapsible Panel component to add collapsing behavior
    */
-  GGRC.Components('assessmentMappedObjectsTitle', {
+  GGRC.Components('collapsiblePanelHeader', {
     tag: tag,
     template: tpl,
     scope: {
-      titleText: null,
+      titleIcon: null,
+      expanded: null,
       toggle: function () {
         this.attr('expanded', !this.attr('expanded'));
       }

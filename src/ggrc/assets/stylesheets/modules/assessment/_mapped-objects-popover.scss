@@ -10,19 +10,22 @@ assessment-mapped-objects-popover {
     opacity: 0.3;
     width: 0;
     z-index: 999;
-    box-shadow: 1px 3px 8px 1px $widgetBorder;
+    box-shadow: 1px 3px 9px 2px rgba(0,0,0,0.12);
+    border-radius: 2px;
     background: rgba(255, 255, 255, 1);
     overflow: hidden;
 
     .assessment-mapped-objects__popover-title {
       font-size: 14px;
       line-height: 18px;
+      display: block;
+      height: 18px;
     }
 
     .assessment-mapped-objects__popover-body {
       padding: 16px;
       box-sizing: border-box;
-      max-height: 300px;
+      max-height: 350px;
       overflow-y: auto;
       display: flex;
       flex-flow: column;
@@ -36,6 +39,11 @@ assessment-mapped-objects-popover {
         text-transform: uppercase;
         font-size: 11px;
       }
+    }
+
+    .assessment-mapped-objects__popover-content {
+      max-height: 290px;
+      overflow: auto;
     }
 
     .assessment-mapped-objects__popover-attributes {

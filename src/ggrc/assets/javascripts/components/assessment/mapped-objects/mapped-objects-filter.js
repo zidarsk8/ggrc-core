@@ -13,7 +13,6 @@
   GGRC.Components('assessmentMappedObjectsFilter', {
     tag: tag,
     scope: {
-      content: '<content></content>',
       mapping: null,
       items: null,
       filter: null,

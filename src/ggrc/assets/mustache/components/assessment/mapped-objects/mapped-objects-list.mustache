@@ -2,9 +2,7 @@
     Copyright (C) 2016 Google Inc., authors, and contributors
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<ul class="assessment-mapped-objects__list" {{#expanded}}expanded{{/expanded}}>
-  {{#each items}}
-    {{> '/static/mustache/components/assessment/mapped-objects/mapped-objects-item.mustache'}}
-  {{/each}}
-</ul>
+{{#items}}
+  {{#renderItemsTpl}}{{/renderItemsTpl}}
+{{/items}}
 <content></content>
