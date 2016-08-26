@@ -26,9 +26,19 @@
     scope: {
       instance: null,
       modifiedField: null,
-      modalCls: '',
-      modalOverlayCls: '',
       modalEl: null,
+      modalCls: function () {
+        return this.attr('state.open') ? baseCls + '-open' : '';
+      },
+      modalOverlayCls: function () {
+        return this.attr('state.open') ? baseCls + '__overlay-open' : '';
+      },
+      actionBtnText: function () {
+        return this.attr('comment') ? 'Save' : 'Done';
+      },
+      isEmpty: function () {
+        return this.attr('state.empty') && this.attr('comment');
+      },
       isPerson: function () {
         return this.attr('modifiedField.value') &&
           this.attr('modifiedField.type') === 'person';
@@ -38,29 +48,30 @@
       state: {
         open: false,
         save: false,
-        empty: false,
+        empty: true,
         controls: false
       },
       saveAttachments: function () {
-        this.attr('state.save', true);
+        return this.attr('comment') ?
+          this.attr('state.save', true) :
+          this.attr('state.open', false);
       },
       hide: function hide() {
         this.attr('state.open', false);
         this.attr('state.save', false);
+        this.attr('state.empty', true);
       },
       show: function () {
         this.attr('state.open', true);
         this.attr('state.save', false);
+        this.attr('state.empty', true);
       },
       toggle: function (isOpen) {
         this.setAttachmentFields(isOpen);
-        this.attr('modalCls', isOpen ? baseCls + '-open' : '');
-        this.attr('modalOverlayCls', isOpen ? baseCls + '__overlay-open' : '');
         this.setPosition(isOpen);
-
-        if (this.attr('comment')) {
-          this.attr('state.empty', true);
-        }
+      },
+      mapToInternal: function () {
+        this.attr('modifiedField', this.attr('modal'));
       },
       setAttachmentFields: function (isOpen) {
         var attachments = this.attr('modifiedField.fields');
@@ -70,9 +81,6 @@
             this.attr(item, isOpen);
           }.bind(this));
         }
-      },
-      mapToInternal: function () {
-        this.attr('modifiedField', this.attr('modal'));
       },
       setPosition: function (isOpen) {
         var modal = this.attr('modalEl');

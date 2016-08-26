@@ -15,6 +15,7 @@
     empty: false,
     controls: true
   });
+  var defaultPlaceHolderText = 'Enter comment (optional)';
   var types = {
     related_creators: 'creator',
     related_verifiers: 'verifier',
@@ -56,6 +57,7 @@
       caIds: null,
       instance: null,
       commentEl: null,
+      commentPlaceHolder: '@',
       notificationEl: null,
       isSaving: false,
       comment: {
@@ -146,6 +148,7 @@
         var scope = this.scope;
         scope.attr('instance', scope.attr('instance') || GGRC.page_instance());
         scope.attr('state', scope.attr('state') || defaultState);
+        scope.attr('commentPlaceHolder', scope.attr('commentPlaceHolder') || defaultPlaceHolderText);
       },
       '{scope.state} save': function (scope, ev, val) {
         if (val) {

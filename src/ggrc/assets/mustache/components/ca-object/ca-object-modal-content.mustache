@@ -9,13 +9,13 @@
           {{#if isPerson}}
               <person-info person-obj="content.value"></person-info>
           {{else}}
-              <assessment-read-more text="content.value"></assessment-read-more>
+              <read-more text="content.value"></read-more>
           {{/if}}
         </div>
     </div>
     <div class="attachment-modal__controls">
       {{#comment}}
-          <assessment-add-comment instance="instance" state="state" ca-ids="caIds"></assessment-add-comment>
+          <assessment-add-comment instance="instance" state="state" ca-ids="caIds" comment-place-holder="Enter comment"></assessment-add-comment>
       {{/comment}}
       {{#evidence}}
           <assessment-attachments-list class="attachment-list" source_mapping="instance"
