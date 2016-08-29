@@ -375,7 +375,7 @@ class WorkflowState(object):
 
     today = date.today()
     overdue_tasks = any(task.end_date and
-                        task.end_date <= today and
+                        task.end_date < today and
                         task.status != "Verified"
                         for task in current_tasks)
 
@@ -408,7 +408,7 @@ class WorkflowState(object):
     for cycle in current_cycles:
       for task in cycle.cycle_task_group_object_tasks:
         if (task.status != "Verified" and
-           task.end_date is not None and task.end_date <= today):
+           task.end_date is not None and task.end_date < today):
           return "Overdue"
 
     return cls._get_state(current_cycles)
