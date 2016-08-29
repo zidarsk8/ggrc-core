@@ -2,7 +2,7 @@
 
 APPENGINE_INSTANCE=local
 SETTINGS_MODULE="development app_engine ggrc_basic_permissions.settings.development ggrc_risks.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development"
-DATABASE_URI='mysql+mysqldb://root:root@localhost/ggrcdev?charset=utf8'
+DATABASE_URI="mysql+mysqldb://root:root@${GGRC_DATABASE_HOST:-localhost}/ggrcdev?charset=utf8"
 SECRET_KEY='Something-secret'
 GOOGLE_ANALYTICS_ID=""
 GOOGLE_ANALYTICS_DOMAIN=""
