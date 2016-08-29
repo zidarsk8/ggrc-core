@@ -167,6 +167,10 @@
         // here we are going to define extra descriptor options, meaning that
         //  these will be used as extra options to create widgets on top of
 
+      // NOTE: By default, widgets are sorted alphabetically (the value of
+      // the order 100+), but the objects with higher importance that should
+      // be  prioritized use order values below 100. An order value of 0 is
+      // reserved for the "info" widget which always comes first.
       extra_descriptor_options = {
         all: {
           Standard: {
@@ -267,26 +271,61 @@
             content_controller: GGRC.Controllers.TreeView
           }
         },
+
+        // An Audit has a different set of object that are more relevant to it,
+        // thus these objects have a customized priority. On the other hand,
+        // the object otherwise prioritized by default (e.g. Regulation) have
+        // their priority lowered so that they fit nicely into the alphabetical
+        // order among the non-prioritized object types.
         Audit: {
-          Person: {
-            widget_id: "person",
-            widget_name: "People",
-            widget_icon: "person",
-            content_controller: GGRC.Controllers.TreeView,
-            content_controller_options: {
-              mapping: "authorized_people",
-              allow_mapping: false,
-              allow_creating: false
-            }
+          Assessment: {
+            order: 10
+          },
+          AssessmentTemplate: {
+            order: 20
+          },
+          Issue: {
+            order: 30
           },
           Request: {
             widget_id: 'Request',
-            widget_name: 'Requests'
+            widget_name: 'Requests',
+            order: 40
+          },
+          Contract: {
+            order: 133  // between default Clause (130) and DataAsset (140)
+          },
+          Control: {
+            order: 137  // between default Clause (130) and DataAsset (140)
+          },
+          Objective: {
+            order: 182  // between default Market (180) and OrgGroup (190)
+          },
+          Regulation: {
+            order: 257  // between default Project (250) and Request (260)
           },
           program: {
-            widget_id: "program",
-            widget_name: "Program",
-            widget_icon: "program"
+            widget_id: 'program',
+            widget_name: 'Program',
+            widget_icon: 'program'
+          },
+          Section: {
+            order: 263  // between default Request (260) and System (270)
+          },
+          Standard: {
+            order: 267  // between default Request (260) and System (270)
+          },
+          Person: {
+            widget_id: 'person',
+            widget_name: 'People',
+            widget_icon: 'person',
+            // NOTE: "order" not overridden
+            content_controller: GGRC.Controllers.TreeView,
+            content_controller_options: {
+              mapping: 'authorized_people',
+              allow_mapping: false,
+              allow_creating: false
+            }
           }
         },
         Control: {
