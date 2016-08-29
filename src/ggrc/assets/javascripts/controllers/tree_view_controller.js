@@ -1510,19 +1510,18 @@ can.Control('CMS.Controllers.TreeViewNode', {
         this.draw_placeholder();
       }
     }.bind(this), 0);
-
   },
 
   '{instance} change': function (inst, ev, prop) {
     if (prop === 'custom_attribute_values') {
-      this.draw_node();
+      this.draw_node(true);
     }
   },
 
   /**
    * Trigger rendering the tree node in the DOM.
    */
-  draw_node: function () {
+  draw_node: function (force) {
     var isActive;
     var isPlaceholder;
     var lazyLoading = this.options.disable_lazy_loading;
@@ -1532,7 +1531,8 @@ can.Control('CMS.Controllers.TreeViewNode', {
     }
     isPlaceholder = this.element.hasClass('tree-item-placeholder');
 
-    if (this._draw_node_in_progress || !lazyLoading && !isPlaceholder) {
+    if (this._draw_node_in_progress ||
+        !force && (!lazyLoading && !isPlaceholder)) {
       return;
     }
 
