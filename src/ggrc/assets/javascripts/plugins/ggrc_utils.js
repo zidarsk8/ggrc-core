@@ -290,7 +290,7 @@
      * @return {String} - Normalized Custom Attribute Type
      */
     mapCAType: function (type) {
-      return customAttributesType[type];
+      return customAttributesType[type] || 'input';
     },
     isEmptyCA: function (value, type) {
       var result = false;
