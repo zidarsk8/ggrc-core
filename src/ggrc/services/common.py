@@ -190,14 +190,15 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
 
   context.cache_manager = _get_cache_manager()
 
-  if len(modified_objects.new) > 0:
-    memcache_mark_for_deletion(context, modified_objects.new.items())
+  if modified_objects is not None:
+    if len(modified_objects.new) > 0:
+      memcache_mark_for_deletion(context, modified_objects.new.items())
 
-  if len(modified_objects.dirty) > 0:
-    memcache_mark_for_deletion(context, modified_objects.dirty.items())
+    if len(modified_objects.dirty) > 0:
+      memcache_mark_for_deletion(context, modified_objects.dirty.items())
 
-  if len(modified_objects.deleted) > 0:
-    memcache_mark_for_deletion(context, modified_objects.deleted.items())
+    if len(modified_objects.deleted) > 0:
+      memcache_mark_for_deletion(context, modified_objects.deleted.items())
 
   status_entries = {}
   for key in context.cache_manager.marked_for_delete:
