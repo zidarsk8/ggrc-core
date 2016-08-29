@@ -261,7 +261,7 @@ can.Control('GGRC.Controllers.Modals', {
       dfd = new $.Deferred().resolve(this.options.instance);
     }
     instance = this.options.instance;
-    if (instance) {
+    if (instance && instance.class.is_custom_attributable) {
       // Make sure custom attributes are preloaded:
       dfd = dfd.then(function () {
         return $.when(
@@ -277,8 +277,9 @@ can.Control('GGRC.Controllers.Modals', {
       this.reset_form(function () {
         if (instance) {
           // Make sure custom attr validations/values are reset
-          instance.custom_attributes = undefined;
-          if (instance.setup_custom_attributes) {
+          if (instance.setup_custom_attributes &&
+            instance.class.is_custom_attributable) {
+            instance.custom_attributes = undefined;
             instance.setup_custom_attributes();
           }
         }

@@ -32,7 +32,7 @@
       },
       threshold: 5
     },
-    is_custom_attributable: true,
+    is_custom_attributable: false,
     isAssessment: true,
     attributes: {
       control: 'CMS.Models.Control.stub',
