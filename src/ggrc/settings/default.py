@@ -92,3 +92,6 @@ LOGGING_LOGGERS = {
     # WARNING - logs warnings and errors only
     # INFO    - logs HTTP-queries
 }
+
+
+DEBUG_BENCHMARK = os.environ.get("GGRC_BENCHMARK")
