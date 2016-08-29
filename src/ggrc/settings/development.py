@@ -21,3 +21,8 @@ ENABLE_JASMINE = True
 USE_APP_ENGINE_ASSETS_SUBDOMAIN = False
 MEMCACHE_MECHANISM = False
 APPENGINE_EMAIL = "user@example.com"
+
+LOGGING_FORMATTER = {
+    "()": "colorlog.ColoredFormatter",
+    "format": "%(log_color)s%(asctime)s %(name)s [%(levelname)s] %(message)s",
+}

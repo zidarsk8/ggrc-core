@@ -23,8 +23,6 @@ THIRD_PARTY_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'third_party'))
 BOWER_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'bower_components'))
 
 from ggrc.settings.default import *  # noqa
-from ggrc.settings.default import exports  # noqa
-from ggrc.settings.default import EXTENSIONS  # noqa
 
 SETTINGS_MODULE = os.environ.get("GGRC_SETTINGS_MODULE", '')
 CUSTOM_URL_ROOT = os.environ.get("GGRC_CUSTOM_URL_ROOT")
@@ -52,17 +50,31 @@ for module_name in SETTINGS_MODULE.split(" "):
     fullpath = "{0}/{1}.py".format(
         pathname, os.path.join(*module_name_parts[1:]))
 
-  try:
-    _EXT = EXTENSIONS if "EXTENSIONS" in vars() else []
-    _exports = exports if "exports" in vars() else []
-    execfile(fullpath)
-    if "EXTENSIONS" in vars() and _EXT != EXTENSIONS:
-      _EXT += EXTENSIONS
-    EXTENSIONS = _EXT
-    del _EXT
-    if "exports" in vars() and _exports != exports:
-      _exports += exports
-    exports = _exports
-    del _exports
-  except Exception:
-    raise
+  namespace = {}
+  execfile(fullpath, globals(), namespace)
+
+  EXTENSIONS.extend(namespace.pop("EXTENSIONS", []))
+  exports.extend(namespace.pop("exports", []))
+  LOGGING_LOGGERS.update(namespace.pop("LOGGING_LOGGERS", {}))
+
+  globals().update(namespace)
+
+
+LOGGING = {
+    "version": 1,
+    "formatters": {
+        "default": LOGGING_FORMATTER,
+    },
+    "handlers": {
+        "default": LOGGING_HANDLER,
+    },
+    "root": {
+        "level": LOGGING_ROOT,
+        "handlers": ["default"],
+    },
+    "loggers": {
+        name: {"level": level}
+        for name, level in LOGGING_LOGGERS.iteritems()
+    },
+    "disable_existing_loggers": False,
+}

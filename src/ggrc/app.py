@@ -4,15 +4,21 @@
 """Sets up Flask app."""
 
 import re
+from logging.config import dictConfig as setup_logging
+
 from flask import Flask
 from flask.ext.sqlalchemy import get_debug_queries
 from flask.ext.sqlalchemy import SQLAlchemy
 from tabulate import tabulate
+
 from ggrc import contributions  # noqa: imported so it can be used with getattr
 from ggrc import db
 from ggrc import extensions
 from ggrc import notifications
 from ggrc import settings
+
+
+setup_logging(settings.LOGGING)
 
 
 app = Flask('ggrc', instance_relative_config=True)  # noqa: valid constant name
@@ -22,7 +28,6 @@ if "public_config" not in app.config:
 
 for key in settings.exports:
   app.config.public_config[key] = app.config[key]
-
 
 # Configure Flask-SQLAlchemy for app
 db.app = app
