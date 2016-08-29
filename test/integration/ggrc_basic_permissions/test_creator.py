@@ -162,7 +162,7 @@ class TestCreator(TestCase):
     self.assertEqual(admin_count, creator_count)
 
   def test_creator_cannot_be_owner(self):
-    """Test if creater cannot become owner of the object he has not created"""
+    """Test if creator cannot become owner of the object he has not created"""
     self.api.set_user(self.users['admin'])
     _, obj = self.generator.generate(all_models.Regulation, "regulation", {
         "regulation": {"title": "Test regulation", "context": None},

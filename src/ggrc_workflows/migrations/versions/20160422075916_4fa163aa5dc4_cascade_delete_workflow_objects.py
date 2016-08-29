@@ -28,7 +28,7 @@ def downgrade():
 
 
 def _update_constraints(ondelete=None):
-  """Update the ON DELETE rule for workflow objects' foreign key constrants.
+  """Update the ON DELETE rule for workflow objects' foreign key constraints.
 
   Args:
     ondelete: (str) An optional setting what should happen if a referenced

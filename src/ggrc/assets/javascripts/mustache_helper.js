@@ -3322,7 +3322,7 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
    * If the attribute does not exist, has a falsy value, or is not considered
    * to be a "default" attribute, an empty string is returned.
    *
-   * If the attribue represents a date information, it is returned in the
+   * If the attribute represents a date information, it is returned in the
    * MM/DD/YYYY format.
    *
    * @param {String} attrName - the name of the attribute to retrieve

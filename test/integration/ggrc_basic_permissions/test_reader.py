@@ -128,7 +128,7 @@ class TestReader(TestCase):
     return response.json["results"]["counts"].get(obj)
 
   def test_reader_should_see_users(self):
-    """ Test if creater can see all the users in the system """
+    """ Test if creator can see all the users in the system """
     self.api.set_user(self.users['admin'])
     admin_count = self._get_count("Person")
     self.api.set_user(self.users['reader'])

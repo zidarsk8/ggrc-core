@@ -525,7 +525,7 @@
                 "href": "/api/audits/1",
                 "type": "Audit"
             },
-            "description": "Example descritpion",
+            "description": "Example description",
             "request_type": "documentation",
             "test": "Example test message",
             "notes": "Example notes",
@@ -575,7 +575,7 @@
           "viewLink": "/requests/1",
           "status": "Not Started",
           "verified_date": null,
-          "description": "Example descritpion",
+          "description": "Example description",
           "end_date": "2016-05-27",
           "workflow_state": null,
           "object_documents": [],
@@ -996,5 +996,3 @@
       }
   }
    ```
-
-

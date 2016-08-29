@@ -24,7 +24,7 @@ from .notification_handler import (
 
 
 def empty_notification(*agrs):
-  """ Used for ignoring notificaitons of a certain type """
+  """ Used for ignoring notifications of a certain type """
   return {}
 
 

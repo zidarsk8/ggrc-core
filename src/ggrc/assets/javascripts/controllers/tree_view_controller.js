@@ -961,7 +961,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       control = children[index];
       if (!control) {
         // TODO this should not be necessary
-        // draw_visible is called too soon when controlers are not yet
+        // draw_visible is called too soon when controllers are not yet
         // available and then again when they are. Remove the too soon
         // invocation and this continue can be dropped too.
         continue;
