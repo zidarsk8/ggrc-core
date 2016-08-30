@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from flask import json
+from flask import g
 from os.path import abspath
 from os.path import dirname
 from os.path import join
@@ -22,6 +23,8 @@ class TestCase(ggrc.TestCase):
         "X-test-only": "true" if dry_run else "false",
         "X-requested-by": "gGRC",
     }
+    if hasattr(g, "cache"):
+      delattr(g, "cache")
     response = self.client.post("/_service/import_csv",
                                 data=data, headers=headers)
     self.assert200(response)
