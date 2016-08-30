@@ -3,6 +3,7 @@
 
 from integration.ggrc.converters import TestCase
 
+from ggrc import models
 
 class TestImportUpdates(TestCase):
 
@@ -23,8 +24,14 @@ class TestImportUpdates(TestCase):
       for message in messages:
         self.assertEqual(set(), set(block[message]))
 
+    policy = models.Policy.query.filter_by(slug="p1").first()
+    self.assertEqual(policy.title, "some weird policy")
+
     filename = "policy_basic_import_update.csv"
     response = self.import_file(filename)
     for block in response:
       for message in messages:
         self.assertEqual(set(), set(block[message]))
+
+    policy = models.Policy.query.filter_by(slug="p1").first()
+    self.assertEqual(policy.title, "Edited policy")
