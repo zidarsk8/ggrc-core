@@ -109,7 +109,6 @@ permissions = {
             },
             "condition": "relationship",
         },
-        "ObjectFile",
         "ObjectPerson",
         "Option",
         "OrgGroup",
