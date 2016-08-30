@@ -99,6 +99,7 @@
         <div class="objective-selector">
           <div style="clear:both">
             <br>
+            {{^if_in instance.status "Finished,Verified"}}
             <a class="section-add section-sticky btn btn-small btn-draft"
               href="javascript://" rel="tooltip"
               {{data "deferred_to"}}
@@ -112,6 +113,7 @@
               data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6">
               Map Objects
             </a>
+            {{/if_in}}
           </div>
         </div>
       </ggrc-modal-connector>
