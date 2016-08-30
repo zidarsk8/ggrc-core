@@ -89,7 +89,8 @@
         widget_id: 'info',
         content_controller: GGRC.Controllers.InfoWidget,
         instance: object,
-        widget_view: info_widget_views[object_table]
+        widget_view: info_widget_views[object_table],
+        order: 0
       });
       model_names = can.Map.keys(base_widgets_by_type);
       model_names.sort();
@@ -132,12 +133,16 @@
           var final_definition = {};
           if (definition._mixins) {
             can.each(definition._mixins, function (mixin) {
-              if (typeof (mixin) === "string") {
+              if (typeof (mixin) === 'string') {
                 // If string, recursive lookup
-                if (!definitions[mixin])
-                  console.debug("Undefined mixin: " + mixin, definitions);
-                else
-                  can.extend(final_definition, reify_mixins(definitions[mixin]));
+                if (!definitions[mixin]) {
+                  console.debug('Undefined mixin: ' + mixin, definitions);
+                } else {
+                  can.extend(
+                    final_definition,
+                    reify_mixins(definitions[mixin])
+                  );
+                }
               } else if (can.isFunction(mixin)) {
                 // If function, call with current definition state
                 mixin(final_definition);
@@ -166,67 +171,177 @@
         // here we are going to define extra descriptor options, meaning that
         //  these will be used as extra options to create widgets on top of
 
+      // NOTE: By default, widgets are sorted alphabetically (the value of
+      // the order 100+), but the objects with higher importance that should
+      // be  prioritized use order values below 100. An order value of 0 is
+      // reserved for the "info" widget which always comes first.
       extra_descriptor_options = {
         all: {
-          Person: {
-            widget_icon: 'fa fa-person'
+          Standard: {
+            order: 10
+          },
+          Regulation: {
+            order: 20
+          },
+          Contract: {
+            order: 30
+          },
+          Section: {
+            order: 40
+          },
+          Objective: {
+            order: 50
+          },
+          Control: {
+            order: 60
+          },
+          AccessGroup: {
+            order: 100
+          },
+          Assessment: {
+            order: 110
+          },
+          Audit: {
+            order: 120
+          },
+          Clause: {
+            order: 130
+          },
+          DataAsset: {
+            order: 140
           },
           Document: {
-            widget_icon: 'fa fa-link'
+            widget_icon: 'fa fa-link',
+            order: 150
+          },
+          Facility: {
+            order: 160
+          },
+          Issue: {
+            order: 170
+          },
+          Market: {
+            order: 180
+          },
+          OrgGroup: {
+            order: 190
+          },
+          Person: {
+            widget_icon: 'fa fa-person',
+            order: 200
+          },
+          Policy: {
+            order: 210
+          },
+          Process: {
+            order: 220
+          },
+          Product: {
+            order: 230
+          },
+          Program: {
+            order: 240
+          },
+          Project: {
+            order: 250
+          },
+          Request: {
+            order: 260
+          },
+          System: {
+            order: 270
+          },
+          Vendor: {
+            order: 280
           }
         },
         Contract: {
           Clause: {
             widget_name: function () {
-              var $objectArea = $(".object-area");
-              if ($objectArea.hasClass("dashboard-area")) {
-                return "Clauses";
+              var $objectArea = $('.object-area');
+              if ($objectArea.hasClass('dashboard-area')) {
+                return 'Clauses';
               } else {
-                return "Mapped Clauses";
+                return 'Mapped Clauses';
               }
             }
           }
         },
         Program: {
           Person: {
-            widget_id: "person",
-            widget_name: "People",
-            widget_icon: "person",
+            widget_id: 'person',
+            widget_name: 'People',
+            widget_icon: 'person',
             content_controller: GGRC.Controllers.TreeView
           }
         },
+
+        // An Audit has a different set of object that are more relevant to it,
+        // thus these objects have a customized priority. On the other hand,
+        // the object otherwise prioritized by default (e.g. Regulation) have
+        // their priority lowered so that they fit nicely into the alphabetical
+        // order among the non-prioritized object types.
         Audit: {
-          Person: {
-            widget_id: "person",
-            widget_name: "People",
-            widget_icon: "person",
-            content_controller: GGRC.Controllers.TreeView,
-            content_controller_options: {
-              mapping: "authorized_people",
-              allow_mapping: false,
-              allow_creating: false
-            }
+          Assessment: {
+            order: 10
+          },
+          AssessmentTemplate: {
+            order: 20
+          },
+          Issue: {
+            order: 30
           },
           Request: {
             widget_id: 'Request',
-            widget_name: 'Requests'
+            widget_name: 'Requests',
+            order: 40
+          },
+          Contract: {
+            order: 133  // between default Clause (130) and DataAsset (140)
+          },
+          Control: {
+            order: 137  // between default Clause (130) and DataAsset (140)
+          },
+          Objective: {
+            order: 182  // between default Market (180) and OrgGroup (190)
+          },
+          Regulation: {
+            order: 257  // between default Project (250) and Request (260)
           },
           program: {
-            widget_id: "program",
-            widget_name: "Program",
-            widget_icon: "program"
+            widget_id: 'program',
+            widget_name: 'Program',
+            widget_icon: 'program'
+          },
+          Section: {
+            order: 263  // between default Request (260) and System (270)
+          },
+          Standard: {
+            order: 267  // between default Request (260) and System (270)
+          },
+          Person: {
+            widget_id: 'person',
+            widget_name: 'People',
+            widget_icon: 'person',
+            // NOTE: "order" not overridden
+            content_controller: GGRC.Controllers.TreeView,
+            content_controller_options: {
+              mapping: 'authorized_people',
+              allow_mapping: false,
+              allow_creating: false
+            }
           }
         },
         Control: {
           Request: {
-            widget_id: "Request",
-            widget_name: "Requests"
+            widget_id: 'Request',
+            widget_name: 'Requests'
           }
         },
         Person: {
           Request: {
-            widget_id: "Request",
-            widget_name: "Requests"
+            widget_id: 'Request',
+            widget_name: 'Requests'
           }
         }
       },
@@ -246,22 +361,22 @@
       extra_content_controller_options = apply_mixins({
         objectives: {
           Objective: {
-            mapping: "objectives",
+            mapping: 'objectives',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
-            show_view: path + "/objectives/tree.mustache",
-            footer_view: path + "/objectives/tree_footer.mustache",
-            add_item_view: path + "/objectives/tree_add_item.mustache"
+            show_view: path + '/objectives/tree.mustache',
+            footer_view: path + '/objectives/tree_footer.mustache',
+            add_item_view: path + '/objectives/tree_add_item.mustache'
           }
         },
         controls: {
           Control: {
-            mapping: "controls",
+            mapping: 'controls',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
-            show_view: path + "/controls/tree.mustache",
-            footer_view: path + "/controls/tree_footer.mustache",
-            add_item_view: path + "/controls/tree_add_item.mustache"
+            show_view: path + '/controls/tree.mustache',
+            footer_view: path + '/controls/tree_footer.mustache',
+            add_item_view: path + '/controls/tree_add_item.mustache'
           }
         },
         business_objects: {
@@ -273,81 +388,81 @@
             add_item_view: path + '/audits/tree_add_item.mustache'
           },
           AccessGroup: {
-            mapping: "related_access_groups",
+            mapping: 'related_access_groups',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           DataAsset: {
-            mapping: "related_data_assets",
+            mapping: 'related_data_assets',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Facility: {
-            mapping: "related_facilities",
+            mapping: 'related_facilities',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Market: {
-            mapping: "related_markets",
+            mapping: 'related_markets',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           OrgGroup: {
-            mapping: "related_org_groups",
+            mapping: 'related_org_groups',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Vendor: {
-            mapping: "related_vendors",
+            mapping: 'related_vendors',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Process: {
-            mapping: "related_processes",
+            mapping: 'related_processes',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Product: {
-            mapping: "related_products",
+            mapping: 'related_products',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Project: {
-            mapping: "related_projects",
+            mapping: 'related_projects',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           System: {
-            mapping: "related_systems",
+            mapping: 'related_systems',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Assessment: {
-            mapping: "related_assessments",
+            mapping: 'related_assessments',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Request: {
-            mapping: "related_requests",
+            mapping: 'related_requests',
             child_options: [
               _.extend({}, relatedObjectsChildOptions[0], {
-                mapping: "info_related_objects"
+                mapping: 'info_related_objects'
               })
             ],
             draw_children: true
           },
           Document: {
-            mapping: "documents",
+            mapping: 'documents',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Person: {
-            mapping: "people",
+            mapping: 'people',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Program: {
-            mapping: "programs",
+            mapping: 'programs',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           }
@@ -373,84 +488,85 @@
         },
         governance_objects: {
           Regulation: {
-            mapping: "regulations",
+            mapping: 'regulations',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections,
-            show_view: path + "/directives/tree.mustache",
-            footer_view: path + "/directives/tree_footer.mustache",
-            add_item_view: path + "/directives/tree_add_item.mustache"
+            show_view: path + '/directives/tree.mustache',
+            footer_view: path + '/directives/tree_footer.mustache',
+            add_item_view: path + '/directives/tree_add_item.mustache'
           },
           Contract: {
-            mapping: "contracts",
+            mapping: 'contracts',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections,
-            show_view: path + "/directives/tree.mustache",
-            footer_view: path + "/directives/tree_footer.mustache",
+            show_view: path + '/directives/tree.mustache',
+            footer_view: path + '/directives/tree_footer.mustache',
           },
           Policy: {
-            mapping: "policies",
+            mapping: 'policies',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections,
-            show_view: path + "/directives/tree.mustache",
-            footer_view: path + "/directives/tree_footer.mustache",
-            add_item_view: path + "/directives/tree_add_item.mustache"
+            show_view: path + '/directives/tree.mustache',
+            footer_view: path + '/directives/tree_footer.mustache',
+            add_item_view: path + '/directives/tree_add_item.mustache'
           },
           Standard: {
-            mapping: "standards",
+            mapping: 'standards',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections,
-            show_view: path + "/directives/tree.mustache",
-            footer_view: path + "/directives/tree_footer.mustache",
-            add_item_view: path + "/directives/tree_add_item.mustache"
+            show_view: path + '/directives/tree.mustache',
+            footer_view: path + '/directives/tree_footer.mustache',
+            add_item_view: path + '/directives/tree_add_item.mustache'
           },
           Control: {
-            mapping: "controls",
+            mapping: 'controls',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Objective: {
-            mapping: "objectives",
+            mapping: 'objectives',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Section: {
-            mapping: "sections",
+            mapping: 'sections',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Clause: {
-            mapping: "clauses",
+            mapping: 'clauses',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
         Program: {
           _mixins: [
-            "governance_objects", "objectives", "controls", "business_objects", "issues"
+            'governance_objects', 'objectives', 'controls',
+            'business_objects', 'issues'
           ],
           Audit: {
-            mapping: "audits",
+            mapping: 'audits',
             allow_mapping: true,
             child_options: relatedObjectsChildOptions,
             draw_children: true,
-            show_view: path + "/audits/tree.mustache",
-            header_view: path + "/audits/tree_header.mustache",
-            footer_view: path + "/audits/tree_footer.mustache",
-            add_item_view: path + "/audits/tree_add_item.mustache"
+            show_view: path + '/audits/tree.mustache',
+            header_view: path + '/audits/tree_header.mustache',
+            footer_view: path + '/audits/tree_footer.mustache',
+            add_item_view: path + '/audits/tree_add_item.mustache'
           },
           Person: {
-            show_view: path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache",
-            footer_view: path + "/ggrc_basic_permissions/people_roles/authorizations_by_person_tree_footer.mustache",
+            show_view: path + '/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache',
+            footer_view: path + '/ggrc_basic_permissions/people_roles/authorizations_by_person_tree_footer.mustache',
             parent_instance: GGRC.page_instance(),
             allow_reading: true,
             allow_mapping: true,
             allow_creating: true,
             model: CMS.Models.Person,
-            mapping: "mapped_and_or_authorized_people",
+            mapping: 'mapped_and_or_authorized_people',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           }
@@ -458,30 +574,30 @@
         Audit: {
           _mixins: ['issues', 'governance_objects', 'business_objects'],
           Request: {
-            mapping: "active_requests",
+            mapping: 'active_requests',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
-            show_view: path + "/requests/tree.mustache",
-            footer_view: path + "/requests/tree_footer.mustache",
-            add_item_view: path + "/requests/tree_add_item.mustache"
+            show_view: path + '/requests/tree.mustache',
+            footer_view: path + '/requests/tree_footer.mustache',
+            add_item_view: path + '/requests/tree_add_item.mustache'
           },
           Program: {
-            mapping: "_program",
+            mapping: '_program',
             parent_instance: GGRC.page_instance(),
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             model: CMS.Models.Program,
-            show_view: path + "/programs/tree.mustache",
+            show_view: path + '/programs/tree.mustache',
             allow_mapping: false,
             allow_creating: false
           },
           Section: {
-            mapping: "sections",
+            mapping: 'sections',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Clause: {
-            mapping: "clauses",
+            mapping: 'clauses',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
@@ -510,14 +626,14 @@
               '/assessment_templates/tree_add_item.mustache'
           },
           Person: {
-            widget_id: "person",
-            widget_name: "People",
-            widget_icon: "person",
+            widget_id: 'person',
+            widget_name: 'People',
+            widget_icon: 'person',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             content_controller: GGRC.Controllers.TreeView,
             content_controller_options: {
-              mapping: "authorized_people",
+              mapping: 'authorized_people',
               allow_mapping: false,
               allow_creating: false
             }
@@ -525,15 +641,15 @@
         },
         directive: {
           _mixins: [
-            "objectives", "controls", "business_objects"
+            'objectives', 'controls', 'business_objects'
           ],
           Section: {
-            mapping: "sections",
+            mapping: 'sections',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Clause: {
-            mapping: "clauses",
+            mapping: 'clauses',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
@@ -544,16 +660,16 @@
           }
          },
         Regulation: {
-          _mixins: ["directive", "issues"]
+          _mixins: ['directive', 'issues']
         },
         Standard: {
-          _mixins: ["directive", "issues"]
+          _mixins: ['directive', 'issues']
         },
         Policy: {
-          _mixins: ["directive", "issues"]
+          _mixins: ['directive', 'issues']
         },
         Contract: {
-          _mixins: ["directive", "issues"]
+          _mixins: ['directive', 'issues']
         },
         Clause: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
@@ -588,51 +704,51 @@
           }
         },
         Request: {
-          _mixins: ["governance_objects", "business_objects", "issues"],
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
-            mapping: "audits",
+            mapping: 'audits',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             allow_creating: false,
             allow_mapping: false,
-            show_view: path + "/audits/tree.mustache",
-            add_item_view: path + "/audits/tree_add_item.mustache"
+            show_view: path + '/audits/tree.mustache',
+            add_item_view: path + '/audits/tree_add_item.mustache'
           },
         },
         Assessment: {
-          _mixins: ["governance_objects", "business_objects", "issues"],
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
-            mapping: "related_audits",
+            mapping: 'related_audits',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             allow_creating: false,
             allow_mapping: true,
-            show_view: path + "/audits/tree.mustache",
-            add_item_view: path + "/audits/tree_add_item.mustache"
+            show_view: path + '/audits/tree.mustache',
+            add_item_view: path + '/audits/tree_add_item.mustache'
           },
           Section: {
-            mapping: "sections",
+            mapping: 'sections',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Clause: {
-            mapping: "clauses",
+            mapping: 'clauses',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Request: {
-            mapping: "related_requests",
+            mapping: 'related_requests',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
-            show_view: path + "/requests/tree.mustache",
-            footer_view: path + "/requests/tree_footer.mustache",
-            add_item_view: path + "/requests/tree_add_item.mustache"
+            show_view: path + '/requests/tree.mustache',
+            footer_view: path + '/requests/tree_footer.mustache',
+            add_item_view: path + '/requests/tree_add_item.mustache'
           }
         },
         Issue: {
           _mixins: ['governance_objects', 'business_objects'],
           Control: {
-            mapping: "related_controls",
+            mapping: 'related_controls',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             show_view: path + '/controls/tree.mustache',
@@ -645,104 +761,109 @@
             add_item_view: path + '/base_objects/tree_add_item.mustache'
           },
           Audit: {
-            mapping: "related_audits",
+            mapping: 'related_audits',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
-            show_view: GGRC.mustache_path + "/audits/tree.mustache",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache"
+            show_view: GGRC.mustache_path + '/audits/tree.mustache',
+            footer_view:
+              GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+            add_item_view:
+              GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
           }
         },
         AccessGroup: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         DataAsset: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         Facility: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         Market: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         OrgGroup: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         Vendor: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         Process: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         Product: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         Project: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         System: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         Document: {
-          _mixins: ["governance_objects", "business_objects", "issues"]
+          _mixins: ['governance_objects', 'business_objects', 'issues']
         },
         Person: {
-          _mixins: ["issues"],
+          _mixins: ['issues'],
           Request: {
             mapping: (/^\/objectBrowser\/?$/.test(window.location.pathname)) ?
-              "all_open_audit_requests" : "open_audit_requests",
+              'all_open_audit_requests' : 'open_audit_requests',
             draw_children: true,
             child_options: relatedObjectsChildOptions,
-            show_view: GGRC.mustache_path + "/requests/tree.mustache",
-            footer_view: GGRC.mustache_path + "/requests/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/requests/tree_add_item.mustache"
+            show_view: GGRC.mustache_path + '/requests/tree.mustache',
+            footer_view: GGRC.mustache_path + '/requests/tree_footer.mustache',
+            add_item_view:
+              GGRC.mustache_path + '/requests/tree_add_item.mustache'
           },
           Program: {
-            mapping: "extended_related_programs_via_search",
+            mapping: 'extended_related_programs_via_search',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections
           },
           Regulation: {
-            mapping: "extended_related_regulations_via_search",
+            mapping: 'extended_related_regulations_via_search',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections,
-            show_view: path + "/directives/tree.mustache"
+            show_view: path + '/directives/tree.mustache'
           },
           Contract: {
-            mapping: "extended_related_contracts_via_search",
+            mapping: 'extended_related_contracts_via_search',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections,
-            show_view: path + "/directives/tree.mustache"
+            show_view: path + '/directives/tree.mustache'
           },
           Standard: {
-            mapping: "extended_related_standards_via_search",
+            mapping: 'extended_related_standards_via_search',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections,
-            show_view: path + "/directives/tree.mustache"
+            show_view: path + '/directives/tree.mustache'
           },
           Policy: {
-            mapping: "extended_related_policies_via_search",
+            mapping: 'extended_related_policies_via_search',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections,
-            show_view: path + "/directives/tree.mustache"
+            show_view: path + '/directives/tree.mustache'
           },
           Audit: {
-            mapping: "extended_related_audits_via_search",
+            mapping: 'extended_related_audits_via_search',
             child_options: relatedObjectsChildOptions,
             draw_children: true,
-            show_view: path + "/audits/tree.mustache"
+            show_view: path + '/audits/tree.mustache'
           },
           Section: {
             model: CMS.Models.Section,
-            mapping: "extended_related_sections_via_search",
-            show_view: GGRC.mustache_path + "/sections/tree.mustache",
-            footer_view: GGRC.mustache_path + "/base_objects/tree_footer.mustache",
-            add_item_view: GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
+            mapping: 'extended_related_sections_via_search',
+            show_view: GGRC.mustache_path + '/sections/tree.mustache',
+            footer_view:
+              GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+            add_item_view:
+              GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
@@ -750,8 +871,10 @@
             model: CMS.Models.Clause,
             mapping: 'extended_related_clauses_via_search',
             show_view: GGRC.mustache_path + '/sections/tree.mustache',
-            footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
-            add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
+            footer_view:
+              GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+            add_item_view:
+              GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
