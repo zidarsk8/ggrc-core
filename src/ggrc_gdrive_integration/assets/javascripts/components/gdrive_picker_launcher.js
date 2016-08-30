@@ -271,9 +271,6 @@
               }
 
               return $.when(
-                CMS.Models.ObjectFile.findAll({
-                  file_id: file.id, fileable_id: docs[0].id
-                }),
                 objectDoc
               ).then(function (ofs) {
                 if (ofs.length < 1) {
@@ -281,12 +278,6 @@
                     doc.mark_for_addition('files', file, {
                       context: that.instance.context || {id: null}
                     });
-                  } else {
-                    return new CMS.Models.ObjectFile({
-                      context: that.instance.context || {id: null},
-                      file: file,
-                      fileable: doc
-                    }).save();
                   }
                 }})
               .then(function () {

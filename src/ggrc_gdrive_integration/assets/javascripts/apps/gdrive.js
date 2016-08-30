@@ -17,13 +17,6 @@
       folders: new GGRC.ListLoaders.ProxyListLoader("ObjectFolder", "folderable", "folder", "object_folders", "GDriveFolder")
     },
 
-    fileable : {
-      _canonical : {
-        files : "GDriveFile"
-      },
-      files : new GGRC.ListLoaders.ProxyListLoader("ObjectFile", "fileable", "file", "object_files", "GDriveFile")
-    },
-
     revisionable : {
       _canonical : {
         revisions : "GDriveFileRevision"
@@ -108,11 +101,6 @@
   GGRC.register_hook("Audit.storage_folder_picker", GGRC.mustache_path + "/audits/gdrive_folder_picker.mustache");
 
 
-  $.extend(true, CMS.Models.Document.attributes, {
-    "object_files": "CMS.Models.ObjectFile.stubs",
-    "files": "CMS.Models.GDriveFile.stubs"
-  });
-
   can.view.mustache("picker-tag-readonly", "<ggrc-gdrive-folder-picker instance='instance' readonly='true'/>");
     //We are no longer mapping GDrive files directly to responses.  It makes it difficult to figure out which GDrive file is which
   // document when we go to present. however, this functionality is still supported.
@@ -120,7 +108,7 @@
 
   // GGRC.JoinDescriptor.from_arguments_list([
   //   [["Program", "Audit", "Request"], "GDriveFolder", "ObjectFolder", "folder", "folderable"]
-  //   , ["GDriveFile", "ObjectFile", "file", "fileable"]
+  //   , ["GDriveFile", "§", "file", "fileable"]
   // ]);
 
   $.extend(true, CMS.Models.Meeting.attributes, {

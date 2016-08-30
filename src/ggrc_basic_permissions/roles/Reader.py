@@ -104,7 +104,7 @@ permissions = {
         {
             "type": "ObjectDocument",
             "terms": {
-                "property_name": "document,documentable",
+                "property_name": "documentable",
                 "action": "update",
             },
             "condition": "relationship",

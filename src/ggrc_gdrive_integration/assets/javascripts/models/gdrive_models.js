@@ -485,47 +485,6 @@
     }
   });
 
-  can.Model.Join('CMS.Models.ObjectFile', {
-    root_object: 'object_file',
-    root_collection: 'object_files',
-    findAll: 'GET /api/object_files',
-    create: 'POST /api/object_files',
-    update: 'PUT /api/object_files/{id}',
-    destroy: 'DELETE /api/object_files/{id}',
-    join_keys: {
-      fileable: can.Model.Cacheable,
-      file: CMS.Models.GDriveFile
-    },
-    attributes: {
-      modified_by: 'CMS.Models.Person.stub',
-      file: 'CMS.Models.GDriveFile.stub',
-      fileable: 'CMS.Models.get_stub'
-    },
-    model: function (params) {
-      if (typeof params === 'object' && params.file_id) {
-        params.file = new CMS.Models.GDriveFile({
-          id: params.file_id,
-          href: '/drive/v2/files/' + params.file_id
-        }).stub();
-      }
-      return this._super(params);
-    }
-  }, {
-    serialize: function (attr) {
-      var serial;
-      if (!attr) {
-        serial = this._super.apply(this, arguments);
-        serial.file_id = serial.file ? serial.file.id : serial.file_id;
-        delete serial.file;
-        return serial;
-      }
-      if (attr === 'file_id') {
-        return this.file_id || this.file.id;
-      }
-      return this._super.apply(this, arguments);
-    }
-  });
-
   $(document).ready(function () {
     gapi_request_with_auth = GGRC.gapi_request_with_auth;
   });
