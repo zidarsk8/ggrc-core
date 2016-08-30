@@ -26,6 +26,7 @@ from ggrc.models.deferred import deferred
 from ggrc.models.mixins.assignable import Assignable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
+from ggrc.utils import similarity_options as similarity_options_module
 
 
 class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
@@ -47,14 +48,7 @@ class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
 
   ASSIGNEE_TYPES = (u'Assignee', u'Requester', u'Verifier')
 
-  similarity_options = {
-      "relevant_types": {
-          "Audit": {"weight": 5},
-          "Regulation": {"weight": 3},
-          "Control": {"weight": 10},
-      },
-      "threshold": 5,
-  }
+  similarity_options = similarity_options_module.REQUEST
 
   # TODO Remove requestor and requestor_id on database cleanup
   requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))
