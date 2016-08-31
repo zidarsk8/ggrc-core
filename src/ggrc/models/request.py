@@ -128,6 +128,16 @@ class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
           "filter_by": "_filter_by_related_verifiers",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
+      "request_url": {
+          "display_name": "Url",
+          "filter_by": "_nop",
+          "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
+      },
+      "request_evidence": {
+          "display_name": "Evidence",
+          "filter_by": "_nop",
+          "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
+      },
   }
 
   def _display_name(self):
