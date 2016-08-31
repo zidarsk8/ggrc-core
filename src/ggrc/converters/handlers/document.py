@@ -20,12 +20,13 @@ class RequestLinkHandler(handlers.ColumnHandler):
       list of documents for all URLs and evidences.
     """
     documents = []
+    user_id = get_current_user_id()
     for line in self.raw_value.splitlines():
       link, title = line.split(None, 1) if " " in line else (line, line)
       documents.append(models.Document(
           link=link,
           title=title,
-          modified_by_id=get_current_user_id(),
+          modified_by_id=user_id,
           context=self.row_converter.obj.context,
       ))
 
