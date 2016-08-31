@@ -158,16 +158,16 @@
       'requested resource. It is either read-protected or not ' +
       'readable by the server.'
     },
-    notifier: function (type) {
+    notifier: function (type, message) {
       if (!type) {
         type = 'warning';
       }
 
       return function (err) {
-        var message = GGRC.Errors.messages[err.status];
         var props = {};
 
-        props[type] = message ? message : 'There was a server problem';
+        message = message || GGRC.Errors.messages[err.status];
+        props[type] = message || 'There was a server problem';
         $('body').trigger('ajax:flash', props);
       };
     }

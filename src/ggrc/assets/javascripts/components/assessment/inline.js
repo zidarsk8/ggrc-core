@@ -171,7 +171,7 @@
           return;
         }
 
-        this.attr('_value', value);
+        this.attr('_value', oldValue);
         this.attr('isSaving', true);
 
         instance.refresh().then(function () {
@@ -190,7 +190,7 @@
             this.afterSave();
           }.bind(this)).fail(function (instance, err) {
             this.attr('context.value', this.attr('_value'));
-            GGRC.Errors.notifier()(err);
+            GGRC.Errors.notifier('error')(err);
           }.bind(this)).always(function () {
             this.attr('isSaving', false);
           }.bind(this));
