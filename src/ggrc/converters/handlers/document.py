@@ -64,6 +64,22 @@ class RequestLinkHandler(handlers.ColumnHandler):
 class RequestEvidenceHandler(RequestLinkHandler):
   """Handler for evidence field on request imports."""
 
+  @staticmethod
+  def _parse_line(line):
+    """Parse a single line and return link and title.
+
+    Args:
+      line: string containing a single line from a cell.
+
+    Returns:
+      tuple containing a link and a title.
+    """
+    parts = line.strip().split()
+    if len(parts) == 1:
+      return parts[0], parts[0]
+
+    return parts[0], " ".join(parts[1:])
+
   def get_value(self):
     return self._get_link_str(self.row_converter.obj.documents)
 
