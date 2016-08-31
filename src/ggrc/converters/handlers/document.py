@@ -7,9 +7,8 @@ from flask import current_app
 
 from ggrc import models
 from ggrc.login import get_current_user_id
-from ggrc.converters import errors
-from ggrc.converters import get_importables
 from ggrc.converters.handlers import handlers
+
 
 class RequestLinkHandler(handlers.ColumnHandler):
 
@@ -57,6 +56,7 @@ class RequestEvidenceHandler(RequestLinkHandler):
   def set_value(self):
     """This should be ignored with second class attributes."""
 
+
 class RequestUrlHandler(RequestLinkHandler):
 
   def get_value(self):
@@ -86,8 +86,8 @@ class RequestUrlHandler(RequestLinkHandler):
         old_link_map[new_link].title = new_doc.title
       else:
         models.Relationship(
-          source=self.row_converter.obj,
-          destination=new_doc,
+            source=self.row_converter.obj,
+            destination=new_doc,
         )
 
     for old_link, old_doc in old_link_map.items():
@@ -102,4 +102,3 @@ class RequestUrlHandler(RequestLinkHandler):
 
   def set_value(self):
     """This should be ignored with second class attributes."""
-
