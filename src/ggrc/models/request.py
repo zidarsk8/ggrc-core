@@ -175,11 +175,11 @@ class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
     return cls._get_relate_filter(predicate, "Verifier")
 
   @classmethod
-  def _filter_by_url(cls, predicate):
+  def _filter_by_url(cls, _):
     return None
 
   @classmethod
-  def _filter_by_evidence(cls, predicate):
+  def _filter_by_evidence(cls, _):
     return None
 
   @classmethod

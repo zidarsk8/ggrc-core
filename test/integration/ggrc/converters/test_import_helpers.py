@@ -178,16 +178,16 @@ class TestGetObjectColumnDefinitions(TestCase):
     errors = ""
     try:
       self._test_definition_names(obj_class, names, has_mappings)
-    except AssertionError as e:
+    except AssertionError as error:
       errors += "\n\n{} definition names missmatch.\n{}".format(
-          obj_class.__name__, str(e))
+          obj_class.__name__, str(error))
 
     for field_name, expected in expected_fields.iteritems():
       try:
         self._test_definition_fields(obj_class, field_name, expected)
-      except AssertionError as e:
+      except AssertionError as error:
         errors += "\n\n{} {} fields missmatch.\n{}".format(
-            obj_class.__name__, field_name, str(e))
+            obj_class.__name__, field_name, str(error))
 
     self.assertEqual(errors, "", errors)
 
@@ -228,15 +228,15 @@ class TestGetObjectColumnDefinitions(TestCase):
               )
           )
 
-    verificationErrors = []
+    verification_errors = []
     for obj in set(converters.get_exportables().values()):
       try:
         test_single_object(obj)
-      except AssertionError as e:
-        verificationErrors.append(str(e))
+      except AssertionError as error:
+        verification_errors.append(str(error))
 
-    verificationErrors.sort()
-    self.assertEqual(verificationErrors, [])
+    verification_errors.sort()
+    self.assertEqual(verification_errors, [])
 
   def test_program_definitions(self):
     """ test default headers for Program """

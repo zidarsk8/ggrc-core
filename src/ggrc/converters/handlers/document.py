@@ -31,7 +31,8 @@ class RequestLinkHandler(handlers.ColumnHandler):
 
     return documents
 
-  def _get_link_str(self, documents):
+  @staticmethod
+  def _get_link_str(documents):
     """Generate a new line separated string for all document links.
 
     Returns:
