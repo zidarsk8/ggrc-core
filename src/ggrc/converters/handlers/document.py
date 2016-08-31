@@ -37,6 +37,8 @@ class RequestLinkHandler(handlers.ColumnHandler):
     user_id = get_current_user_id()
     for line in self.raw_value.splitlines():
       link, title = self._parse_line(line)
+      if not (link and title):
+        return []
       documents.append(models.Document(
           link=link,
           title=title,
