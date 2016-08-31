@@ -2095,8 +2095,6 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
 
   program = program.reify();
   new RefreshQueue().enqueue(program).trigger().then(function () {
-      // this needs to be different than above, otherwise CanJS throws a strange error
-      instance.attr("_transient", {default_title: instance.title});
     title = (new Date()).getFullYear() + ': ' + program.title + ' - Audit';
 
     GGRC.Models.Search.counts_for_types(title, ['Audit'])
@@ -2106,6 +2104,10 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
         title = title + ' ' + index;
         instance.attr('title', title);
         // this needs to be different than above, otherwise CanJS throws a strange error
+        if (instance._transient) {
+          instance.attr('_transient.default_title',
+            instance.title);
+        }
       });
   });
 });
