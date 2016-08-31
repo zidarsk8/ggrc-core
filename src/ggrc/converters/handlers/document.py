@@ -6,8 +6,9 @@
 from flask import current_app
 
 from ggrc import models
-from ggrc.login import get_current_user_id
+from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
+from ggrc.login import get_current_user_id
 
 
 class RequestLinkHandler(handlers.ColumnHandler):
@@ -110,6 +111,22 @@ class RequestEvidenceHandler(RequestLinkHandler):
 
 class RequestUrlHandler(RequestLinkHandler):
   """Handler for URL field on request imports."""
+
+  @staticmethod
+  def _parse_line(line):
+    """Parse a single line and return link and title.
+
+    Args:
+      line: string containing a single line from a cell.
+
+    Returns:
+      tuple containing a link and a title.
+    """
+    line = line.strip()
+    if len(line.split()) > 1:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None, None
+    return line, line
 
   def get_value(self):
     documents = [doc for doc in self.row_converter.obj.related_objects()
