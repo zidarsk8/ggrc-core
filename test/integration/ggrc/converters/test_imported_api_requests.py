@@ -101,13 +101,13 @@ class TestComprehensiveSheets(TestCase):
 
   def test_queries_for_dashboard(self):
     with QueryCounter() as counter:
-      res = self.client.get("/permissions")
+      res = self.client.get("/dashboard")
       self.assertEqual(res.status_code, 200)
       self.assertLess(counter.get, self.LIMIT, "Query count for dashboard")
 
   def test_queries_for_permissions(self):
     with QueryCounter() as counter:
-      res = self.client.get("/dashboard")
+      res = self.client.get("/permissions")
       self.assertEqual(res.status_code, 200)
       self.assertLess(counter.get, self.LIMIT, "Query count for permissions")
 
