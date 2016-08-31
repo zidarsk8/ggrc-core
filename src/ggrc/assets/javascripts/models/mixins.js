@@ -149,8 +149,10 @@
       this.removeAttr('_transient:title');
     },
     'before:attr': function (key, val) {
-      if (key === 'title' && arguments.length > 1) {
-        this.attr('_transient:title', null);
+      if (key === 'title' &&
+          arguments.length > 1 &&
+          this._transient) {
+        this.attr('_transient.title', null);
       }
     }
   });
