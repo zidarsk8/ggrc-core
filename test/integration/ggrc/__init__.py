@@ -29,9 +29,13 @@ class TestCase(BaseTestCase):
     during a test. The ignored tables are the ones that don't exist or have
     constant data in them, that was populated with migrations.
 
+    This function is used to speed up resetting of the database for each test.
+    the proper way would be to run all migrations on a fresh database, but that
+    would take too much time. This function should act as if the database was
+    just created, with the exception of autoincrement indexes.
 
     Note:
-      This is a hack because db.metadata.sorted_tables does not sort by
+      The deletion is a hack because db.metadata.sorted_tables does not sort by
       dependencies. The events table is given before Person table and reversed
       order in then incorrect.
     """
@@ -43,6 +47,7 @@ class TestCase(BaseTestCase):
         "relationship_test_mock_model",
         "roles",
         "test_model",
+        "contexts",
     )
     tables = set(db.metadata.tables).difference(ignore_tables)
     for _ in range(len(tables)):
@@ -55,7 +60,8 @@ class TestCase(BaseTestCase):
             tables.remove(table.name)
           except exc.IntegrityError:
             pass
-
+    contexts = db.metadata.tables["contexts"]
+    db.engine.execute(contexts.delete(contexts.c.id > 1))
     db.session.commit()
 
   def setUp(self):
