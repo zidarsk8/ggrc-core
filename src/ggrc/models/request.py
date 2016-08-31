@@ -20,16 +20,18 @@ from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import statusable
+from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins.assignable import Assignable
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_person import Personable
+from ggrc.utils import similarity_options as similarity_options_module
 
 
-class Request(statusable.Statusable,
-              AutoStatusChangeable, Assignable, Documentable, Personable,
-              CustomAttributable, relationship.Relatable, Titled, Slugged,
+class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
+              Documentable, Personable, CustomAttributable,
+              relationship.Relatable, WithSimilarityScore, Titled, Slugged,
               Described, Commentable, FinishedDate, VerifiedDate, Base,
               db.Model):
   """Class representing Requests.
@@ -45,6 +47,8 @@ class Request(statusable.Statusable,
   VALID_TYPES = (u'documentation', u'interview')
 
   ASSIGNEE_TYPES = (u'Assignee', u'Requester', u'Verifier')
+
+  similarity_options = similarity_options_module.REQUEST
 
   # TODO Remove requestor and requestor_id on database cleanup
   requestor_id = db.Column(db.Integer, db.ForeignKey('people.id'))

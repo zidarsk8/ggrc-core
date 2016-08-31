@@ -7,14 +7,15 @@
 
 import datetime
 import collections
+from operator import attrgetter
+
+import flask
 from sqlalchemy import and_
 from sqlalchemy import not_
 from sqlalchemy import or_
 
 from ggrc.rbac import permissions
 from ggrc.models.custom_attribute_value import CustomAttributeValue
-from ggrc.models.custom_attribute_definition import \
-    CustomAttributeDefinition as CAD
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
@@ -278,6 +279,10 @@ class QueryHelper(object):
       limit: a tuple of indexes in format (from, to); objects is sliced to
              objects[from, to]
 
+    If order_by["name"] == "__similarity__" (a special non-field value),
+    similarity weights returned by WithSimilarityScore.get_similar_objects are
+    used for sorting.
+
     Returns:
       a sorted and sliced list of objects
     """
@@ -287,9 +292,20 @@ class QueryHelper(object):
         order_by = order_by[0]
         order_field = order_by["name"]
         order_desc = order_by.get("desc", False)
+
+        if order_field == "__similarity__" and objects:
+          # a special case to sort by weights from WithSimilarityScore
+          object_class = type(objects[0])
+          id_weight_map = {obj.id: obj.weight for obj in
+                           getattr(flask.g, "query_api_similar_objects", [])}
+          def key(obj):
+            return id_weight_map.get(obj.id)
+        else:
+          key = attrgetter(order_field)
+
         objects = sorted(
             objects,
-            key=lambda obj: getattr(obj, order_field),
+            key=key,
             reverse=order_desc,
         )
       except:
@@ -339,6 +355,20 @@ class QueryHelper(object):
               query["ids"],
           )
       )
+
+    def similar():
+      """Filter by relationships similarity."""
+      similar_class = self.object_map[exp["object_name"]]
+      if not hasattr(similar_class, "get_similar_objects"):
+        return BadQueryException("{} does not define weights to count "
+                                 "relationships similarity"
+                                 .format(similar_class.__name__))
+      similar_objects = similar_class.get_similar_objects(
+          id_=exp["id"],
+          types=[object_class.__name__],
+      )
+      flask.g.query_api_similar_objects = similar_objects  # used for sorting
+      return object_class.id.in_([obj.id for obj in similar_objects])
 
     def unknown():
       raise BadQueryException("Unknown operator \"{}\""
@@ -394,7 +424,8 @@ class QueryHelper(object):
         "<": lambda: with_left(lambda l: l < rhs()),
         ">": lambda: with_left(lambda l: l > rhs()),
         "relevant": relevant,
-        "text_search": text_search
+        "text_search": text_search,
+        "similar": similar,
     }
 
     return ops.get(exp["op"]["name"], unknown)()
