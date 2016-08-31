@@ -13,7 +13,20 @@ from ggrc.converters.handlers import handlers
 class RequestLinkHandler(handlers.ColumnHandler):
   """Base class for request documents handlers."""
 
-  def parse_item(self):
+  @staticmethod
+  def _parse_line(line):
+    """Parse a single line and return link and title.
+
+    Args:
+      line: string containing a single line from a cell.
+
+    Returns:
+      tuple containing a link and a title.
+    """
+    line = line.strip()
+    return line, line
+
+  def parse_item(self, has_title=False):
     """Parse document link lines.
 
     Returns:
@@ -22,7 +35,7 @@ class RequestLinkHandler(handlers.ColumnHandler):
     documents = []
     user_id = get_current_user_id()
     for line in self.raw_value.splitlines():
-      link, title = line.split(None, 1) if " " in line else (line, line)
+      link, title = self._parse_line(line)
       documents.append(models.Document(
           link=link,
           title=title,
