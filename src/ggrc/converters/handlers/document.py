@@ -1,7 +1,7 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Handlers for special object mappings."""
+"""Handlers document entries."""
 
 from flask import current_app
 
@@ -11,8 +11,14 @@ from ggrc.converters.handlers import handlers
 
 
 class RequestLinkHandler(handlers.ColumnHandler):
+  """Base class for request documents handlers."""
 
   def parse_item(self):
+    """Parse document link lines.
+
+    Returns:
+      list of documents for all URLs and evidences.
+    """
     documents = []
     for line in self.raw_value.splitlines():
       link, title = line.split(None, 1) if " " in line else (line, line)
@@ -26,6 +32,11 @@ class RequestLinkHandler(handlers.ColumnHandler):
     return documents
 
   def _get_link_str(self, documents):
+    """Generate a new line separated string for all document links.
+
+    Returns:
+      string containing all URLs and titles.
+    """
     lines = []
     for document in documents:
       lines.append("{} {}".format(document.link, document.title))
@@ -36,11 +47,17 @@ class RequestLinkHandler(handlers.ColumnHandler):
 
 
 class RequestEvidenceHandler(RequestLinkHandler):
+  """Handler for evidence field on request imports."""
 
   def get_value(self):
     return self._get_link_str(self.row_converter.obj.documents)
 
   def insert_object(self):
+    """Update request evidence values
+
+    This function adds missing evidence and remove existing ones from requests.
+    The existing evidence with new titles just change the title.
+    """
     if not self.value or self.row_converter.ignore:
       return
 
@@ -61,6 +78,7 @@ class RequestEvidenceHandler(RequestLinkHandler):
 
 
 class RequestUrlHandler(RequestLinkHandler):
+  """Handler for URL field on request imports."""
 
   def get_value(self):
     documents = [doc for doc in self.row_converter.obj.related_objects()
@@ -68,7 +86,7 @@ class RequestUrlHandler(RequestLinkHandler):
     return self._get_link_str(documents)
 
   def insert_object(self):
-    """Update request url values
+    """Update request URL values
 
     This function adds missing URLs and remove existing ones from requests.
     The existing URLs with new titles just change the title.
