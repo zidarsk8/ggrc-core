@@ -36,6 +36,7 @@
         this.attr('mapper.all_selected', false);
         this.attr('select_state', false);
         scope.attr('selected').replace([]);
+        this.attr('selected', []);
       },
       selectAll: function (scope, el, ev) {
         var entries;
