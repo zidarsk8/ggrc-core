@@ -935,6 +935,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Description",
         "Due On",
+        "Evidence",
         "Notes",
         "Request Type",
         "Starts On",
@@ -947,6 +948,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Test",
         "Title",
         "Verifier",
+        "Url",
     }
     expected_fields = {
         "mandatory": {
