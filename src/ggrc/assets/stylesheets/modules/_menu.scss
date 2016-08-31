@@ -99,14 +99,14 @@
 small {
   &.count {
     @include border-radius(4px);
-    background: $error;
+    background: #777;
+    .critical & {
+      background: $error;
+    }
     text-align: center;
     text-shadow: none;
     color: $white;
     padding: 0 0 0 1px;
-    &.count-zero {
-      background:#777;
-    }
   }
 }
 
