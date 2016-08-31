@@ -14,8 +14,7 @@ from ggrc.login import get_current_user_id
 class RequestLinkHandler(handlers.ColumnHandler):
   """Base class for request documents handlers."""
 
-  @staticmethod
-  def _parse_line(line):
+  def _parse_line(self, line):
     """Parse a single line and return link and title.
 
     Args:
@@ -24,6 +23,7 @@ class RequestLinkHandler(handlers.ColumnHandler):
     Returns:
       tuple containing a link and a title.
     """
+    # pylint: disable=no-self-use
     line = line.strip()
     return line, line
 
@@ -67,8 +67,7 @@ class RequestLinkHandler(handlers.ColumnHandler):
 class RequestEvidenceHandler(RequestLinkHandler):
   """Handler for evidence field on request imports."""
 
-  @staticmethod
-  def _parse_line(line):
+  def _parse_line(self, line):
     """Parse a single line and return link and title.
 
     Args:
@@ -77,6 +76,7 @@ class RequestEvidenceHandler(RequestLinkHandler):
     Returns:
       tuple containing a link and a title.
     """
+    # pylint: disable=no-self-use
     parts = line.strip().split()
     if len(parts) == 1:
       return parts[0], parts[0]
@@ -114,8 +114,7 @@ class RequestEvidenceHandler(RequestLinkHandler):
 class RequestUrlHandler(RequestLinkHandler):
   """Handler for URL field on request imports."""
 
-  @staticmethod
-  def _parse_line(line):
+  def _parse_line(self, line):
     """Parse a single line and return link and title.
 
     Args:
