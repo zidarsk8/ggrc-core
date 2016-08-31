@@ -33,10 +33,27 @@ class RequestLinkHandler(handlers.ColumnHandler):
 class RequestEvidenceHandler(RequestLinkHandler):
 
   def get_value(self):
-    pass
+    lines = []
+    for document in self.row_converter.obj.documents:
+      lines.append("{} {}".format(document.link, document.title))
+    return "\n".join(lines)
+
 
   def insert_object(self):
-    pass
+    if not self.value or self.row_converter.ignore:
+      return
+
+    new_link_map = {doc.link: doc for doc in self.value}
+    old_link_map = {doc.link: doc for doc in self.row_converter.obj.documents}
+    for new_link, new_doc in new_link_map.items():
+      if new_link in old_link_map:
+        old_link_map[new_link].title = new_doc.title
+      else:
+        self.row_converter.obj.documents.append(new_doc)
+
+    for old_link, old_doc in old_link_map.items():
+      if old_link not in new_link_map:
+        self.row_converter.obj.documents.remove(old_doc)
 
   def set_value(self):
     """This should be ignored with second class attributes."""
