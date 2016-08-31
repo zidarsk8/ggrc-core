@@ -97,13 +97,13 @@ class RequestEvidenceHandler(RequestLinkHandler):
 
     new_link_map = {doc.link: doc for doc in self.value}
     old_link_map = {doc.link: doc for doc in self.row_converter.obj.documents}
-    for new_link, new_doc in new_link_map.items():
+    for new_link, new_doc in new_link_map.iteritems():
       if new_link in old_link_map:
         old_link_map[new_link].title = new_doc.title
       else:
         self.row_converter.obj.documents.append(new_doc)
 
-    for old_link, old_doc in old_link_map.items():
+    for old_link, old_doc in old_link_map.iteritems():
       if old_link not in new_link_map:
         self.row_converter.obj.documents.remove(old_doc)
 
@@ -131,9 +131,10 @@ class RequestUrlHandler(RequestLinkHandler):
     return line, line
 
   def get_value(self):
-    documents = [doc for doc in self.row_converter.obj.related_objects()
-                 if isinstance(doc, models.Document)]
-    return self._get_link_str(documents)
+    return self._get_link_str(
+        doc for doc in self.row_converter.obj.related_objects()
+        if isinstance(doc, models.Document)
+    )
 
   def insert_object(self):
     """Update request URL values
@@ -149,7 +150,7 @@ class RequestUrlHandler(RequestLinkHandler):
                     for doc in self.row_converter.obj.related_objects()
                     if isinstance(doc, models.Document)}
 
-    for new_link, new_doc in new_link_map.items():
+    for new_link, new_doc in new_link_map.iteritems():
       if new_link in old_link_map:
         old_link_map[new_link].title = new_doc.title
       else:
@@ -158,7 +159,7 @@ class RequestUrlHandler(RequestLinkHandler):
             destination=new_doc,
         )
 
-    for old_link, old_doc in old_link_map.items():
+    for old_link, old_doc in old_link_map.iteritems():
       if old_link not in new_link_map:
         if old_doc in self.row_converter.obj.related_destinations:
           self.row_converter.obj.related_destinations.remove(old_doc)
