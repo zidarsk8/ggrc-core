@@ -130,12 +130,12 @@ class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
       },
       "request_url": {
           "display_name": "Url",
-          "filter_by": "_nop",
+          "filter_by": "_filter_by_url",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
       },
       "request_evidence": {
           "display_name": "Evidence",
-          "filter_by": "_nop",
+          "filter_by": "_filter_by_evidence",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
       },
   }
@@ -173,6 +173,14 @@ class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
   @classmethod
   def _filter_by_related_verifiers(cls, predicate):
     return cls._get_relate_filter(predicate, "Verifier")
+
+  @classmethod
+  def _filter_by_url(cls, predicate):
+    return None
+
+  @classmethod
+  def _filter_by_evidence(cls, predicate):
+    return None
 
   @classmethod
   def _filter_by_request_audit(cls, predicate):
