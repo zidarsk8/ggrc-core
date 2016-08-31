@@ -25,6 +25,12 @@ class RequestLinkHandler(handlers.ColumnHandler):
 
     return documents
 
+  def _get_link_str(self, documents):
+    lines = []
+    for document in documents:
+      lines.append("{} {}".format(document.link, document.title))
+    return "\n".join(lines)
+
   def set_obj_attr(self):
     self.value = self.parse_item()
 
@@ -32,10 +38,7 @@ class RequestLinkHandler(handlers.ColumnHandler):
 class RequestEvidenceHandler(RequestLinkHandler):
 
   def get_value(self):
-    lines = []
-    for document in self.row_converter.obj.documents:
-      lines.append("{} {}".format(document.link, document.title))
-    return "\n".join(lines)
+    return self._get_link_str(self.row_converter.obj.documents)
 
   def insert_object(self):
     if not self.value or self.row_converter.ignore:
@@ -62,10 +65,7 @@ class RequestUrlHandler(RequestLinkHandler):
   def get_value(self):
     documents = [doc for doc in self.row_converter.obj.related_objects()
                  if isinstance(doc, models.Document)]
-    lines = []
-    for document in documents:
-      lines.append("{} {}".format(document.link, document.title))
-    return "\n".join(lines)
+    return self._get_link_str(documents)
 
   def insert_object(self):
     """Update request url values
