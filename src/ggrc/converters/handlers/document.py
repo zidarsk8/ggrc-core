@@ -60,7 +60,12 @@ class RequestEvidenceHandler(RequestLinkHandler):
 class RequestUrlHandler(RequestLinkHandler):
 
   def get_value(self):
-    return ""
+    documents = [doc for doc in self.row_converter.obj.related_objects()
+                 if isinstance(doc, models.Document)]
+    lines = []
+    for document in documents:
+      lines.append("{} {}".format(document.link, document.title))
+    return "\n".join(lines)
 
   def insert_object(self):
     """Update request url values
