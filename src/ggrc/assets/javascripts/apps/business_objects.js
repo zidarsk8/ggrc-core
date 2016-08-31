@@ -285,15 +285,15 @@
           Assessment: {
             order: 10
           },
-          AssessmentTemplate: {
+          Request: {
+            widget_id: 'Request',
+            widget_name: 'Requests',
             order: 20
           },
           Issue: {
             order: 30
           },
-          Request: {
-            widget_id: 'Request',
-            widget_name: 'Requests',
+          AssessmentTemplate: {
             order: 40
           },
           Contract: {
