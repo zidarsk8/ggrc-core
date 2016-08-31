@@ -815,14 +815,6 @@
         attr_title: 'Verified',
         attr_name: 'verified'
       }, {
-        attr_title: 'Primary Contact',
-        attr_name: 'contact',
-        attr_sort_field: 'contact.name|email'
-      }, {
-        attr_title: 'Secondary Contact',
-        attr_name: 'secondary_contact',
-        attr_sort_field: 'secondary_contact.name|email'
-      }, {
         attr_title: 'Last Updated',
         attr_name: 'updated_at'
       }, {
