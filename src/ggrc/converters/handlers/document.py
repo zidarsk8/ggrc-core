@@ -38,10 +38,10 @@ class RequestLinkHandler(handlers.ColumnHandler):
     Returns:
       string containing all URLs and titles.
     """
-    lines = []
-    for document in documents:
-      lines.append("{} {}".format(document.link, document.title))
-    return "\n".join(lines)
+    return "\n".join(
+        "{} {}".format(document.link, document.title)
+        for document in documents
+    )
 
   def set_obj_attr(self):
     self.value = self.parse_item()
