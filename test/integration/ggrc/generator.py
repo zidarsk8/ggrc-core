@@ -245,10 +245,10 @@ class ObjectGenerator(Generator):
             "modal_title": kwargs.get("modal_title", self.random_str()),
             "attribute_type": kwargs.get("attribute_type", "Text"),
             "mandatory": kwargs.get("mandatory", False),
-            "helptext": kwargs.get("helptext", False),
-            "placeholder": kwargs.get("placeholder", False),
+            "helptext": kwargs.get("helptext", None),
+            "placeholder": kwargs.get("placeholder", None),
             "context": {"id": None},
-            "multi_choice_options": kwargs.get("options", False),
+            "multi_choice_options": kwargs.get("options", None),
         }
     }
     data[obj_name].update(kwargs)
