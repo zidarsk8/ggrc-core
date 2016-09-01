@@ -208,6 +208,7 @@
       default_widgets: defaults || GGRC.default_widgets || [],
       instance: GGRC.page_instance(),
       header_view: GGRC.mustache_path + '/base_objects/page_header.mustache',
+      GGRC: GGRC,  // make the global object available in Mustache templates
       page_title: function (controller) {
         return controller.options.instance.title;
       },

@@ -24,11 +24,28 @@ from ggrc_workflows.models import Workflow
 def get_user_task_count():
   with benchmark("Get user task count RAW"):
     current_user = get_current_user()
-    return CycleTaskGroupObjectTask.query.join(Cycle).filter(
+
+    user_tasks = CycleTaskGroupObjectTask.query.with_entities(
+        # prefetch tasks' finishing dates to avoid firing subsequent queries
+        CycleTaskGroupObjectTask.end_date
+    ).join(
+        Cycle
+    ).filter(
         CycleTaskGroupObjectTask.contact_id == current_user.id,
         CycleTaskGroupObjectTask.status.in_(
             ["Assigned", "InProgress", "Finished", "Declined"]),
-        Cycle.is_current == True).count()  # noqa # pylint: disable=singleton-comparison
+        Cycle.is_current == True  # noqa # pylint: disable=singleton-comparison
+    ).all()
+
+    task_count = len(user_tasks)
+
+    today = date.today()
+    overdue_count = sum(
+        1 for task in user_tasks if task.end_date and today > task.end_date)
+
+    # NOTE: the return value must be a list so that the result can be
+    # directly JSON-serialized to an Array in a HAML template
+    return [task_count, overdue_count]
 
 
 @app.context_processor
