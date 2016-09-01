@@ -56,12 +56,15 @@
     scope: {
       caIds: null,
       instance: null,
-      commentEl: null,
       commentPlaceHolder: '@',
-      notificationEl: null,
       isSaving: false,
       comment: {
-        value: ''
+        notification: false,
+        value: '',
+        checked: false
+      },
+      isEmpty: function () {
+        return !this.attr('comment.value');
       },
       applyState: function () {
         this.saveComment();
@@ -74,22 +77,16 @@
         this.attr('state.empty', false);
       },
       clean: function () {
-        if (this.attr('commentEl')) {
-          this.attr('commentEl').val('');
-        }
+        this.attr('comment.value', null);
       },
       removeEmptyMark: function (scope, el) {
         this.attr('state.empty', !el.val().length);
       },
       getCommentData: function () {
         var source = this.attr('instance');
-        var description = this.attr('commentEl').val().trim();
-        var sendNotification = this.attr('notificationEl').attr('checked');
+        var description = this.attr('comment.value');
+        var sendNotification = this.attr('comment.checked');
         var data;
-
-        if (!description.length) {
-          return;
-        }
 
         data = {
           description: description,
@@ -97,13 +94,11 @@
           context: source.context,
           assignee_type: getAssigneeType(this.attr('instance'))
         };
-        // Extra data to map Custom Attribute and Custom Attribute Value with Comment
+        // Extra data to map Custom Attribute Value with Comment
         if (this.attr('caIds') && this.attr('caIds.valueId')) {
           data.custom_attribute_revision_upd = {
-            custom_attribute_value:
-              {id: this.attr('caIds.valueId')},
-            custom_attribute_definition:
-              {id: this.attr('caIds.defId')}
+            custom_attribute_value: {id: this.attr('caIds.valueId')},
+            custom_attribute_definition: {id: this.attr('caIds.defId')}
           };
         }
         return data;
@@ -115,18 +110,16 @@
         return comment;
       },
       saveComment: function () {
-        var data = this.getCommentData();
         var comment = null;
 
-        if (!data) {
+        if (this.isEmpty()) {
           return;
         }
-
         this.attr('isSaving', true);
 
         comment = this.createComment();
 
-        comment.attr(data).save()
+        comment.attr(this.getCommentData()).save()
           .then(function () {
             return comment.constructor
               .resolve_deferred_bindings(comment);
@@ -139,16 +132,13 @@
       }
     },
     events: {
-      inserted: function () {
-        this.scope.attr('commentEl', this.element.find('textarea'));
-        this.scope.attr('notificationEl',
-          this.element.find('[name=send_notification]'));
-      },
       init: function () {
         var scope = this.scope;
         scope.attr('instance', scope.attr('instance') || GGRC.page_instance());
         scope.attr('state', scope.attr('state') || defaultState);
-        scope.attr('commentPlaceHolder', scope.attr('commentPlaceHolder') || defaultPlaceHolderText);
+        scope.attr('commentPlaceHolder',
+          scope.attr('commentPlaceHolder') || defaultPlaceHolderText);
+        scope.attr('comment.checked', scope.attr('instance.send_by_default'));
       },
       '{scope.state} save': function (scope, ev, val) {
         if (val) {

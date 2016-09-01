@@ -14,7 +14,11 @@
         <div class="row-fluid">
             <div class="confirm-buttons">
                 <a class="attachment-modal__btn-close" can-click="hide">Close</a>
-                <button class="btn btn-small btn-success" {{#isEmpty}}disabled{{/isEmpty}} can-click="saveAttachments">{{actionBtnText}}</button>
+              {{#comment}}
+                  <button class="btn btn-small btn-success" {{#isEmpty}}disabled{{/isEmpty}}
+                          can-click="saveAttachments">Save
+                  </button>
+              {{/comment}}
             </div>
         </div>
     </div>

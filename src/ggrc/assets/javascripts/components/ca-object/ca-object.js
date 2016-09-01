@@ -56,10 +56,8 @@
               success: 'Saved'
             });
           })
-          .fail(function () {
-            can.$(document.body).trigger('ajax:flash', {
-              error: 'There was a problem saving'
-            });
+          .fail(function (instance, err) {
+            GGRC.Errors.notifier()(err);
           })
           .always(function () {
             this.attr('isSaving', false);

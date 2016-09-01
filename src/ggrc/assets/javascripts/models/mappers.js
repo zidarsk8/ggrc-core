@@ -282,10 +282,11 @@
       },
 
       find_result_by_instance: function (result, list) {
-        var i
-          , found_result = null;
+        var old_result;
+        var i;
+        var found_result = null;
 
-        for (i=0; !found_result && i<list.length; i++) {
+        for (i = 0; !found_result && i < list.length; i++) {
           old_result = list[i];
           if (old_result.instance.id == result.instance.id
               && old_result.instance.constructor.shortName
@@ -337,11 +338,11 @@
       },
 
       insert_results: function (binding, results) {
-        var self = this
-          , all_binding_results = []
-          , new_instance_results = []
-          , instances_to_refresh = []
-          ;
+        var self = this;
+        var all_binding_results = [];
+        var new_instance_results = [];
+        var instances_to_refresh = [];
+        var mapping_attr;
 
         can.each(results, function (new_result) {
           var found_result = null;
