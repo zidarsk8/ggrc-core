@@ -162,10 +162,6 @@ can.Control('CMS.Controllers.TreeLoader', {
     }
   },
 
-  _will_navigate: function () {
-    return !!window.location.hash.match(/#.+(\/.+)+/);
-  },
-
   display: function () {
     var that = this;
     var tracker_stop = GGRC.Tracker.start(
@@ -179,9 +175,6 @@ can.Control('CMS.Controllers.TreeLoader', {
         this.fetch_list.bind(this) : this.loadPage.bind(this);
 
     if (this._display_deferred) {
-      if (!this._will_navigate()) {
-        this.show_info_pin();
-      }
       return this._display_deferred;
     }
 
@@ -195,19 +188,12 @@ can.Control('CMS.Controllers.TreeLoader', {
       .done(tracker_stop);
 
     this._display_deferred.then(function (e) {
-      if (!this._will_navigate()) {
-        this.show_info_pin();
-      }
     }.bind(this));
 
     return this._display_deferred;
   },
 
   draw_list: function (list, is_reload, force_prepare_children) {
-    var that = this;
-    var refresh_queue = new RefreshQueue();
-    var temp_list;
-
     is_reload = is_reload === true;
     // TODO figure out why this happens and fix the root of the problem
     if (!list && !this.options.list) {
@@ -235,21 +221,7 @@ can.Control('CMS.Controllers.TreeLoader', {
     this.options.attr('list', []);
     this.on();
 
-    temp_list = [];
-    list.each(function (v) {
-      var item = that.prepare_child_options(v, force_prepare_children);
-      temp_list.push(item);
-      if (!is_reload && !item.instance.selfLink) {
-        refresh_queue.enqueue(v.instance);
-      }
-    });
-
-    temp_list = can.map(temp_list, function (o) {
-      if (o.instance.selfLink) {
-        return o;
-      }
-    });
-    this._draw_list_deferred = this.enqueue_items(temp_list, is_reload, force_prepare_children);
+    this._draw_list_deferred = this.enqueue_items(list, is_reload, force_prepare_children);
     return this._draw_list_deferred;
   },
 
@@ -356,13 +328,17 @@ can.Control('CMS.Controllers.TreeLoader', {
     var toInsert;
     var dfd;
 
-    // Check the list of items to be inserted for any duplicate items.
-    can.each(this.options.list || [], function (item) {
-      idMap[item.instance.type + item.instance.id] = true;
-    });
-    toInsert = _.filter(items, function (item) {
-      return !idMap[item.instance.type + item.instance.id];
-    });
+    if (this.options.attr('is_subtree')) {
+      // Check the list of items to be inserted for any duplicate items.
+      can.each(this.options.list || [], function (item) {
+        idMap[item.instance.type + item.instance.id] = true;
+      });
+      toInsert = _.filter(items, function (item) {
+        return !idMap[item.instance.type + item.instance.id];
+      });
+    } else {
+      toInsert = items;
+    }
 
     can.each(toInsert, function (item) {
       var prepped = that.prepare_child_options(item, force_prepare_children);
@@ -654,8 +630,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       }
 
       if (this.element.parent().length === 0 || // element not attached
-          this.element.data('disable-lazy-loading') || // comment list
-          !this.options.attr('is_subtree')) {
+          this.element.data('disable-lazy-loading')) { // comment list
         this.options.disable_lazy_loading = true;
       }
 
