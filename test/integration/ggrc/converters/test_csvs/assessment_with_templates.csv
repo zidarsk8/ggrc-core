@@ -1,7 +1,7 @@
 Object type,,,,,,,,,,,,,,,,,,,,,,,,,
-Assessment,Code*,Template,Audit*,Object*,Title*,Description,Notes,Test Plan,Assessor*,Creator*,Verifier,Recipients,,Send by default,Effective Date,Stop Date,Finished Date,Verified Date,State*,Primary Contact,Conclusion: Design,Conclusion: Operation,Secondary Contact,Assessment URL,Reference URL
-,A 1,,Audit,control: control-1,No template Assessment 1,,,,user@example.com,user@example.com,user@example.com,,,no,,,,,not started,,,,,,
-,A 2,,Audit,control: control-2,No template Assessment 2,,,,user@example.com,user@example.com,user@example.com,"Assessor , 	Creator,	Verifier",,,,,,,not started,,,,,,
+Assessment,Code*,Template,Audit*,Object*,Title*,Url,Evidence,Test Plan,Assessor*,Creator*,Verifier,Recipients,,Send by default,Effective Date,Stop Date,Finished Date,Verified Date,State*,Primary Contact,Conclusion: Design,Conclusion: Operation,Secondary Contact,Assessment URL,Reference URL
+,A 1,,Audit,control: control-1,No template Assessment 1,https://i.imgur.com/17h9PH3.gif,https://i.imgur.com/t41OTZH.png with a title,,user@example.com,user@example.com,user@example.com,,,no,,,,,not started,,,,,,
+,A 2,,Audit,control: control-2,No template Assessment 2,,https://i.imgur.com/CWa5lKv.gif,,user@example.com,user@example.com,user@example.com,"Assessor , 	Creator,	Verifier",,,,,,,not started,,,,,,
 ,A 3,,Audit,control: control-3,No template Assessment 3,,,,user@example.com,user@example.com,user@example.com,"Creator
 Verifier",,Yes,,,,,not started,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,

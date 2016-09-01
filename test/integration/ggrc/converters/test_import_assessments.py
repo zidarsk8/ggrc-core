@@ -26,7 +26,8 @@ class TestRequestImport(converters.TestCase):
     """Test importing of assessments with templates."""
 
     self.import_file("assessment_template_no_warnings.csv")
-    self.import_file("assessment_with_templates.csv")
+    response = self.import_file("assessment_with_templates.csv")
+    self._check_response(response, {})
 
     assessment = models.Assessment.query.filter(
         models.Assessment.slug == "A 4").first()
