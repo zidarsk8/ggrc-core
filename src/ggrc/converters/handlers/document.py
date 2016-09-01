@@ -5,6 +5,7 @@
 
 from flask import current_app
 
+from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
@@ -101,7 +102,7 @@ class DocumentEvidenceHandler(DocumentLinkHandler):
 
     for old_link, old_doc in old_link_map.iteritems():
       if old_link not in new_link_map:
-        self.row_converter.obj.documents.remove(old_doc)
+        db.session.delete(old_doc.object_documents[0])
 
   def set_value(self):
     """This should be ignored with second class attributes."""
