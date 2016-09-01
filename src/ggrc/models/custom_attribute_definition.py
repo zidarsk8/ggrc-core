@@ -4,11 +4,13 @@
 """Custom attribute definition module"""
 
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import validates
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc import db
 from ggrc.models import mixins
 from ggrc.models.custom_attribute_value import CustomAttributeValue
+from ggrc.models.exceptions import ValidationError
 
 
 class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
@@ -94,6 +96,43 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       "Date": "Date",
       "Person": "Map:Person",
   }
+
+  @validates("attribute_type")
+  def validate_attribute_type(self, _, value):
+    """Check that provided attribute_type is allowed."""
+    if value not in self.VALID_TYPES.values():
+      raise ValidationError("Invalid attribute_type: got {v}, "
+                            "expected one of {l}"
+                            .format(v=value,
+                                    l=list(self.VALID_TYPES.values())))
+    return value
+
+  @validates("multi_choice_options")
+  def validate_multi_choice_options(self, _, value):
+    """Strip spaces around options in dropdown options."""
+    # pylint: disable=no-self-use
+    # TODO: this should be "if value is not None" to disallow value == ""
+    if value:
+      value_list = [part.strip() for part in value.split(",")]
+      value_set = set(value_list)
+      if len(value_set) != len(value_list):
+        raise ValidationError("Duplicate dropdown options are not allowed: "
+                              "'{}'".format(value))
+      if "" in value_set:
+        raise ValidationError("Empty dropdown options are not allowed: '{}'"
+                              .format(value))
+      value = ",".join(value_list)
+
+    return value
+
+  @validates("multi_choice_mandatory")
+  def validate_multi_choice_mandatory(self, _, value):
+    """Strip spaces around bitmas in dropdown options."""
+    # pylint: disable=no-self-use
+    if value:
+      value = ",".join(part.strip() for part in value.split(","))
+
+    return value
 
 
 class CustomAttributeMapable(object):
