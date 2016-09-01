@@ -73,11 +73,11 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
 
   def test_get_similar_objects_weights(self):  # pylint: disable=invalid-name
     """Check weights counted for similar objects."""
-    similar_objects = Assessment.get_similar_objects(
+    similar_objects = Assessment.get_similar_objects_query(
         id_=self.assessment.id,
         types=["Assessment"],
         threshold=0,  # to include low weights too
-    )
+    ).all()
 
     # casting to int from Decimal to prettify the assertion method output
     id_weight_map = {obj.id: int(obj.weight) for obj in similar_objects}
@@ -86,10 +86,10 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
 
   def test_get_similar_objects(self):
     """Check similar objects manually and via Query API."""
-    similar_objects = Assessment.get_similar_objects(
+    similar_objects = Assessment.get_similar_objects_query(
         id_=self.assessment.id,
         types=["Assessment"],
-    )
+    ).all()
     expected_ids = {id_ for id_, weight in self.id_weight_map.items()
                     if weight >= Assessment.similarity_options["threshold"]}
 

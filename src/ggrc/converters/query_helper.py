@@ -280,8 +280,8 @@ class QueryHelper(object):
              objects[from, to]
 
     If order_by["name"] == "__similarity__" (a special non-field value),
-    similarity weights returned by WithSimilarityScore.get_similar_objects are
-    used for sorting.
+    similarity weights returned by get_similar_objects_query are used for
+    sorting.
 
     Returns:
       a sorted and sliced list of objects
@@ -359,14 +359,14 @@ class QueryHelper(object):
     def similar():
       """Filter by relationships similarity."""
       similar_class = self.object_map[exp["object_name"]]
-      if not hasattr(similar_class, "get_similar_objects"):
+      if not hasattr(similar_class, "get_similar_objects_query"):
         return BadQueryException("{} does not define weights to count "
                                  "relationships similarity"
                                  .format(similar_class.__name__))
-      similar_objects = similar_class.get_similar_objects(
+      similar_objects = similar_class.get_similar_objects_query(
           id_=exp["id"],
           types=[object_class.__name__],
-      )
+      ).all()
       flask.g.query_api_similar_objects = similar_objects  # used for sorting
       return object_class.id.in_([obj.id for obj in similar_objects])
 
