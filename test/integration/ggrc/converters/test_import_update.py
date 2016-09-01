@@ -17,22 +17,17 @@ class TestImportUpdates(TestCase):
   def test_policy_basic_update(self):
     """ Test simple policy title update """
 
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
     filename = "policy_basic_import.csv"
     response = self.import_file(filename)
-    for block in response:
-      for message in messages:
-        self.assertEqual(set(), set(block[message]))
+
+    self._check_response(response, {})
 
     policy = models.Policy.query.filter_by(slug="p1").first()
     self.assertEqual(policy.title, "some weird policy")
 
     filename = "policy_basic_import_update.csv"
     response = self.import_file(filename)
-    for block in response:
-      for message in messages:
-        self.assertEqual(set(), set(block[message]))
+    self._check_response(response, {})
 
     policy = models.Policy.query.filter_by(slug="p1").first()
     self.assertEqual(policy.title, "Edited policy")
