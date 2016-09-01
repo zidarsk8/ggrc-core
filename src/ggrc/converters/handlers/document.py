@@ -11,8 +11,8 @@ from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
 
 
-class RequestLinkHandler(handlers.ColumnHandler):
-  """Base class for request documents handlers."""
+class DocumentLinkHandler(handlers.ColumnHandler):
+  """Base class for document documents handlers."""
 
   def _parse_line(self, line):
     """Parse a single line and return link and title.
@@ -64,8 +64,8 @@ class RequestLinkHandler(handlers.ColumnHandler):
     self.value = self.parse_item()
 
 
-class RequestEvidenceHandler(RequestLinkHandler):
-  """Handler for evidence field on request imports."""
+class DocumentEvidenceHandler(DocumentLinkHandler):
+  """Handler for evidence field on document imports."""
 
   def _parse_line(self, line):
     """Parse a single line and return link and title.
@@ -87,9 +87,9 @@ class RequestEvidenceHandler(RequestLinkHandler):
     return self._get_link_str(self.row_converter.obj.documents)
 
   def insert_object(self):
-    """Update request evidence values
+    """Update document evidence values
 
-    This function adds missing evidence and remove existing ones from requests.
+    This function adds missing evidence and remove existing ones from Documents.
     The existing evidence with new titles just change the title.
     """
     if not self.value or self.row_converter.ignore:
@@ -111,8 +111,8 @@ class RequestEvidenceHandler(RequestLinkHandler):
     """This should be ignored with second class attributes."""
 
 
-class RequestUrlHandler(RequestLinkHandler):
-  """Handler for URL field on request imports."""
+class DocumentUrlHandler(DocumentLinkHandler):
+  """Handler for URL field on document imports."""
 
   def _parse_line(self, line):
     """Parse a single line and return link and title.
@@ -136,9 +136,9 @@ class RequestUrlHandler(RequestLinkHandler):
     )
 
   def insert_object(self):
-    """Update request URL values
+    """Update document URL values
 
-    This function adds missing URLs and remove existing ones from requests.
+    This function adds missing URLs and remove existing ones from Documents.
     The existing URLs with new titles just change the title.
     """
     if not self.value or self.row_converter.ignore:
@@ -165,7 +165,7 @@ class RequestUrlHandler(RequestLinkHandler):
         elif old_doc in self.row_converter.obj.related_sources:
           self.row_converter.obj.related_sources.remove(old_doc)
         else:
-          current_app.logger.warning("Invalid relationship state for request "
+          current_app.logger.warning("Invalid relationship state for document "
                                      "URLs.")
 
   def set_value(self):
