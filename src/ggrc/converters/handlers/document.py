@@ -87,10 +87,10 @@ class DocumentEvidenceHandler(DocumentLinkHandler):
     return self._get_link_str(self.row_converter.obj.documents)
 
   def insert_object(self):
-    """Update document evidence values
+    """Update document evidence values.
 
-    This function adds missing evidence and remove existing ones from Documents.
-    The existing evidence with new titles just change the title.
+    This function adds missing evidence and remove existing ones from
+    Documents. The existing evidence with new titles just change the title.
     """
     if not self.value or self.row_converter.ignore:
       return
