@@ -48,18 +48,6 @@ class DocumentLinkHandler(handlers.ColumnHandler):
 
     return documents
 
-  @staticmethod
-  def _get_link_str(documents):
-    """Generate a new line separated string for all document links.
-
-    Returns:
-      string containing all URLs and titles.
-    """
-    return "\n".join(
-        "{} {}".format(document.link, document.title)
-        for document in documents
-    )
-
   def set_obj_attr(self):
     self.value = self.parse_item()
 
@@ -84,7 +72,15 @@ class DocumentEvidenceHandler(DocumentLinkHandler):
     return parts[0], " ".join(parts[1:])
 
   def get_value(self):
-    return self._get_link_str(self.row_converter.obj.documents)
+    """Generate a new line separated string for all document links.
+
+    Returns:
+      string containing all evidence URLs and titles.
+    """
+    return "\n".join(
+        "{} {}".format(document.link, document.title)
+        for document in self.row_converter.obj.documents
+    )
 
   def insert_object(self):
     """Update document evidence values.
@@ -130,8 +126,14 @@ class DocumentUrlHandler(DocumentLinkHandler):
     return line, line
 
   def get_value(self):
-    return self._get_link_str(
-        doc for doc in self.row_converter.obj.related_objects()
+    """Generate a new line separated string for all document links.
+
+    Returns:
+      string containing all URLs
+    """
+    return "\n".join(
+        doc.link
+        for doc in self.row_converter.obj.related_objects()
         if isinstance(doc, models.Document)
     )
 
