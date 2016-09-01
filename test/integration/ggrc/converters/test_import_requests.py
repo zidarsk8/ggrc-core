@@ -150,12 +150,6 @@ class TestRequestImport(converters.TestCase):
     """
     self.import_file("request_full_no_warnings.csv")
     response = self.import_file("request_with_warnings_and_errors.csv")
-    message_types = (
-        "block_errors",
-        "block_warnings",
-        "row_errors",
-        "row_warnings"
-    )
 
     expected_errors = {
         "Request": {
@@ -196,6 +190,13 @@ class TestRequestImport(converters.TestCase):
                     object_type="Project",
                     slug="proj-55"
                 ),
+                errors.REQUEST_INVALID_STATE.format(line=20),
+                errors.REQUEST_INVALID_STATE.format(line=21),
+                errors.WRONG_REQUIRED_VALUE.format(
+                  line=19,
+                  column_name="Status",
+                  value="open",
+                )
             ]),
         }
     }
