@@ -1,6 +1,8 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Tests for bulk updates with CSV import."""
+
 from integration.ggrc.converters import TestCase
 
 from ggrc import models
@@ -24,6 +26,11 @@ class TestImportUpdates(TestCase):
 
     policy = models.Policy.query.filter_by(slug="p1").first()
     self.assertEqual(policy.title, "some weird policy")
+    revision_count = models.Revision.query.filter(
+        models.Revision.resource_type == "Policy",
+        models.Revision.resource_id == policy.id
+    ).count()
+    self.assertEqual(revision_count, 1)
 
     filename = "policy_basic_import_update.csv"
     response = self.import_file(filename)
@@ -31,3 +38,8 @@ class TestImportUpdates(TestCase):
 
     policy = models.Policy.query.filter_by(slug="p1").first()
     self.assertEqual(policy.title, "Edited policy")
+    revision_count = models.Revision.query.filter(
+        models.Revision.resource_type == "Policy",
+        models.Revision.resource_id == policy.id
+    ).count()
+    self.assertEqual(revision_count, 2)
