@@ -64,11 +64,7 @@ class TestRequestImport(converters.TestCase):
     """
     filename = "request_full_no_warnings.csv"
     response = self.import_file(filename)
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
-    for response_block in response:
-      for message in messages:
-        self.assertEqual(set(), set(response_block[message]))
+    self._check_response(response, {})
 
     # Test first request line in the CSV file
     request_1 = models.Request.query.filter_by(slug="Request 1").first()
@@ -146,7 +142,6 @@ class TestRequestImport(converters.TestCase):
     self.assertEqual(requests["Request 4"].status,
                      models.Request.PROGRESS_STATE)
 
-  @skip.SkipTest
   def test_request_warnings_errors(self):
     """ Test full request import with warnings and errors
 
@@ -162,48 +157,47 @@ class TestRequestImport(converters.TestCase):
         "row_warnings"
     )
 
-    messages = {
-        "block_errors": set([]),
-        "block_warnings": set([
-            errors.UNKNOWN_COLUMN.format(
-                line=2,
-                column_name="error description - non existing column will be "
-                "ignored"
-            ),
-            errors.UNKNOWN_COLUMN.format(
-                line=2,
-                column_name="actual error ""message"
-            ),
-        ]),
-        "row_errors": set([
-            errors.UNKNOWN_OBJECT.format(
-                line=18,
-                object_type="Audit",
-                slug="not existing"
-            ),
-            errors.DUPLICATE_VALUE_IN_CSV.format(
-                line_list="19, 21",
-                column_name="Code",
-                value="Request 22",
-                s="",
-                ignore_lines="21",
-            ),
-        ]),
-        "row_warnings": set([
-            errors.UNKNOWN_USER_WARNING.format(
-                line=14,
-                email="non_existing@a.com",
+    expected_errors = {
+        "Request": {
+            "block_errors": set([]),
+            "block_warnings": set([
+                errors.UNKNOWN_COLUMN.format(
+                    line=2,
+                    column_name="error description - non existing column will "
+                    "be ignored"
+                ),
+                errors.UNKNOWN_COLUMN.format(
+                    line=2,
+                    column_name="actual error message"
+                ),
+            ]),
+            "row_errors": set([
+                errors.UNKNOWN_OBJECT.format(
+                    line=18,
+                    object_type="Audit",
+                    slug="not existing"
+                ),
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line_list="19, 21",
+                    column_name="Code",
+                    value="Request 22",
+                    s="",
+                    ignore_lines="21",
+                ),
+            ]),
+            "row_warnings": set([
+                errors.UNKNOWN_USER_WARNING.format(
+                    line=14,
+                    email="non_existing@a.com",
 
-            ),
-            errors.UNKNOWN_OBJECT.format(
-                line=14,
-                object_type="Project",
-                slug="proj-55"
-            ),
-        ]),
+                ),
+                errors.UNKNOWN_OBJECT.format(
+                    line=14,
+                    object_type="Project",
+                    slug="proj-55"
+                ),
+            ]),
+        }
     }
+    self._check_response(response, expected_errors)
 
-    for message_type in message_types:
-      self.assertEqual(len(set(response[0][message_type])),
-                       len(response[0][message_type]))
-      self.assertEqual(set(response[0][message_type]), messages[message_type])
