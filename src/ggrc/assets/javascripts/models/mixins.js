@@ -113,18 +113,24 @@
     }
   }, {
     before_create: function () {
+      var person = {
+        id: GGRC.current_user.id,
+        type: 'Person'
+      };
       if (!this.contact) {
-        this.attr('contact', {
-          id: GGRC.current_user.id,
-          type: 'Person'
-        });
+        this.attr('contact', person);
       }
     },
     form_preload: function (newObjectForm) {
+      var person = {
+        id: GGRC.current_user.id,
+        type: 'Person'
+      };
       if (newObjectForm && !this.contact) {
-        this.attr('contact', {
-          id: GGRC.current_user.id, type: 'Person'
-        });
+        this.attr('contact', person);
+        this.attr('_transient.contact', person);
+      } else if (this.contact) {
+        this.attr('_transient.contact', this.contact);
       }
     }
   });
