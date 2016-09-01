@@ -160,10 +160,10 @@ class DocumentUrlHandler(DocumentLinkHandler):
 
     for old_link, old_doc in old_link_map.iteritems():
       if old_link not in new_link_map:
-        if old_doc in self.row_converter.obj.related_destinations:
-          self.row_converter.obj.related_destinations.remove(old_doc)
-        elif old_doc in self.row_converter.obj.related_sources:
-          self.row_converter.obj.related_sources.remove(old_doc)
+        if old_doc.related_destinations:
+          old_doc.related_destinations.pop()
+        elif old_doc.related_sources:
+          old_doc.related_sources.pop()
         else:
           current_app.logger.warning("Invalid relationship state for document "
                                      "URLs.")
