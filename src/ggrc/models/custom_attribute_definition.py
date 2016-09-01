@@ -111,7 +111,8 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   def validate_multi_choice_options(self, _, value):
     """Strip spaces around options in dropdown options."""
     # pylint: disable=no-self-use
-    if value is not None:
+    # TODO: this should be "if value is not None" to disallow value == ""
+    if value:
       value_list = [part.strip() for part in value.split(",")]
       value_set = set(value_list)
       if len(value_set) != len(value_list):
