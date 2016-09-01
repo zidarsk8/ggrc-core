@@ -102,29 +102,21 @@ class TestRequestImport(converters.TestCase):
     """
     self.import_file("request_full_no_warnings.csv")
     response = self.import_file("request_update_intermediate.csv")
-    message_types = (
-        "block_errors",
-        "block_warnings",
-        "row_errors",
-        "row_warnings"
-    )
 
-    messages = {
-        "block_errors": set(),
-        "block_warnings": set(),
-        "row_errors": set(),
-        "row_warnings": set([
-            errors.REQUEST_INVALID_STATE.format(line=5),
-            errors.REQUEST_INVALID_STATE.format(line=6),
-            errors.REQUEST_INVALID_STATE.format(line=11),
-            errors.REQUEST_INVALID_STATE.format(line=12),
-        ]),
+    expected_errors = {
+        "Request": {
+            "block_errors": set(),
+            "block_warnings": set(),
+            "row_errors": set(),
+            "row_warnings": set([
+                errors.REQUEST_INVALID_STATE.format(line=5),
+                errors.REQUEST_INVALID_STATE.format(line=6),
+                errors.REQUEST_INVALID_STATE.format(line=11),
+                errors.REQUEST_INVALID_STATE.format(line=12),
+            ]),
+        }
     }
-
-    for message_type in message_types:
-      self.assertEqual(len(set(response[0][message_type])),
-                       len(response[0][message_type]))
-      self.assertEqual(set(response[0][message_type]), messages[message_type])
+    self._check_response(response, expected_errors)
 
     requests = {r.slug: r for r in models.Request.query.all()}
     self.assertEqual(requests["Request 60"].status, models.Request.START_STATE)
