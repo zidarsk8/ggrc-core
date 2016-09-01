@@ -9,14 +9,18 @@
 
   overdueCompute = can.compute(function (val) {
     var date;
+    var today = moment().startOf('day');
+    var startOfDate;
     if (this.attr('status') === 'Verified') {
       return '';
     }
     date = moment(this.attr('next_due_date') || this.attr('end_date'));
-    if (date && date.isBefore(new Date())) {
-      return 'overdue';
+    startOfDate = moment(date).startOf('day');
+    // TODO: [Overdue] Move this logic to helper.
+    if (date && today.diff(startOfDate, 'days') <= 0) {
+      return '';
     }
-    return '';
+    return 'overdue';
   });
 
   function refreshAttr(instance, attr) {

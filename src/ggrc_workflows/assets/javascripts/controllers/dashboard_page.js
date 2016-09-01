@@ -12,6 +12,7 @@
     //Any task that is not finished or verified are subject to overdue
     if (task.instance.status === "Finished" || task.instance.status === "Verified")
       return false;
+    // TODO: [Overdue] Move this logic to helper.
     else if (end_date.getTime() < today.getTime())
       return true;
   }
@@ -138,6 +139,7 @@
             if (data.status === 'Verified')
               verified++;
             else {
+              // TODO: [Overdue] Move this logic to helper.
               if (end_date.getTime() < today.getTime()) {
                 over_due++;
                 $('dashboard-errors').control().scope.attr('error_msg', 'Some tasks are overdue!');

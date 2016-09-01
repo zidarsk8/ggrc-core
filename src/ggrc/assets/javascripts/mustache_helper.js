@@ -1507,18 +1507,39 @@ Mustache.registerHelper("json_escape", function (obj, options) {
   */
 });
 
+function localizeDate(date, options, tmpl) {
+  if (!options) {
+    date = new Date();
+  } else {
+    date = resolve_computed(date);
+  }
+  return date ? moment(date).format(tmpl) : '';
+}
+
 can.each({
-  "localize_date" : "MM/DD/YYYY"
-  , "localize_datetime" : "MM/DD/YYYY hh:mm:ss A"
+  localize_date: 'MM/DD/YYYY',
+  localize_datetime: 'MM/DD/YYYY hh:mm:ss A'
 }, function (tmpl, fn) {
   Mustache.registerHelper(fn, function (date, options) {
-    if (!options) {
-      date = new Date();
-    } else {
-      date = resolve_computed(date);
-    }
-    return date ? moment(date).format(tmpl) : "";
+    return localizeDate(date, options, tmpl);
   });
+});
+
+/**
+ *  Helper for rendering date or 'Today' string.
+ *
+ *  @param {Date} value - the date object; if it's falsey the current (local) date is used
+ *  @return {String} - 'Today' or date string in the following format: MM/DD/YYYY
+ */
+Mustache.registerHelper('localize_date_today', function (value) {
+  var date = resolve_computed(value);
+  var today = moment().startOf('day');
+  var startOfDate = moment(date).startOf('day');
+  // TODO: [Overdue] Move this logic to helper.
+  if (!value || (date && today.diff(startOfDate, 'days') === 0)) {
+    return 'Today';
+  }
+  return localizeDate(value, value, 'MM/DD/YYYY');
 });
 
 Mustache.registerHelper("capitalize", function (value, options) {
@@ -2861,10 +2882,14 @@ Mustache.registerHelper('with_mapping_count', function (instance, mapping_names,
 });
 
 Mustache.registerHelper("is_overdue", function (_date, status, options) {
+  var date = moment(resolve_computed(_date));
+  var today = moment().startOf('day');
+  var startOfDate = moment(date).startOf('day');
+  var isBefore = date && today.diff(startOfDate, 'days') > 0;
   options = arguments.length === 2 ? arguments[1] : options;
   status = arguments.length === 2 ? "" : resolve_computed(status);
-  var date = moment(resolve_computed(_date));
-  if (status !== 'Verified' && date && date.isBefore(new Date())) {
+  // TODO: [Overdue] Move this logic to helper.
+  if (status !== 'Verified' && isBefore) {
     return options.fn(options.contexts);
   }
   else {
