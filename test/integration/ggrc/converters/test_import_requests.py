@@ -5,8 +5,6 @@
 
 """Test request import and updates."""
 
-from nose.plugins import skip
-
 from ggrc import models
 from ggrc.converters import errors
 from integration.ggrc import converters
@@ -193,12 +191,12 @@ class TestRequestImport(converters.TestCase):
                 errors.REQUEST_INVALID_STATE.format(line=20),
                 errors.REQUEST_INVALID_STATE.format(line=21),
                 errors.WRONG_REQUIRED_VALUE.format(
-                  line=19,
-                  column_name="Status",
-                  value="open",
-                )
+                    line=19,
+                    column_name="Status",
+                    value="open",
+                ),
+                errors.WRONG_VALUE.format(line=3, column_name="Url"),
             ]),
         }
     }
     self._check_response(response, expected_errors)
-
