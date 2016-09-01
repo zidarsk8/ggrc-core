@@ -132,6 +132,15 @@ class TestRequestImport(converters.TestCase):
     self.assertEqual(requests["Request 4"].status,
                      models.Request.PROGRESS_STATE)
 
+    # Check that there is only one attachment left
+    request1 = requests["Request 1"]
+    self.assertEqual(len(request1.documents), 1)
+
+    # Check that there are only the two new URLs present in request 1
+    url_titles = set(obj.title for obj in request1.related_objects()
+                     if isinstance(obj, models.Document))
+    self.assertEqual(url_titles, set(["a.b.com", "c.d.com"]))
+
   def test_request_warnings_errors(self):
     """ Test full request import with warnings and errors
 
