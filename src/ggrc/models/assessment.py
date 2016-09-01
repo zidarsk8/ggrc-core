@@ -168,6 +168,16 @@ class Assessment(statusable.Statusable, AuditRelationship,
           "filter_by": "_filter_by_related_verifiers",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
+      "request_url": {
+          "display_name": "Url",
+          "filter_by": "_ignore_filter",
+          "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
+      },
+      "request_evidence": {
+          "display_name": "Evidence",
+          "filter_by": "_ignore_filter",
+          "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
+      },
   }
 
   similarity_options = similarity_options_module.ASSESSMENT

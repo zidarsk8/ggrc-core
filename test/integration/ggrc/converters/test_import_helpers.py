@@ -349,6 +349,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Secondary Contact",
         "Assessment URL",
         "Reference URL",
+        "Evidence",
+        "Url",
         "Code",
         "Effective Date",
         "Stop Date",
