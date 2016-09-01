@@ -5,6 +5,7 @@ from integration.ggrc.converters import TestCase
 
 from ggrc import models
 
+
 class TestImportUpdates(TestCase):
 
   """ Test importing of already existing objects """
