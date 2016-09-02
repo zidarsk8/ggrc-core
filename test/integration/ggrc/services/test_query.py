@@ -261,6 +261,152 @@ class TestAdvancedQueryAPI(TestCase):
 
     self.assertEqual(programs_limit["total"], programs_no_limit["total"])
 
+  def test_query_order_by(self):
+    """Results get sorted by own field."""
+    # assumes unique title
+
+    def get_titles(programs):
+      return [program["title"] for program in programs]
+
+    data_default = {
+        "object_name": "Program",
+        "order_by": [{"name": "title"}],
+        "filters": {"expression": {}},
+    }
+    response_default = json.loads(self._post(data_default).data)[0]
+    programs_default = response_default.get("Program", {}).get("values")
+    self.assertIsNot(programs_default, None)
+    titles_default = get_titles(programs_default)
+
+    data_asc = {
+        "object_name": "Program",
+        "order_by": [{"name": "title", "desc": False}],
+        "filters": {"expression": {}},
+    }
+    response_asc = json.loads(self._post(data_asc).data)[0]
+    programs_asc = response_asc.get("Program", {}).get("values")
+    self.assertIsNot(programs_asc, None)
+    titles_asc = get_titles(programs_asc)
+
+    data_desc = {
+        "object_name": "Program",
+        "order_by": [{"name": "title", "desc": True}],
+        "filters": {"expression": {}},
+    }
+    response_desc = json.loads(self._post(data_desc).data)[0]
+    programs_desc = response_desc.get("Program", {}).get("values")
+    self.assertIsNot(programs_desc, None)
+    titles_desc = get_titles(programs_desc)
+
+    # the titles are sorted ascending with desc=False
+    self.assertListEqual(titles_asc, sorted(titles_asc))
+    # desc=False by default
+    self.assertListEqual(titles_default, titles_asc)
+    # the titles are sorted descending with desc=True
+    self.assertListEqual(titles_desc, list(reversed(titles_asc)))
+
+  def test_query_order_by_several_fields(self):
+    """Results get sorted by two fields at once."""
+    data = {
+        "object_name": "Regulation",
+        "order_by": [{"name": "notes", "desc": True}, {"name": "title"}],
+        "filters": {"expression": {}},
+    }
+    response = json.loads(self._post(data).data)[0]
+    regulations = response.get("Regulation", {}).get("values")
+    self.assertIsNot(regulations, None)
+
+    data_unsorted = {
+        "object_name": "Regulation",
+        "filters": {"expression": {}},
+    }
+    response_unsorted = json.loads(self._post(data_unsorted).data)[0]
+    regulations_unsorted = response_unsorted.get("Regulation",
+                                                 {}).get("values")
+    self.assertIsNot(regulations_unsorted, None)
+
+    self.assertListEqual(
+        regulations,
+        sorted(sorted(regulations_unsorted,
+                      key=lambda r: r["title"]),
+               key=lambda r: r["notes"],
+               reverse=True),
+    )
+
+  def test_query_order_by_related_titled(self):
+    """Results get sorted by title of related Titled object."""
+    data_title = {
+        "object_name": "Audit",
+        "order_by": [{"name": "program"}, {"name": "id"}],
+        "filters": {"expression": {}},
+    }
+    response_title = json.loads(self._post(data_title).data)[0]
+    audits_title = response_title.get("Audit", {}).get("values")
+    self.assertIsNot(audits_title, None)
+
+    data_unsorted = {
+        "object_name": "Audit",
+        "filters": {"expression": {}},
+    }
+    response_unsorted = json.loads(self._post(data_unsorted).data)[0]
+    audits_unsorted = response_unsorted.get("Audit", {}).get("values")
+    self.assertIsNot(audits_unsorted, None)
+
+    # get titles from programs to check ordering
+    data_program = {
+        "object_name": "Program",
+        "filters": {"expression": {}},
+    }
+    response_program = json.loads(self._post(data_program).data)[0]
+    programs = response_program.get("Program", {}).get("values")
+    self.assertIsNot(audits_unsorted, None)
+
+    program_id_title = {program["id"]: program["title"]
+                        for program in programs}
+
+    self.assertListEqual(
+        audits_title,
+        sorted(sorted(audits_unsorted, key=lambda a: a["id"]),
+               key=lambda a: program_id_title[a["program"]["id"]]),
+    )
+
+  def test_query_order_by_person(self):
+    """Results get sorted by name or email related Person object."""
+    data_person = {
+        "object_name": "Clause",
+        "order_by": [{"name": "contact"}, {"name": "id"}],
+        "filters": {"expression": {}},
+    }
+    response_person = json.loads(self._post(data_person).data)[0]
+    clauses_person = response_person.get("Clause", {}).get("values")
+    self.assertIsNot(clauses_person, None)
+
+    data_unsorted = {
+        "object_name": "Clause",
+        "filters": {"expression": {}},
+    }
+    response_unsorted = json.loads(self._post(data_unsorted).data)[0]
+    clauses_unsorted = response_unsorted.get("Clause", {}).get("values")
+    self.assertIsNot(clauses_unsorted, None)
+
+    # get names and emails from people to check ordering
+    data_people = {
+        "object_name": "Person",
+        "filters": {"expression": {}},
+    }
+    response_people = json.loads(self._post(data_people).data)[0]
+    people = response_people.get("Person", {}).get("values")
+    self.assertIsNot(people, None)
+
+    person_id_name = {person["id"]: (person["name"], person["email"])
+                      for person in people}
+
+    self.assertListEqual(
+        clauses_person,
+        sorted(sorted(clauses_unsorted, key=lambda c: c["id"]),
+               key=lambda c: person_id_name[c["contact"]["id"]]),
+    )
+
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
     data_values = {
