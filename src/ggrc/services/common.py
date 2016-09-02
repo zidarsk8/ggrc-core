@@ -324,15 +324,16 @@ def log_event(session, obj=None, current_user_id=None, flush=True):
   if current_user_id is None:
     current_user_id = get_current_user_id()
   cache = get_cache()
-  for o in cache.dirty:
-    revision = Revision(o, current_user_id, 'modified', o.log_json())
-    revisions.append(revision)
-  for o in cache.deleted:
-    revision = Revision(o, current_user_id, 'deleted', o.log_json())
-    revisions.append(revision)
-  for o in cache.new:
-    revision = Revision(o, current_user_id, 'created', o.log_json())
-    revisions.append(revision)
+  if cache:
+    for obj_ in cache.dirty:
+      revision = Revision(obj_, current_user_id, 'modified', obj_.log_json())
+      revisions.append(revision)
+    for obj_ in cache.deleted:
+      revision = Revision(obj_, current_user_id, 'deleted', obj_.log_json())
+      revisions.append(revision)
+    for obj_ in cache.new:
+      revision = Revision(obj_, current_user_id, 'created', obj_.log_json())
+      revisions.append(revision)
   if obj is None:
     resource_id = 0
     resource_type = None

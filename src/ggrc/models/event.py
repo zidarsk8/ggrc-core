@@ -9,7 +9,7 @@ class Event(Base, db.Model):
   __tablename__ = 'events'
 
   action = db.Column(
-      db.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT', u'GET'),
+      db.Enum(u'POST', u'PUT', u'DELETE', u'BULK', u'GET'),
       nullable=False,
   )
   resource_id = db.Column(db.Integer)
