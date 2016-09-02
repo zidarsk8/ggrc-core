@@ -43,13 +43,17 @@
         this.attr('isModified', this.attr('def.id'));
       },
       save: function () {
+        var value = this.attr('value');
         this.setModified();
         this.attr('instance').save()
           .done(function () {
-            can.$(document.body).trigger('ajax:flash', {
-              success: 'Saved'
-            });
-          })
+            // TODO: remove hack for flash message appearance after normal solution will be applied
+            if (String(value) === this.attr('value')) {
+              can.$(document.body).trigger('ajax:flash', {
+                success: 'Saved'
+              });
+            }
+          }.bind(this))
           .fail(function (inst, err) {
             GGRC.Errors.notifier('error')(err);
           })
@@ -59,9 +63,9 @@
       }
     },
     events: {
-      '{scope} isSaving': function (scope, ev, val) {
-        if (val) {
-          scope.save(val);
+      '{scope} isSaving': function (scope, ev, isSaving) {
+        if (isSaving) {
+          scope.save();
         }
       }
     }
