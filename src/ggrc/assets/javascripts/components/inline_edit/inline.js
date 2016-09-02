@@ -27,11 +27,7 @@
       },
       emptyText: '@',
       $rootEl: null,
-      define: {
-        type: {
-          type: 'string'
-        }
-      },
+      type: '@',
       _EV_INSTANCE_SAVE: 'on-save',
 
       /**

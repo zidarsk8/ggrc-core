@@ -28,7 +28,10 @@
                     </assessment-mapped-objects>
                     <div class="assessment-controls">
                         <span class="assessment-controls__note">Input assessment information below:</span>
-                        {{> '/static/mustache/components/assessment/custom_attributes.mustache' }}
+                        <assessment-custom-attributes instance="instance"
+                                                      definitions="custom_attribute_definitions"
+                                                      values="custom_attribute_values" class="assessment-custom-attributes">
+                        </assessment-custom-attributes>
                         <div class="assessment-controls__extra-controls">
                             <assessment-attachments-list class="attachment-list"></assessment-attachments-list>
                             <assessment-urls-list></assessment-urls-list>

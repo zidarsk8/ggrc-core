@@ -106,6 +106,7 @@ dashboard-js-files:
   - models/revision.js
   - models/save_queue.js
   - models/custom_attributes.js
+  - models/assessment.js
   - apps/quick_search.js
   - apps/business_objects.js
   - apps/custom_attributes.js
@@ -120,11 +121,16 @@ dashboard-js-files:
   - components/assessment/mapped-objects/mapped-objects-filter.js
   - components/assessment/urls-list.js
   - components/assessment/attachments-list.js
-  - components/assessment/custom_attributes.js
+  - components/assessment/custom-attributes.js
   - components/assessment/inline.js
   - components/assessment/add_comment.js
-  - components/assessment/modal_attachments.js
-  - components/assessment/validation-icon.js
+  - components/ca-object/ca-object.js
+  - components/ca-object/ca-object-validation.js
+  - components/ca-object/ca-object-validation-icon.js
+  - components/ca-object/ca-object-title.js
+  - components/ca-object/ca-object-value-mapper.js
+  - components/ca-object/ca-object-modal.js
+  - components/ca-object/ca-object-modal-content.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
@@ -183,7 +189,7 @@ dashboard-js-template-files:
   - components/assessment/mapped-objects/item-templates/title-and-description.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/attachments-list.mustache
-  - components/assessment/custom_attributes.mustache
+  - components/assessment/custom-attributes.mustache
   - components/assessment/inline/inline.mustache
   - components/assessment/inline/text.mustache
   - components/assessment/inline/input.mustache
@@ -192,10 +198,14 @@ dashboard-js-template-files:
   - components/assessment/inline/person.mustache
   - components/assessment/inline/checkbox.mustache
   - components/assessment/add_comment.mustache
-  - components/assessment/modal/attachments.mustache
   - components/assessment/comment/input.mustache
   - components/assessment/comment/controls.mustache
-  - components/assessment/validation-icon.mustache
+  - components/ca-object/ca-object.mustache
+  - components/ca-object/ca-object-title.mustache
+  - components/ca-object/ca-object-validation.mustache
+  - components/ca-object/ca-object-validation-icon.mustache
+  - components/ca-object/ca-object-modal.mustache
+  - components/ca-object/ca-object-modal-content.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache

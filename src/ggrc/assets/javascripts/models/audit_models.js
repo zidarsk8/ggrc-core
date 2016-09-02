@@ -5,7 +5,7 @@
 
 (function (can, CMS) {
   function update_program_authorizations(programs, person) {
-    return $.when(
+    return can.when(
       programs[0],
       programs[0].get_binding('program_authorized_people').refresh_instances(),
       programs[0].get_binding('program_authorizations').refresh_instances(),
@@ -46,15 +46,6 @@
         });
       }
     }).then(Permission.refresh());
-  }
-
-  function _comment_sort(a, b) {
-    if (a.created_at < b.created_at) {
-      return 1;
-    } else if (a.created_at > b.created_at) {
-      return -1;
-    }
-    return 0;
   }
   can.Model.Cacheable('CMS.Models.Audit', {
     root_object: 'audit',
@@ -330,7 +321,7 @@
         model: CMS.Models.Document,
         mapping: 'documents_and_urls',
         show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
-        sort_function: _comment_sort
+        sort_function: GGRC.Utils.sortingHelpers.commentSort
       },
       urls: {
         model: CMS.Models.Document,
@@ -446,14 +437,14 @@
         model: CMS.Models.Document,
         mapping: 'all_documents',
         show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
-        sort_function: _comment_sort
+        sort_function: GGRC.Utils.sortingHelpers.commentSort
       },
       comments: {
         model: can.Model.Cacheable,
         mapping: 'comments',
         show_view: GGRC.mustache_path +
           '/base_templates/comment_subtree.mustache',
-        sort_function: _comment_sort
+        sort_function: GGRC.Utils.sortingHelpers.commentSort
       },
       urls: {
         model: CMS.Models.Document,
@@ -747,384 +738,6 @@
           }.bind(this));
         }
       }.bind(this));
-    }
-  });
-
-  can.Model.Cacheable('CMS.Models.Assessment', {
-    root_object: 'assessment',
-    root_collection: 'assessments',
-    findOne: 'GET /api/assessments/{id}',
-    findAll: 'GET /api/assessments',
-    update: 'PUT /api/assessments/{id}',
-    destroy: 'DELETE /api/assessments/{id}',
-    create: 'POST /api/assessments',
-    mixins: ['ownable', 'contactable', 'unique_title', 'relatable'],
-    relatable_options: {
-      relevantTypes: {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_assessments',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_assessments',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_assessments',
-          weight: 10
-        }
-      },
-      threshold: 5
-    },
-    is_custom_attributable: true,
-    attributes: {
-      control: 'CMS.Models.Control.stub',
-      context: 'CMS.Models.Context.stub',
-      modified_by: 'CMS.Models.Person.stub',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date',
-      finished_date: 'date',
-      verified_date: 'date'
-    },
-    defaults: {
-      status: 'Not Started'
-    },
-    filter_keys: ['title', 'status', 'operationally', 'operational', 'design',
-                  'finished_date', 'verified_date', 'verified'],
-    filter_mappings: {
-      state: 'status',
-      operational: 'operationally',
-      'verified date': 'verified_date',
-      'finished date': 'finished_date'
-    },
-    tree_view_options: {
-      add_item_view: GGRC.mustache_path +
-        '/base_objects/tree_add_item.mustache',
-      attr_list: [{
-        attr_title: 'Title',
-        attr_name: 'title'
-      }, {
-        attr_title: 'Code',
-        attr_name: 'slug'
-      }, {
-        attr_title: 'State',
-        attr_name: 'status'
-      }, {
-        attr_title: 'Verified',
-        attr_name: 'verified'
-      }, {
-        attr_title: 'Last Updated',
-        attr_name: 'updated_at'
-      }, {
-        attr_title: 'Conclusion: Design',
-        attr_name: 'design'
-      }, {
-        attr_title: 'Conclusion: Operation',
-        attr_name: 'operationally'
-      }, {
-        attr_title: 'Finished Date',
-        attr_name: 'finished_date'
-      }, {
-        attr_title: 'Verified Date',
-        attr_name: 'verified_date'
-      }, {
-        attr_title: 'URL',
-        attr_name: 'url'
-      }, {
-        attr_title: 'Reference URL',
-        attr_name: 'reference_url'
-      }]
-    },
-    info_pane_options: {
-      mapped_objects: {
-        model: can.Model.Cacheable,
-        mapping: 'info_related_objects',
-        show_view: GGRC.mustache_path + '/base_templates/subtree.mustache'
-      },
-      evidence: {
-        model: CMS.Models.Document,
-        mapping: 'all_documents',
-        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
-        sort_function: _comment_sort
-      },
-      comments: {
-        model: can.Model.Cacheable,
-        mapping: 'comments',
-        show_view: GGRC.mustache_path +
-          '/base_templates/comment_subtree.mustache',
-        sort_function: _comment_sort
-      },
-      urls: {
-        model: CMS.Models.Document,
-        mapping: 'all_urls',
-        show_view: GGRC.mustache_path + '/base_templates/urls.mustache'
-      }
-    },
-    confirmEditModal: {
-      title: 'Confirm moving Request to "In Progress"',
-      description: 'You are about to move request from ' +
-      '"{{status}}" to "In Progress" - are you sure about that?',
-      button: 'Confirm'
-    },
-    assignable_list: [{
-      type: 'creator',
-      mapping: 'related_creators',
-      required: true
-    }, {
-      type: 'assessor',
-      mapping: 'related_assessors',
-      required: true
-    }, {
-      type: 'verifier',
-      mapping: 'related_verifiers',
-      required: false
-    }],
-    conflicts: [
-      ['assessor', 'verifier']
-    ],
-    conclusions: ['Effective', 'Ineffective', 'Needs improvement',
-      'Not Applicable'],
-    init: function () {
-      if (this._super) {
-        this._super.apply(this, arguments);
-      }
-      this.validatePresenceOf('object');
-      this.validatePresenceOf('audit');
-      this.validateNonBlank('title');
-
-      this.validate(
-        'validate_creator',
-        function () {
-          if (!this.validate_creator) {
-            return 'You need to specify at least one creator';
-          }
-        }
-      );
-      this.validate(
-        'validate_assessor',
-        function () {
-          if (!this.validate_assessor) {
-            return 'You need to specify at least one assessor';
-          }
-        }
-      );
-    }
-  }, {
-    form_preload: function (newObjectForm) {
-      var pageInstance = GGRC.page_instance();
-      var currentUser = CMS.Models.get_instance('Person',
-        GGRC.current_user.id, GGRC.current_user);
-
-      if (!newObjectForm) {
-        return;
-      }
-
-      if (pageInstance && pageInstance.type === 'Audit' && !this.audit) {
-        this.attr('audit', pageInstance);
-      }
-      this.mark_for_addition('related_objects_as_destination', currentUser, {
-        attrs: {
-          AssigneeType: 'Creator'
-        }
-      });
-    },
-    info_pane_preload: function () {
-      if (!this._pane_preloaded) {
-        this._set_mandatory_msgs();
-        this.get_mapping('comments').bind('length',
-            this._set_mandatory_msgs.bind(this));
-        this.get_mapping('all_documents').bind('length',
-            this._set_mandatory_msgs.bind(this));
-        this._pane_preloaded = true;
-      }
-    },
-    init: function () {
-      if (this._super) {
-        this._super.apply(this, arguments);
-      }
-    },
-    save: function () {
-      if (!this.attr('program')) {
-        this.attr('program', this.attr('audit.program'));
-      }
-      return this._super.apply(this, arguments);
-    },
-    after_save: function () {
-      this._set_mandatory_msgs();
-      if (this.audit && this.audit.selfLink) {
-        this.audit.refresh();
-      }
-    },
-    _set_mandatory_msgs: function () {
-      var instance = this;
-      var FLAGS = {
-        COMMENT: 1,
-        ATTACHMENT: 2 // binary 10
-      };
-      var needed = {
-        attachment: [],
-        comment: [],
-        value: []
-      };
-      var rq = new RefreshQueue();
-
-      if (!instance.custom_attribute_definitions) {
-        instance.load_custom_attribute_definitions();
-      }
-
-      _.each(instance.custom_attribute_values, function (cav) {
-        rq.enqueue(cav);
-      });
-      $.when(
-          instance.refresh_all('custom_attribute_values'),
-          instance.get_binding('comments').refresh_count(),
-          instance.get_binding('all_documents').refresh_count(),
-          rq.trigger()
-      ).then(function (customAttrVals, commentCount, attachmentCount, rqRes) {
-        var values = instance.custom_attribute_values.reify();
-        var definitions = instance.custom_attribute_definitions.reify();
-        var invalidCustomAttributes = [];
-        commentCount = commentCount();
-        attachmentCount = attachmentCount();
-
-        _.each(definitions, function (definition) {
-          var attr = _.result(_.find(values, function (cav) {
-            return cav.custom_attribute_id === definition.id;
-          }), 'attribute_value');
-
-          if (definition.mandatory &&
-            GGRC.Utils.isEmptyCA(attr, definition.attribute_type)) {
-            needed.value.push(definition.title);
-          }
-        });
-
-        _.each(values, function (cav) {
-          var definition;
-          var i;
-          var mandatory;
-          definition = _.find(definitions, {
-            id: cav.custom_attribute_id
-          });
-          if (!definition) {
-            console.warn('CAV id %d is not reified properly.', cav.id);
-          }
-          if (!definition ||
-              !definition.multi_choice_options ||
-              !definition.multi_choice_mandatory) {
-            return;
-          }
-          i = definition.multi_choice_options.split(',')
-                    .indexOf(cav.attribute_value);
-          mandatory = definition.multi_choice_mandatory.split(',')[i];
-          if (mandatory === undefined) {
-            return;
-          }
-          mandatory = Number(mandatory);
-
-          if (mandatory & FLAGS.COMMENT) {
-            needed.comment.push({
-              msg: definition.title + ': ' + cav.attribute_value,
-              id: definition.id
-            });
-          }
-          if (mandatory & FLAGS.ATTACHMENT) {
-            needed.attachment.push({
-              msg: definition.title + ': ' + cav.attribute_value,
-              id: definition.id
-            });
-          }
-        });
-
-        if (!commentCount && needed.comment.length) {
-          invalidCustomAttributes =
-            invalidCustomAttributes
-              .concat(needed.comment.map(function (obj) {
-                return obj.id;
-              }));
-          instance.attr('_mandatory_comment_msg',
-            'Comment required by: ' + needed.comment.map(function (obj) {
-              return obj.msg;
-            }).join(', '));
-        } else {
-          instance.removeAttr('_mandatory_comment_msg');
-        }
-
-        if (!attachmentCount && needed.attachment.length) {
-          invalidCustomAttributes =
-            invalidCustomAttributes
-              .concat(needed.attachment.map(function (obj) {
-                return obj.id;
-              }));
-          instance.attr('_mandatory_attachment_msg',
-            'Evidence required by: ' + needed.attachment.map(function (obj) {
-              return obj.msg;
-            }).join(', '));
-        } else {
-          instance.removeAttr('_mandatory_attachment_msg');
-        }
-
-        if (needed.value.length) {
-          instance.attr(
-              '_mandatory_value_msg',
-              'Values required for: ' + needed.value.join(', ')
-          );
-        } else {
-          instance.removeAttr('_mandatory_value_msg');
-        }
-        instance.attr(
-            '_mandatory_msg',
-            _.filter([
-              instance.attr('_mandatory_value_msg'),
-              instance.attr('_mandatory_attachment_msg'),
-              instance.attr('_mandatory_comment_msg')
-            ]).join('; <br />') || null
-        );
-        instance.attr('invalidCustomAttributes', invalidCustomAttributes);
-      });
-    },
-    related_issues: function () {
-      var relevantTypes = {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_issues',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_issues',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_issues',
-          weight: 10
-        }
-      };
-      return this._related(relevantTypes, 5);
-    },
-    related_requests: function () {
-      var relevantTypes = {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_requests',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_requests',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_requests',
-          weight: 10
-        }
-      };
-      return this._related(relevantTypes, 5);
     }
   });
 
