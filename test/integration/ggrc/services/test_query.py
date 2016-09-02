@@ -208,10 +208,6 @@ class TestAdvancedQueryAPI(TestCase):
                          text_pattern in regulation.get("notes", ""))
                         for regulation in regulations["values"]))
 
-  @SkipTest
-  def test_basic_query_filter(self):
-    pass
-
   def test_basic_query_pagination(self):
     """Test basic query with pagination info."""
     from_, to_ = 1, 12
@@ -335,18 +331,6 @@ class TestAdvancedQueryAPI(TestCase):
         set(obj.get("id") for obj in programs_values["values"]),
         set(programs_ids["ids"]),
     )
-
-  @SkipTest
-  def test_mapped_query(self):
-    pass
-
-  @SkipTest
-  def test_mapped_query_filter(self):
-    pass
-
-  @SkipTest
-  def test_mapped_query_pagination(self):
-    pass
 
   @SkipTest
   def test_self_link(self):
