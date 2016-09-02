@@ -324,51 +324,22 @@
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
       this.update = function (id, params) {
-        var that = this;
+        var self = this;
         var ret = _update
         .call(this, id, this.process_args(params))
         .then(
           this.resolve_deferred_bindings.bind(this),
-          function (xhr, status, e) {
-            var dfd, obj, attrs, base_attrs,
-              orig_dfd = this;
+          function (xhr) {
             if (xhr.status === 409) {
-              obj = that.findInCacheById(id);
-              attrs = obj.attr();
-              base_attrs = obj._backupStore;
-              return obj.refresh().then(function (obj) {
-                var conflict = false,
-                  remote_attrs = obj.attr();
-                if (can.Object.same(remote_attrs, attrs)) {
-                  // current state is same as server state -- do nothing.
-                  return obj;
-                } else if (can.Object.same(remote_attrs, base_attrs)) {
-                  // base state matches server state -- no incorrect expectations -- save.
-                  return obj.attr(attrs).save();
-                } else {
-                  // check what properties changed -- we can merge if the same prop wasn't changed on both
-                  can.each(base_attrs, function (val, key) {
-                    if (!can.Object.same(attrs[key], remote_attrs[key])) {
-                      if (can.Object.same(val, remote_attrs[key])) {
-                        obj.attr(key, attrs[key]);
-                      } else if (!can.Object.same(val, attrs[key])) {
-                        conflict = true;
-                      }
-                    }
-                  });
-                  if (conflict) {
-                    $(document.body).trigger('ajax:flash', {
-                      warning: 'There was a conflict while saving. Your changes have not yet been saved. please check any fields you were editing and try saving again'
-                    });
-                    return orig_dfd;
-                  } else {
-                    return obj.save();
-                  }
-                }
+              $(document.body).trigger('ajax:flash', {
+                warning: 'There was a conflict while saving.' +
+                'Your changes have not yet been saved.' +
+                ' Please check any fields you were editing and try saving again'
               });
-            } else {
-              return xhr;
+              // TODO: we should show modal window here
+              return self.findInCacheById(id).refresh();
             }
+            return xhr;
           }
         );
         delete ret.hasFailCallback;
@@ -478,9 +449,8 @@
           return obj.refresh();
         });
       });
-      } else {
-        return obj;
       }
+      return obj;
     },
 
     findInCacheById: function (id) {
@@ -490,15 +460,14 @@
     newInstance: function (args) {
       var cache = can.getObject('cache', this, true);
       if (args && args[this.id] && cache[args[this.id]]) {
-      // cache[args.id].attr(args, false); //CanJS has bugs in recursive merging
-                                          // (merging -- adding properties from an object without removing existing ones
-                                          //  -- doesn't work in nested objects).  So we're just going to not merge properties.
+        // cache[args.id].attr(args, false); //CanJS has bugs in recursive merging
+        // (merging -- adding properties from an object without removing existing ones
+        //  -- doesn't work in nested objects).  So we're just going to not merge properties.
         return cache[args[this.id]];
-      } else {
-        return this._super.apply(this, arguments);
       }
+      return this._super.apply(this, arguments);
     },
-    process_args: function (args, names) {
+    process_args: function (args) {
       var pargs = {};
       var obj = pargs;
       var src;
@@ -507,15 +476,9 @@
         obj = pargs[this.root_object] = {};
       }
       src = args.serialize ? args.serialize() : args;
-      go_names = (!names || names.not) ? Object.keys(src) : names;
+      go_names = Object.keys(src)
       for (var i = 0; i < (go_names.length || 0); i++) {
         obj[go_names[i]] = src[go_names[i]];
-      }
-      if (names && names.not) {
-        var not_names = names.not;
-        for (i = 0; i < (not_names.length || 0); i++) {
-          delete obj[not_names[i]];
-        }
       }
       return pargs;
     },
@@ -534,7 +497,7 @@
       if (!params || params.length === 0)
         return new this.List();
       ms = this._super(params);
-      if (params instanceof can.Observe) {
+      if (params instanceof can.Map || params instanceof can.List) {
         params.replace(ms);
         return params;
       }
@@ -1237,7 +1200,7 @@
         return result;
       }, function (xhr, status, message) {
         that.save_error && that.save_error(xhr.responseText);
-        return new $.Deferred().reject(xhr, status, message);
+        return new can.Deferred().reject(xhr, status, message);
       })
       .fail(function (response) {
         that.notifier.on_empty(function () {
@@ -1257,7 +1220,7 @@
     },
     save: function () {
       Array.prototype.push.call(arguments, this._super);
-      this._dfd = $.Deferred();
+      this._dfd = new can.Deferred();
       GGRC.SaveQueue.enqueue(this, arguments);
       return this._dfd;
     },

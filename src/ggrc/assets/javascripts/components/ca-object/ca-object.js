@@ -39,25 +39,19 @@
 
         this.attr('modal.open', true);
       },
-      update: function (value) {
-        this.attr('value', value);
+      setModified: function () {
         this.attr('isModified', this.attr('def.id'));
       },
-      save: function (value) {
-        var instance = this.attr('instance');
-        var type = this.attr('type');
-
-        this.attr('isSaving', true);
-
-        this.update(value, type);
-        instance.save()
+      save: function () {
+        this.setModified();
+        this.attr('instance').save()
           .done(function () {
             can.$(document.body).trigger('ajax:flash', {
               success: 'Saved'
             });
           })
-          .fail(function (instance, err) {
-            GGRC.Errors.notifier()(err);
+          .fail(function (inst, err) {
+            GGRC.Errors.notifier('error')(err);
           })
           .always(function () {
             this.attr('isSaving', false);
@@ -65,8 +59,10 @@
       }
     },
     events: {
-      '{scope} value': function (scope, ev, val) {
-        this.scope.save(val);
+      '{scope} isSaving': function (scope, ev, val) {
+        if (val) {
+          scope.save(val);
+        }
       }
     }
   });

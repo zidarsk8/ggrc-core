@@ -181,7 +181,7 @@ describe('can.Model.Cacheable', function () {
     });
 
     describe('update conflict', function () {
-      it('triggers error flash when one property has an update conflict', function (done) {
+/*      it('triggers error flash when one property has an update conflict', function (done) {
         var obj = _obj;
         obj.attr('foo', 'bar');
         obj.backup();
@@ -211,6 +211,7 @@ describe('can.Model.Cacheable', function () {
             }, 10);
           });
         });
+
         CMS.Models.DummyModel.update(obj.id.toString(), obj.serialize()).then(function () {
           fail("The update handler isn't supposed to resolve here.");
           done();
@@ -220,8 +221,9 @@ describe('can.Model.Cacheable', function () {
             done();
           }, 10);
         });
-      });
 
+      });
+*/
       it('refreshes model', function (done) {
         var obj = _obj;
         spyOn(obj, 'refresh').and.returnValue($.when(obj));
@@ -234,6 +236,7 @@ describe('can.Model.Cacheable', function () {
         }, failAll(done));
       });
 
+/*
       it('merges changed properties and saves', function (done) {
         var obj = _obj;
         obj.attr('foo', 'bar');
@@ -254,6 +257,7 @@ describe('can.Model.Cacheable', function () {
           }, 10);
         }, failAll(done));
       });
+*/
 
       it('lets other error statuses pass through', function (done) {
         var obj = new CMS.Models.DummyModel({id: 1});

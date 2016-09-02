@@ -60,7 +60,7 @@
         scope.attr('isEdit', false);
         scope.attr('context.value', scope.attr('_value'));
       },
-      onSave: function (ctx, el, ev) {
+      onSave: function () {
         var oldValue = this.attr('value');
         var value = this.attr('context.value');
 
@@ -69,8 +69,9 @@
         if (oldValue === value) {
           return;
         }
-        this.attr('_value', value);
+        this.attr('_value', oldValue);
         this.attr('value', value);
+        this.attr('isSaving', true);
       }
     },
     init: function () {
@@ -88,8 +89,8 @@
 
         if (!isInside && scope.attr('isEdit')) {
           _.defer(function () {
-            scope.onSave(scope, this.element, ev);
-          }.bind(this));
+            scope.onSave();
+          });
         }
       }
     },
