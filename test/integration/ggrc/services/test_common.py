@@ -4,6 +4,9 @@
 import json
 import time
 from urlparse import urlparse
+
+from wsgiref.handlers import format_date_time
+
 from integration.ggrc import services
 
 COLLECTION_ALLOWED = ["HEAD", "GET", "POST", "OPTIONS"]
@@ -133,6 +136,94 @@ class TestServices(services.TestCase):
             ("If-Match", response.headers["Etag"]))
     )
     self.assert400(response)
+
+  def test_put_428(self):
+    """Headers "If-Match" and "If-Unmodified-Since" are required on PUT."""
+    response = self._prepare_model_for_put(foo="bar")
+
+    def put_with_headers(*headers):
+      url = urlparse(response.json
+                     ["services_test_mock_model"]
+                     ["selfLink"]).path
+      obj = response.json
+      return self.client.put(
+          url,
+          content_type="application/json",
+          data=json.dumps(obj),
+          headers=self.headers(*headers),
+      )
+
+    def check_response_428(response, missing_headers):
+      self.assertEqual(response.status_code, 428)
+      self.assertIn("message", response.json)
+      error_message = response.json["message"]
+      self.assertTrue(error_message.startswith("Missing headers: "))
+      self.assertSetEqual(
+          set(header.strip() for header in
+              error_message[len("Missing headers: "):].split(",")),
+          set(missing_headers),
+      )
+
+    response_etag_and_date_missing = put_with_headers()
+    check_response_428(response_etag_and_date_missing,
+                       missing_headers={"If-Match", "If-Unmodified-Since"})
+
+    response_etag_missing = put_with_headers(
+        ("If-Unmodified-Since", response.headers["Last-Modified"]),
+    )
+    check_response_428(response_etag_missing,
+                       missing_headers={"If-Match"})
+
+    response_date_missing = put_with_headers(
+        ("If-Match", response.headers["Etag"]),
+    )
+    check_response_428(response_date_missing,
+                       missing_headers={"If-Unmodified-Since"})
+
+  def test_put_409(self):
+    """Last modified timestamp and etag are checked on PUT."""
+    response = self._prepare_model_for_put(foo="bas")
+
+    def put_with_headers(*headers):
+      url = urlparse(response.json
+                     ["services_test_mock_model"]
+                     ["selfLink"]).path
+      obj = response.json
+      return self.client.put(
+          url,
+          content_type="application/json",
+          data=json.dumps(obj),
+          headers=self.headers(*headers),
+      )
+
+    def check_response_409(response):
+      self.assertEqual(response.status_code, 409)
+      self.assertIn("message", response.json)
+      self.assertIsInstance(response.json["message"], basestring)
+
+    def invalid_date():
+      return format_date_time(0)  # 1970-01-01
+
+    def invalid_etag():
+      return "Definitely invalid etag"
+
+    response_etag_and_date_invalid = put_with_headers(
+        ("If-Unmodified-Since", invalid_date()),
+        ("If-Match", invalid_etag()),
+    )
+    check_response_409(response_etag_and_date_invalid)
+
+    response_etag_invalid = put_with_headers(
+        ("If-Unmodified-Since", response.headers["Last-Modified"]),
+        ("If-Match", invalid_etag()),
+    )
+    check_response_409(response_etag_invalid)
+
+    response_date_invalid = put_with_headers(
+        ("If-Unmodified-Since", invalid_date()),
+        ("If-Match", response.headers["Etag"]),
+    )
+    check_response_409(response_date_invalid)
 
   def test_options(self):
     mock = self.mock_model()
