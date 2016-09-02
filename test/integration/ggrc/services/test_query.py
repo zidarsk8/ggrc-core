@@ -4,6 +4,7 @@
 """Tests for /query api endpoint."""
 
 from datetime import datetime
+from operator import itemgetter
 from os.path import abspath, dirname, join
 from flask import json
 from nose.plugins.skip import SkipTest
@@ -312,8 +313,8 @@ class TestAdvancedQueryAPI(TestCase):
     self.assertListEqual(
         regulations,
         sorted(sorted(regulations_unsorted,
-                      key=lambda r: r["title"]),
-               key=lambda r: r["notes"],
+                      key=itemgetter("title")),
+               key=itemgetter("notes"),
                reverse=True),
     )
 
@@ -346,7 +347,7 @@ class TestAdvancedQueryAPI(TestCase):
 
     self.assertListEqual(
         audits_title,
-        sorted(sorted(audits_unsorted, key=lambda a: a["id"]),
+        sorted(sorted(audits_unsorted, key=itemgetter("id")),
                key=lambda a: program_id_title[a["program"]["id"]]),
     )
 
@@ -379,7 +380,7 @@ class TestAdvancedQueryAPI(TestCase):
 
     self.assertListEqual(
         clauses_person,
-        sorted(sorted(clauses_unsorted, key=lambda c: c["id"]),
+        sorted(sorted(clauses_unsorted, key=itemgetter("id")),
                key=lambda c: person_id_name[c["contact"]["id"]]),
     )
 
