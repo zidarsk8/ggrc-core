@@ -383,4 +383,94 @@
       return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
     }
   };
+
+  /**
+   * Util methods for work with QueryAPI.
+   */
+  GGRC.Utils.QueryAPI = {
+    /**
+     * @typedef LimitArray
+     * @type {array}
+     * @property {number} 0  - Lower bound is inclusive.
+     * @property {number} 1  - Upper bound is exclusive.
+     */
+
+    /**
+     * @typedef QueryAPIRequest
+     * @type {Object}
+     * @property {string} object_name - The name of object
+     * @property {LimitArray} limit - The boundaries of the requested values.
+     * @property {object} filters - Filter properties
+     */
+
+    /**
+     * Build params for request on Query API.
+     *
+     * @param {String} objName - Name of requested object
+     * @param {Object} page - Information about page state.
+     * @param {Number} page.current - Current page
+     * @param {Number} page.pageSize - Page size
+     * @param {String} page.sortBy - sortBy
+     * @param {String} page.sortDirection - sortDirection
+     * @param {String} page.filter - Filter string
+     * @param {Object} relevant - Information about relevant object
+     * @param {Object} relevant.type - Type of relevant object
+     * @param {Object} relevant.id - Id of relevant object
+     * @return {QueryAPIRequest} Array of QueryAPIRequest
+     */
+    buildParams: function (objName, page, relevant) {
+      var relevantFilter;
+      var first;
+      var last;
+      var params = {};
+
+      if (!objName) {
+        return;
+      }
+
+      params.object_name = objName;
+
+      if (relevant) {
+        relevantFilter = '#' + relevant.type + ',' + relevant.id + '#';
+
+        params.filters = GGRC.query_parser.join_queries(
+          GGRC.query_parser.parse(relevantFilter || ''),
+          GGRC.query_parser.parse(page.filter || '')
+        );
+      } else {
+        params.filters = {expression: {}};
+      }
+
+      if (page.current && page.pageSize) {
+        first = (page.current - 1) * page.pageSize;
+        last = page.current * page.pageSize;
+        params.limit = [first, last];
+      }
+      if (page.sortBy) {
+        params.order_by = [{
+          name: page.sortBy,
+          desc: page.sortDirection === 'desc'
+        }];
+      }
+      return [params];
+    },
+
+    /**
+     * Params for request on Query API
+     * @param {Object} params - Params for request
+     * @param {Object} params.headers - Custom headers for request.
+     * @param {Object} params.data - Object with parameters on Query API needed.
+     * @return {Promise} Promise on Query API request.
+     */
+    makeRequest: function (params) {
+      return $.ajax({
+        type: 'POST',
+        headers: $.extend({
+          'Content-Type': 'application/json'
+        }, params.headers || {}),
+        url: '/query',
+        data: JSON.stringify(params.data || [])
+      });
+    }
+  };
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);
