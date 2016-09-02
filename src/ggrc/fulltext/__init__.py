@@ -20,7 +20,7 @@ class Indexer(object):
     raise NotImplementedError()
 
 class Record(object):
-  def __init__(self, key, type, context_id, tags, **kwargs):
+  def __init__(self, key, type, context_id, tags="", **kwargs):
     self.key = key
     self.type = type
     self.context_id = context_id
