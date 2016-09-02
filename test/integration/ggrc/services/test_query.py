@@ -13,7 +13,7 @@ from integration.ggrc import TestCase
 
 
 THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, '../converters/test_csvs/')
+CSV_DIR = join(THIS_ABS_PATH, "../converters/test_csvs/")
 
 # to be moved into converters.query_helper
 DATE_FORMAT_REQUEST = "%m/%d/%Y"
@@ -50,7 +50,7 @@ class TestAdvancedQueryAPI(TestCase):
     """Make a POST to /query endpoint."""
     if not isinstance(data, list):
       data = [data]
-    headers = {'Content-Type': 'application/json', }
+    headers = {"Content-Type": "application/json", }
     return self.client.post("/query", data=json.dumps(data), headers=headers)
 
   def test_basic_query_eq(self):
