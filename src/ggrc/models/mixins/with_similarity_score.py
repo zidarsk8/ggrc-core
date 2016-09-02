@@ -29,8 +29,8 @@ class WithSimilarityScore(object):
   # }
 
   @classmethod
-  def get_similar_objects(cls, id_, types="all", relevant_types=None,
-                          threshold=None):
+  def get_similar_objects_query(cls, id_, types="all", relevant_types=None,
+                                threshold=None):
     """Get objects of types similar to cls instance by their mappings.
 
     Args:
@@ -43,8 +43,8 @@ class WithSimilarityScore(object):
                  cls.similarity_options["threshold"].
 
     Returns:
-      [(similar_object_id, similar_object_type, weight)] - a list of similar
-          objects with respective weights.
+      SQLAlchemy query that yields results with columns [(id, type, weight)] -
+          the id and type of similar objects with respective weights.
     """
     if not types or (not isinstance(types, list) and types != "all"):
       raise ValueError("Expected types = 'all' or a non-empty list of "
@@ -144,4 +144,4 @@ class WithSimilarityScore(object):
         weight_sum >= threshold,
     )
 
-    return result.all()
+    return result
