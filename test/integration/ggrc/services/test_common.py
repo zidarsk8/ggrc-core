@@ -66,11 +66,16 @@ class TestServices(services.TestCase):
         self.client.delete(self.mock_url(), headers=self.headers()),
         COLLECTION_ALLOWED)
 
-  def test_put_successful(self):
-    mock = self.mock_model(foo="buzz")
+  def _prepare_model_for_put(self, foo="buzz"):
+    """Common object initializing sequence."""
+    mock = self.mock_model(foo=foo)
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())
     self.assert200(response)
     self.assertRequiredHeaders(response)
+    return response
+
+  def test_put_successful(self):
+    response = self._prepare_model_for_put(foo="buzz")
     obj = response.json
     self.assertEqual("buzz", obj["services_test_mock_model"]["foo"])
     obj["services_test_mock_model"]["foo"] = "baz"
@@ -100,8 +105,7 @@ class TestServices(services.TestCase):
 
   def test_put_value_error(self):
     """Test response code for put request with value errors."""
-    mock = self.mock_model(foo="buzz")
-    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
+    response = self._prepare_model_for_put(foo="buzz")
     obj = response.json
     obj["services_test_mock_model"]["validated"] = "Value Error"
     url = urlparse(obj["services_test_mock_model"]["selfLink"]).path
@@ -118,10 +122,7 @@ class TestServices(services.TestCase):
     self.assertEqual(response.status_code, 400)
 
   def test_put_bad_request(self):
-    mock = self.mock_model(foo="tough")
-    response = self.client.get(self.mock_url(mock.id), headers=self.headers())
-    self.assert200(response)
-    self.assertRequiredHeaders(response)
+    response = self._prepare_model_for_put(foo="tough")
     url = urlparse(response.json["services_test_mock_model"]["selfLink"]).path
     response = self.client.put(
         url,
