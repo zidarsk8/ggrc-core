@@ -789,23 +789,30 @@ class Resource(ModelView):
 
   def validate_headers_for_put_or_delete(self, obj):
     """rfc 6585 defines a new status code for missing required headers"""
-    required_headers = set(['If-Match', 'If-Unmodified-Since'])
+    required_headers = set(["If-Match", "If-Unmodified-Since"])
     missing_headers = required_headers.difference(
         set(self.request.headers.keys()))
     if missing_headers:
-      return current_app.make_response(
-          ('required headers: ' + ', '.join(missing_headers),
-           428, [('Content-Type', 'text/plain')]))
-
-    if request.headers['If-Match'] != etag(self.object_for_json(obj)) or \
-        request.headers['If-Unmodified-Since'] != \
-            self.http_timestamp(self.modified_at(obj)):
       return current_app.make_response((
-          'The resource could not be updated due to a conflict with the '
-          'current state on the server. Please resolve the conflict by '
-          'refreshing the resource.',
+          json.dumps({
+              "message": "Missing headers: " + ", ".join(missing_headers),
+          }),
+          428,
+          [("Content-Type", "application/json")],
+      ))
+
+    object_etag = etag(self.object_for_json(obj))
+    object_timestamp = self.http_timestamp(self.modified_at(obj))
+    if (request.headers["If-Match"] != object_etag or
+            request.headers["If-Unmodified-Since"] != object_timestamp):
+      return current_app.make_response((
+          json.dumps({
+              "message": "The resource could not be updated due to a conflict "
+                         "with the current state on the server. Please "
+                         "resolve the conflict by refreshing the resource.",
+          }),
           409,
-          [('Content-Type', 'text/plain')]
+          [("Content-Type", "application/json")]
       ))
     return None
 
