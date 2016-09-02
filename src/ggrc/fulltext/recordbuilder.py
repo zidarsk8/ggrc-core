@@ -24,7 +24,10 @@ class RecordBuilder(object):
       record_type = obj.attributable_type
       # The name of the attribute property needs to be unique for each object,
       # the value comes from the custom_attribute_value
-      properties = {"attribute_value_" + str(obj.id): obj.attribute_value}
+      properties = {
+        "attribute_value_" + str(obj.id): obj.attribute_value,
+        "tags": obj.custom_attribute.title,
+      }
     return Record(
         # This logic saves custom attribute values as attributes of the object
         # that owns the attribute values. When obj is not a CustomAttributeValue
@@ -32,7 +35,6 @@ class RecordBuilder(object):
         record_id,
         record_type,
         obj.context_id,
-        '', #FIXME get any qualifying fields to help in search partitioning...
         **properties
         )
 
