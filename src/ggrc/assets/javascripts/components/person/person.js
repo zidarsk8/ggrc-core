@@ -62,7 +62,6 @@
           personModel = personModel.reify();
         }
       }
-
       // For some reason the cache sometimes contains partially loaded objects,
       // thus we also need to check if "email" (a required field) is present.
       // If it is, we can be certain that we can use the object from the cache.
@@ -78,6 +77,7 @@
       person = new CMS.Models.Person({id: personId});
       new RefreshQueue().enqueue(person).trigger()
         .then(function (person) {
+          person = Array.isArray(person) ? person[0] : person;
           scope.attr('personObj', person);
         }, function () {
           $(document.body).trigger(

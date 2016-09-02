@@ -73,7 +73,7 @@
 
         if (type === 'person') {
           if (value && value instanceof can.Map) {
-            value = value.serialize()[0];
+            value = value.serialize();
             return 'Person:' + value.id;
           }
           return 'Person:None';
