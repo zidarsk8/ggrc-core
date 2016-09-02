@@ -5,7 +5,9 @@
 from ggrc.models.reflection import AttributeInfo
 from . import Record
 
+
 class RecordBuilder(object):
+
   def __init__(self, tgt_class):
     self._fulltext_attrs = AttributeInfo.gather_attrs(
         tgt_class, '_fulltext_attrs')
@@ -25,22 +27,24 @@ class RecordBuilder(object):
       # The name of the attribute property needs to be unique for each object,
       # the value comes from the custom_attribute_value
       properties = {
-        "attribute_value_" + str(obj.id): obj.attribute_value,
-        "tags": obj.custom_attribute.title,
+          "attribute_value_" + str(obj.id): obj.attribute_value,
+          "tags": obj.custom_attribute.title,
       }
     return Record(
         # This logic saves custom attribute values as attributes of the object
-        # that owns the attribute values. When obj is not a CustomAttributeValue
-        # the values are saved directly.
+        # that owns the attribute values. When obj is not a
+        # CustomAttributeValue the values are saved directly.
         record_id,
         record_type,
         obj.context_id,
         **properties
-        )
+    )
+
 
 def model_is_indexed(tgt_class):
   fulltext_attrs = AttributeInfo.gather_attrs(tgt_class, '_fulltext_attrs')
   return len(fulltext_attrs) > 0
+
 
 def get_record_builder(obj, builders={}):
   builder = builders.get(obj.__class__.__name__)
@@ -48,6 +52,7 @@ def get_record_builder(obj, builders={}):
     builder = RecordBuilder(obj.__class__)
     builders[obj.__class__.__name__] = builder
   return builder
+
 
 def fts_record_for(obj):
   builder = get_record_builder(obj)

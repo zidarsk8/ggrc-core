@@ -429,6 +429,23 @@ class QueryHelper(object):
                               .format(exp["op"]["name"]))
 
     def default_filter_by(object_class, key, predicate):
+      """Default filter option that tries to mach predicate in fulltext index.
+
+      This function tries to match the predicate for a give key with entries in
+      the full text index table. The key is matched to record tags and as
+      the tags only contain custom attribute names, so this filter currently
+      only works on custom attributes.
+
+      Args:
+        object_class: class of the object we are querying for.
+        key: string containing attribute name on which we are filtering.
+        predicate: function containing the correct comparison predicate for
+          the attribute value.
+
+      Returs:
+        Query predicate if the given predicate matches a value for the correct
+          custom attribute.
+      """
       return object_class.id.in_(db.session.query(Record.key).filter(
               Record.type == object_class.__name__,
               Record.tags == key,
