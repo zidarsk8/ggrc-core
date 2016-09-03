@@ -23,7 +23,7 @@ def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   op.alter_column(
       'events', 'action',
-      type_=sa.Enum(u'POST', u'PUT', u'DELETE', u'BULK', u'GET'),
+      type_=sa.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT', u'BULK', u'GET'),
       existing_type=sa.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT', u'GET'),
       nullable=False
   )
@@ -34,6 +34,7 @@ def downgrade():
   op.alter_column(
       'events', 'action',
       type_=sa.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT', u'GET'),
-      existing_type=sa.Enum(u'POST', u'PUT', u'DELETE', u'BULK', u'GET'),
+      existing_type=sa.Enum(u'POST', u'PUT', u'DELETE', u'IMPORT', u'BULK',
+                            u'GET'),
       nullable=False
   )
