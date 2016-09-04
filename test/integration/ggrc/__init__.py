@@ -91,8 +91,17 @@ class TestCase(BaseTestCase):
     """
 
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
+    counts = ("created", "updated", "rows")
 
     for block in response:
       for message in messages:
         expected = expected_errors.get(block["name"], {}).get(message, set())
         self.assertEqual(set(expected), set(block[message]))
+      for count in counts:
+        expected = expected_errors.get(block["name"], {}).get(count)
+        if expected is not None:
+          self.assertEqual(
+              block[count],
+              expected,
+              "{}: wrong number of {} count".format(block["name"], count)
+          )
