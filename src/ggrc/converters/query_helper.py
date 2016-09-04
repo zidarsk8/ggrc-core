@@ -17,9 +17,9 @@ from sqlalchemy import orm
 from sqlalchemy.sql import false
 
 from ggrc import db
+from ggrc import models
 from ggrc.login import is_creator
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
-from ggrc import models
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
@@ -338,10 +338,14 @@ class QueryHelper(object):
         key, _ = self.attr_name_map[model].get(key, (key, None))
         attr = getattr(model, key, None)
         if attr is None:
-          raise BadQueryException("Model '{model.__name__}' does not have "
-                                  "'{key}' attribute"
-                                  .format(model=model, key=key))
-        if (isinstance(attr, orm.attributes.InstrumentedAttribute) and
+          # non object attributes are treated as custom attributes
+          join = (Record, and_(
+            Record.key == model.id,
+            Record.type == model.__name__,
+            Record.tags == key)
+          )
+          order = Record.content
+        elif (isinstance(attr, orm.attributes.InstrumentedAttribute) and
                 isinstance(attr.property, orm.properties.RelationshipProperty)):
           # a relationship
           related_model = attr.property.mapper.class_
