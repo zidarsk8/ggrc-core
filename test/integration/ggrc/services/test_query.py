@@ -9,8 +9,7 @@ from os.path import abspath, dirname, join
 from flask import json
 from nose.plugins.skip import SkipTest
 
-from ggrc.app import app
-from integration.ggrc import TestCase
+from integration.ggrc.converters import TestCase
 
 
 THIS_ABS_PATH = abspath(dirname(__file__))
@@ -29,20 +28,7 @@ class TestAdvancedQueryAPI(TestCase):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     # This imported file could be simplified a bit to speed up testing.
-    cls.import_file("data_for_export_testing.csv")
-
-  @classmethod
-  def import_file(cls, filename):
-    """Import a csv file.
-
-    The file should contain all objects and mappings needed for writing proper
-    query api tests.
-    """
-    client = app.test_client()
-    client.get("/login")
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {"X-test-only": "false", "X-requested-by": "gGRC"}
-    client.post("/_service/import_csv", data=data, headers=headers)
+    cls._import_file("data_for_export_testing.csv")
 
   def setUp(self):
     self.client.get("/login")
