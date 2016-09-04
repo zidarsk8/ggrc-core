@@ -131,18 +131,4 @@ class TestCsvImport(TestCase):
 
   def test_big_import_with_mappings(self):
     response = self.import_file("data_for_export_testing.csv")
-    for block in response:
-      msg = json.dumps(block, indent=2, sort_keys=True)
-      self.assertEqual(set(), set(block["row_warnings"]), msg)
-      self.assertEqual(set(), set(block["row_errors"]), msg)
-      self.assertEqual(set(), set(block["block_warnings"]), msg)
-      self.assertEqual(set(), set(block["block_errors"]), msg)
-
-  def test_big_import_with_mappings_dry_run(self):
-    response = self.import_file("data_for_export_testing.csv", dry_run=True)
-    for block in response:
-      msg = json.dumps(block, indent=2, sort_keys=True)
-      self.assertEqual(set(), set(block["row_warnings"]), msg)
-      self.assertEqual(set(), set(block["row_errors"]), msg)
-      self.assertEqual(set(), set(block["block_warnings"]), msg)
-      self.assertEqual(set(), set(block["block_errors"]), msg)
+    self._check_csv_response(response, {})
