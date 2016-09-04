@@ -62,7 +62,7 @@ class TestRequestImport(converters.TestCase):
     """
     filename = "request_full_no_warnings.csv"
     response = self.import_file(filename)
-    self._check_response(response, {})
+    self._check_csv_response(response, {})
 
     # Test first request line in the CSV file
     request_1 = models.Request.query.filter_by(slug="Request 1").first()
@@ -116,7 +116,7 @@ class TestRequestImport(converters.TestCase):
             ]),
         }
     }
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)
 
     requests = {r.slug: r for r in models.Request.query.all()}
     self.assertEqual(requests["Request 60"].status, models.Request.START_STATE)
@@ -200,4 +200,4 @@ class TestRequestImport(converters.TestCase):
             ]),
         }
     }
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)

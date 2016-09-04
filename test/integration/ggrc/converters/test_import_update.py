@@ -22,7 +22,7 @@ class TestImportUpdates(TestCase):
     filename = "policy_basic_import.csv"
     response = self.import_file(filename)
 
-    self._check_response(response, {})
+    self._check_csv_response(response, {})
 
     policy = models.Policy.query.filter_by(slug="p1").first()
     self.assertEqual(policy.title, "some weird policy")
@@ -34,7 +34,7 @@ class TestImportUpdates(TestCase):
 
     filename = "policy_basic_import_update.csv"
     response = self.import_file(filename)
-    self._check_response(response, {})
+    self._check_csv_response(response, {})
 
     policy = models.Policy.query.filter_by(slug="p1").first()
     self.assertEqual(policy.title, "Edited policy")

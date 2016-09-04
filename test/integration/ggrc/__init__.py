@@ -78,7 +78,7 @@ class TestCase(BaseTestCase):
     app.debug = False
     return app
 
-  def _check_response(self, response, expected_errors):
+  def _check_csv_response(self, response, expected_errors):
     """Test that response contains all expected errors and warnigs.
 
     Args:
