@@ -29,8 +29,7 @@ class TestCase(ggrc.TestCase):
       delattr(g, "cache")
     tc = app.test_client()
     tc.get("/login")
-    response = tc.post("/_service/import_csv",
-            data=data, headers=headers)
+    response = tc.post("/_service/import_csv", data=data, headers=headers)
 
     return json.loads(response.data)
 

@@ -1,7 +1,6 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from flask import json
 from sqlalchemy import and_
 from sqlalchemy import or_
 
