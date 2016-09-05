@@ -144,7 +144,7 @@
       }
       this.validatePresenceOf('program');
       this.validateNonBlank('title');
-      this.validatePresenceOf(['_transient.contact', 'contact'], {
+      this.validateContact(['_transient.contact', 'contact'], {
         message: 'Internal audit lead cannot be empty'
       });
       this.validate(['_transient.audit_firm', 'audit_firm'],
