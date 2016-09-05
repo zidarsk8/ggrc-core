@@ -76,7 +76,8 @@ dashboard-js-files:
   - models/mappers/search-list-loader.js
   - models/mappers/reifying-list-loader.js
   - models/mappers/mapper-helpers.js
-  - models/mappings.js
+  - models/mappers/mappings.js
+  - models/mappers/mappings-ggrc.js
   - models/mixins.js
   - models/cacheable.js
   - models/local_storage.js
