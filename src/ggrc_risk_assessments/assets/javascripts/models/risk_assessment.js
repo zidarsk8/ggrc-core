@@ -28,6 +28,8 @@
       modified_by: "CMS.Models.Person.stub",
       object_documents: "CMS.Models.ObjectDocument.stubs",
       custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs",
+      start_date: 'date',
+      end_date: 'date'
     },
     tree_view_options: {
       attr_list: [
