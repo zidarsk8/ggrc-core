@@ -384,6 +384,23 @@ can.Control('GGRC.Controllers.Modals', {
       this.set_value_from_element(el);
     }
   },
+
+  /**
+   * The onChange handler for the custom attribute type dropdown.
+   *
+   * This handler is specific to the Custom Attribute Edit modal.
+   *
+   * @param {jQuery} $el - the dropdown DOM element
+   * @param {$.Event} ev - the event object
+   */
+  'dropdown[data-purpose="ca-type"] change': function ($el, ev) {
+    var instance = this.options.instance;
+
+    if (instance.attribute_type !== 'Dropdown') {
+      instance.attr('multi_choice_options', undefined);
+    }
+  },
+
   serialize_form: function () {
     var $form = this.options.$content.find("form");
     var $elements = $form.find(":input:not(isolate-form *)");
