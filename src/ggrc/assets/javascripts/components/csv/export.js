@@ -151,9 +151,12 @@
               });
               return {
                 object_name: panel.type,
-                fields: _.compact(_.map(Object.keys(panel.selected), function (key) {
-                  return panel.selected[key] === true ? key : null;
-                })),
+                fields: _.compact(_.map(panel.columns(),
+                  function (item, index) {
+                    if (panel.selected[index]) {
+                      return item.key;
+                    }
+                  })),
                 filters: GGRC.query_parser.join_queries(
                   GGRC.query_parser.parse(relevant_filter || ""),
                   GGRC.query_parser.parse(panel.filter || "")
@@ -245,25 +248,27 @@
         }
         this.setSelected();
       },
-      "[data-action=attribute_select_toggle] click": function (el, ev) {
-        var items = GGRC.model_attr_defs[this.scope.attr("item.type")],
-            split_items = {
-              mappings: _.filter(items, function (el) {
-                return el.type === "mapping";
-              }),
-              attributes: _.filter(items, function (el) {
-                return el.type !== "mapping";
-              })
-            };
-        _.map(split_items[el.data("type")], function (attr) {
-          this.scope.attr("item.selected." + attr.key, el.data("value"));
+      '[data-action=attribute_select_toggle] click': function (el, ev) {
+        var items = GGRC.model_attr_defs[this.scope.attr('item.type')];
+        var isMapping = el.data('type') === 'mappings';
+        var value = el.data('value');
+
+        _.each(items, function (item, index) {
+          if (isMapping && item.type === 'mapping') {
+            this.scope.attr('item.selected.' + index, value);
+          }
+          if (!isMapping && item.type !== 'mapping') {
+            this.scope.attr('item.selected.' + index, value);
+          }
         }.bind(this));
       },
-      "setSelected": function () {
-        this.scope.attr("item.selected", _.reduce(this.scope.attr("item").columns(), function (memo, data) {
-          memo[data.key] = true;
-          return memo;
-        }, {}));
+      setSelected: function () {
+        var selected = _.reduce(this.scope.attr('item').columns(),
+          function (memo, data, index) {
+            memo[index] = true;
+            return memo;
+          }, {});
+        this.scope.attr('item.selected', selected);
       },
       "{scope.item} type": function () {
         this.scope.attr("item.selected", {});

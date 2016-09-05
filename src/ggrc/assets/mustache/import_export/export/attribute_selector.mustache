@@ -17,14 +17,14 @@
     <a data-action="attribute_select_toggle" data-value="false" data-type="mappings" href="javascript://">None</a>
     <div class="attribute-wrap">
       <ul class="attr-list">
-        {{#columns}}
+        {{#each columns}}
         <li>
           <label>
-            <input can-value="selected.{{key}}" type="checkbox" name="{{key}}" checked>
+            <input can-value="selected.{{@index}}" type="checkbox" name="{{key}}" checked>
             {{display_name}}
           </label>
         </li>
-        {{/columns}}
+        {{/each}}
       </ul>
     </div>
   </div>
