@@ -177,12 +177,16 @@
           );
         }
 
-        return ret.then(function(wf) {
-          return new CMS.Models.Cycle({
+        return ret.then(function (wf) {
+          var cycleDfd = new CMS.Models.Cycle({
             workflow: wf,
             autogenerate: true,
             context: wf.context
           }).save();
+          cycleDfd.then(function () {
+            return that.original_object.refresh();
+          });
+          return cycleDfd;
         });
       });
     },
