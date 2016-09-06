@@ -2,40 +2,42 @@
  Copyright (C) 2016 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
-(function($) {
+(function ($) {
   function openclose(command) {
-    var $that = $(this),
-      use_slide = $that.length < 100
+    var $that = $(this);
+    var useSlide = $that.length < 100;
 
-    $that.each(function() {
-      var $this = $(this),
-        $main = $this.closest('.item-main'),
-        $li = $main.closest('li'),
-        $content = $li.children('.item-content'),
-        $icon = $main.find('.openclose'),
-        $parentTree = $this.closest('ul.new-tree'),
-        cmd = command;
+    $that.each(function () {
+      var $this = $(this);
+      var $main = $this.closest('.item-main');
+      var $li = $main.closest('li');
+      var $content = $li.children('.item-content');
+      var $icon = $main.find('.openclose');
+      var $parentTree = $this.closest('ul.new-tree');
+      var cmd = command;
 
-      if (typeof cmd !== "string" || cmd === "toggle") {
-        cmd = $icon.hasClass("active") ? "close" : "open";
+      if (typeof cmd !== 'string' || cmd === 'toggle') {
+        cmd = $icon.hasClass('active') ? 'close' : 'open';
       }
 
-      if (cmd === "close") {
-        if (use_slide) {
-          $content.slideUp('fast', callback);
+      if (cmd === 'close') {
+        if (useSlide) {
+          $content.slideUp('fast');
         } else {
-          $content.css("display", "none");
+          $content.css('display', 'none');
         }
         $icon.removeClass('active');
         $li.removeClass('item-open');
         // Only remove tree open if there are no open siblings
-        !$li.siblings('.item-open').length && $parentTree.removeClass('tree-open');
+        if (!$li.siblings('.item-open').length) {
+          $parentTree.removeClass('tree-open');
+        }
         $content.removeClass('content-open');
-      } else if (cmd === "open") {
-        if (use_slide) {
-          $content.slideDown('fast', callback);
+      } else if (cmd === 'open') {
+        if (useSlide) {
+          $content.slideDown('fast');
         } else {
-          $content.css("display", "block");
+          $content.css('display', 'block');
         }
         $icon.addClass('active');
         $li.addClass('item-open');
