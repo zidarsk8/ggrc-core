@@ -4,24 +4,6 @@
  */
 
 (function (GGRC, can) {
-  /*  GGRC.ListLoaders
-   *
-   *  - Generates and manages lists of related objects, pairing each instance
-   *      with the one or more "mappings" -- join tables, direct relationships,
-   *      etc -- which cause it to be present in the list.
-   *
-   *  Terminology:
-   *    - "mappings" -- a list of "result" objects defining the path between
-   *        the root object and the paired instance; can also be the boolean
-   *        literal "true", to denote the "root" instance
-   *    - "result" -- the (instance, mappings) pairs
-   *    - "binding" -- the pairing between a list of results and the "root"
-   *        instance for that list
-   *        e.g., for each item in binding.list, if you follow the chain of
-   *          mappings, you will eventually find
-   *            ``{ instance: binding.instance, mappings: true }``
-   */
-
   /*  GGRC.ListLoaders.MappingResult
    *
    *  - `instance`: The resulting item itself

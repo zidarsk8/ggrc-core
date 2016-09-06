@@ -75,7 +75,7 @@ can.Model.Cacheable("CMS.Models.NewObject", {
     `extra_descriptor_options` is where you define special parameters for some of the widgets ie. their content controller, icon, widget name etc.
     `extra_content_controller_options` is where you define parameters for the content_controller ie can view children, mapping, model, footer view etc.
 
-3. Add new_object to `mappings.js`
+3. Add new_object to `mappings-ggrc.js`
 
     Add the object to the list of mappings: `GGRC.Mappings("ggrc_core", {base:{}, NewObject: {...}}`.
 
