@@ -7,6 +7,7 @@ from os.path import abspath
 from os.path import dirname
 from os.path import join
 
+from ggrc.app import app
 from integration import ggrc
 
 
@@ -17,17 +18,19 @@ class TestCase(ggrc.TestCase):
 
   CSV_DIR = join(THIS_ABS_PATH, "test_csvs/")
 
-  def _import_file(self, filename, dry_run=False):
-    data = {"file": (open(join(self.CSV_DIR, filename)), filename)}
+  @classmethod
+  def _import_file(cls, filename, dry_run=False):
+    data = {"file": (open(join(cls.CSV_DIR, filename)), filename)}
     headers = {
         "X-test-only": "true" if dry_run else "false",
         "X-requested-by": "gGRC",
     }
     if hasattr(g, "cache"):
       delattr(g, "cache")
-    response = self.client.post("/_service/import_csv",
-                                data=data, headers=headers)
-    self.assert200(response)
+    tc = app.test_client()
+    tc.get("/login")
+    response = tc.post("/_service/import_csv", data=data, headers=headers)
+
     return json.loads(response.data)
 
   def import_file(self, filename, dry_run=False):
