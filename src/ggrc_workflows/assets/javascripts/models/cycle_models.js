@@ -172,7 +172,12 @@
     create: 'POST /api/cycle_task_entries',
     update: 'PUT /api/cycle_task_entries/{id}',
     destroy: 'DELETE /api/cycle_task_entries/{id}',
-
+    info_pane_options: {
+      attachments: {
+        mapping: 'documents',
+        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache'
+      }
+    },
     attributes: {
       cycle_task_group_object_task: 'CMS.Models.CycleTaskGroupObjectTask.stub',
       modified_by: 'CMS.Models.Person.stub',
