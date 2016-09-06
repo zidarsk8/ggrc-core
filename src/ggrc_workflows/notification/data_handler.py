@@ -30,7 +30,8 @@ def get_cycle_created_task_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if not cycle_task:
     current_app.logger.warning(
-        '{} for notification {} not found.'.format(notif.object_type, notif.id))
+        '{} for notification {} not found.'.format(
+            notification.object_type, notification.id))
     return {}
 
   cycle_task_group = cycle_task.cycle_task_group
@@ -97,7 +98,8 @@ def get_cycle_task_due(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if not cycle_task:
     current_app.logger.warning(
-        '{} for notification {} not found.'.format(notif.object_type, notif.id))
+        '{} for notification {} not found.'.format(
+            notification.object_type, notification.id))
     return {}
   if not cycle_task.contact:
     current_app.logger.warning(
@@ -179,11 +181,13 @@ def get_cycle_task_declined_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if not cycle_task:
     current_app.logger.warning(
-        '{} for notification {} not found.'.format(notif.object_type, notif.id))
+        '{} for notification {} not found.'.format(
+            notification.object_type, notification.id))
     return {}
   if not cycle_task.contact:
     current_app.logger.warning(
-        '{} for notification {} not found.'.format(notif.object_type, notif.id))
+        '{} for notification {} not found.'.format(
+            notification.object_type, notification.id))
     return {}
 
   force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change

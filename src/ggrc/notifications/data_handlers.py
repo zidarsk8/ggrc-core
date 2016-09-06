@@ -73,7 +73,8 @@ def assignable_open_data(notif):
   obj = get_notification_object(notif)
   if not obj:
     current_app.logger.warning(
-        '{} for notification {} not found.'.format(notif.object_type, notif.id))
+        '{} for notification {} not found.'.format(
+            notif.object_type, notif.id))
     return {}
   people = [person for person, _ in obj.assignees]
 
