@@ -134,6 +134,30 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
 
     return value
 
+  @validates("title")
+  def validate_title(self, _, value):
+    """Validate CAD title/name uniqueness.
+
+    Note: title field is used for storing CAD names.
+    CAD names need to follow 3 uniqueness rules:
+      1) names must not match any attribute name on any existing object.
+      2) Object level CAD names must not match any global CAD name.
+      3) Object level CAD names can clash, but not for the same Object
+         instance. This means we can have two CAD with a name "my cad", with
+         different attributable_id fields.
+
+    Third rule is handled by the database with unique key uq_custom_attribute
+    (`definition_type`,`definition_id`,`title`).
+
+    This validator should check for name collisions for 1st and 2nd rule.
+
+    Args:
+      value: custom attribute definition name
+
+    Returns:
+      value if the name passes all uniqueness checks.
+    """
+    return value
 
 class CustomAttributeMapable(object):
   # pylint: disable=too-few-public-methods
