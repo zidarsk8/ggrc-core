@@ -1512,8 +1512,12 @@ can.Control('CMS.Controllers.TreeViewNode', {
     }.bind(this), 0);
   },
 
-  '{instance} change': function (inst, ev, prop) {
-    if (prop === 'custom_attribute_values') {
+  '{instance} custom_attribute_values': function (object, ev, newVal, oldVal) {
+    function getValues(cav) {
+      return _.pluck(cav.reify(), 'attribute_value');
+    }
+    if (oldVal.length === newVal.length &&
+      _.difference(getValues(oldVal), getValues(newVal)).length) {
       this.draw_node(true);
     }
   },
