@@ -86,32 +86,36 @@
           });
         }
       });
-    },
+    }
   }, {
-    save : function() {
-      var that = this,
-          task_group_title = this.task_group_title,
-          redirect_link;
+    save: function () {
+      var taskGroupTitle = this.task_group_title;
+      var redirectLink;
+      var taskGroup;
+      var dfd;
 
-      return this._super.apply(this, arguments).then(function(instance) {
-        redirect_link = instance.viewLink + "#task_group_widget";
-        if (!task_group_title) {
-          instance.attr('_redirect', redirect_link);
+      dfd = this._super.apply(this, arguments);
+      dfd.then(function (instance) {
+        redirectLink = instance.viewLink + '#task_group_widget';
+        if (!taskGroupTitle) {
+          instance.attr('_redirect', redirectLink);
           return instance;
         }
-        var tg = new CMS.Models.TaskGroup({
-          title: task_group_title,
+        taskGroup = new CMS.Models.TaskGroup({
+          title: taskGroupTitle,
           workflow: instance,
           contact: instance.people && instance.people[0] || instance.modified_by,
-          context: instance.context,
+          context: instance.context
         });
-        return tg.save().then(function(tg) {
-          // Prevent the redirect form workflow_page.js
-          tg.attr('_no_redirect', true);
-          instance.attr('_redirect', redirect_link + "/task_group/" + tg.id);
-          return that;
-        });
-      });
+        return taskGroup.save()
+          .then(function (tg) {
+            // Prevent the redirect form workflow_page.js
+            taskGroup.attr('_no_redirect', true);
+            instance.attr('_redirect', redirectLink + '/task_group/' + tg.id);
+            return this;
+          }.bind(this));
+      }.bind(this));
+      return dfd;
     },
     // Check if task groups are slated to start
     //   in the current week/month/quarter/year
