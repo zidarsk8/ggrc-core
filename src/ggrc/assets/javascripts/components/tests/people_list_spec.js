@@ -49,42 +49,45 @@ describe('GGRC.Components.peopleGroup', function () {
     var getMapped;  // the method under test
     var scope;
     var mappingsList = [{}, {}];  // some arbitrary values
-    var result;
+    var deferred = $.Deferred();
 
     beforeEach(function () {
       scope = new can.Map({
         computed_mapping: false,
         mapping: 'some mapping',
         instance: new can.Map({
-          get_mapping: function () {}
+          get_mapping_deferred: function () {}
         })
       });
       mappingsList = scope.attr('mappingsList', mappingsList);
 
-      spyOn(scope.instance, 'get_mapping').and.returnValue(mappingsList);
+      spyOn(scope.instance, 'get_mapping_deferred')
+        .and
+        .returnValue(deferred.resolve(mappingsList));
 
-      getMapped = Component.prototype.scope.get_mapped.bind(scope);
+      getMapped = Component.prototype.scope.get_mapped_deferred.bind(scope);
     });
 
     it('returns mappings and sets "computed_mapping" to true',
        function () {
-         result = getMapped();
-
-         expect(result).toEqual(mappingsList);
-         expect(scope.attr('list_mapped')).toEqual(mappingsList);
-         expect(scope.computed_mapping).toEqual(true);
-         expect(scope.instance.get_mapping).toHaveBeenCalledWith(scope.mapping);
+         getMapped().then(function (data) {
+           expect(data).toEqual(mappingsList);
+           expect(scope.attr('list_mapped')).toEqual(mappingsList);
+           expect(scope.computed_mapping).toEqual(true);
+           expect(scope.instance.get_mapping_deferred)
+             .toHaveBeenCalledWith(scope.mapping);
+         });
        });
 
-    it('does not call instance.get_mapping if "computed_mapping" is true',
+    it('does not call instance.get_mapping_deferred if "computed_mapping"',
        function () {
          scope.computed_mapping = true;
          scope.attr('list_mapped', mappingsList);
 
-         result = getMapped();
-
-         expect(result).toEqual(scope.attr('list_mapped'));
-         expect(scope.instance.get_mapping).not.toHaveBeenCalled();
+         getMapped().then(function (data) {
+           expect(data).toEqual(scope.attr('list_mapped'));
+           expect(scope.instance.get_mapping_deferred).not.toHaveBeenCalled();
+         });
        });
   });
 

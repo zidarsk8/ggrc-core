@@ -868,6 +868,10 @@
       return [];
     },
 
+    get_mapping_deferred: function (name) {
+      return this.get_binding(name).refresh_list();
+    },
+
   // This retrieves the potential orphan stats for a given instance
   // Example: "This may also delete 3 Sections, 2 Controls, and 4 object mappings."
     get_orphaned_count: function () {
