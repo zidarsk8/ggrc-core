@@ -264,7 +264,8 @@ can.Control('GGRC.Controllers.Modals', {
     }
 
     if (instance &&
-      _.exists(instance, 'class.is_custom_attributable')) {
+      _.exists(instance, 'class.is_custom_attributable') &&
+      !(instance instanceof CMS.Models.Assessment)) {
       // Make sure custom attributes are preloaded:
       dfd.then(function () {
         return $.when(
@@ -280,7 +281,8 @@ can.Control('GGRC.Controllers.Modals', {
       this.reset_form(function () {
         if (instance) {
           // Make sure custom attr validations/values are reset
-          if (instance.setup_custom_attributes) {
+          if (instance.setup_custom_attributes &&
+            !(instance instanceof CMS.Models.Assessment)) {
             instance.removeAttr('custom_attributes');
             instance.setup_custom_attributes();
           }
