@@ -46,7 +46,6 @@ GGRC_COLUMN_HANDLERS = {
     "owners": handlers.OwnerColumnHandler,
     "principal_assessor": handlers.UserColumnHandler,
     "program": handlers.ProgramColumnHandler,
-    "program_mapped": handlers.ObjectPersonColumnHandler,
     "recipients": list_handlers.ValueListHandler,
     "reference_url": handlers.TextColumnHandler,
     "related_assessors": related_person.RelatedAssessorsColumnHandler,
