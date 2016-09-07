@@ -43,9 +43,6 @@
       folders : new GGRC.ListLoaders.CrossListLoader("audits", "folders"),
       extended_folders: new GGRC.ListLoaders.CrossListLoader("audits", "folders")
     },
-    Document : {
-      _mixins : ["fileable"]
-    },
     Meeting : {
       _canonical : {
         "events" : "GCalEvent"
