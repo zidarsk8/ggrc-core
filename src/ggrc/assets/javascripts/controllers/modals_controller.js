@@ -262,10 +262,11 @@ can.Control('GGRC.Controllers.Modals', {
       that.on();
       dfd = new $.Deferred().resolve(instance);
     }
-    if (instance && instance.class.is_custom_attributable &&
-      !instance.class.isAssessment) {
+
+    if (instance &&
+      _.exists(instance, 'class.is_custom_attributable')) {
       // Make sure custom attributes are preloaded:
-      dfd = dfd.then(function () {
+      dfd.then(function () {
         return $.when(
           instance.load_custom_attribute_definitions &&
             instance.load_custom_attribute_definitions(),
@@ -279,10 +280,8 @@ can.Control('GGRC.Controllers.Modals', {
       this.reset_form(function () {
         if (instance) {
           // Make sure custom attr validations/values are reset
-          if (instance.setup_custom_attributes &&
-            instance.class.is_custom_attributable &&
-            !instance.class.isAssessment) {
-            instance.custom_attributes = undefined;
+          if (instance.setup_custom_attributes) {
+            instance.removeAttr('custom_attributes');
             instance.setup_custom_attributes();
           }
         }
