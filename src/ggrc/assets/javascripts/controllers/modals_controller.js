@@ -221,18 +221,20 @@ can.Control('GGRC.Controllers.Modals', {
       , can.view(this.options.button_view, dfd)
       , can.view(this.options.custom_attributes_view, dfd)
     ).done(this.proxy('draw'));
-  }
+  },
 
-  , fetch_data: function (params) {
+  fetch_data: function (params) {
     var that = this;
     var dfd;
-    var instance;
+    var instance = this.options.instance;
+
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
-    if (this.options.skip_refresh && this.options.instance) {
-      return new $.Deferred().resolve(this.options.instance);
-    } else if (this.options.instance) {
-      dfd = this.options.instance.refresh();
+
+    if (this.options.skip_refresh && instance) {
+      return new $.Deferred().resolve(instance);
+    } else if (instance) {
+      dfd = instance.refresh();
     } else if (this.options.model) {
       if (this.options.new_object_form) {
         dfd = $.when(this.options.attr(
@@ -247,7 +249,7 @@ can.Control('GGRC.Controllers.Modals', {
           }
           that.options.attr('new_object_form', true);
           that.options.attr('instance', new that.options.model(params));
-          return that.options.instance;
+          return instance;
         }).done(function () {
           // Check if modal was closed
           if (that.element !== null) {
@@ -258,9 +260,8 @@ can.Control('GGRC.Controllers.Modals', {
     } else {
       this.options.attr('instance', new can.Observe(params));
       that.on();
-      dfd = new $.Deferred().resolve(this.options.instance);
+      dfd = new $.Deferred().resolve(instance);
     }
-    instance = this.options.instance;
     if (instance && instance.class.is_custom_attributable &&
       !instance.class.isAssessment) {
       // Make sure custom attributes are preloaded:
