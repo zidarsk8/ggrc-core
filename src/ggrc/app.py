@@ -131,27 +131,38 @@ def _display_sql_queries():
   This function makes sure we display the sql queries if the record setting is
   enabled.
   """
-  if getattr(settings, "SQLALCHEMY_RECORD_QUERIES", False):
+  report_type = getattr(settings, "SQLALCHEMY_RECORD_QUERIES", False)
+  valid_types = ('count', 'slow', 'all')
+  if report_type:
+    if report_type not in valid_types:
+      raise Exception("""Invalid SQLALCHEMY_RECORD_QUERIES value specified.
+        Possible options: {}""".format(', '.join(valid_types)))
+
     # pylint: disable=unused-variable
     @app.after_request
-    def display_queries(response):  # noqa: not an unused variable
+    def display_queries(response):
       """Display database queries
 
-      Prints out SQL queries, EXPLAINs for queries above explain_threshold, and
+      Prints out SQL queries, EXPLAINs for queries above slow_threshold, and
       a final count of queries after every HTTP request
       """
-      explain_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
+      slow_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
       queries = get_debug_queries()
+      app.logger.info("Total queries: {}".format(len(queries)))
+      if report_type == 'count':
+        return response
       # We have to copy the queries list below otherwise queries executed
       # in the for loop will be appended causing an endless loop
       for query in queries[:]:
+        if report_type == 'slow' and query.duration < slow_threshold:
+          continue
         app.logger.info("{:.8f} {}\n{}\n{}".format(
             query.duration,
             query.context,
             query.statement,
             query.parameters))
         is_select = bool(re.match('SELECT', query.statement, re.I))
-        if query.duration > explain_threshold and is_select:
+        if query.duration > slow_threshold and is_select:
           try:
             statement = "EXPLAIN " + query.statement
             engine = SQLAlchemy().get_engine(app)
@@ -160,7 +171,6 @@ def _display_sql_queries():
           except Exception as err:  # pylint: disable=broad-except
             app.logger.warning("Statement failed: {}".format(statement))
             app.logger.exception(err)
-      app.logger.info("Total queries: {}".format(len(queries)))
       return response
 
 init_models(app)
