@@ -26,7 +26,7 @@ from ggrc_basic_permissions import objects_via_assignable_query
 from ggrc_basic_permissions import program_relationship_query
 from ggrc_basic_permissions import backlog_workflows
 from ggrc.rbac import permissions, context_query_filter
-from .sql import SqlIndexer
+from ggrc.fulltext.sql import SqlIndexer
 
 
 class MysqlRecordProperty(db.Model):

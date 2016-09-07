@@ -15,6 +15,8 @@ from sqlalchemy import not_
 from sqlalchemy import or_
 from sqlalchemy import orm
 
+from ggrc import db
+from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.rbac import permissions
 from ggrc import models
 from ggrc.models.custom_attribute_value import CustomAttributeValue
@@ -112,31 +114,12 @@ class QueryHelper(object):
           filter_name = value.get("filter_by", None)
           if filter_name is not None:
             filter_by = getattr(object_class, filter_name, None)
-          value = value["display_name"]
-        if value:
-          self.attr_name_map[object_class][value.lower()] = (key.lower(),
-                                                             filter_by)
-      if not self.ca_disabled:
-        custom_attrs = AttributeInfo.get_custom_attr_definitions(
-            object_class)
-      else:
-        custom_attrs = {}
-
-      for key, definition in custom_attrs.items():
-        if not key.startswith("__custom__:") or \
-           "display_name" not in definition:
-          continue
-        try:
-          # Global custom attribute definition can only have a single id on
-          # their name, so it is safe for that. Currently the filters do not
-          # work with object level custom attributes.
-          attr_id = definition["definition_ids"][0]
-        except KeyError:
-          continue
-        filter_by = CustomAttributeValue.mk_filter_by_custom(object_class,
-                                                             attr_id)
-        name = definition["display_name"].lower()
-        self.attr_name_map[object_class][name] = (name, filter_by)
+          name = value["display_name"]
+        else:
+          name = value
+        if name:
+          self.attr_name_map[object_class][name.lower()] = (key.lower(),
+                                                            filter_by)
 
   def _clean_query(self, query):
     """ sanitize the query object """
@@ -445,19 +428,42 @@ class QueryHelper(object):
       raise BadQueryException("Unknown operator \"{}\""
                               .format(exp["op"]["name"]))
 
+    def default_filter_by(object_class, key, predicate):
+      """Default filter option that tries to mach predicate in fulltext index.
+
+      This function tries to match the predicate for a give key with entries in
+      the full text index table. The key is matched to record tags and as
+      the tags only contain custom attribute names, so this filter currently
+      only works on custom attributes.
+
+      Args:
+        object_class: class of the object we are querying for.
+        key: string containing attribute name on which we are filtering.
+        predicate: function containing the correct comparison predicate for
+          the attribute value.
+
+      Returs:
+        Query predicate if the given predicate matches a value for the correct
+          custom attribute.
+      """
+      return object_class.id.in_(db.session.query(Record.key).filter(
+              Record.type == object_class.__name__,
+              Record.tags == key,
+              predicate(Record.content)
+          ))
+
     def with_key(key, p):
       key = key.lower()
       key, filter_by = self.attr_name_map[
           object_class].get(key, (key, None))
-      if hasattr(filter_by, "__call__"):
+      if callable(filter_by):
         return filter_by(p)
       else:
         attr = getattr(object_class, key, None)
-        if attr is None:
-          raise BadQueryException("Bad query: object '{}' does "
-                                  "not have attribute '{}'."
-                                  .format(object_class.__name__, key))
-        return p(attr)
+        if attr:
+          return p(attr)
+        else:
+          return default_filter_by(object_class, key, p)
 
     with_left = lambda p: with_key(exp["left"], p)
 
