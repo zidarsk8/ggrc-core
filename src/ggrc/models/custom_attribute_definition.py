@@ -7,8 +7,10 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from sqlalchemy.sql.schema import UniqueConstraint
 
+import ggrc.models
 from ggrc import db
 from ggrc.models import mixins
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.exceptions import ValidationError
 
@@ -50,6 +52,8 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       'helptext',
       'placeholder',
   ]
+
+  _reserved_names = {}
 
   def _clone(self, target):
     """Clone custom attribute definitions."""
@@ -134,8 +138,31 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
 
     return value
 
-  @validates("title")
-  def validate_title(self, _, value):
+  @classmethod
+  def _get_reserved_names(cls, definition_type):
+    """Get a list of all attribute names in all objects.
+
+    On first call this function computes all possible names that can be used by
+    any model and stores them in a static frozen set. All later calls just get
+    this set.
+
+    Returns:
+      frozen set containing all reserved attribute names for the current object.
+    """
+    if not cls._reserved_names.get(definition_type):
+      definition_model = getattr(ggrc.models.all_models, definition_type, None)
+      if not definition_model:
+        raise ValueError("Invalid definition type")
+
+      aliases = AttributeInfo.gather_aliases(definition_model)
+      cls._reserved_names[definition_type] = frozenset(
+        (value["display_name"] if isinstance(value, dict) else value).lower()
+        for value in aliases.values() if value
+      )
+    return cls._reserved_names[definition_type]
+
+  @validates("title", "definition_type")
+  def validate_title(self, key, value):
     """Validate CAD title/name uniqueness.
 
     Note: title field is used for storing CAD names.
@@ -151,12 +178,24 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
 
     This validator should check for name collisions for 1st and 2nd rule.
 
+    This validator works, because definition_type is never changed. It only gets
+    set when the cad is created and after that only title filed can change.
+    This makes validation using both fields possible.
+
     Args:
       value: custom attribute definition name
 
     Returns:
       value if the name passes all uniqueness checks.
     """
+
+    if key == "title" and self.definition_type:
+      if value.lower() in self._get_reserved_names(self.definition_type):
+        raise ValueError("Invalid Custom attribute name.")
+    elif key == "definition_type" and self.title:
+      if self.title.lower() in self._get_reserved_names(value):
+        raise ValueError("Invalid Custom attribute name.")
+
     return value
 
 class CustomAttributeMapable(object):
