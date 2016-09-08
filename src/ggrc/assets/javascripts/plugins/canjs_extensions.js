@@ -79,6 +79,10 @@
 
   // Turn camelSpace strings into Camel Space strings
   can.spaceCamelCase = function (string) {
+    if (!_.isString(string)) {
+      throw new TypeError('Invalid type, string required.');
+    }
+
     return can.underscore(string)
       .split('_')
       .map(can.capitalize)
