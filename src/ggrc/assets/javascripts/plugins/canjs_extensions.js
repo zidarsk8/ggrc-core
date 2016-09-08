@@ -85,7 +85,10 @@
       .join(' ');
   };
   can.camelCaseToUnderscore = function (string) {
-    return string.replace(/([A-Z])/g, '_$1').toLowerCase();
+    if (!_.isString(string)) {
+      throw new TypeError('Invalid type, string required.');
+    }
+    return _.snakeCase(string);
   };
   can.camelCaseToDashCase = function (string) {
     if (!_.isString(string)) {
