@@ -179,15 +179,10 @@ def get_cycle_data(notification):
 
 def get_cycle_task_declined_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
-  if not cycle_task:
+  if not cycle_task or not cycle_task.contact:
     current_app.logger.warning(
-        '{} for notification {} not found.'.format(
-            notification.object_type, notification.id))
-    return {}
-  if not cycle_task.contact:
-    current_app.logger.warning(
-        '{} for notification {} not found.'.format(
-            notification.object_type, notification.id))
+        '%s for notification %s not found.',
+        notification.object_type, notification.id)
     return {}
 
   force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
