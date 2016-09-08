@@ -26,7 +26,7 @@ describe('CanJS extensions', function () {
       expect(method('hello-world')).toBe('hello-world');
       expect(method('hello-world-hi-there')).toBe('hello-world-hi-there');
     });
-    it('should return emptry string in case of non string', function () {
+    it('should return empty string in case of non string', function () {
       expect(method(42)).toBe('');
       expect(method({a: 1})).toBe('');
     });
