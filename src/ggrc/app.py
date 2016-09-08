@@ -148,7 +148,7 @@ def _display_sql_queries():
       """
       slow_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
       queries = get_debug_queries()
-      app.logger.info("Total queries: {}".format(len(queries)))
+      app.logger.info("Total queries: %s", len(queries))
       if report_type == 'count':
         return response
       # We have to copy the queries list below otherwise queries executed
@@ -156,11 +156,12 @@ def _display_sql_queries():
       for query in queries[:]:
         if report_type == 'slow' and query.duration < slow_threshold:
           continue
-        app.logger.info("{:.8f} {}\n{}\n{}".format(
+        app.logger.info(
+            "%.8f %s\n%s\n%s",
             query.duration,
             query.context,
             query.statement,
-            query.parameters))
+            query.parameters)
         is_select = bool(re.match('SELECT', query.statement, re.I))
         if query.duration > slow_threshold and is_select:
           try:
@@ -169,7 +170,7 @@ def _display_sql_queries():
             result = engine.execute(statement, query.parameters)
             app.logger.info(tabulate(result.fetchall(), headers=result.keys()))
           except Exception as err:  # pylint: disable=broad-except
-            app.logger.warning("Statement failed: {}".format(statement))
+            app.logger.warning("Statement failed: %s", statement)
             app.logger.exception(err)
       return response
 

@@ -30,8 +30,8 @@ def get_cycle_created_task_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if not cycle_task:
     current_app.logger.warning(
-        '{} for notification {} not found.'.format(
-            notification.object_type, notification.id))
+        '%s for notification %s not found.',
+        notification.object_type, notification.id)
     return {}
 
   cycle_task_group = cycle_task.cycle_task_group
@@ -98,12 +98,12 @@ def get_cycle_task_due(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if not cycle_task:
     current_app.logger.warning(
-        '{} for notification {} not found.'.format(
-            notification.object_type, notification.id))
+        '%s for notification %s not found.',
+        notification.object_type, notification.id)
     return {}
   if not cycle_task.contact:
     current_app.logger.warning(
-        'Contact for cycle task {} not found.'.format(notification.object_id))
+        'Contact for cycle task %s not found.', notification.object_id)
     return {}
 
   notif_name = notification.notification_type.name

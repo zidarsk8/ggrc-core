@@ -73,8 +73,7 @@ def assignable_open_data(notif):
   obj = get_notification_object(notif)
   if not obj:
     current_app.logger.warning(
-        '{} for notification {} not found.'.format(
-            notif.object_type, notif.id))
+        '%s for notification %s not found.', notif.object_type, notif.id)
     return {}
   people = [person for person, _ in obj.assignees]
 
@@ -248,7 +247,7 @@ def get_comment_data(notif):
                    rel.Assessment_destination or rel.Assessment_source)
   if not comment_obj:
     current_app.logger.warning(
-        'Comment object not found for notification {}'.format(notif.id))
+        'Comment object not found for notification %s', notif.id)
     return {}
 
   if comment_obj.recipients:

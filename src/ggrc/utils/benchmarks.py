@@ -31,7 +31,7 @@ class BenchmarkContextManager(object):
 
   def __exit__(self, exc_type, exc_value, exc_trace):
     end = time.time()
-    current_app.logger.info("{:.4f} {}".format(end - self.start, self.message))
+    current_app.logger.info("%.4f %s", end - self.start, self.message)
 
 
 class WithNop(object):
