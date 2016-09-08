@@ -161,6 +161,15 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       )
     return cls._reserved_names[definition_type]
 
+  @classmethod
+  def _get_global_cad_names(cls, definition_type):
+    query = db.session.query(cls.title).filter(
+      cls.definition_type == definition_type,
+      cls.definition_id.is_(None)
+    )
+
+    return set(item[0] for item in query)
+
   @validates("title", "definition_type")
   def validate_title(self, key, value):
     """Validate CAD title/name uniqueness.
@@ -190,12 +199,17 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     """
 
     if key == "title" and self.definition_type:
-      if value.lower() in self._get_reserved_names(self.definition_type):
-        raise ValueError("Invalid Custom attribute name.")
+      name = value.lower()
+      definition_type = self.definition_type
     elif key == "definition_type" and self.title:
-      if self.title.lower() in self._get_reserved_names(value):
-        raise ValueError("Invalid Custom attribute name.")
+      name = self.title
+      definition_type = value.lower()
+    else:
+      return value
 
+    if (name in self._get_reserved_names(definition_type) or
+        name in self._get_global_cad_names(definition_type)):
+      raise ValueError("Invalid Custom attribute name.")
     return value
 
 class CustomAttributeMapable(object):
