@@ -411,6 +411,10 @@
       var workflows;
       var _workflow;
       var cycle;
+      var person = {
+        id: GGRC.current_user.id,
+        type: 'Person'
+      };
 
       if (newObjectForm) {
         // prepopulate dates with default ones
@@ -418,7 +422,8 @@
         this.attr('end_date', moment().add({month: 3}).toDate());
 
         if (!form.contact) {
-          form.attr('contact', {id: GGRC.current_user.id, type: 'Person'});
+          form.attr('contact', person);
+          form.attr('_transient.contact', person);
         }
 
         // using setTimeout to execute this after the modal is loaded
@@ -449,6 +454,9 @@
         cycle = form.cycle.reify();
         if (!_.isUndefined(cycle.workflow)) {
           form.attr('workflow', cycle.workflow.reify());
+        }
+        if (this.contact) {
+          this.attr('_transient.contact', this.contact);
         }
       }
     },
