@@ -20,7 +20,7 @@ describe('GGRC.Components.personItem', function () {
     });
 
     it('sets the personObj to null', function () {
-      expect(scope.personObj).toBeNull();
+      expect(scope().personObj).toBeNull();
     });
   });
 
