@@ -77,7 +77,7 @@
     };
   }
 
-  // Turn camelSpace strings into Camel Space strings
+  // Turn camelCase or snake-case strings into Camel Space strings
   can.spaceCamelCase = function (string) {
     if (!_.isString(string)) {
       throw new TypeError('Invalid type, string required.');
