@@ -387,7 +387,7 @@
   /**
    * Util methods for work with QueryAPI.
    */
-  GGRC.Utils.QueryAPI = {
+  GGRC.Utils.QueryAPI = (function () {
     /**
      * @typedef LimitArray
      * @type {array}
@@ -416,10 +416,10 @@
      * @param {Object} relevant - Information about relevant object
      * @param {Object} relevant.type - Type of relevant object
      * @param {Object} relevant.id - Id of relevant object
+     * @param {Object} relevant.operation - Type of operation.
      * @return {QueryAPIRequest} Array of QueryAPIRequest
      */
-    buildParams: function (objName, page, relevant) {
-      var relevantFilter;
+    function buildParams(objName, page, relevant) {
       var first;
       var last;
       var params = {};
@@ -429,17 +429,7 @@
       }
 
       params.object_name = objName;
-
-      if (relevant) {
-        relevantFilter = '#' + relevant.type + ',' + relevant.id + '#';
-
-        params.filters = GGRC.query_parser.join_queries(
-          GGRC.query_parser.parse(relevantFilter || ''),
-          GGRC.query_parser.parse(page.filter || '')
-        );
-      } else {
-        params.filters = {expression: {}};
-      }
+      params.filters = _makeFilter(page.filter, relevant);
 
       if (page.current && page.pageSize) {
         first = (page.current - 1) * page.pageSize;
@@ -453,7 +443,7 @@
         }];
       }
       return [params];
-    },
+    }
 
     /**
      * Params for request on Query API
@@ -462,7 +452,7 @@
      * @param {Object} params.data - Object with parameters on Query API needed.
      * @return {Promise} Promise on Query API request.
      */
-    makeRequest: function (params) {
+    function makeRequest(params) {
       return $.ajax({
         type: 'POST',
         headers: $.extend({
@@ -472,5 +462,35 @@
         data: JSON.stringify(params.data || [])
       });
     }
-  };
+
+    function _makeFilter(filter, relevant) {
+      var relevantFilter;
+      var filters;
+      var left;
+
+      if (relevant) {
+        relevantFilter = '#' + relevant.type + ',' + relevant.id + '#';
+        left = GGRC.query_parser.parse(relevantFilter || '');
+
+        if (relevant.operation &&
+          relevant.operation !== left.expression.op.name) {
+          left.expression.op.name = relevant.operation;
+        }
+        if (filter) {
+          filters = GGRC.query_parser.join_queries(left,
+            GGRC.query_parser.parse(filter));
+        } else {
+          filters = left;
+        }
+      } else {
+        filters = {expression: {}};
+      }
+      return filters;
+    }
+
+    return {
+      buildParams: buildParams,
+      makeRequest: makeRequest
+    };
+  })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

@@ -368,5 +368,42 @@ describe('GGRC Utils Query API', function () {
         expect(filterResult.op.name).toEqual('=');
       });
     });
+
+    describe('Correct data for filter expression', function () {
+      beforeEach(function () {
+        relevant = {
+          id: 28,
+          type: 'foo',
+          operation: 'op'
+        };
+        objectName = 'bar';
+      });
+
+      it('return correct ids', function () {
+        var result = method(objectName, paging, relevant)[0];
+
+        expect(result.filters.expression.ids.length).toEqual(1);
+        expect(result.filters.expression.ids).toContain('28');
+      });
+    });
+
+    describe('Assessments owned by the Person', function () {
+      beforeEach(function () {
+        relevant = {
+          id: 1,
+          type: 'Person',
+          operation: 'owned'
+        };
+        objectName = 'Assessment';
+      });
+
+      it('return owned as operation type', function () {
+        var result = method(objectName, paging, relevant)[0];
+
+        expect(result.object_name).toEqual('Assessment');
+        expect(result.filters.expression.object_name).toEqual('Person');
+        expect(result.filters.expression.op.name).toEqual('owned');
+      });
+    });
   });
 });
