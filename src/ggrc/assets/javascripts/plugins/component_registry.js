@@ -84,7 +84,7 @@
         scope[key] = val;
       });
 
-      return new can.Map(_.extend({}, originalScope, scope));
+      return _.extend({}, originalScope, scope);
     };
   };
 
