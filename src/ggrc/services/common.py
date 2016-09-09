@@ -205,14 +205,13 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
     build_cache_status(status_entries, 'DeleteOp:' + key,
                        expiry_time, 'InProgress')
   if len(status_entries) > 0:
-    current_app.logger.info("CACHE: status entries: " + str(status_entries))
+    current_app.logger.info("CACHE: status entries: %s", str(status_entries))
     ret = context.cache_manager.bulk_add(status_entries, expiry_time)
     if ret is not None and len(ret) == 0:
       pass
     else:
       current_app.logger.error(
-          'CACHE: Unable to add status for newly created entries ' +
-          str(ret))
+          'CACHE: Unable to add status for newly created entries %s', str(ret))
 
 
 def update_memcache_after_commit(context):

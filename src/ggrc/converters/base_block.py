@@ -341,7 +341,7 @@ class BlockConverter(object):
         except exc.SQLAlchemyError as err:
           db.session.rollback()
           current_app.logger.error(
-              "Import failed with: {}".format(err.message))
+              "Import failed with: %s", err.message)
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
 
@@ -370,7 +370,7 @@ class BlockConverter(object):
         except exc.SQLAlchemyError as err:
           db.session.rollback()
           current_app.logger.error(
-              "Import failed with: {}".format(err.message))
+              "Import failed with: %s", err.message)
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
       for row_converter in self.row_converters:
@@ -389,7 +389,7 @@ class BlockConverter(object):
     except exc.SQLAlchemyError as err:
       db.session.rollback()
       current_app.logger.error(
-          "Import failed with: {}".format(err.message))
+          "Import failed with: %s", err.message)
       self.add_errors(errors.UNKNOWN_ERROR, line=self.offset + 2)
 
   def add_errors(self, template, **kwargs):
