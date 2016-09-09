@@ -1486,19 +1486,26 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   loadPage: function () {
     var options = this.options;
     var isObjectBrowser = /^\/objectBrowser\/?$/.test(window.location.pathname);
+    var isDashboard = /dashboard/.test(window.location);
     var params;
+    var relevant;
     if (isObjectBrowser) {
       params = GGRC.Utils.QueryAPI.buildParams(
         options.model.shortName,
         options.paging);
     } else {
+      relevant = {
+        type: options.parent_instance.type,
+        id: options.parent_instance.id
+      };
+      if (isDashboard) {
+        relevant.operation = 'owned';
+      }
       params = GGRC.Utils.QueryAPI.buildParams(
         options.model.shortName,
         options.paging,
-        {
-          type: options.parent_instance.type,
-          id: options.parent_instance.id
-        });
+        relevant
+      );
     }
 
     this._draw_list_deferred = false;
