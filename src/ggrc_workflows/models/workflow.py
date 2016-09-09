@@ -9,7 +9,6 @@ of the Objects that are mapped to any cycle tasks.
 
 from datetime import date
 from sqlalchemy import and_
-from sqlalchemy import not_
 from sqlalchemy import orm
 
 from ggrc import db
@@ -22,11 +21,8 @@ from ggrc.models.associationproxy import association_proxy
 from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
-from ggrc.models.person import Person
-from ggrc_basic_permissions.models import UserRole
 from ggrc_workflows.models import cycle
 from ggrc_workflows.models import cycle_task_group
-from ggrc_workflows.models import workflow_person
 
 
 class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
@@ -156,11 +152,6 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
           "type": reflection.AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_workflow_member",
       },
-      "workflow_mapped": {
-          "display_name": "No Access",
-          "type": reflection.AttributeInfo.Type.USER_ROLE,
-          "filter_by": "_filter_by_no_access",
-      },
       "status": None,
       "start_date": None,
       "end_date": None,
@@ -173,28 +164,6 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   @classmethod
   def _filter_by_workflow_member(cls, predicate):
     return cls._filter_by_role("WorkflowMember", predicate)
-
-  @classmethod
-  def _filter_by_no_access(cls, predicate):
-    """Get query that filters workflows with mapped users.
-
-    Args:
-      predicate: lambda function that excepts a single parameter and returns
-        true of false.
-
-    Returns:
-      An sqlalchemy query that evaluates to true or false and can be used in
-      filtering workflows by no_access users.
-    """
-    is_no_access = not_(UserRole.query.filter(
-        (UserRole.person_id == Person.id) &
-        (UserRole.context_id == workflow_person.WorkflowPerson.context_id)
-    ).exists())
-    return workflow_person.WorkflowPerson.query.filter(
-        (cls.id == workflow_person.WorkflowPerson.workflow_id) & is_no_access
-    ).join(Person).filter(
-        (predicate(Person.name) | predicate(Person.email))
-    ).exists()
 
   def copy(self, _other=None, **kwargs):
     """Create a partial copy of the current workflow.

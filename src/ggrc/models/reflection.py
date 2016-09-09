@@ -35,7 +35,6 @@ ATTRIBUTE_ORDER = (
     "program_owner",
     "program_editor",
     "program_reader",
-    "program_mapped",
     "workflow_owner",
     "workflow_member",
     "task_type",
