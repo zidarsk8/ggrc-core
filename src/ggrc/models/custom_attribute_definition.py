@@ -9,6 +9,7 @@ from sqlalchemy.sql.schema import UniqueConstraint
 
 import ggrc.models
 from ggrc import db
+from ggrc.utils import benchmark
 from ggrc.models import mixins
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.custom_attribute_value import CustomAttributeValue
@@ -149,20 +150,22 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     Returns:
       frozen set containing all reserved attribute names for the current object.
     """
-    if not cls._reserved_names.get(definition_type):
-      definition_model = getattr(ggrc.models.all_models, definition_type, None)
-      if not definition_model:
-        raise ValueError("Invalid definition type")
+    with benchmark("Generate list of all reserved attribute names"):
+      if not cls._reserved_names.get(definition_type):
+        definition_model = getattr(ggrc.models.all_models, definition_type, None)
+        if not definition_model:
+          raise ValueError("Invalid definition type")
 
-      aliases = AttributeInfo.gather_aliases(definition_model)
-      cls._reserved_names[definition_type] = frozenset(
-        (value["display_name"] if isinstance(value, dict) else value).lower()
-        for value in aliases.values() if value
-      )
-    return cls._reserved_names[definition_type]
+        aliases = AttributeInfo.gather_aliases(definition_model)
+        cls._reserved_names[definition_type] = frozenset(
+          (value["display_name"] if isinstance(value, dict) else value).lower()
+          for value in aliases.values() if value
+        )
+      return cls._reserved_names[definition_type]
 
   @classmethod
   def _get_global_cad_names(cls, definition_type):
+    """Get names of global cad for a given object."""
     query = db.session.query(cls.title).filter(
       cls.definition_type == definition_type,
       cls.definition_id.is_(None)
