@@ -4,6 +4,7 @@
 """Sets up Flask app."""
 
 import re
+from logging import getLogger
 from logging.config import dictConfig as setup_logging
 
 from flask import Flask
@@ -19,6 +20,9 @@ from ggrc import settings
 
 
 setup_logging(settings.LOGGING)
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 app = Flask('ggrc', instance_relative_config=True)  # noqa: valid constant name
@@ -153,7 +157,7 @@ def _display_sql_queries():
       """
       slow_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
       queries = get_debug_queries()
-      app.logger.info("Total queries: %s", len(queries))
+      logger.info("Total queries: %s", len(queries))
       if report_type == 'count':
         return response
       # We have to copy the queries list below otherwise queries executed
@@ -161,7 +165,7 @@ def _display_sql_queries():
       for query in queries[:]:
         if report_type == 'slow' and query.duration < slow_threshold:
           continue
-        app.logger.info(
+        logger.info(
             "%.8f %s\n%s\n%s",
             query.duration,
             query.context,
@@ -173,10 +177,9 @@ def _display_sql_queries():
             statement = "EXPLAIN " + query.statement
             engine = SQLAlchemy().get_engine(app)
             result = engine.execute(statement, query.parameters)
-            app.logger.info(tabulate(result.fetchall(), headers=result.keys()))
-          except Exception as err:  # pylint: disable=broad-except
-            app.logger.warning("Statement failed: %s", statement)
-            app.logger.exception(err)
+            logger.info(tabulate(result.fetchall(), headers=result.keys()))
+          except:  # pylint: disable=bare-except
+            logger.warning("Statement failed: %s", statement, exc_info=True)
       return response
 
 init_models(app)

@@ -2,13 +2,18 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import json
-from flask import current_app
+from logging import getLogger
+
 from ggrc import db
 from ggrc.builder import simple_property
 from ggrc.models.context import Context
 from ggrc.models.mixins import Base, Described
 from sqlalchemy.orm import backref
 from .contributed_roles import DECLARED_ROLE, get_declared_role
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class Role(Base, Described, db.Model):
@@ -134,8 +139,7 @@ class UserRole(Base, db.Model):
     elif hasattr(self, '_display_related_title'):
       context_related = ' in ' + self._display_related_title
     elif self.context:
-      current_app.logger.warning(
-          'Unable to identify context.related for UserRole')
+      logger.warning('Unable to identify context.related for UserRole')
       context_related = ''
     else:
       context_related = ''

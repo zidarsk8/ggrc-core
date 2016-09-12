@@ -4,8 +4,8 @@
 """Module containing custom attributable mixin."""
 
 import collections
+from logging import getLogger
 
-from flask import current_app
 from sqlalchemy import and_
 from sqlalchemy import orm
 from sqlalchemy import or_
@@ -19,6 +19,10 @@ from ggrc import db
 from ggrc import utils
 from ggrc.models.computed_property import computed_property
 from ggrc.models.reflection import AttributeInfo
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 # pylint: disable=attribute-defined-outside-init; CustomAttributable is a mixin
@@ -180,7 +184,7 @@ class CustomAttributable(object):
       elif "href" in value:
         # Ignore setting of custom attribute stubs. Getting here means that the
         # front-end is not using the API correctly and needs to be updated.
-        current_app.logger.info("Ignoring post/put of custom attribute stubs.")
+        logger.info("Ignoring post/put of custom attribute stubs.")
       else:
         raise BadRequest("Bad custom attribute value inserted")
 

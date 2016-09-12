@@ -2,11 +2,14 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Handlers for boolean attributes."""
 
-import traceback
-from flask import current_app
+from logging import getLogger
 
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class CheckboxColumnHandler(handlers.ColumnHandler):
@@ -43,12 +46,12 @@ class CheckboxColumnHandler(handlers.ColumnHandler):
     This is the only handler that will allow setting a None value"""
     try:
       setattr(self.row_converter.obj, self.key, self.value)
-    except Exception:  # pylint: disable=broad-except
+    except:  # pylint: disable=bare-except
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
-      trace = traceback.format_exc()
-      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
-          self.row_converter.obj, self.key, self.value, trace)
-      current_app.logger.error(error)
+      logger.exception(
+          "Import failed with setattr(%r, %r, %r)",
+          self.row_converter.obj, self.key, self.value
+      )
 
 
 class KeyControlColumnHandler(CheckboxColumnHandler):
