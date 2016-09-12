@@ -162,7 +162,7 @@
       }
     }
   });
-
+  // TODO: remove this mixin and all related logic from Front-end part
   can.Model.Mixin('relatable', {
   }, {
     related_self: function () {
