@@ -295,7 +295,7 @@ class DateColumnHandler(ColumnHandler):
       return
 
     try:
-      return parse(self.raw_value)
+      return parse(value) if value else None
     except:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
 
