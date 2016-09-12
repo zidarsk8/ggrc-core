@@ -258,8 +258,21 @@ class AttributeInfo(object):
     return definitions
 
   @classmethod
-  def get_custom_attr_definitions(cls, object_class, ca_cache=None):
-    """ Get column definitions for custom attributes on object_class """
+  def get_custom_attr_definitions(cls, object_class, ca_cache=None,
+                                  include_oca=False):
+    """Get column definitions for custom attributes on object_class.
+
+    Args:
+      object_class: Model for which we want the attribute definitions.
+      ca_cache: dictionary containing custom attribute definitions. If it's set
+        this function will not look for CAD in the database. This should be
+        used for bulk operations, and eventually replaced with memcache.
+      include_oca: Flag for including object level custom attributes. This
+        should be true only for defenitions needed for csv imports.
+
+    returns:
+      dict of custom attribute definitions.
+    """
     definitions = {}
     if not hasattr(object_class, "get_custom_attribute_definitions"):
       return definitions
@@ -299,11 +312,17 @@ class AttributeInfo(object):
     return set(sum(unique_columns, []))
 
   @classmethod
-  def get_object_attr_definitions(cls, object_class, ca_cache=None):
-    """ get all column definitions for object_class
+  def get_object_attr_definitions(cls, object_class, ca_cache=None,
+                                  include_oca=False):
+    """Get all column definitions for object_class.
 
     This function joins custm attribute definitions, mapping definitions and
     the extra delete column.
+
+    Args:
+      object_class: Model for which we want the attribute definitions.
+      ca_cache: dictionary containing custom attribute definitions.
+      include_oca: Flag for including object level custom attributes.
     """
     definitions = {}
 
@@ -336,7 +355,8 @@ class AttributeInfo(object):
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(
-          cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache))
+          cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache,
+                                          include_oca=include_oca))
 
     if object_class.__name__ not in EXCLUDE_MAPPINGS:
       definitions.update(cls.get_mapping_definitions(object_class))
