@@ -10,7 +10,7 @@ assessment-mapped-objects {
   position: relative;
   display: block;
 
-  [selected] .assessment-mapped-objects__item {
+  .selected .assessment-mapped-objects__item {
       position: relative;
       border-radius: 2px;
       box-shadow: none;
