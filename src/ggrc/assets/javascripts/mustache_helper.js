@@ -3506,6 +3506,42 @@ Mustache.registerHelper("pretty_role_name", function (name) {
   return name;
 });
 
+   /**
+   * Check if provided user is current user
+   *
+   * Example usage:
+   *
+   *   {{#if_current_user person}}
+   *     ...
+   *   {{/if_current_user}}
+   *
+   * or:
+   *
+   *   {{#if_current_user email}}
+   *     ...
+   *   {{/if_current_user}}
+   *
+   * @param {Object|String} person - Person object or email
+   * @param {Object} options - a CanJS options argument passed to every helper
+   *
+   */
+  Mustache.registerHelper('if_current_user', function (person, options) {
+    var email;
+    person = Mustache.resolve(person);
+
+    if (_.isString(person)) {
+      email = person;
+    } else if (person && person.email) {
+      email = person.email;
+    } else {
+      console.warn('You should pass in either email or person object');
+    }
+
+    if (GGRC.current_user.email === email) {
+      return options.fn(options.context);
+    }
+    return options.inverse();
+  });
 
 /*
 Add new variables to current scope. This is useful for passing variables
