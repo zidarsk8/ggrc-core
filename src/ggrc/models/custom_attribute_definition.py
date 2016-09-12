@@ -148,7 +148,8 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     this set.
 
     Returns:
-      frozen set containing all reserved attribute names for the current object.
+      frozen set containing all reserved attribute names for the current
+      object.
     """
     with benchmark("Generate list of all reserved attribute names"):
       if not cls._reserved_names.get(definition_type):
@@ -160,8 +161,9 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
 
         aliases = AttributeInfo.gather_aliases(definition_model)
         cls._reserved_names[definition_type] = frozenset(
-          (value["display_name"] if isinstance(value, dict) else value).lower()
-          for value in aliases.values() if value
+            (value["display_name"] if isinstance(
+                value, dict) else value).lower()
+            for value in aliases.values() if value
         )
       return cls._reserved_names[definition_type]
 
@@ -169,8 +171,8 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   def _get_global_cad_names(cls, definition_type):
     """Get names of global cad for a given object."""
     query = db.session.query(cls.title).filter(
-      cls.definition_type == definition_type,
-      cls.definition_id.is_(None)
+        cls.definition_type == definition_type,
+        cls.definition_id.is_(None)
     )
 
     return set(item[0] for item in query)
@@ -192,9 +194,9 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
 
     This validator should check for name collisions for 1st and 2nd rule.
 
-    This validator works, because definition_type is never changed. It only gets
-    set when the cad is created and after that only title filed can change.
-    This makes validation using both fields possible.
+    This validator works, because definition_type is never changed. It only
+    gets set when the cad is created and after that only title filed can
+    change. This makes validation using both fields possible.
 
     Args:
       value: custom attribute definition name
@@ -213,9 +215,10 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       return value
 
     if (name in self._get_reserved_names(definition_type) or
-        name in self._get_global_cad_names(definition_type)):
+            name in self._get_global_cad_names(definition_type)):
       raise ValueError("Invalid Custom attribute name.")
     return value
+
 
 class CustomAttributeMapable(object):
   # pylint: disable=too-few-public-methods
