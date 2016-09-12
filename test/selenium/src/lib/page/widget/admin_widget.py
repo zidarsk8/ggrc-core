@@ -6,6 +6,7 @@ from lib import environment
 from lib.constants import locator
 from lib.constants import url
 from lib.page.widget import widget_base
+from lib.utils import selenium_utils
 
 
 class Widget(base.Widget):
@@ -14,9 +15,22 @@ class Widget(base.Widget):
 
 class Events(Widget):
   """Model for event widget on admin dashboard"""
+  _locator = locator.WidgetAdminEvents
+
   URL = environment.APP_URL \
       + url.ADMIN_DASHBOARD \
       + url.Widget.EVENTS
+
+  def __init__(self, driver):
+    super(Events, self).__init__(driver)
+    self.widget_header = base.Label(driver, self._locator.TREE_VIEW_HEADER)
+
+  def get_events(self):
+    """Get list of WebElements that displayed in tree view at Event widget"""
+    selenium_utils.get_when_clickable(
+        self._driver,
+        self._locator.FIRST_TREE_VIEW_ITEM)
+    return self._driver.find_elements(*self._locator.TREE_VIEW_ITEMS)
 
 
 class People(Widget):
