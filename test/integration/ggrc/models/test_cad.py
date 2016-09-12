@@ -18,13 +18,13 @@ class TestCAD(TestCase):
 
     with self.assertRaises(ValueError):
       cad = models.CustomAttributeDefinition()
-      cad.definition_type = "Section"
+      cad.definition_type = "section"
       cad.title = "title"
 
     with self.assertRaises(ValueError):
       cad = models.CustomAttributeDefinition()
       cad.title = "title"
-      cad.definition_type = "Section"
+      cad.definition_type = "section"
 
     with self.assertRaises(ValueError):
       models.CustomAttributeDefinition(
@@ -35,18 +35,18 @@ class TestCAD(TestCase):
     with self.assertRaises(ValueError):
       models.CustomAttributeDefinition(
           title="TITLE",
-          definition_type="Program",
+          definition_type="program",
       )
 
     with self.assertRaises(ValueError):
       models.CustomAttributeDefinition(
           title="Secondary CONTACT",
-          definition_type="Program",
+          definition_type="program",
       )
 
     cad = models.CustomAttributeDefinition(
         title="non existing title",
-        definition_type="Program",
+        definition_type="program",
     )
     self.assertEqual(cad.title, "non existing title")
 
@@ -55,18 +55,18 @@ class TestCAD(TestCase):
 
     db.session.add(models.CustomAttributeDefinition(
         title="global cad",
-        definition_type="Section",
+        definition_type="section",
         attribute_type="Text",
     ))
     db.session.add(models.CustomAttributeDefinition(
         title="non existing title",
-        definition_type="Section",
+        definition_type="section",
         definition_id=1,
         attribute_type="Text",
     ))
     db.session.add(models.CustomAttributeDefinition(
         title="non existing title",
-        definition_type="Section",
+        definition_type="section",
         definition_id=2,
         attribute_type="Text",
     ))
@@ -75,7 +75,7 @@ class TestCAD(TestCase):
     with self.assertRaises(IntegrityError):
       db.session.add(models.CustomAttributeDefinition(
           title="non existing title",
-          definition_type="Section",
+          definition_type="section",
           definition_id=2,
           attribute_type="Text",
       ))
@@ -85,7 +85,7 @@ class TestCAD(TestCase):
     with self.assertRaises(ValueError):
       db.session.add(models.CustomAttributeDefinition(
           title="global cad",
-          definition_type="Section",
+          definition_type="section",
           definition_id=2,
           attribute_type="Text",
       ))
@@ -95,13 +95,13 @@ class TestCAD(TestCase):
     """Test unique names over on different models."""
     db.session.add(models.CustomAttributeDefinition(
         title="my custom attribute title",
-        definition_type="Section",
+        definition_type="section",
         attribute_type="Text",
     ))
     db.session.commit()
     cad = models.CustomAttributeDefinition(
         title="my custom attribute title",
-        definition_type="Program",
+        definition_type="program",
         attribute_type="Text",
     )
     self.assertEqual(cad.title, "my custom attribute title")

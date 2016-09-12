@@ -152,7 +152,9 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     """
     with benchmark("Generate list of all reserved attribute names"):
       if not cls._reserved_names.get(definition_type):
-        definition_model = getattr(ggrc.models.all_models, definition_type, None)
+        definition_map = {model._inflector.table_singular: model
+                          for model in ggrc.models.all_models.all_models}
+        definition_model = definition_map.get(definition_type)
         if not definition_model:
           raise ValueError("Invalid definition type")
 
