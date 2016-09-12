@@ -20,15 +20,15 @@ from urllib import urlencode
 from blinker import Namespace
 from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
+from flask.ext.sqlalchemy import Pagination
+import sqlalchemy.orm.exc
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import tuple_
-import sqlalchemy.orm.exc
 from werkzeug.exceptions import BadRequest, Forbidden
 
 import ggrc.builder.json
 import ggrc.models
-from flask.ext.sqlalchemy import Pagination
 from ggrc import db, utils
 from ggrc.utils import as_json, benchmark
 from ggrc.fulltext import get_indexer
@@ -39,7 +39,7 @@ from ggrc.models.event import Event
 from ggrc.models.revision import Revision
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.rbac import permissions, context_query_filter
-from .attribute_query import AttributeQueryBuilder
+from ggrc.services.attribute_query import AttributeQueryBuilder
 from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc import settings
 

@@ -13,14 +13,13 @@ from collections import OrderedDict
 from collections import Counter
 
 from sqlalchemy import exc
-
-from ggrc import db
-from ggrc.utils import structures
 from sqlalchemy import or_
 from sqlalchemy import and_
 
+from ggrc import db
 from ggrc import models
 from ggrc.utils import benchmark
+from ggrc.utils import structures
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import pre_commit_checks
