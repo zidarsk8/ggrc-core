@@ -1,0 +1,64 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+.grid-data-toolbar {
+  display: flex;
+  height: 28px;
+  overflow: hidden;
+  margin: 0 0 16px 0;
+
+  tree-pagination {
+    flex: 1;
+  }
+  .grid-data-toolbar-control {
+    width: 85px;
+    height: 28px;
+    line-height: 26px;
+    margin: 0 24px;
+  }
+}
+.grid-data-header {
+  display: flex;
+  box-sizing: border-box;
+  padding: 8px 0;
+  border: 1px solid #ccc;
+  background: #fafafa;
+
+  > * {
+    overflow: hidden;
+    padding: 0 8px;
+    box-sizing: border-box;
+    text-transform: uppercase;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    font-size: 11px;
+    line-height: 24px;
+    font-weight: bold;
+  }
+}
+.grid-data-body {
+  min-height: 300px;
+  max-height: 600px;
+  box-sizing: border-box;
+  overflow: auto;
+
+  &.loading {
+    opacity: 0.5;
+    background: #fcfcfc;
+  }
+}
+
+.grid-data-item {
+  overflow: hidden;
+  display: flex;
+  box-sizing: border-box;
+  padding: 8px 0;
+  border-bottom: 1px solid #ccc;
+  // Extra style for columns
+  > * {
+    overflow: hidden;
+    padding: 0 8px;
+    box-sizing: border-box;
+  }
+}

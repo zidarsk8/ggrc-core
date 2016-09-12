@@ -1,0 +1,90 @@
+{{!
+Copyright (C) 2016 Google Inc.
+Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<related-objects base-instance="instance" relatedItemsType="Assessment">
+    <reusable-objects-list parent-instance="instance" base-instance="instance">
+        <div class="grid-data-toolbar">
+            <tree-pagination paging="paging"></tree-pagination>
+            {{#is_allowed 'update' baseInstance context='for'}}
+                <div class="grid-data-toolbar-control">
+                    <button {{^hasSelected}}disabled{{/hasSelected}}
+                            class="btn btn-small btn-full btn-draft"
+                            can-click="reuseSelected">
+                      Reuse
+                    </button>
+                </div>
+            {{/is_allowed}}
+        </div>
+        <div class="grid-data-header">
+            <div style="width: 85px;">
+                Date
+            </div>
+            <div style="flex: 2 2;">
+                Title
+            </div>
+            <div style="flex: 3 3;">
+                Mapped objects
+            </div>
+            <div style="flex: 3 3;">
+                Evidence
+            </div>
+        </div>
+        <div class="grid-data-body {{#isLoading}}loading{{/isLoading}}">
+            <object-list items="relatedObjects">
+                <div class="grid-data-item">
+                    <div style="width: 85px;">
+                      {{localize_date instance.created_at}}
+                    </div>
+                    <div style="flex: 2 2;">
+                        <a href="{{instance.viewLink}}" target="_blank">
+                          {{instance.title}}
+                        </a>
+                    </div>
+                    <div style="flex: 3 3;">
+                        <mapped-objects
+                                parent-instance="instance"
+                                is-loading="isLoading"
+                                mapping="{{instance.class.info_pane_options.mapped_objects.mapping}}"
+                        >
+                          {{> '/static/mustache/components/assessment/mapped-objects/item-templates/title.mustache' }}
+                        </mapped-objects>
+                    </div>
+                    <div style="flex: 3 3;">
+                        <mapped-objects
+                                parent-instance="instance"
+                                is-loading="isLoading"
+                                mapping="{{instance.class.info_pane_options.evidence.mapping}}"
+                        >
+                            <reusable-objects-item instance="instance"
+                                                   base-instance="baseInstance"
+                                                   mapping="mapping"
+                                                   selected-list="selectedList">
+                                <span class="date">{{date instance.created_at true}}</span>
+                                <a href="{{schemed_url instance.link}}" target="_blank">
+                                    <span>{{firstnonempty instance.title instance.link}}</span>
+                                </a>
+                            </reusable-objects-item>
+                        </mapped-objects>
+                        <mapped-objects
+                                parent-instance="instance"
+                                is-loading="isLoading"
+                                mapping="{{instance.class.info_pane_options.urls.mapping}}"
+                        >
+                            <reusable-objects-item instance="instance"
+                                                   base-instance="baseInstance"
+                                                   mapping="mapping"
+                                                   selected-list="selectedList">
+                                <span class="date">{{date instance.created_at true}}</span>
+                                <a href="{{schemed_url instance.link}}" target="_blank">
+                                    <span>{{firstnonempty instance.title instance.link}}</span>
+                                </a>
+                            </reusable-objects-item>
+                        </mapped-objects>
+                    </div>
+                </div>
+            </object-list>
+        </div>
+    </reusable-objects-list>
+</related-objects>
