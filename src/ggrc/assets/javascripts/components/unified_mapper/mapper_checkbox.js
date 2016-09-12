@@ -46,14 +46,16 @@
     },
     events: {
       '{scope} selected': function () {
+        var checked = _.findWhere(this.scope.attr('selected'), {
+          id: Number(this.scope.attr('instance').id)
+        });
+        // Avoid null and undefined
+        if (!checked) {
+          checked = false;
+        }
         this.element
           .find('.object-check-single')
-          .prop(
-            'checked',
-            _.findWhere(this.scope.attr('selected'), {
-              id: Number(this.scope.attr('instance').id)
-            })
-          );
+          .prop('checked', checked);
       },
       '.object-check-single change': function (el, ev) {
         var scope = this.scope;

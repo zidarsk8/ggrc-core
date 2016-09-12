@@ -28,7 +28,14 @@ class TestBasicCsvImport(converters.TestCase):
   def test_policy_basic_import(self):
     filename = "policy_basic_import.csv"
     self.import_file(filename)
-    self.assertEqual(models.Policy.query.count(), 3)
+    policies = models.Policy.query.all()
+    policy_ids = [policy.id for policy in policies]
+    self.assertEqual(len(policies), 3)
+    revisions = models.Revision.query.filter(
+        models.Revision.resource_type == "Policy",
+        models.Revision.resource_id.in_(policy_ids)
+    ).all()
+    self.assertEqual(len(revisions), 3)
 
   def test_policy_import_working_with_warnings(self):
     def test_owners(policy):

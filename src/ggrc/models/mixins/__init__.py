@@ -468,7 +468,7 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
       return self._display_name()
     except:
       current_app.logger.warn(
-          "display_name error in {}".format(type(self)), exc_info=True)
+          "display_name error in %s", type(self), exc_info=True)
       return ""
 
   def _display_name(self):

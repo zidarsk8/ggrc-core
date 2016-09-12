@@ -11,13 +11,12 @@
   <span class="status-label status-"></span>
   <div class="w-status">
     {{{instance.description}}}
-    {{#prune_context}}
-    {{#child_options.0}}
-      <ul class="attachment-list" {{data 'options'}} {{ (el) -> el.cms_controllers_tree_view(el.data('options')).control("tree_view").display() }}>
-      </ul>
-    {{/child_options.0}}
-    {{/prune_context}}
 
+    <mapping-tree-view
+      parent-instance="instance"
+      mapping="instance.class.info_pane_options.attachments.mapping"
+      item-template="instance.class.info_pane_options.attachments.show_view"
+    />
     {{^if_equals parent_instance.status 'Verified'}}
     {{#with_mapping 'folders' instance}} {{! dummy to ensure the child content always updates}}
     {{#defer 'workflowFolder' instance.workflowFolder allow_fail=true}}
@@ -48,6 +47,7 @@
       {{#if instance.created_at}}on {{date instance.created_at}}{{/if}}
     </span>
   </div>
+
   <div class="entry-actions pull-right">
     <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-cog"></i></a>
     <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">

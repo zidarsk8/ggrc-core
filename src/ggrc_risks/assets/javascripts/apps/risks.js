@@ -226,6 +226,7 @@
       widget_id: CMS.Models.Threat.table_singular,
       widget_name: CMS.Models.Threat.title_plural,
       widget_icon: CMS.Models.Threat.table_singular,
+      order: 275,
       content_controller_options: {
         child_options: relatedObjectsChildOptions,
         draw_children: true,
@@ -242,6 +243,7 @@
       widget_id: CMS.Models.Risk.table_singular,
       widget_name: CMS.Models.Risk.title_plural,
       widget_icon: CMS.Models.Risk.table_singular,
+      order: 265,
       content_controller_options: {
         child_options: relatedObjectsChildOptions,
         draw_children: true,

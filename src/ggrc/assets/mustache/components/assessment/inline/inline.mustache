@@ -3,30 +3,20 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="inline-edit inline-edit--{{type}}
-  {{#if context.isEdit}}inline-edit--active{{/if}}
+<div class="inline-edit
+  {{#if isEdit}}inline-edit--active{{/if}}
   {{#if readonly}}inline-edit--readonly{{/if}}">
-    <h6 class="inline-edit__title">
-        <assessment-validation-icon ca-id="id" instance="instance" validation="validation"></assessment-validation-icon>
-      <span class="inline-edit__title-body">{{title}}
-        {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
-      </span>
-      <span class="inline-edit__extra-controls">
-        {{#context.value}}<i can-click="addComment" class="fa fa-edit" rel="tooltip" title="Add comment"></i>{{/context.value}}
-      </span>
-    </h6>
     <spinner toggle="isSaving"></spinner>
   {{^if isSaving}}
       <div class="inline-edit__content {{#if_equals type 'text'}}inline-edit__content--wide{{/if_equals}}">
-        {{#renderInnerTemplateByType type}}
-        {{/renderInnerTemplateByType}}
-          <ul class="inline-edit__controls {{#if context.isEdit}}inline-edit__controls--edit-mode{{/if}}">
-            {{#if context.isEdit}}
-                <li><a can-click="onSave" href="#"><i class="fa fa-check"></i></a></li>
-                <li><a can-click="onCancel" href="#"><i class="fa fa-times"></i></a></li>
+        {{#renderInnerTemplateByType type}}{{/renderInnerTemplateByType}}
+          <ul class="inline-edit__controls {{#if isEdit}}inline-edit__controls--edit-mode{{/if}}">
+            {{#if isEdit}}
+                <li><a can-click="onSave"><i class="fa fa-check"></i></a></li>
+                <li><a can-click="onCancel"><i class="fa fa-times"></i></a></li>
             {{else}}
               {{^if readonly}}
-                  <li><a can-click="enableEdit" href="#"><i class="fa fa-pencil"></i></a></li>
+                  <li><a can-click="enableEdit"><i class="fa fa-pencil"></i></a></li>
               {{/if}}
             {{/if}}
           </ul>

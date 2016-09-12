@@ -113,28 +113,34 @@
     }
   }, {
     before_create: function () {
+      var person = {
+        id: GGRC.current_user.id,
+        type: 'Person'
+      };
       if (!this.contact) {
-        this.attr('contact', {
-          id: GGRC.current_user.id,
-          type: 'Person'
-        });
+        this.attr('contact', person);
       }
     },
     form_preload: function (newObjectForm) {
+      var person = {
+        id: GGRC.current_user.id,
+        type: 'Person'
+      };
       if (newObjectForm && !this.contact) {
-        this.attr('contact', {
-          id: GGRC.current_user.id, type: 'Person'
-        });
+        this.attr('contact', person);
+        this.attr('_transient.contact', person);
+      } else if (this.contact) {
+        this.attr('_transient.contact', this.contact);
       }
     }
   });
 
   can.Model.Mixin('unique_title', {
     'after:init': function () {
-      this.validate(['title', '_transient:title'], function (newVal, prop) {
+      this.validate(['title', '_transient.title'], function (newVal, prop) {
         if (prop === 'title') {
-          return this.attr('_transient:title');
-        } else if (prop === '_transient:title') {
+          return this.attr('_transient.title');
+        } else if (prop === '_transient.title') {
           return newVal; // the title error is the error
         }
       });
@@ -142,15 +148,17 @@
   }, {
     save_error: function (val) {
       if (/title values must be unique\.$/.test(val)) {
-        this.attr('_transient:title', val);
+        this.attr('_transient.title', val);
       }
     },
     after_save: function () {
-      this.removeAttr('_transient:title');
+      this.removeAttr('_transient.title');
     },
     'before:attr': function (key, val) {
-      if (key === 'title' && arguments.length > 1) {
-        this.attr('_transient:title', null);
+      if (key === 'title' &&
+          arguments.length > 1 &&
+          this._transient) {
+        this.attr('_transient.title', null);
       }
     }
   });

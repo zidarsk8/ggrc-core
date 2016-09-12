@@ -210,3 +210,9 @@ class ObjectDocumentFactory(ModelFactory):
 
   class Meta:
     model = models.ObjectDocument
+
+
+class RegulationFactory(ModelFactory, TitledFactory):
+
+  class Meta:
+    model = models.Regulation

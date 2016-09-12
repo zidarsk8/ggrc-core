@@ -39,7 +39,7 @@ pushes to google/ggrc-core.
 
 4. prevent pushing to upstream.
 
-        git remote set-url --push upstream git@github.com:<nick>/ggrc-core.git
+        git remote set-url --push upstream $(git remote get-url --push origin)
 
         git fetch upstream
 

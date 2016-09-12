@@ -22,9 +22,6 @@ can.Control('CMS.Controllers.InfoPin', {
     } else {
       view = this.options.view;
     }
-    if (instance.info_pane_preload) {
-      instance.info_pane_preload();
-    }
     return view;
   },
   findOptions: function (el) {
@@ -59,7 +56,7 @@ can.Control('CMS.Controllers.InfoPin', {
     this.element.animate({
       height: 0
     }, {
-      duation: 800,
+      duration: 800,
       complete: function () {
         this.element.html('');
         $('.cms_controllers_tree_view_node').removeClass('active');
@@ -87,6 +84,10 @@ can.Control('CMS.Controllers.InfoPin', {
       result: options.result,
       page_instance: GGRC.page_instance()
     }));
+
+    if (instance.info_pane_preload) {
+      instance.info_pane_preload();
+    }
 
     // Load trees inside info pin
     this.loadChildTrees();

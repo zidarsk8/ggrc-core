@@ -12,6 +12,7 @@ from ggrc.converters.handlers import list_handlers
 from ggrc.converters.handlers import related_person
 from ggrc.converters.handlers import request
 from ggrc.converters.handlers import template
+from ggrc.converters.handlers import document
 from ggrc.extensions import get_extension_modules
 
 GGRC_COLUMN_HANDLERS = {
@@ -45,7 +46,6 @@ GGRC_COLUMN_HANDLERS = {
     "owners": handlers.OwnerColumnHandler,
     "principal_assessor": handlers.UserColumnHandler,
     "program": handlers.ProgramColumnHandler,
-    "program_mapped": handlers.ObjectPersonColumnHandler,
     "recipients": list_handlers.ValueListHandler,
     "reference_url": handlers.TextColumnHandler,
     "related_assessors": related_person.RelatedAssessorsColumnHandler,
@@ -57,8 +57,10 @@ GGRC_COLUMN_HANDLERS = {
     "report_start_date": handlers.DateColumnHandler,
     "request": handlers.RequestColumnHandler,
     "request_audit": handlers.RequestAuditColumnHandler,
+    "request_evidence": document.DocumentEvidenceHandler,
     "request_status": request.RequestStatusColumnHandler,
     "request_type": handlers.RequestTypeColumnHandler,
+    "request_url": document.DocumentUrlHandler,
     "requested_on": handlers.DateColumnHandler,
     "secondary_assessor": handlers.UserColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,

@@ -76,7 +76,7 @@ There may also be a customized `src/ggrc/settings/<something>.py` file, for exam
 | COMPANY                   | This is the company name shown in the “Copyright” footer at the bottom of each page
 | COMPANY_LOGO              | If specified, this is an image to be displayed in the top-left corner of each page.
 | COMPANY_LOGO_TEXT         | If COMPANY_LOGO is not set, this (text) value is used instead of an image in the top-left corner of each page.
-| SQLALCHEMY_RECORD_QUERIES | This flag causes all queries to be recorded in the App Engine logs.  This is useful for debugging purposes.
+| SQLALCHEMY_RECORD_QUERIES | This setting causes queries to be reported in the App Engine logs. Possible options are: 'count' - only the number of queries is logged, 'slow' - only slow queries are logged, 'all' - all queries are logged.  This is useful for debugging purposes.
 | CALENDAR_MECHANISM | If True, Workflow includes Google Calendar integration
         
 

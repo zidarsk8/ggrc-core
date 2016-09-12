@@ -4,10 +4,9 @@
 }}
 
 <custom-attributes instance="instance">
-  {{^loading}}
     {{#if instance.custom_attribute_definitions.length}}
       <div class="row-fluid wrap-row">
-      {{#getValues}}
+      {{#items}}
         <div class="span6">
           <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
             <inline-edit
@@ -21,7 +20,7 @@
               values="cad.values"
               title="cad.title"
               label="cad.label"
-              type="type"
+              type="{{type}}"
               mandatory="cad.mandatory"
               placeholder="cad.placeholder"
               helptext="cad.helptext"
@@ -31,8 +30,7 @@
             ></inline-edit>
           </div>
         </div>
-      {{/getValues}}
+      {{/items}}
       </div>
     {{/if}}
-  {{/loading}}
 </custom-attributes>

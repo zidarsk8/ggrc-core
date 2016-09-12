@@ -7,8 +7,7 @@
   {{^if isSaving}}
       <a class="btn btn-success btn-small pull-right" can-click="save">Add</a>
       <label class="input--inline pull-right">
-          <input type="checkbox" name="send_notification"
-                 {{#parent_instance.send_by_default}}checked{{/parent_instance.send_by_default}}>
+          <input type="checkbox" name="send_notification" can-value="comment.checked">
           Send Notifications
       </label>
   {{/if}}

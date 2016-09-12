@@ -1,14 +1,33 @@
 /*!
-  Copyright (C) 2016 Google Inc.
-  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 (function ($, GGRC, moment, Permission) {
+  var customAttributesType = {
+    Text: 'input',
+    'Rich Text': 'text',
+    'Map:Person': 'person',
+    Date: 'date',
+    Input: 'input',
+    Checkbox: 'checkbox',
+    Dropdown: 'dropdown'
+  };
   /**
    * A module containing various utility functions.
    */
   GGRC.Utils = {
     win: window,
+    sortingHelpers: {
+      commentSort: function (a, b) {
+        if (a.created_at < b.created_at) {
+          return 1;
+        } else if (a.created_at > b.created_at) {
+          return -1;
+        }
+        return 0;
+      }
+    },
     inViewport: function (el) {
       var bounds;
       var isVisible;
@@ -160,7 +179,6 @@
       }
       return result;
     },
-
     /**
      * Determine if two types of models can be mapped
      *
@@ -261,10 +279,18 @@
       if (target instanceof can.Model) {
         canMap = canMap &&
           (Permission.is_allowed_for('update', target) ||
-           targetType === 'Person' ||
-           _.contains(createContexts, targetContext));
+          targetType === 'Person' ||
+          _.contains(createContexts, targetContext));
       }
       return canMap;
+    },
+    /**
+     * Return normalized Custom Attribute Type from Custom Attribute Definition
+     * @param {String} type - String Custom Attribute Value from JSON
+     * @return {String} - Normalized Custom Attribute Type
+     */
+    mapCAType: function (type) {
+      return customAttributesType[type] || 'input';
     },
     isEmptyCA: function (value, type) {
       var result = false;
@@ -279,9 +305,9 @@
           return _.isEmpty(value);
         }
       };
-      if (types.indexOf(type) >= 0 && options[type]) {
+      if (types.indexOf(type) > -1 && options[type]) {
         result = options[type](value);
-      } else if (types.indexOf(type) >= 0) {
+      } else if (types.indexOf(type) > -1) {
         result = _.isEmpty(value);
       }
       return result;
@@ -357,4 +383,114 @@
       return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
     }
   };
+
+  /**
+   * Util methods for work with QueryAPI.
+   */
+  GGRC.Utils.QueryAPI = (function () {
+    /**
+     * @typedef LimitArray
+     * @type {array}
+     * @property {number} 0  - Lower bound is inclusive.
+     * @property {number} 1  - Upper bound is exclusive.
+     */
+
+    /**
+     * @typedef QueryAPIRequest
+     * @type {Object}
+     * @property {string} object_name - The name of object
+     * @property {LimitArray} limit - The boundaries of the requested values.
+     * @property {object} filters - Filter properties
+     */
+
+    /**
+     * Build params for request on Query API.
+     *
+     * @param {String} objName - Name of requested object
+     * @param {Object} page - Information about page state.
+     * @param {Number} page.current - Current page
+     * @param {Number} page.pageSize - Page size
+     * @param {String} page.sortBy - sortBy
+     * @param {String} page.sortDirection - sortDirection
+     * @param {String} page.filter - Filter string
+     * @param {Object} relevant - Information about relevant object
+     * @param {Object} relevant.type - Type of relevant object
+     * @param {Object} relevant.id - Id of relevant object
+     * @param {Object} relevant.operation - Type of operation.
+     * @return {QueryAPIRequest} Array of QueryAPIRequest
+     */
+    function buildParams(objName, page, relevant) {
+      var first;
+      var last;
+      var params = {};
+
+      if (!objName) {
+        return;
+      }
+
+      params.object_name = objName;
+      params.filters = _makeFilter(page.filter, relevant);
+
+      if (page.current && page.pageSize) {
+        first = (page.current - 1) * page.pageSize;
+        last = page.current * page.pageSize;
+        params.limit = [first, last];
+      }
+      if (page.sortBy) {
+        params.order_by = [{
+          name: page.sortBy,
+          desc: page.sortDirection === 'desc'
+        }];
+      }
+      return [params];
+    }
+
+    /**
+     * Params for request on Query API
+     * @param {Object} params - Params for request
+     * @param {Object} params.headers - Custom headers for request.
+     * @param {Object} params.data - Object with parameters on Query API needed.
+     * @return {Promise} Promise on Query API request.
+     */
+    function makeRequest(params) {
+      return $.ajax({
+        type: 'POST',
+        headers: $.extend({
+          'Content-Type': 'application/json'
+        }, params.headers || {}),
+        url: '/query',
+        data: JSON.stringify(params.data || [])
+      });
+    }
+
+    function _makeFilter(filter, relevant) {
+      var relevantFilter;
+      var filters;
+      var left;
+
+      if (relevant) {
+        relevantFilter = '#' + relevant.type + ',' + relevant.id + '#';
+        left = GGRC.query_parser.parse(relevantFilter || '');
+
+        if (relevant.operation &&
+          relevant.operation !== left.expression.op.name) {
+          left.expression.op.name = relevant.operation;
+        }
+        if (filter) {
+          filters = GGRC.query_parser.join_queries(left,
+            GGRC.query_parser.parse(filter));
+        } else {
+          filters = left;
+        }
+      } else {
+        filters = {expression: {}};
+      }
+      return filters;
+    }
+
+    return {
+      buildParams: buildParams,
+      makeRequest: makeRequest
+    };
+  })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

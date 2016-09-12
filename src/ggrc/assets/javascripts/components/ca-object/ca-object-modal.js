@@ -7,7 +7,7 @@
   'use strict';
 
   var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/modal/attachments.mustache');
+    '/components/ca-object/ca-object-modal.mustache');
   var baseCls = 'attachment-modal';
 
   function recalculatePosition(el) {
@@ -20,60 +20,61 @@
     return {top: top, left: left};
   }
 
-  GGRC.Components('assessmentModalAttachments', {
-    tag: 'assessment-modal-attachments',
+  GGRC.Components('customAttributeObjectModal', {
+    tag: 'ca-object-modal',
     template: tpl,
     scope: {
       instance: null,
       modifiedField: null,
-      modalCls: '',
-      modalOverlayCls: '',
       modalEl: null,
+      modalCls: function () {
+        return this.attr('state.open') ? baseCls + '-open' : '';
+      },
+      modalOverlayCls: function () {
+        return this.attr('state.open') ? baseCls + '__overlay-open' : '';
+      },
+      actionBtnText: function () {
+        return this.attr('comment') ? 'Save' : 'Done';
+      },
+      isEmpty: function () {
+        return this.attr('state.empty') && this.attr('comment');
+      },
+      isPerson: function () {
+        return this.attr('modifiedField.value') &&
+          this.attr('modifiedField.type') === 'person';
+      },
       comment: false,
       evidence: false,
-      isPerson: false,
       state: {
         open: false,
         save: false,
-        empty: false,
+        empty: true,
         controls: false
       },
-      applyState: function () {
-        this.toggle(this.attr('state.open'));
-      },
       saveAttachments: function () {
-        this.attr('state.save', true);
+        return this.attr('comment') ?
+          this.attr('state.save', true) :
+          this.attr('state.open', false);
       },
       hide: function hide() {
         this.attr('state.open', false);
         this.attr('state.save', false);
+        this.attr('state.empty', true);
       },
       show: function () {
         this.attr('state.open', true);
         this.attr('state.save', false);
+        this.attr('state.empty', true);
       },
       toggle: function (isOpen) {
-        var modal;
-        var isPerson =
-          this.attr('modifiedField.value') &&
-          this.attr('modifiedField.type') === 'person';
-
         this.setAttachmentFields(isOpen);
-        this.attr('modalCls', isOpen ? baseCls + '-open' : '');
-        this.attr('modalOverlayCls', isOpen ? baseCls + '__overlay-open' : '');
-        this.attr('isPerson', isPerson);
-
-        if (isOpen && this.attr('modalEl')) {
-          modal = this.attr('modalEl');
-          modal.offset(recalculatePosition(modal));
-        }
-
-        if (this.attr('comment')) {
-          this.attr('state.empty', true);
-        }
+        this.setPosition(isOpen);
+      },
+      mapToInternal: function () {
+        this.attr('modifiedField', this.attr('modal'));
       },
       setAttachmentFields: function (isOpen) {
-        var attachments = this.attr('modifiedField.requiredAttachments');
+        var attachments = this.attr('modifiedField.fields');
 
         if (attachments && attachments.length) {
           attachments.forEach(function (item) {
@@ -81,8 +82,11 @@
           }.bind(this));
         }
       },
-      mapToInternal: function () {
-        this.attr('modifiedField', this.attr('instance._modifiedAttribute'));
+      setPosition: function (isOpen) {
+        var modal = this.attr('modalEl');
+        if (isOpen && modal) {
+          modal.offset(recalculatePosition(modal));
+        }
       }
     },
     events: {
@@ -98,15 +102,13 @@
           this.scope.show();
         }
       },
-      '{scope.instance._modifiedAttribute} showModal': 'show',
-      '{scope.state} open': function () {
-        this.scope.applyState();
-      }
-    },
-    helpers: {
-      renderFieldValue: function (value) {
-        value = value();
-        return value || '<span class="empty-message">None</span>';
+      '{scope.modal} open': 'show',
+      '{scope.state} open': function (scope, ev, val) {
+        this.scope.toggle(val);
+      },
+      '{window} resize': function () {
+        var isOpen = this.scope.attr('modifiedField.open');
+        this.scope.setPosition(isOpen);
       }
     }
   });

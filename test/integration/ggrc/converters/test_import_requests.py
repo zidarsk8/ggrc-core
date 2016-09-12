@@ -5,8 +5,6 @@
 
 """Test request import and updates."""
 
-from nose.plugins import skip
-
 from ggrc import models
 from ggrc.converters import errors
 from integration.ggrc import converters
@@ -64,11 +62,7 @@ class TestRequestImport(converters.TestCase):
     """
     filename = "request_full_no_warnings.csv"
     response = self.import_file(filename)
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-
-    for response_block in response:
-      for message in messages:
-        self.assertEqual(set(), set(response_block[message]))
+    self._check_csv_response(response, {})
 
     # Test first request line in the CSV file
     request_1 = models.Request.query.filter_by(slug="Request 1").first()
@@ -108,29 +102,21 @@ class TestRequestImport(converters.TestCase):
     """
     self.import_file("request_full_no_warnings.csv")
     response = self.import_file("request_update_intermediate.csv")
-    message_types = (
-        "block_errors",
-        "block_warnings",
-        "row_errors",
-        "row_warnings"
-    )
 
-    messages = {
-        "block_errors": set(),
-        "block_warnings": set(),
-        "row_errors": set(),
-        "row_warnings": set([
-            errors.REQUEST_INVALID_STATE.format(line=5),
-            errors.REQUEST_INVALID_STATE.format(line=6),
-            errors.REQUEST_INVALID_STATE.format(line=11),
-            errors.REQUEST_INVALID_STATE.format(line=12),
-        ]),
+    expected_errors = {
+        "Request": {
+            "block_errors": set(),
+            "block_warnings": set(),
+            "row_errors": set(),
+            "row_warnings": set([
+                errors.REQUEST_INVALID_STATE.format(line=5),
+                errors.REQUEST_INVALID_STATE.format(line=6),
+                errors.REQUEST_INVALID_STATE.format(line=11),
+                errors.REQUEST_INVALID_STATE.format(line=12),
+            ]),
+        }
     }
-
-    for message_type in message_types:
-      self.assertEqual(len(set(response[0][message_type])),
-                       len(response[0][message_type]))
-      self.assertEqual(set(response[0][message_type]), messages[message_type])
+    self._check_csv_response(response, expected_errors)
 
     requests = {r.slug: r for r in models.Request.query.all()}
     self.assertEqual(requests["Request 60"].status, models.Request.START_STATE)
@@ -146,7 +132,15 @@ class TestRequestImport(converters.TestCase):
     self.assertEqual(requests["Request 4"].status,
                      models.Request.PROGRESS_STATE)
 
-  @skip.SkipTest
+    # Check that there is only one attachment left
+    request1 = requests["Request 1"]
+    self.assertEqual(len(request1.documents), 1)
+
+    # Check that there are only the two new URLs present in request 1
+    url_titles = set(obj.title for obj in request1.related_objects()
+                     if isinstance(obj, models.Document))
+    self.assertEqual(url_titles, set(["a.b.com", "c.d.com"]))
+
   def test_request_warnings_errors(self):
     """ Test full request import with warnings and errors
 
@@ -155,55 +149,55 @@ class TestRequestImport(converters.TestCase):
     """
     self.import_file("request_full_no_warnings.csv")
     response = self.import_file("request_with_warnings_and_errors.csv")
-    message_types = (
-        "block_errors",
-        "block_warnings",
-        "row_errors",
-        "row_warnings"
-    )
 
-    messages = {
-        "block_errors": set([]),
-        "block_warnings": set([
-            errors.UNKNOWN_COLUMN.format(
-                line=2,
-                column_name="error description - non existing column will be "
-                "ignored"
-            ),
-            errors.UNKNOWN_COLUMN.format(
-                line=2,
-                column_name="actual error ""message"
-            ),
-        ]),
-        "row_errors": set([
-            errors.UNKNOWN_OBJECT.format(
-                line=18,
-                object_type="Audit",
-                slug="not existing"
-            ),
-            errors.DUPLICATE_VALUE_IN_CSV.format(
-                line_list="19, 21",
-                column_name="Code",
-                value="Request 22",
-                s="",
-                ignore_lines="21",
-            ),
-        ]),
-        "row_warnings": set([
-            errors.UNKNOWN_USER_WARNING.format(
-                line=14,
-                email="non_existing@a.com",
+    expected_errors = {
+        "Request": {
+            "block_errors": set([]),
+            "block_warnings": set([
+                errors.UNKNOWN_COLUMN.format(
+                    line=2,
+                    column_name="error description - non existing column will "
+                    "be ignored"
+                ),
+                errors.UNKNOWN_COLUMN.format(
+                    line=2,
+                    column_name="actual error message"
+                ),
+            ]),
+            "row_errors": set([
+                errors.UNKNOWN_OBJECT.format(
+                    line=18,
+                    object_type="Audit",
+                    slug="not existing"
+                ),
+                errors.DUPLICATE_VALUE_IN_CSV.format(
+                    line_list="19, 21",
+                    column_name="Code",
+                    value="Request 22",
+                    s="",
+                    ignore_lines="21",
+                ),
+            ]),
+            "row_warnings": set([
+                errors.UNKNOWN_USER_WARNING.format(
+                    line=14,
+                    email="non_existing@a.com",
 
-            ),
-            errors.UNKNOWN_OBJECT.format(
-                line=14,
-                object_type="Project",
-                slug="proj-55"
-            ),
-        ]),
+                ),
+                errors.UNKNOWN_OBJECT.format(
+                    line=14,
+                    object_type="Project",
+                    slug="proj-55"
+                ),
+                errors.REQUEST_INVALID_STATE.format(line=20),
+                errors.REQUEST_INVALID_STATE.format(line=21),
+                errors.WRONG_REQUIRED_VALUE.format(
+                    line=19,
+                    column_name="Status",
+                    value="open",
+                ),
+                errors.WRONG_VALUE.format(line=3, column_name="Url"),
+            ]),
+        }
     }
-
-    for message_type in message_types:
-      self.assertEqual(len(set(response[0][message_type])),
-                       len(response[0][message_type]))
-      self.assertEqual(set(response[0][message_type]), messages[message_type])
+    self._check_csv_response(response, expected_errors)

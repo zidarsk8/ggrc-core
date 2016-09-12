@@ -7,14 +7,19 @@
 
 import datetime
 import collections
+
+import flask
 from sqlalchemy import and_
+from sqlalchemy import case
 from sqlalchemy import not_
 from sqlalchemy import or_
+from sqlalchemy import orm
 
+from ggrc import db
+from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.rbac import permissions
+from ggrc import models
 from ggrc.models.custom_attribute_value import CustomAttributeValue
-from ggrc.models.custom_attribute_definition import \
-    CustomAttributeDefinition as CAD
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
@@ -39,7 +44,6 @@ class QueryHelper(object):
       object_name: search class name,
       permissions: either read or update, if none are given it defaults to read
       order_by: [
-        Note: only the first order_by list item is processed
         {
           "name": the name of the field by which to do the sorting
           "desc": optional; if True, invert the sorting order
@@ -110,31 +114,12 @@ class QueryHelper(object):
           filter_name = value.get("filter_by", None)
           if filter_name is not None:
             filter_by = getattr(object_class, filter_name, None)
-          value = value["display_name"]
-        if value:
-          self.attr_name_map[object_class][value.lower()] = (key.lower(),
-                                                             filter_by)
-      if not self.ca_disabled:
-        custom_attrs = AttributeInfo.get_custom_attr_definitions(
-            object_class)
-      else:
-        custom_attrs = {}
-
-      for key, definition in custom_attrs.items():
-        if not key.startswith("__custom__:") or \
-           "display_name" not in definition:
-          continue
-        try:
-          # Global custom attribute definition can only have a single id on
-          # their name, so it is safe for that. Currently the filters do not
-          # work with object level custom attributes.
-          attr_id = definition["definition_ids"][0]
-        except KeyError:
-          continue
-        filter_by = CustomAttributeValue.mk_filter_by_custom(object_class,
-                                                             attr_id)
-        name = definition["display_name"].lower()
-        self.attr_name_map[object_class][name] = (name, filter_by)
+          name = value["display_name"]
+        else:
+          name = value
+        if name:
+          self.attr_name_map[object_class][name.lower()] = (key.lower(),
+                                                            filter_by)
 
   def _clean_query(self, query):
     """ sanitize the query object """
@@ -234,9 +219,8 @@ class QueryHelper(object):
     """
     for object_query in self.query:
       objects = self._get_objects(object_query)
-      objects = self._apply_order_by_and_limit(
+      objects = self._apply_limit(
           objects,
-          order_by=object_query.get("order_by"),
           limit=object_query.get("limit"),
       )
       object_query["ids"] = [o.id for o in objects]
@@ -259,6 +243,12 @@ class QueryHelper(object):
     )
     if filter_expression is not None:
       query = query.filter(filter_expression)
+    if object_query.get("order_by"):
+      query = self._apply_order_by(
+          object_class,
+          query,
+          object_query["order_by"],
+      )
     requested_permissions = object_query.get("permissions", "read")
     if requested_permissions == "update":
       objs = [o for o in query if permissions.is_allowed_update_for(o)]
@@ -267,34 +257,113 @@ class QueryHelper(object):
 
     return objs
 
-  @staticmethod
-  def _apply_order_by_and_limit(objects, order_by=None, limit=None):
-    """Order objects and apply limits for pagination.
+  def _apply_order_by(self, model, query, order_by):
+    """Add ordering parameters to a query for objects.
+
+    This works only on direct model properties and related objects defined with
+    foreign keys and fails if any CAs are specified in order_by.
 
     Args:
-      objects: a list of objects to sort and limit;
+      model: the model instances of which are requested in query;
+      query: a query to get objects from the db;
       order_by: a list of dicts with keys "name" (the name of the field by which
-                to sort) and "desc" (optional; do reverse sort if True);
-      limit: a tuple of indexes in format (from, to); objects is sliced to
-             objects[from, to]
+                to sort) and "desc" (optional; do reverse sort if True).
+
+    If order_by["name"] == "__similarity__" (a special non-field value),
+    similarity weights returned by get_similar_objects_query are used for
+    sorting.
+
+    If sorting by a relationship field is requested, the following sorting is
+    applied:
+    1. If the field is a relationship to a Titled model, sort by its title.
+    2. If the field is a relationship to Person, sort by its name or email (if
+       name is None or empty string for a person object).
+    3. Otherwise, raise a NotImplementedError.
 
     Returns:
-      a sorted and sliced list of objects
+      the query with sorting parameters.
     """
-    if order_by:
-      try:
-        # Note: currently we sort only by the first column from the list
-        order_by = order_by[0]
-        order_field = order_by["name"]
-        order_desc = order_by.get("desc", False)
-        objects = sorted(
-            objects,
-            key=lambda obj: getattr(obj, order_field),
-            reverse=order_desc,
-        )
-      except:
-        raise BadQueryException("Bad query: Invalid 'order_by' parameter")
+    def join_and_order(clause):
+      """Get join operation and ordering field from item of order_by list.
 
+      Args:
+        clause: {"name": the name of model's field,
+                 "desc": reverse sort on this field if True}
+
+      Returns:
+
+        (join, order) - a tuple of join required for this ordering to work and
+                        ordering clause itself;
+                        join is None if no join required or
+                        (aliased entity, relationship field) if join required.
+      """
+      join = None
+      order = None
+
+      # transform clause["name"] into a model's field name
+      key = clause["name"].lower()
+
+      if key == "__similarity__":
+        # special case
+        if hasattr(flask.g, "similar_objects_query"):
+          join_target = flask.g.similar_objects_query.subquery()
+          join_condition = model.id == join_target.c.id
+          join = join_target, join_condition
+          order = join_target.c.weight
+        else:
+          raise BadQueryException("Can't order by '__similarity__' when no ",
+                                  "'similar' filter was applied.")
+      else:
+        key, _ = self.attr_name_map[model].get(key, (key, None))
+        attr = getattr(model, key, None)
+        if attr is None:
+          raise BadQueryException("Model '{model.__name__}' does not have "
+                                  "'{key}' attribute"
+                                  .format(model=model, key=key))
+        if (isinstance(attr, orm.attributes.InstrumentedAttribute) and
+                isinstance(attr.property, orm.properties.RelationshipProperty)):
+          # a relationship
+          related_model = attr.property.mapper.class_
+          if issubclass(related_model, models.mixins.Titled):
+            join = alias, _ = orm.aliased(attr), attr
+            order = alias.title
+          elif issubclass(related_model, models.Person):
+            join = alias, _ = orm.aliased(attr), attr
+            order = case([(not_(or_(alias.name.is_(None), alias.name == '')),
+                           alias.name)],
+                         else_=alias.email)
+          else:
+            raise NotImplementedError("Sorting by {model.__name__} is "
+                                      "not implemented yet."
+                                      .format(model=related_model))
+        else:
+          # a simple attribute
+          order = attr
+
+      if clause.get("desc", False):
+        order = order.desc()
+
+      return join, order
+
+    joins, orders = zip(*[join_and_order(clause) for clause in order_by])
+    for join in joins:
+      if join is not None:
+        query = query.outerjoin(*join)
+
+    return query.order_by(*orders)
+
+  @staticmethod
+  def _apply_limit(objects, limit):
+    """Apply limits for pagination.
+
+    Args:
+      objects: a list of objects to limit;
+      limit: a tuple of indexes in format (from, to); objects is sliced to
+             objects[from, to].
+
+    Returns:
+      a sliced list of objects.
+    """
     if limit:
       try:
         from_, to_ = limit
@@ -340,23 +409,61 @@ class QueryHelper(object):
           )
       )
 
+    def similar():
+      """Filter by relationships similarity."""
+      similar_class = self.object_map[exp["object_name"]]
+      if not hasattr(similar_class, "get_similar_objects_query"):
+        return BadQueryException("{} does not define weights to count "
+                                 "relationships similarity"
+                                 .format(similar_class.__name__))
+      similar_objects_query = similar_class.get_similar_objects_query(
+          id_=exp["id"],
+          types=[object_class.__name__],
+      )
+      flask.g.similar_objects_query = similar_objects_query
+      similar_objects = similar_objects_query.all()
+      return object_class.id.in_([obj.id for obj in similar_objects])
+
     def unknown():
       raise BadQueryException("Unknown operator \"{}\""
                               .format(exp["op"]["name"]))
+
+    def default_filter_by(object_class, key, predicate):
+      """Default filter option that tries to mach predicate in fulltext index.
+
+      This function tries to match the predicate for a give key with entries in
+      the full text index table. The key is matched to record tags and as
+      the tags only contain custom attribute names, so this filter currently
+      only works on custom attributes.
+
+      Args:
+        object_class: class of the object we are querying for.
+        key: string containing attribute name on which we are filtering.
+        predicate: function containing the correct comparison predicate for
+          the attribute value.
+
+      Returs:
+        Query predicate if the given predicate matches a value for the correct
+          custom attribute.
+      """
+      return object_class.id.in_(db.session.query(Record.key).filter(
+              Record.type == object_class.__name__,
+              Record.tags == key,
+              predicate(Record.content)
+          ))
 
     def with_key(key, p):
       key = key.lower()
       key, filter_by = self.attr_name_map[
           object_class].get(key, (key, None))
-      if hasattr(filter_by, "__call__"):
+      if callable(filter_by):
         return filter_by(p)
       else:
         attr = getattr(object_class, key, None)
-        if attr is None:
-          raise BadQueryException("Bad query: object '{}' does "
-                                  "not have attribute '{}'."
-                                  .format(object_class.__name__, key))
-        return p(attr)
+        if attr:
+          return p(attr)
+        else:
+          return default_filter_by(object_class, key, p)
 
     with_left = lambda p: with_key(exp["left"], p)
 
@@ -394,7 +501,8 @@ class QueryHelper(object):
         "<": lambda: with_left(lambda l: l < rhs()),
         ">": lambda: with_left(lambda l: l > rhs()),
         "relevant": relevant,
-        "text_search": text_search
+        "text_search": text_search,
+        "similar": similar,
     }
 
     return ops.get(exp["op"]["name"], unknown)()

@@ -38,11 +38,6 @@
                   context: object.context || {id: null},
                   documentable: object,
                   document: doc
-                }).save(),
-                new CMS.Models.ObjectFile({
-                  context: object.context || {id: null},
-                  file: file,
-                  fileable: doc
                 }).save()
               ]);
             });

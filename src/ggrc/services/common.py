@@ -190,28 +190,28 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
 
   context.cache_manager = _get_cache_manager()
 
-  if len(modified_objects.new) > 0:
-    memcache_mark_for_deletion(context, modified_objects.new.items())
+  if modified_objects is not None:
+    if len(modified_objects.new) > 0:
+      memcache_mark_for_deletion(context, modified_objects.new.items())
 
-  if len(modified_objects.dirty) > 0:
-    memcache_mark_for_deletion(context, modified_objects.dirty.items())
+    if len(modified_objects.dirty) > 0:
+      memcache_mark_for_deletion(context, modified_objects.dirty.items())
 
-  if len(modified_objects.deleted) > 0:
-    memcache_mark_for_deletion(context, modified_objects.deleted.items())
+    if len(modified_objects.deleted) > 0:
+      memcache_mark_for_deletion(context, modified_objects.deleted.items())
 
   status_entries = {}
   for key in context.cache_manager.marked_for_delete:
     build_cache_status(status_entries, 'DeleteOp:' + key,
                        expiry_time, 'InProgress')
   if len(status_entries) > 0:
-    current_app.logger.info("CACHE: status entries: " + str(status_entries))
+    current_app.logger.info("CACHE: status entries: %s", str(status_entries))
     ret = context.cache_manager.bulk_add(status_entries, expiry_time)
     if ret is not None and len(ret) == 0:
       pass
     else:
       current_app.logger.error(
-          'CACHE: Unable to add status for newly created entries ' +
-          str(ret))
+          'CACHE: Unable to add status for newly created entries %s', str(ret))
 
 
 def update_memcache_after_commit(context):
@@ -323,15 +323,16 @@ def log_event(session, obj=None, current_user_id=None, flush=True):
   if current_user_id is None:
     current_user_id = get_current_user_id()
   cache = get_cache()
-  for o in cache.dirty:
-    revision = Revision(o, current_user_id, 'modified', o.log_json())
-    revisions.append(revision)
-  for o in cache.deleted:
-    revision = Revision(o, current_user_id, 'deleted', o.log_json())
-    revisions.append(revision)
-  for o in cache.new:
-    revision = Revision(o, current_user_id, 'created', o.log_json())
-    revisions.append(revision)
+  if cache:
+    for obj_ in cache.dirty:
+      revision = Revision(obj_, current_user_id, 'modified', obj_.log_json())
+      revisions.append(revision)
+    for obj_ in cache.deleted:
+      revision = Revision(obj_, current_user_id, 'deleted', obj_.log_json())
+      revisions.append(revision)
+    for obj_ in cache.new:
+      revision = Revision(obj_, current_user_id, 'created', obj_.log_json())
+      revisions.append(revision)
   if obj is None:
     resource_id = 0
     resource_type = None
@@ -788,23 +789,30 @@ class Resource(ModelView):
 
   def validate_headers_for_put_or_delete(self, obj):
     """rfc 6585 defines a new status code for missing required headers"""
-    required_headers = set(['If-Match', 'If-Unmodified-Since'])
+    required_headers = set(["If-Match", "If-Unmodified-Since"])
     missing_headers = required_headers.difference(
         set(self.request.headers.keys()))
     if missing_headers:
-      return current_app.make_response(
-          ('required headers: ' + ', '.join(missing_headers),
-           428, [('Content-Type', 'text/plain')]))
-
-    if request.headers['If-Match'] != etag(self.object_for_json(obj)) or \
-        request.headers['If-Unmodified-Since'] != \
-            self.http_timestamp(self.modified_at(obj)):
       return current_app.make_response((
-          'The resource could not be updated due to a conflict with the '
-          'current state on the server. Please resolve the conflict by '
-          'refreshing the resource.',
+          json.dumps({
+              "message": "Missing headers: " + ", ".join(missing_headers),
+          }),
+          428,
+          [("Content-Type", "application/json")],
+      ))
+
+    object_etag = etag(self.object_for_json(obj))
+    object_timestamp = self.http_timestamp(self.modified_at(obj))
+    if (request.headers["If-Match"] != object_etag or
+            request.headers["If-Unmodified-Since"] != object_timestamp):
+      return current_app.make_response((
+          json.dumps({
+              "message": "The resource could not be updated due to a conflict "
+                         "with the current state on the server. Please "
+                         "resolve the conflict by refreshing the resource.",
+          }),
           409,
-          [('Content-Type', 'text/plain')]
+          [("Content-Type", "application/json")]
       ))
     return None
 

@@ -9,9 +9,7 @@ from ggrc.models.mixins import Timeboxed
 from ggrc.models.deferred import deferred
 from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
-from ggrc.models.object_person import ObjectPerson
 from ggrc.models.object_person import Personable
-from ggrc.models.person import Person
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
@@ -55,11 +53,6 @@ class Program(HasObjectState, CustomAttributable, Documentable,
           "type": AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_program_reader",
       },
-      "program_mapped": {
-          "display_name": "No Access",
-          "type": AttributeInfo.Type.USER_ROLE,
-          "filter_by": "_filter_by_program_mapped",
-      },
   }
 
   @classmethod
@@ -73,14 +66,6 @@ class Program(HasObjectState, CustomAttributable, Documentable,
   @classmethod
   def _filter_by_program_reader(cls, predicate):
     return cls._filter_by_role("ProgramReader", predicate)
-
-  @classmethod
-  def _filter_by_program_mapped(cls, predicate):
-    return ObjectPerson.query.join(Person).filter(
-        (ObjectPerson.personable_type == "Program") &
-        (ObjectPerson.personable_id == cls.id) &
-        (predicate(Person.email) | predicate(Person.name))
-    ).exists()
 
   @classmethod
   def eager_query(cls):

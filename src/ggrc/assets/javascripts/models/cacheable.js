@@ -6,7 +6,8 @@
 // = require can.jquery-all
 
 (function (can) {
-  var makeFindRelated = function (thistype, othertype) {
+  var _oldAttr;
+  function makeFindRelated(thistype, othertype) {
     return function (params) {
       if (!params[thistype + '_type']) {
         params[thistype + '_type'] = this.shortName;
@@ -32,7 +33,7 @@
           });
         });
     };
-  };
+  }
 
   function dateConverter(date, oldValue, fn, key) {
     var conversion = 'YYYY-MM-DD\\THH:mm:ss\\Z';
@@ -54,18 +55,18 @@
       return undefined;
     }
 
-    if (typeof date === 'string' && ret
-        //  Don't correct timezone for dates
-        && !/^\d+-\d+-\d+$/.test(date) && !/^\d+\/\d+\/\d+$/.test(date)
-        //  Don't correct timezone if `moment.js` has already done it
-        && !/[-+]\d\d:?\d\d/.test(date)) {
+    if (typeof date === 'string' && ret &&
+      //  Don't correct timezone for dates
+        !/^\d+-\d+-\d+$/.test(date) && !/^\d+\/\d+\/\d+$/.test(date) &&
+      //  Don't correct timezone if `moment.js` has already done it
+        !/[-+]\d\d:?\d\d/.test(date)) {
       // Use the UTC offset that was active at the moment in time to correct
       // the date's timezone.
       ret.add(ret.utcOffset(), 'minute');
     }
 
-    if (oldValue && oldValue.getTime
-        && ret && ret.toDate().getTime() === oldValue.getTime()) {
+    if (oldValue && oldValue.getTime &&
+      ret && ret.toDate().getTime() === oldValue.getTime()) {
       // avoid changing to new Date object if the value is the same.
       return oldValue;
     }
@@ -82,7 +83,9 @@
   }
 
   function makeDateSerializer(type, key) {
-    var conversion = type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DD\\THH:mm:ss\\Z';
+    var conversion = type === 'date' ?
+      'YYYY-MM-DD' :
+      'YYYY-MM-DD\\THH:mm:ss\\Z';
     return function (date) {
       var retstr;
       var retval;
@@ -107,31 +110,31 @@
     };
   }
 
-can.Model('can.Model.Cacheable', {
-  root_object : '',
-  filter_keys: ['assignee', 'company', 'contact', 'description',
+  can.Model('can.Model.Cacheable', {
+    root_object: '',
+    filter_keys: ['assignee', 'company', 'contact', 'description',
                 'email', 'end_date', 'kind', 'name', 'notes',
                 'owners', 'reference_url', 'slug', 'status',
                 'start_date', 'test', 'title', 'updated_at', 'created_at',
                 'due_on'
   ],
-  filter_mappings: {
-    //'search term', 'actual value in the object'
-    'owner': 'owners',
-    'workflow': 'workflows',
-    'due date': 'end_date',
-    'end date': 'end_date',
-    'stop date': 'end_date',
-    'effective date': 'start_date',
-    'start date': 'start_date',
-    'created date': 'created_at',
-    'updated date': 'updated_at',
-    'modified date': 'updated_at',
-    'code': 'slug',
-    'state': 'status'
-  },
+    filter_mappings: {
+    // 'search term', 'actual value in the object'
+      'owner': 'owners',
+      'workflow': 'workflows',
+      'due date': 'end_date',
+      'end date': 'end_date',
+      'stop date': 'end_date',
+      'effective date': 'start_date',
+      'start date': 'start_date',
+      'created date': 'created_at',
+      'updated date': 'updated_at',
+      'modified date': 'updated_at',
+      'code': 'slug',
+      'state': 'status'
+    },
 
-  attr_list: [
+    attr_list: [
     {attr_title: 'Title', attr_name: 'title'},
     {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: 'contact.name|email'},
     {attr_title: 'Code', attr_name: 'slug'},
@@ -139,278 +142,250 @@ can.Model('can.Model.Cacheable', {
     {attr_title: 'Primary Contact', attr_name: 'contact', attr_sort_field: 'contact.name|email'},
     {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_sort_field: 'secondary_contact.name|email'},
     {attr_title: 'Last Updated', attr_name: 'updated_at'}
-  ],
+    ],
 
-  root_collection: '',
-  model_singular: '',
-  model_plural: '',
-  table_singular: '',
-  table_plural: '',
-  title_singular: '',
-  title_plural: '',
-  findOne : 'GET {href}',
+    root_collection: '',
+    model_singular: '',
+    model_plural: '',
+    table_singular: '',
+    table_plural: '',
+    title_singular: '',
+    title_plural: '',
+    findOne: 'GET {href}',
 
-  makeDestroy: function (destroy) {
-    return function(id, instance) {
-      return destroy(id).then(function(result) {
-        if ("background_task" in result) {
-          return CMS.Models.BackgroundTask.findOne(
+    makeDestroy: function (destroy) {
+      return function (id, instance) {
+        return destroy(id).then(function (result) {
+          if ('background_task' in result) {
+            return CMS.Models.BackgroundTask.findOne(
             {id: result.background_task.id}
-          ).then(function(task) {
+          ).then(function (task) {
             if (!task) {
               return;
             }
             return task.poll();
-          }).then(function() {
+          }).then(function () {
             return instance;
           });
-        } else {
-          return instance;
-        }
-      });
-    };
-  },
+          } else {
+            return instance;
+          }
+        });
+      };
+    },
 
-  makeFindAll: function (finder) {
-    return function (params, success, error) {
-      var deferred = $.Deferred();
-      var sourceDeferred = finder.call(this, params);
-      var self = this;
-      var tracker_stop = GGRC.Tracker.start('modelize', self.shortName);
+    makeFindAll: function (finder) {
+      return function (params, success, error) {
+        var deferred = $.Deferred();
+        var sourceDeferred = finder.call(this, params);
+        var self = this;
+        var tracker_stop = GGRC.Tracker.start('modelize', self.shortName);
 
-      deferred.then(success, error);
-      sourceDeferred.then(function(sourceData) {
-        var obsList = new self.List([]);
-        var index = 0;
+        deferred.then(success, error);
+        sourceDeferred.then(function (sourceData) {
+          var obsList = new self.List([]);
+          var index = 0;
 
-        if (sourceData[self.root_collection + '_collection']) {
-          sourceData = sourceData[self.root_collection + '_collection'];
-        }
-        if (sourceData[self.root_collection]) {
-          sourceData = sourceData[self.root_collection];
-        }
+          if (sourceData[self.root_collection + '_collection']) {
+            sourceData = sourceData[self.root_collection + '_collection'];
+          }
+          if (sourceData[self.root_collection]) {
+            sourceData = sourceData[self.root_collection];
+          }
 
-        if (!sourceData.splice) {
-          sourceData = [sourceData];
-        }
+          if (!sourceData.splice) {
+            sourceData = [sourceData];
+          }
 
-        function modelizeMS(ms) {
-          var item
+          function modelizeMS(ms) {
+            var item
             , start
             , instances = []
             ;
-          start = Date.now();
-          while(sourceData.length > index && (Date.now() - start) < ms) {
+            start = Date.now();
+            while (sourceData.length > index && (Date.now() - start) < ms) {
+              can.Observe.startBatch();
+              item = sourceData[index];
+              index = index + 1;
+              instances.push.apply(instances, self.models([item]));
+              can.Observe.stopBatch();
+            }
             can.Observe.startBatch();
-            item = sourceData[index];
-            index = index + 1;
-            instances.push.apply(instances, self.models([item]));
+            obsList.push.apply(obsList, instances);
             can.Observe.stopBatch();
           }
-          can.Observe.startBatch();
-          obsList.push.apply(obsList, instances);
-          can.Observe.stopBatch();
-        }
 
         // Trigger a setTimeout loop to modelize remaining objects
-        (function() {
-          modelizeMS(100);
-          if (sourceData.length > index) {
-            setTimeout(arguments.callee, 5);
-          }
-          else {
-            deferred.resolve(obsList);
-          }
-        })();
-      }, function() {
-        deferred.reject.apply(deferred, arguments);
-      });
+          (function () {
+            modelizeMS(100);
+            if (sourceData.length > index) {
+              setTimeout(arguments.callee, 5);
+            }
+            else {
+              deferred.resolve(obsList);
+            }
+          })();
+        }, function () {
+          deferred.reject.apply(deferred, arguments);
+        });
 
-      return deferred.done(tracker_stop);
-    };
-  },
-
-  setup: function (construct, name, statics, prototypes) {
-    var overrideFindAll = false;
-
-    if(this.fullName === 'can.Model.Cacheable') {
-      this.findAll = function() {
-        throw 'No default findAll() exists for subclasses of Cacheable';
+        return deferred.done(tracker_stop);
       };
-      this.findPage = function() {
-        throw 'No default findPage() exists for subclasses of Cacheable';
-      };
-    }
-    else if((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) {
-      if(this.root_collection) {
-        this.findAll = 'GET /api/' + this.root_collection;
-      } else {
-        overrideFindAll = true;
+    },
+
+    setup: function (construct, name, statics, prototypes) {
+      var overrideFindAll = false;
+
+      if (this.fullName === 'can.Model.Cacheable') {
+        this.findAll = function () {
+          throw 'No default findAll() exists for subclasses of Cacheable';
+        };
+        this.findPage = function () {
+          throw 'No default findPage() exists for subclasses of Cacheable';
+        };
       }
-    }
-    if(this.root_collection) {
-      this.model_plural = statics.model_plural || this.root_collection.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
-      this.title_plural = statics.title_plural || this.root_collection.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
-      this.table_plural = statics.table_plural || this.root_collection;
-    }
-    if(this.root_object) {
-      this.model_singular = statics.model_singular || this.root_object.replace(/(?:^|_)([a-z])/g, function(s, l) { return l.toUpperCase(); } );
-      this.title_singular = statics.title_singular || this.root_object.replace(/(^|_)([a-z])/g, function(s, u, l) { return (u ? " " : "") + l.toUpperCase(); } );
-      this.table_singular = statics.table_singular || this.root_object;
-    }
+      else if ((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) {
+        if (this.root_collection) {
+          this.findAll = 'GET /api/' + this.root_collection;
+        } else {
+          overrideFindAll = true;
+        }
+      }
+      if (this.root_collection) {
+        this.model_plural = statics.model_plural || this.root_collection.replace(/(?:^|_)([a-z])/g, function (s, l) { return l.toUpperCase(); });
+        this.title_plural = statics.title_plural || this.root_collection.replace(/(^|_)([a-z])/g, function (s, u, l) { return (u ? ' ' : '') + l.toUpperCase(); });
+        this.table_plural = statics.table_plural || this.root_collection;
+      }
+      if (this.root_object) {
+        this.model_singular = statics.model_singular || this.root_object.replace(/(?:^|_)([a-z])/g, function (s, l) { return l.toUpperCase(); });
+        this.title_singular = statics.title_singular || this.root_object.replace(/(^|_)([a-z])/g, function (s, u, l) { return (u ? ' ' : '') + l.toUpperCase(); });
+        this.table_singular = statics.table_singular || this.root_object;
+      }
 
-    if (!can.isFunction(this.findAll)) {
-      this.findPage = this.makeFindPage(this.findAll);
-    }
+      if (!can.isFunction(this.findAll)) {
+        this.findPage = this.makeFindPage(this.findAll);
+      }
 
     // Prevent event "bleeding" from other members of the Cacheable tree.
     // This fix causes breakages in places where we're expecting model class
     //  events not to be isolated (like in the LHN controller).
     //  I've submitted a fix to CanJS for this but it remains to be seen
     //  whether it gets in and when.  --BM 3/4/14
-    //this.__bindEvents = {};
+    // this.__bindEvents = {};
 
-    var that = this;
-    if(statics.mixins) {
-      can.each(statics.mixins, function(mixin) {
-        var _mixin = mixin;
-        if(typeof _mixin === 'string') {
-          _mixin = can.getObject(_mixin, CMS.Models.Mixins);
-        }
-        if(_mixin) {
-          _mixin.add_to(that);
-        } else {
-          throw 'Error: Cannot find mixin ' + mixin + ' for class ' + that.fullName;
+      var that = this;
+      if (statics.mixins) {
+        can.each(statics.mixins, function (mixin) {
+          var _mixin = mixin;
+          if (typeof _mixin === 'string') {
+            _mixin = can.getObject(_mixin, CMS.Models.Mixins);
+          }
+          if (_mixin) {
+            _mixin.add_to(that);
+          } else {
+            throw new Error('Error: Cannot find mixin ' +
+              mixin + ' for class ' + that.fullName);
+          }
+        });
+        delete this.mixins;
+      }
+
+      var ret = this._super.apply(this, arguments);
+      if (overrideFindAll)
+        this.findAll = can.Model.Cacheable.findAll;
+
+    // set up default attribute converters/serializers for all classes
+      can.extend(this.attributes, {
+        created_at: 'datetime',
+        updated_at: 'datetime'
+      });
+
+      return ret;
+    },
+
+    init: function () {
+      var id_key = this.id;
+      var _update = this.update;
+      var _create = this.create;
+      this.bind('created', function (ev, new_obj) {
+        var cache = can.getObject('cache', new_obj.constructor, true);
+        if (new_obj[id_key] || new_obj[id_key] === 0) {
+          cache[new_obj[id_key]] = new_obj;
+          if (cache[undefined] === new_obj)
+            delete cache[undefined];
         }
       });
-      delete this.mixins;
-    }
-
-    var ret = this._super.apply(this, arguments);
-    if(overrideFindAll)
-      this.findAll = can.Model.Cacheable.findAll;
-
-    //set up default attribute converters/serializers for all classes
-    can.extend(this.attributes, {
-      created_at : 'datetime'
-      , updated_at : 'datetime'
-    });
-
-    return ret;
-  },
-
-  init: function () {
-    var id_key = this.id;
-
-    this.bind('created', function(ev, new_obj) {
-      var cache = can.getObject('cache', new_obj.constructor, true);
-      if(new_obj[id_key] || new_obj[id_key] === 0) {
-        cache[new_obj[id_key]] = new_obj;
-        if(cache[undefined] === new_obj)
-          delete cache[undefined];
-      }
-    });
-    this.bind('destroyed', function(ev, old_obj) {
-      delete can.getObject('cache', old_obj.constructor, true)[old_obj[id_key]];
-    });
+      this.bind('destroyed', function (ev, old_obj) {
+        delete can.getObject('cache', old_obj.constructor, true)[old_obj[id_key]];
+      });
 
     // FIXME:  This gets set up in a chain of multiple calls to the function defined
     //  below when the update endpoint isn't set in the model's static config.
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
-    var _update = this.update;
-    this.update = function(id, params) {
-      var that = this,
-        ret = _update
+      this.update = function (id, params) {
+        var self = this;
+        var ret = _update
         .call(this, id, this.process_args(params))
         .then(
-          $.proxy(this, 'resolve_deferred_bindings')
-          , function(xhr, status, e) {
-            var dfd, obj, attrs, base_attrs,
-            orig_dfd = this;
-            if(xhr.status === 409) {
-              obj = that.findInCacheById(id);
-              attrs = obj.attr();
-              base_attrs = obj._backupStore;
-              return obj.refresh().then(function(obj) {
-                var conflict = false,
-                    remote_attrs = obj.attr();
-                if (can.Object.same(remote_attrs, attrs)) {
-                  //current state is same as server state -- do nothing.
-                  return obj;
-                } else if(can.Object.same(remote_attrs, base_attrs)) {
-                  //base state matches server state -- no incorrect expectations -- save.
-                  return obj.attr(attrs).save();
-                } else {
-                  //check what properties changed -- we can merge if the same prop wasn't changed on both
-                  can.each(base_attrs, function(val, key) {
-                    if (!can.Object.same(attrs[key], remote_attrs[key])) {
-                      if(can.Object.same(val, remote_attrs[key])) {
-                        obj.attr(key, attrs[key]);
-                      } else if (!can.Object.same(val, attrs[key])) {
-                        conflict = true;
-                      }
-                    }
-                  });
-                  if(conflict) {
-                    $(document.body).trigger('ajax:flash', {
-                      warning: 'There was a conflict while saving. Your changes have not yet been saved. please check any fields you were editing and try saving again'
-                    });
-                    return orig_dfd;
-                  } else {
-                    return obj.save();
-                  }
-                }
+          this.resolve_deferred_bindings.bind(this),
+          function (xhr) {
+            if (xhr.status === 409) {
+              $(document.body).trigger('ajax:flash', {
+                warning: 'There was a conflict while saving.' +
+                'Your changes have not yet been saved.' +
+                ' Please check any fields you were editing and try saving again'
               });
-            } else {
-              return xhr;
+              // TODO: we should show modal window here
+              return self.findInCacheById(id).refresh();
             }
+            return xhr;
           }
         );
-      delete ret.hasFailCallback;
-      return ret;
-    };
-
-    var _create = this.create;
-    this.create = function(params) {
-      var ret = _create
+        delete ret.hasFailCallback;
+        return ret;
+      };
+      this.create = function (params) {
+        var ret = _create
         .call(this, this.process_args(params))
-        .then($.proxy(this, 'resolve_deferred_bindings'));
-      delete ret.hasFailCallback;
-      return ret;
-    };
+        .then(this.resolve_deferred_bindings.bind(this));
+        delete ret.hasFailCallback;
+        return ret;
+      };
 
     // Register this type as a custom attributable type if it is one.
-    if(this.is_custom_attributable) {
-      if(!GGRC.custom_attributable_types) {
-        GGRC.custom_attributable_types = [];
+      if (this.is_custom_attributable) {
+        if (!GGRC.custom_attributable_types) {
+          GGRC.custom_attributable_types = [];
+        }
+        GGRC.custom_attributable_types.push(can.extend({}, this));
       }
-      GGRC.custom_attributable_types.push($.extend({}, this));
-    }
-  },
+    },
 
-  resolve_deferred_bindings: function (obj) {
-    var _pjs;
-    var refresh_dfds = [];
-    var dfds = [];
-    var dfds_apply;
-    if (obj._pending_joins && obj._pending_joins.length) {
-      _pjs = obj._pending_joins.slice(0); //refresh of bindings later will muck up the pending joins on the object
-      can.each(can.unique(can.map(_pjs, function(pj) { return pj.through; })), function(binding) {
-        refresh_dfds.push(obj.get_binding(binding).refresh_stubs());
-      });
+    resolve_deferred_bindings: function (obj) {
+      var _pjs;
+      var refresh_dfds = [];
+      var dfds = [];
+      var dfds_apply;
+      if (obj._pending_joins && obj._pending_joins.length) {
+        _pjs = obj._pending_joins.slice(0); // refresh of bindings later will muck up the pending joins on the object
+        can.each(can.unique(can.map(_pjs, function (pj) {
+          return pj.through;
+        })), function (binding) {
+          refresh_dfds.push(obj.get_binding(binding).refresh_stubs());
+        });
 
-      return $.when.apply($, refresh_dfds)
-      .then(function() {
-        can.each(obj._pending_joins, function(pj) {
+        return $.when.apply($, refresh_dfds)
+      .then(function () {
+        can.each(obj._pending_joins, function (pj) {
           var inst;
           var binding = obj.get_binding(pj.through);
           var model = (CMS.Models[binding.loader.model_name] ||
                        GGRC.Models[binding.loader.model_name]);
-          if(pj.how === 'add') {
-            //Don't re-add -- if the object is already mapped (could be direct or through a proxy)
+          if (pj.how === 'add') {
+            // Don't re-add -- if the object is already mapped (could be direct or through a proxy)
             // move on to the next one
-            if(_.includes(_.map(binding.list, 'instance'), pj.what) ||
+            if (_.includes(_.map(binding.list, 'instance'), pj.what) ||
                (binding.loader.option_attr &&
                 _.includes(_.map(binding.list, function (join_obj) {
                   return join_obj.instance[binding.loader.option_attr];
@@ -420,22 +395,22 @@ can.Model('can.Model.Cacheable', {
             inst = pj.what instanceof model
               ? pj.what
               : new model({
-                  context : obj.context
-                });
+                context: obj.context
+              });
             dfds.push(
               $.when(pj.what !== inst && pj.what.isNew() ? pj.what.save() : null)
-               .then(function() {
-                if(binding.loader.object_attr) {
-                  inst.attr(binding.loader.object_attr, obj.stub());
-                }
-                if(binding.loader.option_attr) {
-                  inst.attr(binding.loader.option_attr, pj.what.stub());
-                }
-                if(pj.extra) {
-                  inst.attr(pj.extra);
-                }
+               .then(function () {
+                 if (binding.loader.object_attr) {
+                   inst.attr(binding.loader.object_attr, obj.stub());
+                 }
+                 if (binding.loader.option_attr) {
+                   inst.attr(binding.loader.option_attr, pj.what.stub());
+                 }
+                 if (pj.extra) {
+                   inst.attr(pj.extra);
+                 }
                  return inst.save();
-              })
+               })
             );
           } else if (pj.how === 'update') {
             binding.list.forEach(function (bound_obj) {
@@ -451,12 +426,11 @@ can.Model('can.Model.Cacheable', {
                 });
               }
             });
-          } else if(pj.how === 'remove') {
-
-            can.map(binding.list, function(bound_obj) {
-              if(bound_obj.instance === pj.what || bound_obj.instance[binding.loader.option_attr] === pj.what) {
-                can.each(bound_obj.get_mappings(), function(mapping) {
-                  dfds.push(mapping.refresh().then(function() {
+          } else if (pj.how === 'remove') {
+            can.map(binding.list, function (bound_obj) {
+              if (bound_obj.instance === pj.what || bound_obj.instance[binding.loader.option_attr] === pj.what) {
+                can.each(bound_obj.get_mappings(), function (mapping) {
+                  dfds.push(mapping.refresh().then(function () {
                     mapping.destroy();
                   }));
                 });
@@ -470,155 +444,150 @@ can.Model('can.Model.Cacheable', {
         obj.attr('_pending_joins', []);
         obj.attr('_pending_joins_dfd', dfds_apply);
 
-        return dfds_apply.then(function() {
+        return dfds_apply.then(function () {
           can.trigger(this, 'resolved');
           return obj.refresh();
         });
       });
-    } else {
-      return obj;
-    }
-  },
-
-  findInCacheById : function (id) {
-    return can.getObject('cache', this, true)[id];
-  },
-
-  newInstance: function (args) {
-    var cache = can.getObject('cache', this, true);
-    if(args && args[this.id] && cache[args[this.id]]) {
-      //cache[args.id].attr(args, false); //CanJS has bugs in recursive merging
-                                          // (merging -- adding properties from an object without removing existing ones
-                                          //  -- doesn't work in nested objects).  So we're just going to not merge properties.
-      return cache[args[this.id]];
-    } else {
-      return this._super.apply(this, arguments);
-    }
-  },
-  process_args: function (args, names) {
-    var pargs = {};
-    var obj = pargs;
-    if(this.root_object && !(this.root_object in args)) {
-      obj = pargs[this.root_object] = {};
-    }
-    var src = args.serialize ? args.serialize() : args;
-    var go_names = (!names || names.not) ? Object.keys(src) : names;
-    for(var i = 0 ; i < (go_names.length || 0) ; i++) {
-      obj[go_names[i]] = src[go_names[i]];
-    }
-    if(names && names.not) {
-      var not_names = names.not;
-      for(i = 0 ; i < (not_names.length || 0) ; i++) {
-        delete obj[not_names[i]];
       }
-    }
-    return pargs;
-  },
+      return obj;
+    },
 
-  findRelated : makeFindRelated('source', 'destination'),
-  findRelatedSource : makeFindRelated('destination', 'source'),
+    findInCacheById: function (id) {
+      return can.getObject('cache', this, true)[id];
+    },
 
-  models: function (params) {
-    if(params[this.root_collection + '_collection']) {
-      params = params[this.root_collection + '_collection'];
-    }
-    if(params[this.root_collection]) {
-      params = params[this.root_collection];
-    }
-    if (!params || params.length == 0)
-      return new this.List();
-    var ms = this._super(params);
-    if(params instanceof can.Observe) {
-      params.replace(ms);
-      return params;
-    } else {
+    newInstance: function (args) {
+      var cache = can.getObject('cache', this, true);
+      if (args && args[this.id] && cache[args[this.id]]) {
+        // cache[args.id].attr(args, false); //CanJS has bugs in recursive merging
+        // (merging -- adding properties from an object without removing existing ones
+        //  -- doesn't work in nested objects).  So we're just going to not merge properties.
+        return cache[args[this.id]];
+      }
+      return this._super.apply(this, arguments);
+    },
+    process_args: function (args) {
+      var pargs = {};
+      var obj = pargs;
+      var src;
+      var go_names;
+      if (this.root_object && !(this.root_object in args)) {
+        obj = pargs[this.root_object] = {};
+      }
+      src = args.serialize ? args.serialize() : args;
+      go_names = Object.keys(src)
+      for (var i = 0; i < (go_names.length || 0); i++) {
+        obj[go_names[i]] = src[go_names[i]];
+      }
+      return pargs;
+    },
+
+    findRelated: makeFindRelated('source', 'destination'),
+    findRelatedSource: makeFindRelated('destination', 'source'),
+
+    models: function (params) {
+      var ms;
+      if (params[this.root_collection + '_collection']) {
+        params = params[this.root_collection + '_collection'];
+      }
+      if (params[this.root_collection]) {
+        params = params[this.root_collection];
+      }
+      if (!params || params.length === 0)
+        return new this.List();
+      ms = this._super(params);
+      if (params instanceof can.Map || params instanceof can.List) {
+        params.replace(ms);
+        return params;
+      }
       return ms;
-    }
-  },
+    },
 
-  object_from_resource: function (params) {
-    var obj_name = this.root_object;
-    if(!params) {
-      return params;
-    }
-    if(typeof obj_name !== 'undefined' && params[obj_name]) {
-        for(var i in params[obj_name]) {
-          if(params[obj_name].hasOwnProperty(i)) {
+    object_from_resource: function (params) {
+      var obj_name = this.root_object;
+      if (!params) {
+        return params;
+      }
+      if (typeof obj_name !== 'undefined' && params[obj_name]) {
+        for (var i in params[obj_name]) {
+          if (params[obj_name].hasOwnProperty(i)) {
             params.attr
             ? params.attr(i, params[obj_name][i])
             : (params[i] = params[obj_name][i]);
           }
         }
-        if(params.removeAttr) {
+        if (params.removeAttr) {
           params.removeAttr(obj_name);
         } else {
           delete params[obj_name];
         }
-    }
-    return params;
-  },
-
-  stubs: function(params) {
-    return new can.List(can.map(this.models(params), function (instance) {
-      if (!instance) {
-        return instance;
       }
-      return instance.stub();
-    }));
-  },
+      return params;
+    },
 
-  stub: function (params) {
-    if (!params) {
-      return params;
-    }
-    return this.model(params).stub();
-  },
-  model: function (params) {
-    var m, that = this;
-    params = this.object_from_resource(params);
-    if (!params)
-      return params;
-    m = this.findInCacheById(params[this.id])
-        || (params.provisional_id && can.getObject('provisional_cache', can.Model.Cacheable, true)[params.provisional_id]);
-    if(m) {
-      if(m.provisional_id && params.id) {
-        delete can.Model.Cacheable.provisional_cache[m.provisional_id];
-        m.removeAttr('provisional_id');
-        m.constructor.cache[params.id] = m;
-        m.attr('id', params.id);
+    stubs: function (params) {
+      return new can.List(can.map(this.models(params), function (instance) {
+        if (!instance) {
+          return instance;
+        }
+        return instance.stub();
+      }));
+    },
+
+    stub: function (params) {
+      if (!params) {
+        return params;
       }
-      m.attr(params);
-    } else {
-      m = this._super(params);
-    }
-    return m;
-  },
+      return this.model(params).stub();
+    },
+    model: function (params) {
+      var model;
+      params = this.object_from_resource(params);
+      if (!params)
+        return params;
+      model = this.findInCacheById(params[this.id]) ||
+        (params.provisional_id &&
+        can.getObject('provisional_cache', can.Model.Cacheable, true)[params.provisional_id]);
+      if (model) {
+        if (model.provisional_id && params.id) {
+          delete can.Model.Cacheable.provisional_cache[model.provisional_id];
+          model.removeAttr('provisional_id');
+          model.constructor.cache[params.id] = model;
+          model.attr('id', params.id);
+        }
+        model.attr(params);
+      } else {
+        model = this._super(params);
+      }
+      return model;
+    },
 
-  convert : {
-    date : dateConverter,
-    datetime : dateConverter,
-    packaged_datetime : makeDateUnpacker(['dateTime', 'date'])
-  },
-  serialize : {
-    datetime : makeDateSerializer('datetime'),
-    date : makeDateSerializer('date'),
-    packaged_datetime: makeDateSerializer('datetime', 'dateTime')
-  },
-  tree_view_options: {
-    display_attr_names: ['title', 'owner', 'status'],
-    mandatory_attr_names: ['title']
-  },
-  obj_nav_options: {},
-  list_view_options : {},
-  getRootModelName: function () {
-    return this.root_model || this.shortName;
-  },
+    convert: {
+      date: dateConverter,
+      datetime: dateConverter,
+      packaged_datetime: makeDateUnpacker(['dateTime', 'date'])
+    },
+    serialize: {
+      datetime: makeDateSerializer('datetime'),
+      date: makeDateSerializer('date'),
+      packaged_datetime: makeDateSerializer('datetime', 'dateTime')
+    },
+    tree_view_options: {
+      display_attr_names: ['title', 'owner', 'status'],
+      mandatory_attr_names: ['title']
+    },
+    obj_nav_options: {},
+    list_view_options: {},
+    getRootModelName: function () {
+      return this.root_model || this.shortName;
+    },
 
-  makeFindPage: function (findAllSpec) {
+    makeFindPage: function (findAllSpec) {
     /* Create a findPage function that will return a paging object that will
      * provide access to the model items provided in a single page as well
      * as paging capability to retrieve the named pages provided in the
-     * resposne.
+     * response.
      *
      * findPage returns an object with two properties:
      * {this.options.model.root_collection}_collection and paging. The models
@@ -634,82 +603,86 @@ can.Model('can.Model.Cacheable', {
      * "GET /api/programs". If this assumption is invalid, this function
      * WILL NOT work correctly.
      */
-    var parts, method, collection_url;
-    if(typeof findAllSpec === 'string') {
-      parts = findAllSpec.split(' ');
-      method = parts.length == 2 ? parts[0] : 'GET';
-      collection_url = parts.length == 2 ? parts[1] : parts[0];
-    } else if(typeof findAllSpec === 'object') {
-      method = findAllSpec.type || 'GET';
-      collection_url = findAllSpec.url;
-    } else {
-      return; // TODO make a pager if findAllSpec is a function.
-    }
-    var base_params = {
-      type: method,
-      dataType: 'json'
-    };
+      var parts;
+      var method;
+      var collectionUrl;
+      var baseParams;
+      var that = this;
 
-    var findPageFunc = function(url, data){
-      return can.ajax(can.extend({
-        url: url,
-        data: data
-      }, base_params)).then(function(response_data) {
-          var collection = response_data[that.root_collection + '_collection'];
-          var ret  = {
-            paging: make_paginator(collection.paging)
-          };
-          ret[that.root_collection+'_collection'] = that.models(collection[that.root_collection]);
-          return ret;
-        });
-    };
-
-    var that = this;
-    var make_paginator = function(paging) {
-      var get_page = function(page_name) {
-        if (paging[page_name]) {
-          return function() { return findPageFunc(paging[page_name]); };
-        } else {
+      function makePaginator(paging) {
+        function getPage(page_name) {
+          if (paging[page_name]) {
+            return function () {
+              return findPageFunc(paging[page_name]);
+            };
+          }
           return null;
         }
-      };
 
-      return {
+        return {
           count: paging.count,
           total: paging.total,
-          first: get_page('first'),
-          prev: get_page('prev'),
-          next: get_page('next'),
-          last: get_page('last'),
-          has_next: function() {
-            return this.next != null;
+          first: getPage('first'),
+          prev: getPage('prev'),
+          next: getPage('next'),
+          last: getPage('last'),
+          has_next: function () {
+            return this.next !== null;
           },
-          has_prev: function() {
-            return this.prev != null;
+          has_prev: function () {
+            return this.prev !== null;
           }
+        };
+      }
+      function findPageFunc(url, data, params, scope) {
+        return can.ajax(can.extend({
+          url: url,
+          data: data
+        }, params)).then(function (response) {
+          var collection = response[that.root_collection + '_collection'];
+          var ret = {
+            paging: makePaginator(collection.paging)
+          };
+          ret[scope.root_collection + '_collection'] =
+            scope.models(collection[scope.root_collection]);
+          return ret;
+        });
+      }
+      if (typeof findAllSpec === 'string') {
+        parts = findAllSpec.split(' ');
+        method = parts.length === 2 ? parts[0] : 'GET';
+        collectionUrl = parts.length === 2 ? parts[1] : parts[0];
+      } else if (typeof findAllSpec === 'object') {
+        method = findAllSpec.type || 'GET';
+        collectionUrl = findAllSpec.url;
+      } else {
+        return; // TODO make a pager if findAllSpec is a function.
+      }
+      baseParams = {
+        type: method,
+        dataType: 'json'
       };
-    };
 
-    return function(params) {
-      params = params || {};
-      if (!params.__page) {
-        params.__page = 1;
-      }
-      if (!params.__page_size) {
-        params.__page_size = 50;
-      }
-      return findPageFunc(collection_url, params);
-    };
-  },
+      return function (params) {
+        params = params || {};
+        if (!params.__page) {
+          params.__page = 1;
+        }
+        if (!params.__page_size) {
+          params.__page_size = 50;
+        }
+        return findPageFunc(collectionUrl, params, baseParams, that);
+      };
+    },
 
-  get_mapper: function(name) {
+    get_mapper: function (name) {
       var mappers, mapper;
       mappers = GGRC.Mappings.get_mappings_for(this.shortName);
       if (mappers) {
         mapper = mappers[name];
         return mapper;
       }
-  },
+    },
 
   // This this is the parsing part of the easy accessor for deep properties.
   // Use the result of this with instance.get_deep_property
@@ -719,121 +692,119 @@ can.Model('can.Model.Cacheable', {
   //
   // owners.GET_ALL.name ->
   // [this.owners[0].reify().name, this.owners[1].reify().name...]
-  parse_deep_property_descriptor: function (deep_property_string) {
-      return Object.freeze(_.map(deep_property_string.split("."), function (part) {
-        if (part === "GET_ALL") {
+    parse_deep_property_descriptor: function (deep_property_string) {
+      return Object.freeze(_.map(deep_property_string.split('.'), function (part) {
+        if (part === 'GET_ALL') {
           return part;
         }
-        return Object.freeze(part.split("|"));
+        return Object.freeze(part.split('|'));
       }));
-  }
-}, {
-  init : function() {
-    var cache = can.getObject("cache", this.constructor, true)
-      , id_key = this.constructor.id
-      , that = this
-      ;
-
-    if (this[id_key] || this[id_key] === 0)
-      cache[this[id_key]] = this;
-    this.attr("class", this.constructor);
-    this.notifier = new PersistentNotifier({ name : this.constructor.model_singular });
-
-    if (!this._pending_joins) {
-      this.attr("_pending_joins", []);
     }
+  }, {
+    init: function () {
+      var cache = can.getObject('cache', this.constructor, true);
+      var id_key = this.constructor.id;
+      var that = this;
+
+      if (this[id_key] || this[id_key] === 0)
+        cache[this[id_key]] = this;
+      this.attr('class', this.constructor);
+      this.notifier = new PersistentNotifier({name: this.constructor.model_singular});
+
+      if (!this._pending_joins) {
+        this.attr('_pending_joins', []);
+      }
 
     // Listen for `stub_destroyed` change events and nullify or remove the
     // corresponding property or list item.
-    this.bind("change", function(ev, path, how, newVal, oldVal) {
-      var m, n;
-      m = path.match(/(.*?)\.stub_destroyed$/);
-      if (m) {
-        n = m[1].match(/^([^.]+)\.(\d+)$/);
-        if (n) {
-          that.attr(n[1]).splice(parseInt(n[2], 10), 1);
+      this.bind('change', function (ev, path, how, newVal, oldVal) {
+        var m, n;
+        m = path.match(/(.*?)\.stub_destroyed$/);
+        if (m) {
+          n = m[1].match(/^([^.]+)\.(\d+)$/);
+          if (n) {
+            that.attr(n[1]).splice(parseInt(n[2], 10), 1);
+          } else {
+            n = m[1].match(/^([^.]+)$/);
+            if (n)
+              that.removeAttr(n[1]);
+          }
         }
-        else {
-          n = m[1].match(/^([^.]+)$/);
-          if (n)
-            that.removeAttr(n[1]);
+      });
+    },
+    load_custom_attribute_definitions: function () {
+      var definitions;
+      if (this.attr('custom_attribute_definitions')) {
+        return;
+      }
+      if (GGRC.custom_attr_defs === undefined) {
+        GGRC.custom_attr_defs = {};
+        console.warn('Missing injected custom attribute definitions');
+      }
+      definitions = can.map(GGRC.custom_attr_defs, function (def) {
+        var idCheck = !def.definition_id || def.definition_id === this.id;
+        if (idCheck && def.definition_type === this.constructor.table_singular) {
+          return def;
         }
-      }
-    });
-  },
-  load_custom_attribute_definitions: function () {
-    var definitions;
-    if (this.attr('custom_attribute_definitions')) {
-      return;
-    }
-    if (GGRC.custom_attr_defs === undefined) {
-      GGRC.custom_attr_defs = {};
-      console.warn("Missing injected custom attribute definitions");
-    }
-    definitions = can.map(GGRC.custom_attr_defs, function (def) {
-      var idCheck = !def.definition_id || def.definition_id === this.id;
-      if (idCheck && def.definition_type === this.constructor.table_singular) {
-        return def;
-      }
-    }.bind(this));
-    this.attr('custom_attribute_definitions', definitions);
-  },
+      }.bind(this));
+      this.attr('custom_attribute_definitions', definitions);
+    },
 
   /**
    * Setup the instance's custom attribute validations, and initialize their
    * values, if necessary.
    */
-  setup_custom_attributes: function () {
-    var self = this;
-    var key;
+    setup_custom_attributes: function () {
+      var self = this;
+      var key;
 
     // Remove existing custom_attribute validations,
     // some of them might have changed
-    for (key in this.class.validations) {
-      if (key.indexOf('custom_attributes.') === 0) {
-        delete this.class.validations[key];
+      for (key in this.class.validations) {
+        if (key.indexOf('custom_attributes.') === 0) {
+          delete this.class.validations[key];
+        }
       }
-    }
 
     // setup validators for custom attributes based on their definitions
-    can.each(this.custom_attribute_definitions, function (definition) {
-      if (definition.mandatory && !this.ignore_ca_errors) {
-        if (definition.attribute_type === 'Checkbox') {
-          self.class.validate('custom_attributes.' + definition.id,
+      can.each(this.custom_attribute_definitions, function (definition) {
+        if (definition.mandatory && !this.ignore_ca_errors) {
+          if (definition.attribute_type === 'Checkbox') {
+            self.class.validate('custom_attributes.' + definition.id,
               function (val) {
                 var msg = val ? '' : 'must be checked';
                 return msg;
               });
-        } else {
-          self.class.validateNonBlank('custom_attributes.' + definition.id);
-        }
-      }
-    }.bind(this));
-
-    // if necessary, initialize custom attributes' values on the instance
-    if (!this.custom_attributes) {
-      this.attr('custom_attributes', new can.Map());
-      can.each(this.custom_attribute_values, function (value) {
-        var def;
-        var attributeValue;
-        var object;
-        var stub = value;
-        value = stub.reify();
-        def = _.find(this.custom_attribute_definitions, {
-          id: value.custom_attribute_id
-        });
-        if (def) {
-          if (def.attribute_type.startsWith('Map:')) {
-            object = value.attribute_object;
-            attributeValue = object.type + ':' + object.id;
           } else {
-            attributeValue = value.attribute_value;
+            self.class.validateNonBlank('custom_attributes.' + definition.id);
           }
-          self.custom_attributes.attr(value.custom_attribute_id,
-                                      attributeValue);
         }
       }.bind(this));
-    }
+
+    // if necessary, initialize custom attributes' values on the instance
+      if (!this.custom_attributes) {
+        this.attr('custom_attributes', new can.Map());
+        can.each(this.custom_attribute_values, function (value) {
+          var def;
+          var attributeValue;
+          var object;
+          var stub = value;
+          value = value.isStub ? value : stub.reify();
+          def = _.find(this.custom_attribute_definitions, {
+            id: value.custom_attribute_id
+          });
+          if (def) {
+            if (def.attribute_type.startsWith('Map:')) {
+              object = value.attribute_object;
+              attributeValue = object.type + ':' + object.id;
+            } else {
+              attributeValue = value.attribute_value;
+            }
+            self.custom_attributes.attr(value.custom_attribute_id,
+                                      attributeValue);
+          }
+        }.bind(this));
+      }
 
     // Due to the current lack on any information on sort order, just use the
     // order the custom attributes were defined in.
@@ -846,213 +817,217 @@ can.Model('can.Model.Cacheable', {
     }
   },
 
-  _custom_attribute_map: function (attrId, object) {
-    var definition;
-    attrId = Number(attrId); // coming from mustache this will be a string
-    definition = _.find(this.custom_attribute_definitions, {id: attrId});
+    _custom_attribute_map: function (attrId, object) {
+      var definition;
+      attrId = Number(attrId); // coming from mustache this will be a string
+      definition = _.find(this.custom_attribute_definitions, {id: attrId});
 
-    if (!definition || !definition.attribute_type.startsWith('Map:')) {
-      return;
-    }
-    if (typeof object === 'string' && object.length > 0) {
-      return;
-    }
-    object = object.stub ? object.stub() : undefined;
-    if (object) {
-      this.custom_attributes.attr(attrId, object.type + ':' + object.id);
-    } else {
-      this.custom_attributes.removeAttr(String(attrId));
-    }
-  },
-  computed_errors: can.compute(function () {
+      if (!definition || !definition.attribute_type.startsWith('Map:')) {
+        return;
+      }
+      if (typeof object === 'string' && object.length > 0) {
+        return;
+      }
+      object = object.stub ? object.stub() : undefined;
+      if (object) {
+        this.custom_attributes.attr(attrId, object.type + ':' + object.id);
+      } else {
+        this.custom_attributes.removeAttr(String(attrId));
+      }
+    },
+    computed_errors: can.compute(function () {
       var errors = this.errors();
-      if(this.attr("_suppress_errors")) {
+      if (this.attr('_suppress_errors')) {
         return null;
       } else {
         return errors;
       }
-  }),
-  computed_unsuppressed_errors: can.compute(function () {
-    return this.errors();
-  }),
-  get_list_counter: function (name) {
-    var binding = this.get_binding(name);
-    if (!binding) {
-      return $.Deferred().reject();
-    }
-    return binding.refresh_count();
-  },
+    }),
+    computed_unsuppressed_errors: can.compute(function () {
+      return this.errors();
+    }),
+    get_list_counter: function (name) {
+      var binding = this.get_binding(name);
+      if (!binding) {
+        return $.Deferred().reject();
+      }
+      return binding.refresh_count();
+    },
 
-  get_list_loader: function (name) {
-    var binding = this.get_binding(name);
-    return binding.refresh_list();
-  },
+    get_list_loader: function (name) {
+      var binding = this.get_binding(name);
+      return binding.refresh_list();
+    },
 
-  get_mapping: function (name) {
-    var binding = this.get_binding(name);
-    if (binding) {
-      binding.refresh_list();
-      return binding.list;
-    }
-    return [];
-  },
+    get_mapping: function (name) {
+      var binding = this.get_binding(name);
+      if (binding) {
+        binding.refresh_list();
+        return binding.list;
+      }
+      return [];
+    },
+
+    get_mapping_deferred: function (name) {
+      return this.get_binding(name).refresh_list();
+    },
 
   // This retrieves the potential orphan stats for a given instance
   // Example: "This may also delete 3 Sections, 2 Controls, and 4 object mappings."
-  get_orphaned_count : function () {
-    if (!this.get_binding('orphaned_objects')) {
-      return new $.Deferred().reject();
-    }
-    return this.get_list_loader('orphaned_objects').then(function (list) {
-      var objects = [], mappings = []
+    get_orphaned_count: function () {
+      if (!this.get_binding('orphaned_objects')) {
+        return new $.Deferred().reject();
+      }
+      return this.get_list_loader('orphaned_objects').then(function (list) {
+        var objects = [], mappings = []
         , counts = {}
         , result = []
         , parts = 0;
 
-      function is_join (mapping) {
-        if (mapping.mappings.length > 0) {
-          for (var i = 0, child; child = mapping.mappings[i]; i++) {
-            if (child = is_join(child)) {
-              return child;
+        function is_join(mapping) {
+          if (mapping.mappings.length > 0) {
+            for (var i = 0, child; child = mapping.mappings[i]; i++) {
+              if (child = is_join(child)) {
+                return child;
+              }
             }
           }
+          return mapping.instance && mapping.instance instanceof can.Model.Join && mapping.instance;
         }
-        return mapping.instance && mapping.instance instanceof can.Model.Join && mapping.instance;
-      }
-      can.each(list, function (mapping) {
-        var inst;
-        if (inst = is_join(mapping))
-          mappings.push(inst);
-        else
+        can.each(list, function (mapping) {
+          var inst;
+          if (inst = is_join(mapping))
+            mappings.push(inst);
+          else
           objects.push(mapping.instance);
-      });
+        });
 
       // Generate the summary
-      if(objects.length || mappings.length){
-        result.push('This may also delete');
-      }
-      if (objects.length) {
-        can.each(objects, function (instance) {
-          var title = instance.constructor.title_singular;
-          counts[title] = counts[title] || {
+        if (objects.length || mappings.length) {
+          result.push('This may also delete');
+        }
+        if (objects.length) {
+          can.each(objects, function (instance) {
+            var title = instance.constructor.title_singular;
+            counts[title] = counts[title] || {
               model: instance.constructor
             , count: 0
             };
-          counts[title].count++;
-        });
-        can.each(counts, function (count, i) {
+            counts[title].count++;
+          });
+          can.each(counts, function (count, i) {
+            parts++;
+            result.push(count.count + ' ' + (count.count === 1 ? count.model.title_singular : count.model.title_plural) + ',');
+          });
+        }
+        if (mappings.length) {
           parts++;
-          result.push(count.count + ' ' + (count.count === 1 ? count.model.title_singular : count.model.title_plural) + ',')
-        });
-      }
-      if (mappings.length) {
-        parts++;
-        result.push(mappings.length + ' object mapping' + (mappings.length !== 1 ? 's' : ''));
-      }
+          result.push(mappings.length + ' object mapping' + (mappings.length !== 1 ? 's' : ''));
+        }
 
       // Clean up commas, add an "and" if appropriate
-      parts >= 1 && parts <= 2 && (result[result.length - 1] = result[result.length - 1].replace(',',''));
-      parts === 2 && (result[result.length - 2] = result[result.length - 2].replace(',',''));
-      parts >= 2 && result.splice(result.length - 1, 0, 'and');
-      return result.join(' ') + (objects.length || mappings.length ? '.' : '');
-    });
-  },
+        parts >= 1 && parts <= 2 && (result[result.length - 1] = result[result.length - 1].replace(',', ''));
+        parts === 2 && (result[result.length - 2] = result[result.length - 2].replace(',', ''));
+        parts >= 2 && result.splice(result.length - 1, 0, 'and');
+        return result.join(' ') + (objects.length || mappings.length ? '.' : '');
+      });
+    },
 
-  _get_binding_attr: function (mapper) {
-    if (typeof(mapper) === 'string') {
-      return '_' + mapper + '_binding';
-    }
-  },
+    _get_binding_attr: function (mapper) {
+      if (typeof (mapper) === 'string') {
+        return '_' + mapper + '_binding';
+      }
+    },
 
   // checks if binding exists without throwing debug statements
   // modeled after what get_binding is doing
-  has_binding: function (mapper) {
-    var binding,
+    has_binding: function (mapper) {
+      var binding,
         mapping,
         binding_attr = this._get_binding_attr(mapper);
 
-    if (binding_attr) {
-      binding = this[binding_attr];
-    }
+      if (binding_attr) {
+        binding = this[binding_attr];
+      }
 
-    if (!binding) {
-      if (typeof(mapper) === 'string') {
-        mapping = this.constructor.get_mapper(mapper);
-        if (!mapping) {
+      if (!binding) {
+        if (typeof (mapper) === 'string') {
+          mapping = this.constructor.get_mapper(mapper);
+          if (!mapping) {
+            return false;
+          }
+        } else if (!(mapper instanceof GGRC.ListLoaders.BaseListLoader)) {
           return false;
         }
-      }else if (!(mapper instanceof GGRC.ListLoaders.BaseListLoader)) {
-        return false;
       }
-    }
 
-    return true;
-  },
+      return true;
+    },
 
-  get_binding: function (mapper) {
-    var mappings;
-    var mapping;
-    var binding;
-    var binding_attr = this._get_binding_attr(mapper);
+    get_binding: function (mapper) {
+      var mappings;
+      var mapping;
+      var binding;
+      var binding_attr = this._get_binding_attr(mapper);
 
-    if (binding_attr) {
-      binding = this[binding_attr];
-    }
+      if (binding_attr) {
+        binding = this[binding_attr];
+      }
 
-    if (!binding) {
-      if (typeof(mapper) === 'string') {
+      if (!binding) {
+        if (typeof (mapper) === 'string') {
         // Lookup and attach named mapper
-        mapping = this.constructor.get_mapper(mapper);
-        if (!mapping)
-          console.debug('No such mapper:  ' + this.constructor.shortName + '.' + mapper);
-        else
+          mapping = this.constructor.get_mapper(mapper);
+          if (!mapping)
+            console.debug('No such mapper:  ' + this.constructor.shortName + '.' + mapper);
+          else
           binding = mapping.attach(this);
-      } else if (mapper instanceof GGRC.ListLoaders.BaseListLoader) {
+        } else if (mapper instanceof GGRC.ListLoaders.BaseListLoader) {
         // Loader directly provided, so just attach
-        binding = mapper.attach(this);
-      } else {
-        console.debug('Invalid mapper specified:', mapper);
+          binding = mapper.attach(this);
+        } else {
+          console.debug('Invalid mapper specified:', mapper);
+        }
+        if (binding && binding_attr) {
+          this[binding_attr] = binding;
+          binding.name = this.constructor.shortName + '.' + mapper;
+        }
       }
-      if (binding && binding_attr) {
-        this[binding_attr] = binding;
-        binding.name = this.constructor.shortName + '.' + mapper;
-      }
-    }
-    return binding;
-  },
+      return binding;
+    },
 
-  addElementToChildList : function (attrName, new_element) {
-    this[attrName].push(new_element);
-    this._triggerChange(attrName, 'set', this[attrName], this[attrName].slice(0, this[attrName].length - 1));
-  },
-  removeElementFromChildList : function (attrName, old_element, all_instances) {
-    for(var i = this[attrName].length - 1 ; i >= 0; i--) {
-      if(this[attrName][i]===old_element) {
-        this[attrName].splice(i, 1);
-        if(!all_instances) break;
+    addElementToChildList: function (attrName, new_element) {
+      this[attrName].push(new_element);
+      this._triggerChange(attrName, 'set', this[attrName], this[attrName].slice(0, this[attrName].length - 1));
+    },
+    removeElementFromChildList: function (attrName, old_element, all_instances) {
+      for (var i = this[attrName].length - 1; i >= 0; i--) {
+        if (this[attrName][i] === old_element) {
+          this[attrName].splice(i, 1);
+          if (!all_instances) break;
+        }
       }
-    }
-    this._triggerChange(attrName, 'set', this[attrName], this[attrName].slice(0, this[attrName].length - 1));
-  },
-  refresh: function (params) {
-    var dfd,
+      this._triggerChange(attrName, 'set', this[attrName], this[attrName].slice(0, this[attrName].length - 1));
+    },
+    refresh: function (params) {
+      var dfd,
         href = this.selfLink || this.href,
         that = this;
 
-    if (!href) {
-      return (new can.Deferred()).reject();
-    }
-    if (!this._pending_refresh) {
-      this._pending_refresh = {
-        dfd: $.Deferred(),
-        fn: _.throttle(function () {
-          var dfd = that._pending_refresh.dfd;
-          can.ajax({
-            url: href,
-            params: params,
-            type: 'get',
-            dataType : 'json'
-          })
+      if (!href) {
+        return (new can.Deferred()).reject();
+      }
+      if (!this._pending_refresh) {
+        this._pending_refresh = {
+          dfd: $.Deferred(),
+          fn: _.throttle(function () {
+            var dfd = that._pending_refresh.dfd;
+            can.ajax({
+              url: href,
+              params: params,
+              type: 'get',
+              dataType: 'json'
+            })
           .then(function (resources) {
             delete that._pending_refresh;
             return resources;
@@ -1065,153 +1040,160 @@ can.Model('can.Model.Cacheable', {
           .fail(function () {
             dfd.reject.apply(dfd, arguments);
           });
-        }, 1000, {trailing: false})
-      };
-    }
-    dfd = this._pending_refresh.dfd
-    this._pending_refresh.fn();
-    return dfd;
-  },
-  serialize : function () {
-    var that = this, serial = {};
-    if(arguments.length) {
-      return this._super.apply(this, arguments);
-    }
-    this.each(function (val, name) {
-      var fun_name;
-      if(that.constructor.attributes && that.constructor.attributes[name]) {
-        fun_name = that.constructor.attributes[name];
-        fun_name = fun_name.substr(fun_name.lastIndexOf('.') + 1);
-        if (fun_name === 'stubs' || fun_name === 'get_stubs'
-            ||fun_name === 'models' || fun_name === 'get_instances') {
-          // val can be null in some cases
-          val && (serial[name] = val.stubs().serialize());
-        } else if (fun_name === 'stub' || fun_name === 'get_stub'
-                   || fun_name === 'model' || fun_name === 'get_instance') {
-          serial[name] = (val ? val.stub().serialize() : null);
-        } else {
-          serial[name] = that._super(name);
-        }
-      } else if(val && typeof val.save === 'function') {
-        serial[name] = val.stub().serialize();
-      } else if(typeof val === 'object' && val != null && val.length != null) {
-        serial[name] = can.map(val, function(v) {
-          return (v && typeof v.save === 'function') ? v.stub().serialize() : (v.serialize ? v.serialize() : v);
-        });
-      } else if(typeof val !== 'function') {
-        if(that[name] && that[name].isComputed) {
-          serial[name] = val && val.serialize ? val.serialize() : val;
-        } else {
-          serial[name] = that[name] && that[name].serialize ? that[name].serialize() : that._super(name);
-        }
+          }, 1000, {trailing: false})
+        };
       }
-    });
-    return serial;
-  },
-  display_name: function () {
-    var displayName = this.title || this.name;
+      dfd = this._pending_refresh.dfd;
+      this._pending_refresh.fn();
+      return dfd;
+    },
+  // TODO: should be refactored and sliced on multiple functions
+    serialize: function () {
+      var that = this;
+      var serial = {};
+      if (arguments.length) {
+        return this._super.apply(this, arguments);
+      }
+      this.each(function (val, name) {
+        var fnName;
+        if (that.constructor.attributes && that.constructor.attributes[name]) {
+          fnName = that.constructor.attributes[name];
+          fnName = fnName.substr(fnName.lastIndexOf('.') + 1);
+          if (fnName === 'stubs' || fnName === 'get_stubs' ||
+          fnName === 'models' || fnName === 'get_instances') {
+          // val can be null in some cases
+            if (val) {
+              serial[name] = val.stubs().serialize();
+            }
+          } else if (fnName === 'stub' || fnName === 'get_stub' ||
+          fnName === 'model' || fnName === 'get_instance') {
+            serial[name] = (val ? val.stub().serialize() : null);
+          } else {
+            serial[name] = that._super(name);
+          }
+        } else if (val && typeof val.save === 'function') {
+          serial[name] = val.stub().serialize();
+        } else if (typeof val === 'object' && val !== null && val.length) {
+          serial[name] = can.map(val, function (v) {
+            var isModel = v && typeof v.save === 'function';
+            return isModel ?
+            v.stub().serialize() :
+            v.serialize ? v.serialize() : v;
+          });
+        } else if (typeof val !== 'function') {
+          if (that[name] && that[name].isComputed) {
+            serial[name] = val && val.serialize ? val.serialize() : val;
+          } else {
+            serial[name] = that[name] && that[name].serialize ?
+            that[name].serialize() :
+            that._super(name);
+          }
+        }
+      });
+      return serial;
+    },
+    display_name: function () {
+      var displayName = this.title || this.name;
 
-    if (_.isUndefined(displayName)) {
-      return '"' + this.type + ' ID: ' + this.id + '" (DELETED)';
-    }
+      if (_.isUndefined(displayName)) {
+        return '"' + this.type + ' ID: ' + this.id + '" (DELETED)';
+      }
 
-    return displayName;
-  },
-  display_type: function () {
-    return this.type;
-  },
-  autocomplete_label : function () {
-    return this.title;
-  },
-  get_permalink: function () {
-    var dfd = $.Deferred(),
+      return displayName;
+    },
+    display_type: function () {
+      return this.type;
+    },
+    autocomplete_label: function () {
+      return this.title;
+    },
+    get_permalink: function () {
+      var dfd = $.Deferred(),
         constructor = this.constructor;
-    if (!constructor.permalink_options) {
-      return dfd.resolve(this.viewLink);
-    }
-    $.when(this.refresh_all.apply(this, constructor.permalink_options.base.split(":"))).then(function (base) {
-      return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
-    }.bind(this));
-    return dfd.promise();
-  },
+      if (!constructor.permalink_options) {
+        return dfd.resolve(this.viewLink);
+      }
+      $.when(this.refresh_all.apply(this, constructor.permalink_options.base.split(':'))).then(function (base) {
+        return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
+      }.bind(this));
+      return dfd.promise();
+    },
 
   /**
     * Set up a deferred join object update when this object is updated.
     */
-  mark_for_update: function (join_attr, obj, extra_attrs, options) {
-    obj = obj.reify ? obj.reify() : obj;
-    extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
+    mark_for_update: function (join_attr, obj, extra_attrs, options) {
+      obj = obj.reify ? obj.reify() : obj;
+      extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
 
-    this.remove_duplicate_pending_joins(obj);
-    this._pending_joins.push({
-      how: 'update',
-      what: obj,
-      through: join_attr,
-      extra: extra_attrs,
-      opts: options
-    });
-  },
-
-
+      this.remove_duplicate_pending_joins(obj);
+      this._pending_joins.push({
+        how: 'update',
+        what: obj,
+        through: join_attr,
+        extra: extra_attrs,
+        opts: options
+      });
+    },
   /**
    Set up a deferred join object deletion when this object is updated.
   */
-  mark_for_deletion: function (join_attr, obj, extra_attrs, options) {
-    obj = obj.reify ? obj.reify() : obj;
+    mark_for_deletion: function (join_attr, obj, extra_attrs, options) {
+      obj = obj.reify ? obj.reify() : obj;
 
-    this.remove_duplicate_pending_joins(obj);
-    this._pending_joins.push({how: 'remove', what: obj, through: join_attr, opts: options});
-  },
+      this.remove_duplicate_pending_joins(obj);
+      this._pending_joins.push({how: 'remove', what: obj, through: join_attr, opts: options});
+    },
 
   /**
    Set up a deferred join object creation when this object is updated.
   */
-  mark_for_addition: function (join_attr, obj, extra_attrs, options) {
-    obj = obj.reify ? obj.reify() : obj;
-    extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
+    mark_for_addition: function (join_attr, obj, extra_attrs, options) {
+      obj = obj.reify ? obj.reify() : obj;
+      extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
 
-    this.remove_duplicate_pending_joins(obj);
-    this._pending_joins.push({how: 'add', what: obj, through: join_attr, extra: extra_attrs, opts: options});
-  },
+      this.remove_duplicate_pending_joins(obj);
+      this._pending_joins.push({how: 'add', what: obj, through: join_attr, extra: extra_attrs, opts: options});
+    },
 
-  remove_duplicate_pending_joins: function (obj) {
-    var joins;
-    var len;
-    if (!this._pending_joins) {
-      this.attr('_pending_joins', []);
-    }
-    len = this._pending_joins.length;
-    joins = _.filter(this._pending_joins, function (val) {
-      return val.what !== obj;
-    }.bind(this));
-    if (len !== joins.length) {
-      this.attr('_pending_joins').replace(joins);
-    }
-  },
+    remove_duplicate_pending_joins: function (obj) {
+      var joins;
+      var len;
+      if (!this._pending_joins) {
+        this.attr('_pending_joins', []);
+      }
+      len = this._pending_joins.length;
+      joins = _.filter(this._pending_joins, function (val) {
+        return val.what !== obj;
+      }.bind(this));
+      if (len !== joins.length) {
+        this.attr('_pending_joins').replace(joins);
+      }
+    },
 
-  delay_resolving_save_until: function (dfd) {
-    return this.notifier.queue(dfd);
-  },
-   _save: function () {
-    var that = this,
+    delay_resolving_save_until: function (dfd) {
+      return this.notifier.queue(dfd);
+    },
+    _save: function () {
+      var that = this,
         _super = Array.prototype.pop.call(arguments),
         isNew = this.isNew(),
         xhr,
         dfd = this._dfd,
-        pre_save_notifier = new PersistentNotifier({ name : this.constructor.model_singular + ' (pre-save)' })
+        pre_save_notifier = new PersistentNotifier({name: this.constructor.model_singular + ' (pre-save)'})
         ;
 
-    this.before_save && this.before_save(pre_save_notifier);
-    if (isNew) {
-      this.attr('provisional_id', 'provisional_' + Math.floor(Math.random() * 10000000));
-      can.getObject('provisional_cache', can.Model.Cacheable, true)[this.provisional_id] = this;
-      this.before_create && this.before_create(pre_save_notifier);
-    } else {
-      this.before_update && this.before_update(pre_save_notifier);
-    }
+      this.before_save && this.before_save(pre_save_notifier);
+      if (isNew) {
+        this.attr('provisional_id', 'provisional_' + Math.floor(Math.random() * 10000000));
+        can.getObject('provisional_cache', can.Model.Cacheable, true)[this.provisional_id] = this;
+        this.before_create && this.before_create(pre_save_notifier);
+      } else {
+        this.before_update && this.before_update(pre_save_notifier);
+      }
 
-    pre_save_notifier.on_empty(function() {
-      xhr = _super.apply(that, arguments)
+      pre_save_notifier.on_empty(function () {
+        xhr = _super.apply(that, arguments)
       .then(function (result) {
         if (isNew) {
           that.after_create && that.after_create();
@@ -1222,11 +1204,11 @@ can.Model('can.Model.Cacheable', {
         return result;
       }, function (xhr, status, message) {
         that.save_error && that.save_error(xhr.responseText);
-        return new $.Deferred().reject(xhr, status, message);
+        return new can.Deferred().reject(xhr, status, message);
       })
       .fail(function (response) {
         that.notifier.on_empty(function () {
-          dfd.reject(that, response.responseText);
+          dfd.reject(that, response);
         });
       })
       .done(function () {
@@ -1235,205 +1217,206 @@ can.Model('can.Model.Cacheable', {
         });
       });
 
-      GGRC.delay_leaving_page_until(xhr);
-      GGRC.delay_leaving_page_until(dfd);
-    });
-    return dfd;
-  },
-  save: function () {
-    Array.prototype.push.call(arguments, this._super);
-    this._dfd = $.Deferred();
-    GGRC.SaveQueue.enqueue(this, arguments);
-    return this._dfd;
-  },
-  refresh_all: function () {
-    var props = Array.prototype.slice.call(arguments, 0);
+        GGRC.delay_leaving_page_until(xhr);
+        GGRC.delay_leaving_page_until(dfd);
+      });
+      return dfd;
+    },
+    save: function () {
+      Array.prototype.push.call(arguments, this._super);
+      this._dfd = new can.Deferred();
+      GGRC.SaveQueue.enqueue(this, arguments);
+      return this._dfd;
+    },
+    refresh_all: function () {
+      var props = Array.prototype.slice.call(arguments, 0);
 
-    return RefreshQueue.refresh_all(this, props);
-  },
-  refresh_all_force: function () {
-    var props = Array.prototype.slice.call(arguments, 0);
+      return RefreshQueue.refresh_all(this, props);
+    },
+    refresh_all_force: function () {
+      var props = Array.prototype.slice.call(arguments, 0);
 
-    return RefreshQueue.refresh_all(this, props, true);
-  },
-  get_filter_vals: function (keys, mappings) {
-    var values = {};
-    var customAttrs = {};
-    var customAttrIds = {};
-    var longTitle = this.type.toLowerCase() + ' title';
+      return RefreshQueue.refresh_all(this, props, true);
+    },
+    get_filter_vals: function (keys, mappings) {
+      var values = {};
+      var customAttrs = {};
+      var customAttrIds = {};
+      var longTitle = this.type.toLowerCase() + ' title';
 
-    keys = keys || this.class.filter_keys;
-    mappings = mappings || this.class.filter_mappings;
+      keys = keys || this.class.filter_keys;
+      mappings = mappings || this.class.filter_mappings;
 
-    if (!this.custom_attribute_definitions) {
-      this.load_custom_attribute_definitions();
-    }
-    this.custom_attribute_definitions.each(function (definition) {
-      customAttrIds[definition.id] = definition.title.toLowerCase();
-    });
-    if (!this.custom_attributes) {
-      this.setup_custom_attributes();
-    }
-    can.each(this.custom_attribute_values, function (customAttr) {
-      var value;
-      var obj;
-      customAttr = customAttr.reify();
-      if (customAttr.attribute_object) {
-        obj = customAttr.attribute_object.reify();
-        value = _.filter([obj.email, obj.name, obj.title, obj.slug]);
-      } else {
-        value = customAttr.attribute_value;
+      if (!this.custom_attribute_definitions) {
+        this.load_custom_attribute_definitions();
       }
-      customAttrs[customAttrIds[customAttr.custom_attribute_id]] = value;
-    });
-
-    if (!mappings[longTitle]) {
-      mappings[longTitle] = 'title';
-    }
-    keys = _.union(keys, longTitle, _.keys(mappings), _.keys(customAttrs));
-    $.each(keys, function (index, key) {
-      var attrKey = mappings[key] || key;
-      var val;
-      var owner;
-      var audit;
-
-      val = this[attrKey];
-      if (val === undefined) {
-        val = customAttrs[attrKey];
+      this.custom_attribute_definitions.each(function (definition) {
+        customAttrIds[definition.id] = definition.title.toLowerCase();
+      });
+      if (!this.custom_attributes) {
+        this.setup_custom_attributes();
       }
-
-      if (val !== undefined && val !== null) {
-        if (key === 'owner' || key === 'owners') {
-          values[key] = [];
-          val.forEach(function (owner_stub) {
-            owner = owner_stub.reify();
-            values[key].push({
-              name: owner.name,
-              email: owner.email
-            });
-          });
-        } else if (key === 'audit') {
-          audit = this.audit.reify();
-          values[key] = {
-            status: audit.status,
-            title: audit.title
-          };
+      can.each(this.custom_attribute_values, function (customAttr) {
+        var value;
+        var obj;
+        customAttr = customAttr.reify();
+        if (customAttr.attribute_object) {
+          obj = customAttr.attribute_object.reify();
+          value = _.filter([obj.email, obj.name, obj.title, obj.slug]);
         } else {
-          if ($.type(val) === 'date') {
-            val = val.toISOString().substring(0, 10);
-          }
-          if ($.type(val) === 'boolean') {
-            val = String(val);
-          }
-          if (_.contains(['string', 'array'], $.type(val))) {
-            values[key] = val;
+          value = customAttr.attribute_value;
+        }
+        customAttrs[customAttrIds[customAttr.custom_attribute_id]] = value;
+      });
+
+      if (!mappings[longTitle]) {
+        mappings[longTitle] = 'title';
+      }
+      keys = _.union(keys, longTitle, _.keys(mappings), _.keys(customAttrs));
+      $.each(keys, function (index, key) {
+        var attrKey = mappings[key] || key;
+        var val;
+        var owner;
+        var audit;
+
+        val = this[attrKey];
+        if (val === undefined) {
+          val = customAttrs[attrKey];
+        }
+
+        if (val !== undefined && val !== null) {
+          if (key === 'owner' || key === 'owners') {
+            values[key] = [];
+            val.forEach(function (owner_stub) {
+              owner = owner_stub.reify();
+              values[key].push({
+                name: owner.name,
+                email: owner.email
+              });
+            });
+          } else if (key === 'audit') {
+            audit = this.audit.reify();
+            values[key] = {
+              status: audit.status,
+              title: audit.title
+            };
+          } else {
+            if ($.type(val) === 'date') {
+              val = val.toISOString().substring(0, 10);
+            }
+            if ($.type(val) === 'boolean') {
+              val = String(val);
+            }
+            if (_.contains(['string', 'array'], $.type(val))) {
+              values[key] = val;
+            }
           }
         }
-      }
-    }.bind(this));
-    return values;
-  },
+      }.bind(this));
+      return values;
+    },
 
-  hash_fragment: function () {
-    var type = can.spaceCamelCase(this.type || '')
+    hash_fragment: function () {
+      var type = can.spaceCamelCase(this.type || '')
             .toLowerCase()
             .replace(/ /g, '_');
 
-    return [type, this.id].join('/');
-  },
-  get_custom_value: function (prop) {
-    var attr = _.find(GGRC.custom_attr_defs, function (item) {
-      return item.definition_type === this.type.toLowerCase() &&
+      return [type, this.id].join('/');
+    },
+    get_custom_value: function (prop) {
+      var attr = _.find(GGRC.custom_attr_defs, function (item) {
+        return item.definition_type === this.type.toLowerCase() &&
         item.title === prop;
-    }.bind(this));
-    var result;
-    if (!attr) {
-      return undefined;
-    }
-    result = _.find(this.custom_attribute_values, function (item) {
-      return item.reify().custom_attribute_id === attr.id;
-    });
-    if (result) {
-      result = result.reify().attribute_value;
-      if (attr.attribute_type.toLowerCase() === 'date') {
-        result = moment(result, 'MM/DD/YYYY').format('YYYY-MM-DD');
+      }.bind(this));
+      var result;
+      if (!attr) {
+        return undefined;
       }
-    }
-    return result;
-  },
+      result = _.find(this.custom_attribute_values, function (item) {
+        return item.reify().custom_attribute_id === attr.id;
+      });
+      if (result) {
+        result = result.reify().attribute_value;
+        if (attr.attribute_type.toLowerCase() === 'date') {
+          result = moment(result, 'MM/DD/YYYY').format('YYYY-MM-DD');
+        }
+      }
+      return result;
+    },
 
   // Returns a deep property as specified in the descriptor built
   // by Cacheable.parse_deep_property_descriptor
-  get_deep_property: function (property_descriptor) {
-    var i;
-    var j;
-    var part;
-    var field;
-    var found;
-    var tmp;
-    var val = this;
-    var rCustom = /^custom\:/i;
-    var mapProp;
+    get_deep_property: function (property_descriptor) {
+      var i;
+      var j;
+      var part;
+      var field;
+      var found;
+      var tmp;
+      var val = this;
+      var rCustom = /^custom\:/i;
+      var mapProp;
 
-    function mapDeepProp(count) {
-      count += 1;
-      return function (element) {
-        return element.get_deep_property(property_descriptor.slice(count));
-      };
-    }
-    for (i = 0; i < property_descriptor.length; i++) {
-      part = property_descriptor[i];
-      if (val.instance) {
-        val = val.instance;
+      function mapDeepProp(count) {
+        count += 1;
+        return function (element) {
+          return element.get_deep_property(property_descriptor.slice(count));
+        };
       }
-      found = false;
-      if (part === 'GET_ALL') {
-        mapProp = mapDeepProp(i);
-        return _.map(val, mapProp);
-      }
-      for (j = 0; j < part.length; j++) {
-        field = part[j];
-        tmp = val[field];
-        if (tmp !== undefined && tmp !== null) {
-          val = tmp;
-          if (typeof val.reify === 'function') {
-            val = val.reify();
+      for (i = 0; i < property_descriptor.length; i++) {
+        part = property_descriptor[i];
+        if (val.instance) {
+          val = val.instance;
+        }
+        found = false;
+        if (part === 'GET_ALL') {
+          mapProp = mapDeepProp(i);
+          return _.map(val, mapProp);
+        }
+        for (j = 0; j < part.length; j++) {
+          field = part[j];
+          tmp = val[field];
+          if (tmp !== undefined && tmp !== null) {
+            val = tmp;
+            if (typeof val.reify === 'function') {
+              val = val.reify();
+            }
+            found = true;
+            break;
+          } else if (rCustom.test(field)) {
+            field = field.split(':')[1];
+            val = this.get_custom_value(field);
+            found = true;
+            break;
           }
-          found = true;
-          break;
-        } else if (rCustom.test(field)) {
-          field = field.split(':')[1];
-          val = this.get_custom_value(field);
-          found = true;
-          break;
+        }
+        if (!found) {
+          return null;
         }
       }
-      if (!found) {
-        return null;
-      }
+      return val;
     }
-    return val;
-  }
-});
-
-  _old_attr = can.Observe.prototype.attr;
-  can.Observe.prototype.attr = function(key, val) {
+  });
+  /* TODO: hack on can.Observe should be removed or at least placed outside of Cacheable Model Class */
+  _oldAttr = can.Observe.prototype.attr;
+  can.Observe.prototype.attr = function (key, val) {
     if (key instanceof can.Observe) {
       if (arguments[0] === this) {
         return this;
       } else {
-        return _old_attr.apply(this, [key.serialize()]);
+        return _oldAttr.apply(this, [key.serialize()]);
       }
     } else {
-      return _old_attr.apply(this, arguments);
+      return _oldAttr.apply(this, arguments);
     }
   };
 
-  can.Observe.prototype.stub = function() {
+  can.Observe.prototype.stub = function () {
+    var type;
+    var id;
+
     if (!(this instanceof can.Model || this instanceof can.Stub))
       console.debug('.stub() called on non-stub, non-instance object', this);
-
-    var type, id, stub;
 
     if (this instanceof can.Stub) {
       return this;
@@ -1507,7 +1490,8 @@ can.Model('can.Model.Cacheable', {
   };
 
   can.Observe.prototype.reify = function () {
-    var type, model;
+    var type;
+    var model;
 
     if (this instanceof can.Model) {
       return this;

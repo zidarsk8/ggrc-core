@@ -9,14 +9,18 @@
 
   overdueCompute = can.compute(function (val) {
     var date;
+    var today = moment().startOf('day');
+    var startOfDate;
     if (this.attr('status') === 'Verified') {
       return '';
     }
     date = moment(this.attr('next_due_date') || this.attr('end_date'));
-    if (date && date.isBefore(new Date())) {
-      return 'overdue';
+    startOfDate = moment(date).startOf('day');
+    // TODO: [Overdue] Move this logic to helper.
+    if (date && today.diff(startOfDate, 'days') <= 0) {
+      return '';
     }
-    return '';
+    return 'overdue';
   });
 
   function refreshAttr(instance, attr) {
@@ -168,7 +172,12 @@
     create: 'POST /api/cycle_task_entries',
     update: 'PUT /api/cycle_task_entries/{id}',
     destroy: 'DELETE /api/cycle_task_entries/{id}',
-
+    info_pane_options: {
+      attachments: {
+        mapping: 'documents',
+        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache'
+      }
+    },
     attributes: {
       cycle_task_group_object_task: 'CMS.Models.CycleTaskGroupObjectTask.stub',
       modified_by: 'CMS.Models.Person.stub',
@@ -407,6 +416,10 @@
       var workflows;
       var _workflow;
       var cycle;
+      var person = {
+        id: GGRC.current_user.id,
+        type: 'Person'
+      };
 
       if (newObjectForm) {
         // prepopulate dates with default ones
@@ -414,7 +427,8 @@
         this.attr('end_date', moment().add({month: 3}).toDate());
 
         if (!form.contact) {
-          form.attr('contact', {id: GGRC.current_user.id, type: 'Person'});
+          form.attr('contact', person);
+          form.attr('_transient.contact', person);
         }
 
         // using setTimeout to execute this after the modal is loaded
@@ -445,6 +459,9 @@
         cycle = form.cycle.reify();
         if (!_.isUndefined(cycle.workflow)) {
           form.attr('workflow', cycle.workflow.reify());
+        }
+        if (this.contact) {
+          this.attr('_transient.contact', this.contact);
         }
       }
     },

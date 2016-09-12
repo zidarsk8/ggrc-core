@@ -35,7 +35,7 @@ class TestWorkflowObjectsImport(TestCase):
     filename = "workflow_small_sheet.csv"
     response = self.import_file(filename)
 
-    self._check_response(response, {})
+    self._check_csv_response(response, {})
 
     self.assertEqual(1, Workflow.query.count())
     self.assertEqual(1, TaskGroup.query.count())
@@ -63,7 +63,7 @@ class TestWorkflowObjectsImport(TestCase):
             ],
         }
     }
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)
 
   def test_import_task_date_format(self):
     """Test import of tasks for workflows
@@ -144,7 +144,7 @@ class TestWorkflowObjectsImport(TestCase):
             ])
         },
     }
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)
 
     task_types = {
         "text": [
@@ -192,7 +192,7 @@ class TestWorkflowObjectsImport(TestCase):
             ])
         },
     }
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)
 
   def test_malformed_task_dates(self):
     """Test import updates with malformed task dates.
@@ -217,7 +217,7 @@ class TestWorkflowObjectsImport(TestCase):
             ]),
         },
     }
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)
     task_slugs = ["t-1", "t-2", "t-3", "t-4"]
     tasks = db.session.query(TaskGroupTask).filter(
         TaskGroupTask.slug.in_(task_slugs)).all()

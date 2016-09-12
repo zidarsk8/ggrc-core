@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <label class="inline-edit__checkbox">
-  {{#if context.isEdit}}
+  {{#if isEdit}}
       <input can-value="context.value" type="checkbox" autofocus> {{titleText}}
   {{else}}
       <input disabled type="checkbox" can-value="context.value"> {{titleText}}

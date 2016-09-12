@@ -91,17 +91,7 @@
                 return mapping.documentable.reify();
               }
             })
-            .fail(function (err) {
-              var messages = {
-                '403': 'You don\'t have the permission to access the ' +
-                'requested resource. It is either read-protected or not ' +
-                'readable by the server.'
-              };
-              if (messages[err.status]) {
-                $('body').trigger('ajax:flash',
-                  {warning: messages[err.status]});
-              }
-            });
+            .fail(GGRC.Errors.notifier('error'));
         });
       }
     }

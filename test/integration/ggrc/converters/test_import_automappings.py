@@ -1,8 +1,6 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from ggrc.models import Relationship
-from ggrc.converters import errors
 from integration.ggrc.converters import TestCase
 from integration.ggrc.generator import ObjectGenerator
 
@@ -13,7 +11,6 @@ class TestBasicCsvImport(TestCase):
     TestCase.setUp(self)
     self.generator = ObjectGenerator()
     self.client.get("/login")
-
 
   def test_basic_automappings(self):
     filename = "automappings.csv"
@@ -33,4 +30,3 @@ class TestBasicCsvImport(TestCase):
     for i in range(1, 8):
       self.assertIn("reg-{}".format(i), response.data)
       self.assertIn("control-{}".format(i), response.data)
-

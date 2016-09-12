@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 (function (can, $) {
+  'use strict';
+
   GGRC.Components('reminder', {
     tag: 'reminder',
     template: '<content/>',
@@ -11,19 +13,31 @@
       type: '@',
       modal_title: '@',
       modal_description: '@',
-      reminder: function (scope, el, ev) {
+
+      /**
+       * Create reminder notifications for all assessors of an Assessment.
+       *
+       * @param {can.Map} scope - the component's scope
+       * @param {jQuery.Object} $el - the DOM element that triggered the action
+       * @param {jQuery.Event} ev - the event object
+       */
+      reminder: function (scope, $el, ev) {
         var instance = scope.instance;
 
-        instance.refresh();
-        instance.attr('reminderType', scope.type);
-
-        $.when(instance.save()).then(function () {
-          GGRC.Controllers.Modals.confirm({
-            modal_title: scope.attr('modal_title'),
-            modal_description: scope.attr('modal_description'),
-            button_view: GGRC.mustache_path + '/modals/close_buttons.mustache'
+        instance
+          .refresh()
+          .then(function () {
+            instance.attr('reminderType', scope.type);
+            return $.when(instance.save());
+          })
+          .then(function () {
+            GGRC.Controllers.Modals.confirm({
+              modal_title: scope.attr('modal_title'),
+              modal_description: scope.attr('modal_description'),
+              button_view:
+                GGRC.mustache_path + '/modals/close_buttons.mustache'
+            });
           });
-        });
       }
     }
   });

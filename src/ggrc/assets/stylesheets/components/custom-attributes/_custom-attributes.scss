@@ -1,0 +1,43 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+ca-object-validation {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-width: 50%;
+  box-sizing: border-box;
+}
+ca-object {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+ca-object-validation-icon {
+  display: flex;
+  width: 24px;
+  line-height: 24px;
+  height: 24px;
+  color: transparent;
+
+  .validation-icon {
+    text-align: center;
+    color: transparent;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    display: block;
+
+    &.validation-icon-empty {
+      color: $icon-color-empty;
+    }
+    &.validation-icon-invalid {
+      color: $icon-color-invalid;
+    }
+    &.validation-icon-valid {
+      color: $icon-color-valid;
+    }
+  }
+}

@@ -299,7 +299,7 @@ def send_email(user_email, subject, body):
   """
   sender = get_app_engine_email()
   if not mail.is_email_valid(user_email):
-    current_app.logger.error("Invalid email recipient: {}".format(user_email))
+    current_app.logger.error("Invalid email recipient: %s", user_email)
     return
   if not sender:
     current_app.logger.error("APPENGINE_EMAIL setting is invalid.")

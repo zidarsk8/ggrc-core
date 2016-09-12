@@ -4,16 +4,16 @@
 """Tests for /query api endpoint."""
 
 from datetime import datetime
+from operator import itemgetter
 from os.path import abspath, dirname, join
 from flask import json
 from nose.plugins.skip import SkipTest
 
-from ggrc.app import app
-from integration.ggrc import TestCase
+from integration.ggrc.converters import TestCase
 
 
 THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, '../converters/test_csvs/')
+CSV_DIR = join(THIS_ABS_PATH, "../converters/test_csvs/")
 
 # to be moved into converters.query_helper
 DATE_FORMAT_REQUEST = "%m/%d/%Y"
@@ -28,20 +28,7 @@ class TestAdvancedQueryAPI(TestCase):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     # This imported file could be simplified a bit to speed up testing.
-    cls.import_file("data_for_export_testing.csv")
-
-  @classmethod
-  def import_file(cls, filename):
-    """Import a csv file.
-
-    The file should contain all objects and mappings needed for writing proper
-    query api tests.
-    """
-    client = app.test_client()
-    client.get("/login")
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {"X-test-only": "false", "X-requested-by": "gGRC"}
-    client.post("/_service/import_csv", data=data, headers=headers)
+    cls._import_file("data_for_export_testing.csv")
 
   def setUp(self):
     self.client.get("/login")
@@ -50,8 +37,16 @@ class TestAdvancedQueryAPI(TestCase):
     """Make a POST to /query endpoint."""
     if not isinstance(data, list):
       data = [data]
-    headers = {'Content-Type': 'application/json', }
+    headers = {"Content-Type": "application/json", }
     return self.client.post("/query", data=json.dumps(data), headers=headers)
+
+  def _get_first_result_set(self, data, *keys):
+    """Post data, get response, get values from it like in obj["a"]["b"]."""
+    result = json.loads(self._post(data).data)[0]
+    for key in keys:
+      result = result.get(key)
+      self.assertIsNot(result, None)
+    return result
 
   def test_basic_query_eq(self):
     """Filter by = operator."""
@@ -82,13 +77,11 @@ class TestAdvancedQueryAPI(TestCase):
             "expression": {
                 "left": "title",
                 "op": {"name": "~"},
-                "right": "1",
+                "right": title_pattern,
             },
         },
     }
-    response = json.loads(self._post(data).data)[0]
-    programs = response.get("Program")
-    self.assertIsNot(programs, None)
+    programs = self._get_first_result_set(data, "Program")
     self.assertEqual(programs["count"], 12)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(all(title_pattern in program["title"]
@@ -107,9 +100,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response = json.loads(self._post(data).data)[0]
-    programs = response.get("Program")
-    self.assertIsNot(programs, None)
+    programs = self._get_first_result_set(data, "Program")
     self.assertEqual(programs["count"], 22)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(all(program["title"] != title
@@ -128,9 +119,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response = json.loads(self._post(data).data)[0]
-    programs = response.get("Program")
-    self.assertIsNot(programs, None)
+    programs = self._get_first_result_set(data, "Program")
     self.assertEqual(programs["count"], 11)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(all(title_pattern not in program["title"]
@@ -149,9 +138,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response = json.loads(self._post(data).data)[0]
-    programs = response.get("Program")
-    self.assertIsNot(programs, None)
+    programs = self._get_first_result_set(data, "Program")
     self.assertEqual(programs["count"], 9)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(
@@ -173,9 +160,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response = json.loads(self._post(data).data)[0]
-    programs = response.get("Program")
-    self.assertIsNot(programs, None)
+    programs = self._get_first_result_set(data, "Program")
     self.assertEqual(programs["count"], 13)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(
@@ -197,9 +182,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response = json.loads(self._post(data).data)[0]
-    regulations = response.get("Regulation")
-    self.assertIsNot(regulations, None)
+    regulations = self._get_first_result_set(data, "Regulation")
     self.assertEqual(regulations["count"], 21)
     self.assertEqual(len(regulations["values"]), regulations["count"])
     self.assertTrue(all((regulation["description"] and
@@ -207,10 +190,6 @@ class TestAdvancedQueryAPI(TestCase):
                         (regulation["notes"] and
                          text_pattern in regulation.get("notes", ""))
                         for regulation in regulations["values"]))
-
-  @SkipTest
-  def test_basic_query_filter(self):
-    pass
 
   def test_basic_query_pagination(self):
     """Test basic query with pagination info."""
@@ -229,9 +208,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response = json.loads(self._post(data).data)[0]
-    programs = response.get("Program")
-    self.assertIsNot(programs, None)
+    programs = self._get_first_result_set(data, "Program")
     self.assertEqual(programs["count"], to_ - from_)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertEqual(programs["total"], 23)
@@ -248,9 +225,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response_no_limit = json.loads(self._post(data_no_limit).data)[0]
-    programs_no_limit = response_no_limit.get("Program")
-    self.assertIsNot(programs_no_limit, None)
+    programs_no_limit = self._get_first_result_set(data_no_limit, "Program")
     self.assertEqual(programs_no_limit["count"], programs_no_limit["total"])
 
     from_, to_ = 3, 5
@@ -258,12 +233,142 @@ class TestAdvancedQueryAPI(TestCase):
     data_limit.update({
         "limit": [from_, to_],
     })
-    response_limit = json.loads(self._post(data_limit).data)[0]
-    programs_limit = response_limit.get("Program")
-    self.assertIsNot(programs_limit, None)
+    programs_limit = self._get_first_result_set(data_limit, "Program")
     self.assertEqual(programs_limit["count"], to_ - from_)
 
     self.assertEqual(programs_limit["total"], programs_no_limit["total"])
+
+  def test_query_order_by(self):
+    """Results get sorted by own field."""
+    # assumes unique title
+
+    def get_titles(programs):
+      return [program["title"] for program in programs]
+
+    data_default = {
+        "object_name": "Program",
+        "order_by": [{"name": "title"}],
+        "filters": {"expression": {}},
+    }
+    programs_default = self._get_first_result_set(data_default,
+                                                  "Program", "values")
+    titles_default = get_titles(programs_default)
+
+    data_asc = {
+        "object_name": "Program",
+        "order_by": [{"name": "title", "desc": False}],
+        "filters": {"expression": {}},
+    }
+    programs_asc = self._get_first_result_set(data_asc,
+                                              "Program", "values")
+    titles_asc = get_titles(programs_asc)
+
+    data_desc = {
+        "object_name": "Program",
+        "order_by": [{"name": "title", "desc": True}],
+        "filters": {"expression": {}},
+    }
+    programs_desc = self._get_first_result_set(data_desc,
+                                               "Program", "values")
+    titles_desc = get_titles(programs_desc)
+
+    # the titles are sorted ascending with desc=False
+    self.assertListEqual(titles_asc, sorted(titles_asc))
+    # desc=False by default
+    self.assertListEqual(titles_default, titles_asc)
+    # the titles are sorted descending with desc=True
+    self.assertListEqual(titles_desc, list(reversed(titles_asc)))
+
+  def test_query_order_by_several_fields(self):
+    """Results get sorted by two fields at once."""
+    data = {
+        "object_name": "Regulation",
+        "order_by": [{"name": "notes", "desc": True}, {"name": "title"}],
+        "filters": {"expression": {}},
+    }
+    regulations = self._get_first_result_set(data,
+                                             "Regulation", "values")
+
+    data_unsorted = {
+        "object_name": "Regulation",
+        "filters": {"expression": {}},
+    }
+    regulations_unsorted = self._get_first_result_set(data_unsorted,
+                                                      "Regulation", "values")
+
+    self.assertListEqual(
+        regulations,
+        sorted(sorted(regulations_unsorted,
+                      key=itemgetter("title")),
+               key=itemgetter("notes"),
+               reverse=True),
+    )
+
+  def test_query_order_by_related_titled(self):
+    """Results get sorted by title of related Titled object."""
+    data_title = {
+        "object_name": "Audit",
+        "order_by": [{"name": "program"}, {"name": "id"}],
+        "filters": {"expression": {}},
+    }
+    audits_title = self._get_first_result_set(data_title,
+                                              "Audit", "values")
+
+    data_unsorted = {
+        "object_name": "Audit",
+        "filters": {"expression": {}},
+    }
+    audits_unsorted = self._get_first_result_set(data_unsorted,
+                                                 "Audit", "values")
+
+    # get titles from programs to check ordering
+    data_program = {
+        "object_name": "Program",
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data_program,
+                                          "Program", "values")
+    program_id_title = {program["id"]: program["title"]
+                        for program in programs}
+
+    self.assertListEqual(
+        audits_title,
+        sorted(sorted(audits_unsorted, key=itemgetter("id")),
+               key=lambda a: program_id_title[a["program"]["id"]]),
+    )
+
+  def test_query_order_by_person(self):
+    """Results get sorted by name or email related Person object."""
+    data_person = {
+        "object_name": "Clause",
+        "order_by": [{"name": "contact"}, {"name": "id"}],
+        "filters": {"expression": {}},
+    }
+    clauses_person = self._get_first_result_set(data_person,
+                                                "Clause", "values")
+
+    data_unsorted = {
+        "object_name": "Clause",
+        "filters": {"expression": {}},
+    }
+    clauses_unsorted = self._get_first_result_set(data_unsorted,
+                                                  "Clause", "values")
+
+    # get names and emails from people to check ordering
+    data_people = {
+        "object_name": "Person",
+        "filters": {"expression": {}},
+    }
+    people = self._get_first_result_set(data_people,
+                                        "Person", "values")
+    person_id_name = {person["id"]: (person["name"], person["email"])
+                      for person in people}
+
+    self.assertListEqual(
+        clauses_person,
+        sorted(sorted(clauses_unsorted, key=itemgetter("id")),
+               key=lambda c: person_id_name[c["contact"]["id"]]),
+    )
 
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
@@ -278,9 +383,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response_values = json.loads(self._post(data_values).data)[0]
-    programs_values = response_values.get("Program")
-    self.assertIsNot(programs_values, None)
+    programs_values = self._get_first_result_set(data_values, "Program")
 
     data_count = {
         "object_name": "Program",
@@ -293,9 +396,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response_count = json.loads(self._post(data_count).data)[0]
-    programs_count = response_count.get("Program")
-    self.assertIsNot(programs_count, None)
+    programs_count = self._get_first_result_set(data_count, "Program")
 
     self.assertEqual(programs_values["count"], programs_count["count"])
 
@@ -312,9 +413,7 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response_values = json.loads(self._post(data_values).data)[0]
-    programs_values = response_values.get("Program")
-    self.assertIsNot(programs_values, None)
+    programs_values = self._get_first_result_set(data_values, "Program")
 
     data_ids = {
         "object_name": "Program",
@@ -327,26 +426,12 @@ class TestAdvancedQueryAPI(TestCase):
             },
         },
     }
-    response_ids = json.loads(self._post(data_ids).data)[0]
-    programs_ids = response_ids.get("Program")
-    self.assertIsNot(programs_ids, None)
+    programs_ids = self._get_first_result_set(data_ids, "Program")
 
     self.assertEqual(
         set(obj.get("id") for obj in programs_values["values"]),
         set(programs_ids["ids"]),
     )
-
-  @SkipTest
-  def test_mapped_query(self):
-    pass
-
-  @SkipTest
-  def test_mapped_query_filter(self):
-    pass
-
-  @SkipTest
-  def test_mapped_query_pagination(self):
-    pass
 
   @SkipTest
   def test_self_link(self):

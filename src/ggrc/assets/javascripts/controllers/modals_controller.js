@@ -221,18 +221,20 @@ can.Control('GGRC.Controllers.Modals', {
       , can.view(this.options.button_view, dfd)
       , can.view(this.options.custom_attributes_view, dfd)
     ).done(this.proxy('draw'));
-  }
+  },
 
-  , fetch_data: function (params) {
+  fetch_data: function (params) {
     var that = this;
     var dfd;
-    var instance;
+    var instance = this.options.instance;
+
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
-    if (this.options.skip_refresh && this.options.instance) {
-      return new $.Deferred().resolve(this.options.instance);
-    } else if (this.options.instance) {
-      dfd = this.options.instance.refresh();
+
+    if (this.options.skip_refresh && instance) {
+      return new $.Deferred().resolve(instance);
+    } else if (instance) {
+      dfd = instance.refresh();
     } else if (this.options.model) {
       if (this.options.new_object_form) {
         dfd = $.when(this.options.attr(
@@ -247,7 +249,7 @@ can.Control('GGRC.Controllers.Modals', {
           }
           that.options.attr('new_object_form', true);
           that.options.attr('instance', new that.options.model(params));
-          return that.options.instance;
+          return instance;
         }).done(function () {
           // Check if modal was closed
           if (that.element !== null) {
@@ -258,12 +260,14 @@ can.Control('GGRC.Controllers.Modals', {
     } else {
       this.options.attr('instance', new can.Observe(params));
       that.on();
-      dfd = new $.Deferred().resolve(this.options.instance);
+      dfd = new $.Deferred().resolve(instance);
     }
-    instance = this.options.instance;
-    if (instance) {
+
+    if (instance &&
+      _.exists(instance, 'class.is_custom_attributable') &&
+      !(instance instanceof CMS.Models.Assessment)) {
       // Make sure custom attributes are preloaded:
-      dfd = dfd.then(function () {
+      dfd.then(function () {
         return $.when(
           instance.load_custom_attribute_definitions &&
             instance.load_custom_attribute_definitions(),
@@ -277,8 +281,9 @@ can.Control('GGRC.Controllers.Modals', {
       this.reset_form(function () {
         if (instance) {
           // Make sure custom attr validations/values are reset
-          instance.custom_attributes = undefined;
-          if (instance.setup_custom_attributes) {
+          if (instance.setup_custom_attributes &&
+            !(instance instanceof CMS.Models.Assessment)) {
+            instance.removeAttr('custom_attributes');
             instance.setup_custom_attributes();
           }
         }
@@ -381,6 +386,23 @@ can.Control('GGRC.Controllers.Modals', {
       this.set_value_from_element(el);
     }
   },
+
+  /**
+   * The onChange handler for the custom attribute type dropdown.
+   *
+   * This handler is specific to the Custom Attribute Edit modal.
+   *
+   * @param {jQuery} $el - the dropdown DOM element
+   * @param {$.Event} ev - the event object
+   */
+  'dropdown[data-purpose="ca-type"] change': function ($el, ev) {
+    var instance = this.options.instance;
+
+    if (instance.attribute_type !== 'Dropdown') {
+      instance.attr('multi_choice_options', undefined);
+    }
+  },
+
   serialize_form: function () {
     var $form = this.options.$content.find("form");
     var $elements = $form.find(":input:not(isolate-form *)");

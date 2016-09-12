@@ -14,6 +14,16 @@
 -block extra_javascript
   =super()
   GGRC.page_object = ={ instance_json()|safe };
-  GGRC.counters = { "user_task_count": ={ user_task_count()|safe } };
+
+  -# Since it is expensive (issues a DB query), only invoke user_task_count()
+  -# once and use the resulting list. An auxiliary property is used to store
+  -# the result, because there are no other better ways (?) to do that in HAML
+  GGRC.counters = {
+    "_task_counts": ={ user_task_count()|safe }
+  }
+  GGRC.counters = {
+    "user_task_count": GGRC.counters._task_counts[0],
+    "user_overdue_task_count": GGRC.counters._task_counts[1]
+  };
 
 -block widget_area

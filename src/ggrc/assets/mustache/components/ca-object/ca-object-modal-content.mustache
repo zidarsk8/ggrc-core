@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2016 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<form class="modal-body attachment-modal__body">
+    <div class="attachment-modal__field">
+        <h6 class="attachment-modal__field-title">{{content.title}}</h6>
+        <div class="attachment-modal__field-value">
+          {{#if isPerson}}
+              <person-info person-obj="content.value"></person-info>
+          {{else}}
+              <read-more text="content.value"></read-more>
+          {{/if}}
+        </div>
+    </div>
+    <div class="attachment-modal__controls">
+      {{#comment}}
+          <assessment-add-comment instance="instance" state="state" ca-ids="caIds" comment-place-holder="Enter comment"></assessment-add-comment>
+      {{/comment}}
+      {{#evidence}}
+          <assessment-attachments-list class="attachment-list" source_mapping="instance"
+                                       parent_instance="instance"></assessment-attachments-list>
+      {{/evidence}}
+    </div>
+</form>

@@ -6,10 +6,9 @@
 (function (can, GGRC) {
   'use strict';
 
-  var cmpName = 'validation-icon';
   var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/validation-icon.mustache');
-  var tag = 'assessment-' + cmpName;
+    '/components/ca-object/ca-object-validation-icon.mustache');
+  var tag = 'ca-object-validation-icon';
   /**
    * State object to present possible icons for validation
    */
@@ -27,8 +26,6 @@
     tag: tag,
     template: tpl,
     scope: {
-      caId: null,
-      instance: null,
       validation: null,
       iconCls: icons.noValidation,
       applyState: function () {
@@ -43,26 +40,14 @@
         }
 
         this.attr('iconCls', icon);
-      },
-      hasRequiredAttachments: function (attachments) {
-        var id = parseInt(this.attr('caId'), 10);
-        return attachments.every(function (x) {
-          return x !== id;
-        });
-      },
-      validate: function (list) {
-        this.attr('validation.valid', this.hasRequiredAttachments(list));
       }
     },
     events: {
       init: function () {
         this.scope.applyState();
       },
-      '{scope.validation} change': function () {
+      '{scope} validation': function () {
         this.scope.applyState();
-      },
-      '{scope.instance} invalidCustomAttributes': function (scope, ev, list) {
-        this.scope.validate(list);
       }
     }
   });
