@@ -229,7 +229,7 @@ class QueryHelper(object):
       object_query["ids"] = [o.id for o in objects]
     return self.query
 
-  def get_type_query(self, model, permission_type):
+  def _get_type_query(self, model, permission_type):
     """Prepare query to filter models based on the available contexts and
     resources.
     """
@@ -258,7 +258,7 @@ class QueryHelper(object):
     query = object_class.query
 
     requested_permissions = object_query.get("permissions", "read")
-    type_query = self.get_type_query(object_class, requested_permissions)
+    type_query = self._get_type_query(object_class, requested_permissions)
     if type_query is not None:
       query = query.filter(type_query)
 
