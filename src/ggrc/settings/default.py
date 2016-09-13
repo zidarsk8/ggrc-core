@@ -77,7 +77,7 @@ LOGGING_HANDLER = {
     "formatter": "default",
 }
 LOGGING_FORMATTER = {
-    "format": "%(asctime)s %(name)s [%(levelname)s] %(message)s",
+    "format": "%(levelname)-8s %(asctime)s %(name)s %(message)s",
 }
 LOGGING_ROOT = "WARNING"
 LOGGING_LOGGERS = {
