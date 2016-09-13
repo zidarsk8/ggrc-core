@@ -10,7 +10,7 @@
     width: 85px;
     height: 28px;
     line-height: 26px;
-    margin: 0 24px;
+    margin: 0 0 0 24px;
   }
 }
 .grid-data-header {
@@ -32,7 +32,7 @@
 }
 .grid-data-body {
   min-height: 300px;
-  max-height: 600px;
+  max-height: 500px;
   box-sizing: border-box;
   overflow: auto;
 
