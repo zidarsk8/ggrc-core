@@ -22,8 +22,6 @@ from ggrc.models.object_person import ObjectPerson
 from ggrc.models.object_owner import ObjectOwner
 from ggrc.models.relationship import Relationship
 from ggrc_basic_permissions.models import UserRole
-from ggrc_basic_permissions import objects_via_assignable_query
-from ggrc_basic_permissions import program_relationship_query
 from ggrc_basic_permissions import backlog_workflows
 from ggrc.rbac import permissions, context_query_filter
 from ggrc.fulltext.sql import SqlIndexer
@@ -99,10 +97,6 @@ class MysqlIndexer(SqlIndexer):
             permissions.read_contexts_for(model_name))
 
       if contexts is not None:
-        # Don't filter out None contexts here
-        if None not in contexts and permission_type == "read":
-          contexts.append(None)
-
         if resources:
           resource_sql = and_(
               MysqlRecordProperty.type == model_name,
@@ -123,13 +117,10 @@ class MysqlIndexer(SqlIndexer):
         or_(*type_queries))
 
   def _get_filter_query(self, terms):
-    whitelist = or_(
-        # Because property values for custom attributes are
-        # `attribute_value_<id>`
-        MysqlRecordProperty.property.contains('attribute_value'),
-        MysqlRecordProperty.property.in_(
-            ['title', 'name', 'email', 'notes', 'description', 'slug'])
-    )
+    """Get the whitelist of fields to filter in full text table."""
+    whitelist = MysqlRecordProperty.property.in_(
+        ['title', 'name', 'email', 'notes', 'description', 'slug'])
+
     if not terms:
       return whitelist
     elif terms:
@@ -178,13 +169,6 @@ class MysqlIndexer(SqlIndexer):
     This method only *limits* the result set -- Contexts and Roles will still
     filter out forbidden objects.
     '''
-
-    # Check if the user has Creator role
-    current_user = get_current_user()
-    my_objects = contact_id is not None
-    if current_user.system_wide_role == "Creator":
-      contact_id = current_user.id
-
     if not contact_id:
       return query
 
@@ -212,6 +196,7 @@ class MysqlIndexer(SqlIndexer):
     # Objects to which the user is "mapped"
     # We don't return mapped objects for the Creator because being mapped
     # does not give the Creator necessary permissions to view the object.
+    current_user = get_current_user()
     if current_user.system_wide_role != "Creator":
       object_people_query = db.session.query(
           ObjectPerson.personable_id.label('id'),
@@ -276,12 +261,6 @@ class MysqlIndexer(SqlIndexer):
     )
     type_union_queries.append(model_assignee_query)
 
-    if not my_objects:
-      type_union_queries.append(
-          program_relationship_query(contact_id, True))
-      type_union_queries.append(
-          objects_via_assignable_query(contact_id)
-      )
     # also show backlog workflows
     type_union_queries.append(backlog_workflows())
 
