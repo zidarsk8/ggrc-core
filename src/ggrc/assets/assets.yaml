@@ -133,14 +133,15 @@ dashboard-js-files:
   - components/collapsible-panel/collapsible-panel-body.js
   - components/read-more/read-more.js
   - components/assessment/mapped-objects/mapped-objects.js
-  - components/assessment/mapped-objects/mapped-objects-list.js
   - components/assessment/mapped-objects/mapped-objects-popover.js
-  - components/assessment/mapped-objects/mapped-objects-filter.js
   - components/assessment/urls-list.js
   - components/assessment/attachments-list.js
   - components/assessment/custom-attributes.js
   - components/assessment/inline.js
   - components/assessment/add_comment.js
+  - components/object-list/object-list.js
+  - components/object-list/object-list-item.js
+  - components/object-popover/object-popover.js
   - components/ca-object/ca-object.js
   - components/ca-object/ca-object-validation.js
   - components/ca-object/ca-object-validation-icon.js
@@ -200,7 +201,6 @@ dashboard-js-template-files:
   - components/collapsible-panel/collapsible-panel-body.mustache
   - components/collapsible-panel/collapsible-panel-header.mustache
   - components/assessment/mapped-objects/mapped-objects.mustache
-  - components/assessment/mapped-objects/mapped-objects-list.mustache
   - components/assessment/mapped-objects/mapped-objects-popover.mustache
   - components/assessment/mapped-objects/item-templates/title.mustache
   - components/assessment/mapped-objects/item-templates/title-and-description.mustache
@@ -217,6 +217,9 @@ dashboard-js-template-files:
   - components/assessment/add_comment.mustache
   - components/assessment/comment/input.mustache
   - components/assessment/comment/controls.mustache
+  - components/object-list/object-list.mustache
+  - components/object-list/object-list-item.mustache
+  - components/object-popover/object-popover.mustache
   - components/ca-object/ca-object.mustache
   - components/ca-object/ca-object-title.mustache
   - components/ca-object/ca-object-validation.mustache
