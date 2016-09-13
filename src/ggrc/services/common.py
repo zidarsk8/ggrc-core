@@ -764,10 +764,16 @@ class Resource(ModelView):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
-    if 'Accept' in self.request.headers and \
-       'application/json' not in self.request.headers['Accept']:
+
+    accept_header = self.request.headers.get('Accept', '').strip()
+    if (
+        accept_header and
+        accept_header != '*/*' and
+        'application/json' not in accept_header
+    ):
       return current_app.make_response((
           'application/json', 406, [('Content-Type', 'text/plain')]))
+
     with benchmark("Query read permissions"):
       if not permissions.is_allowed_read(
           self.model.__name__, obj.id, obj.context_id)\
@@ -991,10 +997,15 @@ class Resource(ModelView):
 
   def collection_get(self):
     with benchmark("dispatch_request > collection_get > Check headers"):
-      if 'Accept' in self.request.headers and \
-         'application/json' not in self.request.headers['Accept']:
+      accept_header = self.request.headers.get('Accept', '').strip()
+      if (
+          accept_header and
+          accept_header != '*/*' and
+          'application/json' not in accept_header
+      ):
         return current_app.make_response((
             'application/json', 406, [('Content-Type', 'text/plain')]))
+
     with benchmark("dispatch_request > collection_get > Collection matches"):
       # We skip querying by contexts for Creator role and relationship objects,
       # because it will filter out objects that the Creator can access.
