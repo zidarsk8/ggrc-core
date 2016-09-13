@@ -7,14 +7,12 @@
   'use strict';
 
   var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/mapped-objects/mapped-objects.mustache');
-  var tag = 'assessment-mapped-objects';
-  var itemTplsBasePath = GGRC.mustache_path +
-    '/components/assessment/mapped-objects/item-templates/';
+    '/components/assessment/mapped-objects/mapped-controls.mustache');
+  var tag = 'assessment-mapped-controls';
   /**
-   * Assessment specific mapped objects view component
+   * Assessment specific mapped controls view component
    */
-  GGRC.Components('assessmentMappedObjects', {
+  can.Component.extend({
     tag: tag,
     template: tpl,
     scope: {
@@ -26,10 +24,6 @@
       selectedItem: null,
       parentInstance: null,
       mappedItems: [],
-      itemsTpl: '@',
-      getComputedItemsTpl: function (tpl) {
-        return itemTplsBasePath + tpl + '.mustache';
-      },
       filterFn: function (item) {
         var isControlOnly = this.filter === 'control';
         var isControlType = item.instance.type === 'Control';
@@ -63,13 +57,6 @@
     },
     init: function () {
       this.scope.load();
-    },
-    helpers: {
-      renderItemsTpl: function (options) {
-        var tpl = this.attr('itemsTpl');
-        tpl = this.getComputedItemsTpl(tpl);
-        return can.view.render(tpl, options.scope);
-      }
     }
   });
 })(window.can, window.GGRC);

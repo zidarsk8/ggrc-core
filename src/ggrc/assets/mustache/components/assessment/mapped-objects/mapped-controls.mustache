@@ -19,9 +19,9 @@
 </collapsible-panel-header>
 <collapsible-panel-body expanded="expanded">
     <object-list items="mappedItems" selected-item="selectedItem">
-      {{{renderItemsTpl}}}
+       {{> '/static/mustache/components/assessment/mapped-objects/mapped-controls-item.mustache'}}
     </object-list>
     <object-popover item="selectedItem">
-        <assessment-mapped-objects-popover item-data="itemData"></assessment-mapped-objects-popover>
+        <assessment-mapped-controls-popover item-data="itemData"></assessment-mapped-controls-popover>
     </object-popover>
 </collapsible-panel-body>
