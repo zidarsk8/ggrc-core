@@ -60,3 +60,11 @@ def login_required(func):
     return flask_login.login_required(func)
   else:
     return func
+
+
+def is_creator():
+  """Check if the current user has global role Creator."""
+  current_user = get_current_user()
+  return (hasattr(current_user, 'system_wide_role')
+          and current_user.system_wide_role == "Creator")
+

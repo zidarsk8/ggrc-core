@@ -14,16 +14,17 @@ from sqlalchemy import case
 from sqlalchemy import not_
 from sqlalchemy import or_
 from sqlalchemy import orm
+from sqlalchemy.sql import false
 
 from ggrc import db
+from ggrc.login import is_creator
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
-from ggrc.rbac import permissions
 from ggrc import models
-from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
-
+from ggrc.rbac import context_query_filter
+from ggrc.utils import query_helpers
 
 class BadQueryException(Exception):
   pass
@@ -226,6 +227,24 @@ class QueryHelper(object):
       object_query["ids"] = [o.id for o in objects]
     return self.query
 
+  def get_type_query(self, model, permission_type):
+    """Prepare query to filter models based on the available contexts and
+    resources.
+    """
+    contexts, resources = query_helpers.get_context_resource(
+        model_name=model.__name__, permission_type=permission_type
+    )
+
+    if contexts is not None:
+      if resources:
+        resource_sql = model.id.in_(resources)
+      else:
+        resource_sql = false()
+
+      return or_(
+        context_query_filter(model.context_id, contexts),
+        resource_sql)
+
   def _get_objects(self, object_query):
     """Get a set of objects described in the filters."""
     object_name = object_query["object_name"]
@@ -234,8 +253,13 @@ class QueryHelper(object):
     if expression is None:
       return set()
     object_class = self.object_map[object_name]
-
     query = object_class.query
+
+    requested_permissions = object_query.get("permissions", "read")
+    type_query = self.get_type_query(object_class, requested_permissions)
+    if type_query is not None:
+      query = query.filter(type_query)
+
     filter_expression = self._build_expression(
         expression,
         object_class,
@@ -249,13 +273,8 @@ class QueryHelper(object):
           query,
           object_query["order_by"],
       )
-    requested_permissions = object_query.get("permissions", "read")
-    if requested_permissions == "update":
-      objs = [o for o in query if permissions.is_allowed_update_for(o)]
-    else:
-      objs = [o for o in query if permissions.is_allowed_read_for(o)]
 
-    return objs
+    return query.all()
 
   def _apply_order_by(self, model, query, order_by):
     """Add ordering parameters to a query for objects.
@@ -488,6 +507,21 @@ class QueryHelper(object):
 
     rhs = lambda: autocast(exp["left"], exp["right"])
 
+    def owned():
+      """Get objects for which the user is owner."""
+      res = db.session.query(
+        query_helpers.get_myobjects_query(
+            types=[object_class.__name__],
+            contact_id=exp["ids"][0],
+            is_creator=is_creator(),
+        ).alias().c.id
+      )
+      res = res.all()
+      if res:
+        return object_class.id.in_([obj.id for obj in res])
+      return false()
+
+
     ops = {
         "AND": lambda: lift_bin(and_),
         "OR": lambda: lift_bin(or_),
@@ -503,6 +537,7 @@ class QueryHelper(object):
         "relevant": relevant,
         "text_search": text_search,
         "similar": similar,
+        "owned": owned,
     }
 
     return ops.get(exp["op"]["name"], unknown)()
