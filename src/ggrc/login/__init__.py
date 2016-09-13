@@ -15,9 +15,9 @@ def get_login_module():
   return get_extension_module_for('LOGIN_MANAGER', False)
 
 
-def user_loader(id):
+def user_loader(user_id):
   from .common import find_user_by_id
-  return find_user_by_id(id)
+  return find_user_by_id(user_id)
 
 
 def init_app(app):
@@ -65,6 +65,5 @@ def login_required(func):
 def is_creator():
   """Check if the current user has global role Creator."""
   current_user = get_current_user()
-  return (hasattr(current_user, 'system_wide_role')
-          and current_user.system_wide_role == "Creator")
-
+  return (hasattr(current_user, 'system_wide_role') and
+          current_user.system_wide_role == "Creator")

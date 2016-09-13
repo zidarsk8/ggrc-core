@@ -126,12 +126,6 @@ class MysqlIndexer(SqlIndexer):
     elif terms:
       return and_(whitelist, MysqlRecordProperty.content.contains(terms))
 
-    # FIXME: Temporary (slow) fix for words shorter than MySQL default limit
-    # elif len(terms) < 4:
-    #   return MysqlRecordProperty.content.contains(terms)
-    # else:
-    #   return MysqlRecordProperty.content.match(terms)
-
   def _get_type_select_column(self, model):
     mapper = model._sa_class_manager.mapper
     if mapper.polymorphic_on is None:

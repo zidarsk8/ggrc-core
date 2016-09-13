@@ -151,6 +151,7 @@ class QueryHelper(object):
     self._clean_filters(expression.get("right"))
 
   def _expression_keys(self, exp):
+    """Return the list of keys specified in the expression."""
     operator = exp.get("op", {}).get("name", None)
     if operator in ["AND", "OR"]:
       return self._expression_keys(exp["left"]).union(
@@ -163,6 +164,7 @@ class QueryHelper(object):
 
   def _macro_expand_object_query(self, object_query):
     def expand_task_dates(exp):
+      """Parse task dates from the specified expression."""
       if not isinstance(exp, dict) or "op" not in exp:
         return
       operator = exp["op"]["name"]
@@ -543,6 +545,7 @@ class QueryHelper(object):
     return ops.get(exp["op"]["name"], unknown)()
 
   def _slugs_to_ids(self, object_name, slugs):
+    """Convert SLUG to proper ids for the given objec."""
     object_class = self.object_map.get(object_name)
     if not object_class:
       return []
