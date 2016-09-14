@@ -139,6 +139,7 @@ dashboard-js-files:
   - components/assessment/custom-attributes.js
   - components/assessment/inline.js
   - components/assessment/add_comment.js
+  - components/assessment/controls-toolbar/controls-toolbar.js
   - components/mapped-objects/mapped-objects.js
   - components/object-list/object-list.js
   - components/object-list/object-list-item.js
@@ -153,6 +154,7 @@ dashboard-js-files:
   - components/related-objects/related-objects.js
   - components/reusable-objects/reusable-objects-list.js
   - components/reusable-objects/reusable-objects-item.js
+  - components/simple-modal/simple-modal.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
@@ -208,6 +210,7 @@ dashboard-js-template-files:
   - components/assessment/mapped-objects/mapped-objects-popover.mustache
   - components/assessment/mapped-objects/item-templates/title.mustache
   - components/assessment/mapped-objects/item-templates/title-and-description.mustache
+  - components/assessment/controls-toolbar/controls-toolbar.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/attachments-list.mustache
   - components/assessment/custom-attributes.mustache
@@ -355,6 +358,7 @@ dashboard-js-template-files:
   - components/datepicker/datepicker.mustache
   - components/object_counter/object_counter.mustache
   - components/tree_pagination/tree_pagination.mustache
+  - components/simple-modal/simple-modal.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
