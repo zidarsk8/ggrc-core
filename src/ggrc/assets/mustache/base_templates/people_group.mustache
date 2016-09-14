@@ -38,7 +38,7 @@
         </span>
         {{/can_unmap}}
       {{/has_permissions}}
-      {{{render '/static/mustache/people/popover.mustache' person=.}}}
+      <person-info person-obj="." />
     </li>
   {{/results}}
   <li class="person-add">
