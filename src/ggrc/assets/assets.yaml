@@ -139,6 +139,7 @@ dashboard-js-files:
   - components/assessment/custom-attributes.js
   - components/assessment/inline.js
   - components/assessment/add_comment.js
+  - components/mapped-objects/mapped-objects.js
   - components/object-list/object-list.js
   - components/object-list/object-list-item.js
   - components/object-popover/object-popover.js
@@ -149,6 +150,9 @@ dashboard-js-files:
   - components/ca-object/ca-object-value-mapper.js
   - components/ca-object/ca-object-modal.js
   - components/ca-object/ca-object-modal-content.js
+  - components/related-objects/related-objects.js
+  - components/reusable-objects/reusable-objects-list.js
+  - components/reusable-objects/reusable-objects-item.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
@@ -220,6 +224,8 @@ dashboard-js-template-files:
   - components/object-list/object-list.mustache
   - components/object-list/object-list-item.mustache
   - components/object-popover/object-popover.mustache
+  - components/mapped-objects/mapped-objects.mustache
+  - components/reusable-objects/reusable-objects-item.mustache
   - components/ca-object/ca-object.mustache
   - components/ca-object/ca-object-title.mustache
   - components/ca-object/ca-object-validation.mustache
@@ -315,6 +321,7 @@ dashboard-js-template-files:
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
   - assessments/reusable_objects.mustache
+  - assessments/related-assessments.mustache
   - assessments/header.mustache
   - assessments/urls.mustache
   - assessments/dates_list.mustache
