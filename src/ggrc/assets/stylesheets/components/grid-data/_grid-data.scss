@@ -3,14 +3,9 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 .grid-data-toolbar {
-  display: flex;
   height: 28px;
-  overflow: hidden;
   margin: 0 0 16px 0;
 
-  tree-pagination {
-    flex: 1;
-  }
   .grid-data-toolbar-control {
     width: 85px;
     height: 28px;
@@ -19,8 +14,6 @@
   }
 }
 .grid-data-header {
-  display: flex;
-  box-sizing: border-box;
   padding: 8px 0;
   border: 1px solid #ccc;
   background: #fafafa;
@@ -48,11 +41,12 @@
     background: #fcfcfc;
   }
 }
-
-.grid-data-item {
+// Extra style for the first index/order column
+.grid-data-item-index {
+  width: 100px;
+}
+.grid-data-row {
   overflow: hidden;
-  display: flex;
-  box-sizing: border-box;
   padding: 8px 0;
   border-bottom: 1px solid #ccc;
   // Extra style for columns
