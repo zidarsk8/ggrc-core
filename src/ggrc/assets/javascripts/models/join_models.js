@@ -154,6 +154,51 @@
                 model.destination.type === source.type &&
                 model.destination.id === source.id;
       }));
+    },
+    /**
+     * Return the Relationship between two objects.
+     *
+     * @param {CMS.Models.Cacheable} first - First object.
+     * @param {CMS.Models.Cacheable} second - Second object.
+     * @param {boolean} noRefresh - Flag for reject if not relationship.
+     * @return {Promise} - Resolved with Relationship instance if it was found
+     * or with undefined if instances not related.
+     */
+    getRelationshipBetweenInstances: function rec(first, second, noRefresh) {
+      var relationshipIds = _.intersection(getRelationshipsIds(first),
+        getRelationshipsIds(second));
+      var relationship;
+      var result = $.Deferred();
+
+      function getRelationshipsIds(obj) {
+        var union = _.union(obj.related_sources, obj.related_destinations);
+        return _.map(union, 'id');
+      }
+      if (!relationshipIds.length && noRefresh) {
+        result.resolve();
+        return result.promise();
+      }
+      if (!relationshipIds.length) {
+        // try to refresh the instances if don't find the relationship between them
+        result = $.when(first.refresh(), second.refresh())
+          .then(function (fObj, sObj) {
+            return rec(fObj, sObj, true);
+          }, function (e) {
+            result.reject(e);
+          });
+      } else if (relationshipIds.length === 1) {
+        relationship = CMS.Models.Relationship
+          .findInCacheById(relationshipIds[0]);
+        result.resolve(relationship);
+      } else if (relationshipIds.length > 1) {
+        // Can't be more than one Relationship, therefore this option is unlikely,
+        // and impossible with the correct data. It's just an additional check
+        // and because we take the most relevant Relationship
+        relationship = CMS.Models.Relationship
+          .findInCacheById(_.max(relationshipIds));
+        result.resolve(relationship);
+      }
+      return result.promise();
     }
   }, {
     reinit: function () {
