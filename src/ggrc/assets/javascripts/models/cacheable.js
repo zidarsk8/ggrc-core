@@ -607,13 +607,16 @@
       var method;
       var collectionUrl;
       var baseParams;
+
       var that = this;
 
-      function makePaginator(paging) {
-        function getPage(page_name) {
-          if (paging[page_name]) {
+      function makePaginator(paging, baseParams, scope) {
+        function getPage(pageName) {
+          if (paging[pageName]) {
             return function () {
-              return findPageFunc(paging[page_name]);
+              // the paging ("next", "prev", etc. URLs already include query
+              // string params, thus passing null for them
+              return findPageFunc(paging[pageName], null, baseParams, scope);
             };
           }
           return null;
@@ -634,20 +637,25 @@
           }
         };
       }
+
       function findPageFunc(url, data, params, scope) {
-        return can.ajax(can.extend({
+        var ajaxOptions = can.extend({
           url: url,
           data: data
-        }, params)).then(function (response) {
+        }, params);
+
+        return can.ajax(ajaxOptions).then(function (response) {
           var collection = response[that.root_collection + '_collection'];
+          var paginator = makePaginator(collection.paging, params, scope);
           var ret = {
-            paging: makePaginator(collection.paging)
+            paging: paginator
           };
           ret[scope.root_collection + '_collection'] =
             scope.models(collection[scope.root_collection]);
           return ret;
         });
       }
+
       if (typeof findAllSpec === 'string') {
         parts = findAllSpec.split(' ');
         method = parts.length === 2 ? parts[0] : 'GET';
@@ -658,6 +666,7 @@
       } else {
         return; // TODO make a pager if findAllSpec is a function.
       }
+
       baseParams = {
         type: method,
         dataType: 'json'
