@@ -333,9 +333,8 @@ class TestClonable(integration.ggrc.TestCase):
         attribute_type="Text"
     )
     factories.CustomAttributeValueFactory(
-        custom_attribute_id=ca_def_text.id,
-        attributable_id=audit.id,
-        attributable_type="Audit",
+        custom_attribute=ca_def_text,
+        attributable=audit,
         attribute_value="CA 1 value"
     )
 
