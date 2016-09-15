@@ -780,6 +780,22 @@ class WidgetAdminRoles(object):
         setattr(self, attribute.SCOPE + name, self._Locator.get_scope(id_))
 
 
+class WidgetAdminEvents(object):
+  """Locators for event widget at admin dashboard"""
+  _BASE_CSS_SELECTOR = 'section#events_list_widget:not([class~="hidden"])'
+  _TREE_ITEMS_SELECTOR = '.tree-item[data-model]'
+
+  TREE_VIEW_ITEMS = (
+      By.CSS_SELECTOR,
+      '{0} {1}'.format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
+  TREE_VIEW_HEADER = (
+      By.CSS_SELECTOR,
+      '{} header'.format(_BASE_CSS_SELECTOR))
+  FIRST_TREE_VIEW_ITEM = (
+      By.CSS_SELECTOR,
+      '{0} {1}:first-child'.format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
+
+
 class WidgetInfoSettingsButton(object):
   """Locators for the control info widget"""
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"]>h3')

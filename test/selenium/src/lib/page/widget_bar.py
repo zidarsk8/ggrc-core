@@ -156,7 +156,7 @@ class AdminDashboard(_WidgetBar):
   def select_events(self):
     """
     Returns:
-        lib.page.widget.admin_widget.People
+        lib.page.widget.admin_widget.Events
     """
     self.tab_events.click()
     return admin_widget.Events(self._driver)

@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module containing element labels or properties e.g. date formatting"""
+# pylint: disable=too-few-public-methods
 
 from lib.constants import objects
 
@@ -116,6 +117,7 @@ class WidgetProgramInfo(object):
 
 
 class AdminRolesWidget(object):
+  """Labels for Roles widget at Admin dashboard"""
   EDITOR = "Editor"
   ADMINISTRATOR = "Administrator"
   PROGRAM_EDITOR = "Program Editor"
@@ -129,3 +131,10 @@ class AdminRolesWidget(object):
   SCOPE_ADMINISTRATOR = "ADMIN"
   SCOPE_PRIVATE_PROGRAM = "PRIVATE PROGRAM"
   SCOPE_WORKFLOW = "WORKFLOW"
+
+
+class AdminEventsWidget(object):
+  """Label and regular expression for Event widget at Admin dashboard"""
+  TREE_VIEW_HEADER = "Events"
+  TREE_VIEW_ROW_REGEXP = r"^.+\s(by.+)\son\s" + \
+      r"(\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M)"
