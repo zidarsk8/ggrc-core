@@ -8,7 +8,7 @@
 .object-popover-body > * {
   padding: 16px;
   box-sizing: border-box;
-  max-height: 350px;
+  max-height: 450px;
   overflow-y: auto;
   display: flex;
   flex-flow: column;
@@ -33,6 +33,11 @@
   .assessment-mapped-objects__popover-content {
     max-height: 290px;
     overflow: auto;
+    &.objectives-regulations{
+      flex: 1;
+      align-items: stretch;
+      flex-wrap: nowrap;
+    }
   }
 
   .assessment-mapped-objects__popover-attributes {
@@ -44,5 +49,75 @@
       flex: 1 1 50%;
       min-width: 50%;
     }
+    &.objectives-regulations{
+      align-items: stretch;
+      flex-wrap: nowrap;
+      > div{
+        min-width: 0;
+
+        &:nth-child(2){
+          margin-right: 2.12766%;
+        }
+      }
+    }
   }
+  .assessment-mapped__objectives-regulations-grid{
+    margin-top: 15px;
+    flex: 2;
+
+    &.loading{
+      pointer-events: none;
+      background-image: url('/static/images/ajax-loader.gif');
+      background-repeat: no-repeat;
+      background-position: 50% 20px;
+      min-height: 55px;
+
+      > * {
+        display: none;
+      }
+    }
+
+    .row{
+      margin-left: 0;
+    }
+    .objectives-regulations-table-header{
+      text-transform: uppercase;
+      margin-top: 3px;
+      margin-bottom: 7px;
+      font-size: 11px;
+    }
+    .objectives-regulations-headers{
+      h6 {
+        .fa.fa-objective.color,
+        .fa.fa-regulation.color{
+          color: #969696;
+        }
+      }
+    }
+    .objectives-regulations-grid-body{
+      overflow-y: auto;
+      max-height: 200px;
+
+      .objectives-regulations-body{
+        margin-top: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+
+        .objectives-regulations-description{
+          .description-title{
+            margin-top: 0;
+            line-height: 18px;
+            -ms-text-overflow: ellipsis;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+        }
+      }
+    }
+  }
+}
+.object-popover-body > .assessment-mapped-controls-popover{
+  align-items: stretch;
+  max-width: 850px;
 }

@@ -21,7 +21,7 @@
     <object-list items="mappedItems" selected-item="selectedItem">
        {{> '/static/mustache/components/assessment/mapped-objects/mapped-controls-item.mustache'}}
     </object-list>
-    <object-popover item="selectedItem">
-        <assessment-mapped-controls-popover item-data="itemData"></assessment-mapped-controls-popover>
+    <object-popover class="object-popover" item="selectedItem">
+        <assessment-mapped-controls-popover class="assessment-mapped-controls-popover" item="selectedItem"></assessment-mapped-controls-popover>
     </object-popover>
 </collapsible-panel-body>
