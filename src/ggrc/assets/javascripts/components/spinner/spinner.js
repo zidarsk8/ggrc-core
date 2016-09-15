@@ -13,7 +13,7 @@
       '/components/spinner/spinner.mustache'
     ),
     scope: {
-      extraCssCls: '@',
+      extraCssClass: '@',
       size: '@',
       toggle: null
     }

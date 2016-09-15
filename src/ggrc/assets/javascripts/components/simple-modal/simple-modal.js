@@ -24,7 +24,7 @@
     tag: 'simple-modal',
     template: tpl,
     scope: {
-      extraCssCls: '@',
+      extraCssClass: '@',
       instance: null,
       modalEl: null,
       state: {
