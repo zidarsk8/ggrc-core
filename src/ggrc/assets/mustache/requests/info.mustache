@@ -94,7 +94,7 @@
             <revision-log instance="instance"></revision-log>
           </tab-panel>
           <tab-panel panels="panels" title-text="Related Requests" instance="instance">
-            {{{render "/static/mustache/requests/reusable_objects.mustache" instance=instance}}}
+            {{> '/static/mustache/requests/related-requests.mustache' }}
           </tab-panel>
         </tabs>
     </div>

@@ -325,7 +325,6 @@ dashboard-js-template-files:
   - assessments/tree_header.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
-  - assessments/reusable_objects.mustache
   - assessments/related-assessments.mustache
   - assessments/header.mustache
   - assessments/urls.mustache
@@ -484,7 +483,7 @@ dashboard-js-template-files:
   - requests/tier2_content.mustache
   - requests/general_info.mustache
   - requests/dates_list.mustache
-  - requests/reusable_objects.mustache
+  - requests/related-requests.mustache
   - base_templates/subtree.mustache
   - objectives/autocomplete_result.mustache
   - meetings/modal_content.mustache
