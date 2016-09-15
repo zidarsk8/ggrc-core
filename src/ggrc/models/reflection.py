@@ -263,7 +263,7 @@ class AttributeInfo(object):
 
   @classmethod
   def get_custom_attr_definitions(cls, object_class, ca_cache=None,
-                                  include_oca=False):
+                                  include_oca=True):
     """Get column definitions for custom attributes on object_class.
 
     Args:
@@ -317,7 +317,7 @@ class AttributeInfo(object):
 
   @classmethod
   def get_object_attr_definitions(cls, object_class, ca_cache=None,
-                                  include_oca=False):
+                                  include_oca=True):
     """Get all column definitions for object_class.
 
     This function joins custm attribute definitions, mapping definitions and
