@@ -35,23 +35,23 @@
   can.Component.extend({
     tag: 'reusable-objects-list',
     scope: {
-      parentInstance: null,
+      baseInstance: null,
       selectedList: new can.List(),
-      isLoading: false,
+      isSaving: false,
       reuseSelected: function () {
         var reusedList = this.attr('selectedList');
-        var source = this.attr('parentInstance');
+        var source = this.attr('baseInstance');
         var models = can.map(reusedList, function (destination) {
           var relationship = mapper.map(source, destination);
           return relationship.save();
         });
-        this.attr('isLoading', true);
+        this.attr('isSaving', true);
         can.when.apply(can, models).then(function () {
           can.$(document.body).trigger('ajax:flash', {
             success: 'Selected evidences are reused'
           });
           reusedList.replace([]);
-          this.attr('isLoading', false);
+          this.attr('isSaving', false);
         }.bind(this));
       }
     },
