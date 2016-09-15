@@ -113,15 +113,16 @@ class DontPropagate(object):
     'inherited_attr',
     ]
   """
+  # pylint: disable=too-few-public-methods
 
   def __init__(self, attr_name):
     self.attr_name = attr_name
 
 
 class PublishOnly(DontPropagate):
-
   """Alias of ``DontPropagate`` for use in a ``_publish_attrs`` specification.
   """
+  # pylint: disable=too-few-public-methods
   pass
 
 
@@ -137,6 +138,9 @@ class AttributeInfo(object):
   CUSTOM_ATTR_PREFIX = "__custom__:"
 
   class Type(object):
+    """Types of model attributes."""
+    # TODO: change to enum.
+    # pylint: disable=too-few-public-methods
     PROPERTY = "property"
     MAPPING = "mapping"
     SPECIAL_MAPPING = "special_mapping"
@@ -175,7 +179,7 @@ class AttributeInfo(object):
     """
     if main_class is None:
       main_class = tgt_class
-    src_attrs = src_attrs if type(src_attrs) is list else [src_attrs]
+    src_attrs = src_attrs if isinstance(src_attrs, list) else [src_attrs]
     accumulator = accumulator if accumulator is not None else set()
     ignore_dontpropagate = True
     for attr in src_attrs:
@@ -258,8 +262,21 @@ class AttributeInfo(object):
     return definitions
 
   @classmethod
-  def get_custom_attr_definitions(cls, object_class, ca_cache=None):
-    """ Get column definitions for custom attributes on object_class """
+  def get_custom_attr_definitions(cls, object_class, ca_cache=None,
+                                  include_oca=True):
+    """Get column definitions for custom attributes on object_class.
+
+    Args:
+      object_class: Model for which we want the attribute definitions.
+      ca_cache: dictionary containing custom attribute definitions. If it's set
+        this function will not look for CAD in the database. This should be
+        used for bulk operations, and eventually replaced with memcache.
+      include_oca: Flag for including object level custom attributes. This
+        should be true only for defenitions needed for csv imports.
+
+    returns:
+      dict of custom attribute definitions.
+    """
     definitions = {}
     if not hasattr(object_class, "get_custom_attribute_definitions"):
       return definitions
@@ -293,17 +310,23 @@ class AttributeInfo(object):
   def get_unique_constraints(cls, object_class):
     """ Return a set of attribute names for single unique columns """
     constraints = object_class.__table__.constraints
-    unique = filter(lambda x: isinstance(x, UniqueConstraint), constraints)
+    unique = [con for con in constraints if isinstance(con, UniqueConstraint)]
     # we only handle single column unique constraints
     unique_columns = [u.columns.keys() for u in unique if len(u.columns) == 1]
     return set(sum(unique_columns, []))
 
   @classmethod
-  def get_object_attr_definitions(cls, object_class, ca_cache=None):
-    """ get all column definitions for object_class
+  def get_object_attr_definitions(cls, object_class, ca_cache=None,
+                                  include_oca=True):
+    """Get all column definitions for object_class.
 
     This function joins custm attribute definitions, mapping definitions and
     the extra delete column.
+
+    Args:
+      object_class: Model for which we want the attribute definitions.
+      ca_cache: dictionary containing custom attribute definitions.
+      include_oca: Flag for including object level custom attributes.
     """
     definitions = {}
 
@@ -330,13 +353,14 @@ class AttributeInfo(object):
           "type": cls.Type.PROPERTY,
           "handler_key": key,
       }
-      if type(value) is dict:
+      if isinstance(value, dict):
         definition.update(value)
       definitions[key] = definition
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(
-          cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache))
+          cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache,
+                                          include_oca=include_oca))
 
     if object_class.__name__ not in EXCLUDE_MAPPINGS:
       definitions.update(cls.get_mapping_definitions(object_class))

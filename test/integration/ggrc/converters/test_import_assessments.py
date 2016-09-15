@@ -48,7 +48,7 @@ class TestAssessmentImportExport(converters.TestCase):
         models.Assessment.slug == u"A 2").first()
     cad = models.CustomAttributeDefinition(
         attribute_type=u"Text",
-        title=u"title",
+        title=u"ca title",
         definition_type=u"assessment",
         definition_id=assessment.id
     )
