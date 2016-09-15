@@ -16,13 +16,16 @@
     tag: tag,
     template: tpl,
     scope: {
+      isLoading: false,
       mapping: '@',
       parentInstance: null,
       mappedItems: [],
       setMappedObjects: function (items) {
+        this.attr('isLoading', false);
         this.attr('mappedItems').replace(items);
       },
       load: function () {
+        this.attr('isLoading', true);
         this.attr('parentInstance')
           .get_binding(this.attr('mapping'))
           .refresh_instances()

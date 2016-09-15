@@ -12,10 +12,12 @@
   /**
    * Object List component
    */
-  GGRC.Components('objectList', {
+  can.Component.extend({
     tag: tag,
     template: tpl,
     scope: {
+      spinnerCss: '@',
+      isLoading: false,
       selectedItem: null,
       items: [],
       select: function (ctx, el) {
