@@ -27,6 +27,7 @@
       list: [],
       // the following are just for the case when we have no object to start with,
       changes: [],
+      description: null,
       removePending: function (scope, el, ev) {
         var joins = this.instance._pending_joins;
         var model = scope.what;
@@ -86,15 +87,14 @@
       },
       cleanPanel: function () {
         this.scope.attachments.replace([]);
-        this.element.find('textarea').val('');
+        this.scope.attr('description', null);
       },
       /**
        * The component's click event (happens when the user clicks add comment),
        * takes care of saving the comment with appended evidence.
        */
       '.btn-success click': function (el, ev) {
-        var $textarea = this.element.find('.add-comment textarea');
-        var description = $.trim($textarea.val());
+        var description = $.trim(this.scope.description);
         var attachments = this.scope.attachments;
         var source = this.scope.source_mapping;
         var instance = this.scope.instance;

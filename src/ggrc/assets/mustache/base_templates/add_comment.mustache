@@ -39,7 +39,14 @@
         {{/is_allowed}}
       </div>
       <div class="wysiwyg-area">
-        <textarea {{#isSaving}}disabled="disabled"{{/isSaving}} rows="4" class="span12 triple wysihtml5" name="comment-description" id="comment-description" placeholder="Enter comment (optional)"></textarea>
+        <textarea {{#isSaving}}disabled="disabled"{{/isSaving}}
+          rows="4"
+          class="span12 triple wysihtml5"
+          name="comment-description"
+          id="comment-description"
+          placeholder="Enter comment (optional)"
+          can-value="description"
+        ></textarea>
       </div>
       <div class="attachments-preview">
         <ul>
