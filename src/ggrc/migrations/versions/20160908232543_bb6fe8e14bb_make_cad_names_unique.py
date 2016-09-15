@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
-make cad names unique
+Make cad names unique
 
 Create Date: 2016-09-08 23:25:43.508159
 """

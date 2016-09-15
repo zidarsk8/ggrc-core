@@ -3,6 +3,7 @@
 
 """Custom attribute definition module"""
 
+import flask
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from sqlalchemy.sql.schema import UniqueConstraint
@@ -151,7 +152,7 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       frozen set containing all reserved attribute names for the current
       object.
     """
-    with benchmark("Generate list of all reserved attribute names"):
+    with benchmark("Generate a list of all reserved attribute names"):
       if not cls._reserved_names.get(definition_type):
         definition_map = {model._inflector.table_singular: model
                           for model in ggrc.models.all_models.all_models}
@@ -170,12 +171,13 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   @classmethod
   def _get_global_cad_names(cls, definition_type):
     """Get names of global cad for a given object."""
-    query = db.session.query(cls.title).filter(
-        cls.definition_type == definition_type,
-        cls.definition_id.is_(None)
-    )
-
-    return set(item[0] for item in query)
+    if not getattr(flask.g, "_global_cad_names", set()):
+      query = db.session.query(cls.title).filter(
+          cls.definition_type == definition_type,
+          cls.definition_id.is_(None)
+      )
+      flask.g._global_cad_names = set(item[0] for item in query)
+    return flask.g._global_cad_names
 
   @validates("title", "definition_type")
   def validate_title(self, key, value):
