@@ -12,7 +12,7 @@
   /**
    * Object List component
    */
-  can.Component.extend({
+  GGRC.Components('objectList', {
     tag: tag,
     template: tpl,
     scope: {
