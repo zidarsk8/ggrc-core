@@ -28,6 +28,7 @@
       // the following are just for the case when we have no object to start with,
       changes: [],
       description: null,
+      sendNotification: false,
       removePending: function (scope, el, ev) {
         var joins = this.instance._pending_joins;
         var model = scope.what;
@@ -73,10 +74,12 @@
       })
     },
     events: {
-      init: function () {
+      inserted: function () {
         if (!this.scope.attr('source_mapping')) {
           this.scope.attr('source_mapping', GGRC.page_instance());
         }
+        this.scope.attr('sendNotification',
+          this.scope.attr('parent_instance.send_by_default'));
         this.newInstance();
       },
       newInstance: function () {
@@ -99,15 +102,13 @@
         var source = this.scope.source_mapping;
         var instance = this.scope.instance;
         var data;
-        var $sendNotification = this.element.find('[name=send_notification]');
-        var sendNotification = $sendNotification[0].checked;
 
         if (!description.length && !attachments.length) {
           return;
         }
         data = {
           description: description,
-          send_notification: sendNotification,
+          send_notification: this.scope.attr('sendNotification'),
           context: source.context,
           assignee_type: this.scope.attr('get_assignee_type')
         };
