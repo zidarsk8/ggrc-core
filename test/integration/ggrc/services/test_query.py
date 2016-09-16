@@ -642,3 +642,26 @@ class TestQueryWithCA(TestCase):
 
     keys = [program["CA text"] for program in programs]
     self.assertEqual(keys, sorted(keys))
+
+  def test_mixed_ca_sorting(self):
+    """Test sorting by multiple fields with CAs."""
+
+    data = {
+        "object_name": "Program",
+        "order_by": [{"name": "CA text"}, {"name": "title"}],
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data, "Program", "values")
+
+    keys = [(program["CA text"], program["title"]) for program in programs]
+    self.assertEqual(keys, sorted(keys))
+
+    data = {
+        "object_name": "Program",
+        "order_by": [{"name": "title"}, {"name": "CA text"}],
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data, "Program", "values")
+
+    keys = [(program["title"], program["CA text"]) for program in programs]
+    self.assertEqual(keys, sorted(keys))
