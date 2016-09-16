@@ -13,6 +13,7 @@
   background: $white;
   z-index: zIndex(pin-content);
   overflow: auto;
+
   .info {
     @include box-shadow(none);
     padding: 15px 25px 20px;
@@ -48,16 +49,12 @@
       margin-top: 18px !important;
     }
   }
-  >.tier-content {
-    margin-top: 77px;
-  }
   .details-wrap {
     &.pin {
       position: fixed;
       right: 47px;
       z-index: zIndex(details-wrap);
       width: 100px;
-      background: $white;
       margin-top: -15px !important;
       padding-top: 5px;
     }

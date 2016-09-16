@@ -9,18 +9,20 @@
     float: left;
     margin-right: 10px;
   }
-  .sticky-info-panel & {
-    position: fixed;
-    left: 52px;
+  &.pane-header__fixed {
     right: 52px;
+    left: 52px;
+    position: fixed;
+    box-shadow: 0px 5px 5px -5px rgba(0, 0, 0, 0.5);
+  }
+  .sticky-info-panel & {
+    padding-top: 15px;
+    margin-top: -15px;
     min-height: 52px;
     background: $white;
     border-bottom: 1px solid $lightGray;
-    padding-top: 15px;
     margin-bottom: 10px;
     z-index: zIndex(pane-header);
-    margin-top: -92px;
-    padding-top: 20px;
   }
 }
 
@@ -56,6 +58,8 @@
 }
 
 .tier-content {
+  position: relative;
+
   &.pin {
     .info-pane-utility {
       .details-wrap {
