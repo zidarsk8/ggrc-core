@@ -88,7 +88,6 @@
             date.subtract(1, 'day');
           }
         };
-        date = this.getDate(date);
         date = moment(date);
 
         if (types[type]) {
