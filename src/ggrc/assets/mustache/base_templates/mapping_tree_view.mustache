@@ -5,6 +5,8 @@
 
 <ul class="{{#if treeViewClass}}{{treeViewClass}}{{else}}attachment-list{{/if}}">
   {{#mappedObjects}}
-    {{{render itemTemplate instance=instance baseInstance=baseInstance parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping isLoading=isLoading isExpandable=isExpandable}}}
+    {{#using instance=instance}}
+      {{{render itemTemplate instance=instance baseInstance=baseInstance parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping isLoading=isLoading isExpandable=isExpandable}}}
+    {{/using}}
   {{/mappedObjects}}
 </ul>
