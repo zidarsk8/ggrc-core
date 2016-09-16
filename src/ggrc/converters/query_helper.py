@@ -94,6 +94,7 @@ class QueryHelper(object):
     self.query = self._clean_query(query)
     self.ca_disabled = ca_disabled
     self._set_attr_name_map()
+    self._count = 0
 
   def _set_attr_name_map(self):
     """ build a map for attributes names and display names
@@ -339,12 +340,14 @@ class QueryHelper(object):
         attr = getattr(model, key, None)
         if attr is None:
           # non object attributes are treated as custom attributes
-          join = (Record, and_(
-            Record.key == model.id,
-            Record.type == model.__name__,
-            Record.tags == key)
+          self._count +=1
+          alias = orm.aliased(Record, name="fulltext_{}".format(self._count))
+          join = (alias, and_(
+            alias.key == model.id,
+            alias.type == model.__name__,
+            alias.tags == key)
           )
-          order = Record.content
+          order = alias.content
         elif (isinstance(attr, orm.attributes.InstrumentedAttribute) and
                 isinstance(attr.property, orm.properties.RelationshipProperty)):
           # a relationship
