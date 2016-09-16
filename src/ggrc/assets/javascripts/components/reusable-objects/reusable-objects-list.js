@@ -38,10 +38,21 @@
       baseInstance: null,
       selectedList: new can.List(),
       isSaving: false,
+      getUniqueItems: function (originalList) {
+        var uniqueList = new can.List();
+        originalList.forEach(function (item, index) {
+          if (index === originalList.indexOf(item)) {
+            uniqueList.push(item);
+          }
+        });
+        return uniqueList;
+      },
       reuseSelected: function () {
         var reusedList = this.attr('selectedList');
+        // We need to get the list of unique items only
+        var uniqueList = this.getUniqueItems(reusedList);
         var source = this.attr('baseInstance');
-        var models = can.map(reusedList, function (destination) {
+        var models = can.map(uniqueList, function (destination) {
           var relationship = mapper.map(source, destination);
           return relationship.save();
         });
