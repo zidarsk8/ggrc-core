@@ -94,7 +94,9 @@
         };
         can.each(objs, function (obj, idx) {
           var single = data[idx];
-          if (single[0] >= 200 && single[0] < 300) {
+          // Add extra check to avoid possible exceptions
+          single = Array.isArray(single) ? single : false;
+          if (single && single[0] >= 200 && single[0] < 300) {
             obj._save(cb(single));
           } else {
             obj._dfd.reject(obj, single);
