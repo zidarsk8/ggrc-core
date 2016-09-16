@@ -16,6 +16,8 @@
     tag: tag,
     template: tpl,
     scope: {
+      spinnerCss: '@',
+      isLoading: false,
       selectedItem: null,
       items: [],
       select: function (ctx, el) {

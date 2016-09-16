@@ -13,6 +13,7 @@
     margin: 0 0 0 24px;
   }
 }
+
 .grid-data-header {
   padding: 8px 0;
   border: 1px solid #ccc;
@@ -30,25 +31,29 @@
     font-weight: bold;
   }
 }
+
 .grid-data-body {
-  min-height: 300px;
-  max-height: 500px;
+  display: flex;
+  height: 400px;
   box-sizing: border-box;
   overflow: auto;
+  position: relative;
 
   &.loading {
     opacity: 0.5;
-    background: #fcfcfc;
   }
 }
+
 // Extra style for the first index/order column
 .grid-data-item-index {
   width: 100px;
 }
+
 .grid-data-row {
   overflow: hidden;
   padding: 8px 0;
   border-bottom: 1px solid #ccc;
+  cursor: default;
   // Extra style for columns
   > * {
     overflow: hidden;

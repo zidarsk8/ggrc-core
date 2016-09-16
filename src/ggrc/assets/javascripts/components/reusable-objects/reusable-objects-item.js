@@ -13,6 +13,7 @@
     tag: 'reusable-objects-item',
     template: tpl,
     scope: {
+      isSaving: false,
       selectedList: new can.List(),
       disabled: false,
       isDisabled: function () {

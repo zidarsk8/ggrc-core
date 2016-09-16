@@ -9,9 +9,8 @@
   can.Component.extend({
     tag: 'related-objects',
     scope: {
-      parentInstance: null,
       baseInstance: null,
-      relatedItemsType: 'Assessment',
+      relatedItemsType: '@',
       relatedObjects: new can.List(),
       paging: {
         current: 1,
