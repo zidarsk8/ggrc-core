@@ -9,11 +9,12 @@ from os.path import abspath, dirname, join
 from flask import json
 from nose.plugins.skip import SkipTest
 
+from ggrc import db
+from ggrc.models import CustomAttributeDefinition as CAD
+
 from integration.ggrc.converters import TestCase
+from integration.ggrc.models import factories
 
-
-THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, "../converters/test_csvs/")
 
 # to be moved into converters.query_helper
 DATE_FORMAT_REQUEST = "%m/%d/%Y"
@@ -570,3 +571,74 @@ class TestAdvancedQueryAPI(TestCase):
     response_single_post = json.loads(self._post(data_list).data)
 
     self.assertEqual(response_multiple_posts, response_single_post)
+
+
+class TestQueryWithCA(TestCase):
+
+  @classmethod
+  def setUpClass(cls):
+    """Set up test cases for all tests."""
+    TestCase.clear_data()
+    cls._generate_cad()
+    response = cls._import_file("sorting_with_ca_setup.csv")
+
+  @staticmethod
+  def _generate_cad():
+    factories.CustomAttributeDefinitionFactory(
+        title="CA dropdown",
+        definition_type = "program",
+        multi_choice_options = "one,two,three,four,five",
+    )
+    factories.CustomAttributeDefinitionFactory(
+        title="CA text",
+        definition_type = "program",
+    )
+
+  def setUp(self):
+    self.client.get("/login")
+
+
+  def _get_first_result_set(self, data, *keys):
+    """Post data, get response, get values from it like in obj["a"]["b"]."""
+
+    result = self.client.post(
+      "/query",
+      data=json.dumps([data]),
+      headers={"Content-Type": "application/json"},
+    ).json[0]
+
+    for key in keys:
+      result = result.get(key)
+      self.assertIsNot(result, None)
+    return self._flatten_cav(result)
+
+  def _flatten_cav(self, data):
+    """Unpack CAVs and put them in data as object attributes."""
+    cad_names = dict(db.session.query(CAD.id, CAD.title))
+    for entry in data:
+      for cav in entry.get("custom_attribute_values", []):
+        entry[cad_names[cav["custom_attribute_id"]]] = cav["attribute_value"]
+    return data
+
+  def test_single_ca_sorting(self):
+    """Results get sorted by single custom attribute field."""
+
+    data = {
+        "object_name": "Program",
+        "order_by": [{"name": "title"}],
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data, "Program", "values")
+
+    keys = [program["title"] for program in programs]
+    self.assertEqual(keys, sorted(keys))
+
+    data = {
+        "object_name": "Program",
+        "order_by": [{"name": "CA text"}],
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data, "Program", "values")
+
+    keys = [program["CA text"] for program in programs]
+    self.assertEqual(keys, sorted(keys))
