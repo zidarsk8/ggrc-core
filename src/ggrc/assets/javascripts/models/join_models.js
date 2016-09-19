@@ -193,7 +193,15 @@
       } else if (relationshipIds.length > 1) {
         // Can't be more than one Relationship, therefore this option is unlikely,
         // and impossible with the correct data. It's just an additional check
-        // and because we take the most relevant Relationship
+        // and because we take the most relevant Relationship and
+        // notify user about possible errors.
+
+        GGRC.Errors.notifier('error', 'The data may contain an error. ' +
+          'Errors are possible in the objects ' +
+          first.type + '(' + first.id + ') or/and ' +
+          second.type + '(' + second.id + '). ' +
+          'Please contact with the administrator for review.')();
+
         relationship = CMS.Models.Relationship
           .findInCacheById(_.max(relationshipIds));
         result.resolve(relationship);
