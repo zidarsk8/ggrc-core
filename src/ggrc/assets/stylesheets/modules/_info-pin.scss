@@ -63,7 +63,10 @@
 
 .info-pane-utility {
   @extend %clearfix;
+  position: relative;
   float: right;
+  z-index: zIndex(info-page-dropdown);
+
   .sticky-info-panel & {
     position: fixed;
     right: 47px;
