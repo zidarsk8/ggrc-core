@@ -575,12 +575,12 @@ class TestAdvancedQueryAPI(TestCase):
 class TestQueryWithCA(TestCase):
   """Test query API with custom attributes."""
 
-  @classmethod
-  def setUpClass(cls):
+  def setUp(self):
     """Set up test cases for all tests."""
     TestCase.clear_data()
-    cls._generate_cad()
-    cls._import_file("sorting_with_ca_setup.csv")
+    self._generate_cad()
+    self._import_file("sorting_with_ca_setup.csv")
+    self.client.get("/login")
 
   @staticmethod
   def _generate_cad():
@@ -594,9 +594,6 @@ class TestQueryWithCA(TestCase):
         title="CA text",
         definition_type="program",
     )
-
-  def setUp(self):
-    self.client.get("/login")
 
   def _get_first_result_set(self, data, *keys):
     """Post data, get response, get values from it like in obj["a"]["b"]."""
