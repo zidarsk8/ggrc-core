@@ -25,7 +25,7 @@
     isObjectDocument: function (object) {
       return object.object_documents && object.object_documents.length;
     },
-    map: function (source, destination) {
+    mapObjects: function (source, destination) {
       return this.isObjectDocument(destination) ?
         this.createObjectRelationship(source, destination) :
         this.createRelationship(source, destination);
@@ -38,24 +38,20 @@
       baseInstance: null,
       selectedList: new can.List(),
       isSaving: false,
-      getUniqueItems: function (originalList) {
-        var uniqueList = new can.List();
-        originalList.forEach(function (item, index) {
-          if (index === originalList.indexOf(item)) {
-            uniqueList.push(item);
-          }
-        });
-        return uniqueList;
-      },
       reuseSelected: function () {
         var reusedList = this.attr('selectedList');
-        // We need to get the list of unique items only
-        var uniqueList = this.getUniqueItems(reusedList);
         var source = this.attr('baseInstance');
-        var models = can.map(uniqueList, function (destination) {
-          var relationship = mapper.map(source, destination);
-          return relationship.save();
-        });
+        var models = Array.prototype.filter
+          // Get Array of unique items
+          .call(reusedList, function (item, index) {
+            return index === reusedList.indexOf(item);
+          })
+          // Get Array of mapped models
+          .map(function (destination) {
+            return mapper
+              .mapObjects(source, destination)
+              .save();
+          });
         this.attr('isSaving', true);
         can.when.apply(can, models).then(function () {
           can.$(document.body).trigger('ajax:flash', {
