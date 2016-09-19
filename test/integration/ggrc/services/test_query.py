@@ -5,7 +5,6 @@
 
 from datetime import datetime
 from operator import itemgetter
-from os.path import abspath, dirname, join
 from flask import json
 from nose.plugins.skip import SkipTest
 
@@ -280,7 +279,7 @@ class TestAdvancedQueryAPI(TestCase):
     # the titles are sorted descending with desc=True
     self.assertListEqual(titles_desc, list(reversed(titles_asc)))
 
-  def test_query_order_by_several_fields(self):
+  def test_order_by_several_fields(self):
     """Results get sorted by two fields at once."""
     data = {
         "object_name": "Regulation",
@@ -305,7 +304,7 @@ class TestAdvancedQueryAPI(TestCase):
                reverse=True),
     )
 
-  def test_query_order_by_related_titled(self):
+  def test_order_by_related_titled(self):
     """Results get sorted by title of related Titled object."""
     data_title = {
         "object_name": "Audit",
@@ -574,37 +573,38 @@ class TestAdvancedQueryAPI(TestCase):
 
 
 class TestQueryWithCA(TestCase):
+  """Test query API with custom attributes."""
 
   @classmethod
   def setUpClass(cls):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     cls._generate_cad()
-    response = cls._import_file("sorting_with_ca_setup.csv")
+    cls._import_file("sorting_with_ca_setup.csv")
 
   @staticmethod
   def _generate_cad():
+    """Generate custom attribute definitions."""
     factories.CustomAttributeDefinitionFactory(
         title="CA dropdown",
-        definition_type = "program",
-        multi_choice_options = "one,two,three,four,five",
+        definition_type="program",
+        multi_choice_options="one,two,three,four,five",
     )
     factories.CustomAttributeDefinitionFactory(
         title="CA text",
-        definition_type = "program",
+        definition_type="program",
     )
 
   def setUp(self):
     self.client.get("/login")
 
-
   def _get_first_result_set(self, data, *keys):
     """Post data, get response, get values from it like in obj["a"]["b"]."""
 
     result = self.client.post(
-      "/query",
-      data=json.dumps([data]),
-      headers={"Content-Type": "application/json"},
+        "/query",
+        data=json.dumps([data]),
+        headers={"Content-Type": "application/json"},
     ).json[0]
 
     for key in keys:
@@ -612,7 +612,8 @@ class TestQueryWithCA(TestCase):
       self.assertIsNot(result, None)
     return self._flatten_cav(result)
 
-  def _flatten_cav(self, data):
+  @staticmethod
+  def _flatten_cav(data):
     """Unpack CAVs and put them in data as object attributes."""
     cad_names = dict(db.session.query(CAD.id, CAD.title))
     for entry in data:
