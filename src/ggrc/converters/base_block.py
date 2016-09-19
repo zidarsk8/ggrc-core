@@ -182,7 +182,8 @@ class BlockConverter(object):
     that case it is impossible to determine the correct handler for all
     columns. Blocks with duplicate names are ignored.
     """
-    counter = Counter(raw_headers)
+    counter = Counter(header.strip().rstrip("*").lower()
+                      for header in raw_headers)
     duplicates = [header for header, count in counter.items() if count > 1]
     if duplicates:
       self.add_errors(errors.DUPLICATE_COLUMN,
