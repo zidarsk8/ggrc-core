@@ -231,8 +231,10 @@ class QueryHelper(object):
     return self.query
 
   def _get_type_query(self, model, permission_type):
-    """Prepare query to filter models based on the available contexts and
-    resources.
+    """Filter by contexts and resources
+
+    Prepare query to filter models based on the available contexts and
+    resources for the given type of object.
     """
     contexts, resources = query_helpers.get_context_resource(
         model_name=model.__name__, permission_type=permission_type

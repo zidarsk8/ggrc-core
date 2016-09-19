@@ -22,9 +22,7 @@ from ggrc_workflows.models import Cycle
 
 
 def get_type_select_column(model):
-  """Determine the name of the type column,
-  taking into account polymorphic types
-  """
+  """Get column name,taking into account polymorphic types."""
   mapper = model._sa_class_manager.mapper
   if mapper.polymorphic_on is None:
     type_column = literal(mapper.class_.__name__)
@@ -47,8 +45,8 @@ def _types_to_type_models(types):
 
 
 def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
-  """
-  Filters by "myview" for a given person
+  """Filters by "myview" for a given person.
+
   Finds all objects which might appear on a user's Profile or Dashboard
   pages.
 
@@ -60,9 +58,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
   type_union_queries = []
 
   def _get_people():
-    """Get all the people w/o any restrictions.
-    Each role should have access to it.
-    """
+    """Get all the people w/o any restrictions."""
     all_people = db.session.query(
         all_models.Person.id.label('id'),
         literal(all_models.Person.__name__).label('type'),
@@ -141,7 +137,8 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
 
   def _get_results_by_context(model):
     """Objects based on the context of the current model.
-    Objects in private contexts via UserRole.
+
+    Return the objects that are in private contexts via UserRole.
     """
     context_query = db.session.query(
         model.id.label('id'),
@@ -157,7 +154,9 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     return context_query
 
   def _get_assigned_to_records(model):
-    """Objects for which the user is the 'contact' or 'secondary contact'.
+    """Get query by models contacts fields.
+
+    Objects for which the user is the 'contact' or 'secondary contact'.
     Control also has 'principal_assessor' and 'secondary_assessor'.
     """
     model_type_queries = []
@@ -204,7 +203,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
         ).filter(or_(*model_type_queries)).distinct()
     return model_type_query
 
-  # We don't return mapped objects for the Creator because being mapped
+  # Note: We don't return mapped objects for the Creator because being mapped
   # does not give the Creator necessary permissions to view the object.
   if not is_creator:
     type_union_queries.append(_get_object_people())
