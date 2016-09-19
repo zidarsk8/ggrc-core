@@ -1,5 +1,5 @@
 Object type,Test duplicate column error.,,,,,,,,,,,
-Control,Code*,Title*,Description,Notes,Test Plan,Owner*,Effective Date,Notes,Test Plan,,,
+Control,Code*,Title*,Description,Notes,Test Plan,Owner*,Effective Date,Notes,Test Plan,TITLE,,
 ,,A,B,C,D,user@example.com,,E,,,,
 ,,,,,,,,,,,,
 Object type,,,,,,,,,,,,
