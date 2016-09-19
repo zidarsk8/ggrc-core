@@ -3,12 +3,12 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-object-popover {
+.object-popover {
 
   > .object-popover-body {
     position: absolute;
     box-sizing: border-box;
-    max-width: 700px;
+    max-width: 850px;
     max-height: 0;
     opacity: 0.3;
     width: 0;

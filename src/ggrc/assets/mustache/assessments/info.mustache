@@ -19,13 +19,12 @@
                           <read-more text="description"></read-more>
                         </div>
                     </div>
-                    <assessment-mapped-objects parent-instance="instance"
+                    <assessment-mapped-controls parent-instance="instance"
                                                title-text="Controls"
                                                mapping-type="Control"
                                                filter="control"
-                                               items-tpl="title-and-description"
                                                mapping="info_related_objects">
-                    </assessment-mapped-objects>
+                    </assessment-mapped-controls>
                     <div class="assessment-controls">
                         <span class="assessment-controls__note">Input assessment information below:</span>
                         <assessment-custom-attributes instance="instance"
@@ -38,13 +37,12 @@
                         </div>
                      <assessment-controls-toolbar class="assessment-controls-toolbar" instance="instance"></assessment-controls-toolbar>
                     </div>
-                    <assessment-mapped-objects parent-instance="instance"
+                    <assessment-mapped-related-information parent-instance="instance"
                                                title-text="Related Information"
                                                mapping-type=""
                                                filter=""
-                                               items-tpl="title"
                                                mapping="info_related_objects">
-                    </assessment-mapped-objects>
+                    </assessment-mapped-related-information>
                 </div>
                 <div class="assessment-summary">
                     <h6>Details</h6>

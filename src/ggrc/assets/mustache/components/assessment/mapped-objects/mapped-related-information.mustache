@@ -17,11 +17,11 @@
       </i>
   {{/is_allowed}}
 </collapsible-panel-header>
-<collapsible-panel-body expanded="expanded">
+<collapsible-panel-body {{#expanded}}expanded{{/expanded}}>
     <object-list items="mappedItems" selected-item="selectedItem">
-      {{{renderItemsTpl}}}
+      {{> '/static/mustache/components/assessment/mapped-objects/mapped-related-information-item.mustache'}}
     </object-list>
     <object-popover item="selectedItem">
-        <assessment-mapped-objects-popover item-data="itemData"></assessment-mapped-objects-popover>
+        <assessment-mapped-related-information-popover item-data="itemData"></assessment-mapped-related-information-popover>
     </object-popover>
 </collapsible-panel-body>

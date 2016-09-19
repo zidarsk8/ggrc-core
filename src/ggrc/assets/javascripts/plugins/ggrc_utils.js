@@ -452,6 +452,27 @@
      * @return {QueryAPIRequest} Array of QueryAPIRequest
      */
     function buildParams(objName, page, relevant) {
+      return [buildParam(objName, page, relevant)];
+    }
+
+    /**
+     * Build params for request on Query API.
+     *
+     * @param {String} objName - Name of requested object
+     * @param {Object} page - Information about page state.
+     * @param {Number} page.current - Current page
+     * @param {Number} page.pageSize - Page size
+     * @param {String} page.sortBy - sortBy
+     * @param {String} page.sortDirection - sortDirection
+     * @param {String} page.filter - Filter string
+     * @param {Object} relevant - Information about relevant object
+     * @param {Object} relevant.type - Type of relevant object
+     * @param {Object} relevant.id - Id of relevant object
+     * @param {Object} relevant.operation - Type of operation.
+     * @param {Array} fields - Array of requested fields.
+     * @return {QueryAPIRequest} Object of QueryAPIRequest
+     */
+    function buildParam(objName, page, relevant, fields) {
       var first;
       var last;
       var params = {};
@@ -474,7 +495,10 @@
           desc: page.sortDirection === 'desc'
         }];
       }
-      return [params];
+      if (fields) {
+        params.fields = fields;
+      }
+      return params;
     }
 
     /**
@@ -521,6 +545,7 @@
     }
 
     return {
+      buildParam: buildParam,
       buildParams: buildParams,
       makeRequest: makeRequest
     };

@@ -7,12 +7,13 @@
   'use strict';
 
   var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/mapped-objects/mapped-objects-popover.mustache');
-  var tag = 'assessment-mapped-objects-popover';
+    '/components/assessment/mapped-objects/' +
+    'mapped-related-information-popover.mustache');
+  var tag = 'assessment-mapped-related-information-popover';
   /**
    * Assessment specific mapped objects popover view component
    */
-  GGRC.Components('assessmentMappedObjectsPopover', {
+  can.Component.extend({
     tag: tag,
     template: tpl,
     scope: {

@@ -132,8 +132,10 @@ dashboard-js-files:
   - components/collapsible-panel/collapsible-panel-header.js
   - components/collapsible-panel/collapsible-panel-body.js
   - components/read-more/read-more.js
-  - components/assessment/mapped-objects/mapped-objects.js
-  - components/assessment/mapped-objects/mapped-objects-popover.js
+  - components/assessment/mapped-objects/mapped-controls.js
+  - components/assessment/mapped-objects/mapped-controls-popover.js
+  - components/assessment/mapped-objects/mapped-related-information.js
+  - components/assessment/mapped-objects/mapped-related-information-popover.js
   - components/assessment/urls-list.js
   - components/assessment/attachments-list.js
   - components/assessment/custom-attributes.js
@@ -206,11 +208,13 @@ dashboard-js-template-files:
   - components/collapsible-panel/collapsible-panel.mustache
   - components/collapsible-panel/collapsible-panel-body.mustache
   - components/collapsible-panel/collapsible-panel-header.mustache
-  - components/assessment/mapped-objects/mapped-objects.mustache
-  - components/assessment/mapped-objects/mapped-objects-popover.mustache
-  - components/assessment/mapped-objects/item-templates/title.mustache
-  - components/assessment/mapped-objects/item-templates/title-and-description.mustache
   - components/assessment/controls-toolbar/controls-toolbar.mustache
+  - components/assessment/mapped-objects/mapped-controls.mustache
+  - components/assessment/mapped-objects/mapped-controls-item.mustache
+  - components/assessment/mapped-objects/mapped-controls-popover.mustache
+  - components/assessment/mapped-objects/mapped-related-information.mustache
+  - components/assessment/mapped-objects/mapped-related-information-item.mustache
+  - components/assessment/mapped-objects/mapped-related-information-popover.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/attachments-list.mustache
   - components/assessment/custom-attributes.mustache
