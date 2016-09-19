@@ -290,7 +290,7 @@ class AttributeInfo(object):
         ca_type = cls.Type.OBJECT_CUSTOM
       else:
         ca_type = cls.Type.CUSTOM
-      attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title)
+      attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title).lower()
 
       definition_ids = definitions.get(attr_name, {}).get("definition_ids", [])
       definition_ids.append(attr.id)
@@ -320,7 +320,7 @@ class AttributeInfo(object):
                                   include_oca=True):
     """Get all column definitions for object_class.
 
-    This function joins custm attribute definitions, mapping definitions and
+    This function joins custom attribute definitions, mapping definitions and
     the extra delete column.
 
     Args:

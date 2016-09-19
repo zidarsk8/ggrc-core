@@ -222,7 +222,7 @@ class TestComprehensiveSheets(TestCase):
         "Control": {
             "block_errors": set([
                 errors.DUPLICATE_COLUMN.format(
-                    line=1, duplicates="Notes, Test Plan"),
+                    line=1, duplicates="title, notes, test plan"),
             ]),
         },
         "Program": {
