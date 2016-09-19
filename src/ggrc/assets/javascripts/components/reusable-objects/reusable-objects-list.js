@@ -25,7 +25,7 @@
     isObjectDocument: function (object) {
       return object.object_documents && object.object_documents.length;
     },
-    map: function (source, destination) {
+    mapObjects: function (source, destination) {
       return this.isObjectDocument(destination) ?
         this.createObjectRelationship(source, destination) :
         this.createRelationship(source, destination);
@@ -41,10 +41,17 @@
       reuseSelected: function () {
         var reusedList = this.attr('selectedList');
         var source = this.attr('baseInstance');
-        var models = can.map(reusedList, function (destination) {
-          var relationship = mapper.map(source, destination);
-          return relationship.save();
-        });
+        var models = Array.prototype.filter
+          // Get Array of unique items
+          .call(reusedList, function (item, index) {
+            return index === reusedList.indexOf(item);
+          })
+          // Get Array of mapped models
+          .map(function (destination) {
+            return mapper
+              .mapObjects(source, destination)
+              .save();
+          });
         this.attr('isSaving', true);
         can.when.apply(can, models).then(function () {
           can.$(document.body).trigger('ajax:flash', {
