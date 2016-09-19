@@ -304,7 +304,7 @@
         'Map:Person'];
       var options = {
         Checkbox: function (value) {
-          return value === '0';
+          return !value || value === '0';
         },
         'Rich Text': function (value) {
           value = GGRC.Utils.getPlainText(value);
