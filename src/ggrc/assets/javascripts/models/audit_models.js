@@ -455,7 +455,7 @@
     tree_view_options: {
       show_view: GGRC.mustache_path + '/requests/tree.mustache',
       header_view: GGRC.mustache_path + '/requests/tree_header.mustache',
-      footer_view: GGRC.mustache_path + '/requests/tree_footer.mustache',
+      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       add_item_view: GGRC.mustache_path + '/requests/tree_add_item.mustache',
       attr_list: [{
         attr_title: 'Title',

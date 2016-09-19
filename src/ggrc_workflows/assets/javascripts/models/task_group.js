@@ -29,14 +29,14 @@
       objects: "CMS.Models.get_stubs",
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
-      end_date: "date",
+      end_date: "date"
     },
 
     tree_view_options: {
       sort_property: 'sort_index',
-      header_view: GGRC.mustache_path + "/task_groups/tree_header.mustache",
-      footer_view: GGRC.mustache_path + "/task_groups/tree_footer.mustache",
-      add_item_view: GGRC.mustache_path + "/task_groups/tree_add_item.mustache"
+      header_view: GGRC.mustache_path + '/task_groups/tree_header.mustache',
+      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+      add_item_view: GGRC.mustache_path + '/task_groups/tree_add_item.mustache'
     },
 
     init: function() {

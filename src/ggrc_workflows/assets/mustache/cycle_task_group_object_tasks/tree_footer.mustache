@@ -18,3 +18,13 @@
   </div>
 </li>
 {{/if_equals}}
+
+{{#if is_subtree}}
+    <!-- {{{renderLive '/static/mustache/base_objects/tree_footer_zero.mustache'}}} -->
+{{else}}
+  {{#if original_list.length}}
+    <div class="paging-wrap pull-right">
+        <tree-pagination paging="paging"></tree-pagination>
+    </div>
+    {{/if}}
+{{/if}}

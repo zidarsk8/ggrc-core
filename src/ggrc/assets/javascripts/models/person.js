@@ -79,7 +79,7 @@
     tree_view_options: {
       show_view: GGRC.mustache_path + '/people/tree.mustache',
       header_view: GGRC.mustache_path + '/people/tree_header.mustache',
-      footer_view: GGRC.mustache_path + '/people/tree_footer.mustache',
+      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       add_item_view: GGRC.mustache_path + '/people/tree_add_item.mustache'
     },
     list_view_options: {

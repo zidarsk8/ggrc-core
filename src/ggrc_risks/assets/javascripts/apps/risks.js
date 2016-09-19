@@ -233,7 +233,7 @@
         parent_instance: page_instance,
         model: CMS.Models.Threat,
         mapping: related_or_owned + CMS.Models.Threat.table_plural,
-        footer_view: is_my_work() ? null : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+        footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache'
       }
     };
     risk_descriptor = {
@@ -250,7 +250,7 @@
         parent_instance: page_instance,
         model: CMS.Models.Risk,
         mapping: related_or_owned + CMS.Models.Risk.table_plural,
-        footer_view: is_my_work() ? null : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
+        footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache'
       }
     };
 

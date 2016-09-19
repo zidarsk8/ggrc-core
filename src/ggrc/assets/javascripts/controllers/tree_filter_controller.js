@@ -3,88 +3,74 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-can.Control("GGRC.Controllers.TreeFilter", {
-
-}, {
-
-  init : function() {
-    var parent_control;
+can.Control('GGRC.Controllers.TreeFilter', {}, {
+  init: function () {
+    var parentControl;
     this._super && this._super.apply(this, arguments);
     this.options.states = new can.Observe();
-    parent_control = this.element.closest('.cms_controllers_dashboard_widgets')
-        .find(".cms_controllers_tree_view").control();
-    parent_control && parent_control.options.attr("states", this.options.states);
+    parentControl = this.element.closest('.cms_controllers_dashboard_widgets')
+      .find('.cms_controllers_tree_view').control();
+    parentControl && parentControl.options.attr('states', this.options.states);
     this.on();
-  }
+  },
+  toggle_indicator: function (currentFilter) {
+    var isExpression =
+      !!currentFilter && !!currentFilter.expression.op &&
+      currentFilter.expression.op.name !== 'text_search' &&
+      currentFilter.expression.op.name !== 'exclude_text_search';
 
-  , toggle_indicator: function(current_filter){
-      var is_expression =
-            !!current_filter &&
-            !!current_filter.expression.op &&
-            current_filter.expression.op.name != "text_search" &&
-            current_filter.expression.op.name != "exclude_text_search";
+    this.element.find('.tree-filter__expression-holder')
+      .toggleClass('tree-filter__expression-holder--active', isExpression);
+    this.element.find('.tree-filter__expression-holder span i')
+      .toggleClass('fa-check-circle green', isExpression);
+    this.element.find('.tree-filter__expression-holder span i')
+      .toggleClass('fa-check-circle-o', !isExpression);
+  },
+  apply_filter: function (filterString) {
+    var currentFilter = GGRC.query_parser.parse(filterString);
+    var parentControl = this.element
+      .closest('.cms_controllers_dashboard_widgets')
+      .find('.cms_controllers_tree_view').control();
 
-      this.element.find('.tree-filter__expression-holder')
-        .toggleClass("tree-filter__expression-holder--active", is_expression);
-      this.element.find('.tree-filter__expression-holder span i')
-        .toggleClass("fa-check-circle green", is_expression);
-      this.element.find('.tree-filter__expression-holder span i')
-        .toggleClass("fa-check-circle-o", !is_expression);
-  }
-  , apply_filter : function(filter_string){
-      var current_filter = GGRC.query_parser.parse(filter_string),
-          parent_control = this.element.closest('.cms_controllers_dashboard_widgets')
-            .find(".cms_controllers_tree_view").control();
-
-      this.toggle_indicator(current_filter);
-      parent_control.options.attr('sort_function', current_filter.order_by.compare);
-      parent_control.options.attr('filter', current_filter);
-      parent_control.reload_list();
-  }
-
-  , "input[type=reset] click" : function(el, ev) {
-    this.element.find("input[type=text]")[0].value = "";
-    this.apply_filter("");
-  }
-
-  , "input[type=submit] click" : function(el, ev) {
-    this.apply_filter(this.element.find("input[type=text]")[0].value)
-  }
-
-  , "input keyup" : function(el, ev) {
+    this.toggle_indicator(currentFilter);
+    parentControl.filter(filterString);
+  },
+  'input[type=reset] click': function (el, ev) {
+    this.element.find('input[type=text]').val('');
+    this.apply_filter('');
+  },
+  'input[type=submit] click': function (el, ev) {
+    this.apply_filter(this.element.find('input[type=text]').val());
+  },
+  'input keyup': function (el, ev) {
     this.toggle_indicator(GGRC.query_parser.parse(el.val()));
 
-    if (ev.keyCode == 13){
+    if (ev.keyCode === 13) {
       this.apply_filter(el.val());
     }
     ev.stopPropagation();
-  }
-
-  , "input, select change" : function(el, ev) {
-
+  },
+  'input, select change': function (el, ev) {
     // this is left from the old filters and should eventually be replaced
     // Convert '.' to '__' ('.' will cause can.Observe to try to update a path instead of just a key)
-    var name = el.attr("name").replace(/\./g, '__');
-    if(el.is(".hasDatepicker")) {
-      this.options.states.attr(name, moment(el.val(), "MM/DD/YYYY"));
-    } else if (el.is(":checkbox") && !el.is(":checked")) {
+    var name = el.attr('name').replace(/\./g, '__');
+    if (el.is('.hasDatepicker')) {
+      this.options.states.attr(name, moment(el.val(), 'MM/DD/YYYY'));
+    } else if (el.is(':checkbox') && !el.is(':checked')) {
       this.options.states.removeAttr(name);
     } else {
       this.options.states.attr(name, el.val());
     }
     ev.stopPropagation();
-  }
-
-  , "input[data-lookup] focus" : function(el, ev) {
+  },
+  'input[data-lookup] focus': function (el, ev) {
     this.autocomplete(el);
-  }
-
-  , autocomplete : function(el) {
+  },
+  autocomplete: function (el) {
     $.cms_autocomplete.call(this, el);
-  }
-
-  , autocomplete_select : function(el, event, ui) {
-    setTimeout(function(){
+  },
+  autocomplete_select: function (el, event, ui) {
+    setTimeout(function () {
       if (ui.item.title) {
         el.val(ui.item.title, ui.item);
       } else {
@@ -92,68 +78,70 @@ can.Control("GGRC.Controllers.TreeFilter", {
       }
       el.trigger('change');
     }, 0);
-  }
-
-  , "{states} change" : function(states) {
+  },
+  '{states} change': function (states) {
     var that = this;
     this.element
-    .closest(".tree-structure")
-    .children(":has(> [data-model],:data(model))").each(function(i, el) {
-      var model = $(el).children("[data-model],:data(model)").data("model");
-      if(can.reduce(Object.keys(states._data), function(st, key) {
-        var val = states[key]
-        , test = that.resolve_object(model, key.replace(/__/g, '.'));
+      .closest('.tree-structure')
+      .children(':has(> [data-model],:data(model))').each(function (i, el) {
+        var model = $(el).children('[data-model],:data(model)').data('model');
+        if (can.reduce(Object.keys(states._data), function (st, key) {
+          var result;
+          var val = states[key];
+          var test = that.resolve_object(model, key.replace(/__/g, '.'));
 
-       if(val && val.isAfter) {
-          if(!test || moment(test).isBefore(val)) {
-            return false;
+          if (val && val.isAfter) {
+            if (!test || moment(test).isBefore(val)) {
+              result = false;
+            } else {
+              result = st;
+            }
+          } else if (val === '[empty]' && test === '') {
+            result = st;
+          } else if (val &&
+            (!test || !~test.toUpperCase().indexOf(val.toUpperCase()))) {
+            result = false;
           } else {
-            return st;
+            result = st;
           }
-        } else if (val === "[empty]" && test === "") {
-          return st;
-        } else if(val && (!test || !~test.toUpperCase().indexOf(val.toUpperCase()))) {
-          return false;
+          return result;
+        }, true)) {
+          $(el).show();
         } else {
-          return st;
+          $(el).hide();
         }
-      }, true)) {
-        $(el).show();
-      } else {
-        $(el).hide();
-      }
-    });
-  }
+      });
+  },
+  '[data-toggle="filter-reset"] click': function (el, ev) {
+    var that = this;
+    var filterResetTarget = 'input, select';
+    var checked;
 
-  , '[data-toggle="filter-reset"] click' : function(el, ev) {
-    var that = this,
-        filter_reset_target = 'input, select',
-        checked;
-
-    this.element.find(filter_reset_target).each(function(i, elem) {
+    this.element.find(filterResetTarget).each(function (i, elem) {
       var $elem = $(elem)
-      ;
+        ;
 
-      that.options.states.removeAttr($elem.attr("name").replace(/\./g, '__'));
+      that.options.states.removeAttr($elem.attr('name').replace(/\./g, '__'));
     });
 
     if (el.is(':checkbox')) {
       checked = el.prop('checked');
       // Manually reset the form
       el.closest('form')[0].reset();
-      if (el.is(":checkbox")) {
+      if (el.is(':checkbox')) {
         // But not the checkbox
         el.prop('checked', checked);
       }
     }
-    can.trigger(this.options.states, "change", "*");
-  }
-
-  , resolve_object : function(obj, path) {
-    path = path.split(".");
-    can.each(path, function(prop) {
+    can.trigger(this.options.states, 'change', '*');
+  },
+  resolve_object: function (obj, path) {
+    path = path.split('.');
+    can.each(path, function (prop) {
       // If the name is blank, use email
-      if (prop === 'name' && obj.attr && (!obj.attr(prop) || !obj.attr(prop).trim()) && obj.attr('email') && obj.attr('email').trim()) {
+      if (prop === 'name' && obj.attr &&
+        (!obj.attr(prop) || !obj.attr(prop).trim()) &&
+        obj.attr('email') && obj.attr('email').trim()) {
         prop = 'email';
       }
       if (obj.instance) {
@@ -161,10 +149,8 @@ can.Control("GGRC.Controllers.TreeFilter", {
       }
       obj = obj.attr ? obj.attr(prop) : obj.prop;
       obj = obj && obj.reify ? obj.reify() : obj;
-      return obj != null; //stop iterating in case of null/undefined.
+      return !_.isEmpty(obj); // stop iterating in case of null/undefined.
     });
     return obj;
   }
-
-
 });

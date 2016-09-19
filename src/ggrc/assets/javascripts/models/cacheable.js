@@ -183,9 +183,6 @@
 
         deferred.then(success, error);
         sourceDeferred.then(function (sourceData) {
-          var obsList = new self.List([]);
-          var index = 0;
-
           if (sourceData[self.root_collection + '_collection']) {
             sourceData = sourceData[self.root_collection + '_collection'];
           }
@@ -197,34 +194,7 @@
             sourceData = [sourceData];
           }
 
-          function modelizeMS(ms) {
-            var item
-            , start
-            , instances = []
-            ;
-            start = Date.now();
-            while (sourceData.length > index && (Date.now() - start) < ms) {
-              can.Observe.startBatch();
-              item = sourceData[index];
-              index = index + 1;
-              instances.push.apply(instances, self.models([item]));
-              can.Observe.stopBatch();
-            }
-            can.Observe.startBatch();
-            obsList.push.apply(obsList, instances);
-            can.Observe.stopBatch();
-          }
-
-        // Trigger a setTimeout loop to modelize remaining objects
-          (function () {
-            modelizeMS(100);
-            if (sourceData.length > index) {
-              setTimeout(arguments.callee, 5);
-            }
-            else {
-              deferred.resolve(obsList);
-            }
-          })();
+          self._modelize(sourceData, deferred);
         }, function () {
           deferred.reject.apply(deferred, arguments);
         });
@@ -503,6 +473,74 @@
       }
       return ms;
     },
+
+    query: function (request) {
+      var deferred = $.Deferred();
+      var self = this;
+
+      GGRC.Utils.QueryAPI.makeRequest(request)
+        .then(function (sourceData) {
+          var values = [];
+          var listDfd = $.Deferred();
+          if (sourceData.length) {
+            sourceData = sourceData[0];
+          } else {
+            sourceData = {};
+          }
+
+          if (sourceData[self.shortName]) {
+            sourceData = sourceData[self.shortName];
+            values = sourceData.values;
+          }
+
+          if (!values.splice) {
+            values = [values];
+          }
+          self._modelize(values, listDfd);
+
+          listDfd.then(function (list) {
+            sourceData.values = list;
+            deferred.resolve(sourceData);
+          });
+        }, function () {
+          deferred.reject.apply(deferred, arguments);
+        });
+
+      return deferred;
+    },
+
+  _modelize: function (sourceData, deferred) {
+    var obsList = new this.List([]);
+    var index = 0;
+    var self = this;
+    function modelizeMS(ms) {
+      var item;
+      var start;
+      var instances = [];
+
+      start = Date.now();
+      while (sourceData.length > index && (Date.now() - start) < ms) {
+        can.Observe.startBatch();
+        item = sourceData[index];
+        index += 1;
+        instances.push.apply(instances, self.models([item]));
+        can.Observe.stopBatch();
+      }
+      can.Observe.startBatch();
+      obsList.push.apply(obsList, instances);
+      can.Observe.stopBatch();
+    }
+
+    // Trigger a setTimeout loop to modelize remaining objects
+    (function cb() {
+      modelizeMS(100);
+      if (sourceData.length > index) {
+        setTimeout(cb, 5);
+      } else {
+        deferred.resolve(obsList);
+      }
+    })();
+  },
 
     object_from_resource: function (params) {
       var obj_name = this.root_object;

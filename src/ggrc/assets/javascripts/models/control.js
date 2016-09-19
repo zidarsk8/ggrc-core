@@ -51,7 +51,7 @@
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/controls/tree.mustache',
-      footer_view: GGRC.mustache_path + '/controls/tree_footer.mustache',
+      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
