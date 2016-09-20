@@ -235,6 +235,13 @@ def update_memcache_after_commit(context):
 
   cache_manager = context.cache_manager
 
+  related_objs = list()
+  for val in getattr(g, "referenced_objects", {}).itervalues():
+    obj_list = val.values()
+    if obj_list:
+      related_objs.append((obj_list[0], None))
+  memcache_mark_for_deletion(context, related_objs)
+
   # TODO(dan): check for duplicates in marked_for_delete
   if len(cache_manager.marked_for_delete) > 0:
     delete_result = cache_manager.bulk_delete(
