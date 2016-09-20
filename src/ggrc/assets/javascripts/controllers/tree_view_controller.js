@@ -546,7 +546,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         obj.attr_title = obj.attr_name = def.title;
         obj.display_status = false;
         obj.attr_type = 'custom';
-        obj.attr_sort_field = 'custom:' + obj.attr_name;
+        obj.attr_sort_field = obj.attr_name;
         select_attr_list.push(obj);
       }
     });
