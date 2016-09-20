@@ -20,11 +20,13 @@ from ggrc import db
 from ggrc import models
 from ggrc.login import is_creator
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
+from ggrc import models
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
 from ggrc.rbac import context_query_filter
-from ggrc.utils import query_helpers
+from ggrc.utils import query_helpers, benchmark
+
 
 class BadQueryException(Exception):
   pass
@@ -261,24 +263,27 @@ class QueryHelper(object):
     query = object_class.query
 
     requested_permissions = object_query.get("permissions", "read")
-    type_query = self._get_type_query(object_class, requested_permissions)
-    if type_query is not None:
-      query = query.filter(type_query)
-
-    filter_expression = self._build_expression(
-        expression,
-        object_class,
-    )
-    if filter_expression is not None:
-      query = query.filter(filter_expression)
-    if object_query.get("order_by"):
-      query = self._apply_order_by(
+    with benchmark("Get permissions: _get_objects > _get_type_query"):
+      type_query = self._get_type_query(object_class, requested_permissions)
+      if type_query is not None:
+        query = query.filter(type_query)
+    with benchmark("Parse filter query: _get_objects > _build_expression"):
+      filter_expression = self._build_expression(
+          expression,
           object_class,
-          query,
-          object_query["order_by"],
       )
-
-    return query.all()
+      if filter_expression is not None:
+        query = query.filter(filter_expression)
+    if object_query.get("order_by"):
+      with benchmark("Sorting: _get_objects > order_by"):
+        query = self._apply_order_by(
+            object_class,
+            query,
+            object_query["order_by"],
+        )
+    with benchmark("fetch the result set of objects"):
+      res = query.all()
+    return res
 
   def _apply_order_by(self, model, query, order_by):
     """Add ordering parameters to a query for objects.
