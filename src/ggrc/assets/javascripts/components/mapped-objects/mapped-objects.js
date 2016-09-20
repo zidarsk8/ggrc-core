@@ -10,7 +10,7 @@
     '/components/mapped-objects/mapped-objects.mustache');
   var tag = 'mapped-objects';
   /**
-   * Assessment specific mapped objects view component
+   * Mapped objects view component
    */
   GGRC.Components('mappedObjects', {
     tag: tag,
@@ -19,9 +19,15 @@
       isLoading: false,
       mapping: '@',
       parentInstance: null,
+      selectedItem: null,
       mappedItems: [],
+      filter: null,
       setMappedObjects: function (items) {
+        var filterObj = this.attr('filter');
         this.attr('isLoading', false);
+        items = filterObj ?
+          GGRC.Utils.filters.applyTypeFilter(items, filterObj.serialize()) :
+          items;
         this.attr('mappedItems').replace(items);
       },
       load: function () {
