@@ -40,6 +40,11 @@
     },
     init: function () {
       this.scope.load();
+    },
+    events: {
+      '{scope.parentInstance.related_destinations} length': function () {
+        this.scope.load();
+      }
     }
   });
 })(window.can, window.GGRC);

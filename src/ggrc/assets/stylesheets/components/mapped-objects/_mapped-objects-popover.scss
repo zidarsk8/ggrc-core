@@ -33,7 +33,7 @@
   .assessment-mapped-objects__popover-content {
     max-height: 290px;
     overflow: auto;
-    &.objectives-regulations{
+    &.two-column-grid-popover{
       flex: 1;
       align-items: stretch;
       flex-wrap: nowrap;
@@ -49,7 +49,7 @@
       flex: 1 1 50%;
       min-width: 50%;
     }
-    &.objectives-regulations{
+    &.two-column-grid-popover{
       align-items: stretch;
       flex-wrap: nowrap;
       > div{
@@ -61,7 +61,7 @@
       }
     }
   }
-  .assessment-mapped__objectives-regulations-grid{
+  .assessment-mapped__two-column-grid{
     margin-top: 15px;
     flex: 2;
 
@@ -80,13 +80,13 @@
     .row{
       margin-left: 0;
     }
-    .objectives-regulations-table-header{
+    .two-column-grid-header{
       text-transform: uppercase;
       margin-top: 3px;
       margin-bottom: 7px;
       font-size: 11px;
     }
-    .objectives-regulations-headers{
+    .two-column-grid-headers{
       h6 {
         .fa.fa-objective.color,
         .fa.fa-regulation.color{
@@ -94,16 +94,16 @@
         }
       }
     }
-    .objectives-regulations-grid-body{
+    .two-column-grid-body{
       overflow-y: auto;
       max-height: 200px;
 
-      .objectives-regulations-body{
+      .column-grid-body{
         margin-top: 15px;
         border-bottom: 1px solid #eee;
         padding-bottom: 15px;
 
-        .objectives-regulations-description{
+        .column-grid-description{
           .description-title{
             margin-top: 0;
             line-height: 18px;
