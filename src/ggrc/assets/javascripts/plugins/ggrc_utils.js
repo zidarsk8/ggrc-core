@@ -18,6 +18,48 @@
    */
   GGRC.Utils = {
     win: window,
+    filters: {
+      /**
+       * Performs filtering on provided array like instances
+       * @param {Array} items - array like instance
+       * @param {Function} filter - filtering function
+       * @return {Array} - filtered array
+       */
+      applyFilter: function (items, filter) {
+        return Array.prototype.filter.call(items, filter);
+      },
+      /**
+       * Helper function to create a filtering function
+       * @param {Object|null} filterObj - filtering params
+       * @return {Function} - filtering function
+       */
+      makeTypeFilter: function (filterObj) {
+        return function (item) {
+          var type = item.instance.type.toString().toLowerCase();
+          if (!filterObj) {
+            return true;
+          }
+          if (filterObj.only && Array.isArray(filterObj.only)) {
+            // Do sanity transformation
+            filterObj.only = filterObj.only.map(function (item) {
+              return item.toString().toLowerCase();
+            });
+            return filterObj.only.indexOf(type) > -1;
+          }
+          if (filterObj.exclude && Array.isArray(filterObj.exclude)) {
+            // Do sanity transformation
+            filterObj.exclude = filterObj.exclude.map(function (item) {
+              return item.toString().toLowerCase();
+            });
+            return filterObj.exclude.indexOf(type) === -1;
+          }
+        };
+      },
+      applyTypeFilter: function (items, filterObj) {
+        var filter = GGRC.Utils.filters.makeTypeFilter(filterObj);
+        return GGRC.Utils.filters.applyFilter(items, filter);
+      }
+    },
     sortingHelpers: {
       commentSort: function (a, b) {
         if (a.created_at < b.created_at) {
@@ -322,7 +364,7 @@
      * Remove all HTML tags from the string
      * @param {String} originalText - original string for parsing
      * @return {string} - plain text without tags
-       */
+     */
     getPlainText: function (originalText) {
       originalText = originalText || '';
       return originalText.replace(/<[^>]*>?/g, '').trim();
@@ -407,6 +449,7 @@
           }
         );
       }
+
       if (relationshipIds.length === 1) {
         result = CMS.Models.Relationship.findInCacheById(relationshipIds[0]);
       } else if (relationshipIds.length > 1) {
