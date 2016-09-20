@@ -62,19 +62,25 @@ for module_name in SETTINGS_MODULE.split(" "):
 
 LOGGING = {
     "version": 1,
-    "formatters": {
-        "default": LOGGING_FORMATTER,
-    },
-    "handlers": {
-        "default": LOGGING_HANDLER,
-    },
     "root": {
         "level": LOGGING_ROOT,
-        "handlers": ["default"],
     },
     "loggers": {
         name: {"level": level}
         for name, level in LOGGING_LOGGERS.iteritems()
     },
-    "disable_existing_loggers": False,
+    # Use preconfigured handlers and formatters when run on AppEngine
+    "incremental": globals().get('APP_ENGINE', False),
 }
+
+if not LOGGING["incremental"]:
+  LOGGING.update({
+      "formatters": {
+          "default": LOGGING_FORMATTER,
+      },
+      "handlers": {
+          "default": LOGGING_HANDLER,
+      },
+      "disable_existing_loggers": False,
+  })
+  LOGGING["root"]["handlers"] = ["default"]
