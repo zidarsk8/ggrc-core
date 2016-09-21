@@ -10,8 +10,8 @@ import datetime
 import hashlib
 import itertools
 import json
-import logging
 import time
+from logging import getLogger
 from collections import defaultdict
 from exceptions import TypeError
 from wsgiref.handlers import format_date_time
@@ -20,15 +20,15 @@ from urllib import urlencode
 from blinker import Namespace
 from flask import url_for, request, current_app, g, has_request_context
 from flask.views import View
+from flask.ext.sqlalchemy import Pagination
+import sqlalchemy.orm.exc
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import tuple_
-import sqlalchemy.orm.exc
 from werkzeug.exceptions import BadRequest, Forbidden
 
 import ggrc.builder.json
 import ggrc.models
-from flask.ext.sqlalchemy import Pagination
 from ggrc import db, utils
 from ggrc.utils import as_json, benchmark
 from ggrc.fulltext import get_indexer
@@ -39,9 +39,13 @@ from ggrc.models.event import Event
 from ggrc.models.revision import Revision
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.rbac import permissions, context_query_filter
-from .attribute_query import AttributeQueryBuilder
+from ggrc.services.attribute_query import AttributeQueryBuilder
 from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc import settings
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 CACHE_EXPIRY_COLLECTION = 60
@@ -205,13 +209,13 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
     build_cache_status(status_entries, 'DeleteOp:' + key,
                        expiry_time, 'InProgress')
   if len(status_entries) > 0:
-    current_app.logger.info("CACHE: status entries: %s", str(status_entries))
+    logger.info("CACHE: status entries: %s", status_entries)
     ret = context.cache_manager.bulk_add(status_entries, expiry_time)
     if ret is not None and len(ret) == 0:
       pass
     else:
-      current_app.logger.error(
-          'CACHE: Unable to add status for newly created entries %s', str(ret))
+      logger.error('CACHE: Unable to add status for newly created entries %s',
+                   ret)
 
 
 def update_memcache_after_commit(context):
@@ -230,7 +234,7 @@ def update_memcache_after_commit(context):
     return
 
   if context.cache_manager is None:
-    current_app.logger.error("CACHE: Error in initiaizing cache manager")
+    logger.error("CACHE: Error in initiaizing cache manager")
     return
 
   cache_manager = context.cache_manager
@@ -242,7 +246,7 @@ def update_memcache_after_commit(context):
     # TODO(dan): handling failure including network errors,
     #            currently we log errors
     if delete_result is not True:
-      current_app.logger.error("CACHE: Failed to remove collection from cache")
+      logger.error("CACHE: Failed to remove collection from cache")
 
   status_entries = []
   for key in cache_manager.marked_for_delete:
@@ -252,8 +256,7 @@ def update_memcache_after_commit(context):
     # TODO(dan): handling failure including network errors,
     #            currently we log errors
     if delete_result is not True:
-      current_app.logger.error(
-          "CACHE: Failed to remove status entries from cache")
+      logger.error("CACHE: Failed to remove status entries from cache")
 
   clear_permission_cache()
   cache_manager.clear_cache()
@@ -291,7 +294,7 @@ def get_cache(create=False):
       cache = g.cache = Cache()
     return cache
   else:
-    logging.warning("No request context - no cache created")
+    logger.warning("No request context - no cache created")
     return None
 
 
@@ -742,10 +745,10 @@ class Resource(ModelView):
             raise NotImplementedError()
         except (IntegrityError, ValidationError, ValueError) as err:
           message = translate_message(err)
-          current_app.logger.warn(message)
+          logger.warning(message)
           return (message, 400, [])
         except Exception as err:
-          current_app.logger.exception(err)
+          logger.exception(err)
           raise
         finally:
           # When running integration tests, cache sometimes does not clear
@@ -1325,7 +1328,7 @@ class Resource(ModelView):
   def _make_error_from_exception(exc):
     """Return a 400-code with the exception message."""
     message = translate_message(exc)
-    current_app.logger.warn(message)
+    logger.warning(message)
     return (400, message)
 
   def collection_post(self):  # noqa
@@ -1368,8 +1371,7 @@ class Resource(ModelView):
           db.session.rollback()
         except Exception as error:
           res.append((getattr(error, "code", 500), error.message))
-          current_app.logger.warn("Collection POST commit failed:")
-          current_app.logger.exception(error)
+          logger.warning("Collection POST commit failed", exc_info=True)
           db.session.rollback()
         if hasattr(g, "referenced_objects"):
           delattr(g, "referenced_objects")

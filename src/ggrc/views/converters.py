@@ -7,6 +7,8 @@ This module handles all view related function to import and export pages
 including the import/export api endponts.
 """
 
+from logging import getLogger
+
 from flask import current_app
 from flask import request
 from flask import json
@@ -21,6 +23,10 @@ from ggrc.converters.query_helper import BadQueryException
 from ggrc.converters.query_helper import QueryHelper
 from ggrc.login import login_required
 from ggrc.utils import benchmark
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 def check_required_headers(required_headers):
@@ -64,8 +70,8 @@ def handle_export_request():
     return current_app.make_response((csv_string, 200, headers))
   except BadQueryException as exception:
     raise BadRequest(exception.message)
-  except Exception as exception:
-    current_app.logger.exception(exception)
+  except:  # pylint: disable=bare-except
+    logger.exception("Export failed")
   raise BadRequest("Export failed due to server error.")
 
 
@@ -100,8 +106,8 @@ def handle_import_request():
     response_json = json.dumps(response_data)
     headers = [("Content-Type", "application/json")]
     return current_app.make_response((response_json, 200, headers))
-  except Exception as exception:
-    current_app.logger.exception(exception)
+  except:  # pylint: disable=bare-except
+    logger.exception("Import failed")
   raise BadRequest("Import failed due to server error.")
 
 

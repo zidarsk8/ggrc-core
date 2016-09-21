@@ -2,19 +2,18 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc.services.common import Resource
-
 from ggrc_workflows.models import (
-    Workflow, Cycle, CycleTaskGroupObjectTask
+    Workflow,
+    Cycle,
+    CycleTaskGroupObjectTask,
 )
 from ggrc_workflows.services.common import Signals
-
-from .data_handler import (
+from ggrc_workflows.notification.data_handler import (
     get_cycle_data,
     get_workflow_data,
     get_cycle_task_data,
 )
-
-from .notification_handler import (
+from ggrc_workflows.notification.notification_handler import (
     handle_workflow_modify,
     handle_cycle_task_group_object_task_put,
     handle_cycle_created,

@@ -30,5 +30,6 @@ SQLAlchemy==0.9.4
 tabulate==0.7.5
 webassets==0.8
 Werkzeug==0.9.3
+colorlog==2.7.0
 # Flask-SQLAlchemy must be last - it somehow mangles `distribute` / `setuptools`
 Flask-SQLAlchemy==1.0

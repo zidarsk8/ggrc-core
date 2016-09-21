@@ -3,7 +3,8 @@
 
 from copy import deepcopy
 from datetime import date
-from flask import current_app
+from logging import getLogger
+
 from sqlalchemy import and_
 from urlparse import urljoin
 
@@ -18,6 +19,10 @@ from ggrc_workflows.models import CycleTaskGroupObjectTask
 from ggrc_workflows.models import Workflow
 
 
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
+
+
 """
 exposed functions
     get_cycle_data,
@@ -29,7 +34,7 @@ exposed functions
 def get_cycle_created_task_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if not cycle_task:
-    current_app.logger.warning(
+    logger.warning(
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}
@@ -97,13 +102,14 @@ def get_cycle_created_task_data(notification):
 def get_cycle_task_due(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if not cycle_task:
-    current_app.logger.warning(
+    logger.warning(
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}
   if not cycle_task.contact:
-    current_app.logger.warning(
-        'Contact for cycle task %s not found.', notification.object_id)
+    logger.warning(
+        'Contact for cycle task %s not found.',
+        notification.object_id)
     return {}
 
   notif_name = notification.notification_type.name
@@ -180,7 +186,7 @@ def get_cycle_data(notification):
 def get_cycle_task_declined_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
   if not cycle_task or not cycle_task.contact:
-    current_app.logger.warning(
+    logger.warning(
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}

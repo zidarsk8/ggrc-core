@@ -9,10 +9,14 @@ Main contributed functions are:
 
 import datetime
 import urlparse
-from flask import current_app
+from logging import getLogger
 
 from ggrc import models
 from ggrc import utils
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 def get_object_url(obj):
@@ -72,8 +76,10 @@ def assignable_open_data(notif):
   """
   obj = get_notification_object(notif)
   if not obj:
-    current_app.logger.warning(
-        '%s for notification %s not found.', notif.object_type, notif.id)
+    logger.warning(
+        '%s for notification %s not found.',
+        notif.object_type, notif.id,
+    )
     return {}
   people = [person for person, _ in obj.assignees]
 
@@ -246,8 +252,7 @@ def get_comment_data(notif):
     comment_obj = (rel.Request_destination or rel.Request_source or
                    rel.Assessment_destination or rel.Assessment_source)
   if not comment_obj:
-    current_app.logger.warning(
-        'Comment object not found for notification %s', notif.id)
+    logger.warning('Comment object not found for notification %s', notif.id)
     return {}
 
   if comment_obj.recipients:

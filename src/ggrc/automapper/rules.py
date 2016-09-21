@@ -1,9 +1,10 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from collections import namedtuple
 import itertools
-import logging
+from collections import namedtuple
+from logging import getLogger
+
 from ggrc import models
 
 Attr = namedtuple('Attr', ['name'])
@@ -13,6 +14,10 @@ type_ordering = [['Audit'], ['Program'],
                  ['Regulation', 'Policy', 'Standard', 'Contract'],
                  ['Section', 'Clause'], ['Objective'], ['Control'],
                  ['Assessment']]
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 def get_type_indices():
@@ -63,12 +68,12 @@ class RuleSet(object):
           err1 = cls._check_type_order(top, mid)
           err2 = cls._check_type_order(mid, bottom)
           if err1 is not None or err2 is not None:
-            logging.warning("Automapping rule ordering violation")
+            logger.warning("Automapping rule ordering violation")
             if err1 is not None:
-              logging.warning(err1)
+              logger.warning(err1)
             if err2 is not None:
-              logging.warning(err2)
-            logging.warning("Skipping bad rule " + str((top, mid, bottom)))
+              logger.warning(err2)
+            logger.warning("Skipping bad rule (%s, %s, %s)", top, mid, bottom)
             continue
           yield (mid, bottom, top, rule)
           yield (mid, top, bottom, rule)
