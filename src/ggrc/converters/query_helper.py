@@ -326,8 +326,77 @@ class QueryHelper(object):
                            required or [(aliased entity, relationship field)]
                            if joins required.
       """
-      joins = None
-      order = None
+      def by_similarity():
+        """Join similar_objects subquery, order by weight from it."""
+        join_target = flask.g.similar_objects_query.subquery()
+        join_condition = model.id == join_target.c.id
+        joins = [(join_target, join_condition)]
+        order = join_target.c.weight
+        return joins, order
+
+      def by_ca():
+        """Join fulltext index table, order by indexed CA value."""
+        alias = sa.orm.aliased(Record, name="fulltext_{}".format(self._count))
+        joins = [(alias, sa.and_(
+          alias.key == model.id,
+          alias.type == model.__name__,
+          alias.tags == key)
+        )]
+        order = alias.content
+        return joins, order
+
+      def by_foreign_key():
+        """Join the related model, order by title or name/email."""
+        related_model = attr.property.mapper.class_
+        if issubclass(related_model, models.mixins.Titled):
+          joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
+          order = alias.title
+        elif issubclass(related_model, models.Person):
+          joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
+          order = sorting_field_for_person(alias)
+        else:
+          raise NotImplementedError("Sorting by {model.__name__} is "
+                                    "not implemented yet."
+                                    .format(model=related_model))
+        return joins, order
+
+      def by_m2m():
+        """Join the Person model, order by name/email.
+
+        Implemented only for ObjectOwner mapping.
+        """
+        if issubclass(attr.target_class, models.object_owner.ObjectOwner):
+          # NOTE: In the current implementation we sort only by the first
+          # assigned owner if multiple owners defined
+          oo_alias_1 = sa.orm.aliased(models.object_owner.ObjectOwner)
+          oo_alias_2 = sa.orm.aliased(models.object_owner.ObjectOwner)
+          oo_subq = db.session.query(
+              oo_alias_1.ownable_id,
+              oo_alias_1.ownable_type,
+              oo_alias_1.person_id,
+          ).filter(
+              oo_alias_1.ownable_type == model.__name__,
+              ~sa.exists().where(sa.and_(
+                  oo_alias_2.ownable_id == oo_alias_1.ownable_id,
+                  oo_alias_2.ownable_type == oo_alias_1.ownable_type,
+                  oo_alias_2.id < oo_alias_1.id,
+              )),
+          ).subquery()
+
+          owner = sa.orm.aliased(models.Person, name="owner")
+
+          joins = [
+              (oo_subq, sa.and_(model.__name__ == oo_subq.c.ownable_type,
+                                model.id == oo_subq.c.ownable_id)),
+              (owner, oo_subq.c.person_id == owner.id),
+          ]
+
+          order = sorting_field_for_person(owner)
+        else:
+          raise NotImplementedError("Sorting by m2m-field '{key}' "
+                                    "is not implemented yet."
+                                    .format(key=key))
+        return joins, order
 
       # transform clause["name"] into a model's field name
       key = clause["name"].lower()
@@ -335,10 +404,7 @@ class QueryHelper(object):
       if key == "__similarity__":
         # special case
         if hasattr(flask.g, "similar_objects_query"):
-          join_target = flask.g.similar_objects_query.subquery()
-          join_condition = model.id == join_target.c.id
-          joins = [(join_target, join_condition)]
-          order = join_target.c.weight
+          joins, order = by_similarity()
         else:
           raise BadQueryException("Can't order by '__similarity__' when no ",
                                   "'similar' filter was applied.")
@@ -348,64 +414,16 @@ class QueryHelper(object):
         if attr is None:
           # non object attributes are treated as custom attributes
           self._count += 1
-          alias = sa.orm.aliased(Record, name="fulltext_{}".format(self._count))
-          joins = [(alias, sa.and_(
-            alias.key == model.id,
-            alias.type == model.__name__,
-            alias.tags == key)
-          )]
-          order = alias.content
+          joins, order = by_ca()
         elif (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
                 isinstance(attr.property,
                            sa.orm.properties.RelationshipProperty)):
-          # a relationship
-          related_model = attr.property.mapper.class_
-          if issubclass(related_model, models.mixins.Titled):
-            joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
-            order = alias.title
-          elif issubclass(related_model, models.Person):
-            joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
-            order = sorting_field_for_person(alias)
-          else:
-            raise NotImplementedError("Sorting by {model.__name__} is "
-                                      "not implemented yet."
-                                      .format(model=related_model))
+          joins, order = by_foreign_key()
         elif isinstance(attr, sa.ext.associationproxy.AssociationProxy):
-          # a many-to-many relationship
-          if issubclass(attr.target_class, models.object_owner.ObjectOwner):
-            # NOTE: In the current implementation we sort only by the first
-            # assigned owner if multiple owners defined
-            oo_alias_1 = sa.orm.aliased(models.object_owner.ObjectOwner)
-            oo_alias_2 = sa.orm.aliased(models.object_owner.ObjectOwner)
-            oo_subq = db.session.query(
-                oo_alias_1.ownable_id,
-                oo_alias_1.ownable_type,
-                oo_alias_1.person_id,
-            ).filter(
-                oo_alias_1.ownable_type == model.__name__,
-                ~sa.exists().where(sa.and_(
-                    oo_alias_2.ownable_id == oo_alias_1.ownable_id,
-                    oo_alias_2.ownable_type == oo_alias_1.ownable_type,
-                    oo_alias_2.id < oo_alias_1.id,
-                )),
-            ).subquery()
-
-            owner = sa.orm.aliased(models.Person, name="owner")
-
-            joins = [
-                (oo_subq, sa.and_(model.__name__ == oo_subq.c.ownable_type,
-                                  model.id == oo_subq.c.ownable_id)),
-                (owner, oo_subq.c.person_id == owner.id),
-            ]
-
-            order = sorting_field_for_person(owner)
-          else:
-            raise NotImplementedError("Sorting by m2m-field '{key}' "
-                                      "is not implemented yet."
-                                      .format(key=key))
+          joins, order = by_m2m()
         else:
           # a simple attribute
-          order = attr
+          joins, order = None, attr
 
       if clause.get("desc", False):
         order = order.desc()
