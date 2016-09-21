@@ -1,29 +1,33 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-import traceback
-from flask import current_app
+from logging import getLogger
+from traceback import format_exc
 
 from ggrc import extensions
 from ggrc.notifications import common
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 def send_error_notification(message):
   try:
     user_email = common.getAppEngineEmail()
     common.send_email(user_email, "Error in nightly cron job", message)
-  except Exception as e:
-    current_app.logger.error(e)
+  except:  # pylint: disable=bare-except
+    logger.exception("Failed on sending notification")
 
 
 def run_job(job):
   try:
     job()
-  except:
-    message = "job '{}' failed with: \n{}".format(
-        job.__name__, traceback.format_exc())
-    current_app.logger.error(message)
-    send_error_notification(message)
+  except:  # pylint: disable=bare-except
+    logger.exception("Job '%s' failed", job.__name__)
+    send_error_notification(
+        "Job '%s' failed with: \n%s" % (job.__name__, format_exc())
+    )
 
 
 def nightly_cron_endpoint():

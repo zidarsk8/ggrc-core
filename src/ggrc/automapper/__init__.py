@@ -2,10 +2,11 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from datetime import datetime
+from logging import getLogger
 import collections
-import logging
 
 from sqlalchemy.sql.expression import tuple_
+
 from ggrc import db
 from ggrc import models
 from ggrc.automapper.rules import rules
@@ -16,6 +17,10 @@ from ggrc.models.request import Request
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource
 from ggrc.utils import benchmark, with_nop
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class Stub(collections.namedtuple("Stub", ["type", "id"])):
@@ -177,7 +182,7 @@ class AutomapperGenerator(object):
 
   def _step_implicit(self, src, dst, implicit):
     if not hasattr(models.all_models, src.type):
-      logging.warning('Automapping by attr: cannot find model %s', src.type)
+      logger.warning('Automapping by attr: cannot find model %s', src.type)
       return
     instance = self.instance_cache.get(src)
     if instance is None:
@@ -185,8 +190,8 @@ class AutomapperGenerator(object):
       instance = model.query.filter(model.id == src.id).first()
       self.instance_cache[src] = instance
     if instance is None:
-      logging.warning("Automapping by attr: cannot load model %s: %s",
-                      src.type, str(src.id))
+      logger.warning("Automapping by attr: cannot load model %s: %s",
+                     src.type, src.id)
       return
     for attr in implicit:
       if hasattr(instance, attr.name):
@@ -199,11 +204,11 @@ class AutomapperGenerator(object):
             if entry not in self.processed:
               self.queue.add(entry)
           else:
-            logging.warning('Automapping by attr: %s is None', attr.name)
+            logger.warning('Automapping by attr: %s is None', attr.name)
       else:
-        logging.warning(
+        logger.warning(
             'Automapping by attr: object %s has no attribute %s',
-            str(src), str(attr.name)
+            src, attr.name,
         )
 
   def _ensure_relationship(self, src, dst):
@@ -235,12 +240,12 @@ def handle_relationship_post(source, destination):
 
   """
   if source is None:
-    logging.warning("Automapping request listener: "
-                    "no source, no mappings created")
+    logger.warning("Automapping request listener: "
+                   "no source, no mappings created")
     return
   if destination is None:
-    logging.warning("Automapping request listener: "
-                    "no destination, no mappings created")
+    logger.warning("Automapping request listener: "
+                   "no destination, no mappings created")
     return
   relationship = Relationship(source_type=source.type,
                               source_id=source.id,
@@ -266,7 +271,7 @@ def register_automapping_listeners():
     automapper = AutomapperGenerator()
     for obj in objects:
       if obj is None:
-        logging.warning("Automapping listener: no obj, no mappings created")
+        logger.warning("Automapping listener: no obj, no mappings created")
         return
       automapper.generate_automappings(obj)
 

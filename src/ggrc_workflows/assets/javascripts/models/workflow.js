@@ -97,8 +97,8 @@
       dfd = this._super.apply(this, arguments);
       dfd.then(function (instance) {
         redirectLink = instance.viewLink + '#task_group_widget';
+        instance.attr('_redirect', redirectLink);
         if (!taskGroupTitle) {
-          instance.attr('_redirect', redirectLink);
           return instance;
         }
         taskGroup = new CMS.Models.TaskGroup({

@@ -5,15 +5,15 @@
 
 from datetime import datetime
 from operator import itemgetter
-from os.path import abspath, dirname, join
 from flask import json
 from nose.plugins.skip import SkipTest
 
+from ggrc import db
+from ggrc.models import CustomAttributeDefinition as CAD
+
 from integration.ggrc.converters import TestCase
+from integration.ggrc.models import factories
 
-
-THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, "../converters/test_csvs/")
 
 # to be moved into converters.query_helper
 DATE_FORMAT_REQUEST = "%m/%d/%Y"
@@ -279,7 +279,7 @@ class TestAdvancedQueryAPI(TestCase):
     # the titles are sorted descending with desc=True
     self.assertListEqual(titles_desc, list(reversed(titles_asc)))
 
-  def test_query_order_by_several_fields(self):
+  def test_order_by_several_fields(self):
     """Results get sorted by two fields at once."""
     data = {
         "object_name": "Regulation",
@@ -304,7 +304,7 @@ class TestAdvancedQueryAPI(TestCase):
                reverse=True),
     )
 
-  def test_query_order_by_related_titled(self):
+  def test_order_by_related_titled(self):
     """Results get sorted by title of related Titled object."""
     data_title = {
         "object_name": "Audit",
@@ -570,3 +570,109 @@ class TestAdvancedQueryAPI(TestCase):
     response_single_post = json.loads(self._post(data_list).data)
 
     self.assertEqual(response_multiple_posts, response_single_post)
+
+
+class TestQueryWithCA(TestCase):
+  """Test query API with custom attributes."""
+
+  def setUp(self):
+    """Set up test cases for all tests."""
+    TestCase.clear_data()
+    self._generate_cad()
+    self._import_file("sorting_with_ca_setup.csv")
+    self.client.get("/login")
+
+  @staticmethod
+  def _generate_cad():
+    """Generate custom attribute definitions."""
+    factories.CustomAttributeDefinitionFactory(
+        title="CA dropdown",
+        definition_type="program",
+        multi_choice_options="one,two,three,four,five",
+    )
+    factories.CustomAttributeDefinitionFactory(
+        title="CA text",
+        definition_type="program",
+    )
+
+  def _get_first_result_set(self, data, *keys):
+    """Post data, get response, get values from it like in obj["a"]["b"]."""
+
+    result = self.client.post(
+        "/query",
+        data=json.dumps([data]),
+        headers={"Content-Type": "application/json"},
+    ).json[0]
+
+    for key in keys:
+      result = result.get(key)
+      self.assertIsNot(result, None)
+    return self._flatten_cav(result)
+
+  @staticmethod
+  def _flatten_cav(data):
+    """Unpack CAVs and put them in data as object attributes."""
+    cad_names = dict(db.session.query(CAD.id, CAD.title))
+    for entry in data:
+      for cav in entry.get("custom_attribute_values", []):
+        entry[cad_names[cav["custom_attribute_id"]]] = cav["attribute_value"]
+    return data
+
+  def test_single_ca_sorting(self):
+    """Results get sorted by single custom attribute field."""
+
+    data = {
+        "object_name": "Program",
+        "order_by": [{"name": "title"}],
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data, "Program", "values")
+
+    keys = [program["title"] for program in programs]
+    self.assertEqual(keys, sorted(keys))
+
+    data = {
+        "object_name": "Program",
+        "order_by": [{"name": "CA text"}],
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data, "Program", "values")
+
+    keys = [program["CA text"] for program in programs]
+    self.assertEqual(keys, sorted(keys))
+
+  def test_mixed_ca_sorting(self):
+    """Test sorting by multiple fields with CAs."""
+
+    data = {
+        "object_name": "Program",
+        "order_by": [{"name": "CA text"}, {"name": "title"}],
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data, "Program", "values")
+
+    keys = [(program["CA text"], program["title"]) for program in programs]
+    self.assertEqual(keys, sorted(keys))
+
+    data = {
+        "object_name": "Program",
+        "order_by": [{"name": "title"}, {"name": "CA text"}],
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data, "Program", "values")
+
+    keys = [(program["title"], program["CA text"]) for program in programs]
+    self.assertEqual(keys, sorted(keys))
+
+  def test_multiple_ca_sorting(self):
+    """Test sorting by multiple CA fields"""
+
+    data = {
+        "object_name": "Program",
+        "order_by": [{"name": "CA text"}, {"name": "CA dropdown"}],
+        "filters": {"expression": {}},
+    }
+    programs = self._get_first_result_set(data, "Program", "values")
+
+    keys = [(prog["CA text"], prog["CA dropdown"]) for prog in programs]
+    self.assertEqual(keys, sorted(keys))

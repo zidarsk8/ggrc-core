@@ -16,10 +16,10 @@ color
 # All declared_attr properties that are class level as per sqlalchemy
 # documentatio, are reported as false positives by pylint.
 
+from logging import getLogger
 from uuid import uuid1
 import datetime
 
-from flask import current_app
 from sqlalchemy import event
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
@@ -34,6 +34,10 @@ from ggrc.models.deferred import deferred
 from ggrc.models.inflector import ModelInflectorDescriptor
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins.customattributable import CustomAttributable
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class Identifiable(object):
@@ -466,9 +470,8 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
   def display_name(self):
     try:
       return self._display_name()
-    except:
-      current_app.logger.warn(
-          "display_name error in %s", type(self), exc_info=True)
+    except:  # pylint: disable=bare-except
+      logger.warning("display_name error in %s", type(self), exc_info=True)
       return ""
 
   def _display_name(self):

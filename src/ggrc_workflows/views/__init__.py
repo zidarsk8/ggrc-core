@@ -4,6 +4,8 @@
 """Ggrc workflow module views."""
 
 from datetime import date
+from logging import getLogger
+
 from flask import redirect
 from flask import render_template
 from flask import url_for
@@ -19,6 +21,10 @@ from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 from ggrc_workflows.models import Workflow
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 def get_user_task_count():
@@ -100,11 +106,11 @@ def start_unstarted_cycles():
     # We must skip tasks that don't have start days and end days defined
     if ((not all(tasks_start_days) and not all(tasks_end_days)) or
             (not tasks_start_days and not tasks_end_days)):
-      app.logger.info(
-          "Skipping workflow {0} (ID: {1}) because it doesn't "
-          "have relative start and end days specified".format(
-              workflow.title,
-              workflow.id))
+      logger.info(
+          "Skipping workflow %s (ID: %s) because it doesn't "
+          "have relative start and end days specified",
+          workflow.title, workflow.id,
+      )
       continue
 
     workflow.next_cycle_start_date = date.today()

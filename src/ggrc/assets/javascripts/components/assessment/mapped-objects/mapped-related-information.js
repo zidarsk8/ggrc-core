@@ -18,46 +18,14 @@
     template: tpl,
     scope: {
       titleText: '@',
-      filter: '@',
+      filter: {
+        exclude: ['Control']
+      },
       mapping: '@',
       mappingType: '@',
       expanded: true,
       selectedItem: null,
-      parentInstance: null,
-      mappedItems: [],
-      filterFn: function (item) {
-        var isControlOnly = this.filter === 'control';
-        var isControlType = item.instance.type === 'Control';
-        if (isControlOnly) {
-          return isControlType;
-        }
-        return !isControlType;
-      },
-      filterItems: function (objects) {
-        objects = objects.serialize();
-        return objects
-          .map(function (obj) {
-            if (this.filterFn(obj)) {
-              return obj;
-            }
-          }.bind(this))
-          .filter(function (item) {
-            return Boolean(item);
-          });
-      },
-      setMappedObjects: function (items) {
-        items = this.filterItems(items);
-        this.attr('mappedItems').replace(items);
-      },
-      load: function () {
-        this.attr('parentInstance')
-          .get_binding(this.attr('mapping'))
-          .refresh_instances()
-          .then(this.setMappedObjects.bind(this));
-      }
-    },
-    init: function () {
-      this.scope.load();
+      instance: null
     }
   });
 })(window.can, window.GGRC);
