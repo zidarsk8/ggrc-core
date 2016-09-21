@@ -105,3 +105,20 @@ class TestCAD(TestCase):
         attribute_type="Text",
     )
     self.assertEqual(cad.title, "my custom attribute title")
+
+  def test_setting_same_name(self):
+    """Setting an already existing title should pass the validator."""
+
+    db.session.add(models.CustomAttributeDefinition(
+        title="my custom attribute title",
+        definition_type="section",
+        attribute_type="Text",
+    ))
+    db.session.commit()
+    cad = models.CustomAttributeDefinition.query.first()
+    cad.title = "my custom attribute title"
+    cad.attribute_type = "Rich Text"
+    db.session.commit()
+    cad = models.CustomAttributeDefinition.query.first()
+    self.assertEqual(cad.title, "my custom attribute title")
+    self.assertEqual(cad.attribute_type, "Rich Text")
