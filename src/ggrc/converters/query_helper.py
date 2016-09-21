@@ -311,21 +311,26 @@ class QueryHelper(object):
     Returns:
       the query with sorting parameters.
     """
-    def join_and_order(clause):
-      """Get join operation and ordering field from item of order_by list.
+    def sorting_field_for_person(person):
+      """Get right field to sort people by: name if defined or email."""
+      return case([(not_(or_(person.name.is_(None), person.name == '')),
+                    person.name)],
+                  else_=person.email)
+
+    def joins_and_order(clause):
+      """Get join operations and ordering field from item of order_by list.
 
       Args:
         clause: {"name": the name of model's field,
                  "desc": reverse sort on this field if True}
 
       Returns:
-
-        (join, order) - a tuple of join required for this ordering to work and
-                        ordering clause itself;
-                        join is None if no join required or
-                        (aliased entity, relationship field) if join required.
+        ([joins], order) - a tuple of joins required for this ordering to work
+                           and ordering clause itself; join is None if no join
+                           required or [(aliased entity, relationship field)]
+                           if joins required.
       """
-      join = None
+      joins = None
       order = None
 
       # transform clause["name"] into a model's field name
@@ -336,7 +341,7 @@ class QueryHelper(object):
         if hasattr(flask.g, "similar_objects_query"):
           join_target = flask.g.similar_objects_query.subquery()
           join_condition = model.id == join_target.c.id
-          join = join_target, join_condition
+          joins = [(join_target, join_condition)]
           order = join_target.c.weight
         else:
           raise BadQueryException("Can't order by '__similarity__' when no ",
@@ -348,24 +353,22 @@ class QueryHelper(object):
           # non object attributes are treated as custom attributes
           self._count += 1
           alias = orm.aliased(Record, name="fulltext_{}".format(self._count))
-          join = (alias, and_(
+          joins = [(alias, and_(
             alias.key == model.id,
             alias.type == model.__name__,
             alias.tags == key)
-          )
+          )]
           order = alias.content
         elif (isinstance(attr, orm.attributes.InstrumentedAttribute) and
                 isinstance(attr.property, orm.properties.RelationshipProperty)):
           # a relationship
           related_model = attr.property.mapper.class_
           if issubclass(related_model, models.mixins.Titled):
-            join = alias, _ = orm.aliased(attr), attr
+            joins = [(alias, _)] = [(orm.aliased(attr), attr)]
             order = alias.title
           elif issubclass(related_model, models.Person):
-            join = alias, _ = orm.aliased(attr), attr
-            order = case([(not_(or_(alias.name.is_(None), alias.name == '')),
-                           alias.name)],
-                         else_=alias.email)
+            joins = [(alias, _)] = [(orm.aliased(attr), attr)]
+            order = sorting_field_for_person(alias)
           else:
             raise NotImplementedError("Sorting by {model.__name__} is "
                                       "not implemented yet."
@@ -377,12 +380,13 @@ class QueryHelper(object):
       if clause.get("desc", False):
         order = order.desc()
 
-      return join, order
+      return joins, order
 
-    joins, orders = zip(*[join_and_order(clause) for clause in order_by])
-    for join in joins:
-      if join is not None:
-        query = query.outerjoin(*join)
+    join_lists, orders = zip(*[joins_and_order(clause) for clause in order_by])
+    for join_list in join_lists:
+      if join_list is not None:
+        for join in join_list:
+          query = query.outerjoin(*join)
 
     return query.order_by(*orders)
 
