@@ -985,56 +985,56 @@ can.Control('GGRC.Controllers.Modals', {
       return ajd;
   },
   save_error: function (_, error) {
-    $("html, body").animate({
-      scrollTop: "0px"
+    $('html, body').animate({
+      scrollTop: '0px'
     }, {
       duration: 200,
       complete: function () {
-        $(document.body).trigger("ajax:flash", { error: error });
+        $(document.body).trigger('ajax:flash', {error: error});
         delete this.disable_hide;
       }.bind(this)
     });
-  }
+  },
 
-  , "{instance} destroyed" : " hide"
+  '{instance} destroyed': ' hide',
 
-  , " hide" : function(el, ev) {
-      if (this.disable_hide) {
-        ev.stopImmediatePropagation();
-        ev.stopPropagation();
-        ev.preventDefault();
-        return false;
-      }
-      if (this.options.instance instanceof can.Model
-          // Ensure that this modal was hidden and not a child modal
-          && this.element
-          && ev.target === this.element[0]
-          && !this.options.skip_refresh
-          && !this.options.instance.isNew()) {
-        this.options.instance.refresh();
-      }
+  ' hide': function (el, ev) {
+    if (this.disable_hide) {
+      ev.stopImmediatePropagation();
+      ev.stopPropagation();
+      ev.preventDefault();
+      return false;
     }
+    if (this.options.instance instanceof can.Model &&
+      // Ensure that this modal was hidden and not a child modal
+      this.element && ev.target === this.element[0] &&
+      !this.options.skip_refresh && !this.options.instance.isNew()) {
+      this.options.instance.refresh();
+    }
+  },
 
-  , destroy : function() {
-    if(this.options.model && this.options.model.cache) {
+  destroy: function () {
+    if (this.options.model && this.options.model.cache) {
       delete this.options.model.cache[undefined];
     }
-    this._super && this._super.apply(this, arguments);
-    if(this.options.instance && this.options.instance._transient) {
-      this.options.instance.removeAttr("_transient");
+    if (this._super) {
+      this._super.apply(this, arguments);
     }
-  }
+    if (this.options.instance && this.options.instance._transient) {
+      this.options.instance.removeAttr('_transient');
+    }
+  },
 
-  , should_update_hash_fragment: function () {
+  should_update_hash_fragment: function () {
     var $trigger = this.options.$trigger;
 
     if (!$trigger) {
       return false;
     }
     return !$trigger.closest('.modal, .cms_controllers_info_pin').length;
-  }
-
-  , update_hash_fragment: function () {
+  },
+  
+  update_hash_fragment: function () {
     if (!this.should_update_hash_fragment()) return;
 
     var hash = window.location.hash.split('/')[0],
