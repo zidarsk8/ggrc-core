@@ -369,6 +369,40 @@ class TestAdvancedQueryAPI(TestCase):
                key=lambda c: person_id_name[c["contact"]["id"]]),
     )
 
+  def test_query_order_by_owners(self):
+    """Results get sorted by name or email of the (first) owner."""
+    # TODO: the test data set lacks objects with several owners
+    data_owner = {
+        "object_name": "Policy",
+        "order_by": [{"name": "owners"}, {"name": "id"}],
+        "filters": {"expression": {}},
+    }
+    policies_owner = self._get_first_result_set(data_owner,
+                                                "Policy", "values")
+
+    data_unsorted = {
+        "object_name": "Policy",
+        "filters": {"expression": {}},
+    }
+    policies_unsorted = self._get_first_result_set(data_unsorted,
+                                                   "Policy", "values")
+    data_people = {
+        "object_name": "Person",
+        "filters": {"expression": {}},
+    }
+    people = self._get_first_result_set(data_people,
+                                        "Person", "values")
+    person_id_name = {person["id"]: (person["name"], person["email"])
+                      for person in people}
+    policy_id_owner = {policy["id"]: person_id_name[policy["owners"][0]["id"]]
+                       for policy in policies_unsorted}
+
+    self.assertListEqual(
+        policies_owner,
+        sorted(sorted(policies_unsorted, key=itemgetter("id")),
+               key=lambda p: policy_id_owner[p["id"]]),
+    )
+
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
     data_values = {
