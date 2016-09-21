@@ -336,8 +336,8 @@ class TestAdvancedQueryAPI(TestCase):
                key=lambda a: program_id_title[a["program"]["id"]]),
     )
 
-  def test_query_order_by_person(self):
-    """Results get sorted by name or email related Person object."""
+  def test_order_by_related_person(self):
+    """Results get sorted by name or email of related Person object."""
     data_person = {
         "object_name": "Clause",
         "order_by": [{"name": "contact"}, {"name": "id"}],
