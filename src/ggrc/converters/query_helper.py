@@ -370,6 +370,39 @@ class QueryHelper(object):
             raise NotImplementedError("Sorting by {model.__name__} is "
                                       "not implemented yet."
                                       .format(model=related_model))
+        elif isinstance(attr, sa.ext.associationproxy.AssociationProxy):
+          # a many-to-many relationship
+          if issubclass(attr.target_class, models.object_owner.ObjectOwner):
+            # NOTE: In the current implementation we sort only by the first
+            # assigned owner if multiple owners defined
+            oo_alias_1 = sa.orm.aliased(models.object_owner.ObjectOwner)
+            oo_alias_2 = sa.orm.aliased(models.object_owner.ObjectOwner)
+            oo_subq = db.session.query(
+                oo_alias_1.ownable_id,
+                oo_alias_1.ownable_type,
+                oo_alias_1.person_id,
+            ).filter(
+                oo_alias_1.ownable_type == model.__name__,
+                ~sa.exists().where(sa.and_(
+                    oo_alias_2.ownable_id == oo_alias_1.ownable_id,
+                    oo_alias_2.ownable_type == oo_alias_1.ownable_type,
+                    oo_alias_2.id < oo_alias_1.id,
+                )),
+            ).subquery()
+
+            owner = sa.orm.aliased(models.Person, name="owner")
+
+            joins = [
+                (oo_subq, sa.and_(model.__name__ == oo_subq.c.ownable_type,
+                                  model.id == oo_subq.c.ownable_id)),
+                (owner, oo_subq.c.person_id == owner.id),
+            ]
+
+            order = sorting_field_for_person(owner)
+          else:
+            raise NotImplementedError("Sorting by m2m-field '{key}' "
+                                      "is not implemented yet."
+                                      .format(key=key))
         else:
           # a simple attribute
           order = attr
