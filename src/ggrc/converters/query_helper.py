@@ -17,9 +17,9 @@ from sqlalchemy import orm
 from sqlalchemy.sql import false
 
 from ggrc import db
+from ggrc import models
 from ggrc.login import is_creator
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
-from ggrc import models
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
@@ -94,6 +94,7 @@ class QueryHelper(object):
     self.query = self._clean_query(query)
     self.ca_disabled = ca_disabled
     self._set_attr_name_map()
+    self._count = 0
 
   def _set_attr_name_map(self):
     """ build a map for attributes names and display names
@@ -338,10 +339,16 @@ class QueryHelper(object):
         key, _ = self.attr_name_map[model].get(key, (key, None))
         attr = getattr(model, key, None)
         if attr is None:
-          raise BadQueryException("Model '{model.__name__}' does not have "
-                                  "'{key}' attribute"
-                                  .format(model=model, key=key))
-        if (isinstance(attr, orm.attributes.InstrumentedAttribute) and
+          # non object attributes are treated as custom attributes
+          self._count +=1
+          alias = orm.aliased(Record, name="fulltext_{}".format(self._count))
+          join = (alias, and_(
+            alias.key == model.id,
+            alias.type == model.__name__,
+            alias.tags == key)
+          )
+          order = alias.content
+        elif (isinstance(attr, orm.attributes.InstrumentedAttribute) and
                 isinstance(attr.property, orm.properties.RelationshipProperty)):
           # a relationship
           related_model = attr.property.mapper.class_
