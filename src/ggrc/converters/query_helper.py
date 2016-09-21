@@ -9,12 +9,7 @@ import datetime
 import collections
 
 import flask
-from sqlalchemy import and_
-from sqlalchemy import case
-from sqlalchemy import not_
-from sqlalchemy import or_
-from sqlalchemy import orm
-from sqlalchemy.sql import false
+import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import models
@@ -246,9 +241,9 @@ class QueryHelper(object):
       if resources:
         resource_sql = model.id.in_(resources)
       else:
-        resource_sql = false()
+        resource_sql = sa.sql.false()
 
-      return or_(
+      return sa.or_(
         context_query_filter(model.context_id, contexts),
         resource_sql)
 
@@ -313,9 +308,10 @@ class QueryHelper(object):
     """
     def sorting_field_for_person(person):
       """Get right field to sort people by: name if defined or email."""
-      return case([(not_(or_(person.name.is_(None), person.name == '')),
-                    person.name)],
-                  else_=person.email)
+      return sa.case([(sa.not_(sa.or_(person.name.is_(None),
+                                      person.name == '')),
+                       person.name)],
+                     else_=person.email)
 
     def joins_and_order(clause):
       """Get join operations and ordering field from item of order_by list.
@@ -352,22 +348,23 @@ class QueryHelper(object):
         if attr is None:
           # non object attributes are treated as custom attributes
           self._count += 1
-          alias = orm.aliased(Record, name="fulltext_{}".format(self._count))
-          joins = [(alias, and_(
+          alias = sa.orm.aliased(Record, name="fulltext_{}".format(self._count))
+          joins = [(alias, sa.and_(
             alias.key == model.id,
             alias.type == model.__name__,
             alias.tags == key)
           )]
           order = alias.content
-        elif (isinstance(attr, orm.attributes.InstrumentedAttribute) and
-                isinstance(attr.property, orm.properties.RelationshipProperty)):
+        elif (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
+                isinstance(attr.property,
+                           sa.orm.properties.RelationshipProperty)):
           # a relationship
           related_model = attr.property.mapper.class_
           if issubclass(related_model, models.mixins.Titled):
-            joins = [(alias, _)] = [(orm.aliased(attr), attr)]
+            joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
             order = alias.title
           elif issubclass(related_model, models.Person):
-            joins = [(alias, _)] = [(orm.aliased(attr), attr)]
+            joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
             order = sorting_field_for_person(alias)
           else:
             raise NotImplementedError("Sorting by {model.__name__} is "
@@ -534,19 +531,19 @@ class QueryHelper(object):
       res = res.all()
       if res:
         return object_class.id.in_([obj.id for obj in res])
-      return false()
+      return sa.sql.false()
 
 
     ops = {
-        "AND": lambda: lift_bin(and_),
-        "OR": lambda: lift_bin(or_),
+        "AND": lambda: lift_bin(sa.and_),
+        "OR": lambda: lift_bin(sa.or_),
         "=": lambda: with_left(lambda l: l == rhs()),
-        "!=": lambda: not_(with_left(
-                           lambda l: l == rhs())),
+        "!=": lambda: sa.not_(with_left(
+                              lambda l: l == rhs())),
         "~": lambda: with_left(lambda l:
                                l.ilike("%{}%".format(rhs()))),
-        "!~": lambda: not_(with_left(
-                           lambda l: l.ilike("%{}%".format(rhs())))),
+        "!~": lambda: sa.not_(with_left(
+                              lambda l: l.ilike("%{}%".format(rhs())))),
         "<": lambda: with_left(lambda l: l < rhs()),
         ">": lambda: with_left(lambda l: l > rhs()),
         "relevant": relevant,
