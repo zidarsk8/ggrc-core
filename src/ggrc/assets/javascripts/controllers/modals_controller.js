@@ -1007,6 +1007,7 @@ can.Control('GGRC.Controllers.Modals', {
       }
       if (this.options.instance instanceof can.Model
           // Ensure that this modal was hidden and not a child modal
+          && this.element
           && ev.target === this.element[0]
           && !this.options.skip_refresh
           && !this.options.instance.isNew()) {
