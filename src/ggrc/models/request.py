@@ -5,6 +5,8 @@
 
 # pylint: disable=fixme
 
+from datetime import date, timedelta
+
 from sqlalchemy import orm
 
 from ggrc import db
@@ -58,8 +60,19 @@ class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
   request_type = deferred(db.Column(db.Enum(*VALID_TYPES), nullable=False),
                           'Request')
 
-  start_date = deferred(db.Column(db.Date, nullable=False), 'Request')
-  end_date = deferred(db.Column(db.Date, nullable=False), 'Request')
+  start_date = deferred(
+      db.Column(db.Date, nullable=False, default=date.today),
+      'Request'
+  )
+
+  end_date = deferred(
+      db.Column(
+          db.Date,
+          nullable=False,
+          default=lambda: date.today() + timedelta(7)
+      ),
+      'Request'
+  )
 
   # TODO Remove audit_id audit_object_id on database cleanup
   audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False)
