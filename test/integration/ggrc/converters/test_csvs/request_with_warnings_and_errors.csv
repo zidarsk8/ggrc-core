@@ -14,13 +14,14 @@ be done only upon re-importing this csv", ,changed notes,In Progress,user1@a.com
 ,Request 10,Audit,Request title 6,"This works because the change is removing verifier, and state does not change",,,In Progress,user1@a.com,user2@a.com,,Interview,7/10/2015,5/20/2016,,,,
 ,Request 11,Audit,Request title 7,State can not transition back to open,,,In Progress,user1@a.com,user2@a.com,user@example.com,Interview,7/11/2015,5/21/2016,,,,
 ,Request 12,Audit,Request title 8,"State will be changed to in-progress, because of the updates to request.",,changes,In Progress,user1@a.com,user2@a.com,user@example.com,Interview,7/12/2015,5/22/2016,,,,
-,Request 17,Audit,Request title 1,"proj-55 does not exist
+,Request 16,Audit,Request title 1,"proj-55 does not exist
 non_existing@a.com does not exist ", --- already exists ---,notes 1,In Progress,"user1@a.com
 user2@a.com","user2@a.com
 user3@a.com","user3@a.com
 non_existing@a.com",docuMEntation,7/1/2015,5/11/2016,Test text 1,proj-55,mkt-1,
-,Request 18,Audit,Request title 2,Missing requested on date - will default to today,,notes 2,In Progress,user1@a.com,user2@a.com,user3@a.com,interviEW,,5/12/2016,Test text 2,proj-1,mkt-2,
-,Request 19,Audit,Request title 3,"Missing requested on and due on dates, default today",,notes 3,In Progress,user1@a.com,user2@a.com,user3@a.com,interviEW,,,Test text 3,,,
+,Request 17,Audit,Request title 2,Missing Due On date - will default to today + 7 days,,notes 2,In Progress,user1@a.com,user2@a.com,user3@a.com,interviEW,5/11/2016,,Test text 2,proj-1,mkt-2,
+,Request 18,Audit,Request title 2,Missing Starts On on date - will default to today,,notes 2,In Progress,user1@a.com,user2@a.com,user3@a.com,interviEW,,5/12/2016,Test text 2,proj-1,mkt-2,
+,Request 19,Audit,Request title 3,"Missing Starts On on and Due On dates, default today / today + 7 days",,notes 3,In Progress,user1@a.com,user2@a.com,user3@a.com,interviEW,,,Test text 3,,,
 ,Request 20,Audit,Request title 4,Missing request type - will take default , --- already exists ---,notes 4,In Progress,user1@a.com,user2@a.com,user3@a.com,,7/4/2015,5/14/2016,Test text 4,,,
 ,Request 21,not existing,Request title 5,Not existing audit does not exist, --- already exists ---,notes 5,In Progress,user1@a.com,user2@a.com,user3@a.com,interviEW,7/5/2015,5/15/2016,Test text 5,,,
 ,Request 22,Audit,same title no warning,"Can not set a state of a new request to verified or finished, because adding a new 
