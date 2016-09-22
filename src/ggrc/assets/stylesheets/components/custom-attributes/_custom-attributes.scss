@@ -6,11 +6,12 @@
 ca-object-validation {
   display: flex;
   flex-direction: row;
-  flex: 1;
-  min-width: 50%;
+  flex: 1 1 50%;
+  max-width: 50%;
   box-sizing: border-box;
 }
 ca-object {
+  max-width: calc(100% - 24px);
   display: flex;
   flex-direction: column;
   box-sizing: border-box;

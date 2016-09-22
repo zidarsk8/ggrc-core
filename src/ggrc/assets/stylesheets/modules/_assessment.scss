@@ -198,11 +198,10 @@ $border-color: #eee;
   .inline-edit__title {
     line-height: 22px;
     margin: 0;
-    height: 22px;
     box-sizing: border-box;
     padding: 0 48px 0 4px;
     position: relative;
-    display: block;
+    display: flex;
 
     .fa {
       width: 24px;
@@ -211,14 +210,12 @@ $border-color: #eee;
     }
 
     .inline-edit__title-body {
-      display: inline-block;
+      display: flex;
       max-width: 100%;
       overflow: hidden;
       line-height: 22px;
       box-sizing: border-box;
       padding: 0 24px 0 0;
-      text-overflow: ellipsis;
-      white-space: nowrap;
       position: relative;
 
       .fa {
