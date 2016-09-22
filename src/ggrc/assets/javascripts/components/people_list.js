@@ -374,36 +374,32 @@
         * @return {jQuery.Deferred} - a promise with the role list
         */
       get_roles: function (person, instance) {
-        var getRelationshipsIds = function (obj) {
-          return _.map(_.union(obj.related_sources, obj.related_destinations),
-            function (relationship) {
-              return relationship.id;
-            }
-          );
-        };
         var rolesDfd = $.Deferred();
-        var relationshipsIds = _.intersection(getRelationshipsIds(person),
-                                              getRelationshipsIds(instance));
-        var found = false;
-        _.each(relationshipsIds, function (relationshipId) {
-          var relationship = CMS.Models.Relationship.findInCacheById(
-            relationshipId);
-          if (_.exists(relationship, 'attrs.AssigneeType')) {
-            found = true;
-            relationship.refresh().then(function (relationship) {
-              var roles = relationship.attrs.AssigneeType.split(',');
-              var result = {roles: roles,
-                            relationship: relationship,
-                            relationshipsIds: relationshipsIds};
-              rolesDfd.resolve(result);
+
+        CMS.Models.Relationship
+          .getRelationshipBetweenInstances(person, instance)
+          .done(function (relationships) {
+            var found = false;
+            _.map(relationships, function (relationship) {
+              if (!found && _.exists(relationship, 'attrs.AssigneeType')) {
+                found = true;
+                relationship.refresh().then(function (relationship) {
+                  var roles = relationship.attrs.AssigneeType.split(',');
+                  var result = {roles: roles,
+                    relationship: relationship};
+                  rolesDfd.resolve(result);
+                });
+              }
             });
-          }
-        });
-        // If the person has no assigneeType relationshipAttr for this instance
-        // then he has no roles
-        if (!found) {
-          rolesDfd.resolve({roles: [], relationshipsIds: relationshipsIds});
-        }
+            if (!found) {
+              rolesDfd.resolve({roles: []});
+            }
+          })
+          .fail(function (e) {
+            GGRC.Errors.notifier('error')(e);
+            rolesDfd.resolve({roles: []});
+          });
+
         return rolesDfd;
       }
     },
