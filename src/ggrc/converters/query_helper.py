@@ -501,18 +501,16 @@ class QueryHelper(object):
                                                   fields))
 
     def text_search():
-      """Filter by text search.
+      """Filter by fulltext search.
 
-      The search is done only in fields listed in external `fields` var.
+      The search is done only in fields indexed for fulltext search.
       """
-      existing_fields = self.attr_name_map[object_class]
-      text = "%{}%".format(exp["text"])
-      p = lambda f: f.ilike(text)
-      return or_(*(
-          with_key(field, p)
-          for field in fields
-          if field in existing_fields
-      ))
+      return object_class.id.in_(
+          db.session.query(Record.key).filter(
+              Record.type == object_class.__name__,
+              Record.content.ilike("%{}%".format(exp["text"])),
+          ),
+      )
 
     rhs = lambda: autocast(exp["left"], exp["right"])
 
