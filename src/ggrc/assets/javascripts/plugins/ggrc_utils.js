@@ -566,6 +566,7 @@
       var relevantFilter;
       var filters;
       var left;
+      var right;
 
       if (relevant) {
         relevantFilter = '#' + relevant.type + ',' + relevant.id + '#';
@@ -575,15 +576,22 @@
           relevant.operation !== left.expression.op.name) {
           left.expression.op.name = relevant.operation;
         }
-        if (filter) {
-          filters = GGRC.query_parser.join_queries(left,
-            GGRC.query_parser.parse(filter));
-        } else {
-          filters = left;
-        }
+      }
+
+      if (filter) {
+        right = GGRC.query_parser.parse(filter);
+      }
+
+      if (left && right) {
+        filters = GGRC.query_parser.join_queries(left, right);
+      } else if (left) {
+        filters = left;
+      } else if (right) {
+        filters = right;
       } else {
         filters = {expression: {}};
       }
+
       return filters;
     }
 
