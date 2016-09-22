@@ -174,7 +174,6 @@ class TestAdvancedQueryAPI(TestCase):
     text_pattern = "ea"
     data = {
         "object_name": "Regulation",
-        "fields": ["description", "notes"],
         "filters": {
             "expression": {
                 "op": {"name": "text_search"},

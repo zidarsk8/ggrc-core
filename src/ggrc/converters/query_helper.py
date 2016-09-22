@@ -266,7 +266,6 @@ class QueryHelper(object):
     filter_expression = self._build_expression(
         expression,
         object_class,
-        object_query.get('fields', []),
     )
     if filter_expression is not None:
       query = query.filter(filter_expression)
@@ -401,7 +400,7 @@ class QueryHelper(object):
 
     return objects
 
-  def _build_expression(self, exp, object_class, fields):
+  def _build_expression(self, exp, object_class):
     """Make an SQLAlchemy filtering expression from exp expression tree."""
     if "op" not in exp:
       return None
@@ -495,24 +494,20 @@ class QueryHelper(object):
 
     with_left = lambda p: with_key(exp["left"], p)
 
-    lift_bin = lambda f: f(self._build_expression(exp["left"], object_class,
-                                                  fields),
-                           self._build_expression(exp["right"], object_class,
-                                                  fields))
+    lift_bin = lambda f: f(self._build_expression(exp["left"], object_class),
+                           self._build_expression(exp["right"], object_class))
 
     def text_search():
-      """Filter by text search.
+      """Filter by fulltext search.
 
-      The search is done only in fields listed in external `fields` var.
+      The search is done only in fields indexed for fulltext search.
       """
-      existing_fields = self.attr_name_map[object_class]
-      text = "%{}%".format(exp["text"])
-      p = lambda f: f.ilike(text)
-      return or_(*(
-          with_key(field, p)
-          for field in fields
-          if field in existing_fields
-      ))
+      return object_class.id.in_(
+          db.session.query(Record.key).filter(
+              Record.type == object_class.__name__,
+              Record.content.ilike("%{}%".format(exp["text"])),
+          ),
+      )
 
     rhs = lambda: autocast(exp["left"], exp["right"])
 
