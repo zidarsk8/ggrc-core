@@ -166,8 +166,10 @@
       return function (err) {
         var props = {};
 
-        message = message || GGRC.Errors.messages[err.status];
-        props[type] = message || 'There was a server problem';
+        if (!message && err && err.status) {
+          message = GGRC.Errors.messages[err.status];
+        }
+        props[type] = message || 'There was an error!';
         $('body').trigger('ajax:flash', props);
       };
     }
