@@ -378,17 +378,19 @@
 
         CMS.Models.Relationship
           .getRelationshipBetweenInstances(person, instance)
-          .done(function (relationship) {
+          .done(function (relationships) {
             var found = false;
-            if (_.exists(relationship, 'attrs.AssigneeType')) {
-              found = true;
-              relationship.refresh().then(function (relationship) {
-                var roles = relationship.attrs.AssigneeType.split(',');
-                var result = {roles: roles,
-                  relationship: relationship};
-                rolesDfd.resolve(result);
-              });
-            }
+            _.map(relationships, function (relationship) {
+              if (!found && _.exists(relationship, 'attrs.AssigneeType')) {
+                found = true;
+                relationship.refresh().then(function (relationship) {
+                  var roles = relationship.attrs.AssigneeType.split(',');
+                  var result = {roles: roles,
+                    relationship: relationship};
+                  rolesDfd.resolve(result);
+                });
+              }
+            });
             if (!found) {
               rolesDfd.resolve({roles: []});
             }
