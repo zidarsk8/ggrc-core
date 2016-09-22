@@ -38,6 +38,10 @@ class CycleTaskGroupObjectTask(
   VALID_STATES = (None, 'InProgress', 'Assigned',
                   'Finished', 'Declined', 'Verified')
 
+  # Note: this statuses are used in utils/query_helpers to filter out the tasks
+  # that should be visible on My Tasks pages.
+  ACTIVE_STATES = ("Assigned", "InProgress", "Finished", "Declined")
+
   cycle_id = db.Column(
       db.Integer,
       db.ForeignKey('cycles.id', ondelete="CASCADE"),

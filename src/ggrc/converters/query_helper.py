@@ -24,7 +24,8 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
 from ggrc.rbac import context_query_filter
-from ggrc.utils import query_helpers
+from ggrc.utils import query_helpers, benchmark
+
 
 class BadQueryException(Exception):
   pass
@@ -164,6 +165,7 @@ class QueryHelper(object):
       return set()
 
   def _macro_expand_object_query(self, object_query):
+    """Expand object query."""
     def expand_task_dates(exp):
       """Parse task dates from the specified expression."""
       if not isinstance(exp, dict) or "op" not in exp:
@@ -231,8 +233,10 @@ class QueryHelper(object):
     return self.query
 
   def _get_type_query(self, model, permission_type):
-    """Prepare query to filter models based on the available contexts and
-    resources.
+    """Filter by contexts and resources
+
+    Prepare query to filter models based on the available contexts and
+    resources for the given type of object.
     """
     contexts, resources = query_helpers.get_context_resource(
         model_name=model.__name__, permission_type=permission_type
@@ -259,24 +263,27 @@ class QueryHelper(object):
     query = object_class.query
 
     requested_permissions = object_query.get("permissions", "read")
-    type_query = self._get_type_query(object_class, requested_permissions)
-    if type_query is not None:
-      query = query.filter(type_query)
-
-    filter_expression = self._build_expression(
-        expression,
-        object_class,
-    )
-    if filter_expression is not None:
-      query = query.filter(filter_expression)
-    if object_query.get("order_by"):
-      query = self._apply_order_by(
+    with benchmark("Get permissions: _get_objects > _get_type_query"):
+      type_query = self._get_type_query(object_class, requested_permissions)
+      if type_query is not None:
+        query = query.filter(type_query)
+    with benchmark("Parse filter query: _get_objects > _build_expression"):
+      filter_expression = self._build_expression(
+          expression,
           object_class,
-          query,
-          object_query["order_by"],
       )
-
-    return query.all()
+      if filter_expression is not None:
+        query = query.filter(filter_expression)
+    if object_query.get("order_by"):
+      with benchmark("Sorting: _get_objects > order_by"):
+        query = self._apply_order_by(
+            object_class,
+            query,
+            object_query["order_by"],
+        )
+    with benchmark("fetch the result set of objects"):
+      res = query.all()
+    return res
 
   def _apply_order_by(self, model, query, order_by):
     """Add ordering parameters to a query for objects.
@@ -339,7 +346,7 @@ class QueryHelper(object):
         attr = getattr(model, key, None)
         if attr is None:
           # non object attributes are treated as custom attributes
-          self._count +=1
+          self._count += 1
           alias = orm.aliased(Record, name="fulltext_{}".format(self._count))
           join = (alias, and_(
             alias.key == model.id,
