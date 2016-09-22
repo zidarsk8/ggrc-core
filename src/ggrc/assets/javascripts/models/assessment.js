@@ -34,6 +34,8 @@
     },
     is_custom_attributable: true,
     attributes: {
+      related_sources: 'CMS.Models.Relationship.stubs',
+      related_destinations: 'CMS.Models.Relationship.stubs',
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       start_date: 'date',
