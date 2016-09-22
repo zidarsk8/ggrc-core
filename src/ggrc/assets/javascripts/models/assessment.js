@@ -34,7 +34,6 @@
     },
     is_custom_attributable: true,
     attributes: {
-      control: 'CMS.Models.Control.stub',
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       start_date: 'date',
