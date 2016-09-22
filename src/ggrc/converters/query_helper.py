@@ -266,7 +266,6 @@ class QueryHelper(object):
     filter_expression = self._build_expression(
         expression,
         object_class,
-        object_query.get('fields', []),
     )
     if filter_expression is not None:
       query = query.filter(filter_expression)
@@ -401,7 +400,7 @@ class QueryHelper(object):
 
     return objects
 
-  def _build_expression(self, exp, object_class, fields):
+  def _build_expression(self, exp, object_class):
     """Make an SQLAlchemy filtering expression from exp expression tree."""
     if "op" not in exp:
       return None
@@ -495,10 +494,8 @@ class QueryHelper(object):
 
     with_left = lambda p: with_key(exp["left"], p)
 
-    lift_bin = lambda f: f(self._build_expression(exp["left"], object_class,
-                                                  fields),
-                           self._build_expression(exp["right"], object_class,
-                                                  fields))
+    lift_bin = lambda f: f(self._build_expression(exp["left"], object_class),
+                           self._build_expression(exp["right"], object_class))
 
     def text_search():
       """Filter by fulltext search.
