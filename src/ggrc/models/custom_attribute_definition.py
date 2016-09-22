@@ -172,11 +172,11 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   def _get_global_cad_names(cls, definition_type):
     """Get names of global cad for a given object."""
     if not getattr(flask.g, "_global_cad_names", set()):
-      query = db.session.query(cls.title).filter(
+      query = db.session.query(cls.title, cls.id).filter(
           cls.definition_type == definition_type,
           cls.definition_id.is_(None)
       )
-      flask.g._global_cad_names = set(item[0] for item in query)
+      flask.g._global_cad_names = {name.lower(): id_ for name, id_ in query}
     return flask.g._global_cad_names
 
   @validates("title", "definition_type")
@@ -211,14 +211,18 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       name = value.lower()
       definition_type = self.definition_type
     elif key == "definition_type" and self.title:
-      name = self.title
+      name = self.title.lower()
       definition_type = value.lower()
     else:
       return value
 
-    if (name in self._get_reserved_names(definition_type) or
-            name in self._get_global_cad_names(definition_type)):
+    if name in self._get_reserved_names(definition_type):
       raise ValueError("Invalid Custom attribute name.")
+
+    if (self._get_global_cad_names(definition_type).get(name) is not None and
+            self._get_global_cad_names(definition_type).get(name) != self.id):
+      raise ValueError("Invalid Custom attribute name.")
+
     return value
 
 
