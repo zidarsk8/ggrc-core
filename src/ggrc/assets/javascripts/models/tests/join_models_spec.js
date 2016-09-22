@@ -15,6 +15,7 @@ describe('CMS.Models.Relationship getRelationshipBetweenInstances() method',
         .and.callFake(function (id) {
           return {id: id};
         });
+      spyOn(console, 'warn');
     });
 
     it('return intersecting Relationships', function (done) {
@@ -124,6 +125,7 @@ describe('CMS.Models.Relationship getRelationshipBetweenInstances() method',
 
       result.then(function (res) {
         expect(res.length).toEqual(2);
+        expect(console.warn.calls.count()).toEqual(1);
         done();
       });
     });
