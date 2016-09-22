@@ -154,6 +154,45 @@
                 model.destination.type === source.type &&
                 model.destination.id === source.id;
       }));
+    },
+    /**
+     * Return the Relationship between two objects.
+     *
+     * @param {CMS.Models.Cacheable} first - First object.
+     * @param {CMS.Models.Cacheable} second - Second object.
+     * @param {boolean} noRefresh - Flag for reject if not relationship.
+     * @return {Promise} - Resolved with Relationship instances if they were
+     * found or an empty list if instances are not related.
+     */
+    getRelationshipBetweenInstances: function rec(first, second, noRefresh) {
+      var relationshipIds = _.intersection(getRelationshipsIds(first),
+        getRelationshipsIds(second));
+      var relationships;
+      var result = $.Deferred();
+
+      function getRelationshipsIds(obj) {
+        var union = _.union(obj.related_sources, obj.related_destinations);
+        return _.map(union, 'id');
+      }
+      if (!relationshipIds.length && noRefresh) {
+        result.resolve([]);
+        return result.promise();
+      }
+      if (!relationshipIds.length) {
+        // try to refresh the instances if don't find the relationship between them
+        return $.when(first.refresh(), second.refresh())
+          .then(function (fObj, sObj) {
+            return rec(fObj, sObj, true);
+          });
+      }
+      if (relationshipIds.length > 1) {
+        console.warn('Duplicated relationship objects', relationshipIds);
+      }
+      relationships = can.map(relationshipIds, function (id) {
+        return CMS.Models.Relationship.findInCacheById(id);
+      });
+      result.resolve(relationships);
+      return result.promise();
     }
   }, {
     reinit: function () {
