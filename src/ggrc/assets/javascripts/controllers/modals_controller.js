@@ -226,7 +226,7 @@ can.Control('GGRC.Controllers.Modals', {
   fetch_data: function (params) {
     var that = this;
     var dfd;
-    var instance = this.options.instance;
+    var instance = this.options.attr('instance');
 
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
@@ -240,7 +240,9 @@ can.Control('GGRC.Controllers.Modals', {
         dfd = $.when(this.options.attr(
           'instance',
           new this.options.model(params).attr('_suppress_errors', true)
-        ));
+        )).then(function () {
+          instance = this.options.attr('instance');
+        }.bind(this));
       } else {
         dfd = this.options.model.findAll(params).then(function (data) {
           if (data.length) {
@@ -263,20 +265,20 @@ can.Control('GGRC.Controllers.Modals', {
       dfd = new $.Deferred().resolve(instance);
     }
 
-    if (instance &&
-      _.exists(instance, 'class.is_custom_attributable') &&
-      !(instance instanceof CMS.Models.Assessment)) {
-      // Make sure custom attributes are preloaded:
-      dfd.then(function () {
+    dfd.then(function () {
+      if (instance &&
+        _.exists(instance, 'class.is_custom_attributable') &&
+        !(instance instanceof CMS.Models.Assessment)) {
         return $.when(
           instance.load_custom_attribute_definitions &&
-            instance.load_custom_attribute_definitions(),
+          instance.load_custom_attribute_definitions(),
           instance.custom_attribute_values ?
             instance.refresh_all('custom_attribute_values') :
             []
         );
-      });
-    }
+      }
+    });
+
     return dfd.done(function () {
       this.reset_form(function () {
         if (instance) {
@@ -1033,7 +1035,7 @@ can.Control('GGRC.Controllers.Modals', {
     }
     return !$trigger.closest('.modal, .cms_controllers_info_pin').length;
   },
-  
+
   update_hash_fragment: function () {
     if (!this.should_update_hash_fragment()) return;
 
