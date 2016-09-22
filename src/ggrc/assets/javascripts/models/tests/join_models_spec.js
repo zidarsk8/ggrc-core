@@ -17,7 +17,7 @@ describe('CMS.Models.Relationship getRelationshipBetweenInstances() method',
         });
     });
 
-    it('return intersecting Relationship', function (done) {
+    it('return intersecting Relationships', function (done) {
       var result;
       instance1 = {
         related_sources: [{id: 1}, {id: 2}, {id: 3}],
@@ -31,7 +31,7 @@ describe('CMS.Models.Relationship getRelationshipBetweenInstances() method',
       result = method(instance1, instance2);
 
       result.then(function (res) {
-        expect(res).toEqual({id: 4});
+        expect(res[0]).toEqual({id: 4});
         done();
       });
     });
@@ -57,7 +57,7 @@ describe('CMS.Models.Relationship getRelationshipBetweenInstances() method',
       result = method(instance1, instance2);
 
       result.then(function (res) {
-        expect(res).toBeUndefined();
+        expect(res).toEqual([]);
         done();
       });
     });
@@ -77,7 +77,7 @@ describe('CMS.Models.Relationship getRelationshipBetweenInstances() method',
         result = method(instance1, instance2, true);
 
         result.then(function (res) {
-          expect(res).toBeUndefined();
+          expect(res).toEqual([]);
           done();
         });
       });
@@ -104,12 +104,12 @@ describe('CMS.Models.Relationship getRelationshipBetweenInstances() method',
       result = method(instance1, instance2);
 
       result.then(function (res) {
-        expect(res).toEqual({id: 4});
+        expect(res[0]).toEqual({id: 4});
         done();
       });
     });
 
-    it('returns more relevant RS for multiple intersection', function (done) {
+    it('returns all RS for multiple intersection', function (done) {
       var result;
       instance1 = {
         related_sources: [{id: 1}, {id: 2}, {id: 3}],
@@ -123,7 +123,7 @@ describe('CMS.Models.Relationship getRelationshipBetweenInstances() method',
       result = method(instance1, instance2);
 
       result.then(function (res) {
-        expect(res).toEqual({id: 5});
+        expect(res.length).toEqual(2);
         done();
       });
     });
