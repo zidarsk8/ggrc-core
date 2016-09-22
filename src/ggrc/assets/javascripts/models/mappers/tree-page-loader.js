@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-;(function (GGRC, can) {
+(function (GGRC, can) {
   'use strict';
 
   GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.TreePageLoader', {}, {
@@ -41,18 +41,19 @@
     makeResult: function (instance, binding) {
       return CMS.Models.Relationship
         .getRelationshipBetweenInstances(binding.instance, instance)
-        .then(function (relationship) {
-          return new GGRC.ListLoaders.MappingResult(instance, [
-            {
-              binding: binding,
-              instance: relationship,
-              mappings: [{
-                instance: true,
-                mappings: [],
-                binding: binding
-              }]
-            }
-          ], binding);
+        .then(function (relationships) {
+          return new GGRC.ListLoaders.MappingResult(
+            instance, can.map(relationships, function (relationship) {
+              return {
+                binding: binding,
+                instance: relationship,
+                mappings: [{
+                  instance: true,
+                  mappings: [],
+                  binding: binding
+                }]
+              };
+            }), binding);
         });
     }
   });

@@ -161,13 +161,13 @@
      * @param {CMS.Models.Cacheable} first - First object.
      * @param {CMS.Models.Cacheable} second - Second object.
      * @param {boolean} noRefresh - Flag for reject if not relationship.
-     * @return {Promise} - Resolved with Relationship instance if it was found
-     * or with undefined if instances not related.
+     * @return {Promise} - Resolved with Relationship instances if they were
+     * found or an empty list if instances are not related.
      */
     getRelationshipBetweenInstances: function rec(first, second, noRefresh) {
       var relationshipIds = _.intersection(getRelationshipsIds(first),
         getRelationshipsIds(second));
-      var relationship;
+      var relationships;
       var result = $.Deferred();
 
       function getRelationshipsIds(obj) {
@@ -175,37 +175,23 @@
         return _.map(union, 'id');
       }
       if (!relationshipIds.length && noRefresh) {
-        result.resolve();
+        result.resolve([]);
         return result.promise();
       }
       if (!relationshipIds.length) {
         // try to refresh the instances if don't find the relationship between them
-        result = $.when(first.refresh(), second.refresh())
+        return $.when(first.refresh(), second.refresh())
           .then(function (fObj, sObj) {
             return rec(fObj, sObj, true);
-          }, function (e) {
-            result.reject(e);
           });
-      } else if (relationshipIds.length === 1) {
-        relationship = CMS.Models.Relationship
-          .findInCacheById(relationshipIds[0]);
-        result.resolve(relationship);
-      } else if (relationshipIds.length > 1) {
-        // Can't be more than one Relationship, therefore this option is unlikely,
-        // and impossible with the correct data. It's just an additional check
-        // and because we take the most relevant Relationship and
-        // notify user about possible errors.
-
-        GGRC.Errors.notifier('error', 'The data may contain an error. ' +
-          'Errors are possible in the objects ' +
-          first.type + '(' + first.id + ') or/and ' +
-          second.type + '(' + second.id + '). ' +
-          'Please contact with the administrator for review.')();
-
-        relationship = CMS.Models.Relationship
-          .findInCacheById(_.max(relationshipIds));
-        result.resolve(relationship);
       }
+      if (relationshipIds.length > 1) {
+        console.warn('Duplicated relationship objects', relationshipIds);
+      }
+      relationships = can.map(relationshipIds, function (id) {
+        return CMS.Models.Relationship.findInCacheById(id);
+      });
+      result.resolve(relationships);
       return result.promise();
     }
   }, {
