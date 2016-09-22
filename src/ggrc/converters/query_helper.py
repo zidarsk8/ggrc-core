@@ -20,7 +20,6 @@ from ggrc import db
 from ggrc import models
 from ggrc.login import is_creator
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
-from ggrc import models
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
@@ -166,6 +165,7 @@ class QueryHelper(object):
       return set()
 
   def _macro_expand_object_query(self, object_query):
+    """Expand object query."""
     def expand_task_dates(exp):
       """Parse task dates from the specified expression."""
       if not isinstance(exp, dict) or "op" not in exp:
@@ -346,7 +346,7 @@ class QueryHelper(object):
         attr = getattr(model, key, None)
         if attr is None:
           # non object attributes are treated as custom attributes
-          self._count +=1
+          self._count += 1
           alias = orm.aliased(Record, name="fulltext_{}".format(self._count))
           join = (alias, and_(
             alias.key == model.id,
