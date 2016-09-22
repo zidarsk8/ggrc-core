@@ -5,6 +5,7 @@
 
 from ggrc.builder import json
 from ggrc.converters.query_helper import QueryHelper
+from ggrc.utils import benchmark
 
 
 # pylint: disable=too-few-public-methods
@@ -47,20 +48,24 @@ class QueryAPIQueryHelper(QueryHelper):
         raise NotImplementedError("Only 'values', 'ids' and 'count' queries "
                                   "are supported now")
       model = self.object_map[object_query["object_name"]]
-      objects = self._get_objects(object_query)
+      with benchmark("Get result set: get_results > _get_objects"):
+        objects = self._get_objects(object_query)
       object_query["total"] = len(objects)
 
-      objects = self._apply_limit(
-          objects,
-          limit=object_query.get("limit"),
-      )
-      object_query["count"] = len(objects)
-      object_query["last_modified"] = self._get_last_modified(model, objects)
-      if query_type == "values":
-        object_query["values"] = self._transform_to_json(
+      with benchmark("Apply limit: get_results > _apply_limit"):
+        objects = self._apply_limit(
             objects,
-            object_query.get("fields"),
+            limit=object_query.get("limit"),
         )
+      object_query["count"] = len(objects)
+      with benchmark("get_results > _get_last_modified"):
+        object_query["last_modified"] = self._get_last_modified(model, objects)
+      with benchmark("serialization: get_results > _transform_to_json"):
+        if query_type == "values":
+          object_query["values"] = self._transform_to_json(
+              objects,
+              object_query.get("fields"),
+          )
       if query_type == "ids":
         object_query["ids"] = [o.id for o in objects]
     return self.query

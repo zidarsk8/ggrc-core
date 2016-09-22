@@ -6,6 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy import case
 from sqlalchemy import literal
 from sqlalchemy import or_
+from sqlalchemy import true
 from sqlalchemy import union
 from sqlalchemy import alias
 from ggrc import db
@@ -17,12 +18,11 @@ from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.rbac import permissions as pr
 from ggrc_basic_permissions import backlog_workflows
 from ggrc_basic_permissions.models import UserRole
+from ggrc_workflows.models import Cycle
 
 
 def get_type_select_column(model):
-  """Determine the name of the type column,
-  taking into account polymorphic types
-  """
+  """Get column name,taking into account polymorphic types."""
   mapper = model._sa_class_manager.mapper
   if mapper.polymorphic_on is None:
     type_column = literal(mapper.class_.__name__)
@@ -45,8 +45,8 @@ def _types_to_type_models(types):
 
 
 def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
-  """
-  Filters by "myview" for a given person
+  """Filters by "myview" for a given person.
+
   Finds all objects which might appear on a user's Profile or Dashboard
   pages.
 
@@ -58,9 +58,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
   type_union_queries = []
 
   def _get_people():
-    """Get all the people w/o any restrictions.
-    Each role should have access to it.
-    """
+    """Get all the people w/o any restrictions."""
     all_people = db.session.query(
         all_models.Person.id.label('id'),
         literal(all_models.Person.__name__).label('type'),
@@ -139,7 +137,8 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
 
   def _get_results_by_context(model):
     """Objects based on the context of the current model.
-    Objects in private contexts via UserRole.
+
+    Return the objects that are in private contexts via UserRole.
     """
     context_query = db.session.query(
         model.id.label('id'),
@@ -155,19 +154,56 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     return context_query
 
   def _get_assigned_to_records(model):
-    """Objects for which the user is the 'contact' or 'secondary contact'.
+    """Get query by models contacts fields.
+
+    Objects for which the user is the 'contact' or 'secondary contact'.
     Control also has 'principal_assessor' and 'secondary_assessor'.
     """
     model_type_queries = []
     for attr in ('contact_id', 'secondary_contact_id',
                  'principal_assessor_id', 'secondary_assessor_id'):
       if hasattr(model, attr):
-        model_type_queries.append(or_(
-            getattr(model, attr) == contact_id
-        ))
+        model_type_queries.append(getattr(model, attr) == contact_id)
     return model_type_queries
 
-  # We don't return mapped objects for the Creator because being mapped
+  def _get_tasks_in_cycle(model):
+    """Filter tasks with particular statuses and cycle.
+
+    Filtering tasks with statuses "Assigned", "InProgress" and "Finished".
+    Where the task is in current users cycle.
+    """
+    task_query = db.session.query(
+        model.id.label('id'),
+        literal(model.__name__).label('type'),
+        literal(None).label('context_id'),
+    ).join(Cycle, Cycle.id == model.cycle_id).filter(
+        and_(
+            Cycle.is_current == true(),
+            model.contact_id == contact_id,
+            model.status.in_(
+                all_models.CycleTaskGroupObjectTask.ACTIVE_STATES
+            )
+        )
+    )
+    return task_query
+
+  def _get_model_specific_query(model):
+    """Prepare query specific for a particular model."""
+    model_type_query = None
+    if model is all_models.CycleTaskGroupObjectTask:
+      model_type_query = _get_tasks_in_cycle(model)
+    else:
+      model_type_queries = _get_assigned_to_records(model)
+      if model_type_queries:
+        type_column = get_type_select_column(model)
+        model_type_query = db.session.query(
+            model.id.label('id'),
+            type_column.label('type'),
+            literal(None).label('context_id')
+        ).filter(or_(*model_type_queries)).distinct()
+    return model_type_query
+
+  # Note: We don't return mapped objects for the Creator because being mapped
   # does not give the Creator necessary permissions to view the object.
   if not is_creator:
     type_union_queries.append(_get_object_people())
@@ -176,15 +212,9 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
                             _get_objects_user_assigned()))
 
   for model in type_models:
-    model_type_queries = _get_assigned_to_records(model)
-    type_column = get_type_select_column(model)
-    if model_type_queries:
-      model_type_query = db.session.query(
-          model.id.label('id'),
-          type_column.label('type'),
-          literal(None).label('context_id')
-      ).filter(or_(*model_type_queries)).distinct()
-      type_union_queries.append(model_type_query)
+    query = _get_model_specific_query(model)
+    if query:
+      type_union_queries.append(query)
 
     if model is all_models.Workflow:
       type_union_queries.append(backlog_workflows())

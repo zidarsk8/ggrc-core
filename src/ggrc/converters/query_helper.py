@@ -9,12 +9,7 @@ import datetime
 import collections
 
 import flask
-from sqlalchemy import and_
-from sqlalchemy import case
-from sqlalchemy import not_
-from sqlalchemy import or_
-from sqlalchemy import orm
-from sqlalchemy.sql import false
+import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import models
@@ -24,7 +19,8 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
 from ggrc.rbac import context_query_filter
-from ggrc.utils import query_helpers
+from ggrc.utils import query_helpers, benchmark
+
 
 class BadQueryException(Exception):
   pass
@@ -164,6 +160,7 @@ class QueryHelper(object):
       return set()
 
   def _macro_expand_object_query(self, object_query):
+    """Expand object query."""
     def expand_task_dates(exp):
       """Parse task dates from the specified expression."""
       if not isinstance(exp, dict) or "op" not in exp:
@@ -231,8 +228,10 @@ class QueryHelper(object):
     return self.query
 
   def _get_type_query(self, model, permission_type):
-    """Prepare query to filter models based on the available contexts and
-    resources.
+    """Filter by contexts and resources
+
+    Prepare query to filter models based on the available contexts and
+    resources for the given type of object.
     """
     contexts, resources = query_helpers.get_context_resource(
         model_name=model.__name__, permission_type=permission_type
@@ -242,9 +241,9 @@ class QueryHelper(object):
       if resources:
         resource_sql = model.id.in_(resources)
       else:
-        resource_sql = false()
+        resource_sql = sa.sql.false()
 
-      return or_(
+      return sa.or_(
         context_query_filter(model.context_id, contexts),
         resource_sql)
 
@@ -259,24 +258,27 @@ class QueryHelper(object):
     query = object_class.query
 
     requested_permissions = object_query.get("permissions", "read")
-    type_query = self._get_type_query(object_class, requested_permissions)
-    if type_query is not None:
-      query = query.filter(type_query)
-
-    filter_expression = self._build_expression(
-        expression,
-        object_class,
-    )
-    if filter_expression is not None:
-      query = query.filter(filter_expression)
-    if object_query.get("order_by"):
-      query = self._apply_order_by(
+    with benchmark("Get permissions: _get_objects > _get_type_query"):
+      type_query = self._get_type_query(object_class, requested_permissions)
+      if type_query is not None:
+        query = query.filter(type_query)
+    with benchmark("Parse filter query: _get_objects > _build_expression"):
+      filter_expression = self._build_expression(
+          expression,
           object_class,
-          query,
-          object_query["order_by"],
       )
-
-    return query.all()
+      if filter_expression is not None:
+        query = query.filter(filter_expression)
+    if object_query.get("order_by"):
+      with benchmark("Sorting: _get_objects > order_by"):
+        query = self._apply_order_by(
+            object_class,
+            query,
+            object_query["order_by"],
+        )
+    with benchmark("fetch the result set of objects"):
+      res = query.all()
+    return res
 
   def _apply_order_by(self, model, query, order_by):
     """Add ordering parameters to a query for objects.
@@ -304,22 +306,97 @@ class QueryHelper(object):
     Returns:
       the query with sorting parameters.
     """
-    def join_and_order(clause):
-      """Get join operation and ordering field from item of order_by list.
+    def sorting_field_for_person(person):
+      """Get right field to sort people by: name if defined or email."""
+      return sa.case([(sa.not_(sa.or_(person.name.is_(None),
+                                      person.name == '')),
+                       person.name)],
+                     else_=person.email)
+
+    def joins_and_order(clause):
+      """Get join operations and ordering field from item of order_by list.
 
       Args:
         clause: {"name": the name of model's field,
                  "desc": reverse sort on this field if True}
 
       Returns:
-
-        (join, order) - a tuple of join required for this ordering to work and
-                        ordering clause itself;
-                        join is None if no join required or
-                        (aliased entity, relationship field) if join required.
+        ([joins], order) - a tuple of joins required for this ordering to work
+                           and ordering clause itself; join is None if no join
+                           required or [(aliased entity, relationship field)]
+                           if joins required.
       """
-      join = None
-      order = None
+      def by_similarity():
+        """Join similar_objects subquery, order by weight from it."""
+        join_target = flask.g.similar_objects_query.subquery()
+        join_condition = model.id == join_target.c.id
+        joins = [(join_target, join_condition)]
+        order = join_target.c.weight
+        return joins, order
+
+      def by_ca():
+        """Join fulltext index table, order by indexed CA value."""
+        alias = sa.orm.aliased(Record, name="fulltext_{}".format(self._count))
+        joins = [(alias, sa.and_(
+          alias.key == model.id,
+          alias.type == model.__name__,
+          alias.tags == key)
+        )]
+        order = alias.content
+        return joins, order
+
+      def by_foreign_key():
+        """Join the related model, order by title or name/email."""
+        related_model = attr.property.mapper.class_
+        if issubclass(related_model, models.mixins.Titled):
+          joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
+          order = alias.title
+        elif issubclass(related_model, models.Person):
+          joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
+          order = sorting_field_for_person(alias)
+        else:
+          raise NotImplementedError("Sorting by {model.__name__} is "
+                                    "not implemented yet."
+                                    .format(model=related_model))
+        return joins, order
+
+      def by_m2m():
+        """Join the Person model, order by name/email.
+
+        Implemented only for ObjectOwner mapping.
+        """
+        if issubclass(attr.target_class, models.object_owner.ObjectOwner):
+          # NOTE: In the current implementation we sort only by the first
+          # assigned owner if multiple owners defined
+          oo_alias_1 = sa.orm.aliased(models.object_owner.ObjectOwner)
+          oo_alias_2 = sa.orm.aliased(models.object_owner.ObjectOwner)
+          oo_subq = db.session.query(
+              oo_alias_1.ownable_id,
+              oo_alias_1.ownable_type,
+              oo_alias_1.person_id,
+          ).filter(
+              oo_alias_1.ownable_type == model.__name__,
+              ~sa.exists().where(sa.and_(
+                  oo_alias_2.ownable_id == oo_alias_1.ownable_id,
+                  oo_alias_2.ownable_type == oo_alias_1.ownable_type,
+                  oo_alias_2.id < oo_alias_1.id,
+              )),
+          ).subquery()
+
+          owner = sa.orm.aliased(models.Person, name="owner")
+
+          joins = [
+              (oo_subq, sa.and_(model.__name__ == oo_subq.c.ownable_type,
+                                model.id == oo_subq.c.ownable_id)),
+              (owner, oo_subq.c.person_id == owner.id),
+          ]
+
+          order = sorting_field_for_person(owner)
+        else:
+          raise NotImplementedError("Sorting by m2m-field '{key}' "
+                                    "is not implemented yet."
+                                    .format(key=key))
+        return joins, order
 
       # transform clause["name"] into a model's field name
       key = clause["name"].lower()
@@ -327,10 +404,7 @@ class QueryHelper(object):
       if key == "__similarity__":
         # special case
         if hasattr(flask.g, "similar_objects_query"):
-          join_target = flask.g.similar_objects_query.subquery()
-          join_condition = model.id == join_target.c.id
-          join = join_target, join_condition
-          order = join_target.c.weight
+          joins, order = by_similarity()
         else:
           raise BadQueryException("Can't order by '__similarity__' when no ",
                                   "'similar' filter was applied.")
@@ -339,43 +413,28 @@ class QueryHelper(object):
         attr = getattr(model, key, None)
         if attr is None:
           # non object attributes are treated as custom attributes
-          self._count +=1
-          alias = orm.aliased(Record, name="fulltext_{}".format(self._count))
-          join = (alias, and_(
-            alias.key == model.id,
-            alias.type == model.__name__,
-            alias.tags == key)
-          )
-          order = alias.content
-        elif (isinstance(attr, orm.attributes.InstrumentedAttribute) and
-                isinstance(attr.property, orm.properties.RelationshipProperty)):
-          # a relationship
-          related_model = attr.property.mapper.class_
-          if issubclass(related_model, models.mixins.Titled):
-            join = alias, _ = orm.aliased(attr), attr
-            order = alias.title
-          elif issubclass(related_model, models.Person):
-            join = alias, _ = orm.aliased(attr), attr
-            order = case([(not_(or_(alias.name.is_(None), alias.name == '')),
-                           alias.name)],
-                         else_=alias.email)
-          else:
-            raise NotImplementedError("Sorting by {model.__name__} is "
-                                      "not implemented yet."
-                                      .format(model=related_model))
+          self._count += 1
+          joins, order = by_ca()
+        elif (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
+                isinstance(attr.property,
+                           sa.orm.properties.RelationshipProperty)):
+          joins, order = by_foreign_key()
+        elif isinstance(attr, sa.ext.associationproxy.AssociationProxy):
+          joins, order = by_m2m()
         else:
           # a simple attribute
-          order = attr
+          joins, order = None, attr
 
       if clause.get("desc", False):
         order = order.desc()
 
-      return join, order
+      return joins, order
 
-    joins, orders = zip(*[join_and_order(clause) for clause in order_by])
-    for join in joins:
-      if join is not None:
-        query = query.outerjoin(*join)
+    join_lists, orders = zip(*[joins_and_order(clause) for clause in order_by])
+    for join_list in join_lists:
+      if join_list is not None:
+        for join in join_list:
+          query = query.outerjoin(*join)
 
     return query.order_by(*orders)
 
@@ -523,19 +582,19 @@ class QueryHelper(object):
       res = res.all()
       if res:
         return object_class.id.in_([obj.id for obj in res])
-      return false()
+      return sa.sql.false()
 
 
     ops = {
-        "AND": lambda: lift_bin(and_),
-        "OR": lambda: lift_bin(or_),
+        "AND": lambda: lift_bin(sa.and_),
+        "OR": lambda: lift_bin(sa.or_),
         "=": lambda: with_left(lambda l: l == rhs()),
-        "!=": lambda: not_(with_left(
-                           lambda l: l == rhs())),
+        "!=": lambda: sa.not_(with_left(
+                              lambda l: l == rhs())),
         "~": lambda: with_left(lambda l:
                                l.ilike("%{}%".format(rhs()))),
-        "!~": lambda: not_(with_left(
-                           lambda l: l.ilike("%{}%".format(rhs())))),
+        "!~": lambda: sa.not_(with_left(
+                              lambda l: l.ilike("%{}%".format(rhs())))),
         "<": lambda: with_left(lambda l: l < rhs()),
         ">": lambda: with_left(lambda l: l > rhs()),
         "relevant": relevant,

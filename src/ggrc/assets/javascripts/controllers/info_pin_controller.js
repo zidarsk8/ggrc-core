@@ -106,6 +106,7 @@ can.Control('CMS.Controllers.InfoPin', {
     } else {
       this.ensureElementVisible(el);
     }
+    this.element.trigger('scroll');
   },
   ensureElementVisible: function (el) {
     var $objectArea;
@@ -194,5 +195,19 @@ can.Control('CMS.Controllers.InfoPin', {
 
     this.element.animate({height: size}, options);
     el.find('i').css({opacity: 1});
+  },
+  ' scroll': function (el, ev) {
+    var header = this.element.find('.pane-header');
+    var isFixed = el.scrollTop() > 0;
+    var offset = isFixed ? header.height() : 0;
+    var HEADER_PADDING = -15;
+
+    this.element.find('.tier-content').css('paddingTop', offset);
+    header.css('marginTop', function () {
+      // Header in info pane is padded by 15px, and we need to make sure
+      // text doesn't bleed below.
+      return HEADER_PADDING - offset;
+    });
+    header.toggleClass('pane-header__fixed', isFixed);
   }
 });
