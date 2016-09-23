@@ -50,13 +50,7 @@ class QueryAPIQueryHelper(QueryHelper):
       model = self.object_map[object_query["object_name"]]
       with benchmark("Get result set: get_results > _get_objects"):
         objects = self._get_objects(object_query)
-      object_query["total"] = len(objects)
 
-      with benchmark("Apply limit: get_results > _apply_limit"):
-        objects = self._apply_limit(
-            objects,
-            limit=object_query.get("limit"),
-        )
       object_query["count"] = len(objects)
       with benchmark("get_results > _get_last_modified"):
         object_query["last_modified"] = self._get_last_modified(model, objects)
