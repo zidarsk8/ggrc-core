@@ -7,6 +7,7 @@
 from sqlalchemy import or_
 
 from ggrc import db
+from ggrc.login import get_current_user
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
     Titled, Slugged, Described, Timeboxed, WithContact
@@ -86,8 +87,10 @@ class TaskGroup(
         'context'
     ]
 
-    if kwargs.get('clone_people', False):
-      columns.append('contact')
+    if kwargs.get('clone_people', False) and getattr(self, "contact"):
+      columns.append("contact")
+    else:
+      kwargs["contact"] = get_current_user()
 
     target = self.copy_into(_other, columns, **kwargs)
 
