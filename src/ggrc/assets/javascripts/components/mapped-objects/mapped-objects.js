@@ -19,7 +19,7 @@
       isLoading: false,
       mapping: '@',
       parentInstance: null,
-      selectedItem: null,
+      selectedItem: {},
       mappedItems: [],
       filter: null,
       setMappedObjects: function (items) {
