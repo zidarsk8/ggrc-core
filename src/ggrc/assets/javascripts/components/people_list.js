@@ -377,7 +377,7 @@
         var rolesDfd = $.Deferred();
 
         CMS.Models.Relationship
-          .getRelationshipBetweenInstances(person, instance)
+          .getRelationshipBetweenInstances(person, instance, instance.isNew())
           .done(function (relationships) {
             var found = false;
             _.map(relationships, function (relationship) {
@@ -396,7 +396,6 @@
             }
           })
           .fail(function (e) {
-            GGRC.Errors.notifier('error')(e);
             rolesDfd.resolve({roles: []});
           });
 

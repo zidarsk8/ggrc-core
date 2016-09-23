@@ -183,6 +183,8 @@
         return $.when(first.refresh(), second.refresh())
           .then(function (fObj, sObj) {
             return rec(fObj, sObj, true);
+          }).fail(function (e) {
+            result.resolve([]);
           });
       }
       if (relationshipIds.length > 1) {
