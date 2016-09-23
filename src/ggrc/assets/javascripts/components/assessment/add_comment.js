@@ -80,7 +80,7 @@
         this.attr('comment.value', null);
       },
       removeEmptyMark: function (scope, el) {
-        this.attr('state.empty', !el.val().length);
+        this.attr('state.empty', !el.text().length);
       },
       getCommentData: function () {
         var source = this.attr('instance');
