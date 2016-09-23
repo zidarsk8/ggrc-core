@@ -54,11 +54,7 @@
               <div class="item-data">
                 <div class="tree-title-area">
                   {{{render '/static/mustache/people/popover.mustache' person=this}}}
-                  {{#if_match name '\\\\S'}}
-                    {{#name}}
-                      <span class="email">{{email}}</span>
-                    {{/name}}
-                  {{/if_match}}
+                    <span class="email">{{email}}</span>
                 </div>
               </div>
 
