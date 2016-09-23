@@ -16,6 +16,7 @@
       text: null,
       editor: null,
       placeholder: null,
+      disabled: null,
       formats: ['bold', 'italic', 'link', 'underline',
         'list', 'bullet', 'strike'],
       onChange: function (delta, source) {
@@ -42,6 +43,19 @@
         }
         editor.on('text-change', this.scope.onChange.bind(this.scope));
         this.scope.attr('editor', editor);
+      },
+      '{scope} disabled': function (el, ev) {
+        if (this.scope.attr('disabled')) {
+          this.scope.attr('editor').editor.disable();
+        } else {
+          this.scope.attr('editor').editor.enable();
+        }
+      },
+      // if text had been changed to nothing then clear
+      '{scope} text': function (el, ev) {
+        if (!this.scope.attr('text')) {
+          this.scope.attr('editor').setHTML('');
+        }
       }
     }
   });
