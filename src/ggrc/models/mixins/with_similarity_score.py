@@ -61,52 +61,12 @@ class WithSimilarityScore(object):
     # naming: self is "object", the object mapped to it is "related",
     # the object mapped to "related" is "similar"
 
-    # get all Relationships for self
-    object_to_related = db.session.query(Relationship).filter(
-        or_(and_(Relationship.source_type == cls.__name__,
-                 Relationship.source_id == id_),
-            and_(Relationship.destination_type == cls.__name__,
-                 Relationship.destination_id == id_))).subquery()
+    queries_for_union = []
 
-    # define how to get id and type of "related" objects
-    related_id_case = (case([(and_(object_to_related.c.source_id == id_,
-                                   object_to_related.c.source_type ==
-                                   cls.__name__),
-                              object_to_related.c.destination_id)],
-                            else_=object_to_related.c.source_id)
-                       .label("related_id"))
-    related_type_case = (case([(and_(object_to_related.c.source_id == id_,
-                                     object_to_related.c.source_type ==
-                                     cls.__name__),
-                                object_to_related.c.destination_type)],
-                              else_=object_to_related.c.source_type)
-                         .label("related_type"))
+    # find "similar" objects with Relationship table
+    queries_for_union += cls._join_relationships(id_)
 
-    related_to_similar = aliased(Relationship, name="related_to_similar")
-
-    # self-join Relationships to get "similar" id and type; save "related" type
-    # to get the weight of this relationship later
-    queries_for_union = [
-        db.session.query(
-            related_type_case,
-            related_to_similar.destination_id.label("similar_id"),
-            related_to_similar.destination_type.label("similar_type"),
-        ).join(
-            related_to_similar,
-            and_(related_id_case == related_to_similar.source_id,
-                 related_type_case == related_to_similar.source_type),
-        ),
-        db.session.query(
-            related_type_case,
-            related_to_similar.source_id.label("similar_id"),
-            related_to_similar.source_type.label("similar_type"),
-        ).join(
-            related_to_similar,
-            and_(related_id_case == related_to_similar.destination_id,
-                 related_type_case == related_to_similar.destination_type),
-        ),
-    ]
-
+    # find "similar" objects when Relationship table is not used
     queries_for_union += cls._emulate_relationships(id_, types, relevant_types)
 
     joined = queries_for_union.pop().union(*queries_for_union).subquery()
@@ -155,6 +115,61 @@ class WithSimilarityScore(object):
     return result
 
   @classmethod
+  def _join_relationships(cls, id_):
+    """Make a self-join of Relationship table to find common mappings.
+
+    Returns a query with results for [(related_type, similar_id, similar_type)]
+    where similar_id and similar_type describe a second-tier mapped object and
+    related_type is the type of a common mapped object between "object" and
+    "similar".
+    """
+    # get all Relationships for self
+    object_to_related = db.session.query(Relationship).filter(
+        or_(and_(Relationship.source_type == cls.__name__,
+                 Relationship.source_id == id_),
+            and_(Relationship.destination_type == cls.__name__,
+                 Relationship.destination_id == id_))).subquery()
+
+    # define how to get id and type of "related" objects
+    related_id_case = (case([(and_(object_to_related.c.source_id == id_,
+                                   object_to_related.c.source_type ==
+                                   cls.__name__),
+                              object_to_related.c.destination_id)],
+                            else_=object_to_related.c.source_id)
+                       .label("related_id"))
+    related_type_case = (case([(and_(object_to_related.c.source_id == id_,
+                                     object_to_related.c.source_type ==
+                                     cls.__name__),
+                                object_to_related.c.destination_type)],
+                              else_=object_to_related.c.source_type)
+                         .label("related_type"))
+
+    related_to_similar = aliased(Relationship, name="related_to_similar")
+
+    # self-join Relationships to get "similar" id and type; save "related" type
+    # to get the weight of this relationship later
+    return [
+        db.session.query(
+            related_type_case,
+            related_to_similar.destination_id.label("similar_id"),
+            related_to_similar.destination_type.label("similar_type"),
+        ).join(
+            related_to_similar,
+            and_(related_id_case == related_to_similar.source_id,
+                 related_type_case == related_to_similar.source_type),
+        ),
+        db.session.query(
+            related_type_case,
+            related_to_similar.source_id.label("similar_id"),
+            related_to_similar.source_type.label("similar_type"),
+        ).join(
+            related_to_similar,
+            and_(related_id_case == related_to_similar.destination_id,
+                 related_type_case == related_to_similar.destination_type),
+        ),
+    ]
+
+  @classmethod
   def _emulate_relationships(cls, id_, types, relevant_types):
     """Get a list of queries for second-tier objects mapped via foreign key.
 
@@ -163,7 +178,7 @@ class WithSimilarityScore(object):
     Relationship object).
 
     Each query returns results compliant with the results of
-    get_similar_objects_query as they get UNIONed in that method.
+    _join_relationships as they get UNIONed.
     """
 
     # Note: this is a hack that can go away only when Request-Audit mapping
