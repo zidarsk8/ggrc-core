@@ -220,14 +220,11 @@ class QueryHelper(object):
     """
     for object_query in self.query:
       objects = self._get_objects(object_query)
-      objects = self._apply_limit(
-          objects,
-          limit=object_query.get("limit"),
-      )
       object_query["ids"] = [o.id for o in objects]
     return self.query
 
-  def _get_type_query(self, model, permission_type):
+  @staticmethod
+  def _get_type_query(model, permission_type):
     """Filter by contexts and resources
 
     Prepare query to filter models based on the available contexts and
@@ -276,9 +273,53 @@ class QueryHelper(object):
             query,
             object_query["order_by"],
         )
-    with benchmark("fetch the result set of objects"):
-      res = query.all()
-    return res
+    with benchmark("Apply limit"):
+      limit = object_query.get("limit")
+      if limit:
+        matches, total = self._apply_limit(query, limit)
+      else:
+        matches = query.all()
+        total = len(matches)
+      object_query["total"] = total
+
+    return matches
+
+  @staticmethod
+  def _apply_limit(query, limit):
+    """Apply limits for pagination.
+
+    Args:
+      query: filter query;
+      limit: a tuple of indexes in format (from, to); objects is sliced to
+            objects[from, to].
+
+    Returns:
+      matched objects and total count.
+    """
+    try:
+      first, last = limit
+      first, last = int(first), int(last)
+    except (ValueError, TypeError):
+      raise BadQueryException("Invalid limit operator. Integers expected.")
+
+    if first < 0 or last < 0:
+      raise BadQueryException("Limit cannot contain negative numbers.")
+    elif first >= last:
+      matches = set()
+      total = 0
+    else:
+      page_size = last - first
+      with benchmark("Apply limit: _apply_limit > query_limit"):
+        # Note: limit request syntax is limit:[0,10]. We are counting
+        # offset from 0 as the offset of the initial row for sql is 0 (not 1).
+        matches = query.limit(page_size).offset(first).all()
+      with benchmark("Apply limit: _apply_limit > query_count"):
+        # Note: using func.count() as query.count() is generating additional
+        # subquery
+        count_q = query.statement.with_only_columns([sa.func.count()])
+        total = db.session.execute(count_q).scalar()
+
+    return matches, total
 
   def _apply_order_by(self, model, query, order_by):
     """Add ordering parameters to a query for objects.
@@ -437,27 +478,6 @@ class QueryHelper(object):
           query = query.outerjoin(*join)
 
     return query.order_by(*orders)
-
-  @staticmethod
-  def _apply_limit(objects, limit):
-    """Apply limits for pagination.
-
-    Args:
-      objects: a list of objects to limit;
-      limit: a tuple of indexes in format (from, to); objects is sliced to
-             objects[from, to].
-
-    Returns:
-      a sliced list of objects.
-    """
-    if limit:
-      try:
-        from_, to_ = limit
-        objects = objects[from_: to_]
-      except:
-        raise BadQueryException("Bad query: Invalid 'limit' parameter.")
-
-    return objects
 
   def _build_expression(self, exp, object_class):
     """Make an SQLAlchemy filtering expression from exp expression tree."""
