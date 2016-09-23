@@ -85,23 +85,28 @@ class WithSimilarityScore(object):
 
     # self-join Relationships to get "similar" id and type; save "related" type
     # to get the weight of this relationship later
-    joined = db.session.query(
-        related_type_case,
-        related_to_similar.destination_id.label("similar_id"),
-        related_to_similar.destination_type.label("similar_type"),
-    ).join(
-        related_to_similar,
-        and_(related_id_case == related_to_similar.source_id,
-             related_type_case == related_to_similar.source_type),
-    ).union(db.session.query(
-        related_type_case,
-        related_to_similar.source_id.label("similar_id"),
-        related_to_similar.source_type.label("similar_type"),
-    ).join(
-        related_to_similar,
-        and_(related_id_case == related_to_similar.destination_id,
-             related_type_case == related_to_similar.destination_type),
-    )).subquery()
+    queries_for_union = [
+        db.session.query(
+            related_type_case,
+            related_to_similar.destination_id.label("similar_id"),
+            related_to_similar.destination_type.label("similar_type"),
+        ).join(
+            related_to_similar,
+            and_(related_id_case == related_to_similar.source_id,
+                 related_type_case == related_to_similar.source_type),
+        ),
+        db.session.query(
+            related_type_case,
+            related_to_similar.source_id.label("similar_id"),
+            related_to_similar.source_type.label("similar_type"),
+        ).join(
+            related_to_similar,
+            and_(related_id_case == related_to_similar.destination_id,
+                 related_type_case == related_to_similar.destination_type),
+        ),
+    ]
+
+    joined = queries_for_union.pop().union(*queries_for_union).subquery()
 
     # define weights for every "related" object type with values from
     # relevant_types dict
