@@ -2862,7 +2862,7 @@ Mustache.registerHelper('with_mapping_count', function (instance, mapping_names,
   // Find the most appropriate mapping
   for (var i = 0; i < mapping_names.length; i++) {
     mapping_name = Mustache.resolve(mapping_names[i]);
-    if (instance.get_binding(mapping_name)) {
+    if (instance.has_binding(mapping_name)) {
       break;
     }
   }
