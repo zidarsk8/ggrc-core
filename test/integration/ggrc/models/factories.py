@@ -216,3 +216,11 @@ class RegulationFactory(ModelFactory, TitledFactory):
 
   class Meta:
     model = models.Regulation
+
+
+class RequestFactory(ModelFactory, TitledFactory):
+
+  class Meta:
+    model = models.Request
+
+  request_type = "documentation"
