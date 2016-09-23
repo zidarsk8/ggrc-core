@@ -2848,39 +2848,37 @@ Mustache.registerHelper("fadeout", function (delay, prop, options) {
       }, binding.refresh_instances());
     });
 
-Mustache.registerHelper('with_mapping_count', function (instance, mapping_names, options) {
+  Mustache.registerHelper('with_mapping_count',
+    function (instance, mappingNames, options) {
+      var args = can.makeArray(arguments);
+      var mappingName;
+      var i;
 
-  var args = can.makeArray(arguments)
-    , options = args[args.length-1]  // FIXME duplicate declaration
-    , mapping_name
-    ;
+      options = args[args.length - 1];  // FIXME duplicate declaration
 
-  mapping_names = args.slice(1, args.length - 1);
+      mappingNames = args.slice(1, args.length - 1);
 
-  instance = Mustache.resolve(instance);
+      instance = Mustache.resolve(instance);
 
-  // Find the most appropriate mapping
-  for (var i = 0; i < mapping_names.length; i++) {
-    mapping_name = Mustache.resolve(mapping_names[i]);
-    if (instance.has_binding(mapping_name)) {
-      break;
-    }
-  }
+      // Find the most appropriate mapping
+      for (i = 0; i < mappingNames.length; i++) {
+        mappingName = Mustache.resolve(mappingNames[i]);
+        if (instance.has_binding(mappingName)) {
+          break;
+        }
+      }
 
-  var finish = function (count) {
-    return options.fn(options.contexts.add({ count: count }));
-  };
-
-  var progress = function () {
-    return options.inverse(options.contexts);
-  };
-
-  return defer_render(
-    "span",
-    { done: finish, progress: progress },
-    instance.get_list_counter(mapping_name)
-  );
-});
+      return defer_render('span', {
+        done: function (count) {
+          return options.fn(options.contexts.add({count: count}));
+        },
+        progress: function () {
+          return options.inverse(options.contexts);
+        }
+      },
+        instance.get_list_counter(mappingName)
+      );
+    });
 
 Mustache.registerHelper("is_overdue", function (_date, status, options) {
   var date = moment(resolve_computed(_date));
