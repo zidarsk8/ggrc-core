@@ -9,6 +9,7 @@ relationships.
 
 from sqlalchemy import and_
 from sqlalchemy import case
+from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import func
@@ -106,6 +107,8 @@ class WithSimilarityScore(object):
         ),
     ]
 
+    queries_for_union += cls._emulate_relationships(id_, types, relevant_types)
+
     joined = queries_for_union.pop().union(*queries_for_union).subquery()
 
     # define weights for every "related" object type with values from
@@ -148,5 +151,90 @@ class WithSimilarityScore(object):
         # filter out "similar" objects that have insufficient similarity
         weight_sum >= threshold,
     )
+
+    return result
+
+  @classmethod
+  def _emulate_relationships(cls, id_, types, relevant_types):
+    """Get a list of queries for second-tier objects mapped via foreign key.
+
+    This is used primarily to determine Requests mapped to Audits (Request
+    model has a foreign key to Audit model and is not mapped with a
+    Relationship object).
+
+    Each query returns results compliant with the results of
+    get_similar_objects_query as they get UNIONed in that method.
+    """
+
+    # Note: this is a hack that can go away only when Request-Audit mapping
+    # will be implemented in Relationships table
+
+    from ggrc.models import Audit, Request
+
+    result = []
+    if Audit.__name__ in relevant_types:
+      # Note: this code assumes that `types` is a single-element list
+      if cls is Request and Request.__name__ in types:
+        similar_requests = aliased(cls, name="similar_requests")
+        result.append(db.session.query(
+            literal(Audit.__name__).label("related_type"),
+            similar_requests.id.label("similar_id"),
+            literal(Request.__name__).label("similar_type"),
+        ).select_from(
+            similar_requests,
+        ).join(
+            cls,
+            similar_requests.audit_id == cls.audit_id,
+        ).filter(
+            and_(cls.id == id_,
+                 cls.id != similar_requests.id),
+        ))
+      elif cls is Request and Request.__name__ not in types:
+        audit_to_similar = aliased(Relationship, name="audit_to_similar")
+        result.append(db.session.query(
+            literal(Audit.__name__).label("related_type"),
+            audit_to_similar.source_id.label("similar_id"),
+            audit_to_similar.source_type.label("similar_type"),
+        ).select_from(
+            audit_to_similar,
+        ).join(
+            cls,
+            and_(audit_to_similar.destination_id == cls.audit_id,
+                 audit_to_similar.destination_type == Audit.__name__),
+        ))
+        result.append(db.session.query(
+            literal(Audit.__name__).label("related_type"),
+            audit_to_similar.destination_id.label("similar_id"),
+            audit_to_similar.destination_type.label("similar_type"),
+        ).select_from(
+            audit_to_similar,
+        ).join(
+            cls,
+            and_(audit_to_similar.source_id == cls.audit_id,
+                 audit_to_similar.source_type == Audit.__name__),
+        ))
+      elif cls is not Request and Request.__name__ in types:
+        self_to_audit = aliased(Relationship, name="self_to_audit")
+        request = aliased(Request)
+
+        result.append(db.session.query(
+            literal(Audit.__name__).label("related_type"),
+            request.id.label("similar_id"),
+            literal(Request.__name__).label("similar_type"),
+        ).select_from(
+            request,
+        ).join(
+            self_to_audit,
+            or_(
+                and_(self_to_audit.source_id == id_,
+                     self_to_audit.source_type == cls.__name__,
+                     self_to_audit.destination_id == request.audit_id,
+                     self_to_audit.destination_type == Audit.__name__),
+                and_(self_to_audit.destination_id == id_,
+                     self_to_audit.destination_type == cls.__name__,
+                     self_to_audit.source_id == request.audit_id,
+                     self_to_audit.source_type == Audit.__name__),
+            ),
+        ))
 
     return result
