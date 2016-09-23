@@ -18,9 +18,11 @@
     scope: {
       item: null,
       itemData: null,
+      expanded: false,
       objectives: new can.List(),
       regulations: new can.List(),
       isLoading: false,
+      //showAdditional: false,
       /**
        * Gets params for current id
        * @return {Object} params for current id
@@ -68,14 +70,23 @@
       toggleItems: function (index) {
         if (index) {
           this.attr('itemData', this.attr('item.data'));
+          //this.loadItems();
+        }
+      },
+      toggleAdditional: function () {
+        var isShown = !this.attr('showAdditional');
+        this.attr('showAdditional', isShown);
+        if (isShown) {
           this.loadItems();
-        } else {
-          this.attr('objectives').replace([]);
-          this.attr('regulations').replace([]);
         }
       }
     },
     events: {
+      '{scope} expanded': function (scope, ev, isExpanded) {
+        if (isExpanded) {
+          this.scope.loadItems();
+        }
+      },
       '{scope.item} index': function (scope, ev, index) {
         this.scope.toggleItems(index);
       }

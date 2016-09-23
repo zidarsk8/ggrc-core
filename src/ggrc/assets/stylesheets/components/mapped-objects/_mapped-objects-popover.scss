@@ -5,119 +5,50 @@
 
 /* Mapped Object Popover Component CSS spec */
 
-.object-popover-body > * {
-  padding: 16px;
-  box-sizing: border-box;
-  max-height: 450px;
-  overflow-y: auto;
-  display: flex;
-  flex-flow: column;
-  align-content: stretch;
-  align-items: flex-start;
+.mapped__two-column-grid {
+  margin-top: 15px;
 
-  .assessment-mapped-objects__popover-title {
-    font-size: 14px;
-    line-height: 18px;
-    display: block;
-    height: 18px;
+  .row {
+    margin-left: 0;
   }
-
-  h6 {
-    margin: 8px 0 0;
-    padding: 0;
-    line-height: 24px;
+  .two-column-grid-header {
     text-transform: uppercase;
+    margin-top: 3px;
+    margin-bottom: 7px;
     font-size: 11px;
   }
-
-  .assessment-mapped-objects__popover-content {
-    max-height: 290px;
-    overflow: auto;
-    &.two-column-grid-popover{
-      flex: 1;
-      align-items: stretch;
-      flex-wrap: nowrap;
-    }
-  }
-
-  .assessment-mapped-objects__popover-attributes {
-    display: flex;
-    align-items: stretch;
-    flex-wrap: wrap;
-
-    > * {
-      flex: 1 1 50%;
-      min-width: 50%;
-    }
-    &.two-column-grid-popover{
-      align-items: stretch;
-      flex-wrap: nowrap;
-      > div{
-        min-width: 0;
-
-        &:nth-child(2){
-          margin-right: 2.12766%;
-        }
+  .two-column-grid-headers {
+    h6 {
+      .fa.fa-objective.color,
+      .fa.fa-regulation.color {
+        color: #969696;
       }
     }
   }
-  .assessment-mapped__two-column-grid{
-    margin-top: 15px;
-    flex: 2;
+  .two-column-grid-body {
+    overflow-y: auto;
+    max-height: 200px;
 
-    &.loading{
-      pointer-events: none;
-      background-image: url('/static/images/ajax-loader.gif');
-      background-repeat: no-repeat;
-      background-position: 50% 20px;
-      min-height: 55px;
+    .column-grid-body {
+      margin-top: 15px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
 
-      > * {
-        display: none;
-      }
-    }
-
-    .row{
-      margin-left: 0;
-    }
-    .two-column-grid-header{
-      text-transform: uppercase;
-      margin-top: 3px;
-      margin-bottom: 7px;
-      font-size: 11px;
-    }
-    .two-column-grid-headers{
-      h6 {
-        .fa.fa-objective.color,
-        .fa.fa-regulation.color{
-          color: #969696;
-        }
-      }
-    }
-    .two-column-grid-body{
-      overflow-y: auto;
-      max-height: 200px;
-
-      .column-grid-body{
-        margin-top: 15px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
-
-        .column-grid-description{
-          .description-title{
-            margin-top: 0;
-            line-height: 18px;
-            -ms-text-overflow: ellipsis;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-          }
+      .column-grid-description {
+        .description-title {
+          margin-top: 0;
+          line-height: 18px;
+          -ms-text-overflow: ellipsis;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
         }
       }
     }
   }
 }
-.object-popover-body > .assessment-mapped-controls-popover{
+
+.object-popover-body > .assessment-mapped-controls-popover {
   align-items: stretch;
   max-width: 850px;
 }

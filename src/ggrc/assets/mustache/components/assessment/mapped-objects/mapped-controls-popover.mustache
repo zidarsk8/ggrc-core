@@ -3,118 +3,76 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 {{#itemData}}
-    <div class="assessment-mapped-objects__popover-content two-column-grid-popover">
-        <div class="assessment-mapped-objects__popover-title">
-          <a href="{{itemData.viewLink}}" target="_blank">{{itemData.title}}</a>
-        </div>
-        <div>
-            <h6>Description</h6>
-            <read-more text="itemData.description"></read-more>
-        </div>
-        <div class="assessment-mapped-objects__popover-attributes two-column-grid-popover">
-            <div>
-                <h6>Owner</h6>
-              {{#if itemData.owners.length}}
-                  <ul class="inner-count-list">
-                    {{#each itemData.owners}}
-                        <li>
-                            <person-info person-id="{{id}}"></person-info>
-                        </li>
-                    {{/each}}
-                  </ul>
-              {{else}}
-                  <span class="empty-message">None</span>
-              {{/if}}
-            </div>
-            <div>
-                <h6>Primary Contact</h6>
-              {{#if itemData.contact}}
-                  <person-info person-obj="itemData.contact"></person-info>
-              {{else}}
-                  <span class="empty-message">None</span>
-              {{/if}}
-            </div>
-            <div>
-                <h6>Secondary Contact</h6>
-              {{#if itemData.secondary_contact}}
-                  <person-info person-obj="itemData.secondary_contact"></person-info>
-              {{else}}
-                  <span class="empty-message">None</span>
-              {{/if}}
-            </div>
-            <div>
-                <h6>Code</h6>
-                <span>{{itemData.slug}}</span>
-            </div>
-        </div>
-    </div>
     <!-- Objectives and Regulations Grids -->
-    <div class="assessment-mapped__two-column-grid {{#isLoading}}loading{{/isLoading}}">
-        <div class="two-column-grid-headers row-fluid">
-            <h6 class="span6">
-                <i class="fa fa-objective color"></i>
-                Objectives ({{objectives.length}})
-            </h6>
-            <h6 class="span6">
-                <i class="fa fa-regulation color"></i>
-                Regulations ({{regulations.length}})
-            </h6>
-        </div>
+    <collapsible-panel title-text="Show Related Objectives and Regulations" collapsed="true" expanded="expanded">
+        <spinner toggle="isLoading"></spinner>
+        <div class="mapped__two-column-grid">
+            <div class="two-column-grid-headers row-fluid">
+                <h6 class="span6">
+                    <i class="fa fa-objective color"></i>
+                    Objectives ({{objectives.length}})
+                </h6>
+                <h6 class="span6">
+                    <i class="fa fa-regulation color"></i>
+                    Regulations ({{regulations.length}})
+                </h6>
+            </div>
 
-        <div class="row-fluid">
-            <div class="span6">
-                <div class="row-fluid">
-                    <div class="two-column-grid-header span7">
-                        Objective Description
+            <div class="row-fluid">
+                <div class="span6">
+                    <div class="row-fluid">
+                        <div class="two-column-grid-header span7">
+                            Objective Description
+                        </div>
+                        <div class="two-column-grid-header span5">
+                            Notes
+                        </div>
                     </div>
-                    <div class="two-column-grid-header span5">
-                        Notes
+                </div>
+                <div class="span6">
+                    <div class="row-fluid">
+                        <div class="two-column-grid-header span7">
+                            Regulation Description
+                        </div>
+                        <div class="two-column-grid-header span5">
+                            Notes
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="span6">
-                <div class="row-fluid">
-                    <div class="two-column-grid-header span7">
-                        Regulation Description
-                    </div>
-                    <div class="two-column-grid-header span5">
-                        Notes
-                    </div>
+
+            <div class="two-column-grid-body row-fluid">
+                <div class="span6">
+                  {{#each objectives}}
+                      <div class="column-grid-body row">
+                          <div class="column-grid-description span7">
+                              <h6 class="description-title">
+                                {{title}}
+                              </h6>
+                              <read-more text="description"></read-more>
+                          </div>
+                          <div class="span5">
+                              <read-more text="notes"></read-more>
+                          </div>
+                      </div>
+                  {{/each}}
+                </div>
+                <div class="span6">
+                  {{#each regulations}}
+                      <div class="column-grid-body row">
+                          <div class="column-grid-description span7">
+                              <h6 class="description-title">
+                                {{title}}
+                              </h6>
+                              <read-more text="description"></read-more>
+                          </div>
+                          <div class="span5">
+                              <read-more text="notes"></read-more>
+                          </div>
+                      </div>
+                  {{/each}}
                 </div>
             </div>
         </div>
-
-        <div class="two-column-grid-body row-fluid">
-            <div class="span6">
-              {{#each objectives}}
-                  <div class="column-grid-body row">
-                      <div class="column-grid-description span7">
-                          <h6 class="description-title">
-                            {{title}}
-                          </h6>
-                          <read-more text="description"></read-more>
-                      </div>
-                      <div class="span5">
-                          <read-more text="notes"></read-more>
-                      </div>
-                  </div>
-              {{/each}}
-            </div>
-            <div class="span6">
-              {{#each regulations}}
-                  <div class="column-grid-body row">
-                      <div class="column-grid-description span7">
-                          <h6 class="description-title">
-                            {{title}}
-                          </h6>
-                          <read-more text="description"></read-more>
-                      </div>
-                      <div class="span5">
-                          <read-more text="notes"></read-more>
-                      </div>
-                  </div>
-              {{/each}}
-            </div>
-        </div>
-    </div>
+    </collapsible-panel>
 {{/itemData}}
