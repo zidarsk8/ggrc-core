@@ -42,7 +42,9 @@ class TestAdvancedQueryAPI(TestCase):
 
   def _get_first_result_set(self, data, *keys):
     """Post data, get response, get values from it like in obj["a"]["b"]."""
-    result = json.loads(self._post(data).data)[0]
+    response = self._post(data)
+    self.assert200(response)
+    result = json.loads(response.data)[0]
     for key in keys:
       result = result.get(key)
       self.assertIsNot(result, None)
@@ -236,6 +238,113 @@ class TestAdvancedQueryAPI(TestCase):
     self.assertEqual(programs_limit["count"], to_ - from_)
 
     self.assertEqual(programs_limit["total"], programs_no_limit["total"])
+
+  def test_query_limit(self):
+    """The limit parameter trims the result set."""
+    def check_counts_and_values(programs, from_, to_, count=None):
+      """Make a typical assertion set for count, total and values."""
+      if count is None:
+        count = to_ - from_
+      self.assertEqual(programs["count"], count)
+      self.assertEqual(programs["total"], programs_no_limit["total"])
+      self.assertEqual(programs["values"],
+                       programs_no_limit["values"][from_:to_])
+
+    data_no_limit = {
+        "object_name": "Program",
+        "filters": {"expression": {}},
+        "order_by": [{"name": "id"}],
+    }
+    programs_no_limit = self._get_first_result_set(data_no_limit, "Program")
+
+    self.assertEqual(programs_no_limit["count"], programs_no_limit["total"])
+
+    data_0_10 = {
+        "limit": [0, 10],
+    }
+    data_0_10.update(data_no_limit)
+    programs_0_10 = self._get_first_result_set(data_0_10, "Program")
+
+    check_counts_and_values(programs_0_10, from_=0, to_=10)
+
+    data_10_21 = {
+        "limit": [10, 21],
+    }
+    data_10_21.update(data_no_limit)
+    programs_10_21 = self._get_first_result_set(data_10_21, "Program")
+
+    check_counts_and_values(programs_10_21, from_=10, to_=21)
+
+    data_10_top = {
+        "limit": [10, programs_no_limit["total"] + 42],
+    }
+    data_10_top.update(data_no_limit)
+    programs_10_top = self._get_first_result_set(data_10_top, "Program")
+
+    check_counts_and_values(programs_10_top, from_=10, to_=None,
+                            count=programs_no_limit["total"] - 10)
+
+    # check if a valid integer string representation gets casted
+    data_10_21_str = {
+        "limit": [10, "21"],
+    }
+    data_10_21_str.update(data_no_limit)
+    programs_10_21_str = self._get_first_result_set(data_10_21_str, "Program")
+    data_10_str_21 = {
+        "limit": ["10", 21],
+    }
+    data_10_str_21.update(data_no_limit)
+    programs_10_str_21 = self._get_first_result_set(data_10_str_21, "Program")
+
+    self.assertDictEqual(programs_10_21_str, programs_10_21)
+    self.assertDictEqual(programs_10_str_21, programs_10_21)
+
+  def test_query_invalid_limit(self):
+    """Invalid limit parameters are handled properly."""
+    def make_request_data(data_dict):
+      """Construct a basic request for programs with values from data_dict."""
+      result = {
+          "object_name": "Program",
+          "filters": {"expression": {}},
+          "order_by": [{"name": "id"}],
+      }
+      result.update(data_dict)
+      return result
+
+    data_invalid_from = make_request_data({
+        "limit": ["invalid", 12],
+    })
+    response_invalid_from = self._post(data_invalid_from)
+
+    self.assert400(response_invalid_from)
+
+    data_invalid_to = make_request_data({
+        "limit": [0, "invalid"],
+    })
+    response_invalid_to = self._post(data_invalid_to)
+
+    self.assert400(response_invalid_to)
+
+    data_from_ge_to = make_request_data({
+        "limit": [12, 0],
+    })
+    response_from_ge_to = self._post(data_from_ge_to)
+
+    self.assert400(response_from_ge_to)
+
+    data_neg_from = make_request_data({
+        "limit": [-2, 10],
+    })
+    response_neg_from = self._post(data_neg_from)
+
+    self.assert400(response_neg_from)
+
+    data_neg_to = make_request_data({
+        "limit": [2, -10],
+    })
+    response_neg_to = self._post(data_neg_to)
+
+    self.assert400(response_neg_to)
 
   def test_query_order_by(self):
     """Results get sorted by own field."""
