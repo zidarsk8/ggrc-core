@@ -1202,6 +1202,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       this._add_child_lists_id += 1;
     }
 
+    // Remove listeners for inactive tabs
     CMS.Models.Relationship.unbind('created', this.onCreatedRS);
     CMS.Models[this.options.model.shortName].unbind('created',
       this.onCreated);
@@ -1222,6 +1223,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     this.onDestroyedRS = this.onDestroyedRS.bind(this);
     this.onDestroyedModel = this.onDestroyedModel.bind(this);
 
+    // Add listeners on creations instance or mappings objects for current tab
+    // and refresh page after that.
     CMS.Models.Relationship.bind('created', this.onCreatedRS);
     CMS.Models[this.options.model.shortName].bind('created',
       this.onCreatedModel);
@@ -1233,27 +1236,33 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   },
 
   _verifyRelationship: function (instance) {
-    var self = this;
-    var props = ['destination', 'source'];
-    var typeChecking = _.reduce(props, function (result, prop) {
-      return result || self.options.model.shortName === instance[prop].type;
-    }, false);
-
-    return typeChecking;
+    return _.includes([instance.destination.type, instance.source.type],
+      this.options.model.shortName);
   },
 
   onCreatedRS: function (ev, instance) {
+    var onCreated = this.onCreated.bind(this);
+    var parentInstance = this.options.parent_instance;
+    var props = ['related_destinations', 'related_sources'];
+    function callback() {
+      props.forEach(function (prop) {
+        parentInstance[prop].unbind('change', callback);
+      });
+      onCreated();
+    }
     if (instance instanceof CMS.Models.Relationship &&
       this._verifyRelationship(instance)) {
-      this.options.parent_instance.on('change', function cb() {
-        this.options.parent_instance.unbind('change', cb);
-        this.onCreated();
-      }.bind(this));
+      props.forEach(function (prop) {
+        parentInstance[prop].on('change', callback);
+      });
     }
   },
 
   onCreatedModel: function (ev, instance) {
     if (instance instanceof CMS.Models[this.options.model.shortName]) {
+      // Workaround for case when we can create new instance and
+      // because we don't need listen the creation of Relationship
+      CMS.Models.Relationship.unbind('created', this.onCreatedRS);
       this.onCreated();
     }
   },
