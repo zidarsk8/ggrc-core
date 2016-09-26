@@ -305,8 +305,7 @@ class QueryHelper(object):
     if first < 0 or last < 0:
       raise BadQueryException("Limit cannot contain negative numbers.")
     elif first >= last:
-      matches = set()
-      total = 0
+      raise BadQueryException("Limit start should be smaller than end.")
     else:
       page_size = last - first
       with benchmark("Apply limit: _apply_limit > query_limit"):
