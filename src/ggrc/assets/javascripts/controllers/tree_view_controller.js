@@ -1837,7 +1837,9 @@ can.Control('CMS.Controllers.TreeViewNode', {
         .then(this._ifNotRemoved(function () {
           this.element.trigger('subtree_loaded');
           this.element.trigger('loaded');
-          this._expand_deferred.resolve();
+          if (this._expand_deferred) {
+            this._expand_deferred.resolve();
+          }
         }.bind(this)));
     }.bind(this)), 0);
     return this._expand_deferred;
