@@ -20,6 +20,7 @@ DATE_FORMAT_REQUEST = "%m/%d/%Y"
 DATE_FORMAT_RESPONSE = "%Y-%m-%d"
 
 
+# pylint: disable=too-many-public-methods
 class TestAdvancedQueryAPI(TestCase):
   """Basic tests for /query api."""
 
