@@ -31,10 +31,6 @@
       objectives: new can.List(),
       regulations: new can.List(),
       isLoading: false,
-      /**
-       * Gets params for current id
-       * @return {Object} params for current id
-       */
       getParams: function (id, type) {
         var params = {};
         var relevant = {
