@@ -280,6 +280,8 @@
         }
       }
 
+      context.attr('disableCreate', this.options.disableCreate);
+
       $ul.unbind('scrollNext')
         .bind('scrollNext', function (ev, data) {
           if (context.attr('scroll_op_in_progress') ||

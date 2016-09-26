@@ -2997,19 +2997,26 @@ Mustache.registerHelper("log", function () {
   })));
 });
 
-Mustache.registerHelper("autocomplete_select", function (options) {
+Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   var cls;
+  var options = arguments[arguments.length - 1];
+  var _disableCreate = Mustache.resolve(disableCreate);
+
+  if (typeof (_disableCreate) !== 'boolean') {
+    _disableCreate = false;
+  }
   if (options.hash && options.hash.controller) {
     cls = Mustache.resolve(cls);
-    if (typeof cls === "string") {
+    if (typeof cls === 'string') {
       cls = can.getObject(cls);
     }
   }
   return function (el) {
-    $(el).bind("inserted", function () {
-      var $ctl = $(this).parents(":data(controls)");
+    $(el).bind('inserted', function () {
+      var $ctl = $(this).parents(':data(controls)');
       $(this).ggrc_autocomplete($.extend({}, options.hash, {
-        controller : cls ? $ctl.control(cls) : $ctl.control()
+        controller: cls ? $ctl.control(cls) : $ctl.control(),
+        disableCreate: _disableCreate
       }));
     });
   };

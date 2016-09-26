@@ -3,11 +3,17 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $) {
-  can.Component.extend({
+(function (can, $, GGRC) {
+  GGRC.Components('relevantFilter', {
     tag: 'relevant-filter',
     template: can.view(GGRC.mustache_path + '/mapper/relevant_filter.mustache'),
     scope: {
+      define: {
+        disableCreate: {
+          type: 'boolean',
+          'default': false
+        }
+      },
       relevant_menu_item: '@',
       show_all: '@',
       addFilter: function () {
@@ -94,4 +100,4 @@
       }
     }
   });
-})(window.can, window.can.$);
+})(window.can, window.can.$, window.GGRC);
