@@ -20,6 +20,7 @@ DATE_FORMAT_REQUEST = "%m/%d/%Y"
 DATE_FORMAT_RESPONSE = "%Y-%m-%d"
 
 
+# pylint: disable=super-on-old-class; false positive
 class BaseQueryAPITestCase(TestCase):
   """Base class for /query api tests with utility methods."""
 
