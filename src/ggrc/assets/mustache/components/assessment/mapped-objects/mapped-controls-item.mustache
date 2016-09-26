@@ -8,6 +8,6 @@
       {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
     </div>
     <div class="description">
-     <read-more text="instance.description"></read-more>
+     {{firstnonempty instance.description '<span class="empty-message">None</span>'}}
     </div>
 </div>

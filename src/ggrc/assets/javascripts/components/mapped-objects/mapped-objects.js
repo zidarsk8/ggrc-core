@@ -44,6 +44,9 @@
     events: {
       '{scope.parentInstance.related_destinations} length': function () {
         this.scope.load();
+      },
+      '{scope.parentInstance.related_sources} length': function () {
+        this.scope.load();
       }
     }
   });

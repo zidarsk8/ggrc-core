@@ -10,29 +10,36 @@
     '/components/assessment/mapped-objects/mapped-controls-popover.mustache');
   var tag = 'assessment-mapped-controls-popover';
   /**
-   * Assessment specific mapped objects popover view component
+   * Assessment specific mapped controls popover view component
    */
+  var defaultResponseArr = [{
+    Objective: {
+      values: []
+    }
+  }, {
+    Regulation: {
+      values: []
+    }
+  }];
+
   GGRC.Components('mappedControlsPopover', {
     tag: tag,
     template: tpl,
     scope: {
       item: null,
-      itemData: null,
       expanded: false,
       objectives: new can.List(),
       regulations: new can.List(),
       isLoading: false,
-      //showAdditional: false,
       /**
        * Gets params for current id
        * @return {Object} params for current id
        */
-      getParams: function () {
-        var id = this.attr('itemData.id');
+      getParams: function (id, type) {
         var params = {};
         var relevant = {
           id: id,
-          type: 'Control'
+          type: type
         };
         var fields = ['id', 'title', 'notes', 'description'];
         params.data = [
@@ -41,44 +48,39 @@
         ];
         return params;
       },
+      setItems: function (responseArr) {
+        responseArr.forEach(function (item) {
+          if (item.Objective) {
+            this.attr('objectives').replace(item.Objective.values);
+          }
+          if (item.Regulation) {
+            this.attr('regulations').replace(item.Regulation.values);
+          }
+        }.bind(this));
+      },
       loadItems: function () {
-        var params = this.getParams();
-        var self = this;
+        var id = this.attr('item.data.id');
+        var type = this.attr('item.data.type');
+        var params;
+
+        if (!id || !type) {
+          this.setItems(defaultResponseArr);
+          return;
+        }
+        params = this.getParams(id, type);
+
         this.attr('isLoading', true);
+
         GGRC.Utils.QueryAPI
           .makeRequest(params)
-          .done(function (responseArr) {
-            var objectives;
-            var regulations;
-            responseArr.forEach(function (item) {
-              if (item.hasOwnProperty('Objective')) {
-                objectives = item.Objective.values;
-              }
-              if (item.hasOwnProperty('Regulation')) {
-                regulations = item.Regulation.values;
-              }
-            });
-            self.attr('objectives').replace(objectives);
-            self.attr('regulations').replace(regulations);
-            self.attr('isLoading', false);
-          });
-      },
-      /**
-       * Toggles objectives and regulations
-       * @param {String} index Index of selected item
-       */
-      toggleItems: function (index) {
-        if (index) {
-          this.attr('itemData', this.attr('item.data'));
-          //this.loadItems();
-        }
-      },
-      toggleAdditional: function () {
-        var isShown = !this.attr('showAdditional');
-        this.attr('showAdditional', isShown);
-        if (isShown) {
-          this.loadItems();
-        }
+          .done(this.setItems.bind(this))
+          .fail(function () {
+            console.warn('Errors are: ', arguments);
+            this.setItems(defaultResponseArr);
+          }.bind(this))
+          .always(function () {
+            this.attr('isLoading', false);
+          }.bind(this));
       }
     },
     events: {
@@ -86,9 +88,6 @@
         if (isExpanded) {
           this.scope.loadItems();
         }
-      },
-      '{scope.item} index': function (scope, ev, index) {
-        this.scope.toggleItems(index);
       }
     }
   });

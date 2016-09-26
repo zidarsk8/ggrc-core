@@ -2,77 +2,70 @@
     Copyright (C) 2016 Google Inc., authors, and contributors
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-{{#itemData}}
-    <!-- Objectives and Regulations Grids -->
-    <collapsible-panel title-text="Show Related Objectives and Regulations" collapsed="true" expanded="expanded">
-        <spinner toggle="isLoading"></spinner>
-        <div class="mapped__two-column-grid">
-            <div class="two-column-grid-headers row-fluid">
-                <h6 class="span6">
-                    <i class="fa fa-objective color"></i>
-                    Objectives ({{objectives.length}})
-                </h6>
-                <h6 class="span6">
-                    <i class="fa fa-regulation color"></i>
-                    Regulations ({{regulations.length}})
-                </h6>
+<!-- Objectives and Regulations Grids -->
+<collapsible-panel title-text="Show Related Objectives and Regulations" collapsed="true" expanded="expanded"
+                   extra-css-class="no-padding">
+    <div class="grid-data-simple">
+        <!-- Header -->
+        <div class="grid-data-header flex-box flex-box-single flex-row">
+            <div class="flex-size-1">
+                <i class="fa fa-objective color"></i>
+                Objectives ({{objectives.length}})
             </div>
-
-            <div class="row-fluid">
-                <div class="span6">
-                    <div class="row-fluid">
-                        <div class="two-column-grid-header span7">
-                            Objective Description
-                        </div>
-                        <div class="two-column-grid-header span5">
-                            Notes
-                        </div>
-                    </div>
+            <div class="flex-size-1">
+                <i class="fa fa-regulation color"></i>
+                Regulations ({{regulations.length}})
+            </div>
+        </div>
+        <!-- Sub Header -->
+        <div class="grid-data-sub-header flex-box flex-box-single flex-row">
+            <div class="flex-box flex-row flex-box-single flex-size-1">
+                <div class="flex-size-5">
+                    Objective Description
                 </div>
-                <div class="span6">
-                    <div class="row-fluid">
-                        <div class="two-column-grid-header span7">
-                            Regulation Description
-                        </div>
-                        <div class="two-column-grid-header span5">
-                            Notes
-                        </div>
-                    </div>
+                <div class="flex-size-3">
+                    Notes
                 </div>
             </div>
-
-            <div class="two-column-grid-body row-fluid">
-                <div class="span6">
-                  {{#each objectives}}
-                      <div class="column-grid-body row">
-                          <div class="column-grid-description span7">
-                              <h6 class="description-title">
-                                {{title}}
-                              </h6>
-                              <read-more text="description"></read-more>
-                          </div>
-                          <div class="span5">
-                              <read-more text="notes"></read-more>
-                          </div>
-                      </div>
-                  {{/each}}
+            <div class="flex-box flex-row flex-box-single flex-size-1">
+                <div class="flex-size-5">
+                    Regulation Description
                 </div>
-                <div class="span6">
-                  {{#each regulations}}
-                      <div class="column-grid-body row">
-                          <div class="column-grid-description span7">
-                              <h6 class="description-title">
-                                {{title}}
-                              </h6>
-                              <read-more text="description"></read-more>
-                          </div>
-                          <div class="span5">
-                              <read-more text="notes"></read-more>
-                          </div>
-                      </div>
-                  {{/each}}
+                <div class="flex-size-3">
+                    Notes
                 </div>
             </div>
         </div>
-    </collapsible-panel>
-{{/itemData}}
+      <!-- Body -->
+        <div class="grid-data-body flex-box flex-box-single flex-row {{#isLoading}}loading{{/isLoading}}">
+            <spinner toggle="isLoading" extra-css-class="grid-spinner"
+                     class="{{#isLoading}}active{{/isLoading}}"></spinner>
+            <object-list items="objectives" class="flex-size-1">
+                <div class="grid-data-row flex-box flex-row flex-box-single">
+                    <div class="flex-box flex-row flex-box-single flex-size-1">
+                        <div class="flex-size-5 flex-size-limit">
+                            <div class="title-text">
+                              {{title}}
+                            </div>
+                            <read-more text="description"></read-more>
+                        </div>
+                        <read-more text="notes" class="flex-size-3 flex-size-limit"></read-more>
+                    </div>
+                </div>
+            </object-list>
+            <object-list items="regulations" class="flex-size-1">
+                <div class="grid-data-row flex-box flex-row flex-box-single">
+                    <div class="flex-box flex-row flex-box-single flex-size-1">
+                        <div class="flex-size-5 flex-size-limit">
+                            <div class="title-text">
+                              {{title}}
+                            </div>
+                            <read-more text="description"></read-more>
+                        </div>
+                        <read-more text="notes" class="flex-size-3 flex-size-limit"></read-more>
+                    </div>
+                </div>
+            </object-list>
+        </div>
+    </div>
+</collapsible-panel>
