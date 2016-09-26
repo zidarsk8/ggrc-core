@@ -3419,11 +3419,16 @@ Mustache.registerHelper('get_custom_attr_value', function (attr, instance, optio
 
   if (definition) {
     can.each(instance.custom_attribute_values, function (item) {
-      item = item.reify();
+      if (!(instance instanceof CMS.Models.Assessment)) {
+        // reify all models with the exception of the Assessment,
+        // because it has a different logic of work with the CA
+        item = item.reify();
+      }
       if (item.custom_attribute_id === definition.id) {
         if (definition.attribute_type.startsWith('Map:')) {
           value = options.fn(options.contexts.add({
-            object: item.attribute_object.reify()
+            object: item.attribute_object ?
+              item.attribute_object.reify() : null
           }));
         } else {
           value = item.attribute_value;
