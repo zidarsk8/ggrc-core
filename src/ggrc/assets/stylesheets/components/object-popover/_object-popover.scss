@@ -22,33 +22,25 @@
     }
 
     > .object-popover-body {
-      padding: 16px;
+      padding: 16px 0 0;
       box-sizing: border-box;
-      max-height: 450px;
-      overflow-y: auto;
       display: flex;
       flex-flow: column;
       align-content: stretch;
       align-items: stretch;
-
-      > * {
-        margin: 8px 0 0;
-
-        &:first-child {
-          margin: 0;
-        }
-      }
     }
   }
 
   .object-popover-title {
+    flex: 0 0;
+    box-sizing: border-box;
     font-size: 14px;
     line-height: 22px;
     display: block;
-    height: 22px;
     max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
+    padding: 0 16px 12px;
+    border-bottom: 1px solid #eee;
   }
 
   h6 {
@@ -60,6 +52,9 @@
   }
 
   .object-popover-content {
+    border: 1px solid $white;
+    background: #fefefe;
+    padding: 8px 16px 16px;
     overflow: auto;
 
     > content {
@@ -80,6 +75,8 @@
     align-items: stretch;
 
     > * {
+      margin: 8px 0 0;
+      flex-basis: 50%;
       min-width: 50%;
     }
   }

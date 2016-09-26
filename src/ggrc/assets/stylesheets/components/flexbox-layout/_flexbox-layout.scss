@@ -39,6 +39,14 @@
     flex: 4 4;
   }
 
+   .flex-size-5 {
+    flex: 5 5;
+  }
+
+  .flex-size-limit {
+    overflow: hidden;
+  }
+
   [class*="flex-size"] {
     box-sizing: border-box;
   }

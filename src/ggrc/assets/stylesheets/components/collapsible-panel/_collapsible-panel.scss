@@ -7,8 +7,18 @@ collapsible-panel {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  margin: 0 0 12px;
   position: relative;
+
+
+  collapsible-panel-body {
+    &.no-padding {
+      margin: 0;
+
+      > .body-inner {
+        padding: 0;
+      }
+    }
+  }
 
   &.details-item {
     margin: 0;

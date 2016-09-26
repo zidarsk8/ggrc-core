@@ -4,50 +4,6 @@
  */
 
 /* Mapped Object Popover Component CSS spec */
-
-.mapped__two-column-grid {
-  margin-top: 15px;
-
-  .row {
-    margin-left: 0;
-  }
-  .two-column-grid-header {
-    text-transform: uppercase;
-    margin-top: 3px;
-    margin-bottom: 7px;
-    font-size: 11px;
-  }
-  .two-column-grid-headers {
-    h6 {
-      .fa.fa-objective.color,
-      .fa.fa-regulation.color {
-        color: #969696;
-      }
-    }
-  }
-  .two-column-grid-body {
-    overflow-y: auto;
-    max-height: 200px;
-
-    .column-grid-body {
-      margin-top: 15px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 15px;
-
-      .column-grid-description {
-        .description-title {
-          margin-top: 0;
-          line-height: 18px;
-          -ms-text-overflow: ellipsis;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
-        }
-      }
-    }
-  }
-}
-
 .object-popover-body > .assessment-mapped-controls-popover {
   align-items: stretch;
   max-width: 850px;
