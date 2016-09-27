@@ -16,7 +16,7 @@ class Login(object):
 
 
 class PageHeader(object):
-  """All locators for the dashboard header (has the same name as the elemnt"""
+  """All locators for the dashboard header (has the same name as the element"""
 
   TOGGLE_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
   BUTTON_DASHBOARD = (By.CSS_SELECTOR, '.header-content .to-my-work['
@@ -61,6 +61,7 @@ class Dashboard(object):
 class LhnMenu(object):
   """Locators for the menu in header"""
   class _Locator(object):
+    """Locators for Lhn Menu"""
     @staticmethod
     def get_accordion_button(label):
       return (By.CSS_SELECTOR, '[data-model-name="{}"]>a'.format(label))
@@ -89,7 +90,7 @@ class LhnMenu(object):
           object_name))
 
   class __metaclass__(type):
-    def __init__(self, *args):
+    def __init__(cls, *args):
       for object_singular, object_plural in zip(objects.ALL_SINGULAR,
                                                 objects.ALL_PLURAL):
         capitalized_name = object_singular.title()
@@ -99,16 +100,16 @@ class LhnMenu(object):
           capitalized_name = capitalized_name.title().replace("_", "")
 
         # set lhn items
-        setattr(self, attribute.TOGGLE + object_plural,
-                self._Locator.get_accordion_button(capitalized_name))
-        setattr(self, attribute.BUTTON_CREATE_NEW + object_plural,
-                self._Locator.get_create_new_button(capitalized_name))
-        setattr(self, attribute.COUNT + object_plural,
-                self._Locator.get_accordion_count(capitalized_name))
-        setattr(self, attribute.SPINNY + object_plural,
-                self._Locator.get_spinny(capitalized_name))
-        setattr(self, attribute.ACCORDION_MEMBERS + object_plural,
-                self._Locator.get_accordion_members(capitalized_name))
+        setattr(cls, attribute.TOGGLE + object_plural,
+                cls._Locator.get_accordion_button(capitalized_name))
+        setattr(cls, attribute.BUTTON_CREATE_NEW + object_plural,
+                cls._Locator.get_create_new_button(capitalized_name))
+        setattr(cls, attribute.COUNT + object_plural,
+                cls._Locator.get_accordion_count(capitalized_name))
+        setattr(cls, attribute.SPINNY + object_plural,
+                cls._Locator.get_spinny(capitalized_name))
+        setattr(cls, attribute.ACCORDION_MEMBERS + object_plural,
+                cls._Locator.get_accordion_members(capitalized_name))
 
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
@@ -279,8 +280,9 @@ class ModalCreateNewControl(BaseModalCreateNew):
   """Locators for the control modal visible when creating a new modal from
   LHN"""
   class _Locator(object):
+    """Locators for the control modal visible when creating a modal from LHN"""
     @staticmethod
-    def get_asessor_row(first_id, second_id):
+    def get_assessor_row(first_id, second_id):
       return (
           By.CSS_SELECTOR,
           '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
@@ -503,11 +505,11 @@ class WidgetBar(object):
       return (By.CSS_SELECTOR, '[href="#{}_widget"]'.format(object_name))
 
   class __metaclass__(type):
-    def __init__(self, *args):
+    def __init__(cls, *args):
       for object_singular, object_plural in zip(objects.ALL_SINGULAR,
                                                 objects.ALL_PLURAL):
         name = object_singular.lower()
-        setattr(self, object_plural, self._Locator.get_widget(name))
+        setattr(cls, object_plural, cls._Locator.get_widget(name))
 
   BUTTON_ADD = (By.CSS_SELECTOR,
                 '[data-test-id="button_widget_add_2c925d94"]')
@@ -534,10 +536,10 @@ class WidgetBarButtonAddDropdown(object):
                                '[href="#{}_widget"]'.format(object_name))
 
   class __metaclass__(type):
-    def __init__(self, *args):
+    def __init__(cls, *args):
       for object_ in objects.ALL_PLURAL:
         name = object_.lower()
-        setattr(self, object_, self._Locator.get_dropdown_item(name))
+        setattr(cls, object_, cls._Locator.get_dropdown_item(name))
 
   THREAD_ACTORS = _Locator.get_dropdown_item("threat_actor")
   WORKFLOW_TASKS = _Locator.get_dropdown_item("workflow_task")
@@ -769,15 +771,15 @@ class WidgetAdminRoles(object):
               '.scope'.format(child_id))
 
   class __metaclass__(type):
-    def __init__(self, *args):
+    def __init__(cls, *args):
       items = (
           "ADMINISTRATOR", "CREATOR", "EDITOR", "PROGRAM_EDITOR",
           "PROGRAM_OWNER", "PROGRAM_READER", "READER", "WORKFLOW_MEMBER",
           "WORKFLOW_OWNER")
 
       for id_, name in enumerate(items, start=1):
-        setattr(self, attribute.ROLE + name, self._Locator.get_role(id_))
-        setattr(self, attribute.SCOPE + name, self._Locator.get_scope(id_))
+        setattr(cls, attribute.ROLE + name, cls._Locator.get_role(id_))
+        setattr(cls, attribute.SCOPE + name, cls._Locator.get_scope(id_))
 
 
 class WidgetAdminEvents(object):
@@ -818,26 +820,26 @@ class BaseWidgetGeneric(object):
     """For sharing parametrized class attributes we simply define how a
     class should look like. Note that the same functionality can be
     implemented using properties though with more code."""
-    def __init__(self, *args):
-      self.TITLE = (
+    def __init__(cls, *args):
+      cls.TITLE = (
           By.CSS_SELECTOR, '#{}_widget .sticky-filter .tree-filter__title h6'
-            .format(self._object_name))
-      self.TEXTFIELD = (
+            .format(cls._object_name))
+      cls.TEXTFIELD = (
           By.CSS_SELECTOR,
           '#{}_widget .sticky-filter .tree-filter__expression-holder'
-            .format(self._object_name))
-      self.BUTTON_SUBMIT = (
+            .format(cls._object_name))
+      cls.BUTTON_SUBMIT = (
           By.CSS_SELECTOR,
           '#{}_widget .sticky-filter .tree-filter__button [type="submit"]'
-            .format(self._object_name))
-      self.BUTTON_RESET = (
+            .format(cls._object_name))
+      cls.BUTTON_RESET = (
           By.CSS_SELECTOR,
           '#{}_widget .sticky-filter .tree-filter__button [type="reset"]'
-            .format(self._object_name))
-      self.BUTTON_HELP = (
+            .format(cls._object_name))
+      cls.BUTTON_HELP = (
           By.CSS_SELECTOR,
           '#{}_widget .sticky-filter .tree-filter__button  #page-help'
-            .format(self._object_name))
+            .format(cls._object_name))
 
 
 class WidgetControls(BaseWidgetGeneric):
@@ -892,7 +894,7 @@ class AdminCustomAttributes(object):
             .format(child_id))
 
   class __metaclass__(type):
-    def __init__(self, *args):
+    def __init__(cls, *args):
       items = (
           objects.WORKFLOWS, "RISK_ASSESSMENTS", objects.THREATS,
           objects.RISKS, objects.PROGRAMS, objects.AUDITS,
@@ -905,9 +907,9 @@ class AdminCustomAttributes(object):
           objects.PROJECTS, objects.DATA_ASSETS, objects.SYSTEMS)
 
       for id_, name in enumerate(items, start=1):
-        setattr(self,
+        setattr(cls,
                 attribute.TOGGLE + name.upper(),
-                self._Locator.get_toggle(id_))
+                cls._Locator.get_toggle(id_))
 
   FILTER_INPUT_FIELD = (By.CLASS_NAME, 'tree-filter__expression-holder')
   FILTER_BUTTON_SUBMIT = (By.CSS_SELECTOR,
