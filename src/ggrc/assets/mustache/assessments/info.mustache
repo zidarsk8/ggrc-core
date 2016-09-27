@@ -63,6 +63,44 @@
                     <collapsible-panel title-text="URL" collapsed="true" title-icon="fa-link" class="details-item">
                       {{> '/static/mustache/assessments/urls.mustache'}}
                     </collapsible-panel>
+                    <collapsible-panel title-text="Conclusions" collapsed="true" title-icon="fa-gavel"
+                                       class="details-item">
+                        <div class="flex-box flex-col"
+                          {{#instance}}{{data 'model'}}{{/instance}}
+                             data-force-refresh="true"
+                             data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+                            <div class="flex-size-1 flex-gutter-2">
+                                <label class="title-text">Conclusion: Design</label>
+                                <p>
+                                    <small><em>Is this control design effective?</em></small>
+                                </p>
+                              {{#is_allowed 'update' instance context='for'}}
+                                  <dropdown options-list="model.conclusions"
+                                            no-value="true"
+                                            no-value-label="---"
+                                            name="instance.design">
+                                  </dropdown>
+                              {{else}}
+                                {{firstnonempty design '--'}}
+                              {{/is_allowed}}
+                            </div>
+                            <div class="flex-size-1 flex-gutter-2">
+                                <label class="title-text">Conclusion: Operation</label>
+                                <p>
+                                    <small><em>Is this control operationally effective?</em></small>
+                                </p>
+                              {{#is_allowed 'update' instance context='for'}}
+                                  <dropdown options-list="model.conclusions"
+                                            no-value="true"
+                                            no-value-label="---"
+                                            name="instance.operationally">
+                                  </dropdown>
+                              {{else}}
+                                {{firstnonempty operationally '--'}}
+                              {{/is_allowed}}
+                            </div>
+                        </div>
+                    </collapsible-panel>
                 </div>
             </div>
             <div class="tabs-wrap">
