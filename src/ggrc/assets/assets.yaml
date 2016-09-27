@@ -196,6 +196,7 @@ dashboard-js-files:
   - components/object_counter/object_counter.js
   - components/sort_by_sort_index/sort_by_sort_index.js
   - components/tree_pagination/tree_pagination.js
+  - components/view-object-button/view-object-button.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -239,6 +240,7 @@ dashboard-js-template-files:
   - components/ca-object/ca-object-validation-icon.mustache
   - components/ca-object/ca-object-modal.mustache
   - components/ca-object/ca-object-modal-content.mustache
+  - components/view-object-button/view-object-button.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
