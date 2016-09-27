@@ -20,17 +20,14 @@ DATE_FORMAT_REQUEST = "%m/%d/%Y"
 DATE_FORMAT_RESPONSE = "%Y-%m-%d"
 
 
-class TestAdvancedQueryAPI(TestCase):
-  """Basic tests for /query api."""
-
-  @classmethod
-  def setUpClass(cls):
-    """Set up test cases for all tests."""
-    TestCase.clear_data()
-    # This imported file could be simplified a bit to speed up testing.
-    cls._import_file("data_for_export_testing.csv")
+# pylint: disable=super-on-old-class; false positive
+class BaseQueryAPITestCase(TestCase):
+  """Base class for /query api tests with utility methods."""
 
   def setUp(self):
+    """Log in before performing queries."""
+    # we don't call super as TestCase.setUp clears the DB
+    # super(BaseQueryAPITestCase, self).setUp()
     self.client.get("/login")
 
   def _post(self, data):
@@ -42,28 +39,57 @@ class TestAdvancedQueryAPI(TestCase):
 
   def _get_first_result_set(self, data, *keys):
     """Post data, get response, get values from it like in obj["a"]["b"]."""
-    result = json.loads(self._post(data).data)[0]
+    response = self._post(data)
+    self.assert200(response)
+    result = json.loads(response.data)[0]
     for key in keys:
       result = result.get(key)
       self.assertIsNot(result, None)
     return result
 
+  @staticmethod
+  def _make_query_dict(object_name, type_=None, expression=None, limit=None,
+                       order_by=None):
+    """Make a dict with query for object_name with optional parameters."""
+    def make_filter_expression(expression):
+      """Convert a three-tuple to a simple expression filter."""
+      left, op_name, right = expression
+      return {"left": left, "op": {"name": op_name}, "right": right}
+
+    query = {
+        "object_name": object_name,
+        "filters": {"expression": {}},
+    }
+    if type_:
+      query["type"] = type_
+    if expression:
+      query["filters"]["expression"] = make_filter_expression(expression)
+    if limit:
+      query["limit"] = limit
+    if order_by:
+      query["order_by"] = order_by
+    return query
+
+
+# pylint: disable=too-many-public-methods
+class TestAdvancedQueryAPI(BaseQueryAPITestCase):
+  """Basic tests for /query api."""
+
+  @classmethod
+  def setUpClass(cls):
+    """Set up test cases for all tests."""
+    TestCase.clear_data()
+    # This imported file could be simplified a bit to speed up testing.
+    cls._import_file("data_for_export_testing.csv")
+
   def test_basic_query_eq(self):
     """Filter by = operator."""
     title = "Cat ipsum 1"
-    data = {
-        "object_name": "Program",
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "="},
-                "right": title,
-            },
-        },
-    }
-    response = json.loads(self._post(data).data)[0]
-    programs = response.get("Program")
-    self.assertIsNot(programs, None)
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program", expression=["title", "=", title]),
+        "Program",
+    )
+
     self.assertEqual(programs["count"], 1)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertEqual(programs["values"][0]["title"], title)
@@ -71,17 +97,12 @@ class TestAdvancedQueryAPI(TestCase):
   def test_basic_query_in(self):
     """Filter by ~ operator."""
     title_pattern = "1"
-    data = {
-        "object_name": "Program",
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "~"},
-                "right": title_pattern,
-            },
-        },
-    }
-    programs = self._get_first_result_set(data, "Program")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["title", "~", title_pattern]),
+        "Program",
+    )
+
     self.assertEqual(programs["count"], 12)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(all(title_pattern in program["title"]
@@ -90,17 +111,12 @@ class TestAdvancedQueryAPI(TestCase):
   def test_basic_query_ne(self):
     """Filter by != operator."""
     title = "Cat ipsum 1"
-    data = {
-        "object_name": "Program",
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "!="},
-                "right": title,
-            },
-        },
-    }
-    programs = self._get_first_result_set(data, "Program")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["title", "!=", title]),
+        "Program",
+    )
+
     self.assertEqual(programs["count"], 22)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(all(program["title"] != title
@@ -109,17 +125,12 @@ class TestAdvancedQueryAPI(TestCase):
   def test_basic_query_not_in(self):
     """Filter by !~ operator."""
     title_pattern = "1"
-    data = {
-        "object_name": "Program",
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "!~"},
-                "right": title_pattern,
-            },
-        },
-    }
-    programs = self._get_first_result_set(data, "Program")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["title", "!~", title_pattern]),
+        "Program",
+    )
+
     self.assertEqual(programs["count"], 11)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(all(title_pattern not in program["title"]
@@ -128,17 +139,13 @@ class TestAdvancedQueryAPI(TestCase):
   def test_basic_query_lt(self):
     """Filter by < operator."""
     date = datetime(2015, 5, 18)
-    data = {
-        "object_name": "Program",
-        "filters": {
-            "expression": {
-                "left": "effective date",
-                "op": {"name": "<"},
-                "right": date.strftime(DATE_FORMAT_REQUEST),
-            },
-        },
-    }
-    programs = self._get_first_result_set(data, "Program")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["effective date", "<",
+                                          date.strftime(DATE_FORMAT_REQUEST)]),
+        "Program",
+    )
+
     self.assertEqual(programs["count"], 9)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(
@@ -150,17 +157,13 @@ class TestAdvancedQueryAPI(TestCase):
   def test_basic_query_gt(self):
     """Filter by > operator."""
     date = datetime(2015, 5, 18)
-    data = {
-        "object_name": "Program",
-        "filters": {
-            "expression": {
-                "left": "effective date",
-                "op": {"name": ">"},
-                "right": date.strftime(DATE_FORMAT_REQUEST),
-            },
-        },
-    }
-    programs = self._get_first_result_set(data, "Program")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["effective date", ">",
+                                          date.strftime(DATE_FORMAT_REQUEST)]),
+        "Program",
+    )
+
     self.assertEqual(programs["count"], 13)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertTrue(
@@ -172,16 +175,13 @@ class TestAdvancedQueryAPI(TestCase):
   def test_basic_query_text_search(self):
     """Filter by fulltext search."""
     text_pattern = "ea"
-    data = {
-        "object_name": "Regulation",
-        "filters": {
-            "expression": {
-                "op": {"name": "text_search"},
-                "text": text_pattern,
-            },
-        },
+    data = self._make_query_dict("Regulation")
+    data["filters"]["expression"] = {
+        "op": {"name": "text_search"},
+        "text": text_pattern,
     }
     regulations = self._get_first_result_set(data, "Regulation")
+
     self.assertEqual(regulations["count"], 21)
     self.assertEqual(len(regulations["values"]), regulations["count"])
     self.assertTrue(all((regulation["description"] and
@@ -193,49 +193,119 @@ class TestAdvancedQueryAPI(TestCase):
   def test_basic_query_pagination(self):
     """Test basic query with pagination info."""
     from_, to_ = 1, 12
-    data = {
-        "object_name": "Program",
-        "order_by": [{
-            "name": "title",
-        }],
-        "limit": [from_, to_],
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "~"},
-                "right": "Cat ipsum",
-            },
-        },
-    }
-    programs = self._get_first_result_set(data, "Program")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["title", "~", "Cat ipsum"],
+                              order_by=[{"name": "title"}],
+                              limit=[from_, to_]),
+        "Program",
+    )
     self.assertEqual(programs["count"], to_ - from_)
     self.assertEqual(len(programs["values"]), programs["count"])
     self.assertEqual(programs["total"], 23)
 
   def test_basic_query_total(self):
     """The value of "total" doesn't depend on "limit" parameter."""
-    data_no_limit = {
-        "object_name": "Program",
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "~"},
-                "right": "Cat ipsum",
-            },
-        },
-    }
-    programs_no_limit = self._get_first_result_set(data_no_limit, "Program")
+    programs_no_limit = self._get_first_result_set(
+        self._make_query_dict("Program"),
+        "Program",
+    )
     self.assertEqual(programs_no_limit["count"], programs_no_limit["total"])
 
     from_, to_ = 3, 5
-    data_limit = data_no_limit.copy()
-    data_limit.update({
-        "limit": [from_, to_],
-    })
-    programs_limit = self._get_first_result_set(data_limit, "Program")
+    programs_limit = self._get_first_result_set(
+        self._make_query_dict("Program", limit=[from_, to_]),
+        "Program",
+    )
     self.assertEqual(programs_limit["count"], to_ - from_)
 
     self.assertEqual(programs_limit["total"], programs_no_limit["total"])
+
+  def test_query_limit(self):
+    """The limit parameter trims the result set."""
+    def make_query_dict(limit=None):
+      """A shortcut for making queries with different limits."""
+      return self._make_query_dict("Program", order_by=[{"name": "title"}],
+                                   limit=limit)
+
+    def check_counts_and_values(programs, from_, to_, count=None):
+      """Make a typical assertion set for count, total and values."""
+      if count is None:
+        count = to_ - from_
+      self.assertEqual(programs["count"], count)
+      self.assertEqual(programs["total"], programs_no_limit["total"])
+      self.assertEqual(programs["values"],
+                       programs_no_limit["values"][from_:to_])
+
+    programs_no_limit = self._get_first_result_set(
+        make_query_dict(),
+        "Program",
+    )
+
+    self.assertEqual(programs_no_limit["count"], programs_no_limit["total"])
+
+    programs_0_10 = self._get_first_result_set(
+        make_query_dict(limit=[0, 10]),
+        "Program",
+    )
+
+    check_counts_and_values(programs_0_10, from_=0, to_=10)
+
+    programs_10_21 = self._get_first_result_set(
+        make_query_dict(limit=[10, 21]),
+        "Program",
+    )
+
+    check_counts_and_values(programs_10_21, from_=10, to_=21)
+
+    programs_10_top = self._get_first_result_set(
+        make_query_dict(limit=[10, programs_no_limit["total"] + 42]),
+        "Program",
+    )
+
+    check_counts_and_values(programs_10_top, from_=10, to_=None,
+                            count=programs_no_limit["total"] - 10)
+
+    # check if a valid integer string representation gets casted
+    programs_10_21_str = self._get_first_result_set(
+        make_query_dict(limit=[10, "21"]),
+        "Program",
+    )
+    programs_10_str_21 = self._get_first_result_set(
+        make_query_dict(limit=["10", 21]),
+        "Program",
+    )
+
+    self.assertDictEqual(programs_10_21_str, programs_10_21)
+    self.assertDictEqual(programs_10_str_21, programs_10_21)
+
+  def test_query_invalid_limit(self):
+    """Invalid limit parameters are handled properly."""
+
+    # invalid "from"
+    self.assert400(self._post(
+        self._make_query_dict("Program", limit=["invalid", 12]),
+    ))
+
+    # invalid "to"
+    self.assert400(self._post(
+        self._make_query_dict("Program", limit=[0, "invalid"]),
+    ))
+
+    # "from" >= "to"
+    self.assert400(self._post(
+        self._make_query_dict("Program", limit=[12, 0]),
+    ))
+
+    # negative "from"
+    self.assert400(self._post(
+        self._make_query_dict("Program", limit=[-2, 10]),
+    ))
+
+    # negative "to"
+    self.assert400(self._post(
+        self._make_query_dict("Program", limit=[2, -10]),
+    ))
 
   def test_query_order_by(self):
     """Results get sorted by own field."""
@@ -244,31 +314,25 @@ class TestAdvancedQueryAPI(TestCase):
     def get_titles(programs):
       return [program["title"] for program in programs]
 
-    data_default = {
-        "object_name": "Program",
-        "order_by": [{"name": "title"}],
-        "filters": {"expression": {}},
-    }
-    programs_default = self._get_first_result_set(data_default,
-                                                  "Program", "values")
+    programs_default = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              order_by=[{"name": "title"}]),
+        "Program", "values",
+    )
     titles_default = get_titles(programs_default)
 
-    data_asc = {
-        "object_name": "Program",
-        "order_by": [{"name": "title", "desc": False}],
-        "filters": {"expression": {}},
-    }
-    programs_asc = self._get_first_result_set(data_asc,
-                                              "Program", "values")
+    programs_asc = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              order_by=[{"name": "title", "desc": False}]),
+        "Program", "values",
+    )
     titles_asc = get_titles(programs_asc)
 
-    data_desc = {
-        "object_name": "Program",
-        "order_by": [{"name": "title", "desc": True}],
-        "filters": {"expression": {}},
-    }
-    programs_desc = self._get_first_result_set(data_desc,
-                                               "Program", "values")
+    programs_desc = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              order_by=[{"name": "title", "desc": True}]),
+        "Program", "values",
+    )
     titles_desc = get_titles(programs_desc)
 
     # the titles are sorted ascending with desc=False
@@ -280,20 +344,17 @@ class TestAdvancedQueryAPI(TestCase):
 
   def test_order_by_several_fields(self):
     """Results get sorted by two fields at once."""
-    data = {
-        "object_name": "Regulation",
-        "order_by": [{"name": "notes", "desc": True}, {"name": "title"}],
-        "filters": {"expression": {}},
-    }
-    regulations = self._get_first_result_set(data,
-                                             "Regulation", "values")
+    regulations = self._get_first_result_set(
+        self._make_query_dict("Regulation",
+                              order_by=[{"name": "notes", "desc": True},
+                                        {"name": "title"}]),
+        "Regulation", "values",
+    )
 
-    data_unsorted = {
-        "object_name": "Regulation",
-        "filters": {"expression": {}},
-    }
-    regulations_unsorted = self._get_first_result_set(data_unsorted,
-                                                      "Regulation", "values")
+    regulations_unsorted = self._get_first_result_set(
+        self._make_query_dict("Regulation"),
+        "Regulation", "values",
+    )
 
     self.assertListEqual(
         regulations,
@@ -305,28 +366,22 @@ class TestAdvancedQueryAPI(TestCase):
 
   def test_order_by_related_titled(self):
     """Results get sorted by title of related Titled object."""
-    data_title = {
-        "object_name": "Audit",
-        "order_by": [{"name": "program"}, {"name": "id"}],
-        "filters": {"expression": {}},
-    }
-    audits_title = self._get_first_result_set(data_title,
-                                              "Audit", "values")
+    audits_title = self._get_first_result_set(
+        self._make_query_dict("Audit",
+                              order_by=[{"name": "program"}, {"name": "id"}]),
+        "Audit", "values",
+    )
 
-    data_unsorted = {
-        "object_name": "Audit",
-        "filters": {"expression": {}},
-    }
-    audits_unsorted = self._get_first_result_set(data_unsorted,
-                                                 "Audit", "values")
+    audits_unsorted = self._get_first_result_set(
+        self._make_query_dict("Audit"),
+        "Audit", "values",
+    )
 
     # get titles from programs to check ordering
-    data_program = {
-        "object_name": "Program",
-        "filters": {"expression": {}},
-    }
-    programs = self._get_first_result_set(data_program,
-                                          "Program", "values")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program"),
+        "Program", "values",
+    )
     program_id_title = {program["id"]: program["title"]
                         for program in programs}
 
@@ -338,28 +393,22 @@ class TestAdvancedQueryAPI(TestCase):
 
   def test_order_by_related_person(self):
     """Results get sorted by name or email of related Person object."""
-    data_person = {
-        "object_name": "Clause",
-        "order_by": [{"name": "contact"}, {"name": "id"}],
-        "filters": {"expression": {}},
-    }
-    clauses_person = self._get_first_result_set(data_person,
-                                                "Clause", "values")
+    clauses_person = self._get_first_result_set(
+        self._make_query_dict("Clause",
+                              order_by=[{"name": "contact"}, {"name": "id"}]),
+        "Clause", "values",
+    )
 
-    data_unsorted = {
-        "object_name": "Clause",
-        "filters": {"expression": {}},
-    }
-    clauses_unsorted = self._get_first_result_set(data_unsorted,
-                                                  "Clause", "values")
+    clauses_unsorted = self._get_first_result_set(
+        self._make_query_dict("Clause"),
+        "Clause", "values",
+    )
 
     # get names and emails from people to check ordering
-    data_people = {
-        "object_name": "Person",
-        "filters": {"expression": {}},
-    }
-    people = self._get_first_result_set(data_people,
-                                        "Person", "values")
+    people = self._get_first_result_set(
+        self._make_query_dict("Person"),
+        "Person", "values",
+    )
     person_id_name = {person["id"]: (person["name"], person["email"])
                       for person in people}
 
@@ -372,26 +421,19 @@ class TestAdvancedQueryAPI(TestCase):
   def test_query_order_by_owners(self):
     """Results get sorted by name or email of the (first) owner."""
     # TODO: the test data set lacks objects with several owners
-    data_owner = {
-        "object_name": "Policy",
-        "order_by": [{"name": "owners"}, {"name": "id"}],
-        "filters": {"expression": {}},
-    }
-    policies_owner = self._get_first_result_set(data_owner,
-                                                "Policy", "values")
-
-    data_unsorted = {
-        "object_name": "Policy",
-        "filters": {"expression": {}},
-    }
-    policies_unsorted = self._get_first_result_set(data_unsorted,
-                                                   "Policy", "values")
-    data_people = {
-        "object_name": "Person",
-        "filters": {"expression": {}},
-    }
-    people = self._get_first_result_set(data_people,
-                                        "Person", "values")
+    policies_owner = self._get_first_result_set(
+        self._make_query_dict("Policy",
+                              order_by=[{"name": "owners"}, {"name": "id"}]),
+        "Policy", "values",
+    )
+    policies_unsorted = self._get_first_result_set(
+        self._make_query_dict("Policy"),
+        "Policy", "values",
+    )
+    people = self._get_first_result_set(
+        self._make_query_dict("Person"),
+        "Person", "values",
+    )
     person_id_name = {person["id"]: (person["name"], person["email"])
                       for person in people}
     policy_id_owner = {policy["id"]: person_id_name[policy["owners"][0]["id"]]
@@ -405,61 +447,27 @@ class TestAdvancedQueryAPI(TestCase):
 
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
-    data_values = {
-        "object_name": "Program",
-        "type": "values",
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "~"},
-                "right": "Cat ipsum",
-            },
-        },
-    }
-    programs_values = self._get_first_result_set(data_values, "Program")
-
-    data_count = {
-        "object_name": "Program",
-        "type": "count",
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "~"},
-                "right": "Cat ipsum",
-            },
-        },
-    }
-    programs_count = self._get_first_result_set(data_count, "Program")
+    programs_values = self._get_first_result_set(
+        self._make_query_dict("Program", type_="values"),
+        "Program",
+    )
+    programs_count = self._get_first_result_set(
+        self._make_query_dict("Program", type_="count"),
+        "Program",
+    )
 
     self.assertEqual(programs_values["count"], programs_count["count"])
 
   def test_query_ids(self):
     """The ids are the same for "values" and "ids" queries."""
-    data_values = {
-        "object_name": "Program",
-        "type": "values",
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "~"},
-                "right": "Cat ipsum",
-            },
-        },
-    }
-    programs_values = self._get_first_result_set(data_values, "Program")
-
-    data_ids = {
-        "object_name": "Program",
-        "type": "ids",
-        "filters": {
-            "expression": {
-                "left": "title",
-                "op": {"name": "~"},
-                "right": "Cat ipsum",
-            },
-        },
-    }
-    programs_ids = self._get_first_result_set(data_ids, "Program")
+    programs_values = self._get_first_result_set(
+        self._make_query_dict("Program", type_="values"),
+        "Program",
+    )
+    programs_ids = self._get_first_result_set(
+        self._make_query_dict("Program", type_="ids"),
+        "Program",
+    )
 
     self.assertEqual(
         set(obj.get("id") for obj in programs_values["values"]),
@@ -479,113 +487,31 @@ class TestAdvancedQueryAPI(TestCase):
   def test_multiple_queries(self):
     """Multiple queries POST is identical to multiple single-query POSTs."""
     data_list = [
-        {
-            "object_name": "Program",
-            "order_by": [{
-                "name": "title",
-            }],
-            "limit": [1, 12],
-            "filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "~"},
-                    "right": "Cat ipsum",
-                },
-            },
-        },
-        {
-            "object_name": "Program",
-            "type": "values",
-            "filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "~"},
-                    "right": "Cat ipsum",
-                },
-            },
-        },
-        {
-            "object_name": "Program",
-            "type": "count",
-            "filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "~"},
-                    "right": "Cat ipsum",
-                },
-            },
-        },
-        {
-            "object_name": "Program",
-            "type": "ids",
-            "filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "~"},
-                    "right": "Cat ipsum",
-                },
-            },
-        },
-        {
-            "object_name": "Program",
-            "filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "="},
-                    "right": "Cat ipsum 1",
-                },
-            },
-        },
-        {
-            "object_name": "Program",
-            "filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "~"},
-                    "right": "1",
-                },
-            },
-        },
-        {
-            "object_name": "Program",
-            "filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "!="},
-                    "right": "Cat ipsum 1",
-                },
-            },
-        },
-        {
-            "object_name": "Program",
-            "filters": {
-                "expression": {
-                    "left": "title",
-                    "op": {"name": "!~"},
-                    "right": "`",
-                },
-            },
-        },
-        {
-            "object_name": "Program",
-            "filters": {
-                "expression": {
-                    "left": "effective date",
-                    "op": {"name": "<"},
-                    "right": "05/18/2015",
-                },
-            },
-        },
-        {
-            "object_name": "Program",
-            "filters": {
-                "expression": {
-                    "left": "effective date",
-                    "op": {"name": ">"},
-                    "right": "05/18/2015",
-                },
-            },
-        },
+        self._make_query_dict("Program",
+                              order_by=[{"name": "title"}],
+                              limit=[1, 12],
+                              expression=["title", "~", "Cat ipsum"]),
+        self._make_query_dict("Program",
+                              type_="values"),
+        self._make_query_dict("Program",
+                              type_="count"),
+        self._make_query_dict("Program",
+                              type_="ids"),
+        self._make_query_dict("Program",
+                              type_="ids",
+                              expression=["title", "=", "Cat ipsum 1"]),
+        self._make_query_dict("Program",
+                              expression=["title", "~", "1"]),
+        self._make_query_dict("Program",
+                              expression=["title", "!=", "Cat ipsum 1"]),
+        self._make_query_dict("Program",
+                              expression=["title", "!~", "1"]),
+        self._make_query_dict("Program",
+                              expression=["effective date", "<",
+                                          "05/18/2015"]),
+        self._make_query_dict("Program",
+                              expression=["effective date", ">",
+                                          "05/18/2015"]),
         {
             "object_name": "Regulation",
             "fields": ["description", "notes"],
@@ -605,7 +531,7 @@ class TestAdvancedQueryAPI(TestCase):
     self.assertEqual(response_multiple_posts, response_single_post)
 
 
-class TestQueryWithCA(TestCase):
+class TestQueryWithCA(BaseQueryAPITestCase):
   """Test query API with custom attributes."""
 
   def setUp(self):
@@ -628,20 +554,6 @@ class TestQueryWithCA(TestCase):
         definition_type="program",
     )
 
-  def _get_first_result_set(self, data, *keys):
-    """Post data, get response, get values from it like in obj["a"]["b"]."""
-
-    result = self.client.post(
-        "/query",
-        data=json.dumps([data]),
-        headers={"Content-Type": "application/json"},
-    ).json[0]
-
-    for key in keys:
-      result = result.get(key)
-      self.assertIsNot(result, None)
-    return self._flatten_cav(result)
-
   @staticmethod
   def _flatten_cav(data):
     """Unpack CAVs and put them in data as object attributes."""
@@ -651,25 +563,29 @@ class TestQueryWithCA(TestCase):
         entry[cad_names[cav["custom_attribute_id"]]] = cav["attribute_value"]
     return data
 
+  def _get_first_result_set(self, *args, **kwargs):
+    """Call this method from super and flatten CAVs additionally."""
+    return self._flatten_cav(
+        super(TestQueryWithCA, self)._get_first_result_set(*args, **kwargs),
+    )
+
   def test_single_ca_sorting(self):
     """Results get sorted by single custom attribute field."""
 
-    data = {
-        "object_name": "Program",
-        "order_by": [{"name": "title"}],
-        "filters": {"expression": {}},
-    }
-    programs = self._get_first_result_set(data, "Program", "values")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              order_by=[{"name": "title"}]),
+        "Program", "values",
+    )
 
     keys = [program["title"] for program in programs]
     self.assertEqual(keys, sorted(keys))
 
-    data = {
-        "object_name": "Program",
-        "order_by": [{"name": "CA text"}],
-        "filters": {"expression": {}},
-    }
-    programs = self._get_first_result_set(data, "Program", "values")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              order_by=[{"name": "CA text"}]),
+        "Program", "values",
+    )
 
     keys = [program["CA text"] for program in programs]
     self.assertEqual(keys, sorted(keys))
@@ -677,22 +593,22 @@ class TestQueryWithCA(TestCase):
   def test_mixed_ca_sorting(self):
     """Test sorting by multiple fields with CAs."""
 
-    data = {
-        "object_name": "Program",
-        "order_by": [{"name": "CA text"}, {"name": "title"}],
-        "filters": {"expression": {}},
-    }
-    programs = self._get_first_result_set(data, "Program", "values")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              order_by=[{"name": "CA text"},
+                                        {"name": "title"}]),
+        "Program", "values",
+    )
 
     keys = [(program["CA text"], program["title"]) for program in programs]
     self.assertEqual(keys, sorted(keys))
 
-    data = {
-        "object_name": "Program",
-        "order_by": [{"name": "title"}, {"name": "CA text"}],
-        "filters": {"expression": {}},
-    }
-    programs = self._get_first_result_set(data, "Program", "values")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              order_by=[{"name": "title"},
+                                        {"name": "CA text"}]),
+        "Program", "values",
+    )
 
     keys = [(program["title"], program["CA text"]) for program in programs]
     self.assertEqual(keys, sorted(keys))
@@ -700,12 +616,12 @@ class TestQueryWithCA(TestCase):
   def test_multiple_ca_sorting(self):
     """Test sorting by multiple CA fields"""
 
-    data = {
-        "object_name": "Program",
-        "order_by": [{"name": "CA text"}, {"name": "CA dropdown"}],
-        "filters": {"expression": {}},
-    }
-    programs = self._get_first_result_set(data, "Program", "values")
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              order_by=[{"name": "CA text"},
+                                        {"name": "CA dropdown"}]),
+        "Program", "values",
+    )
 
     keys = [(prog["CA text"], prog["CA dropdown"]) for prog in programs]
     self.assertEqual(keys, sorted(keys))
