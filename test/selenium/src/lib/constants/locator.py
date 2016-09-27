@@ -113,7 +113,7 @@ class LhnMenu(object):
 
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
-  EXTENDED_INFO = (By.CSS_SELECTOR, '.extended-info.in')
+  EXTENDED_INFO = (By.CSS_SELECTOR, '.extended-info.in .info .fa')
 
   FILTER = (By.CSS_SELECTOR, '.lhs-search')
   FILTER_TEXT_BOX = (By.CSS_SELECTOR, '.lhs-search>.widgetsearch')
@@ -556,8 +556,9 @@ class ObjectWidget(object):
       By.CSS_SELECTOR, '.header .span4 [data-field="status"]')
   MEMBERS_TITLE_LIST = (
       By.CSS_SELECTOR,
-      '.object-area .tree-structure .select .span4:nth-child(1)')
+      '.object-area .tree-structure .select .span4:nth-child(1) .title')
   INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
+  LOADING = (By.CSS_SELECTOR, '.new-tree_loading')
 
 
 class ModalDeleteObject(object):
@@ -840,6 +841,8 @@ class BaseWidgetGeneric(object):
           By.CSS_SELECTOR,
           '#{}_widget .sticky-filter .tree-filter__button  #page-help'
             .format(cls._object_name))
+
+  FILTER_PANE_COUNTER = (By.CSS_SELECTOR, '.tree-pagination__count')
 
 
 class WidgetControls(BaseWidgetGeneric):

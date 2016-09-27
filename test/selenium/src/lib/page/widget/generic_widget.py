@@ -19,6 +19,7 @@ class Widget(base.Widget):
   _info_pane_cls = None
   _locator_widget = None
   _locator_filter = None
+  members_listed = None
 
   def __init__(self, driver):
     # wait for the elements to load
@@ -59,13 +60,52 @@ class Widget(base.Widget):
 
     if self.member_count:
       # wait until the elements are loaded
-      selenium_utils.get_when_clickable(
-          self._driver, locator.ObjectWidget.MEMBERS_TITLE_LIST)
+      selenium_utils.get_when_invisible(
+          self._driver,
+          locator.ObjectWidget.LOADING)
+      selenium_utils.get_when_visible(
+          self._driver,
+          locator.ObjectWidget.MEMBERS_TITLE_LIST)
 
       self.members_listed = self._driver.find_elements(
           *locator.ObjectWidget.MEMBERS_TITLE_LIST)
     else:
       self.members_listed = []
+
+  def wait_for_counter_loaded(self):
+    """Waits for elements' counter on the filter pane to be visible"""
+    return selenium_utils.get_when_visible(
+        self._driver,
+        locator.BaseWidgetGeneric.FILTER_PANE_COUNTER)
+
+  def verify_counter_not_loaded(self):
+    """
+    Checks that in case of empty table,
+    counter is not loaded on the filter pane
+    """
+    selenium_utils.get_when_invisible(
+        self._driver,
+        locator.BaseWidgetGeneric.FILTER_PANE_COUNTER)
+
+  def get_items_count(self):
+    """Gets elements' count from counter on the filter pane """
+    return self.wait_for_counter_loaded().text.split()[2]
+
+  def wait_member_deleted(self, count):
+    """
+    Waits until elements' counter on the filter pane
+    is refreshed with new value.
+        Args:
+            count (str)
+    """
+    if count != '1':
+      new_count = ' {} '.format(int(count) - 1)
+      selenium_utils.wait_for_element_text(
+          self._driver,
+          locator.BaseWidgetGeneric.FILTER_PANE_COUNTER,
+          new_count)
+    else:
+        self.verify_counter_not_loaded()
 
   def select_nth_member(self, member):
     """Selects member from the list. Members start from (including) 0.
