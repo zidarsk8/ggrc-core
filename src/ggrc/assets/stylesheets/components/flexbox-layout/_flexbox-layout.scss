@@ -39,8 +39,12 @@
     flex: 4 4;
   }
 
-   .flex-size-5 {
+  .flex-size-5 {
     flex: 5 5;
+  }
+
+  .flex-size-6 {
+    flex: 6 6;
   }
 
   .flex-size-limit {
@@ -52,13 +56,6 @@
   }
 }
 
-.flex-row {
-  flex-direction: row;
-}
-
-.flex-col {
-  flex-direction: column;
-}
 .flex-row {
   flex-direction: row;
 }

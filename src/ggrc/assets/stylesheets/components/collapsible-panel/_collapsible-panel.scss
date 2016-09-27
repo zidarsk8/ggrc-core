@@ -10,7 +10,7 @@ collapsible-panel {
   position: relative;
 
 
-  collapsible-panel-body {
+  .collapsible-panel-body {
     &.no-padding {
       margin: 0;
 
@@ -23,7 +23,7 @@ collapsible-panel {
   &.details-item {
     margin: 0;
 
-    collapsible-panel-body {
+    .collapsible-panel-body {
       > .body-inner {
         padding: 0;
         border-top: 1px solid #ccc;
@@ -106,7 +106,7 @@ collapsible-panel-header {
   }
 }
 
-collapsible-panel-body {
+.collapsible-panel-body {
   > .body-inner {
     padding: 4px 8px 4px 24px;
     position: relative;

@@ -60,7 +60,7 @@
     opacity: 0.5;
 
     // Should affect only direct children
-    > spinner {
+    > .spinner-wrapper {
       padding: 0;
       margin: 0;
       display: flex;
@@ -163,7 +163,7 @@
       min-height: 64px;
     }
 
-    > spinner {
+    > .spinner-wrapper {
       padding: 0;
 
       > .spinner {
