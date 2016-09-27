@@ -74,6 +74,8 @@ ATTRIBUTE_ORDER = (
     "test",
     "recipients",
     "send_by_default",
+    "request_url",
+    "request_evidence",
     "delete",
 )
 
