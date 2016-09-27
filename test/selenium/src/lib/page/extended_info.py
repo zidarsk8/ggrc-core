@@ -25,6 +25,10 @@ class ExtendedInfo(base.Component):
     self._set_is_mapped()
 
   def map_to_object(self):
+    """Map object to object"""
+    selenium_utils.get_when_visible(
+        self._driver,
+        self.locator_cls.BUTTON_MAP_TO)
     selenium_utils.click_on_staleable_element(
         self._driver,
         self.locator_cls.BUTTON_MAP_TO)

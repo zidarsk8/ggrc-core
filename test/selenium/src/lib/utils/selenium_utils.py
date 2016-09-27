@@ -87,6 +87,19 @@ def get_when_invisible(driver, locator):
       .until(EC.invisibility_of_element_located(locator))
 
 
+def wait_for_element_text(driver, locator, text):
+  """
+    Args:
+      driver (base.CustomDriver)
+      locator (tuple)
+      text (str)
+  """
+  return WebDriverWait(
+      driver,
+      constants.ux.MAX_USER_WAIT_SECONDS) \
+      .until(EC.text_to_be_present_in_element(locator, text))
+
+
 def scroll_to_page_bottom(driver):
   """Scrolls to te page bottom using JS
 
