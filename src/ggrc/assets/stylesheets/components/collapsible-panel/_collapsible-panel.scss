@@ -51,16 +51,6 @@ collapsible-panel-header {
   padding: 0;
   box-sizing: border-box;
 
-  collapse-panel-click-area {
-    cursor: pointer;
-    display: flex;
-    max-width: 70%;
-  }
-
-  &:after {
-    overflow: hidden;
-  }
-
   .title-text {
     text-align: left;
     padding: 0 8px 0 0;
@@ -70,6 +60,16 @@ collapsible-panel-header {
     font-weight: bold;
     font-size: 11px;
     display: inline-block;
+  }
+
+  collapse-panel-click-area {
+    cursor: pointer;
+    display: flex;
+    max-width: 70%;
+  }
+
+  &:after {
+    overflow: hidden;
   }
 
   .fa {
@@ -100,6 +100,18 @@ collapsible-panel-body {
   > .body-inner {
     padding: 4px 8px 4px 24px;
     position: relative;
+  }
+
+  .title-text {
+    text-align: left;
+    padding: 0 8px 0 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 11px;
+    margin: 0;
+    display: inline-block;
   }
 }
 

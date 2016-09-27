@@ -74,6 +74,8 @@ ATTRIBUTE_ORDER = (
     "test",
     "recipients",
     "send_by_default",
+    "document_url",
+    "document_evidence",
     "delete",
 )
 
@@ -334,7 +336,7 @@ class AttributeInfo(object):
     filtered_aliases = [(k, v) for k, v in aliases.items() if v is not None]
 
     # push the extra delete column at the end to override any custom behavior
-    if hasattr(object_class, "slug") or hasattr(object_class, "email"):
+    if hasattr(object_class, "slug"):
       filtered_aliases.append(("delete", {
           "display_name": "Delete",
           "description": "",

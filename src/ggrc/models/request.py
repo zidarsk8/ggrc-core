@@ -141,12 +141,12 @@ class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
           "filter_by": "_filter_by_related_verifiers",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
-      "request_url": {
+      "document_url": {
           "display_name": "Url",
           "filter_by": "_filter_by_url",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
       },
-      "request_evidence": {
+      "document_evidence": {
           "display_name": "Evidence",
           "filter_by": "_filter_by_evidence",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
