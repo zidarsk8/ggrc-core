@@ -25,9 +25,7 @@
             </div> <!-- span8 end -->
             <div class="span4">
               <div class="show-details">
-                {{#is_allowed "view_object_page" instance}}
-                  {{{get_view_link instance}}}
-                {{/is_allowed}}
+                <view-object-button instance="instance" />                
               </div>
             </div>
           </div> <!-- row-fluid end -->
