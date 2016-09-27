@@ -7,12 +7,12 @@
   box-sizing: border-box;
   list-style: none;
 
-  .flex-row {
-    flex-direction: row;
+  .flex-gutter-1 {
+    margin: 0 0 8px;
   }
 
-  .flex-col {
-    flex-direction: column;
+  .flex-gutter-2 {
+    margin: 0 0 16px;
   }
 
   .flex-size-1 {
@@ -30,4 +30,11 @@
   .flex-size-4 {
     flex: 4 4;
   }
+}
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
 }
