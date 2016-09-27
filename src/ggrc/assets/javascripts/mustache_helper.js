@@ -3403,37 +3403,43 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
 /*
   Used to get the string value for custom attributes
 */
-Mustache.registerHelper('get_custom_attr_value', function (attr, instance, options) {
-  var value = '';
-  var definition;
+  Mustache.registerHelper('get_custom_attr_value',
+    function (attr, instance, options) {
+      var value = '';
+      var definition;
 
-  attr = Mustache.resolve(attr);
-  instance = Mustache.resolve(instance);
+      attr = Mustache.resolve(attr);
+      instance = Mustache.resolve(instance);
 
-  can.each(GGRC.custom_attr_defs, function (item) {
-    if (item.definition_type === instance.class.table_singular &&
-        item.title === attr.attr_name) {
-      definition = item;
-    }
-  });
-
-  if (definition) {
-    can.each(instance.custom_attribute_values, function (item) {
-      item = item.reify();
-      if (item.custom_attribute_id === definition.id) {
-        if (definition.attribute_type.startsWith('Map:')) {
-          value = options.fn(options.contexts.add({
-            object: item.attribute_object.reify()
-          }));
-        } else {
-          value = item.attribute_value;
+      can.each(GGRC.custom_attr_defs, function (item) {
+        if (item.definition_type === instance.class.table_singular &&
+          item.title === attr.attr_name) {
+          definition = item;
         }
-      }
-    });
-  }
+      });
 
-  return value;
-});
+      if (definition) {
+        can.each(instance.custom_attribute_values, function (item) {
+          if (!(instance instanceof CMS.Models.Assessment)) {
+            // reify all models with the exception of the Assessment,
+            // because it has a different logic of work with the CA
+            item = item.reify();
+          }
+          if (item.custom_attribute_id === definition.id) {
+            if (definition.attribute_type.startsWith('Map:')) {
+              value = options.fn(options.contexts.add({
+                object: item.attribute_object ?
+                  item.attribute_object.reify() : null
+              }));
+            } else {
+              value = item.attribute_value;
+            }
+          }
+        });
+      }
+
+      return value;
+    });
 
 Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   var audits;
