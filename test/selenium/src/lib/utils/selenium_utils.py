@@ -144,21 +144,22 @@ def handle_alert(driver, accept=False):
 
 def click_on_staleable_element(driver, el_locator):
   """Clicks an element that can be modified between the time we find it
-  and when we click on it."""
+  and when we click on it"""
   time_start = time.time()
 
   while time.time() - time_start < constants.ux.MAX_USER_WAIT_SECONDS:
     try:
       driver.find_element(*el_locator).click()
       break
-    except exceptions.StaleElementReferenceException as e:
-      logger.error(e)
+    except exceptions.StaleElementReferenceException as err:
+      logger.error(err)
       time.sleep(0.1)
   else:
     raise exception.ElementNotFound(el_locator)
 
 
 def scroll_into_view(driver, element):
+  """Scrolls page to element using JS"""
   driver.execute_script("return arguments[0].scrollIntoView();", element)
 
   # compensate for the header
