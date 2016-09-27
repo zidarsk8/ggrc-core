@@ -9,6 +9,7 @@
   var tpl = can.view(GGRC.mustache_path +
     '/components/object-popover/object-popover.mustache');
   var tag = 'object-popover';
+  var defaultMaxInnerHeight = 400;
   /**
    * Assessment specific mapped objects popover view component
    */
@@ -16,9 +17,16 @@
     tag: tag,
     template: tpl,
     scope: {
+      expanded: false,
+      maxInnerHeight: defaultMaxInnerHeight,
       openStyle: '',
       item: null,
-      itemData: null,
+      itemData: function () {
+        return this.attr('item.data');
+      },
+      isActive: function () {
+        return this.attr('active');
+      },
       setPopoverStyle: function (el) {
         var pos = el[0].getBoundingClientRect();
         var top = Math.floor(el.position().top);
@@ -28,24 +36,27 @@
         var topStyle = 'top: ' + top + 'px;';
         var leftStyle = 'left: ' + left + 'px;';
         var widthStyle = 'width: ' + width + 'px;';
-        var opacityStyle = 'opacity: 1;';
-        return topStyle + leftStyle + ' max-height: 450px;' +
-          widthStyle + opacityStyle +
-          'transition: opacity 0.2s ease,' +
-          ' width 0.4s ease, max-height 0.3s ease;';
+        return topStyle + leftStyle + widthStyle;
       },
       setStyle: function (el) {
         var style = el ? this.setPopoverStyle(el) : '';
+        this.attr('active', style.length);
         this.attr('openStyle', style);
       }
     },
     events: {
-      '{scope.item} change': function (item) {
-        this.scope.setStyle(item.el);
-        this.scope.attr('itemData', item.data);
+      '{scope.item} el': function (scope, ev, el) {
+        this.scope.setStyle(el);
       },
-      '.object-popover-body click': function (el, event) {
+      '.object-popover-wrapper click': function (el, event) {
         event.stopPropagation();
+      },
+      '{scope} expanded': function (scope, ev, isExpanded) {
+        // Double max height property in case additional content is expanded and visible
+        var maxInnerHeight = isExpanded ?
+          defaultMaxInnerHeight * 2 :
+          defaultMaxInnerHeight;
+        this.scope.attr('maxInnerHeight', maxInnerHeight);
       }
     }
   });

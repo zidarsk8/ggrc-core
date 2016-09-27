@@ -18,20 +18,16 @@
     scope: {
       spinnerCss: '@',
       isLoading: false,
-      selectedItem: null,
+      selectedItem: {},
       items: [],
       select: function (ctx, el) {
-        this.attr('selectedItem', {
-          el: el,
-          data: ctx.instance
-        });
+        this.attr('selectedItem.el', el);
+        this.attr('selectedItem.data', ctx.instance);
         this.attr('selectedItem.index', el.attr('index'));
       },
       clearSelection: function () {
-        this.attr('selectedItem', {
-          el: null,
-          data: null
-        });
+        this.attr('selectedItem.el', null);
+        this.attr('selectedItem.data', null);
         this.attr('selectedItem.index', null);
       },
       onClickHandler: function (el, ev) {
