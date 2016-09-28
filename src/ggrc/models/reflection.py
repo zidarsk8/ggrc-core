@@ -292,7 +292,7 @@ class AttributeInfo(object):
         ca_type = cls.Type.OBJECT_CUSTOM
       else:
         ca_type = cls.Type.CUSTOM
-      attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title).lower()
+      attr_name = u"{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title).lower()
 
       definition_ids = definitions.get(attr_name, {}).get("definition_ids", [])
       definition_ids.append(attr.id)

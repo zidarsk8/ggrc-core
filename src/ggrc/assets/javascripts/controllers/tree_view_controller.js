@@ -1243,18 +1243,13 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   onCreatedRS: function (ev, instance) {
     var onCreated = this.onCreated.bind(this);
     var parentInstance = this.options.parent_instance;
-    var props = ['related_destinations', 'related_sources'];
     function callback() {
-      props.forEach(function (prop) {
-        parentInstance[prop].unbind('change', callback);
-      });
+      parentInstance.unbind('change', callback);
       onCreated();
     }
     if (instance instanceof CMS.Models.Relationship &&
       this._verifyRelationship(instance)) {
-      props.forEach(function (prop) {
-        parentInstance[prop].on('change', callback);
-      });
+      parentInstance.on('change', callback);
     }
   },
 

@@ -282,6 +282,11 @@ class QueryHelper(object):
         total = len(matches)
       object_query["total"] = total
 
+    if hasattr(flask.g, "similar_objects_query"):
+      # delete similar_objects_query for the case when several queries are
+      # POSTed in one request, the first one filters by similarity and the
+      # second one doesn't but tries to sort by __similarity__
+      delattr(flask.g, "similar_objects_query")
     return matches
 
   @staticmethod

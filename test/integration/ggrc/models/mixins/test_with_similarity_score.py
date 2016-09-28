@@ -6,6 +6,7 @@
 import json
 
 from ggrc.models import Assessment
+from ggrc.models import Request
 import integration.ggrc
 from integration.ggrc.models import factories
 
@@ -83,6 +84,51 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
     id_weight_map = {obj.id: int(obj.weight) for obj in similar_objects}
 
     self.assertDictEqual(id_weight_map, self.id_weight_map)
+
+  def test_similarity_for_request(self):
+    """Check special case for similarity for Request by Audit."""
+    request1 = factories.RequestFactory(audit_id=self.audit.id)
+    request2 = factories.RequestFactory(audit_id=self.audit.id)
+
+    self.make_relationships(request1, [self.control, self.regulation])
+
+    requests_by_request = Request.get_similar_objects_query(
+        id_=request1.id,
+        types=["Request"],
+        threshold=0,
+    ).all()
+
+    self.assertSetEqual(
+        {(obj.type, obj.id, obj.weight) for obj in requests_by_request},
+        {("Request", request2.id, 5)},
+    )
+
+    requests_by_assessment = Assessment.get_similar_objects_query(
+        id_=self.assessment.id,
+        types=["Request"],
+        threshold=0,
+    ).all()
+
+    self.assertSetEqual(
+        {(obj.type, obj.id, obj.weight) for obj in requests_by_assessment},
+        {("Request", request1.id, 18),
+         ("Request", request2.id, 5)},
+    )
+
+    assessments_by_request = Request.get_similar_objects_query(
+        id_=request1.id,
+        types=["Assessment"],
+        threshold=0,
+    ).all()
+
+    other_assessments = {
+        ("Assessment", assessment.id, self.id_weight_map[assessment.id])
+        for assessment in self.other_assessments
+    }
+    self.assertSetEqual(
+        {(obj.type, obj.id, obj.weight) for obj in assessments_by_request},
+        {("Assessment", self.assessment.id, 18)}.union(other_assessments),
+    )
 
   def test_get_similar_objects(self):
     """Check similar objects manually and via Query API."""
@@ -173,3 +219,44 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
         response.json[0]["Assessment"]["ids"],
         [],
     )
+
+  def test_invalid_sort_by_similarity(self):
+    """Check sorting by __similarity__ with query API when it is impossible."""
+
+    # no filter by similarity but order by similarity
+    query = [{
+        "object_name": "Assessment",
+        "order_by": [{"name": "__similarity__"}],
+        "filters": {"expression": {}},
+    }]
+
+    self.assert400(self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
+    ))
+
+    # filter by similarity in one query and order by similarity in another
+    query = [
+        {
+            "object_name": "Assessment",
+            "filters": {
+                "expression": {
+                    "op": {"name": "similar"},
+                    "object_name": "Assessment",
+                    "ids": [1],
+                },
+            },
+        },
+        {
+            "object_name": "Assessment",
+            "order_by": [{"name": "__similarity__"}],
+            "filters": {"expression": {}},
+        },
+    ]
+
+    self.assert400(self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
+    ))
