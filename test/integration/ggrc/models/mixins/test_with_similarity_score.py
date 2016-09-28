@@ -173,3 +173,44 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
         response.json[0]["Assessment"]["ids"],
         [],
     )
+
+  def test_invalid_sort_by_similarity(self):
+    """Check sorting by __similarity__ with query API when it is impossible."""
+
+    # no filter by similarity but order by similarity
+    query = [{
+        "object_name": "Assessment",
+        "order_by": [{"name": "__similarity__"}],
+        "filters": {"expression": {}},
+    }]
+
+    self.assert400(self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
+    ))
+
+    # filter by similarity in one query and order by similarity in another
+    query = [
+        {
+            "object_name": "Assessment",
+            "filters": {
+                "expression": {
+                    "op": {"name": "similar"},
+                    "object_name": "Assessment",
+                    "ids": [1],
+                },
+            },
+        },
+        {
+            "object_name": "Assessment",
+            "order_by": [{"name": "__similarity__"}],
+            "filters": {"expression": {}},
+        },
+    ]
+
+    self.assert400(self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
+    ))
