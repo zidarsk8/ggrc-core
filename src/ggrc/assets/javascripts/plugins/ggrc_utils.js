@@ -277,7 +277,9 @@
         'audit request': true,
         'program riskassessment': true,
         'assessmenttemplate cacheable': true,
-        'cacheable person': true
+        'cacheable person': true,
+        'person risk': true,
+        'person threat': true
       });
 
       if (target instanceof can.Model) {
