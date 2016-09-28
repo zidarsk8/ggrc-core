@@ -529,8 +529,10 @@ class QueryHelper(object):
           types=[object_class.__name__],
       )
       flask.g.similar_objects_query = similar_objects_query
-      similar_objects = similar_objects_query.all()
-      return object_class.id.in_([obj.id for obj in similar_objects])
+      similar_objects_ids = [obj.id for obj in similar_objects_query]
+      if similar_objects_ids:
+        return object_class.id.in_(similar_objects_ids)
+      return sa.sql.false()
 
     def unknown():
       raise BadQueryException("Unknown operator \"{}\""
