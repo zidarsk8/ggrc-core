@@ -149,3 +149,27 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
         json.loads(response.data)[0]["Assessment"]["ids"],
         expected_ids,
     )
+
+  def test_empty_similar_results(self):
+    """Check empty similarity result."""
+    query = [{
+        "object_name": "Assessment",
+        "type": "ids",
+        "filters": {
+            "expression": {
+                "op": {"name": "similar"},
+                "object_name": "Assessment",
+                "ids": ["-1"],
+            },
+        },
+    }]
+    response = self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
+    )
+
+    self.assertListEqual(
+        response.json[0]["Assessment"]["ids"],
+        [],
+    )
