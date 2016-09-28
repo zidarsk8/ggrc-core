@@ -26,19 +26,19 @@ function get_template_path(url) {
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
 
-$.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
-  var template_path = get_template_path(options.url),
-      template = template_path && GGRC.Templates[template_path];
+$.ajaxTransport('text', function (options, _originalOptions, _jqXHR) {
+  var template_path = get_template_path(options.url);
+  var template = template_path && GGRC.Templates[template_path];
   if (template) {
     return {
       send: function (headers, completeCallback) {
         function done() {
           if (template) {
-            completeCallback(200, "success", { text: template });
+            completeCallback(200, 'success', {text: template});
           }
         }
         if (options.async) {
-          //Use requestAnimationFrame where possible because we want
+          // Use requestAnimationFrame where possible because we want
           // these to run as quickly as possible but still release
           // the thread.
           (window.requestAnimationFrame || window.setTimeout)(done, 0);
@@ -56,7 +56,7 @@ $.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
 
 var quickHash = function (str, seed) {
   var bitval = seed || 1;
-  str = str || "";
+  str = str || '';
   for (var i = 0; i < str.length; i++)
   {
     bitval *= str.charCodeAt(i);

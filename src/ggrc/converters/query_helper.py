@@ -313,10 +313,13 @@ class QueryHelper(object):
         # offset from 0 as the offset of the initial row for sql is 0 (not 1).
         matches = query.limit(page_size).offset(first).all()
       with benchmark("Apply limit: _apply_limit > query_count"):
-        # Note: using func.count() as query.count() is generating additional
-        # subquery
-        count_q = query.statement.with_only_columns([sa.func.count()])
-        total = db.session.execute(count_q).scalar()
+        if len(matches) < page_size:
+          total = len(matches) + first
+        else:
+          # Note: using func.count() as query.count() is generating additional
+          # subquery
+          count_q = query.statement.with_only_columns([sa.func.count()])
+          total = db.session.execute(count_q).scalar()
 
     return matches, total
 
@@ -526,8 +529,10 @@ class QueryHelper(object):
           types=[object_class.__name__],
       )
       flask.g.similar_objects_query = similar_objects_query
-      similar_objects = similar_objects_query.all()
-      return object_class.id.in_([obj.id for obj in similar_objects])
+      similar_objects_ids = [obj.id for obj in similar_objects_query]
+      if similar_objects_ids:
+        return object_class.id.in_(similar_objects_ids)
+      return sa.sql.false()
 
     def unknown():
       raise BadQueryException("Unknown operator \"{}\""

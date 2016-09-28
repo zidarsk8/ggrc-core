@@ -24,7 +24,7 @@
       mapping: '@',
       mappingType: '@',
       expanded: true,
-      selectedItem: null,
+      selectedItem: {},
       instance: null
     }
   });

@@ -16,10 +16,16 @@ describe('GGRC.Components.mappedControlsPopover', function () {
 
   describe('creates params for request', function () {
     beforeEach(function () {
-      scope.attr('itemData', {id: 1050});
+      scope.attr('item', {});
+      scope.attr('item.data', {
+        id: 1050,
+        type: 'Control'
+      });
     });
     it('when itemData.id is 1050', function () {
-      var params = scope.getParams();
+      var id = scope.attr('item.data.id');
+      var type = scope.attr('item.data.type');
+      var params = scope.getParams(id, type);
       var resultParams = [{
         object_name: 'Objective',
         filters: {
@@ -65,21 +71,6 @@ describe('GGRC.Components.mappedControlsPopover', function () {
           .toEqual(resultParams[index].filters.expression.ids);
         expect(item.fields).toEqual(resultParams[index].fields);
       });
-    });
-  });
-
-  describe('toggles items', function () {
-    beforeEach(function () {
-      scope.attr('item', {
-        data: {
-          id: 1050
-        }
-      });
-    });
-    it('when index is missing', function () {
-      scope.toggleItems();
-      expect(scope.attr('objectives').length).toEqual(0);
-      expect(scope.attr('regulations').length).toEqual(0);
     });
   });
 });

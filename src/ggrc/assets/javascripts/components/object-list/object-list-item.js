@@ -18,8 +18,7 @@
     template: tpl,
     scope: {
       index: '@',
-      itemData: null,
-      selectedItem: null,
+      selectedItem: {},
       isSelected: function () {
         return this.attr('selectedItem.index') === this.attr('index');
       }

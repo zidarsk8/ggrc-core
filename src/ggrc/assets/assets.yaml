@@ -135,7 +135,6 @@ dashboard-js-files:
   - components/assessment/mapped-objects/mapped-controls.js
   - components/assessment/mapped-objects/mapped-controls-popover.js
   - components/assessment/mapped-objects/mapped-related-information.js
-  - components/assessment/mapped-objects/mapped-related-information-popover.js
   - components/assessment/urls-list.js
   - components/assessment/attachments-list.js
   - components/assessment/custom-attributes.js
@@ -215,7 +214,6 @@ dashboard-js-template-files:
   - components/assessment/mapped-objects/mapped-controls-popover.mustache
   - components/assessment/mapped-objects/mapped-related-information.mustache
   - components/assessment/mapped-objects/mapped-related-information-item.mustache
-  - components/assessment/mapped-objects/mapped-related-information-popover.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/attachments-list.mustache
   - components/assessment/custom-attributes.mustache
