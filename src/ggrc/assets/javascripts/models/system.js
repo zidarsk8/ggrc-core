@@ -107,7 +107,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
   create: 'POST /api/systems',
   update: 'PUT /api/systems/{id}',
   destroy: 'DELETE /api/systems/{id}',
-
+  mixins: ['ca_update'],
   cache: can.getObject('cache', CMS.Models.SystemOrProcess, true),
   is_custom_attributable: true,
   attributes: {},
@@ -161,6 +161,7 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
     url: '',
     status: 'Draft'
   },
+  mixins: ['ca_update'],
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
     'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {
