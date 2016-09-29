@@ -24,13 +24,18 @@ read-more {
 
   .read-more__controls {
     padding: 0 8px;
-    height: 18px;
+    height: 22px;
+    line-height: 22px;
     margin: 0;
     text-align: right;
     position: relative;
   }
 
   .read-more__btn {
+    padding: 2px 0;
+    box-sizing: border-box;
+    text-align: right;
+    min-width: 78px;
     cursor: pointer;
     line-height: 18px;
     display: inline-block;

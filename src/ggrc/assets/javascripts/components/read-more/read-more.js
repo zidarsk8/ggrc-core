@@ -20,7 +20,7 @@
     tag: tag,
     template: tpl,
     scope: {
-      maxTextLength: null,
+      maxTextLength: '@',
       text: null,
       expanded: false,
       resultedText: null,
@@ -28,7 +28,8 @@
       btnText: function () {
         return this.attr('expanded') ? readLess : readMore;
       },
-      toggle: function () {
+      toggle: function (scope, el, ev) {
+        ev.stopPropagation();
         this.attr('expanded', !this.attr('expanded'));
       },
       /**
@@ -43,7 +44,7 @@
         return text.slice(0, limit) + overflowPostfix;
       },
       setValues: function (originalText) {
-        var limit = this.attr('maxTextLength') || defaultTextLength;
+        var limit = Number(this.attr('maxTextLength')) || defaultTextLength;
         var trimmedText = GGRC.Utils.getPlainText(originalText);
         var isOverflowing = trimmedText.length >= limit;
         this.attr('maxTextLength', limit);
