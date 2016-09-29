@@ -54,5 +54,5 @@ def render(filename, template, basedir=None, **data):
   if basedir is not None:
     filename = os.path.join(basedir, filename)
   with open(filename, 'w') as output:
-    body = template.render_unicode(h=helpers, **data).encode('utf-8')
-    output.write(body)
+    body = template.render_unicode(h=helpers, d=descriptors, **data)
+    output.write(body.encode('utf-8'))

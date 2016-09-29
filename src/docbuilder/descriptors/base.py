@@ -13,6 +13,9 @@ class DesciptorMeta(type):
     cls.__cache__ = None
     cls.__built__ = False
 
+  def __contains__(cls, obj):
+    return id(obj) in cls.__registry__
+
 
 class Descriptor(object):
 

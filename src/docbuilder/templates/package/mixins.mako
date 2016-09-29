@@ -5,9 +5,11 @@ Mixins
 ======
 
 % for mixin in package.mixins:
+  % if mixin.obj not in d.Model:
 ..  class:: ${mixin.name}
 
     ${h.doc(mixin, 4)}
 
 
+  % endif
 % endfor
