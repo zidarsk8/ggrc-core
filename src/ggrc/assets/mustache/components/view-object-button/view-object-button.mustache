@@ -1,0 +1,12 @@
+{{!
+    Copyright (C) 2016 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if instance.viewLink}}
+    {{#is_allowed "view_object_page" instance}}
+        <a href="{{instance.viewLink}}" target="_blank" class="btn btn-mini btn-outline">
+            Open
+        </a>          
+    {{/is_allowed}}
+{{/if}}

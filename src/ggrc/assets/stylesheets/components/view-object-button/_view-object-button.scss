@@ -1,0 +1,18 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.btn-outline {
+    background: none;
+    font-weight: normal;
+    border: 1px solid rgba(0,0,0,0.3);
+    color: $blue;
+
+    &:hover,
+    &:focus,
+    &:active {
+        color: $black;
+        border-color: $black;
+    }
+}
