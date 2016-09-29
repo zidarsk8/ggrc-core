@@ -1,9 +1,11 @@
 /*!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 (function (can) {
+  'use strict';
+
   can.Model.Cacheable('CMS.Models.TaskGroup', {
     root_object: 'task_group',
     root_collection: 'task_groups',
@@ -117,7 +119,7 @@
         // Handle cases of a workflow with start and end dates
         if (workflow.frequency === 'one_time') {
           datesAreValid = that.start_date && that.end_date &&
-              that.start_date <= that.end_date;
+            that.start_date <= that.end_date;
         }
 
         if (!datesAreValid) {
@@ -154,6 +156,9 @@
       if (this._super) {
         this._super.apply(this, arguments);
       }
+      // Add base value to this property
+      this.attr('response_options', []);
+
       this.bind('task_group', function (ev, newTask) {
         var task;
         var taskGroup;
@@ -203,10 +208,18 @@
     },
 
     response_options_csv: can.compute(function (val) {
-      if (val != null) {
-        this.attr('response_options', $.map(val.split(','), $.proxy(''.trim.call, ''.trim)));
+      var isSet = val && val.length;
+      var responseOptions = this.attr('response_options');
+      var options = isSet ?
+        val.split(',') :
+        responseOptions;
+
+      if (isSet) {
+        this.attr('response_options', options.map(function (item) {
+          return item.trim();
+        }));
       } else {
-        return (this.attr('response_options') || []).join(', ');
+        return options.join(', ');
       }
     })
   });
