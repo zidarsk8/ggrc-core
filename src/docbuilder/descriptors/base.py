@@ -1,7 +1,7 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from textwrap import dedent
+from inspect import getdoc
 
 from cached_property import cached_property
 
@@ -67,13 +67,4 @@ class Descriptor(object):
 
   @cached_property
   def doc(self):
-    result = self.obj.__doc__
-    if result is None:
-      return None
-    result = result.strip()
-    if '\n' not in result:
-      return result
-    title, body = result.split('\n', 1)
-    title = title.strip()
-    body = dedent(body).strip()
-    return title + '\n\n' + body
+    return getdoc(self.obj)
