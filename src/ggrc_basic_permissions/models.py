@@ -15,13 +15,17 @@ class Role(Base, Described, db.Model):
   """A user role. All roles have a unique name. This name could be a simple
   string, an email address, or some other form of string identifier.
 
-  :permissions:
-    example -
-      { 'create': ['Program', 'Control'],
+  Example:
+
+  ..  code-block:: python
+
+      {
+        'create': ['Program', 'Control'],
         'read': ['Program', 'Control'],
         'update': ['Program', 'Control'],
-        'delete': ['Program']
+        'delete': ['Program'],
       }
+
   """
   __tablename__ = 'roles'
 

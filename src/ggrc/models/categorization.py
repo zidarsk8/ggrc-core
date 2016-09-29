@@ -50,12 +50,15 @@ class Categorizable(object):
   """Subclasses **MUST** provide a declared_attr method that defines the
   relationship and association_proxy. For example:
 
-  ..
+  ..  code-block:: python
 
-     @declared_attr
-     def control_categorizations(cls):
-       return cls.categorizations(
-           'control_categorizations', 'control_categories', 100)
+      @declared_attr
+      def control_categorizations(cls):
+        return cls.categorizations(
+            'control_categorizations',
+            'control_categories',
+            100,
+        )
   """
 
   @classmethod
