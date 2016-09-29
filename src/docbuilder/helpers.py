@@ -16,6 +16,10 @@ def doc(descriptor, indent=0):
     """ % descriptor.name).strip()
   else:
     result = descriptor.doc
+  return textblock(result, indent)
+
+
+def textblock(text, indent=0):
   if indent:
-    result = ('\n' + ' ' * indent).join(result.splitlines())
-  return result
+    return ('\n' + ' ' * indent).join(text.splitlines())
+  return text

@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from cached_property import cached_property
+from sqlalchemy.dialects import mysql
+from sqlalchemy.schema import CreateTable
 
 from docbuilder.descriptors.base import Descriptor
 
@@ -20,6 +22,11 @@ class Model(Descriptor):
         Mixin(class_) for class_ in self.obj.mro()[1:]
         if class_.__module__.startswith('ggrc')
     ]
+
+  @cached_property
+  def create_table(self):
+    query = CreateTable(self.obj.__table__).compile(dialect=mysql.dialect())
+    return str(query).strip()
 
 
 class Mixin(Descriptor):

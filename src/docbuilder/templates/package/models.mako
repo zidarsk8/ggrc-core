@@ -9,6 +9,12 @@ Models
 
     ${h.doc(model, 4)}
 
+    Schema:
+
+    ..  code-block:: sql
+
+        ${h.textblock(model.create_table, 8)}
+
     Mixins:
 
     % for mixin in model.mixins:
