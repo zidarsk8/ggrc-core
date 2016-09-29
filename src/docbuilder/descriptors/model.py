@@ -16,7 +16,10 @@ class Model(Descriptor):
 
   @cached_property
   def mixins(self):
-    return [Mixin(class_) for class_ in _mixins(self.obj)]
+    return [
+        Mixin(class_) for class_ in self.obj.mro()[1:]
+        if class_.__module__.startswith('ggrc')
+    ]
 
 
 class Mixin(Descriptor):
@@ -25,11 +28,5 @@ class Mixin(Descriptor):
   def collect(cls):
     result = set()
     for model in Model.all():
-      result.update(_mixins(model.obj))
+      result.update(m.obj for m in model.mixins)
     return result
-
-
-def _mixins(model_class):
-  for class_ in model_class.mro()[1:]:
-    if class_.__module__.startswith('ggrc'):
-      yield class_
