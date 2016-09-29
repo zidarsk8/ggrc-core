@@ -5,8 +5,9 @@
 
 <custom-attributes instance="instance">
     {{#if instance.custom_attribute_definitions.length}}
+      {{#iterate_by_two items}}
       <div class="row-fluid wrap-row">
-      {{#items}}
+      {{#list}}
         <div class="span6">
           <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
             <inline-edit
@@ -30,7 +31,8 @@
             ></inline-edit>
           </div>
         </div>
-      {{/items}}
+      {{/list}}
       </div>
+      {{/iterate_by_two}}
     {{/if}}
 </custom-attributes>

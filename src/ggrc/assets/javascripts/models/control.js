@@ -14,7 +14,7 @@
     create: 'POST /api/controls',
     update: 'PUT /api/controls/{id}',
     destroy: 'DELETE /api/controls/{id}',
-    mixins: ['ownable', 'contactable', 'unique_title'],
+    mixins: ['ownable', 'contactable', 'unique_title', 'ca_update'],
     is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',

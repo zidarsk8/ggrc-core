@@ -142,6 +142,15 @@
     }
   });
 
+  can.Model.Mixin('ca_update', {}, {
+    after_save: function () {
+      this.attr('isReadyForRender', true);
+    },
+    info_pane_preload: function () {
+      this.refresh();
+    }
+  });
+
   can.Model.Mixin('unique_title', {
     'after:init': function () {
       this.validate(['title', '_transient.title'], function (newVal, prop) {

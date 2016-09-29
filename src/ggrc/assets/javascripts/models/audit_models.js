@@ -56,7 +56,7 @@
     update: 'PUT /api/audits/{id}',
     destroy: 'DELETE /api/audits/{id}',
     create: 'POST /api/audits',
-    mixins: ['contactable', 'unique_title'],
+    mixins: ['contactable', 'unique_title', 'ca_update'],
     is_custom_attributable: true,
     is_clonable: true,
     attributes: {
@@ -389,7 +389,7 @@
     create: 'POST /api/requests',
     update: 'PUT /api/requests/{id}',
     destroy: 'DELETE /api/requests/{id}',
-    mixins: ['unique_title', 'relatable'],
+    mixins: ['unique_title', 'relatable', 'ca_update'],
     relatable_options: {
       relevantTypes: {
         Audit: {
