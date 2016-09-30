@@ -22,31 +22,40 @@
       selectedItem: {},
       mappedItems: [],
       filter: null,
-      setMappedObjects: function (items) {
+      filterMappedObjects: function (items) {
         var filterObj = this.attr('filter');
-        this.attr('isLoading', false);
-        items = filterObj ?
+        return filterObj ?
           GGRC.Utils.filters.applyTypeFilter(items, filterObj.serialize()) :
           items;
-        this.attr('mappedItems').replace(items);
       },
       load: function () {
+        var dfd = new can.Deferred();
         this.attr('isLoading', true);
         this.attr('parentInstance')
           .get_binding(this.attr('mapping'))
           .refresh_instances()
-          .then(this.setMappedObjects.bind(this));
+          .done(function (items) {
+            items = this.filterMappedObjects(items);
+            dfd.resolve(items);
+          }.bind(this))
+          .always(function () {
+            this.attr('isLoading', false);
+          }.bind(this));
+        return dfd;
+      },
+      setMappedObjects: function () {
+        this.attr('mappedItems').replace(this.load());
       }
     },
     init: function () {
-      this.scope.load();
+      this.scope.setMappedObjects();
     },
     events: {
       '{scope.parentInstance.related_destinations} length': function () {
-        this.scope.load();
+        this.scope.setMappedObjects();
       },
       '{scope.parentInstance.related_sources} length': function () {
-        this.scope.load();
+        this.scope.setMappedObjects();
       }
     }
   });

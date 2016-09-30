@@ -24,6 +24,9 @@ describe('GGRC.Component.ReadMore', function () {
     var Component;  // the component under test
     var toggle;
     var scope;
+    var eventMock = {
+      stopPropagation: function () {}
+    };
 
     beforeEach(function () {
       Component = GGRC.Components.get('readMore');
@@ -35,7 +38,7 @@ describe('GGRC.Component.ReadMore', function () {
     it('switch default state', function () {
       scope.attr('expanded', true);
 
-      toggle();
+      toggle(null, null, eventMock);
 
       expect(scope.attr('expanded')).toBe(defaultScopeState.expanded);
     });

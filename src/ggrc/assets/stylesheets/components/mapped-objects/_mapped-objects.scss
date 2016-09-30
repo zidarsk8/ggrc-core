@@ -48,15 +48,11 @@ assessment-mapped-controls, assessment-mapped-related-information {
     font-weight: bold;
   }
 
-  .description {
-    width: 100%;
-    padding: 0 16px 0 28px;
-    word-break: normal;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
+    .description {
+      width: 100%;
+      padding: 0 8px 0 28px;
+      box-sizing: border-box;
+    }
 
   .fa {
     font-size: 14px;
@@ -68,5 +64,4 @@ assessment-mapped-controls, assessment-mapped-related-information {
     box-sizing: border-box;
   }
 }
-
 

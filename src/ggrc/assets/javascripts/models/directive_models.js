@@ -98,6 +98,7 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , attributes : {}
   , meta_kinds : [ "Standard" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
+  mixins: ['ca_update'],
   defaults: {
     status: 'Draft',
     kind: 'Standard'
@@ -128,6 +129,7 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , attributes : {}
   , meta_kinds : [ "Regulation" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
+  mixins: ['ca_update'],
   defaults: {
     status: 'Draft',
     kind: 'Regulation'
@@ -159,6 +161,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , attributes : {}
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
+  mixins: ['ca_update'],
   defaults: {
     status: 'Draft',
     kind: null
@@ -198,6 +201,7 @@ CMS.Models.Directive("CMS.Models.Contract", {
   }
   , meta_kinds : [ "Contract" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
+  mixins: ['ca_update'],
   defaults: {
     status: 'Draft',
     kind: 'Contract'

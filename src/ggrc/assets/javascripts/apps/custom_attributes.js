@@ -12,8 +12,14 @@
     scope: {
       instance: null,
       items: [],
-      setItems: function () {
-        this.attr('items', this.getValues());
+      setItems: function (isReady) {
+        var values = [];
+        if (isReady) {
+          values = this.getValues().sort(function (a, b) {
+            return a.cad.id - b.cad.id;
+          });
+          this.attr('items', values);
+        }
       },
       getValues: function () {
         var result = [];
@@ -42,7 +48,12 @@
       if (this.scope.instance.class.is_custom_attributable) {
         this.scope.instance.setup_custom_attributes();
       }
-      this.scope.setItems();
+      this.scope.setItems(true);
+    },
+    events: {
+      '{scope.instance} isReadyForRender': function (sc, ev, isReady) {
+        this.scope.setItems(isReady);
+      }
     }
   });
 })(window.can, window.GGRC);

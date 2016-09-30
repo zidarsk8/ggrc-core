@@ -43,6 +43,7 @@
       email: 'trimmedLower',
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
+    mixins: ['ca_update'],
     defaults: {
       name: '',
       email: '',

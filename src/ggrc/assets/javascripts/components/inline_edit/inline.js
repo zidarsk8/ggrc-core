@@ -83,39 +83,39 @@
 
         this.attr('_value', value);
         this.attr('isSaving', true);
-        instance.refresh().then(function () {
-          if (this.attr('caId')) {
-            if (type === 'checkbox') {
-              value = value ? 1 : 0;
-            }
-            if (type === 'person') {
-              value = value ? ('Person:' + value.id) : value;
-            }
-            if (type === 'dropdown') {
-              if (value && value === '') {
-                value = undefined;
-              }
-            }
-            instance.attr('custom_attributes.' + caid, value);
-          } else {
-            instance.attr(property, value);
+
+        if (this.attr('caId')) {
+          if (type === 'checkbox') {
+            value = value ? 1 : 0;
           }
-          instance.save()
-            .done(function () {
-              $(document.body).trigger('ajax:flash', {
-                success: 'Saved'
-              });
-            })
-            .fail(function () {
-              this.attr('context.value', this.attr('_value'));
-              $(document.body).trigger('ajax:flash', {
-                error: 'There was a problem saving'
-              });
-            }.bind(this))
-            .always(function () {
-              this.attr('isSaving', false);
-            }.bind(this));
-        }.bind(this));
+          if (type === 'person') {
+            value = value ? ('Person:' + value.id) : value;
+          }
+          if (type === 'dropdown') {
+            if (value && value === '') {
+              value = undefined;
+            }
+          }
+          instance.attr('custom_attributes.' + caid, value);
+        } else {
+          instance.attr(property, value);
+        }
+        instance.attr('isReadyForRender', false);
+        instance.save()
+          .done(function () {
+            $(document.body).trigger('ajax:flash', {
+              success: 'Saved'
+            });
+          })
+          .fail(function () {
+            this.attr('context.value', this.attr('_value'));
+            $(document.body).trigger('ajax:flash', {
+              error: 'There was a problem saving'
+            });
+          }.bind(this))
+          .always(function () {
+            this.attr('isSaving', false);
+          }.bind(this));
       }
     },
     init: function (element, options) {

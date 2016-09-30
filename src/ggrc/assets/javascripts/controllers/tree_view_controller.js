@@ -1255,9 +1255,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
   onCreatedModel: function (ev, instance) {
     if (instance instanceof CMS.Models[this.options.model.shortName]) {
-      // Workaround for case when we can create new instance and
-      // because we don't need listen the creation of Relationship
-      CMS.Models.Relationship.unbind('created', this.onCreatedRS);
       this.onCreated();
     }
   },

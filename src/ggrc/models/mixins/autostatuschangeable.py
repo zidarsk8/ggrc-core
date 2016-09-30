@@ -188,7 +188,42 @@ class AutoStatusChangeable(object):
     if adjust_state:
       cls.adjust_status(model, obj)
 
-  @classmethod
+  @staticmethod
+  def _has_custom_attr_changes(obj):
+    """Check if an object had any of its custom attribute values changed.
+
+    Initially setting a custom attribue's value to a falsy value, i.e. when
+    there was no old value deleted, is *not* considered a change.
+
+    If given None or if the object does not have any custom attributes, False
+    is returned.
+
+    Args:
+      obj: (db.Model instance) An object to check
+
+    Returns:
+      True or False depending whether any of the obejct's custom attribute
+      values have been modified.
+    """
+    if not getattr(obj, "custom_attribute_values", None):
+      return False  # also exits if obj itself is None
+
+    histories = (
+        inspect(value).attrs.get("attribute_value").history
+        for value in obj.custom_attribute_values
+    )
+
+    for attr_history in histories:
+      added, _, deleted = attr_history
+      if attr_history.has_changes() and (any(added) or deleted):
+        has_ca_changes = True
+        break
+    else:
+      has_ca_changes = False
+
+    return has_ca_changes
+
+  @classmethod  # noqa: C901  # ignore flake8 method too complex warning
   def set_handlers(cls, model):
     """Sets up handlers of various events
 
@@ -206,10 +241,27 @@ class AutoStatusChangeable(object):
       Args:
         obj: (db.Model instance) Object on which we will perform manipulation.
       """
-
       # pylint: disable=unused-argument,unused-variable,protected-access
-      if (any(cls._has_changes(obj, attr) for attr in model._tracked_attrs) and
-         model.FIRST_CLASS_EDIT):
+
+      # this needs to be imported here (and not on the top of the file) due to
+      # a circular dependency between Assessment and AutoStatusChangeable
+      from ggrc.models.assessment import Assessment
+
+      has_attr_changes = any(
+          cls._has_changes(obj, attr)
+          for attr in model._tracked_attrs
+      )
+
+      # At the time of writing (2016-09-29) only Assessment objects use a new
+      # Custom Attribute API, thus detecting CA changes for other object types
+      # does not work correctly. For the latter, we simply assume there were no
+      # CA changes, effectively disabling that check.
+      if sender is Assessment:
+        has_ca_changes = cls._has_custom_attr_changes(obj)
+      else:
+        has_ca_changes = False
+
+      if (has_attr_changes or has_ca_changes) and model.FIRST_CLASS_EDIT:
         cls.handle_first_class_edit(model, obj)
 
     @signals.Signals.custom_attribute_changed.connect_via(model)

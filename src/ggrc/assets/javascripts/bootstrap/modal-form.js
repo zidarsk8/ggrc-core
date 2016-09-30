@@ -159,8 +159,6 @@
     },
 
     hide: function (e) {
-      var control = this.control;
-      var options = control && control.options;
       var instance = this.instance;
       var pending;
       var hasPending;
@@ -184,11 +182,8 @@
             modal_title: 'Discard Changes',
             modal_description: 'Are you sure that you want to discard your changes?',
             modal_confirm: 'Discard',
-            instance: instance,
-            model: options.model,
             skip_refresh: true
           }, function () {
-            instance.restore(true);
             can.trigger(instance, 'modal:dismiss');
             this.$element
               .find("[data-dismiss='modal'], [data-dismiss='modal-reset']")
