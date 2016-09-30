@@ -51,10 +51,7 @@
       this.scope.setMappedObjects();
     },
     events: {
-      '{scope.parentInstance.related_destinations} length': function () {
-        this.scope.setMappedObjects();
-      },
-      '{scope.parentInstance.related_sources} length': function () {
+      '{scope.parentInstance} change': function () {
         this.scope.setMappedObjects();
       }
     }
