@@ -174,7 +174,8 @@ class TestCustomAttributeImportExport(TestCase):
                                 headers=self.headers)
 
     self.assert200(response)
-    self.assertEqual(len(response.data.splitlines()), 21)
+    self.assertEqual(len(response.data.splitlines()), 28)
+    self.assertIn("Accepted values are", response.data)
 
   def tests_ca_export_filters(self):
     """Test filtering on custom attribute values."""
