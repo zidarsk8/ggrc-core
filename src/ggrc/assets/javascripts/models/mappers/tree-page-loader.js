@@ -40,7 +40,7 @@
     },
     makeResult: function (instance, binding) {
       return CMS.Models.Relationship
-        .getRelationshipBetweenInstances(binding.instance, instance)
+        .getRelationshipBetweenInstances(binding.instance, instance, true)
         .then(function (relationships) {
           return new GGRC.ListLoaders.MappingResult(
             instance, can.map(relationships, function (relationship) {
