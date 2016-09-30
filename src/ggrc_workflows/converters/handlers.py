@@ -86,10 +86,23 @@ class TaskDateColumnHandler(handlers.ColumnHandler):
       3: "Mar/Jun/Sep/Dec",
   }
 
+  def add_error(self, template, **kwargs):
+    """Add row error.
+
+    This function adds a row error for the current task group task and removes
+    it from any task groups that it might belong to.
+    """
+    if self.row_converter.obj.task_group:
+      self.row_converter.obj.task_group = None
+    super(TaskDateColumnHandler, self).add_error(template, **kwargs)
+
   def parse_item(self):
     """ parse start and end columns fow workflow tasks
     """
     if not self.raw_value.strip():
+      if self.row_converter.is_new:
+        self.add_error(errors.MISSING_VALUE_ERROR,
+                       column_name=self.display_name)
       return None
     raw_parts = self.raw_value.lower().split(" ")
     try:
@@ -103,7 +116,7 @@ class TaskDateColumnHandler(handlers.ColumnHandler):
     except ValueError:
       self.add_error(errors.WRONG_VALUE_ERROR,
                      column_name=self.display_name)
-      return
+      return None
 
   def get_value(self):
     freq = self.row_converter.obj.task_group.workflow.frequency
@@ -127,7 +140,7 @@ class TaskDateColumnHandler(handlers.ColumnHandler):
       return ""
 
   def set_obj_attr(self):
-    if not self.value:
+    if not self.value or self.row_converter.ignore:
       return
     freq = self.row_converter.obj.task_group.workflow.frequency
     handler_map = {
@@ -340,7 +353,7 @@ class TaskDescriptionColumnHandler(handlers.TextareaColumnHandler):
 
   def set_obj_attr(self):
     """ Set task attribute based on task type """
-    if not self.value:
+    if not self.value or self.row_converter.ignore:
       return
     if self.row_converter.obj.task_type == "text":
       self.row_converter.obj.description = self.value
