@@ -107,7 +107,7 @@ class TestMixinAutoStatusChangeable(integration.ggrc.TestCase):
     self.assertEqual(assessment.title.endswith("modified, change #2"),
                      True)
     self.assertEqual(assessment.status,
-                     models.Assessment.DONE_STATE)
+                     models.Assessment.PROGRESS_STATE)
 
     assessment = self.change_status(assessment,
                                     assessment.VERIFIED_STATE,
