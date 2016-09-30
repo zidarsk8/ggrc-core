@@ -8,11 +8,13 @@ Welcome to GGRC's documentation!
 
 Contents:
 
-.. toctree::
-   :maxdepth: 2
+..  toctree::
+    :maxdepth: 2
 
-   api/index
-
+    guidelines/index
+    development/index
+    support/index
+    api/index
 
 
 Indices and tables
