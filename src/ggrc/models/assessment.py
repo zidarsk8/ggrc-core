@@ -22,7 +22,7 @@ from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
 from ggrc.models.mixins.validate_on_complete import ValidateOnComplete
 from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.deferred import deferred
-from ggrc.models.object_document import Documentable
+from ggrc.models.object_document import EvidenceURL
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
@@ -66,7 +66,7 @@ class AuditRelationship(object):
 
 class Assessment(statusable.Statusable, AuditRelationship,
                  AutoStatusChangeable, Assignable, HasObjectState, TestPlanned,
-                 CustomAttributable, Documentable, Commentable, Personable,
+                 CustomAttributable, EvidenceURL, Commentable, Personable,
                  reminderable.Reminderable, Timeboxed, Relatable,
                  WithSimilarityScore, FinishedDate, VerifiedDate,
                  ValidateOnComplete, BusinessObject, db.Model):
@@ -167,16 +167,6 @@ class Assessment(statusable.Statusable, AuditRelationship,
           "display_name": "Verifier",
           "filter_by": "_filter_by_related_verifiers",
           "type": reflection.AttributeInfo.Type.MAPPING,
-      },
-      "document_url": {
-          "display_name": "Url",
-          "filter_by": "_ignore_filter",
-          "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
-      },
-      "document_evidence": {
-          "display_name": "Evidence",
-          "filter_by": "_ignore_filter",
-          "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
       },
   }
 
