@@ -118,6 +118,7 @@ class Documentable(object):
     return cls.eager_inclusions(query, Documentable._include_links).options(
         orm.subqueryload('object_documents'))
 
+
 class EvidenceURL(Documentable):
   """Documentable mixin for evidence and URL documents."""
 
@@ -126,11 +127,15 @@ class EvidenceURL(Documentable):
           "display_name": "Url",
           "filter_by": "_filter_by_url",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
+          "description": "New line separated list of URLs.",
       },
       "document_evidence": {
           "display_name": "Evidence",
           "filter_by": "_filter_by_evidence",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
+          "description": ("New line separated list of evidence links and "
+                          "titles.\nExample:\n\nhttp://my.gdrive.link/file "
+                          "Title of the evidence link"),
       },
   }
 
