@@ -460,8 +460,24 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
   def _display_name(self):
     return getattr(self, "title", None) or getattr(self, "name", "")
 
-  def copy_into(self, _other, columns, **kwargs):
-    target = _other or type(self)()
+  def copy_into(self, target_object, columns, **kwargs):
+    """Copy current object values into a target object.
+
+    Copy all values listed in columns from current class to target class and
+    use kwargs as defaults with precedence. Note that this is a shallow copy
+    and any mutable values will be shared between current and target objects.
+
+    Args:
+      target_object: object to which we want to copy current values. This
+        function will mutate the target_object parameter if it is set.
+      columns: list with all attribute names that we want to set in the
+        target_object.
+      kwargs: additional default values.
+
+    Returns:
+      target_object with all values listed in columns set.
+    """
+    target = target_object or type(self)()
 
     columns = set(columns).union(kwargs.keys())
     for name in columns:
