@@ -13,7 +13,6 @@ from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import WithContact
 from ggrc.models.deferred import deferred
-from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import AttributeInfo
@@ -25,7 +24,7 @@ from ggrc.models.track_object_state import track_state_for_class
 
 class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
               WithContact, Titled, Stateful, db.Model,
-              CustomAttributable, Documentable, Personable,
+              CustomAttributable, Personable,
               Ownable, Relatable, Slugged):
   VALID_STATES = [
       'Draft',

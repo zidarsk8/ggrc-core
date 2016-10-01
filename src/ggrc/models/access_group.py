@@ -3,15 +3,15 @@
 
 from ggrc import db
 from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
-from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
-from ggrc.models.track_object_state import HasObjectState, track_state_for_class
+from ggrc.models.track_object_state import HasObjectState
+from ggrc.models.track_object_state import track_state_for_class
 
 
 class AccessGroup(HasObjectState,
-                  CustomAttributable, Personable, Documentable, Relatable,
+                  CustomAttributable, Personable, Relatable,
                   Timeboxed, Ownable, BusinessObject, db.Model):
     __tablename__ = 'access_groups'
 

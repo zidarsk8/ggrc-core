@@ -3,7 +3,6 @@
 
 from ggrc import db
 from .mixins import BusinessObject, CustomAttributable
-from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
 from .audit_object import Auditable
@@ -12,7 +11,7 @@ from .relationship import Relatable
 
 
 class Objective(HasObjectState, CustomAttributable, Auditable, Relatable,
-                Documentable, Personable, Ownable, BusinessObject, db.Model):
+                Personable, Ownable, BusinessObject, db.Model):
   __tablename__ = 'objectives'
   _publish_attrs = []
   _include_links = []
