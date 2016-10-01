@@ -96,23 +96,6 @@ class Identifiable(object):
       table_args.append(table_dict)
     return tuple(table_args,)
 
-  # FIXME: This is not the right place, but there is no better common base
-  # FIXME: class. I don't know what copy_into is used for. My guess would
-  # FIXME: be cloning of some sort. I'm not sure that this code will work
-  # FIXME: with custom attributes.
-  def copy_into(self, _other, columns, **kwargs):
-    target = _other or type(self)()
-
-    columns = set(columns).union(kwargs.keys())
-    for name in columns:
-      if name in kwargs:
-        value = kwargs[name]
-      else:
-        value = getattr(self, name)
-      setattr(target, name, value)
-
-    return target
-
 
 class ChangeTracked(object):
 
@@ -476,6 +459,19 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
 
   def _display_name(self):
     return getattr(self, "title", None) or getattr(self, "name", "")
+
+  def copy_into(self, _other, columns, **kwargs):
+    target = _other or type(self)()
+
+    columns = set(columns).union(kwargs.keys())
+    for name in columns:
+      if name in kwargs:
+        value = kwargs[name]
+      else:
+        value = getattr(self, name)
+      setattr(target, name, value)
+
+    return target
 
 
 class Slugged(Base):
