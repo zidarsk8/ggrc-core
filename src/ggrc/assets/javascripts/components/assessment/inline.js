@@ -65,10 +65,16 @@
         var value = this.attr('context.value');
 
         this.attr('isEdit', false);
+        // In case value is String and consists only of spaces - do nothing
+        if (typeof value === 'string' && !value.trim()) {
+          this.attr('context.value', '');
+          value = null;
+        }
 
         if (oldValue === value) {
           return;
         }
+
         this.attr('_value', oldValue);
         this.attr('value', value);
         this.attr('isSaving', true);
