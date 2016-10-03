@@ -6,8 +6,8 @@
 (function (can, $) {
   'use strict';
 
-  GGRC.Components('sortBySortIndex', {
-    tag: 'sort-by-sort-index',
+  GGRC.Components('tasksSortList', {
+    tag: 'tasks-sort-list',
     scope: {
       sorted: null,
       mapping: null,
@@ -16,17 +16,36 @@
 
     init: function () {
       var mapping = this.scope.attr('mapping');
+      var getTaskDate = function (instance, type) {
+        var date = new Date();
+        var month = instance['relative_' + type + '_month'];
+        var day = instance['relative_' + type + '_day'];
+
+        if (instance[type + '_date']) {
+          return instance[type + '_date'];
+        }
+        date.setHours(0, 0, 0, 0);
+        date.setDate(day);
+        if (month) {
+          date.setMonth(month - 1);
+        }
+        return date;
+      };
       var sort = function () {
         var arr = _.toArray(mapping);
         var last;
         var lastIndex;
         arr.sort(function (a, b) {
-          a = a.instance.sort_index;
-          b = b.instance.sort_index;
-          if (a === b) {
-            return 0;
+          var ad = getTaskDate(a.instance, 'start');
+          var bd = getTaskDate(b.instance, 'start');
+          var result = ad.getTime() - bd.getTime();
+
+          if (!result) {
+            ad = getTaskDate(a.instance, 'end');
+            bd = getTaskDate(b.instance, 'end');
+            result = ad - bd;
           }
-          return GGRC.Math.string_less_than(a, b) ? -1 : 1;
+          return result;
         });
         this.scope.attr('sorted', arr);
         last = arr[arr.length - 1];
