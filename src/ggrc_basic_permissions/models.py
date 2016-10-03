@@ -3,12 +3,19 @@
 
 import json
 from flask import current_app
+from sqlalchemy.orm import backref
+
 from ggrc import db
 from ggrc.builder import simple_property
+from ggrc.models import all_models
 from ggrc.models.context import Context
+from ggrc.models.person import Person
 from ggrc.models.mixins import Base, Described
-from sqlalchemy.orm import backref
-from .contributed_roles import DECLARED_ROLE, get_declared_role
+
+from ggrc_basic_permissions.contributed_roles import (
+    DECLARED_ROLE,
+    get_declared_role,
+)
 
 
 class Role(Base, Described, db.Model):
@@ -56,36 +63,43 @@ class Role(Base, Described, db.Model):
   def _display_name(self):
     return self.name
 
-from ggrc.models.person import Person
+
 Person._publish_attrs.extend(['user_roles'])
 # FIXME: Cannot use `include_links`, because Memcache expiry doesn't handle
 #   sub-resources correctly
-#Person._include_links.extend(['user_roles'])
+# Person._include_links.extend(['user_roles'])
 
 
 # Override `Person.eager_query` to ensure `user_roles` is loaded efficiently
 _orig_Person_eager_query = Person.eager_query
+
+
 def _Person_eager_query(cls):
   from sqlalchemy import orm
 
   return _orig_Person_eager_query().options(
       orm.subqueryload('user_roles'),
-      #orm.subqueryload('user_roles').undefer_group('UserRole_complete'),
-      #orm.subqueryload('user_roles').joinedload('context'),
-      #orm.subqueryload('user_roles').joinedload('role'),
-      )
+      # orm.subqueryload('user_roles').undefer_group('UserRole_complete'),
+      # orm.subqueryload('user_roles').joinedload('context'),
+      # orm.subqueryload('user_roles').joinedload('role'),
+  )
+
+
 Person.eager_query = classmethod(_Person_eager_query)
 
 
-from ggrc.models.context import Context
 Context._publish_attrs.extend(['user_roles'])
 _orig_Context_eager_query = Context.eager_query
+
+
 def _Context_eager_query(cls):
   from sqlalchemy import orm
 
   return _orig_Context_eager_query().options(
       orm.subqueryload('user_roles')
-      )
+  )
+
+
 Context.eager_query = classmethod(_Context_eager_query)
 
 
@@ -98,7 +112,8 @@ class UserRole(Base, db.Model):
   role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'), nullable=False)
   role = db.relationship(
       'Role', backref=backref('user_roles', cascade='all, delete-orphan'))
-  person_id = db.Column(db.Integer(), db.ForeignKey('people.id'), nullable=False)
+  person_id = db.Column(
+      db.Integer(), db.ForeignKey('people.id'), nullable=False)
   person = db.relationship(
       'Person', backref=backref('user_roles', cascade='all, delete-orphan'))
 
@@ -106,7 +121,7 @@ class UserRole(Base, db.Model):
   def _extra_table_args(cls):
     return (
         db.Index('ix_user_roles_person', 'person_id'),
-        )
+    )
 
   _publish_attrs = ['role', 'person']
 
@@ -168,12 +183,12 @@ class ContextImplication(Base, db.Model):
       'Context',
       uselist=False,
       foreign_keys=[context_id],
-      )
+  )
   source_context = db.relationship(
       'Context',
       uselist=False,
       foreign_keys=[source_context_id],
-      )
+  )
 
   def _display_name(self):
     if self.source_context:
@@ -187,33 +202,30 @@ class ContextImplication(Base, db.Model):
     return u'{source_context} -> {context}'.format(
         source_context=source_context_display_name,
         context=context_display_name,
-        )
+    )
 
 
-import ggrc.models.all_models
-
-ggrc.models.all_models.Role = Role
-ggrc.models.all_models.UserRole = UserRole
-ggrc.models.all_models.ContextImplication = ContextImplication
-ggrc.models.all_models.Role._inflector
-ggrc.models.all_models.UserRole._inflector
-ggrc.models.all_models.ContextImplication._inflector
-ggrc.models.all_models.all_models.extend([Role, UserRole, ContextImplication])
-ggrc.models.all_models.__all__.extend(
-    ["Role", "UserRole", "ContextImplication"])
+all_models.Role = Role
+all_models.UserRole = UserRole
+all_models.ContextImplication = ContextImplication
+all_models.Role._inflector
+all_models.UserRole._inflector
+all_models.ContextImplication._inflector
+all_models.all_models.extend([Role, UserRole, ContextImplication])
+all_models.__all__.extend(["Role", "UserRole", "ContextImplication"])
 
 
 def get_ids_related_to_user_role(object_type, related_type, related_ids):
   if object_type == "Person":
-    related_model = getattr(ggrc.models.all_models, related_type, None)
+    related_model = getattr(all_models, related_type, None)
     if not hasattr(related_model, "context_id"):
       return None
     return db.session \
-      .query(UserRole.person_id.distinct()) \
-      .join(related_model, related_model.context_id == UserRole.context_id) \
-      .filter(related_model.id.in_(related_ids))
+        .query(UserRole.person_id.distinct()) \
+        .join(related_model, related_model.context_id == UserRole.context_id) \
+        .filter(related_model.id.in_(related_ids))
   elif related_type == "Person":
-    object_model = getattr(ggrc.models.all_models, object_type, None)
+    object_model = getattr(all_models, object_type, None)
     if not hasattr(object_model, "context_id"):
       return None
     return db.session \
@@ -227,7 +239,7 @@ def get_ids_related_to_user_role(object_type, related_type, related_ids):
 def get_ids_related_to(object_type, related_type, related_ids):
   functions = [get_ids_related_to_user_role]
   queries = (f(object_type, related_type, related_ids) for f in functions)
-  non_empty = [q for q in queries if q ]
+  non_empty = [q for q in queries if q]
   if len(non_empty) == 0:
     return None
   return non_empty.pop().union(*non_empty)
