@@ -4,7 +4,6 @@
 """Modals for deleting objects"""
 
 from lib import base
-from lib import decorator
 from lib.constants import locator
 
 
@@ -25,7 +24,6 @@ class DeleteObjectModal(base.Modal):
     self.button_delete = base.Button(
         driver, self._locator.BUTTON_DELETE)
 
-  @decorator.wait_for_redirect
   def confirm_delete(self):
     """
     Returns:
