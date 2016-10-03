@@ -16,6 +16,7 @@
                   {{^is_allowed 'update' instance context='for'}}
                         readonly
                   {{/is_allowed}}
+                  can-before-edit="instance.confirmBeginEdit"
                 ></assessment-inline-edit>
             </ca-object-value-mapper>
         </ca-object>
