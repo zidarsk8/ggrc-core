@@ -3,12 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $) {
+(function (_, can, $, GGRC, CMS) {
   'use strict';
 
   GGRC.Components('assessmentGeneratorButton', {
     tag: 'assessment-generator-button',
-    template: '{{{> /static/mustache/base_objects/generate_assessments_button.mustache}}}',
+    template: '{{{> /static/mustache/base_objects/' +
+    'generate_assessments_button.mustache}}}',
     scope: {
       audit: null
     },
@@ -115,8 +116,7 @@
           object: object.stub(),
           context: this.scope.audit.context,
           template: assessmentTemplate && assessmentTemplate.stub(),
-          title: title,
-          owners: [CMS.Models.Person.findInCacheById(GGRC.current_user.id)]
+          title: title
         };
 
         if (assessmentTemplate) {
@@ -167,4 +167,4 @@
       }
     }
   });
-})(window.can, window.can.$);
+})(window._, window.can, window.can.$, window.GGRC, window.CMS);

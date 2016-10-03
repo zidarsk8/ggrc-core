@@ -226,8 +226,9 @@ class BlockConverter(object):
   def clean_headers(self, raw_headers):
     """ Sanitize columns from csv file
 
-    Clear out all the bad column headers and remove coresponding column in the
-    rows data.
+    Clear out all the bad column headers and remove corresponding column in the
+    rows data. When multi byte character appears in any column name whole block
+    should be removed from import. It means that empty dict should be returned.
 
     Args:
       raw_headers (list of str): unmodified header row from csv file
@@ -252,7 +253,7 @@ class BlockConverter(object):
         if field_multibyte_err:
           self.add_errors(errors.MULTIBYTE_ATTRIBUTE_ERROR,
                           column_name=header, line=self.offset + 2)
-          return
+          return OrderedDict()
         clean_headers[field_name] = self.object_headers[field_name]
       else:
         self.add_warning(errors.UNKNOWN_COLUMN,
