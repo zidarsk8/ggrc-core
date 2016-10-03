@@ -18,11 +18,10 @@ from ggrc.models.mixins import statusable
 
 
 class AutoStatusChangeable(object):
-  """
-  Mixin for automatic status changes
+  """A mixin for automatic status changes.
 
-  Enables automatic transitioning of objects on any edit in cases where object
-  has reached one of end states.
+  Enables automatic transitioning of objects on any edit in cases when an
+  object is in one of the DONE states, or in the START state.
   """
 
   __lazy_init__ = True
