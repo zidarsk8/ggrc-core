@@ -195,6 +195,50 @@
       });
       result.resolve(relationships);
       return result.promise();
+    },
+    /**
+     * Return the Relationship between workflow and person.
+     *
+     * @param {CMS.Models.Cacheable} workflow - Workflow object.
+     * @param {CMS.Models.Cacheable} person - Person object.
+     * @param {$.Deferred} deferred - Deferred object to resolve.
+     * @return {Promise} - Resolved with Relationship instances if they were
+     * found or an empty list if instances are not related.
+     */
+    getWorkflowPersonRelationship: function rec(workflow, person, deferred) {
+      var result = deferred || $.Deferred();
+      var workflowPeople = workflow.workflow_people;
+      var workflowPeopleFiltered;
+      var userRoles;
+      var relationships;
+
+      if (workflowPeople.length > 0 && workflowPeople[0].getInstance().person) {
+        workflowPeopleFiltered = _.filter(workflowPeople, function (item) {
+          var _instance = item.getInstance();
+          return _instance.person && _instance.person.id === person.id;
+        });
+
+        userRoles = _.filter(person.user_roles, function (item) {
+          return item.getInstance().context_id === workflow.context_id;
+        });
+
+        relationships = userRoles.concat(workflowPeopleFiltered);
+
+        relationships = relationships.map(function (item) {
+          return item.reify();
+        });
+
+        result.resolve(relationships);
+      } else {
+        workflowPeople[0]
+          .getInstance()
+          .on('change', function (ev, changedProperty) {
+            if (changedProperty === 'person') {
+              return rec(workflow, person, result);
+            }
+          });
+      }
+      return result.promise();
     }
   }, {
     reinit: function () {
