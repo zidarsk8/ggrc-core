@@ -55,11 +55,7 @@
                   {{#child_options}}
                     {{{renderLive add_item_view}}}
                   {{/child_options}}
-                  {{#if instance.viewLink}}
-                    {{#is_allowed "view_object_page" instance}}
-                      <a href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
-                    {{/is_allowed}}
-                  {{/if}}
+                  <view-object-button instance="instance" />
                 </div>
                 <ul class="tree-action-list">
                   {{#infer_roles instance}}

@@ -4,10 +4,9 @@
 from os.path import abspath, dirname, join
 from flask.json import dumps
 
-from ggrc.app import app
 from ggrc.converters import get_importables
 from ggrc.models.reflection import AttributeInfo
-from integration.ggrc import TestCase
+from integration.ggrc.converters import TestCase
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -57,19 +56,7 @@ class TestExportSingleObject(TestCase):
   @classmethod
   def setUpClass(cls):
     TestCase.clear_data()
-    cls.tc = app.test_client()
-    cls.tc.get("/login")
-    cls.import_file("data_for_export_testing.csv")
-
-  @classmethod
-  def import_file(cls, filename, dry_run=False):
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {
-        "X-test-only": "true" if dry_run else "false",
-        "X-requested-by": "gGRC",
-    }
-    cls.tc.post("/_service/import_csv",
-                data=data, headers=headers)
+    cls._import_file("data_for_export_testing.csv")
 
   def setUp(self):
     self.client.get("/login")
@@ -358,19 +345,7 @@ class TestExportMultipleObjects(TestCase):
   @classmethod
   def setUpClass(cls):
     TestCase.clear_data()
-    cls.tc = app.test_client()
-    cls.tc.get("/login")
-    cls.import_file("data_for_export_testing.csv")
-
-  @classmethod
-  def import_file(cls, filename, dry_run=False):
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {
-        "X-test-only": "true" if dry_run else "false",
-        "X-requested-by": "gGRC",
-    }
-    cls.tc.post("/_service/import_csv",
-                data=data, headers=headers)
+    cls._import_file("data_for_export_testing.csv")
 
   def setUp(self):
     self.client.get("/login")

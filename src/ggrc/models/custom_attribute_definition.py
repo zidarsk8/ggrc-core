@@ -3,12 +3,16 @@
 
 """Custom attribute definition module"""
 
+import flask
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from sqlalchemy.sql.schema import UniqueConstraint
 
+import ggrc.models
 from ggrc import db
+from ggrc.utils import benchmark
 from ggrc.models import mixins
+from ggrc.models.reflection import AttributeInfo
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.models.exceptions import ValidationError
 
@@ -50,6 +54,8 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       'helptext',
       'placeholder',
   ]
+
+  _reserved_names = {}
 
   def _clone(self, target):
     """Clone custom attribute definitions."""
@@ -131,6 +137,91 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     # pylint: disable=no-self-use
     if value:
       value = ",".join(part.strip() for part in value.split(","))
+
+    return value
+
+  @classmethod
+  def _get_reserved_names(cls, definition_type):
+    """Get a list of all attribute names in all objects.
+
+    On first call this function computes all possible names that can be used by
+    any model and stores them in a static frozen set. All later calls just get
+    this set.
+
+    Returns:
+      frozen set containing all reserved attribute names for the current
+      object.
+    """
+    with benchmark("Generate a list of all reserved attribute names"):
+      if not cls._reserved_names.get(definition_type):
+        definition_map = {model._inflector.table_singular: model
+                          for model in ggrc.models.all_models.all_models}
+        definition_model = definition_map.get(definition_type)
+        if not definition_model:
+          raise ValueError("Invalid definition type")
+
+        aliases = AttributeInfo.gather_aliases(definition_model)
+        cls._reserved_names[definition_type] = frozenset(
+            (value["display_name"] if isinstance(
+                value, dict) else value).lower()
+            for value in aliases.values() if value
+        )
+      return cls._reserved_names[definition_type]
+
+  @classmethod
+  def _get_global_cad_names(cls, definition_type):
+    """Get names of global cad for a given object."""
+    if not getattr(flask.g, "_global_cad_names", set()):
+      query = db.session.query(cls.title, cls.id).filter(
+          cls.definition_type == definition_type,
+          cls.definition_id.is_(None)
+      )
+      flask.g._global_cad_names = {name.lower(): id_ for name, id_ in query}
+    return flask.g._global_cad_names
+
+  @validates("title", "definition_type")
+  def validate_title(self, key, value):
+    """Validate CAD title/name uniqueness.
+
+    Note: title field is used for storing CAD names.
+    CAD names need to follow 3 uniqueness rules:
+      1) names must not match any attribute name on any existing object.
+      2) Object level CAD names must not match any global CAD name.
+      3) Object level CAD names can clash, but not for the same Object
+         instance. This means we can have two CAD with a name "my cad", with
+         different attributable_id fields.
+
+    Third rule is handled by the database with unique key uq_custom_attribute
+    (`definition_type`,`definition_id`,`title`).
+
+    This validator should check for name collisions for 1st and 2nd rule.
+
+    This validator works, because definition_type is never changed. It only
+    gets set when the cad is created and after that only title filed can
+    change. This makes validation using both fields possible.
+
+    Args:
+      value: custom attribute definition name
+
+    Returns:
+      value if the name passes all uniqueness checks.
+    """
+
+    if key == "title" and self.definition_type:
+      name = value.lower()
+      definition_type = self.definition_type
+    elif key == "definition_type" and self.title:
+      name = self.title.lower()
+      definition_type = value.lower()
+    else:
+      return value
+
+    if name in self._get_reserved_names(definition_type):
+      raise ValueError("Invalid Custom attribute name.")
+
+    if (self._get_global_cad_names(definition_type).get(name) is not None and
+            self._get_global_cad_names(definition_type).get(name) != self.id):
+      raise ValueError("Invalid Custom attribute name.")
 
     return value
 

@@ -1,11 +1,14 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from logging import getLogger
 from functools import wraps
 from time import time
+
 from flask import request
 from flask.wrappers import Response
 from werkzeug.datastructures import Headers
+
 from ggrc import db
 from ggrc import settings
 from ggrc.login import get_current_user
@@ -13,6 +16,10 @@ from ggrc.models.mixins import Base
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Stateful
 from ggrc.models.types import CompressedType
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class BackgroundTask(Base, Stateful, db.Model):
@@ -110,7 +117,7 @@ def queued_task(func):
       result = func(task)
     except:
       import traceback
-      app.logger.error("Task failed", exc_info=True)
+      logger.exception("Task failed")
       task.finish("Failure", app.make_response((
           traceback.format_exc(), 200, [('Content-Type', 'text/html')])))
 

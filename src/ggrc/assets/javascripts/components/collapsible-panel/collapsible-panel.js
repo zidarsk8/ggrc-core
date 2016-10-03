@@ -18,6 +18,7 @@
     scope: {
       titleText: '@',
       titleIcon: '@',
+      extraCssClass: '@',
       expanded: true,
       define: {
         collapsed: {

@@ -26,19 +26,19 @@ function get_template_path(url) {
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
 
-$.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
-  var template_path = get_template_path(options.url),
-      template = template_path && GGRC.Templates[template_path];
+$.ajaxTransport('text', function (options, _originalOptions, _jqXHR) {
+  var template_path = get_template_path(options.url);
+  var template = template_path && GGRC.Templates[template_path];
   if (template) {
     return {
       send: function (headers, completeCallback) {
         function done() {
           if (template) {
-            completeCallback(200, "success", { text: template });
+            completeCallback(200, 'success', {text: template});
           }
         }
         if (options.async) {
-          //Use requestAnimationFrame where possible because we want
+          // Use requestAnimationFrame where possible because we want
           // these to run as quickly as possible but still release
           // the thread.
           (window.requestAnimationFrame || window.setTimeout)(done, 0);
@@ -56,7 +56,7 @@ $.ajaxTransport("text", function (options, _originalOptions, _jqXHR) {
 
 var quickHash = function (str, seed) {
   var bitval = seed || 1;
-  str = str || "";
+  str = str || '';
   for (var i = 0; i < str.length; i++)
   {
     bitval *= str.charCodeAt(i);
@@ -824,28 +824,12 @@ Mustache.registerHelper("get_permalink_for_object", function (instance, options)
   return window.location.origin + instance.viewLink;
 });
 
-  Mustache.registerHelper('get_view_link', function (instance, options) {
-    function finish(link) {
-      return '<a href=' + link + ' target="_blank" class="view-link">' +
-             '  <i class="fa fa-long-arrow-right"></i>' +
-             '</a>';
-    }
-    instance = resolve_computed(instance);
-    if (!instance.viewLink && !instance.get_permalink) {
-      return '';
-    }
-    return defer_render('a', finish, instance.get_permalink());
-  });
-
   /**
    * Generate an anchor element that opens the instance's view page in a
    * new browser tab/window.
    *
    * If the instance does not have such a page, an empty string is returned.
    * The inner content of the tag is used as the text for the link.
-   *
-   * This helper is a modification of the `get_view_link` helper - the latter
-   * generates a link with an arrow icon instead of the text.
    *
    * Example usage:
    *
@@ -2848,39 +2832,37 @@ Mustache.registerHelper("fadeout", function (delay, prop, options) {
       }, binding.refresh_instances());
     });
 
-Mustache.registerHelper('with_mapping_count', function (instance, mapping_names, options) {
+  Mustache.registerHelper('with_mapping_count',
+    function (instance, mappingNames, options) {
+      var args = can.makeArray(arguments);
+      var mappingName;
+      var i;
 
-  var args = can.makeArray(arguments)
-    , options = args[args.length-1]  // FIXME duplicate declaration
-    , mapping_name
-    ;
+      options = args[args.length - 1];  // FIXME duplicate declaration
 
-  mapping_names = args.slice(1, args.length - 1);
+      mappingNames = args.slice(1, args.length - 1);
 
-  instance = Mustache.resolve(instance);
+      instance = Mustache.resolve(instance);
 
-  // Find the most appropriate mapping
-  for (var i = 0; i < mapping_names.length; i++) {
-    mapping_name = Mustache.resolve(mapping_names[i]);
-    if (instance.get_binding(mapping_name)) {
-      break;
-    }
-  }
+      // Find the most appropriate mapping
+      for (i = 0; i < mappingNames.length; i++) {
+        mappingName = Mustache.resolve(mappingNames[i]);
+        if (instance.has_binding(mappingName)) {
+          break;
+        }
+      }
 
-  var finish = function (count) {
-    return options.fn(options.contexts.add({ count: count }));
-  };
-
-  var progress = function () {
-    return options.inverse(options.contexts);
-  };
-
-  return defer_render(
-    "span",
-    { done: finish, progress: progress },
-    instance.get_list_counter(mapping_name)
-  );
-});
+      return defer_render('span', {
+        done: function (count) {
+          return options.fn(options.contexts.add({count: count}));
+        },
+        progress: function () {
+          return options.inverse(options.contexts);
+        }
+      },
+        instance.get_list_counter(mappingName)
+      );
+    });
 
 Mustache.registerHelper("is_overdue", function (_date, status, options) {
   var date = moment(resolve_computed(_date));
@@ -2999,19 +2981,26 @@ Mustache.registerHelper("log", function () {
   })));
 });
 
-Mustache.registerHelper("autocomplete_select", function (options) {
+Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   var cls;
+  var options = arguments[arguments.length - 1];
+  var _disableCreate = Mustache.resolve(disableCreate);
+
+  if (typeof (_disableCreate) !== 'boolean') {
+    _disableCreate = false;
+  }
   if (options.hash && options.hash.controller) {
     cls = Mustache.resolve(cls);
-    if (typeof cls === "string") {
+    if (typeof cls === 'string') {
       cls = can.getObject(cls);
     }
   }
   return function (el) {
-    $(el).bind("inserted", function () {
-      var $ctl = $(this).parents(":data(controls)");
+    $(el).bind('inserted', function () {
+      var $ctl = $(this).parents(':data(controls)');
       $(this).ggrc_autocomplete($.extend({}, options.hash, {
-        controller : cls ? $ctl.control(cls) : $ctl.control()
+        controller: cls ? $ctl.control(cls) : $ctl.control(),
+        disableCreate: _disableCreate
       }));
     });
   };
@@ -3405,37 +3394,43 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
 /*
   Used to get the string value for custom attributes
 */
-Mustache.registerHelper('get_custom_attr_value', function (attr, instance, options) {
-  var value = '';
-  var definition;
+  Mustache.registerHelper('get_custom_attr_value',
+    function (attr, instance, options) {
+      var value = '';
+      var definition;
 
-  attr = Mustache.resolve(attr);
-  instance = Mustache.resolve(instance);
+      attr = Mustache.resolve(attr);
+      instance = Mustache.resolve(instance);
 
-  can.each(GGRC.custom_attr_defs, function (item) {
-    if (item.definition_type === instance.class.table_singular &&
-        item.title === attr.attr_name) {
-      definition = item;
-    }
-  });
-
-  if (definition) {
-    can.each(instance.custom_attribute_values, function (item) {
-      item = item.reify();
-      if (item.custom_attribute_id === definition.id) {
-        if (definition.attribute_type.startsWith('Map:')) {
-          value = options.fn(options.contexts.add({
-            object: item.attribute_object.reify()
-          }));
-        } else {
-          value = item.attribute_value;
+      can.each(GGRC.custom_attr_defs, function (item) {
+        if (item.definition_type === instance.class.table_singular &&
+          item.title === attr.attr_name) {
+          definition = item;
         }
-      }
-    });
-  }
+      });
 
-  return value;
-});
+      if (definition) {
+        can.each(instance.custom_attribute_values, function (item) {
+          if (!(instance instanceof CMS.Models.Assessment)) {
+            // reify all models with the exception of the Assessment,
+            // because it has a different logic of work with the CA
+            item = item.reify();
+          }
+          if (item.custom_attribute_id === definition.id) {
+            if (definition.attribute_type.startsWith('Map:')) {
+              value = options.fn(options.contexts.add({
+                object: item.attribute_object ?
+                  item.attribute_object.reify() : null
+              }));
+            } else {
+              value = item.attribute_value;
+            }
+          }
+        });
+      }
+
+      return value;
+    });
 
 Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   var audits;
@@ -3506,6 +3501,42 @@ Mustache.registerHelper("pretty_role_name", function (name) {
   return name;
 });
 
+   /**
+   * Check if provided user is current user
+   *
+   * Example usage:
+   *
+   *   {{#if_current_user person}}
+   *     ...
+   *   {{/if_current_user}}
+   *
+   * or:
+   *
+   *   {{#if_current_user email}}
+   *     ...
+   *   {{/if_current_user}}
+   *
+   * @param {Object|String} person - Person object or email
+   * @param {Object} options - a CanJS options argument passed to every helper
+   *
+   */
+  Mustache.registerHelper('if_current_user', function (person, options) {
+    var email;
+    person = Mustache.resolve(person);
+
+    if (_.isString(person)) {
+      email = person;
+    } else if (person && person.email) {
+      email = person.email;
+    } else {
+      console.warn('You should pass in either email or person object');
+    }
+
+    if (GGRC.current_user.email === email) {
+      return options.fn(options.context);
+    }
+    return options.inverse();
+  });
 
 /*
 Add new variables to current scope. This is useful for passing variables

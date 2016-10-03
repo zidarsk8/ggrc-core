@@ -93,11 +93,7 @@
 
             <div class="span{{display_options.action_width}}">
               <div class="show-details">
-                {{#if instance.viewLink}}
-                  {{#is_allowed "view_object_page" instance}}
-                    <a href="{{instance.viewLink}}" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
-                  {{/is_allowed}}
-                {{/if}}
+                <view-object-button instance="instance" />
               </div>
             </div>
 

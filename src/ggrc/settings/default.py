@@ -35,7 +35,7 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.9.7-Quince" + BUILD_NUMBER
+VERSION = "0.9.8-Raspberry" + BUILD_NUMBER
 
 # Google Analytics variables
 GOOGLE_ANALYTICS_ID = os.environ.get('GGRC_GOOGLE_ANALYTICS_ID', '')
@@ -69,3 +69,29 @@ EMAIL_PENDING = JINJA2.get_template("notifications/view_pending_digest.html")
 USE_APP_ENGINE_ASSETS_SUBDOMAIN = False
 
 BACKGROUND_COLLECTION_POST_SLEEP = 0
+
+
+LOGGING_HANDLER = {
+    "class": "logging.StreamHandler",
+    "stream": "ext://sys.stdout",
+    "formatter": "default",
+}
+LOGGING_FORMATTER = {
+    "format": "%(levelname)-8s %(asctime)s %(name)s %(message)s",
+}
+LOGGING_ROOT = "WARNING"
+LOGGING_LOGGERS = {
+    "ggrc": "INFO",
+
+    "sqlalchemy": "WARNING",
+    # WARNING - logs warnings and errors only
+    # INFO    - logs SQL-queries
+    # DEBUG   - logs SQL-queries + result sets
+
+    "werkzeug": "INFO",
+    # WARNING - logs warnings and errors only
+    # INFO    - logs HTTP-queries
+}
+
+
+DEBUG_BENCHMARK = os.environ.get("GGRC_BENCHMARK")

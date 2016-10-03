@@ -245,7 +245,7 @@ class Button(Element):
 
 
 class Checkbox(Element):
-  """A generic checkboux element"""
+  """A generic checkbox element"""
 
   def __init__(self, driver, locator, is_checked=False):
     super(Checkbox, self).__init__(driver, locator)
@@ -382,7 +382,7 @@ class Modal(Component):
 
 
 class Filter(Component):
-  """A gneric filter element"""
+  """A generic filter element"""
 
   def __init__(self, driver, locator_text_box, locator_submit,
                locator_clear):

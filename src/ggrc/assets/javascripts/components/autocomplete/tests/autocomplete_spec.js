@@ -20,7 +20,7 @@ describe('GGRC.Components.autocomplete', function () {
     });
 
     it('sets the automappingOff flag to true', function () {
-      expect(scope.automappingOff).toBe(true);
+      expect(scope().automappingOff).toBe(true);
     });
   });
 

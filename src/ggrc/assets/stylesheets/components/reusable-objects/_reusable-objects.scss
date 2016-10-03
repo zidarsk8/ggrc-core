@@ -1,0 +1,33 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+reusable-objects-item {
+  display: flex;
+  position: relative;
+  line-height: 24px;
+  padding-right: 42px;
+
+  > .date {
+    width: 72px;
+    margin: 0 8px 0 0;
+  }
+}
+
+reusable-objets-item-control {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  top: 0;
+  right: 0;
+  line-height: 24px;
+  height: 24px;
+  width: 38px;
+  box-sizing: border-box;
+  text-align: center;
+
+  input[type="checkbox"] {
+    margin: 0;
+    padding: 0;
+  }
+}

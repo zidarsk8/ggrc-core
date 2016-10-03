@@ -33,9 +33,9 @@
       threshold: 5
     },
     is_custom_attributable: true,
-    isAssessment: true,
     attributes: {
-      control: 'CMS.Models.Control.stub',
+      related_sources: 'CMS.Models.Relationship.stubs',
+      related_destinations: 'CMS.Models.Relationship.stubs',
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       start_date: 'date',
@@ -213,21 +213,19 @@
             value = cav.attribute_value;
           }
         });
-        // If Custom Attribute Value is presented - do all required checks
-        if (cav) {
-          cav.preconditions_failed = cav.preconditions_failed || [];
-          if (cad.mandatory &&
+        if (cad.mandatory &&
             GGRC.Utils.isEmptyCA(value, cad.attribute_type)) {
-            errorsList.value.push(cad.title);
-          }
+          // If Custom Attribute is mandatory and empty
+          errorsList.value.push(cad.title);
+        } else if (cav) {
+          // If Custom Attribute Value is presented - do all required checks
+          cav.preconditions_failed = cav.preconditions_failed || [];
           if (cav.preconditions_failed.indexOf('comment') > -1) {
             errorsList.comment.push(cad.title + ': ' + value);
           }
           if (cav.preconditions_failed.indexOf('evidence') > -1) {
             errorsList.attachment.push(cad.title + ': ' + value);
           }
-        } else {
-          errorsList.value.push(cad.title);
         }
       });
     },

@@ -521,7 +521,8 @@
 
       perPersonMappings = _(mappings)
         .filter(function (rev) {
-          if (rev.source_type === 'Person' || rev.destination_type === 'Person') {
+          if (rev.source_type === 'Person' ||
+            rev.destination_type === 'Person') {
             return rev;
           }
         })
@@ -535,7 +536,8 @@
       perPersonRoleHistory = _.zipObject(
         _.map(perPersonMappings, function (revisions, pid) {
           var history = _.map(revisions, function (rev) {
-            if (rev.action === 'deleted') {
+            // Add extra check to fix possible issue with inconsistent data
+            if (rev.action === 'deleted' || !rev.content.attrs.AssigneeType) {
               return {
                 updated_at: rev.updated_at,
                 role: 'none'

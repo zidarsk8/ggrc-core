@@ -22,6 +22,7 @@ class CustomAttributeValue(Base, db.Model):
   """Custom attribute value model"""
 
   __tablename__ = 'custom_attribute_values'
+  _fulltext_attrs = ["attribute_value"]
 
   custom_attribute_id = db.Column(
       db.Integer,

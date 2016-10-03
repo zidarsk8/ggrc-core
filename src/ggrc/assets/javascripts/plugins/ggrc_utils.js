@@ -18,6 +18,48 @@
    */
   GGRC.Utils = {
     win: window,
+    filters: {
+      /**
+       * Performs filtering on provided array like instances
+       * @param {Array} items - array like instance
+       * @param {Function} filter - filtering function
+       * @return {Array} - filtered array
+       */
+      applyFilter: function (items, filter) {
+        return Array.prototype.filter.call(items, filter);
+      },
+      /**
+       * Helper function to create a filtering function
+       * @param {Object|null} filterObj - filtering params
+       * @return {Function} - filtering function
+       */
+      makeTypeFilter: function (filterObj) {
+        return function (item) {
+          var type = item.instance.type.toString().toLowerCase();
+          if (!filterObj) {
+            return true;
+          }
+          if (filterObj.only && Array.isArray(filterObj.only)) {
+            // Do sanity transformation
+            filterObj.only = filterObj.only.map(function (item) {
+              return item.toString().toLowerCase();
+            });
+            return filterObj.only.indexOf(type) > -1;
+          }
+          if (filterObj.exclude && Array.isArray(filterObj.exclude)) {
+            // Do sanity transformation
+            filterObj.exclude = filterObj.exclude.map(function (item) {
+              return item.toString().toLowerCase();
+            });
+            return filterObj.exclude.indexOf(type) === -1;
+          }
+        };
+      },
+      applyTypeFilter: function (items, filterObj) {
+        var filter = GGRC.Utils.filters.makeTypeFilter(filterObj);
+        return GGRC.Utils.filters.applyFilter(items, filter);
+      }
+    },
     sortingHelpers: {
       commentSort: function (a, b) {
         if (a.created_at < b.created_at) {
@@ -28,11 +70,17 @@
         return 0;
       }
     },
+    events: {
+      isInnerClick: function (el, target) {
+        el = el instanceof $ ? el : $(el);
+        return el.has(target).length || el.is(target);
+      }
+    },
     inViewport: function (el) {
       var bounds;
       var isVisible;
 
-      el = el instanceof jQuery ? el[0] : el;
+      el = el instanceof $ ? el[0] : el;
       bounds = el.getBoundingClientRect();
 
       isVisible = this.win.innerHeight > bounds.bottom &&
@@ -229,7 +277,9 @@
         'audit request': true,
         'program riskassessment': true,
         'assessmenttemplate cacheable': true,
-        'cacheable person': true
+        'cacheable person': true,
+        'person risk': true,
+        'person threat': true
       });
 
       if (target instanceof can.Model) {
@@ -298,7 +348,7 @@
         'Map:Person'];
       var options = {
         Checkbox: function (value) {
-          return value === '0';
+          return !value || value === '0';
         },
         'Rich Text': function (value) {
           value = GGRC.Utils.getPlainText(value);
@@ -316,7 +366,7 @@
      * Remove all HTML tags from the string
      * @param {String} originalText - original string for parsing
      * @return {string} - plain text without tags
-       */
+     */
     getPlainText: function (originalText) {
       originalText = originalText || '';
       return originalText.replace(/<[^>]*>?/g, '').trim();
@@ -387,7 +437,7 @@
   /**
    * Util methods for work with QueryAPI.
    */
-  GGRC.Utils.QueryAPI = {
+  GGRC.Utils.QueryAPI = (function () {
     /**
      * @typedef LimitArray
      * @type {array}
@@ -416,10 +466,31 @@
      * @param {Object} relevant - Information about relevant object
      * @param {Object} relevant.type - Type of relevant object
      * @param {Object} relevant.id - Id of relevant object
+     * @param {Object} relevant.operation - Type of operation.
      * @return {QueryAPIRequest} Array of QueryAPIRequest
      */
-    buildParams: function (objName, page, relevant) {
-      var relevantFilter;
+    function buildParams(objName, page, relevant) {
+      return [buildParam(objName, page, relevant)];
+    }
+
+    /**
+     * Build params for request on Query API.
+     *
+     * @param {String} objName - Name of requested object
+     * @param {Object} page - Information about page state.
+     * @param {Number} page.current - Current page
+     * @param {Number} page.pageSize - Page size
+     * @param {String} page.sortBy - sortBy
+     * @param {String} page.sortDirection - sortDirection
+     * @param {String} page.filter - Filter string
+     * @param {Object} relevant - Information about relevant object
+     * @param {Object} relevant.type - Type of relevant object
+     * @param {Object} relevant.id - Id of relevant object
+     * @param {Object} relevant.operation - Type of operation.
+     * @param {Array} fields - Array of requested fields.
+     * @return {QueryAPIRequest} Object of QueryAPIRequest
+     */
+    function buildParam(objName, page, relevant, fields) {
       var first;
       var last;
       var params = {};
@@ -429,17 +500,7 @@
       }
 
       params.object_name = objName;
-
-      if (relevant) {
-        relevantFilter = '#' + relevant.type + ',' + relevant.id + '#';
-
-        params.filters = GGRC.query_parser.join_queries(
-          GGRC.query_parser.parse(relevantFilter || ''),
-          GGRC.query_parser.parse(page.filter || '')
-        );
-      } else {
-        params.filters = {expression: {}};
-      }
+      params.filters = _makeFilter(page.filter, relevant);
 
       if (page.current && page.pageSize) {
         first = (page.current - 1) * page.pageSize;
@@ -452,8 +513,11 @@
           desc: page.sortDirection === 'desc'
         }];
       }
-      return [params];
-    },
+      if (fields) {
+        params.fields = fields;
+      }
+      return params;
+    }
 
     /**
      * Params for request on Query API
@@ -462,7 +526,7 @@
      * @param {Object} params.data - Object with parameters on Query API needed.
      * @return {Promise} Promise on Query API request.
      */
-    makeRequest: function (params) {
+    function makeRequest(params) {
       return $.ajax({
         type: 'POST',
         headers: $.extend({
@@ -472,5 +536,44 @@
         data: JSON.stringify(params.data || [])
       });
     }
-  };
+
+    function _makeFilter(filter, relevant) {
+      var relevantFilter;
+      var filters;
+      var left;
+      var right;
+
+      if (relevant) {
+        relevantFilter = '#' + relevant.type + ',' + relevant.id + '#';
+        left = GGRC.query_parser.parse(relevantFilter || '');
+
+        if (relevant.operation &&
+          relevant.operation !== left.expression.op.name) {
+          left.expression.op.name = relevant.operation;
+        }
+      }
+
+      if (filter) {
+        right = GGRC.query_parser.parse(filter);
+      }
+
+      if (left && right) {
+        filters = GGRC.query_parser.join_queries(left, right);
+      } else if (left) {
+        filters = left;
+      } else if (right) {
+        filters = right;
+      } else {
+        filters = {expression: {}};
+      }
+
+      return filters;
+    }
+
+    return {
+      buildParam: buildParam,
+      buildParams: buildParams,
+      makeRequest: makeRequest
+    };
+  })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

@@ -97,17 +97,21 @@
       /**
         * Get people mapped to this instance
         *
-        * @return {Array} - the list of current mapped people
+        * @return {Promise} - a promise that returns the list of current mapped people
         */
-      get_mapped: function () {
+      get_mapped_deferred: function () {
         // We call get_mapping only once because canjs events can get caught in a loop
         // computed_mapping needs to be in scope so its separated from other people lists
         if (!this.computed_mapping) {
-          this.attr('list_mapped',
-                    this.attr('instance').get_mapping(this.attr('mapping')));
-          this.computed_mapping = true;
+          return this.attr('instance')
+            .get_mapping_deferred(this.attr('mapping'))
+            .then(function (data) {
+              this.attr('list_mapped', data);
+              this.computed_mapping = true;
+              return data;
+            }.bind(this));
         }
-        return this.attr('list_mapped');
+        return $.when(this.attr('list_mapped'));
       },
       /**
         * Get the first (or only) pending join for a person
@@ -370,51 +374,48 @@
         * @return {jQuery.Deferred} - a promise with the role list
         */
       get_roles: function (person, instance) {
-        var getRelationshipsIds = function (obj) {
-          return _.map(_.union(obj.related_sources, obj.related_destinations),
-            function (relationship) {
-              return relationship.id;
-            }
-          );
-        };
         var rolesDfd = $.Deferred();
-        var relationshipsIds = _.intersection(getRelationshipsIds(person),
-                                              getRelationshipsIds(instance));
-        var found = false;
-        _.each(relationshipsIds, function (relationshipId) {
-          var relationship = CMS.Models.Relationship.findInCacheById(
-            relationshipId);
-          if (_.exists(relationship, 'attrs.AssigneeType')) {
-            found = true;
-            relationship.refresh().then(function (relationship) {
-              var roles = relationship.attrs.AssigneeType.split(',');
-              var result = {roles: roles,
-                            relationship: relationship,
-                            relationshipsIds: relationshipsIds};
-              rolesDfd.resolve(result);
+
+        CMS.Models.Relationship
+          .getRelationshipBetweenInstances(person, instance, instance.isNew())
+          .done(function (relationships) {
+            var found = false;
+            _.map(relationships, function (relationship) {
+              if (!found && _.exists(relationship, 'attrs.AssigneeType')) {
+                found = true;
+                relationship.refresh().then(function (relationship) {
+                  var roles = relationship.attrs.AssigneeType.split(',');
+                  var result = {roles: roles,
+                    relationship: relationship};
+                  rolesDfd.resolve(result);
+                });
+              }
             });
-          }
-        });
-        // If the person has no assigneeType relationshipAttr for this instance
-        // then he has no roles
-        if (!found) {
-          rolesDfd.resolve({roles: [], relationshipsIds: relationshipsIds});
-        }
+            if (!found) {
+              rolesDfd.resolve({roles: []});
+            }
+          })
+          .fail(function (e) {
+            rolesDfd.resolve({roles: []});
+          });
+
         return rolesDfd;
       }
     },
     events: {
       inserted: function () {
-        this.scope.attr('list_pending', this.scope.get_pending());
-        this.scope.attr('list_mapped', this.scope.get_mapped());
-        this.updateResult();
-        if (!this.scope.attr('required')) {
-          return;
-        }
-        this.scope.attr('mapped_people', this.scope.get_mapped());
-        if (this.scope.instance.isNew() && this.scope.validate) {
-          this.validate();
-        }
+        this.scope.get_mapped_deferred().then(function (data) {
+          this.scope.attr('list_pending', this.scope.get_pending());
+          this.scope.attr('list_mapped', data);
+          this.updateMappedResult(data);
+          if (!this.scope.attr('required')) {
+            return;
+          }
+          this.scope.attr('mapped_people', data);
+          if (this.scope.instance.isNew() && this.scope.validate) {
+            this.validate();
+          }
+        }.bind(this));
       },
       validate: function () {
         if (!(this.scope.required && this.scope.validate)) {
@@ -424,8 +425,13 @@
           this.scope.attr('type'), !!this.scope.results.length);
       },
       updateResult: function () {
+        this.scope.get_mapped_deferred().then(function (data) {
+          this.updateMappedResult(data);
+        }.bind(this));
+      },
+      updateMappedResult: function (data) {
         var type = can.capitalize(this.scope.type);
-        var mapped = _.map(this.scope.get_mapped(), function (item) {
+        var mapped = _.map(data, function (item) {
           return item.instance;
         });
         var pending = _.filter(this.scope.get_pending(), function (item) {

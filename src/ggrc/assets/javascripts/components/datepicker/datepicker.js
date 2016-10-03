@@ -80,8 +80,20 @@
         return moment(date, this.scope.pattern, true).isValid();
       },
       setDate: function (type, date) {
-        date = this.getDate(date);
-        this.scope.picker.datepicker('option', type, date);
+        var types = {
+          minDate: function () {
+            date.add(1, 'day');
+          },
+          maxDate: function () {
+            date.subtract(1, 'day');
+          }
+        };
+        date = moment(date);
+
+        if (types[type]) {
+          types[type]();
+        }
+        this.scope.picker.datepicker('option', type, date.toDate());
       },
       '{scope} setMinDate': function (scope, ev, date) {
         this.setDate('minDate', date);

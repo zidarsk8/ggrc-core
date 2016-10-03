@@ -107,7 +107,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
   create: 'POST /api/systems',
   update: 'PUT /api/systems/{id}',
   destroy: 'DELETE /api/systems/{id}',
-
+  mixins: ['ca_update'],
   cache: can.getObject('cache', CMS.Models.SystemOrProcess, true),
   is_custom_attributable: true,
   attributes: {},
@@ -124,10 +124,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
     this.tree_view_options = $.extend({},
       CMS.Models.SystemOrProcess.tree_view_options, {
         // systems is a special case; can be imported to programs
-        footer_view: GGRC.mustache_path +
-        (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program ?
-          '/systems/tree_footer.mustache' :
-          '/base_objects/tree_footer.mustache'),
+        footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
         add_item_view: GGRC.mustache_path +
         (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program ?
           '/systems/tree_add_item.mustache' :
@@ -164,6 +161,7 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
     url: '',
     status: 'Draft'
   },
+  mixins: ['ca_update'],
   statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
     'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
   init: function () {

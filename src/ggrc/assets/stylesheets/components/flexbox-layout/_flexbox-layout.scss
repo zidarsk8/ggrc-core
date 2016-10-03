@@ -1,0 +1,65 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+.flex-box {
+  display: flex;
+  box-sizing: border-box;
+  list-style: none;
+
+  &.flex-box-multi {
+    flex-wrap: wrap;
+  }
+
+  &.flex-box-single {
+    flex-wrap: nowrap;
+  }
+
+  .flex-gutter-1 {
+    margin: 0 0 8px;
+  }
+
+  .flex-gutter-2 {
+    margin: 0 0 16px;
+  }
+
+  .flex-size-1 {
+    flex: 1 1;
+  }
+
+  .flex-size-2 {
+    flex: 2 2;
+  }
+
+  .flex-size-3 {
+    flex: 3 3;
+  }
+
+  .flex-size-4 {
+    flex: 4 4;
+  }
+
+  .flex-size-5 {
+    flex: 5 5;
+  }
+
+  .flex-size-6 {
+    flex: 6 6;
+  }
+
+  .flex-size-limit {
+    overflow: hidden;
+  }
+
+  [class*="flex-size"] {
+    box-sizing: border-box;
+  }
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}

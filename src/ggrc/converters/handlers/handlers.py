@@ -3,9 +3,9 @@
 """Generic handlers for imports and exports."""
 
 import re
-import traceback
+from logging import getLogger
 from dateutil.parser import parse
-from flask import current_app
+
 from sqlalchemy import and_
 from sqlalchemy import or_
 
@@ -31,6 +31,9 @@ from ggrc.models import all_models
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 MAPPING_PREFIX = "__mapping__:"
 CUSTOM_ATTR_PREFIX = "__custom__:"
@@ -97,12 +100,12 @@ class ColumnHandler(object):
       return
     try:
       setattr(self.row_converter.obj, self.key, self.value)
-    except:
+    except:  # pylint: disable=bare-except
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
-      trace = traceback.format_exc()
-      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
-          self.row_converter.obj, self.key, self.value, trace)
-      current_app.logger.error(error)
+      logger.exception(
+          "Import failed with setattr(%r, %r, %r)",
+          self.row_converter.obj, self.key, self.value,
+      )
 
   def get_default(self):
     if callable(self.default):
@@ -264,12 +267,12 @@ class OwnerColumnHandler(UserColumnHandler):
       for person in self.value:
         if person not in self.row_converter.obj.owners:
           self.row_converter.obj.owners.append(person)
-    except:
+    except:  # pylint: disable=bare-except
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
-      trace = traceback.format_exc()
-      error = "Import failed with:\nsetattr({}, {}, {})\n{}".format(
-          self.row_converter.obj, self.key, self.value, trace)
-      current_app.logger.error(error)
+      logger.exception(
+          "Import failed with setattr(%r, %r, %r)",
+          self.row_converter.obj, self.key, self.value,
+      )
 
   def get_value(self):
     emails = [owner.email for owner in self.row_converter.obj.owners]
@@ -295,7 +298,7 @@ class DateColumnHandler(ColumnHandler):
       return
 
     try:
-      return parse(self.raw_value)
+      return parse(value) if value else None
     except:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
 

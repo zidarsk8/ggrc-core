@@ -20,11 +20,7 @@
                 </div>
                 <div class="span4">
                   <div class="email tree-title-area">
-                    {{#if_match name '\\\\S'}}
-                      {{#name}}
-                        <span class="email">{{email}}</span>
-                      {{/name}}
-                    {{/if_match}}
+                    <span class="email">{{email}}</span>
                   </div>
                 </div>
                 <div class="span2">
@@ -54,8 +50,8 @@
                 </div>
                 <div class="span2">
                   <div class="show-details">
-                    <a href="/people/{{id}}">
-                      <i class="fa fa-long-arrow-right"></i>
+                    <a href="/people/{{id}}" class="btn btn-mini btn-outline">
+                      Open
                     </a>
                   </div>
                 </div>

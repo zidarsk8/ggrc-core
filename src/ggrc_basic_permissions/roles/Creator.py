@@ -110,14 +110,7 @@ owner_base = [
     "ObjectDocument",
     "ObjectOwner",
     "ObjectPerson",
-    {
-        "type": "Option",
-        "terms": {
-            "list_property": "owners",
-            "value": "$current_user"
-        },
-        "condition": "contains"
-    },
+    "Option",
     {
         "type": "OrgGroup",
         "terms": {

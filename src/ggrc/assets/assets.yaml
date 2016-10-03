@@ -32,7 +32,6 @@ dashboard-js-files:
   - moment/min/moment.min.js
   - moment-timezone/builds/moment-timezone-with-data.min.js
   - spinjs/spin.js
-  - string-natural-compare/natural-compare.min.js
   # end 3rd party
   - bootstrap/wysihtml5.js
   - bootstrap/sticky-popover.js
@@ -59,8 +58,26 @@ dashboard-js-files:
   - client_record_replay.js
   - mustache_helper.js
   - generated/ggrc_filter_query_parser.js
-  - models/mappers.js
-  - models/mappings.js
+  - models/mappers/mapping-result.js
+  - models/mappers/list-binding.js
+  - models/mappers/base-list-loader.js
+  - models/mappers/stub-filtered-list-loader.js
+  - models/mappers/cross-list-loader.js
+  - models/mappers/type-filtered-list-loader.js
+  - models/mappers/attr-filtered-list-loader.js
+  - models/mappers/first-element-loader.js
+  - models/mappers/custom-filtered-list-loader.js
+  - models/mappers/multi-list-loader.js
+  - models/mappers/intersecting-list-loader.js
+  - models/mappers/proxy-list-loader.js
+  - models/mappers/direct-list-loader.js
+  - models/mappers/indirect-list-loader.js
+  - models/mappers/search-list-loader.js
+  - models/mappers/reifying-list-loader.js
+  - models/mappers/tree-page-loader.js
+  - models/mappers/mapper-helpers.js
+  - models/mappers/mappings.js
+  - models/mappers/mappings-ggrc.js
   - models/mixins.js
   - models/cacheable.js
   - models/local_storage.js
@@ -115,15 +132,19 @@ dashboard-js-files:
   - components/collapsible-panel/collapsible-panel-header.js
   - components/collapsible-panel/collapsible-panel-body.js
   - components/read-more/read-more.js
-  - components/assessment/mapped-objects/mapped-objects.js
-  - components/assessment/mapped-objects/mapped-objects-list.js
-  - components/assessment/mapped-objects/mapped-objects-popover.js
-  - components/assessment/mapped-objects/mapped-objects-filter.js
+  - components/assessment/mapped-objects/mapped-controls.js
+  - components/assessment/mapped-objects/mapped-controls-popover.js
+  - components/assessment/mapped-objects/mapped-related-information.js
   - components/assessment/urls-list.js
   - components/assessment/attachments-list.js
   - components/assessment/custom-attributes.js
   - components/assessment/inline.js
   - components/assessment/add_comment.js
+  - components/assessment/controls-toolbar/controls-toolbar.js
+  - components/mapped-objects/mapped-objects.js
+  - components/object-list/object-list.js
+  - components/object-list/object-list-item.js
+  - components/object-popover/object-popover.js
   - components/ca-object/ca-object.js
   - components/ca-object/ca-object-validation.js
   - components/ca-object/ca-object-validation-icon.js
@@ -131,6 +152,10 @@ dashboard-js-files:
   - components/ca-object/ca-object-value-mapper.js
   - components/ca-object/ca-object-modal.js
   - components/ca-object/ca-object-modal-content.js
+  - components/related-objects/related-objects.js
+  - components/reusable-objects/reusable-objects-list.js
+  - components/reusable-objects/reusable-objects-item.js
+  - components/simple-modal/simple-modal.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
@@ -170,6 +195,7 @@ dashboard-js-files:
   - components/object_counter/object_counter.js
   - components/sort_by_sort_index/sort_by_sort_index.js
   - components/tree_pagination/tree_pagination.js
+  - components/view-object-button/view-object-button.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -182,11 +208,12 @@ dashboard-js-template-files:
   - components/collapsible-panel/collapsible-panel.mustache
   - components/collapsible-panel/collapsible-panel-body.mustache
   - components/collapsible-panel/collapsible-panel-header.mustache
-  - components/assessment/mapped-objects/mapped-objects.mustache
-  - components/assessment/mapped-objects/mapped-objects-list.mustache
-  - components/assessment/mapped-objects/mapped-objects-popover.mustache
-  - components/assessment/mapped-objects/item-templates/title.mustache
-  - components/assessment/mapped-objects/item-templates/title-and-description.mustache
+  - components/assessment/controls-toolbar/controls-toolbar.mustache
+  - components/assessment/mapped-objects/mapped-controls.mustache
+  - components/assessment/mapped-objects/mapped-controls-item.mustache
+  - components/assessment/mapped-objects/mapped-controls-popover.mustache
+  - components/assessment/mapped-objects/mapped-related-information.mustache
+  - components/assessment/mapped-objects/mapped-related-information-item.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/attachments-list.mustache
   - components/assessment/custom-attributes.mustache
@@ -200,12 +227,18 @@ dashboard-js-template-files:
   - components/assessment/add_comment.mustache
   - components/assessment/comment/input.mustache
   - components/assessment/comment/controls.mustache
+  - components/object-list/object-list.mustache
+  - components/object-list/object-list-item.mustache
+  - components/object-popover/object-popover.mustache
+  - components/mapped-objects/mapped-objects.mustache
+  - components/reusable-objects/reusable-objects-item.mustache
   - components/ca-object/ca-object.mustache
   - components/ca-object/ca-object-title.mustache
   - components/ca-object/ca-object-validation.mustache
   - components/ca-object/ca-object-validation-icon.mustache
   - components/ca-object/ca-object-modal.mustache
   - components/ca-object/ca-object-modal-content.mustache
+  - components/view-object-button/view-object-button.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
@@ -278,6 +311,7 @@ dashboard-js-template-files:
   - base_templates/test.mustache
   - base_templates/urls.mustache
   - base_templates/mapping_tree_view.mustache
+  - base_templates/assignable_extended_info.mustache
   - mixins/assignable.mustache
   - mixins/stateful.mustache
   - clauses/modal_content.mustache
@@ -291,10 +325,9 @@ dashboard-js-template-files:
   - assessments/modal_content.mustache
   - assessments/tree.mustache
   - assessments/tree_header.mustache
-  - assessments/tree_footer.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
-  - assessments/reusable_objects.mustache
+  - assessments/related-assessments.mustache
   - assessments/header.mustache
   - assessments/urls.mustache
   - assessments/dates_list.mustache
@@ -328,6 +361,7 @@ dashboard-js-template-files:
   - components/datepicker/datepicker.mustache
   - components/object_counter/object_counter.mustache
   - components/tree_pagination/tree_pagination.mustache
+  - components/simple-modal/simple-modal.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
@@ -395,7 +429,6 @@ dashboard-js-template-files:
   - people/popover.mustache
   - people/tier2_content.mustache
   - people/tree.mustache
-  - people/tree_footer.mustache
   - people/tree_add_item.mustache
   - people/tree_header.mustache
   - people/search_result.mustache
@@ -428,24 +461,17 @@ dashboard-js-template-files:
   - standards/modal_content.mustache
   - systems/info.mustache
   - systems/modal_content.mustache
-  - systems/tree_footer.mustache
   - systems/tree_add_item.mustache
   - base_objects/tree_footer.mustache
   - base_objects/tree_add_item.mustache
-  - controls/tree_footer.mustache
   - controls/tree_add_item.mustache
-  - directives/tree_footer.mustache
   - directives/tree_add_item.mustache
-  - objectives/tree_footer.mustache
   - objectives/tree_add_item.mustache
-  - sections/tree_footer.mustache
   - sections/tree_add_item.mustache
-  - documents/tree_footer.mustache
   - documents/tree_add_item.mustache
   - audits/modal_content.mustache
   - audits/tree.mustache
   - audits/info.mustache
-  - audits/tree_footer.mustache
   - audits/tree_add_item.mustache
   - audits/tree_header.mustache
   - audits/search_result.mustache
@@ -453,18 +479,16 @@ dashboard-js-template-files:
   - audits/object_cloner.mustache
   - requests/tree.mustache
   - requests/info.mustache
-  - requests/tree_footer.mustache
   - requests/tree_add_item.mustache
   - requests/tree_header.mustache
   - requests/modal_content.mustache
   - requests/tier2_content.mustache
   - requests/general_info.mustache
   - requests/dates_list.mustache
-  - requests/reusable_objects.mustache
+  - requests/related-requests.mustache
   - base_templates/subtree.mustache
   - objectives/autocomplete_result.mustache
   - meetings/modal_content.mustache
-  - meetings/tree_footer.mustache
   - meetings/tree_add_item.mustache
   - meetings/tree.mustache
   - documents/autocomplete_result.mustache

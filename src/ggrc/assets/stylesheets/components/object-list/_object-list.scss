@@ -1,0 +1,56 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+object-list {
+  box-sizing: border-box;
+  width: 100%;
+  align-self: stretch;
+  flex-direction: column;
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-height: 24px;
+  display: flex;
+  // Should affect only direct children
+  > spinner {
+    display: flex;
+    opacity: 0;
+
+    &.active {
+      z-index: 9999;
+      opacity: 1;
+    }
+
+    .spinner {
+      position: absolute;
+      right: 0;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      // Bigger spinner with separate color for the grid
+      &.grid-spinner {
+        justify-content: center;
+
+        .fa {
+          color: $defaultWidget;
+          font-size: 32px;
+        }
+      }
+    }
+  }
+
+  object-list-item {
+    line-height: 24px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: $text;
+    cursor: pointer;
+  }
+}

@@ -3,5 +3,5 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <div class="">
-    <textarea class="input--textarea" {{#isSaving}}disabled="disabled"{{/isSaving}} rows="4" class="" placeholder="{{commentPlaceHolder}}"can-value="comment.value" can-keyup="removeEmptyMark"></textarea>
+    <rich-text class="input--textarea" {{#isSaving}}disabled="disabled"{{/isSaving}} placeholder="{{commentPlaceHolder}}" text="comment.value" can-keyup="removeEmptyMark"></rich-text>
 </div>

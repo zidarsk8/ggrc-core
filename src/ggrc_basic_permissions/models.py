@@ -2,12 +2,13 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import json
-from flask import current_app
+from logging import getLogger
+
 from sqlalchemy.orm import backref
 
 from ggrc import db
-from ggrc.builder import simple_property
 from ggrc.models import all_models
+from ggrc.builder import simple_property
 from ggrc.models.context import Context
 from ggrc.models.person import Person
 from ggrc.models.mixins import Base, Described
@@ -16,6 +17,10 @@ from ggrc_basic_permissions.contributed_roles import (
     DECLARED_ROLE,
     get_declared_role,
 )
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class Role(Base, Described, db.Model):
@@ -95,9 +100,7 @@ _orig_Context_eager_query = Context.eager_query
 def _Context_eager_query(cls):
   from sqlalchemy import orm
 
-  return _orig_Context_eager_query().options(
-      orm.subqueryload('user_roles')
-  )
+  return _orig_Context_eager_query().options(orm.subqueryload('user_roles'))
 
 
 Context.eager_query = classmethod(_Context_eager_query)
@@ -119,9 +122,7 @@ class UserRole(Base, db.Model):
 
   @staticmethod
   def _extra_table_args(cls):
-    return (
-        db.Index('ix_user_roles_person', 'person_id'),
-    )
+    return (db.Index('ix_user_roles_person', 'person_id'),)
 
   _publish_attrs = ['role', 'person']
 
@@ -153,8 +154,7 @@ class UserRole(Base, db.Model):
     elif hasattr(self, '_display_related_title'):
       context_related = ' in ' + self._display_related_title
     elif self.context:
-      current_app.logger.warning(
-          'Unable to identify context.related for UserRole')
+      logger.warning('Unable to identify context.related for UserRole')
       context_related = ''
     else:
       context_related = ''

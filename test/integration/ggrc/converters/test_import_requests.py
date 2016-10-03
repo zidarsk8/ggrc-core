@@ -5,6 +5,8 @@
 
 """Test request import and updates."""
 
+from datetime import date, timedelta
+
 from ggrc import models
 from ggrc.converters import errors
 from integration.ggrc import converters
@@ -62,7 +64,7 @@ class TestRequestImport(converters.TestCase):
     """
     filename = "request_full_no_warnings.csv"
     response = self.import_file(filename)
-    self._check_response(response, {})
+    self._check_csv_response(response, {})
 
     # Test first request line in the CSV file
     request_1 = models.Request.query.filter_by(slug="Request 1").first()
@@ -116,7 +118,7 @@ class TestRequestImport(converters.TestCase):
             ]),
         }
     }
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)
 
     requests = {r.slug: r for r in models.Request.query.all()}
     self.assertEqual(requests["Request 60"].status, models.Request.START_STATE)
@@ -166,16 +168,16 @@ class TestRequestImport(converters.TestCase):
             ]),
             "row_errors": set([
                 errors.UNKNOWN_OBJECT.format(
-                    line=18,
+                    line=19,
                     object_type="Audit",
                     slug="not existing"
                 ),
                 errors.DUPLICATE_VALUE_IN_CSV.format(
-                    line_list="19, 21",
+                    line_list="20, 22",
                     column_name="Code",
                     value="Request 22",
                     s="",
-                    ignore_lines="21",
+                    ignore_lines="22",
                 ),
             ]),
             "row_warnings": set([
@@ -189,10 +191,10 @@ class TestRequestImport(converters.TestCase):
                     object_type="Project",
                     slug="proj-55"
                 ),
-                errors.REQUEST_INVALID_STATE.format(line=20),
                 errors.REQUEST_INVALID_STATE.format(line=21),
+                errors.REQUEST_INVALID_STATE.format(line=22),
                 errors.WRONG_REQUIRED_VALUE.format(
-                    line=19,
+                    line=20,
                     column_name="Status",
                     value="open",
                 ),
@@ -200,4 +202,22 @@ class TestRequestImport(converters.TestCase):
             ]),
         }
     }
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)
+
+  def test_request_default_dates(self):
+    """ Test full request import with missing Starts On / Due On date values
+
+    CSV sheet:
+      https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=889865936
+    """
+    self.import_file("request_full_no_warnings.csv")
+    self.import_file("request_with_warnings_and_errors.csv")
+
+    requests = {r.slug: r for r in models.Request.query.all()}
+    today = date.today()
+    seven_days = timedelta(7)
+
+    self.assertEqual(requests["Request 17"].end_date, today + seven_days)
+    self.assertEqual(requests["Request 18"].start_date, today)
+    self.assertEqual(requests["Request 19"].start_date, today)
+    self.assertEqual(requests["Request 19"].end_date, today + seven_days)

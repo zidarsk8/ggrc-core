@@ -93,7 +93,6 @@ class TestCustomAttributesDefinitions(TestCase):
         "Manager",
         "Reader",
         "Editor",
-        "No Access",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -250,7 +249,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Manager",
         "Reader",
         "Editor",
-        "No Access",
         "Primary Contact",
         "Secondary Contact",
         "Program URL",
@@ -646,7 +644,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Email",
         "Company",
         "Role",
-        "Delete",
     }
     expected_names = element_names.union(mapping_names)
     self.assertEqual(expected_names, display_names)
@@ -992,7 +989,6 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Custom email message",
         "Manager",
         "Member",
-        "No Access",
         "Frequency",
         "Force real-time email updates",
         "Code",

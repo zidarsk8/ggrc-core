@@ -18,13 +18,13 @@ $border-color: #eee;
   flex-wrap: wrap;
 
   .assessment-attributes {
-    flex:2 2 66%;
-    margin: 0 22px 28px 0;
+    flex: 2 2 66%;
+    margin: 8px 22px 8px 0;
     max-width: 66%;
   }
 
   .assessment-description {
-    margin: 0 0 16px;
+    margin: 8px 0 16px;
   }
 
   .assessment-control-item {
@@ -80,9 +80,9 @@ $border-color: #eee;
       margin: 4px 0;
 
       a.btn {
-        background: rgba(0, 0,0, 0.15);
+        background: rgba(0, 0, 0, 0.15);
         &:hover {
-          background: rgba(0, 0,0, 0.175);
+          background: rgba(0, 0, 0, 0.175);
         }
       }
     }
@@ -116,14 +116,13 @@ $border-color: #eee;
         .state-value {
           padding: 0 8px;
           box-sizing: border-box;
-          height: 22px;
+          min-height: 22px;
           margin: 0 16px 0 0;
           line-height: 22px;
           align-self: center;
         }
       }
     }
-
 
     .assessment-controls {
       h6 {
@@ -140,16 +139,28 @@ $border-color: #eee;
           line-height: 18px;
         }
       }
-
-      .ggrc_controllers_quick_form {
+      .assessment-controls-toolbar {
         margin: 8px 6px 0;
         display: flex;
-        box-sizing: border-box;
-        flex-direction: row-reverse;
+        justify-content: flex-end;
 
-        > * {
-          text-align: center;
-          margin: 0 8px;
+        .btn-extra-gray {
+          background: rgba(0, 0, 0, 0.15);
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.175);
+          }
+        }
+
+        .ggrc_controllers_quick_form {
+          display: flex;
+          box-sizing: border-box;
+          flex-direction: row-reverse;
+
+          > * {
+            text-align: center;
+            margin: 0 8px;
+          }
         }
       }
     }
@@ -187,11 +198,10 @@ $border-color: #eee;
   .inline-edit__title {
     line-height: 22px;
     margin: 0;
-    height: 22px;
     box-sizing: border-box;
     padding: 0 48px 0 4px;
     position: relative;
-    display: block;
+    display: flex;
 
     .fa {
       width: 24px;
@@ -200,14 +210,12 @@ $border-color: #eee;
     }
 
     .inline-edit__title-body {
-      display: inline-block;
+      display: flex;
       max-width: 100%;
       overflow: hidden;
       line-height: 22px;
       box-sizing: border-box;
       padding: 0 24px 0 0;
-      text-overflow: ellipsis;
-      white-space: nowrap;
       position: relative;
 
       .fa {

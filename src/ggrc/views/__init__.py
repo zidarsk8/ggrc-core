@@ -69,15 +69,18 @@ def do_reindex():
   indexer = get_indexer()
   indexer.delete_all_records(False)
 
-  # Find all models then remove base classes
-  #   (If we don't remove base classes, we get duplicates in the index.)
-  inheritance_base_models = [
-      all_models.Directive, all_models.SystemOrProcess
-  ]
-  models_ = set(all_models.all_models) - set(inheritance_base_models)
-  models_ = [model for model in models_ if model_is_indexed(model)]
+  # Remove model base classes and non searchable objects
+  excluded_models = {
+      all_models.Directive,
+      all_models.Option,
+      all_models.SystemOrProcess
+  }
+  indexed_models = {model for model in all_models.all_models
+                    if model_is_indexed(model)}
 
-  for model in models_:
+  indexed_models -= excluded_models
+
+  for model in indexed_models:
     mapper_class = model._sa_class_manager.mapper.base_mapper.class_
     query = model.query.options(
         db.undefer_group(mapper_class.__name__ + '_complete'),

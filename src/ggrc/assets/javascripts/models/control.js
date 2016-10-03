@@ -14,7 +14,7 @@
     create: 'POST /api/controls',
     update: 'PUT /api/controls/{id}',
     destroy: 'DELETE /api/controls/{id}',
-    mixins: ['ownable', 'contactable', 'unique_title'],
+    mixins: ['ownable', 'contactable', 'unique_title', 'ca_update'],
     is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
@@ -51,7 +51,7 @@
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/controls/tree.mustache',
-      footer_view: GGRC.mustache_path + '/controls/tree_footer.mustache',
+      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},

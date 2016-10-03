@@ -1,15 +1,28 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Benchmark context managers."""
+"""Benchmark context managers.
 
-import os
+To enable benchmark logging set up ``ggrc.utils.benchmarks`` logger
+in ``DEBUG`` level within ``settings`` module:
+
+..  code-block:: python
+
+    LOGGING_LOGGERS = {
+        "ggrc.utils.benchmarks": "DEBUG",
+    }
+
+"""
+
 import inspect
 import logging
 import time
 from collections import defaultdict
 
-from flask import current_app
+from ggrc import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class BenchmarkContextManager(object):
@@ -31,7 +44,7 @@ class BenchmarkContextManager(object):
 
   def __exit__(self, exc_type, exc_value, exc_trace):
     end = time.time()
-    current_app.logger.info("{:.4f} {}".format(end - self.start, self.message))
+    logger.debug("%.4f %s", end - self.start, self.message)
 
 
 class WithNop(object):
@@ -119,7 +132,7 @@ class DebugBenchmark(object):
     if not self.quiet and self._summary in {"all", "last"}:
       msg = "{}{}: {}".format(
           self.PREFIX * DebugBenchmark._depth, self.func_name, self.message)
-      logging.info(msg)
+      print msg
     if DebugBenchmark._depth == 0:
       self._reset_stats()
     DebugBenchmark._depth += 1
@@ -139,7 +152,7 @@ class DebugBenchmark(object):
           prefix=self.PREFIX * DebugBenchmark._depth,
           **self._stats[self.message]
       )
-      logging.fatal(msg)
+      print msg
     if DebugBenchmark._depth == 0:
       self._print_stats(self.STATS[self._summary])
 
@@ -183,7 +196,7 @@ class DebugBenchmark(object):
           avg=stat["sum"] / stat["count"] if stat["count"] else 0,
           **stat
       )
-      logging.info(msg)
+      print msg
 
   @classmethod
   def set_summary(cls, summary):
@@ -205,10 +218,8 @@ class DebugBenchmark(object):
 
 def get_benchmark():
   """Get a benchmark context manager."""
-  benchmark = os.environ.get("GGRC_BENCHMARK")
-  if benchmark:
-    logging.basicConfig(format="%(message)s", level=logging.DEBUG)
-    DebugBenchmark.set_summary(benchmark)
+  if settings.DEBUG_BENCHMARK:
+    DebugBenchmark.set_summary(settings.DEBUG_BENCHMARK)
     return DebugBenchmark
   else:
     return BenchmarkContextManager

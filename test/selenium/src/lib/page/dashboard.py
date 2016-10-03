@@ -148,8 +148,7 @@ class Dashboard(widget_bar.Dashboard, Header):
     self.button_help = base.Button(self._driver, self.locators.BUTTON_HELP)
 
 
-class AdminDashboard(widget_bar.AdminDashboard,
-                     Header):
+class AdminDashboard(widget_bar.AdminDashboard, Header):
   """Admin dashboard page model"""
   URL = environment.APP_URL + url.ADMIN_DASHBOARD
 

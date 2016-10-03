@@ -57,12 +57,19 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     definition = self.get_ca_definition()
     if not definition:
       return ""
+
     for value in self.row_converter.obj.custom_attribute_values:
       if value.custom_attribute_id == definition.id:
         if value.custom_attribute.attribute_type.startswith("Map:"):
           obj = value.attribute_object
           return getattr(obj, "email", getattr(obj, "slug", None))
+        elif value.custom_attribute.attribute_type == _types.CHECKBOX:
+          attr_val = value.attribute_value if value.attribute_value else u"0"
+          attr_val = int(attr_val)
+          return str(bool(attr_val)).upper()
+
         return value.attribute_value
+
     return None
 
   def _get_or_create_ca(self):

@@ -1,0 +1,12 @@
+{{!
+    Copyright (C) 2016 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<div class="mapped-objects__item">
+    <div class="mapped-objects__item-body" >
+        <div class="title">
+            <i class="fa fa-{{instance.class.table_singular}}"></i>
+          {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
+        </div>
+    </div>
+</div>

@@ -33,7 +33,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
-  , mixins : ["contactable", "unique_title"]
+  , mixins : ['contactable', 'unique_title', 'ca_update']
   , is_custom_attributable: true
   , attributes : {
       context: 'CMS.Models.Context.stub',
@@ -127,7 +127,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   , create : "POST /api/objectives"
   , update : "PUT /api/objectives/{id}"
   , destroy : "DELETE /api/objectives/{id}"
-  , mixins : ["ownable", "contactable", "unique_title"]
+  , mixins : ['ownable', 'contactable', 'unique_title', 'ca_update']
   , is_custom_attributable: true
   , attributes : {
       context : "CMS.Models.Context.stub"
@@ -146,7 +146,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   }
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/objectives/tree.mustache"
-    , footer_view : GGRC.mustache_path + "/objectives/tree_footer.mustache"
+    , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}

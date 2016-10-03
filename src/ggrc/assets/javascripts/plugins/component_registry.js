@@ -48,7 +48,7 @@
     }
 
     if (definitions) {
-      config.init = Components._extendInit(config.init, definitions);
+      config.scope = Components._extendScope(config.scope, definitions);
     }
 
     constructor = can.Component.extend(config);
@@ -58,37 +58,39 @@
   }
 
   /**
-   * Wrap component init function
+   * Wrap component scope function
    *
-   * @param {Function} init - Component init function
+   * @param {Function} originalScope - Component original scope
    * @param {Object} definitions - Type definitions and their defaults
    *
-   * @return {Function} - Returns wrapped init function
+   * @return {Function} - Scope wrapped init function
    */
-  Components._extendInit = function (init, definitions) {
-    init = init || $.noop;
-
-    return function (element, options) {
-      var scope = this.scope;
+  Components._extendScope = function (originalScope, definitions) {
+    return function (scope, parentScope, element) {
       var val;
+      scope = scope || {};
+      parentScope = parentScope || {};
+      element = element instanceof jQuery ? element : $(element);
 
-      can.batch.start();
-      _.each(definitions, function (obj, key) {
-        var prefix = '';
-        if (!_.has(scope, key)) {
-          if (obj.type === 'function') {
-            prefix = 'can-';
-          }
-          val = element.getAttribute(prefix + can.camelCaseToDashCase(key));
-          val = Components._castValue(val, obj.type, options);
-          if (_.isUndefined(val) && _.has(obj, 'default')) {
-            val = obj.default;
-          }
-          scope.attr(key, val);
+      _.each(originalScope, function (obj, key) {
+        if (originalScope[key] === '@') {
+          scope[key] = element.attr(can.camelCaseToDashCase(key));
         }
       });
-      can.batch.stop();
-      return init.call(this, arguments);
+      _.each(definitions, function (obj, key) {
+        var prefix = '';
+        if (obj.type === 'function') {
+          prefix = 'can-';
+        }
+        val = element.attr(prefix + can.camelCaseToDashCase(key));
+        val = Components._castValue(val, obj.type, parentScope);
+        if (_.isUndefined(val) && _.has(obj, 'default')) {
+          val = obj.default;
+        }
+        scope[key] = val;
+      });
+
+      return _.extend({}, originalScope, scope);
     };
   };
 
@@ -97,11 +99,11 @@
    *
    * @param {String} val - Value we get from element attribute
    * @param {String} type - Type for the value we need to get
-   * @param {object} options - init function options
+   * @param {object} parentScope - Parent scope
    *
    * @return {Any} - Returns casted types
    */
-  Components._castValue = function (val, type, options) {
+  Components._castValue = function (val, type, parentScope) {
     var types = {
       'boolean': function (bool) {
         if (_.isBoolean(bool)) {
@@ -128,23 +130,24 @@
         }
         return num;
       },
-      'function': function (fn, options) {
-        if (!fn || !options.scope.attr(fn)) {
+      'function': function (fn) {
+        if (!fn || !parentScope.attr(fn)) {
           return;
         }
-        return options.scope.attr(fn);
+        return parentScope.attr(fn);
       }
     };
     if (!types[type]) {
       console.warn('Cast value for `' + type + '` is not defined');
       return undefined;
     }
+
     if (val &&
         type !== 'function' &&
-        options.scope.attr(val)) {
-      val = options.scope.attr(val);
+        parentScope.attr(val)) {
+      val = parentScope.attr(val);
     }
-    return types[type](val, options);
+    return types[type](val);
   };
 
   // the internal storage of the registered components

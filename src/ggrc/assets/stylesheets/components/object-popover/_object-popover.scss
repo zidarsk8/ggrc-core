@@ -1,0 +1,83 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.object-popover {
+  > .object-popover-wrapper {
+    position: absolute;
+    box-sizing: border-box;
+    max-width: 850px;
+    opacity: 0.3;
+    width: 0;
+    z-index: 999;
+    box-shadow: 1px 3px 9px 2px rgba(0, 0, 0, 0.12);
+    border-radius: 2px;
+    background: $white;
+    overflow: hidden;
+    transition: opacity 0.12s ease, width 0.32s ease;
+
+    &.active {
+      opacity: 1;
+    }
+
+    > .object-popover-body {
+      padding: 16px 0 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-flow: column;
+      align-content: stretch;
+      align-items: stretch;
+    }
+  }
+
+  .object-popover-title {
+    flex: 0 0;
+    box-sizing: border-box;
+    font-size: 14px;
+    line-height: 22px;
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0 16px 12px;
+    border-bottom: 1px solid #eee;
+  }
+
+  h6 {
+    margin: 0;
+    padding: 0;
+    line-height: 24px;
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+
+  .object-popover-content {
+    border: 1px solid $white;
+    background: #fefefe;
+    padding: 8px 16px 16px;
+    overflow: auto;
+
+    > content {
+      display: none;
+    }
+
+    > * {
+      margin: 8px 0 0;
+
+      &:first-child {
+        margin: 0;
+      }
+    }
+  }
+
+  .object-popover-attributes {
+    flex: 0 0 100%;
+    align-items: stretch;
+
+    > * {
+      margin: 8px 0 0;
+      flex-basis: 50%;
+      min-width: 50%;
+    }
+  }
+}

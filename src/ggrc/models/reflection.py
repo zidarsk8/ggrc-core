@@ -35,7 +35,6 @@ ATTRIBUTE_ORDER = (
     "program_owner",
     "program_editor",
     "program_reader",
-    "program_mapped",
     "workflow_owner",
     "workflow_member",
     "task_type",
@@ -75,6 +74,8 @@ ATTRIBUTE_ORDER = (
     "test",
     "recipients",
     "send_by_default",
+    "document_url",
+    "document_evidence",
     "delete",
 )
 
@@ -114,15 +115,16 @@ class DontPropagate(object):
     'inherited_attr',
     ]
   """
+  # pylint: disable=too-few-public-methods
 
   def __init__(self, attr_name):
     self.attr_name = attr_name
 
 
 class PublishOnly(DontPropagate):
-
   """Alias of ``DontPropagate`` for use in a ``_publish_attrs`` specification.
   """
+  # pylint: disable=too-few-public-methods
   pass
 
 
@@ -138,6 +140,9 @@ class AttributeInfo(object):
   CUSTOM_ATTR_PREFIX = "__custom__:"
 
   class Type(object):
+    """Types of model attributes."""
+    # TODO: change to enum.
+    # pylint: disable=too-few-public-methods
     PROPERTY = "property"
     MAPPING = "mapping"
     SPECIAL_MAPPING = "special_mapping"
@@ -152,14 +157,6 @@ class AttributeInfo(object):
     self._create_attrs = AttributeInfo.gather_create_attrs(tgt_class)
     self._include_links = AttributeInfo.gather_include_links(tgt_class)
     self._aliases = AttributeInfo.gather_aliases(tgt_class)
-
-  @classmethod
-  def iter_bases_attrs(cls, tgt_class, src_attrs):
-    src_attrs = src_attrs if type(src_attrs) is list else [src_attrs]
-    for base in tgt_class.mro():
-      for attr in src_attrs:
-        if attr in tgt_class.__dict__:
-          yield getattr(tgt_class, attr, None)
 
   @classmethod
   def gather_attr_dicts(cls, tgt_class, src_attr):
@@ -184,7 +181,7 @@ class AttributeInfo(object):
     """
     if main_class is None:
       main_class = tgt_class
-    src_attrs = src_attrs if type(src_attrs) is list else [src_attrs]
+    src_attrs = src_attrs if isinstance(src_attrs, list) else [src_attrs]
     accumulator = accumulator if accumulator is not None else set()
     ignore_dontpropagate = True
     for attr in src_attrs:
@@ -267,8 +264,21 @@ class AttributeInfo(object):
     return definitions
 
   @classmethod
-  def get_custom_attr_definitions(cls, object_class, ca_cache=None):
-    """ Get column definitions for custom attributes on object_class """
+  def get_custom_attr_definitions(cls, object_class, ca_cache=None,
+                                  include_oca=True):
+    """Get column definitions for custom attributes on object_class.
+
+    Args:
+      object_class: Model for which we want the attribute definitions.
+      ca_cache: dictionary containing custom attribute definitions. If it's set
+        this function will not look for CAD in the database. This should be
+        used for bulk operations, and eventually replaced with memcache.
+      include_oca: Flag for including object level custom attributes. This
+        should be true only for defenitions needed for csv imports.
+
+    returns:
+      dict of custom attribute definitions.
+    """
     definitions = {}
     if not hasattr(object_class, "get_custom_attribute_definitions"):
       return definitions
@@ -282,7 +292,7 @@ class AttributeInfo(object):
         ca_type = cls.Type.OBJECT_CUSTOM
       else:
         ca_type = cls.Type.CUSTOM
-      attr_name = "{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title)
+      attr_name = u"{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title).lower()
 
       definition_ids = definitions.get(attr_name, {}).get("definition_ids", [])
       definition_ids.append(attr.id)
@@ -302,17 +312,23 @@ class AttributeInfo(object):
   def get_unique_constraints(cls, object_class):
     """ Return a set of attribute names for single unique columns """
     constraints = object_class.__table__.constraints
-    unique = filter(lambda x: isinstance(x, UniqueConstraint), constraints)
+    unique = [con for con in constraints if isinstance(con, UniqueConstraint)]
     # we only handle single column unique constraints
     unique_columns = [u.columns.keys() for u in unique if len(u.columns) == 1]
     return set(sum(unique_columns, []))
 
   @classmethod
-  def get_object_attr_definitions(cls, object_class, ca_cache=None):
-    """ get all column definitions for object_class
+  def get_object_attr_definitions(cls, object_class, ca_cache=None,
+                                  include_oca=True):
+    """Get all column definitions for object_class.
 
-    This function joins custm attribute definitions, mapping definitions and
+    This function joins custom attribute definitions, mapping definitions and
     the extra delete column.
+
+    Args:
+      object_class: Model for which we want the attribute definitions.
+      ca_cache: dictionary containing custom attribute definitions.
+      include_oca: Flag for including object level custom attributes.
     """
     definitions = {}
 
@@ -320,7 +336,7 @@ class AttributeInfo(object):
     filtered_aliases = [(k, v) for k, v in aliases.items() if v is not None]
 
     # push the extra delete column at the end to override any custom behavior
-    if hasattr(object_class, "slug") or hasattr(object_class, "email"):
+    if hasattr(object_class, "slug"):
       filtered_aliases.append(("delete", {
           "display_name": "Delete",
           "description": "",
@@ -339,13 +355,14 @@ class AttributeInfo(object):
           "type": cls.Type.PROPERTY,
           "handler_key": key,
       }
-      if type(value) is dict:
+      if isinstance(value, dict):
         definition.update(value)
       definitions[key] = definition
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(
-          cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache))
+          cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache,
+                                          include_oca=include_oca))
 
     if object_class.__name__ not in EXCLUDE_MAPPINGS:
       definitions.update(cls.get_mapping_definitions(object_class))

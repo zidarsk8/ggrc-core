@@ -1,0 +1,25 @@
+{{!
+    Copyright (C) 2016 Google Inc., authors, and contributors
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<collapsible-panel-header title-text="titleText" expanded="expanded">
+  {{#is_allowed 'update' instance context='for'}}
+      <i class="fa fa-plus-circle"
+         rel="tooltip"
+         data-type="{{mappingType}}"
+         data-placement="right"
+         data-toggle="unified-mapper"
+         data-join-mapping="related_objects"
+         data-join-option-type="{{model.shortName}}"
+         data-join-object-id="{{instance.id}}"
+         data-join-object-type="{{instance.class.shortName}}"
+         data-original-title="Map {{firstnonempty mappingType 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}">
+      </i>
+  {{/is_allowed}}
+</collapsible-panel-header>
+<collapsible-panel-body expanded="expanded" class="collapsible-panel-body">
+    <mapped-objects mapping="{{mapping}}" selected-item="selectedItem" parent-instance="instance" filter="filter">
+        {{> '/static/mustache/components/assessment/mapped-objects/mapped-related-information-item.mustache'}}
+    </mapped-objects>
+    <object-popover class="object-popover" item="selectedItem"></object-popover>
+</collapsible-panel-body>

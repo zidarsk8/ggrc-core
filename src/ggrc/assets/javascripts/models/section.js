@@ -22,7 +22,7 @@ can.Model.Cacheable('CMS.Models.Section', {
   update: 'PUT /api/sections/{id}',
   destroy: 'DELETE /api/sections/{id}',
   is_custom_attributable: true,
-  mixins: ['ownable', 'contactable', 'unique_title'],
+  mixins: ['ownable', 'contactable', 'unique_title', 'ca_update'],
   attributes: {
     context: 'CMS.Models.Context.stub',
     owners: 'CMS.Models.Person.stubs',
@@ -40,7 +40,7 @@ can.Model.Cacheable('CMS.Models.Section', {
   },
   tree_view_options: {
     show_view: '/static/mustache/sections/tree.mustache',
-    footer_view: GGRC.mustache_path + '/sections/tree_footer.mustache',
+    footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
     attr_list: can.Model.Cacheable.attr_list.concat([
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
@@ -61,7 +61,7 @@ can.Model.Cacheable('CMS.Models.Section', {
         title_plural: 'Controls',
         mapping: 'controls',
         draw_children: false,
-        footer_view: GGRC.mustache_path + '/controls/tree_footer.mustache',
+        footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
         add_item_view: GGRC.mustache_path + '/controls/tree_add_item.mustache'
       }]
     }]
@@ -95,7 +95,7 @@ can.Model.Cacheable('CMS.Models.Clause', {
   update: 'PUT /api/clauses/{id}',
   destroy: 'DELETE /api/clauses/{id}',
   is_custom_attributable: true,
-  mixins: ['ownable', 'contactable', 'unique_title'],
+  mixins: ['ownable', 'contactable', 'unique_title', 'ca_update'],
   attributes: {
     context: 'CMS.Models.Context.stub',
     owners: 'CMS.Models.Person.stubs',
@@ -113,7 +113,7 @@ can.Model.Cacheable('CMS.Models.Clause', {
   },
   tree_view_options: {
     show_view: '/static/mustache/sections/tree.mustache',
-    footer_view: GGRC.mustache_path + '/sections/tree_footer.mustache',
+    footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
     attr_list: can.Model.Cacheable.attr_list.concat([
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
@@ -134,7 +134,7 @@ can.Model.Cacheable('CMS.Models.Clause', {
         title_plural: 'Controls',
         mapping: 'controls',
         draw_children: false,
-        footer_view: GGRC.mustache_path + '/controls/tree_footer.mustache',
+        footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
         add_item_view: GGRC.mustache_path + '/controls/tree_add_item.mustache'
       }]
     }]

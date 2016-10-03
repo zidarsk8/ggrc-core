@@ -1,7 +1,7 @@
 /*!
-  Copyright (C) 2016 Google Inc.
-  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 describe('CMS.Controllers.TreeView', function () {
   'use strict';
@@ -39,5 +39,47 @@ describe('CMS.Controllers.TreeView', function () {
     });
 
     // test cases here...
+  });
+
+  describe('_verifyRelationship() method', function () {
+    var ctrlInst;
+    var method;
+    var relationship;
+
+    beforeEach(function () {
+      ctrlInst = {
+        options: new can.Map({
+          model: {
+            shortName: 'foo'
+          }
+        })
+      };
+
+      relationship = new CMS.Models.Relationship();
+
+      method = Ctrl.prototype._verifyRelationship.bind(ctrlInst);
+    });
+
+    it('wrong relationship', function () {
+      var result;
+
+      relationship.source = {type: 'bar'};
+      relationship.destination = {type: 'baz'};
+
+      result = method(relationship);
+
+      expect(result).toBeFalsy();
+    });
+
+    it('right relationship', function () {
+      var result;
+
+      relationship.source = {type: 'bar'};
+      relationship.destination = {type: 'foo'};
+
+      result = method(relationship);
+
+      expect(result).toBeTruthy();
+    });
   });
 });

@@ -3,13 +3,17 @@
 
 """Handlers document entries."""
 
-from flask import current_app
+from logging import getLogger
 
 from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class DocumentLinkHandler(handlers.ColumnHandler):
@@ -168,8 +172,7 @@ class DocumentUrlHandler(DocumentLinkHandler):
         elif old_doc.related_sources:
           old_doc.related_sources.pop()
         else:
-          current_app.logger.warning("Invalid relationship state for document "
-                                     "URLs.")
+          logger.warning("Invalid relationship state for document URLs.")
 
   def set_value(self):
     """This should be ignored with second class attributes."""

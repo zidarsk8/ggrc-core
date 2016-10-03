@@ -183,9 +183,6 @@
 
         deferred.then(success, error);
         sourceDeferred.then(function (sourceData) {
-          var obsList = new self.List([]);
-          var index = 0;
-
           if (sourceData[self.root_collection + '_collection']) {
             sourceData = sourceData[self.root_collection + '_collection'];
           }
@@ -197,34 +194,7 @@
             sourceData = [sourceData];
           }
 
-          function modelizeMS(ms) {
-            var item
-            , start
-            , instances = []
-            ;
-            start = Date.now();
-            while (sourceData.length > index && (Date.now() - start) < ms) {
-              can.Observe.startBatch();
-              item = sourceData[index];
-              index = index + 1;
-              instances.push.apply(instances, self.models([item]));
-              can.Observe.stopBatch();
-            }
-            can.Observe.startBatch();
-            obsList.push.apply(obsList, instances);
-            can.Observe.stopBatch();
-          }
-
-        // Trigger a setTimeout loop to modelize remaining objects
-          (function () {
-            modelizeMS(100);
-            if (sourceData.length > index) {
-              setTimeout(arguments.callee, 5);
-            }
-            else {
-              deferred.resolve(obsList);
-            }
-          })();
+          self._modelize(sourceData, deferred);
         }, function () {
           deferred.reject.apply(deferred, arguments);
         });
@@ -504,6 +474,74 @@
       return ms;
     },
 
+    query: function (request) {
+      var deferred = $.Deferred();
+      var self = this;
+
+      GGRC.Utils.QueryAPI.makeRequest(request)
+        .then(function (sourceData) {
+          var values = [];
+          var listDfd = $.Deferred();
+          if (sourceData.length) {
+            sourceData = sourceData[0];
+          } else {
+            sourceData = {};
+          }
+
+          if (sourceData[self.shortName]) {
+            sourceData = sourceData[self.shortName];
+            values = sourceData.values;
+          }
+
+          if (!values.splice) {
+            values = [values];
+          }
+          self._modelize(values, listDfd);
+
+          listDfd.then(function (list) {
+            sourceData.values = list;
+            deferred.resolve(sourceData);
+          });
+        }, function () {
+          deferred.reject.apply(deferred, arguments);
+        });
+
+      return deferred;
+    },
+
+  _modelize: function (sourceData, deferred) {
+    var obsList = new this.List([]);
+    var index = 0;
+    var self = this;
+    function modelizeMS(ms) {
+      var item;
+      var start;
+      var instances = [];
+
+      start = Date.now();
+      while (sourceData.length > index && (Date.now() - start) < ms) {
+        can.Observe.startBatch();
+        item = sourceData[index];
+        index += 1;
+        instances.push.apply(instances, self.models([item]));
+        can.Observe.stopBatch();
+      }
+      can.Observe.startBatch();
+      obsList.push.apply(obsList, instances);
+      can.Observe.stopBatch();
+    }
+
+    // Trigger a setTimeout loop to modelize remaining objects
+    (function cb() {
+      modelizeMS(100);
+      if (sourceData.length > index) {
+        setTimeout(cb, 5);
+      } else {
+        deferred.resolve(obsList);
+      }
+    })();
+  },
+
     object_from_resource: function (params) {
       var obj_name = this.root_object;
       if (!params) {
@@ -607,13 +645,16 @@
       var method;
       var collectionUrl;
       var baseParams;
+
       var that = this;
 
-      function makePaginator(paging) {
-        function getPage(page_name) {
-          if (paging[page_name]) {
+      function makePaginator(paging, baseParams, scope) {
+        function getPage(pageName) {
+          if (paging[pageName]) {
             return function () {
-              return findPageFunc(paging[page_name]);
+              // the paging ("next", "prev", etc. URLs already include query
+              // string params, thus passing null for them
+              return findPageFunc(paging[pageName], null, baseParams, scope);
             };
           }
           return null;
@@ -634,20 +675,25 @@
           }
         };
       }
+
       function findPageFunc(url, data, params, scope) {
-        return can.ajax(can.extend({
+        var ajaxOptions = can.extend({
           url: url,
           data: data
-        }, params)).then(function (response) {
+        }, params);
+
+        return can.ajax(ajaxOptions).then(function (response) {
           var collection = response[that.root_collection + '_collection'];
+          var paginator = makePaginator(collection.paging, params, scope);
           var ret = {
-            paging: makePaginator(collection.paging)
+            paging: paginator
           };
           ret[scope.root_collection + '_collection'] =
             scope.models(collection[scope.root_collection]);
           return ret;
         });
       }
+
       if (typeof findAllSpec === 'string') {
         parts = findAllSpec.split(' ');
         method = parts.length === 2 ? parts[0] : 'GET';
@@ -658,6 +704,7 @@
       } else {
         return; // TODO make a pager if findAllSpec is a function.
       }
+
       baseParams = {
         type: method,
         dataType: 'json'
@@ -866,6 +913,10 @@
         return binding.list;
       }
       return [];
+    },
+
+    get_mapping_deferred: function (name) {
+      return this.get_binding(name).refresh_list();
     },
 
   // This retrieves the potential orphan stats for a given instance

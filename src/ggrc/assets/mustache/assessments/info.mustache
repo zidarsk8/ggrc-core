@@ -14,54 +14,92 @@
             <div class="assessment-info-pane">
                 <div class="assessment-attributes">
                     <div class="assessment-description">
-                        <h6>Description</h6>
-                        <div data-test-id="title_description_content_7a906d2e">
-                          <read-more text="description"></read-more>
-                        </div>
+                        <h6>Test Plan</h6>
+                        <read-more text="test_plan"></read-more>
                     </div>
-                    <assessment-mapped-objects parent-instance="instance"
-                                               title-text="Controls"
-                                               mapping-type="Control"
-                                               filter="control"
-                                               items-tpl="title-and-description"
-                                               mapping="instance.class.info_pane_options.mapped_objects.mapping">
-                    </assessment-mapped-objects>
+                    <assessment-mapped-controls instance="instance"
+                                                title-text="Controls"
+                                                mapping-type="Control"
+                                                mapping="info_related_objects">
+                    </assessment-mapped-controls>
                     <div class="assessment-controls">
                         <span class="assessment-controls__note">Input assessment information below:</span>
                         <assessment-custom-attributes instance="instance"
                                                       definitions="custom_attribute_definitions"
-                                                      values="custom_attribute_values" class="assessment-custom-attributes">
+                                                      values="custom_attribute_values"
+                                                      class="assessment-custom-attributes">
                         </assessment-custom-attributes>
                         <div class="assessment-controls__extra-controls">
                             <assessment-attachments-list class="attachment-list"></assessment-attachments-list>
                             <assessment-urls-list></assessment-urls-list>
                         </div>
-                      {{> '/static/mustache/mixins/stateful.mustache' }}
+                        <assessment-controls-toolbar class="assessment-controls-toolbar"
+                                                     instance="instance"></assessment-controls-toolbar>
                     </div>
-                    <assessment-mapped-objects parent-instance="instance"
-                                               title-text="Related Information"
-                                               mapping-type=""
-                                               filter=""
-                                               items-tpl="title"
-                                               mapping="instance.class.info_pane_options.mapped_objects.mapping">
-                    </assessment-mapped-objects>
+                    <assessment-mapped-related-information
+                            instance="instance"
+                            title-text="Related Information"
+                            mapping-type=""
+                            mapping="info_related_objects">
+                    </assessment-mapped-related-information>
                 </div>
                 <div class="assessment-summary">
                     <h6>Details</h6>
-                    <collapsible-panel title-text="Test Plan" collapsed="true" title-icon="fa-list-ol" class="details-item">
-                        <read-more text="test_plan"></read-more>
+                    <collapsible-panel title-text="Description" collapsed="true" title-icon="fa-list-ol"
+                                       class="details-item">
+                        <read-more text="description"></read-more>
                     </collapsible-panel>
                     <collapsible-panel title-text="People" collapsed="true" title-icon="fa-users" class="details-item">
-                      <people-list instance="instance" editable="true"></people-list>
+                        <people-list instance="instance" editable="true"></people-list>
                     </collapsible-panel>
-                    <collapsible-panel title-text="Dates" collapsed="true" title-icon="fa-calendar" class="details-item">
+                    <collapsible-panel title-text="Dates" collapsed="true" title-icon="fa-calendar"
+                                       class="details-item">
                       {{> '/static/mustache/assessments/dates_list.mustache'}}
                     </collapsible-panel>
-                    <collapsible-panel title-text="Notes" collapsed="true" title-icon="fa-sticky-note-o" class="details-item">
+                    <collapsible-panel title-text="Notes" collapsed="true" title-icon="fa-sticky-note-o"
+                                       class="details-item">
                         <read-more text="notes"></read-more>
                     </collapsible-panel>
                     <collapsible-panel title-text="URL" collapsed="true" title-icon="fa-link" class="details-item">
                       {{> '/static/mustache/assessments/urls.mustache'}}
+                    </collapsible-panel>
+                    <collapsible-panel title-text="Conclusions" collapsed="true" title-icon="fa-gavel"
+                                       class="details-item">
+                        <div class="flex-box flex-col"
+                          {{#instance}}{{data 'model'}}{{/instance}}
+                             data-force-refresh="true"
+                             data-model="true" {{ (el) -> el.ggrc_controllers_quick_form({ instance : el.data('model')}); }}>
+                            <div class="flex-size-1 flex-gutter-2">
+                                <label class="title-text">Conclusion: Design</label>
+                                <p>
+                                    <small><em>Is this control design effective?</em></small>
+                                </p>
+                              {{#is_allowed 'update' instance context='for'}}
+                                  <dropdown options-list="model.conclusions"
+                                            no-value="true"
+                                            no-value-label="---"
+                                            name="instance.design">
+                                  </dropdown>
+                              {{else}}
+                                {{firstnonempty design '--'}}
+                              {{/is_allowed}}
+                            </div>
+                            <div class="flex-size-1 flex-gutter-2">
+                                <label class="title-text">Conclusion: Operation</label>
+                                <p>
+                                    <small><em>Is this control operationally effective?</em></small>
+                                </p>
+                              {{#is_allowed 'update' instance context='for'}}
+                                  <dropdown options-list="model.conclusions"
+                                            no-value="true"
+                                            no-value-label="---"
+                                            name="instance.operationally">
+                                  </dropdown>
+                              {{else}}
+                                {{firstnonempty operationally '--'}}
+                              {{/is_allowed}}
+                            </div>
+                        </div>
                     </collapsible-panel>
                 </div>
             </div>
@@ -70,10 +108,10 @@
                     <tab-panel panels="panels" title-text="Comments" instance="instance">
                       {{^if_in instance.status 'Completed,Final'}}
                         {{#is_allowed 'update' instance context='for'}}
-                          <div class="tree-item-add">
-                            <assessment-add-comment data="comments" instance="instance">
-                            </assessment-add-comment>
-                          </div>
+                            <div class="tree-item-add">
+                                <assessment-add-comment data="comments" instance="instance">
+                                </assessment-add-comment>
+                            </div>
                         {{/is_allowed}}
                       {{/if_in}}
                       {{> '/static/mustache/base_templates/comment_list.mustache' }}
@@ -82,7 +120,7 @@
                         <revision-log instance="instance"></revision-log>
                     </tab-panel>
                     <tab-panel panels="panels" title-text="Related Assessments" instance="instance">
-                      {{> '/static/mustache/assessments/reusable_objects.mustache' }}
+                      {{> '/static/mustache/assessments/related-assessments.mustache' }}
                     </tab-panel>
                     <tab-panel panels="panels" title-text="Related Requests" instance="instance">
                       {{> '/static/mustache/assessments/related_requests.mustache'}}

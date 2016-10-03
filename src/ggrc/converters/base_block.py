@@ -7,20 +7,19 @@ Each import block should contain data for one Object type. The blocks are
 separated in the csv file with empty lines.
 """
 
+from logging import getLogger
 from collections import defaultdict
 from collections import OrderedDict
 from collections import Counter
 
-from flask import current_app
 from sqlalchemy import exc
-
-from ggrc import db
-from ggrc.utils import structures
 from sqlalchemy import or_
 from sqlalchemy import and_
 
+from ggrc import db
 from ggrc import models
 from ggrc.utils import benchmark
+from ggrc.utils import structures
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import pre_commit_checks
@@ -33,6 +32,9 @@ from ggrc.services.common import update_memcache_after_commit
 from ggrc.services.common import update_memcache_before_commit
 from ggrc.services.common import log_event
 
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 CACHE_EXPIRY_IMPORT = 600
 
@@ -166,8 +168,8 @@ class BlockConverter(object):
             # Some relationships have an invalid state in the database and make
             # rel.source or rel.destination fail. These relationships are
             # ignored everywhere and should eventually be purged from the db
-            current_app.logger.error("Failed adding object to relationship "
-                                     "cache. Rel id: %s", rel.id)
+            logger.error("Failed adding object to relationship cache. "
+                         "Rel id: %s", rel.id)
       return cache
 
   def get_mapping_cache(self):
@@ -182,7 +184,8 @@ class BlockConverter(object):
     that case it is impossible to determine the correct handler for all
     columns. Blocks with duplicate names are ignored.
     """
-    counter = Counter(raw_headers)
+    counter = Counter(header.strip().rstrip("*").lower()
+                      for header in raw_headers)
     duplicates = [header for header, count in counter.items() if count > 1]
     if duplicates:
       self.add_errors(errors.DUPLICATE_COLUMN,
@@ -240,6 +243,16 @@ class BlockConverter(object):
     for index, header in enumerate(headers):
       if header in header_names:
         field_name = header_names[header]
+        field_multibyte_err = False
+        try:
+          if len(field_name) != len(field_name.encode("utf-8")):
+            field_multibyte_err = True
+        except UnicodeDecodeError:
+          field_multibyte_err = True
+        if field_multibyte_err:
+          self.add_errors(errors.MULTIBYTE_ATTRIBUTE_ERROR,
+                          column_name=header, line=self.offset + 2)
+          return
         clean_headers[field_name] = self.object_headers[field_name]
       else:
         self.add_warning(errors.UNKNOWN_COLUMN,
@@ -340,8 +353,7 @@ class BlockConverter(object):
           row_converter.insert_secondary_objects()
         except exc.SQLAlchemyError as err:
           db.session.rollback()
-          current_app.logger.error(
-              "Import failed with: {}".format(err.message))
+          logger.exception("Import failed with: %s", err.message)
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
 
@@ -369,8 +381,7 @@ class BlockConverter(object):
           db.session.flush()
         except exc.SQLAlchemyError as err:
           db.session.rollback()
-          current_app.logger.error(
-              "Import failed with: {}".format(err.message))
+          logger.exception("Import failed with: %s", err.message)
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
       for row_converter in self.row_converters:
@@ -388,8 +399,7 @@ class BlockConverter(object):
       update_index(db.session, modified_objects)
     except exc.SQLAlchemyError as err:
       db.session.rollback()
-      current_app.logger.error(
-          "Import failed with: {}".format(err.message))
+      logger.exception("Import failed with: %s", err.message)
       self.add_errors(errors.UNKNOWN_ERROR, line=self.offset + 2)
 
   def add_errors(self, template, **kwargs):

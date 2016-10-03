@@ -4,15 +4,25 @@
 """Sets up Flask app."""
 
 import re
+from logging import getLogger
+from logging.config import dictConfig as setup_logging
+
 from flask import Flask
 from flask.ext.sqlalchemy import get_debug_queries
 from flask.ext.sqlalchemy import SQLAlchemy
 from tabulate import tabulate
+
 from ggrc import contributions  # noqa: imported so it can be used with getattr
 from ggrc import db
 from ggrc import extensions
 from ggrc import notifications
 from ggrc import settings
+
+
+setup_logging(settings.LOGGING)
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 app = Flask('ggrc', instance_relative_config=True)  # noqa: valid constant name
@@ -22,7 +32,6 @@ if "public_config" not in app.config:
 
 for key in settings.exports:
   app.config.public_config[key] = app.config[key]
-
 
 # Configure Flask-SQLAlchemy for app
 db.app = app
@@ -131,36 +140,46 @@ def _display_sql_queries():
   This function makes sure we display the sql queries if the record setting is
   enabled.
   """
-  if getattr(settings, "SQLALCHEMY_RECORD_QUERIES", False):
+  report_type = getattr(settings, "SQLALCHEMY_RECORD_QUERIES", False)
+  valid_types = ('count', 'slow', 'all')
+  if report_type:
+    if report_type not in valid_types:
+      raise Exception("""Invalid SQLALCHEMY_RECORD_QUERIES value specified.
+        Possible options: {}""".format(', '.join(valid_types)))
+
     # pylint: disable=unused-variable
     @app.after_request
-    def display_queries(response):  # noqa: not an unused variable
+    def display_queries(response):
       """Display database queries
 
-      Prints out SQL queries, EXPLAINs for queries above explain_threshold, and
+      Prints out SQL queries, EXPLAINs for queries above slow_threshold, and
       a final count of queries after every HTTP request
       """
-      explain_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
+      slow_threshold = 0.5  # EXPLAIN queries that ran for more than 0.5s
       queries = get_debug_queries()
+      logger.info("Total queries: %s", len(queries))
+      if report_type == 'count':
+        return response
       # We have to copy the queries list below otherwise queries executed
       # in the for loop will be appended causing an endless loop
       for query in queries[:]:
-        app.logger.info("{:.8f} {}\n{}\n{}".format(
+        if report_type == 'slow' and query.duration < slow_threshold:
+          continue
+        logger.info(
+            "%.8f %s\n%s\n%s",
             query.duration,
             query.context,
             query.statement,
-            query.parameters))
+            query.parameters)
         is_select = bool(re.match('SELECT', query.statement, re.I))
-        if query.duration > explain_threshold and is_select:
+        if query.duration > slow_threshold and is_select:
           try:
             statement = "EXPLAIN " + query.statement
             engine = SQLAlchemy().get_engine(app)
             result = engine.execute(statement, query.parameters)
-            app.logger.info(tabulate(result.fetchall(), headers=result.keys()))
-          except Exception as err:  # pylint: disable=broad-except
-            app.logger.warning("Statement failed: {}".format(statement))
-            app.logger.exception(err)
-      app.logger.info("Total queries: {}".format(len(queries)))
+            logger.info(tabulate(result.fetchall(), headers=result.keys()))
+          except:  # pylint: disable=bare-except
+            logger.warning("Statement failed: %s", statement, exc_info=True)
       return response
 
 init_models(app)

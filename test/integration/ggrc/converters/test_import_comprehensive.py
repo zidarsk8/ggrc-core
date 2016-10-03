@@ -209,7 +209,7 @@ class TestComprehensiveSheets(TestCase):
     self.assertEqual(len(access_groups), 10)
 
     expected_errors = {}
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)
 
   def test_errors_and_warnings(self):
     """Test all possible errors and warnings.
@@ -222,7 +222,7 @@ class TestComprehensiveSheets(TestCase):
         "Control": {
             "block_errors": set([
                 errors.DUPLICATE_COLUMN.format(
-                    line=1, duplicates="Notes, Test Plan"),
+                    line=1, duplicates="title, notes, test plan"),
             ]),
         },
         "Program": {
@@ -240,7 +240,7 @@ class TestComprehensiveSheets(TestCase):
         },
     }
 
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)
 
   def create_custom_attributes(self):
     """Generate custom attributes needed for comprehensive sheet."""
@@ -276,4 +276,4 @@ class TestComprehensiveSheets(TestCase):
             ]
         }
     }
-    self._check_response(response, expected_errors)
+    self._check_csv_response(response, expected_errors)

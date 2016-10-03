@@ -221,24 +221,28 @@ can.Control('GGRC.Controllers.Modals', {
       , can.view(this.options.button_view, dfd)
       , can.view(this.options.custom_attributes_view, dfd)
     ).done(this.proxy('draw'));
-  }
+  },
 
-  , fetch_data: function (params) {
+  fetch_data: function (params) {
     var that = this;
     var dfd;
-    var instance;
+    var instance = this.options.attr('instance');
+
     params = params || this.find_params();
     params = params && params.serialize ? params.serialize() : params;
-    if (this.options.skip_refresh && this.options.instance) {
-      return new $.Deferred().resolve(this.options.instance);
-    } else if (this.options.instance) {
-      dfd = this.options.instance.refresh();
+
+    if (this.options.skip_refresh && instance) {
+      return new $.Deferred().resolve(instance);
+    } else if (instance) {
+      dfd = instance.refresh();
     } else if (this.options.model) {
       if (this.options.new_object_form) {
         dfd = $.when(this.options.attr(
           'instance',
           new this.options.model(params).attr('_suppress_errors', true)
-        ));
+        )).then(function () {
+          instance = this.options.attr('instance');
+        }.bind(this));
       } else {
         dfd = this.options.model.findAll(params).then(function (data) {
           if (data.length) {
@@ -247,7 +251,7 @@ can.Control('GGRC.Controllers.Modals', {
           }
           that.options.attr('new_object_form', true);
           that.options.attr('instance', new that.options.model(params));
-          return that.options.instance;
+          return instance;
         }).done(function () {
           // Check if modal was closed
           if (that.element !== null) {
@@ -258,30 +262,30 @@ can.Control('GGRC.Controllers.Modals', {
     } else {
       this.options.attr('instance', new can.Observe(params));
       that.on();
-      dfd = new $.Deferred().resolve(this.options.instance);
+      dfd = new $.Deferred().resolve(instance);
     }
-    instance = this.options.instance;
-    if (instance && instance.class.is_custom_attributable &&
-      !instance.class.isAssessment) {
-      // Make sure custom attributes are preloaded:
-      dfd = dfd.then(function () {
+
+    dfd.then(function () {
+      if (instance &&
+        _.exists(instance, 'class.is_custom_attributable') &&
+        !(instance instanceof CMS.Models.Assessment)) {
         return $.when(
           instance.load_custom_attribute_definitions &&
-            instance.load_custom_attribute_definitions(),
+          instance.load_custom_attribute_definitions(),
           instance.custom_attribute_values ?
             instance.refresh_all('custom_attribute_values') :
             []
         );
-      });
-    }
+      }
+    });
+
     return dfd.done(function () {
       this.reset_form(function () {
         if (instance) {
           // Make sure custom attr validations/values are reset
           if (instance.setup_custom_attributes &&
-            instance.class.is_custom_attributable &&
-            !instance.class.isAssessment) {
-            instance.custom_attributes = undefined;
+            !(instance instanceof CMS.Models.Assessment)) {
+            instance.removeAttr('custom_attributes');
             instance.setup_custom_attributes();
           }
         }
@@ -384,6 +388,23 @@ can.Control('GGRC.Controllers.Modals', {
       this.set_value_from_element(el);
     }
   },
+
+  /**
+   * The onChange handler for the custom attribute type dropdown.
+   *
+   * This handler is specific to the Custom Attribute Edit modal.
+   *
+   * @param {jQuery} $el - the dropdown DOM element
+   * @param {$.Event} ev - the event object
+   */
+  'dropdown[data-purpose="ca-type"] change': function ($el, ev) {
+    var instance = this.options.instance;
+
+    if (instance.attribute_type !== 'Dropdown') {
+      instance.attr('multi_choice_options', undefined);
+    }
+  },
+
   serialize_form: function () {
     var $form = this.options.$content.find("form");
     var $elements = $form.find(":input:not(isolate-form *)");
@@ -966,55 +987,56 @@ can.Control('GGRC.Controllers.Modals', {
       return ajd;
   },
   save_error: function (_, error) {
-    $("html, body").animate({
-      scrollTop: "0px"
+    $('html, body').animate({
+      scrollTop: '0px'
     }, {
       duration: 200,
       complete: function () {
-        $(document.body).trigger("ajax:flash", { error: error });
+        $(document.body).trigger('ajax:flash', {error: error});
         delete this.disable_hide;
       }.bind(this)
     });
-  }
+  },
 
-  , "{instance} destroyed" : " hide"
+  '{instance} destroyed': ' hide',
 
-  , " hide" : function(el, ev) {
-      if (this.disable_hide) {
-        ev.stopImmediatePropagation();
-        ev.stopPropagation();
-        ev.preventDefault();
-        return false;
-      }
-      if (this.options.instance instanceof can.Model
-          // Ensure that this modal was hidden and not a child modal
-          && ev.target === this.element[0]
-          && !this.options.skip_refresh
-          && !this.options.instance.isNew()) {
-        this.options.instance.refresh();
-      }
+  ' hide': function (el, ev) {
+    if (this.disable_hide) {
+      ev.stopImmediatePropagation();
+      ev.stopPropagation();
+      ev.preventDefault();
+      return false;
     }
+    if (this.options.instance instanceof can.Model &&
+      // Ensure that this modal was hidden and not a child modal
+      this.element && ev.target === this.element[0] &&
+      !this.options.skip_refresh && !this.options.instance.isNew()) {
+      this.options.instance.refresh();
+    }
+  },
 
-  , destroy : function() {
-    if(this.options.model && this.options.model.cache) {
+  destroy: function () {
+    if (this.options.model && this.options.model.cache) {
       delete this.options.model.cache[undefined];
     }
-    this._super && this._super.apply(this, arguments);
-    if(this.options.instance && this.options.instance._transient) {
-      this.options.instance.removeAttr("_transient");
+    if (this._super) {
+      this._super.apply(this, arguments);
     }
-  }
+    if (this.options.instance && this.options.instance._transient) {
+      this.options.instance.removeAttr('_transient');
+    }
+  },
 
-  , should_update_hash_fragment: function () {
+  should_update_hash_fragment: function () {
     var $trigger = this.options.$trigger;
 
     if (!$trigger) {
       return false;
     }
     return !$trigger.closest('.modal, .cms_controllers_info_pin').length;
-  }
+  },
 
-  , update_hash_fragment: function () {
+  update_hash_fragment: function () {
     if (!this.should_update_hash_fragment()) return;
 
     var hash = window.location.hash.split('/')[0],

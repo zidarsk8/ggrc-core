@@ -11,10 +11,10 @@
 from collections import defaultdict
 from datetime import date
 from datetime import datetime
-from flask import current_app
+from logging import getLogger
+
 from sqlalchemy import and_
 from werkzeug.exceptions import Forbidden
-
 from google.appengine.api import mail
 
 from ggrc import db
@@ -24,6 +24,10 @@ from ggrc.models import Notification
 from ggrc.models import NotificationConfig
 from ggrc.rbac import permissions
 from ggrc.utils import merge_dict
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 class Services(object):
@@ -299,10 +303,10 @@ def send_email(user_email, subject, body):
   """
   sender = get_app_engine_email()
   if not mail.is_email_valid(user_email):
-    current_app.logger.error("Invalid email recipient: {}".format(user_email))
+    logger.error("Invalid email recipient: %s", user_email)
     return
   if not sender:
-    current_app.logger.error("APPENGINE_EMAIL setting is invalid.")
+    logger.error("APPENGINE_EMAIL setting is invalid.")
     return
 
   message = mail.EmailMessage(sender=sender, subject=subject)

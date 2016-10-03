@@ -777,6 +777,34 @@ describe('GGRC.Components.objectHistory', function () {
   describe('_computeRoleChanges method', function () {
     var componentInst;  // fake component instance
     var method;  // the method under test
+    var corruptedRevision = new can.Map({
+      object: new can.List([
+        {
+          id: 10,
+          modified_by: {
+            id: 166
+          }
+        }
+      ]),
+      mappings: new can.List([
+        {
+          id: 1,
+          modified_by: {
+            id: 166
+          },
+          action: 'created',
+          source_type: 'Person',
+          source_id: 166,
+          destination_type: 'ObjectFoo',
+          destination_id: 123,
+          updated_at: new Date(2016, 0, 1),
+          type: 'Revision',
+          content: {
+            attrs: {}
+          }
+        }
+      ])
+    });
     var revisions = new can.Map({
       object: new can.List([
         {
@@ -968,6 +996,20 @@ describe('GGRC.Components.objectHistory', function () {
           },
           {
             updated_at: new Date(2016, 0, 5),
+            role: 'none'
+          }
+        ]
+      });
+    });
+
+    it('builds correct history when data is corrupted', function () {
+      var roleHistory;
+
+      roleHistory = method(corruptedRevision);
+      expect(roleHistory).toEqual({
+        '166': [
+          {
+            updated_at: new Date(2016, 0, 1),
             role: 'none'
           }
         ]

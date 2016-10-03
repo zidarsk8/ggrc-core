@@ -254,7 +254,10 @@
       });
 
       $target.on('modal:success', function (e, data, xhr) {
-        var cssSelector;
+        var WARN_MSG = [
+          'The $trigger element was not found in the DOM, thus some',
+          'application events will not be propagated.'
+        ].join(' ');
 
         if (form_target == 'refresh') {
           refresh_page();
@@ -288,8 +291,11 @@
           // element. We thus need to trigger the event on that new element
           // (present in the DOM) if we want event handlers to be invoked.
           if (!document.contains($trigger[0])) {
-            cssSelector = '.' + $trigger.attr('class').replace(/ /g, '.');
-            $trigger = $(cssSelector);
+            $trigger = $('[data-link-purpose="open-edit-modal"]');
+            if (_.isEmpty($trigger)) {
+              console.warn(WARN_MSG);
+              return;
+            }
           }
 
           $trigger.trigger('routeparam', $trigger.data('route'));
