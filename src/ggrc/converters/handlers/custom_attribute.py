@@ -32,6 +32,13 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       _types.MAP: lambda self: self.get_person_value(),
   }
 
+  def set_obj_attr(self):
+    """Set object attribute method should do nothing for custom attributes.
+
+    CA values set in insert_object() method.
+    """
+    pass
+
   def parse_item(self):
     """Parse raw value from csv file
 

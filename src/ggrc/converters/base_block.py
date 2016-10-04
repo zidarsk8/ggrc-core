@@ -227,8 +227,7 @@ class BlockConverter(object):
     """ Sanitize columns from csv file
 
     Clear out all the bad column headers and remove corresponding column in the
-    rows data. When multi byte character appears in any column name whole block
-    should be removed from import. It means that empty dict should be returned.
+    rows data.
 
     Args:
       raw_headers (list of str): unmodified header row from csv file
@@ -244,16 +243,6 @@ class BlockConverter(object):
     for index, header in enumerate(headers):
       if header in header_names:
         field_name = header_names[header]
-        field_multibyte_err = False
-        try:
-          if len(field_name) != len(field_name.encode("utf-8")):
-            field_multibyte_err = True
-        except UnicodeDecodeError:
-          field_multibyte_err = True
-        if field_multibyte_err:
-          self.add_errors(errors.MULTIBYTE_ATTRIBUTE_ERROR,
-                          column_name=header, line=self.offset + 2)
-          return OrderedDict()
         clean_headers[field_name] = self.object_headers[field_name]
       else:
         self.add_warning(errors.UNKNOWN_COLUMN,
