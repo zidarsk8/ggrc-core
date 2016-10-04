@@ -164,15 +164,21 @@
       return new model({
         operation: 'clone',
         cloneOptions: options.cloneOptions,
-        context: this.context
+        program: this.program,
+        title: this.title + new Date()
       });
     },
     save: function () {
       // Make sure the context is always set to the parent program
+      var _super = this._super;
+      var args = arguments;
       if (!this.context || !this.context.id) {
-        this.attr('context', this.program.reify().context);
+        return this.program.reify().refresh().then(function (program) {
+          this.attr('context', program.context);
+          return _super.apply(this, args);
+        }.bind(this));
       }
-      return this._super.apply(this, arguments);
+      return _super.apply(this, args);
     },
     after_save: function () {
       var dfd;

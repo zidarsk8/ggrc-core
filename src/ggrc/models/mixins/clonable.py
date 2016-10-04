@@ -3,6 +3,7 @@
 
 """A mixin for objects that can be cloned"""
 
+import itertools
 from ggrc.services import common
 
 
@@ -21,17 +22,18 @@ class Clonable(object):
 
   @classmethod
   def set_handlers(cls, model):
-    @common.Resource.model_posted.connect_via(model)
-    def handle_model_clone(sender, obj=None, src=None, service=None):
+    @common.Resource.collection_posted.connect_via(model)
+    def handle_model_clone(sender, objects=None, sources=None):
       # pylint: disable=unused-argument, unused-variable
-      if src.get("operation", "") == u"clone":
-        options = src.get("cloneOptions")
-        mapped_objects = options.get("mappedObjects", [])
-        source_id = int(options.get("sourceObjectId"))
-        obj.clone(
-            source_id=source_id,
-            mapped_objects={obj for obj in mapped_objects
-                            if obj in model.CLONEABLE_CHILDREN})
+      for obj, src in itertools.izip(objects, sources):
+        if src.get("operation", "") == u"clone":
+          options = src.get("cloneOptions")
+          mapped_objects = options.get("mappedObjects", [])
+          source_id = int(options.get("sourceObjectId"))
+          obj.clone(
+              source_id=source_id,
+              mapped_objects={obj for obj in mapped_objects
+                              if obj in model.CLONEABLE_CHILDREN})
 
   def generate_attribute(self, attribute):
     """Generate a new unique attribute as a copy of original"""
