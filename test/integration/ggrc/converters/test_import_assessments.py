@@ -35,7 +35,7 @@ class TestAssessmentImportExport(converters.TestCase):
 
     values = set(v.attribute_value for v in assessment.custom_attribute_values)
     self.assertIn("abc", values)
-    self.assertIn("2015-07-15 00:00:00", values)
+    self.assertIn("07/15/2015", values)
 
   def test_export_assessments_with_filters_and_conflicting_ca_names(self):
     """Test exporting assessments with conflicting custom attribute names."""
