@@ -164,7 +164,8 @@
       return new model({
         operation: 'clone',
         cloneOptions: options.cloneOptions,
-        program: this.program
+        program: this.program,
+        title: this.title + new Date()
       });
     },
     save: function () {
