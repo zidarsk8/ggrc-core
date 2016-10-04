@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $) {
+(function (can, GGRC, moment) {
   'use strict';
 
   GGRC.Components('datepicker', {
@@ -21,13 +21,10 @@
       setMinDate: null,
       setMaxDate: null,
       _date: null,
+      required: '@',
       define: {
         label: {
           type: 'string'
-        },
-        required: {
-          type: 'boolean',
-          'default': false
         },
         persistent: {
           type: 'boolean',
@@ -110,8 +107,7 @@
         if (this.scope.attr('persistent')) {
           return;
         }
-        isInside = this.element.has(ev.target).length ||
-                   this.element.is(ev.target);
+        isInside = GGRC.Utils.events.isInnerClick(this.element, ev.target);
 
         if (this.scope.isShown && !isInside) {
           this.scope.attr('isShown', false);
@@ -127,4 +123,4 @@
       }
     }
   });
-})(window.can, window.can.$);
+})(window.can, window.GGRC, window.moment);
