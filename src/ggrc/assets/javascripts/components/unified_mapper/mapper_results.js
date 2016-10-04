@@ -95,6 +95,11 @@
           type: instance.type,
           href: instance.href
         });
+        if (this.scope.attr('page') === 0) {
+          // if the added item is the first one rendered, update the page
+          // counter manually not to confuse drawPage method
+          this.scope.attr('page', 1);
+        }
       },
       '.results-wrap scrollNext': 'drawPage',
       getItem: function (model) {
