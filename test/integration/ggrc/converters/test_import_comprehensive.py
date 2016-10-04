@@ -277,3 +277,39 @@ class TestComprehensiveSheets(TestCase):
         }
     }
     self._check_csv_response(response, expected_errors)
+
+  def test_task_groups_tasks(self):
+    """Test task group task warnings and errors.
+
+    These tests are taken from manual test grid:
+    https://docs.google.com/spreadsheets/d/1sfNXxw_kmiw1r-\
+      Qfzv1jUM48mpeZNjIAnLdSxiCQSsI/edit?pli=1#gid=627526582
+
+    The import file had an additional users block that contains missing users.
+    """
+    response = self.import_file(
+        "importing_task_group_task_warnings_and_errors.csv")
+
+    expected_errors = {
+        "Task Group Task": {
+            "row_errors": [
+                errors.MISSING_VALUE_ERROR.format(
+                    line="5",
+                    column_name="End",
+                ),
+                errors.MISSING_VALUE_ERROR.format(
+                    line="4",
+                    column_name="Start",
+                ),
+                errors.WRONG_VALUE_ERROR.format(
+                    line="6",
+                    column_name="Start",
+                ),
+                errors.WRONG_VALUE_ERROR.format(
+                    line="7",
+                    column_name="End",
+                ),
+            ],
+        },
+    }
+    self._check_csv_response(response, expected_errors)
