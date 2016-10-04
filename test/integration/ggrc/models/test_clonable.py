@@ -32,9 +32,10 @@ class TestClonable(integration.ggrc.TestCase):
     return self.object_generator.generate_object(
         models.Audit,
         {
-            "context": self.object_generator.create_stub(obj.context),
+            "program": self.object_generator.create_stub(obj.program),
+            "title": "Audit - copy 1",
             "operation": "clone",
-            "status": "Not Started",
+            "status": "Planned",
             "cloneOptions": {
                 "sourceObjectId": obj.id,
                 "mappedObjects": mapped_objects
