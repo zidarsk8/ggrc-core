@@ -492,22 +492,6 @@
       } else {
         return (this.attr('selected_response_options') || []).join(', ');
       }
-    }),
-
-    get_filter_vals: function () {
-      var filterVals = can.Model.Cacheable.prototype.get_filter_vals;
-      var mappings = jQuery.extend({}, this.class.filter_mappings, {
-        'task title': 'title'
-      });
-
-      var vals = filterVals.apply(this, [this.class.filter_keys, mappings]);
-
-      try {
-        vals.workflows = this.cycle.reify().workflow.reify().title;
-      } catch (e) {}
-
-      return vals;
-    }
-
+    })
   });
 })(window.can);

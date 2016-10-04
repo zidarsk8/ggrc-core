@@ -252,27 +252,6 @@
           return auditorsList;
         });
       });
-    },
-    get_filter_vals: function () {
-      var filter_vals = can.Model.Cacheable.prototype.get_filter_vals;
-      var mappings = jQuery.extend({}, this.class.filter_mappings, {
-        code: 'slug',
-        'audit lead': 'assignee',
-        state: 'status'
-      });
-      var keys = this.class.filter_keys.concat([
-        'state', 'code', 'audit lead'
-      ]);
-      var vals = filter_vals.apply(this, [keys, mappings]);
-
-      try {
-        if (this.contact) {
-          vals.assignee = filter_vals.apply(this.contact.reify(), [
-            ['email', 'name']
-          ]);
-        }
-      } catch (e) {}
-      return vals;
     }
   });
 
@@ -638,34 +617,6 @@
           });
         });
       } // /new_object_form
-    },
-    get_filter_vals: function () {
-      var filterVals = can.Model.Cacheable.prototype.get_filter_vals;
-      var mappings = $.extend({}, this.class.filter_mappings, {
-        audit: 'audit',
-        code: 'slug',
-        description: 'description',
-        due: 'end_date',
-        'due on': 'end_date',
-        starts: 'start_date',
-        'starts on': 'start_date',
-        state: 'status',
-        title: 'title'
-      });
-      var keys = _.union(this.class.filter_keys, ['state'], _.keys(mappings));
-      var vals = filterVals.call(this, keys, mappings);
-
-      try {
-        vals.starts = moment(this.start_date).format('YYYY-MM-DD');
-        vals['starts on'] = vals.starts;
-        vals.due = moment(this.end_date).format('YYYY-MM-DD');
-        vals['due on'] = vals.due;
-        if (this.assignee) {
-          vals.assignee = filterVals.apply(this.assignee.reify(), []);
-        }
-      } catch (e) {}
-
-      return vals;
     },
     save: function () {
       // Make sure the context is always set to the parent audit
