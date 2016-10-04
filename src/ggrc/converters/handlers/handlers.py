@@ -50,6 +50,7 @@ class ColumnHandler(object):
     self.row_converter = row_converter
     self.key = key
     self.value = None
+    self.set_empty = False
     self.raw_value = options.get("raw_value", "").strip()
     self.validator = options.get("validator")
     self.mandatory = options.get("mandatory", False)
@@ -96,7 +97,7 @@ class ColumnHandler(object):
     return self.raw_value
 
   def set_obj_attr(self):
-    if not self.value:
+    if not self.set_empty and not self.value:
       return
     try:
       setattr(self.row_converter.obj, self.key, self.value)
@@ -453,8 +454,17 @@ class ConclusionColumnHandler(ColumnHandler):
 
 
 class OptionColumnHandler(ColumnHandler):
+  """Column handler for option fields.
+
+  This column handler is used only for option fields that have their values
+  stored in the Options table. Hardcoded options and boolean options should
+  not be handled by this class.
+  """
 
   def parse_item(self):
+    if not self.mandatory and self.raw_value in {"--", "---"}:
+      self.set_empty = True
+      return None
     prefixed_key = "{}_{}".format(
         self.row_converter.object_class._inflector.table_singular, self.key)
     item = Option.query.filter(
