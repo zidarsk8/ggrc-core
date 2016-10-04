@@ -102,8 +102,3 @@ UNSUPPORTED_OPERATION_ERROR = (u"Line {line}: {operation} is not supported. "
 
 INVALID_ATTRIBUTE_WARNING = (u"Line {line}: Object does not contain attribute "
                              u"'{column_name}'. The value will be ignored.")
-
-MULTIBYTE_ATTRIBUTE_ERROR = (u"Line {line}: Cannot import objects with "
-                             u"an attribute name that contains multi-byte "
-                             u"characters: '{column_name}'. "
-                             u"The whole block will be ignored.")
