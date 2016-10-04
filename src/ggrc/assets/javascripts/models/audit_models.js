@@ -347,21 +347,6 @@
 
   can.Model.Cacheable('CMS.Models.Request', {
     root_object: 'request',
-    filter_keys: ['assignee', 'audit', 'code', 'company', 'control', 'due on',
-      'due', 'name', 'notes', 'request', 'starts', 'starts on', 'status',
-      'test', 'title', 'request_type', 'type', 'request type',
-      'request_object', 'request object', 'request title',
-      'verified', 'verified_date', 'finished_date'
-    ],
-    filter_mappings: {
-      type: 'request_type',
-      'request title': 'title',
-      'request description': 'description',
-      'request type': 'request_type',
-      'verified date': 'verified_date',
-      'finished date': 'finished_date',
-      'request date': 'requested_on'
-    },
     root_collection: 'requests',
     findAll: 'GET /api/requests',
     findOne: 'GET /api/requests/{id}',
