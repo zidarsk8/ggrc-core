@@ -37,7 +37,16 @@
               });
             result.push({
               cav: cav,
-              cad: cad,
+              cad: {
+                id: cad.id,
+                attribute_type: cad.attribute_type,
+                mandatory: cad.mandatory,
+                title: cad.title,
+                label: cad.label,
+                placeholder: cad.placeholder,
+                helptext: cad.helptext,
+                multi_choice_options: cad.multi_choice_options
+              },
               type: GGRC.Utils.mapCAType(type)
             });
           }.bind(this));

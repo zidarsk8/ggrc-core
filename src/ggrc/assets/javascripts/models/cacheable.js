@@ -819,8 +819,7 @@
           if (definition.attribute_type === 'Checkbox') {
             self.class.validate('custom_attributes.' + definition.id,
               function (val) {
-                var msg = val ? '' : 'must be checked';
-                return msg;
+                return val ? '' : 'must be checked';
               });
           } else {
             self.class.validateNonBlank('custom_attributes.' + definition.id);
@@ -835,8 +834,7 @@
           var def;
           var attributeValue;
           var object;
-          var stub = value;
-          value = value.isStub ? value : stub.reify();
+          value = value.isStub ? value : value.reify();
           def = _.find(this.custom_attribute_definitions, {
             id: value.custom_attribute_id
           });
@@ -855,14 +853,14 @@
 
     // Due to the current lack on any information on sort order, just use the
     // order the custom attributes were defined in.
-    function sortById(a, b) {
-      return a.id - b.id;
-    }
-    // Sort only if definitions were attached.
-    if (this.attr('custom_attribute_definitions')) {
-      this.attr('custom_attribute_definitions').sort(sortById);
-    }
-  },
+      function sortById(a, b) {
+        return a.id - b.id;
+      }
+      // Sort only if definitions were attached.
+      if (this.attr('custom_attribute_definitions')) {
+        this.attr('custom_attribute_definitions').sort(sortById);
+      }
+    },
 
     _custom_attribute_map: function (attrId, object) {
       var definition;
@@ -1285,84 +1283,6 @@
 
       return RefreshQueue.refresh_all(this, props, true);
     },
-    get_filter_vals: function (keys, mappings) {
-      var values = {};
-      var customAttrs = {};
-      var customAttrIds = {};
-      var longTitle = this.type.toLowerCase() + ' title';
-
-      keys = keys || this.class.filter_keys;
-      mappings = mappings || this.class.filter_mappings;
-
-      if (!this.custom_attribute_definitions) {
-        this.load_custom_attribute_definitions();
-      }
-      this.custom_attribute_definitions.each(function (definition) {
-        customAttrIds[definition.id] = definition.title.toLowerCase();
-      });
-      if (!this.custom_attributes) {
-        this.setup_custom_attributes();
-      }
-      can.each(this.custom_attribute_values, function (customAttr) {
-        var value;
-        var obj;
-        customAttr = customAttr.reify();
-        if (customAttr.attribute_object) {
-          obj = customAttr.attribute_object.reify();
-          value = _.filter([obj.email, obj.name, obj.title, obj.slug]);
-        } else {
-          value = customAttr.attribute_value;
-        }
-        customAttrs[customAttrIds[customAttr.custom_attribute_id]] = value;
-      });
-
-      if (!mappings[longTitle]) {
-        mappings[longTitle] = 'title';
-      }
-      keys = _.union(keys, longTitle, _.keys(mappings), _.keys(customAttrs));
-      $.each(keys, function (index, key) {
-        var attrKey = mappings[key] || key;
-        var val;
-        var owner;
-        var audit;
-
-        val = this[attrKey];
-        if (val === undefined) {
-          val = customAttrs[attrKey];
-        }
-
-        if (val !== undefined && val !== null) {
-          if (key === 'owner' || key === 'owners') {
-            values[key] = [];
-            val.forEach(function (owner_stub) {
-              owner = owner_stub.reify();
-              values[key].push({
-                name: owner.name,
-                email: owner.email
-              });
-            });
-          } else if (key === 'audit') {
-            audit = this.audit.reify();
-            values[key] = {
-              status: audit.status,
-              title: audit.title
-            };
-          } else {
-            if ($.type(val) === 'date') {
-              val = val.toISOString().substring(0, 10);
-            }
-            if ($.type(val) === 'boolean') {
-              val = String(val);
-            }
-            if (_.contains(['string', 'array'], $.type(val))) {
-              values[key] = val;
-            }
-          }
-        }
-      }.bind(this));
-      return values;
-    },
-
     hash_fragment: function () {
       var type = can.spaceCamelCase(this.type || '')
             .toLowerCase()
