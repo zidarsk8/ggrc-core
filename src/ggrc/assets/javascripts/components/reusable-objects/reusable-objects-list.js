@@ -36,13 +36,17 @@
     tag: 'reusable-objects-list',
     scope: {
       baseInstance: null,
+      checkReusedStatus: false,
       selectedList: new can.List(),
       isSaving: false,
       reuseSelected: function () {
         var reusedList = this.attr('selectedList');
         var source = this.attr('baseInstance');
-        var models = Array.prototype.filter
-          // Get Array of unique items
+        var models;
+        this.attr('isSaving', true);
+        this.attr('checkReusedStatus', false);
+        models = Array.prototype.filter
+        // Get Array of unique items
           .call(reusedList, function (item, index) {
             return index === reusedList.indexOf(item);
           })
@@ -52,14 +56,22 @@
               .mapObjects(source, destination)
               .save();
           });
-        this.attr('isSaving', true);
-        can.when.apply(can, models).then(function () {
-          can.$(document.body).trigger('ajax:flash', {
-            success: 'Selected evidences are reused'
-          });
-          reusedList.replace([]);
-          this.attr('isSaving', false);
-        }.bind(this));
+        can.when.apply(can, models)
+          .done(function () {
+            can.$(document.body).trigger('ajax:flash', {
+              success: 'Selected evidences are reused'
+            });
+          })
+          .fail(function () {
+            can.$(document.body).trigger('ajax:flash', {
+              error: 'Selected evidences were not reused'
+            });
+          })
+          .always(function () {
+            reusedList.replace([]);
+            this.attr('isSaving', false);
+            this.attr('checkReusedStatus', true);
+          }.bind(this));
       }
     },
     events: {

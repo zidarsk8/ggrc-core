@@ -14,21 +14,24 @@
     template: tpl,
     scope: {
       isSaving: false,
+      instance: null,
+      checkReusedStatus: false,
       selectedList: new can.List(),
       disabled: false,
       isDisabled: function () {
         return this.attr('disabled');
       },
       setDisabled: function () {
-        this.attr('disabled', GGRC.Utils.is_mapped(
+        var isDisabled = GGRC.Utils.is_mapped(
           this.attr('baseInstance'),
           this.attr('instance'),
-          this.attr('mapping')));
+          this.attr('mapping'));
+        this.attr('disabled', isDisabled);
       },
-      toggleSelection: function (val) {
+      toggleSelection: function (isChecked) {
         var list = this.attr('selectedList');
         var index;
-        if (val) {
+        if (isChecked) {
           list.push(this.attr('instance'));
         } else {
           index = list.indexOf(this.attr('instance'));
@@ -43,11 +46,10 @@
       'input[type="checkbox"] change': function (el) {
         this.scope.toggleSelection(el.is(':checked'));
       },
-      '{scope.baseInstance.object_documents} length': function () {
-        this.scope.setDisabled();
-      },
-      '{scope.baseInstance.related_destinations} length': function () {
-        this.scope.setDisabled();
+      '{scope} checkReusedStatus': function (scope, ev, performCheck) {
+        if (performCheck) {
+          this.scope.setDisabled();
+        }
       }
     }
   });
