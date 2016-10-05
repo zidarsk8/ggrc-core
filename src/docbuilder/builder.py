@@ -1,6 +1,8 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""API documentation builder."""
+
 import os
 import shutil
 
@@ -47,6 +49,7 @@ def build(title, path=None):
       )
 
 
+# pylint: disable=invalid-name
 _template_path = os.path.join(
     os.path.dirname(os.path.realpath(__file__)),
     'templates',

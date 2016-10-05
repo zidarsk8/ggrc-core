@@ -6,22 +6,22 @@
 from textwrap import dedent
 
 
-def title(s, underscore='='):
+def title(text, underscore='='):
   """
   Returns ReST title.
 
   ..  code-block:: pycon
 
-      >>> s = 'Hello'
-      >>> print(title(s))
+      >>> text = 'Hello'
+      >>> print(title(text))
       Hello
       =====
-      >>> print(title(s, '-'))
+      >>> print(title(text, '-'))
       Hello
       -----
 
   """
-  return s + '\n' + underscore * len(s)
+  return text + '\n' + underscore * len(text)
 
 
 def doc(descriptor, indent=0):

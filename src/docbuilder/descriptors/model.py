@@ -31,6 +31,7 @@ class Model(Descriptor):
   @cached_property
   def create_table(self):
     """Text of "CREATE TABLE ..." query."""
+    # pylint: disable=no-value-for-parameter
     query = CreateTable(self.obj.__table__).compile(dialect=mysql.dialect())
     return str(query).strip()
 

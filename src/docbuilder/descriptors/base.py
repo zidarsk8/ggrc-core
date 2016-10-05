@@ -47,7 +47,7 @@ from collections import OrderedDict
 from cached_property import cached_property
 
 
-class DesciptorMeta(type):
+class DescriptorMeta(type):
   """Descriptor Metaclass."""
 
   def __init__(cls, name, bases, attrs):
@@ -55,6 +55,7 @@ class DesciptorMeta(type):
     cls.__registry__ = OrderedDict()
     cls.__registry__.sorted = False
     cls.__registry__.collected = False
+    super(DescriptorMeta, cls).__init__(name, bases, attrs)
 
   def __contains__(cls, obj):
     """Adds support of ``in`` operation to the class object itself."""
@@ -64,7 +65,7 @@ class DesciptorMeta(type):
 class Descriptor(object):
   """Base class for concrete descriptor classes."""
 
-  __metaclass__ = DesciptorMeta
+  __metaclass__ = DescriptorMeta
 
   def __new__(cls, obj):
     """Prevents creation of duplicating descriptors for single object."""
