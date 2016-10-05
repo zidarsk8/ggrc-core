@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from inspect import getdoc
+from collections import OrderedDict
 
 from cached_property import cached_property
 
@@ -9,9 +10,9 @@ from cached_property import cached_property
 class DesciptorMeta(type):
 
   def __init__(cls, name, bases, attrs):
-    cls.__registry__ = {}
-    cls.__cache__ = None
-    cls.__built__ = False
+    cls.__registry__ = OrderedDict()
+    cls.__registry__.sorted = False
+    cls.__registry__.collected = False
 
   def __contains__(cls, obj):
     return id(obj) in cls.__registry__
@@ -25,7 +26,7 @@ class Descriptor(object):
     oid = id(obj)
     if oid not in cls.__registry__:
       cls.__registry__[oid] = super(Descriptor, cls).__new__(cls, obj)
-      cls.__cache__ = None
+      cls.__registry__.sorted = False
     return cls.__registry__[oid]
 
   @classmethod
@@ -33,30 +34,21 @@ class Descriptor(object):
     raise NotImplementedError('Method should be implemented by subclass')
 
   @classmethod
-  def build(cls):
-    if cls.__built__:
-      return
-    cls.__built__ = True
-    try:
-      objects = cls.collect()
-    except NotImplementedError:
-      return
-    for obj in objects:
-      cls(obj)
-
-  @classmethod
   def all(cls):
-    cls.build()
-    if not cls.__cache__:
-      cls.__cache__ = cls.__registry__.values()
-      cls.__cache__.sort()
-    return iter(cls.__cache__)
+    if not cls.__registry__.collected:
+      for obj in cls.collect():
+        cls(obj)
+      cls.__registry__.collected = True
+    if not cls.__registry__.sorted:
+      instances = cls.__registry__.items()
+      instances.sort(key=lambda item: item[1].name)
+      cls.__registry__.clear()
+      cls.__registry__.update(instances)
+      cls.__registry__.sorted = True
+    return cls.__registry__.itervalues()
 
   def __init__(self, obj):
     self.obj = obj
-
-  def __cmp__(self, other):
-    return cmp(self.name, other.name)
 
   @cached_property
   def name(self):
