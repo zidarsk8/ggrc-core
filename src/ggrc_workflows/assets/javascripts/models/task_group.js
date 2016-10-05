@@ -153,11 +153,18 @@
     }
   }, {
     init: function () {
+      // default start and end date
+      var startDate = this.attr('start_date') || new Date();
+      var endDate = this.attr('end_date') ||
+        new Date(moment().add(7, 'days').format());
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      // Add base value to this property
+      // Add base values to this property
       this.attr('response_options', []);
+      this.attr('start_date', startDate);
+      this.attr('end_date', endDate);
+      this.attr('minStartDate', new Date());
 
       this.bind('task_group', function (ev, newTask) {
         var task;

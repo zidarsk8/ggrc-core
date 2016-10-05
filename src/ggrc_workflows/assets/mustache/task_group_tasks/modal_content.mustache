@@ -78,20 +78,16 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
         </label>
         <label class="smaller">
-           <datepicker
-            set-max-date="instance.end_date"
-            date="instance.start_date"
-            required="true"
-            label="Starts Date"
-            />
+           <datepicker set-min-date="instance.minStartDate"
+                       date="instance.start_date"
+                       required="{{true}}"
+                       label="Start Date"></datepicker>
         </label>
         <label class="smaller">
-          <datepicker
-            set-min-date="instance.start_date"
-            date="instance.end_date"
-            required="true"
-            label="Due Date"
-            />
+          <datepicker set-min-date="instance.start_date"
+                      date="instance.end_date"
+                      required="{{true}}"
+                      label="Due Date"></datepicker>
         </label>
       </div>
       {{/add_to_current_scope}}

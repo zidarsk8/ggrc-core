@@ -124,7 +124,7 @@
           <datepicker
             set-max-date="instance.end_date"
             date="instance.start_date"
-            required="true"
+            required="{{true}}"
             label="Starts Date"
             />
             {{#instance.computed_errors.start_date}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.start_date}}
@@ -134,7 +134,7 @@
           <datepicker
             set-min-date="instance.start_date"
             date="instance.end_date"
-            required="true"
+            required="{{true}}"
             label="Due Date"
             />
             {{#instance.computed_errors.end_date}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.end_date}}

@@ -51,6 +51,7 @@
     {{/if_equals}}
 
     {{#if instance.class.is_clonable}}
+    {{#is_allowed 'update' instance context='for'}}
     <li>
       <object-cloner
         instance="instance"
@@ -63,6 +64,7 @@
           Clone {{ instance.type }}</a>
       </object-cloner>
     </li>
+    {{/is_allowed}}
     {{/if}}
 
     <li>
