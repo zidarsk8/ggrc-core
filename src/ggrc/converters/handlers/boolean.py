@@ -22,13 +22,15 @@ class CheckboxColumnHandler(handlers.ColumnHandler):
   ALLOWED_VALUES = {"yes", "true", "no", "false", "--", "---"}
   TRUE_VALUES = {"yes", "true"}
   NONE_VALUES = {"--", "---"}
+  _true = "yes"
+  _false = "no"
 
   def parse_item(self):
     """ mandatory checkboxes will get evelauted to false on empty value """
     if self.raw_value == "":
       return False
     value = self.raw_value.lower() in self.TRUE_VALUES
-    if self.raw_value == self.NONE_VALUES:
+    if self.raw_value in self.NONE_VALUES:
       value = None
     if self.raw_value.lower() not in self.ALLOWED_VALUES:
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
@@ -38,7 +40,7 @@ class CheckboxColumnHandler(handlers.ColumnHandler):
     val = getattr(self.row_converter.obj, self.key, False)
     if val is None:
       return "--"
-    return "true" if val else "false"
+    return self._true if val else self._false
 
   def set_obj_attr(self):
     """ handle set object for boolean values
@@ -63,4 +65,5 @@ class KeyControlColumnHandler(CheckboxColumnHandler):
 
   ALLOWED_VALUES = {"key", "non-key", "--", "---"}
   TRUE_VALUES = {"key"}
-  NONE_VALUES = {"--", "---"}
+  _true = "key"
+  _false = "non-key"
