@@ -11,7 +11,10 @@
     update: 'PUT /api/assessments/{id}',
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
-    mixins: ['ownable', 'contactable', 'unique_title', 'relatable'],
+    mixins: [
+      'ownable', 'contactable', 'unique_title', 'relatable',
+      'autoStatusChangeable'
+    ],
     relatable_options: {
       relevantTypes: {
         Audit: {

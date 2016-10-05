@@ -30,6 +30,9 @@
         value: null,
         options: null
       },
+
+      _EV_BEFORE_EDIT: 'before-edit',  // before entering the edit mode
+
       setPerson: function (scope, el, ev) {
         this.attr('context.value', ev.selectedItem.serialize());
       },
@@ -37,25 +40,43 @@
         ev.preventDefault();
         this.attr('context.value', undefined);
       },
+
       /**
        * Enter the edit mode if editing is allowed (i.e. the readonly option is
-       * not set). If the readonly option is enabled, do not do anything.
+       * not set).
+       *
+       * If the readonly option is enabled, do not do anything. The same if the
+       * beforeEdit handler is not defined, or if the promise it returns is not
+       * resolved.
        *
        * @param {can.Map} scope - the scope object itself (this)
+       * @param {jQuery.Element} $el - the DOM element that triggered the event
+       * @param {jQuery.Event} ev - the event object
        */
-      enableEdit: function (scope) {
-        if (scope.attr('readonly')) {
+      enableEdit: function (scope, $el, ev) {
+        var confirmation;
+        var onBeforeEdit = this.$rootEl.attr('can-' + scope._EV_BEFORE_EDIT);
+
+        ev.preventDefault();
+
+        if (this.attr('readonly')) {
           return;
         }
-        if (scope.needConfirm) {
-          scope.confirmEdit.confirm(scope.instance,
-            scope.confirmEdit).done(function () {
-              scope.attr('isEdit', true);
-            });
-        } else {
-          scope.attr('isEdit', true);
+
+        if (!onBeforeEdit) {
+          this.attr('isEdit', true);
+          return;
         }
+
+        confirmation = this.$rootEl.triggerHandler({
+          type: this._EV_BEFORE_EDIT
+        });
+
+        confirmation.done(function () {
+          this.attr('isEdit', true);
+        }.bind(this));   // and do nothing if no confirmation by the user
       },
+
       onCancel: function (scope) {
         scope.attr('isEdit', false);
         scope.attr('context.value', scope.attr('_value'));
@@ -80,12 +101,14 @@
         this.attr('isSaving', true);
       }
     },
-    init: function () {
+    init: function (element, options) {
       var scope = this.scope;
       var value = scope.attr('value');
 
       scope.attr('_value', value);
       scope.attr('context.value', value);
+
+      scope.attr('$rootEl', $(element));
     },
     events: {
       '{window} mousedown': function (el, ev) {
