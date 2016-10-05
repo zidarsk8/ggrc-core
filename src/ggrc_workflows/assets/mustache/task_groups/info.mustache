@@ -62,7 +62,7 @@
           {{#with_mapping 'task_group_tasks' instance}}
             <h3>Tasks (<span>{{task_group_tasks.length}}</span>)</h3>
             <h4 class="inline-explanation">Define tasks</h4>
-            <sort-by-sort-index mapping="task_group_tasks">
+            <tasks-sort-list mapping="task_group_tasks">
               <ul class="tree-structure new-tree"
                   {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
                 {{#each sorted}}
@@ -70,7 +70,7 @@
                 {{/each}}
                 {{>'/static/mustache/task_group_tasks/task_group_subtree_footer.mustache'}}
               </ul>
-            </sort-by-sort-index>
+            </tasks-sort-list>
           {{/with_mapping}}
         </div>
 
