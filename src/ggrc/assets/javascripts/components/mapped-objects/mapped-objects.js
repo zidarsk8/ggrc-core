@@ -28,16 +28,27 @@
           GGRC.Utils.filters.applyTypeFilter(items, filterObj.serialize()) :
           items;
       },
+      getBinding: function () {
+        return this.attr('parentInstance').get_binding(this.attr('mapping'));
+      },
       load: function () {
         var dfd = new can.Deferred();
+        var binding = this.getBinding();
+        // Set Loading Status
         this.attr('isLoading', true);
-        this.attr('parentInstance')
-          .get_binding(this.attr('mapping'))
+
+        if (!binding) {
+          dfd.resolve([]);
+          return dfd;
+        }
+        binding
           .refresh_instances()
           .done(function (items) {
-            items = this.filterMappedObjects(items);
-            dfd.resolve(items);
+            dfd.resolve(this.filterMappedObjects(items));
           }.bind(this))
+          .fail(function () {
+            dfd.resolve([]);
+          })
           .always(function () {
             this.attr('isLoading', false);
           }.bind(this));

@@ -3,14 +3,26 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 .grid-data-toolbar {
-  height: 28px;
+  height: 26px;
   margin: 0 0 16px 0;
 
   .grid-data-toolbar-control {
-    width: 85px;
-    height: 28px;
+    display: flex;
+    height: 26px;
     line-height: 26px;
-    margin: 0 0 0 24px;
+    padding: 0 0 0 16px;
+
+    .btn.btn-small {
+      height: 26px;
+      line-height: 26px;
+      box-sizing: border-box;
+      padding: 0 16px;
+    }
+
+    > * {
+      min-width: 86px;
+      margin: 0 0 0 12px;
+    }
   }
 }
 
