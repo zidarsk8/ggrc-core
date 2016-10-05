@@ -164,6 +164,10 @@
       var hasPending;
       var changedInstance;
 
+      if (e) {
+        e.preventDefault();
+      }
+
       // If the hide was initiated by the backdrop, check for dirty form data before continuing
       if (e && $(e.target).is('.modal-backdrop,.fa-times')) {
         if ($(e.target).is('.disabled')) {
