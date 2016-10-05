@@ -24,7 +24,7 @@ class Model(Descriptor):
   def mixins(self):
     """List of mixins used by the target model."""
     return [
-        Mixin(class_) for class_ in self.obj.mro()[1:]
+        Mixin(class_) for class_ in self.obj.__mro__[1:]
         if class_.__module__.startswith('ggrc')
     ]
 
