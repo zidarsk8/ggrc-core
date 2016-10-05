@@ -476,7 +476,7 @@ class OptionColumnHandler(ColumnHandler):
   def get_value(self):
     option = getattr(self.row_converter.obj, self.key, None)
     if option is None:
-      return ""
+      return "--"
     if callable(option.title):
       return option.title()
     return option.title
