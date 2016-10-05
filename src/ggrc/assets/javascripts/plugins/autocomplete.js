@@ -284,6 +284,7 @@
 
       $ul.unbind('scrollNext')
         .bind('scrollNext', function (ev, data) {
+          var listItems;
           if (context.attr('scroll_op_in_progress') ||
               context.attr('oldLen') === context.attr('items').length) {
             return;
@@ -295,11 +296,19 @@
           context.attr('scroll_op_in_progress', true);
           context.attr('items_loading', true);
           this.source(this.last_request, function (items) {
-            var listItems = context.attr('items');
-            context.attr('oldLen', listItems.length);
-            listItems.push.apply(listItems, can.map(items, function (item) {
-              return item.item;
-            }));
+            try {
+              listItems = context.attr('items');
+              listItems.push.apply(listItems, can.map(items, function (item) {
+                return item.item;
+              }));
+              context.attr('oldLen', listItems.length);
+            } catch (error) {
+              // Really ugly way to hide canjs exception during scrolling.
+              // Please note that it occurs in really rear cases.
+              // Better solution is needed.
+              console.warn(error);
+            }
+
             context.removeAttr('items_loading');
             _.defer(function () {
               context.attr('scroll_op_in_progress', false);
