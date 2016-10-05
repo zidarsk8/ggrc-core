@@ -47,6 +47,14 @@
         if (type === 'checkbox') {
           return value === '1';
         }
+
+        if (type === 'input') {
+          if (!value) {
+            return null;
+          }
+          return value.trim();
+        }
+
         if (type === 'person') {
           if (valueObj) {
             return valueObj;
