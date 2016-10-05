@@ -11,6 +11,16 @@ from docbuilder import helpers
 
 
 def build(title, path=None):
+  """
+  Build ReST documentation from package descriptors.
+
+  Argument ``title`` is used as title of index document.
+
+  Argument ``path``, if specified sould point to a target directory,
+  where result documentation will be placed. All existent files of
+  the directory will be lost.  By default, ``path`` is equal to ``./_docs``.
+
+  """
   if path is None:
     path = os.path.join(os.path.realpath('.'), '_docs')
 
@@ -45,6 +55,13 @@ _templates = {}
 
 
 def render(filename, template, basedir=None, **data):
+  """
+  Render specified ``template`` into ``filename`` using ``data``.
+
+  Optional ``basedir`` argument is used to calculate absoulte path
+  to ``filename``.
+
+  """
   if template not in _templates:
     _templates[template] = Template(
         filename=os.path.join(_template_path, template + '.mako'),
