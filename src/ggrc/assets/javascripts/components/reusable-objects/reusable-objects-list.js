@@ -21,9 +21,16 @@
         document: destination
       });
     },
-    // TODO: need to add a more reliable check
     isObjectDocument: function (object) {
-      return object.object_documents && object.object_documents.length;
+      var isObjectDocument;
+      if (object.attr('reuseMapperType')) {
+        isObjectDocument =
+          object.attr('reuseMapperType') === 'all_documents';
+      } else {
+        isObjectDocument =
+          object.object_documents && object.object_documents.length;
+      }
+      return isObjectDocument;
     },
     mapObjects: function (source, destination) {
       return this.isObjectDocument(destination) ?
@@ -37,7 +44,7 @@
     scope: {
       baseInstance: null,
       checkReusedStatus: false,
-      selectedList: new can.List(),
+      selectedList: [],
       isSaving: false,
       reuseSelected: function () {
         var reusedList = this.attr('selectedList');

@@ -16,10 +16,15 @@
       isSaving: false,
       instance: null,
       checkReusedStatus: false,
-      selectedList: new can.List(),
+      selectedList: [],
       disabled: false,
+      mapping: null,
       isDisabled: function () {
         return this.attr('disabled');
+      },
+      setReuseMapperType: function () {
+        // Add extra attribute to the instance property to setup exact mapper type
+        this.attr('instance.reuseMapperType', this.attr('mapping'));
       },
       setDisabled: function () {
         var isDisabled = GGRC.Utils.is_mapped(
@@ -40,6 +45,7 @@
       }
     },
     init: function () {
+      this.scope.setReuseMapperType();
       this.scope.setDisabled();
     },
     events: {
