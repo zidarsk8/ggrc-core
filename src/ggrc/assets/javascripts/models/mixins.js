@@ -151,6 +151,52 @@
     }
   });
 
+  /**
+   * A mixin to use for objects that can have their status automatically
+   * changed when they are edited.
+   *
+   * @class CMS.Models.Mixins.autoStatusChangeable
+   */
+  can.Model.Mixin('autoStatusChangeable', {}, {
+
+    /**
+     * Display a confirmation dialog before starting to edit the instance.
+     *
+     * The dialog is not shown only if the instance is in the "In Progress"
+     * state - in that case an already resolved promise is returned.
+     *
+     * @return {Promise} A promise resolved/rejected if the user chooses to
+     *   confirm/reject the dialog.
+     */
+    confirmBeginEdit: function () {
+      var STATUS_IN_PROGRESS = 'In Progress';
+
+      var TITLE = [
+        'Confirm moving ', this.type, ' to "', STATUS_IN_PROGRESS, '"'
+      ].join('');
+
+      var DESCRIPTION = [
+        'If you modify a value, the status of the ', this.type,
+        ' will move from "', this.status, '" to "',
+        STATUS_IN_PROGRESS, '" - are you sure about that?'
+      ].join('');
+
+      var confirmation = $.Deferred();
+
+      if (this.status === STATUS_IN_PROGRESS) {
+        confirmation.resolve();
+      } else {
+        GGRC.Controllers.Modals.confirm({
+          modal_description: DESCRIPTION,
+          modal_title: TITLE,
+          button_view: GGRC.mustache_path + '/gdrive/confirm_buttons.mustache'
+        }, confirmation.resolve, confirmation.reject);
+      }
+
+      return confirmation.promise();
+    }
+  });
+
   can.Model.Mixin('unique_title', {
     'after:init': function () {
       this.validate(['title', '_transient.title'], function (newVal, prop) {

@@ -43,30 +43,73 @@ describe('GGRC.Components.inlineEdit', function () {
       };
       scope = new can.Map({
         context: {},
-        instance: {}
+        instance: {},
+        _EV_BEFORE_EDIT: 'before-edit'
       });
     });
 
     describe('enableEdit() method', function () {
       var enableEdit;
+      var $rootEl;  // the component's root element
+      var dfdBeforeEdit;
 
       beforeEach(function () {
+        $rootEl = $('<div can-before-edit=""></div>');
+        scope.attr('$rootEl', $rootEl);
+
+        dfdBeforeEdit = new can.Deferred();
+        spyOn($rootEl, 'triggerHandler')
+          .and.returnValue(dfdBeforeEdit.promise());
+
         enableEdit = Component.prototype.scope.enableEdit;
         enableEdit = enableEdit.bind(scope);
       });
 
-      it('enters the edit mode if editing allowed', function () {
-        scope.attr('context.isEdit', false);
-        scope.attr('instance.status', 'In Progress');
-        scope.attr('readonly', false);
+      it('enters the edit mode if editing allowed and no beforeEdit callback',
+        function () {
+          scope.attr('context.isEdit', false);
+          scope.attr('readonly', false);
+          $rootEl.attr('can-before-edit', '');
 
-        enableEdit(scope, $el, ev);
-        expect(scope.attr('context.isEdit')).toEqual(true);
-      });
+          enableEdit(scope, $el, ev);
+          expect(scope.attr('context.isEdit')).toEqual(true);
+        }
+      );
+
+      it('enters the edit mode if editing allowed and beforeEdit ' +
+        'callback\'s promise is resolved',
+        function () {
+          scope.attr('context.isEdit', false);
+          scope.attr('readonly', false);
+          $rootEl.attr('can-before-edit', 'open-dialog-foo');
+
+          enableEdit(scope, $el, ev);
+
+          expect(scope.attr('context.isEdit')).toEqual(
+            false,
+            'Edit mode enabled prematurely.'
+          );
+          dfdBeforeEdit.resolve();
+          expect(scope.attr('context.isEdit')).toEqual(true);
+        }
+      );
+
+      it('does not enters the edit mode if editing allowed but beforeEdit ' +
+        'callback\'s promise is rejected',
+        function () {
+          scope.attr('context.isEdit', false);
+          scope.attr('readonly', false);
+          $rootEl.attr('can-before-edit', 'open-dialog-foo');
+
+          enableEdit(scope, $el, ev);
+
+          dfdBeforeEdit.reject();
+          expect(scope.attr('context.isEdit')).toEqual(false);
+        }
+      );
 
       it('does not enter the edit mode if editing not allowed', function () {
         scope.attr('context.isEdit', false);
-        scope.attr('instance.status', 'In Progress');
         scope.attr('readonly', true);
 
         enableEdit(scope, $el, ev);

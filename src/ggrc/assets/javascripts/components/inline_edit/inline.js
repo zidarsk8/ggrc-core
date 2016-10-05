@@ -28,22 +28,47 @@
       emptyText: '@',
       $rootEl: null,
       type: '@',
-      _EV_INSTANCE_SAVE: 'on-save',
+
+      // event names definitions
+      _EV_INSTANCE_SAVE: 'on-save',  // "save" button is clicked
+      _EV_BEFORE_EDIT: 'before-edit',  // before entering the edit mode
 
       /**
        * Enter the edit mode if editing is allowed (i.e. the readonly option is
-       * not set). If the readonly option is enabled, do not do anything.
+       * not set).
+       *
+       * If the readonly option is enabled, do not do anything. The same if the
+       * beforeEdit handler is not defined, or if the promise it returns is not
+       * resolved.
        *
        * @param {can.Map} scope - the scope object itself (this)
        * @param {jQuery.Element} $el - the DOM element that triggered the event
        * @param {jQuery.Event} ev - the event object
        */
       enableEdit: function (scope, $el, ev) {
+        var confirmation;
+        var onBeforeEdit = this.$rootEl.attr('can-' + scope._EV_BEFORE_EDIT);
+
         ev.preventDefault();
-        if (!this.attr('readonly')) {
-          this.attr('context.isEdit', true);
+
+        if (this.attr('readonly')) {
+          return;
         }
+
+        if (!onBeforeEdit) {
+          this.attr('context.isEdit', true);
+          return;
+        }
+
+        confirmation = this.$rootEl.triggerHandler({
+          type: this._EV_BEFORE_EDIT
+        });
+
+        confirmation.done(function () {
+          this.attr('context.isEdit', true);
+        }.bind(this));   // and do nothing if no confirmation by the user
       },
+
       onCancel: function (ctx, el, ev) {
         ev.preventDefault();
         this.attr('context.isEdit', false);

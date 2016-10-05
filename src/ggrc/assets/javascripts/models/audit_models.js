@@ -374,7 +374,7 @@
     create: 'POST /api/requests',
     update: 'PUT /api/requests/{id}',
     destroy: 'DELETE /api/requests/{id}',
-    mixins: ['unique_title', 'relatable', 'ca_update'],
+    mixins: ['unique_title', 'relatable', 'ca_update', 'autoStatusChangeable'],
     relatable_options: {
       relevantTypes: {
         Audit: {
