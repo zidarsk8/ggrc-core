@@ -1447,6 +1447,10 @@
         this.__instance = this._model().model(this);
       }
       return this.__instance;
+    },
+
+    getInstance: function () {
+      return this._instance();
     }
   });
 

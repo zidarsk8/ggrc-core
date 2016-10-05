@@ -6,22 +6,27 @@
 (function (can, GGRC, CMS) {
   'use strict';
 
+  var defaultOrderBy = 'created_at';
+
   can.Component.extend({
     tag: 'related-objects',
     scope: {
+      isLoading: false,
       baseInstance: null,
+      relatedObjects: [],
       relatedItemsType: '@',
-      relatedObjects: new can.List(),
+      orderBy: '@',
       paging: {
         current: 1,
         pageSize: 5,
         pageSizeSelect: [5, 10, 15]
       },
-      isLoading: false,
       getParams: function () {
         var id = this.attr('baseInstance.id');
+        var type = this.attr('baseInstance.type');
         var relatedType = this.attr('relatedItemsType');
         var page = this.attr('paging');
+        var orderBy = this.attr('orderBy') || defaultOrderBy;
         var params = {};
         var first;
         var last;
@@ -33,16 +38,21 @@
         params.data = [{
           limit: [first, last],
           object_name: relatedType,
-          order_by: [{name: '__similarity__', desc: true}],
+          order_by: [{name: orderBy, desc: true}],
           filters: {
             expression: {
-              object_name: relatedType,
+              object_name: type,
               op: {name: 'similar'},
               ids: [id]
             }
           }
         }];
         return params;
+      },
+      updatePaging: function (total) {
+        var count = Math.ceil(total / this.attr('paging.pageSize'));
+        this.attr('paging.total', total);
+        this.attr('paging.count', count);
       },
       loadRelatedItems: function () {
         var dfd = new can.Deferred();
@@ -53,16 +63,18 @@
           .done(function (responseArr) {
             var relatedType = this.attr('relatedItemsType');
             var data = responseArr[0];
-            var total = data[relatedType].total;
-            var count = Math.floor(total / this.attr('paging.pageSize')) + 1;
             var values = data[relatedType].values;
             var result = values.map(function (item) {
               return {instance: new CMS.Models[relatedType](item)};
             });
             // Update paging object
-            this.attr('paging.total', total);
-            this.attr('paging.count', count);
+            this.updatePaging(data[relatedType].total);
             dfd.resolve(result);
+          }.bind(this))
+          .fail(function () {
+            dfd.resolve([]);
+          })
+          .always(function () {
             this.attr('isLoading', false);
           }.bind(this));
         return dfd;
@@ -80,6 +92,16 @@
       },
       '{scope.paging} pageSize': function () {
         this.scope.setRelatedItems();
+      },
+      '{scope.baseInstance} related_destinations': function () {
+        if (!this.scope.attr('isLoading')) {
+          this.scope.setRelatedItems();
+        }
+      },
+      '{scope.baseInstance} related_sources': function () {
+        if (!this.scope.attr('isLoading')) {
+          this.scope.setRelatedItems();
+        }
       }
     }
   });

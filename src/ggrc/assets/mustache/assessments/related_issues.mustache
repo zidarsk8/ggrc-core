@@ -3,41 +3,51 @@ Copyright (C) 2016 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 `}}
 
-<div class="row-fluid wrap-row">
-<ul class="past-items-list relatables mapped-list left-spacing">
-  {{#expose reusedObjects=reusedObjects}}
-  {{#defer 'related_issues' instance.related_issues}}
-  {{#related_issues}}
-    <li class="clearfix">
-      <div class="xmedium-col">
-        <a href="{{instance.viewLink}}" target="_blank">
-          {{instance.title}}
-        </a>
-      </div>
-    </li>
-  {{/related_issues}}
-  {{/defer}}
-  {{/expose}}
-</ul>
-</div>
-<div class="row-fluid wrap-row">
-{{#is_allowed 'update' instance context='for'}}
-  {{#with_mapping 'related_audits' instance}}
-    {{#with_mapping 'related_controls' instance}}
-      {{#using control=control}}
-        {{#with_create_issue_json instance}}
-          <a class="btn btn-small btn-danger"
-             href="javascript://"
-             data-toggle="modal-ajax-form"
-             data-modal-class="modal-wide"
-             data-object-singular="Issue"
-             data-object-plural="issues"
-             data-object-params='{{create_issue_json}}'>
-            Raise an Issue
-          </a>
-        {{/with_create_issue_json}}
-      {{/using}}
-    {{/with_mapping}}
-  {{/with_mapping}}
-{{/is_allowed}}
-</div>
+<related-objects base-instance="instance" related-items-type="Issue">
+    <div class="grid-data-toolbar flex-box">
+        <tree-pagination paging="paging" class="flex-size-1"></tree-pagination>
+      {{#is_allowed 'update' baseInstance context='for'}}
+          <div class="grid-data-toolbar-control">
+            {{#with_mapping 'related_audits' baseInstance}}
+              {{#with_mapping 'related_controls' baseInstance}}
+                {{#using control=control}}
+                  {{#with_create_issue_json baseInstance}}
+                      <a class="btn btn-small btn-danger"
+                         href="javascript://"
+                         data-toggle="modal-ajax-form"
+                         data-modal-class="modal-wide"
+                         data-object-singular="Issue"
+                         data-object-plural="issues"
+                         data-object-params='{{create_issue_json}}'>
+                          Raise an Issue
+                      </a>
+                  {{/with_create_issue_json}}
+                {{/using}}
+              {{/with_mapping}}
+            {{/with_mapping}}
+          </div>
+      {{/is_allowed}}
+    </div>
+    <div class="grid-data-header flex-row flex-box">
+        <div class="flex-size-2">
+            Title
+        </div>
+        <div class="flex-size-3">
+            Description
+        </div>
+    </div>
+    <div class="grid-data-body {{#isLoading}}loading{{/isLoading}}">
+        <object-list items="relatedObjects" is-loading="isLoading" spinner-css="grid-spinner">
+            <div class="grid-data-row flex-row flex-box">
+                <div class="flex-size-2">
+                    <a href="{{instance.viewLink}}" target="_blank">
+                      {{instance.title}}
+                    </a>
+                </div>
+                <div class="flex-size-3">
+                    <read-more text="instance.description"></read-more>
+                </div>
+            </div>
+        </object-list>
+    </div>
+</related-objects>

@@ -205,7 +205,10 @@ class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
           "display_name": "Secondary Assessor",
           "filter_by": "_filter_by_secondary_assessor",
       },
-      "key_control": "Significance",
+      "key_control": {
+          "display_name": "Significance",
+          "description": "Allowed values are:\nkey\nnon-key\n---",
+      }
   }
 
   @validates('kind', 'means', 'verify_frequency')
