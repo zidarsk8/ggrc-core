@@ -18,7 +18,7 @@ def build(title, path=None):
 
   Argument ``title`` is used as title of index document.
 
-  Argument ``path``, if specified sould point to a target directory,
+  Argument ``path``, if specified should point to a target directory,
   where result documentation will be placed. All existent files of
   the directory will be lost.  By default, ``path`` is equal to ``./_docs``.
 
@@ -61,7 +61,7 @@ def render(filename, template, basedir=None, **data):
   """
   Render specified ``template`` into ``filename`` using ``data``.
 
-  Optional ``basedir`` argument is used to calculate absoulte path
+  Optional ``basedir`` argument is used to calculate absolute path
   to ``filename``.
 
   """
