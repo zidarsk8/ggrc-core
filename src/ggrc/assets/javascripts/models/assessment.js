@@ -49,14 +49,6 @@
     defaults: {
       status: 'Not Started'
     },
-    filter_keys: ['title', 'status', 'operationally', 'operational', 'design',
-      'finished_date', 'verified_date', 'verified'],
-    filter_mappings: {
-      state: 'status',
-      operational: 'operationally',
-      'verified date': 'verified_date',
-      'finished date': 'finished_date'
-    },
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
         '/base_objects/tree_add_item.mustache',
