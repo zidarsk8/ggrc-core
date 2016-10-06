@@ -20,7 +20,13 @@ class SqlIndexer(Indexer):
       db.session.commit()
 
   def update_record(self, record, commit=True):
-    self.delete_record(record.key, record.type, commit=False)
+    # remove the obsolete index entries
+    db.session.query(self.record_type).filter(
+        self.record_type.key == record.key,
+        self.record_type.type == record.type,
+        self.record_type.property.in_(list(record.properties.keys())),
+    ).delete(synchronize_session="fetch")
+    # add new index entries
     self.create_record(record, commit=commit)
 
   def delete_record(self, key, type, commit=True):
