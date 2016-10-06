@@ -87,6 +87,19 @@ def get_when_invisible(driver, locator):
       .until(EC.invisibility_of_element_located(locator))
 
 
+def wait_for_element_text(driver, locator, text):
+  """
+    Args:
+      driver (base.CustomDriver)
+      locator (tuple)
+      text (str)
+  """
+  return WebDriverWait(
+      driver,
+      constants.ux.MAX_USER_WAIT_SECONDS) \
+      .until(EC.text_to_be_present_in_element(locator, text))
+
+
 def scroll_to_page_bottom(driver):
   """Scrolls to te page bottom using JS
 
@@ -144,21 +157,22 @@ def handle_alert(driver, accept=False):
 
 def click_on_staleable_element(driver, el_locator):
   """Clicks an element that can be modified between the time we find it
-  and when we click on it."""
+  and when we click on it"""
   time_start = time.time()
 
   while time.time() - time_start < constants.ux.MAX_USER_WAIT_SECONDS:
     try:
       driver.find_element(*el_locator).click()
       break
-    except exceptions.StaleElementReferenceException as e:
-      logger.error(e)
+    except exceptions.StaleElementReferenceException as err:
+      logger.error(err)
       time.sleep(0.1)
   else:
     raise exception.ElementNotFound(el_locator)
 
 
 def scroll_into_view(driver, element):
+  """Scrolls page to element using JS"""
   driver.execute_script("return arguments[0].scrollIntoView();", element)
 
   # compensate for the header
