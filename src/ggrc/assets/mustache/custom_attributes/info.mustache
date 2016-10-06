@@ -28,7 +28,9 @@
               {{^is_allowed 'update' instance context='for'}}
                 readonly
               {{/is_allowed}}
-              can-before-edit="instance.confirmBeginEdit"
+              {{#if_instance_of instance 'Request'}}
+                can-before-edit="instance.confirmBeginEdit"
+              {{/if_instance_of}}
             ></inline-edit>
           </div>
         </div>
