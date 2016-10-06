@@ -39,15 +39,18 @@
       return this.makeResult(mapping.reify(), binding);
     },
     makeResult: function (instance, binding) {
-      var relationships;
+      var result;
       if (binding.instance.workflow_people) {
-        relationships = CMS.Models.Relationship
+        result = CMS.Models.Relationship
           .getWorkflowPersonRelationship(binding.instance, instance);
+      } else if (instance instanceof CMS.Models.Person) {
+        result = CMS.Models.Person
+          .getUserRoles(binding.instance, instance);
       } else {
-        relationships = CMS.Models.Relationship
+        result = CMS.Models.Relationship
           .getRelationshipBetweenInstances(binding.instance, instance, true);
       }
-      return relationships
+      return result
         .then(function (relationships) {
           return new GGRC.ListLoaders.MappingResult(
             instance, can.map(relationships, function (relationship) {
