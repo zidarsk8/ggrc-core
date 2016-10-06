@@ -21,19 +21,11 @@
         document: destination
       });
     },
-    isObjectDocument: function (object) {
-      var isObjectDocument;
-      if (object.attr('reuseMapperType')) {
-        isObjectDocument =
-          object.attr('reuseMapperType') === 'all_documents';
-      } else {
-        isObjectDocument =
-          object.object_documents && object.object_documents.length;
-      }
-      return isObjectDocument;
+    isEvidence: function (type) {
+      return type === 'evidence';
     },
-    mapObjects: function (source, destination) {
-      return this.isObjectDocument(destination) ?
+    mapObjects: function (source, destination, type) {
+      return this.isEvidence(type) ?
         this.createObjectRelationship(source, destination) :
         this.createRelationship(source, destination);
     }
@@ -44,26 +36,42 @@
     scope: {
       baseInstance: null,
       checkReusedStatus: false,
-      selectedList: [],
+      evidenceList: [],
+      urlList: [],
       isSaving: false,
-      reuseSelected: function () {
-        var reusedList = this.attr('selectedList');
-        var source = this.attr('baseInstance');
-        var models;
-        this.attr('isSaving', true);
-        this.attr('checkReusedStatus', false);
-        models = Array.prototype.filter
+      setHasSelected: function () {
+        var hasSelected =
+          this.attr('evidenceList.length') || this.attr('urlList.length');
+        this.attr('hasSelected', hasSelected);
+      },
+      getMapObjects: function (source, list, mapperType) {
+        return Array.prototype.filter
         // Get Array of unique items
-          .call(reusedList, function (item, index) {
-            return index === reusedList.indexOf(item);
+          .call(list, function (item, index) {
+            return index === list.indexOf(item);
           })
           // Get Array of mapped models
           .map(function (destination) {
             return mapper
-              .mapObjects(source, destination)
+              .mapObjects(source, destination, mapperType)
               .save();
           });
-        can.when.apply(can, models)
+      },
+      getReusedObjectList: function () {
+        var source = this.attr('baseInstance');
+        var evidences =
+          this.getMapObjects(source, this.attr('evidenceList'), 'evidence');
+        var urls =
+          this.getMapObjects(source, this.attr('urlList'));
+        return [].concat(evidences, urls);
+      },
+      reuseSelected: function () {
+        var reusedObjectList = this.getReusedObjectList();
+
+        this.attr('isSaving', true);
+        this.attr('checkReusedStatus', false);
+
+        can.when.apply(can, reusedObjectList)
           .done(function () {
             can.$(document.body).trigger('ajax:flash', {
               success: 'Selected evidences are reused'
@@ -74,16 +82,21 @@
               error: 'Selected evidences were not reused'
             });
           })
-          .always(function () {
-            reusedList.replace([]);
-            this.attr('isSaving', false);
-            this.attr('checkReusedStatus', true);
-          }.bind(this));
+          .always(this.restoreDefaults.bind(this));
+      },
+      restoreDefaults: function () {
+        this.attr('evidenceList').replace([]);
+        this.attr('urlList').replace([]);
+        this.attr('isSaving', false);
+        this.attr('checkReusedStatus', true);
       }
     },
     events: {
-      '{scope.selectedList} length': function (arr, ev, length) {
-        this.scope.attr('hasSelected', length > 0);
+      '{scope.evidenceList} length': function () {
+        this.scope.setHasSelected();
+      },
+      '{scope.urlList} length': function () {
+        this.scope.setHasSelected();
       }
     }
   });
