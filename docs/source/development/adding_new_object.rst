@@ -93,7 +93,7 @@ Create a CMS.Models.Cacheable object
    widgets ``extra_descriptor_options`` is where you define special
    parameters for some of the widgets ie. their content controller,
    icon, widget name etc. ``extra_content_controller_options`` is where
-   you define parameters for the content\_controller ie can view
+   you define parameters for the ``content_controller`` ie can view
    children, mapping, model, footer view etc.
 
 3. Add ``new_object`` to ``mappings-ggrc.js``

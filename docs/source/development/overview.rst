@@ -45,7 +45,7 @@ model. There isn’t much more to it than that.
 The code that builds out the API (what endpoints exist and what HTTP
 verbs are allowed on each) is in :src:`ggrc/services`.
 
-See `examples in this GitHub gist <https://gist.github.com/dandv/8794f5add6bcc0e11359>`__.
+See `examples in this GitHub gist <https://gist.github.com/dandv/8794f5add6bcc0e11359>`_.
 
 
 General REST parameters
@@ -183,7 +183,7 @@ Database Migrations
 ^^^^^^^^^^^^^^^^^^^
 
 Migrations are implemented and executed via
-`alembic <http://alembic.zzzcomputing.com/en/latest/>`__, augmented to
+`alembic <http://alembic.zzzcomputing.com/en/latest/>`_, augmented to
 support extension modules in ggrc.migrate.  (The standard ``alembic``
 command will *not* do the right thing.)
 
@@ -674,7 +674,7 @@ View Helpers
 ^^^^^^^^^^^^
 
 View helpers are defined using the Mustache `helper mechanism provided
-by CanJS <http://canjs.com/docs/can.mustache.Helpers.html>`__.  Core
+by CanJS <http://canjs.com/docs/can.mustache.Helpers.html>`_.  Core
 helpers are specified in
 :src:`ggrc/assets/javascripts/mustache_helpers.js`,
 and extension helpers should be specified in a file named similar to
@@ -800,7 +800,7 @@ following files:
 The view for a modal is defined in
 ``/src/<module>/assets/mustache/<class_name>/modal_content.mustache``.
 
-More about modals in `modals.md <modals.md>`__.
+More about modals in `modals.md <modals.md>`_.
 
 Events
 ~~~~~~
@@ -813,7 +813,7 @@ Program Flow
 
 Most client-side logic is implemented in Controls. Much of this logic is
 implemented using asynchronous callbacks via
-`can.Deferred <http://canjs.com/docs/can.Deferred.html>`__.
+`can.Deferred <http://canjs.com/docs/can.Deferred.html>`_.
 
 Error Handling
 ~~~~~~~~~~~~~~
@@ -853,7 +853,7 @@ Mappings
 ~~~~~~~~
 
 Mappings are best thought of as **links**. (“Mapping”
-`often means <http://www.merriam-webster.com/dictionary/mapping>`__ a 1-to-1
+`often means <http://www.merriam-webster.com/dictionary/mapping>`_ a 1-to-1
 correspondence, and for historical reasons is the term adopted by GGRC
 users; but in actuality; we have links between objects - e.g. a
 Directive is **linked** to a Section, or a Programs **references** zero
@@ -865,7 +865,7 @@ database, so that you don't have to care about which tables the
 relationships are stored in.
 
 Mappings essentially turn the entire system into a
-`property graph <https://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph>`__.
+`property graph <https://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph>`_.
 
 Mappings are defined in :src:`ggrc/assets/javascripts/models/mappings-ggrc.js`.
 

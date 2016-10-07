@@ -2,7 +2,7 @@ Javascript
 ==========
 
 We try to keep our code style as close as we can to
-`Google Code Style <https://google.github.io/styleguide/javascriptguide.xml>`__.
+`Google Code Style <https://google.github.io/styleguide/javascriptguide.xml>`_.
 
 Unfortunately, because of our legacy code, we had to make a few
 exceptions. The best way to understand it is to read our

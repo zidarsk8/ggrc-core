@@ -25,7 +25,7 @@ TODO (Please add any questions or clarification requests here):
 -------------------------------------------------
 
 This step should only need to be done once per deployment machine,
-following instructions in the main `README <https://github.com/google/ggrc-core/blob/develop/README.md>`__.
+following instructions in the main `README <https://github.com/google/ggrc-core/blob/develop/README.md>`_.
 
 1. Start and connect to the virtual machine (if necessary)
 ----------------------------------------------------------

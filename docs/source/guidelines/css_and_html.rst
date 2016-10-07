@@ -1,7 +1,7 @@
 CSS and HTML
 ============
 
-Based and borrowed from `CSS Guidelines <http://cssguidelin.es/>`__
+Based and borrowed from `CSS Guidelines <http://cssguidelin.es/>`_
 
 Syntax and formatting
 
@@ -57,12 +57,12 @@ Indentations
 ~~~~~~~~~~~~
 
 Nesting in SASS should be avoided wherever possible. This is
-`WHY <http://cssguidelin.es/#specificity>`__
+`WHY <http://cssguidelin.es/#specificity>`_
 
 Naming
 ~~~~~~
 
-For naming we are using `BEM <https://en.bem.info/method/>`__
+For naming we are using `BEM <https://en.bem.info/method/>`_
 methodology. BEM stands for:
 
 -  Block: The sole root of the component.
@@ -70,7 +70,7 @@ methodology. BEM stands for:
 -  Modifier: A variant or extension of the Block
 
 You can learn more about it
-`here <https://en.bem.info/method/definitions/>`__
+`here <https://en.bem.info/method/definitions/>`_
 
 A good naming convention will tell you and your team:
 

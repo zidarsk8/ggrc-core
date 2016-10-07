@@ -2,7 +2,7 @@ How to Write a Commit Message
 =============================
 
 This is all shamelessly based on
-`chris.beams.io <http://chris.beams.io/posts/git-commit/>`__.
+`chris.beams.io <http://chris.beams.io/posts/git-commit/>`_.
 
 1. Separate subject from body with a blank line
 2. Limit the subject line to 50 characters
@@ -71,7 +71,7 @@ Checking the front-end code
 Code style checks
 ~~~~~~~~~~~~~~~~~
 
-The `ESLint <http://eslint.org/>`__ tool is used for checking the
+The `ESLint <http://eslint.org/>`_ tool is used for checking the
 Javascript code quality. You must assure that your pull request does not
 increase the number of ESLint issues found.
 
@@ -155,7 +155,7 @@ Code style checks
 
 At the moment, no automatic Python coding style checks are performed -
 yet. You should nevertheless make your best effort to write `PEP8
-compliant <https://www.python.org/dev/peps/pep-0008/>`__ code to make it
+compliant <https://www.python.org/dev/peps/pep-0008/>`_ code to make it
 more future compatible for when such automatic checks are introduced and
 enforced.
 

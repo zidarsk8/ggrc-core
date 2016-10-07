@@ -249,7 +249,7 @@ sure, just run them all.*
    ``feature/CORE-1234``.
 
    If you don't yet have the ``<pr_origin>`` defined, you need to add it
-   (`instructions <https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes#Adding-Remote-Repositories>`__).
+   (`instructions <https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes#Adding-Remote-Repositories>`_).
 
 3. Start your local development environment (Vagrant or Docker). No need
    if you already have it running.

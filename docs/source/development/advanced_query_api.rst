@@ -250,7 +250,7 @@ There are two main cases of relevant expressions. Both expressions are
 used to get an object type and ids to which the current object should be
 relevant.
 
--  first is where we specify the relevant to object\_type and ids
+-  first is where we specify the relevant to ``object_type`` and ids
 
 .. code:: python
 

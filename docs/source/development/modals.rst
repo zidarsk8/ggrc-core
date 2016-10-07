@@ -25,15 +25,15 @@ Modals
    stuff in .mustache marks elements that need reload, but there are
    only a few left any more
 -  Adding a new type of modal - create a new handler
--  `modal show <https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L355-L423>`__:
+-  `modal show <https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L355-L423>`_:
    handles stacking, positioning and prevents double submit and escape
 -  `line
-   451 <https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L451>`__
+   451 <https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L451>`_
    extends the Bootstrap model
 -  ``GGRC.register_global_hook`` can be used to add a special modal for
    a module
 -  if you click Delete, a new modal is displayed, `lines
-   119-151 <https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L119-L151>`__
+   119-151 <https://github.com/reciprocity/ggrc-core/blob/1e370e487c4377d7e1162dd881954cc26cffe5a9/src/ggrc/assets/javascripts/bootstrap/modal-ajax.js#L119-L151>`_
 
 Each modal can have its own controller that handles actions performed by
 the modals
@@ -46,14 +46,14 @@ the modals
    find the state where things stop changing
 -  ``data-also-set`` - TBD
 -  'dfd' = abbreviation for deferred; we need the promise
--  wysiwyg\_html extension - we need it to fire triggers when the
+-  ``wysiwyg_html`` extension - we need it to fire triggers when the
    textarea is updates because we can't read the iframe, it's not in the
    same domain
 
 -  init()
 -  fetch_all fetches the data and template
 -  fetch_data a bit complex because we could be TBD
--  \_transient property - added to the object instance while the object
+-  ``_transient`` property - added to the object instance while the object
    is open, but removed from the modal once the modal closes
 -  run form_preload on the modal (if it exists)
 -  apply object params - uses the data-object-params from the link that
