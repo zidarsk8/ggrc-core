@@ -8,6 +8,8 @@ Mixins
 
 % for mixin in package.mixins:
   % if mixin.obj not in d.Model:
+${h.title('``%s``' % mixin.obj.__name__, '-')}
+
 ..  class:: ${mixin.name}
 
     ${h.doc(mixin, 4)}

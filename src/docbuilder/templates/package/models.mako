@@ -7,6 +7,8 @@ Models
 ======
 
 % for model in package.models:
+${h.title('``%s``' % model.obj.__name__, '-')}
+
 ..  class:: ${model.name}
 
     ${h.doc(model, 4)}
