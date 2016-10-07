@@ -6,8 +6,8 @@
 <reusable-objets-item-control>
   {{#is_allowed 'update' baseInstance context='for'}}
     {{#is_allowed 'update' instance context='for'}}
-      {{#if isDisabled}}
-          <input type="checkbox" checked disabled/>
+      {{#if disabled}}
+          <input type="checkbox" checked="checked" disabled/>
       {{else}}
           <input type="checkbox" {{#isSaving}}disabled{{/isSaving}}/>
       {{/if}}

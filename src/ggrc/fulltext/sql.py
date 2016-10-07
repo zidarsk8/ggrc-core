@@ -4,26 +4,33 @@
 from ggrc import db
 from . import Indexer
 
+
 class SqlIndexer(Indexer):
   def create_record(self, record, commit=True):
-    for k,v in record.properties.items():
+    for k, v in record.properties.items():
       db.session.add(self.record_type(
-        key=record.key,
-        type=record.type,
-        context_id=record.context_id,
-        tags=record.tags,
-        property=k,
-        content=v,
-        ))
+          key=record.key,
+          type=record.type,
+          context_id=record.context_id,
+          tags=record.tags,
+          property=k,
+          content=v,
+      ))
     if commit:
       db.session.commit()
 
   def update_record(self, record, commit=True):
-    self.delete_record(record.key, record.type, commit=False)
+    # remove the obsolete index entries
+    db.session.query(self.record_type).filter(
+        self.record_type.key == record.key,
+        self.record_type.type == record.type,
+        self.record_type.property.in_(list(record.properties.keys())),
+    ).delete(synchronize_session="fetch")
+    # add new index entries
     self.create_record(record, commit=commit)
 
   def delete_record(self, key, type, commit=True):
-    db.session.query(self.record_type).filter(\
+    db.session.query(self.record_type).filter(
         self.record_type.key == key,
         self.record_type.type == type).delete()
     if commit:
@@ -36,6 +43,6 @@ class SqlIndexer(Indexer):
 
   def delete_records_by_type(self, type, commit=True):
     db.session.query(self.record_type).filter(
-      self.record_type.type == type).delete()
+        self.record_type.type == type).delete()
     if commit:
       db.session.commit()

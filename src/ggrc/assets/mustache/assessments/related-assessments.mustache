@@ -44,21 +44,20 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     <div class="flex-size-1">
                         <mapped-objects
                                 parent-instance="instance"
-                                mapping="{{instance.class.info_pane_options.mapped_objects.mapping}}"
-                        >
+                                mapping="{{instance.class.info_pane_options.mapped_objects.mapping}}">
                           {{> '/static/mustache/components/assessment/mapped-objects/mapped-related-information-item.mustache' }}
                         </mapped-objects>
                     </div>
                     <div class="flex-size-1">
                         <mapped-objects
                                 parent-instance="instance"
-                                mapping="{{instance.class.info_pane_options.evidence.mapping}}"
-                        >
+                                mapping="{{instance.class.info_pane_options.evidence.mapping}}">
                             <reusable-objects-item instance="instance"
                                                    is-saving="isSaving"
                                                    base-instance="baseInstance"
                                                    mapping="mapping"
-                                                   selected-list="selectedList">
+                                                   check-reused-status="checkReusedStatus"
+                                                   selected-list="evidenceList">
                                 <span class="date">{{date instance.created_at true}}</span>
                                 <a href="{{schemed_url instance.link}}" target="_blank">
                                     <span>{{firstnonempty instance.title instance.link}}</span>
@@ -67,13 +66,13 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                         </mapped-objects>
                         <mapped-objects
                                 parent-instance="instance"
-                                mapping="{{instance.class.info_pane_options.urls.mapping}}"
-                        >
+                                mapping="{{instance.class.info_pane_options.urls.mapping}}">
                             <reusable-objects-item instance="instance"
                                                    is-saving="isSaving"
                                                    base-instance="baseInstance"
                                                    mapping="mapping"
-                                                   selected-list="selectedList">
+                                                   check-reused-status="checkReusedStatus"
+                                                   selected-list="urlList">
                                 <span class="date">{{date instance.created_at true}}</span>
                                 <a href="{{schemed_url instance.link}}" target="_blank">
                                     <span>{{firstnonempty instance.title instance.link}}</span>
