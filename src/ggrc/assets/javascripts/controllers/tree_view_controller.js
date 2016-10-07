@@ -1532,6 +1532,13 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       .then(this._ifNotRemoved(this.proxy('draw_list')))
       .then(function () {
         this.options.attr('paging.disabled', false);
+      }.bind(this))
+      .fail(function () {
+        this.options.attr('original_list', []);
+        this.element.children('.cms_controllers_tree_view_node').remove();
+        this._loading_finished();
+        GGRC.Errors.notifier('warning',
+          'Filter format is incorrect, data cannot be filtered.')();
       }.bind(this));
   }),
   '{paging} change': _.debounce(
