@@ -96,7 +96,7 @@ Create a CMS.Models.Cacheable object
    you define parameters for the content\_controller ie can view
    children, mapping, model, footer view etc.
 
-3. Add ``new_object`` to ``mappings.js``
+3. Add ``new_object`` to ``mappings-ggrc.js``
 
    Add the object to the list of mappings:
    ``GGRC.Mappings("ggrc_core", {base:{}, NewObject: {...}}``.

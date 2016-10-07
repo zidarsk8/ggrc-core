@@ -129,8 +129,10 @@ additional configuration variables, including:
 | COMPANY_LOGO_TEXT         | If COMPANY_LOGO is not set, this (text) value is used instead of an image in    |
 |                           | the top-left corner of each page.                                               |
 +---------------------------+---------------------------------------------------------------------------------+
-| SQLALCHEMY_RECORD_QUERIES | This flag causes all queries to be recorded in the App Engine logs.             |
-|                           | This is useful for debugging purposes.                                          |
+| SQLALCHEMY_RECORD_QUERIES | This setting causes queries to be reported in the App Engine logs. Possible     |
+|                           | options are: 'count' - only the number of queries is logged, 'slow' - only slow |
+|                           | queries are logged, 'all' - all queries are logged.  This is useful for         |
+|                           | debugging purposes.                                                             |
 +---------------------------+---------------------------------------------------------------------------------+
 | CALENDAR_MECHANISM        | If True, Workflow includes Google Calendar integration                          |
 +---------------------------+---------------------------------------------------------------------------------+
