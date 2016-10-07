@@ -28,7 +28,8 @@ class Commentable(object):
 
   recipients is used for setting who gets notified (Verifer, Requester, ...).
   send_by_default should be used for setting the "send notification" flag in
-    the comment modal.
+  the comment modal.
+
   """
   # pylint: disable=too-few-public-methods
 
