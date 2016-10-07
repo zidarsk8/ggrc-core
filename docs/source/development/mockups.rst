@@ -1,7 +1,7 @@
 Creating A New Mockup
 =====================
 
-1. Add a new mockup URL to ``src/views/mockups.py``:
+1. Add a new mockup URL to :src:`ggrc/views/mockups.py`:
 
    .. code-block:: python
 

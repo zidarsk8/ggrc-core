@@ -77,10 +77,10 @@ The line ``SETTINGS_MODULE`` specifies what ``.py`` files from
 
     SETTINGS_MODULE='app_engine ggrc_basic_permissions.settings.development'
 
-means "Include ``src/ggrc/settings/app_engine.py`` and
-``src/ggrc_basic_permissions/settings/development.py``. Note hoe ``ggrc`` is the default module.
+means "Include :src:`ggrc/settings/app_engine.py` and
+:src:`ggrc_basic_permissions/settings/development.py`. Note hoe ``ggrc`` is the default module.
 
-For production, include the ``src/ggrc/settings/production.py`` file among the settings:
+For production, include the :src:`ggrc/settings/production.py` file among the settings:
 
 ..  code-block:: bash
 
@@ -112,9 +112,9 @@ Remember to update the required values (the ``GAPI_KEY`` and
 +------------------------+---------------------------------------------------------------------------------+
 
 There may also be a customized ``src/ggrc/settings/<something>.py`` file, for example,
-``src/ggrc/settings/app_engine_ggrc_test.py``
+:src:`ggrc/settings/app_engine_ggrc_test.py`
 (This file should also not be included in the repository, though
-examples can be found at ``src/ggrc/settings``). This file can contain
+examples can be found at :src:`ggrc/settings`). This file can contain
 additional configuration variables, including:
 
 +---------------------------+---------------------------------------------------------------------------------+

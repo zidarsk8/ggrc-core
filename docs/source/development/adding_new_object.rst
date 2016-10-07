@@ -134,7 +134,7 @@ Create a ModuleExtension object:
 Add NewObject to the LHN
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-In ``src/ggrc/assets/mustache/dashboard/lhn.mustache`` add the line:
+In :src:`ggrc/assets/mustache/dashboard/lhn.mustache` add the line:
 
 ..  code-block:: javascript
 

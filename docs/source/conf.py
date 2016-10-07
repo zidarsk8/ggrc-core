@@ -31,7 +31,15 @@
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.extlinks',
 ]
+
+extlinks = {
+    'src': (
+        'https://github.com/google/ggrc-core/tree/develop/src/%s',
+        'src/',
+    ),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
