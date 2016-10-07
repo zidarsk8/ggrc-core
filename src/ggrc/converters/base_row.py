@@ -9,6 +9,7 @@ import collections
 import ggrc.services
 from ggrc import db
 from ggrc.converters import errors
+from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 from ggrc.services.common import Resource
@@ -135,6 +136,7 @@ class RowConverter(object):
     obj = self.get_object_by_key(attr_name)
     if value:
       new_objects[value] = obj
+    obj.modified_by_id = get_current_user_id()
     return obj
 
   def get_object_by_key(self, key="slug"):
