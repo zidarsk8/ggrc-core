@@ -93,6 +93,24 @@
 
       this.validateNonBlank('email');
       this.validateFormatOf('email', rEmail);
+    },
+    getUserRoles: function (instance, person) {
+      var result = $.Deferred();
+      var refreshQueue = new RefreshQueue();
+      var userRoles;
+
+      can.each(person.user_roles, function (ur) {
+        refreshQueue.enqueue(ur.getInstance());
+      });
+
+      refreshQueue.trigger().then(function (roles) {
+        userRoles = _.filter(roles, function (role) {
+          return !role.context || (instance.context &&
+            role.context.id === instance.context.id);
+        });
+        result.resolve(userRoles);
+      });
+      return result.promise();
     }
   }, {
     display_name: function () {
