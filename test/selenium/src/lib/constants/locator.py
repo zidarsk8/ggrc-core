@@ -757,30 +757,7 @@ class WidgetInfoThreat(BaseInfoWidget):
 
 class WidgetAdminRoles(object):
   """Locators for the roles widget on the admin dashboard"""
-
-  class _Locator(object):
-    @staticmethod
-    def get_role(child_id):
-      return (By.CSS_SELECTOR,
-              '[id="roles_list_widget"] li:nth-child({}) .span8>div'
-              .format(child_id))
-
-    @staticmethod
-    def get_scope(child_id):
-      return (By.CSS_SELECTOR,
-              '[id="roles_list_widget"] li:nth-child({}) .span4 '
-              '.scope'.format(child_id))
-
-  class __metaclass__(type):
-    def __init__(cls, *args):
-      items = (
-          "ADMINISTRATOR", "CREATOR", "EDITOR", "PROGRAM_EDITOR",
-          "PROGRAM_OWNER", "PROGRAM_READER", "READER", "WORKFLOW_MEMBER",
-          "WORKFLOW_OWNER")
-
-      for id_, name in enumerate(items, start=1):
-        setattr(cls, attribute.ROLE + name, cls._Locator.get_role(id_))
-        setattr(cls, attribute.SCOPE + name, cls._Locator.get_scope(id_))
+  ROLES_TREE_VIEW_ITEMS = (By.CSS_SELECTOR, '#roles_list_widget .tree-item')
 
 
 class WidgetAdminEvents(object):
