@@ -117,20 +117,30 @@ class WidgetProgramInfo(object):
 
 
 class AdminRolesWidget(object):
-  """Labels for Roles widget at Admin dashboard"""
-  EDITOR = "Editor"
-  ADMINISTRATOR = "Administrator"
-  PROGRAM_EDITOR = "Program Editor"
-  PROGRAM_OWNER = "Program Manager"
-  PROGRAM_READER = "Program Reader"
-  READER = "Reader"
-  WORKFLOW_MEMEMBER = "Workflow Member"
-  WORKFLOW_OWNER = "Workflow Manager"
+  """Role scopes for Roles widget at Admin dashboard"""
+  _SYS_SCOPE = "SYSTEM"
+  _PRG_SCOPE = "PRIVATE PROGRAM"
+  _WF_SCOPE = "WORKFLOW"
 
-  SCOPE_SYSTEM = "SYSTEM"
-  SCOPE_ADMINISTRATOR = "ADMIN"
-  SCOPE_PRIVATE_PROGRAM = "PRIVATE PROGRAM"
-  SCOPE_WORKFLOW = "WORKFLOW"
+  ROLE_SCOPE_ADMINISTRATOR = ("Administrator", "ADMIN")
+  ROLE_SCOPE_CREATOR = ("Creator", _SYS_SCOPE)
+  ROLE_SCOPE_EDITOR = ("Editor", _SYS_SCOPE)
+  ROLE_SCOPE_READER = ("Reader", _SYS_SCOPE)
+  ROLE_SCOPE_PROGRAM_EDITOR = ("Program Editor", _PRG_SCOPE)
+  ROLE_SCOPE_PROGRAM_MANAGER = ("Program Manager", _PRG_SCOPE)
+  ROLE_SCOPE_PROGRAM_READER = ("Program Reader", _PRG_SCOPE)
+  ROLE_SCOPE_WORKFLOW_MEMBER = ("Workflow Member", _WF_SCOPE)
+  ROLE_SCOPE_WORKFLOW_MANAGER = ("Workflow Manager", _WF_SCOPE)
+  ROLE_SCOPES_LIST = [ROLE_SCOPE_ADMINISTRATOR,
+                      ROLE_SCOPE_CREATOR,
+                      ROLE_SCOPE_EDITOR,
+                      ROLE_SCOPE_PROGRAM_EDITOR,
+                      ROLE_SCOPE_PROGRAM_MANAGER,
+                      ROLE_SCOPE_PROGRAM_READER,
+                      ROLE_SCOPE_READER,
+                      ROLE_SCOPE_WORKFLOW_MEMBER,
+                      ROLE_SCOPE_WORKFLOW_MANAGER]
+  ROLE_SCOPES_DICT = dict(ROLE_SCOPES_LIST)
 
 
 class AdminEventsWidget(object):
