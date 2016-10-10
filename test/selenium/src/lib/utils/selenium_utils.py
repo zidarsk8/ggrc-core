@@ -57,6 +57,22 @@ def get_when_visible(driver, locator):
       .until(EC.presence_of_element_located(locator))
 
 
+def get_when_all_visible(driver, locator):
+  """Return WebElements by locator when all of them are visible.
+
+  Args:
+    driver (base.CustomDriver)
+    locator (tuple)
+
+  Returns:
+      selenium.webdriver.remote.webelement.WebElements
+  """
+  return WebDriverWait(
+      driver,
+      constants.ux.MAX_USER_WAIT_SECONDS) \
+      .until(EC.visibility_of_any_elements_located(locator))
+
+
 def get_when_clickable(driver, locator):
   """
   Args:
