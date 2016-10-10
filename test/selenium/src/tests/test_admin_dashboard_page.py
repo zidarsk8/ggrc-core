@@ -15,7 +15,7 @@ from lib.page import dashboard
 
 class TestAdminDashboardPage(base.Test):
   """Tests for the admin dashboard, a part of smoke tests, section 1"""
-  _element = constants.element.AdminRolesWidget
+  _role_el = constants.element.AdminRolesWidget
   _event_el = constants.element.AdminEventsWidget
 
   @pytest.fixture(scope="function")
@@ -25,38 +25,13 @@ class TestAdminDashboardPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_roles_widget(self, admin_dashboard):
-    """Confirms labels are present"""
+    """Check count and content of role scopes"""
     admin_roles_widget = admin_dashboard.select_roles()
-
-    assert admin_roles_widget.role_editor.text == self._element.EDITOR
-    assert admin_roles_widget.role_administrator.text == \
-        self._element.ADMINISTRATOR
-    assert admin_roles_widget.role_program_editor.text == \
-        self._element.PROGRAM_EDITOR
-    assert admin_roles_widget.role_program_owner.text == \
-        self._element.PROGRAM_OWNER
-    assert admin_roles_widget.role_program_reader.text == \
-        self._element.PROGRAM_READER
-    assert admin_roles_widget.role_reader.text == self._element.READER
-    assert admin_roles_widget.role_workflow_member.text == \
-        self._element.WORKFLOW_MEMEMBER
-    assert admin_roles_widget.role_workflow_owner.text == \
-        self._element.WORKFLOW_OWNER
-
-    assert admin_roles_widget.scope_editor.text == self._element.SCOPE_SYSTEM
-    assert admin_roles_widget.scope_administrator.text == \
-        self._element.SCOPE_ADMINISTRATOR
-    assert admin_roles_widget.scope_program_editor.text == \
-        self._element.SCOPE_PRIVATE_PROGRAM
-    assert admin_roles_widget.scope_program_owner.text == \
-        self._element.SCOPE_PRIVATE_PROGRAM
-    assert admin_roles_widget.scope_program_reader.text == \
-        self._element.SCOPE_PRIVATE_PROGRAM
-    assert admin_roles_widget.scope_reader.text == self._element.SCOPE_SYSTEM
-    assert admin_roles_widget.scope_workflow_member.text == \
-        self._element.SCOPE_WORKFLOW
-    assert admin_roles_widget.scope_workflow_owner.text == \
-        self._element.SCOPE_WORKFLOW
+    expected_dict = self._role_el.ROLE_SCOPES_DICT
+    actual_dict = admin_roles_widget.get_role_scopes_text_as_dict()
+    assert admin_dashboard.tab_roles.member_count == len(expected_dict)
+    assert expected_dict == actual_dict, "Expected '{}', got '{}'".format(
+        expected_dict, actual_dict)
 
   @pytest.mark.smoke_tests
   def test_events_widget_tree_view_has_data(self, admin_dashboard):
