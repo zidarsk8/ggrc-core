@@ -1235,6 +1235,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     CMS.Models[this.options.model.shortName].bind('destroyed',
       this.onDestroyedModel);
 
+    $('body').on('treeupdate', this.refreshList.bind(this));
+
     return false;
   },
 
@@ -1259,6 +1261,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   onCreatedModel: function (ev, instance) {
     if (instance instanceof CMS.Models[this.options.model.shortName]) {
       this.onCreated();
+    }
+
+    if (instance instanceof CMS.Models.UserRole) {
+      this.refreshList();
     }
   },
 
