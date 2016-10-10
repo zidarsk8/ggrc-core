@@ -1522,6 +1522,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       }.bind(this));
   },
   refreshList: _.debounce(function () {
+    if (this.options.attr('paging.disabled')) {
+      return;
+    }
+
     this.options.attr('paging.disabled', true);
     this._loading_started();
     this.loadPage()
