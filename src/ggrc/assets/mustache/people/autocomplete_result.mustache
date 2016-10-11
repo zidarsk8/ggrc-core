@@ -7,11 +7,11 @@
 <li {{data 'ui-autocomplete-item'}} class="ui-menu-item">
   <a href="javascript://" class='show-extended' {{data 'model'}}>
     {{name}} <span class="small">{{email}}</span>
-  {{#if_equals system_wide_role 'No Access'}}
+  {{#if_equals system_wide_role 'No Role'}}
     <span class="user-disabled">
       (Inactive user)
     </span>
-  {{/if}}
+  {{/if_equals}}
   </a>
 </li>
 {{/each}}
