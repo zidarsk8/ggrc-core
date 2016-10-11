@@ -415,6 +415,10 @@
             self.element.trigger('relationshipcreated', join);
           });
         });
+      } else {
+        $.when.apply($, deleteDfds).then(function () {
+          $('body').trigger('treeupdate');
+        });
       }
     },
 
