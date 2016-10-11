@@ -105,8 +105,8 @@
 
       refreshQueue.trigger().then(function (roles) {
         userRoles = _.filter(roles, function (role) {
-          return !role.context || (instance.context &&
-            role.context.id === instance.context.id);
+          return instance.context && role.context &&
+            role.context.id === instance.context.id;
         });
         result.resolve(userRoles);
       });
