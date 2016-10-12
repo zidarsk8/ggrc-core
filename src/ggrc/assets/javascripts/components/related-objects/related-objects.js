@@ -65,7 +65,8 @@
             var data = responseArr[0];
             var values = data[relatedType].values;
             var result = values.map(function (item) {
-              return {instance: new CMS.Models[relatedType](item)};
+              item.instance = new CMS.Models[relatedType](item);
+              return item;
             });
             // Update paging object
             this.updatePaging(data[relatedType].total);
