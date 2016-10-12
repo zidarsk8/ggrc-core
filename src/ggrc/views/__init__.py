@@ -376,3 +376,15 @@ def user_permissions():
      logged in user
   '''
   return get_permissions_json()
+
+
+
+@app.route("/perf_test", methods=["GET"])
+@login_required
+def perf_test():
+  """Run and display performance tests."""
+  import perf_test
+  from flask import request
+  n = int(request.args.get("n", 10))
+  response = perf_test.run_all(n)
+  return response, 200, {'Content-Type': 'text/plain; charset=utf-8'}
