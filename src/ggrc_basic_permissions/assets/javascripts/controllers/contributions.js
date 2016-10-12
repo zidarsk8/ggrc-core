@@ -394,10 +394,10 @@
           return;
         }
         if (join) {
-          return join.refresh().done(function () {
-            return join.destroy().then(function () {
-              self.element.trigger('relationshipdestroyed', join);
-            });
+          return join.refresh().then(function () {
+            return join.destroy();
+          }).then(function () {
+            self.element.trigger('relationshipdestroyed', join);
           });
         }
       });
