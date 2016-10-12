@@ -111,6 +111,40 @@
         result.resolve(userRoles);
       });
       return result.promise();
+    },
+    getPersonMappings: function rec(instance, person, specificOject, deferred) {
+      var result = deferred || $.Deferred();
+      var mappingObject = instance[specificOject];
+      var objectPeopleFiltered;
+      var userRoles;
+      var relationships;
+
+      if (mappingObject.length > 0 && mappingObject[0].getInstance().person) {
+        objectPeopleFiltered = _.filter(mappingObject, function (item) {
+          var itemInstance = item.getInstance();
+          return itemInstance.person && itemInstance.person.id === person.id;
+        });
+
+        userRoles = _.filter(person.user_roles, function (item) {
+          return item.getInstance().context_id === instance.context_id;
+        });
+
+        relationships = userRoles.concat(objectPeopleFiltered)
+        .map(function (item) {
+          return item.reify();
+        });
+
+        result.resolve(relationships);
+      } else {
+        mappingObject[0]
+        .getInstance()
+        .on('change', function (ev, changedProperty) {
+          if (changedProperty === 'person') {
+            rec(instance, person, specificOject, result);
+          }
+        });
+      }
+      return result.promise();
     }
   }, {
     display_name: function () {
