@@ -288,14 +288,16 @@ class AttributeInfo(object):
     else:
       custom_attributes = object_class.get_custom_attribute_definitions()
     for attr in custom_attributes:
-      description = ""
+      description = attr.helptext or ""
       if attr.definition_id:
         ca_type = cls.Type.OBJECT_CUSTOM
       else:
         ca_type = cls.Type.CUSTOM
         if (attr.attribute_type == attr.ValidTypes.DROPDOWN and
                 attr.multi_choice_options):
-          description = "Accepted values are:\n{}".format(
+          if description:
+            description += "\n\n"
+          description += "Accepted values are:\n{}".format(
               attr.multi_choice_options.replace(",", "\n")
           )
       attr_name = u"{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title).lower()
