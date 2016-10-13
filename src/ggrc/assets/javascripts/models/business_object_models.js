@@ -22,8 +22,6 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
@@ -117,8 +115,6 @@ can.Model.Cacheable("CMS.Models.Project", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
@@ -197,8 +193,6 @@ can.Model.Cacheable("CMS.Models.Facility", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
@@ -292,8 +286,6 @@ can.Model.Cacheable("CMS.Models.Product", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
@@ -391,8 +383,6 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
@@ -486,8 +476,6 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
     , modified_by : "CMS.Models.Person.stub"
     , object_people : "CMS.Models.ObjectPerson.stubs"
     , people : "CMS.Models.Person.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
-    , documents : "CMS.Models.Document.stubs"
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
     , objectives : "CMS.Models.Objective.stubs"
@@ -579,8 +567,6 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
@@ -662,8 +648,6 @@ can.Model.Cacheable("CMS.Models.Vendor", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',

@@ -22,8 +22,6 @@
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       categories: 'CMS.Models.ControlCategory.stubs',
       assertions: 'CMS.Models.ControlAssertion.stubs',
       objectives: 'CMS.Models.Objective.stubs',
