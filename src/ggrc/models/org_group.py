@@ -3,14 +3,13 @@
 
 from ggrc import db
 from .mixins import BusinessObject, Timeboxed, CustomAttributable
-from .object_document import Documentable
 from .object_owner import Ownable
 from .object_person import Personable
 from .relationship import Relatable
 from .track_object_state import HasObjectState, track_state_for_class
 
 
-class OrgGroup(HasObjectState, CustomAttributable, Documentable,
+class OrgGroup(HasObjectState, CustomAttributable,
                Personable, Relatable, Timeboxed,
                Ownable, BusinessObject, db.Model):
   __tablename__ = 'org_groups'

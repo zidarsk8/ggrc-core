@@ -6,7 +6,7 @@ from sqlalchemy import event
 from ggrc import db
 from sqlalchemy.ext.declarative import declared_attr
 from ggrc.models.deferred import deferred
-from .reflection import PublishOnly
+from ggrc.models.reflection import PublishOnly
 
 
 class HasObjectState(object):
@@ -33,17 +33,6 @@ class ObjectStates:
   APPROVED = 'Approved'
   DECLINED = 'Declined'
   MODIFIED = 'Modified'
-
-# This table
-
-
-class ObjectStateTables:
-  table_names = [
-      'programs', 'objectives', 'controls', 'sections',
-      'systems', 'data_assets', 'facilities',
-      'markets', 'products', 'projects', 'directives',
-      'org_groups', 'vendors'
-  ]
 
 
 def state_before_insert_listener(mapper, connection, target):

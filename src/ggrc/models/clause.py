@@ -15,7 +15,6 @@ from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import WithContact
-from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
@@ -24,7 +23,7 @@ from ggrc.models.track_object_state import track_state_for_class
 
 
 class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
-             WithContact, Titled, Stateful, CustomAttributable, Documentable,
+             WithContact, Titled, Stateful, CustomAttributable,
              Personable, Ownable, Timeboxed, Relatable, Slugged, db.Model):
 
   VALID_STATES = [

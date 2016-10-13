@@ -41,8 +41,6 @@ can.Model.Cacheable("CMS.Models.Program", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
@@ -135,10 +133,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
     , modified_by : "CMS.Models.Person.stub"
     , sections : "CMS.Models.get_stubs"
     , controls : "CMS.Models.Control.stubs"
-    //, people : "CMS.Models.Person.stubs"
-    //, documents : "CMS.Models.Document.stubs"
     , object_people : "CMS.Models.ObjectPerson.stubs"
-    , object_documents : "CMS.Models.ObjectDocument.stubs"
     , related_sources : "CMS.Models.Relationship.stubs"
     , related_destinations : "CMS.Models.Relationship.stubs"
     , objective_objects : "CMS.Models.ObjectObjective.stubs"

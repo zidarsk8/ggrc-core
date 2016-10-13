@@ -96,23 +96,6 @@ class Identifiable(object):
       table_args.append(table_dict)
     return tuple(table_args,)
 
-  # FIXME: This is not the right place, but there is no better common base
-  # FIXME: class. I don't know what copy_into is used for. My guess would
-  # FIXME: be cloning of some sort. I'm not sure that this code will work
-  # FIXME: with custom attributes.
-  def copy_into(self, _other, columns, **kwargs):
-    target = _other or type(self)()
-
-    columns = set(columns).union(kwargs.keys())
-    for name in columns:
-      if name in kwargs:
-        value = kwargs[name]
-      else:
-        value = getattr(self, name)
-      setattr(target, name, value)
-
-    return target
-
 
 class ChangeTracked(object):
 
@@ -476,6 +459,35 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
 
   def _display_name(self):
     return getattr(self, "title", None) or getattr(self, "name", "")
+
+  def copy_into(self, target_object, columns, **kwargs):
+    """Copy current object values into a target object.
+
+    Copy all values listed in columns from current class to target class and
+    use kwargs as defaults with precedence. Note that this is a shallow copy
+    and any mutable values will be shared between current and target objects.
+
+    Args:
+      target_object: object to which we want to copy current values. This
+        function will mutate the target_object parameter if it is set.
+      columns: list with all attribute names that we want to set in the
+        target_object.
+      kwargs: additional default values.
+
+    Returns:
+      target_object with all values listed in columns set.
+    """
+    target = target_object or type(self)()
+
+    columns = set(columns).union(kwargs.keys())
+    for name in columns:
+      if name in kwargs:
+        value = kwargs[name]
+      else:
+        value = getattr(self, name)
+      setattr(target, name, value)
+
+    return target
 
 
 class Slugged(Base):
