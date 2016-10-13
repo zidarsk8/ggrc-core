@@ -58,6 +58,7 @@
       var object = GGRC.page_instance();
       var path = GGRC.mustache_path;
       var info_widget_views;
+      var summaryWidgetViews;
       var model_names;
       var possible_model_type;
       var treeViewDepth = 2;
@@ -67,8 +68,20 @@
       if (!GGRC.page_object) {
         return;
       }
-      // Info widgets display the object information instead of listing
+      // Info and summary widgets display the object information instead of listing
       // connected objects.
+      summaryWidgetViews = {
+        audits: path + '/audits/summary.mustache'
+      };
+      if (summaryWidgetViews[object_table]) {
+        widget_list.add_widget(object.constructor.shortName, 'summary', {
+          widget_id: 'summary',
+          content_controller: GGRC.Controllers.SummaryWidget,
+          instance: object,
+          widget_view: summaryWidgetViews[object_table],
+          order: 3
+        });
+      }
       info_widget_views = {
         programs: path + '/programs/info.mustache',
         audits: path + '/audits/info.mustache',
@@ -90,7 +103,7 @@
         content_controller: GGRC.Controllers.InfoWidget,
         instance: object,
         widget_view: info_widget_views[object_table],
-        order: 0
+        order: 5
       });
       model_names = can.Map.keys(base_widgets_by_type);
       model_names.sort();

@@ -46,7 +46,9 @@
             <span class="required">*</span>
             <i class="fa fa-question-circle" rel="tooltip" title="Audit for this Assessment"></i>
           </label>
-          <input tabindex="2" class="input-block-level" name="audit.title" data-permission-type="update" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" value="{{firstexist audit.title ''}}" />
+          {{#using audit=instance.audit }}
+            <input tabindex="2" class="input-block-level" name="audit.title" data-permission-type="update" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" null-if-empty="false" value="{{firstnonempty audit.title ''}}" />
+          {{/using}}
       </div>
     {{else}}
       <div class="span6"></div>

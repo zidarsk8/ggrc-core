@@ -96,6 +96,7 @@ dashboard-js-files:
   - controllers/filterable_controller.js
   - controllers/dashboard_widgets_controller.js
   - controllers/info_widget_controller.js
+  - controllers/summary_widget_controller.js
   - controllers/modals_controller.js
   - controllers/delete_modal_controller.js
   - controllers/help_controller.js
@@ -240,6 +241,7 @@ dashboard-js-template-files:
   - components/ca-object/ca-object-modal-content.mustache
   - components/view-object-button/view-object-button.mustache
   - add_widget_menu.mustache
+  - base_objects/add_object_generic.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
   - base_objects/confirm_unmap.mustache
@@ -472,6 +474,7 @@ dashboard-js-template-files:
   - audits/modal_content.mustache
   - audits/tree.mustache
   - audits/info.mustache
+  - audits/summary.mustache
   - audits/tree_add_item.mustache
   - audits/tree_header.mustache
   - audits/search_result.mustache
