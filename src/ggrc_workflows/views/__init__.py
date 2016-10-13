@@ -71,7 +71,7 @@ def _get_unstarted_workflows():
   """
   return db.session.query(Workflow).filter(
       Workflow.next_cycle_start_date < date.today(),
-      Workflow.recurrences.is_(True),
+      Workflow.recurrences == 1,
       Workflow.status == 'Active',
   ).all()
 
