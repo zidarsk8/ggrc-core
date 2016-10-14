@@ -41,8 +41,11 @@
     makeResult: function (instance, binding) {
       var result;
       if (binding.instance.workflow_people) {
-        result = CMS.Models.Relationship
-          .getWorkflowPersonRelationship(binding.instance, instance);
+        result = CMS.Models.Person
+          .getPersonMappings(binding.instance, instance, 'workflow_people');
+      } else if (binding.instance.object_people.length) {
+        result = CMS.Models.Person
+          .getPersonMappings(binding.instance, instance, 'object_people');
       } else if (instance instanceof CMS.Models.Person) {
         result = CMS.Models.Person
           .getUserRoles(binding.instance, instance);
