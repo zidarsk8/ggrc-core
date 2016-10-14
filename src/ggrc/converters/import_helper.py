@@ -95,10 +95,10 @@ def split_array(csv_data):
   data_blocks = []
   offsets = []
   current_block = None
-  for ofset, line in enumerate(csv_data):
+  for offset, line in enumerate(csv_data):
     if sum(map(len, line)) > 0:
       if current_block is None:
-        offsets.append(ofset)
+        offsets.append(offset)
         data_blocks.append([])
         current_block = len(data_blocks) - 1
       data_blocks[current_block].append(line)
