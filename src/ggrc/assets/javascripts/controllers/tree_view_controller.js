@@ -706,17 +706,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
           }.bind(this))));
     }
 
-    // Init the spinner if items need to be loaded:
-    dfds.push(this.init_count().then(function (count) {
-      if (!this.element) {
-        return;
-      }
-      if (count()) {
-        this._loading_started();
-      } else {
-        this.element.trigger('loaded');
-      }
-    }.bind(this)));
+    this.init_count();
 
     if (this.options.footer_view) {
       dfds.push(
@@ -731,39 +721,39 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
   init_count: function () {
     var self = this;
+    var options = this.options;
+    var counts;
 
-    if (this.get_count_deferred) {
-      return this.get_count_deferred;
-    }
     if (this.options.parent_instance && this.options.mapping) {
-      this.get_count_deferred =
-        this.options.parent_instance.get_list_counter(this.options.mapping);
-    } else if (this.options.list_loader) {
-      this.get_count_deferred =
-        this.options.list_loader(this.options.parent_instance)
-          .then(function (list) {
-            return can.compute(function () {
-              return list.attr('length');
-            });
-          });
-    }
-    if (this.get_count_deferred) {
-      this.get_count_deferred.then(this._ifNotRemoved(function (count) {
-        if (self.element) {
-          can.trigger(self.element, 'updateCount', [count(), self.options.update_count]);
-        }
-        count.bind('change', self._ifNotRemoved(function () {
-          can.trigger(self.element, 'updateCount', [count(), self.options.update_count]);
-        }));
-      }));
-    } else {
-      // FIXME: Does this ever happen?
-      this.get_count_deferred = $.Deferred();
-      this.get_count_deferred.resolve(function () {
-        return 0;
+      counts = GGRC.Utils.QueryAPI.getCounts();
+
+      if (self.element) {
+        can.trigger(self.element, 'updateCount',
+          [counts.attr(options.model.shortName), self.options.update_count]);
+      }
+
+      counts.on(options.model.shortName, function (ev, newVal, oldVal) {
+        can.trigger(self.element, 'updateCount',
+          [newVal, self.options.update_count]);
       });
+    } else if (this.options.list_loader) {
+      this.options.list_loader(this.options.parent_instance)
+        .then(function (list) {
+          return can.compute(function () {
+            return list.attr('length');
+          });
+        })
+        .then(function (count) {
+          if (self.element) {
+            can.trigger(self.element, 'updateCount', [count(),
+              self.options.update_count]);
+          }
+          count.bind('change', self._ifNotRemoved(function () {
+            can.trigger(self.element, 'updateCount', [count(),
+              self.options.update_count]);
+          }));
+        });
     }
-    return this.get_count_deferred;
   },
 
   fetch_list: function () {
@@ -1316,7 +1306,6 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     this._draw_list_deferred = false;
     this._is_scrolling_up = false;
     this.find_all_deferred = false;
-    this.get_count_deferred = false;
     this.options.list.replace([]);
     this.element.children('.cms_controllers_tree_view_node').remove();
     this.draw_list(this.options.original_list, true, force_reload);
@@ -1495,38 +1484,27 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
   loadPage: function () {
     var options = this.options;
-    var isObjectBrowser = /^\/objectBrowser\/?$/.test(window.location.pathname);
-    var isDashboard = /dashboard/.test(window.location);
-    var params;
-    var relevant;
-    if (isObjectBrowser) {
-      params = GGRC.Utils.QueryAPI.buildParams(
-        options.model.shortName,
-        options.paging);
-    } else {
-      relevant = {
-        type: options.parent_instance.type,
-        id: options.parent_instance.id
-      };
-      if (isDashboard) {
-        relevant.operation = 'owned';
-      }
-      if (options.model.shortName === 'Person') {
-        relevant.operation = 'related_people';
-      }
-      params = GGRC.Utils.QueryAPI.buildParams(
-        options.model.shortName,
+    var queryAPI = GGRC.Utils.QueryAPI;
+    var modelName = options.model.shortName;
+    var params = queryAPI.buildParam(
+        modelName,
         options.paging,
-        relevant
+        queryAPI.makeExpression(modelName, options.parent_instance.type,
+          options.parent_instance.id)
       );
-    }
 
     this._draw_list_deferred = false;
-    return this.page_loader.load({data: params})
+    return this.page_loader.load({data: [params]})
       .then(function (data) {
-        this.options.attr('paging.total', data.total);
+        var total = data.total;
+        this.options.attr('paging.total', total);
         this.options.attr('paging.count',
           Math.ceil(data.total / this.options.paging.pageSize));
+
+        if (!params.filters.expression.right &&
+          total !== queryAPI.getCounts().attr(params.object_name)) {
+          queryAPI.getCounts().attr(params.object_name, total);
+        }
         return data.values;
       }.bind(this));
   },

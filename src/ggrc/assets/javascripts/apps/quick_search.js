@@ -110,7 +110,7 @@
       // Switch the active widget view if 'data-follow' was specified
       if (follow && type !== "error") {
         window.location.hash = '#' + inst.constructor.root_object + '_widget';
-        $('a[href="' + window.location.hash + '"]').trigger("click");
+        $('a[href="' + window.location.hash + '"]').trigger("click", true);
       }
     }
 

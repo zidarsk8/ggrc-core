@@ -112,38 +112,32 @@
       });
       return result.promise();
     },
-    getPersonMappings: function rec(instance, person, specificOject, deferred) {
-      var result = deferred || $.Deferred();
+    getPersonMappings: function (instance, person, specificOject) {
+      var result = $.Deferred();
       var mappingObject = instance[specificOject];
-      var objectPeopleFiltered;
-      var userRoles;
-      var relationships;
+      var refreshQueue = new RefreshQueue();
 
-      if (mappingObject.length > 0 && mappingObject[0].getInstance().person) {
-        objectPeopleFiltered = _.filter(mappingObject, function (item) {
-          var itemInstance = item.getInstance();
-          return itemInstance.person && itemInstance.person.id === person.id;
+      can.each(mappingObject, function (obj) {
+        refreshQueue.enqueue(obj);
+      });
+
+      refreshQueue.trigger().then(function (objects) {
+        var userRoles;
+        var objectPeopleFiltered = _.filter(objects, function (item) {
+          return item.person && item.person.id === person.id;
         });
 
         userRoles = _.filter(person.user_roles, function (item) {
-          return item.getInstance().context_id === instance.context.id;
-        });
-
-        relationships = userRoles.concat(objectPeopleFiltered)
-        .map(function (item) {
+          item = item.getInstance();
+          return instance.context && item.context_id === instance.context.id;
+        }).map(function (item) {
           return item.reify();
         });
 
-        result.resolve(relationships);
-      } else {
-        mappingObject[0]
-        .getInstance()
-        .on('change', function (ev, changedProperty) {
-          if (changedProperty === 'person') {
-            rec(instance, person, specificOject, result);
-          }
-        });
-      }
+        userRoles = userRoles.concat(objectPeopleFiltered);
+
+        result.resolve(userRoles);
+      });
       return result.promise();
     }
   }, {
