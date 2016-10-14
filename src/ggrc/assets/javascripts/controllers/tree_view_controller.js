@@ -1511,6 +1511,9 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       if (isDashboard) {
         relevant.operation = 'owned';
       }
+      if (options.model.shortName === 'Person') {
+        relevant.operation = 'related_people';
+      }
       params = GGRC.Utils.QueryAPI.buildParams(
         options.model.shortName,
         options.paging,
