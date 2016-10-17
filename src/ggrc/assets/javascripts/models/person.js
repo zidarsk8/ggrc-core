@@ -126,7 +126,7 @@
         });
 
         userRoles = _.filter(person.user_roles, function (item) {
-          return item.getInstance().context_id === instance.context_id;
+          return item.getInstance().context_id === instance.context.id;
         });
 
         relationships = userRoles.concat(objectPeopleFiltered)
