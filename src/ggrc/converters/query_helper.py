@@ -648,6 +648,19 @@ class QueryHelper(object):
                   model.id.in_(related_ids),
               ))
           )
+      if "Workflow" in (object_class.__name__, related_type):
+        try:
+          from ggrc_workflows.models import (relationship_helper as
+                                             wf_relationship_handler)
+        except ImportError:
+          # ggrc_workflows module is not enabled
+          return sa.sql.false()
+        else:
+          res.extend(wf_relationship_handler.workflow_person(
+              object_class.__name__,
+              related_type,
+              related_ids,
+          ))
       if res:
         return object_class.id.in_([obj[0] for obj in res])
       return sa.sql.false()
