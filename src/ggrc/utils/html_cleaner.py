@@ -41,6 +41,7 @@ def cleaner(dummy, value, *_):
   """
   # Some cases like Request don't use the title value
   #  and it's nullable, so check for that
+  return value
   if value is None:
     return value
 
