@@ -22,6 +22,7 @@ from ggrc.converters import get_exportables
 from ggrc.rbac import context_query_filter
 from ggrc.utils import query_helpers, benchmark
 from ggrc_basic_permissions import UserRole
+from ggrc_workflows.models import relationship_helper as wf_relationship_handler
 
 
 class BadQueryException(Exception):
@@ -648,6 +649,12 @@ class QueryHelper(object):
                   model.id.in_(related_ids),
               ))
           )
+      if "Workflow" in (object_class.__name__, related_type):
+        res.extend(wf_relationship_handler.workflow_person(
+            object_class.__name__,
+            related_type,
+            related_ids,
+        ))
       if res:
         return object_class.id.in_([obj[0] for obj in res])
       return sa.sql.false()
