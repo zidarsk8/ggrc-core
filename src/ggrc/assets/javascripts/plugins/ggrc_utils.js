@@ -592,35 +592,29 @@
 
     function _makeFilter(filter, relevant) {
       var relevantFilter;
-      var filters;
-      var left;
-      var right;
+      var filterList = [];
 
       if (relevant) {
-        relevantFilter = '#' + relevant.type + ',' + relevant.id + '#';
-        left = GGRC.query_parser.parse(relevantFilter || '');
+        relevantFilter = GGRC.query_parser.parse('#' + relevant.type + ',' +
+                                                 relevant.id + '#');
+        filterList.push(relevantFilter);
 
         if (relevant.operation &&
-          relevant.operation !== left.expression.op.name) {
-          left.expression.op.name = relevant.operation;
+            relevant.operation !== relevantFilter.expression.op.name) {
+          relevantFilter.expression.op.name = relevant.operation;
         }
       }
 
       if (filter) {
-        right = GGRC.query_parser.parse(filter);
+        filterList.push(GGRC.query_parser.parse(filter));
       }
 
-      if (left && right) {
-        filters = GGRC.query_parser.join_queries(left, right);
-      } else if (left) {
-        filters = left;
-      } else if (right) {
-        filters = right;
-      } else {
-        filters = {expression: {}};
+      if (filterList.length) {
+        return filterList.reduce(function (left, right) {
+          return GGRC.query_parser.join_queries(left, right);
+        });
       }
-
-      return filters;
+      return {expression: {}};
     }
 
     function _getTreeViewOperation(objectName) {
