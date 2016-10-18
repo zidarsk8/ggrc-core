@@ -1,18 +1,19 @@
-# # Copyright (C) 2016 Google Inc.
-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-#
-# See https://developers.google.com/appengine/docs/python/config/appconfig
-
 application: {APPENGINE_INSTANCE}
-version: 1
+version: perftest
 runtime: python27
 api_version: 1
 threadsafe: true
 instance_class: {INSTANCE_CLASS}
-manual_scaling:
-  instances: {MAX_INSTANCES}
+basic_scaling:
+  max_instances: {MAX_INSTANCES}
+  idle_timeout: 10m
 
 handlers:
+  - url: /static
+    static_dir: ggrc/static
+    http_headers:
+      Access-Control-Allow-Origin: '*'
+
   - url: /login
     script: ggrc.app.app.wsgi_app
     login: required
@@ -62,8 +63,7 @@ skip_files:
 # Custom GGRC excludes here
 - requirements\.txt
 - requirements\.txt\.md5
-- requirements-dev\.txt
-- requirements-selenium\.txt
+- dev-requirements\.txt
 - migrations/.*
 - tests/.*
 - service_specs/.*
@@ -85,7 +85,7 @@ env_variables:
   GGRC_RISK_ASSESSMENT_URL: "{RISK_ASSESSMENT_URL}"
   APPENGINE_EMAIL: "{APPENGINE_EMAIL}"
   GGRC_CUSTOM_URL_ROOT: "{CUSTOM_URL_ROOT}"
+  MAX_INSTANCES: "{MAX_INSTANCES}"
+  AUTHORIZED_DOMAINS: "{AUTHORIZED_DOMAINS}" 
   GGRC_ABOUT_URL: "{ABOUT_URL}"
   GGRC_ABOUT_TEXT: "{ABOUT_TEXT}"
-  MAX_INSTANCES: "{MAX_INSTANCES}"
-  AUTHORIZED_DOMAINS: "{AUTHORIZED_DOMAINS}"
