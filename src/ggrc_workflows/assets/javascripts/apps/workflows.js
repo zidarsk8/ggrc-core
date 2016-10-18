@@ -581,7 +581,14 @@
         draw_children: true,
         parent_instance: object,
         model: 'Cycle',
-        mapping: 'previous_cycles'
+        mapping: 'previous_cycles',
+        additional_filter: {
+          expression: {
+            op: {name: '='},
+            left: 'is_current',
+            right: 0
+          }
+        }
       }
     };
 
@@ -597,6 +604,13 @@
         parent_instance: object,
         model: 'Cycle',
         mapping: 'current_cycle',
+        additional_filter: {
+          expression: {
+            op: {name: '='},
+            left: 'is_current',
+            right: 1
+          }
+        },
         header_view: GGRC.mustache_path + '/cycles/tree_header.mustache',
         add_item_view:
           GGRC.mustache_path +
