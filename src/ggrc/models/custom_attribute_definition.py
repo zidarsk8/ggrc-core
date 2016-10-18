@@ -152,6 +152,8 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       frozen set containing all reserved attribute names for the current
       object.
     """
+    # pylint: disable=protected-access
+    # The _inflector is a false positive in our app.
     with benchmark("Generate a list of all reserved attribute names"):
       if not cls._reserved_names.get(definition_type):
         definition_map = {model._inflector.table_singular: model
@@ -174,13 +176,13 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     definition_types = [definition_type]
     if definition_type == "assessment_template":
       definition_types.append("assessment")
-    if not getattr(flask.g, "_global_cad_names", set()):
+    if not getattr(flask.g, "global_cad_names", set()):
       query = db.session.query(cls.title, cls.id).filter(
           cls.definition_type.in_(definition_types),
           cls.definition_id.is_(None)
       )
-      flask.g._global_cad_names = {name.lower(): id_ for name, id_ in query}
-    return flask.g._global_cad_names
+      flask.g.global_cad_names = {name.lower(): id_ for name, id_ in query}
+    return flask.g.global_cad_names
 
   def validate_assessment_title(self, name):
     """Check assessment title uniqueness.
@@ -205,13 +207,13 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       # then title then definition_id, this check would fail.
       return
 
-    if not getattr(flask.g, "_at_cad_names", set()):
+    if not getattr(flask.g, "template_cad_names", set()):
       query = db.session.query(self.__class__.title).filter(
           self.__class__.definition_type == "assessment_template"
       )
-      flask.g._at_cad_names = {cad.title.lower() for cad in query}
+      flask.g.template_cad_names = {cad.title.lower() for cad in query}
 
-    if name in flask.g._at_cad_names:
+    if name in flask.g.template_cad_names:
       raise ValueError("Invalid Custom attribute name.")
 
   @validates("title", "definition_type")

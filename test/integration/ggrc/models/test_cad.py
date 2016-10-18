@@ -3,7 +3,6 @@
 
 """Integration tests for custom attribute definitions model."""
 
-from flask import g
 from sqlalchemy.exc import IntegrityError
 
 from ggrc import db
@@ -11,6 +10,8 @@ from ggrc import models
 from ggrc.app import app
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
+
+CAD = factories.CustomAttributeDefinitionFactory
 
 
 class TestCAD(TestCase):
@@ -133,7 +134,6 @@ class TestCAD(TestCase):
     global CAD, because that will cause collisions when assessments are
     generated when using the mentioned template.
     """
-    CAD = factories.CustomAttributeDefinitionFactory
     with app.app_context():
       CAD(
           title="assessment CAD",
@@ -162,7 +162,6 @@ class TestCAD(TestCase):
     global CAD, because that will cause collisions when assessments are
     generated when using the mentioned template.
     """
-    CAD = factories.CustomAttributeDefinitionFactory
     with app.app_context():
       CAD(
           title="global title",
