@@ -171,9 +171,12 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   @classmethod
   def _get_global_cad_names(cls, definition_type):
     """Get names of global cad for a given object."""
+    definition_types = [definition_type]
+    if definition_type == "assessment_template":
+      definition_types.append("assessment")
     if not getattr(flask.g, "_global_cad_names", set()):
       query = db.session.query(cls.title, cls.id).filter(
-          cls.definition_type == definition_type,
+          cls.definition_type.in_(definition_types),
           cls.definition_id.is_(None)
       )
       flask.g._global_cad_names = {name.lower(): id_ for name, id_ in query}
