@@ -53,7 +53,8 @@ class Relationship(Mapping, db.Model):
   @source.setter
   def source(self, value):
     self.source_id = value.id if value is not None else None
-    self.source_type = value.__class__.__name__ if value is not None else None
+    self.source_type = getattr(
+        value, 'type', value.__class__.__name__ if value is not None else None)
     return setattr(self, self.source_attr, value)
 
   @property
@@ -67,8 +68,8 @@ class Relationship(Mapping, db.Model):
   @destination.setter
   def destination(self, value):
     self.destination_id = value.id if value is not None else None
-    self.destination_type = value.__class__.__name__ if value is not None \
-        else None
+    self.destination_type = getattr(
+        value, 'type', value.__class__.__name__ if value is not None else None)
     return setattr(self, self.destination_attr, value)
 
   @staticmethod
