@@ -169,6 +169,28 @@ class Tests(object):
         )
         db.session.commit()
 
+
+  def _single_statement_insert(self, model, values):
+    insert_str = str(model.__table__.insert())
+    stm, params = insert_str.split("VALUES")
+    keys = params.strip(" ():").split(", :")
+    new_params = "({})".format(", ".join(["%s"] * len(keys)))
+
+    single_insert = "{} VALUES {}".format(stm, ", ".join([new_params] * len(values)))
+    db.engine.execute(
+        single_insert,
+        sum([[v.__dict__.get(key) for key in keys] for v in values], [])
+    )
+
+  def test_single_insert(self):
+    test_models = self._generate_test_models()
+    self.clear_data()
+    for model, values in test_models.iteritems():
+      with Benchmark(self.results,
+                     "single insert object: {}".format(model.__name__)):
+        self._single_statement_insert(model, values)
+        db.session.commit()
+
   def __str__(self):
     max_len = max(len(r[0]) for r in self.results)
     template = "{{:<{}}} : {{:>.6f}}".format(max_len)
@@ -179,10 +201,11 @@ class Tests(object):
       self.test_generate_empty()
       self.test_model_title()
       self.test_model_full()
-      self.test_orm_save_objects()
-      self.test_bulk_save_return()
+      # self.test_orm_save_objects()
+      # self.test_bulk_save_return()
       self.test_bulk_save_objects()
       self.test_core_insert()
+      # self.test_single_insert()
 
 
 def run_all(n):
