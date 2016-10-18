@@ -179,6 +179,38 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       flask.g._global_cad_names = {name.lower(): id_ for name, id_ in query}
     return flask.g._global_cad_names
 
+  def validate_assessment_title(self, name):
+    """Check assessment title uniqueness.
+
+    Assessment CAD should not match any name from assessment_template.
+    Currently assessment templates do not have global custom attributes, but
+    in the future global CAD on assessment templates could be applied to all
+    generated assessments. That's why we do not differentiate between global
+    and local CAD here.
+
+    Args:
+      name: Assessment custom attribute definition title.
+    Raises:
+      ValueError if name is an invalid CAD title.
+    """
+    if self.definition_id:
+      # Local Assessment CAD can match local and global Assessment Template
+      # CAD.
+      # NOTE: This is not the best way of checking if the current CAD is local,
+      # since it relies on the fact that if definition_id will be set, it will
+      # be set along with definition_type. If we manually set definition_type
+      # then title then definition_id, this check would fail.
+      return
+
+    if not getattr(flask.g, "_at_cad_names", set()):
+      query = db.session.query(self.__class__.title).filter(
+          self.__class__.definition_type == "assessment_template"
+      )
+      flask.g._at_cad_names = {cad.title.lower() for cad in query}
+
+    if name in flask.g._at_cad_names:
+      raise ValueError("Invalid Custom attribute name.")
+
   @validates("title", "definition_type")
   def validate_title(self, key, value):
     """Validate CAD title/name uniqueness.
@@ -222,6 +254,9 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     if (self._get_global_cad_names(definition_type).get(name) is not None and
             self._get_global_cad_names(definition_type).get(name) != self.id):
       raise ValueError("Invalid Custom attribute name.")
+
+    if definition_type == "assessment":
+      self.validate_assessment_title(name)
 
     return value
 
