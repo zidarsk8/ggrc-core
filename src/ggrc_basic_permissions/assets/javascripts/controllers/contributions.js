@@ -297,11 +297,12 @@
 
           if (params.scope === 'Private Program') {
             description =
-              'A person with the No Access role will not be ' +
-              'able to see this Private Program.';
+              'A person with no role will not be able to see the program, ' +
+              'unless they have a system wide role (Reader, Editor, Admin) ' +
+              'that allows it.';
           } else if (params.scope === 'Workflow') {
             description =
-              'A person with the No Access role will not be able to update ' +
+              'A person with the No Role role will not be able to update ' +
               'or contribute to this Workflow.';
           } else {
             description =
@@ -309,7 +310,7 @@
               'applications Help files.';
           }
           options.unshift({
-            name: 'No access',
+            name: 'No role',
             id: 0,
             description: description,
             scope: params.scope || 'System'
@@ -393,15 +394,15 @@
           return;
         }
         if (join) {
-          return join.refresh().done(function () {
-            return join.destroy().then(function () {
-              self.element.trigger('relationshipdestroyed', join);
-            });
+          return join.refresh().then(function () {
+            return join.destroy();
+          }).then(function () {
+            self.element.trigger('relationshipdestroyed', join);
           });
         }
       });
 
-      // Create the new join (skipping "No Access" role, with id == 0)
+      // Create the new join (skipping "No Role" role, with id == 0)
       if (clickedOption.id > 0 && !alreadyExists) {
         $.when.apply($, deleteDfds).then(function () {
           join = self.get_new_join(
@@ -414,6 +415,10 @@
             self.refresh_option_list();
             self.element.trigger('relationshipcreated', join);
           });
+        });
+      } else {
+        $.when.apply($, deleteDfds).then(function () {
+          $('body').trigger('treeupdate');
         });
       }
     },

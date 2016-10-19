@@ -453,6 +453,8 @@
      * @property {object} filters - Filter properties
      */
 
+    var widgetsCounts = new can.Map({});
+
     /**
      * Build params for request on Query API.
      *
@@ -500,6 +502,9 @@
       }
 
       params.object_name = objName;
+      if (relevant && !relevant.operation) {
+        relevant.operation = _getTreeViewOperation(objName);
+      }
       params.filters = _makeFilter(page.filter, relevant);
 
       if (page.current && page.pageSize) {
@@ -520,6 +525,36 @@
     }
 
     /**
+     * Counts for related objects.
+     *
+     * @return {can.Map} Promise which return total count of objects.
+     */
+    function getCounts() {
+      return widgetsCounts;
+    }
+
+    function initCounts(widgets, relevant) {
+      var params = [];
+      var param;
+      var i = 0;
+      var iLen = widgets ? widgets.length : 0;
+      for (; i < iLen; i++) {
+        param = buildParam(widgets[i], {},
+          makeExpression(widgets[i], relevant.type, relevant.id));
+        param.type = 'count';
+        params.push(param);
+      }
+      return makeRequest({
+        data: params
+      }).then(function (data) {
+        _.each(data, function (info, i) {
+          var name = widgets[i];
+          widgetsCounts.attr(name, info[name].total);
+        });
+      });
+    }
+
+    /**
      * Params for request on Query API
      * @param {Object} params - Params for request
      * @param {Object} params.headers - Custom headers for request.
@@ -527,14 +562,32 @@
      * @return {Promise} Promise on Query API request.
      */
     function makeRequest(params) {
+      var reqParams = params.data || [];
       return $.ajax({
         type: 'POST',
         headers: $.extend({
           'Content-Type': 'application/json'
         }, params.headers || {}),
         url: '/query',
-        data: JSON.stringify(params.data || [])
+        data: JSON.stringify(reqParams)
       });
+    }
+
+    function makeExpression(parent, type, id, operation) {
+      var isObjectBrowser = /^\/objectBrowser\/?$/
+        .test(window.location.pathname);
+      var expression;
+
+      if (!isObjectBrowser) {
+        expression = {
+          type: type,
+          id: id
+        };
+
+        expression.operation = operation ? operation :
+          _getTreeViewOperation(parent);
+      }
+      return expression;
     }
 
     function _makeFilter(filter, relevant) {
@@ -570,10 +623,24 @@
       return filters;
     }
 
+    function _getTreeViewOperation(objectName) {
+      var isDashboard = /dashboard/.test(window.location);
+      var operation;
+      if (isDashboard) {
+        operation = 'owned';
+      } else if (objectName === 'Person') {
+        operation = 'related_people';
+      }
+      return operation;
+    }
+
     return {
       buildParam: buildParam,
       buildParams: buildParams,
-      makeRequest: makeRequest
+      makeRequest: makeRequest,
+      getCounts: getCounts,
+      makeExpression: makeExpression,
+      initCounts: initCounts
     };
   })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

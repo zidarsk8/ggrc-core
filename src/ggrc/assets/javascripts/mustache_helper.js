@@ -1383,7 +1383,7 @@ Mustache.registerHelper('any_allowed', function (action, data, options) {
 
 Mustache.registerHelper('system_role', function (role, options) {
   role = role.toLowerCase();
-  // If there is no user, it's same as No Access
+  // If there is no user, it's same as No Role
   var user_role = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
       isValid = role === user_role;
 
@@ -3492,7 +3492,7 @@ Mustache.registerHelper("pretty_role_name", function (name) {
     "ProgramReader": "Program Reader",
     "WorkflowOwner": "Workflow Manager",
     "WorkflowMember": "Workflow Member",
-    "Mapped": "No Access",
+    "Mapped": "No Role",
     "Owner": "Manager",
   };
   if (ROLE_LIST[name]) {
@@ -3500,6 +3500,15 @@ Mustache.registerHelper("pretty_role_name", function (name) {
   }
   return name;
 });
+
+  Mustache.registerHelper('role_scope', function (scope) {
+    scope = Mustache.resolve(scope);
+
+    if (scope === 'Private Program') {
+      return 'Program';
+    }
+    return scope;
+  });
 
    /**
    * Check if provided user is current user

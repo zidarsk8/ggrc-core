@@ -194,7 +194,7 @@
     can.each(moduleObjectNames, function (name) {
       baseWidgetsByType[name] = extendedModuleTypes;
 
-      var widgetList = baseWidgetsByType[name].sort();
+      var widgetList = baseWidgetsByType[name];
       var child_model_list = [];
 
       GGRC.tree_view.basic_model_list.push({

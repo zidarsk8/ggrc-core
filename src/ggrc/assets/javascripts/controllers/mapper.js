@@ -29,7 +29,7 @@
     }
   });
 
-  $('body').on('click', selectors.join(', '), function (ev) {
+  $('body').on('click', selectors.join(', '), function (ev, disableMapper) {
     var btn = $(ev.currentTarget);
     var data = {};
     var isSearch;
@@ -46,15 +46,17 @@
     }
 
     isSearch = /unified-search/ig.test(data.toggle);
-    GGRC.Controllers.MapperModal.launch(btn, _.extend({
-      object: btn.data('join-object-type'),
-      type: btn.data('join-option-type'),
-      'join-object-id': btn.data('join-object-id'),
-      'search-only': isSearch,
-      template: {
-        title: isSearch ?
-          '/static/mustache/base_objects/modal/search_title.mustache' : ''
-      }
-    }, data));
+    if (!disableMapper) {
+      GGRC.Controllers.MapperModal.launch(btn, _.extend({
+        object: btn.data('join-object-type'),
+        type: btn.data('join-option-type'),
+        'join-object-id': btn.data('join-object-id'),
+        'search-only': isSearch,
+        template: {
+          title: isSearch ?
+            '/static/mustache/base_objects/modal/search_title.mustache' : ''
+        }
+      }, data));
+    }
   });
 })(window.can, window.can.$);

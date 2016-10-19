@@ -21,7 +21,7 @@
                   <span class="url-link">
                     {{#if instance.email}}{{instance.email}}{{/if}}
                   </span>
-                  {{#if_equals system_wide_role 'No Access'}}
+                  {{#if_equals system_wide_role 'No Role'}}
                     <span class="user-disabled">
                       (Inactive user)
                     </span>
@@ -38,7 +38,7 @@
                       <input type="checkbox" value="{{instance.title}}" checked="checked" disabled="true" class="object-check-single">
                     {{/result_direct_mappings}}
                   {{else}}
-                    <input type="checkbox" value="{{instance.title}}" {{#if_equals system_wide_role 'No Access'}}disabled="true"{{/if}} class="object-check-single">
+                    <input type="checkbox" value="{{instance.title}}" {{#if_equals system_wide_role 'No Role'}}disabled="true"{{/if_equals}} class="object-check-single">
                   {{/if}}
                 </div>
               </div>
@@ -64,11 +64,11 @@
                 <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">
                   {{firstnonempty email}}
                 </span></a>
-                {{#if_equals system_wide_role 'No Access'}}
+                {{#if_equals system_wide_role 'No Role'}}
                   <span class="user-disabled">
                     (Inactive user)
                   </span>
-                {{/if}}
+                {{/if_equals}}
               </span>
             {{/instance}}
             </div>

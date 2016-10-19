@@ -607,6 +607,12 @@
     newWidgetDescriptors.history = historyWidgetDescriptor;
     newWidgetDescriptors.current = currentWidgetDescriptor;
 
+    GGRC.Utils.QueryAPI
+      .initCounts(['Cycle', 'Person', 'TaskGroup'], {
+        type: object.type,
+        id: object.id
+      });
+
     new GGRC.WidgetList(
       'ggrc_workflows',
       {Workflow: newWidgetDescriptors}

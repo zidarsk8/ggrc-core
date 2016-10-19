@@ -186,6 +186,15 @@
       isAssessmentsView || isObjectBrowser) {
     instance = GGRC.page_instance();
     modelName = instance.constructor.shortName;
+
+    if (GGRC.tree_view.base_widgets_by_type[modelName]) {
+      GGRC.Utils.QueryAPI
+        .initCounts(GGRC.tree_view.base_widgets_by_type[modelName], {
+          type: instance.type,
+          id: instance.id
+        });
+    }
+
     initWidgets();
 
     widgetList = GGRC.WidgetList.get_widget_list_for(modelName);

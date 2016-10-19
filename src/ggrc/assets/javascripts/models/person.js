@@ -105,9 +105,37 @@
 
       refreshQueue.trigger().then(function (roles) {
         userRoles = _.filter(roles, function (role) {
-          return !role.context || (instance.context &&
-            role.context.id === instance.context.id);
+          return instance.context && role.context &&
+            role.context.id === instance.context.id;
         });
+        result.resolve(userRoles);
+      });
+      return result.promise();
+    },
+    getPersonMappings: function (instance, person, specificOject) {
+      var result = $.Deferred();
+      var mappingObject = instance[specificOject];
+      var refreshQueue = new RefreshQueue();
+
+      can.each(mappingObject, function (obj) {
+        refreshQueue.enqueue(obj);
+      });
+
+      refreshQueue.trigger().then(function (objects) {
+        var userRoles;
+        var objectPeopleFiltered = _.filter(objects, function (item) {
+          return item.person && item.person.id === person.id;
+        });
+
+        userRoles = _.filter(person.user_roles, function (item) {
+          item = item.getInstance();
+          return instance.context && item.context_id === instance.context.id;
+        }).map(function (item) {
+          return item.reify();
+        });
+
+        userRoles = userRoles.concat(objectPeopleFiltered);
+
         result.resolve(userRoles);
       });
       return result.promise();

@@ -22,7 +22,7 @@
                   <span class="url-link">
                     {{#if instance.email}}{{instance.email}}{{/if}}
                   </span>
-                  {{#if_equals system_wide_role 'No Access'}}
+                  {{#if_equals system_wide_role 'No Role'}}
                     <span class="user-disabled">
                       (Inactive user)
                     </span>
@@ -53,7 +53,7 @@
                 <a href="/people/{{id}}"><span class="person-tooltip-trigger" data-placement="top">
                   {{firstnonempty email}}
                 </span></a>
-                {{#if_equals system_wide_role 'No Access'}}
+                {{#if_equals system_wide_role 'No Role'}}
                   <span class="user-disabled">
                     (Inactive user)
                   </span>
