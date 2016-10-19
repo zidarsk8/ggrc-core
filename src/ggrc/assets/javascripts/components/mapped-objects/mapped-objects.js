@@ -34,13 +34,13 @@
       load: function () {
         var dfd = new can.Deferred();
         var binding = this.getBinding();
-        // Set Loading Status
-        this.attr('isLoading', true);
 
         if (!binding) {
           dfd.resolve([]);
           return dfd;
         }
+        // Set Loading Status
+        this.attr('isLoading', true);
         binding
           .refresh_instances()
           .done(function (items) {
