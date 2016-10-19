@@ -79,6 +79,7 @@ dashboard-js-files:
   - models/mappers/mapper-helpers.js
   - models/mappers/mappings.js
   - models/mappers/mappings-ggrc.js
+  - models/comment.js
   - models/mixins.js
   - models/cacheable.js
   - models/local_storage.js
