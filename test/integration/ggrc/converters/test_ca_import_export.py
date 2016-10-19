@@ -50,11 +50,12 @@ class TestCustomAttributeImportExport(TestCase):
     gen("product", attribute_type="Rich Text", title="normal RT")
     gen("product", attribute_type="Rich Text", title="man RT", mandatory=True)
     gen("product", attribute_type="Date", title="normal Date")
-    gen("product", attribute_type="Date", title="man Date", mandatory=True)
+    gen("product", attribute_type="Date", title="man Date", mandatory=True,
+        helptext="Birthday")
     gen("product", attribute_type="Checkbox", title="normal CH")
     gen("product", attribute_type="Checkbox", title="man CH", mandatory=True)
     gen("product", attribute_type="Dropdown", title="normal select",
-        options="a,b,c,d")
+        options="a,b,c,d", helptext="Your favorite number.")
     gen("product", attribute_type="Dropdown", title="man select",
         options="e,f,g", mandatory=True)
     gen("product", attribute_type="Map:Person", title="normal person")
@@ -174,7 +175,10 @@ class TestCustomAttributeImportExport(TestCase):
                                 headers=self.headers)
 
     self.assert200(response)
-    self.assertEqual(len(response.data.splitlines()), 21)
+    self.assertEqual(len(response.data.splitlines()), 30)
+    self.assertIn("\"Accepted values are", response.data)
+    self.assertIn("number.\n\nAccepted values are", response.data)
+    self.assertIn("Birthday", response.data)
 
   def tests_ca_export_filters(self):
     """Test filtering on custom attribute values."""
