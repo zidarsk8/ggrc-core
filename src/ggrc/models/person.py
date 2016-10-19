@@ -89,7 +89,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   # Methods required by Flask-Login
     # pylint: disable=no-self-use
   def is_authenticated(self):
-    return True
+    return self.system_wide_role != 'No Access'
 
   def is_active(self):
     # pylint: disable=no-self-use
