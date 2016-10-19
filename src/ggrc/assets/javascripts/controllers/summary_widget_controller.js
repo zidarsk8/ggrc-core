@@ -71,13 +71,13 @@
           'piechart_audit_requests_chart');
       });
     },
-    reloadChart: function (type, attr, elementId) {
+    reloadChart: function (type, name, elementId) {
       var that = this;
-      that.setState(attr, {total: 0, statuses: { }}, true);
+      that.setState(name, {total: 0, statuses: { }}, true);
       that.getStatuses(type, that.options.instance.id).then(function (raw) {
         var data = that.parseStatuses(raw[0][type]);
         that.drawChart(elementId, data);
-        that.setState(attr, data, false);
+        that.setState(name, data, false);
       });
     },
     drawChart: function (elementId, raw) {
@@ -123,13 +123,13 @@
         $(window).trigger('resize');
       }, 0);
     },
-    setState: function (type, data, isLoading) {
+    setState: function (name, data, isLoading) {
       var instance = this.options.context.instance;
-      instance.attr(type + '_total', data.total);
-      instance.attr(type + '_any', data.total > 0);
-      instance.attr(type + '_none', isLoading || data.total === 0);
-      instance.attr(type + '_isLoading', isLoading);
-      instance.attr(type + '_isLoaded', !isLoading);
+      instance.attr(name + '_total', data.total);
+      instance.attr(name + '_any', data.total > 0);
+      instance.attr(name + '_none', isLoading || data.total === 0);
+      instance.attr(name + '_isLoading', isLoading);
+      instance.attr(name + '_isLoaded', !isLoading);
     },
     parseStatuses: function (data) {
       var groups = _.groupBy(data.values, 'status');
@@ -138,7 +138,9 @@
         return e[0];
       });
       var result = sorted.map(function (e) {
-        return [e[0], e[1].length];
+        var name = e[0];
+        var count = e[1].length;
+        return [name, count];
       });
       return {
         total: data.total,
