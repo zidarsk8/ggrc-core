@@ -106,7 +106,7 @@
         });
         // Initialize child_model_list, and child_display_list each model_type
         w_list = base_widgets_by_type[name];
-        w_list.sort();
+
         can.each(w_list, function (item) {
           if (possible_model_type.indexOf(item) !== -1) {
             child_model_list.push({

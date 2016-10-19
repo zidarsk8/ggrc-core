@@ -15,11 +15,13 @@ from ggrc import db
 from ggrc import models
 from ggrc.login import is_creator
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
+from ggrc.models import inflector
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
 from ggrc.converters import get_exportables
 from ggrc.rbac import context_query_filter
 from ggrc.utils import query_helpers, benchmark
+from ggrc_basic_permissions import UserRole
 
 
 class BadQueryException(Exception):
@@ -568,6 +570,7 @@ class QueryHelper(object):
           ))
 
     def with_key(key, p):
+      """Apply keys to the filter expression."""
       key = key.lower()
       key, filter_by = self.attr_name_map[
           object_class].get(key, (key, None))
@@ -613,6 +616,54 @@ class QueryHelper(object):
         return object_class.id.in_([obj.id for obj in res])
       return sa.sql.false()
 
+    def related_people():
+      """Get people related to the specified object."""
+      related_type = exp["object_name"]
+      related_ids = exp["ids"]
+      if "Person" not in [object_class.__name__, related_type]:
+        return sa.sql.false()
+      model = inflector.get_model(related_type)
+      res = []
+      res.extend(RelationshipHelper.person_object(
+          object_class.__name__,
+          related_type,
+          related_ids,
+      ))
+
+      if related_type in ('Program', 'Audit'):
+        res.extend(
+            db.session.query(UserRole.person_id).join(model, sa.and_(
+                UserRole.context_id == model.context_id,
+                model.id.in_(related_ids),
+            ))
+        )
+
+        if related_type == "Audit":
+          res.extend(
+              db.session.query(UserRole.person_id).join(
+                  models.Program,
+                  UserRole.context_id == models.Program.context_id,
+              ).join(model, sa.and_(
+                  models.Program.id == model.program_id,
+                  model.id.in_(related_ids),
+              ))
+          )
+      if "Workflow" in (object_class.__name__, related_type):
+        try:
+          from ggrc_workflows.models import (relationship_helper as
+                                             wf_relationship_handler)
+        except ImportError:
+          # ggrc_workflows module is not enabled
+          return sa.sql.false()
+        else:
+          res.extend(wf_relationship_handler.workflow_person(
+              object_class.__name__,
+              related_type,
+              related_ids,
+          ))
+      if res:
+        return object_class.id.in_([obj[0] for obj in res])
+      return sa.sql.false()
 
     ops = {
         "AND": lambda: lift_bin(sa.and_),
@@ -630,6 +681,7 @@ class QueryHelper(object):
         "text_search": text_search,
         "similar": similar,
         "owned": owned,
+        "related_people": related_people,
     }
 
     return ops.get(exp["op"]["name"], unknown)()

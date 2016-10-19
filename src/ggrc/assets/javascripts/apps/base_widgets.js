@@ -31,7 +31,7 @@
     Vendor: 'AccessGroup Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor'
   };
   base_widgets_by_type = _.mapValues(base_widgets_by_type, function (conf) {
-    return conf.split(' ');
+    return conf.split(' ').sort();
   });
   GGRC.tree_view = GGRC.tree_view || new can.Map();
   GGRC.tree_view.attr('base_widgets_by_type', base_widgets_by_type);
