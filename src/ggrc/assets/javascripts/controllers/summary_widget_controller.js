@@ -33,7 +33,7 @@
         .on('widget_shown', this.widget_shown.bind(this));
       this.element.closest('.widget')
         .on('widget_hidden', this.widget_hidden.bind(this));
-      this.options.context = new can.Observe({
+      this.options.context = new can.Map({
         model: this.options.model,
         instance: this.options.instance,
         error_msg: '',
@@ -75,7 +75,7 @@
       var that = this;
       that.setState(attr, {total: 0, statuses: { }}, true);
       that.getStatuses(type, that.options.instance.id).then(function (raw) {
-        var data = that.parseStatuses(type, raw);
+        var data = that.parseStatuses(raw[0][type]);
         that.drawChart(elementId, data);
         that.setState(attr, data, false);
       });
@@ -131,9 +131,8 @@
       instance.attr(type + '_isLoading', isLoading);
       instance.attr(type + '_isLoaded', !isLoading);
     },
-    parseStatuses: function (type, data) {
-      var array = data[0][type];
-      var groups = _.groupBy(array.values, 'status');
+    parseStatuses: function (data) {
+      var groups = _.groupBy(data.values, 'status');
       var pairs = _.pairs(groups);
       var sorted = _.sortBy(pairs, function (e) {
         return e[0];
@@ -142,7 +141,7 @@
         return [e[0], e[1].length];
       });
       return {
-        total: array.total,
+        total: data.total,
         statuses: result
       };
     },
@@ -160,29 +159,10 @@
         callback();
         return;
       }
-      this.loadScript('https://www.gstatic.com/charts/loader.js', function () {
+      GGRC.Utils.loadScript('https://www.gstatic.com/charts/loader.js', function () {
         google.charts.load('45', {packages: ['corechart']});
         google.charts.setOnLoadCallback(callback);
       });
-    },
-    loadScript: function (url, callback) {
-      var script = document.createElement('script');
-      script.type = 'text/javascript';
-      if (script.readyState) {
-        script.onreadystatechange = function () {
-          if (script.readyState === 'loaded' ||
-              script.readyState === 'complete') {
-            script.onreadystatechange = null;
-            callback();
-          }
-        };
-      } else {
-        script.onload = function () {
-          callback();
-        };
-      }
-      script.src = url;
-      document.getElementsByTagName('head')[0].appendChild(script);
     }
   });
 })(this.can, this.can.$);
