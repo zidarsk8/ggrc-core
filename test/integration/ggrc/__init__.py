@@ -3,7 +3,10 @@
 
 """Base test case for all ggrc integration tests."""
 
+import json
 import logging
+from collections import defaultdict
+
 from sqlalchemy import exc
 from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
@@ -12,6 +15,15 @@ from ggrc.app import app
 # Hide errors during testing. Errors are still displayed after all tests are
 # done. This is for the bad request error messages while testing the api calls.
 logging.disable(logging.CRITICAL)
+
+
+class SetEncoder(json.JSONEncoder):
+  # pylint: disable=method-hidden
+  # false positive: https://github.com/PyCQA/pylint/issues/414
+  def default(self, obj):
+    if isinstance(obj, set):
+      return sorted(obj)
+    return json.JSONEncoder.default(self, obj)
 
 
 class TestCase(BaseTestCase):
@@ -91,17 +103,21 @@ class TestCase(BaseTestCase):
     """
 
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
-    counts = ("created", "updated", "rows")
+
+    responses = defaultdict(lambda: defaultdict(set))
 
     for block in response:
       for message in messages:
-        expected = expected_errors.get(block["name"], {}).get(message, set())
-        self.assertEqual(set(expected), set(block[message]))
-      for count in counts:
-        expected = expected_errors.get(block["name"], {}).get(count)
-        if expected is not None:
-          self.assertEqual(
-              block[count],
-              expected,
-              "{}: wrong number of {} count".format(block["name"], count)
-          )
+        if block[message]:
+          responses[block["name"]][message] = \
+              responses[block["name"]][message].union(set(block[message]))
+
+    response_str = json.dumps(responses, indent=4, sort_keys=True,
+                              cls=SetEncoder)
+    expected_str = json.dumps(expected_errors, indent=4, sort_keys=True,
+                              cls=SetEncoder)
+
+    self.assertEqual(responses, expected_errors,
+                     "Expected response does not match received response:\n\n"
+                     "EXPECTED:\n{}\n\nRECEIVED:\n{}".format(
+                         expected_str, response_str))
