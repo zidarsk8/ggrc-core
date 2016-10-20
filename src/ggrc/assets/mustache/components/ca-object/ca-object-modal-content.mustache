@@ -15,7 +15,7 @@
     </div>
     <div class="attachment-modal__controls">
       {{#comment}}
-          <assessment-add-comment instance="instance" state="state" ca-ids="caIds" comment-place-holder="Enter comment"></assessment-add-comment>
+          <assessment-add-comment instance="instance" is-empty="isEmpty" state="state" ca-ids="caIds" comment-place-holder="Enter comment"></assessment-add-comment>
       {{/comment}}
       {{#evidence}}
           <assessment-attachments-list class="attachment-list" source_mapping="instance"

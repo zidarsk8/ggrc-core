@@ -3,9 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="add-comment">
-      {{> '/static/mustache/components/assessment/comment/input.mustache' }}
-      {{#state.controls}}
-        {{> '/static/mustache/components/assessment/comment/controls.mustache' }}
-      {{/state.controls}}
-</div>
+<comment-input value="comment.value" clean="clean" is-empty="isEmpty" disabled="isSaving"></comment-input>
+{{#state.controls}}
+  {{> '/static/mustache/components/assessment/comment/controls.mustache' }}
+{{/state.controls}}
