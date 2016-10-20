@@ -25,6 +25,7 @@
               analyzing: {
                 class: "btn-draft",
                 showSpinner: true,
+                isDisabled: true,
                 text: "Analyzing"
               },
               import: {
@@ -34,10 +35,12 @@
               importing: {
                 class: "btn-draft",
                 showSpinner: true,
+                isDisabled: true,
                 text: "Importing"
               },
               success: {
                 class: "btn-success",
+                isDisabled: true,
                 text: "<i class=\"fa fa-check-square-o white\">"+
                   "</i> Import successful"
               }
