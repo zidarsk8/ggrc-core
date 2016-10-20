@@ -288,12 +288,12 @@ class AttributeInfo(object):
     else:
       custom_attributes = object_class.get_custom_attribute_definitions()
     for attr in custom_attributes:
-      description = attr.helptext or ""
+      description = attr.helptext or u""
       if (attr.attribute_type == attr.ValidTypes.DROPDOWN and
               attr.multi_choice_options):
         if description:
           description += "\n\n"
-        description += "Accepted values are:\n{}".format(
+        description += u"Accepted values are:\n{}".format(
             attr.multi_choice_options.replace(",", "\n")
         )
       if attr.definition_id:

@@ -55,7 +55,7 @@ class TestCustomAttributeImportExport(TestCase):
     gen("product", attribute_type="Checkbox", title="normal CH")
     gen("product", attribute_type="Checkbox", title="man CH", mandatory=True)
     gen("product", attribute_type="Dropdown", title="normal select",
-        options="a,b,c,d", helptext="Your favorite number.")
+        options=u"a,b,c,\u017e", helptext="Your favorite number.")
     gen("product", attribute_type="Dropdown", title="man select",
         options="e,f,g", mandatory=True)
     gen("product", attribute_type="Map:Person", title="normal person")
@@ -143,7 +143,7 @@ class TestCustomAttributeImportExport(TestCase):
         u"man Date": u"01/17/2018",
         u"normal CH": u"1",
         u"man CH": u"0",
-        u"normal select": u"a",
+        u"normal select": u"\u017e",
         u"man select": u"f",
         u"normal person": u"Person",
         u"man person": u"Person",
