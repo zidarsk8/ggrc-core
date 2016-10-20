@@ -21,16 +21,12 @@
 
               <div class="span2">
                 <div class="email tree-title-area">
-                  {{#if_match instance.name '\\\\S'}}
-                    {{#instance.name}}
-                      <span class="email">{{instance.email}}</span>
-                      {{#if_equals system_wide_role 'No Role'}}
-                        <span class="user-disabled">
-                          (Inactive user)
-                        </span>
-                      {{/if_equals}}
-                    {{/instance.name}}
-                  {{/if_match}}
+                  <span class="email">{{instance.email}}</span>
+                  {{#if_equals system_wide_role 'No Role'}}
+                    <span class="user-disabled">
+                      (Inactive user)
+                    </span>
+                  {{/if_equals}}
                 </div>
               </div>
 
