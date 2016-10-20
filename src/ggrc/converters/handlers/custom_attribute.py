@@ -123,7 +123,9 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
       return None  # ignore empty fields
     value = None
     try:
-      value = parse(self.raw_value).strftime("%m/%d/%Y")
+      value = parse(self.raw_value).strftime(
+          models.CustomAttributeValue.DATE_FORMAT_DB,
+      )
     except (TypeError, ValueError):
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
     if self.mandatory and value is None:
