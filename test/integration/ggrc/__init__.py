@@ -103,14 +103,19 @@ class TestCase(BaseTestCase):
     """
 
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
+    counts = ("created", "updated", "rows")
 
     responses = defaultdict(lambda: defaultdict(set))
 
     for block in response:
       for message in messages:
-        if block[message]:
+        if message in expected_errors.get(block["name"], {}):
           responses[block["name"]][message] = \
               responses[block["name"]][message].union(set(block[message]))
+      for count in counts:
+        if count in expected_errors.get(block["name"], {}):
+          responses[block["name"]][count] = \
+              responses[block["name"]].get(count, 0) + int(block[count])
 
     response_str = json.dumps(responses, indent=4, sort_keys=True,
                               cls=SetEncoder)
