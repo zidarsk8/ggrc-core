@@ -10,9 +10,14 @@
         <section class="info">
             {{#if requests_any}}
                 <div class="info-pane-utility">
-                    {{#is_allowed 'create' 'Request' context=instance.context}}
-                        {{{renderLive '/static/mustache/base_objects/add_object_generic.mustache' class="btn btn-small btn-primary" content="+ Add Request" title="Create Request" singular="Request" plural="requests"}}}
-                    {{/is_allowed}}
+                    <add-object-button 
+                        instance="instance"
+                        linkclass="btn btn-small btn-primary"
+                        content="+ Add Request"
+                        title="Create Request"
+                        singular="Request"
+                        plural="requests">
+                    </add-object-button>
                 </div>
             {{/if}}
             <div class="tier-content">
@@ -30,7 +35,7 @@
                 </div>
             </div>
             <div class="row-fluid centered">
-                <div class="span12" {{#if requests_none}}style="visibility: hidden"{{/if}}>
+                <div class="span12" {{#if requests_none}}style="visibility: hidden; max-height: 0px;"{{/if}}>
                     <div id="piechart_audit_requests_chart" style="min-height: 300px;"></div>
                 </div>
                 {{#if requests_isLoading}}
@@ -54,9 +59,14 @@
                             <div class="span12">
                             </div>
                             <div class="span12">
-                                {{#is_allowed 'create' 'Request' context=instance.context}}
-                                    {{{renderLive '/static/mustache/base_objects/add_object_generic.mustache' class="btn btn-small btn-primary" content="+ Add Request" title="Create Request" singular="Request" plural="requests"}}}
-                                {{/is_allowed}}
+                                <add-object-button 
+                                    instance="instance"
+                                    linkclass="btn btn-small btn-primary"
+                                    content="+ Add Request"
+                                    title="Create Request"
+                                    singular="Request"
+                                    plural="requests">
+                                </add-object-button>
                             </div>
                         {{/if}}
                     {{/if}}
@@ -69,12 +79,22 @@
         <section class="info">
             {{#if assessments_any}}
                 <div class="info-pane-utility">
-                    {{#is_allowed 'create' 'Assessment' context=instance.context}}
-                        {{{renderLive '/static/mustache/base_objects/add_object_generic.mustache' class="btn btn-small btn-draft" content="+ Add assessment" title="Create Assessment" singular="Assessment" plural="assessments"}}}
-                    {{/is_allowed}}
-                    {{#is_allowed 'create' 'AssessmentTemplate' context=instance.context}}
-                        {{{renderLive '/static/mustache/base_objects/add_object_generic.mustache' class="btn btn-small btn-primary" content="+ Add Template" title="Define Assessment Template" singular="AssessmentTemplate" plural="assessment_templates"}}}
-                    {{/is_allowed}}
+                    <add-object-button 
+                        instance="instance"
+                        linkclass="btn btn-small btn-draft"
+                        content="+ Add assessment"
+                        title="Create Assessment"
+                        singular="Assessment"
+                        plural="assessments">
+                    </add-object-button>
+                    <add-object-button 
+                        instance="instance"
+                        linkclass="btn btn-small btn-primary"
+                        content="+ Add Template"
+                        title="Define Assessment Template"
+                        singular="AssessmentTemplate"
+                        plural="assessment_templates">
+                    </add-object-button>
                     <assessment-generator-button audit="instance" button='true'></assessment-generator-button>
                 </div>
             {{/if}}
@@ -93,7 +113,7 @@
                 </div>
             </div>
             <div class="row-fluid centered">
-                <div class="span12" {{#if assessments_none}}style="visibility: hidden"{{/if}}>
+                <div class="span12" {{#if assessments_none}}style="visibility: hidden; max-height: 0px;"{{/if}}>
                     <div id="piechart_audit_assessments_chart" style="min-height: 300px;"></div>
                 </div>
                 {{#if assessments_isLoading}}
@@ -115,18 +135,35 @@
                                 {{#is_allowed 'create' 'AssessmentTemplate' context=instance.context}}
                                     {{#is_allowed 'create' 'Assessment' context=instance.context}}
                                         Start by 
-                                        {{{renderLive '/static/mustache/base_objects/add_object_generic.mustache' content="creating an assessment template" title="Define Assessment Template" singular="AssessmentTemplate" plural="assessment_templates"}}}
+                                        <add-object-button 
+                                            instance="instance"
+                                            content="creating an assessment template"
+                                            title="Define Assessment Template"
+                                            singular="AssessmentTemplate"
+                                            plural="assessment_templates">
+                                        </add-object-button>
                                         or add an 
-                                        {{{renderLive '/static/mustache/base_objects/add_object_generic.mustache' content="assessment manually" title="Create Assessment" singular="Assessment" plural="assessments"}}}.
+                                        <add-object-button 
+                                            instance="instance"
+                                            content="assessment manually"
+                                            title="Create Assessment"
+                                            singular="Assessment"
+                                            plural="assessments">
+                                        </add-object-button>
                                     {{/is_allowed}}
                                 {{/is_allowed}}
                             </div>
                             <div class="span12">
                             </div>
                             <div class="span12">
-                                {{#is_allowed 'create' 'AssessmentTemplate' context=instance.context}}
-                                    {{{renderLive '/static/mustache/base_objects/add_object_generic.mustache' class="btn btn-small btn-primary" content="+ Add Template" title="Define Assessment Template" singular="AssessmentTemplate" plural="assessment_templates"}}}
-                                {{/is_allowed}}
+                                <add-object-button 
+                                    instance="instance"
+                                    linkclass="btn btn-small btn-primary"
+                                    content="+ Add Template"
+                                    title="Define Assessment Template"
+                                    singular="AssessmentTemplate"
+                                    plural="assessment_templates">
+                                </add-object-button>
                             </div>
                         {{/if}}
                     {{/if}}
