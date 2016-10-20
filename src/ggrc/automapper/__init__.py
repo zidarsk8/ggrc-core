@@ -11,10 +11,11 @@ from ggrc import db
 from ggrc import models
 from ggrc.automapper.rules import rules
 from ggrc.login import get_current_user
+from ggrc.models.audit import Audit
 from ggrc.models.relationship import Relationship
 from ggrc.models.request import Request
 from ggrc.rbac.permissions import is_allowed_update
-from ggrc.services.common import Resource
+from ggrc.services.common import Resource, get_cache
 from ggrc.utils import benchmark, with_nop
 
 
@@ -164,6 +165,20 @@ class AutomapperGenerator(object):
           "automapping_id": parent_relationship.id}
           for src, dst in self.auto_mappings
           if (src, dst) != original]))  # (src, dst) is sorted
+      cache = get_cache(create=True)
+      if cache:
+        # Add inserted relationships into new objects collection of the cache,
+        # so that they will be logged within event and appropriate revisions
+        # will be created.
+        cache.new.update(
+            (relationship, relationship.log_json())
+            for relationship in Relationship.query.filter_by(
+                automapping_id=parent_relationship.id,
+                modified_by_id=current_user.id,
+                created_at=now,
+                updated_at=now,
+            )
+        )
 
   def _step(self, src, dst):
     explicit, implicit = rules[src.type, dst.type]
@@ -310,7 +325,16 @@ def register_automapping_listeners():
       generate_relationship_snapshots(obj)
       automapper.generate_automappings(obj)
 
-  @Resource.model_posted_after_commit.connect_via(Request)
-  @Resource.model_put_after_commit.connect_via(Request)
-  def handle_request(sender, obj=None, src=None, service=None, event=None):
+  @Resource.collection_posted.connect_via(Request)
+  def handle_requests_collection_post(sender, objects=None, **kwargs):
+    for obj in objects:
+      handle_relationship_post(obj, obj.audit)
+
+  @Resource.model_put.connect_via(Request)
+  def handle_request(sender, obj=None, src=None, service=None):
     handle_relationship_post(obj, obj.audit)
+
+  @Resource.collection_posted.connect_via(Audit)
+  def handle_audits_collection_post(sender, objects=None, **kwargs):
+    for obj in objects:
+      handle_relationship_post(obj, obj.program)
