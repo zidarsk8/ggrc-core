@@ -38,7 +38,32 @@
             model: instance.constructor,
             widget_view: widgetView || defaultInfoWidgetView
           },
-          order: 0
+          order: 5
+        });
+    },
+    /*
+      make an summary widget descriptor for a GGRC object
+      You must provide:
+      instance - an instance that is a subclass of can.Model.Cacheable
+      widgetView [optional] - a template for rendering the info.
+    */
+    make_summary_widget: function (instance, widgetView) {
+      var defaultView = GGRC.mustache_path +
+        '/base_objects/summary.mustache';
+      return new this(
+        instance.constructor.shortName + ':summary', {
+          widget_id: 'Summary',
+          widget_name: function () {
+            return instance.constructor.title_singular + ' Summary';
+          },
+          widget_icon: 'pie-chart',
+          content_controller: GGRC.Controllers.SummaryWidget,
+          content_controller_options: {
+            instance: instance,
+            model: instance.constructor,
+            widget_view: widgetView || defaultView
+          },
+          order: 3
         });
     },
     /*

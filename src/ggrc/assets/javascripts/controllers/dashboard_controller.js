@@ -305,7 +305,7 @@
 
       window.location.hash = path;
 
-      this.display_path(path.length ? path : 'info_widget');
+      this.display_path(path.length ? path : 'Summary_widget');
     },
 
     display_path: function (path) {
@@ -315,6 +315,10 @@
 
       // Find and make active the widget specified by `step`
       var widget = this.find_widget_by_target('#' + step);
+      // If widget was not found and it's not info - try to select info
+      if (!widget && step !== 'info') {
+        return this.display_path('info_widget');
+      }
       if (!widget && widget_list.length) {
         // Target was not found, but we can select the first widget in the list
         widget = widget_list[0];

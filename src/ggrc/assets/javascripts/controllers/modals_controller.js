@@ -1050,10 +1050,22 @@ can.Control('GGRC.Controllers.Modals', {
              : "",
              this.options.instance.hash_fragment()].join('/');
 
+    hash = this.updateSummaryHash(hash, this.options.instance.type);
     window.location.hash = hash;
+  },
+
+  updateSummaryHash: function (hash, type) {
+    var summary = 'Summary';
+    var replacements = {
+      Request: 'Request',
+      Assessment: 'assessment'
+    };
+    var replacement = replacements[type];
+    return replacement && hash.indexOf(summary) > 0 ?
+        hash.replace(summary, replacement) :
+        hash;
   }
 });
-
 
 /*
   Below this line we're defining a can.Component, which is in this file

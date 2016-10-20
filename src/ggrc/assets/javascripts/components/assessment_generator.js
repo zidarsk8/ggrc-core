@@ -11,7 +11,8 @@
     template: '{{{> /static/mustache/base_objects/' +
     'generate_assessments_button.mustache}}}',
     scope: {
-      audit: null
+      audit: null,
+      button: '@'
     },
     events: {
       'a click': function (el, ev) {
