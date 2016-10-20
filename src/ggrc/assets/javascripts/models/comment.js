@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, CMS) {
+(function (can, GGRC, CMS) {
   'use strict';
   /**
    * A model describing a comment to Assessment or Request objects.
@@ -56,8 +56,8 @@
     updateDescription: function (instance, $el, ev) {
       var $body = $(document.body);
 
-      // for some reson the instance must be refreshed before saving to avoid
-      // the HTTP "precondition reqired" error
+      // for some reason the instance must be refreshed before saving to avoid
+      // the HTTP "precondition required" error
       this.refresh()
         .then(function () {
           this.attr('description', ev.newVal);
@@ -76,4 +76,4 @@
         }.bind(this));
     }
   });
-})(window.can, window.CMS);
+})(window.can, window.GGRC, window.CMS);
