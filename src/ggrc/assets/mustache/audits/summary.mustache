@@ -35,9 +35,7 @@
                 </div>
                 {{#if requests_isLoading}}
                     <div class="span12 centered">
-                        <li class="spinner">
-                            <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' }}></span>
-                        </li>
+                        <spinner toggle="requests_isLoading"></spinner>
                     </div> 
                 {{else}}
                     {{#if requests_any}}
@@ -100,9 +98,7 @@
                 </div>
                 {{#if assessments_isLoading}}
                     <div class="span12 centered">
-                        <li class="spinner">
-                            <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' }}></span>
-                        </li>
+                        <spinner toggle="assessments_isLoading"></spinner>
                     </div> 
                 {{else}}
                     {{#if assessments_any}}
