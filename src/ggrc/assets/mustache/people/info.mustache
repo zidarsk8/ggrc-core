@@ -23,11 +23,11 @@
             {{#if name}}
               {{#name}}
                 <h3>{{name}}
-                  {{#if_equals system_wide_role 'No Role'}}
+                  {{#if_equals system_wide_role 'No Access'}}
                     <span class="user-disabled">
                       (Inactive user)
                     </span>
-                  {{/if}}
+                  {{/if_equals}}
                 </h3>
               {{/name}}
             {{else}}

@@ -16,7 +16,7 @@
       {{firstnonempty name email}}
     </span></a>
   {{/if}}
-  {{#if_equals system_wide_role 'No Role'}}
+  {{#if_equals system_wide_role 'No Access'}}
     <span class="user-disabled">
       (Inactive user)
     </span>
@@ -28,7 +28,7 @@
           <div class="profile-info">
             <ul>
               <li><h4>{{firstnonempty name email}}
-                {{#if_equals system_wide_role 'No Role'}}
+                {{#if_equals system_wide_role 'No Access'}}
                   <span class="user-disabled">
                     (Inactive user)
                   </span>
