@@ -27,6 +27,7 @@
       extraCssClass: '@',
       instance: null,
       modalEl: null,
+      modalTitle: '@',
       state: {
         open: false
       },
