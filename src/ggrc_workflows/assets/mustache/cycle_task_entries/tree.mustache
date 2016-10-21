@@ -61,15 +61,12 @@
       </li>
       <li>
         {{^if_equals parent_instance.status 'Verified'}}
-          {{#if mappings}}
-          {{#is_allowed_all 'delete' mappings}}
-            <a href="javascript://" data-toggle="unmap">
-              {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+            {{#is_allowed 'delete' instance}}
+            <a data-toggle="modal-ajax-deleteform" data-object-plural="{{instance.class.table_plural}}" data-object-singular="CycleTaskEntry" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
               <i class="fa fa-trash"></i>
               Delete Comment
             </a>
           {{/is_allowed_all}}
-          {{/if}}
         {{/if_equals}}
       </li>
     </ul>
