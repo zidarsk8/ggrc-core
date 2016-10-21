@@ -18,11 +18,32 @@
       states: function () {
         var state = this.attr("state") || "select",
             states = {
-              select: {class: "btn-success", text: "Choose CSV file to import"},
-              analyzing: {class: "btn-draft", text: "Analyzing", isDisabled: true},
-              import: {class: "btn-primary", text: "Import data"},
-              importing: {class: "btn-draft", text: "Importing", isDisabled: true},
-              success: {class: "btn-success", text: "<i class=\"fa fa-check-square-o white\"></i> Import successful"}
+              select: {
+                class: "btn-success",
+                text: "Choose CSV file to import"
+              },
+              analyzing: {
+                class: "btn-draft",
+                showSpinner: true,
+                isDisabled: true,
+                text: "Analyzing"
+              },
+              import: {
+                class: "btn-primary",
+                text: "Import data"
+              },
+              importing: {
+                class: "btn-draft",
+                showSpinner: true,
+                isDisabled: true,
+                text: "Importing"
+              },
+              success: {
+                class: "btn-success",
+                isDisabled: true,
+                text: "<i class=\"fa fa-check-square-o white\">"+
+                  "</i> Import successful"
+              }
             };
 
         return _.extend(states[state], {state: state});
