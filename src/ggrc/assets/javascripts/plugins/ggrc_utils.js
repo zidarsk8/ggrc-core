@@ -469,10 +469,11 @@
      * @param {Object} relevant.type - Type of relevant object
      * @param {Object} relevant.id - Id of relevant object
      * @param {Object} relevant.operation - Type of operation.
+     * @param {Object} additionalFilter - An additional filter to be applied
      * @return {QueryAPIRequest} Array of QueryAPIRequest
      */
-    function buildParams(objName, page, relevant) {
-      return [buildParam(objName, page, relevant)];
+    function buildParams(objName, page, relevant, additionalFilter) {
+      return [buildParam(objName, page, relevant, undefined, additionalFilter)];
     }
 
     /**
@@ -490,9 +491,10 @@
      * @param {Object} relevant.id - Id of relevant object
      * @param {Object} relevant.operation - Type of operation.
      * @param {Array} fields - Array of requested fields.
+     * @param {Object} additionalFilter - An additional filter to be applied
      * @return {QueryAPIRequest} Object of QueryAPIRequest
      */
-    function buildParam(objName, page, relevant, fields) {
+    function buildParam(objName, page, relevant, fields, additionalFilter) {
       var first;
       var last;
       var params = {};
@@ -505,7 +507,7 @@
       if (relevant && !relevant.operation) {
         relevant.operation = _getTreeViewOperation(objName);
       }
-      params.filters = _makeFilter(page.filter, relevant);
+      params.filters = _makeFilter(page.filter, relevant, additionalFilter);
 
       if (page.current && page.pageSize) {
         first = (page.current - 1) * page.pageSize;
@@ -590,37 +592,35 @@
       return expression;
     }
 
-    function _makeFilter(filter, relevant) {
+    function _makeFilter(filter, relevant, additionalFilter) {
       var relevantFilter;
-      var filters;
-      var left;
-      var right;
+      var filterList = [];
 
       if (relevant) {
-        relevantFilter = '#' + relevant.type + ',' + relevant.id + '#';
-        left = GGRC.query_parser.parse(relevantFilter || '');
+        relevantFilter = GGRC.query_parser.parse('#' + relevant.type + ',' +
+                                                 relevant.id + '#');
+        filterList.push(relevantFilter);
 
         if (relevant.operation &&
-          relevant.operation !== left.expression.op.name) {
-          left.expression.op.name = relevant.operation;
+            relevant.operation !== relevantFilter.expression.op.name) {
+          relevantFilter.expression.op.name = relevant.operation;
         }
       }
 
       if (filter) {
-        right = GGRC.query_parser.parse(filter);
+        filterList.push(GGRC.query_parser.parse(filter));
       }
 
-      if (left && right) {
-        filters = GGRC.query_parser.join_queries(left, right);
-      } else if (left) {
-        filters = left;
-      } else if (right) {
-        filters = right;
-      } else {
-        filters = {expression: {}};
+      if (additionalFilter) {
+        filterList.push(additionalFilter);
       }
 
-      return filters;
+      if (filterList.length) {
+        return filterList.reduce(function (left, right) {
+          return GGRC.query_parser.join_queries(left, right);
+        });
+      }
+      return {expression: {}};
     }
 
     function _getTreeViewOperation(objectName) {

@@ -1490,7 +1490,9 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         modelName,
         options.paging,
         queryAPI.makeExpression(modelName, options.parent_instance.type,
-          options.parent_instance.id)
+          options.parent_instance.id),
+        undefined,
+        options.additional_filter
       );
 
     this._draw_list_deferred = false;

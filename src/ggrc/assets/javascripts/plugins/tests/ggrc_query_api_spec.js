@@ -113,5 +113,103 @@ describe('GGRC Utils Query API', function () {
         expect(result.filters.expression.op.name).toEqual('owned');
       });
     });
+
+    describe('filter builder', function () {
+      var relevantType = 'dummyType1';
+      var requestedType = 'dummyType2';
+      var pageWithFilter = {filter: 'field = value'};
+      var pageNoFilter = {filter: undefined};
+      var relevant = {id: 1, type: relevantType};
+      var additionalFilter = {
+        expression: {
+          op: {name: '~'},
+          left: 'foo',
+          right: 'bar'
+        }
+      };
+      var result;
+
+      var flattenOps = function (expression) {
+        if (expression && expression.op) {
+          return [expression.op.name].concat(flattenOps(expression.left))
+                                     .concat(flattenOps(expression.right));
+        }
+        return [];
+      };
+
+      var checkOps = function (expression, expectedOps) {
+        return _.isEqual(flattenOps(expression).sort(),
+                         expectedOps.sort());
+      };
+
+      it('returns empty expression for no filtering parameters', function () {
+        result = method(requestedType, pageNoFilter, undefined, undefined)[0];
+
+        expect(_.isObject(result.filters.expression)).toBe(true);
+        expect(_.isEmpty(result.filters.expression)).toBe(true);
+      });
+
+      it('returns correct filters for just text filter',
+         function () {
+           result = method(requestedType, pageWithFilter, undefined,
+                           undefined)[0];
+
+           expect(checkOps(result.filters.expression, ['='])).toBe(true);
+         });
+
+      it('returns correct filters for just relevant object',
+         function () {
+           result = method(requestedType, pageNoFilter, relevant,
+                           undefined)[0];
+
+           expect(checkOps(result.filters.expression, ['relevant'])).toBe(true);
+         });
+
+      it('returns correct filters for just additionalFilter',
+         function () {
+           result = method(requestedType, pageNoFilter, undefined,
+                           additionalFilter)[0];
+
+           expect(checkOps(result.filters.expression, ['~'])).toBe(true);
+         });
+
+      it('returns correct filters for just text filter and relevant object',
+         function () {
+           result = method(requestedType, pageWithFilter, relevant,
+                           undefined)[0];
+
+           expect(checkOps(result.filters.expression,
+                           ['=', 'AND', 'relevant'])).toBe(true);
+         });
+
+      it('returns correct filters for just text filter and additionalFilter',
+         function () {
+           result = method(requestedType, pageWithFilter, undefined,
+                           additionalFilter)[0];
+
+           expect(checkOps(result.filters.expression,
+                           ['=', 'AND', '~'])).toBe(true);
+         });
+
+      it('returns correct filters for just relevant object and ' +
+         'additionalFilter',
+         function () {
+           result = method(requestedType, pageNoFilter, relevant,
+                           additionalFilter)[0];
+
+           expect(checkOps(result.filters.expression,
+                           ['relevant', 'AND', '~'])).toBe(true);
+         });
+
+      it('returns correct filters for text filter, relevant object and ' +
+         'additionalFilter',
+         function () {
+           result = method(requestedType, pageWithFilter, relevant,
+                           additionalFilter)[0];
+
+           expect(checkOps(result.filters.expression,
+                           ['=', 'AND', 'relevant', 'AND', '~'])).toBe(true);
+         });
+    });
   });
 });
