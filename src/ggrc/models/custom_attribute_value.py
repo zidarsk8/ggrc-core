@@ -22,6 +22,15 @@ class CustomAttributeValue(Base, db.Model):
   """Custom attribute value model"""
 
   __tablename__ = 'custom_attribute_values'
+
+  _publish_attrs = [
+      'custom_attribute_id',
+      'attributable_id',
+      'attributable_type',
+      'attribute_value',
+      'attribute_object',
+      PublishOnly('preconditions_failed'),
+  ]
   _fulltext_attrs = ["attribute_value"]
 
   custom_attribute_id = db.Column(
@@ -91,15 +100,6 @@ class CustomAttributeValue(Base, db.Model):
     self.attributable_type = value.__class__.__name__ if value is not None \
         else None
     return setattr(self, self.attributable_attr, value)
-
-  _publish_attrs = [
-      'custom_attribute_id',
-      'attributable_id',
-      'attributable_type',
-      'attribute_value',
-      'attribute_object',
-      PublishOnly('preconditions_failed'),
-  ]
 
   @property
   def attribute_object(self):
