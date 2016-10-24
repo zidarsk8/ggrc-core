@@ -10,6 +10,7 @@ from ggrc import contributions
 from ggrc.models import Notification
 from ggrc.models import NotificationType
 from ggrc.models import Request
+from ggrc.models import Revision
 from integration.ggrc import api_helper
 from integration.ggrc import converters
 from integration.ggrc import generator
@@ -50,6 +51,11 @@ class TestRequestDataHandlers(converters.TestCase):
   def test_open_request(self):
     """Test data handlers for opened requests."""
     notif = self._get_notification(self.request1, "request_open").first()
+
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
+
     open_data = self._call_notif_handler(notif)
     request_1_expected_keys = set([
         "user1@a.com",
@@ -62,6 +68,11 @@ class TestRequestDataHandlers(converters.TestCase):
     self.assertEqual(set(open_data.keys()), request_1_expected_keys)
 
     notif = self._get_notification(self.request3, "request_open").first()
+
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
+
     open_data = self._call_notif_handler(notif)
     request_3_expected_keys = set([
         "user1@a.com",
@@ -80,6 +91,11 @@ class TestRequestDataHandlers(converters.TestCase):
     self.api_helper.modify_object(request1, {"status": Request.PROGRESS_STATE})
 
     notif = self._get_notification(self.request1, "request_declined").first()
+
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
+
     declined_data = self._call_notif_handler(notif)
     requester_emails = set([
         "user2@a.com",
@@ -94,6 +110,10 @@ class TestRequestDataHandlers(converters.TestCase):
         request1, "Verifier", "some comment", send_notification="true")
 
     notif = self._get_notification(comment, "comment_created").first()
+
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
 
     declined_data = self._call_notif_handler(notif)
     requester_emails = set([
