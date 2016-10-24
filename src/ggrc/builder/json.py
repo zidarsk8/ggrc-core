@@ -157,34 +157,39 @@ class UpdateAttrHandler(object):
             class_attr.property.columns[0].type,
             JsonType)
     )):
-      # SQLAlchemy instrumentation botches up if we replace entire collections
-      # It works if we update them with changes
-      new_set = set(value)
-      old_set = set(getattr(obj, attr_name))
-      coll_class_attr = getattr(obj.__class__, attr_name)
-      coll_attr = getattr(obj, attr_name)
-      # Join table objects require special handling so that we can be sure to
-      # set the modified_by_id correctly
-      if isinstance(coll_class_attr, AssociationProxy):
-        current_user_id = get_current_user_id()
-        proxied_attr = coll_class_attr.local_attr
-        proxied_property = coll_class_attr.remote_attr
-        proxied_set_map = dict([(getattr(i, proxied_property.key), i)
-                                for i in getattr(obj, proxied_attr.key)])
-        coll_attr = getattr(obj, proxied_attr.key)
-        for item in new_set - old_set:
-          new_item = coll_class_attr.creator(item)
-          new_item.modified_by_id = current_user_id
-          coll_attr.append(new_item)
-        for item in old_set - new_set:
-          coll_attr.remove(proxied_set_map[item])
-      else:
-        for item in new_set - old_set:
-          coll_attr.append(item)
-        for item in old_set - new_set:
-          coll_attr.remove(item)
+      cls._do_update_collection(obj, value, attr_name)
     else:
       setattr(obj, attr_name, value)
+
+  @classmethod
+  def _do_update_collection(cls, obj, value, attr_name):
+    """Special logic to update relationship collection."""
+    # SQLAlchemy instrumentation botches up if we replace entire collections
+    # It works if we update them with changes
+    new_set = set(value)
+    old_set = set(getattr(obj, attr_name))
+    coll_class_attr = getattr(obj.__class__, attr_name)
+    coll_attr = getattr(obj, attr_name)
+    # Join table objects require special handling so that we can be sure to
+    # set the modified_by_id correctly
+    if isinstance(coll_class_attr, AssociationProxy):
+      current_user_id = get_current_user_id()
+      proxied_attr = coll_class_attr.local_attr
+      proxied_property = coll_class_attr.remote_attr
+      proxied_set_map = dict([(getattr(i, proxied_property.key), i)
+                              for i in getattr(obj, proxied_attr.key)])
+      coll_attr = getattr(obj, proxied_attr.key)
+      for item in new_set - old_set:
+        new_item = coll_class_attr.creator(item)
+        new_item.modified_by_id = current_user_id
+        coll_attr.append(new_item)
+      for item in old_set - new_set:
+        coll_attr.remove(proxied_set_map[item])
+    else:
+      for item in new_set - old_set:
+        coll_attr.append(item)
+      for item in old_set - new_set:
+        coll_attr.remove(item)
 
   @classmethod
   def InstrumentedAttribute(cls, obj, json_obj, attr_name, class_attr):
