@@ -258,7 +258,7 @@ class TestComprehensiveSheets(TestCase):
     response = self.import_file("case_sensitive_slugs.csv")
     expected_errors = {
         "Control": {
-            "row_errors": [
+            "row_errors": {
                 errors.DUPLICATE_VALUE_IN_CSV.format(
                     line_list="3, 4",
                     column_name="Code",
@@ -273,7 +273,7 @@ class TestComprehensiveSheets(TestCase):
                     value="a",
                     ignore_lines="4",
                 ),
-            ]
+            }
         }
     }
     self._check_csv_response(response, expected_errors)
@@ -292,7 +292,7 @@ class TestComprehensiveSheets(TestCase):
 
     expected_errors = {
         "Task Group Task": {
-            "row_errors": [
+            "row_errors": {
                 errors.MISSING_VALUE_ERROR.format(
                     line="5",
                     column_name="End",
@@ -309,7 +309,7 @@ class TestComprehensiveSheets(TestCase):
                     line="7",
                     column_name="End",
                 ),
-            ],
+            },
         },
     }
     self._check_csv_response(response, expected_errors)
