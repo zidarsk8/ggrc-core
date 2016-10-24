@@ -8,6 +8,8 @@ needed by ggrc notifications.
 """
 
 from datetime import date
+from itertools import izip
+
 from sqlalchemy import inspect
 from sqlalchemy import and_
 
@@ -140,11 +142,11 @@ def register_handlers():
   def assignable_modified_listener(sender, obj=None, src=None, service=None):
     handle_assignable_modified(obj)
 
-  @Resource.model_posted_after_commit.connect_via(models.Request)
-  @Resource.model_posted_after_commit.connect_via(models.Assessment)
-  def assignable_created_listener(sender, obj=None, src=None, service=None,
-                                  event=None):
-    handle_assignable_created(obj)
+  @Resource.collection_posted.connect_via(models.Request)
+  @Resource.collection_posted.connect_via(models.Assessment)
+  def assignable_created_listener(sender, objects=None, **kwargs):
+    for obj in objects:
+      handle_assignable_created(obj)
 
   @Resource.model_put.connect_via(models.Assessment)
   def assessment_send_reminder(sender, obj=None, src=None, service=None):
@@ -152,7 +154,7 @@ def register_handlers():
     if reminder_type:
       handle_reminder(obj, reminder_type)
 
-  @Resource.model_posted_after_commit.connect_via(models.Comment)
-  def comment_created_listener(sender, obj=None, src=None, service=None,
-                               event=None):
-    handle_comment_created(obj, src)
+  @Resource.collection_posted.connect_via(models.Comment)
+  def comment_created_listener(sender, objects=None, sources=None, **kwargs):
+    for obj, src in izip(objects, sources):
+      handle_comment_created(obj, src)

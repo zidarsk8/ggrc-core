@@ -33,6 +33,7 @@ from ggrc.services.common import update_index
 from ggrc.services.common import update_memcache_after_commit
 from ggrc.services.common import update_memcache_before_commit
 from ggrc.services.common import log_event
+from ggrc.services.common import Resource
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
 
@@ -44,6 +45,7 @@ CACHE_EXPIRY_IMPORT = 600
 
 
 class BlockConverter(object):
+  # pylint: disable=too-many-public-methods
 
   """ Main block converter class for dealing with csv files and data
 
@@ -395,6 +397,7 @@ class BlockConverter(object):
     self.clean_session_from_ignored_objs()
 
     if not self.converter.dry_run:
+      new_objects = []
       for row_converter in self.row_converters:
         row_converter.send_pre_commit_signals()
       for row_converter in self.row_converters:
@@ -405,6 +408,10 @@ class BlockConverter(object):
           db.session.rollback()
           logger.exception("Import failed with: %s", err.message)
           row_converter.add_error(errors.UNKNOWN_ERROR)
+        else:
+          if row_converter.is_new and not row_converter.ignore:
+            new_objects.append(row_converter.obj)
+      self.send_collection_post_signals(new_objects)
       import_event = self.save_import()
       for row_converter in self.row_converters:
         row_converter.send_post_commit_signals(event=import_event)
@@ -422,6 +429,21 @@ class BlockConverter(object):
           db.session.expunge(obj)
       except UnmappedInstanceError:
         continue
+
+  @staticmethod
+  def send_collection_post_signals(new_objects):
+    """Send bulk create pre-commit signals."""
+    if not new_objects:
+      return
+    collections = {}
+    for obj in new_objects:
+      collections.setdefault(obj.__class__, []).append(obj)
+    for object_class, objects in collections.iteritems():
+      Resource.collection_posted.send(
+          object_class,
+          objects=objects,
+          sources=[{} for _ in xrange(len(objects))],
+      )
 
   def save_import(self):
     """Commit all changes in the session and update memcache."""
