@@ -428,6 +428,9 @@ class CustomAttributeValue(Base, db.Model):
 
     literal_date = CustomAttributeDefinition.ValidTypes.DATE
 
+    # pylint: disable=access-member-before-definition
+    # pylint: disable=attribute-defined-outside-init
+    # false positives on the next block; the author doesn't like that block too
     if self.custom_attribute is None:
       # self is newly created and is not yet flushed to the db
       # manually store self.custom_attribute because it is cached as None until
