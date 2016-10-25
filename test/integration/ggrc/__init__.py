@@ -90,12 +90,12 @@ class TestCase(BaseTestCase):
     app.debug = False
     return app
 
-  def _check_csv_response(self, response, expected_errors):
+  def _check_csv_response(self, response, expected_messages):
     """Test that response contains all expected errors and warnigs.
 
     Args:
       response: api response object.
-      expected_errors: dict of all expected errors by object type.
+      expected_messages: dict of all expected errors by object type.
 
     Raises:
       AssertionError if an expected error or warning is not found in the
@@ -110,26 +110,26 @@ class TestCase(BaseTestCase):
     # Set default empty sets for non existing error messages in blocks
     for block in response:
       for message in messages:
-        error_block = expected_errors.get(block["name"], {})
+        error_block = expected_messages.get(block["name"], {})
         error_block[message] = error_block.get(message, set())
-        expected_errors[block["name"]] = error_block
+        expected_messages[block["name"]] = error_block
 
     for block in response:
       for message in messages:
-        if message in expected_errors.get(block["name"], {}):
+        if message in expected_messages.get(block["name"], {}):
           responses[block["name"]][message] = \
               responses[block["name"]][message].union(set(block[message]))
       for count in counts:
-        if count in expected_errors.get(block["name"], {}):
+        if count in expected_messages.get(block["name"], {}):
           responses[block["name"]][count] = \
               responses[block["name"]].get(count, 0) + int(block[count])
 
     response_str = json.dumps(responses, indent=4, sort_keys=True,
                               cls=SetEncoder)
-    expected_str = json.dumps(expected_errors, indent=4, sort_keys=True,
+    expected_str = json.dumps(expected_messages, indent=4, sort_keys=True,
                               cls=SetEncoder)
 
-    self.assertEqual(responses, expected_errors,
+    self.assertEqual(responses, expected_messages,
                      "Expected response does not match received response:\n\n"
                      "EXPECTED:\n{}\n\nRECEIVED:\n{}".format(
                          expected_str, response_str))
