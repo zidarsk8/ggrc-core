@@ -27,8 +27,8 @@
         this.attr('disabled', isDisabled);
       },
       /**
-       * Should set value of the component
-       * @param {String|null} value - Value received from the RichText Editor
+       * Updates values of the component on modifications of the input of the Rich Text Editor
+       * @param {String|null} value - Value received from the Rich Text Editor
        */
       setValues: function (value) {
         this.attr('value', value);
@@ -47,7 +47,7 @@
     events: {
       init: function () {
         this.scope.performCleanup();
-        // Set input and input length
+        // Set default values
         this.scope.initValues();
       },
       '{scope} disabled': function (scope, ev, isDisabled) {
