@@ -108,9 +108,11 @@ class TestCase(BaseTestCase):
     responses = defaultdict(lambda: defaultdict(set))
 
     # Set default empty sets for non existing error messages in blocks
-    for block in expected_errors.itervalues():
+    for block in response:
       for message in messages:
-        block[message] = block.get(message, set())
+        error_block = expected_errors.get(block["name"], {})
+        error_block[message] = error_block.get(message, set())
+        expected_errors[block["name"]] = error_block
 
     for block in response:
       for message in messages:
