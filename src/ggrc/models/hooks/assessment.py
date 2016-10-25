@@ -8,6 +8,8 @@
   new relationships and custom attributes
 """
 
+from itertools import izip
+
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
@@ -20,34 +22,34 @@ from ggrc.services.common import Resource
 def init_hook():
   """ Initialize hooks"""
   # pylint: disable=unused-variable
-  @Resource.model_posted_after_commit.connect_via(Assessment)
-  def handle_assessment_post(sender, obj=None, src=None, service=None):
+  @Resource.collection_posted.connect_via(Assessment)
+  def handle_assessment_post(sender, objects=None, sources=None):
     # pylint: disable=unused-argument
     """Apply custom attribute definitions and map people roles
     when generating Assessmet with template"""
+    for obj, src in izip(objects, sources):
+      src_obj = src.get("object")
+      audit = src.get("audit")
+      program = src.get("program")
+      map_assessment(obj, src_obj)
+      map_assessment(obj, audit)
+      # The program may also be set as the src_obj. If so then it should not be
+      # mapped again.
+      if (src_obj and program and
+          (src_obj["id"] != program["id"] or
+           src_obj["type"] != program["type"])):
+        map_assessment(obj, program)
 
-    src_obj = src.get("object")
-    audit = src.get("audit")
-    program = src.get("program")
-    map_assessment(obj, src_obj)
-    map_assessment(obj, audit)
-    # The program may also be set as the src_obj. If so then it should not be
-    # mapped again.
-    if (src_obj and program and
-        (src_obj["id"] != program["id"] or
-         src_obj["type"] != program["type"])):
-      map_assessment(obj, program)
+      if not src.get("_generated"):
+        continue
 
-    if not src.get("_generated"):
-      return
-
-    related = {
-        "template": get_by_id(src.get("template")),
-        "obj": get_by_id(src.get("object")),
-        "audit": get_by_id(src.get("audit")),
-    }
-    relate_assignees(obj, related)
-    relate_ca(obj, related)
+      related = {
+          "template": get_by_id(src.get("template")),
+          "obj": get_by_id(src.get("object")),
+          "audit": get_by_id(src.get("audit")),
+      }
+      relate_assignees(obj, related)
+      relate_ca(obj, related)
 
 
 def map_assessment(assessment, obj):
@@ -238,8 +240,14 @@ def relate_ca(assessment, related):
   )
 
   for definition in ca_definitions:
-    db.make_transient(definition)
-    definition.id = None
-    definition.definition_id = assessment.id
-    definition.definition_type = assessment._inflector.table_singular
-    db.session.add(definition)
+    cad = all_models.CustomAttributeDefinition(
+        title=definition.title,
+        definition=assessment,
+        attribute_type=definition.attribute_type,
+        multi_choice_options=definition.multi_choice_options,
+        multi_choice_mandatory=definition.multi_choice_mandatory,
+        mandatory=definition.mandatory,
+        helptext=definition.helptext,
+        placeholder=definition.placeholder,
+    )
+    db.session.add(cad)
