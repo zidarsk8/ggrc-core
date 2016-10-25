@@ -4,7 +4,6 @@
 """Custom attribute value model"""
 
 from collections import namedtuple
-from datetime import datetime
 
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import and_
@@ -17,6 +16,7 @@ from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.revision import Revision
+from ggrc import utils
 
 
 class CustomAttributeValue(Base, db.Model):
@@ -390,11 +390,6 @@ class CustomAttributeValue(Base, db.Model):
            for mask in cad.multi_choice_mandatory.split(",")),
       ))
 
-  @staticmethod
-  def _convert_date_format(date, format_from, format_to):
-    """Convert string date format from one to another."""
-    return datetime.strptime(date, format_from).strftime(format_to)
-
   def _publish_attribute_value(self):
     """Return value serialized for JSON.
 
@@ -409,7 +404,7 @@ class CustomAttributeValue(Base, db.Model):
     self_is_date = self.custom_attribute.attribute_type == literal_date
     if self_is_date and self.attribute_value:
       try:
-        result = self._convert_date_format(self.attribute_value,
+        result = utils.convert_date_format(self.attribute_value,
                                            self.DATE_FORMAT_DB,
                                            self.DATE_FORMAT_JSON)
       except ValueError:
@@ -441,7 +436,7 @@ class CustomAttributeValue(Base, db.Model):
     self_is_date = self.custom_attribute.attribute_type == literal_date
     if self_is_date and new_value:
       try:
-        new_value = self._convert_date_format(new_value,
+        new_value = utils.convert_date_format(new_value,
                                               self.DATE_FORMAT_JSON,
                                               self.DATE_FORMAT_DB)
       except ValueError:

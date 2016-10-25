@@ -180,7 +180,7 @@ class CustomAttributable(object):
                 .attribute_type == CustomAttributeDefinition.ValidTypes.DATE):
           # convert the date formats for dates
           if attribute_value:
-            attribute_value = CustomAttributeValue._convert_date_format(
+            attribute_value = utils.convert_date_format(
                 attribute_value,
                 CustomAttributeValue.DATE_FORMAT_JSON,
                 CustomAttributeValue.DATE_FORMAT_DB,
