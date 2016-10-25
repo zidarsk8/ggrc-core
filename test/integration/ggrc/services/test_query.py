@@ -174,6 +174,16 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
             for program in programs["values"]),
     )
 
+  # pylint: disable=invalid-name
+  def test_basic_query_incorrect_date_format(self):
+    """Filtering should fail because of incorrect date input."""
+    data = self._make_query_dict(
+        "Program",
+        expression=["effective date", ">", '05-18-2015']
+    )
+    response = self._post(data)
+    self.assert400(response)
+
   def test_basic_query_text_search(self):
     """Filter by fulltext search."""
     text_pattern = "ea"
@@ -555,6 +565,11 @@ class TestQueryWithCA(BaseQueryAPITestCase):
         title="CA text",
         definition_type="program",
     )
+    factories.CustomAttributeDefinitionFactory(
+        title="CA date",
+        definition_type="program",
+        attribute_type="Date",
+    )
 
   @staticmethod
   def _flatten_cav(data):
@@ -627,6 +642,55 @@ class TestQueryWithCA(BaseQueryAPITestCase):
 
     keys = [(prog["CA text"], prog["CA dropdown"]) for prog in programs]
     self.assertEqual(keys, sorted(keys))
+
+  def test_ca_query_eq(self):
+    """Test CA date fields filtering by = operator."""
+    date = datetime(2015, 5, 18)
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["ca date", "=",
+                                          date.strftime(DATE_FORMAT_REQUEST)]),
+        "Program", "values",
+    )
+    titles = [prog['title'] for prog in programs]
+    self.assertItemsEqual(titles, ('F', 'H', 'J', 'B', 'D'))
+    self.assertEqual(len(programs), 5)
+
+  def test_ca_query_lt(self):
+    """Test CA date fields filtering by < operator."""
+    date = datetime(2015, 5, 18)
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["ca date", "<",
+                                          date.strftime(DATE_FORMAT_REQUEST)]),
+        "Program", "values",
+    )
+    titles = [prog['title'] for prog in programs]
+    self.assertItemsEqual(titles, ('G', 'I'))
+    self.assertEqual(len(programs), 2)
+
+  def test_ca_query_gt(self):
+    """Test CA date fields filtering by > operator."""
+    date = datetime(2015, 5, 18)
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["ca date", ">",
+                                          date.strftime(DATE_FORMAT_REQUEST)]),
+        "Program", "values",
+    )
+    titles = [prog['title'] for prog in programs]
+    self.assertItemsEqual(titles, ('A', 'C', 'E'))
+    self.assertEqual(len(programs), 3)
+
+  # pylint: disable=invalid-name
+  def test_ca_query_incorrect_date_format(self):
+    """CA filtering should fail because of incorrect date input."""
+    data = self._make_query_dict(
+        "Program",
+        expression=["effective date", ">", '05-18-2015']
+    )
+    response = self._post(data)
+    self.assert400(response)
 
 
 class TestQueryWithUnicode(BaseQueryAPITestCase):
