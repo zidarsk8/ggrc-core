@@ -18,9 +18,11 @@ from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship_helper import RelationshipHelper
+from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.converters import get_exportables
 from ggrc.rbac import context_query_filter
-from ggrc.utils import query_helpers, benchmark
+from ggrc.utils import query_helpers, benchmark, convert_date_format
 from ggrc_basic_permissions import UserRole
 
 
@@ -495,21 +497,37 @@ class QueryHelper(object):
 
     def autocast(o_key, value):
       """Try to guess the type of `value` and parse it from the string."""
-      if not isinstance(o_key, (str, unicode)):
+      if not isinstance(o_key, basestring):
         return value
       key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
-      # handle dates
-      if ("date" in key and "relative" not in key) or \
-         key in ["end_date", "start_date"]:
-        if isinstance(value, datetime.date):
-          return value
+      is_date = False
+      try:
+        attr_type = getattr(object_class, key).property.columns[0].type
+      except AttributeError:
+        cad = db.session.query(CustomAttributeDefinition).filter(
+          CustomAttributeDefinition.title == key,
+          CustomAttributeDefinition.definition_type == object_class.__name__,
+          CustomAttributeDefinition.
+              attribute_type == CustomAttributeDefinition.ValidTypes.DATE,
+        ).count()
+        if cad:
+          is_date = True
+      else:
+        if isinstance(attr_type, sa.sql.sqltypes.Date):
+          is_date = True
+      if is_date and isinstance(value, basestring):
         try:
-          month, day, year = [int(part) for part in value.split("/")]
-          return datetime.date(year, month, day)
-        except Exception:
-          raise BadQueryException(u"Field \"{}\" expects a MM/DD/YYYY date"
-                                  .format(o_key))
-      # fallback
+          return convert_date_format(
+              value,
+              CustomAttributeValue.DATE_FORMAT_JSON,
+              CustomAttributeValue.DATE_FORMAT_DB,
+          )
+        except (TypeError, ValueError):
+          raise BadQueryException("Field '{}' expects a '{}' date"
+                                  .format(
+                                      o_key,
+                                      CustomAttributeValue.DATE_FORMAT_JSON,
+                                  ))
       return value
 
     def relevant():
