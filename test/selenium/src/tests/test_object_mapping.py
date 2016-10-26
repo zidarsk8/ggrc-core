@@ -19,7 +19,7 @@ from lib.page import dashboard
 class TestObjectMapping(base.Test):
   """A part of smoke tests, section 4."""
 
-  @pytest.mark.skipif(True, reason="implementation changed")
+  @pytest.mark.smoke_tests
   def test_mapping_via_lhn(self, selenium, new_product,
                            new_project, new_system, new_data_asset,
                            new_process, new_issue):
