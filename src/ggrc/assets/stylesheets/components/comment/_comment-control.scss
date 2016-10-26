@@ -1,0 +1,30 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+.comment-control {
+  padding: 12px 0;
+  line-height: 26px;
+  flex-direction: row-reverse;
+
+  label {
+    display: flex;
+    align-items: flex-start;
+    line-height: 26px;
+    height: 26px;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+      align-self: center;
+      margin: 0 4px;
+    }
+  }
+
+  button {
+    min-width: 68px;
+  }
+
+  > * {
+    margin: 0 0 0 16px;
+  }
+}

@@ -162,14 +162,17 @@
     /**
      * Display a confirmation dialog before starting to edit the instance.
      *
-     * The dialog is not shown only if the instance is in the "In Progress"
-     * state - in that case an already resolved promise is returned.
+     * The dialog is not shown if the instance is either in the "Not Started",
+     * or the "In Progress" state - in that case an already resolved promise is
+     * returned.
      *
      * @return {Promise} A promise resolved/rejected if the user chooses to
      *   confirm/reject the dialog.
      */
     confirmBeginEdit: function () {
+      var STATUS_NOT_STARTED = 'Not Started';
       var STATUS_IN_PROGRESS = 'In Progress';
+      var IGNORED_STATES = [STATUS_NOT_STARTED, STATUS_IN_PROGRESS];
 
       var TITLE = [
         'Confirm moving ', this.type, ' to "', STATUS_IN_PROGRESS, '"'
@@ -183,7 +186,7 @@
 
       var confirmation = $.Deferred();
 
-      if (this.status === STATUS_IN_PROGRESS) {
+      if (_.includes(IGNORED_STATES, this.status)) {
         confirmation.resolve();
       } else {
         GGRC.Controllers.Modals.confirm({

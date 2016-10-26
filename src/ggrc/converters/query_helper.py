@@ -143,7 +143,7 @@ class QueryHelper(object):
     except ValueError as error:
       # catch missing relevant filter (undefined id)
       if expression.get("op", {}).get("name", "") == "relevant":
-        raise BadQueryException("Invalid relevant filter for {}".format(
+        raise BadQueryException(u"Invalid relevant filter for {}".format(
                                 expression.get("object_name", "")))
       raise error
     self._clean_filters(expression.get("left"))
@@ -199,8 +199,8 @@ class QueryHelper(object):
           elif len(parts) == 1:
             exp["left"] = "relative_" + key + "_day"
           else:
-            raise BadQueryException("Field {} should be a date of one of the"
-                                    " following forms: DD, MM/DD, MM/DD/YYYY"
+            raise BadQueryException(u"Field {} should be a date of one of the"
+                                    u" following forms: DD, MM/DD, MM/DD/YYYY"
                                     .format(key))
 
     if object_query["object_name"] == "TaskGroupTask":
@@ -386,7 +386,7 @@ class QueryHelper(object):
 
       def by_ca():
         """Join fulltext index table, order by indexed CA value."""
-        alias = sa.orm.aliased(Record, name="fulltext_{}".format(self._count))
+        alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(self._count))
         joins = [(alias, sa.and_(
           alias.key == model.id,
           alias.type == model.__name__,
@@ -405,8 +405,8 @@ class QueryHelper(object):
           joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
           order = sorting_field_for_person(alias)
         else:
-          raise NotImplementedError("Sorting by {model.__name__} is "
-                                    "not implemented yet."
+          raise NotImplementedError(u"Sorting by {model.__name__} is "
+                                    u"not implemented yet."
                                     .format(model=related_model))
         return joins, order
 
@@ -443,8 +443,8 @@ class QueryHelper(object):
 
           order = sorting_field_for_person(owner)
         else:
-          raise NotImplementedError("Sorting by m2m-field '{key}' "
-                                    "is not implemented yet."
+          raise NotImplementedError(u"Sorting by m2m-field '{key}' "
+                                    u"is not implemented yet."
                                     .format(key=key))
         return joins, order
 
@@ -460,7 +460,7 @@ class QueryHelper(object):
                                   "'similar' filter was applied.")
       else:
         key, _ = self.attr_name_map[model].get(key, (key, None))
-        attr = getattr(model, key, None)
+        attr = getattr(model, key.encode('utf-8'), None)
         if attr is None:
           # non object attributes are treated as custom attributes
           self._count += 1
@@ -507,7 +507,7 @@ class QueryHelper(object):
           month, day, year = [int(part) for part in value.split("/")]
           return datetime.date(year, month, day)
         except Exception:
-          raise BadQueryException("Field \"{}\" expects a MM/DD/YYYY date"
+          raise BadQueryException(u"Field \"{}\" expects a MM/DD/YYYY date"
                                   .format(o_key))
       # fallback
       return value
@@ -528,8 +528,8 @@ class QueryHelper(object):
       """Filter by relationships similarity."""
       similar_class = self.object_map[exp["object_name"]]
       if not hasattr(similar_class, "get_similar_objects_query"):
-        return BadQueryException("{} does not define weights to count "
-                                 "relationships similarity"
+        return BadQueryException(u"{} does not define weights to count "
+                                 u"relationships similarity"
                                  .format(similar_class.__name__))
       similar_objects_query = similar_class.get_similar_objects_query(
           id_=exp["ids"][0],
@@ -542,7 +542,7 @@ class QueryHelper(object):
       return sa.sql.false()
 
     def unknown():
-      raise BadQueryException("Unknown operator \"{}\""
+      raise BadQueryException(u"Unknown operator \"{}\""
                               .format(exp["op"]["name"]))
 
     def default_filter_by(object_class, key, predicate):
@@ -596,7 +596,7 @@ class QueryHelper(object):
       return object_class.id.in_(
           db.session.query(Record.key).filter(
               Record.type == object_class.__name__,
-              Record.content.ilike("%{}%".format(exp["text"])),
+              Record.content.ilike(u"%{}%".format(exp["text"])),
           ),
       )
 
@@ -672,9 +672,9 @@ class QueryHelper(object):
         "!=": lambda: sa.not_(with_left(
                               lambda l: l == rhs())),
         "~": lambda: with_left(lambda l:
-                               l.ilike("%{}%".format(rhs()))),
+                               l.ilike(u"%{}%".format(rhs()))),
         "!~": lambda: sa.not_(with_left(
-                              lambda l: l.ilike("%{}%".format(rhs())))),
+                              lambda l: l.ilike(u"%{}%".format(rhs())))),
         "<": lambda: with_left(lambda l: l < rhs()),
         ">": lambda: with_left(lambda l: l > rhs()),
         "relevant": relevant,

@@ -3,7 +3,10 @@
 
 """Base test case for all ggrc integration tests."""
 
+import json
 import logging
+from collections import defaultdict
+
 from sqlalchemy import exc
 from flask.ext.testing import TestCase as BaseTestCase
 from ggrc import db
@@ -12,6 +15,15 @@ from ggrc.app import app
 # Hide errors during testing. Errors are still displayed after all tests are
 # done. This is for the bad request error messages while testing the api calls.
 logging.disable(logging.CRITICAL)
+
+
+class SetEncoder(json.JSONEncoder):
+  # pylint: disable=method-hidden
+  # false positive: https://github.com/PyCQA/pylint/issues/414
+  def default(self, obj):
+    if isinstance(obj, set):
+      return sorted(obj)
+    return super(SetEncoder, self).default(obj)
 
 
 class TestCase(BaseTestCase):
@@ -78,12 +90,12 @@ class TestCase(BaseTestCase):
     app.debug = False
     return app
 
-  def _check_csv_response(self, response, expected_errors):
+  def _check_csv_response(self, response, expected_messages):
     """Test that response contains all expected errors and warnigs.
 
     Args:
       response: api response object.
-      expected_errors: dict of all expected errors by object type.
+      expected_messages: dict of all expected errors by object type.
 
     Raises:
       AssertionError if an expected error or warning is not found in the
@@ -93,15 +105,31 @@ class TestCase(BaseTestCase):
     messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
     counts = ("created", "updated", "rows")
 
+    responses = defaultdict(lambda: defaultdict(set))
+
+    # Set default empty sets for non existing error messages in blocks
     for block in response:
       for message in messages:
-        expected = expected_errors.get(block["name"], {}).get(message, set())
-        self.assertEqual(set(expected), set(block[message]))
+        error_block = expected_messages.get(block["name"], {})
+        error_block[message] = error_block.get(message, set())
+        expected_messages[block["name"]] = error_block
+
+    for block in response:
+      for message in messages:
+        if message in expected_messages.get(block["name"], {}):
+          responses[block["name"]][message] = \
+              responses[block["name"]][message].union(set(block[message]))
       for count in counts:
-        expected = expected_errors.get(block["name"], {}).get(count)
-        if expected is not None:
-          self.assertEqual(
-              block[count],
-              expected,
-              "{}: wrong number of {} count".format(block["name"], count)
-          )
+        if count in expected_messages.get(block["name"], {}):
+          responses[block["name"]][count] = \
+              responses[block["name"]].get(count, 0) + int(block[count])
+
+    response_str = json.dumps(responses, indent=4, sort_keys=True,
+                              cls=SetEncoder)
+    expected_str = json.dumps(expected_messages, indent=4, sort_keys=True,
+                              cls=SetEncoder)
+
+    self.assertEqual(responses, expected_messages,
+                     "Expected response does not match received response:\n\n"
+                     "EXPECTED:\n{}\n\nRECEIVED:\n{}".format(
+                         expected_str, response_str))

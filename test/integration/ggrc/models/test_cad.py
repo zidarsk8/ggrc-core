@@ -7,7 +7,11 @@ from sqlalchemy.exc import IntegrityError
 
 from ggrc import db
 from ggrc import models
+from ggrc.app import app
 from integration.ggrc import TestCase
+from integration.ggrc.models import factories
+
+CAD = factories.CustomAttributeDefinitionFactory
 
 
 class TestCAD(TestCase):
@@ -122,3 +126,63 @@ class TestCAD(TestCase):
     cad = models.CustomAttributeDefinition.query.first()
     self.assertEqual(cad.title, "my custom attribute title")
     self.assertEqual(cad.attribute_type, "Rich Text")
+
+  def test_assessment(self):
+    """Test collisions between assessment template and assessments.
+
+    Assessment template is not allowed to have local CAD that match Assessment
+    global CAD, because that will cause collisions when assessments are
+    generated when using the mentioned template.
+    """
+    with app.app_context():
+      CAD(
+          title="assessment CAD",
+          definition_type="assessment_template",
+          definition_id=1,
+      )
+
+    with app.app_context():
+      # check that local assessment local CAD can match AT CAD.
+      CAD(
+          title="assessment CAD",
+          definition_type="assessment",
+          definition_id=1,
+      )
+    with app.app_context():
+      with self.assertRaises(ValueError):
+        CAD(
+            title="assessment CAD",
+            definition_type="assessment",
+        )
+
+  def test_assessment_template(self):
+    """Test collisions between assessment template and assessments.
+
+    Assessment template is not allowed to have local CAD that match Assessment
+    global CAD, because that will cause collisions when assessments are
+    generated when using the mentioned template.
+    """
+    with app.app_context():
+      CAD(
+          title="global title",
+          definition_type="assessment",
+      )
+      CAD(
+          title="local title",
+          definition_type="assessment",
+          definition_id=1,
+      )
+    with app.app_context():
+      # check that assessment template CAD can match an assessment local CAD.
+      CAD(
+          title="local title",
+          definition_type="assessment_template",
+          definition_id=1,
+      )
+    with app.app_context():
+      with self.assertRaises(ValueError):
+        CAD(
+            title="global title",
+            definition_type="assessment_template",
+            definition_id=1,
+        )
