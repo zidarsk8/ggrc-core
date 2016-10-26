@@ -12,7 +12,6 @@
   var defaultState = new can.Map({
     open: false,
     save: false,
-    empty: false,
     controls: true
   });
   var defaultPlaceHolderText = 'Enter comment (optional)';
@@ -58,29 +57,16 @@
       instance: null,
       commentPlaceHolder: '@',
       isSaving: false,
+      isEmpty: true,
+      clean: false,
       comment: {
         notification: false,
         value: '',
         checked: false
       },
-      isEmpty: function () {
-        return !this.attr('comment.value');
-      },
-      applyState: function () {
-        this.saveComment();
-        if (!this.attr('state.open')) {
-          this.clean();
-        }
-      },
       save: function () {
         this.attr('state.save', true);
         this.attr('state.empty', false);
-      },
-      clean: function () {
-        this.attr('comment.value', null);
-      },
-      removeEmptyMark: function (scope, el) {
-        this.attr('state.empty', !el.text().length);
       },
       getCommentData: function () {
         var source = this.attr('instance');
@@ -104,7 +90,7 @@
         return data;
       },
       createComment: function () {
-        var comment = CMS.Models.Comment();
+        var comment = new CMS.Models.Comment();
         comment._source_mapping = this.attr('instance');
         comment.attr('context', this.attr('instance.context'));
         return comment;
@@ -112,10 +98,8 @@
       saveComment: function () {
         var comment = null;
 
-        if (this.isEmpty()) {
-          return;
-        }
         this.attr('isSaving', true);
+        this.attr('clean', false);
 
         comment = this.createComment();
 
@@ -124,7 +108,7 @@
             return comment.constructor
               .resolve_deferred_bindings(comment);
           }).always(function () {
-            this.clean();
+            this.attr('clean', true);
             this.attr('isSaving', false);
             this.attr('state.open', false);
             this.attr('state.save', false);
@@ -142,7 +126,7 @@
       },
       '{scope.state} save': function (scope, ev, val) {
         if (val) {
-          this.scope.applyState();
+          this.scope.saveComment();
         }
       }
     }
