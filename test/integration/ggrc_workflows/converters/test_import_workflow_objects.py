@@ -57,10 +57,10 @@ class TestWorkflowObjectsImport(TestCase):
 
     expected_errors = {
         "Workflow": {
-            "row_errors": [
+            "row_errors": {
                 errors.MISSING_VALUE_ERROR.format(
                     line=8, column_name="Manager")
-            ],
+            },
         }
     }
     self._check_csv_response(response, expected_errors)
