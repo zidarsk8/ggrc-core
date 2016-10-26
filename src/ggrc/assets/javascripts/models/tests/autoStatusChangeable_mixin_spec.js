@@ -60,6 +60,8 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
       var promise;
       var spy;
 
+      instance.attr('status', 'In Limbo');
+
       promise = method();
 
       spy = GGRC.Controllers.Modals.confirm;
@@ -82,6 +84,8 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
       var promise;
       var spy;
 
+      instance.attr('status', 'In Limbo');
+
       promise = method();
 
       spy = GGRC.Controllers.Modals.confirm;
@@ -98,12 +102,32 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
       expect(promise.state()).toEqual('rejected');
     });
 
-    it('returns a resolved promise if "In Progress" state', function () {
-      var promise;
+    it('returns a resolved promise if in "In Progress" state without ' +
+      'opening the modal',
+      function () {
+        var promise;
+        var spy = GGRC.Controllers.Modals.confirm;
 
-      instance.attr('status', 'In Progress');
-      promise = method();
-      expect(promise.state()).toEqual('resolved');
-    });
+        instance.attr('status', 'In Progress');
+        promise = method();
+
+        expect(promise.state()).toEqual('resolved');
+        expect(spy).not.toHaveBeenCalled();
+      }
+    );
+
+    it('returns a resolved promise if in "Not Started" state without ' +
+      'opening the modal',
+      function () {
+        var promise;
+        var spy = GGRC.Controllers.Modals.confirm;
+
+        instance.attr('status', 'Not Started');
+        promise = method();
+
+        expect(promise.state()).toEqual('resolved');
+        expect(spy).not.toHaveBeenCalled();
+      }
+    );
   });
 });
