@@ -218,3 +218,10 @@ def new_control_rest():
   """Creates Control via REST API"""
   service = ControlsService()
   yield service.create_controls(1)[0]
+
+
+@pytest.yield_fixture(scope="function")
+def battery_of_controls_rest(count=batch.BATTERY):
+  """Creates batch of Controls via REST API"""
+  service = ControlsService()
+  yield service.create_controls(count=count)

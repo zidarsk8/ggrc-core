@@ -8,13 +8,10 @@
 # pylint: disable=unused-argument
 
 import pytest    # pylint: disable=import-error
-
 from lib import base
-from lib import exception
 from lib.page import dashboard
 from lib.page import lhn
 from lib.page.widget import generic_widget
-from lib.constants.test import batch
 from lib.utils import conftest_utils
 from lib.utils import selenium_utils
 
@@ -22,28 +19,23 @@ from lib.utils import selenium_utils
 class TestMyWorkPage(base.Test):
   """Tests the my work page, a part of smoke tests, section 2"""
 
-  @pytest.mark.skipif(True, reason="implementation changed")
-  def test_horizontal_nav_bar_tabs(self, selenium, battery_of_controls):
+  @pytest.mark.smoke_tests
+  def test_horizontal_nav_bar_tabs(self, selenium, battery_of_controls_rest):
     """Tests that several objects in a widget can be deleted sequentially"""
     selenium.get(dashboard.Dashboard.URL)
     controls_widget = dashboard\
         .Dashboard(selenium)\
         .select_controls()
 
-    try:
-      for _ in xrange(batch.BATTERY):
-        controls_widget\
-            .select_nth_member(0)\
-            .press_object_settings()\
-            .select_edit()\
-            .delete_object()\
-            .confirm_delete()
-    except exception.RedirectTimeout:
-      # we expect this exception since the url will stay the same for the last
-      # deleted member in object list in a widget
-      assert generic_widget.Controls(selenium).members_listed == []
-    else:
-      assert False
+    for _ in xrange(controls_widget.member_count):
+      counter = controls_widget.get_items_count()
+      controls_widget\
+          .select_nth_member(0)\
+          .press_object_settings()\
+          .select_delete()\
+          .confirm_delete()
+      controls_widget.wait_member_deleted(counter)
+    assert generic_widget.Controls(selenium).members_listed == []
 
   @pytest.mark.smoke_tests
   def test_redirect(self, selenium):
