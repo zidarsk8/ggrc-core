@@ -152,6 +152,8 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       frozen set containing all reserved attribute names for the current
       object.
     """
+    # pylint: disable=protected-access
+    # The _inflector is a false positive in our app.
     with benchmark("Generate a list of all reserved attribute names"):
       if not cls._reserved_names.get(definition_type):
         definition_map = {model._inflector.table_singular: model
@@ -171,13 +173,48 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   @classmethod
   def _get_global_cad_names(cls, definition_type):
     """Get names of global cad for a given object."""
-    if not getattr(flask.g, "_global_cad_names", set()):
+    definition_types = [definition_type]
+    if definition_type == "assessment_template":
+      definition_types.append("assessment")
+    if not getattr(flask.g, "global_cad_names", set()):
       query = db.session.query(cls.title, cls.id).filter(
-          cls.definition_type == definition_type,
+          cls.definition_type.in_(definition_types),
           cls.definition_id.is_(None)
       )
-      flask.g._global_cad_names = {name.lower(): id_ for name, id_ in query}
-    return flask.g._global_cad_names
+      flask.g.global_cad_names = {name.lower(): id_ for name, id_ in query}
+    return flask.g.global_cad_names
+
+  def validate_assessment_title(self, name):
+    """Check assessment title uniqueness.
+
+    Assessment CAD should not match any name from assessment_template.
+    Currently assessment templates do not have global custom attributes, but
+    in the future global CAD on assessment templates could be applied to all
+    generated assessments. That's why we do not differentiate between global
+    and local CAD here.
+
+    Args:
+      name: Assessment custom attribute definition title.
+    Raises:
+      ValueError if name is an invalid CAD title.
+    """
+    if self.definition_id:
+      # Local Assessment CAD can match local and global Assessment Template
+      # CAD.
+      # NOTE: This is not the best way of checking if the current CAD is local,
+      # since it relies on the fact that if definition_id will be set, it will
+      # be set along with definition_type. If we manually set definition_type
+      # then title then definition_id, this check would fail.
+      return
+
+    if not getattr(flask.g, "template_cad_names", set()):
+      query = db.session.query(self.__class__.title).filter(
+          self.__class__.definition_type == "assessment_template"
+      )
+      flask.g.template_cad_names = {cad.title.lower() for cad in query}
+
+    if name in flask.g.template_cad_names:
+      raise ValueError("Invalid Custom attribute name.")
 
   @validates("title", "definition_type")
   def validate_title(self, key, value):
@@ -222,6 +259,9 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
     if (self._get_global_cad_names(definition_type).get(name) is not None and
             self._get_global_cad_names(definition_type).get(name) != self.id):
       raise ValueError("Invalid Custom attribute name.")
+
+    if definition_type == "assessment":
+      self.validate_assessment_title(name)
 
     return value
 
