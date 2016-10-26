@@ -191,7 +191,8 @@
         console.warn('Duplicated relationship objects', relationshipIds);
       }
       relationships = can.map(relationshipIds, function (id) {
-        return CMS.Models.Relationship.findInCacheById(id);
+        return CMS.Models.Relationship.findInCacheById(id) ||
+          CMS.Models.get_instance('Relationship', id);
       });
       result.resolve(relationships);
       return result.promise();
