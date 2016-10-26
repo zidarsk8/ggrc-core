@@ -52,11 +52,13 @@
         <a
           href="{{ selector }}"
           {{#is_mappable_type instance.type model.shortName}}
+          {{#is_allowed_to_map instance model.shortName}}
             data-clickable="true"
             data-toggle="unified-mapper"
             data-join-option-type="{{model.shortName}}"
             data-join-object-id="{{instance.id}}"
             data-join-object-type="{{instance.class.shortName}}"
+          {{/is_allowed_to_map}}
           {{/is_mappable_type}}
         >
           <div class="oneline">
