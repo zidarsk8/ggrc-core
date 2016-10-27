@@ -27,6 +27,7 @@
       instance: null,
       modifiedField: null,
       modalEl: null,
+      isEmpty: true,
       modalCls: function () {
         return this.attr('state.open') ? baseCls + '-open' : '';
       },
@@ -35,9 +36,6 @@
       },
       actionBtnText: function () {
         return this.attr('comment') ? 'Save' : 'Done';
-      },
-      isEmpty: function () {
-        return this.attr('state.empty') && this.attr('comment');
       },
       isPerson: function () {
         return this.attr('modifiedField.value') &&
@@ -48,7 +46,6 @@
       state: {
         open: false,
         save: false,
-        empty: true,
         controls: false
       },
       saveAttachments: function () {
@@ -59,12 +56,10 @@
       hide: function hide() {
         this.attr('state.open', false);
         this.attr('state.save', false);
-        this.attr('state.empty', true);
       },
       show: function () {
         this.attr('state.open', true);
         this.attr('state.save', false);
-        this.attr('state.empty', true);
       },
       toggle: function (isOpen) {
         this.setAttachmentFields(isOpen);

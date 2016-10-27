@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
@@ -624,4 +626,63 @@ class TestQueryWithCA(BaseQueryAPITestCase):
     )
 
     keys = [(prog["CA text"], prog["CA dropdown"]) for prog in programs]
+    self.assertEqual(keys, sorted(keys))
+
+
+class TestQueryWithUnicode(BaseQueryAPITestCase):
+  """Test query API with unicode values."""
+
+  def setUp(self):
+    """Set up test cases for all tests."""
+    TestCase.clear_data()
+    self._generate_cad()
+    self._import_file("querying_with_unicode.csv")
+    self.client.get("/login")
+
+  @staticmethod
+  def _generate_cad():
+    """Generate custom attribute definitions."""
+    factories.CustomAttributeDefinitionFactory(
+        title=u"CA список",
+        definition_type="program",
+        multi_choice_options=u"один,два,три,четыре,пять",
+    )
+    factories.CustomAttributeDefinitionFactory(
+        title=u"CA текст",
+        definition_type="program",
+    )
+
+  @staticmethod
+  def _flatten_cav(data):
+    """Unpack CAVs and put them in data as object attributes."""
+    cad_names = dict(db.session.query(CAD.id, CAD.title))
+    for entry in data:
+      for cav in entry.get("custom_attribute_values", []):
+        entry[cad_names[cav["custom_attribute_id"]]] = cav["attribute_value"]
+    return data
+
+  def test_query(self):
+    """Test query by unicode value."""
+    title = u"программа A"
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program", expression=["title", "=", title]),
+        "Program",
+    )
+
+    self.assertEqual(programs["count"], 1)
+    self.assertEqual(len(programs["values"]), programs["count"])
+    self.assertEqual(programs["values"][0]["title"], title)
+
+  def test_sorting_by_ca(self):
+    """Test sorting by CA fields with unicode names."""
+    programs = self._flatten_cav(
+        self._get_first_result_set(
+            self._make_query_dict("Program",
+                                  order_by=[{"name": u"CA текст"},
+                                            {"name": u"CA список"}]),
+            "Program", "values",
+        )
+    )
+
+    keys = [(prog[u"CA текст"], prog[u"CA список"]) for prog in programs]
     self.assertEqual(keys, sorted(keys))
