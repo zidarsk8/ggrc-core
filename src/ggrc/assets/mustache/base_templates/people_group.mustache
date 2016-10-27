@@ -4,23 +4,26 @@
 }}
 
 
-<label>
-  <span class="person-label {{type}}"></span>
-  {{#has_permissions}}
-    {{^toggle toggle_add}}
-      <span class="file-controls">
-        <a href="javascript://" {{toggle_button}}>
-          <i class="fa fa-plus-circle"></i>
-        </a>
-      </span>
-    {{/toggle}}
-  {{/has_permissions}}
-  {{title}}
-  {{#if editable}}
-    {{#if required}}
-      <span class="required">*</span>
+<label class="people-group">
+    <span {{#boldTitle}}class="people-group_title"{{/boldTitle}}>
+      {{title}}
+    </span>
+    {{#if editable}}
+      {{#if required}}
+        <span class="required">*</span>
+      {{/if}}
     {{/if}}
-  {{/if}}
+    {{#editable}}
+      {{#has_permissions}}
+        {{^toggle toggle_add}}
+          <span class="person-add">
+            <a href="javascript://" {{toggle_button}}>
+              <i class="fa fa-plus-circle"></i>
+            </a>
+          </span>
+        {{/toggle}}
+      {{/has_permissions}}
+    {{/editable}}
 </label>
 <ul class="inner-count-list">
   {{^if results.length}}

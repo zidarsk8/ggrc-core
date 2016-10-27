@@ -3,7 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<h6 class="people-list__label">People</h6>
+{{^disableTitle}}
+  <h6 class="people-list__label">People</h6>
+{{/disableTitle}}
 <div class="side-content">
   {{#instance.roleConflicts}}
     <div class="centered">
@@ -17,15 +19,21 @@
 
   <ul class="label-list">
     {{#instance.class.assignable_list}}
-      {{#if required}}
         <li>
-          <people-group validate="validate" deferred="deferred" editable="editable" instance="instance" mapping="mapping" required="true" type="type" title="title"></people-group>
+          <people-group
+                  deferred="deferred"
+                  editable="editable"
+                  instance="instance"
+                  mapping="mapping"
+                  type="type"
+                  title="title"
+                  bold-title="disableTitle"
+                  {{#if required}}
+                  required="true"
+                  validate="validate"
+                  {{/if}}>
+          </people-group>
         </li>
-      {{else}}
-        <li class="hidable">
-          <people-group deferred="deferred" editable="editable" instance="instance" mapping="mapping" type="type" title="title"></people-group>
-        </li>
-      {{/if}}
-    {{/instance}}
+    {{/instance.class.assignable_list}}
   </ul>
 </div>
