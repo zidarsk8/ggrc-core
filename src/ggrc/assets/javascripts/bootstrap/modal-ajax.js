@@ -500,7 +500,7 @@
         function (e) {
 
           var $this = $(this)
-          , toggle_type = $(this).data('toggle')
+          , toggle_type = $(this).data('toggle'), loadHref
           , modal_id, target, $target, option, href, new_target, modal_type;
 
 
@@ -512,6 +512,8 @@
           }
 
           href = $this.attr('data-href') || $this.attr('href');
+          loadHref = !$this.data().noHrefLoad;
+
           modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');
           target = $this.attr('data-target') || $('#' + modal_id);
 
@@ -531,8 +533,8 @@
 
           if (new_target || $this.data('modal-reset') === 'reset') {
             $target.html(preload_content());
-            if ($this.prop('protocol') === window.location.protocol) {
-              $target.load(href, emit_loaded);
+            if ($this.prop('protocol') === window.location.protocol && loadHref) {
+                  $target.load(href, emit_loaded);
             }
           }
 

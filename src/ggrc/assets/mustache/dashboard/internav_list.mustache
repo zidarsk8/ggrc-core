@@ -49,23 +49,60 @@
           or #if' force_show '\
           or #if' instance.constructor.obj_nav_options.show_all_tabs '\
           or #in_array' internav_display instance.constructor.obj_nav_options.force_show_list}}
-        <a
-          href="{{ selector }}"
-          {{#is_mappable_type instance.type model.shortName}}
-          {{#is_allowed_to_map instance model.shortName}}
-            data-clickable="true"
-            data-toggle="unified-mapper"
-            data-join-option-type="{{model.shortName}}"
-            data-join-object-id="{{instance.id}}"
-            data-join-object-type="{{instance.class.shortName}}"
-          {{/is_allowed_to_map}}
-          {{/is_mappable_type}}
-        >
-          <div class="oneline">
-            <i class="fa fa-{{ internav_icon }} color"></i>
-            {{internav_display}}
-          </div>
-        </a>
+
+          {{#if_helpers '\
+            #if_page_type' 'programs' '\
+            and #if_equals' model.shortName 'Audit'}}
+            <a
+              href="{{selector}}"
+              rel="tooltip"
+              data-placement="left"
+              data-original-title="Create {{model.title_singular}}"
+              data-toggle="modal-ajax-form"
+              data-modal-reset="reset"
+              data-no-href-load="true"
+              data-modal-class="modal-wide"
+              data-object-singular="{{model.title_singular}}"
+              data-object-plural="{{model.table_plural}}"
+              data-object-params='{
+                  "{{instance.class.table_singular}}": {
+                      "id": {{instance.id}},
+                      "title": "{{instance.title}}"
+                  },
+                  "context": {
+                      "id": {{firstnonempty instance.context.id "null"}},
+                      "href": "{{instance.context.href}}",
+                      "type": "{{instance.context.type}}"
+                  }
+              }'
+            >
+              <div class="oneline">
+                <i class="fa fa-{{ internav_icon }} color"></i>
+                {{internav_display}}
+              </div>
+            </a>
+          {{else}}
+            <a
+              href="{{ selector }}"
+              {{^is_dashboard_or_all}}
+              {{#is_mappable_type instance.type model.shortName}}
+              {{#is_allowed_to_map instance model.shortName}}
+                data-clickable="true"
+                data-toggle="unified-mapper"
+                data-join-option-type="{{model.shortName}}"
+                data-join-object-id="{{instance.id}}"
+                data-join-object-type="{{instance.class.shortName}}"
+              {{/is_allowed_to_map}}
+              {{/is_mappable_type}}
+              {{/is_dashboard_or_all}}
+            >
+              <div class="oneline">
+                <i class="fa fa-{{ internav_icon }} color"></i>
+                {{internav_display}}
+              </div>
+            </a>
+          {{/if_helpers}}
+
         {{/if_helpers}}
       </div>
     {{/widget_list}}
