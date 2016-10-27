@@ -5583,7 +5583,14 @@ wysihtml5.dom.replaceWithChildNodes = function(node) {
      *    this._unset(document, "cookie", "", true);
      */
     _unset: function(object, property, value, setter) {
-      try { object[property] = value; } catch(e) {}
+      if (property != 'cookie') {
+        // TODO: The following line sets a cookie with an empty name in
+        // Chrome 54 and breaks all the other cookies set by the app.
+        // The if clause is a temproray fix that will unblock users, but
+        // we need to find a better solution (Upgrade the lib to 5.X or
+        // replacing it altogether). - Anze
+        try { object[property] = value; } catch(e) {}
+      }
 
       try { object.__defineGetter__(property, function() { return value; }); } catch(e) {}
       if (setter) {
