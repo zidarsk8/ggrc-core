@@ -269,7 +269,6 @@ dashboard-js-template-files:
   - base_objects/tab_panel.mustache
   - base_objects/page_header.mustache
   - base_objects/paginate.mustache
-  - base_objects/relevance_action.mustache
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
   - base_objects/title.mustache
