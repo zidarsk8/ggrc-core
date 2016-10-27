@@ -66,7 +66,7 @@ describe('CMS.Controllers.TreeView', function () {
       relationship.source = {type: 'bar'};
       relationship.destination = {type: 'baz'};
 
-      result = method(relationship);
+      result = method(relationship, 'foo');
 
       expect(result).toBeFalsy();
     });
@@ -77,7 +77,7 @@ describe('CMS.Controllers.TreeView', function () {
       relationship.source = {type: 'bar'};
       relationship.destination = {type: 'foo'};
 
-      result = method(relationship);
+      result = method(relationship, 'foo');
 
       expect(result).toBeTruthy();
     });
