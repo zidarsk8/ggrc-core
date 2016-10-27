@@ -34,7 +34,9 @@ THREATS = "threats"
 
 
 class Widget(object):
+  # common
   INFO = "#info_widget"
+  # admin dashboard page
   CUSTOM_ATTRIBUTES = "#custom_attribute_widget"
   EVENTS = "#events_list_widget"
   ROLES = "#roles_list_widget"
