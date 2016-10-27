@@ -164,6 +164,11 @@
       var tablePlural;
       var bindings;
 
+      // Should check all passed arguments are presented
+      if (!target || !destination) {
+        console.error('Incorrect arguments list: ', arguments);
+        return false;
+      }
       if (_.isUndefined(mapping)) {
         tablePlural = CMS.Models[destination.type].table_plural;
         mapping = (target.has_binding(tablePlural) ? '' : 'related_') +
