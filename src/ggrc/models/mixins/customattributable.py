@@ -127,6 +127,10 @@ class CustomAttributable(object):
         value.custom_attribute_id or value.custom_attribute.id: value
         for value in self.custom_attribute_values
     }
+    self._definitions_map = {
+        definition.id: definition
+        for definition in self.custom_attribute_definitions
+    }
 
     if isinstance(values[0], dict):
       self._add_ca_value_dicts(values)
@@ -158,6 +162,8 @@ class CustomAttributable(object):
     Args:
       values: List of dictionaries that represent custom attribute values.
     """
+    from ggrc.models.custom_attribute_definition import (
+        CustomAttributeDefinition)
     from ggrc.models.custom_attribute_value import CustomAttributeValue
 
     for value in values:
@@ -169,8 +175,19 @@ class CustomAttributable(object):
                                         None)
       attr = self._values_map.get(value.get("custom_attribute_id"))
       if attr:
+        attribute_value = value.get("attribute_value")
+        if (self._definitions_map[value["custom_attribute_id"]]
+                .attribute_type == CustomAttributeDefinition.ValidTypes.DATE):
+          # convert the date formats for dates
+          if attribute_value:
+            attribute_value = utils.convert_date_format(
+                attribute_value,
+                CustomAttributeValue.DATE_FORMAT_JSON,
+                CustomAttributeValue.DATE_FORMAT_DB,
+            )
+
         attr.attributable = self
-        attr.attribute_value = value.get("attribute_value")
+        attr.attribute_value = attribute_value
         attr.attribute_object_id = value.get("attribute_object_id")
       elif "custom_attribute_id" in value:
         # this is automatically appended to self._custom_attribute_values
