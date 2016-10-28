@@ -179,7 +179,7 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
     """Filtering should fail because of incorrect date input."""
     data = self._make_query_dict(
         "Program",
-        expression=["effective date", ">", '05-18-2015']
+        expression=["effective date", ">", "05-18-2015"]
     )
     response = self._post(data)
     self.assert400(response)
@@ -652,8 +652,8 @@ class TestQueryWithCA(BaseQueryAPITestCase):
                                           date.strftime(DATE_FORMAT_REQUEST)]),
         "Program", "values",
     )
-    titles = [prog['title'] for prog in programs]
-    self.assertItemsEqual(titles, ('F', 'H', 'J', 'B', 'D'))
+    titles = [prog["title"] for prog in programs]
+    self.assertItemsEqual(titles, ("F", "H", "J", "B", "D"))
     self.assertEqual(len(programs), 5)
 
   def test_ca_query_lt(self):
@@ -665,8 +665,8 @@ class TestQueryWithCA(BaseQueryAPITestCase):
                                           date.strftime(DATE_FORMAT_REQUEST)]),
         "Program", "values",
     )
-    titles = [prog['title'] for prog in programs]
-    self.assertItemsEqual(titles, ('G', 'I'))
+    titles = [prog["title"] for prog in programs]
+    self.assertItemsEqual(titles, ("G", "I"))
     self.assertEqual(len(programs), 2)
 
   def test_ca_query_gt(self):
@@ -678,8 +678,8 @@ class TestQueryWithCA(BaseQueryAPITestCase):
                                           date.strftime(DATE_FORMAT_REQUEST)]),
         "Program", "values",
     )
-    titles = [prog['title'] for prog in programs]
-    self.assertItemsEqual(titles, ('A', 'C', 'E'))
+    titles = [prog["title"] for prog in programs]
+    self.assertItemsEqual(titles, ("A", "C", "E"))
     self.assertEqual(len(programs), 3)
 
   # pylint: disable=invalid-name
@@ -687,7 +687,7 @@ class TestQueryWithCA(BaseQueryAPITestCase):
     """CA filtering should fail because of incorrect date input."""
     data = self._make_query_dict(
         "Program",
-        expression=["effective date", ">", '05-18-2015']
+        expression=["effective date", ">", "05-18-2015"]
     )
     response = self._post(data)
     self.assert400(response)
