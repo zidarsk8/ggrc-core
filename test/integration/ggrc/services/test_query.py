@@ -687,7 +687,7 @@ class TestQueryWithCA(BaseQueryAPITestCase):
     """CA filtering should fail because of incorrect date input."""
     data = self._make_query_dict(
         "Program",
-        expression=["effective date", ">", "05-18-2015"]
+        expression=["ca date", ">", "05-18-2015"]
     )
     response = self._post(data)
     self.assert400(response)
