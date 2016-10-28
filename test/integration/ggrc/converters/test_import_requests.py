@@ -6,6 +6,7 @@
 """Test request import and updates."""
 
 from datetime import date, timedelta
+from flask.json import dumps
 
 from ggrc import models
 from ggrc.converters import errors
@@ -221,3 +222,37 @@ class TestRequestImport(converters.TestCase):
     self.assertEqual(requests["Request 18"].start_date, today)
     self.assertEqual(requests["Request 19"].start_date, today)
     self.assertEqual(requests["Request 19"].end_date, today + seven_days)
+
+
+class TestRequestExport(converters.TestCase):
+  """Test Request object export."""
+
+  def setUp(self):
+    """ Set up for Request test cases """
+    converters.TestCase.setUp(self)
+    self.client.get("/login")
+    self.headers = {
+        'Content-Type': 'application/json',
+        "X-Requested-By": "gGRC",
+        "X-export-view": "blocks",
+    }
+
+  def export_csv(self, data):
+    return self.client.post("/_service/export_csv", data=dumps(data),
+                            headers=self.headers)
+
+  def test_simple_export(self):
+    """ Test full request export with no warnings
+
+    CSV sheet:
+      https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=704933240&vpid=A7
+    """
+
+    self.import_file("request_full_no_warnings.csv")
+    data = [{
+        "object_name": "Request",
+        "filters": {"expression": {}},
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+    self.assertIn(u"\u5555", response.data.decode("utf8"))

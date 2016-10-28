@@ -737,9 +737,9 @@ class RequestColumnHandler(ParentColumnHandler):
 class DocumentsColumnHandler(ColumnHandler):
 
   def get_value(self):
-    lines = ["{} {}".format(d.title, d.link)
+    lines = [u"{} {}".format(d.title, d.link)
              for d in self.row_converter.obj.documents]
-    return "\n".join(lines)
+    return u"\n".join(lines)
 
   def parse_item(self):
     lines = [line.rsplit(" ", 1) for line in self.raw_value.splitlines()]
