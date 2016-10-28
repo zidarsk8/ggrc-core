@@ -19,11 +19,11 @@
     {{#instance.class.assignable_list}}
       {{#if required}}
         <li>
-          <people-group validate="validate" deferred="deferred" editable="editable" instance="instance" mapping="mapping" required="true" type="type"></people-group>
+          <people-group validate="validate" deferred="deferred" editable="editable" instance="instance" mapping="mapping" required="true" type="type" title="title"></people-group>
         </li>
       {{else}}
         <li class="hidable">
-          <people-group deferred="deferred" editable="editable" instance="instance" mapping="mapping" type="type" tabindex="7"></people-group>
+          <people-group deferred="deferred" editable="editable" instance="instance" mapping="mapping" type="type" title="title" tabindex="7"></people-group>
         </li>
       {{/if}}
     {{/instance}}

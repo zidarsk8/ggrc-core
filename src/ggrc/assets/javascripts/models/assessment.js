@@ -119,14 +119,17 @@
       button: 'Confirm'
     },
     assignable_list: [{
+      title: 'Creator(s)',
       type: 'creator',
       mapping: 'related_creators',
       required: true
     }, {
+      title: 'Assignee(s)',
       type: 'assessor',
       mapping: 'related_assessors',
       required: true
     }, {
+      title: 'Verifier(s)',
       type: 'verifier',
       mapping: 'related_verifiers',
       required: false

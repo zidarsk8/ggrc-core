@@ -1195,13 +1195,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       this._add_child_lists_id += 1;
     }
 
-    // Remove listeners for inactive tabs
-    CMS.Models.Relationship.unbind('created', this.onCreatedRS);
-    CMS.Models[this.options.model.shortName].unbind('created',
-      this.onCreated);
-    CMS.Models.Relationship.unbind('destroyed', this.onDestroyedRS);
-    CMS.Models[this.options.model.shortName].unbind('destroyed',
-      this.onDestroyedModel);
+    this.triggerListeners(true);
 
     return false;
   },
@@ -1211,87 +1205,87 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       setTimeout(this.reload_list.bind(this), 0);
     }
 
-    this.onCreatedRS = this.onCreatedRS.bind(this);
-    this.onCreatedModel = this.onCreatedModel.bind(this);
-    this.onDestroyedRS = this.onDestroyedRS.bind(this);
-    this.onDestroyedModel = this.onDestroyedModel.bind(this);
-
-    // Add listeners on creations instance or mappings objects for current tab
-    // and refresh page after that.
-    CMS.Models.Relationship.bind('created', this.onCreatedRS);
-    CMS.Models[this.options.model.shortName].bind('created',
-      this.onCreatedModel);
-    CMS.Models.Relationship.bind('destroyed', this.onDestroyedRS);
-    CMS.Models[this.options.model.shortName].bind('destroyed',
-      this.onDestroyedModel);
+    this.triggerListeners();
 
     $('body').on('treeupdate', this.refreshList.bind(this));
 
     return false;
   },
 
-  _verifyRelationship: function (instance) {
+  _verifyRelationship: function (instance, shortName) {
+    if (!(instance instanceof CMS.Models.Relationship)) {
+      return false;
+    }
     return _.includes([instance.destination.type, instance.source.type],
-      this.options.model.shortName);
+      shortName);
   },
 
-  onCreatedRS: function (ev, instance) {
-    var onCreated = this.onCreated.bind(this);
-    var parentInstance = this.options.parent_instance;
-    function callback() {
-      parentInstance.unbind('change', callback);
-      onCreated();
-    }
-    if (instance instanceof CMS.Models.Relationship &&
-      this._verifyRelationship(instance)) {
-      parentInstance.on('change', callback);
-    }
-  },
+  triggerListeners: (function () {
+    var activeTabModel;
+    var self;
 
-  onCreatedModel: function (ev, instance) {
-    if (instance instanceof CMS.Models[this.options.model.shortName]) {
-      this.onCreated();
+    function onCreated(ev, instance) {
+      var parentInstance = self.options.parent_instance;
+
+      function callback() {
+        parentInstance.unbind('change', callback);
+        _refresh(true);
+      }
+
+      if (self._verifyRelationship(instance, activeTabModel)) {
+        parentInstance.on('change', callback);
+      } else if (activeTabModel === instance.type) {
+        _refresh(true);
+      } else if (activeTabModel === 'Person' &&
+        _.includes(['ObjectPerson', 'WorkflowPerson', 'UserRole'],
+          instance.type)) {
+        _refresh();
+      }
     }
 
-    if (instance instanceof CMS.Models.UserRole) {
-      this.refreshList();
+    function onDestroyed(ev, instance) {
+      var current;
+      if (self._verifyRelationship(instance, activeTabModel) ||
+        instance instanceof CMS.Models[activeTabModel]) {
+        if (self.options.attr('original_list').length === 1) {
+          current = self.options.attr('paging.current');
+          self.options.attr('paging.current',
+            current > 1 ? current - 1 : 1);
+        }
+        _refresh();
+        // TODO: This is a workaround.We need to update communication between
+        //       info-pin and tree views through Observer
+        if (!self.element.closest('.cms_controllers_info_pin').length) {
+          $('.cms_controllers_info_pin').control().unsetInstance();
+        }
+        self.show_info_pin();
+      }
     }
-  },
 
-  onCreated: _.debounce(function () {
-    this.options.attr('paging.sortDirection', 'desc');
-    this.options.attr('paging.sortBy', 'updated_at');
-    this.options.attr('paging.current', 1);
-    this.refreshList();
-  }),
+    function _refresh(sortByUpdatedAt) {
+      if (sortByUpdatedAt) {
+        self.options.attr('paging.sortDirection', 'desc');
+        self.options.attr('paging.sortBy', 'updated_at');
+        self.options.attr('paging.current', 1);
+      }
+      self.refreshList();
+    }
 
-  onDestroyedRS: function (ev, instance) {
-    if (instance instanceof CMS.Models.Relationship &&
-      this._verifyRelationship(instance)) {
-      this.onDestroyed();
-    }
-  },
-
-  onDestroyedModel: function (ev, instance) {
-    if (instance instanceof CMS.Models[this.options.model.shortName]) {
-      this.onDestroyed();
-    }
-  },
-
-  onDestroyed: function () {
-    var current;
-    if (this.options.attr('original_list').length === 1) {
-      current = this.options.attr('paging.current');
-      this.options.attr('paging.current', current > 1 ? current - 1 : 1);
-    }
-    this.refreshList();
-    // TODO: This is a workaround. We need to update communication between
-    //       info-pin and tree views through Observer
-    if (!this.element.closest('.cms_controllers_info_pin').length) {
-      $('.cms_controllers_info_pin').control().unsetInstance();
-    }
-    this.show_info_pin();
-  },
+    return function (needDestroy) {
+      activeTabModel = this.options.model.shortName;
+      self = this;
+      if (needDestroy) {
+        // Remove listeners for inactive tabs
+        can.Model.Cacheable.unbind('created', onCreated);
+        can.Model.Cacheable.unbind('destroyed', onDestroyed);
+      } else {
+        // Add listeners on creations instance or mappings objects for current tab
+        // and refresh page after that.
+        can.Model.Cacheable.bind('created', onCreated);
+        can.Model.Cacheable.bind('destroyed', onDestroyed);
+      }
+    };
+  })(),
 
   '.edit-object modal:success': function (el, ev, data) {
     var model = el.closest('[data-model]').data('model');
@@ -1510,11 +1504,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         return data.values;
       }.bind(this));
   },
-  refreshList: _.debounce(function () {
+  refreshList: function () {
     if (this.options.attr('paging.disabled')) {
       return;
     }
-
     this.options.attr('paging.disabled', true);
     this._loading_started();
     this.loadPage()
@@ -1533,7 +1526,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         GGRC.Errors.notifier('warning',
           'Filter format is incorrect, data cannot be filtered.')();
       }.bind(this));
-  }),
+  },
   '{paging} change': _.debounce(
     function (object, event, type, action, newVal, oldVal) {
       if (oldVal !== newVal && _.contains(['current', 'pageSize'], type)) {

@@ -96,11 +96,6 @@
                       <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
                     </li>
                   {{/infer_roles}}
-                  {{#with_page_object_as 'page_instance'}}
-                    <li>
-                      {{>'/static/mustache/base_objects/relevance_action.mustache'}}
-                    </li>
-                  {{/with_page_object_as}}
 
                   {{#with_mapping_count instance 'related_objects'}}
                     {{#prune_context}}

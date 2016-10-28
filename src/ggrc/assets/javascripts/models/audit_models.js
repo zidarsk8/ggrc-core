@@ -408,14 +408,17 @@
       }]
     },
     assignable_list: [{
+      title: 'Requester(s)',
       type: 'requester',
       mapping: 'related_requesters',
       required: true
     }, {
+      title: 'Assignee(s)',
       type: 'assignee',
       mapping: 'related_assignees',
       required: true
     }, {
+      title: 'Verifier(s)',
       type: 'verifier',
       mapping: 'related_verifiers',
       required: false
