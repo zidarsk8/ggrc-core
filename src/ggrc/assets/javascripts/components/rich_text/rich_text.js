@@ -28,8 +28,7 @@
       placeholder: null,
       disabled: null,
       formats: formats,
-      initEditor: function (wysiwyg, toolbar) {
-        var text = this.attr('text');
+      initEditor: function (wysiwyg, toolbar, text) {
         var editor = new Quill(wysiwyg, {
           theme: 'snow',
           formats: this.attr('formats'),
@@ -44,7 +43,7 @@
           editor.setHTML(text);
         }
         editor.on('text-change', this.onChange.bind(this));
-        this.attr('editor', editor);
+        this.setEditor(editor);
       },
       onChange: function () {
         if (!this.getTextLength()) {
@@ -57,6 +56,9 @@
         var editor = this.getEditor().editor;
         var action = isDisabled ? 'disable' : 'enable';
         editor[action]();
+      },
+      setEditor: function (editor) {
+        this.attr('editor', editor);
       },
       getEditor: function () {
         return this.attr('editor');
@@ -80,18 +82,30 @@
       }
     },
     events: {
+      removed: function () {
+        if (this.scope.getEditor()) {
+          this.scope.getEditor().destroy();
+        }
+      },
       inserted: function () {
         var wysiwyg = this.element.find('.rich-text__content');
         var toolbar = this.element.find('.rich-text__toolbar');
-        this.scope.initEditor(wysiwyg[0], toolbar[0]);
+        this.scope.initEditor(wysiwyg[0], toolbar[0], this.scope.attr('text'));
       },
-      '{scope} disabled': function (scope, ev, isDisabled) {
-        this.scope.toggle(isDisabled);
+      toogle: function (scope, ev, isDisabled) {
+        if (!scope.getEditor()) {
+          return this.destroy();
+        }
+        scope.toggle(isDisabled);
       },
+      '{scope} disabled': 'toggle',
       // if text had been changed to nothing then clear
       '{scope} text': function (scope, ev, text) {
+        if (!scope.getEditor()) {
+          return this.destroy();
+        }
         if (!text) {
-          this.scope.attr('editor').setHTML('');
+          scope.getEditor().setHTML('');
         }
       }
     }
