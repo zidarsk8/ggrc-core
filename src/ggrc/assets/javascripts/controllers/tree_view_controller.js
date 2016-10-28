@@ -723,16 +723,17 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var self = this;
     var options = this.options;
     var counts;
+    var countsName = options.counts_name || options.model.shortName;
 
     if (this.options.parent_instance && this.options.mapping) {
       counts = GGRC.Utils.QueryAPI.getCounts();
 
       if (self.element) {
         can.trigger(self.element, 'updateCount',
-          [counts.attr(options.model.shortName), self.options.update_count]);
+          [counts.attr(countsName), self.options.update_count]);
       }
 
-      counts.on(options.model.shortName, function (ev, newVal, oldVal) {
+      counts.on(countsName, function (ev, newVal, oldVal) {
         can.trigger(self.element, 'updateCount',
           [newVal, self.options.update_count]);
       });
