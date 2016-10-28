@@ -5,7 +5,7 @@
 
 {{! transcluded via renderLive in, for example, assets/mustache/sections/tier2_content.mustache }}
 {{#instance}}
-  <div class="pane-header">
+  <div class="pane-header {{#if snapshot}}snapshot{{/if}}" >
     <div class="row-fluid wrap-row">
       <div data-test-id="title_0ad9fbaf" class="span9">
         <h6>Title</h6>
@@ -19,6 +19,14 @@
         </p>
         {{/if}}
       </div>
+      {{#if snapshot}}
+        <div class="span12 snapshot">
+          <hr class="snapshot">
+          <p>
+            A more current version of this {{instance.class.title_singular}} is available. Do you want to <a href="#">update</a>?
+          </p>
+        </div>
+      {{/if}}
     </div>
   </div>
   <div data-test-id="title_review_0ad9fbaf" class="row-fluid wrap-row">
