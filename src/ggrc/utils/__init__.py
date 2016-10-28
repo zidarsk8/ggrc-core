@@ -261,3 +261,8 @@ class QueryCounter(object):
 
 benchmark = benchmarks.get_benchmark()
 with_nop = benchmarks.WithNop
+
+
+def convert_date_format(date, format_from, format_to):
+  """Convert string date format from one to another."""
+  return datetime.datetime.strptime(date, format_from).strftime(format_to)

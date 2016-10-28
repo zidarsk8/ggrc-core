@@ -188,7 +188,7 @@ class TestComprehensiveSheets(TestCase):
     self.assertEqual(prog.description, "test")
 
     custom_vals = [v.attribute_value for v in prog.custom_attribute_values]
-    expected_custom_vals = ['0', 'a', '12/12/2015', 'test1']
+    expected_custom_vals = ['0', 'a', '2015-12-12', 'test1']
     self.assertEqual(set(custom_vals), set(expected_custom_vals))
 
   def test_full_good_import(self):
