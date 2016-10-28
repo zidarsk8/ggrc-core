@@ -497,49 +497,96 @@ class QueryHelper(object):
     if "op" not in exp:
       return None
 
-    def autocast(o_key, value):
+    def autocast(o_key, operator_name, value):
       """Try to guess the type of `value` and parse it from the string.
 
       Args:
         o_key (basestring): the name of the field being compared; the `value`
                             is converted to the type of that field.
+        operator_name: the name of the operator being applied.
         value: the value being compared.
 
       Returns:
-        `value` of type compliant with `getattr(object_class, o_key)`.
+        a list of one or several possible meanings of `value` type compliant
+        with `getattr(object_class, o_key)`.
       """
+      def has_date_or_non_date_cad(title, definition_type):
+        """Check if there is a date and a non-date CA named title.
+
+        Returns:
+          (bool, bool) - flags indicating the presence of date and non-date CA.
+        """
+        cad_query = db.session.query(CustomAttributeDefinition).filter(
+          CustomAttributeDefinition.title == title,
+          CustomAttributeDefinition.definition_type == definition_type,
+        )
+        date_cad = bool(cad_query.filter(
+          CustomAttributeDefinition.
+              attribute_type == CustomAttributeDefinition.ValidTypes.DATE,
+        ).count())
+        non_date_cad = bool(cad_query.filter(
+          CustomAttributeDefinition.
+              attribute_type != CustomAttributeDefinition.ValidTypes.DATE,
+        ).count())
+        return date_cad, non_date_cad
+
       if not isinstance(o_key, basestring):
-        return value
+        return [value]
       key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
-      is_date = False
+
+      date_attr = date_cad = non_date_cad = False
       try:
         attr_type = getattr(object_class, key).property.columns[0].type
       except AttributeError:
-        cad = db.session.query(CustomAttributeDefinition).filter(
-          CustomAttributeDefinition.title == key,
-          CustomAttributeDefinition.definition_type == object_class.__name__,
-          CustomAttributeDefinition.
-              attribute_type == CustomAttributeDefinition.ValidTypes.DATE,
-        ).count()
-        if cad:
-          is_date = True
+        date_cad, non_date_cad = has_date_or_non_date_cad(
+            title=key,
+            definition_type=object_class.__name__,
+        )
+        if not (date_cad or non_date_cad):
+          # no CA with this name
+          raise BadQueryException(u"Model {} has no field or CA {}"
+                                  .format(object_class.__name__, o_key))
       else:
         if isinstance(attr_type, sa.sql.sqltypes.Date):
-          is_date = True
-      if is_date and isinstance(value, basestring):
+          date_attr = True
+
+      converted_date = None
+      if (date_attr or date_cad) and isinstance(value, basestring):
         try:
-          return convert_date_format(
+          converted_date = convert_date_format(
               value,
               CustomAttributeValue.DATE_FORMAT_JSON,
               CustomAttributeValue.DATE_FORMAT_DB,
           )
         except (TypeError, ValueError):
-          raise BadQueryException("Field '{}' expects a '{}' date"
-                                  .format(
-                                      o_key,
-                                      CustomAttributeValue.DATE_FORMAT_JSON,
-                                  ))
-      return value
+          # wrong format or not a date
+          if not non_date_cad:
+            # o_key is not a non-date CA
+            raise BadQueryException(u"Field '{}' expects a '{}' date"
+                                    .format(
+                                        o_key,
+                                        CustomAttributeValue.DATE_FORMAT_JSON,
+                                    ))
+
+
+      if date_attr or (date_cad and not non_date_cad):
+        # Filter by converted date
+        return [converted_date]
+      elif date_cad and non_date_cad and converted_date is None:
+        # Filter by unconverted string as date conversion was unsuccessful
+        return [value]
+      elif date_cad and non_date_cad:
+        if operator_name in ("<", ">"):
+          # "<" and ">" works incorrectly when searching by CA in both formats
+          return [converted_date]
+        else:
+          # Since we can have two local CADs with same name when one is Date
+          # and another is Text, we should handle the case when the user wants
+          # to search by the Text CA that should not be converted
+          return [converted_date, value]
+      else:
+        # Filter by unconverted string
+        return [value]
 
     def _backlink(object_name, ids):
       """Convert ("__previous__", [query_id]) into (model_name, ids).
@@ -690,7 +737,9 @@ class QueryHelper(object):
           ),
       )
 
-    rhs = lambda: autocast(exp["left"], exp["right"])
+    rhs_variants = lambda: autocast(exp["left"],
+                                    exp["op"]["name"],
+                                    exp["right"])
 
     def owned(ids):
       """Get objects for which the user is owner.
@@ -809,7 +858,7 @@ class QueryHelper(object):
 
     def build_op_shortcut(predicate):
       """A shortcut to call build_op with default lhs and rhs."""
-      return build_op(exp["left"], predicate, [rhs()])
+      return build_op(exp["left"], predicate, rhs_variants())
 
     def like(left, right):
       """Handle ~ operator with SQL LIKE."""
