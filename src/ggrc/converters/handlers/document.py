@@ -82,8 +82,8 @@ class DocumentEvidenceHandler(DocumentLinkHandler):
     Returns:
       string containing all evidence URLs and titles.
     """
-    return "\n".join(
-        "{} {}".format(document.link, document.title)
+    return u"\n".join(
+        u"{} {}".format(document.link, document.title)
         for document in self.row_converter.obj.documents
     )
 
