@@ -12,6 +12,7 @@
       editable: '@',
       deferred: '@',
       validate: '@',
+      disableTitle: '@',
       /*
        * Checks whether there are any conflicts between assignable roles.
        *
