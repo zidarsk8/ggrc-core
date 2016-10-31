@@ -229,7 +229,7 @@ class CustomAttributable(object):
     custom attribute definitions in the order provided.
 
     Args:
-      definitions: Ordered list of custom attribute definitions
+      definitions: Ordered list of (dict) custom attribute definitions
     """
     from ggrc.models.custom_attribute_definition \
         import CustomAttributeDefinition as CADef
@@ -247,6 +247,8 @@ class CustomAttributable(object):
     for definition in definitions:
       if "_pending_delete" in definition and definition["_pending_delete"]:
         continue
+
+      definition['context'] = getattr(self, "context", None)
       self.insert_definition(definition)
 
   def custom_attributes(self, src):
