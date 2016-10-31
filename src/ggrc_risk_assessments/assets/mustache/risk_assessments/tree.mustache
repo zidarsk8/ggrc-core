@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-  <li class="tree-item "
+  <li class="tree-item {{#if instance.snapshot}}snapshot{{/if}} "
     data-object-id="{{instance.id}}"
     data-object-type="{{instance.class.table_singular}}"
     {{addclass "t-" instance.workflow_state}}>
