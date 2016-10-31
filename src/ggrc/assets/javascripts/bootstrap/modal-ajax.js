@@ -498,11 +498,14 @@
         'click.modal-ajax.data-api keydown.modal-ajax.data-api',
         toggle ? '[data-toggle=modal-ajax-' + toggle + ']' : '[data-toggle=modal-ajax]',
         function (e) {
-
-          var $this = $(this)
-          , toggle_type = $(this).data('toggle')
-          , modal_id, target, $target, option, href, new_target, modal_type;
-
+          var $this = $(this);
+          var loadHref;
+          var modalId;
+          var target;
+          var $target;
+          var option;
+          var href;
+          var newTarget;
 
           if ($this.hasClass('disabled')) {
             return;
@@ -512,31 +515,39 @@
           }
 
           href = $this.attr('data-href') || $this.attr('href');
-          modal_id = 'ajax-modal-' + href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');
-          target = $this.attr('data-target') || $('#' + modal_id);
+          loadHref = !$this.data().noHrefLoad;
+
+          modalId = 'ajax-modal-' +
+                     href.replace(/[\/\?=\&#%]/g, '-').replace(/^-/, '');
+          target = $this.attr('data-target') || $('#' + modalId);
 
           $target = $(target);
-          new_target = $target.length === 0;
+          newTarget = $target.length === 0;
 
-          if (new_target) {
-            $target = $('<div id="' + modal_id + '" class="modal hide"></div>');
+          if (newTarget) {
+            $target = $('<div id="' + modalId + '" class="modal hide"></div>');
             $target.addClass($this.attr('data-modal-class'));
-            $this.attr('data-target', '#' + modal_id);
+            $this.attr('data-target', '#' + modalId);
           }
 
           $target.on('hidden', function (ev) {
-            if (ev.target === ev.currentTarget)
+            if (ev.target === ev.currentTarget) {
               $target.remove();
+            }
           });
 
-          if (new_target || $this.data('modal-reset') === 'reset') {
+          if (newTarget || $this.data('modal-reset') === 'reset') {
             $target.html(preload_content());
-            if ($this.prop('protocol') === window.location.protocol) {
+            if (
+              $this.prop('protocol') === window.location.protocol &&
+              loadHref
+            ) {
               $target.load(href, emit_loaded);
             }
           }
 
-          option = $target.data('modal-help') ? 'toggle' : $.extend({}, $target.data(), $this.data());
+          option = $target.data('modal-help') ?
+                   'toggle' : $.extend({}, $target.data(), $this.data());
 
           launch_fn.apply($target, [$target, $this, option]);
         });
