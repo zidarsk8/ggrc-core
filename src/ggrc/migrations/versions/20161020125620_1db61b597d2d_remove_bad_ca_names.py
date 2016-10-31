@@ -18,8 +18,6 @@ from sqlalchemy.sql import table, column, select
 revision = "1db61b597d2d"
 down_revision = "53206b20c12b"
 
-MAX_TRIES = 100
-
 CAD = table(
     "custom_attribute_definitions",
     column("id", sa.Integer),
@@ -67,8 +65,10 @@ def upgrade():
 
   if not bad_titles:
     return
+  max_tries = int(connection.execute(
+      "SELECT count(id) FROM custom_attribute_definitions").first()[0]) + 1
 
-  for counter in range(1, MAX_TRIES):
+  for counter in range(1, max_tries):
     new_titles = [u"{} ({})".format(title, counter) for title in bad_titles]
     collisions = connection.execute(
         CAD.select().where(CAD.c.title.in_(new_titles))
