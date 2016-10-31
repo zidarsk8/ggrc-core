@@ -1520,6 +1520,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         this.options.attr('paging.disabled', false);
       }.bind(this))
       .fail(function () {
+        this.options.attr('paging.disabled', false);
         this.options.attr('original_list', []);
         this.element.children('.cms_controllers_tree_view_node').remove();
         this._loading_finished();
