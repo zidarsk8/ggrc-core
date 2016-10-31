@@ -88,10 +88,6 @@
   }
 }
 
-.people-group {
-  padding-bottom: 16px;
-}
-
 .label-list {
   @extend %reset-list;
   > li {
@@ -142,6 +138,13 @@
       .file-controls {
         @include opacity(1);
         left: -25px;
+      }
+    }
+    &.people-group {
+      float: none;
+      width: auto;
+      .people-group_title {
+        font-weight: bold;
       }
     }
     .modal-body & {
