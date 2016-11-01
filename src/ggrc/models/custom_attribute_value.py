@@ -52,6 +52,7 @@ class CustomAttributeValue(Base, db.Model):
   # This is just a mapping for accessing local functions so protected access
   # warning is a false positive
   _validator_map = {
+      "Date": lambda self: self._validate_date(),
       "Dropdown": lambda self: self._validate_dropdown(),
       "Map:Person": lambda self: self._validate_map_person(),
   }
@@ -254,6 +255,20 @@ class CustomAttributeValue(Base, db.Model):
         raise ValueError("Invalid custom attribute dropdown option: {v}, "
                          "expected one of {l}"
                          .format(v=self.attribute_value, l=valid_options))
+
+  def _validate_date(self):
+    """Convert date format."""
+    from ggrc.models.custom_attribute_definition import (
+        CustomAttributeDefinition)
+    if (self.custom_attribute.attribute_type ==
+            CustomAttributeDefinition.ValidTypes.DATE):
+      # convert the date formats for dates
+      if self.attribute_value:
+        self.attribute_value = utils.convert_date_format(
+            self.attribute_value,
+            CustomAttributeValue.DATE_FORMAT_JSON,
+            CustomAttributeValue.DATE_FORMAT_DB,
+        )
 
   def validate(self):
     """Validate custom attribute value."""
