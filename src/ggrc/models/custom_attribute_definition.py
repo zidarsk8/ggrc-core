@@ -55,6 +55,12 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       'placeholder',
   ]
 
+  _sanitize_html = [
+      "multi_choice_options",
+      "helptext",
+      "placeholder",
+  ]
+
   _reserved_names = {}
 
   def _clone(self, target):
