@@ -153,8 +153,8 @@ class AssessmentTemplateFactory(ModelFactory):
   test_plan_procedure = False
   procedure_description = factory.LazyAttribute(
       lambda _: random_string("lorem ipsum description"))
-  default_people = \
-      "{\"assessors\":\"Object Owners\",\"verifiers\":\"Object Owners\"}"
+  default_people = {"assessors": "Object Owners",
+                    "verifiers": "Object Owners"}
 
 
 class ContractFactory(ModelFactory):

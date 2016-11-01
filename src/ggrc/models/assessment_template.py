@@ -4,8 +4,6 @@
 
 """A module containing the implementation of the assessment template entity."""
 
-import json
-
 from sqlalchemy.orm import validates
 
 from ggrc import db
@@ -141,7 +139,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
         "template_object_type": self.template_object_type,
         "test_plan_procedure": self.test_plan_procedure,
         "procedure_description": self.procedure_description,
-        "default_people": json.dumps(self.default_people),
+        "default_people": self.default_people,
     }
     assessment_template_copy = AssessmentTemplate(**data)
     db.session.add(assessment_template_copy)
@@ -175,12 +173,12 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
     this validator.
     """
     # pylint: disable=unused-argument
-    parsed = json.loads(value)
     for mandatory in self._mandatory_default_people:
-      mandatory_value = parsed.get(mandatory)
+      mandatory_value = value.get(mandatory)
       if (not mandatory_value or
               isinstance(mandatory_value, list) and
-              any(not isinstance(p_id, int) for p_id in mandatory_value) or
+              any(not isinstance(p_id, (int, long))
+                  for p_id in mandatory_value) or
               isinstance(mandatory_value, basestring) and
               mandatory_value not in self.DEFAULT_PEOPLE_LABELS):
         raise ValidationError(
