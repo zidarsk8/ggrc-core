@@ -173,21 +173,20 @@ class CustomAttributable(object):
         value["attribute_object_id"] = (value["attribute_object"].get("id") if
                                         value.get("attribute_object") else
                                         None)
+      if (self._definitions_map[value["custom_attribute_id"]]
+              .attribute_type == CustomAttributeDefinition.ValidTypes.DATE):
+        # convert the date formats for dates
+        if value.get("attribute_value"):
+          value["attribute_value"] = utils.convert_date_format(
+              value["attribute_value"],
+              CustomAttributeValue.DATE_FORMAT_JSON,
+              CustomAttributeValue.DATE_FORMAT_DB,
+          )
+
       attr = self._values_map.get(value.get("custom_attribute_id"))
       if attr:
-        attribute_value = value.get("attribute_value")
-        if (self._definitions_map[value["custom_attribute_id"]]
-                .attribute_type == CustomAttributeDefinition.ValidTypes.DATE):
-          # convert the date formats for dates
-          if attribute_value:
-            attribute_value = utils.convert_date_format(
-                attribute_value,
-                CustomAttributeValue.DATE_FORMAT_JSON,
-                CustomAttributeValue.DATE_FORMAT_DB,
-            )
-
         attr.attributable = self
-        attr.attribute_value = attribute_value
+        attr.attribute_value = value.get("attribute_value")
         attr.attribute_object_id = value.get("attribute_object_id")
       elif "custom_attribute_id" in value:
         # this is automatically appended to self._custom_attribute_values
