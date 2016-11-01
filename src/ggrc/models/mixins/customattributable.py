@@ -328,7 +328,9 @@ class CustomAttributable(object):
       #    of the custom attributable.
       # TODO: We are ignoring contexts for now
       # new_value.context_id = cls.context_id
-      self.custom_attribute_values.append(new_value)
+
+      # new value is appended to self.custom_attribute_values by the ORM
+      # self.custom_attribute_values.append(new_value)
       if ad_id in last_values:
         _, previous_value = last_values[ad_id]
         if previous_value != attributes[ad_id]:
