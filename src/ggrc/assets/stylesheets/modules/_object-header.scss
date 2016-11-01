@@ -169,6 +169,11 @@
         padding-top: 5px;
         margin-top: 5px;
       }
+      &.border-bottom {
+        border-bottom: 1px solid $headerBgnd;
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+      }
     }
   }
   &.status-wrap {
