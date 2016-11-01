@@ -359,6 +359,9 @@ class TextareaColumnHandler(ColumnHandler):
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
     if not self.raw_value:
+      if self.mandatory:
+        self.add_error(errors.MISSING_VALUE_ERROR,
+                       column_name=self.display_name)
       return ""
 
     return re.sub(r'\s+', " ", self.raw_value).strip()
