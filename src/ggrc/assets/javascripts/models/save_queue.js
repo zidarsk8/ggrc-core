@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $) {
+(function (can, $, Permission) {
   /*  GGRC.SaveQueue
    *
    *  SaveQueue is used by CMS.Models.Cacheable to prevent firing
@@ -77,7 +77,7 @@
           }
         });
 
-        return dfd;
+        return $.when(dfd, Permission.refresh());
       };
     },
 
@@ -169,4 +169,4 @@
       }.bind(this.constructor))).always(this._resolve.bind(this)); // Move on to the next one
     }
   });
-})(window.can, window.can.$);
+})(window.can, window.can.$, window.Permission);

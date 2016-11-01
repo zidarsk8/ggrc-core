@@ -688,9 +688,6 @@
   };
 
   GGRC.register_hook(
-      'LHN.Sections_workflow', GGRC.mustache_path + '/dashboard/lhn_workflows');
-
-  GGRC.register_hook(
       'Dashboard.Widgets', GGRC.mustache_path + '/dashboard/widgets');
 
   GGRC.register_hook(
