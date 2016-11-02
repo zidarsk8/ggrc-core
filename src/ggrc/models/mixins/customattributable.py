@@ -162,6 +162,8 @@ class CustomAttributable(object):
     Args:
       values: List of dictionaries that represent custom attribute values.
     """
+    from ggrc.models.custom_attribute_definition import (
+        CustomAttributeDefinition)
     from ggrc.models.custom_attribute_value import CustomAttributeValue
 
     for value in values:
@@ -171,11 +173,21 @@ class CustomAttributable(object):
         value["attribute_object_id"] = (value["attribute_object"].get("id") if
                                         value.get("attribute_object") else
                                         None)
-
       attr = self._values_map.get(value.get("custom_attribute_id"))
       if attr:
+        attribute_value = value.get("attribute_value")
+        if (self._definitions_map[value["custom_attribute_id"]]
+                .attribute_type == CustomAttributeDefinition.ValidTypes.DATE):
+          # convert the date formats for dates
+          if attribute_value:
+            attribute_value = utils.convert_date_format(
+                attribute_value,
+                CustomAttributeValue.DATE_FORMAT_JSON,
+                CustomAttributeValue.DATE_FORMAT_DB,
+            )
+
         attr.attributable = self
-        attr.attribute_value = value.get("attribute_value")
+        attr.attribute_value = attribute_value
         attr.attribute_object_id = value.get("attribute_object_id")
       elif "custom_attribute_id" in value:
         # this is automatically appended to self._custom_attribute_values
@@ -328,9 +340,7 @@ class CustomAttributable(object):
       #    of the custom attributable.
       # TODO: We are ignoring contexts for now
       # new_value.context_id = cls.context_id
-
-      # new value is appended to self.custom_attribute_values by the ORM
-      # self.custom_attribute_values.append(new_value)
+      self.custom_attribute_values.append(new_value)
       if ad_id in last_values:
         _, previous_value = last_values[ad_id]
         if previous_value != attributes[ad_id]:
