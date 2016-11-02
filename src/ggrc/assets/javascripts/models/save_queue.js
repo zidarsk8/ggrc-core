@@ -49,10 +49,9 @@
         }).promise();
         dfd.always(function (data, type) {
           if (type === 'error') {
-            data = data.responseJSON;
-            if (_.isUndefined(data)) {
-              return;
-            }
+            can.each(objs, function (obj) {
+              obj._dfd.reject(data);
+            });
           }
           if ('background_task' in data) {
             return CMS.Models.BackgroundTask.findOne({
