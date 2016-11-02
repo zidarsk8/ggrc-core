@@ -288,6 +288,7 @@ dashboard-js-template-files:
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pin.mustache
+  - base_objects/info-pane-utility.mustache
   - base_objects/info_header.mustache
   - base_objects/filters/advanced_search_filter_actions.mustache
   - base_objects/filters/modal_filter_actions.mustache
@@ -532,6 +533,7 @@ dashboard-js-template-files:
   - import_export/export/filter_query.mustache
   - mapper/relevant_filter.mustache
   - quick_form/confirm_buttons.mustache
+  - snapshots/dropdown_menu.mustache
 
 dashboard-css-files:
   - dashboard.css
