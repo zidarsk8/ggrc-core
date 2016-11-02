@@ -33,8 +33,6 @@ def init_app(app):
 
   login_manager = flask_login.LoginManager()
   login_manager.init_app(app)
-  login_manager.login_view = 'login'
-  login_manager.login_message = None
   # login_manager.session_protection = 'strong'
 
   # pylint: disable=unused-variable
