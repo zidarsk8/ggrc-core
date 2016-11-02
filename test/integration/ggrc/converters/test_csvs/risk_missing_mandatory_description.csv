@@ -1,0 +1,3 @@
+Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",,,
+Risk,code*,title*,description*,owner*
+,risk-1,Mandatory description is missing,,user@example.com

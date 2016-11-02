@@ -313,3 +313,19 @@ class TestComprehensiveSheets(TestCase):
         },
     }
     self._check_csv_response(response, expected_errors)
+
+  def test_missing_rich_text_field(self):
+    """MISSING_VALUE_ERROR is returned on empty mandatory description."""
+    response = self.import_file("risk_missing_mandatory_description.csv")
+
+    expected_errors = {
+        "Risk": {
+            "row_errors": {
+                errors.MISSING_VALUE_ERROR.format(
+                    line="3",
+                    column_name="Description",
+                ),
+            },
+        },
+    }
+    self._check_csv_response(response, expected_errors)

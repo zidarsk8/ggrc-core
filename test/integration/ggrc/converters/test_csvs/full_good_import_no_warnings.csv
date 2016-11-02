@@ -564,7 +564,7 @@ Not Launched
 In Scope
 Not in Scope
 Deprecated",MM/DD/YYYY,MM/DD/YYYY,,,,,,,,,,,
-Risk,code*,title*,description,notes,Owner*,Effective date,stop date,,,,,,,,,,,
+Risk,code*,title*,description*,notes,Owner*,Effective date,stop date,,,,,,,,,,,
 ,ra-1,ra-1,test,this is a note,user1@ggrc.com,7/1/2015,7/15/2015,,,,,,,,,,,
 ,ra-2,ra-2,test,this is a note,user1@ggrc.com,7/1/2015,7/15/2015,,,,,,,,,,,
 ,ra-3,ra-3,test,this is a note,user1@ggrc.com,7/1/2015,7/15/2015,,,,,,,,,,,
