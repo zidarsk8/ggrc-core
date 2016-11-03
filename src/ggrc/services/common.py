@@ -326,7 +326,8 @@ def update_index(session, cache):
     session.commit()
 
 
-def log_event(session, obj=None, current_user_id=None, flush=True):
+def log_event(session, obj=None, current_user_id=None, flush=True,
+              force_obj=False):
   revisions = []
   if flush:
     session.flush()
@@ -342,6 +343,13 @@ def log_event(session, obj=None, current_user_id=None, flush=True):
       revisions.append(revision)
     for obj_ in cache.new:
       revision = Revision(obj_, current_user_id, 'created', obj_.log_json())
+      revisions.append(revision)
+    if force_obj and obj is not None and obj not in cache.dirty:
+      # If the ``obj`` has been updated, but only its custom attributes have
+      # been changed, then this object will not be added into
+      # ``cache.dirty set``. So that its revision will not be created.
+      # The ``force_obj`` flag solves the issue, but in a bit dirty way.
+      revision = Revision(obj, current_user_id, 'modified', obj.log_json())
       revisions.append(revision)
   if obj is None:
     resource_id = 0
@@ -881,7 +889,7 @@ class Resource(ModelView):
     with benchmark("Update custom attribute values"):
       set_ids_for_new_custom_attributes(obj)
     with benchmark("Log event"):
-      log_event(db.session, obj)
+      log_event(db.session, obj, force_obj=True)
     with benchmark("Update memcache before commit for collection PUT"):
       update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
