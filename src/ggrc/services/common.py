@@ -879,11 +879,11 @@ class Resource(ModelView):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
-    with benchmark("Send PUTed event"):
-      self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
     with benchmark("Validate custom attributes"):
       if hasattr(obj, "validate_custom_attributes"):
         obj.validate_custom_attributes()
+    with benchmark("Send PUT event"):
+      self.model_put.send(obj.__class__, obj=obj, src=src, service=self)
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Update custom attribute values"):

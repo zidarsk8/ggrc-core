@@ -72,6 +72,12 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       'placeholder',
   ]
 
+  _sanitize_html = [
+      "multi_choice_options",
+      "helptext",
+      "placeholder",
+  ]
+
   _reserved_names = {}
 
   def _clone(self, target):
@@ -231,7 +237,9 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       flask.g.template_cad_names = {cad.title.lower() for cad in query}
 
     if name in flask.g.template_cad_names:
-      raise ValueError("Invalid Custom attribute name.")
+      raise ValueError(u"Local custom attribute '{}' "
+                       u"already exists for this object type."
+                       .format(name))
 
   @validates("title", "definition_type")
   def validate_title(self, key, value):
@@ -271,11 +279,14 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
       return value
 
     if name in self._get_reserved_names(definition_type):
-      raise ValueError("Invalid Custom attribute name.")
+      raise ValueError(u"Attribute '{}' is reserved for this object type."
+                       .format(name))
 
     if (self._get_global_cad_names(definition_type).get(name) is not None and
             self._get_global_cad_names(definition_type).get(name) != self.id):
-      raise ValueError("Invalid Custom attribute name.")
+      raise ValueError(u"Global custom attribute '{}' "
+                       u"already exists for this object type"
+                       .format(name))
 
     if definition_type == "assessment":
       self.validate_assessment_title(name)
