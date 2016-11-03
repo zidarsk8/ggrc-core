@@ -34,6 +34,10 @@ class CustomAttributeValue(Base, db.Model):
   ]
   _fulltext_attrs = ["attribute_value"]
 
+  _sanitize_html = [
+      "attribute_value",
+  ]
+
   custom_attribute_id = db.Column(
       db.Integer,
       db.ForeignKey('custom_attribute_definitions.id', ondelete="CASCADE")

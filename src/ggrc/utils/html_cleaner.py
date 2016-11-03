@@ -43,6 +43,9 @@ def cleaner(dummy, value, *_):
   #  and it's nullable, so check for that
   if value is None:
     return value
+  if not isinstance(value, basestring):
+    # no point in sanitizing non-strings
+    return value
 
   parser = HTMLParser()
   value = unicode(value)
