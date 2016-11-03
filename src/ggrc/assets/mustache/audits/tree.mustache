@@ -5,7 +5,7 @@
 
 
 {{!tree node mustache}}
-<li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
+<li class="tree-item {{#if instance.snapshot}}snapshot{{/if}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
   <div class="item-main" data-model="true" {{#instance}}{{data 'model'}}{{/instance}}>
     <div class="item-wrap">
       {{> '/static/mustache/base_objects/open_close.mustache'}}

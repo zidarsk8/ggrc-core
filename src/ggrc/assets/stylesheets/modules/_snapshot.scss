@@ -33,7 +33,6 @@ hr.snapshot {
 }
 
 // Info widget
-
 .widget {
   .pane-header.snapshot {
     margin-top: -25px;
@@ -43,5 +42,18 @@ hr.snapshot {
     margin-right: -30px;
     padding-left: 30px;
     padding-right: 30px;
+  }
+}
+
+// Tree view
+ul.new-tree {
+  li.tree-item {
+    &.active.snapshot {
+      > .item-main {
+        > .item-wrap {
+          background: $snapshotBgnd;
+        }
+      }
+    }
   }
 }
