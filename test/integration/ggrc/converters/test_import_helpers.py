@@ -10,6 +10,7 @@ from ggrc.converters import import_helper
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.utils import get_mapping_rules
 from ggrc.utils import title_from_camelcase
+from ggrc_risks import models as r_models
 from ggrc_risk_assessments import models as ra_models
 from ggrc_workflows import models as wf_models
 from integration.ggrc import TestCase
@@ -966,6 +967,37 @@ class TestGetObjectColumnDefinitions(TestCase):
         }
     }
     self._test_single_object(models.Request, names, expected_fields)
+
+  def test_risk_definitions(self):
+    """Test default headers for Risk."""
+
+    names = {
+        "Code",
+        "Contact",
+        "Delete",
+        "Description",
+        "Effective Date",
+        "Notes",
+        "Owner",
+        "Reference URL",
+        "State",
+        "Stop Date",
+        "Title",
+        "Url",
+    }
+    expected_fields = {
+        "mandatory": {
+            "Code",
+            "Description",
+            "Owner",
+            "Title",
+        },
+        "unique": {
+            "Code",
+            "Title",
+        },
+    }
+    self._test_single_object(r_models.Risk, names, expected_fields)
 
 
 class TestGetWorkflowObjectColumnDefinitions(TestCase):
