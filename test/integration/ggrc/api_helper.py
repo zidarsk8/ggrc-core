@@ -78,7 +78,7 @@ class Api(object):
     json_data = self.resource.as_json(data)
     logging.info("request json" + json_data)
     response = request(api_link, data=json_data, headers=headers.items())
-    if response.status_code == 302:
+    if response.status_code == 401:
       self.set_user()
       response = request(api_link, data=json_data, headers=headers.items())
     return self.data_to_json(response)
