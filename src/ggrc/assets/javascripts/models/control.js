@@ -104,6 +104,8 @@
           delete that.directive;
         }
       });
+      this.attr('configStartDate.required', false);
+      this.attr('configEndDate.required', false);
     }
   });
 })(this, can.$);
