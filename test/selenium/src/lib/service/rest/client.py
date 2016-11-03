@@ -20,7 +20,6 @@ class RestClient(object):
   BASIC_HEADERS = {'X-Requested-By': 'gGRC',
                    'Content-Type': 'application/json',
                    'Accept-Encoding': 'gzip, deflate'}
-  AUTH = "/".join([url.API, "roles?name__in=Auditor"])
 
   def __init__(self, endpoint):
     self.url = urlparse.urljoin(environment.APP_URL,
@@ -29,7 +28,7 @@ class RestClient(object):
 
   def init_session(self):
     """Return authorization cookie value"""
-    response = requests.get(urlparse.urljoin(environment.APP_URL, self.AUTH))
+    response = requests.get(urlparse.urljoin(environment.APP_URL, "/login"))
     cookie = Cookie.SimpleCookie()
     cookie.load(response.headers["Set-Cookie"])
     self.session = cookie["session"].value
