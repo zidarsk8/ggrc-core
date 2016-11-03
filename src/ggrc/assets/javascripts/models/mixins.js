@@ -319,4 +319,12 @@
       return relatable;
     }
   });
+
+  can.Model.Mixin('timeboxed', {
+    'extend:attributes': {
+      start_date: 'date',
+      end_date: 'date'
+    }
+  }, {
+  });
 })(this.can);

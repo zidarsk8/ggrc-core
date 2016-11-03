@@ -14,7 +14,8 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   create : "POST /api/org_groups",
   update : "PUT /api/org_groups/{id}",
   destroy : "DELETE /api/org_groups/{id}",
-  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update'],
+  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update',
+            'timeboxed'],
   is_custom_attributable: true,
   attributes : {
       context: 'CMS.Models.Context.stub',
@@ -29,9 +30,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
@@ -109,7 +108,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   create : "POST /api/projects",
   update : "PUT /api/projects/{id}",
   destroy : "DELETE /api/projects/{id}",
-  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update'],
+  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update', 'timeboxed'],
   is_custom_attributable: true,
   attributes : {
       context: 'CMS.Models.Context.stub',
@@ -124,9 +123,7 @@ can.Model.Cacheable("CMS.Models.Project", {
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
@@ -189,7 +186,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   create : "POST /api/facilities",
   update : "PUT /api/facilities/{id}",
   destroy : "DELETE /api/facilities/{id}",
-  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update'],
+  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update', 'timeboxed'],
   is_custom_attributable: true,
   attributes : {
       context: 'CMS.Models.Context.stub',
@@ -204,9 +201,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
@@ -284,7 +279,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   create : "POST /api/products",
   update : "PUT /api/products/{id}",
   destroy : "DELETE /api/products/{id}",
-  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update'],
+  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update', 'timeboxed'],
   is_custom_attributable: true,
   attributes : {
       context: 'CMS.Models.Context.stub',
@@ -300,9 +295,7 @@ can.Model.Cacheable("CMS.Models.Product", {
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
       kind: 'CMS.Models.Option.stub',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
   },
   defaults : {
     kind : null
@@ -383,7 +376,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   create : "POST /api/data_assets",
   update : "PUT /api/data_assets/{id}",
   destroy : "DELETE /api/data_assets/{id}",
-  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update'],
+  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update', 'timeboxed'],
   is_custom_attributable: true,
   attributes : {
       context: 'CMS.Models.Context.stub',
@@ -398,9 +391,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections:'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
@@ -571,7 +562,8 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
     create: 'POST /api/markets',
     update: 'PUT /api/markets/{id}',
     destroy: 'DELETE /api/markets/{id}',
-    mixins: ['ownable', 'contactable', 'unique_title', 'ca_update'],
+    mixins: ['ownable', 'contactable', 'unique_title', 'ca_update',
+             'timeboxed'],
     is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
@@ -586,9 +578,7 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
@@ -654,7 +644,7 @@ can.Model.Cacheable("CMS.Models.Vendor", {
   create : "POST /api/vendors",
   update : "PUT /api/vendors/{id}",
   destroy : "DELETE /api/vendors/{id}",
-  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update'],
+  mixins : ['ownable', 'contactable', 'unique_title', 'ca_update', 'timeboxed'],
   is_custom_attributable: true,
   attributes : {
       context: 'CMS.Models.Context.stub',
@@ -669,9 +659,7 @@ can.Model.Cacheable("CMS.Models.Vendor", {
       objectives: 'CMS.Models.Objective.stubs',
       controls: 'CMS.Models.Control.stubs',
       sections: 'CMS.Models.get_stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",

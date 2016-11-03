@@ -13,7 +13,7 @@
     create: 'POST /api/assessments',
     mixins: [
       'ownable', 'contactable', 'unique_title', 'relatable',
-      'autoStatusChangeable'
+      'autoStatusChangeable', 'timeboxed'
     ],
     relatable_options: {
       relevantTypes: {
@@ -41,8 +41,6 @@
       related_destinations: 'CMS.Models.Relationship.stubs',
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
-      start_date: 'date',
-      end_date: 'date',
       finished_date: 'date',
       verified_date: 'date'
     },

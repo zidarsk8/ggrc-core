@@ -293,6 +293,7 @@
   can.Model.Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     root_object: 'cycle_task_group_object_task',
     root_collection: 'cycle_task_group_object_tasks',
+    mixins: ['timeboxed'],
     category: 'workflow',
     findAll: 'GET /api/cycle_task_group_object_tasks',
     findOne: 'GET /api/cycle_task_group_object_tasks/{id}',
@@ -307,9 +308,7 @@
       modified_by: 'CMS.Models.Person.stub',
       contact: 'CMS.Models.Person.stub',
       context: 'CMS.Models.Context.stub',
-      cycle: 'CMS.Models.Cycle.stub',
-      start_date: 'date',
-      end_date: 'date'
+      cycle: 'CMS.Models.Cycle.stub'
     },
     permalink_options: {
       url: '<%= base.viewLink %>#current_widget/cycle/<%= instance.cycle.id %>/cycle_task_group/<%= instance.cycle_task_group.id %>/cycle_task_group_object_task/<%= instance.id %>',

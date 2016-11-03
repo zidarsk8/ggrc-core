@@ -27,7 +27,7 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
       return CMS.Models.System.model(params);
     }
   },
-  mixins: ['ownable', 'contactable', 'unique_title'],
+  mixins: ['ownable', 'contactable', 'unique_title', 'timeboxed'],
   attributes: {
     context: 'CMS.Models.Context.stub',
     owners: 'CMS.Models.Person.stubs',
@@ -42,9 +42,7 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
     controls: 'CMS.Models.Control.stubs',
     sections: 'CMS.Models.get_stubs',
     network_zone: 'CMS.Models.Option.stub',
-    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-    start_date: 'date',
-    end_date: 'date'
+    custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
   },
   tree_view_options: {
     show_view: '/static/mustache/base_objects/tree.mustache',
