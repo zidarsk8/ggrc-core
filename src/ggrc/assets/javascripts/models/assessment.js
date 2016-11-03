@@ -264,6 +264,7 @@
       var pageInstance = GGRC.page_instance();
       var currentUser = CMS.Models.get_instance('Person',
         GGRC.current_user.id, GGRC.current_user);
+      var auditLead;
 
       if (!newObjectForm) {
         return;
@@ -272,6 +273,18 @@
       if (pageInstance && pageInstance.type === 'Audit' && !this.audit) {
         this.attr('audit', pageInstance);
       }
+
+      if (this.audit) {
+        auditLead = this.audit.contact.reify();
+        // Assign Assessor role
+        this.mark_for_addition('related_objects_as_destination', auditLead, {
+          attrs: {
+            AssigneeType: 'Assessor'
+          }
+        });
+      }
+
+      // Assign Creator role
       this.mark_for_addition('related_objects_as_destination', currentUser, {
         attrs: {
           AssigneeType: 'Creator'

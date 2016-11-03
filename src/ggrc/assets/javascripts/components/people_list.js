@@ -77,7 +77,7 @@
       mapping: null,
       required: '@',
       type: null,
-      title: null,
+      heading: null,
       toggle_add: false,
       mapped_people: [],
       results: [],
