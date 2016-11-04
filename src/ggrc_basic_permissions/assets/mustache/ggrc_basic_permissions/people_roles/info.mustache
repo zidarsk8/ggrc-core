@@ -34,21 +34,23 @@
         {{/options.mapped_and_or_authorized_people}}
         {{/is_info_pin}}
         {{/is_allowed}}
-        <li>
+        <li class="border-bottom">
           <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_for_object instance}}" />
         </li>
-        {{#with_program_roles_as "roles" result}}
-          {{#if result.mappings}}
-            {{#is_allowed_all 'delete' result.mappings}}
-              <li class="border">
-                <a href="javascript://" class="unmap" data-toggle="unmap">
-                  {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
-                  <i class="fa fa-ban"></i>
-                  Unmap
-                </a>
-              </li>
-            {{/is_allowed_all}}
-          {{/result.mappings}}
+        {{^if_instance_of options.parent_instance 'Audit'}}
+          {{#with_program_roles_as "roles" result}}
+            {{#if result.mappings}}
+              {{#is_allowed_all 'delete' result.mappings}}
+                <li>
+                  <a href="javascript://" class="unmap" data-toggle="unmap">
+                    {{#result}}<span class="result" {{data 'result'}}></span>{{/result}}
+                    <i class="fa fa-ban"></i>
+                    Unmap
+                  </a>
+                </li>
+              {{/is_allowed_all}}
+            {{/if}}
+          {{/if_instance_of}}
         {{/with_program_roles_as}}
         <li>
           <a href="/people/{{instance.id}}">
