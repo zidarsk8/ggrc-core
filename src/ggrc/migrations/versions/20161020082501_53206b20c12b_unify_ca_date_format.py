@@ -42,13 +42,8 @@ def _strip_whitespace_around_dates(connection):
       """), val=new_value, id=date.id)
 
 
-def upgrade():
-  """Upgrade database schema and/or data, creating a new revision."""
-  connection = op.get_bind()
-
-  _strip_whitespace_around_dates(connection)
-
-  # change M/DD/YYYY or M/D/YYYY into MM/DD/YYYY or MM/D/YYYY correspondigly
+def _fix_single_digit_month(connection):
+  """Change M/DD/YYYY (M/D/YYYY) into MM/DD/YYYY (MM/D/YYYY) correspondigly."""
   connection.execute("""
       UPDATE custom_attribute_values AS cav JOIN
              custom_attribute_definitions AS cad ON
@@ -58,7 +53,9 @@ def upgrade():
             cav.attribute_value REGEXP '^[0-9]{1}/[0-9]{1,2}/[0-9]{4}$'
   """)
 
-  # change MM/D/YYYY into MM/DD/YYYY
+
+def _fix_single_digit_day(connection):
+  """Change MM/D/YYYY into MM/DD/YYYY."""
   connection.execute("""
       UPDATE custom_attribute_values AS cav JOIN
              custom_attribute_definitions AS cad ON
@@ -70,7 +67,9 @@ def upgrade():
             cav.attribute_value REGEXP '^[0-9]{2}/[0-9]{1}/[0-9]{4}$'
   """)
 
-  # change MM/DD/YYYY into YYYY-MM-DD
+
+def _american_date_to_iso(connection):
+  """Change MM/DD/YYYY into YYYY-MM-DD."""
   connection.execute("""
       UPDATE custom_attribute_values AS cav JOIN
              custom_attribute_definitions AS cad ON
@@ -83,7 +82,9 @@ def upgrade():
             cav.attribute_value REGEXP '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
   """)
 
-  # change YYYY-MM-DD 00:00:00 to YYYY-MM-DD
+
+def _strip_trailing_zero_time(connection):
+  """Change YYYY-MM-DD 00:00:00 to YYYY-MM-DD."""
   connection.execute("""
       UPDATE custom_attribute_values AS cav JOIN
              custom_attribute_definitions AS cad ON
@@ -95,11 +96,21 @@ def upgrade():
   """)
 
 
-def downgrade():
-  """Downgrade database schema and/or data back to the previous revision."""
+def upgrade():
+  """Upgrade database schema and/or data, creating a new revision."""
   connection = op.get_bind()
 
-  # change YYYY-MM-DD into MM/DD/YYYY
+  _strip_whitespace_around_dates(connection)
+
+  _fix_single_digit_month(connection)
+  _fix_single_digit_day(connection)
+  _american_date_to_iso(connection)
+
+  _strip_trailing_zero_time(connection)
+
+
+def _iso_date_to_american(connection):
+  """Change YYYY-MM-DD into MM/DD/YYYY."""
   connection.execute("""
       UPDATE custom_attribute_values AS cav JOIN
              custom_attribute_definitions AS cad ON
@@ -111,3 +122,11 @@ def downgrade():
       WHERE cad.attribute_type = 'Date' AND
             cav.attribute_value REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
   """)
+
+
+def downgrade():
+  """Downgrade database schema and/or data back to the previous revision."""
+  connection = op.get_bind()
+
+  _iso_date_to_american(connection)
+
