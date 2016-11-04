@@ -11,14 +11,12 @@
     update: 'PUT /api/issues/{id}',
     destroy: 'DELETE /api/issues/{id}',
     create: 'POST /api/issues',
-    mixins: ['ownable', 'contactable', 'ca_update'],
+    mixins: ['ownable', 'contactable', 'ca_update', 'timeboxed'],
     is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
       attr_list: can.Model.Cacheable.attr_list.concat([

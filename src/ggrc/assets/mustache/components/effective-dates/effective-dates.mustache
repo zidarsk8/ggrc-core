@@ -1,0 +1,28 @@
+{{!
+  Copyright (C) 2016 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div data-id="effective_date_hidden" class="span4 hidable">
+  <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+  <datepicker
+      label="instance.configStartDate.label"
+      date="instance.start_date"
+      set-max-date="instance.end_date"
+      helptext="instance.configStartDate.helpText"
+      test-id="startTestId"
+      {{#instance.configStartDate.required}}required="required"{{/instance.configStartDate.required}}
+  />
+</div>
+
+<div data-id="stop_date_hidden" class="span4 hidable">
+  <a data-id="hide_stop_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+  <datepicker
+      label="instance.configEndDate.label"
+      date="instance.end_date"
+      set-min-date="instance.start_date"
+      helptext="instance.configEndDate.helpText"
+      test-id="endTestId"
+      {{#instance.configEndDate.required}}required="required"{{/instance.configEndDate.required}}
+  />
+</div>

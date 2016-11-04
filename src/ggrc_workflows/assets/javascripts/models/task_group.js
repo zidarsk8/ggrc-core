@@ -84,7 +84,7 @@
     update: 'PUT /api/task_group_tasks/{id}',
     destroy: 'DELETE /api/task_group_tasks/{id}',
 
-    mixins: ['contactable'],
+    mixins: ['contactable', 'timeboxed'],
     permalink_options: {
       url: '<%= base.viewLink %>#task_group_widget/' +
       'task_group/<%= instance.task_group.id %>',
@@ -93,9 +93,7 @@
     attributes: {
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
-      task_group: 'CMS.Models.TaskGroup.stub',
-      start_date: 'date',
-      end_date: 'date'
+      task_group: 'CMS.Models.TaskGroup.stub'
     },
 
     init: function () {

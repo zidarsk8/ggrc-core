@@ -14,7 +14,8 @@
     create: 'POST /api/controls',
     update: 'PUT /api/controls/{id}',
     destroy: 'DELETE /api/controls/{id}',
-    mixins: ['ownable', 'contactable', 'unique_title', 'ca_update'],
+    mixins: ['ownable', 'contactable', 'unique_title', 'ca_update',
+             'timeboxed'],
     is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
@@ -34,9 +35,7 @@
       verify_frequency: 'CMS.Models.Option.stub',
       principal_assessor: 'CMS.Models.Person.stub',
       secondary_assessor: 'CMS.Models.Person.stub',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     links_to: {},
     defaults: {
@@ -103,6 +102,8 @@
           delete that.directive;
         }
       });
+      this.attr('configStartDate.required', false);
+      this.attr('configEndDate.required', false);
     }
   });
 })(this, can.$);
