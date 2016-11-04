@@ -33,7 +33,7 @@
           template: {
             title: '/static/mustache/assessments/generator_title.mustache',
             submitButton: 'Generate Assessments',
-            count: 'assessment(s) will be generated'
+            count: 'assessment(s) will be generated for each selection'
           },
           callback: this.generateAssessments.bind(this)
         });

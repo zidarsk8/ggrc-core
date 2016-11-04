@@ -204,6 +204,7 @@ dashboard-js-files:
   - components/tree_pagination/tree_pagination.js
   - components/view-object-button/view-object-button.js
   - components/add-object-button/add-object-button.js
+  - components/effective-dates/effective-dates.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -212,6 +213,7 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/effective-dates/effective-dates.mustache
   - components/read-more/read-more.mustache
   - components/collapsible-panel/collapsible-panel.mustache
   - components/collapsible-panel/collapsible-panel-body.mustache
@@ -301,7 +303,6 @@ dashboard-js-template-files:
   - base_objects/sub_tree_type_selector.mustache
   - base_objects/modal/search_title.mustache
   - base_templates/add_comment.mustache
-  - base_templates/effective_dates.mustache
   - base_templates/objects_tooltip.mustache
   - base_templates/attachment_list.mustache
   - base_templates/url_list.mustache

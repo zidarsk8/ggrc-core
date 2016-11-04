@@ -10,7 +10,7 @@
     root_object: "workflow",
     root_collection: "workflows",
     category: "workflow",
-    mixins: ['ca_update'],
+    mixins: ['ca_update', 'timeboxed'],
     findAll: "GET /api/workflows",
     findOne: "GET /api/workflows/{id}",
     create: "POST /api/workflows",
@@ -34,8 +34,6 @@
       workflow_people: "CMS.Models.WorkflowPerson.stubs",
       task_groups: "CMS.Models.TaskGroup.stubs",
       cycles: "CMS.Models.Cycle.stubs",
-      start_date: "date",
-      end_date: "date",
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",

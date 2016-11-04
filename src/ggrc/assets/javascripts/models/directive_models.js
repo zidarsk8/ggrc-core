@@ -13,7 +13,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , root_model : "Directive"
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
-  , mixins : ["ownable", "contactable", "unique_title"]
+  , mixins : ["ownable", "contactable", "unique_title", 'timeboxed']
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
@@ -58,9 +58,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
       programs: 'CMS.Models.Program.stubs',
       sections: 'CMS.Models.get_stubs',
       controls: 'CMS.Models.Control.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     }
   , defaults : {
   }

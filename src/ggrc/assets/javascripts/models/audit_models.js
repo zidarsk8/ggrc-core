@@ -56,7 +56,7 @@
     update: 'PUT /api/audits/{id}',
     destroy: 'DELETE /api/audits/{id}',
     create: 'POST /api/audits',
-    mixins: ['contactable', 'unique_title', 'ca_update'],
+    mixins: ['contactable', 'unique_title', 'ca_update', 'timeboxed'],
     is_custom_attributable: true,
     is_clonable: true,
     attributes: {
@@ -64,8 +64,6 @@
       program: 'CMS.Models.Program.stub',
       requests: 'CMS.Models.Request.stubs',
       modified_by: 'CMS.Models.Person.stub',
-      start_date: 'date',
-      end_date: 'date',
       report_start_date: 'date',
       report_end_date: 'date',
       object_people: 'CMS.Models.ObjectPerson.stubs',
@@ -269,7 +267,8 @@
     create: 'POST /api/requests',
     update: 'PUT /api/requests/{id}',
     destroy: 'DELETE /api/requests/{id}',
-    mixins: ['unique_title', 'relatable', 'ca_update', 'autoStatusChangeable'],
+    mixins: ['unique_title', 'relatable', 'ca_update', 'autoStatusChangeable',
+             'timeboxed'],
     relatable_options: {
       relevantTypes: {
         Audit: {
@@ -294,8 +293,6 @@
     attributes: {
       context: 'CMS.Models.Context.stub',
       assignee: 'CMS.Models.Person.stub',
-      start_date: 'date',
-      end_date: 'date',
       finished_date: 'date',
       verified_date: 'date',
       documents: 'CMS.Models.Document.stubs',

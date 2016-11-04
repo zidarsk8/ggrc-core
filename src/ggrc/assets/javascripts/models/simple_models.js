@@ -33,7 +33,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   , create : "POST /api/programs"
   , update : "PUT /api/programs/{id}"
   , destroy : "DELETE /api/programs/{id}"
-  , mixins : ['contactable', 'unique_title', 'ca_update']
+  , mixins : ['contactable', 'unique_title', 'ca_update', 'timeboxed']
   , is_custom_attributable: true
   , attributes : {
       context: 'CMS.Models.Context.stub',
@@ -48,9 +48,7 @@ can.Model.Cacheable("CMS.Models.Program", {
       directives: 'CMS.Models.Directive.stubs',
       controls: 'CMS.Models.Control.stubs',
       audits: 'CMS.Models.Audit.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
-      start_date: 'date',
-      end_date: 'date'
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
   }
   , tree_view_options : {
       show_view : GGRC.mustache_path + "/programs/tree.mustache"
