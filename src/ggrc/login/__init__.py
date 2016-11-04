@@ -7,7 +7,12 @@ Provides basic login and session management using Flask-Login with various
 backends
 """
 
+import json
+import re
 import flask_login
+from flask_login import login_url
+from flask import request
+from flask import redirect
 from ggrc.extensions import get_extension_module_for
 
 
@@ -21,15 +26,31 @@ def user_loader(user_id):
 
 
 def init_app(app):
+  """Initialize Flask_Login LoginManager with our app"""
   login_module = get_login_module()
   if not login_module:
     return
 
   login_manager = flask_login.LoginManager()
   login_manager.init_app(app)
-  login_manager.login_view = 'login'
-  login_manager.login_message = None
   # login_manager.session_protection = 'strong'
+
+  # pylint: disable=unused-variable
+  @app.login_manager.unauthorized_handler
+  def unauthorized():
+    """Called when the user tries to access an endpoint guarded with
+       login_required but they are not authorized.
+
+       Endpoints like /dashboard, /program/1, etc. redirect the user to the
+       /login page.
+
+       Endpoints like /api /query, /import, etc. resolve with 401 UNAUTHORIZED
+       and a simple json error object.
+    """
+    if (re.match(r'^(\/api|\/query|\/search)', request.path) or
+       request.headers.get('X-Requested-By') == 'gGRC'):
+      return json.dumps({'error': 'unauthorized'}), 401
+    return redirect(login_url('/login', request.url))
 
   app.route('/login')(login_module.login)
   app.route('/logout')(login_module.logout)
