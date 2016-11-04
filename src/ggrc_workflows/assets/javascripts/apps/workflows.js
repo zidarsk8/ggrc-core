@@ -581,6 +581,7 @@
         draw_children: true,
         parent_instance: object,
         model: 'Cycle',
+        counts_name: 'cycles:history',
         mapping: 'previous_cycles',
         additional_filter: {
           expression: {
@@ -603,6 +604,7 @@
         draw_children: true,
         parent_instance: object,
         model: 'Cycle',
+        counts_name: 'cycles:active',
         mapping: 'current_cycle',
         additional_filter: {
           expression: {
@@ -622,7 +624,24 @@
     newWidgetDescriptors.current = currentWidgetDescriptor;
 
     GGRC.Utils.QueryAPI
-      .initCounts(['Cycle', 'Person', 'TaskGroup'], {
+      .initCounts([
+        {
+          name: 'Cycle',
+          countsName:
+            historyWidgetDescriptor.content_controller_options.counts_name,
+          additionalFilter:
+            historyWidgetDescriptor.content_controller_options.additional_filter
+        },
+        {
+          name: 'Cycle',
+          countsName:
+            currentWidgetDescriptor.content_controller_options.counts_name,
+          additionalFilter:
+            currentWidgetDescriptor.content_controller_options.additional_filter
+        },
+        'Person',
+        'TaskGroup'
+      ], {
         type: object.type,
         id: object.id
       });

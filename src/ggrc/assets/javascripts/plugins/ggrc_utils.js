@@ -541,22 +541,29 @@
     }
 
     function initCounts(widgets, relevant) {
-      var params = [];
-      var param;
-      var i = 0;
-      var iLen = widgets ? widgets.length : 0;
-      for (; i < iLen; i++) {
-        param = buildParam(widgets[i], {},
-          makeExpression(widgets[i], relevant.type, relevant.id));
+      var params = (widgets ? Array.from(widgets) : []).map(function (widget) {
+        var param;
+        if (typeof widget === 'string') {
+          param = buildParam(widget, {},
+                    makeExpression(widget, relevant.type, relevant.id));
+        } else {
+          param = buildParam(widget.name, {},
+                    makeExpression(widget.name, relevant.type, relevant.id),
+                    null, widget.additionalFilter);
+        }
         param.type = 'count';
-        params.push(param);
-      }
+        return param;
+      });
+
       return makeRequest({
         data: params
       }).then(function (data) {
-        _.each(data, function (info, i) {
-          var name = widgets[i];
-          widgetsCounts.attr(name, info[name].total);
+        data.forEach(function (info, i) {
+          var widget = widgets[i];
+          var name = typeof widget === 'string' ? widget : widget.name;
+          var countsName = typeof widget === 'string' ?
+            widget : (widget.countsName || widget.name);
+          widgetsCounts.attr(countsName, info[name].total);
         });
       });
     }
