@@ -12,6 +12,8 @@ Create Date: 2016-10-20 08:25:01.140510
 from alembic import op
 from sqlalchemy.sql import text
 
+from ggrc.migrations.utils import fix_dates
+
 
 # revision identifiers, used by Alembic.
 revision = '53206b20c12b'
@@ -48,66 +50,15 @@ def upgrade():
 
   _strip_whitespace_around_dates(connection)
 
-  # change M/DD/YYYY or M/D/YYYY into MM/DD/YYYY or MM/D/YYYY correspondigly
-  connection.execute("""
-      UPDATE custom_attribute_values AS cav JOIN
-             custom_attribute_definitions AS cad ON
-                 cav.custom_attribute_id = cad.id
-      SET cav.attribute_value = CONCAT('0', cav.attribute_value)
-      WHERE cad.attribute_type = 'Date' AND
-            cav.attribute_value REGEXP '^[0-9]{1}/[0-9]{1,2}/[0-9]{4}$'
-  """)
+  fix_dates.fix_single_digit_month(connection)
+  fix_dates.fix_single_digit_day(connection)
+  fix_dates.american_date_to_iso(connection)
 
-  # change MM/D/YYYY into MM/DD/YYYY
-  connection.execute("""
-      UPDATE custom_attribute_values AS cav JOIN
-             custom_attribute_definitions AS cad ON
-                 cav.custom_attribute_id = cad.id
-      SET cav.attribute_value = CONCAT(SUBSTR(cav.attribute_value, 1, 3),
-                                       '0',
-                                       SUBSTR(cav.attribute_value, 4, 9))
-      WHERE cad.attribute_type = 'Date' AND
-            cav.attribute_value REGEXP '^[0-9]{2}/[0-9]{1}/[0-9]{4}$'
-  """)
-
-  # change MM/DD/YYYY into YYYY-MM-DD
-  connection.execute("""
-      UPDATE custom_attribute_values AS cav JOIN
-             custom_attribute_definitions AS cad ON
-                 cav.custom_attribute_id = cad.id
-      SET cav.attribute_value = CONCAT_WS('-',
-                                          SUBSTR(cav.attribute_value, 7, 4),
-                                          SUBSTR(cav.attribute_value, 1, 2),
-                                          SUBSTR(cav.attribute_value, 4, 2))
-      WHERE cad.attribute_type = 'Date' AND
-            cav.attribute_value REGEXP '^[0-9]{2}/[0-9]{2}/[0-9]{4}$'
-  """)
-
-  # change YYYY-MM-DD 00:00:00 to YYYY-MM-DD
-  connection.execute("""
-      UPDATE custom_attribute_values AS cav JOIN
-             custom_attribute_definitions AS cad ON
-                 cav.custom_attribute_id = cad.id
-      SET cav.attribute_value = SUBSTR(cav.attribute_value, 1, 10)
-      WHERE cad.attribute_type = 'Date' AND
-            cav.attribute_value REGEXP
-                '^[0-9]{4}-[0-9]{2}-[0-9]{2} 00:00:00$'
-  """)
+  fix_dates.strip_trailing_zero_time(connection)
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   connection = op.get_bind()
 
-  # change YYYY-MM-DD into MM/DD/YYYY
-  connection.execute("""
-      UPDATE custom_attribute_values AS cav JOIN
-             custom_attribute_definitions AS cad ON
-                 cav.custom_attribute_id = cad.id
-      SET cav.attribute_value = CONCAT_WS('/',
-                                          SUBSTR(cav.attribute_value, 6, 2),
-                                          SUBSTR(cav.attribute_value, 9, 2),
-                                          SUBSTR(cav.attribute_value, 1, 4))
-      WHERE cad.attribute_type = 'Date' AND
-            cav.attribute_value REGEXP '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
-  """)
+  fix_dates.iso_date_to_american(connection)
