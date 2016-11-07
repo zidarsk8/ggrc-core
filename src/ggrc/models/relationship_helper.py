@@ -157,14 +157,12 @@ class RelationshipHelper(object):
   @classmethod
   def _array_union(cls, queries):
     """ Union of all valid queries in array """
-    clean_queries = [q for q in queries if q is not None]
-    if len(clean_queries) == 0:
+    clean_queries = [q for q in queries if q]
+    if not clean_queries:
       return db.session.query(Relationship.source_id).filter(sql.false())
 
     query = clean_queries.pop()
-    for q in clean_queries:
-      query = query.union(q)
-    return query
+    return query.union(*clean_queries)
 
   @classmethod
   def get_ids_related_to(cls, object_type, related_type, related_ids=[]):
