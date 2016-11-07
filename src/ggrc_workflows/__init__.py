@@ -408,10 +408,13 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
   if not assignee:
     return
 
+  if any(assignee == wp.person for wp in workflow.workflow_people):
+    return
+
   # Check if assignee is mapped to the Workflow
   workflow_people = models.WorkflowPerson.query.filter(
       models.WorkflowPerson.workflow_id == workflow.id,
-      models.WorkflowPerson.person_id == assignee.id).all()
+      models.WorkflowPerson.person_id == assignee.id).count()
   if not workflow_people:
     workflow_person = models.WorkflowPerson(
         person=assignee,
@@ -424,7 +427,7 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
   from ggrc_basic_permissions.models import UserRole
   user_roles = UserRole.query.filter(
       UserRole.context_id == workflow.context_id,
-      UserRole.person_id == assignee.id).all()
+      UserRole.person_id == assignee.id).count()
   if not user_roles:
     workflow_member_role = _find_role('WorkflowMember')
     user_role = UserRole(
