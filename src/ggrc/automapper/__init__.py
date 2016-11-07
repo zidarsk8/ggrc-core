@@ -11,7 +11,6 @@ from ggrc import db
 from ggrc import models
 from ggrc.automapper.rules import rules
 from ggrc.login import get_current_user
-from ggrc.models.audit import Audit
 from ggrc.models.relationship import Relationship
 from ggrc.models.request import Request
 from ggrc.rbac.permissions import is_allowed_update
@@ -279,7 +278,3 @@ def register_automapping_listeners():
   @Resource.model_put_after_commit.connect_via(Request)
   def handle_request(sender, obj=None, src=None, service=None, event=None):
     handle_relationship_post(obj, obj.audit)
-
-  @Resource.model_posted_after_commit.connect_via(Audit)
-  def handle_audit(sender, obj=None, src=None, service=None, event=None):
-    handle_relationship_post(obj, obj.program)
