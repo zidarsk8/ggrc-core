@@ -15,12 +15,13 @@ exposed functions
     handle_cycle_task_status_change,
 """
 
-from sqlalchemy import and_
-from sqlalchemy import or_
-from sqlalchemy import inspect
 from datetime import timedelta
 from datetime import datetime
 from datetime import date
+
+from sqlalchemy import and_
+from sqlalchemy import or_
+from sqlalchemy import inspect
 
 from ggrc import db
 from ggrc.models.notification import Notification
@@ -127,7 +128,7 @@ def modify_cycle_task_notification(obj, notification_name):
                    NotificationType.name == notification_name,
                    ))
   notif_type = get_notification_type(notification_name)
-  send_on = obj.end_date - timedelta(
+  send_on = datetime.combine(obj.end_date, datetime.min.time()) - timedelta(
       notif_type.advance_notice)
 
   today = datetime.combine(date.today(), datetime.min.time())
@@ -136,8 +137,8 @@ def modify_cycle_task_notification(obj, notification_name):
       # notification or add a new one.
     if notif.count() == 1:
       notif = notif.one()
-      notif.send_on = obj.end_date - timedelta(
-          notif.notification_type.advance_notice)
+      notif.send_on = datetime.combine(obj.end_date, datetime.min.time()) - \
+          timedelta(notif.notification_type.advance_notice)
       db.session.add(notif)
     else:
       add_notif(obj, notif_type, send_on)

@@ -4,6 +4,7 @@
 
 import re
 from logging import getLogger
+from datetime import date
 from dateutil.parser import parse
 
 from sqlalchemy import and_
@@ -100,7 +101,8 @@ class ColumnHandler(object):
     if not self.set_empty and not self.value:
       return
     try:
-      setattr(self.row_converter.obj, self.key, self.value)
+      if getattr(self.row_converter.obj, self.key, None) != self.value:
+        setattr(self.row_converter.obj, self.key, self.value)
     except:  # pylint: disable=bare-except
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
       logger.exception(
@@ -298,8 +300,15 @@ class DateColumnHandler(ColumnHandler):
       self.add_error(errors.UNKNOWN_DATE_FORMAT, column_name=self.display_name)
       return
 
+    # TODO: change all importable date columns' type from 'DateTime'
+    # to 'Date' type. Remove if statement after it.
     try:
-      return parse(value) if value else None
+      value = parse(value) if value else None
+      if type(getattr(self.row_converter.obj, self.key, None)) == date and \
+              value:
+        return value.date()
+      else:
+        return value
     except:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
 
