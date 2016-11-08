@@ -178,7 +178,7 @@ class RowConverter(object):
     for item_handler in self.attrs.values():
       item_handler.set_obj_attr()
 
-  def send_post_commit_signals(self):
+  def send_post_commit_signals(self, event=None):
     """Send after commit signals for all objects
 
     This function sends proper signals for all objects depending if the object
@@ -192,13 +192,15 @@ class RowConverter(object):
     service_class.model = self.object_class
     if self.is_delete:
       Resource.model_deleted_after_commit.send(
-          self.object_class, obj=self.obj, service=service_class)
+          self.object_class, obj=self.obj, service=service_class, event=event)
     elif self.is_new:
       Resource.model_posted_after_commit.send(
-          self.object_class, obj=self.obj, src={}, service=service_class)
+          self.object_class, obj=self.obj, src={}, service=service_class,
+          event=event)
     else:
       Resource.model_put_after_commit.send(
-          self.object_class, obj=self.obj, src={}, service=service_class)
+          self.object_class, obj=self.obj, src={}, service=service_class,
+          event=event)
 
   def send_pre_commit_signals(self):
     """Send before commit signals for all objects.
