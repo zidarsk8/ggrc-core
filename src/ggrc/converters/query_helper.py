@@ -587,21 +587,21 @@ class QueryHelper(object):
               predicate(Record.content)
           ))
 
-    def with_key(key, p):
+    def with_key(key, predicate):
       """Apply keys to the filter expression."""
       key = key.lower()
       key, filter_by = self.attr_name_map[
           object_class].get(key, (key, None))
       if callable(filter_by):
-        return filter_by(p)
+        return filter_by(predicate)
       else:
         attr = getattr(object_class, key, None)
         if attr:
-          return p(attr)
+          return predicate(attr)
         else:
-          return default_filter_by(object_class, key, p)
+          return default_filter_by(object_class, key, predicate)
 
-    with_left = lambda p: with_key(exp["left"], p)
+    with_left = lambda predicate: with_key(exp["left"], predicate)
 
     lift_bin = lambda f: f(self._build_expression(exp["left"], object_class),
                            self._build_expression(exp["right"], object_class))
