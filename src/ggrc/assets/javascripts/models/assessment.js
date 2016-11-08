@@ -282,20 +282,23 @@
 
       if (this.audit) {
         auditLead = this.audit.contact.reify();
-        // Assign Assessor role
-        this.mark_for_addition('related_objects_as_destination', auditLead, {
+        if (currentUser === auditLead) {
+          markForAddition(this, auditLead, 'Creator,Assessor');
+        } else {
+          markForAddition(this, auditLead, 'Assessor');
+          markForAddition(this, currentUser, 'Creator');
+        }
+      } else {
+        markForAddition(this, currentUser, 'Creator');
+      }
+
+      function markForAddition(instance, user, type) {
+        instance.mark_for_addition('related_objects_as_destination', user, {
           attrs: {
-            AssigneeType: 'Assessor'
+            AssigneeType: type
           }
         });
       }
-
-      // Assign Creator role
-      this.mark_for_addition('related_objects_as_destination', currentUser, {
-        attrs: {
-          AssigneeType: 'Creator'
-        }
-      });
     },
     refreshInstance: function () {
       return this.refresh().then(function () {
