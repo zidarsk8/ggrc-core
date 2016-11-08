@@ -5,8 +5,10 @@
 
 # flake8: noqa
 
-import datetime
 import collections
+import datetime
+import functools
+import operator
 
 import flask
 import sqlalchemy as sa
@@ -777,18 +779,53 @@ class QueryHelper(object):
         return object_class.id.in_([obj[0] for obj in res])
       return sa.sql.false()
 
+    def build_op(exp_left, predicate, rhs_variants):
+      """Apply predicate to `exp_left` and each `rhs` and join them with SQL OR.
+
+      Args:
+        exp_left: description of left operand from the expression tree.
+        predicate: a comparison function between a field and a value.
+        rhs_variants: a list of possible interpretations of right operand,
+                      typically a list of strings.
+
+      Raises:
+        ValueError if rhs_variants is empty.
+
+      Returns:
+        sqlalchemy.sql.elements.BinaryExpression if predicate matches exp_left
+        and any of rhs variants.
+      """
+
+      if not rhs_variants:
+        raise ValueError("Expected non-empty sequence in 'rhs_variants', got "
+                         "{!r} instead".format(rhs_variants))
+      return with_key(
+          exp_left,
+          lambda lhs: functools.reduce(
+              sa.or_,
+              (predicate(lhs, rhs) for rhs in rhs_variants),
+          ),
+      )
+
+    def build_op_shortcut(predicate):
+      """A shortcut to call build_op with default lhs and rhs."""
+      return build_op(exp["left"], predicate, [rhs()])
+
+    def like(left, right):
+      """Handle ~ operator with SQL LIKE."""
+      return left.ilike(u"%{}%".format(right))
+
     ops = {
         "AND": lambda: lift_bin(sa.and_),
         "OR": lambda: lift_bin(sa.or_),
-        "=": lambda: with_key(exp["left"], lambda l: l == rhs()),
-        "!=": lambda: sa.not_(with_key(exp["left"],
-                              lambda l: l == rhs())),
-        "~": lambda: with_key(exp["left"], lambda l:
-                               l.ilike(u"%{}%".format(rhs()))),
-        "!~": lambda: sa.not_(with_key(exp["left"],
-                              lambda l: l.ilike(u"%{}%".format(rhs())))),
-        "<": lambda: with_key(exp["left"], lambda l: l < rhs()),
-        ">": lambda: with_key(exp["left"], lambda l: l > rhs()),
+
+        "=": lambda: build_op_shortcut(operator.eq),
+        "!=": lambda: sa.not_(build_op_shortcut(operator.eq)),
+        "~": lambda: build_op_shortcut(like),
+        "!~": lambda: sa.not_(build_op_shortcut(like)),
+        "<": lambda: build_op_shortcut(operator.lt),
+        ">": lambda: build_op_shortcut(operator.gt),
+
         "relevant": lambda: relevant(*_backlink(exp["object_name"],
                                                 exp["ids"])),
         "text_search": lambda: text_search(exp["text"]),
