@@ -87,6 +87,20 @@ describe('GGRC.Components.assessmentTemplates', function () {
       }
     );
 
+    it('issues a warning if an empty group is encountered', function () {
+      var expectedMsg = [
+        'GGRC.Components.assessmentTemplates: ',
+        'An empty template group encountered, possible API error'
+      ].join('');
+
+      spyOn(console, 'warn');
+      templates[1].subitems.length = 0;
+
+      method(templates, mapper);
+
+      expect(console.warn).toHaveBeenCalledWith(expectedMsg);
+    });
+
     it('selects the first non-dummy value if it precedes all object groups',
       function () {
         mapper.attr('assessmentTemplate', 'template-123');

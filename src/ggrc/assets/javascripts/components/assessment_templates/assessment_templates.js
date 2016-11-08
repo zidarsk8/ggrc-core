@@ -61,6 +61,11 @@
        *   the state of the mapper modal
        */
       _selectInitialTemplate: function (templates, mapper) {
+        var WARN_EMPTY_GROUP = [
+          'GGRC.Components.assessmentTemplates: ',
+          'An empty template group encountered, possible API error'
+        ].join('');
+
         var initialTemplate;
         var nonDummyItem;
 
@@ -80,6 +85,7 @@
           initialTemplate = nonDummyItem.value;
         } else {
           if (!nonDummyItem.subitems || nonDummyItem.subitems.length === 0) {
+            console.warn(WARN_EMPTY_GROUP);
             return;  // an empty group, no option to pick from it
           }
           initialTemplate = nonDummyItem.subitems[0].value;
