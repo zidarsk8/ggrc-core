@@ -666,8 +666,6 @@ class QueryHelper(object):
         else:
           return default_filter_by(object_class, key, predicate)
 
-    with_left = lambda predicate: with_key(exp["left"], predicate)
-
     lift_bin = lambda f: f(self._build_expression(exp["left"], object_class),
                            self._build_expression(exp["right"], object_class))
 
@@ -782,15 +780,15 @@ class QueryHelper(object):
     ops = {
         "AND": lambda: lift_bin(sa.and_),
         "OR": lambda: lift_bin(sa.or_),
-        "=": lambda: with_left(lambda l: l == rhs()),
-        "!=": lambda: sa.not_(with_left(
+        "=": lambda: with_key(exp["left"], lambda l: l == rhs()),
+        "!=": lambda: sa.not_(with_key(exp["left"],
                               lambda l: l == rhs())),
-        "~": lambda: with_left(lambda l:
+        "~": lambda: with_key(exp["left"], lambda l:
                                l.ilike(u"%{}%".format(rhs()))),
-        "!~": lambda: sa.not_(with_left(
+        "!~": lambda: sa.not_(with_key(exp["left"],
                               lambda l: l.ilike(u"%{}%".format(rhs())))),
-        "<": lambda: with_left(lambda l: l < rhs()),
-        ">": lambda: with_left(lambda l: l > rhs()),
+        "<": lambda: with_key(exp["left"], lambda l: l < rhs()),
+        ">": lambda: with_key(exp["left"], lambda l: l > rhs()),
         "relevant": lambda: relevant(*_backlink(exp["object_name"],
                                                 exp["ids"])),
         "text_search": lambda: text_search(exp["text"]),
