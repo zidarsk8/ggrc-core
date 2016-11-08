@@ -340,8 +340,8 @@ def modify_data(data):
 
   # combine "my_tasks" from multiple cycles
   data["cycle_started_tasks"] = {}
-  if "cycle_started" in data:
-    for cycle in data["cycle_started"].values():
+  if "cycle_data" in data:
+    for cycle in data["cycle_data"].values():
       if "my_tasks" in cycle:
         data["cycle_started_tasks"].update(cycle["my_tasks"])
 

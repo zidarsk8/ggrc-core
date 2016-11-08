@@ -59,7 +59,7 @@ def get_cycle_created_task_data(notification):
           "force_notifications": {
               notification.id: force
           },
-          "cycle_started": {
+          "cycle_data": {
               cycle.id: {
                   "my_tasks": deepcopy(task)
               }
@@ -72,7 +72,7 @@ def get_cycle_created_task_data(notification):
           "force_notifications": {
               notification.id: force
           },
-          "cycle_started": {
+          "cycle_data": {
               cycle.id: {
                   "my_task_groups": {
                       cycle_task_group.id: deepcopy(task)
@@ -88,7 +88,7 @@ def get_cycle_created_task_data(notification):
             "force_notifications": {
                 notification.id: force
             },
-            "cycle_started": {
+            "cycle_data": {
                 cycle.id: {
                     "cycle_tasks": deepcopy(task)
                 }
