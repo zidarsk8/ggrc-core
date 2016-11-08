@@ -1,0 +1,49 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+.action-button {
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 0 16px;
+  line-height: 22px;
+  text-align: center;
+  display: inline-block;
+  font-size: 11px;
+  text-transform: none;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  min-width: 52px;
+
+  &[disabled] {
+    opacity: 0.47;
+  }
+}
+.create-button {
+  background: $blue;
+  color: $white;
+
+  &:hover {
+    background: $link;
+    color: $white;
+    text-decoration: none;
+
+    &[disabled] {
+      background: $blue;
+    }
+  }
+
+}
+.map-button {
+   background: $white;
+    font-weight: normal;
+    border: 1px solid $widgetBorder;
+    color: $blue;
+
+    &:hover,
+    &:focus,
+    &:active {
+        border-color: $widgetBorder;
+    }
+}
+.view-button {}

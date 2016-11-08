@@ -7,8 +7,17 @@
 {{#if_instance_of parent_instance 'Audit'}}
 {{#if allow_creating}}
 {{#is_allowed 'create' model.shortName context=parent_instance.context.id}}
-  <a href="javascript://" class="section-create" rel="tooltip" data-placement="left" data-original-title="Create Request" data-toggle="modal-ajax-form" data-modal-reset="reset" data-modal-class="modal-wide" data-object-singular="Request" data-object-plural="requests" data-object-params='{ "{{parent_instance.class.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.class.model_singular}}" }, "context": { "id" : {{firstnonempty parent_instance.context.id "null"}}, "href" : "{{parent_instance.context.href}}", "type" : "{{parent_instance.context.type}}" } }'>
-    <i class="fa fa-plus-circle"></i>
+  <a href="javascript://"
+     class="section-create action-button create-button"
+     rel="tooltip" data-placement="left"
+     data-original-title="Create Request"
+     data-toggle="modal-ajax-form"
+     data-modal-reset="reset"
+     data-modal-class="modal-wide"
+     data-object-singular="Request"
+     data-object-plural="requests"
+     data-object-params='{ "{{parent_instance.class.table_singular}}": {"id" : {{parent_instance.id}}, "type" : "{{parent_instance.class.model_singular}}" }, "context": { "id" : {{firstnonempty parent_instance.context.id "null"}}, "href" : "{{parent_instance.context.href}}", "type" : "{{parent_instance.context.type}}" } }'>
+    Create New
   </a>
 {{/is_allowed}}
 {{/if}}
@@ -17,6 +26,7 @@
 {{#if allow_mapping}}
 {{#is_allowed_to_map parent_instance model.shortName}}
   <a
+    class="btn btn-mini action-button map-button"
     href="javascript://"
     rel="tooltip"
     data-placement="left"
@@ -26,7 +36,7 @@
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="{{parent_instance.class.shortName}}"
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-    <i class="fa fa-plus-circle"></i>
+    Map
   </a>
 {{/is_allowed_to_map}}
 {{/if}}

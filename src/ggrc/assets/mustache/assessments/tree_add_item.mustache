@@ -8,7 +8,7 @@
     {{#if allow_creating}}
     {{#is_allowed_to_map parent_instance model.shortName}}
       <a href="javascript://"
-         class="section-create"
+         class="section-create action-button create-button"
          rel="tooltip"
          data-placement="left"
          data-original-title="Create {{model.shortName}}"
@@ -17,7 +17,7 @@
          data-modal-class="modal-wide"
          data-object-singular="{{model.model_singular}}"
          data-object-plural="{{model.table_plural}}">
-        <i class="fa fa-plus-circle"></i>
+        Create New
       </a>
     {{/is_allowed_to_map}}
     {{/if}}
@@ -26,7 +26,7 @@
       {{#if allow_mapping}}
       {{#is_allowed_to_map parent_instance model.shortName}}
         <a
-          class="section-add"
+          class="section-add btn btn-mini action-button map-button"
           href="javascript://"
           rel="tooltip"
           data-placement="left"
@@ -36,7 +36,7 @@
           data-join-object-id="{{parent_instance.id}}"
           data-join-object-type="{{parent_instance.class.shortName}}"
           data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-          <i class="fa fa-plus-circle"></i>
+         Map
         </a>
       {{/is_allowed_to_map}}
       {{/if}}
