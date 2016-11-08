@@ -496,7 +496,16 @@ class QueryHelper(object):
       return None
 
     def autocast(o_key, value):
-      """Try to guess the type of `value` and parse it from the string."""
+      """Try to guess the type of `value` and parse it from the string.
+
+      Args:
+        o_key (basestring): the name of the field being compared; the `value`
+                            is converted to the type of that field.
+        value: the value being compared.
+
+      Returns:
+        `value` of type compliant with `getattr(object_class, o_key)`.
+      """
       if not isinstance(o_key, basestring):
         return value
       key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
@@ -530,27 +539,71 @@ class QueryHelper(object):
                                   ))
       return value
 
-    def relevant():
-      """Filter by relevant object."""
-      query = (self.query[exp["ids"][0]]
-               if exp["object_name"] == "__previous__" else exp)
+    def _backlink(object_name, ids):
+      """Convert ("__previous__", [query_id]) into (model_name, ids).
+
+      If `object_name` == "__previous__", return `object_name` and resulting
+      `ids` from a previous query with index `ids[0]`.
+
+      Example:
+        self.query[0] = {object_name: "Assessment",
+                         type: "ids",
+                         expression: {something}}
+        _backlink("__previous__", [0]) will return ("Assessment",
+                                                    ids returned by query[0])
+
+      Returns:
+        (object_name, ids) if object_name != "__previous__",
+        (self.query[ids[0]]["object_name"],
+         self.query[ids[0]]["ids"]) otherwise.
+      """
+
+      if object_name == "__previous__":
+        previous_query = self.query[ids[0]]
+        return (previous_query["object_name"], previous_query["ids"])
+      else:
+        return object_name, ids
+
+    def relevant(object_name, ids):
+      """Filter by relevant object.
+
+      Args:
+        object_name (basestring): the name of the related model.
+        ids ([int]): the ids of related objects of type `object_name`.
+
+      Returns:
+        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
+        is related (via a Relationship or another m2m) to one the given objects.
+      """
       return object_class.id.in_(
           RelationshipHelper.get_ids_related_to(
               object_class.__name__,
-              query["object_name"],
-              query["ids"],
+              object_name,
+              ids,
           )
       )
 
-    def similar():
-      """Filter by relationships similarity."""
-      similar_class = self.object_map[exp["object_name"]]
+    def similar(object_name, ids):
+      """Filter by relationships similarity.
+
+      Note: only the first id from the list of ids is used.
+
+      Args:
+        object_name: the name of the class of the objects to which similarity
+                     will be computed.
+        ids: the ids of similar objects of type `object_name`.
+
+      Returns:
+        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
+        is similar to one the given objects.
+      """
+      similar_class = self.object_map[object_name]
       if not hasattr(similar_class, "get_similar_objects_query"):
         return BadQueryException(u"{} does not define weights to count "
                                  u"relationships similarity"
                                  .format(similar_class.__name__))
       similar_objects_query = similar_class.get_similar_objects_query(
-          id_=exp["ids"][0],
+          id_=ids[0],
           types=[object_class.__name__],
       )
       flask.g.similar_objects_query = similar_objects_query
@@ -560,6 +613,7 @@ class QueryHelper(object):
       return sa.sql.false()
 
     def unknown():
+      """A fake operator for invalid operator names."""
       raise BadQueryException(u"Unknown operator \"{}\""
                               .format(exp["op"]["name"]))
 
@@ -588,7 +642,18 @@ class QueryHelper(object):
           ))
 
     def with_key(key, predicate):
-      """Apply keys to the filter expression."""
+      """Apply keys to the filter expression.
+
+      Args:
+        key: string containing attribute name on which we are filtering.
+        predicate: function containing a comparison for attribute value.
+
+      Returns:
+        sqlalchemy.sql.elements.BinaryExpression with:
+          `filter_by(predicate)` if there is custom filtering logic for `key`,
+          `predicate(getattr(object_class, key))` for own attributes,
+          `predicate(value of corresponding custom attribute)` otherwise.
+      """
       key = key.lower()
       key, filter_by = self.attr_name_map[
           object_class].get(key, (key, None))
@@ -606,26 +671,43 @@ class QueryHelper(object):
     lift_bin = lambda f: f(self._build_expression(exp["left"], object_class),
                            self._build_expression(exp["right"], object_class))
 
-    def text_search():
+    def text_search(text):
       """Filter by fulltext search.
 
       The search is done only in fields indexed for fulltext search.
+
+      Args:
+        text: the text we are searching for.
+
+      Returns:
+        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
+        has an indexed property that contains `text`.
       """
       return object_class.id.in_(
           db.session.query(Record.key).filter(
               Record.type == object_class.__name__,
-              Record.content.ilike(u"%{}%".format(exp["text"])),
+              Record.content.ilike(u"%{}%".format(text)),
           ),
       )
 
     rhs = lambda: autocast(exp["left"], exp["right"])
 
-    def owned():
-      """Get objects for which the user is owner."""
+    def owned(ids):
+      """Get objects for which the user is owner.
+
+      Note: only the first id from the list of ids is used.
+
+      Args:
+        ids: the ids of owners.
+
+      Returns:
+        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
+        is owned by one of the given users.
+      """
       res = db.session.query(
         query_helpers.get_myobjects_query(
             types=[object_class.__name__],
-            contact_id=exp["ids"][0],
+            contact_id=ids[0],
             is_creator=is_creator(),
         ).alias().c.id
       )
@@ -634,10 +716,24 @@ class QueryHelper(object):
         return object_class.id.in_([obj.id for obj in res])
       return sa.sql.false()
 
-    def related_people():
-      """Get people related to the specified object."""
-      related_type = exp["object_name"]
-      related_ids = exp["ids"]
+    def related_people(related_type, related_ids):
+      """Get people related to the specified object.
+
+      Returns the following people:
+        for each object type: the users mapped via PeopleObjects,
+        for Program: the users that have a Program-wide role,
+        for Audit: the users that have a Program-wide or Audit-wide role,
+        for Workflow: the users mapped via WorkflowPeople and
+                      the users that have a Workflow-wide role.
+
+      Args:
+        related_type: the name of the class of the related objects.
+        related_ids: the ids of related objects.
+
+      Returns:
+        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
+        is related to the given users.
+      """
       if "Person" not in [object_class.__name__, related_type]:
         return sa.sql.false()
       model = inflector.get_model(related_type)
@@ -695,11 +791,13 @@ class QueryHelper(object):
                               lambda l: l.ilike(u"%{}%".format(rhs())))),
         "<": lambda: with_left(lambda l: l < rhs()),
         ">": lambda: with_left(lambda l: l > rhs()),
-        "relevant": relevant,
-        "text_search": text_search,
-        "similar": similar,
-        "owned": owned,
-        "related_people": related_people,
+        "relevant": lambda: relevant(*_backlink(exp["object_name"],
+                                                exp["ids"])),
+        "text_search": lambda: text_search(exp["text"]),
+        "similar": lambda: similar(exp["object_name"], exp["ids"]),
+        "owned": lambda: owned(exp["ids"]),
+        "related_people": lambda: related_people(exp["object_name"],
+                                                 exp["ids"]),
     }
 
     return ops.get(exp["op"]["name"], unknown)()
