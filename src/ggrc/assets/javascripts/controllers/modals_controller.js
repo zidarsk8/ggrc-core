@@ -11,6 +11,8 @@ can.Control('GGRC.Controllers.Modals', {
     GGRC.mustache_path + '/modals/save_cancel_buttons.mustache',
   BUTTON_VIEW_SAVE_CANCEL_DELETE:
     GGRC.mustache_path + '/modals/save_cancel_delete_buttons.mustache',
+  BUTTON_VIEW_OK_CLOSE:
+    GGRC.mustache_path + '/modals/confirm_cancel_buttons.mustache',
 
   defaults: {
     preload_view: GGRC.mustache_path + '/dashboard/modal_preload.mustache',

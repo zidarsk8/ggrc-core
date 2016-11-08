@@ -206,6 +206,7 @@ dashboard-js-files:
   - components/add-object-button/add-object-button.js
   - components/effective-dates/effective-dates.js
   - components/snapshotter/individual-update.js
+  - components/snapshotter/scope-update.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -411,6 +412,7 @@ dashboard-js-template-files:
   - modals/confirm.mustache
   - modals/prompt_buttons.mustache
   - modals/confirm_buttons.mustache
+  - modals/confirm_cancel_buttons.mustache
   - modals/delete_cancel_buttons.mustache
   - modals/done_buttons.mustache
   - modals/modal_header.mustache
