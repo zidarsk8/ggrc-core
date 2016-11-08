@@ -155,8 +155,8 @@ class QueryHelper(object):
 
   def _expression_keys(self, exp):
     """Return the list of keys specified in the expression."""
-    operator = exp.get("op", {}).get("name", None)
-    if operator in ["AND", "OR"]:
+    operator_name = exp.get("op", {}).get("name", None)
+    if operator_name in ["AND", "OR"]:
       return self._expression_keys(exp["left"]).union(
           self._expression_keys(exp["right"]))
     left = exp.get("left", None)
@@ -171,8 +171,8 @@ class QueryHelper(object):
       """Parse task dates from the specified expression."""
       if not isinstance(exp, dict) or "op" not in exp:
         return
-      operator = exp["op"]["name"]
-      if operator in ["AND", "OR"]:
+      operator_name = exp["op"]["name"]
+      if operator_name in ["AND", "OR"]:
         expand_task_dates(exp["left"])
         expand_task_dates(exp["right"])
       elif isinstance(exp["left"], (str, unicode)):
@@ -191,12 +191,12 @@ class QueryHelper(object):
             month, day = parts
             exp["op"] = {"name": u"AND"}
             exp["left"] = {
-                "op": {"name": operator},
+                "op": {"name": operator_name},
                 "left": "relative_" + key + "_month",
                 "right": month,
             }
             exp["right"] = {
-                "op": {"name": operator},
+                "op": {"name": operator_name},
                 "left": "relative_" + key + "_day",
                 "right": day,
             }
