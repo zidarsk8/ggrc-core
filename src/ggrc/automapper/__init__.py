@@ -256,7 +256,7 @@ def handle_relationship_post(source, destination):
 
 def register_automapping_listeners():
   """Register event listeners for auto mapper."""
-  # pylint: disable=unused-variable
+  # pylint: disable=unused-variable,unused-argument
 
   @Resource.collection_posted.connect_via(Relationship)
   def handle_relationship_collection_post(sender, objects=None, **kwargs):
@@ -277,9 +277,9 @@ def register_automapping_listeners():
 
   @Resource.model_posted_after_commit.connect_via(Request)
   @Resource.model_put_after_commit.connect_via(Request)
-  def handle_request(sender, obj=None, src=None, service=None):
+  def handle_request(sender, obj=None, src=None, service=None, event=None):
     handle_relationship_post(obj, obj.audit)
 
   @Resource.model_posted_after_commit.connect_via(Audit)
-  def handle_audit(sender, obj=None, src=None, service=None):
+  def handle_audit(sender, obj=None, src=None, service=None, event=None):
     handle_relationship_post(obj, obj.program)
