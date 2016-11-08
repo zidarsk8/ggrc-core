@@ -905,7 +905,7 @@ class Resource(ModelView):
     with benchmark("Update custom attribute values"):
       set_ids_for_new_custom_attributes(obj)
     with benchmark("Log event"):
-      log_event(db.session, obj, force_obj=True)
+      event = log_event(db.session, obj, force_obj=True)
     with benchmark("Update memcache before commit for collection PUT"):
       update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
@@ -919,7 +919,7 @@ class Resource(ModelView):
       update_memcache_after_commit(self.request)
     with benchmark("Send PUT - after commit event"):
       self.model_put_after_commit.send(obj.__class__, obj=obj,
-                                       src=src, service=self)
+                                       src=src, service=self, event=event)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     with benchmark("Make response"):
@@ -958,7 +958,7 @@ class Resource(ModelView):
       with benchmark("Get modified objects"):
         modified_objects = get_modified_objects(db.session)
       with benchmark("Log event"):
-        log_event(db.session, obj)
+        event = log_event(db.session, obj)
       with benchmark("Update memcache before commit for collection DELETE"):
         update_memcache_before_commit(
             self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
@@ -970,7 +970,7 @@ class Resource(ModelView):
         update_memcache_after_commit(self.request)
       with benchmark("Send DELETEd - after commit event"):
         self.model_deleted_after_commit.send(obj.__class__, obj=obj,
-                                             service=self)
+                                             service=self, event=event)
       with benchmark("Query for object"):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
@@ -1332,7 +1332,7 @@ class Resource(ModelView):
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Log event for all objects"):
-      log_event(db.session, obj, flush=False)
+      event = log_event(db.session, obj, flush=False)
     with benchmark("Update memcache before commit for collection POST"):
       update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
@@ -1350,7 +1350,7 @@ class Resource(ModelView):
     with benchmark("Send model POSTed - after commit event"):
       for obj, src in itertools.izip(objects, sources):
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
-                                            src=src, service=self)
+                                            src=src, service=self, event=event)
         # Note: In model_posted_after_commit necessary mapping and
         # relationships are set, so need to commit the changes
       db.session.commit()
