@@ -839,7 +839,7 @@
         data.verifiers = makeList(this.attr('verifiersList'));
       }
 
-      return JSON.stringify(data);
+      return data;
     },
 
     /**

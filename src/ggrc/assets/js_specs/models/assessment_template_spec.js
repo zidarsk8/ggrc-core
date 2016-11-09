@@ -158,8 +158,6 @@ describe('can.Model.AssessmentTemplate', function () {
 
       result = instance._packPeopleData();
 
-      expect(typeof result).toEqual('string');
-      result = JSON.parse(result);
       expect(result).toEqual({
         assessors: 'Rabbits',
         verifiers: 'Turtles'
@@ -182,8 +180,6 @@ describe('can.Model.AssessmentTemplate', function () {
 
         result = instance._packPeopleData();
 
-        expect(typeof result).toEqual('string');
-        result = JSON.parse(result);
         expect(result).toEqual({
           assessors: [2, 9, 17],
           verifiers: 'Whatever'
@@ -207,8 +203,6 @@ describe('can.Model.AssessmentTemplate', function () {
 
         result = instance._packPeopleData();
 
-        expect(typeof result).toEqual('string');
-        result = JSON.parse(result);
         expect(result).toEqual({
           assessors: 'Whatever',
           verifiers: [6, 11, 12]

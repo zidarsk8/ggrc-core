@@ -86,7 +86,9 @@
 
                 <div class="show-details">
                   {{#child_options}}
-                    {{{renderLive add_item_view}}}
+                    {{#if add_item_view}}
+                      {{{renderLive add_item_view}}}
+                    {{/if}}
                   {{/child_options}}
                   <view-object-button instance="instance" />
                 </div>
@@ -132,7 +134,7 @@
                     </li>
                   {{/with_mapping_count}}
                   <li>
-                    {{{renderLive '/static/mustache/base_objects/states.mustache'}}}
+                    {{> '/static/mustache/base_objects/states.mustache'}}
                   </li>
                 </ul>
 

@@ -1171,12 +1171,18 @@
   /**
    Set up a deferred join object creation when this object is updated.
   */
-    mark_for_addition: function (join_attr, obj, extra_attrs, options) {
+    mark_for_addition: function (joinAttr, obj, extraAttrs, options) {
       obj = obj.reify ? obj.reify() : obj;
-      extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
+      extraAttrs = _.isEmpty(extraAttrs) ? undefined : extraAttrs;
 
       this.remove_duplicate_pending_joins(obj);
-      this._pending_joins.push({how: 'add', what: obj, through: join_attr, extra: extra_attrs, opts: options});
+      this._pending_joins.push({
+        how: 'add',
+        what: obj,
+        through: joinAttr,
+        extra: extraAttrs,
+        opts: options
+      });
     },
 
     remove_duplicate_pending_joins: function (obj) {
@@ -1188,7 +1194,8 @@
       len = this._pending_joins.length;
       joins = _.filter(this._pending_joins, function (val) {
         return val.what !== obj;
-      }.bind(this));
+      });
+
       if (len !== joins.length) {
         this.attr('_pending_joins').replace(joins);
       }

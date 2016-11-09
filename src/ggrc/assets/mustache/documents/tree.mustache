@@ -43,13 +43,13 @@
                     {{status}}
                   </div>
                 </div>
-
               {{/instance}}
               <div class="span4">
-
                 <div class="show-details">
                   {{#child_options}}
-                    {{{renderLive add_item_view}}}
+                    {{#if add_item_view}}
+                      {{{renderLive add_item_view}}}
+                    {{/if}}
                   {{/child_options}}
                   <view-object-button instance="instance" />
                 </div>
@@ -60,7 +60,6 @@
                     </li>
                   {{/infer_roles}}
                 </ul>
-
               </div>
             </div>
           </div><!-- item-data end -->

@@ -366,6 +366,7 @@ class BlockConverter(object):
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
         row_converter.send_pre_commit_signals()
+      for row_converter in self.row_converters:
         try:
           row_converter.insert_object()
           db.session.flush()
