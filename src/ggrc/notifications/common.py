@@ -23,7 +23,6 @@ from ggrc import extensions
 from ggrc import settings
 from ggrc.models import Person
 from ggrc.models import Notification
-from ggrc.models import NotificationConfig
 from ggrc.rbac import permissions
 from ggrc.utils import merge_dict
 
@@ -190,10 +189,9 @@ def should_receive(notif, user_data, people_cache):
     person = people_cache[person_id]
   else:
     person = db.session.query(Person).options(
-      joinedload('user_roles').joinedload('role'),
-      joinedload('notification_configs')).filter(
-        Person.id == person_id
-      ).first()
+        joinedload('user_roles').joinedload('role'),
+        joinedload('notification_configs')
+    ).filter(Person.id == person_id).first()
     people_cache[person_id] = person
 
   # If the user has no access we should not send any emails
@@ -213,8 +211,8 @@ def should_receive(notif, user_data, people_cache):
     """
 
     notification_configs = [nc for nc in person.notification_configs
-                               if nc.notif_type == notif_type]
-    if len(notification_configs) == 0:
+                            if nc.notif_type == notif_type]
+    if not notification_configs:
       # If we have no results, we need to use the default value, which is
       # true for digest emails.
       return notif_type == "Email_Digest"
