@@ -6,8 +6,6 @@
 These should be used on default verifiers and default assessors.
 """
 
-from flask import json
-
 from ggrc.models import AssessmentTemplate, Person
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
@@ -107,8 +105,7 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
 
     if _default_people:
       default_people.update(_default_people)
-      setattr(self.row_converter.obj, "default_people",
-              json.dumps(default_people))
+      setattr(self.row_converter.obj, "default_people", default_people)
     else:
       setattr(self.row_converter.obj, "_default_people", default_people)
 
