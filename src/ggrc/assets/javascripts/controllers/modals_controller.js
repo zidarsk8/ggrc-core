@@ -67,6 +67,11 @@ can.Control('GGRC.Controllers.Modals', {
     } else {
       this.after_preload();
     }
+    if (this.options.$trigger) {
+      this.options
+        .attr('$triggerParent', this.options.$trigger.closest('.add-button'));
+    }
+
     //this.options.attr("mapping", !!this.options.mapping);
   }
   , after_preload : function(content) {
@@ -938,14 +943,25 @@ can.Control('GGRC.Controllers.Modals', {
       ajd.fail(this.save_error.bind(this))
         .done(function (obj) {
           function finish() {
+            var objectArray = [obj];
             delete that.disable_hide;
             if (that.options.add_more) {
-              if (that.options.$trigger) {
-                that.options.$trigger.trigger("modal:added", [obj]);
+              if (that.options.$triggerParent) {
+                that.options.$triggerParent.trigger('modal:added', objectArray);
               }
               that.new_instance();
             } else {
-              that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
+              objectArray.push({
+                map_and_save: $('#map-and-save').is(':checked')
+              });
+              if (that.options.$triggerParent) {
+                that.options
+                  .$triggerParent
+                  .trigger('modal:success', objectArray);
+              } else {
+                that.element.trigger('modal:success', objectArray);
+              }
+              that.element.modal_form('hide');
               that.update_hash_fragment();
             }
           }
@@ -1028,7 +1044,7 @@ can.Control('GGRC.Controllers.Modals', {
   },
 
   should_update_hash_fragment: function () {
-    var $trigger = this.options.$trigger;
+    var $trigger = this.options.$triggerParent;
 
     if (!$trigger) {
       return false;
@@ -1037,18 +1053,17 @@ can.Control('GGRC.Controllers.Modals', {
   },
 
   update_hash_fragment: function () {
-    if (!this.should_update_hash_fragment()) return;
-
-    var hash = window.location.hash.split('/')[0],
-        tree_controller = this.options
-            .$trigger
-            .closest(".cms_controllers_tree_view_node")
+    var hash = window.location.hash.split('/')[0];
+    var treeController = this.options
+            .$triggerParent
+            .closest('.cms_controllers_tree_view_node')
             .control();
 
-    hash += [tree_controller
-             ? tree_controller.hash_fragment()
-             : "",
-             this.options.instance.hash_fragment()].join('/');
+    hash += [treeController ?
+            treeController.hash_fragment() :
+            '',
+            this.options.instance.hash_fragment()]
+            .join('/');
 
     window.location.hash = hash;
   }

@@ -226,8 +226,8 @@
           'defer:add', [data, {map_and_save: true}]);
         this.closeModal();
       },
-      '.add-button .btn modal:added': 'addNew',
-      '.add-button .btn modal:success': 'addNew',
+      '.add-button modal:added': 'addNew',
+      '.add-button modal:success': 'addNew',
       addNew: function (el, ev, model) {
         var entries = this.scope.attr('mapper.entries');
         var getBindingName = this.scope.attr('mapper').get_binding_name;
