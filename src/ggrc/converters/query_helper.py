@@ -532,7 +532,8 @@ class QueryHelper(object):
 
       if not isinstance(o_key, basestring):
         return [value]
-      key, _ = self.attr_name_map[object_class].get(o_key, (o_key, None))
+      key, custom_filter = (self.attr_name_map[object_class]
+                                .get(o_key, (o_key, None)))
 
       date_attr = date_cad = non_date_cad = False
       try:
@@ -542,8 +543,8 @@ class QueryHelper(object):
             title=key,
             definition_type=object_class.__name__,
         )
-        if not (date_cad or non_date_cad):
-          # no CA with this name
+        if not (date_cad or non_date_cad) and not custom_filter:
+          # no CA with this name and no custom filter for the field
           raise BadQueryException(u"Model {} has no field or CA {}"
                                   .format(object_class.__name__, o_key))
       else:
