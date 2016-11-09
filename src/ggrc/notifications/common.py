@@ -14,12 +14,14 @@ from datetime import datetime
 from logging import getLogger
 
 from sqlalchemy import and_
+from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden
 from google.appengine.api import mail
 
 from ggrc import db
 from ggrc import extensions
 from ggrc import settings
+from ggrc.models import Person
 from ggrc.models import Notification
 from ggrc.models import NotificationConfig
 from ggrc.rbac import permissions
@@ -77,7 +79,7 @@ class Services(object):
     return service(notif)
 
 
-def get_filter_data(notification):
+def get_filter_data(notification, people_cache):
   """Get filtered notification data.
 
   This function gets notification data for all users who should receive it. A
@@ -97,7 +99,7 @@ def get_filter_data(notification):
   data = Services.call_service(notification)
 
   for user, user_data in data.iteritems():
-    if should_receive(notification, user_data):
+    if should_receive(notification, user_data, people_cache):
       result[user] = user_data
   return result
 
@@ -119,9 +121,10 @@ def get_notification_data(notifications):
   if not notifications:
     return {}
   aggregate_data = {}
+  people_cache = {}
 
   for notification in notifications:
-    filtered_data = get_filter_data(notification)
+    filtered_data = get_filter_data(notification, people_cache)
     aggregate_data = merge_dict(aggregate_data, filtered_data)
 
   # Remove notifications for objects without a contact (such as task groups)
@@ -171,7 +174,7 @@ def get_daily_notifications():
   return notifications, get_notification_data(notifications)
 
 
-def should_receive(notif, user_data):
+def should_receive(notif, user_data, people_cache):
   """Check if a user should receive a notification or not.
 
   Args:
@@ -183,6 +186,19 @@ def should_receive(notif, user_data):
   """
   force_notif = user_data.get("force_notifications", {}).get(notif.id, False)
   person_id = user_data["user"]["id"]
+  if person_id in people_cache:
+    person = people_cache[person_id]
+  else:
+    person = db.session.query(Person).options(
+      joinedload('user_roles').joinedload('role'),
+      joinedload('notification_configs')).filter(
+        Person.id == person_id
+      ).first()
+    people_cache[person_id] = person
+
+  # If the user has no access we should not send any emails
+  if person.system_wide_role == "No Access":
+    return False
 
   def is_enabled(notif_type):
     """Check user notification settings.
