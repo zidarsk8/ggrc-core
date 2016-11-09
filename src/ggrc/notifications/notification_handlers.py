@@ -142,7 +142,8 @@ def register_handlers():
 
   @Resource.model_posted_after_commit.connect_via(models.Request)
   @Resource.model_posted_after_commit.connect_via(models.Assessment)
-  def assignable_created_listener(sender, obj=None, src=None, service=None):
+  def assignable_created_listener(sender, obj=None, src=None, service=None,
+                                  event=None):
     handle_assignable_created(obj)
 
   @Resource.model_put.connect_via(models.Assessment)
@@ -152,5 +153,6 @@ def register_handlers():
       handle_reminder(obj, reminder_type)
 
   @Resource.model_posted_after_commit.connect_via(models.Comment)
-  def comment_created_listener(sender, obj=None, src=None, service=None):
+  def comment_created_listener(sender, obj=None, src=None, service=None,
+                               event=None):
     handle_comment_created(obj, src)

@@ -373,20 +373,21 @@ class BlockConverter(object):
           db.session.rollback()
           logger.exception("Import failed with: %s", err.message)
           row_converter.add_error(errors.UNKNOWN_ERROR)
-      self.save_import()
+      import_event = self.save_import()
       for row_converter in self.row_converters:
-        row_converter.send_post_commit_signals()
+        row_converter.send_post_commit_signals(event=import_event)
 
   def save_import(self):
     """Commit all changes in the session and update memcache."""
     try:
       modified_objects = get_modified_objects(db.session)
-      log_event(db.session, None)
+      import_event = log_event(db.session, None)
       update_memcache_before_commit(
           self, modified_objects, CACHE_EXPIRY_IMPORT)
       db.session.commit()
       update_memcache_after_commit(self)
       update_index(db.session, modified_objects)
+      return import_event
     except exc.SQLAlchemyError as err:
       db.session.rollback()
       logger.exception("Import failed with: %s", err.message)
