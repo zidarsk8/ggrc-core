@@ -63,27 +63,46 @@
       padding: 0 12px 0 70px;
       font-size: 11px;
       text-transform: uppercase;
-      height: 24px;
+      height: 32px;
       top: 42px;
       background: #e0e0e0;
       z-index: zIndex(tree-header);
       [class^="span"] {
-        line-height: 24px;
-        height: 24px;
+        line-height: 32px;
+        height: 32px;
       }
 
       &.no-filter {
         top: 0px;
       }
       .tree-action-list {
-        height: 22px;
-        margin-top: 2px;
+        height: 32px;
+
         .open {
           .fa-share-alt {
             @include opacity(1);
             color: #2196f3;
           }
         }
+
+          .map-button {
+            line-height: 22px;
+            background: $blue;
+            color: $white;
+            padding: 0 16px;
+            border: 1px solid transparent;
+
+            &:hover {
+              background: $link;
+              color: $white;
+              text-decoration: none;
+
+              &[disabled] {
+                background: $blue;
+              }
+            }
+          }
+
         .fa {
           color: $black;
           margin-top: 1px;
@@ -94,7 +113,7 @@
         li {
           position: relative;
           overflow: visible;
-          line-height: 24px;
+          line-height: 32px;
           .counter {
             @include opacity(1);
           }

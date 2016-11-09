@@ -4,15 +4,14 @@
  */
 
 .btn-outline {
-    background: none;
+    background: $white;
     font-weight: normal;
-    border: 1px solid rgba(0,0,0,0.3);
+    border: 1px solid $widgetBorder;
     color: $blue;
 
     &:hover,
     &:focus,
     &:active {
-        color: $black;
-        border-color: $black;
+        border-color: $widgetBorder;
     }
 }

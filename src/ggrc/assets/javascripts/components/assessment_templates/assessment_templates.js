@@ -16,6 +16,8 @@
       binding: '@',
       responses: [],
       instance: null,
+      mapper: null,  // a shared object representing the mapper modal's state
+
       templates: function () {
         var result = {};
         var responses = this.attr('responses');
@@ -44,15 +46,63 @@
           });
         });
         return [noValue].concat(_.toArray(result));
+      },
+
+      /**
+       * Set the initial Assessment Template to be selected in the relevant
+       * dropdown menu.
+       *
+       * By default, the first option from the first option group is selected,
+       * unless such option does not exist, or if the mapper instance is not
+       * given. In that case this method has no effect.
+       *
+       * @param {Array} templates - a list of possible options for the dropdown
+       * @param {GGRC.Models.MapperModel} mapper - the shared object holding
+       *   the state of the mapper modal
+       */
+      _selectInitialTemplate: function (templates, mapper) {
+        var WARN_EMPTY_GROUP = [
+          'GGRC.Components.assessmentTemplates: ',
+          'An empty template group encountered, possible API error'
+        ].join('');
+
+        var initialTemplate;
+        var nonDummyItem;
+
+        if (!mapper) {
+          return;
+        }
+
+        // The first element is a dummy option, thus if there are no other
+        // elements, simply don't pick anything.
+        if (templates.length < 2) {
+          return;
+        }
+
+        nonDummyItem = templates[1];  // a single item or an object group
+
+        if (!nonDummyItem.group) {  // a single item
+          initialTemplate = nonDummyItem.value;
+        } else {
+          if (!nonDummyItem.subitems || nonDummyItem.subitems.length === 0) {
+            console.warn(WARN_EMPTY_GROUP);
+            return;  // an empty group, no option to pick from it
+          }
+          initialTemplate = nonDummyItem.subitems[0].value;
+        }
+
+        mapper.attr('assessmentTemplate', initialTemplate);
       }
     },
     init: function () {
-      var instance = this.scope.attr('instance');
-      var binding = instance.get_binding(this.scope.attr('binding'));
+      var scope = this.scope;
+      var instance = scope.attr('instance');
+      var binding = instance.get_binding(scope.attr('binding'));
 
       binding.refresh_instances().done(function (response) {
-        this.scope.attr('responses', response);
-      }.bind(this));
+        scope.attr('responses', response);
+        scope._selectInitialTemplate(scope.templates(), scope.mapper);
+      });
     }
   });
 })(window.can, window.can.$);

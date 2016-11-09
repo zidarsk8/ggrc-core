@@ -7,6 +7,7 @@
 {{#if allow_mapping_or_creating}}
   {{#if allow_mapping}}
   <a
+    class="btn btn-mini action-button map-button"
     href="javascript://"
     rel="tooltip"
     data-placement="left"
@@ -16,7 +17,7 @@
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="{{parent_instance.class.shortName}}"
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-    <i class="fa fa-plus-circle"></i>
+    Map
   </a>
   {{/if}}
 {{/if}}

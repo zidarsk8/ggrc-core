@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
+{{> '/static/mustache/base_objects/tree_view_filter.mustache'}}
 
 <header class="header sticky sticky-header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
   <div class="row-fluid">
@@ -30,7 +30,7 @@
     </div>
     <div class="span4">
       <ul class="tree-action-list">
-        {{{> "/static/mustache/base_objects/filter_trigger.mustache}}}
+        {{> '/static/mustache/base_objects/filter_trigger.mustache'}}
         {{#if add_item_view}}
           <li>
             {{{renderLive add_item_view}}}
