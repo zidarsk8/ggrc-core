@@ -174,6 +174,15 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
             for program in programs["values"]),
     )
 
+  def test_basic_query_missing_field(self):
+    """Filter fails on non-existing field."""
+    data = self._make_query_dict(
+        "Program",
+        expression=["This field definitely does not exist", "=", "test"],
+    )
+    response = self._post(data)
+    self.assert400(response)
+
   # pylint: disable=invalid-name
   def test_basic_query_incorrect_date_format(self):
     """Filtering should fail because of incorrect date input."""
