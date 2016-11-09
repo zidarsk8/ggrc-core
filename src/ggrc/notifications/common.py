@@ -200,7 +200,7 @@ def should_receive(notif, user_data, people_cache):
   if person.system_wide_role == "No Access":
     return False
 
-  def is_enabled(notif_type):
+  def is_enabled(notif_type, person):
     """Check user notification settings.
 
     Args:
@@ -211,16 +211,16 @@ def should_receive(notif, user_data, people_cache):
       Boolean based on what settings users has stored or what the default
       setting is for the given notification.
     """
-    result = NotificationConfig.query.filter(
-        and_(NotificationConfig.person_id == person_id,
-             NotificationConfig.notif_type == notif_type))
-    if result.count() == 0:
+
+    notification_configs = [nc for nc in person.notification_configs
+                               if nc.notif_type == notif_type]
+    if len(notification_configs) == 0:
       # If we have no results, we need to use the default value, which is
       # true for digest emails.
       return notif_type == "Email_Digest"
-    return result.one().enable_flag
+    return notification_configs[0].enable_flag
 
-  has_digest = force_notif or is_enabled("Email_Digest")
+  has_digest = force_notif or is_enabled("Email_Digest", person)
 
   return has_digest
 
