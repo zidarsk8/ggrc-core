@@ -360,35 +360,3 @@ class TestAutomappings(integration.ggrc.TestCase):
         to_create=[(program, regulation), (regulation, assessment)],
         implied=[(program, assessment)]
     )
-
-  def test_automapping_audit_program_object(self):
-    """Test rule 'mapping program objects to audit'."""
-    program = self.create_object(models.Program, {
-        'title': make_name('Program')
-    })
-    audit = self.create_object(models.Audit, {
-        'title': make_name('Audit'),
-        'program': {'id': program.id},
-        'status': 'Planned',
-    })
-    regulation = self.create_object(models.Regulation, {
-        'title': make_name('Test PD Regulation')
-    })
-    section = self.create_object(models.Section, {
-        'title': make_name('Test section'),
-        'directive': {'id': regulation.id},
-    })
-
-    self.assert_mapping_implication(
-        to_create=[(program, regulation), (program, section)],
-        implied=[(regulation, audit), (section, audit)]
-    )
-
-    audit_new = self.create_object(models.Audit, {
-        'title': make_name('Audit'),
-        'program': {'id': program.id},
-        'status': 'Planned',
-    })
-    self.assert_mapping(audit_new, regulation)
-    self.assert_mapping(audit_new, section)
-    self.assert_mapping(audit_new, program, missing=True)
