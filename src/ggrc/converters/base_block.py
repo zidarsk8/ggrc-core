@@ -18,6 +18,7 @@ from sqlalchemy import and_
 
 from ggrc import db
 from ggrc import models
+from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 from ggrc.utils import structures
 from ggrc.converters import errors
@@ -31,6 +32,8 @@ from ggrc.services.common import update_index
 from ggrc.services.common import update_memcache_after_commit
 from ggrc.services.common import update_memcache_before_commit
 from ggrc.services.common import log_event
+from ggrc_workflows.models.cycle_task_group_object_task import \
+    CycleTaskGroupObjectTask
 
 
 # pylint: disable=invalid-name
@@ -95,6 +98,7 @@ class BlockConverter(object):
     self.offset = options.get("offset", 0)
     self.object_class = options.get("object_class")
     self.rows = options.get("rows", [])
+    self.operation = 'import' if self.rows else 'export'
     self.object_ids = options.get("object_ids", [])
     self.block_errors = []
     self.block_warnings = []
@@ -102,21 +106,36 @@ class BlockConverter(object):
     self.row_warnings = []
     self.row_converters = []
     self.ignore = False
-    if not self.object_class:
-      class_name = options.get("class_name", "")
-      self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2,
-                      object_name=class_name)
+    # For import contains model name from csv file.
+    # For export contains 'Model.__name__' value.
+    self.class_name = options.get("class_name", "")
+    # TODO: remove 'if' statement. Init should initialize only.
+    if self.object_class:
+      self.object_headers = get_object_column_definitions(self.object_class)
+      all_header_names = [unicode(key)
+                          for key in self.get_header_names().keys()]
+      raw_headers = options.get("raw_headers", all_header_names)
+      self.check_for_duplicate_columns(raw_headers)
+      self.headers = self.clean_headers(raw_headers)
+      self.unique_counts = self.get_unique_counts_dict(self.object_class)
+      self.table_singular = self.object_class._inflector.table_singular
+      self.name = self.object_class._inflector.human_singular.title()
+      self.organize_fields(options.get("fields", []))
+    else:
       self.name = ""
+
+  def check_block_restrictions(self):
+    """Check some block related restrictions"""
+    if not self.object_class:
+      self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2,
+                      object_name=self.class_name)
       return
-    self.object_headers = get_object_column_definitions(self.object_class)
-    all_header_names = [unicode(key) for key in self.get_header_names().keys()]
-    raw_headers = options.get("raw_headers", all_header_names)
-    self.check_for_duplicate_columns(raw_headers)
-    self.headers = self.clean_headers(raw_headers)
-    self.unique_counts = self.get_unique_counts_dict(self.object_class)
-    self.table_singular = self.object_class._inflector.table_singular
-    self.name = self.object_class._inflector.human_singular.title()
-    self.organize_fields(options.get("fields", []))
+    if self.operation == 'import' and \
+            self.object_class is CycleTaskGroupObjectTask and \
+            not permissions.is_admin():
+      self.add_errors(errors.PERMISSION_ERROR, line=self.offset + 2)
+      logger.error("Import failed with: Only admin can update existing "
+                   "cycle-tasks via import")
 
   def _create_ca_definitions_cache(self):
     """Create dict cache for custom attribute definitions.
