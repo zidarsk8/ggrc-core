@@ -22,6 +22,12 @@ hr.snapshot {
   padding: 0;
 }
 
+a.disabled {
+  pointer-events: none !important;
+  cursor: default;
+  color: $disabled;
+}
+
 // Info pane
 .sticky-info-panel {
   .pane-header.snapshot {
