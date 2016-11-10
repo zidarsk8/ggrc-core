@@ -994,7 +994,7 @@ can.Control('GGRC.Controllers.Modals', {
     }, {
       duration: 200,
       complete: function () {
-        $(document.body).trigger('ajax:flash', {error: error});
+        GGRC.Errors.notifier('error')(error);
         delete this.disable_hide;
       }.bind(this)
     });

@@ -156,16 +156,6 @@ class Assessment(statusable.Statusable, AuditRelationship,
 
   _aliases = {
       "owners": None,
-      "assessment_object": {
-          "display_name": "Object",
-          "mandatory": True,
-          "ignore_on_update": True,
-          "filter_by": "_ignore_filter",
-          "type": reflection.AttributeInfo.Type.MAPPING,
-          "description": ("A single object that will be mapped to the audit.\n"
-                          "Example:\n\nControl: Control-slug-1\n"
-                          "Market : MARKET-55"),
-      },
       "assessment_template": {
           "display_name": "Template",
           "ignore_on_update": True,

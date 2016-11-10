@@ -6,7 +6,7 @@
 {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context=null}}
   {{^if_recurring_workflow parent_instance}}
     <a
-      class="section-add"
+      class="section-add action-button create-button"
       href="javascript://"
       rel="tooltip"
       data-placement="left"
@@ -29,7 +29,7 @@
         {{/if_equals}}
         }'>
 
-      <i class="fa fa-plus-circle"></i>
+      Create New
     </a>
   {{/if_recurring_workflow}}
 {{/is_allowed}}

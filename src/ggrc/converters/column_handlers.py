@@ -3,7 +3,6 @@
 
 """List of all column handlers for objects in the ggrc module."""
 
-from ggrc.converters.handlers import assessment_object
 from ggrc.converters.handlers import assessment_template
 from ggrc.converters.handlers import boolean
 from ggrc.converters.handlers import default_people
@@ -17,7 +16,6 @@ from ggrc.extensions import get_extension_modules
 
 GGRC_COLUMN_HANDLERS = {
     "assertions": handlers.ControlAssertionColumnHandler,
-    "assessment_object": assessment_object.AssessmentObjectColumnHandler,
     "assessment_template": assessment_template.AssessmentTemplateColumnHandler,
     "assignee": handlers.UserColumnHandler,
     "audit": handlers.AuditColumnHandler,
