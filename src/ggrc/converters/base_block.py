@@ -490,15 +490,12 @@ class BlockConverter(object):
   def _check_object(self, row_converter):
     """Check object if it has any pre commit checks.
 
-    Object will not be checked if there's already an error on and it's marked
-    as ignored. The check functions can mutate the row_converter object and
-    mark it to be ignored if there are any errors detected.
+    The check functions can mutate the row_converter object and mark it
+    to be ignored if there are any errors detected.
 
     Args:
       row_converter: Row converter for the row we want to check
     """
-    if row_converter.ignore:
-      return
-    checker = pre_commit_checks.CHECKS.get(row_converter.obj.type)
+    checker = pre_commit_checks.CHECKS.get(type(row_converter.obj).__name__)
     if checker and callable(checker):
       checker(row_converter)

@@ -10,12 +10,16 @@ def check_tasks(row_converter):
   """Checker for task group task objects.
 
   This checker should make sure if a task group task has any invalid values
-  that should be ignored.
+  that should be ignored. Object will not be checked if there's already
+  an error on and it's marked as ignored.
 
   Args:
     row_converter: RowConverter object with row data for a task group task
       import.
   """
+  if row_converter.ignore:
+    return
+
   obj = row_converter.obj
   if obj.start_date > obj.end_date:
     row_converter.add_error(
