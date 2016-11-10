@@ -167,7 +167,7 @@
         var props = {};
 
         if (!message && err && err.status) {
-          message = GGRC.Errors.messages[err.status];
+          message = GGRC.Errors.messages[err.status] || err.responseText;
         }
         props[type] = message || 'There was an error!';
         $('body').trigger('ajax:flash', props);
