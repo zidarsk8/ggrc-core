@@ -12,6 +12,8 @@ import factory
 
 from ggrc import db
 from ggrc import models
+from ggrc.fulltext import get_indexer
+from ggrc.fulltext.recordbuilder import fts_record_for
 
 
 def random_string(prefix=''):
@@ -25,8 +27,22 @@ class ModelFactory(factory.Factory):
 
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
+    indexer = get_indexer()
     instance = target_class(*args, **kwargs)
     db.session.add(instance)
+    db.session.flush()
+    revision = models.Revision(instance, 1, 'created', instance.log_json())
+    event = models.Event(
+        modified_by_id=1,
+        action="POST",
+        resource_id=instance.id,
+        resource_type=instance.type,
+        context_id=instance.context_id,
+        revisions = [revision],
+    )
+    db.session.add(revision)
+    db.session.add(event)
+    indexer.create_record(fts_record_for(instance), commit=False)
     db.session.commit()
     return instance
 
@@ -142,6 +158,17 @@ class AuditFactory(ModelFactory):
   context_id = factory.LazyAttribute(lambda _: ContextFactory().id)
 
 
+class SnapshotFactory(ModelFactory):
+
+  class Meta:
+    model = models.Snapshot
+
+  parent = factory.LazyAttribute(lambda _: ProgramFactory().id)
+  child_id = 0
+  child_type = ""
+  revision_id = 0
+
+
 class AssessmentTemplateFactory(ModelFactory):
 
   class Meta:
@@ -224,3 +251,27 @@ class RequestFactory(ModelFactory, TitledFactory):
     model = models.Request
 
   request_type = "documentation"
+
+
+class OrgGroupFactory(ModelFactory, TitledFactory):
+
+  class Meta:
+    model = models.Regulation
+
+
+class ProcessFactory(ModelFactory, TitledFactory):
+
+  class Meta:
+    model = models.Regulation
+
+
+class PolicyFactory(ModelFactory, TitledFactory):
+
+  class Meta:
+    model = models.Regulation
+
+
+class MarketFactory(ModelFactory, TitledFactory):
+
+  class Meta:
+    model = models.Regulation
