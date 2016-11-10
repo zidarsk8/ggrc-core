@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $) {
+(function (can, $, Permission) {
 can.Control('GGRC.Controllers.Modals', {
   BUTTON_VIEW_DONE: GGRC.mustache_path + '/modals/done_buttons.mustache',
   BUTTON_VIEW_CLOSE: GGRC.mustache_path + '/modals/close_buttons.mustache',
@@ -941,23 +941,22 @@ can.Control('GGRC.Controllers.Modals', {
 
       ajd = instance.save();
       ajd.fail(this.save_error.bind(this))
-        .done(function (obj) {
+        .then(function (obj) {
           function finish() {
             var objectArray = [obj];
+            var triggerParent = that.options.$triggerParent;
             delete that.disable_hide;
             if (that.options.add_more) {
-              if (that.options.$triggerParent) {
-                that.options.$triggerParent.trigger('modal:added', objectArray);
+              if (triggerParent && triggerParent.length) {
+                triggerParent.trigger('modal:added', objectArray);
               }
               that.new_instance();
             } else {
               objectArray.push({
                 map_and_save: $('#map-and-save').is(':checked')
               });
-              if (that.options.$triggerParent) {
-                that.options
-                  .$triggerParent
-                  .trigger('modal:success', objectArray);
+              if (triggerParent && triggerParent.length) {
+                triggerParent.trigger('modal:success', objectArray);
               } else {
                 that.element.trigger('modal:success', objectArray);
               }
@@ -998,9 +997,9 @@ can.Control('GGRC.Controllers.Modals', {
             $(document.body).trigger("ajax:flash", { success : msg });
             finish();
           }
-        });
-      this.save_ui_status();
-      return ajd;
+        }).then(Permission.refresh);
+    this.save_ui_status();
+    return ajd;
   },
   save_error: function (_, error) {
     $('html, body').animate({
@@ -1053,6 +1052,8 @@ can.Control('GGRC.Controllers.Modals', {
   },
 
   update_hash_fragment: function () {
+    if (!this.should_update_hash_fragment()) return;
+
     var hash = window.location.hash.split('/')[0];
     var treeController = this.options
             .$triggerParent
@@ -1355,4 +1356,4 @@ can.Component.extend({
     }
   },
 });
-})(window.can, window.can.$);
+})(window.can, window.can.$, window.Permission);
