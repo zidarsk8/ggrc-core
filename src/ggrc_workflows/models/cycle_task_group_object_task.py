@@ -31,6 +31,9 @@ class CycleTaskGroupObjectTask(
   __tablename__ = 'cycle_task_group_object_tasks'
   _title_uniqueness = False
 
+  IMPORTABLE_FIELDS = ('description', 'end_date', 'finished_date',
+                       'slug', 'start_date', 'title', 'verified_date')
+
   @classmethod
   def generate_slug_prefix_for(cls, obj):
     return "CYCLETASK"

@@ -263,6 +263,15 @@ class BlockConverter(object):
     for index, header in enumerate(headers):
       if header in header_names:
         field_name = header_names[header]
+        if self.operation == 'import' and \
+                hasattr(self.object_class, "IMPORTABLE_FIELDS") and \
+                field_name not in self.object_class.IMPORTABLE_FIELDS:
+          self.add_warning(errors.NON_IMPORTABLE_COLUMN_WARNING,
+                           line=self.offset + 2,
+                           column_name=header)
+          self.remove_column(index - removed_count)
+          removed_count += 1
+          continue
         clean_headers[field_name] = self.object_headers[field_name]
       else:
         self.add_warning(errors.UNKNOWN_COLUMN,

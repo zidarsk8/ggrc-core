@@ -12,6 +12,7 @@ from os.path import dirname
 from freezegun import freeze_time
 
 from ggrc import db
+from ggrc.converters import errors
 from ggrc_workflows import start_recurring_cycles
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 from integration.ggrc.converters import TestCase
@@ -60,7 +61,17 @@ class TestCycleTaskGroupObjectTaskUpdate(TestCase):
       self._cmp_tasks(self.exp_tasks_before_update)
       filename = "cycle_task_group_object_task_active_update.csv"
       response = self.import_file(filename)
-      self._check_csv_response(response, {})
+      expected_errors = {
+          "Cycle Task Group Object Task": {
+              "block_warnings": {
+                  errors.NON_IMPORTABLE_COLUMN_WARNING.format(
+                      line=2,
+                      column_name='state',
+                  ),
+              }
+          }
+      }
+      self._check_csv_response(response, expected_errors)
       self._cmp_tasks(self.exp_tasks_after_update)
 
   def _create_test_cases(self):
