@@ -17,7 +17,16 @@
     <span class="bubble"></span>
   </a>
   <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-    {{#is_allowed 'update' instance context='for'}}
+    {{#is_allowed 'update' instance context='for'}}    
+      
+      <li>
+        <snapshot-scope-update instance="instance">
+          <a href="javascript://" can-click="upsertIt">
+            <i class="fa fa-refresh"></i>
+            Update objects to latest version</a>
+        </snapshot-scope-update>
+      </li>
+
       {{> /static/mustache/base_objects/edit_object_link.mustache}}
     {{/is_allowed}}
 
