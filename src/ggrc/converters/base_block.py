@@ -15,6 +15,7 @@ from collections import Counter
 from sqlalchemy import exc
 from sqlalchemy import or_
 from sqlalchemy import and_
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 from ggrc import db
 from ggrc import models
@@ -382,6 +383,8 @@ class BlockConverter(object):
     for row_converter in self.row_converters:
       self._check_object(row_converter)
 
+    self.clean_session_from_ignored_objs()
+
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
         row_converter.send_pre_commit_signals()
@@ -396,6 +399,20 @@ class BlockConverter(object):
       self.save_import()
       for row_converter in self.row_converters:
         row_converter.send_post_commit_signals()
+
+  def clean_session_from_ignored_objs(self):
+    """Clean DB session from ignored objects.
+
+    This function expunges objects from 'db.session' which are in rows that
+    marked as 'ignored' before commit.
+    """
+    for row_converter in self.row_converters:
+      obj = row_converter.obj
+      try:
+        if row_converter.ignore and obj in db.session:
+          db.session.expunge(obj)
+      except UnmappedInstanceError:
+        continue
 
   def save_import(self):
     """Commit all changes in the session and update memcache."""
