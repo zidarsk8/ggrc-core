@@ -15,7 +15,6 @@ ATTRIBUTE_ORDER = (
     "slug",
     "assessment_template",
     "audit",
-    "assessment_object",
     "request_audit",
     "control",
     "program",

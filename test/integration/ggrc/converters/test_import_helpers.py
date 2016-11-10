@@ -339,7 +339,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Test Plan",
         "Notes",
-        "Object",
         "Audit",
         "Creator",
         "Assessor",
@@ -365,7 +364,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     expected_fields = {
         "mandatory": {
             "Title",
-            "Object",
             "Audit",
             "Creator",
             "Assessor",
@@ -377,7 +375,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         },
         "ignore_on_update": {
             "Template",
-            "Object",
             "Audit",
         }
     }
