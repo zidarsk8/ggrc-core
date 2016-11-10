@@ -59,7 +59,7 @@ def get_cycle_created_task_data(notification):
           "force_notifications": {
               notification.id: force
           },
-          "cycle_started": {
+          "cycle_data": {
               cycle.id: {
                   "my_tasks": deepcopy(task)
               }
@@ -72,7 +72,7 @@ def get_cycle_created_task_data(notification):
           "force_notifications": {
               notification.id: force
           },
-          "cycle_started": {
+          "cycle_data": {
               cycle.id: {
                   "my_task_groups": {
                       cycle_task_group.id: deepcopy(task)
@@ -88,7 +88,7 @@ def get_cycle_created_task_data(notification):
             "force_notifications": {
                 notification.id: force
             },
-            "cycle_started": {
+            "cycle_data": {
                 cycle.id: {
                     "cycle_tasks": deepcopy(task)
                 }
@@ -156,7 +156,8 @@ def get_cycle_created_data(notification, cycle):
   force = cycle.workflow.notify_on_change
   result = {}
 
-  for person in cycle.workflow.people:
+  for user_role in cycle.workflow.context.user_roles:
+    person = user_role.person
     result[person.email] = {
         "user": data_handlers.get_person_dict(person),
         "force_notifications": {
@@ -239,9 +240,10 @@ def get_workflow_starts_in_data(notification, workflow):
   workflow_owners = get_workflow_owners_dict(workflow.context_id)
   force = workflow.notify_on_change
 
-  for wf_person in workflow.workflow_people:
-    result[wf_person.person.email] = {
-        "user": data_handlers.get_person_dict(wf_person.person),
+  for user_roles in workflow.context.user_roles:
+    wf_person = user_roles.person
+    result[wf_person.email] = {
+        "user": data_handlers.get_person_dict(wf_person),
         "force_notifications": {
             notification.id: force
         },
