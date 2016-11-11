@@ -30,7 +30,23 @@
               },
               import: {
                 class: "btn-primary",
-                text: "Import data"
+                text: "Import data",
+                isDisabled: function () {
+                  var toImport = this.import;  // info on blocks to import
+                  var nonEmptyBlockExists;
+
+                  if (!toImport || toImport.length < 1) {
+                    return true;
+                  }
+
+                  // A non-empty block is a block containing at least one
+                  // line that is not ignored (due to errors, etc.).
+                  nonEmptyBlockExists = _.any(toImport, function (block) {
+                    return block.rows > block.ignored;
+                  });
+
+                  return !nonEmptyBlockExists;
+                }.bind(this)  // bind the scope object as context
               },
               importing: {
                 class: "btn-draft",
