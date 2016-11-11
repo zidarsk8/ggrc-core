@@ -10,6 +10,7 @@ import collections
 
 import flask
 import sqlalchemy as sa
+from sqlalchemy.orm import undefer
 
 from ggrc import db
 from ggrc import models
@@ -257,6 +258,7 @@ class QueryHelper(object):
       return set()
     object_class = self.object_map[object_name]
     query = object_class.query
+    query = query.options(undefer('updated_at'))
 
     requested_permissions = object_query.get("permissions", "read")
     with benchmark("Get permissions: _get_objects > _get_type_query"):
