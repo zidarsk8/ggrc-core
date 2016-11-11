@@ -21,6 +21,7 @@
     },
     '{CMS.Models.Comment} created': function (model, ev, instance) {
       var parentDfd;
+      var permissionRefresh;
       var source;
 
       if (!(instance instanceof CMS.Models.Comment)) {
@@ -29,8 +30,10 @@
 
       source = instance._source_mapping || GGRC.page_instance();
       parentDfd = this._create_relationship(source, instance);
+      permissionRefresh = Permission.refresh();
 
-      instance.delay_resolving_save_until($.when(parentDfd));
+      instance.delay_resolving_save_until(
+        $.when(parentDfd, permissionRefresh));
     }
   });
 

@@ -1494,13 +1494,14 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     return this.page_loader.load({data: [params]})
       .then(function (data) {
         var total = data.total;
+        var countsName = this.options.counts_name || params.object_name;
         this.options.attr('paging.total', total);
         this.options.attr('paging.count',
           Math.ceil(data.total / this.options.paging.pageSize));
 
-        if (!params.filters.expression.right &&
-          total !== queryAPI.getCounts().attr(params.object_name)) {
-          queryAPI.getCounts().attr(params.object_name, total);
+        if (!this.options.paging.filter &&
+          total !== queryAPI.getCounts().attr(countsName)) {
+          queryAPI.getCounts().attr(countsName, total);
         }
         return data.values;
       }.bind(this));
