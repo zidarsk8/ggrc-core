@@ -42,6 +42,22 @@
             // items from the list.
             binding.list.splice(0, binding.list.length);
             return binding.loader.refresh_list(binding);
+          })
+          .then(function () {
+            var pageInstance = GGRC.page_instance();
+            var WorkflowExtension =
+              GGRC.extensions.find(function (extension) {
+                return extension.name === 'workflows';
+              });
+
+            $('body').trigger('treeupdate');
+            return GGRC.Utils.QueryAPI
+              .initCounts([
+                WorkflowExtension.countsMap.history
+              ], {
+                type: pageInstance.type,
+                id: pageInstance.id
+              });
           });
       }
     }
