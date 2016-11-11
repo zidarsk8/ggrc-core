@@ -1531,7 +1531,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         this.element.children('.cms_controllers_tree_view_node').remove();
         this._loading_finished();
         GGRC.Errors.notifier('warning',
-          'Filter format is incorrect, data cannot be filtered.')();
+          'Filter format is incorrect, data cannot be filtered.');
       }.bind(this));
   },
   '{paging} change': _.debounce(

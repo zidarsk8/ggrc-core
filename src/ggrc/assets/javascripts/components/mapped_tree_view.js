@@ -91,7 +91,7 @@
                 return mapping.documentable.reify();
               }
             })
-            .fail(GGRC.Errors.notifier('error'));
+            .fail(GGRC.Errors.notifierXHR('error'));
         });
       }
     }
