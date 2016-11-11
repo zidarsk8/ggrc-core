@@ -32,10 +32,44 @@
 
   var draftOnUpdateMixin;
 
+  var historyWidgetCountsName = 'cycles:history';
+  var currentWidgetCountsName = 'cycles:active';
+
+  var historyWidgetFilter = {
+    expression: {
+      op: {name: '='},
+      left: 'is_current',
+      right: 0
+    }
+  };
+
+  var currentWidgetFilter = {
+    expression: {
+      op: {name: '='},
+      left: 'is_current',
+      right: 1
+    }
+  };
+
   // Register `workflows` extension with GGRC
   GGRC.extensions.push(WorkflowExtension);
 
   WorkflowExtension.name = 'workflows';
+
+  WorkflowExtension.countsMap = {
+    history: {
+      name: 'Cycle',
+      countsName: historyWidgetCountsName,
+      additionalFilter: historyWidgetFilter
+    },
+    activeCycles: {
+      name: 'Cycle',
+      countsName: currentWidgetCountsName,
+      additionalFilter: currentWidgetFilter
+    },
+    person: 'Person',
+    taskGroup: 'TaskGroup'
+  };
 
   // Register Workflow models for use with `infer_object_type`
   WorkflowExtension.object_type_decision_tree = function () {
@@ -581,15 +615,9 @@
         draw_children: true,
         parent_instance: object,
         model: 'Cycle',
-        counts_name: 'cycles:history',
+        counts_name: historyWidgetCountsName,
         mapping: 'previous_cycles',
-        additional_filter: {
-          expression: {
-            op: {name: '='},
-            left: 'is_current',
-            right: 0
-          }
-        }
+        additional_filter: historyWidgetFilter
       }
     };
 
@@ -604,15 +632,9 @@
         draw_children: true,
         parent_instance: object,
         model: 'Cycle',
-        counts_name: 'cycles:active',
+        counts_name: currentWidgetCountsName,
         mapping: 'current_cycle',
-        additional_filter: {
-          expression: {
-            op: {name: '='},
-            left: 'is_current',
-            right: 1
-          }
-        },
+        additional_filter: currentWidgetFilter,
         header_view: GGRC.mustache_path + '/cycles/tree_header.mustache',
         add_item_view:
           GGRC.mustache_path +
@@ -625,22 +647,10 @@
 
     GGRC.Utils.QueryAPI
       .initCounts([
-        {
-          name: 'Cycle',
-          countsName:
-            historyWidgetDescriptor.content_controller_options.counts_name,
-          additionalFilter:
-            historyWidgetDescriptor.content_controller_options.additional_filter
-        },
-        {
-          name: 'Cycle',
-          countsName:
-            currentWidgetDescriptor.content_controller_options.counts_name,
-          additionalFilter:
-            currentWidgetDescriptor.content_controller_options.additional_filter
-        },
-        'Person',
-        'TaskGroup'
+        WorkflowExtension.countsMap.history,
+        WorkflowExtension.countsMap.activeCycles,
+        WorkflowExtension.countsMap.person,
+        WorkflowExtension.countsMap.taskGroup
       ], {
         type: object.type,
         id: object.id
