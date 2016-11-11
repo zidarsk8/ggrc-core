@@ -5,7 +5,7 @@
 
 (function(can, $) {
 
-  can.Component.extend({
+  GGRC.Components('csvImportWidget', {
     tag: "csv-import",
     template: "<content></content>",
     requestData: null,
