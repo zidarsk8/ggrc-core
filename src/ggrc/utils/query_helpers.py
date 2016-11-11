@@ -9,6 +9,7 @@ from sqlalchemy import or_
 from sqlalchemy import true
 from sqlalchemy import union
 from sqlalchemy import alias
+from sqlalchemy.orm import aliased
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.models.object_person import ObjectPerson
@@ -17,7 +18,7 @@ from ggrc.models.relationship import Relationship
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.rbac import permissions as pr
 from ggrc_basic_permissions import backlog_workflows
-from ggrc_basic_permissions.models import UserRole
+from ggrc_basic_permissions.models import UserRole, Role
 from ggrc_workflows.models import Cycle
 
 
@@ -203,13 +204,50 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
         ).filter(or_(*model_type_queries)).distinct()
     return model_type_query
 
+  def _get_context_relationships():
+    """Load list of objects related on contexts and objects types.
+
+    This code handles the case when user is added as `Auditor` and should be
+    able to see objects mapped to the `Program` on `My Work` page.
+
+    Returns:
+      objects (list((id, type, None))): Related objects
+    """
+    user_role_query = db.session.query(UserRole.context_id).join(
+        Role, UserRole.role_id == Role.id).filter(and_(
+            UserRole.person_id == contact_id, Role.name == 'Auditor')
+    )
+
+    _ct = aliased(all_models.Context, name="c")
+    _rl = aliased(all_models.Relationship, name="rl")
+    context_query = db.session.query(
+        _rl.source_id.label('id'),
+        _rl.source_type.label('type'),
+        literal(None)).join(_ct, and_(
+            _ct.id.in_(user_role_query),
+            _rl.destination_id == _ct.related_object_id,
+            _rl.destination_type == _ct.related_object_type,
+            _rl.source_type.in_(model_names),
+        )).union(db.session.query(
+            _rl.destination_id.label('id'),
+            _rl.destination_type.label('type'),
+            literal(None)).join(_ct, and_(
+                _ct.id.in_(user_role_query),
+                _rl.source_id == _ct.related_object_id,
+                _rl.source_type == _ct.related_object_type,
+                _rl.destination_type.in_(model_names),)))
+
+    return context_query
+
   # Note: We don't return mapped objects for the Creator because being mapped
   # does not give the Creator necessary permissions to view the object.
   if not is_creator:
     type_union_queries.append(_get_object_people())
+
   type_union_queries.extend((_get_object_owners(),
                             _get_object_mapped_ca(),
-                            _get_objects_user_assigned()))
+                            _get_objects_user_assigned(),
+                            _get_context_relationships(),))
 
   for model in type_models:
     query = _get_model_specific_query(model)
