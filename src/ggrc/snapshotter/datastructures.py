@@ -44,6 +44,13 @@ class Pair(collections.namedtuple("Pair", ["parent", "child"])):
     return cls(Stub(_tuple[parent_type], _tuple[parent_id]),
                Stub(_tuple[child_type], _tuple[child_id]))
 
+  @classmethod
+  def from_snapshot(cls, snapshot):
+    return cls(
+        Stub.from_object(snapshot.parent),
+        Stub(snapshot.child_type, snapshot.child_id)
+    )
+
   def to_4tuple(self):
     return self.parent.type, self.parent.id, self.child.type, self.child.id
 
