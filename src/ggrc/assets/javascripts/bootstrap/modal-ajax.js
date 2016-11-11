@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function ($) {
+(function ($, Permission) {
   'use strict';
 
   function preload_content() {
@@ -211,6 +211,7 @@
     'form': function ($target, $trigger, option) {
       var form_target = $trigger.data('form-target')
       , object_params = $trigger.attr('data-object-params')
+      , triggerParent = $trigger.closest('.add-button')
       , model = CMS.Models[$trigger.attr('data-object-singular')] || CMS.ModelHelpers[$trigger.attr('data-object-singular')]
       , mapping = $trigger.data('mapping')
       , instance;
@@ -299,7 +300,16 @@
           }
 
           $trigger.trigger('routeparam', $trigger.data('route'));
-          $trigger.trigger('modal:success', Array.prototype.slice.call(arguments, 1));
+
+          if (triggerParent && triggerParent.length) {
+            $trigger = triggerParent;
+          }
+
+          Permission.refresh().then(function () {
+            $trigger.trigger(
+              'modal:success', Array.prototype.slice.call(arguments, 1)
+            );
+          });
         }
       });
     },
@@ -569,4 +579,4 @@
       }
     );
   });
-})(window.jQuery);
+})(window.jQuery, window.Permission);

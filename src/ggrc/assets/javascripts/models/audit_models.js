@@ -45,7 +45,7 @@
           }).save();
         });
       }
-    }).then(Permission.refresh);
+    }).then(Permission.refresh());
   }
   can.Model.Cacheable('CMS.Models.Audit', {
     root_object: 'audit',

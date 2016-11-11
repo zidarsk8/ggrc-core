@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $, Permission) {
+(function (can, $) {
 can.Control('GGRC.Controllers.Modals', {
   BUTTON_VIEW_DONE: GGRC.mustache_path + '/modals/done_buttons.mustache',
   BUTTON_VIEW_CLOSE: GGRC.mustache_path + '/modals/close_buttons.mustache',
@@ -67,11 +67,6 @@ can.Control('GGRC.Controllers.Modals', {
     } else {
       this.after_preload();
     }
-    if (this.options.$trigger) {
-      this.options
-        .attr('$triggerParent', this.options.$trigger.closest('.add-button'));
-    }
-
     //this.options.attr("mapping", !!this.options.mapping);
   }
   , after_preload : function(content) {
@@ -941,26 +936,16 @@ can.Control('GGRC.Controllers.Modals', {
 
       ajd = instance.save();
       ajd.fail(this.save_error.bind(this))
-        .then(function (obj) {
+        .done(function (obj) {
           function finish() {
-            var objectArray = [obj];
-            var triggerParent = that.options.$triggerParent;
             delete that.disable_hide;
             if (that.options.add_more) {
-              if (triggerParent && triggerParent.length) {
-                triggerParent.trigger('modal:added', objectArray);
+              if (that.options.$trigger && that.options.$trigger.length) {
+                that.options.$trigger.trigger("modal:added", [obj]);
               }
               that.new_instance();
             } else {
-              objectArray.push({
-                map_and_save: $('#map-and-save').is(':checked')
-              });
-              if (triggerParent && triggerParent.length) {
-                triggerParent.trigger('modal:success', objectArray);
-              } else {
-                that.element.trigger('modal:success', objectArray);
-              }
-              that.element.modal_form('hide');
+              that.element.trigger("modal:success", [obj, {map_and_save: $("#map-and-save").is(':checked')}]).modal_form("hide");
               that.update_hash_fragment();
             }
           }
@@ -997,9 +982,9 @@ can.Control('GGRC.Controllers.Modals', {
             $(document.body).trigger("ajax:flash", { success : msg });
             finish();
           }
-        }).then(Permission.refresh);
-    this.save_ui_status();
-    return ajd;
+        });
+      this.save_ui_status();
+      return ajd;
   },
   save_error: function (_, error) {
     $('html, body').animate({
@@ -1043,7 +1028,7 @@ can.Control('GGRC.Controllers.Modals', {
   },
 
   should_update_hash_fragment: function () {
-    var $trigger = this.options.$triggerParent;
+    var $trigger = this.options.$trigger;
 
     if (!$trigger) {
       return false;
@@ -1054,17 +1039,16 @@ can.Control('GGRC.Controllers.Modals', {
   update_hash_fragment: function () {
     if (!this.should_update_hash_fragment()) return;
 
-    var hash = window.location.hash.split('/')[0];
-    var treeController = this.options
-            .$triggerParent
-            .closest('.cms_controllers_tree_view_node')
+    var hash = window.location.hash.split('/')[0],
+        tree_controller = this.options
+            .$trigger
+            .closest(".cms_controllers_tree_view_node")
             .control();
 
-    hash += [treeController ?
-            treeController.hash_fragment() :
-            '',
-            this.options.instance.hash_fragment()]
-            .join('/');
+    hash += [tree_controller
+             ? tree_controller.hash_fragment()
+             : "",
+             this.options.instance.hash_fragment()].join('/');
 
     window.location.hash = hash;
   }
@@ -1356,4 +1340,4 @@ can.Component.extend({
     }
   },
 });
-})(window.can, window.can.$, window.Permission);
+})(window.can, window.can.$);
