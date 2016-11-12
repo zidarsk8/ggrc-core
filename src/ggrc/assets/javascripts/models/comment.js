@@ -74,6 +74,18 @@
           });
           this.attr('description', ev.oldVal);
         }.bind(this));
+    },
+
+    /**
+     * Return the "name" of the comment as represented to end users.
+     *
+     * If the "value" of the comment (i.e. its description) does not exist,
+     * an empty string is returned.
+     *
+     * @return {String} - an end user-friendly "name" of the comment
+     */
+    display_name: function () {
+      return this.description || '';
     }
   });
 })(window.can, window.GGRC, window.CMS);
