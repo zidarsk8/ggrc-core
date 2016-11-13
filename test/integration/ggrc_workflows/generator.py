@@ -1,14 +1,20 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from datetime import date
-from ggrc import db
-from ggrc import builder
-from ggrc_workflows.models import (Workflow, TaskGroup, TaskGroupTask,
-                                   TaskGroupObject, Cycle)
-from integration.ggrc.generator import Generator
 import random
 import copy
+
+from datetime import date
+
+from ggrc import db
+from ggrc import builder
+from ggrc_workflows.models import Cycle
+from ggrc_workflows.models import TaskGroup
+from ggrc_workflows.models import TaskGroupObject
+from ggrc_workflows.models import TaskGroupTask
+from ggrc_workflows.models import Workflow
+from integration.ggrc.generator import Generator
+from integration.ggrc.models import factories
 
 
 class WorkflowsGenerator(Generator):
@@ -22,7 +28,7 @@ class WorkflowsGenerator(Generator):
 
     tgs = data.pop("task_groups", [])
 
-    wf = Workflow(title="wf " + self.random_str())
+    wf = Workflow(title="wf " + factories.random_str())
     obj_dict = self.obj_to_dict(wf, obj_name)
     obj_dict[obj_name].update(data)
 
@@ -45,7 +51,7 @@ class WorkflowsGenerator(Generator):
     workflow = self._session_add(workflow)
 
     tg = TaskGroup(
-      title="tg " + self.random_str(),
+      title="tg " + factories.random_str(),
       workflow_id=workflow.id,
       context_id=workflow.context.id,
       contact_id=1
@@ -76,7 +82,7 @@ class WorkflowsGenerator(Generator):
     tgt = TaskGroupTask(
       task_group_id=task_group.id,
       context_id=task_group.context.id,
-      title="tgt " + self.random_str(),
+      title="tgt " + factories.random_str(),
       start_date=default_start,
       end_date=default_end,
       relative_start_day=random.randrange(1, day_range),

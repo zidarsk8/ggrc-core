@@ -13,6 +13,7 @@ use the object generator in the ggrc.generator module.
 # pylint: disable=no-init
 
 import random
+import string
 
 import factory
 
@@ -23,11 +24,9 @@ from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 
 
-def random_string(prefix=''):
-  return '{prefix}{suffix}'.format(
-      prefix=prefix,
-      suffix=random.randint(0, 9999999999),
-  )
+def random_str(length=8, prefix="", chars=None):
+  chars = chars or string.ascii_uppercase + string.digits + "  _.-"
+  return prefix + "".join(random.choice(chars) for _ in range(length))
 
 
 class ModelFactory(factory.Factory):
@@ -69,7 +68,7 @@ class ModelFactory(factory.Factory):
 
 
 class TitledFactory(factory.Factory):
-  title = factory.LazyAttribute(lambda m: random_string('title'))
+  title = factory.LazyAttribute(lambda m: random_str(prefix='title'))
 
 
 class CustomAttributeDefinitionFactory(ModelFactory, TitledFactory):
@@ -128,7 +127,7 @@ class ControlCategoryFactory(ModelFactory):
   class Meta:
     model = models.ControlCategory
 
-  name = factory.LazyAttribute(lambda m: random_string('name'))
+  name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
   lft = None
   rgt = None
   scope_id = None
@@ -154,7 +153,7 @@ class ContextFactory(ModelFactory):
     model = models.Context
 
   name = factory.LazyAttribute(
-      lambda obj: random_string("SomeObjectType Context"))
+      lambda obj: random_str(prefix="SomeObjectType Context"))
   related_object = None
 
 
@@ -163,8 +162,8 @@ class ProgramFactory(ModelFactory):
   class Meta:
     model = models.Program
 
-  title = factory.LazyAttribute(lambda _: random_string("program_title"))
-  slug = factory.LazyAttribute(lambda _: random_string(""))
+  title = factory.LazyAttribute(lambda _: random_str(prefix="program_title"))
+  slug = factory.LazyAttribute(lambda _: random_str())
 
 
 class AuditFactory(ModelFactory):
@@ -172,8 +171,8 @@ class AuditFactory(ModelFactory):
   class Meta:
     model = models.Audit
 
-  title = factory.LazyAttribute(lambda _: random_string("audit title "))
-  slug = factory.LazyAttribute(lambda _: random_string(""))
+  title = factory.LazyAttribute(lambda _: random_str(prefix="audit title "))
+  slug = factory.LazyAttribute(lambda _: random_str())
   status = "Planned"
   program_id = factory.LazyAttribute(lambda _: ProgramFactory().id)
   context_id = factory.LazyAttribute(lambda _: ContextFactory().id)
@@ -196,11 +195,11 @@ class AssessmentTemplateFactory(ModelFactory):
     model = models.AssessmentTemplate
 
   title = factory.LazyAttribute(
-      lambda _: random_string("assessment template title"))
+      lambda _: random_str(prefix="assessment template title"))
   template_object_type = None
   test_plan_procedure = False
   procedure_description = factory.LazyAttribute(
-      lambda _: random_string("lorem ipsum description"))
+      lambda _: random_str(length=100))
   default_people = {"assessors": "Object Owners",
                     "verifiers": "Object Owners"}
 

@@ -5,7 +5,6 @@
 
 import datetime
 import random
-import string
 
 import names
 
@@ -15,6 +14,7 @@ from ggrc.app import app
 from ggrc.services import common
 from ggrc_basic_permissions import models as permissions_models
 from integration.ggrc import api_helper
+from integration.ggrc.models import factories
 
 
 class Generator(object):
@@ -23,11 +23,6 @@ class Generator(object):
   def __init__(self):
     self.api = api_helper.Api()
     self.resource = common.Resource()
-
-  @staticmethod
-  def random_str(length=8,
-                 chars=string.ascii_uppercase + string.digits + "  _.-"):
-    return ''.join(random.choice(chars) for _ in range(length))
 
   @staticmethod
   def random_date(start=datetime.date.today(), end=None):
@@ -112,7 +107,7 @@ class ObjectGenerator(Generator):
     if add_fields:
       obj_dict[obj_name].update({
           "owners": [self.create_stub(models.Person.query.first())],
-          "title": self.random_str(),
+          "title": factories.random_str(),
       })
     obj_dict[obj_name].update(data)
     return self.generate(obj_class, obj_name, obj_dict)
@@ -252,11 +247,11 @@ class ObjectGenerator(Generator):
     obj_name = "custom_attribute_definition"
     data = {
         obj_name: {
-            "title": kwargs.get("title", self.random_str()),
+            "title": kwargs.get("title", factories.random_str()),
             "custom_attribute_definitions": [],
             "custom_attributes": {},
             "definition_type": definition_type,
-            "modal_title": kwargs.get("modal_title", self.random_str()),
+            "modal_title": kwargs.get("modal_title", factories.random_str()),
             "attribute_type": kwargs.get("attribute_type", "Text"),
             "mandatory": kwargs.get("mandatory", False),
             "helptext": kwargs.get("helptext", None),
@@ -274,7 +269,7 @@ class ObjectGenerator(Generator):
     obj_name = "custom_attribute_value"
     data = {
         obj_name: {
-            "title": kwargs.get("title", self.random_str()),
+            "title": kwargs.get("title", factories.random_str()),
             "custom_attribute_id": custom_attribute_id,
             "attributable_type": attributable.__class__.__name__,
             "attributable_id": attributable.id,
