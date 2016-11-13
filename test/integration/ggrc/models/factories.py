@@ -67,11 +67,11 @@ class ModelFactory(factory.Factory):
     return user
 
 
-class TitledFactory(factory.Factory):
-  title = factory.LazyAttribute(lambda m: random_str(prefix='title'))
+class TitledFactory(ModelFactory):
+  title = factory.LazyAttribute(lambda m: random_str(prefix='title '))
 
 
-class CustomAttributeDefinitionFactory(ModelFactory, TitledFactory):
+class CustomAttributeDefinitionFactory(TitledFactory):
 
   class Meta:
     model = models.CustomAttributeDefinition
@@ -94,13 +94,13 @@ class CustomAttributeValueFactory(ModelFactory):
   attribute_object_id = None
 
 
-class DirectiveFactory(ModelFactory, TitledFactory):
+class DirectiveFactory(TitledFactory):
 
   class Meta:
     model = models.Directive
 
 
-class ControlFactory(ModelFactory, TitledFactory):
+class ControlFactory(TitledFactory):
 
   class Meta:
     model = models.Control
@@ -116,7 +116,7 @@ class ControlFactory(ModelFactory, TitledFactory):
   notes = None
 
 
-class AssessmentFactory(ModelFactory, TitledFactory):
+class AssessmentFactory(TitledFactory):
 
   class Meta:
     model = models.Assessment
@@ -157,25 +157,20 @@ class ContextFactory(ModelFactory):
   related_object = None
 
 
-class ProgramFactory(ModelFactory):
+class ProgramFactory(TitledFactory):
 
   class Meta:
     model = models.Program
 
-  title = factory.LazyAttribute(lambda _: random_str(prefix="program_title"))
-  slug = factory.LazyAttribute(lambda _: random_str())
 
-
-class AuditFactory(ModelFactory):
+class AuditFactory(TitledFactory):
 
   class Meta:
     model = models.Audit
 
-  title = factory.LazyAttribute(lambda _: random_str(prefix="audit title "))
-  slug = factory.LazyAttribute(lambda _: random_str())
   status = "Planned"
-  program_id = factory.LazyAttribute(lambda _: ProgramFactory().id)
-  context_id = factory.LazyAttribute(lambda _: ContextFactory().id)
+  program = factory.LazyAttribute(lambda _: ProgramFactory())
+  context = factory.LazyAttribute(lambda _: ContextFactory())
 
 
 class SnapshotFactory(ModelFactory):
@@ -189,13 +184,11 @@ class SnapshotFactory(ModelFactory):
   revision_id = 0
 
 
-class AssessmentTemplateFactory(ModelFactory):
+class AssessmentTemplateFactory(TitledFactory):
 
   class Meta:
     model = models.AssessmentTemplate
 
-  title = factory.LazyAttribute(
-      lambda _: random_str(prefix="assessment template title"))
   template_object_type = None
   test_plan_procedure = False
   procedure_description = factory.LazyAttribute(
@@ -259,13 +252,13 @@ class ObjectDocumentFactory(ModelFactory):
     model = models.ObjectDocument
 
 
-class RegulationFactory(ModelFactory, TitledFactory):
+class RegulationFactory(TitledFactory):
 
   class Meta:
     model = models.Regulation
 
 
-class RequestFactory(ModelFactory, TitledFactory):
+class RequestFactory(TitledFactory):
 
   class Meta:
     model = models.Request
@@ -273,25 +266,25 @@ class RequestFactory(ModelFactory, TitledFactory):
   request_type = "documentation"
 
 
-class OrgGroupFactory(ModelFactory, TitledFactory):
+class OrgGroupFactory(TitledFactory):
 
   class Meta:
-    model = models.Regulation
+    model = models.OrgGroup
 
 
-class ProcessFactory(ModelFactory, TitledFactory):
-
-  class Meta:
-    model = models.Regulation
-
-
-class PolicyFactory(ModelFactory, TitledFactory):
+class ProcessFactory(TitledFactory):
 
   class Meta:
-    model = models.Regulation
+    model = models.Process
 
 
-class MarketFactory(ModelFactory, TitledFactory):
+class PolicyFactory(TitledFactory):
 
   class Meta:
-    model = models.Regulation
+    model = models.Policy
+
+
+class MarketFactory(TitledFactory):
+
+  class Meta:
+    model = models.Market
