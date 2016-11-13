@@ -39,6 +39,7 @@ class Generator(object):
 
   def generate(self, obj_class, obj_name=None, data=None):
     """Generate `obj_class` instance with fields populated from `data`."""
+    # pylint: disable=protected-access
     if obj_name is None:
       obj_name = obj_class._inflector.table_plural
     if data is None:
@@ -86,22 +87,33 @@ class ObjectGenerator(Generator):
         "type": obj.type,
     }
 
-  def generate_object(self, obj_class, data=None):
-    """Generate an object of `obj_class` with fields from `data`."""
+  def generate_object(self, obj_class, data=None, add_fields=True):
+    """Generate an object of `obj_class` with fields from `data`.
+
+    This generator is used for creating objects with data. By default it will
+    add the first user in the DB as the object owner and it will create a
+    random title.
+
+    Args:
+      obj_class: Model that we want to generate.
+      add_fields: Flag for adding owners and title default field values. If
+        these are present in the data, default values will be overridden.
+      data: Dict containing generation data for the object.
+
+    Returns:
+      Tuple containing server response and the generated object.
+    """
     # pylint: disable=protected-access
     if data is None:
       data = {}
     obj_name = obj_class._inflector.table_singular
     obj = obj_class()
     obj_dict = self.obj_to_dict(obj, obj_name)
-    obj_dict[obj_name].update({
-        "owners": [{
-            "id": 1,
-            "href": "/api/people/1",
-            "type": "Person"
-        }],
-        "title": self.random_str(),
-    })
+    if add_fields:
+      obj_dict[obj_name].update({
+          "owners": [self.create_stub(models.Person.query.first())],
+          "title": self.random_str(),
+      })
     obj_dict[obj_name].update(data)
     return self.generate(obj_class, obj_name, obj_dict)
 
@@ -127,7 +139,8 @@ class ObjectGenerator(Generator):
         "context": context,
     }
     data.update(kwargs)
-    return self.generate_object(models.Relationship, data=data)
+    return self.generate_object(
+        models.Relationship, add_fields=False, data=data)
 
   def generate_comment(self, commentable, assignee_type, description,
                        **kwargs):
@@ -154,7 +167,8 @@ class ObjectGenerator(Generator):
         "context": self.create_stub(commentable),
     }
     data.update(kwargs)
-    response, comment_ = self.generate_object(models.Comment, data=data)
+    response, comment_ = self.generate_object(
+        models.Comment, add_fields=False, data=data)
     # Refresh the object after an API call.
     commentable = commentable.__class__.query.get(commentable.id)
     self.generate_relationship(commentable, comment_, commentable.context)
