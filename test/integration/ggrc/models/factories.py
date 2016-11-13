@@ -1,7 +1,13 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Factories for models"""
+"""Factories for ggrc models.
+
+These are factories for generating regular ggrc models. The factories create a
+model and log a post event with the model revision. These do not however
+trigger signals. For tests that rely on proper signals being triggered, we must
+use the object generator in the ggrc.generator module.
+"""
 
 # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
 # pylint: disable=no-init
@@ -12,6 +18,7 @@ import factory
 
 from ggrc import db
 from ggrc import models
+from ggrc.login import noop
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
 
@@ -30,21 +37,35 @@ class ModelFactory(factory.Factory):
     indexer = get_indexer()
     instance = target_class(*args, **kwargs)
     db.session.add(instance)
-    db.session.flush()
-    revision = models.Revision(instance, 1, 'created', instance.log_json())
-    event = models.Event(
-        modified_by_id=1,
-        action="POST",
-        resource_id=instance.id,
-        resource_type=instance.type,
-        context_id=instance.context_id,
-        revisions = [revision],
-    )
-    db.session.add(revision)
-    db.session.add(event)
-    indexer.create_record(fts_record_for(instance), commit=False)
+    if hasattr(instance, "log_json"):
+      db.session.flush()
+      user = cls._get_user()
+      revision = models.Revision(instance, user.id, 'created', instance.log_json())
+      event = models.Event(
+          modified_by=user,
+          action="POST",
+          resource_id=instance.id,
+          resource_type=instance.type,
+          context=instance.context,
+          revisions = [revision],
+      )
+      db.session.add(revision)
+      db.session.add(event)
+      indexer.create_record(fts_record_for(instance), commit=False)
     db.session.commit()
     return instance
+
+  @staticmethod
+  def _get_user():
+    user = models.Person.query.first()
+    if not user:
+      user = models.Person(
+        name=noop.default_user_name,
+        email=noop.default_user_email,
+      )
+      db.session.add(user)
+      db.session.flush()
+    return user
 
 
 class TitledFactory(factory.Factory):
