@@ -734,7 +734,9 @@
       if (!this.custom_attribute_definitions) {
         this.attr('custom_attribute_definitions', new can.List());
       }
-      this.attr('_objectTypes', this._choosableObjectTypes());
+      if (!this.attr('_objectTypes')) {
+        this.attr('_objectTypes', this._choosableObjectTypes());
+      }
       this._unpackPeopleData();
 
       this._updateDropdownEnabled('assessors');
@@ -752,6 +754,11 @@
 
       return this._super.apply(this, arguments);
     },
+
+    before_save: function () {
+      this.attr('_objectTypes', undefined);
+    },
+
     after_save: function () {
       if (this.audit) {
         this.audit.reify().refresh('related_assessment_templates');

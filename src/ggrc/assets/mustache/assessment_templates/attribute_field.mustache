@@ -6,21 +6,22 @@
 {{^field._pending_delete}}
   <div class="span-custom2-and-half">{{field.title}}</div>
   <div class="span-custom1-and-half">{{field.attribute_name}}</div>
-  <div class="span2">
+  <div class="span5">
     {{#attrs}}
-      <span class="block single-line" title="{{.}}">{{.}}</span>
+        <div class="row">
+            <div class="span5">
+                <span class="block single-line" title="{{value}}">{{value}}</span>
+            </div>
+            <div class="span5 centered checkbox-wrap">
+                <input can-value="attachment" type="checkbox">
+            </div>
+            <div class="span2 centered checkbox-wrap">
+                <input can-value="comment" type="checkbox">
+            </div>
+        </div>
     {{/attrs}}
   </div>
-  <div class="span2 centered checkbox-wrap">
-    {{#attrs}}
-      <input can-value="field.opts.attachment-{{.}}" type="checkbox">
-    {{/attrs}}
-  </div>
-  <div class="span1 centered checkbox-wrap">
-    {{#attrs}}
-      <input can-value="field.opts.comment-{{.}}" type="checkbox">
-    {{/attrs}}
-  </div>
+
   <div class="span1 centered checkbox-wrap">
     <input type="checkbox" can-value="field.mandatory">
   </div>
