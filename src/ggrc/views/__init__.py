@@ -158,6 +158,15 @@ def get_attributes_json():
 
 
 def get_import_types(export_only=False):
+  """Returns types that can be imported (and exported) or exported only.
+
+  Args:
+    export_only (default False): If set to true, return objects that can only
+        be exported and not imported.
+  Returns:
+    A list of models with model_singular and title_plural as keys.
+  """
+  # pylint: disable=protected-access
   types = get_exportables if export_only else get_importables
   data = []
   for model in set(types().values()):
