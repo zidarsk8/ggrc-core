@@ -322,6 +322,15 @@
         return false;
       }
 
+      // special check for snapshot:
+      if (options &&
+          options.context &&
+          options.context.parent_instance &&
+          options.context.parent_instance.snapshot) {
+        // Avoid add mapping for snapshot
+        return false;
+      }
+
       canonical = GGRC.Mappings.get_canonical_mapping_name(
         sourceType, targetType);
       canonicalMapping = GGRC.Mappings.get_canonical_mapping(
