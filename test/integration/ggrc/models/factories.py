@@ -33,26 +33,33 @@ class ModelFactory(factory.Factory):
 
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
-    indexer = get_indexer()
     instance = target_class(*args, **kwargs)
     db.session.add(instance)
+    if isinstance(instance, models.CustomAttributeValue):
+      cls._log_event(instance.attributable)
     if hasattr(instance, "log_json"):
-      db.session.flush()
-      user = cls._get_user()
-      revision = models.Revision(instance, user.id, 'created', instance.log_json())
-      event = models.Event(
-          modified_by=user,
-          action="POST",
-          resource_id=instance.id,
-          resource_type=instance.type,
-          context=instance.context,
-          revisions = [revision],
-      )
-      db.session.add(revision)
-      db.session.add(event)
-      indexer.create_record(fts_record_for(instance), commit=False)
+      cls._log_event(instance)
     db.session.commit()
     return instance
+
+  @classmethod
+  def _log_event(cls, instance):
+    indexer = get_indexer()
+    db.session.flush()
+    user = cls._get_user()
+    revision = models.Revision(instance, user.id, 'created', instance.log_json())
+    event = models.Event(
+        modified_by=user,
+        action="POST",
+        resource_id=instance.id,
+        resource_type=instance.type,
+        context=instance.context,
+        revisions = [revision],
+    )
+    db.session.add(revision)
+    db.session.add(event)
+    indexer.update_record(fts_record_for(instance), commit=False)
+
 
   @staticmethod
   def _get_user():
@@ -178,7 +185,7 @@ class SnapshotFactory(ModelFactory):
   class Meta:
     model = models.Snapshot
 
-  parent = factory.LazyAttribute(lambda _: ProgramFactory().id)
+  parent = factory.LazyAttribute(lambda _: AuditFactory())
   child_id = 0
   child_type = ""
   revision_id = 0
