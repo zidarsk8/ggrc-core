@@ -5,14 +5,9 @@
 
 """Tests for /query api endpoint."""
 
-from datetime import datetime
-from operator import itemgetter
-from flask import json
-from nose.plugins.skip import SkipTest
 
-from ggrc import db
 from ggrc import views
-from ggrc.models import CustomAttributeDefinition as CAD
+from ggrc import models
 
 from integration.ggrc.converters import TestCase
 from integration.ggrc.models import factories
@@ -23,15 +18,44 @@ class BaseQueryAPITestCase(TestCase):
 
   def setUp(self):
     """Log in before performing queries."""
-    # we don't call super as TestCase.setUp clears the DB
-    # super(BaseQueryAPITestCase, self).setUp()
+    super(BaseQueryAPITestCase, self).setUp()
     self.client.get("/login")
 
   def _setup_objects(self):
+    text_cad = factories.CustomAttributeDefinitionFactory(
+        definition_type="market",
+    )
+    date_cad = factories.CustomAttributeDefinitionFactory(
+        definition_type="market",
+        attribute_type="Text",
+    )
     audit = factories.AuditFactory()
-    factories.MarketFactory()
-    factories.MarketFactory()
+    for i in range(5):
+      market = factories.MarketFactory()
+      factories.CustomAttributeValueFactory(
+          custom_attribute=date_cad,
+          attributable=market,
+          attribute_value="2016-11-0{}".format(i + 1),
+      )
+      factories.CustomAttributeValueFactory(
+          custom_attribute=text_cad,
+          attributable=market,
+          attribute_value="2016-11-0{}".format(i + 1),
+      )
 
+    revisions = models.Revision.query.filter(
+        models.Revision.resource_type == "Market")
+
+    self.snapshots = [
+        factories.SnapshotFactory(
+            child_id=revision.resource_id,
+            child_type=revision.resource_type,
+            revision=revision,
+            parent=audit,
+        )
+        for revision in revisions
+    ]
+    views.do_reindex()
 
   def test_basic_query_in(self):
     """Filter by ~ operator."""
