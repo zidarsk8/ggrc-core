@@ -12,7 +12,7 @@ from flask.ext.sqlalchemy import get_debug_queries
 from flask.ext.sqlalchemy import SQLAlchemy
 from tabulate import tabulate
 
-from ggrc import contributions  # noqa: imported so it can be used with getattr
+from ggrc import contributions  # noqa: imported so it can be used with getattr  # pylint: disable=unused-import
 from ggrc import db
 from ggrc import extensions
 from ggrc import notifications
