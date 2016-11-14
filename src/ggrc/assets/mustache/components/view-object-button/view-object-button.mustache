@@ -4,9 +4,16 @@
 }}
 
 {{#if instance.viewLink}}
-    {{#is_allowed "view_object_page" instance}}
-        <a href="{{instance.viewLink}}" target="_blank" class="btn btn-mini btn-outline">
-            Open
-        </a>          
-    {{/is_allowed}}
+  {{#is_allowed "view_object_page" instance}}
+    {{^maximize}}
+    <a href="{{instance.viewLink}}" target="_blank" class="btn btn-mini btn-outline">
+      Open
+    </a>
+    {{/maximize}}
+    {{#maximize}}
+    <a href="#" class="btn btn-mini btn-outline" can-click="maximizeObject">
+      View
+    </a>
+    {{/maximize}}
+  {{/is_allowed}}
 {{/if}}

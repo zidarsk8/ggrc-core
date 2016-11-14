@@ -99,7 +99,10 @@
                       {{{renderLive add_item_view}}}
                     {{/if}}
                   {{/child_options}}
-                  <view-object-button instance="instance" />
+                  {{^is_subtree}}
+                      <view-object-button instance="instance" />
+                  {{/is_subtree}}
+                  <view-object-button instance="instance" maximize="true" />
                 </div>
                 <ul class="tree-action-list">
                   {{#infer_roles instance}}
