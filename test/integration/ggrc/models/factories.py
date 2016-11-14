@@ -47,27 +47,27 @@ class ModelFactory(factory.Factory):
     indexer = get_indexer()
     db.session.flush()
     user = cls._get_user()
-    revision = models.Revision(instance, user.id, 'created', instance.log_json())
+    revision = models.Revision(
+        instance, user.id, 'created', instance.log_json())
     event = models.Event(
         modified_by=user,
         action="POST",
         resource_id=instance.id,
         resource_type=instance.type,
         context=instance.context,
-        revisions = [revision],
+        revisions=[revision],
     )
     db.session.add(revision)
     db.session.add(event)
     indexer.update_record(fts_record_for(instance), commit=False)
-
 
   @staticmethod
   def _get_user():
     user = models.Person.query.first()
     if not user:
       user = models.Person(
-        name=noop.default_user_name,
-        email=noop.default_user_email,
+          name=noop.default_user_name,
+          email=noop.default_user_email,
       )
       db.session.add(user)
       db.session.flush()

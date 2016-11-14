@@ -51,10 +51,10 @@ class WorkflowsGenerator(Generator):
     workflow = self._session_add(workflow)
 
     tg = TaskGroup(
-      title="tg " + factories.random_str(),
-      workflow_id=workflow.id,
-      context_id=workflow.context.id,
-      contact_id=1
+        title="tg " + factories.random_str(),
+        workflow_id=workflow.id,
+        context_id=workflow.context.id,
+        contact_id=1
     )
     obj_dict = self.obj_to_dict(tg, obj_name)
     obj_dict[obj_name].update(data)
@@ -80,16 +80,16 @@ class WorkflowsGenerator(Generator):
     obj_name = "task_group_task"
 
     tgt = TaskGroupTask(
-      task_group_id=task_group.id,
-      context_id=task_group.context.id,
-      title="tgt " + factories.random_str(),
-      start_date=default_start,
-      end_date=default_end,
-      relative_start_day=random.randrange(1, day_range),
-      relative_start_month=random.randrange(1, 12),
-      relative_end_day=random.randrange(1, day_range),
-      relative_end_month=random.randrange(1, 12),
-      contact_id=1
+        task_group_id=task_group.id,
+        context_id=task_group.context.id,
+        title="tgt " + factories.random_str(),
+        start_date=default_start,
+        end_date=default_end,
+        relative_start_day=random.randrange(1, day_range),
+        relative_start_month=random.randrange(1, 12),
+        relative_end_day=random.randrange(1, day_range),
+        relative_end_month=random.randrange(1, 12),
+        contact_id=1
     )
     obj_dict = self.obj_to_dict(tgt, obj_name)
     obj_dict[obj_name].update(data)
@@ -105,10 +105,10 @@ class WorkflowsGenerator(Generator):
     obj_name = "task_group_object"
 
     tgo = TaskGroupObject(
-      object_id=obj.id,
-      object=obj,
-      task_group_id=task_group.id,
-      context_id=task_group.context.id
+        object_id=obj.id,
+        object=obj,
+        task_group_id=task_group.id,
+        context_id=task_group.context.id
     )
     obj_dict = self.obj_to_dict(tgo, obj_name)
 
@@ -123,19 +123,19 @@ class WorkflowsGenerator(Generator):
     obj_name = "cycle"
 
     obj_dict = {
-      obj_name: {
-        "workflow": {
-          "id": workflow.id,
-          "type": workflow.__class__.__name__,
-          "href": "/api/workflows/%d" % workflow.id
-        },
-        "context": {
-          "id": workflow.context.id,
-          "type": workflow.context.__class__.__name__,
-          "href": "/api/workflows/%d" % workflow.context.id
-        },
-        "autogenerate": "true"
-      }
+        obj_name: {
+            "workflow": {
+                "id": workflow.id,
+                "type": workflow.__class__.__name__,
+                "href": "/api/workflows/%d" % workflow.id
+            },
+            "context": {
+                "id": workflow.context.id,
+                "type": workflow.context.__class__.__name__,
+                "href": "/api/workflows/%d" % workflow.context.id
+            },
+            "autogenerate": "true"
+        }
     }
 
     return self.generate(Cycle, obj_name, obj_dict)
@@ -143,8 +143,8 @@ class WorkflowsGenerator(Generator):
   def activate_workflow(self, workflow):
     workflow = self._session_add(workflow)
     return self.modify_workflow(workflow, {
-      "status": "Active",
-      "recurrences": workflow.frequency != "one_time"
+        "status": "Active",
+        "recurrences": workflow.frequency != "one_time"
     })
 
   def modify_workflow(self, wf=None, data={}):
