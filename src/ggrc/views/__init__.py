@@ -261,7 +261,7 @@ def dashboard():
 
 @app.route("/objectBrowser")
 @login_required
-def objectBrowser():
+def object_browser():
   """The object Browser page
   """
   return render_template("dashboard/index.haml")
