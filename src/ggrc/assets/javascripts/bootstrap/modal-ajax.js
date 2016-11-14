@@ -259,6 +259,7 @@
           'The $trigger element was not found in the DOM, thus some',
           'application events will not be propagated.'
         ].join(' ');
+        var args = arguments;
 
         if (form_target == 'refresh') {
           refresh_page();
@@ -307,7 +308,7 @@
 
           Permission.refresh().then(function () {
             $trigger.trigger(
-              'modal:success', Array.prototype.slice.call(arguments, 1)
+              'modal:success', Array.prototype.slice.call(args, 1)
             );
           });
         }

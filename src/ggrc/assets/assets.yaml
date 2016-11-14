@@ -33,11 +33,11 @@ dashboard-js-files:
   - moment-timezone/builds/moment-timezone-with-data.min.js
   - spinjs/spin.js
   # end 3rd party
+  - permission.js
   - bootstrap/wysihtml5.js
   - bootstrap/sticky-popover.js
   - bootstrap/modal-ajax.js
   - bootstrap/modal-form.js
-  - permission.js
   - plugins/lodash_helpers.js
   - plugins/persistent_notifier.js
   - ggrc_base.js
