@@ -85,6 +85,7 @@ def do_reindex():
   indexed_models -= excluded_models
 
   for model in indexed_models:
+    # pylint: disable=protected-access
     mapper_class = model._sa_class_manager.mapper.base_mapper.class_
     query = model.query.options(
         db.undefer_group(mapper_class.__name__ + '_complete'),
