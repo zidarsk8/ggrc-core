@@ -90,8 +90,7 @@ class QueryHelper(object):
   """
 
   def __init__(self, query, ca_disabled=False):
-    importable = get_exportables()
-    self.object_map = {o.__name__: o for o in importable.values()}
+    self.object_map = {o.__name__: o for o in models.all_models.all_models}
     self.query = self._clean_query(query)
     self.ca_disabled = ca_disabled
     self._set_attr_name_map()
@@ -583,11 +582,18 @@ class QueryHelper(object):
         Query predicate if the given predicate matches a value for the correct
           custom attribute.
       """
-      return object_class.id.in_(db.session.query(Record.key).filter(
-              Record.type == object_class.__name__,
-              Record.tags == key,
-              predicate(Record.content)
-          ))
+      if object_class.__name__ == "Snapshot":
+        return object_class.id.in_(db.session.query(Record.key).filter(
+                Record.type == object_class.__name__,
+                Record.property == key,
+                predicate(Record.content)
+            ))
+      else:
+        return object_class.id.in_(db.session.query(Record.key).filter(
+                Record.type == object_class.__name__,
+                Record.tags == key,
+                predicate(Record.content)
+            ))
 
     def with_key(key, p):
       """Apply keys to the filter expression."""

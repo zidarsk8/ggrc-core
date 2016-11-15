@@ -92,6 +92,62 @@ class BaseQueryAPITestCase(TestCase):
     ])
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 5)
 
+  def test_snapshot_attribute_filter(self):
+    """Test filtering snapshots on object attributes."""
+    self._setup_objects()
+
+    result = self._post([
+        {
+            "object_name": "Snapshot",
+            "filters": {
+                "expression": {
+                    "left": self._get_market_expression(),
+                    "op": {"name": "AND"},
+                    "right": {
+                        "left": "title",
+                        "op": {"name": "="},
+                        "right": models.Market.query.first().title,
+                    },
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 1)
+
+  def test_snapshot_ca_filter(self):
+    """Test filtering snapshots on custom attributes."""
+    self._setup_objects()
+
+    result = self._post([
+        {
+            "object_name": "Snapshot",
+            "filters": {
+                "expression": {
+                    "left": self._get_market_expression(),
+                    "op": {"name": "AND"},
+                    "right": {
+                        "left": {
+                            "left": "text cad",
+                            "op": {"name": "="},
+                            "right": "2016-11-01",  # one match
+                        },
+                        "op": {"name": "OR"},
+                        "right": {
+                            "left": "date cad",
+                            "op": {"name": ">"},
+                            "right": "2016-11-05",  # 2 matches
+                        },
+                    },
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 3)
+
   def _get_market_expression(self):
     return {
         "left": {
