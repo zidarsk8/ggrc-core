@@ -1,7 +1,7 @@
 /*!
- Copyright (C) 2016 Google Inc.
- Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
- */
+  Copyright (C) 2016 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
 
 describe('GGRC.Components.templateAttributesField', function () {
   'use strict';
@@ -106,6 +106,60 @@ describe('GGRC.Components.templateAttributesField', function () {
       var result = normalizeMandatory(attrs, pads);
 
       expect(result).toEqual('0,2,1,3');
+    });
+  });
+
+  describe('emitting events', function () {
+    describe('on-remove event', function () {
+      var $root;  // the component's root DOM element
+      var onRemoveCallback;
+
+      beforeEach(function () {
+        var $body = $('body');
+        var docFragment;
+        var htmlSnippet;
+        var renderer;
+        var templateContext;
+
+        onRemoveCallback = jasmine.createSpy('onRemoveCallback');
+
+        htmlSnippet = [
+          '<template-field ',
+          '  field="fieldDefinition"',
+          '  can-on-remove="callMeOnRemove">',
+          '</template-field>'
+        ].join('');
+
+        templateContext = new can.Map({
+          types: new can.List([
+            {
+              type: 'Text',
+              name: 'Text',
+              text: 'Enter description'
+            }
+          ]),
+          fieldDefinition: {
+            attribute_type: 'Text'
+          },
+          callMeOnRemove: onRemoveCallback
+        });
+
+        renderer = can.view.mustache(htmlSnippet);
+        docFragment = renderer(templateContext);
+        $body.append(docFragment);
+
+        $root = $body.find('template-field');
+      });
+
+      afterEach(function () {
+        $root.remove();
+      });
+
+      it('invokes the provided handler when element is removed', function () {
+        var $btnDelete = $root.find('.fa-trash').closest('a');
+        $btnDelete.click();
+        expect(onRemoveCallback).toHaveBeenCalled();
+      });
     });
   });
 });

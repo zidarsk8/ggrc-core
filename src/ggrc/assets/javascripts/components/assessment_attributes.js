@@ -80,11 +80,22 @@
           COMMENT: 0,
           ATTACHMENT: 1
         },
+
+        _EV_FIELD_REMOVED: 'on-remove',
+
         /*
          * Removes `field` from `fields`
          */
         removeField: function (scope, el, ev) {
           ev.preventDefault();
+
+          // CAUTION: In order for the event to not get lost, triggering it
+          // must happen before changing any of the scope attributes that
+          // cause changes in the template.
+          this.$rootEl.triggerHandler({
+            type: this._EV_FIELD_REMOVED
+          });
+
           scope.attr('_pending_delete', true);
         },
         /*
@@ -141,7 +152,14 @@
       };
     },
     events: {
-      init: function () {
+      /**
+       * The component's entry point.
+       *
+       * @param {Object} element - the (unwrapped) DOM element that triggered
+       *   creating the component instance
+       * @param {Object} options - the component instantiation options
+       */
+      init: function (element, options) {
         var field = this.scope.attr('field');
         var pads = this.scope.attr('pads');
         var denormalized = this.scope.denormalize_mandatory(field, pads);
@@ -151,6 +169,8 @@
         });
         this.scope.field.attr('attribute_name', item.name);
         this.scope.attr('attrs', denormalized);
+
+        this.scope.attr('$rootEl', $(element));
       },
       '{attrs} change': function () {
         var attrs = this.scope.attr('attrs');
