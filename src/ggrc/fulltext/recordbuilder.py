@@ -26,7 +26,7 @@ class RecordBuilder(object):
       record_type = obj.attributable_type
       # The name of the attribute property needs to be unique for each object,
       # the value comes from the custom_attribute_value
-      attribute_name = "attribute_value_" + str(obj.id)
+      attribute_name = obj.custom_attribute.title
 
       properties = {}
       if (obj.custom_attribute.attribute_type == "Map:Person" and
@@ -36,9 +36,6 @@ class RecordBuilder(object):
         properties[attribute_name + ".email"] = obj.attribute_object.email
       else:
         properties[attribute_name] = obj.attribute_value
-
-      # Store the title of the CA to enable searching by it
-      properties["tags"] = obj.custom_attribute.title
 
     return Record(
         # This logic saves custom attribute values as attributes of the object
