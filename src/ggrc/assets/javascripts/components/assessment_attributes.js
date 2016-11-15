@@ -39,7 +39,23 @@
         type: 'Map:Person',
         name: 'Person',
         text: ''
-      }])
+      }]),
+
+      /**
+       * A handler for when a user removes a Custom Attribute Definition.
+       *
+       * It removes the corresponding CA definition object from the list to
+       * keep it in sync with the definitions listed in DOM.
+       *
+       * @param {CMS.Models.CustomAttributeDefinition} instance -
+       *   the definition that was removed
+       * @param {jQuery.Element} $el - the source of the event `ev`
+       * @param {jQuery.Event} ev - the onRemove event object
+       */
+      fieldRemoved: function (instance, $el, ev) {
+        var idx = _.findIndex(this.fields, {id: instance.id});
+        this.fields.splice(idx, 1);
+      }
     },
     events: {
       inserted: function () {
