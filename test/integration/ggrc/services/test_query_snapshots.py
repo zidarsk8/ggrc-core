@@ -5,7 +5,6 @@
 
 """Tests for /query api endpoint."""
 
-
 from sqlalchemy import func
 from flask import json
 
@@ -13,17 +12,19 @@ from ggrc import views
 from ggrc import models
 from ggrc import db
 
-from integration.ggrc.converters import TestCase
+from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 
-class BaseQueryAPITestCase(TestCase):
-  """Base class for /query api tests with utility methods."""
+# pylint: disable=super-on-old-class
+class TestAuditSnapshotQueries(TestCase):
+  """Tests for /query api for Audit snapshots"""
 
   def setUp(self):
     """Log in before performing queries."""
-    super(BaseQueryAPITestCase, self).setUp()
+    super(TestAuditSnapshotQueries, self).setUp()
     self.client.get("/login")
+    self._setup_objects()
 
   def _post(self, data):
     return self.client.post(
@@ -32,7 +33,9 @@ class BaseQueryAPITestCase(TestCase):
         headers={"Content-Type": "application/json", }
     )
 
-  def _setup_objects(self):
+  @staticmethod
+  def _setup_objects():
+    """Create and reindex objects needed for tests"""
     text_cad = factories.CustomAttributeDefinitionFactory(
         title="text cad",
         definition_type="market",
@@ -42,7 +45,9 @@ class BaseQueryAPITestCase(TestCase):
         definition_type="market",
         attribute_type="Date",
     )
-    self.audit = factories.AuditFactory()
+
+    audit = factories.AuditFactory()
+
     for i in range(5):
       market = factories.MarketFactory()
       factories.CustomAttributeValueFactory(
@@ -66,20 +71,17 @@ class BaseQueryAPITestCase(TestCase):
         ),
     )
 
-    self.snapshots = [
-        factories.SnapshotFactory(
-            child_id=revision.resource_id,
-            child_type=revision.resource_type,
-            revision=revision,
-            parent=self.audit,
-        )
-        for revision in revisions
-    ]
+    for revision in revisions:
+      factories.SnapshotFactory(
+          child_id=revision.resource_id,
+          child_type=revision.resource_type,
+          revision=revision,
+          parent=audit,
+      )
     views.do_reindex()
 
   def test_basic_snapshot_query(self):
     """Test fetching all snapshots for a given Audit."""
-    self._setup_objects()
     result = self._post([
         {
             "object_name": "Snapshot",
@@ -94,8 +96,6 @@ class BaseQueryAPITestCase(TestCase):
 
   def test_snapshot_attribute_filter(self):
     """Test filtering snapshots on object attributes."""
-    self._setup_objects()
-
     result = self._post([
         {
             "object_name": "Snapshot",
@@ -118,8 +118,6 @@ class BaseQueryAPITestCase(TestCase):
 
   def test_snapshot_ca_filter(self):
     """Test filtering snapshots on custom attributes."""
-    self._setup_objects()
-
     result = self._post([
         {
             "object_name": "Snapshot",
@@ -148,7 +146,8 @@ class BaseQueryAPITestCase(TestCase):
     ])
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 3)
 
-  def _get_market_expression(self):
+  @staticmethod
+  def _get_market_expression():
     return {
         "left": {
             "left": "child_type",
@@ -159,6 +158,6 @@ class BaseQueryAPITestCase(TestCase):
         "right": {
             "object_name": "Audit",
             "op": {"name": "relevant"},
-            "ids": [self.audit.id]
+            "ids": [models.Audit.query.first().id]
         }
     }
