@@ -33,7 +33,8 @@
         data-join-option-type="{{model.shortName}}"
         data-join-object-id="{{parent_instance.id}}"
         data-join-object-type="{{parent_instance.class.shortName}}"
-        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
+        data-is-snapshotable="{{is_snapshotable}}">
         Map
       </a>
     {{/if}}

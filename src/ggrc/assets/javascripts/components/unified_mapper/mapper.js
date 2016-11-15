@@ -27,6 +27,7 @@
     entries: new can.List(),
     options: new can.List(),
     relevant: new can.List(),
+    is_snapshotable: false,
     get_instance: can.compute(function () {
       return CMS.Models.get_instance(
         this.attr('object'),
@@ -176,7 +177,8 @@
           callback: parentScope.attr('callback'),
           getList: parentScope.attr('getList'),
           useTemplates: parentScope.attr('useTemplates'),
-          assessmentGenerator: parentScope.attr('assessmentGenerator')
+          assessmentGenerator: parentScope.attr('assessmentGenerator'),
+          is_snapshotable: parentScope.attr('is_snapshotable')
         })),
         template: parentScope.attr('template'),
         draw_children: true

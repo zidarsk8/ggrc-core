@@ -1587,7 +1587,9 @@ can.Control('CMS.Controllers.TreeViewNode', {
       this.options.child_options.each(function (option) {
         option.attr({
           parent: this,
-          parent_instance: this.options.instance
+          parent_instance: this.options.instance,
+          is_snapshotable:
+            GGRC.Utils.Snapshots.isSnapshotScope(opts.parent_instance)
         });
       }.bind(this));
     }

@@ -683,4 +683,33 @@
       initCounts: initCounts
     };
   })();
+
+  /**
+   * Util methods for work with Snapshots.
+   */
+  GGRC.Utils.Snapshots = (function () {
+    /**
+     * Check whether object is snapshot
+     * @param {Object} instance - Object instance
+     * @return {Boolean} True or False.
+     */
+    function isSnapshot(instance) {
+      return instance.snapshot;
+    }
+
+    /**
+     * Check whether object is in spanshot scope
+     * @param {Object} parentInstance - Object (parent) instance
+     * @return {Boolean} True or False.
+     */
+    function isSnapshotScope(parentInstance) {
+      var instance = parentInstance || GGRC.page_instance();
+      return instance ? instance.is_snapshotable : false;
+    }
+
+    return {
+      isSnapshot: isSnapshot,
+      isSnapshotScope: isSnapshotScope
+    };
+  })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);
