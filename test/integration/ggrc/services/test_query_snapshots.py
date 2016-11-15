@@ -109,6 +109,7 @@ class TestAuditSnapshotQueries(TestCase):
 
   def test_snapshot_attribute_filter(self):
     """Test filtering snapshots on object attributes."""
+    market_title = models.Market.query.first().title
     result = self._post([
         {
             "object_name": "Snapshot",
@@ -119,7 +120,7 @@ class TestAuditSnapshotQueries(TestCase):
                     "right": {
                         "left": "title",
                         "op": {"name": "="},
-                        "right": models.Market.query.first().title,
+                        "right": market_title,
                     },
                 },
                 "keys": [],
@@ -128,6 +129,10 @@ class TestAuditSnapshotQueries(TestCase):
         }
     ])
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 1)
+    self.assertEqual(
+        result.json[0]["Snapshot"]["values"][0]["revision_content"]["title"],
+        market_title,
+    )
 
     result = self._post([
         {
