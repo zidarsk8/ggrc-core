@@ -80,6 +80,7 @@ describe('GGRC.Components.assessmentTemplates', function () {
       function () {
         mapper.attr('assessmentTemplate', 'template-123');
         templates[1].subitems.length = 0;
+        spyOn(console, 'warn');  // just to silence it
 
         method(templates, mapper);
 
