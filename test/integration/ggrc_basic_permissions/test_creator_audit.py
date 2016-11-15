@@ -11,6 +11,7 @@ from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
 
 
 class TestCreatorAudit(TestCase):
@@ -145,7 +146,7 @@ class TestCreatorAudit(TestCase):
     test_case = self.test_cases[test_case_name]
     editor = self.people.get('editor')
     self.api.set_user(editor)
-    random_title = self.object_generator.random_str()
+    random_title = factories.random_str()
     response = self.api.post(all_models.Program, {
         "program": {"title": random_title, "context": None},
     })
@@ -166,7 +167,7 @@ class TestCreatorAudit(TestCase):
     self.objects["audit"] = all_models.Audit.query.get(audit_id)
 
     for prefix in ("mapped", "unrelated"):
-      random_title = self.object_generator.random_str()
+      random_title = factories.random_str()
 
       response = self.api.post(all_models.Issue, {
           "issue": {"title": random_title, "context": None},

@@ -60,6 +60,7 @@ class TestCase(BaseTestCase):
         "roles",
         "test_model",
         "contexts",
+        "people",
     )
     tables = set(db.metadata.tables).difference(ignore_tables)
     for _ in range(len(tables)):
@@ -74,6 +75,8 @@ class TestCase(BaseTestCase):
             pass
     contexts = db.metadata.tables["contexts"]
     db.engine.execute(contexts.delete(contexts.c.id > 1))
+    people = db.metadata.tables["people"]
+    db.engine.execute(people.delete(people.c.email != "user@example.com"))
     db.session.commit()
 
   def setUp(self):

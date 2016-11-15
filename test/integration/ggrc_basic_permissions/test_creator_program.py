@@ -5,12 +5,13 @@
 Test Creator role with Program scoped roles
 """
 
-from integration.ggrc import TestCase
+from ggrc import db
 from ggrc.models import all_models
+from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
-from ggrc import db
+from integration.ggrc.models import factories
 
 
 class TestCreatorProgram(TestCase):
@@ -191,7 +192,7 @@ class TestCreatorProgram(TestCase):
     test_case = self.test_cases[test_case_name]
     creator = self.people.get('creator')
     self.api.set_user(creator)
-    random_title = self.object_generator.random_str()
+    random_title = factories.random_str()
     response = self.api.post(all_models.Program, {
         "program": {"title": random_title, "context": None},
     })
@@ -201,7 +202,7 @@ class TestCreatorProgram(TestCase):
     self.objects["program"] = all_models.Program.query.get(program_id)
     # Create an object:
     for obj in ("mapped_object", "unrelated"):
-      random_title = self.object_generator.random_str()
+      random_title = factories.random_str()
       response = self.api.post(all_models.System, {
           "system": {"title": random_title, "context": None},
       })

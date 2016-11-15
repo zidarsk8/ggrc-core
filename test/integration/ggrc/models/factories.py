@@ -1,24 +1,32 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Factories for models"""
+"""Factories for ggrc models.
+
+These are factories for generating regular ggrc models. The factories create a
+model and log a post event with the model revision. These do not however
+trigger signals. For tests that rely on proper signals being triggered, we must
+use the object generator in the ggrc.generator module.
+"""
 
 # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
 # pylint: disable=no-init
 
 import random
+import string
 
 import factory
 
 from ggrc import db
 from ggrc import models
+from ggrc.login import noop
+from ggrc.fulltext import get_indexer
+from ggrc.fulltext.recordbuilder import fts_record_for
 
 
-def random_string(prefix=''):
-  return '{prefix}{suffix}'.format(
-      prefix=prefix,
-      suffix=random.randint(0, 9999999999),
-  )
+def random_str(length=8, prefix="", chars=None):
+  chars = chars or string.ascii_uppercase + string.digits + "  _.-"
+  return prefix + "".join(random.choice(chars) for _ in range(length))
 
 
 class ModelFactory(factory.Factory):
@@ -27,15 +35,50 @@ class ModelFactory(factory.Factory):
   def _create(cls, target_class, *args, **kwargs):
     instance = target_class(*args, **kwargs)
     db.session.add(instance)
+    if isinstance(instance, models.CustomAttributeValue):
+      cls._log_event(instance.attributable)
+    if hasattr(instance, "log_json"):
+      cls._log_event(instance)
     db.session.commit()
     return instance
 
+  @classmethod
+  def _log_event(cls, instance):
+    indexer = get_indexer()
+    db.session.flush()
+    user = cls._get_user()
+    revision = models.Revision(
+        instance, user.id, 'created', instance.log_json())
+    event = models.Event(
+        modified_by=user,
+        action="POST",
+        resource_id=instance.id,
+        resource_type=instance.type,
+        context=instance.context,
+        revisions=[revision],
+    )
+    db.session.add(revision)
+    db.session.add(event)
+    indexer.update_record(fts_record_for(instance), commit=False)
 
-class TitledFactory(factory.Factory):
-  title = factory.LazyAttribute(lambda m: random_string('title'))
+  @staticmethod
+  def _get_user():
+    user = models.Person.query.first()
+    if not user:
+      user = models.Person(
+          name=noop.default_user_name,
+          email=noop.default_user_email,
+      )
+      db.session.add(user)
+      db.session.flush()
+    return user
 
 
-class CustomAttributeDefinitionFactory(ModelFactory, TitledFactory):
+class TitledFactory(ModelFactory):
+  title = factory.LazyAttribute(lambda m: random_str(prefix='title '))
+
+
+class CustomAttributeDefinitionFactory(TitledFactory):
 
   class Meta:
     model = models.CustomAttributeDefinition
@@ -58,13 +101,13 @@ class CustomAttributeValueFactory(ModelFactory):
   attribute_object_id = None
 
 
-class DirectiveFactory(ModelFactory, TitledFactory):
+class DirectiveFactory(TitledFactory):
 
   class Meta:
     model = models.Directive
 
 
-class ControlFactory(ModelFactory, TitledFactory):
+class ControlFactory(TitledFactory):
 
   class Meta:
     model = models.Control
@@ -80,7 +123,7 @@ class ControlFactory(ModelFactory, TitledFactory):
   notes = None
 
 
-class AssessmentFactory(ModelFactory, TitledFactory):
+class AssessmentFactory(TitledFactory):
 
   class Meta:
     model = models.Assessment
@@ -91,7 +134,7 @@ class ControlCategoryFactory(ModelFactory):
   class Meta:
     model = models.ControlCategory
 
-  name = factory.LazyAttribute(lambda m: random_string('name'))
+  name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
   lft = None
   rgt = None
   scope_id = None
@@ -117,42 +160,46 @@ class ContextFactory(ModelFactory):
     model = models.Context
 
   name = factory.LazyAttribute(
-      lambda obj: random_string("SomeObjectType Context"))
+      lambda obj: random_str(prefix="SomeObjectType Context"))
   related_object = None
 
 
-class ProgramFactory(ModelFactory):
+class ProgramFactory(TitledFactory):
 
   class Meta:
     model = models.Program
 
-  title = factory.LazyAttribute(lambda _: random_string("program_title"))
-  slug = factory.LazyAttribute(lambda _: random_string(""))
 
-
-class AuditFactory(ModelFactory):
+class AuditFactory(TitledFactory):
 
   class Meta:
     model = models.Audit
 
-  title = factory.LazyAttribute(lambda _: random_string("audit title "))
-  slug = factory.LazyAttribute(lambda _: random_string(""))
   status = "Planned"
-  program_id = factory.LazyAttribute(lambda _: ProgramFactory().id)
-  context_id = factory.LazyAttribute(lambda _: ContextFactory().id)
+  program = factory.LazyAttribute(lambda _: ProgramFactory())
+  context = factory.LazyAttribute(lambda _: ContextFactory())
 
 
-class AssessmentTemplateFactory(ModelFactory):
+class SnapshotFactory(ModelFactory):
+
+  class Meta:
+    model = models.Snapshot
+
+  parent = factory.LazyAttribute(lambda _: AuditFactory())
+  child_id = 0
+  child_type = ""
+  revision_id = 0
+
+
+class AssessmentTemplateFactory(TitledFactory):
 
   class Meta:
     model = models.AssessmentTemplate
 
-  title = factory.LazyAttribute(
-      lambda _: random_string("assessment template title"))
   template_object_type = None
   test_plan_procedure = False
   procedure_description = factory.LazyAttribute(
-      lambda _: random_string("lorem ipsum description"))
+      lambda _: random_str(length=100))
   default_people = {"assessors": "Object Owners",
                     "verifiers": "Object Owners"}
 
@@ -212,15 +259,39 @@ class ObjectDocumentFactory(ModelFactory):
     model = models.ObjectDocument
 
 
-class RegulationFactory(ModelFactory, TitledFactory):
+class RegulationFactory(TitledFactory):
 
   class Meta:
     model = models.Regulation
 
 
-class RequestFactory(ModelFactory, TitledFactory):
+class RequestFactory(TitledFactory):
 
   class Meta:
     model = models.Request
 
   request_type = "documentation"
+
+
+class OrgGroupFactory(TitledFactory):
+
+  class Meta:
+    model = models.OrgGroup
+
+
+class ProcessFactory(TitledFactory):
+
+  class Meta:
+    model = models.Process
+
+
+class PolicyFactory(TitledFactory):
+
+  class Meta:
+    model = models.Policy
+
+
+class MarketFactory(TitledFactory):
+
+  class Meta:
+    model = models.Market

@@ -11,6 +11,7 @@ from ggrc import models
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
 
 
 class TestEnableAndDisableNotifications(TestCase):
@@ -173,7 +174,7 @@ class TestEnableAndDisableNotifications(TestCase):
             "contact": person_dict(self.user.id),
             "task_group_tasks": [{
                 "contact": person_dict(self.user.id),
-                "description": self.wf_generator.random_str(100),
+                "description": factories.random_str(100),
                 "relative_start_day": 5,
                 "relative_start_month": 2,
                 "relative_end_day": 25,
@@ -194,7 +195,7 @@ class TestEnableAndDisableNotifications(TestCase):
             "contact": person_dict(self.user.id),
             "task_group_tasks": [{
                 "contact": person_dict(self.user.id),
-                "description": self.wf_generator.random_str(100),
+                "description": factories.random_str(100),
                 "relative_start_day": 5,
                 "relative_start_month": 2,
                 "relative_end_day": 25,
