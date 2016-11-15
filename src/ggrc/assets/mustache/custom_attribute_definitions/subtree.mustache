@@ -4,7 +4,10 @@
 }}
 
 
-<tr>
+<tr
+  data-object-id="{{instance.id}}"
+  data-object-type="{{instance.constructor.table_singular}}"
+>
   {{#instance}}
   <td>{{title}}</td>
   <td>{{attribute_type}}</td>
