@@ -49,6 +49,7 @@ class TestAuditSnapshotQueries(TestCase):
     audit = factories.AuditFactory()
 
     for i in range(5):
+      factories.OrgGroupFactory()
       market = factories.MarketFactory()
       factories.CustomAttributeValueFactory(
           custom_attribute=date_cad,
@@ -62,7 +63,7 @@ class TestAuditSnapshotQueries(TestCase):
       )
 
     revisions = models.Revision.query.filter(
-        models.Revision.resource_type == "Market",
+        models.Revision.resource_type.in_(["OrgGroup", "Market"]),
         models.Revision.id.in_(
             db.session.query(func.max(models.Revision.id)).group_by(
                 models.Revision.resource_type,
@@ -86,7 +87,19 @@ class TestAuditSnapshotQueries(TestCase):
         {
             "object_name": "Snapshot",
             "filters": {
-                "expression": self._get_market_expression(),
+                "expression": self._get_model_expression(),
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 5)
+
+    result = self._post([
+        {
+            "object_name": "Snapshot",
+            "filters": {
+                "expression": self._get_model_expression("OrgGroup"),
                 "keys": [],
                 "order_by": {"keys": [], "order": "", "compare": None}
             }
@@ -101,7 +114,7 @@ class TestAuditSnapshotQueries(TestCase):
             "object_name": "Snapshot",
             "filters": {
                 "expression": {
-                    "left": self._get_market_expression(),
+                    "left": self._get_model_expression(),
                     "op": {"name": "AND"},
                     "right": {
                         "left": "title",
@@ -116,6 +129,26 @@ class TestAuditSnapshotQueries(TestCase):
     ])
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 1)
 
+    result = self._post([
+        {
+            "object_name": "Snapshot",
+            "filters": {
+                "expression": {
+                    "left": self._get_model_expression("OrgGroup"),
+                    "op": {"name": "AND"},
+                    "right": {
+                        "left": "title",
+                        "op": {"name": "!="},
+                        "right": models.OrgGroup.query.first().title,
+                    },
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 4)
+
   def test_snapshot_ca_filter(self):
     """Test filtering snapshots on custom attributes."""
     result = self._post([
@@ -123,7 +156,7 @@ class TestAuditSnapshotQueries(TestCase):
             "object_name": "Snapshot",
             "filters": {
                 "expression": {
-                    "left": self._get_market_expression(),
+                    "left": self._get_model_expression(),
                     "op": {"name": "AND"},
                     "right": {
                         "left": {
@@ -147,12 +180,12 @@ class TestAuditSnapshotQueries(TestCase):
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 3)
 
   @staticmethod
-  def _get_market_expression():
+  def _get_model_expression(model_name="Market"):
     return {
         "left": {
             "left": "child_type",
             "op": {"name": "="},
-            "right": "Market"
+            "right": model_name,
         },
         "op": {"name": "AND"},
         "right": {
