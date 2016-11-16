@@ -37,7 +37,8 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   placeholder = db.Column(db.String)
 
   attribute_values = db.relationship('CustomAttributeValue',
-                                     backref='custom_attribute')
+                                     backref='custom_attribute',
+                                     cascade='all, delete-orphan')
 
   @property
   def definition_attr(self):

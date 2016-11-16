@@ -6,7 +6,7 @@
 <div class="centered">
 <p>
 {{#instance}}
-Are you sure you want to delete 
+Are you sure you want to delete
   <span class="user-string">
     {{#if display_name}}
       {{display_name}}?
@@ -14,6 +14,13 @@ Are you sure you want to delete
       this {{type_to_readable instance.type}}?
     {{/if}}
   </span>
+  {{#if_instance_of instance 'CustomAttributeDefinition'}}
+  <div>
+    <h2>Warning!</h2>
+    <p>This will also remove <strong>ALL</strong> values for this attribute.</p>
+    <p>The action is not reversible.</p>
+  </div>
+  {{/if_instance_of}}
   {{#if delete_counts.loading}}
 	<br/><span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block;' }}></span>
   {{else}}
