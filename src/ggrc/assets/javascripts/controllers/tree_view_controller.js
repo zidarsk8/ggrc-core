@@ -436,7 +436,11 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   },
   deselect: function () {
     var active = this.element.find('.cms_controllers_tree_view_node.active');
-    active.removeClass('active');
+    active
+      .removeClass('active')
+      .removeClass(function (index, css) {
+        return (css.match(/\w+-pin-size/g) || []).join(' ');
+      });
     this.update_hash_fragment(active.length);
   },
   update_hash_fragment: function (status) {
@@ -1853,11 +1857,25 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
   /**
    * Mark the tree node as active (and all other tree nodes as inactive).
+   * @param {string} infoPinSize - Size of the info pin
    */
-  select: function () {
+  select: function (infoPinSize) {
     var $tree = this.element;
+    var infoPinSizeClass;
+    var infoPinSizeClassMatches;
+    if (infoPinSize) {
+      infoPinSizeClass = infoPinSize + '-pin-size';
+    } else {
+      infoPinSizeClassMatches =
+        $tree.attr('class').match(/(\w+)-pin-size/);
+      if (infoPinSizeClassMatches && infoPinSizeClassMatches.length !== 0) {
+        infoPinSizeClass = infoPinSizeClassMatches[0];
+      } else {
+        infoPinSizeClass = 'normal-pin-size';
+      }
+    }
 
-    if ($tree.hasClass('active')) {
+    if ($tree.hasClass('active') && $tree.hasClass(infoPinSizeClass)) {
       return;  // tree node already selected, no need to activate it again
     }
 
@@ -1865,10 +1883,16 @@ can.Control('CMS.Controllers.TreeViewNode', {
       .find('.cms_controllers_tree_view_node')
       .removeClass('active');
 
-    $tree.addClass('active');
+    $tree
+      .removeClass(function (index, css) {
+        return (css.match(/\w+-pin-size/g) || []).join(' ');
+      })
+      .addClass(infoPinSizeClass)
+      .addClass('active');
 
     this.update_hash_fragment();
-    $('.pin-content').control().setInstance(this.options.instance, $tree);
+    $('.pin-content').control()
+      .setInstance(this.options.instance, $tree, infoPinSize);
   },
 
   'input,select click': function (el, ev) {
