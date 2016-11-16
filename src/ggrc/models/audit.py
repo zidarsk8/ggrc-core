@@ -18,9 +18,10 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.program import Program
 from ggrc.models.person import Person
+from ggrc.models.snapshot import Snapshotable
 
 
-class Audit(clonable.Clonable,
+class Audit(Snapshotable, clonable.Clonable,
             CustomAttributable, Personable, HasOwnContext, Relatable,
             Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled,
             Slugged, db.Model):

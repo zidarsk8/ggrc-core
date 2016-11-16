@@ -4,12 +4,29 @@
 """Module for Snapshot object"""
 
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models import mixins
 from ggrc.models import relationship
+
+
+def get_latest_revision_id(snapshot):
+  """Retrieve last revision saved for snapshots
+
+  Args:
+    snapshot: Instance of models.Snapshot
+  Returns:
+    ID of the latest revision or None otherwise
+  """
+  from ggrc.snapshotter.helpers import get_revisions
+  from ggrc.snapshotter.datastructures import Pair
+  pair = Pair.from_snapshot(snapshot)
+  revisions = get_revisions({pair}, revisions=set())
+  if pair in revisions and revisions[pair]:
+    return revisions[pair]
 
 
 class Snapshot(relationship.Relatable, mixins.Base, db.Model):
@@ -30,6 +47,10 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       "child_type",
       "revision",
       "revision_id",
+  ]
+
+  _update_attrs = [
+      "update_revision"
   ]
 
   _include_links = [
@@ -61,6 +82,17 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
     return cls.eager_inclusions(query, Snapshot._include_links).options(
         orm.subqueryload('revision'),
     )
+
+  @hybrid_property
+  def update_revision(self):
+    return self.revision_id
+
+  @update_revision.setter
+  def update_revision(self, value):
+    if value == "latest":
+      latest_revision_id = get_latest_revision_id(self)
+      if latest_revision_id:
+        self.revision_id = latest_revision_id
 
   @property
   def parent_attr(self):
