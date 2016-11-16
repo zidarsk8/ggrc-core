@@ -30,7 +30,7 @@ class RecordBuilder(object):
 
       properties = {}
       if (obj.custom_attribute.attribute_type == "Map:Person" and
-              obj.attribute_object_id is not None):
+              obj.attribute_object_id):
         # Add both name and email for a Map:Person to the index
         properties[attribute_name + ".name"] = obj.attribute_object.name
         properties[attribute_name + ".email"] = obj.attribute_object.email
