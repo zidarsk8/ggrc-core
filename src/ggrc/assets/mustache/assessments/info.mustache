@@ -63,6 +63,14 @@
                     <collapsible-panel title-text="URL" collapsed="true" title-icon="fa-link" class="details-item">
                       {{> '/static/mustache/assessments/urls.mustache'}}
                     </collapsible-panel>
+                    <collapsible-panel title-text="Code" collapsed="true" title-icon="fa-code" class="details-item">
+                        <ul class="label-list">
+                            <li>
+                                <h6>Code</h6>
+                                <span>{{instance.slug}}</span>
+                            </li>
+                        </ul>
+                    </collapsible-panel>
                     <collapsible-panel title-text="Conclusions" collapsed="true" title-icon="fa-gavel"
                                        class="details-item">
                         <div class="flex-box flex-col"
