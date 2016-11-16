@@ -28,6 +28,8 @@
     options: new can.List(),
     relevant: new can.List(),
     is_snapshotable: false,
+    snapshot_scope_id: '',
+    snapshot_scope_type: '',
     get_instance: can.compute(function () {
       return CMS.Models.get_instance(
         this.attr('object'),
@@ -178,7 +180,9 @@
           getList: parentScope.attr('getList'),
           useTemplates: parentScope.attr('useTemplates'),
           assessmentGenerator: parentScope.attr('assessmentGenerator'),
-          is_snapshotable: parentScope.attr('is_snapshotable')
+          is_snapshotable: parentScope.attr('is_snapshotable'),
+          snapshot_scope_id: parentScope.attr('snapshot_scope_id'),
+          snapshot_scope_type: parentScope.attr('snapshot_scope_type')
         })),
         template: parentScope.attr('template'),
         draw_children: true

@@ -18,7 +18,9 @@
     data-join-object-type="{{parent_instance.class.shortName}}"
     data-exclude-option-types="{{exclude_option_types}}"
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
-    data-is-snapshotable="{{parent_instance.is_snapshotable}}">
+    data-is-snapshotable="{{parent_instance.is_snapshotable}}"
+    data-snapshot-scope-id="{{parent_instance.snapshot_scope_id}}"
+    data-snapshot-scope-type="{{parent_instance.snapshot_scope_type}}">
     Map
   </a>
   {{#if null}}
@@ -51,7 +53,9 @@
     data-exclude-option-types="{{exclude_option_types}}"
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
     data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }'
-    data-is-snapshotable="{{is_snapshotable}}">
+    data-is-snapshotable="{{is_snapshotable}}"
+    data-snapshot-scope-id="{{snapshot_scope_id}}"
+    data-snapshot-scope-type="{{snapshot_scope_type}}">
     Map
   </a>
   {{else}}
@@ -66,7 +70,9 @@
     data-join-object-type="{{parent_instance.class.shortName}}"
     data-exclude-option-types="{{exclude_option_types}}"
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
-    data-is-snapshotable="{{is_snapshotable}}">
+    data-is-snapshotable="{{is_snapshotable}}"
+    data-snapshot-scope-id="{{snapshot_scope_id}}"
+    data-snapshot-scope-type="{{snapshot_scope_type}}">
     Map
   </a>
   {{/if_instance_of}}
