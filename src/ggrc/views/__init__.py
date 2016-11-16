@@ -47,9 +47,6 @@ from ggrc.views.registry import object_view
 from ggrc.utils import benchmark
 
 
-EXTERNAL_HELP_URL = getattr(settings, "EXTERNAL_HELP_URL", "")
-
-
 # Needs to be secured as we are removing @login_required
 
 @app.route("/_background_tasks/reindex", methods=["POST"])
@@ -115,14 +112,14 @@ def get_config_json():
         public_config.update(
             extension_module.get_public_config(get_current_user()))
 
-    public_config['external_help_url'] = EXTERNAL_HELP_URL
-
     return json.dumps(public_config)
 
 
 def get_public_config():
   """Expose additional permissions-dependent config to client."""
-  return {}
+  return {
+      "external_help_url": getattr(settings, "EXTERNAL_HELP_URL", ""),
+  }
 
 
 def get_full_user_json():
