@@ -108,6 +108,7 @@ def get_config_json():
   """Get public app config"""
   with benchmark("Get config JSON"):
     public_config = dict(app.config.public_config)
+    public_config.update(get_public_config())
 
     for extension_module in get_extension_modules():
       if hasattr(extension_module, 'get_public_config'):
@@ -117,6 +118,11 @@ def get_config_json():
     public_config['external_help_url'] = EXTERNAL_HELP_URL
 
     return json.dumps(public_config)
+
+
+def get_public_config():
+  """Expose additional permissions-dependent config to client."""
+  return {}
 
 
 def get_full_user_json():
