@@ -566,7 +566,7 @@
      * @param {String} page.sortBy - sortBy
      * @param {String} page.sortDirection - sortDirection
      * @param {String} page.filter - Filter string
-     * @param {Object} relevant - Information about relevant object
+     * @param {Object|Object[]} relevant - Information about relevant object
      * @param {Object} relevant.type - Type of relevant object
      * @param {Object} relevant.id - Id of relevant object
      * @param {Object} relevant.operation - Type of operation.
