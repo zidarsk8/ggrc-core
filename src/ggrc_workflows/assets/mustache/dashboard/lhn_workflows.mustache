@@ -1,8 +1,0 @@
-{{!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-}}
-
-{{#is_allowed "read" "Workflow" context="any"}}
-  {{{renderLive '/static/mustache/workflows/lhn_search.mustache' type="Workflow" li_class="workflow" template_view="/static/mustache/workflows/search_result.mustache" tooltip_view='/workflows/extended_info.mustache'}}}
-{{/is_allowed}}
