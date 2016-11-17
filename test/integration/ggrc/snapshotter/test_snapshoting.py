@@ -591,3 +591,43 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
     self.assertIsNotNone(models.Relationship.find_related(program, objective))
     self.assertIsNotNone(models.Relationship.find_related(program, control))
+
+  def test_relationship_post_api(self):
+    """Test snapshot creation when creating relationships to Audit"""
+    program = self.create_object(models.Program, {
+        "title": "Test Program Snapshot 1"
+    })
+
+    control = self.create_object(models.Control, {
+        "title": "Test Control Snapshot 1"
+    })
+
+    self.create_audit(program)
+
+    objective = self.create_object(models.Objective, {
+        "title": "Test Objective Snapshot UNEDITED"
+    })
+    self.create_mapping(program, objective)
+
+    audit = db.session.query(models.Audit).filter(
+        models.Audit.title.like("%Snapshotable audit%")).one()
+
+    self.create_mapping(audit, objective)
+    self.create_mapping(audit, control)
+
+    objective_snapshot = db.session.query(models.Snapshot).filter(
+        models.Snapshot.child_type == "Objective",
+        models.Snapshot.child_id == objective.id
+    )
+
+    objective_revision = db.session.query(models.Revision).filter(
+        models.Revision.resource_type == "Objective",
+        models.Revision.resource_id == objective.id
+    ).one()
+
+    self.assertEquals(objective_snapshot.count(), 1)
+    self.assertEquals(objective_snapshot.first().revision_id,
+                      objective_revision.id)
+
+    self.assertIsNotNone(models.Relationship.find_related(program, objective))
+    self.assertIsNotNone(models.Relationship.find_related(program, control))
