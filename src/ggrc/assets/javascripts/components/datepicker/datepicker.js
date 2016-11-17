@@ -58,10 +58,10 @@
 
         this.scope.picker.datepicker('setDate', date);
         if (this.scope.setMinDate) {
-          this.setDate('minDate', this.scope.setMinDate);
+          this.updateDate('minDate', this.scope.setMinDate);
         }
         if (this.scope.setMaxDate) {
-          this.setDate('maxDate', this.scope.setMaxDate);
+          this.updateDate('maxDate', this.scope.setMaxDate);
         }
         this.scope._date = date;
       },
@@ -76,7 +76,7 @@
       isValidDate: function (date) {
         return moment(date, this.scope.pattern, true).isValid();
       },
-      setDate: function (type, date) {
+      updateDate: function (type, date) {
         var types = {
           minDate: function () {
             date.add(1, 'day');
@@ -90,13 +90,18 @@
         if (types[type]) {
           types[type]();
         }
-        this.scope.picker.datepicker('option', type, date.toDate());
+        date = date.toDate();
+        this.scope.picker.datepicker('option', type, date);
+        return date;
       },
       '{scope} setMinDate': function (scope, ev, date) {
-        this.setDate('minDate', date);
+        var updated = this.updateDate('minDate', date);
+        if (this.scope.attr('date') < updated) {
+          this.scope.attr('_date', moment(updated).format(this.scope.pattern));
+        }
       },
       '{scope} setMaxDate': function (scope, ev, date) {
-        this.setDate('maxDate', date);
+        this.updateDate('maxDate', date);
       },
       '{scope} _date': function (scope, ev, val) {
         scope.attr('date', val);
