@@ -35,6 +35,7 @@ class Types(object):
 
   ignore = {
       "Assessment",
+      "AssessmentTemplate",
       "Request",
       "Issue",
       "Workflow",

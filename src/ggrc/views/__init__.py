@@ -36,6 +36,7 @@ from ggrc.rbac import permissions
 from ggrc.services.common import as_json
 from ggrc.services.common import inclusion_filter
 from ggrc.services import query as services_query
+from ggrc.snapshotter import rules
 from ggrc.snapshotter.indexer import reindex as reindex_snapshots
 from ggrc.views import converters
 from ggrc.views import cron
@@ -45,9 +46,6 @@ from ggrc.views import notifications
 from ggrc.views.common import RedirectedPolymorphView
 from ggrc.views.registry import object_view
 from ggrc.utils import benchmark
-
-
-EXTERNAL_HELP_URL = getattr(settings, "EXTERNAL_HELP_URL", "")
 
 
 # Needs to be secured as we are removing @login_required
@@ -109,15 +107,23 @@ def get_config_json():
   """Get public app config"""
   with benchmark("Get config JSON"):
     public_config = dict(app.config.public_config)
+    public_config.update(get_public_config())
 
     for extension_module in get_extension_modules():
       if hasattr(extension_module, 'get_public_config'):
         public_config.update(
             extension_module.get_public_config(get_current_user()))
 
-    public_config['external_help_url'] = EXTERNAL_HELP_URL
-
     return json.dumps(public_config)
+
+
+def get_public_config():
+  """Expose additional permissions-dependent config to client."""
+  return {
+      "external_help_url": getattr(settings, "EXTERNAL_HELP_URL", ""),
+      "snapshotable_objects": list(rules.Types.all),
+      "snapshotable_ignored": list(rules.Types.ignore),
+  }
 
 
 def get_full_user_json():
