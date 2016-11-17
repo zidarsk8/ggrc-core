@@ -304,8 +304,8 @@ class DateColumnHandler(ColumnHandler):
     # to 'Date' type. Remove if statement after it.
     try:
       value = parse(value) if value else None
-      if type(getattr(self.row_converter.obj, self.key, None)) == date and \
-              value:
+      if (type(getattr(self.row_converter.obj, self.key, None)) == date and
+              value):
         return value.date()
       else:
         return value

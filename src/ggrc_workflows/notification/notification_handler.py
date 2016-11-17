@@ -137,8 +137,8 @@ def modify_cycle_task_notification(obj, notification_name):
       # notification or add a new one.
     if notif.count() == 1:
       notif = notif.one()
-      notif.send_on = datetime.combine(obj.end_date, datetime.min.time()) - \
-          timedelta(notif.notification_type.advance_notice)
+      notif.send_on = (datetime.combine(obj.end_date, datetime.min.time()) -
+                       timedelta(notif.notification_type.advance_notice))
       db.session.add(notif)
     else:
       add_notif(obj, notif_type, send_on)

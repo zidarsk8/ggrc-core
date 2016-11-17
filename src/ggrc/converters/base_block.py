@@ -131,9 +131,9 @@ class BlockConverter(object):
       self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2,
                       object_name=self.class_name)
       return
-    if self.operation == 'import' and \
-            self.object_class is CycleTaskGroupObjectTask and \
-            not permissions.is_admin():
+    if (self.operation == 'import' and
+            self.object_class is CycleTaskGroupObjectTask and
+            not permissions.is_admin()):
       self.add_errors(errors.PERMISSION_ERROR, line=self.offset + 2)
       logger.error("Import failed with: Only admin can update existing "
                    "cycle-tasks via import")
@@ -263,9 +263,9 @@ class BlockConverter(object):
     for index, header in enumerate(headers):
       if header in header_names:
         field_name = header_names[header]
-        if self.operation == 'import' and \
-                hasattr(self.object_class, "IMPORTABLE_FIELDS") and \
-                field_name not in self.object_class.IMPORTABLE_FIELDS:
+        if (self.operation == 'import' and
+                hasattr(self.object_class, "IMPORTABLE_FIELDS") and
+                field_name not in self.object_class.IMPORTABLE_FIELDS):
           self.add_warning(errors.NON_IMPORTABLE_COLUMN_WARNING,
                            line=self.offset + 2,
                            column_name=header)
