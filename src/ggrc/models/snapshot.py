@@ -3,14 +3,24 @@
 
 """Module for Snapshot object"""
 
+from datetime import datetime
+
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import orm
+from sqlalchemy import event
+from sqlalchemy import inspect
+from sqlalchemy.orm.session import Session
+from sqlalchemy import func
+from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
+from ggrc.utils import benchmark
+from ggrc.login import get_current_user_id
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models import relationship
+from ggrc.models import revision
 from ggrc.models.deferred import deferred
 from ggrc.models.computed_property import computed_property
 
@@ -53,6 +63,9 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
   ]
 
   _update_attrs = [
+      "parent",
+      "child_id",
+      "child_type",
       "update_revision"
   ]
 
@@ -78,6 +91,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
   revision = db.relationship(
       "Revision",
   )
+  _update_revision = None
 
   @classmethod
   def eager_query(cls):
@@ -92,6 +106,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
 
   @update_revision.setter
   def update_revision(self, value):
+    self._update_revision = value
     if value == "latest":
       latest_revision_id = get_latest_revision_id(self)
       if latest_revision_id:
@@ -111,10 +126,8 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
 
   @parent.setter
   def parent(self, value):
-    if value is not None:
-      self.parent_id, self.parent_type = value.id, value.__class__.__name__
-    else:
-      self.parent_id, self.parent_type = None, None
+    self.parent_id = getattr(value, 'id', None)
+    self.parent_type = getattr(value, 'type', None)
     return setattr(self, self.parent_attr, value)
 
   @staticmethod
@@ -126,6 +139,136 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
         db.Index("ix_snapshots_parent", "parent_type", "parent_id"),
         db.Index("ix_snapshots_child", "child_type", "child_id"),
     )
+
+  @classmethod
+  def handle_post_flush(cls, session, flush_context, instances):
+    """Handle snapshot objects on api post requests."""
+    # pylint: disable=unused-argument
+    # Arguments here are set in the event listener and are mandatory.
+
+    with benchmark("Snapshot pre flush handler"):
+
+      snapshots = [o for o in session if isinstance(o, cls)]
+      if not snapshots:
+        return
+
+      with benchmark("Snapshot revert attrs"):
+        cls._revert_attrs(snapshots)
+
+      new_snapshots = [o for o in snapshots
+                       if getattr(o, "_update_revision", "") == "new"]
+      if new_snapshots:
+        with benchmark("Snapshot post api set revisions"):
+          cls._set_revisions(new_snapshots)
+        with benchmark("Snapshot post api ensure relationships"):
+          cls._ensure_relationships(new_snapshots)
+
+  @classmethod
+  def _revert_attrs(cls, objects):
+    """Revert any modified attributes on snapshot.
+
+    All snapshot attributes that are updatable with API calls should only be
+    settable and not editable. This function reverts any possible edits to
+    existing values.
+    """
+    attrs = ["parent_id", "parent_type", "child_id", "child_type"]
+    for snapshot in objects:
+      for attr in attrs:
+        deleted = inspect(snapshot).attrs[attr].history.deleted
+        if deleted:
+          setattr(snapshot, attr, deleted[0])
+
+  @classmethod
+  def _ensure_relationships(cls, objects):
+    """Ensure that snapshotted object is related to audit program.
+
+    This function is made to handle multiple snapshots for a single audit.
+    Args:
+      objects: list of snapshot objects with child_id and child_type set.
+    """
+    pairs = [(o.child_type, o.child_id) for o in objects]
+    assert len({o.parent.id for o in objects}) == 1  # fail on multiple audits
+    program = ("Program", objects[0].parent.program_id)
+    rel = relationship.Relationship
+    columns = db.session.query(
+        rel.destination_type,
+        rel.destination_id,
+        rel.source_type,
+        rel.source_id,
+    )
+    query = columns.filter(
+        tuple_(rel.destination_type, rel.destination_id) == (program),
+        tuple_(rel.source_type, rel.source_id).in_(pairs)
+    ).union(
+        columns.filter(
+            tuple_(rel.source_type, rel.source_id) == (program),
+            tuple_(rel.destination_type, rel.destination_id).in_(pairs)
+        )
+    )
+    existing_pairs = set(sum([
+        [(r.destination_type, r.destination_id), (r.source_type, r.source_id)]
+        for r in query
+    ], []))  # build a set of all found type-id pairs
+    missing_pairs = set(pairs).difference(existing_pairs)
+    cls._insert_relationships(program, missing_pairs)
+
+  @classmethod
+  def _insert_relationships(cls, program, missing_pairs):
+    """Insert missing obj-program relationships."""
+    if not missing_pairs:
+      return
+    current_user_id = get_current_user_id()
+    now = datetime.now()
+    # We are doing an INSERT IGNORE INTO here to mitigate a race condition
+    # that happens when multiple simultaneous requests create the same
+    # automapping. If a relationship object fails our unique constraint
+    # it means that the mapping was already created by another request
+    # and we can safely ignore it.
+    inserter = relationship.Relationship.__table__.insert().prefix_with(
+        "IGNORE")
+    db.session.execute(
+        inserter.values([
+            {
+                "id": None,
+                "modified_by_id": current_user_id,
+                "created_at": now,
+                "updated_at": now,
+                "source_type": program[0],
+                "source_id": program[1],
+                "destination_type": dst_type,
+                "destination_id": dst_id,
+                "context_id": None,
+                "status": None,
+                "automapping_id": None
+            }
+            for dst_type, dst_id in missing_pairs
+        ])
+    )
+
+  @classmethod
+  def _set_revisions(cls, objects):
+    """Set latest revision_id for given child_type.
+
+    Args:
+      objects: list of snapshot objects with child_id and child_type set.
+    """
+    pairs = [(o.child_type, o.child_id) for o in objects]
+    query = db.session.query(
+        func.max(revision.Revision.id, name="id", identifier="id"),
+        revision.Revision.resource_type,
+        revision.Revision.resource_id,
+    ).filter(
+        tuple_(
+            revision.Revision.resource_type,
+            revision.Revision.resource_id,
+        ).in_(pairs)
+    ).group_by(
+        revision.Revision.resource_type,
+        revision.Revision.resource_id,
+    )
+    id_map = {(r_type, r_id): id_ for id_, r_type, r_id in query}
+    for o in objects:
+      o.revision_id = id_map.get((o.child_type, o.child_id))
 
 
 class Snapshotable(object):
@@ -156,3 +299,6 @@ class Snapshotable(object):
             "Snapshot_complete"
         ),
     )
+
+
+event.listen(Session, 'before_flush', Snapshot.handle_post_flush)
