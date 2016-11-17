@@ -32,7 +32,7 @@
       }
     }
   */
-  can.Construct('GGRC.Mappings', {
+  can.Construct.extend('GGRC.Mappings', {
     // Convenience properties for building mappings types.
     Proxy: Proxy,
     Direct: Direct,
@@ -45,6 +45,55 @@
     Cross: Cross,
     modules: {},
 
+    /**
+     * Return list of allowed for mapping models.
+     * Performs checks for
+     * @param {String} type - base model type
+     * @param {Array} include - array of included models
+     * @param {Array} exclude - array of excluded models
+     * @return {Array} - list of allowed for mapping Models
+     */
+    getMappingList: function (type, include, exclude) {
+      var baseModel = GGRC.Utils.getModelByType(type);
+      if (!baseModel) {
+        return [];
+      }
+
+      if (can.isFunction(baseModel.getAllowedMappings)) {
+        return baseModel.getAllowedMappings() || [];
+      }
+      return GGRC.Utils
+        .getMappableTypes(type, {
+          whitelist: include,
+          forbidden: exclude
+        })
+        // Temporary Code to unify output formatting
+        .map(function (item) {
+          return {modelName: item, mappingType: 'relation'};
+        });
+    },
+    /**
+     * Perform a check to identify mapping type of {source} and {destination}.
+     * In case mapping type is "snapshot" - should return {false}.
+     * @param {String} source - model name of selected for mapping object
+     * @param {String} destination - destination model name
+     * @return {boolean} - is mapped directly or via parent object
+     */
+    canBeMappedDirectly: function (source, destination) {
+      var allowedMappingList;
+      var canBe;
+      if (!source || !destination) {
+        console.error('No arguments are provided or ' +
+          'has incorrect format.', arguments);
+        return true;
+      }
+      allowedMappingList = this.getMappingList(destination);
+      canBe = allowedMappingList
+        .some(function (item) {
+          return item.mappingType !== 'snapshot' && item.modelName === source;
+        });
+      return canBe;
+    },
     /*
       return all mappings from all modules for an object type.
       object - a string representing the object type's shortName
