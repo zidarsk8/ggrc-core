@@ -15,6 +15,7 @@ from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
+from ggrc.utils import benchmark
 from ggrc.login import get_current_user_id
 from ggrc.models import mixins
 from ggrc.models import reflection
@@ -145,17 +146,22 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
     # pylint: disable=unused-argument
     # Arguments here are set in the event listener and are mandatory.
 
-    snapshots = [o for o in session if isinstance(o, cls)]
-    if not snapshots:
-      return
+    with benchmark("Snapshot pre flush handler"):
 
-    cls._revert_attrs(snapshots)
+      snapshots = [o for o in session if isinstance(o, cls)]
+      if not snapshots:
+        return
 
-    new_snapshots = [o for o in snapshots
-                     if getattr(o, "_update_revision", "") == "new"]
-    if new_snapshots:
-      cls._set_revisions(new_snapshots)
-      cls._ensure_relationships(new_snapshots)
+      with benchmark("Snapshot revert attrs"):
+        cls._revert_attrs(snapshots)
+
+      new_snapshots = [o for o in snapshots
+                       if getattr(o, "_update_revision", "") == "new"]
+      if new_snapshots:
+        with benchmark("Snapshot post api set revisions"):
+          cls._set_revisions(new_snapshots)
+        with benchmark("Snapshot post api ensure relationships"):
+          cls._ensure_relationships(new_snapshots)
 
   @classmethod
   def _revert_attrs(cls, objects):
@@ -171,8 +177,6 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
         deleted = inspect(snapshot).attrs[attr].history.deleted
         if deleted:
           setattr(snapshot, attr, deleted[0])
-    pass
-
 
   @classmethod
   def _ensure_relationships(cls, objects):
