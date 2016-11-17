@@ -114,7 +114,7 @@
             value = value ? 1 : 0;
           }
           if (type === 'person') {
-            value = value ? ('Person:' + value.id) : value;
+            value = value ? ('Person:' + value.id) : 'Person:None';
           }
           if (type === 'dropdown') {
             if (value && value === '') {
