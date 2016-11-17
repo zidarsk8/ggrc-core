@@ -8,11 +8,14 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import orm
 from sqlalchemy import event
 from sqlalchemy.orm.session import Session
+from sqlalchemy import func
+from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models import relationship
+from ggrc.models import revision
 from ggrc.models.deferred import deferred
 from ggrc.models.computed_property import computed_property
 
@@ -148,7 +151,28 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
 
   @classmethod
   def _set_revisions(cls, objects):
-    pass
+    """Set latest revision_id for given child_type.
+
+    Args:
+      objects: list of snapshot objects with child_id and child_type set.
+    """
+    pairs = [(o.child_type, o.child_id) for o in objects]
+    query = db.session.query(
+        func.max(revision.Revision.id, name="id", identifier="id"),
+        revision.Revision.resource_type,
+        revision.Revision.resource_id,
+    ).filter(
+        tuple_(
+            revision.Revision.resource_type,
+            revision.Revision.resource_id,
+        ).in_(pairs)
+    ).group_by(
+        revision.Revision.resource_type,
+        revision.Revision.resource_id,
+    )
+    id_map = {(r_type, r_id): id_ for id_, r_type, r_id in query}
+    for o in objects:
+      o.revision_id = id_map.get((o.child_type, o.child_id))
 
 
 class Snapshotable(object):
