@@ -940,7 +940,7 @@ can.Control('GGRC.Controllers.Modals', {
           function finish() {
             delete that.disable_hide;
             if (that.options.add_more) {
-              if (that.options.$trigger) {
+              if (that.options.$trigger && that.options.$trigger.length) {
                 that.options.$trigger.trigger("modal:added", [obj]);
               }
               that.new_instance();
