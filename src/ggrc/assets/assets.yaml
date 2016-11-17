@@ -163,6 +163,7 @@ dashboard-js-files:
   - components/reusable-objects/reusable-objects-list.js
   - components/reusable-objects/reusable-objects-item.js
   - components/simple-modal/simple-modal.js
+  - components/mapping-controls/mapping-type-selector.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
@@ -215,6 +216,7 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/mapping-controls/mapping-type-selector.mustache
   - components/effective-dates/effective-dates.mustache
   - components/read-more/read-more.mustache
   - components/collapsible-panel/collapsible-panel.mustache

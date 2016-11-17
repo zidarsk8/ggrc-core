@@ -120,8 +120,10 @@
           };
         }
 
-        selected = this.scope.attr('mapper.get_instance');
-        mapper = this.scope.mapper.model_from_type(model.type);
+        selected = this.scope.attr('mapper.parentInstance');
+        console.info('Models is', model);
+        mapper = this.scope.mapper.modelFromType(model.type);
+        console.info('Mapper plural is: ', mapper.plural);
         bindings = this.scope.attr('mapper.bindings');
 
         if (bindings[model.id]) {
@@ -129,11 +131,9 @@
             selected_object: selected
           });
         }
-
         if (selected.has_binding(mapper.plural.toLowerCase())) {
           binding = selected.get_binding(mapper.plural.toLowerCase());
         }
-
         return {
           instance: model,
           selected_object: selected,
@@ -224,7 +224,7 @@
             this.scope.isRelevantToCurrent() &&
             (!term || !contact)) {
           instance = GGRC.page_instance();
-          binding = this.scope.mapper.get_binding_name(
+          binding = this.scope.mapper.getBindingName(
             instance,
             this.scope.attr('mapper.model.table_plural')
           );

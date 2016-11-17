@@ -34,7 +34,7 @@
     },
     init: function () {
       var scope = this.scope;
-      var parentInstance = scope.mapper.get_instance();
+      var parentInstance = scope.attr('mapper.parentInstance');
       var instance = scope.attr('instance');
       var isMapped = GGRC.Utils.is_mapped(parentInstance, instance);
       var hasPending = GGRC.Utils.hasPending(parentInstance, instance, 'add');
