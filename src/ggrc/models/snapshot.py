@@ -3,6 +3,8 @@
 
 """Module for Snapshot object"""
 
+from datetime import datetime
+
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import orm
@@ -12,6 +14,7 @@ from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
+from ggrc.login import get_current_user_id
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models import relationship
@@ -147,7 +150,70 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
 
   @classmethod
   def _ensure_relationships(cls, objects):
-    pass
+    """Ensure that snapshotted object is related to audit program.
+
+    This function is made to handle multiple snapshots for a single audit.
+    Args:
+      objects: list of snapshot objects with child_id and child_type set.
+    """
+    pairs = [(o.child_type, o.child_id) for o in objects]
+    assert len({o.parent.id for o in objects}) == 1  # fail on multiple audits
+    program = ("Program", o.parent.program_id)
+    rel = relationship.Relationship
+    columns = db.session.query(
+        rel.destination_type,
+        rel.destination_id,
+        rel.source_type,
+        rel.source_id,
+    )
+    query = columns.filter(
+        tuple_(rel.destination_type, rel.destination_id) == (program),
+        tuple_(rel.source_type, rel.source_id).in_(pairs)
+    ).union(
+        columns.filter(
+            tuple_(rel.source_type, rel.source_id) == (program),
+            tuple_(rel.destination_type, rel.destination_id).in_(pairs)
+        )
+    )
+    existing_pairs = set(sum([
+        [(r.destination_type, r.destination_id), (r.source_type, r.source_id)]
+        for r in query
+    ], []))  # build a set of all found type-id pairs
+    missing_pairs = set(pairs).difference(existing_pairs)
+    cls._insert_relationships(program, missing_pairs)
+
+  @classmethod
+  def _insert_relationships(cls, program, missing_pairs):
+    """Insert missing obj-program relationships."""
+    if not missing_pairs:
+      return
+    current_user_id = get_current_user_id()
+    now = datetime.now()
+    # We are doing an INSERT IGNORE INTO here to mitigate a race condition
+    # that happens when multiple simultaneous requests create the same
+    # automapping. If a relationship object fails our unique constraint
+    # it means that the mapping was already created by another request
+    # and we can safely ignore it.
+    inserter = relationship.Relationship.__table__.insert().prefix_with(
+        "IGNORE")
+    db.session.execute(
+        inserter.values([
+            {
+                "id": None,
+                "modified_by_id": current_user_id,
+                "created_at": now,
+                "updated_at": now,
+                "source_type": program[0],
+                "source_id": program[1],
+                "destination_type": dst_type,
+                "destination_id": dst_id,
+                "context_id": None,
+                "status": None,
+                "automapping_id": None
+            }
+            for dst_type, dst_id in missing_pairs
+        ])
+    )
 
   @classmethod
   def _set_revisions(cls, objects):
