@@ -90,8 +90,7 @@ class QueryHelper(object):
   """
 
   def __init__(self, query, ca_disabled=False):
-    importable = get_exportables()
-    self.object_map = {o.__name__: o for o in importable.values()}
+    self.object_map = {o.__name__: o for o in models.all_models.all_models}
     self.query = self._clean_query(query)
     self.ca_disabled = ca_disabled
     self._set_attr_name_map()
@@ -246,8 +245,8 @@ class QueryHelper(object):
         resource_sql = sa.sql.false()
 
       return sa.or_(
-        context_query_filter(model.context_id, contexts),
-        resource_sql)
+          context_query_filter(model.context_id, contexts),
+          resource_sql)
 
   def _get_objects(self, object_query):
     """Get a set of objects described in the filters."""
@@ -392,9 +391,9 @@ class QueryHelper(object):
         """Join fulltext index table, order by indexed CA value."""
         alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(self._count))
         joins = [(alias, sa.and_(
-          alias.key == model.id,
-          alias.type == model.__name__,
-          alias.tags == key)
+            alias.key == model.id,
+            alias.type == model.__name__,
+            alias.property == key)
         )]
         order = alias.content
         return joins, order
@@ -507,10 +506,10 @@ class QueryHelper(object):
         attr_type = getattr(object_class, key).property.columns[0].type
       except AttributeError:
         cad = db.session.query(CustomAttributeDefinition).filter(
-          CustomAttributeDefinition.title == key,
-          CustomAttributeDefinition.definition_type == object_class.__name__,
-          CustomAttributeDefinition.
-              attribute_type == CustomAttributeDefinition.ValidTypes.DATE,
+            CustomAttributeDefinition.title == key,
+            CustomAttributeDefinition.definition_type == object_class.__name__,
+            CustomAttributeDefinition.
+            attribute_type == CustomAttributeDefinition.ValidTypes.DATE,
         ).count()
         if cad:
           is_date = True
@@ -569,9 +568,7 @@ class QueryHelper(object):
       """Default filter option that tries to mach predicate in fulltext index.
 
       This function tries to match the predicate for a give key with entries in
-      the full text index table. The key is matched to record tags and as
-      the tags only contain custom attribute names, so this filter currently
-      only works on custom attributes.
+      the full text index table.
 
       Args:
         object_class: class of the object we are querying for.
@@ -584,10 +581,10 @@ class QueryHelper(object):
           custom attribute.
       """
       return object_class.id.in_(db.session.query(Record.key).filter(
-              Record.type == object_class.__name__,
-              Record.tags == key,
-              predicate(Record.content)
-          ))
+          Record.type == object_class.__name__,
+          Record.property == key,
+          predicate(Record.content)
+      ))
 
     def with_key(key, p):
       """Apply keys to the filter expression."""
@@ -625,11 +622,11 @@ class QueryHelper(object):
     def owned():
       """Get objects for which the user is owner."""
       res = db.session.query(
-        query_helpers.get_myobjects_query(
-            types=[object_class.__name__],
-            contact_id=exp["ids"][0],
-            is_creator=is_creator(),
-        ).alias().c.id
+          query_helpers.get_myobjects_query(
+              types=[object_class.__name__],
+              contact_id=exp["ids"][0],
+              is_creator=is_creator(),
+          ).alias().c.id
       )
       res = res.all()
       if res:

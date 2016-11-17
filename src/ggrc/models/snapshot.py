@@ -8,9 +8,11 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.models.deferred import deferred
 from ggrc.models import mixins
+from ggrc.models import reflection
 from ggrc.models import relationship
+from ggrc.models.deferred import deferred
+from ggrc.models.computed_property import computed_property
 
 
 def get_latest_revision_id(snapshot):
@@ -47,6 +49,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       "child_type",
       "revision",
       "revision_id",
+      reflection.PublishOnly("revision_content"),
   ]
 
   _update_attrs = [
@@ -93,6 +96,10 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       latest_revision_id = get_latest_revision_id(self)
       if latest_revision_id:
         self.revision_id = latest_revision_id
+
+  @computed_property
+  def revision_content(self):
+    return self.revision.content
 
   @property
   def parent_attr(self):
