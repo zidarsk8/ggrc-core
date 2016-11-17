@@ -283,6 +283,8 @@ def generate_relationship_snapshots(obj):
         child_id=child.id,
         child_type=child.type,
         update_revision="new",
+        context=parent.context,
+        modified_by=get_current_user()
     ))
 
 
