@@ -4,6 +4,8 @@
  */
 
 (function ($, GGRC, moment, Permission) {
+  'use strict';
+
   var customAttributesType = {
     Text: 'input',
     'Rich Text': 'text',
@@ -366,6 +368,19 @@
           _.contains(createContexts, targetContext));
       }
       return canMap;
+    },
+    /**
+     * Return Model Constructor Instance
+     * @param {String} type - Model type
+     * @return {CMS.Model.Cacheble} - Return Model Constructor
+     */
+    getModelByType: function (type) {
+      if (!type || typeof type !== 'string') {
+        console.error('Type is not provided or has incorrect format',
+          'Value of Type is: ', type);
+        return null;
+      }
+      return CMS.Models[type] || GGRC.Models[type];
     },
     /**
      * Return normalized Custom Attribute Type from Custom Attribute Definition
