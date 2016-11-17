@@ -121,6 +121,7 @@ def get_public_config():
   return {
       "external_help_url": getattr(settings, "EXTERNAL_HELP_URL", ""),
       "snapshotable_objects": list(rules.Types.all),
+      "snapshotable_ignored": list(rules.Types.ignore),
   }
 
 
