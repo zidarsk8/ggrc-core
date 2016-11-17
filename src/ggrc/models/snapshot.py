@@ -6,6 +6,8 @@
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import orm
+from sqlalchemy import event
+from sqlalchemy.orm.session import Session
 
 from ggrc import db
 from ggrc.models import mixins
@@ -53,6 +55,9 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
   ]
 
   _update_attrs = [
+      "parent",
+      "child_id",
+      "child_type",
       "update_revision"
   ]
 
@@ -92,6 +97,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
 
   @update_revision.setter
   def update_revision(self, value):
+    self._update_revision = value
     if value == "latest":
       latest_revision_id = get_latest_revision_id(self)
       if latest_revision_id:
@@ -111,10 +117,8 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
 
   @parent.setter
   def parent(self, value):
-    if value is not None:
-      self.parent_id, self.parent_type = value.id, value.__class__.__name__
-    else:
-      self.parent_id, self.parent_type = None, None
+    self.parent_id = getattr(value, 'id', None)
+    self.parent_type = getattr(value, 'type', None)
     return setattr(self, self.parent_attr, value)
 
   @staticmethod
@@ -126,6 +130,25 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
         db.Index("ix_snapshots_parent", "parent_type", "parent_id"),
         db.Index("ix_snapshots_child", "child_type", "child_id"),
     )
+
+  @classmethod
+  def handle_post_flush(cls, session, flush_context, instances):
+    objects = [
+        o for o in session.new
+        if isinstance(o, cls) and getattr(o, "_update_revision", "") == "new"
+    ]
+    if not objects:
+      return
+    cls._set_revisions(objects)
+    cls._ensure_relationships(objects)
+
+  @classmethod
+  def _ensure_relationships(cls, objects):
+    pass
+
+  @classmethod
+  def _set_revisions(cls, objects):
+    pass
 
 
 class Snapshotable(object):
@@ -156,3 +179,6 @@ class Snapshotable(object):
             "Snapshot_complete"
         ),
     )
+
+
+event.listen(Session, 'before_flush', Snapshot.handle_post_flush)
