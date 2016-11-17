@@ -28,7 +28,7 @@ describe('can.Model.AssessmentTemplate', function () {
 
       // mock the MapperModel used by the method under test
       fakeMapper = {
-        types: jasmine.createSpy()
+        initTypes: jasmine.createSpy()
       };
       FakeMapperModel = jasmine.createSpy().and.callFake(function (config) {
         return fakeMapper;
@@ -56,7 +56,7 @@ describe('can.Model.AssessmentTemplate', function () {
         }
       };
 
-      fakeMapper.types.and.returnValue(objectTypes);
+      fakeMapper.initTypes.and.returnValue(objectTypes);
       result = instance._choosableObjectTypes();
       expect(result).toEqual(objectTypes);
     });
@@ -77,7 +77,7 @@ describe('can.Model.AssessmentTemplate', function () {
         {name: 'Bar'}, {name: 'Car'}, {name: 'Dar'}, {name: 'Zar'}
       ];
 
-      fakeMapper.types.and.returnValue(objectTypes);
+      fakeMapper.initTypes.and.returnValue(objectTypes);
       result = instance._choosableObjectTypes();
       expect(result.groupFoo.items).toEqual(expected);
     });
@@ -92,7 +92,7 @@ describe('can.Model.AssessmentTemplate', function () {
         }
       };
 
-      fakeMapper.types.and.returnValue(objectTypes);
+      fakeMapper.initTypes.and.returnValue(objectTypes);
       result = instance._choosableObjectTypes();
       expect(result.all_objects).toBeUndefined();
     });
@@ -140,7 +140,7 @@ describe('can.Model.AssessmentTemplate', function () {
           // the groupBaz group, being empty, is expected to have been removed
         };
 
-        fakeMapper.types.and.returnValue(objectTypes);
+        fakeMapper.initTypes.and.returnValue(objectTypes);
         result = instance._choosableObjectTypes();
         expect(result).toEqual(expected);
       }

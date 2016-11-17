@@ -6,28 +6,9 @@
   'use strict';
   /**
    * Tree View Widgets Configuration module
-   * NOTE: should replaced with some back-end configuration JSON
    */
   // Items allowed for mapping via snapshot.
-  // NOTE: 'Risk' and 'Threat' Models has no mapping configuration with Audit!!! Need to be double checked
-  var snapshotWidgetsConfig = [
-    'AccessGroup',
-    'Clause', 'Contract',
-    'Control',
-    'DataAsset',
-    'Facility', 'Market',
-    'Objective',
-    'OrgGroup',
-    'Policy',
-    'Process',
-    'Product',
-    'Regulation',
-    'Section',
-    'Standard',
-    'System',
-    'Vendor',
-    'Risk',
-    'Threat'];
+  var snapshotWidgetsConfig = GGRC.config.snapshotable_objects;
   // Items allowed for relationship mapping
   var directMappingConfig = [
     'Assessment',
@@ -42,10 +23,10 @@
   ];
   // Audit is excluded and created a separate logic for it
   var baseWidgetsConfig = {
-    AccessGroup: 'Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor Snapshot',
-    Clause: 'AccessGroup Audit Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor Snapshot',
-    Contract: 'AccessGroup Audit Clause Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Process Product Program Project Request Section System Vendor Snapshot',
-    Control: 'AccessGroup Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Request Section Standard System Vendor Snapshot',
+    AccessGroup: 'Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor',
+    Clause: 'AccessGroup Audit Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor',
+    Contract: 'AccessGroup Audit Clause Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Process Product Program Project Request Section System Vendor',
+    Control: 'AccessGroup Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Request Section Standard System Vendor',
     Assessment: 'AccessGroup Audit Clause Contract Control DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Request Section Standard System Vendor',
     DataAsset: 'AccessGroup Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor',
     Facility: 'AccessGroup Audit Clause Contract Control Assessment DataAsset Facility Issue Market Objective OrgGroup Person Policy Process Product Program Project Regulation Request Section Standard System Vendor',

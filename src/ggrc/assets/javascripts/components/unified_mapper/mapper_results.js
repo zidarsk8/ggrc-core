@@ -121,9 +121,7 @@
         }
 
         selected = this.scope.attr('mapper.parentInstance');
-        console.info('Models is', model);
         mapper = this.scope.mapper.modelFromType(model.type);
-        console.info('Mapper plural is: ', mapper.plural);
         bindings = this.scope.attr('mapper.bindings');
 
         if (bindings[model.id]) {

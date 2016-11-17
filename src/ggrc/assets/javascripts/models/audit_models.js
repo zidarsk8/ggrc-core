@@ -28,7 +28,8 @@
         }
       });
 
-      if (Permission.is_allowed('create', 'UserRole', program.context.id) && !~can.inArray(person.reify(), editorAuthorizedPeople)) {
+      if (Permission.is_allowed('create', 'UserRole', program.context.id) &&
+        !~can.inArray(person.reify(), editorAuthorizedPeople)) {
         deleteDfds = can.map(readerAuthorizations, function (ra) {
           if (ra.person.reify() === person.reify()) {
             return ra.refresh().then(function () {
@@ -924,7 +925,7 @@
         object: 'MultitypeSearch',
         search_only: true
       });
-      objectTypes = mapper.attr('types');
+      objectTypes = mapper.initTypes();
 
       // the all objects group is not needed
       delete objectTypes.all_objects;

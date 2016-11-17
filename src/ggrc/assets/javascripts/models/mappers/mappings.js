@@ -83,7 +83,7 @@
       var allowedMappingList;
       var canBe;
       if (!source || !destination) {
-        console.error('No arguments are provided or ' +
+        console.debug('No arguments are provided or ' +
           'has incorrect format.', arguments);
         return true;
       }

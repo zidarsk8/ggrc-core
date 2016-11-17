@@ -74,16 +74,7 @@
         this.attr('join_object_id')
       );
     },
-    prepareCorrectTypeFormat: function (modelName) {
-      var cmsModel = GGRC.Utils.getModelByType(modelName);
-      if (!cmsModel) {
-        return null;
-      }
-
-      if (cmsModel.title_singular === 'Reference') {
-        return;
-      }
-
+    prepareCorrectTypeFormat: function (cmsModel) {
       return {
         category: cmsModel.category,
         name: cmsModel.title_plural,
@@ -97,10 +88,13 @@
     },
     addFormattedType: function (modelName, groups) {
       var group;
-      var type = this.prepareCorrectTypeFormat(modelName);
-      if (!type || type.title_singular === 'Reference') {
+      var type;
+      var cmsModel;
+      cmsModel = GGRC.Utils.getModelByType(modelName);
+      if (!cmsModel || cmsModel.title_singular === 'Reference') {
         return;
       }
+      type = this.prepareCorrectTypeFormat(cmsModel);
       group = !groups[type.category] ?
         groups.governance :
         groups[type.category];

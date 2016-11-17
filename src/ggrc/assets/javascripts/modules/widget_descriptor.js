@@ -79,7 +79,7 @@
       // Should not even try to create descriptor if configuration options are missing
       if (!instance || !farModel || !mapping) {
         console
-          .info('Arguments are missing or have incorrect format', arguments);
+          .debug('Arguments are missing or have incorrect format', arguments);
         return null;
       }
       descriptor = {
@@ -159,4 +159,4 @@
       return ret;
     }
   }, {});
-})(this.can.$, this.CMS, this.GGRC);
+})(window.can.$, window.CMS, window.GGRC);
