@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (namespace, $) {
+(function ($, can, CMS, GGRC) {
   var $area = $('.area').first();
   var defaults;
   var extraPageOptions;
@@ -32,7 +32,7 @@
 
   var initWidgets = function () {
     // Ensure each extension has had a chance to initialize widgets
-    _.each(GGRC.extensions, function (extension) {
+    can.each(GGRC.extensions, function (extension) {
       if (extension.init_widgets) {
         extension.init_widgets();
       }
@@ -42,7 +42,7 @@
   var adminListDescriptors = {
     people: {
       model: CMS.Models.Person,
-      roles: new can.Observe.List(),
+      roles: new can.List(),
       init: function () {
         var self = this;
         CMS.Models.Role
@@ -212,7 +212,7 @@
       defaults.splice(defaults.indexOf('task'), 1);
     }
 
-    $area.cms_controllers_page_object($.extend({
+    $area.cms_controllers_page_object(can.extend({
       widget_descriptors: widgetList,
       default_widgets: defaults || GGRC.default_widgets || [],
       instance: GGRC.page_instance(),
@@ -260,4 +260,4 @@
   $(window).on('load', function () {
     $('html').removeClass('no-js');
   });
-})(this, jQuery);
+})(window.can.$, window.can, window.CMS, window.GGRC);

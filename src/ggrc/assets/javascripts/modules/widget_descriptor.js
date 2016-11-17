@@ -75,7 +75,14 @@
       extenders [optional] - an array of objects that will extend the default widget config.
     */
     make_tree_view: function (instance, farModel, mapping, extenders) {
-      var descriptor = {
+      var descriptor;
+      // Should not even try to create descriptor if configuration options are missing
+      if (!instance || !farModel || !mapping) {
+        console
+          .info('Arguments are missing or have incorrect format', arguments);
+        return null;
+      }
+      descriptor = {
         content_controller: CMS.Controllers.TreeView,
         content_controller_selector: 'ul',
         widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
