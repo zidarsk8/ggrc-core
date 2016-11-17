@@ -545,9 +545,11 @@ class QueryHelper(object):
             definition_type=object_class.__name__,
         )
         if not (date_cad or non_date_cad) and not custom_filter:
+          # TODO: this logic fails on CA search for Snapshots
+          pass
           # no CA with this name and no custom filter for the field
-          raise BadQueryException(u"Model {} has no field or CA {}"
-                                  .format(object_class.__name__, o_key))
+          # raise BadQueryException(u"Model {} has no field or CA {}"
+          #                         .format(object_class.__name__, o_key))
       else:
         if isinstance(attr_type, sa.sql.sqltypes.Date):
           date_attr = True

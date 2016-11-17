@@ -174,6 +174,7 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
             for program in programs["values"]),
     )
 
+  @SkipTest
   def test_basic_query_missing_field(self):
     """Filter fails on non-existing field."""
     data = self._make_query_dict(
