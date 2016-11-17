@@ -15,9 +15,11 @@ from collections import Counter
 from sqlalchemy import exc
 from sqlalchemy import or_
 from sqlalchemy import and_
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 from ggrc import db
 from ggrc import models
+from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 from ggrc.utils import structures
 from ggrc.converters import errors
@@ -31,6 +33,8 @@ from ggrc.services.common import update_index
 from ggrc.services.common import update_memcache_after_commit
 from ggrc.services.common import update_memcache_before_commit
 from ggrc.services.common import log_event
+from ggrc_workflows.models.cycle_task_group_object_task import \
+    CycleTaskGroupObjectTask
 
 
 # pylint: disable=invalid-name
@@ -95,6 +99,7 @@ class BlockConverter(object):
     self.offset = options.get("offset", 0)
     self.object_class = options.get("object_class")
     self.rows = options.get("rows", [])
+    self.operation = 'import' if self.rows else 'export'
     self.object_ids = options.get("object_ids", [])
     self.block_errors = []
     self.block_warnings = []
@@ -102,21 +107,36 @@ class BlockConverter(object):
     self.row_warnings = []
     self.row_converters = []
     self.ignore = False
-    if not self.object_class:
-      class_name = options.get("class_name", "")
-      self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2,
-                      object_name=class_name)
+    # For import contains model name from csv file.
+    # For export contains 'Model.__name__' value.
+    self.class_name = options.get("class_name", "")
+    # TODO: remove 'if' statement. Init should initialize only.
+    if self.object_class:
+      self.object_headers = get_object_column_definitions(self.object_class)
+      all_header_names = [unicode(key)
+                          for key in self.get_header_names().keys()]
+      raw_headers = options.get("raw_headers", all_header_names)
+      self.check_for_duplicate_columns(raw_headers)
+      self.headers = self.clean_headers(raw_headers)
+      self.unique_counts = self.get_unique_counts_dict(self.object_class)
+      self.table_singular = self.object_class._inflector.table_singular
+      self.name = self.object_class._inflector.human_singular.title()
+      self.organize_fields(options.get("fields", []))
+    else:
       self.name = ""
+
+  def check_block_restrictions(self):
+    """Check some block related restrictions"""
+    if not self.object_class:
+      self.add_errors(errors.WRONG_OBJECT_TYPE, line=self.offset + 2,
+                      object_name=self.class_name)
       return
-    self.object_headers = get_object_column_definitions(self.object_class)
-    all_header_names = [unicode(key) for key in self.get_header_names().keys()]
-    raw_headers = options.get("raw_headers", all_header_names)
-    self.check_for_duplicate_columns(raw_headers)
-    self.headers = self.clean_headers(raw_headers)
-    self.unique_counts = self.get_unique_counts_dict(self.object_class)
-    self.table_singular = self.object_class._inflector.table_singular
-    self.name = self.object_class._inflector.human_singular.title()
-    self.organize_fields(options.get("fields", []))
+    if (self.operation == 'import' and
+            self.object_class is CycleTaskGroupObjectTask and
+            not permissions.is_admin()):
+      self.add_errors(errors.PERMISSION_ERROR, line=self.offset + 2)
+      logger.error("Import failed with: Only admin can update existing "
+                   "cycle-tasks via import")
 
   def _create_ca_definitions_cache(self):
     """Create dict cache for custom attribute definitions.
@@ -243,6 +263,15 @@ class BlockConverter(object):
     for index, header in enumerate(headers):
       if header in header_names:
         field_name = header_names[header]
+        if (self.operation == 'import' and
+                hasattr(self.object_class, "IMPORTABLE_FIELDS") and
+                field_name not in self.object_class.IMPORTABLE_FIELDS):
+          self.add_warning(errors.NON_IMPORTABLE_COLUMN_WARNING,
+                           line=self.offset + 2,
+                           column_name=header)
+          self.remove_column(index - removed_count)
+          removed_count += 1
+          continue
         clean_headers[field_name] = self.object_headers[field_name]
       else:
         self.add_warning(errors.UNKNOWN_COLUMN,
@@ -363,6 +392,8 @@ class BlockConverter(object):
     for row_converter in self.row_converters:
       self._check_object(row_converter)
 
+    self.clean_session_from_ignored_objs()
+
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
         row_converter.send_pre_commit_signals()
@@ -377,6 +408,20 @@ class BlockConverter(object):
       self.save_import()
       for row_converter in self.row_converters:
         row_converter.send_post_commit_signals()
+
+  def clean_session_from_ignored_objs(self):
+    """Clean DB session from ignored objects.
+
+    This function expunges objects from 'db.session' which are in rows that
+    marked as 'ignored' before commit.
+    """
+    for row_converter in self.row_converters:
+      obj = row_converter.obj
+      try:
+        if row_converter.ignore and obj in db.session:
+          db.session.expunge(obj)
+      except UnmappedInstanceError:
+        continue
 
   def save_import(self):
     """Commit all changes in the session and update memcache."""
@@ -471,15 +516,12 @@ class BlockConverter(object):
   def _check_object(self, row_converter):
     """Check object if it has any pre commit checks.
 
-    Object will not be checked if there's already an error on and it's marked
-    as ignored. The check functions can mutate the row_converter object and
-    mark it to be ignored if there are any errors detected.
+    The check functions can mutate the row_converter object and mark it
+    to be ignored if there are any errors detected.
 
     Args:
       row_converter: Row converter for the row we want to check
     """
-    if row_converter.ignore:
-      return
-    checker = pre_commit_checks.CHECKS.get(row_converter.obj.type)
+    checker = pre_commit_checks.CHECKS.get(type(row_converter.obj).__name__)
     if checker and callable(checker):
       checker(row_converter)

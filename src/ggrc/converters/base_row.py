@@ -9,6 +9,7 @@ import collections
 import ggrc.services
 from ggrc import db
 from ggrc.converters import errors
+from ggrc.converters import get_importables
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 from ggrc.services.common import Resource
@@ -96,7 +97,7 @@ class RowConverter(object):
 
   def check_mandatory_fields(self):
     """Check if the new object contains all mandatory columns."""
-    if not self.is_new or self.is_delete:
+    if not self.is_new or self.is_delete or self.ignore:
       return
     headers = self.block_converter.object_headers
     mandatory = [key for key, header in headers.items() if header["mandatory"]]
@@ -143,6 +144,11 @@ class RowConverter(object):
     self.is_new = False
     obj = self.find_by_key(key, value)
     if not obj:
+      # We assume that 'get_importables()' returned value contains
+      # names of the objects that cannot be created via import but
+      # can be updated.
+      if self.block_converter.class_name.lower() not in get_importables():
+        self.add_error(errors.CREATE_INSTANCE_ERROR)
       obj = self.object_class()
       self.is_new = True
     elif not permissions.is_allowed_update_for(obj):
