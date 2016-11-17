@@ -89,6 +89,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
   revision = db.relationship(
       "Revision",
   )
+  _update_revision = None
 
   @classmethod
   def eager_query(cls):
@@ -139,6 +140,9 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
 
   @classmethod
   def handle_post_flush(cls, session, flush_context, instances):
+    """Handle snapshot objects on api post requests."""
+    # pylint: disable=unused-argument
+    # Arguments here are set in the event listener and are mandatory.
     objects = [
         o for o in session.new
         if isinstance(o, cls) and getattr(o, "_update_revision", "") == "new"
@@ -158,7 +162,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
     """
     pairs = [(o.child_type, o.child_id) for o in objects]
     assert len({o.parent.id for o in objects}) == 1  # fail on multiple audits
-    program = ("Program", o.parent.program_id)
+    program = ("Program", objects[0].parent.program_id)
     rel = relationship.Relationship
     columns = db.session.query(
         rel.destination_type,
