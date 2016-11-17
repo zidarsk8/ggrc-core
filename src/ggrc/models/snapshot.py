@@ -9,6 +9,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import orm
 from sqlalchemy import event
+from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
 from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
@@ -143,14 +144,35 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
     """Handle snapshot objects on api post requests."""
     # pylint: disable=unused-argument
     # Arguments here are set in the event listener and are mandatory.
-    objects = [
-        o for o in session.new
-        if isinstance(o, cls) and getattr(o, "_update_revision", "") == "new"
-    ]
-    if not objects:
+
+    snapshots = [o for o in session if isinstance(o, cls)]
+    if not snapshots:
       return
-    cls._set_revisions(objects)
-    cls._ensure_relationships(objects)
+
+    cls._revert_attrs(snapshots)
+
+    new_snapshots = [o for o in snapshots
+                     if getattr(o, "_update_revision", "") == "new"]
+    if new_snapshots:
+      cls._set_revisions(new_snapshots)
+      cls._ensure_relationships(new_snapshots)
+
+  @classmethod
+  def _revert_attrs(cls, objects):
+    """Revert any modified attributes on snapshot.
+
+    All snapshot attributes that are updatable with API calls should only be
+    settable and not editable. This function reverts any possible edits to
+    existing values.
+    """
+    attrs = ["parent_id", "parent_type", "child_id", "child_type"]
+    for snapshot in objects:
+      for attr in attrs:
+        deleted = inspect(snapshot).attrs[attr].history.deleted
+        if deleted:
+          setattr(snapshot, attr, deleted[0])
+    pass
+
 
   @classmethod
   def _ensure_relationships(cls, objects):
