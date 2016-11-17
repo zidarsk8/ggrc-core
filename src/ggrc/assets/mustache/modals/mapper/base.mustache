@@ -144,7 +144,10 @@
     contact="mapper.contact"
     term="mapper.term"
     options="mapper.options"
-    items-per-page="20">
+    items-per-page="20"
+    is_snapshotable="mapper.is_snapshotable"
+    snapshot_scope_id="{{mapper.snapshot_scope_id}}"
+    snapshot_scope_type="{{mapper.snapshot_scope_type}}">
 </mapper-results>
 <div class="modal-footer">
   {{^if mapper.search_only}}

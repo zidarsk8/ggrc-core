@@ -1576,6 +1576,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
   },
 
   init: function (el, opts) {
+    var parent = opts.parent_instance || {};
     if (this.options.instance && !this.options.show_view) {
       this.options.show_view =
         this.options.instance.constructor[this.options.options_property].show_view ||
@@ -1588,7 +1589,11 @@ can.Control('CMS.Controllers.TreeViewNode', {
       this.options.child_options.each(function (option) {
         option.attr({
           parent: this,
-          parent_instance: this.options.instance
+          parent_instance: this.options.instance,
+          is_snapshotable:
+            GGRC.Utils.Snapshots.isSnapshotScope(parent),
+          snapshot_scope_id: parent.id,
+          snapshot_scope_type: parent.type
         });
       }.bind(this));
     }
