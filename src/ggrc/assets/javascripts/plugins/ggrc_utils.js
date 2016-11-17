@@ -587,7 +587,11 @@
       var params = can.makeArray(widgets)
         .map(function (widget) {
           var param;
-          if (typeof widget === 'string') {
+          if (relevant.type === 'Audit' && GGRC.config.snapshotable_objects.indexOf(widget) > -1){
+            param = buildParam('Snapshot', {},
+              makeExpression(widget, relevant.type, relevant.id), null,
+              GGRC.query_parser.parse('child_type = ' + widget));
+          } else if (typeof widget === 'string') {
             param = buildParam(widget, {},
               makeExpression(widget, relevant.type, relevant.id));
           } else {
@@ -605,6 +609,9 @@
         data.forEach(function (info, i) {
           var widget = widgets[i];
           var name = typeof widget === 'string' ? widget : widget.name;
+          if (relevant.type === 'Audit' && GGRC.config.snapshotable_objects.indexOf(widget) > -1){
+            name = "Snapshot"
+          }
           var countsName = typeof widget === 'string' ?
             widget : (widget.countsName || widget.name);
           widgetsCounts.attr(countsName, info[name].total);
