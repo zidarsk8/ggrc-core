@@ -5,12 +5,41 @@
 
 can.Control('GGRC.Controllers.TreeFilter', {}, {
   init: function () {
+    var filterExpression;
+    var queryParams;  // just a parsed query string
+    var queryString;
     var parentControl;
+
     this._super && this._super.apply(this, arguments);
     this.options.states = new can.Observe();
     parentControl = this.element.closest('.cms_controllers_dashboard_widgets')
       .find('.cms_controllers_tree_view').control();
     parentControl && parentControl.options.attr('states', this.options.states);
+
+    this.$txtFilter = this.element.find('input[name=filter_query]');
+
+    // determine the tree view filter and automatically apply it if it exists
+    queryString = location.search.substr(1);  // remove the '?' prefix
+    queryParams = can.route.deparam(queryString);
+    filterExpression = queryParams.filter || '';
+
+    if (filterExpression) {
+      this.$txtFilter.val(filterExpression);
+
+      // This is needed (?) for the old filter code, because setting the
+      // input's value here does not fire the change event... but we should
+      // delete this once we get rid of that legacy filter code.
+      this.options.states.attr('filter_query', filterExpression);
+
+      // NOTE: We must wait for the parent tree view controller (that does the
+      // actual filtering heavy lifting) and it's DOM element to be present and
+      // initialized. We should probably use some other event than window load,
+      // but could not find a better candidate...
+      $(window).on('load', function () {
+        this.apply_filter(filterExpression);
+      }.bind(this));
+    }
+
     this.on();
   },
   toggle_indicator: function (currentFilter) {
@@ -40,7 +69,7 @@ can.Control('GGRC.Controllers.TreeFilter', {}, {
     this.apply_filter('');
   },
   'input[type=submit] click': function (el, ev) {
-    this.apply_filter(this.element.find('input[type=text]').val());
+    this.apply_filter(this.$txtFilter.val());
   },
   'input keyup': function (el, ev) {
     this.toggle_indicator(GGRC.query_parser.parse(el.val()));
