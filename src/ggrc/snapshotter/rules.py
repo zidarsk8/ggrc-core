@@ -33,6 +33,10 @@ class Types(object):
       "Threat",
   }
 
+  parents = {
+      "Audit",
+  }
+
   ignore = {
       "Assessment",
       "AssessmentTemplate",
