@@ -14,6 +14,16 @@
     ),
     scope: {
       instance: null,
+      configStartDate: {
+        label: 'Effective Date',
+        helpText: 'Enter the date this object becomes effective.',
+        required: false
+      },
+      configEndDate: {
+        label: 'Stop Date',
+        helpText: 'Enter the date this object stops being effective.',
+        required: false
+      }
     }
   });
 })(window.can, window.GGRC);
