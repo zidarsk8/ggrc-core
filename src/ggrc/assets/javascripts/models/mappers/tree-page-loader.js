@@ -12,8 +12,14 @@
       this.binding = instance.get_binding(mapping);
     },
     load: function (params) {
+      var snapshots = GGRC.Utils.Snapshots;
+      var queryParams = params;
       var result;
-      return this.model.query(params)
+      if (snapshots.isSnapshotScope(this.binding.instance) &&
+        snapshots.isSnapshotModel(params.data[0].object_name)) {
+        queryParams = snapshots.transformQuery(params);
+      }
+      return this.model.query(queryParams)
         .then(function (data) {
           result = data;
           return this.insertInstancesFromMappings(data.values);

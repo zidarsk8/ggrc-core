@@ -342,6 +342,7 @@ can.Control('CMS.Controllers.TreeLoader', {
 
     can.each(toInsert, function (item) {
       var prepped = that.prepare_child_options(item, force_prepare_children);
+      // Should we skip items without selfLink?
       if (prepped.instance.selfLink) {
         preppedItems.push(prepped);
       }
@@ -1617,8 +1618,8 @@ can.Control('CMS.Controllers.TreeViewNode', {
     function getValues(cav) {
       return _.pluck(cav.reify(), 'attribute_value');
     }
-    if (oldVal.length === newVal.length &&
-      _.difference(getValues(oldVal), getValues(newVal)).length) {
+    if ((!oldVal || !newVal) || (oldVal.length === newVal.length &&
+      _.difference(getValues(oldVal), getValues(newVal)).length)) {
       this.draw_node(true);
     }
   },

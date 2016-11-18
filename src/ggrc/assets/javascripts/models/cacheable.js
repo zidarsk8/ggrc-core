@@ -469,6 +469,10 @@
           if (sourceData[self.shortName]) {
             sourceData = sourceData[self.shortName];
             values = sourceData.values;
+          } else if (sourceData.Snapshot) {
+            // This is response with snapshots - convert it to objects
+            sourceData = sourceData.Snapshot;
+            values = GGRC.Utils.Snapshots.toObjects(sourceData.values);
           }
 
           if (!values.splice) {
@@ -730,7 +734,7 @@
       var cache = can.getObject('cache', this.constructor, true);
       var id_key = this.constructor.id;
       var that = this;
-
+      GGRC.Utils.Snapshots.setAttrs(this);
       if (this[id_key] || this[id_key] === 0)
         cache[this[id_key]] = this;
       this.attr('class', this.constructor);
