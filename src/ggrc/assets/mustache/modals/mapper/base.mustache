@@ -16,6 +16,12 @@
   </h2>
 </div>
 <div class="modal-filter modal-body choose-object-wrap">
+{{#if mapper.showWarning}}
+    <div class="alert alert-error">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        {{mapper.warningMessage}}
+    </div>
+{{/if}}
   <div class="row-fluid add-button">
     <div class="span12">
       <div class="pull-right">
@@ -80,25 +86,7 @@
   <div class="row-fluid">
     <div class="span4">
       <h6>Object type</h6>
-      <select {{#loading_or_saving}}disabled{{/loading_or_saving}} class="input-block-level" can-value="mapper.type" name="type-select">
-        {{#each mapper.types}}
-          {{#if items}}
-            {{#if items.length}}
-            <optgroup label="{{name}}">
-              {{#each items}}
-                {{#if name}}
-                <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
-                {{/if}}
-              {{/each}}
-            </optgroup>
-            {{/if}}
-          {{else}}
-            {{#if name}}
-            <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
-            {{/if}}
-          {{/if}}
-        {{/each}}
-      </select>
+     <mapping-type-selector types="mapper.types" selected-type="mapper.type" disabled="isLoadingOrSaving"></mapping-type-selector>
     </div>
     <div class="span4">
       <div class="modal-search">

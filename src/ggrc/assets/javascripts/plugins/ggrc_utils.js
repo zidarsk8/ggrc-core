@@ -4,6 +4,8 @@
  */
 
 (function ($, GGRC, moment, Permission) {
+  'use strict';
+
   var customAttributesType = {
     Text: 'input',
     'Rich Text': 'text',
@@ -134,7 +136,7 @@
       if (script.readyState) {
         script.onreadystatechange = function () {
           if (script.readyState === 'loaded' ||
-              script.readyState === 'complete') {
+            script.readyState === 'complete') {
             script.onreadystatechange = null;
             callback();
           }
@@ -324,9 +326,9 @@
 
       // special check for snapshot:
       if (options &&
-          options.context &&
-          options.context.parent_instance &&
-          options.context.parent_instance.snapshot) {
+        options.context &&
+        options.context.parent_instance &&
+        options.context.parent_instance.snapshot) {
         // Avoid add mapping for snapshot
         return false;
       }
@@ -366,6 +368,19 @@
           _.contains(createContexts, targetContext));
       }
       return canMap;
+    },
+    /**
+     * Return Model Constructor Instance
+     * @param {String} type - Model type
+     * @return {CMS.Model.Cacheble|null} - Return Model Constructor
+     */
+    getModelByType: function (type) {
+      if (!type || typeof type !== 'string') {
+        console.debug('Type is not provided or has incorrect format',
+          'Value of Type is: ', type);
+        return null;
+      }
+      return CMS.Models[type] || GGRC.Models[type];
     },
     /**
      * Return normalized Custom Attribute Type from Custom Attribute Definition
@@ -533,7 +548,7 @@
       var params = {};
 
       if (!objName) {
-        return;
+        return {};
       }
 
       params.object_name = objName;
@@ -569,19 +584,20 @@
     }
 
     function initCounts(widgets, relevant) {
-      var params = (widgets ? Array.from(widgets) : []).map(function (widget) {
-        var param;
-        if (typeof widget === 'string') {
-          param = buildParam(widget, {},
-                    makeExpression(widget, relevant.type, relevant.id));
-        } else {
-          param = buildParam(widget.name, {},
-                    makeExpression(widget.name, relevant.type, relevant.id),
-                    null, widget.additionalFilter);
-        }
-        param.type = 'count';
-        return param;
-      });
+      var params = can.makeArray(widgets)
+        .map(function (widget) {
+          var param;
+          if (typeof widget === 'string') {
+            param = buildParam(widget, {},
+              makeExpression(widget, relevant.type, relevant.id));
+          } else {
+            param = buildParam(widget.name, {},
+              makeExpression(widget.name, relevant.type, relevant.id),
+              null, widget.additionalFilter);
+          }
+          param.type = 'count';
+          return param;
+        });
 
       return makeRequest({
         data: params
@@ -638,11 +654,11 @@
 
       if (relevant) {
         relevantFilter = GGRC.query_parser.parse('#' + relevant.type + ',' +
-                                                 relevant.id + '#');
+          relevant.id + '#');
         filterList.push(relevantFilter);
 
         if (relevant.operation &&
-            relevant.operation !== relevantFilter.expression.op.name) {
+          relevant.operation !== relevantFilter.expression.op.name) {
           relevantFilter.expression.op.name = relevant.operation;
         }
       }
@@ -707,9 +723,19 @@
       return instance ? instance.is_snapshotable : false;
     }
 
+    /**
+     * Check whether provided model name should be snapshot or default one
+     * @param {String} modelName - model to check
+     * @return {Boolean} True or False
+     */
+    function isSnapshotModel(modelName) {
+      return GGRC.config.snapshotable_objects.indexOf(modelName) > -1;
+    }
+
     return {
       isSnapshot: isSnapshot,
-      isSnapshotScope: isSnapshotScope
+      isSnapshotScope: isSnapshotScope,
+      isSnapshotModel: isSnapshotModel
     };
   })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

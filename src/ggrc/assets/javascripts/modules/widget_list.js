@@ -17,7 +17,7 @@
     See the comments for GGRC.WidgetDescriptor for details in what is necessary to define
     a widget descriptor.
   */
-  can.Construct('GGRC.WidgetList', {
+  can.Construct.extend('GGRC.WidgetList', {
     modules: {},
     /*
       get_widget_list_for: return a keyed object of widget descriptors for the specified page type.
@@ -74,7 +74,7 @@
       });
 
       can.each(descriptors, function (descriptor, id) {
-        if (descriptor.suppressed) {
+        if (!descriptor || descriptor.suppressed) {
           delete descriptors[id];
         }
       });
@@ -129,4 +129,4 @@
       }
     }
   });
-})(this.can.$, this.CMS, this.GGRC);
+})(window.can.$, window.CMS, window.GGRC);

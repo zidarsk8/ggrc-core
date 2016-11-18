@@ -1,13 +1,46 @@
 /*!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 (function (can, $) {
   'use strict';
+  var warningMessage = 'Selected objects will be mapped ' +
+    'to the corresponding Program, ' +
+    'and system will create snapshots of selected objects for this Audit';
 
-  var MapperModel = GGRC.Models.MapperModel = can.Map({
+  var MapperModel = GGRC.Models.MapperModel = can.Map.extend({
+    defaults: {
+      defaultGroups: {
+        all_objects: {
+          name: 'All Objects',
+          value: 'AllObject',
+          plural: 'allobjects',
+          table_plural: 'allobjects',
+          singular: 'AllObject',
+          models: []
+        },
+        entities: {
+          name: 'People/Groups',
+          items: []
+        },
+        business: {
+          name: 'Assets/Business',
+          items: []
+        },
+        governance: {
+          name: 'Governance',
+          items: []
+        }
+      }
+    }
+  }, {
+    init: function () {
+      this.attr('types', this.initTypes());
+      this.attr('parentInstance', this.initInstance());
+    },
     type: 'AllObject', // We set default as All Object
+    warningMessage: warningMessage,
     contact: null,
     contactEmail: null,
     deferred: '@',
@@ -30,13 +63,80 @@
     is_snapshotable: false,
     snapshot_scope_id: '',
     snapshot_scope_type: '',
-    get_instance: can.compute(function () {
+    parentInstance: null,
+    showWarning: function () {
+      return !(GGRC.Mappings
+        .canBeMappedDirectly(this.attr('type'), this.attr('object')));
+    },
+    initInstance: function () {
       return CMS.Models.get_instance(
         this.attr('object'),
         this.attr('join_object_id')
       );
-    }),
+    },
+    prepareCorrectTypeFormat: function (cmsModel) {
+      return {
+        category: cmsModel.category,
+        name: cmsModel.title_plural,
+        value: cmsModel.shortName,
+        singular: cmsModel.shortName,
+        plural: cmsModel.title_plural.toLowerCase().replace(/\s+/, '_'),
+        table_plural: cmsModel.table_plural,
+        title_singular: cmsModel.title_singular,
+        isSelected: cmsModel.shortName === this.attr('type')
+      };
+    },
+    addFormattedType: function (modelName, groups) {
+      var group;
+      var type;
+      var cmsModel;
+      cmsModel = GGRC.Utils.getModelByType(modelName);
+      if (!cmsModel || cmsModel.title_singular === 'Reference') {
+        return;
+      }
+      type = this.prepareCorrectTypeFormat(cmsModel);
+      group = !groups[type.category] ?
+        groups.governance :
+        groups[type.category];
 
+      group.items.push(type);
+      groups.all_objects.models.push(type.singular);
+    },
+    getModelNamesList: function (object) {
+      var exclude = [];
+      var include = [];
+      // These inclusions\exclusions might be changed and better be defined outside
+      if (this.attr('getList')) {
+        exclude = ['AssessmentTemplate', 'Assessment', 'Audit',
+          'CycleTaskGroupObjectTask', 'Request', 'TaskGroup',
+          'TaskGroupTask', 'Workflow'];
+      }
+      if (this.attr('search_only')) {
+        include = ['TaskGroupTask', 'TaskGroup',
+          'CycleTaskGroupObjectTask'];
+      }
+      return GGRC.Mappings
+        .getMappingList(object, include, exclude)
+        .map(function (item) {
+          return item.modelName;
+        });
+    },
+    initTypes: function () {
+      var object = this.attr('getList') ?
+        'MultitypeSearch' :
+        this.attr('object');
+      var groups = this.attr('defaultGroups');
+      var list = this.getModelNamesList(object);
+
+      list.forEach(function (modelName) {
+        return this.addFormattedType(modelName, groups);
+      }.bind(this));
+
+      if (groups.all_objects.models.length < 2) {
+        delete groups.all_objects;
+      }
+      return groups;
+    },
     setContact: function (scope, el, ev) {
       this.attr('contact', ev.selectedItem);
 
@@ -44,93 +144,19 @@
         this.attr('contactEmail', ev.selectedItem.email);
       }.bind(this));
     },
-
-    get_binding_name: function (instance, plural) {
+    getBindingName: function (instance, plural) {
       return (instance.has_binding(plural) ? '' : 'related_') + plural;
     },
-    model_from_type: function (type) {
-      var types = _.reduce(_.values(this.types()), function (memo, val) {
+    modelFromType: function (type) {
+      var types = _.reduce(_.values(
+        this.attr('types').serialize()), function (memo, val) {
         if (val.items) {
           return memo.concat(val.items);
         }
         return memo;
       }, []);
       return _.findWhere(types, {value: type});
-    },
-    types: can.compute(function () {
-      var object = this.attr('getList') ? 'MultitypeSearch' : this.object;
-      var list;
-      var forbidden;
-      var whitelist;
-      var groups = {
-        all_objects: {
-          name: 'All Objects',
-          value: 'AllObject',
-          plural: 'allobjects',
-          table_plural: 'allobjects',
-          singular: 'AllObject',
-          models: []
-        },
-        entities: {
-          name: 'People/Groups',
-          items: []
-        },
-        business: {
-          name: 'Assets/Business',
-          items: []
-        },
-        governance: {
-          name: 'Governance',
-          items: []
-        }
-      };
-
-      if (this.attr('getList')) {
-        forbidden = ['AssessmentTemplate', 'Assessment', 'Audit',
-          'CycleTaskGroupObjectTask', 'Request', 'TaskGroup',
-          'TaskGroupTask', 'Workflow'];
-      }
-      if (this.attr('search_only')) {
-        whitelist = ['TaskGroupTask', 'TaskGroup',
-          'CycleTaskGroupObjectTask'];
-      }
-      list = GGRC.Utils.getMappableTypes(object, this.type, {
-        whitelist: whitelist,
-        forbidden: forbidden
-      });
-
-      can.each(list, function (modelName) {
-        var cmsModel;
-        var group;
-
-        if (!modelName ||
-            !CMS.Models[modelName]) {
-          return;
-        }
-
-        cmsModel = CMS.Models[modelName];
-        group = !groups[cmsModel.category] ? 'governance' : cmsModel.category;
-
-        if (cmsModel.title_singular === 'Reference') {
-          return;
-        }
-
-        groups[group].items.push({
-          name: cmsModel.title_plural,
-          value: cmsModel.shortName,
-          singular: cmsModel.shortName,
-          plural: cmsModel.title_plural.toLowerCase().replace(/\s+/, '_'),
-          table_plural: cmsModel.table_plural,
-          title_singular: cmsModel.title_singular,
-          isSelected: cmsModel.shortName === this.type
-        });
-        groups.all_objects.models.push(cmsModel.shortName);
-      }, this);
-      if (groups.all_objects.models.length < 2) {
-        delete groups.all_objects;
-      }
-      return groups;
-    })
+    }
   });
 
   /**
@@ -174,7 +200,12 @@
       }
 
       return {
-        mapper: new MapperModel(_.extend(data, {
+        isLoadingOrSaving: function () {
+          return (this.attr('mapper.page_loading') ||
+          this.attr('mapper.is_saving') ||
+          this.attr('mapper.block_type_change'));
+        },
+        mapper: new MapperModel(can.extend(data, {
           relevantTo: parentScope.attr('relevantTo'),
           callback: parentScope.attr('callback'),
           getList: parentScope.attr('getList'),
@@ -205,7 +236,7 @@
       },
       deferredSave: function () {
         var source = this.scope.attr('deferred_to').instance ||
-                     this.scope.attr('mapper.object');
+          this.scope.attr('mapper.object');
 
         var data = {
           multi_map: true,
@@ -217,7 +248,7 @@
                 this.scope.attr('mapper.entries'),
                 function (entry) {
                   return (entry.instance.id === desination.id &&
-                          entry.instance.type === desination.type);
+                  entry.instance.type === desination.type);
                 }
               );
 
@@ -236,13 +267,13 @@
       '.add-button modal:success': 'addNew',
       addNew: function (el, ev, model) {
         var entries = this.scope.attr('mapper.entries');
-        var getBindingName = this.scope.attr('mapper').get_binding_name;
+        var getBindingName = this.scope.attr('mapper').getBindingName;
         var binding;
         var item;
         var mapping;
         var selected;
 
-        selected = this.scope.attr('mapper.get_instance');
+        selected = this.scope.attr('mapper.parentInstance');
         binding = selected.get_binding(
           getBindingName(selected, model.constructor.table_plural));
         mapping = GGRC.Mappings.get_canonical_mapping_name(
@@ -332,8 +363,8 @@
           return;
         }
 
-        getBindingName = this.scope.attr('mapper').get_binding_name;
-        selected = this.scope.attr('mapper.get_instance');
+        getBindingName = this.scope.attr('mapper').getBindingName;
+        selected = this.scope.attr('mapper.parentInstance');
         tablePlural = getBindingName(
           selected, this.scope.attr('mapper.model.table_plural'));
 
@@ -356,7 +387,7 @@
           return this.scope.attr('mapper.model', types.all_objects);
         }
         this.scope.attr(
-          'mapper.model', this.scope.mapper.model_from_type(type));
+          'mapper.model', this.scope.mapper.modelFromType(type));
       },
       '{mapper} type': function () {
         this.scope.attr('mapper.term', '');
@@ -405,11 +436,11 @@
 
     helpers: {
       get_title: function (options) {
-        var instance = this.attr('mapper.get_instance');
+        var instance = this.attr('mapper.parentInstance');
         return (
           (instance && instance.title) ?
-          instance.title :
-          this.attr('mapper.object')
+            instance.title :
+            this.attr('mapper.object')
         );
       },
       get_object: function (options) {
@@ -421,8 +452,8 @@
       },
       loading_or_saving: function (options) {
         if (this.attr('mapper.page_loading') ||
-            this.attr('mapper.is_saving') ||
-            this.attr('mapper.block_type_change')) {
+          this.attr('mapper.is_saving') ||
+          this.attr('mapper.block_type_change')) {
           return options.fn();
         }
         return options.inverse();

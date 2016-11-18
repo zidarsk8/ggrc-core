@@ -1,7 +1,7 @@
 /*!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 (function (can, CMS) {
   function update_program_authorizations(programs, person) {
@@ -29,7 +29,7 @@
       });
 
       if (Permission.is_allowed('create', 'UserRole', program.context.id) &&
-          !~can.inArray(person.reify(), editorAuthorizedPeople)) {
+        !~can.inArray(person.reify(), editorAuthorizedPeople)) {
         deleteDfds = can.map(readerAuthorizations, function (ra) {
           if (ra.person.reify() === person.reify()) {
             return ra.refresh().then(function () {
@@ -47,6 +47,7 @@
       }
     }).then(Permission.refresh());
   }
+
   can.Model.Cacheable('CMS.Models.Audit', {
     root_object: 'audit',
     root_collection: 'audits',
@@ -75,12 +76,40 @@
     defaults: {
       status: 'Planned'
     },
+    allowedMappings: [
+      // Direct mapping to Audit
+      {modelName: 'Assessment', mappingType: 'relation'},
+      {modelName: 'AssessmentTemplate', mappingType: 'relation'},
+      {modelName: 'Issue', mappingType: 'relation'},
+      {modelName: 'Request', mappingType: 'relation'},
+      // Mapping through Parent Object
+      {modelName: 'AccessGroup', mappingType: 'snapshot'},
+      {modelName: 'Clause', mappingType: 'snapshot'},
+      {modelName: 'Contract', mappingType: 'snapshot'},
+      {modelName: 'Control', mappingType: 'snapshot'},
+      {modelName: 'DataAsset', mappingType: 'snapshot'},
+      {modelName: 'Facility', mappingType: 'snapshot'},
+      {modelName: 'Market', mappingType: 'snapshot'},
+      {modelName: 'Objective', mappingType: 'snapshot'},
+      {modelName: 'OrgGroup', mappingType: 'snapshot'},
+      {modelName: 'Policy', mappingType: 'snapshot'},
+      {modelName: 'Process', mappingType: 'snapshot'},
+      {modelName: 'Product', mappingType: 'snapshot'},
+      {modelName: 'Regulation', mappingType: 'snapshot'},
+      {modelName: 'Section', mappingType: 'snapshot'},
+      {modelName: 'Standard', mappingType: 'snapshot'},
+      {modelName: 'System', mappingType: 'snapshot'},
+      {modelName: 'Vendor', mappingType: 'snapshot'}
+    ],
+    getAllowedMappings: function () {
+      return this.allowedMappings;
+    },
     statuses: ['Planned', 'In Progress', 'Manager Review',
       'Ready for External Review', 'Completed'],
     obj_nav_options: {
       show_all_tabs: false,
       force_show_list: ['In Scope Controls', 'Requests',
-                        'Issues', 'Assessments']
+        'Issues', 'Assessments']
     },
     tree_view_options: {
       header_view: GGRC.mustache_path + '/audits/tree_header.mustache',
@@ -215,6 +244,7 @@
               });
             }
           }
+
           if (role.selfLink) {
             checkRole();
           } else {
@@ -245,6 +275,7 @@
                 });
               }
             }
+
             if (role.selfLink) {
               checkRole();
             } else {
@@ -268,7 +299,7 @@
     update: 'PUT /api/requests/{id}',
     destroy: 'DELETE /api/requests/{id}',
     mixins: ['unique_title', 'relatable', 'ca_update', 'autoStatusChangeable',
-             'timeboxed'],
+      'timeboxed'],
     relatable_options: {
       relevantTypes: {
         Audit: {
@@ -320,7 +351,7 @@
         model: can.Model.Cacheable,
         mapping: 'comments',
         show_view: GGRC.mustache_path +
-          '/base_templates/comment_subtree.mustache',
+        '/base_templates/comment_subtree.mustache',
         sort_function: GGRC.Utils.sortingHelpers.commentSort
       },
       urls: {
@@ -455,7 +486,7 @@
       var that = this;
       var assignees = {};
       var current_user = CMS.Models.get_instance('Person',
-                                                 GGRC.current_user.id);
+        GGRC.current_user.id);
       var contact;
 
       if (new_object_form) {
@@ -482,15 +513,15 @@
 
           // Audit leads should be default assignees
           (audit.selfLink ? $.when(audit) : audit.refresh())
-          .then(function (audit) {
-            contact = audit.contact.reify();
+            .then(function (audit) {
+              contact = audit.contact.reify();
 
-            if (assignees[contact.email]) {
-              assignees[contact.email] += ',Assignee';
-            } else {
-              assignees[contact.email] = 'Assignee';
-            }
-          });
+              if (assignees[contact.email]) {
+                assignees[contact.email] += ',Assignee';
+              } else {
+                assignees[contact.email] = 'Assignee';
+              }
+            });
 
           // Audit auditors should be default verifiers
           $.when(audit.findAuditors()).then(function (auditors) {
@@ -822,6 +853,7 @@
      */
     _packPeopleData: function () {
       var data = {};
+
       /**
        * Create a sorted (ascending) list of numbers from the given map's keys.
        *
@@ -893,7 +925,7 @@
         object: 'MultitypeSearch',
         search_only: true
       });
-      objectTypes = mapper.types();
+      objectTypes = mapper.initTypes();
 
       // the all objects group is not needed
       delete objectTypes.all_objects;
