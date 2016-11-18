@@ -1,12 +1,14 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+import urllib
+
 from copy import deepcopy
 from datetime import date
 from logging import getLogger
+from urlparse import urljoin
 
 from sqlalchemy import and_
-from urlparse import urljoin
 
 from ggrc import db
 from ggrc import utils
@@ -374,12 +376,16 @@ def get_cycle_task_dict(cycle_task):
         u"{} [removed from task]".format(object_data.content["display_name"])
     )
 
+  # the filter expression to be included in the cycle task's URL and
+  # automatically applied when user visits it
+  filter_exp = u"id=" + unicode(cycle_task.cycle_id)
+
   return {
       "title": cycle_task.title,
       "related_objects": object_titles,
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
       "fuzzy_due_in": utils.get_fuzzy_date(cycle_task.end_date),
-      "cycle_task_url": get_cycle_task_url(cycle_task),
+      "cycle_task_url": get_cycle_task_url(cycle_task, filter_exp=filter_exp),
   }
 
 
@@ -399,11 +405,17 @@ def get_workflow_url(workflow):
   return urljoin(get_url_root(), url)
 
 
-def get_cycle_task_url(cycle_task):
-  url = ("/workflows/{workflow_id}#current_widget/cycle/{cycle_id}"
-         "/cycle_task_group/{cycle_task_group_id}"
-         "/cycle_task_group_object_task/{cycle_task_id}").format(
+def get_cycle_task_url(cycle_task, filter_exp=u""):
+  if filter_exp:
+    filter_exp = u"?filter=" + urllib.quote(filter_exp)
+
+  url = (u"/workflows/{workflow_id}"
+         u"{filter_exp}"
+         u"#current_widget/cycle/{cycle_id}"
+         u"/cycle_task_group/{cycle_task_group_id}"
+         u"/cycle_task_group_object_task/{cycle_task_id}").format(
       workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
+      filter_exp=filter_exp,
       cycle_id=cycle_task.cycle_task_group.cycle.id,
       cycle_task_group_id=cycle_task.cycle_task_group.id,
       cycle_task_id=cycle_task.id,
