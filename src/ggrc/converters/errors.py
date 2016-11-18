@@ -102,3 +102,13 @@ UNSUPPORTED_OPERATION_ERROR = (u"Line {line}: {operation} is not supported. "
 
 INVALID_ATTRIBUTE_WARNING = (u"Line {line}: Object does not contain attribute "
                              u"'{column_name}'. The value will be ignored.")
+
+CREATE_INSTANCE_ERROR = (u"Line {line}: New instance creation is denied. "
+                         u"The line will be ignored.")
+
+INVALID_STATUS_DATE_CORRELATION = (u"Line {line}: Cannot change {date} for "
+                                   u"task which status is {status}. "
+                                   u"The line will be ignored.")
+
+NON_IMPORTABLE_COLUMN_WARNING = (u"Line {line}: Attribute '{column_name}' "
+                                 u"is non-importable. Column will be ignored.")

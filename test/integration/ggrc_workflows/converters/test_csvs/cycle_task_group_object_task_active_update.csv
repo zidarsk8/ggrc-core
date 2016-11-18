@@ -1,0 +1,6 @@
+Object type,"Must be unique. Can be left empty for auto generation. If updating or deleting, code is required",,,,,,,
+Cycle Task Group Object Task,Code*,Summary*,Task Details,Start Date,End Date,Actual Finish Date,Actual Verified Date,State
+,CYCLETASK-1,first task in task group 1,details 1,11/01/2016,11/05/2016,,,Assigned
+,CYCLETASK-2,second task in task group 1,details 2,11/06/2016,11/10/2016,,,Assigned
+,CYCLETASK-3,first task in task group 2,details 3,11/11/2016,11/18/2016,,,Assigned
+,CYCLETASK-4,second task in task group 2,details 4,11/19/2016,11/30/2016,,,Assigned

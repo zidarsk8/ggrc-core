@@ -119,6 +119,7 @@ class Converter(object):
       block_converter = BlockConverter(self, object_class=object_class,
                                        fields=fields, object_ids=object_ids,
                                        class_name=class_name)
+      block_converter.check_block_restrictions()
       block_converter.row_converters_from_ids()
       self.block_converters.append(block_converter)
 
@@ -136,6 +137,7 @@ class Converter(object):
       block_converter = BlockConverter(self, object_class=object_class,
                                        rows=rows, raw_headers=raw_headers,
                                        offset=offset, class_name=class_name)
+      block_converter.check_block_restrictions()
       self.block_converters.append(block_converter)
 
     order = defaultdict(int)
