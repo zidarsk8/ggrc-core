@@ -8,7 +8,7 @@
     'AccessGroup', 'Audit', 'Clause', 'Contract', 'Control', 'Assessment',
     'DataAsset', 'Facility', 'Issue', 'Market', 'Objective', 'OrgGroup',
     'Person', 'Policy', 'Process', 'Product', 'Program', 'Project',
-    'Regulation', 'Request', 'Section', 'Standard', 'System', 'Vendor'
+    'Regulation', 'Section', 'Standard', 'System', 'Vendor'
   ];
   var baseWidgetsByType = {
     AccessGroup: _.difference(allTypes, ['AccessGroup']),
@@ -34,7 +34,7 @@
     Project: allTypes,
     Regulation: _.difference(allTypes,
       ['Contract', 'Policy', 'Regulation', 'Standard']),
-    Request: allTypes,
+    // Request: allTypes,
     Section: allTypes,
     Standard: _.difference(allTypes,
       ['Contract', 'Policy', 'Regulation', 'Standard']),
