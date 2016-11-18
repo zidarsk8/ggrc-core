@@ -587,7 +587,7 @@
       var params = can.makeArray(widgets)
         .map(function (widget) {
           var param;
-          if (relevant.type === 'Audit' && GGRC.config.snapshotable_objects.indexOf(widget) > -1){
+          if (GGRC.Utils.Snapshots.isSnapshotRelated(relevant.type, widget)) {
             param = buildParam('Snapshot', {},
               makeExpression(widget, relevant.type, relevant.id), null,
               GGRC.query_parser.parse('child_type = ' + widget));
@@ -609,11 +609,11 @@
         data.forEach(function (info, i) {
           var widget = widgets[i];
           var name = typeof widget === 'string' ? widget : widget.name;
-          if (relevant.type === 'Audit' && GGRC.config.snapshotable_objects.indexOf(widget) > -1){
-            name = "Snapshot"
-          }
           var countsName = typeof widget === 'string' ?
             widget : (widget.countsName || widget.name);
+          if (GGRC.Utils.Snapshots.isSnapshotRelated(relevant.type, name)) {
+            name = 'Snapshot';
+          }
           widgetsCounts.attr(countsName, info[name].total);
         });
       });
@@ -800,6 +800,17 @@
       return GGRC.config.snapshotable_objects.indexOf(modelName) > -1;
     }
 
+    /**
+     * Check if the relationship is of type snapshot.
+     * @param {String} parent - Parent of the related objects
+     * @param {String} child - Child of the related objects
+     * @return {Boolean} True or False
+     */
+    function isSnapshotRelated(parent, child) {
+      return GGRC.config.snapshotable_parents.indexOf(parent) > -1 &&
+            isSnapshotModel(child) > -1;
+    }
+
     return {
       isSnapshot: isSnapshot,
       isSnapshotScope: isSnapshotScope,
@@ -807,6 +818,7 @@
       toObjects: toObjects,
       transformQuery: transformQuery,
       setAttrs: setAttrs,
+      isSnapshotRelated: isSnapshotRelated,
       isSnapshotModel: isSnapshotModel
     };
   })();
