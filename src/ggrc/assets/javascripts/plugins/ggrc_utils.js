@@ -745,8 +745,9 @@
       var content = instance.revision.content;
       var type = model.root_collection;
       content.type = instance.child_type;
-      content.snapshot = true;
+      content.snapshot = new CMS.Models.Snapshot(content);
       content.selfLink = instance.selfLink.replace('snapshots', type);
+      content.snapshot.selfLink = content.selfLink;
       content.viewLink = '/' + type + '/' + content.id;
       content.originalLink = content.viewLink;
       return content;
@@ -758,7 +759,7 @@
      * @return {Object} The array of objects
      */
     function toObjects(values) {
-      return _.map(values, toObject);
+      return values.map(toObject);
     }
 
     /**
