@@ -326,17 +326,15 @@
       end_date: 'date'
     }
   }, {
-    // NOTE: when synchronizing mandatory asterisks of dates with backend for
-    // all models, please set the default "required" options to false
     configStartDate: {
       label: 'Effective Date',
       helpText: 'Enter the date this object becomes effective.',
-      required: true
+      required: false
     },
     configEndDate: {
       label: 'Stop Date',
       helpText: 'Enter the date this object stops being effective.',
-      required: true
+      required: false
     }
   });
 })(this.can);
