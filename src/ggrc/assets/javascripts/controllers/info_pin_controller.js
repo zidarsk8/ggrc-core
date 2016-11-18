@@ -46,6 +46,17 @@ can.Control('CMS.Controllers.InfoPin', {
         }
       });
   },
+  getPinHeight: function (size) {
+    switch (size) {
+      case 'min':
+        return 75;
+      case 'max':
+        return Math.floor($(window).height() * 3 / 4);
+      case 'normal':
+      default:
+        return Math.floor($(window).height() / 3);
+    }
+  },
   hideInstance: function () {
     this.element.stop(true);
     this.element.height(0).html('');
@@ -64,12 +75,13 @@ can.Control('CMS.Controllers.InfoPin', {
       }.bind(this)
     });
   },
-  setInstance: function (instance, el) {
+  setInstance: function (instance, el, size) {
     var options = this.findOptions(el);
     var view = this.findView(instance);
-    var panelHeight = $(window).height() / 3;
+    var panelHeight = this.getPinHeight(size);
     var confirmEdit = instance.class.confirmEditModal ?
       instance.class.confirmEditModal : {};
+    var currentPanelHeight;
 
     if (!_.isEmpty(confirmEdit)) {
       confirmEdit.confirm = this.confirmEdit;
@@ -93,7 +105,8 @@ can.Control('CMS.Controllers.InfoPin', {
     this.loadChildTrees();
 
     // Make sure pin is visible
-    if (!this.element.height()) {
+    currentPanelHeight = this.element.height();
+    if (!currentPanelHeight || currentPanelHeight !== panelHeight) {
       this.element.animate({
         height: panelHeight
       }, {
@@ -158,19 +171,15 @@ can.Control('CMS.Controllers.InfoPin', {
   },
   '.pin-action a click': function (el) {
     var $win = $(window);
-    var winHeight = $win.height();
     var options = {
       duration: 800,
       easing: 'easeOutExpo'
     };
-    var targetHeight = {
-      min: 75,
-      normal: (winHeight / 3),
-      max: (winHeight * 3 / 4)
-    };
     var $info = this.element.find('.info');
     var type = el.data('size');
-    var size = targetHeight[type];
+    var size = this.getPinHeight(type);
+    var infoPinSizeClass = type ?
+      type + '-pin-size' : 'normal-pin-size';
 
     if (type === 'deselect') {
       // TODO: Make some direct communication between the components
@@ -195,6 +204,11 @@ can.Control('CMS.Controllers.InfoPin', {
 
     this.element.animate({height: size}, options);
     el.find('i').css({opacity: 1});
+    $('.cms_controllers_tree_view_node.active')
+      .removeClass(function (index, css) {
+        return (css.match(/\w+-pin-size/g) || []).join(' ');
+      })
+      .addClass(infoPinSizeClass);
   },
   ' scroll': function (el, ev) {
     var header = this.element.find('.pane-header');

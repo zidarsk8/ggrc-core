@@ -324,7 +324,7 @@
     'extend:attributes': {
       start_date: 'date',
       end_date: 'date'
-    },
+    }
   }, {
     // NOTE: when synchronizing mandatory asterisks of dates with backend for
     // all models, please set the default "required" options to false
