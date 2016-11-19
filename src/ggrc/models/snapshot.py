@@ -60,6 +60,8 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       "revision",
       "revision_id",
       reflection.PublishOnly("revision_content"),
+      reflection.PublishOnly("revisions"),
+      reflection.PublishOnly("is_latest_revision"),
   ]
 
   _update_attrs = [
@@ -93,11 +95,24 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
   )
   _update_revision = None
 
+  revisions = db.relationship(
+      "Revision",
+      primaryjoin="and_(Revision.resource_id == foreign(Snapshot.child_id),"
+      "Revision.resource_type == foreign(Snapshot.child_type))",
+      uselist=True,
+  )
+
+  @computed_property
+  def is_latest_revision(self):
+    """Flag if the snapshot has the latest revision."""
+    return self.revisions and self.revision == self.revisions[-1]
+
   @classmethod
   def eager_query(cls):
     query = super(Snapshot, cls).eager_query()
     return cls.eager_inclusions(query, Snapshot._include_links).options(
         orm.subqueryload('revision'),
+        orm.subqueryload('revisions'),
     )
 
   @hybrid_property
