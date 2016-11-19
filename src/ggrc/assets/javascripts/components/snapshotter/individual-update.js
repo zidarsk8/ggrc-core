@@ -28,7 +28,9 @@
               operation: 'update'
             };
             instance.attr('individual-update', data);
-            instance.save();
+            return instance.save();
+          }).then(function () {
+            window.location.reload();
           });
         }.bind(this));
       }

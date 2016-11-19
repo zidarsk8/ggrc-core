@@ -705,9 +705,21 @@
    */
   GGRC.Utils.Snapshots = (function () {
     /**
+     * Set extra attrs for snapshoted objects or snapshots
+     * @param {Object} instance - Object instance
+     */
+    function setAttrs(instance) {
+      // Get list of objects that supports 'snapshot scope' from config
+      var className = instance.type;
+      if (className === 'Audit') {
+        instance.attr('is_snapshotable', true);
+      }
+    }
+
+    /**
      * Check whether object is snapshot
      * @param {Object} instance - Object instance
-     * @return {Boolean} True or False.
+     * @return {Boolean} True or False
      */
     function isSnapshot(instance) {
       return instance.snapshot;
@@ -716,11 +728,60 @@
     /**
      * Check whether object is in spanshot scope
      * @param {Object} parentInstance - Object (parent) instance
-     * @return {Boolean} True or False.
+     * @return {Boolean} True or False
      */
     function isSnapshotScope(parentInstance) {
       var instance = parentInstance || GGRC.page_instance();
       return instance ? instance.is_snapshotable : false;
+    }
+
+    /**
+     * Convert snapshot to object
+     * @param {Object} instance - Snapshot instance
+     * @return {Object} The object
+     */
+    function toObject(instance) {
+      var model = CMS.Models[instance.child_type];
+      var content = instance.revision.content;
+      var type = model.root_collection;
+      content.type = instance.child_type;
+      content.snapshot = new CMS.Models.Snapshot(content);
+      content.selfLink = instance.selfLink.replace('snapshots', type);
+      content.snapshot.selfLink = content.selfLink;
+      content.viewLink = '/' + type + '/' + content.id;
+      content.originalLink = content.viewLink;
+      return content;
+    }
+
+    /**
+     * Convert array of snapshots to array of object
+     * @param {Object} values - array of snapshots
+     * @return {Object} The array of objects
+     */
+    function toObjects(values) {
+      return values.map(toObject);
+    }
+
+    /**
+     * Transform query for objects into query for snapshots of the same type
+     * @param {Object} params - original query
+     * @return {Object} The transformed query
+     */
+    function transformQuery(params) {
+      var data = params.data[0];
+      var type = data.object_name;
+      var expression = data.filters.expression;
+      data.object_name = 'Snapshot';
+      data.filters.expression = {
+        left: {
+          left: 'child_type',
+          op: {name: '='},
+          right: type
+        },
+        op: {name: 'AND'},
+        right: expression
+      };
+      return params;
     }
 
     /**
@@ -735,6 +796,10 @@
     return {
       isSnapshot: isSnapshot,
       isSnapshotScope: isSnapshotScope,
+      toObject: toObject,
+      toObjects: toObjects,
+      transformQuery: transformQuery,
+      setAttrs: setAttrs,
       isSnapshotModel: isSnapshotModel
     };
   })();

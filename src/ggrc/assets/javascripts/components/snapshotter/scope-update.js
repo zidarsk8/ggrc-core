@@ -12,14 +12,14 @@
       instance: null,
       upsertIt: function (scope, el, ev) {
         GGRC.Controllers.Modals.confirm({
-          instance: scope,
+          instance: scope.instance,
           modal_title: 'Update to latest version',
           modal_description:
             'Do you want to update all objects of this Audit' +
             ' to the latest version?',
           modal_confirm: 'Update',
           button_view: GGRC.Controllers.Modals.BUTTON_VIEW_OK_CLOSE,
-          skip_refresh: false
+          skip_refresh: true
         }, function () {
           var instance = this.instance;
           instance.refresh().then(function () {
@@ -27,7 +27,9 @@
               operation: 'upsert'
             };
             instance.attr('snapshots', data);
-            instance.save();
+            return instance.save();
+          }).then(function () {
+            window.location.reload();
           });
         }.bind(this));
       }
