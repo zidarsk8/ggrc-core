@@ -8,7 +8,7 @@
    * Tree View Widgets Configuration module
    */
   // Items allowed for mapping via snapshot.
-  var snapshotWidgetsConfig = GGRC.config.snapshotable_objects;
+  var snapshotWidgetsConfig = GGRC.config.snapshotable_objects || [];
   // Items allowed for relationship mapping
   var directMappingConfig = [
     'Assessment',
