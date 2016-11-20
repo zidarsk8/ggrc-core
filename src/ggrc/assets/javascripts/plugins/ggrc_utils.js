@@ -744,12 +744,12 @@
       var model = CMS.Models[instance.child_type];
       var content = instance.revision.content;
       var type = model.root_collection;
-      content.type = instance.child_type;
-      content.snapshot = new CMS.Models.Snapshot(content);
-      content.selfLink = instance.selfLink.replace('snapshots', type);
-      content.snapshot.selfLink = content.selfLink;
-      content.viewLink = '/' + type + '/' + content.id;
-      content.originalLink = content.viewLink;
+      content.originalLink = '/' + type + '/' + content.id;
+      content.snapshot = new CMS.Models.Snapshot(instance);
+      content.viewLink = content.snapshot.viewLink;
+      content.selfLink = content.snapshot.selfLink;
+      content.type = content.snapshot.type;
+      content.id = content.snapshot.id;
       return content;
     }
 
