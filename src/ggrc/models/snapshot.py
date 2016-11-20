@@ -59,7 +59,6 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       "child_type",
       "revision",
       "revision_id",
-      reflection.PublishOnly("revision_content"),
       reflection.PublishOnly("revisions"),
       reflection.PublishOnly("is_latest_revision"),
   ]
@@ -126,10 +125,6 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       latest_revision_id = get_latest_revision_id(self)
       if latest_revision_id:
         self.revision_id = latest_revision_id
-
-  @computed_property
-  def revision_content(self):
-    return self.revision.content
 
   @property
   def parent_attr(self):

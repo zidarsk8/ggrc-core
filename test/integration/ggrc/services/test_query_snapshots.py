@@ -129,8 +129,9 @@ class TestAuditSnapshotQueries(TestCase):
         }
     ])
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 1)
+    content = result.json[0]["Snapshot"]["values"][0]["revision"]["content"]
     self.assertEqual(
-        result.json[0]["Snapshot"]["values"][0]["revision_content"]["title"],
+        content["title"],
         market_title,
     )
 
