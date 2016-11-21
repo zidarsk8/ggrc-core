@@ -751,6 +751,7 @@
       var model = CMS.Models[instance.child_type];
       var content = instance.revision.content;
       var type = model.root_collection;
+      content.isLatestRevision = instance.is_latest_revision;
       content.originalLink = '/' + type + '/' + content.id;
       content.snapshot = new CMS.Models.Snapshot(instance);
       content.viewLink = content.snapshot.viewLink;
