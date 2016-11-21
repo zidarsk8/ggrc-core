@@ -3,8 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 {{#items}}
-    <ca-object-validation class="flex-box flex-row flex-size-1" def="def" value-id="{{id}}" errors="preconditions_failed" value="attribute_value" modal="modal" is-modified="isModified">
-        <ca-object class="flex-box flex-col flex-size-1" instance="instance" value-id="{{id}}" def="def" value="attribute_value" modal="modal" type="attributeType" is-modified="isModified">
+    <ca-object-validation class="flex-box flex-row" def="def" value-id="{{id}}" errors="preconditions_failed" value="attribute_value" modal="modal" is-modified="isModified">
+        <ca-object class="flex-box flex-col" instance="instance" value-id="{{id}}" def="def" value="attribute_value" modal="modal" type="attributeType" is-modified="isModified">
             <ca-object-value-mapper value="attribute_value" type="type" value-obj="attribute_object" def="def">
                 <assessment-inline-edit
                         value="input.value"
