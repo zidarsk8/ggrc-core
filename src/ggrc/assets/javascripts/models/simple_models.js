@@ -88,11 +88,6 @@ can.Model.Cacheable("CMS.Models.Program", {
     this._super.apply(this, arguments);
   }
 }, {
-  init: function () {
-    this._super.apply(this, arguments);
-    this.attr('configStartDate.required', false);
-    this.attr('configEndDate.required', false);
-  }
 });
 
 can.Model.Cacheable("CMS.Models.Option", {
