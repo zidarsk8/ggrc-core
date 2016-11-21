@@ -757,7 +757,7 @@
       content.selfLink = content.snapshot.selfLink;
       content.type = content.snapshot.type;
       content.id = content.snapshot.id;
-      return content;
+      return new model(content);
     }
 
     /**
@@ -766,7 +766,7 @@
      * @return {Object} The array of objects
      */
     function toObjects(values) {
-      return values.map(toObject);
+      return new can.List(values.map(toObject));
     }
 
     /**
