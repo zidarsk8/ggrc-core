@@ -48,20 +48,25 @@ class QueryAPIQueryHelper(QueryHelper):
         raise NotImplementedError("Only 'values', 'ids' and 'count' queries "
                                   "are supported now")
       model = self.object_map[object_query["object_name"]]
-      with benchmark("Get result set: get_results > _get_objects"):
-        objects = self._get_objects(object_query)
-
-      object_query["count"] = len(objects)
-      with benchmark("get_results > _get_last_modified"):
-        object_query["last_modified"] = self._get_last_modified(model, objects)
-      with benchmark("serialization: get_results > _transform_to_json"):
-        if query_type == "values":
+      if query_type == "values":
+        with benchmark("Get result set: get_results > _get_objects"):
+          objects = self._get_objects(object_query)
+        object_query["count"] = len(objects)
+        with benchmark("get_results > _get_last_modified"):
+          object_query["last_modified"] = self._get_last_modified(model,
+                                                                  objects)
+        with benchmark("serialization: get_results > _transform_to_json"):
           object_query["values"] = self._transform_to_json(
               objects,
               object_query.get("fields"),
           )
-      if query_type == "ids":
-        object_query["ids"] = [o.id for o in objects]
+      else:
+        with benchmark("Get result set: get_results -> _get_ids"):
+          ids = self._get_ids(object_query)
+        object_query["count"] = len(ids)
+        object_query["last_modified"] = None  # synonymous to now()
+        if query_type == "ids":
+          object_query["ids"] = ids
     return self.query
 
   @staticmethod
