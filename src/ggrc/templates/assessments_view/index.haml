@@ -74,3 +74,5 @@
             =config.get('COMPANY')
             Version
             =config.get('VERSION')
+      .analytics
+        ={config.get('GOOGLE_ANALYTICS_SCRIPT') | safe}
