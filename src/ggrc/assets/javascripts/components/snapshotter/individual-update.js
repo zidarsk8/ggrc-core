@@ -24,10 +24,7 @@
         }, function () {
           var instance = this.instance.snapshot;
           instance.refresh().then(function () {
-            var data = {
-              operation: 'update'
-            };
-            instance.attr('individual-update', data);
+            instance.attr('update_revision', 'latest');
             return instance.save();
           }).then(function () {
             window.location.reload();
