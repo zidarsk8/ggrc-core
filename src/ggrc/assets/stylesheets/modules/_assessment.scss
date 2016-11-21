@@ -17,20 +17,16 @@ $border-color: #eee;
   align-items: stretch;
   flex-wrap: wrap;
 
-  .assessment-attributes {
-    flex: 2 2 66%;
-    margin: 8px 22px 8px 0;
-    max-width: 66%;
+  .section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+    line-height: 24px;
+    margin: 0 0 4px;
   }
 
   .assessment-description {
-    margin: 8px 0 16px;
-  }
-
-  .assessment-control-item {
-    flex: 1 1 50%;
-    max-width: 50%;
-    min-height: 72px;
+    margin: 0 0 12px;
   }
 
   .assessment-controls {
@@ -38,7 +34,7 @@ $border-color: #eee;
     padding: 12px 12px 24px;
     box-sizing: border-box;
     border-radius: 2px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 
     .assessment-controls__note {
       display: block;
@@ -167,18 +163,10 @@ $border-color: #eee;
   }
 
   .assessment-summary {
-    flex: 1;
-    margin: 0 0 28px;
+    margin: 0 0 28px 24px;
 
     .side-content {
       margin: 0;
-    }
-
-    h6 {
-      margin: 0;
-      padding: 0 0 8px;
-      float: left;
-      width: 32%;
     }
   }
 }

@@ -11,10 +11,10 @@
 
         <div class="tier-content">
           {{> '/static/mustache/assessments/header.mustache' }}
-            <div class="assessment-info-pane">
-                <div class="assessment-attributes">
+            <div class="assessment-info-pane flex-box">
+                <div class="assessment-attributes flex-size-2">
                     <div class="assessment-description">
-                        <h6>Test Plan</h6>
+                        <div class="section-title">Test Plan</div>
                         <read-more text="test_plan"></read-more>
                     </div>
                     <assessment-mapped-controls instance="instance"
@@ -27,7 +27,7 @@
                         <assessment-custom-attributes instance="instance"
                                                       definitions="custom_attribute_definitions"
                                                       values="custom_attribute_values"
-                                                      class="assessment-custom-attributes">
+                                                      class="assessment-custom-attributes flex-box flex-box-multi">
                         </assessment-custom-attributes>
                         <div class="assessment-controls__extra-controls">
                             <assessment-attachments-list class="attachment-list"></assessment-attachments-list>
@@ -43,8 +43,8 @@
                             mapping="info_related_objects">
                     </assessment-mapped-related-information>
                 </div>
-                <div class="assessment-summary">
-                    <h6>Details</h6>
+                <div class="assessment-summary flex-size-1">
+                    <div class="section-title">Details</div>
                     <collapsible-panel title-text="Description" collapsed="true" title-icon="fa-list-ol"
                                        class="details-item">
                         <read-more text="description"></read-more>
