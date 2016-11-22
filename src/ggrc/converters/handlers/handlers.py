@@ -411,6 +411,8 @@ class MappingColumnHandler(ColumnHandler):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
                          slug=slug)
+    if self.mandatory and not objects:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return objects
 
   def set_obj_attr(self):
