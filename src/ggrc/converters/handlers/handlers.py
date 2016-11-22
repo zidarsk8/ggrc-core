@@ -396,6 +396,7 @@ class MappingColumnHandler(ColumnHandler):
     lines = set(self.raw_value.splitlines())
     slugs = set([slug.lower() for slug in lines if slug.strip()])
     objects = []
+    objects_found = False
     for slug in slugs:
       obj = class_.query.filter_by(slug=slug).first()
       if obj:
@@ -411,7 +412,9 @@ class MappingColumnHandler(ColumnHandler):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
                          slug=slug)
-    if self.mandatory and not objects:
+      else:
+        objects_found = True
+    if self.mandatory and not objects and not objects_found:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return objects
 
