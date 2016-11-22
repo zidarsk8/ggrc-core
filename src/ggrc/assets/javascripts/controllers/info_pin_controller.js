@@ -41,21 +41,17 @@ can.Control('CMS.Controllers.InfoPin', {
         //  Ensure this targets only direct child trees, not sub-tree trees
         if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
           childTreeControl = $el.control();
-          if (childTreeControl)
+          if (childTreeControl) {
             childTreeDfds.push(childTreeControl.display());
+          }
         }
       });
   },
-  getPinHeight: function (size) {
-    switch (size) {
-      case 'min':
-        return 75;
-      case 'max':
-        return Math.floor($(window).height() * 3 / 4);
-      case 'normal':
-      default:
-        return Math.floor($(window).height() / 3);
+  getPinHeight: function (maximizedState) {
+    if (maximizedState) {
+      return Math.floor($(window).height() * 3 / 4);
     }
+    return Math.floor($(window).height() / 3);
   },
   hideInstance: function () {
     this.element.stop(true);
@@ -75,10 +71,11 @@ can.Control('CMS.Controllers.InfoPin', {
       }.bind(this)
     });
   },
-  setInstance: function (instance, el, size) {
+  setInstance: function (instance, el, maximizedState) {
+    var self = this;
     var options = this.findOptions(el);
     var view = this.findView(instance);
-    var panelHeight = this.getPinHeight(size);
+    var panelHeight = this.getPinHeight(maximizedState);
     var confirmEdit = instance.class.confirmEditModal ?
       instance.class.confirmEditModal : {};
     var currentPanelHeight;
@@ -94,7 +91,14 @@ can.Control('CMS.Controllers.InfoPin', {
       is_info_pin: true,
       options: options,
       result: options.result,
-      page_instance: GGRC.page_instance()
+      page_instance: GGRC.page_instance(),
+      maximized: maximizedState,
+      onChangeMaximizedState: function () {
+        return self.changeMaximizedState.bind(self);
+      },
+      onClose: function () {
+        return self.close.bind(self);
+      }
     }));
 
     if (instance.info_pane_preload) {
@@ -169,29 +173,15 @@ can.Control('CMS.Controllers.InfoPin', {
     }, confirmDfd.resolve);
     return confirmDfd;
   },
-  '.pin-action a click': function (el) {
+  changeMaximizedState: function (maximizedState) {
     var $win = $(window);
     var options = {
       duration: 800,
       easing: 'easeOutExpo'
     };
     var $info = this.element.find('.info');
-    var type = el.data('size');
-    var size = this.getPinHeight(type);
-    var infoPinSizeClass = type ?
-      type + '-pin-size' : 'normal-pin-size';
-
-    if (type === 'deselect') {
-      // TODO: Make some direct communication between the components
-      //       and make sure only one widget has 'widget-active' class
-      el.find('[rel=tooltip]').data('tooltip').hide();
-      $('.widget-area .widget:visible').find('.cms_controllers_tree_view')
-        .control().deselect();
-      this.unsetInstance();
-      return;
-    }
-    this.element.find('.pin-action i').css({opacity: 0.25});
-
+    var $activeTree = $('.cms_controllers_tree_view_node.active');
+    var size = this.getPinHeight(maximizedState);
     if (size < $info.height()) {
       options.start = function () {
         $win.trigger('resize', size);
@@ -203,12 +193,22 @@ can.Control('CMS.Controllers.InfoPin', {
     }
 
     this.element.animate({height: size}, options);
-    el.find('i').css({opacity: 1});
-    $('.cms_controllers_tree_view_node.active')
-      .removeClass(function (index, css) {
-        return (css.match(/\w+-pin-size/g) || []).join(' ');
-      })
-      .addClass(infoPinSizeClass);
+
+    if (maximizedState) {
+      $activeTree
+        .addClass('maximized-info-pane');
+    } else {
+      $activeTree
+        .removeClass('maximized-info-pane');
+    }
+  },
+  close: function () {
+    $('.widget-area .widget:visible')
+      .find('.cms_controllers_tree_view')
+      .control()
+      .deselect();
+
+    this.unsetInstance();
   },
   ' scroll': function (el, ev) {
     var header = this.element.find('.pane-header');
