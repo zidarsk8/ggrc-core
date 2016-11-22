@@ -751,13 +751,14 @@
       var model = CMS.Models[instance.child_type];
       var content = instance.revision.content;
       var type = model.root_collection;
+      content.isLatestRevision = instance.is_latest_revision;
       content.originalLink = '/' + type + '/' + content.id;
       content.snapshot = new CMS.Models.Snapshot(instance);
       content.viewLink = content.snapshot.viewLink;
       content.selfLink = content.snapshot.selfLink;
       content.type = content.snapshot.type;
       content.id = content.snapshot.id;
-      return content;
+      return new model(content);
     }
 
     /**
@@ -766,7 +767,7 @@
      * @return {Object} The array of objects
      */
     function toObjects(values) {
-      return values.map(toObject);
+      return new can.List(values.map(toObject));
     }
 
     /**

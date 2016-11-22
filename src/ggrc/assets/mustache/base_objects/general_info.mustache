@@ -20,12 +20,14 @@
         {{/if}}
       </div>
       {{#if snapshot}}
-        <div class="span12 snapshot">
-          <hr class="snapshot">
-          <p>
-            A more current version of this {{instance.class.title_singular}} is available. Do you want to <a href="#">update</a>?
-          </p>
-        </div>
+        {{^isLatestRevision}}
+          <div class="span12 snapshot">
+            <hr class="snapshot">
+            <p>
+              A more current version of this {{instance.class.title_singular}} is available. Do you want to <a href="#">update</a>?
+            </p>
+          </div>
+        {{/isLatestRevision}}
       {{/if}}
     </div>
   </div>
