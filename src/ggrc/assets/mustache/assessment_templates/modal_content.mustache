@@ -248,7 +248,10 @@
                     {{#fields}}
                       {{^if _pending_delete}}
                           <li class="row-fluid sortable-item" {{data 'field'}}>
-                              <template-field field="." fields="fields"></template-field>
+                              <template-field
+                                field="."
+                                fields="fields"
+                                can-on-remove="fieldRemoved"></template-field>
                           </li>
                       {{/if _pending_delete}}
                     {{/fields}}
