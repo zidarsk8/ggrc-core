@@ -378,6 +378,16 @@ class BlockConverter(object):
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
 
+  def _import_objects_prepare(self):
+    """Setup all objects and do pre-commit checks for them."""
+    for row_converter in self.row_converters:
+      row_converter.setup_object()
+
+    for row_converter in self.row_converters:
+      self._check_object(row_converter)
+
+    self.clean_session_from_ignored_objs()
+
   def import_objects(self):
     """Add all objects to the database.
 
@@ -387,13 +397,7 @@ class BlockConverter(object):
     if self.ignore:
       return
 
-    for row_converter in self.row_converters:
-      row_converter.setup_object()
-
-    for row_converter in self.row_converters:
-      self._check_object(row_converter)
-
-    self.clean_session_from_ignored_objs()
+    self._import_objects_prepare()
 
     if not self.converter.dry_run:
       new_objects = []
