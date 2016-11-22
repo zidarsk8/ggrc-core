@@ -5,6 +5,10 @@
 
 .spinner {
   display: inline-block;
+  &.initial-spinner {
+    position: relative;
+    left: 49%;  // not 50% to roughly compensate for the spinner's own width
+  }
 }
 
 .spinner-size {
