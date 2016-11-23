@@ -461,6 +461,11 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   // When user selects 3 middle selectable attribute, title width is reduced to span3
   // and when user selects 4 attributes, the action column is also reduced to span3
   setup_column_width: function () {
+    // Special case when import and export buttons should not be wisible for snapshots
+    var snapshots = GGRC.Utils.Snapshots;
+    var hideImportExport =
+        snapshots.isSnapshotScope(this.options.parent_instance) &&
+        snapshots.isSnapshotModel(this.options.model.model_singular);
     var display_options;
     var display_width = 12;
     var attr_count = this.options.display_attr_list.length;
@@ -482,7 +487,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       title_width: selected_widths[0],
       selectable_width: selected_widths[1],
       action_width: selected_widths[2],
-      selectable_attr_width: display_width / Math.max(attr_count, 1)
+      selectable_attr_width: display_width / Math.max(attr_count, 1),
+      hideImportExport: hideImportExport
     };
     this.options.attr('display_options', display_options);
   },
