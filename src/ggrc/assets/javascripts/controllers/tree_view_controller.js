@@ -1004,6 +1004,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
   '{original_list} remove': function (list, ev, oldVals, index) {
     var remove_marker = {}; // Empty object used as unique marker
+    var removedObjectType;
+    var skipInfoPinRefresh = false;
 
     //  FIXME: This assumes we're replacing the entire list, and corrects for
     //    instances being removed and immediately re-added.  This should be
@@ -1018,6 +1020,18 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
           return v.instance ? v.instance : v;
         }));
 
+    // If a removed object is a Document or a Person, it is likely that it
+    // was removed from the info pin, thus refreshing the latter is not needed.
+    // The check will fail, though, if the info pane was displaying a person
+    // located in a subtree, and we unmapped that person from the object
+    // displayed in the parent tree view node.
+    if (oldVals.length === 1 && oldVals[0].instance) {
+      removedObjectType = oldVals[0].instance.type;
+      if (removedObjectType === 'Person' || removedObjectType === 'Document') {
+        skipInfoPinRefresh = true;
+      }
+    }
+
     // `remove_marker` is to ensure that removals are not attempted until 20ms
     //   after the *last* removal (e.g. for a series of removals)
     this._remove_marker = remove_marker;
@@ -1028,6 +1042,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         }.bind(this));
         this.oldList = null;
         this._remove_marker = null;
+
+        if (skipInfoPinRefresh) {
+          return;
+        }
 
         // TODO: This is a workaround. We need to update communication between
         //       info-pin and tree views through Observer
@@ -1250,6 +1268,9 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
     function onDestroyed(ev, instance) {
       var current;
+      var destType;
+      var srcType;
+
       if (self._verifyRelationship(instance, activeTabModel) ||
         instance instanceof CMS.Models[activeTabModel]) {
         if (self.options.attr('original_list').length === 1) {
@@ -1257,7 +1278,20 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
           self.options.attr('paging.current',
             current > 1 ? current - 1 : 1);
         }
+
+        // if unmapping e.g. an URL (a "Document") or an assignee from
+        // the info pin, refreshing the latter is not needed
+        if (instance instanceof CMS.Models.Relationship) {
+          srcType = instance.source.type;
+          destType = instance.destination.type;
+          if (srcType === 'Person' || destType === 'Person' ||
+              srcType === 'Document' || destType === 'Document') {
+            return;
+          }
+        }
+
         _refresh();
+
         // TODO: This is a workaround.We need to update communication between
         //       info-pin and tree views through Observer
         if (!self.element.closest('.cms_controllers_info_pin').length) {
