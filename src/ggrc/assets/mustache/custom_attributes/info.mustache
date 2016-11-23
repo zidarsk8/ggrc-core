@@ -25,9 +25,13 @@
               mandatory="cad.mandatory"
               placeholder="cad.placeholder"
               helptext="cad.helptext"
-              {{^is_allowed 'update' instance context='for'}}
+              {{#if instance.snapshot}}
                 readonly
-              {{/is_allowed}}
+              {{else}}
+                {{^is_allowed 'update' instance context='for'}}
+                  readonly
+                {{/is_allowed}}
+              {{/if}}
               {{#if_instance_of instance 'Request'}}
                 can-before-edit="instance.confirmBeginEdit"
               {{/if_instance_of}}
