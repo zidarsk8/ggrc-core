@@ -391,12 +391,19 @@ class MappingColumnHandler(ColumnHandler):
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
-    """ Remove multiple spaces and new lines from text """
+    """Parse a list of slugs to be mapped.
+
+    Parse a new line separated list of slugs and check if they are valid
+    objects.
+
+    Returns:
+      list of objects. During dry_run, the list can contain a slug instead of
+      an actual object if that object will be generated in the current import.
+    """
     class_ = self.mapping_object
     lines = set(self.raw_value.splitlines())
     slugs = set([slug.lower() for slug in lines if slug.strip()])
     objects = []
-    objects_found = False
     for slug in slugs:
       obj = class_.query.filter_by(slug=slug).first()
       if obj:
@@ -408,13 +415,13 @@ class MappingColumnHandler(ColumnHandler):
               object_type=class_._inflector.human_singular.title(),
               slug=slug,
           )
-      elif not (slug in self.new_slugs and self.dry_run):
+      elif slug in self.new_slugs and self.dry_run:
+        objects.append(slug)
+      else:
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
                          slug=slug)
-      else:
-        objects_found = True
-    if self.mandatory and not objects and not objects_found:
+    if self.mandatory and not objects:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return objects
 
