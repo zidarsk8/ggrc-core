@@ -754,6 +754,7 @@
       content.isLatestRevision = instance.is_latest_revision;
       content.originalLink = '/' + type + '/' + content.id;
       content.snapshot = new CMS.Models.Snapshot(instance);
+      content.custom_attribute_values = content.custom_attributes;
       content.viewLink = content.snapshot.viewLink;
       content.selfLink = content.snapshot.selfLink;
       content.type = content.snapshot.type;

@@ -295,7 +295,8 @@ can.Control('CMS.Controllers.TreeLoader', {
       refreshed_deferred = $.when.apply($,
         can.map(filtered_items, function (item) {
           var instance = item.instance || item;
-          if (instance.custom_attribute_values) {
+          if (instance.custom_attribute_values &&
+              !GGRC.Utils.Snapshots.isSnapshot(instance)) {
             return instance.refresh_all('custom_attribute_values').then(function (values) {
               var rq = new RefreshQueue();
               _.each(values, function (value) {
