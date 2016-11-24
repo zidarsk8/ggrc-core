@@ -226,9 +226,19 @@ can.Control('CMS.Controllers.TreeLoader', {
   },
 
   _loading_started: function () {
+    var $contentContainer;
+
     if (!this._loading_deferred) {
       this._loading_deferred = new $.Deferred();
-      this.init_spinner();
+
+      // for some reason, .closest(<selector>) does not work, thus need to use
+      // using a bit less roboust .parent()
+      $contentContainer = this.element.parent();
+      $contentContainer
+        .find('spinner[extra-css-class="initial-spinner"]')
+        .remove();
+
+      this.init_spinner();  // the tree view's own items loading spinner
       this.element.trigger('loading');
     }
   },
