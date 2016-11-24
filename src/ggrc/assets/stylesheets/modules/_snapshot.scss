@@ -13,6 +13,12 @@
   margin-left: 0;
 }
 
+.state-value.snapshot {
+  color: $snapshotLbl;
+  background: $snapshotLblBgnd;
+  text-transform: none;
+}
+
 hr.snapshot {
   display: block;
   height: 1px;

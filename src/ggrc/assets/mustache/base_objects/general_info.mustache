@@ -10,6 +10,9 @@
       <div data-test-id="title_0ad9fbaf" class="span9">
         <h6>Title</h6>
         <h3>{{title}}</h3>
+        {{#if snapshot}}
+          <span class="state-value snapshot">{{instance.class.title_singular}} version as at {{date instance.updated_at}}</span>
+        {{/if}}
         {{#if status}}
           <span class="state-value">{{un_camel_case status}}</span>
         {{/if}}
