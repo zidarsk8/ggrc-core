@@ -18,6 +18,11 @@ collapsible-panel {
         padding: 0;
       }
     }
+
+    h6 {
+      float: left;
+      width: 50%;
+    }
   }
 
   &.details-item {
@@ -26,11 +31,10 @@ collapsible-panel {
     .collapsible-panel-body {
       > .body-inner {
         padding: 0;
-        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
 
         &.is-expanded {
           padding: 4px 8px 4px 24px;
-          border-top: 1px solid transparent;
         }
       }
     }
