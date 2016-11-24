@@ -83,7 +83,7 @@ class TestComprehensiveSheets(TestCase):
             "created": 14,
             "ignored": 2,
             "row_errors": 3,
-            "row_warnings": 5,
+            "row_warnings": 4,
             "rows": 16,
         },
         "Contract": {
