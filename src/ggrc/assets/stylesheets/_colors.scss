@@ -152,6 +152,7 @@ $bar-warning: #ffcebe;
 
 // snapshots
 $snapshotBgnd: #ddf3fd;
+$snapshotBgndActive: darken($snapshotBgnd, 10%);
 $shapshotBorder: #d9e6ec;
 $snapshotLblBgnd: #6eaacd;
 $snapshotLbl: white;
