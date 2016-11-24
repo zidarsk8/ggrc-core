@@ -34,7 +34,6 @@
     Project: allTypes,
     Regulation: _.difference(allTypes,
       ['Contract', 'Policy', 'Regulation', 'Standard']),
-    // Request: allTypes,
     Section: allTypes,
     Standard: _.difference(allTypes,
       ['Contract', 'Policy', 'Regulation', 'Standard']),

@@ -280,6 +280,9 @@
     }
   });
 
+  /**
+   * @Deprecated
+   */
   can.Model.Cacheable('CMS.Models.Request', {
     root_object: 'request',
     filter_keys: ['assignee', 'audit', 'code', 'company', 'control', 'due on',
