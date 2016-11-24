@@ -383,6 +383,12 @@
         }
       },
 
+      '#search keyup': function (el, ev) {
+        if (ev.keyCode === 13) {
+          this.element.find('mapper-results').control().getResults();
+        }
+      },
+
       allSelected: function () {
         var selected = this.scope.attr('mapper.selected');
         var entries = this.scope.attr('mapper.entries');
