@@ -26,7 +26,7 @@
         ev.preventDefault();
         ev.stopPropagation();
         if (node) {
-          node.select('max');
+          node.select(true);
         }
       }
     }

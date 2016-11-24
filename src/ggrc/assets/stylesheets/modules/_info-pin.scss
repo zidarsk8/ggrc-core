@@ -46,18 +46,16 @@
 .sticky-info-panel {
   .pane-header {
     .details-wrap {
-      margin-top: 18px !important;
+      margin-top: 30px !important;
     }
   }
-  .details-wrap {
-    &.pin {
-      position: fixed;
-      right: 47px;
-      z-index: zIndex(details-wrap);
-      width: 100px;
-      margin-top: -15px !important;
-      padding-top: 5px;
-    }
+  info-pin-buttons {
+    position: fixed;
+    right: 47px;
+    z-index: zIndex(details-wrap);
+    width: 100px;
+    margin-top: -15px !important;
+    padding-top: 5px;
   }
 }
 

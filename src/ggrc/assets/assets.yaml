@@ -203,6 +203,7 @@ dashboard-js-files:
   - components/tree_pagination/tree_pagination.js
   - components/view-object-button/view-object-button.js
   - components/effective-dates/effective-dates.js
+  - components/info-pin-buttons/info-pin-buttons.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -248,6 +249,7 @@ dashboard-js-template-files:
   - components/ca-object/ca-object-modal.mustache
   - components/ca-object/ca-object-modal-content.mustache
   - components/view-object-button/view-object-button.mustache
+  - components/info-pin-buttons/info-pin-buttons.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
@@ -286,7 +288,6 @@ dashboard-js-template-files:
   - base_objects/generate_assessments_button.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
-  - base_objects/info-pin.mustache
   - base_objects/info_header.mustache
   - base_objects/filters/advanced_search_filter_actions.mustache
   - base_objects/filters/modal_filter_actions.mustache
