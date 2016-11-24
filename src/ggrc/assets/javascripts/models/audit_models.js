@@ -674,8 +674,8 @@
         {value: 'Object Owners', title: 'Object Owners'},
         {value: 'Audit Lead', title: 'Audit Lead'},
         {value: 'Auditors', title: 'Auditors'},
-        {value: 'Primary Assessor', title: 'Principal Assessor'},
-        {value: 'Secondary Assessors', title: 'Secondary Assessors'},
+        {value: 'Primary Assessor', title: 'Principal Assignee'},
+        {value: 'Secondary Assessors', title: 'Secondary Assignee'},
         {value: 'Primary Contact', title: 'Primary Contact'},
         {value: 'Secondary Contact', title: 'Secondary Contact'},
         {value: 'other', title: 'Others...'}
