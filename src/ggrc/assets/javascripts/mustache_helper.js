@@ -2124,6 +2124,10 @@ Mustache.registerHelper('param_current_location', function () {
   return GGRC.current_url_compute();
 });
 
+  Mustache.registerHelper('urlPath', function () {
+    return window.location.pathname;
+  });
+
 Mustache.registerHelper("sum", function () {
   var sum = 0;
   for (var i = 0; i < arguments.length - 1; i++) {
