@@ -907,7 +907,7 @@
       if (object) {
         this.custom_attributes.attr(attrId, object.type + ':' + object.id);
       } else {
-        this.custom_attributes.removeAttr(String(attrId));
+        this.custom_attributes.attr(attrId, 'Person:None');
       }
     },
     computed_errors: can.compute(function () {
