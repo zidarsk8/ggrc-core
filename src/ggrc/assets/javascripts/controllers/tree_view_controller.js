@@ -226,9 +226,19 @@ can.Control('CMS.Controllers.TreeLoader', {
   },
 
   _loading_started: function () {
+    var $contentContainer;
+
     if (!this._loading_deferred) {
       this._loading_deferred = new $.Deferred();
-      this.init_spinner();
+
+      // for some reason, .closest(<selector>) does not work, thus need to use
+      // using a bit less roboust .parent()
+      $contentContainer = this.element.parent();
+      $contentContainer
+        .find('spinner[extra-css-class="initial-spinner"]')
+        .remove();
+
+      this.init_spinner();  // the tree view's own items loading spinner
       this.element.trigger('loading');
     }
   },
@@ -440,9 +450,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     var active = this.element.find('.cms_controllers_tree_view_node.active');
     active
       .removeClass('active')
-      .removeClass(function (index, css) {
-        return (css.match(/\w+-pin-size/g) || []).join(' ');
-      });
+      .removeClass('maximized-info-pane');
     this.update_hash_fragment(active.length);
   },
   update_hash_fragment: function (status) {
@@ -1870,25 +1878,22 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
   /**
    * Mark the tree node as active (and all other tree nodes as inactive).
-   * @param {string} infoPinSize - Size of the info pin
+   * @param {Boolean} maximizeInfoPane - Info pane maximized state
    */
-  select: function (infoPinSize) {
+  select: function (maximizeInfoPane) {
     var $tree = this.element;
-    var infoPinSizeClass;
-    var infoPinSizeClassMatches;
-    if (infoPinSize) {
-      infoPinSizeClass = infoPinSize + '-pin-size';
-    } else {
-      infoPinSizeClassMatches =
-        $tree.attr('class').match(/(\w+)-pin-size/);
-      if (infoPinSizeClassMatches && infoPinSizeClassMatches.length !== 0) {
-        infoPinSizeClass = infoPinSizeClassMatches[0];
+    var treeHasMaximizedClass = $tree.hasClass('maximized-info-pane');
+    if (typeof maximizeInfoPane === 'undefined') {
+      if (treeHasMaximizedClass) {
+        maximizeInfoPane = true;
       } else {
-        infoPinSizeClass = 'normal-pin-size';
+        maximizeInfoPane = false;
       }
     }
 
-    if ($tree.hasClass('active') && $tree.hasClass(infoPinSizeClass)) {
+    if ($tree.hasClass('active') &&
+      ((maximizeInfoPane && treeHasMaximizedClass) ||
+      (!maximizeInfoPane && !treeHasMaximizedClass))) {
       return;  // tree node already selected, no need to activate it again
     }
 
@@ -1897,15 +1902,19 @@ can.Control('CMS.Controllers.TreeViewNode', {
       .removeClass('active');
 
     $tree
-      .removeClass(function (index, css) {
-        return (css.match(/\w+-pin-size/g) || []).join(' ');
-      })
-      .addClass(infoPinSizeClass)
       .addClass('active');
+
+    if (maximizeInfoPane) {
+      $tree
+        .addClass('maximized-info-pane');
+    } else {
+      $tree
+        .removeClass('maximized-info-pane');
+    }
 
     this.update_hash_fragment();
     $('.pin-content').control()
-      .setInstance(this.options.instance, $tree, infoPinSize);
+      .setInstance(this.options.instance, $tree, maximizeInfoPane);
   },
 
   'input,select click': function (el, ev) {

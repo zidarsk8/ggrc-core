@@ -995,7 +995,7 @@ can.Control('GGRC.Controllers.Modals', {
       duration: 200,
       complete: function () {
         if (error) {
-          GGRC.Errors.notifierXHR('error')(error);
+          GGRC.Errors.notifier('error', error.responseText);
         }
         delete this.disable_hide;
       }.bind(this)
