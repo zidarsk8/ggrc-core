@@ -27,7 +27,10 @@
           <div class="span12 snapshot">
             <hr class="snapshot">
             <p>
-              A more current version of this {{instance.class.title_singular}} is available. Do you want to <a href="#">update</a>?
+              <snapshot-individual-update instance="instance">
+                  <a href="javascript://" can-click="updateIt">Click here</a>
+                  if you want to check for latest version and update.
+              </snapshot-individual-update>
             </p>
           </div>
         {{/isLatestRevision}}
