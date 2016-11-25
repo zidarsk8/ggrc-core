@@ -156,7 +156,7 @@
         'validate_assessor',
         function () {
           if (!this.validate_assessor) {
-            return 'You need to specify at least one assessor';
+            return 'You need to specify at least one assignee';
           }
         }
       );

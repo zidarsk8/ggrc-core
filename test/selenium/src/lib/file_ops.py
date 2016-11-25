@@ -1,9 +1,9 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-import os
 import logging
-
+import os
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,7 @@ def create_directory(path):
 
 
 def get_unique_postfix(file_path, extension):
+  """Add numeric postfix for file."""
   postfix = 0
   new_path = file_path + str(postfix) + extension
 
@@ -34,5 +35,5 @@ def get_unique_postfix(file_path, extension):
 
 
 def delete_directory_contents(path):
-  for file_name in os.listdir(path):
-    os.remove(path + os.sep + file_name)
+  """Remove all files and sub-dir in provided path."""
+  shutil.rmtree(path)

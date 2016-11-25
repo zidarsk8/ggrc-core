@@ -4,14 +4,16 @@
 
 import re
 
-from selenium.webdriver.common import keys    # pylint: disable=import-error
-from selenium import webdriver    # pylint: disable=import-error
+from selenium import webdriver
+from selenium.webdriver.common import keys
+from selenium.webdriver.common.by import By
 
 from lib import constants
 from lib import exception
 from lib import meta
 from lib import mixin
 from lib.utils import selenium_utils
+# pylint: disable=too-few-public-methods
 
 
 class InstanceRepresentation(object):
@@ -88,6 +90,7 @@ class Label(Element):
 
 
 class RichTextInputField(Element):
+  """Common class for representation of Rich Text input."""
   def __init__(self, driver, locator):
     """
     Args:
@@ -316,6 +319,10 @@ class DropdownStatic(Element):
   """A dropdown with predefined static elements"""
 
   def __init__(self, driver, dropdown_locator, elements_locator):
+    """
+    Args:
+        driver (CustomDriver)
+    """
     super(DropdownStatic, self).__init__(driver, dropdown_locator)
     self._locator_dropdown_elements = elements_locator
     self.elements_dropdown = self._driver.find_elements(
@@ -327,7 +334,7 @@ class DropdownStatic(Element):
   def select(self, member_name):
     """Selects the dropdown element based on dropdown element name"""
     for element in self.elements_dropdown:
-      if element.text == member_name:
+      if element.get_attribute("value") == member_name:
         element.click()
         break
     else:
@@ -369,12 +376,12 @@ class AnimatedComponent(Component):
       self._wait_until_invisible()
 
   def _wait_until_visible(self):
-    for locator in self._locators:
-      selenium_utils.get_when_visible(self._driver, locator)
+    for item_locator in self._locators:
+      selenium_utils.get_when_visible(self._driver, item_locator)
 
   def _wait_until_invisible(self):
-    for locator in self._locators:
-      selenium_utils.get_when_invisible(self._driver, locator)
+    for item_locator in self._locators:
+      selenium_utils.get_when_invisible(self._driver, item_locator)
 
 
 class Modal(Component):
@@ -409,10 +416,15 @@ class AbstractPage(Component):
   it's url in advance"""
 
   def __init__(self, driver):
+    """
+    Args:
+        driver (CustomDriver)
+    """
     super(AbstractPage, self).__init__(driver)
     self.url = driver.current_url
 
   def navigate_to(self, custom_url=None):
+    """Navigate to url."""
     url_to_use = self.url if custom_url is None else custom_url
 
     if self._driver.current_url != url_to_use:
@@ -487,3 +499,67 @@ class Widget(AbstractPage):
     self.name_from_url = widget_name.split("_")[0] or \
         constants.element.WidgetBar.INFO
     self.object_name = object_name
+
+
+class TreeView(Component):
+  """Common class for representing tree-view list with several objects."""
+  _locator = constants.locator.TreeViewCommon
+
+  def __init__(self, driver, object_name):
+    """
+    Args:
+        driver (CustomDriver)
+    """
+    super(TreeView, self).__init__(driver)
+    self.object_name = object_name
+    self._tree_view_items = []
+
+  def _set_tree_view_items(self):
+    """Set tree view items list with TreeViewItem objects from the current
+    widget.
+    """
+    items_locator = (
+        By.CSS_SELECTOR, self._locator.ITEMS.format(self.object_name))
+    selenium_utils.get_when_invisible(self._driver, self._locator.SPINNER)
+    selenium_utils.wait_until_not_present(
+        self._driver, self._locator.ITEM_LOADING
+    )
+    elements = selenium_utils.get_when_all_visible(self._driver, items_locator)
+    self._tree_view_items = [TreeViewItem(
+        driver=self._driver,
+        text=el.text,
+        expand_btn=el.find_element(
+            By.CSS_SELECTOR, self._locator.ITEM_EXPAND_BUTTON)
+    ) for el in elements]
+
+  def tree_view_items(self):
+    """Return list of TreeViewItem objects."""
+    if not self._tree_view_items:
+      self._set_tree_view_items()
+    return self._tree_view_items
+
+
+class TreeViewItem(Component):
+  """Class for describing single item on tree-view."""
+  def __init__(self, driver, text=None, expand_btn=None):
+    super(TreeViewItem, self).__init__(driver)
+    self.text = text
+    self.expand_btn = expand_btn
+
+  def expand(self):
+    """Expands Tree-View item if it is not expanded already."""
+    from lib.page.widget.widget_base import CustomAttributesItemContent
+    if not self.is_expanded:
+      self.expand_btn.click()
+      selenium_utils.wait_until_stops_moving(self.expand_btn)
+    return CustomAttributesItemContent(self._driver, self.text)
+
+  def collapse(self):
+    """Collapse Tree-View item if it is expanded"""
+    if self.is_expanded:
+      self.expand_btn.click()
+      selenium_utils.wait_until_stops_moving(self.expand_btn)
+
+  @property
+  def is_expanded(self):
+    return selenium_utils.is_value_in_attr(self.expand_btn)

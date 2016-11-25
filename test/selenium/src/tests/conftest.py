@@ -44,16 +44,6 @@ def selenium(selenium):
 
 
 @pytest.yield_fixture(scope="function")
-def custom_program_attribute(selenium):
-  """Creates a custom attribute for a program object"""
-  # pylint: disable=redefined-outer-name
-  cust_attr_widget = conftest_utils.create_custom_program_attribute(
-      selenium)
-  yield cust_attr_widget
-  # todo: delete this custom attribute
-
-
-@pytest.yield_fixture(scope="function")
 def new_control(selenium):
   """Creates a new control object.
 
