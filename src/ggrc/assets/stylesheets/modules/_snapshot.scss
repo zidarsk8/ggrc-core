@@ -60,10 +60,17 @@ a.disabled {
 // Tree view
 ul.new-tree {
   li.tree-item {
-    &.active.snapshot {
+    &.snapshot {
       > .item-main {
         > .item-wrap {
           background: $snapshotBgnd;
+        }
+      }
+    }
+    &.active.snapshot {
+      > .item-main {
+        > .item-wrap {
+          background: $snapshotBgndActive;
         }
       }
     }
