@@ -38,9 +38,6 @@ MAP_UNMAP_CONFLICT = (u"Line {line}: Object '{slug}' scheduled for mapping and"
 UNKNOWN_OBJECT = (u"Line {line}: {object_type} '{slug}' doesn't exist, so it"
                   u" can't be mapped/unmapped.")
 
-WHITESPACE_WARNING = (u"Line {line}: Field {column_name} contains multiple"
-                      u"spaces together, that will be merged into one.")
-
 UNKNOWN_USER_WARNING = (u"Line {line}: Specified user '{email}' does not "
                         u"exist. That user will be ignored.")
 
