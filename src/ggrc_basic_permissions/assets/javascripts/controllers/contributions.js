@@ -397,6 +397,7 @@
           return join.refresh().then(function () {
             return join.destroy();
           }).then(function () {
+            self.refresh_object_list();
             self.element.trigger('relationshipdestroyed', join);
           });
         }
@@ -413,6 +414,7 @@
           join.save().then(function () {
             self.join_list.push(join);
             self.refresh_option_list();
+            self.refresh_object_list();
             self.element.trigger('relationshipcreated', join);
           });
         });

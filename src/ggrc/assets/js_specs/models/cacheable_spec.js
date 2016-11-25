@@ -630,7 +630,7 @@ describe('can.Model.Cacheable', function () {
       obj._custom_attribute_map(1, 'garbage');
       expect(obj.custom_attributes[1]).toEqual('DummyModel:1');
       obj._custom_attribute_map(1, '');
-      expect(obj.custom_attributes[1]).toEqual(undefined);
+      expect(obj.custom_attributes[1]).toEqual('Person:None');
     });
   });
 });

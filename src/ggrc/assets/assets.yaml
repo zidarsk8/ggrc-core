@@ -208,6 +208,7 @@ dashboard-js-files:
   - components/effective-dates/effective-dates.js
   - components/snapshotter/individual-update.js
   - components/snapshotter/scope-update.js
+  - components/info-pin-buttons/info-pin-buttons.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -255,6 +256,7 @@ dashboard-js-template-files:
   - components/ca-object/ca-object-modal-content.mustache
   - components/view-object-button/view-object-button.mustache
   - components/add-object-button/add-object-button.mustache
+  - components/info-pin-buttons/info-pin-buttons.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
@@ -293,7 +295,6 @@ dashboard-js-template-files:
   - base_objects/generate_assessments_button.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
-  - base_objects/info-pin.mustache
   - base_objects/info-pane-utility.mustache
   - base_objects/info_header.mustache
   - base_objects/filters/advanced_search_filter_actions.mustache

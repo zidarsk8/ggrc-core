@@ -502,7 +502,10 @@ class WidgetBar(object):
   class _Locator(object):
     @staticmethod
     def get_widget(object_name):
-      return (By.CSS_SELECTOR, '[href="#{}_widget"]'.format(object_name))
+      return (
+          By.CSS_SELECTOR,
+          '.object-nav [href$="#{}_widget"]'.format(object_name)
+      )
 
   class __metaclass__(type):
     def __init__(cls, *args):
@@ -532,8 +535,11 @@ class WidgetBarButtonAddDropdown(object):
   class _Locator(object):
     @staticmethod
     def get_dropdown_item(object_name):
-      return (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                               '[href="#{}_widget"]'.format(object_name))
+      return (
+          By.CSS_SELECTOR,
+          '[data-test-id="button_widget_add_2c925d94"] '
+          '.object-nav [href$="#{}_widget"]'.format(object_name)
+      )
 
   class __metaclass__(type):
     def __init__(cls, *args):

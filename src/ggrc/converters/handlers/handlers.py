@@ -344,11 +344,7 @@ class TextColumnHandler(ColumnHandler):
     return self.clean_whitespaces(self.raw_value)
 
   def clean_whitespaces(self, value):
-    clean_value = re.sub(r'\s+', " ", value)
-    if clean_value != value:
-      self.add_warning(errors.WHITESPACE_WARNING,
-                       column_name=self.display_name)
-    return value
+    return re.sub(r'\s+', " ", value)
 
 
 class RequiredTextColumnHandler(TextColumnHandler):

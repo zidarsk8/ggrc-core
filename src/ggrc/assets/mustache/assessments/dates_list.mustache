@@ -7,16 +7,16 @@
     <ul class="label-list dates">
       {{#if created_at}}
         <li class="gray">
-          <label>
+          <h6>
             Created on
-          </label>
+          </h6>
           <span name="created_at">{{localize_date created_at}}</span>
         </li>
       {{/if}}
       {{#if due_on}}
         <li>
           {{#toggle change_due_date}}
-            <label>Due on</label>
+            <h6>Due on</h6>
             <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
               <input tabindex="5" class="span8 input-block-level date" name="due_on" data-toggle="datepicker" data-after="created_at" placeholder="MM/DD/YYYY" type="text" value="{{localize_date due_on}}">
@@ -29,9 +29,9 @@
                 </span>
               {{/if_in}}
             {{/is_allowed}}
-            <label>
+            <h6>
               Due on
-            </label>
+            </h6>
             {{#if_null instance.due_on}}
               defined
             {{/if_null}}
@@ -41,7 +41,7 @@
       {{/if}}
       {{#if_helpers '#if' instance.finished_date 'or #if_null' instance.finished_date}}
         <li>
-          <label>Finished</label>
+          <h6>Finished</h6>
           {{#if instance.finished_date}}
             <span>{{localize_date instance.finished_date}}</span>
           {{else}}
@@ -51,7 +51,7 @@
       {{/if_helpers}}
       {{#if_helpers '#if' instance.verified_date 'or #if_null' instance.verified_date}}
         <li>
-          <label>Verified</label>
+          <h6>Verified</h6>
           {{#if instance.verified_date}}
             <span>{{localize_date instance.verified_date}}</span>
           {{else}}

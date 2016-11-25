@@ -35,13 +35,13 @@ class TestCreatorAudit(TestCase):
             "objects": {
                 "audit": {
                     "get": 200,
-                    "put": 403,
+                    "put": 200,
                     "delete": 403
                 },
                 "mapped_Issue": {
                     "get": 200,
-                    "put": 403,
-                    "delete": 403
+                    "put": 200,
+                    "delete": 200
                 },
                 "unrelated_Issue": {
                     "get": 403,
@@ -51,8 +51,8 @@ class TestCreatorAudit(TestCase):
                 },
                 "mapped_Assessment": {
                     "get": 200,
-                    "put": 403,
-                    "delete": 403
+                    "put": 200,
+                    "delete": 200
                 },
                 "unrelated_Assessment": {
                     "get": 403,
