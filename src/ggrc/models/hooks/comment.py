@@ -21,7 +21,6 @@ def init_hook():
     for obj in objects:
       obj_owner = ObjectOwner(
           person_id=creator_id,
-          ownable_id=obj.id,
-          ownable_type=obj.type,
+          ownable=obj,
       )
       db.session.add(obj_owner)
