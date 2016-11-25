@@ -41,14 +41,14 @@
                 data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
                 data-object-params='{
                   "audit": {
-                      "id": {{mapper.get_instance.id}},
-                      "type": "{{mapper.get_instance.type}}"
+                      "id": {{mapper.parentInstance.id}},
+                      "type": "{{mapper.parentInstance.type}}"
                   },
                   "context": {
-                      "id": {{mapper.get_instance.context.id}},
-                      "type": "{{json_escape mapper.get_instance.context.type}}"
+                      "id": {{mapper.parentInstance.context.id}},
+                      "type": "{{json_escape mapper.parentInstance.context.type}}"
                   },
-                  "audit_title": "{{json_escape mapper.get_instance.title}}"
+                  "audit_title": "{{json_escape mapper.parentInstance.title}}"
                 }'
                 data-join-object-id="{{mapper.join_object_id}}">
                 <i class="fa fa-plus-circle"></i>
