@@ -3,9 +3,7 @@
 
 """Tests for snapshot model."""
 
-from ggrc import db
 from ggrc.app import app
-from ggrc.services import common
 from ggrc.models import all_models
 from integration.ggrc.converters import TestCase
 from integration.ggrc.models import factories
@@ -51,4 +49,3 @@ class TestSnapshot(TestCase):
 
     self.assertIn("custom_attributes", facility_revision.content)
     self.assertNotEqual(facility_revision.content["custom_attributes"], [])
-
