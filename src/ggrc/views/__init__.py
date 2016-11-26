@@ -75,7 +75,8 @@ def do_reindex():
   excluded_models = {
       all_models.Directive,
       all_models.Option,
-      all_models.SystemOrProcess
+      all_models.SystemOrProcess,
+      all_models.Role,
   }
   indexed_models = {model for model in all_models.all_models
                     if model_is_indexed(model)}
