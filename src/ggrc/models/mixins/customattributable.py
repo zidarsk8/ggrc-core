@@ -402,7 +402,7 @@ class CustomAttributable(object):
     res = getattr(super(CustomAttributable, self), "log_json", lambda: {})()
 
     if self.custom_attribute_values:
-      res["custom_attributes"] = [value.log_json()
+      res["custom_attribute_values"] = [value.log_json()
                                   for value in self.custom_attribute_values]
       # fetch definitions form database because `self.custom_attribute`
       # may not be populated
@@ -418,8 +418,9 @@ class CustomAttributable(object):
                                              for definition in defs]
     else:
       res["custom_attribute_definitions"] = []
-      res["custom_attributes"] = []
+      res["custom_attribute_values"] = []
 
+    res["custom_attributes"] = res["custom_attribute_values"]
     return res
 
   def validate_custom_attributes(self):
