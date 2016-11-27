@@ -8,7 +8,9 @@ from ggrc.models import Control
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
+
 class TestControl(TestCase):
+
   def test_simple_categorization(self):
     category = factories.ControlCategoryFactory(scope_id=100)
     control = factories.ControlFactory()

@@ -448,12 +448,11 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
   @staticmethod
   def _person_stub(id_):
     return {
-      'type': u"Person",
-      'id': id_,
-      'context_id': None,
-      'href': u"/api/people/{}".format(id_),
+        'type': u"Person",
+        'id': id_,
+        'context_id': None,
+        'href': u"/api/people/{}".format(id_),
     }
-
 
   def log_json(self):
     # to integrate with CustomAttributable without order dependencies
@@ -588,6 +587,7 @@ class Slugged(Base):
       if isinstance(o, Slugged) and hasattr(o, '_replace_slug'):
         o.generate_slug_for(o)
         delattr(o, '_replace_slug')
+
 
 event.listen(Session, 'before_flush', Slugged.ensure_slug_before_flush)
 event.listen(

@@ -3,7 +3,6 @@
 
 """Tests for snapshot model."""
 
-from ggrc import db
 from ggrc.app import app
 from ggrc.models import all_models
 from integration.ggrc.converters import TestCase
@@ -36,85 +35,85 @@ class TestSnapshot(TestCase):
   """Basic tests for /query api."""
 
   IGNORE_KEYS = {
-    # currently not working fields:
-    "audit_duration",
-    "audit_duration_id",
+      # currently not working fields:
+      "audit_duration",
+      "audit_duration_id",
 
-    "audit_frequency",
-    "audit_frequency_id",
+      "audit_frequency",
+      "audit_frequency_id",
 
-    "directive",
-    "directive_id",
+      "directive",
+      "directive_id",
 
-    "kind",
-    "kind_id",
+      "kind",
+      "kind_id",
 
-    "means",
-    "means_id",
+      "means",
+      "means_id",
 
-    "meta_kind",
+      "meta_kind",
 
-    "network_zone",
-    "network_zone_id",
+      "network_zone",
+      "network_zone_id",
 
-    "verify_frequency",
-    "verify_frequency_id",
+      "verify_frequency",
+      "verify_frequency_id",
 
-    "assertions",
-    "categories",
-    "categorizations",
-    "categorized_assertions",
+      "assertions",
+      "categories",
+      "categorizations",
+      "categorized_assertions",
 
-    # special fields not needed for snapshots.
-    "display_name",
-    "preconditions_failed",
-    "type",
-    "workflow_state",
+      # special fields not needed for snapshots.
+      "display_name",
+      "preconditions_failed",
+      "type",
+      "workflow_state",
 
-    "selfLink",
-    "viewLink",
+      "selfLink",
+      "viewLink",
 
 
-    # relationships and mappings
-    "audit_objects",
-    "audits",
-    "controls",
-    "object_owners",
-    "object_people",
-    "objects",
-    "people",
-    "related_destinations",
-    "related_sources",
-    "risk_objects",
-    "risks",
-    "task_group_objects",
-    "task_group_tasks",
-    "task_groups",
+      # relationships and mappings
+      "audit_objects",
+      "audits",
+      "controls",
+      "object_owners",
+      "object_people",
+      "objects",
+      "people",
+      "related_destinations",
+      "related_sources",
+      "risk_objects",
+      "risks",
+      "task_group_objects",
+      "task_group_tasks",
+      "task_groups",
 
-    "children",
-    "parent",
-    "parent_id",
+      "children",
+      "parent",
+      "parent_id",
 
-    # we don't need context for snapshots since they are all under an audit.
-    "context",
-    "context_id",
+      # we don't need context for snapshots since they are all under an audit.
+      "context",
+      "context_id",
 
-    # obsolete fields that will be removed
-    "custom_attributes",
+      # obsolete fields that will be removed
+      "custom_attributes",
 
-    # following fields have been handled in fields without _id prefix. That
-    # means that "contact" fields should exists and have correct values.
-    "contact_id",
-    "secondary_contact_id",
+      # following fields have been handled in fields without _id prefix. That
+      # means that "contact" fields should exists and have correct values.
+      "contact_id",
+      "secondary_contact_id",
 
-    "principal_assessor_id",
-    "secondary_assessor_id",
+      "principal_assessor_id",
+      "secondary_assessor_id",
 
-    "modified_by_id",
+      "modified_by_id",
 
-    "attribute_object",
-    "attribute_object_id",
-    "attribute_value",
+      "attribute_object",
+      "attribute_object_id",
+      "attribute_value",
   }
 
   def setUp(self):
@@ -153,7 +152,8 @@ class TestSnapshot(TestCase):
         all_models.Revision.id.desc()).first()
 
     self.assertIn("custom_attribute_values", facility_revision.content)
-    self.assertNotEqual(facility_revision.content["custom_attribute_values"], [])
+    self.assertNotEqual(facility_revision.content[
+                        "custom_attribute_values"], [])
 
   def _get_object(self, obj):
     return self.client.get(
@@ -197,10 +197,16 @@ class TestSnapshot(TestCase):
     return clean
 
   def test_snapshot_content(self):
-    snapshot = all_models.Snapshot()
+    """Test the content of stored revisions
+
+    The content in the revision (that is set by log_json) must match closely to
+    what the api returns for a get request. This ensures that when a model is
+    created from a snapshot on the fronend, it will have all the needed fields.
+    """
     self.client.get("/login")
     for model in TEST_MODELS:
       obj = model.eager_query().first()
       generated_json = self._clean_json(obj.log_json())
       expected_json = self._clean_json(self._get_object(obj))
+      self.assertEqual(expected_json, generated_json)
       self.assertEqual(expected_json, generated_json)

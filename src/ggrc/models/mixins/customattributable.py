@@ -402,8 +402,8 @@ class CustomAttributable(object):
     res = getattr(super(CustomAttributable, self), "log_json", lambda: {})()
 
     if self.custom_attribute_values:
-      res["custom_attribute_values"] = [value.log_json()
-                                  for value in self.custom_attribute_values]
+      res["custom_attribute_values"] = [
+          value.log_json() for value in self.custom_attribute_values]
       # fetch definitions form database because `self.custom_attribute`
       # may not be populated
       defs = CustomAttributeDefinition.query.filter(
@@ -414,8 +414,8 @@ class CustomAttributable(object):
           ])
       )
       # also log definitions to freeze field names in time
-      res["custom_attribute_definitions"] = [definition.log_json()
-                                             for definition in defs]
+      res["custom_attribute_definitions"] = [
+          definition.log_json() for definition in defs]
     else:
       res["custom_attribute_definitions"] = []
       res["custom_attribute_values"] = []
