@@ -125,7 +125,8 @@
       var object = this.attr('getList') ?
         'MultitypeSearch' :
         this.attr('object');
-      var groups = this.attr('defaultGroups');
+      // Can.JS wrap all objects with can.Map by default
+      var groups = this.attr('defaultGroups').serialize();
       var list = this.getModelNamesList(object);
 
       list.forEach(function (modelName) {
