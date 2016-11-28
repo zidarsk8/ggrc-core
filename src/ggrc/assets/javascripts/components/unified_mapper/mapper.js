@@ -64,6 +64,11 @@
     snapshot_scope_id: '',
     snapshot_scope_type: '',
     parentInstance: null,
+    allowedToCreate: function () {
+      var isAllTypeSelected = this.attr('type') === 'AllObject';
+      var isSearch = this.attr('search_only');
+      return !isAllTypeSelected && !isSearch;
+    },
     showWarning: function () {
       return !(GGRC.Mappings
         .canBeMappedDirectly(this.attr('type'), this.attr('object')));
