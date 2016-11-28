@@ -559,7 +559,8 @@
     }, 100),
     '.closed click': function (el, ev) {
       var $link = el.closest('a');
-      var widget = this.widget_by_selector($link.attr('href'));
+      var widget = this.widget_by_selector('#' + $link.attr('href')
+                                                      .split('#')[1]);
       var widgets = this.options.widget_list;
 
       widget.attr('force_show', false);
