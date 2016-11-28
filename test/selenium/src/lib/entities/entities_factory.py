@@ -17,48 +17,48 @@ from lib.utils.test_utils import append_random_string
 class CAFactory(object):
   """Factory class for Custom Attribute entity."""
 
-  @staticmethod
-  def create(title=None, ca_type=None, definition_type=None,
+  @classmethod
+  def create(cls, title=None, ca_type=None, definition_type=None,
              helptext="", placeholder=None, multi_choice_options=None,
              is_mandatory=False, ca_global=True):
     """"
     Method for basic CustomAttribute object creation.
     None type or definition will be filled randomly.
     """
-    ca_entity = CAFactory._create_random_ca()
-    ca_entity = CAFactory._fill_ca_entity_fields(
+    ca_entity = cls._create_random_ca()
+    ca_entity = cls._fill_ca_entity_fields(
         ca_entity, title=title, ca_type=ca_type,
         definition_type=definition_type,
         helptext=helptext, placeholder=placeholder,
         multi_choice_options=multi_choice_options, is_mandatory=is_mandatory,
         ca_global=ca_global
     )
-    ca_entity = CAFactory._normalize_ca_definition_type(ca_entity)
+    ca_entity = cls._normalize_ca_definition_type(ca_entity)
     return ca_entity
 
-  @staticmethod
-  def _create_random_ca():
+  @classmethod
+  def _create_random_ca(cls):
     """Create random CustomAttribute entity."""
     random_ca = entity.CustomAttribute()
     random_ca.ca_type = random.choice(AttributesTypes.ALL_TYPES)
-    random_ca.title = CAFactory._generate_title(random_ca.ca_type)
+    random_ca.title = cls._generate_title(random_ca.ca_type)
     random_ca.definition_type = random.choice(objects.all_objects)
     return random_ca
 
-  @staticmethod
-  def _generate_title(ca_type):
+  @classmethod
+  def _generate_title(cls, ca_type):
     """Generate title according to CustomAttribute type."""
     special_chars = string_utils.SPECIAL
     return append_random_string(
         "{}_{}_".format(ca_type, random_string(
             size=len(special_chars), chars=special_chars)))
 
-  @staticmethod
-  def _fill_ca_entity_fields(ca_object, **ca_object_fields):
+  @classmethod
+  def _fill_ca_entity_fields(cls, ca_object, **ca_object_fields):
     """Set the CustomAttributes object's attributes."""
     if ca_object_fields.get("ca_type"):
       ca_object.ca_type = ca_object_fields["ca_type"]
-      ca_object.title = CAFactory._generate_title(ca_object.ca_type)
+      ca_object.title = cls._generate_title(ca_object.ca_type)
     if ca_object_fields.get("definition_type"):
       ca_object.definition_type = ca_object_fields["definition_type"]
     if ca_object_fields.get("title"):
@@ -87,8 +87,8 @@ class CAFactory(object):
         ca_object.multi_choice_options = random_list_of_strings(list_len=3)
     return ca_object
 
-  @staticmethod
-  def _normalize_ca_definition_type(ca_object):
+  @classmethod
+  def _normalize_ca_definition_type(cls, ca_object):
     """
     Get ca_group title from the selected object for further using in UI.
     For manipulations with object via REST, definition type should be
