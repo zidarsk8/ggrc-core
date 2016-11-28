@@ -1,0 +1,32 @@
+/*
+ * Copyright (C) 2016 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.search-toolbar {
+  font-size: 13px;
+
+  h6 {
+    margin: 0 0 6px;
+  }
+
+  > * {
+    margin: 0 0 16px;
+  }
+
+  .input-filters {
+    width: 100%;
+
+    > * {
+        margin: 0 0 0 16px;
+
+        &:first-child {
+          margin: 0;
+        }
+    }
+  }
+
+  .mapping-filters {
+    width: 100%;
+  }
+}

@@ -1,0 +1,40 @@
+{{!
+    Copyright (C) 2016 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<div class="input-filters flex-box">
+    <div class="flex-size-1">
+        <h6>Object type</h6>
+        <mapping-type-selector types="mapper.types" selected-type="mapper.type"
+                               disabled="isLoadingOrSaving"></mapping-type-selector>
+    </div>
+    <div class="flex-size-1">
+        <div class="modal-search">
+            <h6>Matching terms</h6>
+            <div class="modal-search objective-selector">
+                <input id="search" class="input-block-level" placeholder="Enter text to search..."
+                       can-value="mapper.term" type="text" autofocus>
+            </div>
+        </div>
+    </div>
+    <div class="flex-size-1">
+        <h6>Filter by owner or contact</h6>
+        <div class="modal-search objective-selector">
+            <autocomplete
+                    search-items-type="Person"
+                    can-item-selected="mapper.setContact"
+                    disable="mapper.is_saving"
+                    placeholder="Find owner or contact"
+                    value="mapper.contactEmail"
+                    class-name="search-by-owner input-block-level"
+            ></autocomplete>
+        </div>
+    </div>
+</div>
+<div class="mapping-filters">
+    <relevant-filter search_only="mapper.search_only"
+                     type="mapper.type"
+                     relevant-to="mapper.relevantTo"
+                     relevant="mapper.relevant"
+    ></relevant-filter>
+</div>

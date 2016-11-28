@@ -166,6 +166,7 @@ dashboard-js-files:
   - components/mapping-controls/mapping-type-selector.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
+  - components/search-toolbar/search-toolbar.js
   - components/datepicker/datepicker.js
   - components/person/person.js
   - components/inline_edit/inline.js
@@ -217,6 +218,7 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/search-toolbar/search-toolbar.mustache
   - components/mapping-controls/mapping-type-selector.mustache
   - components/effective-dates/effective-dates.mustache
   - components/read-more/read-more.mustache
