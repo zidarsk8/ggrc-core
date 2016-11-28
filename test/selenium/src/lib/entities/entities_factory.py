@@ -1,6 +1,6 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Module for business entities."""
+"""Module for factories that create business entities."""
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-arguments
 # pylint: disable=no-self-use
@@ -21,9 +21,10 @@ class CAFactory(object):
   def create(cls, title=None, ca_type=None, definition_type=None,
              helptext="", placeholder=None, multi_choice_options=None,
              is_mandatory=False, ca_global=True):
-    """"
-    Method for basic CustomAttribute object creation.
-    None type or definition will be filled randomly.
+    """Create CustomAttribute object.
+
+    Random values will be used for title, ca_type, definition_type and
+    multi_choice_options if they are None.
     """
     ca_entity = cls._create_random_ca()
     ca_entity = cls._fill_ca_entity_fields(
@@ -38,7 +39,7 @@ class CAFactory(object):
 
   @classmethod
   def _create_random_ca(cls):
-    """Create random CustomAttribute entity."""
+    """Create CustomAttribute entity with randomly filled fields."""
     random_ca = entity.CustomAttribute()
     random_ca.ca_type = random.choice(AttributesTypes.ALL_TYPES)
     random_ca.title = cls._generate_title(random_ca.ca_type)
@@ -89,10 +90,11 @@ class CAFactory(object):
 
   @classmethod
   def _normalize_ca_definition_type(cls, ca_object):
-    """
-    Get ca_group title from the selected object for further using in UI.
-    For manipulations with object via REST, definition type should be
-    interpreted as objects.get_singular().get_object_name_form().
+    """Transform definition type to title form.
+
+    Title from used for UI operations.
+    For REST operations definition type should be interpreted as
+    objects.get_singular().get_object_name_form().
     """
     ca_object.definition_type = objects.get_normal_form(
         ca_object.definition_type
