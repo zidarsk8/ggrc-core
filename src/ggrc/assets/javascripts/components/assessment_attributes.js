@@ -39,7 +39,23 @@
         type: 'Map:Person',
         name: 'Person',
         text: ''
-      }])
+      }]),
+
+      /**
+       * A handler for when a user removes a Custom Attribute Definition.
+       *
+       * It removes the corresponding CA definition object from the list to
+       * keep it in sync with the definitions listed in DOM.
+       *
+       * @param {CMS.Models.CustomAttributeDefinition} instance -
+       *   the definition that was removed
+       * @param {jQuery.Element} $el - the source of the event `ev`
+       * @param {jQuery.Event} ev - the onRemove event object
+       */
+      fieldRemoved: function (instance, $el, ev) {
+        var idx = _.findIndex(this.fields, {id: instance.id});
+        this.fields.splice(idx, 1);
+      }
     },
     events: {
       inserted: function () {
@@ -80,68 +96,86 @@
           COMMENT: 0,
           ATTACHMENT: 1
         },
+
+        _EV_FIELD_REMOVED: 'on-remove',
+
         /*
-         * Removes `field` from `fileds`
+         * Removes `field` from `fields`
          */
         removeField: function (scope, el, ev) {
           ev.preventDefault();
+
+          // CAUTION: In order for the event to not get lost, triggering it
+          // must happen before changing any of the scope attributes that
+          // cause changes in the template.
+          this.$rootEl.triggerHandler({
+            type: this._EV_FIELD_REMOVED
+          });
+
           scope.attr('_pending_delete', true);
         },
         /*
-         * Split field values
-         *
-         * @return {Array} attrs - Returns split values as an array
-         */
-        attrs: function () {
-          if (_.contains(['Person', 'Text'], this.field.attr('type'))) {
-            return [this.attr('field.multi_choice_options')];
-          }
-          return _.splitTrim(this.attr('field.multi_choice_options'), {
-            compact: true
-          });
-        },
-        /*
-         * Denormalize field.multi_choice_mandatory into field.opts
+         * Denormalize field.multi_choice_mandatory into opts
          * "0, 1, 2" is normalized into
-         * { attachment-0: false, comment-0: false,
-         *   attachment-1: false, comment-1: true,
-         *   attachment-2: true, comment-2: false
-         * }
+         * [
+         * {value: 0, attachment: false, comment: false},
+         * {value: 1, attachment: false, comment: true},
+         * {value: 2, attachment: true, comment: false},
+         * ]
          */
         denormalize_mandatory: function (field, pads) {
           var options = _.splitTrim(field.attr('multi_choice_options'));
           var vals = _.splitTrim(field.attr('multi_choice_mandatory'));
-          var mand = new can.Map();
-          _.each(_.zip(options, vals), function (zip) {
-            var option = zip[0];
+          var isEqualLength = options.length === vals.length;
+          var range;
+
+          if (!isEqualLength && options.length < vals.length) {
+            vals.length = options.length;
+          } else if (!isEqualLength && options.length > vals.length) {
+            range = _.range(options.length - vals.length);
+            range = range.map(function () {
+              return '0';
+            });
+            vals = vals.concat(range);
+          }
+
+          return _.zip(options, vals).map(function (zip) {
+            var attr = new can.Map();
             var val = zip[1];
             var attachment = !!(val & 1 << pads.ATTACHMENT);
             var comment = !!(val & 1 << pads.COMMENT);
-            mand.attr('attachment-' + option, attachment);
-            mand.attr('comment-' + option, comment);
+            attr.attr('value', zip[0]);
+            attr.attr('attachment', attachment);
+            attr.attr('comment', comment);
+            return attr;
           });
-          return mand;
         },
         /*
-         * Normalize field.opts into field.multi_choice_mandatory
-         * { attachment-0: true, attachment-1: false,
-         *   attachment-1: true, comment-1: true }
+         * Normalize opts into field.multi_choice_mandatory
+         * [
+         * {value: 0, attachment: true, comment: false},
+         * {value: 1, attachment: true, comment: true},
+         * ]
          * is normalized into "2, 3" (10b, 11b).
          */
-        normalize_mandatory: function (field, pads) {
-          var options = _.splitTrim(field.attr('multi_choice_options'));
-          var opts = field.attr('opts');
-          var mand = $.map(options, function (val) {
-            var attach = opts['attachment-' + val] << pads.ATTACHMENT;
-            var comment = opts['comment-' + val] << pads.COMMENT;
+        normalize_mandatory: function (attrs, pads) {
+          return can.map(attrs, function (attr) {
+            var attach = attr.attr('attachment') << pads.ATTACHMENT;
+            var comment = attr.attr('comment') << pads.COMMENT;
             return attach | comment;
-          });
-          return mand.join(',');
+          }).join(',');
         }
       };
     },
     events: {
-      init: function () {
+      /**
+       * The component's entry point.
+       *
+       * @param {Object} element - the (unwrapped) DOM element that triggered
+       *   creating the component instance
+       * @param {Object} options - the component instantiation options
+       */
+      init: function (element, options) {
         var field = this.scope.attr('field');
         var pads = this.scope.attr('pads');
         var denormalized = this.scope.denormalize_mandatory(field, pads);
@@ -150,12 +184,14 @@
           return obj.type === field.attr('attribute_type');
         });
         this.scope.field.attr('attribute_name', item.name);
-        this.scope.field.attr('opts', denormalized);
+        this.scope.attr('attrs', denormalized);
+
+        this.scope.attr('$rootEl', $(element));
       },
-      '{field.opts} change': function (opts) {
-        var field = this.scope.attr('field');
+      '{attrs} change': function () {
+        var attrs = this.scope.attr('attrs');
         var pads = this.scope.attr('pads');
-        var normalized = this.scope.normalize_mandatory(field, pads);
+        var normalized = this.scope.normalize_mandatory(attrs, pads);
         this.scope.field.attr('multi_choice_mandatory', normalized);
       }
     }
@@ -175,7 +211,7 @@
         /*
          * Create a new field.
          *
-         * Field must contain value title, type, values and opts.
+         * Field must contain value title, type, values.
          * Opts are populated, once we start changing checkbox values
          *
          * @param {can.Map} scope - the current (add-template-field) scope
@@ -213,8 +249,7 @@
               id: scope.attr('id'),
               title: title,
               attribute_type: type,
-              multi_choice_options: values,
-              opts: new can.Map()
+              multi_choice_options: values
             });
             _.each(['title', 'values', 'multi_choice_options'],
               function (type) {

@@ -344,11 +344,7 @@ class TextColumnHandler(ColumnHandler):
     return self.clean_whitespaces(self.raw_value)
 
   def clean_whitespaces(self, value):
-    clean_value = re.sub(r'\s+', " ", value)
-    if clean_value != value:
-      self.add_warning(errors.WHITESPACE_WARNING,
-                       column_name=self.display_name)
-    return value
+    return re.sub(r'\s+', " ", value)
 
 
 class RequiredTextColumnHandler(TextColumnHandler):
@@ -391,7 +387,15 @@ class MappingColumnHandler(ColumnHandler):
     super(MappingColumnHandler, self).__init__(row_converter, key, **options)
 
   def parse_item(self):
-    """ Remove multiple spaces and new lines from text """
+    """Parse a list of slugs to be mapped.
+
+    Parse a new line separated list of slugs and check if they are valid
+    objects.
+
+    Returns:
+      list of objects. During dry_run, the list can contain a slug instead of
+      an actual object if that object will be generated in the current import.
+    """
     class_ = self.mapping_object
     lines = set(self.raw_value.splitlines())
     slugs = set([slug.lower() for slug in lines if slug.strip()])
@@ -407,10 +411,14 @@ class MappingColumnHandler(ColumnHandler):
               object_type=class_._inflector.human_singular.title(),
               slug=slug,
           )
-      elif not (slug in self.new_slugs and self.dry_run):
+      elif slug in self.new_slugs and self.dry_run:
+        objects.append(slug)
+      else:
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
                          slug=slug)
+    if self.mandatory and not objects:
+      self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return objects
 
   def set_obj_attr(self):

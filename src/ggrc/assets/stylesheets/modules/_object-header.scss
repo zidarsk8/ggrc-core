@@ -32,26 +32,23 @@
   float: right;
   li {
     float: left;
-    margin-left: 8px;
-    margin-top: 2px;
-    &:last-child {
-      margin-top: 0;
-    }
-    &:first-child {
-      margin-left: 0;
-    }
     a {
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      text-align: center;
       i {
-        @include opacity(.25);
-        &.active {
-          @include opacity(1);
-        }
+        position: relative;
+        top: 1px;
+        color: #797979;
+      }
+      &.close-pane i {
+        font-size: 20px;
+        top: 2px;
       }
       &.active,
       &:hover {
-        i {
-          @include opacity(1);
-        }
+        background-color: #eeeeee;
       }
     }
   }

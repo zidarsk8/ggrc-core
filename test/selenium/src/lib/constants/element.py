@@ -62,6 +62,7 @@ class Lhn(object):
 
 
 class ModalLhnCreateProgram(object):
+  """Modal for creating a Program."""
   # create new program
   DATE_FORMATTING = "%d/%m/%Y"
   OBJECT_REVIEW = "Object Review"
@@ -148,3 +149,15 @@ class AdminEventsWidget(object):
   TREE_VIEW_HEADER = "Events"
   TREE_VIEW_ROW_REGEXP = r"^.+\s(by.+)\son\s" + \
       r"(\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M)"
+
+
+class AttributesTypes(object):
+  """Possible types of Custom Attributes."""
+  TEXT = "Text"
+  RICH_TEXT = "Rich Text"
+  DATE = "Date"
+  CHECKBOX = "Checkbox"
+  DROPDOWN = "Dropdown"
+  PERSON = "Map:Person"
+
+  ALL_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, DROPDOWN, PERSON)

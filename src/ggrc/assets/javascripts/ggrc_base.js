@@ -2,7 +2,7 @@
     Copyright (C) 2016 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-(function($, GGRC) {
+(function(GGRC) {
   GGRC.mustache_path = '/static/mustache';
 
   GGRC.hooks = GGRC.hooks || {};
@@ -152,28 +152,45 @@
     delay_leaving_page_until: $.proxy(notifier, "queue")
   });
 
-  GGRC.Errors = {
-    messages: {
+  GGRC.Errors = (function () {
+    var messages = {
+      'default': 'There was an error!',
+      '401': 'The server says you are not authorized. Are you logged in?',
       '403': 'You don\'t have the permission to access the ' +
       'requested resource. It is either read-protected or not ' +
-      'readable by the server.'
-    },
-    notifier: function (type, message) {
-      if (!type) {
-        type = 'warning';
-      }
+      'readable by the server.',
+      '409': 'There was a conflict in the object you were trying to update. ' +
+      'The version on the server is newer.',
+      '412': 'One of the form fields isn\'t right. ' +
+      'Check the form for any highlighted fields.'
+    };
 
+    function notifier(type, message) {
+      var props = {};
+
+      type = type || 'warning';
+      props[type] = message || GGRC.Errors.messages.default;
+      $('body').trigger('ajax:flash', props);
+    }
+
+    function notifierXHR(type, message) {
       return function (err) {
-        var props = {};
+        var status = err && err.status ? err.status : null;
 
-        if (!message && err && err.status) {
-          message = GGRC.Errors.messages[err.status] || err.responseText;
+        if (status && !message) {
+          message = GGRC.Errors.messages[status];
         }
-        props[type] = message || 'There was an error!';
-        $('body').trigger('ajax:flash', props);
+
+        notifier(type, message);
       };
     }
-  };
+
+    return {
+      messages: messages,
+      notifier: notifier,
+      notifierXHR: notifierXHR
+    };
+  })();
 
   /*
     The GGRC Math library provides basic arithmetic across arbitrary precision numbers represented
@@ -326,4 +343,4 @@
     }
 
   });
-})(jQuery, window.GGRC = window.GGRC || {});
+})(window.GGRC = window.GGRC || {});

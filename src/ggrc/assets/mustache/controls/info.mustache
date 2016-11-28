@@ -7,7 +7,7 @@
   <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
 
     {{#is_info_pin}}
-      {{{render '/static/mustache/base_objects/info-pin.mustache'}}}
+      <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="onChangeMaximizedState" on-close="onClose"></info-pin-buttons>
     {{/is_info_pin}}
 
     <div class="info-pane-utility">
@@ -49,7 +49,7 @@
               </p>
             </div>
             <div class="span3">
-              <h6>Principal Assessor</h6>
+              <h6>Principal Assignee</h6>
               {{#using assessor=instance.principal_assessor}}
               {{#if instance.principal_assessor}}
                 <p>
@@ -61,7 +61,7 @@
               {{/using}}
             </div>
             <div class="span3">
-              <h6>Secondary Assessor</h6>
+              <h6>Secondary Assignee</h6>
               {{#using assessor=instance.secondary_assessor}}
               {{#if instance.secondary_assessor}}
                 <p>

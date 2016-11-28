@@ -230,7 +230,8 @@ class CustomAttributable(object):
           CADef.definition_id == self.id,
           CADef.definition_type == self._inflector.table_singular
       ).delete()
-      db.session.commit()
+      db.session.flush()
+      db.session.expire_all()
 
     for definition in definitions:
       if "_pending_delete" in definition and definition["_pending_delete"]:
@@ -311,6 +312,8 @@ class CustomAttributable(object):
     # 4) Instantiate custom attribute values for each of the definitions
     #    passed in (keys)
     # pylint: disable=not-an-iterable
+    # filter out attributes like Person:None
+    attributes = {k: v for k, v in attributes.items() if v != "Person:None"}
     definitions = {d.id: d for d in self.get_custom_attribute_definitions()}
     for ad_id in attributes.keys():
       obj_type = self.__class__.__name__

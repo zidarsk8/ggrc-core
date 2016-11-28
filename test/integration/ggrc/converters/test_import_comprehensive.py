@@ -83,7 +83,7 @@ class TestComprehensiveSheets(TestCase):
             "created": 14,
             "ignored": 2,
             "row_errors": 3,
-            "row_warnings": 5,
+            "row_warnings": 4,
             "rows": 16,
         },
         "Contract": {
@@ -238,6 +238,18 @@ class TestComprehensiveSheets(TestCase):
                     line=9, column_name="Stop Date"),
             ]),
         },
+        "Assessment": {
+            "row_warnings": set([
+                errors.UNKNOWN_OBJECT.format(
+                    line=14, object_type="Audit", slug="x"),
+            ]),
+            "row_errors": set([
+                errors.MISSING_VALUE_ERROR.format(
+                    line=14, column_name="Audit"),
+                errors.MISSING_VALUE_ERROR.format(
+                    line=15, column_name="Audit"),
+            ]),
+        }
     }
 
     self._check_csv_response(response, expected_errors)

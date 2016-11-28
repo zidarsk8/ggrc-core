@@ -674,8 +674,8 @@
         {value: 'Object Owners', title: 'Object Owners'},
         {value: 'Audit Lead', title: 'Audit Lead'},
         {value: 'Auditors', title: 'Auditors'},
-        {value: 'Primary Assessor', title: 'Principal Assessor'},
-        {value: 'Secondary Assessors', title: 'Secondary Assessors'},
+        {value: 'Primary Assessor', title: 'Principal Assignee'},
+        {value: 'Secondary Assessors', title: 'Secondary Assignee'},
         {value: 'Primary Contact', title: 'Primary Contact'},
         {value: 'Secondary Contact', title: 'Secondary Contact'},
         {value: 'other', title: 'Others...'}
@@ -734,7 +734,9 @@
       if (!this.custom_attribute_definitions) {
         this.attr('custom_attribute_definitions', new can.List());
       }
-      this.attr('_objectTypes', this._choosableObjectTypes());
+      if (!this.attr('_objectTypes')) {
+        this.attr('_objectTypes', this._choosableObjectTypes());
+      }
       this._unpackPeopleData();
 
       this._updateDropdownEnabled('assessors');
@@ -752,6 +754,11 @@
 
       return this._super.apply(this, arguments);
     },
+
+    before_save: function () {
+      this.attr('_objectTypes', undefined);
+    },
+
     after_save: function () {
       if (this.audit) {
         this.audit.reify().refresh('related_assessment_templates');

@@ -107,6 +107,11 @@
           left: -25px;
         }
       }
+      &.gray {
+        h6 {
+          color: $gray;
+        }
+      }
     }
   }
   i {
@@ -145,6 +150,9 @@
       width: auto;
       .people-group_title {
         font-weight: bold;
+      }
+      .person-add {
+        padding-left: 16px;
       }
     }
     .modal-body & {

@@ -4,9 +4,11 @@
 """Locators for all the elements"""
 # pylint: disable=too-few-public-methods
 
-from selenium.webdriver.common.by import By   # pylint: disable=import-error
-from lib.constants import objects
+from selenium.webdriver.common.by import By
+
 from lib.constants import attribute
+from lib.constants import objects
+from lib.constants import url
 
 
 class Login(object):
@@ -30,6 +32,8 @@ class PageHeader(object):
   TOGGLE_USER_DROPDOWN = (
       By.CSS_SELECTOR, '.header-content .dropdown-toggle')
   BUTTON_HELP = (By.CSS_SELECTOR, '.header-content [id="#page-help"]')
+
+  GENERIC_SUCCESS_ALERT = (By.CSS_SELECTOR, ".alert-success")
 
   # dropdown toggle
   BUTTON_ADMIN_DASHBOARD = (
@@ -481,12 +485,11 @@ class ModalCustomAttribute(object):
   ATTRIBUTE_TYPE = (By.CSS_SELECTOR, '.modal-header h2')
   PLACEHOLDER = (By.CSS_SELECTOR, '.modal-header h2')
   MANDATORY = (By.CSS_SELECTOR, '.modal-header h2')
-  UI_ATTRIBUTE_TITLE = (
-      By.CSS_SELECTOR, '.modal-body div:nth-child(1)>input[tabindex="1"]')
-  UI_INLINE_HELP = (
-      By.CSS_SELECTOR,
-      '.modal-body div:nth-child(1)>input[tabindex="4"]')
-  UI_PLACEHOLDER = (By.CSS_SELECTOR, '.modal-body div:nth-child(2)>input')
+  UI_ATTRIBUTE_TITLE = (By.CSS_SELECTOR, '.modal-body [name="title"]')
+  UI_INLINE_HELP = (By.CSS_SELECTOR, '.modal-body [name="helptext"]')
+  UI_PLACEHOLDER = (By.CSS_SELECTOR, '.modal-body [name="placeholder"]')
+  UI_POSSIBLE_VALUES = (By.CSS_SELECTOR, '.modal-body '
+                                         '[name="multi_choice_options"]')
   CHECKBOX_MANDATORY = (By.CSS_SELECTOR, '.modal-body [type="checkbox"]')
   BUTTON_ADD_ANOTHER = (
       By.CSS_SELECTOR,
@@ -494,15 +497,21 @@ class ModalCustomAttribute(object):
   BUTTON_SAVE_AND_CLOSE = (
       By.CSS_SELECTOR,
       '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
+  ATTRIBUTE_TYPE_SELECTOR = (By.CSS_SELECTOR, "dropdown select")
+  ATTRIBUTE_TYPE_OPTIONS = (By.CSS_SELECTOR, "dropdown select option")
 
 
 class WidgetBar(object):
   """Locators for the bar containing the widgets/tabs"""
 
   class _Locator(object):
+    """Locators for the menu in header."""
     @staticmethod
     def get_widget(object_name):
-      return (By.CSS_SELECTOR, '[href="#{}_widget"]'.format(object_name))
+      return (
+          By.CSS_SELECTOR,
+          '.object-nav [href$="#{}_widget"]'.format(object_name)
+      )
 
   class __metaclass__(type):
     def __init__(cls, *args):
@@ -530,10 +539,14 @@ class WidgetBar(object):
 class WidgetBarButtonAddDropdown(object):
   """Locators for the button/dropdown "add widget" in widget bar"""
   class _Locator(object):
+    """Toggle locators for the widget custom attributes in admin dashboard."""
     @staticmethod
     def get_dropdown_item(object_name):
-      return (By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"] '
-                               '[href="#{}_widget"]'.format(object_name))
+      return (
+          By.CSS_SELECTOR,
+          '[data-test-id="button_widget_add_2c925d94"] '
+          '.object-nav [href$="#{}_widget"]'.format(object_name)
+      )
 
   class __metaclass__(type):
     def __init__(cls, *args):
@@ -857,10 +870,20 @@ class WidgetIssues(BaseWidgetGeneric):
   _object_name = "issue"
 
 
+class TreeViewCommon(object):
+  """Locators for tree-view component."""
+  ITEMS = "{} li.tree-item .item-main"
+  ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
+  ITEM_EXPAND_BUTTON = " .openclose"
+  SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
+
+
 class AdminCustomAttributes(object):
-  """Locators for the widget custom attributes in admin dashboard"""
+  """Locators for the widget custom attributes in admin dashboard."""
+  base_locator = url.Widget.CUSTOM_ATTRIBUTES
 
   class _Locator(object):
+    """Locators for the widget custom attributes in admin dashboard."""
     @staticmethod
     def get_toggle(child_id):
       return (By.CSS_SELECTOR, '#custom_attribute_widget li:nth-child({}) '
@@ -876,7 +899,7 @@ class AdminCustomAttributes(object):
   class __metaclass__(type):
     def __init__(cls, *args):
       items = (
-          objects.WORKFLOWS, "RISK_ASSESSMENTS", objects.THREATS,
+          objects.WORKFLOWS, objects.RISK_ASSESSMENTS, objects.THREATS,
           objects.RISKS, objects.PROGRAMS, objects.AUDITS,
           objects.OBJECTIVES, objects.SECTIONS, objects.CONTROLS,
           objects.ISSUES, objects.ASSESSMENTS, objects.STANDARDS,
@@ -911,3 +934,18 @@ class AdminCustomAttributes(object):
   BUTTON_LISTED_MEMBERS_EDIT = (
       By.CSS_SELECTOR,
       '.tree-structure li:nth-child(5) div tbody>tr>td>ul .fa-pencil-square-o')
+  CA_ADDED_SUCCESS_ALERT = PageHeader.GENERIC_SUCCESS_ALERT
+
+
+class CustomAttributesItemContent(AdminCustomAttributes):
+  """Locators for the expanded view of custom attribute group
+   in admin dashboard."""
+  _base_locator = ".content-open .tier-2-info-content"
+  _row_locator = "{} .tree-structure .cms_controllers_tree_view_node"\
+      .format(_base_locator)
+  TITLES_ROW = (By.CSS_SELECTOR, "{} thead tr".format(_base_locator))
+  ROW = (By.CSS_SELECTOR, _row_locator)
+  CELL_IN_ROW = (By.CSS_SELECTOR, "td")
+  EDIT_BTN = (By.CSS_SELECTOR, "{} .tree-action-list a".format(_row_locator))
+  ADD_BTN = (By.CSS_SELECTOR, "{} .add-item .btn".format(_base_locator))
+  TREE_SPINNER = (By.CSS_SELECTOR, ".tree-spinner")

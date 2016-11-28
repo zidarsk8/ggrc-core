@@ -1,0 +1,24 @@
+{{!
+    Copyright (C) 2016 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<ul class="pin-action">
+  {{#if maximized}}
+  <li>
+    <a href="#" class="normal" can-click="toggleSize">
+      <i class="fa fa-fw fa-compress" rel="tooltip" data-placement="left" title="Minimize height"></i>
+    </a>
+  </li>
+  {{else}}
+  <li>
+    <a href="#" class="max" can-click="toggleSize">
+      <i class="fa fa-fw fa-expand" rel="tooltip" data-placement="left" title="Maximize height"></i>
+    </a>
+  </li>
+  {{/if}}
+  <li>
+    <a href="#" class="close-pane" can-click="close">
+      <i class="fa fa-fw fa-times" rel="tooltip" data-placement="left" title="Close info pane"></i>
+    </a>
+  </li>
+</ul>

@@ -3,18 +3,16 @@
 
 """Utility function for selenium"""
 
-import time
 import logging
+import time
 
-# pylint: disable=import-error
-from selenium.webdriver.support import expected_conditions as EC
-# pylint: disable=import-error
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common import action_chains
 from selenium.common import exceptions
+from selenium.webdriver.common import action_chains
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
-from lib import exception
 from lib import constants
+from lib import exception
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +53,18 @@ def get_when_visible(driver, locator):
       driver,
       constants.ux.MAX_USER_WAIT_SECONDS) \
       .until(EC.presence_of_element_located(locator))
+
+
+def wait_until_condition(driver, condition):
+  """Wait until given expected condition is met"""
+  WebDriverWait(
+      driver,
+      constants.ux.MAX_USER_WAIT_SECONDS).until(condition)
+
+
+def wait_until_not_present(driver, locator):
+  """Wait until no element(-s) for locator given are present in the DOM."""
+  wait_until_condition(driver, lambda d: len(d.find_elements(*locator)) == 0)
 
 
 def get_when_all_visible(driver, locator):

@@ -55,7 +55,7 @@
             }
           }.bind(this))
           .fail(function (inst, err) {
-            GGRC.Errors.notifier('error')(err);
+            GGRC.Errors.notifierXHR('error')(err);
           })
           .always(function () {
             this.attr('isSaving', false);
