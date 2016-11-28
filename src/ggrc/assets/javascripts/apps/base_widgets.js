@@ -10,7 +10,7 @@
   // Items allowed for mapping via snapshot.
   var snapshotWidgetsConfig = GGRC.config.snapshotable_objects || [];
   // Items allowed for relationship mapping
-  var directMappingConfig = [
+  var excludeMappingConfig = [
     'Assessment',
     'AssessmentTemplate',
     'Issue',
@@ -50,12 +50,16 @@
   var baseWidgets = {};
   // Should be replaced in a future
   baseWidgets.Audit = []
-    .concat(snapshotWidgetsConfig, directMappingConfig, auditInclusion)
+    .concat(snapshotWidgetsConfig, excludeMappingConfig, auditInclusion)
     .sort();
 
   Object.keys(baseWidgetsConfig)
     .forEach(function (key) {
       baseWidgets[key] = baseWidgetsConfig[key].split(' ').sort();
+      // Add this temporary filter function to remove all excluded dependencies
+      baseWidgets[key] = baseWidgets[key].filter(function (widget) {
+        return excludeMappingConfig.indexOf(widget) < 0;
+      });
     });
   GGRC.tree_view = GGRC.tree_view || new can.Map();
   GGRC.tree_view.attr('base_widgets_by_type', baseWidgets);
