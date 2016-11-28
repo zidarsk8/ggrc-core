@@ -437,6 +437,22 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
   """Several of the models use the same mixins. This class covers that common
   case.
   """
+  _people_log_mappings = [
+      "principal_assessor_id",
+      "secondary_assessor_id",
+      "contact_id",
+      "secondary_contact_id",
+      "modified_by_id",
+  ]
+
+  @staticmethod
+  def _person_stub(id_):
+    return {
+        'type': u"Person",
+        'id': id_,
+        'context_id': None,
+        'href': u"/api/people/{}".format(id_),
+    }
 
   def log_json(self):
     # to integrate with CustomAttributable without order dependencies
@@ -447,6 +463,16 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
       except AttributeError:
         pass
     res['display_name'] = self.display_name
+
+    for attr in self._people_log_mappings:
+      if hasattr(self, attr):
+        value = getattr(self, attr)
+        res[attr[:-3]] = self._person_stub(value) if value else None
+    if hasattr(self, "owners"):
+      res["owners"] = [
+          self._person_stub(owner.id) for owner in self.owners if owner
+      ]
+
     return res
 
   @computed_property
@@ -561,6 +587,7 @@ class Slugged(Base):
       if isinstance(o, Slugged) and hasattr(o, '_replace_slug'):
         o.generate_slug_for(o)
         delattr(o, '_replace_slug')
+
 
 event.listen(Session, 'before_flush', Slugged.ensure_slug_before_flush)
 event.listen(
