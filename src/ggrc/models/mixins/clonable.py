@@ -27,7 +27,7 @@ class Clonable(object):
     @common.Resource.collection_posted.connect_via(model)
     def handle_model_clone(sender, objects=None, sources=None):
       for obj, src in itertools.izip(objects, sources):
-        if src.get("operation", "") == u"clone":
+        if src.get("operation") == "clone":
           options = src.get("cloneOptions")
           mapped_objects = options.get("mappedObjects", [])
           source_id = int(options.get("sourceObjectId"))
@@ -39,7 +39,7 @@ class Clonable(object):
     @common.Resource.model_posted_after_commit.connect_via(model)
     def handle_scope_clone(sender, obj=None, src=None, service=None,
                            event=None):
-      if src.get("operation", "") == u"clone":
+      if src.get("operation") == "clone":
         from ggrc.snapshotter import clone_scope
 
         options = src.get("cloneOptions")
