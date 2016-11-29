@@ -93,6 +93,20 @@ jQuery(function ($) {
       $(target).tmpl_mergeitems([data]);
     }
   });
+
+  $('body').on('click', '[data-toggle="nested-dropdown"]', function (e) {
+    var $parent = $(this).parent();
+    var isActive = $parent.hasClass('open');
+    if (!isActive) {
+      $parent.toggleClass('open');
+    }
+    e.stopPropagation();
+    e.preventDefault();
+  });
+
+  $('html').on('click.dropdown.data-api', function (e) {
+    $('[data-toggle="nested-dropdown"]').parent().removeClass('open');
+  });
 });
 
 // This is only used by import to redirect on successful import

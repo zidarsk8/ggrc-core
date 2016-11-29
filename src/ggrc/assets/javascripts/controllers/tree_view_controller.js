@@ -1319,7 +1319,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
   hide_filter: function () {
     var $filter = this.element.parent().find('.tree-filter');
-    var height = $filter.height();
+    var height = $filter.outerHeight(true);
     var margin = $filter.css('margin-bottom').replace('px', '');
 
     $filter
@@ -1333,8 +1333,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
     this.element.parent().find('.filter-trigger > a')
         .removeClass('active')
-        .find('i')
-        .attr('data-original-title', 'Show filter');
+        .find('span')
+        .text('Show filter');
 
     this.element.parent().find('.sticky.tree-header').addClass('no-filter');
     Stickyfill.rebuild();
@@ -1355,8 +1355,8 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 
     this.element.parent().find('.filter-trigger > a')
         .addClass('active')
-        .find('i')
-        .attr('data-original-title', 'Hide filter');
+        .find('span')
+        .text('Hide filter');
 
     this.element.parent().find('.sticky.tree-header').removeClass('no-filter');
     Stickyfill.rebuild();
@@ -1976,6 +1976,8 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
       '.set-tree-attrs,.close-dropdown click': function (el, ev) {
         this.scope.$rootEl.removeClass('open');
+        this.scope.$rootEl.parents('.dropdown-menu')
+          .parent().removeClass('open');
       }
     }
   });
@@ -2041,6 +2043,8 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
       '.set-display-object-list,.close-dropdown click': function (el, ev) {
         this.scope.$rootEl.removeClass('open');
+        this.scope.$rootEl.parents('.dropdown-menu')
+          .parent().removeClass('open');
       }
     }
   });
