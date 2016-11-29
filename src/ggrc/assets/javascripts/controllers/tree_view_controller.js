@@ -430,9 +430,9 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     if (typeof (opts.model) === 'string') {
       opts.model = CMS.Models[opts.model];
     }
-    this.options = new can.Observe(defaults).attr(defaultOptions).attr(opts);
+    this.options = new can.Map(defaults).attr(defaultOptions).attr(opts);
     if (opts instanceof can.Observe) {
-      this.options = can.extend({}, this.options, opts);
+      this.options = can.extend(this.options, opts);
     }
   },
   deselect: function () {
