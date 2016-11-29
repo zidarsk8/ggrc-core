@@ -23,6 +23,7 @@ from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.types import JsonType
+from ggrc.models.utils import PolymorphicRelationship
 from ggrc.utils import url_for
 from ggrc.utils import view_url_for
 
@@ -608,7 +609,8 @@ class Builder(AttributeInfo):
       return self.publish_link_collection(
           target_objects, inclusions, include, inclusion_filter)
     else:
-      if isinstance(class_attr.remote_attr, property):
+      if isinstance(class_attr.remote_attr, (property,
+                                             PolymorphicRelationship)):
         target_name = class_attr.value_attr + '_id'
         target_type = class_attr.value_attr + '_type'
         return [
