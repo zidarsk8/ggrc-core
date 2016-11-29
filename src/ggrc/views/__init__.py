@@ -56,27 +56,19 @@ from ggrc.utils import revisions
 def refresh_revisions(_):
   """Web hook to update revision content."""
   revisions.do_refresh_revisions()
-  return app.make_response((
-      'success', 200, [('Content-Type', 'text/html')]))
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
 @app.route("/_background_tasks/reindex", methods=["POST"])
 @queued_task
 def reindex(_):
-  """
-  Web hook to update the full text search index
-  """
-
+  """Web hook to update the full text search index."""
   do_reindex()
-
-  return app.make_response((
-      'success', 200, [('Content-Type', 'text/html')]))
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
 def do_reindex():
-  """
-  update the full text search index
-  """
+  """Update the full text search index."""
 
   indexer = get_indexer()
   indexer.delete_all_records(False)
@@ -309,11 +301,11 @@ def admin_reindex():
 @app.route("/admin/refresh_revisions", methods=["POST"])
 @login_required
 def admin_refresh_revisions():
-  """Calls a webhook that reindexes indexable objects
-  """
+  """Calls a webhook that refreshes revision content."""
   admins = getattr(settings, "BOOTSTRAP_ADMIN_USERS", [])
   if get_current_user().email not in admins:
     raise Forbidden()
+
   task_queue = create_task("refresh_revisions", url_for(
       refresh_revisions.__name__), refresh_revisions)
   return task_queue.make_response(
