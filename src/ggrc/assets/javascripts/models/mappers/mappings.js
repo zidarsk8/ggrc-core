@@ -87,6 +87,10 @@
           'has incorrect format.', arguments);
         return true;
       }
+      // AllObjects has no mapping configuration as it's fake instance
+      if (source === 'AllObject' && destination !== 'Audit') {
+        return true;
+      }
       allowedMappingList = this.getMappingList(destination);
       canBe = allowedMappingList
         .some(function (item) {
