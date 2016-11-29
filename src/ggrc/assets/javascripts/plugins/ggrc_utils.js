@@ -491,7 +491,7 @@
      * @param {String} page.sortBy - sortBy
      * @param {String} page.sortDirection - sortDirection
      * @param {String} page.filter - Filter string
-     * @param {Object|Object[]} relevant - Information about relevant object
+     * @param {Object} relevant - Information about relevant object
      * @param {Object} relevant.type - Type of relevant object
      * @param {Object} relevant.id - Id of relevant object
      * @param {Object} relevant.operation - Type of operation.
@@ -508,16 +508,10 @@
         return;
       }
 
-      if (relevant) {
-        relevant = _.isArray(relevant) ? relevant : [relevant];
-        relevant.forEach(function (item) {
-          if (item && !item.operation) {
-            item.operation = _getTreeViewOperation(objName);
-          }
-        });
-      }
-
       params.object_name = objName;
+      if (relevant && !relevant.operation) {
+        relevant.operation = _getTreeViewOperation(objName);
+      }
       params.filters = _makeFilter(page.filter, relevant, additionalFilter);
 
       if (page.current && page.pageSize) {
@@ -615,16 +609,14 @@
       var filterList = [];
 
       if (relevant) {
-        relevant.forEach(function (item) {
-          relevantFilter = GGRC.query_parser.parse('#' + item.type + ',' +
-          item.id + '#');
-          filterList.push(relevantFilter);
+        relevantFilter = GGRC.query_parser.parse('#' + relevant.type + ',' +
+                                                 relevant.id + '#');
+        filterList.push(relevantFilter);
 
-          if (item.operation &&
-            item.operation !== relevantFilter.expression.op.name) {
-            relevantFilter.expression.op.name = item.operation;
-          }
-        });
+        if (relevant.operation &&
+            relevant.operation !== relevantFilter.expression.op.name) {
+          relevantFilter.expression.op.name = relevant.operation;
+        }
       }
 
       if (filter) {
