@@ -416,32 +416,23 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
 }, {
   // prototype properties
   setup: function (el, opts) {
-    var that = this;
+    var defaultOptions = {};
+    var optionsProperty;
+    var defaults = this.constructor.defaults;
     if (typeof this._super === 'function') {
       this._super(el);
     }
+    if (opts.model) {
+      optionsProperty = opts.options_property ||
+       this.constructor.defaults.options_property;
+      defaultOptions = opts.model[optionsProperty];
+    }
+    if (typeof (opts.model) === 'string') {
+      opts.model = CMS.Models[opts.model];
+    }
+    this.options = new can.Observe(defaults).attr(defaultOptions).attr(opts);
     if (opts instanceof can.Observe) {
-      this.options = opts;
-      if (typeof (this.options.model) === 'string') {
-        this.options.attr('model', CMS.Models[this.options.model]);
-      }
-      if (this.options.model) {
-        can.each(this.options.model[opts.options_property || this.constructor.defaults.options_property], function (v, k) {
-          if (!that.options.hasOwnProperty(k)) {
-            that.options.attr(k, v);
-          }
-        });
-      }
-      can.each(this.constructor.defaults, function (v, k) {
-        if (!that.options.hasOwnProperty(k)) {
-          that.options.attr(k, v);
-        }
-      });
-    } else {
-      if (typeof (opts.model) === 'string') {
-        opts.model = CMS.Models[opts.model];
-      }
-      this.options = new can.Observe(this.constructor.defaults).attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {}).attr(opts);
+      this.options = can.extend({}, this.options, opts);
     }
   },
   deselect: function () {
