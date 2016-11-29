@@ -456,3 +456,32 @@ def upsert_snapshots(objs, event, revisions=None, _filter=None, dry_run=False):
       db.session.add(obj)
       generator.add_parent(obj)
     return generator.upsert(event=event, revisions=revisions, _filter=_filter)
+
+
+def clone_scope(base_parent, new_parent, event):
+  """Create exact copy of parent object scope.
+
+  Args:
+    base_parent: Old parent object
+    new_parent: New parent object
+    event: Event that triggered scope cloning
+  """
+
+  with benchmark("clone_scope.clone audit scope"):
+    source_snapshots = db.session.query(
+        models.Snapshot.child_type,
+        models.Snapshot.child_id,
+        models.Snapshot.revision_id
+    ).filter(
+        models.Snapshot.parent_type == base_parent.type,
+        models.Snapshot.parent_id == base_parent.id)
+
+    snapshot_revisions = {
+        Pair.from_4tuple((new_parent.type, new_parent.id, ctype, cid)): revid
+        for ctype, cid, revid in source_snapshots}
+
+    parent = Stub(new_parent.type, new_parent.id)
+    children = {pair.child for pair in snapshot_revisions}
+    generator = SnapshotGenerator(dry_run=False)
+    generator.add_family(parent, children)
+    generator.create(event, snapshot_revisions)

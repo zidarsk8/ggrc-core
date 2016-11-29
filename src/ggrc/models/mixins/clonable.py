@@ -22,11 +22,12 @@ class Clonable(object):
 
   @classmethod
   def set_handlers(cls, model):
+    """Set up handlers for cloning"""
+    # pylint: disable=unused-argument, unused-variable
     @common.Resource.collection_posted.connect_via(model)
     def handle_model_clone(sender, objects=None, sources=None):
-      # pylint: disable=unused-argument, unused-variable
       for obj, src in itertools.izip(objects, sources):
-        if src.get("operation", "") == u"clone":
+        if src.get("operation") == "clone":
           options = src.get("cloneOptions")
           mapped_objects = options.get("mappedObjects", [])
           source_id = int(options.get("sourceObjectId"))
@@ -34,6 +35,17 @@ class Clonable(object):
               source_id=source_id,
               mapped_objects={obj for obj in mapped_objects
                               if obj in model.CLONEABLE_CHILDREN})
+
+    @common.Resource.model_posted_after_commit.connect_via(model)
+    def handle_scope_clone(sender, obj=None, src=None, service=None,
+                           event=None):
+      if src.get("operation") == "clone":
+        from ggrc.snapshotter import clone_scope
+
+        options = src.get("cloneOptions")
+        source_id = int(options.get("sourceObjectId"))
+        base_object = model.query.get(source_id)
+        clone_scope(base_object, obj, event)
 
   def generate_attribute(self, attribute):
     """Generate a new unique attribute as a copy of original"""
