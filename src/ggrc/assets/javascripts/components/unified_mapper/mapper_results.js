@@ -264,10 +264,10 @@
         // Filter by scope
         if (this.scope.attr('mapper.is_snapshotable')) {
           // We can also display it in UI as disabled filter
-          filters.push(
-            this.scope.attr('mapper.snapshot_scope_type') +
-            ':' +
-            this.scope.attr('mapper.snapshot_scope_id'));
+          filters.push({
+            type: this.scope.attr('mapper.snapshot_scope_type'),
+            id: this.scope.attr('mapper.snapshot_scope_id')
+          });
         }
 
         if (!_.isEmpty(filters)) {
