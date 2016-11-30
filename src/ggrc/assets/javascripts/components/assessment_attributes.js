@@ -53,8 +53,13 @@
        * @param {jQuery.Event} ev - the onRemove event object
        */
       fieldRemoved: function (instance, $el, ev) {
-        var idx = _.findIndex(this.fields, {id: instance.id});
-        this.fields.splice(idx, 1);
+        var idx = _.findIndex(this.fields, {title: instance.title});
+        if (idx >= 0) {
+          this.fields.splice(idx, 1);
+        } else {
+          console.warn('The list of CAD doesn\'t contain item with "' +
+            instance.title + '" title');
+        }
       }
     },
     events: {
