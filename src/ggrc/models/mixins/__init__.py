@@ -34,6 +34,7 @@ from ggrc.models.deferred import deferred
 from ggrc.models.inflector import ModelInflectorDescriptor
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins.customattributable import CustomAttributable
+from ggrc.models.mixins.notifiable import Notifiable
 
 
 # pylint: disable=invalid-name
@@ -710,6 +711,7 @@ __all__ = [
     Identifiable,
     Mapping,
     Noted,
+    Notifiable,
     Slugged,
     Stateful,
     TestPlanned,
