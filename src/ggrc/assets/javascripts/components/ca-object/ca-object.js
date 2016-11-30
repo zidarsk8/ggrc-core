@@ -44,15 +44,36 @@
       },
       save: function () {
         var value = this.attr('value');
+        var type = this.attr('type');
+        var valueId = Number(this.attr('valueId'));
+        var attributeObjectId;
+        var valueParts;
+        var customAttributeValue;
+        if (type === 'person') {
+          valueParts = value.split(':');
+          attributeObjectId = Number(valueParts[1]);
+          value = valueParts[0];
+        }
         this.setModified();
         this.attr('instance').save()
           .done(function () {
-            // TODO: remove hack for flash message appearance after normal solution will be applied
-            if (String(value) === this.attr('value')) {
-              can.$(document.body).trigger('ajax:flash', {
-                success: 'Saved'
-              });
+            if (type === 'person') {
+              customAttributeValue =
+                can.makeArray(this.attr('instance.custom_attribute_values'))
+                  .find(function (v) {
+                    return v.id === valueId;
+                  });
+              if (customAttributeValue &&
+                  customAttributeValue.attribute_object &&
+                  customAttributeValue.attribute_object.id !==
+                    attributeObjectId) {
+                return;
+              }
             }
+            if (String(value) !== this.attr('value')) {
+              return;
+            }
+            GGRC.Errors.notifier('success', 'Saved');
           }.bind(this))
           .fail(function (inst, err) {
             GGRC.Errors.notifierXHR('error')(err);

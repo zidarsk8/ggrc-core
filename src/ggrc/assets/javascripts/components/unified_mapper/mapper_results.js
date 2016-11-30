@@ -171,9 +171,6 @@
       },
       searchFor: function (data) {
         var joinModel;
-        var params = [];
-        var param = {};
-        var relevantObjects = data.options.relevant_objects;
 
         data.options = data.options || {};
 
@@ -194,15 +191,8 @@
           [data.model_name] :
           data.model_name;
 
-        data.model_name.forEach(function (modelName) {
-          param = GGRC.Utils.QueryAPI.buildParam(modelName, {
-            filter: data.term
-          }, relevantObjects, {});
-          param.permissions = data.options.__permission_type;
-          params.push(param);
-        });
-
-        return can.Model.Cacheable.queryAll({data: params});
+        return GGRC.Models.Search.search_for_types(
+          data.term || '', data.model_name, data.options);
       },
 
       getResults: function () {
@@ -248,10 +238,7 @@
           if (!relevant.value || !relevant.filter) {
             return undefined;
           }
-          return {
-            type: relevant.filter.type,
-            id: relevant.filter.id
-          };
+          return relevant.filter.type + ':' + relevant.filter.id;
         }));
 
         if (modelName === 'AllObject') {
@@ -271,7 +258,7 @@
         }
 
         if (!_.isEmpty(filters)) {
-          params.relevant_objects = filters;
+          params.relevant_objects = filters.join(',');
         }
 
         this.scope.attr('mapper.page_loading', true);
@@ -282,7 +269,7 @@
             model_name: modelName,
             options: params
           }).then(function (mappings) {
-            return mappings;
+            return mappings.entries;
           });
         }.bind(this)).attach({});
 
