@@ -87,6 +87,11 @@
           'has incorrect format.', arguments);
         return true;
       }
+      // AllObjects has no mapping configuration as it's fake instance
+      if (source === 'AllObject' &&
+        !GGRC.Utils.Snapshots.isSnapshotParent(destination)) {
+        return true;
+      }
       allowedMappingList = this.getMappingList(destination);
       canBe = allowedMappingList
         .some(function (item) {
