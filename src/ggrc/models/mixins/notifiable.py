@@ -15,6 +15,7 @@ class Notifiable(object):
 
   Defines a backref in Notification model named like ModelName_notifiable.
   """
+  # pylint: disable=too-few-public-methods
 
   @declared_attr
   def _notifications(self):

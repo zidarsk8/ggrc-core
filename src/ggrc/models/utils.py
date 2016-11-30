@@ -14,6 +14,8 @@ def validate_option(model, attribute, option, desired_role):
 
 class PolymorphicRelationship(object):
   """This is shortcut to generate relationships from type and id fields."""
+  # pylint: disable=too-few-public-methods
+
   def __init__(self, id_attr, type_attr, backref_format):
     self._id_attr = id_attr
     self._type_attr = type_attr
