@@ -32,8 +32,7 @@ def _add_notification(obj, notif_type, when=None):
   if not when:
     when = date.today()
   db.session.add(models.Notification(
-      object_id=obj.id,
-      object_type=obj.type,
+      object=obj,
       send_on=when,
       notification_type=notif_type,
   ))
