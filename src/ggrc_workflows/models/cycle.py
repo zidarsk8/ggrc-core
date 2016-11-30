@@ -8,6 +8,7 @@ from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models.mixins import Described
+from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Timeboxed
@@ -16,7 +17,7 @@ from ggrc.models.mixins import WithContact
 
 
 class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
-            db.Model):
+            Notifiable, db.Model):
   """Workflow Cycle model
   """
   __tablename__ = 'cycles'

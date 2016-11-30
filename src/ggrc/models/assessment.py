@@ -16,6 +16,7 @@ from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import FinishedDate
+from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import VerifiedDate
@@ -73,7 +74,7 @@ class Assessment(statusable.Statusable, AuditRelationship,
                  CustomAttributable, EvidenceURL, Commentable, Personable,
                  reminderable.Reminderable, Timeboxed, Relatable,
                  WithSimilarityScore, FinishedDate, VerifiedDate,
-                 ValidateOnComplete, BusinessObject, db.Model):
+                 ValidateOnComplete, Notifiable, BusinessObject, db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on

@@ -11,6 +11,7 @@ from ggrc import db
 from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
+from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Timeboxed
@@ -24,7 +25,7 @@ from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
 
 
 class CycleTaskGroupObjectTask(
-        WithContact, Stateful, Slugged, Timeboxed, Relatable,
+        WithContact, Stateful, Slugged, Timeboxed, Relatable, Notifiable,
         Described, Titled, Base, db.Model):
   """Cycle task model
   """
