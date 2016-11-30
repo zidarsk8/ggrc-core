@@ -19,6 +19,8 @@ or #is_allowed' 'update' instance '\
         </a>
         <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
 
+<!--
+TODO: Temporary disabled until snapshot view is added.
             {{#is_info_pin}}
                 {{#if instance.viewLink}}
                     {{#is_allowed "view_object_page" instance}}
@@ -39,7 +41,7 @@ or #is_allowed' 'update' instance '\
                     notify="true"
                     text="{{get_permalink_for_object instance}}" />
             </li>
-
+-->
             <li>
                 <snapshot-individual-update instance="instance">
                     <a href="javascript://" can-click="updateIt">
