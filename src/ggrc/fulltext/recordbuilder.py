@@ -3,6 +3,7 @@
 
 """Module for full text index record builder."""
 
+import ggrc.models.all_models
 from ggrc.models.reflection import AttributeInfo
 from ggrc.fulltext import Record
 
@@ -15,11 +16,25 @@ class RecordBuilder(object):
     self._fulltext_attrs = AttributeInfo.gather_attrs(
         tgt_class, '_fulltext_attrs')
 
+  def _get_properties(self, obj):
+    """Get indexable properties and values."""
+    if obj.type == "Snapshot":
+      # Snapshots do not have any indexable content. The object content for
+      # snapshots is stored in the revision. Snapshots can also be made for
+      # different models so we have to get fulltext attrs for the actual child
+      # that was snapshotted and get data for those from the revision content.
+      tgt_class = getattr(ggrc.models.all_models, obj.child_type, None)
+      if not tgt_class:
+        return {}
+      attrs = AttributeInfo.gather_attrs(tgt_class, '_fulltext_attrs')
+      return {attr: obj.revision.content.get(attr) for attr in attrs}
+
+    return {attr: getattr(obj, attr) for attr in self._fulltext_attrs}
+
   def as_record(self, obj):
     """Generate record representation for an object."""
     # Defaults. These work when the record is not a custom attribute
-    properties = dict([(attr, getattr(obj, attr))
-                       for attr in self._fulltext_attrs])
+    properties = self._get_properties(obj)
     record_id = obj.id
     record_type = obj.__class__.__name__
 
