@@ -195,11 +195,14 @@
           data.model_name;
 
         data.model_name.forEach(function (modelName) {
-          param = GGRC.Utils.QueryAPI.buildParam(modelName, {
-            filter: data.term
-          }, relevantObjects, {});
-          param.permissions = data.options.__permission_type;
-          params.push(param);
+          if (modelName !== 'MultitypeSearch') {
+            param = GGRC.Utils.QueryAPI.buildParam(modelName, {
+              filter: data.term
+            }, relevantObjects, {});
+            param.permissions = data.options.__permission_type;
+            param.type = 'ids';
+            params.push(param);
+          }
         });
 
         return can.Model.Cacheable.queryAll({data: params});
@@ -281,8 +284,6 @@
             term: term,
             model_name: modelName,
             options: params
-          }).then(function (mappings) {
-            return mappings;
           });
         }.bind(this)).attach({});
 

@@ -508,7 +508,16 @@
           sourceData = sourceData.length ? sourceData : {};
 
           values = _.map(sourceData, function (object) {
-            return _.compact(_.pluck(object, 'values'));
+            return _.compact(_.map(object, function (obj, key) {
+              if (obj && obj.ids) {
+                return _.map(obj.ids, function (item) {
+                  return {id: item, type: key};
+                });
+              }
+              if (obj && obj.values) {
+                return obj.values;
+              }
+            }));
           });
 
           values = Array.prototype.concat.apply([], values);
