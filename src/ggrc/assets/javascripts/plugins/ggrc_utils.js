@@ -823,15 +823,25 @@
             isSnapshotModel(child) > -1;
     }
 
+    /**
+     * Check whether provided model name is snapshot parent
+     * @param {String} parent - Model name
+     * @return {Boolean} True or False
+     */
+    function isSnapshotParent(parent) {
+      return GGRC.config.snapshotable_parents.indexOf(parent) > -1;
+    }
+
     return {
       isSnapshot: isSnapshot,
       isSnapshotScope: isSnapshotScope,
+      isSnapshotParent: isSnapshotParent,
+      isSnapshotRelated: isSnapshotRelated,
+      isSnapshotModel: isSnapshotModel,
       toObject: toObject,
       toObjects: toObjects,
       transformQuery: transformQuery,
-      setAttrs: setAttrs,
-      isSnapshotRelated: isSnapshotRelated,
-      isSnapshotModel: isSnapshotModel
+      setAttrs: setAttrs
     };
   })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

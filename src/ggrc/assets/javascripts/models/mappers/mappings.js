@@ -88,7 +88,8 @@
         return true;
       }
       // AllObjects has no mapping configuration as it's fake instance
-      if (source === 'AllObject' && destination !== 'Audit') {
+      if (source === 'AllObject' &&
+        !GGRC.Utils.Snapshots.isSnapshotParent(destination)) {
         return true;
       }
       allowedMappingList = this.getMappingList(destination);
