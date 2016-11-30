@@ -1937,8 +1937,9 @@ can.Control('CMS.Controllers.TreeViewNode', {
     template: '<content/>',
     scope: {},
     events: {
-      init: function () {
+      init: function (element, options) {
         this.scope.attr('controller', this);
+        this.scope.attr('$rootEl', $(element));
       },
 
       disable_attrs: function (el, ev) {
@@ -1974,7 +1975,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
       },
 
       '.set-tree-attrs,.close-dropdown click': function (el, ev) {
-        this.element.find('.dropdown-menu').closest('li').removeClass('open');
+        this.scope.$rootEl.removeClass('open');
       }
     }
   });
@@ -1988,8 +1989,9 @@ can.Control('CMS.Controllers.TreeViewNode', {
     template: '<content/>',
     scope: {},
     events: {
-      init: function () {
+      init: function (element, options) {
         this.scope.attr('controller', this);
+        this.scope.attr('$rootEl', $(element));
       },
 
       'input.model-checkbox click': function (el, ev) {
@@ -2038,7 +2040,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
       },
 
       '.set-display-object-list,.close-dropdown click': function (el, ev) {
-        this.element.find('.dropdown-menu').closest('li').removeClass('open');
+        this.scope.$rootEl.removeClass('open');
       }
     }
   });
