@@ -425,7 +425,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     if (opts.model) {
       optionsProperty = opts.options_property ||
        this.constructor.defaults.options_property;
-      defaultOptions = opts.model[optionsProperty];
+      defaultOptions = opts.model[optionsProperty] || {};
     }
     if (typeof (opts.model) === 'string') {
       opts.model = CMS.Models[opts.model];
