@@ -136,7 +136,7 @@
       <div class="comment-notification" tabindex="13">
         <a data-id="hide_notification_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <label>
-          <input type="checkbox"
+          <input tabindex="11" type="checkbox"
                  name="send_by_default"
                  {{# send_by_default}}checked{{/send_by_default}}>
           Enable notifications on comments
@@ -146,19 +146,19 @@
           <ul class="comment-notification__list">
             <li>
               <label class="input--inline">
-                  <input type="checkbox" can-value="values.Creator">
+                  <input tabindex="12" type="checkbox" can-value="values.Creator">
                   Notify creator(s)
               </label>
             </li>
             <li>
               <label class="input--inline">
-                  <input type="checkbox" can-value="values.Assessor">
+                  <input tabindex="13" type="checkbox" can-value="values.Assessor">
                   Notify assignee(s)
               </label>
             </li>
             <li>
               <label class="input--inline">
-                  <input type="checkbox" can-value="values.Verifier">
+                  <input tabindex="14" type="checkbox" can-value="values.Verifier">
                   Notify verifier(s)
               </label>
             </li>
@@ -241,7 +241,8 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Is this control design effective?"></i>
           <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-          <dropdown options-list="model.conclusions"
+          <dropdown tabindex="9"
+                    options-list="model.conclusions"
                     no-value="true"
                     no-value-label="---"
                     name="instance.design"
@@ -255,7 +256,8 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Is this control operationally effective?"></i>
           <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-          <dropdown options-list="model.conclusions"
+          <dropdown tabindex="10"
+                    options-list="model.conclusions"
                     no-value="true"
                     no-value-label="---"
                     name="instance.operationally"
