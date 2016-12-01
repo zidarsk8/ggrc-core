@@ -65,10 +65,10 @@ function _display_tree_subpath(el, path, attempt_counter) {
       }
     }
   }
-  return new $.Deferred().resolve();
+  return can.Deferred().resolve();
 }
 
-can.Observe('can.Observe.TreeOptions', {
+can.Map.extend('CMS.Models.TreeViewOptions', {
   defaults: {
     instance: undefined,
     parent: null,
@@ -76,7 +76,7 @@ can.Observe('can.Observe.TreeOptions', {
   }
 }, {});
 
-can.Control('CMS.Controllers.TreeLoader', {
+can.Control.extend('CMS.Controllers.TreeLoader', {
   defaults: {}
 }, {
   init_spinner: function () {
@@ -132,7 +132,7 @@ can.Control('CMS.Controllers.TreeLoader', {
       return this._prepare_deferred;
     }
 
-    this._prepare_deferred = $.Deferred();
+    this._prepare_deferred = can.Deferred();
     this._prepare_deferred.resolve();
 
     this._attached_deferred.then(function () {
@@ -187,9 +187,6 @@ can.Control('CMS.Controllers.TreeLoader', {
       .then(that._ifNotRemoved(that.proxy('draw_list')))
       .done(tracker_stop);
 
-    this._display_deferred.then(function (e) {
-    }.bind(this));
-
     return this._display_deferred;
   },
 
@@ -202,13 +199,13 @@ can.Control('CMS.Controllers.TreeLoader', {
     if (this._draw_list_deferred) {
       return this._draw_list_deferred;
     }
-    this._draw_list_deferred = new $.Deferred();
+    this._draw_list_deferred = can.Deferred();
     if (this.element && !this.element.closest('body').length) {
       return undefined;
     }
 
     if (list) {
-      list = list.length === null ? new can.Observe.List([list]) : list;
+      list = list.length === null ? new can.List([list]) : list;
     } else {
       list = this.options.list;
     }
@@ -221,7 +218,8 @@ can.Control('CMS.Controllers.TreeLoader', {
     this.options.attr('list', []);
     this.on();
 
-    this._draw_list_deferred = this.enqueue_items(list, is_reload, force_prepare_children);
+    this._draw_list_deferred =
+      this.enqueue_items(list, is_reload, force_prepare_children);
     return this._draw_list_deferred;
   },
 
@@ -229,7 +227,7 @@ can.Control('CMS.Controllers.TreeLoader', {
     var $contentContainer;
 
     if (!this._loading_deferred) {
-      this._loading_deferred = new $.Deferred();
+      this._loading_deferred = can.Deferred();
 
       // for some reason, .closest(<selector>) does not work, thus need to use
       // using a bit less roboust .parent()
@@ -284,7 +282,7 @@ can.Control('CMS.Controllers.TreeLoader', {
         // skip filter
         filtered_items = items;
       } else if (child_tree_display_list.length === 0) { // no item is selected to filter, so just return
-        return new $.Deferred().resolve();
+        return can.Deferred().resolve();
       } else {
         for (i = 0; i < items.length; i++) {
           if (child_tree_display_list.indexOf(items[i].instance.class.model_singular) !== -1) {
@@ -321,7 +319,7 @@ can.Control('CMS.Controllers.TreeLoader', {
           }
         }));
     } else {
-      refreshed_deferred = new $.Deferred().resolve();
+      refreshed_deferred = can.Deferred().resolve();
     }
     refreshed_deferred
       .then(function () {
@@ -363,14 +361,14 @@ can.Control('CMS.Controllers.TreeLoader', {
       this.options.list.push.apply(this.options.list, preppedItems);
       dfd = this.add_child_lists(preppedItems);
     } else {
-      dfd = $.Deferred().resolve();
+      dfd = can.Deferred().resolve();
     }
 
     return dfd;
   }
 });
 
-CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
+CMS.Controllers.TreeLoader.extend('CMS.Controllers.TreeView', {
   // static properties
   defaults: {
     model: null,
@@ -412,7 +410,13 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     is_subtree: false
   },
   do_not_propagate: [
-    'header_view', 'footer_view', 'add_item_view', 'list', 'original_list', 'single_object', 'find_function',
+    'header_view',
+    'footer_view',
+    'add_item_view',
+    'list',
+    'original_list',
+    'single_object',
+    'find_function',
     'find_all_deferred'
   ]
 }, {
@@ -427,13 +431,13 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     if (opts.model) {
       optionsProperty = opts.options_property ||
        this.constructor.defaults.options_property;
-      defaultOptions = opts.model[optionsProperty];
+      defaultOptions = opts.model[optionsProperty] || {};
     }
     if (typeof (opts.model) === 'string') {
       opts.model = CMS.Models[opts.model];
     }
     this.options = new can.Map(defaults).attr(defaultOptions).attr(opts);
-    if (opts instanceof can.Observe) {
+    if (opts instanceof can.Map) {
       this.options = can.extend(this.options, opts);
     }
   },
@@ -606,8 +610,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
   init: function (el, opts) {
     var setAllowMapping;
 
-    this.element.closest('.widget').on('widget_hidden', this.widget_hidden.bind(this));
-    this.element.closest('.widget').on('widget_shown', this.widget_shown.bind(this));
+    this.element.closest('.widget')
+      .on('widget_hidden', this.widget_hidden.bind(this));
+    this.element.closest('.widget')
+      .on('widget_shown', this.widget_shown.bind(this));
     CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
       var allowed;
       // TODO: Currently Query API doesn't support CustomAttributable.
@@ -645,7 +651,10 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         this.options.disable_lazy_loading = true;
       }
 
-      this.options.update_count = _.isBoolean(this.element.data('update-count')) ? this.element.data('update-count') : true;
+      this.options.update_count =
+        _.isBoolean(this.element.data('update-count')) ?
+        this.element.data('update-count') :
+        true;
 
       if (!this.options.scroll_element) {
         this.options.attr('scroll_element', $('.object-area'));
@@ -660,12 +669,12 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
       });
       this.options.attr('child_options', this.options.child_options.slice(0));
       can.each(this.options.child_options, function (options, i) {
-        this.options.child_options.attr(i, new can.Observe(can.extend(options.attr(), allowed)));
+        this.options.child_options.attr(i, new can.Map(can.extend(options.attr(), allowed)));
       }.bind(this));
 
       this.options.attr('filter_is_hidden', display_prefs.getFilterHidden());
 
-      this._attached_deferred = new $.Deferred();
+      this._attached_deferred = can.Deferred();
       if (this.element && this.element.closest('body').length) {
         this._attached_deferred.resolve();
       }
@@ -812,9 +821,9 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     if (v._child_options_prepared && !force_reload) {
       return v._child_options_prepared;
     }
-    if (!(v instanceof can.Observe.TreeOptions)) {
+    if (!(v instanceof CMS.Models.TreeViewOptions)) {
       tmp = v;
-      v = new can.Observe.TreeOptions();
+      v = new CMS.Models.TreeViewOptions();
       v.attr('instance', tmp);
       this.options.each(function (val, k) {
         if (can.inArray(k, that.constructor.do_not_propagate) === -1) {
@@ -1086,7 +1095,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     this.options.attr('filteredList', []);
     finalDfd = _.foldl(queue, function (dfd, listWindow) {
       return dfd.then(function () {
-        var res = $.Deferred();
+        var res = can.Deferred();
         if (that._add_child_lists_id !== opId) {
           return dfd;
         }
@@ -1108,7 +1117,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
         }, 0);
         return res;
       });
-    }, $.Deferred().resolve());
+    }, can.Deferred().resolve());
 
     finalDfd.done(this._ifNotRemoved(function () {
       var shown = this.element[0].children.length;
@@ -1549,7 +1558,7 @@ CMS.Controllers.TreeLoader('CMS.Controllers.TreeView', {
     })
 });
 
-can.Control('CMS.Controllers.TreeViewNode', {
+can.Control.extend('CMS.Controllers.TreeViewNode', {
   defaults: {
     model: null,
     parent: null,
@@ -1566,7 +1575,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
     if (typeof this._super === 'function') {
       this._super(el);
     }
-    if (opts instanceof can.Observe) {
+    if (opts instanceof can.Map) {
       this.options = opts;
       if (typeof (this.options.model) === 'string') {
         this.options.attr('model', CMS.Models[this.options.model]);
@@ -1580,7 +1589,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
       if (typeof (opts.model) === 'string') {
         opts.model = CMS.Models[opts.model];
       }
-      this.options = new can.Observe.TreeOptions(this.constructor.defaults)
+      this.options = new CMS.Models.TreeViewOptions(this.constructor.defaults)
       .attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {})
       .attr(opts);
     }
@@ -1594,7 +1603,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
          this.options.model[this.options.options_property].show_view ||
          GGRC.mustache_path + '/base_objects/tree.mustache';
     }
-    this._draw_node_deferred = new $.Deferred();
+    this._draw_node_deferred = can.Deferred();
 
     if (this.options.child_options) {
       this.options.child_options.each(function (option) {
@@ -1632,6 +1641,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
   /**
    * Trigger rendering the tree node in the DOM.
+   * @param {Boolean} force - indicates redraw is/is not mandatory
    */
   draw_node: function (force) {
     var isActive;
@@ -1709,7 +1719,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
     if (this.should_draw_children()) {
       can.each(originalChildList, function (data, i) {
-        var options = new can.Observe();
+        var options = new can.Map();
         data.each(function (v, k) {
           options.attr(k, v);
         });
@@ -1761,7 +1771,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
       } else {
         find_params['parent.id'] = item.instance.id;
       }
-      data.attr('find_params', new can.Observe(find_params));
+      data.attr('find_params', new can.Map(find_params));
     }
     // $subtree.cms_controllers_tree_view(opts);
   },
@@ -1838,7 +1848,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
 
     this.options.attr('expanded', true);
 
-    this._expand_deferred = new $.Deferred();
+    this._expand_deferred = can.Deferred();
     setTimeout(this._ifNotRemoved(function () {
       this.display_subtrees()
         .then(this._ifNotRemoved(function () {
@@ -1950,8 +1960,9 @@ can.Control('CMS.Controllers.TreeViewNode', {
     template: '<content/>',
     scope: {},
     events: {
-      init: function () {
+      init: function (element, options) {
         this.scope.attr('controller', this);
+        this.scope.attr('$rootEl', $(element));
       },
 
       disable_attrs: function (el, ev) {
@@ -1987,7 +1998,7 @@ can.Control('CMS.Controllers.TreeViewNode', {
       },
 
       '.set-tree-attrs,.close-dropdown click': function (el, ev) {
-        this.element.find('.dropdown-menu').closest('li').removeClass('open');
+        this.scope.$rootEl.removeClass('open');
       }
     }
   });
@@ -2001,8 +2012,9 @@ can.Control('CMS.Controllers.TreeViewNode', {
     template: '<content/>',
     scope: {},
     events: {
-      init: function () {
+      init: function (element, options) {
         this.scope.attr('controller', this);
+        this.scope.attr('$rootEl', $(element));
       },
 
       'input.model-checkbox click': function (el, ev) {
@@ -2051,8 +2063,8 @@ can.Control('CMS.Controllers.TreeViewNode', {
       },
 
       '.set-display-object-list,.close-dropdown click': function (el, ev) {
-        this.element.find('.dropdown-menu').closest('li').removeClass('open');
+        this.scope.$rootEl.removeClass('open');
       }
     }
   });
-})(this.can, this.can.$);
+})(window.can, window.can.$);

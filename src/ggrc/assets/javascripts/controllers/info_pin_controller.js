@@ -64,10 +64,12 @@ can.Control('CMS.Controllers.InfoPin', {
       height: 0
     }, {
       duration: 800,
+      start: function () {
+        $(window).trigger('resize', 0);
+      },
       complete: function () {
         this.element.html('');
         $('.cms_controllers_tree_view_node').removeClass('active');
-        $(window).trigger('resize');
       }.bind(this)
     });
   },
@@ -179,10 +181,9 @@ can.Control('CMS.Controllers.InfoPin', {
       duration: 800,
       easing: 'easeOutExpo'
     };
-    var $info = this.element.find('.info');
     var $activeTree = $('.cms_controllers_tree_view_node.active');
     var size = this.getPinHeight(maximizedState);
-    if (size < $info.height()) {
+    if (size <= this.element.height()) {
       options.start = function () {
         $win.trigger('resize', size);
       };
