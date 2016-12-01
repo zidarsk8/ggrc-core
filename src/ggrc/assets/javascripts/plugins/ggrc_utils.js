@@ -754,13 +754,13 @@
       content.isLatestRevision = instance.is_latest_revision;
       content.originalLink = '/' + type + '/' + content.id;
       content.snapshot = new CMS.Models.Snapshot(instance);
-      content.related_sources = instance.related_sources;
-      content.related_destinations = instance.related_destinations;
+      content.related_sources = [];
+      content.related_destinations = [];
       content.custom_attribute_values = content.custom_attributes;
       content.viewLink = content.snapshot.viewLink;
       content.selfLink = content.snapshot.selfLink;
-      content.type = content.snapshot.type;
-      content.id = content.snapshot.id;
+      content.type = instance.child_type;
+      content.id = content.id;
       return new model(content);
     }
 
