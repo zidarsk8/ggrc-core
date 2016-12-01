@@ -6,20 +6,15 @@
 (function (can) {
   'use strict';
 
-  GGRC.Components('viewObjectButton', {
-    tag: 'view-object-button',
+  GGRC.Components('viewObjectButtons', {
+    tag: 'view-object-buttons',
     template: can.view(
       GGRC.mustache_path +
-      '/components/view-object-button/view-object-button.mustache'
+      '/components/view-object-buttons/view-object-buttons.mustache'
     ),
     scope: {
       instance: null,
-      define: {
-        maximize: {
-          type: 'boolean',
-          'default': false
-        }
-      },
+      openIsHidden: false,
       maximizeObject: function (scope, el, ev) {
         var tree = el.closest('.cms_controllers_tree_view_node');
         var node = tree.control();
