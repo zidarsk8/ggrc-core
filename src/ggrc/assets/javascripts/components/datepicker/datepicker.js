@@ -85,6 +85,9 @@
             date.subtract(1, 'day');
           }
         };
+        if (!date) {
+          return;
+        }
         date = moment(date);
 
         if (types[type]) {
