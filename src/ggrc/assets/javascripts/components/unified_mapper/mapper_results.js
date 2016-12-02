@@ -157,7 +157,7 @@
         this.scope.attr('mapper.page_loading', true);
 
         return que.enqueue(
-            _.pluck(pageItems, 'instance')
+            pageItems
           ).trigger().then(
             function (models) {
               this.scope.attr('mapper.page_loading', false);
@@ -212,7 +212,6 @@
         var contact = this.scope.attr('contact');
         var contactEmail = this.scope.attr('mapper.contactEmail');
         var filters;
-        var list;
         var modelName = this.scope.attr('type');
         var params = {};
         var relevantList = this.scope.attr('mapper.relevant');
@@ -241,7 +240,8 @@
           );
           if (instance.has_binding(binding)) {
             this.scope.attr('mapper.page_loading', false);
-            this.scope.attr('entries', instance.get_mapping(binding));
+            this.scope.attr('entries',
+              _.pluck(instance.get_mapping(binding), 'instance'));
             this.drawPage();
             return undefined;
           }
@@ -279,19 +279,19 @@
 
         this.scope.attr('mapper.page_loading', true);
 
-        list = new GGRC.ListLoaders.SearchListLoader(function (binding) {
-          return this.searchFor({
-            term: term,
-            model_name: modelName,
-            options: params
-          }).then(function (mappings) {
-            return new can.List(mappings);
+        this.searchFor({
+          term: term,
+          model_name: modelName,
+          options: params
+        }).then(function (mappings) {
+          var list = new can.List();
+          can.each(mappings, function (entry, i) {
+            var _class = (can.getObject('CMS.Models.' + entry.type) ||
+            can.getObject('GGRC.Models.' + entry.type));
+            list.push(new _class({id: entry.id}));
           });
-        }.bind(this)).attach({});
-
-        list.refresh_stubs().then(function (options) {
           this.scope.attr('mapper.page_loading', false);
-          this.scope.attr('entries', options);
+          this.scope.attr('entries', list);
           this.drawPage();
         }.bind(this));
       }

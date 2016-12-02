@@ -518,15 +518,12 @@
             }));
           });
 
-          values = Array.prototype.concat.apply([], values);
-          values = Array.prototype.concat.apply([], values);
+          values = _.flattenDeep(values);
 
           deferred.resolve(values);
-        }, function () {
-          deferred.reject.apply(deferred, arguments);
-        });
+        }, deferred.reject.bind(deferred));
 
-      return deferred;
+      return deferred.promise();
     },
 
   _modelize: function (sourceData, deferred) {
