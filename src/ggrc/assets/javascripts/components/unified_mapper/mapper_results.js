@@ -284,6 +284,8 @@
             term: term,
             model_name: modelName,
             options: params
+          }).then(function (mappings) {
+            return new can.List(mappings);
           });
         }.bind(this)).attach({});
 

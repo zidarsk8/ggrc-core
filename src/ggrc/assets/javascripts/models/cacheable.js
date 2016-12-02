@@ -498,12 +498,10 @@
 
     queryAll: function (request) {
       var deferred = $.Deferred();
-      var self = this;
 
       GGRC.Utils.QueryAPI.makeRequest(request)
         .then(function (sourceData) {
           var values = [];
-          var listDfd = $.Deferred();
 
           sourceData = sourceData.length ? sourceData : {};
 
@@ -523,11 +521,7 @@
           values = Array.prototype.concat.apply([], values);
           values = Array.prototype.concat.apply([], values);
 
-          self._modelize(values, listDfd);
-
-          listDfd.then(function (list) {
-            deferred.resolve(list);
-          });
+          deferred.resolve(values);
         }, function () {
           deferred.reject.apply(deferred, arguments);
         });
