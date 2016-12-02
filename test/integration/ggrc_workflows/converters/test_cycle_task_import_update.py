@@ -455,31 +455,25 @@ class TestCycleTaskImportUpdate(TestCase):
         }
     }
 
-    # Below is description of warnings for non-importable columns. It is needed
+    # Below is description of warning for non-importable columns. It is needed
     # for test_cycle_task_warnings.
-    warning_columns = (
-        'assignee', 'cycle', 'delete', 'map:access group', 'map:assessment',
-        'map:clause', 'map:contract', 'map:control', 'map:data asset',
-        'map:facility', 'map:issue', 'map:market', 'map:objective',
-        'map:org group', 'map:person', 'map:policy', 'map:process',
-        'map:product', 'map:program', 'map:project', 'map:regulation',
-        'map:risk', 'map:section', 'map:standard', 'map:system',
-        'map:threat', 'map:vendor', 'state', 'task group', 'task type'
-    )
+    importable_column_names = []
+    for field_name in CycleTaskGroupObjectTask.IMPORTABLE_FIELDS:
+      if field_name == 'slug':
+        continue
+      # pylint: disable=protected-access
+      importable_column_names.append(
+          CycleTaskGroupObjectTask._aliases.get(field_name, field_name))
     self.expected_warnings = {
         'Cycle Task Group Object Task': {
-            'block_warnings': set(),
+            'block_warnings': {
+                errors.ONLY_IMPORTABLE_COLUMNS_WARNING.format(
+                    line=2,
+                    columns=", ".join(importable_column_names)
+                )
+            },
         }
     }
-    for column_name in warning_columns:
-      self.expected_warnings[
-          'Cycle Task Group Object Task'
-      ]['block_warnings'].add(
-          errors.NON_IMPORTABLE_COLUMN_WARNING.format(
-              line=2,
-              column_name=column_name,
-          )
-      )
 
     # This is an error message which should be shown during
     # test_cycle_task_create_error test

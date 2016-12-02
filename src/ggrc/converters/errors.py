@@ -107,5 +107,6 @@ INVALID_STATUS_DATE_CORRELATION = (u"Line {line}: Cannot change {date} for "
                                    u"task which status is {status}. "
                                    u"The line will be ignored.")
 
-NON_IMPORTABLE_COLUMN_WARNING = (u"Line {line}: Attribute '{column_name}' "
-                                 u"is non-importable. Column will be ignored.")
+ONLY_IMPORTABLE_COLUMNS_WARNING = (u"Line {line}: Only the following "
+                                   u"attributes are importable: {columns}. "
+                                   u"All other columns will be ignored.")
