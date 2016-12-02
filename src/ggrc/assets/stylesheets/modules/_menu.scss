@@ -99,7 +99,7 @@ small {
   &.count {
     @include border-radius(4px);
     background: #777;
-    .critical & {
+    &.critical {
       background: $error;
     }
     text-align: center;
