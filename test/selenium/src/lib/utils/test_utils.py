@@ -140,6 +140,10 @@ class ModalNewRisks(ModalInput):
         modal_create_new.SHORT_TITLE))
 
 
+class ModalNewRequests(ModalInput):
+  """Utils for data entry for request modal"""
+
+
 class ModalNewIssues(ModalInput):
   """Utils for data entry for issues modal"""
 

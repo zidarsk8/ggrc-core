@@ -98,6 +98,7 @@
           'Product',
           'Project',
           'Regulation',
+          'Request',
           'Risk',
           'Section',
           'Standard',
