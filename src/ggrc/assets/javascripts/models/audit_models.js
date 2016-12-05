@@ -290,9 +290,27 @@
     }
   });
 
-  /**
-   * @Deprecated
-   */
+  can.Model.Mixin('requestorable', {
+    before_create: function () {
+      if (!this.requestor) {
+        this.attr('requestor', {
+          id: GGRC.current_user.id,
+          type: 'Person'
+        });
+      }
+    },
+    form_preload: function (new_object_form) {
+      if (new_object_form) {
+        if (!this.requestor) {
+          this.attr('requestor', {
+            id: GGRC.current_user.id,
+            type: 'Person'
+          });
+        }
+      }
+    }
+  });
+
   can.Model.Cacheable('CMS.Models.Request', {
     root_object: 'request',
     root_collection: 'requests',
@@ -323,7 +341,7 @@
       },
       threshold: 5
     },
-    is_custom_attributable: false,
+    is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       assignee: 'CMS.Models.Person.stub',
@@ -710,6 +728,7 @@
       Assessment: true,
       Audit: true,
       CycleTaskGroupObjectTask: true,
+      Request: true,
       TaskGroup: true,
       TaskGroupTask: true,
       Workflow: true

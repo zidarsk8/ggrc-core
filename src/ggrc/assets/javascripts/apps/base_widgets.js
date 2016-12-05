@@ -12,7 +12,7 @@
     'AccessGroup', 'Audit', 'Clause', 'Contract', 'Control', 'Assessment',
     'DataAsset', 'Facility', 'Issue', 'Market', 'Objective', 'OrgGroup',
     'Person', 'Policy', 'Process', 'Product', 'Program', 'Project',
-    'Regulation', 'Section', 'Standard', 'System', 'Vendor'
+    'Regulation', 'Request', 'Section', 'Standard', 'System', 'Vendor'
   ];
   // Items allowed for mapping via snapshot.
   var snapshotWidgetsConfig = GGRC.config.snapshotable_objects || [];
@@ -20,6 +20,7 @@
   var excludeMappingConfig = [
     'Assessment',
     'AssessmentTemplate',
+    'Request',
     'Issue'
   ];
   // Extra Tree View Widgets require to be rendered on Audit View
@@ -28,7 +29,7 @@
     'Program'
   ];
   var baseWidgetsByType;
-  
+
   var filteredTypes = _.difference(allTypes, excludeMappingConfig);
   // Audit is excluded and created a separate logic for it
   baseWidgetsByType = {

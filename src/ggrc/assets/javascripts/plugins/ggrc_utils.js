@@ -227,6 +227,7 @@
         Program: ['Audit', 'RiskAssessment'],
         Audit: ['Assessment', 'Program', 'Request'],
         Assessment: ['Workflow', 'TaskGroup'],
+        Request: ['Workflow', 'TaskGroup', 'Person', 'Audit'],
         Person: '*',
         AssessmentTemplate: '*'
       };

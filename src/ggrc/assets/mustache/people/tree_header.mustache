@@ -30,12 +30,23 @@
     </div>
     <div class="span4">
       <ul class="tree-action-list">
-        {{> '/static/mustache/base_objects/filter_trigger.mustache'}}
         {{#if add_item_view}}
-          <li>
-            {{{renderLive add_item_view}}}
-          </li>
+        <li>
+          {{{renderLive add_item_view}}}
+        </li>
         {{/if}}
+        <li>
+          <div class="details-wrap">
+            <a class="btn btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+            </a>
+            <ul class="dropdown-menu tree-action-list-items" role="menu">
+              {{> '/static/mustache/base_objects/filter_trigger.mustache'}}
+            </ul>
+          </div>
+        </li>
       </ul>
     </div>
   </div>

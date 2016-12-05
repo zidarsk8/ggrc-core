@@ -147,7 +147,7 @@
               {{#each instance.response_options}}
                 <div class="row-fluid wrap-row">
                   <div class="span12">
-                    <input
+                    <label><input
                       type="checkbox"
                       {{^if_can_edit_response instance instance.status}}
                         disabled="disabled"
@@ -159,6 +159,7 @@
                         checked="checked"
                       {{/in_array}}>
                     {{.}}
+                    </label>
                   </div>
                 </div>
               {{/each}}

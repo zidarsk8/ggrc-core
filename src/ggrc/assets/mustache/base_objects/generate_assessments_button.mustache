@@ -5,18 +5,18 @@
 
 {{#if button}}
   {{#is_allowed 'update' parent_instance context="for"}}
-    <a 
-      href="javascript://" 
-      class="generate-control-assessments btn btn-small btn-primary" 
-      rel="tooltip" 
-      data-placement="left" 
-      title="Generate Assessments" 
+    <a
+      href="javascript://"
+      class="generate-control-assessments btn btn-small btn-primary"
+      rel="tooltip"
+      data-placement="left"
+      title="Generate Assessments"
       data-original-title="Generate Assessments">
-      <i 
-         class="fa fa-magic" 
-         rel="tooltip" 
-         data-placement="left" 
-         title="Generate Assessments" 
+      <i
+         class="fa fa-magic"
+         rel="tooltip"
+         data-placement="left"
+         title="Generate Assessments"
          data-original-title="Generate Assessments">
       </i>
       Autogenerate
@@ -29,12 +29,9 @@
           <li class="generate-control-assessments">
             <a href="javascript://">
               <i
-                class="fa fa-magic"
-                rel="tooltip"
-                data-placement="left"
-                title=""
-                data-original-title="Generate Assessments"
-              ></i>
+                class="fa fa-fw fa-magic"
+               ></i>
+              Generate Assessments
             </a>
           </li>
         {{/is_allowed}}
