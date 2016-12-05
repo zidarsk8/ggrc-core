@@ -420,20 +420,19 @@ CMS.Controllers.TreeLoader.extend('CMS.Controllers.TreeView', {
 }, {
   // prototype properties
   setup: function (el, opts) {
-    var defaultOptions = {};
+    var defaultOptions;
     var optionsProperty;
     var defaults = this.constructor.defaults;
     if (typeof this._super === 'function') {
       this._super(el);
     }
-    if (opts.model) {
-      optionsProperty = opts.options_property ||
-       this.constructor.defaults.options_property;
-      defaultOptions = opts.model[optionsProperty] || {};
-    }
+
     if (typeof (opts.model) === 'string') {
       opts.model = CMS.Models[opts.model];
     }
+    optionsProperty = opts.options_property || defaults.options_property;
+    defaultOptions = opts.model[optionsProperty] || {};
+
     this.options = new can.Map(defaults).attr(defaultOptions).attr(opts);
     if (opts instanceof can.Map) {
       this.options = can.extend(this.options, opts);
