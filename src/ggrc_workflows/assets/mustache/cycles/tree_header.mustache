@@ -25,16 +25,28 @@
     </div>
     <div class="span4">
       <ul class="tree-action-list">
-        <li class="filter-trigger">
-          <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
-            <i class="fa fa-search" rel="tooltip" data-placement="left" title="" data-original-title="Hide Filter"></i>
-          </a>
-        </li>
         {{#if add_item_view}}
-          <li>
-            {{{renderLive add_item_view}}}
-          </li>
+        <li>
+          {{{renderLive add_item_view}}}
+        </li>
         {{/if}}
+        <li>
+          <div class="details-wrap">
+            <a class="btn btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+              <span class="bubble"></span>
+            </a>
+            <ul class="dropdown-menu tree-action-list-items" role="menu">
+              <li class="filter-trigger">
+                <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
+                  <i class="fa fa-search"></i>
+                  <span>Hide Filter</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
       </ul>
     </div>
   </div>

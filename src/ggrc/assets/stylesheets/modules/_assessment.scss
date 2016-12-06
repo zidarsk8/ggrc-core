@@ -218,6 +218,9 @@ $border-color: #eee;
         position: absolute;
         right: 0;
         top: 0;
+        &.fa-question-circle {
+          color: $icon-color-dark;
+        }
       }
     }
 

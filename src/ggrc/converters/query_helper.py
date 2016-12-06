@@ -12,7 +12,6 @@ import operator
 
 import flask
 import sqlalchemy as sa
-from sqlalchemy.orm import undefer
 
 from ggrc import db
 from ggrc import models
@@ -226,8 +225,8 @@ class QueryHelper(object):
       list of dicts: same query as the input with all ids that match the filter
     """
     for object_query in self.query:
-      objects = self._get_objects(object_query)
-      object_query["ids"] = [o.id for o in objects]
+      ids = self._get_ids(object_query)
+      object_query["ids"] = ids
     return self.query
 
   @staticmethod
@@ -253,21 +252,42 @@ class QueryHelper(object):
 
   def _get_objects(self, object_query):
     """Get a set of objects described in the filters."""
+
+    with benchmark("Get ids: _get_objects -> _get_ids"):
+      ids = self._get_ids(object_query)
+    if not ids:
+      return set()
+
+    object_name = object_query["object_name"]
+    object_class = self.object_map[object_name]
+    query = object_class.eager_query()
+    query = query.filter(object_class.id.in_(ids))
+
+    with benchmark("Get objects by ids: _get_objects -> obj in query"):
+      id_object_map = {obj.id: obj for obj in query}
+
+    with benchmark("Order objects by ids: _get_objects"):
+      objects = [id_object_map[id_] for id_ in ids]
+
+    return objects
+
+  def _get_ids(self, object_query):
+    """Get a set of ids of objects described in the filters."""
+
     object_name = object_query["object_name"]
     expression = object_query.get("filters", {}).get("expression")
 
     if expression is None:
       return set()
     object_class = self.object_map[object_name]
-    query = object_class.query
-    query = query.options(undefer('updated_at'))
+    query = db.session.query(object_class.id)
 
     requested_permissions = object_query.get("permissions", "read")
-    with benchmark("Get permissions: _get_objects > _get_type_query"):
+    with benchmark("Get permissions: _get_ids > _get_type_query"):
       type_query = self._get_type_query(object_class, requested_permissions)
       if type_query is not None:
         query = query.filter(type_query)
-    with benchmark("Parse filter query: _get_objects > _build_expression"):
+    with benchmark("Parse filter query: _get_ids > _build_expression"):
       filter_expression = self._build_expression(
           expression,
           object_class,
@@ -275,7 +295,7 @@ class QueryHelper(object):
       if filter_expression is not None:
         query = query.filter(filter_expression)
     if object_query.get("order_by"):
-      with benchmark("Sorting: _get_objects > order_by"):
+      with benchmark("Sorting: _get_ids > order_by"):
         query = self._apply_order_by(
             object_class,
             query,
@@ -284,10 +304,10 @@ class QueryHelper(object):
     with benchmark("Apply limit"):
       limit = object_query.get("limit")
       if limit:
-        matches, total = self._apply_limit(query, limit)
+        ids, total = self._apply_limit(query, limit)
       else:
-        matches = query.all()
-        total = len(matches)
+        ids = [obj.id for obj in query]
+        total = len(ids)
       object_query["total"] = total
 
     if hasattr(flask.g, "similar_objects_query"):
@@ -295,7 +315,7 @@ class QueryHelper(object):
       # POSTed in one request, the first one filters by similarity and the
       # second one doesn't but tries to sort by __similarity__
       delattr(flask.g, "similar_objects_query")
-    return matches
+    return ids
 
   @staticmethod
   def _apply_limit(query, limit):
@@ -307,7 +327,7 @@ class QueryHelper(object):
             objects[from, to].
 
     Returns:
-      matched objects and total count.
+      matched objects ids and total count.
     """
     try:
       first, last = limit
@@ -324,17 +344,17 @@ class QueryHelper(object):
       with benchmark("Apply limit: _apply_limit > query_limit"):
         # Note: limit request syntax is limit:[0,10]. We are counting
         # offset from 0 as the offset of the initial row for sql is 0 (not 1).
-        matches = query.limit(page_size).offset(first).all()
+        ids = [obj.id for obj in query.limit(page_size).offset(first)]
       with benchmark("Apply limit: _apply_limit > query_count"):
-        if len(matches) < page_size:
-          total = len(matches) + first
+        if len(ids) < page_size:
+          total = len(ids) + first
         else:
           # Note: using func.count() as query.count() is generating additional
           # subquery
           count_q = query.statement.with_only_columns([sa.func.count()])
           total = db.session.execute(count_q).scalar()
 
-    return matches, total
+    return ids, total
 
   def _apply_order_by(self, model, query, order_by):
     """Add ordering parameters to a query for objects.
