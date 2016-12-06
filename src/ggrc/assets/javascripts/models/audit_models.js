@@ -311,6 +311,9 @@
     }
   });
 
+  /**
+   * @Deprecated
+   */
   can.Model.Cacheable('CMS.Models.Request', {
     root_object: 'request',
     root_collection: 'requests',
@@ -341,7 +344,7 @@
       },
       threshold: 5
     },
-    is_custom_attributable: true,
+    is_custom_attributable: false,
     attributes: {
       context: 'CMS.Models.Context.stub',
       assignee: 'CMS.Models.Person.stub',
@@ -728,7 +731,6 @@
       Assessment: true,
       Audit: true,
       CycleTaskGroupObjectTask: true,
-      Request: true,
       TaskGroup: true,
       TaskGroupTask: true,
       Workflow: true
