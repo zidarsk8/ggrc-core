@@ -728,7 +728,7 @@
      * @return {Boolean} True or False
      */
     function isSnapshot(instance) {
-      return instance.snapshot;
+      return instance && instance.snapshot;
     }
 
     /**
@@ -759,7 +759,6 @@
       content.viewLink = content.snapshot.viewLink;
       content.selfLink = content.snapshot.selfLink;
       content.type = instance.child_type;
-      content.id = content.id;
       return new model(content);
     }
 
