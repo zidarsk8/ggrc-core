@@ -5,15 +5,13 @@
 
 {{#if instance.viewLink}}
   {{#is_allowed "view_object_page" instance}}
-    {{^maximize}}
+    {{^openIsHidden}}
     <a href="{{instance.viewLink}}" target="_blank" class="btn btn-mini btn-outline">
       Open
     </a>
-    {{/maximize}}
-    {{#maximize}}
+    {{/openIsHidden}}
     <a href="#" class="btn btn-mini btn-outline" can-click="maximizeObject">
       View
     </a>
-    {{/maximize}}
   {{/is_allowed}}
 {{/if}}
