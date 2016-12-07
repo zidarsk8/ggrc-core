@@ -744,18 +744,6 @@ class Builder(AttributeInfo):
     for attr_name in attrs:
       UpdateAttrHandler.do_update_attr(obj, json_obj, attr_name)
 
-  def update_attrs(self, obj, json_obj):
-    """Translate the state representation given by ``json_obj`` into the
-    model object ``obj``.
-    """
-    self.do_update_attrs(obj, json_obj, self._update_attrs)
-
-  def create_attrs(self, obj, json_obj):
-    """Translate the state representation given by ``json_obj`` into the new
-    model object ``obj``.
-    """
-    self.do_update_attrs(obj, json_obj, self._create_attrs)
-
   def publish_contribution(self, obj, inclusions, inclusion_filter):
     """Translate the state represented by ``obj`` into a JSON dictionary"""
     json_obj = {}
@@ -775,10 +763,10 @@ class Builder(AttributeInfo):
     """Update the state represented by ``obj`` to be equivalent to the state
     represented by the JSON dictionary ``json_obj``.
     """
-    self.update_attrs(obj, json_obj)
+    self.do_update_attrs(obj, json_obj, self._update_attrs)
 
   def create(self, obj, json_obj):
     """Update the state of the new model object ``obj`` to be equivalent to the
     state represented by the JSON dictionary ``json_obj``.
     """
-    self.create_attrs(obj, json_obj)
+    self.do_update_attrs(obj, json_obj, self._create_attrs)
