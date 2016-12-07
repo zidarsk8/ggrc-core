@@ -6,8 +6,16 @@
 .spinner {
   display: inline-block;
   &.initial-spinner {
-    position: relative;
+    position: absolute;
     left: 49%;  // not 50% to roughly compensate for the spinner's own width
+    top: 205px;
+    color: gray;
+  }
+  &.tree-items {
+    position: absolute;
+    z-index: 1000001 !important;
+    top: 10px;
+    left: 49%;
   }
 }
 

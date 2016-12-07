@@ -80,51 +80,46 @@ can.Control.extend('CMS.Controllers.TreeLoader', {
   defaults: {}
 }, {
   init_spinner: function () {
+    var renderer;
     var spinner;
-    var $spinner;
     var $footer;
     var $wrapper;
-    var spinnerTopOffset = '40%';
-    var elementOffset = $(window).height() - this.element.offset().top;
 
     if (this.element) {
       $footer = this.element.children('.tree-item-add').first();
-      spinner = new Spinner({
-        radius: 4,
-        length: 4,
-        width: 2
-      }).spin();
-      $spinner = $(spinner.el);
+
       if (this.options.is_subtree) {
         $wrapper = $('<li class="tree-item tree-spinner"/>');
       } else {
         $wrapper = $('<div class="tree-spinner"/>');
       }
+
       if (!this.options.is_subtree && !this.element.next().length) {
         $wrapper.css('height', '40px');
       }
 
-      if (this.element.height() > elementOffset) {
-        spinnerTopOffset = Math.floor(elementOffset / 2) + 'px';
-      }
-
-      $wrapper.append($spinner);
-      $spinner.css({
-        display: 'absolute',
-        left: '50%',
-        top: spinnerTopOffset
-      });
+      spinner = [
+        '<spinner toggle="showMe"',
+        '  size="large"',
+        '  extra-css-class="tree-items"',
+        '>',
+        '</spinner>'
+      ].join('');
+      renderer = can.view.mustache(spinner);
+      spinner = renderer({showMe: true});
 
       // Admin dashboard
       if ($footer.length === 0 &&
-        this.element.children('.tree-structure').length > 0) {
+          this.element.children('.tree-structure').length > 0) {
         this.element.children('.tree-structure')
           .addClass('new-tree_loading').append($wrapper);
-      } else if ($footer.length === 0) { // My work
+      } else if ($footer.length === 0) {  // My work
         this.element.addClass('new-tree_loading').append($wrapper);
       } else {
         $footer.before($wrapper);
       }
+
+      $wrapper.append(spinner);
     }
   },
   prepare: function () {
@@ -243,14 +238,17 @@ can.Control.extend('CMS.Controllers.TreeLoader', {
 
   _loading_finished: function () {
     var loading_deferred;
+
     if (this._loading_deferred) {
       this.element.trigger('loaded');
       this.element.find('.tree-spinner').remove();
+
       if (this.element.hasClass('new-tree_loading')) {
         this.element.removeClass('new-tree_loading');
       } else {
         this.element.find('.new-tree_loading').removeClass('new-tree_loading');
       }
+
       loading_deferred = this._loading_deferred;
       this._loading_deferred = null;
       loading_deferred.resolve();
