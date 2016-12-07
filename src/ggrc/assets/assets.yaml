@@ -210,6 +210,7 @@ dashboard-js-files:
   - components/snapshotter/individual-update.js
   - components/snapshotter/scope-update.js
   - components/info-pin-buttons/info-pin-buttons.js
+  - components/snapshot-loader/snapshot-loader.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -218,6 +219,7 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/snapshot-loader/snapshot-loader.mustache
   - components/search-toolbar/search-toolbar.mustache
   - components/mapping-controls/mapping-type-selector.mustache
   - components/effective-dates/effective-dates.mustache
