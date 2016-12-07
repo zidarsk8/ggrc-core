@@ -151,7 +151,6 @@ class AttributeInfo(object):
 
   def __init__(self, tgt_class):
     self._publish_attrs = AttributeInfo.gather_publish_attrs(tgt_class)
-    self._stub_attrs = AttributeInfo.gather_stub_attrs(tgt_class)
     self._update_attrs = AttributeInfo.gather_update_attrs(tgt_class)
     self._create_attrs = AttributeInfo.gather_create_attrs(tgt_class)
     self._include_links = AttributeInfo.gather_include_links(tgt_class)
@@ -212,10 +211,6 @@ class AttributeInfo(object):
   @classmethod
   def gather_aliases(cls, tgt_class):
     return cls.gather_attr_dicts(tgt_class, '_aliases')
-
-  @classmethod
-  def gather_stub_attrs(cls, tgt_class):
-    return cls.gather_attrs(tgt_class, '_stub_attrs')
 
   @classmethod
   def gather_update_attrs(cls, tgt_class):

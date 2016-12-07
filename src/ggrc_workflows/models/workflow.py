@@ -281,7 +281,6 @@ class WorkflowState(object):
 
   _publish_attrs = [reflection.PublishOnly('workflow_state')]
   _update_attrs = []
-  _stub_attrs = []
 
   @classmethod
   def _get_state(cls, current_tasks):

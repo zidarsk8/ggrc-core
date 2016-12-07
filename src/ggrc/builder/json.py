@@ -522,12 +522,6 @@ def publish_representation(resource):
 class Builder(AttributeInfo):
   """JSON Dictionary builder for ggrc.models.* objects and their mixins."""
 
-  @staticmethod
-  def generate_link_object_for_foreign_key(id, type, context_id=None):
-    """Generate a link object for this object reference."""
-    return {'id': id, 'type': type, 'href': url_for(type, id=id),
-            'context_id': context_id}
-
   def generate_link_object_for(
           self, obj, inclusions, include, inclusion_filter):
     """Generate a link object for this object. If there are property paths
