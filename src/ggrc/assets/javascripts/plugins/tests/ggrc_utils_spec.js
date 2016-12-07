@@ -12,6 +12,7 @@ describe('GGRC utils allowed_to_map() method', function () {
   var fakeRequest;
   var fakeAudit;
 
+  GGRC.config.snapshotable_parents = ['Audit'];
   beforeAll(function () {
     allowedToMap = GGRC.Utils.allowed_to_map;
   });
