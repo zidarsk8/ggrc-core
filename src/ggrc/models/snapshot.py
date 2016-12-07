@@ -153,7 +153,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
         with benchmark("Snapshot post api set revisions"):
           cls._set_revisions(new_snapshots)
         with benchmark("Snapshot post api ensure relationships"):
-          cls._ensure_relationships(new_snapshots)
+          cls._ensure_program_relationships(new_snapshots)
 
   @classmethod
   def _revert_attrs(cls, objects):
@@ -171,7 +171,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
           setattr(snapshot, attr, deleted[0])
 
   @classmethod
-  def _ensure_relationships(cls, objects):
+  def _ensure_program_relationships(cls, objects):
     """Ensure that snapshotted object is related to audit program.
 
     This function is made to handle multiple snapshots for a single audit.
