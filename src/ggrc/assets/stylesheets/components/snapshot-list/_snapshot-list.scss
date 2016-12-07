@@ -6,10 +6,22 @@
 .snapshot-list {
   display: block;
   padding: 0 20px;
+
+  .well-small {
+    font-size: 13px;
+    padding: 9px 16px 7px;
+  }
 }
+
 .snapshot-list-toolbar {
   height: 26px;
   margin: 0 0 16px 0;
+}
+
+.snapshot-list-pagination {
+  height: 26px;
+  margin: 0 0 16px 0;
+  padding: 4px 0 2px;
 }
 
 .snapshot-list-header {
@@ -32,7 +44,9 @@
 
 .snapshot-list-body {
   display: flex;
-  height: 200px;
+  padding: 2px 3px 1px;
+  background: #fbfbfb;
+  max-height: 240px;
   box-sizing: border-box;
   overflow: auto;
   position: relative;
@@ -76,6 +90,19 @@
   }
 }
 
+.snapshot-object-item-details {
+  padding: 8px 16px 12px;
+  font-size: 12px;
+  border: 1px solid #eee;
+  border-radius: 2px;
+  margin: 2px 0;
+  background: #fff;
+
+  h6 {
+    margin: 4px 0;
+  }
+}
+
 .snapshot-object-item {
   background: $snapshotBgnd;
   overflow: hidden;
@@ -93,8 +120,23 @@
 
   }
   .title {
+    display: flex;
+    align-items: center;
+
     .fa {
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
       font-size: 12px;
+
+      &.action {
+        cursor: pointer;
+
+        &:hover, &:active {
+          text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.35);
+        }
+      }
     }
   }
   reusable-objects-item {
@@ -140,16 +182,16 @@
 
     &:hover {
       background: #40c4ff;
-      color:#fff;
+      color: #fff;
       border-radius: 3px;
     }
 
     &.selected {
       background: #40c4ff;
-      color:#fff;
+      color: #fff;
       border-radius: 3px;
     }
-}
+  }
 
   .btn-link, .btn-link:active {
     background-color: transparent;

@@ -11,32 +11,25 @@
         Search
     </button>
 </div>
+{{#if items.length}}
 <div class="flex-box flex-box-single flex-row-reverse">
     <div class="snapshot-list-selection-switcher">
         Select:
         <button can-click="unselectAll"
                 class="btn btn-link" {{#inProgress}}disabled="disabled"{{/inProgress}}>None
-        </button>|<button can-click="selectAll"
+        </button>
+        |
+        <button can-click="selectAll"
                 class="btn btn-link" {{#allSelected}}disabled="disabled"{{/allSelected}}>All
         </button>
     </div>
 </div>
-<div class="snapshot-list-body {{#isLoading}}loading{{/isLoading}}">
+<div class="snapshot-list-body {{#isLoading}}loading{{/isLoading}} well">
     <object-list items="items" is-loading="isLoading" spinner-css="grid-spinner">
-        <div class="flex-row flex-box snapshot-object-item {{#instance.isMapped}}is-disabled{{/instance.isMapped}}">
-            <div class="title flex-size-5">
-                <i class="fa fa-{{instance.class.table_singular}}"></i>
-              {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
-            </div>
-            <reusable-objects-item
-                    is-checked="instance.isSelected"
-                    class="flex-size-1"
-                    instance="instance"
-                    is-saving="isSaving"
-                    base-instance="baseInstance"
-                    selected-list="mapper.selected">
-            </reusable-objects-item>
-        </div>
+        <snapshot-loader-item item-data="instance"></snapshot-loader-item>
     </object-list>
 </div>
-<tree-pagination paging="paging" class="flex-size-5"></tree-pagination>
+<tree-pagination paging="paging" class="snapshot-list-pagination"></tree-pagination>
+{{else}}
+  <div class="well well-small">No Objects to select</div>
+{{/if}}

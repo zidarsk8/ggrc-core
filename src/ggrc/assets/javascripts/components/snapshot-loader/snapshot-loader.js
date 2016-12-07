@@ -28,6 +28,7 @@
       scopeType: '@',
       term: '',
       selected: [],
+      isShowDetails: false,
       updatePaging: function (total) {
         var count = Math.ceil(total / this.attr('paging.pageSize'));
         this.attr('paging.total', total);
@@ -150,6 +151,10 @@
             item.attr('isSelected', true);
           }
         });
+      },
+      showDetails: function () {
+        console.info('Was clicked!!!');
+        this.attr('isShowDetails', !this.attr('isShowDetails'));
       }
     },
     events: {
