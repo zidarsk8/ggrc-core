@@ -84,68 +84,80 @@
   {{/if}}
     <search-toolbar class="flex-box search-toolbar flex-box-multi"></search-toolbar>
 </div>
-
-<mapper-results
-    is-loading="mapper.is_loading"
-    object="mapper.object"
-    entries="mapper.entries"
-    options="mapper.options"
-    page_loading="mapper.page_loading"
-    mapper="mapper"
-    types="mapper.types"
-    type="mapper.type"
-    selected="mapper.selected"
-    contact="mapper.contact"
-    term="mapper.term"
-    options="mapper.options"
-    items-per-page="20"
-    is_snapshotable="mapper.is_snapshotable"
-    snapshot_scope_id="{{mapper.snapshot_scope_id}}"
-    snapshot_scope_type="{{mapper.snapshot_scope_type}}">
-</mapper-results>
+{{#if mapper.isInScopeObject}}
+    <snapshot-loader
+            class="snapshot-list"
+            base-instance="mapper.parentInstance"
+            is-loading="mapper.is_loading"
+            object="mapper.object"
+            entries="mapper.entries"
+            mapper="mapper"
+            type="mapper.type"
+            selected="mapper.selected"
+            contact="mapper.contact"
+            term="mapper.term"
+            is_snapshotable="mapper.is_snapshotable"
+            scope-id="{{mapper.snapshot_scope_id}}"
+            scope-type="{{mapper.snapshot_scope_type}}">
+    </snapshot-loader>
+{{else}}
+    <mapper-results
+            is-loading="mapper.is_loading"
+            object="mapper.object"
+            entries="mapper.entries"
+            options="mapper.options"
+            page_loading="mapper.page_loading"
+            mapper="mapper"
+            types="mapper.types"
+            type="mapper.type"
+            selected="mapper.selected"
+            contact="mapper.contact"
+            term="mapper.term"
+            options="mapper.options"
+            items-per-page="20"
+            is_snapshotable="mapper.is_snapshotable"
+            snapshot_scope_id="{{mapper.snapshot_scope_id}}"
+            snapshot_scope_type="{{mapper.snapshot_scope_type}}">
+    </mapper-results>
+{{/if}}
 <div class="modal-footer">
   {{^if mapper.search_only}}
-  <div class="row-fluid">
-    <div class="span5">
-      <div class="deny-buttons"></div>
-    </div>
-    <div class="span7">
-      <div class="confirm-buttons">
+      <div class="row-fluid">
+          <div class="span5">
+              <div class="deny-buttons"></div>
+          </div>
+          <div class="span7">
+              <div class="confirm-buttons">
         <span>
           {{#if mapper.is_loading }}
-            <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
+              <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;">
+          </span>
           {{else}}
             {{mapper.selected.length}}
           {{/if}}
           {{#if template.count}}
             {{template.count}}
           {{else}}
-            object(s) selected
+              object(s) selected
           {{/if}}
-        </span>
+            </span>
 
-        <a class="
-            {{#if_helpers '\
-              ^if' mapper.selected.length '\
-              or #if' mapper.is_loading '\
-              or #if' mapper.is_saving}}
-              disabled
-            {{/if_helpers}}
-            btn-map btn btn-small btn-success preventdoubleclick" href="#">
-          {{#if mapper.is_saving}}
-            Saving, please wait...
-          {{else}}
-            {{#if template.submitButton}}
-              {{template.submitButton}}
-            {{else}}
-              Map Selected
-            {{/if}}
-          {{/if}}
-        </a>
+            <button class="btn-map btn btn-small btn-success preventdoubleclick"
+                    {{^if mapper.selected.length}}disabled="disabled"{{/if}}>
+              {{#if mapper.is_saving}}
+                  Saving, please wait...
+              {{else}}
+                {{#if template.submitButton}}
+                  {{template.submitButton}}
+                {{else}}
+                    Map Selected
+                {{/if}}
+              {{/if}}
+            </button>
 
-        <spinner toggle="mapper.is_saving" ></spinner>
+            <spinner toggle="mapper.is_saving"></spinner>
+              </div>
+          </div>
       </div>
-    </div>
-  </div>
   {{/if}}
 </div>

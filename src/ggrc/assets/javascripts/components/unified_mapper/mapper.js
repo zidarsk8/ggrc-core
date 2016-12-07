@@ -38,6 +38,8 @@
     init: function () {
       this.attr('types', this.initTypes());
       this.attr('parentInstance', this.initInstance());
+      this.attr('isInScopeObject',
+        GGRC.Utils.Snapshots.isInScopeModel(this.attr('object')));
     },
     type: 'AllObject', // We set default as All Object
     warningMessage: warningMessage,
@@ -56,18 +58,22 @@
     assessmentTemplate: '',
     search_only: false,
     join_object_id: '',
-    selected: new can.List(),
-    entries: new can.List(),
-    options: new can.List(),
-    relevant: new can.List(),
+    selected: [],
+    entries: [],
+    options: [],
+    relevant: [],
     is_snapshotable: false,
     snapshot_scope_id: '',
     snapshot_scope_type: '',
     parentInstance: null,
+    isInScopeObject: false,
     allowedToCreate: function () {
       var isAllTypeSelected = this.attr('type') === 'AllObject';
       var isSearch = this.attr('search_only');
-      return !isAllTypeSelected && !isSearch;
+      // Don't allow to create new instances for "In Scope" Objects
+      var isInScopeModel =
+        GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'));
+      return !isAllTypeSelected && !isSearch && !isInScopeModel;
     },
     showWarning: function () {
       return !(GGRC.Mappings
@@ -131,14 +137,15 @@
         'MultitypeSearch' :
         this.attr('object');
       // Can.JS wrap all objects with can.Map by default
-      var groups = this.attr('defaultGroups').serialize();
+      var groups = this.attr('defaultGroups').attr();
       var list = this.getModelNamesList(object);
 
       list.forEach(function (modelName) {
         return this.addFormattedType(modelName, groups);
       }.bind(this));
-
-      if (groups.all_objects.models.length < 2) {
+      // Temporary Remove All Objects select option in case Snapshot mapping
+      if (groups.all_objects.models.length < 2 ||
+        GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
         delete groups.all_objects;
       }
       return groups;
@@ -155,7 +162,7 @@
     },
     modelFromType: function (type) {
       var types = _.reduce(_.values(
-        this.attr('types').serialize()), function (memo, val) {
+        this.attr('types').attr()), function (memo, val) {
         if (val.items) {
           return memo.concat(val.items);
         }
@@ -343,7 +350,11 @@
               type: instance.type,
               id: instance.id
             };
-            data[mapping.option_attr] = destination;
+            data[mapping.option_attr] = {
+              href: destination.href,
+              type: destination.type,
+              id: destination.id
+            };
             modelInstance = new Model(data);
             defer.push(modelInstance.save());
           }, this);
