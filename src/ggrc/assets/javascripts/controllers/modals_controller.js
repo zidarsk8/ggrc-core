@@ -172,21 +172,20 @@ can.Control('GGRC.Controllers.Modals', {
     if (/^\d+$/.test(path[path.length - 1])) {
       index = parseInt(path.pop(), 10);
       path = path.join('.');
-      if (!this.options.instance.attr(path)) {
-        this.options.instance.attr(path, []);
+      if (!instance.attr(path)) {
+        instance.attr(path, []);
       }
-      this.options.instance.attr(path).splice(index, 1, ui.item.stub());
+      instance.attr(path).splice(index, 1, ui.item.stub());
     } else {
       path = path.join('.');
       setTimeout(function () {
         el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
       }, 0);
-
-      this.options.instance.attr(path, ui.item);
-      if (!this.options.instance._transient) {
-        this.options.instance.attr('_transient', can.Map());
+      instance.attr(path, null).attr(path, ui.item);
+      if (!instance._transient) {
+        instance.attr('_transient', can.Map());
       }
-      this.options.instance.attr('_transient.' + path, ui.item);
+      instance.attr('_transient.' + path, ui.item);
     }
   },
   immediate_find_or_create: function(el, ev, data) {
