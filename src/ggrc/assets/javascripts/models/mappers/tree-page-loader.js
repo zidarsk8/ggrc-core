@@ -17,7 +17,8 @@
       var result;
       if (snapshots.isSnapshotScope(this.binding.instance) &&
         snapshots.isSnapshotModel(params.data[0].object_name)) {
-        queryParams = snapshots.transformQuery(params);
+        params.data[0] = snapshots.transformQuery(params.data[0]);
+        queryParams = params;
       }
       return this.model.query(queryParams)
         .then(function (data) {

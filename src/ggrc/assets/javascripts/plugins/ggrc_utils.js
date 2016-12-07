@@ -518,10 +518,43 @@
      * @param {Object} relevant.id - Id of relevant object
      * @param {Object} relevant.operation - Type of operation.
      * @param {Object} additionalFilter - An additional filter to be applied
-     * @return {QueryAPIRequest} Array of QueryAPIRequest
+     * @return {Array} Array of QueryAPIRequest
      */
     function buildParams(objName, page, relevant, additionalFilter) {
       return [buildParam(objName, page, relevant, undefined, additionalFilter)];
+    }
+
+    /**
+     * Build params for ids type request on Query API.
+     *
+     * @param {String} objName - Name of requested object
+     * @param {Object} page - Information about page state.
+     * @param {Number} page.current - Current page
+     * @param {Number} page.pageSize - Page size
+     * @param {String} page.sortBy - sortBy
+     * @param {String} page.sortDirection - sortDirection
+     * @param {String} page.filter - Filter string
+     * @param {Object} relevant - Information about relevant object
+     * @param {Object} relevant.type - Type of relevant object
+     * @param {Object} relevant.id - Id of relevant object
+     * @param {Object} relevant.operation - Type of operation.
+     * @return {Object} Object of QueryAPIRequest
+     */
+    function buildRelevantIdsQuery(objName, page, relevant) {
+      var params = {};
+
+      if (!objName) {
+        return {};
+      }
+
+      params.object_name = objName;
+      if (relevant && !relevant.operation) {
+        relevant.operation = 'relevant';
+      }
+      params.filters = _makeFilter(objName, page.filter, relevant);
+      params.type = 'ids';
+
+      return params;
     }
 
     /**
@@ -540,7 +573,7 @@
      * @param {Object} relevant.operation - Type of operation.
      * @param {Array} fields - Array of requested fields.
      * @param {Object} additionalFilter - An additional filter to be applied
-     * @return {QueryAPIRequest} Object of QueryAPIRequest
+     * @return {Object} Object of QueryAPIRequest
      */
     function buildParam(objName, page, relevant, fields, additionalFilter) {
       var first;
@@ -552,10 +585,8 @@
       }
 
       params.object_name = objName;
-      if (relevant && !relevant.operation) {
-        relevant.operation = _getTreeViewOperation(objName);
-      }
-      params.filters = _makeFilter(page.filter, relevant, additionalFilter);
+      params.filters =
+        _makeFilter(objName, page.filter, relevant, additionalFilter);
 
       if (page.current && page.pageSize) {
         first = (page.current - 1) * page.pageSize;
@@ -628,7 +659,7 @@
      */
     function makeRequest(params) {
       var reqParams = params.data || [];
-      return $.ajax({
+      return can.ajax({
         type: 'POST',
         headers: $.extend({
           'Content-Type': 'application/json'
@@ -655,19 +686,34 @@
       return expression;
     }
 
-    function _makeFilter(filter, relevant, additionalFilter) {
-      var relevantFilter;
+    function _makeRelevantFilter(filter, objName) {
+      var relevantFilter = GGRC.query_parser.parse('#' + filter.type + ',' +
+        filter.id + '#');
+
+      if (filter && !filter.operation) {
+        filter.operation = _getTreeViewOperation(objName);
+      }
+
+      if (filter.operation &&
+        filter.operation !== relevantFilter.expression.op.name) {
+        relevantFilter.expression.op.name = filter.operation;
+      }
+
+      return relevantFilter;
+    }
+
+    function _makeFilter(objName, filter, relevant, additionalFilter) {
+      var relevantFilters;
       var filterList = [];
 
       if (relevant) {
-        relevantFilter = GGRC.query_parser.parse('#' + relevant.type + ',' +
-                                                 relevant.id + '#');
-        filterList.push(relevantFilter);
-
-        if (relevant.operation &&
-            relevant.operation !== relevantFilter.expression.op.name) {
-          relevantFilter.expression.op.name = relevant.operation;
-        }
+        relevant = Array.isArray(relevant) ?
+          relevant :
+          can.makeArray(relevant);
+        relevantFilters = relevant.map(function (filter) {
+          return _makeRelevantFilter(filter, objName);
+        });
+        filterList = filterList.concat(relevantFilters);
       }
 
       if (filter) {
@@ -675,9 +721,11 @@
       }
 
       if (additionalFilter) {
-        filterList.push(additionalFilter);
+        additionalFilter = Array.isArray(additionalFilter) ?
+          additionalFilter :
+          can.makeArray(additionalFilter);
+        filterList = filterList.concat(additionalFilter);
       }
-
       if (filterList.length) {
         return filterList.reduce(function (left, right) {
           return GGRC.query_parser.join_queries(left, right);
@@ -700,6 +748,7 @@
     return {
       buildParam: buildParam,
       buildParams: buildParams,
+      buildRelevantIdsQuery: buildRelevantIdsQuery,
       makeRequest: makeRequest,
       getCounts: getCounts,
       makeExpression: makeExpression,
@@ -718,7 +767,7 @@
     function setAttrs(instance) {
       // Get list of objects that supports 'snapshot scope' from config
       var className = instance.type;
-      if (className === 'Audit') {
+      if (isSnapshotParent(className)) {
         instance.attr('is_snapshotable', true);
       }
     }
@@ -740,6 +789,38 @@
     function isSnapshotScope(parentInstance) {
       var instance = parentInstance || GGRC.page_instance();
       return instance ? instance.is_snapshotable : false;
+    }
+
+    /**
+     * Check whether provided model name is snapshot parent
+     * @param {String} parent - Model name
+     * @return {Boolean} True or False
+     */
+    function isSnapshotParent(parent) {
+      return GGRC.config.snapshotable_parents.indexOf(parent) > -1;
+    }
+
+    /**
+     * Check whether provided model name should be snapshot or default one
+     * @param {String} modelName - model to check
+     * @return {Boolean} True or False
+     */
+    function isSnapshotModel(modelName) {
+      return GGRC.config.snapshotable_objects.indexOf(modelName) > -1;
+    }
+
+    /**
+     * Check if the relationship is of type snapshot.
+     * @param {String} parent - Parent of the related objects
+     * @param {String} child - Child of the related objects
+     * @return {Boolean} True or False
+     */
+    function isSnapshotRelated(parent, child) {
+      return isSnapshotParent(parent) && isSnapshotModel(child);
+    }
+
+    function isInScopeModel(model) {
+      return ['Assessment', 'Issue', 'AssessmentTemplate'].indexOf(model) > -1;
     }
 
     /**
@@ -774,15 +855,14 @@
 
     /**
      * Transform query for objects into query for snapshots of the same type
-     * @param {Object} params - original query
+     * @param {Object} query - original query
      * @return {Object} The transformed query
      */
-    function transformQuery(params) {
-      var data = params.data[0];
-      var type = data.object_name;
-      var expression = data.filters.expression;
-      data.object_name = 'Snapshot';
-      data.filters.expression = {
+    function transformQuery(query) {
+      var type = query.object_name;
+      var expression = query.filters.expression;
+      query.object_name = 'Snapshot';
+      query.filters.expression = {
         left: {
           left: 'child_type',
           op: {name: '='},
@@ -791,36 +871,7 @@
         op: {name: 'AND'},
         right: expression
       };
-      return params;
-    }
-
-    /**
-     * Check whether provided model name should be snapshot or default one
-     * @param {String} modelName - model to check
-     * @return {Boolean} True or False
-     */
-    function isSnapshotModel(modelName) {
-      return GGRC.config.snapshotable_objects.indexOf(modelName) > -1;
-    }
-
-    /**
-     * Check if the relationship is of type snapshot.
-     * @param {String} parent - Parent of the related objects
-     * @param {String} child - Child of the related objects
-     * @return {Boolean} True or False
-     */
-    function isSnapshotRelated(parent, child) {
-      return GGRC.config.snapshotable_parents.indexOf(parent) > -1 &&
-            isSnapshotModel(child) > -1;
-    }
-
-    /**
-     * Check whether provided model name is snapshot parent
-     * @param {String} parent - Model name
-     * @return {Boolean} True or False
-     */
-    function isSnapshotParent(parent) {
-      return GGRC.config.snapshotable_parents.indexOf(parent) > -1;
+      return query;
     }
 
     return {
@@ -829,6 +880,7 @@
       isSnapshotParent: isSnapshotParent,
       isSnapshotRelated: isSnapshotRelated,
       isSnapshotModel: isSnapshotModel,
+      isInScopeModel: isInScopeModel,
       toObject: toObject,
       toObjects: toObjects,
       transformQuery: transformQuery,
