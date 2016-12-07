@@ -25,22 +25,6 @@ from ggrc.models.deferred import deferred
 from ggrc.models.computed_property import computed_property
 
 
-def get_latest_revision_id(snapshot):
-  """Retrieve last revision saved for snapshots
-
-  Args:
-    snapshot: Instance of models.Snapshot
-  Returns:
-    ID of the latest revision or None otherwise
-  """
-  from ggrc.snapshotter.helpers import get_revisions
-  from ggrc.snapshotter.datastructures import Pair
-  pair = Pair.from_snapshot(snapshot)
-  revisions = get_revisions({pair}, revisions=set())
-  if pair in revisions and revisions[pair]:
-    return revisions[pair]
-
-
 class Snapshot(relationship.Relatable, mixins.Base, db.Model):
   """Snapshot object that holds a join of parent object, revision, child object
   and parent object's context.
@@ -122,9 +106,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
   def update_revision(self, value):
     self._update_revision = value
     if value == "latest":
-      latest_revision_id = get_latest_revision_id(self)
-      if latest_revision_id:
-        self.revision_id = latest_revision_id
+      self._set_revisions([self])
 
   @property
   def parent_attr(self):
