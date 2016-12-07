@@ -548,9 +548,6 @@
       }
 
       params.object_name = objName;
-      if (relevant && !relevant.operation) {
-        relevant.operation = 'relevant';
-      }
       params.filters = _makeFilter(objName, page.filter, relevant);
       params.type = 'ids';
 
@@ -820,7 +817,8 @@
     }
 
     function isInScopeModel(model) {
-      return ['Assessment', 'Issue', 'AssessmentTemplate'].indexOf(model) > -1;
+      return ['Assessment', 'Issue', 'AssessmentTemplate']
+          .indexOf(model) > -1;
     }
 
     /**
@@ -841,6 +839,7 @@
       content.viewLink = content.snapshot.viewLink;
       content.selfLink = content.snapshot.selfLink;
       content.type = instance.child_type;
+      content.id = instance.id;
       return new model(content);
     }
 

@@ -334,10 +334,27 @@
 
         que.enqueue(instance).trigger().done(function (inst) {
           data.context = instance.context || null;
-          _.each(this.scope.attr('mapper.selected'), function (destination) {
+          this.scope.attr('mapper.selected').forEach(function (destination) {
             var modelInstance;
-            var isMapped = GGRC.Utils.is_mapped(instance, destination);
-            var isAllowed = GGRC.Utils.allowed_to_map(instance, destination);
+            var isMapped;
+            var isAllowed;
+            // Use simple Relationship Model to map Snapshot
+            if (GGRC.Utils.Snapshots.isSnapshot(destination)) {
+              modelInstance = new CMS.Models.Relationship({
+                context: data.context,
+                source: instance,
+                destination: {
+                  href: destination.href,
+                  type: 'Snapshot',
+                  id: destination.id
+                }
+              });
+
+              return defer.push(modelInstance.save());
+            }
+
+            isMapped = GGRC.Utils.is_mapped(instance, destination);
+            isAllowed = GGRC.Utils.allowed_to_map(instance, destination);
 
             if (isMapped || !isAllowed) {
               return;
@@ -350,14 +367,10 @@
               type: instance.type,
               id: instance.id
             };
-            data[mapping.option_attr] = {
-              href: destination.href,
-              type: destination.type,
-              id: destination.id
-            };
+            data[mapping.option_attr] = destination;
             modelInstance = new Model(data);
             defer.push(modelInstance.save());
-          }, this);
+          });
 
           $.when.apply($, defer)
             .fail(function (response, message) {
