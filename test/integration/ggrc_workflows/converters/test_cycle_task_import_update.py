@@ -463,7 +463,7 @@ class TestCycleTaskImportUpdate(TestCase):
         'map:facility', 'map:issue', 'map:market', 'map:objective',
         'map:org group', 'map:person', 'map:policy', 'map:process',
         'map:product', 'map:program', 'map:project', 'map:regulation',
-        'map:request', 'map:risk', 'map:section', 'map:standard', 'map:system',
+        'map:risk', 'map:section', 'map:standard', 'map:system',
         'map:threat', 'map:vendor', 'state', 'task group', 'task type'
     )
     self.expected_warnings = {

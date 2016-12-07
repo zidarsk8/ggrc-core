@@ -922,49 +922,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Owner"]["mandatory"])
     self.assertTrue(vals["Title"]["unique"])
 
-  def test_request_definitions(self):
-    """Test default headers for Request."""
-
-    names = {
-        "Assignee",
-        "Audit",
-        "Code",
-        "Delete",
-        "Description",
-        "Due On",
-        "Evidence",
-        "Notes",
-        "Request Type",
-        "Starts On",
-        "Verified Date",
-        "Finished Date",
-        "Requester",
-        "Recipients",
-        "Send by default",
-        "Status",
-        "Test",
-        "Title",
-        "Verifier",
-        "Url",
-    }
-    expected_fields = {
-        "mandatory": {
-            "Assignee",
-            "Audit",
-            "Code",
-            "Due On",
-            "Request Type",
-            "Starts On",
-            "Requester",
-            "Status",
-            "Title",
-        },
-        "unique": {
-            "Code",
-        }
-    }
-    self._test_single_object(models.Request, names, expected_fields)
-
   def test_risk_definitions(self):
     """Test default headers for Risk."""
 

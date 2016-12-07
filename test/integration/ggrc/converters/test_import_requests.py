@@ -11,8 +11,12 @@ from flask.json import dumps
 from ggrc import models
 from ggrc.converters import errors
 from integration.ggrc import converters
+from unittest import skip
 
 
+# These tests will be removed|changed during next step:
+# 'GGRC-540: Hide Request from import/export pages'.
+@skip("No reason")
 class TestRequestImport(converters.TestCase):
 
   """Basic Request import tests with.
