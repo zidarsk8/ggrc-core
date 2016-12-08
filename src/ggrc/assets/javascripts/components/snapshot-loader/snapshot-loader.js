@@ -21,14 +21,11 @@
       mapper: null,
       isLoading: false,
       items: [],
-      page_loading: false,
-      select_state: false,
       baseInstance: null,
       scopeId: '@',
       scopeType: '@',
       term: '',
       selected: [],
-      isShowDetails: false,
       updatePaging: function (total) {
         var count = Math.ceil(total / this.attr('paging.pageSize'));
         this.attr('paging.total', total);
@@ -135,8 +132,6 @@
       },
       unselectAll: function (scope, el, ev) {
         ev.preventDefault();
-
-        this.attr('mapper.all_selected', false);
         this.attr('items')
           .forEach(function (item) {
             if (!item.attr('isMapped')) {
@@ -151,10 +146,6 @@
             item.attr('isSelected', true);
           }
         });
-      },
-      showDetails: function () {
-        console.info('Was clicked!!!');
-        this.attr('isShowDetails', !this.attr('isShowDetails'));
       }
     },
     events: {
