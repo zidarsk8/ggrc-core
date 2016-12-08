@@ -108,7 +108,8 @@ describe('can.Model.AssessmentTemplate', function () {
               {value: 'Contract'},  // this object type is relevant
               {value: 'Assessment'},
               {value: 'Audit'},
-              {value: 'CycleTaskGroupObjectTask'}
+              {value: 'CycleTaskGroupObjectTask'},
+              {value: 'Request'}
             ]
           },
           groupBar: {

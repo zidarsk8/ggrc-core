@@ -89,7 +89,7 @@ Create a CMS.Models.Cacheable object
    below).
 2. Add ``new_object`` to ``business_object.js``
 
-   ``base_widgets_by_type`` is where you define the attributes shown in
+   ``baseWidgetsByType`` is where you define the attributes shown in
    widgets ``extra_descriptor_options`` is where you define special
    parameters for some of the widgets ie. their content controller,
    icon, widget name etc. ``extra_content_controller_options`` is where

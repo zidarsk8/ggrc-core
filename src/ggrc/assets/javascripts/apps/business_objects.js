@@ -38,6 +38,7 @@
         control: CMS.Models.Control,
         assessment: CMS.Models.Assessment,
         assessment_template: CMS.Models.AssessmentTemplate,
+        request: CMS.Models.Request,
         issue: CMS.Models.Issue,
         objective: CMS.Models.Objective,
         section: CMS.Models.Section,
@@ -94,6 +95,7 @@
         assessments: path + '/assessments/info.mustache',
         assessment_templates:
           path + '/assessment_templates/info.mustache',
+        requests: path + '/requests/info.mustache',
         issues: path + '/issues/info.mustache'
       };
       widget_list.add_widget(object.constructor.shortName, 'info', {
@@ -106,6 +108,7 @@
       model_names = can.Map.keys(base_widgets_by_type);
       model_names.sort();
       possible_model_type = model_names.slice();
+      possible_model_type.push('Request'); // Missing model-type by selection
       can.each(model_names, function (name) {
         var w_list;
         var child_model_list = [];
@@ -255,6 +258,9 @@
           Project: {
             order: 250
           },
+          Request: {
+            order: 260
+          },
           System: {
             order: 270
           },
@@ -291,6 +297,11 @@
         Audit: {
           Assessment: {
             order: 10
+          },
+          Request: {
+            widget_id: 'Request',
+            widget_name: 'Requests',
+            order: 20
           },
           Issue: {
             order: 30
@@ -332,6 +343,18 @@
               allow_mapping: false,
               allow_creating: false
             }
+          }
+        },
+        Control: {
+          Request: {
+            widget_id: 'Request',
+            widget_name: 'Requests'
+          }
+        },
+        Person: {
+          Request: {
+            widget_id: 'Request',
+            widget_name: 'Requests'
           }
         }
       },
@@ -432,6 +455,15 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true,
             footer_view: path + '/base_objects/tree_footer.mustache'
+          },
+          Request: {
+            mapping: 'related_requests',
+            child_options: [
+              _.extend({}, relatedObjectsChildOptions[0], {
+                mapping: 'info_related_objects'
+              })
+            ],
+            draw_children: true
           },
           Document: {
             mapping: 'documents',
@@ -555,6 +587,14 @@
         },
         Audit: {
           _mixins: ['issues', 'governance_objects', 'business_objects'],
+          Request: {
+            mapping: 'active_requests',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true,
+            show_view: path + '/requests/tree.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
+            add_item_view: path + '/requests/tree_add_item.mustache'
+          },
           Program: {
             mapping: '_program',
             parent_instance: GGRC.page_instance(),
@@ -677,6 +717,18 @@
             draw_children: true
           }
         },
+        Request: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+          Audit: {
+            mapping: 'audits',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true,
+            allow_creating: false,
+            allow_mapping: false,
+            show_view: path + '/audits/tree.mustache',
+            add_item_view: path + '/audits/tree_add_item.mustache'
+          },
+        },
         Assessment: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
@@ -697,6 +749,14 @@
             mapping: 'clauses',
             child_options: relatedObjectsChildOptions,
             draw_children: true
+          },
+          Request: {
+            mapping: 'related_requests',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true,
+            show_view: path + '/requests/tree.mustache',
+            footer_view: path + '/base_objects/tree_footer.mustache',
+            add_item_view: path + '/requests/tree_add_item.mustache'
           }
         },
         Issue: {
@@ -760,6 +820,15 @@
         },
         Person: {
           _mixins: ['issues'],
+          Request: {
+            mapping: (/^\/objectBrowser\/?$/.test(window.location.pathname)) ?
+              'all_open_audit_requests' : 'open_audit_requests',
+            draw_children: true,
+            child_options: relatedObjectsChildOptions,
+            show_view: GGRC.mustache_path + '/requests/tree.mustache',
+            footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
+            add_item_view: GGRC.mustache_path + '/requests/tree_add_item.mustache'
+          },
           Program: {
             mapping: 'extended_related_programs_via_search',
             child_options: relatedObjectsChildOptions,

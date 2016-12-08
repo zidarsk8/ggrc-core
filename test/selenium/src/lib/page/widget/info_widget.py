@@ -141,6 +141,11 @@ class Assessments(Widget):
   _locator = locator.WidgetInfoAssessment
 
 
+class Requests(Widget):
+  """Model for request object info widget"""
+  _locator = locator.WidgetInfoRequest
+
+
 class Issues(Widget):
   """Model for issue object info widget"""
   _locator = locator.WidgetInfoIssue

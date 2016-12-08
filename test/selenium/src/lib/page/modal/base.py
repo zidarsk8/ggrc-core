@@ -288,6 +288,11 @@ class IssuesModal(BaseModal):
   _locator_ui_title = locator.ModalCreateNewIssue.UI_TITLE
 
 
+class RequestsModal(BaseModal):
+  """Class representing a base request modal"""
+  _locator_ui_title = locator.ModalCreateNewRequest.UI_TITLE
+
+
 class ProcessesModal(BaseModal):
   """Class representing a base process modal"""
   _locator_ui_title = locator.ModalCreateNewProcess.UI_TITLE

@@ -428,6 +428,7 @@
 
       '#search keyup': function (el, ev) {
         if (ev.keyCode === 13) {
+          this.scope.attr('mapper.term', el.val());
           this.element.find('mapper-results').control().getResults();
         }
       },
