@@ -108,7 +108,7 @@
       'Ready for External Review', 'Completed'],
     obj_nav_options: {
       show_all_tabs: false,
-      force_show_list: ['In Scope Controls', 'Requests',
+      force_show_list: ['In Scope Controls', 'Assessment Templates',
         'Issues', 'Assessments']
     },
     tree_view_options: {
