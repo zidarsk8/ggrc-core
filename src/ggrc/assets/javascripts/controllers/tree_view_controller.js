@@ -904,22 +904,25 @@ CMS.Controllers.TreeLoader.extend('CMS.Controllers.TreeView', {
         options.attr('drawingItems')) {
       return;
     }
+
     elPosition = this.el_position.bind(this);
-    children = options.attr('filteredList');
+    children = options.attr('filteredList') || [];
+
+    if (!children.length || !children[0].element) {
+      return;
+    }
+
     lo = 0;
+    hi = children.length - 1;
+    max = hi;
     steps = 0;
     visible = [];
     toRender = [];
 
-    if (!children || !children.length || !children[0].element) {
-      return;
-    }
     alreadyVisible = _.filter(children, function (child) {
       return !child.options.attr('isPlaceholder');
     });
 
-    hi = children.length - 1;
-    max = hi;
     while (steps < MAX_STEPS && lo < hi) {
       steps += 1;
       mid = (lo + hi) / 2 | 0;
