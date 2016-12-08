@@ -899,6 +899,11 @@ can.Control('GGRC.Controllers.Modals', {
       }
     }, this);
 
+    if (this.options.add_more &&
+      this.options.model.shortName === 'TaskGroupTask') {
+      new_instance.attr('contact', this.options.attr('instance.contact'));
+    }
+
     $.when(this.options.attr('instance', new_instance))
       .done(function () {
         this.reset_form(function () {
