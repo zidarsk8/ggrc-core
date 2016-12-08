@@ -1,10 +1,14 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from __future__ import with_statement
 import re
 from alembic import context
 from logging.config import fileConfig
+
+# Ensure all models are imported so they can be used
+# with --autogenerate
+from ggrc.app import db
+from ggrc.models import all_models  # noqa
 
 # This is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -14,12 +18,8 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-# Ensure all models are imported so they can be used
-# with --autogenerate
-from ggrc.app import db, app
-from ggrc.models import all_models
-
 target_metadata = db.metadata
+
 
 def include_symbol(tablename, schema=None):
     """Exclude some tables from consideration by alembic's 'autogenerate'.
@@ -30,6 +30,7 @@ def include_symbol(tablename, schema=None):
 
     # If the tablename didn't match any exclusion cases, return True
     return True
+
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -49,6 +50,7 @@ def run_migrations_offline():
 
     with context.begin_transaction():
         context.run_migrations()
+
 
 def run_migrations_online():
     """Run migrations in 'online' mode.
