@@ -57,7 +57,8 @@ def _get_assignable_dict(people, notif):
         notif.notification_type.name: {
             obj.id: {
                 "title": obj.title,
-                "fuzzy_start_date": utils.get_fuzzy_date(start_date),
+                "start_date_statement": utils.get_digest_date_statement(
+                    start_date, "start", True),
                 "url": get_object_url(obj),
             }
         }

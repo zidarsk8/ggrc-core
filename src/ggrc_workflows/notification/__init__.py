@@ -82,7 +82,8 @@ All notifications handle the following structure:
                   "workflow_owners":
                       { workflow_owner.id: workflow_owner_info, ...},
                   "start_date": MM/DD/YYYY
-                  "fuzzy_start_date": "in X days/weeks ..."
+                  "start_date_statement": "starts in X day[s]" or
+                                          "started today|X day[s] ago"
               }
               , ...
           }
@@ -95,7 +96,8 @@ All notifications handle the following structure:
                   "workflow_owners":
                       { workflow_owner.id: workflow_owner_info, ...},
                   "start_date": MM/DD/YYYY
-                  "fuzzy_start_date": "in X days/weeks ..."
+                  "start_date_statement": "starts in X day[s]" or
+                                          "started today|X day[s] ago"
               }
               , ...
           }
@@ -150,7 +152,7 @@ Task and cycle_task have the following structure:
       "title": title,
       "object_titles": list of object titles for all related objects
       "end_date": end date in MM/DD/YYYY format
-      "fuzzy_due_in": "today" or "in 1 day"... "in 5 days", "in 1 week" etc.,
+      "due_date_statement": "due today|in X day[s]|X day[s] ago"
       "cycle_task_url" ""
   }
 

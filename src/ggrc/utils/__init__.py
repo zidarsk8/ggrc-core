@@ -226,6 +226,31 @@ def get_fuzzy_date(delta_date):
   return "in {} day{}".format(delta.days, "s" if delta.days > 1 else "")
 
 
+def get_digest_date_statement(delta_date, word, is_change_tense=False):
+  """Get statement created from word in appropriate tense and readable date.
+
+  This function returns phrase created using concatenation of a word in
+  appropriate tense with human readable date value.
+
+  Args:
+    delta_date (date): Date that we want to show to the user
+    word (str): With which date should be concatenated
+    is_change_tense: Flag which shows is tense of the word should be changed
+
+  Returns:
+    string: A human readable statement, created from word and date
+            concatenation
+  """
+  fuzzy_date = get_fuzzy_date(delta_date)
+  word_end = ''
+  if is_change_tense:
+    if "in" in fuzzy_date:
+      word_end = 's'
+    else:
+      word_end = 'ed'
+  return '{}{} {}'.format(word, word_end, fuzzy_date)
+
+
 # pylint: disable=too-few-public-methods
 # because this is a small context manager
 class QueryCounter(object):
