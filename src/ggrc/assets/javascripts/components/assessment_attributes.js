@@ -234,10 +234,17 @@
           }).join(',');
           ev.preventDefault();
           scope.attr('selected.invalidTitle', false);
+          scope.attr('selected.emptyTitle', false);
+          scope.attr('selected.dublicateTitle', false);
           scope.attr('selected.invalidValues', false);
 
-          if (this.isInvalidTitle(fields, title)) {
+          if (this.isEmptyTitle(title)) {
             this.attr('selected.invalidTitle', true);
+            this.attr('selected.emptyTitle', true);
+            invalidInput = true;
+          } else if (this.isDublicateTitle(fields, title)) {
+            this.attr('selected.invalidTitle', true);
+            this.attr('selected.dublicateTitle', true);
             invalidInput = true;
           }
           if (this.isInvalidValues(scope.valueAttrs, type, values)) {
@@ -265,12 +272,14 @@
         isInvalidValues: function (valueAttrs, type, values) {
           return _.contains(valueAttrs, type) && !values;
         },
-        isInvalidTitle: function (fields, selectedTitle) {
+        isDublicateTitle: function (fields, selectedTitle) {
           var duplicateField = _.some(fields, function (item) {
             return item.title === selectedTitle && !item._pending_delete;
           });
-          return (fields.length && duplicateField) ||
-            !selectedTitle;
+          return fields.length && duplicateField;
+        },
+        isEmptyTitle: function (selectedTitle) {
+          return !selectedTitle;
         }
       });
     },
