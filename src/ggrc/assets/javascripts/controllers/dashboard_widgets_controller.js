@@ -148,11 +148,11 @@ CMS.Controllers.Filterable("CMS.Controllers.DashboardWidgets", {
     this.options.widget_count.attr("count", "" + count);
   }
 
-  , display_path: function(path) {
+  , display_path: function(path, refetch) {
       var that = this;
       return this.display().then(function() {
         if (that.content_controller && that.content_controller.display_path)
-          return that.content_controller.display_path(path);
+          return that.content_controller.display_path(path, refetch);
       });
     }
 });

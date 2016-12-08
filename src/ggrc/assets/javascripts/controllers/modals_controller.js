@@ -1157,6 +1157,14 @@
         return;
       }
 
+      if (this.options.instance.getHashFragment) {
+        hash = this.options.instance.getHashFragment();
+        if (hash) {
+          window.location.hash = hash;
+          return;
+        }
+      }
+
       hash = window.location.hash.split('/')[0];
       treeController = this.options
         .$trigger
