@@ -66,6 +66,11 @@ class TestAutomappings(integration.ggrc.TestCase):
     if not missing:
       self.assertIsNotNone(rel,
                            msg='%s not mapped to %s' % (obj1.type, obj2.type))
+      revisions = models.Revision.query.filter_by(
+          resource_type='Relationship',
+          resource_id=rel.id,
+      ).count()
+      self.assertEqual(revisions, 1)
     else:
       self.assertIsNone(rel,
                         msg='%s mapped to %s' % (obj1.type, obj2.type))
