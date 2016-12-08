@@ -11,7 +11,6 @@ ggrc_packages:
   - name: fabric
   - name: python-mysqldb
   - name: python-imaging
-  - name: sqlite3
   - name: python-dev
   - name: nodejs
 

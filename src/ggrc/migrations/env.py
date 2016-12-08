@@ -21,34 +21,9 @@ from ggrc.models import all_models
 
 target_metadata = db.metadata
 
-def _get_db_scheme():
-    """Returns the database type, e.g. 'sqlite' or 'mysql' based
-    on the database URI.
-    """
-    url = app.config['SQLALCHEMY_DATABASE_URI']
-    db_scheme = url.split(':')[0].split('+')[0]
-    return db_scheme
-
 def include_symbol(tablename, schema=None):
     """Exclude some tables from consideration by alembic's 'autogenerate'.
     """
-    db_scheme = _get_db_scheme()
-
-    # Exclude some tables when considering SQLite3, because full text search
-    # generates tables that are not reflected in SQLAlchemy's metadata.
-    sqlite_fts_exclusions = [
-        # Exclude SQLite full-text-search tables
-        'fulltext_record_properties_content',
-        'fulltext_record_properties_docsize',
-        'fulltext_record_properties_segdir',
-        'fulltext_record_properties_segments',
-        'fulltext_record_properties_stat',
-        'fulltext_record_properties',
-        ]
-
-    if db_scheme == 'sqlite' and tablename in sqlite_fts_exclusions:
-        return False
-
     # Exclude `*_alembic_version` tables
     if re.match(r'.*_alembic_version$', tablename):
         return False
