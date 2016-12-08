@@ -37,9 +37,6 @@
       onSearch: function () {
         this.setItems();
       },
-      getSelectedType: function () {
-        return this.attr('type');
-      },
       prepareRelevantFilters: function () {
         var filters;
         var relevantList = this.attr('mapper.relevant');
@@ -62,42 +59,55 @@
         }
         return filters;
       },
-      prepareBaseQuery: function (modelName, filters) {
+      prepareBaseQuery: function (modelName, filters, ownedFilter) {
         return GGRC.Utils.QueryAPI
           .buildParam(modelName, {
             filter: this.attr('term'),
             current: this.attr('paging.current'),
             pageSize: this.attr('paging.pageSize')
-          }, filters, {});
+          }, filters, [], ownedFilter);
       },
-      prepareRelatedFilter: function (modelName) {
+      prepareRelatedQuery: function (modelName, ownedFilter) {
         return GGRC.Utils.QueryAPI
           .buildRelevantIdsQuery(modelName, {
             filter: this.attr('term')
           }, {
             type: this.attr('baseInstance.type'),
             id: this.attr('baseInstance.id')
-          }, {});
+          }, [], ownedFilter);
       },
-      getQuery: function () {
+      prepareOwnedFilter: function () {
         var contact = this.attr('contact');
         var contactEmail = this.attr('mapper.contactEmail');
-        var filters;
-        var modelName = this.getSelectedType();
-        var params = {};
-        var relatedQuery;
-        if (contact && contactEmail) {
-          params.contact_id = contact.id;
+        var operation = 'owned';
+        // This property is set to false till filters are not working properly
+        var filterIsWorkingProperly = false;
+
+        if (!contact || !contactEmail || !filterIsWorkingProperly) {
+          return null;
         }
 
-        filters = this.prepareRelevantFilters();
-        relatedQuery = this.prepareRelatedFilter(modelName);
-        params = this.prepareBaseQuery(modelName, filters);
-        params = GGRC.Utils.Snapshots.transformQuery(params);
-        params.permissions = 'update';
-
+        return {
+          expression: {
+            op: {name: operation},
+            ids: [String(contact.id)],
+            object_name: this.attr('type')
+          }
+        };
+      },
+      getQuery: function () {
+        var modelName = this.attr('type');
+        var filters = this.prepareRelevantFilters();
+        var ownedFilter = this.prepareOwnedFilter();
+        var query = this.prepareBaseQuery(modelName, filters, ownedFilter);
+        var relatedQuery = this.prepareRelatedQuery(modelName, ownedFilter);
+        // Transform Base Query to Snapshot
+        query = GGRC.Utils.Snapshots.transformQuery(query);
+        // Add Permission check
+        query.permissions = 'update';
+        // Transform Related Query to Snapshot
         relatedQuery = GGRC.Utils.Snapshots.transformQuery(relatedQuery);
-        return {data: [params, relatedQuery]};
+        return {data: [query, relatedQuery]};
       },
       load: function () {
         var dfd = can.Deferred();

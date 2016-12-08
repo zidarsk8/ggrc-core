@@ -538,9 +538,10 @@
      * @param {Object} relevant.type - Type of relevant object
      * @param {Object} relevant.id - Id of relevant object
      * @param {Object} relevant.operation - Type of operation.
+     * @param {Object|Array} additionalFilter - Additional filters to be applied
      * @return {Object} Object of QueryAPIRequest
      */
-    function buildRelevantIdsQuery(objName, page, relevant) {
+    function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
       var params = {};
 
       if (!objName) {
@@ -548,7 +549,8 @@
       }
 
       params.object_name = objName;
-      params.filters = _makeFilter(objName, page.filter, relevant);
+      params.filters =
+        _makeFilter(objName, page.filter, relevant, additionalFilter);
       params.type = 'ids';
 
       return params;
@@ -569,7 +571,7 @@
      * @param {Object} relevant.id - Id of relevant object
      * @param {Object} relevant.operation - Type of operation.
      * @param {Array} fields - Array of requested fields.
-     * @param {Object} additionalFilter - An additional filter to be applied
+     * @param {Object|Array} additionalFilter - Additional filters to be applied
      * @return {Object} Object of QueryAPIRequest
      */
     function buildParam(objName, page, relevant, fields, additionalFilter) {
