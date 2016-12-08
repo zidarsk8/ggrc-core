@@ -1005,6 +1005,7 @@ can.Control('GGRC.Controllers.Modals', {
   '{instance} destroyed': ' hide',
 
   ' hide': function (el, ev) {
+    var cad;
     if (this.disable_hide) {
       ev.stopImmediatePropagation();
       ev.stopPropagation();
@@ -1015,6 +1016,13 @@ can.Control('GGRC.Controllers.Modals', {
       // Ensure that this modal was hidden and not a child modal
       this.element && ev.target === this.element[0] &&
       !this.options.skip_refresh && !this.options.instance.isNew()) {
+      if (this.options.instance.type === 'AssessmentTemplate') {
+        cad = this.options.instance.attr('custom_attribute_definitions');
+        cad = _.filter(cad, function (attr) {
+          return attr.id;
+        });
+        this.options.instance.attr('custom_attribute_definitions', cad);
+      }
       this.options.instance.refresh();
     }
   },
