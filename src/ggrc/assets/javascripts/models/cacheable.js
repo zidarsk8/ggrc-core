@@ -258,7 +258,9 @@
       this.bind('created', function (ev, new_obj) {
         var cache = can.getObject('cache', new_obj.constructor, true);
         if (new_obj[id_key] || new_obj[id_key] === 0) {
-          cache[new_obj[id_key]] = new_obj;
+          if (!GGRC.Utils.Snapshots.isSnapshot(new_obj)) {
+            cache[new_obj[id_key]] = new_obj;
+          }
           if (cache[undefined] === new_obj)
             delete cache[undefined];
         }
@@ -407,7 +409,10 @@
 
     newInstance: function (args) {
       var cache = can.getObject('cache', this, true);
-      if (args && args[this.id] && cache[args[this.id]]) {
+      var isKeyExists = args && args[this.id];
+      var isObjectExists = isKeyExists && cache[args[this.id]];
+      var notSnapshot = args && !GGRC.Utils.Snapshots.isSnapshot(args);
+      if (isObjectExists && notSnapshot) {
         // cache[args.id].attr(args, false); //CanJS has bugs in recursive merging
         // (merging -- adding properties from an object without removing existing ones
         //  -- doesn't work in nested objects).  So we're just going to not merge properties.
@@ -569,7 +574,7 @@
       model = this.findInCacheById(params[this.id]) ||
         (params.provisional_id &&
         can.getObject('provisional_cache', can.Model.Cacheable, true)[params.provisional_id]);
-      if (model) {
+      if (model && !GGRC.Utils.Snapshots.isSnapshot(params)) {
         if (model.provisional_id && params.id) {
           delete can.Model.Cacheable.provisional_cache[model.provisional_id];
           model.removeAttr('provisional_id');
@@ -735,8 +740,10 @@
       var id_key = this.constructor.id;
       var that = this;
       GGRC.Utils.Snapshots.setAttrs(this);
-      if (this[id_key] || this[id_key] === 0)
+      if ((this[id_key] || this[id_key] === 0) &&
+        !GGRC.Utils.Snapshots.isSnapshot(this)) {
         cache[this[id_key]] = this;
+      }
       this.attr('class', this.constructor);
       this.notifier = new PersistentNotifier({name: this.constructor.model_singular});
 
