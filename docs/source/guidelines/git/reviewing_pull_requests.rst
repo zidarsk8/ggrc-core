@@ -170,7 +170,7 @@ A pull request **must be rejected** if **any** of the following is true:
 -  The review reveals that the PR has introduced new issues,
 -  At least one of the automatic checks on the continuous integration
    server fails, i.e. the build is broken,
--  The new code contains severe readability, logical and/or
+-  The new code contains severe readability, logical, performance, and/or
    architectural issues,
 -  The new code is not sufficiently covered with automated tests
    (subject to exceptions, e.g. when a test would be disproportionally
@@ -190,11 +190,7 @@ Sometimes, however, a PR looks good, but the reviewer is nevertheless
 not yet 100% confident with merging it, usually due to its complexity
 and/or size, or his own lesser familiarity with the project codebase. In
 such cases, the reviewer can still express the approval of the PR, but
-defer the final verdict on merging to other reviewers.
-
-An approval is given by posting a comment containing a thumb-up icon
-(:+1:). For this reason, this icon icon *should not* be used in regular
-comments, as it might mislead somebody to a false conclusion.
+defer the final verdict on merging to other reviewers (assign if necessary).
 
 
 .. _merging-pull-requests:
@@ -210,10 +206,14 @@ A pull request can be merged only if **all** of the following is true:
 -  All automatic continuous integration checks have passed,
 -  The pull request does not contain **any of your commits**. You are
    not allowed to merge your own work, including the pull requests that
-   you have at least partially contributed to.
--  The pull request is **not** labeled with the ``needs work`` or the
-   ``question`` label, meaning that all open questions and issues have
-   been resolved.
+   you have at least partially contributed to,
+-  The pull request is **not** labeled with any of the "blocking" labels
+   (``needs work``, ``next release``, ``on hold``, ``question``,
+   ``wrong branch``), meaning that not all open questions and issues have been
+   resolved yet,
+-  The pull request does **not** have any Reviewers assigned that have not yet
+   completed their review (seek information on why, if necessary), or if at
+   least one of the reviewers has requested changes.
 
 
 Setting up (and tearing down) the environment - step by step guide
