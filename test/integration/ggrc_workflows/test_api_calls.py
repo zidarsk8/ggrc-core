@@ -1,7 +1,7 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from nose.plugins.skip import SkipTest
+import unittest
 
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import Workflow
@@ -70,7 +70,7 @@ class TestWorkflowsApiPost(TestCase):
     self.assertEqual(response.status_code, 201)
 
   # TODO: Api should be able to handle invalid data
-  @SkipTest
+  @unittest.skip("Not implemented.")
   def test_create_task_group_invalid_workflow_data(self):
     wf = {"id": -1, "context": {"id": -1}}
     data = self.get_task_group_dict(wf)

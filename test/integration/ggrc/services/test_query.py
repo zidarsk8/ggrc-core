@@ -5,10 +5,11 @@
 
 """Tests for /query api endpoint."""
 
+import unittest
+
 from datetime import datetime
 from operator import itemgetter
 from flask import json
-from nose.plugins.skip import SkipTest
 
 from ggrc import db
 from ggrc.models import CustomAttributeDefinition as CAD
@@ -174,7 +175,7 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
             for program in programs["values"]),
     )
 
-  @SkipTest
+  @unittest.skip("Not implemented.")
   def test_basic_query_missing_field(self):
     """Filter fails on non-existing field."""
     data = self._make_query_dict(
@@ -496,7 +497,7 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
         set(programs_ids["ids"]),
     )
 
-  @SkipTest
+  @unittest.skip("Not implemented")
   def test_self_link(self):
     # It would be good if the api accepted get requests and we could add the
     # query into a get parameter, then each request would also get a self link
