@@ -1,6 +1,8 @@
 # Copyright (C) 2016 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+# pylint: disable=invalid-name
+
 """Tests for notifications for models with assignable mixin."""
 
 from datetime import datetime
@@ -9,7 +11,7 @@ from mock import patch
 from sqlalchemy import and_
 
 from ggrc import db
-from ggrc.models import Request
+from ggrc.models import Assessment
 from ggrc.models import Notification
 from ggrc.models import NotificationType
 from ggrc.models import Revision
@@ -73,107 +75,108 @@ class TestAssignableNotification(converters.TestCase):
     )
 
   @patch("ggrc.notifications.common.send_email")
-  def test_request_without_verifiers(self, _):
-    """Test setting notification entries for simple requests.
+  def test_assessment_without_verifiers(self, _):
+    """Test setting notification entries for simple assessments.
 
-    This function tests that each request gets an entry in the notifications
-    table after it's been created.
-    Second part of the tests is to make sure that request status does not add
-    any new notification entries if the request does not have a verifier.
+    This function tests that each assessment gets an entry in the
+    notifications table after it's been created.
+    Second part of the tests is to make sure that assessment status
+    does not add any new notification entries if the assessment
+    does not have a verifier.
     """
 
     with freeze_time("2015-04-01"):
 
       self.assertEqual(self._get_notifications().count(), 0)
-      self.import_file("request_full_no_warnings.csv")
-      requests = {request.slug: request for request in Request.query}
+      self.import_file("assessment_with_templates.csv")
+      asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
       notifications = self._get_notifications().all()
-      self.assertEqual(len(notifications), 12)
+      self.assertEqual(len(notifications), 6)
 
       revisions = Revision.query.filter(
           Revision.resource_type == 'Notification',
           Revision.resource_id.in_([notif.id for notif in notifications])
       ).count()
-      self.assertEqual(revisions, 12)
+      self.assertEqual(revisions, 6)
 
-      self.api_helper.delete(requests["Request 1"])
-      self.api_helper.delete(requests["Request 11"])
+      self.api_helper.delete(asmts["A 1"])
+      self.api_helper.delete(asmts["A 6"])
 
-      self.assertEqual(self._get_notifications().count(), 10)
+      self.assertEqual(self._get_notifications().count(), 4)
 
       self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
 
-      request = Request.query.get(requests["Request 9"].id)
+      asmt = Assessment.query.get(asmts["A 5"].id)
 
-      self.api_helper.modify_object(request, {"status": Request.FINAL_STATE})
+      self.api_helper.modify_object(asmt, {"status": Assessment.FINAL_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request, {"status": Request.START_STATE})
+      self.api_helper.modify_object(asmt, {"status": Assessment.START_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request,
-                                    {"status": Request.PROGRESS_STATE})
+      self.api_helper.modify_object(asmt,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request, {"status": Request.FINAL_STATE})
+      self.api_helper.modify_object(asmt, {"status": Assessment.FINAL_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request,
-                                    {"status": Request.PROGRESS_STATE})
+      self.api_helper.modify_object(asmt,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
 
   @patch("ggrc.notifications.common.send_email")
-  def test_request_with_verifiers(self, _):
-    """Test notifications entries for declined requests.
+  def test_assessment_with_verifiers(self, _):
+    """Test notifications entries for declined assessments.
 
     This tests makes sure there are extra notification entries added when a
-    request has been declined.
+    assessment has been declined.
     """
 
     with freeze_time("2015-04-01"):
 
       self.assertEqual(self._get_notifications().count(), 0)
-      self.import_file("request_full_no_warnings.csv")
-      requests = {request.slug: request for request in Request.query}
+      self.import_file("assessment_with_templates.csv")
+      asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
       notifications = self._get_notifications().all()
-      self.assertEqual(len(notifications), 12)
+      self.assertEqual(len(notifications), 6)
 
       revisions = Revision.query.filter(
           Revision.resource_type == 'Notification',
           Revision.resource_id.in_([notif.id for notif in notifications])
       ).count()
-      self.assertEqual(revisions, 12)
+      self.assertEqual(revisions, 6)
 
       self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
 
-      request1 = Request.query.get(requests["Request 1"].id)
-      # start and finish request 1
-      self.api_helper.modify_object(request1,
-                                    {"status": Request.PROGRESS_STATE})
+      asmt1 = Assessment.query.get(asmts["A 5"].id)
+      # start and finish assessment 1
+      self.api_helper.modify_object(asmt1,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request1, {"status": Request.DONE_STATE})
+      self.api_helper.modify_object(asmt1, {"status": Assessment.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      # decline request 1
-      self.api_helper.modify_object(request1,
-                                    {"status": Request.PROGRESS_STATE})
+      # decline assessment 1
+      self.api_helper.modify_object(asmt1,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
-      self.api_helper.modify_object(request1, {"status": Request.DONE_STATE})
+      self.api_helper.modify_object(asmt1, {"status": Assessment.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
-      # decline request 1 the second time
-      self.api_helper.modify_object(request1,
-                                    {"status": Request.PROGRESS_STATE})
+      # decline assessment 1 the second time
+      self.api_helper.modify_object(asmt1,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
 
-      request6 = Request.query.get(requests["Request 6"].id)
-      # start and finish request 6
-      self.api_helper.modify_object(request6,
-                                    {"status": Request.PROGRESS_STATE})
+      asmt6 = Assessment.query.get(asmts["A 6"].id)
+      # start and finish assessment 6
+      self.api_helper.modify_object(asmt6,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
-      self.api_helper.modify_object(request6, {"status": Request.DONE_STATE})
+      self.api_helper.modify_object(asmt6, {"status": Assessment.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
-      # decline request 6
-      self.api_helper.modify_object(request6,
-                                    {"status": Request.PROGRESS_STATE})
+      # decline assessment 6
+      self.api_helper.modify_object(asmt6,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 2)
 
       # send all notifications
@@ -181,22 +184,22 @@ class TestAssignableNotification(converters.TestCase):
       self.assertEqual(self._get_notifications().count(), 0)
 
       # Refresh the object because of the lost session due to the get call.
-      request6 = Request.query.get(requests["Request 6"].id)
-      self.api_helper.modify_object(request6,
-                                    {"status": Request.PROGRESS_STATE})
+      asmt6 = Assessment.query.get(asmts["A 6"].id)
+      self.api_helper.modify_object(asmt6,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request6,
-                                    {"status": Request.DONE_STATE})
+      self.api_helper.modify_object(asmt6,
+                                    {"status": Assessment.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request6,
-                                    {"status": Request.VERIFIED_STATE})
+      self.api_helper.modify_object(asmt6,
+                                    {"status": Assessment.VERIFIED_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request6,
-                                    {"status": Request.PROGRESS_STATE})
+      self.api_helper.modify_object(asmt6,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      # decline request 6
-      self.api_helper.modify_object(request6, {"status": Request.DONE_STATE})
+      # decline assessment 6
+      self.api_helper.modify_object(asmt6, {"status": Assessment.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(request6,
-                                    {"status": Request.PROGRESS_STATE})
+      self.api_helper.modify_object(asmt6,
+                                    {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
