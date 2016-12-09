@@ -135,6 +135,7 @@ class SnapshotGenerator(object):
     updated = result.response
     if not self.dry_run:
       reindex_pairs(updated)
+      self._copy_snapshot_relationships()
     return result
 
   def _update(self, for_update, event, revisions, _filter):
@@ -290,6 +291,7 @@ class SnapshotGenerator(object):
     to_reindex = updated | created
     if not self.dry_run:
       reindex_pairs(to_reindex)
+      self._copy_snapshot_relationships()
     return OperationResponse("upsert", True, {
         "create": create,
         "update": update
@@ -322,6 +324,7 @@ class SnapshotGenerator(object):
     created = result.response
     if not self.dry_run:
       reindex_pairs(created)
+      self._copy_snapshot_relationships()
     return result
 
   def _create(self, for_create, event, revisions, _filter):
@@ -419,6 +422,50 @@ class SnapshotGenerator(object):
       with benchmark("Snapshot._create.write revisions to database"):
         self._execute(models.Revision.__table__.insert(), revision_payload)
       return OperationResponse("create", True, for_create, response_data)
+
+  def _copy_snapshot_relationships(self):
+    """Add relationships between snapshotted objects.
+
+    Create relationships between individual snapshots if a relationship exists
+    between a pair of object that was snapshotted. These relationships get
+    created for all objects inside a single parent scope.
+    """
+    for parent in self.parents:
+      query = """
+          INSERT IGNORE INTO relationships (
+              modified_by_id,
+              created_at,
+              updated_at,
+              source_id,
+              source_type,
+              destination_id,
+              destination_type,
+              context_id
+          )
+          SELECT
+              :user_id,
+              now(),
+              now(),
+              snap_1.id,
+              "Snapshot",
+              snap_2.id,
+              "Snapshot",
+              snap_2.context_id
+          FROM relationships AS rel
+          INNER JOIN snapshots AS snap_1
+              ON (snap_1.child_type, snap_1.child_id) =
+                 (rel.source_type, rel.source_id)
+          INNER JOIN snapshots AS snap_2
+              ON (snap_2.child_type, snap_2.child_id) =
+                 (rel.destination_type, rel.destination_id)
+          WHERE
+              snap_1.parent_id = :parent_id AND
+              snap_2.parent_id = :parent_id
+          """
+      db.session.execute(query, {
+          "user_id": get_current_user_id(),
+          "parent_id": parent.id
+      })
 
 
 def create_snapshots(objs, event, revisions=None, _filter=None, dry_run=False):
