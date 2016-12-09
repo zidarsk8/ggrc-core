@@ -308,33 +308,6 @@ class TestAutomappings(integration.ggrc.TestCase):
                  (control, section)],
     )
 
-  def test_automapping_request_audit(self):
-    _, creator = self.gen.generate_person(user_role="Creator")
-    program = self.create_object(models.Program, {
-        'title': make_name('Program')
-    })
-    audit = self.create_object(models.Audit, {
-        'title': make_name('Audit'),
-        'program': {'id': program.id},
-        'status': 'Planned',
-    })
-    control = self.create_object(models.Control, {
-        'title': make_name('Test control')
-    })
-    self.create_mapping(audit, control)
-    request = self.create_object(models.Request, {
-        'audit': {'id': audit.id},
-        'title': make_name('Request'),
-        'assignee': {'id': creator.id},
-        'request_type': 'documentation',
-        'status': 'Not Started',
-        'start_date': '1/1/2015',
-        'end_date': '1/1/2016',
-    })
-    self.assert_mapping(request, program)
-    self.assert_mapping(request, audit, missing=True)
-    self.assert_mapping(request, control, missing=True)
-
   def test_automapping_control_assesment(self):
     program = self.create_object(models.Program, {
         'title': make_name('Program')
