@@ -58,7 +58,6 @@
       return false;
     },
     widget_hidden: function (event) {
-      this.setState('requests', {total: 0, statuses: { }}, true);
       this.setState('assessments', {total: 0, statuses: { }}, true);
       return false;
     },
@@ -67,8 +66,6 @@
       this.loadChartLibrary(function () {
         that.reloadChart('Assessment', 'assessments',
           'piechart_audit_assessments_chart');
-        that.reloadChart('Request', 'requests',
-          'piechart_audit_requests_chart');
       });
     },
     reloadChart: function (type, name, elementId) {
