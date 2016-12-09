@@ -17,9 +17,11 @@
     tag: tag,
     template: tpl,
     scope: {
+      mappedSnapshots: true,
       titleText: '@',
       filter: {
-        only: ['Control']
+        only: ['Control'],
+        exclude: []
       },
       mapping: '@',
       mappingType: '@',

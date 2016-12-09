@@ -18,8 +18,10 @@
     template: tpl,
     scope: {
       titleText: '@',
+      mappedSnapshots: true,
       filter: {
-        exclude: ['Control']
+        exclude: ['Control'],
+        only: []
       },
       mapping: '@',
       mappingType: '@',
