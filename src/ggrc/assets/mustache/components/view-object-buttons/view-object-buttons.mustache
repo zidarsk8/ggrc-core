@@ -6,9 +6,11 @@
 {{#if instance.viewLink}}
   {{#is_allowed "view_object_page" instance}}
     {{^openIsHidden}}
+    {{^instance.snapshot}}
     <a href="{{instance.viewLink}}" target="_blank" class="btn btn-mini btn-outline">
       Open
     </a>
+    {{/instance.snapshot}}
     {{/openIsHidden}}
     <a href="#" class="btn btn-mini btn-outline" can-click="maximizeObject">
       View
