@@ -1,0 +1,35 @@
+{{!
+  Copyright (C) 2016 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="snapshot-list-toolbar flex-box flex-box-single flex-row-reverse">
+    <button
+            can-click="onSearch"
+            class="btn btn-small btn-info"
+            {{#inProgress}}disabled="disabled"{{/inProgress}}>
+        Search
+    </button>
+</div>
+{{#if items.length}}
+<div class="flex-box flex-box-single flex-row-reverse">
+    <div class="snapshot-list-selection-switcher">
+        Select:
+        <button can-click="unselectAll"
+                class="btn btn-link" {{#inProgress}}disabled="disabled"{{/inProgress}}>None
+        </button>
+        |
+        <button can-click="selectAll"
+                class="btn btn-link" {{#allSelected}}disabled="disabled"{{/allSelected}}>All
+        </button>
+    </div>
+</div>
+<div class="snapshot-list-body {{#isLoading}}loading{{/isLoading}} well">
+    <object-list items="items" is-loading="isLoading" spinner-css="grid-spinner">
+        <snapshot-loader-item item-data="instance"></snapshot-loader-item>
+    </object-list>
+</div>
+<tree-pagination paging="paging" class="snapshot-list-pagination"></tree-pagination>
+{{else}}
+  <div class="well well-small">No Objects to select</div>
+{{/if}}

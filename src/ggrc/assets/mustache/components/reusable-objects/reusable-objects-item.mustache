@@ -9,7 +9,9 @@
       {{#if disabled}}
           <input type="checkbox" checked="checked" disabled/>
       {{else}}
-          <input type="checkbox" {{#isSaving}}disabled{{/isSaving}}/>
+          <input type="checkbox"
+                 can-value="isChecked"
+            {{#isSaving}}disabled{{/isSaving}}/>
       {{/if}}
     {{/is_allowed}}
   {{/is_allowed}}

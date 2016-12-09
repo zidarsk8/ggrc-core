@@ -7,7 +7,7 @@
   'use strict';
 
   var tpl = can.view(GGRC.mustache_path +
-      '/components/reusable-objects/reusable-objects-item.mustache');
+    '/components/reusable-objects/reusable-objects-item.mustache');
 
   can.Component.extend({
     tag: 'reusable-objects-item',
@@ -19,14 +19,16 @@
       selectedList: [],
       disabled: false,
       mapping: null,
+      isChecked: false,
       isDisabled: function () {
         return this.attr('disabled');
       },
       setDisabled: function () {
-        var isDisabled = GGRC.Utils.is_mapped(
-          this.attr('baseInstance'),
-          this.attr('instance'),
-          this.attr('mapping'));
+        var isDisabled = this.attr('instance.isMapped') ||
+          GGRC.Utils.is_mapped(
+            this.attr('baseInstance'),
+            this.attr('instance'),
+            this.attr('mapping'));
         this.attr('disabled', isDisabled);
       },
       toggleSelection: function (isChecked) {
@@ -44,8 +46,8 @@
       this.scope.setDisabled();
     },
     events: {
-      'input[type="checkbox"] change': function (el) {
-        this.scope.toggleSelection(el.is(':checked'));
+      '{scope} isChecked': function (scope, ev, isChecked) {
+        this.scope.toggleSelection(isChecked);
       },
       '{scope} checkReusedStatus': function (scope, ev, performCheck) {
         if (performCheck) {

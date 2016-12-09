@@ -20,7 +20,29 @@ GGRC.permissions = {
   update: {},
   view_object_page: {}
 };
-GGRC.config = {};
+GGRC.config = {
+  snapshotable_parents: ['Audit'],
+  snapshotable_objects: [
+    'Control',
+    'Product',
+    'OrgGroup',
+    'Vendor',
+    'Risk',
+    'Facility',
+    'Process',
+    'Clause',
+    'Section',
+    'DataAsset',
+    'AccessGroup',
+    'System',
+    'Contract',
+    'Standard',
+    'Objective',
+    'Regulation',
+    'Threat',
+    'Policy',
+    'Market']
+};
 GGRC.Bootstrap = {
   exportable: [{
     title_plural: 'Audits',
