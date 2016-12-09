@@ -66,33 +66,49 @@ that can (and should!) be used for tagging pull requests. Labeling
 enables easier PR categorization and searching, thus make sure to use
 them.
 
-The meaning of the lables and their intended usage is as follows (sorted
+The meaning of the labels and their intended usage is as follows (sorted
 alphabetically):
 
--  ``documentation`` - a PR contains the updates of project
-   documentation,
--  ``migration`` - a PR contains a migration script that changes the
-   database schema. Such pull requests require additional setup and
-   verification steps,
--  ``needs work`` - a reviewer has concluded that the PR requires
-   additional work before it can be accepted and merged,
--  ``next release`` - the PR will be merged after the current release
-   has branched off of the main development branch, and should not be
-   merged just yet,
--  ``please review`` - the author asked that the PR should be reviewed
-   with a higher priority. This label is usually used when the PR has
-   not received enough attention for a considerable time period, or
-   because it is important and attempts to resolve an important/blocking
-   issue,
--  ``question`` - the PR author seeks advice/feedback on some code
-   feature and/or design decision. It can also be used by a reviewer to
-   ask the PR author for additional explanation before a decision can be
-   made on whether the PR meets all the requirements. On top of that,
-   this label is occasionally used when a reviewer makes a non-essential
-   suggestion for a PR change, but that change is not required to deem
-   the PR ready to merge,
--  ``wrong branch`` - the author sent the PR to the wrong branch. The
-   author should re-issue the same PR against the correct branch.
+- ``critical`` - the PR has the highest possible priority and should thus be
+  reviewed *immediately*. Cases when applying this label is justifiable are,
+  among others, when a PR fixes a blocking issue or a severe issue that needs
+  to be shipped to production in the shortest time possible. Should be used
+  sparsely,
+- ``documentation`` - the PR contains updates to project documentation,
+- ``migration`` - the PR contains a migration script that changes the
+  database schema. Such pull requests require additional setup and
+  verification steps,
+- ``needs work`` - a reviewer or the PR author has concluded that the PR
+  requires additional work before it can be accepted and merged,
+- ``new contribution`` - the PR author is a new contributor that might not yet
+  be familiar with the project workflow, conventions, and other nuances. Please
+  take extra care and effort to answer all the questions, and to explain things
+  as necessary in a welcoming manner, even if they might seem trivial to
+  a seasoned contributor,
+- ``next release`` - the PR will be merged after the current release
+  has branched off of the main development branch, and should not be
+  merged just yet,
+- ``on hold`` - the PR has been temporarily put on hold for a reason that does
+  not fall under any of the other labels. An example would be a case when
+  merging the PR would potentially result in a merge conflict with another PR
+  that is otherwise difficult to review and update, thus resolving such issues
+  would likely be easier on the (less complex) PR itself,
+- ``please review`` - the author asked that the PR should be reviewed
+  with a higher priority. This label is usually used when the PR has either
+  not received enough attention for a considerable period of time, attempts to
+  resolve an important issue, or blocks another (important) PR,
+- ``question`` - the PR author seeks advice/feedback on some code
+  feature and/or design decision. It can also be used by a reviewer to
+  ask the PR author for additional explanation before a decision can be
+  made on whether the PR meets all the requirements. On top of that,
+  this label is occasionally used when a reviewer makes a non-essential
+  suggestion for a PR change, but that change is not required to deem
+  the PR ready to merge,
+- ``wrong branch`` - the author sent the PR to the wrong branch. The
+  author should re-issue the same PR against the correct branch.
+
+  IMPORTANT: The last commit **must** be modified and force-pushed again, so
+  that the tests are re-run against the new base branch.
 
 
 .. _reviewing-and-merging-pull-requests:
