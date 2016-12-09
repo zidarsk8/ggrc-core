@@ -120,29 +120,29 @@ class TestSnapshot(TestCase):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     self._create_cas()
-    self._import_file("all_snapshottable_objects.csv")
+    response = self._import_file("all_snapshottable_objects.csv")
+    self._check_csv_response(response, {})
 
   @staticmethod
   def _create_cas():
     """Create custom attribute definitions."""
-    for type_ in ["facility", "control", "market", "section"]:
+    ca_model_names = ["facility", "control", "market", "section", "threat"]
+    ca_args = [
+        {"title": "CA text", "attribute_type": "Text"},
+        {"title": "CA rich text", "attribute_type": "Rich Text"},
+        {"title": "CA date", "attribute_type": "Date"},
+        {"title": "CA checkbox", "attribute_type": "Checkbox"},
+        {"title": "CA person", "attribute_type": "Map:Person"},
+        {"title": "CA dropdown", "attribute_type": "Dropdown",
+         "multi_choice_options": "one,two,three,four,five"},
+    ]
+    for type_ in ca_model_names:
       with app.app_context():
-        factories.CustomAttributeDefinitionFactory(
-            title="CA dropdown",
-            definition_type=type_,
-            attribute_type="Dropdown",
-            multi_choice_options="one,two,three,four,five",
-        )
-        factories.CustomAttributeDefinitionFactory(
-            title="CA text",
-            definition_type=type_,
-            attribute_type="Text",
-        )
-        factories.CustomAttributeDefinitionFactory(
-            title="CA date",
-            definition_type=type_,
-            attribute_type="Date",
-        )
+        for args in ca_args:
+          factories.CustomAttributeDefinitionFactory(
+              definition_type=type_,
+              **args
+          )
 
   def test_revision_conent(self):
     """Test that revision contains all content needed."""
