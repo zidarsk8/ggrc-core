@@ -56,23 +56,6 @@ def _get_columns():
   return snapshot_columns, revision_columns
 
 
-def _get_revision_content(revision_ids=None):
-  """Get content for provided revision_ids
-
-  Args:
-    revision_ids: An iterable of revision IDs
-  Returns:
-    Dictionary mapping revision_ids to content.
-  """
-  revision_dict = dict()
-  if revision_ids:
-    revisions = db.session.query(
-        models.Revision.id,
-        models.Revision.content).filter(models.Revision.id.in_(revision_ids))
-    revision_dict = dict(revisions)
-  return revision_dict
-
-
 def _get_model_properties():
   """Get indexable properties for all snapshottable objects
 
