@@ -167,10 +167,15 @@ class TestReminderable(ggrc.TestCase):
           "reminderType": "statusToPerson"
       })
 
-      self.assertEqual(
-          self._get_notifications(
-              False, "assessment_assessor_reminder").count(),
-          1)
+      notifications = self._get_notifications(
+          False, "assessment_assessor_reminder",
+      ).all()
+      self.assertEqual(len(notifications), 1)
+
+      notif = notifications[0]
+      revisions = models.Revision.query.filter_by(resource_type='Notification',
+                                                  resource_id=notif.id).count()
+      self.assertEqual(revisions, 1)
 
     with freeze_time("2015-04-02 01:01:01"):
       self.client.get("/_notifications/send_daily_digest")
@@ -186,10 +191,15 @@ class TestReminderable(ggrc.TestCase):
 
       self.send_reminder(assessment)
 
-      self.assertEqual(
-          self._get_notifications(
-              False, "assessment_assessor_reminder").count(),
-          1)
+      notifications = self._get_notifications(
+          False, "assessment_assessor_reminder",
+      ).all()
+      self.assertEqual(len(notifications), 1)
+
+      notif = notifications[0]
+      revisions = models.Revision.query.filter_by(resource_type='Notification',
+                                                  resource_id=notif.id).count()
+      self.assertEqual(revisions, 1)
 
     with freeze_time("2015-04-02 01:01:01"):
       self.client.get("/_notifications/send_daily_digest")
@@ -232,10 +242,15 @@ class TestReminderable(ggrc.TestCase):
 
       self.send_reminder(assessment)
 
-      self.assertEqual(
-          self._get_notifications(
-              False, "assessment_assessor_reminder").count(),
-          1)
+      notifications = self._get_notifications(
+          False, "assessment_assessor_reminder",
+      ).all()
+      self.assertEqual(len(notifications), 1)
+
+      notif = notifications[0]
+      revisions = models.Revision.query.filter_by(resource_type='Notification',
+                                                  resource_id=notif.id).count()
+      self.assertEqual(revisions, 1)
 
       self.change_status(assessment, models.Assessment.DONE_STATE)
 

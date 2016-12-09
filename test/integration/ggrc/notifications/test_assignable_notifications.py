@@ -12,6 +12,7 @@ from ggrc import db
 from ggrc.models import Request
 from ggrc.models import Notification
 from ggrc.models import NotificationType
+from ggrc.models import Revision
 from integration.ggrc import converters
 from integration.ggrc import api_helper
 
@@ -87,7 +88,14 @@ class TestAssignableNotification(converters.TestCase):
       self.import_file("request_full_no_warnings.csv")
       requests = {request.slug: request for request in Request.query}
 
-      self.assertEqual(self._get_notifications().count(), 12)
+      notifications = self._get_notifications().all()
+      self.assertEqual(len(notifications), 12)
+
+      revisions = Revision.query.filter(
+          Revision.resource_type == 'Notification',
+          Revision.resource_id.in_([notif.id for notif in notifications])
+      ).count()
+      self.assertEqual(revisions, 12)
 
       self.api_helper.delete(requests["Request 1"])
       self.api_helper.delete(requests["Request 11"])
@@ -126,7 +134,14 @@ class TestAssignableNotification(converters.TestCase):
       self.import_file("request_full_no_warnings.csv")
       requests = {request.slug: request for request in Request.query}
 
-      self.assertEqual(self._get_notifications().count(), 12)
+      notifications = self._get_notifications().all()
+      self.assertEqual(len(notifications), 12)
+
+      revisions = Revision.query.filter(
+          Revision.resource_type == 'Notification',
+          Revision.resource_id.in_([notif.id for notif in notifications])
+      ).count()
+      self.assertEqual(revisions, 12)
 
       self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)

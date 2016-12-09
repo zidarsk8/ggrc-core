@@ -15,6 +15,7 @@ from ggrc.models.deferred import deferred
 from ggrc.models.revision import Revision
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
+from ggrc.models.mixins import Notifiable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.relationship import Relatable
 
@@ -102,7 +103,7 @@ class Commentable(object):
     )
 
 
-class Comment(Relatable, Described, Ownable, Base, db.Model):
+class Comment(Relatable, Described, Ownable, Notifiable, Base, db.Model):
   """Basic comment model."""
   __tablename__ = "comments"
 

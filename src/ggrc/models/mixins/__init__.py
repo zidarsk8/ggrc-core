@@ -34,6 +34,7 @@ from ggrc.models.deferred import deferred
 from ggrc.models.inflector import ModelInflectorDescriptor
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins.customattributable import CustomAttributable
+from ggrc.models.mixins.notifiable import Notifiable
 
 
 # pylint: disable=invalid-name
@@ -698,23 +699,24 @@ class TestPlanned(object):
 
 
 __all__ = [
-    Base,
-    BusinessObject,
-    ChangeTracked,
-    ContextRBAC,
-    CustomAttributable,
-    Described,
-    FinishedDate,
-    Hierarchical,
-    Hyperlinked,
-    Identifiable,
-    Mapping,
-    Noted,
-    Slugged,
-    Stateful,
-    TestPlanned,
-    Timeboxed,
-    Titled,
-    VerifiedDate,
-    WithContact,
+    "Base",
+    "BusinessObject",
+    "ChangeTracked",
+    "ContextRBAC",
+    "CustomAttributable",
+    "Described",
+    "FinishedDate",
+    "Hierarchical",
+    "Hyperlinked",
+    "Identifiable",
+    "Mapping",
+    "Noted",
+    "Notifiable",
+    "Slugged",
+    "Stateful",
+    "TestPlanned",
+    "Timeboxed",
+    "Titled",
+    "VerifiedDate",
+    "WithContact",
 ]

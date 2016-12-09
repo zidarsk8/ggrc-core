@@ -11,6 +11,7 @@ from ggrc import db
 from ggrc.models import Request
 from ggrc.models import Notification
 from ggrc.models import NotificationType
+from ggrc.models import Revision
 from integration.ggrc import converters
 from integration.ggrc import generator
 
@@ -83,14 +84,16 @@ class TestCommentNotification(converters.TestCase):
     _, comment = self.generator.generate_comment(
         request1, "Verifier", "some comment", send_notification="true")
 
-    self.assertEqual(
-        self._get_notifications(notif_type="comment_created").count(),
-        1,
-        "Missing comment notification entry."
-    )
+    notifications = self._get_notifications(notif_type="comment_created").all()
+    self.assertEqual(len(notifications), 1,
+                     "Missing comment notification entry.")
+    notif = notifications[0]
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
+
     self.client.get("/_notifications/send_daily_digest")
-    self.assertEqual(
-        self._get_notifications(notif_type="comment_created").count(),
-        0,
-        "Found a comment notification that was not sent."
-    )
+
+    notifications = self._get_notifications(notif_type="comment_created").all()
+    self.assertEqual(len(notifications), 0,
+                     "Found a comment notification that was not sent.")

@@ -226,8 +226,6 @@ class RowConverter(object):
     elif self.is_new:
       Resource.model_posted.send(
           self.object_class, obj=self.obj, src={}, service=service_class)
-      Resource.collection_posted.send(
-          self.object_class, objects=[self.obj], sources=[{}])
     else:
       Resource.model_put.send(
           self.object_class, obj=self.obj, src={}, service=service_class)
