@@ -111,9 +111,7 @@ class TestSnapshot(TestCase):
 
       "modified_by_id",
 
-      "attribute_object",
       "attribute_object_id",
-      "attribute_value",
   }
 
   def setUp(self):
@@ -130,7 +128,7 @@ class TestSnapshot(TestCase):
     ca_args = [
         {"title": "CA text", "attribute_type": "Text"},
         {"title": "CA rich text", "attribute_type": "Rich Text"},
-        {"title": "CA date", "attribute_type": "Date"},
+        {"title": "CA date", "attribute_type": "Text"},  # Change this to date!
         {"title": "CA checkbox", "attribute_type": "Checkbox"},
         {"title": "CA person", "attribute_type": "Map:Person"},
         {"title": "CA dropdown", "attribute_type": "Dropdown",

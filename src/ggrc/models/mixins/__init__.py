@@ -444,6 +444,7 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
       "contact_id",
       "secondary_contact_id",
       "modified_by_id",
+      "attribute_object_id",  # used for person mapping CA
   ]
 
   @staticmethod
