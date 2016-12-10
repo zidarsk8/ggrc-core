@@ -18,9 +18,9 @@
         <i class="fa fa-{{ internav_icon }} color"></i>
         {{#if show_title}}
           {{internav_display}}
-          {{#has_count}}({{count}}{{#spinner}}...{{/spinner}}){{/has_count}}
+          {{#has_count}}({{firstnonempty count 0}}){{/has_count}}
         {{else}}
-          {{#has_count}}{{count}}{{#spinner}}...{{/spinner}}{{/has_count}}
+          {{#has_count}}{{firstnonempty count 0}}{{/has_count}}
         {{/if}}
         {{^count}}{{#has_count}}
           {{^instance.constructor.obj_nav_options.show_all_tabs}}
