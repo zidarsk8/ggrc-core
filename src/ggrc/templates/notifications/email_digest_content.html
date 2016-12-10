@@ -86,7 +86,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   {% for task in digest['due_soon'].values() %}
                     <li {{ style.list_item() }} >
                       <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
-                      {{ task['title'] }}</a> due {{ task['fuzzy_due_in'] }}
+                      {{ task['title'] }}</a> {{ task['due_date_statement'] }}
                       <ul>
                       {% for related_object_title in task['related_objects'] %}
                         <li>{{ "%s" % related_object_title if related_object_title }}</li>
@@ -156,7 +156,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       New cycle of
                       <a href="{{ workflow['workflow_url'] }}" {{ style.link_text() }} >
                         {{ workflow['title'] }}</a>
-                      starts {{ workflow['fuzzy_start_date'] }}.
+                      {{ workflow['start_date_statement'] }}.
                     </li>
                   {% endfor %}
                   </ul>
@@ -169,10 +169,9 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     <li {{ style.list_item() }} >
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
-                        {{ assessment_data['title'] }}
-                      </a>
-                      {% if assessment_data.get('fuzzy_start_date') %}
-                        starts {{ assessment_data['fuzzy_start_date'] }}.
+                        {{ assessment_data['title'] }}</a>
+                      {% if assessment_data.get('start_date_statement') %}
+                        {{ assessment_data['start_date_statement'] }}.
                       {% endif %}
                     </li>
                   {% endfor %}
@@ -200,10 +199,9 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     <li {{ style.list_item() }} >
                       Request:
                       <a href="{{ request_data['url'] }}" {{ style.link_text() }} >
-                        {{ request_data['title'] }}
-                      </a>
-                      {% if request_data.get('fuzzy_start_date') %}
-                        starts {{ request_data['fuzzy_start_date'] }}.
+                        {{ request_data['title'] }}</a>
+                      {% if request_data.get('start_date_statement') %}
+                        {{ request_data['start_date_statement'] }}.
                       {% endif %}
                     </li>
                   {% endfor %}
