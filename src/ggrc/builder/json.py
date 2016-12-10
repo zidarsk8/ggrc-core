@@ -76,23 +76,6 @@ def publish(obj, inclusions=(), inclusion_filter=None):
   return obj
 
 
-def publish_stub(obj, inclusions=(), inclusion_filter=None):
-  """Generate a stub for obj."""
-  publisher = get_json_builder(obj)
-  if publisher:
-    ret = {}
-    self_url = url_for(obj)
-    if self_url:
-      ret['href'] = self_url
-    ret['type'] = obj.__class__.__name__
-    ret['context_id'] = obj.context_id
-    if getattr(publisher, '_stub_attrs', []):
-      ret.update(publisher.publish_stubs(obj, inclusions, inclusion_filter))
-    return ret
-  # Otherwise, just return the value itself by default
-  return obj
-
-
 def update(obj, json_obj):
   """Translate the state represented by ``json_obj`` into update actions
   performed upon the model object ``obj``. After performing the update ``obj``
@@ -540,12 +523,6 @@ def publish_representation(resource):
 class Builder(AttributeInfo):
   """JSON Dictionary builder for ggrc.models.* objects and their mixins."""
 
-  @staticmethod
-  def generate_link_object_for_foreign_key(id, type, context_id=None):
-    """Generate a link object for this object reference."""
-    return {'id': id, 'type': type, 'href': url_for(type, id=id),
-            'context_id': context_id}
-
   def generate_link_object_for(
           self, obj, inclusions, include, inclusion_filter):
     """Generate a link object for this object. If there are property paths
@@ -746,41 +723,20 @@ class Builder(AttributeInfo):
     for attr_name in attrs:
       UpdateAttrHandler.do_update_attr(obj, json_obj, attr_name)
 
-  def update_attrs(self, obj, json_obj):
-    """Translate the state representation given by ``json_obj`` into the
-    model object ``obj``.
-    """
-    self.do_update_attrs(obj, json_obj, self._update_attrs)
-
-  def create_attrs(self, obj, json_obj):
-    """Translate the state representation given by ``json_obj`` into the new
-    model object ``obj``.
-    """
-    self.do_update_attrs(obj, json_obj, self._create_attrs)
-
   def publish_contribution(self, obj, inclusions, inclusion_filter):
     """Translate the state represented by ``obj`` into a JSON dictionary"""
     json_obj = {}
     self.publish_attrs(obj, json_obj, inclusions, inclusion_filter)
     return json_obj
 
-  def publish_stubs(self, obj, inclusions, inclusion_filter):
-    """Translate the state represented by ``obj`` into a JSON dictionary
-    containing an abbreviated representation.
-    """
-    json_obj = {}
-    self._publish_attrs_for(
-        obj, self._stub_attrs, json_obj, inclusions, inclusion_filter)
-    return json_obj
-
   def update(self, obj, json_obj):
     """Update the state represented by ``obj`` to be equivalent to the state
     represented by the JSON dictionary ``json_obj``.
     """
-    self.update_attrs(obj, json_obj)
+    self.do_update_attrs(obj, json_obj, self._update_attrs)
 
   def create(self, obj, json_obj):
     """Update the state of the new model object ``obj`` to be equivalent to the
     state represented by the JSON dictionary ``json_obj``.
     """
-    self.create_attrs(obj, json_obj)
+    self.do_update_attrs(obj, json_obj, self._create_attrs)

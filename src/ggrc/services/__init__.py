@@ -89,10 +89,6 @@ def init_extra_services(app):
   app.add_url_rule(
       '/search', 'search', login_required(search))
 
-  from .log_event import log_event
-  app.add_url_rule(
-      '/api/log_events', 'log_events', log_event, methods=['POST'])
-
   from .description import ServiceDescription
   app.add_url_rule(
       '/api', view_func=ServiceDescription.as_view('ServiceDescription'))

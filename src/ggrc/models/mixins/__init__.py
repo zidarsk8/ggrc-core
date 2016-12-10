@@ -49,7 +49,6 @@ class Identifiable(object):
   # REST properties
   _publish_attrs = ['id', 'type']
   _update_attrs = []
-  _stub_attrs = ['id', 'type']
 
   _inflector = ModelInflectorDescriptor()
 
