@@ -11,9 +11,7 @@ from ggrc import db
 from ggrc import models
 from ggrc.automapper.rules import rules
 from ggrc.login import get_current_user
-from ggrc.models.audit import Audit
 from ggrc.models.relationship import Relationship
-from ggrc.models.request import Request
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import Resource, get_cache
 from ggrc.utils import benchmark, with_nop
@@ -241,33 +239,6 @@ class AutomapperGenerator(object):
     return True
 
 
-def handle_relationship_post(source, destination):
-  """Handle posting of special relationships.
-
-  This function handles direct relationships that do not have a relationship
-  object. A fake object is created with source and destination and auto
-  mappings are then generated.
-
-  Args:
-    source: Source model of relationship
-    destination: Destination model of relationship
-
-  """
-  if source is None:
-    logger.warning("Automapping request listener: "
-                   "no source, no mappings created")
-    return
-  if destination is None:
-    logger.warning("Automapping request listener: "
-                   "no destination, no mappings created")
-    return
-  relationship = Relationship(source_type=source.type,
-                              source_id=source.id,
-                              destination_type=destination.type,
-                              destination_id=destination.id)
-  AutomapperGenerator().generate_automappings(relationship)
-
-
 def generate_relationship_snapshots(obj):
   """Generate needed snapshots for a given relationship.
 
@@ -324,17 +295,3 @@ def register_automapping_listeners():
         return
       generate_relationship_snapshots(obj)
       automapper.generate_automappings(obj)
-
-  @Resource.collection_posted.connect_via(Request)
-  def handle_requests_collection_post(sender, objects=None, **kwargs):
-    for obj in objects:
-      handle_relationship_post(obj, obj.audit)
-
-  @Resource.model_put.connect_via(Request)
-  def handle_request(sender, obj=None, src=None, service=None):
-    handle_relationship_post(obj, obj.audit)
-
-  @Resource.collection_posted.connect_via(Audit)
-  def handle_audits_collection_post(sender, objects=None, **kwargs):
-    for obj in objects:
-      handle_relationship_post(obj, obj.program)
