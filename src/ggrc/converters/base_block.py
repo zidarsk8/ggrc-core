@@ -109,6 +109,7 @@ class BlockConverter(object):
     self.row_warnings = []
     self.row_converters = []
     self.ignore = False
+    self._has_non_importable_columns = False
     # For import contains model name from csv file.
     # For export contains 'Model.__name__' value.
     self.class_name = options.get("class_name", "")
@@ -139,6 +140,16 @@ class BlockConverter(object):
       self.add_errors(errors.PERMISSION_ERROR, line=self.offset + 2)
       logger.error("Import failed with: Only admin can update existing "
                    "cycle-tasks via import")
+    if self._has_non_importable_columns:
+      importable_column_names = []
+      for field_name in self.object_class.IMPORTABLE_FIELDS:
+        if field_name == 'slug':
+          continue
+        importable_column_names.append(
+            self.headers[field_name]["display_name"])
+      self.add_warning(errors.ONLY_IMPORTABLE_COLUMNS_WARNING,
+                       line=self.offset + 2,
+                       columns=", ".join(importable_column_names))
 
   def _create_ca_definitions_cache(self):
     """Create dict cache for custom attribute definitions.
@@ -268,9 +279,7 @@ class BlockConverter(object):
         if (self.operation == 'import' and
                 hasattr(self.object_class, "IMPORTABLE_FIELDS") and
                 field_name not in self.object_class.IMPORTABLE_FIELDS):
-          self.add_warning(errors.NON_IMPORTABLE_COLUMN_WARNING,
-                           line=self.offset + 2,
-                           column_name=header)
+          self._has_non_importable_columns = True
           self.remove_column(index - removed_count)
           removed_count += 1
           continue
