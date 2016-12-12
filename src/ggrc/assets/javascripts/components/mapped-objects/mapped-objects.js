@@ -32,7 +32,7 @@
       getBinding: function () {
         return this.attr('parentInstance').get_binding(this.attr('mapping'));
       },
-      getShanshotQueryFilters: function () {
+      getSnapshotQueryFilters: function () {
         var includeTypes = this.attr('filter.only').attr();
         var excludeTypes = this.attr('filter.exclude').attr();
         var includeFilters = includeTypes.map(function (type) {
@@ -60,7 +60,7 @@
           type: this.attr('parentInstance.type'),
           id: this.attr('parentInstance.id')
         }];
-        var filters = this.getShanshotQueryFilters();
+        var filters = this.getSnapshotQueryFilters();
         var query = GGRC.Utils.QueryAPI
           .buildParam('Snapshot', {}, relavantFilters, [], filters);
         return {data: [query]};
@@ -118,7 +118,10 @@
       this.scope.setMappedObjects();
     },
     events: {
-      '{scope.parentInstance} change': function () {
+      '{scope.parentInstance} related_sources': function () {
+        this.scope.setMappedObjects();
+      },
+      '{scope.parentInstance} related_destinations': function () {
         this.scope.setMappedObjects();
       }
     }
