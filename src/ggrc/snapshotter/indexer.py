@@ -56,23 +56,6 @@ def _get_columns():
   return snapshot_columns, revision_columns
 
 
-def _get_revision_content(revision_ids=None):
-  """Get content for provided revision_ids
-
-  Args:
-    revision_ids: An iterable of revision IDs
-  Returns:
-    Dictionary mapping revision_ids to content.
-  """
-  revision_dict = dict()
-  if revision_ids:
-    revisions = db.session.query(
-        models.Revision.id,
-        models.Revision.content).filter(models.Revision.id.in_(revision_ids))
-    revision_dict = dict(revisions)
-  return revision_dict
-
-
 def _get_model_properties():
   """Get indexable properties for all snapshottable objects
 
@@ -87,7 +70,6 @@ def _get_model_properties():
   # pylint: disable=protected-access
   from ggrc.models import all_models
   class_properties = dict()
-  custom_attribute_definitions = dict()
   klass_names = Types.all
 
   cadef_klass_names = {
@@ -99,23 +81,18 @@ def _get_model_properties():
       models.CustomAttributeDefinition.id,
       models.CustomAttributeDefinition.title,
   ).filter(
-      models.CustomAttributeDefinition.definition_type.in_(cadef_klass_names),
-      models.CustomAttributeDefinition.attribute_type.in_(
-          ["Text", "Rich Text", "Date"])
+      models.CustomAttributeDefinition.definition_type.in_(cadef_klass_names)
   )
-
-  custom_attribute_definitions = dict(cad_query)
 
   for klass_name in klass_names:
     model_attributes = AttributeInfo.gather_attrs(
         getattr(all_models, klass_name), '_fulltext_attrs')
     class_properties[klass_name] = model_attributes
 
-  return class_properties, custom_attribute_definitions
+  return class_properties, cad_query.all()
 
 
-def get_searchable_attributes(attributes, cad_keys,
-                              ca_definitions, content):
+def get_searchable_attributes(attributes, cad_list, content):
   """Get all searchable attributes for a given object that should be indexed
 
   Args:
@@ -128,11 +105,14 @@ def get_searchable_attributes(attributes, cad_keys,
   """
   searchable_values = {attr: content.get(attr) for attr in attributes}
 
-  if "custom_attributes" in content and content["custom_attributes"]:
-    for cav in content["custom_attributes"]:
-      cav_id = cav["custom_attribute_id"]
-      if cav_id in cad_keys:
-        searchable_values[ca_definitions[cav_id]] = cav["attribute_value"]
+  cad_map = {cad.id: cad for cad in cad_list}
+
+  cav_list = content.get("custom_attributes", [])
+
+  for cav in cav_list:
+    cad = cad_map.get(cav["custom_attribute_id"])
+    if cad:
+      searchable_values[cad.title] = cav["attribute_value"]
   return searchable_values
 
 
@@ -202,8 +182,7 @@ def reindex_pairs(pairs):
   snap_to_sid_cache = dict()
   search_payload = list()
 
-  object_properties, custom_attr_def_properties = _get_model_properties()
-  ca_def_keys = set(custom_attr_def_properties.keys())
+  object_properties, cad_list = _get_model_properties()
 
   snapshot_columns, revision_columns = _get_columns()
 
@@ -228,8 +207,7 @@ def reindex_pairs(pairs):
     )
     for _id, _type, content in revision_query:
       revisions[_id] = get_searchable_attributes(
-          object_properties[_type], ca_def_keys, custom_attr_def_properties,
-          content)
+          object_properties[_type], cad_list, content)
 
     snapshot_ids = set()
     for pair in snapshots:

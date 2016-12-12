@@ -102,8 +102,6 @@ class ChangeTracked(object):
   """A model with fields to tracked the last user to modify the model, the
   creation time of the model, and the last time the model was updated.
   """
-  # FIXME: change modified_by_id to nullable=False when there is an Account
-  # model
   @declared_attr
   def modified_by_id(cls):
     return deferred(db.Column(db.Integer), cls.__name__)
@@ -443,6 +441,7 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
       "contact_id",
       "secondary_contact_id",
       "modified_by_id",
+      "attribute_object_id",  # used for person mapping CA
   ]
 
   @staticmethod
