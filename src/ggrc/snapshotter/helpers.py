@@ -20,6 +20,9 @@ logger = getLogger(__name__)  # pylint: disable=invalid-name
 def get_revisions(pairs, revisions, filters=None):
   """Retrieve revision ids for pairs
 
+  If revisions dictionary is provided it will validate that the selected
+  revision exists in the objects revision history.
+
   Args:
     pairs: set([(parent_1, child_1), (parent_2, child_2), ...])
     revisions: dict({(parent, child): revision_id, ...})
