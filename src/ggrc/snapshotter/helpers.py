@@ -4,7 +4,7 @@
 """Various simple helper functions for snapshot generator"""
 
 import collections
-
+from logging import getLogger
 
 from sqlalchemy.sql.expression import tuple_
 
@@ -13,6 +13,8 @@ from ggrc import models
 from ggrc.snapshotter.datastructures import Stub
 from ggrc.snapshotter.datastructures import Pair
 from ggrc.utils import benchmark
+
+logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def get_revisions(pairs, revisions, filters=None):
@@ -56,6 +58,10 @@ def get_revisions(pairs, revisions, filters=None):
             if key in revisions:
               if revid == revisions[key]:
                 revision_id_cache[key] = revid
+              else:
+                logger.warning(
+                    "Specified revision for object %s but couldn't find the"
+                    "revision '%s' in object history", key, revisions[key])
             else:
               if key not in revision_id_cache:
                 revision_id_cache[key] = revid
