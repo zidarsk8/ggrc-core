@@ -73,8 +73,10 @@ can.Control('CMS.Controllers.InfoPin', {
       }.bind(this)
     });
   },
-  setInstance: function (instance, el, maximizedState) {
+  setInstance: function (opts, el, maximizedState) {
     var self = this;
+    var instance = opts.attr('instance');
+    var parentInstance = opts.attr('parent_instance');
     var options = this.findOptions(el);
     var view = this.findView(instance);
     var panelHeight = this.getPinHeight(maximizedState);
@@ -88,6 +90,7 @@ can.Control('CMS.Controllers.InfoPin', {
 
     this.element.html(can.view(view, {
       instance: instance,
+      parentInstance: parentInstance,
       model: instance.class,
       confirmEdit: confirmEdit,
       is_info_pin: true,

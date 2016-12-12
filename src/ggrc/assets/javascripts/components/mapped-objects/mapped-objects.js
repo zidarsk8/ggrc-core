@@ -16,6 +16,7 @@
     tag: tag,
     template: tpl,
     scope: {
+      mappedSnapshots: false,
       isLoading: false,
       mapping: '@',
       parentInstance: null,
@@ -25,14 +26,68 @@
       filterMappedObjects: function (items) {
         var filterObj = this.attr('filter');
         return filterObj ?
-          GGRC.Utils.filters.applyTypeFilter(items, filterObj.serialize()) :
+          GGRC.Utils.filters.applyTypeFilter(items, filterObj.attr()) :
           items;
       },
       getBinding: function () {
         return this.attr('parentInstance').get_binding(this.attr('mapping'));
       },
+      getSnapshotQueryFilters: function () {
+        var includeTypes = this.attr('filter.only').attr();
+        var excludeTypes = this.attr('filter.exclude').attr();
+        var includeFilters = includeTypes.map(function (type) {
+          return {
+            expression: {
+              op: {name: '='},
+              left: 'child_type',
+              right: type
+            }
+          };
+        });
+        var excludeFilters = excludeTypes.map(function (type) {
+          return {
+            expression: {
+              op: {name: '!='},
+              left: 'child_type',
+              right: type
+            }
+          };
+        });
+        return [].concat(includeFilters, excludeFilters);
+      },
+      getSnapshotQuery: function () {
+        var relavantFilters = [{
+          type: this.attr('parentInstance.type'),
+          id: this.attr('parentInstance.id')
+        }];
+        var filters = this.getSnapshotQueryFilters();
+        var query = GGRC.Utils.QueryAPI
+          .buildParam('Snapshot', {}, relavantFilters, [], filters);
+        return {data: [query]};
+      },
+      loadSnapshots: function () {
+        var dfd = can.Deferred();
+        var query = this.getSnapshotQuery();
+        this.attr('isLoading', true);
+        GGRC.Utils.QueryAPI
+          .makeRequest(query)
+          .done(function (responseArr) {
+            var data = responseArr[0];
+            var values = data.Snapshot.values;
+            var result = values.map(function (item) {
+              item = GGRC.Utils.Snapshots.toObject(item);
+              item.attr('instance', item);
+              return item;
+            });
+            dfd.resolve(result);
+          })
+          .always(function () {
+            this.attr('isLoading', false);
+          }.bind(this));
+        return dfd;
+      },
       load: function () {
-        var dfd = new can.Deferred();
+        var dfd = can.Deferred();
         var binding = this.getBinding();
 
         if (!binding) {
@@ -55,14 +110,18 @@
         return dfd;
       },
       setMappedObjects: function () {
-        this.attr('mappedItems').replace(this.load());
+        this.attr('mappedItems').replace(
+          this.attr('mappedSnapshots') ? this.loadSnapshots() : this.load());
       }
     },
     init: function () {
       this.scope.setMappedObjects();
     },
     events: {
-      '{scope.parentInstance} change': function () {
+      '{scope.parentInstance} related_sources': function () {
+        this.scope.setMappedObjects();
+      },
+      '{scope.parentInstance} related_destinations': function () {
         this.scope.setMappedObjects();
       }
     }

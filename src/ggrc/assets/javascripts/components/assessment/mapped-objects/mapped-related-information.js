@@ -18,14 +18,17 @@
     template: tpl,
     scope: {
       titleText: '@',
+      mappedSnapshots: true,
       filter: {
-        exclude: ['Control']
+        exclude: ['Control'],
+        only: []
       },
       mapping: '@',
       mappingType: '@',
       expanded: true,
       selectedItem: {},
-      instance: null
+      instance: null,
+      scopeObject: null
     }
   });
 })(window.can, window.GGRC);
