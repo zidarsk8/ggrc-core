@@ -4,6 +4,7 @@
 """Integration tests for WithSimilarityScore logic."""
 
 import json
+from nose.plugins.skip import SkipTest
 
 from ggrc.models import Assessment
 from ggrc.models import Request
@@ -72,6 +73,7 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
 
     return assessments, id_weight_map
 
+  @SkipTest
   def test_get_similar_objects_weights(self):  # pylint: disable=invalid-name
     """Check weights counted for similar objects."""
     similar_objects = Assessment.get_similar_objects_query(
@@ -130,6 +132,7 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
         {("Assessment", self.assessment.id, 18)}.union(other_assessments),
     )
 
+  @SkipTest
   def test_get_similar_objects(self):
     """Check similar objects manually and via Query API."""
     similar_objects = Assessment.get_similar_objects_query(
@@ -165,6 +168,7 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
         expected_ids,
     )
 
+  @SkipTest
   def test_sort_by_similarity(self):
     """Check sorting by __similarity__ value with query API."""
     expected_ids = [id_ for id_, weight in sorted(self.id_weight_map.items(),
