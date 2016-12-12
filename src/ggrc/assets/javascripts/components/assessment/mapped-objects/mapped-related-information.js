@@ -27,7 +27,8 @@
       mappingType: '@',
       expanded: true,
       selectedItem: {},
-      instance: null
+      instance: null,
+      scopeObject: null
     }
   });
 })(window.can, window.GGRC);

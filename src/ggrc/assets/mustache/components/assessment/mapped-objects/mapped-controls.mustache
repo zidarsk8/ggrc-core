@@ -13,7 +13,10 @@
          data-join-option-type="{{model.shortName}}"
          data-join-object-id="{{instance.id}}"
          data-join-object-type="{{instance.class.shortName}}"
-         data-original-title="Map {{firstnonempty mappingType 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}">
+         data-original-title="Map {{firstnonempty mappingType 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}"
+         data-is-snapshotable="{{scopeObject.is_snapshotable}}"
+         data-snapshot-scope-id="{{scopeObject.id}}"
+         data-snapshot-scope-type="{{scopeObject.type}}">
       </i>
   {{/is_allowed}}
 </collapsible-panel-header>

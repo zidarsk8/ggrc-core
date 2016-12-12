@@ -1951,7 +1951,7 @@ can.Control.extend('CMS.Controllers.TreeViewNode', {
 
     this.update_hash_fragment();
     $('.pin-content').control()
-      .setInstance(this.options.instance, $tree, maximizeInfoPane);
+      .setInstance(this.options, $tree, maximizeInfoPane);
   },
 
   'input,select click': function (el, ev) {
