@@ -8,6 +8,7 @@ snapshot object represent a join between parent object (Audit),
 child object (e.g. Control, Regulation, ...) and a particular revision.
 """
 
+from logging import getLogger
 
 from sqlalchemy.sql.expression import tuple_
 from sqlalchemy.sql.expression import bindparam
@@ -31,6 +32,8 @@ from ggrc.snapshotter.helpers import get_snapshots
 from ggrc.snapshotter.indexer import reindex_pairs
 
 from ggrc.snapshotter.rules import get_rules
+
+logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class SnapshotGenerator(object):
@@ -213,6 +216,11 @@ class SnapshotGenerator(object):
           else:
             missed_keys.add(key)
 
+      if missed_keys:
+        logger.warning(
+            "Tried to update snapshots for the following objects but "
+            "found no revisions: %s", missed_keys)
+
       if not modified_snapshot_keys:
         return OperationResponse("update", True, set(), response_data)
 
@@ -372,6 +380,11 @@ class SnapshotGenerator(object):
             data_payload += [data]
           else:
             missed_keys.add(pair)
+
+      if missed_keys:
+        logger.warning(
+            "Tried to create snapshots for the following objects but "
+            "found no revisions: %s", missed_keys)
 
       with benchmark("Snapshot._create.write to database"):
         self._execute(
