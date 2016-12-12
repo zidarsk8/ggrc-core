@@ -36,11 +36,6 @@ Copyright (C) 2016 Google Inc.
                         </li>
 
                       {{#is_info_pin}}
-                        {{#is_allowed_to_map page_instance instance}}
-                          {{^options.is_in_selector}}
-                            {{> '/static/mustache/base_objects/unmap.mustache'}}
-                          {{/options.is_in_selector}}
-                        {{/is_allowed_to_map}}
                         {{#if instance.viewLink}}
                           {{#is_allowed "view_object_page" instance}}
                               <li>

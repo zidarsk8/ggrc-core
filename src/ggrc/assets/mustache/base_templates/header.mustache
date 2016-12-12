@@ -36,7 +36,7 @@
           </a>
           <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
             {{#is_allowed 'update' instance context='for'}}
-              {{> /static/mustache/base_objects/edit_object_link.mustache}}
+              {{> '/static/mustache/base_objects/edit_object_link.mustache'}}
             {{/is_allowed}}
 
             <li>
@@ -70,9 +70,10 @@
             {{#is_info_pin}}
               {{#is_allowed_to_map page_instance instance}}
                 {{^options.is_in_selector}}
-                  {{> /static/mustache/base_objects/unmap.mustache}}
-
-                {{/options}}
+                  {{^if_in instance.type GGRC.Utils.Snapshots.inScopeModels}}
+                    {{> '/static/mustache/base_objects/unmap.mustache'}}
+                  {{/if_in}}
+                {{/options.is_in_selector}}
               {{/is_allowed_to_map}}
               {{#if instance.viewLink}}
                 {{#is_allowed "view_object_page" instance}}
@@ -98,7 +99,7 @@
           </ul>
         </div>
       </div>
-      {{> /static/mustache/mixins/stateful.mustache }}
+      {{> '/static/mustache/mixins/stateful.mustache'}}
     </div>
   </div>
 </div>

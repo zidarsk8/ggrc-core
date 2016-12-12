@@ -819,8 +819,7 @@
     }
 
     function isInScopeModel(model) {
-      return ['Assessment', 'Issue', 'AssessmentTemplate']
-          .indexOf(model) > -1;
+      return GGRC.Utils.Snapshots.inScopeModels.indexOf(model) > -1;
     }
 
     /**
@@ -876,6 +875,7 @@
     }
 
     return {
+      inScopeModels: ['Assessment', 'Issue', 'AssessmentTemplate'],
       isSnapshot: isSnapshot,
       isSnapshotScope: isSnapshotScope,
       isSnapshotParent: isSnapshotParent,
