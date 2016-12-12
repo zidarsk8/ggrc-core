@@ -3,7 +3,7 @@
 
 """Test object owner of comments."""
 
-from ggrc.models import Request, ObjectOwner, Revision
+from ggrc.models import Assessment, ObjectOwner, Revision
 from integration.ggrc import converters
 from integration.ggrc import generator
 
@@ -19,12 +19,12 @@ class TestCommentObjectOwner(converters.TestCase):
     self.generator = generator.ObjectGenerator()
 
   def test_object_owner(self):
-    """Test object owner and its revision of request comment."""
+    """Test object owner and its revision of assessment comment."""
 
-    self.import_file("request_full_no_warnings.csv")
-    request1 = Request.query.filter_by(slug="Request 1").first()
+    self.import_file("assessment_full_no_warnings.csv")
+    asmt1 = Assessment.query.filter_by(slug="Assessment 1").first()
     _, comment = self.generator.generate_comment(
-        request1, "Verifier", "some comment", send_notification="false")
+        asmt1, "Verifier", "some comment", send_notification="false")
 
     object_owner = ObjectOwner.query.filter_by(
         ownable_type='Comment',
