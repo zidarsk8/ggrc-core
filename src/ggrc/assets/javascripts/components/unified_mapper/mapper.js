@@ -38,8 +38,10 @@
     init: function () {
       this.attr('types', this.initTypes());
       this.attr('parentInstance', this.initInstance());
-      this.attr('isInScopeObject',
-        GGRC.Utils.Snapshots.isInScopeModel(this.attr('object')));
+      this.attr('useSnapshots',
+        GGRC.Utils.Snapshots.isInScopeModel(this.attr('object')) ||
+        // Assessment generation should use Snapshot Objects
+        this.attr('assessmentGenerator'));
     },
     type: 'AllObject', // We set default as All Object
     warningMessage: warningMessage,
@@ -66,7 +68,7 @@
     snapshot_scope_id: '',
     snapshot_scope_type: '',
     parentInstance: null,
-    isInScopeObject: false,
+    useSnapshots: false,
     allowedToCreate: function () {
       var isAllTypeSelected = this.attr('type') === 'AllObject';
       var isSearch = this.attr('search_only');
@@ -76,6 +78,10 @@
       return !isAllTypeSelected && !isSearch && !isInScopeModel;
     },
     showWarning: function () {
+      // In case we generate assessments this should be false no matter what objects should be mapped to assessments
+      if (this.attr('assessmentGenerator')) {
+        return false;
+      }
       return !(GGRC.Mappings
         .canBeMappedDirectly(this.attr('type'), this.attr('object')));
     },
