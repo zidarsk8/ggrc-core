@@ -74,7 +74,7 @@ class WithSimilarityScore(object):
     # find "similar" objects when Relationship table is not used
     queries_for_union += cls._emulate_relationships(id_, types, relevant_types)
 
-    joined = queries_for_union.pop().union(*queries_for_union).subquery()
+    joined = queries_for_union.pop().union_all(*queries_for_union).subquery()
 
     # define weights for every "related" object type with values from
     # relevant_types dict
