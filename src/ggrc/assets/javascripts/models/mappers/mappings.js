@@ -55,12 +55,18 @@
      */
     getMappingList: function (type, include, exclude) {
       var baseModel = GGRC.Utils.getModelByType(type);
+      exclude = exclude || [];
+      include = include || [];
       if (!baseModel) {
         return [];
       }
 
       if (can.isFunction(baseModel.getAllowedMappings)) {
-        return baseModel.getAllowedMappings() || [];
+        return baseModel
+            .getAllowedMappings()
+            .filter(function (model) {
+              return exclude.indexOf(model.modelName) < 0;
+            }) || [];
       }
       return GGRC.Utils
         .getMappableTypes(type, {

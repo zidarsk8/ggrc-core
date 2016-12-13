@@ -87,7 +87,6 @@
       {modelName: 'Assessment', mappingType: 'relation'},
       {modelName: 'AssessmentTemplate', mappingType: 'relation'},
       {modelName: 'Issue', mappingType: 'relation'},
-      {modelName: 'Request', mappingType: 'relation'},
       // Mapping through Parent Object
       {modelName: 'AccessGroup', mappingType: 'snapshot'},
       {modelName: 'Clause', mappingType: 'snapshot'},
