@@ -40,6 +40,7 @@ class GetValueTestCase(unittest.TestCase):
     ]
 
     self.related_object = MagicMock(name="assessment_1")
+    self.related_object.revision.content = {}
 
   # pylint: disable=invalid-name
   def test_returns_auditors_as_default_assessors_when_no_template(
