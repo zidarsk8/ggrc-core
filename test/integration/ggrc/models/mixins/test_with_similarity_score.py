@@ -6,8 +6,6 @@
 import json
 
 from ggrc import db
-from ggrc.models import Assessment
-from ggrc.models import Request
 import ggrc.models as models
 from ggrc.snapshotter.rules import Types
 
@@ -73,51 +71,6 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
                                     snapshot_mappings)
 
     return assessments
-
-  def test_similarity_for_request(self):
-    """Check special case for similarity for Request by Audit."""
-    request1 = factories.RequestFactory(audit_id=self.audit.id)
-    request2 = factories.RequestFactory(audit_id=self.audit.id)
-
-    self.make_relationships(request1, [self.control, self.regulation])
-
-    requests_by_request = Request.get_similar_objects_query(
-        id_=request1.id,
-        types=["Request"],
-        threshold=0,
-    ).all()
-
-    self.assertSetEqual(
-        {(obj.type, obj.id, obj.weight) for obj in requests_by_request},
-        {("Request", request2.id, 5)},
-    )
-
-    requests_by_assessment = Assessment.get_similar_objects_query(
-        id_=self.assessment.id,
-        types=["Request"],
-        threshold=0,
-    ).all()
-
-    self.assertSetEqual(
-        {(obj.type, obj.id, obj.weight) for obj in requests_by_assessment},
-        {("Request", request1.id, 18),
-         ("Request", request2.id, 5)},
-    )
-
-    assessments_by_request = Request.get_similar_objects_query(
-        id_=request1.id,
-        types=["Assessment"],
-        threshold=0,
-    ).all()
-
-    other_assessments = {
-        ("Assessment", assessment.id, self.id_weight_map[assessment.id])
-        for assessment in self.other_assessments
-    }
-    self.assertSetEqual(
-        {(obj.type, obj.id, obj.weight) for obj in assessments_by_request},
-        {("Assessment", self.assessment.id, 18)}.union(other_assessments),
-    )
 
   def test_get_similar_basic(self):
     """Basic check of similar objects manually and via Query API.
