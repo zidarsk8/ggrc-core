@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
+{{#if display_options.hideImportExport}}
+{{else}}
+
 {{^if_instance_of parent_instance 'Assessment'}}
 <li>
   <a href="/import"
@@ -21,3 +24,5 @@
   </li>
 {{/if}}
 {{/if_instance_of}}
+
+{{/if}}
