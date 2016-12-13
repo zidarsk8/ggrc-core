@@ -126,15 +126,12 @@
     getModelNamesList: function (object) {
       var exclude = [];
       var include = [];
-      // These inclusions\exclusions might be changed and better be defined outside
-      if (this.attr('getList')) {
-        exclude = ['AssessmentTemplate', 'Assessment', 'Audit',
-          'CycleTaskGroupObjectTask', 'TaskGroup',
-          'TaskGroupTask', 'Workflow'];
-      }
       if (this.attr('search_only')) {
         include = ['TaskGroupTask', 'TaskGroup',
           'CycleTaskGroupObjectTask'];
+      }
+      if (this.attr('assessmentGenerator')) {
+        exclude = GGRC.Utils.Snapshots.inScopeModels;
       }
       return GGRC.Mappings
         .getMappingList(object, include, exclude)
@@ -143,9 +140,7 @@
         });
     },
     initTypes: function () {
-      var object = this.attr('getList') ?
-        'MultitypeSearch' :
-        this.attr('object');
+      var object = this.attr('object');
       // Can.JS wrap all objects with can.Map by default
       var groups = this.attr('defaultGroups').attr();
       var list = this.getModelNamesList(object);
@@ -155,7 +150,8 @@
       }.bind(this));
       // Temporary Remove All Objects select option in case Snapshot mapping
       if (groups.all_objects.models.length < 2 ||
-        GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
+          this.attr('assessmentGenerator') ||
+          GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
         delete groups.all_objects;
       }
       return groups;

@@ -23,7 +23,6 @@
           type: 'Control',
           'join-object-id': instance.id,
           'join-mapping': 'program_controls',
-          getList: true,
           useTemplates: true,
           assessmentGenerator: true,
           relevantTo: [{
