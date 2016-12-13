@@ -32,6 +32,8 @@
         this.attr('paging.count', count);
       },
       setItems: function () {
+        // Clean up selection before any items update
+        this.unselectAll();
         this.attr('items').replace(this.load());
       },
       onSearch: function () {
@@ -41,17 +43,21 @@
         var filters;
         var relevantList = this.attr('mapper.relevant');
 
-        filters = _.compact(_.map(relevantList, function (relevant) {
-          if (!relevant.value || !relevant.filter) {
-            return undefined;
-          }
-          return {
-            type: relevant.filter.type,
-            id: relevant.filter.id
-          };
-        }));
+        filters = relevantList.attr()
+          .map(function (relevant) {
+            if (!relevant.value || !relevant.filter) {
+              return undefined;
+            }
+            return {
+              type: relevant.filter.type,
+              id: Number(relevant.filter.id)
+            };
+          }).filter(function (item) {
+            return item;
+          });
         // Filter by scope
-        if (this.attr('mapper.isInScopeObject')) {
+        if (this.attr('mapper.useSnapshots') &&
+          Number(this.attr('scopeId'))) {
           filters.push({
             type: this.attr('scopeType'),
             id: Number(this.attr('scopeId'))
@@ -124,10 +130,13 @@
               item.attr('instance', item);
               return item;
             });
-            result.forEach(function (item) {
-              item.attr('instance.isMapped',
-                filters.indexOf(item.attr('id')) > -1);
-            });
+            // Do not perform extra mapping validation in case Assessment generation
+            if (!this.attr('mapper.assessmentGenerator')) {
+              result.forEach(function (item) {
+                item.attr('instance.isMapped',
+                  filters.indexOf(item.attr('id')) > -1);
+              });
+            }
             // Update paging object
             this.updatePaging(data.Snapshot.total);
             dfd.resolve(result);
@@ -140,8 +149,7 @@
           }.bind(this));
         return dfd;
       },
-      unselectAll: function (scope, el, ev) {
-        ev.preventDefault();
+      unselectAll: function () {
         this.attr('items')
           .forEach(function (item) {
             if (!item.attr('isMapped')) {
@@ -149,8 +157,7 @@
             }
           });
       },
-      selectAll: function (scope, el, ev) {
-        ev.preventDefault();
+      selectAll: function () {
         this.attr('items').forEach(function (item) {
           if (!item.attr('isMapped')) {
             item.attr('isSelected', true);

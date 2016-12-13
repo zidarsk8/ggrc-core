@@ -27,6 +27,7 @@
           useTemplates: true,
           assessmentGenerator: true,
           relevantTo: [{
+            readOnly: true,
             type: instance.type,
             id: instance.id
           }],
@@ -114,7 +115,12 @@
         var data = {
           _generated: true,
           audit: this.scope.audit,
-          object: object.stub(),
+          // Provide actual Snapshot Object for Assessment
+          object: {
+            id: object.id,
+            type: 'Snapshot',
+            href: object.selfLink
+          },
           context: this.scope.audit.context,
           template: assessmentTemplate && assessmentTemplate.stub(),
           title: title
