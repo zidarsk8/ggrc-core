@@ -311,6 +311,9 @@
     },
 
     reset_form: function (setFieldsCb) {
+      var $textArea = $('#program_description');
+      var editorData = $textArea.data('wysihtml5');
+
       // If the modal is closed early, the element no longer exists
       if (this.element) {
         // Do the fields (re-)setting
@@ -326,6 +329,12 @@
       if (this.options.instance.form_preload) {
         this.options.instance.form_preload(this.options.new_object_form,
           this.options.object_params);
+      }
+
+      // The rich text editor's content is not a "normal" form field, thus
+      // it needs to be reset manually (if it exists)
+      if (editorData && editorData.editor) {
+        editorData.editor.clear();
       }
     },
 
