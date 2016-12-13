@@ -496,6 +496,36 @@
       return deferred;
     },
 
+    queryAll: function (request) {
+      var deferred = $.Deferred();
+
+      GGRC.Utils.QueryAPI.makeRequest(request)
+        .then(function (sourceData) {
+          var values = [];
+
+          sourceData = sourceData.length ? sourceData : {};
+
+          values = _.map(sourceData, function (object) {
+            return _.compact(_.map(object, function (obj, key) {
+              if (obj && obj.ids) {
+                return _.map(obj.ids, function (item) {
+                  return {id: item, type: key};
+                });
+              }
+              if (obj && obj.values) {
+                return obj.values;
+              }
+            }));
+          });
+
+          values = _.flattenDeep(values);
+
+          deferred.resolve(values);
+        }, deferred.reject.bind(deferred));
+
+      return deferred.promise();
+    },
+
   _modelize: function (sourceData, deferred) {
     var obsList = new this.List([]);
     var index = 0;
