@@ -99,6 +99,26 @@
     }
   }, {
   });
+  can.Model.Mixin('requestorable', {
+    before_create: function () {
+      if (!this.requestor) {
+        this.attr('requestor', {
+          id: GGRC.current_user.id,
+          type: 'Person'
+        });
+      }
+    },
+    form_preload: function (new_object_form) {
+      if (new_object_form) {
+        if (!this.requestor) {
+          this.attr('requestor', {
+            id: GGRC.current_user.id,
+            type: 'Person'
+          });
+        }
+      }
+    }
+  });
 
   can.Model.Mixin('ownable', {
     'after:init': function () {
@@ -151,6 +171,11 @@
     }
   });
 
+  can.Model.Mixin('mapping-limit', {
+    getAllowedMappings: function () {
+      return this.allowedMappings;
+    }
+  }, {});
   /**
    * A mixin to use for objects that can have their status automatically
    * changed when they are edited.
@@ -264,7 +289,7 @@
      *   }
      * @param {Number} threshold - minimum weight required to render related
      *   object
-     *
+     * @return {Deferred} relatable - Promise
      */
     _related: function (relevantTypes, threshold) {
       var that = this;
