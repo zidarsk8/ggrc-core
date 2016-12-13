@@ -69,6 +69,7 @@
         can.each(this.scope.attr('relevantTo') || [], function (item) {
           var model = CMS.Models[item.type].cache[item.id];
           this.scope.attr('relevant').push({
+            readOnly: item.readOnly,
             value: true,
             filter: model,
             menu: this.scope.attr('menu'),

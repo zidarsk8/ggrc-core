@@ -6,13 +6,17 @@
 <h6>Filter by mapping</h6>
 {{#each relevant}}
   <div class="single-line-filter">
-    <button type="submit" data-index="{{@index}}" class="remove_filter">
-      <i class="fa fa-trash"></i>
-    </button>
+    {{^readOnly}}
+      <button type="submit" data-index="{{@index}}" class="remove_filter">
+        <i class="fa fa-trash"></i>
+      </button>
+    {{/readOnly}}
     <label>
       {{#if @index}}AND {{/if}}Mapped to:
     </label>
-    <select class="input-small filter-type-selector select-filter{{@index}}" can-value="model_name">
+    <select class="input-small filter-type-selector select-filter{{@index}}"
+            {{#readOnly}}disabled="disabled"{{/readOnly}}
+            can-value="model_name">
       {{#menu}}
         {{#if model_singular}}<option value="{{model_singular}}" label="{{title_singular}}"></option>{{/if}}
       {{/menu}}
@@ -24,6 +28,7 @@
         {{#model_name}}
         <div class="modal-search objective-selector">
           <input
+            {{#readOnly}}disabled="disabled"{{/readOnly}}
             class="input-large search-icon search-filter-{{@index}}"
             placeholder="Enter text to search for {{model_name}}"
             type="text"
@@ -41,5 +46,7 @@
   </div>
 {{/each}}
 <div class="add-rule">
-  <a href="javascript://" can-click="addFilter" class="add-filter-rule">+ Add New Rule</a>
+  {{^readOnly}}
+     <a href="javascript://" can-click="addFilter" class="add-filter-rule">+ Add New Rule</a>
+  {{/readOnly}}
 </div>
