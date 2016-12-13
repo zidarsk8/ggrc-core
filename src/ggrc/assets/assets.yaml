@@ -366,6 +366,7 @@ dashboard-js-template-files:
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache
+  - issues/tree_add_item.mustache
   - components/inline_edit/inline.mustache
   - components/inline_edit/text.mustache
   - components/inline_edit/input.mustache

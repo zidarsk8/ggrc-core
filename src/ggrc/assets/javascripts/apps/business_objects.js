@@ -487,7 +487,7 @@
             footer_view: GGRC.mustache_path +
               '/base_objects/tree_footer.mustache',
             add_item_view: GGRC.mustache_path +
-              '/base_objects/tree_add_item.mustache',
+              '/issues/tree_add_item.mustache',
             child_options: relatedObjectsChildOptions.concat({
               model: CMS.Models.Person,
               mapping: 'people',
@@ -772,7 +772,7 @@
           Issue: {
             mapping: 'related_issues',
             footer_view: path + '/base_objects/tree_footer.mustache',
-            add_item_view: path + '/base_objects/tree_add_item.mustache'
+            add_item_view: path + '/issues/tree_add_item.mustache'
           },
           Audit: {
             mapping: 'related_audits',
