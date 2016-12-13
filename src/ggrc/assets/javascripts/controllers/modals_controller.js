@@ -989,6 +989,7 @@
     prepareInstance: function () {
       var params = this.find_params();
       var instance = new this.options.model(params);
+      var saveContactModels = ['TaskGroup', 'TaskGroupTask'];
 
       instance.attr('_suppress_errors', true)
         .attr('custom_attribute_definitions',
@@ -996,7 +997,7 @@
         .attr('custom_attributes', new can.Map());
 
       if (this.options.add_more &&
-        this.options.model.shortName === 'TaskGroupTask') {
+        _.includes(saveContactModels, this.options.model.shortName)) {
         instance.attr('contact', this.options.attr('instance.contact'));
       }
 
