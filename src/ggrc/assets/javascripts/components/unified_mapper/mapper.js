@@ -78,6 +78,10 @@
       return !isAllTypeSelected && !isSearch && !isInScopeModel;
     },
     showWarning: function () {
+      // Never show warning for In Scope Objects
+      if (GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
+        return false;
+      }
       // In case we generate assessments this should be false no matter what objects should be mapped to assessments
       if (this.attr('assessmentGenerator')) {
         return false;
