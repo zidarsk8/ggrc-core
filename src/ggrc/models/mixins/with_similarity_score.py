@@ -245,6 +245,8 @@ class WithSimilarityScore(object):
             related_to_similar,
             and_(related_id_case == related_to_similar.source_id,
                  related_type_case == related_to_similar.source_type),
+        ).filter(
+            related_to_similar.source_type != "Snapshot"
         ),
         db.session.query(
             related_type_case,
@@ -254,7 +256,9 @@ class WithSimilarityScore(object):
             related_to_similar,
             and_(related_id_case == related_to_similar.destination_id,
                  related_type_case == related_to_similar.destination_type),
-        ),
+        ).filter(
+            related_to_similar.destination_type != "Snapshot"
+        )
     ]
 
   @classmethod
