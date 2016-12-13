@@ -57,7 +57,13 @@
     update: 'PUT /api/audits/{id}',
     destroy: 'DELETE /api/audits/{id}',
     create: 'POST /api/audits',
-    mixins: ['contactable', 'unique_title', 'ca_update', 'timeboxed'],
+    mixins: [
+      'contactable',
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'mapping-limit'
+    ],
     is_custom_attributable: true,
     is_clonable: true,
     attributes: {
@@ -99,9 +105,6 @@
       {modelName: 'System', mappingType: 'snapshot'},
       {modelName: 'Vendor', mappingType: 'snapshot'}
     ],
-    getAllowedMappings: function () {
-      return this.allowedMappings;
-    },
     statuses: ['Planned', 'In Progress', 'Manager Review',
       'Ready for External Review', 'Completed'],
     obj_nav_options: {
@@ -351,7 +354,26 @@
       audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
     },
-
+    allowedMappings: [
+      // Mapping through Parent Object
+      {modelName: 'AccessGroup', mappingType: 'snapshot'},
+      {modelName: 'Clause', mappingType: 'snapshot'},
+      {modelName: 'Contract', mappingType: 'snapshot'},
+      {modelName: 'Control', mappingType: 'snapshot'},
+      {modelName: 'DataAsset', mappingType: 'snapshot'},
+      {modelName: 'Facility', mappingType: 'snapshot'},
+      {modelName: 'Market', mappingType: 'snapshot'},
+      {modelName: 'Objective', mappingType: 'snapshot'},
+      {modelName: 'OrgGroup', mappingType: 'snapshot'},
+      {modelName: 'Policy', mappingType: 'snapshot'},
+      {modelName: 'Process', mappingType: 'snapshot'},
+      {modelName: 'Product', mappingType: 'snapshot'},
+      {modelName: 'Regulation', mappingType: 'snapshot'},
+      {modelName: 'Section', mappingType: 'snapshot'},
+      {modelName: 'Standard', mappingType: 'snapshot'},
+      {modelName: 'System', mappingType: 'snapshot'},
+      {modelName: 'Vendor', mappingType: 'snapshot'}
+    ],
     defaults: {
       test_plan_procedure: false,
       template_object_type: 'Control',
