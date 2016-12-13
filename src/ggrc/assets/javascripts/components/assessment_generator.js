@@ -27,6 +27,7 @@
           useTemplates: true,
           assessmentGenerator: true,
           relevantTo: [{
+            readOnly: true,
             type: instance.type,
             id: instance.id
           }],
