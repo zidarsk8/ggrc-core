@@ -34,44 +34,45 @@
     },
 
     init_tree_view_settings: function () {
-      var valid_models;
-      var saved_child_tree_display_list;
+      var validModels;
+      var savedChildTreeDisplayList;
       if (!GGRC.page_object) { // Admin dashboard
         return;
       }
 
-      valid_models = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
+      validModels = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
     // only change the display list
-      can.each(valid_models, function (m_name) {
-        saved_child_tree_display_list = this.display_prefs.getChildTreeDisplayList(m_name);
-        if (saved_child_tree_display_list !== null) {
-          GGRC.tree_view.sub_tree_for.attr(m_name + '.display_list',
-            saved_child_tree_display_list);
+      can.each(validModels, function (mName) {
+        savedChildTreeDisplayList = this.display_prefs
+          .getChildTreeDisplayList(mName);
+        if (savedChildTreeDisplayList !== null) {
+          GGRC.tree_view.sub_tree_for.attr(mName + '.display_list',
+            savedChildTreeDisplayList);
         }
       }.bind(this));
     },
 
     init_page_title: function () {
-      var page_title = null;
+      var pageTitle = null;
       if (typeof (this.options.page_title) === 'function') {
-        page_title = this.options.page_title(this);
+        pageTitle = this.options.page_title(this);
       } else if (this.options.page_title) {
-        page_title = this.options.page_title;
+        pageTitle = this.options.page_title;
       }
-      if (page_title) {
-        $('head > title').text(page_title);
+      if (pageTitle) {
+        $('head > title').text(pageTitle);
       }
     },
 
     init_page_help: function () {
-      var page_help = null;
+      var pageHelp = null;
       if (typeof (this.options.page_help) === 'function') {
-        page_help = this.options.page_help(this);
+        pageHelp = this.options.page_help(this);
       } else if (this.options.page_help) {
-        page_help = this.options.page_help;
+        pageHelp = this.options.page_help;
       }
-      if (page_help) {
-        this.element.find('#page-help').attr('data-help-slug', page_help);
+      if (pageHelp) {
+        this.element.find('#page-help').attr('data-help-slug', pageHelp);
       }
     },
 
@@ -107,7 +108,8 @@
     },
 
     init_info_pin: function () {
-      this.info_pin = new CMS.Controllers.InfoPin(this.element.find('.pin-content'));
+      this.info_pin = new CMS.Controllers
+        .InfoPin(this.element.find('.pin-content'));
     },
 
     '.nav-logout click': function (el, ev) {
@@ -120,7 +122,8 @@
 
     init_default_widgets: function () {
       can.each(this.options.default_widgets, function (name) {
-        this.add_dashboard_widget_from_descriptor(this.options.widget_descriptors[name]);
+        var descriptor = this.options.widget_descriptors[name];
+        this.add_dashboard_widget_from_descriptor(descriptor);
       }.bind(this));
     },
 
@@ -135,12 +138,14 @@
       if (_.isBoolean(updateCount) && !updateCount) {
         return;
       }
-      this.inner_nav_controller.update_widget_count($(ev.target), count, updateCount);
+      this.inner_nav_controller
+        .update_widget_count($(ev.target), count, updateCount);
     },
     update_inner_nav: function (el, ev, data) {
       if (this.inner_nav_controller) {
         if (data) {
-          this.inner_nav_controller.update_widget(data.widget || data, data.index);
+          this.inner_nav_controller
+            .update_widget(data.widget || data, data.index);
         } else {
           this.inner_nav_controller.update_widget_list(
             this.get_active_widget_elements());
@@ -163,15 +168,15 @@
       var $element;
       var control;
       var $container;
-      var $last_widget;
+      var $lastWidget;
 
       // Construct the final descriptor from one or more arguments
-      can.each(arguments, function (name_or_descriptor) {
-        if (typeof (name_or_descriptor) === 'string') {
-          name_or_descriptor =
-            that.options.widget_descriptors[name_or_descriptor];
+      can.each(arguments, function (nameOrDescriptor) {
+        if (typeof (nameOrDescriptor) === 'string') {
+          nameOrDescriptor =
+            that.options.widget_descriptors[nameOrDescriptor];
         }
-        $.extend(descriptor, name_or_descriptor || {});
+        $.extend(descriptor, nameOrDescriptor || {});
       });
 
       // Create widget in container?
@@ -188,7 +193,8 @@
       }
 
       $element = $("<section class='widget'>");
-      control = new descriptor.controller($element, descriptor.controller_options);
+      control = new descriptor
+        .controller($element, descriptor.controller_options);
 
       // FIXME: This should be elsewhere -- currently required so TreeView can
       //   initialize ObjectNav with counts
@@ -197,10 +203,10 @@
       // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
       //   controllers should maybe handle this?
       $container = this.get_active_widget_containers().eq(0);
-      $last_widget = $container.find('section.widget').last();
+      $lastWidget = $container.find('section.widget').last();
 
-      if ($last_widget.length > 0) {
-        $last_widget.after($element);
+      if ($lastWidget.length > 0) {
+        $lastWidget.after($element);
       } else {
         $container.append($element);
       }
@@ -240,10 +246,10 @@
     init_page_title: function () {
       // Reset title when page object is modified
       var that = this;
-      var that_super = this._super;
+      var thatSuper = this._super;
 
       this.options.instance.bind('change', function () {
-        that_super.apply(that);
+        thatSuper.apply(that);
       });
       this._super();
     },
@@ -311,17 +317,13 @@
     display_path: function (path) {
       var step = path.split('/')[0];
       var rest = path.substr(step.length + 1);
-      var widget_list = this.options.widget_list;
+      var widgetList = this.options.widget_list;
 
       // Find and make active the widget specified by `step`
       var widget = this.find_widget_by_target('#' + step);
-      // If widget was not found and it's not info - try to select info
-      if (!widget && step !== 'info') {
-        return this.display_path('info_widget');
-      }
-      if (!widget && widget_list.length) {
+      if (!widget && widgetList.length) {
         // Target was not found, but we can select the first widget in the list
-        widget = widget_list[0];
+        widget = widgetList[0];
       }
       if (widget) {
         this.set_active_widget(widget);
@@ -331,12 +333,12 @@
     },
 
     display_widget_path: function (path) {
-      var active_widget_selector = this.options.contexts.active_widget.selector;
-      var $active_widget = $(active_widget_selector);
-      var widget_controller = $active_widget.control();
+      var activeWidgetSelector = this.options.contexts.active_widget.selector;
+      var $activeWidget = $(activeWidgetSelector);
+      var widgetController = $activeWidget.control();
 
-      if (widget_controller && widget_controller.display_path) {
-        return widget_controller.display_path(path);
+      if (widgetController && widgetController.display_path) {
+        return widgetController.display_path(path);
       }
       return new $.Deferred().resolve();
     },
@@ -409,35 +411,37 @@
       this.options.widget_list.sort(sortByOrderAttr);
     },
 
-    update_widget_list: function (widget_elements) {
-      var widget_list = this.options.widget_list.slice(0);
+    update_widget_list: function (widgetElements) {
+      var widgetList = this.options.widget_list.slice(0);
       var that = this;
 
-      can.each(widget_elements, function (widget_element, index) {
-        widget_list.splice(
+      can.each(widgetElements, function (widgetElement, index) {
+        widgetList.splice(
           can.inArray(
-            that.update_widget(widget_element, index)
-            , widget_list)
+            that.update_widget(widgetElement, index)
+            , widgetList)
           , 1);
       });
 
-      can.each(widget_list, function (widget) {
-        that.options.widget_list.splice(can.inArray(widget, that.options.widget_list), 1);
+      can.each(widgetList, function (widget) {
+        that.options.widget_list
+          .splice(can.inArray(widget, that.options.widget_list), 1);
       });
     },
 
-    update_widget: function (widget_element, index) {
-      var $widget = $(widget_element);
+    update_widget: function (widgetElement, index) {
+      var $widget = $(widgetElement);
       var widget = this.widget_by_selector('#' + $widget.attr('id'));
       var $header = $widget.find('.header h2');
       var icon = $header.find('i').attr('class');
       var menuItem = $header.text().trim();
-      var match = menuItem ? menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {};
+      var match = menuItem ?
+        menuItem.match(/\s*(\S.*?)\s*(?:\((?:(\d+)|\.*)(\/\d+)?\))?$/) : {};
       var title = match[1];
       var count = match[2] || undefined;
-      var existing_index;
-      var widget_options;
-      var widget_name;
+      var existingIndex;
+      var widgetOptions;
+      var widgetName;
 
       if (this.delayed_display) {
         clearTimeout(this.delayed_display.timeout);
@@ -446,11 +450,13 @@
 
     // If the metadata is unrendered, find it via options
       if (!title) {
-        widget_options = $widget.control('dashboard_widgets').options;
-        widget_name = widget_options.widget_name;
-        icon = icon || widget_options.widget_icon;
+        widgetOptions = $widget.control('dashboard_widgets').options;
+        widgetName = widgetOptions.widget_name;
+        icon = icon || widgetOptions.widget_icon;
       // Strips html
-        title = $('<div>').html(typeof widget_name === 'function' ? widget_name() : (String(widget_name))).text();
+        title = $('<div>')
+          .html(typeof widgetName === 'function' ?
+            widgetName() : (String(widgetName))).text();
       }
       title = title.replace(/^(Mapped|Linked|My)\s+/, '');
 
@@ -462,25 +468,26 @@
           has_count: count != null
         });
       }
-      existing_index = this.options.widget_list.indexOf(widget);
+      existingIndex = this.options.widget_list.indexOf(widget);
 
       widget.attr({
         internav_icon: icon,
         internav_display: title,
         spinner: this.options.spinners['#' + $widget.attr('id')],
-        model: widget_options && widget_options.model,
-        order: (widget_options || widget).order
+        model: widgetOptions && widgetOptions.model,
+        order: (widgetOptions || widget).order
       });
 
       index = this.options.widget_list.length;
 
-      if (existing_index !== index) {
-        if (existing_index > -1) {
+      if (existingIndex !== index) {
+        if (existingIndex > -1) {
           if (index >= this.options.widget_list.length) {
-            this.options.widget_list.splice(existing_index, 1);
+            this.options.widget_list.splice(existingIndex, 1);
             this.options.widget_list.push(widget);
           } else {
-            this.options.widget_list.splice(existing_index, 1, this.options.widget_list[index]);
+            this.options.widget_list
+              .splice(existingIndex, 1, this.options.widget_list[index]);
             this.options.widget_list.splice(index, 1, widget);
           }
         } else {
@@ -492,8 +499,8 @@
     },
 
     update_widget_count: function ($el, count) {
-      var widget_id = $el.closest('.widget').attr('id');
-      var widget = this.widget_by_selector('#' + widget_id);
+      var widgetId = $el.closest('.widget').attr('id');
+      var widget = this.widget_by_selector('#' + widgetId);
 
       if (widget) {
         widget.attr({
@@ -505,27 +512,27 @@
     },
 
     update_add_more_link: function () {
-      var has_hidden_widgets = false;
-      var $hidden_widgets = $('.hidden-widgets-list:not(.top-space)');
+      var hasHiddenWidgets = false;
+      var $hiddenWidgets = $('.hidden-widgets-list:not(.top-space)');
       var instance = this.options.instance || {};
       var model = instance.constructor;
-      var show_all_tabs = false;
+      var showAllTabs = false;
 
       if (model.obj_nav_options) {
-        show_all_tabs = model.obj_nav_options.show_all_tabs;
+        showAllTabs = model.obj_nav_options.show_all_tabs;
       }
 
       // Update has hidden widget attr
       $.map(this.options.widget_list, function (widget) {
         if (widget.has_count && widget.count === 0 &&
-            !widget.force_show && !show_all_tabs) {
-          has_hidden_widgets = true;
+            !widget.force_show && !showAllTabs) {
+          hasHiddenWidgets = true;
         }
       });
-      if (has_hidden_widgets) {
-        $hidden_widgets.show();
+      if (hasHiddenWidgets) {
+        $hiddenWidgets.show();
       } else {
-        $hidden_widgets.hide();
+        $hiddenWidgets.hide();
       }
       this.show_hide_titles();
     },
@@ -544,11 +551,11 @@
 
       // see if too wide
       widths = _.map($el.children(':visible'),
-                         function (el) {
-                           return $(el).width();
-                         }).reduce(function (m, w) {
-                           return m + w;
-                         }, 0);
+        function (el) {
+          return $(el).width();
+        }).reduce(function (sum, current) {
+          return sum + current;
+        }, 0);
 
       // adjust
       if (widths > $el.width()) {
@@ -571,18 +578,18 @@
     // top nav dropdown position
     '.dropdown-toggle click': function (el, ev) {
       var $dropdown = el.closest('.hidden-widgets-list').find('.dropdown-menu');
-      var $menu_item = $dropdown.find('.inner-nav-item').find('a');
+      var $menuItem = $dropdown.find('.inner-nav-item').find('a');
       var offset = el.offset();
-      var left_pos = offset.left;
+      var leftPos = offset.left;
       var win = $(window);
-      var win_width = win.width();
+      var winWidth = win.width();
 
-      if (win_width - left_pos < 322) {
+      if (winWidth - leftPos < 322) {
         $dropdown.addClass('right-pos');
       } else {
         $dropdown.removeClass('right-pos');
       }
-      if ($menu_item.length === 1) {
+      if ($menuItem.length === 1) {
         $dropdown.addClass('one-item');
       } else {
         $dropdown.removeClass('one-item');
