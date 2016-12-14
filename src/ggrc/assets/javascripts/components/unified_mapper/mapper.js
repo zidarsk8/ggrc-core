@@ -86,8 +86,8 @@
       if (this.attr('assessmentGenerator')) {
         return false;
       }
-      return !(GGRC.Mappings
-        .canBeMappedDirectly(this.attr('type'), this.attr('object')));
+      return GGRC.Utils.Snapshots.isSnapshotParent(this.attr('object')) ||
+        GGRC.Utils.Snapshots.isSnapshotParent(this.attr('type'));
     },
     initInstance: function () {
       return CMS.Models.get_instance(
@@ -134,10 +134,7 @@
         exclude = GGRC.Utils.Snapshots.inScopeModels;
       }
       return GGRC.Mappings
-        .getMappingList(object, include, exclude)
-        .map(function (item) {
-          return item.modelName;
-        });
+        .getMappingList(object, include, exclude);
     },
     initTypes: function () {
       var object = this.attr('object');
@@ -153,6 +150,9 @@
           this.attr('assessmentGenerator') ||
           GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
         delete groups.all_objects;
+        // Set default type to Control in case AllObject type is not available
+        this.attr('type',
+          this.attr('type') === 'AllObject' ? 'Control' : this.attr('type'));
       }
       return groups;
     },
@@ -431,7 +431,8 @@
         this.scope.attr('mapper.term', '');
         this.scope.attr('mapper.contact', null);
         this.scope.attr('mapper.contactEmail', null);
-        if (!this.scope.attr('mapper.getList')) {
+        // Edge case for Assessment Generation
+        if (!this.scope.attr('mapper.assessmentGenerator')) {
           this.scope.attr('mapper.relevant').replace([]);
         }
         this.setModel();

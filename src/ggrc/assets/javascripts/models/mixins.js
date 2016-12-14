@@ -173,7 +173,7 @@
 
   can.Model.Mixin('mapping-limit', {
     getAllowedMappings: function () {
-      return this.allowedMappings;
+      return GGRC.config.snapshotable_objects || [];
     }
   }, {});
   /**

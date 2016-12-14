@@ -65,45 +65,15 @@
         return baseModel
             .getAllowedMappings()
             .filter(function (model) {
-              return exclude.indexOf(model.modelName) < 0;
-            }) || [];
+              return exclude.indexOf(model) < 0;
+            })
+            .concat(include);
       }
       return GGRC.Utils
         .getMappableTypes(type, {
           whitelist: include,
           forbidden: exclude
-        })
-        // Temporary Code to unify output formatting
-        .map(function (item) {
-          return {modelName: item, mappingType: 'relation'};
         });
-    },
-    /**
-     * Perform a check to identify mapping type of {source} and {destination}.
-     * In case mapping type is "snapshot" - should return {false}.
-     * @param {String} source - model name of selected for mapping object
-     * @param {String} destination - destination model name
-     * @return {boolean} - is mapped directly or via parent object
-     */
-    canBeMappedDirectly: function (source, destination) {
-      var allowedMappingList;
-      var canBe;
-      if (!source || !destination) {
-        console.debug('No arguments are provided or ' +
-          'has incorrect format.', arguments);
-        return true;
-      }
-      // AllObjects has no mapping configuration as it's fake instance
-      if (source === 'AllObject' &&
-        !GGRC.Utils.Snapshots.isSnapshotParent(destination)) {
-        return true;
-      }
-      allowedMappingList = this.getMappingList(destination);
-      canBe = allowedMappingList
-        .some(function (item) {
-          return item.mappingType !== 'snapshot' && item.modelName === source;
-        });
-      return canBe;
     },
     /*
       return all mappings from all modules for an object type.

@@ -81,30 +81,6 @@
     defaults: {
       status: 'Planned'
     },
-    allowedMappings: [
-      // Direct mapping to Audit
-      {modelName: 'Assessment', mappingType: 'relation'},
-      {modelName: 'AssessmentTemplate', mappingType: 'relation'},
-      {modelName: 'Issue', mappingType: 'relation'},
-      // Mapping through Parent Object
-      {modelName: 'AccessGroup', mappingType: 'snapshot'},
-      {modelName: 'Clause', mappingType: 'snapshot'},
-      {modelName: 'Contract', mappingType: 'snapshot'},
-      {modelName: 'Control', mappingType: 'snapshot'},
-      {modelName: 'DataAsset', mappingType: 'snapshot'},
-      {modelName: 'Facility', mappingType: 'snapshot'},
-      {modelName: 'Market', mappingType: 'snapshot'},
-      {modelName: 'Objective', mappingType: 'snapshot'},
-      {modelName: 'OrgGroup', mappingType: 'snapshot'},
-      {modelName: 'Policy', mappingType: 'snapshot'},
-      {modelName: 'Process', mappingType: 'snapshot'},
-      {modelName: 'Product', mappingType: 'snapshot'},
-      {modelName: 'Regulation', mappingType: 'snapshot'},
-      {modelName: 'Section', mappingType: 'snapshot'},
-      {modelName: 'Standard', mappingType: 'snapshot'},
-      {modelName: 'System', mappingType: 'snapshot'},
-      {modelName: 'Vendor', mappingType: 'snapshot'}
-    ],
     statuses: ['Planned', 'In Progress', 'Manager Review',
       'Ready for External Review', 'Completed'],
     obj_nav_options: {
@@ -341,39 +317,17 @@
     title_plural: 'Assessment Templates',
     table_singular: 'assessment_template',
     table_plural: 'assessment_templates',
-
+    mixins: ['mapping-limit'],
     findOne: 'GET /api/assessment_templates/{id}',
     findAll: 'GET /api/assessment_templates',
     update: 'PUT /api/assessment_templates/{id}',
     destroy: 'DELETE /api/assessment_templates/{id}',
     create: 'POST /api/assessment_templates',
-
     is_custom_attributable: false,
-
     attributes: {
       audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
     },
-    allowedMappings: [
-      // Mapping through Parent Object
-      {modelName: 'AccessGroup', mappingType: 'snapshot'},
-      {modelName: 'Clause', mappingType: 'snapshot'},
-      {modelName: 'Contract', mappingType: 'snapshot'},
-      {modelName: 'Control', mappingType: 'snapshot'},
-      {modelName: 'DataAsset', mappingType: 'snapshot'},
-      {modelName: 'Facility', mappingType: 'snapshot'},
-      {modelName: 'Market', mappingType: 'snapshot'},
-      {modelName: 'Objective', mappingType: 'snapshot'},
-      {modelName: 'OrgGroup', mappingType: 'snapshot'},
-      {modelName: 'Policy', mappingType: 'snapshot'},
-      {modelName: 'Process', mappingType: 'snapshot'},
-      {modelName: 'Product', mappingType: 'snapshot'},
-      {modelName: 'Regulation', mappingType: 'snapshot'},
-      {modelName: 'Section', mappingType: 'snapshot'},
-      {modelName: 'Standard', mappingType: 'snapshot'},
-      {modelName: 'System', mappingType: 'snapshot'},
-      {modelName: 'Vendor', mappingType: 'snapshot'}
-    ],
     defaults: {
       test_plan_procedure: false,
       template_object_type: 'Control',
