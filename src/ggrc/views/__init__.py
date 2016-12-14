@@ -180,6 +180,9 @@ def get_import_types(export_only=False):
   types = get_exportables if export_only else get_importables
   data = []
   for model in set(types().values()):
+    # TODO: remove Requests from GGRC_IMPORTABLE during requests cleanup
+    if model.__name__ == "Request":
+      continue
     data.append({
         "model_singular": model.__name__,
         "title_plural": model._inflector.title_plural
