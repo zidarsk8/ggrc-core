@@ -86,6 +86,7 @@
           }
         };
         if (!date) {
+          this.scope.picker.datepicker('option', type, null);
           return;
         }
         date = moment(date);
@@ -108,6 +109,7 @@
       },
       '{scope} _date': function (scope, ev, val) {
         scope.attr('date', val);
+        scope.picker.datepicker('setDate', val);
       },
       '{window} mousedown': function (el, ev) {
         var isInside;
