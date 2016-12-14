@@ -27,6 +27,7 @@ def init_hook():
     # pylint: disable=unused-argument
     """Apply custom attribute definitions and map people roles
     when generating Assessmet with template"""
+    db.session.flush()
     for obj, src in izip(objects, sources):
       src_obj = src.get("object")
       audit = src.get("audit")
