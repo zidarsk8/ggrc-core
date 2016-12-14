@@ -63,7 +63,6 @@
     attributes: {
       context: 'CMS.Models.Context.stub',
       program: 'CMS.Models.Program.stub',
-      requests: 'CMS.Models.Request.stubs',
       modified_by: 'CMS.Models.Person.stub',
       report_start_date: 'date',
       report_end_date: 'date',
@@ -81,7 +80,6 @@
       {modelName: 'Assessment', mappingType: 'relation'},
       {modelName: 'AssessmentTemplate', mappingType: 'relation'},
       {modelName: 'Issue', mappingType: 'relation'},
-      {modelName: 'Request', mappingType: 'relation'},
       // Mapping through Parent Object
       {modelName: 'AccessGroup', mappingType: 'snapshot'},
       {modelName: 'Clause', mappingType: 'snapshot'},
@@ -144,17 +142,7 @@
         attr_name: 'audit_firm'
       }],
       draw_children: true,
-      child_options: [{
-        model: 'Request',
-        mapping: 'requests',
-        allow_creating: true,
-        parent_find_param: 'audit.id'
-      }, {
-        model: 'Request',
-        mapping: 'related_owned_requests',
-        allow_creating: true,
-        parent_find_param: 'audit.id'
-      }]
+      child_options: []
     },
     init: function () {
       if (this._super) {

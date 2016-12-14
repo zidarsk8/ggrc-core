@@ -1158,7 +1158,6 @@
     updateSummaryHash: function (hash, type) {
       var summary = 'Summary';
       var replacements = {
-        Request: 'Request',
         Assessment: 'assessment'
       };
       var replacement = replacements[type];

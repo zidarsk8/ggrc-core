@@ -125,7 +125,7 @@
       // These inclusions\exclusions might be changed and better be defined outside
       if (this.attr('getList')) {
         exclude = ['AssessmentTemplate', 'Assessment', 'Audit',
-          'CycleTaskGroupObjectTask', 'Request', 'TaskGroup',
+          'CycleTaskGroupObjectTask', 'TaskGroup',
           'TaskGroupTask', 'Workflow'];
       }
       if (this.attr('search_only')) {

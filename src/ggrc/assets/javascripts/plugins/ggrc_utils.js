@@ -225,7 +225,7 @@
       var forbidden;
       var forbiddenList = {
         Program: ['Audit', 'RiskAssessment'],
-        Audit: ['Assessment', 'Program', 'Request'],
+        Audit: ['Assessment', 'Program'],
         Assessment: ['Workflow', 'TaskGroup'],
         Person: '*',
         AssessmentTemplate: '*'
