@@ -2500,13 +2500,13 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
     , include_admin = !options.hash || options.hash.include_admin !== false;
 
   instance = Mustache.resolve(instance);
-  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+  instance = !instance ? instance : instance.reify();
 
   if (!instance) {
     return '';
   }
 
-  audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
+  audit = instance;
 
   if (!audit) {
     return '';  // take no action until audit is available
@@ -2532,7 +2532,7 @@ Mustache.registerHelper("if_verifiers_defined", function (instance, options) {
   var verifiers;
 
   instance = Mustache.resolve(instance);
-  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+  instance = !instance ? instance : instance.reify();
 
   if (!instance) {
     return '';
@@ -2553,7 +2553,7 @@ Mustache.registerHelper("if_verifier", function (instance, options) {
       verifiers;
 
   instance = Mustache.resolve(instance);
-  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+  instance = !instance ? instance : instance.reify();
 
   if (!instance) {
     return '';
@@ -2619,7 +2619,7 @@ can.each({
           editor = GGRC.current_user.system_wide_role === "Editor";
 
       instance = resolve_computed(instance);
-      instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+      instance = !instance ? instance : instance.reify();
 
       if(!instance)
         return "";
