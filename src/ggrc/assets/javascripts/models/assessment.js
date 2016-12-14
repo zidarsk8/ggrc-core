@@ -36,29 +36,6 @@
       threshold: 5
     },
     is_custom_attributable: true,
-    allowedMappings: [
-      // Mapping through Parent Object
-      {modelName: 'AccessGroup', mappingType: 'snapshot'},
-      {modelName: 'Clause', mappingType: 'snapshot'},
-      {modelName: 'Contract', mappingType: 'snapshot'},
-      {modelName: 'Control', mappingType: 'snapshot'},
-      {modelName: 'DataAsset', mappingType: 'snapshot'},
-      {modelName: 'Facility', mappingType: 'snapshot'},
-      {modelName: 'Market', mappingType: 'snapshot'},
-      {modelName: 'Objective', mappingType: 'snapshot'},
-      {modelName: 'OrgGroup', mappingType: 'snapshot'},
-      {modelName: 'Policy', mappingType: 'snapshot'},
-      {modelName: 'Process', mappingType: 'snapshot'},
-      {modelName: 'Product', mappingType: 'snapshot'},
-      {modelName: 'Regulation', mappingType: 'snapshot'},
-      {modelName: 'Section', mappingType: 'snapshot'},
-      {modelName: 'Standard', mappingType: 'snapshot'},
-      {modelName: 'System', mappingType: 'snapshot'},
-      {modelName: 'Vendor', mappingType: 'snapshot'}
-    ],
-    getAllowedMappings: function () {
-      return this.allowedMappings;
-    },
     attributes: {
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
