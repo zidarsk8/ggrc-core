@@ -36,7 +36,7 @@
     init_tree_view_settings: function () {
       var validModels;
       var savedChildTreeDisplayList;
-      if (!GGRC.page_object) { // Admin dashboard
+      if (GGRC.pageType && GGRC.pageType === 'admin') { // Admin dashboard
         return;
       }
 
