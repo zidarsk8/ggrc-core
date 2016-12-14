@@ -394,12 +394,12 @@ class SnapshotGenerator(object):
       with benchmark("Snapshot._create.retrieve inserted snapshots"):
         snapshots = get_snapshots(for_create)
 
-      with benchmark("Snapshot._create.create base object -> snapshot rels"):
+      with benchmark("Snapshot._create.create parent object -> snapshot rels"):
         for snapshot in snapshots:
-          base_object = Stub.from_tuple(snapshot, 6, 7)
-          snapshot_object = Stub("Snapshot", snapshot[0])
-          relationship = create_relationship_dict(base_object, snapshot_object,
-                                                  user_id, snapshot[1])
+          parent = Stub(snapshot.parent_type, snapshot.parent_id)
+          base = Stub(snapshot.child_type, snapshot.child_id)
+          relationship = create_relationship_dict(
+              parent, base, user_id, self.context_cache[parent])
           relationship_payload += [relationship]
 
       with benchmark("Snapshot._create.write relationships to database"):
@@ -423,10 +423,8 @@ class SnapshotGenerator(object):
             revision_payload += [data]
 
         with benchmark("Snapshot._create.create rel revision payload"):
-          snapshot_parents = {pair.child: pair.parent for pair in for_create}
           for relationship in relationships:
-            obj = Stub.from_tuple(relationship, 4, 5)
-            parent = snapshot_parents[obj]
+            parent = Stub(relationship.source_type, relationship.source_id)
             context_id = self.context_cache[parent]
             data = create_relationship_revision_dict(
                 "created", event_id, relationship, user_id, context_id)
