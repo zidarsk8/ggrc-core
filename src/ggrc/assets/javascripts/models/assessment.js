@@ -13,7 +13,7 @@
     create: 'POST /api/assessments',
     mixins: [
       'ownable', 'contactable', 'unique_title', 'relatable',
-      'autoStatusChangeable', 'timeboxed'
+      'autoStatusChangeable', 'timeboxed', 'mapping-limit'
     ],
     relatable_options: {
       relevantTypes: {

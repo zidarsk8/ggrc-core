@@ -78,12 +78,16 @@
       return !isAllTypeSelected && !isSearch && !isInScopeModel;
     },
     showWarning: function () {
+      // Never show warning for In Scope Objects
+      if (GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
+        return false;
+      }
       // In case we generate assessments this should be false no matter what objects should be mapped to assessments
       if (this.attr('assessmentGenerator')) {
         return false;
       }
-      return !(GGRC.Mappings
-        .canBeMappedDirectly(this.attr('type'), this.attr('object')));
+      return GGRC.Utils.Snapshots.isSnapshotParent(this.attr('object')) ||
+        GGRC.Utils.Snapshots.isSnapshotParent(this.attr('type'));
     },
     initInstance: function () {
       return CMS.Models.get_instance(
@@ -122,26 +126,18 @@
     getModelNamesList: function (object) {
       var exclude = [];
       var include = [];
-      // These inclusions\exclusions might be changed and better be defined outside
-      if (this.attr('getList')) {
-        exclude = ['AssessmentTemplate', 'Assessment', 'Audit',
-          'CycleTaskGroupObjectTask', 'Request', 'TaskGroup',
-          'TaskGroupTask', 'Workflow'];
-      }
       if (this.attr('search_only')) {
         include = ['TaskGroupTask', 'TaskGroup',
           'CycleTaskGroupObjectTask'];
       }
+      if (this.attr('assessmentGenerator')) {
+        exclude = GGRC.Utils.Snapshots.inScopeModels;
+      }
       return GGRC.Mappings
-        .getMappingList(object, include, exclude)
-        .map(function (item) {
-          return item.modelName;
-        });
+        .getMappingList(object, include, exclude);
     },
     initTypes: function () {
-      var object = this.attr('getList') ?
-        'MultitypeSearch' :
-        this.attr('object');
+      var object = this.attr('object');
       // Can.JS wrap all objects with can.Map by default
       var groups = this.attr('defaultGroups').attr();
       var list = this.getModelNamesList(object);
@@ -151,8 +147,12 @@
       }.bind(this));
       // Temporary Remove All Objects select option in case Snapshot mapping
       if (groups.all_objects.models.length < 2 ||
-        GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
+          this.attr('assessmentGenerator') ||
+          GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
         delete groups.all_objects;
+        // Set default type to Control in case AllObject type is not available
+        this.attr('type',
+          this.attr('type') === 'AllObject' ? 'Control' : this.attr('type'));
       }
       return groups;
     },
@@ -429,7 +429,8 @@
         this.scope.attr('mapper.term', '');
         this.scope.attr('mapper.contact', null);
         this.scope.attr('mapper.contactEmail', null);
-        if (!this.scope.attr('mapper.getList')) {
+        // Edge case for Assessment Generation
+        if (!this.scope.attr('mapper.assessmentGenerator')) {
           this.scope.attr('mapper.relevant').replace([]);
         }
         this.setModel();
