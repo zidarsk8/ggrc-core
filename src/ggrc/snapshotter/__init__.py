@@ -112,12 +112,19 @@ class SnapshotGenerator(object):
   def _get_snapshottable_objects(self, obj):
     """Get snapshottable objects from parent object's neighborhood."""
     with benchmark("Snapshot._get_snapshotable_objects"):
+      related_mappings = set()
       object_rules = self.rules.rules[obj.type]
 
       with benchmark("Snapshot._get_snapshotable_objects.related_mappings"):
-        related_mappings = obj.related_objects({
+        relatable_rules = {
             rule for rule in object_rules["fst"]
-            if isinstance(rule, basestring)})
+            if isinstance(rule, basestring)
+        }
+
+        if relatable_rules:
+          related_mappings = obj.related_objects({
+              rule for rule in object_rules["fst"]
+              if isinstance(rule, basestring)})
 
       with benchmark("Snapshot._get_snapshotable_objects.direct mappings"):
         direct_mappings = {getattr(obj, rule.name)

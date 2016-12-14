@@ -452,7 +452,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     self.create_audit(program)
 
     audit = db.session.query(models.Audit).filter(
-        models.Audit.title.like("%Snapshotable audit%")).first()
+        models.Audit.title == "Snapshotable audit").one()
 
     snapshots = db.session.query(models.Snapshot).filter(
         models.Snapshot.parent_type == "Audit",
