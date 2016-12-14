@@ -201,7 +201,7 @@
             'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
             'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
             'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-            'Objective', 'Audit', 'Assessment', 'AccessGroup', 'Request',
+            'Objective', 'Audit', 'Assessment', 'AccessGroup',
             'Document', 'Risk', 'Threat'
           ]
         },
@@ -236,7 +236,6 @@
         related_controls: TypeFilter('related_objects', 'Control'),
         related_documents: TypeFilter('related_objects', 'Document'),
         related_assessments: TypeFilter('related_objects', 'Assessment'),
-        related_requests: TypeFilter('related_objects', 'Request'),
         regulations: TypeFilter('related_objects', 'Regulation'),
         contracts: TypeFilter('related_objects', 'Contract'),
         policies: TypeFilter('related_objects', 'Policy'),
@@ -369,7 +368,7 @@
     var pageInstance = GGRC.page_instance();
     var treeWidgets = GGRC.tree_view.base_widgets_by_type;
     var subTrees = GGRC.tree_view.sub_tree_for;
-    var subTreeItems = ['Cycle', 'Request'];
+    var subTreeItems = ['Cycle'];
     var models = ['TaskGroup', 'Workflow', 'CycleTaskEntry',
       'CycleTaskGroupObjectTask', 'CycleTaskGroupObject', 'CycleTaskGroup'];
     _.each(_workflowObjectTypes, function (type) {
