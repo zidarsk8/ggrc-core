@@ -236,7 +236,7 @@ class SnapshotGenerator(object):
 
       with benchmark("Snapshot._update.create snapshots revision payload"):
         for snapshot in snapshots:
-          parent = Stub.from_tuple(snapshot, 4, 5)
+          parent = Stub(snapshot.parent_type, snapshot.parent_id)
           context_id = self.context_cache[parent]
           data = create_snapshot_revision_dict("modified", event_id, snapshot,
                                                user_id, context_id)
@@ -416,7 +416,7 @@ class SnapshotGenerator(object):
       with benchmark("Snapshot._create.create revision payload"):
         with benchmark("Snapshot._create.create snapshots revision payload"):
           for snapshot in snapshots:
-            parent = Stub.from_tuple(snapshot, 4, 5)
+            parent = Stub(snapshot.parent_type, snapshot.parent_id)
             context_id = self.context_cache[parent]
             data = create_snapshot_revision_dict("created", event_id, snapshot,
                                                  user_id, context_id)
