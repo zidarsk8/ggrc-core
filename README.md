@@ -104,7 +104,7 @@ simple:
 launch_ggrc
 ```
 
-### Launching gGRC in Google App Engine SDK
+### Launching GGRC in Google App Engine SDK
 
 We strive to make getting up and running as simple as possible; to that end,
 launching the application in the Google App Engine SDK environment is simple:
