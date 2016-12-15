@@ -227,7 +227,6 @@
         mapper: new MapperModel(can.extend(data, {
           relevantTo: parentScope.attr('relevantTo'),
           callback: parentScope.attr('callback'),
-          getList: parentScope.attr('getList'),
           useTemplates: parentScope.attr('useTemplates'),
           assessmentGenerator: parentScope.attr('assessmentGenerator'),
           is_snapshotable: parentScope.attr('is_snapshotable'),
@@ -321,7 +320,7 @@
         if (el.hasClass('disabled')) {
           return;
         }
-        if (this.scope.attr('mapper.getList')) {
+        if (this.scope.attr('mapper.assessmentGenerator')) {
           this.scope.attr('mapper.is_saving', true);
           return callback(this.scope.attr('mapper.selected'), {
             type: type,
