@@ -938,17 +938,32 @@
     },
 
     new_instance: function (data) {
+      var newInstance = this.prepareInstance();
+
+      this.resetCAFields(newInstance.attr('custom_attribute_definitions'));
+
+      $.when(this.options.attr('instance', newInstance))
+        .done(function () {
+          this.reset_form(function () {
+            var $form = $(this.element).find('form');
+            $form.trigger('reset');
+          });
+        }.bind(this))
+        .then(this.proxy('apply_object_params'))
+        .then(this.proxy('serialize_form'))
+        .then(this.proxy('autocomplete'));
+
+      this.restore_ui_status();
+    },
+
+    /**
+     * Reset custom attribute values manually
+     * @param {Array} cad - Array with custom attribute definitions
+     */
+    resetCAFields: function (cad) {
       var wysihtml5;
-      var params = this.find_params();
-      var newInstance = new this.options.model(params);
 
-      newInstance.attr('_suppress_errors', true)
-        .attr('custom_attribute_definitions',
-          this.options.instance.custom_attribute_definitions)
-        .attr('custom_attributes', new can.Map());
-
-      // Reset custom attribute values manually
-      can.each(newInstance.custom_attribute_definitions, function (definition) {
+      can.each(cad, function (definition) {
         var element = this.element
           .find('[name="custom_attributes.' + definition.id + '"]');
         if (definition.attribute_type === 'Checkbox') {
@@ -969,24 +984,24 @@
           element.val('');
         }
       }, this);
+    },
+
+    prepareInstance: function () {
+      var params = this.find_params();
+      var instance = new this.options.model(params);
+      var saveContactModels = ['TaskGroup', 'TaskGroupTask'];
+
+      instance.attr('_suppress_errors', true)
+        .attr('custom_attribute_definitions',
+          this.options.instance.custom_attribute_definitions)
+        .attr('custom_attributes', new can.Map());
 
       if (this.options.add_more &&
-        this.options.model.shortName === 'TaskGroupTask') {
-        newInstance.attr('contact', this.options.attr('instance.contact'));
+        _.includes(saveContactModels, this.options.model.shortName)) {
+        instance.attr('contact', this.options.attr('instance.contact'));
       }
 
-      $.when(this.options.attr('instance', newInstance))
-        .done(function () {
-          this.reset_form(function () {
-            var $form = $(this.element).find('form');
-            $form.trigger('reset');
-          });
-        }.bind(this))
-        .then(this.proxy('apply_object_params'))
-        .then(this.proxy('serialize_form'))
-        .then(this.proxy('autocomplete'));
-
-      this.restore_ui_status();
+      return instance;
     },
 
     save_instance: function (el, ev) {
