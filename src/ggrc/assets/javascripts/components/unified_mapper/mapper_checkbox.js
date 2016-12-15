@@ -12,7 +12,7 @@
     scope: {
       instance: null,
       checkbox: can.compute(function (status) {
-        if (this.attr('mapper.getList') && !this.attr('appended')) {
+        if (this.attr('mapper.assessmentGenerator') && !this.attr('appended')) {
           return false;
         }
         return (
@@ -87,7 +87,7 @@
     },
     helpers: {
       not_allowed_to_map: function (options) {
-        if (this.attr('mapper.getList')) {
+        if (this.attr('mapper.assessmentGenerator')) {
           return options.inverse();
         }
         if (!this.attr('allowedToMap')) {
@@ -100,7 +100,7 @@
             this.attr('is_loading')) {
           return options.fn();
         }
-        if (this.attr('mapper.getList')) {
+        if (this.attr('mapper.assessmentGenerator')) {
           return options.inverse();
         }
         if (this.attr('isMapped') ||
