@@ -262,16 +262,18 @@
             this.scope.attr('mapper.selected'),
             function (desination) {
               var isAllowed = GGRC.Utils.allowed_to_map(source, desination);
-              var inst = _.find(
-                this.scope.attr('mapper.entries'),
-                function (entry) {
-                  return (entry.instance.id === desination.id &&
-                  entry.instance.type === desination.type);
-                }
-              );
+              var instance =
+                can.makeArray(this.scope.attr('mapper.entries'))
+                  .map(function (entry) {
+                    return entry.instance || entry;
+                  })
+                  .find(function (instance) {
+                    return instance.id === desination.id &&
+                      instance.type === desination.type; }
+                  );
 
-              if (inst && isAllowed) {
-                return inst.instance;
+              if (instance && isAllowed) {
+                return instance;
               }
             }.bind(this)
           ))
