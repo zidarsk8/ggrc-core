@@ -3717,4 +3717,14 @@ Example:
       return options.inverse(options.contexts);
     }
   );
+
+   Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
+     var isInScopeModel;
+     modelName = can.isFunction(modelName) ? modelName() : modelName;
+     isInScopeModel = GGRC.Utils.Snapshots.isInScopeModel(modelName);
+     // Temporary Modification to remove possibility to unmap Audit
+     isInScopeModel =
+       isInScopeModel || GGRC.Utils.Snapshots.isSnapshotParent(modelName);
+     return isInScopeModel ? options.inverse(this) : options.fn(this);
+    });
 })(this, jQuery, can);
