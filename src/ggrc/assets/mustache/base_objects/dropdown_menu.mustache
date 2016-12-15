@@ -17,7 +17,7 @@
     <span class="bubble"></span>
   </a>
   <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
-    {{#is_allowed 'update' instance context='for'}}    
+    {{#is_allowed 'update' instance context='for'}}
       {{#if instance.is_snapshotable}}
         <li>
           <snapshot-scope-update instance="instance">
@@ -111,9 +111,10 @@
     {{#is_info_pin}}
       {{#is_allowed_to_map page_instance instance}}
         {{^options.is_in_selector}}
-          {{> /static/mustache/base_objects/unmap.mustache}}
-
-        {{/options}}
+           {{#isNotInScopeModel instance.type}}
+             {{> '/static/mustache/base_objects/unmap.mustache'}}
+           {{/isNotInScopeModel}}
+        {{/options.is_in_selector}}
       {{/is_allowed_to_map}}
       {{#if instance.viewLink}}
         {{#is_allowed "view_object_page" instance}}
