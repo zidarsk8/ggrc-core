@@ -876,6 +876,7 @@
 
     return {
       inScopeModels: ['Assessment', 'Issue', 'AssessmentTemplate'],
+      outOfScopeModels: ['Person', 'Program'],
       isSnapshot: isSnapshot,
       isSnapshotScope: isSnapshotScope,
       isSnapshotParent: isSnapshotParent,
