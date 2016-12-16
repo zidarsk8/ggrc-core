@@ -303,18 +303,26 @@
     },
 
     route: function (path) {
+      var refetchMatches;
+      var refetch = false;
       if (path.substr(0, 2) === '#!') {
         path = path.substr(2);
       } else if (path.substr(0, 1) === '#') {
         path = path.substr(1);
       }
+      refetchMatches = path.match(/&refetch|^refetch$/);
+
+      if (refetchMatches && refetchMatches.length === 1) {
+        path = path.replace(refetchMatches[0], '');
+        refetch = true;
+      }
 
       window.location.hash = path;
 
-      this.display_path(path.length ? path : 'Summary_widget');
+      this.display_path(path.length ? path : 'Summary_widget', refetch);
     },
 
-    display_path: function (path) {
+    display_path: function (path, refetch) {
       var step = path.split('/')[0];
       var rest = path.substr(step.length + 1);
       var widgetList = this.options.widget_list;
@@ -327,18 +335,18 @@
       }
       if (widget) {
         this.set_active_widget(widget);
-        return this.display_widget_path(rest);
+        return this.display_widget_path(rest, refetch);
       }
       return new $.Deferred().resolve();
     },
 
-    display_widget_path: function (path) {
+    display_widget_path: function (path, refetch) {
       var activeWidgetSelector = this.options.contexts.active_widget.selector;
       var $activeWidget = $(activeWidgetSelector);
       var widgetController = $activeWidget.control();
 
       if (widgetController && widgetController.display_path) {
-        return widgetController.display_path(path);
+        return widgetController.display_path(path, refetch);
       }
       return new $.Deferred().resolve();
     },

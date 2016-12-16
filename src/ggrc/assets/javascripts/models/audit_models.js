@@ -453,7 +453,7 @@
 
     after_save: function () {
       if (this.audit) {
-        this.audit.reify().refresh('related_assessment_templates');
+        this.audit.reify().refresh();
       }
     },
 
@@ -641,6 +641,19 @@
       });
 
       return objectTypes;
+    },
+
+    getHashFragment: function () {
+      var widgetName = this.constructor.table_singular;
+      if (window.location.hash
+          .startsWith(['#', widgetName, '_widget'].join(''))) {
+        return;
+      }
+
+      return [widgetName,
+              '_widget/',
+              this.hash_fragment(),
+              '&refetch'].join('');
     },
     ignore_ca_errors: true
   });
