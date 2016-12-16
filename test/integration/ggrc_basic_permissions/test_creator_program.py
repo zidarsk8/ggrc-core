@@ -5,6 +5,8 @@
 Test Creator role with Program scoped roles
 """
 
+import unittest
+
 from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import TestCase
@@ -293,6 +295,7 @@ class TestCreatorProgram(TestCase):
       # Try mapping
     self.assertEqual(errors, [])
 
+  @unittest.skip("Test for request object, not important anymore")
   def test_creator_audit_request_creation(self):
     self.init_objects("ProgramOwner")
     program = self.objects.get("program")

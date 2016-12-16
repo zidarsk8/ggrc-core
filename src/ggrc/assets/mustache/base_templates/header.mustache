@@ -70,9 +70,9 @@
             {{#is_info_pin}}
               {{#is_allowed_to_map page_instance instance}}
                 {{^options.is_in_selector}}
-                  {{^if_in instance.type GGRC.Utils.Snapshots.inScopeModels}}
+                  {{#isNotInScopeModel instance.type}}
                     {{> '/static/mustache/base_objects/unmap.mustache'}}
-                  {{/if_in}}
+                  {{/isNotInScopeModel}}
                 {{/options.is_in_selector}}
               {{/is_allowed_to_map}}
               {{#if instance.viewLink}}

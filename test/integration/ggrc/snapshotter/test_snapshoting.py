@@ -48,10 +48,8 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         }
     })
 
-    self.assertEqual(
-        db.session.query(models.Audit).filter(
-            models.Audit.title.like(
-                "%Snapshotable audit%")).count(), 1)
+    audit = db.session.query(models.Audit).filter(
+        models.Audit.title == "Snapshotable audit").one()
 
     snapshot = db.session.query(models.Snapshot).filter(
         models.Snapshot.child_id == control.id,
@@ -79,16 +77,16 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
     relationship_columns = db.session.query(models.Relationship)
     relationship = relationship_columns.filter(
-        models.Relationship.source_type == "Control",
-        models.Relationship.source_id == control.id,
-        models.Relationship.destination_type == "Snapshot",
-        models.Relationship.destination_id == snapshot.first().id
+        models.Relationship.source_type == "Audit",
+        models.Relationship.source_id == audit.id,
+        models.Relationship.destination_type == "Control",
+        models.Relationship.destination_id == control.id
     ).union(
         relationship_columns.filter(
-            models.Relationship.source_type == "Snapshot",
-            models.Relationship.source_id == snapshot.first().id,
-            models.Relationship.destination_type == "Control",
-            models.Relationship.destination_id == control.id
+            models.Relationship.source_type == "Control",
+            models.Relationship.source_id == control.id,
+            models.Relationship.destination_type == "Audit",
+            models.Relationship.destination_id == audit.id
         )
     )
     self.assertEqual(relationship.count(), 1)
@@ -454,7 +452,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     self.create_audit(program)
 
     audit = db.session.query(models.Audit).filter(
-        models.Audit.title.like("%Snapshotable audit%")).first()
+        models.Audit.title == "Snapshotable audit").one()
 
     snapshots = db.session.query(models.Snapshot).filter(
         models.Snapshot.parent_type == "Audit",
