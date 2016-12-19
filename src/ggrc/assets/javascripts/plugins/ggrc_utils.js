@@ -755,6 +755,26 @@
   })();
 
   /**
+   * Browser-specific utils.
+   */
+  GGRC.Utils.Browser = (function () {
+    /**
+     * Refresh current page
+     * @param {Boolean} force - Force refresh and don't wait for GGRC queue.
+     */
+    function refreshPage(force) {
+      if (force) {
+        window.onbeforeunload = null;
+      }
+      window.location.reload(force);
+    }
+
+    return {
+      refreshPage: refreshPage
+    };
+  })();
+
+  /**
    * Util methods for work with Snapshots.
    */
   GGRC.Utils.Snapshots = (function () {
@@ -835,7 +855,6 @@
       content.snapshot = new CMS.Models.Snapshot(instance);
       content.related_sources = [];
       content.related_destinations = [];
-      content.custom_attribute_values = content.custom_attributes;
       content.viewLink = content.snapshot.viewLink;
       content.selfLink = content.snapshot.selfLink;
       content.type = instance.child_type;
