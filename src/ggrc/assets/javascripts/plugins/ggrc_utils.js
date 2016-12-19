@@ -756,6 +756,26 @@
   })();
 
   /**
+   * Browser-specific utils.
+   */
+  GGRC.Utils.Browser = (function () {
+    /**
+     * Refresh current page
+     * @param {Boolean} force - Force refresh and don't wait for GGRC queue.
+     */
+    function refreshPage(force) {
+      if (force) {
+        window.onbeforeunload = null;
+      }
+      window.location.reload(force);
+    }
+
+    return {
+      refreshPage: refreshPage
+    };
+  })();
+
+  /**
    * Util methods for work with Snapshots.
    */
   GGRC.Utils.Snapshots = (function () {
