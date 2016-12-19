@@ -29,7 +29,7 @@
             instance.attr('snapshots', data);
             return instance.save();
           }).then(function () {
-            window.location.reload();
+            GGRC.Utils.Browser.refreshPage(true);
           });
         }.bind(this));
       }
