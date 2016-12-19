@@ -523,6 +523,40 @@ class ModelView(View):
         for j in joinlist:
           query = query.join(j)
         query = query.filter(filter_)
+
+    if "__no_role" in request.args:
+      attr = getattr(self.model, "user_roles")
+      query = query.outerjoin(attr)
+      user_roles_module = attr.mapper.class_
+      superusers = getattr(settings, "BOOTSTRAP_ADMIN_USERS", [])
+      # Filter out:
+      # non superusers AND
+      #   (users without user_role OR
+      #    users with user_role BUT without global role:
+      #    Reader, Editor, Administrator)
+      subq = db.session.query(user_roles_module.person_id).filter(
+          or_(
+              # all users that have global user_role
+              user_roles_module.context_id.is_(None),
+              user_roles_module.context_id == 0
+          )
+      ).subquery()
+      filter_ = and_(
+          # user is not superuser
+          ~self.model.email.in_(superusers),
+          or_(
+              # user hasn't user_role in user_role table
+              user_roles_module.id.is_(None),
+              and_(
+                  # user has user_role in user_role table
+                  user_roles_module.id.isnot(None),
+                  # user hasn't global role
+                  ~user_roles_module.person_id.in_(subq)
+              )
+          )
+      )
+      query = query.filter(filter_)
+
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
       resources = permissions.read_resources_for(self.model.__name__)
