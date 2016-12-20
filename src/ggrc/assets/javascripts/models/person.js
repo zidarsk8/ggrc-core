@@ -115,13 +115,14 @@
     getPersonMappings: function (instance, person, specificOject) {
       var result = $.Deferred();
       var mappingObject = instance[specificOject];
-      var refreshQueue = new RefreshQueue();
+      var mappingsRQ = new RefreshQueue();
+      var userRolesRQ = new RefreshQueue();
 
       can.each(mappingObject, function (obj) {
-        refreshQueue.enqueue(obj);
+        mappingsRQ.enqueue(obj);
       });
 
-      refreshQueue.trigger().then(function (objects) {
+      mappingsRQ.trigger().then(function (objects) {
         var userRoles;
         var objectPeopleFiltered = _.filter(objects, function (item) {
           return item.person && item.person.id === person.id;
@@ -136,6 +137,12 @@
 
         userRoles = userRoles.concat(objectPeopleFiltered);
 
+        can.each(userRoles, function (obj) {
+          userRolesRQ.enqueue(obj);
+        });
+
+        return userRolesRQ.trigger();
+      }).then(function (userRoles) {
         result.resolve(userRoles);
       });
       return result.promise();
