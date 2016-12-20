@@ -1206,6 +1206,7 @@ Mustache.registerHelper("link_to_tree", function () {
  *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
  */
 Mustache.registerHelper('date', function (date, hideTime) {
+  date = Mustache.resolve(date);
   return GGRC.Utils.formatDate(date, hideTime);
 });
 
@@ -1430,6 +1431,10 @@ function localizeDate(date, options, tmpl) {
   }
   date = resolve_computed(date);
   if (date) {
+    if (typeof date === 'string') {
+      // string dates are assumed to be in ISO format
+      return moment.utc(date, 'YYYY-MM-DD', true).format(tmpl);
+    }
     return moment(new Date(date)).format(tmpl);
   }
   return '';
