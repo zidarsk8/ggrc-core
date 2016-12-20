@@ -277,14 +277,6 @@ class CustomAttributable(object):
         CustomAttributeValue.attributable_type == self.__class__.__name__,
         CustomAttributeValue.attributable_id == self.id)).all()
 
-    attr_value_ids = [value.id for value in attr_values]
-    ftrp_properties = []
-    for val in attr_values:
-      ftrp_properties.append(val.custom_attribute.title)
-      if val.custom_attribute.attribute_type == "Map:Person":
-        ftrp_properties.append(val.custom_attribute.title+".name")
-        ftrp_properties.append(val.custom_attribute.title+".email")
-
 
     # Save previous value of custom attribute. This is a bit complicated by
     # the fact that imports can save multiple values at the time of writing.
@@ -299,7 +291,13 @@ class CustomAttributable(object):
                    for key, old_vals in old_values.iteritems()}
 
     # 2) Delete all fulltext_record_properties for the list of values
-    if len(attr_value_ids) > 0:
+    if attr_values:
+      ftrp_properties = []
+      for val in attr_values:
+        ftrp_properties.append(val.custom_attribute.title)
+        if val.custom_attribute.attribute_type == "Map:Person":
+          ftrp_properties.append(val.custom_attribute.title + ".name")
+          ftrp_properties.append(val.custom_attribute.title + ".email")
       db.session.query(MysqlRecordProperty)\
           .filter(
               and_(
@@ -308,6 +306,7 @@ class CustomAttributable(object):
           .delete(synchronize_session='fetch')
 
       # 3) Delete the list of custom attribute values
+      attr_value_ids = [value.id for value in attr_values]
       db.session.query(CustomAttributeValue)\
           .filter(CustomAttributeValue.id.in_(attr_value_ids))\
           .delete(synchronize_session='fetch')
