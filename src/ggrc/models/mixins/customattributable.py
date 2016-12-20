@@ -278,7 +278,13 @@ class CustomAttributable(object):
         CustomAttributeValue.attributable_id == self.id)).all()
 
     attr_value_ids = [value.id for value in attr_values]
-    ftrp_properties = [val.custom_attribute.title for val in attr_values]
+    ftrp_properties = []
+    for val in attr_values:
+      ftrp_properties.append(val.custom_attribute.title)
+      if val.custom_attribute.attribute_type == "Map:Person":
+        ftrp_properties.append(val.custom_attribute.title+".name")
+        ftrp_properties.append(val.custom_attribute.title+".email")
+
 
     # Save previous value of custom attribute. This is a bit complicated by
     # the fact that imports can save multiple values at the time of writing.
