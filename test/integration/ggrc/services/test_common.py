@@ -4,10 +4,15 @@
 import json
 import time
 from urlparse import urlparse
-
 from wsgiref.handlers import format_date_time
+from sqlalchemy import and_
 
 from integration.ggrc import services
+from integration.ggrc.api_helper import Api
+from integration.ggrc.generator import ObjectGenerator
+from ggrc.models import all_models
+from ggrc import db
+
 
 COLLECTION_ALLOWED = ["HEAD", "GET", "POST", "OPTIONS"]
 RESOURCE_ALLOWED = ["HEAD", "GET", "PUT", "DELETE", "OPTIONS"]
@@ -275,3 +280,55 @@ class TestServices(services.TestCase):
     )
     self.assertStatus(response, 304)
     self.assertIn("Etag", response.headers)
+
+
+class TestFilteringByRequest(services.TestCase):
+  """Test filter query by request"""
+
+  def setUp(self):
+    services.TestCase.setUp(self)
+    self.object_generator = ObjectGenerator()
+    self.api = Api()
+    self.init_users()
+
+  def init_users(self):
+    """ Init users needed by the test cases """
+    users = (
+        ("creator", "Creator"),
+        ("admin", "Administrator"),
+        ("john", "WorkflowOwner")
+    )
+    self.users = {}
+    for (name, role) in users:
+      _, user = self.object_generator.generate_person(
+          data={"name": name}, user_role=role)
+      self.users[name] = user
+    context = (
+        db.session.query(all_models.Context).filter(
+            all_models.Context.id != 0
+        ).first()
+    )
+    user_role = (
+        db.session.query(all_models.UserRole).join(all_models.Person).
+        filter(
+            and_(
+                all_models.UserRole.person_id == all_models.Person.id,
+                all_models.Person.name == "john"
+            )
+        ).first()
+    )
+    user_role.context_id = context.id
+    db.session.commit()
+    db.session.flush()
+
+  def test_no_role_users_filtering(self):
+    """Test 'No Role' users filtering"""
+    self.api.set_user(self.users['admin'])
+    response = self.api.get_query(all_models.Person, "__no_role=true")
+
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(len(response.json['people_collection']['people']), 1)
+    self.assertEqual(
+        response.json['people_collection']['people'][0]['name'],
+        'john'
+    )
