@@ -33,7 +33,6 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
-from ggrc.utils import similarity_options as similarity_options_module
 from ggrc.fulltext.mixin import Indexed, ReindexRule
 from ggrc.fulltext.attributes import MultipleSubpropertyFullTextAttr
 
@@ -209,7 +208,13 @@ class Assessment(statusable.Statusable, AuditRelationship,
       ReindexRule("Relationship", reindex_by_relationship)
   ]
 
-  similarity_options = similarity_options_module.ASSESSMENT
+  similarity_options = {
+      "relevant_types": {
+          "Objective": {"weight": 2},
+          "Control": {"weight": 2},
+      },
+      "threshold": 1,
+  }
 
   @property
   def assessors(self):
