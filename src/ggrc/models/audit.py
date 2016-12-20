@@ -47,8 +47,6 @@ class Audit(Snapshotable, clonable.Clonable,
   program_id = deferred(
       db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False),
       'Audit')
-  requests = db.relationship(
-      'Request', backref='audit', cascade='all, delete-orphan')
   audit_objects = db.relationship(
       'AuditObject', backref='audit', cascade='all, delete-orphan')
   object_type = db.Column(
@@ -64,7 +62,6 @@ class Audit(Snapshotable, clonable.Clonable,
       'status',
       'gdrive_evidence_folder',
       'program',
-      'requests',
       'object_type',
       PublishOnly('audit_objects')
   ]
@@ -209,7 +206,6 @@ class Audit(Snapshotable, clonable.Clonable,
     query = super(Audit, cls).eager_query()
     return query.options(
         orm.joinedload('program'),
-        orm.subqueryload('requests'),
         orm.subqueryload('object_people').joinedload('person'),
         orm.subqueryload('audit_objects'),
     )
