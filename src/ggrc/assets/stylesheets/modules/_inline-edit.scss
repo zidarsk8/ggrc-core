@@ -45,7 +45,7 @@
       border: 1px solid $warmGray;
       &:hover {
         .inline-edit__controls {
-          height: auto;
+          height: 32px;
         }
       }
     }
@@ -82,6 +82,25 @@
     }
     .inline-edit--active & {
       display: block;
+    }
+
+    &.inline-edit__controls--edit-mode {
+      background: $white;
+      box-sizing: border-box;
+      height: 32px;
+      bottom: -33px;
+      line-height: 32px;
+      margin: 0;
+      padding: 0;
+      width: 70px;
+      z-index: 1;
+
+      li {
+        box-sizing: border-box;
+        float: left;
+        width: 32px;
+        line-height: 31px;
+      }
     }
   }
 }
