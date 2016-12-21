@@ -900,7 +900,7 @@
         object: 'MultitypeSearch',
         search_only: true
       });
-      objectTypes = mapper.initTypes();
+      objectTypes = mapper.initTypes('AssessmentTemplate');
 
       // the all objects group is not needed
       delete objectTypes.all_objects;

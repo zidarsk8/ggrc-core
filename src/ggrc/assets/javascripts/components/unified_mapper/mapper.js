@@ -126,18 +126,19 @@
     getModelNamesList: function (object) {
       var exclude = [];
       var include = [];
+      var snapshots = GGRC.Utils.Snapshots;
       if (this.attr('search_only')) {
         include = ['TaskGroupTask', 'TaskGroup',
           'CycleTaskGroupObjectTask'];
       }
       if (this.attr('assessmentGenerator')) {
-        exclude = GGRC.Utils.Snapshots.inScopeModels;
+        exclude = snapshots.inScopeModels;
       }
       return GGRC.Mappings
         .getMappingList(object, include, exclude);
     },
-    initTypes: function () {
-      var object = this.attr('object');
+    initTypes: function (objectType) {
+      var object = objectType || this.attr('object');
       // Can.JS wrap all objects with can.Map by default
       var groups = this.attr('defaultGroups').attr();
       var list = this.getModelNamesList(object);
