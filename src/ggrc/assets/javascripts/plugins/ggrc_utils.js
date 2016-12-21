@@ -478,7 +478,50 @@
 
       roles.unshift('none');
       return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
+    },
+    _display_tree_subpath: function display_subpath(el, path, attempt_counter) {
+    var rest = path.split('/');
+    var type = rest.shift();
+    var id = rest.shift();
+    var selector = '[data-object-type=\'' + type + '\'][data-object-id=' + id + ']';
+    var $node;
+    var node_controller;
+    var controller;
+
+    if (!attempt_counter) {
+      attempt_counter = 0;
     }
+
+    rest = rest.join('/');
+
+    if (type || id) {
+      $node = el.find(selector);
+
+      // sometimes nodes haven't loaded yet, wait for them
+      if (!$node.size() && attempt_counter < 5) {
+        setTimeout(function () {
+          display_subpath(el, path, attempt_counter + 1);
+        }, 100);
+        return undefined;
+      }
+
+      if (!rest.length) {
+        controller = $node
+          .closest('.cms_controllers_tree_view_node')
+          .control();
+
+        if (controller) {
+          controller.select();
+        }
+      } else {
+        node_controller = $node.control();
+        if (node_controller && node_controller.display_path) {
+          return node_controller.display_path(rest);
+        }
+      }
+    }
+    return can.Deferred().resolve();
+  }
   };
 
   /**

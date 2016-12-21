@@ -115,9 +115,11 @@ dashboard-js-files:
   - controllers/help_controller.js
   - controllers/quick_search_controller.js
   - controllers/recently_viewed_controller.js
-  - controllers/tree_view_controller.js
-  - controllers/list_view_controller.js
-  - controllers/tree_filter_controller.js
+  - controllers/tree/tree-loader.js
+  - controllers/tree/tree-view.js
+  - controllers/tree/tree-view-node.js
+  - controllers/tree/list_view_controller.js
+  - controllers/tree/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
   - controllers/info_pin_controller.js
   - controllers/automapper_controller.js
@@ -205,6 +207,8 @@ dashboard-js-files:
   - components/object_counter/object_counter.js
   - components/sort_by_sort_index/sort_by_sort_index.js
   - components/tree_pagination/tree_pagination.js
+  - components/tree/tree-header-selector.js
+  - components/tree/tree-type-selector.js
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
   - components/effective-dates/effective-dates.js
