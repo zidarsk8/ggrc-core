@@ -150,9 +150,9 @@
       );
     }
   }, {
-    object_model: can.compute(function () {
+    object_model: function () {
       return CMS.Models[this.attr('object_type')];
-    }),
+    },
     clone: function (options) {
       var model = CMS.Models.Audit;
       return new model({
@@ -613,7 +613,7 @@
 
       // remove the groups that have ended up being empty
       objectTypes = _.pick(objectTypes, function (objGroup) {
-        return objGroup.items.length > 0;
+        return objGroup.items && objGroup.items.length > 0;
       });
 
       return objectTypes;

@@ -18,12 +18,7 @@
         relevant: can.compute(function () {
           return new can.List();
         }),
-        columns: function () {
-          return _.filter(GGRC.model_attr_defs[this.attr("type")], function (el) {
-            return (!el.import_only) &&
-                   (el.display_name.indexOf("unmap:") === -1);
-          });
-        }
+        columns: [],
       }),
       panelsModel = can.Map({
         items: new can.List()
@@ -33,12 +28,8 @@
         loading: false,
         url: "/_service/export_csv",
         type: url.model_type || "Program",
-        edit_filename: false,
         only_relevant: false,
-        filename: "Export Objects",
-        get_filename: can.compute(function () {
-          return this.attr("filename").replace(/\s+/, "_").toLowerCase() + ".csv";
-        })
+        filename: "export_objects.csv"
       });
 
 
@@ -115,11 +106,6 @@
       };
     },
     events: {
-      ".btn-title-change click": function (el, ev) {
-        ev.preventDefault();
-        this.scope.attr("export.edit_filename", !this.scope.attr("export.edit_filename"));
-      },
-
       toggleIndicator: function (currentFilter) {
         var isExpression =
             !!currentFilter &&
@@ -167,7 +153,7 @@
         GGRC.Utils.export_request({
           data: query
         }).then(function (data) {
-          GGRC.Utils.download(this.scope.attr("export.get_filename"), data);
+          GGRC.Utils.download(this.scope.attr("export.filename"), data);
         }.bind(this))
         .fail(function (data) {
           $("body").trigger("ajax:flash", {
@@ -202,8 +188,15 @@
         }
 
         this.scope.attr("_index", index);
-        data.index = index;
-        return this.scope.attr("panels.items").push(new panelModel(data));
+        var pm = new panelModel(data);
+        pm.attr('columns', can.compute(function() {
+          var definitions = GGRC.model_attr_defs[pm.attr('type')];
+          return _.filter(definitions, function (el) {
+            return (!el.import_only) &&
+                   (el.display_name.indexOf("unmap:") === -1);
+          });
+        }));
+        return this.scope.attr("panels.items").push(pm);
       },
       getIndex: function (el) {
         return +el.closest("export-panel").control().scope.attr("item.index");
