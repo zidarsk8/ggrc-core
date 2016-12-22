@@ -76,7 +76,8 @@
         if (!this.element) {
           return;
         }
-        can.trigger(this.element, 'updateCount', [0, this.options.update_count]);
+        can.trigger(this.element, 'updateCount',
+          [0, this.options.update_count]);
         this.init_count();
       }.bind(this));
 
@@ -101,7 +102,7 @@
 
     display: function (refetch) {
       var that = this;
-      var tracker_stop = GGRC.Tracker.start(
+      var trackerStop = GGRC.Tracker.start(
         'TreeView', 'display', this.options.model.shortName);
       // TODO: Currently Query API doesn't support CustomAttributable.
       var isCustomAttr = /CustomAttr/.test(this.options.model.shortName);
@@ -125,13 +126,13 @@
           return $.when(loader(), that.init_view());
         }))
         .then(that._ifNotRemoved(that.proxy('draw_list')))
-        .done(tracker_stop);
+        .done(trackerStop);
 
       return this._display_deferred;
     },
 
-    draw_list: function (list, is_reload, force_prepare_children) {
-      is_reload = is_reload === true;
+    draw_list: function (list, isReload, forcePrepareChildren) {
+      isReload = isReload === true;
       // TODO figure out why this happens and fix the root of the problem
       if (!list && !this.options.list) {
         return undefined;
@@ -159,7 +160,7 @@
       this.on();
 
       this._draw_list_deferred =
-        this.enqueue_items(list, is_reload, force_prepare_children);
+        this.enqueue_items(list, isReload, forcePrepareChildren);
       return this._draw_list_deferred;
     },
 
@@ -182,7 +183,7 @@
     },
 
     _loading_finished: function () {
-      var loading_deferred;
+      var loadingDeferred;
 
       if (this._loading_deferred) {
         this.element.trigger('loaded');
@@ -191,50 +192,52 @@
         if (this.element.hasClass('new-tree_loading')) {
           this.element.removeClass('new-tree_loading');
         } else {
-          this.element.find('.new-tree_loading').removeClass('new-tree_loading');
+          this.element.find('.new-tree_loading')
+            .removeClass('new-tree_loading');
         }
 
-        loading_deferred = this._loading_deferred;
+        loadingDeferred = this._loading_deferred;
         this._loading_deferred = null;
-        loading_deferred.resolve();
+        loadingDeferred.resolve();
       }
     },
 
-    enqueue_items: function (items, is_reload, force_prepare_children) {
-      var child_tree_display_list = [];
-      var filtered_items = [];
+    enqueue_items: function (items, isReload, forcePrepareChildren) {
+      var childTreeDisplayList = [];
+      var filteredItems = [];
       var i;
-      var refreshed_deferred;
+      var refreshedDeferred;
       var that = this;
-      var parent_model_name;
-      var parent_instance_type;
-      is_reload = is_reload === true;
+      var parentModelName;
+      var parentInstanceType;
+      isReload = isReload === true;
 
       // find current widget model and check if first layer tree
       if (GGRC.page_object && this.options.parent) { // this is a second label tree
-        parent_model_name = this.options.parent.options.model.shortName;
-        parent_instance_type = this.options.parent.options.instance.type;
-        child_tree_display_list =
-          (GGRC.tree_view.sub_tree_for[parent_model_name] ||
-            GGRC.tree_view.sub_tree_for[parent_instance_type] ||
+        parentModelName = this.options.parent.options.model.shortName;
+        parentInstanceType = this.options.parent.options.instance.type;
+        childTreeDisplayList =
+          (GGRC.tree_view.sub_tree_for[parentModelName] ||
+            GGRC.tree_view.sub_tree_for[parentInstanceType] ||
             {} // all hope is lost, skip filtering
           ).display_list;
 
         // check if no objects selected, then skip filter
-        if (!child_tree_display_list) {
+        if (!childTreeDisplayList) {
           // skip filter
-          filtered_items = items;
-        } else if (child_tree_display_list.length === 0) { // no item is selected to filter, so just return
+          filteredItems = items;
+        } else if (childTreeDisplayList.length === 0) { // no item is selected to filter, so just return
           return can.Deferred().resolve();
         } else {
           for (i = 0; i < items.length; i++) {
-            if (child_tree_display_list.indexOf(items[i].instance.class.model_singular) !== -1) {
-              filtered_items.push(items[i]);
+            if (childTreeDisplayList
+                .indexOf(items[i].instance.class.model_singular) !== -1) {
+              filteredItems.push(items[i]);
             }
           }
         }
       } else {
-        filtered_items = items;
+        filteredItems = items;
       }
 
       if (!this._pending_items) {
@@ -242,38 +245,39 @@
         this._loading_started();
       }
 
-      if (!is_reload) {
-        refreshed_deferred = $.when.apply($,
-          can.map(filtered_items, function (item) {
+      if (!isReload) {
+        refreshedDeferred = $.when.apply($,
+          can.map(filteredItems, function (item) {
             var instance = item.instance || item;
             if (instance.custom_attribute_values &&
               !GGRC.Utils.Snapshots.isSnapshot(instance)) {
-              return instance.refresh_all('custom_attribute_values').then(function (values) {
-                var rq = new RefreshQueue();
-                _.each(values, function (value) {
-                  if (value.attribute_object) {
-                    rq.enqueue(value.attribute_object);
-                  }
+              return instance.refresh_all('custom_attribute_values')
+                .then(function (values) {
+                  var rq = new RefreshQueue();
+                  _.each(values, function (value) {
+                    if (value.attribute_object) {
+                      rq.enqueue(value.attribute_object);
+                    }
+                  });
+                  return rq.trigger().then(function () {
+                    return values;
+                  });
                 });
-                return rq.trigger().then(function () {
-                  return values;
-                });
-              });
             }
           }));
       } else {
-        refreshed_deferred = can.Deferred().resolve();
+        refreshedDeferred = can.Deferred().resolve();
       }
-      refreshed_deferred
+      refreshedDeferred
         .then(function () {
-          return that.insert_items(filtered_items, force_prepare_children);
+          return that.insert_items(filteredItems, forcePrepareChildren);
         })
         .then(this._ifNotRemoved(this.proxy('_loading_finished')));
 
       return this._loading_deferred;
     },
 
-    insert_items: function (items, force_prepare_children) {
+    insert_items: function (items, forcePrepareChildren) {
       var that = this;
       var preppedItems = [];
       var idMap = {};
@@ -293,7 +297,7 @@
       }
 
       can.each(toInsert, function (item) {
-        var prepped = that.prepare_child_options(item, force_prepare_children);
+        var prepped = that.prepare_child_options(item, forcePrepareChildren);
         // Should we skip items without selfLink?
         if (prepped.instance.selfLink) {
           preppedItems.push(prepped);
