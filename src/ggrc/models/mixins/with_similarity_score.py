@@ -74,7 +74,7 @@ class WithSimilarityScore(object):
     # find "similar" objects when Relationship table is not used
     queries_for_union += cls._emulate_relationships(id_, types, relevant_types)
 
-    joined = queries_for_union.pop().union(*queries_for_union).subquery()
+    joined = queries_for_union.pop().union_all(*queries_for_union).subquery()
 
     # define weights for every "related" object type with values from
     # relevant_types dict
@@ -179,25 +179,29 @@ class WithSimilarityScore(object):
 
     return [
         db.session.query(
-            right_relationship.source_type.label("similar_type"),
+            right_snapshot_join.c.right_snapshot_child_type.label(
+                "related_type"),
             right_relationship.source_id.label("similar_id"),
-            right_snapshot.child_type.label("related_type"),
+            right_relationship.source_type.label("similar_type"),
         ).filter(
             and_(
                 right_relationship.destination_type == "Snapshot",
                 right_relationship.destination_id ==
                 right_snapshot_join.c.right_snapshot_id,
+                right_relationship.source_type == cls.__name__
             )
         ),
         db.session.query(
-            right_relationship.destination_type.label("similar_type"),
+            right_snapshot_join.c.right_snapshot_child_type.label(
+                "related_type"),
             right_relationship.destination_id.label("similar_id"),
-            right_snapshot.child_type.label("related_type"),
+            right_relationship.destination_type.label("similar_type"),
         ).filter(
             and_(
                 right_relationship.source_type == "Snapshot",
                 right_relationship.source_id ==
                 right_snapshot_join.c.right_snapshot_id,
+                right_relationship.destination_type == cls.__name__
             )
         )
     ]
@@ -245,6 +249,8 @@ class WithSimilarityScore(object):
             related_to_similar,
             and_(related_id_case == related_to_similar.source_id,
                  related_type_case == related_to_similar.source_type),
+        ).filter(
+            related_to_similar.source_type != "Snapshot"
         ),
         db.session.query(
             related_type_case,
@@ -254,7 +260,9 @@ class WithSimilarityScore(object):
             related_to_similar,
             and_(related_id_case == related_to_similar.destination_id,
                  related_type_case == related_to_similar.destination_type),
-        ),
+        ).filter(
+            related_to_similar.destination_type != "Snapshot"
+        )
     ]
 
   @classmethod

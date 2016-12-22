@@ -240,13 +240,39 @@ class CustomAttributable(object):
       definition['context'] = getattr(self, "context", None)
       self.insert_definition(definition)
 
+  def _remove_existing_items(self, attr_values):
+    """Remove existing CAV and corresponding full text records."""
+    from ggrc.fulltext.mysql import MysqlRecordProperty
+    from ggrc.models.custom_attribute_value import CustomAttributeValue
+    if not attr_values:
+      return
+    # 2) Delete all fulltext_record_properties for the list of values
+    ftrp_properties = []
+    for val in attr_values:
+      ftrp_properties.append(val.custom_attribute.title)
+      if val.custom_attribute.attribute_type == "Map:Person":
+        ftrp_properties.append(val.custom_attribute.title + ".name")
+        ftrp_properties.append(val.custom_attribute.title + ".email")
+    db.session.query(MysqlRecordProperty)\
+        .filter(
+            and_(
+                MysqlRecordProperty.type == self.__class__.__name__,
+                MysqlRecordProperty.property.in_(ftrp_properties)))\
+        .delete(synchronize_session='fetch')
+
+    # 3) Delete the list of custom attribute values
+    attr_value_ids = [value.id for value in attr_values]
+    db.session.query(CustomAttributeValue)\
+        .filter(CustomAttributeValue.id.in_(attr_value_ids))\
+        .delete(synchronize_session='fetch')
+    db.session.commit()
+
   def custom_attributes(self, src):
     """Legacy setter for custom attribute values and definitions.
 
     This code should only be used for custom attribute definitions until
     setter for that is updated.
     """
-    from ggrc.fulltext.mysql import MysqlRecordProperty
     from ggrc.models.custom_attribute_value import CustomAttributeValue
     from ggrc.services import signals
 
@@ -277,9 +303,6 @@ class CustomAttributable(object):
         CustomAttributeValue.attributable_type == self.__class__.__name__,
         CustomAttributeValue.attributable_id == self.id)).all()
 
-    attr_value_ids = [value.id for value in attr_values]
-    ftrp_properties = [val.custom_attribute.title for val in attr_values]
-
     # Save previous value of custom attribute. This is a bit complicated by
     # the fact that imports can save multiple values at the time of writing.
     # old_values holds all previous values of attribute, last_values holds
@@ -292,21 +315,7 @@ class CustomAttributable(object):
                                  key=lambda (created_at, _): created_at)
                    for key, old_vals in old_values.iteritems()}
 
-    # 2) Delete all fulltext_record_properties for the list of values
-    if len(attr_value_ids) > 0:
-      db.session.query(MysqlRecordProperty)\
-          .filter(
-              and_(
-                  MysqlRecordProperty.type == self.__class__.__name__,
-                  MysqlRecordProperty.property.in_(ftrp_properties)))\
-          .delete(synchronize_session='fetch')
-
-      # 3) Delete the list of custom attribute values
-      db.session.query(CustomAttributeValue)\
-          .filter(CustomAttributeValue.id.in_(attr_value_ids))\
-          .delete(synchronize_session='fetch')
-
-      db.session.commit()
+    self._remove_existing_items(attr_values)
 
     # 4) Instantiate custom attribute values for each of the definitions
     #    passed in (keys)
