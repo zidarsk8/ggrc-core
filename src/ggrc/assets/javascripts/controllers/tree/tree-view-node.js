@@ -49,17 +49,19 @@
           opts.model = CMS.Models[opts.model];
         }
         this.options = new CMS.Models.TreeViewOptions(this.constructor.defaults)
-          .attr(opts.model ? opts.model[opts.options_property || this.constructor.defaults.options_property] : {})
+          .attr(opts.model ? opts.model[opts.options_property ||
+            this.constructor.defaults.options_property] : {})
           .attr(opts);
       }
     },
 
     init: function (el, opts) {
       var parent = opts.parent_instance || {};
-      if (this.options.instance && !this.options.show_view) {
-        this.options.show_view =
-          this.options.instance.constructor[this.options.options_property].show_view ||
-          this.options.model[this.options.options_property].show_view ||
+      var options = this.options;
+      if (options.instance && !options.show_view) {
+        options.show_view =
+          options.instance.constructor[options.options_property].show_view ||
+          options.model[options.options_property].show_view ||
           GGRC.mustache_path + '/base_objects/tree.mustache';
       }
       this._draw_node_deferred = can.Deferred();
@@ -88,15 +90,16 @@
       }.bind(this), 0);
     },
 
-    '{instance} custom_attribute_values': function (object, ev, newVal, oldVal) {
-      function getValues(cav) {
-        return _.pluck(cav.reify(), 'attribute_value');
-      }
-      if ((!oldVal || !newVal) || (oldVal.length === newVal.length &&
-        _.difference(getValues(oldVal), getValues(newVal)).length)) {
-        this.draw_node(true);
-      }
-    },
+    '{instance} custom_attribute_values':
+      function (object, ev, newVal, oldVal) {
+        function getValues(cav) {
+          return _.pluck(cav.reify(), 'attribute_value');
+        }
+        if ((!oldVal || !newVal) || (oldVal.length === newVal.length &&
+          _.difference(getValues(oldVal), getValues(newVal)).length)) {
+          this.draw_node(true);
+        }
+      },
 
     /**
      * Trigger rendering the tree node in the DOM.
@@ -155,11 +158,11 @@
     },
 
     should_draw_children: function () {
-      var draw_children = this.options.draw_children;
-      if (can.isFunction(draw_children)) {
-        return draw_children.apply(this.options);
+      var drawChildren = this.options.draw_children;
+      if (can.isFunction(drawChildren)) {
+        return drawChildren.apply(this.options);
       }
-      return draw_children;
+      return drawChildren;
     },
 
     // add all child options to one TreeViewOptions object
@@ -199,60 +202,61 @@
 
     // data is an entry from child options.  if child options is an array, run once for each.
     add_child_list: function (item, data) {
-      var find_params;
+      var findParams;
       data.attr({start_expanded: false});
       if (can.isFunction(item.instance[data.property])) {
         // Special case for handling mappings which are functions until
         // first requested, then set their name via .attr('...')
-        find_params = function () {
+        findParams = function () {
           return item.instance[data.property]();
         };
-        data.attr('find_params', find_params);
+        data.attr('find_params', findParams);
       } else if (data.property) {
-        find_params = item.instance[data.property];
-        if (find_params && find_params.isComputed) {
-          data.attr('original_list', find_params);
-          find_params = find_params();
-        } else if (find_params && find_params.length) {
-          data.attr('original_list', find_params);
-          find_params = find_params.slice(0);
+        findParams = item.instance[data.property];
+        if (findParams && findParams.isComputed) {
+          data.attr('original_list', findParams);
+          findParams = findParams();
+        } else if (findParams && findParams.length) {
+          data.attr('original_list', findParams);
+          findParams = findParams.slice(0);
         }
-        data.attr('list', find_params);
+        data.attr('list', findParams);
       } else {
-        find_params = data.attr('find_params');
-        if (find_params) {
-          find_params = find_params.serialize();
+        findParams = data.attr('find_params');
+        if (findParams) {
+          findParams = findParams.serialize();
         } else {
-          find_params = {};
+          findParams = {};
         }
         if (data.parent_find_param) {
-          find_params[data.parent_find_param] = item.instance.id;
+          findParams[data.parent_find_param] = item.instance.id;
         } else {
-          find_params['parent.id'] = item.instance.id;
+          findParams['parent.id'] = item.instance.id;
         }
-        data.attr('find_params', new can.Map(find_params));
+        data.attr('find_params', new can.Map(findParams));
       }
       // $subtree.cms_controllers_tree_view(opts);
     },
 
     replace_element: function (el) {
-      var old_el = this.element;
-      var old_data;
+      var oldEl = this.element;
+      var oldData;
       var firstchild;
 
       if (!this.element) {
         return;
       }
 
-      old_data = $.extend({}, old_el.data());
+      oldData = $.extend({}, oldEl.data());
 
       firstchild = $(_firstElementChild(el));
 
-      old_data.controls = old_data.controls.slice(0);
-      old_el.data('controls', []);
+      oldData.controls = oldData.controls.slice(0);
+      oldEl.data('controls', []);
       this.off();
-      old_el.replaceWith(el);
-      this.element = firstchild.addClass(this.constructor._fullName).data(old_data);
+      oldEl.replaceWith(el);
+      this.element = firstchild.addClass(this.constructor._fullName)
+        .data(oldData);
       this.on();
     },
 
@@ -267,23 +271,24 @@
     },
 
     display_subtrees: function () {
-      var child_tree_dfds = [];
+      var childTreeDfds = [];
       var that = this;
 
-      this.element.find('.' + CMS.Controllers.TreeView._fullName).each(function (_, el) {
-        var $el = $(el);
-        var child_tree_control;
+      this.element.find('.' + CMS.Controllers.TreeView._fullName)
+        .each(function (_, el) {
+          var $el = $(el);
+          var childTreeControl;
 
-        //  Ensure this targets only direct child trees, not sub-tree trees
-        if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
-          child_tree_control = $el.control();
-          if (child_tree_control) {
-            child_tree_dfds.push(child_tree_control.display());
+          //  Ensure this targets only direct child trees, not sub-tree trees
+          if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
+            childTreeControl = $el.control();
+            if (childTreeControl) {
+              childTreeDfds.push(childTreeControl.display());
+            }
           }
-        }
-      });
+        });
 
-      return $.when.apply($, child_tree_dfds);
+      return $.when.apply($, childTreeDfds);
     },
 
     /**
@@ -383,21 +388,21 @@
     },
 
     trigger_expand: function () {
-      var $expand_el = this.element.find('.openclose').first();
-      if (!$expand_el.hasClass('active')) {
-        $expand_el.trigger('click');
+      var $expandEl = this.element.find('.openclose').first();
+      if (!$expandEl.hasClass('active')) {
+        $expandEl.trigger('click');
       }
       return this.expand();
     },
 
     hash_fragment: function () {
-      var parent_fragment = '';
+      var parentFragment = '';
 
       if (this.options.parent) {
-        parent_fragment = this.options.parent.hash_fragment();
+        parentFragment = this.options.parent.hash_fragment();
       }
 
-      return [parent_fragment,
+      return [parentFragment,
         this.options.instance.hash_fragment()].join('/');
     },
 
