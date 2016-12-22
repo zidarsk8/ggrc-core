@@ -4,7 +4,7 @@
 }}
 
 {{#if isEdit}}
-  <datepicker persistent="true" date="context.value"></datepicker>
+  <datepicker is-shown="true" date="context.value"></datepicker>
 {{else}}
   <div class="inline-edit__text">
     {{{firstnonempty context.value '<span class="empty-message">None</span>'}}}
