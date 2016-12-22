@@ -104,9 +104,9 @@
       var hideImportExport =
         snapshots.isSnapshotScope(this.options.parent_instance) &&
         snapshots.isSnapshotModel(this.options.model.model_singular);
-      var display_options;
-      var display_width = 12;
-      var attr_count = this.options.display_attr_list.length;
+      var displayOptions;
+      var displayWidth = 12;
+      var attrCount = this.options.display_attr_list.length;
       var nested = this.options.parent !== null;
       var widths = {
         defaults: [4, 4, 4],
@@ -115,129 +115,131 @@
         '4': [3, 6, 3],
         nested: [4, 0, 8]
       };
-      var selected_widths = widths[attr_count] || widths.defaults;
+      var selectedWidths = widths[attrCount] || widths.defaults;
 
       if (nested) {
-        selected_widths = widths.nested;
+        selectedWidths = widths.nested;
       }
 
-      display_options = {
-        title_width: selected_widths[0],
-        selectable_width: selected_widths[1],
-        action_width: selected_widths[2],
-        selectable_attr_width: display_width / Math.max(attr_count, 1),
+      displayOptions = {
+        title_width: selectedWidths[0],
+        selectable_width: selectedWidths[1],
+        action_width: selectedWidths[2],
+        selectable_attr_width: displayWidth / Math.max(attrCount, 1),
         hideImportExport: hideImportExport
       };
-      this.options.attr('display_options', display_options);
+      this.options.attr('display_options', displayOptions);
     },
 
     init_child_tree_display: function (model) {
-      var model_name;
-      var child_tree_model_list;
-      var valid_models;
-      var w_list;
-      var sub_tree;
+      var modelName;
+      var childTreeModelList;
+      var validModels;
+      var wList;
+      var subTree;
       if (!GGRC.page_object) { // Admin dashboard
         return;
       }
 
       // Set child tree options
-      model_name = model.model_singular;
-      child_tree_model_list = [];
-      valid_models = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
+      modelName = model.model_singular;
+      childTreeModelList = [];
+      validModels = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
 
-      w_list = GGRC.tree_view.base_widgets_by_type[model_name]; // possible widget/mapped model_list
-      if (w_list === undefined) {
-        child_tree_model_list = GGRC.tree_view.basic_model_list;
-        GGRC.tree_view.sub_tree_for.attr(model_name, {
-          model_list: child_tree_model_list,
-          display_list: valid_models
+      wList = GGRC.tree_view.base_widgets_by_type[modelName]; // possible widget/mapped model_list
+      if (wList === undefined) {
+        childTreeModelList = GGRC.tree_view.basic_model_list;
+        GGRC.tree_view.sub_tree_for.attr(modelName, {
+          model_list: childTreeModelList,
+          display_list: validModels
         });
       }
 
-      sub_tree = GGRC.tree_view.sub_tree_for[model_name];
-      this.options.attr('child_tree_model_list', sub_tree.model_list);
-      this.options.attr('selected_child_tree_model_list', sub_tree.model_list);
+      subTree = GGRC.tree_view.sub_tree_for[modelName];
+      this.options.attr('child_tree_model_list', subTree.model_list);
+      this.options.attr('selected_child_tree_model_list', subTree.model_list);
       this.options.attr('select_model_list', GGRC.tree_view.basic_model_list);
-      this.options.attr('selected_model_name', model_name);
+      this.options.attr('selected_model_name', modelName);
     },
 
     // Displays attribute list for tree-header, Select attribute list drop down
     // Gets default and custom attribute list for each model, and sets upthe display-list
     init_display_options: function (opts) {
       var i;
-      var saved_attr_list;
-      var select_attr_list = [];
-      var display_attr_list = [];
+      var savedAttrList;
+      var selectAttrList = [];
+      var displayAttrList = [];
       var model = opts.model;
-      var model_name = model.model_singular;
-      var model_definition = model().class.root_object;
-      var mandatory_attr_names;
-      var display_attr_names;
+      var modelName = model.model_singular;
+      var modelDefinition = model().class.root_object;
+      var mandatoryAttrNames;
+      var displayAttrNames;
       var attr;
 
       // get standard attrs for each model
-      can.each(model.tree_view_options.attr_list || can.Model.Cacheable.attr_list, function (item) {
+      can.each(model.tree_view_options.attr_list ||
+        can.Model.Cacheable.attr_list, function (item) {
         if (!item.attr_sort_field) {
           item.attr_sort_field = item.attr_name;
         }
-        select_attr_list.push(item);
+        selectAttrList.push(item);
       });
       // Get mandatory_attr_names
-      mandatory_attr_names = model.tree_view_options.mandatory_attr_names ?
+      mandatoryAttrNames = model.tree_view_options.mandatory_attr_names ?
         model.tree_view_options.mandatory_attr_names :
         can.Model.Cacheable.tree_view_options.mandatory_attr_names;
 
       // get custom attrs
       can.each(GGRC.custom_attr_defs, function (def, i) {
         var obj;
-        if (def.definition_type === model_definition && def.attribute_type !== 'Rich Text') {
+        if (def.definition_type === modelDefinition &&
+          def.attribute_type !== 'Rich Text') {
           obj = {};
           obj.attr_title = obj.attr_name = def.title;
           obj.display_status = false;
           obj.attr_type = 'custom';
           obj.attr_sort_field = obj.attr_name;
-          select_attr_list.push(obj);
+          selectAttrList.push(obj);
         }
       });
 
       // Get the display attr_list from local storage
-      saved_attr_list = this.display_prefs.getTreeViewHeaders(model_name);
+      savedAttrList = this.display_prefs.getTreeViewHeaders(modelName);
 
-      if (!saved_attr_list.length) {
+      if (!savedAttrList.length) {
         // Initialize the display status, Get display_attr_names for model
-        display_attr_names = model.tree_view_options.display_attr_names ?
+        displayAttrNames = model.tree_view_options.display_attr_names ?
           model.tree_view_options.display_attr_names :
           can.Model.Cacheable.tree_view_options.display_attr_names;
 
-        for (i = 0; i < select_attr_list.length; i++) {
-          attr = select_attr_list[i];
+        for (i = 0; i < selectAttrList.length; i++) {
+          attr = selectAttrList[i];
 
-          attr.display_status = display_attr_names.indexOf(attr.attr_name) !== -1;
-          attr.mandatory = mandatory_attr_names.indexOf(attr.attr_name) !== -1;
+          attr.display_status = displayAttrNames.indexOf(attr.attr_name) !== -1;
+          attr.mandatory = mandatoryAttrNames.indexOf(attr.attr_name) !== -1;
         }
       } else {
         // Mandatory attr should be always displayed in tree view
-        can.each(mandatory_attr_names, function (attr_name) {
-          saved_attr_list.push(attr_name);
+        can.each(mandatoryAttrNames, function (attrName) {
+          savedAttrList.push(attrName);
         });
 
-        for (i = 0; i < select_attr_list.length; i++) {
-          attr = select_attr_list[i];
-          attr.display_status = saved_attr_list.indexOf(attr.attr_name) !== -1;
-          attr.mandatory = mandatory_attr_names.indexOf(attr.attr_name) !== -1;
+        for (i = 0; i < selectAttrList.length; i++) {
+          attr = selectAttrList[i];
+          attr.display_status = savedAttrList.indexOf(attr.attr_name) !== -1;
+          attr.mandatory = mandatoryAttrNames.indexOf(attr.attr_name) !== -1;
         }
       }
 
       // Create display list
-      can.each(select_attr_list, function (item) {
+      can.each(selectAttrList, function (item) {
         if (!item.mandatory && item.display_status) {
-          display_attr_list.push(item);
+          displayAttrList.push(item);
         }
       });
 
-      this.options.attr('select_attr_list', select_attr_list);
-      this.options.attr('display_attr_list', display_attr_list);
+      this.options.attr('select_attr_list', selectAttrList);
+      this.options.attr('display_attr_list', displayAttrList);
       this.setup_column_width();
       this.init_child_tree_display(model);
     },
@@ -249,12 +251,12 @@
         .on('widget_hidden', this.widget_hidden.bind(this));
       this.element.closest('.widget')
         .on('widget_shown', this.widget_shown.bind(this));
-      CMS.Models.DisplayPrefs.getSingleton().then(function (display_prefs) {
+      CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
         var allowed;
         // TODO: Currently Query API doesn't support CustomAttributable.
         var isCustomAttr = /CustomAttr/.test(this.options.model.shortName);
 
-        this.display_prefs = display_prefs;
+        this.display_prefs = displayPrefs;
         this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
 
         this.element.uniqueId();
@@ -263,15 +265,17 @@
           this.element && this.element.closest('.inner-tree').length > 0);
 
         if (!this.options.attr('is_subtree') && !isCustomAttr) {
-          this.page_loader = new GGRC.ListLoaders.TreePageLoader(this.options.model,
-            this.options.parent_instance, this.options.mapping);
+          this.page_loader = new GGRC.ListLoaders.TreePageLoader(
+            this.options.model, this.options.parent_instance,
+            this.options.mapping);
         }
 
         if ('parent_instance' in opts && 'status' in opts.parent_instance) {
           setAllowMapping = function () {
-            var is_accepted = opts.parent_instance.attr('status') === 'Accepted';
+            var isAccepted = opts.parent_instance.attr('status') === 'Accepted';
             var admin = Permission.is_allowed('__GGRC_ADMIN__');
-            this.options.attr('allow_mapping_or_creating', (admin || !is_accepted) &&
+            this.options.attr('allow_mapping_or_creating',
+              (admin || !isAccepted) &&
               (this.options.allow_mapping || this.options.allow_creating));
           }.bind(this);
           setAllowMapping();
@@ -304,10 +308,11 @@
         });
         this.options.attr('child_options', this.options.child_options.slice(0));
         can.each(this.options.child_options, function (options, i) {
-          this.options.child_options.attr(i, new can.Map(can.extend(options.attr(), allowed)));
+          this.options.child_options.attr(i,
+            new can.Map(can.extend(options.attr(), allowed)));
         }.bind(this));
 
-        this.options.attr('filter_is_hidden', display_prefs.getFilterHidden());
+        this.options.attr('filter_is_hidden', displayPrefs.getFilterHidden());
 
         this._attached_deferred = can.Deferred();
         if (this.element && this.element.closest('body').length) {
@@ -346,7 +351,8 @@
                 }.bind(this)
               );
 
-              can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
+              can.bind.call(this.element.parent()
+                  .find('.widget-col-title[data-field]'),
                 'click',
                 this.sort.bind(this)
               );
@@ -354,7 +360,8 @@
                 'click',
                 this.set_tree_attrs.bind(this)
               );
-              can.bind.call(this.element.parent().find('.set-display-object-list'),
+              can.bind.call(this.element.parent()
+                  .find('.set-display-object-list'),
                 'click',
                 this.set_tree_display_list.bind(this)
               );
@@ -419,7 +426,8 @@
       }
       if (can.isEmptyObject(this.options.find_params.serialize())) {
         this.options.find_params.attr(
-          'id', this.options.parent_instance ? this.options.parent_instance.id : undefined);
+          'id', this.options.parent_instance ?
+            this.options.parent_instance.id : undefined);
       }
 
       if (this.options.mapping) {
@@ -445,7 +453,7 @@
       }.bind(this)));
     },
 
-    prepare_child_options: function (v, force_reload) {
+    prepare_child_options: function (v, forceReload) {
       //  v may be any of:
       //    <model_instance>
       //    { instance: <model instance>, mappings: [...] }
@@ -453,7 +461,7 @@
       var tmp;
       var that = this;
       var original = v;
-      if (v._child_options_prepared && !force_reload) {
+      if (v._child_options_prepared && !forceReload) {
         return v._child_options_prepared;
       }
       if (!(v instanceof CMS.Models.TreeViewOptions)) {
@@ -476,42 +484,42 @@
         }
       }
       v.attr('child_count', can.compute(function () {
-        var total_children = 0;
+        var totalChildren = 0;
         if (v.attr('child_options')) {
-          can.each(v.attr('child_options'), function (child_options) {
-            var list = child_options.attr('list');
+          can.each(v.attr('child_options'), function (childCptions) {
+            var list = childCptions.attr('list');
             if (list) {
-              total_children += list.attr('length');
+              totalChildren += list.attr('length');
             }
           });
         }
-        return total_children;
+        return totalChildren;
       }));
       original._child_options_prepared = v;
       return v;
     },
     el_position: function (el) {
       var se = this.options.scroll_element;
-      var se_o = se.offset().top;
-      var se_h = se.outerHeight();
-      var el_o;
-      var el_h;
-      var above_top;
-      var below_bottom;
+      var seO = se.offset().top;
+      var seH = se.outerHeight();
+      var elO;
+      var elH;
+      var aboveTop;
+      var belowBottom;
       if (!(el instanceof jQuery)) {
         el = $(el);
       }
       if (!el.offset()) {
         return 0;
       }
-      el_o = el.offset().top;
-      el_h = el.outerHeight();
-      above_top = (el_o + el_h - se_o) / se_h;
-      below_bottom = (el_o - se_o) / se_h - 1;
-      if (above_top < 0) {
-        return above_top;
-      } else if (below_bottom > 0) {
-        return below_bottom;
+      elO = el.offset().top;
+      elH = el.outerHeight();
+      aboveTop = (elO + elH - seO) / seH;
+      belowBottom = (elO - seO) / seH - 1;
+      if (aboveTop < 0) {
+        return aboveTop;
+      } else if (belowBottom > 0) {
+        return belowBottom;
       }
       return 0;
     },
@@ -643,21 +651,21 @@
 
     '{original_list} add': function (list, ev, newVals, index) {
       var that = this;
-      var real_add = [];
+      var realAdd = [];
 
       can.each(newVals, function (newVal) {
         var _newVal = newVal.instance ? newVal.instance : newVal;
         if (that.oldList && ~can.inArray(_newVal, that.oldList)) {
           that.oldList.splice(can.inArray(_newVal, that.oldList), 1);
         } else if (that.element) {
-          real_add.push(newVal);
+          realAdd.push(newVal);
         }
       });
-      this.enqueue_items(real_add);
+      this.enqueue_items(realAdd);
     },
 
     '{original_list} remove': function (list, ev, oldVals, index) {
-      var remove_marker = {}; // Empty object used as unique marker
+      var removeMarker = {}; // Empty object used as unique marker
       var removedObjectType;
       var skipInfoPinRefresh = false;
 
@@ -681,16 +689,17 @@
       // displayed in the parent tree view node.
       if (oldVals.length === 1 && oldVals[0].instance) {
         removedObjectType = oldVals[0].instance.type;
-        if (removedObjectType === 'Person' || removedObjectType === 'Document') {
+        if (removedObjectType === 'Person' ||
+          removedObjectType === 'Document') {
           skipInfoPinRefresh = true;
         }
       }
 
       // `remove_marker` is to ensure that removals are not attempted until 20ms
       //   after the *last* removal (e.g. for a series of removals)
-      this._remove_marker = remove_marker;
+      this._remove_marker = removeMarker;
       setTimeout(this._ifNotRemoved(function () {
-        if (this._remove_marker === remove_marker) {
+        if (this._remove_marker === removeMarker) {
           can.each(this.oldList, function (v) {
             this.element.trigger('removeChild', v);
           }.bind(this));
@@ -712,14 +721,14 @@
     },
 
     '.tree-structure subtree_loaded': function (el, ev) {
-      var instance_id;
+      var instanceId;
       var parent;
       ev.stopPropagation();
-      instance_id = el.closest('.tree-item').data('object-id');
+      instanceId = el.closest('.tree-item').data('object-id');
       parent = can.reduce(this.options.list, function (a, b) {
         switch (true) {
           case !!a : return a;
-          case b.instance.id === instance_id: return b;
+          case b.instance.id === instanceId: return b;
           default: return null;
         }
       }, null);
@@ -859,7 +868,8 @@
 
     ' updateCount': function (el, ev) { // eslint-disable-line quote-props
       // Suppress events from sub-trees
-      if (!($(ev.target).closest('.' + this.constructor._fullName).is(this.element))) {
+      if (!($(ev.target)
+          .closest('.' + this.constructor._fullName).is(this.element))) {
         ev.stopPropagation();
       }
     },
@@ -986,7 +996,7 @@
       ev.stopPropagation();
     },
 
-    reload_list: function (force_reload) {
+    reload_list: function (forceReload) {
       if (this.options.list === undefined || this.options.list === null) {
         return;
       }
@@ -995,14 +1005,15 @@
       this.find_all_deferred = false;
       this.options.list.replace([]);
       this.element.children('.cms_controllers_tree_view_node').remove();
-      this.draw_list(this.options.original_list, true, force_reload);
+      this.draw_list(this.options.original_list, true, forceReload);
       this.init_count();
     },
 
     '[custom-event] click': function (el, ev) {
-      var event_name = el.attr('custom-event');
-      if (this.options.events && typeof this.options.events[event_name] === 'function') {
-        this.options.events[event_name].apply(this, arguments);
+      var eventName = el.attr('custom-event');
+      if (this.options.events &&
+        typeof this.options.events[eventName] === 'function') {
+        this.options.events[eventName].apply(this, arguments);
       }
     },
 
@@ -1047,7 +1058,8 @@
         .find('span')
         .text('Hide filter');
 
-      this.element.parent().find('.sticky.tree-header').removeClass('no-filter');
+      this.element.parent().find('.sticky.tree-header')
+        .removeClass('no-filter');
       Stickyfill.rebuild();
 
       this.display_prefs.setFilterHidden(false);
@@ -1060,17 +1072,17 @@
       // update the display attrbute list and re-draw
       // 1: find checked items
       // 2. update
-      var attr_to_save = [];
+      var attrToSave = [];
       var $check = this.element.parent().find('.attr-checkbox');
       var $selected = $check.filter(':checked');
-      var selected_items = [];
+      var selectedItems = [];
 
       $selected.each(function (index) {
-        selected_items.push(this.value);
+        selectedItems.push(this.value);
       });
 
       can.each(this.options.select_attr_list, function (item) {
-        item.display_status = selected_items.indexOf(item.attr_name) !== -1;
+        item.display_status = selectedItems.indexOf(item.attr_name) !== -1;
       });
 
       this.options.attr('select_attr_list', this.options.select_attr_list);
@@ -1087,49 +1099,49 @@
       this.reload_list(true);
       // set user preferences for next time
       can.each(this.options.display_attr_list, function (item) {
-        attr_to_save.push(item.attr_name);
+        attrToSave.push(item.attr_name);
       });
       this.display_prefs.setTreeViewHeaders(this.options.model.model_singular,
-        attr_to_save);
+        attrToSave);
       this.display_prefs.save();
 
       can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
-        'click',this.sort.bind(this));
+        'click', this.sort.bind(this));
     },
 
     set_tree_display_list: function (ev) {
-      var model_name; // = this.options.model.model_singular,
+      var modelName; // = this.options.model.model_singular,
       var $check = this.element.parent().find('.model-checkbox');
       var $selected = $check.filter(':checked');
-      var selected_items = [];
+      var selectedItems = [];
       var i;
       var el;
-      var open_items;
+      var openItems;
       var control;
-      var tview_el;
+      var tviewEl;
 
-      model_name = this.element.parent().find('.object-type-selector').val();
+      modelName = this.element.parent().find('.object-type-selector').val();
 
       // save the list
       $selected.each(function (index) {
-        selected_items.push(this.value);
+        selectedItems.push(this.value);
       });
       // update GGRC.tree_view
-      GGRC.tree_view.sub_tree_for.attr(model_name + '.display_list',
-        selected_items);
+      GGRC.tree_view.sub_tree_for.attr(modelName + '.display_list',
+        selectedItems);
 
       // save in local storage
-      this.display_prefs.setChildTreeDisplayList(model_name, selected_items);
+      this.display_prefs.setChildTreeDisplayList(modelName, selectedItems);
 
       // check if any inner tree is open
       el = this.element;
       if (el.hasClass('tree-open')) {
         // find the inner tree and reload it
-        open_items = el.find('.item-open .cms_controllers_tree_view');
+        openItems = el.find('.item-open .cms_controllers_tree_view');
 
-        for (i = 0; i < open_items.length; i++) {
-          tview_el = $(open_items[i]);
-          control = tview_el.control();
+        for (i = 0; i < openItems.length; i++) {
+          tviewEl = $(openItems[i]);
+          control = tviewEl.control();
           if (control) {
             control.reload_list();
           }
