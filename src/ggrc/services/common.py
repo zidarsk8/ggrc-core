@@ -357,11 +357,8 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
         revision = Revision(obj_, current_user_id, action, obj_.log_json())
         revisions.append(revision)
         if obj_.type == "ObjectOwner":
-          # any change (create/delete/modify) of the owners is an edit on the
-          # original object. That is why the action is always set to modified.
-          revision = Revision(obj_.ownable, current_user_id, "modified",
-                              obj_.ownable.log_json())
-          revisions.append(revision)
+          import ggrc.utils.revisions
+          ggrc.utils.revisions.regfresh_single_revison(obj.ownable)
 
     if force_obj and obj is not None and obj not in cache.dirty:
       # If the ``obj`` has been updated, but only its custom attributes have
