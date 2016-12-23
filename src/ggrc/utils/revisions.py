@@ -89,6 +89,7 @@ def do_refresh_revisions():
     logger.info("Updating revisions for: %s", type_)
     _fix_type_revisions(type_, rows)
 
+
 def regfresh_single_revison(obj):
   """Refresh last revision of a given object."""
   if not obj.id:

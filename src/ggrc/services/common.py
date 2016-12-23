@@ -333,9 +333,9 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
   cache = get_cache()
   if cache:
     cached_objects = {
-      "modified": cache.dirty,
-      "deleted": cache.deleted,
-      "created": cache.new,
+        "modified": cache.dirty,
+        "deleted": cache.deleted,
+        "created": cache.new,
     }
     for action, objects in cached_objects.iteritems():
       for obj_ in objects:
