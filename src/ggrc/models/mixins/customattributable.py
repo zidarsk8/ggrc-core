@@ -327,7 +327,7 @@ class CustomAttributable(object):
       obj_type = self.__class__.__name__
       obj_id = self.id
       new_value = CustomAttributeValue(
-          custom_attribute_id=ad_id,
+          custom_attribute_id=int(ad_id),
           attributable=self,
           attribute_value=attributes[ad_id],
       )
