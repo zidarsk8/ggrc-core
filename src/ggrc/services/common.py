@@ -347,15 +347,16 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
     current_user_id = get_current_user_id()
   cache = get_cache()
   if cache:
-    for obj_ in cache.dirty:
-      revision = Revision(obj_, current_user_id, 'modified', obj_.log_json())
-      revisions.append(revision)
-    for obj_ in cache.deleted:
-      revision = Revision(obj_, current_user_id, 'deleted', obj_.log_json())
-      revisions.append(revision)
-    for obj_ in cache.new:
-      revision = Revision(obj_, current_user_id, 'created', obj_.log_json())
-      revisions.append(revision)
+    cached_objects = {
+      "modified": cache.dirty,
+      "deleted": cache.deleted,
+      "created": cache.new,
+    }
+    for action, objects in cached_objects.iteritems():
+      for obj_ in objects:
+        revision = Revision(obj_, current_user_id, action, obj_.log_json())
+        revisions.append(revision)
+
     if force_obj and obj is not None and obj not in cache.dirty:
       # If the ``obj`` has been updated, but only its custom attributes have
       # been changed, then this object will not be added into
