@@ -22,7 +22,10 @@
       parentInstance: null,
       selectedItem: {},
       mappedItems: [],
-      filter: null,
+      filter: {
+        only: [],
+        exclude: []
+      },
       filterMappedObjects: function (items) {
         var filterObj = this.attr('filter');
         return filterObj ?
@@ -56,13 +59,13 @@
         return [].concat(includeFilters, excludeFilters);
       },
       getSnapshotQuery: function () {
-        var relavantFilters = [{
+        var relevantFilters = [{
           type: this.attr('parentInstance.type'),
           id: this.attr('parentInstance.id')
         }];
         var filters = this.getSnapshotQueryFilters();
         var query = GGRC.Utils.QueryAPI
-          .buildParam('Snapshot', {}, relavantFilters, [], filters);
+          .buildParam('Snapshot', {}, relevantFilters, [], filters);
         return {data: [query]};
       },
       loadSnapshots: function () {
