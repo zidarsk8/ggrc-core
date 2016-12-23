@@ -343,7 +343,7 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
         revisions.append(revision)
         if obj_.type == "ObjectOwner":
           from ggrc.utils import revisions as revision_utils
-          revision_utils.regfresh_single_revison(obj.ownable)
+          revision_utils.regfresh_single_revison(obj_.ownable)
 
     if force_obj and obj is not None and obj not in cache.dirty:
       # If the ``obj`` has been updated, but only its custom attributes have
