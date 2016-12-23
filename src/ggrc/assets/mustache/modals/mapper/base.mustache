@@ -128,7 +128,9 @@
               <div class="confirm-buttons">
         <span>
           {{#if mapper.is_loading }}
+            {{^if mapper.useSnapshots}}
               <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;">
+            {{/if}}
           </span>
           {{else}}
             {{mapper.selected.length}}
@@ -152,7 +154,6 @@
                 {{/if}}
               {{/if}}
             </button>
-
             <spinner toggle="mapper.is_saving"></spinner>
               </div>
           </div>
