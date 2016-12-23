@@ -315,6 +315,7 @@ def get_modified_objects(session):
 
 
 def update_index(session, cache):
+  """Update fulltext index records for cached objects."""
   if cache:
     indexer = get_indexer()
     for obj in cache.new:
@@ -324,6 +325,34 @@ def update_index(session, cache):
     for obj in cache.deleted:
       indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
     session.commit()
+
+
+def _get_log_revisions(current_user_id, obj=None, force_obj=False):
+  """Generate and return revisions for all cached objects."""
+  revisions = []
+  cache = get_cache()
+  if cache:
+    cached_objects = {
+      "modified": cache.dirty,
+      "deleted": cache.deleted,
+      "created": cache.new,
+    }
+    for action, objects in cached_objects.iteritems():
+      for obj_ in objects:
+        revision = Revision(obj_, current_user_id, action, obj_.log_json())
+        revisions.append(revision)
+        if obj_.type == "ObjectOwner":
+          from ggrc.utils import revisions as revision_utils
+          revision_utils.regfresh_single_revison(obj.ownable)
+
+    if force_obj and obj is not None and obj not in cache.dirty:
+      # If the ``obj`` has been updated, but only its custom attributes have
+      # been changed, then this object will not be added into
+      # ``cache.dirty set``. So that its revision will not be created.
+      # The ``force_obj`` flag solves the issue, but in a bit dirty way.
+      revision = Revision(obj, current_user_id, 'modified', obj.log_json())
+      revisions.append(revision)
+  return revisions
 
 
 def log_event(session, obj=None, current_user_id=None, flush=True,
@@ -339,34 +368,12 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
   Returns:
     Uncommitted models.Event instance
   """
-  revisions = []
   event = None
   if flush:
     session.flush()
   if current_user_id is None:
     current_user_id = get_current_user_id()
-  cache = get_cache()
-  if cache:
-    cached_objects = {
-      "modified": cache.dirty,
-      "deleted": cache.deleted,
-      "created": cache.new,
-    }
-    for action, objects in cached_objects.iteritems():
-      for obj_ in objects:
-        revision = Revision(obj_, current_user_id, action, obj_.log_json())
-        revisions.append(revision)
-        if obj_.type == "ObjectOwner":
-          import ggrc.utils.revisions
-          ggrc.utils.revisions.regfresh_single_revison(obj.ownable)
-
-    if force_obj and obj is not None and obj not in cache.dirty:
-      # If the ``obj`` has been updated, but only its custom attributes have
-      # been changed, then this object will not be added into
-      # ``cache.dirty set``. So that its revision will not be created.
-      # The ``force_obj`` flag solves the issue, but in a bit dirty way.
-      revision = Revision(obj, current_user_id, 'modified', obj.log_json())
-      revisions.append(revision)
+  revisions = _get_log_revisions(current_user_id, obj=obj, force_obj=force_obj)
   if obj is None:
     resource_id = 0
     resource_type = None
