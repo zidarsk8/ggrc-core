@@ -327,7 +327,7 @@ class CustomAttributable(object):
       obj_type = self.__class__.__name__
       obj_id = self.id
       new_value = CustomAttributeValue(
-          custom_attribute_id=ad_id,
+          custom_attribute_id=int(ad_id),
           attributable=self,
           attribute_value=attributes[ad_id],
       )
@@ -335,6 +335,9 @@ class CustomAttributable(object):
         obj_type, obj_id = new_value.attribute_value.split(":")
         new_value.attribute_value = obj_type
         new_value.attribute_object_id = long(obj_id)
+      elif definitions[int(ad_id)].attribute_type == "Checkbox":
+        new_value.attribute_value = "1" if new_value.attribute_value else "0"
+
       # 5) Set the context_id for each custom attribute value to the context id
       #    of the custom attributable.
       # TODO: We are ignoring contexts for now
