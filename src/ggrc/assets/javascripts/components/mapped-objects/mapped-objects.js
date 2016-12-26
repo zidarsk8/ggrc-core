@@ -27,10 +27,12 @@
         exclude: []
       },
       filterMappedObjects: function (items) {
-        var filterObj = this.attr('filter');
-        return filterObj ?
-          GGRC.Utils.filters.applyTypeFilter(items, filterObj.attr()) :
-          items;
+        function getTypeFromInstance(item) {
+          return item.instance.type;
+        }
+        return GGRC.Utils.filters
+          .applyTypeFilter(items,
+            this.attr('filter').attr(), getTypeFromInstance);
       },
       getBinding: function () {
         return this.attr('parentInstance').get_binding(this.attr('mapping'));
