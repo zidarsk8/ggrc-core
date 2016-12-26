@@ -110,7 +110,7 @@
       generateModel: function (object, template) {
         var assessmentTemplate = CMS.Models.AssessmentTemplate.findInCacheById(
           template);
-        var title = object.title + ' assessment for ' + this.scope.audit.title;
+        var title = 'Generated Assessment for ' + this.scope.audit.title;
         var data = {
           _generated: true,
           audit: this.scope.audit,

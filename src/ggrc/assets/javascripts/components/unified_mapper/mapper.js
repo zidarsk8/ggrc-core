@@ -284,27 +284,6 @@
           'defer:add', [data, {map_and_save: true}]);
         this.closeModal();
       },
-      '.add-button modal:added': 'addNew',
-      '.add-button modal:success': 'addNew',
-      addNew: function (el, ev, model) {
-        var entries = this.scope.attr('mapper.entries');
-        var getBindingName = this.scope.attr('mapper').getBindingName;
-        var binding;
-        var item;
-        var mapping;
-        var selected;
-
-        selected = this.scope.attr('mapper.parentInstance');
-        binding = selected.get_binding(
-          getBindingName(selected, model.constructor.table_plural));
-        mapping = GGRC.Mappings.get_canonical_mapping_name(
-          selected.type, model.type);
-        mapping = model.get_mapping(mapping);
-
-        item = new GGRC.ListLoaders.MappingResult(model, mapping, binding);
-        item.append = true;
-        entries.unshift(item);
-      },
       '.modal-footer .btn-map click': function (el, ev) {
         var callback = this.scope.attr('mapper.callback');
         var type = this.scope.attr('mapper.type');

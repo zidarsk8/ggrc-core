@@ -20,23 +20,12 @@
       loading_or_saving: function () {
         return this.attr('page_loading') || this.attr('mapper.is_saving');
       },
-      isRelevantToCurrent: function () {
-        var relevant = this.attr('mapper.relevant');
-        var instance = GGRC.page_instance();
-        if (relevant.length !== 1) {
-          return false;
-        }
-        relevant = relevant[0].filter;
-        return relevant.id === instance.id &&
-               relevant.type === instance.type;
-      },
       unselectAll: function (scope, el, ev) {
         ev.preventDefault();
 
         this.attr('mapper.all_selected', false);
         this.attr('select_state', false);
         scope.attr('selected').replace([]);
-        this.attr('selected', []);
       },
       selectAll: function (scope, el, ev) {
         var entries;
@@ -55,7 +44,7 @@
         this.attr('mapper.all_selected', true);
         this.attr('is_loading', true);
 
-        que.enqueue(_.pluck(entries, 'instance'))
+        que.enqueue(entries)
           .trigger()
           .then(function (models) {
             this.attr('is_loading', false);
@@ -76,31 +65,6 @@
         this.element.find('.results-wrap').cms_controllers_infinite_scroll();
       },
       '.modalSearchButton click': 'getResults',
-      '{scope.entries} add': function (list, ev, added) {
-        var instance;
-        var option;
-
-        // TODO: I'm assuming we are adding only one item manually
-        if (!added[0].append) {
-          return;
-        }
-
-        instance = added[0].instance;
-        option = this.getItem(instance);
-
-        option.appended = true;
-        this.scope.attr('options').unshift(option);
-        this.scope.attr('selected').push({
-          id: instance.id,
-          type: instance.type,
-          href: instance.href
-        });
-        if (this.scope.attr('page') === 0) {
-          // if the added item is the first one rendered, update the page
-          // counter manually not to confuse drawPage method
-          this.scope.attr('page', 1);
-        }
-      },
       '.results-wrap scrollNext': 'drawPage',
       getItem: function (model) {
         var selected;
@@ -156,18 +120,15 @@
 
         this.scope.attr('mapper.page_loading', true);
 
-        return que.enqueue(
-            pageItems
-          ).trigger().then(
-            function (models) {
-              this.scope.attr('mapper.page_loading', false);
-              this.scope.attr('page', nextPage);
-              options.push.apply(
-                options,
+        return que.enqueue(pageItems)
+          .trigger()
+          .then(function (models) {
+            this.scope.attr('mapper.page_loading', false);
+            this.scope.attr('page', nextPage);
+            options.push.apply(options,
                 can.map(models, this.getItem.bind(this))
-              );
-            }.bind(this)
-          );
+            );
+          }.bind(this));
       },
       searchFor: function (data) {
         var joinModel;
@@ -215,8 +176,6 @@
         var modelName = this.scope.attr('type');
         var params = {};
         var relevantList = this.scope.attr('mapper.relevant');
-        var binding;
-        var instance;
         var term = this.scope.attr('term');
 
         if (this.scope.attr('mapper.page_loading') ||
@@ -229,23 +188,6 @@
         this.scope.attr('options', []);
         this.scope.attr('select_state', false);
         this.scope.attr('mapper.all_selected', false);
-
-        if (this.scope.attr('mapper.assessmentGenerator') &&
-            this.scope.isRelevantToCurrent() &&
-            (!term || !contact)) {
-          instance = GGRC.page_instance();
-          binding = this.scope.mapper.getBindingName(
-            instance,
-            this.scope.attr('mapper.model.table_plural')
-          );
-          if (instance.has_binding(binding)) {
-            this.scope.attr('mapper.page_loading', false);
-            this.scope.attr('entries',
-              _.pluck(instance.get_mapping(binding), 'instance'));
-            this.drawPage();
-            return undefined;
-          }
-        }
 
         filters = _.compact(_.map(relevantList, function (relevant) {
           if (!relevant.value || !relevant.filter) {
@@ -275,7 +217,7 @@
           model_name: modelName,
           options: params
         }).then(function (mappings) {
-          var list = new can.List();
+          var list = [];
           can.each(mappings, function (entry, i) {
             var _class = (can.getObject('CMS.Models.' + entry.type) ||
             can.getObject('GGRC.Models.' + entry.type));
