@@ -210,22 +210,6 @@
           return workflow.context.reify().refresh();
         });
       }
-    },
-
-    response_options_csv: function (val) {
-      var isSet = val && val.length;
-      var responseOptions = this.attr('response_options');
-      var options = isSet ?
-        val.split(',') :
-        responseOptions;
-
-      if (isSet) {
-        this.attr('response_options', options.map(function (item) {
-          return item.trim();
-        }));
-      } else {
-        return options.join(', ');
-      }
     }
   });
 })(window.can);
