@@ -88,3 +88,18 @@ def do_refresh_revisions():
   for type_, rows in rows_by_type.iteritems():
     logger.info("Updating revisions for: %s", type_)
     _fix_type_revisions(type_, rows)
+
+
+def refresh_single_revison(obj):
+  """Refresh last revision of a given object."""
+  if not obj or not obj.id:
+    logger.warning("Can not refresh revisions of new objects.")
+    return
+  revision = all_models.Revision.query.filter(
+      all_models.Revision.resource_id == obj.id,
+      all_models.Revision.resource_type == obj.type,
+  ).order_by(all_models.Revision.id.desc()).first()
+  if revision and revision.action in {"created", "modified"}:
+    new_content = obj.log_json()
+    if revision.content != new_content:
+      revision.content = new_content

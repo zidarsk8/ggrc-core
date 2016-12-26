@@ -25,10 +25,17 @@
        * Performs filtering on provided array like instances
        * @param {Array} items - array like instance
        * @param {Function} filter - filtering function
+       * @param {Function} selectFn - function to select proper attributes
        * @return {Array} - filtered array
        */
-      applyFilter: function (items, filter) {
-        return Array.prototype.filter.call(items, filter);
+      applyFilter: function (items, filter, selectFn) {
+        selectFn = selectFn ||
+          function (x) {
+            return x;
+          };
+        return Array.prototype.filter.call(items, function (item) {
+          return filter(selectFn(item));
+        });
       },
       /**
        * Helper function to create a filtering function
@@ -36,19 +43,22 @@
        * @return {Function} - filtering function
        */
       makeTypeFilter: function (filterObj) {
-        return function (item) {
-          var type = item.instance.type.toString().toLowerCase();
+        function checkIsNotEmptyArray(arr) {
+          return arr && Array.isArray(arr) && arr.length;
+        }
+        return function (type) {
+          type = type.toString().toLowerCase();
           if (!filterObj) {
             return true;
           }
-          if (filterObj.only && Array.isArray(filterObj.only)) {
+          if (checkIsNotEmptyArray(filterObj.only)) {
             // Do sanity transformation
             filterObj.only = filterObj.only.map(function (item) {
               return item.toString().toLowerCase();
             });
             return filterObj.only.indexOf(type) > -1;
           }
-          if (filterObj.exclude && Array.isArray(filterObj.exclude)) {
+          if (checkIsNotEmptyArray(filterObj.exclude)) {
             // Do sanity transformation
             filterObj.exclude = filterObj.exclude.map(function (item) {
               return item.toString().toLowerCase();
@@ -57,9 +67,9 @@
           }
         };
       },
-      applyTypeFilter: function (items, filterObj) {
+      applyTypeFilter: function (items, filterObj, getTypeSelectFn) {
         var filter = GGRC.Utils.filters.makeTypeFilter(filterObj);
-        return GGRC.Utils.filters.applyFilter(items, filter);
+        return GGRC.Utils.filters.applyFilter(items, filter, getTypeSelectFn);
       }
     },
     sortingHelpers: {
