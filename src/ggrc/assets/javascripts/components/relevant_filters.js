@@ -17,7 +17,7 @@
       relevant_menu_item: '@',
       show_all: '@',
       addFilter: function () {
-        var menu = this.attr('menu');
+        var menu = this.menu();
 
         if (this.attr('relevant_menu_item') === 'parent' &&
              Number(this.attr('panel_number')) !== 0 &&
@@ -35,7 +35,7 @@
           model_name: menu[0].model_singular
         });
       },
-      menu: can.compute(function () {
+      menu: function () {
         var type = this.attr('type');
         var mappings;
         var models;
@@ -58,7 +58,7 @@
         return _.sortBy(_.compact(_.map(_.keys(mappings), function (mapping) {
           return CMS.Models[mapping];
         })), 'model_singular');
-      })
+      }
     },
     events: {
       init: function () {

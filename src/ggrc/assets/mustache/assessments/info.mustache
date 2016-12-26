@@ -6,7 +6,7 @@
 {{#instance}}
     <section class="assessment-module info{{#is_info_pin}} sticky-info-panel assignable{{/is_info_pin}}">
       {{#is_info_pin}}
-          <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="onChangeMaximizedState" on-close="onClose"></info-pin-buttons>
+          <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
       {{/is_info_pin}}
 
         <div class="tier-content">
@@ -128,9 +128,6 @@
                     </tab-panel>
                     <tab-panel panels="panels" title-text="Related Assessments" instance="instance">
                       {{> '/static/mustache/assessments/related-assessments.mustache' }}
-                    </tab-panel>
-                    <tab-panel panels="panels" title-text="Related Requests" instance="instance">
-                      {{> '/static/mustache/assessments/related_requests.mustache'}}
                     </tab-panel>
                     <tab-panel panels="panels" title-text="Related Issues" instance="instance">
                       {{> '/static/mustache/assessments/related_issues.mustache' }}

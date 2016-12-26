@@ -42,28 +42,6 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
   });
 
-  describe('given an Audit and Request pair', function () {
-    beforeEach(function () {
-      fakeRequest = new CMS.Models.Request({type: 'Request'});
-      fakeAudit = new CMS.Models.Audit({type: 'Audit'});
-
-      spyOn(GGRC.Mappings, 'get_canonical_mapping_name')
-        .and.returnValue('audits');
-
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
-    });
-
-    it('returns false for Audit as source and Request as target', function () {
-      var result = allowedToMap(fakeAudit, fakeRequest, fakeOptions);
-      expect(result).toBe(false);
-    });
-
-    it('returns false for Request as source and Audit as target', function () {
-      var result = allowedToMap(fakeRequest, fakeAudit, fakeOptions);
-      expect(result).toBe(false);
-    });
-  });
-
   describe('given a Person instance', function () {
     var origShortName;
     var otherInstance;
@@ -227,7 +205,7 @@ describe('GGRC utils getMappableTypes() method', function () {
       'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
       'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
       'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-      'Objective', 'Audit', 'Assessment', 'AccessGroup', 'Request',
+      'Objective', 'Audit', 'Assessment', 'AccessGroup',
       'Document', 'Risk', 'Threat'
     ];
     mapper = GGRC.Utils.getMappableTypes;

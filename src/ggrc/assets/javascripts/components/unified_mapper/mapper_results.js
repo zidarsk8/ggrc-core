@@ -17,9 +17,9 @@
       page: 0,
       page_loading: false,
       select_state: false,
-      loading_or_saving: can.compute(function () {
+      loading_or_saving: function () {
         return this.attr('page_loading') || this.attr('mapper.is_saving');
-      }),
+      },
       unselectAll: function (scope, el, ev) {
         ev.preventDefault();
 

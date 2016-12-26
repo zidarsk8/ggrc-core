@@ -47,19 +47,19 @@ describe('GGRC Utils Query API', function () {
       });
     });
 
-    describe('Request related to Assessment', function () {
+    describe('Audit related to Assessment', function () {
       beforeEach(function () {
         relevant = {
           id: 1,
           type: 'Assessment'
         };
-        objectName = 'Request';
+        objectName = 'Audit';
       });
 
       it('return default params for paging request', function () {
         var result = method(objectName, paging, relevant)[0];
 
-        expect(result.object_name).toEqual('Request');
+        expect(result.object_name).toEqual('Audit');
         expect(result.limit).toEqual([0, 10]);
         expect(result.filters.expression.object_name).toEqual('Assessment');
       });

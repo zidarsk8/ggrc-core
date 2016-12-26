@@ -92,7 +92,7 @@
           'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
           'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
           'Objective', 'Audit', 'Assessment', 'AssessmentTemplate',
-          'AccessGroup', 'Request', 'Document'
+          'AccessGroup', 'Document'
         ]
       },
       related_objects_as_source: Proxy(
@@ -118,7 +118,6 @@
       related_audits: TypeFilter('related_objects', 'Audit'),
       related_controls: TypeFilter('related_objects', 'Control'),
       related_assessments: TypeFilter('related_objects', 'Assessment'),
-      related_requests: TypeFilter('related_objects', 'Request'),
       regulations: TypeFilter('related_objects', 'Regulation'),
       contracts: TypeFilter('related_objects', 'Contract'),
       policies: TypeFilter('related_objects', 'Policy'),
@@ -242,9 +241,7 @@
           'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
           'AccessGroup', 'Objective', 'Control', 'Section', 'Clause',
           'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-          'Product', 'Project', 'System', 'Issue',
-          'Request'
-        ],
+          'Product', 'Project', 'System', 'Issue'],
         authorizations: 'UserRole'
       },
       owned_programs: Indirect('Program', 'contact'),
@@ -333,8 +330,7 @@
         });
       }, 'Program,Regulation,Contract,Policy,Standard,Section,Clause,' +
         'Objective,Control,System,Process,DataAsset,AccessGroup,Product,' +
-        'Project,Facility,Market,OrgGroup,Vendor,Audit,Assessment,Request,' +
-        'Issue'),
+        'Project,Facility,Market,OrgGroup,Vendor,Audit,Assessment,Issue'),
       extended_related_programs_via_search:
         TypeFilter('related_objects_via_search', 'Program'),
       extended_related_regulations_via_search:
@@ -378,20 +374,7 @@
       extended_related_issues_via_search:
         TypeFilter('related_objects_via_search', 'Issue'),
       extended_related_assessment_via_search:
-        TypeFilter('related_objects_via_search', 'Assessment'),
-      extended_related_request_via_search:
-        TypeFilter('related_objects_via_search', 'Request'),
-      open_audit_requests: CustomFilter('extended_related_request_via_search',
-        function (result) {
-          return result.instance.status !== 'Accepted';
-        }),
-      all_audit_requests: Search(function (binding) {
-        return CMS.Models.Request.findAll({});
-      }),
-      all_open_audit_requests: CustomFilter('all_audit_requests',
-        function (result) {
-          return result.instance.status !== 'Accepted';
-        })
+        TypeFilter('related_objects_via_search', 'Assessment')
     },
     Context: {
       _canonical: {
@@ -412,7 +395,6 @@
     },
     Audit: {
       _canonical: {
-        requests: 'Request',
         _program: 'Program',
         context: 'Context'
 
@@ -420,23 +402,12 @@
       _mixins: [
         'related_object'
       ],
-      requests: Direct('Request', 'audit', 'requests'),
-      active_requests: CustomFilter('requests', function (result) {
-        return result.instance.status !== 'Accepted';
-      }),
-      history: CustomFilter('requests', function (result) {
-        return result.instance.status === 'Accepted';
-      }),
       _program: Direct('Program', 'audits', 'program'),
       program_controls: Cross('_program', 'controls'),
-      program_requests: Cross('_program', 'related_requests'),
       program_issues: Cross('_program', 'related_issues'),
       program_assessments: Cross('_program', 'related_assessments'),
       objects:
         Proxy(null, 'auditable', 'AuditObject', 'audit', 'audit_objects'),
-      responses_via_requests: Cross('requests', 'related_objects'),
-      related_objects_via_requests:
-        Multi(['requests', 'responses_via_requests']),
       context: Direct('Context', 'related_object', 'context'),
       authorizations: Cross('context', 'user_roles'),
       authorized_program_people: Cross('_program', 'authorized_people'),
@@ -452,57 +423,6 @@
           });
       }),
       auditors: Cross('auditor_authorizations', 'person'),
-      related_owned_objects:
-        CustomFilter('related_objects_via_requests', function (result) {
-          var person = GGRC.page_instance() instanceof CMS.Models.Person &&
-            GGRC.page_instance();
-          var instance = result.instance;
-          return !person ||
-            (instance.attr('contact') && instance.contact.id === person.id) ||
-            (instance.attr('assignee') && instance.assignee.id === person.id) ||
-            (instance.attr('requestor') && instance.requestor.id === person.id);
-        }),
-      related_owned_requests: TypeFilter('related_owned_objects', 'Request'),
-      related_mapped_objects: CustomFilter('related_objects_via_requests',
-        function (result) {
-          var pageInstance = GGRC.page_instance();
-          var instance = result.instance;
-          var res;
-          var isMapped = function (responses) {
-            var i;
-            var j;
-            var response;
-            var relationships;
-            var relationship;
-
-            for (i = 0, response = responses[i]; ;i++) {
-              //  FIXME: This avoids script errors due to stubs, but causes
-              //    incorrect results.  `CustomFilter.filter_fn` should be
-              //    refactored to return a deferred, and then this function
-              //    should be cleaned up.
-              if (!('related_sources' in response)) continue;
-              relationships = new can.Observe.List()
-                .concat(response.related_sources.reify(),
-                  response.related_destinations.reify());
-              for (j = 0, relationship = relationships[j]; ; j++) {
-                if (relationship.source && relationship.source.reify &&
-                  relationship.source.reify() === pageInstance ||
-                  relationship.destination &&
-                  relationship.destination.reify() === pageInstance) {
-                  return true;
-                }
-              }
-            }
-          };
-
-          if (instance instanceof CMS.Models.Request && instance.responses) {
-            res = isMapped(instance.responses.reify());
-          } else {
-            res = false;
-          }
-          return res;
-        }),
-      extended_related_objects: Cross('requests', 'extended_related_objects'),
       related_assessment_templates: TypeFilter(
         'related_objects', 'AssessmentTemplate')
     },
@@ -528,48 +448,6 @@
       _mixins: [
         'related_object', 'personable', 'ownable'
       ]
-    },
-    Request: {
-      _mixins: ['related_object', 'personable', 'ownable', 'business_object',
-        'documentable', 'assignable'],
-      business_objects: Multi(['related_objects', 'controls', 'documents',
-        'people', 'sections', 'clauses']),
-      audits: Direct('Audit', 'requests', 'audit'),
-      related_controls: TypeFilter('related_objects', 'Control'),
-      related_regulations:
-        TypeFilter('related_objects', 'Regulation'),
-      related_assignees:
-        AttrFilter('related_objects', 'AssigneeType', 'Assignee', 'Person'),
-      related_requesters:
-        AttrFilter('related_objects', 'AssigneeType', 'Requester', 'Person'),
-      related_verifiers:
-        AttrFilter('related_objects', 'AssigneeType', 'Verifier', 'Person'),
-      people: AttrFilter('related_objects', 'AssigneeType', null, 'Person'),
-      related_objects_via_search: Search(function (binding) {
-        var types = [
-          'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
-          'Section', 'Clause', 'Objective', 'Control', 'AccessGroup',
-          'System', 'Process', 'DataAsset', 'Product', 'Project', 'Facility',
-          'Market', 'OrgGroup', 'Vendor', 'Audit', 'Issue', 'Assessment',
-          'Request'
-        ];
-
-        // checkfor window.location
-        if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
-          return GGRC.Models.Search.search_for_types('', types, {})
-              .pipe(function (mappings) {
-                return mappings.entries;
-              });
-        }
-        return GGRC.Models.Search.search_for_types(
-            '', types, {
-              contact_id: binding.instance.id
-            }).pipe(function (mappings) {
-              return mappings.entries;
-            });
-      }, 'Program,Regulation,Contract,Policy,Standard,Section,Clause,' +
-        'Objective,Control,System,Process,DataAsset,AccessGroup,Product,' +
-        'Project,Facility,Market,OrgGroup,Vendor,Audit,Assessment,Request')
     },
     Comment: {
       _mixins: ['related_object', 'documentable', 'ownable'],

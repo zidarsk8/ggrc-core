@@ -24,7 +24,9 @@
     tag: 'cycle-end-cycle',
     template: '<content/>',
     events: {
-      click: function () {
+      click: function (el, ev) {
+        ev.stopPropagation();
+
         this.scope.cycle
           .refresh()
           .then(function (cycle) {

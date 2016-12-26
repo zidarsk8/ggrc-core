@@ -8,7 +8,7 @@ from mock import patch
 from sqlalchemy import and_
 
 from ggrc import db
-from ggrc.models import Request
+from ggrc.models import Assessment
 from ggrc.models import Notification
 from ggrc.models import NotificationType
 from ggrc.models import Revision
@@ -18,7 +18,7 @@ from integration.ggrc import generator
 
 class TestCommentNotification(converters.TestCase):
 
-  """Test notification on request comments."""
+  """Test notification on assessment comments."""
 
   def setUp(self):
     converters.TestCase.setUp(self)
@@ -73,16 +73,16 @@ class TestCommentNotification(converters.TestCase):
 
   @patch("ggrc.notifications.common.send_email")
   def test_notification_entries(self, _):
-    """Test setting notification entries for request comments.
+    """Test setting notification entries for assessment comments.
 
     Check if the correct notification entries are created when a comment gets
     posted.
     """
 
-    self.import_file("request_full_no_warnings.csv")
-    request1 = Request.query.filter_by(slug="Request 1").first()
+    self.import_file("assessment_with_templates.csv")
+    asmt1 = Assessment.query.filter_by(slug="A 1").first()
     _, comment = self.generator.generate_comment(
-        request1, "Verifier", "some comment", send_notification="true")
+        asmt1, "Verifier", "some comment", send_notification="true")
 
     notifications = self._get_notifications(notif_type="comment_created").all()
     self.assertEqual(len(notifications), 1,

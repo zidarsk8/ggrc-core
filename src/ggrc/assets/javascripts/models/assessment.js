@@ -325,26 +325,6 @@
         }
       };
       return this._related(relevantTypes, 5);
-    },
-    related_requests: function () {
-      var relevantTypes = {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_requests',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_requests',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_requests',
-          weight: 10
-        }
-      };
-      return this._related(relevantTypes, 5);
     }
   });
 })(window.can, window.GGRC, window.CMS);

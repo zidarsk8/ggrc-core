@@ -23,6 +23,7 @@
 {{/list}}
 
 {{#list.is_loading}}
-  <li class="spinny"  {{attach_spinner '{ "radius": 4, "length": 7, "width": 2 }' }}>
+  <li class="spinny">
+    <spinner toggle="list.is_loading"></spinner>
   </li>
 {{/list.is_loading}}

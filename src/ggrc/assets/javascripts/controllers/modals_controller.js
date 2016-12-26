@@ -311,6 +311,9 @@
     },
 
     reset_form: function (setFieldsCb) {
+      var $textArea = $('#program_description');
+      var editorData = $textArea.data('wysihtml5');
+
       // If the modal is closed early, the element no longer exists
       if (this.element) {
         // Do the fields (re-)setting
@@ -326,6 +329,12 @@
       if (this.options.instance.form_preload) {
         this.options.instance.form_preload(this.options.new_object_form,
           this.options.object_params);
+      }
+
+      // The rich text editor's content is not a "normal" form field, thus
+      // it needs to be reset manually (if it exists)
+      if (editorData && editorData.editor) {
+        editorData.editor.clear();
       }
     },
 
@@ -938,17 +947,32 @@
     },
 
     new_instance: function (data) {
+      var newInstance = this.prepareInstance();
+
+      this.resetCAFields(newInstance.attr('custom_attribute_definitions'));
+
+      $.when(this.options.attr('instance', newInstance))
+        .done(function () {
+          this.reset_form(function () {
+            var $form = $(this.element).find('form');
+            $form.trigger('reset');
+          });
+        }.bind(this))
+        .then(this.proxy('apply_object_params'))
+        .then(this.proxy('serialize_form'))
+        .then(this.proxy('autocomplete'));
+
+      this.restore_ui_status();
+    },
+
+    /**
+     * Reset custom attribute values manually
+     * @param {Array} cad - Array with custom attribute definitions
+     */
+    resetCAFields: function (cad) {
       var wysihtml5;
-      var params = this.find_params();
-      var newInstance = new this.options.model(params);
 
-      newInstance.attr('_suppress_errors', true)
-        .attr('custom_attribute_definitions',
-          this.options.instance.custom_attribute_definitions)
-        .attr('custom_attributes', new can.Map());
-
-      // Reset custom attribute values manually
-      can.each(newInstance.custom_attribute_definitions, function (definition) {
+      can.each(cad, function (definition) {
         var element = this.element
           .find('[name="custom_attributes.' + definition.id + '"]');
         if (definition.attribute_type === 'Checkbox') {
@@ -969,24 +993,24 @@
           element.val('');
         }
       }, this);
+    },
+
+    prepareInstance: function () {
+      var params = this.find_params();
+      var instance = new this.options.model(params);
+      var saveContactModels = ['TaskGroup', 'TaskGroupTask'];
+
+      instance.attr('_suppress_errors', true)
+        .attr('custom_attribute_definitions',
+          this.options.instance.custom_attribute_definitions)
+        .attr('custom_attributes', new can.Map());
 
       if (this.options.add_more &&
-        this.options.model.shortName === 'TaskGroupTask') {
-        newInstance.attr('contact', this.options.attr('instance.contact'));
+        _.includes(saveContactModels, this.options.model.shortName)) {
+        instance.attr('contact', this.options.attr('instance.contact'));
       }
 
-      $.when(this.options.attr('instance', newInstance))
-        .done(function () {
-          this.reset_form(function () {
-            var $form = $(this.element).find('form');
-            $form.trigger('reset');
-          });
-        }.bind(this))
-        .then(this.proxy('apply_object_params'))
-        .then(this.proxy('serialize_form'))
-        .then(this.proxy('autocomplete'));
-
-      this.restore_ui_status();
+      return instance;
     },
 
     save_instance: function (el, ev) {
@@ -1142,6 +1166,14 @@
         return;
       }
 
+      if (this.options.instance.getHashFragment) {
+        hash = this.options.instance.getHashFragment();
+        if (hash) {
+          window.location.hash = hash;
+          return;
+        }
+      }
+
       hash = window.location.hash.split('/')[0];
       treeController = this.options
         .$trigger
@@ -1158,7 +1190,6 @@
     updateSummaryHash: function (hash, type) {
       var summary = 'Summary';
       var replacements = {
-        Request: 'Request',
         Assessment: 'assessment'
       };
       var replacement = replacements[type];

@@ -67,11 +67,15 @@
       },
       getDate: function (date) {
         if (date instanceof Date) {
-          date = moment(date).format(this.scope.pattern);
-        } else if (!this.isValidDate(date)) {
-          date = null;
+          return moment(date).format(this.scope.pattern);
         }
-        return date;
+        if (moment(date, 'YYYY-MM-DD').isValid()) {
+          return moment(date).format(this.scope.pattern);
+        }
+        if (this.isValidDate(date)) {
+          return date;
+        }
+        return null;
       },
       isValidDate: function (date) {
         return moment(date, this.scope.pattern, true).isValid();
@@ -86,9 +90,10 @@
           }
         };
         if (!date) {
+          this.scope.picker.datepicker('option', type, null);
           return;
         }
-        date = moment(date);
+        date = moment(date, "MM/DD/YYYY");
 
         if (types[type]) {
           types[type]();
@@ -108,6 +113,7 @@
       },
       '{scope} _date': function (scope, ev, val) {
         scope.attr('date', val);
+        scope.picker.datepicker('setDate', val);
       },
       '{window} mousedown': function (el, ev) {
         var isInside;
