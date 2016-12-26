@@ -65,6 +65,7 @@
             });
             return filterObj.exclude.indexOf(type) === -1;
           }
+          return true;
         };
       },
       applyTypeFilter: function (items, filterObj, getTypeSelectFn) {

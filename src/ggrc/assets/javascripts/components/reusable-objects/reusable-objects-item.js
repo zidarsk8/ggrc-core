@@ -33,12 +33,25 @@
       },
       toggleSelection: function (isChecked) {
         var list = this.attr('selectedList');
-        var index;
+        var index = -1;
         if (isChecked) {
-          list.push(this.attr('instance'));
+          list.push({
+            id: this.attr('instance.id'),
+            type: this.attr('instance.type')
+          });
         } else {
-          index = list.indexOf(this.attr('instance'));
-          list.splice(index, 1);
+          list.forEach(function (item, i) {
+            var type = this.attr('instance.snapshot') ?
+              'Snapshot' :
+              this.attr('instance.type');
+            if (this.attr('instance.id') === item.attr('id') &&
+              type === item.attr('type')) {
+              index = i;
+            }
+          }.bind(this));
+          if (index >= 0) {
+            list.splice(index, 1);
+          }
         }
       }
     },
