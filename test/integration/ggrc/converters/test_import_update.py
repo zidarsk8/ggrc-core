@@ -43,3 +43,4 @@ class TestImportUpdates(TestCase):
         models.Revision.resource_id == policy.id
     ).count()
     self.assertEqual(revision_count, 2)
+    self.assertEqual(policy.owners[0].email, "user1@example.com")
