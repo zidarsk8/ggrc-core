@@ -90,7 +90,7 @@ def do_refresh_revisions():
     _fix_type_revisions(type_, rows)
 
 
-def regfresh_single_revison(obj):
+def refresh_single_revison(obj):
   """Refresh last revision of a given object."""
   if not obj or not obj.id:
     logger.warning("Can not refresh revisions of new objects.")
