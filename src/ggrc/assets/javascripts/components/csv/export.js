@@ -130,7 +130,7 @@
                   predicates;
               predicates = _.map(panel.attr("relevant"), function (el) {
                 var id = el.model_name === "__previous__" ? index - 1 : el.filter.id;
-                return "#" + el.model_name + "," + id + "#";
+                return id ? '#' + el.model_name + ',' + id + '#' : null;
               });
               relevant_filter = _.reduce(predicates, function (p1, p2) {
                 return p1 + " AND " + p2;
