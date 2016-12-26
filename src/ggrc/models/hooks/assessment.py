@@ -16,6 +16,7 @@ from ggrc.models import all_models
 from ggrc.models import Assessment
 from ggrc.models import Person
 from ggrc.models import Relationship
+from ggrc.models import Snapshot
 from ggrc.services.common import Resource
 
 
@@ -28,6 +29,11 @@ def init_hook():
     """Apply custom attribute definitions and map people roles
     when generating Assessmet with template"""
     db.session.flush()
+
+    snapshot_ids = [src.get('object', {}).get('id') for src in sources]
+    snapshots = Snapshot.eager_query().filter(Snapshot.id.in_(snapshot_ids))
+    snapshots = {snapshot.id: snapshot for snapshot in snapshots}
+
     for obj, src in izip(objects, sources):
       src_obj = src.get("object")
       audit = src.get("audit")
@@ -51,6 +57,14 @@ def init_hook():
       }
       relate_assignees(obj, related)
       relate_ca(obj, related)
+
+      if src_obj:
+        snapshot = snapshots.get(src_obj.get('id'))
+        if snapshot:
+          parent_title = snapshot.parent.title
+          child_revision_title = snapshot.revision.content['title']
+          obj.title = '{} assessment for {}'.format(child_revision_title,
+                                                    parent_title)
 
 
 def map_assessment(assessment, obj):
