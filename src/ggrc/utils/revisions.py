@@ -92,7 +92,7 @@ def do_refresh_revisions():
 
 def regfresh_single_revison(obj):
   """Refresh last revision of a given object."""
-  if not obj.id:
+  if not obj or not obj.id:
     logger.warning("Can not refresh revisions of new objects.")
     return
   revision = all_models.Revision.query.filter(
