@@ -114,7 +114,8 @@
 
       if (this._display_deferred) {
         if (refetch) {
-          return loader();
+          return loader()
+            .then(that.proxy('draw_list'));
         }
         return this._display_deferred;
       }
@@ -154,6 +155,8 @@
       if (!this.element) {
         return undefined;  // controller has been destroyed
       }
+
+      this.clearList();
 
       this.options.attr('original_list', list);
       this.options.attr('list', []);
