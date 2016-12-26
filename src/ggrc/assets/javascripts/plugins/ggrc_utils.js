@@ -36,19 +36,22 @@
        * @return {Function} - filtering function
        */
       makeTypeFilter: function (filterObj) {
+        function checkIsNotEmptyArray(arr) {
+          return arr && Array.isArray(arr) && arr.length;
+        }
         return function (item) {
           var type = item.instance.type.toString().toLowerCase();
           if (!filterObj) {
             return true;
           }
-          if (filterObj.only && Array.isArray(filterObj.only)) {
+          if (checkIsNotEmptyArray(filterObj.only)) {
             // Do sanity transformation
             filterObj.only = filterObj.only.map(function (item) {
               return item.toString().toLowerCase();
             });
             return filterObj.only.indexOf(type) > -1;
           }
-          if (filterObj.exclude && Array.isArray(filterObj.exclude)) {
+          if (checkIsNotEmptyArray(filterObj.exclude)) {
             // Do sanity transformation
             filterObj.exclude = filterObj.exclude.map(function (item) {
               return item.toString().toLowerCase();
