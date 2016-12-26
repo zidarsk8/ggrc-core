@@ -271,10 +271,7 @@ class TestGetObjectColumnDefinitions(TestCase):
 
   def test_audit_definitions(self):
     """ test default headers for Audit """
-    definitions = get_object_column_definitions(models.Audit)
-    mapping_names = get_mapping_names(models.Audit.__name__)
-    display_names = {val["display_name"] for val in definitions.itervalues()}
-    element_names = {
+    names = {
         "Program",
         "Code",
         "Title",
@@ -288,13 +285,19 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Auditors",
         "Delete",
     }
-    expected_names = element_names.union(mapping_names)
-    self.assertEqual(expected_names, display_names)
-    vals = {val["display_name"]: val for val in definitions.itervalues()}
-    self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Program"]["mandatory"])
-    self.assertTrue(vals["Title"]["unique"])
-    self.assertTrue(vals["Internal Audit Lead"]["mandatory"])
+    expected_fields = {
+        "mandatory": {
+            "Code",
+            "Title",
+            "Program",
+            "Status",
+            "Internal Audit Lead",
+        },
+        "unique": {
+            "Title",
+        },
+    }
+    self._test_single_object(models.Audit, names, expected_fields)
 
   def test_assessment_template_defs(self):
     """Test default headers for Assessment Template."""
