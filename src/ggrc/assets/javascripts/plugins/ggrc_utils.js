@@ -25,10 +25,17 @@
        * Performs filtering on provided array like instances
        * @param {Array} items - array like instance
        * @param {Function} filter - filtering function
+       * @param {Function} selectFn - function to select proper attributes
        * @return {Array} - filtered array
        */
-      applyFilter: function (items, filter) {
-        return Array.prototype.filter.call(items, filter);
+      applyFilter: function (items, filter, selectFn) {
+        selectFn = selectFn ||
+          function (x) {
+            return x;
+          };
+        return Array.prototype.filter.call(items, function (item) {
+          return filter(selectFn(item));
+        });
       },
       /**
        * Helper function to create a filtering function
@@ -39,8 +46,8 @@
         function checkIsNotEmptyArray(arr) {
           return arr && Array.isArray(arr) && arr.length;
         }
-        return function (item) {
-          var type = item.instance.type.toString().toLowerCase();
+        return function (type) {
+          type = type.toString().toLowerCase();
           if (!filterObj) {
             return true;
           }
@@ -60,9 +67,9 @@
           }
         };
       },
-      applyTypeFilter: function (items, filterObj) {
+      applyTypeFilter: function (items, filterObj, getTypeSelectFn) {
         var filter = GGRC.Utils.filters.makeTypeFilter(filterObj);
-        return GGRC.Utils.filters.applyFilter(items, filter);
+        return GGRC.Utils.filters.applyFilter(items, filter, getTypeSelectFn);
       }
     },
     sortingHelpers: {
