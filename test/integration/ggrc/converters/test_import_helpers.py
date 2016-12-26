@@ -125,6 +125,18 @@ class TestGetObjectColumnDefinitions(TestCase):
   order of these test functions is the same as the objects in LHN
   """
 
+  COMMON_EXPECTED = {
+      "mandatory": {
+          "Title",
+          "Owner",
+          "Code",
+      },
+      "unique": {
+          "Code",
+          "Title",
+      },
+  }
+
   @classmethod
   def setUpClass(cls):
     TestCase.clear_data()
@@ -406,18 +418,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Issue, names, expected_fields)
+    self._test_single_object(models.Issue, names, self.COMMON_EXPECTED)
 
   def test_regulation_definitions(self):
     """ test default headers for Regulation """
@@ -436,18 +437,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Regulation, names, expected_fields)
+    self._test_single_object(models.Regulation, names, self.COMMON_EXPECTED)
 
   def test_policy_definitions(self):
     """ test default headers for Policy """
@@ -467,18 +457,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Policy, names, expected_fields)
+    self._test_single_object(models.Policy, names, self.COMMON_EXPECTED)
 
   def test_standard_definitions(self):
     """ test default headers for Standard """
@@ -497,18 +476,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Standard, names, expected_fields)
+    self._test_single_object(models.Standard, names, self.COMMON_EXPECTED)
 
   def test_contract_definitions(self):
     """ test default headers for Contract """
@@ -527,18 +495,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Contract, names, expected_fields)
+    self._test_single_object(models.Contract, names, self.COMMON_EXPECTED)
 
   def test_clause_definitions(self):
     """ test default headers for Clause """
@@ -557,18 +514,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Clause, names, expected_fields)
+    self._test_single_object(models.Clause, names, self.COMMON_EXPECTED)
 
   def test_section_definitions(self):
     """ test default headers for Section """
@@ -586,18 +532,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Section, names, expected_fields)
+    self._test_single_object(models.Section, names, self.COMMON_EXPECTED)
 
   def test_control_definitions(self):
     """ test default headers for Control """
@@ -626,18 +561,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Control, names, expected_fields)
+    self._test_single_object(models.Control, names, self.COMMON_EXPECTED)
 
   def test_objective_definitions(self):
     """ test default headers for Objective """
@@ -654,18 +578,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Objective, names, expected_fields)
+    self._test_single_object(models.Objective, names, self.COMMON_EXPECTED)
 
   def test_person_definitions(self):
     """ test default headers for Person """
@@ -702,18 +615,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.OrgGroup, names, expected_fields)
+    self._test_single_object(models.OrgGroup, names, self.COMMON_EXPECTED)
 
   def test_vendor_definitions(self):
     """ test default headers for Vendor """
@@ -732,18 +634,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Vendor, names, expected_fields)
+    self._test_single_object(models.Vendor, names, self.COMMON_EXPECTED)
 
   def test_system_definitions(self):
     """ test default headers for System """
@@ -763,18 +654,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.System, names, expected_fields)
+    self._test_single_object(models.System, names, self.COMMON_EXPECTED)
 
   def test_process_definitions(self):
     """ test default headers for Process """
@@ -794,18 +674,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Process, names, expected_fields)
+    self._test_single_object(models.Process, names, self.COMMON_EXPECTED)
 
   def test_data_asset_definitions(self):
     """ test default headers for DataAsset """
@@ -824,18 +693,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.DataAsset, names, expected_fields)
+    self._test_single_object(models.DataAsset, names, self.COMMON_EXPECTED)
 
   def test_access_group_definitions(self):
     """ test default headers for AccessGroup """
@@ -854,18 +712,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.AccessGroup, names, expected_fields)
+    self._test_single_object(models.AccessGroup, names, self.COMMON_EXPECTED)
 
   def test_product_definitions(self):
     """ test default headers for Product """
@@ -885,18 +732,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Product, names, expected_fields)
+    self._test_single_object(models.Product, names, self.COMMON_EXPECTED)
 
   def test_project_definitions(self):
     """ test default headers for Project """
@@ -915,18 +751,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Project, names, expected_fields)
+    self._test_single_object(models.Project, names, self.COMMON_EXPECTED)
 
   def test_facility_definitions(self):
     """ test default headers for Facility """
@@ -945,18 +770,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Facility, names, expected_fields)
+    self._test_single_object(models.Facility, names, self.COMMON_EXPECTED)
 
   def test_market_definitions(self):
     """ test default headers for Market """
@@ -975,18 +789,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
     }
-    expected_fields = {
-        "mandatory": {
-            "Title",
-            "Owner",
-            "Code",
-        },
-        "unique": {
-            "Code",
-            "Title",
-        },
-    }
-    self._test_single_object(models.Market, names, expected_fields)
+    self._test_single_object(models.Market, names, self.COMMON_EXPECTED)
 
   def test_risk_definitions(self):
     """Test default headers for Risk."""
