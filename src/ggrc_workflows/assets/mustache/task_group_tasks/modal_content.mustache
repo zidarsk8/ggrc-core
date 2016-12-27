@@ -71,7 +71,6 @@
       {{#using workflow=task_group.workflow}}
       {{#switch workflow.frequency}}
       {{#case "one_time"}}
-      {{#add_to_current_scope instance=instance}}
       <div id="one-time" class="frequency-wrap" style="display:block">
         <label>
           Frequency: One time
@@ -89,7 +88,6 @@
                       label="Due Date"></datepicker>
         </label>
       </div>
-      {{/add_to_current_scope}}
       {{/case}}
       {{#case "weekly"}}
       <div id="weekly" class="frequency-wrap" style="display:block">
