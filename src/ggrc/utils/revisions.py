@@ -7,8 +7,11 @@ from logging import getLogger
 
 from sqlalchemy.sql import select
 from sqlalchemy import func
+from sqlalchemy import literal
+from sqlalchemy import not_
 
 from ggrc import db
+from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
@@ -66,12 +69,14 @@ def _fix_type_revisions(type_, obj_rev_map):
   ids = list(obj_rev_map.keys())
   if ids:
     objects_with_revisions = model.eager_query().filter(model.id.in_(ids))
+    objects_without_revisions = model.eager_query().filter(
+        not_(model.id.in_(ids)),
+    )
   else:
     objects_with_revisions = []
+    objects_without_revisions = model.eager_query()
 
   for obj in objects_with_revisions:
-    # This block only updates the content of existing revisions and does not
-    # recreate missing revision objects
     rev_id = obj_rev_map.pop(obj.id)
     # Update revisions_table.content to the latest object's json
     db.session.execute(
@@ -80,7 +85,89 @@ def _fix_type_revisions(type_, obj_rev_map):
         .values(content=obj.log_json())
     )
 
+  # Every revision present in obj_rev_map has no object in the DB
+  missing_delete_revisions = list(obj_rev_map.values())
+
+  # Every object with id not present in obj_
+  missing_create_revisions = [
+      (obj.id, obj.log_json()) for obj in objects_without_revisions
+  ]
+
+  if missing_delete_revisions or missing_create_revisions:
+    # Log a "BULK" event for missing revision creation
+    event = all_models.Event(action="BULK")
+    db.session.add(event)
+    db.session.flush([event])  # to get its id
+
+  if missing_delete_revisions:
+    # For each lost object log a "deleted" revision with content identical to
+    # the last logged revision
+    _recover_delete_revisions(revisions_table, event, missing_delete_revisions)
+
+  if missing_create_revisions:
+    # For each unlogged object log a "created"/"modified" revision with content
+    # equal to obj.log_json()
+    _recover_create_revisions(revisions_table, event,
+                              type_, missing_create_revisions)
+
   db.session.commit()
+
+
+def _recover_delete_revisions(revisions_table, event,
+                              last_available_revision_ids):
+  """Log an action="deleted" copy for revisions with ids in passed list."""
+  columns_to_clone = sorted(set(c.name for c in revisions_table.c) -
+                            {"id", "event_id", "action", "created_at",
+                             "updated_at"})
+  db.session.execute(
+      revisions_table.insert().from_select(
+          ["event_id",
+           "action",
+           "created_at",
+           "updated_at"] + columns_to_clone,
+          select(
+              [event.id,
+               literal("deleted"),
+               func.now(),
+               func.now()] + columns_to_clone,
+          ).select_from(
+              revisions_table,
+          ).where(
+              revisions_table.c.id.in_(last_available_revision_ids),
+          ),
+      ),
+  )
+
+
+def _recover_create_revisions(revisions_table, event, object_type,
+                              object_ids_with_jsons):
+  """Log a "created"/"modified" revision for every passed object's json.
+
+  If json["updated_at"] == json["created_at"], log action="created".
+  If json["updated_at"] != json["created_at"], log action="modified".
+  """
+  def determine_action(obj_content):
+    if obj_content.get("created_at") != obj_content.get("updated_at"):
+      return "modified"
+    else:
+      return "created"
+
+  db.session.execute(
+      revisions_table.insert(),
+      [{"resource_id": obj_id,
+        "resource_type": object_type,
+        "event_id": event.id,
+        "action": determine_action(obj_content),
+        "content": obj_content,
+        "context_id": obj_content.get("context_id"),
+        "modified_by_id": (obj_content.get("modified_by_id") or
+                           get_current_user_id()),
+        "source_type": obj_content.get("source_type"),
+        "source_id": obj_content.get("source_id"),
+        "destination_type": obj_content.get("destination_type"),
+        "destination_id": obj_content.get("destination_id")}
+       for (obj_id, obj_content) in object_ids_with_jsons],
+  )
 
 
 def do_refresh_revisions():
