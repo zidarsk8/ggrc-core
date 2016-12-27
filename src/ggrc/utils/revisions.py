@@ -3,7 +3,6 @@
 
 """Utility class for handling revisions."""
 
-from collections import defaultdict
 from logging import getLogger
 
 from sqlalchemy.sql import select
@@ -15,40 +14,37 @@ from ggrc.models import all_models
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
 
-def _get_revisions_by_type():
+def _get_revisions_by_type(type_):
   """Get latest revisions for all existing objects
 
+  Args:
+    type_ (str): the resource_type of revisions to fetch.
+
   Returns:
-    dict with model name as key and list of latest revisions for that model.
+    list of tuples of (revision_id, resource_id).
   """
-  valid_types = [model.__name__ for model in all_models.all_models]
   revisions_table = all_models.Revision.__table__
   id_query = select([
       func.max(revisions_table.c.id),
-  ]).group_by(
-      revisions_table.c.resource_type,
+  ]).where(
+      revisions_table.c.resource_type == type_,
+  ).group_by(
       revisions_table.c.resource_id,
   )
   ids = [row for (row,) in db.session.execute(id_query)]
-  query = select([
-      revisions_table.c.id,
-      revisions_table.c.resource_type,
-      revisions_table.c.resource_id,
-  ]).where(
-      revisions_table.c.resource_type.in_(valid_types)
-  ).where(
-      revisions_table.c.action != "deleted"
-  ).where(
-      revisions_table.c.id.in_(ids)
-  ).order_by(
-      revisions_table.c.resource_type,
-  )
 
-  rows_by_type = defaultdict(list)
-  for row in db.session.execute(query):
-    rows_by_type[row.resource_type].append(row)
-
-  return rows_by_type
+  if ids:
+    query = select([
+        revisions_table.c.id,
+        revisions_table.c.resource_id,
+    ]).where(
+        revisions_table.c.action != "deleted"
+    ).where(
+        revisions_table.c.id.in_(ids)
+    )
+    return db.session.execute(query).all()
+  else:
+    return []
 
 
 def _fix_type_revisions(type_, rows):
@@ -57,6 +53,11 @@ def _fix_type_revisions(type_, rows):
   revisions_table = all_models.Revision.__table__
   if not model:
     logger.warning("Failed to update revisions for invalid model: %s", type_)
+    return
+
+  if not hasattr(model, "log_json"):
+    logger.warning("Model '%s' has no log_json method, revision generation "
+                   "skipped", type_)
     return
 
   ids = [row.resource_id for row in rows]
@@ -77,14 +78,21 @@ def _fix_type_revisions(type_, rows):
           .where(revisions_table.c.id == row.id)
           .values(content=obj_content_map[row.resource_id])
       )
+
   db.session.commit()
 
 
 def do_refresh_revisions():
   """Update last revisions of models with fixed data."""
 
-  rows_by_type = _get_revisions_by_type()
+  valid_types = {model.__name__ for model in all_models.all_models}
 
-  for type_, rows in rows_by_type.iteritems():
+  # No sense in storing revisions for Revisions or Events
+  valid_types -= {"Revision", "Event"}
+
+  # Not storing revisions for RelationshipAttrs (part of Relationships)
+  valid_types -= {"RelationshipAttr"}
+
+  for type_ in valid_types:
     logger.info("Updating revisions for: %s", type_)
-    _fix_type_revisions(type_, rows)
+    _fix_type_revisions(type_, _get_revisions_by_type(type_))
