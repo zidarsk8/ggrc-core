@@ -181,6 +181,13 @@ def do_refresh_revisions():
   # Not storing revisions for RelationshipAttrs (part of Relationships)
   valid_types -= {"RelationshipAttr"}
 
+  # TODO: fix the errors for the next excluded types and remove this block
+  valid_types -= {
+      "BackgroundTask",  # over max content length
+      "Role",  # no FK by modified_by_id to Person
+      "RiskObject",  # does not mix in Relatable, thus fails on eager_query
+  }
+
   for type_ in valid_types:
     logger.info("Updating revisions for: %s", type_)
     _fix_type_revisions(type_, _get_revisions_by_type(type_))
