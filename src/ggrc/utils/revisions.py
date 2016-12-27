@@ -21,7 +21,7 @@ def _get_revisions_by_type(type_):
     type_ (str): the resource_type of revisions to fetch.
 
   Returns:
-    list of tuples of (revision_id, resource_id).
+    dict with object_id as key and revision_id of the latest revision as value.
   """
   revisions_table = all_models.Revision.__table__
   id_query = select([
@@ -42,12 +42,15 @@ def _get_revisions_by_type(type_):
     ).where(
         revisions_table.c.id.in_(ids)
     )
-    return db.session.execute(query).all()
+
+    return {row.resource_id: row.id for row in db.session.execute(query)}
+
   else:
-    return []
+    # no revisions found
+    return {}
 
 
-def _fix_type_revisions(type_, rows):
+def _fix_type_revisions(type_, obj_rev_map):
   """Update revision content for all rows of a given model type."""
   model = getattr(all_models, type_, None)
   revisions_table = all_models.Revision.__table__
@@ -60,24 +63,22 @@ def _fix_type_revisions(type_, rows):
                    "skipped", type_)
     return
 
-  ids = [row.resource_id for row in rows]
-  objects = model.eager_query().filter(model.id.in_(ids))
+  ids = list(obj_rev_map.keys())
+  if ids:
+    objects_with_revisions = model.eager_query().filter(model.id.in_(ids))
+  else:
+    objects_with_revisions = []
 
-  obj_content_map = {obj.id: obj.log_json() for obj in objects}
-
-  for row in rows:
-    # This if statement checks that we only update content for objects that
-    # exist. If an object has been deleted via import or in some other way that
-    # its delete revision was not created, this if statement will prevent a
-    # false error.
-    # Note: there will be other migrations that deal with adding missing
-    # revisions for those deleted objects.
-    if row.resource_id in obj_content_map:
-      db.session.execute(
-          revisions_table.update()
-          .where(revisions_table.c.id == row.id)
-          .values(content=obj_content_map[row.resource_id])
-      )
+  for obj in objects_with_revisions:
+    # This block only updates the content of existing revisions and does not
+    # recreate missing revision objects
+    rev_id = obj_rev_map.pop(obj.id)
+    # Update revisions_table.content to the latest object's json
+    db.session.execute(
+        revisions_table.update()
+        .where(revisions_table.c.id == rev_id)
+        .values(content=obj.log_json())
+    )
 
   db.session.commit()
 
