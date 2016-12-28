@@ -7,7 +7,7 @@
             {{#if context.isEdit}}inline-edit--active{{/if}}
             {{#if readonly}}inline-edit--readonly{{/if}}">
   <h6 class="inline-edit__title">
-    {{firstnonempty title label}}
+    {{firstnonempty titleText label}}
     {{#mandatory}}<span class="required">*</span>{{/mandatory}}
     {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
   </h6>
