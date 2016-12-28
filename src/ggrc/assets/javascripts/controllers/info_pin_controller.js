@@ -68,7 +68,7 @@ can.Control('CMS.Controllers.InfoPin', {
         $(window).trigger('resize', 0);
       },
       complete: function () {
-        this.element.html('');
+        this.element.height(0).html('');
         $('.cms_controllers_tree_view_node').removeClass('active');
       }.bind(this)
     });
