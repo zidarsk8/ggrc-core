@@ -326,12 +326,12 @@
             var isMapped;
             var isAllowed;
             // Use simple Relationship Model to map Snapshot
-            if (GGRC.Utils.Snapshots.isSnapshot(destination)) {
+            if (this.scope.attr('mapper.useSnapshots')) {
               modelInstance = new CMS.Models.Relationship({
                 context: data.context,
                 source: instance,
                 destination: {
-                  href: destination.href,
+                  href: '/api/snapshots/' + destination.id,
                   type: 'Snapshot',
                   id: destination.id
                 }
@@ -357,7 +357,7 @@
             data[mapping.option_attr] = destination;
             modelInstance = new Model(data);
             defer.push(modelInstance.save());
-          });
+          }.bind(this));
 
           $.when.apply($, defer)
             .fail(function (response, message) {

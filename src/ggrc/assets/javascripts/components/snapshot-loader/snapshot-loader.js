@@ -160,14 +160,18 @@
           .done(function (responseArr) {
             var data = responseArr[0];
             var filters = responseArr[1].Snapshot.ids;
-            var allSelected = this.attr('allSelected');
             var values = data.Snapshot.values;
             var result = values.map(function (item) {
               item = GGRC.Utils.Snapshots.toObject(item);
               item.attr('instance', item);
-              item.attr('isSelected', allSelected);
+              item.attr('isSelected', Array.prototype.some
+                .call(this.attr('selected'), function (selected) {
+                  return item.attr('id') === selected.attr('id') &&
+                    (item.attr('snapshot') ? 'Snapshot' : item.attr('type')) ===
+                    selected.attr('type');
+                }));
               return item;
-            });
+            }.bind(this));
             // Do not perform extra mapping validation in case Assessment generation
             if (!this.attr('mapper.assessmentGenerator')) {
               result.forEach(function (item) {
