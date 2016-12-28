@@ -118,7 +118,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     value = None
     try:
       value = parse(self.raw_value).strftime(
-          models.CustomAttributeValue.DATE_FORMAT_DB,
+          models.CustomAttributeValue.DATE_FORMAT_ISO,
       )
     except (TypeError, ValueError):
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)

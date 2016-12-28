@@ -62,8 +62,8 @@ class CustomAttributeValue(Base, db.Model):
   }
 
   # formats to represent Date-type values
-  DATE_FORMAT_DB = "%Y-%m-%d"
-  DATE_FORMAT_JSON = "%m/%d/%Y"
+  DATE_FORMAT_ISO = "%Y-%m-%d"
+  DATE_FORMAT_US = "%m/%d/%Y"
 
   @property
   def latest_revision(self):
@@ -263,8 +263,8 @@ class CustomAttributeValue(Base, db.Model):
         # Validate the date format by trying to parse it
         self.attribute_value = utils.convert_date_format(
             self.attribute_value,
-            CustomAttributeValue.DATE_FORMAT_DB,
-            CustomAttributeValue.DATE_FORMAT_DB,
+            CustomAttributeValue.DATE_FORMAT_ISO,
+            CustomAttributeValue.DATE_FORMAT_ISO,
         )
 
   def validate(self):
