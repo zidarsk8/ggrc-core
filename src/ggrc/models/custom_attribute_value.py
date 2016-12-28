@@ -255,17 +255,13 @@ class CustomAttributeValue(Base, db.Model):
 
   def _validate_date(self):
     """Convert date format."""
-    from ggrc.models.custom_attribute_definition import (
-        CustomAttributeDefinition)
-    if (self.custom_attribute.attribute_type ==
-            CustomAttributeDefinition.ValidTypes.DATE):
-      if self.attribute_value:
-        # Validate the date format by trying to parse it
-        self.attribute_value = utils.convert_date_format(
-            self.attribute_value,
-            CustomAttributeValue.DATE_FORMAT_ISO,
-            CustomAttributeValue.DATE_FORMAT_ISO,
-        )
+    if self.attribute_value:
+      # Validate the date format by trying to parse it
+      self.attribute_value = utils.convert_date_format(
+          self.attribute_value,
+          CustomAttributeValue.DATE_FORMAT_ISO,
+          CustomAttributeValue.DATE_FORMAT_ISO,
+      )
 
   def validate(self):
     """Validate custom attribute value."""
