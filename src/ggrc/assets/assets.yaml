@@ -79,6 +79,7 @@ dashboard-js-files:
   - models/mappers/reifying-list-loader.js
   - models/mappers/tree-base-loader.js
   - models/mappers/tree-page-loader.js
+  - models/mappers/sub-tree-loader.js
   - models/mappers/mapper-helpers.js
   - models/mappers/mappings.js
   - models/mappers/mappings-ggrc.js
