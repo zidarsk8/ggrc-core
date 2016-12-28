@@ -10,11 +10,15 @@ can.Control('GGRC.Controllers.TreeFilter', {}, {
     var queryString;
     var parentControl;
 
-    this._super && this._super.apply(this, arguments);
+    if (this._super) {
+      this._super.apply(this, arguments);
+    }
     this.options.states = new can.Observe();
     parentControl = this.element.closest('.cms_controllers_dashboard_widgets')
       .find('.cms_controllers_tree_view').control();
-    parentControl && parentControl.options.attr('states', this.options.states);
+    if (parentControl) {
+      parentControl.options.attr('states', this.options.states);
+    }
 
     this.$txtFilter = this.element.find('input[name=filter_query]');
 
