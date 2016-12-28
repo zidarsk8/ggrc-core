@@ -16,7 +16,6 @@
       date: null,
       format: '@',
       helptext: '@',
-      isShown: false,
       pattern: 'MM/DD/YYYY',
       setMinDate: null,
       setMaxDate: null,
@@ -27,6 +26,10 @@
           type: 'string'
         },
         persistent: {
+          type: 'boolean',
+          'default': false
+        },
+        isShown: {
           type: 'boolean',
           'default': false
         }
