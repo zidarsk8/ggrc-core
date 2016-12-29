@@ -49,8 +49,6 @@
 
       'select.object-type-selector change': 'update_check_boxes',
 
-      '.tview-type-toggle click': 'update_check_boxes',
-
       'a.select-all click': function (el, ev) {
         var $check = this.element.find('.model-checkbox');
 
