@@ -125,6 +125,9 @@
         if (searchParams.role_id) {
           params['user_roles.role_id'] = searchParams.role_id;
         }
+        if (searchParams.noRole) {
+          params.__no_role = true;
+        }
       }
 
       return this.options.list_loader(this, params)
@@ -227,7 +230,14 @@
     },
 
     '.search-filters select[name=user_role] change': function (el, ev) {
-      this.options.search_params.role_id = el.val();
+      var value = el.val();
+      if (value === 'no-role') {
+        this.options.search_params.noRole = true;
+        this.options.search_params.role_id = undefined;
+      } else {
+        this.options.search_params.noRole = false;
+        this.options.search_params.role_id = value;
+      }
       this.fetch_list().then(this.proxy('draw_list'));
     },
 
