@@ -128,7 +128,7 @@ class TestSnapshot(TestCase):
     ca_args = [
         {"title": "CA text", "attribute_type": "Text"},
         {"title": "CA rich text", "attribute_type": "Rich Text"},
-        {"title": "CA date", "attribute_type": "Text"},  # Change this to date!
+        {"title": "CA date", "attribute_type": "Date"},
         {"title": "CA checkbox", "attribute_type": "Checkbox"},
         {"title": "CA person", "attribute_type": "Map:Person"},
         {"title": "CA dropdown", "attribute_type": "Dropdown",
@@ -206,5 +206,4 @@ class TestSnapshot(TestCase):
       obj = model.eager_query().first()
       generated_json = self._clean_json(obj.log_json())
       expected_json = self._clean_json(self._get_object(obj))
-      self.assertEqual(expected_json, generated_json)
       self.assertEqual(expected_json, generated_json)
