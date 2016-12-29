@@ -209,6 +209,12 @@ ul.new-tree {
         color: $gray;
       }
     }
+    &.current-instance-related {
+      color: $darkText;
+      .fa {
+        color: $darkText;
+      }
+    }
     .black-font {
       color: $black;
     }

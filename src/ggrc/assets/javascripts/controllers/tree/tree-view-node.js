@@ -101,6 +101,19 @@
         }
       },
 
+    markNotRelatedItem: function () {
+      var instance = this.options.instance;
+      var relatedInstances = GGRC.Utils.CurrentPage.related
+        .attr(instance.type);
+
+      if (!relatedInstances || relatedInstances &&
+        !relatedInstances[instance.id]) {
+        this.element.addClass('parent-related');
+      } else {
+        this.element.addClass('current-instance-related');
+      }
+    },
+
     /**
      * Trigger rendering the tree node in the DOM.
      * @param {Boolean} force - indicates redraw is/is not mandatory
@@ -139,6 +152,7 @@
           this._draw_node_deferred.resolve();
         }.bind(this))
       );
+
       this.options.attr('isPlaceholder', false);
       this._draw_node_in_progress = false;
     },
@@ -257,6 +271,10 @@
       oldEl.replaceWith(el);
       this.element = firstchild.addClass(this.constructor._fullName)
         .data(oldData);
+
+      if (this.options.is_subtree) {
+        this.markNotRelatedItem();
+      }
       this.on();
     },
 
