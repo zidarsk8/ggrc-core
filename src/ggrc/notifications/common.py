@@ -232,7 +232,7 @@ def send_daily_digest_notifications():
   # pylint: disable=invalid-name
   notif_list, notif_data = get_daily_notifications()
   sent_emails = []
-  subject = "gGRC daily digest for {}".format(date.today().strftime("%b %d"))
+  subject = "GGRC daily digest for {}".format(date.today().strftime("%b %d"))
   for user_email, data in notif_data.iteritems():
     data = modify_data(data)
     email_body = settings.EMAIL_DIGEST.render(digest=data)
