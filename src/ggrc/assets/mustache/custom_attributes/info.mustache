@@ -25,13 +25,15 @@
               mandatory="cad.mandatory"
               placeholder="cad.placeholder"
               helptext="cad.helptext"
-              {{#if instance.snapshot}}
+              {{#if_helpers '\
+                #if' instance.snapshot '\
+                or #if' instance.isRevision }}
                 readonly
               {{else}}
                 {{^is_allowed 'update' instance context='for'}}
                   readonly
                 {{/is_allowed}}
-              {{/if}}
+              {{/if_helpers}}
             ></inline-edit>
           </div>
         </div>

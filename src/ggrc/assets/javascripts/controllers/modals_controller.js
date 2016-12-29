@@ -29,6 +29,8 @@
       add_more: false,
       ui_array: [],
       reset_visible: false,
+      extraCssClass: '',
+      afterFetch: function () {},
       isSaving: false  // is there a save/map operation currently in progress
     },
 
@@ -37,7 +39,9 @@
     },
 
     confirm: function (options, success, dismiss) {
-      var $target = $('<div class="modal hide"></div>');
+      var $target = $('<div class="modal hide ' +
+                      options.extraCssClass +
+                      '"></div>');
       $target
         .modal({backdrop: 'static'})
         .ggrc_controllers_modals(can.extend({
@@ -98,7 +102,10 @@
               that.element.trigger('preload');
             }
           })
-          .then(this.proxy('autocomplete'));
+          .then(this.proxy('autocomplete'))
+          .then(function () {
+            this.options.afterFetch(this.element);
+          }.bind(this));
         this.restore_ui_status_from_storage();
       }.bind(this));
     },

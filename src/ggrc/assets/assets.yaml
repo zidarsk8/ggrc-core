@@ -214,6 +214,7 @@ dashboard-js-files:
   - components/add-object-button/add-object-button.js
   - components/effective-dates/effective-dates.js
   - components/snapshotter/individual-update.js
+  - components/snapshotter/revisions-comparer.js
   - components/snapshotter/scope-update.js
   - components/info-pin-buttons/info-pin-buttons.js
   - components/snapshot-loader/snapshot-loader.js
@@ -435,6 +436,7 @@ dashboard-js-template-files:
   - modals/delete_cancel_buttons.mustache
   - modals/done_buttons.mustache
   - modals/modal_header.mustache
+  - modals/modal_compare_header.mustache
   - modals/save_cancel_buttons.mustache
   - modals/save_cancel_delete_buttons.mustache
   - modals/unmap_cancel_buttons.mustache

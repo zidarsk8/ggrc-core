@@ -1,0 +1,280 @@
+/*!
+ Copyright (C) 2016 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+(function (can, $) {
+  'use strict';
+
+  GGRC.Components('RevisionsComparer', {
+    tag: 'revisions-comparer',
+    template: '<content/>',
+    scope: {
+      instance: null,
+      leftRevisionId: null,
+      rightRevisions: [],
+      compareIt: function (scope, el, ev) {
+        var instanceType = scope.instance.type;
+        var currentRevisionID = scope.leftRevisionId;
+        var revisionsLength = scope.rightRevisions.length;
+        var newRevisionID = scope.rightRevisions[revisionsLength - 1].id;
+        var view = scope.instance.view;
+        this.getRevisions(currentRevisionID, newRevisionID)
+          .then(function (data) {
+            var revisions = this.prepareInstances(data, instanceType);
+            var that = this;
+
+            GGRC.Controllers.Modals.confirm({
+              modal_title: 'Compare to latest version',
+              header_view: GGRC.mustache_path +
+                            '/modals/modal_compare_header.mustache',
+              modal_confirm: 'Update',
+              skip_refresh: true,
+              extraCssClass: 'compare-modal',
+              button_view: GGRC.mustache_path +
+                            '/modals/prompt_buttons.mustache',
+              afterFetch: function (target) {
+                var fragLeft = can.view(view, revisions[0]);
+                var fragRight = can.view(view, revisions[1]);
+                fragLeft.appendChild(fragRight);
+                target.find('.modal-body').html(fragLeft);
+                that.highlightDifference(target);
+              }
+            }, this.updateRevision.bind(this));
+          }.bind(this));
+      },
+      getRevisions: function (currentRevisionID, newRevisionID) {
+        var additionalFilter = {
+          expression: {
+            op: {name: 'OR'},
+            left: {
+              op: {name: '='},
+              left: 'id',
+              right: currentRevisionID
+            },
+            right: {
+              op: {name: '='},
+              left: 'id',
+              right: newRevisionID
+            }
+          }
+        };
+        var params = GGRC.Utils.QueryAPI.buildParam(
+          'Revision',
+          {},
+          undefined,
+          undefined,
+          additionalFilter
+        );
+        return can.Model.Cacheable.query({data: [params]});
+      },
+      prepareInstances: function (data, instanceType) {
+        return data.Revision.values.map(function (value) {
+          var content = GGRC.Utils.Snapshots.revisionToModel(value);
+          return {instance: content};
+        });
+      },
+      updateRevision: function () {
+        var instance = this.instance.snapshot;
+        instance.refresh().then(function () {
+          instance.attr('update_revision', 'latest');
+          return instance.save();
+        }).then(function () {
+          GGRC.Utils.Browser.refreshPage(true);
+        });
+      },
+
+      /**
+       * Highlight difference
+       * @param {Object} $target - jQuery object
+       */
+      highlightDifference: function ($target) {
+        highlightAttributes($target);
+        highlightCustomAttributes($target);
+
+        /**
+         * Highlight difference in attributes
+         * @param {Object} $target - jQuery object
+         */
+        function highlightAttributes($target) {
+          var emptySelector = '.empty-message';
+          var highlightClass = 'diff-highlighted';
+          var listSelector = 'ul li';
+          var infoPanes = $target.find('.info .tier-content');
+          var valuesOld = $(infoPanes[0]).find('.row-fluid h6 + *');
+          var valuesNew = $(infoPanes[1]).find('.row-fluid h6 + *');
+
+          valuesOld.each(function (index, valueOld) {
+            var $valueNew = $(valuesNew[index]);
+            var $valueOld = $(valueOld);
+            var listOld = [];
+            var listNew = [];
+            if ($valueOld.html() !== $valueNew.html()) {
+              listOld = $valueOld.find(listSelector);
+              listNew = $valueNew.find(listSelector);
+              if (listOld.length) {
+                highlightLists(listOld, listNew);
+              } else {
+                highlightValues($valueOld);
+                highlightValues($valueNew);
+              }
+              equalValuesHeight($valueOld, $valueNew);
+            }
+          });
+
+          /**
+           * Highlight difference in two DOM lists
+           * @param {Object} listFirst - DOM object
+           * @param {Object} listLast - DOM object
+           */
+          function highlightLists(listFirst, listLast) {
+            compareLists(listFirst, listLast);
+            compareLists(listLast, listFirst);
+          }
+
+          /**
+           * Compare DOM lists
+           * @param {Object} liFirst - DOM object
+           * @param {Object} liLast - DOM object
+           */
+          function compareLists(liFirst, liLast) {
+            liFirst.each(function (i, li) {
+              var atLeastOneIsEqual = false;
+              liLast.each(function (j, li2) {
+                if (li.innerHTML === li2.innerHTML) {
+                  atLeastOneIsEqual = true;
+                }
+              });
+              if (!atLeastOneIsEqual) {
+                $(li).addClass(highlightClass);
+              }
+            });
+          }
+
+          /**
+           * Highlight difference in simple values
+           * @param {Object} $value - jQuery object
+           */
+          function highlightValues($value) {
+            if ($value.html() && !$value.find(emptySelector).length) {
+              $value.addClass(highlightClass);
+            }
+          }
+
+          /**
+           * Set max height between two jQuery objects
+           * @param {Object} $firstItem - jQuery object
+           * @param {Object} $secondItem - jQuery object
+           */
+          function equalValuesHeight($firstItem, $secondItem) {
+            var firstItemHeight = $firstItem.outerHeight();
+            var secondItemHeight = $secondItem.outerHeight();
+            if (firstItemHeight > secondItemHeight) {
+              $secondItem.outerHeight(firstItemHeight);
+            } else if (firstItemHeight < secondItemHeight) {
+              $firstItem.outerHeight(secondItemHeight);
+            }
+          }
+        }
+
+        /**
+         * Highlight difference in custom attributes
+         * @param {Object} $target - jQuery object
+         */
+        function highlightCustomAttributes($target) {
+          var titleSelector = '.inline-edit__title';
+          var valueSelector = '.inline-edit__content';
+          var highlightClass = 'diff-highlighted';
+          var caSelector = '[data-custom-attribute]';
+          var caWrapperSelector = '.span6';
+          var cas = $target.find('.info custom-attributes');
+          var ca0s = $(cas[0]).find('[data-custom-attribute] inline-edit');
+          var ca1s = $(cas[1]).find('[data-custom-attribute] inline-edit');
+          compareCA(ca0s, ca1s);
+          compareCA(ca1s, ca0s);
+
+          /**
+           * Compare two lists of custom attributes
+           * @param {Object} caFirst - jQuery object
+           * @param {Object} caLast - jQuery object
+           */
+          function compareCA(caFirst, caLast) {
+            caFirst.each(function (i, caOld) {
+              var $sameCA = [];
+              var $caOld = $(caOld);
+              var caOldScope = $caOld.control().scope;
+              caLast.each(function (j, caNew) {
+                var $caNew = $(caNew);
+                var caNewScope = $caNew.control().scope;
+                if (caNewScope.caId === caOldScope.caId) {
+                  $sameCA = $caNew;
+                }
+              });
+              if ($sameCA.length) {
+                highlightProperty('title', $sameCA, $caOld, titleSelector);
+                highlightProperty('value', $sameCA, $caOld, valueSelector);
+                equalCAHeight($caOld, $sameCA);
+              } else {
+                fillEmptyCA(caLast, $caOld, i);
+              }
+            });
+          }
+
+          /**
+           * Highlight specific property in custom attributes
+           * @param {String} name - Property name
+           * @param {Object} $caFirst - jQuery object
+           * @param {Object} $caLast - jQuery object
+           * @param {String} selector - child selector to add class
+           */
+          function highlightProperty(name, $caFirst, $caLast, selector) {
+            var caFirstScope = $caFirst.control().scope;
+            var caLastScope = $caLast.control().scope;
+            if (caFirstScope[name] !== caLastScope[name]) {
+              if (caFirstScope[name]) {
+                $caFirst.find(selector).addClass(highlightClass);
+              }
+              if (caLastScope[name]) {
+                $caLast.find(selector).addClass(highlightClass);
+              }
+            }
+          }
+
+          /**
+           * Set max height between two custom attributes
+           * @param {Object} $caFirst - jQuery object
+           * @param {Object} $caLast - jQuery object
+           */
+          function equalCAHeight($caFirst, $caLast) {
+            var caFirstHeight = $caFirst.closest(caSelector).outerHeight();
+            var caLastHeight = $caLast.closest(caSelector).outerHeight();
+            if (caFirstHeight > caLastHeight) {
+              $caLast.closest(caSelector).outerHeight(caFirstHeight);
+            } else if (caFirstHeight < caLastHeight) {
+              $caFirst.closest(caSelector).outerHeight(caLastHeight);
+            }
+          }
+
+          /**
+           * Fill empty space when CA is not existing
+           * @param {Object} caList - List of CA
+           * @param {Object} $ca - jQuery object Current attribute
+           * @param {Number} index - Index of current attribute
+           */
+          function fillEmptyCA(caList, $ca, index) {
+            var i = 1;
+            var caOldHeight = $ca
+                                .closest(caWrapperSelector)
+                                .outerHeight(true);
+            while (!$(caList[index - i]).length && i < index) {
+              i++;
+            }
+            $(caList[index - i])
+                    .closest(caWrapperSelector)
+                    .css('margin-bottom', '+=' + caOldHeight);
+            $ca.closest(caSelector).addClass(highlightClass);
+          }
+        }
+      }
+    }
+  });
+})(window.can, window.can.$);
