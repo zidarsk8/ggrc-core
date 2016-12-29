@@ -14,6 +14,7 @@ from ggrc.models.utils import validate_option
 class Document(Ownable, Relatable, Base, db.Model):
   __tablename__ = 'documents'
 
+  # TODO: inherit from Titled mixin (note: title is nullable here)
   title = deferred(db.Column(db.String), 'Document')
   link = deferred(db.Column(db.String), 'Document')
   description = deferred(db.Column(db.Text), 'Document')
