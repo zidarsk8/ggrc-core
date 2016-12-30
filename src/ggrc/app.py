@@ -49,6 +49,11 @@ def _ensure_session_teardown():
     db.session.remove()
 
 
+def setup_error_handlers(app_):
+  from ggrc.utils import error_handlers
+  error_handlers.register_handlers(app_)
+
+
 def init_models(app_):
   import ggrc.models
   ggrc.models.init_app(app_)
@@ -185,6 +190,8 @@ def _display_sql_queries():
             logger.warning("Statement failed: %s", statement, exc_info=True)
       return response
 
+
+setup_error_handlers(app)
 init_models(app)
 configure_flask_login(app)
 configure_webassets(app)
