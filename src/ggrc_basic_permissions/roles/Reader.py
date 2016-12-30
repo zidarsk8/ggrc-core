@@ -140,7 +140,6 @@ permissions = {
         "Person",
         "Program",
         "Role",
-        "UserRole",
         "Context",
         "BackgroundTask",
     ],
