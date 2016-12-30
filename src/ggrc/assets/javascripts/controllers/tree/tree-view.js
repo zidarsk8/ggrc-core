@@ -1198,7 +1198,7 @@
       return this.page_loader.load({data: [params]})
         .then(function (data) {
           var total = data.total;
-          var countsName = this.options.counts_name || params.object_name;
+          var countsName = this.options.counts_name || modelName;
           this.options.attr('paging.total', total);
           this.options.attr('paging.count',
             Math.ceil(data.total / this.options.paging.pageSize));
