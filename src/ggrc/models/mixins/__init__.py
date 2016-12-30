@@ -155,6 +155,12 @@ class ChangeTracked(object):
 
 class Titled(object):
 
+  @validates('title')
+  def validate_title(self, key, value):
+    """Validates and cleans Title that has leading/trailing spaces"""
+    # pylint: disable=unused-argument,no-self-use
+    return value if value is None else value.strip()
+
   @declared_attr
   def title(cls):
     return deferred(db.Column(db.String, nullable=False), cls.__name__)

@@ -39,7 +39,6 @@ class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   ]
   __tablename__ = 'clauses'
   _table_plural = 'clauses'
-  _title_uniqueness = True
   _aliases = {
       "url": "Clause URL",
       "description": "Text of Clause",
