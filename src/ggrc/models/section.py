@@ -39,7 +39,6 @@ class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   ]
   __tablename__ = 'sections'
   _table_plural = 'sections'
-  _title_uniqueness = True
   _aliases = {
       "url": "Section URL",
       "description": "Text of Section",
