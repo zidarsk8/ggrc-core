@@ -61,16 +61,9 @@ class CustomAttributeValue(Base, db.Model):
       "Map:Person": lambda self: self._validate_map_person(),
   }
 
-  _custom_publish = {
-      "attribute_value": lambda self: self._publish_attribute_value(),
-  }
-  _custom_update = {
-      "attribute_value": lambda self, val: self._update_attribute_value(val),
-  }
-
   # formats to represent Date-type values
-  DATE_FORMAT_DB = "%Y-%m-%d"
-  DATE_FORMAT_JSON = "%m/%d/%Y"
+  DATE_FORMAT_ISO = "%Y-%m-%d"
+  DATE_FORMAT_US = "%m/%d/%Y"
 
   @property
   def latest_revision(self):
@@ -262,17 +255,13 @@ class CustomAttributeValue(Base, db.Model):
 
   def _validate_date(self):
     """Convert date format."""
-    from ggrc.models.custom_attribute_definition import (
-        CustomAttributeDefinition)
-    if (self.custom_attribute.attribute_type ==
-            CustomAttributeDefinition.ValidTypes.DATE):
-      # convert the date formats for dates
-      if self.attribute_value:
-        self.attribute_value = utils.convert_date_format(
-            self.attribute_value,
-            CustomAttributeValue.DATE_FORMAT_JSON,
-            CustomAttributeValue.DATE_FORMAT_DB,
-        )
+    if self.attribute_value:
+      # Validate the date format by trying to parse it
+      self.attribute_value = utils.convert_date_format(
+          self.attribute_value,
+          CustomAttributeValue.DATE_FORMAT_ISO,
+          CustomAttributeValue.DATE_FORMAT_ISO,
+      )
 
   def validate(self):
     """Validate custom attribute value."""
@@ -408,58 +397,3 @@ class CustomAttributeValue(Base, db.Model):
           (make_flags(mask)
            for mask in cad.multi_choice_mandatory.split(",")),
       ))
-
-  def _publish_attribute_value(self):
-    """Return value serialized for JSON.
-
-    If self is a Date-type CAV, convert it to MM/DD/YYYY.
-    """
-
-    from ggrc.models import CustomAttributeDefinition
-
-    result = self.attribute_value
-    literal_date = CustomAttributeDefinition.ValidTypes.DATE
-
-    self_is_date = self.custom_attribute.attribute_type == literal_date
-    if self_is_date and self.attribute_value:
-      try:
-        result = utils.convert_date_format(self.attribute_value,
-                                           self.DATE_FORMAT_DB,
-                                           self.DATE_FORMAT_JSON)
-      except ValueError:
-        # invalid format or not a date, don't convert
-        pass
-
-    return result
-
-  def _update_attribute_value(self, new_value):
-    """Update value from received JSON.
-
-    If self is a Date-type CAV, convert the received value to YYYY-MM-DD.
-    """
-
-    from ggrc.models import CustomAttributeDefinition
-
-    literal_date = CustomAttributeDefinition.ValidTypes.DATE
-
-    # pylint: disable=access-member-before-definition
-    # pylint: disable=attribute-defined-outside-init
-    # false positives on the next block; the author doesn't like that block too
-    if self.custom_attribute is None:
-      # self is newly created and is not yet flushed to the db
-      # manually store self.custom_attribute because it is cached as None until
-      # flush & expire
-      self.custom_attribute = (db.session.query(CustomAttributeDefinition)
-                               .filter_by(id=self.custom_attribute_id).one())
-
-    self_is_date = self.custom_attribute.attribute_type == literal_date
-    if self_is_date and new_value:
-      try:
-        new_value = utils.convert_date_format(new_value,
-                                              self.DATE_FORMAT_JSON,
-                                              self.DATE_FORMAT_DB)
-      except ValueError:
-        # invalid format or not a date, don't convert
-        pass
-
-    self.attribute_value = new_value

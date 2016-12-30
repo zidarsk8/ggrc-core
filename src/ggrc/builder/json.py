@@ -118,10 +118,6 @@ class UpdateAttrHandler(object):
       # values
       attr_name = attr
       value = json_obj.get(attr_name)
-    elif attr in getattr(obj.__class__, "_custom_update", []):
-      # The attribute has a custom setter
-      attr_name = attr
-      value = obj.__class__._custom_update[attr](obj, json_obj.get(attr_name))
     elif hasattr(attr, '__call__'):
       # The attribute has been decorated with a callable, grab the name and
       # invoke the callable to get the value
@@ -659,8 +655,6 @@ class Builder(AttributeInfo):
             isinstance(class_attr.property, RelationshipProperty):
       result = self.publish_relationship(
           obj, attr_name, class_attr, inclusions, include, inclusion_filter)
-    elif attr_name in getattr(obj.__class__, "_custom_publish", []):
-      result = obj.__class__._custom_publish[attr_name](obj)
     elif class_attr.__class__.__name__ == 'property':
       if not inclusions or include:
         if getattr(obj, '{0}_id'.format(attr_name)):

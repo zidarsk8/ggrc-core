@@ -579,8 +579,8 @@ class QueryHelper(object):
         try:
           converted_date = convert_date_format(
               value,
-              CustomAttributeValue.DATE_FORMAT_JSON,
-              CustomAttributeValue.DATE_FORMAT_DB,
+              CustomAttributeValue.DATE_FORMAT_US,
+              CustomAttributeValue.DATE_FORMAT_ISO,
           )
         except (TypeError, ValueError):
           # wrong format or not a date
@@ -589,7 +589,7 @@ class QueryHelper(object):
             raise BadQueryException(u"Field '{}' expects a '{}' date"
                                     .format(
                                         o_key,
-                                        CustomAttributeValue.DATE_FORMAT_JSON,
+                                        CustomAttributeValue.DATE_FORMAT_US,
                                     ))
 
 

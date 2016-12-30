@@ -117,6 +117,11 @@
         return '';
       }
 
+      if (typeof date === 'string') {
+        // string dates are assumed to be in ISO format
+        return moment.utc(date, 'YYYY-MM-DD', true).format('MM/DD/YYYY');
+      }
+
       inst = moment(new Date(date.isComputed ? date() : date));
       if (hideTime === true) {
         return inst.format('MM/DD/YYYY');
