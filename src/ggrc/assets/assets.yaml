@@ -217,6 +217,7 @@ dashboard-js-files:
   - components/info-pin-buttons/info-pin-buttons.js
   - components/snapshot-loader/snapshot-loader.js
   - components/snapshot-loader/snapshot-loader-item.js
+  - components/textarea-array/textarea-array.js
   #- d3.v2.js
   #- related_graph.js
 

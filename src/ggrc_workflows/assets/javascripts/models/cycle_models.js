@@ -470,27 +470,6 @@
       ).then(function (object) {
         return object;
       });
-    },
-    response_options_csv: function (val) {
-      if (val != null) {
-        this.attr(
-          'response_options',
-          $.map(val.split(','), $.proxy(''.trim.call, ''.trim))
-        );
-      } else {
-        return (this.attr('response_options') || []).join(', ');
-      }
-    },
-
-    selected_response_options_csv: function (val) {
-      if (val != null) {
-        this.attr(
-          'selected_response_options',
-          $.map(val.split(','), $.proxy(''.trim.call, ''.trim))
-        );
-      } else {
-        return (this.attr('selected_response_options') || []).join(', ');
-      }
     }
   });
 })(window.can);
