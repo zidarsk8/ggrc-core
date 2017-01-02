@@ -65,9 +65,9 @@ class CycleTaskGroupObjectTask(
   task_type = db.Column(
       db.String(length=250), nullable=False)
   response_options = db.Column(
-      JsonType(), nullable=False, default='[]')
+      JsonType(), nullable=False, default=[])
   selected_response_options = db.Column(
-      JsonType(), nullable=False, default='[]')
+      JsonType(), nullable=False, default=[])
 
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)
