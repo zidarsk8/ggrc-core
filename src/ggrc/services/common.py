@@ -341,9 +341,12 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
       for obj_ in objects:
         revision = Revision(obj_, current_user_id, action, obj_.log_json())
         revisions.append(revision)
-        if obj_.type == "ObjectOwner":
-          from ggrc.utils import revisions as revision_utils
-          revision_utils.refresh_single_revison(obj_.ownable)
+        if obj_.type == "ObjectOwner" and obj_.ownable:
+          # any change (create/delete/modify) of the owners is an edit on the
+          # original object. That is why the action is always set to modified.
+          revision = Revision(obj_.ownable, current_user_id, "modified",
+                              obj_.ownable.log_json())
+          revisions.append(revision)
 
     if force_obj and obj is not None and obj not in cache.dirty:
       # If the ``obj`` has been updated, but only its custom attributes have

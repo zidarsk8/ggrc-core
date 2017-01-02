@@ -242,4 +242,4 @@ class TestCreator(TestCase):
 
     self.api.set_user(self.users["creator"])
     check(obj_1, 0)
-    check(obj_2, 1)
+    check(obj_2, 2)

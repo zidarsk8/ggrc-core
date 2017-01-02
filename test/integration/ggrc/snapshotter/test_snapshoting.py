@@ -177,9 +177,8 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     control_revisions = db.session.query(models.Revision).filter(
         models.Revision.resource_type == control.type,
         models.Revision.resource_id == control.id)
-    self.assertEqual(
-        control_revisions.count(), 3,
-        "There were 3 edits made at the time")
+    # 2 revisions are from the initial creation, and 2 are from edits.
+    self.assertEqual(control_revisions.count(), 4)
 
     self.assertEqual(
         control_revisions.order_by(models.Revision.id.desc()).first().id,
@@ -581,7 +580,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     objective_revision = db.session.query(models.Revision).filter(
         models.Revision.resource_type == "Objective",
         models.Revision.resource_id == objective.id
-    ).one()
+    ).all()[-1]
 
     self.assertEquals(objective_snapshot.count(), 1)
     self.assertEquals(objective_snapshot.first().revision_id,
@@ -621,7 +620,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     objective_revision = db.session.query(models.Revision).filter(
         models.Revision.resource_type == "Objective",
         models.Revision.resource_id == objective.id
-    ).one()
+    ).all()[-1]
 
     self.assertEquals(objective_snapshot.count(), 1)
     self.assertEquals(objective_snapshot.first().revision_id,

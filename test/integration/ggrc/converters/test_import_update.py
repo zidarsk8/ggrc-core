@@ -30,7 +30,7 @@ class TestImportUpdates(TestCase):
         models.Revision.resource_type == "Policy",
         models.Revision.resource_id == policy.id
     ).count()
-    self.assertEqual(revision_count, 1)
+    self.assertEqual(revision_count, 2)
 
     filename = "policy_basic_import_update.csv"
     response = self.import_file(filename)
@@ -42,5 +42,5 @@ class TestImportUpdates(TestCase):
         models.Revision.resource_type == "Policy",
         models.Revision.resource_id == policy.id
     ).count()
-    self.assertEqual(revision_count, 2)
+    self.assertEqual(revision_count, 4)
     self.assertEqual(policy.owners[0].email, "user1@example.com")
