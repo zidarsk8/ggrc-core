@@ -30,26 +30,24 @@
         // change checkboxes based on the model_type
         // get the closest tree_view controller, change the options to reload the checkboxes.
         var i;
-        var select_el = this.element.find('.object-type-selector');
-        var model_name = select_el.val();
-        var sec_el = select_el.closest('section');
-        var tree_view_el = sec_el.find('.cms_controllers_tree_view');
-        var control = tree_view_el.control();
-        var display_list = GGRC.tree_view.sub_tree_for[model_name].display_list;
-        var select_model_list = GGRC.tree_view.sub_tree_for[model_name].model_list;
+        var selectEl = this.element.find('.object-type-selector');
+        var modelName = selectEl.val();
+        var secEl = selectEl.closest('section');
+        var treeViewEl = secEl.find('.cms_controllers_tree_view');
+        var control = treeViewEl.control();
+        var displayList = GGRC.tree_view.sub_tree_for[modelName].display_list;
+        var selectModelList = GGRC.tree_view.sub_tree_for[modelName].model_list;
         var obj;
 
         // set up display status for UI
-        for (i = 0; i < select_model_list.length; i++) {
-          obj = select_model_list[i];
-          obj.display_status = display_list.indexOf(obj.model_name) !== -1;
+        for (i = 0; i < selectModelList.length; i++) {
+          obj = selectModelList[i];
+          obj.display_status = displayList.indexOf(obj.model_name) !== -1;
         }
-        control.options.attr('selected_child_tree_model_list', select_model_list);
+        control.options.attr('selected_child_tree_model_list', selectModelList);
       },
 
       'select.object-type-selector change': 'update_check_boxes',
-
-      '.tview-type-toggle click': 'update_check_boxes',
 
       'a.select-all click': function (el, ev) {
         var $check = this.element.find('.model-checkbox');
