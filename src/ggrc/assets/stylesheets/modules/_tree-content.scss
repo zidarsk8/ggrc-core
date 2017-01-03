@@ -203,6 +203,12 @@ ul.new-tree {
         color: $black;
       }
     }
+    &.parent-related {
+      color: $gray;
+      .fa {
+        color: $gray;
+      }
+    }
     .black-font {
       color: $black;
     }

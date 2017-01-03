@@ -214,6 +214,7 @@ dashboard-js-files:
   - components/tree/tree-header-selector.js
   - components/tree/tree-type-selector.js
   - components/tree/tree-child-show.js
+  - components/tree/sub-tree-expander.js
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
   - components/effective-dates/effective-dates.js
@@ -311,6 +312,7 @@ dashboard-js-template-files:
   - base_objects/tree_column_selector.mustache
   - base_objects/tree_column_names.mustache
   - base_objects/tree_child_show.mustache
+  - base_objects/sub_tree_expand.mustache
   - base_objects/filter_trigger.mustache
   - base_objects/generate_assessments_button.mustache
   - base_objects/states.mustache
