@@ -150,6 +150,7 @@ dashboard-js-files:
   - components/assessment/inline.js
   - components/assessment/add_comment.js
   - components/comment/comment-input.js
+  - components/comment/comment-list-helper.js
   - components/assessment/controls-toolbar/controls-toolbar.js
   - components/mapped-objects/mapped-objects.js
   - components/object-list/object-list.js
