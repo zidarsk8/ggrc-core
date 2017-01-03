@@ -16,52 +16,87 @@
 
     init: function () {
       var mapping = this.scope.attr('mapping');
-      var getTaskDate = function (instance, type) {
-        var date = new Date();
-        var month = instance['relative_' + type + '_month'];
-        var day = instance['relative_' + type + '_day'];
+      this.sort(mapping);
+      mapping.bind('change', _.bind(this.sort, this, mapping));
+    },
 
-        if (instance[type + '_date']) {
-          return instance[type + '_date'];
-        }
-        date.setHours(0, 0, 0, 0);
-        date.setDate(day);
-        if (month) {
-          date.setMonth(month - 1);
-        }
-        return date;
-      };
-      var sort = function () {
-        var arr = _.toArray(mapping);
-        var last;
-        var lastIndex;
-        arr.sort(function (a, b) {
-          var ad = getTaskDate(a.instance, 'start');
-          var bd = getTaskDate(b.instance, 'start');
-          var result = ad.getTime() - bd.getTime();
+    /**
+     * Sort a list of tasks and update the next sort index.
+     *
+     * @param {can.List} mapping - a mapping representing a list of Tasks
+     *   mapped to the "parent" object
+     */
+    sort: function (mapping) {
+      var arr = _.toArray(mapping);
+      var last;
+      var lastIndex;
 
-          if (!result) {
-            ad = getTaskDate(a.instance, 'end');
-            bd = getTaskDate(b.instance, 'end');
-            result = ad - bd;
-          }
-          return result;
-        });
-        this.scope.attr('sorted', arr);
-        last = arr[arr.length - 1];
-        lastIndex = (last !== -Infinity && last) ?
-            last.instance.sort_index :
-            '0';
-        this.scope.attr('next_sort_index',
-            GGRC.Math.string_half(
-                GGRC.Math.string_add(
-                    Number.MAX_SAFE_INTEGER.toString(), lastIndex
-                )
-            )
-        );
-      }.bind(this);
-      sort();
-      mapping.bind('change', sort);
+      arr.sort(this.compareTasks.bind(this));
+      this.scope.attr('sorted', arr);
+
+      last = arr[arr.length - 1];
+      lastIndex = (last !== -Infinity && last) ?
+          last.instance.sort_index :
+          '0';
+      this.scope.attr('next_sort_index',
+          GGRC.Math.string_half(
+              GGRC.Math.string_add(
+                  Number.MAX_SAFE_INTEGER.toString(), lastIndex
+              )
+          )
+      );
+    },
+
+    /**
+     * Compare two Task definitions for sorting purposes.
+     *
+     * @param {CMS.Models.TaskGroupTask} a - the first Task to compare
+     * @param {CMS.Models.TaskGroupTask} b - the second Task to compare
+     *
+     * @return {Number} - a number less than 0 if "a" should come first,
+     *   greater than 0 if "b" should come first, or exactly zero if "a"
+     *   and "b" are considered equal to each other.
+     */
+    compareTasks: function (a, b) {
+      var ad = this.getTaskDate(a.instance, 'start');
+      var bd = this.getTaskDate(b.instance, 'start');
+      var result = ad.getTime() - bd.getTime();
+
+      if (!result) {
+        ad = this.getTaskDate(a.instance, 'end');
+        bd = this.getTaskDate(b.instance, 'end');
+        result = ad - bd;
+      }
+      return result;
+    },
+
+    /**
+     * Get the date on which the given task starts or ends.
+
+     * If the task does not have that date set, compute it by using a relative
+     * offset (as defined by the task) in the current year. All time
+     * components are set to zero in such case.
+     *
+     * @param {CMS.Models.TaskGroupTask} instance - the Task to read the
+     *   date from
+     * @param {string} type - which Task date to read (either "start" or "end")
+     *
+     * @return {Date} - the date read from the task
+     */
+    getTaskDate: function (instance, type) {
+      var date = new Date();
+      var month = instance['relative_' + type + '_month'];
+      var day = instance['relative_' + type + '_day'];
+
+      if (instance[type + '_date']) {
+        return instance[type + '_date'];
+      }
+      date.setHours(0, 0, 0, 0);
+      date.setDate(day);
+      if (month) {
+        date.setMonth(month - 1);
+      }
+      return date;
     },
 
     events: {
