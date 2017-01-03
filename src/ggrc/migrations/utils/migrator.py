@@ -46,7 +46,7 @@ def ensure_user():
     return user_id
 
   result = conn.execute(
-      people.insert().values(
+      people.insert().values(  # pylint: disable=no-value-for-parameter
           email=email,
           name=name,
           created_at=sa.sql.func.now(),
