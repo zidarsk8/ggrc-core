@@ -7,7 +7,7 @@ from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
     Timeboxed, Noted, Described, Hyperlinked, WithContact,
-    Titled, Slugged, CustomAttributable
+    Titled, Slugged, CustomAttributable, Stateful
 )
 
 from ggrc.models.mixins import clonable
@@ -24,7 +24,7 @@ from ggrc.models.snapshot import Snapshotable
 class Audit(Snapshotable, clonable.Clonable,
             CustomAttributable, Personable, HasOwnContext, Relatable,
             Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled,
-            Slugged, db.Model):
+            Stateful, Slugged, db.Model):
   """Audit model."""
 
   __tablename__ = 'audits'
@@ -42,9 +42,6 @@ class Audit(Snapshotable, clonable.Clonable,
   audit_firm_id = deferred(
       db.Column(db.Integer, db.ForeignKey('org_groups.id')), 'Audit')
   audit_firm = db.relationship('OrgGroup', uselist=False)
-  # TODO: this should be stateful mixin
-  status = deferred(db.Column(db.Enum(*VALID_STATES), nullable=False),
-                    'Audit')
   gdrive_evidence_folder = deferred(db.Column(db.String), 'Audit')
   program_id = deferred(
       db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False),
@@ -86,7 +83,10 @@ class Audit(Snapshotable, clonable.Clonable,
           "type": AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_auditor",
       },
-      "status": "Status",
+      "status": {
+          "display_name": "Status",
+          "mandatory": True,
+      },
       "start_date": "Planned Start Date",
       "end_date": "Planned End Date",
       "report_start_date": "Planned Report Period from",
