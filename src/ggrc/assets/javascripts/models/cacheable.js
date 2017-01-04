@@ -5,7 +5,7 @@
 
 // = require can.jquery-all
 
-(function (can) {
+(function (can, GGRC, CMS) {
   var _oldAttr;
   function makeFindRelated(thistype, othertype) {
     return function (params) {
@@ -154,7 +154,7 @@
 
     makeFindAll: function (finder) {
       return function (params, success, error) {
-        var deferred = $.Deferred();
+        var deferred = can.Deferred();
         var sourceDeferred = finder.call(this, params);
         var self = this;
         var tracker_stop = GGRC.Tracker.start('modelize', self.shortName);
@@ -186,13 +186,12 @@
 
       if (this.fullName === 'can.Model.Cacheable') {
         this.findAll = function () {
-          throw 'No default findAll() exists for subclasses of Cacheable';
+          throw new Error('No default findAll() exists for subclasses of Cacheable');
         };
         this.findPage = function () {
-          throw 'No default findPage() exists for subclasses of Cacheable';
+          throw new Error('No default findPage() exists for subclasses of Cacheable');
         };
-      }
-      else if ((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) {
+      } else if ((!statics || !statics.findAll) && this.findAll === can.Model.Cacheable.findAll) {
         if (this.root_collection) {
           this.findAll = 'GET /api/' + this.root_collection;
         } else {
@@ -429,7 +428,7 @@
         obj = pargs[this.root_object] = {};
       }
       src = args.serialize ? args.serialize() : args;
-      go_names = Object.keys(src)
+      go_names = Object.keys(src);
       for (var i = 0; i < (go_names.length || 0); i++) {
         obj[go_names[i]] = src[go_names[i]];
       }
@@ -458,13 +457,13 @@
     },
 
     query: function (request) {
-      var deferred = $.Deferred();
+      var deferred = can.Deferred();
       var self = this;
 
       GGRC.Utils.QueryAPI.makeRequest(request)
         .then(function (sourceData) {
           var values = [];
-          var listDfd = $.Deferred();
+          var listDfd = can.Deferred();
           if (sourceData.length) {
             sourceData = sourceData[0];
           } else {
@@ -497,7 +496,7 @@
     },
 
     queryAll: function (request) {
-      var deferred = $.Deferred();
+      var deferred = can.Deferred();
 
       GGRC.Utils.QueryAPI.makeRequest(request)
         .then(function (sourceData) {
@@ -537,15 +536,15 @@
 
       start = Date.now();
       while (sourceData.length > index && (Date.now() - start) < ms) {
-        can.Observe.startBatch();
+        can.batch.start();
         item = sourceData[index];
         index += 1;
         instances.push.apply(instances, self.models([item]));
-        can.Observe.stopBatch();
+        can.batch.stop();
       }
-      can.Observe.startBatch();
+      can.batch.start();
       obsList.push.apply(obsList, instances);
-      can.Observe.stopBatch();
+      can.batch.stop();
     }
 
     // Trigger a setTimeout loop to modelize remaining objects
@@ -634,9 +633,6 @@
     },
     obj_nav_options: {},
     list_view_options: {},
-    getRootModelName: function () {
-      return this.root_model || this.shortName;
-    },
 
     makeFindPage: function (findAllSpec) {
     /* Create a findPage function that will return a paging object that will
@@ -740,29 +736,12 @@
     },
 
     get_mapper: function (name) {
-      var mappers, mapper;
-      mappers = GGRC.Mappings.get_mappings_for(this.shortName);
+      var mapper;
+      var mappers = GGRC.Mappings.get_mappings_for(this.shortName);
       if (mappers) {
         mapper = mappers[name];
         return mapper;
       }
-    },
-
-  // This this is the parsing part of the easy accessor for deep properties.
-  // Use the result of this with instance.get_deep_property
-  // owners.0.name -> this.owners[0].reify().name
-  // owners.0.name|email ->
-  // firstnonempty this.owners[0].reify().name this.owners[0].reify().email
-  //
-  // owners.GET_ALL.name ->
-  // [this.owners[0].reify().name, this.owners[1].reify().name...]
-    parse_deep_property_descriptor: function (deep_property_string) {
-      return Object.freeze(_.map(deep_property_string.split('.'), function (part) {
-        if (part === 'GET_ALL') {
-          return part;
-        }
-        return Object.freeze(part.split('|'));
-      }));
     }
   }, {
     init: function () {
@@ -903,9 +882,8 @@
       var errors = this.errors();
       if (this.attr('_suppress_errors')) {
         return null;
-      } else {
-        return errors;
       }
+      return errors;
     },
     computed_unsuppressed_errors: function () {
       return this.errors();
@@ -913,7 +891,7 @@
     get_list_counter: function (name) {
       var binding = this.get_binding(name);
       if (!binding) {
-        return $.Deferred().reject();
+        return can.Deferred().reject();
       }
       return binding.refresh_count();
     },
@@ -940,13 +918,14 @@
   // Example: "This may also delete 3 Sections, 2 Controls, and 4 object mappings."
     get_orphaned_count: function () {
       if (!this.get_binding('orphaned_objects')) {
-        return new $.Deferred().reject();
+        return can.Deferred().reject();
       }
       return this.get_list_loader('orphaned_objects').then(function (list) {
-        var objects = [], mappings = []
-        , counts = {}
-        , result = []
-        , parts = 0;
+        var objects = [];
+        var mappings = [];
+        var counts = {};
+        var result = [];
+        var parts = 0;
 
         function is_join(mapping) {
           if (mapping.mappings.length > 0) {
@@ -956,7 +935,9 @@
               }
             }
           }
-          return mapping.instance && mapping.instance instanceof can.Model.Join && mapping.instance;
+          return mapping.instance &&
+            mapping.instance instanceof can.Model.Join &&
+            mapping.instance;
         }
         can.each(list, function (mapping) {
           var inst;
@@ -973,10 +954,11 @@
         if (objects.length) {
           can.each(objects, function (instance) {
             var title = instance.constructor.title_singular;
-            counts[title] = counts[title] || {
-              model: instance.constructor
-            , count: 0
-            };
+            counts[title] = counts[title] ||
+              {
+                model: instance.constructor,
+                count: 0
+              };
             counts[title].count++;
           });
           can.each(counts, function (count, i) {
@@ -1006,9 +988,9 @@
   // checks if binding exists without throwing debug statements
   // modeled after what get_binding is doing
     has_binding: function (mapper) {
-      var binding,
-        mapping,
-        binding_attr = this._get_binding_attr(mapper);
+      var binding;
+      var mapping;
+      var binding_attr = this._get_binding_attr(mapper);
 
       if (binding_attr) {
         binding = this[binding_attr];
@@ -1029,7 +1011,6 @@
     },
 
     get_binding: function (mapper) {
-      var mappings;
       var mapping;
       var binding;
       var binding_attr = this._get_binding_attr(mapper);
@@ -1059,31 +1040,17 @@
       }
       return binding;
     },
-
-    addElementToChildList: function (attrName, new_element) {
-      this[attrName].push(new_element);
-      this._triggerChange(attrName, 'set', this[attrName], this[attrName].slice(0, this[attrName].length - 1));
-    },
-    removeElementFromChildList: function (attrName, old_element, all_instances) {
-      for (var i = this[attrName].length - 1; i >= 0; i--) {
-        if (this[attrName][i] === old_element) {
-          this[attrName].splice(i, 1);
-          if (!all_instances) break;
-        }
-      }
-      this._triggerChange(attrName, 'set', this[attrName], this[attrName].slice(0, this[attrName].length - 1));
-    },
     refresh: function (params) {
-      var dfd,
-        href = this.selfLink || this.href,
-        that = this;
+      var dfd;
+      var href = this.selfLink || this.href;
+      var that = this;
 
       if (!href) {
-        return (new can.Deferred()).reject();
+        return can.Deferred().reject();
       }
       if (!this._pending_refresh) {
         this._pending_refresh = {
-          dfd: $.Deferred(),
+          dfd: can.Deferred(),
           fn: _.throttle(function () {
             var dfd = that._pending_refresh.dfd;
             can.ajax({
@@ -1113,18 +1080,17 @@
     },
   // TODO: should be refactored and sliced on multiple functions
     serialize: function () {
-      var that = this;
       var serial = {};
       var fnName;
       var val;
-      var name;
       if (arguments.length) {
         return this._super.apply(this, arguments);
       }
-      for (name in this._data) {
+      /* Serialize only meaningful properties */
+      Object.keys(this._data).forEach(function (name) {
         val = this[name];
-        if (that.constructor.attributes && that.constructor.attributes[name]) {
-          fnName = that.constructor.attributes[name];
+        if (this.constructor.attributes && this.constructor.attributes[name]) {
+          fnName = this.constructor.attributes[name];
           fnName = fnName.substr(fnName.lastIndexOf('.') + 1);
           if (fnName === 'stubs' || fnName === 'get_stubs' ||
           fnName === 'models' || fnName === 'get_instances') {
@@ -1138,25 +1104,25 @@
           } else {
             serial[name] = val;
           }
-        } else if (val && typeof val.save === 'function') {
+        } else if (val && can.isFunction(val.save)) {
           serial[name] = val.stub().serialize();
         } else if (typeof val === 'object' && val !== null && val.length) {
           serial[name] = can.map(val, function (v) {
-            var isModel = v && typeof v.save === 'function';
+            var isModel = v && can.isFunction(v.save);
             return isModel ?
                    v.stub().serialize() :
                    (v && v.serialize) ? v.serialize() : v;
           });
-        } else if (typeof val !== 'function') {
-          if (that[name] && that[name].isComputed) {
+        } else if (!can.isFunction(val)) {
+          if (this[name] && this[name].isComputed) {
             serial[name] = val && val.serialize ? val.serialize() : val;
           } else {
-            serial[name] = that[name] && that[name].serialize ?
-            that[name].serialize() :
+            serial[name] = this[name] && this[name].serialize ?
+            this[name].serialize() :
             serial[name] = val;
           }
         }
-      }
+      }.bind(this));
       return serial;
     },
     display_name: function () {
@@ -1175,20 +1141,21 @@
       return this.title;
     },
     get_permalink: function () {
-      var dfd = $.Deferred(),
-        constructor = this.constructor;
+      var dfd = can.Deferred();
+      var constructor = this.constructor;
       if (!constructor.permalink_options) {
         return dfd.resolve(this.viewLink);
       }
-      $.when(this.refresh_all.apply(this, constructor.permalink_options.base.split(':'))).then(function (base) {
-        return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
-      }.bind(this));
+      $.when(this.refresh_all.apply(this, constructor.permalink_options.base.split(':')))
+        .then(function (base) {
+          return dfd.resolve(_.template(constructor.permalink_options.url)({base: base, instance: this}));
+        }.bind(this));
       return dfd.promise();
     },
 
-  /**
-    * Set up a deferred join object update when this object is updated.
-    */
+    /*
+     * Set up a deferred join object update when this object is updated.
+     */
     mark_for_update: function (join_attr, obj, extra_attrs, options) {
       obj = obj.reify ? obj.reify() : obj;
       extra_attrs = _.isEmpty(extra_attrs) ? undefined : extra_attrs;
@@ -1202,9 +1169,9 @@
         opts: options
       });
     },
-  /**
-   Set up a deferred join object deletion when this object is updated.
-  */
+    /*
+     * Set up a deferred join object deletion when this object is updated.
+     */
     mark_for_deletion: function (join_attr, obj, extra_attrs, options) {
       obj = obj.reify ? obj.reify() : obj;
 
@@ -1212,9 +1179,9 @@
       this._pending_joins.push({how: 'remove', what: obj, through: join_attr, opts: options});
     },
 
-  /**
-   Set up a deferred join object creation when this object is updated.
-  */
+    /*
+     * Set up a deferred join object creation when this object is updated.
+     */
     mark_for_addition: function (joinAttr, obj, extraAttrs, options) {
       obj = obj.reify ? obj.reify() : obj;
       extraAttrs = _.isEmpty(extraAttrs) ? undefined : extraAttrs;
@@ -1249,21 +1216,29 @@
       return this.notifier.queue(dfd);
     },
     _save: function () {
-      var that = this,
-        _super = Array.prototype.pop.call(arguments),
-        isNew = this.isNew(),
-        xhr,
-        dfd = this._dfd,
-        pre_save_notifier = new PersistentNotifier({name: this.constructor.model_singular + ' (pre-save)'})
-        ;
+      var that = this;
+      var _super = Array.prototype.pop.call(arguments);
+      var isNew = this.isNew();
+      var xhr;
+      var dfd = this._dfd;
+      var pre_save_notifier =
+        new PersistentNotifier({name:
+        this.constructor.model_singular + ' (pre-save)'});
 
-      this.before_save && this.before_save(pre_save_notifier);
+      if (this.before_save) {
+        this.before_save(pre_save_notifier);
+      }
       if (isNew) {
-        this.attr('provisional_id', 'provisional_' + Math.floor(Math.random() * 10000000));
-        can.getObject('provisional_cache', can.Model.Cacheable, true)[this.provisional_id] = this;
-        this.before_create && this.before_create(pre_save_notifier);
+        this.attr('provisional_id', 'provisional_' + Date.now());
+        can.getObject('provisional_cache',
+          can.Model.Cacheable, true)[this.provisional_id] = this;
+        if (this.before_create) {
+          this.before_create(pre_save_notifier);
+        }
       } else {
-        this.before_update && this.before_update(pre_save_notifier);
+        if (this.before_update) {
+          this.before_update(pre_save_notifier);
+        }
       }
 
       pre_save_notifier.on_empty(function () {
@@ -1318,79 +1293,6 @@
             .replace(/ /g, '_');
 
       return [type, this.id].join('/');
-    },
-    get_custom_value: function (prop) {
-      var attr = _.find(GGRC.custom_attr_defs, function (item) {
-        return item.definition_type === this.type.toLowerCase() &&
-        item.title === prop;
-      }.bind(this));
-      var result;
-      if (!attr) {
-        return undefined;
-      }
-      result = _.find(this.custom_attribute_values, function (item) {
-        return item.reify().custom_attribute_id === attr.id;
-      });
-      if (result) {
-        result = result.reify().attribute_value;
-        if (attr.attribute_type.toLowerCase() === 'date') {
-          result = moment(result, 'MM/DD/YYYY').format('YYYY-MM-DD');
-        }
-      }
-      return result;
-    },
-
-  // Returns a deep property as specified in the descriptor built
-  // by Cacheable.parse_deep_property_descriptor
-    get_deep_property: function (property_descriptor) {
-      var i;
-      var j;
-      var part;
-      var field;
-      var found;
-      var tmp;
-      var val = this;
-      var rCustom = /^custom\:/i;
-      var mapProp;
-
-      function mapDeepProp(count) {
-        count += 1;
-        return function (element) {
-          return element.get_deep_property(property_descriptor.slice(count));
-        };
-      }
-      for (i = 0; i < property_descriptor.length; i++) {
-        part = property_descriptor[i];
-        if (val.instance) {
-          val = val.instance;
-        }
-        found = false;
-        if (part === 'GET_ALL') {
-          mapProp = mapDeepProp(i);
-          return _.map(val, mapProp);
-        }
-        for (j = 0; j < part.length; j++) {
-          field = part[j];
-          tmp = val[field];
-          if (tmp !== undefined && tmp !== null) {
-            val = tmp;
-            if (typeof val.reify === 'function') {
-              val = val.reify();
-            }
-            found = true;
-            break;
-          } else if (rCustom.test(field)) {
-            field = field.split(':')[1];
-            val = this.get_custom_value(field);
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          return null;
-        }
-      }
-      return val;
     }
   });
   /* TODO: hack on can.Observe should be removed or at least placed outside of Cacheable Model Class */
@@ -1399,12 +1301,10 @@
     if (key instanceof can.Observe) {
       if (arguments[0] === this) {
         return this;
-      } else {
-        return _oldAttr.apply(this, [key.serialize()]);
       }
-    } else {
-      return _oldAttr.apply(this, arguments);
+      return _oldAttr.apply(this, [key.serialize()]);
     }
+    return _oldAttr.apply(this, arguments);
   };
 
   can.Observe.prototype.stub = function () {
@@ -1515,4 +1415,4 @@
       return obj.reify();
     }));
   };
-})(window.can);
+})(window.can, window.GGRC, window.CMS);
