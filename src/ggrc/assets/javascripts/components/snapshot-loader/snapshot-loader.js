@@ -3,31 +3,33 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, $) {
+(function (can, GGRC) {
   'use strict';
 
-  GGRC.Components('snapshotLoader', {
+  can.Component.extend('snapshotLoader', {
     tag: 'snapshot-loader',
     template: can.view(
       GGRC.mustache_path +
       '/components/snapshot-loader/snapshot-loader.mustache'
     ),
-    scope: {
+    viewModel: {
       paging: {
         current: 1,
         pageSize: 5,
         filter: '',
         pageSizeSelect: [5, 10, 15]
       },
-      allSelected: false,
       mapper: null,
       isLoading: false,
       items: [],
+      allItems: [],
+      allSelected: false,
       baseInstance: null,
       scopeId: '@',
       scopeType: '@',
       term: '',
       selected: [],
+      refreshItems: false,
       updatePaging: function (total) {
         var count = Math.ceil(total / this.attr('paging.pageSize'));
         this.attr('paging.total', total);
@@ -37,8 +39,7 @@
         this.attr('items').replace(this.load());
       },
       onSearch: function () {
-        this.clearSelection();
-        this.setItems();
+        this.attr('refreshItems', true);
       },
       prepareRelevantFilters: function () {
         var filters;
@@ -53,7 +54,8 @@
               type: relevant.filter.type,
               id: Number(relevant.filter.id)
             };
-          }).filter(function (item) {
+          })
+          .filter(function (item) {
             return item;
           });
         // Filter by scope
@@ -128,6 +130,9 @@
           });
         return dfd;
       },
+      loadAllItems: function () {
+        this.attr('allItems', this.loadAllItemsIds());
+      },
       getQuery: function (queryType, addPaging) {
         var modelName = this.attr('type');
         var paging = addPaging ? {
@@ -160,23 +165,11 @@
           .done(function (responseArr) {
             var data = responseArr[0];
             var filters = responseArr[1].Snapshot.ids;
-            var values = data.Snapshot.values;
-            var result = values.map(function (item) {
-              item = GGRC.Utils.Snapshots.toObject(item);
-              item.attr('instance', item);
-              item.attr('isSelected', Array.prototype.some
-                .call(this.attr('selected'), function (selected) {
-                  return item.attr('id') === selected.attr('id') &&
-                    (item.attr('snapshot') ? 'Snapshot' : item.attr('type')) ===
-                    selected.attr('type');
-                }));
-              return item;
-            }.bind(this));
+            var result = data.Snapshot.values;
             // Do not perform extra mapping validation in case Assessment generation
             if (!this.attr('mapper.assessmentGenerator')) {
               result.forEach(function (item) {
-                item.attr('instance.isMapped',
-                  filters.indexOf(item.attr('id')) > -1);
+                item.isDisabled = filters.indexOf(item.id) > -1;
               });
             }
             // Update paging object
@@ -190,40 +183,26 @@
             this.attr('isLoading', false);
           }.bind(this));
         return dfd;
-      },
-      clearSelection: function () {
-        this.attr('allSelected', false);
-        // Remove all selected items
-        this.attr('selected').replace([]);
-      },
-      unselectAll: function () {
-        this.attr('items')
-          .forEach(function (item) {
-            if (!item.attr('isMapped')) {
-              item.attr('isSelected', false);
-            }
-          });
-        this.clearSelection();
-      },
-      selectAll: function () {
-        this.attr('allSelected', true);
-        // Add visual Selection to all currently visible items
-        this.attr('items').forEach(function (item) {
-          if (!item.attr('isMapped')) {
-            item.attr('isSelected', true);
-          }
-        });
-        // Replace with actual items loaded from the back-end
-        this.attr('selected').replace(this.loadAllItemsIds());
       }
     },
     events: {
-      '{scope.paging} current': function () {
-        this.scope.setItems();
+      '{viewModel} allSelected': function (scope, ev, allSelected) {
+        if (allSelected) {
+          this.viewModel.loadAllItems();
+        }
       },
-      '{scope.paging} pageSize': function () {
-        this.scope.setItems();
+      '{viewModel} refreshItems': function (scope, ev, refreshItems) {
+        if (refreshItems) {
+          this.viewModel.setItems();
+          this.viewModel.attr('refreshItems', false);
+        }
+      },
+      '{viewModel.paging} current': function () {
+        this.viewModel.setItems();
+      },
+      '{viewModel.paging} pageSize': function () {
+        this.viewModel.setItems();
       }
     }
   });
-})(window.can, window.can.$);
+})(window.can, window.GGRC);
