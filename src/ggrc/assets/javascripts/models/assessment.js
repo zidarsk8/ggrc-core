@@ -12,29 +12,9 @@
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
     mixins: [
-      'ownable', 'contactable', 'unique_title', 'relatable',
+      'ownable', 'contactable', 'unique_title',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit'
     ],
-    relatable_options: {
-      relevantTypes: {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_assessments',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_assessments',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_assessments',
-          weight: 10
-        }
-      },
-      threshold: 5
-    },
     is_custom_attributable: true,
     attributes: {
       related_sources: 'CMS.Models.Relationship.stubs',
@@ -305,26 +285,6 @@
         this.refreshInstance();
         this._pane_preloaded = true;
       }
-    },
-    related_issues: function () {
-      var relevantTypes = {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_issues',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_issues',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_issues',
-          weight: 10
-        }
-      };
-      return this._related(relevantTypes, 5);
     }
   });
 })(window.can, window.GGRC, window.CMS);
