@@ -965,28 +965,6 @@ LOCK TABLES `fulltext_record_properties` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `ggrc_alembic_version`
---
-
-DROP TABLE IF EXISTS `ggrc_alembic_version`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ggrc_alembic_version` (
-  `version_num` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `ggrc_alembic_version`
---
-
-LOCK TABLES `ggrc_alembic_version` WRITE;
-/*!40000 ALTER TABLE `ggrc_alembic_version` DISABLE KEYS */;
-INSERT INTO `ggrc_alembic_version` VALUES ('297131e22e28');
-/*!40000 ALTER TABLE `ggrc_alembic_version` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `helps`
 --
 
