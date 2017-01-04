@@ -8,6 +8,7 @@
 
   GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.TreeBaseLoader', {}, {
     init: function (model, instance, mapping) {
+      mapping = mapping || 'related_objects';
       this.model = model;
       this.binding = instance.get_binding(mapping);
     },
