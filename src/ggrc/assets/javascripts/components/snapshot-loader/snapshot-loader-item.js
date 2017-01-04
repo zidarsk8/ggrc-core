@@ -12,15 +12,23 @@
       GGRC.mustache_path +
       '/components/snapshot-loader/snapshot-loader-item.mustache'
     ),
-    scope: {
-      itemData: null,
+    viewModel: {
+      itemData: {},
+      objectType: '@',
+      title: function () {
+        return this.attr('itemData.title') ||
+          this.attr('itemData.description_inline') ||
+          this.attr('itemData.name') || this.attr('itemData.email');
+      },
+      objectTypeIcon: function () {
+        return 'fa-' + this.attr('objectType').toLowerCase();
+      },
       toggleIconCls: function () {
         return this.attr('showDetails') ? 'fa-caret-down' : 'fa-caret-right';
       },
       toggleDetails: function () {
         this.attr('showDetails', !this.attr('showDetails'));
       }
-    },
-    events: {}
+    }
   });
 })(window.can, window.GGRC);
