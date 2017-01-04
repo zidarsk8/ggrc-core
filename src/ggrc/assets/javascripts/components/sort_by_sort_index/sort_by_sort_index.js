@@ -60,9 +60,9 @@
     compareTasks: function (a, b) {
       var ad = this.getTaskDate(a.instance, 'start');
       var bd = this.getTaskDate(b.instance, 'start');
-      var result = ad.getTime() - bd.getTime();
+      var result = ad - bd;
 
-      if (!result) {
+      if (!result) {  // if same start dates
         ad = this.getTaskDate(a.instance, 'end');
         bd = this.getTaskDate(b.instance, 'end');
         result = ad - bd;
@@ -81,22 +81,27 @@
      *   date from
      * @param {string} type - which Task date to read (either "start" or "end")
      *
-     * @return {Date} - the date read from the task
+     * @return {moment} - the date read from the task
      */
     getTaskDate: function (instance, type) {
-      var date = new Date();
       var month = instance['relative_' + type + '_month'];
       var day = instance['relative_' + type + '_day'];
 
-      if (instance[type + '_date']) {
-        return instance[type + '_date'];
+      var value = instance[type + '_date'];
+      if (value) {
+        return moment.utc(value);
       }
-      date.setHours(0, 0, 0, 0);
-      date.setDate(day);
+
+      value = moment.utc().set({hour: 0, minute: 0, second: 0, millisecond: 0});
+
       if (month) {
-        date.setMonth(month - 1);
+        value.month(month - 1);  // expects a zero-based month value
       }
-      return date;
+
+      day = Math.min(day, value.daysInMonth());  // prevent days overflow
+      value.date(day);
+
+      return value;
     },
 
     events: {
