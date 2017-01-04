@@ -62,6 +62,10 @@
       var possible_model_type;
       var treeViewDepth = 2;
       var relatedObjectsChildOptions = [GGRC.Utils.getRelatedObjects(treeViewDepth)];
+      var farModels;
+      var extraDescriptorOptions;
+      var overriddenModels;
+      var extraContentControllerOptions;
 
       // TODO: Really ugly way to avoid executing IIFE - needs cleanup
       if (!GGRC.page_object) {
@@ -176,8 +180,13 @@
         return mappings;
       }
 
+      // the assessments_view only needs the Assessments widget
+      if (/^\/assessments_view/.test(window.location.pathname)) {
+        farModels = ['Assessment'];
+      } else {
+        farModels = base_widgets_by_type[object.constructor.shortName];
+      }
 
-      var far_models = base_widgets_by_type[object.constructor.shortName],
         // here we are going to define extra descriptor options, meaning that
         //  these will be used as extra options to create widgets on top of
 
@@ -185,7 +194,7 @@
       // the order 100+), but the objects with higher importance that should
       // be  prioritized use order values below 100. An order value of 0 is
       // reserved for the "info" widget which always comes first.
-      extra_descriptor_options = {
+      extraDescriptorOptions = {
         all: {
           Standard: {
             order: 10
@@ -334,21 +343,21 @@
             }
           }
         }
-      },
+      };
       // Prevent widget creation with <model_name>: false
       // e.g. to prevent ever creating People widget:
       //     { all : { Person: false }}
       // or to prevent creating People widget on Objective page:
       //     { Objective: { Person: false } }
-      overridden_models = {
+      overriddenModels = {
         Program: {
         },
         all: {
           Document: false
         }
-      },
+      };
 
-      extra_content_controller_options = apply_mixins({
+      extraContentControllerOptions = apply_mixins({
         objectives: {
           Objective: {
             mapping: 'objectives',
@@ -911,7 +920,7 @@
 
       // Disable editing on profile pages, as long as it isn't audits on the dashboard
       if (GGRC.page_instance() instanceof CMS.Models.Person) {
-        var person_options = extra_content_controller_options.Person;
+        var person_options = extraContentControllerOptions.Person;
         can.each(person_options, function (options, model_name) {
           if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {
             can.extend(options, {
@@ -922,8 +931,8 @@
         });
       }
 
-      can.each(far_models, function (model_name) {
-        if ((overridden_models.all && overridden_models.all.hasOwnProperty(model_name) && !overridden_models[model_name]) || (overridden_models[object.constructor.shortName] && overridden_models[object.constructor.shortName].hasOwnProperty(model_name) && !overridden_models[object.constructor.shortName][model_name]))
+      can.each(farModels, function (model_name) {
+        if ((overriddenModels.all && overriddenModels.all.hasOwnProperty(model_name) && !overriddenModels[model_name]) || (overriddenModels[object.constructor.shortName] && overriddenModels[object.constructor.shortName].hasOwnProperty(model_name) && !overriddenModels[object.constructor.shortName][model_name]))
           return;
         var sources = [],
           far_model, descriptor = {},
@@ -942,23 +951,23 @@
         }
 
         // Custom overrides
-        if (extra_descriptor_options.all && extra_descriptor_options.all[model_name]) {
-          $.extend(descriptor, extra_descriptor_options.all[model_name]);
+        if (extraDescriptorOptions.all && extraDescriptorOptions.all[model_name]) {
+          $.extend(descriptor, extraDescriptorOptions.all[model_name]);
         }
 
-        if (extra_descriptor_options[object.constructor.shortName] && extra_descriptor_options[object.constructor.shortName][model_name]) {
-          $.extend(descriptor, extra_descriptor_options[object.constructor.shortName][model_name]);
+        if (extraDescriptorOptions[object.constructor.shortName] && extraDescriptorOptions[object.constructor.shortName][model_name]) {
+          $.extend(descriptor, extraDescriptorOptions[object.constructor.shortName][model_name]);
         }
 
-        if (extra_content_controller_options.all && extra_content_controller_options.all[model_name]) {
+        if (extraContentControllerOptions.all && extraContentControllerOptions.all[model_name]) {
           $.extend(true, descriptor, {
-            content_controller_options: extra_content_controller_options.all[model_name]
+            content_controller_options: extraContentControllerOptions.all[model_name]
           });
         }
 
-        if (extra_content_controller_options[object.constructor.shortName] && extra_content_controller_options[object.constructor.shortName][model_name]) {
+        if (extraContentControllerOptions[object.constructor.shortName] && extraContentControllerOptions[object.constructor.shortName][model_name]) {
           $.extend(true, descriptor, {
-            content_controller_options: extra_content_controller_options[object.constructor.shortName][model_name]
+            content_controller_options: extraContentControllerOptions[object.constructor.shortName][model_name]
           });
         }
         widget_list.add_widget(object.constructor.shortName, widget_id, descriptor);
