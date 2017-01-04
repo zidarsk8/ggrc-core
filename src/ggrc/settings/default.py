@@ -37,6 +37,12 @@ except (ImportError):
 
 VERSION = "0.10.0-Raspberry" + BUILD_NUMBER
 
+# Migration owner
+MIGRATOR = os.environ.get(
+    'GGRC_MIGRATOR',
+    'Default Migrator <migrator@example.com>',
+)
+
 # Google Analytics variables
 GOOGLE_ANALYTICS_ID = os.environ.get('GGRC_GOOGLE_ANALYTICS_ID', '')
 GOOGLE_ANALYTICS_DOMAIN = os.environ.get('GGRC_GOOGLE_ANALYTICS_DOMAIN', '')
