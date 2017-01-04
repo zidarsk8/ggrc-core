@@ -1144,8 +1144,8 @@
           serial[name] = can.map(val, function (v) {
             var isModel = v && typeof v.save === 'function';
             return isModel ?
-            v.stub().serialize() :
-            v.serialize ? v.serialize() : v;
+                   v.stub().serialize() :
+                   (v && v.serialize) ? v.serialize() : v;
           });
         } else if (typeof val !== 'function') {
           if (that[name] && that[name].isComputed) {
