@@ -188,6 +188,6 @@ def do_refresh_revisions():
       "RiskObject",  # does not mix in Relatable, thus fails on eager_query
   }
 
-  for type_ in valid_types:
+  for type_ in sorted(valid_types):
     logger.info("Updating revisions for: %s", type_)
     _fix_type_revisions(type_, _get_revisions_by_type(type_))
