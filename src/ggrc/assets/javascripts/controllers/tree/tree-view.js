@@ -1218,6 +1218,8 @@
         .find('.cms_controllers_tree_view').control();
       var displayModels = can.makeArray(
         parentCtrl.options.attr('selected_child_tree_model_list'));
+      var originalOrder =
+        GGRC.tree_view.attr('orderedWidgetsByType')[parent.type];
       var relevant = {
         type: parent.type,
         id: parent.id,
@@ -1239,6 +1241,7 @@
         };
       }
       displayModels = _.map(displayModels, 'model_name');
+      displayModels = _.intersection(originalOrder, displayModels);
       reqParams = displayModels.map(function (model) {
         return queryAPI.buildParam(model, {}, relevant, null, addFilter);
       });

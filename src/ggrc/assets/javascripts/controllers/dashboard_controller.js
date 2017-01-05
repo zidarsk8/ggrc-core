@@ -55,14 +55,14 @@
 
     initCurrentRelatedInstanses: function () {
       var instance;
-      if (GGRC.pageType && GGRC.pageType === 'admin') { // Admin dashboard
+      if (GGRC.pageType === 'admin') { // Admin dashboard
         return;
       }
 
       instance = this.options.instance;
 
-      GGRC.Utils.CurrentPage.initMappedInstanses(
-        GGRC.tree_view.base_widgets_by_type[instance.type], {
+      GGRC.Utils.CurrentPage.initMappedInstances(
+        GGRC.tree_view.attr('orderedWidgetsByType')[instance.type], {
           type: instance.type,
           id: instance.id
         });

@@ -61,12 +61,12 @@
       var model_names;
       var possible_model_type;
       var treeViewDepth = 2;
-      var relatedObjectsChildOptions = [GGRC.Utils.getRelatedObjects(treeViewDepth)];
+      var relatedObjectsChildOptions =
+        [GGRC.Utils.getRelatedObjects(treeViewDepth)];
       var farModels;
       var extraDescriptorOptions;
       var overriddenModels;
       var extraContentControllerOptions;
-
       // TODO: Really ugly way to avoid executing IIFE - needs cleanup
       if (!GGRC.page_object) {
         return;
@@ -190,87 +190,23 @@
         // here we are going to define extra descriptor options, meaning that
         //  these will be used as extra options to create widgets on top of
 
-      // NOTE: By default, widgets are sorted alphabetically (the value of
-      // the order 100+), but the objects with higher importance that should
-      // be  prioritized use order values below 100. An order value of 0 is
-      // reserved for the "info" widget which always comes first.
       extraDescriptorOptions = {
-        all: {
-          Standard: {
-            order: 10
-          },
-          Regulation: {
-            order: 20
-          },
-          Contract: {
-            order: 30
-          },
-          Section: {
-            order: 40
-          },
-          Objective: {
-            order: 50
-          },
-          Control: {
-            order: 60
-          },
-          AccessGroup: {
-            order: 100
-          },
-          Assessment: {
-            order: 110
-          },
-          Audit: {
-            order: 120
-          },
-          Clause: {
-            order: 130
-          },
-          DataAsset: {
-            order: 140
-          },
-          Document: {
-            widget_icon: 'fa fa-link',
-            order: 150
-          },
-          Facility: {
-            order: 160
-          },
-          Issue: {
-            order: 170
-          },
-          Market: {
-            order: 180
-          },
-          OrgGroup: {
-            order: 190
-          },
-          Person: {
-            widget_icon: 'fa fa-person',
-            order: 200
-          },
-          Policy: {
-            order: 210
-          },
-          Process: {
-            order: 220
-          },
-          Product: {
-            order: 230
-          },
-          Program: {
-            order: 240
-          },
-          Project: {
-            order: 250
-          },
-          System: {
-            order: 270
-          },
-          Vendor: {
-            order: 280
-          }
-        },
+        all: (function () {
+          var defOrder = GGRC.tree_view.attr('defaultOrderTypes');
+          var all = {};
+          Object.keys(defOrder).forEach(function (type) {
+            all[type] = {
+              order: defOrder[type]
+            };
+          });
+
+          all.Document = {
+            widget_icon: 'fa fa-link!',
+              order: 150
+          };
+          all.Person.widget_icon = 'fa fa-person';
+          return all;
+        })(),
         Contract: {
           Clause: {
             widget_name: function () {
