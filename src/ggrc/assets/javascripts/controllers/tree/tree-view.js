@@ -876,7 +876,7 @@
 
     widget_hidden: function (event) {
       if (this.options.original_list) {
-        this.element.children('.cms_controllers_tree_view_node').remove();
+        this.clearList();
       }
       if (this._add_child_lists_id) {
         this._add_child_lists_id += 1;
@@ -1004,7 +1004,6 @@
       this._is_scrolling_up = false;
       this.find_all_deferred = false;
       this.options.list.replace([]);
-      this.element.children('.cms_controllers_tree_view_node').remove();
       this.draw_list(this.options.original_list, true, forceReload);
       this.init_count();
     },
@@ -1210,6 +1209,11 @@
           return data.values;
         }.bind(this));
     },
+
+    clearList: function () {
+      this.element.children('.cms_controllers_tree_view_node').remove();
+    },
+
     refreshList: function () {
       if (this.options.attr('paging.disabled')) {
         return;
@@ -1218,7 +1222,7 @@
       this._loading_started();
       this.loadPage()
         .then(function (data) {
-          this.element.children('.cms_controllers_tree_view_node').remove();
+          this.clearList();
           return data;
         }.bind(this))
         .then(this._ifNotRemoved(this.proxy('draw_list')))
@@ -1228,7 +1232,7 @@
         .fail(function () {
           this.options.attr('paging.disabled', false);
           this.options.attr('original_list', []);
-          this.element.children('.cms_controllers_tree_view_node').remove();
+          this.clearList();
           this._loading_finished();
           GGRC.Errors.notifier('warning',
             'Filter format is incorrect, data cannot be filtered.');
