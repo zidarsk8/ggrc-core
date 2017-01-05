@@ -26,31 +26,21 @@ def _get_revisions_by_type(type_):
   Returns:
     dict with object_id as key and revision_id of the latest revision as value.
   """
-  revisions_table = all_models.Revision.__table__
-  id_query = select([
-      func.max(revisions_table.c.id),
-  ]).where(
-      revisions_table.c.resource_type == type_,
-  ).group_by(
-      revisions_table.c.resource_id,
+
+  revisions = db.session.execute(
+      """
+      SELECT * FROM (
+          SELECT id, resource_id
+          FROM revisions
+          WHERE resource_type = :type
+          ORDER BY resource_id, id DESC
+      ) AS revs
+      GROUP BY resource_id
+      """,
+      [{"type": type_}]
   )
-  ids = [row for (row,) in db.session.execute(id_query)]
 
-  if ids:
-    query = select([
-        revisions_table.c.id,
-        revisions_table.c.resource_id,
-    ]).where(
-        revisions_table.c.action != "deleted"
-    ).where(
-        revisions_table.c.id.in_(ids)
-    )
-
-    return {row.resource_id: row.id for row in db.session.execute(query)}
-
-  else:
-    # no revisions found
-    return {}
+  return {row.resource_id: row.id for row in revisions}
 
 
 def _fix_type_revisions(type_, obj_rev_map):
