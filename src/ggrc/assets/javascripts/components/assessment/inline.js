@@ -96,7 +96,7 @@
           return;
         }
 
-        this.attr('_value', oldValue);
+        this.attr('_value', value);
         this.attr('value', value);
         this.attr('isSaving', true);
       }
@@ -118,7 +118,7 @@
 
         if (!isInside && scope.attr('isEdit')) {
           _.defer(function () {
-            scope.onSave();
+            scope.onCancel(scope);
           });
         }
       }
