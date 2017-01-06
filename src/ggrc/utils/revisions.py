@@ -160,19 +160,26 @@ def _recover_create_revisions(revisions_table, event, object_type,
 def do_refresh_revisions():
   """Update last revisions of models with fixed data."""
 
-  valid_types = {model.__name__ for model in all_models.all_models}
-
-  # No sense in storing revisions for Revisions or Events
-  valid_types -= {"Revision", "Event"}
-
-  # Not storing revisions for RelationshipAttrs (part of Relationships)
-  valid_types -= {"RelationshipAttr"}
-
-  # TODO: fix the errors for the next excluded types and remove this block
-  valid_types -= {
-      "BackgroundTask",  # over max content length
-      "Role",  # no FK by modified_by_id to Person
-      "RiskObject",  # does not mix in Relatable, thus fails on eager_query
+  valid_types = {
+      "AccessGroup",
+      "Clause",
+      "Contract",
+      "Control",
+      "DataAsset",
+      "Facility",
+      "Market",
+      "Objective",
+      "OrgGroup",
+      "Policy",
+      "Process",
+      "Product",
+      "Regulation",
+      "Section",
+      "Standard",
+      "System",
+      "Vendor",
+      "Risk",
+      "Threat",
   }
 
   event = all_models.Event(action="BULK")
