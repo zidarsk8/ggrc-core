@@ -43,7 +43,7 @@ def _get_revisions_by_type(type_):
   return {row.resource_id: row.id for row in revisions}
 
 
-def _fix_type_revisions(type_, obj_rev_map):
+def _fix_type_revisions(event, type_, obj_rev_map):
   """Update revision content for all rows of a given model type."""
   model = getattr(all_models, type_, None)
   revisions_table = all_models.Revision.__table__
@@ -83,11 +83,6 @@ def _fix_type_revisions(type_, obj_rev_map):
       (obj.id, obj.log_json()) for obj in objects_without_revisions
   ]
 
-  if missing_delete_revisions or missing_create_revisions:
-    # Log a "BULK" event for missing revision creation
-    event = all_models.Event(action="BULK")
-    db.session.add(event)
-    db.session.flush([event])  # to get its id
 
   if missing_delete_revisions:
     # For each lost object log a "deleted" revision with content identical to
@@ -178,6 +173,10 @@ def do_refresh_revisions():
       "RiskObject",  # does not mix in Relatable, thus fails on eager_query
   }
 
+  event = all_models.Event(action="BULK")
+  db.session.add(event)
+  db.session.flush([event])
+
   for type_ in sorted(valid_types):
     logger.info("Updating revisions for: %s", type_)
-    _fix_type_revisions(type_, _get_revisions_by_type(type_))
+    _fix_type_revisions(event, type_, _get_revisions_by_type(type_))
