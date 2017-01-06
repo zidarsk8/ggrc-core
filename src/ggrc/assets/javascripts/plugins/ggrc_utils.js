@@ -923,6 +923,20 @@
     }
 
     /**
+     * Convert revision to object
+     * @param {Object} instance -  instance
+     * @return {Object} The object
+     */
+    function revisionToModel(instance) {
+      var content = instance.content;
+      content.isRevision = true;
+      content.class = {
+        is_custom_attributable: false
+      };
+      return content;
+    }
+
+    /**
      * Convert array of snapshots to array of object
      * @param {Object} values - array of snapshots
      * @return {Object} The array of objects
@@ -963,6 +977,7 @@
       isInScopeModel: isInScopeModel,
       toObject: toObject,
       toObjects: toObjects,
+      revisionToModel: revisionToModel,
       transformQuery: transformQuery,
       setAttrs: setAttrs
     };

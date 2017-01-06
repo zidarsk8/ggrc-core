@@ -83,6 +83,7 @@ can.Control('CMS.Controllers.InfoPin', {
     var confirmEdit = instance.class.confirmEditModal ?
       instance.class.confirmEditModal : {};
     var currentPanelHeight;
+    instance.attr('view', view);
 
     if (!_.isEmpty(confirmEdit)) {
       confirmEdit.confirm = this.confirmEdit;
