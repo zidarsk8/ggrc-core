@@ -701,7 +701,7 @@
       setTimeout(this._ifNotRemoved(function () {
         if (this._remove_marker === removeMarker) {
           can.each(this.oldList, function (v) {
-            this.element.trigger('removeChild', v);
+            this.element.trigger('removeChildNode', v);
           }.bind(this));
           this.oldList = null;
           this._remove_marker = null;
@@ -837,7 +837,7 @@
       return res;
     },
 
-    ' removeChild': function (el, ev, data) { // eslint-disable-line quote-props
+    ' removeChildNode': function (el, ev, data) { // eslint-disable-line quote-props
       var that = this;
       var instance;
 
