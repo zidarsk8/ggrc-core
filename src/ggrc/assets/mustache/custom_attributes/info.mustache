@@ -28,10 +28,10 @@
               {{#if_helpers '\
                 #if' instance.snapshot '\
                 or #if' instance.isRevision }}
-                readonly
+                readonly="true"
               {{else}}
                 {{^is_allowed 'update' instance context='for'}}
-                  readonly
+                  readonly="true"
                 {{/is_allowed}}
               {{/if_helpers}}
             ></inline-edit>

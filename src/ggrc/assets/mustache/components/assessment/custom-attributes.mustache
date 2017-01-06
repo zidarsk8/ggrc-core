@@ -14,7 +14,7 @@
                         placeholder="input.placeholder"
                         is-saving="isSaving"
                   {{^is_allowed 'update' instance context='for'}}
-                        readonly
+                        readonly="true"
                   {{/is_allowed}}
                   can-before-edit="instance.confirmBeginEdit"
                 ></assessment-inline-edit>
