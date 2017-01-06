@@ -759,23 +759,6 @@
       if (!this._pending_joins) {
         this.attr('_pending_joins', []);
       }
-
-    // Listen for `stub_destroyed` change events and nullify or remove the
-    // corresponding property or list item.
-      this.bind('change', function (ev, path, how, newVal, oldVal) {
-        var m, n;
-        m = path.match(/(.*?)\.stub_destroyed$/);
-        if (m) {
-          n = m[1].match(/^([^.]+)\.(\d+)$/);
-          if (n) {
-            that.attr(n[1]).splice(parseInt(n[2], 10), 1);
-          } else {
-            n = m[1].match(/^([^.]+)$/);
-            if (n)
-              that.removeAttr(n[1]);
-          }
-        }
-      });
     },
     load_custom_attribute_definitions: function () {
       var definitions;
