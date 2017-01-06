@@ -56,16 +56,41 @@ def _fix_type_revisions(event, type_, obj_rev_map):
                    "skipped", type_)
     return
 
-  ids = list(obj_rev_map.keys())
-  if ids:
-    objects_with_revisions = model.eager_query().filter(model.id.in_(ids))
-    objects_without_revisions = model.eager_query().filter(
-        not_(model.id.in_(ids)),
-    )
-  else:
-    objects_with_revisions = []
-    objects_without_revisions = model.eager_query()
+  ids = set(obj_rev_map.keys())
+  chunk = 1000
+  all_objects = model.eager_query()
+  all_objects_count = all_objects.count()
 
+  for i in range(all_objects_count/chunk + 1):
+    objects_chunk = all_objects.limit(chunk).offset(i*chunk)
+    chunk_with_revisions = [obj for obj in objects_chunk if obj.id in ids]
+    chunk_without_revisions = [obj for obj in objects_chunk if obj.id not in ids]
+
+    _update_existing_revisions(chunk_with_revisions, revisions_table, obj_rev_map)
+
+    # Every revision present in obj_rev_map has no object in the DB
+    missing_delete_revisions = list(obj_rev_map.values())
+
+    # Every object with id not present in obj_
+    missing_create_revisions = [
+        (obj.id, obj.log_json()) for obj in chunk_without_revisions
+    ]
+
+    if missing_delete_revisions:
+      # For each lost object log a "deleted" revision with content identical to
+      # the last logged revision
+      _recover_delete_revisions(revisions_table, event, missing_delete_revisions)
+
+    if missing_create_revisions:
+      # For each unlogged object log a "created"/"modified" revision with content
+      # equal to obj.log_json()
+      _recover_create_revisions(revisions_table, event,
+                                type_, missing_create_revisions)
+    db.session.commit()
+
+
+def _update_existing_revisions(objects_with_revisions, revisions_table, obj_rev_map):
+  """Update existing revisions with the result of log_json()"""
   for obj in objects_with_revisions:
     rev_id = obj_rev_map.pop(obj.id)
     # Update revisions_table.content to the latest object's json
@@ -74,29 +99,6 @@ def _fix_type_revisions(event, type_, obj_rev_map):
         .where(revisions_table.c.id == rev_id)
         .values(content=obj.log_json())
     )
-
-  # Every revision present in obj_rev_map has no object in the DB
-  missing_delete_revisions = list(obj_rev_map.values())
-
-  # Every object with id not present in obj_
-  missing_create_revisions = [
-      (obj.id, obj.log_json()) for obj in objects_without_revisions
-  ]
-
-
-  if missing_delete_revisions:
-    # For each lost object log a "deleted" revision with content identical to
-    # the last logged revision
-    _recover_delete_revisions(revisions_table, event, missing_delete_revisions)
-
-  if missing_create_revisions:
-    # For each unlogged object log a "created"/"modified" revision with content
-    # equal to obj.log_json()
-    _recover_create_revisions(revisions_table, event,
-                              type_, missing_create_revisions)
-
-  db.session.commit()
-
 
 def _recover_delete_revisions(revisions_table, event,
                               last_available_revision_ids):
