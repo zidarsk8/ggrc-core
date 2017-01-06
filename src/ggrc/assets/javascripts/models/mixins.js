@@ -3,8 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can) {
-  can.Construct('can.Model.Mixin', {
+(function (can, GGRC) {
+  can.Construct.extend('can.Model.Mixin', {
     extend: function (fullName, klass, proto) {
       var tempname;
       var mixinName;
@@ -39,19 +39,17 @@
       throw new Error('Mixins cannot be directly instantiated');
     },
     add_to: function (cls) {
-      var setupfns;
       if (this === can.Model.Mixin) {
         throw new Error('Must only add a subclass of Mixin to an object,' +
           ' not Mixin itself');
       }
-      setupfns = function (obj) {
+      function setupFns(obj) {
         return function (fn, key) {
           var blockedKeys = ['fullName', 'defaults', '_super', 'constructor'];
           var aspect = ~key.indexOf(':') ?
             key.substr(0, key.indexOf(':')) :
             'after';
           var oldfn;
-          var key;
 
           key = ~key.indexOf(':') ? key.substr(key.indexOf(':') + 1) : key;
           if (fn !== can.Model.Mixin[key] && !~can.inArray(key, blockedKeys)) {
@@ -65,7 +63,7 @@
             //   Necessary for "attributes"/"serialize"/"convert"
             // Defaults will always be "after" for functions
             //  and "override" for non-function values
-            if (oldfn && typeof oldfn === 'function') {
+            if (can.isFunction(oldfn)) {
               switch (aspect) {
                 case 'before':
                   obj[key] = function () {
@@ -83,26 +81,24 @@
                   break;
               }
             } else if (aspect === 'extend') {
-              obj[key] = $.extend(obj[key], fn);
+              obj[key] = can.extend(obj[key], fn);
             } else {
               obj[key] = fn;
             }
           }
         };
-      };
+      }
+
       if (!~can.inArray(this.fullName, cls._mixins)) {
         cls._mixins = cls._mixins || [];
         cls._mixins.push(this.fullName);
-        for (key in this) {
-          if (this.hasOwnProperty(key)) {
-            setupfns(cls).call(null, this[key], key);
-          }
-        }
-        can.each(this.prototype, setupfns(cls.prototype));
+        Object.keys(this).forEach(function (key) {
+          setupFns(cls)(this[key], key);
+        }.bind(this));
+        can.each(this.prototype, setupFns(cls.prototype));
       }
     }
-  }, {
-  });
+  }, {});
   can.Model.Mixin('requestorable', {
     before_create: function () {
       if (!this.requestor) {
@@ -213,7 +209,7 @@
         STATUS_IN_PROGRESS, '" - are you sure about that?'
       ].join('');
 
-      var confirmation = $.Deferred();
+      var confirmation = can.Deferred();
 
       if (_.includes(IGNORED_STATES, this.status)) {
         confirmation.resolve();
@@ -250,102 +246,10 @@
     },
     'before:attr': function (key, val) {
       if (key === 'title' &&
-          arguments.length > 1 &&
-          this._transient) {
+        arguments.length > 1 &&
+        this._transient) {
         this.attr('_transient.title', null);
       }
-    }
-  });
-  // TODO: remove this mixin and all related logic from Front-end part
-  can.Model.Mixin('relatable', {
-  }, {
-    related_self: function () {
-      var model = CMS.Models[this.type];
-      return this._related(
-        model.relatable_options.relevantTypes,
-        model.relatable_options.threshold
-      );
-    },
-    /**
-     * Return objects of single type above threshold that are
-     * mapped to specified mapped objects.
-     *
-     * @param {Object} relevantTypes - object with specified first degree
-     *   binding (objectBinding), second degree binding (relatableBinding) and
-     *   weights that individual second degree bindings are carrying.
-     *
-     *   relevantTypes = {
-     *     @ObjectType: {
-     *       objectBinding: @first-degree-mapping,
-     *       relatableBinding: @second-degree-mapping,
-     *       weight: @weight-of-objects
-     *     },
-     *     Audit: {
-     *       objectBinding: 'audits',
-     *       relatableBinding: 'program_requests',
-     *       weight: 5
-     *     },
-     *     Regulation: {
-     *       objectBinding: 'related_regulations',
-     *       relatableBinding: 'related_requests',
-     *       weight: 3
-     *     }, ...
-     *   }
-     * @param {Number} threshold - minimum weight required to render related
-     *   object
-     * @return {Deferred} relatable - Promise
-     */
-    _related: function (relevantTypes, threshold) {
-      var that = this;
-      var relatable = $.Deferred();
-      var connectionsCount = {};
-      var relatedObjectsDeferreds = [];
-      var mappedObjectDeferreds = _.map(relevantTypes, function (rtype) {
-        return this.get_binding(rtype.objectBinding).refresh_instances();
-      }.bind(this));
-
-      $.when.apply($, mappedObjectDeferreds).done(function () {
-        _.each(_.toArray(arguments), function (mappedObjectInstances) {
-          if (!mappedObjectInstances.length) {
-            return;
-          }
-          relatedObjectsDeferreds = relatedObjectsDeferreds.concat(
-            _.map(mappedObjectInstances, function (mappedObj) {
-              var insttype = mappedObj.instance.type;
-              var binding = relevantTypes[insttype].relatableBinding;
-              return mappedObj.instance.get_binding(
-                binding).refresh_instances();
-            }));
-        });
-        $.when.apply($, relatedObjectsDeferreds).done(function () {
-          _.each(_.toArray(arguments), function (relatedObjects) {
-            _.each(relatedObjects, function (relObj) {
-              var type = relObj.binding.instance.type;
-              var weight = relevantTypes[type].weight;
-              if (relObj.instance.id !== that.id) {
-                if (connectionsCount[relObj.instance.id] === undefined) {
-                  connectionsCount[relObj.instance.id] = {
-                    count: weight,
-                    object: relObj
-                  };
-                } else {
-                  connectionsCount[relObj.instance.id].count += weight;
-                }
-              }
-            });
-          });
-          relatable.resolve(
-            _.map(_.sortBy(_.filter(connectionsCount, function (item) {
-              if (item.count >= threshold) {
-                return item;
-              }
-            }), 'count').reverse(),
-              function (item) {
-                return item.object;
-              }));
-        });
-      });
-      return relatable;
     }
   });
 
@@ -375,6 +279,5 @@
         return val;
       }
     }
-  }, {
-  });
-})(this.can);
+  }, {});
+})(window.can, window.GGRC);
