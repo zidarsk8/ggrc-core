@@ -117,12 +117,12 @@ def validate():
       ids = [id_ for _, id_ in result]
       print "Too many Audits mapped to {klass}: {ids}".format(
           klass=klass_name,
-          ids=",".join(str(id_) for id_ in ids)
+          ids=",".join(str(id_) for id_ in sorted(ids))
       )
     for klass_name, result in ghost_objects:
       print "No Audits mapped to {klass}: {ids}".format(
           klass=klass_name,
-          ids=",".join(str(id_) for id_ in result)
+          ids=",".join(str(id_) for id_ in sorted(result))
       )
     print "FAIL"
     sys.exit(1)
