@@ -66,16 +66,18 @@ def _fix_type_revisions(event, type_, obj_rev_map):
     chunk_without_revisions = [
         obj for obj in objects_chunk if obj.id not in ids]
 
+    # 1. Update the object's latest revision using the value of the up to date
+    # log_json function
     _update_existing_revisions(
         chunk_with_revisions, revisions_table, obj_rev_map)
 
-    # For each lost object log a "deleted" revision with content identical to
-    # the last logged revision
+    # 2. For each lost object log a "deleted" revision with content identical
+    # to the last logged revision.
     _recover_delete_revisions(
         # Every revision present in obj_rev_map has no object in the DB
         revisions_table, event, list(obj_rev_map.values()))
 
-    # For each unlogged object log a "created"/"modified" revision with
+    # 3. For each unlogged object log a "created"/"modified" revision with
     # content equal to obj.log_json()
     _recover_create_revisions(revisions_table, event,
                               type_, chunk_without_revisions)
