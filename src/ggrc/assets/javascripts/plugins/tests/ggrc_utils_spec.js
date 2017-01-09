@@ -142,6 +142,16 @@ describe('GGRC utils isEmptyCA() method', function () {
       var result = isEmptyCA('', 'Map:Person');
       expect(result).toBe(true);
     });
+
+    it('returns true for not selected cav', function () {
+      var result = isEmptyCA('', 'Map:Person', {attribute_object: null});
+      expect(result).toBe(true);
+    });
+
+    it('returns false for selected cav', function () {
+      var result = isEmptyCA('', 'Map:Person', {attribute_object: 'Person'});
+      expect(result).toBe(false);
+    });
   });
 
   describe('check Date type', function () {

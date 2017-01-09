@@ -406,7 +406,7 @@
     mapCAType: function (type) {
       return customAttributesType[type] || 'input';
     },
-    isEmptyCA: function (value, type) {
+    isEmptyCA: function (value, type, cav) {
       var result = false;
       var types = ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
         'Map:Person'];
@@ -417,10 +417,17 @@
         'Rich Text': function (value) {
           value = GGRC.Utils.getPlainText(value);
           return _.isEmpty(value);
+        },
+        'Map:Person': function (value, cav) {
+          // Special case, Map:Person has 'Person' value by default
+          if (cav) {
+            return !cav.attribute_object;
+          }
+          return _.isEmpty(value);
         }
       };
       if (types.indexOf(type) > -1 && options[type]) {
-        result = options[type](value);
+        result = options[type](value, cav);
       } else if (types.indexOf(type) > -1) {
         result = _.isEmpty(value);
       }
