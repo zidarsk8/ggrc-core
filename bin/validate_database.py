@@ -15,10 +15,6 @@ import sys
 import csv
 from collections import defaultdict
 
-from sqlalchemy.sql import and_
-from sqlalchemy.sql import func
-from sqlalchemy.sql import select
-
 # We have to import app before we can use db and other parts of the app.
 from ggrc import app  # noqa  pylint: disable=unused-import
 from ggrc import db
@@ -66,14 +62,13 @@ def validate():
 
   all_bad_ids = defaultdict(list)
   if multiple_mappings or zero_mappings:
-    for klass_name, result in multiple_mappings:
-      ids = [id_ for _, id_ in result]
+    for klass_name, ids in multiple_mappings.items():
       all_bad_ids[klass_name] += ids
       print "Too many Audits mapped to {klass}: {ids}".format(
           klass=klass_name,
           ids=",".join(str(id_) for id_ in sorted(ids))
       )
-    for klass_name, ids in zero_mappings:
+    for klass_name, ids in zero_mappings.items():
       all_bad_ids[klass_name] += ids
       print "No Audits mapped to {klass}: {ids}".format(
           klass=klass_name,

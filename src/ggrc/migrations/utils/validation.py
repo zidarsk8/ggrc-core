@@ -1,4 +1,7 @@
+# Copyright (C) 2017 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Database validation for Audit snapshots migration."""
 
 from sqlalchemy.sql import and_
 from sqlalchemy.sql import func
@@ -19,9 +22,9 @@ def validate_database(connection):
   """
 
   # pylint: disable=too-many-locals
-  multiple_mappings = []
+  multiple_mappings = {}
+  zero_mappings = {}
 
-  zero_mappings = []
   relationships_table = Relationship.__table__
   assessments_table = Assessment.__table__
   issues_table = Issue.__table__
@@ -74,10 +77,11 @@ def validate_database(connection):
         x.object_id for x in result_more + result_one
     }
 
-    result_zero = all_object_ids - to_audit_mapped_ids
+    zero_mapped_ids = all_object_ids - to_audit_mapped_ids
+    multiple_mapped_ids = [id_ for _, id_ in result_more]
 
-    if result_more:
-      multiple_mappings += [(klass_name, result_more)]
-    if result_zero:
-      zero_mappings += [(klass_name, result_zero)]
+    if multiple_mapped_ids:
+      multiple_mappings[klass_name] = multiple_mapped_ids
+    if zero_mapped_ids:
+      zero_mappings[klass_name] = zero_mapped_ids
   return multiple_mappings, zero_mappings
