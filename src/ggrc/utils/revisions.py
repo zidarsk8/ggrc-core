@@ -77,17 +77,15 @@ def _fix_type_revisions(event, type_, obj_rev_map):
         (obj.id, obj.log_json()) for obj in chunk_without_revisions
     ]
 
-    if missing_delete_revisions:
-      # For each lost object log a "deleted" revision with content identical to
-      # the last logged revision
-      _recover_delete_revisions(
-          revisions_table, event, missing_delete_revisions)
+    # For each lost object log a "deleted" revision with content identical to
+    # the last logged revision
+    _recover_delete_revisions(
+        revisions_table, event, missing_delete_revisions)
 
-    if missing_create_revisions:
-      # For each unlogged object log a "created"/"modified" revision with
-      # content equal to obj.log_json()
-      _recover_create_revisions(revisions_table, event,
-                                type_, missing_create_revisions)
+    # For each unlogged object log a "created"/"modified" revision with
+    # content equal to obj.log_json()
+    _recover_create_revisions(revisions_table, event,
+                              type_, missing_create_revisions)
     db.session.commit()
 
 
@@ -106,6 +104,8 @@ def _update_existing_revisions(objects, revisions_table, obj_rev_map):
 def _recover_delete_revisions(revisions_table, event,
                               last_available_revision_ids):
   """Log an action="deleted" copy for revisions with ids in passed list."""
+  if not last_available_revision_ids:
+    return
   columns_to_clone = sorted(set(c.name for c in revisions_table.c) -
                             {"id", "event_id", "action", "created_at",
                              "updated_at"})
@@ -141,6 +141,9 @@ def _recover_create_revisions(revisions_table, event, object_type,
       return "modified"
     else:
       return "created"
+
+  if not object_ids_with_jsons:
+    return
 
   db.session.execute(
       revisions_table.insert(),
