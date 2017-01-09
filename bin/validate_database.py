@@ -29,18 +29,18 @@ from ggrc.models.assessment import Assessment
 from ggrc.models.issue import Issue
 
 
-def validate_database2():
-  """Check if database in a valid state for Audit migrations.
+def validate_database():
+  """Check if the database is in a valid state for Audit migrations.
 
-  The Audit snapshot migration does produce correct results if any Assessment
-  or Issue are not mapped to exactly one Audit. This function checks and
-  outputs the ids of the offending objects and returns a non zero code if any
-  such object is found.
+  The Audit snapshot migration does not produce correct results if any
+  Assessment or Issue are not mapped to exactly one Audit. This function
+  checks and outputs the ids of the offending objects and returns a non zero
+  code if any such object is found.
   """
 
   # pylint: disable=too-many-locals
-  audits_more = []
-  ghost_objects = []
+  multiple_mappings = []
+  zero_mappings = []
   relationships_table = Relationship.__table__
   assessments_table = Assessment.__table__
   issues_table = Issue.__table__
@@ -96,10 +96,10 @@ def validate_database2():
     result_zero = all_object_ids - to_audit_mapped_ids
 
     if result_more:
-      audits_more += [(klass_name, result_more)]
+      multiple_mappings += [(klass_name, result_more)]
     if result_zero:
-      ghost_objects += [(klass_name, result_zero)]
-  return audits_more, ghost_objects
+      zero_mappings += [(klass_name, result_zero)]
+  return multiple_mappings, zero_mappings
 
 
 def _generate_delete_csv(all_bad_ids):
@@ -132,23 +132,23 @@ def validate():
 
   tables = set(row[0] for row in db.session.execute("show tables"))
 
-  if {"relationships", "issues"}.difference(tables):
+  if {"relationships", "issues", "assessments"}.difference(tables):
     # Ignore checks if required tables do not exist. This is if the check is
     # run on an empty database (usually with db_reset)
     return
 
-  audits_more, ghost_objects = validate_database2()
+  multiple_mappings, zero_mappings = validate_database()
 
   all_bad_ids = defaultdict(list)
-  if audits_more or ghost_objects:
-    for klass_name, result in audits_more:
+  if multiple_mappings or zero_mappings:
+    for klass_name, result in multiple_mappings:
       ids = [id_ for _, id_ in result]
       all_bad_ids[klass_name] += ids
       print "Too many Audits mapped to {klass}: {ids}".format(
           klass=klass_name,
           ids=",".join(str(id_) for id_ in sorted(ids))
       )
-    for klass_name, ids in ghost_objects:
+    for klass_name, ids in zero_mappings:
       all_bad_ids[klass_name] += ids
       print "No Audits mapped to {klass}: {ids}".format(
           klass=klass_name,
