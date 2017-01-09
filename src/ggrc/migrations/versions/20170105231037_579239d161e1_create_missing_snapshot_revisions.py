@@ -40,6 +40,9 @@ def upgrade():
 
       "System",
       "Process",
+
+      "Risk",
+      "Threat",
   ])
 
   handle_objects(snapshot_objects)

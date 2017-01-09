@@ -229,21 +229,45 @@ def _create_bulk_event():
   return connection.execute("SELECT LAST_INSERT_ID()").fetchall()[0][0]
 
 
+def _filter_objects(objects):
+  """Remove all objects that do not have a table.
+
+  Args:
+    objects: list of Models names for which we want to create revisions
+  Returns:
+    list of Models names that already have a table created.
+  """
+  connection = op.get_bind()
+  tables_query = connection.execute("SHOW TABLES").fetchall()
+  existing_tables = {row[0] for row in tables_query}
+  existing_models = {model.__name__ for model in all_models.all_models
+                     if model.__tablename__ in existing_tables}
+
+  fake_objects = [name for name in objects if name not in existing_models]
+  if fake_objects:
+    print "Following objects not found:", fake_objects
+
+  return [name for name in objects if name in existing_models]
+
+
 def handle_objects(objects):
   """Create missing revisions for all listed objects.
 
   Args:
     objects: List of model names for which we want to create missing revisions.
   """
+
+  existing_objects = _filter_objects(objects)
+
   print "#" * 80
-  sum_counts = _print_missing_counts(objects)
+  sum_counts = _print_missing_counts(existing_objects)
   print "#" * 80
 
   if not sum_counts:
     # No missing revisions, we can safely return
     return
 
-  _insert_missing_objects(objects)
+  _insert_missing_objects(existing_objects)
 
-  _print_missing_counts(objects)
+  _print_missing_counts(existing_objects)
   print "#" * 80
