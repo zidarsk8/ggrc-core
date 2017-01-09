@@ -13,7 +13,8 @@
     create: 'POST /api/assessments',
     mixins: [
       'ownable', 'contactable', 'unique_title',
-      'autoStatusChangeable', 'timeboxed', 'mapping-limit'
+      'autoStatusChangeable', 'timeboxed', 'mapping-limit',
+      'inScopeObjects'
     ],
     is_custom_attributable: true,
     attributes: {
