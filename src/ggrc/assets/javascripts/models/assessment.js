@@ -189,7 +189,7 @@
           }
         });
         if (cad.mandatory &&
-            GGRC.Utils.isEmptyCA(value, cad.attribute_type)) {
+            GGRC.Utils.isEmptyCA(value, cad.attribute_type, cav)) {
           // If Custom Attribute is mandatory and empty
           errorsList.value.push(cad.title);
         } else if (cav) {
