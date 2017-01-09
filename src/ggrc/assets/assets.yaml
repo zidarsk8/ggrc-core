@@ -169,6 +169,7 @@ dashboard-js-files:
   - components/simple-modal/simple-modal.js
   - components/mapping-controls/mapping-type-selector.js
   - components/dropdown/dropdown.js
+  - components/complete-button/complete-button.js
   - components/autocomplete/autocomplete.js
   - components/search-toolbar/search-toolbar.js
   - components/datepicker/datepicker.js
@@ -230,6 +231,7 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/complete-button/complete-button.mustache
   - components/snapshot-loader/snapshot-loader.mustache
   - components/snapshot-loader/snapshot-loader-item.mustache
   - components/object-selection/object-selection-item.mustache
