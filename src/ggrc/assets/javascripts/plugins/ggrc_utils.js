@@ -419,6 +419,9 @@
           return _.isEmpty(value);
         }
       };
+      if (value === undefined) {
+        return true;
+      }
       if (types.indexOf(type) > -1 && options[type]) {
         result = options[type](value);
       } else if (types.indexOf(type) > -1) {

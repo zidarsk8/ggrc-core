@@ -75,6 +75,13 @@ describe('GGRC utils isEmptyCA() method', function () {
     isEmptyCA = GGRC.Utils.isEmptyCA;
   });
 
+  describe('check undefined value', function () {
+    it('returns true for undefined', function () {
+      var result = isEmptyCA(undefined);
+      expect(result).toBe(true);
+    });
+  });
+
   describe('check Rich Text value', function () {
     it('returns true for empty div', function () {
       var result = isEmptyCA('<div></div>', 'Rich Text');

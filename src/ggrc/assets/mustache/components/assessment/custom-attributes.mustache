@@ -13,6 +13,7 @@
                         title-text="input.title"
                         placeholder="input.placeholder"
                         is-saving="isSaving"
+                        object-validation="validation"
                   {{^is_allowed 'update' instance context='for'}}
                         readonly="true"
                   {{/is_allowed}}

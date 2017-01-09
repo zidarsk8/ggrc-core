@@ -44,7 +44,13 @@
     },
     events: {
       init: function () {
+        var self = this;
         this.scope.applyState();
+        this.scope.validation.bind('change', function (event, propertyName) {
+          if (propertyName === 'empty') {
+            self.scope.applyState();
+          }
+        });
       },
       '{scope} validation': function () {
         this.scope.applyState();
