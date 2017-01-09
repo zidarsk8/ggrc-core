@@ -172,7 +172,7 @@
   });
 
   can.Model.Mixin('inScopeObjects', {}, {
-    'after:init': function () {
+    'after:info_pane_preload': function () {
       var objType = 'Audit';
       var queryType = 'ids';
       var query = GGRC.Utils.QueryAPI
