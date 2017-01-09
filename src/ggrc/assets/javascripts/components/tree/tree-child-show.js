@@ -7,19 +7,19 @@
   GGRC.Components('treeChildShow', {
     tag: 'tree-child-show',
     template: '<content/>',
-    scope: {},
+    viewModel: {
+      onChildShowStateChange: null,
+      isChildShow: null
+    },
     events: {
       init: function (element, options) {
-        this.scope.attr('controller', this);
-        this.scope.attr('$rootEl', $(element));
       },
       'a click': function () {
-        var sec_el = this.element.closest('section');
-        var tree_view_el = sec_el.find('.cms_controllers_tree_view');
-        var control = tree_view_el.control();
-        var cur = control.options.attr('showMappedToAllParents');
+        var isChildShow = this.viewModel.attr('isChildShow');
+        var onChildShowStateChange = this.viewModel.onChildShowStateChange;
 
-        control.options.attr('showMappedToAllParents', !cur);
+        this.viewModel.attr('isChildShow', !isChildShow);
+        onChildShowStateChange(!isChildShow);
       }
     }
   });

@@ -4,9 +4,10 @@
 }}
 
 <li class="tree-child-show">
-  <tree-child-show>
+  <tree-child-show is-child-show="showMappedToAllParents"
+                   on-child-show-state-change="@onChildShowStateChange">
     <a href="javascript://">
-      <i class="fa fa-fw fa-{{#if showMappedToAllParents}}check-{{/if}}square-o"></i>
+      <i class="fa fa-fw fa-{{#if isChildShow}}check-{{/if}}square-o"></i>
       Show mapped to all parents in child tree
     </a>
   </tree-child-show>

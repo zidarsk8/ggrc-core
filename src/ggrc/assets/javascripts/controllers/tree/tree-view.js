@@ -342,6 +342,7 @@
 
       if (this.options.header_view && this.options.show_header) {
         optionsDfd = $.when(this.options).then(function (options) {
+          options.onChildShowStateChange = self.childShowStateChange.bind(self);
           options.onChildModelsChange = self.set_tree_display_list.bind(self);
           return options;
         });
@@ -857,15 +858,16 @@
       var options;
       var expander;
 
-      if (!showMappedToAllParents) {
-        return;
-      }
       element = this.element.find('.parent-related:first');
       options = {
         expanded: !!element.length && showMappedToAllParents
       };
       expander = can.view(GGRC.mustache_path +
         '/base_objects/sub_tree_expand.mustache', options);
+
+      if (!showMappedToAllParents) {
+        $(expander.firstElementChild).hide();
+      }
 
       if (element.length) {
         $(expander).insertBefore(element);
@@ -1312,6 +1314,20 @@
         if (oldVal !== newVal && _.contains(['current', 'pageSize'], type)) {
           this.refreshList();
         }
-      })
+      }),
+    childShowStateChange: function (childShowState) {
+      var expanderEls = this.element.find('.sub-tree-expander');
+
+      if (!_.isBoolean(childShowState)) {
+        return;
+      }
+      if (childShowState) {
+        expanderEls.show();
+      } else {
+        expanderEls.hide();
+      }
+
+      this.options.attr('showMappedToAllParents', !!childShowState);
+    }
   });
 })(window.can, window.$);
