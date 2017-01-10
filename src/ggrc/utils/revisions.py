@@ -57,8 +57,8 @@ def _fix_type_revisions(event, type_, obj_rev_map):
 
   ids = set(obj_rev_map.keys())
   chunk = 1000
-  all_objects = model.eager_query()
-  all_objects_count = all_objects.count()
+  all_objects = model.eager_query().order_by(model.id)
+  all_objects_count = model.query.count()
 
   for i in range(all_objects_count / chunk + 1):
     objects_chunk = all_objects.limit(chunk).offset(i * chunk)
