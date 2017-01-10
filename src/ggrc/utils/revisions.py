@@ -85,7 +85,9 @@ def _fix_type_revisions(event, type_, obj_rev_map):
 
 
 def _update_existing_revisions(objects, revisions_table, obj_rev_map):
-  """Update existing revisions with the result of log_json."""
+  """Update existing revisions with the result of log_json and remove
+     the obj.id from obj_rev_map.
+  """
   for obj in objects:
     rev_id = obj_rev_map.pop(obj.id)
     # Update revisions_table.content to the latest object's json
