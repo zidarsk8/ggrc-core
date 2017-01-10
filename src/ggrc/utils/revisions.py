@@ -8,11 +8,11 @@ from logging import getLogger
 from sqlalchemy.sql import select
 from sqlalchemy import func
 from sqlalchemy import literal
-from sqlalchemy import not_
 
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
+from ggrc.snapshotter.rules import Types
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -26,34 +26,24 @@ def _get_revisions_by_type(type_):
   Returns:
     dict with object_id as key and revision_id of the latest revision as value.
   """
-  revisions_table = all_models.Revision.__table__
-  id_query = select([
-      func.max(revisions_table.c.id),
-  ]).where(
-      revisions_table.c.resource_type == type_,
-  ).group_by(
-      revisions_table.c.resource_id,
+
+  revisions = db.session.execute(
+      """
+      SELECT * FROM (
+          SELECT id, resource_id
+          FROM revisions
+          WHERE resource_type = :type
+          ORDER BY resource_id, id DESC
+      ) AS revs
+      GROUP BY resource_id
+      """,
+      [{"type": type_}]
   )
-  ids = [row for (row,) in db.session.execute(id_query)]
 
-  if ids:
-    query = select([
-        revisions_table.c.id,
-        revisions_table.c.resource_id,
-    ]).where(
-        revisions_table.c.action != "deleted"
-    ).where(
-        revisions_table.c.id.in_(ids)
-    )
-
-    return {row.resource_id: row.id for row in db.session.execute(query)}
-
-  else:
-    # no revisions found
-    return {}
+  return {row.resource_id: row.id for row in revisions}
 
 
-def _fix_type_revisions(type_, obj_rev_map):
+def _fix_type_revisions(event, type_, obj_rev_map):
   """Update revision content for all rows of a given model type."""
   model = getattr(all_models, type_, None)
   revisions_table = all_models.Revision.__table__
@@ -66,17 +56,41 @@ def _fix_type_revisions(type_, obj_rev_map):
                    "skipped", type_)
     return
 
-  ids = list(obj_rev_map.keys())
-  if ids:
-    objects_with_revisions = model.eager_query().filter(model.id.in_(ids))
-    objects_without_revisions = model.eager_query().filter(
-        not_(model.id.in_(ids)),
-    )
-  else:
-    objects_with_revisions = []
-    objects_without_revisions = model.eager_query()
+  chunk = 1000
+  all_objects = model.eager_query().order_by(model.id)
+  all_objects_count = model.query.count()
 
-  for obj in objects_with_revisions:
+  for i in range(all_objects_count // chunk + 1):
+    objects_chunk = all_objects.limit(chunk).offset(i * chunk)
+    chunk_with_revisions = [
+        obj for obj in objects_chunk if obj.id in obj_rev_map]
+    chunk_without_revisions = [
+        obj for obj in objects_chunk if obj.id not in obj_rev_map]
+
+    # 1. Update the object's latest revision using the value of the up to date
+    # log_json function
+    _update_existing_revisions(
+        chunk_with_revisions, revisions_table, obj_rev_map)
+
+    # 2. For each unlogged object log a "created"/"modified" revision with
+    # content equal to obj.log_json()
+    _recover_create_revisions(revisions_table, event,
+                              type_, chunk_without_revisions)
+
+  # 3. For each lost object log a "deleted" revision with content identical
+  # to the last logged revision.
+  _recover_delete_revisions(
+      # Every revision present in obj_rev_map has no object in the DB
+      revisions_table, event, list(obj_rev_map.values()))
+
+  db.session.commit()
+
+
+def _update_existing_revisions(objects, revisions_table, obj_rev_map):
+  """Update existing revisions with the result of log_json and remove
+     the obj.id from obj_rev_map.
+  """
+  for obj in objects:
     rev_id = obj_rev_map.pop(obj.id)
     # Update revisions_table.content to the latest object's json
     db.session.execute(
@@ -85,37 +99,12 @@ def _fix_type_revisions(type_, obj_rev_map):
         .values(content=obj.log_json())
     )
 
-  # Every revision present in obj_rev_map has no object in the DB
-  missing_delete_revisions = list(obj_rev_map.values())
-
-  # Every object with id not present in obj_
-  missing_create_revisions = [
-      (obj.id, obj.log_json()) for obj in objects_without_revisions
-  ]
-
-  if missing_delete_revisions or missing_create_revisions:
-    # Log a "BULK" event for missing revision creation
-    event = all_models.Event(action="BULK")
-    db.session.add(event)
-    db.session.flush([event])  # to get its id
-
-  if missing_delete_revisions:
-    # For each lost object log a "deleted" revision with content identical to
-    # the last logged revision
-    _recover_delete_revisions(revisions_table, event, missing_delete_revisions)
-
-  if missing_create_revisions:
-    # For each unlogged object log a "created"/"modified" revision with content
-    # equal to obj.log_json()
-    _recover_create_revisions(revisions_table, event,
-                              type_, missing_create_revisions)
-
-  db.session.commit()
-
 
 def _recover_delete_revisions(revisions_table, event,
                               last_available_revision_ids):
   """Log an action="deleted" copy for revisions with ids in passed list."""
+  if not last_available_revision_ids:
+    return
   columns_to_clone = sorted(set(c.name for c in revisions_table.c) -
                             {"id", "event_id", "action", "created_at",
                              "updated_at"})
@@ -140,7 +129,7 @@ def _recover_delete_revisions(revisions_table, event,
 
 
 def _recover_create_revisions(revisions_table, event, object_type,
-                              object_ids_with_jsons):
+                              chunk_without_revisions):
   """Log a "created"/"modified" revision for every passed object's json.
 
   If json["updated_at"] == json["created_at"], log action="created".
@@ -151,6 +140,14 @@ def _recover_create_revisions(revisions_table, event, object_type,
       return "modified"
     else:
       return "created"
+
+  # Every object with id not present in obj_
+  object_ids_with_jsons = [
+      (obj.id, obj.log_json()) for obj in chunk_without_revisions
+  ]
+
+  if not object_ids_with_jsons:
+    return
 
   db.session.execute(
       revisions_table.insert(),
@@ -172,22 +169,13 @@ def _recover_create_revisions(revisions_table, event, object_type,
 
 def do_refresh_revisions():
   """Update last revisions of models with fixed data."""
+  event = all_models.Event(action="BULK")
+  db.session.add(event)
+  db.session.flush([event])
 
-  valid_types = {model.__name__ for model in all_models.all_models}
-
-  # No sense in storing revisions for Revisions or Events
-  valid_types -= {"Revision", "Event"}
-
-  # Not storing revisions for RelationshipAttrs (part of Relationships)
-  valid_types -= {"RelationshipAttr"}
-
-  # TODO: fix the errors for the next excluded types and remove this block
-  valid_types -= {
-      "BackgroundTask",  # over max content length
-      "Role",  # no FK by modified_by_id to Person
-      "RiskObject",  # does not mix in Relatable, thus fails on eager_query
-  }
-
-  for type_ in valid_types:
+  # TODO: Improve performance/memory consumption so that we can run
+  # _fix_type_revisions for all objects and not just the objects that are
+  # snapshottable
+  for type_ in sorted(Types.all):
     logger.info("Updating revisions for: %s", type_)
-    _fix_type_revisions(type_, _get_revisions_by_type(type_))
+    _fix_type_revisions(event, type_, _get_revisions_by_type(type_))
