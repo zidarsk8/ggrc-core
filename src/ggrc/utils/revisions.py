@@ -12,6 +12,7 @@ from sqlalchemy import literal
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
+from ggrc.snapshotter.rules import Types
 
 logger = getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -168,33 +169,10 @@ def _recover_create_revisions(revisions_table, event, object_type,
 
 def do_refresh_revisions():
   """Update last revisions of models with fixed data."""
-
-  valid_types = {
-      "AccessGroup",
-      "Clause",
-      "Contract",
-      "Control",
-      "DataAsset",
-      "Facility",
-      "Market",
-      "Objective",
-      "OrgGroup",
-      "Policy",
-      "Process",
-      "Product",
-      "Regulation",
-      "Section",
-      "Standard",
-      "System",
-      "Vendor",
-      "Risk",
-      "Threat",
-  }
-
   event = all_models.Event(action="BULK")
   db.session.add(event)
   db.session.flush([event])
 
-  for type_ in sorted(valid_types):
+  for type_ in sorted(Types.all):
     logger.info("Updating revisions for: %s", type_)
     _fix_type_revisions(event, type_, _get_revisions_by_type(type_))
