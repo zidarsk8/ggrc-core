@@ -75,13 +75,14 @@ def _fix_type_revisions(event, type_, obj_rev_map):
     # content equal to obj.log_json()
     _recover_create_revisions(revisions_table, event,
                               type_, chunk_without_revisions)
-    db.session.commit()
 
   # 3. For each lost object log a "deleted" revision with content identical
   # to the last logged revision.
   _recover_delete_revisions(
       # Every revision present in obj_rev_map has no object in the DB
       revisions_table, event, list(obj_rev_map.values()))
+
+  db.session.commit()
 
 
 def _update_existing_revisions(objects, revisions_table, obj_rev_map):
