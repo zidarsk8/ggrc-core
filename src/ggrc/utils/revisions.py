@@ -173,6 +173,9 @@ def do_refresh_revisions():
   db.session.add(event)
   db.session.flush([event])
 
+  # TODO: Improve performance/memory consumption so that we can run
+  # _fix_type_revisions for all objects and not just the objects that are
+  # snapshottable
   for type_ in sorted(Types.all):
     logger.info("Updating revisions for: %s", type_)
     _fix_type_revisions(event, type_, _get_revisions_by_type(type_))
