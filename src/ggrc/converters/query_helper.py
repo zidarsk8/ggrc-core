@@ -406,8 +406,7 @@ class QueryHelper(object):
         join_target = flask.g.similar_objects_query.subquery()
         join_condition = model.id == join_target.c.id
         joins = [(join_target, join_condition)]
-        order = "weight, {model._inflector.table_plural}_id".format(
-            model=model)
+        order = join_target.c.weight
         return joins, order
 
       def by_ca():

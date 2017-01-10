@@ -364,9 +364,15 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
           headers={"Content-Type": "application/json"},
       )
 
+      # our sorted results are only unstably sorted. As such we verify that
+      # weights match and not actual object ids
+      obj_weight = {so.id: so.weight for so in similar_objects}
+      response_ids = json.loads(response.data)[0]["Assessment"]["ids"]
+      response_weights = [obj_weight[rid] for rid in response_ids]
+
       self.assertListEqual(
-          json.loads(response.data)[0]["Assessment"]["ids"],
-          [obj.id for obj in sorted_similar]
+          response_weights,
+          [obj.weight for obj in sorted_similar],
       )
 
   def test_empty_similar_results(self):
