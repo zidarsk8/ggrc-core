@@ -96,15 +96,36 @@ select {
 
 // buttons
 .btn-info-pin-header {
+
   margin-right: 10px;
   &.undo {
     margin-right: 10px;
     margin-top: 6px;
+    &.btn-link {
+        margin:0 ;
+        background: transparent;
+        box-shadow: none;
+        color: $link;
+
+        &:hover {
+          color: $darkBlue;
+        }
+      }
   }
   .sticky-info-panel & {
     margin-top: 30px;
     &.undo {
       margin-top: 22px;
+      &.btn-link {
+        margin-top: 30px;
+        background: transparent;
+        box-shadow: none;
+        color: $link;
+
+        &:hover {
+          color: $darkBlue;
+        }
+      }
     }
   }
 }
