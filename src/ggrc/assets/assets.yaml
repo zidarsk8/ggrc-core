@@ -153,6 +153,7 @@ dashboard-js-files:
   - components/comment/comment-input.js
   - components/assessment/controls-toolbar/controls-toolbar.js
   - components/mapped-objects/mapped-objects.js
+  - components/object-state-toolbar/object-state-toolbar.js
   - components/object-list/object-list.js
   - components/object-list/object-list-item.js
   - components/object-popover/object-popover.js
@@ -230,6 +231,7 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/object-state-toolbar/object-state-toolbar.mustache
   - components/snapshot-loader/snapshot-loader.mustache
   - components/snapshot-loader/snapshot-loader-item.mustache
   - components/object-selection/object-selection-item.mustache
@@ -346,7 +348,6 @@ dashboard-js-template-files:
   - base_templates/mapping_tree_view.mustache
   - base_templates/assignable_extended_info.mustache
   - mixins/assignable.mustache
-  - mixins/stateful.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache

@@ -11,12 +11,12 @@
   can.Component.extend({
     tag: 'assessment-controls-toolbar',
     template: tpl,
-    scope: {
+    viewModel: {
       instance: null,
       modal: {
         open: false
       },
-      showRelatedResponses: function (ctx, ev, el) {
+      showRelatedResponses: function () {
         this.attr('modal.open', true);
       }
     }

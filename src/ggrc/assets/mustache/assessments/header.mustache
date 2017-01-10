@@ -93,7 +93,9 @@ Copyright (C) 2017 Google Inc.
                     </ul>
                 </div>
             </div>
-          {{> '/static/mustache/mixins/stateful.mustache' }}
+          {{#is_allowed 'update' instance context='for'}}
+            <object-state-toolbar instance="instance"></object-state-toolbar>
+          {{/is_allowed}}
         </div>
     </div>
 </div>

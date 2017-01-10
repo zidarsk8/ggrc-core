@@ -234,7 +234,7 @@
           this.attr('_mandatory_value_msg'),
           this.attr('_mandatory_attachment_msg'),
           this.attr('_mandatory_comment_msg')
-        ]).join('; <br />') || null
+        ]).join('; <br />') || false
       );
     },
     form_preload: function (newObjectForm) {
