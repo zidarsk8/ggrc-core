@@ -22,14 +22,14 @@ target_metadata = db.metadata
 
 
 def include_symbol(tablename, schema=None):
-    """Exclude some tables from consideration by alembic's 'autogenerate'.
-    """
-    # Exclude `*_alembic_version` tables
-    if re.match(r'.*_alembic_version$', tablename):
-        return False
+  """Exclude some tables from consideration by alembic's 'autogenerate'.
+  """
+  # Exclude `*_alembic_version` tables
+  if re.match(r'.*_alembic_version$', tablename):
+    return False
 
-    # If the tablename didn't match any exclusion cases, return True
-    return True
+  # If the tablename didn't match any exclusion cases, return True
+  return True
 
 
 def run_migrations_offline():
