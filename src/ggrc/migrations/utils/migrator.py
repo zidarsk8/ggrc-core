@@ -4,11 +4,11 @@
 Migrator Utility Module.
 
 Provides default user for migrations (migrator).  It is useful in migrations,
-where user account is needed, but it is impossible to detect which user accout
+where user account is needed, but it is impossible to detect which user account
 should be used.
 
 It uses ``MIGRATOR`` value from the ``ggrc.settings`` module. The value should
-be user name in format ``User Name <email@example.com>``.
+be user's name and email in format ``User Name <email@example.com>``.
 
 """
 
@@ -16,20 +16,17 @@ from email.utils import parseaddr
 
 # pylint: disable=invalid-name,
 import sqlalchemy as sa
-from alembic import op
 
 from ggrc import settings
+from ggrc.models.person import Person
 
 
-def ensure_user():
+def get_migration_user_id(conn):
+  """Get or create migrator account and return its ID.
+
+  If specified migrator doesn't exists a new one will be created using values
+  from ``ggrc.settings.MIGRATOR``.
   """
-  Ensure migrator account exists and return its ID.
-
-  If migrator doesn't exists, a new one will be created using info from
-  ``ggrc.settings.MIGRATOR``.
-
-  """
-  conn = op.get_bind()
   meta = sa.MetaData(bind=conn)
   people = sa.Table('people', meta, autoload=True)
 
@@ -54,3 +51,9 @@ def ensure_user():
       )
   )
   return result.inserted_primary_key[0]
+
+
+def get_migration_user(connection):
+  """Return migration user object"""
+  migrator_id = get_migration_user_id(connection).id
+  return Person.query.get(migrator_id)
