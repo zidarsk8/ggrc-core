@@ -287,7 +287,7 @@
       /*
        * Set default dropdown type on init
        */
-      inserted: function () {
+      init: function () {
         var types = this.scope.attr('types');
         if (!this.scope.attr('selected.type')) {
           this.scope.attr('selected.type', _.first(types).attr('type'));
