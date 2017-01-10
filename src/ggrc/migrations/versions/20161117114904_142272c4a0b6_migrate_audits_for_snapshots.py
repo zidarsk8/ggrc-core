@@ -13,9 +13,7 @@ from logging import getLogger
 
 from alembic import op
 
-from sqlalchemy.sql import and_
 from sqlalchemy.sql import column
-from sqlalchemy.sql import func
 from sqlalchemy.sql import select
 from sqlalchemy.sql import table
 from sqlalchemy.sql import tuple_
@@ -31,6 +29,7 @@ from ggrc.migrations.utils import get_relationship_cache
 from ggrc.migrations.utils import get_revisions
 from ggrc.migrations.utils import insert_payloads
 from ggrc.migrations.utils import Stub
+from ggrc.migrations.utils.validation import validate_database
 
 from ggrc.migrations.utils.migrator import get_migration_user_id
 
@@ -164,68 +163,6 @@ def process_audits(connection, user_id, caches, audits):
           relationships_payload)
 
 
-def validate_database(connection):
-  """Validate that there are no invalid objects in the database before performing
-  any operations"""
-  # pylint: disable=too-many-locals
-  audits_more = []
-  ghost_objects = []
-
-  tables = [
-      ("Assessment", assessments_table),
-      ("Issue", issues_table),
-  ]
-
-  for (klass_name, table_) in tables:
-    sql_base_left = select([
-        func.count(relationships_table.c.id).label("relcount"),
-        relationships_table.c.source_id.label("object_id"),
-    ]).where(
-        and_(
-            relationships_table.c.source_type == klass_name,
-            relationships_table.c.destination_type == "Audit"
-        )
-    ).group_by(relationships_table.c.source_id)
-
-    sql_base_right = select([
-        func.count(relationships_table.c.id).label("relcount"),
-        relationships_table.c.destination_id.label("object_id"),
-    ]).where(
-        and_(
-            relationships_table.c.destination_type == klass_name,
-            relationships_table.c.source_type == "Audit"
-        )
-    ).group_by(relationships_table.c.destination_id)
-
-    sql_left_more = sql_base_left.having(sql_base_left.c.relcount > 1)
-    sql_right_more = sql_base_right.having(sql_base_right.c.relcount > 1)
-    sql_left_one = sql_base_left.having(sql_base_left.c.relcount == 1)
-    sql_right_one = sql_base_right.having(sql_base_right.c.relcount == 1)
-
-    result_left_more = connection.execute(sql_left_more).fetchall()
-    result_right_more = connection.execute(sql_right_more).fetchall()
-    result_more = result_left_more + result_right_more
-
-    result_left_one = connection.execute(sql_left_one).fetchall()
-    result_right_one = connection.execute(sql_right_one).fetchall()
-    result_one = result_left_one + result_right_one
-
-    all_object_ids = {
-        x.id for x in connection.execute(select([table_.c.id])).fetchall()
-    }
-    to_audit_mapped_ids = {
-        x.object_id for x in result_more + result_one
-    }
-
-    result_zero = all_object_ids - to_audit_mapped_ids
-
-    if result_more:
-      audits_more += [(klass_name, result_more)]
-    if result_zero:
-      ghost_objects += [(klass_name, result_zero)]
-  return audits_more, ghost_objects
-
-
 def upgrade():
   """Migrate audit-related data and concepts to audit snapshots"""
   # pylint: disable=too-many-locals
@@ -236,19 +173,18 @@ def upgrade():
 
   if audits_more or ghost_objects:
     if audits_more:
-      for klass_name, result in audits_more:
-        ids = [id_ for _, id_ in result]
+      for klass_name, ids in audits_more.items():
         logger.warning(
             "The following %s have more than one Audit: %s",
             klass_name,
             ",".join(map(str, ids))  # pylint: disable=bad-builtin
         )
     if ghost_objects:
-      for klass_name, result in ghost_objects:
+      for klass_name, ids in ghost_objects.items():
         logger.warning(
             "The following %s have no Audits mapped to them: %s",
             klass_name,
-            ",".join(map(str, result))  # pylint: disable=bad-builtin
+            ",".join(map(str, ids))  # pylint: disable=bad-builtin
         )
     raise Exception("Cannot perform migration. Check logger warnings.")
 
