@@ -55,16 +55,16 @@ def _fix_type_revisions(event, type_, obj_rev_map):
                    "skipped", type_)
     return
 
-  ids = set(obj_rev_map.keys())
   chunk = 1000
   all_objects = model.eager_query().order_by(model.id)
   all_objects_count = model.query.count()
 
   for i in range(all_objects_count / chunk + 1):
     objects_chunk = all_objects.limit(chunk).offset(i * chunk)
-    chunk_with_revisions = [obj for obj in objects_chunk if obj.id in ids]
+    chunk_with_revisions = [
+        obj for obj in objects_chunk if obj.id in obj_rev_map]
     chunk_without_revisions = [
-        obj for obj in objects_chunk if obj.id not in ids]
+        obj for obj in objects_chunk if obj.id not in obj_rev_map]
 
     # 1. Update the object's latest revision using the value of the up to date
     # log_json function
