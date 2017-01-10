@@ -11,7 +11,12 @@
     //  were already created with content, we just used <content> instead of making
     //  new view template files.
     template: '<content/>',
-    scope: {},
+    viewModel: {
+      activeModel: null,
+      modelsList: [],
+      selectedChildModels: [],
+      onChildModelsChange: null
+    },
     events: {
       init: function (element, options) {
         this.scope.attr('controller', this);
@@ -26,28 +31,37 @@
         ev.stopPropagation();
       },
 
-      update_check_boxes: function (el, ev) {
+      updateCheckBoxes: function (el, ev) {
         // change checkboxes based on the model_type
         // get the closest tree_view controller, change the options to reload the checkboxes.
         var i;
         var selectEl = this.element.find('.object-type-selector');
         var modelName = selectEl.val();
-        var secEl = selectEl.closest('section');
-        var treeViewEl = secEl.find('.cms_controllers_tree_view');
-        var control = treeViewEl.control();
-        var displayList = GGRC.tree_view.sub_tree_for[modelName].display_list;
-        var selectModelList = GGRC.tree_view.sub_tree_for[modelName].model_list;
+        var displayList;
+        var selectModelList;
         var obj;
+
+        if (!modelName) {
+          modelName = this.viewModel.activeModel;
+          selectEl.val(modelName);
+        } else {
+          this.viewModel.attr('activeModel', modelName);
+        }
+
+        displayList = GGRC.tree_view.sub_tree_for[modelName].display_list;
+        selectModelList = GGRC.tree_view.sub_tree_for[modelName].model_list;
 
         // set up display status for UI
         for (i = 0; i < selectModelList.length; i++) {
           obj = selectModelList[i];
           obj.display_status = displayList.indexOf(obj.model_name) !== -1;
         }
-        control.options.attr('selected_child_tree_model_list', selectModelList);
+        this.viewModel.attr('selectedChildModels', selectModelList.slice(0));
       },
 
-      'select.object-type-selector change': 'update_check_boxes',
+      'select.object-type-selector change': 'updateCheckBoxes',
+
+      '.tview-type-toggle click': 'updateCheckBoxes',
 
       'a.select-all click': function (el, ev) {
         var $check = this.element.find('.model-checkbox');
@@ -65,6 +79,20 @@
         this.scope.$rootEl.removeClass('open');
         this.scope.$rootEl.parents('.dropdown-menu')
           .parent().removeClass('open');
+      },
+
+      '.set-display-object-list click': function (ev) {
+        var modelName = this.viewModel.activeModel;
+        var $check = this.element.find('.model-checkbox');
+        var $selected = $check.filter(':checked');
+        var selectedItems = [];
+
+        // save the list
+        $selected.each(function (index) {
+          selectedItems.push(this.value);
+        });
+
+        this.viewModel.onChildModelsChange(modelName, selectedItems);
       }
     }
   });

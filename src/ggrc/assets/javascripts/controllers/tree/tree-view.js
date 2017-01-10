@@ -331,11 +331,17 @@
     },
 
     init_view: function () {
+      var self = this;
       var dfds = [];
+      var optionsDfd;
 
       if (this.options.header_view && this.options.show_header) {
+        optionsDfd = $.when(this.options).then(function (options) {
+          options.onChildModelsChange = self.set_tree_display_list.bind(self);
+          return options;
+        });
         dfds.push(
-          can.view(this.options.header_view, $.when(this.options)).then(
+          can.view(this.options.header_view, optionsDfd).then(
             this._ifNotRemoved(function (frag) {
               this.element.before(frag);
               // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
@@ -359,11 +365,6 @@
               can.bind.call(this.element.parent().find('.set-tree-attrs'),
                 'click',
                 this.set_tree_attrs.bind(this)
-              );
-              can.bind.call(this.element.parent()
-                  .find('.set-display-object-list'),
-                'click',
-                this.set_tree_display_list.bind(this)
               );
             }.bind(this))));
       }
@@ -1108,23 +1109,17 @@
         'click', this.sort.bind(this));
     },
 
-    set_tree_display_list: function (ev) {
-      var modelName; // = this.options.model.model_singular,
-      var $check = this.element.parent().find('.model-checkbox');
-      var $selected = $check.filter(':checked');
-      var selectedItems = [];
+    set_tree_display_list: function (modelName, selectedItems) {
       var i;
       var el;
       var openItems;
       var control;
       var tviewEl;
 
-      modelName = this.element.parent().find('.object-type-selector').val();
+      if (!modelName) {
+        return;
+      }
 
-      // save the list
-      $selected.each(function (index) {
-        selectedItems.push(this.value);
-      });
       // update GGRC.tree_view
       GGRC.tree_view.sub_tree_for.attr(modelName + '.display_list',
         selectedItems);
