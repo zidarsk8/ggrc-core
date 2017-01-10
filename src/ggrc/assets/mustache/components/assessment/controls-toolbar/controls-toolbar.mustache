@@ -3,7 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <button class="btn btn-small btn-draft btn-extra-gray" can-click="showRelatedResponses" title="Show Prior Audit Responses">Prior Audit Responses</button>
- {{> '/static/mustache/mixins/stateful.mustache' }}
+{{#is_allowed 'update' instance context='for'}}
+    <object-state-toolbar instance="instance"></object-state-toolbar>
+{{/is_allowed}}
 <simple-modal instance="instance" modal-title="Prior Audit Responses" state="modal" extra-css-class="related-assessments">
     {{> '/static/mustache/assessments/related-assessments.mustache' }}
 </simple-modal>
