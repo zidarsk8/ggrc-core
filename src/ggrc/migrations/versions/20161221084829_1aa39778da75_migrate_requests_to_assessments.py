@@ -293,31 +293,58 @@ def upgrade():
       "Requester": "Creator",
       "Assignee": "Assessor",
   }
-  for attr_id, assignees in connection.execute("""
-      select id, attr_value from relationship_attrs
-      where attr_name = 'AssigneeType'
-  """):
+
+  assignee_type_query = connection.execute("""
+      SELECT id, relationship_id, attr_name, attr_value
+      FROM relationship_attrs
+      WHERE attr_name = 'AssigneeType'
+  """)
+
+  attr_delete_ids = []
+  attr_update_str = []
+  attr_update_val = {}
+
+  for i, attr in enumerate(assignee_type_query):
     # Split the assignees csv; replace every Request-specific assignee with its
     # Assessment variant; discard empty assignees
     new_assignees = ",".join(sorted({
         assignee_translation.get(assignee, assignee)
-        for assignee in (assignees or "").split(",")
+        for assignee in (attr.attr_value or "").split(",")
         if assignee
     }))
     if not new_assignees:
-      connection.execute(text("""
-          delete from relationship_attrs
-          where id = :id
-      """), id=attr_id)
-    elif new_assignees != assignees:
-      connection.execute(text("""
-          update relationship_attrs
-          set attr_value = :attr_value
-          where id = :id
-      """), id=attr_id, attr_value=new_assignees)
+      attr_delete_ids.append(attr.id)
+    elif new_assignees != attr.attr_value:
+      attr_update_str.append("(:id{i}, :relationship_id{i}, :attr_name{i}, "
+                             ":attr_value{i})".format(i=i))
+      attr_update_val["id{}".format(i)] = attr.id
+      attr_update_val["relationship_id{}".format(i)] = attr.relationship_id
+      attr_update_val["attr_name{}".format(i)] = attr.attr_name
+      attr_update_val["attr_value{}".format(i)] = new_assignees
     else:
       # same set of assignees, no action required
       pass
+
+  if attr_delete_ids:
+    connection.execute(
+        "delete from relationship_attrs where id in ({})".format(
+            ",".join(str(id_) for id_ in attr_delete_ids)
+        )
+    )
+  if attr_update_val:
+    connection.execute(text(
+        """
+        REPLACE INTO relationship_attrs (
+            id,
+            relationship_id,
+            attr_name,
+            attr_value
+        )
+        VALUES
+        {}
+        """.format(", ".join(attr_update_str))),
+        **attr_update_val
+    )
 
   # The following block logically belongs to ggrc_workflows but is included
   # here to ensure that it is executed before dropping the Requests table.
