@@ -327,13 +327,13 @@ def upgrade():
 
   if attr_delete_ids:
     connection.execute(
-      "delete from relationship_attrs where id in ({})".format(
-        ",".join(str(id_) for id_ in attr_delete_ids)
-      )
+        "delete from relationship_attrs where id in ({})".format(
+            ",".join(str(id_) for id_ in attr_delete_ids)
+        )
     )
   if attr_update_val:
     connection.execute(text(
-      """
+        """
         REPLACE INTO relationship_attrs (
             id,
             relationship_id,
@@ -342,8 +342,8 @@ def upgrade():
         )
         VALUES
         {}
-      """.format(", ".join(attr_update_str))),
-      **attr_update_val
+        """.format(", ".join(attr_update_str))),
+        **attr_update_val
     )
 
   # The following block logically belongs to ggrc_workflows but is included
