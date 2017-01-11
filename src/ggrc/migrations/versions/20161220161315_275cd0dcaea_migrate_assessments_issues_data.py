@@ -23,7 +23,6 @@ from ggrc.models.assessment import Assessment
 from ggrc.models.event import Event
 from ggrc.models.request import Request
 from ggrc.models.issue import Issue
-from ggrc.models.relationship import Relationship
 from ggrc.models.revision import Revision
 from ggrc.models.snapshot import Snapshot
 
@@ -48,7 +47,6 @@ requests_table = Request.__table__
 issues_table = Issue.__table__
 snapshots_table = Snapshot.__table__
 revisions_table = Revision.__table__
-relationships_table = Relationship.__table__
 events_table = Event.__table__
 
 audits_table = table(
@@ -245,10 +243,7 @@ def link_snapshots_to_objects(connection, user_id,
                 object_klass, object_.id, obj_.type, obj_.id
             )
 
-  if relationships_payload:
-    connection.execute(
-        relationships_table.insert().prefix_with("IGNORE"),
-        relationships_payload)
+  insert_payloads(connection, relationships=relationships_payload)
 
 
 def get_scope_snapshots(connection):

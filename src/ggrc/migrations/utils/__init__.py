@@ -125,15 +125,44 @@ def get_revisions(connection, objects):
   return revisions_
 
 
-def insert_payloads(connection, snapshots_payload, relationships_payload):
+def insert_payloads(connection, snapshots=None, relationships=None):
   """Bulk insert snapshot and relationship payloads and create applicable
   revisions."""
+  # pylint: disable=not-a-mapping
+  # snap and rel variables show a false not a mapping warning
 
-  if snapshots_payload:
-    connection.execute(
-        snapshots_table.insert().prefix_with("IGNORE"), snapshots_payload)
+  if snapshots:
+    sql = """INSERT IGNORE INTO snapshots (
+          parent_id,
+          parent_type,
+          child_id,
+          child_type,
+          revision_id,
+          modified_by_id,
+          context_id,
+          created_at,
+          updated_at
+        )
+        VALUES """
+    value_ = ("({parent_id}, '{parent_type}', {child_id}, '{child_type}', "
+              "{revision_id}, {modified_by_id}, {context_id}, now(), now())")
+    sql += ','.join(value_.format(**snap) for snap in snapshots)
+    connection.execute(sql)
 
-  if relationships_payload:
-    connection.execute(
-        relationships_table.insert().prefix_with("IGNORE"),
-        relationships_payload)
+  if relationships:
+    sql = """INSERT IGNORE INTO relationships (
+          source_id,
+          source_type,
+          destination_id,
+          destination_type,
+          modified_by_id,
+          context_id,
+          created_at,
+          updated_at
+        )
+        VALUES """
+    value_ = ("({source_id}, '{source_type}', {destination_id}, "
+              "'{destination_type}', {modified_by_id}, {context_id}, now(), "
+              "now())")
+    sql += ','.join(value_.format(**rel) for rel in relationships)
+    connection.execute(sql)

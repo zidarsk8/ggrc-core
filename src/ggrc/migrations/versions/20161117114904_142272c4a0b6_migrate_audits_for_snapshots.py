@@ -19,7 +19,6 @@ from sqlalchemy.sql import table
 from sqlalchemy.sql import tuple_
 
 from ggrc.models.event import Event
-from ggrc.models.relationship import Relationship
 from ggrc.models.revision import Revision
 from ggrc.models.snapshot import Snapshot
 from ggrc.models.assessment import Assessment
@@ -43,7 +42,6 @@ logger = getLogger(__name__)  # pylint: disable=invalid-name
 revision = '142272c4a0b6'
 down_revision = '579239d161e1'
 
-relationships_table = Relationship.__table__
 events_table = Event.__table__
 snapshots_table = Snapshot.__table__
 revisions_table = Revision.__table__
@@ -157,10 +155,7 @@ def process_audits(connection, user_id, caches, audits):
           "context_id": snapshot_cache[snapshot][1],
       }]
 
-    if relationships_payload:
-      connection.execute(
-          relationships_table.insert().prefix_with("IGNORE"),
-          relationships_payload)
+    insert_payloads(connection, relationships=relationships_payload)
 
 
 def upgrade():
