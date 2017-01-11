@@ -300,6 +300,8 @@ def upgrade():
       WHERE attr_name = 'AssigneeType'
   """)
 
+  attr_delete_ids = []
+
   for attr in assignee_type_query:
     # Split the assignees csv; replace every Request-specific assignee with its
     # Assessment variant; discard empty assignees
@@ -309,10 +311,7 @@ def upgrade():
         if assignee
     }))
     if not new_assignees:
-      connection.execute(text("""
-          delete from relationship_attrs
-          where id = :id
-      """), id=attr.id)
+      attr_delete_ids.append(attr.id)
     elif new_assignees != attr.attr_value:
       connection.execute(text("""
           update relationship_attrs
@@ -322,6 +321,13 @@ def upgrade():
     else:
       # same set of assignees, no action required
       pass
+
+  if attr_delete_ids:
+    connection.execute(
+      "delete from relationship_attrs where id in ({})".format(
+        ",".join(str(id_) for id_ in attr_delete_ids)
+      )
+    )
 
   # The following block logically belongs to ggrc_workflows but is included
   # here to ensure that it is executed before dropping the Requests table.
