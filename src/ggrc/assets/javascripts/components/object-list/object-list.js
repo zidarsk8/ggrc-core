@@ -20,6 +20,9 @@
       isLoading: false,
       selectedItem: {},
       items: [],
+      isLoadingInProgress: function () {
+        return this.attr('isLoading');
+      },
       select: function (ctx, el) {
         this.attr('selectedItem.el', el);
         this.attr('selectedItem.data', ctx.instance);
