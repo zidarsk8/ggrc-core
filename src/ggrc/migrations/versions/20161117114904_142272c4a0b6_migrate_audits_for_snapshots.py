@@ -211,8 +211,7 @@ def upgrade():
           ["{obj.type}-{obj.id}".format(obj=obj)
            for obj in objects_missing_revision])
       logger.warning(
-          "The following objects are missing revisions: %s", missing)
-      raise Exception("There are still objects with missing revisions!")
+          "Phantom objects mapped to program or audit: %s", missing)
 
     caches = {
         "program_contexts": program_contexts,
