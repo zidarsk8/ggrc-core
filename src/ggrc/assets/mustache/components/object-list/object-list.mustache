@@ -2,7 +2,7 @@
     Copyright (C) 2017 Google Inc., authors, and contributors
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<spinner toggle="isLoading" extra-css-class="{{spinnerCss}}" class="spinner-wrapper {{#isLoading}}active{{/isLoading}}"></spinner>
+<spinner toggle="isLoading" extra-css-class="{{spinnerCss}}" class="spinner-wrapper {{#if isLoadingInProgress}}active{{/if}}"></spinner>
 {{#each items}}
   <object-list-item selected-item="selectedItem" index="{{@index}}" can-click="select">
     <content></content>
