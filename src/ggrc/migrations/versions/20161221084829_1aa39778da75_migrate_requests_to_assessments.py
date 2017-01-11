@@ -301,8 +301,10 @@ def upgrade():
   """)
 
   attr_delete_ids = []
+  attr_update_str = []
+  attr_update_val = {}
 
-  for attr in assignee_type_query:
+  for i, attr in enumerate(assignee_type_query):
     # Split the assignees csv; replace every Request-specific assignee with its
     # Assessment variant; discard empty assignees
     new_assignees = ",".join(sorted({
@@ -313,11 +315,12 @@ def upgrade():
     if not new_assignees:
       attr_delete_ids.append(attr.id)
     elif new_assignees != attr.attr_value:
-      connection.execute(text("""
-          update relationship_attrs
-          set attr_value = :attr_value
-          where id = :id
-      """), id=attr.id, attr_value=new_assignees)
+      attr_update_str.append("(:id{i}, :relationship_id{i}, :attr_name{i}, "
+                             ":attr_value{i})".format(i=i))
+      attr_update_val["id{}".format(i)] = attr.id
+      attr_update_val["relationship_id{}".format(i)] = attr.relationship_id
+      attr_update_val["attr_name{}".format(i)] = attr.attr_name
+      attr_update_val["attr_value{}".format(i)] = new_assignees
     else:
       # same set of assignees, no action required
       pass
@@ -327,6 +330,20 @@ def upgrade():
       "delete from relationship_attrs where id in ({})".format(
         ",".join(str(id_) for id_ in attr_delete_ids)
       )
+    )
+  if attr_update_val:
+    connection.execute(text(
+      """
+        REPLACE INTO relationship_attrs (
+            id,
+            relationship_id,
+            attr_name,
+            attr_value
+        )
+        VALUES
+        {}
+      """.format(", ".join(attr_update_str))),
+      **attr_update_val
     )
 
   # The following block logically belongs to ggrc_workflows but is included
