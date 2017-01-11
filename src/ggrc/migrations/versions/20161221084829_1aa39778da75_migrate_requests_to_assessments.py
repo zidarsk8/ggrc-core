@@ -295,29 +295,30 @@ def upgrade():
   }
 
   assignee_type_query = connection.execute("""
-      select id, attr_value from relationship_attrs
-      where attr_name = 'AssigneeType'
+      SELECT id, relationship_id, attr_name, attr_value
+      FROM relationship_attrs
+      WHERE attr_name = 'AssigneeType'
   """)
 
-  for attr_id, assignees in assignee_type_query:
+  for attr in assignee_type_query:
     # Split the assignees csv; replace every Request-specific assignee with its
     # Assessment variant; discard empty assignees
     new_assignees = ",".join(sorted({
         assignee_translation.get(assignee, assignee)
-        for assignee in (assignees or "").split(",")
+        for assignee in (attr.attr_value or "").split(",")
         if assignee
     }))
     if not new_assignees:
       connection.execute(text("""
           delete from relationship_attrs
           where id = :id
-      """), id=attr_id)
-    elif new_assignees != assignees:
+      """), id=attr.id)
+    elif new_assignees != attr.attr_value:
       connection.execute(text("""
           update relationship_attrs
           set attr_value = :attr_value
           where id = :id
-      """), id=attr_id, attr_value=new_assignees)
+      """), id=attr.id, attr_value=new_assignees)
     else:
       # same set of assignees, no action required
       pass
