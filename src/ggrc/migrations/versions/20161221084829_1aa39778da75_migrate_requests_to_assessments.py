@@ -293,10 +293,13 @@ def upgrade():
       "Requester": "Creator",
       "Assignee": "Assessor",
   }
-  for attr_id, assignees in connection.execute("""
+
+  assignee_type_query = connection.execute("""
       select id, attr_value from relationship_attrs
       where attr_name = 'AssigneeType'
-  """):
+  """)
+
+  for attr_id, assignees in assignee_type_query:
     # Split the assignees csv; replace every Request-specific assignee with its
     # Assessment variant; discard empty assignees
     new_assignees = ",".join(sorted({
