@@ -13,6 +13,7 @@ permissions = {
         "Assessment",
         "Issue",
         "Audit",
+        "Snapshot",
         "AuditObject",
         "Meeting",
         "ObjectControl",
@@ -25,6 +26,7 @@ permissions = {
         "Context",
     ],
     "create": [
+        "Snapshot",
         "Request",
         "Comment",
         "Assessment",
@@ -58,6 +60,7 @@ permissions = {
             },
             "condition": "contains"
         },
+        "Snapshot",
         "Request",
         "Audit",
         "AuditObject",
