@@ -8,6 +8,7 @@ description = """
 permissions = {
     "read": [
         "Audit",
+        "Snapshot",
         "Categorization",
         "Category",
         "Comment",
@@ -64,6 +65,7 @@ permissions = {
     ],
     "create": [
         "Audit",
+        "Snapshot",
         "Workflow",
         "Categorization",
         "Category",
@@ -122,6 +124,7 @@ permissions = {
     ],
     "update": [
         "Audit",
+        "Snapshot",
         "Workflow",
         "Categorization",
         "Category",
