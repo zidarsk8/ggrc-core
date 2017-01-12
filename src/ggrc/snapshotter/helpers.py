@@ -173,10 +173,23 @@ def create_snapshot_dict(pair, revision_id, user_id, context_id):
 def create_snapshot_revision_dict(action, event_id, snapshot,
                                   user_id, context_id):
   """Create dictionary representation of snapshot revision"""
+  revision_content = snapshot._asdict()
+  metadata = {
+      "display_name": "Snapshot:{} of {}:{} in {}:{}".format(
+          snapshot.id,
+          snapshot.child_type,
+          snapshot.child_id,
+          snapshot.parent_type,
+          snapshot.parent_id
+      ),
+      "modified_by": create_json_stub("Person", context_id, user_id),
+  }
+  revision_content.update(metadata)
+
   return {
       "action": action,
       "event_id": event_id,
-      "content": snapshot._asdict(),
+      "content": revision_content,
       "modified_by_id": user_id,
       "resource_id": snapshot[0],
       "resource_type": "Snapshot",
@@ -199,14 +212,29 @@ def create_relationship_dict(source, destination, user_id, context_id):
 def create_relationship_revision_dict(action, event_id, relationship,  # noqa # pylint: disable=invalid-name
                                       user_id, context_id):
   """Create dictionary representation of relationship revision"""
+  revision_content = relationship._asdict()
+  metadata = {
+      "display_name": "{}:{} <-> {}:{}".format(
+          relationship.source_type,
+          relationship.source_id,
+          relationship.destination_type,
+          relationship.destination_id
+      ),
+      "modified_by": create_json_stub("Person", context_id, user_id),
+      "automapping_id": None,
+      "attrs": {}
+  }
+  revision_content.update(metadata)
+
   return {
       "action": action,
       "event_id": event_id,
-      "content": relationship._asdict(),
+      "content": revision_content,
       "modified_by_id": user_id,
       "resource_id": relationship.id,
       "resource_type": "Relationship",
-      "context_id": context_id
+      "context_id": context_id,
+      "status": None,
   }
 
 
