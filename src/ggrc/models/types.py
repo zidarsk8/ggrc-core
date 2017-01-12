@@ -13,6 +13,32 @@ from ggrc import utils
 from ggrc.models import exceptions
 
 
+class LongJsonType(types.TypeDecorator):
+  # pylint: disable=W0223
+  """Custom Long Json data type.
+
+  Custom type for storing Json objects in our database as serialized text.
+  The Limit for the serialized Json is the same as the database text column
+  limit (2^32).
+  """
+  MAX_TEXT_LENGTH = 4294967295
+  impl = types.Text
+
+  def process_result_value(self, value, dialect):
+    if value is not None:
+      value = json.loads(value)
+    return value
+
+  def process_bind_param(self, value, dialect):
+    if value is None or isinstance(value, basestring):
+      pass
+    else:
+      value = utils.as_json(value)
+      if len(value.encode('utf-8')) > self.MAX_TEXT_LENGTH:
+        raise exceptions.ValidationError("Log record content too long")
+    return value
+
+
 class JsonType(types.TypeDecorator):
   # pylint: disable=W0223
   """ Custom Json data type
