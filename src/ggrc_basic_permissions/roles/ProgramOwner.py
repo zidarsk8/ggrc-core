@@ -27,6 +27,7 @@ permissions = {
         "Relationship",
         "UserRole",
         "Audit",
+        "Snapshot",
     ],
     "view_object_page": [
         "__GGRC_ALL__"
