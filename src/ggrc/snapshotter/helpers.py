@@ -144,6 +144,18 @@ def get_snapshots(objects=None, ids=None):
     return set()
 
 
+def create_json_stub(model_, context_id, object_id):
+  from ggrc.models import all_models
+  return {  # pylint: disable=protected-access
+      "context_id": context_id,
+      "id": object_id,
+      "href": "/api/{}/{}".format(
+          getattr(all_models, model_)._inflector.table_name,
+          object_id),
+      "type": model_,
+  }
+
+
 def create_snapshot_dict(pair, revision_id, user_id, context_id):
   """Create dictionary representation of snapshot"""
   parent, child = pair.to_2tuple()
