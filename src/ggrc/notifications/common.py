@@ -185,6 +185,9 @@ def should_receive(notif, user_data, people_cache):
   """
   force_notif = user_data.get("force_notifications", {}).get(notif.id, False)
   person_id = user_data["user"]["id"]
+  # The person does not exist
+  if person_id == -1:
+    return False
   if person_id in people_cache:
     person = people_cache[person_id]
   else:
