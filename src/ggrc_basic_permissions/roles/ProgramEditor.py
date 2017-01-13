@@ -20,6 +20,7 @@ permissions = {
     ],
     "create": [
         "Audit",
+        "Snapshot",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
@@ -29,6 +30,7 @@ permissions = {
         "__GGRC_ALL__"
     ],
     "update": [
+        "Snapshot",
         "ObjectDocument",
         "ObjectObjective",
         "ObjectPerson",
