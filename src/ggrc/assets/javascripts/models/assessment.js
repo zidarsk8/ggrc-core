@@ -194,7 +194,6 @@
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      this.setIsReadyForRender(false);
     },
     save: function () {
       if (!this.attr('program')) {
@@ -208,9 +207,6 @@
         this.audit.refresh();
       }
     },
-    setIsReadyForRender: function (isReady) {
-      this.attr('isReadyForRender', isReady);
-    },
     updateValidation: function () {
       var values = this.attr('custom_attribute_values');
       var definitions = this.attr('custom_attribute_definitions');
@@ -219,11 +215,9 @@
         comment: [],
         value: []
       };
-      this.setIsReadyForRender(false);
       this.validateValues(definitions, values, errorsList);
       this.setErrorMessages(errorsList);
       this.setAggregatedErrorMessage();
-      this.setIsReadyForRender(true);
     },
     validateValues: function (definitions, values, errorsList) {
       can.each(definitions, function (cad) {
