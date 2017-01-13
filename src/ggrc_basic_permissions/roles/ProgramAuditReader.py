@@ -8,6 +8,7 @@ description = """
   """
 permissions = {
     "read": [
+        "Snapshot",
         "Request",
         "Comment",
         "Assessment",

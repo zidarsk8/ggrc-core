@@ -22,6 +22,7 @@
         </p>
         {{/if}}
       </div>
+      {{#is_allowed 'update' instance context='for'}}
       {{#if snapshot}}
         {{^isLatestRevision}}
           <div class="span12 snapshot">
@@ -40,6 +41,7 @@
           </div>
         {{/isLatestRevision}}
       {{/if}}
+      {{/is_allowed}}
     </div>
   </div>
   <div data-test-id="title_review_0ad9fbaf" class="row-fluid wrap-row">

@@ -42,6 +42,7 @@ TODO: Temporary disabled until snapshot view is added.
                     text="{{get_permalink_for_object instance}}" />
             </li>
 -->
+            {{#is_allowed 'update' instance context='for'}}
             <li>
                 <snapshot-individual-update instance="instance">
                     <a href="javascript://" can-click="updateIt">
@@ -50,6 +51,7 @@ TODO: Temporary disabled until snapshot view is added.
                     </a>
                 </snapshot-individual-update>
             </li>
+            {{/is_allowed}}
 
             <li>
                 <a href="{{instance.originalLink}}">

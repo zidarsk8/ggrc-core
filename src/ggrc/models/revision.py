@@ -6,7 +6,7 @@
 from ggrc import db
 from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
-from ggrc.models.types import JsonType
+from ggrc.models.types import LongJsonType
 
 
 class Revision(Base, db.Model):
@@ -19,7 +19,7 @@ class Revision(Base, db.Model):
   event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
   action = db.Column(db.Enum(u'created', u'modified', u'deleted'),
                      nullable=False)
-  content = db.Column(JsonType, nullable=False)
+  content = db.Column(LongJsonType, nullable=False)
 
   source_type = db.Column(db.String, nullable=True)
   source_id = db.Column(db.Integer, nullable=True)

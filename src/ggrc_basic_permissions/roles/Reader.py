@@ -17,6 +17,7 @@ description = """
 permissions = {
     "read": [
         "Audit",
+        "Snapshot",
         "Categorization",
         "Category",
         "ControlCategory",

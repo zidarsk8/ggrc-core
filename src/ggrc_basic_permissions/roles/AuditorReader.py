@@ -9,6 +9,7 @@ description = """
   """
 permissions = {
     "read": [
+        "Snapshot",
         "Categorization",
         "Category",
         "ControlCategory",
