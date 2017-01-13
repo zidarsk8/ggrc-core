@@ -1,5 +1,5 @@
 Object type,,,,,,,,,,,,,,
-program,code*,title*,description ,Manager,state,primary contact,effective date,stop date,notes,program url,reference url,editor,CA текст,CA список
+program,code*,title*,description ,Manager,state,primary contact,effective date,stop date,notes,program url,reference url,editor,CA текстXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX,CA списокXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ,prog-1,программа F,2,"anze@example.com
 albert@example.com
 tommy@example.com",Draft,anze@example.com,1/6/2016,1/19/2016,3,http://google.com/_1,http://google.com/_2,"anze@example.com
