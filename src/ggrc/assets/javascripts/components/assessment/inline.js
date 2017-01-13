@@ -76,17 +76,10 @@
           this.attr('isEdit', true);
         }.bind(this));   // and do nothing if no confirmation by the user
       },
-      updateValidation: function (value) {
-        if (this.objectValidation) {
-          this.objectValidation.attr('empty', GGRC.Utils.isEmptyCA(value));
-        }
-      },
       onCancel: function (scope) {
         var value = scope.attr('_value');
         scope.attr('isEdit', false);
         scope.attr('context.value', value);
-
-        this.updateValidation(value);
       },
       onSave: function () {
         var oldValue = this.attr('value');
@@ -106,8 +99,6 @@
         this.attr('_value', value);
         this.attr('value', value);
         this.attr('isSaving', true);
-
-        this.updateValidation(value);
       }
     },
     init: function (element, options) {
