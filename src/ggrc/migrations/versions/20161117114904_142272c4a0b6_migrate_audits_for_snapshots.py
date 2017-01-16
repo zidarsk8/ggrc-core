@@ -28,7 +28,8 @@ from ggrc.migrations.utils import get_relationship_cache
 from ggrc.migrations.utils import get_revisions
 from ggrc.migrations.utils import insert_payloads
 from ggrc.migrations.utils import Stub
-from ggrc.migrations.utils.validation import validate_database
+from ggrc.migrations.utils.validation import (
+    validate_assessment_issue_to_audit_relationships)
 
 from ggrc.migrations.utils.migrator import get_migration_user_id
 
@@ -164,7 +165,8 @@ def upgrade():
 
   connection = op.get_bind()
 
-  audits_more, ghost_objects = validate_database(connection)
+  audits_more, ghost_objects = (
+      validate_assessment_issue_to_audit_relationships(connection))
 
   if audits_more or ghost_objects:
     if audits_more:
