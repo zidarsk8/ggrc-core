@@ -58,10 +58,30 @@ def validate():
     # run on an empty database (usually with db_reset)
     return
 
-  multiple_mappings, zero_mappings = validation.validate_database(db.session)
+  assessment_template_validation = (
+      validation.validate_assessment_templates(db.session))
+
+  assessment_relationships_validation = (
+      validation.validate_assessment_relationships(db.session))
+
+  request_relationships_validation = (
+      validation.validate_request_relationships(db.session))
+
+  issue_relationships_validation = (
+      validation.validate_issue_relationships(db.session))
+
+  multiple_mappings, zero_mappings = (
+      validation.validate_assessment_issue_to_audit_relationships(db.session))
 
   all_bad_ids = defaultdict(list)
-  if multiple_mappings or zero_mappings:
+  validations = [
+      multiple_mappings,
+      zero_mappings,
+      assessment_template_validation,
+      request_relationships_validation,
+      issue_relationships_validation
+  ]
+  if any(validations):
     for klass_name, ids in multiple_mappings.items():
       all_bad_ids[klass_name] += ids
       print "Too many Audits mapped to {klass}: {ids}".format(
@@ -75,7 +95,28 @@ def validate():
           ids=",".join(str(id_) for id_ in sorted(ids))
       )
     _generate_delete_csv(all_bad_ids)
-    print "To remove all violating objects import delete_invalid_data.csv."
+    if assessment_template_validation:
+      print (
+          "The following Assessment Templates are mapped "
+          "to multiple Audits: {}".format(
+              ",".join(str(id_)
+                       for id_, _ in assessment_template_validation)
+          ))
+    object_validations = [
+        ("Assessment", assessment_relationships_validation),
+        ("Request", request_relationships_validation),
+        ("Issue", issue_relationships_validation),
+    ]
+    for type_, obj_type_validation in object_validations:
+      if obj_type_validation:
+        print "The following {} have invalid relationships present: {}".format(
+            type_,
+            ",".join(str(id_)
+                     for id_, in obj_type_validation)
+        )
+
+    print ("To remove all violating objects import delete_invalid_data.csv. "
+           "Relationships however will not be removed.")
     print "FAIL"
     sys.exit(1)
   else:
