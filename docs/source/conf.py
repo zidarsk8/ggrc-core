@@ -61,7 +61,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'GGRC'
-copyright = u'2016, Google Inc.'
+copyright = u'2017, Google Inc.'
 author = u'Google Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
