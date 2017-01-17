@@ -407,11 +407,15 @@ class TestWithSimilarityScore(TestCase):
         "filters": {"expression": {}},
     }]
 
-    self.assert400(self.client.post(
+    response = self.client.post(
         "/query",
         data=json.dumps(query),
         headers={"Content-Type": "application/json"},
-    ))
+    )
+    self.assert400(response)
+    self.assertEqual(response.json["message"],
+                     "Can't order by '__similarity__' when no 'similar' "
+                     "filter was applied.")
 
     # filter by similarity in one query and order by similarity in another
     query = [
@@ -432,11 +436,12 @@ class TestWithSimilarityScore(TestCase):
         },
     ]
 
-    self.assert400(self.client.post(
+    response = self.client.post(
         "/query",
         data=json.dumps(query),
         headers={"Content-Type": "application/json"},
-    ))
+    )
+    self.assert400(response)
 
   def test_asmt_issue_similarity(self):
     """Test Issues related to assessments."""
