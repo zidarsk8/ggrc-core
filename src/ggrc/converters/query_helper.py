@@ -481,7 +481,7 @@ class QueryHelper(object):
         if hasattr(flask.g, "similar_objects_query"):
           joins, order = by_similarity()
         else:
-          raise BadQueryException("Can't order by '__similarity__' when no ",
+          raise BadQueryException("Can't order by '__similarity__' when no "
                                   "'similar' filter was applied.")
       else:
         key, _ = self.attr_name_map[model].get(key, (key, None))
