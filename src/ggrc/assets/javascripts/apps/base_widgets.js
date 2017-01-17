@@ -39,10 +39,10 @@
     Contract: _.difference(filteredTypes,
       ['Contract', 'Policy', 'Regulation', 'Standard']),
     Control: filteredTypes,
-    Assessment: _.difference(filteredTypes, ['Assessment']),
+    Assessment: snapshotWidgetsConfig.concat('Audit').sort(),
     DataAsset: filteredTypes,
     Facility: filteredTypes,
-    Issue: filteredTypes,
+    Issue: snapshotWidgetsConfig.concat('Audit').sort(),
     Market: filteredTypes,
     Objective: filteredTypes,
     OrgGroup: filteredTypes,
@@ -64,4 +64,4 @@
 
   GGRC.tree_view = GGRC.tree_view || new can.Map();
   GGRC.tree_view.attr('base_widgets_by_type', baseWidgetsByType);
-})(this.GGRC, this._);
+})(window.GGRC, window._);

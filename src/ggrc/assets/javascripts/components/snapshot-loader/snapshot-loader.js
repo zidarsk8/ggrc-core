@@ -38,6 +38,14 @@
       setItems: function () {
         this.attr('items').replace(this.load());
       },
+      setAdditionalScopeFilter: function () {
+        var id = this.attr('baseInstance.scopeObject.id');
+        var type = this.attr('baseInstance.scopeObject.type');
+        return {
+          type: type,
+          id: id
+        };
+      },
       onSearch: function () {
         this.attr('refreshItems', true);
       },
@@ -59,12 +67,18 @@
             return item;
           });
         // Filter by scope
-        if (this.attr('mapper.useSnapshots') &&
-          Number(this.attr('scopeId'))) {
-          filters.push({
-            type: this.attr('scopeType'),
-            id: Number(this.attr('scopeId'))
-          });
+        if (this.attr('mapper.useSnapshots')) {
+          if (Number(this.attr('scopeId'))) {
+            filters.push({
+              type: this.attr('scopeType'),
+              id: Number(this.attr('scopeId'))
+            });
+          } else {
+            if (this.attr('baseInstance.scopeObject')) {
+              filters.push(this.setAdditionalScopeFilter());
+            }
+            return filters;
+          }
         }
         return filters;
       },

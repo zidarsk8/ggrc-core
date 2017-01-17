@@ -317,7 +317,10 @@
     title_plural: 'Assessment Templates',
     table_singular: 'assessment_template',
     table_plural: 'assessment_templates',
-    mixins: ['mapping-limit'],
+    mixins: [
+      'mapping-limit',
+      'inScopeObjects'
+    ],
     findOne: 'GET /api/assessment_templates/{id}',
     findAll: 'GET /api/assessment_templates',
     update: 'PUT /api/assessment_templates/{id}',
