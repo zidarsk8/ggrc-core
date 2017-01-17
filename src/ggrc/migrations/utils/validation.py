@@ -11,8 +11,90 @@ from ggrc.models.relationship import Relationship
 from ggrc.models.assessment import Assessment
 from ggrc.models.issue import Issue
 
+from ggrc.snapshotter.rules import Types
 
-def validate_database(connection):
+
+def format_types(types):
+  """Format types for SQL statements"""
+  return ["\"{}\"".format(type_) for type_ in types]
+
+
+def validate_assessment_templates(connection):
+  """Check that assessment templates are not mapped to multiple audits"""
+  sql = """
+  SELECT obj.id, count(rel.id) AS rel_count
+  FROM assessment_templates AS obj
+    JOIN relationships AS rel ON (
+      (rel.source_type="AssessmentTemplate" AND
+       rel.source_id=obj.id AND
+       rel.destination_type="Audit") OR
+      (rel.destination_type="AssessmentTemplate" AND
+       rel.destination_id=obj.id AND
+       rel.source_type="Audit"))
+  GROUP BY obj.id
+  HAVING rel_count > 1;
+  """
+  return connection.execute(sql).fetchall()
+
+
+def validate_assessment_relationships(connection):  # noqa # pylint: disable=invalid-name
+  """Check that assessments are not mapped to any non-snapshottable object"""
+  valid_types = format_types(
+      Types.all | {"Audit", "Document", "Person", "Comment"})
+
+  sql = """
+  SELECT DISTINCT obj.id
+  FROM assessments AS obj
+  JOIN relationships AS rel ON (
+    (rel.source_type="Assessment" AND
+     rel.source_id=obj.id AND
+     rel.destination_type NOT IN ({valid_types})) OR
+    (rel.destination_type="Assessment" AND
+     rel.destination_id=obj.id AND
+     rel.source_type NOT IN ({valid_types})))
+  ORDER BY obj.id;
+  """.format(valid_types=", ".join(valid_types))
+  return connection.execute(sql).fetchall()
+
+
+def validate_request_relationships(connection):
+  """Check that requests are not mapped to any non-snapshottable object"""
+  valid_types = format_types(Types.all | {"Document", "Person", "Comment"})
+  sql = """
+  SELECT DISTINCT obj.id
+  FROM requests AS obj
+  JOIN relationships AS rel ON (
+    (rel.source_type="Request" AND rel.source_id=obj.id AND
+     rel.destination_type NOT IN ({valid_types})) OR
+    (rel.destination_type="Request" AND
+     rel.destination_id=obj.id AND
+     rel.source_type NOT IN ({valid_types})))
+  ORDER BY obj.id;
+  """.format(valid_types=",".join(valid_types))
+  return connection.execute(sql).fetchall()
+
+
+def validate_issue_relationships(connection):
+  """Check that issues are not mapped to any non-snapshottable object"""
+  valid_types = format_types(
+      Types.all | {"Audit", "Document", "Person", "Comment"})
+
+  sql = """
+  SELECT DISTINCT obj.id
+  FROM issues AS obj
+  JOIN relationships AS rel ON (
+    (rel.source_type="Issue" AND
+     rel.source_id=obj.id AND
+     rel.destination_type NOT IN ({valid_types})) OR
+    (rel.destination_type="Issue" AND
+     rel.destination_id=obj.id AND
+     rel.source_type NOT IN ({valid_types})))
+  ORDER BY obj.id;
+  """.format(valid_types=",".join(valid_types))
+  return connection.execute(sql).fetchall()
+
+
+def validate_assessment_issue_to_audit_relationships(connection):  # noqa # pylint: disable=invalid-name
   """Check if the database is in a valid state for Audit migrations.
 
   The Audit snapshot migration does not produce correct results if any

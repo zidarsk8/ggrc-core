@@ -876,7 +876,9 @@
      */
     function isSnapshotScope(parentInstance) {
       var instance = parentInstance || GGRC.page_instance();
-      return instance ? instance.is_snapshotable : false;
+      return instance ?
+        instance.is_snapshotable || isInScopeModel(instance.type) :
+        false;
     }
 
     /**
@@ -904,7 +906,8 @@
      * @return {Boolean} True or False
      */
     function isSnapshotRelated(parent, child) {
-      return isSnapshotParent(parent) && isSnapshotModel(child);
+      return isSnapshotParent(parent) && isSnapshotModel(child) ||
+        isInScopeModel(parent) && isSnapshotModel(child);
     }
 
     function isInScopeModel(model) {

@@ -16,7 +16,8 @@
       'contactable',
       'ca_update',
       'timeboxed',
-      'mapping-limit'
+      'mapping-limit',
+      'inScopeObjects'
     ],
     is_custom_attributable: true,
     attributes: {
@@ -53,4 +54,4 @@
       return CMS.Models[this.attr('object_type')];
     }
   });
-})(this.can);
+})(window.can, window.GGRC, window.CMS);

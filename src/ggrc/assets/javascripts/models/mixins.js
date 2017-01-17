@@ -171,6 +171,27 @@
     }
   });
 
+  can.Model.Mixin('inScopeObjects', {}, {
+    'after:info_pane_preload': function () {
+      var objType = 'Audit';
+      var queryType = 'ids';
+      var query = GGRC.Utils.QueryAPI
+        .buildRelevantIdsQuery(objType, {}, {
+          type: this.attr('type'),
+          id: this.attr('id')
+        }, null);
+      return GGRC.Utils.QueryAPI
+        .makeRequest({data: [query]})
+        .done(function (idsArr) {
+          this.attr('scopeObject',
+            {
+              id: idsArr[0][objType][queryType][0],
+              type: 'Audit'
+            });
+        }.bind(this));
+    }
+  });
+
   can.Model.Mixin('mapping-limit', {
     getAllowedMappings: function () {
       return GGRC.config.snapshotable_objects || [];
