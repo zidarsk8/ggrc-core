@@ -825,7 +825,7 @@ class Resource(ModelView):
         except (IntegrityError, ValidationError, ValueError) as err:
           message = translate_message(err)
           logger.warning(message)
-          return (message, 400, [])
+          raise BadRequest(message)
         except Exception as err:
           logger.exception(err)
           raise
@@ -936,9 +936,8 @@ class Resource(ModelView):
     try:
       src = src[root_attribute]
     except KeyError:
-      return current_app.make_response((
-          'Required attribute "{0}" not found'.format(
-              root_attribute), 400, []))
+      raise BadRequest('Required attribute "{0}" not found'.format(
+          root_attribute))
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
