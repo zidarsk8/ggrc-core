@@ -51,10 +51,16 @@ class TestServices(services.TestCase):
   def test_X_Requested_By_required(self):
     response = self.client.post(self.mock_url())
     self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "X-Requested-By header is REQUIRED.")
     response = self.client.put(self.mock_url() + "/1", data="blah")
     self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "X-Requested-By header is REQUIRED.")
     response = self.client.delete(self.mock_url() + "/1")
     self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "X-Requested-By header is REQUIRED.")
 
   def test_empty_collection_get(self):
     response = self.client.get(self.mock_url(), headers=self.headers())
@@ -112,6 +118,27 @@ class TestServices(services.TestCase):
         original_headers["Etag"], response.headers["Etag"])
     self.assertEqual("baz", response.json["services_test_mock_model"]["foo"])
 
+  def test_put_required_attribute_error(self):  # pylint: disable=invalid-name
+    """Test response for put request with wrong required attribute error."""
+    response = self._prepare_model_for_put(foo_param="buzz")
+    obj = response.json
+    url = urlparse(obj["services_test_mock_model"]["selfLink"]).path
+    original_headers = dict(response.headers)
+    del obj["services_test_mock_model"]
+    response = self.client.put(
+        url,
+        data=json.dumps(obj),
+        headers=self.headers(
+            ("If-Unmodified-Since", original_headers["Last-Modified"]),
+            ("If-Match", original_headers["Etag"]),
+        ),
+        content_type="application/json",
+    )
+    self.assert400(response)
+    self.assertEqual(
+        response.json['message'],
+        'Required attribute "services_test_mock_model" not found')
+
   def test_put_value_error(self):
     """Test response code for put request with value errors."""
     response = self._prepare_model_for_put(foo_param="buzz")
@@ -128,7 +155,8 @@ class TestServices(services.TestCase):
         ),
         content_type="application/json",
     )
-    self.assertEqual(response.status_code, 400)
+    self.assert400(response)
+    self.assertEqual(response.json['message'], "raised Value Error")
 
   def test_put_bad_request(self):
     """PUT of an invalid object data returns HTTP 400."""
@@ -143,6 +171,9 @@ class TestServices(services.TestCase):
             ("If-Match", response.headers["Etag"]))
     )
     self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "The browser (or proxy) sent a request that "
+                     "this server could not understand.")
 
   def test_put_428(self):
     """Headers "If-Match" and "If-Unmodified-Since" are required on PUT."""

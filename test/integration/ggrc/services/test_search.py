@@ -70,3 +70,11 @@ class TestResource(TestCase):
     entries = self.search("Control", relevant_objects=ids)
     self.assertEqual({entry["id"] for entry in entries},
                      {self.objects[2].id})
+
+  def test_search_fail_with_terms_none(self):
+    """Test search to fail with BadRequest (400 Error) when terms are None."""
+    query = '/search?types={}&counts_only={}'.format("Control", False)
+    response = self.api.tc.get(query)
+    self.assert400(response)
+    self.assertEqual(response.json['message'], 'Query parameter "q" '
+                     'specifying search terms must be provided.')
