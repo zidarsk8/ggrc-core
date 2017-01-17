@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -12,7 +12,9 @@
               <div class="row-fluid">
                 <div class="span4">
                   <div class="title tree-title-area">
-                    {{{render '/static/mustache/people/popover.mustache' person=instance}}}
+                    {{#using person=instance}}
+                      {{>'/static/mustache/people/popover.mustache'}}
+                    {{/using}}
                   </div>
                 </div>
                 <div class="span2">
@@ -32,9 +34,9 @@
                               {{#if_helpers '\
                                 #if_equals' roles.0.role.permission_summary 'Mapped' '\
                                 and ^if_equals' roles.length 1}}
-                                {{pretty_role_name roles.1.role.permission_summary}}
+                                {{pretty_role_name roles.1.role.name}}
                               {{else}}
-                                {{pretty_role_name roles.0.role.permission_summary}}
+                                {{pretty_role_name roles.0.role.name}}
                               {{/if_helpers}}
                               {{#roles.1}}
                                 {{#if_in_map roles 'role.permission_summary' 'Mapped'}}
@@ -66,7 +68,7 @@
 
                 <div class="span4">
                   <div class="show-details">
-                    <view-object-button instance="instance" />
+                    <view-object-buttons instance="instance" open-is-hidden="is_subtree" />
                   </div>
                 </div>
               </div>

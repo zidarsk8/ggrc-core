@@ -1,5 +1,5 @@
 -#
--# Copyright (C) 2016 Google Inc.
+-# Copyright (C) 2017 Google Inc.
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 -#
 !!! 5
@@ -23,7 +23,8 @@
   %body
     %div{ 'class': 'page-loader'}
       %div{ 'class': 'page-loader__wrapper'}
-        %span{ 'class': 'page-loader__icon' }
+        %i{'class': 'spinner-icon spinner-size__large fa fa-spinner fa-pulse',
+           'aria-hidden': 'true'}
         %span{ 'class': 'page-loader__text' } Page is loading, please wait...
 
     -block body
@@ -32,6 +33,7 @@
       GGRC = window.GGRC || {};
       GGRC.Settings = {};
       GGRC.Bootstrap = {};
+      GGRC.config = {};
       -include "scripts/tracker-prefix.js"
       window.st=Date.now();
       -block extra_javascript
@@ -83,10 +85,7 @@
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-        ga('create', '{{config.get("GOOGLE_ANALYTICS_ID")}}', {
-          cookieDomain: '{{config.get("GOOGLE_ANALYTICS_DOMAIN")}}',
-          siteSpeedSampleRate: 100,
-        });
+        ga('create', '{{config.get("GOOGLE_ANALYTICS_ID")}}', 'auto');
         //  Presence of appName/appVersion seems to prevent 'Real-Time' metrics
         //  https://code.google.com/p/analytics-issues/issues/detail?id=366
         //ga('set', 'appVersion', '{{config.get("VERSION")}}');

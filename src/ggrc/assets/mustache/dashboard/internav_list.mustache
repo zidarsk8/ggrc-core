@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -18,9 +18,9 @@
         <i class="fa fa-{{ internav_icon }} color"></i>
         {{#if show_title}}
           {{internav_display}}
-          {{#has_count}}({{count}}{{#spinner}}...{{/spinner}}){{/has_count}}
+          {{#has_count}}({{firstnonempty count 0}}){{/has_count}}
         {{else}}
-          {{#has_count}}{{count}}{{#spinner}}...{{/spinner}}{{/has_count}}
+          {{#has_count}}{{firstnonempty count 0}}{{/has_count}}
         {{/if}}
         {{^count}}{{#has_count}}
           {{^instance.constructor.obj_nav_options.show_all_tabs}}

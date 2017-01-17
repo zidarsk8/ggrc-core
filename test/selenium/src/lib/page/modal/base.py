@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from lib import base
@@ -286,11 +286,6 @@ class IssuesModal(BaseModal):
   """Class representing a base issue modal visible after creating a new
   issue from LHN"""
   _locator_ui_title = locator.ModalCreateNewIssue.UI_TITLE
-
-
-class RequestsModal(BaseModal):
-  """Class representing a base request modal"""
-  _locator_ui_title = locator.ModalCreateNewRequest.UI_TITLE
 
 
 class ProcessesModal(BaseModal):

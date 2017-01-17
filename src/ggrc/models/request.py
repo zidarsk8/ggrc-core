@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A module for Request object"""
@@ -18,6 +18,7 @@ from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import FinishedDate
+from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import VerifiedDate
@@ -32,7 +33,7 @@ from ggrc.utils import similarity_options as similarity_options_module
 
 
 class Request(statusable.Statusable, AutoStatusChangeable, Assignable,
-              EvidenceURL, Personable, CustomAttributable,
+              EvidenceURL, Personable, CustomAttributable, Notifiable,
               relationship.Relatable, WithSimilarityScore, Titled, Slugged,
               Described, Commentable, FinishedDate, VerifiedDate, Base,
               db.Model):

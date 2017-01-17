@@ -1,18 +1,19 @@
-
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+"""Tests for control model."""
 
 from ggrc import db
 from ggrc.models import Control
 from integration.ggrc import TestCase
-from .factories import ControlCategoryFactory, ControlFactory
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_in, eq_
+from integration.ggrc.models import factories
+
 
 class TestControl(TestCase):
+
   def test_simple_categorization(self):
-    category = ControlCategoryFactory(scope_id=100)
-    control = ControlFactory()
+    category = factories.ControlCategoryFactory(scope_id=100)
+    control = factories.ControlFactory()
     control.categories.append(category)
     db.session.commit()
     self.assertIn(category, control.categories)
@@ -21,8 +22,6 @@ class TestControl(TestCase):
     self.assertIn(category, control.categories)
 
   def test_has_test_plan(self):
-    control = ControlFactory(test_plan="This is a test text")
-    db.session.commit()
-
+    control = factories.ControlFactory(test_plan="This is a test text")
     control = db.session.query(Control).get(control.id)
-    eq_(control.test_plan, "This is a test text")
+    self.assertEqual(control.test_plan, "This is a test text")

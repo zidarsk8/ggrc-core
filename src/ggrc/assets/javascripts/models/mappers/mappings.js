@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -32,7 +32,7 @@
       }
     }
   */
-  can.Construct('GGRC.Mappings', {
+  can.Construct.extend('GGRC.Mappings', {
     // Convenience properties for building mappings types.
     Proxy: Proxy,
     Direct: Direct,
@@ -45,6 +45,36 @@
     Cross: Cross,
     modules: {},
 
+    /**
+     * Return list of allowed for mapping models.
+     * Performs checks for
+     * @param {String} type - base model type
+     * @param {Array} include - array of included models
+     * @param {Array} exclude - array of excluded models
+     * @return {Array} - list of allowed for mapping Models
+     */
+    getMappingList: function (type, include, exclude) {
+      var baseModel = GGRC.Utils.getModelByType(type);
+      exclude = exclude || [];
+      include = include || [];
+      if (!baseModel) {
+        return [];
+      }
+
+      if (can.isFunction(baseModel.getAllowedMappings)) {
+        return baseModel
+            .getAllowedMappings()
+            .filter(function (model) {
+              return exclude.indexOf(model) < 0;
+            })
+            .concat(include);
+      }
+      return GGRC.Utils
+        .getMappableTypes(type, {
+          whitelist: include,
+          forbidden: exclude
+        });
+    },
     /*
       return all mappings from all modules for an object type.
       object - a string representing the object type's shortName

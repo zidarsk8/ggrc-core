@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -40,7 +40,7 @@
         My Tasks
         <object-counter
           counter="user_task_count"
-          {{#if GGRC.counters.user_overdue_task_count}}class="critical"{{/if}}
+          counter-overdue="user_overdue_task_count"
           model-name="CycleTaskGroupObjectTask"
           search-keys="contact_id;cycle.is_current;status__in"
           search-values="current_user;true;Assigned,InProgress,Finished,Declined"

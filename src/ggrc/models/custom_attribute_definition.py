@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Custom attribute definition module"""
@@ -39,6 +39,23 @@ class CustomAttributeDefinition(mixins.Base, mixins.Titled, db.Model):
   attribute_values = db.relationship('CustomAttributeValue',
                                      backref='custom_attribute',
                                      cascade='all, delete-orphan')
+
+  @property
+  def definition_attr(self):
+    return '{0}_definition'.format(self.definition_type)
+
+  @property
+  def definition(self):
+    return getattr(self, self.definition_attr)
+
+  @definition.setter
+  def definition(self, value):
+    self.definition_id = getattr(value, 'id', None)
+    if hasattr(value, '_inflector'):
+      self.definition_type = value._inflector.table_singular
+    else:
+      self.definition_type = ''
+    return setattr(self, self.definition_attr, value)
 
   _extra_table_args = (
       UniqueConstraint('definition_type', 'definition_id', 'title',

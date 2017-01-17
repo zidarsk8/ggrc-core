@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2016 Google Inc.
+  Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -7,7 +7,7 @@
             {{#if context.isEdit}}inline-edit--active{{/if}}
             {{#if readonly}}inline-edit--readonly{{/if}}">
   <h6 class="inline-edit__title">
-    {{firstnonempty title label}}
+    {{firstnonempty titleText label}}
     {{#mandatory}}<span class="required">*</span>{{/mandatory}}
     {{#helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{helptext}}"></i>{{/helptext}}
   </h6>

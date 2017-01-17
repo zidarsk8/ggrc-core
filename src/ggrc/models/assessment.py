@@ -1,17 +1,22 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for Assessment object"""
 
+from sqlalchemy import and_
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import remote
 from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.models import reflection
 from ggrc.models.audit import Audit
 from ggrc.models.comment import Commentable
+from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import FinishedDate
+from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import VerifiedDate
@@ -69,7 +74,7 @@ class Assessment(statusable.Statusable, AuditRelationship,
                  CustomAttributable, EvidenceURL, Commentable, Personable,
                  reminderable.Reminderable, Timeboxed, Relatable,
                  WithSimilarityScore, FinishedDate, VerifiedDate,
-                 ValidateOnComplete, BusinessObject, db.Model):
+                 ValidateOnComplete, Notifiable, BusinessObject, db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on
@@ -96,6 +101,26 @@ class Assessment(statusable.Statusable, AuditRelationship,
 
   design = deferred(db.Column(db.String), "Assessment")
   operationally = deferred(db.Column(db.String), "Assessment")
+
+  @declared_attr
+  def object_level_definitions(self):
+    """Set up a backref so that we can create an object level custom
+       attribute definition without the need to do a flush to get the
+       assessment id.
+
+      This is used in the relate_ca method in hooks/assessment.py.
+    """
+    return db.relationship(
+        'CustomAttributeDefinition',
+        primaryjoin=lambda: and_(
+            remote(CustomAttributeDefinition.definition_id) == Assessment.id,
+            remote(CustomAttributeDefinition.definition_type) == "assessment"),
+        foreign_keys=[
+            CustomAttributeDefinition.definition_id,
+            CustomAttributeDefinition.definition_type
+        ],
+        backref='assessment_definition',
+        cascade='all, delete-orphan')
 
   object = {}  # we add this for the sake of client side error checking
   audit = {}
@@ -188,7 +213,7 @@ class Assessment(statusable.Statusable, AuditRelationship,
     return cls._get_relate_filter(predicate, "Verifier")
 
   @classmethod
-  def _ignore_filter(cls, predicate):
+  def _ignore_filter(cls, _):
     return None
 
 

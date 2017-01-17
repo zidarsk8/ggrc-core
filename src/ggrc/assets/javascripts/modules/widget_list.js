@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -17,7 +17,7 @@
     See the comments for GGRC.WidgetDescriptor for details in what is necessary to define
     a widget descriptor.
   */
-  can.Construct('GGRC.WidgetList', {
+  can.Construct.extend('GGRC.WidgetList', {
     modules: {},
     /*
       get_widget_list_for: return a keyed object of widget descriptors for the specified page type.
@@ -49,6 +49,16 @@
               widget.content_controller_options && widget.content_controller_options.widget_view || widget.widget_view
             );
             break;
+          case GGRC.Controllers.SummaryWidget:
+            descriptors[widgetId] = GGRC.WidgetDescriptor.make_summary_widget(
+              widget.content_controller_options &&
+              widget.content_controller_options.instance ||
+              widget.instance,
+              widget.content_controller_options &&
+              widget.content_controller_options.widget_view ||
+              widget.widget_view
+            );
+            break;
           case GGRC.Controllers.TreeView:
             descriptors[widgetId] = GGRC.WidgetDescriptor.make_tree_view(
               widget.content_controller_options && (widget.content_controller_options.instance || widget.content_controller_options.parent_instance) || widget.instance,
@@ -64,7 +74,7 @@
       });
 
       can.each(descriptors, function (descriptor, id) {
-        if (descriptor.suppressed) {
+        if (!descriptor || descriptor.suppressed) {
           delete descriptors[id];
         }
       });
@@ -119,4 +129,4 @@
       }
     }
   });
-})(this.can.$, this.CMS, this.GGRC);
+})(window.can.$, window.CMS, window.GGRC);

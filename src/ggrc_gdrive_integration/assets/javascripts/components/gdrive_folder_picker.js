@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Google Inc.
+ * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 (function (can, $) {
@@ -93,6 +93,14 @@
         });
 
         return deleteDeferred;
+      },
+      _updateCurrentFolder: function () {
+        var item = this.instance.get_binding('folders').list[0];
+        if (!item && this.instance.get_binding('extended_folders')) {
+          item = this.instance.get_binding('extended_folders').list[0];
+        }
+
+        this.attr('current_folder', item ? item.instance : null);
       }
     },
     events: {
@@ -149,12 +157,8 @@
       },
       '{scope.folder_list} change': function () {
         var pjlength;
-        var item = this.scope.instance.get_binding('folders').list[0];
-        if (!item && this.scope.instance.get_binding('extended_folders')) {
-          item = this.scope.instance.get_binding('extended_folders').list[0];
-        }
 
-        this.scope.attr('current_folder', item ? item.instance : null);
+        this.scope._updateCurrentFolder();
         if (this.scope.deferred && this.scope.instance._pending_joins) {
           pjlength = this.scope.instance._pending_joins.length;
           can.each(this.scope.instance._pending_joins.slice(0).reverse(), function (pj, i) {
@@ -163,6 +167,10 @@
             }
           }, this);
         }
+      },
+
+      '{scope.instance} object_folders': function () {
+        this.scope._updateCurrentFolder();
       },
 
       /**

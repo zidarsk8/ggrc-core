@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from datetime import datetime, date
@@ -10,7 +10,7 @@ from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.relationship import Relationship
 from ggrc.rbac.permissions import is_allowed_update
-from ggrc.services.common import Resource
+from ggrc.services.common import Resource, log_event
 from ggrc.services.registry import service
 from ggrc_workflows import models, notification
 from ggrc_workflows.models import relationship_helper
@@ -885,8 +885,8 @@ def start_recurring_cycles():
     notification.handle_workflow_modify(None, workflow)
     notification.handle_cycle_created(None, obj=cycle)
 
+  log_event(db.session)
   db.session.commit()
-  db.session.flush()
 
 
 def get_cycles(workflow):

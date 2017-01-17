@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2016 Google Inc.
+  Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -8,12 +8,14 @@
     <div class="row-fluid wrap-row">
       <div class="span8 import">
         <p>
-          Here you are able to import all gGRC objects.
+          Here you are able to import all GGRC objects.
           Please make sure you have your CSV file ready, or
           download one of the predefined templates.
         </p>
         <div class="clearfix">
-          <input type="file" data-file-upload class="csv-upload" name="upload" style="visibility: hidden; width: 1px; height: 1px" />
+          <input type="file" accept=".csv"
+                 data-file-upload class="csv-upload" name="upload"
+                 style="visibility: hidden; width: 1px; height: 1px" />
           {{#states}}
             <button id="import_btn" {{#isDisabled}}disabled{{/isDisabled}} class="btn btn-large btn-fixed state-{{state}} {{class}}">{{{text}}}</button>
             {{^if_equals state "select"}}

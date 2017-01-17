@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 dashboard-js-files:
@@ -26,6 +26,7 @@ dashboard-js-files:
   - canjs/can.construct.proxy.js
   - canjs/can.map.attributes.js
   - canjs/can.map.backup.js
+  - canjs/can.map.define.js
   - wysihtml5/advanced.js
   - wysihtml5/wysihtml5-0.4.0pre.js
   - wysihtml5/bootstrap-wysihtml5-0.0.2.js
@@ -109,14 +110,17 @@ dashboard-js-files:
   - controllers/filterable_controller.js
   - controllers/dashboard_widgets_controller.js
   - controllers/info_widget_controller.js
+  - controllers/summary_widget_controller.js
   - controllers/modals_controller.js
   - controllers/delete_modal_controller.js
   - controllers/help_controller.js
   - controllers/quick_search_controller.js
   - controllers/recently_viewed_controller.js
-  - controllers/tree_view_controller.js
-  - controllers/list_view_controller.js
-  - controllers/tree_filter_controller.js
+  - controllers/tree/tree-loader.js
+  - controllers/tree/tree-view.js
+  - controllers/tree/tree-view-node.js
+  - controllers/tree/list_view_controller.js
+  - controllers/tree/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
   - controllers/info_pin_controller.js
   - controllers/automapper_controller.js
@@ -133,6 +137,7 @@ dashboard-js-files:
   - apps/custom_attributes.js
   # Components
   - components/spinner/spinner.js
+  - components/modal-connector.js
   - components/collapsible-panel/collapsible-panel.js
   - components/collapsible-panel/collapsible-panel-header.js
   - components/collapsible-panel/collapsible-panel-body.js
@@ -148,6 +153,7 @@ dashboard-js-files:
   - components/comment/comment-input.js
   - components/assessment/controls-toolbar/controls-toolbar.js
   - components/mapped-objects/mapped-objects.js
+  - components/object-state-toolbar/object-state-toolbar.js
   - components/object-list/object-list.js
   - components/object-list/object-list-item.js
   - components/object-popover/object-popover.js
@@ -162,8 +168,10 @@ dashboard-js-files:
   - components/reusable-objects/reusable-objects-list.js
   - components/reusable-objects/reusable-objects-item.js
   - components/simple-modal/simple-modal.js
+  - components/mapping-controls/mapping-type-selector.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
+  - components/search-toolbar/search-toolbar.js
   - components/datepicker/datepicker.js
   - components/person/person.js
   - components/inline_edit/inline.js
@@ -201,9 +209,20 @@ dashboard-js-files:
   - components/object_counter/object_counter.js
   - components/sort_by_sort_index/sort_by_sort_index.js
   - components/tree_pagination/tree_pagination.js
-  - components/view-object-button/view-object-button.js
+  - components/tree/tree-header-selector.js
+  - components/tree/tree-type-selector.js
+  - components/view-object-buttons/view-object-buttons.js
+  - components/add-object-button/add-object-button.js
   - components/effective-dates/effective-dates.js
+  - components/snapshotter/individual-update.js
+  - components/snapshotter/revisions-comparer.js
+  - components/snapshotter/scope-update.js
   - components/info-pin-buttons/info-pin-buttons.js
+  - components/snapshot-loader/snapshot-loader.js
+  - components/snapshot-loader/snapshot-loader-item.js
+  - components/textarea-array/textarea-array.js
+  - components/object-selection/object-selection.js
+  - components/object-selection/object-selection-item.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -212,6 +231,12 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/object-state-toolbar/object-state-toolbar.mustache
+  - components/snapshot-loader/snapshot-loader.mustache
+  - components/snapshot-loader/snapshot-loader-item.mustache
+  - components/object-selection/object-selection-item.mustache
+  - components/search-toolbar/search-toolbar.mustache
+  - components/mapping-controls/mapping-type-selector.mustache
   - components/effective-dates/effective-dates.mustache
   - components/read-more/read-more.mustache
   - components/collapsible-panel/collapsible-panel.mustache
@@ -248,7 +273,8 @@ dashboard-js-template-files:
   - components/ca-object/ca-object-validation-icon.mustache
   - components/ca-object/ca-object-modal.mustache
   - components/ca-object/ca-object-modal-content.mustache
-  - components/view-object-button/view-object-button.mustache
+  - components/view-object-buttons/view-object-buttons.mustache
+  - components/add-object-button/add-object-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - add_widget_menu.mustache
   - base_objects/autocomplete_result.mustache
@@ -288,6 +314,7 @@ dashboard-js-template-files:
   - base_objects/generate_assessments_button.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache
+  - base_objects/info-pane-utility.mustache
   - base_objects/info_header.mustache
   - base_objects/filters/advanced_search_filter_actions.mustache
   - base_objects/filters/modal_filter_actions.mustache
@@ -321,7 +348,6 @@ dashboard-js-template-files:
   - base_templates/mapping_tree_view.mustache
   - base_templates/assignable_extended_info.mustache
   - mixins/assignable.mustache
-  - mixins/stateful.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
@@ -347,10 +373,10 @@ dashboard-js-template-files:
   - assessment_templates/tier2_content.mustache
   - assessment_templates/tree_add_item.mustache
   - assessments/related_issues.mustache
-  - assessments/related_requests.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache
+  - issues/tree_add_item.mustache
   - components/inline_edit/inline.mustache
   - components/inline_edit/text.mustache
   - components/inline_edit/input.mustache
@@ -407,9 +433,11 @@ dashboard-js-template-files:
   - modals/confirm.mustache
   - modals/prompt_buttons.mustache
   - modals/confirm_buttons.mustache
+  - modals/confirm_cancel_buttons.mustache
   - modals/delete_cancel_buttons.mustache
   - modals/done_buttons.mustache
   - modals/modal_header.mustache
+  - modals/modal_compare_header.mustache
   - modals/save_cancel_buttons.mustache
   - modals/save_cancel_delete_buttons.mustache
   - modals/unmap_cancel_buttons.mustache
@@ -480,20 +508,12 @@ dashboard-js-template-files:
   - audits/modal_content.mustache
   - audits/tree.mustache
   - audits/info.mustache
+  - audits/summary.mustache
   - audits/tree_add_item.mustache
   - audits/tree_header.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache
   - audits/object_cloner.mustache
-  - requests/tree.mustache
-  - requests/info.mustache
-  - requests/tree_add_item.mustache
-  - requests/tree_header.mustache
-  - requests/modal_content.mustache
-  - requests/tier2_content.mustache
-  - requests/general_info.mustache
-  - requests/dates_list.mustache
-  - requests/related-requests.mustache
   - base_templates/subtree.mustache
   - objectives/autocomplete_result.mustache
   - meetings/modal_content.mustache
@@ -501,8 +521,6 @@ dashboard-js-template-files:
   - meetings/tree.mustache
   - documents/autocomplete_result.mustache
   - documents/pbc_tree.mustache
-  - requests/filters.mustache
-  - requests/amend_modal_content.mustache
   - org_groups/autocomplete_result.mustache
   - vendors/autocomplete_result.mustache
   - base_objects/edit_object_link.mustache
@@ -530,6 +548,7 @@ dashboard-js-template-files:
   - import_export/export/filter_query.mustache
   - mapper/relevant_filter.mustache
   - quick_form/confirm_buttons.mustache
+  - snapshots/dropdown_menu.mustache
 
 dashboard-css-files:
   - dashboard.css

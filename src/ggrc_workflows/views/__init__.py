@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Ggrc workflow module views."""
@@ -71,7 +71,7 @@ def _get_unstarted_workflows():
   """
   return db.session.query(Workflow).filter(
       Workflow.next_cycle_start_date < date.today(),
-      Workflow.recurrences.is_(True),
+      Workflow.recurrences == 1,
       Workflow.status == 'Active',
   ).all()
 

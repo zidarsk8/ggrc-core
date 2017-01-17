@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc.services.common import Resource
@@ -82,7 +82,8 @@ All notifications handle the following structure:
                   "workflow_owners":
                       { workflow_owner.id: workflow_owner_info, ...},
                   "start_date": MM/DD/YYYY
-                  "fuzzy_start_date": "in X days/weeks ..."
+                  "start_date_statement": "starts in X day[s]" or
+                                          "started today|X day[s] ago"
               }
               , ...
           }
@@ -95,35 +96,34 @@ All notifications handle the following structure:
                   "workflow_owners":
                       { workflow_owner.id: workflow_owner_info, ...},
                   "start_date": MM/DD/YYYY
-                  "fuzzy_start_date": "in X days/weeks ..."
+                  "start_date_statement": "starts in X day[s]" or
+                                          "started today|X day[s] ago"
               }
               , ...
           }
-
-          "cycle_started": {
+          "cycle_data": {
               cycle.id: {
-                  # manually started cycles have instant notification
-                  "manually": False
-
-                  "custom_message": ""
-                  "cycle_title": ""
-                  "cycle_url": ""
-                  "workflow_owners":
-                      { workflow_owner.id: workflow_owner_info, ...},
-
                   "my_tasks" : # list of all tasks assigned to the user
-                      { cycle_task.id: { task_info }, ...}
-
+                      { cycle_task.id: { task_info }, ...},
                   # list of all task groups assigned to the user, including
                   # tasks
                   "my_task_groups" :
                       { task_group.id:
                           { cycle_task.id: { task_info }, ... }, ...
-                      }
-
+                      },
                   "cycle_tasks" : # list of all tasks in the workflow
                       { cycle_task.id: { task_info }, ...}
-
+              }
+          }
+          "cycle_started": {
+              cycle.id: {
+                  # manually started cycles have instant notification
+                  "manually": False,
+                  "custom_message": "",
+                  "cycle_title": "",
+                  "cycle_url": "",
+                  "workflow_owners":
+                      { workflow_owner.id: workflow_owner_info, ...}
               }
               , ...
           }
@@ -152,7 +152,7 @@ Task and cycle_task have the following structure:
       "title": title,
       "object_titles": list of object titles for all related objects
       "end_date": end date in MM/DD/YYYY format
-      "fuzzy_due_in": "today" or "in 1 day"... "in 5 days", "in 1 week" etc.,
+      "due_date_statement": "due today|in X day[s]|X day[s] ago"
       "cycle_task_url" ""
   }
 

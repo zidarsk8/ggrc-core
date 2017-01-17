@@ -1,17 +1,19 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
 {{#instance}}
-  {{#if notes}}
-  <div class="row-fluid wrap-row">
-    <div data-test-id="title_notes_ef5bc3a71e88" class="span12">
-      <h6>Notes</h6>
-      <div data-test-id="title_notes_content_ef5bc3a71e88" class="rtf-block">
-        {{{firstnonempty notes '<span class="empty-message">None</span>'}}}
+  {{#if_helpers '\
+    #if' notes '\
+    or #if' isRevision}}
+    <div class="row-fluid wrap-row">
+      <div data-test-id="title_notes_ef5bc3a71e88" class="span12">
+        <h6>Notes</h6>
+        <div data-test-id="title_notes_content_ef5bc3a71e88" class="rtf-block">
+          {{{firstnonempty notes '<span class="empty-message">None</span>'}}}
+        </div>
       </div>
     </div>
-  </div>
-  {{/if}}
+  {{/if_helpers}}
 {{/instance}}

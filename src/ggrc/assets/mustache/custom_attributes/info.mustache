@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -19,18 +19,21 @@
               value="cav.attribute_value"
               {{/if}}
               values="cad.multi_choice_options"
-              title="cad.title"
+              title-text="cad.title"
               label="cad.label"
               type="{{type}}"
               mandatory="cad.mandatory"
               placeholder="cad.placeholder"
               helptext="cad.helptext"
-              {{^is_allowed 'update' instance context='for'}}
-                readonly
-              {{/is_allowed}}
-              {{#if_instance_of instance 'Request'}}
-                can-before-edit="instance.confirmBeginEdit"
-              {{/if_instance_of}}
+              {{#if_helpers '\
+                #if' instance.snapshot '\
+                or #if' instance.isRevision }}
+                readonly="true"
+              {{else}}
+                {{^is_allowed 'update' instance context='for'}}
+                  readonly="true"
+                {{/is_allowed}}
+              {{/if_helpers}}
             ></inline-edit>
           </div>
         </div>

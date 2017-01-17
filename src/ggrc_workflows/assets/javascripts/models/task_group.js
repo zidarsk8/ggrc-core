@@ -1,5 +1,5 @@
 /*!
- Copyright (C) 2016 Google Inc.
+ Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -210,22 +210,6 @@
           return workflow.context.reify().refresh();
         });
       }
-    },
-
-    response_options_csv: can.compute(function (val) {
-      var isSet = val && val.length;
-      var responseOptions = this.attr('response_options');
-      var options = isSet ?
-        val.split(',') :
-        responseOptions;
-
-      if (isSet) {
-        this.attr('response_options', options.map(function (item) {
-          return item.trim();
-        }));
-      } else {
-        return options.join(', ');
-      }
-    })
+    }
   });
 })(window.can);

@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -139,28 +139,28 @@
               start = moment().isoWeekday(task.relative_start_day);
               end = moment().isoWeekday(task.relative_end_day);
               if (_afterOrSame(start, end)) {
-                end.add('w', 1);
+                end.add(1, 'w');
               }
               break;
             case "monthly":
               start = moment().date(task.relative_start_day);
               end = moment().date(task.relative_end_day);
               if (_afterOrSame(start, end)) {
-                end.add('M', 1);
+                end.add(1, 'M');
               }
               break;
             case "quarterly":
-              start = _currentQuarter().date(task.relative_start_day).add('M', task.relative_start_month-1);
-              end = _currentQuarter().date(task.relative_end_day).add('M', task.relative_end_month-1);
+              start = _currentQuarter().date(task.relative_start_day).add(task.relative_start_month-1, 'M');
+              end = _currentQuarter().date(task.relative_end_day).add(task.relative_end_month-1, 'M');
               if (_afterOrSame(start, end)) {
-                end.add('q', 1);
+                end.add(1, 'q');
               }
               break;
             case "annually":
               start = moment().date(task.relative_start_day).month(task.relative_start_month-1);
               end = moment().date(task.relative_end_day).month(task.relative_end_month-1);
               if (_afterOrSame(start, end)) {
-                end.add('y', 1);
+                end.add(1, 'y');
               }
               break;
           }
@@ -201,7 +201,7 @@
     // start day of month, affects start_date.
     //  Use when month number doesn't matter or is
     //  selectable.
-    start_day_of_month: can.compute(function(val) {
+    start_day_of_month: function(val) {
       var newdate;
       if(val) {
         while(val.isComputed) {
@@ -224,12 +224,12 @@
           return null;
         }
       }
-    }),
+    },
 
     // end day of month, affects end_date.
     //  Use when month number doesn't matter or is
     //  selectable.
-    end_day_of_month: can.compute(function(val) {
+    end_day_of_month: function(val) {
       var newdate;
       if(val) {
         while(val.isComputed) {
@@ -252,12 +252,12 @@
           return null;
         }
       }
-    }),
+    },
 
     // start month of quarter, affects start_date.
     //  Sets month to be a 31-day month in the chosen quarterly cycle:
     //  1 for Jan-Apr-Jul-Oct, 2 for Feb-May-Aug-Nov, 3 for Mar-Jun-Sep-Dec
-    start_month_of_quarter: can.compute(function(val) {
+    start_month_of_quarter: function(val) {
       var newdate;
       var month_lookup = [0, 4, 2]; //31-day months in quarter cycles: January, May, March
 
@@ -273,12 +273,12 @@
           return null;
         }
       }
-    }),
+    },
 
     // end month of quarter, affects end_date.
     //  Sets month to be a 31-day month in the chosen quarterly cycle:
     //  1 for Jan-Apr-Jul-Oct, 2 for Feb-May-Aug-Nov, 3 for Mar-Jun-Sep-Dec
-    end_month_of_quarter: can.compute(function(val) {
+    end_month_of_quarter: function(val) {
       var newdate;
       var month_lookup = [0, 7, 2]; //31-day months in quarter cycles: January, May, March
 
@@ -294,12 +294,12 @@
           return null;
         }
       }
-    }),
+    },
 
     // start month of yesr, affects start_date.
     //  Sets month to the chosen month, and adjusts
     //  day of month to be within chosen month
-    start_month_of_year: can.compute(function(val) {
+    start_month_of_year: function(val) {
       var newdate;
       if(val) {
         if(val > 12) {
@@ -319,12 +319,12 @@
           return null;
         }
       }
-    }),
+    },
 
     // end month of yesr, affects end_date.
     //  Sets month to the chosen month, and adjusts
     //  day of month to be within chosen month
-    end_month_of_year: can.compute(function(val) {
+    end_month_of_year: function(val) {
       var newdate;
       if(val) {
         if(val > 12) {
@@ -344,13 +344,13 @@
           return null;
         }
       }
-    }),
+    },
 
     // start day of week, affects start_date.
     //  Sets day of month to the first day of the
     //  month that is the selected day of the week
     //  Sunday is 0, Saturday is 6
-    start_day_of_week: can.compute(function(val) {
+    start_day_of_week: function(val) {
       var newdate;
       if(val) {
         val = +val;
@@ -365,13 +365,13 @@
           return null;
         }
       }
-    }),
+    },
 
     // end day of week, affects end_date.
     //  Sets day of month to the first day of the
     //  month that is the selected day of the week
     //  Sunday is 0, Saturday is 6
-    end_day_of_week: can.compute(function(val) {
+    end_day_of_week: function(val) {
       var newdate;
       if(val) {
         val = +val;
@@ -386,7 +386,7 @@
           return null;
         }
       }
-    })
+    }
   });
 
 })(window.can);

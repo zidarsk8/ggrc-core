@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A page model for LHN"""
@@ -47,14 +47,6 @@ class _Assessments(lhn.AccordionGroup):
   _locator_spinny = locator.LhnMenu.SPINNY_ASSESSMENTS
   _locator_button_create_new = locator.LhnMenu \
       .BUTTON_CREATE_NEW_ASSESSMENTS
-
-
-class _Requests(lhn.AccordionGroup):
-  """Requests dropdown in LHN"""
-  _locator_spinny = locator.LhnMenu.SPINNY_REQUESTS
-  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_REQUESTS
-  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_REQUESTS
-  _create_new_modal_cls = modal.create_new_object.Requests
 
 
 class _Issues(lhn.AccordionGroup):
@@ -542,7 +534,6 @@ class Menu(base.AnimatedComponent):
     self.toggle_workflows = None
     self.toggle_audits = None
     self.toggle_assessments = None
-    self.toggle_requests = None
     self.toggle_issues = None
     self.toggle_directives = None
     self.toggle_controls_or_objectives = None
@@ -577,10 +568,6 @@ class Menu(base.AnimatedComponent):
         self._driver,
         locator.LhnMenu.TOGGLE_ASSESSMENTS,
         locator.LhnMenu.COUNT_ASSESSMENTS)
-    self.toggle_requests = lhn.Toggle(
-        self._driver,
-        locator.LhnMenu.TOGGLE_REQUESTS,
-        locator.LhnMenu.COUNT_REQUESTS)
     self.toggle_issues = lhn.Toggle(
         self._driver,
         locator.LhnMenu.TOGGLE_ISSUES,
@@ -639,14 +626,6 @@ class Menu(base.AnimatedComponent):
     """
     self.toggle_assessments.toggle()
     return _Assessments(self._driver)
-
-  def select_requests(self):
-    """
-    Returns:
-        _Requests
-    """
-    self.toggle_requests.toggle()
-    return _Requests(self._driver)
 
   def select_issues(self):
     """

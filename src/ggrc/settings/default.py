@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import os
@@ -35,7 +35,13 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.9.7-Quince" + BUILD_NUMBER
+VERSION = "0.10.0-Raspberry" + BUILD_NUMBER
+
+# Migration owner
+MIGRATOR = os.environ.get(
+    'GGRC_MIGRATOR',
+    'Default Migrator <migrator@example.com>',
+)
 
 # Google Analytics variables
 GOOGLE_ANALYTICS_ID = os.environ.get('GGRC_GOOGLE_ANALYTICS_ID', '')

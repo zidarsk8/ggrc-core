@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -16,11 +16,9 @@
       date: null,
       format: '@',
       helptext: '@',
-      isShown: false,
-      pattern: 'MM/DD/YYYY',
       setMinDate: null,
       setMaxDate: null,
-      _date: null,
+      _date: null,  // the internal value of the text input field
       required: '@',
       define: {
         label: {
@@ -29,10 +27,14 @@
         persistent: {
           type: 'boolean',
           'default': false
+        },
+        isShown: {
+          type: 'boolean',
+          'default': false
         }
       },
       onSelect: function (val, ev) {
-        this.attr('_date', val);
+        this.attr('date', val);
         this.attr('isShown', false);
       },
       onFocus: function (el, ev) {
@@ -42,41 +44,93 @@
         if (!GGRC.Utils.inViewport(this.picker)) {
           this.attr('showTop', true);
         }
-      }
+      },
+
+      // Date formats for the actual selected value, and for the date as
+      // displayed to the user. The Moment.js library and the jQuery datepicker
+      // use different format notation, thus separate settings for each.
+      // IMPORTANT: The pair of settings for each "type" of value (i.e. actual
+      // value / display value) must be consistent across both libraries!
+      MOMENT_ISO_DATE: 'YYYY-MM-DD',
+      MOMENT_DISPLAY_FMT: 'MM/DD/YYYY',
+      PICKER_ISO_DATE: 'yy-mm-dd',
+      PICKER_DISPLAY_FMT: 'mm/dd/yy'
     },
+
     events: {
       inserted: function () {
+        var scope = this.scope;
         var element = this.element.find('.datepicker__calendar');
-        var date = this.getDate(this.scope.date);
+        var minDate;
+        var maxDate;
+        var date;
 
         element.datepicker({
+          dateFormat: scope.PICKER_ISO_DATE,
           altField: this.element.find('.datepicker__input'),
+          altFormat: scope.PICKER_DISPLAY_FMT,
           onSelect: this.scope.onSelect.bind(this.scope)
         });
+        scope.attr('picker', element);
 
-        this.scope.attr('picker', element);
+        date = this.getDate(scope.date);
+        scope.picker.datepicker('setDate', date);
 
-        this.scope.picker.datepicker('setDate', date);
-        if (this.scope.setMinDate) {
-          this.updateDate('minDate', this.scope.setMinDate);
+        // set the boundaries of the dates that user is allowed to select
+        minDate = this.getDate(scope.setMinDate);
+        maxDate = this.getDate(scope.setMaxDate);
+        scope.attr('setMinDate', minDate);
+        scope.attr('setMaxDate', maxDate);
+
+        if (scope.setMinDate) {
+          this.updateDate('minDate', scope.setMinDate);
         }
-        if (this.scope.setMaxDate) {
-          this.updateDate('maxDate', this.scope.setMaxDate);
+        if (scope.setMaxDate) {
+          this.updateDate('maxDate', scope.setMaxDate);
         }
-        this.scope._date = date;
       },
+
+      /**
+       * Convert given date to an ISO date string.
+       *
+       * @param {Date|string|null} date - the date to convert
+       * @return {string|null} - date in ISO format or null if empty or invalid
+       */
       getDate: function (date) {
+        var scope = this.scope;
+
         if (date instanceof Date) {
-          date = moment(date).format(this.scope.pattern);
-        } else if (!this.isValidDate(date)) {
-          date = null;
+          // NOTE: Not using moment.utc(), because if a Date instance is given,
+          // it is in the browser's local timezone, thus we need to take that
+          // into account to not end up with a different date. Ideally this
+          // should never happen, but that would require refactoring the way
+          // Date objects are created throughout the app.
+          return moment(date).format(scope.MOMENT_ISO_DATE);
+        } else if (this.isValidDate(date)) {
+          return date;
         }
-        return date;
+
+        return null;
       },
+
       isValidDate: function (date) {
-        return moment(date, this.scope.pattern, true).isValid();
+        var scope = this.scope;
+        return moment(date, scope.MOMENT_ISO_DATE, true).isValid();
       },
+
+      /**
+       * Change the min/max date allowed to be picked.
+       *
+       * @param {string} type - the setting to change ("minDate" or "maxDate").
+       *   The value given is automatically adjusted for a day as business
+       *   rules dictate.
+       * @param {Date|string|null} date - the new value of the `type` setting.
+       *   If given as string, it must be in ISO date format.
+       * @return {Date|null} - the new date value
+       */
       updateDate: function (type, date) {
+        var scope = this.scope;
+
         var types = {
           minDate: function () {
             date.add(1, 'day');
@@ -85,30 +139,59 @@
             date.subtract(1, 'day');
           }
         };
+
         if (!date) {
-          return;
+          scope.picker.datepicker('option', type, null);
+          return null;
         }
-        date = moment(date);
+
+        if (date instanceof Date) {
+          // NOTE: Not using moment.utc(), because if a Date instance is given,
+          // it is in the browser's local timezone, thus we need to take that
+          // into account to not end up with a different date. Ideally this
+          // should never happen, but that would require refactoring the way
+          // Date objects are created throughout the app.
+          date = moment(date).format(scope.MOMENT_ISO_DATE);
+        }
+        date = moment.utc(date);
 
         if (types[type]) {
           types[type]();
         }
         date = date.toDate();
-        this.scope.picker.datepicker('option', type, date);
+        scope.picker.datepicker('option', type, date);
         return date;
       },
+
       '{scope} setMinDate': function (scope, ev, date) {
+        var currentDateObj = null;
         var updated = this.updateDate('minDate', date);
-        if (this.scope.attr('date') < updated) {
-          this.scope.attr('_date', moment(updated).format(this.scope.pattern));
+
+        if (scope.date) {
+          currentDateObj = moment.utc(scope.date).toDate();
+          if (currentDateObj < updated) {
+            this.scope.attr(
+              '_date',
+              moment.utc(updated).format(scope.MOMENT_DISPLAY_FMT));
+          }
         }
       },
+
       '{scope} setMaxDate': function (scope, ev, date) {
         this.updateDate('maxDate', date);
       },
+
       '{scope} _date': function (scope, ev, val) {
-        scope.attr('date', val);
+        var valISO = null;
+
+        if (val) {
+          valISO = moment.utc(val, scope.MOMENT_DISPLAY_FMT)
+                         .format(scope.MOMENT_ISO_DATE);
+        }
+        scope.attr('date', valISO);
+        scope.picker.datepicker('setDate', valISO);
       },
+
       '{window} mousedown': function (el, ev) {
         var isInside;
 

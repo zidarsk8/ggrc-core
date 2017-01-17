@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -138,10 +138,6 @@ class ModalNewRisks(ModalInput):
         modal_create_new.SHORT_TITLE))
     modal.enter_description(append_random_string(
         modal_create_new.SHORT_TITLE))
-
-
-class ModalNewRequests(ModalInput):
-  """Utils for data entry for request modal"""
 
 
 class ModalNewIssues(ModalInput):

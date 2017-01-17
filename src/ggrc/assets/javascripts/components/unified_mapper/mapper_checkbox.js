@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -11,8 +11,8 @@
     template: '<content />',
     scope: {
       instance: null,
-      checkbox: can.compute(function (status) {
-        if (this.attr('mapper.getList') && !this.attr('appended')) {
+      checkbox: function (status) {
+        if (this.attr('mapper.assessmentGenerator') && !this.attr('appended')) {
           return false;
         }
         return (
@@ -20,7 +20,7 @@
           this.attr('select_state') ||
           this.attr('appended')
         );
-      }),
+      },
       define: {
         isMapped: {
           type: 'boolean',
@@ -34,7 +34,7 @@
     },
     init: function () {
       var scope = this.scope;
-      var parentInstance = scope.mapper.get_instance();
+      var parentInstance = scope.attr('mapper.parentInstance');
       var instance = scope.attr('instance');
       var isMapped = GGRC.Utils.is_mapped(parentInstance, instance);
       var hasPending = GGRC.Utils.hasPending(parentInstance, instance, 'add');
@@ -87,7 +87,7 @@
     },
     helpers: {
       not_allowed_to_map: function (options) {
-        if (this.attr('mapper.getList')) {
+        if (this.attr('mapper.assessmentGenerator')) {
           return options.inverse();
         }
         if (!this.attr('allowedToMap')) {
@@ -100,7 +100,7 @@
             this.attr('is_loading')) {
           return options.fn();
         }
-        if (this.attr('mapper.getList')) {
+        if (this.attr('mapper.assessmentGenerator')) {
           return options.inverse();
         }
         if (this.attr('isMapped') ||

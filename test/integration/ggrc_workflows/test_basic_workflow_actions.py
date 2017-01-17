@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from datetime import datetime
@@ -13,6 +13,7 @@ from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
 
 
 class TestBasicWorkflowActions(TestCase):
@@ -131,19 +132,19 @@ class TestBasicWorkflowActions(TestCase):
         "task_groups": [{
             "title": "tg_1",
             "task_group_tasks": [{
-                "description": self.generator.random_str(100),
+                "description": factories.random_str(100),
                 "relative_start_day": 5,
                 "relative_start_month": 1,
                 "relative_end_day": 25,
                 "relative_end_month": 2,
             }, {
-                "description": self.generator.random_str(100),
+                "description": factories.random_str(100),
                 "relative_start_day": 15,
                 "relative_start_month": 2,
                 "relative_end_day": 28,
                 "relative_end_month": 2,
             }, {
-                "description": self.generator.random_str(100),
+                "description": factories.random_str(100),
                 "relative_start_day": 1,
                 "relative_start_month": 1,
                 "relative_end_day": 1,
@@ -161,7 +162,7 @@ class TestBasicWorkflowActions(TestCase):
         "task_groups": [{
             "title": "tg_2",
             "task_group_tasks": [{
-                "description": self.generator.random_str(100),
+                "description": factories.random_str(100),
                 "relative_end_day": 1,
                 "relative_end_month": None,
                 "relative_start_day": 5,
@@ -194,7 +195,7 @@ class TestBasicWorkflowActions(TestCase):
         }, {
             "title": "tg_2",
             "task_group_tasks": [{
-                "description": self.generator.random_str(100)
+                "description": factories.random_str(100)
             }, {}
             ],
             "task_group_objects": self.random_objects[:2]
@@ -202,13 +203,13 @@ class TestBasicWorkflowActions(TestCase):
             "title": "tg_3",
             "task_group_tasks": [{
                 "title": "simple task 1",
-                "description": self.generator.random_str(100)
+                "description": factories.random_str(100)
             }, {
-                "title": self.generator.random_str(),
-                "description": self.generator.random_str(100)
+                "title": factories.random_str(),
+                "description": factories.random_str(100)
             }, {
-                "title": self.generator.random_str(),
-                "description": self.generator.random_str(100)
+                "title": factories.random_str(),
+                "description": factories.random_str(100)
             }
             ],
             "task_group_objects": self.random_objects
@@ -226,7 +227,7 @@ class TestBasicWorkflowActions(TestCase):
             {
                 "title": "tg_2",
                 "task_group_tasks": [{
-                    "description": self.generator.random_str(100)
+                    "description": factories.random_str(100)
                 }, {}],
                 "task_group_objects": self.random_objects[:2]
             },
@@ -234,13 +235,13 @@ class TestBasicWorkflowActions(TestCase):
                 "title": "tg_3",
                 "task_group_tasks": [{
                     "title": "simple task 1",
-                    "description": self.generator.random_str(100)
+                    "description": factories.random_str(100)
                 }, {
-                    "title": self.generator.random_str(),
-                    "description": self.generator.random_str(100)
+                    "title": factories.random_str(),
+                    "description": factories.random_str(100)
                 }, {
-                    "title": self.generator.random_str(),
-                    "description": self.generator.random_str(100)
+                    "title": factories.random_str(),
+                    "description": factories.random_str(100)
                 }],
                 "task_group_objects": []
             }
@@ -255,7 +256,7 @@ class TestBasicWorkflowActions(TestCase):
             {
                 "title": "tg_2",
                 "task_group_tasks": [{
-                     "description": self.generator.random_str(100),
+                     "description": factories.random_str(100),
                      "relative_end_day": 1,
                      "relative_end_month": None,
                      "relative_start_day": 5,

@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -38,7 +38,6 @@
         control: CMS.Models.Control,
         assessment: CMS.Models.Assessment,
         assessment_template: CMS.Models.AssessmentTemplate,
-        request: CMS.Models.Request,
         issue: CMS.Models.Issue,
         objective: CMS.Models.Objective,
         section: CMS.Models.Section,
@@ -58,17 +57,34 @@
       var object = GGRC.page_instance();
       var path = GGRC.mustache_path;
       var info_widget_views;
+      var summaryWidgetViews;
       var model_names;
       var possible_model_type;
       var treeViewDepth = 2;
       var relatedObjectsChildOptions = [GGRC.Utils.getRelatedObjects(treeViewDepth)];
+      var farModels;
+      var extraDescriptorOptions;
+      var overriddenModels;
+      var extraContentControllerOptions;
 
       // TODO: Really ugly way to avoid executing IIFE - needs cleanup
       if (!GGRC.page_object) {
         return;
       }
-      // Info widgets display the object information instead of listing
+      // Info and summary widgets display the object information instead of listing
       // connected objects.
+      summaryWidgetViews = {
+        audits: path + '/audits/summary.mustache'
+      };
+      if (summaryWidgetViews[object_table]) {
+        widget_list.add_widget(object.constructor.shortName, 'summary', {
+          widget_id: 'summary',
+          content_controller: GGRC.Controllers.SummaryWidget,
+          instance: object,
+          widget_view: summaryWidgetViews[object_table],
+          order: 3
+        });
+      }
       info_widget_views = {
         programs: path + '/programs/info.mustache',
         audits: path + '/audits/info.mustache',
@@ -82,7 +98,6 @@
         assessments: path + '/assessments/info.mustache',
         assessment_templates:
           path + '/assessment_templates/info.mustache',
-        requests: path + '/requests/info.mustache',
         issues: path + '/issues/info.mustache'
       };
       widget_list.add_widget(object.constructor.shortName, 'info', {
@@ -90,12 +105,11 @@
         content_controller: GGRC.Controllers.InfoWidget,
         instance: object,
         widget_view: info_widget_views[object_table],
-        order: 0
+        order: 5
       });
       model_names = can.Map.keys(base_widgets_by_type);
       model_names.sort();
       possible_model_type = model_names.slice();
-      possible_model_type.push('Request'); // Missing model-type by selection
       can.each(model_names, function (name) {
         var w_list;
         var child_model_list = [];
@@ -166,8 +180,13 @@
         return mappings;
       }
 
+      // the assessments_view only needs the Assessments widget
+      if (/^\/assessments_view/.test(window.location.pathname)) {
+        farModels = ['Assessment'];
+      } else {
+        farModels = base_widgets_by_type[object.constructor.shortName];
+      }
 
-      var far_models = base_widgets_by_type[object.constructor.shortName],
         // here we are going to define extra descriptor options, meaning that
         //  these will be used as extra options to create widgets on top of
 
@@ -175,7 +194,7 @@
       // the order 100+), but the objects with higher importance that should
       // be  prioritized use order values below 100. An order value of 0 is
       // reserved for the "info" widget which always comes first.
-      extra_descriptor_options = {
+      extraDescriptorOptions = {
         all: {
           Standard: {
             order: 10
@@ -245,9 +264,6 @@
           Project: {
             order: 250
           },
-          Request: {
-            order: 260
-          },
           System: {
             order: 270
           },
@@ -284,11 +300,6 @@
         Audit: {
           Assessment: {
             order: 10
-          },
-          Request: {
-            widget_id: 'Request',
-            widget_name: 'Requests',
-            order: 20
           },
           Issue: {
             order: 30
@@ -331,34 +342,22 @@
               allow_creating: false
             }
           }
-        },
-        Control: {
-          Request: {
-            widget_id: 'Request',
-            widget_name: 'Requests'
-          }
-        },
-        Person: {
-          Request: {
-            widget_id: 'Request',
-            widget_name: 'Requests'
-          }
         }
-      },
+      };
       // Prevent widget creation with <model_name>: false
       // e.g. to prevent ever creating People widget:
       //     { all : { Person: false }}
       // or to prevent creating People widget on Objective page:
       //     { Objective: { Person: false } }
-      overridden_models = {
+      overriddenModels = {
         Program: {
         },
         all: {
           Document: false
         }
-      },
+      };
 
-      extra_content_controller_options = apply_mixins({
+      extraContentControllerOptions = apply_mixins({
         objectives: {
           Objective: {
             mapping: 'objectives',
@@ -443,15 +442,6 @@
             draw_children: true,
             footer_view: path + '/base_objects/tree_footer.mustache'
           },
-          Request: {
-            mapping: 'related_requests',
-            child_options: [
-              _.extend({}, relatedObjectsChildOptions[0], {
-                mapping: 'info_related_objects'
-              })
-            ],
-            draw_children: true
-          },
           Document: {
             mapping: 'documents',
             child_options: relatedObjectsChildOptions,
@@ -474,7 +464,7 @@
             footer_view: GGRC.mustache_path +
               '/base_objects/tree_footer.mustache',
             add_item_view: GGRC.mustache_path +
-              '/base_objects/tree_add_item.mustache',
+              '/issues/tree_add_item.mustache',
             child_options: relatedObjectsChildOptions.concat({
               model: CMS.Models.Person,
               mapping: 'people',
@@ -574,14 +564,6 @@
         },
         Audit: {
           _mixins: ['issues', 'governance_objects', 'business_objects'],
-          Request: {
-            mapping: 'active_requests',
-            child_options: relatedObjectsChildOptions,
-            draw_children: true,
-            show_view: path + '/requests/tree.mustache',
-            footer_view: path + '/base_objects/tree_footer.mustache',
-            add_item_view: path + '/requests/tree_add_item.mustache'
-          },
           Program: {
             mapping: '_program',
             parent_instance: GGRC.page_instance(),
@@ -704,18 +686,6 @@
             draw_children: true
           }
         },
-        Request: {
-          _mixins: ['governance_objects', 'business_objects', 'issues'],
-          Audit: {
-            mapping: 'audits',
-            child_options: relatedObjectsChildOptions,
-            draw_children: true,
-            allow_creating: false,
-            allow_mapping: false,
-            show_view: path + '/audits/tree.mustache',
-            add_item_view: path + '/audits/tree_add_item.mustache'
-          },
-        },
         Assessment: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
@@ -736,14 +706,6 @@
             mapping: 'clauses',
             child_options: relatedObjectsChildOptions,
             draw_children: true
-          },
-          Request: {
-            mapping: 'related_requests',
-            child_options: relatedObjectsChildOptions,
-            draw_children: true,
-            show_view: path + '/requests/tree.mustache',
-            footer_view: path + '/base_objects/tree_footer.mustache',
-            add_item_view: path + '/requests/tree_add_item.mustache'
           }
         },
         Issue: {
@@ -759,7 +721,7 @@
           Issue: {
             mapping: 'related_issues',
             footer_view: path + '/base_objects/tree_footer.mustache',
-            add_item_view: path + '/base_objects/tree_add_item.mustache'
+            add_item_view: path + '/issues/tree_add_item.mustache'
           },
           Audit: {
             mapping: 'related_audits',
@@ -807,15 +769,6 @@
         },
         Person: {
           _mixins: ['issues'],
-          Request: {
-            mapping: (/^\/objectBrowser\/?$/.test(window.location.pathname)) ?
-              'all_open_audit_requests' : 'open_audit_requests',
-            draw_children: true,
-            child_options: relatedObjectsChildOptions,
-            show_view: GGRC.mustache_path + '/requests/tree.mustache',
-            footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
-            add_item_view: GGRC.mustache_path + '/requests/tree_add_item.mustache'
-          },
           Program: {
             mapping: 'extended_related_programs_via_search',
             child_options: relatedObjectsChildOptions,
@@ -967,7 +920,7 @@
 
       // Disable editing on profile pages, as long as it isn't audits on the dashboard
       if (GGRC.page_instance() instanceof CMS.Models.Person) {
-        var person_options = extra_content_controller_options.Person;
+        var person_options = extraContentControllerOptions.Person;
         can.each(person_options, function (options, model_name) {
           if (model_name !== 'Audit' || !/dashboard/.test(window.location)) {
             can.extend(options, {
@@ -978,8 +931,8 @@
         });
       }
 
-      can.each(far_models, function (model_name) {
-        if ((overridden_models.all && overridden_models.all.hasOwnProperty(model_name) && !overridden_models[model_name]) || (overridden_models[object.constructor.shortName] && overridden_models[object.constructor.shortName].hasOwnProperty(model_name) && !overridden_models[object.constructor.shortName][model_name]))
+      can.each(farModels, function (model_name) {
+        if ((overriddenModels.all && overriddenModels.all.hasOwnProperty(model_name) && !overriddenModels[model_name]) || (overriddenModels[object.constructor.shortName] && overriddenModels[object.constructor.shortName].hasOwnProperty(model_name) && !overriddenModels[object.constructor.shortName][model_name]))
           return;
         var sources = [],
           far_model, descriptor = {},
@@ -998,23 +951,23 @@
         }
 
         // Custom overrides
-        if (extra_descriptor_options.all && extra_descriptor_options.all[model_name]) {
-          $.extend(descriptor, extra_descriptor_options.all[model_name]);
+        if (extraDescriptorOptions.all && extraDescriptorOptions.all[model_name]) {
+          $.extend(descriptor, extraDescriptorOptions.all[model_name]);
         }
 
-        if (extra_descriptor_options[object.constructor.shortName] && extra_descriptor_options[object.constructor.shortName][model_name]) {
-          $.extend(descriptor, extra_descriptor_options[object.constructor.shortName][model_name]);
+        if (extraDescriptorOptions[object.constructor.shortName] && extraDescriptorOptions[object.constructor.shortName][model_name]) {
+          $.extend(descriptor, extraDescriptorOptions[object.constructor.shortName][model_name]);
         }
 
-        if (extra_content_controller_options.all && extra_content_controller_options.all[model_name]) {
+        if (extraContentControllerOptions.all && extraContentControllerOptions.all[model_name]) {
           $.extend(true, descriptor, {
-            content_controller_options: extra_content_controller_options.all[model_name]
+            content_controller_options: extraContentControllerOptions.all[model_name]
           });
         }
 
-        if (extra_content_controller_options[object.constructor.shortName] && extra_content_controller_options[object.constructor.shortName][model_name]) {
+        if (extraContentControllerOptions[object.constructor.shortName] && extraContentControllerOptions[object.constructor.shortName][model_name]) {
           $.extend(true, descriptor, {
-            content_controller_options: extra_content_controller_options[object.constructor.shortName][model_name]
+            content_controller_options: extraContentControllerOptions[object.constructor.shortName][model_name]
           });
         }
         widget_list.add_widget(object.constructor.shortName, widget_id, descriptor);

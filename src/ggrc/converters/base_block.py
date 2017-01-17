@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for handling a single import block.
@@ -33,6 +33,7 @@ from ggrc.services.common import update_index
 from ggrc.services.common import update_memcache_after_commit
 from ggrc.services.common import update_memcache_before_commit
 from ggrc.services.common import log_event
+from ggrc.services.common import Resource
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
 
@@ -44,6 +45,7 @@ CACHE_EXPIRY_IMPORT = 600
 
 
 class BlockConverter(object):
+  # pylint: disable=too-many-public-methods
 
   """ Main block converter class for dealing with csv files and data
 
@@ -107,6 +109,7 @@ class BlockConverter(object):
     self.row_warnings = []
     self.row_converters = []
     self.ignore = False
+    self._has_non_importable_columns = False
     # For import contains model name from csv file.
     # For export contains 'Model.__name__' value.
     self.class_name = options.get("class_name", "")
@@ -137,6 +140,16 @@ class BlockConverter(object):
       self.add_errors(errors.PERMISSION_ERROR, line=self.offset + 2)
       logger.error("Import failed with: Only admin can update existing "
                    "cycle-tasks via import")
+    if self._has_non_importable_columns:
+      importable_column_names = []
+      for field_name in self.object_class.IMPORTABLE_FIELDS:
+        if field_name == 'slug':
+          continue
+        importable_column_names.append(
+            self.headers[field_name]["display_name"])
+      self.add_warning(errors.ONLY_IMPORTABLE_COLUMNS_WARNING,
+                       line=self.offset + 2,
+                       columns=", ".join(importable_column_names))
 
   def _create_ca_definitions_cache(self):
     """Create dict cache for custom attribute definitions.
@@ -266,9 +279,7 @@ class BlockConverter(object):
         if (self.operation == 'import' and
                 hasattr(self.object_class, "IMPORTABLE_FIELDS") and
                 field_name not in self.object_class.IMPORTABLE_FIELDS):
-          self.add_warning(errors.NON_IMPORTABLE_COLUMN_WARNING,
-                           line=self.offset + 2,
-                           column_name=header)
+          self._has_non_importable_columns = True
           self.remove_column(index - removed_count)
           removed_count += 1
           continue
@@ -376,16 +387,8 @@ class BlockConverter(object):
           row_converter.add_error(errors.UNKNOWN_ERROR)
       self.save_import()
 
-  def import_objects(self):
-    """Add all objects to the database.
-
-    This function flushes all objects to the database and if the dry_run flag
-    is not set, the session gets committed and all signals for the imported
-    objects get sent.
-    """
-    if self.ignore:
-      return
-
+  def _import_objects_prepare(self):
+    """Setup all objects and do pre-commit checks for them."""
     for row_converter in self.row_converters:
       row_converter.setup_object()
 
@@ -394,7 +397,19 @@ class BlockConverter(object):
 
     self.clean_session_from_ignored_objs()
 
+  def import_objects(self):
+    """Add all objects to the database.
+
+    This function flushes all objects to the database if the dry_run flag is
+    not set and all signals for the imported objects get sent.
+    """
+    if self.ignore:
+      return
+
+    self._import_objects_prepare()
+
     if not self.converter.dry_run:
+      new_objects = []
       for row_converter in self.row_converters:
         row_converter.send_pre_commit_signals()
       for row_converter in self.row_converters:
@@ -405,9 +420,13 @@ class BlockConverter(object):
           db.session.rollback()
           logger.exception("Import failed with: %s", err.message)
           row_converter.add_error(errors.UNKNOWN_ERROR)
-      self.save_import()
+        else:
+          if row_converter.is_new and not row_converter.ignore:
+            new_objects.append(row_converter.obj)
+      self.send_collection_post_signals(new_objects)
+      import_event = self.save_import()
       for row_converter in self.row_converters:
-        row_converter.send_post_commit_signals()
+        row_converter.send_post_commit_signals(event=import_event)
 
   def clean_session_from_ignored_objs(self):
     """Clean DB session from ignored objects.
@@ -423,16 +442,32 @@ class BlockConverter(object):
       except UnmappedInstanceError:
         continue
 
+  @staticmethod
+  def send_collection_post_signals(new_objects):
+    """Send bulk create pre-commit signals."""
+    if not new_objects:
+      return
+    collections = {}
+    for obj in new_objects:
+      collections.setdefault(obj.__class__, []).append(obj)
+    for object_class, objects in collections.iteritems():
+      Resource.collection_posted.send(
+          object_class,
+          objects=objects,
+          sources=[{} for _ in xrange(len(objects))],
+      )
+
   def save_import(self):
     """Commit all changes in the session and update memcache."""
     try:
       modified_objects = get_modified_objects(db.session)
-      log_event(db.session, None)
+      import_event = log_event(db.session, None)
       update_memcache_before_commit(
           self, modified_objects, CACHE_EXPIRY_IMPORT)
       db.session.commit()
       update_memcache_after_commit(self)
       update_index(db.session, modified_objects)
+      return import_event
     except exc.SQLAlchemyError as err:
       db.session.rollback()
       logger.exception("Import failed with: %s", err.message)

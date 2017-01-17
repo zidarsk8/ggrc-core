@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Google Inc.
+ * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -672,6 +672,106 @@
       }
     }
   }
+
+ &.compare-modal {
+   width: 1000px;
+   margin-left: -500px;
+   .modal-header{
+     .legend{
+       margin-top: 15px;
+       font-size: 12px;
+       font-weight: normal;
+       .removed,
+       .added{
+         vertical-align: middle;
+         display: inline-block;
+         width: 20px;
+         height: 20px;
+         margin-left: 15px;
+       }
+       .removed{
+         background-color: $pastelRed;
+       }
+       .added{
+         background-color: $pastelGreen;
+       }
+     }
+   }
+   .modal-body{
+     display: flex;
+     .info{
+       border: 1px solid $warmGray;
+       padding: 20px 15px;
+       width: 50%;
+       box-shadow: none;
+       &:first-child{
+         border-right: none;
+       }
+       .inner-count-list{
+         li:last-child{
+           margin-bottom: 0;
+         }
+       }
+       .diff-highlighted{
+         display: block;
+         width: 100%;
+         max-width: 100%;
+         position: relative;
+         left: -15px;
+         padding-left: 15px;
+         padding-right: 15px;
+         background-color: $pastelRed;
+         &.inline-edit__content,
+         &.inline-edit__title{
+           padding-left: 19px;
+           padding-right: 11px;
+           box-sizing: content-box;
+         }
+       }
+       & ~ .info{
+         .diff-highlighted{
+           background-color: $pastelGreen;
+         }
+       }
+       .info-pane-utility{
+         display: none;
+       }
+       .state-value{
+         display: none;
+       }
+       .tier-content,
+       custom-attributes{
+         .row-fluid{
+           margin-bottom: 0;
+           .span3,
+           .span6,
+           .span9,
+           .span12{
+             margin-left: 0;
+             width: 100%;
+             margin-bottom: 20px;
+           }
+           .oneline{
+             overflow: visible !important;
+           }
+         }
+         .custom-attr-wrap{
+           border: none;
+           .info-expand{
+             border: none;
+           }
+           .hidden-fields-area{
+             padding-left: 0;
+             padding-top: 0;
+           }
+         }
+       }
+     }
+     .info-widget-footer{
+       display: none;
+     }
+   }
+ }
 }
 
 .selector-info {

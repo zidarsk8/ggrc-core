@@ -1,5 +1,5 @@
 /*!
- Copyright (C) 2016 Google Inc., authors, and contributors
+ Copyright (C) 2017 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -20,6 +20,9 @@
       isLoading: false,
       selectedItem: {},
       items: [],
+      isLoadingInProgress: function () {
+        return this.attr('isLoading');
+      },
       select: function (ctx, el) {
         this.attr('selectedItem.el', el);
         this.attr('selectedItem.data', ctx.instance);

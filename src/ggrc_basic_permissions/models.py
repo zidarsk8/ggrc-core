@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import json
@@ -14,7 +14,8 @@ from ggrc.models.person import Person
 from ggrc.models.mixins import Base, Described
 
 from ggrc_basic_permissions.contributed_roles import (
-    DECLARED_ROLE, get_declared_role,
+    DECLARED_ROLE,
+    get_declared_role,
 )
 
 
@@ -26,13 +27,17 @@ class Role(Base, Described, db.Model):
   """A user role. All roles have a unique name. This name could be a simple
   string, an email address, or some other form of string identifier.
 
-  :permissions:
-    example -
-      { 'create': ['Program', 'Control'],
+  Example:
+
+  ..  code-block:: python
+
+      {
+        'create': ['Program', 'Control'],
         'read': ['Program', 'Control'],
         'update': ['Program', 'Control'],
-        'delete': ['Program']
+        'delete': ['Program'],
       }
+
   """
   __tablename__ = 'roles'
 
@@ -207,8 +212,7 @@ all_models.Role._inflector
 all_models.UserRole._inflector
 all_models.ContextImplication._inflector
 all_models.all_models.extend([Role, UserRole, ContextImplication])
-all_models.__all__.extend(
-    ["Role", "UserRole", "ContextImplication"])
+all_models.__all__.extend(["Role", "UserRole", "ContextImplication"])
 
 
 def get_ids_related_to_user_role(object_type, related_type, related_ids):

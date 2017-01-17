@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A module with tests for the GGRC Workflow package.
@@ -40,6 +40,7 @@ class GetValueTestCase(unittest.TestCase):
     ]
 
     self.related_object = MagicMock(name="assessment_1")
+    self.related_object.revision.content = {}
 
   # pylint: disable=invalid-name
   def test_returns_auditors_as_default_assessors_when_no_template(

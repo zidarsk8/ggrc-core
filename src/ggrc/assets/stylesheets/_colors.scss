@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Google Inc.
+ * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -28,10 +28,12 @@ $darkGray: #7c7c7c;
 $lightGray: #eee;
 $red: #e53935;
 $lightRed: #ff9d9d;
+$pastelRed: #ffe5e5;
 $purpleRed: #9c27b0;
 $purple: #361c74;
 $green: #1d8d15;
 $lightGreen: #8bc34a;
+$pastelGreen: #e5f2e5;
 $defaultGreen: #4caf50;
 $blue: #0277bd;
 $darkBlue: #369;
@@ -149,3 +151,10 @@ $bar-base: #fff;
 $bar-success: #d1fcb5;
 $bar-danger: #ffffbe;
 $bar-warning: #ffcebe;
+
+// snapshots
+$snapshotBgnd: #ddf3fd;
+$snapshotBgndActive: darken($snapshotBgnd, 10%);
+$shapshotBorder: #d9e6ec;
+$snapshotLblBgnd: #6eaacd;
+$snapshotLbl: white;

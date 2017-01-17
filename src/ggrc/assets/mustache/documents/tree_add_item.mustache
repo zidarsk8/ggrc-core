@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -15,8 +15,11 @@
     data-join-option-type="{{model.shortName}}"
     data-join-object-id="{{parent_instance.id}}"
     data-join-object-type="{{parent_instance.class.shortName}}"
-    data-original-title="{{#if_equals model.title_singular 'Reference'}}Link non-gGRC URLs as References{{else}}Map {{firstnonempty title_singular model.title_singular 'Object'}}{{/if_equals}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
-   Map
+    data-original-title="{{#if_equals model.title_singular 'Reference'}}Link non-GGRC URLs as References{{else}}Map {{firstnonempty title_singular model.title_singular 'Object'}}{{/if_equals}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
+    data-is-snapshotable="{{parent_instance.is_snapshotable}}"
+    data-snapshot-scope-id="{{parent_instance.id}}"
+    data-snapshot-scope-type="{{parent_instance.type}}">
+      Map
   </a>
 {{/is_allowed_to_map}}
 {{/if}}

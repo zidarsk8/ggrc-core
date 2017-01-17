@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Contains WithSimilarityScore mixin.
@@ -11,11 +11,13 @@ from sqlalchemy import and_
 from sqlalchemy import case
 from sqlalchemy import literal
 from sqlalchemy import or_
+from sqlalchemy import select
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import func
 
 from ggrc import db
 from ggrc.models.relationship import Relationship
+from ggrc.models.snapshot import Snapshot
 
 
 class WithSimilarityScore(object):
@@ -66,10 +68,13 @@ class WithSimilarityScore(object):
     # find "similar" objects with Relationship table
     queries_for_union += cls._join_relationships(id_)
 
+    # find "similar" objects based on snapshots
+    queries_for_union += cls._join_snapshots(id_)
+
     # find "similar" objects when Relationship table is not used
     queries_for_union += cls._emulate_relationships(id_, types, relevant_types)
 
-    joined = queries_for_union.pop().union(*queries_for_union).subquery()
+    joined = queries_for_union.pop().union_all(*queries_for_union).subquery()
 
     # define weights for every "related" object type with values from
     # relevant_types dict
@@ -115,6 +120,93 @@ class WithSimilarityScore(object):
     return result
 
   @classmethod
+  def _join_snapshots(cls, id_):
+    """Retrieves related objects with snapshots
+
+    Performs a query where it first:
+    1) Find all directly mapped snapshots
+    2) Join with snapshots to find type and id of snapshots (child_type and
+    child_id) - left snapshots
+    3) Join with snapshots to find snapshots with the same child_type and
+    child_id (right_snapshots)
+    4) Find all objects mapped to right snapshots (right_relationships)
+
+    Arg:
+      id_: ID of instance performing similarity query on
+    Return:
+      [(related_type, similar_id, similar_type)] where related type is the type
+      related objects, similar_id and similar_type being id and type of
+      second tier objects.
+    """
+
+    left_snapshot = aliased(Snapshot, name="left_snapshot")
+    right_snapshot = aliased(Snapshot, name="right_snapshot")
+    left_relationship = aliased(Relationship, name="left_relationship")
+    right_relationship = aliased(Relationship, name="right_relationship")
+
+    snapshot_ids = select([
+        left_relationship.destination_id.label("snapshot_left_id"),
+    ]).where(
+        and_(
+            left_relationship.source_type == cls.__name__,
+            left_relationship.source_id == id_,
+            left_relationship.destination_type == "Snapshot"
+        )
+    ).union(
+        select([
+            left_relationship.source_id.label("snapshot_left_id"),
+        ]).where(
+            and_(
+                left_relationship.destination_type == cls.__name__,
+                left_relationship.destination_id == id_,
+                left_relationship.source_type == "Snapshot"
+            )
+        )
+    ).alias("snapshot_ids")
+
+    left_snapshot_join = snapshot_ids.outerjoin(
+        left_snapshot,
+        left_snapshot.id == snapshot_ids.c.snapshot_left_id
+    )
+
+    right_snapshot_join = left_snapshot_join.outerjoin(
+        right_snapshot,
+        and_(
+            right_snapshot.child_type == left_snapshot.child_type,
+            right_snapshot.child_id == left_snapshot.child_id
+        )
+    ).alias("right_snapshot_join")
+
+    return [
+        db.session.query(
+            right_snapshot_join.c.right_snapshot_child_type.label(
+                "related_type"),
+            right_relationship.source_id.label("similar_id"),
+            right_relationship.source_type.label("similar_type"),
+        ).filter(
+            and_(
+                right_relationship.destination_type == "Snapshot",
+                right_relationship.destination_id ==
+                right_snapshot_join.c.right_snapshot_id,
+                right_relationship.source_type == cls.__name__
+            )
+        ),
+        db.session.query(
+            right_snapshot_join.c.right_snapshot_child_type.label(
+                "related_type"),
+            right_relationship.destination_id.label("similar_id"),
+            right_relationship.destination_type.label("similar_type"),
+        ).filter(
+            and_(
+                right_relationship.source_type == "Snapshot",
+                right_relationship.source_id ==
+                right_snapshot_join.c.right_snapshot_id,
+                right_relationship.destination_type == cls.__name__
+            )
+        )
+    ]
+
+  @classmethod
   def _join_relationships(cls, id_):
     """Make a self-join of Relationship table to find common mappings.
 
@@ -157,6 +249,8 @@ class WithSimilarityScore(object):
             related_to_similar,
             and_(related_id_case == related_to_similar.source_id,
                  related_type_case == related_to_similar.source_type),
+        ).filter(
+            related_to_similar.source_type != "Snapshot"
         ),
         db.session.query(
             related_type_case,
@@ -166,7 +260,9 @@ class WithSimilarityScore(object):
             related_to_similar,
             and_(related_id_case == related_to_similar.destination_id,
                  related_type_case == related_to_similar.destination_type),
-        ),
+        ).filter(
+            related_to_similar.destination_type != "Snapshot"
+        )
     ]
 
   @classmethod

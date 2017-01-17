@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -29,8 +29,6 @@ can.Model.Cacheable('CMS.Models.Section', {
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
     people: 'CMS.Models.Person.stubs',
-    object_documents: 'CMS.Models.ObjectDocument.stubs',
-    documents: 'CMS.Models.Document.stubs',
     directive: 'CMS.Models.get_stub',
     children: 'CMS.Models.get_stubs',
     directive_sections: 'CMS.Models.DirectiveSection.stubs',
@@ -102,8 +100,6 @@ can.Model.Cacheable('CMS.Models.Clause', {
     modified_by: 'CMS.Models.Person.stub',
     object_people: 'CMS.Models.ObjectPerson.stubs',
     people: 'CMS.Models.Person.stubs',
-    object_documents: 'CMS.Models.ObjectDocument.stubs',
-    documents: 'CMS.Models.Document.stubs',
     directive: 'CMS.Models.get_stub',
     children: 'CMS.Models.get_stubs',
     directive_sections: 'CMS.Models.DirectiveSection.stubs',

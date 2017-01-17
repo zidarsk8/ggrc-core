@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -7,7 +7,7 @@
   var _mustachePath;
   var overdueCompute;
 
-  overdueCompute = can.compute(function (val) {
+  overdueCompute = function (val) {
     var date;
     var today = moment().startOf('day');
     var startOfDate;
@@ -21,7 +21,7 @@
       return '';
     }
     return 'overdue';
-  });
+  };
 
   function refreshAttr(instance, attr) {
     if (instance.attr(attr).reify().selfLink) {
@@ -470,27 +470,6 @@
       ).then(function (object) {
         return object;
       });
-    },
-    response_options_csv: can.compute(function (val) {
-      if (val != null) {
-        this.attr(
-          'response_options',
-          $.map(val.split(','), $.proxy(''.trim.call, ''.trim))
-        );
-      } else {
-        return (this.attr('response_options') || []).join(', ');
-      }
-    }),
-
-    selected_response_options_csv: can.compute(function (val) {
-      if (val != null) {
-        this.attr(
-          'selected_response_options',
-          $.map(val.split(','), $.proxy(''.trim.call, ''.trim))
-        );
-      } else {
-        return (this.attr('selected_response_options') || []).join(', ');
-      }
-    })
+    }
   });
 })(window.can);

@@ -1,194 +1,162 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
 <div class="modal-header">
-  <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
-    <i class="fa fa-times black"></i>
-  </a>
-  <h2>
-    {{#if template.title}}
-      {{{render template.title mapper=mapper}}}
-    {{else}}
-      Map {{get_object}} to {{get_title}}
-    {{/if}}
-  </h2>
+    <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+        <i class="fa fa-times black"></i>
+    </a>
+    <h2>
+      {{#if template.title}}
+        {{{render template.title mapper=mapper}}}
+      {{else}}
+          Map {{get_object}} to {{get_title}}
+      {{/if}}
+    </h2>
 </div>
 <div class="modal-filter modal-body choose-object-wrap">
-  <div class="row-fluid add-button">
-    <div class="span12">
-      <div class="pull-right">
-        {{^if mapper.useTemplates}}
-        {{#if_helpers "\
-          ^if_equals" mapper.type "AllObject" "\
-          and ^if" mapper.search_only}}
-          {{#is_allowed 'create' mapper.model.singular context='any'}}
-
-            {{#if_equals mapper.type 'AssessmentTemplate'}}
-              <a
-                class="btn btn-small btn-draft"
-                href="javascript://"
-                data-toggle="modal-ajax-form"
-                data-modal-class="modal-wide"
-                data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
-                data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
-                data-object-params='{
+  {{#if mapper.showWarning}}
+      <div class="alert alert-error">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        {{mapper.warningMessage}}
+      </div>
+  {{/if}}
+  {{#if mapper.useTemplates}}
+      <assessment-templates
+              instance="mapper.parentInstance"
+              type="mapper.type"
+              binding="related_assessment_templates"
+              assessment-template="mapper.assessmentTemplate"
+              mapper="mapper"
+      ></assessment-templates>
+  {{else}}
+    {{#if mapper.allowedToCreate}}
+      {{#is_allowed 'create' mapper.model.singular context='any'}}
+        {{#if_equals mapper.type 'AssessmentTemplate'}}
+            <div class="row-fluid add-button">
+                <div class="pull-right">
+                    <a
+                            class="btn btn-small btn-draft"
+                            href="javascript://"
+                            data-toggle="modal-ajax-form"
+                            data-modal-class="modal-wide"
+                            data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
+                            data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
+                            data-object-params='{
                   "audit": {
-                      "id": {{mapper.get_instance.id}},
-                      "type": "{{mapper.get_instance.type}}"
+                      "id": {{mapper.parentInstance.id}},
+                      "type": "{{mapper.parentInstance.type}}"
                   },
                   "context": {
-                      "id": {{mapper.get_instance.context.id}},
-                      "type": "{{json_escape mapper.get_instance.context.type}}"
+                      "id": {{mapper.parentInstance.context.id}},
+                      "type": "{{json_escape mapper.parentInstance.context.type}}"
                   },
-                  "audit_title": "{{json_escape mapper.get_instance.title}}"
+                  "audit_title": "{{json_escape mapper.parentInstance.title}}"
                 }'
-                data-join-object-id="{{mapper.join_object_id}}">
-                <i class="fa fa-plus-circle"></i>
-                Create New {{mapper.model.title_singular}}
-              </a>
-            {{else}}
-              <a
-                 class="btn btn-small btn-draft"
-                 href="javascript://"
-                 data-toggle="modal-ajax-form"
-                 data-modal-class="modal-wide"
-                 data-object-singular="{{mapper.model.singular}}"
-                 data-object-plural="{{mapper.model.plural}}"
-                 data-join-object-id="{{mapper.join_object_id}}">
-                <i class="fa fa-plus-circle"></i>
-                Create New {{mapper.model.title_singular}}
-              </a>
-            {{/if_equals}}
-          {{/is_allowed}}
-        {{/if_helpers}}
-        {{/if}}
-      </div>
-    </div>
-  </div>
-  {{#if mapper.useTemplates}}
-  <assessment-templates
-    instance="mapper.get_instance"
-    type="mapper.type"
-    binding="related_assessment_templates"
-    assessment-template="mapper.assessmentTemplate"
-    mapper="mapper"
-  >
-  </assessment-templates>
-  {{/if}}
-  <div class="row-fluid">
-    <div class="span4">
-      <h6>Object type</h6>
-      <select {{#loading_or_saving}}disabled{{/loading_or_saving}} class="input-block-level" can-value="mapper.type" name="type-select">
-        {{#each mapper.types}}
-          {{#if items}}
-            {{#if items.length}}
-            <optgroup label="{{name}}">
-              {{#each items}}
-                {{#if name}}
-                <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
-                {{/if}}
-              {{/each}}
-            </optgroup>
-            {{/if}}
-          {{else}}
-            {{#if name}}
-            <option data-singular="{{singular}}" data-plural="{{plural}}" value="{{value}}" label="{{name}}"></option>
-            {{/if}}
+                            data-join-object-id="{{mapper.join_object_id}}">
+                        <i class="fa fa-plus-circle"></i>
+                        Create New {{mapper.model.title_singular}}
+                    </a>
+                </div>
+            </div>
+        {{else}}
+          {{^if mapper.showWarning}}
+              <div class="row-fluid add-button">
+                  <div class="pull-right">
+                      <a
+                              class="btn btn-small btn-draft"
+                              href="javascript://"
+                              data-toggle="modal-ajax-form"
+                              data-modal-class="modal-wide"
+                              data-object-singular="{{mapper.model.singular}}"
+                              data-object-plural="{{mapper.model.plural}}"
+                              data-join-object-id="{{mapper.join_object_id}}">
+                          <i class="fa fa-plus-circle"></i>
+                          Create New {{mapper.model.title_singular}}
+                      </a>
+                  </div>
+              </div>
           {{/if}}
-        {{/each}}
-      </select>
-    </div>
-    <div class="span4">
-      <div class="modal-search">
-        <h6>Matching terms</h6>
-        <div class="modal-search objective-selector">
-          <input id="search" class="input-block-level" placeholder="Enter text to search..." can-value="mapper.term" type="text" autofocus>
-        </div>
-      </div>
-    </div>
-    <div class="span4">
-      <h6>Filter by owner or contact</h6>
-      <div class="modal-search objective-selector">
-        <autocomplete
-          search-items-type="Person"
-          can-item-selected="mapper.setContact"
-          disable="mapper.is_saving"
-          placeholder="Find owner or contact"
-          value="mapper.contactEmail"
-          class-name="search-by-owner input-block-level"
-        ></autocomplete>
-      </div>
-    </div>
-  </div>
-  <div class="relevance-filters">
-    <div class="row-fluid">
-      <div class="span12">
-        <relevant-filter search_only="mapper.search_only" type="mapper.type" relevant-to="mapper.relevantTo" relevant="mapper.relevant"></relevant-filter>
-      </div>
-    </div>
-  </div>
+        {{/if_equals}}
+      {{/is_allowed}}
+    {{/if}}
+  {{/if}}
+    <search-toolbar class="flex-box search-toolbar flex-box-multi"></search-toolbar>
 </div>
-
-<mapper-results
-    is-loading="mapper.is_loading"
-    object="mapper.object"
-    entries="mapper.entries"
-    options="mapper.options"
-    page_loading="mapper.page_loading"
-    mapper="mapper"
-    types="mapper.types"
-    type="mapper.type"
-    selected="mapper.selected"
-    contact="mapper.contact"
-    term="mapper.term"
-    options="mapper.options"
-    items-per-page="20">
-</mapper-results>
+{{#if mapper.useSnapshots}}
+    <snapshot-loader
+            class="snapshot-list"
+            base-instance="mapper.parentInstance"
+            is-loading="mapper.is_loading"
+            object="mapper.object"
+            mapper="mapper"
+            type="mapper.type"
+            selected="mapper.selected"
+            contact="mapper.contact"
+            term="mapper.term"
+            scope-id="{{mapper.snapshot_scope_id}}"
+            scope-type="{{mapper.snapshot_scope_type}}">
+    </snapshot-loader>
+{{else}}
+    <mapper-results
+            is-loading="mapper.is_loading"
+            object="mapper.object"
+            entries="mapper.entries"
+            options="mapper.options"
+            page_loading="mapper.page_loading"
+            mapper="mapper"
+            types="mapper.types"
+            type="mapper.type"
+            selected="mapper.selected"
+            contact="mapper.contact"
+            term="mapper.term"
+            options="mapper.options"
+            items-per-page="20"
+            is_snapshotable="mapper.is_snapshotable"
+            snapshot_scope_id="{{mapper.snapshot_scope_id}}"
+            snapshot_scope_type="{{mapper.snapshot_scope_type}}">
+    </mapper-results>
+{{/if}}
 <div class="modal-footer">
   {{^if mapper.search_only}}
-  <div class="row-fluid">
-    <div class="span5">
-      <div class="deny-buttons"></div>
-    </div>
-    <div class="span7">
-      <div class="confirm-buttons">
+      <div class="row-fluid">
+          <div class="span5">
+              <div class="deny-buttons"></div>
+          </div>
+          <div class="span7">
+              <div class="confirm-buttons">
         <span>
           {{#if mapper.is_loading }}
-            <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;"></span>
+            {{^if mapper.useSnapshots}}
+              <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;">
+            {{/if}}
+          </span>
           {{else}}
             {{mapper.selected.length}}
           {{/if}}
           {{#if template.count}}
             {{template.count}}
           {{else}}
-            object(s) selected
+              object(s) selected
           {{/if}}
-        </span>
+            </span>
 
-        <a class="
-            {{#if_helpers '\
-              ^if' mapper.selected.length '\
-              or #if' mapper.is_loading '\
-              or #if' mapper.is_saving}}
-              disabled
-            {{/if_helpers}}
-            btn-map btn btn-small btn-success preventdoubleclick" href="#">
-          {{#if mapper.is_saving}}
-            Saving, please wait...
-          {{else}}
-            {{#if template.submitButton}}
-              {{template.submitButton}}
-            {{else}}
-              Map Selected
-            {{/if}}
-          {{/if}}
-        </a>
-
-        <spinner toggle="mapper.is_saving" ></spinner>
+            <button class="btn-map btn btn-small btn-success preventdoubleclick"
+                    {{^if mapper.selected.length}}disabled="disabled"{{/if}}>
+              {{#if mapper.is_saving}}
+                  Saving, please wait...
+              {{else}}
+                {{#if template.submitButton}}
+                  {{template.submitButton}}
+                {{else}}
+                    Map Selected
+                {{/if}}
+              {{/if}}
+            </button>
+            <spinner toggle="mapper.is_saving"></spinner>
+              </div>
+          </div>
       </div>
-    </div>
-  </div>
   {{/if}}
 </div>

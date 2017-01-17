@@ -1,5 +1,5 @@
 {{!
-Copyright (C) 2016 Google Inc.
+Copyright (C) 2017 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <related-objects base-instance="instance" related-items-type="Assessment" order-by="__similarity__">
@@ -43,6 +43,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     </div>
                     <div class="flex-size-1">
                         <mapped-objects
+                                mapped-snapshots="instance"
                                 parent-instance="instance"
                                 mapping="{{instance.class.info_pane_options.mapped_objects.mapping}}">
                           {{> '/static/mustache/components/assessment/mapped-objects/mapped-related-information-item.mustache' }}

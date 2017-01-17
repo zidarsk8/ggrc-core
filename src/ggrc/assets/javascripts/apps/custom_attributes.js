@@ -1,5 +1,5 @@
 /*!
- Copyright (C) 2016 Google Inc.
+ Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -28,9 +28,10 @@
           function (cad) {
             var cav;
             var type = cad.attribute_type;
+            var instance = this.attr('instance');
             can.each(this.attr('instance.custom_attribute_values'),
               function (val) {
-                val = val.isStub ? val : val.reify();
+                val = val.isStub || instance.isRevision ? val : val.reify();
                 if (val.custom_attribute_id === cad.id) {
                   cav = val;
                 }

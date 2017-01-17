@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Workflow object and WorkflowState mixins.
@@ -27,7 +27,7 @@ from ggrc_workflows.models import cycle_task_group
 
 class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
                mixins.Described, mixins.Titled, mixins.Slugged,
-               mixins.Stateful, mixins.Base, db.Model):
+               mixins.Notifiable, mixins.Stateful, mixins.Base, db.Model):
   """Basic Workflow first class object.
   """
   __tablename__ = 'workflows'
@@ -281,7 +281,6 @@ class WorkflowState(object):
 
   _publish_attrs = [reflection.PublishOnly('workflow_state')]
   _update_attrs = []
-  _stub_attrs = []
 
   @classmethod
   def _get_state(cls, current_tasks):

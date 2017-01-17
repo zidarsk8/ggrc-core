@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 
@@ -62,6 +62,7 @@ def all_cache_entries():
       resource('systems', 'System'),
       resource('processes', 'Process'),
       resource('issues', 'Issue'),
+      resource('snapshots', 'Snapshot'),
 
       # ggrc notification models
       resource('notification_configs', 'NotificationConfig'),

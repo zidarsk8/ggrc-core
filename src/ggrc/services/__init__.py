@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """All gGRC REST services."""
@@ -64,6 +64,7 @@ def contributed_services():
       service('processes', models.Process),
       service('notification_configs', models.NotificationConfig),
       service('issues', models.Issue),
+      service('snapshots', models.Snapshot),
   ]
 
 
@@ -87,10 +88,6 @@ def init_extra_services(app):
   from .search import search
   app.add_url_rule(
       '/search', 'search', login_required(search))
-
-  from .log_event import log_event
-  app.add_url_rule(
-      '/api/log_events', 'log_events', log_event, methods=['POST'])
 
   from .description import ServiceDescription
   app.add_url_rule(

@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """This module is used for handling a single line from a csv file.
@@ -10,6 +10,7 @@ import ggrc.services
 from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters import get_importables
+from ggrc.login import get_current_user_id
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 from ggrc.services.common import Resource
@@ -136,6 +137,7 @@ class RowConverter(object):
     obj = self.get_object_by_key(attr_name)
     if value:
       new_objects[value] = obj
+    obj.modified_by_id = get_current_user_id()
     return obj
 
   def get_object_by_key(self, key="slug"):
@@ -182,7 +184,7 @@ class RowConverter(object):
     for item_handler in self.attrs.values():
       item_handler.set_obj_attr()
 
-  def send_post_commit_signals(self):
+  def send_post_commit_signals(self, event=None):
     """Send after commit signals for all objects
 
     This function sends proper signals for all objects depending if the object
@@ -196,13 +198,15 @@ class RowConverter(object):
     service_class.model = self.object_class
     if self.is_delete:
       Resource.model_deleted_after_commit.send(
-          self.object_class, obj=self.obj, service=service_class)
+          self.object_class, obj=self.obj, service=service_class, event=event)
     elif self.is_new:
       Resource.model_posted_after_commit.send(
-          self.object_class, obj=self.obj, src={}, service=service_class)
+          self.object_class, obj=self.obj, src={}, service=service_class,
+          event=event)
     else:
       Resource.model_put_after_commit.send(
-          self.object_class, obj=self.obj, src={}, service=service_class)
+          self.object_class, obj=self.obj, src={}, service=service_class,
+          event=event)
 
   def send_pre_commit_signals(self):
     """Send before commit signals for all objects.
@@ -222,8 +226,6 @@ class RowConverter(object):
     elif self.is_new:
       Resource.model_posted.send(
           self.object_class, obj=self.obj, src={}, service=service_class)
-      Resource.collection_posted.send(
-          self.object_class, objects=[self.obj], sources=[{}])
     else:
       Resource.model_put.send(
           self.object_class, obj=self.obj, src={}, service=service_class)

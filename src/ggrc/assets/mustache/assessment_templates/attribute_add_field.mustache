@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2016 Google Inc.
+  Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -8,9 +8,12 @@
     type="text"
     can-value="selected.title"
     placeholder="Enter title">
-    {{#selected.invalidTitle}}
+    {{#selected.dublicateTitle}}
       <label class="warning">A custom attribute with this title already exists</label>
-    {{/selected.invalidTitle}}
+    {{/selected.dublicateTitle}}
+    {{#selected.emptyTitle}}
+      <label class="warning">A custom attribute title can not be blank</label>
+    {{/selected.emptyTitle}}
 </div>
 <div class="span-custom1-and-half">
   <select class="input-block-level" can-value="selected.type">

@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 
@@ -315,6 +315,7 @@ def get_modified_objects(session):
 
 
 def update_index(session, cache):
+  """Update fulltext index records for cached objects."""
   if cache:
     indexer = get_indexer()
     for obj in cache.new:
@@ -326,24 +327,27 @@ def update_index(session, cache):
     session.commit()
 
 
-def log_event(session, obj=None, current_user_id=None, flush=True,
-              force_obj=False):
+def _get_log_revisions(current_user_id, obj=None, force_obj=False):
+  """Generate and return revisions for all cached objects."""
   revisions = []
-  if flush:
-    session.flush()
-  if current_user_id is None:
-    current_user_id = get_current_user_id()
   cache = get_cache()
   if cache:
-    for obj_ in cache.dirty:
-      revision = Revision(obj_, current_user_id, 'modified', obj_.log_json())
-      revisions.append(revision)
-    for obj_ in cache.deleted:
-      revision = Revision(obj_, current_user_id, 'deleted', obj_.log_json())
-      revisions.append(revision)
-    for obj_ in cache.new:
-      revision = Revision(obj_, current_user_id, 'created', obj_.log_json())
-      revisions.append(revision)
+    cached_objects = {
+        "modified": cache.dirty,
+        "deleted": cache.deleted,
+        "created": cache.new,
+    }
+    for action, objects in cached_objects.iteritems():
+      for obj_ in objects:
+        revision = Revision(obj_, current_user_id, action, obj_.log_json())
+        revisions.append(revision)
+        if obj_.type == "ObjectOwner" and obj_.ownable:
+          # any change (create/delete/modify) of the owners is an edit on the
+          # original object. That is why the action is always set to modified.
+          revision = Revision(obj_.ownable, current_user_id, "modified",
+                              obj_.ownable.log_json())
+          revisions.append(revision)
+
     if force_obj and obj is not None and obj not in cache.dirty:
       # If the ``obj`` has been updated, but only its custom attributes have
       # been changed, then this object will not be added into
@@ -351,6 +355,28 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
       # The ``force_obj`` flag solves the issue, but in a bit dirty way.
       revision = Revision(obj, current_user_id, 'modified', obj.log_json())
       revisions.append(revision)
+  return revisions
+
+
+def log_event(session, obj=None, current_user_id=None, flush=True,
+              force_obj=False):
+  """Logs an event on object `obj`.
+
+  Args:
+    session: Current SQLAlchemy session (db.session)
+    obj: object on which some operation took place
+    current_user_id: ID of the user performing operation
+    flush: If set to true, flush the session at the start
+    force_obj: Used in case of custom attribute changes to force revision write
+  Returns:
+    Uncommitted models.Event instance
+  """
+  event = None
+  if flush:
+    session.flush()
+  if current_user_id is None:
+    current_user_id = get_current_user_id()
+  revisions = _get_log_revisions(current_user_id, obj=obj, force_obj=force_obj)
   if obj is None:
     resource_id = 0
     resource_type = None
@@ -370,6 +396,7 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
         context_id=context_id)
     event.revisions = revisions
     session.add(event)
+  return event
 
 
 def clear_permission_cache():
@@ -499,6 +526,40 @@ class ModelView(View):
         for j in joinlist:
           query = query.join(j)
         query = query.filter(filter_)
+
+    if "__no_role" in request.args:
+      attr = getattr(self.model, "user_roles")
+      query = query.outerjoin(attr)
+      user_roles_module = attr.mapper.class_
+      superusers = getattr(settings, "BOOTSTRAP_ADMIN_USERS", [])
+      # Filter out:
+      # non superusers AND
+      #   (users without user_role OR
+      #    users with user_role BUT without global role:
+      #    Reader, Editor, Administrator)
+      subq = db.session.query(user_roles_module.person_id).filter(
+          or_(
+              # all users that have global user_role
+              user_roles_module.context_id.is_(None),
+              user_roles_module.context_id == 0
+          )
+      ).subquery()
+      filter_ = and_(
+          # user is not superuser
+          ~self.model.email.in_(superusers),
+          or_(
+              # user hasn't user_role in user_role table
+              user_roles_module.id.is_(None),
+              and_(
+                  # user has user_role in user_role table
+                  user_roles_module.id.isnot(None),
+                  # user hasn't global role
+                  ~user_roles_module.person_id.in_(subq)
+              )
+          )
+      )
+      query = query.filter(filter_)
+
     if filter_by_contexts:
       contexts = permissions.read_contexts_for(self.model.__name__)
       resources = permissions.read_resources_for(self.model.__name__)
@@ -680,12 +741,13 @@ class Resource(ModelView):
       """
       Indicates that a model object was received via POST and has been
       committed to the database. The sender in the signal will be the model
-      aclass of the POSTed resource. The following arguments will be sent along
+      class of the POSTed resource. The following arguments will be sent along
       with the signal:
 
         :obj: The model instance created from the POSTed JSON.
         :src: The original POSTed JSON dictionary.
         :service: The instance of Resource handling the POST request.
+        :event: Instance of an Event (if change took place) or None otherwise
       """,)
   model_put = signals.signal(
       "Model PUT",
@@ -710,6 +772,7 @@ class Resource(ModelView):
         :obj: The model instance updated from the PUT JSON.
         :src: The original PUT JSON dictionary.
         :service: The instance of Resource handling the PUT request.
+        :event: Instance of an Event (if change took place) or None otherwise
       """,)
   model_deleted = signals.signal(
       "Model DELETEd",
@@ -730,6 +793,7 @@ class Resource(ModelView):
 
         :obj: The model instance removed.
         :service: The instance of Resource handling the DELETE request.
+        :event: Instance of an Event (if change took place) or None otherwise
       """,)
 
   def dispatch_request(self, *args, **kwargs):  # noqa
@@ -889,7 +953,7 @@ class Resource(ModelView):
     with benchmark("Update custom attribute values"):
       set_ids_for_new_custom_attributes(obj)
     with benchmark("Log event"):
-      log_event(db.session, obj, force_obj=True)
+      event = log_event(db.session, obj, force_obj=True)
     with benchmark("Update memcache before commit for collection PUT"):
       update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
@@ -903,7 +967,7 @@ class Resource(ModelView):
       update_memcache_after_commit(self.request)
     with benchmark("Send PUT - after commit event"):
       self.model_put_after_commit.send(obj.__class__, obj=obj,
-                                       src=src, service=self)
+                                       src=src, service=self, event=event)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     with benchmark("Make response"):
@@ -942,7 +1006,7 @@ class Resource(ModelView):
       with benchmark("Get modified objects"):
         modified_objects = get_modified_objects(db.session)
       with benchmark("Log event"):
-        log_event(db.session, obj)
+        event = log_event(db.session, obj)
       with benchmark("Update memcache before commit for collection DELETE"):
         update_memcache_before_commit(
             self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
@@ -954,7 +1018,7 @@ class Resource(ModelView):
         update_memcache_after_commit(self.request)
       with benchmark("Send DELETEd - after commit event"):
         self.model_deleted_after_commit.send(obj.__class__, obj=obj,
-                                             service=self)
+                                             service=self, event=event)
       with benchmark("Query for object"):
         object_for_json = self.object_for_json(obj)
       with benchmark("Make response"):
@@ -1316,7 +1380,7 @@ class Resource(ModelView):
     with benchmark("Get modified objects"):
       modified_objects = get_modified_objects(db.session)
     with benchmark("Log event for all objects"):
-      log_event(db.session, obj, flush=False)
+      event = log_event(db.session, obj, flush=False)
     with benchmark("Update memcache before commit for collection POST"):
       update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
@@ -1334,7 +1398,7 @@ class Resource(ModelView):
     with benchmark("Send model POSTed - after commit event"):
       for obj, src in itertools.izip(objects, sources):
         self.model_posted_after_commit.send(obj.__class__, obj=obj,
-                                            src=src, service=self)
+                                            src=src, service=self, event=event)
         # Note: In model_posted_after_commit necessary mapping and
         # relationships are set, so need to commit the changes
       db.session.commit()

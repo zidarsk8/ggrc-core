@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from sqlalchemy import and_
@@ -9,6 +9,7 @@ from ggrc.extensions import get_extension_modules
 from ggrc import models
 from ggrc.models import Audit
 from ggrc.models import Request
+from ggrc.models import Snapshot
 from ggrc.models.relationship import Relationship
 from ggrc.models import all_models
 
@@ -133,9 +134,22 @@ class RelationshipHelper(object):
       return None
 
   @classmethod
+  def _audit_snapshot(cls, object_type, related_type, related_ids):
+    if {object_type, related_type} != {"Audit", "Snapshot"} or not related_ids:
+      return None
+
+    if object_type == "Audit":
+      return db.session.query(Snapshot.parent_id).filter(
+          Snapshot.id.in_(related_ids))
+    else:
+      return db.session.query(Snapshot.id).filter(
+          Snapshot.parent_id.in_(related_ids))
+
+  @classmethod
   def get_special_mappings(cls, object_type, related_type, related_ids):
     return [
         cls.audit_request(object_type, related_type, related_ids),
+        cls._audit_snapshot(object_type, related_type, related_ids),
         cls.person_object(object_type, related_type, related_ids),
         cls.person_ownable(object_type, related_type, related_ids),
         cls.person_withcontact(object_type, related_type, related_ids),
@@ -157,14 +171,12 @@ class RelationshipHelper(object):
   @classmethod
   def _array_union(cls, queries):
     """ Union of all valid queries in array """
-    clean_queries = [q for q in queries if q is not None]
-    if len(clean_queries) == 0:
+    clean_queries = [q for q in queries if q]
+    if not clean_queries:
       return db.session.query(Relationship.source_id).filter(sql.false())
 
     query = clean_queries.pop()
-    for q in clean_queries:
-      query = query.union(q)
-    return query
+    return query.union(*clean_queries)
 
   @classmethod
   def get_ids_related_to(cls, object_type, related_type, related_ids=[]):

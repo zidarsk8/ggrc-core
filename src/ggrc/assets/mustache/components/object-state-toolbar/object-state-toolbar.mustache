@@ -1,0 +1,56 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data('model') }) }}>
+  {{#if isInProgressOrNotStarted}}
+    {{^if hasErrors}}
+      {{#unless isDisabled}}
+        {{#if hasVerifiers}}
+            <button class="btn btn-small btn-primary pull-right btn-info-pin-header"
+                    data-name="status"
+                    data-value="Ready for Review">
+                Complete</button>
+        {{else}}
+            <button class="btn btn-small btn-primary pull-right btn-info-pin-header"
+                    data-name="status"
+                    data-value="Completed">Complete</button>
+        {{/if}}
+      {{/unless}}
+    {{else}}
+        <button class="btn btn-small btn-primary pull-right btn-info-pin-header disabled" {{#if errorMsg }}title="{{errorMsg}}"{{/if}}>Complete</button>
+    {{/if}}
+  {{/if}}
+  {{#if isInReview}}
+    {{#if isCurrentUserVerifier}}
+      {{#unless hasErrors}}
+          <button class="btn btn-small btn-success pull-right btn-info-pin-header"
+                  data-name="status"
+                  data-value="Verified">Verify
+          </button>
+          <button class="btn btn-small btn-danger pull-right btn-info-pin-header"
+                  data-name="status"
+                  data-value="In Progress">Reject
+          </button>
+      {{else}}
+          <button class="btn btn-small btn-success pull-right btn-info-pin-header disabled"
+                  data-name="status"
+                  data-value="Verified"
+                  title="{{errorMsg}}">Verify
+          </button>
+          <button class="btn btn-small btn-danger pull-right btn-info-pin-header disabled"
+                  data-name="status"
+                  data-value="In Progress"
+                  title="{{errorMsg}}">Reject
+          </button>
+      {{/unless}}
+    {{/if}}
+  {{/if}}
+  {{#unless isInProgress}}
+    {{#instance._undo.0}}
+        <a data-name="status" data-value="{{instance._undo.0}}" data-undo="true"
+           class="undo btn btn-small btn-link btn-info-pin-header pull-right {{#if isDisabled}}disabled{{/if}}">Undo</a>
+    {{/instance._undo.0}}
+  {{/unless}}
+</div>

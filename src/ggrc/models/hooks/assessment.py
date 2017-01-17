@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -8,46 +8,63 @@
   new relationships and custom attributes
 """
 
+from itertools import izip
+
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models import Assessment
 from ggrc.models import Person
 from ggrc.models import Relationship
+from ggrc.models import Snapshot
 from ggrc.services.common import Resource
 
 
 def init_hook():
   """ Initialize hooks"""
   # pylint: disable=unused-variable
-  @Resource.model_posted_after_commit.connect_via(Assessment)
-  def handle_assessment_post(sender, obj=None, src=None, service=None):
+  @Resource.collection_posted.connect_via(Assessment)
+  def handle_assessment_post(sender, objects=None, sources=None):
     # pylint: disable=unused-argument
     """Apply custom attribute definitions and map people roles
     when generating Assessmet with template"""
+    db.session.flush()
 
-    src_obj = src.get("object")
-    audit = src.get("audit")
-    program = src.get("program")
-    map_assessment(obj, src_obj)
-    map_assessment(obj, audit)
-    # The program may also be set as the src_obj. If so then it should not be
-    # mapped again.
-    if (src_obj and program and
-        (src_obj["id"] != program["id"] or
-         src_obj["type"] != program["type"])):
-      map_assessment(obj, program)
+    snapshot_ids = [src.get('object', {}).get('id') for src in sources]
+    snapshots = Snapshot.eager_query().filter(Snapshot.id.in_(snapshot_ids))
+    snapshots = {snapshot.id: snapshot for snapshot in snapshots}
 
-    if not src.get("_generated"):
-      return
+    for obj, src in izip(objects, sources):
+      src_obj = src.get("object")
+      audit = src.get("audit")
+      program = src.get("program")
+      map_assessment(obj, src_obj)
+      map_assessment(obj, audit)
+      # The program may also be set as the src_obj. If so then it should not be
+      # mapped again.
+      if (src_obj and program and
+          (src_obj["id"] != program["id"] or
+           src_obj["type"] != program["type"])):
+        map_assessment(obj, program)
 
-    related = {
-        "template": get_by_id(src.get("template")),
-        "obj": get_by_id(src.get("object")),
-        "audit": get_by_id(src.get("audit")),
-    }
-    relate_assignees(obj, related)
-    relate_ca(obj, related)
+      if not src.get("_generated"):
+        continue
+
+      related = {
+          "template": get_by_id(src.get("template")),
+          "obj": get_by_id(src.get("object")),
+          "audit": get_by_id(src.get("audit")),
+      }
+      relate_assignees(obj, related)
+      relate_ca(obj, related)
+
+      if src_obj:
+        snapshot = snapshots.get(src_obj.get('id'))
+        if snapshot:
+          parent_title = snapshot.parent.title
+          child_revision_title = snapshot.revision.content['title']
+          obj.title = '{} assessment for {}'.format(child_revision_title,
+                                                    parent_title)
 
 
 def map_assessment(assessment, obj):
@@ -119,13 +136,17 @@ def get_value(people_group, audit, obj, template=None):
 
   types = {
       "Object Owners": [
-          owner.person for owner in getattr(obj, 'object_owners', None)
+          get_by_id(owner)
+          for owner in obj.revision.content.get("owners", [])
       ],
-      "Audit Lead": getattr(audit, 'contact', None),
-      "Primary Contact": getattr(obj, 'contact', None),
-      "Secondary Contact": getattr(obj, 'secondary_contact', None),
-      "Primary Assessor": getattr(obj, 'principal_assessor', None),
-      "Secondary Assessor": getattr(obj, 'secondary_assessor', None),
+      "Audit Lead": getattr(audit, "contact", None),
+      "Primary Contact": get_by_id(obj.revision.content.get("contact")),
+      "Secondary Contact": get_by_id(
+          obj.revision.content.get("secondary_contact")),
+      "Primary Assessor": get_by_id(
+          obj.revision.content.get("principal_assessor")),
+      "Secondary Assessor": get_by_id(
+          obj.revision.content.get("secondary_assessor")),
   }
   people = template.default_people.get(people_group)
   if not people:
@@ -238,8 +259,14 @@ def relate_ca(assessment, related):
   )
 
   for definition in ca_definitions:
-    db.make_transient(definition)
-    definition.id = None
-    definition.definition_id = assessment.id
-    definition.definition_type = assessment._inflector.table_singular
-    db.session.add(definition)
+    cad = all_models.CustomAttributeDefinition(
+        title=definition.title,
+        definition=assessment,
+        attribute_type=definition.attribute_type,
+        multi_choice_options=definition.multi_choice_options,
+        multi_choice_mandatory=definition.multi_choice_mandatory,
+        mandatory=definition.mandatory,
+        helptext=definition.helptext,
+        placeholder=definition.placeholder,
+    )
+    db.session.add(cad)

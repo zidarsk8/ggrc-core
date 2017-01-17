@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -27,6 +27,7 @@
             </label>
             <select name="user_role">
               <option value="" selected>All Roles</option>
+              <option value="no-role">No Role</option>
               {{#roles}}
                 <option value="{{id}}">{{name}}</option>
               {{/roles}}

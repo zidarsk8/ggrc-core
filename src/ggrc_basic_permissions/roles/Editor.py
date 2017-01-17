@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 scope = "System"
@@ -8,6 +8,7 @@ description = """
 permissions = {
     "read": [
         "Audit",
+        "Snapshot",
         "Categorization",
         "Category",
         "Comment",
@@ -64,6 +65,7 @@ permissions = {
     ],
     "create": [
         "Audit",
+        "Snapshot",
         "Workflow",
         "Categorization",
         "Category",
@@ -122,6 +124,7 @@ permissions = {
     ],
     "update": [
         "Audit",
+        "Snapshot",
         "Workflow",
         "Categorization",
         "Category",

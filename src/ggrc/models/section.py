@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
@@ -13,7 +13,6 @@ from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import WithContact
 from ggrc.models.deferred import deferred
-from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import AttributeInfo
@@ -25,7 +24,7 @@ from ggrc.models.track_object_state import track_state_for_class
 
 class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
               WithContact, Titled, Stateful, db.Model,
-              CustomAttributable, Documentable, Personable,
+              CustomAttributable, Personable,
               Ownable, Relatable, Slugged):
   VALID_STATES = [
       'Draft',
@@ -40,7 +39,6 @@ class Section(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   ]
   __tablename__ = 'sections'
   _table_plural = 'sections'
-  _title_uniqueness = True
   _aliases = {
       "url": "Section URL",
       "description": "Text of Section",

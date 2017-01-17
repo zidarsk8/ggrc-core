@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -18,6 +18,15 @@
   </a>
   <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
     {{#is_allowed 'update' instance context='for'}}
+      {{#if instance.is_snapshotable}}
+        <li>
+          <snapshot-scope-update instance="instance">
+            <a href="javascript://" can-click="upsertIt">
+              <i class="fa fa-refresh"></i>
+              Update objects to latest version</a>
+          </snapshot-scope-update>
+        </li>
+      {{/if}}
       {{> /static/mustache/base_objects/edit_object_link.mustache}}
     {{/is_allowed}}
 
@@ -102,9 +111,10 @@
     {{#is_info_pin}}
       {{#is_allowed_to_map page_instance instance}}
         {{^options.is_in_selector}}
-          {{> /static/mustache/base_objects/unmap.mustache}}
-
-        {{/options}}
+           {{#isNotInScopeModel instance.type}}
+             {{> '/static/mustache/base_objects/unmap.mustache'}}
+           {{/isNotInScopeModel}}
+        {{/options.is_in_selector}}
       {{/is_allowed_to_map}}
       {{#if instance.viewLink}}
         {{#is_allowed "view_object_page" instance}}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Google Inc.
+ * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -96,15 +96,36 @@ select {
 
 // buttons
 .btn-info-pin-header {
+
   margin-right: 10px;
   &.undo {
     margin-right: 10px;
     margin-top: 6px;
+    &.btn-link {
+        margin:0 ;
+        background: transparent;
+        box-shadow: none;
+        color: $link;
+
+        &:hover {
+          color: $darkBlue;
+        }
+      }
   }
   .sticky-info-panel & {
     margin-top: 30px;
     &.undo {
       margin-top: 22px;
+      &.btn-link {
+        margin-top: 30px;
+        background: transparent;
+        box-shadow: none;
+        color: $link;
+
+        &:hover {
+          color: $darkBlue;
+        }
+      }
     }
   }
 }

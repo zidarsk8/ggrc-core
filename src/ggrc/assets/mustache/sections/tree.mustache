@@ -1,10 +1,10 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
 
-  <li class="tree-item" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
+  <li class="tree-item {{#if instance.snapshot}}snapshot{{/if}}" data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}" {{addclass "t-" instance.workflow_state}}>
     <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
       <div class="item-wrap">
         {{> '/static/mustache/base_objects/open_close.mustache'}}
@@ -90,7 +90,7 @@
                       {{{renderLive add_item_view}}}
                     {{/if}}
                   {{/child_options}}
-                  <view-object-button instance="instance" />
+                  <view-object-buttons instance="instance" open-is-hidden="is_subtree" />
                 </div>
                 <ul class="tree-action-list">
                   {{#infer_roles instance}}

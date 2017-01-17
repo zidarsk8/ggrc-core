@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for notifications for models with assignable mixin."""
@@ -9,7 +9,8 @@ from ggrc import db
 from ggrc import contributions
 from ggrc.models import Notification
 from ggrc.models import NotificationType
-from ggrc.models import Request
+from ggrc.models import Assessment
+from ggrc.models import Revision
 from integration.ggrc import api_helper
 from integration.ggrc import converters
 from integration.ggrc import generator
@@ -22,9 +23,9 @@ class TestRequestDataHandlers(converters.TestCase):
     converters.TestCase.setUp(self)
     self.client.get("/login")
     self.api_helper = api_helper.Api()
-    self.import_file("request_full_no_warnings.csv")
-    self.request1 = Request.query.filter_by(slug="Request 1").one()
-    self.request3 = Request.query.filter_by(slug="Request 3").one()
+    self.import_file("assessment_notifications.csv")
+    self.asmt1 = Assessment.query.filter_by(slug="A 1").one()
+    self.asmt3 = Assessment.query.filter_by(slug="A 3").one()
     self.generator = generator.ObjectGenerator()
     self.handlers = contributions.contributed_notifications()
 
@@ -47,60 +48,70 @@ class TestRequestDataHandlers(converters.TestCase):
         NotificationType.name == notif_type,
     ))
 
-  def test_open_request(self):
+  def test_open_assessment(self):
     """Test data handlers for opened requests."""
-    notif = self._get_notification(self.request1, "request_open").first()
+    notif = self._get_notification(self.asmt1, "assessment_open").first()
+
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
+
     open_data = self._call_notif_handler(notif)
-    request_1_expected_keys = set([
-        "user1@a.com",
-        "user2@a.com",
-        "user3@a.com",
-        "user4@a.com",
-        "user5@a.com",
-    ])
+    asmt_1_expected_keys = {
+        "user1@example.com",
+        "user2@example.com",
+        "user3@example.com"
+    }
 
-    self.assertEqual(set(open_data.keys()), request_1_expected_keys)
+    self.assertEqual(set(open_data.keys()), asmt_1_expected_keys)
 
-    notif = self._get_notification(self.request3, "request_open").first()
+    notif = self._get_notification(self.asmt3, "assessment_open").first()
+
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
+
     open_data = self._call_notif_handler(notif)
-    request_3_expected_keys = set([
-        "user1@a.com",
-        "user2@a.com",
-        "user@example.com",
-    ])
+    asmt_4_expected_keys = {"user1@example.com", "user2@example.com"}
 
-    self.assertEqual(set(open_data.keys()), request_3_expected_keys)
+    self.assertEqual(set(open_data.keys()), asmt_4_expected_keys)
 
-  def test_declined_request(self):
-    """Test data handlers for declined requests"""
+  def test_declined_assessment(self):
+    """Test data handlers for declined assessments"""
 
-    # decline request 1
-    request1 = Request.query.filter_by(slug="Request 1").first()
-    self.api_helper.modify_object(request1, {"status": Request.DONE_STATE})
-    self.api_helper.modify_object(request1, {"status": Request.PROGRESS_STATE})
+    # decline assessment 1
+    asmt1 = Assessment.query.filter_by(slug="A 1").first()
+    self.api_helper.modify_object(asmt1, {"status": Assessment.DONE_STATE})
+    self.api_helper.modify_object(asmt1, {"status": Assessment.PROGRESS_STATE})
 
-    notif = self._get_notification(self.request1, "request_declined").first()
+    notif = self._get_notification(self.asmt1, "assessment_declined").first()
+
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
+
     declined_data = self._call_notif_handler(notif)
-    requester_emails = set([
-        "user2@a.com",
-        "user3@a.com",
-    ])
+    requester_emails = {"user1@example.com", }
 
     self.assertEqual(set(declined_data.keys()), requester_emails)
 
-  def test_request_comments(self):
-    request1 = Request.query.filter_by(slug="Request 1").first()
+  def test_assessment_comments(self):
+    """Test data handlers for comment to assessment"""
+    asmt1 = Assessment.query.filter_by(slug="A 1").first()
     _, comment = self.generator.generate_comment(
-        request1, "Verifier", "some comment", send_notification="true")
+        asmt1, "Verifier", "some comment", send_notification="true")
 
     notif = self._get_notification(comment, "comment_created").first()
 
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
+
     declined_data = self._call_notif_handler(notif)
-    requester_emails = set([
-        "user2@a.com",
-        "user3@a.com",
-        "user4@a.com",
-        "user5@a.com",
-    ])
+    requester_emails = {
+        "user1@example.com",
+        "user2@example.com",
+        "user3@example.com"
+    }
 
     self.assertEqual(set(declined_data.keys()), requester_emails)

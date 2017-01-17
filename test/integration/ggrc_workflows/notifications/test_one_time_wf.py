@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from datetime import date
@@ -61,7 +61,7 @@ class TestOneTimeWorkflowNotification(TestCase):
       self.assertIn("cycle_started", notif_data[person_1.email])
       self.assertIn(cycle.id, notif_data[person_1.email]["cycle_started"])
       self.assertIn("my_tasks",
-                    notif_data[person_1.email]["cycle_started"][cycle.id])
+                    notif_data[person_1.email]["cycle_data"][cycle.id])
 
     with freeze_time("2015-05-03"):  # two days befor due date
       _, notif_data = common.get_daily_notifications()
@@ -92,14 +92,14 @@ class TestOneTimeWorkflowNotification(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertIn("cycle_started", notif_data[user])
       self.assertIn(cycle.id, notif_data[user]["cycle_started"])
-      self.assertIn("my_tasks", notif_data[user]["cycle_started"][cycle.id])
-      self.assertIn("cycle_tasks", notif_data[user]["cycle_started"][cycle.id])
+      self.assertIn("my_tasks", notif_data[user]["cycle_data"][cycle.id])
+      self.assertIn("cycle_tasks", notif_data[user]["cycle_data"][cycle.id])
       self.assertIn(
-          "my_task_groups", notif_data[user]["cycle_started"][cycle.id])
+          "my_task_groups", notif_data[user]["cycle_data"][cycle.id])
       self.assertIn("cycle_url", notif_data[user]["cycle_started"][cycle.id])
 
       cycle = Cycle.query.get(cycle.id)
-      cycle_data = notif_data[user]["cycle_started"][cycle.id]
+      cycle_data = notif_data[user]["cycle_data"][cycle.id]
       for task in cycle.cycle_task_group_object_tasks:
         self.assertIn(task.id, cycle_data["my_tasks"])
         self.assertIn(task.id, cycle_data["cycle_tasks"])

@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for control model and related classes."""
@@ -16,7 +16,6 @@ from ggrc.models.mixins import Hierarchical
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.deferred import deferred
-from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.option import Option
@@ -109,7 +108,7 @@ class AssertionCategorized(Categorizable):
     )
 
 
-class Control(HasObjectState, Relatable, CustomAttributable, Documentable,
+class Control(HasObjectState, Relatable, CustomAttributable,
               Personable, ControlCategorized, AssertionCategorized,
               Hierarchical, Timeboxed, Ownable, Auditable,
               TestPlanned, BusinessObject, db.Model):

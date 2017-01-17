@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Google Inc.
+ * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -12,7 +12,7 @@
       "Program", "Regulation", "Standard", "Policy", "Contract",
       "Objective", "Control", "Section", "Clause", "System", "Process",
       "DataAsset", "Facility", "Market", "Product", "Project",
-      "MultitypeSearch", "Issue", "Assessment", "AccessGroup", "Request",
+      "MultitypeSearch", "Issue", "Assessment", "AccessGroup",
       "Person", "OrgGroup", "Vendor"
     ],
     related_object_descriptors = {},
@@ -76,7 +76,6 @@
         related_objectives: TypeFilter("related_objects", "Objective"),
         related_issues: TypeFilter("related_objects", "Issue"),
         related_assessments: TypeFilter("related_objects", "Assessment"),
-        related_requests: TypeFilter("related_objects", "Request"),
         related_people: TypeFilter("related_objects", "Person"),
         related_org_groups: TypeFilter("related_objects", "OrgGroup"),
         related_vendors: TypeFilter("related_objects", "Vendor")

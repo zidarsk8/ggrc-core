@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -18,6 +18,16 @@ from ggrc import db
 
 
 def resolve_duplicates(model, attr, separator=u"-"):
+  """Resolve duplicates on a model property
+
+  Check and remove by renaming duplicate attribute for values.
+
+  Args:
+    model: model that will be checked
+    attr: attribute that will be checked
+    separator: (default -) Separator between old attr value and integer
+  """
+  # pylint: disable=invalid-name
   v0, v1 = aliased(model, name="v0"), aliased(model, name="v1")
   query = db.session.query(v0).join(v1, and_(
       getattr(v0, attr) == getattr(v1, attr),

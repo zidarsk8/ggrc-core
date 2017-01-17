@@ -1,5 +1,5 @@
 /*!
-   Copyright (C) 2016 Google Inc.
+   Copyright (C) 2017 Google Inc.
    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -39,6 +39,7 @@
       '/components/object_counter/object_counter.mustache'),
     scope: {
       counter: '@',
+      counterOverdue: '@',
       modelName: '@',
       searchKeys: '@',
       searchValues: '@',
@@ -48,12 +49,22 @@
         'false': false
       },
       count: null,
+      overdueCount: null,
       initialCount: function () {
         var counter = this.attr('counter');
+        var counterOverdue = this.attr('counterOverdue');
+
         if (_.isUndefined(GGRC.counters[counter])) {
-          throw new Error('Specified counter doesn\'t exist.');
+          throw new Error('Counter ' + counter + ' doesn\'t exist');
         }
         this.attr('count', parseInt(GGRC.counters[counter], 10));
+
+        // the "overdue" counter is optional, thus no error
+        if (!_.isUndefined(GGRC.counters[counterOverdue])) {
+          this.attr(
+            'overdueCount',
+            parseInt(GGRC.counters[counterOverdue], 10));
+        }
       },
       updateCount: _.throttle(function () {
         var searchData = {};
@@ -79,9 +90,27 @@
 
         data = CMS.Models[modelName].findAll(searchData);
         data.done(function (objectList) {
+          var overdue;
+          var utcToday;
+
           this.scope.attr('count', objectList.length);
+
+          // Calculate overdue objects count, assuming UTC time zone and not
+          // taking user's local browser timezone into account.
+          utcToday = moment().tz('UTC');
+
+          overdue = _.filter(objectList, function (item) {
+            var utcDate;
+            if (!item.end_date) {
+              return false;  // no end date --> not considered overdue
+            }
+            utcDate = moment(item.end_date).tz('UTC');
+            return utcToday.isAfter(utcDate, 'day');
+          });
+
+          this.scope.attr('overdueCount', overdue.length);
         }.bind(this));
-      }, 10000) // See component documentation for explanation
+      }, 10000)  // See component documentation for explanation
     },
     init: function () {
       var updateEvents = ['created', 'updated', 'destroyed'];

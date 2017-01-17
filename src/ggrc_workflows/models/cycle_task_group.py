@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for cycle task group model.
@@ -86,8 +86,7 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
     Make sure we load all cycle task group relevant data in a single query.
 
     Returns:
-      a query object with cycle_task_group_tasks and cycle_task_group_objects
-      added to joined load options.
+      a query object with cycle_task_group_tasks added to joined load options.
     """
     query = super(CycleTaskGroup, cls).eager_query()
     return query.options(

@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -17,7 +17,7 @@
       relevant_menu_item: '@',
       show_all: '@',
       addFilter: function () {
-        var menu = this.attr('menu');
+        var menu = this.menu();
 
         if (this.attr('relevant_menu_item') === 'parent' &&
              Number(this.attr('panel_number')) !== 0 &&
@@ -35,7 +35,7 @@
           model_name: menu[0].model_singular
         });
       },
-      menu: can.compute(function () {
+      menu: function () {
         var type = this.attr('type');
         var mappings;
         var models;
@@ -58,7 +58,7 @@
         return _.sortBy(_.compact(_.map(_.keys(mappings), function (mapping) {
           return CMS.Models[mapping];
         })), 'model_singular');
-      })
+      }
     },
     events: {
       init: function () {
@@ -69,6 +69,7 @@
         can.each(this.scope.attr('relevantTo') || [], function (item) {
           var model = CMS.Models[item.type].cache[item.id];
           this.scope.attr('relevant').push({
+            readOnly: item.readOnly,
             value: true,
             filter: model,
             menu: this.scope.attr('menu'),

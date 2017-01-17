@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Sets up Flask app."""
@@ -12,7 +12,7 @@ from flask.ext.sqlalchemy import get_debug_queries
 from flask.ext.sqlalchemy import SQLAlchemy
 from tabulate import tabulate
 
-from ggrc import contributions  # noqa: imported so it can be used with getattr
+from ggrc import contributions  # noqa: imported so it can be used with getattr  # pylint: disable=unused-import
 from ggrc import db
 from ggrc import extensions
 from ggrc import notifications
@@ -101,8 +101,11 @@ def init_permissions_provider():
 
 
 def init_extra_listeners():
+  """Initializes listeners for additional services"""
   from ggrc.automapper import register_automapping_listeners
+  from ggrc.snapshotter.listeners import register_snapshot_listeners
   register_automapping_listeners()
+  register_snapshot_listeners()
 
 
 def _enable_debug_toolbar():

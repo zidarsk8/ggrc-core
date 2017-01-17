@@ -1,11 +1,13 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """ Tests for ggrc.models.Revision """
 
+import ggrc.models
 import integration.ggrc
 import integration.ggrc.generator
-import ggrc.models
+
+from integration.ggrc.models import factories
 
 
 def _get_revisions(obj, field="resource"):
@@ -108,3 +110,18 @@ class TestRevisions(integration.ggrc.TestCase):
     actual = [(r.action, _project_content(r.content))
               for r in revisions_source]
     self.assertEqual(sorted(actual), sorted(expected))
+
+  def test_content_length(self):
+    """Test revision content length restrictions."""
+    process = factories.ProcessFactory(
+        title="a" * 200,
+        description="b" * 65000,
+        notes="c" * 65000,
+    )
+    revision = ggrc.models.Revision.query.filter(
+        ggrc.models.Revision.resource_id == process.id,
+        ggrc.models.Revision.resource_type == process.type,
+    ).first()
+    self.assertIsNotNone(revision)
+    self.assertEqual(revision.content["title"], process.title)
+    self.assertEqual(revision.content["description"], process.description)

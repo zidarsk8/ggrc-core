@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -23,14 +23,16 @@
       },
       toggleSize: function (scope, el, ev) {
         var maximized = !this.attr('maximized');
+        var onChangeMaximizedState = Mustache.resolve(this.onChangeMaximizedState);
         ev.preventDefault();
         this.attr('maximized', maximized);
-        this.onChangeMaximizedState(maximized);
+        onChangeMaximizedState(maximized);
       },
       close: function (scope, el, ev) {
+        var onClose = Mustache.resolve(this.onClose);
         el.find('[rel=tooltip]').data('tooltip').hide();
         ev.preventDefault();
-        this.onClose();
+        onClose();
       }
     }
   });

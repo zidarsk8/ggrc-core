@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -68,19 +68,22 @@ can.Control('CMS.Controllers.InfoPin', {
         $(window).trigger('resize', 0);
       },
       complete: function () {
-        this.element.html('');
+        this.element.height(0).html('');
         $('.cms_controllers_tree_view_node').removeClass('active');
       }.bind(this)
     });
   },
-  setInstance: function (instance, el, maximizedState) {
+  setInstance: function (opts, el, maximizedState) {
     var self = this;
+    var instance = opts.attr('instance');
+    var parentInstance = opts.attr('parent_instance');
     var options = this.findOptions(el);
     var view = this.findView(instance);
     var panelHeight = this.getPinHeight(maximizedState);
     var confirmEdit = instance.class.confirmEditModal ?
       instance.class.confirmEditModal : {};
     var currentPanelHeight;
+    instance.attr('view', view);
 
     if (!_.isEmpty(confirmEdit)) {
       confirmEdit.confirm = this.confirmEdit;
@@ -88,6 +91,7 @@ can.Control('CMS.Controllers.InfoPin', {
 
     this.element.html(can.view(view, {
       instance: instance,
+      parentInstance: parentInstance,
       model: instance.class,
       confirmEdit: confirmEdit,
       is_info_pin: true,

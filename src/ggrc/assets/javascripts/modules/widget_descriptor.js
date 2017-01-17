@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -38,7 +38,32 @@
             model: instance.constructor,
             widget_view: widgetView || defaultInfoWidgetView
           },
-          order: 0
+          order: 5
+        });
+    },
+    /*
+      make an summary widget descriptor for a GGRC object
+      You must provide:
+      instance - an instance that is a subclass of can.Model.Cacheable
+      widgetView [optional] - a template for rendering the info.
+    */
+    make_summary_widget: function (instance, widgetView) {
+      var defaultView = GGRC.mustache_path +
+        '/base_objects/summary.mustache';
+      return new this(
+        instance.constructor.shortName + ':summary', {
+          widget_id: 'Summary',
+          widget_name: function () {
+            return instance.constructor.title_singular + ' Summary';
+          },
+          widget_icon: 'pie-chart',
+          content_controller: GGRC.Controllers.SummaryWidget,
+          content_controller_options: {
+            instance: instance,
+            model: instance.constructor,
+            widget_view: widgetView || defaultView
+          },
+          order: 3
         });
     },
     /*
@@ -50,7 +75,14 @@
       extenders [optional] - an array of objects that will extend the default widget config.
     */
     make_tree_view: function (instance, farModel, mapping, extenders) {
-      var descriptor = {
+      var descriptor;
+      // Should not even try to create descriptor if configuration options are missing
+      if (!instance || !farModel || !mapping) {
+        console
+          .debug('Arguments are missing or have incorrect format', arguments);
+        return null;
+      }
+      descriptor = {
         content_controller: CMS.Controllers.TreeView,
         content_controller_selector: 'ul',
         widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
@@ -127,4 +159,4 @@
       return ret;
     }
   }, {});
-})(this.can.$, this.CMS, this.GGRC);
+})(window.can.$, window.CMS, window.GGRC);

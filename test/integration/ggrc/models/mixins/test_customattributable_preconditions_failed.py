@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration tests for "preconditions_failed" CAV and CAable fields logic."""
@@ -45,9 +45,8 @@ class CustomAttributeMock(object):
     """Generate a custom attribute value."""
     if self.attribute_value is not None:
       value = factories.CustomAttributeValueFactory(
-          custom_attribute_id=self.definition.id,
-          attributable_type=self.attributable.__class__.__name__,
-          attributable_id=self.attributable.id,
+          custom_attribute=self.definition,
+          attributable=self.attributable,
           attribute_value=self.attribute_value,
       )
     else:

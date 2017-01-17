@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -43,7 +43,7 @@
     {{/if_equals}}
     <span class="entry-author">
       Modified by
-      {{#using person=instance.modified_by}}{{{render '/static/mustache/people/popover.mustache' person=person}}}{{/using}}
+      {{#using person=instance.modified_by}}{{>'/static/mustache/people/popover.mustache'}}{{/using}}
       {{#if instance.created_at}}on {{date instance.created_at}}{{/if}}
     </span>
   </div>

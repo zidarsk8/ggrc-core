@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -132,16 +132,16 @@
         .done(function (data) {
           this.scope.attr("import", _.map(data, function (element) {
             element.data = [];
-            if (element.block_warnings.concat(element.row_warnings).length) {
-              element.data.push({
-                status: "warnings",
-                messages: element.block_warnings.concat(element.row_warnings)
-              });
-            }
             if (element.block_errors.concat(element.row_errors).length) {
               element.data.push({
                 status: "errors",
                 messages: element.block_errors.concat(element.row_errors)
+              });
+            }
+            if (element.block_warnings.concat(element.row_warnings).length) {
+              element.data.push({
+                status: "warnings",
+                messages: element.block_warnings.concat(element.row_warnings)
               });
             }
             return element;

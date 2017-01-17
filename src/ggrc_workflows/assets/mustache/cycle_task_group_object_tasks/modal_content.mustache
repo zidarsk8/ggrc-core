@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -26,7 +26,7 @@
         <label>
           Selection Response Options (Comma Separated)
         </label>
-          <textarea id="tgt_response_options" class="span12 double" name="response_options_csv" placeholder="Enter Description" tabindex="2">{{instance.response_options_csv}}</textarea>
+          <textarea-array array="instance.response_options" class-name="span12 double" placeholder="Enter Description" tabindex="2"></textarea-array>
       {{/if_equals}}
       <br>
       <select name="task_type">

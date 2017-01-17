@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -7,14 +7,8 @@
   {{#if options.mappings}}
     {{#is_allowed_to_map instance page_instance}}
       {{^is_dashboard_or_all}}
-        <li class="border">
-          <a href="javascript://" class="unmap" data-toggle="unmap">
-            {{#options.result}}<span class="result" {{data 'result'}}></span>{{/options.result}}
-            <i class="fa fa-ban"></i>
-            Unmap
-          </a>
-        </li>
+        <li class="border"><a href="javascript://" class="unmap" data-toggle="unmap">{{#options.result}}<span class="result" {{data 'result'}}></span>{{/options.result}}<i class="fa fa-ban"></i>Unmap</a></li>
       {{/is_dashboard_or_all}}
-    {{/is_allowed_all}}
+    {{/is_allowed_to_map}}
   {{/if}}
 {{/if}}

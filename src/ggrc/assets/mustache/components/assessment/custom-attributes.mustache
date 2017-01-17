@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 {{#items}}
@@ -13,8 +13,9 @@
                         title-text="input.title"
                         placeholder="input.placeholder"
                         is-saving="isSaving"
+                        object-validation="validation"
                   {{^is_allowed 'update' instance context='for'}}
-                        readonly
+                        readonly="true"
                   {{/is_allowed}}
                   can-before-edit="instance.confirmBeginEdit"
                 ></assessment-inline-edit>

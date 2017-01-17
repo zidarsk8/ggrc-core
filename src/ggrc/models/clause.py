@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for Clause model."""
@@ -15,7 +15,6 @@ from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import WithContact
-from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
@@ -24,7 +23,7 @@ from ggrc.models.track_object_state import track_state_for_class
 
 
 class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
-             WithContact, Titled, Stateful, CustomAttributable, Documentable,
+             WithContact, Titled, Stateful, CustomAttributable,
              Personable, Ownable, Timeboxed, Relatable, Slugged, db.Model):
 
   VALID_STATES = [
@@ -40,7 +39,6 @@ class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
   ]
   __tablename__ = 'clauses'
   _table_plural = 'clauses'
-  _title_uniqueness = True
   _aliases = {
       "url": "Clause URL",
       "description": "Text of Clause",

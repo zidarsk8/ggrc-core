@@ -1,10 +1,10 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 (function (can, $, CMS) {
-  var ApprovalWorkflowErrors = can.compute(function () {
+  var ApprovalWorkflowErrors = function () {
     var errors = null;
     if (!this.attr('contact')) {
       errors = {
@@ -17,7 +17,7 @@
       });
     }
     return errors;
-  });
+  };
 
   can.Observe('CMS.ModelHelpers.CycleTask', {
     findInCacheById: function () {
@@ -65,7 +65,7 @@
           return CycleTask.save();
         }.bind(this));
     },
-    computed_errors: can.compute(function () {
+    computed_errors: function () {
       var errors = null;
       if (!this.attr('title')) {
         errors = {
@@ -73,7 +73,7 @@
         };
       }
       return errors;
-    })
+    }
   });
 
   can.Observe('CMS.ModelHelpers.ApprovalWorkflow', {

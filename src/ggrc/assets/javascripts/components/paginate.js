@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -76,12 +76,12 @@
         *                     pageNum: `True page number that gets passed to setPage function`
         *                   }
         */
-      totalPages: can.compute(function () {
+      totalPages: function () {
         var list = this.attr('list');
         var perPage = Number(this.attr('perPage'));
 
         return Math.ceil(list.length / perPage);
-      })
+      }
     }
   });
 })(window.can, window.can.$);

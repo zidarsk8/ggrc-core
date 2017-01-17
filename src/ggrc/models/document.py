@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from sqlalchemy.orm import validates
@@ -14,6 +14,7 @@ from ggrc.models.utils import validate_option
 class Document(Ownable, Relatable, Base, db.Model):
   __tablename__ = 'documents'
 
+  # TODO: inherit from Titled mixin (note: title is nullable here)
   title = deferred(db.Column(db.String), 'Document')
   link = deferred(db.Column(db.String), 'Document')
   description = deferred(db.Column(db.Text), 'Document')

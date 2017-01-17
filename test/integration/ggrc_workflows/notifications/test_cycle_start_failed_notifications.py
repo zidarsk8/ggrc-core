@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from integration.ggrc import TestCase
@@ -11,6 +11,7 @@ from ggrc.models import Notification
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
 
 
 class TestCycleStartFailed(TestCase):
@@ -168,7 +169,7 @@ class TestCycleStartFailed(TestCase):
             "contact": person_dict(self.user.id),
             "task_group_tasks": [{
                 "contact": person_dict(self.user.id),
-                "description": self.wf_generator.random_str(100),
+                "description": factories.random_str(100),
                 "relative_start_day": 5,
                 "relative_start_month": 2,
                 "relative_end_day": 25,
@@ -189,7 +190,7 @@ class TestCycleStartFailed(TestCase):
             "contact": person_dict(self.user.id),
             "task_group_tasks": [{
                 "contact": person_dict(self.user.id),
-                "description": self.wf_generator.random_str(100),
+                "description": factories.random_str(100),
                 "relative_start_day": 14,
                 "relative_end_day": 25,
             },

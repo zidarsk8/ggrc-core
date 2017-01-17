@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -12,7 +12,7 @@
         Reviewed on {{instance.updated_at}} <br />
         and approved by
         {{#using person=instance.modified_by}}
-          {{{> '/static/mustache/people/popover.mustache'}}}
+          {{>'/static/mustache/people/popover.mustache'}}
         {{/using}}
       </span>
       {{/last_approved}}
@@ -38,9 +38,9 @@
               {{/with_most_recent_declining_task_entry}}
             {{/if_equals}}
             <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
-              <button class="btn btn-mini btn-success change-task-status {{instance._disabled}}" data-name="status" data-value="Verified">Approve</button>
+              <button class="btn btn-mini btn-success change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}" data-name="status" data-value="Verified">Approve</button>
               <a href="javascript://"
-                class="undoable btn btn-mini btn-danger change-task-status {{instance._disabled}}"
+                class="undoable btn btn-mini btn-danger change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}"
                 data-toggle="modal-ajax-form"
                 data-object-singular="CycleTaskEntry"
                 data-object-params='{\
@@ -65,7 +65,7 @@
                 {{#with_mapping 'object_tasks' instance}}
                 <p>
                   If you wish to change the current reviewer, please click
-                  <a href="#task_widget/cycle_task_group_object_task/{{object_tasks.0.instance.id}}">here</a>
+                  <a href="#task_widget/cycle_task_group_object_task/{{object_tasks.0.instance.id}}" class="{{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}">here</a>
                   and change the assignee.
                 </p>
                 {{/with_mapping}}
@@ -76,7 +76,7 @@
               {{#with_mapping_count instance 'current_approval_cycles'}}
                 {{#if_equals count 0}}
                   {{#is_allowed "update" instance}}
-                    <a href="javascript://" class="non-transparent" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
+                    <a href="javascript://" class="non-transparent {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}" data-toggle="modal-ajax-approvalform" data-object-singular="{{instance.class.model_singular}}" data-object-id="{{instance.id}}">
                       <i class="fa fa-check-square-o gray"></i>
                       Submit For Review
                     </a>

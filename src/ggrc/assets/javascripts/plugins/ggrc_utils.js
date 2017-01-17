@@ -1,9 +1,11 @@
 /*!
- Copyright (C) 2016 Google Inc.
+ Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 (function ($, GGRC, moment, Permission) {
+  'use strict';
+
   var customAttributesType = {
     Text: 'input',
     'Rich Text': 'text',
@@ -23,10 +25,17 @@
        * Performs filtering on provided array like instances
        * @param {Array} items - array like instance
        * @param {Function} filter - filtering function
+       * @param {Function} selectFn - function to select proper attributes
        * @return {Array} - filtered array
        */
-      applyFilter: function (items, filter) {
-        return Array.prototype.filter.call(items, filter);
+      applyFilter: function (items, filter, selectFn) {
+        selectFn = selectFn ||
+          function (x) {
+            return x;
+          };
+        return Array.prototype.filter.call(items, function (item) {
+          return filter(selectFn(item));
+        });
       },
       /**
        * Helper function to create a filtering function
@@ -34,30 +43,34 @@
        * @return {Function} - filtering function
        */
       makeTypeFilter: function (filterObj) {
-        return function (item) {
-          var type = item.instance.type.toString().toLowerCase();
+        function checkIsNotEmptyArray(arr) {
+          return arr && Array.isArray(arr) && arr.length;
+        }
+        return function (type) {
+          type = type.toString().toLowerCase();
           if (!filterObj) {
             return true;
           }
-          if (filterObj.only && Array.isArray(filterObj.only)) {
+          if (checkIsNotEmptyArray(filterObj.only)) {
             // Do sanity transformation
             filterObj.only = filterObj.only.map(function (item) {
               return item.toString().toLowerCase();
             });
             return filterObj.only.indexOf(type) > -1;
           }
-          if (filterObj.exclude && Array.isArray(filterObj.exclude)) {
+          if (checkIsNotEmptyArray(filterObj.exclude)) {
             // Do sanity transformation
             filterObj.exclude = filterObj.exclude.map(function (item) {
               return item.toString().toLowerCase();
             });
             return filterObj.exclude.indexOf(type) === -1;
           }
+          return true;
         };
       },
-      applyTypeFilter: function (items, filterObj) {
+      applyTypeFilter: function (items, filterObj, getTypeSelectFn) {
         var filter = GGRC.Utils.filters.makeTypeFilter(filterObj);
-        return GGRC.Utils.filters.applyFilter(items, filter);
+        return GGRC.Utils.filters.applyFilter(items, filter, getTypeSelectFn);
       }
     },
     sortingHelpers: {
@@ -104,6 +117,11 @@
         return '';
       }
 
+      if (typeof date === 'string') {
+        // string dates are assumed to be in ISO format
+        return moment.utc(date, 'YYYY-MM-DD', true).format('MM/DD/YYYY');
+      }
+
       inst = moment(new Date(date.isComputed ? date() : date));
       if (hideTime === true) {
         return inst.format('MM/DD/YYYY');
@@ -127,6 +145,25 @@
       document.body.appendChild(element);
       element.click();
       document.body.removeChild(element);
+    },
+    loadScript: function (url, callback) {
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      if (script.readyState) {
+        script.onreadystatechange = function () {
+          if (script.readyState === 'loaded' ||
+            script.readyState === 'complete') {
+            script.onreadystatechange = null;
+            callback();
+          }
+        };
+      } else {
+        script.onload = function () {
+          callback();
+        };
+      }
+      script.src = url;
+      document.getElementsByTagName('head')[0].appendChild(script);
     },
     export_request: function (request) {
       return $.ajax({
@@ -204,9 +241,8 @@
       var forbidden;
       var forbiddenList = {
         Program: ['Audit', 'RiskAssessment'],
-        Audit: ['Assessment', 'Program', 'Request'],
+        Audit: ['Assessment', 'Program'],
         Assessment: ['Workflow', 'TaskGroup'],
-        Request: ['Workflow', 'TaskGroup', 'Person', 'Audit'],
         Person: '*',
         AssessmentTemplate: '*'
       };
@@ -278,6 +314,7 @@
 
       // NOTE: the names in every type pair must be sorted alphabetically!
       var FORBIDDEN = Object.freeze({
+        'audit issue': true,
         'audit program': true,
         'audit request': true,
         'program riskassessment': true,
@@ -300,6 +337,15 @@
       // (and vice versa)
       types = [sourceType.toLowerCase(), targetType.toLowerCase()].sort();
       if (FORBIDDEN[types.join(' ')]) {
+        return false;
+      }
+
+      // special check for snapshot:
+      if (options &&
+        options.context &&
+        options.context.parent_instance &&
+        options.context.parent_instance.snapshot) {
+        // Avoid add mapping for snapshot
         return false;
       }
 
@@ -340,6 +386,19 @@
       return canMap;
     },
     /**
+     * Return Model Constructor Instance
+     * @param {String} type - Model type
+     * @return {CMS.Model.Cacheble|null} - Return Model Constructor
+     */
+    getModelByType: function (type) {
+      if (!type || typeof type !== 'string') {
+        console.debug('Type is not provided or has incorrect format',
+          'Value of Type is: ', type);
+        return null;
+      }
+      return CMS.Models[type] || GGRC.Models[type];
+    },
+    /**
      * Return normalized Custom Attribute Type from Custom Attribute Definition
      * @param {String} type - String Custom Attribute Value from JSON
      * @return {String} - Normalized Custom Attribute Type
@@ -347,7 +406,7 @@
     mapCAType: function (type) {
       return customAttributesType[type] || 'input';
     },
-    isEmptyCA: function (value, type) {
+    isEmptyCA: function (value, type, cav) {
       var result = false;
       var types = ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
         'Map:Person'];
@@ -358,10 +417,20 @@
         'Rich Text': function (value) {
           value = GGRC.Utils.getPlainText(value);
           return _.isEmpty(value);
+        },
+        'Map:Person': function (value, cav) {
+          // Special case, Map:Person has 'Person' value by default
+          if (cav) {
+            return !cav.attribute_object;
+          }
+          return _.isEmpty(value);
         }
       };
+      if (value === undefined) {
+        return true;
+      }
       if (types.indexOf(type) > -1 && options[type]) {
-        result = options[type](value);
+        result = options[type](value, cav);
       } else if (types.indexOf(type) > -1) {
         result = _.isEmpty(value);
       }
@@ -436,7 +505,50 @@
 
       roles.unshift('none');
       return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
+    },
+    _display_tree_subpath: function display_subpath(el, path, attempt_counter) {
+    var rest = path.split('/');
+    var type = rest.shift();
+    var id = rest.shift();
+    var selector = '[data-object-type=\'' + type + '\'][data-object-id=' + id + ']';
+    var $node;
+    var node_controller;
+    var controller;
+
+    if (!attempt_counter) {
+      attempt_counter = 0;
     }
+
+    rest = rest.join('/');
+
+    if (type || id) {
+      $node = el.find(selector);
+
+      // sometimes nodes haven't loaded yet, wait for them
+      if (!$node.size() && attempt_counter < 5) {
+        setTimeout(function () {
+          display_subpath(el, path, attempt_counter + 1);
+        }, 100);
+        return undefined;
+      }
+
+      if (!rest.length) {
+        controller = $node
+          .closest('.cms_controllers_tree_view_node')
+          .control();
+
+        if (controller) {
+          controller.select();
+        }
+      } else {
+        node_controller = $node.control();
+        if (node_controller && node_controller.display_path) {
+          return node_controller.display_path(rest);
+        }
+      }
+    }
+    return can.Deferred().resolve();
+  }
   };
 
   /**
@@ -475,14 +587,14 @@
      * @param {Object} relevant.id - Id of relevant object
      * @param {Object} relevant.operation - Type of operation.
      * @param {Object} additionalFilter - An additional filter to be applied
-     * @return {QueryAPIRequest} Array of QueryAPIRequest
+     * @return {Array} Array of QueryAPIRequest
      */
     function buildParams(objName, page, relevant, additionalFilter) {
       return [buildParam(objName, page, relevant, undefined, additionalFilter)];
     }
 
     /**
-     * Build params for request on Query API.
+     * Build params for ids type request on Query API.
      *
      * @param {String} objName - Name of requested object
      * @param {Object} page - Information about page state.
@@ -495,9 +607,41 @@
      * @param {Object} relevant.type - Type of relevant object
      * @param {Object} relevant.id - Id of relevant object
      * @param {Object} relevant.operation - Type of operation.
+     * @param {Object|Array} additionalFilter - Additional filters to be applied
+     * @return {Object} Object of QueryAPIRequest
+     */
+    function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
+      var params = {};
+
+      if (!objName) {
+        return {};
+      }
+
+      params.object_name = objName;
+      params.filters =
+        _makeFilter(objName, page.filter, relevant, additionalFilter);
+      params.type = 'ids';
+
+      return params;
+    }
+
+    /**
+     * Build params for request on Query API.
+     *
+     * @param {String} objName - Name of requested object
+     * @param {Object} page - Information about page state.
+     * @param {Number} page.current - Current page
+     * @param {Number} page.pageSize - Page size
+     * @param {String} page.sortBy - sortBy
+     * @param {String} page.sortDirection - sortDirection
+     * @param {String} page.filter - Filter string
+     * @param {Object|Object[]} relevant - Information about relevant object
+     * @param {Object} relevant.type - Type of relevant object
+     * @param {Object} relevant.id - Id of relevant object
+     * @param {Object} relevant.operation - Type of operation.
      * @param {Array} fields - Array of requested fields.
-     * @param {Object} additionalFilter - An additional filter to be applied
-     * @return {QueryAPIRequest} Object of QueryAPIRequest
+     * @param {Object|Array} additionalFilter - Additional filters to be applied
+     * @return {Object} Object of QueryAPIRequest
      */
     function buildParam(objName, page, relevant, fields, additionalFilter) {
       var first;
@@ -505,14 +649,12 @@
       var params = {};
 
       if (!objName) {
-        return;
+        return {};
       }
 
       params.object_name = objName;
-      if (relevant && !relevant.operation) {
-        relevant.operation = _getTreeViewOperation(objName);
-      }
-      params.filters = _makeFilter(page.filter, relevant, additionalFilter);
+      params.filters =
+        _makeFilter(objName, page.filter, relevant, additionalFilter);
 
       if (page.current && page.pageSize) {
         first = (page.current - 1) * page.pageSize;
@@ -541,19 +683,24 @@
     }
 
     function initCounts(widgets, relevant) {
-      var params = (widgets ? Array.from(widgets) : []).map(function (widget) {
-        var param;
-        if (typeof widget === 'string') {
-          param = buildParam(widget, {},
-                    makeExpression(widget, relevant.type, relevant.id));
-        } else {
-          param = buildParam(widget.name, {},
-                    makeExpression(widget.name, relevant.type, relevant.id),
-                    null, widget.additionalFilter);
-        }
-        param.type = 'count';
-        return param;
-      });
+      var params = can.makeArray(widgets)
+        .map(function (widget) {
+          var param;
+          if (GGRC.Utils.Snapshots.isSnapshotRelated(relevant.type, widget)) {
+            param = buildParam('Snapshot', {},
+              makeExpression(widget, relevant.type, relevant.id), null,
+              GGRC.query_parser.parse('child_type = ' + widget));
+          } else if (typeof widget === 'string') {
+            param = buildParam(widget, {},
+              makeExpression(widget, relevant.type, relevant.id));
+          } else {
+            param = buildParam(widget.name, {},
+              makeExpression(widget.name, relevant.type, relevant.id),
+              null, widget.additionalFilter);
+          }
+          param.type = 'count';
+          return param;
+        });
 
       return makeRequest({
         data: params
@@ -563,6 +710,9 @@
           var name = typeof widget === 'string' ? widget : widget.name;
           var countsName = typeof widget === 'string' ?
             widget : (widget.countsName || widget.name);
+          if (GGRC.Utils.Snapshots.isSnapshotRelated(relevant.type, name)) {
+            name = 'Snapshot';
+          }
           widgetsCounts.attr(countsName, info[name].total);
         });
       });
@@ -577,7 +727,7 @@
      */
     function makeRequest(params) {
       var reqParams = params.data || [];
-      return $.ajax({
+      return can.ajax({
         type: 'POST',
         headers: $.extend({
           'Content-Type': 'application/json'
@@ -604,19 +754,34 @@
       return expression;
     }
 
-    function _makeFilter(filter, relevant, additionalFilter) {
-      var relevantFilter;
+    function _makeRelevantFilter(filter, objName) {
+      var relevantFilter = GGRC.query_parser.parse('#' + filter.type + ',' +
+        filter.id + '#');
+
+      if (filter && !filter.operation) {
+        filter.operation = _getTreeViewOperation(objName);
+      }
+
+      if (filter.operation &&
+        filter.operation !== relevantFilter.expression.op.name) {
+        relevantFilter.expression.op.name = filter.operation;
+      }
+
+      return relevantFilter;
+    }
+
+    function _makeFilter(objName, filter, relevant, additionalFilter) {
+      var relevantFilters;
       var filterList = [];
 
       if (relevant) {
-        relevantFilter = GGRC.query_parser.parse('#' + relevant.type + ',' +
-                                                 relevant.id + '#');
-        filterList.push(relevantFilter);
-
-        if (relevant.operation &&
-            relevant.operation !== relevantFilter.expression.op.name) {
-          relevantFilter.expression.op.name = relevant.operation;
-        }
+        relevant = Array.isArray(relevant) ?
+          relevant :
+          can.makeArray(relevant);
+        relevantFilters = relevant.map(function (filter) {
+          return _makeRelevantFilter(filter, objName);
+        });
+        filterList = filterList.concat(relevantFilters);
       }
 
       if (filter) {
@@ -624,9 +789,11 @@
       }
 
       if (additionalFilter) {
-        filterList.push(additionalFilter);
+        additionalFilter = Array.isArray(additionalFilter) ?
+          additionalFilter :
+          can.makeArray(additionalFilter);
+        filterList = filterList.concat(additionalFilter);
       }
-
       if (filterList.length) {
         return filterList.reduce(function (left, right) {
           return GGRC.query_parser.join_queries(left, right);
@@ -649,10 +816,180 @@
     return {
       buildParam: buildParam,
       buildParams: buildParams,
+      buildRelevantIdsQuery: buildRelevantIdsQuery,
       makeRequest: makeRequest,
       getCounts: getCounts,
       makeExpression: makeExpression,
       initCounts: initCounts
+    };
+  })();
+
+  /**
+   * Browser-specific utils.
+   */
+  GGRC.Utils.Browser = (function () {
+    /**
+     * Refresh current page
+     * @param {Boolean} force - Force refresh and don't wait for GGRC queue.
+     */
+    function refreshPage(force) {
+      if (force) {
+        window.onbeforeunload = null;
+      }
+      window.location.reload(force);
+    }
+
+    return {
+      refreshPage: refreshPage
+    };
+  })();
+
+  /**
+   * Util methods for work with Snapshots.
+   */
+  GGRC.Utils.Snapshots = (function () {
+    /**
+     * Set extra attrs for snapshoted objects or snapshots
+     * @param {Object} instance - Object instance
+     */
+    function setAttrs(instance) {
+      // Get list of objects that supports 'snapshot scope' from config
+      var className = instance.type;
+      if (isSnapshotParent(className)) {
+        instance.attr('is_snapshotable', true);
+      }
+    }
+
+    /**
+     * Check whether object is snapshot
+     * @param {Object} instance - Object instance
+     * @return {Boolean} True or False
+     */
+    function isSnapshot(instance) {
+      return instance && instance.snapshot;
+    }
+
+    /**
+     * Check whether object is in spanshot scope
+     * @param {Object} parentInstance - Object (parent) instance
+     * @return {Boolean} True or False
+     */
+    function isSnapshotScope(parentInstance) {
+      var instance = parentInstance || GGRC.page_instance();
+      return instance ? instance.is_snapshotable : false;
+    }
+
+    /**
+     * Check whether provided model name is snapshot parent
+     * @param {String} parent - Model name
+     * @return {Boolean} True or False
+     */
+    function isSnapshotParent(parent) {
+      return GGRC.config.snapshotable_parents.indexOf(parent) > -1;
+    }
+
+    /**
+     * Check whether provided model name should be snapshot or default one
+     * @param {String} modelName - model to check
+     * @return {Boolean} True or False
+     */
+    function isSnapshotModel(modelName) {
+      return GGRC.config.snapshotable_objects.indexOf(modelName) > -1;
+    }
+
+    /**
+     * Check if the relationship is of type snapshot.
+     * @param {String} parent - Parent of the related objects
+     * @param {String} child - Child of the related objects
+     * @return {Boolean} True or False
+     */
+    function isSnapshotRelated(parent, child) {
+      return isSnapshotParent(parent) && isSnapshotModel(child);
+    }
+
+    function isInScopeModel(model) {
+      return GGRC.Utils.Snapshots.inScopeModels.indexOf(model) > -1;
+    }
+
+    /**
+     * Convert snapshot to object
+     * @param {Object} instance - Snapshot instance
+     * @return {Object} The object
+     */
+    function toObject(instance) {
+      var model = CMS.Models[instance.child_type];
+      var content = instance.revision.content;
+      var type = model.root_collection;
+      content.isLatestRevision = instance.is_latest_revision;
+      content.originalLink = '/' + type + '/' + content.id;
+      content.snapshot = new CMS.Models.Snapshot(instance);
+      content.related_sources = [];
+      content.related_destinations = [];
+      content.viewLink = content.snapshot.viewLink;
+      content.selfLink = content.snapshot.selfLink;
+      content.type = instance.child_type;
+      content.id = instance.id;
+      return new model(content);
+    }
+
+    /**
+     * Convert revision to object
+     * @param {Object} instance -  instance
+     * @return {Object} The object
+     */
+    function revisionToModel(instance) {
+      var content = instance.content;
+      content.isRevision = true;
+      content.class = {
+        is_custom_attributable: false
+      };
+      return content;
+    }
+
+    /**
+     * Convert array of snapshots to array of object
+     * @param {Object} values - array of snapshots
+     * @return {Object} The array of objects
+     */
+    function toObjects(values) {
+      return new can.List(values.map(toObject));
+    }
+
+    /**
+     * Transform query for objects into query for snapshots of the same type
+     * @param {Object} query - original query
+     * @return {Object} The transformed query
+     */
+    function transformQuery(query) {
+      var type = query.object_name;
+      var expression = query.filters.expression;
+      query.object_name = 'Snapshot';
+      query.filters.expression = {
+        left: {
+          left: 'child_type',
+          op: {name: '='},
+          right: type
+        },
+        op: {name: 'AND'},
+        right: expression
+      };
+      return query;
+    }
+
+    return {
+      inScopeModels: ['Assessment', 'Issue', 'AssessmentTemplate'],
+      outOfScopeModels: ['Person', 'Program'],
+      isSnapshot: isSnapshot,
+      isSnapshotScope: isSnapshotScope,
+      isSnapshotParent: isSnapshotParent,
+      isSnapshotRelated: isSnapshotRelated,
+      isSnapshotModel: isSnapshotModel,
+      isInScopeModel: isInScopeModel,
+      toObject: toObject,
+      toObjects: toObjects,
+      revisionToModel: revisionToModel,
+      transformQuery: transformQuery,
+      setAttrs: setAttrs
     };
   })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

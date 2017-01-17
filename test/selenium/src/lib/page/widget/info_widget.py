@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Page object models for the info widget of the object"""
@@ -139,11 +139,6 @@ class Audits(Widget):
 class Assessments(Widget):
   """Model for assessment object info widget"""
   _locator = locator.WidgetInfoAssessment
-
-
-class Requests(Widget):
-  """Model for request object info widget"""
-  _locator = locator.WidgetInfoRequest
 
 
 class Issues(Widget):

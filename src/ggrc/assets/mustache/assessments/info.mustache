@@ -1,12 +1,12 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
 {{#instance}}
     <section class="assessment-module info{{#is_info_pin}} sticky-info-panel assignable{{/is_info_pin}}">
       {{#is_info_pin}}
-          <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="onChangeMaximizedState" on-close="onClose"></info-pin-buttons>
+          <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
       {{/is_info_pin}}
 
         <div class="tier-content">
@@ -20,7 +20,8 @@
                     <assessment-mapped-controls instance="instance"
                                                 title-text="Controls"
                                                 mapping-type="Control"
-                                                mapping="info_related_objects">
+                                                mapping="info_related_objects"
+                                                scope-object="parentInstance">
                     </assessment-mapped-controls>
                     <div class="assessment-controls">
                         <span class="assessment-controls__note">Input assessment information below:</span>
@@ -40,7 +41,8 @@
                             instance="instance"
                             title-text="Related Information"
                             mapping-type=""
-                            mapping="info_related_objects">
+                            mapping="info_related_objects"
+                            scope-object="parentInstance">
                     </assessment-mapped-related-information>
                 </div>
                 <div class="assessment-summary flex-size-1">
@@ -126,9 +128,6 @@
                     </tab-panel>
                     <tab-panel panels="panels" title-text="Related Assessments" instance="instance">
                       {{> '/static/mustache/assessments/related-assessments.mustache' }}
-                    </tab-panel>
-                    <tab-panel panels="panels" title-text="Related Requests" instance="instance">
-                      {{> '/static/mustache/assessments/related_requests.mustache'}}
                     </tab-panel>
                     <tab-panel panels="panels" title-text="Related Issues" instance="instance">
                       {{> '/static/mustache/assessments/related_issues.mustache' }}

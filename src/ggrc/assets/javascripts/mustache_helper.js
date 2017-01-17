@@ -1,58 +1,57 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 (function (namespace, $, can) {
-
-//chrome likes to cache AJAX requests for Mustaches.
-var mustache_urls = {};
-$.ajaxPrefilter(function ( options, originalOptions, jqXHR ) {
-  if ( /\.mustache$/.test(options.url) ) {
-    if (mustache_urls[options.url]) {
-      options.url = mustache_urls[options.url];
-    } else {
-      mustache_urls[options.url] = options.url += "?r=" + Math.random();
+// Chrome likes to cache AJAX requests for Mustaches.
+  var mustache_urls = {};
+  $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+    if (/\.mustache$/.test(options.url)) {
+      if (mustache_urls[options.url]) {
+        options.url = mustache_urls[options.url];
+      } else {
+        mustache_urls[options.url] = options.url += "?r=" + Math.random();
+      }
     }
-  }
-});
+  });
 
-function get_template_path(url) {
-  var match;
-  match = url.match(/\/static\/(mustache|mockups)\/(.*)\.mustache/);
-  return match && match[2];
-}
+  function get_template_path(url) {
+    var match;
+    match = url.match(/\/static\/(mustache|mockups)\/(.*)\.mustache/);
+    return match && match[2];
+  }
 
 // Check if the template is available in "GGRC.Templates", and if so,
 //   short-circuit the request.
 
-$.ajaxTransport('text', function (options, _originalOptions, _jqXHR) {
-  var template_path = get_template_path(options.url);
-  var template = template_path && GGRC.Templates[template_path];
-  if (template) {
-    return {
-      send: function (headers, completeCallback) {
-        function done() {
-          if (template) {
-            completeCallback(200, 'success', {text: template});
+  $.ajaxTransport('text', function (options, _originalOptions, _jqXHR) {
+    var template_path = get_template_path(options.url);
+    var template = template_path && GGRC.Templates[template_path];
+    if (template) {
+      return {
+        send: function (headers, completeCallback) {
+          function done() {
+            if (template) {
+              completeCallback(200, 'success', {text: template});
+            }
           }
-        }
-        if (options.async) {
-          // Use requestAnimationFrame where possible because we want
-          // these to run as quickly as possible but still release
-          // the thread.
-          (window.requestAnimationFrame || window.setTimeout)(done, 0);
-        } else {
-          done();
-        }
-      },
+          if (options.async) {
+            // Use requestAnimationFrame where possible because we want
+            // these to run as quickly as possible but still release
+            // the thread.
+            (window.requestAnimationFrame || window.setTimeout)(done, 0);
+          } else {
+            done();
+          }
+        },
 
-      abort: function () {
-        template = null;
-      }
-    };
-  }
-});
+        abort: function () {
+          template = null;
+        }
+      };
+    }
+  });
 
 var quickHash = function (str, seed) {
   var bitval = seed || 1;
@@ -65,72 +64,6 @@ var quickHash = function (str, seed) {
   }
   return bitval;
 };
-
-
-var getParentNode = function (el, defaultParentNode) {
-  return defaultParentNode && el.parentNode.nodeType === 11 ? defaultParentNode : el.parentNode;
-};
-
-
-function isExtendedFalsy(obj) {
-  return !obj
-    || (typeof obj === "object" && can.isEmptyObject(obj))
-    || (obj.length != null && obj.length === 0)
-    || (obj.serialize && can.isEmptyObject(obj.serialize()));
-}
-
-function preprocessClassString(str) {
-  var ret = []
-  , src = str.split(" ");
-
-  for (var i = 0; i < src.length; i++) {
-    var expr = src[i].trim();
-    if (expr.charAt(0) === "=") {
-      ret.push({ attr : src[i].trim().substr(1) });
-    } else if (expr.indexOf(":") > -1) {
-      var spl = expr.split(":");
-      var arr = [];
-      for (var j = 0; j < spl.length - 1; j ++) {
-        var inverse = spl[j].trim()[0] === "!"
-        , attr_name = spl[j].trim().substr(inverse ? 1 : 0);
-
-        arr.push({attr : attr_name, inverse : inverse});
-      }
-      arr.value = spl[spl.length - 1];
-      ret.push(arr);
-    } else {
-      ret.push(expr);
-    }
-  }
-  return ret;
-}
-
-function buildClassString(arr, context) {
-  var ret = [];
-  for (var i = 0; i < arr.length; i++) {
-    if (typeof arr[i] === "string") {
-      ret.push(arr[i]);
-    } else if (typeof arr[i] === "object" && arr[i].attr) {
-      ret.push(can.getObject(arr[i].attr, context));
-    } else if (can.isArray(arr[i]) && arr[i].value) {
-      var p = true;
-      for (var j = 0; j < arr[i].length; j ++) {
-        var attr = can.getObject(arr[i][j].attr, context);
-        if (arr[i][j].inverse ? !isExtendedFalsy(attr) : isExtendedFalsy(attr)) {
-          p = false;
-          break;
-        }
-      }
-      if (p) {
-        ret.push(arr[i].value);
-      }
-    } else {
-      throw "Unsupported class building expression: " + JSON.stringify(arr[i]);
-    }
-  }
-
-  return ret.join(" ");
-}
 
 Mustache.registerHelper("addclass", function (prefix, compute, options) {
   prefix = resolve_computed(prefix);
@@ -1273,6 +1206,7 @@ Mustache.registerHelper("link_to_tree", function () {
  *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
  */
 Mustache.registerHelper('date', function (date, hideTime) {
+  date = Mustache.resolve(date);
   return GGRC.Utils.formatDate(date, hideTime);
 });
 
@@ -1493,11 +1427,17 @@ Mustache.registerHelper("json_escape", function (obj, options) {
 
 function localizeDate(date, options, tmpl) {
   if (!options) {
-    date = new Date();
-  } else {
-    date = resolve_computed(date);
+    return moment().format(tmpl);
   }
-  return date ? moment(date).format(tmpl) : '';
+  date = resolve_computed(date);
+  if (date) {
+    if (typeof date === 'string') {
+      // string dates are assumed to be in ISO format
+      return moment.utc(date, 'YYYY-MM-DD', true).format(tmpl);
+    }
+    return moment(new Date(date)).format(tmpl);
+  }
+  return '';
 }
 
 can.each({
@@ -2500,13 +2440,13 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
     , include_admin = !options.hash || options.hash.include_admin !== false;
 
   instance = Mustache.resolve(instance);
-  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+  instance = !instance ? instance : instance.reify();
 
   if (!instance) {
     return '';
   }
 
-  audit = instance instanceof CMS.Models.Request ? instance.attr("audit") : instance;
+  audit = instance;
 
   if (!audit) {
     return '';  // take no action until audit is available
@@ -2532,7 +2472,7 @@ Mustache.registerHelper("if_verifiers_defined", function (instance, options) {
   var verifiers;
 
   instance = Mustache.resolve(instance);
-  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+  instance = !instance ? instance : instance.reify();
 
   if (!instance) {
     return '';
@@ -2553,7 +2493,7 @@ Mustache.registerHelper("if_verifier", function (instance, options) {
       verifiers;
 
   instance = Mustache.resolve(instance);
-  instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+  instance = !instance ? instance : instance.reify();
 
   if (!instance) {
     return '';
@@ -2619,7 +2559,7 @@ can.each({
           editor = GGRC.current_user.system_wide_role === "Editor";
 
       instance = resolve_computed(instance);
-      instance = (!instance || instance instanceof CMS.Models.Request) ? instance : instance.reify();
+      instance = !instance ? instance : instance.reify();
 
       if(!instance)
         return "";
@@ -3717,4 +3657,13 @@ Example:
       return options.inverse(options.contexts);
     }
   );
+  Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
+    var isInScopeModel;
+    modelName = can.isFunction(modelName) ? modelName() : modelName;
+    isInScopeModel = GGRC.Utils.Snapshots.isInScopeModel(modelName);
+    // Temporary Modification to remove possibility to unmap Audit
+    isInScopeModel =
+      isInScopeModel || GGRC.Utils.Snapshots.isSnapshotParent(modelName);
+    return isInScopeModel ? options.inverse(this) : options.fn(this);
+  });
 })(this, jQuery, can);

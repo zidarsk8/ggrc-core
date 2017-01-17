@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 API = "api"
@@ -8,7 +8,6 @@ PROGRAMS = "programs"
 WORKFLOWS = "workflows"
 AUDITS = "audits"
 ASSESSMENTS = "assessments"
-REQUESTS = "requests"
 ISSUES = "issues"
 REGULATIONS = "regulations"
 POLICIES = "policies"

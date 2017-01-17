@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Google Inc.
+ * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -417,6 +417,10 @@ ul.new-tree {
     margin-bottom: 0;
     max-height: 240px;
     overflow-y: auto;
+    .task-comments & {
+      max-height: none;
+      overflow-y: visible;
+    }
     & .tier-2-info {
       padding: 14px 10px 0 10px;
       .tier-2-info-content {

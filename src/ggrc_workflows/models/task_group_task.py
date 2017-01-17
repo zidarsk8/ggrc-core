@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A module containing the workflow TaskGroupTask model."""
@@ -51,7 +51,7 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
       db.String(length=250), default=default_task_type, nullable=False)
 
   response_options = db.Column(
-      JsonType(), nullable=False, default='[]')
+      JsonType(), nullable=False, default=[])
 
   VALID_TASK_TYPES = ['text', 'menu', 'checkbox']
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration test for AutoStatusChangeable mixin"""
@@ -159,6 +159,44 @@ class TestMixinAutoStatusChangeable(integration.ggrc.TestCase):
     assessment = self.refresh_object(assessment)
     self.assertEqual(assessment.status,
                      models.Assessment.PROGRESS_STATE)
+
+  def test_modifying_person_custom_attribute_changes_status(self):
+    """Test that changing a Person CA changes the status to in progress."""
+    person_id = models.Person.query.first().id
+    _, another_person = self.objgen.generate_person()
+
+    # define a Custom Attribute of type Person...
+    _, ca_def = self.objgen.generate_custom_attribute(
+        definition_type="assessment",
+        attribute_type="Map:Person",
+        title="best employee")
+
+    # create assessment with a Person Custom Attribute set, make sure the
+    # state is set to final
+    assessment = self.create_simple_assessment()
+
+    custom_attribute_values = [{
+        "custom_attribute_id": ca_def.id,
+        "attribute_value": "Person:" + str(person_id),
+    }]
+    self.api_helper.modify_object(assessment, {
+        "custom_attribute_values": custom_attribute_values
+    })
+
+    assessment = self.change_status(assessment, assessment.FINAL_STATE)
+    assessment = self.refresh_object(assessment)
+
+    # now change the Person CA and check what happens with the status
+    custom_attribute_values = [{
+        "custom_attribute_id": ca_def.id,
+        "attribute_value": "Person:" + str(another_person.id),  # make a change
+    }]
+    self.api_helper.modify_object(assessment, {
+        "custom_attribute_values": custom_attribute_values
+    })
+
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status, models.Assessment.PROGRESS_STATE)
 
   @classmethod
   def create_assignees(cls, obj, persons):

@@ -1,5 +1,5 @@
 /*!
- Copyright (C) 2016 Google Inc.
+ Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -76,10 +76,17 @@
           this.attr('isEdit', true);
         }.bind(this));   // and do nothing if no confirmation by the user
       },
-
+      updateValidation: function (value) {
+        if (this.objectValidation) {
+          this.objectValidation.attr('empty', GGRC.Utils.isEmptyCA(value));
+        }
+      },
       onCancel: function (scope) {
+        var value = scope.attr('_value');
         scope.attr('isEdit', false);
-        scope.attr('context.value', scope.attr('_value'));
+        scope.attr('context.value', value);
+
+        this.updateValidation(value);
       },
       onSave: function () {
         var oldValue = this.attr('value');
@@ -96,9 +103,11 @@
           return;
         }
 
-        this.attr('_value', oldValue);
+        this.attr('_value', value);
         this.attr('value', value);
         this.attr('isSaving', true);
+
+        this.updateValidation(value);
       }
     },
     init: function (element, options) {
@@ -118,7 +127,7 @@
 
         if (!isInside && scope.attr('isEdit')) {
           _.defer(function () {
-            scope.onSave();
+            scope.onCancel(scope);
           });
         }
       }

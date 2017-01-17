@@ -1,5 +1,5 @@
 /*!
- Copyright (C) 2016 Google Inc., authors, and contributors
+ Copyright (C) 2017 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -44,7 +44,13 @@
     },
     events: {
       init: function () {
+        var self = this;
         this.scope.applyState();
+        this.scope.validation.bind('change', function (event, propertyName) {
+          if (propertyName === 'empty') {
+            self.scope.applyState();
+          }
+        });
       },
       '{scope} validation': function () {
         this.scope.applyState();

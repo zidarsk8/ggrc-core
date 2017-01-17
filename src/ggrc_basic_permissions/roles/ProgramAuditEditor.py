@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 scope = "Audit Implied"
@@ -13,6 +13,7 @@ permissions = {
         "Assessment",
         "Issue",
         "Audit",
+        "Snapshot",
         "AuditObject",
         "Meeting",
         "ObjectControl",
@@ -25,6 +26,7 @@ permissions = {
         "Context",
     ],
     "create": [
+        "Snapshot",
         "Request",
         "Comment",
         "Assessment",
@@ -58,6 +60,7 @@ permissions = {
             },
             "condition": "contains"
         },
+        "Snapshot",
         "Request",
         "Audit",
         "AuditObject",

@@ -1,10 +1,14 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from __future__ import with_statement
 import re
 from alembic import context
 from logging.config import fileConfig
+
+# Ensure all models are imported so they can be used
+# with --autogenerate
+from ggrc.app import db
+from ggrc.models import all_models  # noqa
 
 # This is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -14,47 +18,19 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-# Ensure all models are imported so they can be used
-# with --autogenerate
-from ggrc.app import db, app
-from ggrc.models import all_models
-
 target_metadata = db.metadata
 
-def _get_db_scheme():
-    """Returns the database type, e.g. 'sqlite' or 'mysql' based
-    on the database URI.
-    """
-    url = app.config['SQLALCHEMY_DATABASE_URI']
-    db_scheme = url.split(':')[0].split('+')[0]
-    return db_scheme
 
 def include_symbol(tablename, schema=None):
-    """Exclude some tables from consideration by alembic's 'autogenerate'.
-    """
-    db_scheme = _get_db_scheme()
+  """Exclude some tables from consideration by alembic's 'autogenerate'.
+  """
+  # Exclude `*_alembic_version` tables
+  if re.match(r'.*_alembic_version$', tablename):
+    return False
 
-    # Exclude some tables when considering SQLite3, because full text search
-    # generates tables that are not reflected in SQLAlchemy's metadata.
-    sqlite_fts_exclusions = [
-        # Exclude SQLite full-text-search tables
-        'fulltext_record_properties_content',
-        'fulltext_record_properties_docsize',
-        'fulltext_record_properties_segdir',
-        'fulltext_record_properties_segments',
-        'fulltext_record_properties_stat',
-        'fulltext_record_properties',
-        ]
+  # If the tablename didn't match any exclusion cases, return True
+  return True
 
-    if db_scheme == 'sqlite' and tablename in sqlite_fts_exclusions:
-        return False
-
-    # Exclude `*_alembic_version` tables
-    if re.match(r'.*_alembic_version$', tablename):
-        return False
-
-    # If the tablename didn't match any exclusion cases, return True
-    return True
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -74,6 +50,7 @@ def run_migrations_offline():
 
     with context.begin_transaction():
         context.run_migrations()
+
 
 def run_migrations_online():
     """Run migrations in 'online' mode.

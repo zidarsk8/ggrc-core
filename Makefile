@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 SHELL := /bin/bash
@@ -18,7 +18,6 @@ APPENGINE_ZIP_HREF=https://commondatastorage.googleapis.com/appengine-sdks/depre
 APPENGINE_ZIP_NAME=google_appengine_1.9.3.zip
 APPENGINE_ZIP_PATH=$(DEV_PREFIX)/opt/$(APPENGINE_ZIP_NAME)
 APPENGINE_SDK_PATH=$(DEV_PREFIX)/opt/google_appengine
-APPENGINE_SQLITE_PATCH_PATH=$(PREFIX)/extras/google_appengine__enable_sqlite3.diff
 APPENGINE_NOAUTH_PATCH_PATH=$(PREFIX)/extras/google_appengine__force_noauth_local_webserver.diff
 
 APPENGINE_PACKAGES_ZIP=$(PREFIX)/src/packages.zip
@@ -44,7 +43,6 @@ $(APPENGINE_SDK_PATH) : $(APPENGINE_ZIP_PATH)
 		unzip -o $(APPENGINE_ZIP_PATH)
 	touch $(APPENGINE_SDK_PATH)
 	cd $(APPENGINE_SDK_PATH); \
-		patch -p1 < $(APPENGINE_SQLITE_PATCH_PATH); \
 		patch -p1 < $(APPENGINE_NOAUTH_PATCH_PATH)
 
 appengine_sdk : $(APPENGINE_SDK_PATH)
@@ -174,6 +172,7 @@ src/app.yaml : src/app.yaml.dist
 		GAPI_CLIENT_SECRET="$(GAPI_CLIENT_SECRET)" \
 		GAPI_ADMIN_GROUP="$(GAPI_ADMIN_GROUP)" \
 		BOOTSTRAP_ADMIN_USERS="$(BOOTSTRAP_ADMIN_USERS)" \
+		MIGRATOR="$(MIGRATOR)" \
 		RISK_ASSESSMENT_URL="$(RISK_ASSESSMENT_URL)"\
 		APPENGINE_EMAIL="$(APPENGINE_EMAIL)" \
 		CUSTOM_URL_ROOT="$(CUSTOM_URL_ROOT)" \

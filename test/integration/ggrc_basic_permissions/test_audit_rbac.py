@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test audit RBAC"""
@@ -37,8 +37,8 @@ class TestAuditRBAC(TestCase):
     """Sanity check if the audit_rbac.csv was imported correctly"""
     assert len(self.people) == 17, \
         "Expecting 17 people not {}.".format(len(self.people))
-    assert len(self.related_objects) == 12, \
-        "Expecting 12 objects mapped to audit not {}."\
+    assert len(self.related_objects) == 11, \
+        "Expecting 11 objects mapped to audit not {}."\
         .format(len(self.related_objects))
 
   def read(self, objects):

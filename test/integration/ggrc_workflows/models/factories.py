@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import factory
@@ -10,7 +10,7 @@ from integration.ggrc.models.factories import ModelFactory
 from integration.ggrc.models.factories import TitledFactory
 
 
-class WorkflowFactory(ModelFactory, TitledFactory):
+class WorkflowFactory(TitledFactory):
 
   class Meta:
     model = models.Workflow
@@ -18,7 +18,7 @@ class WorkflowFactory(ModelFactory, TitledFactory):
   frequency = "one_time"
 
 
-class TaskGroupFactory(ModelFactory, TitledFactory):
+class TaskGroupFactory(TitledFactory):
 
   class Meta:
     model = models.TaskGroup
@@ -36,7 +36,7 @@ class TaskGroupObjectFactory(ModelFactory):
   object_type = ""
 
 
-class TaskGroupTaskFactory(ModelFactory, TitledFactory):
+class TaskGroupTaskFactory(TitledFactory):
 
   class Meta:
     model = models.TaskGroupTask
@@ -45,7 +45,7 @@ class TaskGroupTaskFactory(ModelFactory, TitledFactory):
   task_type = "text"
 
 
-class CycleFactory(ModelFactory, TitledFactory):
+class CycleFactory(TitledFactory):
 
   class Meta:
     model = models.Cycle
@@ -53,7 +53,7 @@ class CycleFactory(ModelFactory, TitledFactory):
   workflow = factory.SubFactory(WorkflowFactory)
 
 
-class CycleTaskGroupFactory(ModelFactory, TitledFactory):
+class CycleTaskGroupFactory(TitledFactory):
 
   class Meta:
     model = models.CycleTaskGroup
@@ -61,7 +61,7 @@ class CycleTaskGroupFactory(ModelFactory, TitledFactory):
   cycle = factory.SubFactory(CycleFactory)
 
 
-class CycleTaskFactory(ModelFactory, TitledFactory):
+class CycleTaskFactory(TitledFactory):
 
   class Meta:
     model = models.CycleTaskGroupObjectTask

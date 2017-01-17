@@ -1,5 +1,5 @@
   /*!
-  Copyright (C) 2016 Google Inc.
+  Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -109,13 +109,28 @@
             workflow.attr('status', 'Active');
             return workflow.save();
           }, restore_button).then(function (workflow) {
-            if (moment(workflow.next_cycle_start_date).isSame(moment(), 'day')) {
+            if (moment(workflow.next_cycle_start_date)
+                .isSame(moment(), 'day')) {
               return new CMS.Models.Cycle({
                 context: workflow.context.stub(),
                 workflow: {id: workflow.id, type: 'Workflow'},
                 autogenerate: true
               }).save();
             }
+          }, restore_button).then(function () {
+            var WorkflowExtension =
+              GGRC.extensions.find(function (extension) {
+                return extension.name === 'workflows';
+              });
+
+            $('body').trigger('treeupdate');
+            return GGRC.Utils.QueryAPI
+              .initCounts([
+                WorkflowExtension.countsMap.activeCycles
+              ], {
+                type: workflow.type,
+                id: workflow.id
+              });
           }, restore_button).then(restore_button);
         } else {
           _generate_cycle().then(function () {

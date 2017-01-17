@@ -1,10 +1,9 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
-from .object_document import Documentable
 from .object_person import Personable
 from .object_owner import Ownable
 from .relationship import Relatable
@@ -103,7 +102,7 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
 
 
 # FIXME: For subclasses, restrict kind
-class Policy(CustomAttributable, Relatable, Documentable,
+class Policy(CustomAttributable, Relatable,
              Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
@@ -123,7 +122,7 @@ class Policy(CustomAttributable, Relatable, Documentable,
     return 'Policy'
 
 
-class Regulation(CustomAttributable, Relatable, Documentable,
+class Regulation(CustomAttributable, Relatable,
                  Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
@@ -143,7 +142,7 @@ class Regulation(CustomAttributable, Relatable, Documentable,
     return 'Regulation'
 
 
-class Standard(CustomAttributable, Relatable, Documentable,
+class Standard(CustomAttributable, Relatable,
                Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Standard'
@@ -163,7 +162,7 @@ class Standard(CustomAttributable, Relatable, Documentable,
     return 'Standard'
 
 
-class Contract(CustomAttributable, Relatable, Documentable,
+class Contract(CustomAttributable, Relatable,
                Personable, Ownable, Directive):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'

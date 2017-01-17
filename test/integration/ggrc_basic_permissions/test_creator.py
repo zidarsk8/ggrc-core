@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -242,4 +242,4 @@ class TestCreator(TestCase):
 
     self.api.set_user(self.users["creator"])
     check(obj_1, 0)
-    check(obj_2, 1)
+    check(obj_2, 2)

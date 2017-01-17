@@ -1,10 +1,12 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{^if_equals parent_instance.status 'Verified'}}
-  {{#using cycle=parent_instance.cycle}}
+{{#using task=instance}} {{! just a more descriptive alias}}
+
+{{^if_equals task.status 'Verified'}}
+  {{#using cycle=task.cycle}}
     {{#if cycle.is_current}}
     {{#is_allowed 'update' instance context='for'}}
       <li class="tree-footer tree-item-add inner-tree-footer non-stick">
@@ -20,9 +22,9 @@
           data-object-singular="CycleTaskEntry"
           data-object-plural="cycle_task_entries"
           data-object-params='{
-            "cycle_task_group_object_task": {{parent_instance.id}},
-            "cycle": {{parent_instance.cycle.id}},
-            "context": {{parent_instance.context.id}}
+            "cycle_task_group_object_task": {{task.id}},
+            "cycle": {{task.cycle.id}},
+            "context": {{task.context.id}}
           }'>
           Add Comment
         </a>
@@ -31,3 +33,5 @@
     {{/if}}
   {{/using}}
 {{/if_equals}}
+
+{{/using}}

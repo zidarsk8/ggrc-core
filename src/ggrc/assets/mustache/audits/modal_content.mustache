@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -65,7 +65,8 @@
         </label>
         <div tabindex="4">
             <dropdown options-list="model.statuses"
-                      name="instance.status">
+                      name="instance.status"
+                      tabindex="23">
             </dropdown>
         </div>
       </div>
@@ -78,6 +79,7 @@
           label="Planned Start Date"
           date="start_date"
           set-max-date="end_date"
+          tabindex="20"
           />
       </div>
       <div data-id="planned_end_date_hidden" class="span3 hidable">
@@ -86,6 +88,7 @@
           label="Planned End Date"
           set-min-date="start_date"
           date="end_date"
+          tabindex="21"
           />
         <label>
       </div>
@@ -99,6 +102,7 @@
             <datepicker
               set-max-date="report_end_date"
               date="report_start_date"
+              tabindex="22"
               />
           </div>
           <div class="span6">
@@ -195,7 +199,7 @@
       <div data-id="code_hidden" class="span4 hidable">
         <label>
           Code
-          <i class="fa fa-question-circle" rel="tooltip" title="The gGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+          <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
           <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="AUDIT-XXX" type="text" value="{{instance.slug}}">

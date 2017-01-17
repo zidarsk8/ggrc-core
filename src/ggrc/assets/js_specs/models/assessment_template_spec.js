@@ -1,5 +1,5 @@
 /*!
-  Copyright (C) 2016 Google Inc.
+  Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -28,7 +28,7 @@ describe('can.Model.AssessmentTemplate', function () {
 
       // mock the MapperModel used by the method under test
       fakeMapper = {
-        types: jasmine.createSpy()
+        initTypes: jasmine.createSpy()
       };
       FakeMapperModel = jasmine.createSpy().and.callFake(function (config) {
         return fakeMapper;
@@ -56,7 +56,7 @@ describe('can.Model.AssessmentTemplate', function () {
         }
       };
 
-      fakeMapper.types.and.returnValue(objectTypes);
+      fakeMapper.initTypes.and.returnValue(objectTypes);
       result = instance._choosableObjectTypes();
       expect(result).toEqual(objectTypes);
     });
@@ -77,7 +77,7 @@ describe('can.Model.AssessmentTemplate', function () {
         {name: 'Bar'}, {name: 'Car'}, {name: 'Dar'}, {name: 'Zar'}
       ];
 
-      fakeMapper.types.and.returnValue(objectTypes);
+      fakeMapper.initTypes.and.returnValue(objectTypes);
       result = instance._choosableObjectTypes();
       expect(result.groupFoo.items).toEqual(expected);
     });
@@ -92,7 +92,7 @@ describe('can.Model.AssessmentTemplate', function () {
         }
       };
 
-      fakeMapper.types.and.returnValue(objectTypes);
+      fakeMapper.initTypes.and.returnValue(objectTypes);
       result = instance._choosableObjectTypes();
       expect(result.all_objects).toBeUndefined();
     });
@@ -108,8 +108,7 @@ describe('can.Model.AssessmentTemplate', function () {
               {value: 'Contract'},  // this object type is relevant
               {value: 'Assessment'},
               {value: 'Audit'},
-              {value: 'CycleTaskGroupObjectTask'},
-              {value: 'Request'}
+              {value: 'CycleTaskGroupObjectTask'}
             ]
           },
           groupBar: {
@@ -140,7 +139,7 @@ describe('can.Model.AssessmentTemplate', function () {
           // the groupBaz group, being empty, is expected to have been removed
         };
 
-        fakeMapper.types.and.returnValue(objectTypes);
+        fakeMapper.initTypes.and.returnValue(objectTypes);
         result = instance._choosableObjectTypes();
         expect(result).toEqual(expected);
       }

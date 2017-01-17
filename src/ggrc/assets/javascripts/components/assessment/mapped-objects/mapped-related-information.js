@@ -1,5 +1,5 @@
 /*!
- Copyright (C) 2016 Google Inc., authors, and contributors
+ Copyright (C) 2017 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -18,14 +18,17 @@
     template: tpl,
     scope: {
       titleText: '@',
+      mappedSnapshots: true,
       filter: {
-        exclude: ['Control']
+        exclude: ['Control'],
+        only: []
       },
       mapping: '@',
       mappingType: '@',
       expanded: true,
       selectedItem: {},
-      instance: null
+      instance: null,
+      scopeObject: null
     }
   });
 })(window.can, window.GGRC);

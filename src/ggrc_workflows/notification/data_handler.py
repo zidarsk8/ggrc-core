@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import urllib
@@ -61,7 +61,7 @@ def get_cycle_created_task_data(notification):
           "force_notifications": {
               notification.id: force
           },
-          "cycle_started": {
+          "cycle_data": {
               cycle.id: {
                   "my_tasks": deepcopy(task)
               }
@@ -74,7 +74,7 @@ def get_cycle_created_task_data(notification):
           "force_notifications": {
               notification.id: force
           },
-          "cycle_started": {
+          "cycle_data": {
               cycle.id: {
                   "my_task_groups": {
                       cycle_task_group.id: deepcopy(task)
@@ -90,7 +90,7 @@ def get_cycle_created_task_data(notification):
             "force_notifications": {
                 notification.id: force
             },
-            "cycle_started": {
+            "cycle_data": {
                 cycle.id: {
                     "cycle_tasks": deepcopy(task)
                 }
@@ -158,7 +158,8 @@ def get_cycle_created_data(notification, cycle):
   force = cycle.workflow.notify_on_change
   result = {}
 
-  for person in cycle.workflow.people:
+  for user_role in cycle.workflow.context.user_roles:
+    person = user_role.person
     result[person.email] = {
         "user": data_handlers.get_person_dict(person),
         "force_notifications": {
@@ -241,9 +242,10 @@ def get_workflow_starts_in_data(notification, workflow):
   workflow_owners = get_workflow_owners_dict(workflow.context_id)
   force = workflow.notify_on_change
 
-  for wf_person in workflow.workflow_people:
-    result[wf_person.person.email] = {
-        "user": data_handlers.get_person_dict(wf_person.person),
+  for user_roles in workflow.context.user_roles:
+    wf_person = user_roles.person
+    result[wf_person.email] = {
+        "user": data_handlers.get_person_dict(wf_person),
         "force_notifications": {
             notification.id: force
         },
@@ -252,8 +254,8 @@ def get_workflow_starts_in_data(notification, workflow):
                 "workflow_owners": workflow_owners,
                 "workflow_url": get_workflow_url(workflow),
                 "start_date": workflow.next_cycle_start_date,
-                "fuzzy_start_date": utils.get_fuzzy_date(
-                    workflow.next_cycle_start_date),
+                "start_date_statement": utils.get_digest_date_statement(
+                    workflow.next_cycle_start_date, "start", True),
                 "custom_message": workflow.notify_custom_message,
                 "title": workflow.title,
             }
@@ -284,8 +286,8 @@ def get_cycle_start_failed_data(notification, workflow):
                 "workflow_owners": workflow_owners,
                 "workflow_url": get_workflow_url(workflow),
                 "start_date": workflow.next_cycle_start_date,
-                "fuzzy_start_date": utils.get_fuzzy_date(
-                    workflow.next_cycle_start_date),
+                "start_date_statement": utils.get_digest_date_statement(
+                    workflow.next_cycle_start_date, "start", True),
                 "custom_message": workflow.notify_custom_message,
                 "title": workflow.title,
             }
@@ -384,7 +386,8 @@ def get_cycle_task_dict(cycle_task):
       "title": cycle_task.title,
       "related_objects": object_titles,
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
-      "fuzzy_due_in": utils.get_fuzzy_date(cycle_task.end_date),
+      "due_date_statement": utils.get_digest_date_statement(
+          cycle_task.end_date, "due"),
       "cycle_task_url": get_cycle_task_url(cycle_task, filter_exp=filter_exp),
   }
 

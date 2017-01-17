@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
@@ -29,6 +29,7 @@ make deploy \
 	GAPI_CLIENT_SECRET="${GAPI_CLIENT_SECRET}" \
 	GAPI_ADMIN_GROUP="${GAPI_ADMIN_GROUP}" \
 	BOOTSTRAP_ADMIN_USERS="${BOOTSTRAP_ADMIN_USERS}" \
+	MIGRATOR="${MIGRATOR}" \
 	RISK_ASSESSMENT_URL="${RISK_ASSESSMENT_URL}" \
 	APPENGINE_EMAIL="${APPENGINE_EMAIL}" \
 	CUSTOM_URL_ROOT="${CUSTOM_URL_ROOT}" \

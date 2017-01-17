@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -13,7 +13,9 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , root_model : "Directive"
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
-  , mixins : ["ownable", "contactable", "unique_title", 'timeboxed']
+  , mixins : [
+    'ownable', 'contactable', 'unique_title', 'timeboxed', 'ca_update'
+  ]
   , tree_view_options : {
       list_view : GGRC.mustache_path + "/directives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
@@ -52,8 +54,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
       people: 'CMS.Models.Person.stubs',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       related_sources: 'CMS.Models.Relationship.stubs',
       related_destinations: 'CMS.Models.Relationship.stubs',
       objectives: 'CMS.Models.Objective.stubs',
@@ -96,7 +96,6 @@ CMS.Models.Directive("CMS.Models.Standard", {
   , attributes : {}
   , meta_kinds : [ "Standard" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
-  mixins: ['ca_update'],
   defaults: {
     status: 'Draft',
     kind: 'Standard'
@@ -127,7 +126,6 @@ CMS.Models.Directive("CMS.Models.Regulation", {
   , attributes : {}
   , meta_kinds : [ "Regulation" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
-  mixins: ['ca_update'],
   defaults: {
     status: 'Draft',
     kind: 'Regulation'
@@ -159,7 +157,6 @@ CMS.Models.Directive("CMS.Models.Policy", {
   , attributes : {}
   , meta_kinds : [  "Company Policy", "Org Group Policy", "Data Asset Policy", "Product Policy", "Contract-Related Policy", "Company Controls Policy" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
-  mixins: ['ca_update'],
   defaults: {
     status: 'Draft',
     kind: null
@@ -199,7 +196,6 @@ CMS.Models.Directive("CMS.Models.Contract", {
   }
   , meta_kinds : [ "Contract" ]
   , cache : can.getObject("cache", CMS.Models.Directive, true),
-  mixins: ['ca_update'],
   defaults: {
     status: 'Draft',
     kind: 'Contract'

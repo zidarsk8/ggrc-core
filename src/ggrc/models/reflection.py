@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Utilties to deal with introspecting gGRC models for publishing, creation,
@@ -87,9 +87,8 @@ EXCLUDE_MAPPINGS = set([
 ])
 
 
-class DontPropagate(object):
-
-  """Attributes wrapped by ``DontPropagate`` instances should not be considered
+class PublishOnly(object):
+  """Attributes wrapped by ``PublishOnly`` instances should not be considered
   to be a part of an inherited list. For example, ``_update_attrs`` can be
   inherited from ``_publish_attrs`` if left unspecified. This class provides
   a mechanism to use that inheritance while excluding some elements from the
@@ -99,7 +98,7 @@ class DontPropagate(object):
 
     _publish_attrs = [
       'inherited_attr',
-      DontPropagate('not_inherited_attr'),
+      PublishOnly('not_inherited_attr'),
       ]
 
   is equivalent to this:
@@ -118,13 +117,6 @@ class DontPropagate(object):
 
   def __init__(self, attr_name):
     self.attr_name = attr_name
-
-
-class PublishOnly(DontPropagate):
-  """Alias of ``DontPropagate`` for use in a ``_publish_attrs`` specification.
-  """
-  # pylint: disable=too-few-public-methods
-  pass
 
 
 class AttributeInfo(object):
@@ -151,7 +143,6 @@ class AttributeInfo(object):
 
   def __init__(self, tgt_class):
     self._publish_attrs = AttributeInfo.gather_publish_attrs(tgt_class)
-    self._stub_attrs = AttributeInfo.gather_stub_attrs(tgt_class)
     self._update_attrs = AttributeInfo.gather_update_attrs(tgt_class)
     self._create_attrs = AttributeInfo.gather_create_attrs(tgt_class)
     self._include_links = AttributeInfo.gather_include_links(tgt_class)
@@ -182,7 +173,7 @@ class AttributeInfo(object):
       main_class = tgt_class
     src_attrs = src_attrs if isinstance(src_attrs, list) else [src_attrs]
     accumulator = accumulator if accumulator is not None else set()
-    ignore_dontpropagate = True
+    ignore_publishonly = True
     for attr in src_attrs:
       attrs = None
       # Only get the attribute if it is defined on the target class, but
@@ -192,15 +183,15 @@ class AttributeInfo(object):
         if callable(attrs):
           attrs = attrs(main_class)
       if attrs is not None:
-        if not ignore_dontpropagate:
-          attrs = [a for a in attrs if not isinstance(a, DontPropagate)]
+        if not ignore_publishonly:
+          attrs = [a for a in attrs if not isinstance(a, PublishOnly)]
         else:
-          attrs = [a if not isinstance(a, DontPropagate) else a.attr_name for
+          attrs = [a if not isinstance(a, PublishOnly) else a.attr_name for
                    a in attrs]
         accumulator.update(attrs)
         break
       else:
-        ignore_dontpropagate = False
+        ignore_publishonly = False
     for base in tgt_class.__bases__:
       cls.gather_attrs(base, src_attrs, accumulator, main_class=main_class)
     return accumulator
@@ -212,10 +203,6 @@ class AttributeInfo(object):
   @classmethod
   def gather_aliases(cls, tgt_class):
     return cls.gather_attr_dicts(tgt_class, '_aliases')
-
-  @classmethod
-  def gather_stub_attrs(cls, tgt_class):
-    return cls.gather_attrs(tgt_class, '_stub_attrs')
 
   @classmethod
   def gather_update_attrs(cls, tgt_class):

@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for notifications for models with assignable mixin."""
@@ -8,16 +8,17 @@ from mock import patch
 from sqlalchemy import and_
 
 from ggrc import db
-from ggrc.models import Request
+from ggrc.models import Assessment
 from ggrc.models import Notification
 from ggrc.models import NotificationType
+from ggrc.models import Revision
 from integration.ggrc import converters
 from integration.ggrc import generator
 
 
 class TestCommentNotification(converters.TestCase):
 
-  """Test notification on request comments."""
+  """Test notification on assessment comments."""
 
   def setUp(self):
     converters.TestCase.setUp(self)
@@ -72,25 +73,27 @@ class TestCommentNotification(converters.TestCase):
 
   @patch("ggrc.notifications.common.send_email")
   def test_notification_entries(self, _):
-    """Test setting notification entries for request comments.
+    """Test setting notification entries for assessment comments.
 
     Check if the correct notification entries are created when a comment gets
     posted.
     """
 
-    self.import_file("request_full_no_warnings.csv")
-    request1 = Request.query.filter_by(slug="Request 1").first()
+    self.import_file("assessment_with_templates.csv")
+    asmt1 = Assessment.query.filter_by(slug="A 1").first()
     _, comment = self.generator.generate_comment(
-        request1, "Verifier", "some comment", send_notification="true")
+        asmt1, "Verifier", "some comment", send_notification="true")
 
-    self.assertEqual(
-        self._get_notifications(notif_type="comment_created").count(),
-        1,
-        "Missing comment notification entry."
-    )
+    notifications = self._get_notifications(notif_type="comment_created").all()
+    self.assertEqual(len(notifications), 1,
+                     "Missing comment notification entry.")
+    notif = notifications[0]
+    revisions = Revision.query.filter_by(resource_type='Notification',
+                                         resource_id=notif.id).count()
+    self.assertEqual(revisions, 1)
+
     self.client.get("/_notifications/send_daily_digest")
-    self.assertEqual(
-        self._get_notifications(notif_type="comment_created").count(),
-        0,
-        "Found a comment notification that was not sent."
-    )
+
+    notifications = self._get_notifications(notif_type="comment_created").all()
+    self.assertEqual(len(notifications), 0,
+                     "Found a comment notification that was not sent.")

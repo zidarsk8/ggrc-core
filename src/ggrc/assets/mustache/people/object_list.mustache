@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -168,7 +168,9 @@
               </div>
             </div>
           </div>
-          {{{render '/static/mustache/custom_attributes/info.mustache' instance=this}}}
+          {{#using instance=this}}
+          {{>'/static/mustache/custom_attributes/info.mustache'}}
+          {{/using}}
         </div>
       </div><!-- tier 2 end -->
     </li>

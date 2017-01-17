@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Mixin for automatic status changes"""
@@ -208,8 +208,9 @@ class AutoStatusChangeable(object):
       return False  # also exits if obj itself is None
 
     histories = (
-        inspect(value).attrs.get("attribute_value").history
+        inspect(value).attrs.get(attr_name).history
         for value in obj.custom_attribute_values
+        for attr_name in ("attribute_value", "attribute_object_id")
     )
 
     for attr_history in histories:

@@ -14,7 +14,6 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     python-pip \
     python-pycurl \
     python-virtualenv \
-    sqlite3 \
     unzip \
     vim \
     wget \

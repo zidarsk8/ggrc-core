@@ -1,14 +1,15 @@
 # coding: utf-8
 
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for /query api endpoint."""
 
+import unittest
+
 from datetime import datetime
 from operator import itemgetter
 from flask import json
-from nose.plugins.skip import SkipTest
 
 from ggrc import db
 from ggrc.models import CustomAttributeDefinition as CAD
@@ -174,6 +175,7 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
             for program in programs["values"]),
     )
 
+  @unittest.skip("Not implemented.")
   def test_basic_query_missing_field(self):
     """Filter fails on non-existing field."""
     data = self._make_query_dict(
@@ -495,7 +497,7 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
         set(programs_ids["ids"]),
     )
 
-  @SkipTest
+  @unittest.skip("Not implemented")
   def test_self_link(self):
     # It would be good if the api accepted get requests and we could add the
     # query into a get parameter, then each request would also get a self link
@@ -789,16 +791,19 @@ class TestQueryWithUnicode(BaseQueryAPITestCase):
     self._import_file("querying_with_unicode.csv")
     self.client.get("/login")
 
-  @staticmethod
-  def _generate_cad():
+  CAD_TITLE1 = u"CA список" + "X" * 200
+  CAD_TITLE2 = u"CA текст" + "X" * 200
+
+  @classmethod
+  def _generate_cad(cls):
     """Generate custom attribute definitions."""
     factories.CustomAttributeDefinitionFactory(
-        title=u"CA список",
+        title=cls.CAD_TITLE1,
         definition_type="program",
         multi_choice_options=u"один,два,три,четыре,пять",
     )
     factories.CustomAttributeDefinitionFactory(
-        title=u"CA текст",
+        title=cls.CAD_TITLE2,
         definition_type="program",
     )
 
@@ -828,11 +833,12 @@ class TestQueryWithUnicode(BaseQueryAPITestCase):
     programs = self._flatten_cav(
         self._get_first_result_set(
             self._make_query_dict("Program",
-                                  order_by=[{"name": u"CA текст"},
-                                            {"name": u"CA список"}]),
+                                  order_by=[{"name": self.CAD_TITLE2},
+                                            {"name": self.CAD_TITLE1}]),
             "Program", "values",
         )
     )
 
-    keys = [(prog[u"CA текст"], prog[u"CA список"]) for prog in programs]
+    keys = [(prog[self.CAD_TITLE2], prog[self.CAD_TITLE1])
+            for prog in programs]
     self.assertEqual(keys, sorted(keys))

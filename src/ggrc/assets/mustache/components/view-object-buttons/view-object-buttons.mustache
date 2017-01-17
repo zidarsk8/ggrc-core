@@ -1,0 +1,21 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if instance.viewLink}}
+  {{#is_allowed "view_object_page" instance}}
+    {{^openIsHidden}}
+    {{^instance.snapshot}}
+    <a href="{{instance.viewLink}}" target="_blank"
+       class="btn btn-mini btn-outline"
+       can-click="openObject">
+      Open
+    </a>
+    {{/instance.snapshot}}
+    {{/openIsHidden}}
+    <a href="#" class="btn btn-mini btn-outline" can-click="maximizeObject">
+      View
+    </a>
+  {{/is_allowed}}
+{{/if}}

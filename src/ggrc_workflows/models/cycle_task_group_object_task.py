@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module containing Cycle tasks.
@@ -11,6 +11,7 @@ from ggrc import db
 from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
+from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Stateful
 from ggrc.models.mixins import Timeboxed
@@ -24,15 +25,15 @@ from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
 
 
 class CycleTaskGroupObjectTask(
-        WithContact, Stateful, Slugged, Timeboxed, Relatable,
+        WithContact, Stateful, Slugged, Timeboxed, Relatable, Notifiable,
         Described, Titled, Base, db.Model):
   """Cycle task model
   """
   __tablename__ = 'cycle_task_group_object_tasks'
   _title_uniqueness = False
 
-  IMPORTABLE_FIELDS = ('description', 'end_date', 'finished_date',
-                       'slug', 'start_date', 'title', 'verified_date')
+  IMPORTABLE_FIELDS = ('slug', 'title', 'description', 'start_date',
+                       'end_date', 'finished_date', 'verified_date')
 
   @classmethod
   def generate_slug_prefix_for(cls, obj):
@@ -64,9 +65,9 @@ class CycleTaskGroupObjectTask(
   task_type = db.Column(
       db.String(length=250), nullable=False)
   response_options = db.Column(
-      JsonType(), nullable=False, default='[]')
+      JsonType(), nullable=False, default=[])
   selected_response_options = db.Column(
-      JsonType(), nullable=False, default='[]')
+      JsonType(), nullable=False, default=[])
 
   sort_index = db.Column(
       db.String(length=250), default="", nullable=False)

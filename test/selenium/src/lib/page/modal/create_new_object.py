@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Models for LHN modals when creating new objects"""
@@ -45,10 +45,6 @@ class OrgGroups(modal_base.OrgGroupsModal, _CreateNewObjectModal):
 
 class Risks(modal_base.RisksModal, _CreateNewObjectModal):
   """Class representing a risk modal"""
-
-
-class Requests(modal_base.RequestsModal, _CreateNewObjectModal):
-  """Class representing an request modal"""
 
 
 class Issues(modal_base.IssuesModal, _CreateNewObjectModal):

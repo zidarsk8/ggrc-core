@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Widget bar models.
@@ -188,10 +188,6 @@ class Audits(_ObjectWidgetBar):
 
 class Assessments(_ObjectWidgetBar):
   """A model representing widget bar of the Assessments object"""
-
-
-class Requests(_ObjectWidgetBar):
-  """A model representing widget bar of the requests object"""
 
 
 class Issues(_ObjectWidgetBar):

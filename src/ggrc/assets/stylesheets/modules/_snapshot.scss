@@ -1,0 +1,78 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+// Common styles
+
+.pane-header.snapshot {
+  background: $snapshotBgnd;
+}
+
+.span12.snapshot {
+  margin-left: 0;
+}
+
+.state-value.snapshot {
+  color: $snapshotLbl;
+  background: $snapshotLblBgnd;
+  text-transform: none;
+}
+
+hr.snapshot {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid $shapshotBorder;
+  margin: 1em 0;
+  padding: 0;
+}
+
+a.disabled {
+  pointer-events: none !important;
+  cursor: default;
+  color: $disabled;
+}
+
+// Info pane
+.sticky-info-panel {
+  .pane-header.snapshot {
+    margin-left: -25px;
+    margin-right: -25px;
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+}
+
+// Info widget
+.widget {
+  .pane-header.snapshot {
+    margin-top: -25px;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+    margin-left: -30px;
+    margin-right: -30px;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
+// Tree view
+ul.new-tree {
+  li.tree-item {
+    &.snapshot {
+      > .item-main {
+        > .item-wrap {
+          background: $snapshotBgnd;
+        }
+      }
+    }
+    &.active.snapshot {
+      > .item-main {
+        > .item-wrap {
+          background: $snapshotBgndActive;
+        }
+      }
+    }
+  }
+}

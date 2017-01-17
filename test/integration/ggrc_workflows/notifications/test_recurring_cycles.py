@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from integration.ggrc import TestCase
@@ -11,6 +11,7 @@ from ggrc.models import Person
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
 
 
 class TestRecurringCycleNotifications(TestCase):
@@ -96,7 +97,7 @@ class TestRecurringCycleNotifications(TestCase):
             "contact": person_dict(self.assignee.id),
             "task_group_tasks": [{
                 "contact": person_dict(self.assignee.id),
-                "description": self.generator.random_str(100),
+                "description": factories.random_str(100),
                 "relative_start_day": 5,
                 "relative_start_month": 2,
                 "relative_end_day": 25,

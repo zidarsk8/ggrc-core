@@ -1,5 +1,5 @@
 /*!
-  Copyright (C) 2016 Google Inc.
+  Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -42,28 +42,6 @@ describe('GGRC utils allowed_to_map() method', function () {
     });
   });
 
-  describe('given an Audit and Request pair', function () {
-    beforeEach(function () {
-      fakeRequest = new CMS.Models.Request({type: 'Request'});
-      fakeAudit = new CMS.Models.Audit({type: 'Audit'});
-
-      spyOn(GGRC.Mappings, 'get_canonical_mapping_name')
-        .and.returnValue('audits');
-
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
-    });
-
-    it('returns false for Audit as source and Request as target', function () {
-      var result = allowedToMap(fakeAudit, fakeRequest, fakeOptions);
-      expect(result).toBe(false);
-    });
-
-    it('returns false for Request as source and Audit as target', function () {
-      var result = allowedToMap(fakeRequest, fakeAudit, fakeOptions);
-      expect(result).toBe(false);
-    });
-  });
-
   describe('given a Person instance', function () {
     var origShortName;
     var otherInstance;
@@ -95,6 +73,13 @@ describe('GGRC utils isEmptyCA() method', function () {
 
   beforeAll(function () {
     isEmptyCA = GGRC.Utils.isEmptyCA;
+  });
+
+  describe('check undefined value', function () {
+    it('returns true for undefined', function () {
+      var result = isEmptyCA(undefined);
+      expect(result).toBe(true);
+    });
   });
 
   describe('check Rich Text value', function () {
@@ -164,6 +149,16 @@ describe('GGRC utils isEmptyCA() method', function () {
       var result = isEmptyCA('', 'Map:Person');
       expect(result).toBe(true);
     });
+
+    it('returns true for not selected cav', function () {
+      var result = isEmptyCA('', 'Map:Person', {attribute_object: null});
+      expect(result).toBe(true);
+    });
+
+    it('returns false for selected cav', function () {
+      var result = isEmptyCA('', 'Map:Person', {attribute_object: 'Person'});
+      expect(result).toBe(false);
+    });
   });
 
   describe('check Date type', function () {
@@ -227,7 +222,7 @@ describe('GGRC utils getMappableTypes() method', function () {
       'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
       'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
       'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
-      'Objective', 'Audit', 'Assessment', 'AccessGroup', 'Request',
+      'Objective', 'Audit', 'Assessment', 'AccessGroup',
       'Document', 'Risk', 'Threat'
     ];
     mapper = GGRC.Utils.getMappableTypes;

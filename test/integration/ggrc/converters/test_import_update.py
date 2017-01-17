@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for bulk updates with CSV import."""
@@ -30,7 +30,7 @@ class TestImportUpdates(TestCase):
         models.Revision.resource_type == "Policy",
         models.Revision.resource_id == policy.id
     ).count()
-    self.assertEqual(revision_count, 1)
+    self.assertEqual(revision_count, 2)
 
     filename = "policy_basic_import_update.csv"
     response = self.import_file(filename)
@@ -42,4 +42,5 @@ class TestImportUpdates(TestCase):
         models.Revision.resource_type == "Policy",
         models.Revision.resource_id == policy.id
     ).count()
-    self.assertEqual(revision_count, 2)
+    self.assertEqual(revision_count, 4)
+    self.assertEqual(policy.owners[0].email, "user1@example.com")

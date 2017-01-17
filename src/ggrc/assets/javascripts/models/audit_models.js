@@ -1,7 +1,7 @@
 /*!
-    Copyright (C) 2016 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2017 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 (function (can, CMS) {
   function update_program_authorizations(programs, person) {
@@ -29,7 +29,7 @@
       });
 
       if (Permission.is_allowed('create', 'UserRole', program.context.id) &&
-          !~can.inArray(person.reify(), editorAuthorizedPeople)) {
+        !~can.inArray(person.reify(), editorAuthorizedPeople)) {
         deleteDfds = can.map(readerAuthorizations, function (ra) {
           if (ra.person.reify() === person.reify()) {
             return ra.refresh().then(function () {
@@ -47,6 +47,7 @@
       }
     }).then(Permission.refresh());
   }
+
   can.Model.Cacheable('CMS.Models.Audit', {
     root_object: 'audit',
     root_collection: 'audits',
@@ -56,13 +57,18 @@
     update: 'PUT /api/audits/{id}',
     destroy: 'DELETE /api/audits/{id}',
     create: 'POST /api/audits',
-    mixins: ['contactable', 'unique_title', 'ca_update', 'timeboxed'],
+    mixins: [
+      'contactable',
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'mapping-limit'
+    ],
     is_custom_attributable: true,
     is_clonable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       program: 'CMS.Models.Program.stub',
-      requests: 'CMS.Models.Request.stubs',
       modified_by: 'CMS.Models.Person.stub',
       report_start_date: 'date',
       report_end_date: 'date',
@@ -79,8 +85,8 @@
       'Ready for External Review', 'Completed'],
     obj_nav_options: {
       show_all_tabs: false,
-      force_show_list: ['In Scope Controls', 'Requests',
-                        'Issues', 'Assessments']
+      force_show_list: ['In Scope Controls', 'Assessment Templates',
+        'Issues', 'Assessments']
     },
     tree_view_options: {
       header_view: GGRC.mustache_path + '/audits/tree_header.mustache',
@@ -115,17 +121,7 @@
         attr_name: 'audit_firm'
       }],
       draw_children: true,
-      child_options: [{
-        model: 'Request',
-        mapping: 'requests',
-        allow_creating: true,
-        parent_find_param: 'audit.id'
-      }, {
-        model: 'Request',
-        mapping: 'related_owned_requests',
-        allow_creating: true,
-        parent_find_param: 'audit.id'
-      }]
+      child_options: []
     },
     init: function () {
       if (this._super) {
@@ -154,9 +150,9 @@
       );
     }
   }, {
-    object_model: can.compute(function () {
+    object_model: function () {
       return CMS.Models[this.attr('object_type')];
-    }),
+    },
     clone: function (options) {
       var model = CMS.Models.Audit;
       return new model({
@@ -215,6 +211,7 @@
               });
             }
           }
+
           if (role.selfLink) {
             checkRole();
           } else {
@@ -245,6 +242,7 @@
                 });
               }
             }
+
             if (role.selfLink) {
               checkRole();
             } else {
@@ -256,332 +254,6 @@
           return auditorsList;
         });
       });
-    }
-  });
-
-  can.Model.Mixin('requestorable', {
-    before_create: function () {
-      if (!this.requestor) {
-        this.attr('requestor', {
-          id: GGRC.current_user.id,
-          type: 'Person'
-        });
-      }
-    },
-    form_preload: function (new_object_form) {
-      if (new_object_form) {
-        if (!this.requestor) {
-          this.attr('requestor', {
-            id: GGRC.current_user.id,
-            type: 'Person'
-          });
-        }
-      }
-    }
-  });
-
-  can.Model.Cacheable('CMS.Models.Request', {
-    root_object: 'request',
-    filter_keys: ['assignee', 'audit', 'code', 'company', 'control', 'due on',
-      'due', 'name', 'notes', 'request', 'starts', 'starts on', 'status',
-      'test', 'title', 'request_type', 'type', 'request type',
-      'request_object', 'request object', 'request title',
-      'verified', 'verified_date', 'finished_date'
-    ],
-    filter_mappings: {
-      type: 'request_type',
-      'request title': 'title',
-      'request description': 'description',
-      'request type': 'request_type',
-      'verified date': 'verified_date',
-      'finished date': 'finished_date',
-      'request date': 'requested_on'
-    },
-    root_collection: 'requests',
-    findAll: 'GET /api/requests',
-    findOne: 'GET /api/requests/{id}',
-    create: 'POST /api/requests',
-    update: 'PUT /api/requests/{id}',
-    destroy: 'DELETE /api/requests/{id}',
-    mixins: ['unique_title', 'relatable', 'ca_update', 'autoStatusChangeable',
-             'timeboxed'],
-    relatable_options: {
-      relevantTypes: {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_requests',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_requests',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_requests',
-          weight: 10
-        }
-      },
-      threshold: 5
-    },
-    is_custom_attributable: true,
-    attributes: {
-      context: 'CMS.Models.Context.stub',
-      assignee: 'CMS.Models.Person.stub',
-      finished_date: 'date',
-      verified_date: 'date',
-      documents: 'CMS.Models.Document.stubs',
-      audit: 'CMS.Models.Audit.stub',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
-    },
-    defaults: {
-      status: 'Not Started',
-      start_date: moment().toDate(),
-      end_date: GGRC.Utils.firstWorkingDay(moment().add(1, 'weeks'))
-    },
-    info_pane_options: {
-      mapped_objects: {
-        model: can.Model.Cacheable,
-        mapping: 'info_related_objects',
-        show_view: GGRC.mustache_path + '/base_templates/subtree.mustache'
-      },
-      evidence: {
-        model: CMS.Models.Document,
-        mapping: 'all_documents',
-        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
-        sort_function: GGRC.Utils.sortingHelpers.commentSort
-      },
-      comments: {
-        model: can.Model.Cacheable,
-        mapping: 'comments',
-        show_view: GGRC.mustache_path +
-          '/base_templates/comment_subtree.mustache',
-        sort_function: GGRC.Utils.sortingHelpers.commentSort
-      },
-      urls: {
-        model: CMS.Models.Document,
-        mapping: 'all_urls',
-        show_view: GGRC.mustache_path + '/base_templates/urls.mustache'
-      }
-    },
-    tree_view_options: {
-      show_view: GGRC.mustache_path + '/requests/tree.mustache',
-      header_view: GGRC.mustache_path + '/requests/tree_header.mustache',
-      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
-      add_item_view: GGRC.mustache_path + '/requests/tree_add_item.mustache',
-      attr_list: [{
-        attr_title: 'Title',
-        attr_name: 'title'
-      }, {
-        attr_title: 'Status',
-        attr_name: 'status'
-      }, {
-        attr_title: 'Verified',
-        attr_name: 'verified',
-        attr_sort_field: 'verified'
-      }, {
-        attr_title: 'Last Updated',
-        attr_name: 'updated_at'
-      }, {
-        attr_title: 'Starts On',
-        attr_name: 'start_date',
-        attr_sort_field: 'start_date'
-      }, {
-        attr_title: 'Due On',
-        attr_name: 'end_date',
-        attr_sort_field: 'end_date'
-      }, {
-        attr_title: 'Verified Date',
-        attr_name: 'verified_date',
-        attr_sort_field: 'verified_date'
-      }, {
-        attr_title: 'Finished Date',
-        attr_name: 'finished_date',
-        attr_sort_field: 'finished_date'
-      }, {
-        attr_title: 'Request Type',
-        attr_name: 'request_type'
-      }, {
-        attr_title: 'Code',
-        attr_name: 'slug'
-      }, {
-        attr_title: 'Audit',
-        attr_name: 'audit'
-      }],
-      display_attr_names: ['title', 'assignee', 'end_date',
-        'status', 'request_type'],
-      mandatory_attr_names: ['title'],
-      draw_children: true,
-      child_options: [{
-        model: can.Model.Cacheable,
-        mapping: 'info_related_objects',
-        allow_creating: true
-      }]
-    },
-    assignable_list: [{
-      title: 'Requester(s)',
-      type: 'requester',
-      mapping: 'related_requesters',
-      required: true
-    }, {
-      title: 'Assignee(s)',
-      type: 'assignee',
-      mapping: 'related_assignees',
-      required: true
-    }, {
-      title: 'Verifier(s)',
-      type: 'verifier',
-      mapping: 'related_verifiers',
-      required: false
-    }],
-    init: function () {
-      this._super.apply(this, arguments);
-      this.validateNonBlank('title');
-      this.validateNonBlank('end_date');
-      this.validateNonBlank('start_date');
-      this.validatePresenceOf('audit');
-
-      this.validate(['start_date', 'end_date'], function () {
-        var datesAreValid;
-
-        if (this.start_date && this.end_date) {
-          datesAreValid = this.end_date >= this.start_date;
-        }
-
-        if (!datesAreValid) {
-          return 'Start and/or Due date is invalid';
-        }
-      });
-
-      this.validate(
-        'validate_assignee',
-        function () {
-          if (!this.validate_assignee) {
-            return 'You need to specify at least one assignee';
-          }
-        }
-      );
-      this.validate(
-        'validate_requester',
-        function () {
-          if (!this.validate_requester) {
-            return 'You need to specify at least one requester';
-          }
-        }
-      );
-
-      if (this === CMS.Models.Request) {
-        this.bind('created', function (ev, instance) {
-          if (instance.constructor === CMS.Models.Request) {
-            instance.audit.reify().refresh();
-          }
-        });
-      }
-    }
-  }, {
-    init: function () {
-      if (this._super) {
-        this._super.apply(this, arguments);
-      }
-    },
-    form_preload: function (new_object_form, object_params) {
-      var audit;
-      var auditId;
-      var that = this;
-      var assignees = {};
-      var current_user = CMS.Models.get_instance('Person',
-                                                 GGRC.current_user.id);
-      var contact;
-
-      if (new_object_form) {
-        // Current user should be Requester
-        assignees[current_user.email] = 'Requester';
-
-        // auditId = the audit info from the request creation button ||
-        //           the audit from the current page if we are on audit page
-        if (_.exists(object_params, 'audit.id')) {
-          auditId = object_params.audit.id;
-        } else if (_.exists(GGRC, 'page_model.type') === 'Audit') {
-          auditId = GGRC.page_model.id;
-        }
-
-        if (auditId) {
-          this.attr('audit', {
-            id: auditId,
-            type: 'Audit'
-          });
-        }
-
-        if (this.audit) {
-          audit = this.audit.reify();
-
-          // Audit leads should be default assignees
-          (audit.selfLink ? $.when(audit) : audit.refresh())
-          .then(function (audit) {
-            contact = audit.contact.reify();
-
-            if (assignees[contact.email]) {
-              assignees[contact.email] += ',Assignee';
-            } else {
-              assignees[contact.email] = 'Assignee';
-            }
-          });
-
-          // Audit auditors should be default verifiers
-          $.when(audit.findAuditors()).then(function (auditors) {
-            auditors.each(function (elem) {
-              elem.each(function (obj) {
-                if (obj.type === 'Person') {
-                  if (assignees[obj.email]) {
-                    assignees[obj.email] += ',Verifier';
-                  } else {
-                    assignees[obj.email] = 'Verifier';
-                  }
-                }
-              });
-            });
-          });
-        }
-
-        // Assign assignee roles
-        can.each(assignees, function (value, key) {
-          var person = CMS.Models.Person.findInCacheByEmail(key);
-          that.mark_for_addition('related_objects_as_destination', person, {
-            attrs: {
-              AssigneeType: value
-            }
-          });
-        });
-      } // /new_object_form
-    },
-    save: function () {
-      // Make sure the context is always set to the parent audit
-      if (!this.context || !this.context.id) {
-        this.attr('context', this.audit.reify().context);
-      }
-      return this._super.apply(this, arguments);
-    },
-    after_save: function () {
-      // Create a relationship between request & assessment
-      // if the request is created from the assessment view page
-      var dfd;
-      if (!(this.attr('assessment') && this.attr('assessment').stub)) {
-        return;
-      }
-      dfd = new CMS.Models.Relationship({
-        source: this.attr('assessment').stub(),
-        destination: this.stub(),
-        context: this.context.stub()
-      }).save();
-      GGRC.delay_leaving_page_until(dfd);
-    },
-    _refresh: function (bindings) {
-      var refresh_queue = new RefreshQueue();
-      can.each(bindings, function (binding) {
-        refresh_queue.enqueue(binding.instance);
-      });
-      return refresh_queue.trigger();
     }
   });
 
@@ -645,20 +317,17 @@
     title_plural: 'Assessment Templates',
     table_singular: 'assessment_template',
     table_plural: 'assessment_templates',
-
+    mixins: ['mapping-limit'],
     findOne: 'GET /api/assessment_templates/{id}',
     findAll: 'GET /api/assessment_templates',
     update: 'PUT /api/assessment_templates/{id}',
     destroy: 'DELETE /api/assessment_templates/{id}',
     create: 'POST /api/assessment_templates',
-
     is_custom_attributable: false,
-
     attributes: {
       audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
     },
-
     defaults: {
       test_plan_procedure: false,
       template_object_type: 'Control',
@@ -712,7 +381,6 @@
       Assessment: true,
       Audit: true,
       CycleTaskGroupObjectTask: true,
-      Request: true,
       TaskGroup: true,
       TaskGroupTask: true,
       Workflow: true
@@ -761,7 +429,7 @@
 
     after_save: function () {
       if (this.audit) {
-        this.audit.reify().refresh('related_assessment_templates');
+        this.audit.reify().refresh();
       }
     },
 
@@ -858,6 +526,7 @@
      */
     _packPeopleData: function () {
       var data = {};
+
       /**
        * Create a sorted (ascending) list of numbers from the given map's keys.
        *
@@ -929,7 +598,7 @@
         object: 'MultitypeSearch',
         search_only: true
       });
-      objectTypes = mapper.types();
+      objectTypes = mapper.initTypes('AssessmentTemplate');
 
       // the all objects group is not needed
       delete objectTypes.all_objects;
@@ -944,10 +613,23 @@
 
       // remove the groups that have ended up being empty
       objectTypes = _.pick(objectTypes, function (objGroup) {
-        return objGroup.items.length > 0;
+        return objGroup.items && objGroup.items.length > 0;
       });
 
       return objectTypes;
+    },
+
+    getHashFragment: function () {
+      var widgetName = this.constructor.table_singular;
+      if (window.location.hash
+          .startsWith(['#', widgetName, '_widget'].join(''))) {
+        return;
+      }
+
+      return [widgetName,
+              '_widget/',
+              this.hash_fragment(),
+              '&refetch'].join('');
     },
     ignore_ca_errors: true
   });

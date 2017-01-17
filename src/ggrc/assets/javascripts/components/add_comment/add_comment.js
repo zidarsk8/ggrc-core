@@ -1,5 +1,5 @@
 /*!
-  Copyright (C) 2016 Google Inc.
+  Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -42,7 +42,7 @@
           joins.splice(index, 1);
         });
       },
-      get_assignee_type: can.compute(function () {
+      get_assignee_type: function () {
         var types = new Map([
           ['related_verifiers', 'verifier'],
           ['related_assessors', 'assessor'],
@@ -71,7 +71,7 @@
           }
         });
         return user_type;
-      })
+      }
     },
     events: {
       inserted: function () {
@@ -112,7 +112,7 @@
           description: description,
           send_notification: this.scope.attr('sendNotification'),
           context: source.context,
-          assignee_type: this.scope.attr('get_assignee_type')
+          assignee_type: this.scope.get_assignee_type()
         };
 
         this.scope.attr('isSaving', true);

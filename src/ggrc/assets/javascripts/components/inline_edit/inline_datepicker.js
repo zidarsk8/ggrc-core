@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -20,7 +20,7 @@
         if (_.isEmpty(val)) {
           return;
         }
-        if (!moment(val, 'MM/DD/YYYY', true).isValid()) {
+        if (!moment(val, 'YYYY-MM-DD', true).isValid()) {
           this.scope.attr('context.value', undefined);
         }
       }

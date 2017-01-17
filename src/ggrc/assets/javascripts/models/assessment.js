@@ -1,5 +1,5 @@
 /*!
- Copyright (C) 2016 Google Inc.
+ Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 (function (can, GGRC, CMS) {
@@ -12,29 +12,9 @@
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
     mixins: [
-      'ownable', 'contactable', 'unique_title', 'relatable',
-      'autoStatusChangeable', 'timeboxed'
+      'ownable', 'contactable', 'unique_title',
+      'autoStatusChangeable', 'timeboxed', 'mapping-limit'
     ],
-    relatable_options: {
-      relevantTypes: {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_assessments',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_assessments',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_assessments',
-          weight: 10
-        }
-      },
-      threshold: 5
-    },
     is_custom_attributable: true,
     attributes: {
       related_sources: 'CMS.Models.Relationship.stubs',
@@ -46,14 +26,6 @@
     },
     defaults: {
       status: 'Not Started'
-    },
-    filter_keys: ['title', 'status', 'operationally', 'operational', 'design',
-      'finished_date', 'verified_date', 'verified'],
-    filter_mappings: {
-      state: 'status',
-      operational: 'operationally',
-      'verified date': 'verified_date',
-      'finished date': 'finished_date'
     },
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
@@ -217,7 +189,7 @@
           }
         });
         if (cad.mandatory &&
-            GGRC.Utils.isEmptyCA(value, cad.attribute_type)) {
+            GGRC.Utils.isEmptyCA(value, cad.attribute_type, cav)) {
           // If Custom Attribute is mandatory and empty
           errorsList.value.push(cad.title);
         } else if (cav) {
@@ -262,7 +234,7 @@
           this.attr('_mandatory_value_msg'),
           this.attr('_mandatory_attachment_msg'),
           this.attr('_mandatory_comment_msg')
-        ]).join('; <br />') || null
+        ]).join('; <br />') || false
       );
     },
     form_preload: function (newObjectForm) {
@@ -313,46 +285,6 @@
         this.refreshInstance();
         this._pane_preloaded = true;
       }
-    },
-    related_issues: function () {
-      var relevantTypes = {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_issues',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_issues',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_issues',
-          weight: 10
-        }
-      };
-      return this._related(relevantTypes, 5);
-    },
-    related_requests: function () {
-      var relevantTypes = {
-        Audit: {
-          objectBinding: 'audits',
-          relatableBinding: 'program_requests',
-          weight: 5
-        },
-        Regulation: {
-          objectBinding: 'related_regulations',
-          relatableBinding: 'related_requests',
-          weight: 3
-        },
-        Control: {
-          objectBinding: 'related_controls',
-          relatableBinding: 'related_requests',
-          weight: 10
-        }
-      };
-      return this._related(relevantTypes, 5);
     }
   });
 })(window.can, window.GGRC, window.CMS);

@@ -1,5 +1,5 @@
 /*!
-    Copyright (C) 2016 Google Inc.
+    Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 (function (can) {
@@ -11,7 +11,13 @@
     update: 'PUT /api/issues/{id}',
     destroy: 'DELETE /api/issues/{id}',
     create: 'POST /api/issues',
-    mixins: ['ownable', 'contactable', 'ca_update', 'timeboxed'],
+    mixins: [
+      'ownable',
+      'contactable',
+      'ca_update',
+      'timeboxed',
+      'mapping-limit'
+    ],
     is_custom_attributable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
@@ -33,11 +39,18 @@
       if (this._super) {
         this._super.apply(this, arguments);
       }
+      this.validatePresenceOf('audit');
       this.validateNonBlank('title');
     }
   }, {
-    object_model: can.compute(function () {
+    form_preload: function (newObjectForm) {
+      var pageInstance = GGRC.page_instance();
+      if (pageInstance && pageInstance.type === 'Audit' && !this.audit) {
+        this.attr('audit', pageInstance);
+      }
+    },
+    object_model: function () {
       return CMS.Models[this.attr('object_type')];
-    })
+    }
   });
 })(this.can);

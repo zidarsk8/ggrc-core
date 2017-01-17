@@ -1,5 +1,5 @@
 /*!
-  Copyright (C) 2016 Google Inc.
+  Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -38,7 +38,8 @@ describe('GGRC.Components.addTemplateField', function () {
         selected: new can.Map(),
         valueAttrs: ['Dropdown'],
         id: 123,
-        isInvalidTitle: scope_.isInvalidTitle.bind(scope),
+        isDublicateTitle: scope_.isDublicateTitle.bind(scope),
+        isEmptyTitle: scope_.isEmptyTitle.bind(scope),
         isInvalidValues: scope_.isInvalidValues.bind(scope)
       });
     });
@@ -126,8 +127,39 @@ describe('GGRC.Components.addTemplateField', function () {
     );
   });
 
-  describe('isInvalidTitle() method', function () {
-    var isInvalidTitle;  // the method under test
+  describe('isEmptyTitle() method', function () {
+    var isEmptyTitle;  // the method under test
+    var result;
+    var selectedTitle;
+
+    beforeAll(function () {
+      var parentScope = {
+        attr: function () {
+          return {};
+        }
+      };
+      var scope_ = Component.prototype.scope({}, parentScope);
+      isEmptyTitle = scope_.isEmptyTitle;
+    });
+
+    beforeEach(function () {
+      result = undefined;
+    });
+
+    it('has not to allow to input empty titles',
+      function (done) {
+        selectedTitle = '';
+
+        result = isEmptyTitle(selectedTitle);
+
+        expect(result).toEqual(true);
+        done();
+      }
+    );
+  });
+
+  describe('isDublicateTitle() method', function () {
+    var isDublicateTitle;  // the method under test
     var result;
     var selectedTitle;
     var fields;
@@ -139,7 +171,7 @@ describe('GGRC.Components.addTemplateField', function () {
         }
       };
       var scope_ = Component.prototype.scope({}, parentScope);
-      isInvalidTitle = scope_.isInvalidTitle;
+      isDublicateTitle = scope_.isDublicateTitle;
     });
 
     beforeEach(function () {
@@ -158,7 +190,7 @@ describe('GGRC.Components.addTemplateField', function () {
         });
         selectedTitle = 'title';
 
-        result = isInvalidTitle(fields, selectedTitle);
+        result = isDublicateTitle(fields, selectedTitle);
 
         expect(result).toEqual(true);
         done();
@@ -176,20 +208,9 @@ describe('GGRC.Components.addTemplateField', function () {
         });
         selectedTitle = 'new title';
 
-        result = isInvalidTitle(fields, selectedTitle);
+        result = isDublicateTitle(fields, selectedTitle);
 
         expect(result).toEqual(false);
-        done();
-      }
-    );
-
-    it('has not to allow to input empty titles',
-      function (done) {
-        selectedTitle = '';
-
-        result = isInvalidTitle(fields, selectedTitle);
-
-        expect(result).toEqual(true);
         done();
       }
     );

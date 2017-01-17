@@ -1,4 +1,4 @@
-# Copyright (C) 2016 Google Inc.
+# Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from sqlalchemy.orm import validates
@@ -6,7 +6,6 @@ from sqlalchemy.orm import validates
 from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
-from ggrc.models.object_document import Documentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.option import Option
@@ -85,7 +84,7 @@ class SystemOrProcess(track_object_state.HasObjectState, Timeboxed,
 track_object_state.track_state_for_class(SystemOrProcess)
 
 
-class System(CustomAttributable, Documentable, Personable,
+class System(CustomAttributable, Personable,
              Relatable, Ownable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': False
@@ -99,7 +98,7 @@ class System(CustomAttributable, Documentable, Personable,
     return False
 
 
-class Process(CustomAttributable, Documentable, Personable,
+class Process(CustomAttributable, Personable,
               Relatable, Ownable, SystemOrProcess):
   __mapper_args__ = {
       'polymorphic_identity': True
