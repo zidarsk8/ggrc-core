@@ -198,10 +198,6 @@
             id: relevant.filter.id
           };
         }));
-
-        if (modelName === 'AllObject') {
-          modelName = this.scope.attr('types.all_objects.models');
-        }
         if (contact && contactEmail) {
           params.contact_id = contact.id;
         }

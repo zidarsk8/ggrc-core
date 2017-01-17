@@ -50,10 +50,6 @@
           });
           return _.sortBy(_.compact(models), 'model_singular');
         }
-
-        if (type === 'AllObject') {
-          type = GGRC.page_model.type;
-        }
         mappings = GGRC.Mappings.get_canonical_mappings_for(type);
         return _.sortBy(_.compact(_.map(_.keys(mappings), function (mapping) {
           return CMS.Models[mapping];
