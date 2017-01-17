@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Tests for /api/<model> endpoints."""
+
 import json
 import time
 from urlparse import urlparse
@@ -19,36 +21,41 @@ RESOURCE_ALLOWED = ["HEAD", "GET", "PUT", "DELETE", "OPTIONS"]
 
 
 class TestServices(services.TestCase):
+  """Integration tests suite for /api/<model> endpoints common logic."""
 
-  def get_location(self, response):
+  @staticmethod
+  def get_location(response):
     """Ignore the `http://localhost` prefix of the Location"""
     return response.headers["Location"][16:]
 
-  def assertRequiredHeaders(self, response,
-                            headers={"Content-Type": "application/json"}):
+  def assert_required_headers(self, response, headers=None):
+    """Check if response has the provided list of headers."""
+    if headers is None:
+      headers = {"Content-Type": "application/json"}
     self.assertIn("Etag", response.headers)
     self.assertIn("Last-Modified", response.headers)
     self.assertIn("Content-Type", response.headers)
-    for k, v in headers.items():
-      self.assertEqual(v, response.headers.get(k))
+    for header, value in headers.items():
+      self.assertEqual(value, response.headers.get(header))
 
-  def assertAllow(self, response, allowed=None):
+  def assert_allow(self, response, allowed=None):
     self.assert405(response)
     self.assertIn("Allow", response.headers)
     if allowed:
       self.assertItemsEqual(allowed, response.headers["Allow"].split(", "))
 
-  def assertOptions(self, response, allowed):
+  def assert_options(self, response, allowed):
     self.assertIn("Allow", response.headers)
     self.assertItemsEqual(allowed, response.headers["Allow"].split(", "))
 
-  def headers(self, *args, **kwargs):
+  @staticmethod
+  def headers(*args, **kwargs):
     ret = list(args)
     ret.append(("X-Requested-By", "Unit Tests"))
     ret.extend(kwargs.items())
     return ret
 
-  def test_X_Requested_By_required(self):
+  def test_x_requested_by_required(self):
     response = self.client.post(self.mock_url())
     self.assert400(response)
     self.assertEqual(response.json['message'],
@@ -71,12 +78,12 @@ class TestServices(services.TestCase):
     self.assert404(response)
 
   def test_collection_put(self):
-    self.assertAllow(
+    self.assert_allow(
         self.client.put(self.mock_url(), headers=self.headers()),
         COLLECTION_ALLOWED)
 
   def test_collection_delete(self):
-    self.assertAllow(
+    self.assert_allow(
         self.client.delete(self.mock_url(), headers=self.headers()),
         COLLECTION_ALLOWED)
 
@@ -85,7 +92,7 @@ class TestServices(services.TestCase):
     mock = self.mock_model(foo=foo_param)
     response = self.client.get(self.mock_url(mock.id), headers=self.headers())
     self.assert200(response)
-    self.assertRequiredHeaders(response)
+    self.assert_required_headers(response)
     return response
 
   def test_put_successful(self):
@@ -271,12 +278,12 @@ class TestServices(services.TestCase):
     mock = self.mock_model()
     response = self.client.open(
         self.mock_url(mock.id), method="OPTIONS", headers=self.headers())
-    self.assertOptions(response, RESOURCE_ALLOWED)
+    self.assert_options(response, RESOURCE_ALLOWED)
 
   def test_collection_options(self):
     response = self.client.open(
         self.mock_url(), method="OPTIONS", headers=self.headers())
-    self.assertOptions(response, COLLECTION_ALLOWED)
+    self.assert_options(response, COLLECTION_ALLOWED)
 
   def test_get_bad_accept(self):
     mock1 = self.mock_model(foo="baz")
