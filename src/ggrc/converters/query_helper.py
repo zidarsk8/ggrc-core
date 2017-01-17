@@ -421,7 +421,7 @@ class QueryHelper(object):
         if hasattr(flask.g, "similar_objects_query"):
           joins, order = by_similarity()
         else:
-          raise BadQueryException("Can't order by '__similarity__' when no ",
+          raise BadQueryException("Can't order by '__similarity__' when no "
                                   "'similar' filter was applied.")
       else:
         key, _ = tgt_class.attributes_map().get(key, (key, None))
