@@ -1,0 +1,157 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.assessment-custom-attributes {
+  ca-object {
+    max-width: 50%;
+    width: 50%;
+    box-sizing: border-box;
+  }
+
+  ca-object-validation-icon {
+    display: flex;
+    width: 24px;
+    line-height: 24px;
+    height: 24px;
+    color: transparent;
+
+    .validation-icon {
+      text-align: center;
+      color: transparent;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      display: block;
+
+      &.validation-icon-empty {
+        color: $icon-color-empty;
+      }
+      &.validation-icon-invalid {
+        color: $icon-color-invalid;
+      }
+      &.validation-icon-valid {
+        color: $icon-color-valid;
+      }
+    }
+  }
+
+  .inline-edit {
+    padding: 0;
+    margin: 0 0 16px;
+  }
+
+  .inline-edit__title {
+    line-height: 22px;
+    margin: 0;
+    box-sizing: border-box;
+    padding: 0 48px 0 4px;
+    position: relative;
+    display: flex;
+
+    .fa {
+      width: 24px;
+      text-align: center;
+      line-height: 22px;
+    }
+
+    .inline-edit__title-body {
+      display: flex;
+      max-width: 100%;
+      overflow: hidden;
+      line-height: 22px;
+      box-sizing: border-box;
+      padding: 0 24px 0 0;
+      position: relative;
+
+      .fa {
+        position: absolute;
+        right: 0;
+        top: 0;
+        &.fa-question-circle {
+          color: $icon-color-dark;
+        }
+      }
+    }
+
+    &:hover {
+      .inline-edit__extra-controls {
+        .fa {
+          opacity: 1;
+        }
+      }
+    }
+
+    .inline-edit__extra-controls {
+      height: 22px;
+      display: inline-block;
+
+      .fa {
+        float: left;
+        width: 24px;
+        padding: 0;
+        text-align: center;
+        font-size: 12px;
+        color: $icon-color-normal;
+        opacity: 0;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .inline-edit--active {
+    .inline-edit__content--wide {
+      width: auto;
+    }
+  }
+  .inline-edit__controls--edit-mode {
+    background: #fff;
+    box-sizing: border-box;
+    height: 32px;
+    bottom: -33px;
+    line-height: 32px;
+    margin: 0;
+    padding: 0;
+    width: 66px;
+    z-index: 1;
+
+    li {
+      box-sizing: border-box;
+      float: left;
+      width: 32px;
+      line-height: 31px;
+
+      a {
+        display: inline-block;
+        line-height: 31px;
+        width: 32px;
+      }
+    }
+  }
+
+  .inline-edit__content {
+    box-sizing: border-box;
+    width: auto;
+    line-height: 24px;
+    margin-left: 0;
+
+    &:hover {
+      background: #fff;
+    }
+
+    input[type="checkbox"] {
+      float: left;
+      margin: 3px 6px 0 0;
+    }
+    .datepicker__calendar {
+      top: -250px;
+      left: -6px;
+      z-index: 4000;
+    }
+  }
+}

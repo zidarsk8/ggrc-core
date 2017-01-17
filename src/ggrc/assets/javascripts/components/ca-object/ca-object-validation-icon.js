@@ -22,38 +22,27 @@
   /**
    * Assessment specific validation icon component
    */
-  GGRC.Components('assessmentValidationIcon', {
+  can.Component.extend({
     tag: tag,
     template: tpl,
-    scope: {
-      validation: null,
-      iconCls: icons.noValidation,
-      applyState: function () {
-        var icon = icons.noValidation;
+    viewModel: {
+      define: {
+        validation: {},
+        iconCls: {
+          value: icons.noValidation,
+          get: function () {
+            var icon = icons.noValidation;
 
-        if (this.attr('validation.mandatory')) {
-          icon = this.attr('validation.empty') ? icons.empty : icons.valid;
-        }
-        /* This validation is required for DropDowns with required attachments */
-        if (!this.attr('validation.valid')) {
-          icon = icons.invalid;
-        }
-
-        this.attr('iconCls', icon);
-      }
-    },
-    events: {
-      init: function () {
-        var self = this;
-        this.scope.applyState();
-        this.scope.validation.bind('change', function (event, propertyName) {
-          if (propertyName === 'empty') {
-            self.scope.applyState();
+            if (this.attr('validation.mandatory')) {
+              icon = this.attr('validation.empty') ? icons.empty : icons.valid;
+            }
+            /* This validation is required for DropDowns with required attachments */
+            if (!this.attr('validation.valid')) {
+              icon = icons.invalid;
+            }
+            return icon;
           }
-        });
-      },
-      '{scope} validation': function () {
-        this.scope.applyState();
+        }
       }
     }
   });
