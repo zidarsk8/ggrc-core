@@ -21,7 +21,6 @@ from sqlalchemy.sql import tuple_
 
 from ggrc.models.assessment import Assessment
 from ggrc.models.event import Event
-from ggrc.models.request import Request
 from ggrc.models.issue import Issue
 from ggrc.models.revision import Revision
 from ggrc.models.snapshot import Snapshot
@@ -43,7 +42,6 @@ revision = '275cd0dcaea'
 down_revision = '142272c4a0b6'
 
 assessments_table = Assessment.__table__
-requests_table = Request.__table__
 issues_table = Issue.__table__
 snapshots_table = Snapshot.__table__
 revisions_table = Revision.__table__
