@@ -29,7 +29,7 @@
       },
       types: {
         get: function () {
-          return this.initTypes(this.attr('object'));
+          return this.initTypes();
         }
       },
       parentInstance: {
@@ -133,7 +133,7 @@
     initTypes: function (objectType) {
       var object = objectType || this.attr('object');
       // Can.JS wrap all objects with can.Map by default
-      var groups = this.attr('typeGroups');
+      var groups = this.attr('typeGroups').attr();
       var list = this.getModelNamesList(object);
 
       list.forEach(function (modelName) {
@@ -153,7 +153,7 @@
     },
     modelFromType: function (type) {
       var types = _.reduce(_.values(
-        this.attr('types').attr()), function (memo, val) {
+        this.attr('types')), function (memo, val) {
         if (val.items) {
           return memo.concat(val.items);
         }
