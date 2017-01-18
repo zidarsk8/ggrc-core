@@ -470,6 +470,22 @@
       ).then(function (object) {
         return object;
       });
+    },
+
+    /**
+     * Determine whether the Task's response options can be edited, taking
+     * the Task and Task's Cycle status into account.
+     *
+     * @return {Boolean} - true if editing response options is allowed,
+     *   false otherwise
+     */
+    responseOptionsEditable: function () {
+      var cycle = this.attr('cycle').reify();
+      var status = this.attr('status');
+
+      var isEditable = cycle.attr('is_current') &&
+                       !_.contains(['Finished', 'Verified'], status);
+      return isEditable;
     }
   });
 })(window.can);

@@ -1433,7 +1433,8 @@ function localizeDate(date, options, tmpl) {
   if (date) {
     if (typeof date === 'string') {
       // string dates are assumed to be in ISO format
-      return moment.utc(date, 'YYYY-MM-DD', true).format(tmpl);
+      return moment.utc(date, ['YYYY-MM-DD', 'YYYY-MM-DDTHH:mm:ss'], true)
+        .format(tmpl);
     }
     return moment(new Date(date)).format(tmpl);
   }

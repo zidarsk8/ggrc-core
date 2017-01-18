@@ -151,6 +151,7 @@ dashboard-js-files:
   - components/assessment/inline.js
   - components/assessment/add_comment.js
   - components/comment/comment-input.js
+  - components/comment/comment-list-helper.js
   - components/assessment/controls-toolbar/controls-toolbar.js
   - components/mapped-objects/mapped-objects.js
   - components/object-state-toolbar/object-state-toolbar.js
@@ -158,9 +159,7 @@ dashboard-js-files:
   - components/object-list/object-list-item.js
   - components/object-popover/object-popover.js
   - components/ca-object/ca-object.js
-  - components/ca-object/ca-object-validation.js
   - components/ca-object/ca-object-validation-icon.js
-  - components/ca-object/ca-object-title.js
   - components/ca-object/ca-object-value-mapper.js
   - components/ca-object/ca-object-modal.js
   - components/ca-object/ca-object-modal-content.js
@@ -267,9 +266,6 @@ dashboard-js-template-files:
   - components/object-popover/object-popover.mustache
   - components/mapped-objects/mapped-objects.mustache
   - components/reusable-objects/reusable-objects-item.mustache
-  - components/ca-object/ca-object.mustache
-  - components/ca-object/ca-object-title.mustache
-  - components/ca-object/ca-object-validation.mustache
   - components/ca-object/ca-object-validation-icon.mustache
   - components/ca-object/ca-object-modal.mustache
   - components/ca-object/ca-object-modal-content.mustache

@@ -3,24 +3,40 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 {{#items}}
-    <ca-object-validation class="flex-box flex-row" def="def" value-id="{{id}}" errors="preconditions_failed" value="attribute_value" modal="modal" is-modified="isModified">
-        <ca-object class="flex-box flex-col" instance="instance" value-id="{{id}}" def="def" value="attribute_value" modal="modal" type="attributeType" is-modified="isModified">
-            <ca-object-value-mapper value="attribute_value" type="type" value-obj="attribute_object" def="def">
-                <assessment-inline-edit
-                        value="input.value"
-                        options="input.options"
-                        type="input.type"
-                        title-text="input.title"
-                        placeholder="input.placeholder"
-                        is-saving="isSaving"
-                        object-validation="validation"
-                  {{^is_allowed 'update' instance context='for'}}
-                        readonly="true"
-                  {{/is_allowed}}
-                  can-before-edit="instance.confirmBeginEdit"
-                ></assessment-inline-edit>
-            </ca-object-value-mapper>
-        </ca-object>
-    </ca-object-validation>
+    <ca-object class="flex-box flex-row" instance="instance" value-id="id" def="def" value="attribute_value"
+               modal="modal" type="attributeType" is-modified="isModified">
+        <ca-object-validation-icon validation="validation"></ca-object-validation-icon>
+      <div class="flex-box flex-col">
+        <h6 class="inline-edit__title">
+          <span class="inline-edit__title-body">
+            {{def.title}}
+            {{#if def.helptext}}
+                <i class="fa fa-question-circle" rel="tooltip" title="{{def.helptext}}"></i>
+            {{/if}}
+          </span>
+          {{#is_allowed 'update' instance context='for'}}
+            {{#if value}}
+              <span class="inline-edit__extra-controls">
+                <i can-click="addComment" class="fa fa-edit" rel="tooltip" title="Add comment"></i>
+              </span>
+            {{/if}}
+          {{/is_allowed}}
+        </h6>
+        <ca-object-value-mapper value="attribute_value" type="type" value-obj="attribute_object" def="def">
+            <assessment-inline-edit
+                    value="input.value"
+                    options="input.options"
+                    type="input.type"
+                    title-text="input.title"
+                    placeholder="input.placeholder"
+                    is-saving="isSaving"
+              {{^is_allowed 'update' instance context='for'}}
+                    readonly="true"
+              {{/is_allowed}}
+                    can-before-edit="instance.confirmBeginEdit"
+            ></assessment-inline-edit>
+        </ca-object-value-mapper>
+          </div>
+    </ca-object>
 {{/items}}
 <ca-object-modal modal="modal" instance="instance"></ca-object-modal>

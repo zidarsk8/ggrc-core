@@ -143,11 +143,58 @@
       );
     }
   }, {
+    define: {
+      customAttributeItems: {
+        get: function () {
+          var scope = this;
+          var values = this.attr('custom_attribute_values');
+          var definitions = this.attr('custom_attribute_definitions');
+          return definitions.map(function (def) {
+            var valueData = false;
+            var id = def.id;
+            var type = GGRC.Utils.mapCAType(def.attribute_type);
+            var stub = {
+              isStub: true,
+              attributable_id: scope.id,
+              custom_attribute_id: id,
+              attribute_value: null,
+              attribute_object: null,
+              preconditions_failed: (def.mandatory) ? ['value'] : [],
+              validation: {
+                empty: true,
+                mandatory: def.mandatory,
+                valid: true
+              },
+              def: def,
+              attributeType: type
+            };
+
+            values.forEach(function (value) {
+              var errors = [];
+              if (value.custom_attribute_id === id) {
+                errors = value.attr('preconditions_failed') || [];
+                value.attr('def', def);
+                value.attr('attributeType', type);
+                value.attr('validation', {
+                  empty: errors.indexOf('value') > -1,
+                  mandatory: def.mandatory,
+                  valid: errors.indexOf('comment') < 0 &&
+                  errors.indexOf('evidence') < 0
+                });
+
+                valueData = value;
+              }
+            });
+
+            return valueData || stub;
+          });
+        }
+      }
+    },
     init: function () {
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      this.setIsReadyForRender(false);
     },
     save: function () {
       if (!this.attr('program')) {
@@ -161,9 +208,6 @@
         this.audit.refresh();
       }
     },
-    setIsReadyForRender: function (isReady) {
-      this.attr('isReadyForRender', isReady);
-    },
     updateValidation: function () {
       var values = this.attr('custom_attribute_values');
       var definitions = this.attr('custom_attribute_definitions');
@@ -172,11 +216,9 @@
         comment: [],
         value: []
       };
-      this.setIsReadyForRender(false);
       this.validateValues(definitions, values, errorsList);
       this.setErrorMessages(errorsList);
       this.setAggregatedErrorMessage();
-      this.setIsReadyForRender(true);
     },
     validateValues: function (definitions, values, errorsList) {
       can.each(definitions, function (cad) {
