@@ -25,6 +25,7 @@
       options_property: 'tree_view_options',
       show_view: null,
       expanded: false,
+      subTreeLoading: false,
       draw_children: true,
       child_options: []
     }
@@ -288,7 +289,7 @@
       }.bind(this)));
     },
 
-    display_subtrees: function () {
+    display_subtrees: function (refetch) {
       var childTreeDfds = [];
       var that = this;
 
@@ -301,7 +302,11 @@
           if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
             childTreeControl = $el.control();
             if (childTreeControl) {
-              childTreeDfds.push(childTreeControl.display());
+              that.options.attr('subTreeLoading', true);
+              childTreeDfds.push(childTreeControl.display(refetch)
+                .then(function () {
+                  that.options.attr('subTreeLoading', false);
+                }));
             }
           }
         });
