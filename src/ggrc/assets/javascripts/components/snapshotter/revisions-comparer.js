@@ -23,7 +23,7 @@
             var that = this;
 
             GGRC.Controllers.Modals.confirm({
-              modal_title: 'Compare to latest version',
+              modal_title: 'Compare with the latest version',
               header_view: GGRC.mustache_path +
                             '/modals/modal_compare_header.mustache',
               modal_confirm: 'Update',
