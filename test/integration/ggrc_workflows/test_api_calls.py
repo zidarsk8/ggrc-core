@@ -24,6 +24,7 @@ class TestWorkflowsApiPost(TestCase):
     del data["workflow"]["context"]
     response = self.api.post(Workflow, data)
     self.assert400(response)
+    # TODO: check why response.json["message"] is empty
 
   def test_create_one_time_workflows(self):
     data = self.get_workflow_dict()

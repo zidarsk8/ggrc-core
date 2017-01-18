@@ -138,6 +138,11 @@ class TestCollectionPost(services.TestCase):
         headers=self.headers(),
     )
     self.assert400(response)
+    self.assertEqual(
+        response.json['message'],
+        "The browser (or proxy) sent a request that this server "
+        "could not understand.",
+    )
 
   def test_bad_content_type(self):
     """Test post with bad content type."""

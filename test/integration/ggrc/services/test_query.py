@@ -194,6 +194,8 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
     )
     response = self._post(data)
     self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "Field 'effective date' expects a '%m/%d/%Y' date")
 
   def test_basic_query_text_search(self):
     """Filter by fulltext search."""
@@ -306,29 +308,44 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
     """Invalid limit parameters are handled properly."""
 
     # invalid "from"
-    self.assert400(self._post(
+    response = self._post(
         self._make_query_dict("Program", limit=["invalid", 12]),
-    ))
+    )
+    self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "Invalid limit operator. Integers expected.")
 
     # invalid "to"
-    self.assert400(self._post(
+    response = self._post(
         self._make_query_dict("Program", limit=[0, "invalid"]),
-    ))
+    )
+    self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "Invalid limit operator. Integers expected.")
 
     # "from" >= "to"
-    self.assert400(self._post(
+    response = self._post(
         self._make_query_dict("Program", limit=[12, 0]),
-    ))
+    )
+    self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "Limit start should be smaller than end.")
 
     # negative "from"
-    self.assert400(self._post(
+    response = self._post(
         self._make_query_dict("Program", limit=[-2, 10]),
-    ))
+    )
+    self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "Limit cannot contain negative numbers.")
 
     # negative "to"
-    self.assert400(self._post(
+    response = self._post(
         self._make_query_dict("Program", limit=[2, -10]),
-    ))
+    )
+    self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "Limit cannot contain negative numbers.")
 
   def test_query_order_by(self):
     """Results get sorted by own field."""
@@ -729,6 +746,8 @@ class TestQueryWithCA(BaseQueryAPITestCase):
     )
     response = self._post(data)
     self.assert400(response)
+    self.assertEqual(response.json['message'],
+                     "Field 'ca date' expects a '%m/%d/%Y' date")
 
   def test_ca_query_different_types_local_ca(self):
     """Filter by local CAs with same title and different types."""
