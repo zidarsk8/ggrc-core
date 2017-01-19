@@ -904,8 +904,15 @@
       if (!(instance instanceof CMS.Models.Relationship)) {
         return false;
       }
-      return _.includes([instance.destination.type, instance.source.type],
-        shortName);
+      if (instance.destination &&
+        instance.destination.type === shortName) {
+        return true;
+      }
+      if (instance.source &&
+        instance.source.type === shortName) {
+        return true;
+      }
+      return false;
     },
 
     triggerListeners: (function () {
@@ -947,8 +954,10 @@
           // if unmapping e.g. an URL (a "Document") or an assignee from
           // the info pin, refreshing the latter is not needed
           if (instance instanceof CMS.Models.Relationship) {
-            srcType = instance.source.type;
-            destType = instance.destination.type;
+            srcType = instance.source ?
+              instance.source.type : null;
+            destType = instance.destination ?
+              instance.destination.type : null;
             if (srcType === 'Person' || destType === 'Person' ||
               srcType === 'Document' || destType === 'Document') {
               return;
