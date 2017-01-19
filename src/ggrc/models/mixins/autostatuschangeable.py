@@ -286,8 +286,8 @@ class AutoStatusChangeable(object):
     def handle_relationship(sender, obj=None, src=None, service=None):
       """Handle creation of relationships that can change object status.
 
-      Adding or removing assigable persons (Assignees, Requesters, Creators,
-      Verifiers, etc.) moves object back to PROGRESS_STATE.
+      Adding or removing assigable persons (Assignees, Creators, Verifiers,
+      etc.) moves object back to PROGRESS_STATE.
 
       Adding evidence moves object back to to PROGRESS_STATE.
 
