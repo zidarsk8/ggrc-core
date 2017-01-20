@@ -233,3 +233,46 @@ class AsmtModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
       CommonModalSetVisibleFields.STATE, VERIFIED,
       CommonModalSetVisibleFields.LAST_UPDATED)
+
+
+class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for the Modal to set visible
+  fields for Control.
+  """
+  # pylint: disable=too-many-instance-attributes
+  def __init__(self):
+    super(ControlModalSetVisibleFields, self).__init__()
+    self.MODAL_HEADER = "Set visible fields for Control"
+    self.OWNER = "Owner"
+    self.STATE = "State"
+    self.PRIMARY_CONTACT = "Primary Contact"
+    self.SECONDARY_CONTACT = "Secondary Contact"
+    self.URL = "URL"
+    self.REFERENCE_URL = "Reference URL"
+    self.EFFECTIVE_DATE = "Effective Date"
+    self.STOP_DATE = "Stop Date"
+    self.KIND_NATURE = "Kind/Nature"
+    self.FRAUD_RELATED = "Fraud Related"
+    self.SIGNIFICANCE = "Significance"
+    self.TYPE_MEANS = "Type/Means"
+    self.FREQUENCY = "Frequency"
+    self.ASSERTIONS = "Assertions"
+    self.CATEGORIES = "Categories"
+    self.PRINCIPAL_ASSIGNEE = "Principal Assignee"
+    self.SECONDARY_ASSIGNEE = "Secondary Assignee"
+    self.OPT_SET_FIELDS = {
+        "TITLE": self.TITLE, "OWNER": self.OWNER, "CODE": self.CODE,
+        "STATE": self.STATE, "PRIMARY_CONTACT": self.PRIMARY_CONTACT,
+        "SECONDARY_CONTACT": self.SECONDARY_CONTACT,
+        "LAST_UPDATED": self.LAST_UPDATED, "URL": self.URL,
+        "REFERENCE_URL": self.REFERENCE_URL,
+        "EFFECTIVE_DATE": self.EFFECTIVE_DATE, "STOP_DATE": self.STOP_DATE,
+        "KIND_NATURE": self.KIND_NATURE, "FRAUD_RELATED": self.FRAUD_RELATED,
+        "SIGNIFICANCE": self.SIGNIFICANCE, "TYPE_MEANS": self.TYPE_MEANS,
+        "FREQUENCY": self.FREQUENCY, "ASSERTIONS": self.ASSERTIONS,
+        "CATEGORIES": self.CATEGORIES,
+        "PRINCIPAL_ASSIGNEE": self.PRINCIPAL_ASSIGNEE,
+        "SECONDARY_ASSIGNEE": self.SECONDARY_ASSIGNEE
+    }
+    self.DEFAULT_SET_FIELDS = (self.TITLE, self.OWNER, self.CODE,
+                               self.STATE, self.LAST_UPDATED)
