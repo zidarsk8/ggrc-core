@@ -425,9 +425,7 @@ class AbstractPage(Component):
   def navigate_to(self, custom_url=None):
     """Navigate to url."""
     url_to_use = self.url if custom_url is None else custom_url
-
-    if self._driver.current_url != url_to_use:
-      self._driver.get(url_to_use)
+    selenium_utils.open_url(self._driver, url_to_use)
     return self
 
 
