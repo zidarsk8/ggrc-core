@@ -15,6 +15,7 @@ class Common(object):
   # modal
   MODAL_GENEATE = ".modal-selector"
   MODAL_CREATE = ".modal-wide"
+  MODAL_CONFIRM = ".modal.hide"
   # attribute names used amongst classes
   BUTTON = "BUTTON_"
   BUTTON_CREATE_NEW = "BUTTON_CREATE_NEW_"
@@ -220,12 +221,22 @@ class ModalSetVisibleFields(object):
   FIELDS_TITLES = "{} " + TreeView.TREE_HEADER + " .checkbox-inline"
   FIELDS_CHECKBOXES = "{} " + TreeView.TREE_HEADER + " .attr-checkbox"
   BUTTON_SET_FIELDS = "{} " + TreeView.TREE_HEADER + " .set-tree-attrs"
+  MODAL = "{} .open .dropdown-menu-form"
+  # labels
+  MODAL_TITLE = "{} .open .dropdown-menu-form h5"
+  FIELDS_TITLES = "{} .tree-header .checkbox-inline"
+  # user input elements
+  FIELDS_CHECKBOXES = "{} .tree-header .attr-checkbox"
+  BUTTON_SAVE_SET_FIELDS = "{} .tree-action-list .set-tree-attrs"
 
 
 class ModalCreateNewObject(BaseModalCreateNew):
   """Locators for a generic new object modal."""
-  UI_TITLE = (By.CSS_SELECTOR,
-              '{} [data-id="title_txtbx"]'.format(BaseModalCreateNew.MODAL))
+  UI_TITLE = (
+      By.CSS_SELECTOR,
+      '{} [placeholder="Enter Title"]'.format(BaseModalCreateNew.MODAL))
+  UI_CODE = (By.CSS_SELECTOR,
+             '{} [name="slug"]'.format(BaseModalCreateNew.MODAL))
   BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
                            '{} [data-toggle="modal-submit"]'.
                            format(BaseModalCreateNew.MODAL))
@@ -237,8 +248,6 @@ class ModalCreateNewObject(BaseModalCreateNew):
 class ModalCreateNewProgram(BaseModalCreateNew):
   """Locators for the program modal visible when creating a new modal from
   LHN"""
-  UI_TITLE = (By.CSS_SELECTOR,
-              '[data-test-id="new_program_field_title_a63ed79d"]')
   UI_DESCRIPTION = (By.CSS_SELECTOR,
                     '[data-test-id="new_program_field_description_1fb8bc06"]'
                     '>iframe.wysihtml5-sandbox')
@@ -638,6 +647,7 @@ class ObjectWidget(object):
   HEADER_STATE = (By.CSS_SELECTOR, _HEADER + ' [data-field="status"]')
   HEADER_LAST_ASSESSMENT_DATE = (
       By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
+  """Locators for a generic widget"""
   MEMBERS_TITLE_LIST = (
       By.CSS_SELECTOR, '.object-area .tree-structure .select '
                        '[class^="span"]:nth-child(1) .title')
@@ -647,6 +657,7 @@ class ObjectWidget(object):
 
 class ModalDeleteObject(object):
   """Locators for the modal of deletion object."""
+  """Locators for a generic delete object modal."""
   MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
   CONFIRMATION_TEXT = (By.CSS_SELECTOR, '.modal-body>div>p')
   OBJECT_TITLE = (By.CSS_SELECTOR, '.modal-body>div>p>span')
@@ -654,11 +665,24 @@ class ModalDeleteObject(object):
       By.CSS_SELECTOR, '.modal-footer .confirm-buttons>[data-toggle="delete"]')
 
 
+class ModalUpdateObject(object):
+  """Locators for a generic update object modal."""
+  MODAL = Common.MODAL_CONFIRM
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, "{} .modal-header".format(MODAL))
+  CONFIRMATION_TEXT = (By.CSS_SELECTOR, "{} .modal-body".format(MODAL))
+  # user input elements
+  BUTTON_UPDATE = (By.CSS_SELECTOR, "{} .btn-success".format(MODAL))
+
+
 class BaseInfoWidget(object):
   """Locators that are common to all info widgets"""
   BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility .dropdown-toggle')
+  """Locators that are common to all info widgets."""
+  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
   TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
+  LINK_UPDATE_OBJ = (By.CSS_SELECTOR, '.snapshot [can-click="updateIt"]')
 
 
 class WidgetInfoProgram(BaseInfoWidget):
@@ -789,7 +813,8 @@ class WidgetInfoSection(BaseInfoWidget):
 
 
 class WidgetInfoControl(BaseInfoWidget):
-  """Locators for the control info widget"""
+  """Locators for the control info widget."""
+  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.sticky-info-panel .info-pane-utility')
 
 
 class WidgetInfoObjective(BaseInfoWidget):
@@ -882,6 +907,7 @@ class BaseWidgetGeneric(object):
     """For sharing parametrized class attributes we simply define how a
     class should look like. Note that the same functionality can be
     implemented using properties though with more code."""
+    # pylint: disable=invalid-name
     def __init__(cls, *args):
       _FILTER = "#{}_widget .sticky-filter"
       _FILTER_BUTTON = _FILTER + " .tree-filter__button"
@@ -913,14 +939,15 @@ class BaseWidgetGeneric(object):
 
 
 class WidgetAssessments(BaseWidgetGeneric):
-  """Locators for assessment widget"""
+  """Locators for Assessments widget."""
   _object_name = objects.get_singular(objects.ASSESSMENTS)
   widget_name = url.Widget.ASSESSMENTS
 
 
 class WidgetControls(BaseWidgetGeneric):
-  """Locators for control widget"""
-  _object_name = "control"
+  """Locators for Controls widget."""
+  _object_name = objects.get_singular(objects.CONTROLS)
+  widget_name = url.Widget.CONTROLS
 
 
 class WidgetProducts(BaseWidgetGeneric):
@@ -954,7 +981,7 @@ class WidgetIssues(BaseWidgetGeneric):
 
 
 class WidgetAssessmentTemplates(BaseWidgetGeneric):
-  """Locators for assessment widget."""
+  """Locators for Assessment Templates widget."""
   _object_name = objects.get_singular(objects.ASSESSMENT_TEMPLATES)
   widget_name = url.Widget.ASSESSMENT_TEMPLATES
 

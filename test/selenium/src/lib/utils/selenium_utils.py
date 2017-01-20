@@ -1,7 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
-"""Utility function for selenium"""
+"""Utility function for selenium."""
 
 import logging
 import time
@@ -20,6 +19,17 @@ logger = logging.getLogger(__name__)
 def hover_over_element(driver, element):
   """Moves the mouse pointer to the element and hovers"""
   action_chains.ActionChains(driver).move_to_element(element).perform()
+
+
+def open_url(driver, full_url):
+  """Loads a web page in the current browser session if
+  it hasn't been opened yet.
+  """
+  if (constants.url.get_second_part_url(full_url) ==
+          constants.url.get_second_part_url(driver.current_url)):
+    pass
+  else:
+    driver.get(full_url)
 
 
 def wait_until_stops_moving(element):
