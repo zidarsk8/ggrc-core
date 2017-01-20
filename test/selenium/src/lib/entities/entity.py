@@ -42,6 +42,7 @@ class Person(Entity):
 
   def __repr__(self):
     return ("object: {type}, name: {name}, id: {id}, href: {href}, "
+    return ("object_type: {type}, name: {title}, id: {id}, href: {href}, "
             "email: {email}, authorizations: {authorizations}").format(
         type=self.type, name=self.title, id=self.id, href=self.href,
         email=self.email, authorizations=self.authorizations)
@@ -95,8 +96,8 @@ class Program(Entity):
     self.last_update = last_update
 
   def __repr__(self):
-    return ("object: {type}, title: {title}, id: {id}, href: {href}, "
-            "manager: {manager}, primary contact: {pr_contact}, code: {code},"
+    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
+            "manager: {manager}, primary contact: {pr_contact}, code: {code}, "
             "state: {state}, last update: {last_update}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
         manager=self.manager, pr_contact=self.pr_contact, code=self.code,
@@ -104,8 +105,9 @@ class Program(Entity):
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.manager == other.manager and
-            self.state == other.state and self.pr_contact == other.pr_contact)
+            self.title == other.title and self.code == other.code and
+            self.manager == other.manager and self.state == other.state and
+            self.pr_contact == other.pr_contact)
 
 
 class Control(Entity):
@@ -122,8 +124,8 @@ class Control(Entity):
     self.last_update = last_update
 
   def __repr__(self):
-    return ("object: {type}, title: {title}, id: {id}, href: {href}, "
-            "owner: {owner}, primary contact: {pr_contact}, code: {code},"
+    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
+            "owner: {owner}, primary contact: {pr_contact}, code: {code}, "
             "state: {state}, last update: {last_update}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
         owner=self.owner, pr_contact=self.pr_contact, code=self.code,
@@ -131,8 +133,9 @@ class Control(Entity):
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.state == other.state and
-            self.owner == other.owner and self.pr_contact == other.pr_contact)
+            self.title == other.title and self.code == other.code and
+            self.state == other.state and self.owner == other.owner and
+            self.pr_contact == other.pr_contact)
 
 
 class Audit(Entity):
@@ -150,7 +153,7 @@ class Audit(Entity):
 
   def __repr__(self):
     return (
-        "object: {type}, title: {title}, id: {id}, href: {href}, "
+        "object_type: {type}, title: {title}, id: {id}, href: {href}, "
         "program: {program}, audit lead: {audit_lead}, code: {code},"
         "status: {status}, last update: {last_update}").format(
             type=self.type, title=self.title, id=self.id, href=self.href,
@@ -159,7 +162,8 @@ class Audit(Entity):
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.program == other.program and
+            self.title == other.title and self.code == other.code and
+            self.program == other.program and
             self.audit_lead == other.audit_lead and
             self.status == other.status)
 
@@ -181,7 +185,7 @@ class AsmtTmpl(Entity):
     self.last_update = last_update
 
   def __repr__(self):
-    return ("object: {type}, title: {title}, id: {id}, href: {href}, "
+    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
             "audit: {audit}, assessment objects: {asmt_objects}, "
             "default assessors: {def_assessors}, "
             "default verifiers: {def_verifiers}, code: {code}, "
@@ -193,7 +197,7 @@ class AsmtTmpl(Entity):
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title)
+            self.title == other.title and self.code == other.code)
 
 
 class Asmt(Entity):
@@ -229,5 +233,6 @@ class Asmt(Entity):
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.state == other.state and
+            self.title == other.title and self.code == other.code and
+            self.state == other.state and
             self.is_verified == other.is_verified)

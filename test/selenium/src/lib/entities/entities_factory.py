@@ -41,11 +41,19 @@ class EntitiesFactory(object):
 
   @classmethod
   def _generate_title(cls, obj_type):
-    """Generate title according object type."""
+    """Generate title according object type and random data."""
     special_chars = string_utils.SPECIAL
     return "{obj_type}_{rand_str}_{uuid}".format(
         obj_type=obj_type, uuid=uuid.uuid4(),
         rand_str=random_string(size=len(special_chars), chars=special_chars))
+    return append_random_string(
+        "{}_{}_".format(obj_type, random_string(size=len(special_chars),
+                                                chars=special_chars)))[:-23]
+
+  @classmethod
+  def _generate_code(cls, str="code"):
+    """Generate code according str part and random data."""
+    return append_random_string("{}-".format(str))[:13]
 
   @classmethod
   def _generate_email(cls, domain=url.DEFAULT_EMAIL_DOMAIN):
@@ -174,7 +182,7 @@ class ProgramFactory(EntitiesFactory):
              pr_contact=None, code=None, state=None, last_update=None):
     """Create Program object.
 
-    Random values will be used for title.
+    Random values will be used for title and code.
     Predictable values will be used for type, manager, pr_contact, state.
     """
     program_entity = cls._create_random_program()
@@ -191,6 +199,7 @@ class ProgramFactory(EntitiesFactory):
     random_program = entity.Program()
     random_program.title = cls._generate_title(cls._obj_program)
     random_program.type = cls._obj_program
+    random_program.code = cls._generate_code()
     random_program.manager = roles.DEFAULT_USER
     random_program.pr_contact = roles.DEFAULT_USER
     random_program.state = element.ObjectStates.DRAFT
@@ -205,7 +214,7 @@ class ControlFactory(EntitiesFactory):
              pr_contact=None, code=None, state=None, last_update=None):
     """Create Control object.
 
-    Random values will be used for title.
+    Random values will be used for title and code.
     Predictable values will be used for type, owner, pr_contact, state.
     """
     control_entity = cls._create_random_control()
@@ -222,6 +231,7 @@ class ControlFactory(EntitiesFactory):
     random_control = entity.Control()
     random_control.title = cls._generate_title(cls._obj_control)
     random_control.type = cls._obj_control
+    random_control.code = cls._generate_code()
     random_control.owner = roles.DEFAULT_USER
     random_control.pr_contact = roles.DEFAULT_USER
     random_control.state = element.ObjectStates.DRAFT
@@ -236,7 +246,7 @@ class AuditFactory(EntitiesFactory):
              audit_lead=None, code=None, status=None, last_update=None):
     """Create Audit object.
 
-    Random values will be used for title.
+    Random values will be used for title and code.
     Predictable values will be used for type, audit_lead, status.
     """
     audit_entity = cls._create_random_audit()
@@ -253,6 +263,7 @@ class AuditFactory(EntitiesFactory):
     random_audit = entity.Audit()
     random_audit.title = cls._generate_title(cls._obj_audit)
     random_audit.type = cls._obj_audit
+    random_audit.code = cls._generate_code()
     random_audit.audit_lead = roles.DEFAULT_USER
     random_audit.status = element.AuditStates.PLANNED
     return random_audit
@@ -267,7 +278,7 @@ class AsmtTmplFactory(EntitiesFactory):
              code=None, last_update=None):
     """Create Assessment Template object.
 
-    Random values will be used for title.
+    Random values will be used for title and code.
     Predictable values will be used for type, asmt_objects, def_assessors,
     def_verifiers.
     """
@@ -286,6 +297,7 @@ class AsmtTmplFactory(EntitiesFactory):
     random_asmt_tmpl = entity.AsmtTmpl()
     random_asmt_tmpl.title = cls._generate_title(cls._obj_asmt_tmpl)
     random_asmt_tmpl.type = cls._obj_asmt_tmpl
+    random_asmt_tmpl.code = cls._generate_code()
     random_asmt_tmpl.asmt_objects = objects.CONTROLS
     random_asmt_tmpl.def_assessors = roles.OBJECT_OWNERS
     random_asmt_tmpl.def_verifiers = roles.OBJECT_OWNERS
@@ -296,12 +308,30 @@ class AsmtFactory(EntitiesFactory):
   """Factory class for Assessment entity."""
 
   @classmethod
+  def generate(cls, objs_under_asmt_tmpl, audit):
+    """Generate Assessment object according to:
+    objects' under Assessment Template titles from list objects
+    "objs_under_asmt_tmpl", audit's title from "audit", the total number of
+    objects under Assessment Template.
+    """
+    from lib.service.rest_service import ObjectsInfoService
+    actual_count_all_asmts = ObjectsInfoService().total_count(
+        obj_name=objects.get_normal_form(cls._obj_asmt)
+    )
+    return [
+        cls.create(
+            title=obj_under_asmt_tmpl.title + " assessment for " + audit.title,
+            code=(cls._obj_asmt.upper() + "-" + str(asmt_number)),
+            audit=audit.title) for asmt_number, obj_under_asmt_tmpl in
+        enumerate(objs_under_asmt_tmpl, start=actual_count_all_asmts + 1)]
+
+  @classmethod
   def create(cls, title=None, id=None, href=None, type=None, object=None,
              audit=None, creators=None, assignees=None, pr_contact=None,
              is_verified=None, code=None, state=None, last_update=None):
     """Create Assessment object.
 
-    Random values will be used for title.
+    Random values will be used for title and code.
     Predictable values will be used for type, object, creators, assignees,
     state, is_verified.
     """
@@ -319,6 +349,7 @@ class AsmtFactory(EntitiesFactory):
     random_asmt = entity.Asmt()
     random_asmt.title = cls._generate_title(cls._obj_asmt)
     random_asmt.type = cls._obj_asmt
+    random_asmt.code = cls._generate_code()
     random_asmt.object = roles.DEFAULT_USER
     random_asmt.creators = roles.DEFAULT_USER
     random_asmt.assignees = roles.DEFAULT_USER
