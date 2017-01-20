@@ -13,13 +13,14 @@ from lib.utils import selenium_utils
 class BaseModal(base.Modal):
   """Base class for the edit modal."""
   _locator_ui_title = locator.ModalCreateNewObject.UI_TITLE
+  _locator_ui_code = locator.ModalCreateNewObject.UI_CODE
   locator_button_save = locator.ModalCreateNewObject.BUTTON_SAVE_AND_CLOSE
 
   def __init__(self, driver):
     super(BaseModal, self).__init__(driver)
     self.button_save_and_close = base.Button(driver, self.locator_button_save)
-    self.ui_title = base.TextInputField(self._driver,
-                                        self._locator_ui_title)
+    self.ui_title = base.TextInputField(self._driver, self._locator_ui_title)
+    self.ui_code = base.TextInputField(self._driver, self._locator_ui_code)
 
   def enter_title(self, text):
     """
@@ -27,6 +28,13 @@ class BaseModal(base.Modal):
         text (basestring)
     """
     self.ui_title.enter_text(text)
+
+  def enter_code(self, text):
+    """
+    Args:
+        text (basestring)
+    """
+    self.ui_code.enter_text(text)
 
 
 class SetFieldsModal(base.Modal):
@@ -46,16 +54,18 @@ class SetFieldsModal(base.Modal):
 
   def set_visible_fields(self, fields):
     """Set visible fields to display objects on the tree view."""
-    _locator_modal_fields = (By.CSS_SELECTOR, self._locators.FIELDS_MODAL.
-                             format(self.widget_name))
-    _locator_fields_titles = (By.CSS_SELECTOR, locator.ModalSetVisibleFields.
-                              FIELDS_TITLES.format(self.widget_name))
-    _locator_fields_checkboxes = (By.CSS_SELECTOR,
-                                  locator.ModalSetVisibleFields.
-                                  FIELDS_CHECKBOXES.format(self.widget_name))
-    selenium_utils.get_when_visible(self._driver, _locator_modal_fields)
-    self.fields_elements = base.Checkboxes(
-        self._driver, _locator_fields_titles, _locator_fields_checkboxes)
+    locator_modal_fields = (By.CSS_SELECTOR,
+                            self._locators.MODAL.format(self.widget_name))
+    locator_fields_titles = (
+        By.CSS_SELECTOR,
+        locator.ModalSetVisibleFields.FIELDS_TITLES.format(self.widget_name))
+    locator_fields_checkboxes = (
+        By.CSS_SELECTOR,
+        (locator.ModalSetVisibleFields.FIELDS_CHECKBOXES.
+         format(self.widget_name)))
+    selenium_utils.get_when_visible(self._driver, locator_modal_fields)
+    self.fields_elements = base.Checkboxes(self._driver, locator_fields_titles,
+                                           locator_fields_checkboxes)
     self.fields_elements.select_by_titles(fields)
 
   def save_set_visible_fields(self):
@@ -77,7 +87,6 @@ class ProgramsModal(BaseModal):
   # pylint: disable=too-many-instance-attributes
 
   _locators = locator.ModalCreateNewProgram
-  _locator_ui_title = locator.ModalCreateNewProgram.UI_TITLE
 
   def __init__(self, driver):
     super(ProgramsModal, self).__init__(driver)
@@ -366,9 +375,10 @@ class AsmtTmplModal(BaseModal):
   def __init__(self, driver):
     super(AsmtTmplModal, self).__init__(driver)
 
-  def fill_minimal_data(self, title):
+  def fill_minimal_data(self, title, code):
     """Enter minimal data to create assessment template."""
     self.enter_title(title)
+    self.enter_code(code)
 
 
 class AsmtsModal(BaseModal):
@@ -378,9 +388,10 @@ class AsmtsModal(BaseModal):
   def __init__(self, driver):
     super(AsmtsModal, self).__init__(driver)
 
-  def fill_minimal_data(self, title):
+  def fill_minimal_data(self, title, code):
     """Enter minimal data to create assessment."""
     self.enter_title(title)
+    self.enter_code(code)
 
 
 class AsmtsModalGenerate(base.Modal):
