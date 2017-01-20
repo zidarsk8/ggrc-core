@@ -43,7 +43,8 @@
       // { property: "controls", model: CMS.Models.Control, }
       // { parent_find_param: "system_id" ... }
       scroll_page_count: 1, // pages above and below viewport
-      is_subtree: false
+      is_subtree: false,
+      showMappedToAllParents: false
     },
     do_not_propagate: [
       'header_view',
@@ -268,6 +269,10 @@
           this.page_loader = new GGRC.ListLoaders.TreePageLoader(
             this.options.model, this.options.parent_instance,
             this.options.mapping);
+        } else if (this.options.attr('is_subtree')) {
+          this.page_loader = new GGRC.ListLoaders.SubTreeLoader(
+            this.options.model, this.options.parent_instance,
+            this.options.mapping);
         }
 
         if ('parent_instance' in opts && 'status' in opts.parent_instance) {
@@ -337,6 +342,7 @@
 
       if (this.options.header_view && this.options.show_header) {
         optionsDfd = $.when(this.options).then(function (options) {
+          options.onChildShowStateChange = self.childShowStateChange.bind(self);
           options.onChildModelsChange = self.set_tree_display_list.bind(self);
           return options;
         });
@@ -379,7 +385,9 @@
             }.bind(this))
           ));
       }
-      return $.when.apply($.when, dfds);
+
+      this._init_view_deferred = $.when.apply($.when, dfds);
+      return this._init_view_deferred;
     },
 
     init_count: function () {
@@ -833,9 +841,39 @@
       res = $.when.apply($, drawItemsDfds);
 
       res.then(function () {
+        if (this.options.is_subtree) {
+          this.addSubTreeExpander(items);
+        }
         _.defer(this.draw_visible.bind(this));
       }.bind(this));
       return res;
+    },
+
+    addSubTreeExpander: function () {
+      var parentCtrl = this.element.closest('section')
+        .find('.cms_controllers_tree_view').control();
+      var showMappedToAllParents = parentCtrl.options
+        .attr('showMappedToAllParents');
+      var element;
+      var options;
+      var expander;
+
+      element = this.element.find('.parent-related:first');
+      options = {
+        expanded: !!element.length && showMappedToAllParents
+      };
+      expander = can.view(GGRC.mustache_path +
+        '/base_objects/sub_tree_expand.mustache', options);
+
+      if (!showMappedToAllParents) {
+        $(expander.firstElementChild).hide();
+      }
+
+      if (element.length) {
+        $(expander).insertBefore(element);
+      } else {
+        this.element.append(expander);
+      }
     },
 
     ' removeChildNode': function (el, ev, data) { // eslint-disable-line quote-props
@@ -1184,6 +1222,44 @@
       this.refreshList();
     },
 
+    loadSubTree: function (allRelatedToParent) {
+      var parent = this.options.parent_instance;
+      var queryAPI = GGRC.Utils.QueryAPI;
+      var parentCtrl = this.element.closest('section')
+        .find('.cms_controllers_tree_view').control();
+      var displayModels = can.makeArray(
+        parentCtrl.options.attr('selected_child_tree_model_list'));
+      var originalOrder =
+        GGRC.tree_view.attr('orderedWidgetsByType')[parent.type];
+      var relevant = {
+        type: parent.type,
+        id: parent.id,
+        operation: 'relevant'
+      };
+      var current = GGRC.page_instance();
+      var addFilter;
+      var reqParams;
+
+      if (!allRelatedToParent) {
+        addFilter = {
+          expression: {
+            object_name: current.type,
+            op: {
+              name: 'relevant'
+            },
+            ids: [current.id]
+          }
+        };
+      }
+      displayModels = _.map(displayModels, 'model_name');
+      displayModels = _.intersection(originalOrder, displayModels);
+      reqParams = displayModels.map(function (model) {
+        return queryAPI.buildParam(model, {}, relevant, null, addFilter);
+      });
+
+      return this.page_loader.load({data: reqParams}, displayModels);
+    },
+
     loadPage: function () {
       var options = this.options;
       var queryAPI = GGRC.Utils.QueryAPI;
@@ -1247,6 +1323,20 @@
         if (oldVal !== newVal && _.contains(['current', 'pageSize'], type)) {
           this.refreshList();
         }
-      })
+      }),
+    childShowStateChange: function (childShowState) {
+      var expanderEls = this.element.find('.sub-tree-expander');
+
+      if (!_.isBoolean(childShowState)) {
+        return;
+      }
+      if (childShowState) {
+        expanderEls.show();
+      } else {
+        expanderEls.hide();
+      }
+
+      this.options.attr('showMappedToAllParents', !!childShowState);
+    }
   });
 })(window.can, window.$);

@@ -107,16 +107,22 @@
       // TODO: Currently Query API doesn't support CustomAttributable.
       var isCustomAttr = /CustomAttr/.test(this.options.model.shortName);
       var isTreeView = this instanceof CMS.Controllers.TreeView;
-      // Use Query API only for first tier in TreeViewController
-      var loader = !isTreeView || isCustomAttr ||
-      this.options.attr('is_subtree') ?
-        this.fetch_list.bind(this) : this.loadPage.bind(this);
+      var loader;
+      if (!isTreeView || isCustomAttr) {
+        loader = this.fetch_list.bind(this);
+      } else if (this.options.attr('is_subtree')) {
+        loader = this.loadSubTree.bind(this, refetch);
+      } else {
+        loader = this.loadPage.bind(this);
+      }
+
+      if (refetch) {
+        this._draw_list_deferred = null;
+        this._display_deferred = null;
+        this.element.slideUp('fast').empty().slideDown();
+      }
 
       if (this._display_deferred) {
-        if (refetch) {
-          return loader()
-            .then(that.proxy('draw_list'));
-        }
         return this._display_deferred;
       }
 
@@ -124,7 +130,13 @@
 
       this._display_deferred = this._display_deferred
         .then(this._ifNotRemoved(function () {
-          return $.when(loader(), that.init_view());
+          var dfds = [loader()];
+          if (that._init_view_deferred) {
+            dfds.push(that._init_view_deferred);
+          } else {
+            dfds.push(that.init_view());
+          }
+          return $.when.apply($, dfds);
         }))
         .then(that._ifNotRemoved(that.proxy('draw_list')))
         .done(trackerStop);
