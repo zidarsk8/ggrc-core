@@ -17,29 +17,29 @@
         var revisionsLength = scope.rightRevisions.length;
         var newRevisionID = scope.rightRevisions[revisionsLength - 1].id;
         var view = scope.instance.view;
-        this.getRevisions(currentRevisionID, newRevisionID)
-          .then(function (data) {
-            var revisions = this.prepareInstances(data);
-            var that = this;
-
-            GGRC.Controllers.Modals.confirm({
-              modal_title: 'Compare with the latest version',
-              header_view: GGRC.mustache_path +
-                            '/modals/modal_compare_header.mustache',
-              modal_confirm: 'Update',
-              skip_refresh: true,
-              extraCssClass: 'compare-modal',
-              button_view: GGRC.mustache_path +
-                            '/modals/prompt_buttons.mustache',
-              afterFetch: function (target) {
+        var that = this;
+        GGRC.Controllers.Modals.confirm({
+          modal_title: 'Compare with the latest version',
+          modal_description: 'Loading...',
+          header_view: GGRC.mustache_path +
+                        '/modals/modal_compare_header.mustache',
+          modal_confirm: 'Update',
+          skip_refresh: true,
+          extraCssClass: 'compare-modal',
+          button_view: GGRC.mustache_path +
+                        '/modals/prompt_buttons.mustache',
+          afterFetch: function (target) {
+            that.getRevisions(currentRevisionID, newRevisionID)
+              .then(function (data) {
+                var revisions = that.prepareInstances(data);
                 var fragLeft = can.view(view, revisions[0]);
                 var fragRight = can.view(view, revisions[1]);
                 fragLeft.appendChild(fragRight);
                 target.find('.modal-body').html(fragLeft);
                 that.highlightDifference(target);
-              }
-            }, this.updateRevision.bind(this));
-          }.bind(this));
+              });
+          }
+        }, this.updateRevision.bind(this));
       },
       getRevisions: function (currentRevisionID, newRevisionID) {
         var additionalFilter = {
