@@ -3,7 +3,6 @@
 
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
-from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Noted
@@ -17,9 +16,9 @@ from ggrc.models.program import Program
 from ggrc.models.relationship import Relatable
 
 
-class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
-                     CustomAttributable, Titled, Relatable, Base, Indexed,
-                     db.Model):
+class RiskAssessment(Documentable, Timeboxed, Noted, Described,
+                     CustomAttributable, Titled, Relatable, Slugged, 
+                     Indexed, db.Model):
   __tablename__ = 'risk_assessments'
   _title_uniqueness = False
 
