@@ -6,4 +6,4 @@ from app_engine import *
 PRODUCTION = False
 USE_APP_ENGINE_ASSETS_SUBDOMAIN = False
 COMPANY = "Reciprocity, Inc."
-COMPANY_LOGO_TEXT = "Demo gGRC Implementation"
+COMPANY_LOGO_TEXT = "Demo GGRC Implementation"
