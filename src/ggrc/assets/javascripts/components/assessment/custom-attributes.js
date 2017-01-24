@@ -8,66 +8,93 @@
   var tpl = can.view(GGRC.mustache_path +
     '/components/assessment/custom-attributes.mustache');
 
-  GGRC.Components('assessmentCustomAttributes', {
+  can.Component.extend({
     tag: 'assessment-custom-attributes',
     template: tpl,
-    scope: {
+    viewModel: {
       instance: null,
-      values: null,
-      definitions: null,
-      isModified: null,
       modal: {
         open: false
       },
-      items: [],
-      updateValues: function (defs, values) {
-        var scope = this;
-        return can.map(defs, function (def) {
-          var valueData = false;
-          var id = def.id;
-          var type = GGRC.Utils.mapCAType(def.attribute_type);
-          var stub = {
-            isStub: true,
-            attributable_id: scope.id,
-            custom_attribute_id: id,
-            attribute_value: null,
-            attribute_object: null,
-            preconditions_failed: (def.mandatory) ? ['value'] : [],
-            def: def,
-            attributeType: type
-          };
-
-          can.each(values, function (value) {
-            if (value.custom_attribute_id === id) {
-              value.attr('def', def);
-              value.attr('attributeType', type);
-              value.attr('preconditions_failed',
-                value.attr('preconditions_failed') || []);
-              valueData = value;
-            }
-          });
-
-          return valueData || new can.Map(stub);
-        });
-      },
-      refresh: function (isReady) {
-        var scope = this;
-        if (isReady) {
-          scope.attr('values')
-            .replace(scope.updateValues(scope.attr('definitions'),
-              scope.attr('values')));
-          scope.attr('items', scope.attr('values'));
+      save: function (scope) {
+        var items = this.attr('items');
+        var itemToSave;
+        var errors;
+        var value = scope.attr('value');
+        var type = scope.attr('type');
+        var defId = scope.attr('def.id');
+        var attributeObjectId;
+        var valueParts;
+        var customAttributeValue;
+        if (type === 'person') {
+          valueParts = value.split(':');
+          attributeObjectId = Number(valueParts[1]);
+          value = valueParts[0];
         }
+
+        this.attr('instance').save()
+          .done(function () {
+            items.each(function (item) {
+              if (defId === item.attr('def.id')) {
+                itemToSave = item;
+                return false;
+              }
+            });
+            errors = itemToSave.attr('preconditions_failed') || [];
+            if (!(errors.indexOf('comment') < 0 &&
+              errors.indexOf('evidence') < 0)) {
+              this.showRequiredModal(errors, {
+                value: scope.attr('value'),
+                title: scope.attr('def.title'),
+                type: scope.attr('type')
+              }, {
+                defId: defId,
+                valueId: itemToSave.id
+              });
+            }
+            if (type === 'person') {
+              customAttributeValue =
+                can.makeArray(this.attr('instance.custom_attribute_values'))
+                  .find(function (v) {
+                    return v.id === itemToSave.id;
+                  });
+              if (customAttributeValue &&
+                customAttributeValue.attribute_object &&
+                customAttributeValue.attribute_object.id !==
+                attributeObjectId) {
+                return;
+              }
+            }
+            if (String(value) !== scope.attr('value')) {
+              return;
+            }
+            GGRC.Errors.notifier('success', 'Saved');
+          }.bind(this))
+          .fail(function (inst, err) {
+            GGRC.Errors.notifierXHR('error')(err);
+          })
+          .always(function () {
+            scope.attr('isSaving', false);
+          });
+      },
+      showRequiredModal: function (fields, content, ids) {
+        can.batch.start();
+        this.attr('modal', {
+          content: content,
+          caIds: ids,
+          modalTitleText: 'Required ' + fields.map(function (field) {
+            return can.capitalize(field);
+          }).join(' and '),
+          fields: fields
+        });
+        can.batch.stop();
+        this.attr('modal.open', true);
       }
     },
-    init: function () {
-      var isReady = this.scope.attr('instance.isReadyForRender');
-      this.scope.refresh(isReady);
-    },
     events: {
-      '{scope.instance} isReadyForRender': function (sc, ev, isReady) {
-        this.scope.refresh(isReady);
+      'ca-object saveCustomAttribute': function (el, ev, scope) {
+        this.viewModel.save(scope);
       }
     }
   });
-})(window.can, window.GGRC, window.CMS);
+})(window.can, window.GGRC);

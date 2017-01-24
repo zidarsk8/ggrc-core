@@ -317,7 +317,10 @@
     title_plural: 'Assessment Templates',
     table_singular: 'assessment_template',
     table_plural: 'assessment_templates',
-    mixins: ['mapping-limit'],
+    mixins: [
+      'mapping-limit',
+      'inScopeObjects'
+    ],
     findOne: 'GET /api/assessment_templates/{id}',
     findAll: 'GET /api/assessment_templates',
     update: 'PUT /api/assessment_templates/{id}',
@@ -599,10 +602,6 @@
         search_only: true
       });
       objectTypes = mapper.initTypes('AssessmentTemplate');
-
-      // the all objects group is not needed
-      delete objectTypes.all_objects;
-
       // remove ignored types and sort the rest
       _.each(objectTypes, function (objGroup) {
         objGroup.items = _.filter(objGroup.items, function (item) {

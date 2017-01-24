@@ -15,6 +15,7 @@
         this.display_prefs = prefs;
 
         this.init_tree_view_settings();
+        this.initCurrentRelatedInstanses();
         this.init_page_title();
         this.init_page_help();
         this.init_page_header();
@@ -50,6 +51,21 @@
             savedChildTreeDisplayList);
         }
       }.bind(this));
+    },
+
+    initCurrentRelatedInstanses: function () {
+      var instance;
+      if (GGRC.pageType === 'admin') { // Admin dashboard
+        return;
+      }
+
+      instance = this.options.instance;
+
+      GGRC.Utils.CurrentPage.initMappedInstances(
+        GGRC.tree_view.attr('orderedWidgetsByType')[instance.type], {
+          type: instance.type,
+          id: instance.id
+        });
     },
 
     init_page_title: function () {

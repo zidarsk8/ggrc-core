@@ -20,34 +20,50 @@
     return {top: top, left: left};
   }
 
-  GGRC.Components('customAttributeObjectModal', {
+  can.Component.extend({
     tag: 'ca-object-modal',
     template: tpl,
-    scope: {
+    viewModel: {
+      define: {
+        modifiedField: {
+          get: function () {
+            return this.attr('modal');
+          }
+        },
+        modalCls: {
+          get: function () {
+            return this.attr('state.open') ? baseCls + '-open' : '';
+          }
+        },
+        modalOverlayCls: {
+          get: function () {
+            return this.attr('state.open') ? baseCls + '__overlay-open' : '';
+          }
+        },
+        state: {
+          value: {
+            open: false,
+            save: false,
+            controls: false
+          }
+        },
+        isPerson: {
+          get: function () {
+            return this.attr('modifiedField.value') &&
+              this.attr('modifiedField.type') === 'person';
+          }
+        },
+        actionBtnText: {
+          get: function () {
+            return this.attr('comment') ? 'Save' : 'Done';
+          }
+        }
+      },
       instance: null,
-      modifiedField: null,
       modalEl: null,
       isEmpty: true,
-      modalCls: function () {
-        return this.attr('state.open') ? baseCls + '-open' : '';
-      },
-      modalOverlayCls: function () {
-        return this.attr('state.open') ? baseCls + '__overlay-open' : '';
-      },
-      actionBtnText: function () {
-        return this.attr('comment') ? 'Save' : 'Done';
-      },
-      isPerson: function () {
-        return this.attr('modifiedField.value') &&
-          this.attr('modifiedField.type') === 'person';
-      },
       comment: false,
       evidence: false,
-      state: {
-        open: false,
-        save: false,
-        controls: false
-      },
       saveAttachments: function () {
         return this.attr('comment') ?
           this.attr('state.save', true) :
@@ -64,9 +80,6 @@
       toggle: function (isOpen) {
         this.setAttachmentFields(isOpen);
         this.setPosition(isOpen);
-      },
-      mapToInternal: function () {
-        this.attr('modifiedField', this.attr('modal'));
       },
       setAttachmentFields: function (isOpen) {
         var attachments = this.attr('modifiedField.fields');
@@ -88,22 +101,21 @@
       inserted: function (el) {
         var modal = el.find('.' + baseCls);
         modal.appendTo('body');
-        this.scope.attr('modalEl', modal);
+        this.viewModel.attr('modalEl', modal);
         el.find('.' + baseCls + '__overlay').appendTo('body');
       },
-      show: function (scope, ev, val) {
+      show: function (viewModel, ev, val) {
         if (val) {
-          this.scope.mapToInternal();
-          this.scope.show();
+          this.viewModel.show();
         }
       },
-      '{scope.modal} open': 'show',
-      '{scope.state} open': function (scope, ev, val) {
-        this.scope.toggle(val);
+      '{viewModel.modal} open': 'show',
+      '{viewModel.state} open': function (viewModel, ev, val) {
+        this.viewModel.toggle(val);
       },
       '{window} resize': function () {
-        var isOpen = this.scope.attr('modifiedField.open');
-        this.scope.setPosition(isOpen);
+        var isOpen = this.viewModel.attr('modifiedField.open');
+        this.viewModel.setPosition(isOpen);
       }
     }
   });

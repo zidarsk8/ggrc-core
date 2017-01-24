@@ -43,6 +43,7 @@ dashboard-js-files:
   - plugins/persistent_notifier.js
   - ggrc_base.js
   - plugins/ggrc_utils.js
+  - plugins/utils/current-page-utils.js
   - plugins/datepicker.js
   - plugins/can_control.js
   - plugins/wysiwyg.js
@@ -76,7 +77,9 @@ dashboard-js-files:
   - models/mappers/indirect-list-loader.js
   - models/mappers/search-list-loader.js
   - models/mappers/reifying-list-loader.js
+  - models/mappers/tree-base-loader.js
   - models/mappers/tree-page-loader.js
+  - models/mappers/sub-tree-loader.js
   - models/mappers/mapper-helpers.js
   - models/mappers/mappings.js
   - models/mappers/mappings-ggrc.js
@@ -151,6 +154,7 @@ dashboard-js-files:
   - components/assessment/inline.js
   - components/assessment/add_comment.js
   - components/comment/comment-input.js
+  - components/comment/comment-list-helper.js
   - components/assessment/controls-toolbar/controls-toolbar.js
   - components/mapped-objects/mapped-objects.js
   - components/object-state-toolbar/object-state-toolbar.js
@@ -158,9 +162,7 @@ dashboard-js-files:
   - components/object-list/object-list-item.js
   - components/object-popover/object-popover.js
   - components/ca-object/ca-object.js
-  - components/ca-object/ca-object-validation.js
   - components/ca-object/ca-object-validation-icon.js
-  - components/ca-object/ca-object-title.js
   - components/ca-object/ca-object-value-mapper.js
   - components/ca-object/ca-object-modal.js
   - components/ca-object/ca-object-modal-content.js
@@ -211,10 +213,11 @@ dashboard-js-files:
   - components/tree_pagination/tree_pagination.js
   - components/tree/tree-header-selector.js
   - components/tree/tree-type-selector.js
+  - components/tree/tree-child-show.js
+  - components/tree/sub-tree-expander.js
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
   - components/effective-dates/effective-dates.js
-  - components/snapshotter/individual-update.js
   - components/snapshotter/revisions-comparer.js
   - components/snapshotter/scope-update.js
   - components/info-pin-buttons/info-pin-buttons.js
@@ -267,9 +270,6 @@ dashboard-js-template-files:
   - components/object-popover/object-popover.mustache
   - components/mapped-objects/mapped-objects.mustache
   - components/reusable-objects/reusable-objects-item.mustache
-  - components/ca-object/ca-object.mustache
-  - components/ca-object/ca-object-title.mustache
-  - components/ca-object/ca-object-validation.mustache
   - components/ca-object/ca-object-validation-icon.mustache
   - components/ca-object/ca-object-modal.mustache
   - components/ca-object/ca-object-modal-content.mustache
@@ -310,6 +310,8 @@ dashboard-js-template-files:
   - base_objects/tree_view_filter.mustache
   - base_objects/tree_column_selector.mustache
   - base_objects/tree_column_names.mustache
+  - base_objects/tree_child_show.mustache
+  - base_objects/sub_tree_expand.mustache
   - base_objects/filter_trigger.mustache
   - base_objects/generate_assessments_button.mustache
   - base_objects/states.mustache

@@ -10,40 +10,43 @@
     'and system will create snapshots of selected objects for this Audit';
 
   var MapperModel = GGRC.Models.MapperModel = can.Map.extend({
-    defaults: {
-      defaultGroups: {
-        all_objects: {
-          name: 'All Objects',
-          value: 'AllObject',
-          plural: 'allobjects',
-          table_plural: 'allobjects',
-          singular: 'AllObject',
-          models: []
-        },
-        entities: {
-          name: 'People/Groups',
-          items: []
-        },
-        business: {
-          name: 'Assets/Business',
-          items: []
-        },
-        governance: {
-          name: 'Governance',
-          items: []
+    define: {
+      typeGroups: {
+        value: {
+          entities: {
+            name: 'People/Groups',
+            items: []
+          },
+          business: {
+            name: 'Assets/Business',
+            items: []
+          },
+          governance: {
+            name: 'Governance',
+            items: []
+          }
+        }
+      },
+      types: {
+        get: function () {
+          return this.initTypes();
+        }
+      },
+      parentInstance: {
+        get: function () {
+          return CMS.Models
+            .get_instance(this.attr('object'), this.attr('join_object_id'));
+        }
+      },
+      useSnapshots: {
+        get: function () {
+          return GGRC.Utils.Snapshots.isInScopeModel(this.attr('object')) ||
+            // In case Assessment generation - use Snapshot Objects
+            this.attr('assessmentGenerator');
         }
       }
-    }
-  }, {
-    init: function () {
-      this.attr('types', this.initTypes());
-      this.attr('parentInstance', this.initInstance());
-      this.attr('useSnapshots',
-        GGRC.Utils.Snapshots.isInScopeModel(this.attr('object')) ||
-        // Assessment generation should use Snapshot Objects
-        this.attr('assessmentGenerator'));
     },
-    type: 'AllObject', // We set default as All Object
+    type: 'Control', // We set default as Control
     warningMessage: warningMessage,
     contact: null,
     contactEmail: null,
@@ -67,15 +70,12 @@
     is_snapshotable: false,
     snapshot_scope_id: '',
     snapshot_scope_type: '',
-    parentInstance: null,
-    useSnapshots: false,
     allowedToCreate: function () {
-      var isAllTypeSelected = this.attr('type') === 'AllObject';
       var isSearch = this.attr('search_only');
       // Don't allow to create new instances for "In Scope" Objects
       var isInScopeModel =
         GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'));
-      return !isAllTypeSelected && !isSearch && !isInScopeModel;
+      return !isSearch && !isInScopeModel;
     },
     showWarning: function () {
       // Never show warning for In Scope Objects
@@ -88,12 +88,6 @@
       }
       return GGRC.Utils.Snapshots.isSnapshotParent(this.attr('object')) ||
         GGRC.Utils.Snapshots.isSnapshotParent(this.attr('type'));
-    },
-    initInstance: function () {
-      return CMS.Models.get_instance(
-        this.attr('object'),
-        this.attr('join_object_id')
-      );
     },
     prepareCorrectTypeFormat: function (cmsModel) {
       return {
@@ -121,7 +115,6 @@
         groups[type.category];
 
       group.items.push(type);
-      groups.all_objects.models.push(type.singular);
     },
     getModelNamesList: function (object) {
       var exclude = [];
@@ -140,21 +133,12 @@
     initTypes: function (objectType) {
       var object = objectType || this.attr('object');
       // Can.JS wrap all objects with can.Map by default
-      var groups = this.attr('defaultGroups').attr();
+      var groups = this.attr('typeGroups').attr();
       var list = this.getModelNamesList(object);
 
       list.forEach(function (modelName) {
         return this.addFormattedType(modelName, groups);
       }.bind(this));
-      // Temporary Remove All Objects select option in case Snapshot mapping
-      if (groups.all_objects.models.length < 2 ||
-          this.attr('assessmentGenerator') ||
-          GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
-        delete groups.all_objects;
-        // Set default type to Control in case AllObject type is not available
-        this.attr('type',
-          this.attr('type') === 'AllObject' ? 'Control' : this.attr('type'));
-      }
       return groups;
     },
     setContact: function (scope, el, ev) {
@@ -169,7 +153,7 @@
     },
     modelFromType: function (type) {
       var types = _.reduce(_.values(
-        this.attr('types').attr()), function (memo, val) {
+        this.attr('types')), function (memo, val) {
         if (val.items) {
           return memo.concat(val.items);
         }
@@ -206,10 +190,8 @@
       if (!data.search_only) {
         if (type) {
           data.type = type;
-        } else if (id === GGRC.page_instance().id || !treeView) {
-          data.type = 'AllObject';
         } else {
-          data.type = treeView.display_list[0];
+          data.type = treeView ? treeView.display_list[0] : 'Control';
         }
       } else {
         data.type = 'Program';
@@ -270,9 +252,8 @@
                   })
                   .find(function (instance) {
                     return instance.id === desination.id &&
-                      instance.type === desination.type; }
-                  );
-
+                      instance.type === desination.type;
+                  });
               if (instance && isAllowed) {
                 return instance;
               }
@@ -289,7 +270,6 @@
         var type = this.scope.attr('mapper.type');
         var object = this.scope.attr('mapper.object');
         var assessmentTemplate = this.scope.attr('mapper.assessmentTemplate');
-        var isAllObject = type === 'AllObject';
         var instance = CMS.Models[object].findInCacheById(
           this.scope.attr('mapper.join_object_id'));
         var mapping;
@@ -346,8 +326,7 @@
             if (isMapped || !isAllowed) {
               return;
             }
-            mapping = GGRC.Mappings.get_canonical_mapping(
-              object, isAllObject ? destination.type : type);
+            mapping = GGRC.Mappings.get_canonical_mapping(object, type);
             Model = CMS.Models[mapping.model_name];
             data[mapping.object_attr] = {
               href: instance.href,
@@ -398,11 +377,7 @@
       },
       setModel: function () {
         var type = this.scope.attr('mapper.type');
-        var types = this.scope.attr('mapper.types');
 
-        if (~['All Object', 'AllObject'].indexOf(type)) {
-          return this.scope.attr('mapper.model', types.all_objects);
-        }
         this.scope.attr(
           'mapper.model', this.scope.mapper.modelFromType(type));
       },

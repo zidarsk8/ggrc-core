@@ -149,7 +149,7 @@ ul.new-tree {
     > .item-main {
       background: $white;
       > .item-wrap {
-        margin: 0 10px;
+        padding: 0 10px;
         border-bottom: 1px solid $itemBorder;
         .openclose,
         .select {
@@ -201,6 +201,18 @@ ul.new-tree {
     &.object-filter {
       span {
         color: $black;
+      }
+    }
+    &.parent-related {
+      color: $gray;
+      .fa {
+        color: $gray;
+      }
+    }
+    &.current-instance-related {
+      color: $darkText;
+      .fa {
+        color: $darkText;
       }
     }
     .black-font {
@@ -360,7 +372,6 @@ ul.new-tree {
       }
     }
     .inner-tree {
-      border-top: 1px solid $itemBorder;
       margin-left: 38px;
       li.tree-item {
         @include scale(1);
@@ -467,7 +478,8 @@ ul.new-tree {
 
 .tier-2-info-content {
   @extend %clearfix;
-  padding: 0 10px 0 32px;
+  border-top: 1px solid $itemBorder;
+  padding: 0 0 0 32px;
   position: relative;
   font-size: 13px;
   line-height: 20px;

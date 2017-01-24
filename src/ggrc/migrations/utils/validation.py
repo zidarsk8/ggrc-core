@@ -40,7 +40,7 @@ def validate_assessment_templates(connection):
 def validate_assessment_relationships(connection):  # noqa # pylint: disable=invalid-name
   """Check that assessments are not mapped to any non-snapshottable object"""
   valid_types = format_types(
-      Types.all | {"Audit", "Document", "Person", "Comment"})
+      Types.all | {"Audit", "Document", "Person", "Comment", "Snapshot"})
 
   sql = """
   SELECT DISTINCT obj.id
@@ -77,7 +77,7 @@ def validate_request_relationships(connection):
 def validate_issue_relationships(connection):
   """Check that issues are not mapped to any non-snapshottable object"""
   valid_types = format_types(
-      Types.all | {"Audit", "Document", "Person", "Comment"})
+      Types.all | {"Audit", "Document", "Person", "Comment", "Snapshot"})
 
   sql = """
   SELECT DISTINCT obj.id
