@@ -109,7 +109,8 @@
        * @return {Object} - jQuery object
        */
       getAttributes: function ($infoPanes, index) {
-        return $($infoPanes[index]).find('.row-fluid h6 + *');
+        var selector = '.row-fluid h6 + *, .row-fluid .state-value';
+        return $($infoPanes[index]).find(selector);
       },
 
       /**
