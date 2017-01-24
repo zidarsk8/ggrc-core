@@ -6,7 +6,8 @@
 produce specific resource state representations for GGRC models as well as
 update/create GGRC model instances from resource state representations.
 """
-from .json import *
+from .json import *  # noqa
+
 
 class simple_property(property):
   pass
