@@ -25,7 +25,7 @@ def relate(src, dst):
     return (dst, src)
 
 
-class automapping_count_limit:
+class automapping_count_limit(object):
   def __init__(self, new_limit):
     self.new_limit = new_limit
 
