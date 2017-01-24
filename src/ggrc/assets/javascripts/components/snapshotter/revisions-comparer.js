@@ -77,11 +77,10 @@
       prepareInstances: function (data) {
         return data.Revision.values.map(function (value) {
           var content = value.content;
+          var model = CMS.Models[value.resource_type];
           content.isRevision = true;
-          content.class = {
-            is_custom_attributable: false
-          };
-          return {instance: content};
+          content.type = value.resource_type;
+          return {instance: new model(content)};
         });
       },
       updateRevision: function () {
