@@ -34,7 +34,7 @@ class TestRevisions(TestCase):
   """ Tests for ggrc.models.Revision """
 
   def setUp(self):
-    TestCase.setUp(self)
+    super(TestRevisions, self).setUp()
     self.gen = integration.ggrc.generator.ObjectGenerator()
 
   def test_revisions(self):

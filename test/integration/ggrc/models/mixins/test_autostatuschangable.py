@@ -18,7 +18,7 @@ class TestMixinAutoStatusChangeable(TestCase):
   # pylint: disable=invalid-name
 
   def setUp(self):
-    TestCase.setUp(self)
+    super(TestMixinAutoStatusChangeable, self).setUp()
     self.client.get("/login")
     self.api_helper = api_helper.Api()
     self.objgen = generator.ObjectGenerator()

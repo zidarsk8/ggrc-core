@@ -23,7 +23,7 @@ class ProductTestCase(TestCase):
   """Test case for Product post and put requests."""
 
   def setUp(self):
-    TestCase.setUp(self)
+    super(ProductTestCase, self).setUp()
     self.generator = ObjectGenerator()
     self.client.get("/login")
 

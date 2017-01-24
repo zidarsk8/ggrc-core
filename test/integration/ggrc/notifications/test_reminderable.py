@@ -21,7 +21,7 @@ class TestReminderable(TestCase):
   """Test sending reminder."""
 
   def setUp(self):
-    TestCase.setUp(self)
+    super(TestReminderable, self).setUp()
     self.client.get("/login")
     self._fix_notification_init()
     self.api_helper = api_helper.Api()

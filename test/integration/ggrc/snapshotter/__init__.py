@@ -32,7 +32,7 @@ class SnapshotterBaseTestCase(TestCase):
   # pylint: disable=invalid-name
 
   def setUp(self):
-    TestCase.setUp(self)
+    super(SnapshotterBaseTestCase, self).setUp()
     self.objgen = integration.ggrc.generator.ObjectGenerator()
     self.api = api_helper.Api()
 

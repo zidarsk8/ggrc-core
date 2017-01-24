@@ -286,7 +286,7 @@ class TestFilteringByRequest(TestCase):
   """Test filter query by request"""
 
   def setUp(self):
-    TestCase.setUp(self)
+    super(TestFilteringByRequest, self).setUp()
     self.object_generator = ObjectGenerator()
     self.api = Api()
     self.init_users()

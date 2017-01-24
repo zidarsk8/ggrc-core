@@ -40,7 +40,7 @@ class automapping_count_limit(object):
 class TestAutomappings(TestCase):
 
   def setUp(self):
-    TestCase.setUp(self)
+    super(TestAutomappings, self).setUp()
     self.gen = generator.ObjectGenerator()
     self.api = self.gen.api
 
