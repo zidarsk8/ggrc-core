@@ -599,13 +599,6 @@ event.listen(
     Session, 'after_flush_postexec', Slugged.ensure_slug_after_flush_postexec)
 
 
-class Mapping(Stateful, Base):
-  VALID_STATES = (
-      'Draft',
-      'Final',
-  )
-
-
 class WithContact(object):
 
   @declared_attr
@@ -707,7 +700,6 @@ __all__ = [
     "Hierarchical",
     "Hyperlinked",
     "Identifiable",
-    "Mapping",
     "Noted",
     "Notifiable",
     "Slugged",
