@@ -28,14 +28,8 @@ class Clause(HasObjectState, Hierarchical, Noted, Described, Hyperlinked,
 
   VALID_STATES = [
       'Draft',
-      'Final',
-      'Effective',
-      'Ineffective',
-      'Launched',
-      'Not Launched',
-      'In Scope',
-      'Not in Scope',
-      'Deprecated',
+      'Active',
+      'Deprecated'
   ]
   __tablename__ = 'clauses'
   _table_plural = 'clauses'

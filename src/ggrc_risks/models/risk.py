@@ -23,14 +23,8 @@ class Risk(HasObjectState, mixins.CustomAttributable, mixins.Stateful,
 
   VALID_STATES = [
       'Draft',
-      'Final',
-      'Effective',
-      'Ineffective',
-      'Launched',
-      'Not Launched',
-      'In Scope',
-      'Not in Scope',
       'Deprecated',
+      'Active'
   ]
 
   # Overriding mixin to make mandatory

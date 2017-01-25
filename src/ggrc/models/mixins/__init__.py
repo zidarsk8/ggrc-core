@@ -280,8 +280,8 @@ class Stateful(object):
 
   @declared_attr
   def status(cls):
-    return deferred(
-        db.Column(db.String, default=cls.default_status), cls.__name__)
+    return deferred(db.Column(
+        db.String, default=cls.default_status, nullable=False), cls.__name__)
 
   _publish_attrs = ['status']
   _aliases = {"status": "State"}
@@ -675,14 +675,8 @@ class BusinessObject(Stateful, Noted, Described, Hyperlinked, WithContact,
                      Titled, Slugged):
   VALID_STATES = (
       'Draft',
-      'Final',
-      'Effective',
-      'Ineffective',
-      'Launched',
-      'Not Launched',
-      'In Scope',
-      'Not in Scope',
-      'Deprecated',
+      'Active',
+      'Deprecated'
   )
 
 # This class is just a marker interface/mixin to indicate that a model type
