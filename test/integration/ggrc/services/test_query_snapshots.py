@@ -8,6 +8,9 @@
 from sqlalchemy import func
 from flask import json
 
+from ddt import ddt
+from ddt import data
+
 from ggrc import app
 from ggrc import views
 from ggrc import models
@@ -18,8 +21,32 @@ from integration.ggrc.models import factories
 
 
 # pylint: disable=super-on-old-class
+@ddt
 class TestAuditSnapshotQueries(TestCase):
   """Tests for /query api for Audit snapshots"""
+
+  # objects mapped to assessments after set up:
+  # Assessment 1 -- Market 1,
+  # Assessment 2 -- Market 2, Control 1,
+  # Assessment 3 -- Market 3, Control 1, Control 2
+  # Assessment 4 -- Market 4, Control 1, Control 2, Control 3
+
+  # Number of controls mapped to assessments
+  ASSESSMENT_COUNTS = {
+      "Assessment 1": 0,
+      "Assessment 2": 1,
+      "Assessment 3": 2,
+      "Assessment 4": 3,
+  }
+
+  # Number of assessments mapped to controls
+  CONTROL_COUNTS = {
+      "Control 1": 3,
+      "Control 2": 2,
+      "Control 3": 1,
+      "Control 4": 0,
+      "Control 5": 0,
+  }
 
   def setUp(self):
     """Log in before performing queries."""
@@ -93,16 +120,6 @@ class TestAuditSnapshotQueries(TestCase):
 
     # create Assessments and issues and map some snapshots to them
     # Markets and Controls represent snapshots of those objects.
-
-    # Assessment 1 -- Market 1,
-    # Assessment 2 -- Market 2, Control 1,
-    # Assessment 3 -- Market 3, Control 1, Control 2
-    # Assessment 4 -- Market 4, Control 1, Control 2, Control 3
-
-    # Issue 1 -- Market 1,
-    # Issue 2 -- Market 2, Control 1,
-    # Issue 3 -- Market 3, Control 1, Control 2
-    # Issue 4 -- Market 4, Control 1, Control 2, Control 3
 
     assessment_issues = (
         factories.AssessmentFactory,
@@ -236,90 +253,55 @@ class TestAuditSnapshotQueries(TestCase):
     ])
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 3)
 
-  def test_assesessment_relationships(self):
+  @data(*CONTROL_COUNTS.items())
+  def test_assesessment_relationships(self, data):
     """Test relationships between Assessments and original objects."""
-    control_id_map = {control.title: control.id
-                      for control in models.Control.query}
+    title, expected = data
+    control = models.Control.query.filter_by(title=title).first()
 
-    # assessment 1 --
-    # assessment 2 -- control 1,
-    # assessment 3 -- control 1, control 2
-    # assessment 4 -- control 1, control 2, control 3
-    expected_counts = {
-        "Control 1": 3,
-        "Control 2": 2,
-        "Control 3": 1,
-        "Control 4": 0,
-        "Control 5": 0,
-    }
+    result = self._post([
+        {
+            "object_name": "Assessment",
+            "filters": {
+                "expression": {
+                    "object_name": "Control",
+                    "op": {"name": "relevant"},
+                    "ids": [control.id]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    count = len(result.json[0]["Assessment"]["values"])
+    self.assertEqual(count, expected,
+                     "Invalid related Assessment count for '{}'."
+                     "Expected {}, got {}".format(title, expected, count))
 
-    for title, count in expected_counts.items():
-      result = self._post([
-          {
-              "object_name": "Assessment",
-              "filters": {
-                  "expression": {
-                      "object_name": "Control",
-                      "op": {"name": "relevant"},
-                      "ids": [control_id_map[title]]
-                  },
-                  "keys": [],
-                  "order_by": {"keys": [], "order": "", "compare": None}
-              }
-          }
-      ])
-      self.assertEqual(
-          len(result.json[0]["Assessment"]["values"]),
-          count,
-          "Invalid related Assessment count for '{}'."
-          "Expected {}, got {}".format(
-              title,
-              count,
-              len(result.json[0]["Assessment"]["values"]),
-          )
-      )
-
-  def test_original_objects(self):
+  @data(*ASSESSMENT_COUNTS.items())
+  def test_original_objects(self, data):
     """Test relationships between original objects and Assessments."""
-    assessment_id_map = {assessment.title: assessment.id
-                      for assessment in models.Assessment.query}
+    title, expected = data
+    assessment = models.Assessment.query.filter_by(title=title).first()
 
-    # assessment 1 --
-    # assessment 2 -- control 1,
-    # assessment 3 -- control 1, control 2
-    # assessment 4 -- control 1, control 2, control 3
-    expected_counts = {
-        "Assessment 1": 0,
-        "Assessment 2": 1,
-        "Assessment 3": 2,
-        "Assessment 4": 3,
-    }
-
-    for title, count in expected_counts.items():
-      result = self._post([
-          {
-              "object_name": "Control",
-              "filters": {
-                  "expression": {
-                      "object_name": "Assessment",
-                      "op": {"name": "relevant"},
-                      "ids": [assessment_id_map[title]]
-                  },
-                  "keys": [],
-                  "order_by": {"keys": [], "order": "", "compare": None}
-              }
-          }
-      ])
-      self.assertEqual(
-          len(result.json[0]["Control"]["values"]),
-          count,
-          "Invalid related Control count for '{}'."
-          "Expected {}, got {}".format(
-              title,
-              count,
-              len(result.json[0]["Control"]["values"]),
-          )
-      )
+    result = self._post([
+        {
+            "object_name": "Control",
+            "filters": {
+                "expression": {
+                    "object_name": "Assessment",
+                    "op": {"name": "relevant"},
+                    "ids": [assessment.id]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    count = len(result.json[0]["Control"]["values"])
+    self.assertEqual(count, expected,
+                     "Invalid related Control count for '{}'."
+                     "Expected {}, got {}".format(title, expected, count))
 
   @staticmethod
   def _get_model_expression(model_name="Market"):
