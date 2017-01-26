@@ -23,7 +23,7 @@ class TestCase(ggrc.TestCase):
     data = {"file": (open(join(cls.CSV_DIR, filename)), filename)}
     headers = {
         "X-test-only": "true" if dry_run else "false",
-        "X-requested-by": "gGRC",
+        "X-requested-by": "GGRC",
     }
     if hasattr(g, "cache"):
       delattr(g, "cache")
@@ -45,7 +45,7 @@ class TestCase(ggrc.TestCase):
   def export_csv(self, data):
     headers = {
         'Content-Type': 'application/json',
-        "X-requested-by": "gGRC",
+        "X-requested-by": "GGRC",
         "X-export-view": "blocks",
     }
     return self.client.post("/_service/export_csv", data=json.dumps(data),

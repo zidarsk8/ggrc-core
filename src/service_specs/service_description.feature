@@ -2,10 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 Feature: Rather than have clients keep a list of the endpoint URLs for
-  gGRC-Core services, a service description document will be provided that
+  GGRC-Core services, a service description document will be provided that
   lists the endpoints by name.
 
-  Scenario: GET the service description for gGRC-CORE
+  Scenario: GET the service description for GGRC-CORE
     Given nothing new
     When GET of "/api" as "service_description"
     Then all expected endpoints are listed and GETtable in "service_description"
