@@ -4,7 +4,7 @@
 }}
 
 {{#widget_list}}
-  <li>
+  <li class="{{internav_icon}}">
     {{#if_helpers '\
       #if' has_count '\
       and #if' count '\
@@ -110,3 +110,9 @@
 {{/is_allowed}}
 
 {{{render_hooks 'ObjectNav.Actions'}}}
+
+{{#if_page_type 'audits'}}
+  <li class="menu-action">
+    <input type="button" class="btn btn-small hide-menu" value="Hide">
+  </li>
+{{/if_page_type}}
