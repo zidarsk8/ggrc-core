@@ -3,6 +3,8 @@
 
 from sqlalchemy import and_
 from sqlalchemy import sql
+from sqlalchemy import union
+from sqlalchemy.orm import aliased
 
 from ggrc import db
 from ggrc.extensions import get_extension_modules
@@ -10,8 +12,9 @@ from ggrc import models
 from ggrc.models import Audit
 from ggrc.models import Request
 from ggrc.models import Snapshot
-from ggrc.models.relationship import Relationship
 from ggrc.models import all_models
+from ggrc.models.relationship import Relationship
+from ggrc.snapshotter import rules
 
 
 class RelationshipHelper(object):
@@ -179,6 +182,58 @@ class RelationshipHelper(object):
     return query.union(*clean_queries)
 
   @classmethod
+  def _assessment_object_mappings(cls, object_type, related_type, related_ids):
+    """Get Object ids for audit scope objects and snapshotted objects."""
+
+    q1 = db.session.query(
+        Relationship.destination_id.label("snap_id"),
+        Relationship.destination_type.label("snap_type"),
+        Snapshot.child_id.label("scope_id"),
+        Snapshot.child_type.label("scope_type"),
+    ).join(
+        Snapshot,
+        and_(
+            Relationship.source_id == Snapshot.id,
+            Relationship.source_type == Snapshot.__name__,
+        )
+    )
+
+    q2 = db.session.query(
+        Relationship.source_id.label("snap_id"),
+        Relationship.source_type.label("snap_type"),
+        Snapshot.child_id.label("scope_id"),
+        Snapshot.child_type.label("scope_type"),
+    ).join(
+        Snapshot,
+        and_(
+            Relationship.destination_id == Snapshot.id,
+            Relationship.destination_type == Snapshot.__name__,
+        )
+    )
+
+    query = aliased(union(q1, q2))
+
+    if object_type in rules.Types.scoped and related_type in rules.Types.all:
+      id_query = db.session.query(query.c.snap_id).filter(
+          query.c.snap_type == object_type,
+          query.c.scope_type == related_type,
+          query.c.scope_id.in_(related_ids),
+      )
+    elif object_type in rules.Types.all and related_type in rules.Types.scoped:
+      id_query = db.session.query(query.c.scope_id).filter(
+          query.c.snap_type == related_type,
+          query.c.snap_id.in_(related_ids),
+          query.c.scope_type == object_type,
+      )
+    else:
+      raise Exception(
+          "Snapshot relationship called with invalid types.\n"
+          "object types: '{}' - '{}'".format(object_type, related_type)
+      )
+
+    return id_query
+
+  @classmethod
   def get_ids_related_to(cls, object_type, related_type, related_ids=[]):
     """ get ids of objects
 
@@ -188,6 +243,11 @@ class RelationshipHelper(object):
 
     if isinstance(related_ids, (int, long)):
       related_ids = [related_ids]
+
+    if (object_type == "Assessment" and related_type in rules.Types.all or
+            related_type == "Assessment" and object_type in rules.Types.all):
+      return cls._assessment_object_mappings(
+          object_type, related_type, related_ids)
 
     if not related_ids:
       return db.session.query(Relationship.source_id).filter(sql.false())
