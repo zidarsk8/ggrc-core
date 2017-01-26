@@ -20,7 +20,7 @@ class TestCreatorProgram(TestCase):
   """Set up necessary objects and test Creator role with Program roles"""
 
   def setUp(self):
-    TestCase.setUp(self)
+    super(TestCreatorProgram, self).setUp()
     self.generator = Generator()
     self.api = Api()
     self.object_generator = ObjectGenerator()
