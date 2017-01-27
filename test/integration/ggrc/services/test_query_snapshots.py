@@ -41,11 +41,18 @@ class TestAuditSnapshotQueries(TestCase):
 
   # Number of assessments mapped to controls
   CONTROL_COUNTS = {
+      "Control 0": 0,  # unmapped control
       "Control 1": 3,
       "Control 2": 2,
       "Control 3": 1,
       "Control 4": 0,
       "Control 5": 0,
+  }
+
+  AUDIT_COUNTS = {
+      "Control 0": 0,  # unmapped control
+      "Control 1": 1,
+      "Control 2": 1,
   }
 
   def setUp(self):
@@ -146,6 +153,9 @@ class TestAuditSnapshotQueries(TestCase):
               source=control if i % 2 == 0 else obj,
               destination=control if i % 2 == 1 else obj,
           )
+
+    # Create an unmapped control for base tests
+    factories.ControlFactory(title="Control 0")
 
     views.do_reindex()
 
@@ -303,7 +313,7 @@ class TestAuditSnapshotQueries(TestCase):
                      "Invalid related Control count for '{}'."
                      "Expected {}, got {}".format(title, expected, count))
 
-  def test_audit_relationships(self):
+  def test_audit_parent_relationships(self):
     audit = models.Audit.query.first()
     result = self._post([
         {
@@ -324,6 +334,30 @@ class TestAuditSnapshotQueries(TestCase):
     self.assertEqual(count, expected,
                      "Invalid related Control count for Audit."
                      "Expected {}, got {}".format(expected, count))
+
+  @data(*AUDIT_COUNTS.items())
+  def test_audit_child_relationships(self, data):
+    title, expected = data
+    control = models.Control.query.filter_by(title=title).first()
+
+    result = self._post([
+        {
+            "object_name": "Audit",
+            "filters": {
+                "expression": {
+                    "object_name": "Control",
+                    "op": {"name": "relevant"},
+                    "ids": [control.id]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    count = len(result.json[0]["Audit"]["values"])
+    self.assertEqual(count, expected,
+                     "Invalid related Audit count for '{}'."
+                     "Expected {}, got {}".format(title, expected, count))
 
   @staticmethod
   def _get_model_expression(model_name="Market"):
